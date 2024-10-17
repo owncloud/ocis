@@ -288,3 +288,125 @@ Feature: an user shares resources usin ScienceMesh application
       | Space Viewer     |
       | Space Editor     |
       | Manager          |
+
+  @issue-9908
+  Scenario: sharer lists the shares shared to a federated user
+    Given using server "LOCAL"
+    And user "Alice" has uploaded file with content "ocm test" to "/textfile.txt"
+    And "Alice" has created the federation share invitation
+    And using server "REMOTE"
+    And "Brian" has accepted invitation
+    And using server "LOCAL"
+    And user "Alice" has sent the following resource share invitation to federated user:
+      | resource        | textfile.txt                  |
+      | space           | Personal                      |
+      | sharee          | Brian                         |
+      | shareType       | user                          |
+      | permissionsRole | Viewer                        |
+      | federatedServer | @federation-ocis-server:10200 |
+    When user "Alice" lists the shares shared by her using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should contain resource "textfile.txt" with the following data:
+      """
+      {
+        "type": "object",
+        "required": [
+          "parentReference",
+          "permissions",
+          "name",
+          "size"
+        ],
+        "properties": {
+          "parentReference": {
+            "type": "object",
+            "required": [
+              "driveId",
+              "driveType",
+              "path",
+              "name",
+              "id"
+            ],
+            "properties": {
+              "driveId": {
+                "type": "string",
+                "pattern": "^%space_id_pattern%$"
+              },
+              "driveType": {
+                "const": "personal"
+              },
+              "path": {
+                "const": "/"
+              },
+              "name": {
+                "const": "/"
+              },
+              "id": {
+                "type": "string",
+                "pattern": "^%file_id_pattern%$"
+              }
+            }
+          },
+          "permissions": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "grantedToV2",
+                "id",
+                "roles"
+              ],
+              "properties": {
+                "grantedToV2": {
+                  "type": "object",
+                  "required": [
+                    "user"
+                  ],
+                  "properties": {
+                    "user": {
+                      "type": "object",
+                      "required": [
+                        "displayName",
+                        "id"
+                      ],
+                      "properties": {
+                        "@libre.graph.userType": {
+                          "const": "Federated"
+                        },
+                        "id": {
+                          "type": "string",
+                          "pattern": "^%federated_user_id_pattern%$"
+                        },
+                        "displayName": {
+                          "const": "Brian Murphy"
+                        }
+                      }
+                    }
+                  }
+                },
+                "id": {
+                  "type": "string",
+                  "pattern": "^%user_id_pattern%$"
+                },
+                "roles": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 1,
+                  "items": {
+                    "type": "string",
+                    "pattern": "^%role_id_pattern%$"
+                  }
+                }
+              }
+            }
+          },
+          "name": {
+            "const": "textfile.txt"
+          },
+          "size": {
+            "const": 8
+          }
+        }
+      }
+      """
