@@ -188,7 +188,7 @@ func (s *Service) getAppUrl(fileExt string, viewMode appproviderv1beta1.ViewMode
 	// prioritize view action if possible
 	appURL := s.getAppUrlFor("view", fileExt)
 
-	if strings.ToLower(s.config.App.Name) == "collabora" {
+	if strings.ToLower(s.config.App.Provider) == "collabora" {
 		// collabora provides only one action per extension. usual options
 		// are "view" (checked above), "edit" or "view_comment" (this last one
 		// is exclusive of collabora)
@@ -276,7 +276,7 @@ func (s *Service) addQueryToURL(baseURL string, req *appproviderv1beta1.OpenInAp
 	}
 
 	if lang != "" {
-		switch strings.ToLower(s.config.App.Name) {
+		switch strings.ToLower(s.config.App.Provider) {
 		case "collabora":
 			q.Add("lang", lang)
 		case "onlyoffice":
