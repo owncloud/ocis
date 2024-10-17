@@ -731,7 +731,7 @@ class WebDavHelper {
 			if (\str_starts_with($path, "Shares/")) {
 				$spaceId = self::getSharesSpaceIdForUser(
 					$baseUrl,
-					$doDavRequestAsUser ?? $user,
+					$user,
 					$password,
 					$xRequestId
 				);
@@ -739,7 +739,7 @@ class WebDavHelper {
 			} else {
 				$spaceId = self::getPersonalSpaceIdForUserOrFakeIfNotFound(
 					$baseUrl,
-					$doDavRequestAsUser ?? $user,
+					$user,
 					$password,
 					$xRequestId
 				);
