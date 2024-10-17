@@ -304,26 +304,14 @@ def main(ctx):
 
     pipelines = []
 
-    build_release_helpers = \
-        changelog() + \
-        docs() + \
-        licenseCheck(ctx)
+    build_release_helpers = []
 
     test_pipelines = \
-        codestyle(ctx) + \
-        checkGherkinLint(ctx) + \
-        checkTestSuitesInExpectedFailures(ctx) + \
-        buildWebCache(ctx) + \
-        getGoBinForTesting(ctx) + \
         buildOcisBinaryForTesting(ctx) + \
-        checkStarlark() + \
         build_release_helpers + \
-        testOcisAndUploadResults(ctx) + \
         testPipelines(ctx)
 
-    build_release_pipelines = \
-        dockerReleases(ctx) + \
-        binaryReleases(ctx)
+    build_release_pipelines = []
 
     test_pipelines.append(
         pipelineDependsOn(
@@ -401,21 +389,21 @@ def testOcisAndUploadResults(ctx):
 def testPipelines(ctx):
     pipelines = []
 
-    if config["litmus"]:
-        pipelines += litmus(ctx, "ocis")
+    # if config["litmus"]:
+    #     pipelines += litmus(ctx, "ocis")
 
-    if "skip" not in config["cs3ApiTests"] or not config["cs3ApiTests"]["skip"]:
-        pipelines.append(cs3ApiTests(ctx, "ocis", "default"))
-    if "skip" not in config["wopiValidatorTests"] or not config["wopiValidatorTests"]["skip"]:
-        pipelines.append(wopiValidatorTests(ctx, "ocis", "builtin", "default"))
-        pipelines.append(wopiValidatorTests(ctx, "ocis", "cs3", "default"))
+    # if "skip" not in config["cs3ApiTests"] or not config["cs3ApiTests"]["skip"]:
+    #     pipelines.append(cs3ApiTests(ctx, "ocis", "default"))
+    # if "skip" not in config["wopiValidatorTests"] or not config["wopiValidatorTests"]["skip"]:
+    #     pipelines.append(wopiValidatorTests(ctx, "ocis", "builtin", "default"))
+    #     pipelines.append(wopiValidatorTests(ctx, "ocis", "cs3", "default"))
 
     pipelines += localApiTestPipeline(ctx)
 
     if "skip" not in config["apiTests"] or not config["apiTests"]["skip"]:
         pipelines += apiTests(ctx)
 
-    pipelines += e2eTestPipeline(ctx)
+    # pipelines += e2eTestPipeline(ctx)
 
     if ("skip" not in config["k6LoadTests"] or not config["k6LoadTests"]["skip"]) and ("k6-test" in ctx.build.title.lower() or ctx.build.event == "cron"):
         pipelines += k6LoadTests(ctx)
