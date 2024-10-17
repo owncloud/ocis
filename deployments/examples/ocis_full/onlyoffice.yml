@@ -48,7 +48,7 @@ services:
     restart: always
 
   onlyoffice:
-    image: onlyoffice/4testing-documentserver:8.2.0.108 # use the beta image for early integration testing
+    image: onlyoffice/documentserver:8.2.0
     networks:
       ocis-net:
     entrypoint:
