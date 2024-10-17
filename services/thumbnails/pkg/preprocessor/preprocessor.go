@@ -12,7 +12,6 @@ import (
 	"mime"
 	"strings"
 
-	"github.com/kovidgoyal/imaging"
 	"github.com/pkg/errors"
 	"golang.org/x/image/font"
 	"golang.org/x/image/font/opentype"
@@ -60,8 +59,11 @@ func (g GgsDecoder) Convert(r io.Reader) (interface{}, error) {
 			if err != nil {
 				return nil, err
 			}
-
-			img, err := imaging.Decode(thumbnail, imaging.AutoOrientation(true))
+			converter := ForType("image/png", nil)
+			if converter == nil {
+				return nil, thumbnailerErrors.ErrNoConverterForExtractedImageFromGgsFile
+			}
+			img, err := converter.Convert(thumbnail)
 			if err != nil {
 				return nil, errors.Wrap(err, `could not decode the image`)
 			}

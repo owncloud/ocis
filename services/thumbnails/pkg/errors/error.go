@@ -11,6 +11,8 @@ var (
 	ErrNoEncoderForType = errors.New("thumbnails: no encoder for this type found")
 	// ErrNoImageFromAudioFile defines an error when an image cannot be extracted from an audio file
 	ErrNoImageFromAudioFile = errors.New("thumbnails: could not extract image from audio file")
+	// ErrNoConverterForExtractedImageFromGgsFile defines an error when the extracted image from an ggs file could not be converted
+	ErrNoConverterForExtractedImageFromGgsFile = errors.New("thumbnails: could not find converter for image extracted from ggs file")
 	// ErrNoConverterForExtractedImageFromAudioFile defines an error when the extracted image from an audio file could not be converted
 	ErrNoConverterForExtractedImageFromAudioFile = errors.New("thumbnails: could not find converter for image extracted from audio file")
 	// ErrCS3AuthorizationMissing defines an error when the CS3 authorization is missing
