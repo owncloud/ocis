@@ -17,19 +17,18 @@ import (
 )
 
 func TestCheckHandlerConfiguration(t *testing.T) {
-	nopCheck := func(_ context.Context) error { return nil }
+	nopCheckCounter := 0
+	nopCheck := func(_ context.Context) error { nopCheckCounter++; return nil }
 	handlerConfiguration := handlers.NewCheckHandlerConfiguration().WithCheck("check-1", nopCheck)
 
 	t.Run("add check", func(t *testing.T) {
-		inheritedHandlerConfiguration := handlerConfiguration.WithCheck("check-2", nopCheck)
-		require.Equal(t, 1, len(handlers.NewCheckHandler(handlerConfiguration).Checks()))
-		require.Equal(t, 2, len(handlers.NewCheckHandler(inheritedHandlerConfiguration).Checks()))
-	})
+		localCounter := 0
+		handlers.NewCheckHandler(handlerConfiguration).ServeHTTP(httptest.NewRecorder(), httptest.NewRequest("GET", "/", nil))
+		require.Equal(t, 1, nopCheckCounter)
 
-	t.Run("add checks", func(t *testing.T) {
-		inheritedHandlerConfiguration := handlerConfiguration.WithChecks(map[string]func(ctx context.Context) error{"check-2": nopCheck, "check-3": nopCheck})
-		require.Equal(t, 1, len(handlers.NewCheckHandler(handlerConfiguration).Checks()))
-		require.Equal(t, 3, len(handlers.NewCheckHandler(inheritedHandlerConfiguration).Checks()))
+		handlers.NewCheckHandler(handlerConfiguration.WithCheck("check-2", func(_ context.Context) error { localCounter++; return nil })).ServeHTTP(httptest.NewRecorder(), httptest.NewRequest("GET", "/", nil))
+		require.Equal(t, 2, nopCheckCounter)
+		require.Equal(t, 1, localCounter)
 	})
 
 	t.Run("checks are unique", func(t *testing.T) {
@@ -40,6 +39,7 @@ func TestCheckHandlerConfiguration(t *testing.T) {
 		}()
 
 		handlerConfiguration.WithCheck("check-1", nopCheck)
+		require.Equal(t, 3, nopCheckCounter)
 	})
 }
 

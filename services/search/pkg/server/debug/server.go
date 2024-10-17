@@ -14,24 +14,18 @@ import (
 func Server(opts ...Option) (*http.Server, error) {
 	options := newOptions(opts...)
 
-	checkHandler := handlers.NewCheckHandler(
-		handlers.NewCheckHandlerConfiguration().
-			WithLogger(options.Logger).
-			WithCheck("grpc reachability", checks.NewGRPCCheck(options.Config.GRPC.Addr)),
-	)
+	healthHandlerConfiguration := handlers.NewCheckHandlerConfiguration().
+		WithLogger(options.Logger).
+		WithCheck("grpc reachability", checks.NewGRPCCheck(options.Config.GRPC.Addr))
 
-	readyHandler := handlers.NewCheckHandler(
-		handlers.NewCheckHandlerConfiguration().
-			WithLogger(options.Logger).
-			WithCheck("nats reachability", checks.NewNatsCheck(options.Config.Events.Cluster)).
-			WithCheck("tika-check", func(ctx context.Context) error {
-				if options.Config.Extractor.Type == "tika" {
-					return checks.NewTCPCheck(options.Config.Extractor.Tika.TikaURL)(ctx)
-				}
-				return nil
-			}).
-			WithChecks(checkHandler.Checks()),
-	)
+	readyHandlerConfiguration := healthHandlerConfiguration.
+		WithCheck("nats reachability", checks.NewNatsCheck(options.Config.Events.Cluster)).
+		WithCheck("tika-check", func(ctx context.Context) error {
+			if options.Config.Extractor.Type == "tika" {
+				return checks.NewTCPCheck(options.Config.Extractor.Tika.TikaURL)(ctx)
+			}
+			return nil
+		})
 
 	return debug.NewService(
 		debug.Logger(options.Logger),
@@ -41,7 +35,7 @@ func Server(opts ...Option) (*http.Server, error) {
 		debug.Token(options.Config.Debug.Token),
 		debug.Pprof(options.Config.Debug.Pprof),
 		debug.Zpages(options.Config.Debug.Zpages),
-		debug.Health(checkHandler),
-		debug.Ready(readyHandler),
+		debug.Health(handlers.NewCheckHandler(healthHandlerConfiguration)),
+		debug.Ready(handlers.NewCheckHandler(readyHandlerConfiguration)),
 	), nil
 }

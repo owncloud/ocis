@@ -15,12 +15,9 @@ import (
 // check is a function that performs a check.
 type checker func(ctx context.Context) error
 
-// checks is a map of check names to check functions.
-type checkers map[string]func(ctx context.Context) error
-
 // CheckHandlerConfiguration defines the configuration for the CheckHandler.
 type CheckHandlerConfiguration struct {
-	checks        checkers
+	checks        map[string]checker
 	logger        log.Logger
 	limit         int
 	statusFailed  int
@@ -30,7 +27,7 @@ type CheckHandlerConfiguration struct {
 // NewCheckHandlerConfiguration initializes a new CheckHandlerConfiguration.
 func NewCheckHandlerConfiguration() CheckHandlerConfiguration {
 	return CheckHandlerConfiguration{
-		checks: make(checkers),
+		checks: make(map[string]checker),
 
 		limit:         -1,
 		statusFailed:  http.StatusInternalServerError,
@@ -52,15 +49,6 @@ func (c CheckHandlerConfiguration) WithCheck(name string, check checker) CheckHa
 
 	c.checks = maps.Clone(c.checks) // prevent propagated check duplication, maps are references;
 	c.checks[name] = check
-
-	return c
-}
-
-// WithChecks adds multiple checks to the CheckHandlerConfiguration.
-func (c CheckHandlerConfiguration) WithChecks(checks checkers) CheckHandlerConfiguration {
-	for name, check := range checks {
-		c.checks = c.WithCheck(name, check).checks
-	}
 
 	return c
 }
@@ -94,10 +82,6 @@ func NewCheckHandler(c CheckHandlerConfiguration) *CheckHandler {
 	return &CheckHandler{
 		conf: c,
 	}
-}
-
-func (h *CheckHandler) Checks() map[string]func(ctx context.Context) error {
-	return maps.Clone(h.conf.checks)
 }
 
 func (h *CheckHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
