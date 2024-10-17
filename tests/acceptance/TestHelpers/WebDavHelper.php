@@ -805,7 +805,7 @@ class WebDavHelper {
 			$fullUrl,
 			$xRequestId,
 			$method,
-			$user,
+			$doDavRequestAsUser ?? $user,
 			$password,
 			$headers,
 			$body,
