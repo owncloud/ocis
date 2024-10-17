@@ -14,6 +14,7 @@ import (
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
+	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/wopisrc"
 
@@ -102,7 +103,12 @@ func (s *Service) OpenInApp(
 	appURL, err = s.addQueryToURL(appURL, req)
 	if err != nil {
 		logger.Error().Err(err).Msg("OpenInApp: error parsing appUrl")
-		return nil, err
+		return &appproviderv1beta1.OpenInAppResponse{
+			Status: &rpcv1beta1.Status{
+				Code:    rpcv1beta1.Code_CODE_INVALID_ARGUMENT,
+				Message: "OpenInApp: error parsing appUrl",
+			},
+		}, nil
 	}
 
 	// create the wopiContext and generate the token
@@ -111,6 +117,25 @@ func (s *Service) OpenInApp(
 		ViewOnlyToken: utils.ReadPlainFromOpaque(req.GetOpaque(), "viewOnlyToken"),
 		FileReference: &providerFileRef,
 		ViewMode:      req.GetViewMode(),
+	}
+
+	if templateID := utils.ReadPlainFromOpaque(req.GetOpaque(), "template"); templateID != "" {
+		// we can ignore the error here, as we are sure that the templateID is not empty
+		templateRes, _ := storagespace.ParseID(templateID)
+		// we need to have at least both opaqueID and spaceID set
+		if templateRes.GetOpaqueId() == "" || templateRes.GetSpaceId() == "" {
+			logger.Error().Err(err).Msg("OpenInApp: error parsing templateID")
+			return &appproviderv1beta1.OpenInAppResponse{
+				Status: &rpcv1beta1.Status{
+					Code:    rpcv1beta1.Code_CODE_INVALID_ARGUMENT,
+					Message: "OpenInApp: error parsing templateID",
+				},
+			}, nil
+		}
+		wopiContext.TemplateReference = &providerv1beta1.Reference{
+			ResourceId: &templateRes,
+			Path:       ".",
+		}
 	}
 
 	accessToken, accessExpiration, err := middleware.GenerateWopiToken(wopiContext, s.config)
