@@ -14,18 +14,10 @@ import (
 func Server(opts ...Option) (*http.Server, error) {
 	options := newOptions(opts...)
 
-	checkHandler := handlers.NewCheckHandler(
-		handlers.NewCheckHandlerConfiguration().
-			WithLogger(options.Logger),
-	)
-
-	readyHandler := handlers.NewCheckHandler(
-		handlers.NewCheckHandlerConfiguration().
-			WithLogger(options.Logger).
-			WithCheck("nats reachability", checks.NewNatsCheck(options.Config.Notifications.Events.Cluster)).
-			WithCheck("smtp-check", checks.NewTCPCheck(options.Config.Notifications.SMTP.Host+":"+strconv.Itoa(options.Config.Notifications.SMTP.Port))).
-			WithChecks(checkHandler.Checks()),
-	)
+	readyHandlerConfiguration := handlers.NewCheckHandlerConfiguration().
+		WithLogger(options.Logger).
+		WithCheck("nats reachability", checks.NewNatsCheck(options.Config.Notifications.Events.Cluster)).
+		WithCheck("smtp-check", checks.NewTCPCheck(options.Config.Notifications.SMTP.Host+":"+strconv.Itoa(options.Config.Notifications.SMTP.Port)))
 
 	return debug.NewService(
 		debug.Logger(options.Logger),
@@ -35,7 +27,6 @@ func Server(opts ...Option) (*http.Server, error) {
 		debug.Token(options.Config.Debug.Token),
 		debug.Pprof(options.Config.Debug.Pprof),
 		debug.Zpages(options.Config.Debug.Zpages),
-		debug.Health(checkHandler),
-		debug.Ready(readyHandler),
+		debug.Ready(handlers.NewCheckHandler(readyHandlerConfiguration)),
 	), nil
 }

@@ -17,27 +17,21 @@ import (
 func Server(opts ...Option) (*http.Server, error) {
 	options := newOptions(opts...)
 
-	healthHandler := handlers.NewCheckHandler(
-		handlers.NewCheckHandlerConfiguration().
-			WithLogger(options.Logger),
-	)
-
-	readyHandler := handlers.NewCheckHandler(
-		handlers.NewCheckHandlerConfiguration().
-			WithLogger(options.Logger).
-			WithCheck("nats reachability", checks.NewNatsCheck(options.Config.Events.Cluster)).
-			WithCheck("antivirus reachability", func(ctx context.Context) error {
-				cfg := options.Config
-				switch cfg.Scanner.Type {
-				default:
-					return errors.New("no antivirus configured")
-				case "clamav":
-					return clamd.NewClamd(cfg.Scanner.ClamAV.Socket).Ping()
-				case "icap":
-					return checks.NewTCPCheck(cfg.Scanner.ICAP.URL)(ctx)
-				}
-			}),
-	)
+	readyHandlerConfiguration := handlers.NewCheckHandlerConfiguration().
+		WithLogger(options.Logger).
+		WithLogger(options.Logger).
+		WithCheck("nats reachability", checks.NewNatsCheck(options.Config.Events.Cluster)).
+		WithCheck("antivirus reachability", func(ctx context.Context) error {
+			cfg := options.Config
+			switch cfg.Scanner.Type {
+			default:
+				return errors.New("no antivirus configured")
+			case "clamav":
+				return clamd.NewClamd(cfg.Scanner.ClamAV.Socket).Ping()
+			case "icap":
+				return checks.NewTCPCheck(cfg.Scanner.ICAP.URL)(ctx)
+			}
+		})
 
 	return debug.NewService(
 		debug.Logger(options.Logger),
@@ -47,7 +41,6 @@ func Server(opts ...Option) (*http.Server, error) {
 		debug.Token(options.Config.Debug.Token),
 		debug.Pprof(options.Config.Debug.Pprof),
 		debug.Zpages(options.Config.Debug.Zpages),
-		debug.Health(healthHandler),
-		debug.Ready(readyHandler),
+		debug.Ready(handlers.NewCheckHandler(readyHandlerConfiguration)),
 	), nil
 }

@@ -12,9 +12,25 @@ import (
 	"go.opentelemetry.io/contrib/zpages"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/cors"
+	"github.com/owncloud/ocis/v2/ocis-pkg/handlers"
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	graphMiddleware "github.com/owncloud/ocis/v2/services/graph/pkg/middleware"
 )
+
+var handleProbe = func(mux *http.ServeMux, pattern string, h http.Handler, name string, logger log.Logger) {
+	if h == nil {
+		h = handlers.NewCheckHandler(handlers.NewCheckHandlerConfiguration())
+		logger.Info().
+			Str("service", name).
+			Str("endpoint", pattern).
+			Msg("no probe provided, reverting to default (OK)")
+	}
+
+	mux.Handle(pattern, h)
+}
+
+//var probeHandler = func(w http.ResponseWriter, r *http.Request) { w.WriteHeader(http.StatusOK) }
 
 // NewService initializes a new debug service.
 func NewService(opts ...Option) *http.Server {
@@ -29,13 +45,8 @@ func NewService(opts ...Option) *http.Server {
 		promhttp.Handler(),
 	))
 
-	if dopts.Health != nil {
-		mux.Handle("/healthz", dopts.Health)
-	}
-
-	if dopts.Ready != nil {
-		mux.Handle("/readyz", dopts.Ready)
-	}
+	handleProbe(mux, "/healthz", dopts.Health, dopts.Name, dopts.Logger) // healthiness check
+	handleProbe(mux, "/readyz", dopts.Ready, dopts.Name, dopts.Logger)   // readiness check
 
 	if dopts.ConfigDump != nil {
 		mux.Handle("/config", dopts.ConfigDump)

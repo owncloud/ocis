@@ -3,7 +3,6 @@ package debug
 import (
 	"net/http"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/handlers"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/debug"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 )
@@ -11,11 +10,6 @@ import (
 // Server initializes the debug service and server.
 func Server(opts ...Option) (*http.Server, error) {
 	options := newOptions(opts...)
-
-	checkHandler := handlers.NewCheckHandler(
-		handlers.NewCheckHandlerConfiguration().
-			WithLogger(options.Logger),
-	)
 
 	return debug.NewService(
 		debug.Logger(options.Logger),
@@ -25,7 +19,5 @@ func Server(opts ...Option) (*http.Server, error) {
 		debug.Token(options.Config.Debug.Token),
 		debug.Pprof(options.Config.Debug.Pprof),
 		debug.Zpages(options.Config.Debug.Zpages),
-		debug.Health(checkHandler),
-		debug.Ready(checkHandler),
 	), nil
 }

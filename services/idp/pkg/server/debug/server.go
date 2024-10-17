@@ -13,18 +13,12 @@ import (
 func Server(opts ...Option) (*http.Server, error) {
 	options := newOptions(opts...)
 
-	healthHandler := handlers.NewCheckHandler(
-		handlers.NewCheckHandlerConfiguration().
-			WithLogger(options.Logger).
-			WithCheck("http reachability", checks.NewHTTPCheck(options.Config.HTTP.Addr)),
-	)
+	healthHandlerConfiguration := handlers.NewCheckHandlerConfiguration().
+		WithLogger(options.Logger).
+		WithCheck("http reachability", checks.NewHTTPCheck(options.Config.HTTP.Addr))
 
-	readinessHandler := handlers.NewCheckHandler(
-		handlers.NewCheckHandlerConfiguration().
-			WithLogger(options.Logger).
-			WithCheck("ldap-check", checks.NewTCPCheck(options.Config.Ldap.URI)).
-			WithChecks(healthHandler.Checks()),
-	)
+	readyHandlerConfiguration := healthHandlerConfiguration.
+		WithCheck("ldap-check", checks.NewTCPCheck(options.Config.Ldap.URI))
 
 	return debug.NewService(
 		debug.Logger(options.Logger),
@@ -34,7 +28,7 @@ func Server(opts ...Option) (*http.Server, error) {
 		debug.Token(options.Config.Debug.Token),
 		debug.Pprof(options.Config.Debug.Pprof),
 		debug.Zpages(options.Config.Debug.Zpages),
-		debug.Health(healthHandler),
-		debug.Ready(readinessHandler),
+		debug.Health(handlers.NewCheckHandler(healthHandlerConfiguration)),
+		debug.Ready(handlers.NewCheckHandler(readyHandlerConfiguration)),
 	), nil
 }
