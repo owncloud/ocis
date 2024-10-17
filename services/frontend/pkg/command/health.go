@@ -1,14 +1,16 @@
 package command
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
+
+	"github.com/urfave/cli/v2"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	"github.com/owncloud/ocis/v2/services/frontend/pkg/config"
 	"github.com/owncloud/ocis/v2/services/frontend/pkg/config/parser"
 	"github.com/owncloud/ocis/v2/services/frontend/pkg/logging"
-	"github.com/urfave/cli/v2"
 )
 
 // Health is the entrypoint for the health command.
@@ -29,6 +31,10 @@ func Health(cfg *config.Config) *cli.Command {
 					cfg.Debug.Addr,
 				),
 			)
+
+			if resp.StatusCode != http.StatusOK {
+				err = errors.New("foo")
+			}
 
 			if err != nil {
 				logger.Fatal().

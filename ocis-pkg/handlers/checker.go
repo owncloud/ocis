@@ -13,12 +13,14 @@ import (
 )
 
 // check is a function that performs a check.
-type check func(ctx context.Context) error
+type checker func(ctx context.Context) error
+
+// checks is a map of check names to check functions.
+type checkers map[string]func(ctx context.Context) error
 
 // CheckHandlerConfiguration defines the configuration for the CheckHandler.
 type CheckHandlerConfiguration struct {
-	Checks map[string]check
-
+	checks        checkers
 	logger        log.Logger
 	limit         int
 	statusFailed  int
@@ -28,7 +30,7 @@ type CheckHandlerConfiguration struct {
 // NewCheckHandlerConfiguration initializes a new CheckHandlerConfiguration.
 func NewCheckHandlerConfiguration() CheckHandlerConfiguration {
 	return CheckHandlerConfiguration{
-		Checks: make(map[string]check),
+		checks: make(checkers),
 
 		limit:         -1,
 		statusFailed:  http.StatusInternalServerError,
@@ -43,19 +45,21 @@ func (c CheckHandlerConfiguration) WithLogger(l log.Logger) CheckHandlerConfigur
 }
 
 // WithCheck sets a check for the CheckHandlerConfiguration.
-func (c CheckHandlerConfiguration) WithCheck(name string, f check) CheckHandlerConfiguration {
-	if _, ok := c.Checks[name]; ok {
+func (c CheckHandlerConfiguration) WithCheck(name string, check checker) CheckHandlerConfiguration {
+	if _, ok := c.checks[name]; ok {
 		c.logger.Panic().Str("check", name).Msg("check already exists")
 	}
 
-	c.Checks[name] = f
+	c.checks = maps.Clone(c.checks) // prevent propagated check duplication, maps are references;
+	c.checks[name] = check
+
 	return c
 }
 
-// WithInheritedChecksFrom appends the checks from another CheckHandlerConfiguration.
-func (c CheckHandlerConfiguration) WithInheritedChecksFrom(other CheckHandlerConfiguration) CheckHandlerConfiguration {
-	for name, check := range other.Checks {
-		c.WithCheck(name, check)
+// WithChecks adds multiple checks to the CheckHandlerConfiguration.
+func (c CheckHandlerConfiguration) WithChecks(checks checkers) CheckHandlerConfiguration {
+	for name, check := range checks {
+		c.checks = c.WithCheck(name, check).checks
 	}
 
 	return c
@@ -81,27 +85,26 @@ func (c CheckHandlerConfiguration) WithStatusSuccess(status int) CheckHandlerCon
 
 // CheckHandler is a http Handler that performs different checks.
 type CheckHandler struct {
-	Conf CheckHandlerConfiguration
+	conf CheckHandlerConfiguration
 }
 
 // NewCheckHandler initializes a new CheckHandler.
 func NewCheckHandler(c CheckHandlerConfiguration) *CheckHandler {
-	c.Checks = maps.Clone(c.Checks) // prevent check duplication after initialization
+	c.checks = maps.Clone(c.checks) // prevent check duplication after initialization
 	return &CheckHandler{
-		Conf: c,
+		conf: c,
 	}
 }
 
-// AddCheck adds a check to the CheckHandler.
-func (h *CheckHandler) AddCheck(name string, c check) {
-	h.Conf.WithCheck(name, c)
+func (h *CheckHandler) Checks() map[string]func(ctx context.Context) error {
+	return maps.Clone(h.conf.checks)
 }
 
 func (h *CheckHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	g, ctx := errgroup.WithContext(r.Context())
-	g.SetLimit(h.Conf.limit)
+	g.SetLimit(h.conf.limit)
 
-	for name, check := range h.Conf.Checks {
+	for name, check := range h.conf.checks {
 		checker := check
 		checkerName := name
 		g.Go(func() error { // https://go.dev/blog/loopvar-preview per iteration scope since go 1.22
@@ -113,16 +116,16 @@ func (h *CheckHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 
-	status := h.Conf.statusSuccess
+	status := h.conf.statusSuccess
 	if err := g.Wait(); err != nil {
-		status = h.Conf.statusFailed
-		h.Conf.logger.Error().Err(err).Msg("check failed")
+		status = h.conf.statusFailed
+		h.conf.logger.Error().Err(err).Msg("check failed")
 	}
 
 	w.Header().Set("Content-Type", "text/plain")
 	w.WriteHeader(status)
 
 	if _, err := io.WriteString(w, http.StatusText(status)); err != nil { // io.WriteString should not fail, but if it does, we want to know.
-		h.Conf.logger.Panic().Err(err).Msg("failed to write response")
+		h.conf.logger.Panic().Err(err).Msg("failed to write response")
 	}
 }

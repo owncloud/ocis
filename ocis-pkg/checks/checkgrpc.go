@@ -1,4 +1,4 @@
-package handlers
+package checks
 
 import (
 	"context"
@@ -10,7 +10,7 @@ import (
 )
 
 // NewGRPCCheck checks the reachability of a grpc server.
-func NewGRPCCheck(address string) func(ctx context.Context) error {
+func NewGRPCCheck(address string) func(context.Context) error {
 	return func(_ context.Context) error {
 		conn, err := grpc.NewClient(address, grpc.WithTransportCredentials(insecure.NewCredentials()))
 		if err != nil {

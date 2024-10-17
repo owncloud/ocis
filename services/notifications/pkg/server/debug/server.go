@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/owncloud/ocis/v2/ocis-pkg/checks"
 	"github.com/owncloud/ocis/v2/ocis-pkg/handlers"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/debug"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
@@ -21,9 +22,9 @@ func Server(opts ...Option) (*http.Server, error) {
 	readyHandler := handlers.NewCheckHandler(
 		handlers.NewCheckHandlerConfiguration().
 			WithLogger(options.Logger).
-			WithCheck("nats reachability", handlers.NewNatsCheck(options.Config.Notifications.Events.Cluster)).
-			WithCheck("smtp-check", handlers.NewTCPCheck(options.Config.Notifications.SMTP.Host+":"+strconv.Itoa(options.Config.Notifications.SMTP.Port))).
-			WithInheritedChecksFrom(checkHandler.Conf),
+			WithCheck("nats reachability", checks.NewNatsCheck(options.Config.Notifications.Events.Cluster)).
+			WithCheck("smtp-check", checks.NewTCPCheck(options.Config.Notifications.SMTP.Host+":"+strconv.Itoa(options.Config.Notifications.SMTP.Port))).
+			WithChecks(checkHandler.Checks()),
 	)
 
 	return debug.NewService(

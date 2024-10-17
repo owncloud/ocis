@@ -3,6 +3,7 @@ package debug
 import (
 	"net/http"
 
+	"github.com/owncloud/ocis/v2/ocis-pkg/checks"
 	"github.com/owncloud/ocis/v2/ocis-pkg/handlers"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/debug"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
@@ -15,14 +16,14 @@ func Server(opts ...Option) (*http.Server, error) {
 	healthHandler := handlers.NewCheckHandler(
 		handlers.NewCheckHandlerConfiguration().
 			WithLogger(options.Logger).
-			WithCheck("http reachability", handlers.NewHTTPCheck(options.Config.HTTP.Addr)),
+			WithCheck("http reachability", checks.NewHTTPCheck(options.Config.HTTP.Addr)),
 	)
 
 	readinessHandler := handlers.NewCheckHandler(
 		handlers.NewCheckHandlerConfiguration().
 			WithLogger(options.Logger).
-			WithCheck("ldap-check", handlers.NewTCPCheck(options.Config.Ldap.URI)).
-			WithInheritedChecksFrom(healthHandler.Conf),
+			WithCheck("ldap-check", checks.NewTCPCheck(options.Config.Ldap.URI)).
+			WithChecks(healthHandler.Checks()),
 	)
 
 	return debug.NewService(
