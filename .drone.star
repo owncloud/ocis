@@ -40,7 +40,7 @@ REDIS = "redis:6-alpine"
 SONARSOURCE_SONAR_SCANNER_CLI = "sonarsource/sonar-scanner-cli:11.0"
 
 DEFAULT_PHP_VERSION = "8.2"
-DEFAULT_NODEJS_VERSION = "18"
+DEFAULT_NODEJS_VERSION = "20"
 
 dirs = {
     "base": "/drone/src",
