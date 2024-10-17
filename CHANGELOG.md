@@ -60,6 +60,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix delete share panic: [#10219](https://github.com/owncloud/ocis/pull/10219)
 * Bugfix - Continue listing shares on error: [#10243](https://github.com/owncloud/ocis/pull/10243)
 * Bugfix - Avoid re-creating thumbnails: [#10251](https://github.com/owncloud/ocis/pull/10251)
+* Bugfix - Fix panic when sharing with groups: [#10279](https://github.com/owncloud/ocis/pull/10279)
 * Bugfix - Thumbnail request limit: [#10280](https://github.com/owncloud/ocis/pull/10280)
 * Bugfix - Forbid the ocm space sharing: [#10287](https://github.com/owncloud/ocis/pull/10287)
 * Bugfix - Use secure config defaults for OCM: [#10307](https://github.com/owncloud/ocis/pull/10307)
@@ -116,6 +117,15 @@ The following sections list the changes for unreleased.
    if a thumbnail already existed in the cache.
 
    https://github.com/owncloud/ocis/pull/10251
+
+* Bugfix - Fix panic when sharing with groups: [#10279](https://github.com/owncloud/ocis/pull/10279)
+
+   We fixed a bug which caused a panic when sharing with groups, this only happened
+   under a heavy load. Besides the bugfix, we also reduced the number of share auto
+   accept log messages to avoid flooding the logs.
+
+   https://github.com/owncloud/ocis/issues/10258
+   https://github.com/owncloud/ocis/pull/10279
 
 * Bugfix - Thumbnail request limit: [#10280](https://github.com/owncloud/ocis/pull/10280)
 
