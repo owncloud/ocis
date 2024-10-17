@@ -55,6 +55,7 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Fix health and ready endpoints: [#10163](https://github.com/owncloud/ocis/pull/10163)
 * Bugfix - Always treat LDAP attribute names case-insensitively: [#10204](https://github.com/owncloud/ocis/pull/10204)
 * Bugfix - Fix delete share panic: [#10219](https://github.com/owncloud/ocis/pull/10219)
 * Bugfix - Continue listing shares on error: [#10243](https://github.com/owncloud/ocis/pull/10243)
@@ -70,6 +71,23 @@ The following sections list the changes for unreleased.
 * Enhancement - Bump reva to 2.xx.x: [#10321](https://github.com/owncloud/ocis/pull/10321)
 
 ## Details
+
+* Bugfix - Fix health and ready endpoints: [#10163](https://github.com/owncloud/ocis/pull/10163)
+
+   We added new checks to the `/readyz` and `/healthz` endpoints to ensure that the
+   services are ready and healthy. This change ensures that the endpoints return
+   the correct status codes, which is needed to stabilize the k8s deployments.
+
+   https://github.com/owncloud/ocis/issues/10316
+   https://github.com/owncloud/ocis/issues/10281
+   https://github.com/owncloud/ocis/pull/10163
+   https://github.com/owncloud/ocis/pull/10301
+   https://github.com/owncloud/ocis/pull/10302
+   https://github.com/owncloud/ocis/pull/10303
+   https://github.com/owncloud/ocis/pull/10308
+   https://github.com/owncloud/ocis/pull/10323
+   https://github.com/owncloud/ocis/pull/10163
+   https://github.com/owncloud/ocis/pull/10333
 
 * Bugfix - Always treat LDAP attribute names case-insensitively: [#10204](https://github.com/owncloud/ocis/pull/10204)
 
