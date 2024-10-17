@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2024-09-19 00:42+0000\n"
+"POT-Creation-Date: 2024-10-17 01:01+0000\n"
 "PO-Revision-Date: 2024-08-20 10:13+0000\n"
 "Last-Translator: Viktor Scharf, 2024\n"
 "Language-Team: Russian (https://app.transifex.com/owncloud-org/teams/6149/ru/)\n"
@@ -21,50 +21,82 @@ msgstr ""
 "Language: ru\n"
 "Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n%100>=11 && n%100<=14)? 2 : 3);\n"
 
-#: pkg/service/response.go:24
-msgid "{user} added {resource} to {space}"
-msgstr "{user} добавил {resource} в {space}"
+#: pkg/service/response.go:44
+msgid "description"
+msgstr "описание"
 
-#: pkg/service/response.go:34
+#: pkg/service/response.go:43
+msgid "display name"
+msgstr "отображаемое имя"
+
+#: pkg/service/response.go:42
+msgid "expiration date"
+msgstr "дата истечения срока действия"
+
+#: pkg/service/response.go:41
+msgid "password"
+msgstr "пароль"
+
+#: pkg/service/response.go:40
+msgid "permission"
+msgstr "разрешения"
+
+#: pkg/service/response.go:39
+msgid "some field"
+msgstr "некоторое поле"
+
+#: pkg/service/response.go:26
+msgid "{resource} was downloaded via public link {token}"
+msgstr "{resource} был скачан по публичной ссылке {token}"
+
+#: pkg/service/response.go:24
+msgid "{user} added {resource} to {folder}"
+msgstr "{user} добавил {resource} в {folder}"
+
+#: pkg/service/response.go:36
 msgid "{user} added {sharee} as member of {space}"
 msgstr "{user} добавил {sharee} как участника {space}"
 
-#: pkg/service/response.go:26
-msgid "{user} deleted {resource} from {space}"
-msgstr "{user} удалил {resource} из {space}"
-
 #: pkg/service/response.go:27
-msgid "{user} moved {resource} to {space}"
-msgstr "{user} переместил {resource} в {space}"
+msgid "{user} deleted {resource} from {folder}"
+msgstr "{user} удалил {resource} из {folder}"
 
-#: pkg/service/response.go:33
+#: pkg/service/response.go:28
+msgid "{user} moved {resource} to {folder}"
+msgstr "{user} переместил {resource} в {folder}"
+
+#: pkg/service/response.go:35
 msgid "{user} removed link to {resource}"
 msgstr "{user} удалил ссылку на {resource}"
 
-#: pkg/service/response.go:30
+#: pkg/service/response.go:32
 msgid "{user} removed {sharee} from {resource}"
 msgstr "{user} удалил {sharee} из {resource}"
 
-#: pkg/service/response.go:35
+#: pkg/service/response.go:37
 msgid "{user} removed {sharee} from {space}"
 msgstr "{user} удалил {sharee} из {space}"
 
-#: pkg/service/response.go:28
+#: pkg/service/response.go:29
 msgid "{user} renamed {oldResource} to {resource}"
 msgstr "{user} переименовал {oldResource} в {resource}"
 
-#: pkg/service/response.go:31
+#: pkg/service/response.go:33
 msgid "{user} shared {resource} via link"
 msgstr "{user} поделился {resource} через ссылку"
 
-#: pkg/service/response.go:29
+#: pkg/service/response.go:30
 msgid "{user} shared {resource} with {sharee}"
 msgstr "{user} поделился {resource} с {sharee}"
 
-#: pkg/service/response.go:32
+#: pkg/service/response.go:34
 msgid "{user} updated {field} for a link {token} on {resource}"
-msgstr ""
+msgstr "{user} обновил {field} для ссылки {token} для {resource}"
+
+#: pkg/service/response.go:31
+msgid "{user} updated {field} for the {resource}"
+msgstr "{user} обновил {field} для {resource}"
 
 #: pkg/service/response.go:25
 msgid "{user} updated {resource} in {folder}"
-msgstr ""
+msgstr "{user} добавил {resource} в {folder}"
