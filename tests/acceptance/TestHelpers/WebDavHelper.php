@@ -767,7 +767,7 @@ class WebDavHelper {
 		$fullUrl = self::sanitizeUrl("{$baseUrl}/{$davPath}");
 		// NOTE: no need to append path for archive and versions endpoints
 		if (!\in_array($type, ["archive", "versions"])) {
-			$fullUrl .= "/{$path}";
+			$fullUrl .= "/" . \ltrim($path, "/");
 		}
 
 		if ($authType === 'bearer') {
