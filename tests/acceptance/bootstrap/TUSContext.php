@@ -304,15 +304,15 @@ class TUSContext implements Context {
 				'headers' => $headers
 			]
 		);
+
+		$davPathVersion = $this->featureContext->getDavPathVersion();
+		$uniquePath = $user;
+		if ($davPathVersion === WebDavHelper::DAV_VERSION_SPACES) {
+			$uniquePath = $spaceId ?: $this->featureContext->getPersonalSpaceIdForUser($user);
+		}
+
 		$client->setChecksumAlgorithm('sha1');
-		$client->setApiPath(
-			WebDavHelper::getDavPath(
-				$user,
-				$this->featureContext->getDavPathVersion(),
-				"files",
-				$spaceId ?: $this->featureContext->getPersonalSpaceIdForUser($user)
-			)
-		);
+		$client->setApiPath(WebDavHelper::getDavPath($davPathVersion, $uniquePath));
 		$client->setMetadata($uploadMetadata);
 		$sourceFile = $this->featureContext->acceptanceTestsDirLocation() . $source;
 		$client->setKey((string)rand())->file($sourceFile, $destination);

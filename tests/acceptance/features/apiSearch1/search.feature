@@ -173,17 +173,12 @@ Feature: Search
       | spaces           |
 
 
-  Scenario Outline: user can search project space by name
-    Given using <dav-path-version> DAV path
+  Scenario: user can search project space by name
+    Given using spaces DAV path
     When user "Alice" searches for '*project101*' using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result should contain "1" entries
     And for user "Alice" the search result should contain space "project101"
-    Examples:
-      | dav-path-version |
-      | old              |
-      | new              |
-      | spaces           |
 
 
   Scenario Outline: user can search inside folder in space
