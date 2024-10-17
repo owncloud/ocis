@@ -28,6 +28,7 @@ use Psr\Http\Message\ResponseInterface;
 use TestHelpers\HttpRequestHelper;
 use TestHelpers\WebDavHelper;
 use TestHelpers\BehatHelper;
+use TestHelpers\OcisHelper;
 
 require_once 'bootstrap.php';
 
@@ -36,6 +37,27 @@ require_once 'bootstrap.php';
  */
 class FilesVersionsContext implements Context {
 	private FeatureContext $featureContext;
+	private SpacesContext $spacesContext;
+
+	/**
+	 * This will run before EVERY scenario.
+	 * It will set the properties for this object.
+	 *
+	 * @BeforeScenario
+	 *
+	 * @param BeforeScenarioScope $scope
+	 *
+	 * @return void
+	 */
+	public function before(BeforeScenarioScope $scope):void {
+		// Get the environment
+		$environment = $scope->getEnvironment();
+		// Get all the contexts you need in this context
+		$this->featureContext = BehatHelper::getContext($scope, $environment, 'FeatureContext');
+		if (!OcisHelper::isTestingOnReva()) {
+			$this->spacesContext = $environment->getContext('SpacesContext');
+		}
+	}
 
 	/**
 	 * @param string $fileId
@@ -559,19 +581,26 @@ class FilesVersionsContext implements Context {
 	}
 
 	/**
-	 * This will run before EVERY scenario.
-	 * It will set the properties for this object.
+	 * @When user :user gets the number of versions of file :file from space :space
+	 * @When user :user tries to get the number of versions of file :file from space :space
 	 *
-	 * @BeforeScenario
-	 *
-	 * @param BeforeScenarioScope $scope
+	 * @param string $user
+	 * @param string $file
+	 * @param string $space
 	 *
 	 * @return void
 	 */
-	public function before(BeforeScenarioScope $scope):void {
-		// Get the environment
-		$environment = $scope->getEnvironment();
-		// Get all the contexts you need in this context
-		$this->featureContext = BehatHelper::getContext($scope, $environment, 'FeatureContext');
+	public function userGetsTheNumberOfVersionsOfFileInsideSpace(string $user, string $file, string $space): void {
+		$fileId = $this->spacesContext->getFileId($user, $space, $file);
+		$response = $this->featureContext->makeDavRequest(
+			$user,
+			"PROPFIND",
+			"/meta/$fileId/v",
+			null,
+			null,
+			null,
+			'2'
+		);
+		$this->featureContext->setResponse($response);
 	}
 }
