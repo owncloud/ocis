@@ -24,6 +24,7 @@ import (
 	"strings"
 
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	"github.com/cs3org/reva/v2/internal/grpc/services/storageprovider"
 	"github.com/cs3org/reva/v2/pkg/appctx"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
@@ -227,7 +228,8 @@ func (fs *Decomposedfs) RemoveGrant(ctx context.Context, ref *provider.Reference
 }
 
 func isShareGrant(ctx context.Context) bool {
-	return ctx.Value(utils.SpaceGrant) == nil
+	_, ok := storageprovider.SpaceTypeFromContext(ctx)
+	return !ok
 }
 
 // UpdateGrant updates a grant on a resource
@@ -306,15 +308,11 @@ func (fs *Decomposedfs) loadGrant(ctx context.Context, ref *provider.Reference, 
 }
 
 func (fs *Decomposedfs) storeGrant(ctx context.Context, n *node.Node, g *provider.Grant) error {
-	var spaceType string
-	spaceGrant := ctx.Value(utils.SpaceGrant)
-	// this is not a grant on a space root we are just adding a share
-	if spaceGrant == nil {
+	// if is a grant to a space root, the receiver needs the space type to update the indexes
+	spaceType, ok := storageprovider.SpaceTypeFromContext(ctx)
+	if !ok {
+		// this is not a grant on a space root we are just adding a share
 		spaceType = spaceTypeShare
-	}
-	// this is a grant to a space root, the receiver needs the space type to update the indexes
-	if sg, ok := spaceGrant.(struct{ SpaceType string }); ok && sg.SpaceType != "" {
-		spaceType = sg.SpaceType
 	}
 
 	// set the grant

@@ -178,7 +178,6 @@ func (session *OcisSession) FinishUpload(ctx context.Context) error {
 			return err
 		}
 	}
-
 	// increase the processing counter for every started processing
 	// will be decreased in Cleanup()
 	metrics.UploadProcessing.Inc()
@@ -213,7 +212,9 @@ func (session *OcisSession) FinishUpload(ctx context.Context) error {
 		}
 	}
 
-	if !session.store.async {
+	// if the upload is synchronous or the upload is empty, finalize it now
+	// for 0-byte uploads we take a shortcut and finalize isn't called elsewhere
+	if !session.store.async || session.info.Size == 0 {
 		// handle postprocessing synchronously
 		err = session.Finalize()
 		session.store.Cleanup(ctx, session, err != nil, false, err == nil)

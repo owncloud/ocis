@@ -21,7 +21,6 @@ package errors
 import (
 	"bytes"
 	"encoding/xml"
-	"fmt"
 	"net/http"
 
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
@@ -210,6 +209,6 @@ func NewErrFromStatus(s *rpc.Status) error {
 	case rpc.Code_CODE_UNIMPLEMENTED:
 		return ErrNotImplemented
 	default:
-		return fmt.Errorf(s.GetMessage())
+		return errors.New(s.GetMessage())
 	}
 }
