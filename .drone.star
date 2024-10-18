@@ -920,6 +920,8 @@ def localApiTestPipeline(ctx):
     return pipelines
 
 def localApiTests(suite, storage, extra_environment = {}):
+    expectedFailuresFile = "%s/tests/acceptance/expected-failures-localAPI-on-%s-storage.md" % (dirs["base"], storage.upper())
+
     environment = {
         "PATH_TO_OCIS": dirs["base"],
         "TEST_SERVER_URL": OCIS_URL,
@@ -944,7 +946,9 @@ def localApiTests(suite, storage, extra_environment = {}):
         "image": OC_CI_PHP % DEFAULT_PHP_VERSION,
         "environment": environment,
         "commands": [
-            "make test-acceptance-api",
+            "cat %s/tests/acceptance/expected-failures-without-remotephp.md >> %s" % (dirs["base"], expectedFailuresFile),
+            "make -C %s test-acceptance-api" % (dirs["base"]),
+            "cat %s" % expectedFailuresFile,
         ],
     }]
 
@@ -1135,7 +1139,9 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "ocis", ac
                              "WITH_REMOTE_PHP": False,
                          },
                          "commands": [
+                             "cat %s/tests/acceptance/expected-failures-without-remotephp.md >> %s" % (dirs["base"], expectedFailuresFile),
                              "make -C %s test-acceptance-api" % (dirs["base"]),
+                             "cat %s" % expectedFailuresFile,
                          ],
                      },
                  ] +
