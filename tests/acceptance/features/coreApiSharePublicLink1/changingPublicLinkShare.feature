@@ -196,7 +196,7 @@ Feature: changing a public link share
       | 1               | 200              |
       | 2               | 403              |
 
-  @issue-10331
+  @issue-9724 @issue-10331
   Scenario Outline: administrator removes password of a read-only public link
     Given using OCS API version "<ocs-api-version>"
     And admin has created folder "/PARENT"

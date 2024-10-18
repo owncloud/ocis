@@ -40,7 +40,7 @@ Feature: upload resources using TUS protocol
       | test.txt   |
       | upload.txt |
 
-  @issue-tus
+  @issue-10346
   Scenario Outline: upload a zero-byte file inside a shared folder
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files

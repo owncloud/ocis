@@ -10,7 +10,7 @@ Feature: upload file
       | Alice    |
       | Brian    |
 
-
+  @issue-10346
   Scenario Outline: upload file with mtime to a received share
     Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/toShare"
@@ -29,7 +29,7 @@ Feature: upload file
       | old              |
       | new              |
 
-
+  @issue-10346
   Scenario Outline: upload file with mtime to a send share
     Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/toShare"
@@ -48,7 +48,7 @@ Feature: upload file
       | old              |
       | new              |
 
-
+  @issue-10346
   Scenario Outline: overwriting a file with mtime in a received share
     Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/toShare"
@@ -68,7 +68,7 @@ Feature: upload file
       | old              |
       | new              |
 
-
+  @issue-10346
   Scenario Outline: overwriting a file with mtime in a send share
     Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/toShare"

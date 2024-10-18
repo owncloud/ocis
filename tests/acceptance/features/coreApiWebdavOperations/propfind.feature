@@ -9,7 +9,7 @@ Feature: PROPFIND
     When user "Alice" requests "<dav-path>" with "PROPFIND" using basic auth
     Then the HTTP status code should be "405"
     Examples:
-      | dav-path               |
+      | dav-path    |
       | /dav/files  |
       | /dav/spaces |
 
@@ -21,7 +21,7 @@ Feature: PROPFIND
       | depth  | <depth> |
     Then the HTTP status code should be "<http-status-code>"
     Examples:
-      | dav-path                         | depth    | http-status-code |
+      | dav-path              | depth    | http-status-code |
       | /webdav               | 0        | 207              |
       | /webdav               | 1        | 207              |
       | /dav/files/alice      | 0        | 207              |
@@ -32,7 +32,7 @@ Feature: PROPFIND
 
     @skipOnReva
     Examples:
-      | dav-path                    | depth    | http-status-code |
+      | dav-path         | depth    | http-status-code |
       | /webdav          | infinity | 400              |
       | /dav/files/alice | infinity | 400              |
 
