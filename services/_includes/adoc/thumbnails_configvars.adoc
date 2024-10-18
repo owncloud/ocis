@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-10-16-01-02-48]
+[#deprecation-note-2024-10-18-01-36-35]
 [caption=]
 .Deprecation notes for the thumbnails service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -155,6 +155,15 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 The bind address of the GRPC service.
 
+a|`THUMBNAILS_MAX_CONCURRENT_REQUESTS` +
+
+a| [subs=-attributes]
+++int ++
+a| [subs=-attributes]
+++0 ++
+a| [subs=-attributes]
+Number of maximum concurrent thumbnail requests. Default is 0 which is unlimited.
+
 a|`THUMBNAILS_HTTP_ADDR` +
 
 a| [subs=-attributes]
@@ -199,15 +208,6 @@ a| [subs=-attributes]
 ++/thumbnails ++
 a| [subs=-attributes]
 Subdirectory that serves as the root for this HTTP service.
-
-a|`THUMBNAILS_MAX_CONCURRENT_REQUESTS` +
-
-a| [subs=-attributes]
-++int ++
-a| [subs=-attributes]
-++0 ++
-a| [subs=-attributes]
-Number of maximum concurrent thumbnail requests. Default is 0 which is unlimited.
 
 a|`THUMBNAILS_RESOLUTIONS` +
 
@@ -282,5 +282,32 @@ a| [subs=-attributes]
 ++http://127.0.0.1:9186/thumbnails/data ++
 a| [subs=-attributes]
 The HTTP endpoint where the actual thumbnail file can be downloaded.
+
+a|`THUMBNAILS_MAX_INPUT_WIDTH` +
+
+a| [subs=-attributes]
+++int ++
+a| [subs=-attributes]
+++7680 ++
+a| [subs=-attributes]
+The maximum width of an input image which is being processed.
+
+a|`THUMBNAILS_MAX_INPUT_HEIGHT` +
+
+a| [subs=-attributes]
+++int ++
+a| [subs=-attributes]
+++7680 ++
+a| [subs=-attributes]
+The maximum height of an input image which is being processed.
+
+a|`THUMBNAILS_MAX_INPUT_IMAGE_FILE_SIZE` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++50MB ++
+a| [subs=-attributes]
+The maximum file size of an input image which is being processed. Usable common abbreviations: [KB, KiB, MB, MiB, GB, GiB, TB, TiB, PB, PiB, EB, EiB], example: 2GB.
 |===
 
