@@ -18,7 +18,7 @@ func Server(opts ...Option) (*http.Server, error) {
 		WithCheck("web reachability", checks.NewHTTPCheck(options.Config.HTTP.Addr))
 
 	readyHandlerConfiguration := healthHandlerConfiguration.
-		WithCheck("nats reachability", checks.NewNatsCheck(options.Config.Events.Cluster)).
+		WithCheck("nats reachability", checks.NewNatsCheck(options.Config.Events.Endpoint)).
 		WithCheck("ldap reachability", checks.NewTCPCheck(options.Config.Identity.LDAP.URI))
 
 	return debug.NewService(
