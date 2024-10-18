@@ -729,6 +729,24 @@ class FeatureContext extends BehatVariablesContext {
 	}
 
 	/**
+	 * removes the port rom the ocis URL
+	 *
+	 * @param string $url
+	 *
+	 * @return string
+	 */
+	public function removePortFromUrl(string $url): string {
+		return \str_replace(':9200', '', $url);
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getOcPath(): string {
+		return $this->ocPath;
+	}
+
+	/**
 	 * returns the base URL (which is without a slash at the end)
 	 *
 	 * @return string
@@ -781,6 +799,15 @@ class FeatureContext extends BehatVariablesContext {
 	 */
 	public function getBaseUrlWithoutScheme(): string {
 		return $this->removeSchemeFromUrl($this->getBaseUrl());
+	}
+
+	/**
+	 * returns the base URL but without "http(s)://" and port
+	 *
+	 * @return string
+	 */
+	public function getBaseUrlWithoutSchemeAndPort(): string {
+		return $this->removePortFromUrl($this->removeSchemeFromUrl($this->getBaseUrl()));
 	}
 
 	/**
@@ -2179,6 +2206,14 @@ class FeatureContext extends BehatVariablesContext {
 				"parameter" => []
 			],
 			[
+				"code" => "%base_url_without_scheme_and_port%",
+				"function" => [
+					$this,
+					"getBaseUrlWithoutSchemeAndPort"
+				],
+				"parameter" => []
+			],
+			[
 				"code" => "%remote_server%",
 				"function" => [
 					$this,
@@ -2959,5 +2994,27 @@ class FeatureContext extends BehatVariablesContext {
 			\fclose($reader);
 		}
 		return false;
+	}
+
+	/**
+	 * @When a user requests these endpoints:
+	 *
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function userRequestsEndpoints(TableNode $table): void {
+		$this->verifyTableNodeColumns($table, ['endpoint'], ['service', 'comment']);
+
+		foreach ($table->getHash() as $row) {
+			$this->setResponse(
+				HttpRequestHelper::sendRequest(
+					$this->substituteInLineCodes($row['endpoint']),
+					$this->getStepLineRef()
+				)
+			);
+			$this->pushToLastStatusCodesArrays();
+		}
 	}
 }

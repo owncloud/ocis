@@ -750,6 +750,14 @@ default:
         - SharingNgContext:
         - WebDavPropertiesContext:
         - OcisConfigContext:
+    
+    serviceAvailability:
+      paths:
+        - "%paths.base%/../features/serviceAvailability"
+      context: *common_ldap_suite_context
+      contexts:
+        - FeatureContext: *common_feature_context_params
+        - OcisConfigContext:
 
   extensions:
     rdx\behatvars\BehatVariablesExtension: ~
