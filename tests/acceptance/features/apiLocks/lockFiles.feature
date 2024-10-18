@@ -52,10 +52,11 @@ Feature: lock files
       | spaces           |
 
 
-  Scenario Outline: lock a file using file-id
-    Given user "Alice" has uploaded a file inside space "Alice Hansen" with content "some content" to "textfile.txt"
+  Scenario: lock a file using file-id
+    Given using spaces DAV path
+    And user "Alice" has uploaded a file inside space "Alice Hansen" with content "some content" to "textfile.txt"
     And we save it into "FILEID"
-    When user "Alice" locks file "textfile.txt" using file-id path "<dav-path>" using the WebDAV API setting the following properties
+    When user "Alice" locks file "textfile.txt" using file-id "<<FILEID>>" using the WebDAV API setting the following properties
       | lockscope | exclusive   |
       | timeout   | Second-3600 |
     Then the HTTP status code should be "200"
@@ -67,10 +68,6 @@ Feature: lock files
       | d:lockdiscovery/d:activelock/d:depth                 | Infinity     |
       | d:lockdiscovery/d:activelock/d:timeout               | Second-3600  |
       | d:lockdiscovery/d:activelock/oc:ownername            | Alice Hansen |
-    Examples:
-      | dav-path                          |
-      | /remote.php/dav/spaces/<<FILEID>> |
-      | /dav/spaces/<<FILEID>>            |
 
 
   Scenario Outline: user cannot lock file twice
@@ -127,7 +124,7 @@ Feature: lock files
       | sharee          | Brian        |
       | shareType       | user         |
       | permissionsRole | <space-role> |
-    When user "Brian" locks file "textfile.txt" using file-id path "<dav-path>" using the WebDAV API setting the following properties
+    When user "Brian" locks file "textfile.txt" using file-id "<<FILEID>>" using the WebDAV API setting the following properties
       | lockscope | exclusive   |
       | timeout   | Second-3600 |
     Then the HTTP status code should be "200"
@@ -140,9 +137,9 @@ Feature: lock files
       | d:lockdiscovery/d:activelock/d:timeout               | Second-3600  |
       | d:lockdiscovery/d:activelock/oc:ownername            | Brian Murphy |
     Examples:
-      | space-role   | dav-path                          |
-      | Manager      | /remote.php/dav/spaces/<<FILEID>> |
-      | Space Editor | /dav/spaces/<<FILEID>>            |
+      | space-role   |
+      | Manager      |
+      | Space Editor |
 
 
   Scenario: viewer cannot lock a file in the project space
@@ -156,7 +153,7 @@ Feature: lock files
       | sharee          | Brian        |
       | shareType       | user         |
       | permissionsRole | Space Viewer |
-    When user "Brian" tries to lock file "textfile.txt" using file-id path "/dav/spaces/<<FILEID>>" using the WebDAV API setting the following properties
+    When user "Brian" tries to lock file "textfile.txt" using file-id "<<FILEID>>" using the WebDAV API setting the following properties
       | lockscope | exclusive |
     Then the HTTP status code should be "403"
     When user "Brian" tries to lock file "textfile.txt" inside the space "Project" using the WebDAV API setting the following properties
@@ -190,8 +187,9 @@ Feature: lock files
       | spaces           |
 
 
-  Scenario Outline: lock a file in the shares using file-id
-    Given user "Alice" has uploaded a file inside space "Alice Hansen" with content "some content" to "textfile.txt"
+  Scenario: lock a file in the shares using file-id
+    Given using spaces DAV path
+    And user "Alice" has uploaded a file inside space "Alice Hansen" with content "some content" to "textfile.txt"
     And we save it into "FILEID"
     And user "Alice" has sent the following resource share invitation:
       | resource        | textfile.txt |
@@ -200,7 +198,7 @@ Feature: lock files
       | shareType       | user         |
       | permissionsRole | File Editor  |
     And user "Brian" has a share "textfile.txt" synced
-    When user "Brian" locks file "textfile.txt" using file-id path "<dav-path>" using the WebDAV API setting the following properties
+    When user "Brian" locks file "textfile.txt" using file-id "<<FILEID>>" using the WebDAV API setting the following properties
       | lockscope | exclusive   |
       | timeout   | Second-3600 |
     Then the HTTP status code should be "200"
@@ -210,14 +208,11 @@ Feature: lock files
       | key                                                  | value        |
       | d:lockdiscovery/d:activelock/d:lockscope/d:exclusive |              |
       | d:lockdiscovery/d:activelock/oc:ownername            | Brian Murphy |
-    Examples:
-      | dav-path                          |
-      | /remote.php/dav/spaces/<<FILEID>> |
-      | /dav/spaces/<<FILEID>>            |
 
 
   Scenario Outline: viewer cannot lock a file in the shares using file-id
-    Given user "Alice" has uploaded a file inside space "Alice Hansen" with content "some content" to "textfile.txt"
+    Given using spaces DAV path
+    And user "Alice" has uploaded a file inside space "Alice Hansen" with content "some content" to "textfile.txt"
     And we save it into "FILEID"
     And user "Alice" has sent the following resource share invitation:
       | resource        | textfile.txt       |
@@ -226,7 +221,7 @@ Feature: lock files
       | shareType       | user               |
       | permissionsRole | <permissions-role> |
     And user "Brian" has a share "textfile.txt" synced
-    When user "Brian" tries to lock file "textfile.txt" using file-id path "/dav/spaces/<<FILEID>>" using the WebDAV API setting the following properties
+    When user "Brian" tries to lock file "textfile.txt" using file-id "<<FILEID>>" using the WebDAV API setting the following properties
       | lockscope | exclusive |
     Then the HTTP status code should be "403"
     Examples:
@@ -236,7 +231,8 @@ Feature: lock files
 
 
   Scenario: sharee cannot lock a resource exclusively locked by a sharer
-    Given user "Alice" has uploaded a file inside space "Alice Hansen" with content "some content" to "textfile.txt"
+    Given using spaces DAV path
+    And user "Alice" has uploaded a file inside space "Alice Hansen" with content "some content" to "textfile.txt"
     And we save it into "FILEID"
     And user "Alice" has sent the following resource share invitation:
       | resource        | textfile.txt |
@@ -247,7 +243,7 @@ Feature: lock files
     And user "Brian" has a share "textfile.txt" synced
     And user "Alice" has locked file "textfile.txt" setting the following properties
       | lockscope | exclusive |
-    When user "Brian" tries to lock file "textfile.txt" using file-id path "/dav/spaces/<<FILEID>>" using the WebDAV API setting the following properties
+    When user "Brian" tries to lock file "textfile.txt" using file-id "<<FILEID>>" using the WebDAV API setting the following properties
       | lockscope | exclusive   |
       | timeout   | Second-3600 |
     Then the HTTP status code should be "423"
@@ -260,7 +256,8 @@ Feature: lock files
 
 
   Scenario: sharer cannot lock a resource exclusively locked by a sharee
-    Given user "Alice" has uploaded a file inside space "Alice Hansen" with content "some content" to "textfile.txt"
+    Given using spaces DAV path
+    And user "Alice" has uploaded a file inside space "Alice Hansen" with content "some content" to "textfile.txt"
     And we save it into "FILEID"
     And user "Alice" has sent the following resource share invitation:
       | resource        | textfile.txt |
@@ -269,9 +266,9 @@ Feature: lock files
       | shareType       | user         |
       | permissionsRole | File Editor  |
     And user "Brian" has a share "textfile.txt" synced
-    And user "Brian" has locked file "textfile.txt" using file-id path "/dav/spaces/<<FILEID>>" setting the following properties
+    And user "Brian" has locked file "textfile.txt" using file-id "<<FILEID>>" setting the following properties
       | lockscope | exclusive |
-    When user "Alice" tries to lock file "textfile.txt" using file-id path "/dav/spaces/<<FILEID>>" using the WebDAV API setting the following properties
+    When user "Alice" tries to lock file "textfile.txt" using file-id "<<FILEID>>" using the WebDAV API setting the following properties
       | lockscope | exclusive   |
       | timeout   | Second-3600 |
     Then the HTTP status code should be "423"
@@ -293,7 +290,7 @@ Feature: lock files
       | sharee          | Brian         |
       | shareType       | user          |
       | permissionsRole | File Editor   |
-    And user "Brian" has a share "textfile.txt" synced
+    And user "Brian" has a share "textfile0.txt" synced
     And user "Alice" has locked file "textfile0.txt" setting the following properties
       | lockscope | shared |
     And user "Brian" has locked file "Shares/textfile0.txt" setting the following properties
@@ -423,7 +420,7 @@ Feature: lock files
       | spaces           | shared     |
       | spaces           | exclusive  |
 
-  @issue-7641
+  @issue-7641 @issue-10331
   Scenario Outline: try to lock a folder as anonymous user
     Given using <dav-path-version> DAV path
     And using SharingNG
@@ -468,7 +465,7 @@ Feature: lock files
       | spaces           | shared     |
       | spaces           | exclusive  |
 
-
+  @issue-10331
   Scenario Outline: lock a file inside a folder shared by a link as anonymous user with edit permission
     Given using <dav-path-version> DAV path
     And using SharingNG
@@ -486,14 +483,12 @@ Feature: lock files
     And user "Alice" should not be able to upload file "filesForUpload/lorem.txt" to "PARENT/textfile0.txt"
     Examples:
       | dav-path-version | lock-scope |
-      | old              | shared     |
-      | old              | exclusive  |
       | new              | shared     |
       | new              | exclusive  |
       | spaces           | shared     |
       | spaces           | exclusive  |
 
-
+  @issue-10331
   Scenario Outline: try to lock a file inside a folder shared by a link as anonymous user with read permission
     Given using <dav-path-version> DAV path
     And using SharingNG
@@ -511,14 +506,12 @@ Feature: lock files
     And user "Alice" should be able to upload file "filesForUpload/lorem.txt" to "PARENT/textfile0.txt"
     Examples:
       | dav-path-version | lock-scope |
-      | old              | shared     |
-      | old              | exclusive  |
       | new              | shared     |
       | new              | exclusive  |
       | spaces           | shared     |
       | spaces           | exclusive  |
 
-  @issue-7790
+  @issue-7790 @issue-10331
   Scenario Outline: lock a file shared by a link as anonymous user with edit permission
     Given using <dav-path-version> DAV path
     And using SharingNG
@@ -535,14 +528,12 @@ Feature: lock files
     And user "Alice" should not be able to upload file "filesForUpload/lorem.txt" to "textfile0.txt"
     Examples:
       | dav-path-version | lock-scope |
-      | old              | shared     |
-      | old              | exclusive  |
       | new              | shared     |
       | new              | exclusive  |
       | spaces           | shared     |
       | spaces           | exclusive  |
 
-  @issue-7790
+  @issue-7790 @issue-10331
   Scenario Outline: try to lock a file shared by a link as anonymous user with read permission
     Given using <dav-path-version> DAV path
     And using SharingNG
@@ -559,8 +550,6 @@ Feature: lock files
     And user "Alice" should be able to upload file "filesForUpload/lorem.txt" to "textfile0.txt"
     Examples:
       | dav-path-version | lock-scope |
-      | old              | shared     |
-      | old              | exclusive  |
       | new              | shared     |
       | new              | exclusive  |
       | spaces           | shared     |

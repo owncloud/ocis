@@ -925,7 +925,7 @@ Feature: collaboration (wopi)
     And as "Alice" file "testFolder/simple.odt" should not exist
     And as "Brian" file "Shares/testFolder/simple.odt" should not exist
 
-
+  @issue-10331
   Scenario Outline: public user with permission edit/upload/createOnly creates odt file inside public folder using wopi endpoint
     Given user "Alice" has created folder "publicFolder"
     And user "Alice" has created the following resource link share:
@@ -957,7 +957,7 @@ Feature: collaboration (wopi)
       | upload           |
       | createOnly       |
 
-  @issue-10126
+  @issue-10126 @issue-10331
   Scenario: public user with permission view tries to creates odt file inside public folder using wopi endpoint
     Given user "Alice" has created folder "publicFolder"
     And user "Alice" has created the following resource link share:
@@ -1013,7 +1013,7 @@ Feature: collaboration (wopi)
       }
       """
 
-  @issue-8691
+  @issue-8691 @issue-10331
   Scenario Outline: public user with permission edit/upload/createOnly creates odt file inside folder of public space using wopi endpoint
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
@@ -1048,7 +1048,7 @@ Feature: collaboration (wopi)
       | upload           |
       | createOnly       |
 
-  @issue-8691 @issue-10126
+  @issue-8691 @issue-10126 @issue-10331
   Scenario: public user with permission view tries to create odt file inside folder of public space using wopi endpoint
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API

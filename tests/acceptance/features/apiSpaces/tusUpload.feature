@@ -40,7 +40,7 @@ Feature: upload resources using TUS protocol
       | test.txt   |
       | upload.txt |
 
-
+  @issue-10346
   Scenario Outline: upload a zero-byte file inside a shared folder
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
@@ -84,7 +84,7 @@ Feature: upload resources using TUS protocol
     When user "Alice" uploads a file from "filesForUpload/zerobyte.txt" to "textfile.txt" via TUS inside of the space "new-space" using the WebDAV API
     Then for user "Alice" the content of the file "textfile.txt" of the space "new-space" should be ""
 
-  @issue-8003
+  @issue-8003 @issue-10346
   Scenario Outline: replace a shared file with zero-byte file
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files

@@ -166,7 +166,7 @@ Feature: propagation of etags when uploading data
       | old              |
       | new              |
 
-  @issue-4251 @skipOnReva
+  @issue-4251 @skipOnReva @issue-10331
   Scenario Outline: uploading a file into a publicly shared folder changes its etag for the sharer
     Given using <dav-path-version> DAV path
     And using SharingNG

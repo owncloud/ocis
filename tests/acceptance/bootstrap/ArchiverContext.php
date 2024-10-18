@@ -61,6 +61,15 @@ class ArchiverContext implements Context {
 	}
 
 	/**
+	 * @param string $query
+	 *
+	 * @return string
+	 */
+	public function getArchiverUrl(string $query): string {
+		return $this->featureContext->getBaseUrl() . '/archiver?' . $query;
+	}
+
+	/**
 	 * @param string $type
 	 *
 	 * @return Archive
@@ -203,7 +212,7 @@ class ArchiverContext implements Context {
 			$queryString .= '&output-format=' . $archiveType;
 		}
 		return HttpRequestHelper::get(
-			$this->featureContext->getBaseUrl() . '/archiver?' . $queryString,
+			$this->getArchiverUrl($queryString),
 			$this->featureContext->getStepLineRef(),
 			$downloader,
 			$this->featureContext->getPasswordForUser($downloader),
@@ -215,8 +224,8 @@ class ArchiverContext implements Context {
 	 * @When user :user downloads the archive of these items using the resource :addressType
 	 *
 	 * @param string $user
-	 * @param TableNode $items
 	 * @param string $addressType ids|paths
+	 * @param TableNode $items
 	 *
 	 * @return void
 	 *
@@ -224,19 +233,19 @@ class ArchiverContext implements Context {
 	 */
 	public function userDownloadsTheArchiveOfTheseItems(
 		string $user,
-		TableNode $items,
-		string $addressType
+		string $addressType,
+		TableNode $items
 	): void {
 		$user = $this->featureContext->getActualUsername($user);
-		$queryString = '';
+		$queryString = [];
 		foreach ($items->getRows() as $item) {
-			$queryString .= $this->getArchiverQueryString($user, $item[0], $addressType) . '&';
+			$queryString[] = $this->getArchiverQueryString($user, $item[0], $addressType);
 		}
+		$queryString = \join('&', $queryString);
 
-		$queryString = \rtrim($queryString, '&');
 		$this->featureContext->setResponse(
 			HttpRequestHelper::get(
-				$this->featureContext->getBaseUrl() . '/archiver?' . $queryString,
+				$this->getArchiverUrl($queryString),
 				$this->featureContext->getStepLineRef(),
 				$user,
 				$this->featureContext->getPasswordForUser($user),

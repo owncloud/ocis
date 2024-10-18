@@ -12,10 +12,9 @@ Feature: REPORT request to project space
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "findData" with the default quota using the Graph API
 
-
+  @issue-10329
   Scenario: check the response of the searched file
     Given user "Alice" has uploaded a file inside space "findData" with content "some content" to "testFile.txt"
-    And using new DAV path
     When user "Alice" searches for "testFile.txt" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result of user "Alice" should contain only these entries:
@@ -31,11 +30,10 @@ Feature: REPORT request to project space
       | oc:permissions     | RDNVW             |
       | d:getcontentlength | 12                |
 
-
+  @issue-10329
   Scenario: check the response of the searched sub-file
     Given user "Alice" has created a folder "folderMain/SubFolder1/subFOLDER2" in space "findData"
     And user "Alice" has uploaded a file inside space "findData" with content "some content" to "folderMain/SubFolder1/subFOLDER2/insideTheFolder.txt"
-    And using new DAV path
     When user "Alice" searches for "insideTheFolder.txt" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result of user "Alice" should contain only these entries:
@@ -51,10 +49,9 @@ Feature: REPORT request to project space
       | oc:permissions     | RDNVW               |
       | d:getcontentlength | 12                  |
 
-
+  @issue-10329
   Scenario: check the response of the searched folder
     Given user "Alice" has created a folder "folderMain" in space "findData"
-    And using new DAV path
     When user "Alice" searches for "folderMain" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result of user "Alice" should contain only these entries:
@@ -70,10 +67,9 @@ Feature: REPORT request to project space
       | oc:permissions   | RDNVCK               |
       | oc:size          | 0                    |
 
-
+  @issue-10329
   Scenario: check the response of the searched sub-folder
     Given user "Alice" has created a folder "folderMain/sub-folder" in space "findData"
-    And using new DAV path
     When user "Alice" searches for "*sub*" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result of user "Alice" should contain only these entries:

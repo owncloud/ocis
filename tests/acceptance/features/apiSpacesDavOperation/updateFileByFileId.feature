@@ -15,9 +15,8 @@ Feature: update files using file id
     Then the HTTP status code should be "204"
     And for user "Alice" the content of the file "/textfile.txt" of the space "Personal" should be "updated content"
     Examples:
-      | dav-path                          |
-      | /remote.php/dav/spaces/<<FILEID>> |
-      | /dav/spaces/<<FILEID>>            |
+      | dav-path               |
+      | /dav/spaces/<<FILEID>> |
 
 
   Scenario Outline: update content of a file inside a folder
@@ -28,9 +27,8 @@ Feature: update files using file id
     Then the HTTP status code should be "204"
     And for user "Alice" the content of the file "/uploadFolder/textfile.txt" of the space "Personal" should be "updated content"
     Examples:
-      | dav-path                          |
-      | /remote.php/dav/spaces/<<FILEID>> |
-      | /dav/spaces/<<FILEID>>            |
+      | dav-path               |
+      | /dav/spaces/<<FILEID>> |
 
 
   Scenario Outline: update content of a file inside a project space
@@ -42,9 +40,8 @@ Feature: update files using file id
     Then the HTTP status code should be "204"
     And for user "Alice" the content of the file "/textfile.txt" of the space "new-space" should be "updated content"
     Examples:
-      | dav-path                          |
-      | /remote.php/dav/spaces/<<FILEID>> |
-      | /dav/spaces/<<FILEID>>            |
+      | dav-path               |
+      | /dav/spaces/<<FILEID>> |
 
 
   Scenario Outline: sharee updates content of a shared file
@@ -63,9 +60,8 @@ Feature: update files using file id
     And for user "Alice" the content of the file "/textfile.txt" of the space "Personal" should be "updated content"
     And for user "Brian" the content of the file "textfile.txt" of the space "Shares" should be "updated content"
     Examples:
-      | dav-path                          |
-      | /remote.php/dav/spaces/<<FILEID>> |
-      | /dav/spaces/<<FILEID>>            |
+      | dav-path               |
+      | /dav/spaces/<<FILEID>> |
 
 
   Scenario Outline: sharee updates content of a file inside a shared folder
@@ -85,9 +81,8 @@ Feature: update files using file id
     And for user "Alice" the content of the file "uploadFolder/textfile.txt" of the space "Personal" should be "updated content"
     And for user "Brian" the content of the file "uploadFolder/textfile.txt" of the space "Shares" should be "updated content"
     Examples:
-      | dav-path                          |
-      | /remote.php/dav/spaces/<<FILEID>> |
-      | /dav/spaces/<<FILEID>>            |
+      | dav-path               |
+      | /dav/spaces/<<FILEID>> |
 
 
   Scenario Outline: sharee with different role tries to update content of a file inside a shared space
@@ -106,9 +101,8 @@ Feature: update files using file id
     And for user "Alice" the content of the file "/textfile.txt" of the space "new-space" should be "<file-content>"
     And for user "Brian" the content of the file "/textfile.txt" of the space "new-space" should be "<file-content>"
     Examples:
-      | dav-path                          | space-role   | http-status-code | file-content    |
-      | /remote.php/dav/spaces/<<FILEID>> | Space Viewer | 403              | some data       |
-      | /dav/spaces/<<FILEID>>            | Space Editor | 204              | updated content |
+      | dav-path               | space-role   | http-status-code | file-content    |
+      | /dav/spaces/<<FILEID>> | Space Editor | 204              | updated content |
 
 
   Scenario Outline: user tries to update content of a file owned by others
@@ -119,6 +113,5 @@ Feature: update files using file id
     Then the HTTP status code should be "404"
     And for user "Alice" the content of the file "/textfile.txt" of the space "Personal" should be "some data"
     Examples:
-      | dav-path                          |
-      | /remote.php/dav/spaces/<<FILEID>> |
-      | /dav/spcaes/<<FILEID>>            |
+      | dav-path               |
+      | /dav/spcaes/<<FILEID>> |

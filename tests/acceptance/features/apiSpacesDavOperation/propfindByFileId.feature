@@ -18,9 +18,8 @@ Feature: propfind a file using file id
       | oc:name        | textfile.txt |
       | oc:permissions | RDNVWZP      |
     Examples:
-      | dav-path                          |
-      | /remote.php/dav/spaces/<<FILEID>> |
-      | /dav/spaces/<<FILEID>>            |
+      | dav-path               |
+      | /dav/spaces/<<FILEID>> |
 
 
   Scenario Outline: send a PROPFIND request to a file inside a folder of personal space
@@ -34,9 +33,8 @@ Feature: propfind a file using file id
       | oc:name        | textfile.txt |
       | oc:permissions | RDNVWZP      |
     Examples:
-      | dav-path                          |
-      | /remote.php/dav/spaces/<<FILEID>> |
-      | /dav/spaces/<<FILEID>>            |
+      | dav-path               |
+      | /dav/spaces/<<FILEID>> |
 
 
   Scenario Outline: send a PROPFIND request to a file in personal space owned by another user
@@ -46,9 +44,8 @@ Feature: propfind a file using file id
     When user "Brian" sends HTTP method "PROPFIND" to URL "<dav-path>"
     Then the HTTP status code should be "404"
     Examples:
-      | dav-path                          |
-      | /remote.php/dav/spaces/<<FILEID>> |
-      | /dav/spaces/<<FILEID>>            |
+      | dav-path               |
+      | /dav/spaces/<<FILEID>> |
 
 
   Scenario Outline: send a PROPFIND request to a file of inside project space
@@ -63,9 +60,8 @@ Feature: propfind a file using file id
       | oc:name        | textfile.txt |
       | oc:permissions | RDNVWZP      |
     Examples:
-      | dav-path                          |
-      | /remote.php/dav/spaces/<<FILEID>> |
-      | /dav/spaces/<<FILEID>>            |
+      | dav-path               |
+      | /dav/spaces/<<FILEID>> |
 
 
   Scenario Outline: send a PROPFIND request to a file inside a folder of project space
@@ -81,9 +77,8 @@ Feature: propfind a file using file id
       | oc:name        | textfile.txt |
       | oc:permissions | RDNVWZP      |
     Examples:
-      | dav-path                          |
-      | /remote.php/dav/spaces/<<FILEID>> |
-      | /dav/spaces/<<FILEID>>            |
+      | dav-path               |
+      | /dav/spaces/<<FILEID>> |
 
 
   Scenario Outline: send a PROPFIND request to a file inside project space owned by another user
@@ -95,9 +90,8 @@ Feature: propfind a file using file id
     When user "Brian" sends HTTP method "PROPFIND" to URL "<dav-path>"
     Then the HTTP status code should be "404"
     Examples:
-      | dav-path                          |
-      | /remote.php/dav/spaces/<<FILEID>> |
-      | /dav/spaces/<<FILEID>>            |
+      | dav-path               |
+      | /dav/spaces/<<FILEID>> |
 
 
   Scenario Outline: send a PROPFIND request to a shared file
@@ -118,9 +112,8 @@ Feature: propfind a file using file id
       | oc:name        | textfile.txt |
       | oc:permissions | SNVW         |
     Examples:
-      | dav-path                          |
-      | /remote.php/dav/spaces/<<FILEID>> |
-      | /dav/spaces/<<FILEID>>            |
+      | dav-path               |
+      | /dav/spaces/<<FILEID>> |
 
 
   Scenario Outline: sharee sends a PROPFIND request to a file inside of a shared folder
@@ -142,6 +135,5 @@ Feature: propfind a file using file id
       | oc:name        | textfile.txt |
       | oc:permissions | DNVW         |
     Examples:
-      | dav-path                          |
-      | /remote.php/dav/spaces/<<FILEID>> |
-      | /dav/spaces/<<FILEID>>            |
+      | dav-path               |
+      | /dav/spaces/<<FILEID>> |

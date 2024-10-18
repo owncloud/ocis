@@ -38,15 +38,6 @@ class FilesVersionsContext implements Context {
 	private FeatureContext $featureContext;
 
 	/**
-	 * @param string $fileId
-	 *
-	 * @return string
-	 */
-	private function getVersionsPathForFileId(string $fileId):string {
-		return "/meta/$fileId/v";
-	}
-
-	/**
 	 * @When user :user tries to get versions of file :file from :fileOwner
 	 *
 	 * @param string $user
@@ -74,26 +65,26 @@ class FilesVersionsContext implements Context {
 	}
 
 	/**
-	 * @When the public tries to get the number of versions of file :file with password :password using file-id path :endpoint
+	 * @When the public tries to get the number of versions of file :file with password :password using file-id :endpoint
 	 *
 	 * @param string $file
 	 * @param string $password
-	 * @param string $endpoint
+	 * @param string $fileId
 	 *
 	 * @return void
 	 */
-	public function thePublicGetsTheNumberOfVersionsOfFileWithPasswordUsingFileIdPath(string $file, string $password, string $endpoint): void {
+	public function thePublicTriesToGetTheNumberOfVersionsOfFileWithPasswordUsingFileId(string $file, string $password, string $fileId): void {
 		$password = $this->featureContext->getActualPassword($password);
 		$this->featureContext->setResponse(
 			$this->featureContext->makeDavRequest(
 				"public",
 				"PROPFIND",
-				$endpoint,
+				$fileId,
 				null,
 				null,
 				null,
 				"versions",
-				(string)$this->featureContext->getDavPathVersion(),
+				$this->featureContext->getDavPathVersion(),
 				false,
 				$password
 			)
@@ -123,35 +114,33 @@ class FilesVersionsContext implements Context {
 		return $this->featureContext->makeDavRequest(
 			$user,
 			"PROPFIND",
-			$this->getVersionsPathForFileId($fileId),
+			$fileId,
 			null,
 			null,
 			$spaceId,
-			null,
-			'2'
+			"versions"
 		);
 	}
 
 	/**
-	 * @When user :user gets the number of versions of file :resource using file-id path :endpoint
-	 * @When user :user tries to get the number of versions of file :resource using file-id path :endpoint
+	 * @When user :user gets the number of versions of file :resource using file-id :fileId
+	 * @When user :user tries to get the number of versions of file :resource using file-id :fileId
 	 *
 	 * @param string $user
-	 * @param string $endpoint
+	 * @param string $fileId
 	 *
 	 * @return void
 	 */
-	public function userGetsTheNumberOfVersionsOfFileOfTheSpace(string $user, string $endpoint):void {
+	public function userGetsTheNumberOfVersionsOfFileOfTheSpace(string $user, string $fileId):void {
 		$this->featureContext->setResponse(
 			$this->featureContext->makeDavRequest(
 				$user,
 				"PROPFIND",
-				$endpoint,
+				$fileId,
 				null,
 				null,
 				null,
-				"versions",
-				(string)$this->featureContext->getDavPathVersion()
+				"versions"
 			)
 		);
 	}
@@ -190,12 +179,11 @@ class FilesVersionsContext implements Context {
 		return $this->featureContext->makeDavRequest(
 			$user,
 			"PROPFIND",
-			$this->getVersionsPathForFileId($fileId),
+			$fileId,
 			null,
 			$body,
 			null,
-			null,
-			'2'
+			"versions",
 		);
 	}
 
@@ -219,7 +207,7 @@ class FilesVersionsContext implements Context {
 		$xmlPart = $responseXml->xpath("//d:response/d:href");
 		//restoring the version only works with DAV path v2
 		$destinationUrl = $this->featureContext->getBaseUrl() . "/" .
-			WebDavHelper::getDavPath($user, 2) . \trim($path, "/");
+			WebDavHelper::getDavPath(WebDavHelper::DAV_VERSION_NEW, $user) . \trim($path, "/");
 		$fullUrl = $this->featureContext->getBaseUrlWithoutPath() .
 			$xmlPart[$versionIndex];
 		return HttpRequestHelper::sendRequest(
@@ -306,7 +294,7 @@ class FilesVersionsContext implements Context {
 	):void {
 		$user = $this->featureContext->getActualUsername($user);
 		$fileId = $this->featureContext->getFileIdForPath($user, $path);
-		Assert::assertNotNull($fileId, __METHOD__ . " file '$path' for user '$user' not found (the file may not exist)");
+		Assert::assertNotNull($fileId, __METHOD__ . ". file '$path' for user '$user' not found (the file may not exist)");
 		$this->assertFileVersionsCount($user, $fileId, $count);
 	}
 
@@ -548,7 +536,7 @@ class FilesVersionsContext implements Context {
 			$this->featureContext->getBaseUrl(),
 			$user,
 			$password,
-			$this->getVersionsPathForFileId($fileId),
+			$fileId,
 			$properties,
 			$this->featureContext->getStepLineRef(),
 			(string) $folderDepth,

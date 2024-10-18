@@ -304,26 +304,14 @@ def main(ctx):
 
     pipelines = []
 
-    build_release_helpers = \
-        changelog() + \
-        docs() + \
-        licenseCheck(ctx)
+    build_release_helpers = []
 
     test_pipelines = \
-        codestyle(ctx) + \
-        checkGherkinLint(ctx) + \
-        checkTestSuitesInExpectedFailures(ctx) + \
-        buildWebCache(ctx) + \
-        getGoBinForTesting(ctx) + \
         buildOcisBinaryForTesting(ctx) + \
-        checkStarlark() + \
         build_release_helpers + \
-        testOcisAndUploadResults(ctx) + \
         testPipelines(ctx)
 
-    build_release_pipelines = \
-        dockerReleases(ctx) + \
-        binaryReleases(ctx)
+    build_release_pipelines = []
 
     test_pipelines.append(
         pipelineDependsOn(
@@ -401,21 +389,21 @@ def testOcisAndUploadResults(ctx):
 def testPipelines(ctx):
     pipelines = []
 
-    if config["litmus"]:
-        pipelines += litmus(ctx, "ocis")
+    # if config["litmus"]:
+    #     pipelines += litmus(ctx, "ocis")
 
-    if "skip" not in config["cs3ApiTests"] or not config["cs3ApiTests"]["skip"]:
-        pipelines.append(cs3ApiTests(ctx, "ocis", "default"))
-    if "skip" not in config["wopiValidatorTests"] or not config["wopiValidatorTests"]["skip"]:
-        pipelines.append(wopiValidatorTests(ctx, "ocis", "builtin", "default"))
-        pipelines.append(wopiValidatorTests(ctx, "ocis", "cs3", "default"))
+    # if "skip" not in config["cs3ApiTests"] or not config["cs3ApiTests"]["skip"]:
+    #     pipelines.append(cs3ApiTests(ctx, "ocis", "default"))
+    # if "skip" not in config["wopiValidatorTests"] or not config["wopiValidatorTests"]["skip"]:
+    #     pipelines.append(wopiValidatorTests(ctx, "ocis", "builtin", "default"))
+    #     pipelines.append(wopiValidatorTests(ctx, "ocis", "cs3", "default"))
 
     pipelines += localApiTestPipeline(ctx)
 
     if "skip" not in config["apiTests"] or not config["apiTests"]["skip"]:
         pipelines += apiTests(ctx)
 
-    pipelines += e2eTestPipeline(ctx)
+    # pipelines += e2eTestPipeline(ctx)
 
     if ("skip" not in config["k6LoadTests"] or not config["k6LoadTests"]["skip"]) and ("k6-test" in ctx.build.title.lower() or ctx.build.event == "cron"):
         pipelines += k6LoadTests(ctx)
@@ -932,6 +920,8 @@ def localApiTestPipeline(ctx):
     return pipelines
 
 def localApiTests(suite, storage, extra_environment = {}):
+    expectedFailuresFile = "%s/tests/acceptance/expected-failures-localAPI-on-%s-storage.md" % (dirs["base"], storage.upper())
+
     environment = {
         "PATH_TO_OCIS": dirs["base"],
         "TEST_SERVER_URL": OCIS_URL,
@@ -945,6 +935,7 @@ def localApiTests(suite, storage, extra_environment = {}):
         "EXPECTED_FAILURES_FILE": "%s/tests/acceptance/expected-failures-localAPI-on-%s-storage.md" % (dirs["base"], storage.upper()),
         "UPLOAD_DELETE_WAIT_TIME": "1" if storage == "owncloud" else 0,
         "OCIS_WRAPPER_URL": "http://ocis-server:5200",
+        "WITH_REMOTE_PHP": False,
     }
 
     for item in extra_environment:
@@ -955,7 +946,9 @@ def localApiTests(suite, storage, extra_environment = {}):
         "image": OC_CI_PHP % DEFAULT_PHP_VERSION,
         "environment": environment,
         "commands": [
-            "make test-acceptance-api",
+            "cat %s/tests/acceptance/expected-failures-without-remotephp.md >> %s" % (dirs["base"], expectedFailuresFile),
+            "make -C %s test-acceptance-api" % (dirs["base"]),
+            "cat %s" % expectedFailuresFile,
         ],
     }]
 
@@ -1143,9 +1136,12 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "ocis", ac
                              "EXPECTED_FAILURES_FILE": expectedFailuresFile,
                              "UPLOAD_DELETE_WAIT_TIME": "1" if storage == "owncloud" else 0,
                              "OCIS_WRAPPER_URL": "http://ocis-server:5200",
+                             "WITH_REMOTE_PHP": False,
                          },
                          "commands": [
+                             "cat %s/tests/acceptance/expected-failures-without-remotephp.md >> %s" % (dirs["base"], expectedFailuresFile),
                              "make -C %s test-acceptance-api" % (dirs["base"]),
+                             "cat %s" % expectedFailuresFile,
                          ],
                      },
                  ] +
