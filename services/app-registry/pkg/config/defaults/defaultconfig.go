@@ -117,6 +117,12 @@ func defaultMimeTypeConfig() []config.MimeTypeConfig {
 			Name:        "GeoGebra Slides",
 			Description: "GeoGebra Slides",
 		},
+		{
+			MimeType:    "application/vnd.geogebra.pinboard",
+			Extension:   "ggp",
+			Name:        "GeoGebra Pinboard",
+			Description: "GeoGebra Pinboard",
+		},
 	}
 }
 
