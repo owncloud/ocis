@@ -18,7 +18,7 @@ func Server(opts ...Option) (*http.Server, error) {
 		WithCheck("http reachability", checks.NewHTTPCheck(options.Config.HTTP.Addr))
 
 	readyHandlerConfiguration := healthHandlerConfiguration.
-		WithCheck("nats reachability", checks.NewNatsCheck(options.Config.Events.Cluster))
+		WithCheck("nats reachability", checks.NewNatsCheck(options.Config.Events.Endpoint))
 
 	return debug.NewService(
 		debug.Logger(options.Logger),

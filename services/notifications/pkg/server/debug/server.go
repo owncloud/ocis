@@ -16,7 +16,7 @@ func Server(opts ...Option) (*http.Server, error) {
 
 	readyHandlerConfiguration := handlers.NewCheckHandlerConfiguration().
 		WithLogger(options.Logger).
-		WithCheck("nats reachability", checks.NewNatsCheck(options.Config.Notifications.Events.Cluster)).
+		WithCheck("nats reachability", checks.NewNatsCheck(options.Config.Notifications.Events.Endpoint)).
 		WithCheck("smtp-check", checks.NewTCPCheck(options.Config.Notifications.SMTP.Host+":"+strconv.Itoa(options.Config.Notifications.SMTP.Port)))
 
 	return debug.NewService(
