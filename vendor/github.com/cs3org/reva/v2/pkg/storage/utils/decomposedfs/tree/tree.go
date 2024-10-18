@@ -440,9 +440,7 @@ func (t *Tree) Delete(ctx context.Context, n *node.Node) (err error) {
 	// remove entry from cache immediately to avoid inconsistencies
 	defer func() { _ = t.idCache.Delete(path) }()
 
-	deletingSharedResource := ctx.Value(appctx.DeletingSharedResource)
-
-	if deletingSharedResource != nil && deletingSharedResource.(bool) {
+	if appctx.DeletingSharedResourceFromContext(ctx) {
 		src := filepath.Join(n.ParentPath(), n.Name)
 		return os.Remove(src)
 	}

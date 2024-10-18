@@ -148,13 +148,13 @@ func (s *svc) handleMkcol(ctx context.Context, w http.ResponseWriter, r *http.Re
 		}
 		return http.StatusForbidden, errors.New(sRes.Status.Message)
 	case res.Status.Code == rpc.Code_CODE_ABORTED:
-		return http.StatusPreconditionFailed, fmt.Errorf(res.Status.Message)
+		return http.StatusPreconditionFailed, errors.New(res.Status.Message)
 	case res.Status.Code == rpc.Code_CODE_FAILED_PRECONDITION:
 		// https://www.rfc-editor.org/rfc/rfc4918#section-9.3.1:
 		// 409 (Conflict) - A collection cannot be made at the Request-URI until
 		// one or more intermediate collections have been created. The server
 		// MUST NOT create those intermediate collections automatically.
-		return http.StatusConflict, fmt.Errorf(res.Status.Message)
+		return http.StatusConflict, errors.New(res.Status.Message)
 	case res.Status.Code == rpc.Code_CODE_ALREADY_EXISTS:
 		// https://www.rfc-editor.org/rfc/rfc4918#section-9.3.1:
 		// 405 (Method Not Allowed) - MKCOL can only be executed on an unmapped URL.

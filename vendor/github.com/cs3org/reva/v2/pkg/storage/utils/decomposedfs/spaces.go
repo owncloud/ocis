@@ -34,6 +34,7 @@ import (
 	v1beta11 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	"github.com/cs3org/reva/v2/internal/grpc/services/storageprovider"
 	"github.com/cs3org/reva/v2/pkg/appctx"
 	ocsconv "github.com/cs3org/reva/v2/pkg/conversions"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
@@ -65,7 +66,7 @@ const (
 
 // CreateStorageSpace creates a storage space
 func (fs *Decomposedfs) CreateStorageSpace(ctx context.Context, req *provider.CreateStorageSpaceRequest) (*provider.CreateStorageSpaceResponse, error) {
-	ctx = context.WithValue(ctx, utils.SpaceGrant, struct{}{})
+	ctx = storageprovider.WithSpaceType(ctx, "")
 	u := ctxpkg.ContextMustGetUser(ctx)
 
 	// "everything is a resource" this is the unique ID for the Space resource.
@@ -195,7 +196,7 @@ func (fs *Decomposedfs) CreateStorageSpace(ctx context.Context, req *provider.Cr
 		return nil, err
 	}
 
-	ctx = context.WithValue(ctx, utils.SpaceGrant, struct{ SpaceType string }{SpaceType: req.Type})
+	ctx = storageprovider.WithSpaceType(ctx, req.Type)
 
 	if req.Type != _spaceTypePersonal {
 		if err := fs.AddGrant(ctx, &provider.Reference{

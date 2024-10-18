@@ -335,17 +335,14 @@ func getSharedResource(ctx context.Context, client gateway.GatewayAPIClient, res
 		},
 	})
 	if err != nil {
-		e := fmt.Errorf("could not get reference")
-		return nil, arbitraryOcsResponse(response.MetaServerError.StatusCode, e.Error())
+		return nil, arbitraryOcsResponse(response.MetaServerError.StatusCode, "could not get reference")
 	}
 
 	if res.Status.Code != rpc.Code_CODE_OK {
 		if res.Status.Code == rpc.Code_CODE_NOT_FOUND {
-			e := fmt.Errorf("not found")
-			return nil, arbitraryOcsResponse(response.MetaNotFound.StatusCode, e.Error())
+			return nil, arbitraryOcsResponse(response.MetaNotFound.StatusCode, "not found")
 		}
-		e := fmt.Errorf(res.GetStatus().GetMessage())
-		return nil, arbitraryOcsResponse(response.MetaServerError.StatusCode, e.Error())
+		return nil, arbitraryOcsResponse(response.MetaServerError.StatusCode, res.GetStatus().GetMessage())
 	}
 
 	return res, nil

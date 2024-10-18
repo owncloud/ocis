@@ -720,7 +720,7 @@ func (s *Service) Delete(ctx context.Context, req *provider.DeleteRequest) (*pro
 	if req.Opaque != nil {
 		if _, ok := req.Opaque.Map["deleting_shared_resource"]; ok {
 			// it is a binary key; its existence signals true. Although, do not assume.
-			ctx = context.WithValue(ctx, appctx.DeletingSharedResource, true)
+			ctx = appctx.WithDeletingSharedResource(ctx)
 		}
 	}
 
@@ -1095,6 +1095,16 @@ func (s *Service) DenyGrant(ctx context.Context, req *provider.DenyGrantRequest)
 	return res, nil
 }
 
+type spaceTypeKey struct{}
+
+func WithSpaceType(ctx context.Context, spaceType string) context.Context {
+	return context.WithValue(ctx, spaceTypeKey{}, spaceType)
+}
+func SpaceTypeFromContext(ctx context.Context) (string, bool) {
+	spaceType, ok := ctx.Value(spaceTypeKey{}).(string)
+	return spaceType, ok
+}
+
 func (s *Service) AddGrant(ctx context.Context, req *provider.AddGrantRequest) (*provider.AddGrantResponse, error) {
 	ctx = ctxpkg.ContextSetLockID(ctx, req.LockId)
 
@@ -1102,13 +1112,7 @@ func (s *Service) AddGrant(ctx context.Context, req *provider.AddGrantRequest) (
 	// FIXME these should be part of the AddGrantRequest object
 	// https://github.com/owncloud/ocis/issues/4312
 	if utils.ExistsInOpaque(req.Opaque, "spacegrant") {
-		ctx = context.WithValue(
-			ctx,
-			utils.SpaceGrant,
-			struct{ SpaceType string }{
-				SpaceType: utils.ReadPlainFromOpaque(req.Opaque, "spacetype"),
-			},
-		)
+		ctx = WithSpaceType(ctx, utils.ReadPlainFromOpaque(req.Opaque, "spacetype"))
 	}
 
 	// check grantee type is valid
@@ -1137,13 +1141,7 @@ func (s *Service) UpdateGrant(ctx context.Context, req *provider.UpdateGrantRequ
 	// FIXME these should be part of the AddGrantRequest object
 	// https://github.com/owncloud/ocis/issues/4312
 	if utils.ExistsInOpaque(req.Opaque, "spacegrant") {
-		ctx = context.WithValue(
-			ctx,
-			utils.SpaceGrant,
-			struct{ SpaceType string }{
-				SpaceType: utils.ReadPlainFromOpaque(req.Opaque, "spacetype"),
-			},
-		)
+		ctx = WithSpaceType(ctx, utils.ReadPlainFromOpaque(req.Opaque, "spacetype"))
 	}
 
 	// check grantee type is valid
@@ -1174,7 +1172,7 @@ func (s *Service) RemoveGrant(ctx context.Context, req *provider.RemoveGrantRequ
 	// FIXME these should be part of the RemoveGrantRequest object
 	// https://github.com/owncloud/ocis/issues/4312
 	if utils.ExistsInOpaque(req.Opaque, "spacegrant") {
-		ctx = context.WithValue(ctx, utils.SpaceGrant, struct{}{})
+		ctx = WithSpaceType(ctx, "")
 	}
 
 	err := s.Storage.RemoveGrant(ctx, req.Ref, req.Grant)

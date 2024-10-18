@@ -19,6 +19,7 @@
 package importers
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 	"sync"
@@ -70,7 +71,7 @@ func (importer *BaseImporter) Process(connectors *connectors.Collection) (bool, 
 
 	var err error
 	if len(processErrs) != 0 {
-		err = fmt.Errorf(strings.Join(processErrs, "; "))
+		err = errors.New(strings.Join(processErrs, "; "))
 	}
 	return true, err
 }
