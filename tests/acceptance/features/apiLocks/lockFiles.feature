@@ -209,9 +209,10 @@ Feature: lock files
       | d:lockdiscovery/d:activelock/d:lockscope/d:exclusive |              |
       | d:lockdiscovery/d:activelock/oc:ownername            | Brian Murphy |
 
-
+  @env-config
   Scenario Outline: viewer cannot lock a file in the shares using file-id
     Given using spaces DAV path
+    And the administrator has enabled the permissions role "Secure Viewer"
     And user "Alice" has uploaded a file inside space "Alice Hansen" with content "some content" to "textfile.txt"
     And we save it into "FILEID"
     And user "Alice" has sent the following resource share invitation:
@@ -227,7 +228,7 @@ Feature: lock files
     Examples:
       | permissions-role |
       | Viewer           |
-      | Secure viewer    |
+      | Secure Viewer    |
 
 
   Scenario: sharee cannot lock a resource exclusively locked by a sharer

@@ -48,9 +48,10 @@ Feature: copy file
       | new              |
       | spaces           |
 
-  @skipOnReva
+  @skipOnReva @env-config
   Scenario Outline: copying a file to a folder with no permissions
     Given using <dav-path-version> DAV path
+    And the administrator has enabled the permissions role "Secure Viewer"
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Brian" has created folder "/testshare"
     And user "Brian" has sent the following resource share invitation:
@@ -67,8 +68,8 @@ Feature: copy file
       | dav-path-version | permissions-role |
       | old              | Viewer           |
       | new              | Viewer           |
-      | old              | Secure viewer    |
-      | new              | Secure viewer    |
+      | old              | Secure Viewer    |
+      | new              | Secure Viewer    |
 
   @skipOnReva
   Scenario Outline: copying a file to overwrite a file into a folder with no permissions
@@ -761,9 +762,10 @@ Feature: copy file
       | old              |
       | new              |
 
-  @skipOnReva
+  @skipOnReva @env-config
   Scenario Outline: sharee copies a file from a shared folder, shared with secure viewer permission
     Given using <dav-path-version> DAV path
+    And the administrator has enabled the permissions role "Secure Viewer"
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Brian" has created folder "/testshare"
     And user "Brian" has uploaded file with content "hello world" to "testshare/fileInsideShare.txt"
@@ -772,7 +774,7 @@ Feature: copy file
       | space           | Personal      |
       | sharee          | Alice         |
       | shareType       | user          |
-      | permissionsRole | Secure viewer |
+      | permissionsRole | Secure Viewer |
     And user "Alice" has a share "testshare" synced
     When user "Alice" copies file "/Shares/testshare/fileInsideShare.txt" to "/fileInsideShare.txt" using the WebDAV API
     Then the HTTP status code should be "403"
@@ -861,9 +863,10 @@ Feature: copy file
       | old              |
       | new              |
 
-  @skipOnReva
+  @skipOnReva @env-config
   Scenario Outline: copying a file between shares received from different users when one share is shared via Viewer and Secure viewer permission
     Given using <dav-path-version> DAV path
+    And the administrator has enabled the permissions role "Secure Viewer"
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Carol" has been created with default attributes and without skeleton files
     And user "Brian" has created folder "/testshare0"
@@ -893,14 +896,14 @@ Feature: copy file
 
     Examples:
       | dav-path-version | permissions-role-1 | permissions-role-2 |
-      | old              | Secure viewer      | Secure viewer      |
-      | new              | Secure viewer      | Secure viewer      |
-      | old              | Secure viewer      | Viewer             |
-      | new              | Secure viewer      | Viewer             |
-      | old              | Editor             | Secure viewer      |
-      | new              | Editor             | Secure viewer      |
-      | old              | Viewer             | Secure viewer      |
-      | new              | Viewer             | Secure viewer      |
+      | old              | Secure Viewer      | Secure Viewer      |
+      | new              | Secure Viewer      | Secure Viewer      |
+      | old              | Secure Viewer      | Viewer             |
+      | new              | Secure Viewer      | Viewer             |
+      | old              | Editor             | Secure Viewer      |
+      | new              | Editor             | Secure Viewer      |
+      | old              | Viewer             | Secure Viewer      |
+      | new              | Viewer             | Secure Viewer      |
 
   @skipOnReva
   Scenario Outline: copying a folder between shares received from different users

@@ -41,7 +41,7 @@ class GraphHelper {
 	];
 
 	public const ADDITIONAL_PERMISSIONS_ROLES = [
-		'Secure viewer' => 'aa97fe03-7980-45ac-9e50-b325749fd7e6',
+		'Secure Viewer' => 'aa97fe03-7980-45ac-9e50-b325749fd7e6',
 		'Space Editor Without Versions' => '3284f2d5-0070-4ad8-ac40-c247f7c1fb27',
 	];
 

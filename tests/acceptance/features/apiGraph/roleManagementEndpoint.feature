@@ -14,8 +14,8 @@ Feature: permissions role definitions
       """
       {
         "type": "array",
-        "maxItems": 8,
-        "minItems": 8,
+        "maxItems": 7,
+        "minItems": 7,
         "uniqueItems": true,
         "items": {
           "oneOf": [
@@ -541,78 +541,6 @@ Feature: permissions role definitions
                   }
                 }
               }
-            },
-            {
-              "type": "object",
-              "required": [
-                "@libre.graph.weight",
-                "description",
-                "displayName",
-                "id",
-                "rolePermissions"
-              ],
-              "properties": {
-                "@libre.graph.weight": {
-                  "const": 0
-                },
-                "description": {
-                  "const": "View only documents, images and PDFs. Watermarks will be applied."
-                },
-                "displayName": {
-                  "const": "Can view (secure)"
-                },
-                "id": {
-                  "const": "aa97fe03-7980-45ac-9e50-b325749fd7e6"
-                },
-                "rolePermissions": {
-                  "type": "array",
-                  "maxItems": 2,
-                  "minItems": 2,
-                  "uniqueItems": true,
-                  "items": {
-                    "oneOf": [
-                      {
-                        "type": "object",
-                        "required": [
-                          "allowedResourceActions",
-                          "condition"
-                        ],
-                        "properties": {
-                          "allowedResourceActions": {
-                            "const": [
-                              "libre.graph/driveItem/path/read",
-                              "libre.graph/driveItem/children/read",
-                              "libre.graph/driveItem/basic/read"
-                            ]
-                          },
-                          "condition": {
-                            "const": "exists @Resource.File"
-                          }
-                        }
-                      },
-                      {
-                        "type": "object",
-                        "required": [
-                          "allowedResourceActions",
-                          "condition"
-                        ],
-                        "properties": {
-                          "allowedResourceActions": {
-                            "const": [
-                              "libre.graph/driveItem/path/read",
-                              "libre.graph/driveItem/children/read",
-                              "libre.graph/driveItem/basic/read"
-                            ]
-                          },
-                          "condition": {
-                            "const": "exists @Resource.Folder"
-                          }
-                        }
-                      }
-                    ]
-                  }
-                }
-              }
             }
           ]
         }
@@ -746,5 +674,86 @@ Feature: permissions role definitions
                   }
                 }
           }
+      }
+      """
+
+  @env-config
+  Scenario: get details of a secure viewer role definition
+    Given the administrator has enabled the permissions role "Secure Viewer"
+    When user "Alice" gets the "Secure Viewer" role definition using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "@libre.graph.weight",
+          "description",
+          "displayName",
+          "id",
+          "rolePermissions"
+        ],
+        "properties": {
+          "@libre.graph.weight": {
+            "const": 0
+          },
+          "description": {
+            "const": "View only documents, images and PDFs. Watermarks will be applied."
+          },
+          "displayName": {
+            "const": "Can view (secure)"
+          },
+          "id": {
+            "const": "aa97fe03-7980-45ac-9e50-b325749fd7e6"
+          },
+          "rolePermissions": {
+            "type": "array",
+            "maxItems": 2,
+            "minItems": 2,
+            "uniqueItems": true,
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "required": [
+                    "allowedResourceActions",
+                    "condition"
+                  ],
+                  "properties": {
+                    "allowedResourceActions": {
+                      "const": [
+                        "libre.graph/driveItem/path/read",
+                        "libre.graph/driveItem/children/read",
+                        "libre.graph/driveItem/basic/read"
+                      ]
+                    },
+                    "condition": {
+                      "const": "exists @Resource.File"
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": [
+                    "allowedResourceActions",
+                    "condition"
+                  ],
+                  "properties": {
+                    "allowedResourceActions": {
+                      "const": [
+                        "libre.graph/driveItem/path/read",
+                        "libre.graph/driveItem/children/read",
+                        "libre.graph/driveItem/basic/read"
+                      ]
+                    },
+                    "condition": {
+                      "const": "exists @Resource.Folder"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
       }
       """

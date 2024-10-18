@@ -61,16 +61,17 @@ Feature: Preview file in project space
       | filesForUpload/testavatar.png | testavatar.png |
       | filesForUpload/lorem.txt      | lorem.txt      |
 
-
+  @env-config
   Scenario Outline: download preview of shared file shared via Secure viewer permission role
     Given user "Brian" has been created with default attributes and without skeleton files
+    And the administrator has enabled the permissions role "Secure Viewer"
     And user "Alice" has uploaded a file from "<source>" to "<destination>" via TUS inside of the space "Alice Hansen" using the WebDAV API
     And user "Alice" has sent the following resource share invitation:
       | resource        | <destination> |
       | space           | Personal      |
       | sharee          | Brian         |
       | shareType       | user          |
-      | permissionsRole | Secure viewer |
+      | permissionsRole | Secure Viewer |
     And user "Brian" has a share "<destination>" synced
     When user "Brian" downloads the preview of shared resource "/Shares/<destination>" with width "32" and height "32" using the WebDAV API
     Then the HTTP status code should be "403"

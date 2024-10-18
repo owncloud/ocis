@@ -204,6 +204,7 @@ Feature: copying file using file id
 
   Scenario: sharee tries to copy a file from shares space with secure viewer to personal space
     Given user "Brian" has been created with default attributes and without skeleton files
+    And the administrator has enabled the permissions role "Secure Viewer"
     And user "Alice" has created folder "/folder"
     And user "Alice" has uploaded file with content "some data" to "/folder/test.txt"
     And we save it into "FILEID"
@@ -212,7 +213,7 @@ Feature: copying file using file id
       | space           | Personal      |
       | sharee          | Brian         |
       | shareType       | user          |
-      | permissionsRole | Secure viewer |
+      | permissionsRole | Secure Viewer |
     And user "Brian" has a share "folder" synced
     When user "Brian" copies a file "/test.txt" into "/" inside space "Personal" using file-id "<<FILEID>>"
     Then the HTTP status code should be "403"
@@ -258,9 +259,10 @@ Feature: copying file using file id
       | Uploader        | Manager       |
       | Uploader        | Space Editor  |
 
-
+  @env-config
   Scenario Outline: sharee tries to copy a file from shares to project space
     Given user "Brian" has been created with default attributes and without skeleton files
+    And the administrator has enabled the permissions role "Secure Viewer"
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created folder "/folder"
     And user "Alice" has uploaded file with content "some data" to "/folder/test.txt"
@@ -288,9 +290,9 @@ Feature: copying file using file id
       | test.txt |
     Examples:
       | permission-role | space-role    |
-      | Secure viewer   | Manager       |
-      | Secure viewer   | Space Viewer  |
-      | Secure viewer   | Space Editor  |
+      | Secure Viewer   | Manager       |
+      | Secure Viewer   | Space Viewer  |
+      | Secure Viewer   | Space Editor  |
       | Editor          | Space Viewer  |
       | Viewer          | Space Viewer  |
       | Uploader        | Space Viewer  |
@@ -335,9 +337,10 @@ Feature: copying file using file id
       | Uploader        | Editor        |
       | Uploader        | Uploader      |
 
-
+  @env-config
   Scenario Outline: sharee tries to copy a file between shares space
     Given user "Brian" has been created with default attributes and without skeleton files
+    And the administrator has enabled the permissions role "Secure Viewer"
     And user "Alice" has created folder "/share1"
     And user "Alice" has created folder "/share2"
     And user "Alice" has uploaded file with content "some data" to "/share1/test.txt"
@@ -368,16 +371,16 @@ Feature: copying file using file id
       | test.txt |
     Examples:
       | from-share-role | to-share-role |
-      | Secure viewer   | Viewer        |
-      | Secure viewer   | Editor        |
-      | Secure viewer   | Uploader      |
-      | Secure viewer   | Secure viewer |
+      | Secure Viewer   | Viewer        |
+      | Secure Viewer   | Editor        |
+      | Secure Viewer   | Uploader      |
+      | Secure Viewer   | Secure Viewer |
       | Viewer          | Viewer        |
       | Editor          | Viewer        |
       | Uploader        | Viewer        |
-      | Viewer          | Secure viewer |
-      | Editor          | Secure viewer |
-      | Uploader        | Secure viewer |
+      | Viewer          | Secure Viewer |
+      | Editor          | Secure Viewer |
+      | Uploader        | Secure Viewer |
 
 
   Scenario Outline: copy a file from project to personal space
@@ -507,9 +510,10 @@ Feature: copying file using file id
       | Space Viewer | Editor      |
       | Space Viewer | Uploader    |
 
-
+  @env-config
   Scenario Outline: try to copy a file from project to shares space with read permission
     Given user "Brian" has been created with default attributes and without skeleton files
+    And the administrator has enabled the permissions role "Secure Viewer"
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "project-space" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "project-space" with content "some data" to "textfile.txt"
@@ -538,8 +542,8 @@ Feature: copying file using file id
     Examples:
       | space-role   | permissions   |
       | Manager      | Viewer        |
-      | Manager      | Secure viewer |
+      | Manager      | Secure Viewer |
       | Space Editor | Viewer        |
-      | Space Editor | Secure viewer |
+      | Space Editor | Secure Viewer |
       | Space Viewer | Viewer        |
-      | Space Viewer | Secure viewer |
+      | Space Viewer | Secure Viewer |
