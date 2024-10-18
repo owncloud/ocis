@@ -70,7 +70,7 @@ The following sections list the changes for unreleased.
 * Enhancement - WebOffice Templates: [#10276](https://github.com/owncloud/ocis/pull/10276)
 * Enhancement - Remove Deprecations: [#10305](https://github.com/owncloud/ocis/pull/10305)
 * Enhancement - Allow to use libvips for generating thumbnails: [#10310](https://github.com/owncloud/ocis/pull/10310)
-* Enhancement - Bump reva to 2.xx.x: [#10321](https://github.com/owncloud/ocis/pull/10321)
+* Enhancement - Bump reva to 2.xx.x: [#10347](https://github.com/owncloud/ocis/pull/10347)
 
 ## Details
 
@@ -241,10 +241,11 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/10310
 
-* Enhancement - Bump reva to 2.xx.x: [#10321](https://github.com/owncloud/ocis/pull/10321)
+* Enhancement - Bump reva to 2.xx.x: [#10347](https://github.com/owncloud/ocis/pull/10347)
 
    TODO
 
+   https://github.com/owncloud/ocis/pull/10347
    https://github.com/owncloud/ocis/pull/10321
    https://github.com/owncloud/ocis/pull/10236
    https://github.com/owncloud/ocis/pull/10216
