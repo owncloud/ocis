@@ -2977,4 +2977,31 @@ class FeatureContext extends BehatVariablesContext {
 		}
 		return false;
 	}
+
+	/**
+	 * @When a user requests these endpoints with :method
+	 *
+	 * @param string $method
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function userRequestsEndpoints(string $method, TableNode $table): void {
+		$this->verifyTableNodeColumns($table, ['endpoint'], ['service', 'comment']);
+		foreach ($table->getHash() as $row) {
+			$this->setResponse(
+				HttpRequestHelper::sendRequest(
+					$row['endpoint'],
+					$this->getStepLineRef(),
+					$method,
+					null,
+					null,
+					[],
+					null,
+				)
+			);
+			$this->pushToLastStatusCodesArrays();
+		}
+	}
 }

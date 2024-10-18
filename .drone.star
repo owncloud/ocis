@@ -93,6 +93,7 @@ config = {
                 "apiSharingNgLinkSharePermission",
                 "apiSharingNgLinkShareRoot",
                 "apiActivities",
+                "serviceAvailability"
             ],
             "skip": False,
         },
