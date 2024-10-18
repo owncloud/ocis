@@ -3439,3 +3439,431 @@ Feature: resources shared by user
         }
       }
       """
+
+
+  Scenario: sharer (also a group member) lists shares shared to group (Personal space)
+    Given group "grp1" has been created
+    And user "Alice" has been added to group "grp1"
+    And user "Alice" has created folder "FolderToShare"
+    And user "Alice" has uploaded file with content "hello world" to "textfile.txt"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | textfile.txt |
+      | space           | Personal     |
+      | sharee          | grp1         |
+      | shareType       | group        |
+      | permissionsRole | Viewer       |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | FolderToShare |
+      | space           | Personal      |
+      | sharee          | grp1          |
+      | shareType       | group         |
+      | permissionsRole | Viewer        |
+    When user "Alice" lists the shares shared by her using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should contain resource "textfile.txt" with the following data:
+      """
+      {
+        "type": "object",
+        "required": [
+          "parentReference",
+          "permissions",
+          "name",
+          "size"
+        ],
+        "properties": {
+          "parentReference": {
+            "type": "object",
+            "required": [
+              "driveId",
+              "driveType",
+              "path",
+              "name",
+              "id"
+            ],
+            "properties": {
+              "driveId": {
+                "type": "string",
+                "pattern": "^%space_id_pattern%$"
+              },
+              "driveType": {
+                "const": "personal"
+              },
+              "path": {
+                "const": "/"
+              },
+              "name": {
+                "const": "/"
+              },
+              "id": {
+                "type": "string",
+                "pattern": "^%file_id_pattern%$"
+              }
+            }
+          },
+          "permissions": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "grantedToV2",
+                "id",
+                "roles"
+              ],
+              "properties": {
+                "grantedToV2": {
+                  "type": "object",
+                  "required": ["group"],
+                  "properties": {
+                    "group": {
+                      "type": "object",
+                      "required": [
+                        "displayName",
+                        "id"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "pattern": "^%group_id_pattern%$"
+                        },
+                        "displayName": {
+                          "const": "grp1"
+                        }
+                      }
+                    }
+                  }
+                },
+                "id": {
+                  "type": "string",
+                  "pattern": "^%permissions_id_pattern%$"
+                },
+                "roles": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 1,
+                  "items": {
+                    "type": "string",
+                    "pattern": "^%role_id_pattern%$"
+                  }
+                }
+              }
+            }
+          },
+          "name": {
+            "const": "textfile.txt"
+          }
+        }
+      }
+      """
+    And the JSON data of the response should contain resource "FolderToShare" with the following data:
+      """
+      {
+        "type": "object",
+        "required": [
+          "parentReference",
+          "permissions",
+          "name"
+        ],
+        "properties": {
+          "parentReference": {
+            "type": "object",
+            "required": [
+              "driveId",
+              "driveType",
+              "path",
+              "name",
+              "id"
+            ],
+            "properties": {
+              "driveId": {
+                "type": "string",
+                "pattern": "^%space_id_pattern%$"
+              },
+              "driveType": {
+                "const": "personal"
+              },
+              "path": {
+                "const": "/"
+              },
+              "name": {
+                "const": "/"
+              },
+              "id": {
+                "type": "string",
+                "pattern": "^%file_id_pattern%$"
+              }
+            }
+          },
+          "permissions": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "grantedToV2",
+                "id",
+                "roles"
+              ],
+              "properties": {
+                "grantedToV2": {
+                  "type": "object",
+                  "required": ["group"],
+                  "properties": {
+                    "group": {
+                      "type": "object",
+                      "required": [
+                        "displayName",
+                        "id"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "pattern": "^%user_id_pattern%$"
+                        },
+                        "displayName": {
+                          "const": "grp1"
+                        }
+                      }
+                    }
+                  }
+                },
+                "id": {
+                  "type": "string",
+                  "pattern": "^%permissions_id_pattern%$"
+                },
+                "roles": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 1,
+                  "items": {
+                    "type": "string",
+                    "pattern": "^%role_id_pattern%$"
+                  }
+                }
+              }
+            }
+          },
+          "name": {
+            "const": "FolderToShare"
+          }
+        }
+      }
+      """
+
+
+  Scenario: sharer (also a group member) lists shares shared to group (Project space)
+    Given group "grp1" has been created
+    And user "Alice" has been added to group "grp1"
+    And using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Alice" has uploaded a file inside space "new-space" with content "some content" to "textfile.txt"
+    And user "Alice" has created a folder "FolderToShare" in space "new-space"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | textfile.txt |
+      | space           | new-space    |
+      | sharee          | grp1         |
+      | shareType       | group        |
+      | permissionsRole | Viewer       |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | FolderToShare |
+      | space           | new-space     |
+      | sharee          | grp1          |
+      | shareType       | group         |
+      | permissionsRole | Viewer        |
+    When user "Alice" lists the shares shared by her using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should contain resource "textfile.txt" with the following data:
+      """
+      {
+        "type": "object",
+        "required": [
+          "parentReference",
+          "permissions",
+          "name",
+          "size"
+        ],
+        "properties": {
+          "parentReference": {
+            "type": "object",
+            "required": [
+              "driveId",
+              "driveType",
+              "path",
+              "name",
+              "id"
+            ],
+            "properties": {
+              "driveId": {
+                "type": "string",
+                "pattern": "^%space_id_pattern%$"
+              },
+              "driveType": {
+                "const": "project"
+              },
+              "path": {
+                "const": "/"
+              },
+              "name": {
+                "const": "/"
+              },
+              "id": {
+                "type": "string",
+                "pattern": "^%file_id_pattern%$"
+              }
+            }
+          },
+          "permissions": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "grantedToV2",
+                "id",
+                "roles"
+              ],
+              "properties": {
+                "grantedToV2": {
+                  "type": "object",
+                  "required": ["group"],
+                  "properties": {
+                    "group": {
+                      "type": "object",
+                      "required": [
+                        "displayName",
+                        "id"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "pattern": "^%group_id_pattern%$"
+                        },
+                        "displayName": {
+                          "const": "grp1"
+                        }
+                      }
+                    }
+                  }
+                },
+                "id": {
+                  "type": "string",
+                  "pattern": "^%permissions_id_pattern%$"
+                },
+                "roles": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 1,
+                  "items": {
+                    "type": "string",
+                    "pattern": "^%role_id_pattern%$"
+                  }
+                }
+              }
+            }
+          },
+          "name": {
+            "const": "textfile.txt"
+          }
+        }
+      }
+      """
+    And the JSON data of the response should contain resource "FolderToShare" with the following data:
+      """
+      {
+        "type": "object",
+        "required": [
+          "parentReference",
+          "permissions",
+          "name"
+        ],
+        "properties": {
+          "parentReference": {
+            "type": "object",
+            "required": [
+              "driveId",
+              "driveType",
+              "path",
+              "name",
+              "id"
+            ],
+            "properties": {
+              "driveId": {
+                "type": "string",
+                "pattern": "^%space_id_pattern%$"
+              },
+              "driveType": {
+                "const": "project"
+              },
+              "path": {
+                "const": "/"
+              },
+              "name": {
+                "const": "/"
+              },
+              "id": {
+                "type": "string",
+                "pattern": "^%file_id_pattern%$"
+              }
+            }
+          },
+          "permissions": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "grantedToV2",
+                "id",
+                "roles"
+              ],
+              "properties": {
+                "grantedToV2": {
+                  "type": "object",
+                  "required": ["group"],
+                  "properties": {
+                    "group": {
+                      "type": "object",
+                      "required": [
+                        "displayName",
+                        "id"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "pattern": "^%user_id_pattern%$"
+                        },
+                        "displayName": {
+                          "const": "grp1"
+                        }
+                      }
+                    }
+                  }
+                },
+                "id": {
+                  "type": "string",
+                  "pattern": "^%permissions_id_pattern%$"
+                },
+                "roles": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 1,
+                  "items": {
+                    "type": "string",
+                    "pattern": "^%role_id_pattern%$"
+                  }
+
+                }
+              }
+            }
+          },
+          "name": {
+            "const": "FolderToShare"
+          }
+        }
+      }
+      """

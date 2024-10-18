@@ -5185,3 +5185,54 @@ Feature: an user gets the resources shared to them
       | textfile3.txt |
       | textfile4.txt |
       | textfile5.txt |
+
+
+  Scenario: sharee (also a group member) lists shares shared to group (Personal space)
+    Given group "grp1" has been created
+    And user "Alice" has been added to group "grp1"
+    And user "Alice" has created folder "FolderToShare"
+    And user "Alice" has uploaded file with content "hello world" to "textfile.txt"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | textfile.txt |
+      | space           | Personal     |
+      | sharee          | grp1         |
+      | shareType       | group        |
+      | permissionsRole | Viewer       |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | FolderToShare |
+      | space           | Personal      |
+      | sharee          | grp1          |
+      | shareType       | group         |
+      | permissionsRole | Viewer        |
+    When user "Alice" lists the shares shared with her using the Graph API
+    Then the HTTP status code should be "200"
+    And the json response should contain the following shares:
+      | textfile.txt  |
+      | FolderToShare |
+
+
+  Scenario: sharee (also a group member) lists shares shared to group (Project space)
+    Given group "grp1" has been created
+    And user "Alice" has been added to group "grp1"
+    And using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Alice" has uploaded a file inside space "new-space" with content "some content" to "textfile.txt"
+    And user "Alice" has created a folder "FolderToShare" in space "new-space"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | textfile.txt |
+      | space           | new-space    |
+      | sharee          | grp1         |
+      | shareType       | group        |
+      | permissionsRole | Viewer       |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | FolderToShare |
+      | space           | new-space     |
+      | sharee          | grp1          |
+      | shareType       | group         |
+      | permissionsRole | Viewer        |
+    When user "Alice" lists the shares shared with her using the Graph API
+    Then the HTTP status code should be "200"
+    And the json response should contain the following shares:
+      | textfile.txt  |
+      | FolderToShare |
