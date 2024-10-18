@@ -1,0 +1,15 @@
+Feature: service health check
+
+
+  Scenario: health check
+    When a user requests these endpoints with "GET"
+      | endpoint                      | service   |
+      | http://127.0.0.1:9297/healthz | antivirus |
+    Then the HTTP status code of responses on all endpoints should be "200"
+
+
+  Scenario: ready check
+    When a user requests these endpoints with "GET"
+      | endpoint                     | service   |
+      | http://127.0.0.1:9297/readyz | antivirus |
+    Then the HTTP status code of responses on all endpoints should be "200"
