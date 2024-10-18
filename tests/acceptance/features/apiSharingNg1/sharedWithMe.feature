@@ -313,7 +313,6 @@ Feature: an user gets the resources shared to them
       | permissions-role |
       | File Editor      |
       | Viewer           |
-      | Secure viewer    |
 
 
   Scenario Outline: sharee lists the folder share (Personal space)
@@ -606,7 +605,6 @@ Feature: an user gets the resources shared to them
       | permissions-role |
       | Editor           |
       | Viewer           |
-      | Secure viewer    |
 
 
   Scenario: sharee lists the file share received via group invitation (Personal space)
@@ -2739,7 +2737,6 @@ Feature: an user gets the resources shared to them
       | permissions-role |
       | File Editor      |
       | Viewer           |
-      | Secure viewer    |
 
   @issue-8027 @issue-8314
   Scenario Outline: sharee lists the folder share (Project space)
@@ -2953,7 +2950,6 @@ Feature: an user gets the resources shared to them
       | permissions-role |
       | Editor           |
       | Viewer           |
-      | Secure viewer    |
 
 
   Scenario: sharee lists the file share received via group invitation (Project space)
