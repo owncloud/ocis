@@ -71,6 +71,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Remove Deprecations: [#10305](https://github.com/owncloud/ocis/pull/10305)
 * Enhancement - Allow to use libvips for generating thumbnails: [#10310](https://github.com/owncloud/ocis/pull/10310)
 * Enhancement - Bump reva to 2.xx.x: [#10347](https://github.com/owncloud/ocis/pull/10347)
+* Enhancement - Bump various dependencies: [#10352](https://github.com/owncloud/ocis/pull/10352)
 
 ## Details
 
@@ -250,6 +251,10 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/10236
    https://github.com/owncloud/ocis/pull/10216
    https://github.com/owncloud/ocis/pull/10315
+
+* Enhancement - Bump various dependencies: [#10352](https://github.com/owncloud/ocis/pull/10352)
+
+   https://github.com/owncloud/ocis/pull/10352
 
 # Changelog for [6.5.0] (2024-10-01)
 
