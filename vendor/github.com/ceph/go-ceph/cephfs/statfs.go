@@ -44,7 +44,8 @@ type CephStatVFS struct {
 // useful values.
 //
 // Implements:
-//  int ceph_statfs(struct ceph_mount_info *cmount, const char *path, struct statvfs *stbuf);
+//
+//	int ceph_statfs(struct ceph_mount_info *cmount, const char *path, struct statvfs *stbuf);
 func (mount *MountInfo) StatFS(path string) (*CephStatVFS, error) {
 	if err := mount.validate(); err != nil {
 		return nil, err

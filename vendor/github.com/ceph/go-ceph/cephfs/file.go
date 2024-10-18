@@ -48,7 +48,8 @@ type File struct {
 // a local open call. Mode is the same mode bits as a local open call.
 //
 // Implements:
-//  int ceph_open(struct ceph_mount_info *cmount, const char *path, int flags, mode_t mode);
+//
+//	int ceph_open(struct ceph_mount_info *cmount, const char *path, int flags, mode_t mode);
 func (mount *MountInfo) Open(path string, flags int, mode uint32) (*File, error) {
 	if mount.mount == nil {
 		return nil, ErrNotConnected
@@ -72,7 +73,8 @@ func (f *File) validate() error {
 // Close the file.
 //
 // Implements:
-//  int ceph_close(struct ceph_mount_info *cmount, int fd);
+//
+//	int ceph_close(struct ceph_mount_info *cmount, int fd);
 func (f *File) Close() error {
 	if f.fd == -1 {
 		// already closed
@@ -93,7 +95,8 @@ func (f *File) Close() error {
 // wrappers for external callers of the library.
 //
 // Implements:
-//  int ceph_read(struct ceph_mount_info *cmount, int fd, char *buf, int64_t size, int64_t offset);
+//
+//	int ceph_read(struct ceph_mount_info *cmount, int fd, char *buf, int64_t size, int64_t offset);
 func (f *File) read(buf []byte, offset int64) (int, error) {
 	if err := f.validate(); err != nil {
 		return 0, err
@@ -137,8 +140,9 @@ func (f *File) ReadAt(buf []byte, offset int64) (int, error) {
 // 0, io.EOF.
 //
 // Implements:
-//  int ceph_preadv(struct ceph_mount_info *cmount, int fd, const struct iovec *iov, int iovcnt,
-//                  int64_t offset);
+//
+//	int ceph_preadv(struct ceph_mount_info *cmount, int fd, const struct iovec *iov, int iovcnt,
+//	                int64_t offset);
 func (f *File) Preadv(data [][]byte, offset int64) (int, error) {
 	if err := f.validate(); err != nil {
 		return 0, err
@@ -167,8 +171,9 @@ func (f *File) Preadv(data [][]byte, offset int64) (int, error) {
 // wrappers for external callers of the library.
 //
 // Implements:
-//  int ceph_write(struct ceph_mount_info *cmount, int fd, const char *buf,
-//                 int64_t size, int64_t offset);
+//
+//	int ceph_write(struct ceph_mount_info *cmount, int fd, const char *buf,
+//	               int64_t size, int64_t offset);
 func (f *File) write(buf []byte, offset int64) (int, error) {
 	if err := f.validate(); err != nil {
 		return 0, err
@@ -202,8 +207,9 @@ func (f *File) WriteAt(buf []byte, offset int64) (int, error) {
 // The number of bytes written is returned.
 //
 // Implements:
-//  int ceph_pwritev(struct ceph_mount_info *cmount, int fd, const struct iovec *iov, int iovcnt,
-//                   int64_t offset);
+//
+//	int ceph_pwritev(struct ceph_mount_info *cmount, int fd, const struct iovec *iov, int iovcnt,
+//	                 int64_t offset);
 func (f *File) Pwritev(data [][]byte, offset int64) (int, error) {
 	if err := f.validate(); err != nil {
 		return 0, err
@@ -226,7 +232,8 @@ func (f *File) Pwritev(data [][]byte, offset int64) (int, error) {
 // Seek will reposition the file stream based on the given offset.
 //
 // Implements:
-//  int64_t ceph_lseek(struct ceph_mount_info *cmount, int fd, int64_t offset, int whence);
+//
+//	int64_t ceph_lseek(struct ceph_mount_info *cmount, int fd, int64_t offset, int whence);
 func (f *File) Seek(offset int64, whence int) (int64, error) {
 	if err := f.validate(); err != nil {
 		return 0, err
@@ -250,7 +257,8 @@ func (f *File) Seek(offset int64, whence int) (int64, error) {
 // Fchmod changes the mode bits (permissions) of a file.
 //
 // Implements:
-//  int ceph_fchmod(struct ceph_mount_info *cmount, int fd, mode_t mode);
+//
+//	int ceph_fchmod(struct ceph_mount_info *cmount, int fd, mode_t mode);
 func (f *File) Fchmod(mode uint32) error {
 	if err := f.validate(); err != nil {
 		return err
@@ -263,7 +271,8 @@ func (f *File) Fchmod(mode uint32) error {
 // Fchown changes the ownership of a file.
 //
 // Implements:
-//  int ceph_fchown(struct ceph_mount_info *cmount, int fd, int uid, int gid);
+//
+//	int ceph_fchown(struct ceph_mount_info *cmount, int fd, int uid, int gid);
 func (f *File) Fchown(user uint32, group uint32) error {
 	if err := f.validate(); err != nil {
 		return err
@@ -276,8 +285,9 @@ func (f *File) Fchown(user uint32, group uint32) error {
 // Fstatx returns information about an open file.
 //
 // Implements:
-//  int ceph_fstatx(struct ceph_mount_info *cmount, int fd, struct ceph_statx *stx,
-//                  unsigned int want, unsigned int flags);
+//
+//	int ceph_fstatx(struct ceph_mount_info *cmount, int fd, struct ceph_statx *stx,
+//	                unsigned int want, unsigned int flags);
 func (f *File) Fstatx(want StatxMask, flags AtFlags) (*CephStatx, error) {
 	if err := f.validate(); err != nil {
 		return nil, err
@@ -317,6 +327,7 @@ const (
 // on the given range.
 //
 // Implements:
+//
 //	int ceph_fallocate(struct ceph_mount_info *cmount, int fd, int mode,
 //								  int64_t offset, int64_t length);
 func (f *File) Fallocate(mode FallocFlags, offset, length int64) error {
@@ -348,7 +359,8 @@ const (
 // lock, must be an arbitrary integer.
 //
 // Implements:
-//  int ceph_flock(struct ceph_mount_info *cmount, int fd, int operation, uint64_t owner);
+//
+//	int ceph_flock(struct ceph_mount_info *cmount, int fd, int operation, uint64_t owner);
 func (f *File) Flock(operation LockOp, owner uint64) error {
 	if err := f.validate(); err != nil {
 		return err
@@ -372,7 +384,8 @@ func (f *File) Flock(operation LockOp, owner uint64) error {
 // Pass SyncDataOnly to have this call behave more like fdatasync (on linux).
 //
 // Implements:
-//  int ceph_fsync(struct ceph_mount_info *cmount, int fd, int syncdataonly);
+//
+//	int ceph_fsync(struct ceph_mount_info *cmount, int fd, int syncdataonly);
 func (f *File) Fsync(sync SyncChoice) error {
 	if err := f.validate(); err != nil {
 		return err
@@ -401,7 +414,8 @@ func (f *File) Sync() error {
 // https://tracker.ceph.com/issues/48202
 //
 // Implements:
-//  int ceph_ftruncate(struct ceph_mount_info *cmount, int fd, int64_t size);
+//
+//	int ceph_ftruncate(struct ceph_mount_info *cmount, int fd, int64_t size);
 func (f *File) Truncate(size int64) error {
 	if err := f.validate(); err != nil {
 		return err

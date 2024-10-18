@@ -61,7 +61,8 @@ func CreateMountWithId(id string) (*MountInfo, error) {
 // connection.
 //
 // Implements:
-//  int ceph_create_from_rados(struct ceph_mount_info **cmount, rados_t cluster);
+//
+//	int ceph_create_from_rados(struct ceph_mount_info **cmount, rados_t cluster);
 func CreateFromRados(conn *rados.Conn) (*MountInfo, error) {
 	mount := &MountInfo{}
 	ret := C.ceph_create_from_rados(&mount.mount, C.rados_t(conn.Cluster()))
@@ -74,7 +75,8 @@ func CreateFromRados(conn *rados.Conn) (*MountInfo, error) {
 // ReadDefaultConfigFile loads the ceph configuration from the default config file.
 //
 // Implements:
-//  int ceph_conf_read_file(struct ceph_mount_info *cmount, const char *path_list);
+//
+//	int ceph_conf_read_file(struct ceph_mount_info *cmount, const char *path_list);
 func (mount *MountInfo) ReadDefaultConfigFile() error {
 	ret := C.ceph_conf_read_file(mount.mount, nil)
 	return getError(ret)
@@ -83,7 +85,8 @@ func (mount *MountInfo) ReadDefaultConfigFile() error {
 // ReadConfigFile loads the ceph configuration from the specified config file.
 //
 // Implements:
-//  int ceph_conf_read_file(struct ceph_mount_info *cmount, const char *path_list);
+//
+//	int ceph_conf_read_file(struct ceph_mount_info *cmount, const char *path_list);
 func (mount *MountInfo) ReadConfigFile(path string) error {
 	cPath := C.CString(path)
 	defer C.free(unsafe.Pointer(cPath))
@@ -95,7 +98,8 @@ func (mount *MountInfo) ReadConfigFile(path string) error {
 // argument vector.
 //
 // Implements:
-//  int ceph_conf_parse_argv(struct ceph_mount_info *cmount, int argc, const char **argv);
+//
+//	int ceph_conf_parse_argv(struct ceph_mount_info *cmount, int argc, const char **argv);
 func (mount *MountInfo) ParseConfigArgv(argv []string) error {
 	if err := mount.validate(); err != nil {
 		return err
@@ -117,7 +121,8 @@ func (mount *MountInfo) ParseConfigArgv(argv []string) error {
 // environment variable CEPH_ARGS.
 //
 // Implements:
-//  int ceph_conf_parse_env(struct ceph_mount_info *cmount, const char *var);
+//
+//	int ceph_conf_parse_env(struct ceph_mount_info *cmount, const char *var);
 func (mount *MountInfo) ParseDefaultConfigEnv() error {
 	if err := mount.validate(); err != nil {
 		return err
@@ -130,7 +135,8 @@ func (mount *MountInfo) ParseDefaultConfigEnv() error {
 // the given name.
 //
 // Implements:
-//  int ceph_conf_set(struct ceph_mount_info *cmount, const char *option, const char *value);
+//
+//	int ceph_conf_set(struct ceph_mount_info *cmount, const char *option, const char *value);
 func (mount *MountInfo) SetConfigOption(option, value string) error {
 	cOption := C.CString(option)
 	defer C.free(unsafe.Pointer(cOption))
@@ -143,7 +149,8 @@ func (mount *MountInfo) SetConfigOption(option, value string) error {
 // identified by the given name.
 //
 // Implements:
-//  int ceph_conf_get(struct ceph_mount_info *cmount, const char *option, char *buf, size_t len);
+//
+//	int ceph_conf_get(struct ceph_mount_info *cmount, const char *option, char *buf, size_t len);
 func (mount *MountInfo) GetConfigOption(option string) (string, error) {
 	cOption := C.CString(option)
 	defer C.free(unsafe.Pointer(cOption))
@@ -173,7 +180,8 @@ func (mount *MountInfo) GetConfigOption(option string) (string, error) {
 // Init the file system client without actually mounting the file system.
 //
 // Implements:
-//  int ceph_init(struct ceph_mount_info *cmount);
+//
+//	int ceph_init(struct ceph_mount_info *cmount);
 func (mount *MountInfo) Init() error {
 	return getError(C.ceph_init(mount.mount))
 }
@@ -181,7 +189,8 @@ func (mount *MountInfo) Init() error {
 // Mount the file system, establishing a connection capable of I/O.
 //
 // Implements:
-//  int ceph_mount(struct ceph_mount_info *cmount, const char *root);
+//
+//	int ceph_mount(struct ceph_mount_info *cmount, const char *root);
 func (mount *MountInfo) Mount() error {
 	ret := C.ceph_mount(mount.mount, nil)
 	return getError(ret)
@@ -191,7 +200,8 @@ func (mount *MountInfo) Mount() error {
 // the mount. This establishes a connection capable of I/O.
 //
 // Implements:
-//  int ceph_mount(struct ceph_mount_info *cmount, const char *root);
+//
+//	int ceph_mount(struct ceph_mount_info *cmount, const char *root);
 func (mount *MountInfo) MountWithRoot(root string) error {
 	croot := C.CString(root)
 	defer C.free(unsafe.Pointer(croot))
@@ -201,7 +211,8 @@ func (mount *MountInfo) MountWithRoot(root string) error {
 // Unmount the file system.
 //
 // Implements:
-//  int ceph_unmount(struct ceph_mount_info *cmount);
+//
+//	int ceph_unmount(struct ceph_mount_info *cmount);
 func (mount *MountInfo) Unmount() error {
 	ret := C.ceph_unmount(mount.mount)
 	return getError(ret)
@@ -210,7 +221,8 @@ func (mount *MountInfo) Unmount() error {
 // Release destroys the mount handle.
 //
 // Implements:
-//  int ceph_release(struct ceph_mount_info *cmount);
+//
+//	int ceph_release(struct ceph_mount_info *cmount);
 func (mount *MountInfo) Release() error {
 	if mount.mount == nil {
 		return nil

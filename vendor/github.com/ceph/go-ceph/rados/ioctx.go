@@ -125,8 +125,9 @@ func (ioctx *IOContext) Pointer() unsafe.Pointer {
 // Setting namespace to a empty or zero length string sets the pool to the default namespace.
 //
 // Implements:
-//  void rados_ioctx_set_namespace(rados_ioctx_t io,
-//                                 const char *nspace);
+//
+//	void rados_ioctx_set_namespace(rados_ioctx_t io,
+//	                               const char *nspace);
 func (ioctx *IOContext) SetNamespace(namespace string) {
 	var cns *C.char
 	if len(namespace) > 0 {
@@ -139,8 +140,9 @@ func (ioctx *IOContext) SetNamespace(namespace string) {
 // Create a new object with key oid.
 //
 // Implements:
-//  void rados_write_op_create(rados_write_op_t write_op, int exclusive,
-//                             const char* category)
+//
+//	void rados_write_op_create(rados_write_op_t write_op, int exclusive,
+//	                           const char* category)
 func (ioctx *IOContext) Create(oid string, exclusive CreateOption) error {
 	op := CreateWriteOp()
 	defer op.Release()
@@ -247,8 +249,9 @@ func (ioctx *IOContext) Destroy() {
 // context.
 //
 // Implements:
-//  int rados_ioctx_pool_stat(rados_ioctx_t io,
-//                            struct rados_pool_stat_t *stats);
+//
+//	int rados_ioctx_pool_stat(rados_ioctx_t io,
+//	                          struct rados_pool_stat_t *stats);
 func (ioctx *IOContext) GetPoolStats() (stat PoolStat, err error) {
 	cStat := C.struct_rados_pool_stat_t{}
 	ret := C.rados_ioctx_pool_stat(ioctx.ioctx, &cStat)
@@ -274,7 +277,8 @@ func (ioctx *IOContext) GetPoolStats() (stat PoolStat, err error) {
 // GetPoolID returns the pool ID associated with the I/O context.
 //
 // Implements:
-//  int64_t rados_ioctx_get_id(rados_ioctx_t io)
+//
+//	int64_t rados_ioctx_get_id(rados_ioctx_t io)
 func (ioctx *IOContext) GetPoolID() int64 {
 	ret := C.rados_ioctx_get_id(ioctx.ioctx)
 	return int64(ret)
@@ -328,7 +332,8 @@ func (ioctx *IOContext) ListObjects(listFn ObjectListFunc) error {
 	defer C.rados_object_list_cursor_free(ioctx.ioctx, finish)
 
 	for {
-		ret := C.rados_object_list(ioctx.ioctx, next, finish, pageResults, nil, filterLen, (*C.rados_object_list_item)(unsafe.Pointer(&results[0])), &next)
+		res := (*C.rados_object_list_item)(unsafe.Pointer(&results[0]))
+		ret := C.rados_object_list(ioctx.ioctx, next, finish, pageResults, nil, filterLen, res, &next)
 		if ret < 0 {
 			return getError(ret)
 		}
@@ -338,6 +343,7 @@ func (ioctx *IOContext) ListObjects(listFn ObjectListFunc) error {
 			item := results[i]
 			listFn(C.GoStringN(item.oid, (C.int)(item.oid_length)))
 		}
+		C.rados_object_list_free(C.size_t(ret), res)
 
 		if C.rados_object_list_is_end(ioctx.ioctx, next) == listEndSentinel {
 			return nil
@@ -634,7 +640,7 @@ func (ioctx *IOContext) ListLockers(oid, name string) (*LockInfo, error) {
 	}
 
 	if ret < 0 {
-		return nil, radosError(ret)
+		return nil, getError(C.int(ret))
 	}
 	return &LockInfo{int(ret), cExclusive == 1, C.GoString(cTag), splitCString(cClients, cClientsLen), splitCString(cCookies, cCookiesLen), splitCString(cAddrs, cAddrsLen)}, nil
 }
@@ -678,7 +684,8 @@ func (ioctx *IOContext) BreakLock(oid, name, client, cookie string) (int, error)
 // written to.
 //
 // Implements:
-//  uint64_t rados_get_last_version(rados_ioctx_t io);
+//
+//	uint64_t rados_get_last_version(rados_ioctx_t io);
 func (ioctx *IOContext) GetLastVersion() (uint64, error) {
 	if err := ioctx.validate(); err != nil {
 		return 0, err
@@ -690,8 +697,9 @@ func (ioctx *IOContext) GetLastVersion() (uint64, error) {
 // GetNamespace gets the namespace used for objects within this IO context.
 //
 // Implements:
-//  int rados_ioctx_get_namespace(rados_ioctx_t io, char *buf,
-//                                unsigned maxlen);
+//
+//	int rados_ioctx_get_namespace(rados_ioctx_t io, char *buf,
+//	                              unsigned maxlen);
 func (ioctx *IOContext) GetNamespace() (string, error) {
 	if err := ioctx.validate(); err != nil {
 		return "", err

@@ -7,6 +7,7 @@ package tag
 import (
 	"strconv"
 	"strings"
+	"time"
 )
 
 type frameNames map[string][2]string
@@ -89,8 +90,18 @@ func (m metadataID3v2) Genre() string {
 }
 
 func (m metadataID3v2) Year() int {
-	year, _ := strconv.Atoi(m.getString(frames.Name("year", m.Format())))
-	return year
+	stringYear := m.getString(frames.Name("year", m.Format()))
+
+	if year, err := strconv.Atoi(stringYear); err == nil {
+		return year
+	}
+
+	date, err := time.Parse(time.DateOnly, stringYear)
+	if err != nil {
+		return 0
+	}
+
+	return date.Year()
 }
 
 func parseXofN(s string) (x, n int) {

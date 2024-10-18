@@ -16,7 +16,8 @@ import "C"
 // or return EDQUOT or ENOSPC.
 //
 // Implements:
-//  void rados_set_pool_full_try(rados_ioctx_t io);
+//
+//	void rados_set_pool_full_try(rados_ioctx_t io);
 func (ioctx *IOContext) SetPoolFullTry() error {
 	if err := ioctx.validate(); err != nil {
 		return err
@@ -28,7 +29,8 @@ func (ioctx *IOContext) SetPoolFullTry() error {
 // UnsetPoolFullTry unsets the flag set by SetPoolFullTry()
 //
 // Implements:
-//  void rados_unset_pool_full_try(rados_ioctx_t io);
+//
+//	void rados_unset_pool_full_try(rados_ioctx_t io);
 func (ioctx *IOContext) UnsetPoolFullTry() error {
 	if err := ioctx.validate(); err != nil {
 		return err

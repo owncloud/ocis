@@ -11,8 +11,9 @@ import "C"
 // previously obtained with IOContext.GetLastVersion().
 //
 // Implements:
-//  void rados_read_op_assert_version(rados_read_op_t read_op,
-//                                    uint64_t ver)
+//
+//	void rados_read_op_assert_version(rados_read_op_t read_op,
+//	                                  uint64_t ver)
 func (r *ReadOp) AssertVersion(ver uint64) {
 	C.rados_read_op_assert_version(r.op, C.uint64_t(ver))
 }

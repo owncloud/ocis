@@ -7,7 +7,8 @@ import (
 // EnableModule will enable the specified manager module.
 //
 // Similar To:
-//  ceph mgr module enable <module> [--force]
+//
+//	ceph mgr module enable <module> [--force]
 func (fsa *MgrAdmin) EnableModule(module string, force bool) error {
 	m := map[string]string{
 		"prefix": "mgr module enable",
@@ -25,7 +26,8 @@ func (fsa *MgrAdmin) EnableModule(module string, force bool) error {
 // DisableModule will disable the specified manager module.
 //
 // Similar To:
-//  ceph mgr module disable <module>
+//
+//	ceph mgr module disable <module>
 func (fsa *MgrAdmin) DisableModule(module string) error {
 	m := map[string]string{
 		"prefix": "mgr module disable",

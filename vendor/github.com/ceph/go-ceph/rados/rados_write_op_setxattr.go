@@ -13,10 +13,11 @@ import (
 // SetXattr sets an xattr.
 //
 // Implements:
-//  void rados_write_op_setxattr(rados_write_op_t write_op,
-//                               const char * name,
-//                               const char * value,
-//                               size_t value_len)
+//
+//	void rados_write_op_setxattr(rados_write_op_t write_op,
+//	                             const char * name,
+//	                             const char * value,
+//	                             size_t value_len)
 func (w *WriteOp) SetXattr(name string, value []byte) {
 	cName := C.CString(name)
 	defer C.free(unsafe.Pointer(cName))

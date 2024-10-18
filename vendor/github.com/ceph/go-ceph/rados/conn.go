@@ -95,8 +95,9 @@ func (c *Conn) ReadDefaultConfigFile() error {
 // OpenIOContext creates and returns a new IOContext for the given pool.
 //
 // Implements:
-//  int rados_ioctx_create(rados_t cluster, const char *pool_name,
-//                         rados_ioctx_t *ioctx);
+//
+//	int rados_ioctx_create(rados_t cluster, const char *pool_name,
+//	                       rados_ioctx_t *ioctx);
 func (c *Conn) OpenIOContext(pool string) (*IOContext, error) {
 	cPool := C.CString(pool)
 	defer C.free(unsafe.Pointer(cPool))
@@ -200,8 +201,9 @@ func (c *Conn) GetClusterStats() (stat ClusterStat, err error) {
 // argument vector.
 //
 // Implements:
-//  int rados_conf_parse_argv(rados_t cluster, int argc,
-//                            const char **argv);
+//
+//	int rados_conf_parse_argv(rados_t cluster, int argc,
+//	                          const char **argv);
 func (c *Conn) ParseConfigArgv(argv []string) error {
 	if c.cluster == nil {
 		return ErrNotConnected
@@ -289,11 +291,11 @@ func (c *Conn) GetPoolByName(name string) (int64, error) {
 	}
 	cName := C.CString(name)
 	defer C.free(unsafe.Pointer(cName))
-	ret := int64(C.rados_pool_lookup(c.cluster, cName))
+	ret := C.rados_pool_lookup(c.cluster, cName)
 	if ret < 0 {
-		return 0, radosError(ret)
+		return 0, getError(C.int(ret))
 	}
-	return ret, nil
+	return int64(ret), nil
 }
 
 // GetPoolByID returns the name of a pool by a given ID.
@@ -303,9 +305,9 @@ func (c *Conn) GetPoolByID(id int64) (string, error) {
 		return "", err
 	}
 	cid := C.int64_t(id)
-	ret := int(C.rados_pool_reverse_lookup(c.cluster, cid, (*C.char)(unsafe.Pointer(&buf[0])), C.size_t(len(buf))))
+	ret := C.rados_pool_reverse_lookup(c.cluster, cid, (*C.char)(unsafe.Pointer(&buf[0])), C.size_t(len(buf)))
 	if ret < 0 {
-		return "", radosError(ret)
+		return "", getError(ret)
 	}
 	return C.GoString((*C.char)(unsafe.Pointer(&buf[0]))), nil
 }

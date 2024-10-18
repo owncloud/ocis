@@ -1,6 +1,3 @@
-//go:build ceph_preview
-// +build ceph_preview
-
 package rados
 
 // #cgo LDFLAGS: -lrados
@@ -15,10 +12,11 @@ import "C"
 // the backend.
 //
 // Implements:
-//  void rados_write_op_set_alloc_hint2(rados_write_op_t write_op,
-//                                      uint64_t expected_object_size,
-//                                      uint64_t expected_write_size,
-//                                      uint32_t flags);
+//
+//	void rados_write_op_set_alloc_hint2(rados_write_op_t write_op,
+//	                                    uint64_t expected_object_size,
+//	                                    uint64_t expected_write_size,
+//	                                    uint32_t flags);
 func (w *WriteOp) SetAllocationHint(expectedObjectSize uint64, expectedWriteSize uint64, flags AllocHintFlags) {
 	C.rados_write_op_set_alloc_hint2(
 		w.op,

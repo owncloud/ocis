@@ -14,7 +14,8 @@ var (
 // ListVolumes return a list of volumes in this Ceph cluster.
 //
 // Similar To:
-//  ceph fs volume ls
+//
+//	ceph fs volume ls
 func (fsa *FSAdmin) ListVolumes() ([]string, error) {
 	res := fsa.rawMgrCommand(listVolumesCmd)
 	return parseListNames(res)
@@ -34,7 +35,8 @@ type FSPoolInfo struct {
 // file systems.
 //
 // Similar To:
-//  ceph fs ls
+//
+//	ceph fs ls
 func (fsa *FSAdmin) ListFileSystems() ([]FSPoolInfo, error) {
 	res := fsa.rawMonCommand(listFsCmd)
 	return parseFsList(res)
@@ -168,7 +170,8 @@ func parseVolumeStatus(res response) (*volumeStatusResponse, error) {
 // VolumeStatus returns a VolumeStatus object for the given volume name.
 //
 // Similar To:
-//  ceph fs status cephfs <name>
+//
+//	ceph fs status cephfs <name>
 func (fsa *FSAdmin) VolumeStatus(name string) (*VolumeStatus, error) {
 	res := fsa.marshalMgrCommand(map[string]string{
 		"fs":     name,

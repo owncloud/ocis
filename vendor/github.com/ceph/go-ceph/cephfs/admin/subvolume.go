@@ -53,7 +53,8 @@ const NoGroup = ""
 // belonging to an optional subvolume group.
 //
 // Similar To:
-//  ceph fs subvolume create <volume> --group-name=<group> <name> ...
+//
+//	ceph fs subvolume create <volume> --group-name=<group> <name> ...
 func (fsa *FSAdmin) CreateSubVolume(volume, group, name string, o *SubVolumeOptions) error {
 	if o == nil {
 		o = &SubVolumeOptions{}
@@ -66,7 +67,8 @@ func (fsa *FSAdmin) CreateSubVolume(volume, group, name string, o *SubVolumeOpti
 // optional subvolume group.
 //
 // Similar To:
-//  ceph fs subvolume ls <volume> --group-name=<group>
+//
+//	ceph fs subvolume ls <volume> --group-name=<group>
 func (fsa *FSAdmin) ListSubVolumes(volume, group string) ([]string, error) {
 	m := map[string]string{
 		"prefix":   "fs subvolume ls",
@@ -83,7 +85,8 @@ func (fsa *FSAdmin) ListSubVolumes(volume, group string) ([]string, error) {
 // subvolume group.
 //
 // Similar To:
-//  ceph fs subvolume rm <volume> --group-name=<group> <name>
+//
+//	ceph fs subvolume rm <volume> --group-name=<group> <name>
 func (fsa *FSAdmin) RemoveSubVolume(volume, group, name string) error {
 	return fsa.RemoveSubVolumeWithFlags(volume, group, name, SubVolRmFlags{})
 }
@@ -92,7 +95,8 @@ func (fsa *FSAdmin) RemoveSubVolume(volume, group, name string) error {
 // subvolume group.
 //
 // Similar To:
-//  ceph fs subvolume rm <volume> --group-name=<group> <name> --force
+//
+//	ceph fs subvolume rm <volume> --group-name=<group> <name> --force
 func (fsa *FSAdmin) ForceRemoveSubVolume(volume, group, name string) error {
 	return fsa.RemoveSubVolumeWithFlags(volume, group, name, SubVolRmFlags{Force: true})
 }
@@ -104,7 +108,8 @@ func (fsa *FSAdmin) ForceRemoveSubVolume(volume, group, name string) error {
 // Equivalent to ForceRemoveSubVolume if only the "Force" flag is set.
 //
 // Similar To:
-//  ceph fs subvolume rm <volume> --group-name=<group> <name> [...flags...]
+//
+//	ceph fs subvolume rm <volume> --group-name=<group> <name> [...flags...]
 func (fsa *FSAdmin) RemoveSubVolumeWithFlags(volume, group, name string, o SubVolRmFlags) error {
 	m := map[string]string{
 		"prefix":   "fs subvolume rm",
@@ -141,7 +146,8 @@ type SubVolumeResizeResult struct {
 // prevent reducing the size of the volume below the current used size.
 //
 // Similar To:
-//  ceph fs subvolume resize <volume> --group-name=<group> <name> ...
+//
+//	ceph fs subvolume resize <volume> --group-name=<group> <name> ...
 func (fsa *FSAdmin) ResizeSubVolume(
 	volume, group, name string,
 	newSize QuotaSize, noShrink bool) (*SubVolumeResizeResult, error) {
@@ -166,7 +172,8 @@ func (fsa *FSAdmin) ResizeSubVolume(
 // SubVolumePath returns the path to the subvolume from the root of the file system.
 //
 // Similar To:
-//  ceph fs subvolume getpath <volume> --group-name=<group> <name>
+//
+//	ceph fs subvolume getpath <volume> --group-name=<group> <name>
 func (fsa *FSAdmin) SubVolumePath(volume, group, name string) (string, error) {
 	m := map[string]string{
 		"prefix":   "fs subvolume getpath",
@@ -258,7 +265,8 @@ func parseSubVolumeInfo(res response) (*SubVolumeInfo, error) {
 // SubVolumeInfo returns information about the specified subvolume.
 //
 // Similar To:
-//  ceph fs subvolume info <volume> --group-name=<group> <name>
+//
+//	ceph fs subvolume info <volume> --group-name=<group> <name>
 func (fsa *FSAdmin) SubVolumeInfo(volume, group, name string) (*SubVolumeInfo, error) {
 	m := map[string]string{
 		"prefix":   "fs subvolume info",
@@ -275,7 +283,8 @@ func (fsa *FSAdmin) SubVolumeInfo(volume, group, name string) (*SubVolumeInfo, e
 // CreateSubVolumeSnapshot creates a new snapshot from the source subvolume.
 //
 // Similar To:
-//  ceph fs subvolume snapshot create <volume> --group-name=<group> <source> <name>
+//
+//	ceph fs subvolume snapshot create <volume> --group-name=<group> <source> <name>
 func (fsa *FSAdmin) CreateSubVolumeSnapshot(volume, group, source, name string) error {
 	m := map[string]string{
 		"prefix":    "fs subvolume snapshot create",
@@ -293,7 +302,8 @@ func (fsa *FSAdmin) CreateSubVolumeSnapshot(volume, group, source, name string) 
 // RemoveSubVolumeSnapshot removes the specified snapshot from the subvolume.
 //
 // Similar To:
-//  ceph fs subvolume snapshot rm <volume> --group-name=<group> <subvolume> <name>
+//
+//	ceph fs subvolume snapshot rm <volume> --group-name=<group> <subvolume> <name>
 func (fsa *FSAdmin) RemoveSubVolumeSnapshot(volume, group, subvolume, name string) error {
 	return fsa.rmSubVolumeSnapshot(volume, group, subvolume, name, commonRmFlags{})
 }
@@ -301,7 +311,8 @@ func (fsa *FSAdmin) RemoveSubVolumeSnapshot(volume, group, subvolume, name strin
 // ForceRemoveSubVolumeSnapshot removes the specified snapshot from the subvolume.
 //
 // Similar To:
-//  ceph fs subvolume snapshot rm <volume> --group-name=<group> <subvolume> <name> --force
+//
+//	ceph fs subvolume snapshot rm <volume> --group-name=<group> <subvolume> <name> --force
 func (fsa *FSAdmin) ForceRemoveSubVolumeSnapshot(volume, group, subvolume, name string) error {
 	return fsa.rmSubVolumeSnapshot(volume, group, subvolume, name, commonRmFlags{force: true})
 }
@@ -324,7 +335,8 @@ func (fsa *FSAdmin) rmSubVolumeSnapshot(volume, group, subvolume, name string, o
 // ListSubVolumeSnapshots returns a listing of snapshots for a given subvolume.
 //
 // Similar To:
-//  ceph fs subvolume snapshot ls <volume> --group-name=<group> <name>
+//
+//	ceph fs subvolume snapshot ls <volume> --group-name=<group> <name>
 func (fsa *FSAdmin) ListSubVolumeSnapshots(volume, group, name string) ([]string, error) {
 	m := map[string]string{
 		"prefix":   "fs subvolume snapshot ls",
@@ -358,7 +370,8 @@ func parseSubVolumeSnapshotInfo(res response) (*SubVolumeSnapshotInfo, error) {
 // SubVolumeSnapshotInfo returns information about the specified subvolume snapshot.
 //
 // Similar To:
-//  ceph fs subvolume snapshot info <volume> --group-name=<group> <subvolume> <name>
+//
+//	ceph fs subvolume snapshot info <volume> --group-name=<group> <subvolume> <name>
 func (fsa *FSAdmin) SubVolumeSnapshotInfo(volume, group, subvolume, name string) (*SubVolumeSnapshotInfo, error) {
 	m := map[string]string{
 		"prefix":    "fs subvolume snapshot info",
@@ -376,7 +389,8 @@ func (fsa *FSAdmin) SubVolumeSnapshotInfo(volume, group, subvolume, name string)
 // ProtectSubVolumeSnapshot protects the specified snapshot.
 //
 // Similar To:
-//  ceph fs subvolume snapshot protect <volume> --group-name=<group> <subvolume> <name>
+//
+//	ceph fs subvolume snapshot protect <volume> --group-name=<group> <subvolume> <name>
 func (fsa *FSAdmin) ProtectSubVolumeSnapshot(volume, group, subvolume, name string) error {
 	m := map[string]string{
 		"prefix":    "fs subvolume snapshot protect",
@@ -394,7 +408,8 @@ func (fsa *FSAdmin) ProtectSubVolumeSnapshot(volume, group, subvolume, name stri
 // UnprotectSubVolumeSnapshot removes protection from the specified snapshot.
 //
 // Similar To:
-//  ceph fs subvolume snapshot unprotect <volume> --group-name=<group> <subvolume> <name>
+//
+//	ceph fs subvolume snapshot unprotect <volume> --group-name=<group> <subvolume> <name>
 func (fsa *FSAdmin) UnprotectSubVolumeSnapshot(volume, group, subvolume, name string) error {
 	m := map[string]string{
 		"prefix":    "fs subvolume snapshot unprotect",

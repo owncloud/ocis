@@ -216,6 +216,13 @@ func (m *metadataVorbis) Year() int {
 	// and obviously the VorbisComment standard https://wiki.xiph.org/VorbisComment#Date_and_time
 	switch len(m.c["date"]) {
 	case 0:
+		// Fallback on year tag as some files use that.
+		if len(m.c["year"]) != 0 {
+			year, err := strconv.Atoi(m.c["year"])
+			if err == nil {
+				return year
+			}
+		}
 		return 0
 	case 4:
 		dateFormat = "2006"

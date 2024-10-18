@@ -17,26 +17,6 @@ type FSAdmin struct {
 	conn RadosCommander
 }
 
-// New creates an FSAdmin automatically based on the default ceph
-// configuration file. If more customization is needed, create a
-// *rados.Conn as you see fit and use NewFromConn to use that
-// connection with these administrative functions.
-func New() (*FSAdmin, error) {
-	conn, err := rados.NewConn()
-	if err != nil {
-		return nil, err
-	}
-	err = conn.ReadDefaultConfigFile()
-	if err != nil {
-		return nil, err
-	}
-	err = conn.Connect()
-	if err != nil {
-		return nil, err
-	}
-	return NewFromConn(conn), nil
-}
-
 // NewFromConn creates an FSAdmin management object from a preexisting
 // rados connection. The existing connection can be rados.Conn or any
 // type implementing the RadosCommander interface. This may be useful

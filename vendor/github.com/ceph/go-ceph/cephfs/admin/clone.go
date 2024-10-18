@@ -28,7 +28,8 @@ type CloneOptions struct {
 // specified using the clone options parameter.
 //
 // Similar To:
-//  ceph fs subvolume snapshot clone <volume> --group_name=<group> <subvolume> <snapshot> <name> [...]
+//
+//	ceph fs subvolume snapshot clone <volume> --group_name=<group> <subvolume> <snapshot> <name> [...]
 func (fsa *FSAdmin) CloneSubVolumeSnapshot(volume, group, subvolume, snapshot, name string, o *CloneOptions) error {
 	m := map[string]string{
 		"prefix":          "fs subvolume snapshot clone",
@@ -114,7 +115,8 @@ func parseCloneStatus(res response) (*CloneStatus, error) {
 // CloneStatus returns data reporting the status of a subvolume clone.
 //
 // Similar To:
-//  ceph fs clone status <volume> --group_name=<group> <clone>
+//
+//	ceph fs clone status <volume> --group_name=<group> <clone>
 func (fsa *FSAdmin) CloneStatus(volume, group, clone string) (*CloneStatus, error) {
 	m := map[string]string{
 		"prefix":     "fs clone status",
@@ -132,7 +134,8 @@ func (fsa *FSAdmin) CloneStatus(volume, group, clone string) (*CloneStatus, erro
 // CancelClone does not delete the clone.
 //
 // Similar To:
-//  ceph fs clone cancel <volume> --group_name=<group> <clone>
+//
+//	ceph fs clone cancel <volume> --group_name=<group> <clone>
 func (fsa *FSAdmin) CancelClone(volume, group, clone string) error {
 	m := map[string]string{
 		"prefix":     "fs clone cancel",

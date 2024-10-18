@@ -42,13 +42,13 @@ func (iter *Iter) Seek(token IterToken) {
 // end of the iterator was reached, or the iterator received an error.
 //
 // Example:
+//
 //	iter := pool.Iter()
 //	defer iter.Close()
 //	for iter.Next() {
 //		fmt.Printf("%v\n", iter.Value())
 //	}
 //	return iter.Err()
-//
 func (iter *Iter) Next() bool {
 	var cEntry *C.char
 	var cNamespace *C.char

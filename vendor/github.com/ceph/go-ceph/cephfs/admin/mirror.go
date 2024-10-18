@@ -20,7 +20,8 @@ func (fsa *FSAdmin) SnapshotMirror() *SnapshotMirrorAdmin {
 // Enable snapshot mirroring for the given file system.
 //
 // Similar To:
-//  ceph fs snapshot mirror enable <fs_name>
+//
+//	ceph fs snapshot mirror enable <fs_name>
 func (sma *SnapshotMirrorAdmin) Enable(fsname string) error {
 	m := map[string]string{
 		"prefix":  "fs snapshot mirror enable",
@@ -33,7 +34,8 @@ func (sma *SnapshotMirrorAdmin) Enable(fsname string) error {
 // Disable snapshot mirroring for the given file system.
 //
 // Similar To:
-//  ceph fs snapshot mirror disable <fs_name>
+//
+//	ceph fs snapshot mirror disable <fs_name>
 func (sma *SnapshotMirrorAdmin) Disable(fsname string) error {
 	m := map[string]string{
 		"prefix":  "fs snapshot mirror disable",
@@ -46,7 +48,8 @@ func (sma *SnapshotMirrorAdmin) Disable(fsname string) error {
 // Add a path in the file system to be mirrored.
 //
 // Similar To:
-//  ceph fs snapshot mirror add <fs_name> <path>
+//
+//	ceph fs snapshot mirror add <fs_name> <path>
 func (sma *SnapshotMirrorAdmin) Add(fsname, path string) error {
 	m := map[string]string{
 		"prefix":  "fs snapshot mirror add",
@@ -60,7 +63,8 @@ func (sma *SnapshotMirrorAdmin) Add(fsname, path string) error {
 // Remove a path in the file system from mirroring.
 //
 // Similar To:
-//  ceph fs snapshot mirror remove <fs_name> <path>
+//
+//	ceph fs snapshot mirror remove <fs_name> <path>
 func (sma *SnapshotMirrorAdmin) Remove(fsname, path string) error {
 	m := map[string]string{
 		"prefix":  "fs snapshot mirror remove",
@@ -79,7 +83,8 @@ type bootstrapTokenResponse struct {
 // a peering association between this site an another site.
 //
 // Similar To:
-//  ceph fs snapshot mirror peer_bootstrap create <fs_name> <client_entity> <site-name>
+//
+//	ceph fs snapshot mirror peer_bootstrap create <fs_name> <client_entity> <site-name>
 func (sma *SnapshotMirrorAdmin) CreatePeerBootstrapToken(
 	fsname, client, site string) (string, error) {
 	m := map[string]string{
@@ -100,7 +105,8 @@ func (sma *SnapshotMirrorAdmin) CreatePeerBootstrapToken(
 // that has provided a token, with the current site.
 //
 // Similar To:
-//  ceph fs snapshot mirror peer_bootstrap import <fs_name> <token>
+//
+//	ceph fs snapshot mirror peer_bootstrap import <fs_name> <token>
 func (sma *SnapshotMirrorAdmin) ImportPeerBoostrapToken(fsname, token string) error {
 	m := map[string]string{
 		"prefix":  "fs snapshot mirror peer_bootstrap import",
@@ -170,7 +176,8 @@ func parseDaemonStatus(res response) (DaemonStatusResults, error) {
 // associated with the given file system.
 //
 // Similar To:
-//  ceph fs snapshot mirror daemon status <fs_name>
+//
+//	ceph fs snapshot mirror daemon status <fs_name>
 func (sma *SnapshotMirrorAdmin) DaemonStatus(fsname string) (
 	DaemonStatusResults, error) {
 	// ---
@@ -204,7 +211,8 @@ func parsePeerList(res response) (PeerListResults, error) {
 // PeerList returns information about peers associated with the given file system.
 //
 // Similar To:
-//  ceph fs snapshot mirror peer_list <fs_name>
+//
+//	ceph fs snapshot mirror peer_list <fs_name>
 func (sma *SnapshotMirrorAdmin) PeerList(fsname string) (
 	PeerListResults, error) {
 	// ---

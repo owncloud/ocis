@@ -48,12 +48,13 @@ func newReadOpReadStep() *ReadOpReadStep {
 // buffer[:ReadOpReadStep.BytesRead] then contains object data.
 //
 // Implements:
-//  void rados_read_op_read(rados_read_op_t read_op,
-//                          uint64_t offset,
-//                          size_t len,
-//                          char * buffer,
-//                          size_t * bytes_read,
-//                          int * prval)
+//
+//	void rados_read_op_read(rados_read_op_t read_op,
+//	                        uint64_t offset,
+//	                        size_t len,
+//	                        char * buffer,
+//	                        size_t * bytes_read,
+//	                        int * prval)
 func (r *ReadOp) Read(offset uint64, buffer []byte) *ReadOpReadStep {
 	oe := newReadStep(buffer, offset)
 	readStep := newReadOpReadStep()

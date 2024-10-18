@@ -15,7 +15,8 @@ import "C"
 // This function must be called after Init but before Mount.
 //
 // Implements:
-//  int ceph_mount_perms_set(struct ceph_mount_info *cmount, UserPerm *perm);
+//
+//	int ceph_mount_perms_set(struct ceph_mount_info *cmount, UserPerm *perm);
 func (mount *MountInfo) SetMountPerms(perm *UserPerm) error {
 	return getError(C.ceph_mount_perms_set(mount.mount, perm.userPerm))
 }

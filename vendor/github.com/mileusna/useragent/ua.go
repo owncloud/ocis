@@ -25,15 +25,19 @@ type UserAgent struct {
 
 // Constants for browsers and operating systems for easier comparison
 const (
-	Windows      = "Windows"
-	WindowsPhone = "Windows Phone"
-	Android      = "Android"
-	MacOS        = "macOS"
-	IOS          = "iOS"
-	Linux        = "Linux"
-	FreeBSD      = "FreeBSD"
-	ChromeOS     = "ChromeOS"
-	BlackBerry   = "BlackBerry"
+	Windows        = "Windows"
+	WindowsPhone   = "Windows Phone"
+	WindowsNT      = "Windows NT"
+	WindowsPhoneOS = "Windows Phone OS"
+	Android        = "Android"
+	MacOS          = "macOS"
+	IOS            = "iOS"
+	Linux          = "Linux"
+	FreeBSD        = "FreeBSD"
+	ChromeOS       = "ChromeOS"
+	BlackBerry     = "BlackBerry"
+	CrOS           = "CrOS"
+	Harmony        = "Harmony"
 
 	Opera            = "Opera"
 	OperaMini        = "Opera Mini"
@@ -45,6 +49,11 @@ const (
 	Safari           = "Safari"
 	Edge             = "Edge"
 	Vivaldi          = "Vivaldi"
+	MobileSafari     = "Mobile Safari"
+	NetFront         = "NetFront"
+	Mozilla          = "Mozilla"
+	Msie             = "MSIE"
+	SamsungBrowser   = "Samsung Browser"
 
 	GoogleAdsBot        = "Google Ads Bot"
 	Googlebot           = "Googlebot"
@@ -52,10 +61,18 @@ const (
 	FacebookExternalHit = "facebookexternalhit"
 	Applebot            = "Applebot"
 	Bingbot             = "Bingbot"
+	YandexBot           = "YandexBot"
+	YandexAdNet         = "YandexAdNet"
 
 	FacebookApp  = "Facebook App"
 	InstagramApp = "Instagram App"
 	TiktokApp    = "TikTok App"
+
+	Version = "Version"
+	Mobile  = "Mobile"
+	Tablet  = "Tablet"
+
+	tablet = "tablet"
 )
 
 // Parse user agent string returning UserAgent struct
@@ -64,26 +81,16 @@ func Parse(userAgent string) UserAgent {
 		String: userAgent,
 	}
 
-	tokens := parse(userAgent)
-
-	// check is there URL
-	for i, token := range tokens.list {
-		if strings.HasPrefix(token.Key, "http://") || strings.HasPrefix(token.Key, "https://") {
-			ua.URL = token.Key
-			tokens.list = append(tokens.list[:i], tokens.list[i+1:]...)
-			break
-		}
-	}
-
-	//fmt.Printf("%+v\n", tokens)
+	tokens := parse([]byte(userAgent))
+	ua.URL = tokens.url
 
 	// OS lookup
 	switch {
-	case tokens.exists("Android"):
+	case tokens.exists(Android):
 		ua.OS = Android
 		var osIndex int
 		osIndex, ua.OSVersion = tokens.getIndexValue(Android)
-		ua.Tablet = strings.Contains(strings.ToLower(ua.String), "tablet")
+		ua.Tablet = strings.Contains(strings.ToLower(ua.String), tablet)
 		ua.Device = tokens.findAndroidDevice(osIndex)
 
 	case tokens.exists("iPhone"):
@@ -98,14 +105,14 @@ func Parse(userAgent string) UserAgent {
 		ua.Device = "iPad"
 		ua.Tablet = true
 
-	case tokens.exists("Windows NT"):
+	case tokens.exists(WindowsNT):
 		ua.OS = Windows
-		ua.OSVersion = tokens.get("Windows NT")
+		ua.OSVersion = tokens.get(WindowsNT)
 		ua.Desktop = true
 
-	case tokens.exists("Windows Phone OS"):
+	case tokens.exists(WindowsPhoneOS):
 		ua.OS = WindowsPhone
-		ua.OSVersion = tokens.get("Windows Phone OS")
+		ua.OSVersion = tokens.get(WindowsPhoneOS)
 		ua.Mobile = true
 
 	case tokens.exists("Macintosh"):
@@ -113,33 +120,38 @@ func Parse(userAgent string) UserAgent {
 		ua.OSVersion = tokens.findMacOSVersion()
 		ua.Desktop = true
 
-	case tokens.exists("Linux"):
+	case tokens.exists(Linux):
 		ua.OS = Linux
 		ua.OSVersion = tokens.get(Linux)
 		ua.Desktop = true
 
-	case tokens.exists("FreeBSD"):
+	case tokens.exists(FreeBSD):
 		ua.OS = FreeBSD
 		ua.OSVersion = tokens.get(FreeBSD)
 		ua.Desktop = true
 
-	case tokens.exists("CrOS"):
+	case tokens.exists(CrOS):
 		ua.OS = ChromeOS
-		ua.OSVersion = tokens.get("CrOS")
+		ua.OSVersion = tokens.get(CrOS)
 		ua.Desktop = true
 
-	case tokens.exists("BlackBerry"):
+	case tokens.exists(BlackBerry):
 		ua.OS = BlackBerry
-		ua.OSVersion = tokens.get("BlackBerry")
+		ua.OSVersion = tokens.get(BlackBerry)
+		ua.Mobile = true
+
+	case tokens.exists("OpenHarmony"):
+		ua.OS = Harmony
+		ua.OSVersion = tokens.get("OpenHarmony")
 		ua.Mobile = true
 	}
 
 	switch {
-	case tokens.exists("Googlebot"):
+	case tokens.exists(Googlebot):
 		ua.Name = Googlebot
 		ua.Version = tokens.get(Googlebot)
 		ua.Bot = true
-		ua.Mobile = tokens.existsAny("Mobile", "Mobile Safari")
+		ua.Mobile = tokens.existsAny(Mobile, MobileSafari)
 
 	case tokens.existsAny("GoogleProber", "GoogleProducer"):
 		if name := tokens.findBestMatch(false); name != "" {
@@ -147,14 +159,19 @@ func Parse(userAgent string) UserAgent {
 		}
 		ua.Bot = true
 
-	case tokens.exists("Applebot"):
+	case tokens.exists("Bytespider"):
+		ua.Name = "Bytespider"
+		ua.Mobile = tokens.exists("Mobile Safari")
+		ua.Bot = true
+
+	case tokens.exists(Applebot):
 		ua.Name = Applebot
 		ua.Version = tokens.get(Applebot)
 		ua.Bot = true
-		ua.Mobile = tokens.existsAny("Mobile", "Mobile Safari")
+		ua.Mobile = tokens.existsAny(Mobile, MobileSafari)
 		ua.OS = ""
 
-	case tokens.get("Opera Mini") != "":
+	case tokens.get(OperaMini) != "":
 		ua.Name = OperaMini
 		ua.Version = tokens.get(OperaMini)
 		ua.Mobile = true
@@ -162,84 +179,92 @@ func Parse(userAgent string) UserAgent {
 	case tokens.get("OPR") != "":
 		ua.Name = Opera
 		ua.Version = tokens.get("OPR")
-		ua.Mobile = tokens.existsAny("Mobile", "Mobile Safari")
+		ua.Mobile = tokens.existsAny(Mobile, MobileSafari)
 
 	case tokens.get("OPT") != "":
 		ua.Name = OperaTouch
 		ua.Version = tokens.get("OPT")
-		ua.Mobile = tokens.existsAny("Mobile", "Mobile Safari")
+		ua.Mobile = tokens.existsAny(Mobile, MobileSafari)
 
 	// Opera on iOS
 	case tokens.get("OPiOS") != "":
 		ua.Name = Opera
 		ua.Version = tokens.get("OPiOS")
-		ua.Mobile = tokens.existsAny("Mobile", "Mobile Safari")
+		ua.Mobile = tokens.existsAny(Mobile, MobileSafari)
 
 	// Chrome on iOS
 	case tokens.get("CriOS") != "":
 		ua.Name = Chrome
 		ua.Version = tokens.get("CriOS")
-		ua.Mobile = tokens.existsAny("Mobile", "Mobile Safari")
+		ua.Mobile = tokens.existsAny(Mobile, MobileSafari)
 
 	// Firefox on iOS
 	case tokens.get("FxiOS") != "":
 		ua.Name = Firefox
 		ua.Version = tokens.get("FxiOS")
-		ua.Mobile = tokens.existsAny("Mobile", "Mobile Safari")
+		ua.Mobile = tokens.existsAny(Mobile, MobileSafari)
 
-	case tokens.get("Firefox") != "":
+	case tokens.get(Firefox) != "":
 		ua.Name = Firefox
 		ua.Version = tokens.get(Firefox)
-		ua.Mobile = tokens.exists("Mobile")
-		ua.Tablet = tokens.exists("Tablet")
+		ua.Mobile = tokens.exists(Mobile)
+		ua.Tablet = tokens.exists(Tablet)
 
-	case tokens.get("Vivaldi") != "":
+	case tokens.get(Vivaldi) != "":
 		ua.Name = Vivaldi
 		ua.Version = tokens.get(Vivaldi)
 
-	case tokens.exists("MSIE"):
+	case tokens.exists(Msie):
 		ua.Name = InternetExplorer
-		ua.Version = tokens.get("MSIE")
+		ua.Version = tokens.get(Msie)
 
 	case tokens.get("EdgiOS") != "":
 		ua.Name = Edge
 		ua.Version = tokens.get("EdgiOS")
-		ua.Mobile = tokens.existsAny("Mobile", "Mobile Safari")
+		ua.Mobile = tokens.existsAny(Mobile, MobileSafari)
 
-	case tokens.get("Edge") != "":
+	case tokens.get(Edge) != "":
 		ua.Name = Edge
-		ua.Version = tokens.get("Edge")
-		ua.Mobile = tokens.existsAny("Mobile", "Mobile Safari")
+		ua.Version = tokens.get(Edge)
+		ua.Mobile = tokens.existsAny(Mobile, MobileSafari)
 
 	case tokens.get("Edg") != "":
 		ua.Name = Edge
 		ua.Version = tokens.get("Edg")
-		ua.Mobile = tokens.existsAny("Mobile", "Mobile Safari")
+		ua.Mobile = tokens.existsAny(Mobile, MobileSafari)
 
 	case tokens.get("EdgA") != "":
 		ua.Name = Edge
 		ua.Version = tokens.get("EdgA")
-		ua.Mobile = tokens.existsAny("Mobile", "Mobile Safari")
+		ua.Mobile = tokens.existsAny(Mobile, MobileSafari)
 
 	case tokens.get("bingbot") != "":
 		ua.Name = Bingbot
 		ua.Version = tokens.get("bingbot")
-		ua.Mobile = tokens.existsAny("Mobile", "Mobile Safari")
+		ua.Mobile = tokens.existsAny(Mobile, MobileSafari)
 
-	case tokens.get("YandexBot") != "":
-		ua.Name = "YandexBot"
-		ua.Version = tokens.get("YandexBot")
-		ua.Mobile = tokens.existsAny("Mobile", "Mobile Safari")
+	case tokens.get(YandexBot) != "":
+		ua.Name = YandexBot
+		ua.Version = tokens.get(YandexBot)
+		ua.Mobile = tokens.existsAny(Mobile, MobileSafari)
+		ua.Bot = true
+
+	case tokens.get(YandexAdNet) != "":
+		ua.Name = YandexAdNet
+		ua.Version = tokens.get(YandexAdNet)
+		ua.Mobile = tokens.existsAny(Mobile, MobileSafari)
+		ua.Bot = true
 
 	case tokens.get("SamsungBrowser") != "":
-		ua.Name = "Samsung Browser"
+		ua.Name = SamsungBrowser
 		ua.Version = tokens.get("SamsungBrowser")
-		ua.Mobile = tokens.existsAny("Mobile", "Mobile Safari")
+		ua.Mobile = tokens.existsAny(Mobile, MobileSafari)
+		ua.OS = Android
 
 	case tokens.get("HeadlessChrome") != "":
 		ua.Name = HeadlessChrome
 		ua.Version = tokens.get("HeadlessChrome")
-		ua.Mobile = tokens.existsAny("Mobile", "Mobile Safari")
+		ua.Mobile = tokens.existsAny(Mobile, MobileSafari)
 		ua.Bot = true
 
 	case tokens.existsAny("AdsBot-Google-Mobile", "Mediapartners-Google", "AdsBot-Google"):
@@ -279,18 +304,18 @@ func Parse(userAgent string) UserAgent {
 	case tokens.get("HuaweiBrowser") != "":
 		ua.Name = "Huawei Browser"
 		ua.Version = tokens.get("HuaweiBrowser")
-		ua.Mobile = tokens.existsAny("Mobile", "Mobile Safari")
+		ua.Mobile = tokens.existsAny(Mobile, MobileSafari)
 
-	case tokens.exists("BlackBerry"):
-		ua.Name = "BlackBerry"
-		ua.Version = tokens.get("Version")
+	case tokens.exists(BlackBerry):
+		ua.Name = BlackBerry
+		ua.Version = tokens.get(Version)
 
-	case tokens.exists("NetFront"):
-		ua.Name = "NetFront"
-		ua.Version = tokens.get("NetFront")
+	case tokens.exists(NetFront):
+		ua.Name = NetFront
+		ua.Version = tokens.get(NetFront)
 		ua.Mobile = true
 
-	// if chrome and Safari defined, find any other token sent descr
+	// if Chrome and Safari defined, find any other token sent descr
 	case tokens.exists(Chrome) && tokens.exists(Safari):
 		name := tokens.findBestMatch(true)
 		if name != "" {
@@ -300,30 +325,30 @@ func Parse(userAgent string) UserAgent {
 		}
 		fallthrough
 
-	case tokens.exists("Chrome"):
+	case tokens.exists(Chrome):
 		ua.Name = Chrome
-		ua.Version = tokens.get("Chrome")
-		ua.Mobile = tokens.existsAny("Mobile", "Mobile Safari")
+		ua.Version = tokens.get(Chrome)
+		ua.Mobile = tokens.existsAny(Mobile, MobileSafari)
 
 	case tokens.exists("Brave Chrome"):
 		ua.Name = Chrome
 		ua.Version = tokens.get("Brave Chrome")
-		ua.Mobile = tokens.existsAny("Mobile", "Mobile Safari")
+		ua.Mobile = tokens.existsAny(Mobile, MobileSafari)
 
-	case tokens.exists("Safari"):
+	case tokens.exists(Safari):
 		ua.Name = Safari
-		v := tokens.get("Version")
+		v := tokens.get(Version)
 		if v != "" {
 			ua.Version = v
 		} else {
-			ua.Version = tokens.get("Safari")
+			ua.Version = tokens.get(Safari)
 		}
-		ua.Mobile = tokens.existsAny("Mobile", "Mobile Safari")
+		ua.Mobile = tokens.existsAny(Mobile, MobileSafari)
 
 	default:
-		if ua.OS == "Android" && tokens.get("Version") != "" {
+		if ua.IsAndroid() && tokens.get(Version) != "" {
 			ua.Name = "Android browser"
-			ua.Version = tokens.get("Version")
+			ua.Version = tokens.get(Version)
 			ua.Mobile = true
 		} else {
 			if name := tokens.findBestMatch(false); name != "" {
@@ -335,7 +360,7 @@ func Parse(userAgent string) UserAgent {
 			ua.Bot = strings.Contains(strings.ToLower(ua.Name), "bot")
 			// If mobile flag has already been set, don't override it.
 			if !ua.Mobile {
-				ua.Mobile = tokens.existsAny("Mobile", "Mobile Safari")
+				ua.Mobile = tokens.existsAny(Mobile, MobileSafari)
 			}
 		}
 	}
@@ -349,45 +374,53 @@ func Parse(userAgent string) UserAgent {
 		ua.Mobile = false
 	}
 
-	// if not already bot, check some popular bots and wether URL is set
-	if !ua.Bot {
-		ua.Bot = ua.URL != ""
-	}
-
+	// if not already bot, check some popular bots and whether URL is set
 	if !ua.Bot {
 		switch ua.Name {
-		case Twitterbot, FacebookExternalHit:
+		case Twitterbot, FacebookExternalHit, "facebookcatalog":
 			ua.Bot = true
+		default:
+			ua.Bot = ua.URL != ""
 		}
 	}
 
-	parseVersion(ua.Version, &ua.VersionNo)
-	parseVersion(ua.OSVersion, &ua.OSVersionNo)
+	ua.VersionNo = parseVersion(ua.Version)
+	ua.OSVersionNo = parseVersion(ua.OSVersion)
 
 	return ua
 }
 
-func parse(userAgent string) properties {
+// var buffPool = sync.Pool{New: func() interface{} {
+// 	return bytes.NewBuffer(make([]byte, 0, 30))
+// }}
+
+func parse(userAgent []byte) properties {
 	clients := properties{
 		list: make([]property, 0, 8),
 	}
 	slash := false
 	isURL := false
-	var buff, val bytes.Buffer
+	// buff := buffPool.Get().(*bytes.Buffer)
+	// val := buffPool.Get().(*bytes.Buffer)
+	// buff.Reset()
+	// val.Reset()
+
+	buff := bytes.NewBuffer(make([]byte, 0, 30))
+	val := bytes.NewBuffer(make([]byte, 0, 30))
+
 	addToken := func() {
 		if buff.Len() != 0 {
-			s := strings.TrimSpace(buff.String())
+			s := string(bytes.TrimSpace(buff.Bytes()))
 			if !ignore(s) {
 				if isURL {
-					s = strings.TrimPrefix(s, "+")
+					clients.url = strings.TrimPrefix(s, "+")
+					return
 				}
-
-				if val.Len() == 0 { // only if value don't exists
-					var ver string
-					s, ver = checkVer(s) // determin version string and split
-					clients.add(s, ver)
+				if val.Len() == 0 {
+					// if value don't exists, try to get version from the token
+					clients.list = append(clients.list, checkVer(s))
 				} else {
-					clients.add(s, strings.TrimSpace(val.String()))
+					clients.list = append(clients.list, property{Key: s, Value: string(bytes.TrimSpace(val.Bytes()))})
 				}
 			}
 		}
@@ -400,10 +433,7 @@ func parse(userAgent string) properties {
 	parOpen := false
 	braOpen := false
 
-	bua := []byte(userAgent)
-	for i, c := range bua {
-
-		//fmt.Println(string(c), c)
+	for i, c := range userAgent {
 		switch {
 		case c == 41: // )
 			addToken()
@@ -430,11 +460,11 @@ func parse(userAgent string) properties {
 			if bytes.HasSuffix(buff.Bytes(), []byte("http")) || bytes.HasSuffix(buff.Bytes(), []byte("https")) {
 				// If we are part of a URL just write the character.
 				buff.WriteByte(c)
-			} else if i != len(bua)-1 && bua[i+1] != ' ' {
+			} else if i != len(userAgent)-1 && userAgent[i+1] != ' ' {
 				// If the following character is not a space, change to a space.
 				buff.WriteByte(' ')
 			}
-			// Otherwise don't write as its probably a badly formatted key value separator.
+			// Otherwise don't write as it's probably a badly formatted key value separator.
 
 		case slash && c == 32:
 			addToken()
@@ -443,7 +473,7 @@ func parse(userAgent string) properties {
 			val.WriteByte(c)
 
 		case c == 47 && !isURL: //   /
-			if i != len(bua)-1 && bua[i+1] == 47 && (bytes.HasSuffix(buff.Bytes(), []byte("http:")) || bytes.HasSuffix(buff.Bytes(), []byte("https:"))) {
+			if i != len(userAgent)-1 && userAgent[i+1] == 47 && (bytes.HasSuffix(buff.Bytes(), []byte("http:")) || bytes.HasSuffix(buff.Bytes(), []byte("https:"))) {
 				buff.WriteByte(c)
 				isURL = true
 			} else {
@@ -460,40 +490,32 @@ func parse(userAgent string) properties {
 	}
 	addToken()
 
+	// buffPool.Put(buff)
+	// buffPool.Put(val)
 	return clients
 }
 
-func checkVer(s string) (name, v string) {
+func checkVer(s string) property {
 	i := strings.LastIndex(s, " ")
 	if i == -1 {
-		return s, ""
+		return property{Key: s, Value: ""}
 	}
-
-	//v = s[i+1:]
 
 	switch s[:i] {
-	case "Linux", "Windows NT", "Windows Phone OS", "MSIE", "Android":
-		return s[:i], s[i+1:]
+	case Linux, WindowsNT, WindowsPhoneOS, Msie, Android, "OpenHarmony":
+		return property{Key: s[:i], Value: s[i+1:]}
 	case "CrOS x86_64", "CrOS aarch64", "CrOS armv7l":
 		j := strings.LastIndex(s[:i], " ")
-		return s[:j], s[j+1 : i]
+		return property{Key: s[:j], Value: s[j+1 : i]}
 	default:
-		return s, ""
+		return property{Key: s, Value: ""}
 	}
-
-	// for _, c := range v {
-	// 	if (c >= 48 && c <= 57) || c == 46 {
-	// 	} else {
-	// 		return s, ""
-	// 	}
-	// }
-	// return s[:i], s[i+1:]
 }
 
-// ignore retursn true if token should be ignored
+// ignore returns true if token should be ignored
 func ignore(s string) bool {
 	switch s {
-	case "KHTML, like Gecko", "U", "compatible", "Mozilla", "WOW64", "en", "en-us", "en-gb", "ru-ru", "Browser":
+	case "KHTML, like Gecko", "U", "compatible", Mozilla, "WOW64", "en", "en-us", "en-gb", "ru-ru", "Browser":
 		return true
 	default:
 		return false
@@ -506,10 +528,7 @@ type property struct {
 }
 type properties struct {
 	list []property
-}
-
-func (p *properties) add(key, value string) {
-	p.list = append(p.list, property{Key: key, Value: value})
+	url  string
 }
 
 func (p properties) get(key string) string {
@@ -557,6 +576,17 @@ func (p properties) existsAny(keys ...string) bool {
 		}
 	}
 	return false
+}
+
+func (p properties) getAny(keys ...string) (key, value string) {
+	for _, k := range keys {
+		for _, prop := range p.list {
+			if prop.Key == k {
+				return prop.Key, prop.Value
+			}
+		}
+	}
+	return "", ""
 }
 
 func (p properties) findMacOSVersion() string {
@@ -607,9 +637,9 @@ func (p properties) findBestMatch(withVerOnly bool) string {
 	for i := 0; i < n; i++ {
 		for _, prop := range p.list {
 			switch prop.Key {
-			case Chrome, Firefox, Safari, "Version", "Mobile", "Mobile Safari", "Mozilla", "AppleWebKit", "Windows NT", "Windows Phone OS", Android, "Macintosh", Linux, "GSA", "CrOS", "Tablet":
+			case Chrome, Firefox, Safari, Version, Mobile, MobileSafari, Mozilla, "AppleWebKit", WindowsNT, WindowsPhoneOS, Android, "Macintosh", Linux, "GSA", CrOS, Tablet, "OpenHarmony":
 			default:
-				// don' pick if starts with number
+				// don't pick if starts with number
 				if len(prop.Key) != 0 && prop.Key[0] >= 48 && prop.Key[0] <= 57 {
 					break
 				}
@@ -641,15 +671,15 @@ func (p *properties) findAndroidDevice(startIndex int) string {
 		if len(p.list) > i+1 {
 			dev := p.list[i+1].Key
 			if len(dev) == 2 || (len(dev) == 5 && dev[2] == '-') {
-				// probably langage tag (en-us etc..), ignore and continue loop
+				// probably language tag (en-us etc..), ignore and continue loop
 				continue
 			}
 			switch dev {
-			case Chrome, Firefox, Safari, "Opera Mini", "Presto", "Version", "Mobile", "Mobile Safari", "Mozilla", "AppleWebKit", "Windows NT", "Windows Phone OS", Android, "Macintosh", Linux, "CrOS":
-				// ignore this tokens, not device names
+			case Chrome, Firefox, Safari, OperaMini, "Presto", Version, Mobile, MobileSafari, Mozilla, "AppleWebKit", WindowsNT, WindowsPhoneOS, Android, "Macintosh", Linux, CrOS:
+				// ignore these tokens, not device names
 			default:
-				if strings.Contains(strings.ToLower(dev), "tablet") {
-					p.list[i+1].Key = "Tablet" // leave Tablet tag for later table detection
+				if strings.Contains(strings.ToLower(dev), tablet) {
+					p.list[i+1].Key = Tablet // leave Tablet tag for later table detection
 				} else {
 					p.list = append(p.list[:i+1], p.list[i+2:]...)
 				}

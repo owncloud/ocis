@@ -13,6 +13,9 @@ import (
 	"strings"
 )
 
+// Genre definitions 0-79 follow the ID3 tag specification of 1999.
+// More genres have been successively introduced in later Winamp versions.
+// https://en.wikipedia.org/wiki/List_of_ID3v1_genres#Extension_by_Winamp
 var id3v2Genres = [...]string{
 	"Blues", "Classic Rock", "Country", "Dance", "Disco", "Funk", "Grunge",
 	"Hip-Hop", "Jazz", "Metal", "New Age", "Oldies", "Other", "Pop", "R&B",
@@ -41,6 +44,14 @@ var id3v2Genres = [...]string{
 	"Heavy Metal", "Black Metal", "Crossover", "Contemporary Christian",
 	"Christian Rock ", "Merengue", "Salsa", "Thrash Metal", "Anime", "JPop",
 	"Synthpop",
+	"Christmas", "Art Rock", "Baroque", "Bhangra", "Big Beat", "Breakbeat",
+	"Chillout", "Downtempo", "Dub", "EBM", "Eclectic", "Electro",
+	"Electroclash", "Emo", "Experimental", "Garage", "Global", "IDM",
+	"Illbient", "Industro-Goth", "Jam Band", "Krautrock", "Leftfield", "Lounge",
+	"Math Rock", "New Romantic", "Nu-Breakz", "Post-Punk", "Post-Rock", "Psytrance",
+	"Shoegaze", "Space Rock", "Trop Rock", "World Music", "Neoclassical", "Audiobook",
+	"Audio Theatre", "Neue Deutsche Welle", "Podcast", "Indie Rock", "G-Funk", "Dubstep",
+	"Garage Rock", "Psybient",
 }
 
 // id3v2Header is a type which represents an ID3v2 tag header.

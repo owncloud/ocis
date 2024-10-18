@@ -326,7 +326,7 @@ func (s *Server) bootstrapRaftNode(cfg *RaftConfig, knownPeers []string, allPeer
 
 	// Check the store directory. If we have a memory based WAL we need to make sure the directory is setup.
 	if stat, err := os.Stat(cfg.Store); os.IsNotExist(err) {
-		if err := os.MkdirAll(cfg.Store, 0750); err != nil {
+		if err := os.MkdirAll(cfg.Store, defaultDirPerms); err != nil {
 			return fmt.Errorf("raft: could not create storage directory - %v", err)
 		}
 	} else if stat == nil || !stat.IsDir() {
@@ -416,7 +416,7 @@ func (s *Server) startRaftNode(accName string, cfg *RaftConfig, labels pprofLabe
 	}
 
 	// Make sure that the snapshots directory exists.
-	if err := os.MkdirAll(filepath.Join(n.sd, snapshotsDir), 0750); err != nil {
+	if err := os.MkdirAll(filepath.Join(n.sd, snapshotsDir), defaultDirPerms); err != nil {
 		return nil, fmt.Errorf("could not create snapshots directory - %v", err)
 	}
 
@@ -3457,13 +3457,17 @@ func (n *raft) processAppendEntry(ae *appendEntry, sub *subscription) {
 		}
 	}
 
+	// Make a copy of these values, as the AppendEntry might be cached and returned to the pool in applyCommit.
+	aeCommit := ae.commit
+	aeReply := ae.reply
+
 	// Apply anything we need here.
-	if ae.commit > n.commit {
+	if aeCommit > n.commit {
 		if n.paused {
-			n.hcommit = ae.commit
-			n.debug("Paused, not applying %d", ae.commit)
+			n.hcommit = aeCommit
+			n.debug("Paused, not applying %d", aeCommit)
 		} else {
-			for index := n.commit + 1; index <= ae.commit; index++ {
+			for index := n.commit + 1; index <= aeCommit; index++ {
 				if err := n.applyCommit(index); err != nil {
 					break
 				}
@@ -3479,7 +3483,7 @@ func (n *raft) processAppendEntry(ae *appendEntry, sub *subscription) {
 
 	// Success. Send our response.
 	if ar != nil {
-		n.sendRPC(ae.reply, _EMPTY_, ar.encode(arbuf))
+		n.sendRPC(aeReply, _EMPTY_, ar.encode(arbuf))
 		arPool.Put(ar)
 	}
 }

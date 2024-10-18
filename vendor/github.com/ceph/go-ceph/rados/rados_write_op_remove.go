@@ -9,7 +9,8 @@ import "C"
 // Remove object.
 //
 // Implements:
-//  void rados_write_op_remove(rados_write_op_t write_op)
+//
+//	void rados_write_op_remove(rados_write_op_t write_op)
 func (w *WriteOp) Remove() {
 	C.rados_write_op_remove(w.op)
 }
