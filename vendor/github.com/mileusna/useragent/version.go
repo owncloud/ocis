@@ -12,24 +12,26 @@ type VersionNo struct {
 	Patch int
 }
 
-func parseVersion(ver string, verno *VersionNo) {
+// parseVersion parse version string into Major.Minor.Patch struct
+func parseVersion(ver string) (verno VersionNo) {
 	var err error
 	parts := strings.Split(ver, ".")
 	if len(parts) > 0 {
 		if verno.Major, err = strconv.Atoi(parts[0]); err != nil {
-			return
+			return verno
 		}
-	}
-	if len(parts) > 1 {
-		if verno.Minor, err = strconv.Atoi(parts[1]); err != nil {
-			return
-		}
-		if len(parts) > 2 {
-			if verno.Patch, err = strconv.Atoi(parts[2]); err != nil {
-				return
+		if len(parts) > 1 {
+			if verno.Minor, err = strconv.Atoi(parts[1]); err != nil {
+				return verno
+			}
+			if len(parts) > 2 {
+				if verno.Patch, err = strconv.Atoi(parts[2]); err != nil {
+					return verno
+				}
 			}
 		}
 	}
+	return verno
 }
 
 // VersionNoShort return version string in format <Major>.<Minor>

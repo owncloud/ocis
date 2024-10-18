@@ -1,6 +1,3 @@
-//go:build ceph_preview
-// +build ceph_preview
-
 package rados
 
 // #cgo LDFLAGS: -lrados
@@ -19,11 +16,12 @@ import (
 // the backend.
 //
 // Implements:
-//  int rados_set_alloc_hint2(rados_ioctx_t io,
-//                            const char *o,
-//                            uint64_t expected_object_size,
-//                            uint64_t expected_write_size,
-//                            uint32_t flags);
+//
+//	int rados_set_alloc_hint2(rados_ioctx_t io,
+//	                          const char *o,
+//	                          uint64_t expected_object_size,
+//	                          uint64_t expected_write_size,
+//	                          uint32_t flags);
 func (ioctx *IOContext) SetAllocationHint(oid string, expectedObjectSize uint64, expectedWriteSize uint64, flags AllocHintFlags) error {
 	coid := C.CString(oid)
 	defer C.free(unsafe.Pointer(coid))

@@ -39,11 +39,12 @@ func newWriteOpCmpExtStep() *WriteOpCmpExtStep {
 // CmpExt ensures that given object range (extent) satisfies comparison.
 //
 // Implements:
-//  void rados_write_op_cmpext(rados_write_op_t write_op,
-//                             const char * cmp_buf,
-//                             size_t cmp_len,
-//                             uint64_t off,
-//                             int * prval);
+//
+//	void rados_write_op_cmpext(rados_write_op_t write_op,
+//	                           const char * cmp_buf,
+//	                           size_t cmp_len,
+//	                           uint64_t off,
+//	                           int * prval);
 func (w *WriteOp) CmpExt(b []byte, offset uint64) *WriteOpCmpExtStep {
 	oe := newWriteStep(b, 0, offset)
 	cmpExtStep := newWriteOpCmpExtStep()

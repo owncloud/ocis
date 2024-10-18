@@ -31,7 +31,8 @@ func (ioctx *IOContext) CreateSnap(snapName string) error {
 // RemoveSnap deletes the pool snapshot.
 //
 // Implements:
-//  int rados_ioctx_snap_remove(rados_ioctx_t io, const char *snapname)
+//
+//	int rados_ioctx_snap_remove(rados_ioctx_t io, const char *snapname)
 func (ioctx *IOContext) RemoveSnap(snapName string) error {
 	if err := ioctx.validate(); err != nil {
 		return err
@@ -50,7 +51,8 @@ type SnapID C.rados_snap_t
 // LookupSnap returns the ID of a pool snapshot.
 //
 // Implements:
-//  int rados_ioctx_snap_lookup(rados_ioctx_t io, const char *name, rados_snap_t *id)
+//
+//	int rados_ioctx_snap_lookup(rados_ioctx_t io, const char *name, rados_snap_t *id)
 func (ioctx *IOContext) LookupSnap(snapName string) (SnapID, error) {
 	var snapID SnapID
 
@@ -71,7 +73,8 @@ func (ioctx *IOContext) LookupSnap(snapName string) (SnapID, error) {
 // GetSnapName returns the name of a pool snapshot with the given snapshot ID.
 //
 // Implements:
-//  int rados_ioctx_snap_get_name(rados_ioctx_t io, rados_snap_t id, char *name, int maxlen)
+//
+//	int rados_ioctx_snap_get_name(rados_ioctx_t io, rados_snap_t id, char *name, int maxlen)
 func (ioctx *IOContext) GetSnapName(snapID SnapID) (string, error) {
 	if err := ioctx.validate(); err != nil {
 		return "", err
@@ -82,8 +85,8 @@ func (ioctx *IOContext) GetSnapName(snapID SnapID) (string, error) {
 		err error
 	)
 	// range from 1k to 64KiB
-	retry.WithSizes(1024, 1<<16, func(len int) retry.Hint {
-		cLen := C.int(len)
+	retry.WithSizes(1024, 1<<16, func(length int) retry.Hint {
+		cLen := C.int(length)
 		buf = make([]byte, cLen)
 		ret := C.rados_ioctx_snap_get_name(
 			ioctx.ioctx,
@@ -103,7 +106,8 @@ func (ioctx *IOContext) GetSnapName(snapID SnapID) (string, error) {
 // GetSnapStamp returns the time of the pool snapshot creation.
 //
 // Implements:
-//  int rados_ioctx_snap_get_stamp(rados_ioctx_t io, rados_snap_t id, time_t *t)
+//
+//	int rados_ioctx_snap_get_stamp(rados_ioctx_t io, rados_snap_t id, time_t *t)
 func (ioctx *IOContext) GetSnapStamp(snapID SnapID) (time.Time, error) {
 	var cTime C.time_t
 
@@ -121,7 +125,8 @@ func (ioctx *IOContext) GetSnapStamp(snapID SnapID) (time.Time, error) {
 // ListSnaps returns a slice containing the SnapIDs of existing pool snapshots.
 //
 // Implements:
-//  int rados_ioctx_snap_list(rados_ioctx_t io, rados_snap_t *snaps, int maxlen)
+//
+//	int rados_ioctx_snap_list(rados_ioctx_t io, rados_snap_t *snaps, int maxlen)
 func (ioctx *IOContext) ListSnaps() ([]SnapID, error) {
 	if err := ioctx.validate(); err != nil {
 		return nil, err
@@ -154,7 +159,8 @@ func (ioctx *IOContext) ListSnaps() ([]SnapID, error) {
 // The contents of the object will be the same as when the snapshot was taken.
 //
 // Implements:
-//  int rados_ioctx_snap_rollback(rados_ioctx_t io, const char *oid, const char *snapname);
+//
+//	int rados_ioctx_snap_rollback(rados_ioctx_t io, const char *oid, const char *snapname);
 func (ioctx *IOContext) RollbackSnap(oid, snapName string) error {
 	if err := ioctx.validate(); err != nil {
 		return err
@@ -178,7 +184,8 @@ const SnapHead = SnapID(C.LIBRADOS_SNAP_HEAD)
 // Pass SnapHead for no snapshot (i.e. normal operation).
 //
 // Implements:
-//  void rados_ioctx_snap_set_read(rados_ioctx_t io, rados_snap_t snap);
+//
+//	void rados_ioctx_snap_set_read(rados_ioctx_t io, rados_snap_t snap);
 func (ioctx *IOContext) SetReadSnap(snapID SnapID) error {
 	if err := ioctx.validate(); err != nil {
 		return err

@@ -15,7 +15,8 @@ import (
 // To reset the locator, an empty string must be set.
 //
 // Implements:
-//  void rados_ioctx_locator_set_key(rados_ioctx_t io, const char *key);
+//
+//	void rados_ioctx_locator_set_key(rados_ioctx_t io, const char *key);
 func (ioctx *IOContext) SetLocator(locator string) {
 	if locator == "" {
 		C.rados_ioctx_locator_set_key(ioctx.ioctx, nil)

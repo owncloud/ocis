@@ -30,6 +30,11 @@ func (ua UserAgent) IsChromeOS() bool {
 	return ua.OS == ChromeOS || ua.OS == "CrOS"
 }
 
+// IsBlackberryOS shorthand function to check if OS == BlackBerry
+func (ua UserAgent) IsBlackberryOS() bool {
+	return ua.OS == BlackBerry
+}
+
 // IsOpera shorthand function to check if Name == Opera
 func (ua UserAgent) IsOpera() bool {
 	return ua.Name == Opera
@@ -65,6 +70,11 @@ func (ua UserAgent) IsEdge() bool {
 	return ua.Name == Edge
 }
 
+// IsBlackBerry shorthand function to check if Name == BlackBerry
+func (ua UserAgent) IsBlackBerry() bool {
+	return ua.Name == BlackBerry
+}
+
 // IsGooglebot shorthand function to check if Name == Googlebot
 func (ua UserAgent) IsGooglebot() bool {
 	return ua.Name == Googlebot
@@ -78,6 +88,11 @@ func (ua UserAgent) IsTwitterbot() bool {
 // IsFacebookbot shorthand function to check if Name == FacebookExternalHit
 func (ua UserAgent) IsFacebookbot() bool {
 	return ua.Name == FacebookExternalHit
+}
+
+// IsYandexbot shorthand function to check if Name == YandexBot
+func (ua UserAgent) IsYandexbot() bool {
+	return ua.Name == YandexBot
 }
 
 // IsUnknown returns true if the package can't determine the user agent reliably.

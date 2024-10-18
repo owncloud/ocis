@@ -86,12 +86,13 @@ func (s *ReadOpOmapGetValsByKeysStep) Next() (*OmapKeyValue, error) {
 // GetOmapValuesByKeys starts iterating over specific key/value pairs.
 //
 // Implements:
-//  void rados_read_op_omap_get_vals_by_keys2(rados_read_op_t read_op,
-//                                            char const * const * keys,
-//                                            size_t num_keys,
-//                                            const size_t * key_lens,
-//                                            rados_omap_iter_t * iter,
-//                                            int * prval)
+//
+//	void rados_read_op_omap_get_vals_by_keys2(rados_read_op_t read_op,
+//	                                          char const * const * keys,
+//	                                          size_t num_keys,
+//	                                          const size_t * key_lens,
+//	                                          rados_omap_iter_t * iter,
+//	                                          int * prval)
 func (r *ReadOp) GetOmapValuesByKeys(keys []string) *ReadOpOmapGetValsByKeysStep {
 	s := newReadOpOmapGetValsByKeysStep()
 	r.steps = append(r.steps, s)

@@ -22,7 +22,8 @@ type Directory struct {
 // OpenDir returns a new Directory handle open for I/O.
 //
 // Implements:
-//  int ceph_opendir(struct ceph_mount_info *cmount, const char *name, struct ceph_dir_result **dirpp);
+//
+//	int ceph_opendir(struct ceph_mount_info *cmount, const char *name, struct ceph_dir_result **dirpp);
 func (mount *MountInfo) OpenDir(path string) (*Directory, error) {
 	var dir *C.struct_ceph_dir_result
 
@@ -43,7 +44,8 @@ func (mount *MountInfo) OpenDir(path string) (*Directory, error) {
 // Close the open directory handle.
 //
 // Implements:
-//  int ceph_closedir(struct ceph_mount_info *cmount, struct ceph_dir_result *dirp);
+//
+//	int ceph_closedir(struct ceph_mount_info *cmount, struct ceph_dir_result *dirp);
 func (dir *Directory) Close() error {
 	return getError(C.ceph_closedir(dir.mount.mount, dir.dir))
 }
@@ -136,7 +138,8 @@ func toDirEntryPlus(de *C.struct_dirent, s C.struct_ceph_statx) *DirEntryPlus {
 // exhausted.
 //
 // Implements:
-//  int ceph_readdir_r(struct ceph_mount_info *cmount, struct ceph_dir_result *dirp, struct dirent *de);
+//
+//	int ceph_readdir_r(struct ceph_mount_info *cmount, struct ceph_dir_result *dirp, struct dirent *de);
 func (dir *Directory) ReadDir() (*DirEntry, error) {
 	var de C.struct_dirent
 	ret := C.ceph_readdir_r(dir.mount.mount, dir.dir, &de)
@@ -156,8 +159,9 @@ func (dir *Directory) ReadDir() (*DirEntry, error) {
 // See Statx for a description of the wants and flags parameters.
 //
 // Implements:
-//  int ceph_readdirplus_r(struct ceph_mount_info *cmount, struct ceph_dir_result *dirp, struct dirent *de,
-//                         struct ceph_statx *stx, unsigned want, unsigned flags, struct Inode **out);
+//
+//	int ceph_readdirplus_r(struct ceph_mount_info *cmount, struct ceph_dir_result *dirp, struct dirent *de,
+//	                       struct ceph_statx *stx, unsigned want, unsigned flags, struct Inode **out);
 func (dir *Directory) ReadDirPlus(
 	want StatxMask, flags AtFlags) (*DirEntryPlus, error) {
 
@@ -186,7 +190,8 @@ func (dir *Directory) ReadDirPlus(
 // RewindDir sets the directory stream to the beginning of the directory.
 //
 // Implements:
-//  void ceph_rewinddir(struct ceph_mount_info *cmount, struct ceph_dir_result *dirp);
+//
+//	void ceph_rewinddir(struct ceph_mount_info *cmount, struct ceph_dir_result *dirp);
 func (dir *Directory) RewindDir() {
 	C.ceph_rewinddir(dir.mount.mount, dir.dir)
 }

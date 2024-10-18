@@ -39,8 +39,9 @@ const (
 // Please refer to https://tracker.ceph.com/issues/46084
 //
 // Implements:
-//  int ceph_fsetxattr(struct ceph_mount_info *cmount, int fd, const char *name,
-//                     const void *value, size_t size, int flags);
+//
+//	int ceph_fsetxattr(struct ceph_mount_info *cmount, int fd, const char *name,
+//	                   const void *value, size_t size, int flags);
 func (f *File) SetXattr(name string, value []byte, flags XattrFlags) error {
 	if err := f.validate(); err != nil {
 		return err
@@ -68,8 +69,9 @@ func (f *File) SetXattr(name string, value []byte, flags XattrFlags) error {
 // GetXattr gets an extended attribute from the open file.
 //
 // Implements:
-//  int ceph_fgetxattr(struct ceph_mount_info *cmount, int fd, const char *name,
-//                     void *value, size_t size);
+//
+//	int ceph_fgetxattr(struct ceph_mount_info *cmount, int fd, const char *name,
+//	                   void *value, size_t size);
 func (f *File) GetXattr(name string) ([]byte, error) {
 	if err := f.validate(); err != nil {
 		return nil, err
@@ -107,7 +109,8 @@ func (f *File) GetXattr(name string) ([]byte, error) {
 // on the file.
 //
 // Implements:
-//  int ceph_flistxattr(struct ceph_mount_info *cmount, int fd, char *list, size_t size);
+//
+//	int ceph_flistxattr(struct ceph_mount_info *cmount, int fd, char *list, size_t size);
 func (f *File) ListXattr() ([]string, error) {
 	if err := f.validate(); err != nil {
 		return nil, err
@@ -140,7 +143,8 @@ func (f *File) ListXattr() ([]string, error) {
 // RemoveXattr removes the named xattr from the open file.
 //
 // Implements:
-//  int ceph_fremovexattr(struct ceph_mount_info *cmount, int fd, const char *name);
+//
+//	int ceph_fremovexattr(struct ceph_mount_info *cmount, int fd, const char *name);
 func (f *File) RemoveXattr(name string) error {
 	if err := f.validate(); err != nil {
 		return err

@@ -1,5 +1,5 @@
-//go:build !(nautilus || octopus) && ceph_preview && ceph_pre_quincy
-// +build !nautilus,!octopus,ceph_preview,ceph_pre_quincy
+//go:build !(nautilus || octopus || pacific)
+// +build !nautilus,!octopus,!pacific
 
 package admin
 
@@ -7,7 +7,8 @@ package admin
 // volume belonging to an optional subvolume group based on provided key name.
 //
 // Similar To:
-//  ceph fs subvolume snapshot metadata get <vol_name> <sub_name> <snap_name> <key_name> [--group_name <subvol_group_name>]
+//
+//	ceph fs subvolume snapshot metadata get <vol_name> <sub_name> <snap_name> <key_name> [--group_name <subvol_group_name>]
 func (fsa *FSAdmin) GetSnapshotMetadata(volume, group, subvolume, snapname, key string) (string, error) {
 	m := map[string]string{
 		"prefix":    "fs subvolume snapshot metadata get",
@@ -29,7 +30,8 @@ func (fsa *FSAdmin) GetSnapshotMetadata(volume, group, subvolume, snapname, key 
 // volume belonging to an optional subvolume group as a key-value pair.
 //
 // Similar To:
-//  ceph fs subvolume snapshot metadata set <vol_name> <sub_name> <snap_name> <key_name> <value> [--group_name <subvol_group_name>]
+//
+//	ceph fs subvolume snapshot metadata set <vol_name> <sub_name> <snap_name> <key_name> <value> [--group_name <subvol_group_name>]
 func (fsa *FSAdmin) SetSnapshotMetadata(volume, group, subvolume, snapname, key, value string) error {
 	m := map[string]string{
 		"prefix":    "fs subvolume snapshot metadata set",
@@ -53,7 +55,8 @@ func (fsa *FSAdmin) SetSnapshotMetadata(volume, group, subvolume, snapname, key,
 // metadata key.
 //
 // Similar To:
-//  ceph fs subvolume snapshot metadata rm <vol_name> <sub_name> <snap_name> <key_name> [--group_name <subvol_group_name>]
+//
+//	ceph fs subvolume snapshot metadata rm <vol_name> <sub_name> <snap_name> <key_name> [--group_name <subvol_group_name>]
 func (fsa *FSAdmin) RemoveSnapshotMetadata(volume, group, subvolume, snapname, key string) error {
 	return fsa.rmSubVolumeSnapShotMetadata(volume, group, subvolume, snapname, key, commonRmFlags{})
 }
@@ -63,7 +66,8 @@ func (fsa *FSAdmin) RemoveSnapshotMetadata(volume, group, subvolume, snapname, k
 // subvolume group using the metadata key.
 //
 // Similar To:
-//  ceph fs subvolume snapshot metadata rm <vol_name> <sub_name> <snap_name> <key_name> [--group_name <subvol_group_name>] --force
+//
+//	ceph fs subvolume snapshot metadata rm <vol_name> <sub_name> <snap_name> <key_name> [--group_name <subvol_group_name>] --force
 func (fsa *FSAdmin) ForceRemoveSnapshotMetadata(volume, group, subvolume, snapname, key string) error {
 	return fsa.rmSubVolumeSnapShotMetadata(volume, group, subvolume, snapname, key, commonRmFlags{force: true})
 }
@@ -89,7 +93,8 @@ func (fsa *FSAdmin) rmSubVolumeSnapShotMetadata(volume, group, subvolume, snapna
 // snapshot in a volume belonging to an optional subvolume group.
 //
 // Similar To:
-//  ceph fs subvolume snapshot metadata ls <vol_name> <sub_name> <snap_name> [--group_name <subvol_group_name>]
+//
+//	ceph fs subvolume snapshot metadata ls <vol_name> <sub_name> <snap_name> [--group_name <subvol_group_name>]
 func (fsa *FSAdmin) ListSnapshotMetadata(volume, group, subvolume, snapname string) (map[string]string, error) {
 	m := map[string]string{
 		"prefix":    "fs subvolume snapshot metadata ls",

@@ -40,7 +40,8 @@ func (s *SubVolumeGroupOptions) toFields(v, g string) *subVolumeGroupFields {
 // CreateSubVolumeGroup sends a request to create a subvolume group in a volume.
 //
 // Similar To:
-//  ceph fs subvolumegroup create <volume> <group_name>  ...
+//
+//	ceph fs subvolumegroup create <volume> <group_name>  ...
 func (fsa *FSAdmin) CreateSubVolumeGroup(volume, name string, o *SubVolumeGroupOptions) error {
 	if o == nil {
 		o = &SubVolumeGroupOptions{}
@@ -53,7 +54,8 @@ func (fsa *FSAdmin) CreateSubVolumeGroup(volume, name string, o *SubVolumeGroupO
 // specified volume.
 //
 // Similar To:
-//  ceph fs subvolumegroup ls cephfs <volume>
+//
+//	ceph fs subvolumegroup ls cephfs <volume>
 func (fsa *FSAdmin) ListSubVolumeGroups(volume string) ([]string, error) {
 	res := fsa.marshalMgrCommand(map[string]string{
 		"prefix":   "fs subvolumegroup ls",
@@ -65,14 +67,16 @@ func (fsa *FSAdmin) ListSubVolumeGroups(volume string) ([]string, error) {
 
 // RemoveSubVolumeGroup will delete a subvolume group in a volume.
 // Similar To:
-//  ceph fs subvolumegroup rm <volume> <group_name>
+//
+//	ceph fs subvolumegroup rm <volume> <group_name>
 func (fsa *FSAdmin) RemoveSubVolumeGroup(volume, name string) error {
 	return fsa.rmSubVolumeGroup(volume, name, commonRmFlags{})
 }
 
 // ForceRemoveSubVolumeGroup will delete a subvolume group in a volume.
 // Similar To:
-//  ceph fs subvolumegroup rm <volume> <group_name> --force
+//
+//	ceph fs subvolumegroup rm <volume> <group_name> --force
 func (fsa *FSAdmin) ForceRemoveSubVolumeGroup(volume, name string) error {
 	return fsa.rmSubVolumeGroup(volume, name, commonRmFlags{force: true})
 }
@@ -91,7 +95,8 @@ func (fsa *FSAdmin) rmSubVolumeGroup(volume, name string, o commonRmFlags) error
 // file system.
 //
 // Similar To:
-//  ceph fs subvolumegroup getpath <volume> <group_name>
+//
+//	ceph fs subvolumegroup getpath <volume> <group_name>
 func (fsa *FSAdmin) SubVolumeGroupPath(volume, name string) (string, error) {
 	m := map[string]string{
 		"prefix":     "fs subvolumegroup getpath",

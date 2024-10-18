@@ -1,5 +1,5 @@
-//go:build !(nautilus || octopus) && ceph_preview && ceph_pre_quincy
-// +build !nautilus,!octopus,ceph_preview,ceph_pre_quincy
+//go:build !(nautilus || octopus || pacific)
+// +build !nautilus,!octopus,!pacific
 
 package admin
 
@@ -7,7 +7,8 @@ package admin
 // an optional subvolume group based on provided key name.
 //
 // Similar To:
-//  ceph fs subvolume metadata get <vol_name> <sub_name> <key_name> [--group_name <subvol_group_name>]
+//
+//	ceph fs subvolume metadata get <vol_name> <sub_name> <key_name> [--group_name <subvol_group_name>]
 func (fsa *FSAdmin) GetMetadata(volume, group, subvolume, key string) (string, error) {
 	m := map[string]string{
 		"prefix":   "fs subvolume metadata get",
@@ -28,7 +29,8 @@ func (fsa *FSAdmin) GetMetadata(volume, group, subvolume, key string) (string, e
 // an optional subvolume group as a key-value pair.
 //
 // Similar To:
-//  ceph fs subvolume metadata set <vol_name> <sub_name> <key_name> <value> [--group_name <subvol_group_name>]
+//
+//	ceph fs subvolume metadata set <vol_name> <sub_name> <key_name> <value> [--group_name <subvol_group_name>]
 func (fsa *FSAdmin) SetMetadata(volume, group, subvolume, key, value string) error {
 	m := map[string]string{
 		"prefix":   "fs subvolume metadata set",
@@ -50,7 +52,8 @@ func (fsa *FSAdmin) SetMetadata(volume, group, subvolume, key, value string) err
 // belonging to an optional subvolume group using the metadata key.
 //
 // Similar To:
-//  ceph fs subvolume metadata rm <vol_name> <sub_name> <key_name> [--group_name <subvol_group_name>]
+//
+//	ceph fs subvolume metadata rm <vol_name> <sub_name> <key_name> [--group_name <subvol_group_name>]
 func (fsa *FSAdmin) RemoveMetadata(volume, group, subvolume, key string) error {
 	return fsa.rmSubVolumeMetadata(volume, group, subvolume, key, commonRmFlags{})
 }
@@ -60,7 +63,8 @@ func (fsa *FSAdmin) RemoveMetadata(volume, group, subvolume, key string) error {
 // the metadata key.
 //
 // Similar To:
-//  ceph fs subvolume metadata rm <vol_name> <sub_name> <key_name> [--group_name <subvol_group_name>] --force
+//
+//	ceph fs subvolume metadata rm <vol_name> <sub_name> <key_name> [--group_name <subvol_group_name>] --force
 func (fsa *FSAdmin) ForceRemoveMetadata(volume, group, subvolume, key string) error {
 	return fsa.rmSubVolumeMetadata(volume, group, subvolume, key, commonRmFlags{force: true})
 }
@@ -85,7 +89,8 @@ func (fsa *FSAdmin) rmSubVolumeMetadata(volume, group, subvolume, key string, o 
 // in a volume belonging to an optional subvolume group.
 //
 // Similar To:
-//  ceph fs subvolume metadata ls <vol_name> <sub_name> [--group_name <subvol_group_name>]
+//
+//	ceph fs subvolume metadata ls <vol_name> <sub_name> [--group_name <subvol_group_name>]
 func (fsa *FSAdmin) ListMetadata(volume, group, subvolume string) (map[string]string, error) {
 	m := map[string]string{
 		"prefix":   "fs subvolume metadata ls",

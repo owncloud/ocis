@@ -1,6 +1,3 @@
-//go:build ceph_preview
-// +build ceph_preview
-
 package rados
 
 // #cgo LDFLAGS: -lrados
@@ -14,7 +11,8 @@ import "C"
 // alignment or not, use RequiresAlignment.
 //
 // Implements:
-//  int rados_ioctx_pool_required_alignment2(rados_ioctx_t io, uint64_t *alignment)
+//
+//	int rados_ioctx_pool_required_alignment2(rados_ioctx_t io, uint64_t *alignment)
 func (ioctx *IOContext) Alignment() (uint64, error) {
 	var alignSizeBytes C.uint64_t
 	ret := C.rados_ioctx_pool_required_alignment2(

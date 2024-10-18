@@ -32,13 +32,14 @@ func (mount *MountInfo) MdsCommandWithInputBuffer(mdsSpec string, args [][]byte,
 // mdsCommand supports sending formatted commands to MDS.
 //
 // Implements:
-//  int ceph_mds_command(struct ceph_mount_info *cmount,
-//      const char *mds_spec,
-//      const char **cmd,
-//      size_t cmdlen,
-//      const char *inbuf, size_t inbuflen,
-//      char **outbuf, size_t *outbuflen,
-//      char **outs, size_t *outslen);
+//
+//	int ceph_mds_command(struct ceph_mount_info *cmount,
+//	    const char *mds_spec,
+//	    const char **cmd,
+//	    size_t cmdlen,
+//	    const char *inbuf, size_t inbuflen,
+//	    char **outbuf, size_t *outbuflen,
+//	    char **outs, size_t *outslen);
 func (mount *MountInfo) mdsCommand(mdsSpec string, args [][]byte, inputBuffer []byte) (buffer []byte, info string, err error) {
 	spec := C.CString(mdsSpec)
 	defer C.free(unsafe.Pointer(spec))

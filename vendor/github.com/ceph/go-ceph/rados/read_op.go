@@ -59,7 +59,8 @@ func (r *ReadOp) operateCompat(ioctx *IOContext, oid string) error {
 // AssertExists assures the object targeted by the read op exists.
 //
 // Implements:
-//  void rados_read_op_assert_exists(rados_read_op_t read_op);
+//
+//	void rados_read_op_assert_exists(rados_read_op_t read_op);
 func (r *ReadOp) AssertExists() {
 	C.rados_read_op_assert_exists(r.op)
 }

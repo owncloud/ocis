@@ -72,27 +72,28 @@ var (
 // the NotifyEvents and Errors() receives all occuring errors. A typical code
 // creating a Watcher could look like this:
 //
-//  watcher, err := ioctx.Watch(oid)
-//  go func() { // event handler
-//    for ne := range watcher.Events() {
-//      ...
-//      ne.Ack([]byte("response data..."))
-//      ...
-//    }
-//  }()
-//  go func() { // error handler
-//    for err := range watcher.Errors() {
-//      ... handle err ...
-//    }
-//  }()
+//	watcher, err := ioctx.Watch(oid)
+//	go func() { // event handler
+//	  for ne := range watcher.Events() {
+//	    ...
+//	    ne.Ack([]byte("response data..."))
+//	    ...
+//	  }
+//	}()
+//	go func() { // error handler
+//	  for err := range watcher.Errors() {
+//	    ... handle err ...
+//	  }
+//	}()
 //
 // CAUTION: the Watcher references the IOContext in which it has been created.
 // Therefore all watchers must be deleted with the Delete() method before the
 // IOContext is being destroyed.
 //
 // Implements:
-//  int rados_watch2(rados_ioctx_t io, const char* o, uint64_t* cookie,
-//    rados_watchcb2_t watchcb, rados_watcherrcb_t watcherrcb, void* arg)
+//
+//	int rados_watch2(rados_ioctx_t io, const char* o, uint64_t* cookie,
+//	  rados_watchcb2_t watchcb, rados_watcherrcb_t watcherrcb, void* arg)
 func (ioctx *IOContext) Watch(obj string) (*Watcher, error) {
 	return ioctx.WatchWithTimeout(obj, 0)
 }
@@ -101,9 +102,10 @@ func (ioctx *IOContext) Watch(obj string) (*Watcher, error) {
 // different timeout than the default can be specified.
 //
 // Implements:
-//  int rados_watch3(rados_ioctx_t io, const char *o, uint64_t *cookie,
-// 	  rados_watchcb2_t watchcb, rados_watcherrcb_t watcherrcb, uint32_t timeout,
-// 	  void *arg);
+//
+//	 int rados_watch3(rados_ioctx_t io, const char *o, uint64_t *cookie,
+//		  rados_watchcb2_t watchcb, rados_watcherrcb_t watcherrcb, uint32_t timeout,
+//		  void *arg);
 func (ioctx *IOContext) WatchWithTimeout(oid string, timeout time.Duration) (*Watcher, error) {
 	cObj := C.CString(oid)
 	defer C.free(unsafe.Pointer(cObj))
@@ -158,7 +160,8 @@ func (w *Watcher) Errors() <-chan error {
 // Watcher is no longer valid, and should be destroyed with the Delete() method.
 //
 // Implements:
-//  int rados_watch_check(rados_ioctx_t io, uint64_t cookie)
+//
+//	int rados_watch_check(rados_ioctx_t io, uint64_t cookie)
 func (w *Watcher) Check() (time.Duration, error) {
 	ret := C.rados_watch_check(w.ioctx.ioctx, C.uint64_t(w.id))
 	if ret < 0 {
@@ -170,7 +173,8 @@ func (w *Watcher) Check() (time.Duration, error) {
 // Delete the watcher. This closes both the event and error channel.
 //
 // Implements:
-//  int rados_unwatch2(rados_ioctx_t io, uint64_t cookie)
+//
+//	int rados_unwatch2(rados_ioctx_t io, uint64_t cookie)
 func (w *Watcher) Delete() error {
 	watchersMtx.Lock()
 	_, ok := watchers[w.id]
@@ -204,8 +208,9 @@ func (ioctx *IOContext) Notify(obj string, data []byte) ([]NotifyAck, []NotifyTi
 // default.
 //
 // Implements:
-//  int rados_notify2(rados_ioctx_t io, const char* o, const char* buf, int buf_len,
-//    uint64_t timeout_ms, char** reply_buffer, size_t* reply_buffer_len)
+//
+//	int rados_notify2(rados_ioctx_t io, const char* o, const char* buf, int buf_len,
+//	  uint64_t timeout_ms, char** reply_buffer, size_t* reply_buffer_len)
 func (ioctx *IOContext) NotifyWithTimeout(obj string, data []byte, timeout time.Duration) ([]NotifyAck,
 	[]NotifyTimeout, error) {
 	cObj := C.CString(obj)
@@ -236,8 +241,9 @@ func (ioctx *IOContext) NotifyWithTimeout(obj string, data []byte, timeout time.
 // blocks and eventiually times out.
 //
 // Implements:
-//  int rados_notify_ack(rados_ioctx_t io, const char *o, uint64_t notify_id,
-//    uint64_t cookie, const char *buf, int buf_len)
+//
+//	int rados_notify_ack(rados_ioctx_t io, const char *o, uint64_t notify_id,
+//	  uint64_t cookie, const char *buf, int buf_len)
 func (ne *NotifyEvent) Ack(response []byte) error {
 	watchersMtx.RLock()
 	w, ok := watchers[ne.WatcherID]
@@ -265,7 +271,8 @@ func (ne *NotifyEvent) Ack(response []byte) error {
 // WatcherFlush flushes all pending notifications of the cluster.
 //
 // Implements:
-//  int rados_watch_flush(rados_t cluster)
+//
+//	int rados_watch_flush(rados_t cluster)
 func (c *Conn) WatcherFlush() error {
 	if !c.connected {
 		return ErrNotConnected
@@ -275,26 +282,27 @@ func (c *Conn) WatcherFlush() error {
 }
 
 // decoder for this notify response format:
-//    le32 num_acks
-//    {
-//      le64 gid     global id for the client (for client.1234 that's 1234)
-//      le64 cookie  cookie for the client
-//      le32 buflen  length of reply message buffer
-//      u8 buflen  payload
-//    } num_acks
-//    le32 num_timeouts
-//    {
-//      le64 gid     global id for the client
-//      le64 cookie  cookie for the client
-//    } num_timeouts
+//
+//	le32 num_acks
+//	{
+//	  le64 gid     global id for the client (for client.1234 that's 1234)
+//	  le64 cookie  cookie for the client
+//	  le32 buflen  length of reply message buffer
+//	  u8 buflen  payload
+//	} num_acks
+//	le32 num_timeouts
+//	{
+//	  le64 gid     global id for the client
+//	  le64 cookie  cookie for the client
+//	} num_timeouts
 //
 // NOTE: starting with pacific this is implemented as a C function and this can
 // be replaced later
-func decodeNotifyResponse(response *C.char, len C.size_t) ([]NotifyAck, []NotifyTimeout) {
-	if len == 0 || response == nil {
+func decodeNotifyResponse(response *C.char, length C.size_t) ([]NotifyAck, []NotifyTimeout) {
+	if length == 0 || response == nil {
 		return nil, nil
 	}
-	b := (*[math.MaxInt32]byte)(unsafe.Pointer(response))[:len:len]
+	b := (*[math.MaxInt32]byte)(unsafe.Pointer(response))[:length:length]
 	pos := 0
 
 	num := binary.LittleEndian.Uint32(b[pos:])

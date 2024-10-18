@@ -15,10 +15,12 @@ import "C"
 // will be returned.
 //
 // Note:
-//  Only supported in Ceph Nautilus and newer.
+//
+//	Only supported in Ceph Nautilus and newer.
 //
 // Implements:
-//  int64_t ceph_get_fs_cid(struct ceph_mount_info *cmount);
+//
+//	int64_t ceph_get_fs_cid(struct ceph_mount_info *cmount);
 func (mount *MountInfo) GetFsCid() (int64, error) {
 	ret := C.ceph_get_fs_cid(mount.mount)
 	if ret < 0 {

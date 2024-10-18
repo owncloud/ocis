@@ -44,11 +44,12 @@ func (c *Conn) MonCommandWithInputBuffer(args, inputBuffer []byte) ([]byte, stri
 // PGCommand sends a command to one of the PGs
 //
 // Implements:
-//  int rados_pg_command(rados_t cluster, const char *pgstr,
-//                       const char **cmd, size_t cmdlen,
-//                       const char *inbuf, size_t inbuflen,
-//                       char **outbuf, size_t *outbuflen,
-//                       char **outs, size_t *outslen);
+//
+//	int rados_pg_command(rados_t cluster, const char *pgstr,
+//	                     const char **cmd, size_t cmdlen,
+//	                     const char *inbuf, size_t inbuflen,
+//	                     char **outbuf, size_t *outbuflen,
+//	                     char **outs, size_t *outslen);
 func (c *Conn) PGCommand(pgid []byte, args [][]byte) ([]byte, string, error) {
 	return c.PGCommandWithInputBuffer(pgid, args, nil)
 }
@@ -56,11 +57,12 @@ func (c *Conn) PGCommand(pgid []byte, args [][]byte) ([]byte, string, error) {
 // PGCommandWithInputBuffer sends a command to one of the PGs, with an input buffer
 //
 // Implements:
-//  int rados_pg_command(rados_t cluster, const char *pgstr,
-//                       const char **cmd, size_t cmdlen,
-//                       const char *inbuf, size_t inbuflen,
-//                       char **outbuf, size_t *outbuflen,
-//                       char **outs, size_t *outslen);
+//
+//	int rados_pg_command(rados_t cluster, const char *pgstr,
+//	                     const char **cmd, size_t cmdlen,
+//	                     const char *inbuf, size_t inbuflen,
+//	                     char **outbuf, size_t *outbuflen,
+//	                     char **outs, size_t *outslen);
 func (c *Conn) PGCommandWithInputBuffer(pgid []byte, args [][]byte, inputBuffer []byte) ([]byte, string, error) {
 	name := C.CString(string(pgid))
 	defer C.free(unsafe.Pointer(name))
@@ -92,11 +94,12 @@ func (c *Conn) MgrCommand(args [][]byte) ([]byte, string, error) {
 // MgrCommandWithInputBuffer sends a command, with an input buffer, to a ceph-mgr.
 //
 // Implements:
-//  int rados_mgr_command(rados_t cluster, const char **cmd,
-//                         size_t cmdlen, const char *inbuf,
-//                         size_t inbuflen, char **outbuf,
-//                         size_t *outbuflen, char **outs,
-//                          size_t *outslen);
+//
+//	int rados_mgr_command(rados_t cluster, const char **cmd,
+//	                       size_t cmdlen, const char *inbuf,
+//	                       size_t inbuflen, char **outbuf,
+//	                       size_t *outbuflen, char **outs,
+//	                        size_t *outslen);
 func (c *Conn) MgrCommandWithInputBuffer(args [][]byte, inputBuffer []byte) ([]byte, string, error) {
 	ci := cutil.NewCommandInput(args, inputBuffer)
 	defer ci.Free()
@@ -126,11 +129,12 @@ func (c *Conn) OsdCommand(osd int, args [][]byte) ([]byte, string, error) {
 // specified ceph OSD.
 //
 // Implements:
-//  int rados_osd_command(rados_t cluster, int osdid,
-//                                       const char **cmd, size_t cmdlen,
-//                                       const char *inbuf, size_t inbuflen,
-//                                       char **outbuf, size_t *outbuflen,
-//                                       char **outs, size_t *outslen);
+//
+//	int rados_osd_command(rados_t cluster, int osdid,
+//	                                     const char **cmd, size_t cmdlen,
+//	                                     const char *inbuf, size_t inbuflen,
+//	                                     char **outbuf, size_t *outbuflen,
+//	                                     char **outs, size_t *outslen);
 func (c *Conn) OsdCommandWithInputBuffer(
 	osd int, args [][]byte, inputBuffer []byte) ([]byte, string, error) {
 
@@ -162,11 +166,12 @@ func (c *Conn) MonCommandTarget(name string, args [][]byte) ([]byte, string, err
 // MonCommandTargetWithInputBuffer sends a command, with an input buffer, to a specified monitor.
 //
 // Implements:
-//  int rados_mon_command_target(rados_t cluster, const char *name,
-//                               const char **cmd, size_t cmdlen,
-//                               const char *inbuf, size_t inbuflen,
-//                               char **outbuf, size_t *outbuflen,
-//                               char **outs, size_t *outslen);
+//
+//	int rados_mon_command_target(rados_t cluster, const char *name,
+//	                             const char **cmd, size_t cmdlen,
+//	                             const char *inbuf, size_t inbuflen,
+//	                             char **outbuf, size_t *outbuflen,
+//	                             char **outs, size_t *outslen);
 func (c *Conn) MonCommandTargetWithInputBuffer(
 	name string, args [][]byte, inputBuffer []byte) ([]byte, string, error) {
 

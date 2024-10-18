@@ -22,8 +22,9 @@ import (
 // the xattr to be unset. Please refer to https://tracker.ceph.com/issues/46084
 //
 // Implements:
-//  int ceph_setxattr(struct ceph_mount_info *cmount, const char *path, const char *name,
-//                    const void *value, size_t size, int flags);
+//
+//	int ceph_setxattr(struct ceph_mount_info *cmount, const char *path, const char *name,
+//	                  const void *value, size_t size, int flags);
 func (mount *MountInfo) SetXattr(path, name string, value []byte, flags XattrFlags) error {
 	if err := mount.validate(); err != nil {
 		return err
@@ -53,8 +54,9 @@ func (mount *MountInfo) SetXattr(path, name string, value []byte, flags XattrFla
 // GetXattr gets an extended attribute from the file at the supplied path.
 //
 // Implements:
-//  int ceph_getxattr(struct ceph_mount_info *cmount, const char *path, const char *name,
-//                    void *value, size_t size);
+//
+//	int ceph_getxattr(struct ceph_mount_info *cmount, const char *path, const char *name,
+//	                  void *value, size_t size);
 func (mount *MountInfo) GetXattr(path, name string) ([]byte, error) {
 	if err := mount.validate(); err != nil {
 		return nil, err
@@ -94,7 +96,8 @@ func (mount *MountInfo) GetXattr(path, name string) ([]byte, error) {
 // on the file at the supplied path.
 //
 // Implements:
-//  int ceph_listxattr(struct ceph_mount_info *cmount, const char *path, char *list, size_t size);
+//
+//	int ceph_listxattr(struct ceph_mount_info *cmount, const char *path, char *list, size_t size);
 func (mount *MountInfo) ListXattr(path string) ([]string, error) {
 	if err := mount.validate(); err != nil {
 		return nil, err
@@ -129,7 +132,8 @@ func (mount *MountInfo) ListXattr(path string) ([]string, error) {
 // RemoveXattr removes the named xattr from the open file.
 //
 // Implements:
-//  int ceph_removexattr(struct ceph_mount_info *cmount, const char *path, const char *name);
+//
+//	int ceph_removexattr(struct ceph_mount_info *cmount, const char *path, const char *name);
 func (mount *MountInfo) RemoveXattr(path, name string) error {
 	if err := mount.validate(); err != nil {
 		return err
@@ -155,8 +159,9 @@ func (mount *MountInfo) RemoveXattr(path, name string) error {
 // the xattr to be unset. Please refer to https://tracker.ceph.com/issues/46084
 //
 // Implements:
-//  int ceph_lsetxattr(struct ceph_mount_info *cmount, const char *path, const char *name,
-//                    const void *value, size_t size, int flags);
+//
+//	int ceph_lsetxattr(struct ceph_mount_info *cmount, const char *path, const char *name,
+//	                  const void *value, size_t size, int flags);
 func (mount *MountInfo) LsetXattr(path, name string, value []byte, flags XattrFlags) error {
 	if err := mount.validate(); err != nil {
 		return err
@@ -186,8 +191,9 @@ func (mount *MountInfo) LsetXattr(path, name string, value []byte, flags XattrFl
 // LgetXattr gets an extended attribute from the file at the supplied path.
 //
 // Implements:
-//  int ceph_lgetxattr(struct ceph_mount_info *cmount, const char *path, const char *name,
-//                    void *value, size_t size);
+//
+//	int ceph_lgetxattr(struct ceph_mount_info *cmount, const char *path, const char *name,
+//	                  void *value, size_t size);
 func (mount *MountInfo) LgetXattr(path, name string) ([]byte, error) {
 	if err := mount.validate(); err != nil {
 		return nil, err
@@ -227,7 +233,8 @@ func (mount *MountInfo) LgetXattr(path, name string) ([]byte, error) {
 // on the file at the supplied path.
 //
 // Implements:
-//  int ceph_llistxattr(struct ceph_mount_info *cmount, const char *path, char *list, size_t size);
+//
+//	int ceph_llistxattr(struct ceph_mount_info *cmount, const char *path, char *list, size_t size);
 func (mount *MountInfo) LlistXattr(path string) ([]string, error) {
 	if err := mount.validate(); err != nil {
 		return nil, err
@@ -262,7 +269,8 @@ func (mount *MountInfo) LlistXattr(path string) ([]string, error) {
 // LremoveXattr removes the named xattr from the open file.
 //
 // Implements:
-//  int ceph_lremovexattr(struct ceph_mount_info *cmount, const char *path, const char *name);
+//
+//	int ceph_lremovexattr(struct ceph_mount_info *cmount, const char *path, const char *name);
 func (mount *MountInfo) LremoveXattr(path, name string) error {
 	if err := mount.validate(); err != nil {
 		return err

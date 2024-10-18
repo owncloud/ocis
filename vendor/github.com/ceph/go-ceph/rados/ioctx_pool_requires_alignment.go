@@ -1,6 +1,3 @@
-//go:build ceph_preview
-// +build ceph_preview
-
 package rados
 
 // #cgo LDFLAGS: -lrados
@@ -14,7 +11,8 @@ import "C"
 // Alignment to know how to get the stripe size for pools requiring it.
 //
 // Implements:
-//  int rados_ioctx_pool_requires_alignment2(rados_ioctx_t io, int *req)
+//
+//	int rados_ioctx_pool_requires_alignment2(rados_ioctx_t io, int *req)
 func (ioctx *IOContext) RequiresAlignment() (bool, error) {
 	var alignRequired C.int
 	ret := C.rados_ioctx_pool_requires_alignment2(
