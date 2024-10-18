@@ -11,9 +11,10 @@ Feature: an user gets the resources shared to them
       | Alice    |
       | Brian    |
 
-
+  @env-config
   Scenario Outline: sharee lists the file share (Personal space)
     Given user "Alice" has uploaded file with content "hello world" to "/textfile0.txt"
+    And the administrator has enabled the permissions role "Secure Viewer"
     And user "Alice" has sent the following resource share invitation:
       | resource        | textfile0.txt      |
       | space           | Personal           |
@@ -313,11 +314,12 @@ Feature: an user gets the resources shared to them
       | permissions-role |
       | File Editor      |
       | Viewer           |
-      | Secure viewer    |
+      | Secure Viewer    |
 
-
+  @env-config
   Scenario Outline: sharee lists the folder share (Personal space)
     Given user "Alice" has created folder "folder"
+    And the administrator has enabled the permissions role "Secure Viewer"
     And user "Alice" has sent the following resource share invitation:
       | resource        | folder             |
       | space           | Personal           |
@@ -606,7 +608,7 @@ Feature: an user gets the resources shared to them
       | permissions-role |
       | Editor           |
       | Viewer           |
-      | Secure viewer    |
+      | Secure Viewer    |
 
 
   Scenario: sharee lists the file share received via group invitation (Personal space)
@@ -2508,9 +2510,10 @@ Feature: an user gets the resources shared to them
       }
       """
 
-  @issue-8027 @issue-8314
+  @issue-8027 @issue-8314 @env-config
   Scenario Outline: sharee lists the file share (Project space)
     Given using spaces DAV path
+    And the administrator has enabled the permissions role "Secure Viewer"
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "new-space" with content "some content" to "testfile.txt"
@@ -2739,11 +2742,12 @@ Feature: an user gets the resources shared to them
       | permissions-role |
       | File Editor      |
       | Viewer           |
-      | Secure viewer    |
+      | Secure Viewer    |
 
-  @issue-8027 @issue-8314
+  @issue-8027 @issue-8314 @env-config
   Scenario Outline: sharee lists the folder share (Project space)
     Given using spaces DAV path
+    And the administrator has enabled the permissions role "Secure Viewer"
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
     And user "Alice" has created a folder "folder" in space "new-space"
@@ -2953,7 +2957,7 @@ Feature: an user gets the resources shared to them
       | permissions-role |
       | Editor           |
       | Viewer           |
-      | Secure viewer    |
+      | Secure Viewer    |
 
 
   Scenario: sharee lists the file share received via group invitation (Project space)

@@ -90,9 +90,10 @@ Feature: sharing
       | /remote.php/dav/spaces/%shares_drive_id% | /remote.php/dav/spaces/%spaceid% |
       | /dav/spaces/%shares_drive_id%            | /remote.php/dav/spaces/%spaceid% |
 
-  @issue-8242
+  @issue-8242 @env-config
   Scenario Outline: share receiver renames the shared item (old/new webdav)
     Given user "Alice" has uploaded file with content "foo" to "/sharefile.txt"
+    And the administrator has enabled the permissions role "Secure Viewer"
     And using <dav-path-version> DAV path
     And user "Alice" has sent the following resource share invitation:
       | resource        | sharefile.txt      |
@@ -130,13 +131,14 @@ Feature: sharing
       | old              | /remote.php/webdav               | Viewer           |
       | new              | /remote.php/dav/files/%username% | Viewer           |
       | new              | /dav/files/%username%            | Viewer           |
-      | old              | /remote.php/webdav               | Secure viewer    |
-      | new              | /remote.php/dav/files/%username% | Secure viewer    |
-      | new              | /dav/files/%username%            | Secure viewer    |
+      | old              | /remote.php/webdav               | Secure Viewer    |
+      | new              | /remote.php/dav/files/%username% | Secure Viewer    |
+      | new              | /dav/files/%username%            | Secure Viewer    |
 
-  @issue-8242
+  @issue-8242 @env-config
   Scenario Outline: share receiver renames the shared item (spaces webdav)
     Given user "Alice" has uploaded file with content "foo" to "/sharefile.txt"
+    And the administrator has enabled the permissions role "Secure Viewer"
     And user "Alice" has sent the following resource share invitation:
       | resource        | sharefile.txt      |
       | space           | Personal           |
@@ -173,8 +175,8 @@ Feature: sharing
       | dav-path                                 | dav-path-personal                | permissions-role |
       | /remote.php/dav/spaces/%shares_drive_id% | /remote.php/dav/spaces/%spaceid% | Viewer           |
       | /dav/spaces/%shares_drive_id%            | /remote.php/dav/spaces/%spaceid% | Viewer           |
-      | /remote.php/dav/spaces/%shares_drive_id% | /remote.php/dav/spaces/%spaceid% | Secure viewer    |
-      | /dav/spaces/%shares_drive_id%            | /remote.php/dav/spaces/%spaceid% | Secure viewer    |
+      | /remote.php/dav/spaces/%shares_drive_id% | /remote.php/dav/spaces/%spaceid% | Secure Viewer    |
+      | /dav/spaces/%shares_drive_id%            | /remote.php/dav/spaces/%spaceid% | Secure Viewer    |
 
 
   Scenario: keep group share when the one user renames the share and the user is deleted
@@ -215,9 +217,10 @@ Feature: sharing
     And as "Alice" file "/folderToShare/renamedFile" should exist
     But as "Alice" file "/folderToShare/fileInside" should not exist
 
-
+  @env-config
   Scenario Outline: receiver tries to rename a received share with read permissions inside the Shares folder
     Given user "Alice" has created folder "folderToShare"
+    And the administrator has enabled the permissions role "Secure Viewer"
     And user "Alice" has created folder "folderToShare/folderInside"
     And user "Alice" has uploaded file with content "thisIsAFileInsideTheSharedFolder" to "/folderToShare/fileInside"
     And user "Alice" has sent the following resource share invitation:
@@ -242,7 +245,7 @@ Feature: sharing
     Examples:
       | permissions-role |
       | Viewer           |
-      | Secure viewer    |
+      | Secure Viewer    |
 
 
   Scenario: receiver renames a received folder share to a different name on the same folder

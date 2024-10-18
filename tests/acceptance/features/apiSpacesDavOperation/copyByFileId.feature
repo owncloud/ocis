@@ -248,9 +248,10 @@ Feature: copying file using file id
       | Viewer          | /dav/spaces/<<FILEID>>            |
       | Uploader        | /dav/spaces/<<FILEID>>            |
 
-
+  @env-config
   Scenario Outline: sharee tries to copy a file from shares space with secure viewer to personal space
     Given user "Brian" has been created with default attributes and without skeleton files
+    And the administrator has enabled the permissions role "Secure Viewer"
     And user "Alice" has created folder "/folder"
     And user "Alice" has uploaded file with content "some data" to "/folder/test.txt"
     And we save it into "FILEID"
@@ -259,7 +260,7 @@ Feature: copying file using file id
       | space           | Personal      |
       | sharee          | Brian         |
       | shareType       | user          |
-      | permissionsRole | Secure viewer |
+      | permissionsRole | Secure Viewer |
     And user "Brian" has a share "folder" synced
     When user "Brian" copies a file "/test.txt" into "/" inside space "Personal" using file-id path "<dav-path>"
     Then the HTTP status code should be "403"
@@ -315,9 +316,10 @@ Feature: copying file using file id
       | Uploader        | Manager       | /dav/spaces/<<FILEID>>            |
       | Uploader        | Space Editor  | /dav/spaces/<<FILEID>>            |
 
-
+  @env-config
   Scenario Outline: sharee tries to copy a file from shares to project space
     Given user "Brian" has been created with default attributes and without skeleton files
+    And the administrator has enabled the permissions role "Secure Viewer"
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created folder "/folder"
     And user "Alice" has uploaded file with content "some data" to "/folder/test.txt"
@@ -345,15 +347,15 @@ Feature: copying file using file id
       | test.txt |
     Examples:
       | permission-role | space-role    | dav-path                          |
-      | Secure viewer   | Manager       | /remote.php/dav/spaces/<<FILEID>> |
-      | Secure viewer   | Space Viewer  | /remote.php/dav/spaces/<<FILEID>> |
-      | Secure viewer   | Space Editor  | /remote.php/dav/spaces/<<FILEID>> |
+      | Secure Viewer   | Manager       | /remote.php/dav/spaces/<<FILEID>> |
+      | Secure Viewer   | Space Viewer  | /remote.php/dav/spaces/<<FILEID>> |
+      | Secure Viewer   | Space Editor  | /remote.php/dav/spaces/<<FILEID>> |
       | Editor          | Space Viewer  | /remote.php/dav/spaces/<<FILEID>> |
       | Viewer          | Space Viewer  | /remote.php/dav/spaces/<<FILEID>> |
       | Uploader        | Space Viewer  | /remote.php/dav/spaces/<<FILEID>> |
-      | Secure viewer   | Manager       | /dav/spaces/<<FILEID>>            |
-      | Secure viewer   | Space Viewer  | /dav/spaces/<<FILEID>>            |
-      | Secure viewer   | Space Editor  | /dav/spaces/<<FILEID>>            |
+      | Secure Viewer   | Manager       | /dav/spaces/<<FILEID>>            |
+      | Secure Viewer   | Space Viewer  | /dav/spaces/<<FILEID>>            |
+      | Secure Viewer   | Space Editor  | /dav/spaces/<<FILEID>>            |
       | Editor          | Space Viewer  | /dav/spaces/<<FILEID>>            |
       | Viewer          | Space Viewer  | /dav/spaces/<<FILEID>>            |
       | Uploader        | Space Viewer  | /dav/spaces/<<FILEID>>            |
@@ -404,9 +406,10 @@ Feature: copying file using file id
       | Uploader        | Editor        | /dav/spaces/<<FILEID>>            |
       | Uploader        | Uploader      | /dav/spaces/<<FILEID>>            |
 
-
+  @env-config
   Scenario Outline: sharee tries to copy a file between shares space
     Given user "Brian" has been created with default attributes and without skeleton files
+    And the administrator has enabled the permissions role "Secure Viewer"
     And user "Alice" has created folder "/share1"
     And user "Alice" has created folder "/share2"
     And user "Alice" has uploaded file with content "some data" to "/share1/test.txt"
@@ -437,26 +440,26 @@ Feature: copying file using file id
       | test.txt |
     Examples:
       | from-share-role | to-share-role | dav-path                          |
-      | Secure viewer   | Viewer        | /remote.php/dav/spaces/<<FILEID>> |
-      | Secure viewer   | Editor        | /remote.php/dav/spaces/<<FILEID>> |
-      | Secure viewer   | Uploader      | /remote.php/dav/spaces/<<FILEID>> |
-      | Secure viewer   | Secure viewer | /remote.php/dav/spaces/<<FILEID>> |
+      | Secure Viewer   | Viewer        | /remote.php/dav/spaces/<<FILEID>> |
+      | Secure Viewer   | Editor        | /remote.php/dav/spaces/<<FILEID>> |
+      | Secure Viewer   | Uploader      | /remote.php/dav/spaces/<<FILEID>> |
+      | Secure Viewer   | Secure Viewer | /remote.php/dav/spaces/<<FILEID>> |
       | Viewer          | Viewer        | /remote.php/dav/spaces/<<FILEID>> |
       | Editor          | Viewer        | /remote.php/dav/spaces/<<FILEID>> |
       | Uploader        | Viewer        | /remote.php/dav/spaces/<<FILEID>> |
-      | Viewer          | Secure viewer | /remote.php/dav/spaces/<<FILEID>> |
-      | Editor          | Secure viewer | /remote.php/dav/spaces/<<FILEID>> |
-      | Uploader        | Secure viewer | /remote.php/dav/spaces/<<FILEID>> |
-      | Secure viewer   | Viewer        | /dav/spaces/<<FILEID>>            |
-      | Secure viewer   | Editor        | /dav/spaces/<<FILEID>>            |
-      | Secure viewer   | Uploader      | /dav/spaces/<<FILEID>>            |
-      | Secure viewer   | Secure viewer | /dav/spaces/<<FILEID>>            |
+      | Viewer          | Secure Viewer | /remote.php/dav/spaces/<<FILEID>> |
+      | Editor          | Secure Viewer | /remote.php/dav/spaces/<<FILEID>> |
+      | Uploader        | Secure Viewer | /remote.php/dav/spaces/<<FILEID>> |
+      | Secure Viewer   | Viewer        | /dav/spaces/<<FILEID>>            |
+      | Secure Viewer   | Editor        | /dav/spaces/<<FILEID>>            |
+      | Secure Viewer   | Uploader      | /dav/spaces/<<FILEID>>            |
+      | Secure Viewer   | Secure Viewer | /dav/spaces/<<FILEID>>            |
       | Viewer          | Viewer        | /dav/spaces/<<FILEID>>            |
       | Editor          | Viewer        | /dav/spaces/<<FILEID>>            |
       | Uploader        | Viewer        | /dav/spaces/<<FILEID>>            |
-      | Viewer          | Secure viewer | /dav/spaces/<<FILEID>>            |
-      | Editor          | Secure viewer | /dav/spaces/<<FILEID>>            |
-      | Uploader        | Secure viewer | /dav/spaces/<<FILEID>>            |
+      | Viewer          | Secure Viewer | /dav/spaces/<<FILEID>>            |
+      | Editor          | Secure Viewer | /dav/spaces/<<FILEID>>            |
+      | Uploader        | Secure Viewer | /dav/spaces/<<FILEID>>            |
 
 
   Scenario Outline: copy a file from project to personal space
@@ -604,9 +607,10 @@ Feature: copying file using file id
       | Space Viewer | Editor      | /dav/spaces/<<FILEID>>            |
       | Space Viewer | Uploader    | /dav/spaces/<<FILEID>>            |
 
-
+  @env-config
   Scenario Outline: try to copy a file from project to shares space with read permission
     Given user "Brian" has been created with default attributes and without skeleton files
+    And the administrator has enabled the permissions role "Secure Viewer"
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "project-space" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "project-space" with content "some data" to "textfile.txt"
@@ -635,14 +639,14 @@ Feature: copying file using file id
     Examples:
       | space-role   | permissions   | dav-path                          |
       | Manager      | Viewer        | /remote.php/dav/spaces/<<FILEID>> |
-      | Manager      | Secure viewer | /remote.php/dav/spaces/<<FILEID>> |
+      | Manager      | Secure Viewer | /remote.php/dav/spaces/<<FILEID>> |
       | Space Editor | Viewer        | /remote.php/dav/spaces/<<FILEID>> |
-      | Space Editor | Secure viewer | /remote.php/dav/spaces/<<FILEID>> |
+      | Space Editor | Secure Viewer | /remote.php/dav/spaces/<<FILEID>> |
       | Space Viewer | Viewer        | /remote.php/dav/spaces/<<FILEID>> |
-      | Space Viewer | Secure viewer | /remote.php/dav/spaces/<<FILEID>> |
+      | Space Viewer | Secure Viewer | /remote.php/dav/spaces/<<FILEID>> |
       | Manager      | Viewer        | /dav/spaces/<<FILEID>>            |
-      | Manager      | Secure viewer | /dav/spaces/<<FILEID>>            |
+      | Manager      | Secure Viewer | /dav/spaces/<<FILEID>>            |
       | Space Editor | Viewer        | /dav/spaces/<<FILEID>>            |
-      | Space Editor | Secure viewer | /dav/spaces/<<FILEID>>            |
+      | Space Editor | Secure Viewer | /dav/spaces/<<FILEID>>            |
       | Space Viewer | Viewer        | /dav/spaces/<<FILEID>>            |
-      | Space Viewer | Secure viewer | /dav/spaces/<<FILEID>>            |
+      | Space Viewer | Secure Viewer | /dav/spaces/<<FILEID>>            |

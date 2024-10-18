@@ -9,6 +9,7 @@ Feature: List a sharing permissions
 
   Scenario: user lists permissions of a folder in personal space
     Given user "Alice" has created folder "folder"
+    And the administrator has enabled the permissions role "Secure Viewer"
     When user "Alice" gets permissions list for folder "folder" of the space "Personal" using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match

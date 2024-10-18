@@ -215,9 +215,10 @@ Feature: lock files
       | /remote.php/dav/spaces/<<FILEID>> |
       | /dav/spaces/<<FILEID>>            |
 
-
+  @env-config
   Scenario Outline: viewer cannot lock a file in the shares using file-id
     Given user "Alice" has uploaded a file inside space "Alice Hansen" with content "some content" to "textfile.txt"
+    And the administrator has enabled the permissions role "Secure Viewer"
     And we save it into "FILEID"
     And user "Alice" has sent the following resource share invitation:
       | resource        | textfile.txt       |
@@ -232,7 +233,7 @@ Feature: lock files
     Examples:
       | permissions-role |
       | Viewer           |
-      | Secure viewer    |
+      | Secure Viewer    |
 
 
   Scenario: sharee cannot lock a resource exclusively locked by a sharer
