@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2024-10-18 01:34+0000\n"
+"POT-Creation-Date: 2024-10-18 13:05+0000\n"
 "PO-Revision-Date: 2024-04-04 00:17+0000\n"
 "Last-Translator: Michael Barz <mbarz@owncloud.com>, 2024\n"
 "Language-Team: German (https://app.transifex.com/owncloud-org/teams/6149/de/)\n"
@@ -71,7 +71,7 @@ msgstr "Hier können Sie eine Beschreibung für diesen Space einfügen."
 #. UnifiedRole SpaceViewer, Role Description (resolves directly)
 #: pkg/unifiedrole/roles.go:93 pkg/unifiedrole/roles.go:105
 msgid "View and download."
-msgstr "Ansehen und herunterladen"
+msgstr "Ansehen und herunterladen."
 
 #. UnifiedRole SecureViewer, Role Description (resolves directly)
 #: pkg/unifiedrole/roles.go:159
