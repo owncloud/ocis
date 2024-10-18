@@ -205,7 +205,7 @@ Feature: Update a link share for a resource
       }
       """
 
-
+  @issue-9724 @issue-10331
   Scenario: update password of a file's link share using permissions endpoint
     Given user "Alice" has uploaded file with content "other data" to "textfile1.txt"
     And user "Alice" has created the following resource link share:
@@ -283,7 +283,7 @@ Feature: Update a link share for a resource
       | password        |
       | ownCloud        |
 
-  @env-config
+  @env-config @issue-9724 @issue-10331
   Scenario: set password on a existing link share of a folder inside project-space using permissions endpoint
     Given the following configs have been set:
       | config                                       | value |

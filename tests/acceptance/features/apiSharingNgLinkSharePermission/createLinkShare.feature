@@ -474,7 +474,7 @@ Feature: Create a link share for a resource
       | internal         |
       | blocksDownload   |
 
-  @env-config
+  @env-config @issue-9724 @issue-10331
   Scenario: set password on a file's link share using permissions endpoint
     Given the following configs have been set:
       | config                                       | value |
@@ -1221,7 +1221,7 @@ Feature: Create a link share for a resource
       | password        | blocksDownload   |
       | ownCloud        | blocksDownload   |
 
-  @env-config
+  @env-config @issue-9724 @issue-10331
   Scenario: set password on a existing link share of a file inside project-space using permissions endpoint
     Given the following configs have been set:
       | config                                       | value |
