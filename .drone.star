@@ -520,7 +520,7 @@ def restoreGoBinCache():
     ]
 
 def testOcis(ctx):
-    steps = skipIfUnchanged(ctx, "unit-tests") + restoreGoBinCache() + makeGoGenerate("") + [
+    steps = skipIfUnchanged(ctx, "unit-tests") + restoreGoBinCache() + [
         {
             "name": "golangci-lint",
             "image": OC_CI_GOLANG,
@@ -584,7 +584,7 @@ def testOcis(ctx):
     }
 
 def scanOcis(ctx):
-    steps = skipIfUnchanged(ctx, "unit-tests") + restoreGoBinCache() + makeGoGenerate("") + [
+    steps = skipIfUnchanged(ctx, "unit-tests") + restoreGoBinCache() + [
         {
             "name": "govulncheck",
             "image": OC_CI_GOLANG,
@@ -626,7 +626,6 @@ def buildOcisBinaryForTesting(ctx):
         },
         "steps": skipIfUnchanged(ctx, "acceptance-tests") +
                  makeNodeGenerate("") +
-                 makeGoGenerate("") +
                  build() +
                  rebuildBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin"),
         "trigger": {
@@ -1399,8 +1398,7 @@ def dockerRelease(ctx, arch, repo, build_type):
             "arch": arch,
         },
         "steps": skipIfUnchanged(ctx, "build-docker") +
-                 makeNodeGenerate("") +
-                 makeGoGenerate("") + [
+                 makeNodeGenerate("") + [
             {
                 "name": "build",
                 "image": OC_CI_GOLANG,
@@ -1544,8 +1542,7 @@ def binaryRelease(ctx, arch, build_type, target, depends_on = []):
             "arch": "amd64",
         },
         "steps": skipIfUnchanged(ctx, "build-binary") +
-                 makeNodeGenerate("") +
-                 makeGoGenerate("") + [
+                 makeNodeGenerate("") + [
             {
                 "name": "build",
                 "image": OC_CI_GOLANG,
@@ -2016,23 +2013,6 @@ def makeNodeGenerate(module):
                 "pnpm config set store-dir ./.pnpm-store",
                 "retry -t 3 '%s ci-node-generate'" % (make),
             ],
-            "volumes": [stepVolumeGo],
-        },
-    ]
-
-def makeGoGenerate(module):
-    if module == "":
-        make = "make"
-    else:
-        make = "make -C %s" % (module)
-    return [
-        {
-            "name": "generate go",
-            "image": OC_CI_GOLANG,
-            "commands": [
-                "retry -t 3 '%s ci-go-generate'" % (make),
-            ],
-            "environment": DRONE_HTTP_PROXY_ENV,
             "volumes": [stepVolumeGo],
         },
     ]
