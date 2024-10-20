@@ -76,7 +76,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The password to authenticate with the cache. Only applies when store type 'nats-js-kv' is configured.
+The password to use for authentication. Only applies when using the 'nats-js-kv' store type.
 a| `OCIS_CACHE_AUTH_USERNAME`
 
 a| [subs=attributes+]
@@ -99,7 +99,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The username to authenticate with the cache. Only applies when store type 'nats-js-kv' is configured.
+The username to use for authentication. Only applies when using the 'nats-js-kv' store type.
 a| `OCIS_CACHE_DATABASE`
 
 a| [subs=attributes+]
@@ -116,7 +116,7 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++settings-cache ++
+++cache-stat ++
 
 a| [subs=-attributes]
 The database name the configured store should use.
@@ -141,7 +141,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Disables persistence of the cache. Only applies when store type 'nats-js-kv' is configured. Defaults to false.
+Disable persistence of the cache. Only applies when using the 'nats-js-kv' store type. Defaults to false.
 a| `OCIS_CACHE_SIZE`
 
 a| [subs=attributes+]
@@ -162,7 +162,7 @@ a| [subs=-attributes]
 ++0 ++
 
 a| [subs=-attributes]
-The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not explicitly set as default.
+Max number of entries to hold in the cache.
 a| `OCIS_CACHE_STORE`
 
 a| [subs=attributes+]
@@ -228,10 +228,10 @@ a| [subs=-attributes]
 ++Duration ++
 
 a| [subs=-attributes]
-++336h0m0s ++
+++5m0s ++
 
 a| [subs=-attributes]
-Time to live for cache records in the graph. Defaults to '336h' (2 weeks). See the Environment Variable Types description for more details.
+Default time to live for user info in the cache. Only applied when access tokens has no expiration. See the Environment Variable Types description for more details.
 a| `OCIS_CORS_ALLOW_CREDENTIALS`
 
 a| [subs=attributes+]
@@ -278,7 +278,7 @@ a| [subs=-attributes]
 ++[]string ++
 
 a| [subs=-attributes]
-++[Authorization Origin Content-Type Accept X-Requested-With X-Request-Id Purge Restore] ++
+++[Origin Accept Content-Type Depth Authorization Ocs-Apirequest If-None-Match If-Match Destination Overwrite X-Request-Id X-Requested-With Tus-Resumable Tus-Checksum-Algorithm Upload-Concat Upload-Length Upload-Metadata Upload-Defer-Length Upload-Expires Upload-Checksum Upload-Offset X-HTTP-Method-Override Cache-Control] ++
 
 a| [subs=-attributes]
 A list of allowed CORS headers. See following chapter for more details: *Access-Control-Request-Headers* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers. See the Environment Variable Types description for more details.
@@ -303,7 +303,7 @@ a| [subs=-attributes]
 ++[]string ++
 
 a| [subs=-attributes]
-++[GET POST PUT PATCH DELETE OPTIONS] ++
+++[OPTIONS HEAD GET PUT POST DELETE MKCOL PROPFIND PROPPATCH MOVE COPY REPORT SEARCH] ++
 
 a| [subs=-attributes]
 A list of allowed CORS methods. See following chapter for more details: *Access-Control-Request-Method* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method. See the Environment Variable Types description for more details.
@@ -388,7 +388,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Set this option to 'true' to disable rendering of thumbnails triggered via webdav access. Note that when disabled, all access to preview related webdav paths will return a 404.
+Set this option to 'true' to disable previews in all the different web file listing views. This can speed up file listings in folders with many files. The only list view that is not affected by this setting is the trash bin, as it does not allow previewing at all.
 a| `OCIS_EDITION`
 
 a| [subs=attributes+]
@@ -417,7 +417,7 @@ a| [subs=-attributes]
 ++true ++
 
 a| [subs=-attributes]
-Changing this value is NOT supported. Enables the support for resharing.
+Changing this value is NOT supported. Enables the support for resharing in the clients.
 a| `OCIS_EVENTS_AUTH_PASSWORD`
 
 a| [subs=attributes+]
@@ -495,7 +495,7 @@ a| [subs=-attributes]
 ++ocis-cluster ++
 
 a| [subs=-attributes]
-The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.
+The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system.
 a| `OCIS_EVENTS_ENABLE_TLS`
 
 a| [subs=attributes+]
@@ -548,7 +548,7 @@ a| [subs=-attributes]
 ++127.0.0.1:9233 ++
 
 a| [subs=-attributes]
-The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Set to a empty string to disable emitting events.
+The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.
 a| `OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE`
 
 a| [subs=attributes+]
@@ -573,7 +573,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The root CA certificate used to validate the server's TLS certificate. If provided GRAPH_EVENTS_TLS_INSECURE will be seen as false.
+The root CA certificate used to validate the server's TLS certificate. If provided SHARING_EVENTS_TLS_INSECURE will be seen as false.
 a| `OCIS_GATEWAY_GRPC_ADDR`
 
 a| [subs=attributes+]
@@ -757,7 +757,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Whether to verify the server TLS certificates.
+Allow insecure connections to the frontend.
 a| `OCIS_JWT_SECRET`
 
 a| [subs=attributes+]
@@ -1591,7 +1591,7 @@ a| [subs=-attributes]
 ++https://localhost:9200 ++
 
 a| [subs=-attributes]
-The identity provider value to set in the userids of the CS3 user objects for users returned by this user provider.
+URL of the OIDC issuer. It defaults to URL of the builtin IDP.
 a| `OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST`
 
 a| [subs=attributes+]
@@ -1764,7 +1764,7 @@ a| [subs=-attributes]
 ++0 ++
 
 a| [subs=-attributes]
-The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived and used from the ocmem package though no explicit default was set.
+The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not explicitly set as default.
 a| `OCIS_PERSISTENT_STORE_TTL`
 
 a| [subs=attributes+]
@@ -2179,7 +2179,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The storage transfer secret.
+Transfer secret for signing file up- and download requests.
 a| `OCIS_TRANSLATION_PATH`
 
 a| [subs=attributes+]
@@ -2223,7 +2223,7 @@ a| [subs=-attributes]
 ++https://localhost:9200 ++
 
 a| [subs=-attributes]
-The public facing URL of WebDAV.
+The public facing URL of the oCIS frontend.
 a| `STORAGE_USERS_ASYNC_PROPAGATOR_PROPAGATION_DELAY`
 
 a| [subs=attributes+]
