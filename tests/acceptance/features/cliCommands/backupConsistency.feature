@@ -4,11 +4,13 @@ Feature: backup consistency
   I want to check my data for inconsistencies
   So that I can backup my data
 
+  Background:
+    Given user "Alice" has been created with default attributes and without skeleton files
+
 
   Scenario: check backup consistency via CLI command
     Given these users have been created with default attributes and without skeleton files:
       | username |
-      | Alice    |
       | Brian    |
       | Carol    |
     And user "Alice" has created folder "/uploadFolder"
@@ -24,3 +26,17 @@ Feature: backup consistency
     When the administrator checks the backup consistency using the CLI
     Then the command should be successful
     And the command output should contain "💚 No inconsistency found. The backup in '%storage_path%' seems to be valid."
+
+  @issue-9498
+  Scenario: check backup consistency after uploading a file multiple times
+    Given user "Alice" has uploaded file with content "hello world" to "textfile.txt"
+    And user "Alice" has uploaded file with content "hello world" to "textfile.txt"
+    And user "Alice" has uploaded file with content "hello world" to "textfile.txt"
+    And the administrator has stopped the server
+    When the administrator checks the backup consistency using the CLI
+    Then the command should be successful
+    And the command output should contain "💚 No inconsistency found. The backup in '%storage_path%' seems to be valid."
+    And the administrator starts the server
+    When user "Alice" gets the number of versions of file "textfile.txt"
+    Then the HTTP status code should be "207"
+    And the number of versions should be "2"
