@@ -8,6 +8,7 @@ Feature: permissions role definitions
 
 
   Scenario: get a list of permissions role definitions
+    Given the administrator has enabled the permissions role "Secure Viewer"
     When user "Alice" gets a list of permissions role definitions using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
