@@ -2191,6 +2191,9 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             ] + (wrapper_commands),
             "volumes": volumes,
             "depends_on": depends_on,
+            "port": [
+              "9000-9400:9000-9400",
+            ],
         },
         wait_for_ocis,
     ]
