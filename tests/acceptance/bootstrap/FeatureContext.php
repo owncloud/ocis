@@ -54,7 +54,6 @@ use Swaggest\JsonSchema\Exception\NumericException;
 use Swaggest\JsonSchema\Exception\ObjectException;
 use Swaggest\JsonSchema\Exception\StringException;
 use Swaggest\JsonSchema\Exception\TypeException;
-use Swaggest\JsonSchema\Exception\Error as JsonSchemaError;
 
 require_once 'bootstrap.php';
 
@@ -221,6 +220,13 @@ class FeatureContext extends BehatVariablesContext {
 	 */
 	public function isUsingSharingNG(): bool {
 		return $this->useSharingNG;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function runningInCi(): bool {
+		return \getenv("RUNNING_IN_CI") === "true";
 	}
 
 	/**
@@ -755,17 +761,6 @@ class FeatureContext extends BehatVariablesContext {
 	}
 
 	/**
-	 * removes the port rom the ocis URL
-	 *
-	 * @param string $url
-	 *
-	 * @return string
-	 */
-	public function removePortFromUrl(string $url): string {
-		return \str_replace(':9200', '', $url);
-	}
-
-	/**
 	 * @return string
 	 */
 	public function getOcPath(): string {
@@ -825,15 +820,6 @@ class FeatureContext extends BehatVariablesContext {
 	 */
 	public function getBaseUrlWithoutScheme(): string {
 		return $this->removeSchemeFromUrl($this->getBaseUrl());
-	}
-
-	/**
-	 * returns the base URL but without "http(s)://" and port
-	 *
-	 * @return string
-	 */
-	public function getBaseUrlWithoutSchemeAndPort(): string {
-		return $this->removePortFromUrl($this->removeSchemeFromUrl($this->getBaseUrl()));
 	}
 
 	/**
@@ -2200,14 +2186,6 @@ class FeatureContext extends BehatVariablesContext {
 				"parameter" => []
 			],
 			[
-				"code" => "%base_url_without_scheme_and_port%",
-				"function" => [
-					$this,
-					"getBaseUrlWithoutSchemeAndPort"
-				],
-				"parameter" => []
-			],
-			[
 				"code" => "%remote_server%",
 				"function" => [
 					$this,
@@ -2992,30 +2970,25 @@ class FeatureContext extends BehatVariablesContext {
 	}
 
 	/**
-	 * @When a user requests these endpoints with :method
+	 * @When a user requests these endpoints
 	 *
-	 * @param string $method
 	 * @param TableNode $table
 	 *
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userRequestsEndpoints(string $method, TableNode $table): void {
+	public function userRequestsEndpoints(TableNode $table): void {
 		$this->verifyTableNodeColumns($table, ['endpoint'], ['service', 'comment']);
-	
 		foreach ($table->getHash() as $row) {
-			$this->setResponse(
-				HttpRequestHelper::sendRequest(
-					$this->substituteInLineCodes($row['endpoint']),
-					$this->getStepLineRef(),
-					$method,
-					null,
-					null,
-					[],
-					null,
-				)
-			);
-			$this->pushToLastStatusCodesArrays();
+			$endpoint = $row['endpoint'];
+			// osis and tests in the CI are in different containers
+			// Using `docker exec` allows us to execute curl commands within the `ocis-server` container to access services running inside it.
+			if ($this->runningInCi()) {
+				$output = shell_exec("docker exec ocis-server curl -s {$endpoint}");
+			} else {
+				$output = shell_exec("curl -s {$endpoint}");
+			}
+			Assert::assertStringContainsString('OK', $output, "Service {$endpoint} responded, but expected 'OK'. Got: '{$output}'");
 		}
 	}
 }
