@@ -2962,6 +2962,19 @@ def wopiCollaborationService(name):
         },
     ]
 
+def natsService():
+    return [
+        {
+            "name": "nats-service",
+            "image": OC_CI_GOLANG,
+            "detach": True,
+            "environment": [],
+            "commands": [
+                "ocis/bin/ocis nats server",
+            ],
+        },
+    ]
+
 def tikaService():
     return [{
         "name": "tika",

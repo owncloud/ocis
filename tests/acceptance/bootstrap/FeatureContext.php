@@ -2988,6 +2988,7 @@ class FeatureContext extends BehatVariablesContext {
 			} else {
 				$output = shell_exec("curl -s {$endpoint}");
 			}
+			Assert::assertNotNull($output, "Service {$endpoint} did not respond; output is null.");
 			Assert::assertStringContainsString('OK', $output, "Service {$endpoint} responded, but expected 'OK'. Got: '{$output}'");
 		}
 	}

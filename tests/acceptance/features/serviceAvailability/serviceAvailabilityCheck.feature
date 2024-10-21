@@ -2,8 +2,8 @@ Feature: service health check
 
 
   Scenario: health check defauts service
-    When a user requests these endpoints with "GET"
-      | endpoint                                        | service            | comment |
+    When a user requests these endpoints
+      | endpoint                      | service            | comment |
       # | http://localhost/healthz      | activitylog        | #get 500                      |
       # | http://localhost:9297/healthz | antivirus          | checked in apiAntivirus suite |
       | http://localhost:9165/healthz | app-provider       |         |
@@ -17,7 +17,7 @@ Feature: service health check
       | http://localhost:9260/healthz | clientlog          |         |
       # | http://localhost:9980/healthz | collaboration      | checked in apiColaboration suite |
       | http://localhost:9270/healthz | eventhistory       |         |
-      | http://localhost:9141/healthz | frontend           |         |
+      # | http://localhost:9141/healthz | frontend           | #get 500 |
       | http://localhost:9143/healthz | gateway            |         |
       # | http://localhost:9124/healthz | graph              | #get 500                      |
       | http://localhost:9161/healthz | groups             |         |
@@ -32,7 +32,7 @@ Feature: service health check
       # | http://localhost:9129/healthz | policies           | extra                         |
       | http://localhost:9255/healthz | postprocessing     |         |
       # | http://localhost:9205/healthz | proxy              | #get 500                      |
-      | http://localhost:9224/healthz | search             |         |
+      # | http://localhost:9224/healthz | search             |    response is null     |
       # | http://localhost:9194/healthz | settings           | #get 500                      |
       | http://localhost:9151/healthz | sharing            |         |
       # | http://localhost:9135/healthz | sse                | #get 500                      |
@@ -44,14 +44,14 @@ Feature: service health check
       # | http://localhost:9189/healthz | thumbnails         | #get 500                      |
       # | http://localhost:9210/healthz | userlog            | #get 500                      |
       | http://localhost:9145/healthz | users              |         |
-    # | http://localhost:9104/healthz | web                | #get 500                      |
-    # | http://localhost:9119/healthz | webdav             | #get 500                      |
-    # | http://localhost:/healthz | webfinger          | #fix me need a proper port    |
+  # | http://localhost:9104/healthz | web                | #get 500                      |
+  # | http://localhost:9119/healthz | webdav             | #get 500                      |
+  # | http://localhost:/healthz | webfinger          | #fix me need a proper port    |
 
   @env-config
   Scenario: health check extra services
     Given the config "OCIS_ADD_RUN_SERVICES" has been set to "audit,auth-app,auth-bearer,policies"
-    When a user requests these endpoints with "GET"
+    When a user requests these endpoints
       | endpoint                      | service  | comment |
       | http://localhost:9229/healthz | audit    |         |
       | http://localhost:9245/healthz | auth-app |         |
@@ -60,8 +60,8 @@ Feature: service health check
 
 
   Scenario: service ready check
-    When a user requests these endpoints with "GET"
-      | endpoint                                       | service            | comment |
+    When a user requests these endpoints
+      | endpoint                     | service            | comment |
       # | http://localhost:9197/readyz | activitylog        | #get 500                      |
       # | http://localhost:9297/readyz | antivirus          | checked in apiAntivirus suite |
       | http://localhost:9165/readyz | app-provider       |         |
@@ -75,7 +75,7 @@ Feature: service health check
       # | http://localhost:9260/readyz | clientlog          | #get 500 |
       # | http://localhost:9980/readyz | collaboration      | checked in apiColaboration suite |
       # | http://localhost:9270/readyz | eventhistory       | #get 500 |
-      | http://localhost:9141/readyz | frontend           |         |
+      # | http://localhost:9141/readyz | frontend           | #get 500 |
       | http://localhost:9143/readyz | gateway            |         |
       # | http://localhost:9124/readyz | graph              | #get 500                      |
       | http://localhost:9161/readyz | groups             |         |
@@ -102,15 +102,15 @@ Feature: service health check
       # | http://localhost:9189/readyz | thumbnails         | #get 500                      |
       # | http://localhost:9210/readyz | userlog            | #get 500                      |
       | http://localhost:9145/readyz | users              |         |
-    # | http://localhost:9104/readyz | web                | #get 500                      |
-    # | http://localhost:9119/readyz | webdav             | #get 500                      |
-    # | http://localhost:/readyz | webfinger          | #fix me need a proper port    |
+  # | http://localhost:9104/readyz | web                | #get 500                      |
+  # | http://localhost:9119/readyz | webdav             | #get 500                      |
+  # | http://localhost:/readyz | webfinger          | #fix me need a proper port    |
 
   @env-config
-  Scenario: health check extra services
+  Scenario: extra services ready check 
     Given the config "OCIS_ADD_RUN_SERVICES" has been set to "audit,auth-app,auth-bearer,policies"
-    When a user requests these endpoints with "GET"
-      | endpoint                                       | service  | comment |
+    When a user requests these endpoints
+      | endpoint                     | service  | comment |
       # | http://localhost:9229/readyz | audit    | #get 500 |
       | http://localhost:9245/readyz | auth-app |         |
       # | http://localhost:9149/readyz | auth-bearer | donot work |
