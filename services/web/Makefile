@@ -1,6 +1,6 @@
 SHELL := bash
 NAME := web
-WEB_ASSETS_VERSION = v10.3.0
+WEB_ASSETS_VERSION = v11.0.0
 
 include ../../.make/recursion.mk
 
