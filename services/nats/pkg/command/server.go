@@ -103,7 +103,6 @@ func Server(cfg *config.Config) *cli.Command {
 					Err(err).
 					Msg("Shutting down server")
 
-				natsServer.Shutdown()
 				cancel()
 			})
 
