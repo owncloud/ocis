@@ -13,7 +13,7 @@ To run tests in the test suite you have two options. You may go the easy way and
 
 Both ways to run tests with the test suites are described here.
 
-## Testing With Test Suite in Docker
+## Running Test Suite in Docker
 
 Let's see what is available. Invoke the following command from within the root of the oCIS repository.
 
@@ -194,7 +194,7 @@ During testing we start a redis and oCIS docker container. These will not be sto
 make -C tests/acceptance/docker clean
 ```
 
-## Testing With Test Suite Natively Installed
+## Running Test Suite in Local Environment
 
 ### Run oCIS
 
@@ -283,6 +283,16 @@ If you want to work on a specific issue
 4. go back to 1. and repeat till the tests are passing.
 5. remove those tests from the expected failures file
 6. make a PR that has the fixed code, and the relevant lines removed from the expected failures file.
+
+## Running Tests With And Without `remote.php`
+
+By default, the tests are run with `remote.php` enabled. If you want to run the tests without `remote.php`, you can disable it by setting the environment variable `WITH_REMOTE_PHP=false` while running the tests.
+
+```bash
+WITH_REMOTE_PHP=false \
+TEST_SERVER_URL="https://localhost:9200" \
+make test-acceptance-api
+```
 
 ## Running ENV Config Tests (@env-Config)
 
@@ -407,40 +417,52 @@ make test-acceptance-api
 ```
 
 ## Running Test Suite With Antivirus Service (@antivirus)
+
 Test suites that are tagged with `@antivirus` require antivirus service. The available antivirus and the configuration related to them can be found [here](https://doc.owncloud.com/ocis/next/deployment/services/s-list/antivirus.html). This documentation is only going to use `clamAv` as antivirus.
 
 ### Setup clamAV
+
 #### 1. Setup Locally
 
 ##### Linux OS user
+
 Run the following command to set up calmAV and clamAV daemon
+
 ```bash
 sudo apt install clamav clamav-daemon -y
 ```
 
-Make sure that the  clamAV daemon is up and running
+Make sure that the clamAV daemon is up and running
 
 ```bash
 sudo service clamav-daemon status
 ```
+
 {{< hint info >}}
 The commands are ubuntu specific and may differ according to your system. You can find information related to installation of clamAV in their official documentation [here](https://docs.clamav.net/manual/Installing/Packages.html).
 {{< /hint>}}
 
 ##### Mac OS user
+
 Install ClamAV using [here](https://gist.github.com/mendozao/3ea393b91f23a813650baab9964425b9)
 Start ClamAV daemon
+
 ```bash
 /your/location/to/brew/Cellar/clamav/1.1.0/sbin/clamd
 ```
+
 #### 2. Setup clamAV With Docker
+
 ##### Linux OS user
+
 Run `clamAV` through docker
+
 ```bash
 docker run -d -p 3310:3310 owncloudci/clamavd
 ```
 
 ##### Mac OS user
+
 ```bash
 docker run -d -p 3310:3310 -v /your/local/filesystem/path/to/clamav/:/var/lib/clamav mkodockx/docker-clamav:alpine
 ```
@@ -459,6 +481,7 @@ OCIS_ASYNC_UPLOADS=true \
 OCIS_ADD_RUN_SERVICES="antivirus"
 ocis/bin/ocis server
 ```
+
 {{< hint info >}}
 The value for `ANTIVIRUS_CLAMAV_SOCKET` is an example which needs adaption according your OS.
 
@@ -478,13 +501,16 @@ make test-acceptance-api
 ```
 
 ## Running Test Suite With Federated Sharing (@ocm)
+
 Test suites that are tagged with `@ocm` require running two different ocis instances. More detailed information and configuration related to it can be found [here](https://doc.owncloud.com/ocis/5.0/deployment/services/s-list/ocm.html).
 
 Put
+
 ```bash
 127.0.0.1 ocis-server
 127.0.0.1 federation-ocis-server
 ```
+
 in the `/etc/hosts` file
 
 ### Setup first ocis instance
@@ -505,6 +531,7 @@ ocis/bin/ocis server
 The first oCIS instance should be available at: https://ocis-server:9200/
 
 ### Setup second ocis instance
+
 #### Using .vscode/launch.json
 
 #### Using .env file
@@ -547,6 +574,7 @@ ocis/bin/ocis server
 ```
 
 The sample `fontsMap.json` file is located in `tests/config/drone/fontsMap.json`.
+
 ```json
 {
   "defaultFont": "/path/to/ocis/tests/config/drone/NotoSans.ttf"

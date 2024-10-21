@@ -84,7 +84,7 @@ Feature: REPORT request to Shares space
       | old              |
       | new              |
 
-  @issue-9607
+  @issue-9607 @issue-10329
   Scenario Outline: check the REPORT response of a folder shared with secure viewer role
     Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/secureFolder"
@@ -125,7 +125,7 @@ Feature: REPORT request to Shares space
       | new              |
       | spaces           |
 
-  @issue-9607
+  @issue-9607 @issue-10329
   Scenario Outline: check the REPORT response of a file shared with secure viewer role
     Given using <dav-path-version> DAV path
     And user "Alice" has uploaded file with content "secure content" to "/secure.txt"

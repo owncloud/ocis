@@ -21,7 +21,7 @@ Feature: Search
     And user "Alice" has uploaded file with content "does-not-matter" to "/upload😀 😁/upload😀 😁.txt"
     And user "Alice" has uploaded file with content "file with comma in filename" to "/upload😀 😁/upload,1.txt"
 
-  @smokeTest
+  @smokeTest @issue-10329
   Scenario Outline: search for entry by pattern
     Given using <dav-path-version> DAV path
     When user "Alice" searches for "*upload*" using the WebDAV API
@@ -43,7 +43,7 @@ Feature: Search
       | new              |
       | spaces           |
 
-
+  @issue-10329
   Scenario Outline: search for entries by only some letters from the middle of the entry name
     Given using <dav-path-version> DAV path
     And user "Alice" has created folder "FOLDER"
@@ -61,7 +61,7 @@ Feature: Search
       | new              |
       | spaces           |
 
-
+  @issue-10329
   Scenario Outline: search for files by extension
     Given using <dav-path-version> DAV path
     When user "Alice" searches for "*png*" using the WebDAV API
@@ -91,7 +91,7 @@ Feature: Search
       | new              |
       | spaces           |
 
-
+  @issue-10329
   Scenario Outline: limit returned search entries
     Given using <dav-path-version> DAV path
     When user "Alice" searches for "*upload*" and limits the results to "3" items using the WebDAV API
@@ -111,7 +111,7 @@ Feature: Search
       | new              |
       | spaces           |
 
-
+  @issue-10329
   Scenario Outline: limit returned search entries to only 1 entry
     Given using <dav-path-version> DAV path
     When user "Alice" searches for "*upload*" and limits the results to "1" items using the WebDAV API
@@ -131,7 +131,7 @@ Feature: Search
       | new              |
       | spaces           |
 
-
+  @issue-10329
   Scenario Outline: limit returned search entries to more entries than there are
     Given using <dav-path-version> DAV path
     When user "Alice" searches for "*upload*" and limits the results to "100" items using the WebDAV API
@@ -152,7 +152,7 @@ Feature: Search
       | new              |
       | spaces           |
 
-  @issue-4712 @issue-9780 @issue-9781 @issue-9783
+  @issue-4712 @issue-9780 @issue-9781 @issue-9783 @issue-10329
   Scenario Outline: report extra properties in search entries for a file
     Given using <dav-path-version> DAV path
     When user "Alice" searches for "*upload*" using the WebDAV API requesting these properties:
@@ -181,7 +181,7 @@ Feature: Search
       | new              |
       | spaces           |
 
-  @issue-4712 @issue-9780 @issue-9781 @issue-9783
+  @issue-4712 @issue-9780 @issue-9781 @issue-9783 @issue-10329
   Scenario Outline: report extra properties in search entries for a folder
     Given using <dav-path-version> DAV path
     When user "Alice" searches for "*upload*" using the WebDAV API requesting these properties:
@@ -209,7 +209,7 @@ Feature: Search
       | new              |
       | spaces           |
 
-
+  @issue-10329
   Scenario Outline: search for entry with emoji by pattern
     Given using <dav-path-version> DAV path
     When user "Alice" searches for '"*😀 😁*"' using the WebDAV API

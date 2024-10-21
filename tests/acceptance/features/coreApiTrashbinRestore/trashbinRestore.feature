@@ -31,8 +31,8 @@ Feature: restore deleted files/folders
       | /textfile1.txt     |
     Examples:
       | dav-path-version |
-      | old              |
       | new              |
+      | spaces           |
 
 
   Scenario Outline: file deleted from a folder can be restored to the original folder
@@ -47,8 +47,8 @@ Feature: restore deleted files/folders
     And the content of file "/new-folder/new-file.txt" for user "Alice" should be "file to delete"
     Examples:
       | dav-path-version |
-      | old              |
       | new              |
+      | spaces           |
 
 
   Scenario Outline: file deleted from a folder is restored to the original folder if the original folder was deleted and restored
@@ -65,8 +65,8 @@ Feature: restore deleted files/folders
     And the content of file "/new-folder/new-file.txt" for user "Alice" should be "file to delete"
     Examples:
       | dav-path-version |
-      | old              |
       | new              |
+      | spaces           |
 
 
   Scenario Outline: file is deleted and restored to a new destination
@@ -85,11 +85,11 @@ Feature: restore deleted files/folders
     And the content of file "<restore-path>" for user "Alice" should be "to delete"
     Examples:
       | dav-path-version | delete-path             | restore-path         |
-      | old              | /PARENT/parent.txt      | parent.txt           |
+      | spaces           | /PARENT/parent.txt      | parent.txt           |
       | new              | /PARENT/parent.txt      | parent.txt           |
-      | old              | /PARENT/CHILD/child.txt | child.txt            |
+      | spaces           | /PARENT/CHILD/child.txt | child.txt            |
       | new              | /PARENT/CHILD/child.txt | child.txt            |
-      | old              | /textfile0.txt          | PARENT/textfile0.txt |
+      | spaces           | /textfile0.txt          | PARENT/textfile0.txt |
       | new              | /textfile0.txt          | PARENT/textfile0.txt |
 
 
@@ -105,9 +105,9 @@ Feature: restore deleted files/folders
     And the content of file <upload-path> for user "Alice" should be "file to delete"
     Examples:
       | dav-path-version | upload-path                | delete-path        |
-      | old              | "/PARENT/textfile0.txt"    | "/textfile0.txt"   |
+      | spaces           | "/PARENT/textfile0.txt"    | "/textfile0.txt"   |
       | new              | "/PARENT/textfile0.txt"    | "/textfile0.txt"   |
-      | old              | "/PARENT/.hiddenfile0.txt" | ".hiddenfile0.txt" |
+      | spaces           | "/PARENT/.hiddenfile0.txt" | ".hiddenfile0.txt" |
       | new              | "/PARENT/.hiddenfile0.txt" | ".hiddenfile0.txt" |
 
 
@@ -127,8 +127,8 @@ Feature: restore deleted files/folders
     And the content of file "/new-folder/new-file.txt" for user "Alice" should be "file to delete"
     Examples:
       | dav-path-version |
-      | old              |
       | new              |
+      | spaces           |
 
   @smokeTest
   Scenario Outline: deleted file cannot be restored by a different user
@@ -136,14 +136,14 @@ Feature: restore deleted files/folders
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has deleted file "/textfile0.txt"
     When user "Brian" tries to restore the file with original path "/textfile0.txt" from the trashbin of user "Alice" using the trashbin API
-    Then the HTTP status code should be "404"
+    Then the HTTP status code should be "<http-status-code>"
     And as "Alice" the folder with original path "/textfile0.txt" should exist in the trashbin
     And user "Alice" should not see the following elements
       | /textfile0.txt |
     Examples:
-      | dav-path-version |
-      | old              |
-      | new              |
+      | dav-path-version | http-status-code |
+      | new              | 404              |
+      | spaces           | 400              |
 
   @smokeTest
   Scenario Outline: deleted file cannot be restored with invalid password
@@ -157,8 +157,8 @@ Feature: restore deleted files/folders
       | /textfile0.txt |
     Examples:
       | dav-path-version |
-      | old              |
       | new              |
+      | spaces           |
 
   @smokeTest
   Scenario Outline: deleted file cannot be restored without using a password
@@ -172,7 +172,7 @@ Feature: restore deleted files/folders
       | /textfile0.txt |
     Examples:
       | dav-path-version |
-      | old              |
+      | spaces           |
       | new              |
 
 
@@ -187,11 +187,11 @@ Feature: restore deleted files/folders
     And the content of file "<file-name>" for user "Alice" should be "file original content"
     Examples:
       | dav-path-version | file-name               |
-      | old              | 😛 😜 🐱 🐭 ⌚️ ♀️ 🚴‍♂️    |
+      | spaces           | 😛 😜 🐱 🐭 ⌚️ ♀️ 🚴‍♂️    |
       | new              | 😛 😜 🐱 🐭 ⌚️ ♀️ 🚴‍♂️    |
-      | old              | strängé नेपाली file       |
+      | spaces           | strängé नेपाली file       |
       | new              | strängé नेपाली file       |
-      | old              | sample,1.txt            |
+      | spaces           | sample,1.txt            |
       | new              | sample,1.txt            |
 
 
@@ -209,7 +209,7 @@ Feature: restore deleted files/folders
     And the content of file "/new-folder/folder1/folder2/new-file.txt" for user "Alice" should be "file to delete"
     Examples:
       | dav-path-version |
-      | old              |
+      | spaces           |
       | new              |
 
 
@@ -227,7 +227,7 @@ Feature: restore deleted files/folders
     And the content of file "/new-folder/folder1/folder2/new-file.txt" for user "Alice" should be "file to delete"
     Examples:
       | dav-path-version |
-      | old              |
+      | spaces           |
       | new              |
 
 
@@ -247,7 +247,7 @@ Feature: restore deleted files/folders
     But as "Alice" the folder with original path "/new-folder" should exist in the trashbin
     Examples:
       | dav-path-version |
-      | old              |
+      | spaces           |
       | new              |
 
 
@@ -267,7 +267,7 @@ Feature: restore deleted files/folders
     But as "Alice" the file with original path "/new-folder/folder1/folder2/not-restored.txt" should exist in the trashbin
     Examples:
       | dav-path-version |
-      | old              |
+      | spaces           |
       | new              |
 
 
@@ -301,7 +301,7 @@ Feature: restore deleted files/folders
       | /FOLDER/.hidden_file |
     Examples:
       | dav-path-version |
-      | old              |
+      | spaces           |
       | new              |
 
 
@@ -340,7 +340,7 @@ Feature: restore deleted files/folders
       | # %ab ab?=ed.txt |
     Examples:
       | dav-path-version |
-      | old              |
+      | spaces           |
       | new              |
 
 
@@ -384,7 +384,7 @@ Feature: restore deleted files/folders
       | Folder,Comma |
     Examples:
       | dav-path-version |
-      | old              |
+      | spaces           |
       | new              |
 
 
@@ -402,7 +402,7 @@ Feature: restore deleted files/folders
     And the content of file "parent.txt" for user "Alice" should be "parent text"
     Examples:
       | dav-path-version |
-      | old              |
+      | spaces           |
       | new              |
 
 
@@ -421,7 +421,7 @@ Feature: restore deleted files/folders
       | /parent_folder/sub/parent.txt |
     Examples:
       | dav-path-version |
-      | old              |
+      | spaces           |
       | new              |
 
 
@@ -445,7 +445,7 @@ Feature: restore deleted files/folders
       | /parent_folder/sub/parent.txt |
     Examples:
       | dav-path-version |
-      | old              |
+      | spaces           |
       | new              |
 
 
@@ -464,7 +464,7 @@ Feature: restore deleted files/folders
       | /parent_folder/sub/parent.txt |
     Examples:
       | dav-path-version |
-      | old              |
+      | spaces           |
       | new              |
 
 
@@ -479,7 +479,7 @@ Feature: restore deleted files/folders
       | /parent.txt |
     Examples:
       | dav-path-version |
-      | old              |
+      | spaces           |
       | new              |
 
 
@@ -533,7 +533,7 @@ Feature: restore deleted files/folders
       | /fo.exe   |
     Examples:
       | dav-path-version |
-      | old              |
+      | spaces           |
       | new              |
 
 
@@ -549,7 +549,7 @@ Feature: restore deleted files/folders
     And as "Alice" the folder with original path "same-name.txt" should exist in the trashbin
     Examples:
       | dav-path-version |
-      | old              |
+      | spaces           |
       | new              |
 
 
@@ -565,5 +565,5 @@ Feature: restore deleted files/folders
     And as "Alice" the file with original path "same-name.txt" should exist in the trashbin
     Examples:
       | dav-path-version |
-      | old              |
+      | spaces           |
       | new              |

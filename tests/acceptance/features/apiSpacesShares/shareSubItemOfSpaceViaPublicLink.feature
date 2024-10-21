@@ -121,7 +121,7 @@ Feature: Share a file or folder that is inside a space via public link
       | folder/file.txt | Space Editor |
       | folder/file.txt | Space Viewer |
 
-
+  @issue-9724 @issue-10331
   Scenario Outline: user creates a new public link share of a file inside the personal space with edit permissions
     Given using OCS API version "<ocs-api-version>"
     And user "Alice" has uploaded file with content "Random data" to "/file.txt"

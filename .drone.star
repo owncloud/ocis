@@ -915,7 +915,7 @@ def localApiTestPipeline(ctx):
                                      (ocisServer(storage, params["accounts_hash_difficulty"], deploy_type = "federation", extra_server_environment = params["extraServerEnvironment"]) if params["federationServer"] else []) +
                                      ((wopiCollaborationService("fakeoffice") + wopiCollaborationService("collabora") + wopiCollaborationService("onlyoffice")) if params["collaborationServiceNeeded"] else []) +
                                      (waitForServices("wopi", ["wopi-collabora:9300", "wopi-onlyoffice:9300", "wopi-fakeoffice:9300"]) if params["collaborationServiceNeeded"] else []) +
-                                     localApiTests(suite, storage, params["extraEnvironment"]) +
+                                     localApiTests(ctx, suite, storage, params["extraEnvironment"]) +
                                      logRequests(),
                             "services": (emailService() if params["emailNeeded"] else []) +
                                         (clamavService() if params["antivirusNeeded"] else []) +
@@ -931,7 +931,10 @@ def localApiTestPipeline(ctx):
                         pipelines.append(pipeline)
     return pipelines
 
-def localApiTests(suite, storage, extra_environment = {}):
+def localApiTests(ctx, suite, storage, extra_environment = {}):
+    test_dir = "%s/tests/acceptance" % dirs["base"]
+    expected_failures_file = "%s/expected-failures-localAPI-on-%s-storage.md" % (test_dir, storage.upper())
+
     environment = {
         "PATH_TO_OCIS": dirs["base"],
         "TEST_SERVER_URL": OCIS_URL,
@@ -942,9 +945,10 @@ def localApiTests(suite, storage, extra_environment = {}):
         "STORAGE_DRIVER": storage,
         "BEHAT_SUITE": suite,
         "BEHAT_FILTER_TAGS": "~@skip&&~@skipOnGraph&&~@skipOnOcis-%s-Storage" % ("OC" if storage == "owncloud" else "OCIS"),
-        "EXPECTED_FAILURES_FILE": "%s/tests/acceptance/expected-failures-localAPI-on-%s-storage.md" % (dirs["base"], storage.upper()),
+        "EXPECTED_FAILURES_FILE": expected_failures_file,
         "UPLOAD_DELETE_WAIT_TIME": "1" if storage == "owncloud" else 0,
         "OCIS_WRAPPER_URL": "http://ocis-server:5200",
+        "WITH_REMOTE_PHP": get_remotephp_config(ctx),
     }
 
     for item in extra_environment:
@@ -955,7 +959,9 @@ def localApiTests(suite, storage, extra_environment = {}):
         "image": OC_CI_PHP % DEFAULT_PHP_VERSION,
         "environment": environment,
         "commands": [
-            "make test-acceptance-api",
+            # merge the expected failures
+            "" if get_remotephp_config(ctx) else "cat %s/expected-failures-without-remotephp.md >> %s" % (test_dir, expected_failures_file),
+            "make -C %s test-acceptance-api" % (dirs["base"]),
         ],
     }]
 
@@ -1112,7 +1118,8 @@ def wopiValidatorTests(ctx, storage, wopiServerType, accounts_hash_difficulty = 
 
 def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "ocis", accounts_hash_difficulty = 4):
     filterTags = "~@skipOnGraph&&~@skipOnOcis-%s-Storage" % ("OC" if storage == "owncloud" else "OCIS")
-    expectedFailuresFile = "%s/tests/acceptance/expected-failures-API-on-%s-storage.md" % (dirs["base"], storage.upper())
+    test_dir = "%s/tests/acceptance" % dirs["base"]
+    expected_failures_file = "%s/expected-failures-API-on-%s-storage.md" % (test_dir, storage.upper())
 
     return {
         "kind": "pipeline",
@@ -1140,11 +1147,14 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "ocis", ac
                              "DIVIDE_INTO_NUM_PARTS": number_of_parts,
                              "RUN_PART": part_number,
                              "ACCEPTANCE_TEST_TYPE": "core-api",
-                             "EXPECTED_FAILURES_FILE": expectedFailuresFile,
+                             "EXPECTED_FAILURES_FILE": expected_failures_file,
                              "UPLOAD_DELETE_WAIT_TIME": "1" if storage == "owncloud" else 0,
                              "OCIS_WRAPPER_URL": "http://ocis-server:5200",
+                             "WITH_REMOTE_PHP": get_remotephp_config(ctx),
                          },
                          "commands": [
+                             # merge the expected failures
+                             "" if get_remotephp_config(ctx) else "cat %s/expected-failures-without-remotephp.md >> %s" % (test_dir, expected_failures_file),
                              "make -C %s test-acceptance-api" % (dirs["base"]),
                          ],
                      },
@@ -1169,6 +1179,13 @@ def apiTests(ctx):
             pipelines.append(coreApiTests(ctx, runPart, config["apiTests"]["numberOfParts"], "ocis"))
 
     return pipelines
+
+def get_remotephp_config(ctx):
+    # run tests with remote.php for PRs and commit push
+    # run tests without remote.php for cron jobs
+    if ctx.build.event == "cron":
+        return False
+    return True
 
 def e2eTestPipeline(ctx):
     defaults = {

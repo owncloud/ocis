@@ -91,7 +91,7 @@ Feature: antivirus
       | old              |
       | spaces           |
 
-
+  @issue-10331
   Scenario Outline: public uploads a file with the virus to a public share
     Given using <dav-path-version> DAV path
     And the config "OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false"
@@ -117,7 +117,7 @@ Feature: antivirus
       | spaces           | eicar.com     | virusFile1.txt |
       | spaces           | eicar_com.zip | virusFile2.zip |
 
-
+  @issue-10331
   Scenario Outline: public uploads a file with the virus to a password-protected public share
     Given using <dav-path-version> DAV path
     And using SharingNG
@@ -380,7 +380,7 @@ Feature: antivirus
       | new              |
       | spaces           |
 
-  @env-config
+  @env-config @issue-10331
   Scenario Outline: try to overwrite a file with the virus content in a public link share
     Given the config "OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false"
     And using <dav-path-version> DAV path

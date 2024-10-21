@@ -75,8 +75,16 @@ class AuthContext implements Context {
 		?string $body = null,
 		?array $headers = []
 	): ResponseInterface {
-		$fullUrl = $this->featureContext->getBaseUrl() . $url;
-
+		// NOTE: preserving '/' for tests with special cases
+		// E.g: coreApiAuth/webDavSpecialURLs.feature
+		$url = \substr($url, 1);
+		$trimmedUrl = \ltrim($url, '/');
+		$slashCount = \strlen($url) - \strlen($trimmedUrl);
+		if (WebdavHelper::isDAVRequest($url)) {
+			$url = WebdavHelper::prefixRemotePhp($trimmedUrl);
+		}
+		$url = \str_repeat("/", $slashCount) . $url;
+		$fullUrl = $this->featureContext->getBaseUrl() . "/$url";
 		return HttpRequestHelper::sendRequest(
 			$fullUrl,
 			$this->featureContext->getStepLineRef(),
@@ -391,10 +399,11 @@ class AuthContext implements Context {
 				$ofUser
 			);
 			if (isset($row['destination'])) {
-				$headers['Destination'] = $this->featureContext->substituteInLineCodes(
-					$this->featureContext->getBaseUrl() . $row['destination'],
+				$destination = $this->featureContext->substituteInLineCodes(
+					$row['destination'],
 					$ofUser
 				);
+				$headers['Destination'] = $this->featureContext->getBaseUrl() . "/" . WebdavHelper::prefixRemotePhp(\ltrim($destination, "/"));
 			}
 			$response = $this->sendRequest(
 				$row['endpoint'],
@@ -440,10 +449,11 @@ class AuthContext implements Context {
 				$ofUser
 			);
 			if (isset($row['destination'])) {
-				$headers['Destination'] = $this->featureContext->substituteInLineCodes(
-					$this->featureContext->getBaseUrl() . $row['destination'],
+				$destination = $this->featureContext->substituteInLineCodes(
+					$row['destination'],
 					$ofUser
 				);
+				$headers['Destination'] = $this->featureContext->getBaseUrl() . "/" . WebdavHelper::prefixRemotePhp(\ltrim($destination, "/"));
 			}
 			$response = $this->sendRequest(
 				$row['endpoint'],
@@ -583,10 +593,10 @@ class AuthContext implements Context {
 			$baseUrl = $this->featureContext->getBaseUrl();
 			$suffix = "";
 			if ($this->featureContext->getDavPathVersion() === WebDavHelper::DAV_VERSION_SPACES) {
-				$suffix = $this->featureContext->spacesContext->getSpaceIdByName($user, "Personal") . "/";
+				$suffix = $this->featureContext->spacesContext->getSpaceIdByName($user, "Personal");
 			}
-			$davPath = WebDavHelper::getDavPath($user, $this->featureContext->getDavPathVersion());
-			$headers['Destination'] = "{$baseUrl}/{$davPath}{$suffix}moved";
+			$davPath = WebDavHelper::getDavPath($this->featureContext->getDavPathVersion(), $user);
+			$headers['Destination'] = "$baseUrl/$davPath/$suffix/moved";
 		}
 
 		foreach ($table->getHash() as $row) {
@@ -625,7 +635,11 @@ class AuthContext implements Context {
 			$endpoint,
 			$username
 		);
-		$fullUrl = $this->featureContext->getBaseUrl() . $endpoint;
+		$endpoint = \ltrim($endpoint, '/');
+		if (WebdavHelper::isDAVRequest($endpoint)) {
+			$endpoint = WebdavHelper::prefixRemotePhp($endpoint);
+		}
+		$fullUrl = $this->featureContext->getBaseUrl() . "/$endpoint";
 		$response = HttpRequestHelper::sendRequestOnce(
 			$fullUrl,
 			$this->featureContext->getStepLineRef(),

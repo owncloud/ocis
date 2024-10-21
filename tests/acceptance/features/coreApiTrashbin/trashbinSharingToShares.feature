@@ -197,10 +197,11 @@ Feature: using trashbin together with sharing
       | spaces           |
 
 
-  Scenario Outline: restoring a file to a read-only folder
+  Scenario Outline: restoring personal file to a read-only folder
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Brian" has created folder "shareFolderParent"
+    And user "Brian" has uploaded file with content "file to delete" to "shareFolderParent/textfile0.txt"
     And user "Brian" has sent the following resource share invitation:
       | resource        | shareFolderParent |
       | space           | Personal          |
@@ -208,20 +209,20 @@ Feature: using trashbin together with sharing
       | shareType       | user              |
       | permissionsRole | Viewer            |
     And user "Alice" has a share "shareFolderParent" synced
-    And as "Alice" folder "/Shares/shareFolderParent" should exist
     And user "Alice" has deleted file "/textfile0.txt"
     When user "Alice" restores the file with original path "/textfile0.txt" to "/Shares/shareFolderParent/textfile0.txt" using the trashbin API
-    Then the HTTP status code should be "403"
+    Then the HTTP status code should be "<http-status-code>"
     And as "Alice" the file with original path "/textfile0.txt" should exist in the trashbin
-    And as "Alice" file "/Shares/shareFolderParent/textfile0.txt" should not exist
-    And as "Brian" file "/shareFolderParent/textfile0.txt" should not exist
+    And as "Brian" the file with original path "/textfile0.txt" should not exist in the trashbin
+    And as "Alice" file "/Shares/shareFolderParent/textfile0.txt" should exist
+    And as "Brian" file "/shareFolderParent/textfile0.txt" should exist
     Examples:
-      | dav-path-version |
-      | new              |
-      | spaces           |
+      | dav-path-version | http-status-code |
+      | new              | 403              |
+      | spaces           | 400              |
 
 
-  Scenario Outline: restoring a file to a read-only sub-folder
+  Scenario Outline: restoring personal file to a read-only sub-folder
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Brian" has created folder "shareFolderParent"
@@ -236,11 +237,36 @@ Feature: using trashbin together with sharing
     And as "Alice" folder "/Shares/shareFolderParent/shareFolderChild" should exist
     And user "Alice" has deleted file "/textfile0.txt"
     When user "Alice" restores the file with original path "/textfile0.txt" to "/Shares/shareFolderParent/shareFolderChild/textfile0.txt" using the trashbin API
-    Then the HTTP status code should be "403"
+    Then the HTTP status code should be "<http-status-code>"
     And as "Alice" the file with original path "/textfile0.txt" should exist in the trashbin
     And as "Alice" file "/Shares/shareFolderParent/shareFolderChild/textfile0.txt" should not exist
     And as "Brian" file "/shareFolderParent/shareFolderChild/textfile0.txt" should not exist
     Examples:
-      | dav-path-version |
-      | new              |
-      | spaces           |
+      | dav-path-version | http-status-code |
+      | new              | 403              |
+      | spaces           | 400              |
+
+  @issue-10356
+  Scenario Outline: try to restore personal file to a shared folder as an editor
+    Given using <dav-path-version> DAV path
+    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has created folder "shareFolderParent"
+    And user "Brian" has uploaded file with content "file to delete" to "shareFolderParent/textfile0.txt"
+    And user "Brian" has sent the following resource share invitation:
+      | resource        | shareFolderParent |
+      | space           | Personal          |
+      | sharee          | Alice             |
+      | shareType       | user              |
+      | permissionsRole | Editor            |
+    And user "Alice" has a share "shareFolderParent" synced
+    And user "Alice" has deleted file "/textfile0.txt"
+    When user "Alice" restores the file with original path "/textfile0.txt" to "/Shares/shareFolderParent/textfile0.txt" using the trashbin API
+    Then the HTTP status code should be "<http-status-code>"
+    And as "Alice" the file with original path "/textfile0.txt" should exist in the trashbin
+    And as "Brian" the file with original path "/shareFolderParent/textfile0.txt" should not exist in the trashbin
+    And as "Brian" file "/shareFolderParent/textfile0.txt" should exist
+    And as "Alice" file "/Shares/shareFolderParent/textfile0.txt" should exist
+    Examples:
+      | dav-path-version | http-status-code |
+      | new              | 403              |
+      | spaces           | 400              |

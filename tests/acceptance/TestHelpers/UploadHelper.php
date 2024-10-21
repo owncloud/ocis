@@ -170,7 +170,7 @@ class UploadHelper extends Assert {
 		if ($chunkingVersion === 2) {
 			$source = $v2ChunksDestination . '/.file';
 			$headers['Destination'] = $baseUrl . "/" .
-				WebDavHelper::getDavPath($user, $davPathVersionToUse) .
+				WebDavHelper::getDavPath($davPathVersionToUse, $user) .
 				$destination;
 			$result = WebDavHelper::makeDavRequest(
 				$baseUrl,

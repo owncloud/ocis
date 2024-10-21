@@ -215,7 +215,7 @@ Feature: propagation of etags when deleting a file or folder
       | old              |
       | new              |
 
-  @issue-4251 @skipOnReva
+  @issue-4251 @skipOnReva @issue-10331
   Scenario Outline: deleting a file in a publicly shared folder changes its etag for the sharer
     Given using <dav-path-version> DAV path
     And user "Alice" has uploaded file with content "uploaded content" to "/upload/file.txt"
@@ -239,7 +239,7 @@ Feature: propagation of etags when deleting a file or folder
       | new              |
       | spaces           |
 
-  @issue-4251 @skipOnReva
+  @issue-4251 @skipOnReva @issue-10331
   Scenario Outline: deleting a folder in a publicly shared folder changes its etag for the sharer
     Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/upload/sub"

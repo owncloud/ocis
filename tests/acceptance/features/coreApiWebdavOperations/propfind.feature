@@ -4,39 +4,39 @@ Feature: PROPFIND
   So that I can get the information about a resource
 
   @issue-751
-  Scenario Outline: send PROPFIND request to "/remote.php/dav/(files|spaces)"
+  Scenario Outline: send PROPFIND request to "/dav/(files|spaces)"
     Given user "Alice" has been created with default attributes and without skeleton files
     When user "Alice" requests "<dav-path>" with "PROPFIND" using basic auth
     Then the HTTP status code should be "405"
     Examples:
-      | dav-path               |
-      | /remote.php/dav/files  |
-      | /remote.php/dav/spaces |
+      | dav-path    |
+      | /dav/files  |
+      | /dav/spaces |
 
-
-  Scenario Outline: send PROPFIND request to "/remote.php/dav/(files|spaces)" with depth header
+  @issue-10334
+  Scenario Outline: send PROPFIND request to "/dav/(files|spaces)" with depth header
     Given user "Alice" has been created with default attributes and without skeleton files
     When user "Alice" requests "<dav-path>" with "PROPFIND" using basic auth and with headers
       | header | value   |
       | depth  | <depth> |
     Then the HTTP status code should be "<http-status-code>"
     Examples:
-      | dav-path                         | depth    | http-status-code |
-      | /remote.php/webdav               | 0        | 207              |
-      | /remote.php/webdav               | 1        | 207              |
-      | /remote.php/dav/files/alice      | 0        | 207              |
-      | /remote.php/dav/files/alice      | 1        | 207              |
-      | /remote.php/dav/spaces/%spaceid% | 0        | 207              |
-      | /remote.php/dav/spaces/%spaceid% | 1        | 207              |
-      | /remote.php/dav/spaces/%spaceid% | infinity | 400              |
+      | dav-path              | depth    | http-status-code |
+      | /webdav               | 0        | 207              |
+      | /webdav               | 1        | 207              |
+      | /dav/files/alice      | 0        | 207              |
+      | /dav/files/alice      | 1        | 207              |
+      | /dav/spaces/%spaceid% | 0        | 207              |
+      | /dav/spaces/%spaceid% | 1        | 207              |
+      | /dav/spaces/%spaceid% | infinity | 400              |
 
     @skipOnReva
     Examples:
-      | dav-path                    | depth    | http-status-code |
-      | /remote.php/webdav          | infinity | 400              |
-      | /remote.php/dav/files/alice | infinity | 400              |
+      | dav-path         | depth    | http-status-code |
+      | /webdav          | infinity | 400              |
+      | /dav/files/alice | infinity | 400              |
 
-  @skipOnReva
+  @skipOnReva @issue-10071 @issue-10331
   Scenario: send PROPFIND request to a public link shared with password
     Given user "Alice" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/PARENT"
@@ -48,10 +48,10 @@ Feature: PROPFIND
       | password        | %public% |
     When the public sends "PROPFIND" request to the last public link share using the new public WebDAV API with password "%public%"
     Then the HTTP status code should be "207"
-    And the value of the item "//d:href" in the response should match "/%base_path%\/remote.php\/dav\/public-files\/%public_token%\/$/"
+    And the value of the item "//d:href" in the response should match "/\/dav\/public-files\/%public_token%\/$/"
     And the value of the item "//oc:public-link-share-owner" in the response should be "Alice"
 
-  @skipOnReva
+  @skipOnReva @issue-10071 @issue-10331
   Scenario: send PROPFIND request to a public link shared with password (request without password)
     Given user "Alice" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/PARENT"
@@ -65,7 +65,7 @@ Feature: PROPFIND
     Then the HTTP status code should be "401"
     And the value of the item "/d:error/s:exception" in the response should be "Sabre\DAV\Exception\NotAuthenticated"
 
-  @skipOnReva
+  @skipOnReva @issue-10071 @issue-10331
   Scenario: send PROPFIND request to a public link shared with password (request with incorrect password)
     Given user "Alice" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/PARENT"

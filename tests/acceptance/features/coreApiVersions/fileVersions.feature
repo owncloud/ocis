@@ -95,19 +95,19 @@ Feature: dav-versions
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "123" to "/davtest.txt"
     And we save it into "FILEID"
-    When user "Brian" sends HTTP method "PROPFIND" to URL "/remote.php/dav/meta/<<FILEID>>"
+    When user "Brian" sends HTTP method "PROPFIND" to URL "/dav/meta/<<FILEID>>"
     Then the HTTP status code should be "400" or "404"
 
 
   Scenario: user cannot access meta folder of a file which does not exist
     Given user "Brian" has been created with default attributes and without skeleton files
-    When user "Brian" sends HTTP method "PROPFIND" to URL "/remote.php/dav/meta/MTI4NGQyMzgtYWE5Mi00MmNlLWJkYzQtMGIwMDAwMDA5MTU2OjhjY2QyNzUxLTkwYTQtNDBmMi1iOWYzLTYxZWRmODQ0MjFmNA=="
+    When user "Brian" sends HTTP method "PROPFIND" to URL "/dav/meta/MTI4NGQyMzgtYWE5Mi00MmNlLWJkYzQtMGIwMDAwMDA5MTU2OjhjY2QyNzUxLTkwYTQtNDBmMi1iOWYzLTYxZWRmODQ0MjFmNA=="
     Then the HTTP status code should be "400" or "404"
 
 
   Scenario Outline: user cannot access meta folder of a file with invalid fileid
     Given user "Brian" has been created with default attributes and without skeleton files
-    When user "Brian" sends HTTP method "PROPFIND" to URL "/remote.php/dav/meta/<file-id>/v"
+    When user "Brian" sends HTTP method "PROPFIND" to URL "/dav/meta/<file-id>/v"
     Then the HTTP status code should be "400" or "404"
     Examples:
       | file-id                                                                                              | decoded-value                                                             | comment            |
