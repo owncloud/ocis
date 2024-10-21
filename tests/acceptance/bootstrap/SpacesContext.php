@@ -269,7 +269,7 @@ class SpacesContext implements Context {
 		$space = $this->getSpaceByName($user, $spaceName);
 		$baseUrl = $this->featureContext->getBaseUrl();
 		$davPath = WebdavHelper::getDavPath(WebDavHelper::DAV_VERSION_SPACES, $space["id"]);
-		$fullUrl = "{$baseUrl}/{$davPath}/{$fileName}";
+		$fullUrl = "$baseUrl/$davPath/$fileName";
 
 		return HttpRequestHelper::get(
 			$fullUrl,
@@ -316,7 +316,7 @@ class SpacesContext implements Context {
 		$encodedName = \rawurlencode($folderName);
 		$baseUrl = $this->featureContext->getBaseUrl();
 		$davPath = WebDavHelper::getDavPath(WebDavHelper::DAV_VERSION_SPACES, $space["id"]);
-		$fullUrl = "{$baseUrl}/{$davPath}/{$encodedName}";
+		$fullUrl = "$baseUrl/$davPath/$encodedName";
 
 		$response = HttpRequestHelper::sendRequest(
 			$fullUrl,
@@ -1701,7 +1701,7 @@ class SpacesContext implements Context {
 		$encodedName = \rawurlencode(ltrim($fileSource, "/"));
 		$baseUrl = $this->featureContext->getBaseUrl();
 		$davPath = WebdavHelper::getDavPath(WebDavHelper::DAV_VERSION_SPACES, $space["id"]);
-		$fullUrl = "{$baseUrl}/{$davPath}/{$encodedName}";
+		$fullUrl = "$baseUrl/$davPath/$encodedName";
 
 		$this->featureContext->setResponse($this->copyFilesAndFoldersRequest($user, $fullUrl, $headers));
 	}
@@ -1732,7 +1732,7 @@ class SpacesContext implements Context {
 		$encodedName = \rawurlencode(ltrim($fileSource, "/"));
 		$baseUrl = $this->featureContext->getBaseUrl();
 		$davPath = WebdavHelper::getDavPath(WebDavHelper::DAV_VERSION_SPACES, $space["id"]);
-		$fullUrl = "{$baseUrl}/{$davPath}/{$encodedName}";
+		$fullUrl = "$baseUrl/$davPath/$encodedName";
 
 		return $this->moveFilesAndFoldersRequest($user, $fullUrl, $headers);
 	}
@@ -1849,7 +1849,7 @@ class SpacesContext implements Context {
 		$encodedName = \rawurlencode(ltrim($fileSource, "/"));
 		$baseUrl = $this->featureContext->getBaseUrl();
 		$davPath = WebdavHelper::getDavPath(WebDavHelper::DAV_VERSION_SPACES, $space["id"]);
-		$fullUrl = "{$baseUrl}/{$davPath}/{$encodedName}";
+		$fullUrl = "$baseUrl/$davPath/$encodedName";
 
 		$this->featureContext->setResponse($this->copyFilesAndFoldersRequest($user, $fullUrl, $headers));
 	}
@@ -1882,7 +1882,7 @@ class SpacesContext implements Context {
 		$encodedName = \rawurlencode(ltrim($fileSource, "/"));
 		$baseUrl = $this->featureContext->getBaseUrl();
 		$davPath = WebdavHelper::getDavPath(WebDavHelper::DAV_VERSION_SPACES, $space["id"]);
-		$fullUrl = "{$baseUrl}/{$davPath}/{$encodedName}";
+		$fullUrl = "$baseUrl/$davPath/$encodedName";
 
 		if ($action === 'copying') {
 			$response = $this->copyFilesAndFoldersRequest($user, $fullUrl, $headers);
@@ -1950,7 +1950,7 @@ class SpacesContext implements Context {
 		$encodedName = \rawurlencode(ltrim($fileSource, "/"));
 		$baseUrl = $this->featureContext->getBaseUrl();
 		$davPath = WebdavHelper::getDavPath(WebDavHelper::DAV_VERSION_SPACES, $space["id"]);
-		$fullUrl = "{$baseUrl}/{$davPath}/{$encodedName}";
+		$fullUrl = "$baseUrl/$davPath/$encodedName";
 
 		$this->featureContext->setResponse($this->moveFilesAndFoldersRequest($user, $fullUrl, $headers));
 		$this->featureContext->pushToLastHttpStatusCodesArray();
@@ -1972,7 +1972,7 @@ class SpacesContext implements Context {
 		$fileDestination = $this->escapePath(\ltrim($fileDestination, "/"));
 		$baseUrl = $this->featureContext->getBaseUrl();
 		$davPath = WebdavHelper::getDavPath(WebDavHelper::DAV_VERSION_SPACES, $space["id"]);
-		return "{$baseUrl}/{$davPath}/{$fileDestination}";
+		return "$baseUrl/$davPath/$fileDestination";
 	}
 
 	/**
@@ -2062,11 +2062,11 @@ class SpacesContext implements Context {
 		$source = \trim($source, "/");
 		$baseUrl = $this->featureContext->getBaseUrl();
 		$davPathVersion = $this->featureContext->getDavPathVersion();
-		$uniquePath = $user;
+		$suffixPath = $user;
 		if ($davPathVersion === WebDavHelper::DAV_VERSION_SPACES) {
-			$uniquePath = $this->getSpaceIdByName($user, $sourceSpace);
+			$suffixPath = $this->getSpaceIdByName($user, $sourceSpace);
 		}
-		$sourceDavPath = WebDavHelper::getDavPath($davPathVersion, $uniquePath);
+		$sourceDavPath = WebDavHelper::getDavPath($davPathVersion, $suffixPath);
 		$fullUrl = "$baseUrl/$sourceDavPath/$source";
 
 		if ($destinationType === "space") {
@@ -2553,7 +2553,7 @@ class SpacesContext implements Context {
 		$encodedName = \rawurlencode(ltrim($object, "/"));
 		$baseUrl = $this->featureContext->getBaseUrl();
 		$davPath = WebdavHelper::getDavPath(WebDavHelper::DAV_VERSION_SPACES, $space["id"]);
-		$fullUrl = "{$baseUrl}/{$davPath}/{$encodedName}";
+		$fullUrl = "$baseUrl/$davPath/$encodedName";
 
 		return HttpRequestHelper::delete(
 			$fullUrl,
@@ -2819,7 +2819,7 @@ class SpacesContext implements Context {
 		$space = $this->getSpaceByName($user, $spaceName);
 		$baseUrl = $this->featureContext->getBaseUrl();
 		$davPath = WebDavHelper::getDavPath(WebDavHelper::DAV_VERSION_SPACES, $space["id"], "trash-bin");
-		$fullUrl = "{$baseUrl}/{$davPath}";
+		$fullUrl = "$baseUrl/$davPath";
 		return HttpRequestHelper::sendRequest(
 			$fullUrl,
 			$this->featureContext->getStepLineRef(),
@@ -2864,7 +2864,7 @@ class SpacesContext implements Context {
 		$space = $this->getSpaceByName($this->featureContext->getAdminUserName(), $spaceName);
 		$baseUrl = $this->featureContext->getBaseUrl();
 		$davPath = WebDavHelper::getDavPath(WebDavHelper::DAV_VERSION_SPACES, $space["id"], "trash-bin");
-		$fullUrl = "{$baseUrl}/{$davPath}";
+		$fullUrl = "$baseUrl/$davPath";
 		$this->featureContext->setResponse(
 			HttpRequestHelper::sendRequest($fullUrl, $this->featureContext->getStepLineRef(), 'PROPFIND', $user, $this->featureContext->getPasswordForUser($user))
 		);
@@ -2971,7 +2971,7 @@ class SpacesContext implements Context {
 
 		$baseUrl = $this->featureContext->getBaseUrl();
 		$davPath = WebDavHelper::getDavPath(WebDavHelper::DAV_VERSION_SPACES, $space["id"]);
-		$destination = "{$baseUrl}/{$davPath}/{$destination}";
+		$destination = "$baseUrl/$davPath/$destination";
 		$header = ["Destination" => $destination, "Overwrite" => "F"];
 
 		$fullUrl = $baseUrl . $pathToDeletedObject;
@@ -3067,7 +3067,7 @@ class SpacesContext implements Context {
 
 		$baseUrl = $this->featureContext->getBaseUrl();
 		$davPath = WebDavHelper::getDavPath(WebDavHelper::DAV_VERSION_SPACES, $space["id"]);
-		$fullUrl = "{$baseUrl}/{$davPath}/{$fileName}?{$urlParameters}";
+		$fullUrl = "$baseUrl/$davPath/$fileName?$urlParameters";
 		$this->featureContext->setResponse(
 			HttpRequestHelper::get(
 				$fullUrl,
@@ -3648,13 +3648,13 @@ class SpacesContext implements Context {
 			$space = $this->getSpaceByName($user, $spaceName);
 			$spaceId = $space['id'];
 		}
-		$uniquePath = $user;
+		$suffixPath = $user;
 		$davPathVersion = $this->featureContext->getDavPathVersion();
 		if ($davPathVersion === WebDavHelper::DAV_VERSION_SPACES) {
-			$uniquePath = $spaceId;
+			$suffixPath = $spaceId;
 		}
 
-		$topWebDavPath = "/" . WebDavHelper::getDavPath($davPathVersion, $uniquePath);
+		$topWebDavPath = "/" . WebDavHelper::getDavPath($davPathVersion, $suffixPath);
 
 		$spaceFound = false;
 		foreach ($responseArray as $value) {

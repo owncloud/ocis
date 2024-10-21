@@ -728,7 +728,7 @@ class WebDavPropertiesContext implements Context {
 	public function valueOfItemOfPathShouldBe(string $user, string $xpath, string $path, string $expectedValue):void {
 		$path = $this->featureContext->substituteInLineCodes($path, $user);
 		$path = \ltrim($path, '/');
-		$path = "/" . WebdavHelper::withRemotePhp($path);
+		$path = "/" . WebdavHelper::prefixRemotePhp($path);
 		$fullXpath = "//d:response/d:href[.='$path']/following-sibling::d:propstat$xpath";
 		$this->assertValueOfItemInResponseAboutUserIs(
 			$fullXpath,
@@ -898,7 +898,7 @@ class WebDavPropertiesContext implements Context {
 			$user,
 			['preg_quote' => ['/']]
 		);
-		$expectedHref = WebdavHelper::withRemotePhp($expectedHref);
+		$expectedHref = WebdavHelper::prefixRemotePhp($expectedHref);
 
 		$index = 0;
 		while (true) {
@@ -959,8 +959,8 @@ class WebDavPropertiesContext implements Context {
 			$pattern = \preg_replace("/^\//", "", $pattern);
 			$pattern = \preg_replace("/^\^/", "", $pattern);
 			$pattern = \ltrim($pattern, "\/");
-			$withRemotePhp = \rtrim(WebdavHelper::withRemotePhp(""), "/");
-			$pattern = "/^\/{$withRemotePhp}\/{$pattern}";
+			$prefixRemotePhp = \rtrim(WebdavHelper::prefixRemotePhp(""), "/");
+			$pattern = "/^\/{$prefixRemotePhp}\/{$pattern}";
 		}
 		$pattern = $this->featureContext->substituteInLineCodes(
 			$pattern,

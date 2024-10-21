@@ -1450,7 +1450,7 @@ class FeatureContext extends BehatVariablesContext {
 	public function sendingToWithDirectUrl(string $user, string $verb, string $url, ?string $body = null, ?string $password = null, ?array $headers = null): ResponseInterface {
 		$url = \ltrim($url, '/');
 		if (WebdavHelper::isDAVRequest($url)) {
-			$url = WebdavHelper::withRemotePhp($url);
+			$url = WebdavHelper::prefixRemotePhp($url);
 		}
 		$fullUrl = $this->getBaseUrl() . "/$url";
 
@@ -2112,7 +2112,7 @@ class FeatureContext extends BehatVariablesContext {
 	public function getCommentUrlRegExp(): string {
 		$basePath = \ltrim($this->getBasePath() . "/", "/");
 		$commentsPath = WebDAVHelper::getDavPath(WebDavHelper::DAV_VERSION_NEW, null, "comments");
-		return "/{$basePath}/{$commentsPath}/([0-9]+)";
+		return "/$basePath/$commentsPath/([0-9]+)";
 	}
 
 	/**

@@ -197,12 +197,12 @@ class WebDavLockingContext implements Context {
 		$spaceId = $this->spacesContext->getSpaceIdByName($user, $space);
 		$baseUrl = $this->featureContext->getBaseUrl();
 		$davPathVersion = $this->featureContext->getDavPathVersion();
-		$uniquePath = $user;
+		$suffixPath = $user;
 		if ($davPathVersion === WebDavHelper::DAV_VERSION_SPACES) {
-			$uniquePath = $spaceId;
+			$suffixPath = $spaceId;
 		}
 
-		$davPath = WebDavHelper::getDavPath($davPathVersion, $uniquePath);
+		$davPath = WebDavHelper::getDavPath($davPathVersion, $suffixPath);
 		$fullUrl = "$baseUrl/$davPath/$file";
 		return $this->lockFile($user, $file, $properties, $fullUrl, false, true, $spaceId);
 	}
@@ -236,12 +236,12 @@ class WebDavLockingContext implements Context {
 	public function userTriesToLockFileInProjectSpaceUsingWebDavAPI(string $user, string $file, string $space, TableNode $properties) {
 		$spaceId = $this->spacesContext->getSpaceIdByName($user, $space);
 		$davPathVersion = $this->featureContext->getDavPathVersion();
-		$uniquePath = $user;
+		$suffixPath = $user;
 		if ($davPathVersion === WebDavHelper::DAV_VERSION_SPACES) {
-			$uniquePath = $spaceId;
+			$suffixPath = $spaceId;
 		}
 
-		$davPath = WebdavHelper::getDavPath($davPathVersion, $uniquePath);
+		$davPath = WebdavHelper::getDavPath($davPathVersion, $suffixPath);
 		$fullUrl = $this->featureContext->getBaseUrl() . "/$davPath/$file";
 		$response = $this->lockFile($user, $file, $properties, $fullUrl, false, false, $spaceId);
 		$this->featureContext->setResponse($response);

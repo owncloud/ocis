@@ -81,7 +81,7 @@ class AuthContext implements Context {
 		$trimmedUrl = \ltrim($url, '/');
 		$slashCount = \strlen($url) - \strlen($trimmedUrl);
 		if (WebdavHelper::isDAVRequest($url)) {
-			$url = WebdavHelper::withRemotePhp($trimmedUrl);
+			$url = WebdavHelper::prefixRemotePhp($trimmedUrl);
 		}
 		$url = \str_repeat("/", $slashCount) . $url;
 		$fullUrl = $this->featureContext->getBaseUrl() . "/$url";
@@ -403,7 +403,7 @@ class AuthContext implements Context {
 					$row['destination'],
 					$ofUser
 				);
-				$headers['Destination'] = $this->featureContext->getBaseUrl() . "/" . WebdavHelper::withRemotePhp(\ltrim($destination, "/"));
+				$headers['Destination'] = $this->featureContext->getBaseUrl() . "/" . WebdavHelper::prefixRemotePhp(\ltrim($destination, "/"));
 			}
 			$response = $this->sendRequest(
 				$row['endpoint'],
@@ -453,7 +453,7 @@ class AuthContext implements Context {
 					$row['destination'],
 					$ofUser
 				);
-				$headers['Destination'] = $this->featureContext->getBaseUrl() . "/" . WebdavHelper::withRemotePhp(\ltrim($destination, "/"));
+				$headers['Destination'] = $this->featureContext->getBaseUrl() . "/" . WebdavHelper::prefixRemotePhp(\ltrim($destination, "/"));
 			}
 			$response = $this->sendRequest(
 				$row['endpoint'],
@@ -596,7 +596,7 @@ class AuthContext implements Context {
 				$suffix = $this->featureContext->spacesContext->getSpaceIdByName($user, "Personal");
 			}
 			$davPath = WebDavHelper::getDavPath($this->featureContext->getDavPathVersion(), $user);
-			$headers['Destination'] = "{$baseUrl}/{$davPath}/{$suffix}/moved";
+			$headers['Destination'] = "$baseUrl/$davPath/$suffix/moved";
 		}
 
 		foreach ($table->getHash() as $row) {
@@ -637,7 +637,7 @@ class AuthContext implements Context {
 		);
 		$endpoint = \ltrim($endpoint, '/');
 		if (WebdavHelper::isDAVRequest($endpoint)) {
-			$endpoint = WebdavHelper::withRemotePhp($endpoint);
+			$endpoint = WebdavHelper::prefixRemotePhp($endpoint);
 		}
 		$fullUrl = $this->featureContext->getBaseUrl() . "/$endpoint";
 		$response = HttpRequestHelper::sendRequestOnce(

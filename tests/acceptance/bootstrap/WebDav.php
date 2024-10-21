@@ -235,13 +235,13 @@ trait WebDav {
 		}
 
 		$davPathVersion = $this->getDavPathVersion();
-		$uniquePath = $user;
+		$suffixPath = $user;
 		if ($davPathVersion === WebDavHelper::DAV_VERSION_SPACES) {
-			$uniquePath = $spaceId;
+			$suffixPath = $spaceId;
 		}
 
-		$davPath = WebDavHelper::getDavPath($davPathVersion, $uniquePath);
-		$path = "{$this->getBasePath()}/{$davPath}";
+		$davPath = WebDavHelper::getDavPath($davPathVersion, $suffixPath);
+		$path = "{$this->getBasePath()}/$davPath";
 		$path = WebDavHelper::sanitizeUrl($path);
 		return \ltrim($path, "/");
 	}
@@ -253,7 +253,7 @@ trait WebDav {
 	 */
 	public function getPublicLinkDavPath(string $token):string {
 		$davPath = WebDavHelper::getDavPath($this->getDavPathVersion(), $token, "public-files");
-		$path = "{$this->getBasePath()}/{$davPath}";
+		$path = "{$this->getBasePath()}/$davPath";
 		$path = WebDavHelper::sanitizeUrl($path);
 		return \ltrim($path, "/");
 	}
@@ -484,12 +484,12 @@ trait WebDav {
 		}
 
 		$davPathVersion = $this->getDavPathVersion();
-		$uniquePath = $user;
+		$suffixPath = $user;
 		if ($davPathVersion === WebDavHelper::DAV_VERSION_SPACES) {
-			$uniquePath = $spaceId;
+			$suffixPath = $spaceId;
 		}
 
-		$davPath = WebDavHelper::getDavPath($davPathVersion, $uniquePath);
+		$davPath = WebDavHelper::getDavPath($davPathVersion, $suffixPath);
 		$fullUrl = $this->getBaseUrl() . "/$davPath";
 		return \rtrim($fullUrl, '/') . '/' . $fileDestination;
 	}
@@ -1114,7 +1114,7 @@ trait WebDav {
 	public function publicGetsSizeOfLastSharedPublicLinkUsingTheWebdavApi():void {
 		$token = ($this->isUsingSharingNG()) ? $this->shareNgGetLastCreatedLinkShareToken() : $this->getLastCreatedPublicShareToken();
 		$davPath = WebDavHelper::getDavPath($this->getDavPathVersion(), $token, "public-files");
-		$url = "{$this->getBaseUrl()}/{$davPath}";
+		$url = "{$this->getBaseUrl()}/$davPath";
 		$this->response = HttpRequestHelper::sendRequest(
 			$url,
 			$this->getStepLineRef(),
@@ -3849,13 +3849,13 @@ trait WebDav {
 		}
 
 		$davPathVersion = $this->getDavPathVersion();
-		$uniquePath = $user;
+		$suffixPath = $user;
 		if ($davPathVersion === WebDavHelper::DAV_VERSION_SPACES) {
-			$uniquePath = $this->getSharesMountPath($user, $path);
+			$suffixPath = $this->getSharesMountPath($user, $path);
 			$path = "";
 		}
 		$path = \ltrim($path, "/");
-		$davPath = WebDavHelper::getDavPath($this->getDavPathVersion(), $uniquePath);
+		$davPath = WebDavHelper::getDavPath($this->getDavPathVersion(), $suffixPath);
 		$davPath = \rtrim($davPath, "/");
 		$fullUrl = $this->getBaseUrl() . "/$davPath/$path?$urlParameter";
 

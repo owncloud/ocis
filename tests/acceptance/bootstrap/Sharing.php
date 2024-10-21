@@ -3248,7 +3248,7 @@ trait Sharing {
 	public function getPublicPreviewOfFile(string $fileName, string $token):ResponseInterface {
 		$baseUrl = $this->getBaseUrl();
 		$davPath = WebdavHelper::getDavPath($this->getDavPathVersion(), $token, "public-files");
-		$url = "{$baseUrl}/{$davPath}/$fileName?preview=1";
+		$url = "$baseUrl/$davPath/$fileName?preview=1";
 		return HttpRequestHelper::get(
 			$url,
 			$this->getStepLineRef()

@@ -47,14 +47,20 @@ class WebDavHelper {
 	public static array $spacesIdRef = [];
 
 	/**
-	 * clear space id reference for user
-	 *
+	 * @return bool
+	 */
+	public static function withRemotePhp(): bool {
+		// use remote.php by default
+		return \getenv("WITH_REMOTE_PHP") !== "false";
+	}
+
+	/**
 	 * @param string $urlPath
 	 *
 	 * @return string
 	 */
-	public static function withRemotePhp(string $urlPath): string {
-		if (\getenv("WITH_REMOTE_PHP") === "true") {
+	public static function prefixRemotePhp(string $urlPath): string {
+		if (self::withRemotePhp()) {
 			return "remote.php/$urlPath";
 		}
 		return $urlPath;
@@ -746,15 +752,15 @@ class WebDavHelper {
 			}
 		}
 
-		$uniquePath = $user;
+		$suffixPath = $user;
 		if ($davPathVersionToUse === self::DAV_VERSION_SPACES && !\in_array($type, ["archive", "versions", "public-files"])) {
-			$uniquePath = $spaceId;
+			$suffixPath = $spaceId;
 		} elseif ($type === "versions") {
 			// $path is file-id in case of versions
-			$uniquePath = $path;
+			$suffixPath = $path;
 		}
 
-		$davPath = self::getDavPath($davPathVersionToUse, $uniquePath, $type);
+		$davPath = self::getDavPath($davPathVersionToUse, $suffixPath, $type);
 
 		//replace %, # and ? and in the path, Guzzle will not encode them
 		$urlSpecialChar = [['%', '#', '?'], ['%25', '%23', '%3F']];
@@ -764,7 +770,7 @@ class WebDavHelper {
 			$urlParameter = \http_build_query($urlParameter, '', '&');
 			$path .= '?' . $urlParameter;
 		}
-		$fullUrl = self::sanitizeUrl("{$baseUrl}/{$davPath}");
+		$fullUrl = self::sanitizeUrl("$baseUrl/$davPath");
 		// NOTE: no need to append path for archive and versions endpoints
 		if (!\in_array($type, ["archive", "versions"])) {
 			$fullUrl .= "/" . \ltrim($path, "/");
@@ -834,11 +840,11 @@ class WebDavHelper {
 	):string {
 		switch ($type) {
 			case 'archive':
-				return self::withRemotePhp("dav/archive/$userOrItemIdOrSpaceIdOrToken/files");
+				return self::prefixRemotePhp("dav/archive/$userOrItemIdOrSpaceIdOrToken/files");
 			case 'versions':
-				return self::withRemotePhp("dav/meta/$userOrItemIdOrSpaceIdOrToken/v");
+				return self::prefixRemotePhp("dav/meta/$userOrItemIdOrSpaceIdOrToken/v");
 			case 'comments':
-				return self::withRemotePhp("dav/comments/files");
+				return self::prefixRemotePhp("dav/comments/files");
 			default:
 				break;
 		}
@@ -848,37 +854,37 @@ class WebDavHelper {
 				if ($userOrItemIdOrSpaceIdOrToken === null) {
 					throw new InvalidArgumentException("Space ID is required for trash-bin endpoint");
 				}
-				return self::withRemotePhp("dav/spaces/trash-bin/$userOrItemIdOrSpaceIdOrToken");
+				return self::prefixRemotePhp("dav/spaces/trash-bin/$userOrItemIdOrSpaceIdOrToken");
 			} elseif ($type === "public-files") {
 				// spaces DAV path doesn't have own public-files endpoint
-				return self::withRemotePhp("dav/public-files/$userOrItemIdOrSpaceIdOrToken");
+				return self::prefixRemotePhp("dav/public-files/$userOrItemIdOrSpaceIdOrToken");
 			}
 			// return spaces root path if spaceid is null
 			// REPORT request uses spaces root path
 			if ($userOrItemIdOrSpaceIdOrToken === null) {
-				return self::withRemotePhp("dav/spaces");
+				return self::prefixRemotePhp("dav/spaces");
 			}
-			return self::withRemotePhp("dav/spaces/$userOrItemIdOrSpaceIdOrToken");
+			return self::prefixRemotePhp("dav/spaces/$userOrItemIdOrSpaceIdOrToken");
 		} else {
 			if ($type === "trash-bin") {
 				// Since there is no trash bin endpoint for old dav version,
 				// new dav version's endpoint is used here.
-				return self::withRemotePhp("dav/trash-bin/$userOrItemIdOrSpaceIdOrToken");
+				return self::prefixRemotePhp("dav/trash-bin/$userOrItemIdOrSpaceIdOrToken");
 			}
 			if ($davPathVersion === self::DAV_VERSION_OLD) {
 				if ($type === "public-files") {
 					// TODO: cleanup
 					// this endpoint does not exist
-					return self::withRemotePhp("public.php/webdav");
+					return self::prefixRemotePhp("public.php/webdav");
 				}
-				return self::withRemotePhp("webdav");
+				return self::prefixRemotePhp("webdav");
 			} elseif ($davPathVersion === self::DAV_VERSION_NEW) {
 				if ($type === "files") {
-					return self::withRemotePhp("dav/files/$userOrItemIdOrSpaceIdOrToken");
+					return self::prefixRemotePhp("dav/files/$userOrItemIdOrSpaceIdOrToken");
 				} elseif ($type === "public-files") {
-					return self::withRemotePhp("dav/public-files/$userOrItemIdOrSpaceIdOrToken");
+					return self::prefixRemotePhp("dav/public-files/$userOrItemIdOrSpaceIdOrToken");
 				}
-				return self::withRemotePhp("dav");
+				return self::prefixRemotePhp("dav");
 			}
 			throw new InvalidArgumentException("Invalid DAV path: $davPathVersion");
 		}
@@ -952,7 +958,7 @@ class WebDavHelper {
 			$baseUrl,
 			null,
 			null,
-			"{$token}/{$fileName}",
+			"$token/$fileName",
 			['d:getlastmodified'],
 			$xRequestId,
 			'1',

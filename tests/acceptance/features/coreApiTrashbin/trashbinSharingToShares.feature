@@ -246,7 +246,7 @@ Feature: using trashbin together with sharing
       | new              | 403              |
       | spaces           | 400              |
 
-
+  @issue-10356
   Scenario Outline: try to restore personal file to a shared folder as an editor
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
