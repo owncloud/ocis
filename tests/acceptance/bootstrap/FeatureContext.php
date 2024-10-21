@@ -54,7 +54,6 @@ use Swaggest\JsonSchema\Exception\NumericException;
 use Swaggest\JsonSchema\Exception\ObjectException;
 use Swaggest\JsonSchema\Exception\StringException;
 use Swaggest\JsonSchema\Exception\TypeException;
-use Swaggest\JsonSchema\Exception\Error as JsonSchemaError;
 
 require_once 'bootstrap.php';
 
@@ -221,6 +220,13 @@ class FeatureContext extends BehatVariablesContext {
 	 */
 	public function isUsingSharingNG(): bool {
 		return $this->useSharingNG;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function runningInCi(): bool {
+		return \getenv("RUNNING_IN_CI") === "true";
 	}
 
 	/**
@@ -2961,5 +2967,29 @@ class FeatureContext extends BehatVariablesContext {
 			\fclose($reader);
 		}
 		return false;
+	}
+
+	/**
+	 * @When a user requests these endpoints
+	 *
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function userRequestsEndpoints(TableNode $table): void {
+		$this->verifyTableNodeColumns($table, ['endpoint'], ['service', 'comment']);
+		foreach ($table->getHash() as $row) {
+			$endpoint = $row['endpoint'];
+			// osis and tests in the CI are in different containers
+			// Using `docker exec` allows us to execute curl commands within the `ocis-server` container to access services running inside it.
+			if ($this->runningInCi()) {
+				$output = shell_exec("docker exec ocis-server curl -s {$endpoint}");
+			} else {
+				$output = shell_exec("curl -s {$endpoint}");
+			}
+			Assert::assertNotNull($output, "Service {$endpoint} did not respond; output is null.");
+			Assert::assertStringContainsString('OK', $output, "Service {$endpoint} responded, but expected 'OK'. Got: '{$output}'");
+		}
 	}
 }
