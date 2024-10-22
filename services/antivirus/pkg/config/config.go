@@ -10,7 +10,7 @@ type Config struct {
 	File string
 	Log  *Log
 
-	Debug Debug `mask:"struct" yaml:"debug"`
+	Debug Debug `yaml:"debug" mask:"struct"`
 
 	Service Service `yaml:"-"`
 
@@ -23,7 +23,7 @@ type Config struct {
 	Scanner     Scanner
 	MaxScanSize string `yaml:"max-scan-size" env:"ANTIVIRUS_MAX_SCAN_SIZE" desc:"The maximum scan size the virus scanner can handle. Only this many bytes of a file will be scanned. 0 means unlimited and is the default. Usable common abbreviations: [KB, KiB, MB, MiB, GB, GiB, TB, TiB, PB, PiB, EB, EiB], example: 2GB." introductionVersion:"pre5.0"`
 
-	Context context.Context `yaml:"-" json:"-"`
+	Context context.Context `json:"-" yaml:"-"`
 
 	DebugScanOutcome string `yaml:"-" env:"ANTIVIRUS_DEBUG_SCAN_OUTCOME" desc:"A predefined outcome for virus scanning, FOR DEBUG PURPOSES ONLY! (example values: 'found,infected')" introductionVersion:"pre5.0"`
 }

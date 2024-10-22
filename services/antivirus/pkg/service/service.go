@@ -91,7 +91,7 @@ func (av Antivirus) Run() error {
 	evtsCfg := av.c.Events
 
 	var rootCAPool *x509.CertPool
-	if evtsCfg.TLSRootCACertificate != "" {
+	if av.c.Events.TLSRootCACertificate != "" {
 		rootCrtFile, err := os.Open(evtsCfg.TLSRootCACertificate)
 		if err != nil {
 			return err
@@ -104,7 +104,7 @@ func (av Antivirus) Run() error {
 
 		rootCAPool = x509.NewCertPool()
 		rootCAPool.AppendCertsFromPEM(certBytes.Bytes())
-		evtsCfg.TLSInsecure = false
+		av.c.Events.TLSInsecure = false
 	}
 
 	natsStream, err := stream.NatsFromConfig(av.c.Service.Name, false, stream.NatsConfig(av.c.Events))
