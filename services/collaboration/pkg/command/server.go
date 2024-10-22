@@ -6,6 +6,7 @@ import (
 	"net"
 
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
+	"github.com/cs3org/reva/v2/pkg/store"
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	registry "github.com/owncloud/ocis/v2/ocis-pkg/registry"
@@ -19,6 +20,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/server/grpc"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/server/http"
 	"github.com/urfave/cli/v2"
+	microstore "go-micro.dev/v4/store"
 )
 
 // Server is the entrypoint for the server command.
@@ -70,12 +72,22 @@ func Server(cfg *config.Config) *cli.Command {
 				return err
 			}
 
+			st := store.Create(
+				store.Store(cfg.Store.Store),
+				store.TTL(cfg.Store.TTL),
+				microstore.Nodes(cfg.Store.Nodes...),
+				microstore.Database(cfg.Store.Database),
+				microstore.Table(cfg.Store.Table),
+				store.Authentication(cfg.Store.AuthUsername, cfg.Store.AuthPassword),
+			)
+
 			// start GRPC server
 			grpcServer, teardown, err := grpc.Server(
 				grpc.AppURLs(appUrls),
 				grpc.Config(cfg),
 				grpc.Logger(logger),
 				grpc.TraceProvider(traceProvider),
+				grpc.Store(st),
 			)
 			defer teardown()
 			if err != nil {
@@ -113,11 +125,12 @@ func Server(cfg *config.Config) *cli.Command {
 
 			// start HTTP server
 			httpServer, err := http.Server(
-				http.Adapter(connector.NewHttpAdapter(gatewaySelector, cfg)),
+				http.Adapter(connector.NewHttpAdapter(gatewaySelector, cfg, st)),
 				http.Logger(logger),
 				http.Config(cfg),
 				http.Context(ctx),
 				http.TracerProvider(traceProvider),
+				http.Store(st),
 			)
 			if err != nil {
 				logger.Error().Err(err).Str("transport", "http").Msg("Failed to initialize server")

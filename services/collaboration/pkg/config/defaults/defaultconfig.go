@@ -1,6 +1,8 @@
 package defaults
 
 import (
+	"time"
+
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	"github.com/owncloud/ocis/v2/ocis-pkg/structs"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config"
@@ -31,6 +33,13 @@ func DefaultConfig() *config.Config {
 				// they'll be enabled by default
 				Duration: "12h",
 			},
+		},
+		Store: config.Store{
+			Store:    "nats-js-kv",
+			Nodes:    []string{"127.0.0.1:9233"},
+			Database: "collaboration",
+			Table:    "",
+			TTL:      30 * time.Minute,
 		},
 		GRPC: config.GRPC{
 			Addr:      "127.0.0.1:9301",

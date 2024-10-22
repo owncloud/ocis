@@ -4,6 +4,7 @@ import (
 	gatewayv1beta1 "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config"
+	microstore "go-micro.dev/v4/store"
 )
 
 // Option defines a single option function.
@@ -15,6 +16,7 @@ type Options struct {
 	Config  *config.Config
 	AppURLs map[string]map[string]string
 	Gwc     gatewayv1beta1.GatewayAPIClient
+	Store   microstore.Store
 }
 
 // newOptions initializes the available default options.
@@ -53,5 +55,12 @@ func AppURLs(val map[string]map[string]string) Option {
 func GatewayAPIClient(val gatewayv1beta1.GatewayAPIClient) Option {
 	return func(o *Options) {
 		o.Gwc = val
+	}
+}
+
+// Store proivdes a function to set the store
+func Store(val microstore.Store) Option {
+	return func(o *Options) {
+		o.Store = val
 	}
 }

@@ -13,6 +13,7 @@ type Config struct {
 
 	Service Service `yaml:"-"`
 	App     App     `yaml:"app"`
+	Store   Store   `yaml:"store"`
 
 	TokenManager *TokenManager `yaml:"token_manager"`
 

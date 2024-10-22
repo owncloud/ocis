@@ -119,7 +119,7 @@ func prepareRoutes(r *chi.Mux, options Options) {
 			r.Use(
 				func(h stdhttp.Handler) stdhttp.Handler {
 					// authentication and wopi context
-					return colabmiddleware.WopiContextAuthMiddleware(options.Config, h)
+					return colabmiddleware.WopiContextAuthMiddleware(options.Config, options.Store, h)
 				},
 				colabmiddleware.CollaborationTracingMiddleware,
 			)
@@ -186,7 +186,7 @@ func prepareRoutes(r *chi.Mux, options Options) {
 			r.Use(
 				func(h stdhttp.Handler) stdhttp.Handler {
 					// authentication and wopi context
-					return colabmiddleware.WopiContextAuthMiddleware(options.Config, h)
+					return colabmiddleware.WopiContextAuthMiddleware(options.Config, options.Store, h)
 				},
 				colabmiddleware.CollaborationTracingMiddleware,
 			)

@@ -7,4 +7,5 @@ type Wopi struct {
 	DisableChat bool   `yaml:"disable_chat" env:"COLLABORATION_WOPI_DISABLE_CHAT;OCIS_WOPI_DISABLE_CHAT" desc:"Disable chat in the office web frontend. This feature applies to OnlyOffice and Microsoft." introductionVersion:"7.0.0"`
 	ProxyURL    string `yaml:"proxy_url" env:"COLLABORATION_WOPI_PROXY_URL" desc:"The URL to the ownCloud Office365 WOPI proxy. Optional. To use this feature, you need an office365 proxy subscription. If you become part of the Microsoft CSP program (https://learn.microsoft.com/en-us/partner-center/enroll/csp-overview), you can use WebOffice without a proxy." introductionVersion:"7.0.0"`
 	ProxySecret string `yaml:"proxy_secret" env:"COLLABORATION_WOPI_PROXY_SECRET" desc:"Optional, the secret to authenticate against the ownCloud Office365 WOPI proxy. This secret can be obtained from ownCloud via the office365 proxy subscription." introductionVersion:"7.0.0"`
+	ShortTokens bool   `yaml:"short_tokens" env:"COLLABORATION_WOPI_SHORTTOKENS" desc:"Use short access tokens for WOPI access. This is useful for Office Online, which has URL length restrictions." introductionVersion:"7.0.0"`
 }

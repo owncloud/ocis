@@ -27,6 +27,7 @@ func Server(opts ...Option) (*grpc.Server, func(), error) {
 		svc.Config(options.Config),
 		svc.Logger(options.Logger),
 		svc.AppURLs(options.AppURLs),
+		svc.Store(options.Store),
 	)
 	if err != nil {
 		options.Logger.Error().
