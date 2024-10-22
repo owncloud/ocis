@@ -24,6 +24,7 @@ use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\TableNode;
 use GuzzleHttp\Exception\GuzzleException;
+use PHPUnit\Framework\Assert;
 use TestHelpers\HttpRequestHelper;
 use TestHelpers\WebDavHelper;
 use TestHelpers\CollaborationHelper;
@@ -323,5 +324,35 @@ class CollaborationContext implements Context {
 				$this->featureContext->getStepLineRef()
 			)
 		);
+	}
+
+	/**
+	 * @Then /^the response (should|should not) contain the following MIME types:$/
+	 *
+	 * @param string    $shouldOrNot
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function theFollowingMimeTypesShouldExistForUser(string $shouldOrNot, TableNode $table):void {
+		$rows = $table->getRows();
+		$responseArray = $this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse())['mime-types'];
+		$mimeTypes = \array_column($responseArray, 'mime_type');
+		foreach ($rows as $row) {
+			if ($shouldOrNot === "should not") {
+				Assert::assertFalse(
+					\in_array($row[0], $mimeTypes),
+					"the response should not contain the mimetype $row[0].\nMime Types found in response:\n"
+					. print_r($mimeTypes, true)
+				);
+			} else {
+				Assert::assertTrue(
+					\in_array($row[0], $mimeTypes),
+					"the response does not contain the mimetype $row[0].\nMime Types found in response:\n"
+					. print_r($mimeTypes, true)
+				);
+			}
+		}
 	}
 }
