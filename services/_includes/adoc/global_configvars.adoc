@@ -24,7 +24,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Flag to enable or disable the creation of the demo users.
+The default role assignments the demo users should be setup.
 a| `OCIS_ADMIN_USER_ID`
 
 a| [subs=attributes+]
@@ -388,7 +388,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Set this option to 'true' to disable rendering of thumbnails triggered via webdav access. Note that when disabled, all access to preview related webdav paths will return a 404.
+Set this option to 'true' to disable previews in all the different web file listing views. This can speed up file listings in folders with many files. The only list view that is not affected by this setting is the trash bin, as it does not allow previewing at all.
 a| `OCIS_EDITION`
 
 a| [subs=attributes+]
@@ -402,7 +402,7 @@ a| [subs=-attributes]
 ++Community ++
 
 a| [subs=-attributes]
-Edition of oCIS. Used for branding purposes.
+Edition of oCIS. Used for branding pruposes.
 a| `OCIS_ENABLE_RESHARING`
 
 a| [subs=attributes+]
@@ -587,7 +587,7 @@ a| [subs=-attributes]
 ++127.0.0.1:9142 ++
 
 a| [subs=-attributes]
-The bind address of the GRPC service.
+The bind address of the gateway GRPC address.
 a| `OCIS_GRPC_CLIENT_TLS_CACERT`
 
 a| [subs=attributes+]
@@ -822,7 +822,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The client id to authenticate with keycloak.
+The client ID to authenticate with keycloak.
 a| `OCIS_KEYCLOAK_CLIENT_REALM`
 
 a| [subs=attributes+]
@@ -892,7 +892,7 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++uid=reva,ou=sysusers,o=libregraph-idm ++
+++uid=idp,ou=sysusers,o=libregraph-idm ++
 
 a| [subs=-attributes]
 LDAP DN to use for simple bind authentication with the target LDAP server.
@@ -929,7 +929,7 @@ a| [subs=-attributes]
 ++/var/lib/ocis/idm/ldap.crt ++
 
 a| [subs=-attributes]
-Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the LDAP service. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/idm.
+Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the LDAP service. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/idp.
 a| `OCIS_LDAP_DISABLED_USERS_GROUP_DN`
 
 a| [subs=attributes+]
@@ -1165,7 +1165,7 @@ a| [subs=-attributes]
 ++ldaps://localhost:9235 ++
 
 a| [subs=-attributes]
-URI of the LDAP Server to connect to. Supported URI schemes are 'ldaps://' and 'ldap://'
+Url of the LDAP service to use as IDP.
 a| `OCIS_LDAP_USER_BASE_DN`
 
 a| [subs=attributes+]
@@ -1198,7 +1198,7 @@ a| [subs=-attributes]
 ++ownCloudUserEnabled ++
 
 a| [subs=-attributes]
-LDAP attribute to use as a flag telling if the user is enabled or disabled.
+LDAP Attribute to use as a flag telling if the user is enabled or disabled.
 a| `OCIS_LDAP_USER_FILTER`
 
 a| [subs=attributes+]
@@ -1232,7 +1232,7 @@ a| [subs=-attributes]
 ++inetOrgPerson ++
 
 a| [subs=-attributes]
-The object class to use for users in the default user search filter ('inetOrgPerson').
+LDAP User ObjectClass like 'inetOrgPerson'.
 a| `OCIS_LDAP_USER_SCHEMA_DISPLAYNAME`
 
 a| [subs=attributes+]
@@ -1261,10 +1261,10 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++ownclouduuid ++
+++ownCloudUUID ++
 
 a| [subs=-attributes]
-LDAP Attribute to use as the unique ID for users. This should be a stable globally unique ID like a UUID.
+LDAP User UUID attribute like 'uid'.
 a| `OCIS_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING`
 
 a| [subs=attributes+]
@@ -1297,7 +1297,7 @@ a| [subs=-attributes]
 ++mail ++
 
 a| [subs=-attributes]
-LDAP Attribute to use for the email address of users.
+LDAP User email attribute like 'mail'.
 a| `OCIS_LDAP_USER_SCHEMA_USERNAME`
 
 a| [subs=attributes+]
@@ -1311,10 +1311,10 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++uid ++
+++displayName ++
 
 a| [subs=-attributes]
-LDAP Attribute to use for username of users.
+LDAP User name attribute like 'displayName'.
 a| `OCIS_LDAP_USER_SCHEMA_USER_TYPE`
 
 a| [subs=attributes+]
@@ -1345,7 +1345,7 @@ a| [subs=-attributes]
 ++sub ++
 
 a| [subs=-attributes]
-LDAP search scope to use when looking up users. Supported values are 'base', 'one' and 'sub'.
+LDAP search scope to use when looking up users. Supported scopes are 'base', 'one' and 'sub'.
 a| `OCIS_LOG_COLOR`
 
 a| [subs=attributes+]
@@ -1591,7 +1591,7 @@ a| [subs=-attributes]
 ++https://localhost:9200 ++
 
 a| [subs=-attributes]
-The identity provider value to set in the userids of the CS3 user objects for users returned by this user provider.
+The OIDC issuer URL to use.
 a| `OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST`
 
 a| [subs=attributes+]
@@ -1764,7 +1764,7 @@ a| [subs=-attributes]
 ++0 ++
 
 a| [subs=-attributes]
-The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not explicitly set as default.
+The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived and used from the ocmem package though no explicit default was set.
 a| `OCIS_PERSISTENT_STORE_TTL`
 
 a| [subs=attributes+]
@@ -1817,7 +1817,7 @@ a| [subs=-attributes]
 ++com.owncloud.api.gateway ++
 
 a| [subs=-attributes]
-CS3 gateway used to look up user metadata
+The CS3 gateway endpoint.
 a| `OCIS_SERVICE_ACCOUNT_ID`
 
 a| [subs=attributes+]
@@ -2179,7 +2179,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The storage transfer secret.
+Transfer secret for signing file up- and download requests.
 a| `OCIS_TRANSLATION_PATH`
 
 a| [subs=attributes+]
@@ -2220,10 +2220,10 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++https://127.0.0.1:9200 ++
+++https://localhost:9200 ++
 
 a| [subs=-attributes]
-URL, where oCIS is reachable for users.
+The OIDC issuer URL to use.
 a| `STORAGE_USERS_ASYNC_PROPAGATOR_PROPAGATION_DELAY`
 
 a| [subs=attributes+]
