@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-10-22-15-25-12]
+[#deprecation-note-2024-10-22-17-25-27]
 [caption=]
 .Deprecation notes for the settings service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -285,7 +285,8 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 The bind address of the GRPC service.
 
-a|`STORAGE_GATEWAY_GRPC_ADDR` +
+a|`SETTINGS_STORAGE_GATEWAY_GRPC_ADDR` +
+`STORAGE_GATEWAY_GRPC_ADDR` +
 
 a| [subs=-attributes]
 ++pre5.0 ++
@@ -296,7 +297,8 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 GRPC address of the STORAGE-SYSTEM service.
 
-a|`STORAGE_GRPC_ADDR` +
+a|`SETTINGS_STORAGE_GRPC_ADDR` +
+`STORAGE_GRPC_ADDR` +
 
 a| [subs=-attributes]
 ++pre5.0 ++

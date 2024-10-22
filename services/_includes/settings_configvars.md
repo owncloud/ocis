@@ -24,8 +24,8 @@
 | OCIS_CORS_ALLOW_HEADERS<br/>SETTINGS_CORS_ALLOW_HEADERS | []string | [Authorization Origin Content-Type Accept X-Requested-With X-Request-Id] | A list of allowed CORS headers. See following chapter for more details: *Access-Control-Request-Headers* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers. See the Environment Variable Types description for more details.|
 | OCIS_CORS_ALLOW_CREDENTIALS<br/>SETTINGS_CORS_ALLOW_CREDENTIALS | bool | true | Allow credentials for CORS.See following chapter for more details: *Access-Control-Allow-Credentials* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials.|
 | SETTINGS_GRPC_ADDR | string | 127.0.0.1:9191 | The bind address of the GRPC service.|
-| STORAGE_GATEWAY_GRPC_ADDR | string | com.owncloud.api.storage-system | GRPC address of the STORAGE-SYSTEM service.|
-| STORAGE_GRPC_ADDR | string | com.owncloud.api.storage-system | GRPC address of the STORAGE-SYSTEM service.|
+| SETTINGS_STORAGE_GATEWAY_GRPC_ADDR<br/>STORAGE_GATEWAY_GRPC_ADDR | string | com.owncloud.api.storage-system | GRPC address of the STORAGE-SYSTEM service.|
+| SETTINGS_STORAGE_GRPC_ADDR<br/>STORAGE_GRPC_ADDR | string | com.owncloud.api.storage-system | GRPC address of the STORAGE-SYSTEM service.|
 | OCIS_SYSTEM_USER_ID<br/>SETTINGS_SYSTEM_USER_ID | string |  | ID of the oCIS STORAGE-SYSTEM system user. Admins need to set the ID for the STORAGE-SYSTEM system user in this config option which is then used to reference the user. Any reasonable long string is possible, preferably this would be an UUIDv4 format.|
 | OCIS_SYSTEM_USER_IDP<br/>SETTINGS_SYSTEM_USER_IDP | string | internal | IDP of the oCIS STORAGE-SYSTEM system user.|
 | OCIS_SYSTEM_USER_API_KEY | string |  | API key for the STORAGE-SYSTEM system user.|
