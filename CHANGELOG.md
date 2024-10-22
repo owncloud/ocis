@@ -56,9 +56,18 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Fix Activitylog issues: [#10376](https://github.com/owncloud/ocis/pull/10376)
 * Bugfix - Security fixes: [#10376](https://github.com/owncloud/ocis/pull/10376)
 
 ## Details
+
+* Bugfix - Fix Activitylog issues: [#10376](https://github.com/owncloud/ocis/pull/10376)
+
+   Fixes multiple activititylog issues. There was an error about `max payload
+   exceeded` when there were too many activities on one folder. Listing would take
+   very long even with a limit activated. All of these issues are now fixed.
+
+   https://github.com/owncloud/ocis/pull/10376
 
 * Bugfix - Security fixes: [#10376](https://github.com/owncloud/ocis/pull/10376)
 
