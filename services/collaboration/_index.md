@@ -1,6 +1,6 @@
 ---
 title: Collaboration
-date: 2024-10-22T06:53:44.285052825Z
+date: 2024-10-22T07:12:50.795537211Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/collaboration
@@ -57,7 +57,7 @@ There are a few variables that you need to set:
 * `COLLABORATION_APP_INSECURE`:\
   In case you are using a self signed certificate for the WOPI app you can tell the collaboration service to allow an insecure connection.
 
-* `COLLABORATION_APP_WOPISRC`:\
+* `COLLABORATION_WOPI_SRC`:\
   The external address of the collaboration service. The target app (onlyoffice, collabora, etc) will use this address to read and write files from Infinite Scale.\
   For example: `https://wopi.example.com`.
 
