@@ -3,7 +3,7 @@ FROM arm64v8/alpine:3.20
 ARG VERSION=""
 ARG REVISION=""
 
-RUN apk add --no-cache ca-certificates mailcap tree attr curl inotify-tools bash libc6-compat vips && \
+RUN apk add --no-cache attr bash ca-certificates curl inotify-tools libc6-compat mailcap tree vips && \
 	echo 'hosts: files dns' >| /etc/nsswitch.conf
 
 LABEL maintainer="ownCloud GmbH <devops@owncloud.com>" \

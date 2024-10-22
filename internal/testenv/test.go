@@ -9,7 +9,6 @@ import (
 // CMDTest spawns a new independent test environment
 type CMDTest struct {
 	n string
-	f func()
 }
 
 // NewCMDTest creates a new CMDTest instance

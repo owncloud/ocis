@@ -14,14 +14,14 @@
 # is a lot faster than the build steps below.
 
 
-FROM owncloudci/nodejs:18 as generate
+FROM owncloudci/nodejs:18 AS generate
 
 COPY ./ /ocis/
 
 WORKDIR /ocis/ocis
 RUN make ci-node-generate
 
-FROM owncloudci/golang:1.22 as build
+FROM owncloudci/golang:1.22 AS build
 
 COPY --from=generate /ocis /ocis
 
@@ -30,7 +30,7 @@ RUN make ci-go-generate build ENABLE_VIPS=true
 
 FROM alpine:3.20
 
-RUN apk add --no-cache ca-certificates mailcap tree attr curl vips && \
+RUN apk add --no-cache attr ca-certificates curl mailcap tree vips && \
 	echo 'hosts: files dns' >| /etc/nsswitch.conf
 
 LABEL maintainer="ownCloud GmbH <devops@owncloud.com>" \
