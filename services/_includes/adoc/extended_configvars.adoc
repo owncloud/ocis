@@ -82,6 +82,14 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++The default directory location for config files. See the General Info section in the documentation for more details on defaults. ++
     
+
+a| `RUN_CMD_TEST` +
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+++ ++
     
     
 |===

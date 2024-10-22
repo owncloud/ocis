@@ -146,12 +146,20 @@ variables:
   do_ignore: false
 - rawname: RUN_CMD_TEST
   path: internal/testenv/test.go:33
-  foundincode: true
+  foundincode: false
   name: RUN_CMD_TEST
   type: ""
   default_value: ""
   description: ""
   do_ignore: true
+- rawname: RUN_CMD_TEST
+  path: internal/testenv/test.go:32
+  foundincode: true
+  name: RUN_CMD_TEST
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
 - rawname: YEAR
   path: tests/qa-activity-report/generate-qa-activity-report.go:93
   foundincode: true
