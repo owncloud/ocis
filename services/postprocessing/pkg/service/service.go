@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"sync"
 	"time"
 
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
@@ -65,12 +66,14 @@ func NewPostprocessingService(ctx context.Context, stream events.Stream, logger 
 
 // Run to fulfil Runner interface
 func (pps *PostprocessingService) Run() error {
-	// Spawn workers that'll concurrently work the queue
+	wg := sync.WaitGroup{}
+
 	for i := 0; i < pps.c.Workers; i++ {
-		go (func() {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
 			for e := range pps.events {
-				err := pps.processEvent(e)
-				if err != nil {
+				if err := pps.processEvent(e); err != nil {
 					switch {
 					case errors.Is(err, ErrFatal):
 						pps.log.Fatal().Err(err).Msg("fatal error - exiting")
@@ -81,8 +84,10 @@ func (pps *PostprocessingService) Run() error {
 					}
 				}
 			}
-		})()
+		}()
 	}
+	wg.Wait()
+
 	return nil
 }
 
