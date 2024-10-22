@@ -57,6 +57,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Fix panic when stopping the nats: [#10363](https://github.com/owncloud/ocis/pull/10363)
+* Bugfix - Increase event processing workers: [#10368](https://github.com/owncloud/ocis/pull/10368)
 * Bugfix - Fix Activitylog issues: [#10376](https://github.com/owncloud/ocis/pull/10376)
 * Bugfix - Security fixes: [#10376](https://github.com/owncloud/ocis/pull/10376)
 
@@ -69,6 +70,15 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/10360
    https://github.com/owncloud/ocis/pull/10363
+
+* Bugfix - Increase event processing workers: [#10368](https://github.com/owncloud/ocis/pull/10368)
+
+   We increased the number of go routines that pull events from the queue to three
+   and made the number off workers configurable. Furthermore, the postprocessing
+   delay no longer introduces a sleep that slows down pulling of events, but
+   asynchronously triggers the next step.
+
+   https://github.com/owncloud/ocis/pull/10368
 
 * Bugfix - Fix Activitylog issues: [#10376](https://github.com/owncloud/ocis/pull/10376)
 
