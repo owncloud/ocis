@@ -56,10 +56,19 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Fix panic when stopping the nats: [#10363](https://github.com/owncloud/ocis/pull/10363)
 * Bugfix - Fix Activitylog issues: [#10376](https://github.com/owncloud/ocis/pull/10376)
 * Bugfix - Security fixes: [#10376](https://github.com/owncloud/ocis/pull/10376)
 
 ## Details
+
+* Bugfix - Fix panic when stopping the nats: [#10363](https://github.com/owncloud/ocis/pull/10363)
+
+   The nats server itself runs signal handling that the Shutdown() call in the ocis
+   code is redundant and led to a panic.
+
+   https://github.com/owncloud/ocis/issues/10360
+   https://github.com/owncloud/ocis/pull/10363
 
 * Bugfix - Fix Activitylog issues: [#10376](https://github.com/owncloud/ocis/pull/10376)
 
