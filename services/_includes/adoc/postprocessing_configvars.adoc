@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-10-22-10-36-42]
+[#deprecation-note-2024-10-22-12-20-37]
 [caption=]
 .Deprecation notes for the postprocessing service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -336,6 +336,17 @@ a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 The password to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.
+
+a|`POSTPROCESSING_WORKERS` +
+
+a| [subs=-attributes]
+++6.7 ++
+a| [subs=-attributes]
+++int ++
+a| [subs=-attributes]
+++3 ++
+a| [subs=-attributes]
+The number of concurrent go routines that fetch events from the event queue.
 
 a|`POSTPROCESSING_STEPS` +
 
