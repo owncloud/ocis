@@ -1,5 +1,6 @@
 # Table of Contents
 
+* [Changelog for unreleased](#changelog-for-unreleased-unreleased)
 * [Changelog for 6.6.0](#changelog-for-660-2024-10-21)
 * [Changelog for 6.5.0](#changelog-for-650-2024-10-01)
 * [Changelog for 6.4.0](#changelog-for-640-2024-09-12)
@@ -46,6 +47,24 @@
 * [Changelog for 1.2.0](#changelog-for-120-2021-02-17)
 * [Changelog for 1.1.0](#changelog-for-110-2021-01-22)
 * [Changelog for 1.0.0](#changelog-for-100-2020-12-17)
+
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes for unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis/compare/v6.6.0...master
+
+## Summary
+
+* Bugfix - Security fixes: [#10376](https://github.com/owncloud/ocis/pull/10376)
+
+## Details
+
+* Bugfix - Security fixes: [#10376](https://github.com/owncloud/ocis/pull/10376)
+
+   We polished some of the sonarcloud issues.
+
+   https://github.com/owncloud/ocis/pull/10376
 
 # Changelog for [6.6.0] (2024-10-21)
 
