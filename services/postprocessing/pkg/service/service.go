@@ -149,7 +149,11 @@ func (pps *PostprocessingService) processEvent(e events.Event) error {
 			pps.log.Error().Str("uploadID", ev.UploadID).Err(err).Msg("cannot get upload")
 			return fmt.Errorf("%w: cannot get upload", ErrEvent)
 		}
-		next = pp.Delay()
+		pp.Delay(func(next interface{}) {
+			if err := events.Publish(ctx, pps.pub, next); err != nil {
+				pps.log.Error().Err(err).Msg("cannot publish event")
+			}
+		})
 	case events.UploadReady:
 		if ev.Failed {
 			// the upload failed - let's keep it around for a while - but mark it as finished

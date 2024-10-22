@@ -75,9 +75,12 @@ func (pp *Postprocessing) CurrentStep() interface{} {
 }
 
 // Delay will sleep the configured time then continue
-func (pp *Postprocessing) Delay() interface{} {
-	time.Sleep(pp.config.Delayprocessing)
-	return pp.next(events.PPStepDelay)
+func (pp *Postprocessing) Delay(f func(next interface{})) {
+	next := pp.next(events.PPStepDelay)
+	go func() {
+		time.Sleep(pp.config.Delayprocessing)
+		f(next)
+	}()
 }
 
 // BackoffDuration calculates the duration for exponential backoff based on the number of failures.
