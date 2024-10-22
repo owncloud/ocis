@@ -24,6 +24,9 @@ import (
 	"github.com/owncloud/ocis/v2/services/activitylog/pkg/config"
 )
 
+// Nats runs into max payload exceeded errors at around 7k activities. Let's keep a buffer.
+var _maxActivities = 6000
+
 // RawActivity represents an activity as it is stored in the activitylog store
 type RawActivity struct {
 	EventID   string    `json:"event_id"`
@@ -311,7 +314,10 @@ func (a *ActivitylogService) storeActivity(resourceID string, eventID string, de
 		}
 	}
 
-	// TODO: max len check?
+	if l := len(activities); l >= _maxActivities {
+		activities = activities[l-_maxActivities+1:]
+	}
+
 	activities = append(activities, RawActivity{
 		EventID:   eventID,
 		Depth:     depth,

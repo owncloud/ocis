@@ -103,9 +103,16 @@ func (s *ActivitylogService) HandleGetItemActivities(w http.ResponseWriter, r *h
 		return
 	}
 
+	evs := evRes.GetEvents()
+	sort(evs)
+
 	resp := GetActivitiesResponse{Activities: make([]libregraph.Activity, 0, len(evRes.GetEvents()))}
-	for _, e := range evRes.GetEvents() {
+	for _, e := range evs {
 		delete(toDelete, e.GetId())
+
+		if limit > 0 && limit <= len(resp.Activities) {
+			continue
+		}
 
 		if !activityAccepted(e) {
 			continue
@@ -230,12 +237,6 @@ func (s *ActivitylogService) HandleGetItemActivities(w http.ResponseWriter, r *h
 		}()
 	}
 
-	sort(resp.Activities)
-
-	if limit > 0 && limit < len(resp.Activities) {
-		resp.Activities = resp.Activities[:limit]
-	}
-
 	b, err := json.Marshal(resp)
 	if err != nil {
 		s.log.Error().Err(err).Msg("error marshalling activities")
@@ -267,7 +268,7 @@ func (s *ActivitylogService) unwrapEvent(e *ehmsg.Event) interface{} {
 	return einterface
 }
 
-func (s *ActivitylogService) getFilters(query string) (*provider.ResourceId, int, func(RawActivity) bool, func(*ehmsg.Event) bool, func([]libregraph.Activity), error) {
+func (s *ActivitylogService) getFilters(query string) (*provider.ResourceId, int, func(RawActivity) bool, func(*ehmsg.Event) bool, func([]*ehmsg.Event), error) {
 	qast, err := kql.Builder{}.Build(query)
 	if err != nil {
 		return nil, 0, nil, nil, nil, err
@@ -276,7 +277,7 @@ func (s *ActivitylogService) getFilters(query string) (*provider.ResourceId, int
 	prefilters := make([]func(RawActivity) bool, 0)
 	postfilters := make([]func(*ehmsg.Event) bool, 0)
 
-	sortby := func(_ []libregraph.Activity) {}
+	sortby := func(_ []*ehmsg.Event) {}
 
 	var (
 		itemID string
@@ -313,7 +314,7 @@ func (s *ActivitylogService) getFilters(query string) (*provider.ResourceId, int
 				case "asc":
 					// nothing to do - already ascending
 				case "desc":
-					sortby = func(activities []libregraph.Activity) {
+					sortby = func(activities []*ehmsg.Event) {
 						slices.Reverse(activities)
 					}
 				}
