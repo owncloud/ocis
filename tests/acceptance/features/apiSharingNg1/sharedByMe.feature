@@ -137,7 +137,7 @@ Feature: resources shared by user
       | permissions-role |
       | File Editor      |
       | Viewer           |
-      | Secure viewer    |
+      | Secure Viewer    |
 
 
   Scenario: sharer lists the file share shared from inside a folder (Personal space)
@@ -382,7 +382,7 @@ Feature: resources shared by user
       | permissions-role |
       | Editor           |
       | Viewer           |
-      | Secure viewer    |
+      | Secure Viewer    |
 
 
   Scenario: sharer lists the file and folder shares (Personal space)
@@ -958,7 +958,7 @@ Feature: resources shared by user
       | permissions-role |
       | File Editor      |
       | Viewer           |
-      | Secure viewer    |
+      | Secure Viewer    |
 
 
   Scenario: sharer lists the file share shared from inside a folder (Project space)
@@ -1209,7 +1209,7 @@ Feature: resources shared by user
       | permissions-role |
       | Editor           |
       | Viewer           |
-      | Secure viewer    |
+      | Secure Viewer    |
 
 
   Scenario: sharer lists the file and folder shares (Project space)
