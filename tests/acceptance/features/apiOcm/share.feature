@@ -272,43 +272,58 @@ Feature: an user shares resources using ScienceMesh application
     And "Alice" has created the federation share invitation
     And using server "REMOTE"
     And "Brian" has accepted invitation
+    And using server "LOCAL"
     And using spaces DAV path
-    And the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
-    And user "Brian" has created a space "brian's space" with the default quota using the Graph API
-    When user "Brian" tries to send the following space share invitation to federated user using permissions endpoint of the Graph API:
-      | space           | brian's space      |
-      | sharee          | Alice              |
-      | shareType       | user               |
-      | permissionsRole | <permissions-role> |
-      | federatedServer | @ocis-server:9200  |
-    Then the HTTP status code should be "403"
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "alice's space" with the default quota using the Graph API
+    When user "Alice" tries to send the following space share invitation to federated user using permissions endpoint of the Graph API:
+      | space           | alice's space                 |
+      | sharee          | Brian                         |
+      | shareType       | user                          |
+      | permissionsRole | <permissions-role>            |
+      | federatedServer | @federation-ocis-server:10200 |
+    Then the HTTP status code should be "400"
     And the JSON data of the response should match
       """
       {
         "type": "object",
-        "required": [
-          "code",
-          "message"
-        ],
+        "required": ["error"],
         "properties": {
-          "code": {
-            "const": "PERMISSION_DENIED"
-          },
-          "message": {
-            "const": "permission denied to create the file"
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "innererror",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "const": "invalidRequest"
+              },
+              "innererror": {
+                "type": "object",
+                "required": [
+                  "date",
+                  "request-id"
+                ]
+              },
+              "message": {
+                "const": "federated user can not become a space member"
+              }
+            }
           }
         }
       }
       """
-    And using server "LOCAL"
-    And the user "Alice" should not have a space called "brian's space"
+    And using server "REMOTE"
+    And the user "Brian" should not have a space called "alice's space"
     Examples:
       | permissions-role |
       | Space Viewer     |
       | Space Editor     |
       | Manager          |
 
-
+  @issue-10051
   Scenario Outline: try to add federated user as a member of a project space (root endpoint)
     Given using server "LOCAL"
     And using spaces DAV path
