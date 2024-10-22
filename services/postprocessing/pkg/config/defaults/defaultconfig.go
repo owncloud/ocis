@@ -28,10 +28,10 @@ func DefaultConfig() *config.Config {
 		},
 		Postprocessing: config.Postprocessing{
 			Events: config.Events{
-				Workers:  3,
 				Endpoint: "127.0.0.1:9233",
 				Cluster:  "ocis-cluster",
 			},
+			Workers:              3,
 			RetryBackoffDuration: 5 * time.Second,
 			MaxRetries:           14,
 		},

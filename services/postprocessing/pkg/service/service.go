@@ -66,7 +66,7 @@ func NewPostprocessingService(ctx context.Context, stream events.Stream, logger 
 // Run to fulfil Runner interface
 func (pps *PostprocessingService) Run() error {
 	// Spawn workers that'll concurrently work the queue
-	for i := 0; i < 3; i++ {
+	for i := 0; i < pps.c.Workers; i++ {
 		go (func() {
 			for e := range pps.events {
 				err := pps.processEvent(e)
