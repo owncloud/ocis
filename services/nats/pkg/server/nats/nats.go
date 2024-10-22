@@ -14,6 +14,7 @@ type NATSServer struct {
 	server *nserver.Server
 }
 
+// NatsOption configures the new NATSServer instance
 func NewNATSServer(ctx context.Context, logger nserver.Logger, opts ...NatsOption) (*NATSServer, error) {
 	natsOpts := &nserver.Options{}
 
@@ -23,6 +24,8 @@ func NewNATSServer(ctx context.Context, logger nserver.Logger, opts ...NatsOptio
 
 	// enable JetStream
 	natsOpts.JetStream = true
+	// The NATS server itself runs the signal handling. We set `natsOpts.NoSigs = true` because we want to handle signals ourselves
+	natsOpts.NoSigs = true
 
 	server, err := nserver.NewServer(natsOpts)
 	if err != nil {
@@ -44,6 +47,8 @@ func (n *NATSServer) ListenAndServe() (err error) {
 	return nil
 }
 
+// Shutdown stops the NATSServer gracefully
 func (n *NATSServer) Shutdown() {
 	n.server.Shutdown()
+	n.server.WaitForShutdown()
 }
