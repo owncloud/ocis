@@ -1,7 +1,7 @@
 Feature: checking file versions using file id
   As a user
-  I want to share file outside of the space
-  So that other users can access the file
+  I want the versions of files to be available
+  So that I can manage the changes made to the files
 
   Background:
     Given these users have been created with default attributes and without skeleton files:

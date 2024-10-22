@@ -615,6 +615,7 @@ default:
         - WebDavPropertiesContext:
         - TrashbinContext:
         - SharingNgContext:
+        - OcisConfigContext:
 
     coreApiWebdavDelete:
       paths:
