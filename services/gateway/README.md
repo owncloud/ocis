@@ -30,7 +30,7 @@ Store specific notes:
 ## Service Endpoints
 
 **IMPORTANT**\
-This functionality is currently highly experimental and intended for testing only! There are known bugs that need to be sorted out like not closing sockets when a service ends.
+This functionality is currently highly experimental and intended for testing only! There are known bugs that need to be sorted out like not removing sockets when a service ends.
 
 The gateway acts as a proxy for other CS3 services. As such it has to forward requests to a lot of services and needs to establish connections by looking up the IP address using the service registry. Instead of using the service registry each endpoint can also be configured to use the grpc `dns://` or `kubernetes://` URLs, which might be useful when running in kubernetes.
 
