@@ -81,7 +81,9 @@ func NewClient(opts ...ClientOption) (client.Client, error) {
 		}
 		cOpts = append(cOpts, mgrpcc.AuthTLS(tlsConfig))
 	case "on":
-		tlsConfig = &tls.Config{}
+		tlsConfig = &tls.Config{
+			MinVersion: tls.VersionTLS12,
+		}
 		// Note: If caCert is empty we use the system's default set of trusted CAs
 		if options.caCert != "" {
 			certs := x509.NewCertPool()

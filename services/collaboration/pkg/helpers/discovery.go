@@ -22,6 +22,7 @@ func GetAppURLs(cfg *config.Config, logger log.Logger) (map[string]map[string]st
 	httpClient := http.Client{
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{
+				MinVersion:         tls.VersionTLS12,
 				InsecureSkipVerify: cfg.App.Insecure,
 			},
 		},
