@@ -66,7 +66,7 @@ func Server(cfg *config.Config) *cli.Command {
 					return err
 				}
 				gr.Add(func() error {
-					err := make(chan error, 1)
+					err := make(chan error)
 					select {
 					case <-ctx.Done():
 						return nil
