@@ -67,11 +67,12 @@ func RenderEmailTemplate(mt MessageTemplate, locale, defaultLocale string, email
 	}, nil
 }
 
+// emailTemplate builds the email template. It does not use any user provided input, so it is safe to use template.HTML.
 func emailTemplate(tpl *template.Template, mt MessageTemplate) (string, error) {
 	str, err := executeTemplate(tpl, map[string]interface{}{
-		"Greeting":     template.HTML(strings.TrimSpace(mt.Greeting)),
-		"MessageBody":  template.HTML(strings.TrimSpace(mt.MessageBody)),
-		"CallToAction": template.HTML(strings.TrimSpace(mt.CallToAction)),
+		"Greeting":     template.HTML(strings.TrimSpace(mt.Greeting)),     // #nosec G203
+		"MessageBody":  template.HTML(strings.TrimSpace(mt.MessageBody)),  // #nosec G203
+		"CallToAction": template.HTML(strings.TrimSpace(mt.CallToAction)), // #nosec G203
 	})
 	if err != nil {
 		return "", err

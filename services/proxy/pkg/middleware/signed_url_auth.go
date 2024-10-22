@@ -21,7 +21,7 @@ import (
 
 const (
 	_paramOCSignature  = "OC-Signature"
-	_paramOCCredential = "OC-Credential"
+	_paramOCCredential = "OC-Credential" // #nosec G101
 	_paramOCDate       = "OC-Date"
 	_paramOCExpires    = "OC-Expires"
 	_paramOCVerb       = "OC-Verb"

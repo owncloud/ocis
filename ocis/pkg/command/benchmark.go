@@ -207,7 +207,10 @@ func client(o clientOptions) error {
 	for i := 0; i < o.jobs; i++ {
 		go func(i int) {
 			tr := &http.Transport{
-				TLSClientConfig: &tls.Config{InsecureSkipVerify: o.insecure},
+				TLSClientConfig: &tls.Config{
+					MinVersion:         tls.VersionTLS12,
+					InsecureSkipVerify: o.insecure,
+				},
 			}
 			client := &http.Client{Transport: tr}
 

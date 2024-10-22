@@ -148,6 +148,7 @@ func (c *ContentConnector) GetFile(ctx context.Context, w http.ResponseWriter) e
 	httpClient := http.Client{
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{
+				MinVersion:         tls.VersionTLS12,
 				InsecureSkipVerify: c.cfg.CS3Api.DataGateway.Insecure,
 			},
 		},
@@ -312,6 +313,7 @@ func (c *ContentConnector) PutFile(ctx context.Context, stream io.Reader, stream
 		httpClient := http.Client{
 			Transport: &http.Transport{
 				TLSClientConfig: &tls.Config{
+					MinVersion:         tls.VersionTLS12,
 					InsecureSkipVerify: c.cfg.CS3Api.DataGateway.Insecure,
 				},
 			},

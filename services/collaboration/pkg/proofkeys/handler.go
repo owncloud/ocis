@@ -198,6 +198,7 @@ func (vh *VerifyHandler) fetchPublicKeys(logger *zerolog.Logger) (*PubKeys, erro
 	httpClient := http.Client{
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{
+				MinVersion:         tls.VersionTLS12,
 				InsecureSkipVerify: vh.insecure,
 			},
 		},
