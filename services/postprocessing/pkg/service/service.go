@@ -65,18 +65,23 @@ func NewPostprocessingService(ctx context.Context, stream events.Stream, logger 
 
 // Run to fulfil Runner interface
 func (pps *PostprocessingService) Run() error {
-	for e := range pps.events {
-		err := pps.processEvent(e)
-		if err != nil {
-			switch {
-			case errors.Is(err, ErrFatal):
-				return err
-			case errors.Is(err, ErrEvent):
-				continue
-			default:
-				pps.log.Fatal().Err(err).Msg("unknown error - exiting")
+	// Spawn workers that'll concurrently work the queue
+	for i := 0; i < pps.c.Workers; i++ {
+		go (func() {
+			for e := range pps.events {
+				err := pps.processEvent(e)
+				if err != nil {
+					switch {
+					case errors.Is(err, ErrFatal):
+						pps.log.Fatal().Err(err).Msg("fatal error - exiting")
+					case errors.Is(err, ErrEvent):
+						pps.log.Error().Err(err).Msg("continuing")
+					default:
+						pps.log.Fatal().Err(err).Msg("unknown error - exiting")
+					}
+				}
 			}
-		}
+		})()
 	}
 	return nil
 }
@@ -149,7 +154,11 @@ func (pps *PostprocessingService) processEvent(e events.Event) error {
 			pps.log.Error().Str("uploadID", ev.UploadID).Err(err).Msg("cannot get upload")
 			return fmt.Errorf("%w: cannot get upload", ErrEvent)
 		}
-		next = pp.Delay()
+		pp.Delay(func(next interface{}) {
+			if err := events.Publish(ctx, pps.pub, next); err != nil {
+				pps.log.Error().Err(err).Msg("cannot publish event")
+			}
+		})
 	case events.UploadReady:
 		if ev.Failed {
 			// the upload failed - let's keep it around for a while - but mark it as finished
