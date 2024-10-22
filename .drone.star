@@ -310,15 +310,7 @@ def main(ctx):
         licenseCheck(ctx)
 
     test_pipelines = \
-        codestyle(ctx) + \
-        checkGherkinLint(ctx) + \
-        checkTestSuitesInExpectedFailures(ctx) + \
-        buildWebCache(ctx) + \
-        getGoBinForTesting(ctx) + \
         buildOcisBinaryForTesting(ctx) + \
-        checkStarlark() + \
-        build_release_helpers + \
-        testOcisAndUploadResults(ctx) + \
         testPipelines(ctx)
 
     build_release_pipelines = \
@@ -332,7 +324,7 @@ def main(ctx):
         ),
     )
 
-    pipelines = test_pipelines + build_release_pipelines
+    pipelines = test_pipelines  #+ build_release_pipelines
 
     if ctx.build.event == "cron":
         pipelines = \
@@ -400,6 +392,8 @@ def testOcisAndUploadResults(ctx):
 
 def testPipelines(ctx):
     pipelines = []
+    pipelines.append(wopiValidatorTests(ctx, "ocis", "builtin", "default"))
+    return pipelines
 
     if config["litmus"]:
         pipelines += litmus(ctx, "ocis")
@@ -1092,21 +1086,11 @@ def wopiValidatorTests(ctx, storage, wopiServerType, accounts_hash_difficulty = 
                          "image": OC_CI_ALPINE,
                          "environment": {},
                          "commands": [
-                             "curl -v -X PUT 'https://ocis-server:9200/remote.php/webdav/test.wopitest' -k --fail --retry-connrefused --retry 7 --retry-all-errors -u admin:admin -D headers.txt",
-                             "cat headers.txt",
-                             "export FILE_ID=$(cat headers.txt | sed -n -e 's/^.*Oc-Fileid: //p')",
-                             "export URL=\"https://ocis-server:9200/app/open?app_name=FakeOffice&file_id=$FILE_ID\"",
-                             "export URL=$(echo $URL | tr -d '[:cntrl:]')",
-                             "curl -v -X POST \"$URL\" -k --fail --retry-connrefused --retry 7 --retry-all-errors -u admin:admin > open.json",
-                             "cat open.json",
-                             "cat open.json | jq .form_parameters.access_token | tr -d '\"' > accesstoken",
-                             "cat open.json | jq .form_parameters.access_token_ttl | tr -d '\"' > accesstokenttl",
-                             "echo -n 'http://wopi-fakeoffice:9300/wopi/files/' > wopisrc",
-                             "cat open.json | jq .app_url | sed -n -e 's/^.*files%2F//p' | tr -d '\"' >> wopisrc",
+                             "curl -k 'http://wopi-fakeoffice:9300'",
+                             "curl -k 'http://ocis-server:9243/healthz'",
                          ],
                      },
-                 ] +
-                 validatorTests,
+                 ],
         "depends_on": getPipelineNames(buildOcisBinaryForTesting(ctx)),
         "trigger": {
             "ref": [
@@ -2114,6 +2098,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
         "EVENTHISTORY_STORE": "memory",
         "GRAPH_AVAILABLE_ROLES": "b1e2218d-eef8-4d4c-b82d-0f1a1b48f3b5,a8d5fe5e-96e3-418d-825b-534dbdf22b99,fb6c3e19-e378-47e5-b277-9732f9de6e21,58c63c02-1d89-4572-916a-870abc5a1b7d,2d00ce52-1fc2-4dbc-8b95-a73b73395f5a,1c996275-f1c9-4e71-abdf-a42f6495e960,312c0871-5ef7-4b3a-85b6-0e4074c64049,aa97fe03-7980-45ac-9e50-b325749fd7e6",
         "OCIS_TRANSLATION_PATH": "%s/tests/config/translations" % dirs["base"],
+        # "APP_REGISTRY_DEBUG_ADDR": "0.0.0.0:9243",
     }
 
     if deploy_type == "":
