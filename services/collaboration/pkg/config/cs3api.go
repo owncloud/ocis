@@ -11,7 +11,7 @@ type CS3Api struct {
 
 // Gateway defines the available configuration for the CS3 API gateway
 type Gateway struct {
-	Name string `yaml:"name" env:"OCIS_REVA_GATEWAY;COLLABORATION_CS3API_GATEWAY_NAME" desc:"CS3 gateway used to look up user metadata." introductionVersion:"6.0.0" deprecationVersion:"6.0" removalVersion:"%%NEXT_PRODUCTION_VERSION%%" deprecationInfo:"COLLABORATION_CS3API_GATEWAY_NAME removed for simplicity."`
+	Name string `yaml:"name" env:"OCIS_REVA_GATEWAY" desc:"CS3 gateway used to look up user metadata." introductionVersion:"6.0.0"`
 }
 
 // DataGateway defines the available configuration for the CS3 API data gateway
