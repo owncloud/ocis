@@ -65,18 +65,23 @@ func NewPostprocessingService(ctx context.Context, stream events.Stream, logger 
 
 // Run to fulfil Runner interface
 func (pps *PostprocessingService) Run() error {
-	for e := range pps.events {
-		err := pps.processEvent(e)
-		if err != nil {
-			switch {
-			case errors.Is(err, ErrFatal):
-				return err
-			case errors.Is(err, ErrEvent):
-				continue
-			default:
-				pps.log.Fatal().Err(err).Msg("unknown error - exiting")
+	// Spawn workers that'll concurrently work the queue
+	for i := 0; i < 3; i++ {
+		go (func() {
+			for e := range pps.events {
+				err := pps.processEvent(e)
+				if err != nil {
+					switch {
+					case errors.Is(err, ErrFatal):
+						pps.log.Fatal().Err(err).Msg("fatal error - exiting")
+					case errors.Is(err, ErrEvent):
+						pps.log.Error().Err(err).Msg("continuing")
+					default:
+						pps.log.Fatal().Err(err).Msg("unknown error - exiting")
+					}
+				}
 			}
-		}
+		})()
 	}
 	return nil
 }
