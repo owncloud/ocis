@@ -103,11 +103,12 @@ func (a *ActivitylogService) Run() {
 			err = a.AddActivity(ev.FileRef, e.ID, utils.TSToTime(ev.Timestamp))
 		case events.FileTouched:
 			err = a.AddActivity(ev.Ref, e.ID, utils.TSToTime(ev.Timestamp))
-		case events.FileDownloaded:
-			// we are only interested in public link downloads - so no need to store others.
-			if ev.ImpersonatingUser.GetDisplayName() == "Public" {
-				err = a.AddActivity(ev.Ref, e.ID, utils.TSToTime(ev.Timestamp))
-			}
+		// Disabled https://github.com/owncloud/ocis/issues/10293
+		//case events.FileDownloaded:
+		// we are only interested in public link downloads - so no need to store others.
+		//if ev.ImpersonatingUser.GetDisplayName() == "Public" {
+		//	err = a.AddActivity(ev.Ref, e.ID, utils.TSToTime(ev.Timestamp))
+		//}
 		case events.ContainerCreated:
 			err = a.AddActivity(ev.Ref, e.ID, utils.TSToTime(ev.Timestamp))
 		case events.ItemTrashed:
