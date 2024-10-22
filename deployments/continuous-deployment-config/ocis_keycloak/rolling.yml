@@ -32,7 +32,7 @@
         env:
           INSECURE: "false"
           TRAEFIK_ACME_MAIL: mbarz@owncloud.com
-          OCIS_DOCKER_TAG: 6.5.0
+          OCIS_DOCKER_TAG: 6.6.0
           OCIS_DOCKER_IMAGE: owncloud/ocis-rolling
           OCIS_DOMAIN: ocis.ocis-keycloak.rolling.owncloud.works
           KEYCLOAK_DOMAIN: keycloak.ocis-keycloak.rolling.owncloud.works
