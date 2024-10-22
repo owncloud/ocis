@@ -28,6 +28,7 @@ func DefaultConfig() *config.Config {
 			Endpoint: "127.0.0.1:9233",
 			Cluster:  "ocis-cluster",
 		},
+		Workers:              10,
 		InfectedFileHandling: "delete",
 		Scanner: config.Scanner{
 			Type: "clamav",

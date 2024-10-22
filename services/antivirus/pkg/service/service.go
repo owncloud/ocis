@@ -9,6 +9,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"sync"
 	"time"
 
 	"github.com/cs3org/reva/v2/pkg/bytesize"
@@ -116,9 +117,11 @@ func (av Antivirus) Run() error {
 		return err
 	}
 
-	// Spawn workers that'll concurrently work the queue
+	wg := sync.WaitGroup{}
 	for i := 0; i < av.c.Workers; i++ {
-		go (func() {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
 			for e := range ch {
 				err := av.processEvent(e, natsStream)
 				if err != nil {
@@ -132,8 +135,9 @@ func (av Antivirus) Run() error {
 					}
 				}
 			}
-		})()
+		}()
 	}
+	wg.Wait()
 
 	return nil
 }
