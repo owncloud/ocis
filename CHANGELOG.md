@@ -123,6 +123,7 @@ The following sections list the changes for 6.6.0.
 * Bugfix - Fix delete share panic: [#10219](https://github.com/owncloud/ocis/pull/10219)
 * Bugfix - Continue listing shares on error: [#10243](https://github.com/owncloud/ocis/pull/10243)
 * Bugfix - Avoid re-creating thumbnails: [#10251](https://github.com/owncloud/ocis/pull/10251)
+* Bugfix - Graph service now supports `OCIS_LDAP_USER_SCHEMA_DISPLAYNAME` env var: [#10257](https://github.com/owncloud/ocis/issues/10257)
 * Bugfix - Kept historical resource naming in activity: [#10266](https://github.com/owncloud/ocis/pull/10266)
 * Bugfix - Fix panic when sharing with groups: [#10279](https://github.com/owncloud/ocis/pull/10279)
 * Bugfix - Thumbnail request limit: [#10280](https://github.com/owncloud/ocis/pull/10280)
@@ -183,6 +184,17 @@ The following sections list the changes for 6.6.0.
    if a thumbnail already existed in the cache.
 
    https://github.com/owncloud/ocis/pull/10251
+
+* Bugfix - Graph service now supports `OCIS_LDAP_USER_SCHEMA_DISPLAYNAME` env var: [#10257](https://github.com/owncloud/ocis/issues/10257)
+
+   To align with the other services the graph service now supports the
+   `OCIS_LDAP_USER_SCHEMA_DISPLAYNAME` environment variable to configure the LDAP
+   attribute that is used for display name attribute of users.
+
+   `LDAP_USER_SCHEMA_DISPLAY_NAME` is now deprecated and will be removed in a
+   future release.
+
+   https://github.com/owncloud/ocis/issues/10257
 
 * Bugfix - Kept historical resource naming in activity: [#10266](https://github.com/owncloud/ocis/pull/10266)
 
