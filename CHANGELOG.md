@@ -63,6 +63,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Make antivirus workers configurable: [#10383](https://github.com/owncloud/ocis/pull/10383)
 * Bugfix - Increase event processing workers: [#10385](https://github.com/owncloud/ocis/pull/10385)
 * Bugfix - Fix envvar deprecations for next production release: [#10386](https://github.com/owncloud/ocis/pull/10386)
+* Enhancement - Add web extensions to the ocis_full example: [#10399](https://github.com/owncloud/ocis/pull/10399)
 
 ## Details
 
@@ -117,6 +118,20 @@ The following sections list the changes for unreleased.
    missing information.
 
    https://github.com/owncloud/ocis/pull/10386
+
+* Enhancement - Add web extensions to the ocis_full example: [#10399](https://github.com/owncloud/ocis/pull/10399)
+
+   We added some of the web extensions from ownCloud to the ocis_full docker
+   compose example.
+
+   - importer - draw-io - external-sites - json-viewer - unzip - progressbars
+
+   These can be enabled in the .env file one by one.
+
+   Read more about ocis extensions in
+   https://github.com/owncloud/web-extensions/blob/main/README.md
+
+   https://github.com/owncloud/ocis/pull/10399
 
 # Changelog for [6.6.0] (2024-10-21)
 
