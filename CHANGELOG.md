@@ -57,6 +57,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Fix panic when stopping the nats: [#10363](https://github.com/owncloud/ocis/pull/10363)
+* Bugfix - Disable download activity: [#10367](https://github.com/owncloud/ocis/pull/10367)
 * Bugfix - Fix Activitylog issues: [#10376](https://github.com/owncloud/ocis/pull/10376)
 * Bugfix - Security fixes: [#10376](https://github.com/owncloud/ocis/pull/10376)
 * Bugfix - Increase event processing workers: [#10385](https://github.com/owncloud/ocis/pull/10385)
@@ -70,6 +71,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/10360
    https://github.com/owncloud/ocis/pull/10363
+
+* Bugfix - Disable download activity: [#10367](https://github.com/owncloud/ocis/pull/10367)
+
+   We disable the download activity until we have a proper solution for it.
+
+   https://github.com/owncloud/ocis/issues/10293
+   https://github.com/owncloud/ocis/pull/10367
 
 * Bugfix - Fix Activitylog issues: [#10376](https://github.com/owncloud/ocis/pull/10376)
 
