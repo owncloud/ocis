@@ -62,6 +62,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Security fixes: [#10376](https://github.com/owncloud/ocis/pull/10376)
 * Bugfix - Make antivirus workers configurable: [#10383](https://github.com/owncloud/ocis/pull/10383)
 * Bugfix - Increase event processing workers: [#10385](https://github.com/owncloud/ocis/pull/10385)
+* Bugfix - Fix envvar deprecations for next production release: [#10386](https://github.com/owncloud/ocis/pull/10386)
 
 ## Details
 
@@ -109,6 +110,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/10385
    https://github.com/owncloud/ocis/pull/10368
+
+* Bugfix - Fix envvar deprecations for next production release: [#10386](https://github.com/owncloud/ocis/pull/10386)
+
+   Some envvar deprecations were incomplete. One was missed to be removed, one had
+   missing information.
+
+   https://github.com/owncloud/ocis/pull/10386
 
 # Changelog for [6.6.0] (2024-10-21)
 
