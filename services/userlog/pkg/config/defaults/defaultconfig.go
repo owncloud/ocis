@@ -21,7 +21,7 @@ func FullDefaultConfig() *config.Config {
 func DefaultConfig() *config.Config {
 	return &config.Config{
 		Debug: config.Debug{
-			Addr:   "127.0.0.1:9210",
+			Addr:   "127.0.0.1:9214",
 			Token:  "",
 			Pprof:  false,
 			Zpages: false,
@@ -42,7 +42,7 @@ func DefaultConfig() *config.Config {
 		},
 		RevaGateway: shared.DefaultRevaConfig().Address,
 		HTTP: config.HTTP{
-			Addr:      "127.0.0.1:0",
+			Addr:      "127.0.0.1:9210",
 			Root:      "/",
 			Namespace: "com.owncloud.web",
 			CORS: config.CORS{

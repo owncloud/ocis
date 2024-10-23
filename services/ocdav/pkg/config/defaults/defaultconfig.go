@@ -25,7 +25,7 @@ func DefaultConfig() *config.Config {
 			Zpages: false,
 		},
 		HTTP: config.HTTPConfig{
-			Addr:      "127.0.0.1:0", // :0 to pick any free local port
+			Addr:      "127.0.0.1:19163",
 			Namespace: "com.owncloud.web",
 			Protocol:  "tcp",
 			Prefix:    "",

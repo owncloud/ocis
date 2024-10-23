@@ -18,7 +18,7 @@ func FullDefaultConfig() *config.Config {
 func DefaultConfig() *config.Config {
 	return &config.Config{
 		Debug: config.Debug{
-			Addr:  "127.0.0.1:9135",
+			Addr:  "127.0.0.1:9139",
 			Token: "",
 		},
 		Service: config.Service{
@@ -29,7 +29,7 @@ func DefaultConfig() *config.Config {
 			Cluster:  "ocis-cluster",
 		},
 		HTTP: config.HTTP{
-			Addr:      "127.0.0.1:0",
+			Addr:      "127.0.0.1:9135",
 			Root:      "/",
 			Namespace: "com.owncloud.sse",
 			CORS: config.CORS{
