@@ -22,6 +22,7 @@
 | OCIS_EVENTS_ENABLE_TLS<br/>ANTIVIRUS_EVENTS_ENABLE_TLS | bool | false | Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services.|
 | OCIS_EVENTS_AUTH_USERNAME<br/>ANTIVIRUS_EVENTS_AUTH_USERNAME | string |  | The username to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.|
 | OCIS_EVENTS_AUTH_PASSWORD<br/>ANTIVIRUS_EVENTS_AUTH_PASSWORD | string |  | The password to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.|
+| ANTIVIRUS_WORKERS | int | 10 | The number of concurrent go routines that fetch events from the event queue.|
 | ANTIVIRUS_SCANNER_TYPE | string | clamav | The antivirus scanner to use. Supported values are 'clamav' and 'icap'.|
 | ANTIVIRUS_CLAMAV_SOCKET | string | /run/clamav/clamd.ctl | The socket clamav is running on. Note the default value is an example which needs adaption according your OS.|
 | ANTIVIRUS_ICAP_SCAN_TIMEOUT | Duration | 5m0s | Scan timeout for the ICAP client. Defaults to '5m' (5 minutes). See the Environment Variable Types description for more details.|

@@ -1,6 +1,6 @@
 ---
 title: Antivirus
-date: 2024-10-23T08:06:28.587051177Z
+date: 2024-10-23T08:40:03.776857219Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/antivirus
@@ -25,6 +25,7 @@ The `antivirus` service is responsible for scanning files for viruses.
   * [Scanner Inaccessibility](#scanner-inaccessibility)
 * [Operation Modes](#operation-modes)
   * [Postprocessing](#postprocessing)
+  * [Scaling in Kubernetes](#scaling-in-kubernetes)
 * [Example Yaml Config](#example-yaml-config)
 
 ## Configuration
@@ -39,6 +40,9 @@ The antivirus service currently supports [ICAP](https://tools.ietf.org/html/rfc3
 ### Maximum Scan Size
 
 Several factors can make it necessary to limit the maximum filesize the antivirus service will use for scanning. Use the `ANTIVIRUS_MAX_SCAN_SIZE` environment variable to scan only a given amount of bytes. Obviously, it is recommended to scan the whole file, but several factors like scanner type and version, bandwidth, performance issues, etc. might make a limit necessary.
+
+> [!CAUTION]
+> Streaming of files to the virus scan service still [needs to be implemented](https://github.com/owncloud/ocis/issues/6803). To prevent OOM errors `ANTIVIRUS_MAX_SCAN_SIZE` needs to be set lower than available ram.
 
 ### Infected File Handling
 
@@ -61,6 +65,12 @@ The antivirus service can scan files during `postprocessing`. `on demand` scanni
 ### Postprocessing
 
 The antivirus service will scan files during postprocessing. It listens for a postprocessing step called `virusscan`. This step can be added in the environment variable `POSTPROCESSING_STEPS`. Read the documentation of the [postprocessing service](https://github.com/owncloud/ocis/tree/master/services/postprocessing) for more details.
+
+The number of concurrent scans can be increased by setting `ANTIVIRUS_WORKERS`, but be aware that this will also increase the memory usage.
+
+### Scaling in Kubernetes
+
+In kubernetes `ANTIVIRUS_WORKERS` and `ANTIVIRUS_MAX_SCAN_SIZE` can be used to trigger the horizontal pod autoscaler by requesting a memory size that is below `ANTIVIRUS_MAX_SCAN_SIZE`. Keep in mind that `ANTIVIRUS_MAX_SCAN_SIZE` amount of memory might be held by `ANTIVIRUS_WORKERS` number of go routines.
 ## Example Yaml Config
 {{< include file="services/_includes/antivirus-config-example.yaml"  language="yaml" >}}
 

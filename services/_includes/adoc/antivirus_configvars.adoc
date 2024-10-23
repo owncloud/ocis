@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-10-23-08-06-23]
+[#deprecation-note-2024-10-23-08-39-59]
 [caption=]
 .Deprecation notes for the antivirus service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -265,6 +265,17 @@ a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 The password to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.
+
+a|`ANTIVIRUS_WORKERS` +
+
+a| [subs=-attributes]
+++next ++
+a| [subs=-attributes]
+++int ++
+a| [subs=-attributes]
+++10 ++
+a| [subs=-attributes]
+The number of concurrent go routines that fetch events from the event queue.
 
 a|`ANTIVIRUS_SCANNER_TYPE` +
 
