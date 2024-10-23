@@ -91,7 +91,7 @@ var (
 // AuthMiddleware configures the proxy http auth middleware.
 type AuthMiddleware struct {
 	CredentialsByUserAgent map[string]string `yaml:"credentials_by_user_agent"`
-	AllowAppAuth           bool              `yaml:"allow_app_auth" env:"PROXY_ENABLE_APP_AUTH" desc:"Allow app authentication. This can be used to authenticate 3rd party applications. Note that auth-app service must be running for this feature to work." introductionVersion:"%%NEXT%%"`
+	AllowAppAuth           bool              `yaml:"allow_app_auth" env:"PROXY_ENABLE_APP_AUTH" desc:"Allow app authentication. This can be used to authenticate 3rd party applications. Note that auth-app service must be running for this feature to work." introductionVersion:"7.0.0"`
 }
 
 // PoliciesMiddleware configures the proxy's policies middleware.
@@ -222,11 +222,11 @@ type ServiceAccount struct {
 
 // Events combines the configuration options for the event bus.
 type Events struct {
-	Endpoint             string `yaml:"endpoint" env:"OCIS_EVENTS_ENDPOINT;PROXY_EVENTS_ENDPOINT" desc:"The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Set to a empty string to disable emitting events." introductionVersion:"%%NEXT%%"`
-	Cluster              string `yaml:"cluster" env:"OCIS_EVENTS_CLUSTER;PROXY_EVENTS_CLUSTER" desc:"The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture." introductionVersion:"%%NEXT%%"`
-	TLSInsecure          bool   `yaml:"tls_insecure" env:"OCIS_INSECURE;PROXY_EVENTS_TLS_INSECURE" desc:"Whether to verify the server TLS certificates." introductionVersion:"%%NEXT%%"`
-	TLSRootCACertificate string `yaml:"tls_root_ca_certificate" env:"OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE;PROXY_EVENTS_TLS_ROOT_CA_CERTIFICATE" desc:"The root CA certificate used to validate the server's TLS certificate. If provided PROXY_EVENTS_TLS_INSECURE will be seen as false." introductionVersion:"%%NEXT%%"`
-	EnableTLS            bool   `yaml:"enable_tls" env:"OCIS_EVENTS_ENABLE_TLS;PROXY_EVENTS_ENABLE_TLS" desc:"Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services." introductionVersion:"%%NEXT%%"`
-	AuthUsername         string `yaml:"username" env:"OCIS_EVENTS_AUTH_USERNAME;PROXY_EVENTS_AUTH_USERNAME" desc:"The username to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services." introductionVersion:"%%NEXT%%"`
-	AuthPassword         string `yaml:"password" env:"OCIS_EVENTS_AUTH_PASSWORD;PROXY_EVENTS_AUTH_PASSWORD" desc:"The password to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services." introductionVersion:"%%NEXT%%"`
+	Endpoint             string `yaml:"endpoint" env:"OCIS_EVENTS_ENDPOINT;PROXY_EVENTS_ENDPOINT" desc:"The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Set to a empty string to disable emitting events." introductionVersion:"7.0.0"`
+	Cluster              string `yaml:"cluster" env:"OCIS_EVENTS_CLUSTER;PROXY_EVENTS_CLUSTER" desc:"The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture." introductionVersion:"7.0.0"`
+	TLSInsecure          bool   `yaml:"tls_insecure" env:"OCIS_INSECURE;PROXY_EVENTS_TLS_INSECURE" desc:"Whether to verify the server TLS certificates." introductionVersion:"7.0.0"`
+	TLSRootCACertificate string `yaml:"tls_root_ca_certificate" env:"OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE;PROXY_EVENTS_TLS_ROOT_CA_CERTIFICATE" desc:"The root CA certificate used to validate the server's TLS certificate. If provided PROXY_EVENTS_TLS_INSECURE will be seen as false." introductionVersion:"7.0.0"`
+	EnableTLS            bool   `yaml:"enable_tls" env:"OCIS_EVENTS_ENABLE_TLS;PROXY_EVENTS_ENABLE_TLS" desc:"Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services." introductionVersion:"7.0.0"`
+	AuthUsername         string `yaml:"username" env:"OCIS_EVENTS_AUTH_USERNAME;PROXY_EVENTS_AUTH_USERNAME" desc:"The username to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services." introductionVersion:"7.0.0"`
+	AuthPassword         string `yaml:"password" env:"OCIS_EVENTS_AUTH_PASSWORD;PROXY_EVENTS_AUTH_PASSWORD" desc:"The password to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services." introductionVersion:"7.0.0"`
 }
