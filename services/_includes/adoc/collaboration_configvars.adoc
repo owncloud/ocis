@@ -2,11 +2,11 @@
 // if the generated adoc file is used outside tabs, it renders correctly depending on the attribute set.
 // if inside, you need to also use the xxx_deprecation.adoc file. attributes can't be defined inside tabs.
 
-:show-deprecation: true
+:show-deprecation: false
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-10-23-14-17-33]
+[#deprecation-note-2024-10-23-14-39-07]
 [caption=]
 .Deprecation notes for the collaboration service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -15,11 +15,6 @@ ifeval::[{show-deprecation} == true]
 | Deprecation Version
 | Removal Version
 | Deprecation Replacement
-
-| COLLABORATION_CS3API_GATEWAY_NAME removed for simplicity.
-| 6.0
-| next-prod
-| 
 |===
 
 {empty} +
@@ -271,8 +266,7 @@ a| [subs=-attributes]
 Optional, the secret to authenticate against the ownCloud Office365 WOPI proxy. This secret can be obtained from ownCloud via the office365 proxy subscription.
 
 a|`OCIS_REVA_GATEWAY` +
-`COLLABORATION_CS3API_GATEWAY_NAME` +
-xref:deprecation-note-2024-10-23-14-17-33[Deprecation Note]
+
 a| [subs=-attributes]
 ++6.0.0 ++
 a| [subs=-attributes]
