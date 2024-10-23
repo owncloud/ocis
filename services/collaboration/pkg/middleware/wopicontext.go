@@ -2,11 +2,12 @@ package middleware
 
 import (
 	"context"
-	"crypto/sha256"
+	"crypto/md5"
 	"encoding/hex"
 	"errors"
 	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -213,9 +214,9 @@ func GenerateWopiToken(wopiContext WopiContext, cfg *config.Config, st microstor
 	accessToken, err := token.SignedString([]byte(cfg.Wopi.Secret))
 
 	if cfg.Wopi.ShortTokens {
-		c := sha256.New()
+		c := md5.New()
 		c.Write([]byte(accessToken))
-		shortAccessToken := hex.EncodeToString(c.Sum(nil))
+		shortAccessToken := hex.EncodeToString(c.Sum(nil)) + strconv.FormatInt(time.Now().UnixNano(), 16)
 
 		errWrite := st.Write(&microstore.Record{
 			Key:    shortAccessToken,
