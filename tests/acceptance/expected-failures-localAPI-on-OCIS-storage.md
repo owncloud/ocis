@@ -257,12 +257,6 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 
 - [apiOcm/deleteFederatedConnections.feature:103](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/deleteFederatedConnections.feature#L103)
 
-#### [OCM. Prevent federated users from being added as members of the space](https://github.com/owncloud/ocis/issues/10051)
-
-- [apiOcm/share.feature:307](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L307)
-- [apiOcm/share.feature:308](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L308)
-- [apiOcm/share.feature:309](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L309)
-
 #### [same href in REPORT request for all dav-path-version](https://github.com/owncloud/ocis/issues/7060)
 
 - [apiSearch1/dateSearch.feature:17](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearch1/dateSearch.feature#L17)
