@@ -1,7 +1,7 @@
 Feature: service health check
 
 
-  Scenario: health check defauts service
+  Scenario: check default services health
     When a user requests these endpoints:
       | endpoint                                        | service            | comment |
       # | %base_url_without_scheme_and_port%:9197/healthz | activitylog        | #get 500 |
@@ -50,7 +50,7 @@ Feature: service health check
     Then the HTTP status code of responses on all endpoints should be "200"
 
   @env-config
-  Scenario: health check extra services
+  Scenario: check extra services health
     Given the following configs have been set:
       | config                 | value                               |
       | OCIS_ADD_RUN_SERVICES  | audit,auth-app,auth-bearer,policies |
@@ -67,7 +67,7 @@ Feature: service health check
     Then the HTTP status code of responses on all endpoints should be "200"
 
 
-  Scenario: service ready check
+  Scenario: check default services readiness
     When a user requests these endpoints:
       | endpoint                                       | service            | comment |
       # | %base_url_without_scheme_and_port%:9197/readyz | activitylog        | #get 500                      |
@@ -116,7 +116,7 @@ Feature: service health check
     Then the HTTP status code of responses on all endpoints should be "200"
 
   @env-config
-  Scenario: health check extra services
+  Scenario: check extra services readiness
     Given the following configs have been set:
       | config                 | value                               |
       | OCIS_ADD_RUN_SERVICES  | audit,auth-app,auth-bearer,policies |
