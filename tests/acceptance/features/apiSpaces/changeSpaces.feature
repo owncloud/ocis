@@ -577,3 +577,27 @@ Feature: Change data of space
     Then the HTTP status code should be "404"
     When user "Carol" sends PATCH request to the space "Project Jupiter" of user "Alice" with data "{}"
     Then the HTTP status code should be "404"
+
+  @env-config
+  Scenario Outline: space member with role 'Space Editor Without Versions' and Space Editor edits the space
+    Given the administrator has enabled the permissions role "Space Editor Without Versions"
+    And these users have been created with default attributes and without skeleton files:
+      | username |
+      | Carol    |
+    And user "Alice" has sent the following space share invitation:
+      | space           | Project Jupiter |
+      | sharee          | Carol           |
+      | shareType       | user            |
+      | permissionsRole | <role>          |
+    When user "Carol" creates a folder ".space" in space "Project Jupiter" using the WebDav Api
+    Then the HTTP status code should be "201"
+    When user "Carol" uploads a file inside space "Project Jupiter" with content "hello" to ".space/readme.md" using the WebDAV API
+    Then the HTTP status code should be "201"
+    When user "Carol" sets the file ".space/readme.md" as a description in a special section of the "Project Jupiter" space
+    Then the HTTP status code should be "200"
+    When user "Carol" removes the folder ".space" from space "Project Jupiter"
+    Then the HTTP status code should be "204"
+    Examples:
+      | role                          |
+      | Space Editor Without Versions |
+      | Space Editor                  |
