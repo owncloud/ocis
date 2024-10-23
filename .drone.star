@@ -241,6 +241,7 @@ config = {
             "extraServerEnvironment": {
                 "GATEWAY_GRPC_ADDR": "0.0.0.0:9142",
                 "COLLABORATION_DEBUG_ADDR": "0.0.0.0:9304",
+                "OCIS_ADD_RUN_SERVICES": "collaboration",
             },
         },
         "cliCommands": {
@@ -2326,6 +2327,7 @@ def ocisServer(storage = "ocis", accounts_hash_difficulty = 4, volumes = [], dep
         "OCIS_JWT_SECRET": "some-ocis-jwt-secret",
         "EVENTHISTORY_STORE": "memory",
         "OCIS_TRANSLATION_PATH": "%s/tests/config/translations" % dirs["base"],
+        # debug addresses required for running services health tests
         "ACTIVITYLOG_DEBUG_ADDR": "0.0.0.0:9197",
         "APP_PROVIDER_DEBUG_ADDR": "0.0.0.0:9165",
         "APP_REGISTRY_DEBUG_ADDR": "0.0.0.0:9243",
