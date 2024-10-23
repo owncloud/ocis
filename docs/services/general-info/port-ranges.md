@@ -40,7 +40,7 @@ We also suggest using the last port in your extensions' range as a debug/metrics
 | 9154-9156  | [storage-shares]({{< ref "../storage-shares/_index.md" >}})                            |
 | 9157-9159  | [storage-users]({{< ref "../storage-users/_index.md" >}})                              |
 | 9160-9162  | [groups]({{< ref "../groups/_index.md" >}})                                            |
-| 9163,19163 | [ocdav]({{< ref "../ocdav/_index.md" >}})                                              |
+| 9163       | [ocdav]({{< ref "../ocdav/_index.md" >}})                                              |
 | 9164       | [groups]({{< ref "../groups/_index.md" >}})                                            |
 | 9165       | [app-provider]({{< ref "../app-provider/_index.md" >}})                                |
 | 9166-9169  | [auth-machine]({{< ref "../auth-machine/_index.md" >}})                                |
@@ -81,7 +81,7 @@ We also suggest using the last port in your extensions' range as a debug/metrics
 | 9335-9339  | FREE                                                                                   |
 | 9340-9344  | FREE                                                                                   |
 | 9345-9349  | FREE                                                                                   |
-| 9350-9354  | FREE                                                                                   |
+| 9350-9354  | [ocdav]({{< ref "../ocdav/_index.md" >}})                                                                                   |
 | 9355-9359  | FREE                                                                                   |
 | 9360-9364  | FREE                                                                                   |
 | 9365-9369  | FREE                                                                                   |
