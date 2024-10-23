@@ -9,6 +9,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"sync"
 	"time"
 
 	"github.com/cs3org/reva/v2/pkg/bytesize"
@@ -90,7 +91,7 @@ func (av Antivirus) Run() error {
 	evtsCfg := av.c.Events
 
 	var rootCAPool *x509.CertPool
-	if evtsCfg.TLSRootCACertificate != "" {
+	if av.c.Events.TLSRootCACertificate != "" {
 		rootCrtFile, err := os.Open(evtsCfg.TLSRootCACertificate)
 		if err != nil {
 			return err
@@ -103,7 +104,7 @@ func (av Antivirus) Run() error {
 
 		rootCAPool = x509.NewCertPool()
 		rootCAPool.AppendCertsFromPEM(certBytes.Bytes())
-		evtsCfg.TLSInsecure = false
+		av.c.Events.TLSInsecure = false
 	}
 
 	natsStream, err := stream.NatsFromConfig(av.c.Service.Name, false, stream.NatsConfig(av.c.Events))
@@ -116,21 +117,27 @@ func (av Antivirus) Run() error {
 		return err
 	}
 
-	for e := range ch {
-		err := av.processEvent(e, natsStream)
-		if err != nil {
-			switch {
-			case errors.Is(err, ErrFatal):
-				return err
-			case errors.Is(err, ErrEvent):
-				// Right now logging of these happens in the processEvent method, might be cleaner to do it here.
-				continue
-			default:
-				av.l.Fatal().Err(err).Msg("unknown error - exiting")
+	wg := sync.WaitGroup{}
+	for i := 0; i < av.c.Workers; i++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			for e := range ch {
+				err := av.processEvent(e, natsStream)
+				if err != nil {
+					switch {
+					case errors.Is(err, ErrFatal):
+						av.l.Fatal().Err(err).Msg("fatal error - exiting")
+					case errors.Is(err, ErrEvent):
+						av.l.Error().Err(err).Msg("continuing")
+					default:
+						av.l.Fatal().Err(err).Msg("unknown error - exiting")
+					}
+				}
 			}
-		}
-
+		}()
 	}
+	wg.Wait()
 
 	return nil
 }
@@ -168,10 +175,12 @@ func (av Antivirus) processEvent(e events.Event, s events.Publisher) error {
 
 	av.l.Debug().Str("uploadid", ev.UploadID).Str("filename", ev.Filename).Msg("Starting virus scan.")
 	var errmsg string
+	start := time.Now()
 	res, err := av.process(ev)
 	if err != nil {
 		errmsg = err.Error()
 	}
+	duration := time.Since(start)
 
 	var outcome events.PostprocessingOutcome
 	switch {
@@ -186,7 +195,7 @@ func (av Antivirus) processEvent(e events.Event, s events.Publisher) error {
 		outcome = events.PPOutcomeAbort
 	}
 
-	av.l.Info().Str("uploadid", ev.UploadID).Interface("resourceID", ev.ResourceID).Str("virus", res.Description).Str("outcome", string(outcome)).Str("filename", ev.Filename).Str("user", ev.ExecutingUser.GetId().GetOpaqueId()).Bool("infected", res.Infected).Msg("File scanned")
+	av.l.Info().Str("uploadid", ev.UploadID).Interface("resourceID", ev.ResourceID).Str("virus", res.Description).Str("outcome", string(outcome)).Str("filename", ev.Filename).Str("user", ev.ExecutingUser.GetId().GetOpaqueId()).Bool("infected", res.Infected).Dur("duration", duration).Msg("File scanned")
 	if err := events.Publish(ctx, s, events.PostprocessingStepFinished{
 		FinishedStep:  events.PPStepAntivirus,
 		Outcome:       outcome,
