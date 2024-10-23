@@ -7,7 +7,7 @@ log:
   color: false
   file: ""
 debug:
-  addr: 127.0.0.1:9135
+  addr: 127.0.0.1:9139
   token: ""
   pprof: false
   zpages: false
@@ -25,7 +25,7 @@ events:
   username: ""
   password: ""
 http:
-  addr: 127.0.0.1:0
+  addr: 127.0.0.1:9135
   root: /
   cors:
     allow_origins:

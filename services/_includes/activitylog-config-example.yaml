@@ -36,7 +36,7 @@ store:
 reva_gateway: com.owncloud.api.gateway
 grpc_client_tls: null
 http:
-  addr: 127.0.0.1:0
+  addr: 127.0.0.1:9195
   root: /
   cors:
     allow_origins:

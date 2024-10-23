@@ -10,11 +10,11 @@
 | OCIS_LOG_PRETTY<br/>INVITATIONS_LOG_PRETTY | bool | false | Activates pretty log output.|
 | OCIS_LOG_COLOR<br/>INVITATIONS_LOG_COLOR | bool | false | Activates colorized log output.|
 | OCIS_LOG_FILE<br/>INVITATIONS_LOG_FILE | string |  | The path to the log file. Activates logging to this file if set.|
-| INVITATIONS_DEBUG_ADDR | string | 127.0.0.1:0 | Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.|
+| INVITATIONS_DEBUG_ADDR | string | 127.0.0.1:9269 | Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.|
 | INVITATIONS_DEBUG_TOKEN | string |  | Token to secure the metrics endpoint.|
 | INVITATIONS_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling.|
 | INVITATIONS_DEBUG_ZPAGES | bool | false | Enables zpages, which can be used for collecting and viewing in-memory traces.|
-| INVITATIONS_HTTP_ADDR | string | 127.0.0.1:0 | The bind address of the HTTP service.|
+| INVITATIONS_HTTP_ADDR | string | 127.0.0.1:9265 | The bind address of the HTTP service.|
 | INVITATIONS_HTTP_ROOT | string | /graph/v1.0 | Subdirectory that serves as the root for this HTTP service.|
 | OCIS_CORS_ALLOW_ORIGINS<br/>INVITATIONS_CORS_ALLOW_ORIGINS | []string | [https://localhost:9200] | A list of allowed CORS origins. See following chapter for more details: *Access-Control-Allow-Origin* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin. See the Environment Variable Types description for more details.|
 | OCIS_CORS_ALLOW_METHODS<br/>INVITATIONS_CORS_ALLOW_METHODS | []string | [] | A list of allowed CORS methods. See following chapter for more details: *Access-Control-Request-Method* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method. See the Environment Variable Types description for more details.|

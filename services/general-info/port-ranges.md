@@ -64,9 +64,9 @@ We also suggest using the last port in your extensions' range as a debug/metrics
 | 9250-9254  | [ocis server (runtime)](https://github.com/owncloud/ocis/tree/master/ocis/pkg/runtime) |
 | 9255-9259  | [postprocessing]({{< ref "../postprocessing/_index.md" >}})                            |
 | 9260-9264  | [clientlog]({{< ref "../clientlog/_index.md" >}})                                      |
-| 9265-9269  | FREE                                                                                   |
+| 9265-9269  | [clientlog]({{< ref "../clientlog/_index.md" >}})                                                                                   |
 | 9270-9274  | [eventhistory]({{< ref "../eventhistory/_index.md" >}})                                |
-| 9275-9279  | FREE                                                                                   |
+| 9275-9279  | [webfinger]({{< ref "../webfinger/_index.md" >}}                                                                                   |
 | 9280-9284  | [ocm]({{< ref "../ocm/_index.md" >}})                                                  |
 | 9285-9289  | FREE                                                                                   |
 | 9290-9294  | FREE                                                                                   |

@@ -29,7 +29,7 @@
 | OCIS_PERSISTENT_STORE_AUTH_USERNAME<br/>ACTIVITYLOG_STORE_AUTH_USERNAME | string |  | The username to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.|
 | OCIS_PERSISTENT_STORE_AUTH_PASSWORD<br/>ACTIVITYLOG_STORE_AUTH_PASSWORD | string |  | The password to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.|
 | OCIS_REVA_GATEWAY | string | com.owncloud.api.gateway | CS3 gateway used to look up user metadata|
-| ACTIVITYLOG_HTTP_ADDR | string | 127.0.0.1:0 | The bind address of the HTTP service.|
+| ACTIVITYLOG_HTTP_ADDR | string | 127.0.0.1:9195 | The bind address of the HTTP service.|
 | ACTIVITYLOG_HTTP_ROOT | string | / | Subdirectory that serves as the root for this HTTP service.|
 | OCIS_CORS_ALLOW_ORIGINS<br/>ACTIVITYLOG_CORS_ALLOW_ORIGINS | []string | [*] | A list of allowed CORS origins. See following chapter for more details: *Access-Control-Allow-Origin* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin. See the Environment Variable Types description for more details.|
 | OCIS_CORS_ALLOW_METHODS<br/>ACTIVITYLOG_CORS_ALLOW_METHODS | []string | [GET] | A list of allowed CORS methods. See following chapter for more details: *Access-Control-Request-Method* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method. See the Environment Variable Types description for more details.|

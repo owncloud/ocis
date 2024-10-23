@@ -12,12 +12,12 @@ log:
   color: false
   file: ""
 debug:
-  addr: 127.0.0.1:9210
+  addr: 127.0.0.1:9214
   token: ""
   pprof: false
   zpages: false
 http:
-  addr: 127.0.0.1:0
+  addr: 127.0.0.1:9210
   root: /
   cors:
     allow_origins:

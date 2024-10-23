@@ -12,12 +12,12 @@ log:
   color: false
   file: ""
 debug:
-  addr: 127.0.0.1:0
+  addr: 127.0.0.1:9269
   token: ""
   pprof: false
   zpages: false
 http:
-  addr: 127.0.0.1:0
+  addr: 127.0.0.1:9265
   root: /graph/v1.0
   cors:
     allow_origins:

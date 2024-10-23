@@ -14,7 +14,7 @@
 | EVENTHISTORY_DEBUG_TOKEN | string |  | Token to secure the metrics endpoint.|
 | EVENTHISTORY_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling.|
 | EVENTHISTORY_DEBUG_ZPAGES | bool | false | Enables zpages, which can be used for collecting and viewing in-memory traces.|
-| EVENTHISTORY_GRPC_ADDR | string | 127.0.0.1:0 | The bind address of the GRPC service.|
+| EVENTHISTORY_GRPC_ADDR | string | 127.0.0.1:9274 | The bind address of the GRPC service.|
 | OCIS_EVENTS_ENDPOINT<br/>EVENTHISTORY_EVENTS_ENDPOINT | string | 127.0.0.1:9233 | The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.|
 | OCIS_EVENTS_CLUSTER<br/>EVENTHISTORY_EVENTS_CLUSTER | string | ocis-cluster | The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system.|
 | OCIS_INSECURE<br/>EVENTHISTORY_EVENTS_TLS_INSECURE | bool | false | Whether to verify the server TLS certificates.|

@@ -6,7 +6,7 @@
 | OCIS_LOG_PRETTY<br/>SSE_LOG_PRETTY | bool | false | Activates pretty log output.|
 | OCIS_LOG_COLOR<br/>SSE_LOG_COLOR | bool | false | Activates colorized log output.|
 | OCIS_LOG_FILE<br/>SSE_LOG_FILE | string |  | The path to the log file. Activates logging to this file if set.|
-| SSE_DEBUG_ADDR | string | 127.0.0.1:9135 | Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.|
+| SSE_DEBUG_ADDR | string | 127.0.0.1:9139 | Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.|
 | SSE_DEBUG_TOKEN | string |  | Token to secure the metrics endpoint.|
 | SSE_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling.|
 | SSE_DEBUG_ZPAGES | bool | false | Enables zpages, which can be used for collecting and viewing in-memory traces.|
@@ -21,7 +21,7 @@
 | OCIS_EVENTS_ENABLE_TLS<br/>SSE_EVENTS_ENABLE_TLS | bool | false | Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services.|
 | OCIS_EVENTS_AUTH_USERNAME<br/>SSE_EVENTS_AUTH_USERNAME | string |  | The username to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.|
 | OCIS_EVENTS_AUTH_PASSWORD<br/>SSE_EVENTS_AUTH_PASSWORD | string |  | The password to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.|
-| SSE_HTTP_ADDR | string | 127.0.0.1:0 | The bind address of the HTTP service.|
+| SSE_HTTP_ADDR | string | 127.0.0.1:9135 | The bind address of the HTTP service.|
 | SSE_HTTP_ROOT | string | / | Subdirectory that serves as the root for this HTTP service.|
 | OCIS_CORS_ALLOW_ORIGINS<br/>SSE_CORS_ALLOW_ORIGINS | []string | [*] | A list of allowed CORS origins. See following chapter for more details: *Access-Control-Allow-Origin* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin. See the Environment Variable Types description for more details.|
 | OCIS_CORS_ALLOW_METHODS<br/>SSE_CORS_ALLOW_METHODS | []string | [GET] | A list of allowed CORS methods. See following chapter for more details: *Access-Control-Request-Method* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method. See the Environment Variable Types description for more details.|
