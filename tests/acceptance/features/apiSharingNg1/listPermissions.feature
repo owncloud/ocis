@@ -2307,3 +2307,112 @@ Feature: List a sharing permissions
           }
       }
       """
+
+
+  Scenario: user lists permissions of a folder in personal space
+    Given the administrator has enabled the permissions role "Space Editor Without Versions"
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Alice" has sent the following space share invitation:
+      | space           | new-space                     |
+      | sharee          | Brian                         |
+      | shareType       | user                          |
+      | permissionsRole | Space Editor Without Versions |
+    When user "Alice" lists the permissions of space "new-space" using root endpoint of the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "@libre.graph.permissions.roles.allowedValues"
+        ],
+        "properties": {
+          "@libre.graph.permissions.roles.allowedValues": {
+            "type": "array",
+            "minItems": 4,
+            "maxItems": 4,
+            "uniqueItems": true,
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "required": [
+                    "@libre.graph.weight",
+                    "description",
+                    "displayName",
+                    "id"
+                  ],
+                  "properties": {
+                    "@libre.graph.weight": {
+                      "type": "integer",
+                      "enum": [1]
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": [
+                    "@libre.graph.weight",
+                    "description",
+                    "displayName",
+                    "id"
+                  ],
+                  "properties": {
+                    "@libre.graph.weight": {
+                      "type": "integer",
+                      "enum": [2]
+                    },
+                    "description": {
+                      "type": "string",
+                      "enum": [
+                        "View, download, upload, edit, add and delete."
+                      ]
+                    },
+                    "displayName": {
+                      "type": "string",
+                      "enum": ["Can edit without versions"]
+                    },
+                    "id": {
+                      "type": "string",
+                      "enum": ["3284f2d5-0070-4ad8-ac40-c247f7c1fb27"]
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": [
+                    "@libre.graph.weight",
+                    "description",
+                    "displayName",
+                    "id"
+                  ],
+                  "properties": {
+                    "@libre.graph.weight": {
+                      "type": "integer",
+                      "enum": [3]
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": [
+                    "@libre.graph.weight",
+                    "description",
+                    "displayName",
+                    "id"
+                  ],
+                  "properties": {
+                    "@libre.graph.weight": {
+                      "type": "integer",
+                      "enum": [4]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+      """
