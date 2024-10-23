@@ -40,7 +40,7 @@ We also suggest using the last port in your extensions' range as a debug/metrics
 | 9154-9156  | [storage-shares]({{< ref "../storage-shares/_index.md" >}})                            |
 | 9157-9159  | [storage-users]({{< ref "../storage-users/_index.md" >}})                              |
 | 9160-9162  | [groups]({{< ref "../groups/_index.md" >}})                                            |
-| 9163       | [ocdav]({{< ref "../ocdav/_index.md" >}})                                              |
+| 9163,19163 | [ocdav]({{< ref "../ocdav/_index.md" >}})                                              |
 | 9164       | [groups]({{< ref "../groups/_index.md" >}})                                            |
 | 9165       | [app-provider]({{< ref "../app-provider/_index.md" >}})                                |
 | 9166-9169  | [auth-machine]({{< ref "../auth-machine/_index.md" >}})                                |
@@ -64,9 +64,9 @@ We also suggest using the last port in your extensions' range as a debug/metrics
 | 9250-9254  | [ocis server (runtime)](https://github.com/owncloud/ocis/tree/master/ocis/pkg/runtime) |
 | 9255-9259  | [postprocessing]({{< ref "../postprocessing/_index.md" >}})                            |
 | 9260-9264  | [clientlog]({{< ref "../clientlog/_index.md" >}})                                      |
-| 9265-9269  | [clientlog]({{< ref "../clientlog/_index.md" >}})                                                                                   |
+| 9265-9269  | [clientlog]({{< ref "../clientlog/_index.md" >}})                                      |
 | 9270-9274  | [eventhistory]({{< ref "../eventhistory/_index.md" >}})                                |
-| 9275-9279  | [webfinger]({{< ref "../webfinger/_index.md" >}}                                                                                   |
+| 9275-9279  | [webfinger]({{< ref "../webfinger/_index.md" >}})                                      |
 | 9280-9284  | [ocm]({{< ref "../ocm/_index.md" >}})                                                  |
 | 9285-9289  | FREE                                                                                   |
 | 9290-9294  | FREE                                                                                   |
