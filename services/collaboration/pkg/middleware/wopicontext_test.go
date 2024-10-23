@@ -47,7 +47,7 @@ var _ = Describe("Wopi Context Middleware", func() {
 		next := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusOK)
 		})
-		mw = middleware.WopiContextAuthMiddleware(cfg, next)
+		mw = middleware.WopiContextAuthMiddleware(cfg, nil, next)
 
 		tknMngr, err = rjwt.New(map[string]interface{}{
 			"secret":  cfg.TokenManager.JWTSecret,
@@ -110,7 +110,7 @@ var _ = Describe("Wopi Context Middleware", func() {
 				Path: ".",
 			},
 		}
-		wopiToken, ttl, err := middleware.GenerateWopiToken(wopiContext, cfg)
+		wopiToken, ttl, err := middleware.GenerateWopiToken(wopiContext, cfg, nil)
 		q := req.URL.Query()
 		q.Add("access_token", wopiToken)
 		q.Add("access_token_ttl", strconv.FormatInt(ttl, 10))
@@ -132,7 +132,7 @@ var _ = Describe("Wopi Context Middleware", func() {
 		// use wrong wopi secret when generating the wopi token
 		wopiToken, ttl, err := middleware.GenerateWopiToken(wopiContext, &config.Config{Wopi: config.Wopi{
 			Secret: "wrongSecret",
-		}})
+		}}, nil)
 		q := req.URL.Query()
 		q.Add("access_token", wopiToken)
 		q.Add("access_token_ttl", strconv.FormatInt(ttl, 10))
@@ -155,7 +155,7 @@ var _ = Describe("Wopi Context Middleware", func() {
 				Path:       ".",
 			},
 		}
-		wopiToken, ttl, err := middleware.GenerateWopiToken(wopiContext, cfg)
+		wopiToken, ttl, err := middleware.GenerateWopiToken(wopiContext, cfg, nil)
 		q := req.URL.Query()
 		q.Add("access_token", wopiToken)
 		q.Add("access_token_ttl", strconv.FormatInt(ttl, 10))
@@ -185,7 +185,7 @@ var _ = Describe("Wopi Context Middleware", func() {
 				},
 			},
 		}
-		wopiToken, ttl, err := middleware.GenerateWopiToken(wopiContext, cfg)
+		wopiToken, ttl, err := middleware.GenerateWopiToken(wopiContext, cfg, nil)
 		q := req.URL.Query()
 		q.Add("access_token", wopiToken)
 		q.Add("access_token_ttl", strconv.FormatInt(ttl, 10))
@@ -219,7 +219,7 @@ var _ = Describe("Wopi Context Middleware", func() {
 				},
 			},
 		}
-		wopiToken, ttl, err := middleware.GenerateWopiToken(wopiContext, cfg)
+		wopiToken, ttl, err := middleware.GenerateWopiToken(wopiContext, cfg, nil)
 		q := req.URL.Query()
 		q.Add("access_token", wopiToken)
 		q.Add("access_token_ttl", strconv.FormatInt(ttl, 10))
@@ -250,7 +250,7 @@ var _ = Describe("Wopi Context Middleware", func() {
 				Path: ".",
 			},
 		}
-		wopiToken, ttl, err := middleware.GenerateWopiToken(wopiContext, cfg)
+		wopiToken, ttl, err := middleware.GenerateWopiToken(wopiContext, cfg, nil)
 		q := req.URL.Query()
 		q.Add("access_token", wopiToken)
 		q.Add("access_token_ttl", strconv.FormatInt(ttl, 10))
@@ -277,7 +277,7 @@ var _ = Describe("Wopi Context Middleware", func() {
 				Path:       ".",
 			},
 		}
-		wopiToken, ttl, err := middleware.GenerateWopiToken(wopiContext, cfg)
+		wopiToken, ttl, err := middleware.GenerateWopiToken(wopiContext, cfg, nil)
 		q := req.URL.Query()
 		q.Add("access_token", wopiToken)
 		q.Add("access_token_ttl", strconv.FormatInt(ttl, 10))
