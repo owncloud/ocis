@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-10-23-14-39-06]
+[#deprecation-note-2024-10-23-14-52-09]
 [caption=]
 .Deprecation notes for the proxy service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -720,7 +720,7 @@ Path/File for the root CA certificate used to validate the server’s TLS certif
 a|`PROXY_ENABLE_APP_AUTH` +
 
 a| [subs=-attributes]
-++next ++
+++7.0.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -754,7 +754,7 @@ a|`OCIS_EVENTS_ENDPOINT` +
 `PROXY_EVENTS_ENDPOINT` +
 
 a| [subs=-attributes]
-++next ++
+++7.0.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -766,7 +766,7 @@ a|`OCIS_EVENTS_CLUSTER` +
 `PROXY_EVENTS_CLUSTER` +
 
 a| [subs=-attributes]
-++next ++
+++7.0.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -778,7 +778,7 @@ a|`OCIS_INSECURE` +
 `PROXY_EVENTS_TLS_INSECURE` +
 
 a| [subs=-attributes]
-++next ++
+++7.0.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -790,7 +790,7 @@ a|`OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
 `PROXY_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
 
 a| [subs=-attributes]
-++next ++
+++7.0.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -802,7 +802,7 @@ a|`OCIS_EVENTS_ENABLE_TLS` +
 `PROXY_EVENTS_ENABLE_TLS` +
 
 a| [subs=-attributes]
-++next ++
+++7.0.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -814,7 +814,7 @@ a|`OCIS_EVENTS_AUTH_USERNAME` +
 `PROXY_EVENTS_AUTH_USERNAME` +
 
 a| [subs=-attributes]
-++next ++
+++7.0.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -826,7 +826,7 @@ a|`OCIS_EVENTS_AUTH_PASSWORD` +
 `PROXY_EVENTS_AUTH_PASSWORD` +
 
 a| [subs=-attributes]
-++next ++
+++7.0.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]

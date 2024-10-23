@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-10-23-14-39-07]
+[#deprecation-note-2024-10-23-14-52-09]
 [caption=]
 .Deprecation notes for the gateway service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -487,7 +487,7 @@ The public facing URL of the oCIS frontend.
 a|`GATEWAY_USERS_ENDPOINT` +
 
 a| [subs=-attributes]
-++next ++
+++7.0.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -498,7 +498,7 @@ The endpoint of the users service. Can take a service name or a gRPC URI with th
 a|`GATEWAY_GROUPS_ENDPOINT` +
 
 a| [subs=-attributes]
-++next ++
+++7.0.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -509,7 +509,7 @@ The endpoint of the groups service. Can take a service name or a gRPC URI with t
 a|`GATEWAY_PERMISSIONS_ENDPOINT` +
 
 a| [subs=-attributes]
-++next ++
+++7.0.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -520,7 +520,7 @@ The endpoint of the permissions service. Can take a service name or a gRPC URI w
 a|`GATEWAY_SHARING_ENDPOINT` +
 
 a| [subs=-attributes]
-++next ++
+++7.0.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -531,7 +531,7 @@ The endpoint of the shares service. Can take a service name or a gRPC URI with t
 a|`GATEWAY_AUTH_APP_ENDPOINT` +
 
 a| [subs=-attributes]
-++next ++
+++7.0.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -542,7 +542,7 @@ The endpoint of the auth-app service. Can take a service name or a gRPC URI with
 a|`GATEWAY_AUTH_BASIC_ENDPOINT` +
 
 a| [subs=-attributes]
-++next ++
+++7.0.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -553,7 +553,7 @@ The endpoint of the auth-basic service. Can take a service name or a gRPC URI wi
 a|`GATEWAY_AUTH_BEARER_ENDPOINT` +
 
 a| [subs=-attributes]
-++next ++
+++7.0.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -564,7 +564,7 @@ The endpoint of the auth-bearer service. Can take a service name or a gRPC URI w
 a|`GATEWAY_AUTH_MACHINE_ENDPOINT` +
 
 a| [subs=-attributes]
-++next ++
+++7.0.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -575,7 +575,7 @@ The endpoint of the auth-machine service. Can take a service name or a gRPC URI 
 a|`GATEWAY_AUTH_SERVICE_ENDPOINT` +
 
 a| [subs=-attributes]
-++next ++
+++7.0.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -586,7 +586,7 @@ The endpoint of the auth-service service. Can take a service name or a gRPC URI 
 a|`GATEWAY_STORAGE_PUBLIC_LINK_ENDPOINT` +
 
 a| [subs=-attributes]
-++next ++
+++7.0.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -597,7 +597,7 @@ The endpoint of the storage-publiclink service. Can take a service name or a gRP
 a|`GATEWAY_STORAGE_USERS_ENDPOINT` +
 
 a| [subs=-attributes]
-++next ++
+++7.0.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -608,7 +608,7 @@ The endpoint of the storage-users service. Can take a service name or a gRPC URI
 a|`GATEWAY_STORAGE_SHARES_ENDPOINT` +
 
 a| [subs=-attributes]
-++next ++
+++7.0.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -619,7 +619,7 @@ The endpoint of the storage-shares service. Can take a service name or a gRPC UR
 a|`GATEWAY_APP_REGISTRY_ENDPOINT` +
 
 a| [subs=-attributes]
-++next ++
+++7.0.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -630,7 +630,7 @@ The endpoint of the app-registry service. Can take a service name or a gRPC URI 
 a|`GATEWAY_OCM_ENDPOINT` +
 
 a| [subs=-attributes]
-++next ++
+++7.0.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]

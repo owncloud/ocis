@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-10-23-14-39-07]
+[#deprecation-note-2024-10-23-14-52-09]
 [caption=]
 .Deprecation notes for the activitylog service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -460,7 +460,7 @@ a|`OCIS_TRANSLATION_PATH` +
 `ACTIVITYLOG_TRANSLATION_PATH` +
 
 a| [subs=-attributes]
-++next ++
+++7.0.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -471,7 +471,7 @@ a| [subs=-attributes]
 a|`OCIS_DEFAULT_LANGUAGE` +
 
 a| [subs=-attributes]
-++next ++
+++7.0.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]

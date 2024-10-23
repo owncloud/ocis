@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-10-23-14-39-06]
+[#deprecation-note-2024-10-23-14-52-09]
 [caption=]
 .Deprecation notes for the auth-app service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -35,7 +35,7 @@ a|`OCIS_TRACING_ENABLED` +
 `AUTH_APP_TRACING_ENABLED` +
 
 a| [subs=-attributes]
-++next ++
+++7.0.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -47,7 +47,7 @@ a|`OCIS_TRACING_TYPE` +
 `AUTH_APP_TRACING_TYPE` +
 
 a| [subs=-attributes]
-++next ++
+++7.0.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -59,7 +59,7 @@ a|`OCIS_TRACING_ENDPOINT` +
 `AUTH_APP_TRACING_ENDPOINT` +
 
 a| [subs=-attributes]
-++next ++
+++7.0.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -71,7 +71,7 @@ a|`OCIS_TRACING_COLLECTOR` +
 `AUTH_APP_TRACING_COLLECTOR` +
 
 a| [subs=-attributes]
-++next ++
+++7.0.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -83,7 +83,7 @@ a|`OCIS_LOG_LEVEL` +
 `AUTH_APP_LOG_LEVEL` +
 
 a| [subs=-attributes]
-++next ++
+++7.0.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -95,7 +95,7 @@ a|`OCIS_LOG_PRETTY` +
 `AUTH_APP_LOG_PRETTY` +
 
 a| [subs=-attributes]
-++next ++
+++7.0.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -107,7 +107,7 @@ a|`OCIS_LOG_COLOR` +
 `AUTH_APP_LOG_COLOR` +
 
 a| [subs=-attributes]
-++next ++
+++7.0.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -119,7 +119,7 @@ a|`OCIS_LOG_FILE` +
 `AUTH_APP_LOG_FILE` +
 
 a| [subs=-attributes]
-++next ++
+++7.0.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -130,7 +130,7 @@ The path to the log file. Activates logging to this file if set.
 a|`AUTH_APP_DEBUG_ADDR` +
 
 a| [subs=-attributes]
-++next ++
+++7.0.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -141,7 +141,7 @@ Bind address of the debug server, where metrics, health, config and debug endpoi
 a|`AUTH_APP_DEBUG_TOKEN` +
 
 a| [subs=-attributes]
-++next ++
+++7.0.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -152,7 +152,7 @@ Token to secure the metrics endpoint.
 a|`AUTH_APP_DEBUG_PPROF` +
 
 a| [subs=-attributes]
-++next ++
+++7.0.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -163,7 +163,7 @@ Enables pprof, which can be used for profiling.
 a|`AUTH_APP_DEBUG_ZPAGES` +
 
 a| [subs=-attributes]
-++next ++
+++7.0.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -174,7 +174,7 @@ Enables zpages, which can  be used for collecting and viewing traces in-memory.
 a|`AUTH_APP_GRPC_ADDR` +
 
 a| [subs=-attributes]
-++next ++
+++7.0.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -186,7 +186,7 @@ a|`OCIS_GRPC_PROTOCOL` +
 `AUTH_APP_GRPC_PROTOCOL` +
 
 a| [subs=-attributes]
-++next ++
+++7.0.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -301,7 +301,7 @@ a|`OCIS_JWT_SECRET` +
 `AUTH_APP_JWT_SECRET` +
 
 a| [subs=-attributes]
-++next ++
+++7.0.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -345,7 +345,7 @@ Path/File name for the root CA certificate (in PEM format) used to validate TLS 
 a|`AUTH_APP_SKIP_USER_GROUPS_IN_TOKEN` +
 
 a| [subs=-attributes]
-++next ++
+++7.0.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -357,7 +357,7 @@ a|`OCIS_MACHINE_AUTH_API_KEY` +
 `AUTH_APP_MACHINE_AUTH_API_KEY` +
 
 a| [subs=-attributes]
-++next ++
+++7.0.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -368,7 +368,7 @@ The machine auth API key used to validate internal requests necessary to access 
 a|`AUTH_APP_ENABLE_IMPERSONATION` +
 
 a| [subs=-attributes]
-++next ++
+++7.0.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]

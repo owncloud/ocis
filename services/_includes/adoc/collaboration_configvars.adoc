@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-10-23-14-39-07]
+[#deprecation-note-2024-10-23-14-52-09]
 [caption=]
 .Deprecation notes for the collaboration service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -122,7 +122,7 @@ Duration for the proof keys to be cached in memory, using time.ParseDuration for
 a|`COLLABORATION_APP_LICENSE_CHECK_ENABLE` +
 
 a| [subs=-attributes]
-++next ++
+++7.0.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -157,7 +157,7 @@ a|`OCIS_GRPC_PROTOCOL` +
 `COLLABORATION_GRPC_PROTOCOL` +
 
 a| [subs=-attributes]
-++next ++
+++7.0.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -235,7 +235,7 @@ a|`COLLABORATION_WOPI_DISABLE_CHAT` +
 `OCIS_WOPI_DISABLE_CHAT` +
 
 a| [subs=-attributes]
-++next ++
+++7.0.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -246,7 +246,7 @@ Disable chat in the office web frontend. This feature applies to OnlyOffice and 
 a|`COLLABORATION_WOPI_PROXY_URL` +
 
 a| [subs=-attributes]
-++next ++
+++7.0.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -257,7 +257,7 @@ The URL to the ownCloud Office365 WOPI proxy. Optional. To use this feature, you
 a|`COLLABORATION_WOPI_PROXY_SECRET` +
 
 a| [subs=-attributes]
-++next ++
+++7.0.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]

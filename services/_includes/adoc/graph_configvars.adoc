@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-10-23-14-39-07]
+[#deprecation-note-2024-10-23-14-52-09]
 [caption=]
 .Deprecation notes for the graph service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -599,7 +599,7 @@ a|`OCIS_TRANSLATION_PATH` +
 `GRAPH_TRANSLATION_PATH` +
 
 a| [subs=-attributes]
-++next ++
+++7.0.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -786,7 +786,7 @@ LDAP Attribute to use for the email address of users.
 a|`OCIS_LDAP_USER_SCHEMA_DISPLAYNAME` +
 `LDAP_USER_SCHEMA_DISPLAY_NAME` +
 `GRAPH_LDAP_USER_DISPLAYNAME_ATTRIBUTE` +
-xref:deprecation-note-2024-10-23-14-39-07[Deprecation Note]
+xref:deprecation-note-2024-10-23-14-52-09[Deprecation Note]
 a| [subs=-attributes]
 ++pre5.0 ++
 a| [subs=-attributes]
@@ -1185,7 +1185,7 @@ The password to authenticate with the events broker. The events broker is the oc
 a|`GRAPH_AVAILABLE_ROLES` +
 
 a| [subs=-attributes]
-++next ++
+++7.0.0 ++
 a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]

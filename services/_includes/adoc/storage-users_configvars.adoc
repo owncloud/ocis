@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-10-23-14-39-06]
+[#deprecation-note-2024-10-23-14-52-09]
 [caption=]
 .Deprecation notes for the storage-users service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -34,7 +34,7 @@ endif::[]
 a|`STORAGE_USERS_SERVICE_NAME` +
 
 a| [subs=-attributes]
-++next ++
+++7.0.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -548,7 +548,7 @@ Set a global max quota for spaces in bytes. A value of 0 equals unlimited. If no
 a|`OCIS_DISABLE_VERSIONING` +
 
 a| [subs=-attributes]
-++next ++
+++7.0.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -825,7 +825,7 @@ Maximum number of concurrent go-routines. Higher values can potentially get work
 a|`OCIS_DISABLE_VERSIONING` +
 
 a| [subs=-attributes]
-++next ++
+++7.0.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
