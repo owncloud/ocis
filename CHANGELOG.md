@@ -60,6 +60,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Disable download activity: [#10367](https://github.com/owncloud/ocis/pull/10367)
 * Bugfix - Fix Activitylog issues: [#10376](https://github.com/owncloud/ocis/pull/10376)
 * Bugfix - Security fixes: [#10376](https://github.com/owncloud/ocis/pull/10376)
+* Bugfix - Make antivirus workers configurable: [#10383](https://github.com/owncloud/ocis/pull/10383)
 * Bugfix - Increase event processing workers: [#10385](https://github.com/owncloud/ocis/pull/10385)
 
 ## Details
@@ -92,6 +93,12 @@ The following sections list the changes for unreleased.
    We polished some of the sonarcloud issues.
 
    https://github.com/owncloud/ocis/pull/10376
+
+* Bugfix - Make antivirus workers configurable: [#10383](https://github.com/owncloud/ocis/pull/10383)
+
+   We made the number of go routines that pull events from the queue configurable.
+
+   https://github.com/owncloud/ocis/pull/10383
 
 * Bugfix - Increase event processing workers: [#10385](https://github.com/owncloud/ocis/pull/10385)
 
