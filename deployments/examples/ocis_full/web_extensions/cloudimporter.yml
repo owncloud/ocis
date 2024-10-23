@@ -8,7 +8,19 @@ services:
   ocis:
     volumes:
       # the cloud importer needs to be enabled in the web.yaml
-      - ./config/ocis/web.yaml:/etc/ocis/web.yaml
+      - ./config/ocis/apps.yaml:/etc/ocis/apps.yaml
+    depends_on:
+      importer-init:
+        condition: service_completed_successfully
+
+  importer-init:
+    image: owncloud/web-extensions:importer-0.1.0
+    user: root
+    volumes:
+      - ocis-apps:/apps
+    entrypoint:
+      - /bin/sh
+    command: [ "-c", "cp -R /var/lib/nginx/html/importer/ /apps" ]
 
   companion:
     image: ${COMPANION_IMAGE:-owncloud/uppy-companion:3.12.13-owncloud}
