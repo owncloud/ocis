@@ -17,7 +17,7 @@ debug:
   pprof: false
   zpages: false
 http:
-  addr: 127.0.0.1:19163
+  addr: 127.0.0.1:9350
   protocol: tcp
   prefix: ""
   cors:
