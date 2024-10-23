@@ -4,10 +4,10 @@ import "github.com/owncloud/ocis/v2/ocis-pkg/tracing"
 
 // Tracing defines the tracing configuration.
 type Tracing struct {
-	Enabled   bool   `yaml:"enabled" env:"OCIS_TRACING_ENABLED;AUTH_APP_TRACING_ENABLED" desc:"Activates tracing." introductionVersion:"%%NEXT%%"`
-	Type      string `yaml:"type" env:"OCIS_TRACING_TYPE;AUTH_APP_TRACING_TYPE" desc:"The type of tracing. Defaults to '', which is the same as 'jaeger'. Allowed tracing types are 'jaeger' and '' as of now." introductionVersion:"%%NEXT%%"`
-	Endpoint  string `yaml:"endpoint" env:"OCIS_TRACING_ENDPOINT;AUTH_APP_TRACING_ENDPOINT" desc:"The endpoint of the tracing agent." introductionVersion:"%%NEXT%%"`
-	Collector string `yaml:"collector" env:"OCIS_TRACING_COLLECTOR;AUTH_APP_TRACING_COLLECTOR" desc:"The HTTP endpoint for sending spans directly to a collector, i.e. http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset." introductionVersion:"%%NEXT%%"`
+	Enabled   bool   `yaml:"enabled" env:"OCIS_TRACING_ENABLED;AUTH_APP_TRACING_ENABLED" desc:"Activates tracing." introductionVersion:"7.0.0"`
+	Type      string `yaml:"type" env:"OCIS_TRACING_TYPE;AUTH_APP_TRACING_TYPE" desc:"The type of tracing. Defaults to '', which is the same as 'jaeger'. Allowed tracing types are 'jaeger' and '' as of now." introductionVersion:"7.0.0"`
+	Endpoint  string `yaml:"endpoint" env:"OCIS_TRACING_ENDPOINT;AUTH_APP_TRACING_ENDPOINT" desc:"The endpoint of the tracing agent." introductionVersion:"7.0.0"`
+	Collector string `yaml:"collector" env:"OCIS_TRACING_COLLECTOR;AUTH_APP_TRACING_COLLECTOR" desc:"The HTTP endpoint for sending spans directly to a collector, i.e. http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset." introductionVersion:"7.0.0"`
 }
 
 // Convert Tracing to the tracing package's Config struct.
