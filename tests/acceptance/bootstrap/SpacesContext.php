@@ -3822,12 +3822,50 @@ class SpacesContext implements Context {
 	}
 
 	/**
+	 * @param SimpleXMLElement $xmlResponse
+	 * @param array $xpaths
+	 * @param string $message
+	 *
+	 * @return string
+	 */
+	public function buildXpathErrorMessage(SimpleXMLElement $xmlResponse, array $xpaths, string $message): string {
+		return "Using xpaths:\n\t- " . \join("\n\t- ", $xpaths)
+			. "\n"
+			. $message
+			. "\n\t"
+			. "'" . \trim($xmlResponse->asXML()) . "'";
+	}
+
+	/**
+	 * @param SimpleXMLElement $xmlResponse
+	 * @param string $siblingXpath
+	 * @param string $siblingToFind
+	 *
+	 * @return string
+	 * @throws Exception
+	 */
+	public function getXpathSiblingValue(SimpleXMLElement $xmlResponse, string $siblingXpath, string $siblingToFind): string {
+		$xpaths[] = $siblingXpath . "/preceding-sibling::$siblingToFind";
+		$xpaths[] = $siblingXpath . "/following-sibling::$siblingToFind";
+
+		foreach ($xpaths as $key => $xpath) {
+			$foundSibling = $xmlResponse->xpath($xpath);
+			if (\count($foundSibling)) {
+				break;
+			}
+		}
+		$errorMessage = $this->buildXpathErrorMessage($xmlResponse, $xpaths, "Could not find sibling '<$siblingToFind>' element in the XML response");
+		Assert::assertNotEmpty($foundSibling, $errorMessage);
+		return \preg_quote($foundSibling[0]->__toString(), "/");
+	}
+
+	/**
 	 * @param string $resource	// can be resource name, space id or file id
 	 * @param array $properties	// ["key" => "value"]
 	 *
 	 * @return void
 	 * @throws GuzzleException
-	 * @throws JsonException
+	 * @throws Exception
 	 */
 	public function theXMLResponseShouldContain(string $resource, array $properties): void {
 		$xmlResponse = $this->featureContext->getResponseXml();
@@ -3878,17 +3916,39 @@ class SpacesContext implements Context {
 				$xpaths[] = $xpath;
 			}
 
+			Assert::assertCount(
+				1,
+				$foundXmlItem,
+				$this->buildXpathErrorMessage($xmlResponse, $xpaths, "Found multiple elements for '<$itemToFind>' in the XML response")
+			);
 			Assert::assertNotEmpty(
 				$foundXmlItem,
-				// all these for the sake of a nice error message
-				"Using xpaths:\n\t- " . \join("\n\t- ", $xpaths)
-				. "\n"
-				. "Could not find '<$itemToFind>' element in the XML response\n\t"
-				. "'" . \trim($xmlResponse->asXML()) . "'"
+				$this->buildXpathErrorMessage($xmlResponse, $xpaths, "Could not find '<$itemToFind>' element in the XML response")
 			);
 
 			$actualValue = $foundXmlItem[0]->__toString();
-			$expectedValue = $this->featureContext->substituteInLineCodes($property['value']);
+			$expectedValue = $property['value'];
+			\preg_match_all("/%self::[a-z0-9-:]+?%/", $expectedValue, $selfMatches);
+			$substituteFunctions = [];
+			if (!empty($selfMatches[0])) {
+				$siblingXpath = $xpaths[\count($xpaths) - 1];
+				foreach ($selfMatches[0] as $match) {
+					$siblingToFind = \ltrim($match, "/%self::/");
+					$siblingToFind = \rtrim($siblingToFind, "/%/");
+					$substituteFunctions[] = [
+						"code" => $match,
+						"function" =>
+							[$this, "getXpathSiblingValue"],
+						"parameter" => [$xmlResponse, $siblingXpath, $siblingToFind]
+					];
+				}
+			}
+			$expectedValue = $this->featureContext->substituteInLineCodes(
+				$property['value'],
+				null,
+				[],
+				$substituteFunctions,
+			);
 
 			switch ($itemToFind) {
 				case "oc:fileid":
