@@ -40,7 +40,7 @@ func DefaultConfig() *config.Config {
 			TTL:      336 * time.Hour,
 		},
 		GRPC: config.GRPCConfig{
-			Addr:      "127.0.0.1:0",
+			Addr:      "127.0.0.1:9274",
 			Namespace: "com.owncloud.api",
 		},
 	}
