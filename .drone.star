@@ -179,7 +179,6 @@ config = {
             "extraServerEnvironment": {
                 "GATEWAY_GRPC_ADDR": "0.0.0.0:9142",
                 "COLLABORATION_DEBUG_ADDR": "0.0.0.0:9304",
-                "OCIS_ADD_RUN_SERVICES": "collaboration",
             },
         },
         "cli": {
@@ -2971,6 +2970,7 @@ def wopiCollaborationService(name):
         "COLLABORATION_CS3API_DATAGATEWAY_INSECURE": "true",
         "OCIS_JWT_SECRET": "some-ocis-jwt-secret",
         "COLLABORATION_WOPI_SECRET": "some-wopi-secret",
+        "OCIS_ADD_RUN_SERVICES": "collaboration",
     }
 
     if name == "collabora":
