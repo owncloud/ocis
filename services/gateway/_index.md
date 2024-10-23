@@ -1,6 +1,6 @@
 ---
 title: Gateway
-date: 2024-10-23T15:05:23.989879148Z
+date: 2024-10-23T15:16:59.293237036Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/gateway
@@ -51,11 +51,19 @@ Store specific notes:
 ## Service Endpoints
 
 **IMPORTANT**\
-This functionality is currently experimental.
+This functionality is currently highly experimental and intended for testing only! There are known bugs that need to be sorted out like not removing sockets when a service ends.
 
 The gateway acts as a proxy for other CS3 services. As such it has to forward requests to a lot of services and needs to establish connections by looking up the IP address using the service registry. Instead of using the service registry each endpoint can also be configured to use the grpc `dns://` or `kubernetes://` URLs, which might be useful when running in kubernetes.
 
 For a local single node deployment you might want to use `unix:` sockets as shown below. Using unix sockets will reduce the amount of service lookups and omit the TCP stack. For now, this is experimental and the services do not delete the socket on shutdown. PRs welcome.
+
+The scheme for this setup is the following. Note that there is, except storage, always a service and a gateway envvar triple:
+
+| **envvar** | **default** | **alternative** |
+|------|------|------|
+| OCIS_GRPC_PROTOCOL or <br> `<service>`_GRPC_PROTOCOL | tcp | unix |
+| `<service>`_GRPC_ADDR | 127.0.0.1:`<port>` | /var/run/ocis/`<service>`.sock |
+| GATEWAY_`<service>`_ENDPOINT | com.owncloud.api.`<service>` | unix:/var/run/ocis/`<service>`.sock <br> dns: ... <br> kubernetes: ... |
 
 ```console
 USERS_GRPC_PROTOCOL=unix"
@@ -104,11 +112,11 @@ OCM_GRPC_PROTOCOL=unix"
 OCM_GRPC_ADDR=/var/run/ocis/ocm.sock"
 GATEWAY_OCM_ENDPOINT=unix:/var/run/ocis/ocm.sock"
 
-// storage system
+// storage related
+SETTINGS_STORAGE_GATEWAY_GRPC_ADDR="unix:/var/run/ocis/storage-system.sock"
+SETTINGS_STORAGE_GRPC_ADDR="unix:/var/run/ocis/storage-system.sock"
 STORAGE_SYSTEM_GRPC_PROTOCOL="unix"
 STORAGE_SYSTEM_GRPC_ADDR="/var/run/ocis/storage-system.sock"
-STORAGE_GATEWAY_GRPC_ADDR="unix:/var/run/ocis/storage-system.sock"
-STORAGE_GRPC_ADDR="unix:/var/run/ocis/storage-system.sock"
 SHARING_USER_CS3_PROVIDER_ADDR="unix:/var/run/ocis/storage-system.sock"
 SHARING_USER_JSONCS3_PROVIDER_ADDR="unix:/var/run/ocis/storage-system.sock"
 SHARING_PUBLIC_CS3_PROVIDER_ADDR="unix:/var/run/ocis/storage-system.sock"
