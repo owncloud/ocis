@@ -2040,6 +2040,60 @@ class SpacesContext implements Context {
 	}
 
 	/**
+	 * @Given /^user "([^"]*)" has (copied|moved|renamed) file "([^"]*)" into "([^"]*)" inside space "([^"]*)" using file-id "([^"]*)"$/
+	 *
+	 * @param string $user
+	 * @param string $actionType
+	 * @param string $sourceFile
+	 * @param string $destinationFile
+	 * @param string $spaceName
+	 * @param string $fileId
+	 *
+	 * @throws GuzzleException
+	 * @return void
+	 */
+	public function userHasCopiedOrMovedFileInsideSpaceUsingFileId(
+		string $user,
+		string $actionType,
+		string $sourceFile,
+		string $destinationFile,
+		string $spaceName,
+		string $fileId
+	): void {
+		// split the source when there are sub-folders
+		$sourceFile = \trim($sourceFile, "/");
+		$sourceFile = \explode("/", $sourceFile);
+		$sourceFile = \end($sourceFile);
+		$destinationFile = \trim($destinationFile, "/");
+		if ($actionType === 'copied' || $actionType === 'moved') {
+			$fileDestination = $this->escapePath($destinationFile) . '/' . $this->escapePath($sourceFile);
+		} else {
+			$fileDestination = $destinationFile;
+		}
+
+		$baseUrl = $this->featureContext->getBaseUrl();
+		$sourceDavPath = WebdavHelper::getDavPath($this->featureContext->getDavPathVersion());
+		if ($spaceName === 'Shares') {
+			$sharesPath = $this->featureContext->getSharesMountPath($user, $fileDestination);
+			$davPath = WebDavHelper::getDavPath($this->featureContext->getDavPathVersion());
+			$headers['Destination'] = "$baseUrl/$davPath/$sharesPath";
+		} else {
+			$headers['Destination'] = $this->destinationHeaderValueWithSpaceName($user, $fileDestination, $spaceName, $fileId);
+		}
+		$fullUrl = "$baseUrl/$sourceDavPath/$fileId";
+		if ($actionType === 'copied') {
+			$response = $this->copyFilesAndFoldersRequest($user, $fullUrl, $headers);
+		} else {
+			$response = $this->moveFilesAndFoldersRequest($user, $fullUrl, $headers);
+		}
+		Assert::assertEquals(
+			201,
+			$response->getStatusCode(),
+			"Expected response status code should be 201"
+		);
+	}
+
+	/**
 	 * @When /^user "([^"]*)" tries to move (?:file|folder) "([^"]*)" of space "([^"]*)" to (space|folder) "([^"]*)" using its id in destination path$/
 	 * @When /^user "([^"]*)" moves (?:file|folder) "([^"]*)" of space "([^"]*)" to (folder) "([^"]*)" using its id in destination path$/
 	 *
