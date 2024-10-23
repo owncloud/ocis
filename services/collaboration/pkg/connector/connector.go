@@ -112,12 +112,14 @@ func NewResponseSuccessBodyName(name string) *ConnectorResponse {
 // contain "Name" and "Url" keys with their respective suplied values
 //
 // This is used in the `PutRelativeFile` methods (both suggested and relative).
-func NewResponseSuccessBodyNameUrl(name, url string) *ConnectorResponse {
+func NewResponseSuccessBodyNameUrl(name, url string, hostEditURL string, hostViewURL string) *ConnectorResponse {
 	return &ConnectorResponse{
 		Status: 200,
 		Body: map[string]interface{}{
-			"Name": name,
-			"Url":  url,
+			"Name":        name,
+			"Url":         url,
+			"HostEditUrl": hostEditURL,
+			"HostViewUrl": hostViewURL,
 		},
 	}
 }

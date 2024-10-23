@@ -713,9 +713,9 @@ func (f *FileConnector) PutRelativeFileSuggested(ctx context.Context, ccs Conten
 			return NewResponse(500), nil
 		}
 	}
-
+	var newInfo *providerv1beta1.ResourceInfo
 	// adjust the wopi file reference to use only the resource id without path
-	if err := f.adjustWopiReference(ctx, &wopiContext, newLogger); err != nil {
+	if newInfo, err = f.adjustWopiReference(ctx, &wopiContext, newLogger); err != nil {
 		return nil, err
 	}
 
@@ -729,7 +729,16 @@ func (f *FileConnector) PutRelativeFileSuggested(ctx context.Context, ccs Conten
 		Str("FinalReference", wopiContext.FileReference.String()).
 		Msg("PutRelativeFileSuggested: success")
 
-	return NewResponseSuccessBodyNameUrl(finalTarget, wopiSrcURL.String()), nil
+	webURL, err := url.Parse(f.cfg.Commons.OcisURL)
+	if err != nil {
+		return nil, err
+	}
+	return NewResponseSuccessBodyNameUrl(
+		finalTarget,
+		wopiSrcURL.String(),
+		createHostUrl("write", webURL, strings.ToLower(f.cfg.App.Name), newInfo),
+		createHostUrl("view", webURL, strings.ToLower(f.cfg.App.Name), newInfo),
+	), nil
 }
 
 // PutRelativeFileRelative upload a file using the provided target name
@@ -811,10 +820,11 @@ func (f *FileConnector) PutRelativeFileRelative(ctx context.Context, ccs Content
 		lockID = putResponse.Headers[HeaderWopiLock]
 	}
 
+	var newInfo *providerv1beta1.ResourceInfo
 	switch putResponse.Status {
 	case 200: // success case, so don't do anything
 	case 409:
-		if err := f.adjustWopiReference(ctx, &wopiContext, newLogger); err != nil {
+		if newInfo, err = f.adjustWopiReference(ctx, &wopiContext, newLogger); err != nil {
 			return nil, err
 		}
 		// if conflict generate a different name and retry.
@@ -855,7 +865,7 @@ func (f *FileConnector) PutRelativeFileRelative(ctx context.Context, ccs Content
 		return nil, NewConnectorError(putResponse.Status, "put file failed with unhandled status")
 	}
 
-	if err := f.adjustWopiReference(ctx, &wopiContext, newLogger); err != nil {
+	if newInfo, err = f.adjustWopiReference(ctx, &wopiContext, newLogger); err != nil {
 		return nil, err
 	}
 
@@ -867,7 +877,17 @@ func (f *FileConnector) PutRelativeFileRelative(ctx context.Context, ccs Content
 
 	newLogger.Debug().Msg("PutRelativeFileRelative: success")
 
-	return NewResponseSuccessBodyNameUrl(target, wopiSrcURL.String()), nil
+	webURL, err := url.Parse(f.cfg.Commons.OcisURL)
+	if err != nil {
+		return nil, err
+	}
+
+	return NewResponseSuccessBodyNameUrl(
+		target,
+		wopiSrcURL.String(),
+		createHostUrl("write", webURL, strings.ToLower(f.cfg.App.Name), newInfo),
+		createHostUrl("view", webURL, strings.ToLower(f.cfg.App.Name), newInfo),
+	), nil
 }
 
 // DeleteFile will delete the requested file
@@ -1413,10 +1433,10 @@ func (f *FileConnector) generateWOPISrc(wopiContext middleware.WopiContext, logg
 	return wopiSrcURL, nil
 }
 
-func (f *FileConnector) adjustWopiReference(ctx context.Context, wopiContext *middleware.WopiContext, logger zerolog.Logger) error {
+func (f *FileConnector) adjustWopiReference(ctx context.Context, wopiContext *middleware.WopiContext, logger zerolog.Logger) (*providerv1beta1.ResourceInfo, error) {
 	gwc, err := f.gws.Next()
 	if err != nil {
-		return err
+		return nil, err
 	}
 	// using resourceid + path won't do for WOPI, we need just the resource if of the new file
 	// the wopicontext has resourceid + path, which is good enough for the stat request
@@ -1425,7 +1445,7 @@ func (f *FileConnector) adjustWopiReference(ctx context.Context, wopiContext *mi
 	})
 	if err != nil {
 		logger.Error().Err(err).Msg("stat failed")
-		return err
+		return nil, err
 	}
 
 	if newStatRes.GetStatus().GetCode() != rpcv1beta1.Code_CODE_OK {
@@ -1433,12 +1453,12 @@ func (f *FileConnector) adjustWopiReference(ctx context.Context, wopiContext *mi
 			Str("StatusCode", newStatRes.GetStatus().GetCode().String()).
 			Str("StatusMsg", newStatRes.GetStatus().GetMessage()).
 			Msg("stat failed with unexpected status")
-		return NewConnectorError(500, newStatRes.GetStatus().GetCode().String()+" "+newStatRes.GetStatus().GetMessage())
+		return nil, NewConnectorError(500, newStatRes.GetStatus().GetCode().String()+" "+newStatRes.GetStatus().GetMessage())
 	}
 	// adjust the reference in the wopi context to use only the resourceid without the path
 	wopiContext.FileReference = &providerv1beta1.Reference{
 		ResourceId: newStatRes.GetInfo().GetId(),
 	}
 
-	return nil
+	return newStatRes.GetInfo(), nil
 }
