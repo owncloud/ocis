@@ -92,16 +92,14 @@ OCM_GRPC_ADDR=/var/run/ocis/ocm.sock"
 GATEWAY_OCM_ENDPOINT=unix:/var/run/ocis/ocm.sock"
 
 // storage related
+SETTINGS_STORAGE_GATEWAY_GRPC_ADDR="unix:/var/run/ocis/storage-system.sock"
+SETTINGS_STORAGE_GRPC_ADDR="unix:/var/run/ocis/storage-system.sock"
 STORAGE_SYSTEM_GRPC_PROTOCOL="unix"
 STORAGE_SYSTEM_GRPC_ADDR="/var/run/ocis/storage-system.sock"
 SHARING_USER_CS3_PROVIDER_ADDR="unix:/var/run/ocis/storage-system.sock"
 SHARING_USER_JSONCS3_PROVIDER_ADDR="unix:/var/run/ocis/storage-system.sock"
 SHARING_PUBLIC_CS3_PROVIDER_ADDR="unix:/var/run/ocis/storage-system.sock"
 SHARING_PUBLIC_JSONCS3_PROVIDER_ADDR="unix:/var/run/ocis/storage-system.sock"
-
-// the STORAGE_xxx envvars should (and will) be named SETTINGS_STORAGE_xxx
-STORAGE_GATEWAY_GRPC_ADDR="unix:/var/run/ocis/storage-system.sock"
-STORAGE_GRPC_ADDR="unix:/var/run/ocis/storage-system.sock"
 ```
 
 ## Storage Registry
