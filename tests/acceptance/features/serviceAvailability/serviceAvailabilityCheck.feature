@@ -42,7 +42,7 @@ Feature: service health check
       | %base_url_without_scheme_and_port%:9159/healthz | storage-users      |         |
       # | %base_url_without_scheme_and_port%:/healthz     | store              | # deleted                     |
       # | %base_url_without_scheme_and_port%:9189/healthz | thumbnails         | #get 500                      |
-      # | %base_url_without_scheme_and_port%:9210/healthz | userlog            | #get 500                      |
+      # | %base_url_without_scheme_and_port%:9214/healthz | userlog            | #get 500                      |
       | %base_url_without_scheme_and_port%:9145/healthz | users              |         |
     # | %base_url_without_scheme_and_port%:9104/healthz | web                | #get 500                      |
     # | %base_url_without_scheme_and_port%:9119/healthz | webdav             | #get 500                      |
@@ -108,7 +108,7 @@ Feature: service health check
       | %base_url_without_scheme_and_port%:9159/readyz | storage-users      |         |
       # | %base_url_without_scheme_and_port%:/readyz     | store              | # deleted                     |
       # | %base_url_without_scheme_and_port%:9189/readyz | thumbnails         | #get 500                      |
-      # | %base_url_without_scheme_and_port%:9210/readyz | userlog            | #get 500                      |
+      # | %base_url_without_scheme_and_port%:9214/readyz | userlog            | #get 500                      |
       | %base_url_without_scheme_and_port%:9145/readyz | users              |         |
     # | %base_url_without_scheme_and_port%:9104/readyz | web                | #get 500                      |
     # | %base_url_without_scheme_and_port%:9119/readyz | webdav             | #get 500                      |
