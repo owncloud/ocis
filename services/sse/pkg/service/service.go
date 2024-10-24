@@ -2,6 +2,7 @@ package service
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/r3labs/sse/v2"
@@ -80,6 +81,18 @@ func (s SSE) HandleSSE(w http.ResponseWriter, r *http.Request) {
 
 	stream := s.sse.CreateStream(uid)
 	stream.AutoReplay = false
+
+	if s.c.KeepAliveInterval != 0 {
+		ticker := time.NewTicker(s.c.KeepAliveInterval)
+		defer ticker.Stop()
+		go func() {
+			for range ticker.C {
+				s.sse.Publish(uid, &sse.Event{
+					Comment: []byte("keepalive"),
+				})
+			}
+		}()
+	}
 
 	// add stream to URL
 	q := r.URL.Query()
