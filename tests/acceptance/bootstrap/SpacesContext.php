@@ -2065,9 +2065,9 @@ class SpacesContext implements Context {
 		$sourceFile = \explode("/", $sourceFile);
 		$sourceFile = \end($sourceFile);
 		$destinationFile = \trim($destinationFile, "/");
-		if ($actionType === 'copied' || $actionType === 'moved') {
+		if ($actionType === 'copied') {
 			$fileDestination = $this->escapePath($destinationFile) . '/' . $this->escapePath($sourceFile);
-		} else {
+		} elseif ($actionType === 'renamed' || $actionType === 'moved') {
 			$fileDestination = $destinationFile;
 		}
 
