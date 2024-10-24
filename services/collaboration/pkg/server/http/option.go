@@ -6,6 +6,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/connector"
+	microstore "go-micro.dev/v4/store"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -19,6 +20,7 @@ type Options struct {
 	Context        context.Context
 	Config         *config.Config
 	TracerProvider trace.TracerProvider
+	Store          microstore.Store
 }
 
 // newOptions initializes the available default options.
@@ -64,5 +66,12 @@ func Config(val *config.Config) Option {
 func TracerProvider(val trace.TracerProvider) Option {
 	return func(o *Options) {
 		o.TracerProvider = val
+	}
+}
+
+// Store provides a function to set the Store option
+func Store(val microstore.Store) Option {
+	return func(o *Options) {
+		o.Store = val
 	}
 }

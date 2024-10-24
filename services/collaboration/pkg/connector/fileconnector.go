@@ -29,6 +29,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/middleware"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/wopisrc"
 	"github.com/rs/zerolog"
+	microstore "go-micro.dev/v4/store"
 )
 
 const (
@@ -95,15 +96,17 @@ type FileConnectorService interface {
 // Currently, it handles file locks and getting the file info.
 // Note that operations might return any kind of error, not just ConnectorError
 type FileConnector struct {
-	gws pool.Selectable[gatewayv1beta1.GatewayAPIClient]
-	cfg *config.Config
+	gws   pool.Selectable[gatewayv1beta1.GatewayAPIClient]
+	cfg   *config.Config
+	store microstore.Store
 }
 
 // NewFileConnector creates a new file connector
-func NewFileConnector(gws pool.Selectable[gatewayv1beta1.GatewayAPIClient], cfg *config.Config) *FileConnector {
+func NewFileConnector(gws pool.Selectable[gatewayv1beta1.GatewayAPIClient], cfg *config.Config, st microstore.Store) *FileConnector {
 	return &FileConnector{
-		gws: gws,
-		cfg: cfg,
+		gws:   gws,
+		cfg:   cfg,
+		store: st,
 	}
 }
 
@@ -1265,7 +1268,7 @@ func (f *FileConnector) createDownloadURL(wopiContext middleware.WopiContext, co
 	templateContext.FileReference = wopiContext.TemplateReference
 	templateContext.TemplateReference = nil
 
-	token, _, err := middleware.GenerateWopiToken(templateContext, f.cfg)
+	token, _, err := middleware.GenerateWopiToken(templateContext, f.cfg, f.store)
 	if err != nil {
 		return "", err
 	}
@@ -1389,7 +1392,7 @@ func (f *FileConnector) generatePrefix() string {
 // will be ignored
 func (f *FileConnector) generateWOPISrc(wopiContext middleware.WopiContext, logger zerolog.Logger) (*url.URL, error) {
 	// get the WOPI token for the new file
-	accessToken, _, err := middleware.GenerateWopiToken(wopiContext, f.cfg)
+	accessToken, _, err := middleware.GenerateWopiToken(wopiContext, f.cfg, f.store)
 	if err != nil {
 		logger.Error().Err(err).Msg("generateWOPISrc: failed to generate access token for the new file")
 		return nil, err

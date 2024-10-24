@@ -22,6 +22,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/helpers"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/middleware"
+	microstore "go-micro.dev/v4/store"
 )
 
 // NewHandler creates a new grpc service implementing the OpenInApp interface
@@ -47,6 +48,7 @@ func NewHandler(opts ...Option) (*Service, func(), error) {
 		logger:  options.Logger,
 		config:  options.Config,
 		gwc:     gwc,
+		store:   options.Store,
 	}, teardown, nil
 }
 
@@ -57,6 +59,7 @@ type Service struct {
 	logger  log.Logger
 	config  *config.Config
 	gwc     gatewayv1beta1.GatewayAPIClient
+	store   microstore.Store
 }
 
 // OpenInApp will implement the OpenInApp interface of the app provider
@@ -138,7 +141,7 @@ func (s *Service) OpenInApp(
 		}
 	}
 
-	accessToken, accessExpiration, err := middleware.GenerateWopiToken(wopiContext, s.config)
+	accessToken, accessExpiration, err := middleware.GenerateWopiToken(wopiContext, s.config, s.store)
 	if err != nil {
 		logger.Error().Err(err).Msg("OpenInApp: error generating the token")
 		return &appproviderv1beta1.OpenInAppResponse{

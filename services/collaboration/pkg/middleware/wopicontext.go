@@ -2,10 +2,14 @@ package middleware
 
 import (
 	"context"
+	"crypto/md5"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
+	"time"
 
 	appproviderv1beta1 "github.com/cs3org/go-cs3apis/cs3/app/provider/v1beta1"
 	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
@@ -15,6 +19,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/helpers"
 	"github.com/rs/zerolog"
+	microstore "go-micro.dev/v4/store"
 	"google.golang.org/grpc/metadata"
 )
 
@@ -44,7 +49,7 @@ type WopiContext struct {
 // * The created WopiContext for the request
 // * A contextual zerologger containing information about the request
 // and the WopiContext
-func WopiContextAuthMiddleware(cfg *config.Config, next http.Handler) http.Handler {
+func WopiContextAuthMiddleware(cfg *config.Config, st microstore.Store, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 
@@ -65,6 +70,23 @@ func WopiContextAuthMiddleware(cfg *config.Config, next http.Handler) http.Handl
 			wopiLogger.Error().Msg("missing access token")
 			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 			return
+		}
+
+		if cfg.Wopi.ShortTokens {
+			records, err := st.Read(accessToken)
+			if err != nil {
+				wopiLogger.Error().Err(err).Msg("cannot retrieve access token from store")
+				http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+				return
+			}
+
+			if len(records) != 1 {
+				wopiLogger.Error().Int("records", len(records)).Msg("no record found for the token")
+				http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+				return
+			}
+
+			accessToken = string(records[0].Value)
 		}
 
 		claims := &Claims{}
@@ -163,7 +185,11 @@ func WopiContextToCtx(ctx context.Context, wopiContext WopiContext) context.Cont
 // The access token inside the wopiContext is expected to be decrypted.
 // In order to generate the access token for WOPI, the reva token inside the
 // wopiContext will be encrypted
-func GenerateWopiToken(wopiContext WopiContext, cfg *config.Config) (string, int64, error) {
+func GenerateWopiToken(wopiContext WopiContext, cfg *config.Config, st microstore.Store) (string, int64, error) {
+	if cfg.Wopi.ShortTokens && st == nil {
+		return "", 0, errors.New("Cannot generate a short token without microstore")
+	}
+
 	cryptedReqAccessToken, err := EncryptAES([]byte(cfg.Wopi.Secret), wopiContext.AccessToken)
 	if err != nil {
 		return "", 0, err
@@ -186,6 +212,20 @@ func GenerateWopiToken(wopiContext WopiContext, cfg *config.Config) (string, int
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	accessToken, err := token.SignedString([]byte(cfg.Wopi.Secret))
+
+	if cfg.Wopi.ShortTokens {
+		c := md5.New()
+		c.Write([]byte(accessToken))
+		shortAccessToken := hex.EncodeToString(c.Sum(nil)) + strconv.FormatInt(time.Now().UnixNano(), 16)
+
+		errWrite := st.Write(&microstore.Record{
+			Key:    shortAccessToken,
+			Value:  []byte(accessToken),
+			Expiry: time.Until(claims.ExpiresAt.Time),
+		})
+
+		return shortAccessToken, claims.ExpiresAt.UnixMilli(), errWrite
+	}
 
 	return accessToken, claims.ExpiresAt.UnixMilli(), err
 }

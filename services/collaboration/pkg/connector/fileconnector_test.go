@@ -59,7 +59,7 @@ var _ = Describe("FileConnector", func() {
 
 		gatewaySelector = mocks.NewSelectable[gateway.GatewayAPIClient](GinkgoT())
 		gatewaySelector.On("Next").Return(gatewayClient, nil)
-		fc = connector.NewFileConnector(gatewaySelector, cfg)
+		fc = connector.NewFileConnector(gatewaySelector, cfg, nil)
 
 		wopiCtx = middleware.WopiContext{
 			// a real token is needed for the PutRelativeFileSuggested tests

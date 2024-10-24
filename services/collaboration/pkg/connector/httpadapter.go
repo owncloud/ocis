@@ -12,6 +12,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/connector/utf7"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/locks"
 	"github.com/rs/zerolog"
+	microstore "go-micro.dev/v4/store"
 )
 
 const (
@@ -44,10 +45,10 @@ type HttpAdapter struct {
 
 // NewHttpAdapter will create a new HTTP adapter. A new connector using the
 // provided gateway API client and configuration will be used in the adapter
-func NewHttpAdapter(gws pool.Selectable[gatewayv1beta1.GatewayAPIClient], cfg *config.Config) *HttpAdapter {
+func NewHttpAdapter(gws pool.Selectable[gatewayv1beta1.GatewayAPIClient], cfg *config.Config, st microstore.Store) *HttpAdapter {
 	httpAdapter := &HttpAdapter{
 		con: NewConnector(
-			NewFileConnector(gws, cfg),
+			NewFileConnector(gws, cfg, st),
 			NewContentConnector(gws, cfg),
 		),
 	}
