@@ -42,7 +42,7 @@ There are a few variables that you need to set:
   For example: `https://wopi.example.com`.
 
 * `COLLABORATION_WOPI_SHORTTOKENS`:\
-  Needs to be set if the office application like `Office Online` complains about the URL is too long  (which contains the access token) and refuses to work. If enabled, a store must be configured.
+  Needs to be set if the office application like `Microsoft Office Online` complains about the URL is too long  (which contains the access token) and refuses to work. If enabled, a store must be configured.
 
 The application can be customized further by changing the `COLLABORATION_APP_*` options to better describe the application.
 
