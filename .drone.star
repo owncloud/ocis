@@ -2148,7 +2148,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
         "STORAGE_SYSTEM_DEBUG_ADDR": "0.0.0.0:9217",
         "STORAGE_USERS_DEBUG_ADDR": "0.0.0.0:9159",
         "THUMBNAILS_DEBUG_ADDR": "0.0.0.0:9189",
-        "USERLOG_DEBUG_ADDR": "0.0.0.0:9210",
+        "USERLOG_DEBUG_ADDR": "0.0.0.0:9214",
         "USERS_DEBUG_ADDR": "0.0.0.0:9145",
         "WEB_DEBUG_ADDR": "0.0.0.0:9104",
         "WEBDAV_DEBUG_ADDR": "0.0.0.0:9119",
