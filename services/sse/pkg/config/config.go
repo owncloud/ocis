@@ -2,6 +2,7 @@ package config
 
 import (
 	"context"
+	"time"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 )
@@ -14,7 +15,8 @@ type Config struct {
 	Debug   Debug    `mask:"struct" yaml:"debug"`
 	Tracing *Tracing `yaml:"tracing"`
 
-	Service Service `yaml:"-"`
+	Service           Service       `yaml:"-"`
+	KeepAliveInterval time.Duration `yaml:"keepalive_interval" env:"SSE_KEEPALIVE_INTERVAL" desc:"To prevent intermediate proxies from closing the SSE connection send periodic SSE comments." introductionVersion:"6.7"`
 
 	Events       Events
 	HTTP         HTTP          `yaml:"http"`
