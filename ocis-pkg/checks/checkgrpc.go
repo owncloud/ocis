@@ -13,12 +13,14 @@ import (
 // NewGRPCCheck checks the reachability of a grpc server.
 func NewGRPCCheck(address string) func(context.Context) error {
 	return func(_ context.Context) error {
-		if strings.Contains(address, "0.0.0.0") {
+		if strings.Contains(address, "0.0.0.0") || strings.Contains(address, "::") {
 			outboundIp, err := handlers.GetOutBoundIP()
 			if err != nil {
 				return err
 			}
 			address = strings.Replace(address, "0.0.0.0", outboundIp, 1)
+			address = strings.Replace(address, "::", "["+outboundIp+"]", 1)
+			address = strings.Replace(address, "[::]", "["+outboundIp+"]", 1)
 		}
 
 		conn, err := grpc.NewClient(address, grpc.WithTransportCredentials(insecure.NewCredentials()))
