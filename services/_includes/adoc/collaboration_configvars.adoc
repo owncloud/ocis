@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-10-24-10-30-45]
+[#deprecation-note-2024-10-24-14-01-36]
 [caption=]
 .Deprecation notes for the collaboration service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -129,6 +129,88 @@ a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
 Enable license checking to edit files. Needs to be enabled when using Microsoft365 with the business flow.
+
+a|`OCIS_PERSISTENT_STORE` +
+`COLLABORATION_STORE` +
+
+a| [subs=-attributes]
+++7.0.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++nats-js-kv ++
+a| [subs=-attributes]
+The type of the store. Supported values are: 'memory', 'nats-js-kv', 'redis-sentinel', 'noop'. See the text description for details.
+
+a|`OCIS_PERSISTENT_STORE_NODES` +
+`COLLABORATION_STORE_NODES` +
+
+a| [subs=-attributes]
+++7.0.0 ++
+a| [subs=-attributes]
+++[]string ++
+a| [subs=-attributes]
+++[127.0.0.1:9233] ++
+a| [subs=-attributes]
+A list of nodes to access the configured store. This has no effect when 'memory' store is configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details.
+
+a|`COLLABORATION_STORE_DATABASE` +
+
+a| [subs=-attributes]
+++7.0.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++collaboration ++
+a| [subs=-attributes]
+The database name the configured store should use.
+
+a|`COLLABORATION_STORE_TABLE` +
+
+a| [subs=-attributes]
+++7.0.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The database table the store should use.
+
+a|`OCIS_PERSISTENT_STORE_TTL` +
+`COLLABORATION_STORE_TTL` +
+
+a| [subs=-attributes]
+++7.0.0 ++
+a| [subs=-attributes]
+++Duration ++
+a| [subs=-attributes]
+++30m0s ++
+a| [subs=-attributes]
+Time to live for events in the store. Defaults to '30m' (30 minutes). See the Environment Variable Types description for more details.
+
+a|`OCIS_PERSISTENT_STORE_AUTH_USERNAME` +
+`COLLABORATION_STORE_AUTH_USERNAME` +
+
+a| [subs=-attributes]
+++7.0.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The username to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.
+
+a|`OCIS_PERSISTENT_STORE_AUTH_PASSWORD` +
+`COLLABORATION_STORE_AUTH_PASSWORD` +
+
+a| [subs=-attributes]
+++7.0.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The password to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.
 
 a|`OCIS_JWT_SECRET` +
 `COLLABORATION_JWT_SECRET` +
@@ -264,6 +346,17 @@ a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 Optional, the secret to authenticate against the ownCloud Office365 WOPI proxy. This secret can be obtained from ownCloud via the office365 proxy subscription.
+
+a|`COLLABORATION_WOPI_SHORTTOKENS` +
+
+a| [subs=-attributes]
+++7.0.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Use short access tokens for WOPI access. This is useful for office packages, like Microsoft Office Online, which have URL length restrictions. If enabled, a persistent store must be configured.
 
 a|`OCIS_REVA_GATEWAY` +
 

@@ -12,6 +12,15 @@ app:
     disable: false
     duration: 12h
   licensecheckenable: false
+store:
+  store: nats-js-kv
+  nodes:
+  - 127.0.0.1:9233
+  database: collaboration
+  table: ""
+  ttl: 30m0s
+  username: ""
+  password: ""
 token_manager:
   jwt_secret: ""
 grpc:
@@ -29,6 +38,7 @@ wopi:
   disable_chat: false
   proxy_url: ""
   proxy_secret: ""
+  short_tokens: false
 cs3api:
   gateway:
     name: com.owncloud.api.gateway

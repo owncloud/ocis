@@ -11,6 +11,13 @@
 | COLLABORATION_APP_PROOF_DISABLE | bool | false | Disable the proof keys verification|
 | COLLABORATION_APP_PROOF_DURATION | string | 12h | Duration for the proof keys to be cached in memory, using time.ParseDuration format. If the duration can't be parsed, we'll use the default 12h as duration|
 | COLLABORATION_APP_LICENSE_CHECK_ENABLE | bool | false | Enable license checking to edit files. Needs to be enabled when using Microsoft365 with the business flow.|
+| OCIS_PERSISTENT_STORE<br/>COLLABORATION_STORE | string | nats-js-kv | The type of the store. Supported values are: 'memory', 'nats-js-kv', 'redis-sentinel', 'noop'. See the text description for details.|
+| OCIS_PERSISTENT_STORE_NODES<br/>COLLABORATION_STORE_NODES | []string | [127.0.0.1:9233] | A list of nodes to access the configured store. This has no effect when 'memory' store is configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details.|
+| COLLABORATION_STORE_DATABASE | string | collaboration | The database name the configured store should use.|
+| COLLABORATION_STORE_TABLE | string |  | The database table the store should use.|
+| OCIS_PERSISTENT_STORE_TTL<br/>COLLABORATION_STORE_TTL | Duration | 30m0s | Time to live for events in the store. Defaults to '30m' (30 minutes). See the Environment Variable Types description for more details.|
+| OCIS_PERSISTENT_STORE_AUTH_USERNAME<br/>COLLABORATION_STORE_AUTH_USERNAME | string |  | The username to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.|
+| OCIS_PERSISTENT_STORE_AUTH_PASSWORD<br/>COLLABORATION_STORE_AUTH_PASSWORD | string |  | The password to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.|
 | OCIS_JWT_SECRET<br/>COLLABORATION_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|
 | COLLABORATION_GRPC_ADDR | string | 127.0.0.1:9301 | The bind address of the GRPC service.|
 | OCIS_GRPC_PROTOCOL<br/>COLLABORATION_GRPC_PROTOCOL | string | tcp | The transport protocol of the GRPC service.|
@@ -23,6 +30,7 @@
 | COLLABORATION_WOPI_DISABLE_CHAT<br/>OCIS_WOPI_DISABLE_CHAT | bool | false | Disable chat in the office web frontend. This feature applies to OnlyOffice and Microsoft.|
 | COLLABORATION_WOPI_PROXY_URL | string |  | The URL to the ownCloud Office365 WOPI proxy. Optional. To use this feature, you need an office365 proxy subscription. If you become part of the Microsoft CSP program (https://learn.microsoft.com/en-us/partner-center/enroll/csp-overview), you can use WebOffice without a proxy.|
 | COLLABORATION_WOPI_PROXY_SECRET | string |  | Optional, the secret to authenticate against the ownCloud Office365 WOPI proxy. This secret can be obtained from ownCloud via the office365 proxy subscription.|
+| COLLABORATION_WOPI_SHORTTOKENS | bool | false | Use short access tokens for WOPI access. This is useful for office packages, like Microsoft Office Online, which have URL length restrictions. If enabled, a persistent store must be configured.|
 | OCIS_REVA_GATEWAY | string | com.owncloud.api.gateway | CS3 gateway used to look up user metadata.|
 | COLLABORATION_CS3API_DATAGATEWAY_INSECURE | bool | false | Connect to the CS3API data gateway insecurely.|
 | OCIS_TRACING_ENABLED<br/>COLLABORATION_TRACING_ENABLED | bool | false | Activates tracing.|
