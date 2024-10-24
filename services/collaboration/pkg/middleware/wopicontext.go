@@ -221,7 +221,7 @@ func GenerateWopiToken(wopiContext WopiContext, cfg *config.Config, st microstor
 		errWrite := st.Write(&microstore.Record{
 			Key:    shortAccessToken,
 			Value:  []byte(accessToken),
-			Expiry: claims.ExpiresAt.Sub(time.Now()),
+			Expiry: time.Until(claims.ExpiresAt.Time),
 		})
 
 		return shortAccessToken, claims.ExpiresAt.UnixMilli(), errWrite

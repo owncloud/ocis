@@ -76,7 +76,7 @@ func TraceProvider(val trace.TracerProvider) Option {
 	}
 }
 
-// Store provides a funtion to set the Store option
+// Store provides a function to set the Store option
 func Store(val microstore.Store) Option {
 	return func(o *Options) {
 		o.Store = val
