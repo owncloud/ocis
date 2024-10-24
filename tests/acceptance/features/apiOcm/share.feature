@@ -696,3 +696,40 @@ Feature: an user shares resources using ScienceMesh application
         }
       }
       """
+
+  @issue-10285 @issue-10536
+  Scenario: federation user uploads file to a federated shared folder via TUS
+    Given using spaces DAV path
+    And using server "LOCAL"
+    And "Alice" has created the federation share invitation
+    And using server "REMOTE"
+    And "Brian" has accepted invitation
+    And using server "LOCAL"
+    And user "Alice" has created a folder "FOLDER" in space "Personal"
+    And user "Alice" has sent the following resource share invitation to federated user:
+      | resource        | FOLDER                        |
+      | space           | Personal                      |
+      | sharee          | Brian                         |
+      | shareType       | user                          |
+      | permissionsRole | Editor                        |
+    When using server "REMOTE"
+    And user "Brian" uploads a file with content "lorem" to "file.txt" inside federated share "FOLDER" via TUS using the WebDAV API
+    Then for user "Brian" the content of file "file.txt" of federated share "FOLDER" should be "lorem"
+
+  @issue-10285 @issue-10536
+  Scenario: local user uploads file to a federated shared folder via TUS
+    Given using spaces DAV path
+    And using server "LOCAL"
+    And "Alice" has created the federation share invitation
+    And using server "REMOTE"
+    And "Brian" has accepted invitation
+    And user "Brian" has created a folder "FOLDER" in space "Personal"
+    And user "Brian" has sent the following resource share invitation to federated user:
+      | resource        | FOLDER                        |
+      | space           | Personal                      |
+      | sharee          | Alice                         |
+      | shareType       | user                          |
+      | permissionsRole | Editor                        |
+    When using server "LOCAL"
+    And user "Alice" uploads a file with content "lorem" to "file.txt" inside federated share "FOLDER" via TUS using the WebDAV API
+    Then for user "Alice" the content of file "file.txt" of federated share "FOLDER" should be "lorem"

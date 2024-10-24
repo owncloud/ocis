@@ -110,13 +110,13 @@ Feature: CORS headers
 
   @issue-8380
   Scenario: CORS headers should be returned when uploading file using Tus and when CORS domain sending origin header in the Webdav api
-    Given user "Alice" has created a new TUS resource for the space "Personal" with content "" using the WebDAV API with these headers:
+    Given user "Alice" has created a new TUS resource in the space "Personal" with the following headers:
       | Upload-Length   | 5                         |
       #    dGV4dEZpbGUudHh0 is the base64 encode of textFile.txt
       | Upload-Metadata | filename dGV4dEZpbGUudHh0 |
       | Tus-Resumable   | 1.0.0                     |
       | Origin          | https://aphno.badal       |
-    When user "Alice" sends a chunk to the last created TUS Location with data "01234" inside of the space "Personal" with headers:
+    When user "Alice" sends a chunk to the last created TUS Location with data "01234" with the following headers:
       | Origin          | https://aphno.badal                  |
       | Upload-Checksum | MD5 4100c4d44da9177247e44a5fc1546778 |
       | Upload-Offset   | 0                                    |
@@ -128,13 +128,13 @@ Feature: CORS headers
 
   @issue-8380
   Scenario: uploading file using Tus using different CORS headers
-    Given user "Alice" has created a new TUS resource for the space "Personal" with content "" using the WebDAV API with these headers:
+    Given user "Alice" has created a new TUS resource in the space "Personal" with the following headers:
       | Upload-Length   | 5                         |
       #    dGV4dEZpbGUudHh0 is the base64 encode of textFile.txt
       | Upload-Metadata | filename dGV4dEZpbGUudHh0 |
       | Tus-Resumable   | 1.0.0                     |
       | Origin          | https://something.else    |
-    When user "Alice" sends a chunk to the last created TUS Location with data "01234" inside of the space "Personal" with headers:
+    When user "Alice" sends a chunk to the last created TUS Location with data "01234" with the following headers:
       | Origin          | https://something.else               |
       | Upload-Checksum | MD5 4100c4d44da9177247e44a5fc1546778 |
       | Upload-Offset   | 0                                    |
@@ -144,7 +144,7 @@ Feature: CORS headers
   # The Access-Control-Request-Headers need to be in lower-case and alphabetically order to comply with the rs/cors
   # package see: https://github.com/rs/cors/commit/4c32059b2756926619f6bf70281b91be7b5dddb2#diff-bf80d8fbedf172fab9ba2604da7f7be972e48b2f78a8d0cd21619d5f93665895R367
   Scenario Outline: CORS headers should be returned when an preflight request is sent to Tus upload
-    Given user "Alice" has created a new TUS resource for the space "Personal" with content "" using the WebDAV API with these headers:
+    Given user "Alice" has created a new TUS resource in the space "Personal" with the following headers:
       | Upload-Length   | 5                         |
       #    dGV4dEZpbGUudHh0 is the base64 encode of textFile.txt
       | Upload-Metadata | filename dGV4dEZpbGUudHh0 |
