@@ -49,9 +49,18 @@ func Server(cfg *config.Config) *cli.Command {
 				svc.AuditLoggerFromConfig(ctx, cfg.Auditlog, evts, logger)
 				return nil
 			}, func(err error) {
-				logger.Error().
-					Err(err).
-					Msg("Shutting down server")
+				if err == nil {
+					logger.Info().
+						Str("transport", "stream").
+						Str("server", cfg.Service.Name).
+						Msg("Shutting down server")
+				} else {
+					logger.Error().Err(err).
+						Str("transport", "stream").
+						Str("server", cfg.Service.Name).
+						Msg("Shutting down server")
+				}
+
 				cancel()
 			})
 

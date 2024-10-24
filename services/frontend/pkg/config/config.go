@@ -58,8 +58,7 @@ type Config struct {
 
 	PasswordPolicy PasswordPolicy `yaml:"password_policy"`
 
-	Supervised bool            `yaml:"-"`
-	Context    context.Context `yaml:"-"`
+	Context context.Context `yaml:"-"`
 }
 
 type Log struct {

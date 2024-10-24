@@ -56,10 +56,17 @@ func Server(cfg *config.Config) *cli.Command {
 					Msg("reva runtime exited")
 				return nil
 			}, func(err error) {
-				logger.Error().
-					Err(err).
-					Str("server", cfg.Service.Name).
-					Msg("Shutting down server")
+				if err == nil {
+					logger.Info().
+						Str("transport", "reva").
+						Str("server", cfg.Service.Name).
+						Msg("Shutting down server")
+				} else {
+					logger.Error().Err(err).
+						Str("transport", "reva").
+						Str("server", cfg.Service.Name).
+						Msg("Shutting down server")
+				}
 
 				cancel()
 			})

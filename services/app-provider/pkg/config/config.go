@@ -22,8 +22,7 @@ type Config struct {
 	Driver       string  `yaml:"driver" env:"APP_PROVIDER_DRIVER" desc:"Driver, the APP PROVIDER services uses. Only 'wopi' is supported as of now." introductionVersion:"pre5.0"`
 	Drivers      Drivers `yaml:"drivers"`
 
-	Supervised bool            `yaml:"-"`
-	Context    context.Context `yaml:"-"`
+	Context context.Context `yaml:"-"`
 }
 
 type Log struct {

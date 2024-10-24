@@ -23,8 +23,7 @@ type Config struct {
 	Driver  string  `yaml:"driver" env:"GROUPS_DRIVER" desc:"The driver which should be used by the groups service. Supported values are 'ldap' and 'owncloudsql'." introductionVersion:"pre5.0"`
 	Drivers Drivers `yaml:"drivers"`
 
-	Supervised bool            `yaml:"-"`
-	Context    context.Context `yaml:"-"`
+	Context context.Context `yaml:"-"`
 }
 
 type Log struct {

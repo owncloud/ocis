@@ -42,6 +42,13 @@ func Server(cfg *config.Config) *cli.Command {
 			defer cancel()
 
 			gr.Add(func() error {
+				<-ctx.Done()
+				cancel()
+				return nil
+			}, func(err error) {
+			})
+
+			gr.Add(func() error {
 				pidFile := path.Join(os.TempDir(), "revad-"+cfg.Service.Name+"-"+uuid.Must(uuid.NewV4()).String()+".pid")
 				rCfg := revaconfig.AppRegistryConfigFromStruct(cfg, logger)
 				reg := registry.GetRegistry()
@@ -54,10 +61,17 @@ func Server(cfg *config.Config) *cli.Command {
 
 				return nil
 			}, func(err error) {
-				logger.Error().
-					Str("server", cfg.Service.Name).
-					Err(err).
-					Msg("Shutting down server")
+				if err == nil {
+					logger.Info().
+						Str("transport", "reva").
+						Str("server", cfg.Service.Name).
+						Msg("Shutting down server")
+				} else {
+					logger.Error().Err(err).
+						Str("transport", "reva").
+						Str("server", cfg.Service.Name).
+						Msg("Shutting down server")
+				}
 
 				cancel()
 			})

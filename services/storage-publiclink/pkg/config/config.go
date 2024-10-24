@@ -22,8 +22,7 @@ type Config struct {
 
 	StorageProvider StorageProvider `yaml:"storage_provider"`
 
-	Supervised bool            `yaml:"-"`
-	Context    context.Context `yaml:"-"`
+	Context context.Context `yaml:"-"`
 }
 
 type Log struct {

@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
+	"time"
 
 	"github.com/oklog/run"
 
@@ -99,9 +100,24 @@ func Server(cfg *config.Config) *cli.Command {
 				}
 
 			}, func(err error) {
-				logger.Error().
-					Err(err).
-					Msg("Shutting down server")
+				if err == nil {
+					logger.Info().
+						Str("transport", "nats").
+						Str("server", cfg.Service.Name).
+						Msg("letting other services deregister")
+
+					time.Sleep(3 * time.Second)
+
+					logger.Info().
+						Str("transport", "nats").
+						Str("server", cfg.Service.Name).
+						Msg("Shutting down server")
+				} else {
+					logger.Error().Err(err).
+						Str("transport", "nats").
+						Str("server", cfg.Service.Name).
+						Msg("Shutting down server")
+				}
 
 				natsServer.Shutdown()
 				cancel()
