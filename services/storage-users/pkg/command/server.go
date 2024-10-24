@@ -56,10 +56,17 @@ func Server(cfg *config.Config) *cli.Command {
 
 				return nil
 			}, func(err error) {
-				logger.Error().
-					Err(err).
-					Str("server", "reva").
-					Msg("Shutting down server")
+				if err == nil {
+					logger.Info().
+						Str("transport", "reva").
+						Str("server", cfg.Service.Name).
+						Msg("Shutting down server")
+				} else {
+					logger.Error().Err(err).
+						Str("transport", "reva").
+						Str("server", cfg.Service.Name).
+						Msg("Shutting down server")
+				}
 
 				cancel()
 			})
@@ -100,11 +107,18 @@ func Server(cfg *config.Config) *cli.Command {
 					logger.Fatal().Err(err).Msg("can't create event handler")
 				}
 
-				gr.Add(eventSVC.Run, func(_ error) {
-					logger.Error().
-						Err(err).
-						Str("server", cfg.Service.Name).
-						Msg("Shutting down event handler")
+				gr.Add(eventSVC.Run, func(err error) {
+					if err == nil {
+						logger.Info().
+							Str("transport", "stream").
+							Str("server", cfg.Service.Name).
+							Msg("Shutting down server")
+					} else {
+						logger.Error().Err(err).
+							Str("transport", "stream").
+							Str("server", cfg.Service.Name).
+							Msg("Shutting down server")
+					}
 
 					cancel()
 				})
