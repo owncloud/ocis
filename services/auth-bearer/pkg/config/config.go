@@ -22,8 +22,7 @@ type Config struct {
 
 	OIDC OIDC `yaml:"oidc"`
 
-	Supervised bool            `yaml:"-"`
-	Context    context.Context `yaml:"-"`
+	Context context.Context `yaml:"-"`
 }
 
 type Log struct {

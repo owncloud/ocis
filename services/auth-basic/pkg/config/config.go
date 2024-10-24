@@ -22,8 +22,7 @@ type Config struct {
 	AuthProvider          string        `yaml:"auth_provider" env:"AUTH_BASIC_AUTH_MANAGER" desc:"The authentication manager to check if credentials are valid. Supported value is 'ldap'." introductionVersion:"pre5.0"`
 	AuthProviders         AuthProviders `yaml:"auth_providers"`
 
-	Supervised bool            `yaml:"-"`
-	Context    context.Context `yaml:"-"`
+	Context context.Context `yaml:"-"`
 }
 
 type Log struct {

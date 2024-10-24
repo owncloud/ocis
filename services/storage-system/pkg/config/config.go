@@ -31,8 +31,7 @@ type Config struct {
 	Drivers           Drivers `yaml:"drivers"`
 	DataServerURL     string  `yaml:"data_server_url" env:"STORAGE_SYSTEM_DATA_SERVER_URL" desc:"URL of the data server, needs to be reachable by other services using this service." introductionVersion:"pre5.0"`
 
-	Supervised bool            `yaml:"-"`
-	Context    context.Context `yaml:"-"`
+	Context context.Context `yaml:"-"`
 }
 
 // Log holds Log config
