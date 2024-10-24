@@ -49,9 +49,9 @@ The application can be customized further by changing the `COLLABORATION_APP_*` 
 ## Storing
 
 The `collaboration` service persists information via the configured store in `COLLABORATION_STORE`. Possible stores are:
-  -   `memory`: Basic in-memory store and the default.
+  -   `memory`: Basic in-memory store. Will not survive a restart. This is not recommended for this service.
   -   `redis-sentinel`: Stores data in a configured Redis Sentinel cluster.
-  -   `nats-js-kv`: Stores data using key-value-store feature of [nats jetstream](https://docs.nats.io/nats-concepts/jetstream/key-value-store)
+  -   `nats-js-kv`: Stores data using key-value-store feature of [nats jetstream](https://docs.nats.io/nats-concepts/jetstream/key-value-store). This is the default value.
   -   `noop`: Stores nothing. Useful for testing. Not recommended in production environments.
 
 Other store types may work but are not supported currently.
