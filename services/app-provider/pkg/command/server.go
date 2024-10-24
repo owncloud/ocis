@@ -54,10 +54,17 @@ func Server(cfg *config.Config) *cli.Command {
 
 				return nil
 			}, func(err error) {
-				logger.Error().
-					Str("server", cfg.Service.Name).
-					Err(err).
-					Msg("Shutting down server")
+				if err == nil {
+					logger.Info().
+						Str("transport", "reva").
+						Str("server", cfg.Service.Name).
+						Msg("Shutting down server")
+				} else {
+					logger.Error().Err(err).
+						Str("transport", "reva").
+						Str("server", cfg.Service.Name).
+						Msg("Shutting down server")
+				}
 
 				cancel()
 			})
