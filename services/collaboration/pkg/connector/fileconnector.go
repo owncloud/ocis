@@ -821,6 +821,11 @@ func (f *FileConnector) PutRelativeFileRelative(ctx context.Context, ccs Content
 	}
 
 	var newInfo *providerv1beta1.ResourceInfo
+	webURL, err := url.Parse(f.cfg.Commons.OcisURL)
+	if err != nil {
+		return nil, err
+	}
+
 	switch putResponse.Status {
 	case 200: // success case, so don't do anything
 	case 409:
@@ -854,8 +859,10 @@ func (f *FileConnector) PutRelativeFileRelative(ctx context.Context, ccs Content
 				HeaderWopiLockFailureReason: "Lock Conflict",
 			},
 			Body: map[string]interface{}{
-				"Name": target,
-				"Url":  wopiSrcURL.String(),
+				"Name":        target,
+				"Url":         wopiSrcURL.String(),
+				"HostViewUrl": createHostUrl("view", webURL, strings.ToLower(f.cfg.App.Name), newInfo),
+				"HostEditUrl": createHostUrl("write", webURL, strings.ToLower(f.cfg.App.Name), newInfo),
 			},
 		}, nil
 	default:
@@ -876,11 +883,6 @@ func (f *FileConnector) PutRelativeFileRelative(ctx context.Context, ccs Content
 	}
 
 	newLogger.Debug().Msg("PutRelativeFileRelative: success")
-
-	webURL, err := url.Parse(f.cfg.Commons.OcisURL)
-	if err != nil {
-		return nil, err
-	}
 
 	return NewResponseSuccessBodyNameUrl(
 		target,
