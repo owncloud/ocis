@@ -63,6 +63,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Make antivirus workers configurable: [#10383](https://github.com/owncloud/ocis/pull/10383)
 * Bugfix - Increase event processing workers: [#10385](https://github.com/owncloud/ocis/pull/10385)
 * Bugfix - Fix envvar deprecations for next production release: [#10386](https://github.com/owncloud/ocis/pull/10386)
+* Bugfix - Generate short tokens to be used as access tokens for WOPI: [#10391](https://github.com/owncloud/ocis/pull/10391)
 * Enhancement - Add web extensions to the ocis_full example: [#10399](https://github.com/owncloud/ocis/pull/10399)
 
 ## Details
@@ -118,6 +119,14 @@ The following sections list the changes for unreleased.
    missing information.
 
    https://github.com/owncloud/ocis/pull/10386
+
+* Bugfix - Generate short tokens to be used as access tokens for WOPI: [#10391](https://github.com/owncloud/ocis/pull/10391)
+
+   Currently, the access tokens being used might be too long. In particular,
+   Microsoft Office Online complains about the URL (which contains the access
+   token) is too long and refuses to work.
+
+   https://github.com/owncloud/ocis/pull/10391
 
 * Enhancement - Add web extensions to the ocis_full example: [#10399](https://github.com/owncloud/ocis/pull/10399)
 
