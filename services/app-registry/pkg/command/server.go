@@ -42,6 +42,13 @@ func Server(cfg *config.Config) *cli.Command {
 			defer cancel()
 
 			gr.Add(func() error {
+				<-ctx.Done()
+				cancel()
+				return nil
+			}, func(err error) {
+			})
+
+			gr.Add(func() error {
 				pidFile := path.Join(os.TempDir(), "revad-"+cfg.Service.Name+"-"+uuid.Must(uuid.NewV4()).String()+".pid")
 				rCfg := revaconfig.AppRegistryConfigFromStruct(cfg, logger)
 				reg := registry.GetRegistry()

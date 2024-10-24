@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
+	"time"
 
 	"github.com/oklog/run"
 
@@ -100,6 +101,13 @@ func Server(cfg *config.Config) *cli.Command {
 
 			}, func(err error) {
 				if err == nil {
+					logger.Info().
+						Str("transport", "nats").
+						Str("server", cfg.Service.Name).
+						Msg("letting other services deregister")
+
+					time.Sleep(3 * time.Second)
+
 					logger.Info().
 						Str("transport", "nats").
 						Str("server", cfg.Service.Name).
