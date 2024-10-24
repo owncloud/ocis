@@ -93,6 +93,7 @@ config = {
                 "apiSharingNgLinkSharePermission",
                 "apiSharingNgLinkShareRoot",
                 "apiActivities",
+                "serviceAvailability",
             ],
             "skip": False,
         },
@@ -119,6 +120,7 @@ config = {
                 "NOTIFICATIONS_SMTP_PORT": "2500",
                 "NOTIFICATIONS_SMTP_INSECURE": "true",
                 "NOTIFICATIONS_SMTP_SENDER": "ownCloud <noreply@example.com>",
+                "NOTIFICATIONS_DEBUG_ADDR": "0.0.0.0:9174",
             },
         },
         "apiAntivirus": {
@@ -133,6 +135,7 @@ config = {
                 "POSTPROCESSING_STEPS": "virusscan",
                 "OCIS_ASYNC_UPLOADS": True,
                 "OCIS_ADD_RUN_SERVICES": "antivirus",
+                "ANTIVIRUS_DEBUG_ADDR": "0.0.0.0:9297",
             },
         },
         "apiSearchContent": {
@@ -175,6 +178,7 @@ config = {
             "collaborationServiceNeeded": True,
             "extraServerEnvironment": {
                 "GATEWAY_GRPC_ADDR": "0.0.0.0:9142",
+                "COLLABORATION_DEBUG_ADDR": "0.0.0.0:9304",
             },
         },
         "cli": {
@@ -2114,6 +2118,40 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
         "EVENTHISTORY_STORE": "memory",
         "GRAPH_AVAILABLE_ROLES": "b1e2218d-eef8-4d4c-b82d-0f1a1b48f3b5,a8d5fe5e-96e3-418d-825b-534dbdf22b99,fb6c3e19-e378-47e5-b277-9732f9de6e21,58c63c02-1d89-4572-916a-870abc5a1b7d,2d00ce52-1fc2-4dbc-8b95-a73b73395f5a,1c996275-f1c9-4e71-abdf-a42f6495e960,312c0871-5ef7-4b3a-85b6-0e4074c64049,aa97fe03-7980-45ac-9e50-b325749fd7e6",
         "OCIS_TRANSLATION_PATH": "%s/tests/config/translations" % dirs["base"],
+        # debug addresses required for running services health tests
+        "ACTIVITYLOG_DEBUG_ADDR": "0.0.0.0:9197",
+        "APP_PROVIDER_DEBUG_ADDR": "0.0.0.0:9165",
+        "APP_REGISTRY_DEBUG_ADDR": "0.0.0.0:9243",
+        "AUTH_BASIC_DEBUG_ADDR": "0.0.0.0:9147",
+        "AUTH_MACHINE_DEBUG_ADDR": "0.0.0.0:9167",
+        "AUTH_SERVICE_DEBUG_ADDR": "0.0.0.0:9198",
+        "CLIENTLOG_DEBUG_ADDR": "0.0.0.0:9260",
+        "EVENTHISTORY_DEBUG_ADDR": "0.0.0.0:9270",
+        "FRONTEND_DEBUG_ADDR": "0.0.0.0:9141",
+        "GATEWAY_DEBUG_ADDR": "0.0.0.0:9143",
+        "GRAPH_DEBUG_ADDR": "0.0.0.0:9124",
+        "GROUPS_DEBUG_ADDR": "0.0.0.0:9161",
+        "IDM_DEBUG_ADDR": "0.0.0.0:9239",
+        "IDP_DEBUG_ADDR": "0.0.0.0:9134",
+        "NATS_DEBUG_ADDR": "0.0.0.0:9234",
+        "OCDAV_DEBUG_ADDR": "0.0.0.0:9163",
+        "OCM_DEBUG_ADDR": "0.0.0.0:9281",
+        "OCS_DEBUG_ADDR": "0.0.0.0:9114",
+        "POSTPROCESSING_DEBUG_ADDR": "0.0.0.0:9255",
+        "PROXY_DEBUG_ADDR": "0.0.0.0:9205",
+        "SEARCH_DEBUG_ADDR": "0.0.0.0:9224",
+        "SETTINGS_DEBUG_ADDR": "0.0.0.0:9194",
+        "SHARING_DEBUG_ADDR": "0.0.0.0:9151",
+        "SSE_DEBUG_ADDR": "0.0.0.0:9135",
+        "STORAGE_PUBLICLINK_DEBUG_ADDR": "0.0.0.0:9179",
+        "STORAGE_SHARES_DEBUG_ADDR": "0.0.0.0:9156",
+        "STORAGE_SYSTEM_DEBUG_ADDR": "0.0.0.0:9217",
+        "STORAGE_USERS_DEBUG_ADDR": "0.0.0.0:9159",
+        "THUMBNAILS_DEBUG_ADDR": "0.0.0.0:9189",
+        "USERLOG_DEBUG_ADDR": "0.0.0.0:9214",
+        "USERS_DEBUG_ADDR": "0.0.0.0:9145",
+        "WEB_DEBUG_ADDR": "0.0.0.0:9104",
+        "WEBDAV_DEBUG_ADDR": "0.0.0.0:9119",
     }
 
     if deploy_type == "":
@@ -2932,6 +2970,7 @@ def wopiCollaborationService(name):
         "COLLABORATION_CS3API_DATAGATEWAY_INSECURE": "true",
         "OCIS_JWT_SECRET": "some-ocis-jwt-secret",
         "COLLABORATION_WOPI_SECRET": "some-wopi-secret",
+        "OCIS_ADD_RUN_SERVICES": "collaboration",
     }
 
     if name == "collabora":

@@ -1,16 +1,16 @@
 @env-config
 Feature: enforce password on public link
-  As a user
-  I want to enforce passwords on public links shared with upload, edit, or contribute permission
-  So that the password is required to access the contents of the link
+      As a user
+      I want to enforce passwords on public links shared with upload, edit, or contribute permission
+      So that the password is required to access the contents of the link
 
-  Password requirements. set by default:
-  | OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD      | true |
-  | OCIS_PASSWORD_POLICY_MIN_CHARACTERS           | 8    |
-  | OCIS_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS | 1    |
-  | OCIS_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS | 1    |
-  | OCIS_PASSWORD_POLICY_MIN_DIGITS               | 1    |
-  | OCIS_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS   | 1    |
+      Password requirements. set by default:
+      | OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD  | true |
+      | OCIS_PASSWORD_POLICY_MIN_CHARACTERS           | 8    |
+      | OCIS_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS | 1    |
+      | OCIS_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS | 1    |
+      | OCIS_PASSWORD_POLICY_MIN_DIGITS               | 1    |
+      | OCIS_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS   | 1    |
 
 
   Scenario Outline: create a public link with edit permission without a password when enforce-password is enabled
