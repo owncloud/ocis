@@ -38,8 +38,7 @@ type Config struct {
 	OCMCore                      OCMCore                      `yaml:"ocm_core"`
 	OCMStorageProvider           OCMStorageProvider           `yaml:"ocm_storage_provider"`
 
-	Supervised bool            `yaml:"-"`
-	Context    context.Context `yaml:"-"`
+	Context context.Context `yaml:"-"`
 }
 
 // HTTPConfig defines the available http configuration.

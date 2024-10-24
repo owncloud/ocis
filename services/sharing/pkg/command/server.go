@@ -12,7 +12,6 @@ import (
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
-	"github.com/owncloud/ocis/v2/ocis-pkg/sync"
 	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	"github.com/owncloud/ocis/v2/services/sharing/pkg/config"
@@ -93,10 +92,6 @@ func Server(cfg *config.Config) *cli.Command {
 			gr.Add(debugServer.ListenAndServe, func(_ error) {
 				cancel()
 			})
-
-			if !cfg.Supervised {
-				sync.Trap(&gr, cancel)
-			}
 
 			grpcSvc := registry.BuildGRPCService(cfg.GRPC.Namespace+"."+cfg.Service.Name, cfg.GRPC.Protocol, cfg.GRPC.Addr, version.GetString())
 			if err := registry.RegisterService(ctx, grpcSvc, logger); err != nil {
