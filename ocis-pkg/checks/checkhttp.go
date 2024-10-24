@@ -3,23 +3,19 @@ package checks
 import (
 	"context"
 	"fmt"
-	"github.com/owncloud/ocis/v2/ocis-pkg/handlers"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/owncloud/ocis/v2/ocis-pkg/handlers"
 )
 
 // NewHTTPCheck checks the reachability of a http server.
 func NewHTTPCheck(url string) func(context.Context) error {
 	return func(_ context.Context) error {
-		if strings.Contains(url, "0.0.0.0") || strings.Contains(url, "::") {
-			outboundIp, err := handlers.GetOutBoundIP()
-			if err != nil {
-				return err
-			}
-			url = strings.Replace(url, "0.0.0.0", outboundIp, 1)
-			url = strings.Replace(url, "::", outboundIp, 1)
-			url = strings.Replace(url, "[::]", "["+outboundIp+"]", 1)
+		url, err := handlers.FailSaveAddress(url)
+		if err != nil {
+			return err
 		}
 
 		if !strings.HasPrefix(url, "http://") && !strings.HasPrefix(url, "https://") {
