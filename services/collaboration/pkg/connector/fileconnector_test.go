@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/hex"
 	"errors"
+	"net/url"
 	"path"
 	"regexp"
 	"strings"
@@ -26,6 +27,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/middleware"
 	"github.com/owncloud/ocis/v2/services/graph/mocks"
 	"github.com/stretchr/testify/mock"
+	"google.golang.org/grpc"
 )
 
 var _ = Describe("FileConnector", func() {
@@ -952,6 +954,8 @@ var _ = Describe("FileConnector", func() {
 			rBody := response.Body.(map[string]interface{})
 			Expect(rBody["Name"]).To(Equal("newDocument.docx"))
 			Expect(rBody["Url"]).To(HavePrefix("https://ocis.server.prv/wopi/files/")) // skip checking the actual reference
+			Expect(rBody["HostEditUrl"]).To(Equal("https://ocis.example.prv/external-test/personal/path/to/newDocument.docx?fileId=storageid%24spaceid%21opaqueid_newDoc&view_mode=write"))
+			Expect(rBody["HostViewUrl"]).To(Equal("https://ocis.example.prv/external-test/personal/path/to/newDocument.docx?fileId=storageid%24spaceid%21opaqueid_newDoc&view_mode=view"))
 		})
 
 		It("PutRelativeFileSuggested success only extension", func() {
@@ -1005,6 +1009,8 @@ var _ = Describe("FileConnector", func() {
 			rBody := response.Body.(map[string]interface{})
 			Expect(rBody["Name"]).To(Equal("file.pdf"))
 			Expect(rBody["Url"]).To(HavePrefix("https://ocis.server.prv/wopi/files/")) // skip checking the actual reference
+			Expect(rBody["HostEditUrl"]).To(Equal("https://ocis.example.prv/external-test/personal/path/to/file.pdf?fileId=storageid%24spaceid%21opaqueid_newDoc&view_mode=write"))
+			Expect(rBody["HostViewUrl"]).To(Equal("https://ocis.example.prv/external-test/personal/path/to/file.pdf?fileId=storageid%24spaceid%21opaqueid_newDoc&view_mode=view"))
 		})
 
 		It("PutRelativeFileSuggested success conflict", func() {
@@ -1048,21 +1054,25 @@ var _ = Describe("FileConnector", func() {
 				}
 				return false
 			})
-			gatewayClient.On("Stat", mock.Anything, stat2ParamMatcher).Times(1).Return(&providerv1beta1.StatResponse{
-				Status: status.NewOK(ctx),
-				Info: &providerv1beta1.ResourceInfo{
-					Path: path.Join("/personal/path/to", *newFilePath),
-					Id: &providerv1beta1.ResourceId{
-						StorageId: "storageid",
-						OpaqueId:  "opaqueid_newDoc",
-						SpaceId:   "spaceid",
-					},
-					Lock: &providerv1beta1.Lock{
-						LockId: "zzz999",
-						Type:   providerv1beta1.LockType_LOCK_TYPE_WRITE,
-					},
-				},
-			}, nil)
+
+			gatewayClient.EXPECT().Stat(mock.Anything, stat2ParamMatcher).
+				RunAndReturn(func(ctx context.Context, req *providerv1beta1.StatRequest, opts ...grpc.CallOption) (*providerv1beta1.StatResponse, error) {
+					return &providerv1beta1.StatResponse{
+						Status: status.NewOK(ctx),
+						Info: &providerv1beta1.ResourceInfo{
+							Path: path.Join("/personal/path/to", path.Base(req.GetRef().GetPath())),
+							Id: &providerv1beta1.ResourceId{
+								StorageId: "storageid",
+								OpaqueId:  "opaqueid_newDoc",
+								SpaceId:   "spaceid",
+							},
+							Lock: &providerv1beta1.Lock{
+								LockId: "zzz999",
+								Type:   providerv1beta1.LockType_LOCK_TYPE_WRITE,
+							},
+						},
+					}, nil
+				})
 
 			response, err := fc.PutRelativeFileSuggested(ctx, ccs, stream, int64(stream.Len()), ".pdf")
 			Expect(err).ToNot(HaveOccurred())
@@ -1071,6 +1081,8 @@ var _ = Describe("FileConnector", func() {
 			rBody := response.Body.(map[string]interface{})
 			Expect(rBody["Name"]).To(MatchRegexp(`[a-zA-Z0-9_-] file\.pdf`))
 			Expect(rBody["Url"]).To(HavePrefix("https://ocis.server.prv/wopi/files/")) // skip checking the actual reference
+			Expect(rBody["HostEditUrl"]).To(Equal("https://ocis.example.prv/external-test/personal/path/to/" + url.PathEscape(path.Base(*newFilePath)) + "?fileId=storageid%24spaceid%21opaqueid_newDoc&view_mode=write"))
+			Expect(rBody["HostViewUrl"]).To(Equal("https://ocis.example.prv/external-test/personal/path/to/" + url.PathEscape(path.Base(*newFilePath)) + "?fileId=storageid%24spaceid%21opaqueid_newDoc&view_mode=view"))
 		})
 
 		It("PutRelativeFileSuggested put file fails", func() {
@@ -1193,6 +1205,8 @@ var _ = Describe("FileConnector", func() {
 			rBody := response.Body.(map[string]interface{})
 			Expect(rBody["Name"]).To(Equal("newDocument.docx"))
 			Expect(rBody["Url"]).To(HavePrefix("https://ocis.server.prv/wopi/files/")) // skip checking the actual reference
+			Expect(rBody["HostEditUrl"]).To(Equal("https://ocis.example.prv/external-test/personal/path/to/newDocument.docx?fileId=storageid%24spaceid%21opaqueid_newDoc&view_mode=write"))
+			Expect(rBody["HostViewUrl"]).To(Equal("https://ocis.example.prv/external-test/personal/path/to/newDocument.docx?fileId=storageid%24spaceid%21opaqueid_newDoc&view_mode=view"))
 		})
 
 		It("PutRelativeFileRelative conflict", func() {
@@ -1250,6 +1264,8 @@ var _ = Describe("FileConnector", func() {
 			rBody := response.Body.(map[string]interface{})
 			Expect(rBody["Name"]).To(Equal("convFile.pdf"))
 			Expect(rBody["Url"]).To(HavePrefix("https://ocis.server.prv/wopi/files/")) // skip checking the actual reference
+			Expect(rBody["HostEditUrl"]).To(Equal("https://ocis.example.prv/external-test/personal/path/to/convFile.pdf?fileId=storageid%24spaceid%21opaqueid_newDoc&view_mode=write"))
+			Expect(rBody["HostViewUrl"]).To(Equal("https://ocis.example.prv/external-test/personal/path/to/convFile.pdf?fileId=storageid%24spaceid%21opaqueid_newDoc&view_mode=view"))
 		})
 
 		It("PutRelativeFileRelative put file fails", func() {
