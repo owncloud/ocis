@@ -1,6 +1,7 @@
 # Table of Contents
 
 * [Changelog for unreleased](#changelog-for-unreleased-unreleased)
+* [Changelog for 6.6.1](#changelog-for-661-2024-10-24)
 * [Changelog for 6.6.0](#changelog-for-660-2024-10-21)
 * [Changelog for 6.5.0](#changelog-for-650-2024-10-01)
 * [Changelog for 6.4.0](#changelog-for-640-2024-09-12)
@@ -26,8 +27,8 @@
 * [Changelog for 3.0.0](#changelog-for-300-2023-06-06)
 * [Changelog for 2.0.0](#changelog-for-200-2022-11-30)
 * [Changelog for 1.20.0](#changelog-for-1200-2022-04-13)
-* [Changelog for 1.19.1](#changelog-for-1191-2022-03-29)
 * [Changelog for 1.19.0](#changelog-for-1190-2022-03-29)
+* [Changelog for 1.19.1](#changelog-for-1191-2022-03-29)
 * [Changelog for 1.18.0](#changelog-for-1180-2022-03-03)
 * [Changelog for 1.17.0](#changelog-for-1170-2022-02-16)
 * [Changelog for 1.16.0](#changelog-for-1160-2021-12-10)
@@ -52,19 +53,53 @@
 
 The following sections list the changes for unreleased.
 
-[unreleased]: https://github.com/owncloud/ocis/compare/v6.6.0...master
+[unreleased]: https://github.com/owncloud/ocis/compare/v6.6.1...master
+
+## Summary
+
+* Bugfix - Generate short tokens to be used as access tokens for WOPI: [#10391](https://github.com/owncloud/ocis/pull/10391)
+* Enhancement - Add web extensions to the ocis_full example: [#10399](https://github.com/owncloud/ocis/pull/10399)
+
+## Details
+
+* Bugfix - Generate short tokens to be used as access tokens for WOPI: [#10391](https://github.com/owncloud/ocis/pull/10391)
+
+   Currently, the access tokens being used might be too long. In particular,
+   Microsoft Office Online complains about the URL (which contains the access
+   token) is too long and refuses to work.
+
+   https://github.com/owncloud/ocis/pull/10391
+
+* Enhancement - Add web extensions to the ocis_full example: [#10399](https://github.com/owncloud/ocis/pull/10399)
+
+   We added some of the web extensions from ownCloud to the ocis_full docker
+   compose example.
+
+   - importer - draw-io - external-sites - json-viewer - unzip - progressbars
+
+   These can be enabled in the .env file one by one.
+
+   Read more about ocis extensions in
+   https://github.com/owncloud/web-extensions/blob/main/README.md
+
+   https://github.com/owncloud/ocis/pull/10399
+
+# Changelog for [6.6.1] (2024-10-24)
+
+The following sections list the changes for 6.6.1.
+
+[6.6.1]: https://github.com/owncloud/ocis/compare/v6.6.0...v6.6.1
 
 ## Summary
 
 * Bugfix - Fix panic when stopping the nats: [#10363](https://github.com/owncloud/ocis/pull/10363)
-* Bugfix - Disable download activity: [#10367](https://github.com/owncloud/ocis/pull/10367)
+* Bugfix - Disable download activity: [#10368](https://github.com/owncloud/ocis/pull/10368)
 * Bugfix - Fix Activitylog issues: [#10376](https://github.com/owncloud/ocis/pull/10376)
 * Bugfix - Security fixes: [#10376](https://github.com/owncloud/ocis/pull/10376)
 * Bugfix - Make antivirus workers configurable: [#10383](https://github.com/owncloud/ocis/pull/10383)
 * Bugfix - Increase event processing workers: [#10385](https://github.com/owncloud/ocis/pull/10385)
 * Bugfix - Fix envvar deprecations for next production release: [#10386](https://github.com/owncloud/ocis/pull/10386)
-* Bugfix - Generate short tokens to be used as access tokens for WOPI: [#10391](https://github.com/owncloud/ocis/pull/10391)
-* Enhancement - Add web extensions to the ocis_full example: [#10399](https://github.com/owncloud/ocis/pull/10399)
+* Bugfix - Fix healthchecks: [#10405](https://github.com/owncloud/ocis/pull/10405)
 
 ## Details
 
@@ -76,12 +111,12 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/issues/10360
    https://github.com/owncloud/ocis/pull/10363
 
-* Bugfix - Disable download activity: [#10367](https://github.com/owncloud/ocis/pull/10367)
+* Bugfix - Disable download activity: [#10368](https://github.com/owncloud/ocis/pull/10368)
 
    We disable the download activity until we have a proper solution for it.
 
    https://github.com/owncloud/ocis/issues/10293
-   https://github.com/owncloud/ocis/pull/10367
+   https://github.com/owncloud/ocis/pull/10368
 
 * Bugfix - Fix Activitylog issues: [#10376](https://github.com/owncloud/ocis/pull/10376)
 
@@ -120,27 +155,12 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/10386
 
-* Bugfix - Generate short tokens to be used as access tokens for WOPI: [#10391](https://github.com/owncloud/ocis/pull/10391)
+* Bugfix - Fix healthchecks: [#10405](https://github.com/owncloud/ocis/pull/10405)
 
-   Currently, the access tokens being used might be too long. In particular,
-   Microsoft Office Online complains about the URL (which contains the access
-   token) is too long and refuses to work.
+   We needed to replace 0.0.0.0 bind addresses by outbound IP addresses in the
+   healthcheck routine.
 
-   https://github.com/owncloud/ocis/pull/10391
-
-* Enhancement - Add web extensions to the ocis_full example: [#10399](https://github.com/owncloud/ocis/pull/10399)
-
-   We added some of the web extensions from ownCloud to the ocis_full docker
-   compose example.
-
-   - importer - draw-io - external-sites - json-viewer - unzip - progressbars
-
-   These can be enabled in the .env file one by one.
-
-   Read more about ocis extensions in
-   https://github.com/owncloud/web-extensions/blob/main/README.md
-
-   https://github.com/owncloud/ocis/pull/10399
+   https://github.com/owncloud/ocis/pull/10405
 
 # Changelog for [6.6.0] (2024-10-21)
 
@@ -10129,7 +10149,7 @@ The following sections list the changes for 2.0.0.
 
 The following sections list the changes for 1.20.0.
 
-[1.20.0]: https://github.com/owncloud/ocis/compare/v1.19.1...v1.20.0
+[1.20.0]: https://github.com/owncloud/ocis/compare/v1.19.0...v1.20.0
 
 ## Summary
 
@@ -10303,29 +10323,11 @@ The following sections list the changes for 1.20.0.
    https://github.com/owncloud/ocis/pull/3509
    https://github.com/owncloud/web/releases/tag/v5.4.0
 
-# Changelog for [1.19.1] (2022-03-29)
-
-The following sections list the changes for 1.19.1.
-
-[1.19.1]: https://github.com/owncloud/ocis/compare/v1.19.0...v1.19.1
-
-## Summary
-
-* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
-
-## Details
-
-* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
-
-   URLs for Special items (space image, readme) were broken.
-
-   https://github.com/owncloud/ocis/pull/3419
-
 # Changelog for [1.19.0] (2022-03-29)
 
 The following sections list the changes for 1.19.0.
 
-[1.19.0]: https://github.com/owncloud/ocis/compare/v1.18.0...v1.19.0
+[1.19.0]: https://github.com/owncloud/ocis/compare/v1.19.1...v1.19.0
 
 ## Summary
 
@@ -10498,6 +10500,24 @@ The following sections list the changes for 1.19.0.
    https://github.com/owncloud/ocis/pull/3291
    https://github.com/owncloud/ocis/pull/3375
    https://github.com/owncloud/web/releases/tag/v5.3.0
+
+# Changelog for [1.19.1] (2022-03-29)
+
+The following sections list the changes for 1.19.1.
+
+[1.19.1]: https://github.com/owncloud/ocis/compare/v1.18.0...v1.19.1
+
+## Summary
+
+* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
+
+## Details
+
+* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
+
+   URLs for Special items (space image, readme) were broken.
+
+   https://github.com/owncloud/ocis/pull/3419
 
 # Changelog for [1.18.0] (2022-03-03)
 
