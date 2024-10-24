@@ -94,7 +94,7 @@ func ListenForEvents(ctx context.Context, cfg *config.Config, l log.Logger) erro
 			}
 		case <-ctx.Done():
 			l.Info().Msg("context cancelled")
-			return ctx.Err()
+			return nil
 		}
 	}
 }
