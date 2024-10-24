@@ -125,3 +125,28 @@ Feature: List upload sessions via CLI command
       | virusFile.txt |
     And the CLI response should not contain these entries:
       | file1.txt |
+
+
+  Scenario: clean upload sessions that are not in post-processing and is not virus infected
+    Given the following configs have been set:
+      | config                           | value     |
+      | POSTPROCESSING_STEPS             | virusscan |
+      | ANTIVIRUS_INFECTED_FILE_HANDLING | abort     |
+      | POSTPROCESSING_DELAY             | 10s       |
+    And user "Alice" has uploaded file "filesForUpload/filesWithVirus/eicar.com" to "/virusFile.txt"
+    And user "Alice" has uploaded file with content "upload content" to "/file1.txt"
+    And user "Alice" has created a new TUS resource for the space "Personal" with content "" using the WebDAV API with these headers:
+      | Upload-Length   | 10                        |
+      #    dGV4dEZpbGUudHh0 is the base64 encode of textFile.txt
+      | Upload-Metadata | filename dGV4dEZpbGUudHh0 |
+      | Tus-Resumable   | 1.0.0                     |
+    And user "Alice" has uploaded file with checksum "SHA1 8cb2237d0679ca88db6464eac60da96345513964" to the last created TUS Location with offset "0" and content "12345" via TUS inside of the space "Personal" using the WebDAV API
+    When the administrator cleans upload sessions with the following flags:
+      | processing=false |
+      | has-virus=false  |
+    Then the command should be successful
+    And the CLI response should contain these entries:
+      | textFile.txt |
+    And the CLI response should not contain these entries:
+      | file1.txt     |
+      | virusFile.txt |
