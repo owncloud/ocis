@@ -5,11 +5,12 @@ import (
 	"fmt"
 	"io"
 	"maps"
+	"net"
 	"net/http"
-
-	"golang.org/x/sync/errgroup"
+	"strings"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"golang.org/x/sync/errgroup"
 )
 
 // check is a function that performs a check.
@@ -112,4 +113,36 @@ func (h *CheckHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if _, err := io.WriteString(w, http.StatusText(status)); err != nil { // io.WriteString should not fail, but if it does, we want to know.
 		h.conf.logger.Panic().Err(err).Msg("failed to write response")
 	}
+}
+
+// FailSaveAddress replaces wildcard addresses with the outbound IP.
+func FailSaveAddress(address string) (string, error) {
+	if strings.Contains(address, "0.0.0.0") || strings.Contains(address, "::") {
+		outboundIp, err := getOutBoundIP()
+		if err != nil {
+			return "", err
+		}
+		address = strings.Replace(address, "0.0.0.0", outboundIp, 1)
+		address = strings.Replace(address, "::", "["+outboundIp+"]", 1)
+		address = strings.Replace(address, "[::]", "["+outboundIp+"]", 1)
+	}
+	return address, nil
+}
+
+// getOutBoundIP returns the outbound IP address.
+func getOutBoundIP() (string, error) {
+	interfacesAddresses, err := net.InterfaceAddrs()
+	if err != nil {
+		return "", err
+	}
+
+	for _, address := range interfacesAddresses {
+		if ipNet, ok := address.(*net.IPNet); ok && !ipNet.IP.IsLoopback() {
+			if ipNet.IP.To4() != nil {
+				return ipNet.IP.String(), nil
+			}
+		}
+	}
+
+	return "", fmt.Errorf("no IP found")
 }
