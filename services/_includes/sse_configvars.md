@@ -14,6 +14,7 @@
 | OCIS_TRACING_TYPE<br/>SSE_TRACING_TYPE | string |  | The type of tracing. Defaults to '', which is the same as 'jaeger'. Allowed tracing types are 'jaeger' and '' as of now.|
 | OCIS_TRACING_ENDPOINT<br/>SSE_TRACING_ENDPOINT | string |  | The endpoint of the tracing agent.|
 | OCIS_TRACING_COLLECTOR<br/>SSE_TRACING_COLLECTOR | string |  | The HTTP endpoint for sending spans directly to a collector, i.e. http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.|
+| SSE_KEEPALIVE_INTERVAL | Duration | 0s | To prevent intermediate proxies from closing the SSE connection, send periodic SSE comments to keep it open.|
 | OCIS_EVENTS_ENDPOINT<br/>SSE_EVENTS_ENDPOINT | string | 127.0.0.1:9233 | The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.|
 | OCIS_EVENTS_CLUSTER<br/>SSE_EVENTS_CLUSTER | string | ocis-cluster | The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system.|
 | OCIS_INSECURE<br/>SSE_EVENTS_TLS_INSECURE | bool | false | Whether to verify the server TLS certificates.|

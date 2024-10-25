@@ -16,6 +16,7 @@ tracing:
   type: ""
   endpoint: ""
   collector: ""
+keepalive_interval: 0s
 events:
   endpoint: 127.0.0.1:9233
   cluster: ocis-cluster
