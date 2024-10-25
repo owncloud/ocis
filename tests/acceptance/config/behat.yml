@@ -428,6 +428,7 @@ default:
         - SearchContext:
         - TagContext:
         - TrashbinContext:
+        - SpacesTUSContext:
 
     coreApiMain:
       paths:
