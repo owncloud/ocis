@@ -29,7 +29,6 @@ import (
 
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/lookup"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/node"
-	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/tree"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/pkg/errors"
@@ -127,12 +126,6 @@ func (bs *Blobstore) Delete(node *node.Node) error {
 		return errors.Wrapf(err, "could not delete object '%s' from bucket '%s'", bs.Path(node), bs.bucket)
 	}
 	return nil
-}
-
-// GetAvailableSize returns the available size in the blobstore in bytes
-func (bs *Blobstore) GetAvailableSize(n *node.Node) (uint64, error) {
-	// S3 doen't have a concept of available size
-	return 0, tree.ErrSizeUnlimited
 }
 
 // List lists all blobs in the Blobstore
