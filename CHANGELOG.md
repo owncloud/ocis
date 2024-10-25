@@ -58,6 +58,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Generate short tokens to be used as access tokens for WOPI: [#10391](https://github.com/owncloud/ocis/pull/10391)
+* Bugfix - Make SSE keepalive interval configurable: [#10411](https://github.com/owncloud/ocis/pull/10411)
 * Enhancement - Add web extensions to the ocis_full example: [#10399](https://github.com/owncloud/ocis/pull/10399)
 
 ## Details
@@ -69,6 +70,13 @@ The following sections list the changes for unreleased.
    token) is too long and refuses to work.
 
    https://github.com/owncloud/ocis/pull/10391
+
+* Bugfix - Make SSE keepalive interval configurable: [#10411](https://github.com/owncloud/ocis/pull/10411)
+
+   To prevent intermediate proxies from closing the SSE connection admins can now
+   configure a `SSE_KEEPALIVE_INTERVAL`.
+
+   https://github.com/owncloud/ocis/pull/10411
 
 * Enhancement - Add web extensions to the ocis_full example: [#10399](https://github.com/owncloud/ocis/pull/10399)
 
