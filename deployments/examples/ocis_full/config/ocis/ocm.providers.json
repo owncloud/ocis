@@ -1,0 +1,46 @@
+[
+  {
+    "name": "ocis-server",
+    "full_name": "first-ocis-instance",
+    "organization": "Owncloud",
+    "domain": "ocis.owncloud.test",
+    "homepage": "https://owncloud.com",
+    "services": [
+      {
+        "endpoint": {
+          "type": {
+            "name": "OCM",
+            "description": "CERNBox Open Cloud Mesh API"
+          },
+          "name": "CERNBox - OCM API",
+          "path": "https://ocis.owncloud.test/ocm/",
+          "is_monitored": true
+        },
+        "api_version": "0.0.1",
+        "host": "ocis.owncloud.test"
+      }
+    ]
+  },
+  {
+    "name": "federation-ocis-server",
+    "full_name": "Ocm ocis",
+    "organization": "Owncloud",
+    "domain": "ocis.ocm.owncloud.test",
+    "homepage": "https://owncloud.com",
+    "services": [
+      {
+        "endpoint": {
+          "type": {
+            "name": "OCM",
+            "description": "CERNBox Open Cloud Mesh API"
+          },
+          "name": "CERNBox - OCM API",
+          "path": "https://ocis.ocm.owncloud.test/ocm/",
+          "is_monitored": true
+        },
+        "api_version": "0.0.1",
+        "host": "ocis.ocm.owncloud.test"
+      }
+    ]
+  }
+]

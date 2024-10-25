@@ -2,8 +2,8 @@
 services:
 
   collaboration-oo:
-    command: [ "-c", "dlv --listen=:40002 --headless=true --continue --check-go-version=false --api-version=2 --accept-multiclient exec /usr/bin/ocis collaboration server" ]
+    command: [ "-c", "dlv --listen=:40000 --headless=true --continue --check-go-version=false --api-version=2 --accept-multiclient exec /usr/bin/ocis collaboration server" ]
     environment:
       COLLABORATION_LOG_LEVEL: debug
     ports:
-      - 40002:40002
+      - 40002:40000

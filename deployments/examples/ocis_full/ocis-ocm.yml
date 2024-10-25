@@ -4,11 +4,20 @@ services:
     networks:
       ocis-net:
         aliases:
-          - ${OCIS_DOMAIN:-ocis.owncloud.test}
+          - ${OCIS_OCM_DOMAIN:-ocis.ocm.owncloud.test}
   ocis:
+    environment:
+      OCIS_ADD_RUN_SERVICES: "notifications, ocm"
+      OCIS_ENABLE_OCM: true
+      OCM_OCM_INVITE_MANAGER_INSECURE: true
+      OCM_OCM_SHARE_PROVIDER_INSECURE: true
+      OCM_OCM_STORAGE_PROVIDER_INSECURE: true
+      OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE: /etc/ocm/providers.json
+      WEB_UI_CONFIG_FILE: /etc/ocis/ocis.web.config.json
+
+
+  ocis-ocm:
     image: ${OCIS_DOCKER_IMAGE:-owncloud/ocis}:${OCIS_DOCKER_TAG:-latest}
-    # changelog: https://github.com/owncloud/ocis/tree/master/changelog
-    # release notes: https://doc.owncloud.com/ocis_release_notes.html
     networks:
       ocis-net:
     entrypoint:
@@ -18,9 +27,9 @@ services:
     # therefore we ignore the error and then start the ocis server
     command: ["-c", "ocis init || true; ocis server"]
     environment:
-      # enable services that are not started automatically
-      OCIS_ADD_RUN_SERVICES: ${START_ADDITIONAL_SERVICES}
-      OCIS_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}
+      # enable the notifications service as it is not started automatically
+      OCIS_ADD_RUN_SERVICES: "notifications, ocm"
+      OCIS_URL: https://${OCIS_OCM_DOMAIN:-ocis.ocm.owncloud.test}
       OCIS_LOG_LEVEL: ${LOG_LEVEL:-info}
       OCIS_LOG_COLOR: "${LOG_PRETTY:-false}"
       OCIS_LOG_PRETTY: "${LOG_PRETTY:-false}"
@@ -39,7 +48,7 @@ services:
       # email server (if configured)
       NOTIFICATIONS_SMTP_HOST: "${SMTP_HOST}"
       NOTIFICATIONS_SMTP_PORT: "${SMTP_PORT}"
-      NOTIFICATIONS_SMTP_SENDER: "${SMTP_SENDER:-oCIS notifications <notifications@${OCIS_DOMAIN:-ocis.owncloud.test}>}"
+      NOTIFICATIONS_SMTP_SENDER: "${SMTP_OCM_SENDER:-oCIS notifications <notifications@${OCIS_OCM_DOMAIN:-ocis.ocm.owncloud.test}>}"
       NOTIFICATIONS_SMTP_USERNAME: "${SMTP_USERNAME}"
       NOTIFICATIONS_SMTP_INSECURE: "${SMTP_INSECURE}"
       # make the registry available to the app provider containers
@@ -53,26 +62,33 @@ services:
       COMPANION_DOMAIN: ${COMPANION_DOMAIN:-companion.owncloud.test}
       # enable to allow using the banned passwords list
       OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST: banned-password-list.txt
+      # ocm configuration
+      OCIS_ENABLE_OCM: true
+      OCM_OCM_INVITE_MANAGER_INSECURE: true
+      OCM_OCM_SHARE_PROVIDER_INSECURE: true
+      OCM_OCM_STORAGE_PROVIDER_INSECURE: true
+      OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE: /etc/ocm/providers.json
+      WEB_UI_CONFIG_FILE: /etc/ocis/ocis.ocm.web.config.json
     volumes:
       - ./config/ocis/app-registry.yaml:/etc/ocis/app-registry.yaml
       - ./config/ocis/csp.yaml:/etc/ocis/csp.yaml
       - ./config/ocis/banned-password-list.txt:/etc/ocis/banned-password-list.txt
-      - ./config/ocis/ocis.web.config.json:/etc/ocis/ocis.web.config.json:ro
+      - ./config/ocis/ocis.ocm.web.config.json:/etc/ocis/ocis.ocm.web.config.json:ro
       - ./config/ocis/ocm.providers.json:/etc/ocm/providers.json
       # configure the .env file to use own paths instead of docker internal volumes
-      - ${OCIS_CONFIG_DIR:-ocis-config}:/etc/ocis
-      - ${OCIS_DATA_DIR:-ocis-data}:/var/lib/ocis
+      - ${OCIS_CONFIG_DIR:-ocis-ocm-config}:/etc/ocis
+      - ${OCIS_OCM_DATA_DIR:-ocis-ocm-data}:/var/lib/ocis
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.ocis.entrypoints=https"
-      - "traefik.http.routers.ocis.rule=Host(`${OCIS_DOMAIN:-ocis.owncloud.test}`)"
-      - "traefik.http.routers.ocis.tls.certresolver=http"
-      - "traefik.http.routers.ocis.service=ocis"
-      - "traefik.http.services.ocis.loadbalancer.server.port=9200"
+      - "traefik.http.routers.ocis-ocm.entrypoints=https"
+      - "traefik.http.routers.ocis-ocm.rule=Host(`${OCIS_OCM_DOMAIN:-ocis.ocm.owncloud.test}`)"
+      - "traefik.http.routers.ocis-ocm.tls.certresolver=http"
+      - "traefik.http.routers.ocis-ocm.service=ocis-ocm"
+      - "traefik.http.services.ocis-ocm.loadbalancer.server.port=9200"
     logging:
       driver: ${LOG_DRIVER:-local}
     restart: always
 
 volumes:
-  ocis-config:
-  ocis-data:
+  ocis-ocm-config:
+  ocis-ocm-data:

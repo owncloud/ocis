@@ -6,4 +6,4 @@ services:
     environment:
       OCIS_LOG_LEVEL: debug
     ports:
-      - 40000:40000
+      - 40004:40000
