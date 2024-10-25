@@ -58,6 +58,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Generate short tokens to be used as access tokens for WOPI: [#10391](https://github.com/owncloud/ocis/pull/10391)
+* Bugfix - Fix put relative wopi operation for microsoft: [#10403](https://github.com/owncloud/ocis/pull/10403)
 * Bugfix - Make SSE keepalive interval configurable: [#10411](https://github.com/owncloud/ocis/pull/10411)
 * Enhancement - Add web extensions to the ocis_full example: [#10399](https://github.com/owncloud/ocis/pull/10399)
 
@@ -70,6 +71,13 @@ The following sections list the changes for unreleased.
    token) is too long and refuses to work.
 
    https://github.com/owncloud/ocis/pull/10391
+
+* Bugfix - Fix put relative wopi operation for microsoft: [#10403](https://github.com/owncloud/ocis/pull/10403)
+
+   We fixed a bug in the put relative wopi operation for microsoft. The response
+   now contains the correct properties.
+
+   https://github.com/owncloud/ocis/pull/10403
 
 * Bugfix - Make SSE keepalive interval configurable: [#10411](https://github.com/owncloud/ocis/pull/10411)
 
