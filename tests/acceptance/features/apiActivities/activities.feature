@@ -1566,6 +1566,234 @@ Feature: check activities
       }
       """
 
+  @issue-10210
+  Scenario: check activities of a folder after renaming
+    Given user "Alice" has created folder "FOLDER"
+    And user "Alice" has uploaded file with content "ownCloud test text file" to "FOLDER/textfile.txt"
+    And user "Alice" has moved folder "FOLDER" to "RENAMED FOLDER"
+    And user "Alice" has uploaded file with content "updated ownCloud test text file" to "RENAMED FOLDER/textfile.txt"
+    When user "Alice" lists the activities of file "RENAMED FOLDER" from space "Personal" using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 4,
+            "maxItems": 4,
+            "uniqueItems": true,
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "required": ["id", "template", "times"],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^%user_id_pattern%$"
+                    },
+                    "template": {
+                      "type": "object",
+                      "required": ["message", "variables"],
+                      "properties": {
+                        "message": {
+                          "const": "{user} added {resource} to {folder}"
+                        },
+                        "variables": {
+                          "type": "object",
+                          "required": ["folder", "resource", "user"],
+                          "properties": {
+                            "resource": {
+                              "type": "object",
+                              "required": ["id", "name"],
+                              "properties": {
+                                "name": {
+                                  "const": "FOLDER"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["id", "template", "times"],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^%user_id_pattern%$"
+                    },
+                    "template": {
+                      "type": "object",
+                      "required": ["message", "variables"],
+                      "properties": {
+                        "message": {
+                          "const": "{user} added {resource} to {folder}"
+                        },
+                        "variables": {
+                          "type": "object",
+                          "required": ["folder", "resource", "user"],
+                          "properties": {
+                            "folder": {
+                              "type": "object",
+                              "required": ["id", "name"],
+                              "properties": {
+                                "name": {
+                                  "const": "FOLDER"
+                                }
+                              }
+                            },
+                            "resource": {
+                              "type": "object",
+                              "required": ["id", "name"],
+                              "properties": {
+                                "name": {
+                                  "const": "textfile.txt"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["id", "template", "times"],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^%user_id_pattern%$"
+                    },
+                    "template": {
+                      "type": "object",
+                      "required": ["message", "variables"],
+                      "properties": {
+                        "message": {
+                          "const": "{user} renamed {oldResource} to {resource}"
+                        },
+                        "variables": {
+                          "type": "object",
+                          "required": ["folder", "oldResource", "resource", "user"],
+                          "properties": {
+                            "folder": {
+                              "type": "object",
+                              "required": ["id", "name"],
+                              "properties": {
+                                "name": {
+                                  "const": "Alice Hansen"
+                                }
+                              }
+                            },
+                            "oldResource": {
+                              "type": "object",
+                              "required": ["id", "name"],
+                              "properties": {
+                                "name": {
+                                  "const": "FOLDER"
+                                }
+                              }
+                            },
+                            "resource": {
+                              "type": "object",
+                              "required": ["id", "name"],
+                              "properties": {
+                                "name": {
+                                  "const": "RENAMED FOLDER"
+                                }
+                              }
+                            },
+                            "user": {
+                              "type": "object",
+                              "required": ["id", "displayName"],
+                              "properties": {
+                                "displayName": {
+                                  "const": "Alice Hansen"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["id", "template", "times"],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^%user_id_pattern%$"
+                    },
+                    "template": {
+                      "type": "object",
+                      "required": ["message", "variables"],
+                      "properties": {
+                        "message": {
+                          "const": "{user} updated {resource} in {folder}"
+                        },
+                        "variables": {
+                          "type": "object",
+                          "required": ["folder", "resource", "user"],
+                          "properties": {
+                            "folder": {
+                              "type": "object",
+                              "required": ["id", "name"],
+                              "properties": {
+                                "name": {
+                                  "const": "RENAMED FOLDER"
+                                }
+                              }
+                            },
+                            "resource": {
+                              "type": "object",
+                              "required": ["id", "name"],
+                              "properties": {
+                                "name": {
+                                  "const": "textfile.txt"
+                                }
+                              }
+                            },
+                            "user": {
+                              "type": "object",
+                              "required": ["id", "displayName"],
+                              "properties": {
+                                "displayName": {
+                                  "const": "Alice Hansen"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "times": {
+                      "type": "object",
+                      "required": ["recordedTime"],
+                      "properties": {
+                        "recordedTime": {
+                          "type": "string",
+                          "format": "date-time"
+                        }
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+      """
+
   @issue-9856 @issue-10127
   Scenario: check activity message with different language
     Given user "Alice" has uploaded file with content "ownCloud test text file" to "textfile.txt"
