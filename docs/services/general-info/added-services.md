@@ -13,7 +13,7 @@ have been added per release.
 
 ## Added Services
 
-The following table gives an overview about releases and their services. Note that v6.x were rolling releases only and not mentioned therefore. Any changes from v6.x got incorporated in v7.
+The following table gives an overview about releases and their services. Note that v6.x were rolling releases only and not mentioned therefore. Any changes from v6.x were incorporated in v7.
 
 [//]: # (for ease of handling, use the .excel table from the same folder and convert it via https://tabletomarkdown.com/convert-spreadsheet-to-markdown/)
 
