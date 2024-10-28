@@ -8,6 +8,16 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [0.10.1] - 2024-10-27
+
+### Changed
+
+- Upgrade `go.opentelemetry.io/otel`, `go.opentelemetry.io/otel/sdk`, & `go.opentelemetry.io/otel/trace` to `v1.31.0`. ([#70])
+
+### Fixed
+
+- Span for websocket connection now won't be marked as error span. ([#67])
+
 ## [0.10.0] - 2024-09-17
 
 ### Added
@@ -194,6 +204,8 @@ It contains instrumentation for trace and depends on:
 - Example code for a basic usage.
 - Apache-2.0 license.
 
+[#70]: https://github.com/riandyrn/otelchi/pull/70
+[#67]: https://github.com/riandyrn/otelchi/pull/67
 [#64]: https://github.com/riandyrn/otelchi/pull/64
 [#63]: https://github.com/riandyrn/otelchi/pull/63
 [#62]: https://github.com/riandyrn/otelchi/pull/62
@@ -219,7 +231,8 @@ It contains instrumentation for trace and depends on:
 [#2]: https://github.com/riandyrn/otelchi/pull/2
 [#1]: https://github.com/riandyrn/otelchi/pull/1
 
-[Unreleased]: https://github.com/riandyrn/otelchi/compare/v0.10.0...HEAD
+[Unreleased]: https://github.com/riandyrn/otelchi/compare/v0.10.1...HEAD
+[0.10.1]: https://github.com/riandyrn/otelchi/releases/tag/v0.10.1
 [0.10.0]: https://github.com/riandyrn/otelchi/releases/tag/v0.10.0
 [0.9.0]: https://github.com/riandyrn/otelchi/releases/tag/v0.9.0
 [0.8.0]: https://github.com/riandyrn/otelchi/releases/tag/v0.8.0
