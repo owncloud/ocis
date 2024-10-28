@@ -126,7 +126,6 @@ func New(m map[string]interface{}, stream events.Stream) (storage.FS, error) {
 	aspects := aspects.Aspects{
 		Lookup:            lu,
 		Tree:              tp,
-		Blobstore:         bs,
 		Permissions:       p,
 		EventStream:       stream,
 		UserMapper:        um,
