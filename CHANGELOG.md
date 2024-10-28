@@ -61,6 +61,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Generate short tokens to be used as access tokens for WOPI: [#10391](https://github.com/owncloud/ocis/pull/10391)
 * Bugfix - Fix put relative wopi operation for microsoft: [#10403](https://github.com/owncloud/ocis/pull/10403)
 * Bugfix - Make SSE keepalive interval configurable: [#10411](https://github.com/owncloud/ocis/pull/10411)
+* Bugfix - Micro registry cache fixes: [#10429](https://github.com/owncloud/ocis/pull/10429)
 * Enhancement - Add web extensions to the ocis_full example: [#10399](https://github.com/owncloud/ocis/pull/10399)
 
 ## Details
@@ -99,6 +100,12 @@ The following sections list the changes for unreleased.
    configure a `SSE_KEEPALIVE_INTERVAL`.
 
    https://github.com/owncloud/ocis/pull/10411
+
+* Bugfix - Micro registry cache fixes: [#10429](https://github.com/owncloud/ocis/pull/10429)
+
+   We now invalidate cache entries when any of the nodes was not updated.
+
+   https://github.com/owncloud/ocis/pull/10429
 
 * Enhancement - Add web extensions to the ocis_full example: [#10399](https://github.com/owncloud/ocis/pull/10399)
 
