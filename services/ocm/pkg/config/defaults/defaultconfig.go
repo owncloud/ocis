@@ -109,8 +109,7 @@ func DefaultConfig() *config.Config {
 		OCMProviderAuthorizerDriver: "json",
 		OCMProviderAuthorizerDrivers: config.OCMProviderAuthorizerDrivers{
 			JSON: config.OCMProviderAuthorizerJSONDriver{
-				Providers:             filepath.Join(defaults.BaseConfigPath(), "ocmproviders.json"),
-				VerifyRequestHostname: true,
+				Providers: filepath.Join(defaults.BaseConfigPath(), "ocmproviders.json"),
 			},
 		},
 		OCMShareProvider: config.OCMShareProvider{
