@@ -1,6 +1,6 @@
 ---
 title: Thumbnails
-date: 2024-10-28T11:50:16.719320486Z
+date: 2024-10-28T13:33:57.699314611Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/thumbnails
@@ -128,7 +128,13 @@ enabled at buildtime and has a couple of implications:
 *  Therefore, the libvips shared libraries need to be available at runtime in the same release that was used to build the ocis binary.
 *  When using the ocis docker images, the libvips shared libraries are included in the image and are correctly embedded.
 
-Support of libvips is disabled by default. To enable it, make sure libvips and its buildtime dependencies are installed in your build environment.
+Support of libvips is disabled by default. To enable it, make sure libvips and its buildtime dependencies are installed in your build environment. For macOS users, add the build time dependencies via:
+
+```shell
+brew install vips pkg-config
+export PKG_CONFIG_PATH="/usr/local/opt/libffi/lib/pkgconfig"
+```
+
 Then you just need to set the `ENABLE_VIPS` variable on the `make` command:
 
 ```shell
