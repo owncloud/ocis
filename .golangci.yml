@@ -66,6 +66,7 @@ linters-settings:
       - github.com/egirna/icap-client
       - github.com/unrolled/secure
       - github.com/go-micro/plugins/v4/store/nats-js-kv
+      - go-micro.dev/v4
   interfacebloat:
     max: 15
 
