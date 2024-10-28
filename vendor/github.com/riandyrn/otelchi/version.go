@@ -2,5 +2,5 @@ package otelchi
 
 // Version is the current release version of otelchi in use.
 func Version() string {
-	return "0.10.0"
+	return "0.10.1"
 }

@@ -3,12 +3,14 @@ package otelchi
 import (
 	"net/http"
 	"strconv"
+	"strings"
 	"sync"
 
 	"github.com/felixge/httpsnoop"
 	"github.com/go-chi/chi/v5"
 
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/propagation"
 
 	semconv "go.opentelemetry.io/otel/semconv/v1.20.0"
@@ -202,6 +204,12 @@ func (tw traceware) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		span.SetName(spanName)
 	}
 
+	// check if the request is a WebSocket upgrade request
+	if isWebSocketRequest(r) {
+		span.SetStatus(codes.Unset, "WebSocket upgrade request")
+		return
+	}
+
 	// set status code attribute
 	span.SetAttributes(semconv.HTTPStatusCode(rrw.status))
 
@@ -220,4 +228,18 @@ func addPrefixToSpanName(shouldAdd bool, prefix, spanName string) string {
 		spanName = prefix + " " + spanName
 	}
 	return spanName
+}
+
+// isWebSocketRequest checks if an HTTP request is a WebSocket upgrade request
+// Fix: https://github.com/riandyrn/otelchi/issues/66
+func isWebSocketRequest(r *http.Request) bool {
+	// Check if the Connection header contains "Upgrade"
+	connectionHeader := r.Header.Get("Connection")
+	if !strings.Contains(strings.ToLower(connectionHeader), "upgrade") {
+		return false
+	}
+
+	// Check if the Upgrade header is "websocket"
+	upgradeHeader := r.Header.Get("Upgrade")
+	return strings.ToLower(upgradeHeader) == "websocket"
 }
