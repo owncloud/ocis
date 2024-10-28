@@ -63,6 +63,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Make SSE keepalive interval configurable: [#10411](https://github.com/owncloud/ocis/pull/10411)
 * Bugfix - Micro registry cache fixes: [#10429](https://github.com/owncloud/ocis/pull/10429)
 * Enhancement - Add web extensions to the ocis_full example: [#10399](https://github.com/owncloud/ocis/pull/10399)
+* Enhancement - Bump reva to 2.26.2: [#10419](https://github.com/owncloud/ocis/pull/10419)
 
 ## Details
 
@@ -120,6 +121,13 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/web-extensions/blob/main/README.md
 
    https://github.com/owncloud/ocis/pull/10399
+
+* Enhancement - Bump reva to 2.26.2: [#10419](https://github.com/owncloud/ocis/pull/10419)
+
+  *   Enhancement [cs3org/reva#4897](https://github.com/cs3org/reva/pull/4897): Fix remaining quota calculation
+  *   Bugfix      [cs3org/reva#4902](https://github.com/cs3org/reva/pull/4902): Fix quota calculation
+
+   https://github.com/owncloud/ocis/pull/10419
 
 # Changelog for [6.6.1] (2024-10-24)
 
