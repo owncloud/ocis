@@ -130,8 +130,7 @@ func OCMConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]inter
 					"driver": cfg.OCMProviderAuthorizerDriver,
 					"drivers": map[string]interface{}{
 						"json": map[string]interface{}{
-							"providers":               cfg.OCMProviderAuthorizerDrivers.JSON.Providers,
-							"verify_request_hostname": cfg.OCMProviderAuthorizerDrivers.JSON.VerifyRequestHostname,
+							"providers": cfg.OCMProviderAuthorizerDrivers.JSON.Providers,
 						},
 					},
 				},

@@ -114,8 +114,7 @@ type OCMProviderAuthorizerDrivers struct {
 }
 
 type OCMProviderAuthorizerJSONDriver struct {
-	Providers             string `yaml:"providers" env:"OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE" desc:"Path to the JSON file where ocm invite data will be stored. Defaults to $OCIS_CONFIG_DIR/ocmproviders.json." introductionVersion:"5.0"`
-	VerifyRequestHostname bool   `yaml:"verify_request_hostname" env:"OCM_OCM_PROVIDER_AUTHORIZER_VERIFY_REQUEST_HOSTNAME" desc:"Verify the hostname of the incoming request against the hostname of the OCM provider." introductionVersion:"5.0"`
+	Providers string `yaml:"providers" env:"OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE" desc:"Path to the JSON file where ocm invite data will be stored. Defaults to $OCIS_CONFIG_DIR/ocmproviders.json." introductionVersion:"5.0"`
 }
 
 type OCMCore struct {
