@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-10-28-09-41-04]
+[#deprecation-note-2024-10-28-11-50-16]
 [caption=]
 .Deprecation notes for the ocm service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -548,17 +548,6 @@ a| [subs=-attributes]
 ++/etc/ocis/ocmproviders.json ++
 a| [subs=-attributes]
 Path to the JSON file where ocm invite data will be stored. Defaults to $OCIS_CONFIG_DIR/ocmproviders.json.
-
-a|`OCM_OCM_PROVIDER_AUTHORIZER_VERIFY_REQUEST_HOSTNAME` +
-
-a| [subs=-attributes]
-++5.0 ++
-a| [subs=-attributes]
-++bool ++
-a| [subs=-attributes]
-++true ++
-a| [subs=-attributes]
-Verify the hostname of the incoming request against the hostname of the OCM provider.
 
 a|`OCM_OCM_SHARE_PROVIDER_DRIVER` +
 
