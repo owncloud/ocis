@@ -41,11 +41,11 @@ func Server(cfg *config.Config) *cli.Command {
 
 			defer cancel()
 
+			// make sure the run group executes all interrupt handlers when the context is canceled
 			gr.Add(func() error {
 				<-ctx.Done()
-				cancel()
 				return nil
-			}, func(err error) {
+			}, func(_ error) {
 			})
 
 			gr.Add(func() error {

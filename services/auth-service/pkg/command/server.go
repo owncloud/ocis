@@ -46,6 +46,13 @@ func Server(cfg *config.Config) *cli.Command {
 
 			rcfg := revaconfig.AuthMachineConfigFromStruct(cfg)
 
+			// make sure the run group executes all interrupt handlers when the context is canceled
+			gr.Add(func() error {
+				<-ctx.Done()
+				return nil
+			}, func(_ error) {
+			})
+
 			gr.Add(func() error {
 				runtime.RunWithOptions(rcfg, pidFile,
 					runtime.WithLogger(&logger.Logger),
