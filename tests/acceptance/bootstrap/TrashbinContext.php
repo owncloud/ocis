@@ -721,7 +721,6 @@ class TrashbinContext implements Context {
 		);
 
 		if (\count($sections) !== 1) {
-			// TODO: handle deeper structures
 			$listing = $this->listTrashbinFolderCollection($user, \basename(\rtrim($firstEntry['href'], '/')));
 		} else {
 			$listing = [];
