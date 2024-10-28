@@ -48,8 +48,8 @@ Feature: List a sharing permissions
           },
           "@libre.graph.permissions.roles.allowedValues": {
             "type": "array",
-            "minItems": 4,
-            "maxItems": 4,
+            "minItems": 3,
+            "maxItems": 3,
             "uniqueItems": true,
             "items": {
               "oneOf": [
@@ -66,41 +66,6 @@ Feature: List a sharing permissions
                       "type": "integer",
                       "enum": [
                         1
-                      ]
-                    },
-                    "description": {
-                      "type": "string",
-                      "enum": [
-                        "View only documents, images and PDFs. Watermarks will be applied."
-                      ]
-                    },
-                    "displayName": {
-                      "type": "string",
-                      "enum": [
-                        "Can view (secure)"
-                      ]
-                    },
-                    "id": {
-                      "type": "string",
-                      "enum": [
-                        "aa97fe03-7980-45ac-9e50-b325749fd7e6"
-                      ]
-                    }
-                  }
-                },
-                {
-                  "type": "object",
-                  "required": [
-                    "@libre.graph.weight",
-                    "description",
-                    "displayName",
-                    "id"
-                  ],
-                  "properties": {
-                    "@libre.graph.weight": {
-                      "type": "integer",
-                      "enum": [
-                        2
                       ]
                     },
                     "description": {
@@ -135,7 +100,7 @@ Feature: List a sharing permissions
                     "@libre.graph.weight": {
                       "type": "integer",
                       "enum": [
-                        3
+                        2
                       ]
                     },
                     "description": {
@@ -170,7 +135,7 @@ Feature: List a sharing permissions
                     "@libre.graph.weight": {
                       "type": "integer",
                       "enum": [
-                        4
+                        3
                       ]
                     },
                     "description": {
@@ -642,8 +607,8 @@ Feature: List a sharing permissions
           },
           "@libre.graph.permissions.roles.allowedValues": {
             "type": "array",
-            "minItems": 3,
-            "maxItems": 3,
+            "minItems": 2,
+            "maxItems": 2,
             "uniqueItems": true,
             "items": {
               "oneOf":[
@@ -658,29 +623,6 @@ Feature: List a sharing permissions
                   "properties": {
                     "@libre.graph.weight": {
                       "const": 1
-                    },
-                    "description": {
-                      "const": "View only documents, images and PDFs. Watermarks will be applied."
-                    },
-                    "displayName": {
-                      "const": "Can view (secure)"
-                    },
-                    "id": {
-                      "const": "aa97fe03-7980-45ac-9e50-b325749fd7e6"
-                    }
-                  }
-                },
-                {
-                  "type": "object",
-                  "required": [
-                    "@libre.graph.weight",
-                    "description",
-                    "displayName",
-                    "id"
-                  ],
-                  "properties": {
-                    "@libre.graph.weight": {
-                      "const": 2
                     },
                     "description": {
                       "const": "View and download."
@@ -703,7 +645,7 @@ Feature: List a sharing permissions
                   ],
                   "properties": {
                     "@libre.graph.weight": {
-                      "const": 3
+                      "const": 2
                     },
                     "description": {
                       "const": "View, download and edit."
@@ -768,34 +710,11 @@ Feature: List a sharing permissions
             },
             "@libre.graph.permissions.roles.allowedValues": {
               "type": "array",
-              "minItems": 4,
-              "maxItems": 4,
+              "minItems": 3,
+              "maxItems": 3,
               "uniqueItems": true,
               "items": {
                 "oneOf":[
-                  {
-                    "type": "object",
-                    "required": [
-                      "@libre.graph.weight",
-                      "description",
-                      "displayName",
-                      "id"
-                    ],
-                    "properties": {
-                      "@libre.graph.weight": {
-                        "const": 1
-                      },
-                      "description": {
-                        "const": "View only documents, images and PDFs. Watermarks will be applied."
-                      },
-                      "displayName": {
-                        "const": "Can view (secure)"
-                      },
-                      "id": {
-                        "const": "aa97fe03-7980-45ac-9e50-b325749fd7e6"
-                      }
-                    }
-                  },
                 {
                   "type": "object",
                   "required": [
@@ -806,7 +725,7 @@ Feature: List a sharing permissions
                   ],
                   "properties": {
                     "@libre.graph.weight": {
-                      "const": 2
+                      "const": 1
                     },
                     "description": {
                       "const": "View and download."
@@ -829,7 +748,7 @@ Feature: List a sharing permissions
                   ],
                   "properties": {
                     "@libre.graph.weight": {
-                      "const": 3
+                      "const": 2
                     },
                     "description": {
                       "const": "View, download and upload."
@@ -852,7 +771,7 @@ Feature: List a sharing permissions
                   ],
                   "properties": {
                     "@libre.graph.weight": {
-                      "const": 4
+                      "const": 3
                     },
                     "description": {
                       "const": "View, download, upload, edit, add and delete."
@@ -917,8 +836,8 @@ Feature: List a sharing permissions
             },
             "@libre.graph.permissions.roles.allowedValues": {
               "type": "array",
-              "minItems": 3,
-              "maxItems": 3,
+              "minItems": 2,
+              "maxItems": 2,
               "uniqueItems": true,
               "items": {
                 "oneOf":[
@@ -933,29 +852,6 @@ Feature: List a sharing permissions
                   "properties": {
                     "@libre.graph.weight": {
                       "const": 1
-                    },
-                    "description": {
-                      "const": "View only documents, images and PDFs. Watermarks will be applied."
-                    },
-                    "displayName": {
-                      "const": "Can view (secure)"
-                    },
-                    "id": {
-                      "const": "aa97fe03-7980-45ac-9e50-b325749fd7e6"
-                    }
-                  }
-                },
-                {
-                  "type": "object",
-                  "required": [
-                    "@libre.graph.weight",
-                    "description",
-                    "displayName",
-                    "id"
-                  ],
-                  "properties": {
-                    "@libre.graph.weight": {
-                      "const": 2
                     },
                     "description": {
                       "const": "View and download."
@@ -978,7 +874,7 @@ Feature: List a sharing permissions
                   ],
                   "properties": {
                     "@libre.graph.weight": {
-                      "const": 3
+                      "const": 2
                     },
                     "description": {
                       "const": "View, download and edit."
@@ -2305,5 +2201,99 @@ Feature: List a sharing permissions
               }
             }
           }
+      }
+      """
+
+  @env-config
+  Scenario: user lists permissions of a folder in personal space after enabling secure viewer role
+    Given user "Alice" has created folder "folder"
+    And the administrator has enabled the permissions role "Secure Viewer"
+    When user "Alice" gets permissions list for folder "folder" of the space "Personal" using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "@libre.graph.permissions.actions.allowedValues",
+          "@libre.graph.permissions.roles.allowedValues"
+        ],
+        "properties": {
+          "@libre.graph.permissions.roles.allowedValues": {
+            "type": "array",
+            "minItems": 4,
+            "maxItems": 4,
+            "uniqueItems": true,
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "required": [
+                    "@libre.graph.weight",
+                    "description",
+                    "displayName",
+                    "id"
+                  ],
+                  "properties": {
+                    "@libre.graph.weight": {
+                      "const": 1
+                    },
+                    "description": {
+                      "const": "View only documents, images and PDFs. Watermarks will be applied."
+                    },
+                    "displayName": {
+                      "const": "Can view (secure)"
+                    },
+                    "id": {
+                      "const": "aa97fe03-7980-45ac-9e50-b325749fd7e6"
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": [
+                    "@libre.graph.weight",
+                    "description",
+                    "displayName",
+                    "id"
+                  ],
+                  "properties": {
+                    "displayName": {
+                      "const": "Can view"
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": [
+                    "@libre.graph.weight",
+                    "description",
+                    "displayName",
+                    "id"
+                  ],
+                  "properties": {
+                    "displayName": {
+                      "const": "Can upload"
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": [
+                    "@libre.graph.weight",
+                    "description",
+                    "displayName",
+                    "id"
+                  ],
+                  "properties": {
+                    "displayName": {
+                      "const": "Can edit"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
       }
       """

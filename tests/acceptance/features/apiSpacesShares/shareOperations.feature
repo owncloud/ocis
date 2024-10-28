@@ -404,23 +404,25 @@ Feature: sharing
       | Editor           |
       | Uploader         |
 
-
+  @env-config
   Scenario: sharee cannot download file shared with Secure viewer permission by sharee
     Given using old DAV path
+    And the administrator has enabled the permissions role "Secure Viewer"
     And user "Alice" has uploaded file with content "hello world" to "textfile.txt"
     And user "Alice" has sent the following resource share invitation:
       | resource        | textfile.txt  |
       | space           | Personal      |
       | sharee          | Brian         |
       | shareType       | user          |
-      | permissionsRole | Secure viewer |
+      | permissionsRole | Secure Viewer |
     And user "Brian" has a share "textfile.txt" synced
     And user "Brian" downloads file "/Shares/textfile.txt" using the WebDAV API
     Then the HTTP status code should be "403"
 
-
+  @env-config
   Scenario: sharee cannot download file inside folder shared with Secure viewer permission by sharee
     Given using old DAV path
+    And the administrator has enabled the permissions role "Secure Viewer"
     And user "Alice" has created folder "FolderToShare"
     And user "Alice" has uploaded file with content "hello world" to "FolderToShare/textfile.txt"
     And user "Alice" has sent the following resource share invitation:
@@ -428,7 +430,7 @@ Feature: sharing
       | space           | Personal      |
       | sharee          | Brian         |
       | shareType       | user          |
-      | permissionsRole | Secure viewer |
+      | permissionsRole | Secure Viewer |
     And user "Brian" has a share "FolderToShare" synced
     And user "Brian" downloads file "/Shares/FolderToShare/textfile.txt" using the WebDAV API
     Then the HTTP status code should be "403"

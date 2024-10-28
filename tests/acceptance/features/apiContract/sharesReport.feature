@@ -84,9 +84,10 @@ Feature: REPORT request to Shares space
       | old              |
       | new              |
 
-  @issue-9607 @issue-10329
+  @issue-9607 @issue-10329 @env-config
   Scenario Outline: check the REPORT response of a folder shared with secure viewer role
     Given using <dav-path-version> DAV path
+    And the administrator has enabled the permissions role "Secure Viewer"
     And user "Alice" has created folder "/secureFolder"
     And user "Alice" has uploaded file with content "secure content" to "/secureFolder/secure.txt"
     And user "Alice" has sent the following resource share invitation:
@@ -94,7 +95,7 @@ Feature: REPORT request to Shares space
       | space           | Personal      |
       | sharee          | Brian         |
       | shareType       | user          |
-      | permissionsRole | Secure viewer |
+      | permissionsRole | Secure Viewer |
     And user "Brian" has a share "secureFolder" synced
     When user "Brian" searches for "secureFolder" using the WebDAV API
     Then the HTTP status code should be "207"
@@ -125,16 +126,17 @@ Feature: REPORT request to Shares space
       | new              |
       | spaces           |
 
-  @issue-9607 @issue-10329
+  @issue-9607 @issue-10329 @env-config
   Scenario Outline: check the REPORT response of a file shared with secure viewer role
     Given using <dav-path-version> DAV path
+    And the administrator has enabled the permissions role "Secure Viewer"
     And user "Alice" has uploaded file with content "secure content" to "/secure.txt"
     And user "Alice" has sent the following resource share invitation:
       | resource        | secure.txt    |
       | space           | Personal      |
       | sharee          | Brian         |
       | shareType       | user          |
-      | permissionsRole | Secure viewer |
+      | permissionsRole | Secure Viewer |
     And user "Brian" has a share "secure.txt" synced
     When user "Brian" searches for "secure.txt" using the WebDAV API
     Then the HTTP status code should be "207"

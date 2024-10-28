@@ -89,6 +89,7 @@ default:
         - SpacesTUSContext:
         - GraphContext:
         - SharingNgContext:
+        - OcisConfigContext:
 
     apiArchiver:
       paths:
@@ -328,6 +329,7 @@ default:
         - WebDavLockingContext:
         - PublicWebDavContext:
         - SharingNgContext:
+        - OcisConfigContext:
 
     apiSharingNg1:
       paths:
@@ -515,6 +517,7 @@ default:
         - FilesVersionsContext:
         - SettingsContext:
         - SharingNgContext:
+        - OcisConfigContext:
 
     coreApiShareManagementBasicToShares:
       paths:
@@ -699,6 +702,7 @@ default:
         - FeatureContext: *common_feature_context_params
         - SharingNgContext:
         - WebDavPropertiesContext:
+        - OcisConfigContext:
 
     coreApiWebdavUpload:
       paths:
