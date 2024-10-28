@@ -515,7 +515,8 @@ func trap(s *Service, ctx context.Context) {
 		}
 	}
 	s.Log.Debug().Str("service", "runtime service").Msgf("terminating with signal: %v", s)
-	os.Exit(0)
+	time.Sleep(3 * time.Second) // give the services time to deregister
+	os.Exit(0)                  // FIXME this cause an early exit that prevents services from shitting down properly
 }
 
 // pingNats will attempt to connect to nats, blocking until a connection is established

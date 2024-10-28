@@ -63,10 +63,18 @@ func Server(cfg *config.Config) *cli.Command {
 			}
 
 			gr.Add(grpcServer.Run, func(_ error) {
-				logger.Error().
-					Err(err).
-					Str("server", "grpc").
-					Msg("shutting down server")
+				if err == nil {
+					logger.Info().
+						Str("transport", "grpc").
+						Str("server", cfg.Service.Name).
+						Msg("Shutting down server")
+				} else {
+					logger.Error().Err(err).
+						Str("transport", "grpc").
+						Str("server", cfg.Service.Name).
+						Msg("Shutting down server")
+				}
+
 				cancel()
 			})
 

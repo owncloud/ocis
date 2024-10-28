@@ -11,7 +11,6 @@ import (
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
-	"github.com/owncloud/ocis/v2/ocis-pkg/sync"
 	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	"github.com/owncloud/ocis/v2/services/storage-system/pkg/config"
@@ -42,6 +41,13 @@ func Server(cfg *config.Config) *cli.Command {
 
 			defer cancel()
 
+			// make sure the run group executes all interrupt handlers when the context is canceled
+			gr.Add(func() error {
+				<-ctx.Done()
+				return nil
+			}, func(_ error) {
+			})
+
 			gr.Add(func() error {
 				pidFile := path.Join(os.TempDir(), "revad-"+cfg.Service.Name+"-"+uuid.Must(uuid.NewV4()).String()+".pid")
 				rCfg := revaconfig.StorageSystemFromStruct(cfg)
@@ -55,10 +61,17 @@ func Server(cfg *config.Config) *cli.Command {
 
 				return nil
 			}, func(err error) {
-				logger.Error().
-					Err(err).
-					Str("server", "reva").
-					Msg("Shutting down server")
+				if err == nil {
+					logger.Info().
+						Str("transport", "reva").
+						Str("server", cfg.Service.Name).
+						Msg("Shutting down server")
+				} else {
+					logger.Error().Err(err).
+						Str("transport", "reva").
+						Str("server", cfg.Service.Name).
+						Msg("Shutting down server")
+				}
 
 				cancel()
 			})
@@ -77,10 +90,6 @@ func Server(cfg *config.Config) *cli.Command {
 				_ = debugServer.Shutdown(ctx)
 				cancel()
 			})
-
-			if !cfg.Supervised {
-				sync.Trap(&gr, cancel)
-			}
 
 			grpcSvc := registry.BuildGRPCService(cfg.GRPC.Namespace+"."+cfg.Service.Name, cfg.GRPC.Protocol, cfg.GRPC.Addr, version.GetString())
 			if err := registry.RegisterService(ctx, grpcSvc, logger); err != nil {

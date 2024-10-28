@@ -23,8 +23,7 @@ type Config struct {
 	Driver  string  `yaml:"driver" env:"USERS_DRIVER" desc:"The driver which should be used by the users service. Supported values are 'ldap' and 'owncloudsql'." introductionVersion:"pre5.0"`
 	Drivers Drivers `yaml:"drivers"`
 
-	Supervised bool            `yaml:"-"`
-	Context    context.Context `yaml:"-"`
+	Context context.Context `yaml:"-"`
 }
 type Log struct {
 	Level  string `yaml:"level" env:"OCIS_LOG_LEVEL;USERS_LOG_LEVEL" desc:"The log level. Valid values are: 'panic', 'fatal', 'error', 'warn', 'info', 'debug', 'trace'." introductionVersion:"pre5.0"`

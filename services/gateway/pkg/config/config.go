@@ -48,8 +48,7 @@ type Config struct {
 
 	StorageRegistry StorageRegistry `yaml:"storage_registry"` // TODO: should we even support switching this?
 
-	Supervised bool            `yaml:"-"`
-	Context    context.Context `yaml:"-"`
+	Context context.Context `yaml:"-"`
 }
 
 type Log struct {

@@ -63,10 +63,17 @@ func Server(cfg *config.Config) *cli.Command {
 			)
 
 			gr.Add(service.Run, func(_ error) {
-				logger.Error().
-					Err(err).
-					Str("server", "grpc").
-					Msg("Shutting down server")
+				if err == nil {
+					logger.Info().
+						Str("transport", "grpc").
+						Str("server", cfg.Service.Name).
+						Msg("Shutting down server")
+				} else {
+					logger.Error().Err(err).
+						Str("transport", "grpc").
+						Str("server", cfg.Service.Name).
+						Msg("Shutting down server")
+				}
 
 				cancel()
 			})
@@ -104,10 +111,18 @@ func Server(cfg *config.Config) *cli.Command {
 			}
 
 			gr.Add(httpServer.Run, func(_ error) {
-				logger.Error().
-					Err(err).
-					Str("server", "http").
-					Msg("Shutting down server")
+				if err == nil {
+					logger.Info().
+						Str("transport", "http").
+						Str("server", cfg.Service.Name).
+						Msg("Shutting down server")
+				} else {
+					logger.Error().Err(err).
+						Str("transport", "http").
+						Str("server", cfg.Service.Name).
+						Msg("Shutting down server")
+				}
+
 				cancel()
 			})
 

@@ -21,8 +21,7 @@ type Config struct {
 
 	AppRegistry AppRegistry `yaml:"app_registry"`
 
-	Supervised bool            `yaml:"-"`
-	Context    context.Context `yaml:"-"`
+	Context context.Context `yaml:"-"`
 }
 
 type Log struct {

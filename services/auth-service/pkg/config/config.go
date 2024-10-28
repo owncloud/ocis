@@ -21,8 +21,7 @@ type Config struct {
 	// TODO: when using multiple service accounts we need to find a way to configure them
 	ServiceAccount ServiceAccount `yaml:"service_account"`
 
-	Supervised bool            `yaml:"-"`
-	Context    context.Context `yaml:"-"`
+	Context context.Context `yaml:"-"`
 }
 
 type Log struct {
