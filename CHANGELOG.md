@@ -64,6 +64,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Micro registry cache fixes: [#10429](https://github.com/owncloud/ocis/pull/10429)
 * Enhancement - Add web extensions to the ocis_full example: [#10399](https://github.com/owncloud/ocis/pull/10399)
 * Enhancement - Bump reva to 2.26.2: [#10419](https://github.com/owncloud/ocis/pull/10419)
+* Enhancement - Remove deprecated CLI commands: [#10430](https://github.com/owncloud/ocis/pull/10430)
 
 ## Details
 
@@ -128,6 +129,14 @@ The following sections list the changes for unreleased.
   *   Bugfix      [cs3org/reva#4902](https://github.com/cs3org/reva/pull/4902): Fix quota calculation
 
    https://github.com/owncloud/ocis/pull/10419
+
+* Enhancement - Remove deprecated CLI commands: [#10430](https://github.com/owncloud/ocis/pull/10430)
+
+   We removed the following deprecated CLI commands: `ocis storage-users uploads
+   list` `ocis storage-users uploads clean`
+
+   https://github.com/owncloud/ocis/issues/10428
+   https://github.com/owncloud/ocis/pull/10430
 
 # Changelog for [6.6.1] (2024-10-24)
 
