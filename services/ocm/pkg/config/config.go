@@ -121,8 +121,9 @@ type OCMCore struct {
 	Drivers OCMCoreDrivers `yaml:"drivers"`
 }
 type OCMStorageProvider struct {
-	Insecure    bool   `yaml:"insecure" env:"OCM_OCM_STORAGE_PROVIDER_INSECURE" desc:"Disable TLS certificate validation for the OCM connections. Do not set this in production environments." introductionVersion:"5.0"`
-	StorageRoot string `yaml:"storage_root" env:"OCM_OCM_STORAGE_PROVIDER_STORAGE_ROOT" desc:"Directory where the ocm storage provider persists its data like tus upload info files." introductionVersion:"5.0"`
+	Insecure      bool   `yaml:"insecure" env:"OCM_OCM_STORAGE_PROVIDER_INSECURE" desc:"Disable TLS certificate validation for the OCM connections. Do not set this in production environments." introductionVersion:"5.0"`
+	StorageRoot   string `yaml:"storage_root" env:"OCM_OCM_STORAGE_PROVIDER_STORAGE_ROOT" desc:"Directory where the ocm storage provider persists its data like tus upload info files." introductionVersion:"5.0"`
+	DataServerURL string `yaml:"data_server_url" env:"OCM_OCM_STORAGE_DATA_SERVER_URL" desc:"URL of the data server, needs to be reachable by the data gateway provided by the frontend service or the user if directly exposed." introductionVersion:"7.0.0"`
 }
 
 type OCMCoreDrivers struct {

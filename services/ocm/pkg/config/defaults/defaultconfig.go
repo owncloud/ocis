@@ -130,8 +130,9 @@ func DefaultConfig() *config.Config {
 			},
 		},
 		OCMStorageProvider: config.OCMStorageProvider{
-			Insecure:    false,
-			StorageRoot: filepath.Join(defaults.BaseDataPath(), "storage", "ocm"),
+			Insecure:      false,
+			StorageRoot:   filepath.Join(defaults.BaseDataPath(), "storage", "ocm"),
+			DataServerURL: "http://localhost:9280/data",
 		},
 	}
 }
