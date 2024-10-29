@@ -163,7 +163,7 @@ func OCMConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]inter
 							"storage_root": cfg.OCMStorageProvider.StorageRoot,
 						},
 					},
-					"data_server_url": "http://" + cfg.HTTP.Addr + "/data",
+					"data_server_url": cfg.OCMStorageProvider.DataServerURL,
 				},
 				"authprovider": map[string]interface{}{
 					"auth_manager": "ocmshares",
