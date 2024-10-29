@@ -1573,32 +1573,34 @@ trait WebDav {
 				//       /some-folder%20with%20spaces/sub-folder
 				// So we need both $elementToRequest and $expectedElement
 				$expectedElement = $this->encodePath($elementToRequest);
+
 				$responseXmlObject = $this->listFolderAndReturnResponseXml(
 					$user,
 					$elementToRequest,
 					"1"
 				);
 
-				// TODO: make it work for folder entries
-				// Doesn't work for folder entries
-				// as the folder entry has trailing '/' in d:href
 				$webdavPath = "/" . $this->getFullDavFilesPath($user) . $expectedElement;
+				// return xmlobject that matches the x-path pattern.
 				$element = $responseXmlObject->xpath(
-					"//d:response/d:href[text() = \"$webdavPath\"]"
+					"//d:response/d:href"
 				);
 
-				if ($expectedToBeListed
-					&& (!isset($element[0]) || urldecode($element[0]->__toString()) !== urldecode($webdavPath))
-				) {
-					Assert::fail(
-						"$webdavPath is not in propfind answer but should be"
-					);
-				} elseif (!$expectedToBeListed && isset($element[0])
+				if (!$expectedToBeListed && isset($element[0])
 				) {
 					Assert::fail(
 						"$webdavPath is in propfind answer but should not be"
 					);
+				};
+				if ($expectedToBeListed) {
+					$elementSanitized =  rtrim($element[0]->__toString(), '/');
+					if (!isset($element[0]) || urldecode($elementSanitized) !== urldecode($webdavPath)) {
+						Assert::fail(
+							"$webdavPath is not in propfind answer but should be"
+						);
+					}
 				}
+
 			}
 		}
 	}

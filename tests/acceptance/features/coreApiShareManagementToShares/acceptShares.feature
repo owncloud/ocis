@@ -36,11 +36,11 @@ Feature: accept/decline shares coming from internal users
     Then the OCS status code of responses on all endpoints should be "100"
     And the HTTP status code of responses on all endpoints should be "200"
     And user "Brian" should see the following elements
-      | /FOLDER/       |
-      | /PARENT/       |
+      | /FOLDER       |
+      | /PARENT       |
       | /textfile0.txt |
     But user "Brian" should not see the following elements
-      | /Shares/PARENT/           |
+      | /Shares/PARENT          |
       | /Shares/PARENT/parent.txt |
       | /Shares/textfile0.txt     |
     And the sharing API should report to user "Brian" that these shares are in the pending state
@@ -48,11 +48,11 @@ Feature: accept/decline shares coming from internal users
       | /PARENT/       |
       | /textfile0.txt |
     And user "Carol" should see the following elements
-      | /FOLDER/       |
-      | /PARENT/       |
+      | /FOLDER       |
+      | /PARENT       |
       | /textfile0.txt |
     But user "Carol" should not see the following elements
-      | /Shares/PARENT/           |
+      | /Shares/PARENT          |
       | /Shares/PARENT/parent.txt |
       | /Shares/textfile0.txt     |
     And the sharing API should report to user "Carol" that these shares are in the pending state
@@ -68,11 +68,11 @@ Feature: accept/decline shares coming from internal users
     Then the OCS status code of responses on all endpoints should be "100"
     And the HTTP status code of responses on all endpoints should be "200"
     And user "Brian" should see the following elements
-      | /FOLDER/       |
-      | /PARENT/       |
+      | /FOLDER       |
+      | /PARENT      |
       | /textfile0.txt |
     But user "Brian" should not see the following elements
-      | /Shares/PARENT/           |
+      | /Shares/PARENT           |
       | /Shares/PARENT/parent.txt |
       | /Shares/textfile0.txt     |
     And the sharing API should report to user "Brian" that these shares are in the pending state
@@ -120,10 +120,10 @@ Feature: accept/decline shares coming from internal users
       | share_with_displayname | %displayname%                 |
       | mail_send              | 0                             |
     And user "Brian" should see the following elements
-      | /FOLDER/                  |
-      | /PARENT/                  |
+      | /FOLDER                  |
+      | /PARENT                  |
       | /textfile0.txt            |
-      | /Shares/PARENT/           |
+      | /Shares/PARENT           |
       | /Shares/PARENT/parent.txt |
       | /Shares/textfile0.txt     |
     And the sharing API should report to user "Brian" that these shares are in the accepted state
@@ -145,7 +145,7 @@ Feature: accept/decline shares coming from internal users
     Then the OCS status code should be "100"
     And the HTTP status code should be "200"
     And user "Brian" should see the following elements
-      | /Shares/shared/ |
+      | /Shares/shared |
     And the sharing API should report to user "Brian" that these shares are in the accepted state
       | path            |
       | /Shares/shared/ |
@@ -170,11 +170,11 @@ Feature: accept/decline shares coming from internal users
     Then the OCS status code of responses on all endpoints should be "100"
     And the HTTP status code of responses on all endpoints should be "200"
     And user "Brian" should see the following elements
-      | /FOLDER/       |
-      | /PARENT/       |
+      | /FOLDER      |
+      | /PARENT     |
       | /textfile0.txt |
     But user "Brian" should not see the following elements
-      | /Shares/PARENT/           |
+      | /Shares/PARENT          |
       | /Shares/PARENT/parent.txt |
       | /Shares/textfile0.txt     |
     And the sharing API should report to user "Brian" that these shares are in the declined state
@@ -204,7 +204,7 @@ Feature: accept/decline shares coming from internal users
     Then the OCS status code of responses on all endpoints should be "100"
     And the HTTP status code of responses on all endpoints should be "200"
     And user "Brian" should not see the following elements
-      | /Shares/PARENT/           |
+      | /Shares/PARENT         |
       | /Shares/PARENT/parent.txt |
       | /Shares/textfile0.txt     |
     And the sharing API should report to user "Brian" that these shares are in the declined state
@@ -253,7 +253,7 @@ Feature: accept/decline shares coming from internal users
     Then the OCS status code of responses on all endpoints should be "100"
     And the HTTP status code of responses on all endpoints should be "200"
     And user "Carol" should not see the following elements
-      | /Shares/PARENT/           |
+      | /Shares/PARENT           |
       | /Shares/PARENT/parent.txt |
       | /Shares/textfile0.txt     |
     And the sharing API should report to user "Carol" that these shares are in the pending state
@@ -261,7 +261,7 @@ Feature: accept/decline shares coming from internal users
       | /PARENT/       |
       | /textfile0.txt |
     But user "Brian" should see the following elements
-      | /Shares/PARENT/           |
+      | /Shares/PARENT          |
       | /Shares/PARENT/parent.txt |
       | /Shares/textfile0.txt     |
     And the sharing API should report to user "Brian" that these shares are in the accepted state
@@ -293,8 +293,8 @@ Feature: accept/decline shares coming from internal users
     Then the OCS status code of responses on all endpoints should be "100"
     And the HTTP status code of responses on all endpoints should be "200"
     And user "Carol" should see the following elements
-      | /Shares/shared/Brian/     |
-      | /Shares/shared (1)/Alice/ |
+      | /Shares/shared/Brian    |
+      | /Shares/shared (1)/Alice |
     And the sharing API should report to user "Carol" that these shares are in the accepted state
       | path                |
       | /Shares/shared/     |
@@ -384,11 +384,11 @@ Feature: accept/decline shares coming from internal users
     Then the OCS status code of responses on all endpoints should be "100"
     And the HTTP status code of responses on all endpoints should be "200"
     And user "Brian" should see the following elements
-      | /FOLDER/               |
-      | /PARENT/               |
-      | /Shares/PARENT/        |
+      | /FOLDER               |
+      | /PARENT               |
+      | /Shares/PARENT        |
       | /Shares/PARENT/abc.txt |
-      | /Shares/FOLDER/        |
+      | /Shares/FOLDER        |
       | /Shares/FOLDER/abc.txt |
     And user "Brian" should not see the following elements
       | /FOLDER/abc.txt |
@@ -413,20 +413,20 @@ Feature: accept/decline shares coming from internal users
     Then the OCS status code of responses on all endpoints should be "100"
     And the HTTP status code of responses on all endpoints should be "200"
     And user "Brian" should see the following elements
-      | /FOLDER/               |
-      | /PARENT/               |
-      | /Shares/PARENT/        |
-      | /Shares/FOLDER/        |
+      | /FOLDER               |
+      | /PARENT               |
+      | /Shares/PARENT        |
+      | /Shares/FOLDER        |
       | /Shares/PARENT/abc.txt |
       | /Shares/FOLDER/abc.txt |
     And user "Brian" should not see the following elements
       | /FOLDER/abc.txt |
       | /PARENT/abc.txt |
     And user "Carol" should see the following elements
-      | /FOLDER/               |
-      | /PARENT/               |
-      | /Shares/PARENT/        |
-      | /Shares/FOLDER/        |
+      | /FOLDER               |
+      | /PARENT               |
+      | /Shares/PARENT        |
+      | /Shares/FOLDER        |
       | /Shares/PARENT/abc.txt |
       | /Shares/FOLDER/abc.txt |
     And user "Carol" should not see the following elements
@@ -472,19 +472,19 @@ Feature: accept/decline shares coming from internal users
     Then the OCS status code of responses on all endpoints should be "100"
     And the HTTP status code of responses on all endpoints should be "200"
     And user "Brian" should see the following elements
-      | /PARENT/       |
+      | /PARENT       |
       | /textfile0.txt |
     But user "Brian" should not see the following elements
       | /Shares/textfile0.txt |
-      | /Shares/PARENT/       |
+      | /Shares/PARENT       |
     When user "Brian" accepts share "/textfile0.txt" offered by user "Alice" using the sharing API
     And user "Brian" accepts share "/PARENT" offered by user "Alice" using the sharing API
     Then the OCS status code of responses on all endpoints should be "100"
     And the HTTP status code of responses on all endpoints should be "200"
     And user "Brian" should see the following elements
-      | /PARENT/              |
+      | /PARENT              |
       | /textfile0.txt        |
-      | /Shares/PARENT/       |
+      | /Shares/PARENT       |
       | /Shares/textfile0.txt |
 
 
@@ -526,10 +526,10 @@ Feature: accept/decline shares coming from internal users
     Then the OCS status code of responses on all endpoints should be "100"
     And the HTTP status code of responses on all endpoints should be "200"
     And user "David" should see the following elements
-      | /Shares/PARENT/        |
+      | /Shares/PARENT        |
       | /Shares/PARENT/abc.txt |
     And user "David" should not see the following elements
-      | /PARENT (2)/ |
+      | /PARENT (2) |
     And the content of file "/Shares/PARENT/abc.txt" for user "David" should be "uploaded content"
 
   @issue-1123 @issue-2540
@@ -600,9 +600,9 @@ Feature: accept/decline shares coming from internal users
     Then the OCS status code of responses on all endpoints should be "100"
     And the HTTP status code of responses on all endpoints should be "200"
     And user "Brian" should see the following elements
-      | /PARENT/           |
-      | /Shares/PARENT/    |
-      | /Shares/PaRent/    |
+      | /PARENT           |
+      | /Shares/PARENT    |
+      | /Shares/PaRent    |
       | /Shares/PARENT.txt |
     And the content of file "/Shares/PARENT/parent.txt" for user "Brian" should be "subfile, from alice to grp2"
     And the content of file "/Shares/PaRent/parent.txt" for user "Brian" should be "subfile, from alice to grp2"
@@ -620,10 +620,10 @@ Feature: accept/decline shares coming from internal users
     Then the OCS status code of responses on all endpoints should be "100"
     And the HTTP status code of responses on all endpoints should be "200"
     And user "Brian" should see the following elements
-      | /PARENT/               |
-      | /Shares/PARENT/        |
-      | /Shares/PARENT (1)/    |
-      | /Shares/PaRent/        |
+      | /PARENT               |
+      | /Shares/PARENT        |
+      | /Shares/PARENT (1)    |
+      | /Shares/PaRent        |
       | /Shares/PARENT.txt     |
       | /Shares/PARENT (1).txt |
       | /Shares/parent.txt     |
@@ -664,9 +664,9 @@ Feature: accept/decline shares coming from internal users
     Then the OCS status code of responses on all endpoints should be "100"
     And the HTTP status code of responses on all endpoints should be "200"
     And user "Carol" should see the following elements
-      | /PARENT/           |
-      | /Shares/PARENT/    |
-      | /Shares/PaRent/    |
+      | /PARENT           |
+      | /Shares/PARENT    |
+      | /Shares/PaRent    |
       | /Shares/PARENT.txt |
     And the content of file "/Shares/PARENT/parent.txt" for user "Carol" should be "subfile, from alice to grp1"
     And the content of file "/Shares/PARENT.txt" for user "Carol" should be "from alice to grp1"
@@ -683,10 +683,10 @@ Feature: accept/decline shares coming from internal users
     Then the OCS status code of responses on all endpoints should be "100"
     And the HTTP status code of responses on all endpoints should be "200"
     And user "Carol" should see the following elements
-      | /PARENT/               |
-      | /Shares/PARENT/        |
-      | /Shares/PARENT (1)/    |
-      | /Shares/PaRent/        |
+      | /PARENT               |
+      | /Shares/PARENT        |
+      | /Shares/PARENT (1)    |
+      | /Shares/PaRent        |
       | /Shares/PARENT.txt     |
       | /Shares/PARENT (1).txt |
       | /Shares/parent.txt     |

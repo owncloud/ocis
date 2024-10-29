@@ -24,8 +24,8 @@ Feature: restore deleted files/folders
     And as "Alice" the file with original path "/textfile0.txt" should not exist in the trashbin
     And the content of file "/textfile0.txt" for user "Alice" should be "file to delete"
     And user "Alice" should see the following elements
-      | /FOLDER/           |
-      | /PARENT/           |
+      | /FOLDER           |
+      | /PARENT           |
       | /PARENT/parent.txt |
       | /textfile0.txt     |
       | /textfile1.txt     |
@@ -416,8 +416,8 @@ Feature: restore deleted files/folders
     Then the HTTP status code should be "409"
     And as "Alice" the file with original path "/parent_folder/sub/parent.txt" should exist in the trashbin
     And user "Alice" should not see the following elements
-      | /parent_folder/               |
-      | /parent_folder/sub/           |
+      | /parent_folder               |
+      | /parent_folder/sub           |
       | /parent_folder/sub/parent.txt |
     Examples:
       | dav-path-version |
@@ -440,8 +440,8 @@ Feature: restore deleted files/folders
     And as "Alice" the file with original path "/parent_folder/sub/parent.txt" should not exist in the trashbin
     And the content of file "/parent_folder/sub/parent.txt" for user "Alice" should be "parent text"
     And user "Alice" should see the following elements
-      | /parent_folder/               |
-      | /parent_folder/sub/           |
+      | /parent_folder               |
+      | /parent_folder/sub           |
       | /parent_folder/sub/parent.txt |
     Examples:
       | dav-path-version |
@@ -459,8 +459,8 @@ Feature: restore deleted files/folders
     Then the HTTP status code should be "400"
     And as "Alice" the file with original path "/parent_folder/sub/parent.txt" should exist in the trashbin
     And user "Alice" should not see the following elements
-      | /parent_folder/               |
-      | /parent_folder/sub/           |
+      | /parent_folder               |
+      | /parent_folder/sub           |
       | /parent_folder/sub/parent.txt |
     Examples:
       | dav-path-version |

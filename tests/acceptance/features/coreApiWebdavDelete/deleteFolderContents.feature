@@ -19,12 +19,12 @@ Feature: delete folder contents
     When user "Alice" deletes everything from folder "/FOLDER/" using the WebDAV API
     Then the HTTP status code should be "204"
     And user "Alice" should see the following elements
-      | /FOLDER/       |
-      | /PARENT/       |
+      | /FOLDER       |
+      | /PARENT       |
       | /textfile0.txt |
       | /textfile1.txt |
     And user "Alice" should not see the following elements
-      | /FOLDER/SUBFOLDER/              |
+      | /FOLDER/SUBFOLDER              |
       | /FOLDER/fileToDelete.txt        |
       | /FOLDER/SUBFOLDER/testfile0.txt |
     Examples:

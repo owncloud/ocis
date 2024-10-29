@@ -215,10 +215,10 @@ Feature: sharing
     And user "Alice" has uploaded file with content "file in parent folder" to "/PARENT/parent.txt"
     When user "Alice" shares folder "/PARENT" with group "grp1" using the sharing API
     And user "Brian" should see the following elements
-      | /Shares/PARENT/           |
+      | /Shares/PARENT            |
       | /Shares/PARENT/parent.txt |
     And user "Carol" should see the following elements
-      | /Shares/PARENT/           |
+      | /Shares/PARENT            |
       | /Shares/PARENT/parent.txt |
 
   @smokeTest @skipOnReva # reva doesn't have a pre-created admin user
@@ -230,7 +230,7 @@ Feature: sharing
     And admin has created folder "/PARENT"
     When user "admin" shares folder "/PARENT" with group "grp1" using the sharing API
     Then user "Alice" should see the following elements
-      | /Shares/PARENT/ |
+      | /Shares/PARENT |
 
   @smokeTest
   Scenario: user included in multiple groups, shares a folder with a group
@@ -247,7 +247,7 @@ Feature: sharing
     When user "Alice" shares folder "/PARENT" with group "grp1" using the sharing API
     Then user "Brian" should have sync enabled for share "PARENT"
     And user "Brian" should see the following elements
-      | /Shares/PARENT/ |
+      | /Shares/PARENT |
 
 
   Scenario: sharing again an own file while belonging to a group
@@ -426,10 +426,10 @@ Feature: sharing
     Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
     And user "Brian" should see the following elements
-      | /Shares/PARENT/           |
+      | /Shares/PARENT           |
       | /Shares/PARENT/parent.txt |
     And user "Carol" should see the following elements
-      | /Shares/PARENT/           |
+      | /Shares/PARENT           |
       | /Shares/PARENT/parent.txt |
     Examples:
       | ocs-api-version | ocs-status-code |

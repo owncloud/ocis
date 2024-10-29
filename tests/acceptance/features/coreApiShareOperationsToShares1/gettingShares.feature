@@ -154,10 +154,10 @@ Feature: sharing
     When the administrator removes user "Carol" from group "group0" using the provisioning API
     Then the HTTP status code should be "204"
     And user "Brian" should see the following elements
-      | /Shares/PARENT/           |
+      | /Shares/PARENT           |
       | /Shares/PARENT/parent.txt |
     But user "Carol" should not see the following elements
-      | /Shares/PARENT/           |
+      | /Shares/PARENT           |
       | /Shares/PARENT/parent.txt |
 
   @smokeTest @issue-1226 @issue-1270 @issue-1271 @issue-1231
