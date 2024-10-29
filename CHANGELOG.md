@@ -62,6 +62,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix put relative wopi operation for microsoft: [#10403](https://github.com/owncloud/ocis/pull/10403)
 * Bugfix - Make SSE keepalive interval configurable: [#10411](https://github.com/owncloud/ocis/pull/10411)
 * Bugfix - Micro registry cache fixes: [#10429](https://github.com/owncloud/ocis/pull/10429)
+* Bugfix - Fix the memlimit loglevel: [#10431](https://github.com/owncloud/ocis/pull/10431)
 * Enhancement - Add web extensions to the ocis_full example: [#10399](https://github.com/owncloud/ocis/pull/10399)
 * Enhancement - Bump reva to 2.26.2: [#10419](https://github.com/owncloud/ocis/pull/10419)
 * Enhancement - Remove deprecated CLI commands: [#10430](https://github.com/owncloud/ocis/pull/10430)
@@ -108,6 +109,13 @@ The following sections list the changes for unreleased.
    We now invalidate cache entries when any of the nodes was not updated.
 
    https://github.com/owncloud/ocis/pull/10429
+
+* Bugfix - Fix the memlimit loglevel: [#10431](https://github.com/owncloud/ocis/pull/10431)
+
+   We set the memlimit default loglevel to error.
+
+   https://github.com/owncloud/ocis/issues/10428
+   https://github.com/owncloud/ocis/pull/10431
 
 * Enhancement - Add web extensions to the ocis_full example: [#10399](https://github.com/owncloud/ocis/pull/10399)
 
