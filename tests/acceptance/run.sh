@@ -474,6 +474,8 @@ else
 		else
 			get_behat_suites "${ACCEPTANCE_TEST_TYPE}"
 		fi
+	else
+	  BEHAT_SUITES=(`echo "$BEHAT_SUITES" | tr "," "\n"`)
 	fi
 fi
 

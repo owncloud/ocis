@@ -74,40 +74,93 @@ config = {
             "suites": [
                 "apiArchiver",
                 "apiContract",
-                "apiGraph",
-                "apiGraphUserGroup",
-                "apiSpaces",
-                "apiSpacesShares",
                 "apiCors",
                 "apiAsyncUpload",
                 "apiDownloads",
-                "apiReshare",
-                "apiSpacesDavOperation",
                 "apiDepthInfinity",
                 "apiLocks",
-                "apiSearch1",
-                "apiSearch2",
-                "apiSharingNg1",
-                "apiSharingNg2",
-                "apiSharingNgShareInvitation",
-                "apiSharingNgLinkSharePermission",
-                "apiSharingNgLinkShareRoot",
                 "apiActivities",
             ],
             "skip": False,
         },
-        "apiAccountsHashDifficulty": {
+        "graph": {
+            "suites": [
+                "apiGraph",
+            ],
+            "skip": False,
+            "withRemotePhp": [True],
+        },
+        "graphUserGroup": {
+            "suites": [
+                "apiGraphUserGroup",
+            ],
+            "skip": False,
+            "withRemotePhp": [True],
+        },
+        "spaces": {
+            "suites": [
+                "apiSpaces",
+            ],
+            "skip": False,
+        },
+        "spacesShares": {
+            "suites": [
+                "apiSpacesShares",
+            ],
+            "skip": False,
+        },
+        "spacesDavOperation": {
+            "suites": [
+                "apiSpacesDavOperation",
+            ],
+            "skip": False,
+        },
+        "search1": {
+            "suites": [
+                "apiSearch1",
+            ],
+            "skip": False,
+        },
+        "search2": {
+            "suites": [
+                "apiSearch2",
+            ],
+            "skip": False,
+        },
+        "sharingNg": {
+            "suites": [
+                "apiReshare",
+                "apiSharingNg1",
+                "apiSharingNg2",
+            ],
+            "skip": False,
+        },
+        "sharingNgShareInvitation": {
+            "suites": [
+                "apiSharingNgShareInvitation",
+            ],
+            "skip": False,
+        },
+        "sharingNgLinkShare": {
+            "suites": [
+                "apiSharingNgLinkSharePermission",
+                "apiSharingNgLinkShareRoot",
+            ],
+            "skip": False,
+        },
+        "accountsHashDifficulty": {
             "skip": False,
             "suites": [
                 "apiAccountsHashDifficulty",
             ],
             "accounts_hash_difficulty": "default",
         },
-        "apiNotification": {
+        "notification": {
             "suites": [
                 "apiNotification",
             ],
             "skip": False,
+            "withRemotePhp": [True],
             "emailNeeded": True,
             "extraEnvironment": {
                 "EMAIL_HOST": "email",
@@ -121,7 +174,7 @@ config = {
                 "NOTIFICATIONS_SMTP_SENDER": "ownCloud <noreply@example.com>",
             },
         },
-        "apiAntivirus": {
+        "antivirus": {
             "suites": [
                 "apiAntivirus",
             ],
@@ -135,18 +188,19 @@ config = {
                 "OCIS_ADD_RUN_SERVICES": "antivirus",
             },
         },
-        "apiSearchContent": {
+        "searchContent": {
             "suites": [
                 "apiSearchContent",
             ],
             "skip": False,
             "tikaNeeded": True,
         },
-        "apiOcm": {
+        "ocm": {
             "suites": [
                 "apiOcm",
             ],
             "skip": False,
+            "withRemotePhp": [True],
             "federationServer": True,
             "emailNeeded": True,
             "extraEnvironment": {
@@ -167,7 +221,7 @@ config = {
                 "NOTIFICATIONS_SMTP_SENDER": "ownCloud <noreply@example.com>",
             },
         },
-        "apiWopi": {
+        "wopi": {
             "suites": [
                 "apiCollaboration",
             ],
@@ -177,11 +231,12 @@ config = {
                 "GATEWAY_GRPC_ADDR": "0.0.0.0:9142",
             },
         },
-        "cli": {
+        "cliCommands": {
             "suites": [
                 "cliCommands",
             ],
             "skip": False,
+            "withRemotePhp": [True],
             "antivirusNeeded": True,
             "extraServerEnvironment": {
                 "ANTIVIRUS_SCANNER_TYPE": "clamav",
@@ -192,7 +247,7 @@ config = {
         },
     },
     "apiTests": {
-        "numberOfParts": 10,
+        "numberOfParts": 7,
         "skip": False,
         "skipExceptParts": [],
     },
@@ -887,6 +942,7 @@ def localApiTestPipeline(ctx):
         "federationServer": False,
         "collaborationServiceNeeded": False,
         "extraCollaborationEnvironment": {},
+        "withRemotePhp": [True, False] if ctx.build.event == "cron" else [True],
     }
 
     if "localApiTests" in config:
@@ -895,12 +951,12 @@ def localApiTestPipeline(ctx):
                 params = {}
                 for item in defaults:
                     params[item] = matrix[item] if item in matrix else defaults[item]
-                for suite in params["suites"]:
-                    for storage in params["storages"]:
+                for storage in params["storages"]:
+                    for withRemotePhp in params["withRemotePhp"]:
                         pipeline = {
                             "kind": "pipeline",
                             "type": "docker",
-                            "name": "%s-Tests-%s" % ("CLI" if name.startswith("cli") else "API", suite),
+                            "name": "%s-%s%s" % ("CLI" if name.startswith("cli") else "API", name, "-withoutRemotePhp" if not withRemotePhp else ""),
                             "platform": {
                                 "os": "linux",
                                 "arch": "amd64",
@@ -915,7 +971,7 @@ def localApiTestPipeline(ctx):
                                      (ocisServer(storage, params["accounts_hash_difficulty"], deploy_type = "federation", extra_server_environment = params["extraServerEnvironment"]) if params["federationServer"] else []) +
                                      ((wopiCollaborationService("fakeoffice") + wopiCollaborationService("collabora") + wopiCollaborationService("onlyoffice")) if params["collaborationServiceNeeded"] else []) +
                                      (waitForServices("wopi", ["wopi-collabora:9300", "wopi-onlyoffice:9300", "wopi-fakeoffice:9300"]) if params["collaborationServiceNeeded"] else []) +
-                                     localApiTests(ctx, suite, storage, params["extraEnvironment"]) +
+                                     localApiTests(ctx, name, params["suites"], storage, params["extraEnvironment"], withRemotePhp) +
                                      logRequests(),
                             "services": (emailService() if params["emailNeeded"] else []) +
                                         (clamavService() if params["antivirusNeeded"] else []) +
@@ -931,7 +987,7 @@ def localApiTestPipeline(ctx):
                         pipelines.append(pipeline)
     return pipelines
 
-def localApiTests(ctx, suite, storage, extra_environment = {}):
+def localApiTests(ctx, name, suites, storage = "ocis", extra_environment = {}, with_remote_php = False):
     test_dir = "%s/tests/acceptance" % dirs["base"]
     expected_failures_file = "%s/expected-failures-localAPI-on-%s-storage.md" % (test_dir, storage.upper())
 
@@ -943,24 +999,24 @@ def localApiTests(ctx, suite, storage, extra_environment = {}):
         "OCIS_SKELETON_STRATEGY": "%s" % ("copy" if storage == "owncloud" else "upload"),
         "SEND_SCENARIO_LINE_REFERENCES": "true",
         "STORAGE_DRIVER": storage,
-        "BEHAT_SUITE": suite,
+        "BEHAT_SUITES": ",".join(suites),
         "BEHAT_FILTER_TAGS": "~@skip&&~@skipOnGraph&&~@skipOnOcis-%s-Storage" % ("OC" if storage == "owncloud" else "OCIS"),
         "EXPECTED_FAILURES_FILE": expected_failures_file,
         "UPLOAD_DELETE_WAIT_TIME": "1" if storage == "owncloud" else 0,
         "OCIS_WRAPPER_URL": "http://ocis-server:5200",
-        "WITH_REMOTE_PHP": get_remotephp_config(ctx),
+        "WITH_REMOTE_PHP": with_remote_php,
     }
 
     for item in extra_environment:
         environment[item] = extra_environment[item]
 
     return [{
-        "name": "localApiTests-%s" % suite,
+        "name": "localApiTests-%s" % name,
         "image": OC_CI_PHP % DEFAULT_PHP_VERSION,
         "environment": environment,
         "commands": [
             # merge the expected failures
-            "" if get_remotephp_config(ctx) else "cat %s/expected-failures-without-remotephp.md >> %s" % (test_dir, expected_failures_file),
+            "" if with_remote_php else "cat %s/expected-failures-without-remotephp.md >> %s" % (test_dir, expected_failures_file),
             "make -C %s test-acceptance-api" % (dirs["base"]),
         ],
     }]
@@ -1116,7 +1172,7 @@ def wopiValidatorTests(ctx, storage, wopiServerType, accounts_hash_difficulty = 
         },
     }
 
-def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "ocis", accounts_hash_difficulty = 4):
+def coreApiTests(ctx, part_number = 1, number_of_parts = 1, with_remote_php = False, storage = "ocis", accounts_hash_difficulty = 4):
     filterTags = "~@skipOnGraph&&~@skipOnOcis-%s-Storage" % ("OC" if storage == "owncloud" else "OCIS")
     test_dir = "%s/tests/acceptance" % dirs["base"]
     expected_failures_file = "%s/expected-failures-API-on-%s-storage.md" % (test_dir, storage.upper())
@@ -1124,7 +1180,7 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "ocis", ac
     return {
         "kind": "pipeline",
         "type": "docker",
-        "name": "Core-API-Tests-%s" % part_number,
+        "name": "Core-API-Tests-%s%s" % (part_number, "-withoutRemotePhp" if not with_remote_php else ""),
         "platform": {
             "os": "linux",
             "arch": "amd64",
@@ -1150,11 +1206,11 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "ocis", ac
                              "EXPECTED_FAILURES_FILE": expected_failures_file,
                              "UPLOAD_DELETE_WAIT_TIME": "1" if storage == "owncloud" else 0,
                              "OCIS_WRAPPER_URL": "http://ocis-server:5200",
-                             "WITH_REMOTE_PHP": get_remotephp_config(ctx),
+                             "WITH_REMOTE_PHP": with_remote_php,
                          },
                          "commands": [
                              # merge the expected failures
-                             "" if get_remotephp_config(ctx) else "cat %s/expected-failures-without-remotephp.md >> %s" % (test_dir, expected_failures_file),
+                             "" if with_remote_php else "cat %s/expected-failures-without-remotephp.md >> %s" % (test_dir, expected_failures_file),
                              "make -C %s test-acceptance-api" % (dirs["base"]),
                          ],
                      },
@@ -1174,18 +1230,15 @@ def apiTests(ctx):
     pipelines = []
     debugParts = config["apiTests"]["skipExceptParts"]
     debugPartsEnabled = (len(debugParts) != 0)
+    defaults = {
+        "withRemotePhp": [True, False] if ctx.build.event == "cron" else [True],
+    }
     for runPart in range(1, config["apiTests"]["numberOfParts"] + 1):
-        if (not debugPartsEnabled or (debugPartsEnabled and runPart in debugParts)):
-            pipelines.append(coreApiTests(ctx, runPart, config["apiTests"]["numberOfParts"], "ocis"))
+        for withRemotePhp in defaults["withRemotePhp"]:
+            if (not debugPartsEnabled or (debugPartsEnabled and runPart in debugParts)):
+                pipelines.append(coreApiTests(ctx, runPart, config["apiTests"]["numberOfParts"], withRemotePhp))
 
     return pipelines
-
-def get_remotephp_config(ctx):
-    # run tests with remote.php for PRs and commit push
-    # run tests without remote.php for cron jobs
-    if ctx.build.event == "cron":
-        return False
-    return True
 
 def e2eTestPipeline(ctx):
     defaults = {
