@@ -24,6 +24,7 @@ The following table gives an overview about releases and their services. Note th
 | app-provider       | app-provider       | app-provider       | app-provider       | app-provider       |
 | app-registry       | app-registry       | app-registry       | app-registry       | app-registry       |
 | audit              | audit              | audit              | audit              | audit              |
+|                    |                    |                    |                    | auth-app           |
 | auth-basic         | auth-basic         | auth-basic         | auth-basic         | auth-basic         |
 | auth-bearer        | auth-bearer        | auth-bearer        | auth-bearer        | auth-bearer        |
 | auth-machine       | auth-machine       | auth-machine       | auth-machine       | auth-machine       |
@@ -50,11 +51,11 @@ The following table gives an overview about releases and their services. Note th
 | settings           | settings           | settings           | settings           | settings           |
 | sharing            | sharing            | sharing            | sharing            | sharing            |
 |                    |                    | sse                | sse                | sse                |
+| store              | store              | store              | store              | store              |
 | storage-publiclink | storage-publiclink | storage-publiclink | storage-publiclink | storage-publiclink |
 | storage-shares     | storage-shares     | storage-shares     | storage-shares     | storage-shares     |
 | storage-system     | storage-system     | storage-system     | storage-system     | storage-system     |
 | storage-users      | storage-users      | storage-users      | storage-users      | storage-users      |
-| store              | store              | store              | store              | store              |
 | thumbnails         | thumbnails         | thumbnails         | thumbnails         | thumbnails         |
 | userlog            | userlog            | userlog            | userlog            | userlog            |
 | users              | users              | users              | users              | users              |
