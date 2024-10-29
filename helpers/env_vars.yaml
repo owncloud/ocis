@@ -6220,10 +6220,10 @@ IDM_ADMIN_USER_ID:
   removalVersion: ""
   deprecationInfo: ""
 IDM_CREATE_DEMO_USERS:
-  name: IDM_CREATE_DEMO_USERS
+  name: SETTINGS_SETUP_DEFAULT_ASSIGNMENTS;IDM_CREATE_DEMO_USERS
   defaultValue: "false"
   type: bool
-  description: Flag to enable or disable the creation of the demo users.
+  description: The default role assignments the demo users should be setup.
   introductionVersion: pre5.0
   deprecationVersion: ""
   removalVersion: ""
@@ -7995,12 +7995,12 @@ OCDAV_WEBDAV_NAMESPACE:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_ADMIN_USER_ID:
-  name: OCIS_ADMIN_USER_ID;STORAGE_USERS_PURGE_TRASH_BIN_USER_ID
+  name: OCIS_ADMIN_USER_ID;SETTINGS_ADMIN_USER_ID
   defaultValue: ""
   type: string
-  description: ID of the user who collects all necessary information for deletion.
-    Consider that the UUID can be encoded in some LDAP deployment configurations like
-    in .ldif files. These need to be decoded beforehand.
+  description: ID of the user that should receive admin privileges. Consider that
+    the UUID can be encoded in some LDAP deployment configurations like in .ldif files.
+    These need to be decoded beforehand.
   introductionVersion: pre5.0
   deprecationVersion: ""
   removalVersion: ""
@@ -8016,7 +8016,7 @@ OCIS_ASSET_THEMES_PATH:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_ASYNC_UPLOADS:
-  name: OCIS_ASYNC_UPLOADS
+  name: OCIS_ASYNC_UPLOADS;SEARCH_EVENTS_ASYNC_UPLOADS
   defaultValue: "true"
   type: bool
   description: Enable asynchronous file uploads.
@@ -8025,20 +8025,20 @@ OCIS_ASYNC_UPLOADS:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_CACHE_AUTH_PASSWORD:
-  name: OCIS_CACHE_AUTH_PASSWORD;PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE_AUTH_PASSWORD
+  name: OCIS_CACHE_AUTH_PASSWORD;SETTINGS_CACHE_AUTH_PASSWORD
   defaultValue: ""
   type: string
-  description: The password to authenticate with the store. Only applies when store
+  description: The password to authenticate with the cache. Only applies when store
     type 'nats-js-kv' is configured.
   introductionVersion: "5.0"
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
 OCIS_CACHE_AUTH_USERNAME:
-  name: OCIS_CACHE_AUTH_USERNAME;PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE_AUTH_USERNAME
+  name: OCIS_CACHE_AUTH_USERNAME;SETTINGS_CACHE_AUTH_USERNAME
   defaultValue: ""
   type: string
-  description: The username to authenticate with the store. Only applies when store
+  description: The username to authenticate with the cache. Only applies when store
     type 'nats-js-kv' is configured.
   introductionVersion: "5.0"
   deprecationVersion: ""
@@ -8046,7 +8046,7 @@ OCIS_CACHE_AUTH_USERNAME:
   deprecationInfo: ""
 OCIS_CACHE_DATABASE:
   name: OCIS_CACHE_DATABASE
-  defaultValue: cache-userinfo
+  defaultValue: settings-cache
   type: string
   description: The database name the configured store should use.
   introductionVersion: pre5.0
@@ -8054,11 +8054,11 @@ OCIS_CACHE_DATABASE:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_CACHE_DISABLE_PERSISTENCE:
-  name: OCIS_CACHE_DISABLE_PERSISTENCE;PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE_DISABLE_PERSISTENCE
-  defaultValue: "true"
+  name: OCIS_CACHE_DISABLE_PERSISTENCE;SETTINGS_CACHE_DISABLE_PERSISTENCE
+  defaultValue: "false"
   type: bool
-  description: Disables persistence of the store. Only applies when store type 'nats-js-kv'
-    is configured. Defaults to true.
+  description: Disables persistence of the cache. Only applies when store type 'nats-js-kv'
+    is configured. Defaults to false.
   introductionVersion: "5.0"
   deprecationVersion: ""
   removalVersion: ""
@@ -8075,39 +8075,40 @@ OCIS_CACHE_SIZE:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_CACHE_STORE:
-  name: OCIS_CACHE_STORE;PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE
-  defaultValue: nats-js-kv
+  name: OCIS_CACHE_STORE;SETTINGS_CACHE_STORE
+  defaultValue: memory
   type: string
-  description: 'The type of the signing key store. Supported values are: ''redis-sentinel'',
-    ''nats-js-kv'' and ''ocisstoreservice'' (deprecated). See the text description
-    for details.'
-  introductionVersion: "5.0"
+  description: 'The type of the cache store. Supported values are: ''memory'', ''redis-sentinel'',
+    ''nats-js-kv'', ''noop''. See the text description for details.'
+  introductionVersion: pre5.0
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
 OCIS_CACHE_STORE_NODES:
-  name: OCIS_CACHE_STORE_NODES;PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE_NODES
+  name: OCIS_CACHE_STORE_NODES;SETTINGS_CACHE_STORE_NODES
   defaultValue: '[127.0.0.1:9233]'
   type: '[]string'
-  description: A list of nodes to access the configured store. Note that the behaviour
-    how nodes are used is dependent on the library of the configured store. See the
-    Environment Variable Types description for more details.
-  introductionVersion: "5.0"
+  description: A list of nodes to access the configured store. This has no effect
+    when 'memory' store is configured. Note that the behaviour how nodes are used
+    is dependent on the library of the configured store. See the Environment Variable
+    Types description for more details.
+  introductionVersion: pre5.0
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
 OCIS_CACHE_TTL:
-  name: OCIS_CACHE_TTL;PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE_TTL
-  defaultValue: 12h0m0s
+  name: OCIS_CACHE_TTL;SETTINGS_CACHE_TTL
+  defaultValue: 10m0s
   type: Duration
-  description: Default time to live for signing keys. See the Environment Variable
-    Types description for more details.
-  introductionVersion: "5.0"
+  description: Default time to live for entries in the cache. Only applied when access
+    tokens has no expiration. See the Environment Variable Types description for more
+    details.
+  introductionVersion: pre5.0
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
 OCIS_CORS_ALLOW_CREDENTIALS:
-  name: OCIS_CORS_ALLOW_CREDENTIALS;WEBDAV_CORS_ALLOW_CREDENTIALS
+  name: OCIS_CORS_ALLOW_CREDENTIALS;USERLOG_CORS_ALLOW_CREDENTIALS
   defaultValue: "true"
   type: bool
   description: 'Allow credentials for CORS.See following chapter for more details:
@@ -8117,9 +8118,9 @@ OCIS_CORS_ALLOW_CREDENTIALS:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_CORS_ALLOW_HEADERS:
-  name: OCIS_CORS_ALLOW_HEADERS;WEBDAV_CORS_ALLOW_HEADERS
+  name: OCIS_CORS_ALLOW_HEADERS;USERLOG_CORS_ALLOW_HEADERS
   defaultValue: '[Authorization Origin Content-Type Accept X-Requested-With X-Request-Id
-    Cache-Control]'
+    Ocs-Apirequest]'
   type: '[]string'
   description: 'A list of allowed CORS headers. See following chapter for more details:
     *Access-Control-Request-Headers* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers.
@@ -8129,8 +8130,8 @@ OCIS_CORS_ALLOW_HEADERS:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_CORS_ALLOW_METHODS:
-  name: OCIS_CORS_ALLOW_METHODS;WEBDAV_CORS_ALLOW_METHODS
-  defaultValue: '[GET POST PUT PATCH DELETE OPTIONS]'
+  name: OCIS_CORS_ALLOW_METHODS;USERLOG_CORS_ALLOW_METHODS
+  defaultValue: '[GET]'
   type: '[]string'
   description: 'A list of allowed CORS methods. See following chapter for more details:
     *Access-Control-Request-Method* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method.
@@ -8140,7 +8141,7 @@ OCIS_CORS_ALLOW_METHODS:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_CORS_ALLOW_ORIGINS:
-  name: OCIS_CORS_ALLOW_ORIGINS;WEBDAV_CORS_ALLOW_ORIGINS
+  name: OCIS_CORS_ALLOW_ORIGINS;USERLOG_CORS_ALLOW_ORIGINS
   defaultValue: '[*]'
   type: '[]string'
   description: 'A list of allowed CORS origins. See following chapter for more details:
@@ -8247,7 +8248,7 @@ OCIS_DISABLE_VERSIONING:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_EDITION:
-  name: OCIS_EDITION;FRONTEND_EDITION
+  name: OCIS_EDITION;OCDAV_EDITION
   defaultValue: Community
   type: string
   description: Edition of oCIS. Used for branding purposes.
@@ -8345,11 +8346,11 @@ OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_GATEWAY_GRPC_ADDR:
-  name: OCIS_GATEWAY_GRPC_ADDR;STORAGE_USERS_GATEWAY_GRPC_ADDR
+  name: OCIS_GATEWAY_GRPC_ADDR;GATEWAY_GRPC_ADDR
   defaultValue: 127.0.0.1:9142
   type: string
-  description: The bind address of the gateway GRPC address.
-  introductionVersion: "5.0"
+  description: The bind address of the GRPC service.
+  introductionVersion: pre5.0
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
@@ -8377,11 +8378,11 @@ OCIS_GRPC_CLIENT_TLS_MODE:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_GRPC_PROTOCOL:
-  name: OCIS_GRPC_PROTOCOL;APP_PROVIDER_GRPC_PROTOCOL
+  name: OCIS_GRPC_PROTOCOL;AUTH_SERVICE_GRPC_PROTOCOL
   defaultValue: ""
   type: string
-  description: The transport protocol of the GPRC service.
-  introductionVersion: pre5.0
+  description: The transport protocol of the GRPC service.
+  introductionVersion: "5.0"
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
@@ -8426,7 +8427,7 @@ OCIS_INSECURE:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_JWT_SECRET:
-  name: OCIS_JWT_SECRET;APP_PROVIDER_JWT_SECRET
+  name: OCIS_JWT_SECRET;USERLOG_JWT_SECRET
   defaultValue: ""
   type: string
   description: The secret to mint and validate jwt tokens.
@@ -8520,20 +8521,20 @@ OCIS_LDAP_CACERT:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_LDAP_DISABLE_USER_MECHANISM:
-  name: OCIS_LDAP_DISABLE_USER_MECHANISM;GRAPH_DISABLE_USER_MECHANISM
+  name: OCIS_LDAP_DISABLE_USER_MECHANISM;USERS_LDAP_DISABLE_USER_MECHANISM
   defaultValue: attribute
   type: string
-  description: An option to control the behavior for disabling users. Supported options
+  description: An option to control the behavior for disabling users. Valid options
     are 'none', 'attribute' and 'group'. If set to 'group', disabling a user via API
     will add the user to the configured group for disabled users, if set to 'attribute'
     this will be done in the ldap user entry, if set to 'none' the disable request
-    is not processed. Default is 'attribute'.
+    is not processed.
   introductionVersion: pre5.0
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
 OCIS_LDAP_DISABLED_USERS_GROUP_DN:
-  name: OCIS_LDAP_DISABLED_USERS_GROUP_DN;GRAPH_DISABLED_USERS_GROUP_DN
+  name: OCIS_LDAP_DISABLED_USERS_GROUP_DN;USERS_LDAP_DISABLED_USERS_GROUP_DN
   defaultValue: cn=DisabledUsersGroup,ou=groups,o=libregraph-idm
   type: string
   description: The distinguished name of the group to which added users will be classified
@@ -8543,7 +8544,7 @@ OCIS_LDAP_DISABLED_USERS_GROUP_DN:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_LDAP_GROUP_BASE_DN:
-  name: OCIS_LDAP_GROUP_BASE_DN;GRAPH_LDAP_GROUP_BASE_DN
+  name: OCIS_LDAP_GROUP_BASE_DN;USERS_LDAP_GROUP_BASE_DN
   defaultValue: ou=groups,o=libregraph-idm
   type: string
   description: Search base DN for looking up LDAP groups.
@@ -8552,7 +8553,7 @@ OCIS_LDAP_GROUP_BASE_DN:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_LDAP_GROUP_FILTER:
-  name: OCIS_LDAP_GROUP_FILTER;GRAPH_LDAP_GROUP_FILTER
+  name: OCIS_LDAP_GROUP_FILTER;USERS_LDAP_GROUP_FILTER
   defaultValue: ""
   type: string
   description: LDAP filter to add to the default filters for group searches.
@@ -8561,17 +8562,17 @@ OCIS_LDAP_GROUP_FILTER:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_LDAP_GROUP_OBJECTCLASS:
-  name: OCIS_LDAP_GROUP_OBJECTCLASS;GRAPH_LDAP_GROUP_OBJECTCLASS
+  name: OCIS_LDAP_GROUP_OBJECTCLASS;USERS_LDAP_GROUP_OBJECTCLASS
   defaultValue: groupOfNames
   type: string
   description: The object class to use for groups in the default group search filter
-    ('groupOfNames').
+    like 'groupOfNames'.
   introductionVersion: pre5.0
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
 OCIS_LDAP_GROUP_SCHEMA_DISPLAYNAME:
-  name: OCIS_LDAP_GROUP_SCHEMA_DISPLAYNAME;GROUPS_LDAP_GROUP_SCHEMA_DISPLAYNAME
+  name: OCIS_LDAP_GROUP_SCHEMA_DISPLAYNAME;USERS_LDAP_GROUP_SCHEMA_DISPLAYNAME
   defaultValue: cn
   type: string
   description: LDAP Attribute to use for the displayname of groups (often the same
@@ -8581,7 +8582,7 @@ OCIS_LDAP_GROUP_SCHEMA_DISPLAYNAME:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_LDAP_GROUP_SCHEMA_GROUPNAME:
-  name: OCIS_LDAP_GROUP_SCHEMA_GROUPNAME;GRAPH_LDAP_GROUP_NAME_ATTRIBUTE
+  name: OCIS_LDAP_GROUP_SCHEMA_GROUPNAME;USERS_LDAP_GROUP_SCHEMA_GROUPNAME
   defaultValue: cn
   type: string
   description: LDAP Attribute to use for the name of groups.
@@ -8590,28 +8591,28 @@ OCIS_LDAP_GROUP_SCHEMA_GROUPNAME:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_LDAP_GROUP_SCHEMA_ID:
-  name: OCIS_LDAP_GROUP_SCHEMA_ID;GRAPH_LDAP_GROUP_ID_ATTRIBUTE
-  defaultValue: owncloudUUID
+  name: OCIS_LDAP_GROUP_SCHEMA_ID;USERS_LDAP_GROUP_SCHEMA_ID
+  defaultValue: ownclouduuid
   type: string
-  description: LDAP Attribute to use as the unique id for groups. This should be a
+  description: LDAP Attribute to use as the unique ID for groups. This should be a
     stable globally unique ID like a UUID.
   introductionVersion: pre5.0
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
 OCIS_LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING:
-  name: OCIS_LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING;GRAPH_LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING
+  name: OCIS_LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING;USERS_LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING
   defaultValue: "false"
   type: bool
-  description: Set this to true if the defined 'ID' attribute for groups is of the
-    'OCTETSTRING' syntax. This is required when using the 'objectGUID' attribute of
-    Active Directory for the group ID's.
+  description: Set this to true if the defined 'id' attribute for groups is of the
+    'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute
+    of Active Directory for the group ID's.
   introductionVersion: pre5.0
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
 OCIS_LDAP_GROUP_SCHEMA_MAIL:
-  name: OCIS_LDAP_GROUP_SCHEMA_MAIL;GROUPS_LDAP_GROUP_SCHEMA_MAIL
+  name: OCIS_LDAP_GROUP_SCHEMA_MAIL;USERS_LDAP_GROUP_SCHEMA_MAIL
   defaultValue: mail
   type: string
   description: LDAP Attribute to use for the email address of groups (can be empty).
@@ -8620,7 +8621,7 @@ OCIS_LDAP_GROUP_SCHEMA_MAIL:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_LDAP_GROUP_SCHEMA_MEMBER:
-  name: OCIS_LDAP_GROUP_SCHEMA_MEMBER;GRAPH_LDAP_GROUP_MEMBER_ATTRIBUTE
+  name: OCIS_LDAP_GROUP_SCHEMA_MEMBER;USERS_LDAP_GROUP_SCHEMA_MEMBER
   defaultValue: member
   type: string
   description: LDAP Attribute that is used for group members.
@@ -8629,10 +8630,10 @@ OCIS_LDAP_GROUP_SCHEMA_MEMBER:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_LDAP_GROUP_SCOPE:
-  name: OCIS_LDAP_GROUP_SCOPE;GRAPH_LDAP_GROUP_SEARCH_SCOPE
+  name: OCIS_LDAP_GROUP_SCOPE;USERS_LDAP_GROUP_SCOPE
   defaultValue: sub
   type: string
-  description: LDAP search scope to use when looking up groups. Supported scopes are
+  description: LDAP search scope to use when looking up groups. Supported values are
     'base', 'one' and 'sub'.
   introductionVersion: pre5.0
   deprecationVersion: ""
@@ -8706,10 +8707,10 @@ OCIS_LDAP_USER_OBJECTCLASS:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_LDAP_USER_SCHEMA_DISPLAYNAME:
-  name: OCIS_LDAP_USER_SCHEMA_DISPLAYNAME;LDAP_USER_SCHEMA_DISPLAY_NAME;GRAPH_LDAP_USER_DISPLAYNAME_ATTRIBUTE
-  defaultValue: displayName
+  name: OCIS_LDAP_USER_SCHEMA_DISPLAYNAME;USERS_LDAP_USER_SCHEMA_DISPLAYNAME
+  defaultValue: displayname
   type: string
-  description: LDAP Attribute to use for the display name of users.
+  description: LDAP Attribute to use for the displayname of users.
   introductionVersion: pre5.0
   deprecationVersion: ""
   removalVersion: ""
@@ -8724,12 +8725,12 @@ OCIS_LDAP_USER_SCHEMA_ID:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING:
-  name: OCIS_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING;GRAPH_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING
+  name: OCIS_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING;USERS_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING
   defaultValue: "false"
   type: bool
   description: Set this to true if the defined 'ID' attribute for users is of the
-    'OCTETSTRING' syntax. This is required when using the 'objectGUID' attribute of
-    Active Directory for the user ID's.
+    'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute
+    of Active Directory for the user ID's.
   introductionVersion: pre5.0
   deprecationVersion: ""
   removalVersion: ""
@@ -8744,7 +8745,7 @@ OCIS_LDAP_USER_SCHEMA_MAIL:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_LDAP_USER_SCHEMA_USER_TYPE:
-  name: OCIS_LDAP_USER_SCHEMA_USER_TYPE;GRAPH_LDAP_USER_TYPE_ATTRIBUTE
+  name: OCIS_LDAP_USER_SCHEMA_USER_TYPE;USERS_LDAP_USER_TYPE_ATTRIBUTE
   defaultValue: ownCloudUserType
   type: string
   description: LDAP Attribute to distinguish between 'Member' and 'Guest' users. Default
@@ -8773,7 +8774,7 @@ OCIS_LDAP_USER_SCOPE:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_LOG_COLOR:
-  name: OCIS_LOG_COLOR;APP_PROVIDER_LOG_COLOR
+  name: OCIS_LOG_COLOR;USERLOG_LOG_COLOR
   defaultValue: "false"
   type: bool
   description: Activates colorized log output.
@@ -8782,7 +8783,7 @@ OCIS_LOG_COLOR:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_LOG_FILE:
-  name: OCIS_LOG_FILE;APP_PROVIDER_LOG_FILE
+  name: OCIS_LOG_FILE;USERLOG_LOG_FILE
   defaultValue: ""
   type: string
   description: The path to the log file. Activates logging to this file if set.
@@ -8791,7 +8792,7 @@ OCIS_LOG_FILE:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_LOG_LEVEL:
-  name: OCIS_LOG_LEVEL;APP_PROVIDER_LOG_LEVEL
+  name: OCIS_LOG_LEVEL;USERLOG_LOG_LEVEL
   defaultValue: ""
   type: string
   description: 'The log level. Valid values are: ''panic'', ''fatal'', ''error'',
@@ -8801,7 +8802,7 @@ OCIS_LOG_LEVEL:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_LOG_PRETTY:
-  name: OCIS_LOG_PRETTY;APP_PROVIDER_LOG_PRETTY
+  name: OCIS_LOG_PRETTY;USERLOG_LOG_PRETTY
   defaultValue: "false"
   type: bool
   description: Activates pretty log output.
@@ -8982,7 +8983,7 @@ OCIS_REVA_GATEWAY:
   name: OCIS_REVA_GATEWAY
   defaultValue: com.owncloud.api.gateway
   type: string
-  description: The CS3 gateway endpoint.
+  description: CS3 gateway used to look up user metadata
   introductionVersion: pre5.0
   deprecationVersion: ""
   removalVersion: ""
@@ -9072,7 +9073,7 @@ OCIS_SPACES_MAX_QUOTA:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_SYSTEM_USER_API_KEY:
-  name: OCIS_SYSTEM_USER_API_KEY;SHARING_PUBLIC_CS3_SYSTEM_USER_API_KEY
+  name: OCIS_SYSTEM_USER_API_KEY
   defaultValue: ""
   type: string
   description: API key for the STORAGE-SYSTEM system user.
@@ -9081,7 +9082,7 @@ OCIS_SYSTEM_USER_API_KEY:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_SYSTEM_USER_ID:
-  name: OCIS_SYSTEM_USER_ID;SHARING_PUBLIC_CS3_SYSTEM_USER_ID
+  name: OCIS_SYSTEM_USER_ID;SETTINGS_SYSTEM_USER_ID
   defaultValue: ""
   type: string
   description: ID of the oCIS STORAGE-SYSTEM system user. Admins need to set the ID
@@ -9093,7 +9094,7 @@ OCIS_SYSTEM_USER_ID:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_SYSTEM_USER_IDP:
-  name: OCIS_SYSTEM_USER_IDP;SHARING_PUBLIC_CS3_SYSTEM_USER_IDP
+  name: OCIS_SYSTEM_USER_IDP;SETTINGS_SYSTEM_USER_IDP
   defaultValue: internal
   type: string
   description: IDP of the oCIS STORAGE-SYSTEM system user.
@@ -9102,7 +9103,7 @@ OCIS_SYSTEM_USER_IDP:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_TRACING_COLLECTOR:
-  name: OCIS_TRACING_COLLECTOR;APP_PROVIDER_TRACING_COLLECTOR
+  name: OCIS_TRACING_COLLECTOR;USERLOG_TRACING_COLLECTOR
   defaultValue: ""
   type: string
   description: The HTTP endpoint for sending spans directly to a collector, i.e. http://jaeger-collector:14268/api/traces.
@@ -9112,7 +9113,7 @@ OCIS_TRACING_COLLECTOR:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_TRACING_ENABLED:
-  name: OCIS_TRACING_ENABLED;APP_PROVIDER_TRACING_ENABLED
+  name: OCIS_TRACING_ENABLED;USERLOG_TRACING_ENABLED
   defaultValue: "false"
   type: bool
   description: Activates tracing.
@@ -9121,7 +9122,7 @@ OCIS_TRACING_ENABLED:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_TRACING_ENDPOINT:
-  name: OCIS_TRACING_ENDPOINT;APP_PROVIDER_TRACING_ENDPOINT
+  name: OCIS_TRACING_ENDPOINT;USERLOG_TRACING_ENDPOINT
   defaultValue: ""
   type: string
   description: The endpoint of the tracing agent.
@@ -9130,7 +9131,7 @@ OCIS_TRACING_ENDPOINT:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_TRACING_TYPE:
-  name: OCIS_TRACING_TYPE;APP_PROVIDER_TRACING_TYPE
+  name: OCIS_TRACING_TYPE;USERLOG_TRACING_TYPE
   defaultValue: ""
   type: string
   description: The type of tracing. Defaults to '', which is the same as 'jaeger'.
@@ -9143,7 +9144,7 @@ OCIS_TRANSFER_SECRET:
   name: OCIS_TRANSFER_SECRET
   defaultValue: ""
   type: string
-  description: Transfer secret for signing file up- and download requests.
+  description: The storage transfer secret.
   introductionVersion: pre5.0
   deprecationVersion: ""
   removalVersion: ""
@@ -9160,11 +9161,10 @@ OCIS_TRANSLATION_PATH:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_URL:
-  name: OCIS_URL;APP_PROVIDER_WOPI_FOLDER_URL_BASE_URL
-  defaultValue: https://localhost:9200/
+  name: OCIS_URL;OCIS_OIDC_ISSUER;IDP_ISS
+  defaultValue: https://localhost:9200
   type: string
-  description: Base url to navigate back from the app to the containing folder in
-    the file list.
+  description: The OIDC issuer URL to use.
   introductionVersion: pre5.0
   deprecationVersion: ""
   removalVersion: ""
