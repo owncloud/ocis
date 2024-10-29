@@ -53,15 +53,13 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 	 * @param string|null $adminUsername
 	 * @param string|null $adminPassword
 	 * @param string|null $baseUrl
-	 * @param string|null $ocPath
 	 *
 	 * @return void
 	 */
 	public static function init(
 		?string $adminUsername,
 		?string $adminPassword,
-		?string $baseUrl,
-		?string $ocPath
+		?string $baseUrl
 	): void {
 		foreach (\func_get_args() as $variableToCheck) {
 			if (!\is_string($variableToCheck)) {

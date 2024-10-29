@@ -108,7 +108,6 @@ class FeatureContext extends BehatVariablesContext {
 	 * The password to use in tests that create public link shares
 	 */
 	private string $publicLinkSharePassword;
-	private string $ocPath;
 	private string $currentUser = '';
 	private string $currentServer;
 
@@ -458,29 +457,22 @@ class FeatureContext extends BehatVariablesContext {
 	/**
 	 * BasicStructure constructor.
 	 *
-	 * @param string $baseUrl
 	 * @param string $adminUsername
 	 * @param string $adminPassword
 	 * @param string $regularUserPassword
-	 * @param string $ocPath
 	 *
 	 */
 	public function __construct(
-		string $baseUrl,
 		string $adminUsername,
 		string $adminPassword,
 		string $regularUserPassword,
-		string $ocPath
 	) {
 		// Initialize your context here
-		$this->baseUrl = \rtrim($baseUrl, '/');
 		$this->adminUsername = $adminUsername;
 		$this->adminPassword = $adminPassword;
 		$this->regularUserPassword = $regularUserPassword;
-		$this->localBaseUrl = $this->baseUrl;
 		$this->currentServer = 'LOCAL';
 		$this->cookieJar = new CookieJar();
-		$this->ocPath = $ocPath;
 
 		// These passwords are referenced in tests and can be overridden by
 		// setting environment variables.
@@ -493,10 +485,8 @@ class FeatureContext extends BehatVariablesContext {
 		$this->publicLinkSharePassword = "publicPwd:1";
 
 		$testServerUrl = OcisHelper::getServerUrl();
-		if ($testServerUrl !== false) {
-			$this->baseUrl = \rtrim($testServerUrl, '/');
-			$this->localBaseUrl = $this->baseUrl;
-		}
+		$this->baseUrl = \rtrim($testServerUrl, '/');
+		$this->localBaseUrl = $this->baseUrl;
 
 		// federated server url from the environment
 		$testRemoteServerUrl = \getenv('TEST_SERVER_FED_URL');
@@ -752,13 +742,6 @@ class FeatureContext extends BehatVariablesContext {
 			"",
 			$url
 		);
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getOcPath(): string {
-		return $this->ocPath;
 	}
 
 	/**
@@ -2627,7 +2610,6 @@ class FeatureContext extends BehatVariablesContext {
 			$this->getAdminUsername(),
 			$this->getAdminPassword(),
 			$this->getBaseUrl(),
-			$this->getOcPath()
 		);
 
 		if ($this->isTestingWithLdap()) {
