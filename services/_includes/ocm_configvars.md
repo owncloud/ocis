@@ -55,3 +55,4 @@
 | OCM_OCM_CORE_JSON_FILE | string | /var/lib/ocis/storage/ocm/ocmshares.json | Path to the JSON file where OCM share data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH/storage.|
 | OCM_OCM_STORAGE_PROVIDER_INSECURE | bool | false | Disable TLS certificate validation for the OCM connections. Do not set this in production environments.|
 | OCM_OCM_STORAGE_PROVIDER_STORAGE_ROOT | string | /var/lib/ocis/storage/ocm | Directory where the ocm storage provider persists its data like tus upload info files.|
+| OCM_OCM_STORAGE_DATA_SERVER_URL | string | http://localhost:9280/data | URL of the data server, needs to be reachable by the data gateway provided by the frontend service or the user if directly exposed.|

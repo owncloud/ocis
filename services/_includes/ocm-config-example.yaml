@@ -113,3 +113,4 @@ ocm_core:
 ocm_storage_provider:
   insecure: false
   storage_root: /var/lib/ocis/storage/ocm
+  data_server_url: http://localhost:9280/data

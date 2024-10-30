@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-10-30-09-54-38]
+[#deprecation-note-2024-10-30-15-47-43]
 [caption=]
 .Deprecation notes for the ocm service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -636,5 +636,16 @@ a| [subs=-attributes]
 ++/var/lib/ocis/storage/ocm ++
 a| [subs=-attributes]
 Directory where the ocm storage provider persists its data like tus upload info files.
+
+a|`OCM_OCM_STORAGE_DATA_SERVER_URL` +
+
+a| [subs=-attributes]
+++7.0.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++http://localhost:9280/data ++
+a| [subs=-attributes]
+URL of the data server, needs to be reachable by the data gateway provided by the frontend service or the user if directly exposed.
 |===
 
