@@ -17,7 +17,7 @@ func RestartPostprocessing(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:    "resume",
 		Aliases: []string{"restart"},
-		Usage:   "restart postprocessing for an uploadID",
+		Usage:   "resume postprocessing for an uploadID",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:    "upload-id",
