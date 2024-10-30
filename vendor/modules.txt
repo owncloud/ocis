@@ -20,7 +20,6 @@ github.com/BurntSushi/toml/internal
 github.com/CiscoM31/godata
 # github.com/KimMachineGun/automemlimit v0.6.1
 ## explicit; go 1.21
-github.com/KimMachineGun/automemlimit
 github.com/KimMachineGun/automemlimit/memlimit
 # github.com/Masterminds/goutils v1.1.1
 ## explicit
@@ -1484,7 +1483,7 @@ github.com/onsi/ginkgo/v2/internal/parallel_support
 github.com/onsi/ginkgo/v2/internal/testingtproxy
 github.com/onsi/ginkgo/v2/reporters
 github.com/onsi/ginkgo/v2/types
-# github.com/onsi/gomega v1.34.2
+# github.com/onsi/gomega v1.35.0
 ## explicit; go 1.22
 github.com/onsi/gomega
 github.com/onsi/gomega/format
