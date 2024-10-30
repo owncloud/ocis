@@ -2,7 +2,7 @@
 services:
   traefik:
     networks:
-      ocis-net:
+      ocis-ocm-net:
         aliases:
           - ${OCIS_OCM_DOMAIN:-ocis.ocm.owncloud.test}
   ocis:
@@ -19,7 +19,7 @@ services:
   ocis-ocm:
     image: ${OCIS_DOCKER_IMAGE:-owncloud/ocis}:${OCIS_DOCKER_TAG:-latest}
     networks:
-      ocis-net:
+      ocis-ocm-net:
     entrypoint:
       - /bin/sh
     # run ocis init to initialize a configuration file with random secrets
@@ -55,9 +55,9 @@ services:
       MICRO_REGISTRY_ADDRESS: 127.0.0.1:9233
       NATS_NATS_HOST: 0.0.0.0
       NATS_NATS_PORT: 9233
-      PROXY_CSP_CONFIG_FILE_LOCATION: /etc/ocis/csp.yaml
+      PROXY_CSP_CONFIG_FILE_LOCATION: /etc/ocis/csp-ocm.yaml
       # these three vars are needed to the csp config file to include the web office apps and the importer
-      COLLABORA_DOMAIN: ${COLLABORA_DOMAIN:-collabora.owncloud.test}
+      COLLABORA_DOMAIN: ${COLLABORA_DOMAIN:-collabora.ocm.owncloud.test}
       ONLYOFFICE_DOMAIN: ${ONLYOFFICE_DOMAIN:-onlyoffice.owncloud.test}
       COMPANION_DOMAIN: ${COMPANION_DOMAIN:-companion.owncloud.test}
       # enable to allow using the banned passwords list
@@ -71,7 +71,7 @@ services:
       WEB_UI_CONFIG_FILE: /etc/ocis/ocis.ocm.web.config.json
     volumes:
       - ./config/ocis/app-registry.yaml:/etc/ocis/app-registry.yaml
-      - ./config/ocis/csp.yaml:/etc/ocis/csp.yaml
+      - ./config/ocis/csp-ocm.yaml:/etc/ocis/csp-ocm.yaml
       - ./config/ocis/banned-password-list.txt:/etc/ocis/banned-password-list.txt
       - ./config/ocis/ocis.ocm.web.config.json:/etc/ocis/ocis.ocm.web.config.json:ro
       - ./config/ocis/ocm.providers.json:/etc/ocm/providers.json
