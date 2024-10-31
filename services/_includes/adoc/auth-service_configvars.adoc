@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-10-31-00-08-43]
+[#deprecation-note-2024-10-31-05-12-30]
 [caption=]
 .Deprecation notes for the auth-service service
 [width="100%",cols="~,~,~,~",options="header"]
