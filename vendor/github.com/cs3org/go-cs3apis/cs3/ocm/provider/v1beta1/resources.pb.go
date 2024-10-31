@@ -280,19 +280,19 @@ type ProviderInfo struct {
 	// REQUIRED.
 	// The full name of the provider.
 	FullName string `protobuf:"bytes,2,opt,name=full_name,json=fullName,proto3" json:"full_name,omitempty"`
-	// REQUIRED.
+	// OPTIONAL.
 	// A description of the provider.
 	Description string `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
-	// REQUIRED.
+	// OPTIONAL.
 	// The organization to which the provider belongs.
 	Organization string `protobuf:"bytes,4,opt,name=organization,proto3" json:"organization,omitempty"`
 	// REQUIRED.
 	// The domain of the sync'n'share provider.
 	Domain string `protobuf:"bytes,5,opt,name=domain,proto3" json:"domain,omitempty"`
-	// REQUIRED.
+	// OPTIONAL.
 	// The homepage of the provider.
 	Homepage string `protobuf:"bytes,6,opt,name=homepage,proto3" json:"homepage,omitempty"`
-	// REQUIRED.
+	// OPTIONAL.
 	// The email at which the provider can be reached.
 	Email string `protobuf:"bytes,7,opt,name=email,proto3" json:"email,omitempty"`
 	// REQUIRED.
