@@ -10,10 +10,23 @@
         "endpoint": {
           "type": {
             "name": "OCM",
-            "description": "CERNBox Open Cloud Mesh API"
+            "description": "ocis.owncloud.test Open Cloud Mesh API"
           },
-          "name": "CERNBox - OCM API",
+          "name": "ocis - OCM API",
           "path": "https://ocis.owncloud.test/ocm/",
+          "is_monitored": true
+        },
+        "api_version": "0.0.1",
+        "host": "ocis.owncloud.test"
+      },
+      {
+        "endpoint": {
+          "type": {
+            "name": "Webdav",
+            "description": "ocis.owncloud.test Webdav API"
+          },
+          "name": "ocis - Webdav API",
+          "path": "https://ocis.owncloud.test/dav/",
           "is_monitored": true
         },
         "api_version": "0.0.1",
@@ -36,6 +49,19 @@
           },
           "name": "CERNBox - OCM API",
           "path": "https://ocis.ocm.owncloud.test/ocm/",
+          "is_monitored": true
+        },
+        "api_version": "0.0.1",
+        "host": "ocis.ocm.owncloud.test"
+      },
+      {
+        "endpoint": {
+          "type": {
+            "name": "Webdav",
+            "description": "ocis.ocm.owncloud.test Webdav API"
+          },
+          "name": "ocis.ocm - Webdav API",
+          "path": "https://ocis.ocm.owncloud.test/dav/",
           "is_monitored": true
         },
         "api_version": "0.0.1",

@@ -30,6 +30,7 @@ services:
       - "--providers.docker.exposedByDefault=false"
       # access log
       - "--accessLog=true"
+      - "--accesslog.filePath=/var/log/access.log"
       - "--accessLog.format=json"
       - "--accessLog.fields.headers.names.X-Request-Id=keep"
     ports:

@@ -25,8 +25,8 @@ services:
       - /bin/sh
     command: [ "-c", "ocis collaboration server" ]
     environment:
-      COLLABORATION_GRPC_ADDR: 0.0.0.0:9301
-      COLLABORATION_HTTP_ADDR: 0.0.0.0:9300
+      COLLABORATION_GRPC_ADDR: collaboration:9301
+      COLLABORATION_HTTP_ADDR: collaboration:9300
       MICRO_REGISTRY: "nats-js-kv"
       MICRO_REGISTRY_ADDRESS: "ocis:9233"
       COLLABORATION_WOPI_SRC: https://${WOPISERVER_DOMAIN:-wopiserver.owncloud.test}

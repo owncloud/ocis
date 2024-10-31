@@ -76,7 +76,7 @@ services:
       - ./config/ocis/ocis.ocm.web.config.json:/etc/ocis/ocis.ocm.web.config.json:ro
       - ./config/ocis/ocm.providers.json:/etc/ocm/providers.json
       # configure the .env file to use own paths instead of docker internal volumes
-      - ${OCIS_CONFIG_DIR:-ocis-ocm-config}:/etc/ocis
+      - ${OCIS_OCM_CONFIG_DIR:-ocis-ocm-config}:/etc/ocis
       - ${OCIS_OCM_DATA_DIR:-ocis-ocm-data}:/var/lib/ocis
     labels:
       - "traefik.enable=true"
