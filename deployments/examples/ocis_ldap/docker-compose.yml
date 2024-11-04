@@ -127,6 +127,7 @@ services:
       - ./config/ldap/schemas:/schemas
       - ./config/ldap/docker-entrypoint-override.sh:/opt/bitnami/scripts/openldap/docker-entrypoint-override.sh
       - ldap-certs:/opt/bitnami/openldap/share
+      - ldap-data:/bitnami/openldap
     logging:
       driver: ${LOG_DRIVER:-local}
     restart: always
@@ -154,6 +155,7 @@ volumes:
   ldap-certs:
   ocis-config:
   ocis-data:
+  ldap-data:
 
 
 networks:
