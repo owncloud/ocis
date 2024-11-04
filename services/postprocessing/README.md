@@ -75,29 +75,47 @@ See the [cs3 org](https://github.com/cs3org/reva/blob/edge/pkg/events/postproces
 
 ### Resume Postprocessing
 
-If postprocessing fails in one step due to an unforseen error, current uploads will not be retried automatically. A system admin can instead run a CLI command to retry the failed upload which is a two step process. For details on the `storage-users` command see the **Manage Unfinished Uploads** documentation in the `storage-users` service documentation:
+**IMPORTANT**
+> If not noted otherwise, commands with the `restart` option can also use the `resume` option. This changes behaviour slightly.
+>
+> * `restart`\
+> When restarting an upload, all steps for open items will be restarted, except if otherwise defined.
+> * `resume`\
+> When resuming an upload, processing will continue unfinished items from their last completed step.
 
--   First list ongoing upload sessions
+If post-processing fails in one step due to an unforeseen error, current uploads will not be resumed automatically. A system administrator can instead run CLI commands to resume the failed upload manually which is at minimum a two step process.
+
+For details on the `storage-users` command see the **Manage Unfinished Uploads** documentation in the `storage-users` service documentation.
+
+Depending if you want to restart/resume all or defined failed uploads, different commands are used.
+
+-   First, list ongoing upload sessions to identify possibly failed ones.\
+    Note that there never can be a clear identification of a failed upload session due to various reasons causing them. You need to apply more critera like free space on disk, a failed service like antivirus etc. to declare an upload as failed.
+
     ```bash
     ocis storage-users uploads sessions
     ```
 
--   If you want to restart all uploads just rerun the command with the `--restart` flag
+-   **All failed uploads**\
+    If you want to restart/resume all failed uploads, just rerun the command with the relevant flag. Note that this is the preferred command to handle failed processing steps:
     ```bash
-    ocis storage-users uploads sessions --restart
+    ocis storage-users uploads sessions --resume
     ```
 
--   If you want to restart only one upload use the postprocessing restart command
-    ```bash
-    ocis postprocessing restart -u <uploadID>
-    ```
+-   **Particular failed uploads**\
+    Use the `postprocessing` command to resume defined failed uploads. For postprocessing steps, the default is to resume . Note that at the moment, `resume` is an alias for `restart` to keep old functionality. `restart` is subject of change and will most likely be removed in a later version.
 
-Instead of starting one specific upload, a system admin can also restart all uploads that are currently in a specific step.
-Examples:
-```
-ocis postprocessing restart                # Restarts all uploads where postprocessing is finished, but upload is not finished
-ocis postprocessing restart -s "finished"  # Equivalent to the above
-ocis postprocessing restart -s "virusscan" # Restart all uploads currently in virusscan step
-```
+    - **Defined by ID**\
+      If you want to resume only a specific upload, use the postprocessing resume command with the ID selected:
+      ```bash
+      ocis postprocessing resume -u <uploadID>
+      ```
 
-Note: All above commands containing the word `restart` can also be replaced by `resume`. This changes behaviour slightly. When `restarting` an upload, the whole postprocessing will be (re)done. If `resuming` an upload, it will only continue from the last step that was completed.
+    - **Defined by step**\
+      Alternatively, instead of restarting one specific upload, a system admin can also resume all uploads that are currently in a specific step.\
+      Examples:\
+      ```bash
+      ocis postprocessing resume                # Resumes all uploads where postprocessing is finished, but upload is not finished
+      ocis postprocessing resume -s "finished"  # Equivalent to the above
+      ocis postprocessing resume -s "virusscan" # Resume all uploads currently in virusscan step
+      ```
