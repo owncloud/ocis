@@ -63,6 +63,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Make SSE keepalive interval configurable: [#10411](https://github.com/owncloud/ocis/pull/10411)
 * Bugfix - Micro registry cache fixes: [#10429](https://github.com/owncloud/ocis/pull/10429)
 * Bugfix - Fix the memlimit loglevel: [#10431](https://github.com/owncloud/ocis/pull/10431)
+* Bugfix - Restart Postprocessing properly: [#10439](https://github.com/owncloud/ocis/pull/10439)
 * Bugfix - Allow to configure data server URL for ocm: [#10440](https://github.com/owncloud/ocis/pull/10440)
 * Enhancement - Add web extensions to the ocis_full example: [#10399](https://github.com/owncloud/ocis/pull/10399)
 * Enhancement - Bump reva to 2.26.2: [#10419](https://github.com/owncloud/ocis/pull/10419)
@@ -117,6 +118,12 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/10428
    https://github.com/owncloud/ocis/pull/10431
+
+* Bugfix - Restart Postprocessing properly: [#10439](https://github.com/owncloud/ocis/pull/10439)
+
+   Properly differentiate between resume and restart postprocessing.
+
+   https://github.com/owncloud/ocis/pull/10439
 
 * Bugfix - Allow to configure data server URL for ocm: [#10440](https://github.com/owncloud/ocis/pull/10440)
 
