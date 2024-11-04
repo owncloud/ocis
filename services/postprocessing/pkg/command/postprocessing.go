@@ -15,19 +15,25 @@ import (
 // RestartPostprocessing cli command to restart postprocessing
 func RestartPostprocessing(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:  "restart",
-		Usage: "restart postprocessing for an uploadID",
+		Name:    "resume",
+		Aliases: []string{"restart"},
+		Usage:   "resume postprocessing for an uploadID",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:    "upload-id",
 				Aliases: []string{"u"},
-				Usage:   "the uploadid to restart. Ignored if unset.",
+				Usage:   "the uploadid to resume. Ignored if unset.",
 			},
 			&cli.StringFlag{
 				Name:    "step",
 				Aliases: []string{"s"},
-				Usage:   "restarts all uploads in the given postprocessing step. Ignored if upload-id is set.",
-				Value:   "finished", // Calling `ocis postprocessing restart` without any arguments will restart all uploads that are finished but failed to move the uploed from the upload area to the blobstore.
+				Usage:   "resume all uploads in the given postprocessing step. Ignored if upload-id is set.",
+				Value:   "finished",
+			},
+			&cli.BoolFlag{
+				Name:    "restart",
+				Aliases: []string{"r"},
+				Usage:   "restart postprocessing for the given uploadID. Ignores the step flag.",
 			},
 		},
 		Before: func(c *cli.Context) error {
@@ -44,10 +50,19 @@ func RestartPostprocessing(cfg *config.Config) *cli.Command {
 				step = c.String("step")
 			}
 
-			ev := events.ResumePostprocessing{
-				UploadID:  uid,
-				Step:      events.Postprocessingstep(step),
-				Timestamp: utils.TSNow(),
+			var ev events.Unmarshaller
+			switch {
+			case c.Bool("retrigger"):
+				ev = events.RestartPostprocessing{
+					UploadID:  uid,
+					Timestamp: utils.TSNow(),
+				}
+			default:
+				ev = events.ResumePostprocessing{
+					UploadID:  uid,
+					Step:      events.Postprocessingstep(step),
+					Timestamp: utils.TSNow(),
+				}
 			}
 
 			return events.Publish(context.Background(), stream, ev)
