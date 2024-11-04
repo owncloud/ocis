@@ -56,13 +56,19 @@ ocis storage-users uploads <command>
 ```plaintext
 COMMANDS:
    sessions   Print a list of upload sessions
-   clean      Clean up leftovers from expired uploads (deprecated)
-   list       Print a list of all incomplete uploads (deprecated)
 ```
 
 #### Sessions command
 
 The `sessions` command is the entry point for listing, restarting and cleaning unfinished uploads.
+
+**IMPORTANT**
+> If not noted otherwise, commands with the `restart` option can also use the `resume` option. This changes behaviour slightly.
+>
+> * `restart`\
+> When restarting an upload, all steps for open items will be restarted, except if otherwise defined.
+> * `resume`\
+> When resuming an upload, processing will continue unfinished items from their last completed step.
 
 ```bash
 ocis storage-users uploads sessions <commandoptions>
@@ -82,6 +88,7 @@ OPTIONS:
    --has-virus   filter sessions by virus scan result (default: unset)
    --json        output as json (default: false)
    --restart     send restart event for all listed sessions (default: false)
+   --resume      send resume event for all listed sessions (default: false)
    --clean       remove uploads (default: false)
    --help, -h    show help
 ```
@@ -122,24 +129,15 @@ ocis storage-users uploads sessions --expired=false --processing=false --json
 {"id":"f066244d-97b2-48e7-a30d-b40fcb60cec6","space":"f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c","filename":"bar.txt","offset":0,"size":4321,"executant":{"idp":"https://cloud.ocis.test","opaque_id":"f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c"},"spaceowner":{"opaque_id":"f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c"},"expires":"2024-01-26T13:18:47+01:00","processing":false, "scanDate": "2024-04-24T14:38:29+02:00", "scanResult": ""}
 ```
 
-The sessions command can also clear and restart uploads. The output is the same as if run without `--clean` or `--restart` flag.
-Note: It is recommended to run to command first without the `--clean` (`--processing`) flag to double check which uploads get cleaned (restarted).
+The sessions command can also clear and restart/resume uploads. The output is the same as if run without `--clean` or `--restart` flag.
+Note: It is recommended to run to command first without the `--clean` (`--processing`) flag to double check which uploads get cleaned (restarted/resumed).
+
 ```bash
 # cleans all expired uploads regardless of processing and virus state.
 ocis storage-users uploads sessions --expired=true --clean
 
-# restarts all uploads that are processing and are not virus infected
-ocis storage-users uploads sessions --processing=false --has-virus=false --restart
-```
-
-IMPORTANT: `list` and `clean` commands are deprecated. Do not use them.
-
-```bash
-# deprecated
-ocis storage-users uploads list
-
-# deprecated
-ocis storage-users uploads clean
+# resumes all uploads that are processing and are not virus infected
+ocis storage-users uploads sessions --processing=false --has-virus=false --resume
 ```
 
 ### Manage Trash-Bin Items
