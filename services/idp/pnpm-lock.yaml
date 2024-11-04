@@ -12,8 +12,8 @@ importers:
   .:
     dependencies:
       '@fontsource/roboto':
-        specifier: ^5.0.14
-        version: 5.0.14
+        specifier: ^5.1.0
+        version: 5.1.0
       '@material-ui/core':
         specifier: ^4.12.4
         version: 4.12.4(@types/react@17.0.80)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
@@ -1387,8 +1387,8 @@ packages:
     resolution: {integrity: sha512-J6KFFz5QCYUJq3pf0mjEcCJVERbzv71PUIDczuh9JkwGEzced6CO5ADLHB1rbf/+oPBtoPfMYNOpGDzCANlbXw==}
     engines: {node: ^10.12.0 || >=12.0.0}
 
-  '@fontsource/roboto@5.0.14':
-    resolution: {integrity: sha512-zHAxlTTm9RuRn9/StwclFJChf3z9+fBrOxC3fw71htjHP1BgXNISwRjdJtAKAmMe5S2BzgpnjkQR93P9EZYI/Q==}
+  '@fontsource/roboto@5.1.0':
+    resolution: {integrity: sha512-cFRRC1s6RqPygeZ8Uw/acwVHqih8Czjt6Q0MwoUoDe9U3m4dH1HmNDRBZyqlMSFwgNAUKgFImncKdmDHyKpwdg==}
 
   '@gluejs/glue@0.3.0':
     resolution: {integrity: sha512-byvFoZCbZW+A3Pg8JUU+8FjoPuF5l1v7mDeLJQP/YSeEcEDiD/YdUKLBUapPrcuyxclrtS8+peX4cxkh6awwTw==}
@@ -7950,7 +7950,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@fontsource/roboto@5.0.14': {}
+  '@fontsource/roboto@5.1.0': {}
 
   '@gluejs/glue@0.3.0': {}
 
