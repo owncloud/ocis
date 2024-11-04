@@ -1,6 +1,6 @@
 ---
 title: Antivirus
-date: 2024-11-04T13:26:06.229276668Z
+date: 2024-11-04T18:21:47.019260439Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/antivirus
@@ -42,7 +42,7 @@ The antivirus service currently supports [ICAP](https://tools.ietf.org/html/rfc3
 
 Several factors can make it necessary to limit the maximum filesize the antivirus service will use for scanning. Use the `ANTIVIRUS_MAX_SCAN_SIZE` environment variable to scan only a given amount of bytes. Obviously, it is recommended to scan the whole file, but several factors like scanner type and version, bandwidth, performance issues, etc. might make a limit necessary.
 
-> [!CAUTION]
+**IMPORTANT**
 > Streaming of files to the virus scan service still [needs to be implemented](https://github.com/owncloud/ocis/issues/6803). To prevent OOM errors `ANTIVIRUS_MAX_SCAN_SIZE` needs to be set lower than available ram.
 
 ### Antivirus Workers
