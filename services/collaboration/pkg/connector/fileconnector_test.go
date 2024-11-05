@@ -48,6 +48,7 @@ var _ = Describe("FileConnector", func() {
 			App: config.App{
 				LockName: "testName_for_unittests", // Only the LockName is used
 				Name:     "test",
+				Product:  "Microsoft",
 			},
 			Wopi: config.Wopi{
 				WopiSrc: "https://ocis.server.prv",
@@ -1761,6 +1762,7 @@ var _ = Describe("FileConnector", func() {
 
 			// change wopi app provider
 			cfg.App.Name = "Collabora"
+			cfg.App.Product = "Collabora"
 
 			expectedFileInfo := &fileinfo.Collabora{
 				OwnerID:                 "61616262636340637573746f6d496470", // hex of aabbcc@customIdp
@@ -1834,6 +1836,7 @@ var _ = Describe("FileConnector", func() {
 
 			// change wopi app provider
 			cfg.App.Name = "Collabora"
+			cfg.App.Product = "Collabora"
 
 			expectedFileInfo := &fileinfo.Collabora{
 				OwnerID:                 "61616262636340637573746f6d496470", // hex of aabbcc@customIdp
@@ -1921,6 +1924,7 @@ var _ = Describe("FileConnector", func() {
 
 			// change wopi app provider
 			cfg.App.Name = "OnlyOffice"
+			cfg.App.Product = "OnlyOffice"
 
 			response, err := fc.CheckFileInfo(ctx)
 			Expect(err).ToNot(HaveOccurred())

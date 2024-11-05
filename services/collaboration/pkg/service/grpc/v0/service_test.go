@@ -147,6 +147,7 @@ var _ = Describe("Discovery", func() {
 				cfg.Wopi.Secret = "my_supa_secret"
 				cfg.Wopi.DisableChat = disableChat
 				cfg.App.Name = appName
+				cfg.App.Product = appName
 
 				myself := &userv1beta1.User{
 					Id: &userv1beta1.UserId{
@@ -333,6 +334,7 @@ var _ = Describe("Discovery", func() {
 			cfg.Wopi.WopiSrc = "htttps://wopiserver.test.prv"
 			cfg.Wopi.Secret = "my_supa_secret"
 			cfg.App.Name = "OnlyOffice"
+			cfg.App.Product = "OnlyOffice"
 
 			myself := &userv1beta1.User{
 				Id: &userv1beta1.UserId{
