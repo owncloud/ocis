@@ -6,7 +6,6 @@ type App struct {
 	Product     string `yaml:"product" env:"COLLABORATION_APP_PRODUCT" desc:"The WebOffice app, either Collabora, OnlyOffice, Microsoft365 or MicrosoftOfficeOnline" introductionVersion:"%%NEXT%%"`
 	Description string `yaml:"description" env:"COLLABORATION_APP_DESCRIPTION" desc:"App description" introductionVersion:"6.0.0"`
 	Icon        string `yaml:"icon" env:"COLLABORATION_APP_ICON" desc:"Icon for the app" introductionVersion:"6.0.0"`
-	LockName    string `yaml:"lockname" env:"COLLABORATION_APP_LOCKNAME" desc:"Name for the app lock" introductionVersion:"6.0.0"`
 
 	Addr     string `yaml:"addr" env:"COLLABORATION_APP_ADDR" desc:"The URL where the WOPI app is located, such as https://127.0.0.1:8080." introductionVersion:"6.0.0"`
 	Insecure bool   `yaml:"insecure" env:"COLLABORATION_APP_INSECURE" desc:"Skip TLS certificate verification when connecting to the WOPI app" introductionVersion:"6.0.0"`
