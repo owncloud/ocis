@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-11-04-00-08-04]
+[#deprecation-note-2024-11-05-00-28-37]
 [caption=]
 .Deprecation notes for the graph service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -1027,7 +1027,7 @@ The service account secret.
 
 a|`OCIS_ENABLE_RESHARING` +
 `GRAPH_ENABLE_RESHARING` +
-xref:deprecation-note-2024-11-04-00-08-04[Deprecation Note]
+xref:deprecation-note-2024-11-05-00-28-37[Deprecation Note]
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
