@@ -113,7 +113,7 @@ var _ = Describe("FileConnector", func() {
 			response, err := fc.GetLock(ctx)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(response.Status).To(Equal(404))
-			Expect(response.Headers).To(BeNil())
+			Expect(response.Headers[connector.HeaderWopiLock]).To(Equal(""))
 		})
 
 		It("Get lock success", func() {
