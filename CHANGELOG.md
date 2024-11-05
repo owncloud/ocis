@@ -58,6 +58,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Removed 'OCM_OCM_PROVIDER_AUTHORIZER_VERIFY_REQUEST_HOSTNAME' setting: [#104](https://github.com/owncloud/ocis/pull/104xx)
+* Bugfix - Respect proxy url when validating proofkeys: [#1234](https://github.com/owncloud/ocis/pull/1234)
 * Bugfix - Generate short tokens to be used as access tokens for WOPI: [#10391](https://github.com/owncloud/ocis/pull/10391)
 * Bugfix - Fix put relative wopi operation for microsoft: [#10403](https://github.com/owncloud/ocis/pull/10403)
 * Bugfix - Make SSE keepalive interval configurable: [#10411](https://github.com/owncloud/ocis/pull/10411)
@@ -83,6 +84,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/10355
    https://github.com/owncloud/ocis/pull/104xx
+
+* Bugfix - Respect proxy url when validating proofkeys: [#1234](https://github.com/owncloud/ocis/pull/1234)
+
+   We fixed a bug where the proxied wopi URL was not used when validating
+   proofkeys. This caused the validation to fail when the proxy was used.
+
+   https://github.com/owncloud/ocis/pull/1234
 
 * Bugfix - Generate short tokens to be used as access tokens for WOPI: [#10391](https://github.com/owncloud/ocis/pull/10391)
 
