@@ -93,6 +93,7 @@ const (
 	GatewayAPI_RemoveShare_FullMethodName                      = "/cs3.gateway.v1beta1.GatewayAPI/RemoveShare"
 	GatewayAPI_GetShare_FullMethodName                         = "/cs3.gateway.v1beta1.GatewayAPI/GetShare"
 	GatewayAPI_ListShares_FullMethodName                       = "/cs3.gateway.v1beta1.GatewayAPI/ListShares"
+	GatewayAPI_ListExistingShares_FullMethodName               = "/cs3.gateway.v1beta1.GatewayAPI/ListExistingShares"
 	GatewayAPI_UpdateShare_FullMethodName                      = "/cs3.gateway.v1beta1.GatewayAPI/UpdateShare"
 	GatewayAPI_ListReceivedShares_FullMethodName               = "/cs3.gateway.v1beta1.GatewayAPI/ListReceivedShares"
 	GatewayAPI_ListExistingReceivedShares_FullMethodName       = "/cs3.gateway.v1beta1.GatewayAPI/ListExistingReceivedShares"
@@ -105,6 +106,7 @@ const (
 	GatewayAPI_GetPublicShare_FullMethodName                   = "/cs3.gateway.v1beta1.GatewayAPI/GetPublicShare"
 	GatewayAPI_GetPublicShareByToken_FullMethodName            = "/cs3.gateway.v1beta1.GatewayAPI/GetPublicShareByToken"
 	GatewayAPI_ListPublicShares_FullMethodName                 = "/cs3.gateway.v1beta1.GatewayAPI/ListPublicShares"
+	GatewayAPI_ListExistingPublicShares_FullMethodName         = "/cs3.gateway.v1beta1.GatewayAPI/ListExistingPublicShares"
 	GatewayAPI_UpdatePublicShare_FullMethodName                = "/cs3.gateway.v1beta1.GatewayAPI/UpdatePublicShare"
 	GatewayAPI_CreateOCMShare_FullMethodName                   = "/cs3.gateway.v1beta1.GatewayAPI/CreateOCMShare"
 	GatewayAPI_RemoveOCMShare_FullMethodName                   = "/cs3.gateway.v1beta1.GatewayAPI/RemoveOCMShare"
@@ -302,6 +304,9 @@ type GatewayAPIClient interface {
 	// both as owner and creator. If a filter is specified, only
 	// shares satisfying the filter MUST be returned.
 	ListShares(ctx context.Context, in *v1beta13.ListSharesRequest, opts ...grpc.CallOption) (*v1beta13.ListSharesResponse, error)
+	// List all existing shares the authenticated principal has created,
+	// including their storage resource information.
+	ListExistingShares(ctx context.Context, in *v1beta13.ListSharesRequest, opts ...grpc.CallOption) (*ListExistingSharesResponse, error)
 	// Updates a share.
 	// MUST return CODE_NOT_FOUND if the share reference does not exist.
 	UpdateShare(ctx context.Context, in *v1beta13.UpdateShareRequest, opts ...grpc.CallOption) (*v1beta13.UpdateShareResponse, error)
@@ -340,6 +345,10 @@ type GatewayAPIClient interface {
 	// both as owner and creator. If a filter is specified, only
 	// shares satisfying the filter MUST be returned.
 	ListPublicShares(ctx context.Context, in *v1beta15.ListPublicSharesRequest, opts ...grpc.CallOption) (*v1beta15.ListPublicSharesResponse, error)
+	// List all existing shares the authenticated principal has created,
+	// both as owner and creator, including their storage resource information.
+	// If a filter is specified, only shares satisfying the filter MUST be returned.
+	ListExistingPublicShares(ctx context.Context, in *v1beta15.ListPublicSharesRequest, opts ...grpc.CallOption) (*ListExistingPublicSharesResponse, error)
 	// Updates a share.
 	// MUST return CODE_NOT_FOUND if the share reference does not exist.
 	UpdatePublicShare(ctx context.Context, in *v1beta15.UpdatePublicShareRequest, opts ...grpc.CallOption) (*v1beta15.UpdatePublicShareResponse, error)
@@ -867,6 +876,15 @@ func (c *gatewayAPIClient) ListShares(ctx context.Context, in *v1beta13.ListShar
 	return out, nil
 }
 
+func (c *gatewayAPIClient) ListExistingShares(ctx context.Context, in *v1beta13.ListSharesRequest, opts ...grpc.CallOption) (*ListExistingSharesResponse, error) {
+	out := new(ListExistingSharesResponse)
+	err := c.cc.Invoke(ctx, GatewayAPI_ListExistingShares_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *gatewayAPIClient) UpdateShare(ctx context.Context, in *v1beta13.UpdateShareRequest, opts ...grpc.CallOption) (*v1beta13.UpdateShareResponse, error) {
 	out := new(v1beta13.UpdateShareResponse)
 	err := c.cc.Invoke(ctx, GatewayAPI_UpdateShare_FullMethodName, in, out, opts...)
@@ -969,6 +987,15 @@ func (c *gatewayAPIClient) GetPublicShareByToken(ctx context.Context, in *v1beta
 func (c *gatewayAPIClient) ListPublicShares(ctx context.Context, in *v1beta15.ListPublicSharesRequest, opts ...grpc.CallOption) (*v1beta15.ListPublicSharesResponse, error) {
 	out := new(v1beta15.ListPublicSharesResponse)
 	err := c.cc.Invoke(ctx, GatewayAPI_ListPublicShares_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gatewayAPIClient) ListExistingPublicShares(ctx context.Context, in *v1beta15.ListPublicSharesRequest, opts ...grpc.CallOption) (*ListExistingPublicSharesResponse, error) {
+	out := new(ListExistingPublicSharesResponse)
+	err := c.cc.Invoke(ctx, GatewayAPI_ListExistingPublicShares_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -1538,6 +1565,9 @@ type GatewayAPIServer interface {
 	// both as owner and creator. If a filter is specified, only
 	// shares satisfying the filter MUST be returned.
 	ListShares(context.Context, *v1beta13.ListSharesRequest) (*v1beta13.ListSharesResponse, error)
+	// List all existing shares the authenticated principal has created,
+	// including their storage resource information.
+	ListExistingShares(context.Context, *v1beta13.ListSharesRequest) (*ListExistingSharesResponse, error)
 	// Updates a share.
 	// MUST return CODE_NOT_FOUND if the share reference does not exist.
 	UpdateShare(context.Context, *v1beta13.UpdateShareRequest) (*v1beta13.UpdateShareResponse, error)
@@ -1576,6 +1606,10 @@ type GatewayAPIServer interface {
 	// both as owner and creator. If a filter is specified, only
 	// shares satisfying the filter MUST be returned.
 	ListPublicShares(context.Context, *v1beta15.ListPublicSharesRequest) (*v1beta15.ListPublicSharesResponse, error)
+	// List all existing shares the authenticated principal has created,
+	// both as owner and creator, including their storage resource information.
+	// If a filter is specified, only shares satisfying the filter MUST be returned.
+	ListExistingPublicShares(context.Context, *v1beta15.ListPublicSharesRequest) (*ListExistingPublicSharesResponse, error)
 	// Updates a share.
 	// MUST return CODE_NOT_FOUND if the share reference does not exist.
 	UpdatePublicShare(context.Context, *v1beta15.UpdatePublicShareRequest) (*v1beta15.UpdatePublicShareResponse, error)
@@ -1813,6 +1847,9 @@ func (UnimplementedGatewayAPIServer) GetShare(context.Context, *v1beta13.GetShar
 func (UnimplementedGatewayAPIServer) ListShares(context.Context, *v1beta13.ListSharesRequest) (*v1beta13.ListSharesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListShares not implemented")
 }
+func (UnimplementedGatewayAPIServer) ListExistingShares(context.Context, *v1beta13.ListSharesRequest) (*ListExistingSharesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListExistingShares not implemented")
+}
 func (UnimplementedGatewayAPIServer) UpdateShare(context.Context, *v1beta13.UpdateShareRequest) (*v1beta13.UpdateShareResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateShare not implemented")
 }
@@ -1848,6 +1885,9 @@ func (UnimplementedGatewayAPIServer) GetPublicShareByToken(context.Context, *v1b
 }
 func (UnimplementedGatewayAPIServer) ListPublicShares(context.Context, *v1beta15.ListPublicSharesRequest) (*v1beta15.ListPublicSharesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListPublicShares not implemented")
+}
+func (UnimplementedGatewayAPIServer) ListExistingPublicShares(context.Context, *v1beta15.ListPublicSharesRequest) (*ListExistingPublicSharesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListExistingPublicShares not implemented")
 }
 func (UnimplementedGatewayAPIServer) UpdatePublicShare(context.Context, *v1beta15.UpdatePublicShareRequest) (*v1beta15.UpdatePublicShareResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdatePublicShare not implemented")
@@ -2725,6 +2765,24 @@ func _GatewayAPI_ListShares_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
+func _GatewayAPI_ListExistingShares_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(v1beta13.ListSharesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GatewayAPIServer).ListExistingShares(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GatewayAPI_ListExistingShares_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GatewayAPIServer).ListExistingShares(ctx, req.(*v1beta13.ListSharesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _GatewayAPI_UpdateShare_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(v1beta13.UpdateShareRequest)
 	if err := dec(in); err != nil {
@@ -2937,6 +2995,24 @@ func _GatewayAPI_ListPublicShares_Handler(srv interface{}, ctx context.Context, 
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(GatewayAPIServer).ListPublicShares(ctx, req.(*v1beta15.ListPublicSharesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GatewayAPI_ListExistingPublicShares_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(v1beta15.ListPublicSharesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GatewayAPIServer).ListExistingPublicShares(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GatewayAPI_ListExistingPublicShares_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GatewayAPIServer).ListExistingPublicShares(ctx, req.(*v1beta15.ListPublicSharesRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -3929,6 +4005,10 @@ var GatewayAPI_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _GatewayAPI_ListShares_Handler,
 		},
 		{
+			MethodName: "ListExistingShares",
+			Handler:    _GatewayAPI_ListExistingShares_Handler,
+		},
+		{
 			MethodName: "UpdateShare",
 			Handler:    _GatewayAPI_UpdateShare_Handler,
 		},
@@ -3975,6 +4055,10 @@ var GatewayAPI_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListPublicShares",
 			Handler:    _GatewayAPI_ListPublicShares_Handler,
+		},
+		{
+			MethodName: "ListExistingPublicShares",
+			Handler:    _GatewayAPI_ListExistingPublicShares_Handler,
 		},
 		{
 			MethodName: "UpdatePublicShare",

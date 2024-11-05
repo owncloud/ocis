@@ -116,7 +116,7 @@ func (UserType) EnumDescriptor() ([]byte, []int) {
 	return file_cs3_identity_user_v1beta1_resources_proto_rawDescGZIP(), []int{0}
 }
 
-// A UserId represents a user.
+// A UserId represents a unique identifier of a user.
 type UserId struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -193,15 +193,33 @@ type User struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Id           *UserId         `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Username     string          `protobuf:"bytes,2,opt,name=username,proto3" json:"username,omitempty"`
-	Mail         string          `protobuf:"bytes,3,opt,name=mail,proto3" json:"mail,omitempty"`
-	MailVerified bool            `protobuf:"varint,4,opt,name=mail_verified,json=mailVerified,proto3" json:"mail_verified,omitempty"`
-	DisplayName  string          `protobuf:"bytes,5,opt,name=display_name,json=displayName,proto3" json:"display_name,omitempty"`
-	Groups       []string        `protobuf:"bytes,6,rep,name=groups,proto3" json:"groups,omitempty"`
-	Opaque       *v1beta1.Opaque `protobuf:"bytes,7,opt,name=opaque,proto3" json:"opaque,omitempty"`
-	UidNumber    int64           `protobuf:"varint,8,opt,name=uid_number,json=uidNumber,proto3" json:"uid_number,omitempty"`
-	GidNumber    int64           `protobuf:"varint,9,opt,name=gid_number,json=gidNumber,proto3" json:"gid_number,omitempty"`
+	// REQUIRED.
+	// The unique identifier of this user.
+	Id *UserId `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// REQUIRED.
+	// A human-friendly unique identifier of this user.
+	Username string `protobuf:"bytes,2,opt,name=username,proto3" json:"username,omitempty"`
+	// OPTIONAL.
+	// The e-mail address of this user.
+	Mail string `protobuf:"bytes,3,opt,name=mail,proto3" json:"mail,omitempty"`
+	// OPTIONAL.
+	// Whether the e-mail address was verified by the IDP.
+	MailVerified bool `protobuf:"varint,4,opt,name=mail_verified,json=mailVerified,proto3" json:"mail_verified,omitempty"`
+	// OPTIONAL.
+	// A human-friendly display name for this user, e.g. "Family and First Name"
+	DisplayName string `protobuf:"bytes,5,opt,name=display_name,json=displayName,proto3" json:"display_name,omitempty"`
+	// OPTIONAL.
+	// A list of groups this user belongs to.
+	Groups []string `protobuf:"bytes,6,rep,name=groups,proto3" json:"groups,omitempty"`
+	// OPTIONAL.
+	// Opaque information.
+	Opaque *v1beta1.Opaque `protobuf:"bytes,7,opt,name=opaque,proto3" json:"opaque,omitempty"`
+	// OPTIONAL.
+	// The user id of this user in the Unix world.
+	UidNumber int64 `protobuf:"varint,8,opt,name=uid_number,json=uidNumber,proto3" json:"uid_number,omitempty"`
+	// OPTIONAL.
+	// The group id of this user in the Unix world.
+	GidNumber int64 `protobuf:"varint,9,opt,name=gid_number,json=gidNumber,proto3" json:"gid_number,omitempty"`
 }
 
 func (x *User) Reset() {

@@ -22,11 +22,13 @@ import (
 	"context"
 	"crypto/tls"
 	"encoding/base64"
+	"encoding/xml"
 	"io"
 	"io/fs"
 	"net/http"
 	"net/url"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
@@ -288,9 +290,12 @@ func convertStatToResourceInfo(ref *provider.Reference, f fs.FileInfo, share *oc
 		Etag:          webdavFile.ETag(),
 		Owner:         share.Creator,
 		PermissionSet: webdavProtocol.Permissions.Permissions,
-		Checksum: &provider.ResourceChecksum{
-			Type: provider.ResourceChecksumType_RESOURCE_CHECKSUM_TYPE_INVALID,
-		},
+	}
+
+	if t == provider.ResourceType_RESOURCE_TYPE_FILE {
+		// get SHA1 checksum from owncloud specific properties if available
+		propstat := webdavFile.Sys().(gowebdav.Props)
+		ri.Checksum = extractChecksum(propstat)
 	}
 
 	if f.(gowebdav.File).StatusCode() == 425 {
@@ -298,6 +303,26 @@ func convertStatToResourceInfo(ref *provider.Reference, f fs.FileInfo, share *oc
 	}
 
 	return &ri, nil
+}
+
+func extractChecksum(props gowebdav.Props) *provider.ResourceChecksum {
+	checksums := props.GetString(xml.Name{Space: "http://owncloud.org/ns", Local: "checksums"})
+	if checksums == "" {
+		return &provider.ResourceChecksum{
+			Type: provider.ResourceChecksumType_RESOURCE_CHECKSUM_TYPE_INVALID,
+		}
+	}
+	re := regexp.MustCompile("SHA1:(.*)")
+	matches := re.FindStringSubmatch(checksums)
+	if len(matches) == 2 {
+		return &provider.ResourceChecksum{
+			Type: provider.ResourceChecksumType_RESOURCE_CHECKSUM_TYPE_SHA1,
+			Sum:  matches[1],
+		}
+	}
+	return &provider.ResourceChecksum{
+		Type: provider.ResourceChecksumType_RESOURCE_CHECKSUM_TYPE_INVALID,
+	}
 }
 
 func (d *driver) GetMD(ctx context.Context, ref *provider.Reference, _ []string, _ []string) (*provider.ResourceInfo, error) {

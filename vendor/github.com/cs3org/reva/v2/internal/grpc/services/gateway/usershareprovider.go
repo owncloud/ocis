@@ -107,6 +107,10 @@ func (s *svc) ListShares(ctx context.Context, req *collaboration.ListSharesReque
 	return res, nil
 }
 
+func (s *svc) ListExistingShares(_ context.Context, _ *collaboration.ListSharesRequest) (*gateway.ListExistingSharesResponse, error) {
+	return nil, errtypes.NotSupported("method ListExistingShares not implemented")
+}
+
 func (s *svc) updateShare(ctx context.Context, req *collaboration.UpdateShareRequest) (*collaboration.UpdateShareResponse, error) {
 	// TODO: update wopi server
 	// FIXME This is a workaround that should prevent removing or changing the share permissions when the file is locked.

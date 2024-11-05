@@ -21,9 +21,11 @@ package gateway
 import (
 	"context"
 
+	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	link "github.com/cs3org/go-cs3apis/cs3/sharing/link/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/appctx"
+	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/pkg/errors"
 )
@@ -105,6 +107,10 @@ func (s *svc) ListPublicShares(ctx context.Context, req *link.ListPublicSharesRe
 	}
 
 	return res, nil
+}
+
+func (s *svc) ListExistingPublicShares(_ context.Context, _ *link.ListPublicSharesRequest) (*gateway.ListExistingPublicSharesResponse, error) {
+	return nil, errtypes.NotSupported("method ListExistingPublicShares not implemented")
 }
 
 func (s *svc) UpdatePublicShare(ctx context.Context, req *link.UpdatePublicShareRequest) (*link.UpdatePublicShareResponse, error) {
