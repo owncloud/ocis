@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-11-05-16-28-52]
+[#deprecation-note-2024-11-05-16-41-07]
 [caption=]
 .Deprecation notes for the collaboration service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -40,18 +40,18 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++Collabora ++
 a| [subs=-attributes]
-The name of the app
+The name of the app which is shown to the user. You can chose freely but you are limited to a single word without special characters or whitespaces. We recommend to use pascalCase like 'CollaboraOnline'.
 
 a|`COLLABORATION_APP_PRODUCT` +
 
 a| [subs=-attributes]
-++next ++
+++7.0.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++Collabora ++
 a| [subs=-attributes]
-The WebOffice app, either Collabora, OnlyOffice, Microsoft365 or MicrosoftOfficeOnline
+The WebOffice app, either Collabora, OnlyOffice, Microsoft365 or MicrosoftOfficeOnline.
 
 a|`COLLABORATION_APP_DESCRIPTION` +
 

@@ -2,8 +2,8 @@
 
 | Name | Type | Default Value | Description |
 |------|------|---------------|-------------|
-| COLLABORATION_APP_NAME | string | Collabora | The name of the app|
-| COLLABORATION_APP_PRODUCT | string | Collabora | The WebOffice app, either Collabora, OnlyOffice, Microsoft365 or MicrosoftOfficeOnline|
+| COLLABORATION_APP_NAME | string | Collabora | The name of the app which is shown to the user. You can chose freely but you are limited to a single word without special characters or whitespaces. We recommend to use pascalCase like 'CollaboraOnline'.|
+| COLLABORATION_APP_PRODUCT | string | Collabora | The WebOffice app, either Collabora, OnlyOffice, Microsoft365 or MicrosoftOfficeOnline.|
 | COLLABORATION_APP_DESCRIPTION | string | Open office documents with Collabora | App description|
 | COLLABORATION_APP_ICON | string | image-edit | Icon for the app|
 | COLLABORATION_APP_ADDR | string | https://127.0.0.1:9980 | The URL where the WOPI app is located, such as https://127.0.0.1:8080.|
