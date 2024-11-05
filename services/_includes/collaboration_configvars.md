@@ -6,7 +6,6 @@
 | COLLABORATION_APP_PRODUCT | string | Collabora | The WebOffice app, either Collabora, OnlyOffice, Microsoft365 or MicrosoftOfficeOnline|
 | COLLABORATION_APP_DESCRIPTION | string | Open office documents with Collabora | App description|
 | COLLABORATION_APP_ICON | string | image-edit | Icon for the app|
-| COLLABORATION_APP_LOCKNAME | string | com.github.owncloud.collaboration | Name for the app lock|
 | COLLABORATION_APP_ADDR | string | https://127.0.0.1:9980 | The URL where the WOPI app is located, such as https://127.0.0.1:8080.|
 | COLLABORATION_APP_INSECURE | bool | false | Skip TLS certificate verification when connecting to the WOPI app|
 | COLLABORATION_APP_PROOF_DISABLE | bool | false | Disable the proof keys verification|

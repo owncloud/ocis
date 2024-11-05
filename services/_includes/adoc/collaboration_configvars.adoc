@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-11-05-15-59-38]
+[#deprecation-note-2024-11-05-16-13-35]
 [caption=]
 .Deprecation notes for the collaboration service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -74,17 +74,6 @@ a| [subs=-attributes]
 ++image-edit ++
 a| [subs=-attributes]
 Icon for the app
-
-a|`COLLABORATION_APP_LOCKNAME` +
-
-a| [subs=-attributes]
-++6.0.0 ++
-a| [subs=-attributes]
-++string ++
-a| [subs=-attributes]
-++com.github.owncloud.collaboration ++
-a| [subs=-attributes]
-Name for the app lock
 
 a|`COLLABORATION_APP_ADDR` +
 

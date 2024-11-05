@@ -6,7 +6,6 @@ app:
   product: Collabora
   description: Open office documents with Collabora
   icon: image-edit
-  lockname: com.github.owncloud.collaboration
   addr: https://127.0.0.1:9980
   insecure: false
   proofkeys:
