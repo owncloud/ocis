@@ -130,6 +130,7 @@ func DefaultConfig() *config.Config {
 			Cluster:   "ocis-cluster",
 			EnableTLS: false,
 		},
+		MaxConcurrency: 25,
 		PasswordPolicy: config.PasswordPolicy{
 			MinCharacters:          8,
 			MinLowerCaseCharacters: 1,
@@ -195,5 +196,7 @@ func EnsureDefaults(cfg *config.Config) {
 
 // Sanitize sanitized the configuration
 func Sanitize(cfg *config.Config) {
-	// nothing to sanitize here atm
+	if cfg.MaxConcurrency <= 0 {
+		cfg.MaxConcurrency = 5
+	}
 }
