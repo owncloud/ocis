@@ -147,8 +147,10 @@ func (f *FileConnector) GetLock(ctx context.Context) (*ConnectorResponse, error)
 			Str("StatusCode", resp.GetStatus().GetCode().String()).
 			Str("StatusMsg", resp.GetStatus().GetMessage()).
 			Msg("GetLock failed with unexpected status")
-		// TODO: Should we be more strict? There could be more causes for the failure
-		return NewResponse(404), nil
+		// Return 404 and the required header, even if it's empty
+		// https://docs.microsoft.com/en-us/microsoft-365/cloud-storage-partner-program/rest/files/getlock#response-headers
+		// This is needed to fulfill the requirements of online WOPI validator
+		return NewResponseWithLock(404, ""), nil
 	}
 
 	lockID := ""
