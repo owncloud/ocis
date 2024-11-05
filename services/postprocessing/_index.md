@@ -1,6 +1,6 @@
 ---
 title: Postprocessing
-date: 2024-11-05T04:24:30.94590782Z
+date: 2024-11-05T12:35:48.023392044Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/postprocessing
@@ -133,6 +133,8 @@ ocis postprocessing restart # Restarts all uploads where postprocessing is finis
 ocis postprocessing restart -s "finished" # Equivalent to the above
 ocis postprocessing restart -s "virusscan" # Restart all uploads currently in virusscan step
 ```
+
+Note: All above commands containing the word `restart` can also be replaced by `resume`. This changes behaviour slightly. When `restarting` an upload, the whole postprocessing will be (re)done. If `resuming` an upload, it will only continue from the last step that was completed.
 ## Example Yaml Config
 {{< include file="services/_includes/postprocessing-config-example.yaml"  language="yaml" >}}
 
