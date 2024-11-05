@@ -27,7 +27,6 @@ func DefaultConfig() *config.Config {
 			Product:     "Collabora",
 			Description: "Open office documents with Collabora",
 			Icon:        "image-edit",
-			LockName:    "com.github.owncloud.collaboration",
 			Addr:        "https://127.0.0.1:9980",
 			Insecure:    false,
 			ProofKeys: config.ProofKeys{

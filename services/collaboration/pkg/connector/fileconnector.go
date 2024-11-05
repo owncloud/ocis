@@ -211,7 +211,7 @@ func (f *FileConnector) Lock(ctx context.Context, lockID, oldLockID string) (*Co
 			Ref: wopiContext.FileReference,
 			Lock: &providerv1beta1.Lock{
 				LockId:  lockID,
-				AppName: f.cfg.App.LockName + "." + f.cfg.App.Name,
+				AppName: f.cfg.App.Name,
 				Type:    providerv1beta1.LockType_LOCK_TYPE_WRITE,
 				Expiration: &typesv1beta1.Timestamp{
 					Seconds: uint64(time.Now().Add(lockDuration).Unix()),
@@ -237,7 +237,7 @@ func (f *FileConnector) Lock(ctx context.Context, lockID, oldLockID string) (*Co
 			Ref: wopiContext.FileReference,
 			Lock: &providerv1beta1.Lock{
 				LockId:  lockID,
-				AppName: f.cfg.App.LockName + "." + f.cfg.App.Name,
+				AppName: f.cfg.App.Name,
 				Type:    providerv1beta1.LockType_LOCK_TYPE_WRITE,
 				Expiration: &typesv1beta1.Timestamp{
 					Seconds: uint64(time.Now().Add(lockDuration).Unix()),
@@ -380,7 +380,7 @@ func (f *FileConnector) RefreshLock(ctx context.Context, lockID string) (*Connec
 		Ref: wopiContext.FileReference,
 		Lock: &providerv1beta1.Lock{
 			LockId:  lockID,
-			AppName: f.cfg.App.LockName + "." + f.cfg.App.Name,
+			AppName: f.cfg.App.Name,
 			Type:    providerv1beta1.LockType_LOCK_TYPE_WRITE,
 			Expiration: &typesv1beta1.Timestamp{
 				Seconds: uint64(time.Now().Add(lockDuration).Unix()),
@@ -520,7 +520,7 @@ func (f *FileConnector) UnLock(ctx context.Context, lockID string) (*ConnectorRe
 		Ref: wopiContext.FileReference,
 		Lock: &providerv1beta1.Lock{
 			LockId:  lockID,
-			AppName: f.cfg.App.LockName + "." + f.cfg.App.Name,
+			AppName: f.cfg.App.Name,
 		},
 	}
 

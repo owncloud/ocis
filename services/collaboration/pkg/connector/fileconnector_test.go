@@ -46,9 +46,8 @@ var _ = Describe("FileConnector", func() {
 				OcisURL: "https://ocis.example.prv",
 			},
 			App: config.App{
-				LockName: "testName_for_unittests", // Only the LockName is used
-				Name:     "test",
-				Product:  "Microsoft",
+				Name:    "test",
+				Product: "Microsoft",
 			},
 			Wopi: config.Wopi{
 				WopiSrc: "https://ocis.server.prv",
