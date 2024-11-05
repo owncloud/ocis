@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-11-05-16-41-07]
+[#deprecation-note-2024-11-05-19-01-34]
 [caption=]
 .Deprecation notes for the sse service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -174,7 +174,7 @@ The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger
 a|`SSE_KEEPALIVE_INTERVAL` +
 
 a| [subs=-attributes]
-++7.0 ++
+++7.0.0 ++
 a| [subs=-attributes]
 ++Duration ++
 a| [subs=-attributes]
