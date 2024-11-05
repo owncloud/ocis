@@ -68,6 +68,7 @@ func RegisterAppProvider(
 			Icon:        cfg.App.Icon,
 			Address:     cfg.GRPC.Namespace + "." + cfg.Service.Name + "." + cfg.App.Name,
 			MimeTypes:   mimeTypes,
+			ProductName: cfg.App.Product,
 		},
 	}
 	gwc, err := gws.Next()
