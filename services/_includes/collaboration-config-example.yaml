@@ -3,6 +3,7 @@
 
 app:
   name: Collabora
+  product: Collabora
   description: Open office documents with Collabora
   icon: image-edit
   lockname: com.github.owncloud.collaboration

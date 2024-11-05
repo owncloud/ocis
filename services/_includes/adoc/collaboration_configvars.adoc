@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-11-05-12-27-40]
+[#deprecation-note-2024-11-05-13-20-37]
 [caption=]
 .Deprecation notes for the collaboration service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -40,7 +40,18 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++Collabora ++
 a| [subs=-attributes]
-The name of the app, either Collabora, OnlyOffice, Microsoft365 or MicrosoftOfficeOnline
+The name of the app
+
+a|`COLLABORATION_APP_PRODUCT` +
+
+a| [subs=-attributes]
+++next ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++Collabora ++
+a| [subs=-attributes]
+The WebOffice app, either Collabora, OnlyOffice, Microsoft365 or MicrosoftOfficeOnline
 
 a|`COLLABORATION_APP_DESCRIPTION` +
 
