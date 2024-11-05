@@ -41,7 +41,7 @@
           COLLABORA_DOMAIN: collabora.ocis.rolling.owncloud.works
           INBUCKET_DOMAIN: mail.ocis.rolling.owncloud.works
           DEMO_USERS: "true"
-          COMPOSE_FILE: docker-compose.yml:ocis.yml:tika.yml:collabora.yml:cloudimporter.yml:inbucket.yml:monitoring_tracing/monitoring.yml
+          COMPOSE_FILE: docker-compose.yml:ocis.yml:tika.yml:collabora.yml:web_extensions/extensions.yml:web_extensions/unzip.yml:web_extensions/importer.yml:inbucket.yml:monitoring_tracing/monitoring.yml
       - name: monitoring
         git_url: https://github.com/owncloud-devops/monitoring-tracing-client.git
         ref: master
