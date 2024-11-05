@@ -130,11 +130,15 @@ func ListUploadSessions(cfg *config.Config) *cli.Command {
 			},
 			&cli.BoolFlag{
 				Name:  "restart",
-				Usage: "send restart event for all listed sessions",
+				Usage: "send restart event for all listed sessions. Only one of resume/restart/clean can be set.",
+			},
+			&cli.BoolFlag{
+				Name:  "resume",
+				Usage: "send resume event for all listed sessions. Only one of resume/restart/clean can be set.",
 			},
 			&cli.BoolFlag{
 				Name:  "clean",
-				Usage: "remove uploads",
+				Usage: "remove uploads for all listed sessions. Only one of resume/restart/clean can be set.",
 			},
 		},
 		Before: func(c *cli.Context) error {
@@ -223,8 +227,9 @@ func ListUploadSessions(cfg *config.Config) *cli.Command {
 					})
 				}
 
-				if c.Bool("restart") {
-					if err := events.Publish(context.Background(), stream, events.ResumePostprocessing{
+				switch {
+				case c.Bool("restart"):
+					if err := events.Publish(context.Background(), stream, events.RestartPostprocessing{
 						UploadID:  u.ID(),
 						Timestamp: utils.TSNow(),
 					}); err != nil {
@@ -232,9 +237,18 @@ func ListUploadSessions(cfg *config.Config) *cli.Command {
 						// if publishing fails there is no need to try publishing other events - they will fail too.
 						os.Exit(1)
 					}
-				}
 
-				if c.Bool("clean") {
+				case c.Bool("resume"):
+					if err := events.Publish(context.Background(), stream, events.ResumePostprocessing{
+						UploadID:  u.ID(),
+						Timestamp: utils.TSNow(),
+					}); err != nil {
+						fmt.Fprintf(os.Stderr, "Failed to send resume event for upload session '%s'\n", u.ID())
+						// if publishing fails there is no need to try publishing other events - they will fail too.
+						os.Exit(1)
+					}
+
+				case c.Bool("clean"):
 					if err := u.Purge(c.Context); err != nil {
 						fmt.Fprintf(os.Stderr, "Failed to clean upload session '%s'\n", u.ID())
 					}
