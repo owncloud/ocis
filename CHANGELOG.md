@@ -66,6 +66,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix the memlimit loglevel: [#10431](https://github.com/owncloud/ocis/pull/10431)
 * Bugfix - Restart Postprocessing properly: [#10439](https://github.com/owncloud/ocis/pull/10439)
 * Bugfix - Allow to configure data server URL for ocm: [#10440](https://github.com/owncloud/ocis/pull/10440)
+* Bugfix - Return wopi lock header in get lock response: [#10469](https://github.com/owncloud/ocis/pull/10469)
 * Enhancement - Add web extensions to the ocis_full example: [#10399](https://github.com/owncloud/ocis/pull/10399)
 * Enhancement - Bump reva to 2.26.2: [#10419](https://github.com/owncloud/ocis/pull/10419)
 * Enhancement - Remove deprecated CLI commands: [#10430](https://github.com/owncloud/ocis/pull/10430)
@@ -143,6 +144,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/10358
    https://github.com/owncloud/ocis/pull/10440
+
+* Bugfix - Return wopi lock header in get lock response: [#10469](https://github.com/owncloud/ocis/pull/10469)
+
+   We fixed a bug where the wopi lock header was not returned in the get lock
+   response. This is now fixed and the wopi validator tests are passing.
+
+   https://github.com/owncloud/ocis/pull/10469
 
 * Enhancement - Add web extensions to the ocis_full example: [#10399](https://github.com/owncloud/ocis/pull/10399)
 
