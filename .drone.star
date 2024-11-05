@@ -1038,7 +1038,6 @@ def wopiValidatorTests(ctx, storage, wopiServerType, accounts_hash_difficulty = 
 
         wopiServer = wopiCollaborationService("fakeoffice")
 
-    wopiTestCases = dirs["base"] + "/tests/config/drone/wopiValidatorCustomTestCases.xml"
     for testgroup in testgroups:
         validatorTests.append({
             "name": "wopiValidatorTests-%s" % testgroup,
@@ -1051,7 +1050,7 @@ def wopiValidatorTests(ctx, storage, wopiServerType, accounts_hash_difficulty = 
                 "export WOPI_SRC=$(cat wopisrc)",
                 "echo $WOPI_SRC",
                 "cd /app",
-                "/app/Microsoft.Office.WopiValidator -t $WOPI_TOKEN -w $WOPI_SRC -l $WOPI_TTL --testgroup %s -c %s" % (testgroup, wopiTestCases),
+                "/app/Microsoft.Office.WopiValidator -t $WOPI_TOKEN -w $WOPI_SRC -l $WOPI_TTL --testgroup %s" % testgroup,
             ],
         })
     if wopiServerType == "builtin":
@@ -1067,7 +1066,7 @@ def wopiValidatorTests(ctx, storage, wopiServerType, accounts_hash_difficulty = 
                     "export WOPI_SRC=$(cat wopisrc)",
                     "echo $WOPI_SRC",
                     "cd /app",
-                    "/app/Microsoft.Office.WopiValidator -s -t $WOPI_TOKEN -w $WOPI_SRC -l $WOPI_TTL --testgroup %s -c %s" % (builtinOnlyGroup, wopiTestCases),
+                    "/app/Microsoft.Office.WopiValidator -s -t $WOPI_TOKEN -w $WOPI_SRC -l $WOPI_TTL --testgroup %s" % builtinOnlyGroup,
                 ],
             })
 
