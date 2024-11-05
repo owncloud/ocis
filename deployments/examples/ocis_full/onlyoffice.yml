@@ -48,6 +48,8 @@ services:
     restart: always
 
   onlyoffice:
+    # if you want to use oo enterprise edition, use: onlyoffice/documentserver-ee:<version>
+    # note, you also need to add a volume, see below
     image: onlyoffice/documentserver:8.2.0
     networks:
       ocis-net:
@@ -62,6 +64,9 @@ services:
       # paths are relative to the main compose file
       - ./config/onlyoffice/entrypoint-override.sh:/entrypoint-override.sh
       - ./config/onlyoffice/local.json:/etc/onlyoffice/documentserver/local.dist.json
+      # if you want to use oo enterprise edition, you need to add a volume for the license file
+      # for details see: Registering your Enterprise Edition version -->
+      # https://helpcenter.onlyoffice.com/installation/docs-enterprise-install-docker.aspx
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.onlyoffice.entrypoints=https"
