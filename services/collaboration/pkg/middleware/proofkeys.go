@@ -35,6 +35,9 @@ func ProofKeysMiddleware(cfg *config.Config, next http.Handler) http.Handler {
 		// the url we need is the one being requested, but we need the
 		// scheme and host, so we'll get those from the configured WOPISrc
 		wopiSrcURL, _ := url.Parse(cfg.Wopi.WopiSrc)
+		if cfg.Wopi.ProxyURL != "" {
+			wopiSrcURL, _ = url.Parse(cfg.Wopi.ProxyURL)
+		}
 		currentURL, _ := url.Parse(r.URL.String())
 		currentURL.Scheme = wopiSrcURL.Scheme
 		currentURL.Host = wopiSrcURL.Host
