@@ -24,6 +24,7 @@ func DefaultConfig() *config.Config {
 		},
 		App: config.App{
 			Name:        "Collabora",
+			Product:     "Collabora",
 			Description: "Open office documents with Collabora",
 			Icon:        "image-edit",
 			LockName:    "com.github.owncloud.collaboration",

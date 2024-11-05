@@ -1172,7 +1172,7 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (*ConnectorResponse, 
 	// This will help with the CI because we're using a "FakeOffice" app
 	// for the wopi validator, which requires a Microsoft fileinfo
 	var info fileinfo.FileInfo
-	switch strings.ToLower(f.cfg.App.Name) {
+	switch strings.ToLower(f.cfg.App.Product) {
 	case "collabora":
 		info = &fileinfo.Collabora{}
 	case "onlyoffice":
