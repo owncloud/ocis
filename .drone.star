@@ -2270,6 +2270,7 @@ def skipIfUnchanged(ctx, type):
 def example_deploys(ctx):
     on_merge_deploy = [
         "ocis_full/master.yml",
+        "ocis_full/onlyoffice-master.yml",
     ]
     nightly_deploy = [
         "ocis_ldap/rolling.yml",

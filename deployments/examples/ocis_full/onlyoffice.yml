@@ -26,6 +26,7 @@ services:
       MICRO_REGISTRY_ADDRESS: "ocis:9233"
       COLLABORATION_WOPI_SRC: https://${WOPISERVER_ONLYOFFICE_DOMAIN:-wopiserver-oo.owncloud.test}
       COLLABORATION_APP_NAME: "OnlyOffice"
+      COLLABORATION_APP_PRODUCT: "OnlyOffice"
       COLLABORATION_APP_ADDR: https://${ONLYOFFICE_DOMAIN:-onlyoffice.owncloud.test}
       COLLABORATION_APP_ICON: https://${ONLYOFFICE_DOMAIN:-onlyoffice.owncloud.test}/web-apps/apps/documenteditor/main/resources/img/favicon.ico
       COLLABORATION_APP_INSECURE: "${INSECURE:-true}"
