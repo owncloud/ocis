@@ -16,7 +16,7 @@ type Config struct {
 	Tracing *Tracing `yaml:"tracing"`
 
 	Service           Service       `yaml:"-"`
-	KeepAliveInterval time.Duration `yaml:"keepalive_interval" env:"SSE_KEEPALIVE_INTERVAL" desc:"To prevent intermediate proxies from closing the SSE connection, send periodic SSE comments to keep it open." introductionVersion:"7.0"`
+	KeepAliveInterval time.Duration `yaml:"keepalive_interval" env:"SSE_KEEPALIVE_INTERVAL" desc:"To prevent intermediate proxies from closing the SSE connection, send periodic SSE comments to keep it open." introductionVersion:"7.0.0"`
 
 	Events       Events
 	HTTP         HTTP          `yaml:"http"`
