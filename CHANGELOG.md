@@ -51,6 +51,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Thumbnail request limit: [#10280](https://github.com/owncloud/ocis/pull/10280)
+* Bugfix - Restart Postprocessing properly: [#10439](https://github.com/owncloud/ocis/pull/10439)
 * Change - Define maximum input image dimensions and size when generating previews: [#10270](https://github.com/owncloud/ocis/pull/10270)
 
 ## Details
@@ -66,6 +67,12 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/10280
    https://github.com/owncloud/ocis/pull/10270
    https://github.com/owncloud/ocis/pull/10225
+
+* Bugfix - Restart Postprocessing properly: [#10439](https://github.com/owncloud/ocis/pull/10439)
+
+   Properly differentiate between resume and restart postprocessing.
+
+   https://github.com/owncloud/ocis/pull/10439
 
 * Change - Define maximum input image dimensions and size when generating previews: [#10270](https://github.com/owncloud/ocis/pull/10270)
 
