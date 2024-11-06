@@ -173,6 +173,7 @@ The following sections list the changes for unreleased.
    name.
 
    https://github.com/owncloud/ocis/pull/10335
+   https://github.com/owncloud/ocis/pull/10490
 
 * Enhancement - Add web extensions to the ocis_full example: [#10399](https://github.com/owncloud/ocis/pull/10399)
 
