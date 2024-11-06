@@ -72,6 +72,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Remove deprecated CLI commands: [#10430](https://github.com/owncloud/ocis/pull/10430)
 * Enhancement - Bump cs3api: [#10448](https://github.com/owncloud/ocis/pull/10448)
 * Enhancement - Update web to v11.0.1: [#10467](https://github.com/owncloud/ocis/pull/10467)
+* Enhancement - Bump reva to latest: [#10472](https://github.com/owncloud/ocis/pull/10472)
 
 ## Details
 
@@ -203,6 +204,10 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/10467
    https://github.com/owncloud/web/releases/tag/v11.0.1
+
+* Enhancement - Bump reva to latest: [#10472](https://github.com/owncloud/ocis/pull/10472)
+
+   https://github.com/owncloud/ocis/pull/10472
 
 # Changelog for [6.6.1] (2024-10-24)
 
