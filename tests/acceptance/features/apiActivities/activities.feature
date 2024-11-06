@@ -3208,3 +3208,725 @@ Feature: check activities
     And user "Alice" has uploaded file with content "updated ownCloud test text file" to "textfile.txt"
     When user "Brian" tries to list the activities of file "textfile.txt" from space "Personal" owned by user "Alice" using the Graph API
     Then the HTTP status code should be "403"
+
+
+  Scenario: check activities of destination resources after copying a file
+    Given user "Alice" has uploaded file with content "ownCloud test text file" to "textfile.txt"
+    And user "Alice" has created folder "/FOLDER"
+    And user "Alice" has copied file "textfile.txt" to "FOLDER/textfile.txt"
+    When user "Alice" lists the activities of file "FOLDER/textfile.txt" from space "Personal" using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "required": ["id","template","times"],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^%user_id_pattern%$"
+                    },
+                    "template": {
+                      "type": "object",
+                      "required": ["message","variables"],
+                      "properties": {
+                        "message": {
+                          "const": "{user} added {resource} to {folder}"
+                        },
+                        "variables": {
+                          "type": "object",
+                          "required": ["folder", "resource", "user"],
+                          "properties": {
+                            "folder": {
+                              "type": "object",
+                              "required": ["name"],
+                              "properties": {
+                                "name": {
+                                  "const": "FOLDER"
+                                }
+                              }
+                            },
+                            "resource": {
+                              "type": "object",
+                              "required": ["id","name"],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "^%file_id_pattern%$"
+                                },
+                                "name": {
+                                  "const": "textfile.txt"
+                                }
+                              }
+                            },
+                            "user": {
+                              "type": "object",
+                              "required": ["id","displayName"],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "%user_id_pattern%"
+                                },
+                                "displayName": {
+                                  "const": "Alice Hansen"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "times": {
+                      "type": "object",
+                      "required": ["recordedTime"],
+                      "properties": {
+                        "recordedTime": {
+                          "type": "string",
+                          "format": "date-time"
+                        }
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+      """
+    When user "Alice" lists the activities of folder "FOLDER" from space "Personal" using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "uniqueItems": true,
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "required": ["id","template","times"],
+                  "properties": {
+                    "template": {
+                      "type": "object",
+                      "required": ["message","variables"],
+                      "properties": {
+                        "message": {
+                          "const": "{user} added {resource} to {folder}"
+                        },
+                        "variables": {
+                          "type": "object",
+                          "required": ["folder", "resource", "user"],
+                          "properties": {
+                            "resource": {
+                              "type": "object",
+                              "required": ["id","name"],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "^%file_id_pattern%$"
+                                },
+                                "name": {
+                                  "const": "FOLDER"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["id","template","times"],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^%user_id_pattern%$"
+                    },
+                    "template": {
+                      "type": "object",
+                      "required": ["message","variables"],
+                      "properties": {
+                        "message": {
+                          "const": "{user} added {resource} to {folder}"
+                        },
+                        "variables": {
+                          "type": "object",
+                          "required": ["folder", "resource", "user"],
+                          "properties": {
+                            "folder": {
+                              "type": "object",
+                              "required": ["name"],
+                              "properties": {
+                                "name": {
+                                  "const": "FOLDER"
+                                }
+                              }
+                            },
+                            "resource": {
+                              "type": "object",
+                              "required": ["id","name"],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "^%file_id_pattern%$"
+                                },
+                                "name": {
+                                  "const": "textfile.txt"
+                                }
+                              }
+                            },
+                            "user": {
+                              "type": "object",
+                              "required": ["id","displayName"],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "%user_id_pattern%"
+                                },
+                                "displayName": {
+                                  "const": "Alice Hansen"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "times": {
+                      "type": "object",
+                      "required": ["recordedTime"],
+                      "properties": {
+                        "recordedTime": {
+                          "type": "string",
+                          "format": "date-time"
+                        }
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+      """
+
+
+  Scenario: check activities of destination resources after copying a file by renaming the destination file
+    Given user "Alice" has uploaded file with content "ownCloud test text file" to "textfile.txt"
+    And user "Alice" has created folder "/FOLDER"
+    And user "Alice" has copied file "textfile.txt" to "FOLDER/renamed.txt"
+    When user "Alice" lists the activities of file "FOLDER/renamed.txt" from space "Personal" using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "required": ["id","template","times"],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^%user_id_pattern%$"
+                    },
+                    "template": {
+                      "type": "object",
+                      "required": ["message","variables"],
+                      "properties": {
+                        "message": {
+                          "const": "{user} added {resource} to {folder}"
+                        },
+                        "variables": {
+                          "type": "object",
+                          "required": ["folder", "resource", "user"],
+                          "properties": {
+                            "folder": {
+                              "type": "object",
+                              "required": ["name"],
+                              "properties": {
+                                "name": {
+                                  "const": "FOLDER"
+                                }
+                              }
+                            },
+                            "resource": {
+                              "type": "object",
+                              "required": ["id","name"],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "^%file_id_pattern%$"
+                                },
+                                "name": {
+                                  "const": "renamed.txt"
+                                }
+                              }
+                            },
+                            "user": {
+                              "type": "object",
+                              "required": ["id","displayName"],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "%user_id_pattern%"
+                                },
+                                "displayName": {
+                                  "const": "Alice Hansen"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "times": {
+                      "type": "object",
+                      "required": ["recordedTime"],
+                      "properties": {
+                        "recordedTime": {
+                          "type": "string",
+                          "format": "date-time"
+                        }
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+      """
+    When user "Alice" lists the activities of folder "FOLDER" from space "Personal" using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "uniqueItems": true,
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "required": ["id","template","times"],
+                  "properties": {
+                    "template": {
+                      "type": "object",
+                      "required": ["message","variables"],
+                      "properties": {
+                        "message": {
+                          "const": "{user} added {resource} to {folder}"
+                        },
+                        "variables": {
+                          "type": "object",
+                          "required": ["folder", "resource", "user"],
+                          "properties": {
+                            "resource": {
+                              "type": "object",
+                              "required": ["id","name"],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "^%file_id_pattern%$"
+                                },
+                                "name": {
+                                  "const": "FOLDER"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["id","template","times"],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^%user_id_pattern%$"
+                    },
+                    "template": {
+                      "type": "object",
+                      "required": ["message","variables"],
+                      "properties": {
+                        "message": {
+                          "const": "{user} added {resource} to {folder}"
+                        },
+                        "variables": {
+                          "type": "object",
+                          "required": ["folder", "resource", "user"],
+                          "properties": {
+                            "folder": {
+                              "type": "object",
+                              "required": ["name"],
+                              "properties": {
+                                "name": {
+                                  "const": "FOLDER"
+                                }
+                              }
+                            },
+                            "resource": {
+                              "type": "object",
+                              "required": ["id","name"],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "^%file_id_pattern%$"
+                                },
+                                "name": {
+                                  "const": "renamed.txt"
+                                }
+                              }
+                            },
+                            "user": {
+                              "type": "object",
+                              "required": ["id","displayName"],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "%user_id_pattern%"
+                                },
+                                "displayName": {
+                                  "const": "Alice Hansen"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "times": {
+                      "type": "object",
+                      "required": ["recordedTime"],
+                      "properties": {
+                        "recordedTime": {
+                          "type": "string",
+                          "format": "date-time"
+                        }
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+      """
+
+
+  Scenario: check activities of destination resources after copying a file into same folder by renaming the destination file
+    Given user "Alice" has created folder "/FOLDER"
+    And user "Alice" has uploaded file with content "ownCloud test text file" to "FOLDER/textfile.txt"
+    And user "Alice" has copied file "FOLDER/textfile.txt" to "FOLDER/renamed.txt"
+    When user "Alice" lists the activities of file "FOLDER/renamed.txt" from space "Personal" using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "required": ["id","template","times"],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^%user_id_pattern%$"
+                    },
+                    "template": {
+                      "type": "object",
+                      "required": ["message","variables"],
+                      "properties": {
+                        "message": {
+                          "const": "{user} added {resource} to {folder}"
+                        },
+                        "variables": {
+                          "type": "object",
+                          "required": ["folder", "resource", "user"],
+                          "properties": {
+                            "folder": {
+                              "type": "object",
+                              "required": ["name"],
+                              "properties": {
+                                "name": {
+                                  "const": "FOLDER"
+                                }
+                              }
+                            },
+                            "resource": {
+                              "type": "object",
+                              "required": ["id","name"],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "^%file_id_pattern%$"
+                                },
+                                "name": {
+                                  "const": "renamed.txt"
+                                }
+                              }
+                            },
+                            "user": {
+                              "type": "object",
+                              "required": ["id","displayName"],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "%user_id_pattern%"
+                                },
+                                "displayName": {
+                                  "const": "Alice Hansen"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "times": {
+                      "type": "object",
+                      "required": ["recordedTime"],
+                      "properties": {
+                        "recordedTime": {
+                          "type": "string",
+                          "format": "date-time"
+                        }
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+      """
+    When user "Alice" lists the activities of file "FOLDER" from space "Personal" using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 3,
+            "maxItems": 3,
+            "uniqueItems": true,
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "required": ["id", "template", "times"],
+                  "properties": {
+                    "template": {
+                      "type": "object",
+                      "required": ["message", "variables"],
+                      "properties": {
+                        "message": {
+                          "const": "{user} added {resource} to {folder}"
+                        },
+                        "variables": {
+                          "type": "object",
+                          "required": ["folder", "resource", "user"],
+                          "properties": {
+                            "folder": {
+                              "type": "object",
+                              "required": ["name"],
+                              "properties": {
+                                "name": {
+                                  "const": "Alice Hansen"
+                                }
+                              }
+                            },
+                            "resource": {
+                              "type": "object",
+                              "required": ["id", "name"],
+                              "properties": {
+                                "name": {
+                                  "const": "FOLDER"
+                                }
+                              }
+                            },
+                            "user": {
+                              "type": "object",
+                              "required": ["id","displayName"],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "%user_id_pattern%"
+                                },
+                                "displayName": {
+                                  "const": "Alice Hansen"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["id", "template", "times"],
+                  "properties": {
+                    "template": {
+                      "type": "object",
+                      "required": ["message", "variables"],
+                      "properties": {
+                        "message": {
+                          "const": "{user} added {resource} to {folder}"
+                        },
+                        "variables": {
+                          "type": "object",
+                          "required": ["folder", "resource", "user"],
+                          "properties": {
+                            "folder": {
+                              "type": "object",
+                              "required": ["name"],
+                              "properties": {
+                                "name": {
+                                  "const": "FOLDER"
+                                }
+                              }
+                            },
+                            "resource": {
+                              "type": "object",
+                              "required": ["id", "name"],
+                              "properties": {
+                                "name": {
+                                  "const": "textfile.txt"
+                                }
+                              }
+                            },
+                            "user": {
+                              "type": "object",
+                              "required": ["id","displayName"],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "%user_id_pattern%"
+                                },
+                                "displayName": {
+                                  "const": "Alice Hansen"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["id", "template", "times"],
+                  "properties": {
+                    "template": {
+                      "type": "object",
+                      "required": ["message", "variables"],
+                      "properties": {
+                        "message": {
+                          "const": "{user} added {resource} to {folder}"
+                        },
+                        "variables": {
+                          "type": "object",
+                          "required": ["folder", "resource", "user"],
+                          "properties": {
+                            "folder": {
+                              "type": "object",
+                              "required": ["name"],
+                              "properties": {
+                                "name": {
+                                  "const": "FOLDER"
+                                }
+                              }
+                            },
+                            "resource": {
+                              "type": "object",
+                              "required": ["id", "name"],
+                              "properties": {
+                                "name": {
+                                  "const": "renamed.txt"
+                                }
+                              }
+                            },
+                            "user": {
+                              "type": "object",
+                              "required": ["id","displayName"],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "%user_id_pattern%"
+                                },
+                                "displayName": {
+                                  "const": "Alice Hansen"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "times": {
+                      "type": "object",
+                      "required": ["recordedTime"]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+      """
