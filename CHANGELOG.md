@@ -67,6 +67,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Restart Postprocessing properly: [#10439](https://github.com/owncloud/ocis/pull/10439)
 * Bugfix - Allow to configure data server URL for ocm: [#10440](https://github.com/owncloud/ocis/pull/10440)
 * Bugfix - Return wopi lock header in get lock response: [#10469](https://github.com/owncloud/ocis/pull/10469)
+* Enhancement - Include a product name in the collaboration service: [#10335](https://github.com/owncloud/ocis/pull/10335)
 * Enhancement - Add web extensions to the ocis_full example: [#10399](https://github.com/owncloud/ocis/pull/10399)
 * Enhancement - Bump reva to 2.26.2: [#10419](https://github.com/owncloud/ocis/pull/10419)
 * Enhancement - Remove deprecated CLI commands: [#10430](https://github.com/owncloud/ocis/pull/10430)
@@ -153,6 +154,14 @@ The following sections list the changes for unreleased.
    response. This is now fixed and the wopi validator tests are passing.
 
    https://github.com/owncloud/ocis/pull/10469
+
+* Enhancement - Include a product name in the collaboration service: [#10335](https://github.com/owncloud/ocis/pull/10335)
+
+   The product name will allow using a different app name. For example, a "CoolBox"
+   app name might use a branded Collabora instance by using "Collabora" as product
+   name.
+
+   https://github.com/owncloud/ocis/pull/10335
 
 * Enhancement - Add web extensions to the ocis_full example: [#10399](https://github.com/owncloud/ocis/pull/10399)
 
