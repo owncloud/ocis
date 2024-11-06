@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-11-06-08-09-25]
+[#deprecation-note-2024-11-06-08-35-09]
 [caption=]
 .Deprecation notes for the storage-users service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -511,7 +511,8 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 When trying to lock files, ocis will multiply the cycle with this factor and use it as a millisecond timeout. Values of 0 or below will be ignored and the default value will be used.
 
-a|`STORAGE_USERS_OCIS_MAX_CONCURRENCY` +
+a|`OCIS_MAX_CONCURRENCY` +
+`STORAGE_USERS_OCIS_MAX_CONCURRENCY` +
 
 a| [subs=-attributes]
 ++pre5.0 ++
@@ -811,7 +812,8 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 When trying to lock files, ocis will multiply the cycle with this factor and use it as a millisecond timeout. Values of 0 or below will be ignored and the default value of 30 will be used.
 
-a|`STORAGE_USERS_S3NG_MAX_CONCURRENCY` +
+a|`OCIS_MAX_CONCURRENCY` +
+`STORAGE_USERS_S3NG_MAX_CONCURRENCY` +
 
 a| [subs=-attributes]
 ++pre5.0 ++

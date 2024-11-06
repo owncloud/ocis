@@ -44,7 +44,7 @@
 | STORAGE_USERS_OCIS_SHARE_FOLDER | string | /Shares | Name of the folder jailing all shares.|
 | STORAGE_USERS_OCIS_MAX_ACQUIRE_LOCK_CYCLES | int | 20 | When trying to lock files, ocis will try this amount of times to acquire the lock before failing. After each try it will wait for an increasing amount of time. Values of 0 or below will be ignored and the default value will be used.|
 | STORAGE_USERS_OCIS_LOCK_CYCLE_DURATION_FACTOR | int | 30 | When trying to lock files, ocis will multiply the cycle with this factor and use it as a millisecond timeout. Values of 0 or below will be ignored and the default value will be used.|
-| STORAGE_USERS_OCIS_MAX_CONCURRENCY | int | 5 | Maximum number of concurrent go-routines. Higher values can potentially get work done faster but will also cause more load on the system. Values of 0 or below will be ignored and the default value will be used.|
+| OCIS_MAX_CONCURRENCY<br/>STORAGE_USERS_OCIS_MAX_CONCURRENCY | int | 5 | Maximum number of concurrent go-routines. Higher values can potentially get work done faster but will also cause more load on the system. Values of 0 or below will be ignored and the default value will be used.|
 | OCIS_ASYNC_UPLOADS | bool | true | Enable asynchronous file uploads.|
 | OCIS_SPACES_MAX_QUOTA<br/>STORAGE_USERS_OCIS_MAX_QUOTA | uint64 | 0 | Set a global max quota for spaces in bytes. A value of 0 equals unlimited. If not using the global OCIS_SPACES_MAX_QUOTA, you must define the FRONTEND_MAX_QUOTA in the frontend service.|
 | OCIS_DISABLE_VERSIONING | bool | false | Disables versioning of files. When set to true, new uploads with the same filename will overwrite existing files instead of creating a new version.|
@@ -71,7 +71,7 @@
 | STORAGE_USERS_S3NG_SHARE_FOLDER | string | /Shares | Name of the folder jailing all shares.|
 | STORAGE_USERS_S3NG_MAX_ACQUIRE_LOCK_CYCLES | int | 20 | When trying to lock files, ocis will try this amount of times to acquire the lock before failing. After each try it will wait for an increasing amount of time. Values of 0 or below will be ignored and the default value of 20 will be used.|
 | STORAGE_USERS_S3NG_LOCK_CYCLE_DURATION_FACTOR | int | 30 | When trying to lock files, ocis will multiply the cycle with this factor and use it as a millisecond timeout. Values of 0 or below will be ignored and the default value of 30 will be used.|
-| STORAGE_USERS_S3NG_MAX_CONCURRENCY | int | 5 | Maximum number of concurrent go-routines. Higher values can potentially get work done faster but will also cause more load on the system. Values of 0 or below will be ignored and the default value of 100 will be used.|
+| OCIS_MAX_CONCURRENCY<br/>STORAGE_USERS_S3NG_MAX_CONCURRENCY | int | 5 | Maximum number of concurrent go-routines. Higher values can potentially get work done faster but will also cause more load on the system. Values of 0 or below will be ignored and the default value of 100 will be used.|
 | OCIS_DISABLE_VERSIONING | bool | false | Disables versioning of files. When set to true, new uploads with the same filename will overwrite existing files instead of creating a new version.|
 | STORAGE_USERS_OWNCLOUDSQL_DATADIR | string | /var/lib/ocis/storage/owncloud | The directory where the filesystem storage will store SQL migration data. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH/storage/owncloud.|
 | STORAGE_USERS_OWNCLOUDSQL_SHARE_FOLDER | string | /Shares | Name of the folder jailing all shares.|
