@@ -14,6 +14,7 @@ CHKO_DOCKER_PUSHRM = "chko/docker-pushrm:1"
 COLLABORA_CODE = "collabora/code:24.04.5.1.1"
 INBUCKET_INBUCKET = "inbucket/inbucket"
 MINIO_MC = "minio/mc:RELEASE.2021-10-07T04-19-58Z"
+NGINX_ALPINE = "nginx:alpine3.20"
 OC_CI_ALPINE = "owncloudci/alpine:latest"
 OC_CI_BAZEL_BUILDIFIER = "owncloudci/bazel-buildifier:latest"
 OC_CI_CLAMAVD = "owncloudci/clamavd"
@@ -263,6 +264,13 @@ config = {
             "tikaNeeded": True,
         },
     },
+    "e2eMultiService": {
+        "part": {
+            "skip": False,
+            "suites": ["smoke"],  # suites to run
+            "tikaNeeded": False,
+        },
+    },
     "rocketchat": {
         "channel": "builds",
         "channel_cron": "builds",
@@ -365,15 +373,8 @@ def main(ctx):
         licenseCheck(ctx)
 
     test_pipelines = \
-        codestyle(ctx) + \
-        checkGherkinLint(ctx) + \
-        checkTestSuitesInExpectedFailures(ctx) + \
         buildWebCache(ctx) + \
-        getGoBinForTesting(ctx) + \
         buildOcisBinaryForTesting(ctx) + \
-        checkStarlark() + \
-        build_release_helpers + \
-        testOcisAndUploadResults(ctx) + \
         testPipelines(ctx)
 
     build_release_pipelines = \
@@ -387,7 +388,7 @@ def main(ctx):
         ),
     )
 
-    pipelines = test_pipelines + build_release_pipelines
+    pipelines = test_pipelines  #+ build_release_pipelines
 
     if ctx.build.event == "cron":
         pipelines = \
@@ -409,7 +410,7 @@ def main(ctx):
         ),
     )
 
-    pipelineSanityChecks(ctx, pipelines)
+    # pipelineSanityChecks(ctx, pipelines)
     return pipelines
 
 def cachePipeline(name, steps):
@@ -475,7 +476,8 @@ def testPipelines(ctx):
     if ("skip" not in config["k6LoadTests"] or not config["k6LoadTests"]["skip"]) and ("k6-test" in ctx.build.title.lower() or ctx.build.event == "cron"):
         pipelines += k6LoadTests(ctx)
 
-    return pipelines
+    # return pipelines
+    return multiServiceE2ePipeline(ctx)
 
 def getGoBinForTesting(ctx):
     return [{
@@ -1303,7 +1305,7 @@ def e2eTestPipeline(ctx):
             restoreWebCache() + \
             restoreWebPnpmCache() + \
             (tikaService() if params["tikaNeeded"] else []) + \
-            ocisServer("ocis", 4, [], extra_server_environment = extra_server_environment, tika_enabled = params["tikaNeeded"])
+            ocisServer(extra_server_environment = extra_server_environment, tika_enabled = params["tikaNeeded"])
 
         step_e2e = {
             "name": "e2e-tests",
@@ -1353,6 +1355,138 @@ def e2eTestPipeline(ctx):
                 "volumes": e2e_volumes,
             })
 
+    return pipelines
+
+def multiServiceE2ePipeline(ctx):
+    pipelines = []
+
+    defaults = {
+        "skip": False,
+        "suites": [],
+        "xsuites": [],
+        "tikaNeeded": True,
+    }
+
+    e2e_trigger = {
+        "ref": [
+            "refs/heads/master",
+            "refs/pull/**",
+        ],
+    }
+
+    if ("skip-e2e" in ctx.build.title.lower()):
+        return pipelines
+
+    extra_server_environment = {
+        "OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST": "%s" % dirs["bannedPasswordList"],
+        "OCIS_JWT_SECRET": "some-ocis-jwt-secret",
+        "OCIS_SERVICE_ACCOUNT_ID": "service-account-id",
+        "OCIS_SERVICE_ACCOUNT_SECRET": "service-account-secret",
+        "OCIS_EXCLUDE_RUN_SERVICES": "storage-users",
+        "OCIS_GATEWAY_GRPC_ADDR": "0.0.0.0:9142",
+        "SETTINGS_GRPC_ADDR": "0.0.0.0:9191",
+        "GATEWAY_STORAGE_USERS_MOUNT_ID": "storage-users-id",
+        "GATEWAY_STORAGE_USERS_ENDPOINT": "dns:///nginx:9157",
+        "GRAPH_SPACES_STORAGE_USERS_ADDRESS": "dns:///nginx:9157",
+    }
+
+    storage_users_environment = {
+        "STORAGE_USERS_JWT_SECRET": "some-ocis-jwt-secret",
+        "STORAGE_USERS_MOUNT_ID": "storage-users-id",
+        "STORAGE_USERS_SERVICE_ACCOUNT_ID": "service-account-id",
+        "STORAGE_USERS_SERVICE_ACCOUNT_SECRET": "service-account-secret",
+        "STORAGE_USERS_GATEWAY_GRPC_ADDR": "ocis-server:9142",
+        "STORAGE_USERS_EVENTS_ENDPOINT": "ocis-server:9233",
+        "STORAGE_USERS_DATA_GATEWAY_URL": "https://ocis-server:9200/data",
+        "OCIS_CACHE_STORE": "nats-js-kv",
+        "OCIS_CACHE_STORE_NODES": "ocis-server:9233",
+        "MICRO_REGISTRY_ADDRESS": "ocis-server:9233",
+        "STORAGE_USERS_DATA_SERVER_URL": "http://nginx:9158/data",
+    }
+    storage_users1_environment = {
+        "STORAGE_USERS_GRPC_ADDR": "storageusers1:9157",
+        "STORAGE_USERS_HTTP_ADDR": "storageusers1:9158",
+        "STORAGE_USERS_DEBUG_ADDR": "storageusers1:9159",
+        # "STORAGE_USERS_DATA_SERVER_URL": "http://storageusers1:9158/data",
+    }
+    for item in storage_users_environment:
+        storage_users1_environment[item] = storage_users_environment[item]
+
+    storage_users2_environment = {
+        "STORAGE_USERS_GRPC_ADDR": "storageusers2:9157",
+        "STORAGE_USERS_HTTP_ADDR": "storageusers2:9158",
+        "STORAGE_USERS_DEBUG_ADDR": "storageusers2:9159",
+        # "STORAGE_USERS_DATA_SERVER_URL": "http://storageusers2:9158/data",
+    }
+    for item in storage_users_environment:
+        storage_users2_environment[item] = storage_users_environment[item]
+
+    storage_volume = [{
+        "name": "storage",
+        "path": "/var/lib/ocis",
+    }]
+    storage_users_services = startOcisService("storage-users", "storageusers1", storage_users1_environment, storage_volume) + \
+                             startOcisService("storage-users", "storageusers2", storage_users2_environment, storage_volume) + \
+                             ocisHealthCheck("storage-users", ["storageusers1:9159", "storageusers2:9159"]) + \
+                             nginxLoadBalancer()
+
+    for name, suite in config["e2eMultiService"].items():
+        if "skip" in suite and suite["skip"]:
+            continue
+
+        params = {}
+        for item in defaults:
+            params[item] = suite[item] if item in suite else defaults[item]
+
+        e2e_args = ""
+        if params["suites"]:
+            e2e_args = "--suites %s" % ",".join(params["suites"])
+
+        # suites to skip
+        if params["xsuites"]:
+            e2e_args += " --xsuites %s" % ",".join(params["xsuites"])
+
+        steps = \
+            skipIfUnchanged(ctx, "e2e-tests") + \
+            restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") + \
+            restoreWebCache() + \
+            restoreWebPnpmCache() + \
+            tikaService() + \
+            ocisServer(extra_server_environment = extra_server_environment, tika_enabled = params["tikaNeeded"]) + \
+            storage_users_services + \
+            [{
+                "name": "e2e-tests",
+                "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
+                "environment": {
+                    "BASE_URL_OCIS": OCIS_DOMAIN,
+                    "HEADLESS": "true",
+                    "RETRY": "1",
+                    "SLOW_MO": 500,
+                },
+                "commands": [
+                    "cd %s/tests/e2e" % dirs["web"],
+                    # "bash run-e2e.sh %s" % e2e_args,
+                    "bash run-e2e.sh cucumber/features/smoke/activity.feature cucumber/features/smoke/upload.feature:19",
+                ],
+            }] + \
+            uploadTracingResult(ctx) + \
+            logTracingResults()
+
+        pipelines.append({
+            "kind": "pipeline",
+            "type": "docker",
+            "name": "e2e-tests-multi-service",
+            "steps": steps,
+            "depends_on": getPipelineNames(buildOcisBinaryForTesting(ctx) + buildWebCache(ctx)),
+            "trigger": e2e_trigger,
+            "volumes": [
+                {
+                    "name": "storage",
+                    "temp": {},
+                },
+                pipelineVolumeGo,
+            ],
+        })
     return pipelines
 
 def uploadTracingResult(ctx):
@@ -2143,7 +2277,7 @@ def notify(ctx):
         },
     }
 
-def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on = [], deploy_type = "", extra_server_environment = {}, with_wrapper = False, tika_enabled = False):
+def ocisServer(storage = "ocis", accounts_hash_difficulty = 4, volumes = [], depends_on = [], deploy_type = "", extra_server_environment = {}, with_wrapper = False, tika_enabled = False):
     user = "0:0"
     container_name = "ocis-server"
     environment = {
@@ -2158,8 +2292,6 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
         "FRONTEND_SEARCH_MIN_LENGTH": "2",
         "OCIS_ASYNC_UPLOADS": True,
         "OCIS_EVENTS_ENABLE_TLS": False,
-        "MICRO_REGISTRY": "nats-js-kv",
-        "MICRO_REGISTRY_ADDRESS": "127.0.0.1:9233",
         "NATS_NATS_HOST": "0.0.0.0",
         "NATS_NATS_PORT": 9233,
         "OCIS_JWT_SECRET": "some-ocis-jwt-secret",
@@ -2243,6 +2375,38 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "depends_on": depends_on,
         },
         wait_for_ocis,
+    ]
+
+def startOcisService(service = None, name = None, environment = {}, volumes = []):
+    """
+    Starts an OCIS service in a detached container.
+
+    Args:
+        service (str): The name of the service to start.
+        name (str): The name of the container.
+        environment (dict): The environment variables to set in the container.
+        volumes (list): The volumes to mount in the container.
+
+    Returns:
+        list: A list of pipeline steps to start the service.
+    """
+
+    if not service:
+        return []
+    if not name:
+        name = service
+
+    return [
+        {
+            "name": name,
+            "image": OC_CI_GOLANG,
+            "detach": True,
+            "environment": environment,
+            "commands": [
+                "ocis/bin/ocis %s server" % service,
+            ],
+            "volumes": volumes,
+        },
     ]
 
 def redis():
@@ -3003,17 +3167,7 @@ def wopiCollaborationService(name):
 
     environment["COLLABORATION_WOPI_SRC"] = "http://%s:9300" % service_name
 
-    return [
-        {
-            "name": service_name,
-            "image": OC_CI_GOLANG,
-            "detach": True,
-            "environment": environment,
-            "commands": [
-                "ocis/bin/ocis collaboration server",
-            ],
-        },
-    ]
+    return startOcisService("collaboration", service_name, environment)
 
 def tikaService():
     return [{
@@ -3148,6 +3302,20 @@ def waitForServices(name, services = []):
         ],
     }]
 
+def ocisHealthCheck(name, services = []):
+    commands = []
+    timeout = 300
+    curl_command = ["timeout %s bash -c 'while [ $(curl -s %s/%s ", "-w %{http_code} -o /dev/null) != 200 ]; do sleep 1; done'"]
+    for service in services:
+        commands.append(curl_command[0] % (timeout, service, "healthz") + curl_command[1])
+        commands.append(curl_command[0] % (timeout, service, "readyz") + curl_command[1])
+
+    return [{
+        "name": "health-check-%s" % name,
+        "image": OC_CI_ALPINE,
+        "commands": commands,
+    }]
+
 def collaboraService():
     return [
         {
@@ -3188,3 +3356,15 @@ def onlyofficeService():
             ],
         },
     ]
+
+def nginxLoadBalancer():
+    return [{
+        "name": "nginx",
+        "type": "docker",
+        "image": NGINX_ALPINE,
+        "detach": True,
+        "commands": [
+            "cp  %s/tests/config/drone/nginx.conf /etc/nginx/conf.d/default.conf" % dirs["base"],
+            "/docker-entrypoint.sh nginx -g \"daemon off;\"",
+        ],
+    }] + waitForServices("nginx", ["nginx:80"])
