@@ -40,6 +40,7 @@
 | OCIS_DISABLE_SSE<br/>FRONTEND_DISABLE_SSE | bool | false | When set to true, clients are informed that the Server-Sent Events endpoint is not accessible.|
 | FRONTEND_DEFAULT_LINK_PERMISSIONS | int | 1 | Defines the default permissions a link is being created with. Possible values are 0 (= internal link, for instance members only) and 1 (= public link with viewer permissions). Defaults to 1.|
 | OCIS_URL<br/>FRONTEND_PUBLIC_URL | string | https://localhost:9200 | The public facing URL of the oCIS frontend.|
+| OCIS_MAX_CONCURRENCY<br/>FRONTEND_MAX_CONCURRENCY | int | 25 | Maximum number of concurrent go-routines. Higher values can potentially get work done faster but will also cause more load on the system. Values of 0 or below will be ignored and the default value will be used.|
 | OCIS_INSECURE<br/>FRONTEND_APP_HANDLER_INSECURE | bool | false | Allow insecure connections to the frontend.|
 | FRONTEND_APP_HANDLER_SECURE_VIEW_APP_ADDR | string | com.owncloud.api.collaboration | Service name or address of the app provider to use for secure view. Should match the service name or address of the registered CS3 app provider.|
 | FRONTEND_ARCHIVER_MAX_NUM_FILES | int64 | 10000 | Max number of files that can be packed into an archive.|

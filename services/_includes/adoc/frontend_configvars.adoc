@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-11-06-14-41-37]
+[#deprecation-note-2024-11-06-14-54-39]
 [caption=]
 .Deprecation notes for the frontend service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -468,6 +468,18 @@ a| [subs=-attributes]
 ++https://localhost:9200 ++
 a| [subs=-attributes]
 The public facing URL of the oCIS frontend.
+
+a|`OCIS_MAX_CONCURRENCY` +
+`FRONTEND_MAX_CONCURRENCY` +
+
+a| [subs=-attributes]
+++7.0.0 ++
+a| [subs=-attributes]
+++int ++
+a| [subs=-attributes]
+++25 ++
+a| [subs=-attributes]
+Maximum number of concurrent go-routines. Higher values can potentially get work done faster but will also cause more load on the system. Values of 0 or below will be ignored and the default value will be used.
 
 a|`OCIS_INSECURE` +
 `FRONTEND_APP_HANDLER_INSECURE` +
