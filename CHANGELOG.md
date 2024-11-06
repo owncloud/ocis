@@ -69,7 +69,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Return wopi lock header in get lock response: [#10469](https://github.com/owncloud/ocis/pull/10469)
 * Enhancement - Include a product name in the collaboration service: [#10335](https://github.com/owncloud/ocis/pull/10335)
 * Enhancement - Add web extensions to the ocis_full example: [#10399](https://github.com/owncloud/ocis/pull/10399)
-* Enhancement - Bump reva to 2.26.2: [#10419](https://github.com/owncloud/ocis/pull/10419)
+* Enhancement - Bump reva to 2.26.3: [#10419](https://github.com/owncloud/ocis/pull/10419)
 * Enhancement - Remove deprecated CLI commands: [#10430](https://github.com/owncloud/ocis/pull/10430)
 * Enhancement - Bump cs3api: [#10448](https://github.com/owncloud/ocis/pull/10448)
 * Enhancement - Update web to v11.0.1: [#10467](https://github.com/owncloud/ocis/pull/10467)
@@ -178,7 +178,14 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/10399
 
-* Enhancement - Bump reva to 2.26.2: [#10419](https://github.com/owncloud/ocis/pull/10419)
+* Enhancement - Bump reva to 2.26.3: [#10419](https://github.com/owncloud/ocis/pull/10419)
+
+  *   Bugfix [cs3org/reva#4908](https://github.com/cs3org/reva/pull/4908): Add checksum to OCM storageprovider responses
+  *   Enhancement [cs3org/reva#4910](https://github.com/cs3org/reva/pull/4910): Bump cs3api
+  *   Enhancement [cs3org/reva#4909](https://github.com/cs3org/reva/pull/4909): Bump cs3api
+  *   Enhancement [cs3org/reva#4906](https://github.com/cs3org/reva/pull/4906): Bump cs3api
+
+   Bump reva to 2.26.2
 
   *   Enhancement [cs3org/reva#4897](https://github.com/cs3org/reva/pull/4897): Fix remaining quota calculation
   *   Bugfix      [cs3org/reva#4902](https://github.com/cs3org/reva/pull/4902): Fix quota calculation
