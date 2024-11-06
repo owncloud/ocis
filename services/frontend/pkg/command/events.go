@@ -3,7 +3,13 @@ package command
 import (
 	"context"
 	"errors"
+	"sync"
 
+	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
+	group "github.com/cs3org/go-cs3apis/cs3/identity/group/v1beta1"
+	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
+	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/events/stream"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
@@ -17,16 +23,9 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
+	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/frontend/pkg/config"
 	"github.com/owncloud/ocis/v2/services/settings/pkg/store/defaults"
-
-	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
-	group "github.com/cs3org/go-cs3apis/cs3/identity/group/v1beta1"
-	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
-	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
-	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
-
-	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 )
 
 var _registeredEvents = []events.Unmarshaller{
@@ -90,7 +89,7 @@ func ListenForEvents(ctx context.Context, cfg *config.Config, l log.Logger) erro
 			default:
 				l.Error().Interface("event", e).Msg("unhandled event")
 			case events.ShareCreated:
-				AutoAcceptShares(ev, cfg.AutoAcceptShares, l, gatewaySelector, valueService, cfg.ServiceAccount)
+				AutoAcceptShares(ev, cfg.AutoAcceptShares, l, gatewaySelector, valueService, cfg.ServiceAccount, cfg.MaxConcurrency)
 			}
 		case <-ctx.Done():
 			l.Info().Msg("context cancelled")
@@ -100,7 +99,7 @@ func ListenForEvents(ctx context.Context, cfg *config.Config, l log.Logger) erro
 }
 
 // AutoAcceptShares automatically accepts shares if configured by the admin or user
-func AutoAcceptShares(ev events.ShareCreated, autoAcceptDefault bool, l log.Logger, gatewaySelector pool.Selectable[gateway.GatewayAPIClient], vs settingssvc.ValueService, cfg config.ServiceAccount) {
+func AutoAcceptShares(ev events.ShareCreated, autoAcceptDefault bool, l log.Logger, gatewaySelector pool.Selectable[gateway.GatewayAPIClient], vs settingssvc.ValueService, cfg config.ServiceAccount, maxConcurrency int) {
 	gwc, err := gatewaySelector.Next()
 	if err != nil {
 		l.Error().Err(err).Msg("cannot get gateway client")
@@ -118,36 +117,60 @@ func AutoAcceptShares(ev events.ShareCreated, autoAcceptDefault bool, l log.Logg
 		return
 	}
 
-	for _, uid := range userIDs {
-		if !autoAcceptShares(ctx, uid, autoAcceptDefault, vs) {
-			continue
-		}
+	work := make(chan *user.UserId, len(userIDs))
 
-		gwc, err := gatewaySelector.Next()
-		if err != nil {
-			l.Error().Err(err).Msg("cannot get gateway client")
-			continue
+	// Distribute work
+	go func() {
+		defer close(work)
+		for _, userID := range userIDs {
+			select {
+			case work <- userID:
+			case <-ctx.Done():
+				return
+			}
 		}
-		resp, err := gwc.UpdateReceivedShare(ctx, updateShareRequest(ev.ShareID, uid))
-		if err != nil {
-			l.Error().Err(err).Msg("error sending grpc request")
-			continue
-		}
+	}()
 
-		if code := resp.GetStatus().GetCode(); code != rpc.Code_CODE_OK {
-			// log unexpected status codes if a share cannot be accepted...
-			func() *zerolog.Event {
-				switch code {
-				// ... not found is not an error in the context of auto-accepting shares
-				case rpc.Code_CODE_NOT_FOUND:
-					return l.Debug()
-				default:
-					return l.Error()
+	wg := sync.WaitGroup{}
+	for i := 0; i < maxConcurrency; i++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			for userID := range work {
+
+				if !autoAcceptShares(ctx, userID, autoAcceptDefault, vs) {
+					continue
 				}
-			}().Interface("status", resp.GetStatus()).Str("userid", uid.GetOpaqueId()).Msg("unexpected status code while accepting share")
-		}
+
+				gwc, err := gatewaySelector.Next()
+				if err != nil {
+					l.Error().Err(err).Msg("cannot get gateway client")
+					continue
+				}
+				resp, err := gwc.UpdateReceivedShare(ctx, updateShareRequest(ev.ShareID, userID))
+				if err != nil {
+					l.Error().Err(err).Msg("error sending grpc request")
+					continue
+				}
+
+				if code := resp.GetStatus().GetCode(); code != rpc.Code_CODE_OK {
+					// log unexpected status codes if a share cannot be accepted...
+					func() *zerolog.Event {
+						switch code {
+						// ... not found is not an error in the context of auto-accepting shares
+						case rpc.Code_CODE_NOT_FOUND:
+							return l.Debug()
+						default:
+							return l.Error()
+						}
+					}().Interface("status", resp.GetStatus()).Str("userid", userID.GetOpaqueId()).Msg("unexpected status code while accepting share")
+				}
+			}
+		}()
 	}
 
+	// Wait for all goroutines to finish
+	wg.Wait()
 }
 
 func getUserIDs(ctx context.Context, gatewaySelector pool.Selectable[gateway.GatewayAPIClient], uid *user.UserId, gid *group.GroupId) ([]*user.UserId, error) {

@@ -38,8 +38,8 @@ type Config struct {
 	DisableSSE                     bool   `yaml:"disable_sse" env:"OCIS_DISABLE_SSE;FRONTEND_DISABLE_SSE" desc:"When set to true, clients are informed that the Server-Sent Events endpoint is not accessible." introductionVersion:"pre5.0"`
 	DefaultLinkPermissions         int    `yaml:"default_link_permissions" env:"FRONTEND_DEFAULT_LINK_PERMISSIONS" desc:"Defines the default permissions a link is being created with. Possible values are 0 (= internal link, for instance members only) and 1 (= public link with viewer permissions). Defaults to 1." introductionVersion:"5.0"`
 
-	PublicURL string `yaml:"public_url" env:"OCIS_URL;FRONTEND_PUBLIC_URL" desc:"The public facing URL of the oCIS frontend." introductionVersion:"pre5.0"`
-
+	PublicURL              string      `yaml:"public_url" env:"OCIS_URL;FRONTEND_PUBLIC_URL" desc:"The public facing URL of the oCIS frontend." introductionVersion:"pre5.0"`
+	MaxConcurrency         int         `yaml:"max_concurrency" env:"OCIS_MAX_CONCURRENCY;FRONTEND_MAX_CONCURRENCY" desc:"Maximum number of concurrent go-routines. Higher values can potentially get work done faster but will also cause more load on the system. Values of 0 or below will be ignored and the default value will be used." introductionVersion:"7.0.0"`
 	AppHandler             AppHandler  `yaml:"app_handler"`
 	Archiver               Archiver    `yaml:"archiver"`
 	DataGateway            DataGateway `yaml:"data_gateway"`
