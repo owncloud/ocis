@@ -74,6 +74,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Bump cs3api: [#10448](https://github.com/owncloud/ocis/pull/10448)
 * Enhancement - Update web to v11.0.1: [#10467](https://github.com/owncloud/ocis/pull/10467)
 * Enhancement - Bump reva to latest: [#10472](https://github.com/owncloud/ocis/pull/10472)
+* Enhancement - Concurrent autoaccept for shares: [#10476](https://github.com/owncloud/ocis/pull/10476)
 
 ## Details
 
@@ -217,6 +218,13 @@ The following sections list the changes for unreleased.
 * Enhancement - Bump reva to latest: [#10472](https://github.com/owncloud/ocis/pull/10472)
 
    https://github.com/owncloud/ocis/pull/10472
+
+* Enhancement - Concurrent autoaccept for shares: [#10476](https://github.com/owncloud/ocis/pull/10476)
+
+   Shares for groups are now concurrently accepted. Tha default of 25 goroutinges
+   can be changed with the new `FRONTEND_MAX_CONCURRENCY` environment variable.
+
+   https://github.com/owncloud/ocis/pull/10476
 
 # Changelog for [6.6.1] (2024-10-24)
 
