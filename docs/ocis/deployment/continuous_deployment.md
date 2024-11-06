@@ -40,9 +40,15 @@ Credentials:
 - oCIS: [ocis.ocis.production.owncloud.works](https://ocis.ocis.production.owncloud.works)
 - Mail: [mail.ocis.production.owncloud.works](https://mail.ocis.production.owncloud.works)
 
+## Master with OnlyOffice
+
+This example is using OnlyOffice as the office suite.
+
+- oCIS: [ocis.ocis-onlyoffice.master.owncloud.works](https://ocis.ocis-onlyoffice.master.owncloud.works)
+
 ## Rolling Release with OnlyOffice
 
-This example is based on the [ocis_full Example](ocis_full.md) and uses the default configuration with OnlyOffice as the office suite.
+This example is using OnlyOffice as the office suite.
 
 - oCIS: [ocis.ocis-onlyoffice.rolling.owncloud.works](https://ocis.ocis-onlyoffice.rolling.owncloud.works)
 
