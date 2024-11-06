@@ -67,6 +67,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Restart Postprocessing properly: [#10439](https://github.com/owncloud/ocis/pull/10439)
 * Bugfix - Allow to configure data server URL for ocm: [#10440](https://github.com/owncloud/ocis/pull/10440)
 * Bugfix - Return wopi lock header in get lock response: [#10469](https://github.com/owncloud/ocis/pull/10469)
+* Bugfix - 'ocis backup consistency' fixed for file revisions: [#10493](https://github.com/owncloud/ocis/pull/10493)
 * Enhancement - Include a product name in the collaboration service: [#10335](https://github.com/owncloud/ocis/pull/10335)
 * Enhancement - Add web extensions to the ocis_full example: [#10399](https://github.com/owncloud/ocis/pull/10399)
 * Enhancement - Bump reva to 2.26.3: [#10419](https://github.com/owncloud/ocis/pull/10419)
@@ -155,6 +156,15 @@ The following sections list the changes for unreleased.
    response. This is now fixed and the wopi validator tests are passing.
 
    https://github.com/owncloud/ocis/pull/10469
+
+* Bugfix - 'ocis backup consistency' fixed for file revisions: [#10493](https://github.com/owncloud/ocis/pull/10493)
+
+   A bug was fixed that caused the 'ocis backup consistency' command to incorrectly
+   report inconistencies when file revisions with a zero value for the nano-second
+   part of the timestamp were present.
+
+   https://github.com/owncloud/ocis/issues/9498
+   https://github.com/owncloud/ocis/pull/10493
 
 * Enhancement - Include a product name in the collaboration service: [#10335](https://github.com/owncloud/ocis/pull/10335)
 
