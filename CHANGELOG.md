@@ -70,6 +70,7 @@ The following sections list the changes for unreleased.
 * Bugfix - 'ocis backup consistency' fixed for file revisions: [#10493](https://github.com/owncloud/ocis/pull/10493)
 * Bugfix - Wait for services to be ready before registering them: [#10498](https://github.com/owncloud/ocis/pull/10498)
 * Bugfix - Fix 0-byte file uploads: [#10500](https://github.com/owncloud/ocis/pull/10500)
+* Bugfix - Fixed `sharedWithMe` response for OCM shares: [#10501](https://github.com/owncloud/ocis/pull/10501)
 * Bugfix - Fix gateway nats checks: [#10502](https://github.com/owncloud/ocis/pull/10502)
 * Enhancement - Create thumbnails for GGP MIME types: [#10303](https://github.com/owncloud/ocis/pull/10303)
 * Enhancement - Include a product name in the collaboration service: [#10335](https://github.com/owncloud/ocis/pull/10335)
@@ -181,6 +182,14 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/10469
    https://github.com/owncloud/ocis/pull/10500
+
+* Bugfix - Fixed `sharedWithMe` response for OCM shares: [#10501](https://github.com/owncloud/ocis/pull/10501)
+
+   OCM shares returned in the `sharedWithMe` response did not have the `mimeType`
+   property populated correctly.
+
+   https://github.com/owncloud/ocis/issues/10495
+   https://github.com/owncloud/ocis/pull/10501
 
 * Bugfix - Fix gateway nats checks: [#10502](https://github.com/owncloud/ocis/pull/10502)
 
