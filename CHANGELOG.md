@@ -69,10 +69,11 @@ The following sections list the changes for unreleased.
 * Bugfix - Return wopi lock header in get lock response: [#10469](https://github.com/owncloud/ocis/pull/10469)
 * Bugfix - 'ocis backup consistency' fixed for file revisions: [#10493](https://github.com/owncloud/ocis/pull/10493)
 * Bugfix - Wait for services to be ready before registering them: [#10498](https://github.com/owncloud/ocis/pull/10498)
+* Bugfix - Fix 0-byte file uploads: [#10500](https://github.com/owncloud/ocis/pull/10500)
 * Bugfix - Fix gateway nats checks: [#10502](https://github.com/owncloud/ocis/pull/10502)
 * Enhancement - Include a product name in the collaboration service: [#10335](https://github.com/owncloud/ocis/pull/10335)
 * Enhancement - Add web extensions to the ocis_full example: [#10399](https://github.com/owncloud/ocis/pull/10399)
-* Enhancement - Bump reva to 2.26.3: [#10419](https://github.com/owncloud/ocis/pull/10419)
+* Enhancement - Bump reva to 2.26.4: [#10419](https://github.com/owncloud/ocis/pull/10419)
 * Enhancement - Remove deprecated CLI commands: [#10430](https://github.com/owncloud/ocis/pull/10430)
 * Enhancement - Bump cs3api: [#10448](https://github.com/owncloud/ocis/pull/10448)
 * Enhancement - Update web to v11.0.2: [#10467](https://github.com/owncloud/ocis/pull/10467)
@@ -172,6 +173,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/10498
 
+* Bugfix - Fix 0-byte file uploads: [#10500](https://github.com/owncloud/ocis/pull/10500)
+
+   We fixed an issue where 0-byte files upload did not return the Location header.
+
+   https://github.com/owncloud/ocis/issues/10469
+   https://github.com/owncloud/ocis/pull/10500
+
 * Bugfix - Fix gateway nats checks: [#10502](https://github.com/owncloud/ocis/pull/10502)
 
    We now only check if nats is available when the gateway actually uses it.
@@ -202,7 +210,12 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/10399
 
-* Enhancement - Bump reva to 2.26.3: [#10419](https://github.com/owncloud/ocis/pull/10419)
+* Enhancement - Bump reva to 2.26.4: [#10419](https://github.com/owncloud/ocis/pull/10419)
+
+  *   Bugfix [cs3org/reva#4917](https://github.com/cs3org/reva/pull/4917): Fix 0-byte file uploads
+  *   Bugfix [cs3org/reva#4918](https://github.com/cs3org/reva/pull/4918): Fix app templates
+
+   Bump reva to 2.26.3
 
   *   Bugfix [cs3org/reva#4908](https://github.com/cs3org/reva/pull/4908): Add checksum to OCM storageprovider responses
   *   Enhancement [cs3org/reva#4910](https://github.com/cs3org/reva/pull/4910): Bump cs3api
