@@ -156,31 +156,39 @@ The process further picks up the `yaml` file generated in the `Extract Rogue Env
 
 ## Tasks for New Releases
 
-Close before a new release gets published, and **before** a new ocis admin docs branch is created, some tasks need to be done manually. These tasks cant be done automatically! By processing these manual tasks, doc related and important files get updated or created, ready to be consumed by the admin docs. The following situations can occur, see the solution provided:
+**IMPORTANT**\
+For a new ocis release, some tasks are necessary to be done **before** and **after** releasing. Follow the steps carefully to avoid issues. Most of the docs related tasks are not part of the CI. With each step finished successfully, the next step can be started. Sometimes, due to last minute changes, steps need to be redone! 
 
-1. Admin docs prepares in master for envvar delta changes. Building the admin docs report non-existent referenced delta files.\
-&#8594; Run the manual tasks described below and restart the branched admin docs.
+**Backgroud Information**\
+Admin docs rely on the existance of following branches in the ocis repo. Note that the reference in the admin docs which ocis branch is accessed is defined in the `antora.yml` file via `attributes` existing in each branch.
 
-2. A new admin docs branch gets created but no `docs-stable-x.y` branch has been created in the ocis repo so far. Building the branched admin docs reports non-existent referenced files.\
-&#8594; Run the manual tasks described below.\
-&#8594; Take care that the `docs-stable-x.y` branch gets created in the ocis repo.\
-&#8594; Alternatively you can _temporarily_ point in the branched [docs-ocis/antora.yml](https://github.com/owncloud/docs-ocis/blob/master/antora.yml) `compose_url_component` to `master`.\
-&#8594; Restart building the branched admin docs.
+* `docs`\
+This reflects ocis master and is referenced from the admin docs from the master branch showing as `next`
+* `docs-stable-x.y`\
+This reflects a published ocis release and is referenced from the admin docs from the corresponding branch showing like `7.0`
 
-3. A new ocis release is close to being released, the manual tasks **have not been** processed so far.\
-&#8594; Run the manual tasks AND backport the results into the `docs-stable-x.y` branch.
+Because of this, branching and parametrizing admin docs occurs **after** branching an ocis release with its necessary branches! If you branch admin docs before the required ocis branches are available, you must set the ocis source branch to import data from to `docs` and reconfigure afterwards. 
 
-4. A new ocis release is close to being released, the manual tasks **have been** processed some time ago.\
-&#8594; Re-run the manual tasks AND backport the results into the `docs-stable-x.y` branch.
+**Notes**
+* When docs relevant data will be generated in ocis, the will be written into the `docs/servcies/...` folder structure, but they are in the master branch. When merging, an automated process will move them into the `docs`branch. When running make commands locally, the relocation is not done and files reside on the generated location!
 
-5. A new ocis release **has been released**, the manual tasks **have not been** processed so far.\
-&#8594; Re-run the manual tasks AND backport the results into the `docs-stable-x.y` branch.
-  
+* .adoc file generation
+  * Service related adoc files are saved during generation in `/docs/services/<service-name>` but will be relocated into the docs branch into a subfolder named `services/_include/adoc/<service-name.adoc>`.
+  * Release based envvar changes are saved during generation in `/docs/services/general-info/env-var-deltas/<filename>` but will be relocated into the doc branch into a subfolder named `services/_include/adoc/env-var-deltas/<filename>`.
+
 ### Task List
 
-The following can be done at any time but *latest* it must be done before a new release gets published.
+The following can be done at any time but it must be done *latest* when no envvar changes are made which is just before a new release gets published. The data generated **must** be part of the upcoming release and be merged therefore!
 
-1. From the ocis root, run `make -C docs docs-generate` and check if there is a change in the `extended-envars.yaml` output. In this case, process [Extended Envvars](#extended-envvars). When done, re-run the make command and check if the output of `./docs/services/_includes/adoc/extended_configvars.adoc` matches the expectations.
+* Run from the ocis root `make -C docs docs-generate`
+  * **Check for Extended Envvars**\
+Check if there is a change in the `extended-envars.yaml` output. In this case, process [Extended Envvars](#extended-envvars). When done, re-run the make command and check if the output of `./docs/services/_includes/adoc/extended_configvars.adoc` matches the expectations.
+  * **Check for a changed 'env_vars.yaml' File**\
+This file will most likely show changes.
+
+  Commit the changes, create a PR and merge it. Next steps are based on this!
+
+Only in case of a new release, **remove** all envvars that have been 
 
 2. In `./docs/helpers` run: `go run . --help` This will give you an overview of available commands. 
     1. Run `go run . all` to generate and/or update required base files.\
