@@ -1,0 +1,17 @@
+// # Deprecated Variables between oCIS 5.0.0 and oCIS 7.0.0
+// commenting the headline to make it better includable
+
+// table created per 2024.11.07
+// the table should be recreated/updated on source () changes
+
+[width="100%",cols="~,~,~,~",options="header"]
+|===
+| Service| Variable| Description| Removalversion
+
+| xref:{s-path}/antivirus.adoc[Antivirus]
+| ANTIVIRUS_ICAP_TIMEOUT
+| Timeout for the ICAP client.
+| %%NEXT_PRODUCTION_VERSION%%
+
+|===
+

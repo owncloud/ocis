@@ -1,0 +1,117 @@
+// # Removed Variables between oCIS 5.0.0 and oCIS 7.0.0
+// commenting the headline to make it better includable
+
+// table created per 2024.11.07
+// the table should be recreated/updated on source () changes
+
+[width="100%",cols="~,~,~,~",options="header"]
+|===
+| Service| Variable| Description| Default
+
+| xref:deployment/services/env-vars-special-scope.adoc[Special Scope Envvars]
+| OCIS_ENABLE_RESHARING
+| Changing this value is NOT supported. Enables the support for re-sharing in the clients.
+| false
+
+| xref:{s-path}/frontend.adoc[Frontend]
+| FRONTEND_ENABLE_RESHARING
+| Changing this value is NOT supported. Enables the support for re-sharing in the clients.
+| false
+
+| xref:{s-path}/graph.adoc[Graph]
+| GRAPH_ENABLE_RESHARING
+| Changing this value is NOT supported. Enables the support for re-sharing.
+| false
+
+| xref:{s-path}/sharing.adoc[Sharing]
+| SHARING_ENABLE_RESHARING
+| Changing this value is NOT supported. Enables the support for resharing.
+| false
+
+| xref:{s-path}/storage-system.adoc[Storage-System]
+| STORAGE_SYSTEM_OCIS_METADATA_BACKEND
+| The backend to use for storing metadata. Supported values are 'messagepack' and 'xattrs'. The setting 'messagepack' uses a dedicated file to store file metadata while 'xattrs' uses extended attributes to store file metadata. Defaults to 'messagepack'.
+| messagepack
+
+| xref:{s-path}/storage-users.adoc[Storage-Users]
+| STORAGE_USERS_OCIS_METADATA_BACKEND
+| The backend to use for storing metadata. Supported values are 'messagepack' and 'xattrs'. The setting 'messagepack' uses a dedicated file to store file metadata while 'xattrs' uses extended attributes to store file metadata. Defaults to 'messagepack'.
+| messagepack
+
+| The `Store` service has fully been removed
+| STORE_DATA_PATH
+| The directory where the filesystem storage will store ocis settings. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/store.
+| /var/lib/ocis/store
+
+| 
+| STORE_DEBUG_ADDR
+| Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.
+| 127.0.0.1:9464
+
+| 
+| STORE_DEBUG_PPROF
+| Enables pprof, which can be used for profiling.
+| false
+
+| 
+| STORE_DEBUG_TOKEN
+| Token to secure the metrics endpoint.
+| 
+
+| 
+| STORE_DEBUG_ZPAGES
+| Enables zpages, which can be used for collecting and viewing in-memory traces.
+| false
+
+| 
+| STORE_GRPC_ADDR
+| The bind address of the GRPC service.
+| 127.0.0.1:9460
+
+| 
+| STORE_LOG_COLOR
+| Activates colorized log output.
+| false
+
+| 
+| STORE_LOG_FILE
+| The path to the log file. Activates logging to this file if set.
+| 
+
+| 
+| STORE_LOG_LEVEL
+| The log level. Valid values are: 'panic', 'fatal', 'error', 'warn', 'info', 'debug', 'trace'.
+| 
+
+| 
+| STORE_LOG_PRETTY
+| Activates pretty log output.
+| false
+
+| 
+| STORE_TRACING_COLLECTOR
+| The HTTP endpoint for sending spans directly to a collector, i.e. http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.
+| 
+
+| 
+| STORE_TRACING_ENABLED
+| Activates tracing.
+| false
+
+| 
+| STORE_TRACING_ENDPOINT
+| The endpoint of the tracing agent.
+| 
+
+| 
+| STORE_TRACING_TYPE
+| The type of tracing. Defaults to '', which is the same as 'jaeger'. Allowed tracing types are 'jaeger' and '' as of now.
+| 
+
+| xref:{s-path}/web.adoc[Web]
+| WEB_ASSET_PATH
+| Serve ownCloud Web assets from a path on the filesystem instead of the builtin assets.
+| 
+
+|===
+
