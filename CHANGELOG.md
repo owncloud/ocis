@@ -78,6 +78,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Bump cs3api: [#10448](https://github.com/owncloud/ocis/pull/10448)
 * Enhancement - Update web to v11.0.2: [#10467](https://github.com/owncloud/ocis/pull/10467)
 * Enhancement - Bump reva to latest: [#10472](https://github.com/owncloud/ocis/pull/10472)
+* Enhancement - Concurrent userlog processing: [#10504](https://github.com/owncloud/ocis/pull/10504)
 * Enhancement - Concurrent autoaccept for shares: [#10505](https://github.com/owncloud/ocis/pull/10505)
 
 ## Details
@@ -275,6 +276,14 @@ The following sections list the changes for unreleased.
 * Enhancement - Bump reva to latest: [#10472](https://github.com/owncloud/ocis/pull/10472)
 
    https://github.com/owncloud/ocis/pull/10472
+
+* Enhancement - Concurrent userlog processing: [#10504](https://github.com/owncloud/ocis/pull/10504)
+
+   We now start multiple go routines that process events. The default of 5
+   goroutines can be changed with the new `USERLOG_MAX_CONCURRENCY` environment
+   variable.
+
+   https://github.com/owncloud/ocis/pull/10504
 
 * Enhancement - Concurrent autoaccept for shares: [#10505](https://github.com/owncloud/ocis/pull/10505)
 
