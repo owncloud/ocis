@@ -4,6 +4,8 @@ import (
 	"archive/zip"
 	"bufio"
 	"bytes"
+	"encoding/base64"
+	"encoding/json"
 	"image"
 	"image/draw"
 	"image/gif"
@@ -176,6 +178,57 @@ Scan: // Label for the scanner loop, so we can break it easily
 	return img, scanner.Err()
 }
 
+// GGPStruct is the layout of a ggp file (which is basically json)
+type GGPStruct struct {
+	Sections []struct {
+		Cards []struct {
+			Element struct {
+				Image struct {
+					Base64Image string
+				}
+			}
+		}
+	}
+}
+
+// GgpDecoder is a converter for the geogebra pinboard file
+type GgpDecoder struct{}
+
+// Convert reads the ggp file and returns the first thumbnail image
+func (j GgpDecoder) Convert(r io.Reader) (interface{}, error) {
+	ggp := &GGPStruct{}
+	err := json.NewDecoder(r).Decode(ggp)
+	if err != nil {
+		return nil, err
+	}
+
+	elem, err := extractBase64ImageFromGGP(ggp)
+	if err != nil {
+		return nil, err
+	}
+
+	b, err := base64.StdEncoding.DecodeString(elem)
+	if err != nil {
+		return nil, err
+	}
+
+	img, _, err := image.Decode(bytes.NewReader(b))
+	return img, err
+}
+
+func extractBase64ImageFromGGP(ggp *GGPStruct) (string, error) {
+	if len(ggp.Sections) < 1 || len(ggp.Sections[0].Cards) < 1 {
+		return "", errors.New("cant find thumbnail in ggp file")
+	}
+
+	raw := strings.Split(ggp.Sections[0].Cards[0].Element.Image.Base64Image, "base64,")
+	if len(raw) < 2 {
+		return "", errors.New("cant decode ggp thumbnail")
+	}
+
+	return raw[1], nil
+}
+
 // Draw the word in the canvas. The mixX and maxX defines the drawable range
 // (X axis) where the word can be drawn (in case the word is too big and doesn't
 // fit in the canvas), and the incY defines the increment in the Y axis if we
@@ -259,7 +312,7 @@ func ForType(mimeType string, opts map[string]interface{}) FileConverter {
 	case "application/vnd.geogebra.slides":
 		return GgsDecoder{"_slide0/geogebra_thumbnail.png"}
 	case "application/vnd.geogebra.pinboard":
-		return GgsDecoder{"geogebra_thumbnail.png"}
+		return GgpDecoder{}
 	case "image/gif":
 		return GifDecoder{}
 	case "audio/flac":
