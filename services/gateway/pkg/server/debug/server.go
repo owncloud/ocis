@@ -17,7 +17,7 @@ func Server(opts ...Option) (*http.Server, error) {
 	readyHandlerConfiguration := handlers.NewCheckHandlerConfiguration().
 		WithLogger(options.Logger).
 		WithCheck("nats reachability", func(ctx context.Context) error {
-			if len(options.Config.Cache.ProviderCacheNodes) > 0 {
+			if options.Config.Cache.ProviderCacheStore == "nats-js-kv" && len(options.Config.Cache.ProviderCacheNodes) > 0 {
 				return checks.NewNatsCheck(options.Config.Cache.ProviderCacheNodes[0])(ctx)
 			}
 			return nil

@@ -27,11 +27,15 @@ func RegisterService(ctx context.Context, logger log.Logger, service *mRegistry.
 
 	go func() {
 		// check if the service is ready
+		delay := 500 * time.Millisecond
 		for {
 			resp, err := http.DefaultClient.Get("http://" + debugAddr + "/readyz")
 			if err == nil && resp.StatusCode == http.StatusOK {
+				resp.Body.Close()
 				break
 			}
+			time.Sleep(delay)
+			delay *= 2
 		}
 		for {
 			select {
