@@ -69,6 +69,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Return wopi lock header in get lock response: [#10469](https://github.com/owncloud/ocis/pull/10469)
 * Bugfix - 'ocis backup consistency' fixed for file revisions: [#10493](https://github.com/owncloud/ocis/pull/10493)
 * Bugfix - Wait for services to be ready before registering them: [#10498](https://github.com/owncloud/ocis/pull/10498)
+* Bugfix - Fix gateway nats checks: [#10502](https://github.com/owncloud/ocis/pull/10502)
 * Enhancement - Include a product name in the collaboration service: [#10335](https://github.com/owncloud/ocis/pull/10335)
 * Enhancement - Add web extensions to the ocis_full example: [#10399](https://github.com/owncloud/ocis/pull/10399)
 * Enhancement - Bump reva to 2.26.3: [#10419](https://github.com/owncloud/ocis/pull/10419)
@@ -170,6 +171,13 @@ The following sections list the changes for unreleased.
 * Bugfix - Wait for services to be ready before registering them: [#10498](https://github.com/owncloud/ocis/pull/10498)
 
    https://github.com/owncloud/ocis/pull/10498
+
+* Bugfix - Fix gateway nats checks: [#10502](https://github.com/owncloud/ocis/pull/10502)
+
+   We now only check if nats is available when the gateway actually uses it.
+   Furthermore, we added a backoff for checking the readys endpoint.
+
+   https://github.com/owncloud/ocis/pull/10502
 
 * Enhancement - Include a product name in the collaboration service: [#10335](https://github.com/owncloud/ocis/pull/10335)
 
