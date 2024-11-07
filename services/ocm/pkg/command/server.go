@@ -93,12 +93,12 @@ func Server(cfg *config.Config) *cli.Command {
 			})
 
 			grpcSvc := registry.BuildGRPCService(cfg.GRPC.Namespace+"."+cfg.Service.Name, cfg.GRPC.Protocol, cfg.GRPC.Addr, version.GetString())
-			if err := registry.RegisterService(ctx, grpcSvc, logger); err != nil {
+			if err := registry.RegisterService(ctx, logger, grpcSvc, cfg.Debug.Addr); err != nil {
 				logger.Fatal().Err(err).Msg("failed to register the grpc service")
 			}
 
 			httpSvc := registry.BuildHTTPService(cfg.HTTP.Namespace+"."+cfg.Service.Name, cfg.HTTP.Addr, version.GetString())
-			if err := registry.RegisterService(ctx, httpSvc, logger); err != nil {
+			if err := registry.RegisterService(ctx, logger, httpSvc, cfg.Debug.Addr); err != nil {
 				logger.Fatal().Err(err).Msg("failed to register the http service")
 			}
 
