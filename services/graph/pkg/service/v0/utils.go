@@ -2,6 +2,7 @@ package svc
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -538,14 +539,21 @@ func cs3ReceivedOCMSharesToDriveItems(ctx context.Context,
 
 		group.Go(func() error {
 			var err error // redeclare
+
+			// for OCM shares the opaqueID is the '/' for shared directories and '/filename' for
+			// file shares
+			resOpaqueID := "/"
+			if receivedShares[0].GetResourceType() == storageprovider.ResourceType_RESOURCE_TYPE_FILE {
+				resOpaqueID += receivedShares[0].GetName()
+			}
+
 			shareStat, err := gatewayClient.Stat(ctx, &storageprovider.StatRequest{
 				Ref: &storageprovider.Reference{
 					ResourceId: &storageprovider.ResourceId{
 						// TODO maybe the reference is wrong
 						StorageId: utils.OCMStorageProviderID,
 						SpaceId:   receivedShares[0].GetId().GetOpaqueId(),
-						OpaqueId:  "", // in OCM resources the opaque id is the base64 encoded path
-						//OpaqueId: maybe ? receivedShares[0].GetId().GetOpaqueId(),
+						OpaqueId:  base64.StdEncoding.EncodeToString([]byte(resOpaqueID)),
 					},
 				},
 			})
