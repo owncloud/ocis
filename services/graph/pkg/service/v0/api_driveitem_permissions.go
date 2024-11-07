@@ -634,7 +634,7 @@ func (api DriveItemPermissionsApi) Invite(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	permission, err := api.driveItemPermissionsService.Invite(ctx, &itemID, *driveItemInvite)
+	permission, err := api.driveItemPermissionsService.Invite(ctx, itemID, *driveItemInvite)
 	if err != nil {
 		errorcode.RenderError(w, r, err)
 		return
@@ -698,7 +698,7 @@ func (api DriveItemPermissionsApi) ListPermissions(w http.ResponseWriter, r *htt
 
 	ctx := r.Context()
 
-	permissions, err := api.driveItemPermissionsService.ListPermissions(ctx, &itemID, listFederatedRoles, selectRoles)
+	permissions, err := api.driveItemPermissionsService.ListPermissions(ctx, itemID, listFederatedRoles, selectRoles)
 	if err != nil {
 		errorcode.RenderError(w, r, err)
 		return
@@ -774,7 +774,7 @@ func (api DriveItemPermissionsApi) DeletePermission(w http.ResponseWriter, r *ht
 	}
 
 	ctx := r.Context()
-	err = api.driveItemPermissionsService.DeletePermission(ctx, &itemID, permissionID)
+	err = api.driveItemPermissionsService.DeletePermission(ctx, itemID, permissionID)
 	if err != nil {
 		errorcode.RenderError(w, r, err)
 		return
@@ -841,7 +841,7 @@ func (api DriveItemPermissionsApi) UpdatePermission(w http.ResponseWriter, r *ht
 		return
 	}
 
-	updatedPermission, err := api.driveItemPermissionsService.UpdatePermission(ctx, &itemID, permissionID, permission)
+	updatedPermission, err := api.driveItemPermissionsService.UpdatePermission(ctx, itemID, permissionID, permission)
 	if err != nil {
 		errorcode.RenderError(w, r, err)
 		return

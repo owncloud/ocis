@@ -499,7 +499,7 @@ func (api DrivesDriveItemApi) CreateDriveItem(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	if !IsShareJail(driveID) {
+	if !IsShareJail(&driveID) {
 		api.logger.Debug().Interface("driveID", driveID).Msg(ErrNotAShareJail.Error())
 		ErrNotAShareJail.Render(w, r)
 		return

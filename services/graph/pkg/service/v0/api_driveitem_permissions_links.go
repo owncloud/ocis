@@ -166,7 +166,7 @@ func (api DriveItemPermissionsApi) CreateLink(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	perm, err := api.driveItemPermissionsService.CreateLink(r.Context(), &driveItemID, createLink)
+	perm, err := api.driveItemPermissionsService.CreateLink(r.Context(), driveItemID, createLink)
 	if err != nil {
 		errorcode.RenderError(w, r, err)
 		return
@@ -228,7 +228,7 @@ func (api DriveItemPermissionsApi) SetLinkPassword(w http.ResponseWriter, r *htt
 		return
 	}
 
-	newPermission, err := api.driveItemPermissionsService.SetPublicLinkPassword(ctx, &itemID, permissionID, password.GetPassword())
+	newPermission, err := api.driveItemPermissionsService.SetPublicLinkPassword(ctx, itemID, permissionID, password.GetPassword())
 	if err != nil {
 		errorcode.RenderError(w, r, err)
 		return

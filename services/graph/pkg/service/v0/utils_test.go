@@ -15,6 +15,7 @@ import (
 
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
+	"google.golang.org/protobuf/testing/protocmp"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/conversions"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
@@ -42,10 +43,10 @@ var _ = Describe("Utils", func() {
 			case true:
 				Expect(err).To(BeNil())
 				parsedItemID, _ := storagespace.ParseID(itemID)
-				Expect(extractedItemID).To(Equal(parsedItemID))
+				Expect(extractedItemID).To(BeComparableTo(&parsedItemID, protocmp.Transform()))
 
 				parsedDriveID, _ := storagespace.ParseID(driveID)
-				Expect(extractedDriveID).To(Equal(parsedDriveID))
+				Expect(extractedDriveID).To(BeComparableTo(&parsedDriveID, protocmp.Transform()))
 			default:
 				Expect(err).ToNot(BeNil())
 			}
@@ -82,29 +83,29 @@ var _ = Describe("Utils", func() {
 	)
 
 	DescribeTable("IsShareJail",
-		func(resourceID provider.ResourceId, isShareJail bool) {
+		func(resourceID *provider.ResourceId, isShareJail bool) {
 			Expect(service.IsShareJail(resourceID)).To(Equal(isShareJail))
 		},
-		Entry("valid: share jail", provider.ResourceId{
+		Entry("valid: share jail", &provider.ResourceId{
 			StorageId: utils.ShareStorageProviderID,
 			SpaceId:   utils.ShareStorageSpaceID,
 		}, true),
-		Entry("invalid: empty storageId", provider.ResourceId{
+		Entry("invalid: empty storageId", &provider.ResourceId{
 			SpaceId: utils.ShareStorageSpaceID,
 		}, false),
-		Entry("invalid: empty spaceId", provider.ResourceId{
+		Entry("invalid: empty spaceId", &provider.ResourceId{
 			StorageId: utils.ShareStorageProviderID,
 		}, false),
-		Entry("invalid: empty storageId and spaceId", provider.ResourceId{}, false),
-		Entry("invalid: non share jail storageId", provider.ResourceId{
+		Entry("invalid: empty storageId and spaceId", &provider.ResourceId{}, false),
+		Entry("invalid: non share jail storageId", &provider.ResourceId{
 			StorageId: "123",
 			SpaceId:   utils.ShareStorageSpaceID,
 		}, false),
-		Entry("invalid: non share jail spaceId", provider.ResourceId{
+		Entry("invalid: non share jail spaceId", &provider.ResourceId{
 			StorageId: utils.ShareStorageProviderID,
 			SpaceId:   "123",
 		}, false),
-		Entry("invalid: non share jail storageID and spaceId", provider.ResourceId{
+		Entry("invalid: non share jail storageID and spaceId", &provider.ResourceId{
 			StorageId: "123",
 			SpaceId:   "123",
 		}, false),
