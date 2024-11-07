@@ -2040,14 +2040,14 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @Given /^user "([^"]*)" has (copied|moved|renamed) file "([^"]*)" into "([^"]*)" inside space "([^"]*)" using file-id "([^"]*)"$/
+	 * @Given /^user "([^"]*)" has (copied|moved) file with id "([^"]*)" as "([^"]*)" into folder "([^"]*)" inside space "([^"]*)"$/
 	 *
 	 * @param string $user
 	 * @param string $actionType
-	 * @param string $sourceFile
-	 * @param string $destinationFile
-	 * @param string $spaceName
 	 * @param string $fileId
+	 * @param string $destinationFile
+	 * @param string $destinationFolder
+	 * @param string $spaceName
 	 *
 	 * @throws GuzzleException
 	 * @return void
@@ -2055,21 +2055,15 @@ class SpacesContext implements Context {
 	public function userHasCopiedOrMovedFileInsideSpaceUsingFileId(
 		string $user,
 		string $actionType,
-		string $sourceFile,
+		string $fileId,
 		string $destinationFile,
+		string $destinationFolder,
 		string $spaceName,
-		string $fileId
 	): void {
-		// split the source when there are sub-folders
-		$sourceFile = \trim($sourceFile, "/");
-		$sourceFile = \explode("/", $sourceFile);
-		$sourceFile = \end($sourceFile);
 		$destinationFile = \trim($destinationFile, "/");
-		if ($actionType === 'copied') {
-			$fileDestination = $this->escapePath($destinationFile) . '/' . $this->escapePath($sourceFile);
-		} elseif ($actionType === 'renamed' || $actionType === 'moved') {
-			$fileDestination = $destinationFile;
-		}
+		$destinationFolder = \trim($destinationFolder, "/");
+
+		$fileDestination = $destinationFolder . '/' . $this->escapePath($destinationFile);
 
 		$baseUrl = $this->featureContext->getBaseUrl();
 		$sourceDavPath = WebdavHelper::getDavPath($this->featureContext->getDavPathVersion());
@@ -2086,6 +2080,45 @@ class SpacesContext implements Context {
 		} else {
 			$response = $this->moveFilesAndFoldersRequest($user, $fullUrl, $headers);
 		}
+		Assert::assertEquals(
+			201,
+			$response->getStatusCode(),
+			"Expected response status code should be 201"
+		);
+	}
+
+	/**
+	 * @Given /^user "([^"]*)" has renamed file with id "([^"]*)" to "([^"]*)" inside space "([^"]*)"$/
+	 *
+	 * @param string $user
+	 * @param string $fileId
+	 * @param string $destinationFile
+	 * @param string $spaceName
+	 *
+	 * @throws GuzzleException
+	 * @return void
+	 */
+	public function userHasRenamedFileInsideSpaceUsingFileId(
+		string $user,
+		string $fileId,
+		string $destinationFile,
+		string $spaceName
+	): void {
+		$destinationFile = \trim($destinationFile, "/");
+
+		$fileDestination = $this->escapePath($destinationFile);
+
+		$baseUrl = $this->featureContext->getBaseUrl();
+		$sourceDavPath = WebdavHelper::getDavPath($this->featureContext->getDavPathVersion());
+		if ($spaceName === 'Shares') {
+			$sharesPath = $this->featureContext->getSharesMountPath($user, $fileDestination);
+			$davPath = WebDavHelper::getDavPath($this->featureContext->getDavPathVersion());
+			$headers['Destination'] = "$baseUrl/$davPath/$sharesPath";
+		} else {
+			$headers['Destination'] = $this->destinationHeaderValueWithSpaceName($user, $fileDestination, $spaceName, $fileId);
+		}
+		$fullUrl = "$baseUrl/$sourceDavPath/$fileId";
+		$response = $this->moveFilesAndFoldersRequest($user, $fullUrl, $headers);
 		Assert::assertEquals(
 			201,
 			$response->getStatusCode(),
@@ -3656,7 +3689,7 @@ class SpacesContext implements Context {
 	/**
 	 * @Then /^user "([^"]*)" (folder|file) "([^"]*)" of the space "([^"]*)" should have the previously stored id$/
 	 *
-	 * @param string|null $user
+	 * @param string $user
 	 * @param string $fileOrFolder
 	 * @param string $path
 	 * @param string $spaceName
@@ -3664,6 +3697,7 @@ class SpacesContext implements Context {
 	 * @return void
 	 *
 	 * @throws GuzzleException
+	 * @throws JsonException
 	 */
 	public function userFolderOfTheSpaceShouldHaveThePreviouslyStoredId(string $user, string $fileOrFolder, string $path, string $spaceName): void {
 		$this->getSpaceIdByName($user, $spaceName);
