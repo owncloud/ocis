@@ -380,12 +380,12 @@ func (g Service) AssignRoleToUser(ctx context.Context, req *settingssvc.AssignRo
 
 	switch {
 	case ownAccountUUID == req.AccountUuid:
-		// Allow users to assign themself to the user role
+		// Allow users to assign themself to the user or user light role
 		// deny any other attempt to change	the user's own assignment
 		if r, err := g.manager.ListRoleAssignments(req.AccountUuid); err == nil && len(r) > 0 {
 			return merrors.Forbidden(g.id, "Changing own role assignment forbidden")
 		}
-		if req.RoleId != defaults.BundleUUIDRoleUser {
+		if req.RoleId != defaults.BundleUUIDRoleUser && req.RoleId != defaults.BundleUUIDRoleUserLight {
 			return merrors.Forbidden(g.id, "Changing own role assignment forbidden")
 		}
 		g.logger.Debug().Str("userid", ownAccountUUID).Msg("Self-assignment for default 'user' role permitted")

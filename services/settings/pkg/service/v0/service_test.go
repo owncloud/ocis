@@ -84,6 +84,15 @@ func TestEditOwnRoleAssignment(t *testing.T) {
 	err := svc.AssignRoleToUser(ctxWithUUID, &req, &res)
 	assert.Nil(t, err)
 
+	// Creating an initial self assignment is expected to succeed for UserLightRole when no assignment exists yet
+	req = v0.AssignRoleToUserRequest{
+		AccountUuid: "61445573-4dbe-4d56-88dc-88ab47aceba7",
+		RoleId:      defaults.BundleUUIDRoleUserLight,
+	}
+	res = v0.AssignRoleToUserResponse{}
+	err = svc.AssignRoleToUser(ctxWithUUID, &req, &res)
+	assert.Nil(t, err)
+
 	// Creating an initial self assignment is expected to fail for non UserRole when no assignment exists yet
 	req = v0.AssignRoleToUserRequest{
 		AccountUuid: "61445573-4dbe-4d56-88dc-88ab47aceba7",
