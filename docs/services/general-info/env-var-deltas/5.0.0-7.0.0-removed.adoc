@@ -38,7 +38,7 @@
 | The backend to use for storing metadata. Supported values are 'messagepack' and 'xattrs'. The setting 'messagepack' uses a dedicated file to store file metadata while 'xattrs' uses extended attributes to store file metadata. Defaults to 'messagepack'.
 | messagepack
 
-| The `Store` service has fully been removed
+| The `Store` service has been removed completely
 | STORE_DATA_PATH
 | The directory where the filesystem storage will store ocis settings. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/store.
 | /var/lib/ocis/store
