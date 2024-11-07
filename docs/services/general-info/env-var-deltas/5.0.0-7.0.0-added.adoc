@@ -19,6 +19,16 @@
 | false
 
 | 
+| OCIS_MACHINE_AUTH_API_KEY
+| The machine auth API key used to validate internal requests necessary to access resources from other services.
+| 
+
+| 
+| OCIS_MAX_CONCURRENCY
+| Maximum number of concurrent go-routines. Higher values can potentially get work done faster but will also cause more load on the system. Values of 0 or below will be ignored and the default value will be used.
+| 5
+
+| 
 | OCIS_SHOW_USER_EMAIL_IN_RESULTS
 | Include user email addresses in responses. If absent or set to false emails will be omitted from results. Please note that admin users can always see all email addresses.
 | false
@@ -333,6 +343,11 @@
 | Service name or address of the app provider to use for secure view. Should match the service name or address of the registered CS3 app provider.
 | com.owncloud.api.collaboration
 
+| 
+| FRONTEND_MAX_CONCURRENCY
+| Maximum number of concurrent go-routines. Higher values can potentially get work done faster but will also cause more load on the system. Values of 0 or below will be ignored and the default value will be used.
+| 25
+
 | xref:{s-path}/gateway.adoc[Gateway]
 | GATEWAY_APP_REGISTRY_ENDPOINT
 | The endpoint of the app-registry service. Can take a service name or a gRPC URI with the dns, kubernetes or unix protocol.
@@ -597,6 +612,11 @@
 | THUMBNAILS_MAX_INPUT_WIDTH
 | The maximum width of an input image which is being processed.
 | 7680
+
+| xref:{s-path}/userlog.adoc[Userlog]
+| USERLOG_MAX_CONCURRENCY
+| Maximum number of concurrent go-routines. Higher values can potentially get work done faster but will also cause more load on the system. Values of 0 or below will be ignored and the default value will be used.
+| 5
 
 | xref:{s-path}/web.adoc[Web]
 | WEB_ASSET_APPS_PATH
