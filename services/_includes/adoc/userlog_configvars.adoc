@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-11-07-15-09-13]
+[#deprecation-note-2024-11-07-15-19-25]
 [caption=]
 .Deprecation notes for the userlog service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -403,6 +403,18 @@ a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 The password to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.
+
+a|`OCIS_MAX_CONCURRENCY` +
+`USERLOG_MAX_CONCURRENCY` +
+
+a| [subs=-attributes]
+++7.0.0 ++
+a| [subs=-attributes]
+++int ++
+a| [subs=-attributes]
+++5 ++
+a| [subs=-attributes]
+Maximum number of concurrent go-routines. Higher values can potentially get work done faster but will also cause more load on the system. Values of 0 or below will be ignored and the default value will be used.
 
 a|`OCIS_PERSISTENT_STORE` +
 `USERLOG_STORE` +

@@ -34,6 +34,7 @@
 | OCIS_EVENTS_ENABLE_TLS<br/>USERLOG_EVENTS_ENABLE_TLS | bool | false | Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services.|
 | OCIS_EVENTS_AUTH_USERNAME<br/>USERLOG_EVENTS_AUTH_USERNAME | string |  | The username to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.|
 | OCIS_EVENTS_AUTH_PASSWORD<br/>USERLOG_EVENTS_AUTH_PASSWORD | string |  | The password to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.|
+| OCIS_MAX_CONCURRENCY<br/>USERLOG_MAX_CONCURRENCY | int | 5 | Maximum number of concurrent go-routines. Higher values can potentially get work done faster but will also cause more load on the system. Values of 0 or below will be ignored and the default value will be used.|
 | OCIS_PERSISTENT_STORE<br/>USERLOG_STORE | string | memory | The type of the store. Supported values are: 'memory', 'nats-js-kv', 'redis-sentinel', 'noop'. See the text description for details.|
 | OCIS_PERSISTENT_STORE_NODES<br/>USERLOG_STORE_NODES | []string | [] | A list of nodes to access the configured store. This has no effect when 'memory' store is configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details.|
 | USERLOG_STORE_DATABASE | string | userlog | The database name the configured store should use.|
