@@ -9,6 +9,8 @@ var (
 	ErrInvalidType = errors.New("thumbnails: can't encode this type")
 	// ErrNoEncoderForType represents the error when an encoder couldn't be found for a type.
 	ErrNoEncoderForType = errors.New("thumbnails: no encoder for this type found")
+	// ErrNoGeneratorForType represents the error when a generator couldn't be found for a type.
+	ErrNoGeneratorForType = errors.New("thumbnails: no generator for this type found")
 	// ErrNoImageFromAudioFile defines an error when an image cannot be extracted from an audio file
 	ErrNoImageFromAudioFile = errors.New("thumbnails: could not extract image from audio file")
 	// ErrNoConverterForExtractedImageFromGgsFile defines an error when the extracted image from an ggs file could not be converted
