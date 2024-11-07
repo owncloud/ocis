@@ -104,8 +104,9 @@ func Server(cfg *config.Config) *cli.Command {
 				cancel()
 			})
 
+			// FIXME we should defer registering the service until we are sure that reva is running
 			grpcSvc := registry.BuildGRPCService(cfg.GRPC.Namespace+"."+cfg.Service.Name, cfg.GRPC.Protocol, cfg.GRPC.Addr, version.GetString())
-			if err := registry.RegisterService(ctx, grpcSvc, logger); err != nil {
+			if err := registry.RegisterService(ctx, logger, grpcSvc, cfg.Debug.Addr); err != nil {
 				logger.Fatal().Err(err).Msg("failed to register the grpc service")
 			}
 

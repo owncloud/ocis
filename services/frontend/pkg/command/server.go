@@ -9,6 +9,8 @@ import (
 	"github.com/cs3org/reva/v2/cmd/revad/runtime"
 	"github.com/gofrs/uuid"
 	"github.com/oklog/run"
+	"github.com/urfave/cli/v2"
+
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
@@ -18,7 +20,6 @@ import (
 	"github.com/owncloud/ocis/v2/services/frontend/pkg/logging"
 	"github.com/owncloud/ocis/v2/services/frontend/pkg/revaconfig"
 	"github.com/owncloud/ocis/v2/services/frontend/pkg/server/debug"
-	"github.com/urfave/cli/v2"
 )
 
 // Server is the entry point for the server command.
@@ -96,7 +97,7 @@ func Server(cfg *config.Config) *cli.Command {
 			})
 
 			httpSvc := registry.BuildHTTPService(cfg.HTTP.Namespace+"."+cfg.Service.Name, cfg.HTTP.Addr, version.GetString())
-			if err := registry.RegisterService(ctx, httpSvc, logger); err != nil {
+			if err := registry.RegisterService(ctx, logger, httpSvc, cfg.Debug.Addr); err != nil {
 				logger.Fatal().Err(err).Msg("failed to register the http service")
 			}
 

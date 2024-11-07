@@ -2,15 +2,17 @@ package registry
 
 import (
 	"context"
+	"net/http"
 	"time"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	mRegistry "go-micro.dev/v4/registry"
+
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 )
 
 // RegisterService publishes an arbitrary endpoint to the service-registry. This allows querying nodes of
 // non-micro services like reva. No health-checks are done, thus the caller is responsible for canceling.
-func RegisterService(ctx context.Context, service *mRegistry.Service, logger log.Logger) error {
+func RegisterService(ctx context.Context, logger log.Logger, service *mRegistry.Service, debugAddr string) error {
 	registry := GetRegistry()
 	node := service.Nodes[0]
 
@@ -24,6 +26,13 @@ func RegisterService(ctx context.Context, service *mRegistry.Service, logger log
 	t := time.NewTicker(GetRegisterInterval())
 
 	go func() {
+		// check if the service is ready
+		for {
+			resp, err := http.DefaultClient.Get("http://" + debugAddr + "/readyz")
+			if err == nil && resp.StatusCode == http.StatusOK {
+				break
+			}
+		}
 		for {
 			select {
 			case <-t.C:

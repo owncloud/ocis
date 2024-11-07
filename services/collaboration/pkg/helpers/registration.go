@@ -9,6 +9,7 @@ import (
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/mime"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
+
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
@@ -20,7 +21,7 @@ import (
 // without changes to the underlying RegisterService method.
 func RegisterOcisService(ctx context.Context, cfg *config.Config, logger log.Logger) error {
 	svc := registry.BuildGRPCService(cfg.GRPC.Namespace+"."+cfg.Service.Name+"."+cfg.App.Name, cfg.GRPC.Protocol, cfg.GRPC.Addr, version.GetString())
-	return registry.RegisterService(ctx, svc, logger)
+	return registry.RegisterService(ctx, logger, svc, cfg.Debug.Addr)
 }
 
 // RegisterAppProvider will register this service as app provider in REVA.

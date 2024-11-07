@@ -9,6 +9,8 @@ import (
 	"github.com/cs3org/reva/v2/cmd/revad/runtime"
 	"github.com/gofrs/uuid"
 	"github.com/oklog/run"
+	"github.com/urfave/cli/v2"
+
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
@@ -18,7 +20,6 @@ import (
 	"github.com/owncloud/ocis/v2/services/storage-system/pkg/logging"
 	"github.com/owncloud/ocis/v2/services/storage-system/pkg/revaconfig"
 	"github.com/owncloud/ocis/v2/services/storage-system/pkg/server/debug"
-	"github.com/urfave/cli/v2"
 )
 
 // Server is the entry point for the server command.
@@ -92,12 +93,12 @@ func Server(cfg *config.Config) *cli.Command {
 			})
 
 			grpcSvc := registry.BuildGRPCService(cfg.GRPC.Namespace+"."+cfg.Service.Name, cfg.GRPC.Protocol, cfg.GRPC.Addr, version.GetString())
-			if err := registry.RegisterService(ctx, grpcSvc, logger); err != nil {
+			if err := registry.RegisterService(ctx, logger, grpcSvc, cfg.Debug.Addr); err != nil {
 				logger.Fatal().Err(err).Msg("failed to register the grpc service")
 			}
 
-			httpScv := registry.BuildHTTPService(cfg.HTTP.Namespace+"."+cfg.Service.Name, cfg.HTTP.Addr, version.GetString())
-			if err := registry.RegisterService(ctx, httpScv, logger); err != nil {
+			httpSvc := registry.BuildHTTPService(cfg.HTTP.Namespace+"."+cfg.Service.Name, cfg.HTTP.Addr, version.GetString())
+			if err := registry.RegisterService(ctx, logger, httpSvc, cfg.Debug.Addr); err != nil {
 				logger.Fatal().Err(err).Msg("failed to register the http service")
 			}
 
