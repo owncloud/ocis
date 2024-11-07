@@ -1,4 +1,9 @@
-Enhancement: Bump reva to 2.26.3
+Enhancement: Bump reva to 2.26.4
+
+*   Bugfix [cs3org/reva#4917](https://github.com/cs3org/reva/pull/4917): Fix 0-byte file uploads
+*   Bugfix [cs3org/reva#4918](https://github.com/cs3org/reva/pull/4918): Fix app templates
+
+Bump reva to 2.26.3
 
 *   Bugfix [cs3org/reva#4908](https://github.com/cs3org/reva/pull/4908): Add checksum to OCM storageprovider responses
 *   Enhancement [cs3org/reva#4910](https://github.com/cs3org/reva/pull/4910): Bump cs3api
