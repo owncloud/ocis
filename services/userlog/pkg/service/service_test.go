@@ -19,6 +19,13 @@ import (
 	"github.com/google/uuid"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"github.com/stretchr/testify/mock"
+	"go-micro.dev/v4/client"
+	microevents "go-micro.dev/v4/events"
+	microstore "go-micro.dev/v4/store"
+	"go.opentelemetry.io/otel/trace"
+	"google.golang.org/grpc"
+
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	ehmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/eventhistory/v0"
 	ehsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/eventhistory/v0"
@@ -26,17 +33,13 @@ import (
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/userlog/pkg/config"
 	"github.com/owncloud/ocis/v2/services/userlog/pkg/service"
-	"github.com/stretchr/testify/mock"
-	"go-micro.dev/v4/client"
-	microevents "go-micro.dev/v4/events"
-	microstore "go-micro.dev/v4/store"
-	"go.opentelemetry.io/otel/trace"
-	"google.golang.org/grpc"
 )
 
 var _ = Describe("UserlogService", func() {
 	var (
-		cfg = &config.Config{}
+		cfg = &config.Config{
+			MaxConcurrency: 5,
+		}
 
 		ul  *service.UserlogService
 		bus testBus
