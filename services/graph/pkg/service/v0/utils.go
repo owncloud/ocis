@@ -45,8 +45,8 @@ func IsSpaceRoot(rid *storageprovider.ResourceId) bool {
 
 // GetDriveAndItemIDParam parses the driveID and itemID from the request,
 // validates the common fields and returns the parsed IDs if ok.
-func GetDriveAndItemIDParam(r *http.Request, logger *log.Logger) (storageprovider.ResourceId, storageprovider.ResourceId, error) {
-	empty := storageprovider.ResourceId{}
+func GetDriveAndItemIDParam(r *http.Request, logger *log.Logger) (*storageprovider.ResourceId, *storageprovider.ResourceId, error) {
+	empty := &storageprovider.ResourceId{}
 
 	driveID, err := parseIDParam(r, "driveID")
 	if err != nil {
@@ -61,16 +61,16 @@ func GetDriveAndItemIDParam(r *http.Request, logger *log.Logger) (storageprovide
 	}
 
 	if itemID.GetOpaqueId() == "" {
-		logger.Debug().Interface("driveID", driveID).Interface("itemID", itemID).Msg("empty item opaqueID")
+		logger.Debug().Interface("driveID", &driveID).Interface("itemID", &itemID).Msg("empty item opaqueID")
 		return empty, empty, errorcode.New(errorcode.InvalidRequest, "invalid itemID")
 	}
 
 	if driveID.GetStorageId() != itemID.GetStorageId() || driveID.GetSpaceId() != itemID.GetSpaceId() {
-		logger.Debug().Interface("driveID", driveID).Interface("itemID", itemID).Msg("driveID and itemID do not match")
+		logger.Debug().Interface("driveID", &driveID).Interface("itemID", &itemID).Msg("driveID and itemID do not match")
 		return empty, empty, errorcode.New(errorcode.ItemNotFound, "driveID and itemID do not match")
 	}
 
-	return driveID, itemID, nil
+	return &driveID, &itemID, nil
 }
 
 // GetFilterParam returns the $filter query parameter from the request. If you need to parse the filter use godata.ParseRequest
@@ -96,7 +96,7 @@ func (g Graph) GetGatewayClient(w http.ResponseWriter, r *http.Request) (gateway
 }
 
 // IsShareJail returns true if given id is a share jail id.
-func IsShareJail(id storageprovider.ResourceId) bool {
+func IsShareJail(id *storageprovider.ResourceId) bool {
 	return id.GetStorageId() == utils.ShareStorageProviderID && id.GetSpaceId() == utils.ShareStorageSpaceID
 }
 
@@ -511,7 +511,7 @@ func federatedRoleConditionForResourceType(ri *storageprovider.ResourceInfo) (st
 // ExtractShareIdFromResourceId is a bit of a hack.
 // We should not rely on a specific format of the item id.
 // But currently there is no other way to get the ShareID.
-func ExtractShareIdFromResourceId(rid storageprovider.ResourceId) *collaboration.ShareId {
+func ExtractShareIdFromResourceId(rid *storageprovider.ResourceId) *collaboration.ShareId {
 	return &collaboration.ShareId{
 		OpaqueId: rid.GetOpaqueId(),
 	}
