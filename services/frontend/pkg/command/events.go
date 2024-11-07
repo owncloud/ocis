@@ -82,20 +82,31 @@ func ListenForEvents(ctx context.Context, cfg *config.Config, l log.Logger) erro
 
 	valueService := settingssvc.NewValueService("com.owncloud.api.settings", grpcClient)
 
-	for {
-		select {
-		case e := <-evChannel:
-			switch ev := e.Event.(type) {
-			default:
-				l.Error().Interface("event", e).Msg("unhandled event")
-			case events.ShareCreated:
-				AutoAcceptShares(ev, cfg.AutoAcceptShares, l, gatewaySelector, valueService, cfg.ServiceAccount, cfg.MaxConcurrency)
+	wg := sync.WaitGroup{}
+	for i := 0; i < cfg.MaxConcurrency; i++ {
+		wg.Add(1)
+		go func(ch <-chan events.Event) {
+			defer wg.Done()
+			for {
+				select {
+				case e := <-ch:
+					switch ev := e.Event.(type) {
+					default:
+						l.Error().Interface("event", e).Msg("unhandled event")
+					case events.ShareCreated:
+						AutoAcceptShares(ev, cfg.AutoAcceptShares, l, gatewaySelector, valueService, cfg.ServiceAccount, cfg.MaxConcurrency)
+					}
+				case <-ctx.Done():
+					l.Info().Msg("context cancelled")
+					return
+				}
 			}
-		case <-ctx.Done():
-			l.Info().Msg("context cancelled")
-			return nil
-		}
+		}(evChannel)
 	}
+	// Wait for all goroutines to finish
+	wg.Wait()
+
+	return nil
 }
 
 // AutoAcceptShares automatically accepts shares if configured by the admin or user
