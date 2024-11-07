@@ -10,13 +10,13 @@ import (
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	"github.com/cs3org/reva/v2/pkg/events"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
+	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/go-chi/chi/v5"
 	"go-micro.dev/v4/store"
 	"go.opentelemetry.io/otel/trace"
 
-	"github.com/cs3org/reva/v2/pkg/events"
-	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
-	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/owncloud/ocis/v2/ocis-pkg/l10n"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/roles"
@@ -96,8 +96,12 @@ func NewUserlogService(opts ...Option) (*UserlogService, error) {
 
 // MemorizeEvents stores eventIDs a user wants to receive
 func (ul *UserlogService) MemorizeEvents(ch <-chan events.Event) {
-	for event := range ch {
-		ul.processEvent(event)
+	for i := 0; i < ul.cfg.MaxConcurrency; i++ {
+		go func(ch <-chan events.Event) {
+			for event := range ch {
+				ul.processEvent(event)
+			}
+		}(ch)
 	}
 }
 

@@ -34,6 +34,7 @@ func DefaultConfig() *config.Config {
 			Cluster:   "ocis-cluster",
 			EnableTLS: false,
 		},
+		MaxConcurrency: 5,
 		Persistence: config.Persistence{
 			Store:    "memory",
 			Database: "userlog",
@@ -103,5 +104,8 @@ func Sanitize(cfg *config.Config) {
 	// sanitize config
 	if cfg.HTTP.Root != "/" {
 		cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
+	}
+	if cfg.MaxConcurrency < 1 {
+		cfg.MaxConcurrency = 5
 	}
 }
