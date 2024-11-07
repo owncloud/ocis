@@ -83,8 +83,8 @@ Feature: CORS headers
       | Access-Control-Allow-Origin | https://aphno.badal |
 
   @issue-8231
-  Scenario: CORS headers should be returned when setting CORS domain sending origin header in the Webdav api
-    Given using spaces DAV path
+  Scenario Outline: CORS headers should be returned when setting CORS domain sending origin header in the Webdav api
+    Given using <dav-path-version> DAV path
     When user "Alice" sends PROPFIND request to space "Alice Hansen" with headers using the WebDAV API
       | header | value               |
       | Origin | https://aphno.badal |
@@ -92,6 +92,11 @@ Feature: CORS headers
     And the following headers should be set
       | header                      | value               |
       | Access-Control-Allow-Origin | https://aphno.badal |
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
 
 
   Scenario: CORS headers should be returned when setting CORS domain sending origin header in the settings api

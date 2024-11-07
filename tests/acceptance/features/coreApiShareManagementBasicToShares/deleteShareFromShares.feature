@@ -56,8 +56,9 @@ Feature: sharing
       | 2               | 200             |
 
 
-  Scenario: orphaned shares
-    Given using OCS API version "1"
+  Scenario Outline: orphaned shares
+    Given using <dav-path-version> DAV path
+    And using OCS API version "1"
     And user "Alice" has created folder "/common"
     And user "Alice" has created folder "/common/sub"
     And user "Alice" has sent the following resource share invitation:
@@ -70,10 +71,16 @@ Feature: sharing
     Then the HTTP status code should be "204"
     And as "Brian" folder "/Shares/sub" should not exist
     And as "Brian" folder "/sub" should not exist
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
 
   @smokeTest
-  Scenario: deleting a file out of a share as recipient creates a backup for the owner
-    Given using OCS API version "1"
+  Scenario Outline: deleting a file out of a share as recipient creates a backup for the owner
+    Given using <dav-path-version> DAV path
+    And using OCS API version "1"
     And user "Alice" has created folder "/shared"
     And user "Alice" has moved file "/textfile0.txt" to "/shared/shared_file.txt"
     And user "Alice" has sent the following resource share invitation:
@@ -88,10 +95,16 @@ Feature: sharing
     And as "Alice" file "/shared/shared_file.txt" should not exist
     And as "Alice" file "/shared_file.txt" should exist in the trashbin
     And as "Brian" the file with original path "/shared_file.txt" should not exist in the trashbin
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
 
 
-  Scenario: deleting a folder out of a share as recipient creates a backup for the owner
-    Given using OCS API version "1"
+  Scenario Outline: deleting a folder out of a share as recipient creates a backup for the owner
+    Given using <dav-path-version> DAV path
+    And using OCS API version "1"
     And user "Alice" has created folder "/shared"
     And user "Alice" has created folder "/shared/sub"
     And user "Alice" has moved file "/textfile0.txt" to "/shared/sub/shared_file.txt"
@@ -109,6 +122,11 @@ Feature: sharing
     And as "Alice" file "/sub/shared_file.txt" should exist in the trashbin
     And as "Brian" the folder with original path "/sub" should not exist in the trashbin
     And as "Brian" the file with original path "/sub/shared_file.txt" should not exist in the trashbin
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
 
   @smokeTest
   Scenario: unshare from self
@@ -136,8 +154,9 @@ Feature: sharing
     And the etag of element "/PARENT" of user "Carol" should not have changed
 
 
-  Scenario: sharee of a read-only share folder tries to delete the shared folder
-    Given using OCS API version "1"
+  Scenario Outline: sharee of a read-only share folder tries to delete the shared folder
+    Given using <dav-path-version> DAV path
+    And using OCS API version "1"
     And user "Alice" has created folder "/shared"
     And user "Alice" has moved file "/textfile0.txt" to "/shared/shared_file.txt"
     And user "Alice" has sent the following resource share invitation:
@@ -150,10 +169,16 @@ Feature: sharing
     Then the HTTP status code should be "403"
     And as "Alice" file "/shared/shared_file.txt" should exist
     And as "Brian" file "/Shares/shared/shared_file.txt" should exist
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
 
 
-  Scenario: sharee of a upload-only shared folder tries to delete a file in the shared folder
-    Given using OCS API version "1"
+  Scenario Outline: sharee of a upload-only shared folder tries to delete a file in the shared folder
+    Given using <dav-path-version> DAV path
+    And using OCS API version "1"
     And user "Alice" has created folder "/shared"
     And user "Alice" has moved file "/textfile0.txt" to "/shared/shared_file.txt"
     And user "Alice" has sent the following resource share invitation:
@@ -166,10 +191,16 @@ Feature: sharing
     Then the HTTP status code should be "403"
     And as "Alice" file "/shared/shared_file.txt" should exist
     And as "Brian" file "/Shares/shared/shared_file.txt" should exist
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
 
 
-  Scenario: sharee of an upload-only shared folder tries to delete their file in the folder
-    Given using OCS API version "1"
+  Scenario Outline: sharee of an upload-only shared folder tries to delete their file in the folder
+    Given using <dav-path-version> DAV path
+    And using OCS API version "1"
     And user "Alice" has created folder "/shared"
     And user "Alice" has sent the following resource share invitation:
       | resource        | shared   |
@@ -182,6 +213,11 @@ Feature: sharing
     Then the HTTP status code should be "403"
     And as "Alice" file "/shared/textfile.txt" should exist
     And as "Brian" file "/Shares/shared/textfile.txt" should exist
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
 
 
   Scenario Outline: group share recipient tries to delete the share

@@ -6,7 +6,6 @@ Feature: file versions remember the author of each version
 
   Background:
     Given using OCS API version "2"
-    And using new DAV path
     And user "Alice" has been created with default attributes and without skeleton files
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Carol" has been created with default attributes and without skeleton files

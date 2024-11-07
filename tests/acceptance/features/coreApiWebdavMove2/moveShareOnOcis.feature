@@ -34,6 +34,9 @@ Feature: move (rename) file
       | new              | Viewer           |
       | new              | Uploader         |
       | new              | Editor           |
+      | spaces           | Viewer           |
+      | spaces           | Uploader         |
+      | spaces           | Editor           |
 
 
   Scenario Outline: sharee tries to move a file into a shared folder
@@ -61,6 +64,9 @@ Feature: move (rename) file
       | new              | Viewer           |
       | new              | Uploader         |
       | new              | Editor           |
+      | spaces           | Viewer           |
+      | spaces           | Uploader         |
+      | spaces           | Editor           |
 
 
   Scenario Outline: moving a file out of a shared folder as the sharer
@@ -88,6 +94,9 @@ Feature: move (rename) file
       | new              | Viewer           |
       | new              | Uploader         |
       | new              | Editor           |
+      | spaces           | Viewer           |
+      | spaces           | Uploader         |
+      | spaces           | Editor           |
 
 
   Scenario Outline: moving a file out of a shared folder as the sharee
@@ -114,6 +123,9 @@ Feature: move (rename) file
       | new              | Viewer           |
       | new              | Uploader         |
       | new              | Editor           |
+      | spaces           | Viewer           |
+      | spaces           | Uploader         |
+      | spaces           | Editor           |
 
 
   Scenario Outline: moving a folder into a shared folder the sharer
@@ -142,6 +154,9 @@ Feature: move (rename) file
       | new              | Viewer           |
       | new              | Uploader         |
       | new              | Editor           |
+      | spaces           | Viewer           |
+      | spaces           | Uploader         |
+      | spaces           | Editor           |
 
 
   Scenario Outline: moving a folder into a shared folder as the sharee
@@ -170,6 +185,9 @@ Feature: move (rename) file
       | new              | Viewer           |
       | new              | Uploader         |
       | new              | Editor           |
+      | spaces           | Viewer           |
+      | spaces           | Uploader         |
+      | spaces           | Editor           |
 
 
   Scenario Outline: moving a folder out of a shared folder as the sharer
@@ -200,6 +218,9 @@ Feature: move (rename) file
       | new              | Viewer           |
       | new              | Uploader         |
       | new              | Editor           |
+      | spaces           | Viewer           |
+      | spaces           | Uploader         |
+      | spaces           | Editor           |
 
 
   Scenario Outline: moving a folder out of a shared folder as the sharee
@@ -229,6 +250,9 @@ Feature: move (rename) file
       | new              | Viewer           |
       | new              | Uploader         |
       | new              | Editor           |
+      | spaces           | Viewer           |
+      | spaces           | Uploader         |
+      | spaces           | Editor           |
 
 
   Scenario Outline: sharee moves a file within a shared folder (change/all permissions)
@@ -256,6 +280,8 @@ Feature: move (rename) file
       | old              | Editor           |
       | new              | Uploader         |
       | new              | Editor           |
+      | spaces           | Uploader         |
+      | spaces           | Editor           |
 
 
   Scenario Outline: sharee tries to move a file within a shared folder (read permissions)
@@ -281,6 +307,7 @@ Feature: move (rename) file
       | dav-path-version |
       | old              |
       | new              |
+      | spaces           |
 
   @issue-1976
   Scenario Outline: sharee tries to move a file into same shared folder with same name
@@ -308,3 +335,6 @@ Feature: move (rename) file
       | new              | Viewer           |
       | new              | Uploader         |
       | new              | Editor           |
+      | spaces           | Viewer           |
+      | spaces           | Uploader         |
+      | spaces           | Editor           |

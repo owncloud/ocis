@@ -505,8 +505,9 @@ Feature: sharing
       | 2               | 200             |
 
   @issue-764 @issue-7555
-  Scenario: share a file by multiple channels and download from sub-folder and direct file share
-    Given these users have been created with default attributes and without skeleton files:
+  Scenario Outline: share a file by multiple channels and download from sub-folder and direct file share
+    Given using <dav-path-version> DAV path
+    And these users have been created with default attributes and without skeleton files:
       | username |
       | Brian    |
       | Carol    |
@@ -542,6 +543,10 @@ Feature: sharing
       | /Shares/textfile0.txt            |
     And the content of file "/Shares/common/sub/textfile0.txt" for user "Brian" should be "BLABLABLA" plus end-of-line
     And the content of file "/common/sub/textfile0.txt" for user "Alice" should be "BLABLABLA" plus end-of-line
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
 
   @smokeTest
   Scenario Outline: creating a share of a renamed file

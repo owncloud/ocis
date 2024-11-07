@@ -26,6 +26,8 @@ Feature: files and folders can be deleted from the trashbin
     And as "Alice" the file with original path "<file-name-2>" should not exist in the trashbin
     Examples:
       | dav-path-version | file-name     | file-name-2   |
+      | old              | textfile0.txt | textfile1.txt |
+      | old              | sample,0.txt  | sample,1.txt  |
       | new              | textfile0.txt | textfile1.txt |
       | new              | sample,0.txt  | sample,1.txt  |
       | spaces           | textfile0.txt | textfile1.txt |
@@ -46,6 +48,7 @@ Feature: files and folders can be deleted from the trashbin
     And as "Alice" the file with original path "/PARENT/CHILD/child.txt" should exist in the trashbin
     Examples:
       | dav-path-version |
+      | old              |
       | new              |
       | spaces           |
 
@@ -69,6 +72,7 @@ Feature: files and folders can be deleted from the trashbin
     And as "Alice" the file with original path "/PARENT/child.txt" should exist in the trashbin
     Examples:
       | dav-path-version |
+      | old              |
       | new              |
       | spaces           |
 
@@ -88,6 +92,7 @@ Feature: files and folders can be deleted from the trashbin
     And as "Alice" the file with original path "/PARENT/CHILD/child.txt" should exist in the trashbin
     Examples:
       | dav-path-version |
+      | old              |
       | new              |
       | spaces           |
 
@@ -107,6 +112,7 @@ Feature: files and folders can be deleted from the trashbin
     And as "Alice" the file with original path "/PARENT/CHILD/child.txt" should exist in the trashbin
     Examples:
       | dav-path-version |
+      | old              |
       | new              |
       | spaces           |
 
@@ -126,6 +132,7 @@ Feature: files and folders can be deleted from the trashbin
     And as "Alice" the file with original path "/PARENT/CHILD/child.txt" should exist in the trashbin
     Examples:
       | dav-path-version |
+      | old              |
       | new              |
       | spaces           |
 
@@ -147,6 +154,7 @@ Feature: files and folders can be deleted from the trashbin
     And as "Alice" the file with original path "/FOLDER/CHILD/child.txt" should exist in the trashbin
     Examples:
       | dav-path-version |
+      | old              |
       | new              |
       | spaces           |
 
@@ -168,6 +176,7 @@ Feature: files and folders can be deleted from the trashbin
     And as "Alice" the file with original path "/FOLDER/CHILD/child.txt" should exist in the trashbin
     Examples:
       | dav-path-version |
+      | old              |
       | new              |
       | spaces           |
 
@@ -201,6 +210,7 @@ Feature: files and folders can be deleted from the trashbin
       | # %ab ab?=ed.txt |
     Examples:
       | dav-path-version |
+      | old              |
       | new              |
       | spaces           |
 
@@ -234,6 +244,7 @@ Feature: files and folders can be deleted from the trashbin
       | # %ab ab?=ed |
     Examples:
       | dav-path-version |
+      | old              |
       | new              |
       | spaces           |
 
@@ -279,5 +290,6 @@ Feature: files and folders can be deleted from the trashbin
       | /fo.exe   |
     Examples:
       | dav-path-version |
+      | old              |
       | new              |
       | spaces           |

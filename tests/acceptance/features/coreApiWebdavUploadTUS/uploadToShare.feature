@@ -106,6 +106,7 @@ Feature: upload file to shared folder
       | dav-path-version |
       | old              |
       | new              |
+      | spaces           |
 
 
   Scenario Outline: upload a file to shared folder with checksum should return the checksum in the propfind for sharee
@@ -130,6 +131,7 @@ Feature: upload file to shared folder
       | dav-path-version |
       | old              |
       | new              |
+      | spaces           |
 
 
   Scenario Outline: upload a file to shared folder with checksum should return the checksum in the download header for sharee
@@ -154,6 +156,7 @@ Feature: upload file to shared folder
       | dav-path-version |
       | old              |
       | new              |
+      | spaces           |
 
 
   Scenario Outline: sharer shares a file with correct checksum should return the checksum in the propfind for sharee
@@ -177,6 +180,7 @@ Feature: upload file to shared folder
       | dav-path-version |
       | old              |
       | new              |
+      | spaces           |
 
 
   Scenario Outline: sharer shares a file with correct checksum should return the checksum in the download header for sharee
@@ -200,6 +204,7 @@ Feature: upload file to shared folder
       | dav-path-version |
       | old              |
       | new              |
+      | spaces           |
 
 
   Scenario Outline: sharee uploads a file to a received share folder with correct checksum
@@ -290,6 +295,7 @@ Feature: upload file to shared folder
       | dav-path-version |
       | old              |
       | new              |
+      | spaces           |
 
 
   Scenario Outline: sharee uploads a chunked file with correct checksum to a received share folder should work

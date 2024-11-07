@@ -6,12 +6,12 @@ Feature: propagation of etags when restoring a version of a file
 
   Background:
     Given using OCS API version "2"
-    And using new DAV path
     And user "Alice" has been created with default attributes and without skeleton files
 
   @skipOnStorage:ceph @skipOnStorage:scality
-  Scenario: restoring a file changes the etags of all parents
-    Given user "Alice" has created folder "/upload"
+  Scenario Outline: restoring a file changes the etags of all parents
+    Given using <dav-path-version> DAV path
+    And user "Alice" has created folder "/upload"
     And user "Alice" has created folder "/upload/sub"
     And user "Alice" has uploaded file with content "uploaded content" to "/upload/sub/file.txt"
     And user "Alice" has uploaded file with content "changed content" to "/upload/sub/file.txt"
@@ -25,3 +25,8 @@ Feature: propagation of etags when restoring a version of a file
       | Alice | /           |
       | Alice | /upload     |
       | Alice | /upload/sub |
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |

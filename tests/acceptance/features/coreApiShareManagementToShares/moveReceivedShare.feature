@@ -173,8 +173,9 @@ Feature: sharing
       | /dav/spaces/%shares_drive_id%            | /dav/spaces/%spaceid% | Secure Viewer    |
 
 
-  Scenario: keep group share when the one user renames the share and the user is deleted
-    Given group "grp1" has been created
+  Scenario Outline: keep group share when the one user renames the share and the user is deleted
+    Given using <dav-path-version> DAV path
+    And group "grp1" has been created
     And user "Brian" has been added to group "grp1"
     And user "Carol" has been added to group "grp1"
     And user "Alice" has created folder "/TMP"
@@ -189,10 +190,16 @@ Feature: sharing
     And the administrator deletes user "Carol" using the provisioning API
     Then the HTTP status code of responses on each endpoint should be "201, 204" respectively
     And as "Alice" file "Shares/TMP" should not exist
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
 
 
-  Scenario: receiver renames a received share with read, change permissions inside the Shares folder
-    Given user "Alice" has created folder "folderToShare"
+  Scenario Outline: receiver renames a received share with read, change permissions inside the Shares folder
+    Given using <dav-path-version> DAV path
+    And user "Alice" has created folder "folderToShare"
     And user "Alice" has uploaded file with content "thisIsAFileInsideTheSharedFolder" to "/folderToShare/fileInside"
     And user "Alice" has sent the following resource share invitation:
       | resource        | folderToShare |
@@ -210,10 +217,16 @@ Feature: sharing
     And as "Brian" file "/Shares/myFolder/renamedFile" should exist
     And as "Alice" file "/folderToShare/renamedFile" should exist
     But as "Alice" file "/folderToShare/fileInside" should not exist
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
 
   @env-config
   Scenario Outline: receiver tries to rename a received share with read permissions inside the Shares folder
-    Given user "Alice" has created folder "folderToShare"
+    Given using <dav-path-version> DAV path
+    And user "Alice" has created folder "folderToShare"
     And the administrator has enabled the permissions role "Secure Viewer"
     And user "Alice" has created folder "folderToShare/folderInside"
     And user "Alice" has uploaded file with content "thisIsAFileInsideTheSharedFolder" to "/folderToShare/fileInside"
@@ -237,13 +250,18 @@ Feature: sharing
     And as "Brian" folder "/Shares/myFolder/renamedFolder" should not exist
     But as "Brian" folder "Shares/myFolder/folderInside" should exist
     Examples:
-      | permissions-role |
-      | Viewer           |
-      | Secure Viewer    |
+      | permissions-role | dav-path-version |
+      | Viewer           | old              |
+      | Secure Viewer    | old              |
+      | Viewer           | new              |
+      | Secure Viewer    | new              |
+      | Viewer           | spaces           |
+      | Secure Viewer    | spaces           |
 
 
-  Scenario: receiver renames a received folder share to a different name on the same folder
-    Given user "Alice" has created folder "PARENT"
+  Scenario Outline: receiver renames a received folder share to a different name on the same folder
+    Given using <dav-path-version> DAV path
+    And user "Alice" has created folder "PARENT"
     And user "Alice" has sent the following resource share invitation:
       | resource        | PARENT   |
       | space           | Personal |
@@ -255,10 +273,16 @@ Feature: sharing
     Then the HTTP status code should be "201"
     And as "Brian" folder "/Shares/myFolder" should exist
     But as "Alice" folder "myFolder" should not exist
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
 
 
-  Scenario: receiver renames a received file share to different name on the same folder
-    Given user "Alice" has uploaded file "filesForUpload/textfile.txt" to "fileToShare.txt"
+  Scenario Outline: receiver renames a received file share to different name on the same folder
+    Given using <dav-path-version> DAV path
+    And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "fileToShare.txt"
     And user "Alice" has sent the following resource share invitation:
       | resource        | fileToShare.txt |
       | space           | Personal        |
@@ -270,10 +294,16 @@ Feature: sharing
     Then the HTTP status code should be "201"
     And as "Brian" file "/Shares/newFile.txt" should exist
     But as "Alice" file "newFile.txt" should not exist
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
 
 
-  Scenario: receiver renames a received file share to different name on the same folder for group sharing
-    Given group "grp1" has been created
+  Scenario Outline: receiver renames a received file share to different name on the same folder for group sharing
+    Given using <dav-path-version> DAV path
+    And group "grp1" has been created
     And user "Brian" has been added to group "grp1"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "fileToShare.txt"
     And user "Alice" has sent the following resource share invitation:
@@ -287,10 +317,16 @@ Feature: sharing
     Then the HTTP status code should be "201"
     And as "Brian" file "/Shares/newFile.txt" should exist
     But as "Alice" file "newFile.txt" should not exist
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
 
 
-  Scenario: receiver renames a received folder share to different name on the same folder for group sharing
-    Given group "grp1" has been created
+  Scenario Outline: receiver renames a received folder share to different name on the same folder for group sharing
+    Given using <dav-path-version> DAV path
+    And group "grp1" has been created
     And user "Alice" has created folder "PARENT"
     And user "Brian" has been added to group "grp1"
     And user "Alice" has sent the following resource share invitation:
@@ -304,10 +340,16 @@ Feature: sharing
     Then the HTTP status code should be "201"
     And as "Brian" folder "/Shares/myFolder" should exist
     But as "Alice" folder "myFolder" should not exist
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
 
 
-  Scenario: receiver renames a received file share with read,update permissions inside the Shares folder in group sharing
-    Given group "grp1" has been created
+  Scenario Outline: receiver renames a received file share with read,update permissions inside the Shares folder in group sharing
+    Given using <dav-path-version> DAV path
+    And group "grp1" has been created
     And user "Brian" has been added to group "grp1"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "fileToShare.txt"
     And user "Alice" has sent the following resource share invitation:
@@ -321,10 +363,16 @@ Feature: sharing
     Then the HTTP status code should be "201"
     And as "Brian" file "/Shares/newFile.txt" should exist
     But as "Alice" file "/Shares/newFile.txt" should not exist
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
 
 
-  Scenario: receiver renames a received folder share with read, change permissions inside the Shares folder in group sharing
-    Given group "grp1" has been created
+  Scenario Outline: receiver renames a received folder share with read, change permissions inside the Shares folder in group sharing
+    Given using <dav-path-version> DAV path
+    And group "grp1" has been created
     And user "Alice" has created folder "PARENT"
     And user "Brian" has been added to group "grp1"
     And user "Alice" has sent the following resource share invitation:
@@ -338,10 +386,16 @@ Feature: sharing
     Then the HTTP status code should be "201"
     And as "Brian" folder "/Shares/myFolder" should exist
     But as "Alice" folder "/Shares/myFolder" should not exist
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
 
 
-  Scenario: receiver renames a received file share with share, read permissions inside the Shares folder in group sharing)
-    Given group "grp1" has been created
+  Scenario Outline: receiver renames a received file share with share, read permissions inside the Shares folder in group sharing)
+    Given using <dav-path-version> DAV path
+    And group "grp1" has been created
     And user "Brian" has been added to group "grp1"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "fileToShare.txt"
     And user "Alice" has sent the following resource share invitation:
@@ -355,10 +409,16 @@ Feature: sharing
     Then the HTTP status code should be "201"
     And as "Brian" file "/Shares/newFile.txt" should exist
     But as "Alice" file "/Shares/newFile.txt" should not exist
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
 
 
-  Scenario: receiver renames a received folder share with read permissions inside the Shares folder in group sharing
-    Given group "grp1" has been created
+  Scenario Outline: receiver renames a received folder share with read permissions inside the Shares folder in group sharing
+    Given using <dav-path-version> DAV path
+    And group "grp1" has been created
     And user "Alice" has created folder "PARENT"
     And user "Brian" has been added to group "grp1"
     And user "Alice" has sent the following resource share invitation:
@@ -372,10 +432,16 @@ Feature: sharing
     Then the HTTP status code should be "201"
     And as "Brian" folder "/Shares/myFolder" should exist
     But as "Alice" folder "/Shares/myFolder" should not exist
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
 
   @issue-2141
   Scenario Outline: receiver renames a received folder share to name with special characters in group sharing
-    Given group "grp1" has been created
+    Given using <dav-path-version> DAV path
+    And group "grp1" has been created
     And user "Carol" has been added to group "grp1"
     And user "Alice" has created folder "<sharer-folder>"
     And user "Alice" has created folder "<group-folder>"
@@ -396,13 +462,18 @@ Feature: sharing
     And as "Alice" folder "<receiver-folder>" should not exist
     But as "Carol" folder "/Shares/<receiver-folder>" should exist
     Examples:
-      | sharer-folder | group-folder    | receiver-folder |
-      | ?abc=oc #     | ?abc=oc g%rp#   | # oc?test=oc&a  |
-      | @a#8a=b?c=d   | @a#8a=b?c=d grp | ?a#8 a=b?c=d    |
+      | sharer-folder | group-folder    | receiver-folder | dav-path-version |
+      | ?abc=oc #     | ?abc=oc g%rp#   | # oc?test=oc&a  | old              |
+      | @a#8a=b?c=d   | @a#8a=b?c=d grp | ?a#8 a=b?c=d    | old              |
+      | ?abc=oc #     | ?abc=oc g%rp#   | # oc?test=oc&a  | new              |
+      | @a#8a=b?c=d   | @a#8a=b?c=d grp | ?a#8 a=b?c=d    | new              |
+      | ?abc=oc #     | ?abc=oc g%rp#   | # oc?test=oc&a  | spaces           |
+      | @a#8a=b?c=d   | @a#8a=b?c=d grp | ?a#8 a=b?c=d    | spaces           |
 
   @issue-2141
   Scenario Outline: receiver renames a received file share to name with special characters with read, change permissions in group sharing
-    Given group "grp1" has been created
+    Given using <dav-path-version> DAV path
+    And group "grp1" has been created
     And user "Carol" has been added to group "grp1"
     And user "Alice" has created folder "<sharer-folder>"
     And user "Alice" has created folder "<group-folder>"
@@ -425,6 +496,10 @@ Feature: sharing
     And as "Alice" file "<group-folder>/<receiver_file>" should exist
     And as "Carol" file "/Shares/<group-folder>/<receiver_file>" should exist
     Examples:
-      | sharer-folder | group-folder    | receiver_file  |
-      | ?abc=oc #     | ?abc=oc g%rp#   | # oc?test=oc&a |
-      | @a#8a=b?c=d   | @a#8a=b?c=d grp | ?a#8 a=b?c=d   |
+      | sharer-folder | group-folder    | receiver_file  | dav-path-version |
+      | ?abc=oc #     | ?abc=oc g%rp#   | # oc?test=oc&a | old              |
+      | @a#8a=b?c=d   | @a#8a=b?c=d grp | ?a#8 a=b?c=d   | old              |
+      | ?abc=oc #     | ?abc=oc g%rp#   | # oc?test=oc&a | new              |
+      | @a#8a=b?c=d   | @a#8a=b?c=d grp | ?a#8 a=b?c=d   | new              |
+      | ?abc=oc #     | ?abc=oc g%rp#   | # oc?test=oc&a | spaces           |
+      | @a#8a=b?c=d   | @a#8a=b?c=d grp | ?a#8 a=b?c=d   | spaces           |

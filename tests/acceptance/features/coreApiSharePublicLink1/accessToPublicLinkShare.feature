@@ -68,7 +68,8 @@ Feature: accessing a public link share
     Then the HTTP status code of responses on all endpoints should be "200"
 
   @issue-web-10473
-  Scenario: user tries to download public link file using own basic auth
+  Scenario Outline: user tries to download public link file using own basic auth
+    Given using <dav-path-version> DAV path
     And user "Alice" has created folder "FOLDER"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "FOLDER/textfile.txt"
     And using SharingNG
@@ -79,3 +80,7 @@ Feature: accessing a public link share
       | password        | %public% |
     When user "Alice" tries to download file "textfile.txt" from the last public link using own basic auth and new public WebDAV API
     Then the HTTP status code should be "401"
+    Examples:
+      | dav-path-version |
+      | new              |
+      | spaces           |

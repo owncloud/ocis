@@ -18,5 +18,7 @@ Feature: upload file
       | ocs-api-version | dav-path-version |
       | 1               | old              |
       | 1               | new              |
+      | 1               | spaces           |
       | 2               | old              |
       | 2               | new              |
+      | 2               | spaces           |

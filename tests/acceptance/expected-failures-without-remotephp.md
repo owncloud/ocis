@@ -8,6 +8,8 @@
 - [apiContract/spacesReport.feature:34](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiContract/spacesReport.feature#L34)
 - [apiContract/spacesReport.feature:53](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiContract/spacesReport.feature#L53)
 - [apiContract/spacesReport.feature:71](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiContract/spacesReport.feature#L71)
+- [apiContract/spacesSharesReport.feature:48](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiContract/spacesSharesReport.feature#L48)
+- [apiContract/spacesSharesReport.feature:78](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiContract/spacesSharesReport.feature#L78)
 - [apiSearch1/dateSearch.feature:19](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearch1/dateSearch.feature#L19)
 - [apiSearch1/dateSearch.feature:39](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearch1/dateSearch.feature#L39)
 - [apiSearch1/dateSearch.feature:40](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearch1/dateSearch.feature#L40)

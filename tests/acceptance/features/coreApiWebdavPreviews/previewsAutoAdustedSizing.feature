@@ -12,14 +12,25 @@ Feature: sizing of previews of files downloaded through the webdav API
 
 
   Scenario Outline: download different sizes of previews of file
-    Given user "Alice" has uploaded file "filesForUpload/lorem.txt" to "/parent.txt"
+    Given using <dav-path-version> DAV path
+    And user "Alice" has uploaded file "filesForUpload/lorem.txt" to "/parent.txt"
     When user "Alice" downloads the preview of "/parent.txt" with width <request-width> and height <request-height> using the WebDAV API
     Then the HTTP status code should be "200"
     And the downloaded image should be <return-width> pixels wide and <return-height> pixels high
     Examples:
-      | request-width | request-height | return-width | return-height |
-      | 1             | 1              | 16           | 16            |
-      | 32            | 32             | 32           | 32            |
-      | 1024          | 1024           | 640          | 480           |
-      | 1             | 1024           | 16           | 16            |
-      | 1024          | 1              | 640          | 480           |
+      | request-width | request-height | return-width | return-height | dav-path-version |
+      | 1             | 1              | 16           | 16            | old              |
+      | 32            | 32             | 32           | 32            | old              |
+      | 1024          | 1024           | 640          | 480           | old              |
+      | 1             | 1024           | 16           | 16            | old              |
+      | 1024          | 1              | 640          | 480           | old              |
+      | 1             | 1              | 16           | 16            | new              |
+      | 32            | 32             | 32           | 32            | new              |
+      | 1024          | 1024           | 640          | 480           | new              |
+      | 1             | 1024           | 16           | 16            | new              |
+      | 1024          | 1              | 640          | 480           | new              |
+      | 1             | 1              | 16           | 16            | spaces           |
+      | 32            | 32             | 32           | 32            | spaces           |
+      | 1024          | 1024           | 640          | 480           | spaces           |
+      | 1             | 1024           | 16           | 16            | spaces           |
+      | 1024          | 1              | 640          | 480           | spaces           |

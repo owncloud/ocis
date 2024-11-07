@@ -109,8 +109,9 @@ Feature: sharing
     And as "Brian" folder "/Shares/merge-test-inside-twogroups-perms (2)" should not exist
 
 
-  Scenario: merging shares for recipient when shared from outside with group then user and recipient renames in between
-    Given user "Alice" has created folder "/merge-test-outside-groups-renamebeforesecondshare"
+  Scenario Outline: merging shares for recipient when shared from outside with group then user and recipient renames in between
+    Given using <dav-path-version> DAV path
+    And user "Alice" has created folder "/merge-test-outside-groups-renamebeforesecondshare"
     # Section 1: Brian receives and accepts the group share from Alice and moves and renames it out of the "Shares" folder
     When user "Alice" shares folder "/merge-test-outside-groups-renamebeforesecondshare" with group "grp1" using the sharing API
     And user "Brian" accepts share "/merge-test-outside-groups-renamebeforesecondshare" offered by user "Alice" using the sharing API
@@ -126,10 +127,16 @@ Feature: sharing
     And the HTTP status code of responses on all endpoints should be "200"
     And as "Brian" folder "/Shares/merge-test-outside-groups-renamebeforesecondshare" should exist
     But as "Brian" folder "/merge-test-outside-groups-renamebeforesecondshare-renamed" should not exist
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
 
 
-  Scenario: merging shares for recipient when shared from outside with user then group and recipient renames in between
-    Given user "Alice" has created folder "/merge-test-outside-groups-renamebeforesecondshare"
+  Scenario Outline: merging shares for recipient when shared from outside with user then group and recipient renames in between
+    Given using <dav-path-version> DAV path
+    And user "Alice" has created folder "/merge-test-outside-groups-renamebeforesecondshare"
     # Section 1: Brian receives and accepts the user share from Alice and moves and renames it out of the "Shares" folder
     When user "Alice" shares folder "/merge-test-outside-groups-renamebeforesecondshare" with user "Brian" using the sharing API
     And user "Brian" accepts share "/merge-test-outside-groups-renamebeforesecondshare" offered by user "Alice" using the sharing API
@@ -146,3 +153,8 @@ Feature: sharing
     And the HTTP status code of responses on all endpoints should be "200"
     And as "Brian" folder "/Shares/merge-test-outside-groups-renamebeforesecondshare" should exist
     But as "Brian" folder "/merge-test-outside-groups-renamebeforesecondshare-renamed" should not exist
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |

@@ -17,6 +17,7 @@ Feature: upload file
       | dav-path-version |
       | old              |
       | new              |
+      | spaces           |
 
 
   Scenario Outline: attempt to upload a file into a nonexistent folder
@@ -49,6 +50,7 @@ Feature: upload file
       | dav-path-version |
       | old              |
       | new              |
+      | spaces           |
 
   @skipOnReva
   Scenario Outline: attempt to upload a file into a nonexistent folder within correctly received read only share
@@ -69,3 +71,4 @@ Feature: upload file
       | dav-path-version |
       | old              |
       | new              |
+      | spaces           |

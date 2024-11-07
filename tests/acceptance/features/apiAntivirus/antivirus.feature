@@ -89,6 +89,7 @@ Feature: antivirus
     Examples:
       | dav-path-version |
       | old              |
+      | new              |
       | spaces           |
 
   @issue-10331
@@ -168,6 +169,8 @@ Feature: antivirus
       | old              | eicar_com.zip | virusFile2.zip |
       | new              | eicar.com     | virusFile1.txt |
       | new              | eicar_com.zip | virusFile2.zip |
+      | spaces           | eicar.com     | virusFile1.txt |
+      | spaces           | eicar_com.zip | virusFile2.zip |
 
 
   Scenario Outline: upload a file with virus to a user share using spaces dav endpoint
@@ -220,6 +223,8 @@ Feature: antivirus
       | old              | eicar_com.zip | virusFile2.zip |
       | new              | eicar.com     | virusFile1.txt |
       | new              | eicar_com.zip | virusFile2.zip |
+      | spaces           | eicar.com     | virusFile1.txt |
+      | spaces           | eicar_com.zip | virusFile2.zip |
 
 
   Scenario Outline: upload a file with virus to a group share using spaces dav endpoint
@@ -428,6 +433,7 @@ Feature: antivirus
       | dav-path-version |
       | old              |
       | new              |
+      | spaces           |
 
 
   Scenario: try to overwrite a file with the virus content in group share using spaces dav endpoint
@@ -491,6 +497,7 @@ Feature: antivirus
       | dav-path-version |
       | old              |
       | new              |
+      | spaces           |
 
 
   Scenario: try to overwrite a file with the virus content in user share using spaces dav endpoint

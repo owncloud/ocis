@@ -16,11 +16,11 @@ Feature: Report test
     And user "Alice" has created a space "find data" with the default quota using the Graph API
     And user "Alice" has created a folder "folderMain/SubFolder1/subFOLDER2" in space "find data"
     And user "Alice" has uploaded a file inside space "find data" with content "some content" to "folderMain/SubFolder1/subFOLDER2/insideTheFolder.txt"
-    And using new DAV path
 
 
-  Scenario: check the response of the found folder
-    Given user "Alice" has sent the following resource share invitation:
+  Scenario Outline: check the response of the found folder
+    Given using <dav-path-version> DAV path
+    And user "Alice" has sent the following resource share invitation:
       | resource        | folderMain |
       | space           | find data  |
       | sharee          | Brian      |
@@ -41,10 +41,16 @@ Feature: Report test
       | oc:permissions    | S                    |
       | oc:size           | 12                   |
       | oc:remote-item-id | %file_id_pattern%    |
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
 
 
-  Scenario: check the response of the found file
-    Given user "Alice" has sent the following resource share invitation:
+  Scenario Outline: check the response of the found file
+    Given using <dav-path-version> DAV path
+    And user "Alice" has sent the following resource share invitation:
       | resource        | folderMain |
       | space           | find data  |
       | sharee          | Brian      |
@@ -65,10 +71,16 @@ Feature: Report test
       | oc:permissions     | SD                  |
       | d:getcontentlength | 12                  |
       | oc:remote-item-id  | %file_id_pattern%   |
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
 
 
-  Scenario: search for the shared folder when the share is not accepted
-    Given user "Brian" has disabled auto-accepting
+  Scenario Outline: search for the shared folder when the share is not accepted
+    Given using <dav-path-version> DAV path
+    And user "Brian" has disabled auto-accepting
     And user "Alice" has sent the following resource share invitation:
       | resource        | folderMain |
       | space           | find data  |
@@ -80,3 +92,8 @@ Feature: Report test
     And the following headers should match these regular expressions
       | X-Request-Id | %request_id_pattern% |
     And the search result should contain "0" entries
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |

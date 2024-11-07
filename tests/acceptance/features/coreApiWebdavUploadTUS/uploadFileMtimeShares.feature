@@ -47,6 +47,7 @@ Feature: upload file
       | dav-path-version |
       | old              |
       | new              |
+      | spaces           |
 
   @issue-10346
   Scenario Outline: overwriting a file with mtime in a received share
@@ -87,3 +88,4 @@ Feature: upload file
       | dav-path-version |
       | old              |
       | new              |
+      | spaces           |

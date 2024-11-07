@@ -127,8 +127,9 @@ Feature: sharing
       | 2               | 400              | create,delete |
 
   @issue-2442
-  Scenario: share ownership change after moving a shared file to another share
-    Given these users have been created with default attributes and without skeleton files:
+  Scenario Outline: share ownership change after moving a shared file to another share
+    Given using <dav-path-version> DAV path
+    And these users have been created with default attributes and without skeleton files:
       | username |
       | Brian    |
       | Carol    |
@@ -151,6 +152,11 @@ Feature: sharing
     And user "Brian" has a share "Carol-folder" synced
     When user "Brian" moves folder "/Shares/Alice-folder/folder2" to "/Shares/Carol-folder/folder2" using the WebDAV API
     Then the HTTP status code should be "502"
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
 
   @issue-1253 @issue-1224 @issue-1225
   Scenario Outline: change the permission of the share and check the API response
@@ -252,3 +258,4 @@ Feature: sharing
       | dav-path-version |
       | old              |
       | new              |
+      | spaces           |
