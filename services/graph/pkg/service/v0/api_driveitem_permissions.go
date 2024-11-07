@@ -168,11 +168,9 @@ func (s DriveItemPermissionsService) Invite(ctx context.Context, resourceId *sto
 		shareid = createShareResponse.GetShare().GetId().GetOpaqueId()
 		expiration = createShareResponse.GetShare().GetExpiration()
 	default:
-		federated := false
 		user, err := s.identityCache.GetUser(ctx, objectID)
 		if errors.Is(err, identity.ErrNotFound) && s.config.IncludeOCMSharees {
 			user, err = s.identityCache.GetAcceptedUser(ctx, objectID)
-			federated = true
 			if err == nil && IsSpaceRoot(statResponse.GetInfo().GetId()) {
 				return libregraph.Permission{}, errorcode.New(errorcode.InvalidRequest, "federated user can not become a space member")
 			}
@@ -189,7 +187,7 @@ func (s DriveItemPermissionsService) Invite(ctx context.Context, resourceId *sto
 			},
 		}
 
-		if federated {
+		if user.GetUserType() == identity.UserTypeFederated {
 			if len(user.Identities) < 1 {
 				return libregraph.Permission{}, errorcode.New(errorcode.InvalidRequest, "user has no federated identity")
 			}
