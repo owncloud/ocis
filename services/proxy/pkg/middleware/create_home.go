@@ -106,6 +106,9 @@ func (m createHome) getUserRoles(user *userv1beta1.User) ([]string, error) {
 }
 
 func (m createHome) checkRoleQuotaLimit(roleIDs []string) (uint64, bool) {
+	if len(roleIDs) == 0 {
+		return 0, false
+	}
 	id := roleIDs[0] // At the moment a user can only have one role.
 	quota, ok := m.roleQuotas[id]
 	return quota, ok
