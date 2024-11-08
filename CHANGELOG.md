@@ -57,40 +57,33 @@ The following sections list the changes for 7.0.0-rc.1.
 
 ## Summary
 
-* Bugfix - Respect proxy url when validating proofkeys: [#1234](https://github.com/owncloud/ocis/pull/1234)
 * Bugfix - Generate short tokens to be used as access tokens for WOPI: [#10391](https://github.com/owncloud/ocis/pull/10391)
 * Bugfix - Fix put relative wopi operation for microsoft: [#10403](https://github.com/owncloud/ocis/pull/10403)
 * Bugfix - Make SSE keepalive interval configurable: [#10411](https://github.com/owncloud/ocis/pull/10411)
 * Bugfix - Removed 'OCM_OCM_PROVIDER_AUTHORIZER_VERIFY_REQUEST_HOSTNAME' setting: [#10425](https://github.com/owncloud/ocis/pull/10425)
 * Bugfix - Micro registry cache fixes: [#10429](https://github.com/owncloud/ocis/pull/10429)
-* Bugfix - Fix the memlimit loglevel: [#10431](https://github.com/owncloud/ocis/pull/10431)
+* Bugfix - Fix the memlimit loglevel: [#10433](https://github.com/owncloud/ocis/pull/10433)
 * Bugfix - Restart Postprocessing properly: [#10439](https://github.com/owncloud/ocis/pull/10439)
 * Bugfix - Allow to configure data server URL for ocm: [#10440](https://github.com/owncloud/ocis/pull/10440)
-* Bugfix - Return wopi lock header in get lock response: [#10469](https://github.com/owncloud/ocis/pull/10469)
+* Bugfix - Respect proxy url when validating proofkeys: [#10462](https://github.com/owncloud/ocis/pull/10462)
+* Bugfix - Return wopi lock header in get lock response: [#10470](https://github.com/owncloud/ocis/pull/10470)
 * Bugfix - 'ocis backup consistency' fixed for file revisions: [#10493](https://github.com/owncloud/ocis/pull/10493)
 * Bugfix - Wait for services to be ready before registering them: [#10498](https://github.com/owncloud/ocis/pull/10498)
 * Bugfix - Fix 0-byte file uploads: [#10500](https://github.com/owncloud/ocis/pull/10500)
 * Bugfix - Fixed `sharedWithMe` response for OCM shares: [#10501](https://github.com/owncloud/ocis/pull/10501)
 * Bugfix - Fix gateway nats checks: [#10502](https://github.com/owncloud/ocis/pull/10502)
-* Enhancement - Create thumbnails for GGP MIME types: [#10303](https://github.com/owncloud/ocis/pull/10303)
+* Enhancement - Create thumbnails for GGP MIME types: [#10304](https://github.com/owncloud/ocis/pull/10304)
 * Enhancement - Include a product name in the collaboration service: [#10335](https://github.com/owncloud/ocis/pull/10335)
 * Enhancement - Add web extensions to the ocis_full example: [#10399](https://github.com/owncloud/ocis/pull/10399)
 * Enhancement - Bump reva to 2.26.4: [#10419](https://github.com/owncloud/ocis/pull/10419)
-* Enhancement - Remove deprecated CLI commands: [#10430](https://github.com/owncloud/ocis/pull/10430)
-* Enhancement - Bump cs3api: [#10448](https://github.com/owncloud/ocis/pull/10448)
+* Enhancement - Remove deprecated CLI commands: [#10432](https://github.com/owncloud/ocis/pull/10432)
+* Enhancement - Bump cs3api: [#10449](https://github.com/owncloud/ocis/pull/10449)
 * Enhancement - Update web to v11.0.2: [#10467](https://github.com/owncloud/ocis/pull/10467)
 * Enhancement - Bump reva to latest: [#10472](https://github.com/owncloud/ocis/pull/10472)
 * Enhancement - Concurrent userlog processing: [#10504](https://github.com/owncloud/ocis/pull/10504)
-* Enhancement - Concurrent autoaccept for shares: [#10505](https://github.com/owncloud/ocis/pull/10505)
+* Enhancement - Concurrent autoaccept for shares: [#10507](https://github.com/owncloud/ocis/pull/10507)
 
 ## Details
-
-* Bugfix - Respect proxy url when validating proofkeys: [#1234](https://github.com/owncloud/ocis/pull/1234)
-
-   We fixed a bug where the proxied wopi URL was not used when validating
-   proofkeys. This caused the validation to fail when the proxy was used.
-
-   https://github.com/owncloud/ocis/pull/1234
 
 * Bugfix - Generate short tokens to be used as access tokens for WOPI: [#10391](https://github.com/owncloud/ocis/pull/10391)
 
@@ -133,12 +126,12 @@ The following sections list the changes for 7.0.0-rc.1.
 
    https://github.com/owncloud/ocis/pull/10429
 
-* Bugfix - Fix the memlimit loglevel: [#10431](https://github.com/owncloud/ocis/pull/10431)
+* Bugfix - Fix the memlimit loglevel: [#10433](https://github.com/owncloud/ocis/pull/10433)
 
    We set the memlimit default loglevel to error.
 
-   https://github.com/owncloud/ocis/issues/10428
-   https://github.com/owncloud/ocis/pull/10431
+   https://github.com/owncloud/ocis/issues/10427
+   https://github.com/owncloud/ocis/pull/10433
 
 * Bugfix - Restart Postprocessing properly: [#10439](https://github.com/owncloud/ocis/pull/10439)
 
@@ -156,12 +149,19 @@ The following sections list the changes for 7.0.0-rc.1.
    https://github.com/owncloud/ocis/issues/10358
    https://github.com/owncloud/ocis/pull/10440
 
-* Bugfix - Return wopi lock header in get lock response: [#10469](https://github.com/owncloud/ocis/pull/10469)
+* Bugfix - Respect proxy url when validating proofkeys: [#10462](https://github.com/owncloud/ocis/pull/10462)
+
+   We fixed a bug where the proxied wopi URL was not used when validating
+   proofkeys. This caused the validation to fail when the proxy was used.
+
+   https://github.com/owncloud/ocis/pull/10462
+
+* Bugfix - Return wopi lock header in get lock response: [#10470](https://github.com/owncloud/ocis/pull/10470)
 
    We fixed a bug where the wopi lock header was not returned in the get lock
    response. This is now fixed and the wopi validator tests are passing.
 
-   https://github.com/owncloud/ocis/pull/10469
+   https://github.com/owncloud/ocis/pull/10470
 
 * Bugfix - 'ocis backup consistency' fixed for file revisions: [#10493](https://github.com/owncloud/ocis/pull/10493)
 
@@ -198,11 +198,11 @@ The following sections list the changes for 7.0.0-rc.1.
 
    https://github.com/owncloud/ocis/pull/10502
 
-* Enhancement - Create thumbnails for GGP MIME types: [#10303](https://github.com/owncloud/ocis/pull/10303)
+* Enhancement - Create thumbnails for GGP MIME types: [#10304](https://github.com/owncloud/ocis/pull/10304)
 
    Creates thumbnails for newly added ggp files
 
-   https://github.com/owncloud/ocis/pull/10303
+   https://github.com/owncloud/ocis/pull/10304
 
 * Enhancement - Include a product name in the collaboration service: [#10335](https://github.com/owncloud/ocis/pull/10335)
 
@@ -246,17 +246,17 @@ The following sections list the changes for 7.0.0-rc.1.
 
    https://github.com/owncloud/ocis/pull/10419
 
-* Enhancement - Remove deprecated CLI commands: [#10430](https://github.com/owncloud/ocis/pull/10430)
+* Enhancement - Remove deprecated CLI commands: [#10432](https://github.com/owncloud/ocis/pull/10432)
 
    We removed the following deprecated CLI commands: `ocis storage-users uploads
    list` `ocis storage-users uploads clean`
 
    https://github.com/owncloud/ocis/issues/10428
-   https://github.com/owncloud/ocis/pull/10430
+   https://github.com/owncloud/ocis/pull/10432
 
-* Enhancement - Bump cs3api: [#10448](https://github.com/owncloud/ocis/pull/10448)
+* Enhancement - Bump cs3api: [#10449](https://github.com/owncloud/ocis/pull/10449)
 
-   https://github.com/owncloud/ocis/pull/10448
+   https://github.com/owncloud/ocis/pull/10449
 
 * Enhancement - Update web to v11.0.2: [#10467](https://github.com/owncloud/ocis/pull/10467)
 
@@ -301,12 +301,12 @@ The following sections list the changes for 7.0.0-rc.1.
 
    https://github.com/owncloud/ocis/pull/10504
 
-* Enhancement - Concurrent autoaccept for shares: [#10505](https://github.com/owncloud/ocis/pull/10505)
+* Enhancement - Concurrent autoaccept for shares: [#10507](https://github.com/owncloud/ocis/pull/10507)
 
    Shares for groups are now concurrently accepted. Tha default of 25 goroutinges
    can be changed with the new `FRONTEND_MAX_CONCURRENCY` environment variable.
 
-   https://github.com/owncloud/ocis/pull/10505
+   https://github.com/owncloud/ocis/pull/10507
    https://github.com/owncloud/ocis/pull/10476
 
 # Changelog for [6.6.1] (2024-10-24)
