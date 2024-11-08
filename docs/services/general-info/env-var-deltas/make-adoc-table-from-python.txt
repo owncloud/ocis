@@ -1,7 +1,0 @@
-it is most easiest to create the added/removed/deprecated adoc tables using
-the python script in docs/helpers/changes_envvars.py
-
-the script creates based on variables that need to be adapted according your needs
-all files necessary. finally you only MUST handle xrefs manually, see existing files
-for an example for how to do so.
-

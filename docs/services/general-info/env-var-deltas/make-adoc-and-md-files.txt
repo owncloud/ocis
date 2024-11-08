@@ -1,0 +1,1 @@
+see docs/helpers/README.md#doc-tasks-for-new-releases for details how to create the necessary .adoc and .md files
