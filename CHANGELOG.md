@@ -59,6 +59,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Fix idp guest role default assignment: [#10511](https://github.com/owncloud/ocis/pull/10511)
+* Bugfix - Remove mbreaker: [#10524](https://github.com/owncloud/ocis/pull/10524)
 
 ## Details
 
@@ -68,6 +69,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/10474
    https://github.com/owncloud/ocis/pull/10511
+
+* Bugfix - Remove mbreaker: [#10524](https://github.com/owncloud/ocis/pull/10524)
+
+   The circuit breaker is not handle correctly and leads therefore to more issues
+   than it solves. We removed it.
+
+   https://github.com/owncloud/ocis/pull/10524
 
 # Changelog for [7.0.0-rc.1] (2024-11-07)
 
