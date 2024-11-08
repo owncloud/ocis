@@ -3,7 +3,7 @@
     "name": "ocis-server",
     "full_name": "first-ocis-instance",
     "organization": "Owncloud",
-    "domain": "ocis-server:9200",
+    "domain": "localhost:9200",
     "homepage": "https://owncloud.com",
     "services": [
       {
@@ -13,11 +13,11 @@
             "description": "CERNBox Open Cloud Mesh API"
           },
           "name": "CERNBox - OCM API",
-          "path": "https://ocis-server:9200/ocm/",
+          "path": "https://localhost:9200/ocm/",
           "is_monitored": true
         },
         "api_version": "0.0.1",
-        "host": "ocis-server:9200"
+        "host": "localhost:9200"
       }
     ]
   },
@@ -25,7 +25,7 @@
     "name": "federation-ocis-server",
     "full_name": "Federation ocis",
     "organization": "Owncloud",
-    "domain": "federation-ocis-server:10200",
+    "domain": "localhost:10200",
     "homepage": "https://owncloud.com",
     "services": [
       {
@@ -35,11 +35,11 @@
             "description": "CERNBox Open Cloud Mesh API"
           },
           "name": "CERNBox - OCM API",
-          "path": "https://federation-ocis-server:10200/ocm/",
+          "path": "https://localhost:10200/ocm/",
           "is_monitored": true
         },
         "api_version": "0.0.1",
-        "host": "federation-ocis-server:10200"
+        "host": "localhost:10200"
       }
     ]
   }

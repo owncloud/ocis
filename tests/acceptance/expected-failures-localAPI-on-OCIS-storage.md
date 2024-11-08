@@ -255,7 +255,7 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 
 #### [OCM. server crash after deleting share for ocm user](https://github.com/owncloud/ocis/issues/10213)
 
-- [apiOcm/deleteFederatedConnections.feature:103](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/deleteFederatedConnections.feature#L103)
+- [apiOcm/deleteFederatedConnections.feature:102](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/deleteFederatedConnections.feature#L102)
 
 #### [same href in REPORT request for all dav-path-version](https://github.com/owncloud/ocis/issues/7060)
 

@@ -18,12 +18,11 @@ Feature: an user shares resources using ScienceMesh application
     And user "Alice" has created folder "folderToShare"
     And user "Alice" has uploaded file with content "ocm test" to "/textfile.txt"
     When user "Alice" sends the following resource share invitation to federated user using the Graph API:
-      | resource        | <resource>                    |
-      | space           | Personal                      |
-      | sharee          | Brian                         |
-      | shareType       | user                          |
-      | permissionsRole | Viewer                        |
-      | federatedServer | @federation-ocis-server:10200 |
+      | resource        | <resource> |
+      | space           | Personal   |
+      | sharee          | Brian      |
+      | shareType       | user       |
+      | permissionsRole | Viewer     |
     Then the HTTP status code should be "200"
     When using server "REMOTE"
     And user "Brian" lists the shares shared with him without retry using the Graph API
@@ -112,12 +111,11 @@ Feature: an user shares resources using ScienceMesh application
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
     And user "Alice" has created a folder "folderToShare" in space "projectSpace"
     When user "Alice" sends the following resource share invitation to federated user using the Graph API:
-      | resource        | folderToShare                 |
-      | space           | projectSpace                  |
-      | sharee          | Brian                         |
-      | shareType       | user                          |
-      | permissionsRole | Viewer                        |
-      | federatedServer | @federation-ocis-server:10200 |
+      | resource        | folderToShare |
+      | space           | projectSpace  |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Viewer        |
     Then the HTTP status code should be "200"
     When using server "REMOTE"
     And user "Brian" lists the shares shared with him without retry using the Graph API
@@ -185,12 +183,11 @@ Feature: an user shares resources using ScienceMesh application
     And user "Brian" has created folder "folderToShare"
     And user "Brian" has uploaded file with content "ocm test" to "/textfile.txt"
     When user "Brian" sends the following resource share invitation to federated user using the Graph API:
-      | resource        | <resource>        |
-      | space           | Personal          |
-      | sharee          | Alice             |
-      | shareType       | user              |
-      | permissionsRole | Viewer            |
-      | federatedServer | @ocis-server:9200 |
+      | resource        | <resource> |
+      | space           | Personal   |
+      | sharee          | Alice      |
+      | shareType       | user       |
+      | permissionsRole | Viewer     |
     Then the HTTP status code should be "200"
     When using server "LOCAL"
     And user "Alice" lists the shares shared with her without retry using the Graph API
@@ -277,11 +274,10 @@ Feature: an user shares resources using ScienceMesh application
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "alice's space" with the default quota using the Graph API
     When user "Alice" tries to send the following space share invitation to federated user using permissions endpoint of the Graph API:
-      | space           | alice's space                 |
-      | sharee          | Brian                         |
-      | shareType       | user                          |
-      | permissionsRole | <permissions-role>            |
-      | federatedServer | @federation-ocis-server:10200 |
+      | space           | alice's space      |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
     Then the HTTP status code should be "400"
     And the JSON data of the response should match
       """
@@ -334,11 +330,10 @@ Feature: an user shares resources using ScienceMesh application
     And "Brian" has accepted invitation
     And using server "LOCAL"
     When user "Alice" tries to send the following space share invitation to federated user using root endpoint of the Graph API:
-      | space           | alice's space                 |
-      | sharee          | Brian                         |
-      | shareType       | user                          |
-      | permissionsRole | <permissions-role>            |
-      | federatedServer | @federation-ocis-server:10200 |
+      | space           | alice's space      |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
     Then the HTTP status code should be "400"
     And the JSON data of the response should match
       """
@@ -389,12 +384,11 @@ Feature: an user shares resources using ScienceMesh application
     And "Brian" has accepted invitation
     And using server "LOCAL"
     And user "Alice" has sent the following resource share invitation to federated user:
-      | resource        | textfile.txt                  |
-      | space           | Personal                      |
-      | sharee          | Brian                         |
-      | shareType       | user                          |
-      | permissionsRole | Viewer                        |
-      | federatedServer | @federation-ocis-server:10200 |
+      | resource        | textfile.txt |
+      | space           | Personal     |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | Viewer       |
     When user "Alice" lists the shares shared by her using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should contain resource "textfile.txt" with the following data:
@@ -511,12 +505,11 @@ Feature: an user shares resources using ScienceMesh application
     And using server "LOCAL"
     And user "Alice" has uploaded file with content "ocm test" to "/textfile.txt"
     And user "Alice" has sent the following resource share invitation to federated user:
-      | resource        | textfile.txt                  |
-      | space           | Personal                      |
-      | sharee          | Brian                         |
-      | shareType       | user                          |
-      | permissionsRole | Viewer                        |
-      | federatedServer | @federation-ocis-server:10200 |
+      | resource        | textfile.txt |
+      | space           | Personal     |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | Viewer       |
     And using server "LOCAL"
     When user "Alice" gets permissions list for file "textfile.txt" of the space "Personal" using the Graph API
     Then the HTTP status code should be "200"

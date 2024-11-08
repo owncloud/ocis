@@ -71,12 +71,11 @@ Feature: delete federated connections
     And using server "LOCAL"
     And user "Alice" has created folder "folderToShare"
     And user "Alice" has sent the following resource share invitation to federated user:
-      | resource        | folderToShare                 |
-      | space           | Personal                      |
-      | sharee          | Brian                         |
-      | shareType       | user                          |
-      | permissionsRole | Viewer                        |
-      | federatedServer | @federation-ocis-server:10200 |
+      | resource        | folderToShare |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Viewer        |
     And using server "REMOTE"
     When user "Brian" deletes federated connection with user "Alice" using the Graph API
     Then the HTTP status code should be "200"
@@ -108,12 +107,11 @@ Feature: delete federated connections
     And using server "LOCAL"
     And user "Alice" has created folder "folderToShare"
     And user "Alice" has sent the following resource share invitation to federated user:
-      | resource        | folderToShare                 |
-      | space           | Personal                      |
-      | sharee          | Brian                         |
-      | shareType       | user                          |
-      | permissionsRole | Viewer                        |
-      | federatedServer | @federation-ocis-server:10200 |
+      | resource        | folderToShare |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Viewer        |
     When user "Alice" deletes federated connection with user "Brian" using the Graph API
     Then the HTTP status code should be "200"
     And using server "REMOTE"

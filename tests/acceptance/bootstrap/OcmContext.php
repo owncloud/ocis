@@ -54,20 +54,6 @@ class OcmContext implements Context {
 
 	/**
 	 * @return string
-	 */
-	public function getOcisDomain(): string {
-		return $this->extractDomain(OcisHelper::getServerUrl());
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getFedOcisDomain(): string {
-		return $this->extractDomain(\getenv('TEST_SERVER_FED_URL'));
-	}
-
-	/**
-	 * @return string
 	 * @throws Exception
 	 */
 	public function getLastFederatedInvitationToken():string {
@@ -75,18 +61,6 @@ class OcmContext implements Context {
 			throw new Exception(__METHOD__ . " token not found");
 		}
 		return $this->invitationToken;
-	}
-
-	/**
-	 * @param string $url
-	 *
-	 * @return string
-	 */
-	public function extractDomain($url): string {
-		if (!$url) {
-			return "localhost";
-		}
-		return parse_url($url)["host"];
 	}
 
 	/**
@@ -152,7 +126,10 @@ class OcmContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function acceptInvitation(string $user, string $token = null): ResponseInterface {
-		$providerDomain = ($this->featureContext->getCurrentServer() === "LOCAL") ? $this->getFedOcisDomain() : $this->getOcisDomain();
+		$providerDomain = $this->featureContext->getLocalBaseUrlWithoutScheme();
+		if ($this->featureContext->getCurrentServer() === "LOCAL") {
+			$providerDomain = $this->featureContext->getRemoteBaseUrlWithoutScheme();
+		}
 		return OcmHelper::acceptInvitation(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
