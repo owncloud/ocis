@@ -1573,7 +1573,6 @@ trait WebDav {
 				//       /some-folder%20with%20spaces/sub-folder
 				// So we need both $elementToRequest and $expectedElement
 				$expectedElement = $this->encodePath($elementToRequest);
-
 				$responseXmlObject = $this->listFolderAndReturnResponseXml(
 					$user,
 					$elementToRequest,
@@ -1585,7 +1584,7 @@ trait WebDav {
 				$element = $responseXmlObject->xpath(
 					"//d:response/d:href"
 				);
-
+				// check the first element because the requested resource will always be the first one
 				if (!$expectedToBeListed && isset($element[0])
 				) {
 					Assert::fail(
@@ -1600,7 +1599,6 @@ trait WebDav {
 						);
 					}
 				}
-
 			}
 		}
 	}
