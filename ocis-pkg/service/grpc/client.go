@@ -7,7 +7,6 @@ import (
 	"os"
 
 	mgrpcc "github.com/go-micro/plugins/v4/client/grpc"
-	mbreaker "github.com/go-micro/plugins/v4/wrapper/breaker/gobreaker"
 	mtracer "github.com/go-micro/plugins/v4/wrapper/trace/opentelemetry"
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
@@ -69,7 +68,6 @@ func NewClient(opts ...ClientOption) (client.Client, error) {
 	var tlsConfig *tls.Config
 	cOpts := []client.Option{
 		client.Registry(reg),
-		client.Wrap(mbreaker.NewClientWrapper()),
 		client.Wrap(mtracer.NewClientWrapper(
 			mtracer.WithTraceProvider(options.tp),
 		)),
