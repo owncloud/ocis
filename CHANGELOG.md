@@ -1,5 +1,6 @@
 # Table of Contents
 
+* [Changelog for unreleased](#changelog-for-unreleased-unreleased)
 * [Changelog for 7.0.0-rc.1](#changelog-for-700-rc1-2024-11-07)
 * [Changelog for 6.6.1](#changelog-for-661-2024-10-24)
 * [Changelog for 6.6.0](#changelog-for-660-2024-10-21)
@@ -48,6 +49,25 @@
 * [Changelog for 1.2.0](#changelog-for-120-2021-02-17)
 * [Changelog for 1.1.0](#changelog-for-110-2021-01-22)
 * [Changelog for 1.0.0](#changelog-for-100-2020-12-17)
+
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes for unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis/compare/v7.0.0-rc.1...master
+
+## Summary
+
+* Bugfix - Fix idp guest role default assignment: [#10511](https://github.com/owncloud/ocis/pull/10511)
+
+## Details
+
+* Bugfix - Fix idp guest role default assignment: [#10511](https://github.com/owncloud/ocis/pull/10511)
+
+   We fixed an idp guest role default assignment.
+
+   https://github.com/owncloud/ocis/issues/10474
+   https://github.com/owncloud/ocis/pull/10511
 
 # Changelog for [7.0.0-rc.1] (2024-11-07)
 
