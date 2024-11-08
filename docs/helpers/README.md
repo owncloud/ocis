@@ -177,7 +177,7 @@ Because of this, branching and parametrizing admin docs occurs **after** branchi
   * Release based envvar changes are saved during manual generation in `/docs/services/general-info/env-var-deltas/<filename>` but will be _copied_ on each merge into the doc branch into a subfolder named `services/_include/adoc/env-var-deltas/<filename>`.
 
 * Exclude paths for Hugo
-  * The paths defined above for .adoc files are excluded from parsing by Hugo. The source of what to exclude is defined in the `config.yaml` file located in [github.io](https://github.com/owncloud/owncloud.github.io/). Any folder containg .adoc files must be added there else `make -C docs docs-serve` or CI will fail reporting an adoc related parsing error. (We could also add an asciidoc parser to Hugo as alternative...)
+  * The paths defined above for .adoc files are excluded from parsing by Hugo. The source of what to exclude is defined in the `config.yaml` file located in [owncloud.github.io](https://github.com/owncloud/owncloud.github.io/). Any folder containg .adoc files must be added there else `make -C docs docs-serve` or CI will fail reporting an adoc related parsing error. (We could also add an asciidoc parser to Hugo as alternative...)
 
 ### Task List
 
