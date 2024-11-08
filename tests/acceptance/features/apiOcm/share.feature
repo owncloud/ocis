@@ -753,3 +753,26 @@ Feature: an user shares resources using ScienceMesh application
     Then the HTTP status code should be "200"
     And the downloaded image should be "32" pixels wide and "32" pixels high
     And the downloaded preview content should match with "thumbnail.png" fixtures preview content
+
+  @issue-10358
+  Scenario: user edits content of a federated share file
+    Given using spaces DAV path
+    And using server "LOCAL"
+    And "Alice" has created the federation share invitation
+    And using server "REMOTE"
+    And "Brian" has accepted invitation
+    And using server "LOCAL"
+    And user "Alice" has uploaded file with content "ocm test" to "/textfile.txt"
+    And user "Alice" has sent the following resource share invitation to federated user:
+      | resource        | textfile.txt |
+      | space           | Personal     |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | File Editor  |
+    And using server "REMOTE"
+    And for user "Brian" the content of file "textfile.txt" of federated share "textfile.txt" should be "ocm test"
+    When user "Brian" updates the content of federated share "textfile.txt" with "this is a new content" using the WebDAV API
+    Then the HTTP status code should be "204"
+    And for user "Brian" the content of file "textfile.txt" of federated share "textfile.txt" should be "this is a new content"
+    And using server "LOCAL"
+    And for user "Alice" the content of the file "textfile.txt" of the space "Personal" should be "this is a new content"
