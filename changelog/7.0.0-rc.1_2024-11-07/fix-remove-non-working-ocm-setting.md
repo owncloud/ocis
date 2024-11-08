@@ -8,5 +8,5 @@ We are not going through the normal deprecation process for this setting, as it
 was never really working anyway. If you have this setting in your configuration,
 it will be ignored. You can safely remove it.
 
-https://github.com/owncloud/ocis/pull/104xx
+https://github.com/owncloud/ocis/pull/10425
 https://github.com/owncloud/ocis/issues/10355
