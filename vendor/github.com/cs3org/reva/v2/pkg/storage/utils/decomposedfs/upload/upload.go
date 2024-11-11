@@ -33,6 +33,12 @@ import (
 
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	"github.com/golang-jwt/jwt"
+	"github.com/pkg/errors"
+	tusd "github.com/tus/tusd/v2/pkg/handler"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/trace"
+
 	"github.com/cs3org/reva/v2/pkg/appctx"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
@@ -41,11 +47,6 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/metadata/prefixes"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/node"
 	"github.com/cs3org/reva/v2/pkg/utils"
-	"github.com/golang-jwt/jwt"
-	"github.com/pkg/errors"
-	tusd "github.com/tus/tusd/v2/pkg/handler"
-	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/trace"
 )
 
 var (
@@ -106,7 +107,25 @@ func (session *OcisSession) GetReader(ctx context.Context) (io.ReadCloser, error
 }
 
 // FinishUpload finishes an upload and moves the file to the internal destination
+// implements tusd.DataStore interface
+// returns tusd errors
 func (session *OcisSession) FinishUpload(ctx context.Context) error {
+	err := session.FinishUploadDecomposed(ctx)
+
+	//  we need to return a tusd error here to make the tusd handler return the correct status code
+	switch err.(type) {
+	case errtypes.AlreadyExists:
+		return tusd.NewError("ERR_ALREADY_EXISTS", err.Error(), http.StatusConflict)
+	case errtypes.Aborted:
+		return tusd.NewError("ERR_PRECONDITION_FAILED", err.Error(), http.StatusPreconditionFailed)
+	default:
+		return err
+	}
+}
+
+// FinishUploadDecomposed finishes an upload and moves the file to the internal destination
+// retures errtypes errors
+func (session *OcisSession) FinishUploadDecomposed(ctx context.Context) error {
 	ctx, span := tracer.Start(session.Context(ctx), "FinishUpload")
 	defer span.End()
 	log := appctx.GetLogger(ctx)
@@ -167,16 +186,7 @@ func (session *OcisSession) FinishUpload(ctx context.Context) error {
 
 	n, err := session.store.CreateNodeForUpload(session, attrs)
 	if err != nil {
-		session.store.Cleanup(ctx, session, true, false, false)
-		//  we need to return a tusd error here to make the tusd handler return the correct status code
-		switch err.(type) {
-		case errtypes.AlreadyExists:
-			return ErrAlreadyExists
-		case errtypes.Aborted:
-			return tusd.NewError("ERR_PRECONDITION_FAILED", err.Error(), http.StatusPreconditionFailed)
-		default:
-			return err
-		}
+		return err
 	}
 	// increase the processing counter for every started processing
 	// will be decreased in Cleanup()
