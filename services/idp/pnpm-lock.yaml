@@ -81,8 +81,8 @@ importers:
         specifier: ^17.0.2
         version: 17.0.2(react@17.0.2)
       react-i18next:
-        specifier: ^15.0.3
-        version: 15.0.3(i18next@23.16.4)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
+        specifier: ^15.1.1
+        version: 15.1.1(i18next@23.16.4)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
       react-redux:
         specifier: ^8.1.3
         version: 8.1.3(@types/react-dom@17.0.25)(@types/react@17.0.80)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)(redux@4.2.1)
@@ -215,7 +215,7 @@ importers:
         version: 4.3.0(postcss@8.4.39)(webpack@5.96.1)
       postcss-normalize:
         specifier: 13.0.0
-        version: 13.0.0(browserslist@4.23.2)(postcss@8.4.39)
+        version: 13.0.0(browserslist@4.24.2)(postcss@8.4.39)
       postcss-preset-env:
         specifier: 10.0.8
         version: 10.0.8(postcss@8.4.39)
@@ -4995,8 +4995,8 @@ packages:
   react-error-overlay@6.0.11:
     resolution: {integrity: sha512-/6UZ2qgEyH2aqzYZgQPxEnz33NJ2gNsnHA2o5+o4wW9bLM/JYQitNP9xPhsXwC08hMMovfGe/8retsdDsczPRg==}
 
-  react-i18next@15.0.3:
-    resolution: {integrity: sha512-BlO1P+oLKjjIxDBQ0GkAIMacgjfMbnvops+3Y5nZXF7UJ99v4KCWr0Na1azJXC8AMiNWp4kgUcFCJM7U9ZsUDg==}
+  react-i18next@15.1.1:
+    resolution: {integrity: sha512-R/Vg9wIli2P3FfeI8o1eNJUJue5LWpFsQePCHdQDmX0Co3zkr6kdT8gAseb/yGeWbNz1Txc4bKDQuZYsC0kQfw==}
     peerDependencies:
       i18next: '>= 23.2.3'
       react: '>= 16.8.0'
@@ -11855,9 +11855,9 @@ snapshots:
       postcss: 8.4.39
       postcss-selector-parser: 7.0.0
 
-  postcss-browser-comments@4.0.0(browserslist@4.23.2)(postcss@8.4.39):
+  postcss-browser-comments@4.0.0(browserslist@4.24.2)(postcss@8.4.39):
     dependencies:
-      browserslist: 4.23.2
+      browserslist: 4.24.2
       postcss: 8.4.39
 
   postcss-calc@10.0.0(postcss@8.4.39):
@@ -12124,12 +12124,12 @@ snapshots:
       postcss: 8.4.39
       postcss-value-parser: 4.2.0
 
-  postcss-normalize@13.0.0(browserslist@4.23.2)(postcss@8.4.39):
+  postcss-normalize@13.0.0(browserslist@4.24.2)(postcss@8.4.39):
     dependencies:
       '@csstools/normalize.css': 12.1.1
-      browserslist: 4.23.2
+      browserslist: 4.24.2
       postcss: 8.4.39
-      postcss-browser-comments: 4.0.0(browserslist@4.23.2)(postcss@8.4.39)
+      postcss-browser-comments: 4.0.0(browserslist@4.24.2)(postcss@8.4.39)
       sanitize.css: 13.0.0
 
   postcss-opacity-percentage@3.0.0(postcss@8.4.39):
@@ -12412,7 +12412,7 @@ snapshots:
 
   react-error-overlay@6.0.11: {}
 
-  react-i18next@15.0.3(i18next@23.16.4)(react-dom@17.0.2(react@17.0.2))(react@17.0.2):
+  react-i18next@15.1.1(i18next@23.16.4)(react-dom@17.0.2(react@17.0.2))(react@17.0.2):
     dependencies:
       '@babel/runtime': 7.25.7
       html-parse-stringify: 3.0.1
