@@ -142,8 +142,8 @@ importers:
         specifier: ^7.0.0
         version: 7.0.0(webpack@5.96.1)
       dotenv:
-        specifier: 16.3.1
-        version: 16.3.1
+        specifier: 16.4.5
+        version: 16.4.5
       dotenv-expand:
         specifier: 10.0.0
         version: 10.0.0
@@ -215,7 +215,7 @@ importers:
         version: 4.3.0(postcss@8.4.39)(webpack@5.96.1)
       postcss-normalize:
         specifier: 13.0.0
-        version: 13.0.0(browserslist@4.23.2)(postcss@8.4.39)
+        version: 13.0.0(browserslist@4.24.2)(postcss@8.4.39)
       postcss-preset-env:
         specifier: 10.0.8
         version: 10.0.8(postcss@8.4.39)
@@ -2758,8 +2758,8 @@ packages:
     resolution: {integrity: sha512-GopVGCpVS1UKH75VKHGuQFqS1Gusej0z4FyQkPdwjil2gNIv+LNsqBlboOzpJFZKVT95GkCyWJbBSdFEFUWI2A==}
     engines: {node: '>=12'}
 
-  dotenv@16.3.1:
-    resolution: {integrity: sha512-IPzF4w4/Rd94bA9imS68tZBaYyBWSCE47V1RGuMrB94iyTOIEwRmVL2x/4An+6mETpLrKJ5hQkB8W4kFAadeIQ==}
+  dotenv@16.4.5:
+    resolution: {integrity: sha512-ZmdL2rui+eB2YwhsWzjInR8LldtZHGDoQ1ugH85ppHKwpUHL7j7rN0Ti9NCnGiQbhaZ11FpR+7ao1dNsmduNUg==}
     engines: {node: '>=12'}
 
   duplexer@0.1.2:
@@ -9728,7 +9728,7 @@ snapshots:
 
   dotenv-expand@10.0.0: {}
 
-  dotenv@16.3.1: {}
+  dotenv@16.4.5: {}
 
   duplexer@0.1.2: {}
 
@@ -11855,9 +11855,9 @@ snapshots:
       postcss: 8.4.39
       postcss-selector-parser: 7.0.0
 
-  postcss-browser-comments@4.0.0(browserslist@4.23.2)(postcss@8.4.39):
+  postcss-browser-comments@4.0.0(browserslist@4.24.2)(postcss@8.4.39):
     dependencies:
-      browserslist: 4.23.2
+      browserslist: 4.24.2
       postcss: 8.4.39
 
   postcss-calc@10.0.0(postcss@8.4.39):
@@ -12124,12 +12124,12 @@ snapshots:
       postcss: 8.4.39
       postcss-value-parser: 4.2.0
 
-  postcss-normalize@13.0.0(browserslist@4.23.2)(postcss@8.4.39):
+  postcss-normalize@13.0.0(browserslist@4.24.2)(postcss@8.4.39):
     dependencies:
       '@csstools/normalize.css': 12.1.1
-      browserslist: 4.23.2
+      browserslist: 4.24.2
       postcss: 8.4.39
-      postcss-browser-comments: 4.0.0(browserslist@4.23.2)(postcss@8.4.39)
+      postcss-browser-comments: 4.0.0(browserslist@4.24.2)(postcss@8.4.39)
       sanitize.css: 13.0.0
 
   postcss-opacity-percentage@3.0.0(postcss@8.4.39):
