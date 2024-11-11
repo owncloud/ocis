@@ -44,6 +44,16 @@ class OcisHelper {
 	}
 
 	/**
+	 * @return string
+	 */
+	public static function getFederatedServerUrl(): string {
+		if (\getenv('TEST_SERVER_FED_URL')) {
+			return \getenv('TEST_SERVER_FED_URL');
+		}
+		return 'https://localhost:10200';
+	}
+
+	/**
 	 * @return bool
 	 */
 	public static function isTestingOnReva():bool {

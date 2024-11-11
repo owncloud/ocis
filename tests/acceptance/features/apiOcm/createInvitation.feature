@@ -148,7 +148,7 @@ Feature: create invitation
 
       Please visit your federation settings and use the following details:
         Token: %fed_invitation_token%
-        ProviderDomain: https://ocis-server:9200
+        ProviderDomain: %local_base_url%
       """
 
   @env-config

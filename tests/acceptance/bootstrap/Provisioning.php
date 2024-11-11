@@ -451,13 +451,8 @@ trait Provisioning {
 			$entry['ownCloudUUID'] = WebDavHelper::generateUUIDv4();
 		}
 
-		if ($this->federatedServerExists()) {
-			if (!\in_array($setting['userid'], $this->ldapCreatedUsers)) {
-				$this->ldap->add($newDN, $entry);
-			}
-		} else {
-			$this->ldap->add($newDN, $entry);
-		}
+		$this->ldap->add($newDN, $entry);
+
 		$this->ldapCreatedUsers[] = $setting["userid"];
 	}
 

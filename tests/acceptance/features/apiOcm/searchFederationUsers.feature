@@ -64,7 +64,7 @@ Feature: search federation users
                     ],
                     "properties": {
                       "issuer": {
-                        "const": "ocis-server:9200"
+                        "const": "%local_host_port%"
                       },
                       "issuerAssignedId": {
                         "type": "string",
@@ -126,7 +126,7 @@ Feature: search federation users
                     ],
                     "properties": {
                       "issuer": {
-                        "const": "federation-ocis-server:10200"
+                        "const": "%remote_host_port%"
                       },
                       "issuerAssignedId": {
                         "type": "string",
@@ -194,7 +194,7 @@ Feature: search federation users
                     ],
                     "properties": {
                       "issuer": {
-                        "const": "ocis-server:9200"
+                        "const": "%local_host_port%"
                       },
                       "issuerAssignedId": {
                         "type": "string",
@@ -256,7 +256,7 @@ Feature: search federation users
                     ],
                     "properties": {
                       "issuer": {
-                        "const": "federation-ocis-server:10200"
+                        "const": "%remote_host_port%"
                       },
                       "issuerAssignedId": {
                         "type": "string",
@@ -346,7 +346,7 @@ Feature: search federation users
             },
             "idp": {
               "type": "string",
-              "const": "federation-ocis-server:10200"
+              "const": "%remote_host_port%"
             },
             "mail": {
               "type": "string",
@@ -385,7 +385,7 @@ Feature: search federation users
                   "const": "Alice Hansen"
                 },
                 "idp": {
-                  "const": "ocis-server:9200"
+                  "const": "%local_host_port%"
                 },
                 "mail": {
                   "pattern": "alice@example.org"
@@ -409,7 +409,7 @@ Feature: search federation users
                   "const": "Carol King"
                 },
                 "idp": {
-                  "const": "ocis-server:9200"
+                  "const": "%local_host_port%"
                 },
                 "mail": {
                   "pattern": "carol@example.org"
@@ -480,7 +480,7 @@ Feature: search federation users
                     ],
                     "properties": {
                       "issuer": {
-                        "const": "ocis-server:9200"
+                        "const": "%local_host_port%"
                       },
                       "issuerAssignedId": {
                         "type": "string",
@@ -545,7 +545,7 @@ Feature: search federation users
                     ],
                     "properties": {
                       "issuer": {
-                        "const": "federation-ocis-server:10200"
+                        "const": "%remote_host_port%"
                       },
                       "issuerAssignedId": {
                         "type": "string",
@@ -692,7 +692,7 @@ Feature: search federation users
                         ],
                         "properties": {
                           "issuer": {
-                            "const": "federation-ocis-server:10200"
+                            "const": "%remote_host_port%"
                           },
                           "issuerAssignedId": {
                             "type": "string",

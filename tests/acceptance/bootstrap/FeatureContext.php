@@ -146,10 +146,6 @@ class FeatureContext extends BehatVariablesContext {
 	 */
 	private string $stepLineRef = '';
 
-	/**
-	 * @var boolean true if TEST_SERVER_FED_URL is defined
-	 */
-	private bool $federatedServerExists;
 	private int $ocsApiVersion = 1;
 	private ?ResponseInterface $response = null;
 	private string $responseUser = '';
@@ -484,19 +480,10 @@ class FeatureContext extends BehatVariablesContext {
 		$this->alternateAdminPassword = "IHave99LotsOfPriv";
 		$this->publicLinkSharePassword = "publicPwd:1";
 
-		$testServerUrl = OcisHelper::getServerUrl();
-		$this->baseUrl = \rtrim($testServerUrl, '/');
+		$this->baseUrl = OcisHelper::getServerUrl();
 		$this->localBaseUrl = $this->baseUrl;
-
 		// federated server url from the environment
-		$testRemoteServerUrl = \getenv('TEST_SERVER_FED_URL');
-		if ($testRemoteServerUrl !== false) {
-			$this->remoteBaseUrl = \rtrim($testRemoteServerUrl, '/');
-			$this->federatedServerExists = true;
-		} else {
-			$this->remoteBaseUrl = $this->localBaseUrl;
-			$this->federatedServerExists = false;
-		}
+		$this->remoteBaseUrl = OcisHelper::getFederatedServerUrl();
 
 		// get the admin username from the environment (if defined)
 		$adminUsernameFromEnvironment = $this->getAdminUsernameFromEnvironment();
@@ -737,11 +724,8 @@ class FeatureContext extends BehatVariablesContext {
 	 * @return string
 	 */
 	public function removeSchemeFromUrl(string $url): string {
-		return \preg_replace(
-			"(^https?://)",
-			"",
-			$url
-		);
+		$parsedUrl = parse_url($url);
+		return $parsedUrl["host"] . ":" . $parsedUrl["port"];
 	}
 
 	/**
@@ -1016,14 +1000,6 @@ class FeatureContext extends BehatVariablesContext {
 			$this->currentServer = 'REMOTE';
 		}
 		return $previousServer;
-	}
-
-	/**
-	 *
-	 * @return boolean
-	 */
-	public function federatedServerExists(): bool {
-		return $this->federatedServerExists;
 	}
 
 	/**
@@ -2143,6 +2119,46 @@ class FeatureContext extends BehatVariablesContext {
 				"function" => [
 					$this,
 					"getBaseUrl"
+				],
+				"parameter" => []
+			],
+			[
+				"code" => "%local_base_url%",
+				"function" => [
+					$this,
+					"getLocalBaseUrl"
+				],
+				"parameter" => []
+			],
+			[
+				"code" => "%remote_base_url%",
+				"function" => [
+					$this,
+					"getRemoteBaseUrl"
+				],
+				"parameter" => []
+			],
+			[
+				"code" => "%base_host_port%",
+				"function" => [
+					$this,
+					"getBaseUrlWithoutScheme"
+				],
+				"parameter" => []
+			],
+			[
+				"code" => "%local_host_port%",
+				"function" => [
+					$this,
+					"getLocalBaseUrlWithoutScheme"
+				],
+				"parameter" => []
+			],
+			[
+				"code" => "%remote_host_port%",
+				"function" => [
+					$this,
+					"getRemoteBaseUrlWithoutScheme"
 				],
 				"parameter" => []
 			],
