@@ -44,7 +44,7 @@ Feature: A manager of the space can edit public link
       | share_type        | public_link            |
       | displayname_owner | %displayname%          |
       | name              | <link-name>            |
-    When the public downloads file "/test.txt" from inside the last public link shared folder with password "<password>" using the new public WebDAV API
+    When the public downloads file "/test.txt" from inside the last public link shared folder with password "<password>" using the public WebDAV API
     Then the HTTP status code should be "200"
     And the downloaded content should be "some content"
     Examples:

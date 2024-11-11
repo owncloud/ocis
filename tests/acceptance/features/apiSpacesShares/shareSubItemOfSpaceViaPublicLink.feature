@@ -142,8 +142,8 @@ Feature: Share a file or folder that is inside a space via public link
       | displayname_owner      | %displayname% |
       | uid_file_owner         | %username%    |
       | uid_owner              | %username%    |
-    And the public should be able to download the last publicly shared file using the new public WebDAV API with password "%public%" and the content should be "Random data"
-    And the public upload to the last publicly shared file using the new public WebDAV API with password "%public%" should pass with HTTP status code "204"
+    And the public should be able to download the last publicly shared file using the public WebDAV API with password "%public%" and the content should be "Random data"
+    And the public upload to the last publicly shared file using the public WebDAV API with password "%public%" should pass with HTTP status code "204"
     Examples:
       | ocs-api-version | ocs-status-code |
       | 1               | 100             |

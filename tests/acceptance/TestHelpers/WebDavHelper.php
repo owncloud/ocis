@@ -872,11 +872,6 @@ class WebDavHelper {
 				return self::prefixRemotePhp("dav/trash-bin/$userOrItemIdOrSpaceIdOrToken");
 			}
 			if ($davPathVersion === self::DAV_VERSION_OLD) {
-				if ($type === "public-files") {
-					// TODO: cleanup
-					// this endpoint does not exist
-					return self::prefixRemotePhp("public.php/webdav");
-				}
 				return self::prefixRemotePhp("webdav");
 			} elseif ($davPathVersion === self::DAV_VERSION_NEW) {
 				if ($type === "files") {

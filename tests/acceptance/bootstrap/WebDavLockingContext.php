@@ -394,18 +394,16 @@ class WebDavLockingContext implements Context {
 	}
 
 	/**
-	 * @When /^the public locks "([^"]*)" in the last public link shared folder using the (old|new) public WebDAV API setting the following properties$/
-	 * @When /^the public tries to lock "([^"]*)" in the last public link shared folder using the (old|new) public WebDAV API setting the following properties$/
+	 * @When /^the public locks "([^"]*)" in the last public link shared folder using the public WebDAV API setting the following properties$/
+	 * @When /^the public tries to lock "([^"]*)" in the last public link shared folder using the public WebDAV API setting the following properties$/
 	 *
 	 * @param string $file
-	 * @param string $publicWebDAVAPIVersion
 	 * @param TableNode $properties
 	 *
 	 * @return void
 	 */
 	public function publicLocksFileLastSharedFolder(
 		string $file,
-		string $publicWebDAVAPIVersion,
 		TableNode $properties
 	) {
 		$token = ($this->featureContext->isUsingSharingNG()) ? $this->featureContext->shareNgGetLastCreatedLinkShareToken() : $this->featureContext->getLastCreatedPublicShareToken();
@@ -860,92 +858,6 @@ class WebDavLockingContext implements Context {
 		);
 		$this->featureContext->setResponse($response);
 		$this->featureContext->setLastUploadDeleteTime(\time());
-	}
-
-	/**
-	 * @When /^the public uploads file "([^"]*)" with content "([^"]*)" sending the locktoken of file "([^"]*)" of user "([^"]*)" using the (old|new) public WebDAV API$/
-	 *
-	 * @param string $filename
-	 * @param string $content
-	 * @param string $itemToUseLockOf
-	 * @param string $lockOwner
-	 * @param string $publicWebDAVAPIVersion
-	 *
-	 * @return void
-	 *
-	 */
-	public function publicUploadFileSendingLockTokenOfUser(
-		string $filename,
-		string $content,
-		string $itemToUseLockOf,
-		string $lockOwner,
-		string $publicWebDAVAPIVersion
-	) {
-		$response = $this->publicUploadWithUserLockToken(
-			$filename,
-			$content,
-			$itemToUseLockOf,
-			$lockOwner,
-			$publicWebDAVAPIVersion
-		);
-		$this->featureContext->setResponse($response);
-	}
-
-	/**
-	 * @param string $filename
-	 * @param string $content
-	 * @param string $itemToUseLockOf
-	 * @param string $lockOwner
-	 * @param string $publicWebDAVAPIVersion
-	 *
-	 * @return ResponseInterface
-	 */
-	public function publicUploadWithUserLockToken(
-		string $filename,
-		string $content,
-		string $itemToUseLockOf,
-		string $lockOwner,
-		string $publicWebDAVAPIVersion
-	): ResponseInterface {
-		$lockOwner = $this->featureContext->getActualUsername($lockOwner);
-		$headers = [
-			"If" => "(<" . $this->tokenOfLastLock[$lockOwner][$itemToUseLockOf] . ">)"
-		];
-		return $this->publicWebDavContext->publicUploadContent(
-			$filename,
-			'',
-			$content,
-			false,
-			$headers,
-			$publicWebDAVAPIVersion
-		);
-	}
-
-	/**
-	 * @When /^the public uploads file "([^"]*)" with content "([^"]*)" sending the locktoken of "([^"]*)" of the public using the (old|new) public WebDAV API$/
-	 *
-	 * @param string $filename
-	 * @param string $content
-	 * @param string $itemToUseLockOf
-	 * @param string $publicWebDAVAPIVersion
-	 *
-	 * @return void
-	 */
-	public function publicUploadFileSendingLockTokenOfPublic(
-		string $filename,
-		string $content,
-		string $itemToUseLockOf,
-		string $publicWebDAVAPIVersion
-	) {
-		$lockOwner = $this->featureContext->getLastCreatedPublicShareToken();
-		$response = $this->publicUploadWithUserLockToken(
-			$filename,
-			$content,
-			$itemToUseLockOf,
-			$lockOwner,
-			$publicWebDAVAPIVersion
-		);
-		$this->featureContext->setResponse($response);
 	}
 
 	/**

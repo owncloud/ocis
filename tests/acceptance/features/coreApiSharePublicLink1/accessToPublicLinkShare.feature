@@ -77,5 +77,5 @@ Feature: accessing a public link share
       | space           | Personal |
       | permissionsRole | edit     |
       | password        | %public% |
-    When user "Alice" tries to download file "textfile.txt" from the last public link using own basic auth and new public WebDAV API
+    When user "Alice" tries to download file "textfile.txt" from the last public link using own basic auth and public WebDAV API
     Then the HTTP status code should be "401"

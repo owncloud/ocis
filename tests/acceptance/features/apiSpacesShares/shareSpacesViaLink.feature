@@ -36,10 +36,10 @@ Feature: Share spaces via link
       | displayname_owner | %displayname%          |
       | uid_owner         | %username%             |
       | name              | <link-name>            |
-    When the public downloads file "/test.txt" from inside the last public link shared folder with password "<password>" using the new public WebDAV API
+    When the public downloads file "/test.txt" from inside the last public link shared folder with password "<password>" using the public WebDAV API
     Then the HTTP status code should be "200"
     And the downloaded content should be "some content"
-    But the public should not be able to download file "/test.txt" from inside the last public link shared folder using the new public WebDAV API with password "wrong pass"
+    But the public should not be able to download file "/test.txt" from inside the last public link shared folder using the public WebDAV API with password "wrong pass"
     Examples:
       | permissions | expected-permissions      | password | link-name | expire-date              |
       | 1           | read                      | %public% | link      | 2042-03-25T23:59:59+0100 |
@@ -77,7 +77,7 @@ Feature: Share spaces via link
       | displayname_owner | %displayname%        |
       | uid_owner         | %username%           |
       | name              | forUpload            |
-    And the public should be able to upload file "lorem.txt" into the last public link shared folder using the new public WebDAV API with password "%public%"
+    And the public should be able to upload file "lorem.txt" into the last public link shared folder using the public WebDAV API with password "%public%"
     And for user "Alice" the space "share space" should contain these entries:
       | lorem.txt |
 

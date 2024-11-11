@@ -382,6 +382,6 @@ Feature: upload file
       | space           | new-space |
       | permissionsRole | edit      |
       | password        | %public%  |
-    When the public uploads file "test.txt" with password "%public%" and content "test-file" using the new public WebDAV API
+    When the public uploads file "test.txt" with password "%public%" and content "test-file" using the public WebDAV API
     Then the HTTP status code should be "201"
     And for user "Alice" the content of the file "/test.txt" of the space "new-space" should be "test-file"

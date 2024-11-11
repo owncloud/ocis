@@ -177,7 +177,7 @@ Feature: propagation of etags when uploading data
       | password        | %public%   |
     And user "Alice" has stored etag of element "/"
     And user "Alice" has stored etag of element "/upload"
-    When the public uploads file "file.txt" with password "%public%" and content "new content" using the new public WebDAV API
+    When the public uploads file "file.txt" with password "%public%" and content "new content" using the public WebDAV API
     Then the HTTP status code should be "201"
     And these etags should have changed:
       | user  | path    |
