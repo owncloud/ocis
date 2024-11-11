@@ -472,6 +472,10 @@ docker run -d -p 3310:3310 -v /your/local/filesystem/path/to/clamav/:/var/lib/cl
 As `antivirus` service is not enabled by default we need to enable the service while running oCIS server. We also need to enable `async upload` and as virus scan is performed in post-processing step, we need to set it as well. Documentation for environment variables related to antivirus is available [here](https://owncloud.dev/services/antivirus/#environment-variables)
 
 ```bash
+# init oCIS
+IDM_ADMIN_PASSWORD=admin \
+ocis/bin/ocis init --insecure true
+
 # run oCIS
 PROXY_ENABLE_BASIC_AUTH=true \
 ANTIVIRUS_SCANNER_TYPE="clamav" \
@@ -504,47 +508,47 @@ make test-acceptance-api
 
 Test suites that are tagged with `@ocm` require running two different ocis instances. More detailed information and configuration related to it can be found [here](https://doc.owncloud.com/ocis/5.0/deployment/services/s-list/ocm.html).
 
-Put
+### Setup First oCIS Instance
 
 ```bash
-127.0.0.1 ocis-server
-127.0.0.1 federation-ocis-server
-```
+# init oCIS
+IDM_ADMIN_PASSWORD=admin \
+ocis/bin/ocis init --insecure true
 
-in the `/etc/hosts` file
-
-### Setup first ocis instance
-
-```bash
 # run oCIS
-OCIS_URL="https://ocis-server:9200" \
+OCIS_URL="https://localhost:9200" \
 PROXY_ENABLE_BASIC_AUTH=true \
 OCIS_ENABLE_OCM=true \
-OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE="${workspaceFolder}/tests/config/drone/providers.json" \
+OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE="tests/config/local/providers.json" \
 OCIS_ADD_RUN_SERVICES="ocm" \
 OCM_OCM_INVITE_MANAGER_INSECURE=true \
 OCM_OCM_SHARE_PROVIDER_INSECURE=true \
 OCM_OCM_STORAGE_PROVIDER_INSECURE=true \
+WEB_UI_CONFIG_FILE="tests/config/local/ocis-web.json" \
 ocis/bin/ocis server
 ```
 
-The first oCIS instance should be available at: https://ocis-server:9200/
+The first oCIS instance should be available at: https://localhost:9200/
 
-### Setup second ocis instance
+### Setup Second oCIS Instance
 
-#### Using .vscode/launch.json
+You can run the second oCIS instance in two ways:
 
-#### Using .env file
+#### Using `.vscode/launch.json`
+
+From the `Run and Debug` panel of VSCode, select `Fed oCIS Server` and start the debugger.
+
+#### Using env file
 
 ```bash
 # init oCIS
-source tests/config/drone/.env-federation && ocis/bin/ocis init
+source tests/config/local/.env-federation && ocis/bin/ocis init
 
 # run oCIS
 ocis/bin/ocis server
 ```
 
-The second oCIS instance should be available at: https://federation-ocis-server:10200/
+The second oCIS instance should be available at: https://localhost:10200/
 
 {{< hint info >}}
 To enable ocm in the web interface, you need to set the following envs:
@@ -557,8 +561,8 @@ To enable ocm in the web interface, you need to set the following envs:
 Run the acceptance test with the following command:
 
 ```bash
-TEST_SERVER_URL="https://ocis-server:9200" \
-TEST_SERVER_FED_URL="https://federation-ocis-server:10200" \
+TEST_SERVER_URL="https://localhost:9200" \
+TEST_SERVER_FED_URL="https://localhost:10200" \
 BEHAT_FEATURE="tests/acceptance/features/apiOcm/ocm.feature" \
 make test-acceptance-api
 ```
