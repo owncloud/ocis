@@ -25,18 +25,21 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"path"
 	"strings"
 
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	"github.com/mitchellh/mapstructure"
+	"github.com/pkg/errors"
+
 	"github.com/cs3org/reva/v2/pkg/appctx"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/storage"
 	"github.com/cs3org/reva/v2/pkg/storage/fs/registry"
-	"github.com/mitchellh/mapstructure"
-	"github.com/pkg/errors"
 )
 
 func init() {
@@ -413,8 +416,17 @@ func (nc *StorageDriver) Upload(ctx context.Context, req storage.UploadRequest, 
 }
 
 // Download as defined in the storage.FS interface
-func (nc *StorageDriver) Download(ctx context.Context, ref *provider.Reference) (io.ReadCloser, error) {
-	return nc.doDownload(ctx, ref.Path)
+func (nc *StorageDriver) Download(ctx context.Context, ref *provider.Reference, openReaderfunc func(*provider.ResourceInfo) bool) (*provider.ResourceInfo, io.ReadCloser, error) {
+	md, err := nc.GetMD(ctx, ref, []string{}, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+	if !openReaderfunc(md) {
+		return md, nil, nil
+	}
+
+	reader, err := nc.doDownload(ctx, ref.Path)
+	return md, reader, err
 }
 
 // ListRevisions as defined in the storage.FS interface
@@ -441,12 +453,54 @@ func (nc *StorageDriver) ListRevisions(ctx context.Context, ref *provider.Refere
 }
 
 // DownloadRevision as defined in the storage.FS interface
-func (nc *StorageDriver) DownloadRevision(ctx context.Context, ref *provider.Reference, key string) (io.ReadCloser, error) {
+func (nc *StorageDriver) DownloadRevision(ctx context.Context, ref *provider.Reference, key string, openReaderfunc func(*provider.ResourceInfo) bool) (*provider.ResourceInfo, io.ReadCloser, error) {
 	log := appctx.GetLogger(ctx)
 	log.Info().Msgf("DownloadRevision %s %s", ref.Path, key)
 
+	md, err := nc.GetMD(ctx, ref, []string{}, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+	revs, err := nc.ListRevisions(ctx, ref)
+	if err != nil {
+		return nil, nil, err
+	}
+	var ri *provider.ResourceInfo
+	for _, rev := range revs {
+		if rev.Key == key {
+
+			ri = &provider.ResourceInfo{
+				// TODO(jfd) we cannot access version content, this will be a problem when trying to fetch version thumbnails
+				// Opaque
+				Type: provider.ResourceType_RESOURCE_TYPE_FILE,
+				Id: &provider.ResourceId{
+					StorageId: "versions",
+					OpaqueId:  md.Id.OpaqueId + "@" + rev.GetKey(),
+				},
+				// Checksum
+				Etag: rev.Etag,
+				// MimeType
+				Mtime: &types.Timestamp{
+					Seconds: rev.Mtime,
+					// TODO cs3apis FileVersion should use types.Timestamp instead of uint64
+				},
+				Path: path.Join("v", rev.Key),
+				// PermissionSet
+				Size:  rev.Size,
+				Owner: md.Owner,
+			}
+		}
+	}
+	if ri == nil {
+		return nil, nil, errtypes.NotFound("revision not found")
+	}
+
+	if !openReaderfunc(ri) {
+		return ri, nil, nil
+	}
+
 	readCloser, err := nc.doDownloadRevision(ctx, ref.Path, key)
-	return readCloser, err
+	return ri, readCloser, err
 }
 
 // RestoreRevision as defined in the storage.FS interface

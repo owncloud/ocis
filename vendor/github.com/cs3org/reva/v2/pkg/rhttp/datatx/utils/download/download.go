@@ -30,6 +30,8 @@ import (
 	"strings"
 
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	"github.com/rs/zerolog"
+
 	"github.com/cs3org/reva/v2/internal/grpc/services/storageprovider"
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/net"
 	"github.com/cs3org/reva/v2/pkg/appctx"
@@ -37,7 +39,6 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storage"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
-	"github.com/rs/zerolog"
 )
 
 type contextKey struct{}
@@ -91,27 +92,47 @@ func GetOrHeadFile(w http.ResponseWriter, r *http.Request, fs storage.FS, spaceI
 	// TODO check preconditions like If-Range, If-Match ...
 
 	var md *provider.ResourceInfo
+	var content io.ReadCloser
 	var err error
+	var notModified bool
 
-	// do a stat to set a Content-Length header
+	// do a stat to set Content-Length and etag headers
 
-	if md, err = fs.GetMD(ctx, ref, nil, []string{"size", "mimetype", "etag"}); err != nil {
-		handleError(w, &sublog, err, "stat")
+	md, content, err = fs.Download(ctx, ref, func(md *provider.ResourceInfo) bool {
+		// range requests always need to open the reader to check if it is seekable
+		if r.Header.Get("Range") != "" {
+			return true
+		}
+		// otherwise, HEAD requests do not need to open a reader
+		if r.Method == "HEAD" {
+			return false
+		}
+
+		// check etag, see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-None-Match
+		for _, etag := range r.Header.Values(net.HeaderIfNoneMatch) {
+			if md.Etag == etag {
+				// When the condition fails for GET and HEAD methods, then the server must return
+				// HTTP status code 304 (Not Modified). [...] Note that the server generating a
+				// 304 response MUST generate any of the following header fields that would have
+				// been sent in a 200 (OK) response to the same request:
+				// Cache-Control, Content-Location, Date, ETag, Expires, and Vary.
+				notModified = true
+				return false
+			}
+		}
+		return true
+	})
+	if err != nil {
+		handleError(w, &sublog, err, "download")
 		return
 	}
-
-	// check etag, see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-None-Match
-	for _, etag := range r.Header.Values(net.HeaderIfNoneMatch) {
-		if md.Etag == etag {
-			// When the condition fails for GET and HEAD methods, then the server must return
-			// HTTP status code 304 (Not Modified). [...] Note that the server generating a
-			// 304 response MUST generate any of the following header fields that would have
-			// been sent in a 200 (OK) response to the same request:
-			// Cache-Control, Content-Location, Date, ETag, Expires, and Vary.
-			w.Header().Set(net.HeaderETag, md.Etag)
-			w.WriteHeader(http.StatusNotModified)
-			return
-		}
+	if content != nil {
+		defer content.Close()
+	}
+	if notModified {
+		w.Header().Set(net.HeaderETag, md.Etag)
+		w.WriteHeader(http.StatusNotModified)
+		return
 	}
 
 	// fill in storage provider id if it is missing
@@ -140,14 +161,6 @@ func GetOrHeadFile(w http.ResponseWriter, r *http.Request, fs storage.FS, spaceI
 			ranges = nil
 		}
 	}
-
-	ctx = ContextWithEtag(ctx, md.Etag)
-	content, err := fs.Download(ctx, ref)
-	if err != nil {
-		handleError(w, &sublog, err, "download")
-		return
-	}
-	defer content.Close()
 
 	code := http.StatusOK
 	sendSize := int64(md.Size)
@@ -259,6 +272,9 @@ func handleError(w http.ResponseWriter, log *zerolog.Logger, err error, action s
 	case errtypes.IsPermissionDenied:
 		log.Debug().Err(err).Str("action", action).Msg("permission denied")
 		w.WriteHeader(http.StatusForbidden)
+	case errtypes.Aborted:
+		log.Debug().Err(err).Str("action", action).Msg("etags do not match")
+		w.WriteHeader(http.StatusPreconditionFailed)
 	default:
 		log.Error().Err(err).Str("action", action).Msg("unexpected error")
 		w.WriteHeader(http.StatusInternalServerError)

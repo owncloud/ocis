@@ -24,6 +24,7 @@ import (
 	"net/url"
 
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+
 	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/cs3org/reva/v2/pkg/storage"
 )
@@ -153,8 +154,8 @@ func (fs *hellofs) ListRevisions(ctx context.Context, ref *provider.Reference) (
 }
 
 // DownloadRevision downloads a revision
-func (fs *hellofs) DownloadRevision(ctx context.Context, ref *provider.Reference, revisionKey string) (io.ReadCloser, error) {
-	return nil, errtypes.NotSupported("unimplemented")
+func (fs *hellofs) DownloadRevision(ctx context.Context, ref *provider.Reference, revisionKey string, openReaderFunc func(md *provider.ResourceInfo) bool) (*provider.ResourceInfo, io.ReadCloser, error) {
+	return nil, nil, errtypes.NotSupported("unimplemented")
 }
 
 // RestoreRevision restores a revision

@@ -33,13 +33,14 @@ import (
 
 	cephfs2 "github.com/ceph/go-ceph/cephfs"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	"github.com/mitchellh/mapstructure"
+	"github.com/pkg/errors"
+
 	"github.com/cs3org/reva/v2/pkg/appctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/storage"
 	"github.com/cs3org/reva/v2/pkg/storage/fs/registry"
-	"github.com/mitchellh/mapstructure"
-	"github.com/pkg/errors"
 )
 
 const (
@@ -276,11 +277,11 @@ func (fs *cephfs) ListFolder(ctx context.Context, ref *provider.Reference, mdKey
 	return files, getRevaError(err)
 }
 
-func (fs *cephfs) Download(ctx context.Context, ref *provider.Reference) (rc io.ReadCloser, err error) {
+func (fs *cephfs) Download(ctx context.Context, ref *provider.Reference, openReaderFunc func(md *provider.ResourceInfo) bool) (ri *provider.ResourceInfo, rc io.ReadCloser, err error) {
 	var path string
 	user := fs.makeUser(ctx)
 	if path, err = user.resolveRef(ref); err != nil {
-		return nil, errors.Wrap(err, "cephfs: error resolving ref")
+		return nil, nil, errors.Wrap(err, "cephfs: error resolving ref")
 	}
 
 	user.op(func(cv *cacheVal) {
@@ -288,10 +289,24 @@ func (fs *cephfs) Download(ctx context.Context, ref *provider.Reference) (rc io.
 			err = errtypes.PermissionDenied("cephfs: cannot download under the virtual share folder")
 			return
 		}
+
+		var stat Statx
+		if stat, err = cv.mount.Statx(path, cephfs2.StatxBasicStats, 0); err != nil {
+			return
+		}
+		ri, err = user.fileAsResourceInfo(cv, path, stat, nil)
+		if err != nil {
+			return
+		}
+
+		if !openReaderFunc(ri) {
+			return
+		}
+
 		rc, err = cv.mount.Open(path, os.O_RDONLY, 0)
 	})
 
-	return rc, getRevaError(err)
+	return ri, rc, getRevaError(err)
 }
 
 func (fs *cephfs) ListRevisions(ctx context.Context, ref *provider.Reference) (fvs []*provider.FileVersion, err error) {
@@ -341,7 +356,7 @@ func (fs *cephfs) ListRevisions(ctx context.Context, ref *provider.Reference) (f
 	return fvs, getRevaError(err)
 }
 
-func (fs *cephfs) DownloadRevision(ctx context.Context, ref *provider.Reference, key string) (file io.ReadCloser, err error) {
+func (fs *cephfs) DownloadRevision(ctx context.Context, ref *provider.Reference, key string, openReaderFunc func(md *provider.ResourceInfo) bool) (ri *provider.ResourceInfo, file io.ReadCloser, err error) {
 	//TODO(tmourati): Fix entry id logic
 	user := fs.makeUser(ctx)
 
@@ -352,10 +367,22 @@ func (fs *cephfs) DownloadRevision(ctx context.Context, ref *provider.Reference,
 			return
 		}
 
+		var stat Statx
+		stat, err = cv.mount.Statx(revPath, cephfs2.StatxMtime|cephfs2.StatxSize, 0)
+		if err != nil {
+			return
+		}
+		ri, err = user.fileAsResourceInfo(cv, revPath, stat, nil)
+		if err != nil {
+			return
+		}
+		if !openReaderFunc(ri) {
+			return
+		}
 		file, err = cv.mount.Open(revPath, os.O_RDONLY, 0)
 	})
 
-	return file, getRevaError(err)
+	return ri, file, getRevaError(err)
 }
 
 func (fs *cephfs) RestoreRevision(ctx context.Context, ref *provider.Reference, key string) (err error) {

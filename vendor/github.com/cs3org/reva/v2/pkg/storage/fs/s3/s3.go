@@ -616,12 +616,21 @@ func (fs *s3FS) ListFolder(ctx context.Context, ref *provider.Reference, mdKeys,
 	return finfos, nil
 }
 
-func (fs *s3FS) Download(ctx context.Context, ref *provider.Reference) (io.ReadCloser, error) {
+func (fs *s3FS) Download(ctx context.Context, ref *provider.Reference, openReaderfunc func(*provider.ResourceInfo) bool) (*provider.ResourceInfo, io.ReadCloser, error) {
 	log := appctx.GetLogger(ctx)
 
 	fn, err := fs.resolve(ctx, ref)
 	if err != nil {
-		return nil, errors.Wrap(err, "error resolving ref")
+		return nil, nil, errors.Wrap(err, "error resolving ref")
+	}
+
+	ri, err := fs.GetMD(ctx, ref, nil, []string{"size", "mimetype", "etag"})
+	if err != nil {
+		return nil, nil, errors.Wrap(err, "error getting metadata")
+	}
+
+	if !openReaderfunc(ri) {
+		return ri, nil, nil
 	}
 
 	// use GetObject instead of s3manager.Downloader:
@@ -637,20 +646,20 @@ func (fs *s3FS) Download(ctx context.Context, ref *provider.Reference) (io.ReadC
 			switch aerr.Code() {
 			case s3.ErrCodeNoSuchBucket:
 			case s3.ErrCodeNoSuchKey:
-				return nil, errtypes.NotFound(fn)
+				return nil, nil, errtypes.NotFound(fn)
 			}
 		}
-		return nil, errors.Wrap(err, "s3fs: error deleting "+fn)
+		return nil, nil, errors.Wrap(err, "s3fs: error deleting "+fn)
 	}
-	return r.Body, nil
+	return ri, r.Body, nil
 }
 
 func (fs *s3FS) ListRevisions(ctx context.Context, ref *provider.Reference) ([]*provider.FileVersion, error) {
 	return nil, errtypes.NotSupported("list revisions")
 }
 
-func (fs *s3FS) DownloadRevision(ctx context.Context, ref *provider.Reference, revisionKey string) (io.ReadCloser, error) {
-	return nil, errtypes.NotSupported("download revision")
+func (fs *s3FS) DownloadRevision(ctx context.Context, ref *provider.Reference, revisionKey string, openReaderfunc func(*provider.ResourceInfo) bool) (*provider.ResourceInfo, io.ReadCloser, error) {
+	return nil, nil, errtypes.NotSupported("download revision")
 }
 
 func (fs *s3FS) RestoreRevision(ctx context.Context, ref *provider.Reference, revisionKey string) error {

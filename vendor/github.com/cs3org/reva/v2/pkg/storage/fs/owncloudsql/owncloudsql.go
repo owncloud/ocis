@@ -39,6 +39,11 @@ import (
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	"github.com/mitchellh/mapstructure"
+	"github.com/pkg/errors"
+	"github.com/pkg/xattr"
+	"github.com/rs/zerolog/log"
+
 	"github.com/cs3org/reva/v2/internal/grpc/services/storageprovider"
 	"github.com/cs3org/reva/v2/pkg/appctx"
 	"github.com/cs3org/reva/v2/pkg/conversions"
@@ -54,10 +59,6 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storage/fs/registry"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/chunking"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/templates"
-	"github.com/mitchellh/mapstructure"
-	"github.com/pkg/errors"
-	"github.com/pkg/xattr"
-	"github.com/rs/zerolog/log"
 )
 
 const (
@@ -1544,32 +1545,60 @@ func (fs *owncloudsqlfs) archiveRevision(ctx context.Context, vbp string, ip str
 	return err
 }
 
-func (fs *owncloudsqlfs) Download(ctx context.Context, ref *provider.Reference) (io.ReadCloser, error) {
+func (fs *owncloudsqlfs) Download(ctx context.Context, ref *provider.Reference, openReaderfunc func(*provider.ResourceInfo) bool) (*provider.ResourceInfo, io.ReadCloser, error) {
 	ip, err := fs.resolve(ctx, ref)
 	if err != nil {
-		return nil, errors.Wrap(err, "owncloudsql: error resolving reference")
+		return nil, nil, errors.Wrap(err, "owncloudsql: error resolving reference")
+	}
+	p := fs.toStoragePath(ctx, ip)
+
+	// If Download is called for a path shared with the user then the path is
+	// already wrapped. (fs.resolve wraps the path)
+	if strings.HasPrefix(p, fs.c.DataDirectory) {
+		ip = p
 	}
 
 	// check permissions
 	if perm, err := fs.readPermissions(ctx, ip); err == nil {
 		if !perm.InitiateFileDownload {
-			return nil, errtypes.PermissionDenied("")
+			return nil, nil, errtypes.PermissionDenied("")
 		}
 	} else {
 		if isNotFound(err) {
-			return nil, errtypes.NotFound(fs.toStoragePath(ctx, filepath.Dir(ip)))
+			return nil, nil, errtypes.NotFound(fs.toStoragePath(ctx, filepath.Dir(ip)))
 		}
-		return nil, errors.Wrap(err, "owncloudsql: error reading permissions")
+		return nil, nil, errors.Wrap(err, "owncloudsql: error reading permissions")
+	}
+
+	ownerStorageID, err := fs.filecache.GetNumericStorageID(ctx, "home::"+fs.getOwner(ip))
+	if err != nil {
+		return nil, nil, err
+	}
+	entry, err := fs.filecache.Get(ctx, ownerStorageID, fs.toDatabasePath(ip))
+	switch {
+	case err == sql.ErrNoRows:
+		return nil, nil, errtypes.NotFound(fs.toStoragePath(ctx, filepath.Dir(ip)))
+	case err != nil:
+		return nil, nil, err
+	}
+
+	md, err := fs.convertToResourceInfo(ctx, entry, ip, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	if !openReaderfunc(md) {
+		return md, nil, nil
 	}
 
 	r, err := os.Open(ip)
 	if err != nil {
 		if os.IsNotExist(err) {
-			return nil, errtypes.NotFound(fs.toStoragePath(ctx, ip))
+			return nil, nil, errtypes.NotFound(fs.toStoragePath(ctx, ip))
 		}
-		return nil, errors.Wrap(err, "owncloudsql: error reading "+ip)
+		return nil, nil, errors.Wrap(err, "owncloudsql: error reading "+ip)
 	}
-	return r, nil
+	return md, r, nil
 }
 
 func (fs *owncloudsqlfs) ListRevisions(ctx context.Context, ref *provider.Reference) ([]*provider.FileVersion, error) {
@@ -1623,8 +1652,8 @@ func (fs *owncloudsqlfs) ListRevisions(ctx context.Context, ref *provider.Refere
 	return revisions, nil
 }
 
-func (fs *owncloudsqlfs) DownloadRevision(ctx context.Context, ref *provider.Reference, revisionKey string) (io.ReadCloser, error) {
-	return nil, errtypes.NotSupported("download revision")
+func (fs *owncloudsqlfs) DownloadRevision(ctx context.Context, ref *provider.Reference, revisionKey string, openReaderfunc func(*provider.ResourceInfo) bool) (*provider.ResourceInfo, io.ReadCloser, error) {
+	return nil, nil, errtypes.NotSupported("download revision")
 }
 
 func (fs *owncloudsqlfs) RestoreRevision(ctx context.Context, ref *provider.Reference, revisionKey string) error {

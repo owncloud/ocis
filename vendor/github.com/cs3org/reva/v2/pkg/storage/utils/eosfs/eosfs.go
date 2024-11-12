@@ -1834,13 +1834,23 @@ func (fs *eosfs) moveShadow(ctx context.Context, oldPath, newPath string) error 
 	return fs.c.Rename(ctx, auth, oldfn, newfn)
 }
 
-func (fs *eosfs) Download(ctx context.Context, ref *provider.Reference) (io.ReadCloser, error) {
+func (fs *eosfs) Download(ctx context.Context, ref *provider.Reference, openReaderfunc func(*provider.ResourceInfo) bool) (*provider.ResourceInfo, io.ReadCloser, error) {
 	fn, auth, err := fs.resolveRefForbidShareFolder(ctx, ref)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	return fs.c.Read(ctx, auth, fn)
+	md, err := fs.GetMD(ctx, ref, nil, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	if !openReaderfunc(md) {
+		return md, nil, nil
+	}
+
+	reader, err := fs.c.Read(ctx, auth, fn)
+	return md, reader, err
 }
 
 func (fs *eosfs) ListRevisions(ctx context.Context, ref *provider.Reference) ([]*provider.FileVersion, error) {
@@ -1886,37 +1896,43 @@ func (fs *eosfs) ListRevisions(ctx context.Context, ref *provider.Reference) ([]
 	return revisions, nil
 }
 
-func (fs *eosfs) DownloadRevision(ctx context.Context, ref *provider.Reference, revisionKey string) (io.ReadCloser, error) {
+func (fs *eosfs) DownloadRevision(ctx context.Context, ref *provider.Reference, revisionKey string, openReaderfunc func(*provider.ResourceInfo) bool) (*provider.ResourceInfo, io.ReadCloser, error) {
 	var auth eosclient.Authorization
 	var fn string
 	var err error
+
+	md, err := fs.GetMD(ctx, ref, nil, nil)
+	if err != nil {
+		return nil, nil, err
+	}
 
 	if !fs.conf.EnableHome && fs.conf.ImpersonateOwnerforRevisions {
 		// We need to access the revisions for a non-home reference.
 		// We'll get the owner of the particular resource and impersonate them
 		// if we have access to it.
-		md, err := fs.GetMD(ctx, ref, nil, nil)
-		if err != nil {
-			return nil, err
-		}
-		fn = fs.wrap(ctx, md.Path)
 
+		fn = fs.wrap(ctx, md.Path)
 		if md.PermissionSet.InitiateFileDownload {
 			auth, err = fs.getUIDGateway(ctx, md.Owner)
 			if err != nil {
-				return nil, err
+				return nil, nil, err
 			}
 		} else {
-			return nil, errtypes.PermissionDenied("eosfs: user doesn't have permissions to download revisions")
+			return nil, nil, errtypes.PermissionDenied("eosfs: user doesn't have permissions to download revisions")
 		}
 	} else {
 		fn, auth, err = fs.resolveRefForbidShareFolder(ctx, ref)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 	}
 
-	return fs.c.ReadVersion(ctx, auth, fn, revisionKey)
+	if !openReaderfunc(md) {
+		return md, nil, nil
+	}
+
+	reader, err := fs.c.ReadVersion(ctx, auth, fn, revisionKey)
+	return md, reader, err
 }
 
 func (fs *eosfs) RestoreRevision(ctx context.Context, ref *provider.Reference, revisionKey string) error {

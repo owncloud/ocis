@@ -201,6 +201,11 @@ func MTimeToTime(v string) (t time.Time, err error) {
 	return time.Unix(sec, nsec), err
 }
 
+// TimeToOCMtime converts a Go time.Time to a string in the form "<unix>.<nanoseconds>"
+func TimeToOCMtime(t time.Time) string {
+	return strconv.FormatInt(t.Unix(), 10) + "." + strconv.FormatInt(int64(t.Nanosecond()), 10)
+}
+
 // ExtractGranteeID returns the ID, user or group, set in the GranteeId object
 func ExtractGranteeID(grantee *provider.Grantee) (*userpb.UserId, *grouppb.GroupId) {
 	switch t := grantee.Id.(type) {
