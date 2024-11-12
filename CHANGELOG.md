@@ -60,6 +60,7 @@ The following sections list the changes for unreleased.
 
 * Bugfix - Fix idp guest role default assignment: [#10511](https://github.com/owncloud/ocis/pull/10511)
 * Bugfix - Remove mbreaker: [#10524](https://github.com/owncloud/ocis/pull/10524)
+* Bugfix - Bump Reva: [#10539](https://github.com/owncloud/ocis/pull/10539)
 
 ## Details
 
@@ -76,6 +77,12 @@ The following sections list the changes for unreleased.
    than it solves. We removed it.
 
    https://github.com/owncloud/ocis/pull/10524
+
+* Bugfix - Bump Reva: [#10539](https://github.com/owncloud/ocis/pull/10539)
+
+   Bumps reva version
+
+   https://github.com/owncloud/ocis/pull/10539
 
 # Changelog for [7.0.0-rc.1] (2024-11-07)
 
