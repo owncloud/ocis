@@ -1,21 +1,3 @@
-// Copyright 2018-2024 CERN
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
-// In applying this license, CERN does not waive the privileges and immunities
-// granted to it by virtue of its status as an Intergovernmental Organization
-// or submit itself to any jurisdiction.
-
 package tree
 
 import (
@@ -48,7 +30,6 @@ func (iw *InotifyWatcher) Watch(path string) {
 			Events: []inotifywaitgo.EVENT{
 				inotifywaitgo.CREATE,
 				inotifywaitgo.MOVED_TO,
-				inotifywaitgo.MOVED_FROM,
 				inotifywaitgo.CLOSE_WRITE,
 				inotifywaitgo.DELETE,
 			},
@@ -64,18 +45,18 @@ func (iw *InotifyWatcher) Watch(path string) {
 				if isLockFile(event.Filename) || isTrash(event.Filename) || iw.tree.isUpload(event.Filename) {
 					continue
 				}
-				go func() {
-					switch e {
-					case inotifywaitgo.DELETE:
-						_ = iw.tree.Scan(event.Filename, ActionDelete, event.IsDir)
-					case inotifywaitgo.MOVED_FROM:
-						_ = iw.tree.Scan(event.Filename, ActionMoveFrom, event.IsDir)
-					case inotifywaitgo.CREATE, inotifywaitgo.MOVED_TO:
-						_ = iw.tree.Scan(event.Filename, ActionCreate, event.IsDir)
-					case inotifywaitgo.CLOSE_WRITE:
-						_ = iw.tree.Scan(event.Filename, ActionUpdate, event.IsDir)
-					}
-				}()
+				switch e {
+				case inotifywaitgo.DELETE:
+					go func() { _ = iw.tree.HandleFileDelete(event.Filename) }()
+				case inotifywaitgo.CREATE:
+					go func() { _ = iw.tree.Scan(event.Filename, ActionCreate, event.IsDir, false) }()
+				case inotifywaitgo.MOVED_TO:
+					go func() {
+						_ = iw.tree.Scan(event.Filename, ActionMove, event.IsDir, true)
+					}()
+				case inotifywaitgo.CLOSE_WRITE:
+					go func() { _ = iw.tree.Scan(event.Filename, ActionUpdate, event.IsDir, true) }()
+				}
 			}
 
 		case err := <-errors:

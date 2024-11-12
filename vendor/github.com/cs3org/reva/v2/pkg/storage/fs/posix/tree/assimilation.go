@@ -59,7 +59,6 @@ const (
 	ActionUpdate
 	ActionMove
 	ActionDelete
-	ActionMoveFrom
 )
 
 type queueItem struct {
@@ -161,14 +160,14 @@ func (t *Tree) workScanQueue() {
 }
 
 // Scan scans the given path and updates the id chache
-func (t *Tree) Scan(path string, action EventAction, isDir bool) error {
+func (t *Tree) Scan(path string, action EventAction, isDir bool, recurse bool) error {
 	// cases:
 	switch action {
 	case ActionCreate:
 		if !isDir {
 			// 1. New file (could be emitted as part of a new directory)
 			//	 -> assimilate file
-			//   -> scan parent directory recursively to update tree size and catch nodes that weren't covered by an event
+			//   -> scan parent directory recursively
 			if !t.scanDebouncer.InProgress(filepath.Dir(path)) {
 				t.scanDebouncer.Debounce(scanItem{
 					Path:        path,
@@ -217,24 +216,8 @@ func (t *Tree) Scan(path string, action EventAction, isDir bool) error {
 			Recurse:     isDir,
 		})
 
-	case ActionMoveFrom:
-		// 6. file/directory moved out of the watched directory
-		//   -> update directory
-		if err := t.setDirty(filepath.Dir(path), true); err != nil {
-			return err
-		}
-
-		go func() { _ = t.WarmupIDCache(filepath.Dir(path), false, true) }()
-
 	case ActionDelete:
 		_ = t.HandleFileDelete(path)
-		// 7. Deleted file or directory
-		//   -> update parent and all children
-		t.scanDebouncer.Debounce(scanItem{
-			Path:        filepath.Dir(path),
-			ForceRescan: true,
-			Recurse:     true,
-		})
 	}
 
 	return nil
@@ -610,7 +593,6 @@ func (t *Tree) WarmupIDCache(root string, assimilate, onlyDirty bool) error {
 			if !dirty {
 				return filepath.SkipDir
 			}
-			sizes[path] += 0 // Make sure to set the size to 0 for empty directories
 		}
 
 		attribs, err := t.lookup.MetadataBackend().All(context.Background(), path)

@@ -197,7 +197,6 @@ func (s *svc) handleTusPost(ctx context.Context, w http.ResponseWriter, r *http.
 		}
 		switch tfRes.Status.Code {
 		case rpc.Code_CODE_OK:
-			w.Header().Set(net.HeaderLocation, "")
 			w.WriteHeader(http.StatusCreated)
 			return
 		case rpc.Code_CODE_ALREADY_EXISTS:

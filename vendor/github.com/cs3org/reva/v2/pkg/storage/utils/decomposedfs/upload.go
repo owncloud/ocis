@@ -26,11 +26,10 @@ import (
 	"strings"
 	"time"
 
-	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/google/uuid"
-	"github.com/pkg/errors"
 	tusd "github.com/tus/tusd/v2/pkg/handler"
 
+	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/appctx"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
@@ -41,6 +40,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/upload"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
+	"github.com/pkg/errors"
 )
 
 // Upload uploads data to the given resource
@@ -90,7 +90,7 @@ func (fs *Decomposedfs) Upload(ctx context.Context, req storage.UploadRequest, u
 		}
 	}
 
-	if err := session.FinishUploadDecomposed(ctx); err != nil {
+	if err := session.FinishUpload(ctx); err != nil {
 		return &provider.ResourceInfo{}, err
 	}
 
@@ -321,7 +321,7 @@ func (fs *Decomposedfs) InitiateUpload(ctx context.Context, ref *provider.Refere
 
 	if uploadLength == 0 {
 		// Directly finish this upload
-		err = session.FinishUploadDecomposed(ctx)
+		err = session.FinishUpload(ctx)
 		if err != nil {
 			return nil, err
 		}

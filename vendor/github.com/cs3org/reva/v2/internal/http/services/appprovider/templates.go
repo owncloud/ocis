@@ -75,7 +75,7 @@ var tl = TemplateList{
 
 func addTemplateInfo(mt *appregistry.MimeTypeInfo, apps []*ProviderInfo) {
 	for _, app := range apps {
-		if tls, ok := tl.Templates[strings.ToLower(app.ProductName)]; ok {
+		if tls, ok := tl.Templates[strings.ToLower(app.Name)]; ok {
 			for _, tmpl := range tls {
 				if tmpl.Extension != "" && tmpl.Extension == mt.Ext {
 					app.TargetExt = tmpl.TargetExtension
