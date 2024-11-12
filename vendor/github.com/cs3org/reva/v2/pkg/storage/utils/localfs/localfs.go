@@ -1045,25 +1045,42 @@ func (fs *localfs) listShareFolderRoot(ctx context.Context, home string, mdKeys 
 	return finfos, nil
 }
 
-func (fs *localfs) Download(ctx context.Context, ref *provider.Reference) (io.ReadCloser, error) {
+func (fs *localfs) Download(ctx context.Context, ref *provider.Reference, openReaderfunc func(*provider.ResourceInfo) bool) (*provider.ResourceInfo, io.ReadCloser, error) {
 	fn, err := fs.resolve(ctx, ref)
 	if err != nil {
-		return nil, errors.Wrap(err, "localfs: error resolving ref")
+		return nil, nil, errors.Wrap(err, "localfs: error resolving ref")
 	}
 
 	if fs.isShareFolder(ctx, fn) {
-		return nil, errtypes.PermissionDenied("localfs: cannot download under the virtual share folder")
+		return nil, nil, errtypes.PermissionDenied("localfs: cannot download under the virtual share folder")
 	}
 
 	fn = fs.wrap(ctx, fn)
+	md, err := os.Stat(fn)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil, nil, errtypes.NotFound(fn)
+		}
+		return nil, nil, errors.Wrap(err, "localfs: error stating "+fn)
+	}
+
+	ri, err := fs.normalize(ctx, md, fn, []string{"size", "mimetype", "etag"})
+	if err != nil {
+		return nil, nil, err
+	}
+
+	if !openReaderfunc(ri) {
+		return ri, nil, nil
+	}
+
 	r, err := os.Open(fn)
 	if err != nil {
 		if os.IsNotExist(err) {
-			return nil, errtypes.NotFound(fn)
+			return nil, nil, errtypes.NotFound(fn)
 		}
-		return nil, errors.Wrap(err, "localfs: error reading "+fn)
+		return nil, nil, errors.Wrap(err, "localfs: error reading "+fn)
 	}
-	return r, nil
+	return ri, r, nil
 }
 
 func (fs *localfs) archiveRevision(ctx context.Context, np string) error {
@@ -1117,28 +1134,42 @@ func (fs *localfs) ListRevisions(ctx context.Context, ref *provider.Reference) (
 	return revisions, nil
 }
 
-func (fs *localfs) DownloadRevision(ctx context.Context, ref *provider.Reference, revisionKey string) (io.ReadCloser, error) {
+func (fs *localfs) DownloadRevision(ctx context.Context, ref *provider.Reference, revisionKey string, openReaderfunc func(*provider.ResourceInfo) bool) (*provider.ResourceInfo, io.ReadCloser, error) {
 	np, err := fs.resolve(ctx, ref)
 	if err != nil {
-		return nil, errors.Wrap(err, "localfs: error resolving ref")
+		return nil, nil, errors.Wrap(err, "localfs: error resolving ref")
 	}
 
 	if fs.isShareFolder(ctx, np) {
-		return nil, errtypes.PermissionDenied("localfs: cannot download revisions under the virtual share folder")
+		return nil, nil, errtypes.PermissionDenied("localfs: cannot download revisions under the virtual share folder")
 	}
 
 	versionsDir := fs.wrapVersions(ctx, np)
 	vp := path.Join(versionsDir, revisionKey)
 
-	r, err := os.Open(vp)
+	md, err := os.Stat(vp)
 	if err != nil {
 		if os.IsNotExist(err) {
-			return nil, errtypes.NotFound(vp)
+			return nil, nil, errtypes.NotFound(vp)
 		}
-		return nil, errors.Wrap(err, "localfs: error reading "+vp)
+		return nil, nil, errors.Wrap(err, "localfs: error stating "+vp)
 	}
 
-	return r, nil
+	ri, err := fs.normalize(ctx, md, vp, []string{"size", "mimetype", "etag"})
+	if err != nil {
+		return nil, nil, err
+	}
+
+	if !openReaderfunc(ri) {
+		return ri, nil, nil
+	}
+
+	r, err := os.Open(vp)
+	if err != nil {
+		return nil, nil, errors.Wrap(err, "localfs: error reading "+vp)
+	}
+
+	return ri, r, nil
 }
 
 func (fs *localfs) RestoreRevision(ctx context.Context, ref *provider.Reference, revisionKey string) error {

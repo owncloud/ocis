@@ -23,10 +23,9 @@ import (
 	"io"
 	"net/url"
 
-	tusd "github.com/tus/tusd/v2/pkg/handler"
-
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	registry "github.com/cs3org/go-cs3apis/cs3/storage/registry/v1beta1"
+	tusd "github.com/tus/tusd/v2/pkg/handler"
 )
 
 // FS is the interface to implement access to the storage.
@@ -48,7 +47,7 @@ type FS interface {
 	// ListFolder returns the resource infos for all children of the referenced resource
 	ListFolder(ctx context.Context, ref *provider.Reference, mdKeys, fieldMask []string) ([]*provider.ResourceInfo, error)
 	// Download returns a ReadCloser for the content of the referenced resource
-	Download(ctx context.Context, ref *provider.Reference) (io.ReadCloser, error)
+	Download(ctx context.Context, ref *provider.Reference, openReaderfunc func(*provider.ResourceInfo) bool) (*provider.ResourceInfo, io.ReadCloser, error)
 
 	// GetPathByID returns the path for the given resource id relative to the space root
 	// It should only reveal the path visible to the current user to not leak the names uf unshared parent resources
@@ -80,7 +79,7 @@ type FS interface {
 	// ListRevisions lists all revisions for the referenced resource
 	ListRevisions(ctx context.Context, ref *provider.Reference) ([]*provider.FileVersion, error)
 	// DownloadRevision downloads a revision
-	DownloadRevision(ctx context.Context, ref *provider.Reference, key string) (io.ReadCloser, error)
+	DownloadRevision(ctx context.Context, ref *provider.Reference, key string, openReaderFunc func(md *provider.ResourceInfo) bool) (*provider.ResourceInfo, io.ReadCloser, error)
 	// RestoreRevision restores a revision
 	RestoreRevision(ctx context.Context, ref *provider.Reference, key string) error
 

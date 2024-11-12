@@ -29,6 +29,7 @@ import (
 	"time"
 
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+
 	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/storage"
@@ -222,20 +223,23 @@ func (fs *hellofs) ListFolder(ctx context.Context, ref *provider.Reference, mdKe
 }
 
 // Download returns a ReadCloser for the content of the referenced resource
-func (fs *hellofs) Download(ctx context.Context, ref *provider.Reference) (io.ReadCloser, error) {
+func (fs *hellofs) Download(ctx context.Context, ref *provider.Reference, openReaderFunc func(md *provider.ResourceInfo) bool) (*provider.ResourceInfo, io.ReadCloser, error) {
 	info, err := fs.lookup(ctx, ref)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-
 	if info.Type != provider.ResourceType_RESOURCE_TYPE_FILE {
-		return nil, errtypes.InternalError("expected a file")
+		return nil, nil, errtypes.InternalError("expected a file")
 	}
 	if info.GetId().GetOpaqueId() != fileid {
-		return nil, errtypes.InternalError("unknown file")
+		return nil, nil, errtypes.InternalError("unknown file")
+	}
+
+	if !openReaderFunc(info) {
+		return info, nil, nil
 	}
 
 	b := &bytes.Buffer{}
 	b.WriteString(content)
-	return io.NopCloser(b), nil
+	return info, io.NopCloser(b), nil
 }

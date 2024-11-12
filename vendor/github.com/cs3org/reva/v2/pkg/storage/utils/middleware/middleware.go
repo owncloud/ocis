@@ -23,9 +23,9 @@ import (
 	"io"
 	"net/url"
 
+	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	tusd "github.com/tus/tusd/v2/pkg/handler"
 
-	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/storage"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/upload"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
@@ -361,7 +361,7 @@ func (f *FS) Upload(ctx context.Context, req storage.UploadRequest, uploadFunc s
 	return res0, res1
 }
 
-func (f *FS) Download(ctx context.Context, ref *provider.Reference) (io.ReadCloser, error) {
+func (f *FS) Download(ctx context.Context, ref *provider.Reference, openReaderFunc func(md *provider.ResourceInfo) bool) (*provider.ResourceInfo, io.ReadCloser, error) {
 	var (
 		err     error
 		unhook  UnHook
@@ -370,22 +370,22 @@ func (f *FS) Download(ctx context.Context, ref *provider.Reference) (io.ReadClos
 	for _, hook := range f.hooks {
 		ctx, unhook, err = hook("Download", ctx, ref.GetResourceId().GetSpaceId())
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 		if unhook != nil {
 			unhooks = append(unhooks, unhook)
 		}
 	}
 
-	res0, res1 := f.next.Download(ctx, ref)
+	res0, res1, res2 := f.next.Download(ctx, ref, openReaderFunc)
 
 	for _, unhook := range unhooks {
 		if err := unhook(); err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 	}
 
-	return res0, res1
+	return res0, res1, res2
 }
 
 func (f *FS) ListRevisions(ctx context.Context, ref *provider.Reference) ([]*provider.FileVersion, error) {
@@ -415,7 +415,7 @@ func (f *FS) ListRevisions(ctx context.Context, ref *provider.Reference) ([]*pro
 	return res0, res1
 }
 
-func (f *FS) DownloadRevision(ctx context.Context, ref *provider.Reference, key string) (io.ReadCloser, error) {
+func (f *FS) DownloadRevision(ctx context.Context, ref *provider.Reference, key string, openReaderFunc func(md *provider.ResourceInfo) bool) (*provider.ResourceInfo, io.ReadCloser, error) {
 	var (
 		err     error
 		unhook  UnHook
@@ -424,22 +424,22 @@ func (f *FS) DownloadRevision(ctx context.Context, ref *provider.Reference, key 
 	for _, hook := range f.hooks {
 		ctx, unhook, err = hook("DownloadRevision", ctx, ref.GetResourceId().GetSpaceId())
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 		if unhook != nil {
 			unhooks = append(unhooks, unhook)
 		}
 	}
 
-	res0, res1 := f.next.DownloadRevision(ctx, ref, key)
+	res0, res1, res2 := f.next.DownloadRevision(ctx, ref, key, openReaderFunc)
 
 	for _, unhook := range unhooks {
 		if err := unhook(); err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 	}
 
-	return res0, res1
+	return res0, res1, res2
 }
 
 func (f *FS) RestoreRevision(ctx context.Context, ref *provider.Reference, key string) error {

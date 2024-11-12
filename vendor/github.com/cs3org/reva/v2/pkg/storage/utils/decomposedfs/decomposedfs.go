@@ -33,13 +33,20 @@ import (
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	"github.com/jellydator/ttlcache/v2"
+	"github.com/pkg/errors"
+	tusd "github.com/tus/tusd/v2/pkg/handler"
+	microstore "go-micro.dev/v4/store"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/trace"
+	"golang.org/x/sync/errgroup"
+
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/logger"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/rhttp/datatx/metrics"
-	"github.com/cs3org/reva/v2/pkg/rhttp/datatx/utils/download"
 	"github.com/cs3org/reva/v2/pkg/storage"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/chunking"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/aspects"
@@ -60,13 +67,6 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/store"
 	"github.com/cs3org/reva/v2/pkg/utils"
-	"github.com/jellydator/ttlcache/v2"
-	"github.com/pkg/errors"
-	tusd "github.com/tus/tusd/v2/pkg/handler"
-	microstore "go-micro.dev/v4/store"
-	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/trace"
-	"golang.org/x/sync/errgroup"
 )
 
 type CtxKey int
@@ -1054,54 +1054,49 @@ func (fs *Decomposedfs) Delete(ctx context.Context, ref *provider.Reference) (er
 }
 
 // Download returns a reader to the specified resource
-func (fs *Decomposedfs) Download(ctx context.Context, ref *provider.Reference) (io.ReadCloser, error) {
+func (fs *Decomposedfs) Download(ctx context.Context, ref *provider.Reference, openReaderFunc func(md *provider.ResourceInfo) bool) (*provider.ResourceInfo, io.ReadCloser, error) {
 	ctx, span := tracer.Start(ctx, "Download")
 	defer span.End()
 	// check if we are trying to download a revision
 	// TODO the CS3 api should allow initiating a revision download
 	if ref.ResourceId != nil && strings.Contains(ref.ResourceId.OpaqueId, node.RevisionIDDelimiter) {
-		return fs.DownloadRevision(ctx, ref, ref.ResourceId.OpaqueId)
+		return fs.DownloadRevision(ctx, ref, ref.ResourceId.OpaqueId, openReaderFunc)
 	}
 
 	n, err := fs.lu.NodeFromResource(ctx, ref)
 	if err != nil {
-		return nil, errors.Wrap(err, "Decomposedfs: error resolving ref")
+		return nil, nil, err
 	}
 
 	if !n.Exists {
 		err = errtypes.NotFound(filepath.Join(n.ParentID, n.Name))
-		return nil, err
+		return nil, nil, err
 	}
 
 	rp, err := fs.p.AssemblePermissions(ctx, n)
 	switch {
 	case err != nil:
-		return nil, err
+		return nil, nil, err
 	case !rp.InitiateFileDownload:
 		f, _ := storagespace.FormatReference(ref)
 		if rp.Stat {
-			return nil, errtypes.PermissionDenied(f)
+			return nil, nil, errtypes.PermissionDenied(f)
 		}
-		return nil, errtypes.NotFound(f)
+		return nil, nil, errtypes.NotFound(f)
 	}
 
-	mtime, err := n.GetMTime(ctx)
+	ri, err := n.AsResourceInfo(ctx, rp, nil, []string{"size", "mimetype", "etag"}, true)
 	if err != nil {
-		return nil, errors.Wrap(err, "Decomposedfs: error getting mtime for '"+n.ID+"'")
+		return nil, nil, err
 	}
-	currentEtag, err := node.CalculateEtag(n.ID, mtime)
-	if err != nil {
-		return nil, errors.Wrap(err, "Decomposedfs: error calculating etag for '"+n.ID+"'")
+	var reader io.ReadCloser
+	if openReaderFunc(ri) {
+		reader, err = fs.tp.ReadBlob(n)
+		if err != nil {
+			return nil, nil, errors.Wrap(err, "Decomposedfs: error download blob '"+n.ID+"'")
+		}
 	}
-	expectedEtag := download.EtagFromContext(ctx)
-	if currentEtag != expectedEtag {
-		return nil, errtypes.Aborted(fmt.Sprintf("file changed from etag %s to %s", expectedEtag, currentEtag))
-	}
-	reader, err := fs.tp.ReadBlob(n)
-	if err != nil {
-		return nil, errors.Wrap(err, "Decomposedfs: error download blob '"+n.ID+"'")
-	}
-	return reader, nil
+	return ri, reader, nil
 }
 
 // GetLock returns an existing lock on the given reference

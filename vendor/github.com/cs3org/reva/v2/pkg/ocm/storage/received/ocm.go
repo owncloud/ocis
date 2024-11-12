@@ -38,6 +38,8 @@ import (
 	ocmpb "github.com/cs3org/go-cs3apis/cs3/sharing/ocm/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	typepb "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	"github.com/studio-b12/gowebdav"
+
 	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/mime"
@@ -49,7 +51,6 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/cs3org/reva/v2/pkg/utils/cfg"
-	"github.com/studio-b12/gowebdav"
 )
 
 func init() {
@@ -364,13 +365,30 @@ func (d *driver) ListFolder(ctx context.Context, ref *provider.Reference, _ []st
 	return res, nil
 }
 
-func (d *driver) Download(ctx context.Context, ref *provider.Reference) (io.ReadCloser, error) {
-	client, _, rel, err := d.webdavClient(ctx, nil, ref)
+func (d *driver) Download(ctx context.Context, ref *provider.Reference, openReaderfunc func(*provider.ResourceInfo) bool) (*provider.ResourceInfo, io.ReadCloser, error) {
+	client, share, rel, err := d.webdavClient(ctx, nil, ref)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	return client.ReadStream(rel)
+	info, err := client.StatWithProps(rel, []string{}) // request all properties by giving an empty list
+	if err != nil {
+		if gowebdav.IsErrNotFound(err) {
+			return nil, nil, errtypes.NotFound(ref.GetPath())
+		}
+		return nil, nil, err
+	}
+	md, err := convertStatToResourceInfo(ref, info, share)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	if !openReaderfunc(md) {
+		return md, nil, nil
+	}
+
+	reader, err := client.ReadStream(rel)
+	return md, reader, err
 }
 
 func (d *driver) GetPathByID(ctx context.Context, id *provider.ResourceId) (string, error) {
@@ -396,8 +414,8 @@ func (d *driver) ListRevisions(ctx context.Context, ref *provider.Reference) ([]
 	return nil, errtypes.NotSupported("operation not supported")
 }
 
-func (d *driver) DownloadRevision(ctx context.Context, ref *provider.Reference, key string) (io.ReadCloser, error) {
-	return nil, errtypes.NotSupported("operation not supported")
+func (d *driver) DownloadRevision(ctx context.Context, ref *provider.Reference, key string, openReaderFunc func(md *provider.ResourceInfo) bool) (*provider.ResourceInfo, io.ReadCloser, error) {
+	return nil, nil, errtypes.NotSupported("operation not supported")
 }
 
 func (d *driver) RestoreRevision(ctx context.Context, ref *provider.Reference, key string) error {

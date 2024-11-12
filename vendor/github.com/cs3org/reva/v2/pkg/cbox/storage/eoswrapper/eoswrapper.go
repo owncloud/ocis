@@ -28,6 +28,9 @@ import (
 
 	"github.com/Masterminds/sprig"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	"github.com/mitchellh/mapstructure"
+	"github.com/pkg/errors"
+
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/cs3org/reva/v2/pkg/events"
@@ -36,8 +39,6 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storage/utils/eosfs"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
-	"github.com/mitchellh/mapstructure"
-	"github.com/pkg/errors"
 )
 
 func init() {
@@ -193,12 +194,12 @@ func (w *wrapper) ListRevisions(ctx context.Context, ref *provider.Reference) ([
 	return w.FS.ListRevisions(ctx, ref)
 }
 
-func (w *wrapper) DownloadRevision(ctx context.Context, ref *provider.Reference, revisionKey string) (io.ReadCloser, error) {
+func (w *wrapper) DownloadRevision(ctx context.Context, ref *provider.Reference, revisionKey string, openReaderfunc func(*provider.ResourceInfo) bool) (*provider.ResourceInfo, io.ReadCloser, error) {
 	if err := w.userIsProjectAdmin(ctx, ref); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	return w.FS.DownloadRevision(ctx, ref, revisionKey)
+	return w.FS.DownloadRevision(ctx, ref, revisionKey, openReaderfunc)
 }
 
 func (w *wrapper) RestoreRevision(ctx context.Context, ref *provider.Reference, revisionKey string) error {
