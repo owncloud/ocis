@@ -1,6 +1,6 @@
 ---
 title: Proxy
-date: 2024-11-12T10:49:56.382300665Z
+date: 2024-11-12T14:48:13.935101721Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/proxy
@@ -26,6 +26,8 @@ The proxy service is the only service communicating to the outside and needs the
   * [Prequisites](#prequisites)
   * [Configuration](#configuration)
   * [How it Works](#how-it-works)
+  * [Claim Updates](#claim-updates)
+    * [Impacts](#impacts)
 * [Automatic Quota Assignments](#automatic-quota-assignments)
 * [Automatic Role Assignments](#automatic-role-assignments)
 * [Recommendations for Production Deployments](#recommendations-for-production-deployments)
@@ -162,6 +164,30 @@ Groups that do not exist in the external IDP yet will be created. Note: This can
 somewhat costly operation, especially if the user is a member of a large number of
 groups. If the group memberships of a user are changed in the IDP after the
 first login, it can take up to 5 minutes until the changes are reflected in Infinite Scale.
+
+### Claim Updates
+
+OpenID Connect (OIDC) scopes are used by an application during authentication to authorize access to a user's detail, like name, email or picture information. A scope can also contain among other things groups, roles, and permissions data. Each scope returns a set of attributes, which are called claims. The scopes an application requests, depends on which  attributes the application needs. Once the user authorizes the requested scopes, the claims are returned in a token.
+
+These issued JWT tokens are immutable and integrity-protected. Which means, any change in the source requires issuing a new token containing updated claims. On the other hand side, there is no active synchronisation process between the identity provider (IDP) who issues the token and Infinite Scale. The earliest possible time that Infinite Scale will notice changes is, when the current access token has expired and a new access token is issued by the IDP, or the user logs out and relogs in.
+
+**NOTES**
+
+* For resource optimisation, Infinite Scale skips any checks and updates on groupmemberships, if the last update happened less than 5min ago.
+
+* Infinite Scale can't differentiate between a group being renamed in the IDP and users being reassigned to a different group.
+
+* Infinite Scale does not get aware when a group is being deleted in the IDP, an updated claim will not hold any information from the deleted group. Infinite Scale does not track a claim history to compare. 
+
+#### Impacts
+
+For shares or space memberships based on groups, a renamed or deleted group will impact accessing the resource:
+
+* There is no user notification about the inability accessing the resource.
+* The user will only experience rejected access. 
+* This also applies for connected apps like the Desktop, iOS or Android app!
+
+To give access for rejected users on a resource, one with rights to share must update the group information.
 
 ## Automatic Quota Assignments
 
