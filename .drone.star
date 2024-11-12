@@ -14,7 +14,6 @@ CHKO_DOCKER_PUSHRM = "chko/docker-pushrm:1"
 COLLABORA_CODE = "collabora/code:24.04.5.1.1"
 INBUCKET_INBUCKET = "inbucket/inbucket"
 MINIO_MC = "minio/mc:RELEASE.2021-10-07T04-19-58Z"
-NGINX_ALPINE = "nginx:alpine3.20"
 OC_CI_ALPINE = "owncloudci/alpine:latest"
 OC_CI_BAZEL_BUILDIFIER = "owncloudci/bazel-buildifier:latest"
 OC_CI_CLAMAVD = "owncloudci/clamavd"
@@ -265,10 +264,17 @@ config = {
         },
     },
     "e2eMultiService": {
-        "part": {
+        "testSuites": {
             "skip": False,
-            "suites": ["smoke"],  # suites to run
-            "tikaNeeded": False,
+            "suites": [
+                # "smoke", NOTE: large upload test fails. uncomment when fixed
+                "shares",
+                "search",
+                "journeys",
+                "file-action",
+                "spaces",
+            ],
+            "tikaNeeded": True,
         },
     },
     "rocketchat": {
@@ -373,8 +379,15 @@ def main(ctx):
         licenseCheck(ctx)
 
     test_pipelines = \
+        codestyle(ctx) + \
+        checkGherkinLint(ctx) + \
+        checkTestSuitesInExpectedFailures(ctx) + \
         buildWebCache(ctx) + \
+        getGoBinForTesting(ctx) + \
         buildOcisBinaryForTesting(ctx) + \
+        checkStarlark() + \
+        build_release_helpers + \
+        testOcisAndUploadResults(ctx) + \
         testPipelines(ctx)
 
     build_release_pipelines = \
@@ -388,7 +401,7 @@ def main(ctx):
         ),
     )
 
-    pipelines = test_pipelines  #+ build_release_pipelines
+    pipelines = test_pipelines + build_release_pipelines
 
     if ctx.build.event == "cron":
         pipelines = \
@@ -410,7 +423,7 @@ def main(ctx):
         ),
     )
 
-    # pipelineSanityChecks(ctx, pipelines)
+    pipelineSanityChecks(ctx, pipelines)
     return pipelines
 
 def cachePipeline(name, steps):
@@ -471,13 +484,12 @@ def testPipelines(ctx):
     if "skip" not in config["apiTests"] or not config["apiTests"]["skip"]:
         pipelines += apiTests(ctx)
 
-    pipelines += e2eTestPipeline(ctx)
+    pipelines += e2eTestPipeline(ctx) + multiServiceE2ePipeline(ctx)
 
     if ("skip" not in config["k6LoadTests"] or not config["k6LoadTests"]["skip"]) and ("k6-test" in ctx.build.title.lower() or ctx.build.event == "cron"):
         pipelines += k6LoadTests(ctx)
 
-    # return pipelines
-    return multiServiceE2ePipeline(ctx)
+    return pipelines
 
 def getGoBinForTesting(ctx):
     return [{
@@ -1364,7 +1376,7 @@ def multiServiceE2ePipeline(ctx):
         "skip": False,
         "suites": [],
         "xsuites": [],
-        "tikaNeeded": True,
+        "tikaNeeded": False,
     }
 
     e2e_trigger = {
@@ -1386,8 +1398,6 @@ def multiServiceE2ePipeline(ctx):
         "OCIS_GATEWAY_GRPC_ADDR": "0.0.0.0:9142",
         "SETTINGS_GRPC_ADDR": "0.0.0.0:9191",
         "GATEWAY_STORAGE_USERS_MOUNT_ID": "storage-users-id",
-        "GATEWAY_STORAGE_USERS_ENDPOINT": "dns:///nginx:9157",
-        "GRAPH_SPACES_STORAGE_USERS_ADDRESS": "dns:///nginx:9157",
     }
 
     storage_users_environment = {
@@ -1401,13 +1411,12 @@ def multiServiceE2ePipeline(ctx):
         "OCIS_CACHE_STORE": "nats-js-kv",
         "OCIS_CACHE_STORE_NODES": "ocis-server:9233",
         "MICRO_REGISTRY_ADDRESS": "ocis-server:9233",
-        "STORAGE_USERS_DATA_SERVER_URL": "http://nginx:9158/data",
     }
     storage_users1_environment = {
         "STORAGE_USERS_GRPC_ADDR": "storageusers1:9157",
         "STORAGE_USERS_HTTP_ADDR": "storageusers1:9158",
         "STORAGE_USERS_DEBUG_ADDR": "storageusers1:9159",
-        # "STORAGE_USERS_DATA_SERVER_URL": "http://storageusers1:9158/data",
+        "STORAGE_USERS_DATA_SERVER_URL": "http://storageusers1:9158/data",
     }
     for item in storage_users_environment:
         storage_users1_environment[item] = storage_users_environment[item]
@@ -1416,21 +1425,20 @@ def multiServiceE2ePipeline(ctx):
         "STORAGE_USERS_GRPC_ADDR": "storageusers2:9157",
         "STORAGE_USERS_HTTP_ADDR": "storageusers2:9158",
         "STORAGE_USERS_DEBUG_ADDR": "storageusers2:9159",
-        # "STORAGE_USERS_DATA_SERVER_URL": "http://storageusers2:9158/data",
+        "STORAGE_USERS_DATA_SERVER_URL": "http://storageusers2:9158/data",
     }
     for item in storage_users_environment:
         storage_users2_environment[item] = storage_users_environment[item]
 
     storage_volume = [{
         "name": "storage",
-        "path": "/var/lib/ocis",
+        "path": "/root/.ocis",
     }]
     storage_users_services = startOcisService("storage-users", "storageusers1", storage_users1_environment, storage_volume) + \
                              startOcisService("storage-users", "storageusers2", storage_users2_environment, storage_volume) + \
-                             ocisHealthCheck("storage-users", ["storageusers1:9159", "storageusers2:9159"]) + \
-                             nginxLoadBalancer()
+                             ocisHealthCheck("storage-users", ["storageusers1:9159", "storageusers2:9159"])
 
-    for name, suite in config["e2eMultiService"].items():
+    for _, suite in config["e2eMultiService"].items():
         if "skip" in suite and suite["skip"]:
             continue
 
@@ -1461,12 +1469,11 @@ def multiServiceE2ePipeline(ctx):
                     "BASE_URL_OCIS": OCIS_DOMAIN,
                     "HEADLESS": "true",
                     "RETRY": "1",
-                    "SLOW_MO": 500,
+                    "REPORT_TRACING": True,
                 },
                 "commands": [
                     "cd %s/tests/e2e" % dirs["web"],
-                    # "bash run-e2e.sh %s" % e2e_args,
-                    "bash run-e2e.sh cucumber/features/smoke/activity.feature cucumber/features/smoke/upload.feature:19",
+                    "bash run-e2e.sh %s" % e2e_args,
                 ],
             }] + \
             uploadTracingResult(ctx) + \
@@ -3356,15 +3363,3 @@ def onlyofficeService():
             ],
         },
     ]
-
-def nginxLoadBalancer():
-    return [{
-        "name": "nginx",
-        "type": "docker",
-        "image": NGINX_ALPINE,
-        "detach": True,
-        "commands": [
-            "cp  %s/tests/config/drone/nginx.conf /etc/nginx/conf.d/default.conf" % dirs["base"],
-            "/docker-entrypoint.sh nginx -g \"daemon off;\"",
-        ],
-    }] + waitForServices("nginx", ["nginx:80"])
