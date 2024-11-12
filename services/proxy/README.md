@@ -136,11 +136,11 @@ These issued JWT tokens are immutable and integrity-protected. Which means, any 
 
 **NOTES**
 
-* When there is a changed group information for thousands of users, an additional delay may occur to get updated information based on optimizing computational resources needed for group handling.
+* For resource optimisation, Infinite Scale skips any checks and updates on groupmemberships, if the last update happened less than 5min ago.
 
 * Infinite Scale can't differentiate between a group being renamed in the IDP and users being reassigned to a different group.
 
-* Infinite Scale does not get aware when a group is being deleted in the IDP, an updated claim will not hold any information from the deleted group. Infinite Scale does not track a claim history to comapare. 
+* Infinite Scale does not get aware when a group is being deleted in the IDP, an updated claim will not hold any information from the deleted group. Infinite Scale does not track a claim history to compare. 
 
 #### Impacts
 
