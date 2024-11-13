@@ -130,7 +130,7 @@ func DefaultConfig() *config.Config {
 			Cluster:   "ocis-cluster",
 			EnableTLS: false,
 		},
-		MaxConcurrency: 25,
+		MaxConcurrency: 1,
 		PasswordPolicy: config.PasswordPolicy{
 			MinCharacters:          8,
 			MinLowerCaseCharacters: 1,

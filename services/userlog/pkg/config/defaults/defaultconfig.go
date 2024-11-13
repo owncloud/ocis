@@ -34,7 +34,7 @@ func DefaultConfig() *config.Config {
 			Cluster:   "ocis-cluster",
 			EnableTLS: false,
 		},
-		MaxConcurrency: 5,
+		MaxConcurrency: 1,
 		Persistence: config.Persistence{
 			Store:    "memory",
 			Database: "userlog",
