@@ -28,7 +28,7 @@ Feature: move (rename) folder
     When user "Alice" moves folder "/testshare" to "\" using the WebDAV API
     Then the HTTP status code should be "400"
     And user "Alice" should see the following elements
-      | /testshare/ |
+      | /testshare |
     Examples:
       | dav-path-version |
       | old              |
@@ -42,7 +42,7 @@ Feature: move (rename) folder
     When user "Alice" moves folder "/testshare" to "\testshare" using the WebDAV API
     Then the HTTP status code should be "400"
     And user "Alice" should see the following elements
-      | /testshare/ |
+      | /testshare |
     Examples:
       | dav-path-version |
       | old              |
@@ -56,7 +56,7 @@ Feature: move (rename) folder
     When user "Alice" moves folder "/testshare" to "/hola\hola" using the WebDAV API
     Then the HTTP status code should be "400"
     And user "Alice" should see the following elements
-      | /testshare/ |
+      | /testshare |
     Examples:
       | dav-path-version |
       | old              |
@@ -71,9 +71,9 @@ Feature: move (rename) folder
     When user "Alice" moves folder "/testshare" to "/an-other-folder/testshare" using the WebDAV API
     Then the HTTP status code should be "201"
     And user "Alice" should not see the following elements
-      | /testshare/ |
+      | /testshare |
     And user "Alice" should see the following elements
-      | /an-other-folder/testshare/ |
+      | /an-other-folder/testshare |
     Examples:
       | dav-path-version |
       | old              |
@@ -87,7 +87,7 @@ Feature: move (rename) folder
     When user "Alice" moves folder "/testshare" to "/not-existing/testshare" using the WebDAV API
     Then the HTTP status code should be "409"
     And user "Alice" should see the following elements
-      | /testshare/ |
+      | /testshare |
     Examples:
       | dav-path-version |
       | old              |
@@ -258,7 +258,7 @@ Feature: move (rename) folder
     When user "Alice" moves folder "/testshare" to "/.htaccess" using the WebDAV API
     Then the HTTP status code should be "201"
     And user "Alice" should see the following elements
-      | /.htaccess/ |
+      | /.htaccess |
     Examples:
       | dav-path-version |
       | old              |

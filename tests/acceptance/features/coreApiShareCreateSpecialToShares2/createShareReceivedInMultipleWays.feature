@@ -58,9 +58,9 @@ Feature: share resources where the sharee receives the share in multiple ways
     Then the OCS status code should be "<ocs-status-code>"
     And the HTTP status code should be "200"
     And user "Brian" should see the following elements
-      | /Shares/PARENT/           |
+      | /Shares/PARENT            |
       | /Shares/PARENT/parent.txt |
-      | /Shares/CHILD/            |
+      | /Shares/CHILD             |
       | /Shares/CHILD/child.txt   |
     Examples:
       | ocs-api-version | ocs-status-code |
