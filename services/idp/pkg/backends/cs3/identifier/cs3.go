@@ -95,7 +95,7 @@ func (b *CS3Backend) Logon(ctx context.Context, audience, username, password str
 		return false, nil, nil, nil, fmt.Errorf("cs3 backend basic authenticate failed with code %s: %s", res.GetStatus().GetCode().String(), res.GetStatus().GetMessage())
 	}
 
-	session := createSession(ctx, res.GetUser())
+	session := createSession(res.GetUser())
 
 	user, err := newCS3User(res.GetUser())
 	if err != nil {
@@ -155,7 +155,7 @@ func (b *CS3Backend) GetUser(ctx context.Context, userEntryID string, sessionRef
 	}
 
 	// cache session
-	session = createSession(ctx, res.GetUser())
+	session = createSession(res.GetUser())
 	b.sessions.Set(*sessionRef, session)
 
 	user, err := newCS3User(res.GetUser())

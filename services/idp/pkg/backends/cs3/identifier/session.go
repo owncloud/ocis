@@ -1,7 +1,6 @@
 package cs3
 
 import (
-	"context"
 	"time"
 
 	cs3user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
@@ -9,17 +8,9 @@ import (
 
 // createSession creates a new Session without the server using the provided
 // data.
-func createSession(ctx context.Context, u *cs3user.User) *cs3Session {
-
-	if ctx == nil {
-		ctx = context.Background()
-	}
-
-	sessionCtx, cancel := context.WithCancel(ctx)
+func createSession(u *cs3user.User) *cs3Session {
 	s := &cs3Session{
-		ctx:       sessionCtx,
-		u:         u,
-		ctxCancel: cancel,
+		u: u,
 	}
 
 	s.when = time.Now()
@@ -28,10 +19,8 @@ func createSession(ctx context.Context, u *cs3user.User) *cs3Session {
 }
 
 type cs3Session struct {
-	ctx       context.Context
-	ctxCancel context.CancelFunc
-	u         *cs3user.User
-	when      time.Time
+	u    *cs3user.User
+	when time.Time
 }
 
 // User returns the cs3 user of the session
