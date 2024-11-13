@@ -140,7 +140,7 @@ These issued JWT tokens are immutable and integrity-protected. Which means, any 
 
 * Infinite Scale can't differentiate between a group being renamed in the IDP and users being reassigned to a different group.
 
-* Infinite Scale does not get aware when a group is being deleted in the IDP, an updated claim will not hold any information from the deleted group. Infinite Scale does not track a claim history to compare. 
+* Infinite Scale does not get aware when a group is being deleted in the IDP, a new claim will not hold any information from the deleted group. Infinite Scale does not track a claim history to compare. 
 
 #### Impacts
 
