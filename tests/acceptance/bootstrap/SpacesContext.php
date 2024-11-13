@@ -1997,31 +1997,22 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" (copies|moves|renames) a file "([^"]*)" into "([^"]*)" inside space "([^"]*)" using file-id "([^"]*)"$/
+	 * @When /^user "([^"]*)" (copies|moves) file with id "([^"]*)" as "([^"]*)" into folder "([^"]*)" inside space "([^"]*)"$/
 	 *
 	 * @param string $user
 	 * @param string $actionType
-	 * @param string $sourceFile
-	 * @param string $destinationFile
-	 * @param string $toSpaceName
 	 * @param string $fileId
+	 * @param string $destinationFile
+	 * @param string $destinationFolder
+	 * @param string $toSpaceName
 	 *
 	 * @throws GuzzleException
 	 * @return void
 	 */
-	public function userCopiesMovesFileIntoInsideSpaceUsingFileId(string $user, string $actionType, string $sourceFile, string $destinationFile, string $toSpaceName, string $fileId): void {
-		// split the source when there are sub-folders
-		$sourceFile = \trim($sourceFile, "/");
-		$sourceFile = \explode("/", $sourceFile);
-		$sourceFile = \end($sourceFile);
+	public function userCopiesOrMovesFileWithIdAsIntoFolderInsideSpace(string $user, string $actionType, string $fileId, string $destinationFile, string $destinationFolder, string $toSpaceName): void {
 		$destinationFile = \trim($destinationFile, "/");
-		$fileDestination = '';
-		if ($actionType === 'copies' || $actionType === 'moves') {
-			$fileDestination = $this->escapePath($destinationFile) . '/' . $this->escapePath($sourceFile);
-		} elseif ($actionType === 'renames') {
-			$fileDestination = $destinationFile;
-		}
-
+		$destinationFolder = \trim($destinationFolder, "/");
+		$fileDestination = $destinationFolder . '/' . $this->escapePath($destinationFile);
 		$baseUrl = $this->featureContext->getBaseUrl();
 		$sourceDavPath = WebdavHelper::getDavPath($this->featureContext->getDavPathVersion());
 		if ($toSpaceName === 'Shares') {
@@ -2034,9 +2025,43 @@ class SpacesContext implements Context {
 		$fullUrl = "$baseUrl/$sourceDavPath/$fileId";
 		if ($actionType === 'copies') {
 			$this->featureContext->setResponse($this->copyFilesAndFoldersRequest($user, $fullUrl, $headers));
-		} elseif ($actionType === 'moves' || $actionType === 'renames') {
+		} else {
 			$this->featureContext->setResponse($this->moveFilesAndFoldersRequest($user, $fullUrl, $headers));
 		}
+	}
+
+	/**
+	 * @Given /^user "([^"]*)" renames file with id "([^"]*)" to "([^"]*)" inside space "([^"]*)"$/
+	 *
+	 * @param string $user
+	 * @param string $fileId
+	 * @param string $destinationFile
+	 * @param string $spaceName
+	 *
+	 * @throws GuzzleException
+	 * @return void
+	 */
+	public function userRenamesFileWithIdToInsideSpace(
+		string $user,
+		string $fileId,
+		string $destinationFile,
+		string $spaceName
+	): void {
+		$destinationFile = \trim($destinationFile, "/");
+
+		$fileDestination = $this->escapePath($destinationFile);
+
+		$baseUrl = $this->featureContext->getBaseUrl();
+		$sourceDavPath = WebdavHelper::getDavPath($this->featureContext->getDavPathVersion());
+		if ($spaceName === 'Shares') {
+			$sharesPath = $this->featureContext->getSharesMountPath($user, $fileDestination);
+			$davPath = WebDavHelper::getDavPath($this->featureContext->getDavPathVersion());
+			$headers['Destination'] = "$baseUrl/$davPath/$sharesPath";
+		} else {
+			$headers['Destination'] = $this->destinationHeaderValueWithSpaceName($user, $fileDestination, $spaceName, $fileId);
+		}
+		$fullUrl = "$baseUrl/$sourceDavPath/$fileId";
+		$this->featureContext->setResponse($this->moveFilesAndFoldersRequest($user, $fullUrl, $headers));
 	}
 
 	/**

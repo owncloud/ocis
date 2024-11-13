@@ -125,7 +125,7 @@ Feature: checking file versions using file id
     And user "Alice" has uploaded file with content "some data - edited" to "<source>textfile.txt"
     And we save it into "FILEID"
     And using spaces DAV path
-    When user "Alice" moves a file "<source>textfile.txt" into "<destination>" inside space "Personal" using file-id "<<FILEID>>"
+    When user "Alice" moves file with id "<<FILEID>>" as "textfile.txt" into folder "<destination>" inside space "Personal"
     Then the HTTP status code should be "201"
     When user "Alice" gets the number of versions of file "<destination>textfile.txt" using file-id "<<FILEID>>"
     Then the HTTP status code should be "207"
@@ -156,7 +156,7 @@ Feature: checking file versions using file id
     And user "Alice" has uploaded a file inside space "Project1" with content "some data" to "<source>textfile.txt"
     And user "Alice" has uploaded a file inside space "Project1" with content "some data - edited" to "<source>textfile.txt"
     And we save it into "FILEID"
-    When user "Alice" moves a file "<source>textfile.txt" into "<destination>" inside space "Project1" using file-id "<<FILEID>>"
+    When user "Alice" moves file with id "<<FILEID>>" as "textfile.txt" into folder "<destination>" inside space "Project1"
     Then the HTTP status code should be "201"
     When user "Alice" gets the number of versions of file "<destination>textfile.txt" using file-id "<<FILEID>>"
     Then the HTTP status code should be "207"
