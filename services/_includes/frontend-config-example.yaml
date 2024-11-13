@@ -85,7 +85,7 @@ edition: Community
 disable_sse: false
 default_link_permissions: 1
 public_url: https://localhost:9200
-max_concurrency: 25
+max_concurrency: 1
 app_handler:
   insecure: false
   secure_view_app_addr: com.owncloud.api.collaboration

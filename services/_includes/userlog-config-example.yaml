@@ -51,7 +51,7 @@ events:
   enable_tls: false
   username: ""
   password: ""
-max_concurrency: 5
+max_concurrency: 1
 persistence:
   store: memory
   nodes: []
