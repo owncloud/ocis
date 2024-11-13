@@ -60,6 +60,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Fix impersonated request user mismatch: [#10548](https://github.com/owncloud/ocis/pull/10548)
+* Bugfix - Set MaxConcurrency to 1: [#10557](https://github.com/owncloud/ocis/pull/10557)
 
 ## Details
 
@@ -69,6 +70,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/10292
    https://github.com/owncloud/ocis/pull/10548
+
+* Bugfix - Set MaxConcurrency to 1: [#10557](https://github.com/owncloud/ocis/pull/10557)
+
+   Set MaxConcurrency for frontend and userlog services to 1. Too many workers will
+   negatively impact performance on small machines.
+
+   https://github.com/owncloud/ocis/pull/10557
 
 # Changelog for [7.0.0-rc.2] (2024-11-12)
 
