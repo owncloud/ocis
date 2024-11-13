@@ -86,6 +86,10 @@ func writePatch(configPath string, yamlOutput []byte) error {
 	cmd := exec.Command("diff", "-u", path.Join(configPath, configFilename), tmpFile)
 	stdout, err := cmd.Output()
 	if err == nil {
+		err = os.Remove(tmpFile)
+		if err != nil {
+			return err
+		}
 		fmt.Println("no changes, your config is up to date")
 		return nil
 	}

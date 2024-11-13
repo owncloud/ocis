@@ -83,6 +83,12 @@ func CreateConfig(insecure, forceOverwrite, diff bool, configPath, adminPassword
 		revaServicePassword = oldCfg.Idm.ServiceUserPasswords.RevaPassword
 		tokenManagerJwtSecret = oldCfg.TokenManager.JWTSecret
 		collaborationWOPISecret = oldCfg.Collaboration.WopiApp.Secret
+		if collaborationWOPISecret == "" {
+			collaborationWOPISecret, err = generators.GenerateRandomPassword(passwordLength)
+			if err != nil {
+				return fmt.Errorf("could not generate random wopi secret for collaboration service: %s", err)
+			}
+		}
 		machineAuthAPIKey = oldCfg.MachineAuthAPIKey
 		systemUserAPIKey = oldCfg.SystemUserAPIKey
 		revaTransferSecret = oldCfg.TransferSecret
