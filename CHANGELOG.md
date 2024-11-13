@@ -1,5 +1,6 @@
 # Table of Contents
 
+* [Changelog for unreleased](#changelog-for-unreleased-unreleased)
 * [Changelog for 7.0.0-rc.2](#changelog-for-700-rc2-2024-11-12)
 * [Changelog for 7.0.0-rc.1](#changelog-for-700-rc1-2024-11-07)
 * [Changelog for 6.6.1](#changelog-for-661-2024-10-24)
@@ -49,6 +50,25 @@
 * [Changelog for 1.2.0](#changelog-for-120-2021-02-17)
 * [Changelog for 1.1.0](#changelog-for-110-2021-01-22)
 * [Changelog for 1.0.0](#changelog-for-100-2020-12-17)
+
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes for unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis/compare/v7.0.0-rc.2...master
+
+## Summary
+
+* Bugfix - Fix impersonated request user mismatch: [#10548](https://github.com/owncloud/ocis/pull/10548)
+
+## Details
+
+* Bugfix - Fix impersonated request user mismatch: [#10548](https://github.com/owncloud/ocis/pull/10548)
+
+   We fixed a user id and name mismatch in the impersonated auth-app API request
+
+   https://github.com/owncloud/ocis/issues/10292
+   https://github.com/owncloud/ocis/pull/10548
 
 # Changelog for [7.0.0-rc.2] (2024-11-12)
 
