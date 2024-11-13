@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -24,6 +25,8 @@ import (
 	settings "github.com/owncloud/ocis/v2/services/settings/pkg/service/v0"
 	"google.golang.org/grpc/metadata"
 )
+
+var ErrBadRequest = errors.New("bad request")
 
 // AuthAppToken represents an app token.
 type AuthAppToken struct {
@@ -97,8 +100,10 @@ func (a *AuthAppService) HandleCreate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	label := "Generated via API"
-	cid := buildClientID(q.Get("userID"), q.Get("userName"))
-	if cid != "" {
+
+	// Impersonated request
+	userID, userName := q.Get("userID"), q.Get("userName")
+	if userID != "" || userName != "" {
 		if !a.cfg.AllowImpersonation {
 			sublog.Error().Msg("impersonation is not allowed")
 			http.Error(w, "impersonation is not allowed", http.StatusForbidden)
@@ -115,9 +120,13 @@ func (a *AuthAppService) HandleCreate(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusForbidden)
 			return
 		}
-		ctx, err = a.authenticateUser(cid, gwc)
+		ctx, err = a.authenticateUser(userID, userName, gwc)
 		if err != nil {
 			sublog.Error().Err(err).Msg("error authenticating user")
+			if errors.Is(err, ErrBadRequest) {
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
@@ -241,11 +250,11 @@ func (a *AuthAppService) HandleDelete(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func (a *AuthAppService) authenticateUser(clientID string, gwc gateway.GatewayAPIClient) (context.Context, error) {
+func (a *AuthAppService) authenticateUser(userID, userName string, gwc gateway.GatewayAPIClient) (context.Context, error) {
 	ctx := context.Background()
 	authRes, err := gwc.Authenticate(ctx, &gateway.AuthenticateRequest{
 		Type:         "machine",
-		ClientId:     clientID,
+		ClientId:     buildClientID(userID, userName),
 		ClientSecret: a.cfg.MachineAuthAPIKey,
 	})
 	if err != nil {
@@ -254,6 +263,10 @@ func (a *AuthAppService) authenticateUser(clientID string, gwc gateway.GatewayAP
 
 	if authRes.GetStatus().GetCode() != rpc.Code_CODE_OK {
 		return nil, errors.New("error authenticating user: " + authRes.GetStatus().GetMessage())
+	}
+
+	if (userID != "" && authRes.GetUser().GetId().GetOpaqueId() != userID) || (userName != "" && authRes.GetUser().GetUsername() != userName) {
+		return nil, fmt.Errorf("requested user does not match authenticated user: userID:%s, userName:%s, %w", authRes.GetUser().GetId().GetOpaqueId(), authRes.GetUser().GetUsername(), ErrBadRequest)
 	}
 
 	ctx = ctxpkg.ContextSetUser(ctx, &userpb.User{Id: authRes.GetUser().GetId()})
