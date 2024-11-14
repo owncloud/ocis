@@ -1,12 +1,15 @@
 # Table of Contents
 
 * [Changelog for unreleased](#changelog-for-unreleased-unreleased)
+* [Changelog for 5.0.9](#changelog-for-509-2024-11-14)
 * [Changelog for 7.0.0-rc.2](#changelog-for-700-rc2-2024-11-12)
 * [Changelog for 7.0.0-rc.1](#changelog-for-700-rc1-2024-11-07)
 * [Changelog for 6.6.1](#changelog-for-661-2024-10-24)
 * [Changelog for 6.6.0](#changelog-for-660-2024-10-21)
 * [Changelog for 6.5.0](#changelog-for-650-2024-10-01)
+* [Changelog for 5.0.8](#changelog-for-508-2024-09-30)
 * [Changelog for 6.4.0](#changelog-for-640-2024-09-12)
+* [Changelog for 5.0.7](#changelog-for-507-2024-09-04)
 * [Changelog for 6.3.0](#changelog-for-630-2024-08-20)
 * [Changelog for 6.2.0](#changelog-for-620-2024-07-30)
 * [Changelog for 5.0.6](#changelog-for-506-2024-07-17)
@@ -55,7 +58,7 @@
 
 The following sections list the changes for unreleased.
 
-[unreleased]: https://github.com/owncloud/ocis/compare/v7.0.0-rc.2...master
+[unreleased]: https://github.com/owncloud/ocis/compare/v5.0.9...master
 
 ## Summary
 
@@ -101,6 +104,48 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/10569
    https://github.com/owncloud/web/releases/tag/v11.0.3
+
+# Changelog for [5.0.9] (2024-11-14)
+
+The following sections list the changes for 5.0.9.
+
+[5.0.9]: https://github.com/owncloud/ocis/compare/v7.0.0-rc.2...v5.0.9
+
+## Summary
+
+* Bugfix - Thumbnail request limit: [#10280](https://github.com/owncloud/ocis/pull/10280)
+* Bugfix - Restart Postprocessing properly: [#10439](https://github.com/owncloud/ocis/pull/10439)
+* Change - Define maximum input image dimensions and size when generating previews: [#10270](https://github.com/owncloud/ocis/pull/10270)
+
+## Details
+
+* Bugfix - Thumbnail request limit: [#10280](https://github.com/owncloud/ocis/pull/10280)
+
+   The `THUMBNAILS_MAX_CONCURRENT_REQUESTS` setting was not working correctly.
+   Previously it was just limiting the number of concurrent thumbnail downloads.
+   Now the limit is applied to the number thumbnail generations requests.
+   Additionally the webdav service is now returning a "Retry-After" header when it
+   is hitting the ratelimit of the thumbnail service.
+
+   https://github.com/owncloud/ocis/pull/10280
+   https://github.com/owncloud/ocis/pull/10270
+   https://github.com/owncloud/ocis/pull/10225
+
+* Bugfix - Restart Postprocessing properly: [#10439](https://github.com/owncloud/ocis/pull/10439)
+
+   Properly differentiate between resume and restart postprocessing.
+
+   https://github.com/owncloud/ocis/pull/10439
+
+* Change - Define maximum input image dimensions and size when generating previews: [#10270](https://github.com/owncloud/ocis/pull/10270)
+
+   This is a general hardening change to limit processing time and resources of the
+   thumbnailer.
+
+   https://github.com/owncloud/ocis/pull/10270
+   https://github.com/owncloud/ocis/pull/9360
+   https://github.com/owncloud/ocis/pull/9035
+   https://github.com/owncloud/ocis/pull/9069
 
 # Changelog for [7.0.0-rc.2] (2024-11-12)
 
@@ -765,7 +810,7 @@ The following sections list the changes for 6.6.0.
 
 The following sections list the changes for 6.5.0.
 
-[6.5.0]: https://github.com/owncloud/ocis/compare/v6.4.0...v6.5.0
+[6.5.0]: https://github.com/owncloud/ocis/compare/v5.0.8...v6.5.0
 
 ## Summary
 
@@ -1038,11 +1083,34 @@ The following sections list the changes for 6.5.0.
    https://github.com/owncloud/ocis/pull/10157
    https://github.com/owncloud/ocis/pull/9817
 
+# Changelog for [5.0.8] (2024-09-30)
+
+The following sections list the changes for 5.0.8.
+
+[5.0.8]: https://github.com/owncloud/ocis/compare/v6.4.0...v5.0.8
+
+## Summary
+
+* Bugfix - Update reva to v2.19.8: [#10138](https://github.com/owncloud/ocis/pull/10138)
+
+## Details
+
+* Bugfix - Update reva to v2.19.8: [#10138](https://github.com/owncloud/ocis/pull/10138)
+
+   We updated reva to v2.19.8
+
+  *   Fix [cs3org/reva#4761](https://github.com/cs3org/reva/pull/4761): Quotes in dav Content-Disposition header
+  *   Fix [cs3org/reva#4853](https://github.com/cs3org/reva/pull/4853): Write upload session info atomically
+  *   Enh [cs3org/reva#4701](https://github.com/cs3org/reva/pull/4701): Extend service account permissions
+
+   https://github.com/owncloud/ocis/pull/10138
+   https://github.com/owncloud/ocis/pull/10103
+
 # Changelog for [6.4.0] (2024-09-12)
 
 The following sections list the changes for 6.4.0.
 
-[6.4.0]: https://github.com/owncloud/ocis/compare/v6.3.0...v6.4.0
+[6.4.0]: https://github.com/owncloud/ocis/compare/v5.0.7...v6.4.0
 
 ## Summary
 
@@ -1291,6 +1359,52 @@ The following sections list the changes for 6.4.0.
    https://github.com/owncloud/ocis/pull/9920
    https://github.com/owncloud/ocis/pull/9879
    https://github.com/owncloud/ocis/pull/9860
+
+# Changelog for [5.0.7] (2024-09-04)
+
+The following sections list the changes for 5.0.7.
+
+[5.0.7]: https://github.com/owncloud/ocis/compare/v6.3.0...v5.0.7
+
+## Summary
+
+* Enhancement - Add virus filter to sessions command: [#9041](https://github.com/owncloud/ocis/pull/9041)
+* Enhancement - Assimilate `clean` into `sessions` command: [#9828](https://github.com/owncloud/ocis/pull/9828)
+* Enhancement - Update web to v8.0.5: [#9958](https://github.com/owncloud/ocis/pull/9958)
+
+## Details
+
+* Enhancement - Add virus filter to sessions command: [#9041](https://github.com/owncloud/ocis/pull/9041)
+
+   Allow filtering upload session by virus status (has-virus=true/false)
+
+   https://github.com/owncloud/ocis/pull/9041
+
+* Enhancement - Assimilate `clean` into `sessions` command: [#9828](https://github.com/owncloud/ocis/pull/9828)
+
+   We deprecated `ocis storage-user uploads clean` and added the same logic to
+   `ocis storage-users uploads session --clean`
+
+   https://github.com/owncloud/ocis/pull/9828
+
+* Enhancement - Update web to v8.0.5: [#9958](https://github.com/owncloud/ocis/pull/9958)
+
+   Tags: web
+
+   We updated ownCloud Web to v8.0.5. Please refer to the changelog (linked) for
+   details on the web release.
+
+   - Bugfix [owncloud/web#11395](https://github.com/owncloud/web/pull/11395):
+   Missing space members for group memberships - Bugfix
+   [owncloud/web#11263](https://github.com/owncloud/web/pull/11263): Show more
+   toggle in space members view not reactive - Bugfix
+   [owncloud/web#11263](https://github.com/owncloud/web/pull/11263): Space show
+   links from other spaces - Bugfix
+   [owncloud/web#11303](https://github.com/owncloud/web/pull/11303): Uploading
+   nested folders
+
+   https://github.com/owncloud/ocis/pull/9958
+   https://github.com/owncloud/web/releases/tag/v8.0.5
 
 # Changelog for [6.3.0] (2024-08-20)
 
