@@ -57,6 +57,14 @@ type CopyIndex interface {
 	CopyReader() CopyReader
 }
 
+// EventIndex is an optional interface for exposing the support for firing event
+// callbacks for various events in the index.
+type EventIndex interface {
+	// FireIndexEvent is used to fire an event callback when Index() is called,
+	// to notify the caller that a document has been added to the index.
+	FireIndexEvent()
+}
+
 type IndexReader interface {
 	TermFieldReader(ctx context.Context, term []byte, field string, includeFreq, includeNorm, includeTermVectors bool) (TermFieldReader, error)
 

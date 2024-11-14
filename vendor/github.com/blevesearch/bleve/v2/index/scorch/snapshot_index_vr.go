@@ -24,6 +24,7 @@ import (
 	"fmt"
 	"reflect"
 
+	"github.com/RoaringBitmap/roaring"
 	"github.com/blevesearch/bleve/v2/size"
 	index "github.com/blevesearch/bleve_index_api"
 	segment_api "github.com/blevesearch/scorch_segment_api/v2"
@@ -51,6 +52,31 @@ type IndexSnapshotVectorReader struct {
 	ctx           context.Context
 
 	searchParams json.RawMessage
+
+	// The following fields are only applicable for vector readers which will
+	// process pre-filtered kNN queries.
+	eligibleDocIDs []index.IndexInternalID
+}
+
+// Function to convert the internal IDs of the eligible documents to a type suitable
+// for addition to a bitmap.
+// Useful to have the eligible doc IDs in a bitmap to leverage the fast intersection
+// (AND) operations. Eg. finding the eligible doc IDs present in a segment.
+func (i *IndexSnapshotVectorReader) getEligibleDocIDs() *roaring.Bitmap {
+	res := roaring.NewBitmap()
+	if len(i.eligibleDocIDs) > 0 {
+		internalDocIDs := make([]uint32, 0, len(i.eligibleDocIDs))
+		// converts the doc IDs to uint32 and returns
+		for _, eligibleDocInternalID := range i.eligibleDocIDs {
+			internalDocID, err := docInternalToNumber(index.IndexInternalID(eligibleDocInternalID))
+			if err != nil {
+				continue
+			}
+			internalDocIDs = append(internalDocIDs, uint32(internalDocID))
+		}
+		res.AddMany(internalDocIDs)
+	}
+	return res
 }
 
 func (i *IndexSnapshotVectorReader) Size() int {
@@ -108,7 +134,17 @@ func (i *IndexSnapshotVectorReader) Advance(ID index.IndexInternalID,
 	preAlloced *index.VectorDoc) (*index.VectorDoc, error) {
 
 	if i.currPosting != nil && bytes.Compare(i.currID, ID) >= 0 {
-		i2, err := i.snapshot.VectorReader(i.ctx, i.vector, i.field, i.k, i.searchParams)
+		var i2 index.VectorReader
+		var err error
+
+		if len(i.eligibleDocIDs) > 0 {
+			i2, err = i.snapshot.VectorReaderWithFilter(i.ctx, i.vector, i.field,
+				i.k, i.searchParams, i.eligibleDocIDs)
+		} else {
+			i2, err = i.snapshot.VectorReader(i.ctx, i.vector, i.field, i.k,
+				i.searchParams)
+		}
+
 		if err != nil {
 			return nil, err
 		}

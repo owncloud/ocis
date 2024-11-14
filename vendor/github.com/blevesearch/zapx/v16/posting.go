@@ -305,10 +305,7 @@ func (rv *PostingsList) read(postingsOffset uint64, d *Dictionary) error {
 	chunkSize, err := getChunkSize(d.sb.chunkMode,
 		rv.postings.GetCardinality(), d.sb.numDocs)
 	if err != nil {
-		return err
-	} else if chunkSize == 0 {
-		return fmt.Errorf("chunk size is zero, chunkMode: %v, numDocs: %v",
-			d.sb.chunkMode, d.sb.numDocs)
+		return fmt.Errorf("failed to get chunk size: %v", err)
 	}
 
 	rv.chunkSize = chunkSize
@@ -632,6 +629,10 @@ func (i *PostingsIterator) nextDocNumAtOrAfter(atOrAfter uint64) (uint64, bool, 
 		return i.nextDocNumAtOrAfterClean(atOrAfter)
 	}
 
+	if i.postings.chunkSize == 0 {
+		return 0, false, ErrChunkSizeZero
+	}
+
 	i.Actual.AdvanceIfNeeded(uint32(atOrAfter))
 
 	if !i.Actual.HasNext() || !i.all.HasNext() {
@@ -739,6 +740,10 @@ func (i *PostingsIterator) nextDocNumAtOrAfterClean(
 		}
 
 		return uint64(i.Actual.Next()), true, nil
+	}
+
+	if i.postings != nil && i.postings.chunkSize == 0 {
+		return 0, false, ErrChunkSizeZero
 	}
 
 	// freq-norm's needed, so maintain freq-norm chunk reader

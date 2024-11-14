@@ -591,6 +591,10 @@ func writePostings(postings *roaring.Bitmap, tfEncoder, locEncoder *chunkedIntCo
 	use1HitEncoding func(uint64) (bool, uint64, uint64),
 	w *CountHashWriter, bufMaxVarintLen64 []byte) (
 	offset uint64, err error) {
+	if postings == nil {
+		return 0, nil
+	}
+
 	termCardinality := postings.GetCardinality()
 	if termCardinality <= 0 {
 		return 0, nil

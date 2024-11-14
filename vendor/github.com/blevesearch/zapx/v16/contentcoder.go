@@ -19,7 +19,6 @@ import (
 	"encoding/binary"
 	"io"
 	"reflect"
-	"sync/atomic"
 
 	"github.com/golang/snappy"
 )
@@ -37,7 +36,7 @@ var (
 )
 
 type chunkedContentCoder struct {
-	bytesWritten uint64 // atomic access to this variable, moved to top to correct alignment issues on ARM, 386 and 32-bit MIPS.
+	bytesWritten uint64 // moved to top to correct alignment issues on ARM, 386 and 32-bit MIPS.
 
 	final     []byte
 	chunkSize uint64
@@ -112,11 +111,11 @@ func (c *chunkedContentCoder) Close() error {
 }
 
 func (c *chunkedContentCoder) incrementBytesWritten(val uint64) {
-	atomic.AddUint64(&c.bytesWritten, val)
+	c.bytesWritten += val
 }
 
 func (c *chunkedContentCoder) getBytesWritten() uint64 {
-	return atomic.LoadUint64(&c.bytesWritten)
+	return c.bytesWritten
 }
 
 func (c *chunkedContentCoder) flushContents() error {

@@ -24,6 +24,7 @@ import (
 	"github.com/blevesearch/bleve/v2/document"
 	"github.com/blevesearch/bleve/v2/util"
 	index "github.com/blevesearch/bleve_index_api"
+	faiss "github.com/blevesearch/go-faiss"
 )
 
 // Min and Max allowed dimensions for a vector field;
@@ -140,6 +141,10 @@ func (fm *FieldMapping) processVector(propertyMightBeVector interface{},
 	if !ok {
 		return false
 	}
+	// normalize raw vector if similarity is cosine
+	if fm.Similarity == index.CosineSimilarity {
+		vector = NormalizeVector(vector)
+	}
 
 	fieldName := getFieldName(pathString, path, fm)
 	options := fm.Options()
@@ -162,6 +167,10 @@ func (fm *FieldMapping) processVectorBase64(propertyMightBeVectorBase64 interfac
 	decodedVector, err := document.DecodeVector(encodedString)
 	if err != nil || len(decodedVector) != fm.Dims {
 		return
+	}
+	// normalize raw vector if similarity is cosine
+	if fm.Similarity == index.CosineSimilarity {
+		decodedVector = NormalizeVector(decodedVector)
 	}
 
 	fieldName := getFieldName(pathString, path, fm)
@@ -251,4 +260,13 @@ func validateVectorFieldAlias(field *FieldMapping, parentName string,
 	}
 
 	return nil
+}
+
+func NormalizeVector(vec []float32) []float32 {
+	// make a copy of the vector to avoid modifying the original
+	// vector in-place
+	vecCopy := make([]float32, len(vec))
+	copy(vecCopy, vec)
+	// normalize the vector copy using in-place normalization provided by faiss
+	return faiss.NormalizeVector(vecCopy)
 }
