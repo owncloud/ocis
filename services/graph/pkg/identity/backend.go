@@ -8,7 +8,6 @@ import (
 	"github.com/CiscoM31/godata"
 	cs3group "github.com/cs3org/go-cs3apis/cs3/identity/group/v1beta1"
 	cs3user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
-	ocmuser "github.com/cs3org/reva/v2/pkg/ocm/user"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
 )
@@ -133,12 +132,6 @@ func CreateUserModelFromCS3(u *cs3user.User) *libregraph.User {
 		Mail:                     &u.Mail,
 		OnPremisesSamAccountName: u.GetUsername(),
 		Id:                       &u.GetId().OpaqueId,
-	}
-	// decode the remote id if the user is federated
-	if u.GetId().GetType() == cs3user.UserType_USER_TYPE_FEDERATED {
-		remoteID := ocmuser.RemoteID(u.GetId())
-		user.Identities[0].Issuer = &remoteID.Idp
-		user.Identities[0].IssuerAssignedId = &remoteID.OpaqueId
 	}
 	return user
 }
