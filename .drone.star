@@ -942,7 +942,7 @@ def localApiTestPipeline(ctx):
         "federationServer": False,
         "collaborationServiceNeeded": False,
         "extraCollaborationEnvironment": {},
-        "withRemotePhp": [True, False] if ctx.build.event == "cron" else [True],
+        "withRemotePhp": [True, False],
     }
 
     if "localApiTests" in config:
@@ -1230,7 +1230,7 @@ def apiTests(ctx):
     debugParts = config["apiTests"]["skipExceptParts"]
     debugPartsEnabled = (len(debugParts) != 0)
     defaults = {
-        "withRemotePhp": [True, False] if ctx.build.event == "cron" else [True],
+        "withRemotePhp": [True, False],
     }
     for runPart in range(1, config["apiTests"]["numberOfParts"] + 1):
         for withRemotePhp in defaults["withRemotePhp"]:
