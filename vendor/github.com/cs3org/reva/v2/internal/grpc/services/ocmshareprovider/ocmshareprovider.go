@@ -326,8 +326,8 @@ func (s *service) CreateOCMShare(ctx context.Context, req *ocm.CreateOCMShareReq
 	shareWith := ocmuser.FormatOCMUser(ocmuser.RemoteID(req.GetGrantee().GetUserId()))
 
 	// wrap the local user id in a federated user id
-	owner := ocmuser.FormatOCMUser(ocmuser.FederatedID(info.Owner))
-	sender := ocmuser.FormatOCMUser(ocmuser.FederatedID(user.Id))
+	owner := ocmuser.FormatOCMUser(ocmuser.FederatedID(info.Owner, s.conf.ProviderDomain))
+	sender := ocmuser.FormatOCMUser(ocmuser.FederatedID(user.Id, s.conf.ProviderDomain))
 
 	newShareReq := &client.NewShareRequest{
 		ShareWith:         shareWith,

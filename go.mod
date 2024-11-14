@@ -1,6 +1,7 @@
 module github.com/owncloud/ocis/v2
 
-go 1.22.0
+go 1.22.7
+
 toolchain go1.22.9
 
 require (
@@ -16,7 +17,7 @@ require (
 	github.com/cenkalti/backoff v2.2.1+incompatible
 	github.com/coreos/go-oidc/v3 v3.11.0
 	github.com/cs3org/go-cs3apis v0.0.0-20241105092511-3ad35d174fc1
-	github.com/cs3org/reva/v2 v2.26.5
+	github.com/cs3org/reva/v2 v2.26.6-0.20241114152615-4ce61d4d09fc
 	github.com/davidbyttow/govips/v2 v2.15.0
 	github.com/dhowden/tag v0.0.0-20240417053706-3d75831295e8
 	github.com/dutchcoders/go-clamd v0.0.0-20170520113014-b970184f4d9e
