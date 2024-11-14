@@ -106,6 +106,7 @@ type UserSharingJSONCS3Driver struct {
 	SystemUserIDP    string `yaml:"system_user_idp" env:"OCIS_SYSTEM_USER_IDP;SHARING_USER_JSONCS3_SYSTEM_USER_IDP" desc:"IDP of the oCIS STORAGE-SYSTEM system user." introductionVersion:"pre5.0"`
 	SystemUserAPIKey string `yaml:"system_user_api_key" env:"OCIS_SYSTEM_USER_API_KEY;SHARING_USER_JSONCS3_SYSTEM_USER_API_KEY" desc:"API key for the STORAGE-SYSTEM system user." introductionVersion:"pre5.0"`
 	CacheTTL         int    `yaml:"cache_ttl" env:"SHARING_USER_JSONCS3_CACHE_TTL" desc:"TTL for the internal caches in seconds." introductionVersion:"pre5.0"`
+	MaxConcurrency   int    `yaml:"max_concurrency" env:"SHARING_USER_JSONCS3_MAX_CONCURRENCY" desc:"Maximum number of workers for requests to the storage system." introductionVersion:"7.0.0"`
 }
 type PublicSharingDrivers struct {
 	JSON    PublicSharingJSONDriver    `yaml:"json"`
