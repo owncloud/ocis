@@ -18,7 +18,6 @@ import (
 	"bytes"
 	"encoding/binary"
 	"io"
-	"sync/atomic"
 )
 
 // We can safely use 0 to represent termNotEncoded since 0
@@ -36,7 +35,6 @@ type chunkedIntCoder struct {
 
 	buf []byte
 
-	// atomic access to this variable
 	bytesWritten uint64
 }
 
@@ -79,11 +77,11 @@ func (c *chunkedIntCoder) SetChunkSize(chunkSize uint64, maxDocNum uint64) {
 }
 
 func (c *chunkedIntCoder) incrementBytesWritten(val uint64) {
-	atomic.AddUint64(&c.bytesWritten, val)
+	c.bytesWritten += val
 }
 
 func (c *chunkedIntCoder) getBytesWritten() uint64 {
-	return atomic.LoadUint64(&c.bytesWritten)
+	return c.bytesWritten
 }
 
 // Add encodes the provided integers into the correct chunk for the provided

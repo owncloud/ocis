@@ -27,7 +27,6 @@ type chunkedIntDecoder struct {
 	data            []byte
 	r               *memUvarintReader
 
-	// atomic access to this variable
 	bytesRead uint64
 }
 

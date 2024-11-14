@@ -15,6 +15,7 @@
 package zap
 
 import (
+	"errors"
 	"fmt"
 )
 
@@ -26,8 +27,18 @@ var LegacyChunkMode uint32 = 1024
 // be used by default.
 var DefaultChunkMode uint32 = 1026
 
+var ErrChunkSizeZero = errors.New("chunk size is zero")
+
+// getChunkSize returns the chunk size for the given chunkMode, cardinality, and
+// maxDocs.
+//
+// In error cases, the returned chunk size will be 0. Caller can differentiate
+// between a valid chunk size of 0 and an error by checking for ErrChunkSizeZero.
 func getChunkSize(chunkMode uint32, cardinality uint64, maxDocs uint64) (uint64, error) {
 	switch {
+	case chunkMode == 0:
+		return 0, ErrChunkSizeZero
+
 	// any chunkMode <= 1024 will always chunk with chunkSize=chunkMode
 	case chunkMode <= 1024:
 		// legacy chunk size
@@ -46,6 +57,9 @@ func getChunkSize(chunkMode uint32, cardinality uint64, maxDocs uint64) (uint64,
 		// chunk-size items.
 		// no attempt is made to tweak any other case
 		if cardinality <= 1024 {
+			if maxDocs == 0 {
+				return 0, ErrChunkSizeZero
+			}
 			return maxDocs, nil
 		}
 		return 1024, nil
@@ -61,6 +75,9 @@ func getChunkSize(chunkMode uint32, cardinality uint64, maxDocs uint64) (uint64,
 		// 2.  convert to chunkSize, dividing into maxDocs
 		numChunks := (cardinality / 1024) + 1
 		chunkSize := maxDocs / numChunks
+		if chunkSize == 0 {
+			return 0, ErrChunkSizeZero
+		}
 		return chunkSize, nil
 	}
 	return 0, fmt.Errorf("unknown chunk mode %d", chunkMode)

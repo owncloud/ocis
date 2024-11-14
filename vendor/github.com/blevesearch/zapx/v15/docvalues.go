@@ -75,7 +75,6 @@ type docValueReader struct {
 	curChunkData   []byte // compressed data cache
 	uncompressed   []byte // temp buf for snappy decompression
 
-	// atomic access to this variable
 	bytesRead uint64
 }
 

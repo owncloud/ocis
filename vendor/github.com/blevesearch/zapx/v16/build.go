@@ -157,24 +157,24 @@ func persistStoredFieldValues(fieldID int,
 	return curr, data, nil
 }
 
-func InitSegmentBase(mem []byte, memCRC uint32, chunkMode uint32,
-	fieldsMap map[string]uint16, fieldsInv []string, numDocs uint64,
-	storedIndexOffset uint64, dictLocs []uint64,
-	sectionsIndexOffset uint64) (*SegmentBase, error) {
+func InitSegmentBase(mem []byte, memCRC uint32, chunkMode uint32, numDocs uint64,
+	storedIndexOffset uint64, sectionsIndexOffset uint64) (*SegmentBase, error) {
 	sb := &SegmentBase{
 		mem:                 mem,
 		memCRC:              memCRC,
 		chunkMode:           chunkMode,
-		fieldsMap:           fieldsMap,
 		numDocs:             numDocs,
 		storedIndexOffset:   storedIndexOffset,
 		fieldsIndexOffset:   sectionsIndexOffset,
 		sectionsIndexOffset: sectionsIndexOffset,
 		fieldDvReaders:      make([]map[uint16]*docValueReader, len(segmentSections)),
 		docValueOffset:      0, // docValueOffsets identified automatically by the section
-		dictLocs:            dictLocs,
 		fieldFSTs:           make(map[uint16]*vellum.FST),
 		vecIndexCache:       newVectorIndexCache(),
+		// following fields gets populated by loadFieldsNew
+		fieldsMap: make(map[string]uint16),
+		dictLocs:  make([]uint64, 0),
+		fieldsInv: make([]string, 0),
 	}
 	sb.updateSize()
 

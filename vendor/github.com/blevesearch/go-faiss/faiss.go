@@ -9,6 +9,7 @@ package faiss
 
 #include <faiss/c_api/Index_c.h>
 #include <faiss/c_api/error_c.h>
+#include <faiss/c_api/utils/distances_c.h>
 */
 import "C"
 import "errors"
@@ -28,3 +29,13 @@ const (
 	MetricBrayCurtis    = C.METRIC_BrayCurtis
 	MetricJensenShannon = C.METRIC_JensenShannon
 )
+
+// In-place normalization of provided vector (single)
+func NormalizeVector(vector []float32) []float32 {
+	C.faiss_fvec_renorm_L2(
+		C.size_t(len(vector)),
+		1, // number of vectors
+		(*C.float)(&vector[0]))
+
+	return vector
+}
