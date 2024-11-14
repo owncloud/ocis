@@ -8,8 +8,7 @@ Feature: unassign user role
 
 
   Scenario Outline: admin user unassigns the role of another user
-    Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes and without skeleton files
     And the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     And the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
     When user "Alice" unassigns the role of user "Brian" using the Graph API
@@ -18,19 +17,11 @@ Feature: unassign user role
     When user "Brian" uploads file with content "this step will assign the role to default" to "assign-to-default.txt" using the WebDAV API
     And user "Brian" should have the role "User" assigned
     Examples:
-      | user-role   | dav-path-version |
-      | Admin       | old              |
-      | Space Admin | old              |
-      | User        | old              |
-      | User Light  | old              |
-      | Admin       | new              |
-      | Space Admin | new              |
-      | User        | new              |
-      | User Light  | new              |
-      | Admin       | spaces           |
-      | Space Admin | spaces           |
-      | User        | spaces           |
-      | User Light  | spaces           |
+      | user-role   |
+      | Admin       |
+      | Space Admin |
+      | User        |
+      | User Light  |
 
   @issue-6035
   Scenario: admin user tries to unassign his/her own role
