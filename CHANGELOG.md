@@ -65,6 +65,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix impersonated request user mismatch: [#10548](https://github.com/owncloud/ocis/pull/10548)
 * Bugfix - Set MaxConcurrency to 1: [#10557](https://github.com/owncloud/ocis/pull/10557)
 * Bugfix - Fix federated sharing when using an external IDP: [#10567](https://github.com/owncloud/ocis/pull/10567)
+* Bugfix - Fix node cache ttl updates: [#10575](https://github.com/owncloud/ocis/pull/10575)
 * Bugfix - We now limit the number of workers of the jsoncs3 share manager: [#10578](https://github.com/owncloud/ocis/pull/10578)
 * Enhancement - Update web to v11.0.3: [#10569](https://github.com/owncloud/ocis/pull/10569)
 
@@ -91,6 +92,12 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/10567
    https://github.com/cs3org/reva/pull/4933
+
+* Bugfix - Fix node cache ttl updates: [#10575](https://github.com/owncloud/ocis/pull/10575)
+
+   We now only udpate the TTL of the node that is created or updated.
+
+   https://github.com/owncloud/ocis/pull/10575
 
 * Bugfix - We now limit the number of workers of the jsoncs3 share manager: [#10578](https://github.com/owncloud/ocis/pull/10578)
 
