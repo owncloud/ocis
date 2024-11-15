@@ -2,6 +2,7 @@ package revaconfig
 
 import (
 	"math"
+	"net/url"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/ocm/pkg/config"
@@ -9,6 +10,19 @@ import (
 
 // OCMConfigFromStruct will adapt an oCIS config struct into a reva mapstructure to start a reva service.
 func OCMConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]interface{} {
+
+	// Construct the ocm provider domain from the oCIS URL
+	providerDomain := ""
+	u, err := url.Parse(cfg.Commons.OcisURL)
+	switch {
+	case err != nil:
+		logger.Error().Err(err).Msg("could not parse oCIS URL")
+	case u.Host == "":
+		logger.Error().Msg("oCIS URL has no host")
+	default:
+		providerDomain = u.Host
+	}
+
 	return map[string]interface{}{
 		"shared": map[string]interface{}{
 			"jwt_secret":          cfg.TokenManager.JWTSecret,
@@ -59,7 +73,7 @@ func OCMConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]inter
 					"smtp_credentials":   map[string]string{},
 					"gatewaysvc":         cfg.Reva.Address,
 					"mesh_directory_url": cfg.ScienceMesh.MeshDirectoryURL,
-					"provider_domain":    cfg.Commons.OcisURL,
+					"provider_domain":    providerDomain,
 					"events": map[string]interface{}{
 						"natsaddress":          cfg.Events.Endpoint,
 						"natsclusterid":        cfg.Events.Cluster,
@@ -121,7 +135,7 @@ func OCMConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]inter
 							"file": cfg.OCMInviteManager.Drivers.JSON.File,
 						},
 					},
-					"provider_domain":  cfg.Commons.OcisURL,
+					"provider_domain":  providerDomain,
 					"token_expiration": cfg.OCMInviteManager.TokenExpiration.String(),
 					"ocm_timeout":      int(math.Round(cfg.OCMInviteManager.Timeout.Seconds())),
 					"ocm_insecure":     cfg.OCMInviteManager.Insecure,
@@ -142,7 +156,7 @@ func OCMConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]inter
 						},
 					},
 					"gatewaysvc":      cfg.Reva.Address,
-					"provider_domain": cfg.Commons.OcisURL,
+					"provider_domain": providerDomain,
 					"webdav_endpoint": cfg.Commons.OcisURL,
 					"webapp_template": cfg.OCMShareProvider.WebappTemplate,
 					"client_insecure": cfg.OCMShareProvider.Insecure,

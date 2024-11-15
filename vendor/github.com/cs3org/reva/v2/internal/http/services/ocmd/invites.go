@@ -32,6 +32,7 @@ import (
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	"github.com/cs3org/reva/v2/internal/http/services/reqres"
 	"github.com/cs3org/reva/v2/pkg/appctx"
+	ocmuser "github.com/cs3org/reva/v2/pkg/ocm/user"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/utils"
 )
@@ -145,7 +146,7 @@ func (h *invitesHandler) AcceptInvite(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := json.NewEncoder(w).Encode(&user{
-		UserID: acceptInviteResponse.UserId.OpaqueId,
+		UserID: ocmuser.FederatedID(acceptInviteResponse.UserId, "").GetOpaqueId(),
 		Email:  acceptInviteResponse.Email,
 		Name:   acceptInviteResponse.DisplayName,
 	}); err != nil {
