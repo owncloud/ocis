@@ -34,7 +34,7 @@
 | OCIS_SYSTEM_USER_IDP<br/>SHARING_USER_JSONCS3_SYSTEM_USER_IDP | string | internal | IDP of the oCIS STORAGE-SYSTEM system user.|
 | OCIS_SYSTEM_USER_API_KEY<br/>SHARING_USER_JSONCS3_SYSTEM_USER_API_KEY | string |  | API key for the STORAGE-SYSTEM system user.|
 | SHARING_USER_JSONCS3_CACHE_TTL | int | 0 | TTL for the internal caches in seconds.|
-| OCIS_MAX_CONCURRENCY<br/>SHARING_USER_JSONCS3_MAX_CONCURRENCY | int | 5 | Maximum number of concurrent go-routines. Higher values can potentially get work done faster but will also cause more load on the system. Values of 0 or below will be ignored and the default value will be used.|
+| OCIS_MAX_CONCURRENCY<br/>SHARING_USER_JSONCS3_MAX_CONCURRENCY | int | 1 | Maximum number of concurrent go-routines. Higher values can potentially get work done faster but will also cause more load on the system. Values of 0 or below will be ignored and the default value will be used.|
 | SHARING_USER_JSON_FILE | string | /var/lib/ocis/storage/shares.json | Path to the JSON file where shares will be persisted. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH/storage.|
 | SHARING_USER_CS3_PROVIDER_ADDR | string | com.owncloud.api.storage-system | GRPC address of the STORAGE-SYSTEM service.|
 | OCIS_SYSTEM_USER_ID<br/>SHARING_USER_CS3_SYSTEM_USER_ID | string |  | ID of the oCIS STORAGE-SYSTEM system user. Admins need to set the ID for the STORAGE-SYSTEM system user in this config option which is then used to reference the user. Any reasonable long string is possible, preferably this would be an UUIDv4 format.|
