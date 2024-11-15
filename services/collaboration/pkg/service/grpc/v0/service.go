@@ -16,13 +16,13 @@ import (
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
-	"github.com/owncloud/ocis/v2/services/collaboration/pkg/wopisrc"
+	microstore "go-micro.dev/v4/store"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/helpers"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/middleware"
-	microstore "go-micro.dev/v4/store"
+	"github.com/owncloud/ocis/v2/services/collaboration/pkg/wopisrc"
 )
 
 // NewHandler creates a new grpc service implementing the OpenInApp interface
@@ -33,33 +33,33 @@ func NewHandler(opts ...Option) (*Service, func(), error) {
 	}
 	options := newOptions(opts...)
 
-	gwc := options.Gwc
+	gatewaySelector := options.GatewaySelector
 	var err error
-	if gwc == nil {
-		gwc, err = pool.GetGatewayServiceClient(options.Config.CS3Api.Gateway.Name)
+	if gatewaySelector == nil {
+		gatewaySelector, err = pool.GatewaySelector(options.Config.CS3Api.Gateway.Name)
 		if err != nil {
 			return nil, teardown, err
 		}
 	}
 
 	return &Service{
-		id:      options.Config.GRPC.Namespace + "." + options.Config.Service.Name + "." + options.Config.App.Name,
-		appURLs: options.AppURLs,
-		logger:  options.Logger,
-		config:  options.Config,
-		gwc:     gwc,
-		store:   options.Store,
+		id:              options.Config.GRPC.Namespace + "." + options.Config.Service.Name + "." + options.Config.App.Name,
+		appURLs:         options.AppURLs,
+		logger:          options.Logger,
+		config:          options.Config,
+		gatewaySelector: gatewaySelector,
+		store:           options.Store,
 	}, teardown, nil
 }
 
 // Service implements the OpenInApp interface
 type Service struct {
-	id      string
-	appURLs map[string]map[string]string
-	logger  log.Logger
-	config  *config.Config
-	gwc     gatewayv1beta1.GatewayAPIClient
-	store   microstore.Store
+	id              string
+	appURLs         map[string]map[string]string
+	logger          log.Logger
+	config          *config.Config
+	gatewaySelector pool.Selectable[gatewayv1beta1.GatewayAPIClient]
+	store           microstore.Store
 }
 
 // OpenInApp will implement the OpenInApp interface of the app provider
@@ -73,7 +73,13 @@ func (s *Service) OpenInApp(
 	meReq := &gatewayv1beta1.WhoAmIRequest{
 		Token: req.GetAccessToken(),
 	}
-	meResp, err := s.gwc.WhoAmI(ctx, meReq)
+	gwc, err := s.gatewaySelector.Next()
+	if err != nil {
+		s.logger.Error().Err(err).Msg("OpenInApp: could not select a gateway client")
+		return nil, err
+	}
+
+	meResp, err := gwc.WhoAmI(ctx, meReq)
 	if err == nil {
 		if meResp.GetStatus().GetCode() == rpcv1beta1.Code_CODE_OK {
 			user = meResp.GetUser()
