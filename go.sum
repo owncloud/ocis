@@ -194,8 +194,8 @@ github.com/bombsimon/logrusr/v3 v3.1.0/go.mod h1:PksPPgSFEL2I52pla2glgCyyd2OqOHA
 github.com/boombuler/barcode v1.0.1-0.20190219062509-6c824513bacc/go.mod h1:paBWMcWSl3LHKBqUq+rly7CNSldXjb2rDl3JlRe0mD8=
 github.com/bufbuild/protocompile v0.4.0 h1:LbFKd2XowZvQ/kajzguUp2DC9UEIQhIq77fZZlaQsNA=
 github.com/bufbuild/protocompile v0.4.0/go.mod h1:3v93+mbWn/v3xzN+31nwkJfrEpAUwp+BagBSZWx+TP8=
-github.com/butonic/go-micro/v4 v4.11.1-0.20241028133844-ac2cdce96c71 h1:O26NWIQEs6vT4j/mQBH81D82ix7NE2ks1lekZ+g+C2k=
-github.com/butonic/go-micro/v4 v4.11.1-0.20241028133844-ac2cdce96c71/go.mod h1:eE/tD53n3KbVrzrWxKLxdkGw45Fg1qaNLWjpJMvIUF4=
+github.com/butonic/go-micro/v4 v4.11.1-0.20241115112658-b5d4de5ed9b3 h1:h8Z0hBv5tg/uZMKu8V47+DKWYVQg0lYP8lXDQq7uRpE=
+github.com/butonic/go-micro/v4 v4.11.1-0.20241115112658-b5d4de5ed9b3/go.mod h1:eE/tD53n3KbVrzrWxKLxdkGw45Fg1qaNLWjpJMvIUF4=
 github.com/bwesterb/go-ristretto v1.2.3/go.mod h1:fUIoIZaG73pV5biE2Blr2xEzDoMj7NFEuV9ekS419A0=
 github.com/bytecodealliance/wasmtime-go/v3 v3.0.2 h1:3uZCA/BLTIu+DqCfguByNMJa2HVHpXvjfy0Dy7g6fuA=
 github.com/bytecodealliance/wasmtime-go/v3 v3.0.2/go.mod h1:RnUjnIXxEJcL6BgCvNyzCCRzZcxCgsZCi+RNlvYor5Q=
