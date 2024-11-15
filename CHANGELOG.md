@@ -63,9 +63,9 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Fix impersonated request user mismatch: [#10548](https://github.com/owncloud/ocis/pull/10548)
-* Bugfix - We now limit the number of workers of the jsoncs3 share manager: [#10552](https://github.com/owncloud/ocis/pull/10552)
 * Bugfix - Set MaxConcurrency to 1: [#10557](https://github.com/owncloud/ocis/pull/10557)
 * Bugfix - Fix federated sharing when using an external IDP: [#10567](https://github.com/owncloud/ocis/pull/10567)
+* Bugfix - We now limit the number of workers of the jsoncs3 share manager: [#10578](https://github.com/owncloud/ocis/pull/10578)
 * Enhancement - Update web to v11.0.3: [#10569](https://github.com/owncloud/ocis/pull/10569)
 
 ## Details
@@ -76,13 +76,6 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/10292
    https://github.com/owncloud/ocis/pull/10548
-
-* Bugfix - We now limit the number of workers of the jsoncs3 share manager: [#10552](https://github.com/owncloud/ocis/pull/10552)
-
-   We now restrict the number of workers that look up shares to 5. The number can
-   be changed with `SHARING_USER_JSONCS3_MAX_CONCURRENCY`.
-
-   https://github.com/owncloud/ocis/pull/10552
 
 * Bugfix - Set MaxConcurrency to 1: [#10557](https://github.com/owncloud/ocis/pull/10557)
 
@@ -98,6 +91,15 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/10567
    https://github.com/cs3org/reva/pull/4933
+
+* Bugfix - We now limit the number of workers of the jsoncs3 share manager: [#10578](https://github.com/owncloud/ocis/pull/10578)
+
+   We now restrict the number of workers that look up shares to 5. The number can
+   be changed with `SHARING_USER_JSONCS3_MAX_CONCURRENCY` or
+   `OCIS_MAX_CONCURRENCY`.
+
+   https://github.com/owncloud/ocis/pull/10578
+   https://github.com/owncloud/ocis/pull/10552
 
 * Enhancement - Update web to v11.0.3: [#10569](https://github.com/owncloud/ocis/pull/10569)
 
