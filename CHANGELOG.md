@@ -67,6 +67,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix node cache ttl updates: [#10575](https://github.com/owncloud/ocis/pull/10575)
 * Bugfix - We now limit the number of workers of the jsoncs3 share manager: [#10578](https://github.com/owncloud/ocis/pull/10578)
 * Bugfix - Set MaxConcurrency to 1: [#10580](https://github.com/owncloud/ocis/pull/10580)
+* Bugfix - Make collaboration service use a gateway selector: [#10584](https://github.com/owncloud/ocis/pull/10584)
 * Enhancement - Update web to v11.0.3: [#10569](https://github.com/owncloud/ocis/pull/10569)
 
 ## Details
@@ -108,6 +109,10 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/10580
    https://github.com/owncloud/ocis/pull/10557
+
+* Bugfix - Make collaboration service use a gateway selector: [#10584](https://github.com/owncloud/ocis/pull/10584)
+
+   https://github.com/owncloud/ocis/pull/10584
 
 * Enhancement - Update web to v11.0.3: [#10569](https://github.com/owncloud/ocis/pull/10569)
 
