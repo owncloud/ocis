@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-11-15-11-39-13]
+[#deprecation-note-2024-11-15-13-34-14]
 [caption=]
 .Deprecation notes for the sharing service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -403,7 +403,8 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 TTL for the internal caches in seconds.
 
-a|`SHARING_USER_JSONCS3_MAX_CONCURRENCY` +
+a|`OCIS_MAX_CONCURRENCY` +
+`SHARING_USER_JSONCS3_MAX_CONCURRENCY` +
 
 a| [subs=-attributes]
 ++7.0.0 ++
@@ -412,7 +413,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++5 ++
 a| [subs=-attributes]
-Maximum number of workers for requests to the storage system.
+Maximum number of concurrent go-routines. Higher values can potentially get work done faster but will also cause more load on the system. Values of 0 or below will be ignored and the default value will be used.
 
 a|`SHARING_USER_JSON_FILE` +
 
