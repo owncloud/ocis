@@ -6,9 +6,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/defaults"
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/sharing/pkg/config"
 )
 
@@ -76,6 +75,7 @@ func SharingConfigFromStruct(cfg *config.Config, logger log.Logger) (map[string]
 							"service_user_idp":    cfg.UserSharingDrivers.JSONCS3.SystemUserIDP,
 							"machine_auth_apikey": cfg.UserSharingDrivers.JSONCS3.SystemUserAPIKey,
 							"ttl":                 cfg.UserSharingDrivers.JSONCS3.CacheTTL,
+							"max_concurrency":     cfg.UserSharingDrivers.JSONCS3.MaxConcurrency,
 							"events": map[string]interface{}{
 								"natsaddress":          cfg.Events.Addr,
 								"natsclusterid":        cfg.Events.ClusterID,
