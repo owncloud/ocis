@@ -44,6 +44,7 @@ user_sharing_drivers:
     system_user_idp: internal
     system_user_api_key: ""
     cache_ttl: 0
+    max_concurrency: 5
   json:
     file: /var/lib/ocis/storage/shares.json
   cs3:

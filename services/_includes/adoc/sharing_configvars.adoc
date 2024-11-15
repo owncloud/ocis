@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-11-15-11-37-05]
+[#deprecation-note-2024-11-15-11-37-58]
 [caption=]
 .Deprecation notes for the sharing service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -402,6 +402,17 @@ a| [subs=-attributes]
 ++0 ++
 a| [subs=-attributes]
 TTL for the internal caches in seconds.
+
+a|`SHARING_USER_JSONCS3_MAX_CONCURRENCY` +
+
+a| [subs=-attributes]
+++7.0.0 ++
+a| [subs=-attributes]
+++int ++
+a| [subs=-attributes]
+++5 ++
+a| [subs=-attributes]
+Maximum number of workers for requests to the storage system.
 
 a|`SHARING_USER_JSON_FILE` +
 

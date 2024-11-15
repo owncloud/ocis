@@ -6222,10 +6222,10 @@ IDM_ADMIN_USER_ID:
   removalVersion: ""
   deprecationInfo: ""
 IDM_CREATE_DEMO_USERS:
-  name: SETTINGS_SETUP_DEFAULT_ASSIGNMENTS;IDM_CREATE_DEMO_USERS
+  name: IDM_CREATE_DEMO_USERS
   defaultValue: "false"
   type: bool
-  description: The default role assignments the demo users should be setup.
+  description: Flag to enable or disable the creation of the demo users.
   introductionVersion: pre5.0
   deprecationVersion: ""
   removalVersion: ""
@@ -7996,7 +7996,7 @@ OCDAV_WEBDAV_NAMESPACE:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_ADMIN_USER_ID:
-  name: OCIS_ADMIN_USER_ID;SETTINGS_ADMIN_USER_ID
+  name: OCIS_ADMIN_USER_ID;IDM_ADMIN_USER_ID
   defaultValue: ""
   type: string
   description: ID of the user that should receive admin privileges. Consider that
@@ -8017,7 +8017,7 @@ OCIS_ASSET_THEMES_PATH:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_ASYNC_UPLOADS:
-  name: OCIS_ASYNC_UPLOADS
+  name: OCIS_ASYNC_UPLOADS;SEARCH_EVENTS_ASYNC_UPLOADS
   defaultValue: "true"
   type: bool
   description: Enable asynchronous file uploads.
@@ -8047,7 +8047,7 @@ OCIS_CACHE_AUTH_USERNAME:
   deprecationInfo: ""
 OCIS_CACHE_DATABASE:
   name: OCIS_CACHE_DATABASE
-  defaultValue: cache-stat
+  defaultValue: storage-system
   type: string
   description: The database name the configured store should use.
   introductionVersion: pre5.0
@@ -8336,11 +8336,11 @@ OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_GATEWAY_GRPC_ADDR:
-  name: OCIS_GATEWAY_GRPC_ADDR;GATEWAY_GRPC_ADDR
+  name: OCIS_GATEWAY_GRPC_ADDR;STORAGE_USERS_GATEWAY_GRPC_ADDR
   defaultValue: 127.0.0.1:9142
   type: string
-  description: The bind address of the GRPC service.
-  introductionVersion: pre5.0
+  description: The bind address of the gateway GRPC address.
+  introductionVersion: "5.0"
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
@@ -8368,11 +8368,11 @@ OCIS_GRPC_CLIENT_TLS_MODE:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_GRPC_PROTOCOL:
-  name: OCIS_GRPC_PROTOCOL;OCM_GRPC_PROTOCOL
+  name: OCIS_GRPC_PROTOCOL;AUTH_BEARER_GRPC_PROTOCOL
   defaultValue: ""
   type: string
   description: The transport protocol of the GRPC service.
-  introductionVersion: "5.0"
+  introductionVersion: pre5.0
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
@@ -8481,8 +8481,8 @@ OCIS_KEYCLOAK_USER_REALM:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_LDAP_BIND_DN:
-  name: OCIS_LDAP_BIND_DN;GRAPH_LDAP_BIND_DN
-  defaultValue: uid=libregraph,ou=sysusers,o=libregraph-idm
+  name: OCIS_LDAP_BIND_DN;IDP_LDAP_BIND_DN
+  defaultValue: uid=idp,ou=sysusers,o=libregraph-idm
   type: string
   description: LDAP DN to use for simple bind authentication with the target LDAP
     server.
@@ -8491,7 +8491,7 @@ OCIS_LDAP_BIND_DN:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_LDAP_BIND_PASSWORD:
-  name: OCIS_LDAP_BIND_PASSWORD;GRAPH_LDAP_BIND_PASSWORD
+  name: OCIS_LDAP_BIND_PASSWORD;IDP_LDAP_BIND_PASSWORD
   defaultValue: ""
   type: string
   description: Password to use for authenticating the 'bind_dn'.
@@ -8500,12 +8500,12 @@ OCIS_LDAP_BIND_PASSWORD:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_LDAP_CACERT:
-  name: OCIS_LDAP_CACERT;GRAPH_LDAP_CACERT
+  name: OCIS_LDAP_CACERT;IDP_LDAP_TLS_CACERT
   defaultValue: /var/lib/ocis/idm/ldap.crt
   type: string
   description: Path/File name for the root CA certificate (in PEM format) used to
     validate TLS server certificates of the LDAP service. If not defined, the root
-    directory derives from $OCIS_BASE_DATA_PATH/idm.
+    directory derives from $OCIS_BASE_DATA_PATH/idp.
   introductionVersion: pre5.0
   deprecationVersion: ""
   removalVersion: ""
@@ -8562,7 +8562,7 @@ OCIS_LDAP_GROUP_OBJECTCLASS:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_LDAP_GROUP_SCHEMA_DISPLAYNAME:
-  name: OCIS_LDAP_GROUP_SCHEMA_DISPLAYNAME;USERS_LDAP_GROUP_SCHEMA_DISPLAYNAME
+  name: OCIS_LDAP_GROUP_SCHEMA_DISPLAYNAME;AUTH_BASIC_LDAP_GROUP_SCHEMA_DISPLAYNAME
   defaultValue: cn
   type: string
   description: LDAP Attribute to use for the displayname of groups (often the same
@@ -8602,7 +8602,7 @@ OCIS_LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_LDAP_GROUP_SCHEMA_MAIL:
-  name: OCIS_LDAP_GROUP_SCHEMA_MAIL;USERS_LDAP_GROUP_SCHEMA_MAIL
+  name: OCIS_LDAP_GROUP_SCHEMA_MAIL;AUTH_BASIC_LDAP_GROUP_SCHEMA_MAIL
   defaultValue: mail
   type: string
   description: LDAP Attribute to use for the email address of groups (can be empty).
@@ -8630,7 +8630,7 @@ OCIS_LDAP_GROUP_SCOPE:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_LDAP_INSECURE:
-  name: OCIS_LDAP_INSECURE;GRAPH_LDAP_INSECURE
+  name: OCIS_LDAP_INSECURE;IDP_INSECURE
   defaultValue: "false"
   type: bool
   description: Disable TLS certificate validation for the LDAP connections. Do not
@@ -8652,17 +8652,16 @@ OCIS_LDAP_SERVER_WRITE_ENABLED:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_LDAP_URI:
-  name: OCIS_LDAP_URI;GRAPH_LDAP_URI
+  name: OCIS_LDAP_URI;IDP_LDAP_URI
   defaultValue: ldaps://localhost:9235
   type: string
-  description: URI of the LDAP Server to connect to. Supported URI schemes are 'ldaps://'
-    and 'ldap://'
+  description: Url of the LDAP service to use as IDP.
   introductionVersion: pre5.0
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
 OCIS_LDAP_USER_BASE_DN:
-  name: OCIS_LDAP_USER_BASE_DN;GRAPH_LDAP_USER_BASE_DN
+  name: OCIS_LDAP_USER_BASE_DN;IDP_LDAP_BASE_DN
   defaultValue: ou=users,o=libregraph-idm
   type: string
   description: Search base DN for looking up LDAP users.
@@ -8671,7 +8670,7 @@ OCIS_LDAP_USER_BASE_DN:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_LDAP_USER_ENABLED_ATTRIBUTE:
-  name: OCIS_LDAP_USER_ENABLED_ATTRIBUTE;GRAPH_USER_ENABLED_ATTRIBUTE
+  name: OCIS_LDAP_USER_ENABLED_ATTRIBUTE;IDP_USER_ENABLED_ATTRIBUTE
   defaultValue: ownCloudUserEnabled
   type: string
   description: LDAP Attribute to use as a flag telling if the user is enabled or disabled.
@@ -8680,7 +8679,7 @@ OCIS_LDAP_USER_ENABLED_ATTRIBUTE:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_LDAP_USER_FILTER:
-  name: OCIS_LDAP_USER_FILTER;GRAPH_LDAP_USER_FILTER
+  name: OCIS_LDAP_USER_FILTER;IDP_LDAP_FILTER
   defaultValue: ""
   type: string
   description: LDAP filter to add to the default filters for user search like '(objectclass=ownCloud)'.
@@ -8689,11 +8688,10 @@ OCIS_LDAP_USER_FILTER:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_LDAP_USER_OBJECTCLASS:
-  name: OCIS_LDAP_USER_OBJECTCLASS;GRAPH_LDAP_USER_OBJECTCLASS
+  name: OCIS_LDAP_USER_OBJECTCLASS;IDP_LDAP_OBJECTCLASS
   defaultValue: inetOrgPerson
   type: string
-  description: The object class to use for users in the default user search filter
-    ('inetOrgPerson').
+  description: LDAP User ObjectClass like 'inetOrgPerson'.
   introductionVersion: pre5.0
   deprecationVersion: ""
   removalVersion: ""
@@ -8708,11 +8706,10 @@ OCIS_LDAP_USER_SCHEMA_DISPLAYNAME:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_LDAP_USER_SCHEMA_ID:
-  name: OCIS_LDAP_USER_SCHEMA_ID;GRAPH_LDAP_USER_UID_ATTRIBUTE
-  defaultValue: owncloudUUID
+  name: OCIS_LDAP_USER_SCHEMA_ID;IDP_LDAP_UUID_ATTRIBUTE
+  defaultValue: ownCloudUUID
   type: string
-  description: LDAP Attribute to use as the unique ID for users. This should be a
-    stable globally unique ID like a UUID.
+  description: LDAP User UUID attribute like 'uid'.
   introductionVersion: pre5.0
   deprecationVersion: ""
   removalVersion: ""
@@ -8729,10 +8726,10 @@ OCIS_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_LDAP_USER_SCHEMA_MAIL:
-  name: OCIS_LDAP_USER_SCHEMA_MAIL;GRAPH_LDAP_USER_EMAIL_ATTRIBUTE
+  name: OCIS_LDAP_USER_SCHEMA_MAIL;IDP_LDAP_EMAIL_ATTRIBUTE
   defaultValue: mail
   type: string
-  description: LDAP Attribute to use for the email address of users.
+  description: LDAP User email attribute like 'mail'.
   introductionVersion: pre5.0
   deprecationVersion: ""
   removalVersion: ""
@@ -8748,16 +8745,16 @@ OCIS_LDAP_USER_SCHEMA_USER_TYPE:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_LDAP_USER_SCHEMA_USERNAME:
-  name: OCIS_LDAP_USER_SCHEMA_USERNAME;GRAPH_LDAP_USER_NAME_ATTRIBUTE
-  defaultValue: uid
+  name: OCIS_LDAP_USER_SCHEMA_USERNAME;IDP_LDAP_NAME_ATTRIBUTE
+  defaultValue: displayName
   type: string
-  description: LDAP Attribute to use for username of users.
+  description: LDAP User name attribute like 'displayName'.
   introductionVersion: pre5.0
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
 OCIS_LDAP_USER_SCOPE:
-  name: OCIS_LDAP_USER_SCOPE;GRAPH_LDAP_USER_SCOPE
+  name: OCIS_LDAP_USER_SCOPE;IDP_LDAP_SCOPE
   defaultValue: sub
   type: string
   description: LDAP search scope to use when looking up users. Supported scopes are
@@ -8836,16 +8833,16 @@ OCIS_OIDC_CLIENT_ID:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_OIDC_ISSUER:
-  name: OCIS_URL;OCIS_OIDC_ISSUER;AUTH_BEARER_OIDC_ISSUER
+  name: OCIS_URL;OCIS_OIDC_ISSUER;IDP_ISS
   defaultValue: https://localhost:9200
   type: string
-  description: URL of the OIDC issuer. It defaults to URL of the builtin IDP.
+  description: The OIDC issuer URL to use.
   introductionVersion: pre5.0
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
 OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST:
-  name: OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST;FRONTEND_PASSWORD_POLICY_BANNED_PASSWORDS_LIST
+  name: OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST;SHARING_PASSWORD_POLICY_BANNED_PASSWORDS_LIST
   defaultValue: ""
   type: string
   description: Path to the 'banned passwords list' file. This only impacts public
@@ -8855,7 +8852,7 @@ OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_PASSWORD_POLICY_DISABLED:
-  name: OCIS_PASSWORD_POLICY_DISABLED;FRONTEND_PASSWORD_POLICY_DISABLED
+  name: OCIS_PASSWORD_POLICY_DISABLED;SHARING_PASSWORD_POLICY_DISABLED
   defaultValue: "false"
   type: bool
   description: Disable the password policy. Defaults to false if not set.
@@ -8864,7 +8861,7 @@ OCIS_PASSWORD_POLICY_DISABLED:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_PASSWORD_POLICY_MIN_CHARACTERS:
-  name: OCIS_PASSWORD_POLICY_MIN_CHARACTERS;FRONTEND_PASSWORD_POLICY_MIN_CHARACTERS
+  name: OCIS_PASSWORD_POLICY_MIN_CHARACTERS;SHARING_PASSWORD_POLICY_MIN_CHARACTERS
   defaultValue: "8"
   type: int
   description: Define the minimum password length. Defaults to 8 if not set.
@@ -8873,7 +8870,7 @@ OCIS_PASSWORD_POLICY_MIN_CHARACTERS:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_PASSWORD_POLICY_MIN_DIGITS:
-  name: OCIS_PASSWORD_POLICY_MIN_DIGITS;FRONTEND_PASSWORD_POLICY_MIN_DIGITS
+  name: OCIS_PASSWORD_POLICY_MIN_DIGITS;SHARING_PASSWORD_POLICY_MIN_DIGITS
   defaultValue: "1"
   type: int
   description: Define the minimum number of digits. Defaults to 1 if not set.
@@ -8882,7 +8879,7 @@ OCIS_PASSWORD_POLICY_MIN_DIGITS:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS:
-  name: OCIS_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS;FRONTEND_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS
+  name: OCIS_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS;SHARING_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS
   defaultValue: "1"
   type: int
   description: Define the minimum number of uppercase letters. Defaults to 1 if not
@@ -8892,7 +8889,7 @@ OCIS_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS:
-  name: OCIS_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS;FRONTEND_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS
+  name: OCIS_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS;SHARING_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS
   defaultValue: "1"
   type: int
   description: Define the minimum number of characters from the special characters
@@ -8902,7 +8899,7 @@ OCIS_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS:
-  name: OCIS_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS;FRONTEND_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS
+  name: OCIS_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS;SHARING_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS
   defaultValue: "1"
   type: int
   description: Define the minimum number of lowercase letters. Defaults to 1 if not
@@ -9034,7 +9031,7 @@ OCIS_SERVICE_ACCOUNT_SECRET:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD:
-  name: OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD;FRONTEND_OCS_PUBLIC_SHARE_MUST_HAVE_PASSWORD
+  name: OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD;SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD
   defaultValue: "true"
   type: bool
   description: Set this to true if you want to enforce passwords on all public shares.
@@ -9043,11 +9040,13 @@ OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD:
-  name: OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD;FRONTEND_OCS_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD
+  name: OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD;SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD
   defaultValue: "false"
   type: bool
-  description: Set this to true if you want to enforce passwords for writable shares.
-    Only effective if the setting for 'passwords on all public shares' is set to false.
+  description: Set this to true if you want to enforce passwords on Uploader, Editor
+    or Contributor shares. If not using the global OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD,
+    you must define the FRONTEND_OCS_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD in
+    the frontend service.
   introductionVersion: "5.0"
   deprecationVersion: ""
   removalVersion: ""
@@ -9083,10 +9082,10 @@ OCIS_SYSTEM_USER_API_KEY:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_SYSTEM_USER_ID:
-  name: OCIS_SYSTEM_USER_ID;SETTINGS_SYSTEM_USER_ID
+  name: OCIS_SYSTEM_USER_ID
   defaultValue: ""
   type: string
-  description: ID of the oCIS STORAGE-SYSTEM system user. Admins need to set the ID
+  description: ID of the oCIS storage-system system user. Admins need to set the ID
     for the STORAGE-SYSTEM system user in this config option which is then used to
     reference the user. Any reasonable long string is possible, preferably this would
     be an UUIDv4 format.
@@ -9095,7 +9094,7 @@ OCIS_SYSTEM_USER_ID:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_SYSTEM_USER_IDP:
-  name: OCIS_SYSTEM_USER_IDP;SETTINGS_SYSTEM_USER_IDP
+  name: OCIS_SYSTEM_USER_IDP;SHARING_PUBLIC_CS3_SYSTEM_USER_IDP
   defaultValue: internal
   type: string
   description: IDP of the oCIS STORAGE-SYSTEM system user.
@@ -12316,6 +12315,15 @@ SHARING_USER_JSONCS3_CACHE_TTL:
   type: int
   description: TTL for the internal caches in seconds.
   introductionVersion: pre5.0
+  deprecationVersion: ""
+  removalVersion: ""
+  deprecationInfo: ""
+SHARING_USER_JSONCS3_MAX_CONCURRENCY:
+  name: SHARING_USER_JSONCS3_MAX_CONCURRENCY
+  defaultValue: "5"
+  type: int
+  description: Maximum number of workers for requests to the storage system.
+  introductionVersion: 7.0.0
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
