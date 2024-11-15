@@ -5,12 +5,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/cs3org/reva/v2/pkg/utils"
-	"github.com/golang-jwt/jwt/v5"
-	. "github.com/onsi/ginkgo/v2"
-	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/mock"
-
 	appproviderv1beta1 "github.com/cs3org/go-cs3apis/cs3/app/provider/v1beta1"
 	authpb "github.com/cs3org/go-cs3apis/cs3/auth/provider/v1beta1"
 	gatewayv1beta1 "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
@@ -18,10 +12,16 @@ import (
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
-
 	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
+	"github.com/cs3org/reva/v2/pkg/utils"
 	cs3mocks "github.com/cs3org/reva/v2/tests/cs3mocks/mocks"
+	"github.com/golang-jwt/jwt/v5"
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
+	"github.com/stretchr/testify/mock"
+
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/services/collaboration/mocks"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config"
 	service "github.com/owncloud/ocis/v2/services/collaboration/pkg/service/grpc/v0"
 )
@@ -77,23 +77,26 @@ var _ = Describe("Discovery", func() {
 		cfg = &config.Config{}
 		gatewayClient = &cs3mocks.GatewayAPIClient{}
 
+		gatewaySelector := mocks.NewSelectable[gatewayv1beta1.GatewayAPIClient](GinkgoT())
+		gatewaySelector.On("Next").Return(gatewayClient, nil)
+
 		srv, srvTear, _ = service.NewHandler(
 			service.Logger(log.NopLogger()),
 			service.Config(cfg),
 			service.AppURLs(map[string]map[string]string{
-				"view": map[string]string{
+				"view": {
 					".pdf":  "https://test.server.prv/hosting/wopi/word/view",
 					".djvu": "https://test.server.prv/hosting/wopi/word/view",
 					".docx": "https://test.server.prv/hosting/wopi/word/view",
 					".xls":  "https://test.server.prv/hosting/wopi/cell/view",
 					".xlsb": "https://test.server.prv/hosting/wopi/cell/view",
 				},
-				"edit": map[string]string{
+				"edit": {
 					".docx":    "https://test.server.prv/hosting/wopi/word/edit",
 					".invalid": "://test.server.prv/hosting/wopi/cell/edit",
 				},
 			}),
-			service.GatewayAPIClient(gatewayClient),
+			service.GatewaySelector(gatewaySelector),
 		)
 	})
 
