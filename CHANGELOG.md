@@ -63,10 +63,10 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Fix impersonated request user mismatch: [#10548](https://github.com/owncloud/ocis/pull/10548)
-* Bugfix - Set MaxConcurrency to 1: [#10557](https://github.com/owncloud/ocis/pull/10557)
 * Bugfix - Fix federated sharing when using an external IDP: [#10567](https://github.com/owncloud/ocis/pull/10567)
 * Bugfix - Fix node cache ttl updates: [#10575](https://github.com/owncloud/ocis/pull/10575)
 * Bugfix - We now limit the number of workers of the jsoncs3 share manager: [#10578](https://github.com/owncloud/ocis/pull/10578)
+* Bugfix - Set MaxConcurrency to 1: [#10580](https://github.com/owncloud/ocis/pull/10580)
 * Enhancement - Update web to v11.0.3: [#10569](https://github.com/owncloud/ocis/pull/10569)
 
 ## Details
@@ -77,13 +77,6 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/10292
    https://github.com/owncloud/ocis/pull/10548
-
-* Bugfix - Set MaxConcurrency to 1: [#10557](https://github.com/owncloud/ocis/pull/10557)
-
-   Set MaxConcurrency for frontend and userlog services to 1. Too many workers will
-   negatively impact performance on small machines.
-
-   https://github.com/owncloud/ocis/pull/10557
 
 * Bugfix - Fix federated sharing when using an external IDP: [#10567](https://github.com/owncloud/ocis/pull/10567)
 
@@ -107,6 +100,14 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/10578
    https://github.com/owncloud/ocis/pull/10552
+
+* Bugfix - Set MaxConcurrency to 1: [#10580](https://github.com/owncloud/ocis/pull/10580)
+
+   Set MaxConcurrency for frontend and userlog and sharing services to 1. Too many
+   workers will negatively impact performance on small machines.
+
+   https://github.com/owncloud/ocis/pull/10580
+   https://github.com/owncloud/ocis/pull/10557
 
 * Enhancement - Update web to v11.0.3: [#10569](https://github.com/owncloud/ocis/pull/10569)
 
