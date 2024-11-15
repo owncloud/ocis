@@ -14,6 +14,12 @@ import (
 	userprovider "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	"github.com/cs3org/reva/v2/pkg/conversions"
+	revactx "github.com/cs3org/reva/v2/pkg/ctx"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
+	"github.com/cs3org/reva/v2/pkg/utils"
+	cs3mocks "github.com/cs3org/reva/v2/tests/cs3mocks/mocks"
 	"github.com/go-chi/chi/v5"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -23,12 +29,6 @@ import (
 	"github.com/tidwall/gjson"
 	"google.golang.org/grpc"
 
-	"github.com/cs3org/reva/v2/pkg/conversions"
-	revactx "github.com/cs3org/reva/v2/pkg/ctx"
-	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
-	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
-	"github.com/cs3org/reva/v2/pkg/utils"
-	cs3mocks "github.com/cs3org/reva/v2/tests/cs3mocks/mocks"
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	v0 "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
@@ -96,6 +96,13 @@ var _ = Describe("Graph", func() {
 
 	Describe("Drives", func() {
 		Describe("GetDrivesV1 and GetAllDrivesV1", func() {
+			BeforeEach(func() {
+				permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settingssvc.GetPermissionByIDResponse{
+					Permission: &v0.Permission{
+						// the permission is not relevant for this test
+					},
+				}, nil)
+			})
 			It("can list an empty list of spaces", func() {
 				gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&provider.ListStorageSpacesResponse{
 					Status:        status.NewOK(ctx),
@@ -482,6 +489,11 @@ var _ = Describe("Graph", func() {
 		})
 		DescribeTable("GetDrivesV1Beta1 and GetAllDrivesV1Beta1",
 			func(check func(gjson.Result), resourcePermissions provider.ResourcePermissions) {
+				permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settingssvc.GetPermissionByIDResponse{
+					Permission: &v0.Permission{
+						// the permission is not relevant for this test
+					},
+				}, nil)
 				gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Times(1).Return(&provider.ListStorageSpacesResponse{
 					Status: status.NewOK(ctx),
 					StorageSpaces: []*provider.StorageSpace{
@@ -822,6 +834,11 @@ var _ = Describe("Graph", func() {
 			gatewayClient.On("GetQuota", mock.Anything, mock.Anything).Return(&provider.GetQuotaResponse{
 				Status:     status.NewOK(ctx),
 				TotalBytes: 500,
+			}, nil)
+			permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settingssvc.GetPermissionByIDResponse{
+				Permission: &v0.Permission{
+					// the permission is not relevant for this test
+				},
 			}, nil)
 		})
 

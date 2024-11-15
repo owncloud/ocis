@@ -18,6 +18,9 @@ import (
 	cs3rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	revactx "github.com/cs3org/reva/v2/pkg/ctx"
+	"github.com/cs3org/reva/v2/pkg/storagespace"
+	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/pkg/errors"
@@ -25,12 +28,7 @@ import (
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/protobuf/proto"
 
-	revactx "github.com/cs3org/reva/v2/pkg/ctx"
-	"github.com/cs3org/reva/v2/pkg/storagespace"
-	"github.com/cs3org/reva/v2/pkg/utils"
-
 	"github.com/owncloud/ocis/v2/ocis-pkg/l10n"
-	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	v0 "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
@@ -697,18 +695,8 @@ func (g Graph) formatDrives(ctx context.Context, baseURL *url.URL, storageSpaces
 
 // ListStorageSpacesWithFilters List Storage Spaces using filters
 func (g Graph) ListStorageSpacesWithFilters(ctx context.Context, filters []*storageprovider.ListStorageSpacesRequest_Filter, unrestricted bool) (*storageprovider.ListStorageSpacesResponse, error) {
-	gatewayClient, err := g.gatewaySelector.Next()
-	if err != nil {
-		return nil, err
-	}
 
-	grpcClient, err := grpc.NewClient(append(grpc.GetClientOptions(g.config.GRPCClientTLS), grpc.WithTraceProvider(g.traceProvider))...)
-	if err != nil {
-		return nil, err
-	}
-	s := settingssvc.NewPermissionService("com.owncloud.api.settings", grpcClient)
-
-	_, err = s.GetPermissionByID(ctx, &settingssvc.GetPermissionByIDRequest{
+	_, err := g.permissionsService.GetPermissionByID(ctx, &settingssvc.GetPermissionByIDRequest{
 		PermissionId: settingsServiceExt.ListSpacesPermission(0).Id,
 	})
 
@@ -733,6 +721,11 @@ func (g Graph) ListStorageSpacesWithFilters(ctx context.Context, filters []*stor
 			},
 		}},
 		Filters: filters,
+	}
+
+	gatewayClient, err := g.gatewaySelector.Next()
+	if err != nil {
+		return nil, err
 	}
 	res, err := gatewayClient.ListStorageSpaces(ctx, lReq)
 	return res, err
