@@ -1,7 +1,7 @@
 // # Added Variables between oCIS 5.0.0 and oCIS 7.0.0
 // commenting the headline to make it better includable
 
-// table created per 2024.11.07
+// table created per 2024.11.15
 // the table should be recreated/updated on source () changes
 
 [width="100%",cols="~,~,~,~",options="header"]
@@ -31,7 +31,7 @@
 | 
 | OCIS_MAX_CONCURRENCY
 | Maximum number of concurrent go-routines. Higher values can potentially get work done faster but will also cause more load on the system. Values of 0 or below will be ignored and the default value will be used.
-| 5
+| 1
 
 | 
 | OCIS_SHOW_USER_EMAIL_IN_RESULTS
@@ -43,7 +43,7 @@
 | (optional) Set this to a path with custom translations to overwrite the builtin translations. Note that file and folder naming rules apply, see the documentation for more details.
 | 
 
-| 
+| xref:{s-path}/activitylog.adoc[Activitylog]
 | ACTIVITYLOG_TRANSLATION_PATH
 | (optional) Set this to a path with custom translations to overwrite the builtin translations. Note that file and folder naming rules apply, see the documentation for more details.
 | 
@@ -351,7 +351,7 @@
 | 
 | FRONTEND_MAX_CONCURRENCY
 | Maximum number of concurrent go-routines. Higher values can potentially get work done faster but will also cause more load on the system. Values of 0 or below will be ignored and the default value will be used.
-| 25
+| 1
 
 | xref:{s-path}/gateway.adoc[Gateway]
 | GATEWAY_APP_REGISTRY_ENDPOINT
@@ -518,6 +518,11 @@
 | The root CA certificate used to validate the server's TLS certificate. If provided PROXY_EVENTS_TLS_INSECURE will be seen as false.
 | 
 
+| xref:{s-path}/sharing.adoc[Sharing]
+| SHARING_USER_JSONCS3_MAX_CONCURRENCY
+| Maximum number of concurrent go-routines. Higher values can potentially get work done faster but will also cause more load on the system. Values of 0 or below will be ignored and the default value will be used.
+| 1
+
 | xref:{s-path}/sse.adoc[SSE]
 | SSE_KEEPALIVE_INTERVAL
 | To prevent intermediate proxies from closing the SSE connection, send periodic SSE comments to keep it open.
@@ -621,7 +626,7 @@
 | xref:{s-path}/userlog.adoc[Userlog]
 | USERLOG_MAX_CONCURRENCY
 | Maximum number of concurrent go-routines. Higher values can potentially get work done faster but will also cause more load on the system. Values of 0 or below will be ignored and the default value will be used.
-| 5
+| 1
 
 | xref:{s-path}/web.adoc[Web]
 | WEB_ASSET_APPS_PATH
