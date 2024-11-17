@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-11-16-00-41-29]
+[#deprecation-note-2024-11-17-00-40-56]
 [caption=]
 .Deprecation notes for the webdav service
 [width="100%",cols="~,~,~,~",options="header"]
