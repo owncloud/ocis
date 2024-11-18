@@ -72,6 +72,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Make collaboration service use a gateway selector: [#10584](https://github.com/owncloud/ocis/pull/10584)
 * Bugfix - Return an error if we can't get the keys and ensure they're cached: [#10590](https://github.com/owncloud/ocis/pull/10590)
 * Bugfix - Fix status code for thumbnail requests: [#10592](https://github.com/owncloud/ocis/pull/10592)
+* Bugfix - Fix the activity field mapping: [#10593](https://github.com/owncloud/ocis/pull/10593)
 * Enhancement - Update web to v11.0.3: [#10569](https://github.com/owncloud/ocis/pull/10569)
 
 ## Details
@@ -152,6 +153,16 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/10589
    https://github.com/owncloud/ocis/pull/10592
+
+* Bugfix - Fix the activity field mapping: [#10593](https://github.com/owncloud/ocis/pull/10593)
+
+   https://github.com/owncloud/ocis/issues/10228
+   https://github.com/owncloud/ocis/pull/10593
+   Fixed
+   the
+   activity
+   field
+   mapping
 
 * Enhancement - Update web to v11.0.3: [#10569](https://github.com/owncloud/ocis/pull/10569)
 
