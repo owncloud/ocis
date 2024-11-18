@@ -69,6 +69,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Set MaxConcurrency to 1: [#10580](https://github.com/owncloud/ocis/pull/10580)
 * Bugfix - Reuse go-micro service clients: [#10582](https://github.com/owncloud/ocis/pull/10582)
 * Bugfix - Make collaboration service use a gateway selector: [#10584](https://github.com/owncloud/ocis/pull/10584)
+* Bugfix - Return an error if we can't get the keys and ensure they're cached: [#10590](https://github.com/owncloud/ocis/pull/10590)
 * Enhancement - Update web to v11.0.3: [#10569](https://github.com/owncloud/ocis/pull/10569)
 
 ## Details
@@ -121,6 +122,18 @@ The following sections list the changes for unreleased.
 * Bugfix - Make collaboration service use a gateway selector: [#10584](https://github.com/owncloud/ocis/pull/10584)
 
    https://github.com/owncloud/ocis/pull/10584
+
+* Bugfix - Return an error if we can't get the keys and ensure they're cached: [#10590](https://github.com/owncloud/ocis/pull/10590)
+
+   Previously, there was an issue where we could get an error while getting the
+   public keys from the /hosting/discovery endpoint but we're returning a wrong
+   success value instead. This is fixed now and we're returning the error.
+
+   In addition, the public keys weren't being cached, so we hit the
+   /hosting/discovery endpoint every time we need to use the public keys. The keys
+   are now cached so we don't need to hit the endpoint more than what we need.
+
+   https://github.com/owncloud/ocis/pull/10590
 
 * Enhancement - Update web to v11.0.3: [#10569](https://github.com/owncloud/ocis/pull/10569)
 
