@@ -62,6 +62,7 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Log GRPC requests in debug mode: [#10438](https://github.com/owncloud/ocis/pull/10438)
 * Bugfix - Fix impersonated request user mismatch: [#10548](https://github.com/owncloud/ocis/pull/10548)
 * Bugfix - Fix federated sharing when using an external IDP: [#10567](https://github.com/owncloud/ocis/pull/10567)
 * Bugfix - Fix node cache ttl updates: [#10575](https://github.com/owncloud/ocis/pull/10575)
@@ -73,6 +74,12 @@ The following sections list the changes for unreleased.
 * Enhancement - Update web to v11.0.3: [#10569](https://github.com/owncloud/ocis/pull/10569)
 
 ## Details
+
+* Bugfix - Log GRPC requests in debug mode: [#10438](https://github.com/owncloud/ocis/pull/10438)
+
+   When log level is set to debug we will now also log grpc requests.
+
+   https://github.com/owncloud/ocis/pull/10438
 
 * Bugfix - Fix impersonated request user mismatch: [#10548](https://github.com/owncloud/ocis/pull/10548)
 
