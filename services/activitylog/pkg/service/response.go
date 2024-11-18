@@ -331,7 +331,7 @@ func getFolderName(ctx context.Context, gwc gateway.GatewayAPIClient, ref *provi
 
 func mapField(val string) string {
 	switch val {
-	case "TYPE_PERMISSIONS", "permission":
+	case "TYPE_PERMISSIONS", "permission", "permissions":
 		return StrPermission
 	case "TYPE_PASSWORD", "password":
 		return StrPassword
