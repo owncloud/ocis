@@ -104,6 +104,7 @@ func (vh *VerifyHandler) Verify(accessToken, url, timestamp, sig64, oldSig64 str
 			return err
 		}
 		pubkeys = newpubkeys
+		vh.cachedKeys = newpubkeys
 	}
 
 	// build and hash the expected proof
@@ -195,6 +196,8 @@ func (vh *VerifyHandler) generateProof(accessToken, url, timestamp string) []byt
 // The PubKeys returned might be either nil (with the non-nil error), or might
 // contain only a PubKeys.Key field (the PubKeys.OldKey might be nil)
 func (vh *VerifyHandler) fetchPublicKeys(logger *zerolog.Logger) (*PubKeys, error) {
+	logger.Debug().Str("WopiAppUrl", vh.discoveryURL).Msg("WopiDiscovery: requesting new public keys")
+
 	httpClient := http.Client{
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{
@@ -220,7 +223,7 @@ func (vh *VerifyHandler) fetchPublicKeys(logger *zerolog.Logger) (*PubKeys, erro
 			Str("WopiAppUrl", vh.discoveryURL).
 			Int("HttpCode", httpResp.StatusCode).
 			Msg("WopiDiscovery: wopi app url failed with unexpected code")
-		return nil, err
+		return nil, errors.New("wopi app url failed with unexpected code")
 	}
 
 	doc := etree.NewDocument()
