@@ -71,6 +71,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Reuse go-micro service clients: [#10582](https://github.com/owncloud/ocis/pull/10582)
 * Bugfix - Make collaboration service use a gateway selector: [#10584](https://github.com/owncloud/ocis/pull/10584)
 * Bugfix - Return an error if we can't get the keys and ensure they're cached: [#10590](https://github.com/owncloud/ocis/pull/10590)
+* Bugfix - Fix status code for thumbnail requests: [#10592](https://github.com/owncloud/ocis/pull/10592)
 * Enhancement - Update web to v11.0.3: [#10569](https://github.com/owncloud/ocis/pull/10569)
 
 ## Details
@@ -141,6 +142,16 @@ The following sections list the changes for unreleased.
    are now cached so we don't need to hit the endpoint more than what we need.
 
    https://github.com/owncloud/ocis/pull/10590
+
+* Bugfix - Fix status code for thumbnail requests: [#10592](https://github.com/owncloud/ocis/pull/10592)
+
+   We fixed the status code returned by the thumbnails service when the image
+   source for a thumbnail exceeds the configured maximum dimensions or file size.
+   The service now returns a 403 Forbidden status code instead of a 500 Internal
+   Server Error status code.
+
+   https://github.com/owncloud/ocis/issues/10589
+   https://github.com/owncloud/ocis/pull/10592
 
 * Enhancement - Update web to v11.0.3: [#10569](https://github.com/owncloud/ocis/pull/10569)
 
