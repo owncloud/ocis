@@ -117,17 +117,15 @@ Feature: PROPFIND with depth:infinity
       | simple-folder/simple-folder1/simple-folder2/welcome.txt   |
     Examples:
       | dav-path-version |
-      | old              |
       | new              |
       | spaces           |
 
   @issue-10331
-  Scenario Outline: get the list of resources in a folder shared through public link with depth infinity when depth infinity is not allowed
+  Scenario: get the list of resources in a folder shared through public link with depth infinity when depth infinity is not allowed
     Given the following configs have been set:
       | config                                       | value |
       | OCDAV_ALLOW_PROPFIND_DEPTH_INFINITY          | false |
       | OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD | false |
-    And using <dav-path-version> DAV path
     And using SharingNG
     And user "Alice" has created the following resource link share:
       | resource        | simple-folder |
@@ -135,10 +133,6 @@ Feature: PROPFIND with depth:infinity
       | permissionsRole | view          |
     When the public lists the resources in the last created public link with depth "infinity" using the WebDAV API
     Then the HTTP status code should be "400"
-    Examples:
-      | dav-path-version |
-      | new              |
-      | spaces           |
 
 
   Scenario Outline: get the list of files in the trashbin with depth infinity when depth infinity is not allowed
@@ -153,6 +147,5 @@ Feature: PROPFIND with depth:infinity
     Then the HTTP status code should be "400"
     Examples:
       | dav-path-version |
-      | old              |
       | new              |
       | spaces           |

@@ -62,7 +62,6 @@ Synchronization features like etag propagation, setting mtime and locking files
 - [coreApiTrashbin/trashbinSharingToShares.feature:144](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinSharingToShares.feature#L144)
 - [coreApiTrashbin/trashbinSharingToShares.feature:202](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinSharingToShares.feature#L202)
 - [coreApiTrashbin/trashbinSharingToShares.feature:203](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinSharingToShares.feature#L203)
-- [coreApiTrashbin/trashbinSharingToShares.feature:204](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinSharingToShares.feature#L204)
 
 ### Other
 
@@ -154,7 +153,7 @@ _ocdav: api compatibility, return correct status code_
 
 #### [Trying to delete other user's trashbin item returns 409 for spaces path instead of 404](https://github.com/owncloud/ocis/issues/9791)
 
-- [coreApiTrashbin/trashbinDelete.feature:97](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinDelete.feature#L97)
+- [coreApiTrashbin/trashbinDelete.feature:92](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinDelete.feature#L92)
 
 #### [MOVE a file into same folder with same name returns 404 instead of 403](https://github.com/owncloud/ocis/issues/1976)
 
@@ -194,7 +193,7 @@ _ocdav: api compatibility, return correct status code_
 
 #### [Trying to restore personal file to file of share received folder returns 403 but the share file is deleted (new dav path)](https://github.com/owncloud/ocis/issues/10356)
 
-- [coreApiTrashbin/trashbinSharingToShares.feature:281](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinSharingToShares.feature#L281)
+- [coreApiTrashbin/trashbinSharingToShares.feature:277](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinSharingToShares.feature#L277)
 
 ### Won't fix
 

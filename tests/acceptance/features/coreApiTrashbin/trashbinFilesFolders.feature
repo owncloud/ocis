@@ -17,7 +17,6 @@ Feature: files and folders exist in the trashbin after being deleted
     But as "Alice" file "/textfile0.txt" should not exist
     Examples:
       | dav-path-version |
-      | old              |
       | new              |
       | spaces           |
 
@@ -30,7 +29,6 @@ Feature: files and folders exist in the trashbin after being deleted
     And as "Alice" folder "/tmp" should exist in the trashbin
     Examples:
       | dav-path-version |
-      | old              |
       | new              |
       | spaces           |
 
@@ -46,7 +44,6 @@ Feature: files and folders exist in the trashbin after being deleted
     But as "Alice" file "/new-folder/new-file.txt" should not exist
     Examples:
       | dav-path-version |
-      | old              |
       | new              |
       | spaces           |
 
@@ -70,7 +67,6 @@ Feature: files and folders exist in the trashbin after being deleted
     But as "Alice" file "/shared/shared_file.txt" should not exist
     Examples:
       | dav-path-version |
-      | old              |
       | new              |
       | spaces           |
 
@@ -92,7 +88,6 @@ Feature: files and folders exist in the trashbin after being deleted
     And as "Alice" the folder with original path "/shared" should exist in the trashbin
     Examples:
       | dav-path-version |
-      | old              |
       | new              |
       | spaces           |
 
@@ -124,7 +119,6 @@ Feature: files and folders exist in the trashbin after being deleted
     And as "Alice" the folder with original path "/textfile0.txt" should exist in the trashbin
     Examples:
       | dav-path-version |
-      | old              |
       | new              |
       | spaces           |
 
@@ -144,7 +138,6 @@ Feature: files and folders exist in the trashbin after being deleted
     And as "Alice" the folder with original path "/textfile0.txt" should exist in the trashbin
     Examples:
       | dav-path-version |
-      | old              |
       | new              |
       | spaces           |
 
@@ -162,7 +155,6 @@ Feature: files and folders exist in the trashbin after being deleted
       | textfile1.txt | testtrashbin100 |
     Examples:
       | dav-path-version |
-      | old              |
       | new              |
       | spaces           |
 
@@ -183,7 +175,6 @@ Feature: files and folders exist in the trashbin after being deleted
       | textfile2.txt | testtrashbin101 |
     Examples:
       | dav-path-version |
-      | old              |
       | new              |
       | spaces           |
 
@@ -209,7 +200,6 @@ Feature: files and folders exist in the trashbin after being deleted
       | textfile3.txt | testtrashbin102 |
     Examples:
       | dav-path-version |
-      | old              |
       | new              |
       | spaces           |
 
@@ -222,7 +212,6 @@ Feature: files and folders exist in the trashbin after being deleted
     Then the HTTP status code should be "404"
     Examples:
       | dav-path-version |
-      | old              |
       | new              |
       | spaces           |
 
@@ -233,7 +222,6 @@ Feature: files and folders exist in the trashbin after being deleted
     Then the HTTP status code should be "404"
     Examples:
       | dav-path-version |
-      | old              |
       | new              |
       | spaces           |
 
@@ -249,7 +237,6 @@ Feature: files and folders exist in the trashbin after being deleted
       | /textfile0.txt | Alice |
     Examples:
       | dav-path-version |
-      | old              |
       | new              |
       | spaces           |
 
@@ -265,7 +252,6 @@ Feature: files and folders exist in the trashbin after being deleted
       | /textfile0.txt | Alice |
     Examples:
       | dav-path-version |
-      | old              |
       | new              |
       | spaces           |
 
@@ -280,9 +266,6 @@ Feature: files and folders exist in the trashbin after being deleted
     But as "<user>" file "/textfile0.txt" should not exist
     Examples:
       | dav-path-version | user     |
-      | old              | dash-123 |
-      | old              | null     |
-      | old              | nil      |
       | new              | dash-123 |
       | new              | null     |
       | new              | nil      |
@@ -300,7 +283,6 @@ Feature: files and folders exist in the trashbin after being deleted
     But as "Alice" file "sample,1.txt" should not exist
     Examples:
       | dav-path-version |
-      | old              |
       | new              |
       | spaces           |
 
@@ -317,7 +299,6 @@ Feature: files and folders exist in the trashbin after being deleted
     But as "Alice" file "/new-folder/new-file.txt" should not exist
     Examples:
       | dav-path-version |
-      | old              |
       | new              |
       | spaces           |
 
@@ -331,7 +312,6 @@ Feature: files and folders exist in the trashbin after being deleted
     And the deleted file "file.txt" should have the correct deletion mtime in the response
     Examples:
       | dav-path-version |
-      | old              |
       | new              |
       | spaces           |
 
@@ -389,7 +369,6 @@ Feature: files and folders exist in the trashbin after being deleted
       | fo.xyz           |
     Examples:
       | dav-path-version |
-      | old              |
       | new              |
       | spaces           |
 
@@ -447,6 +426,5 @@ Feature: files and folders exist in the trashbin after being deleted
       | fo.xyz       |
     Examples:
       | dav-path-version |
-      | old              |
       | new              |
       | spaces           |

@@ -167,7 +167,8 @@ Feature: List a sharing permissions
 
 
   Scenario: user lists permissions of a project space
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given using spaces DAV path
+    And user "Brian" has been created with default attributes and without skeleton files
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
     When user "Alice" lists the permissions of space "new-space" using permissions endpoint of the Graph API
@@ -289,7 +290,8 @@ Feature: List a sharing permissions
 
   @issues-8352
   Scenario Outline: sharer lists permissions of a shared project space
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given using spaces DAV path
+    And user "Brian" has been created with default attributes and without skeleton files
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
     And user "Alice" has sent the following space share invitation:
@@ -1040,7 +1042,8 @@ Feature: List a sharing permissions
 
 
   Scenario: try to lists the permissions of a Personal drive using root endpoint
-    Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
     When user "Alice" tries to list the permissions of space "Personal" using root endpoint of the Graph API
     Then the HTTP status code should be "200"
@@ -1161,7 +1164,8 @@ Feature: List a sharing permissions
 
 
   Scenario: try to lists the permissions of a Shares drive using root endpoint
-    Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
     When user "Alice" tries to list the permissions of space "Shares" using root endpoint of the Graph API
     Then the HTTP status code should be "200"
@@ -1184,7 +1188,8 @@ Feature: List a sharing permissions
 
 
   Scenario: space admin invites to a project space with all allowed roles
-    Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
+    Given using spaces DAV path
+    And the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
     And user "Brian" has been created with default attributes and without skeleton files
     When user "Alice" lists the permissions of space "new-space" using permissions endpoint of the Graph API
@@ -1211,7 +1216,8 @@ Feature: List a sharing permissions
 
 
   Scenario: non-member user tries to list the permissions of a project space using permissions endpoint
-    Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
     When user "Brian" tries to list the permissions of space "new-space" owned by "Alice" using permissions endpoint of the Graph API
@@ -1267,7 +1273,8 @@ Feature: List a sharing permissions
 
 
   Scenario: try to list the permissions of other user's personal space
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given using spaces DAV path
+    And user "Brian" has been created with default attributes and without skeleton files
     When user "Brian" tries to list the permissions of space "Personal" owned by "Alice" using permissions endpoint of the Graph API
     Then the HTTP status code should be "404"
     And the JSON data of the response should match
@@ -1306,7 +1313,8 @@ Feature: List a sharing permissions
 
 
   Scenario Outline: sharer lists permissions of a shared project space using root endpoint
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given using spaces DAV path
+    And user "Brian" has been created with default attributes and without skeleton files
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
     And user "Alice" has sent the following space share invitation:
@@ -1582,7 +1590,8 @@ Feature: List a sharing permissions
 
 
   Scenario: user sends share invitation with all allowed roles for a project space using root endpoint
-    Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
+    Given using spaces DAV path
+    And the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
     And user "Brian" has been created with default attributes and without skeleton files
     When user "Alice" lists the permissions of space "new-space" using root endpoint of the Graph API
@@ -1594,7 +1603,8 @@ Feature: List a sharing permissions
 
   @issue-9151
   Scenario: non-member user tries to list the permissions of a project space using root endpoint
-    Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
     When user "Brian" tries to list the permissions of space "new-space" owned by "Alice" using root endpoint of the Graph API

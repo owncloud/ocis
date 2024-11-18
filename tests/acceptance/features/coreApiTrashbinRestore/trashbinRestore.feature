@@ -142,7 +142,6 @@ Feature: restore deleted files/folders
       | /textfile0.txt |
     Examples:
       | dav-path-version | http-status-code |
-      | old              | 404              |
       | new              | 404              |
       | spaces           | 400              |
 
@@ -158,7 +157,6 @@ Feature: restore deleted files/folders
       | /textfile0.txt |
     Examples:
       | dav-path-version |
-      | old              |
       | new              |
       | spaces           |
 
@@ -174,7 +172,6 @@ Feature: restore deleted files/folders
       | /textfile0.txt |
     Examples:
       | dav-path-version |
-      | old              |
       | spaces           |
       | new              |
 
@@ -467,7 +464,6 @@ Feature: restore deleted files/folders
       | /parent_folder/sub/parent.txt |
     Examples:
       | dav-path-version |
-      | old              |
       | spaces           |
       | new              |
 
@@ -483,7 +479,6 @@ Feature: restore deleted files/folders
       | /parent.txt |
     Examples:
       | dav-path-version |
-      | old              |
       | spaces           |
       | new              |
 
