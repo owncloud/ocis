@@ -611,3 +611,88 @@ Feature: an user shares resources using ScienceMesh application
         }
       }
       """
+
+  @issue-10222
+  Scenario: local user lists multiple federation shares
+    Given using server "LOCAL"
+    And "Alice" has created the federation share invitation
+    And using server "REMOTE"
+    And "Brian" has accepted invitation
+    And user "Brian" has uploaded file with content "ocm test" to "/textfile.txt"
+    And user "Brian" has created folder "folderToShare"
+    And user "Brian" has sent the following resource share invitation to federated user:
+      | resource        | folderToShare                 |
+      | space           | Personal                      |
+      | sharee          | Alice                         |
+      | shareType       | user                          |
+      | permissionsRole | Viewer                        |
+    And user "Brian" has sent the following resource share invitation to federated user:
+      | resource        | textfile.txt                  |
+      | space           | Personal                      |
+      | sharee          | Alice                         |
+      | shareType       | user                          |
+      | permissionsRole | Viewer                        |
+    And using server "LOCAL"
+    When user "Alice" lists the shares shared with her using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "value"
+        ],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "uniqueItems": true,
+            "items": {
+              "oneOf":[
+                {
+                  "type": "object",
+                  "required": [
+                    "@UI.Hidden",
+                    "@client.synchronize",
+                    "createdBy",
+                    "eTag",
+                    "folder",
+                    "id",
+                    "lastModifiedDateTime",
+                    "name",
+                    "parentReference",
+                    "remoteItem"
+                  ],
+                  "properties": {
+                    "name": {
+                      "const": "folderToShare"
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": [
+                    "@UI.Hidden",
+                    "@client.synchronize",
+                    "createdBy",
+                    "eTag",
+                    "file",
+                    "id",
+                    "lastModifiedDateTime",
+                    "name",
+                    "parentReference",
+                    "remoteItem"
+                  ],
+                  "properties": {
+                    "name": {
+                      "const": "textfile.txt"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+      """
