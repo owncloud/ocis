@@ -22,6 +22,7 @@ import (
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	thumbnailssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/thumbnails/v0"
+	terrors "github.com/owncloud/ocis/v2/services/thumbnails/pkg/errors"
 	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/preprocessor"
 	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/service/grpc/v0/decorators"
 	tjwt "github.com/owncloud/ocis/v2/services/thumbnails/pkg/service/jwt"
@@ -155,9 +156,13 @@ func (g Thumbnail) handleCS3Source(ctx context.Context, req *thumbnailssvc.GetTh
 
 	ctx = imgsource.ContextSetAuthorization(ctx, src.GetAuthorization())
 	r, err := g.cs3Source.Get(ctx, src.GetPath())
-	if err != nil {
+	switch {
+	case errors.Is(err, terrors.ErrImageTooLarge):
+		return "", merrors.Forbidden(g.serviceID, err.Error())
+	case err != nil:
 		return "", merrors.InternalServerError(g.serviceID, "could not get image from source: %s", err.Error())
 	}
+
 	defer r.Close()
 	ppOpts := map[string]interface{}{
 		"fontFileMap": g.preprocessorOpts.TxtFontFileMap,
@@ -169,10 +174,10 @@ func (g Thumbnail) handleCS3Source(ctx context.Context, req *thumbnailssvc.GetTh
 	}
 
 	key, err = g.manager.Generate(tr, img)
-	if err != nil {
-		return "", err
+	if errors.Is(err, terrors.ErrImageTooLarge) {
+		return "", merrors.Forbidden(g.serviceID, err.Error())
 	}
-	return key, nil
+	return key, err
 }
 
 func (g Thumbnail) handleWebdavSource(ctx context.Context, req *thumbnailssvc.GetThumbnailRequest) (string, error) {
@@ -244,7 +249,10 @@ func (g Thumbnail) handleWebdavSource(ctx context.Context, req *thumbnailssvc.Ge
 	imgURL.RawQuery = params.Encode()
 
 	r, err := g.webdavSource.Get(ctx, imgURL.String())
-	if err != nil {
+	switch {
+	case errors.Is(err, terrors.ErrImageTooLarge):
+		return "", merrors.Forbidden(g.serviceID, err.Error())
+	case err != nil:
 		return "", merrors.InternalServerError(g.serviceID, "could not get image from source: %s", err.Error())
 	}
 	defer r.Close()
@@ -258,10 +266,10 @@ func (g Thumbnail) handleWebdavSource(ctx context.Context, req *thumbnailssvc.Ge
 	}
 
 	key, err = g.manager.Generate(tr, img)
-	if err != nil {
-		return "", err
+	if errors.Is(err, terrors.ErrImageTooLarge) {
+		return "", merrors.Forbidden(g.serviceID, err.Error())
 	}
-	return key, nil
+	return key, err
 }
 
 func (g Thumbnail) stat(path, auth string) (*provider.StatResponse, error) {
