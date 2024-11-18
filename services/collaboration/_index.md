@@ -1,6 +1,6 @@
 ---
 title: Collaboration
-date: 2024-11-18T15:55:54.968615693Z
+date: 2024-11-18T16:00:38.139765144Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/collaboration
@@ -48,8 +48,11 @@ If any of the named services above have not been started or are not reachable, t
 There are a few variables that you need to set:
 
 * `COLLABORATION_APP_NAME`:\
-  The name of the connected WebOffice app, which can be one of the following:\
-  `Collabora`, `OnlyOffice`, `Microsoft365` or `MicrosoftOfficeOnline`.
+  The name of the app which is shown to the user. You can chose freely but you are limited to a single word without special characters or whitespaces. We recommend to use pascalCase like 'CollaboraOnline'.
+
+* `COLLABORATION_APP_PRODUCT`:\
+  The product name of the connected WebOffice app, which can be one of the following:\
+  `Collabora`, `OnlyOffice`, `Microsoft365` or `MicrosoftOfficeOnline`. This is used to internally control the behavior according to the different features of the used products.
 
 * `COLLABORATION_APP_ADDR`:\
   The URL of the collaborative editing app (onlyoffice, collabora, etc).\
