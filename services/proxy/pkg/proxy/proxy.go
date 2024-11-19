@@ -14,6 +14,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/proxy/policy"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/router"
+	"github.com/rs/zerolog"
 )
 
 // MultiHostReverseProxy extends "httputil" to support multiple hosts with different policies
@@ -39,6 +40,16 @@ func NewMultiHostReverseProxy(opts ...Option) (*MultiHostReverseProxy, error) {
 	rp.Rewrite = func(r *httputil.ProxyRequest) {
 		ri := router.ContextRoutingInfo(r.In.Context())
 		ri.Rewrite()(r)
+	}
+
+	rp.ErrorHandler = func(rw http.ResponseWriter, req *http.Request, err error) {
+		reqLogger := zerolog.Ctx(req.Context())
+		if ev := reqLogger.Error(); ev.Enabled() {
+			ev.Err(err).Msg("error happened in MultiHostReverseProxy")
+		} else {
+			rp.logger.Err(err).Msg("error happened in MultiHostReverseProxy")
+		}
+		rw.WriteHeader(http.StatusBadGateway)
 	}
 
 	tlsConf := &tls.Config{
