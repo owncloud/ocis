@@ -108,9 +108,8 @@ Feature: propagation of etags when creating folders
       | new              |
 
   @env-config @issue-4251 @issue-10331
-  Scenario Outline: creating a folder in a publicly shared folder changes its etag for the sharer
+  Scenario: creating a folder in a publicly shared folder changes its etag for the sharer
     Given the config "OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false"
-    And using <dav-path-version> DAV path
     And user "Alice" has created folder "/folder"
     And using SharingNG
     And user "Alice" has created the following resource link share:
@@ -125,7 +124,3 @@ Feature: propagation of etags when creating folders
       | user  | path    |
       | Alice | /       |
       | Alice | /folder |
-    Examples:
-      | dav-path-version |
-      | new              |
-      | spaces           |

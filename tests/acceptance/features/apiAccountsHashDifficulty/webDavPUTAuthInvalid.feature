@@ -14,7 +14,7 @@ Feature: attempt to PUT files with invalid password
 
   Scenario: send PUT requests to webDav endpoints as normal user with wrong password
     When user "Alice" requests these endpoints with "PUT" including body "doesnotmatter" using password "invalid" about user "Alice"
-      | endpoint                                           |
+      | endpoint                                |
       | /webdav/textfile0.txt                   |
       | /dav/files/%username%/textfile0.txt     |
       | /webdav/PARENT                          |
@@ -25,7 +25,7 @@ Feature: attempt to PUT files with invalid password
 
   Scenario: send PUT requests to webDav endpoints as normal user with no password
     When user "Alice" requests these endpoints with "PUT" including body "doesnotmatter" using password "" about user "Alice"
-      | endpoint                                           |
+      | endpoint                                |
       | /webdav/textfile0.txt                   |
       | /dav/files/%username%/textfile0.txt     |
       | /webdav/PARENT                          |

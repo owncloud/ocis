@@ -8,8 +8,9 @@ Feature: sharing
     Given user "Alice" has been created with default attributes and without skeleton files
 
 
-  Scenario: uploading file to a user read-only share folder does not work
-    Given user "Brian" has been created with default attributes and without skeleton files
+  Scenario Outline: uploading file to a user read-only share folder does not work
+    Given using <dav-path-version> DAV path
+    And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "FOLDER"
     And user "Alice" has sent the following resource share invitation:
       | resource        | FOLDER   |
@@ -20,6 +21,11 @@ Feature: sharing
     When user "Brian" uploads file "filesForUpload/textfile.txt" to "/Shares/FOLDER/textfile.txt" using the WebDAV API
     Then the HTTP status code should be "403"
     And as "Alice" file "/FOLDER/textfile.txt" should not exist
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
 
 
   Scenario Outline: uploading file to a group read-only share folder does not work
@@ -43,6 +49,7 @@ Feature: sharing
       | dav-path-version |
       | old              |
       | new              |
+      | spaces           |
 
 
   Scenario Outline: uploading file to a user upload-only share folder works
@@ -70,6 +77,7 @@ Feature: sharing
       | dav-path-version |
       | old              |
       | new              |
+      | spaces           |
 
 
   Scenario Outline: uploading file to a group upload-only share folder works
@@ -99,6 +107,7 @@ Feature: sharing
       | dav-path-version |
       | old              |
       | new              |
+      | spaces           |
 
   @smokeTest
   Scenario Outline: uploading file to a user read/write share folder works
@@ -124,6 +133,7 @@ Feature: sharing
       | dav-path-version |
       | old              |
       | new              |
+      | spaces           |
 
 
   Scenario Outline: uploading file to a group read/write share folder works
@@ -151,6 +161,7 @@ Feature: sharing
       | dav-path-version |
       | old              |
       | new              |
+      | spaces           |
 
   @smokeTest
   Scenario Outline: check quota of owners parent directory of a shared file
@@ -179,6 +190,7 @@ Feature: sharing
       | dav-path-version |
       | old              |
       | new              |
+      | spaces           |
 
 
   Scenario Outline: uploading to a user shared folder with read/write permission when the sharer has insufficient quota does not work
@@ -200,6 +212,7 @@ Feature: sharing
       | dav-path-version |
       | old              |
       | new              |
+      | spaces           |
 
 
   Scenario Outline: uploading to a group shared folder with read/write permission when the sharer has insufficient quota does not work
@@ -223,6 +236,7 @@ Feature: sharing
       | dav-path-version |
       | old              |
       | new              |
+      | spaces           |
 
 
   Scenario Outline: uploading to a user shared folder with upload-only permission when the sharer has insufficient quota does not work
@@ -244,6 +258,7 @@ Feature: sharing
       | dav-path-version |
       | old              |
       | new              |
+      | spaces           |
 
 
   Scenario Outline: uploading to a group shared folder with upload-only permission when the sharer has insufficient quota does not work
@@ -267,6 +282,7 @@ Feature: sharing
       | dav-path-version |
       | old              |
       | new              |
+      | spaces           |
 
 
   Scenario Outline: sharer can download file uploaded with different permission by sharee to a shared folder
@@ -287,7 +303,11 @@ Feature: sharing
     Examples:
       | dav-path-version | permissions-role |
       | old              | Editor           |
+      | old              | Uploader         |
+      | new              | Editor           |
       | new              | Uploader         |
+      | spaces           | Editor           |
+      | spaces           | Uploader         |
 
 
   Scenario Outline: upload an empty file (size zero byte) to a shared folder
@@ -309,3 +329,4 @@ Feature: sharing
       | dav-path-version |
       | old              |
       | new              |
+      | spaces           |

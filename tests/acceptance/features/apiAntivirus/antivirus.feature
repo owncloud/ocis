@@ -89,6 +89,7 @@ Feature: antivirus
     Examples:
       | dav-path-version |
       | old              |
+      | new              |
       | spaces           |
 
   @issue-10331

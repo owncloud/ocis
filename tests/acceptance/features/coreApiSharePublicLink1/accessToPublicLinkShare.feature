@@ -69,7 +69,7 @@ Feature: accessing a public link share
 
   @issue-web-10473
   Scenario: user tries to download public link file using own basic auth
-    And user "Alice" has created folder "FOLDER"
+    Given user "Alice" has created folder "FOLDER"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "FOLDER/textfile.txt"
     And using SharingNG
     And user "Alice" has created the following resource link share:

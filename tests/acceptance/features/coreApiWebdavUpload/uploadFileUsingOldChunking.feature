@@ -24,6 +24,7 @@ Feature: upload file using old chunking
     Examples:
       | dav-path-version |
       | old              |
+      | new              |
       | spaces           |
 
 
@@ -40,6 +41,7 @@ Feature: upload file using old chunking
     Examples:
       | dav-path-version |
       | old              |
+      | new              |
       | spaces           |
 
 
@@ -56,6 +58,7 @@ Feature: upload file using old chunking
     Examples:
       | dav-path-version |
       | old              |
+      | new              |
       | spaces           |
 
 
@@ -64,7 +67,7 @@ Feature: upload file using old chunking
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "textfile0.txt"
     And user "Alice" has copied file "/textfile0.txt" to "/existingFile.txt"
     And user "Alice" has stored id of file "/existingFile.txt"
-    When user "Alice" uploads file "filesForUpload/textfile.txt" to "/existingFile.txt" in 3 chunks with old chunking and using the WebDAV API
+    When user "Alice" uploads file "filesForUpload/textfile.txt" to "/existingFile.txt" in 3 chunks using the WebDAV API
     Then the HTTP status code should be "201"
     And user "Alice" file "/existingFile.txt" should have the previously stored id
     And the content of file "/existingFile.txt" for user "Alice" should be:
@@ -76,6 +79,7 @@ Feature: upload file using old chunking
     Examples:
       | dav-path-version |
       | old              |
+      | new              |
       | spaces           |
 
   @smokeTest
@@ -97,6 +101,8 @@ Feature: upload file using old chunking
       | dav-path-version | file-name                       |
       | old              | &#? TIÄFÜ @a#8a=b?c=d ?abc=oc # |
       | old              | 0                               |
+      | new              | &#? TIÄFÜ @a#8a=b?c=d ?abc=oc # |
+      | new              | 0                               |
       | spaces           | &#? TIÄFÜ @a#8a=b?c=d ?abc=oc # |
       | spaces           | 0                               |
 
@@ -116,4 +122,5 @@ Feature: upload file using old chunking
     Examples:
       | dav-path-version |
       | old              |
+      | new              |
       | spaces           |

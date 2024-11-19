@@ -27,6 +27,7 @@ Feature: favorite
       | dav-path-version |
       | old              |
       | new              |
+      | spaces           |
 
 
   Scenario Outline: favorite a folder inside of a received share
@@ -47,6 +48,7 @@ Feature: favorite
       | dav-path-version |
       | old              |
       | new              |
+      | spaces           |
 
 
   Scenario Outline: favorite a received share itself
@@ -66,6 +68,7 @@ Feature: favorite
       | dav-path-version |
       | old              |
       | new              |
+      | spaces           |
 
   @issue-1228
   Scenario Outline: moving a favorite file out of a share keeps favorite state
@@ -87,6 +90,7 @@ Feature: favorite
       | dav-path-version |
       | old              |
       | new              |
+      | spaces           |
 
 
   Scenario Outline: sharee file favorite state should not change the favorite state of sharer
@@ -107,3 +111,4 @@ Feature: favorite
       | dav-path-version |
       | old              |
       | new              |
+      | spaces           |

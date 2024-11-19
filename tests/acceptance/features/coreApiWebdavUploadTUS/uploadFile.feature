@@ -132,6 +132,7 @@ Feature: upload file
       | dav-path-version |
       | old              |
       | new              |
+      | spaces           |
 
   @issue-10346
   Scenario Outline: upload a twice file in chunks with TUS and versions are available

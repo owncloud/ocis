@@ -72,8 +72,7 @@ Feature: PROPFIND with depth:infinity
 
   @issue-10331
   Scenario: get the list of resources in a folder shared through public link with depth infinity
-    Given using new DAV path
-    And using SharingNG
+    Given using SharingNG
     And the following configs have been set:
       | config                                       | value |
       | OCDAV_ALLOW_PROPFIND_DEPTH_INFINITY          | true  |
@@ -127,7 +126,6 @@ Feature: PROPFIND with depth:infinity
       | config                                       | value |
       | OCDAV_ALLOW_PROPFIND_DEPTH_INFINITY          | false |
       | OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD | false |
-    And using new DAV path
     And using SharingNG
     And user "Alice" has created the following resource link share:
       | resource        | simple-folder |

@@ -46,6 +46,7 @@ Feature: sharing
       | dav-path-version |
       | old              |
       | new              |
+      | spaces           |
 
 
   Scenario Outline: check webdav share-permissions for received group shared file with edit
@@ -69,6 +70,7 @@ Feature: sharing
       | dav-path-version |
       | old              |
       | new              |
+      | spaces           |
 
   @skipOnReva @issue-2213
   Scenario Outline: check webdav share-permissions for received file without edit permissions
@@ -90,6 +92,7 @@ Feature: sharing
       | dav-path-version |
       | old              |
       | new              |
+      | spaces           |
 
 
   Scenario Outline: check webdav share-permissions for owned folder
@@ -126,6 +129,7 @@ Feature: sharing
       | dav-path-version |
       | old              |
       | new              |
+      | spaces           |
 
 
   Scenario Outline: check webdav share-permissions for received group shared folder with all permissions
@@ -149,11 +153,11 @@ Feature: sharing
       | dav-path-version |
       | old              |
       | new              |
+      | spaces           |
 
   @skipOnReva @issue-2213
-  Scenario Outline: check webdav share-permissions for received folder with all permissions but edit
-    Given using <dav-path-version> DAV path
-    And user "Alice" has created folder "/tmp"
+  Scenario: check webdav share-permissions for received folder with all permissions but edit
+    Given user "Alice" has created folder "/tmp"
     And user "Alice" has sent the following resource share invitation:
       | resource        | tmp      |
       | space           | Personal |
@@ -166,15 +170,10 @@ Feature: sharing
       | permissions | delete,create,read |
     Then the HTTP status code should be "200"
     And as user "Brian" folder "/Shares/tmp" should contain a property "ocs:share-permissions" with value "13"
-    Examples:
-      | dav-path-version |
-      | old              |
-      | new              |
 
 
-  Scenario Outline: check webdav share-permissions for received group shared folder with all permissions but edit
-    Given using <dav-path-version> DAV path
-    And group "grp1" has been created
+  Scenario: check webdav share-permissions for received group shared folder with all permissions but edit
+    Given group "grp1" has been created
     And user "Brian" has been added to group "grp1"
     And user "Alice" has created folder "/tmp"
     And using SharingNG
@@ -189,15 +188,10 @@ Feature: sharing
       | permissions | delete,create,read |
     Then the HTTP status code should be "200"
     And as user "Brian" folder "/Shares/tmp" should contain a property "ocs:share-permissions" with value "13"
-    Examples:
-      | dav-path-version |
-      | old              |
-      | new              |
 
   @skipOnReva
-  Scenario Outline: check webdav share-permissions for received folder with all permissions but create
-    Given using <dav-path-version> DAV path
-    And user "Alice" has created folder "/tmp"
+  Scenario: check webdav share-permissions for received folder with all permissions but create
+    Given user "Alice" has created folder "/tmp"
     And user "Alice" has sent the following resource share invitation:
       | resource        | tmp      |
       | space           | Personal |
@@ -210,15 +204,10 @@ Feature: sharing
       | permissions | delete,update,read |
     Then the HTTP status code should be "200"
     And as user "Brian" folder "/Shares/tmp" should contain a property "ocs:share-permissions" with value "11"
-    Examples:
-      | dav-path-version |
-      | old              |
-      | new              |
 
 
-  Scenario Outline: check webdav share-permissions for received group shared folder with all permissions but create
-    Given using <dav-path-version> DAV path
-    And group "grp1" has been created
+  Scenario: check webdav share-permissions for received group shared folder with all permissions but create
+    Given group "grp1" has been created
     And user "Brian" has been added to group "grp1"
     And user "Alice" has created folder "/tmp"
     And using SharingNG
@@ -233,15 +222,10 @@ Feature: sharing
       | permissions | delete,update,read |
     Then the HTTP status code should be "200"
     And as user "Brian" folder "/Shares/tmp" should contain a property "ocs:share-permissions" with value "11"
-    Examples:
-      | dav-path-version |
-      | old              |
-      | new              |
 
   @skipOnReva
-  Scenario Outline: check webdav share-permissions for received folder with all permissions but delete
-    Given using <dav-path-version> DAV path
-    And user "Alice" has created folder "/tmp"
+  Scenario: check webdav share-permissions for received folder with all permissions but delete
+    Given user "Alice" has created folder "/tmp"
     And user "Alice" has sent the following resource share invitation:
       | resource        | tmp      |
       | space           | Personal |
@@ -254,15 +238,10 @@ Feature: sharing
       | permissions | create,update,read |
     Then the HTTP status code should be "200"
     And as user "Brian" folder "/Shares/tmp" should contain a property "ocs:share-permissions" with value "7"
-    Examples:
-      | dav-path-version |
-      | old              |
-      | new              |
 
 
-  Scenario Outline: check webdav share-permissions for received group shared folder with all permissions but delete
-    Given using <dav-path-version> DAV path
-    And group "grp1" has been created
+  Scenario: check webdav share-permissions for received group shared folder with all permissions but delete
+    Given group "grp1" has been created
     And user "Brian" has been added to group "grp1"
     And user "Alice" has created folder "/tmp"
     And using SharingNG
@@ -277,7 +256,3 @@ Feature: sharing
       | permissions | create,update,read |
     Then the HTTP status code should be "200"
     And as user "Brian" folder "/Shares/tmp" should contain a property "ocs:share-permissions" with value "7"
-    Examples:
-      | dav-path-version |
-      | old              |
-      | new              |

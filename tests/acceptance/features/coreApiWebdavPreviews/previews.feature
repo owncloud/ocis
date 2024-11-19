@@ -169,6 +169,7 @@ Feature: previews of files downloaded through the webdav API
     And the value of the item "/d:error/s:exception" in the response about user "Alice" should be "Sabre\DAV\Exception\NotFound"
     Examples:
       | dav-path-version |
+      | old              |
       | new              |
       | spaces           |
 

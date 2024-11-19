@@ -1734,7 +1734,6 @@ trait WebDav {
 	 * @param string $source
 	 * @param string $destination
 	 * @param integer $noOfChunks
-	 * @param string|null $chunkingVersion
 	 * @param boolean $async
 	 * @param array|null $headers
 	 *
@@ -1745,7 +1744,6 @@ trait WebDav {
 		string $source,
 		string $destination,
 		int $noOfChunks = 2,
-		?string $chunkingVersion = null,
 		bool $async = false,
 		?array $headers = []
 	):void {
@@ -1755,22 +1753,9 @@ trait WebDav {
 			$noOfChunks,
 			"What does it mean to have $noOfChunks chunks?"
 		);
-		// use the chunking version that works with the set DAV version
-		if ($chunkingVersion === null) {
-			if (\in_array($this->currentDAVPath, [WebDavHelper::DAV_VERSION_OLD, WebDavHelper::DAV_VERSION_SPACES])) {
-				$chunkingVersion = "v1";
-			} else {
-				$chunkingVersion = "v2";
-			}
-		}
-		$this->useSpecificChunking($chunkingVersion);
-		Assert::assertTrue(
-			WebDavHelper::isValidDavChunkingCombination(
-				$this->getDavPathVersion(),
-				$this->chunkingToUse
-			),
-			"invalid chunking/webdav version combination"
-		);
+
+		// use chunking version 1 as default, since version 2 uses "remote.php/dav/uploads" endpoint and it doesn't exist in oCIS
+		$this->chunkingToUse = 1;
 
 		if ($async === true) {
 			$headers['OC-LazyOps'] = 'true';
@@ -1783,27 +1768,6 @@ trait WebDav {
 			$noOfChunks
 		);
 		$this->pushToLastStatusCodesArrays();
-	}
-
-	/**
-	 * sets the chunking version from human-readable format
-	 *
-	 * @param string $version (no|v1|v2|new|old)
-	 *
-	 * @return void
-	 */
-	public function useSpecificChunking(string $version):void {
-		if ($version === "v1" || $version === "old") {
-			$this->chunkingToUse = 1;
-		} elseif ($version === "v2" || $version === "new") {
-			$this->chunkingToUse = 2;
-		} elseif ($version === "no") {
-			$this->chunkingToUse = null;
-		} else {
-			throw new InvalidArgumentException(
-				"cannot set chunking version to $version"
-			);
-		}
 	}
 
 	/**
@@ -1839,13 +1803,12 @@ trait WebDav {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" uploads file "([^"]*)" to "([^"]*)" in (\d+) chunks (?:with (new|old|v1|v2) chunking and)?\s?using the WebDAV API$/
+	 * @When /^user "([^"]*)" uploads file "([^"]*)" to "([^"]*)" in (\d+) chunks using the WebDAV API$/
 	 *
 	 * @param string $user
 	 * @param string $source
 	 * @param string $destination
 	 * @param int $noOfChunks
-	 * @param string|null $chunkingVersion old|v1|new|v2 null for autodetect
 	 *
 	 * @return void
 	 * @throws Exception
@@ -1854,10 +1817,9 @@ trait WebDav {
 		string $user,
 		string $source,
 		string $destination,
-		int $noOfChunks = 2,
-		?string $chunkingVersion = null
+		int $noOfChunks = 2
 	):void {
-		$this->userUploadsAFileInChunk($user, $source, $destination, $noOfChunks, $chunkingVersion);
+		$this->userUploadsAFileInChunk($user, $source, $destination, $noOfChunks);
 	}
 
 	/**
@@ -3059,7 +3021,7 @@ trait WebDav {
 			['OC-Chunked' => '1'],
 			$data,
 			null,
-			"uploads",
+			"files",
 			null,
 			false,
 			null,
@@ -4430,7 +4392,6 @@ trait WebDav {
 	 */
 	public function thePublicListsTheResourcesInTheLastCreatedPublicLinkWithDepthUsingTheWebdavApi(string $depth):void {
 		$token = ($this->isUsingSharingNG()) ? $this->shareNgGetLastCreatedLinkShareToken() : $this->getLastCreatedPublicShareToken();
-		// https://drone.owncloud.com/owncloud/ocis/39693/29/6
 		$response = $this->listFolder(
 			$token,
 			'/',

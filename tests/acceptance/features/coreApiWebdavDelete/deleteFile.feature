@@ -132,11 +132,17 @@ Feature: delete file
       | spaces           |
 
 
-  Scenario: delete a file of size zero byte
-    Given user "Alice" has uploaded file "filesForUpload/zerobyte.txt" to "/zerobyte.txt"
+  Scenario Outline: delete a file of size zero byte
+    Given using <dav-path-version> DAV path
+    And user "Alice" has uploaded file "filesForUpload/zerobyte.txt" to "/zerobyte.txt"
     When user "Alice" deletes file "/zerobyte.txt" using the WebDAV API
     Then the HTTP status code should be "204"
     And as "Alice" file "/zerobyte.txt" should not exist
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
 
   @issue-9619
   Scenario: delete a file using file-id

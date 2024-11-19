@@ -68,8 +68,10 @@ Feature: copy file
       | dav-path-version | permissions-role |
       | old              | Viewer           |
       | new              | Viewer           |
+      | spaces           | Viewer           |
       | old              | Secure Viewer    |
       | new              | Secure Viewer    |
+      | spaces           | Secure Viewer    |
 
   @skipOnReva
   Scenario Outline: copying a file to overwrite a file into a folder with no permissions
@@ -92,6 +94,7 @@ Feature: copy file
       | dav-path-version |
       | old              |
       | new              |
+      | spaces           |
 
   @issue-1345 @issue-2177
   Scenario Outline: copying file to a path with extension .part should not be possible
@@ -341,6 +344,7 @@ Feature: copy file
       | dav-path-version |
       | old              |
       | new              |
+      | spaces           |
 
   @issue-1239 @skipOnReva
   Scenario Outline: copy a file into a folder at different level received as a user share
@@ -372,6 +376,7 @@ Feature: copy file
       | dav-path-version |
       | old              |
       | new              |
+      | spaces           |
 
   @issue-1239 @skipOnReva
   Scenario Outline: copy a file into a file at different level received as a user share
@@ -402,6 +407,7 @@ Feature: copy file
       | dav-path-version |
       | old              |
       | new              |
+      | spaces           |
 
   @issue-1239 @skipOnReva
   Scenario Outline: copy a folder into a file at different level received as a user share
@@ -432,6 +438,7 @@ Feature: copy file
       | dav-path-version |
       | old              |
       | new              |
+      | spaces           |
 
   @issue-1239 @issue-9753 @skipOnReva
   Scenario Outline: copy a file over the top of an existing folder received as a group share
@@ -520,6 +527,7 @@ Feature: copy file
       | dav-path-version |
       | old              |
       | new              |
+      | spaces           |
 
   @issue-1239 @skipOnReva
   Scenario Outline: copy a file into a folder at different level received as a group share
@@ -554,6 +562,7 @@ Feature: copy file
       | dav-path-version |
       | old              |
       | new              |
+      | spaces           |
 
   @issue-1239 @skipOnReva
   Scenario Outline: copy a file into a file at different level received as a group share
@@ -587,6 +596,7 @@ Feature: copy file
       | dav-path-version |
       | old              |
       | new              |
+      | spaces           |
 
   @issue-1239 @skipOnReva
   Scenario Outline: copy a folder into a file at different level received as a group share
@@ -620,6 +630,7 @@ Feature: copy file
       | dav-path-version |
       | old              |
       | new              |
+      | spaces           |
 
 
   Scenario Outline: copy a file of size zero byte
@@ -695,6 +706,7 @@ Feature: copy file
       | dav-path-version |
       | old              |
       | new              |
+      | spaces           |
 
   @skipOnReva
   Scenario Outline: copying a file into a shared folder as the sharer
@@ -717,6 +729,7 @@ Feature: copy file
       | dav-path-version |
       | old              |
       | new              |
+      | spaces           |
 
   @skipOnReva
   Scenario Outline: copying a file out of a shared folder as the sharee
@@ -740,6 +753,7 @@ Feature: copy file
       | dav-path-version |
       | old              |
       | new              |
+      | spaces           |
 
   @skipOnReva
   Scenario Outline: sharee copies a file from a shared folder, shared with  viewer permission
@@ -761,6 +775,7 @@ Feature: copy file
       | dav-path-version |
       | old              |
       | new              |
+      | spaces           |
 
   @skipOnReva @env-config
   Scenario Outline: sharee copies a file from a shared folder, shared with secure viewer permission
@@ -783,6 +798,7 @@ Feature: copy file
       | dav-path-version |
       | old              |
       | new              |
+      | spaces           |
 
   @skipOnReva
   Scenario Outline: copying a file out of a shared folder as the sharer
@@ -806,6 +822,7 @@ Feature: copy file
       | dav-path-version |
       | old              |
       | new              |
+      | spaces           |
 
 
   Scenario Outline: copying a hidden file
@@ -862,6 +879,7 @@ Feature: copy file
       | dav-path-version |
       | old              |
       | new              |
+      | spaces           |
 
   @skipOnReva @env-config
   Scenario Outline: copying a file between shares received from different users when one share is shared via Viewer and Secure viewer permission
@@ -898,12 +916,16 @@ Feature: copy file
       | dav-path-version | permissions-role-1 | permissions-role-2 |
       | old              | Secure Viewer      | Secure Viewer      |
       | new              | Secure Viewer      | Secure Viewer      |
+      | spaces           | Secure Viewer      | Secure Viewer      |
       | old              | Secure Viewer      | Viewer             |
       | new              | Secure Viewer      | Viewer             |
+      | spaces           | Secure Viewer      | Viewer             |
       | old              | Editor             | Secure Viewer      |
       | new              | Editor             | Secure Viewer      |
+      | spaces           | Editor             | Secure Viewer      |
       | old              | Viewer             | Secure Viewer      |
       | new              | Viewer             | Secure Viewer      |
+      | spaces           | Viewer             | Secure Viewer      |
 
   @skipOnReva
   Scenario Outline: copying a folder between shares received from different users
@@ -938,6 +960,7 @@ Feature: copy file
       | dav-path-version |
       | old              |
       | new              |
+      | spaces           |
 
   @skipOnReva
   Scenario Outline: copying a file to a folder that is shared with multiple users
@@ -969,6 +992,7 @@ Feature: copy file
       | dav-path-version |
       | old              |
       | new              |
+      | spaces           |
 
 
   Scenario Outline: copy a folder into another one

@@ -5,7 +5,7 @@ Feature: enforce password on public link
   So that the password is required to access the contents of the link
 
   Password requirements. set by default:
-  | OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD      | true |
+  | OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD  | true |
   | OCIS_PASSWORD_POLICY_MIN_CHARACTERS           | 8    |
   | OCIS_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS | 1    |
   | OCIS_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS | 1    |

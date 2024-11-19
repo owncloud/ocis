@@ -41,6 +41,7 @@ Feature: sharing
       | dav-path-version |
       | old              |
       | new              |
+      | spaces           |
 
 
   Scenario Outline: overwrite a received file share
@@ -62,4 +63,5 @@ Feature: sharing
       | dav-path-version |
       | old              |
       | new              |
+      | spaces           |
 

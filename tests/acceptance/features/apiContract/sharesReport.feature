@@ -39,6 +39,7 @@ Feature: REPORT request to Shares space
       | dav-path-version |
       | old              |
       | new              |
+      | spaces           |
 
 
   Scenario Outline: check the REPORT response of the found file
@@ -62,6 +63,7 @@ Feature: REPORT request to Shares space
       | dav-path-version |
       | old              |
       | new              |
+      | spaces           |
 
 
   Scenario Outline: search for the shared folder when share is not accepted
@@ -83,6 +85,7 @@ Feature: REPORT request to Shares space
       | dav-path-version |
       | old              |
       | new              |
+      | spaces           |
 
   @issue-9607 @issue-10329 @env-config
   Scenario Outline: check the REPORT response of a folder shared with secure viewer role

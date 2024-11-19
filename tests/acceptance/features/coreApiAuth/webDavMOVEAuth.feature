@@ -12,7 +12,6 @@ Feature: MOVE file/folder
     And user "Alice" has created folder "/PARENT"
     And user "Alice" has created folder "/FOLDER"
     And user "Alice" has uploaded file with content "some data" to "/PARENT/parent.txt"
-    And using new DAV path
 
   @smokeTest
   Scenario: send MOVE requests to webDav endpoints as normal user with wrong password

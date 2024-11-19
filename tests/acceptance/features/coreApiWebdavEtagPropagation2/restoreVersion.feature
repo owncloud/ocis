@@ -6,7 +6,6 @@ Feature: propagation of etags when restoring a version of a file
 
   Background:
     Given using OCS API version "2"
-    And using new DAV path
     And user "Alice" has been created with default attributes and without skeleton files
 
   @skipOnStorage:ceph @skipOnStorage:scality

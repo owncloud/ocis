@@ -5,49 +5,78 @@ Feature: dav-versions
 
   Background:
     Given using OCS API version "2"
-    And using new DAV path
     And user "Alice" has been created with default attributes and without skeleton files
 
 
-  Scenario: upload file and no version is available
+  Scenario Outline: upload file and no version is available
+    Given using <dav-path-version> DAV path
     When user "Alice" uploads file "filesForUpload/davtest.txt" to "/davtest.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And the version folder of file "/davtest.txt" for user "Alice" should contain "0" elements
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
 
 
-  Scenario: upload file and no version is available using various chunking methods (except new chunking)
+  Scenario Outline: upload file and no version is available using various chunking methods (except new chunking)
+    Given using <dav-path-version> DAV path
     When user "Alice" uploads file "filesForUpload/davtest.txt" to filenames based on "/davtest.txt" with all mechanisms except new chunking using the WebDAV API
     Then the HTTP status code of all upload responses should be "201"
     And the version folder of file "/davtest.txt-olddav-regular" for user "Alice" should contain "0" elements
     And the version folder of file "/davtest.txt-newdav-regular" for user "Alice" should contain "0" elements
     And the version folder of file "/davtest.txt-olddav-oldchunking" for user "Alice" should contain "0" elements
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
 
   @smokeTest
-  Scenario: upload a file twice and versions are available
+  Scenario Outline: upload a file twice and versions are available
+    Given using <dav-path-version> DAV path
     When user "Alice" uploads file "filesForUpload/davtest.txt" to "/davtest.txt" using the WebDAV API
     And user "Alice" uploads file "filesForUpload/davtest.txt" to "/davtest.txt" using the WebDAV API
     Then the HTTP status code of responses on each endpoint should be "201, 204" respectively
     And the version folder of file "/davtest.txt" for user "Alice" should contain "1" element
     And the content length of file "/davtest.txt" with version index "1" for user "Alice" in versions folder should be "8"
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
 
 
-  Scenario: upload a file twice and versions are available using various chunking methods (except new chunking)
+  Scenario Outline: upload a file twice and versions are available using various chunking methods (except new chunking)
+    Given using <dav-path-version> DAV path
     When user "Alice" uploads file "filesForUpload/davtest.txt" to filenames based on "/davtest.txt" with all mechanisms except new chunking using the WebDAV API
     And user "Alice" uploads file "filesForUpload/davtest.txt" to filenames based on "/davtest.txt" with all mechanisms except new chunking using the WebDAV API
     Then the HTTP status code of all upload responses should be between "201" and "204"
     And the version folder of file "/davtest.txt-olddav-regular" for user "Alice" should contain "1" element
     And the version folder of file "/davtest.txt-newdav-regular" for user "Alice" should contain "1" element
     And the version folder of file "/davtest.txt-olddav-oldchunking" for user "Alice" should contain "1" element
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
 
   @smokeTest
-  Scenario: remove a file
-    Given user "Alice" has uploaded file "filesForUpload/davtest.txt" to "/davtest.txt"
+  Scenario Outline: remove a file
+    Given using <dav-path-version> DAV path
+    And user "Alice" has uploaded file "filesForUpload/davtest.txt" to "/davtest.txt"
     And user "Alice" has uploaded file "filesForUpload/davtest.txt" to "/davtest.txt"
     And the version folder of file "/davtest.txt" for user "Alice" should contain "1" element
     And user "Alice" has deleted file "/davtest.txt"
     When user "Alice" uploads file "filesForUpload/davtest.txt" to "/davtest.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And the version folder of file "/davtest.txt" for user "Alice" should contain "0" elements
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
 
   @smokeTest
   Scenario: restore a file and check its content
@@ -60,7 +89,7 @@ Feature: dav-versions
 
   @smokeTest @skipOnStorage:ceph @skipOnStorage:scality
   Scenario: restore a file back to bigger content and check its content
-    Given user "Alice" has uploaded file with content "Back To The Future." to "/davtest.txt"
+    And user "Alice" has uploaded file with content "Back To The Future." to "/davtest.txt"
     And user "Alice" has uploaded file with content "Update Content." to "/davtest.txt"
     And the version folder of file "/davtest.txt" for user "Alice" should contain "1" element
     When user "Alice" restores version index "1" of file "/davtest.txt" using the WebDAV API
@@ -69,11 +98,9 @@ Feature: dav-versions
 
   @smokeTest @skipOnStorage:ceph
   Scenario: uploading a chunked file does create the correct version that can be restored
-    Given using old DAV path
-    And user "Alice" has uploaded file with content "textfile0" to "textfile0.txt"
+    Given user "Alice" has uploaded file with content "textfile0" to "textfile0.txt"
     When user "Alice" uploads file "filesForUpload/davtest.txt" to "/textfile0.txt" in 2 chunks using the WebDAV API
     And user "Alice" uploads file "filesForUpload/lorem.txt" to "/textfile0.txt" in 3 chunks using the WebDAV API
-#    HTTP status code is different for old (201) and new (204) WebDav API when uploading in chunks
     Then the HTTP status code of responses on all endpoints should be "201"
     And the version folder of file "/textfile0.txt" for user "Alice" should contain "2" elements
     When user "Alice" restores version index "1" of file "/textfile0.txt" using the WebDAV API
@@ -248,19 +275,31 @@ Feature: dav-versions
     And the content of file "/davtest.txt" for user "Alice" should be "Old Test Content."
 
 
-  Scenario: upload the same file twice with the same mtime and a version is available
-    Given user "Alice" has uploaded file "filesForUpload/textfile.txt" to "file.txt" with mtime "Thu, 08 Aug 2019 04:18:13 GMT" using the WebDAV API
-    When user "Alice" uploads file "filesForUpload/textfile.txt" to "file.txt" with mtime "Thu, 08 Aug 2019 04:18:13 GMT" using the WebDAV API
-    Then the HTTP status code should be "204"
-    And the version folder of file "/file.txt" for user "Alice" should contain "1" element
-
-
-  Scenario: upload the same file more than twice with the same mtime and only one version is available
-    Given user "Alice" has uploaded file "filesForUpload/textfile.txt" to "file.txt" with mtime "Thu, 08 Aug 2019 04:18:13 GMT" using the WebDAV API
+  Scenario Outline: upload the same file twice with the same mtime and a version is available
+    Given using <dav-path-version> DAV path
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "file.txt" with mtime "Thu, 08 Aug 2019 04:18:13 GMT" using the WebDAV API
     When user "Alice" uploads file "filesForUpload/textfile.txt" to "file.txt" with mtime "Thu, 08 Aug 2019 04:18:13 GMT" using the WebDAV API
     Then the HTTP status code should be "204"
     And the version folder of file "/file.txt" for user "Alice" should contain "1" element
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
+
+
+  Scenario Outline: upload the same file more than twice with the same mtime and only one version is available
+    Given using <dav-path-version> DAV path
+    And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "file.txt" with mtime "Thu, 08 Aug 2019 04:18:13 GMT" using the WebDAV API
+    And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "file.txt" with mtime "Thu, 08 Aug 2019 04:18:13 GMT" using the WebDAV API
+    When user "Alice" uploads file "filesForUpload/textfile.txt" to "file.txt" with mtime "Thu, 08 Aug 2019 04:18:13 GMT" using the WebDAV API
+    Then the HTTP status code should be "204"
+    And the version folder of file "/file.txt" for user "Alice" should contain "1" element
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
 
 
   Scenario: upload the same file twice with the same mtime and no version after restoring
@@ -431,6 +470,9 @@ Feature: dav-versions
       | new              | Viewer           |
       | new              | Uploader         |
       | new              | Editor           |
+      | spaces           | Viewer           |
+      | spaces           | Uploader         |
+      | spaces           | Editor           |
 
   @skipOnReva
   Scenario: sharee tries to get file versions of file not shared by the sharer

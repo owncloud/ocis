@@ -213,8 +213,9 @@ Feature: accept/decline shares coming from internal users
       | /textfile0.txt |
 
 
-  Scenario: deleting shares in pending state
-    Given user "Brian" has disabled auto-accepting
+  Scenario Outline: deleting shares in pending state
+    Given using <dav-path-version> DAV path
+    And user "Brian" has disabled auto-accepting
     And user "Alice" has sent the following resource share invitation:
       | resource        | PARENT   |
       | space           | Personal |
@@ -231,6 +232,11 @@ Feature: accept/decline shares coming from internal users
     And user "Alice" deletes file "/textfile0.txt" using the WebDAV API
     Then the HTTP status code of responses on all endpoints should be "204"
     And the sharing API should report that no shares are shared with user "Brian"
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
 
   @issue-2540
   Scenario: only one user in a group accepts a share
@@ -533,8 +539,9 @@ Feature: accept/decline shares coming from internal users
     And the content of file "/Shares/PARENT/abc.txt" for user "David" should be "uploaded content"
 
   @issue-1123 @issue-2540
-  Scenario: deleting a share accepted file and folder
-    Given user "Brian" has disabled auto-accepting
+  Scenario Outline: deleting a share accepted file and folder
+    Given using <dav-path-version> DAV path
+    And user "Brian" has disabled auto-accepting
     And user "Alice" has sent the following resource share invitation:
       | resource        | PARENT   |
       | space           | Personal |
@@ -547,10 +554,15 @@ Feature: accept/decline shares coming from internal users
     And the sharing API should report to user "Brian" that these shares are in the declined state
       | path    |
       | /PARENT |
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
 
   @issue-765 @issue-2131
-  Scenario: shares exist after restoring already shared file to a previous version
-    Given user "Brian" has disabled auto-accepting
+  Scenario Outline: shares exist after restoring already shared file to a previous version
+    Given using <dav-path-version> DAV path
+    And user "Brian" has disabled auto-accepting
     And user "Alice" has uploaded file with content "Test Content." to "/toShareFile.txt"
     And user "Alice" has uploaded file with content "Content Test Updated." to "/toShareFile.txt"
     And user "Alice" has sent the following resource share invitation:
@@ -564,6 +576,11 @@ Feature: accept/decline shares coming from internal users
     Then the HTTP status code should be "204"
     And the content of file "/toShareFile.txt" for user "Alice" should be "Test Content."
     And the content of file "/Shares/toShareFile.txt" for user "Brian" should be "Test Content."
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
 
   @issue-2131
   Scenario: user receives multiple group shares for matching file and folder name

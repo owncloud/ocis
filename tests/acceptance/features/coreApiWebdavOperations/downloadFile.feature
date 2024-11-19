@@ -239,7 +239,7 @@ Feature: download file
       | spaces           | 'quote'single'.txt | %27quote%27single%27.txt |
 
   @smokeTest @issue-8361 @skipOnReva
-  Scenario Outline: downloading a file should serve security headers (file with doubel quotes)
+  Scenario Outline: downloading a file should serve security headers (file with double quotes)
     Given using <dav-path-version> DAV path
     And user "Alice" has uploaded file with content "test file" to '/"quote"double".txt'
     When user "Alice" downloads file '/"quote"double".txt' using the WebDAV API
@@ -261,15 +261,27 @@ Feature: download file
       | spaces           |
 
 
-  Scenario: download a zero byte size file
-    Given user "Alice" has uploaded file "filesForUpload/zerobyte.txt" to "/zerobyte.txt"
+  Scenario Outline: download a zero byte size file
+    Given using <dav-path-version> DAV path
+    And user "Alice" has uploaded file "filesForUpload/zerobyte.txt" to "/zerobyte.txt"
     When user "Alice" downloads file "/zerobyte.txt" using the WebDAV API
     Then the HTTP status code should be "200"
     And the size of the downloaded file should be 0 bytes
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
 
 
-  Scenario: try to download recently deleted file
+  Scenario Outline: try to download recently deleted file
+    Given using <dav-path-version> DAV path
     When user "Alice" deletes file "textfile0.txt" using the WebDAV API
     Then the HTTP status code should be "204"
     When user "Alice" tries to download file "textfile0.txt" using the WebDAV API
     Then the HTTP status code should be "404"
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
