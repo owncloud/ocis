@@ -267,7 +267,7 @@ config = {
         "testSuites": {
             "skip": False,
             "suites": [
-                # "smoke", NOTE: large upload test fails. uncomment when fixed
+                "smoke",
                 "shares",
                 "search",
                 "journeys",
@@ -1389,6 +1389,10 @@ def multiServiceE2ePipeline(ctx):
     if ("skip-e2e" in ctx.build.title.lower()):
         return pipelines
 
+    # run this pipeline only for cron jobs and full-ci PRs
+    if (not "full-ci" in ctx.build.title.lower() and ctx.build.event != "cron"):
+        return pipelines
+
     extra_server_environment = {
         "OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST": "%s" % dirs["bannedPasswordList"],
         "OCIS_JWT_SECRET": "some-ocis-jwt-secret",
@@ -1401,6 +1405,7 @@ def multiServiceE2ePipeline(ctx):
     }
 
     storage_users_environment = {
+        "OCIS_CORS_ALLOW_ORIGINS": "https://ocis-server:9200,https://ocis-server:9201",
         "STORAGE_USERS_JWT_SECRET": "some-ocis-jwt-secret",
         "STORAGE_USERS_MOUNT_ID": "storage-users-id",
         "STORAGE_USERS_SERVICE_ACCOUNT_ID": "service-account-id",
