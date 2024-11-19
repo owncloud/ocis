@@ -73,7 +73,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Return an error if we can't get the keys and ensure they're cached: [#10590](https://github.com/owncloud/ocis/pull/10590)
 * Bugfix - Fix status code for thumbnail requests: [#10592](https://github.com/owncloud/ocis/pull/10592)
 * Bugfix - Fix the activity field mapping: [#10593](https://github.com/owncloud/ocis/pull/10593)
-* Enhancement - Update web to v11.0.3: [#10569](https://github.com/owncloud/ocis/pull/10569)
+* Enhancement - Update web to v11.0.4: [#10569](https://github.com/owncloud/ocis/pull/10569)
 
 ## Details
 
@@ -164,11 +164,11 @@ The following sections list the changes for unreleased.
    field
    mapping
 
-* Enhancement - Update web to v11.0.3: [#10569](https://github.com/owncloud/ocis/pull/10569)
+* Enhancement - Update web to v11.0.4: [#10569](https://github.com/owncloud/ocis/pull/10569)
 
    Tags: web
 
-   We updated ownCloud Web to v11.0.3. Please refer to the changelog (linked) for
+   We updated ownCloud Web to v11.0.4. Please refer to the changelog (linked) for
    details on the web release.
 
    - Bugfix [owncloud/web#11870](https://github.com/owncloud/web/issues/11870):
@@ -182,10 +182,20 @@ The following sections list the changes for unreleased.
    [owncloud/web#11900](https://github.com/owncloud/web/issues/11900): Open from
    app and Save As feature broken when opened via shared file - Bugfix
    [owncloud/web#11904](https://github.com/owncloud/web/issues/11904): Public
-   folder reload
+   folder reload - Bugfix
+   [owncloud/web#11916](https://github.com/owncloud/web/issues/11916): Fix order in
+   roles drop down - Bugfix
+   [owncloud/web#11923](https://github.com/owncloud/web/issues/11923): Allow create
+   template with different editors - Bugfix
+   [owncloud/web#11924](https://github.com/owncloud/web/issues/11924): Extension
+   actions in right sidebar - Bugfix
+   [owncloud/web#11929](https://github.com/owncloud/web/issues/11929): Unique
+   request ids
 
    https://github.com/owncloud/ocis/pull/10569
+   https://github.com/owncloud/ocis/pull/10604
    https://github.com/owncloud/web/releases/tag/v11.0.3
+   https://github.com/owncloud/web/releases/tag/v11.0.4
 
 # Changelog for [5.0.9] (2024-11-14)
 
