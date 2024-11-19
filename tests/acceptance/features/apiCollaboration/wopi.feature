@@ -1080,3 +1080,51 @@ Feature: collaboration (wopi)
       """
     And for user "Alice" folder "testFolder" of the space "new-space" should not contain these files:
       | simple.odt |
+
+
+  Scenario Outline: open file with .potx extension and template
+    Given user "Alice" has uploaded file "filesForUpload/template.xltx" to "template.xltx"
+    And we save it into "TEMPLATEID"
+    And user "Alice" has created a file "template.pptx" in space "Personal" using wopi endpoint
+    And we save it into "FILEID"
+    When user "Alice" sends HTTP method "POST" to URL "<app-endpoint>"
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "app_url",
+          "method",
+          "form_parameters"
+        ],
+        "properties": {
+          "app_url": {
+            "type": "string",
+            "pattern": "^.*\\?WOPISrc=.*wopi%2Ffiles%2F[a-fA-F0-9]{64}$"
+          },
+          "method": {
+            "const": "POST"
+          },
+          "form_parameters": {
+            "type": "object",
+            "required": [
+              "access_token",
+              "access_token_ttl"
+            ],
+            "properties": {
+              "access_token": {
+                "type": "string"
+              },
+              "access_token_ttl": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | app-endpoint                                                                                |
+      | /app/open?file_id=<<FILEID>>&app_name=Collabora&view_mode=write&template_id=<<TEMPLATEID>>  |
+      | /app/open?file_id=<<FILEID>>&app_name=OnlyOffice&view_mode=write&template_id=<<TEMPLATEID>> |

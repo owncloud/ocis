@@ -355,4 +355,79 @@ class CollaborationContext implements Context {
 			}
 		}
 	}
+
+	/**
+	 * @Then the app list response should contain the following information:
+	 *
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function theAppListResponseShouldContainTheFollowingInformation(TableNode $table): void {
+		$responseArray = $this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse());
+
+		if (!isset($responseArray['mime-types'])) {
+			throw new Exception(__METHOD__ . "The response does not contain a 'mime-types' key.");
+		}
+
+		$mimeTypes = $responseArray['mime-types'];
+
+		$mimeTypeMap = [];
+		foreach ($mimeTypes as $mimeType) {
+			$mimeTypeMap[$mimeType['mime_type']] = $mimeType;
+		}
+
+		foreach ($table->getColumnsHash() as $row) {
+			if (!isset($mimeTypeMap[$row['mimeType']])) {
+				throw new Exception("Mime type '{$row['mimeType']}' not found in the response.");
+			}
+
+			$mimeType = $mimeTypeMap[$row['mimeType']];
+			foreach ($mimeType['app_providers'] as $provider) {
+				if ($provider['name'] === 'OnlyOffice' && $row['onlyOffice']) {
+					Assert::assertSame(
+						$row['onlyOffice'],
+						$provider['target_ext'],
+						"Expected target_ext for OnlyOffice in mimeType '{$row['onlyOffice']} but found '{$provider['target_ext']}"
+					);
+				}
+				if ($provider['name'] === 'Collabora' && $row['collabora']) {
+					Assert::assertSame(
+						$row['collabora'],
+						$provider['target_ext'],
+						"Expected target_ext for Collabora in mimeType '{$row['collabora']} but found '{$provider['target_ext']}"
+					);
+				}
+			}
+		}
+	}
+
+	/**
+	 * @When user :user has created a file :file in space :space using wopi endpoint
+	 *
+	 * @param string $user
+	 * @param string $file
+	 * @param string $space
+	 *
+	 * @return string
+	 * @throws GuzzleException
+	 */
+	public function userHasCreatedAFileInSpaceUsingWopiEndpoint(string $user, string $file, string $space):string {
+		$spaceId = $this->spacesContext->getSpaceIdByName($user, $space);
+		$splitSpaceId = explode('$', $spaceId);
+		$parentContainerId = $splitSpaceId[0] . '$' . $splitSpaceId[1] . '!' . $splitSpaceId[1];
+		$response = CollaborationHelper::createFile(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			$parentContainerId,
+			$file
+		);
+		$this->featureContext->theHTTPStatusCodeShouldBe(200, "", $response);
+		$decodedResponse =  json_decode($response->getBody()->getContents(), true);
+		return $decodedResponse['file_id'];
+	}
+
 }

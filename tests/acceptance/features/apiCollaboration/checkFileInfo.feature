@@ -1862,3 +1862,19 @@ Feature: check file info with different wopi apps
     Then the HTTP status code should be "200"
     And the response should not contain the following MIME types:
       | application/octet-stream |
+
+
+  Scenario: check that '/app/list' contain WebOffice template
+    When user "Alice" sends HTTP method "GET" to URL "/app/list"
+    Then the HTTP status code should be "200"
+    And the app list response should contain the following information:
+      | mimeType                                                                | onlyOffice | collabora |
+      | application/vnd.ms-powerpoint.template.macroenabled.12                  | pptx       |           |
+      | application/vnd.oasis.opendocument.presentation-template                | pptx       | odp       |
+      | application/vnd.openxmlformats-officedocument.spreadsheetml.template    | xlsx       |           |
+      | application/vnd.oasis.opendocument.spreadsheet-template                 | xlsx       | ods       |
+      | application/vnd.openxmlformats-officedocument.presentationml.template   | pptx       |           |
+      | application/vnd.openxmlformats-officedocument.wordprocessingml.template | docx       |           |
+      | application/vnd.ms-word.template.macroenabled.12                        | docx       |           |
+      | application/vnd.oasis.opendocument.text-template                        | docx       | odt       |
+      | application/vnd.ms-excel.template.macroenabled.12                       | xlsx       |           |
