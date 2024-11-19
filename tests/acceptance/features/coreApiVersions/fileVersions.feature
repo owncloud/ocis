@@ -277,7 +277,7 @@ Feature: dav-versions
 
   Scenario Outline: upload the same file twice with the same mtime and a version is available
     Given using <dav-path-version> DAV path
-    And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "file.txt" with mtime "Thu, 08 Aug 2019 04:18:13 GMT" using the WebDAV API
+    And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "file.txt" with mtime "Thu, 08 Aug 2019 04:18:13 GMT"
     When user "Alice" uploads file "filesForUpload/textfile.txt" to "file.txt" with mtime "Thu, 08 Aug 2019 04:18:13 GMT" using the WebDAV API
     Then the HTTP status code should be "204"
     And the version folder of file "/file.txt" for user "Alice" should contain "1" element
@@ -287,14 +287,15 @@ Feature: dav-versions
       | new              |
       | spaces           |
 
-
+  @issue-10496
   Scenario Outline: upload the same file more than twice with the same mtime and only one version is available
     Given using <dav-path-version> DAV path
-    And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "file.txt" with mtime "Thu, 08 Aug 2019 04:18:13 GMT" using the WebDAV API
-    And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "file.txt" with mtime "Thu, 08 Aug 2019 04:18:13 GMT" using the WebDAV API
+    And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "file.txt" with mtime "Thu, 08 Aug 2019 04:18:13 GMT"
+    And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "file.txt" with mtime "Thu, 08 Aug 2019 04:18:13 GMT"
     When user "Alice" uploads file "filesForUpload/textfile.txt" to "file.txt" with mtime "Thu, 08 Aug 2019 04:18:13 GMT" using the WebDAV API
     Then the HTTP status code should be "204"
     And the version folder of file "/file.txt" for user "Alice" should contain "1" element
+    And as "Alice" the mtime of the file "file.txt" should be "Thu, 08 Aug 2019 04:18:13 GMT"
     Examples:
       | dav-path-version |
       | old              |
@@ -303,8 +304,8 @@ Feature: dav-versions
 
 
   Scenario: upload the same file twice with the same mtime and no version after restoring
-    Given user "Alice" has uploaded file "filesForUpload/textfile.txt" to "file.txt" with mtime "Thu, 08 Aug 2019 04:18:13 GMT" using the WebDAV API
-    And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "file.txt" with mtime "Thu, 08 Aug 2019 04:18:13 GMT" using the WebDAV API
+    Given user "Alice" has uploaded file "filesForUpload/textfile.txt" to "file.txt" with mtime "Thu, 08 Aug 2019 04:18:13 GMT"
+    And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "file.txt" with mtime "Thu, 08 Aug 2019 04:18:13 GMT"
     When user "Alice" restores version index "1" of file "/file.txt" using the WebDAV API
     Then the HTTP status code should be "204"
     And the version folder of file "/file.txt" for user "Alice" should contain "0" element

@@ -399,6 +399,37 @@ class TUSContext implements Context {
 	}
 
 	/**
+	 * @Given user :user has uploaded file :source to :destination with mtime :mtime using the TUS protocol
+	 *
+	 * @param string $user
+	 * @param string $source
+	 * @param string $destination
+	 * @param string $mtime Time in human-readable format is taken as input which is converted into milliseconds that is used by API
+	 *
+	 * @return void
+	 * @throws Exception
+	 * @throws GuzzleException
+	 */
+	public function userHasUploadedFileWithMtimeUsingTUS(
+		string $user,
+		string $source,
+		string $destination,
+		string $mtime
+	): void {
+		$mtime = new DateTime($mtime);
+		$mtime = $mtime->format('U');
+		$user = $this->featureContext->getActualUsername($user);
+		$this->uploadFileUsingTus(
+			$user,
+			$source,
+			$destination,
+			null,
+			['mtime' => $mtime]
+		);
+		$this->featureContext->setLastUploadDeleteTime(\time());
+	}
+
+	/**
 	 * @When user :user uploads file :source to :destination with mtime :mtime using the TUS protocol on the WebDAV API
 	 *
 	 * @param string $user
