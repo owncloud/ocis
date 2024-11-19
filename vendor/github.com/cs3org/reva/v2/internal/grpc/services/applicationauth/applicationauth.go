@@ -29,6 +29,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
 	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
+	"github.com/rs/zerolog"
 	"google.golang.org/grpc"
 )
 
@@ -73,7 +74,7 @@ func parseConfig(m map[string]interface{}) (*config, error) {
 }
 
 // New creates a app auth provider svc
-func New(m map[string]interface{}, ss *grpc.Server) (rgrpc.Service, error) {
+func New(m map[string]interface{}, ss *grpc.Server, _ *zerolog.Logger) (rgrpc.Service, error) {
 
 	c, err := parseConfig(m)
 	if err != nil {

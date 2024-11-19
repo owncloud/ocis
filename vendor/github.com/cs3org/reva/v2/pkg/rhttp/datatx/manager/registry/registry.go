@@ -19,13 +19,15 @@
 package registry
 
 import (
+	"github.com/rs/zerolog"
+
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/rhttp/datatx"
 )
 
 // NewFunc is the function that data transfer implementations
 // should register at init time.
-type NewFunc func(map[string]interface{}, events.Publisher) (datatx.DataTX, error)
+type NewFunc func(map[string]interface{}, events.Publisher, *zerolog.Logger) (datatx.DataTX, error)
 
 // NewFuncs is a map containing all the registered data transfers.
 var NewFuncs = map[string]NewFunc{}

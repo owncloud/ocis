@@ -21,11 +21,12 @@ package registry
 import (
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/storage"
+	"github.com/rs/zerolog"
 )
 
 // NewFunc is the function that storage implementations
 // should register at init time.
-type NewFunc func(map[string]interface{}, events.Stream) (storage.FS, error)
+type NewFunc func(map[string]interface{}, events.Stream, *zerolog.Logger) (storage.FS, error)
 
 // NewFuncs is a map containing all the registered storage backends.
 var NewFuncs = map[string]NewFunc{}

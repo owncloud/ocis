@@ -39,6 +39,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/juliangruber/go-intersect"
 	"github.com/mitchellh/mapstructure"
+	"github.com/rs/zerolog"
 	"google.golang.org/grpc"
 )
 
@@ -84,7 +85,7 @@ func parseConfig(m map[string]interface{}) (*config, error) {
 }
 
 // New creates a new AppProviderService
-func New(m map[string]interface{}, ss *grpc.Server) (rgrpc.Service, error) {
+func New(m map[string]interface{}, ss *grpc.Server, _ *zerolog.Logger) (rgrpc.Service, error) {
 	c, err := parseConfig(m)
 	if err != nil {
 		return nil, err

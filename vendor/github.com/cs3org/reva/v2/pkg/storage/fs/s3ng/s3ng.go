@@ -26,6 +26,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storage/fs/registry"
 	"github.com/cs3org/reva/v2/pkg/storage/fs/s3ng/blobstore"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs"
+	"github.com/rs/zerolog"
 )
 
 func init() {
@@ -34,7 +35,7 @@ func init() {
 
 // New returns an implementation to of the storage.FS interface that talk to
 // a local filesystem.
-func New(m map[string]interface{}, stream events.Stream) (storage.FS, error) {
+func New(m map[string]interface{}, stream events.Stream, _ *zerolog.Logger) (storage.FS, error) {
 	o, err := parseConfig(m)
 	if err != nil {
 		return nil, err

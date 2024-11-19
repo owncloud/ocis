@@ -22,11 +22,12 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/mitchellh/mapstructure"
-	"github.com/pkg/errors"
-
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	"github.com/mitchellh/mapstructure"
+	"github.com/pkg/errors"
+	"github.com/rs/zerolog"
+
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/net"
 	"github.com/cs3org/reva/v2/pkg/appctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
@@ -48,6 +49,7 @@ func init() {
 type manager struct {
 	conf      *cache.Config
 	publisher events.Publisher
+	log       *zerolog.Logger
 }
 
 func parseConfig(m map[string]interface{}) (*cache.Config, error) {
@@ -60,22 +62,26 @@ func parseConfig(m map[string]interface{}) (*cache.Config, error) {
 }
 
 // New returns a datatx manager implementation that relies on HTTP PUT/GET.
-func New(m map[string]interface{}, publisher events.Publisher) (datatx.DataTX, error) {
+func New(m map[string]interface{}, publisher events.Publisher, log *zerolog.Logger) (datatx.DataTX, error) {
 	c, err := parseConfig(m)
 	if err != nil {
 		return nil, err
 	}
 
+	l := log.With().Str("datatx", "simple").Logger()
+
 	return &manager{
 		conf:      c,
 		publisher: publisher,
+		log:       &l,
 	}, nil
 }
 
 func (m *manager) Handler(fs storage.FS) (http.Handler, error) {
 	h := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		sublog := m.log.With().Str("path", r.URL.Path).Logger()
+		r = r.WithContext(appctx.WithLogger(r.Context(), &sublog))
 		ctx := r.Context()
-		sublog := appctx.GetLogger(ctx).With().Str("datatx", "simple").Logger()
 
 		switch r.Method {
 		case "GET", "HEAD":

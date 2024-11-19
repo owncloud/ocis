@@ -104,7 +104,7 @@ func ListUploadSessions(cfg *config.Config) *cli.Command {
 				os.Exit(1)
 			}
 			drivers := revaconfig.StorageProviderDrivers(cfg)
-			fs, err := f(drivers[cfg.Driver].(map[string]interface{}), nil)
+			fs, err := f(drivers[cfg.Driver].(map[string]interface{}), nil, nil)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Failed to initialize filesystem driver '%s'\n", cfg.Driver)
 				return err

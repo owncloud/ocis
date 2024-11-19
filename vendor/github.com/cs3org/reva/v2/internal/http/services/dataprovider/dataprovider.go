@@ -22,6 +22,9 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/mitchellh/mapstructure"
+	"github.com/rs/zerolog"
+
 	"github.com/cs3org/reva/v2/pkg/appctx"
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/events/stream"
@@ -30,8 +33,6 @@ import (
 	"github.com/cs3org/reva/v2/pkg/rhttp/router"
 	"github.com/cs3org/reva/v2/pkg/storage"
 	"github.com/cs3org/reva/v2/pkg/storage/fs/registry"
-	"github.com/mitchellh/mapstructure"
-	"github.com/rs/zerolog"
 )
 
 func init() {
@@ -98,12 +99,12 @@ func New(m map[string]interface{}, log *zerolog.Logger) (global.Service, error) 
 		evstream = s
 	}
 
-	fs, err := getFS(conf, evstream)
+	fs, err := getFS(conf, evstream, log)
 	if err != nil {
 		return nil, err
 	}
 
-	dataTXs, err := getDataTXs(conf, fs, evstream)
+	dataTXs, err := getDataTXs(conf, fs, evstream, log)
 	if err != nil {
 		return nil, err
 	}
@@ -118,14 +119,14 @@ func New(m map[string]interface{}, log *zerolog.Logger) (global.Service, error) 
 	return s, err
 }
 
-func getFS(c *config, stream events.Stream) (storage.FS, error) {
+func getFS(c *config, stream events.Stream, log *zerolog.Logger) (storage.FS, error) {
 	if f, ok := registry.NewFuncs[c.Driver]; ok {
-		return f(c.Drivers[c.Driver], stream)
+		return f(c.Drivers[c.Driver], stream, log)
 	}
 	return nil, fmt.Errorf("driver not found: %s", c.Driver)
 }
 
-func getDataTXs(c *config, fs storage.FS, publisher events.Publisher) (map[string]http.Handler, error) {
+func getDataTXs(c *config, fs storage.FS, publisher events.Publisher, log *zerolog.Logger) (map[string]http.Handler, error) {
 	if c.DataTXs == nil {
 		c.DataTXs = make(map[string]map[string]interface{})
 	}
@@ -144,7 +145,7 @@ func getDataTXs(c *config, fs storage.FS, publisher events.Publisher) (map[strin
 	txs := make(map[string]http.Handler)
 	for t := range c.DataTXs {
 		if f, ok := datatxregistry.NewFuncs[t]; ok {
-			if tx, err := f(c.DataTXs[t], publisher); err == nil {
+			if tx, err := f(c.DataTXs[t], publisher, log); err == nil {
 				if handler, err := tx.Handler(fs); err == nil {
 					txs[t] = handler
 				}

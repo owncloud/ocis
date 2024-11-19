@@ -26,6 +26,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/rgrpc"
 	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
+	"github.com/rs/zerolog"
 	"google.golang.org/grpc"
 )
 
@@ -43,7 +44,7 @@ type service struct {
 // New returns a new PreferencesServiceServer
 // It can be tested like this:
 // prototool grpc --address 0.0.0.0:9999 --method 'revad.helloworld.HelloWorldService/Hello' --data '{"name": "Alice"}'
-func New(m map[string]interface{}, ss *grpc.Server) (rgrpc.Service, error) {
+func New(m map[string]interface{}, ss *grpc.Server, _ *zerolog.Logger) (rgrpc.Service, error) {
 	c := &conf{}
 	if err := mapstructure.Decode(m, c); err != nil {
 		err = errors.Wrap(err, "helloworld: error decoding conf")

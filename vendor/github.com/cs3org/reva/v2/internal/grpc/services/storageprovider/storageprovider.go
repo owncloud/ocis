@@ -49,6 +49,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
+	"github.com/rs/zerolog"
 	"go.opentelemetry.io/otel/attribute"
 	"google.golang.org/grpc"
 )
@@ -165,7 +166,7 @@ func registerMimeTypes(mappingFile string) error {
 }
 
 // New creates a new storage provider svc
-func New(m map[string]interface{}, ss *grpc.Server) (rgrpc.Service, error) {
+func New(m map[string]interface{}, ss *grpc.Server, log *zerolog.Logger) (rgrpc.Service, error) {
 
 	c, err := parseConfig(m)
 	if err != nil {
@@ -174,7 +175,7 @@ func New(m map[string]interface{}, ss *grpc.Server) (rgrpc.Service, error) {
 
 	c.init()
 
-	fs, err := getFS(c)
+	fs, err := getFS(c, log)
 	if err != nil {
 		return nil, err
 	}
@@ -1276,7 +1277,7 @@ func (s *Service) addMissingStorageProviderID(resourceID *provider.ResourceId, s
 	}
 }
 
-func getFS(c *config) (storage.FS, error) {
+func getFS(c *config, log *zerolog.Logger) (storage.FS, error) {
 	evstream, err := estreamFromConfig(c.Events)
 	if err != nil {
 		return nil, err
@@ -1286,7 +1287,7 @@ func getFS(c *config) (storage.FS, error) {
 		driverConf := c.Drivers[c.Driver]
 		driverConf["mount_id"] = c.MountID // pass the mount id to the driver
 
-		return f(driverConf, evstream)
+		return f(driverConf, evstream, log)
 	}
 
 	return nil, errtypes.NotFound("driver not found: " + c.Driver)

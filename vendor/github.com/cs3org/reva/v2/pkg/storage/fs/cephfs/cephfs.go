@@ -35,6 +35,7 @@ import (
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
+	"github.com/rs/zerolog"
 
 	"github.com/cs3org/reva/v2/pkg/appctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
@@ -66,7 +67,7 @@ func init() {
 
 // New returns an implementation to of the storage.FS interface that talk to
 // a ceph filesystem.
-func New(m map[string]interface{}, _ events.Stream) (fs storage.FS, err error) {
+func New(m map[string]interface{}, _ events.Stream, _ *zerolog.Logger) (fs storage.FS, err error) {
 	c := &Options{}
 	if err = mapstructure.Decode(m, c); err != nil {
 		return nil, errors.Wrap(err, "error decoding conf")
