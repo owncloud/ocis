@@ -197,7 +197,11 @@ func buildOpenInAppRequest(ctx context.Context, ri *storageprovider.ResourceInfo
 		}
 
 		// build a fake user object for the token
-		currentuser := ctxpkg.ContextMustGetUser(ctx)
+		currentuser, ok := ctxpkg.ContextGetUser(ctx)
+		if !ok {
+			return nil, errors.New("user not found in context")
+		}
+
 		scopedUser := &userpb.User{
 			Id:          ri.GetOwner(), // the owner of the resource is always set, right?
 			DisplayName: "View Only user for " + currentuser.GetUsername(),

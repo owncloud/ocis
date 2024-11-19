@@ -84,7 +84,7 @@ func New(m map[string]interface{}, stream events.Stream, log *zerolog.Logger) (s
 		return nil, fmt.Errorf("unknown metadata backend %s, only 'messagepack' or 'xattrs' (default) supported", o.MetadataBackend)
 	}
 
-	trashbin, err := trashbin.New(o, lu)
+	trashbin, err := trashbin.New(o, lu, log)
 	if err != nil {
 		return nil, err
 	}

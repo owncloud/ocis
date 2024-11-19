@@ -21,13 +21,13 @@ package manager
 import (
 	"time"
 
-	"github.com/golang-jwt/jwt"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/pkg/errors"
 	"github.com/sethvargo/go-password/password"
 )
 
 type userToken struct {
-	jwt.StandardClaims
+	jwt.RegisteredClaims
 
 	User  string `json:"user"`
 	Scope string `json:"scope"`
@@ -45,10 +45,10 @@ var (
 func generateUserToken(user string, scope string, timeout int) (string, error) {
 	// Create a JWT as the user token
 	claims := userToken{
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(time.Duration(timeout) * time.Second).Unix(),
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Duration(timeout) * time.Second)),
 			Issuer:    tokenIssuer,
-			IssuedAt:  time.Now().Unix(),
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
 		},
 		User:  user,
 		Scope: scope,

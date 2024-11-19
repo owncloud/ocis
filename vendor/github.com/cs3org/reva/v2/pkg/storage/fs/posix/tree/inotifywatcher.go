@@ -22,15 +22,18 @@ import (
 	"fmt"
 
 	"github.com/pablodz/inotifywaitgo/inotifywaitgo"
+	"github.com/rs/zerolog"
 )
 
 type InotifyWatcher struct {
 	tree *Tree
+	log  *zerolog.Logger
 }
 
-func NewInotifyWatcher(tree *Tree) *InotifyWatcher {
+func NewInotifyWatcher(tree *Tree, log *zerolog.Logger) *InotifyWatcher {
 	return &InotifyWatcher{
 		tree: tree,
+		log:  log,
 	}
 }
 
@@ -60,20 +63,29 @@ func (iw *InotifyWatcher) Watch(path string) {
 	for {
 		select {
 		case event := <-events:
+			if isLockFile(event.Filename) || isTrash(event.Filename) || iw.tree.isUpload(event.Filename) {
+				continue
+			}
 			for _, e := range event.Events {
-				if isLockFile(event.Filename) || isTrash(event.Filename) || iw.tree.isUpload(event.Filename) {
-					continue
-				}
 				go func() {
+					var err error
 					switch e {
 					case inotifywaitgo.DELETE:
-						_ = iw.tree.Scan(event.Filename, ActionDelete, event.IsDir)
+						err = iw.tree.Scan(event.Filename, ActionDelete, event.IsDir)
 					case inotifywaitgo.MOVED_FROM:
-						_ = iw.tree.Scan(event.Filename, ActionMoveFrom, event.IsDir)
+						err = iw.tree.Scan(event.Filename, ActionMoveFrom, event.IsDir)
 					case inotifywaitgo.CREATE, inotifywaitgo.MOVED_TO:
-						_ = iw.tree.Scan(event.Filename, ActionCreate, event.IsDir)
+						err = iw.tree.Scan(event.Filename, ActionCreate, event.IsDir)
 					case inotifywaitgo.CLOSE_WRITE:
-						_ = iw.tree.Scan(event.Filename, ActionUpdate, event.IsDir)
+						err = iw.tree.Scan(event.Filename, ActionUpdate, event.IsDir)
+					case inotifywaitgo.CLOSE:
+						// ignore, already handled by CLOSE_WRITE
+					default:
+						iw.log.Warn().Interface("event", event).Msg("unhandled event")
+						return
+					}
+					if err != nil {
+						iw.log.Error().Err(err).Str("path", event.Filename).Msg("error scanning file")
 					}
 				}()
 			}

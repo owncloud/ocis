@@ -31,13 +31,9 @@ import (
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	typespb "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
-	"github.com/cs3org/reva/v2/internal/http/services/datagateway"
-	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/net"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
-	"github.com/cs3org/reva/v2/pkg/rhttp"
 	"github.com/cs3org/reva/v2/pkg/rhttp/global"
 	"github.com/cs3org/reva/v2/pkg/sharedconf"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
@@ -230,92 +226,38 @@ func (s *svc) handleNew(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Create empty file via storageprovider
-	createReq := &provider.InitiateFileUploadRequest{
+	touchFileReq := &provider.TouchFileRequest{
 		Ref: fileRef,
-		Opaque: &typespb.Opaque{
-			Map: map[string]*typespb.OpaqueEntry{
-				"Upload-Length": {
-					Decoder: "plain",
-					Value:   []byte("0"),
-				},
-			},
-		},
 	}
 
-	// having a client.CreateFile() function would come in handy here...
-
-	createRes, err := client.InitiateFileUpload(ctx, createReq)
+	touchRes, err := client.TouchFile(ctx, touchFileReq)
 	if err != nil {
-		writeError(w, r, appErrorServerError, "error calling InitiateFileUpload", err)
+		writeError(w, r, appErrorServerError, "error sending a grpc touchfile request", err)
 		return
 	}
-	if createRes.Status.Code != rpc.Code_CODE_OK {
-		switch createRes.Status.Code {
-		case rpc.Code_CODE_PERMISSION_DENIED:
-			writeError(w, r, appErrorPermissionDenied, "permission denied to create the file", nil)
-			return
-		case rpc.Code_CODE_NOT_FOUND:
-			writeError(w, r, appErrorNotFound, "parent container does not exist", nil)
-			return
-		default:
-			writeError(w, r, appErrorServerError, "error calling InitiateFileUpload", nil)
-			return
-		}
+
+	if touchRes.Status.Code != rpc.Code_CODE_OK {
+		writeError(w, r, appErrorServerError, "touching the file failed", nil)
+		return
 	}
 
-	// Do a HTTP PUT with an empty body
-	var ep, token string
-	for _, p := range createRes.Protocols {
-		if p.Protocol == "simple" {
-			ep, token = p.UploadEndpoint, p.Token
-		}
-	}
-	httpReq, err := rhttp.NewRequest(ctx, http.MethodPut, ep, nil)
+	// Stat the newly created file
+	statRes, err := client.Stat(ctx, statFileReq)
 	if err != nil {
-		writeError(w, r, appErrorServerError, "failed to create the file", err)
+		writeError(w, r, appErrorServerError, "statting the created file failed", err)
 		return
 	}
 
-	httpReq.Header.Set(datagateway.TokenTransportHeader, token)
-	httpRes, err := rhttp.GetHTTPClient(
-		rhttp.Context(ctx),
-		rhttp.Insecure(s.conf.Insecure),
-	).Do(httpReq)
-	if err != nil {
-		writeError(w, r, appErrorServerError, "failed to create the file", err)
-		return
-	}
-	defer httpRes.Body.Close()
-	if httpRes.StatusCode == http.StatusBadRequest {
-		// the file upload was already finished since it is a zero byte file
-	} else if httpRes.StatusCode != http.StatusOK {
-		writeError(w, r, appErrorServerError, "failed to create the file", nil)
+	if statRes.Status.Code != rpc.Code_CODE_OK {
+		writeError(w, r, appErrorServerError, "statting the created file failed", nil)
 		return
 	}
 
-	var fileid string
-	if httpRes.Header.Get(net.HeaderOCFileID) != "" {
-		fileid = httpRes.Header.Get(net.HeaderOCFileID)
-	} else {
-		// Stat the newly created file
-		statRes, err := client.Stat(ctx, statFileReq)
-		if err != nil {
-			writeError(w, r, appErrorServerError, "statting the created file failed", err)
-			return
-		}
-
-		if statRes.Status.Code != rpc.Code_CODE_OK {
-			writeError(w, r, appErrorServerError, "statting the created file failed", nil)
-			return
-		}
-
-		if statRes.Info.Type != provider.ResourceType_RESOURCE_TYPE_FILE {
-			writeError(w, r, appErrorInvalidParameter, "the given file id does not point to a file", nil)
-			return
-		}
-		fileid = storagespace.FormatResourceID(statRes.Info.Id)
+	if statRes.Info.Type != provider.ResourceType_RESOURCE_TYPE_FILE {
+		writeError(w, r, appErrorInvalidParameter, "the given file id does not point to a file", nil)
+		return
 	}
+	fileid := storagespace.FormatResourceID(statRes.Info.Id)
 
 	js, err := json.Marshal(
 		map[string]interface{}{

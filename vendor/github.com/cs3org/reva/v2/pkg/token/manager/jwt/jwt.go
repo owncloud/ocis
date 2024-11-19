@@ -28,20 +28,22 @@ import (
 	"github.com/cs3org/reva/v2/pkg/sharedconf"
 	"github.com/cs3org/reva/v2/pkg/token"
 	"github.com/cs3org/reva/v2/pkg/token/manager/registry"
-	"github.com/golang-jwt/jwt"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
 )
 
 const defaultExpiration int64 = 86400 // 1 day
+const defaultLeeway int64 = 5         // 5 seconds
 
 func init() {
 	registry.Register("jwt", New)
 }
 
 type config struct {
-	Secret  string `mapstructure:"secret"`
-	Expires int64  `mapstructure:"expires"`
+	Secret          string `mapstructure:"secret"`
+	Expires         int64  `mapstructure:"expires"`
+	tokenTimeLeeway int64  `mapstructure:"token_leeway"`
 }
 
 type manager struct {
@@ -50,7 +52,7 @@ type manager struct {
 
 // claims are custom claims for the JWT token.
 type claims struct {
-	jwt.StandardClaims
+	jwt.RegisteredClaims
 	User  *user.User             `json:"user"`
 	Scope map[string]*auth.Scope `json:"scope"`
 }
@@ -75,6 +77,10 @@ func New(value map[string]interface{}) (token.Manager, error) {
 		c.Expires = defaultExpiration
 	}
 
+	if c.tokenTimeLeeway == 0 {
+		c.tokenTimeLeeway = defaultLeeway
+	}
+
 	c.Secret = sharedconf.GetJWTSecret(c.Secret)
 
 	if c.Secret == "" {
@@ -87,31 +93,32 @@ func New(value map[string]interface{}) (token.Manager, error) {
 
 func (m *manager) MintToken(ctx context.Context, u *user.User, scope map[string]*auth.Scope) (string, error) {
 	ttl := time.Duration(m.conf.Expires) * time.Second
-	claims := claims{
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(ttl).Unix(),
+	newClaims := claims{
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(ttl)),
 			Issuer:    u.Id.Idp,
-			Audience:  "reva",
-			IssuedAt:  time.Now().Unix(),
+			Audience:  jwt.ClaimStrings{"reva"},
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
 		},
 		User:  u,
 		Scope: scope,
 	}
 
-	t := jwt.NewWithClaims(jwt.GetSigningMethod("HS256"), claims)
+	t := jwt.NewWithClaims(jwt.GetSigningMethod("HS256"), newClaims)
 
 	tkn, err := t.SignedString([]byte(m.conf.Secret))
 	if err != nil {
-		return "", errors.Wrapf(err, "error signing token with claims %+v", claims)
+		return "", errors.Wrapf(err, "error signing token with claims %+v", newClaims)
 	}
 
 	return tkn, nil
 }
 
 func (m *manager) DismantleToken(ctx context.Context, tkn string) (*user.User, map[string]*auth.Scope, error) {
-	token, err := jwt.ParseWithClaims(tkn, &claims{}, func(token *jwt.Token) (interface{}, error) {
+	keyfunc := func(token *jwt.Token) (interface{}, error) {
 		return []byte(m.conf.Secret), nil
-	})
+	}
+	token, err := jwt.ParseWithClaims(tkn, &claims{}, keyfunc, jwt.WithLeeway(time.Duration(m.conf.tokenTimeLeeway)*time.Second))
 
 	if err != nil {
 		return nil, nil, errors.Wrap(err, "error parsing token")
