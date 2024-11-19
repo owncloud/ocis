@@ -7,8 +7,8 @@ Feature: upload file
     Given using OCS API version "1"
     And user "Alice" has been created with default attributes and without skeleton files
 
-
-  Scenario Outline: attempt to upload a file into a nonexistent folder inside shares
+  @skipOnReva
+  Scenario Outline: attempt to upload a file into a nonexistent shares
     Given using <dav-path-version> DAV path
     When user "Alice" uploads file with content "uploaded content" to "/Shares/FOLDER/textfile.txt" using the TUS protocol on the WebDAV API
     Then as "Alice" folder "/Shares/FOLDER/" should not exist
@@ -29,6 +29,10 @@ Feature: upload file
       | dav-path-version |
       | old              |
       | new              |
+
+    @skipOnReva
+    Examples:
+      | dav-path-version |
       | spaces           |
 
   @skipOnReva
