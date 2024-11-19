@@ -33,6 +33,7 @@ import (
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
+	"github.com/rs/zerolog"
 	"google.golang.org/grpc"
 
 	"github.com/cs3org/reva/v2/pkg/appctx"
@@ -108,7 +109,7 @@ func parseConfig(m map[string]interface{}) (*config, error) {
 }
 
 // New creates a new user share provider svc initialized from defaults
-func NewDefault(m map[string]interface{}, ss *grpc.Server) (rgrpc.Service, error) {
+func NewDefault(m map[string]interface{}, ss *grpc.Server, _ *zerolog.Logger) (rgrpc.Service, error) {
 
 	c, err := parseConfig(m)
 	if err != nil {

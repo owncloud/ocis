@@ -34,6 +34,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/user/manager/registry"
 	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
+	"github.com/rs/zerolog"
 	"google.golang.org/grpc"
 )
 
@@ -88,7 +89,7 @@ func getDriver(c *config) (user.Manager, *plugin.RevaPlugin, error) {
 }
 
 // New returns a new UserProviderServiceServer.
-func New(m map[string]interface{}, ss *grpc.Server) (rgrpc.Service, error) {
+func New(m map[string]interface{}, ss *grpc.Server, _ *zerolog.Logger) (rgrpc.Service, error) {
 	c, err := parseConfig(m)
 	if err != nil {
 		return nil, err

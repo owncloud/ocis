@@ -25,6 +25,7 @@ import (
 	"strings"
 
 	"github.com/cs3org/reva/v2/pkg/storagespace"
+	"github.com/rs/zerolog"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/genproto/protobuf/field_mask"
 	"google.golang.org/grpc"
@@ -84,7 +85,7 @@ func (s *service) Register(ss *grpc.Server) {
 }
 
 // NewDefault returns a new instance of the SharesStorageProvider service with default dependencies
-func NewDefault(m map[string]interface{}, _ *grpc.Server) (rgrpc.Service, error) {
+func NewDefault(m map[string]interface{}, _ *grpc.Server, _ *zerolog.Logger) (rgrpc.Service, error) {
 	c := &config{}
 	if err := mapstructure.Decode(m, c); err != nil {
 		err = errors.Wrap(err, "error decoding conf")

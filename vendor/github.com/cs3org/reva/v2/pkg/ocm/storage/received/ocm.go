@@ -38,6 +38,7 @@ import (
 	ocmpb "github.com/cs3org/go-cs3apis/cs3/sharing/ocm/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	typepb "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	"github.com/rs/zerolog"
 	"github.com/studio-b12/gowebdav"
 
 	"github.com/cs3org/reva/v2/pkg/errtypes"
@@ -101,7 +102,7 @@ func (BearerAuthenticator) Close() error {
 }
 
 // New creates an OCM storage driver.
-func New(m map[string]interface{}, _ events.Stream) (storage.FS, error) {
+func New(m map[string]interface{}, _ events.Stream, _ *zerolog.Logger) (storage.FS, error) {
 	var c config
 	if err := cfg.Decode(m, &c); err != nil {
 		return nil, err

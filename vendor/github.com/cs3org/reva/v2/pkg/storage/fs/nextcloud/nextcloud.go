@@ -33,6 +33,7 @@ import (
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
+	"github.com/rs/zerolog"
 
 	"github.com/cs3org/reva/v2/pkg/appctx"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
@@ -72,7 +73,7 @@ func parseConfig(m map[string]interface{}) (*StorageDriverConfig, error) {
 
 // New returns an implementation to of the storage.FS interface that talks to
 // a Nextcloud instance over http.
-func New(m map[string]interface{}, _ events.Stream) (storage.FS, error) {
+func New(m map[string]interface{}, _ events.Stream, _ *zerolog.Logger) (storage.FS, error) {
 	conf, err := parseConfig(m)
 	if err != nil {
 		return nil, err

@@ -78,7 +78,7 @@ func Register(name string, newFunc NewService) {
 
 // NewService is the function that gRPC services need to register at init time.
 // It returns an io.Closer to close the service and a list of service endpoints that need to be unprotected.
-type NewService func(conf map[string]interface{}, ss *grpc.Server) (Service, error)
+type NewService func(conf map[string]interface{}, ss *grpc.Server, log *zerolog.Logger) (Service, error)
 
 // Service represents a grpc service.
 type Service interface {
@@ -220,7 +220,7 @@ func (s *Server) registerServices() error {
 	for svcName := range s.conf.Services {
 		if s.isServiceEnabled(svcName) {
 			newFunc := Services[svcName]
-			svc, err := newFunc(s.conf.Services[svcName], s.s)
+			svc, err := newFunc(s.conf.Services[svcName], s.s, &s.log)
 			if err != nil {
 				return errors.Wrapf(err, "rgrpc: grpc service %s could not be started,", svcName)
 			}

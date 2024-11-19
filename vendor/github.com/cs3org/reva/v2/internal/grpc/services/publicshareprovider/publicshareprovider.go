@@ -38,6 +38,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
+	"github.com/rs/zerolog"
 	"google.golang.org/grpc"
 
 	"github.com/cs3org/reva/v2/pkg/appctx"
@@ -128,7 +129,7 @@ func parsePasswordPolicy(m map[string]interface{}) (*passwordPolicy, error) {
 }
 
 // New creates a new public share provider svc initialized from defaults
-func NewDefault(m map[string]interface{}, ss *grpc.Server) (rgrpc.Service, error) {
+func NewDefault(m map[string]interface{}, ss *grpc.Server, _ *zerolog.Logger) (rgrpc.Service, error) {
 	c, err := parseConfig(m)
 	if err != nil {
 		return nil, err

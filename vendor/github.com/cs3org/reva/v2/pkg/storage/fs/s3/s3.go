@@ -44,6 +44,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storage/fs/registry"
 	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
+	"github.com/rs/zerolog"
 )
 
 func init() {
@@ -70,7 +71,7 @@ func parseConfig(m map[string]interface{}) (*config, error) {
 
 // New returns an implementation to of the storage.FS interface that talk to
 // a s3 api.
-func New(m map[string]interface{}, _ events.Stream) (storage.FS, error) {
+func New(m map[string]interface{}, _ events.Stream, _ *zerolog.Logger) (storage.FS, error) {
 	c, err := parseConfig(m)
 	if err != nil {
 		return nil, err

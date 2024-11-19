@@ -42,6 +42,7 @@ import (
 	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
 	"github.com/pkg/xattr"
+	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 
 	"github.com/cs3org/reva/v2/internal/grpc/services/storageprovider"
@@ -152,7 +153,7 @@ func (c *config) init(m map[string]interface{}) {
 
 // New returns an implementation to of the storage.FS interface that talk to
 // a local filesystem.
-func New(m map[string]interface{}, _ events.Stream) (storage.FS, error) {
+func New(m map[string]interface{}, _ events.Stream, _ *zerolog.Logger) (storage.FS, error) {
 	c, err := parseConfig(m)
 	if err != nil {
 		return nil, err

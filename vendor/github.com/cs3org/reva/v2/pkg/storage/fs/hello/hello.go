@@ -29,6 +29,7 @@ import (
 	"time"
 
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	"github.com/rs/zerolog"
 
 	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/cs3org/reva/v2/pkg/events"
@@ -144,7 +145,7 @@ func calcEtag(t time.Time, nodeid string) string {
 
 // New returns an implementation to of the storage.FS interface that talks to
 // a local filesystem with user homes disabled.
-func New(_ map[string]interface{}, _ events.Stream) (storage.FS, error) {
+func New(_ map[string]interface{}, _ events.Stream, _ *zerolog.Logger) (storage.FS, error) {
 	return &hellofs{
 		bootTime: time.Now(),
 	}, nil

@@ -24,11 +24,13 @@ import (
 	"path"
 	"regexp"
 
+	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 	tusd "github.com/tus/tusd/v2/pkg/handler"
+	"golang.org/x/exp/slog"
 
-	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/net"
 	"github.com/cs3org/reva/v2/pkg/appctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
@@ -38,8 +40,6 @@ import (
 	"github.com/cs3org/reva/v2/pkg/rhttp/datatx/metrics"
 	"github.com/cs3org/reva/v2/pkg/storage"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
-	"github.com/mitchellh/mapstructure"
-	"golang.org/x/exp/slog"
 )
 
 func init() {
@@ -59,6 +59,7 @@ type TusConfig struct {
 type manager struct {
 	conf      *TusConfig
 	publisher events.Publisher
+	log       *zerolog.Logger
 }
 
 func parseConfig(m map[string]interface{}) (*TusConfig, error) {
@@ -71,14 +72,18 @@ func parseConfig(m map[string]interface{}) (*TusConfig, error) {
 }
 
 // New returns a datatx manager implementation that relies on HTTP PUT/GET.
-func New(m map[string]interface{}, publisher events.Publisher) (datatx.DataTX, error) {
+func New(m map[string]interface{}, publisher events.Publisher, log *zerolog.Logger) (datatx.DataTX, error) {
 	c, err := parseConfig(m)
 	if err != nil {
 		return nil, err
 	}
+
+	l := log.With().Str("datatx", "tus").Logger()
+
 	return &manager{
 		conf:      c,
 		publisher: publisher,
+		log:       &l,
 	}, nil
 }
 
@@ -100,7 +105,7 @@ func (m *manager) Handler(fs storage.FS) (http.Handler, error) {
 	config := tusd.Config{
 		StoreComposer:         composer,
 		NotifyCompleteUploads: true,
-		Logger:                slog.New(tusdLogger{log: appctx.GetLogger(context.Background())}), // Note: this is a noop logger
+		Logger:                slog.New(tusdLogger{log: m.log}),
 	}
 
 	if m.conf.CorsEnabled {
@@ -154,6 +159,8 @@ func (m *manager) Handler(fs storage.FS) (http.Handler, error) {
 	}
 
 	h := handler.Middleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		sublog := m.log.With().Str("uploadid", r.URL.Path).Logger()
+		r = r.WithContext(appctx.WithLogger(r.Context(), &sublog))
 		method := r.Method
 		// https://github.com/tus/tus-resumable-upload-protocol/blob/master/protocol.md#x-http-method-override
 		if r.Header.Get("X-HTTP-Method-Override") != "" {
@@ -251,8 +258,16 @@ func (l tusdLogger) Handle(_ context.Context, r slog.Record) error {
 // Enabled returns true
 func (l tusdLogger) Enabled(_ context.Context, _ slog.Level) bool { return true }
 
-// WithAttrs is not implemented
-func (l tusdLogger) WithAttrs(_ []slog.Attr) slog.Handler { return l }
+// WithAttrs creates a new logger with the given attributes
+func (l tusdLogger) WithAttrs(attr []slog.Attr) slog.Handler {
+	fields := make(map[string]interface{}, len(attr))
+	for _, a := range attr {
+		fields[a.Key] = a.Value
+	}
+	c := l.log.With().Fields(fields).Logger()
+	sLog := tusdLogger{log: &c}
+	return sLog
+}
 
 // WithGroup is not implemented
-func (l tusdLogger) WithGroup(_ string) slog.Handler { return l }
+func (l tusdLogger) WithGroup(name string) slog.Handler { return l }
