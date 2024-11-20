@@ -165,6 +165,7 @@ func (t *Tree) Scan(path string, action EventAction, isDir bool) error {
 	// cases:
 	switch action {
 	case ActionCreate:
+		t.log.Debug().Str("path", path).Bool("isDir", isDir).Msg("scanning path (ActionCreate)")
 		if !isDir {
 			// 1. New file (could be emitted as part of a new directory)
 			//	 -> assimilate file
@@ -197,6 +198,7 @@ func (t *Tree) Scan(path string, action EventAction, isDir bool) error {
 		}
 
 	case ActionUpdate:
+		t.log.Debug().Str("path", path).Bool("isDir", isDir).Msg("scanning path (ActionUpdate)")
 		// 3. Updated file
 		//   -> update file unless parent directory is being rescanned
 		if !t.scanDebouncer.InProgress(filepath.Dir(path)) {
@@ -207,6 +209,7 @@ func (t *Tree) Scan(path string, action EventAction, isDir bool) error {
 		}
 
 	case ActionMove:
+		t.log.Debug().Str("path", path).Bool("isDir", isDir).Msg("scanning path (ActionMove)")
 		// 4. Moved file
 		//   -> update file
 		// 5. Moved directory
@@ -218,6 +221,7 @@ func (t *Tree) Scan(path string, action EventAction, isDir bool) error {
 		})
 
 	case ActionMoveFrom:
+		t.log.Debug().Str("path", path).Bool("isDir", isDir).Msg("scanning path (ActionMoveFrom)")
 		// 6. file/directory moved out of the watched directory
 		//   -> update directory
 		if err := t.setDirty(filepath.Dir(path), true); err != nil {
@@ -227,9 +231,16 @@ func (t *Tree) Scan(path string, action EventAction, isDir bool) error {
 		go func() { _ = t.WarmupIDCache(filepath.Dir(path), false, true) }()
 
 	case ActionDelete:
-		_ = t.HandleFileDelete(path)
+		t.log.Debug().Str("path", path).Bool("isDir", isDir).Msg("handling deleted item")
+
 		// 7. Deleted file or directory
 		//   -> update parent and all children
+
+		err := t.HandleFileDelete(path)
+		if err != nil {
+			return err
+		}
+
 		t.scanDebouncer.Debounce(scanItem{
 			Path:        filepath.Dir(path),
 			ForceRescan: true,
@@ -242,8 +253,12 @@ func (t *Tree) Scan(path string, action EventAction, isDir bool) error {
 
 func (t *Tree) HandleFileDelete(path string) error {
 	// purge metadata
-	_ = t.lookup.(*lookup.Lookup).IDCache.DeleteByPath(context.Background(), path)
-	_ = t.lookup.MetadataBackend().Purge(context.Background(), path)
+	if err := t.lookup.(*lookup.Lookup).IDCache.DeleteByPath(context.Background(), path); err != nil {
+		t.log.Error().Err(err).Str("path", path).Msg("could not delete id cache entry by path")
+	}
+	if err := t.lookup.MetadataBackend().Purge(context.Background(), path); err != nil {
+		t.log.Error().Err(err).Str("path", path).Msg("could not purge metadata")
+	}
 
 	// send event
 	owner, spaceID, nodeID, parentID, err := t.getOwnerAndIDs(filepath.Dir(path))
@@ -369,23 +384,36 @@ func (t *Tree) assimilate(item scanItem) error {
 		if ok && len(previousParentID) > 0 && previousPath != item.Path {
 			_, err := os.Stat(previousPath)
 			if err == nil {
-				// this id clashes with an existing id -> clear metadata and re-assimilate
+				// this id clashes with an existing item -> clear metadata and re-assimilate
+				t.log.Debug().Str("path", item.Path).Msg("ID clash detected, purging metadata and re-assimilating")
 
-				_ = t.lookup.MetadataBackend().Purge(context.Background(), item.Path)
+				if err := t.lookup.MetadataBackend().Purge(context.Background(), item.Path); err != nil {
+					t.log.Error().Err(err).Str("path", item.Path).Msg("could not purge metadata")
+				}
 				go func() {
-					_ = t.assimilate(scanItem{Path: item.Path, ForceRescan: true})
+					if err := t.assimilate(scanItem{Path: item.Path, ForceRescan: true}); err != nil {
+						t.log.Error().Err(err).Str("path", item.Path).Msg("could not re-assimilate")
+					}
 				}()
 			} else {
 				// this is a move
-				_ = t.lookup.(*lookup.Lookup).CacheID(context.Background(), spaceID, string(id), item.Path)
+				t.log.Debug().Str("path", item.Path).Msg("move detected")
+
+				if err := t.lookup.(*lookup.Lookup).CacheID(context.Background(), spaceID, string(id), item.Path); err != nil {
+					t.log.Error().Err(err).Str("spaceID", spaceID).Str("id", string(id)).Str("path", item.Path).Msg("could not cache id")
+				}
 				_, err := t.updateFile(item.Path, string(id), spaceID)
 				if err != nil {
 					return err
 				}
 
 				// purge original metadata. Only delete the path entry using DeletePath(reverse lookup), not the whole entry pair.
-				_ = t.lookup.(*lookup.Lookup).IDCache.DeletePath(context.Background(), previousPath)
-				_ = t.lookup.MetadataBackend().Purge(context.Background(), previousPath)
+				if err := t.lookup.(*lookup.Lookup).IDCache.DeletePath(context.Background(), previousPath); err != nil {
+					t.log.Error().Err(err).Str("path", previousPath).Msg("could not delete id cache entry by path")
+				}
+				if err := t.lookup.MetadataBackend().Purge(context.Background(), previousPath); err != nil {
+					t.log.Error().Err(err).Str("path", previousPath).Msg("could not purge metadata")
+				}
 
 				fi, err := os.Stat(item.Path)
 				if err != nil {
@@ -393,7 +421,11 @@ func (t *Tree) assimilate(item scanItem) error {
 				}
 				if fi.IsDir() {
 					// if it was moved and it is a directory we need to propagate the move
-					go func() { _ = t.WarmupIDCache(item.Path, false, true) }()
+					go func() {
+						if err := t.WarmupIDCache(item.Path, false, true); err != nil {
+							t.log.Error().Err(err).Str("path", item.Path).Msg("could not warmup id cache")
+						}
+					}()
 				}
 
 				parentID, err := t.lookup.MetadataBackend().Get(context.Background(), item.Path, prefixes.ParentidAttr)
@@ -426,7 +458,10 @@ func (t *Tree) assimilate(item scanItem) error {
 			}
 		} else {
 			// This item had already been assimilated in the past. Update the path
-			_ = t.lookup.(*lookup.Lookup).CacheID(context.Background(), spaceID, string(id), item.Path)
+			t.log.Debug().Str("path", item.Path).Msg("updating cached path")
+			if err := t.lookup.(*lookup.Lookup).CacheID(context.Background(), spaceID, string(id), item.Path); err != nil {
+				t.log.Error().Err(err).Str("spaceID", spaceID).Str("id", string(id)).Str("path", item.Path).Msg("could not cache id")
+			}
 
 			_, err := t.updateFile(item.Path, string(id), spaceID)
 			if err != nil {
@@ -434,6 +469,7 @@ func (t *Tree) assimilate(item scanItem) error {
 			}
 		}
 	} else {
+		t.log.Debug().Str("path", item.Path).Msg("new item detected")
 		// assimilate new file
 		newId := uuid.New().String()
 		fi, err := t.updateFile(item.Path, newId, spaceID)
@@ -550,12 +586,15 @@ assimilate:
 		return nil, errors.Wrap(err, "failed to propagate")
 	}
 
+	t.log.Debug().Str("path", path).Interface("attributes", attributes).Msg("setting attributes")
 	err = t.lookup.MetadataBackend().SetMultiple(context.Background(), path, attributes, false)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to set attributes")
 	}
 
-	_ = t.lookup.(*lookup.Lookup).CacheID(context.Background(), spaceID, id, path)
+	if err := t.lookup.(*lookup.Lookup).CacheID(context.Background(), spaceID, id, path); err != nil {
+		t.log.Error().Err(err).Str("spaceID", spaceID).Str("id", id).Str("path", path).Msg("could not cache id")
+	}
 
 	return fi, nil
 }
@@ -654,10 +693,14 @@ func (t *Tree) WarmupIDCache(root string, assimilate, onlyDirty bool) error {
 						_ = t.assimilate(scanItem{Path: path, ForceRescan: true})
 					}
 				}
-				_ = t.lookup.(*lookup.Lookup).CacheID(context.Background(), string(spaceID), string(id), path)
+				if err := t.lookup.(*lookup.Lookup).CacheID(context.Background(), string(spaceID), string(id), path); err != nil {
+					t.log.Error().Err(err).Str("spaceID", string(spaceID)).Str("id", string(id)).Str("path", path).Msg("could not cache id")
+				}
 			}
 		} else if assimilate {
-			_ = t.assimilate(scanItem{Path: path, ForceRescan: true})
+			if err := t.assimilate(scanItem{Path: path, ForceRescan: true}); err != nil {
+				t.log.Error().Err(err).Str("path", path).Msg("could not assimilate item")
+			}
 		}
 		return t.setDirty(path, false)
 	})
@@ -665,9 +708,13 @@ func (t *Tree) WarmupIDCache(root string, assimilate, onlyDirty bool) error {
 	for dir, size := range sizes {
 		if dir == root {
 			// Propagate the size diff further up the tree
-			_ = t.propagateSizeDiff(dir, size)
+			if err := t.propagateSizeDiff(dir, size); err != nil {
+				t.log.Error().Err(err).Str("path", dir).Msg("could not propagate size diff")
+			}
 		}
-		_ = t.lookup.MetadataBackend().Set(context.Background(), dir, prefixes.TreesizeAttr, []byte(fmt.Sprintf("%d", size)))
+		if err := t.lookup.MetadataBackend().Set(context.Background(), dir, prefixes.TreesizeAttr, []byte(fmt.Sprintf("%d", size))); err != nil {
+			t.log.Error().Err(err).Str("path", dir).Int64("size", size).Msg("could not set tree size")
+		}
 	}
 
 	if err != nil {

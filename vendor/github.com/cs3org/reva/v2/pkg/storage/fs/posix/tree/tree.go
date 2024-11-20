@@ -121,17 +121,17 @@ func New(lu node.PathLookup, bs Blobstore, um usermapper.Mapper, trashbin *trash
 	var err error
 	switch o.WatchType {
 	case "gpfswatchfolder":
-		t.watcher, err = NewGpfsWatchFolderWatcher(t, strings.Split(o.WatchFolderKafkaBrokers, ","))
+		t.watcher, err = NewGpfsWatchFolderWatcher(t, strings.Split(o.WatchFolderKafkaBrokers, ","), log)
 		if err != nil {
 			return nil, err
 		}
 	case "gpfsfileauditlogging":
-		t.watcher, err = NewGpfsFileAuditLoggingWatcher(t, o.WatchPath)
+		t.watcher, err = NewGpfsFileAuditLoggingWatcher(t, o.WatchPath, log)
 		if err != nil {
 			return nil, err
 		}
 	default:
-		t.watcher = NewInotifyWatcher(t)
+		t.watcher = NewInotifyWatcher(t, log)
 		watchPath = o.Root
 	}
 
@@ -213,7 +213,9 @@ func (t *Tree) TouchFile(ctx context.Context, n *node.Node, markprocessing bool,
 	n.SetType(provider.ResourceType_RESOURCE_TYPE_FILE)
 
 	// Set id in cache
-	_ = t.lookup.(*lookup.Lookup).CacheID(context.Background(), n.SpaceID, n.ID, nodePath)
+	if err := t.lookup.(*lookup.Lookup).CacheID(context.Background(), n.SpaceID, n.ID, nodePath); err != nil {
+		t.log.Error().Err(err).Str("spaceID", n.SpaceID).Str("id", n.ID).Str("path", nodePath).Msg("could not cache id")
+	}
 
 	if err := os.MkdirAll(filepath.Dir(nodePath), 0700); err != nil {
 		return errors.Wrap(err, "Decomposedfs: error creating node")
@@ -312,7 +314,9 @@ func (t *Tree) Move(ctx context.Context, oldNode *node.Node, newNode *node.Node)
 	if newNode.ID == "" {
 		newNode.ID = oldNode.ID
 	}
-	_ = t.lookup.(*lookup.Lookup).CacheID(ctx, newNode.SpaceID, newNode.ID, filepath.Join(newNode.ParentPath(), newNode.Name))
+	if err := t.lookup.(*lookup.Lookup).CacheID(ctx, newNode.SpaceID, newNode.ID, filepath.Join(newNode.ParentPath(), newNode.Name)); err != nil {
+		t.log.Error().Err(err).Str("spaceID", newNode.SpaceID).Str("id", newNode.ID).Str("path", filepath.Join(newNode.ParentPath(), newNode.Name)).Msg("could not cache id")
+	}
 
 	// rename the lock (if it exists)
 	if _, err := os.Stat(oldNode.LockFilePath()); err == nil {
@@ -476,7 +480,11 @@ func (t *Tree) Delete(ctx context.Context, n *node.Node) error {
 	}
 
 	// remove entry from cache immediately to avoid inconsistencies
-	defer func() { _ = t.idCache.Delete(path) }()
+	defer func() {
+		if err := t.idCache.Delete(path); err != nil {
+			log.Error().Err(err).Str("path", path).Msg("could not delete id from cache")
+		}
+	}()
 
 	if appctx.DeletingSharedResourceFromContext(ctx) {
 		src := filepath.Join(n.ParentPath(), n.Name)
@@ -495,7 +503,9 @@ func (t *Tree) Delete(ctx context.Context, n *node.Node) error {
 	}
 
 	// Remove lock file if it exists
-	_ = os.Remove(n.LockFilePath())
+	if err := os.Remove(n.LockFilePath()); err != nil {
+		log.Error().Err(err).Str("path", n.LockFilePath()).Msg("could not remove lock file")
+	}
 
 	err := t.trashbin.MoveToTrash(ctx, n, path)
 	if err != nil {
@@ -748,7 +758,9 @@ func (t *Tree) createDirNode(ctx context.Context, n *node.Node) (err error) {
 		return errors.Wrap(err, "Decomposedfs: error creating node")
 	}
 
-	_ = idcache.Set(ctx, n.SpaceID, n.ID, path)
+	if err := idcache.Set(ctx, n.SpaceID, n.ID, path); err != nil {
+		log.Error().Err(err).Str("spaceID", n.SpaceID).Str("id", n.ID).Str("path", path).Msg("could not cache id")
+	}
 
 	attributes := n.NodeMetadata(ctx)
 	attributes[prefixes.IDAttr] = []byte(n.ID)

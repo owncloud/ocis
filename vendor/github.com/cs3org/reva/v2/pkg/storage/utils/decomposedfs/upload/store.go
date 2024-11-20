@@ -312,11 +312,8 @@ func (store OcisStore) updateExistingNode(ctx context.Context, session *OcisSess
 	}
 
 	unlock := func() error {
-		err := f.Close()
-		if err != nil {
-			return err
-		}
-		return os.Remove(store.lu.MetadataBackend().LockfilePath(targetPath))
+		// NOTE: to prevent stale NFS file handles do not remove lock file!
+		return f.Close()
 	}
 
 	old, _ := node.ReadNode(ctx, store.lu, spaceID, n.ID, false, nil, false)

@@ -28,6 +28,7 @@ import (
 	sdk "github.com/cs3org/reva/v2/pkg/sdk/common"
 	"github.com/cs3org/reva/v2/pkg/storage/cache"
 	"github.com/cs3org/reva/v2/pkg/utils"
+	"github.com/pkg/errors"
 	"google.golang.org/grpc"
 )
 
@@ -44,7 +45,12 @@ func (c *cachedRegistryClient) ListStorageProviders(ctx context.Context, in *reg
 
 	spaceID := sdk.DecodeOpaqueMap(in.Opaque)["space_id"]
 
-	key := c.cache.GetKey(ctxpkg.ContextMustGetUser(ctx).GetId(), spaceID)
+	u, ok := ctxpkg.ContextGetUser(ctx)
+	if !ok {
+		return nil, errors.New("user not found in context")
+	}
+
+	key := c.cache.GetKey(u.GetId(), spaceID)
 	if key != "" {
 		s := &registry.ListStorageProvidersResponse{}
 		if err := c.cache.PullFromCache(key, s); err == nil {
@@ -89,7 +95,12 @@ type cachedSpacesAPIClient struct {
 // CreateStorageSpace creates a storage space
 func (c *cachedSpacesAPIClient) CreateStorageSpace(ctx context.Context, in *provider.CreateStorageSpaceRequest, opts ...grpc.CallOption) (*provider.CreateStorageSpaceResponse, error) {
 	if in.Type == "personal" {
-		key := c.createPersonalSpaceCache.GetKey(ctxpkg.ContextMustGetUser(ctx).GetId())
+		u, ok := ctxpkg.ContextGetUser(ctx)
+		if !ok {
+			return nil, errors.New("user not found in context")
+		}
+
+		key := c.createPersonalSpaceCache.GetKey(u.GetId())
 		if key != "" {
 			s := &provider.CreateStorageSpaceResponse{}
 			if err := c.createPersonalSpaceCache.PullFromCache(key, s); err == nil {
@@ -132,7 +143,12 @@ type cachedAPIClient struct {
 
 // CreateHome caches calls to CreateHome locally - anyways they only need to be called once per user
 func (c *cachedAPIClient) CreateHome(ctx context.Context, in *provider.CreateHomeRequest, opts ...grpc.CallOption) (*provider.CreateHomeResponse, error) {
-	key := c.createPersonalSpaceCache.GetKey(ctxpkg.ContextMustGetUser(ctx).GetId())
+	u, ok := ctxpkg.ContextGetUser(ctx)
+	if !ok {
+		return nil, errors.New("user not found in context")
+	}
+
+	key := c.createPersonalSpaceCache.GetKey(u.GetId())
 	if key != "" {
 		s := &provider.CreateHomeResponse{}
 		if err := c.createPersonalSpaceCache.PullFromCache(key, s); err == nil {

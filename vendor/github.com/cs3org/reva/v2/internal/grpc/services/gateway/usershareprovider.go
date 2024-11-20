@@ -139,7 +139,11 @@ func (s *svc) updateShare(ctx context.Context, req *collaboration.UpdateShareReq
 	}
 
 	if s.c.CommitShareToStorageGrant {
-		creator := ctxpkg.ContextMustGetUser(ctx)
+		creator, ok := ctxpkg.ContextGetUser(ctx)
+		if !ok {
+			return nil, errors.New("user not found in context")
+		}
+
 		grant := &provider.Grant{
 			Grantee:     res.GetShare().GetGrantee(),
 			Permissions: res.GetShare().GetPermissions().GetPermissions(),
@@ -198,11 +202,16 @@ func (s *svc) updateSpaceShare(ctx context.Context, req *collaboration.UpdateSha
 			req.Share.Expiration = existsGrant.GetExpiration()
 		}
 
+		u, ok := ctxpkg.ContextGetUser(ctx)
+		if !ok {
+			return nil, errors.New("user not found in context")
+		}
+
 		grant := &provider.Grant{
 			Grantee:     req.GetShare().GetGrantee(),
 			Permissions: req.GetShare().GetPermissions().GetPermissions(),
 			Expiration:  req.GetShare().GetExpiration(),
-			Creator:     ctxpkg.ContextMustGetUser(ctx).GetId(),
+			Creator:     u.GetId(),
 		}
 
 		if grant.GetPermissions() == nil {
@@ -410,7 +419,11 @@ func (s *svc) addGrant(ctx context.Context, id *provider.ResourceId, g *provider
 		ResourceId: id,
 	}
 
-	creator := ctxpkg.ContextMustGetUser(ctx)
+	creator, ok := ctxpkg.ContextGetUser(ctx)
+	if !ok {
+		return nil, errors.New("user not found in context")
+	}
+
 	grantReq := &provider.AddGrantRequest{
 		Ref: ref,
 		Grant: &provider.Grant{
