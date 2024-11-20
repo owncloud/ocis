@@ -26,6 +26,19 @@ use Exception;
 use GuzzleHttp\Exception\GuzzleException;
 
 /**
+ * Class StorageDriver
+ *
+ * @package TestHelpers
+ */
+abstract class StorageDriver {
+	public const OCIS = "OCIS";
+	public const EOS = "EOS";
+	public const OWNCLOUD = "OWNCLOUD";
+	public const S3NG = "S3NG";
+	public const POSIX = "POSIX";
+}
+
+/**
  * Class OcisHelper
  *
  * Helper functions that are needed to run tests on OCIS
@@ -33,6 +46,14 @@ use GuzzleHttp\Exception\GuzzleException;
  * @package TestHelpers
  */
 class OcisHelper {
+	public const STORAGE_DRIVERS = [
+		StorageDriver::OCIS,
+		StorageDriver::EOS,
+		StorageDriver::OWNCLOUD,
+		StorageDriver::S3NG,
+		StorageDriver::POSIX
+	];
+
 	/**
 	 * @return string
 	 */
@@ -78,42 +99,52 @@ class OcisHelper {
 	public static function getStorageDriver():string {
 		$storageDriver = (\getenv("STORAGE_DRIVER"));
 		if ($storageDriver === false) {
-			return "OWNCLOUD";
+			return StorageDriver::OWNCLOUD;
 		}
 		$storageDriver = \strtoupper($storageDriver);
-		if ($storageDriver !== "OCIS" && $storageDriver !== "EOS" && $storageDriver !== "OWNCLOUD" && $storageDriver !== "S3NG" && $storageDriver !== "POSIX") {
+		if (!\in_array($storageDriver, self::STORAGE_DRIVERS)) {
 			throw new Exception(
 				"Invalid storage driver. " .
-				"STORAGE_DRIVER must be OCIS|EOS|OWNCLOUD|S3NG|POSIX"
+				"STORAGE_DRIVER must be '" . \join(", ", self::STORAGE_DRIVERS) . "'"
 			);
 		}
 		return $storageDriver;
 	}
 
 	/**
-	 * @param string|null $user
+	 * @param array $users
 	 *
 	 * @return void
 	 * @throws Exception
 	 */
-	public static function deleteRevaUserData(?string $user = ""):void {
+	public static function deleteRevaUserData(?array $users = []): void {
 		$deleteCmd = self::getDeleteUserDataCommand();
-		if ($deleteCmd === false) {
-			if (self::getStorageDriver() === "OWNCLOUD") {
-				self::recurseRmdir(self::getOcisRevaDataRoot() . $user);
-			}
+
+		if (self::getStorageDriver() === StorageDriver::POSIX) {
+			\exec($deleteCmd);
 			return;
 		}
-		if (self::getStorageDriver() === "EOS") {
-			$deleteCmd = \str_replace(
-				"%s",
-				$user[0] . '/' . $user,
-				$deleteCmd
-			);
-		} else {
-			$deleteCmd = \sprintf($deleteCmd, $user);
+
+		foreach ($users as $user) {
+			if (\is_array($user)) {
+				$user = $user["actualUsername"];
+			}
+			if ($deleteCmd === false) {
+				if (self::getStorageDriver() === StorageDriver::OWNCLOUD) {
+					self::recurseRmdir(self::getOcisRevaDataRoot() . $user);
+				}
+				continue;
+			} elseif (self::getStorageDriver() === StorageDriver::EOS) {
+				$deleteCmd = \str_replace(
+					"%s",
+					$user[0] . '/' . $user,
+					$deleteCmd
+				);
+			} else {
+				$deleteCmd = \sprintf($deleteCmd, $user);
+			}
+			\exec($deleteCmd);
 		}
-		\exec($deleteCmd);
 	}
 
 	/**

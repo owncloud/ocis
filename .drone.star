@@ -1006,11 +1006,9 @@ def localApiTests(ctx, name, suites, storage = "ocis", extra_environment = {}, w
     expected_failures_file = "%s/expected-failures-localAPI-on-%s-storage.md" % (test_dir, storage.upper())
 
     environment = {
-        "PATH_TO_OCIS": dirs["base"],
         "TEST_SERVER_URL": OCIS_URL,
         "TEST_SERVER_FED_URL": OCIS_FED_URL,
         "OCIS_REVA_DATA_ROOT": "%s" % (dirs["ocisRevaDataRoot"] if storage == "owncloud" else ""),
-        "OCIS_SKELETON_STRATEGY": "%s" % ("copy" if storage == "owncloud" else "upload"),
         "SEND_SCENARIO_LINE_REFERENCES": "true",
         "STORAGE_DRIVER": storage,
         "BEHAT_SUITES": ",".join(suites),
@@ -1206,10 +1204,8 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, with_remote_php = Fa
                          "name": "oC10ApiTests-%s" % part_number,
                          "image": OC_CI_PHP % DEFAULT_PHP_VERSION,
                          "environment": {
-                             "PATH_TO_OCIS": "%s" % dirs["base"],
                              "TEST_SERVER_URL": OCIS_URL,
                              "OCIS_REVA_DATA_ROOT": "%s" % (dirs["ocisRevaDataRoot"] if storage == "owncloud" else ""),
-                             "OCIS_SKELETON_STRATEGY": "%s" % ("copy" if storage == "owncloud" else "upload"),
                              "SEND_SCENARIO_LINE_REFERENCES": "true",
                              "STORAGE_DRIVER": storage,
                              "BEHAT_FILTER_TAGS": filterTags,
