@@ -235,14 +235,17 @@ func (lu *Lookup) GenerateSpaceID(spaceType string, owner *user.User) (string, e
 // Path returns the path for node
 func (lu *Lookup) Path(ctx context.Context, n *node.Node, hasPermission node.PermissionFunc) (p string, err error) {
 	root := n.SpaceRoot
+	var child *node.Node
 	for n.ID != root.ID {
 		p = filepath.Join(n.Name, p)
+		child = n
 		if n, err = n.Parent(ctx); err != nil {
 			appctx.GetLogger(ctx).
 				Error().Err(err).
 				Str("path", p).
-				Str("spaceid", n.SpaceID).
-				Str("nodeid", n.ID).
+				Str("spaceid", child.SpaceID).
+				Str("nodeid", child.ID).
+				Str("parentid", child.ParentID).
 				Msg("Path()")
 			return
 		}

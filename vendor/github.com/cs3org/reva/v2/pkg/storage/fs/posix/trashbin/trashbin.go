@@ -26,6 +26,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/google/uuid"
+	"github.com/rs/zerolog"
+
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/storage"
@@ -34,13 +37,13 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/metadata/prefixes"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/node"
 	"github.com/cs3org/reva/v2/pkg/utils"
-	"github.com/google/uuid"
 )
 
 type Trashbin struct {
-	fs storage.FS
-	o  *options.Options
-	lu *lookup.Lookup
+	fs  storage.FS
+	o   *options.Options
+	lu  *lookup.Lookup
+	log *zerolog.Logger
 }
 
 const (
@@ -49,10 +52,11 @@ const (
 )
 
 // New returns a new Trashbin
-func New(o *options.Options, lu *lookup.Lookup) (*Trashbin, error) {
+func New(o *options.Options, lu *lookup.Lookup, log *zerolog.Logger) (*Trashbin, error) {
 	return &Trashbin{
-		o:  o,
-		lu: lu,
+		o:   o,
+		lu:  lu,
+		log: log,
 	}, nil
 }
 
@@ -261,7 +265,9 @@ func (tb *Trashbin) RestoreRecycleItem(ctx context.Context, ref *provider.Refere
 	if err != nil {
 		return err
 	}
-	_ = tb.lu.CacheID(ctx, n.SpaceID, string(id), restorePath)
+	if err := tb.lu.CacheID(ctx, n.SpaceID, string(id), restorePath); err != nil {
+		tb.log.Error().Err(err).Str("spaceID", n.SpaceID).Str("id", string(id)).Str("path", restorePath).Msg("trashbin: error caching id")
+	}
 
 	// cleanup trash info
 	if relativePath == "." || relativePath == "/" {

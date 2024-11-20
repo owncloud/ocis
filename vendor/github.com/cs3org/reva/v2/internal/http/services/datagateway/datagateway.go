@@ -32,7 +32,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/rhttp"
 	"github.com/cs3org/reva/v2/pkg/rhttp/global"
 	"github.com/cs3org/reva/v2/pkg/sharedconf"
-	"github.com/golang-jwt/jwt"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
@@ -58,7 +58,7 @@ func init() {
 
 // transferClaims are custom claims for a JWT token to be used between the metadata and data gateways.
 type transferClaims struct {
-	jwt.StandardClaims
+	jwt.RegisteredClaims
 	Target string `json:"target"`
 }
 type config struct {
