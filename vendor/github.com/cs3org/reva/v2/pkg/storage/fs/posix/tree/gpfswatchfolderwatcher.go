@@ -25,18 +25,21 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/rs/zerolog"
 	kafka "github.com/segmentio/kafka-go"
 )
 
 type GpfsWatchFolderWatcher struct {
 	tree    *Tree
 	brokers []string
+	log     *zerolog.Logger
 }
 
-func NewGpfsWatchFolderWatcher(tree *Tree, kafkaBrokers []string) (*GpfsWatchFolderWatcher, error) {
+func NewGpfsWatchFolderWatcher(tree *Tree, kafkaBrokers []string, log *zerolog.Logger) (*GpfsWatchFolderWatcher, error) {
 	return &GpfsWatchFolderWatcher{
 		tree:    tree,
 		brokers: kafkaBrokers,
+		log:     log,
 	}, nil
 }
 
@@ -66,23 +69,27 @@ func (w *GpfsWatchFolderWatcher) Watch(topic string) {
 		go func() {
 			isDir := strings.Contains(lwev.Event, "IN_ISDIR")
 
+			var err error
 			switch {
 			case strings.Contains(lwev.Event, "IN_DELETE"):
-				_ = w.tree.Scan(lwev.Path, ActionDelete, isDir)
+				err = w.tree.Scan(lwev.Path, ActionDelete, isDir)
 
 			case strings.Contains(lwev.Event, "IN_MOVE_FROM"):
-				_ = w.tree.Scan(lwev.Path, ActionMoveFrom, isDir)
+				err = w.tree.Scan(lwev.Path, ActionMoveFrom, isDir)
 
 			case strings.Contains(lwev.Event, "IN_CREATE"):
-				_ = w.tree.Scan(lwev.Path, ActionCreate, isDir)
+				err = w.tree.Scan(lwev.Path, ActionCreate, isDir)
 
 			case strings.Contains(lwev.Event, "IN_CLOSE_WRITE"):
-				bytesWritten, err := strconv.Atoi(lwev.BytesWritten)
-				if err == nil && bytesWritten > 0 {
-					_ = w.tree.Scan(lwev.Path, ActionUpdate, isDir)
+				bytesWritten, convErr := strconv.Atoi(lwev.BytesWritten)
+				if convErr == nil && bytesWritten > 0 {
+					err = w.tree.Scan(lwev.Path, ActionUpdate, isDir)
 				}
 			case strings.Contains(lwev.Event, "IN_MOVED_TO"):
-				_ = w.tree.Scan(lwev.Path, ActionMove, isDir)
+				err = w.tree.Scan(lwev.Path, ActionMove, isDir)
+			}
+			if err != nil {
+				w.log.Error().Err(err).Str("path", lwev.Path).Msg("error scanning path")
 			}
 		}()
 	}

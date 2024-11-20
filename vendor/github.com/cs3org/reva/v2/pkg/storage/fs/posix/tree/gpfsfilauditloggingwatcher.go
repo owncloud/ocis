@@ -25,10 +25,13 @@ import (
 	"os"
 	"strconv"
 	"time"
+
+	"github.com/rs/zerolog"
 )
 
 type GpfsFileAuditLoggingWatcher struct {
 	tree *Tree
+	log  *zerolog.Logger
 }
 
 type lwe struct {
@@ -37,9 +40,10 @@ type lwe struct {
 	BytesWritten string
 }
 
-func NewGpfsFileAuditLoggingWatcher(tree *Tree, auditLogFile string) (*GpfsFileAuditLoggingWatcher, error) {
+func NewGpfsFileAuditLoggingWatcher(tree *Tree, auditLogFile string, log *zerolog.Logger) (*GpfsFileAuditLoggingWatcher, error) {
 	w := &GpfsFileAuditLoggingWatcher{
 		tree: tree,
+		log:  log,
 	}
 
 	_, err := os.Stat(auditLogFile)
@@ -75,25 +79,33 @@ start:
 		case nil:
 			err := json.Unmarshal([]byte(line), ev)
 			if err != nil {
+				w.log.Error().Err(err).Str("line", line).Msg("error unmarshalling line")
 				continue
 			}
 			if isLockFile(ev.Path) || isTrash(ev.Path) || w.tree.isUpload(ev.Path) {
 				continue
 			}
-			switch ev.Event {
-			case "CREATE":
-				go func() { _ = w.tree.Scan(ev.Path, ActionCreate, false) }()
-			case "CLOSE":
-				bytesWritten, err := strconv.Atoi(ev.BytesWritten)
-				if err == nil && bytesWritten > 0 {
-					go func() { _ = w.tree.Scan(ev.Path, ActionUpdate, false) }()
+			go func() {
+				switch ev.Event {
+				case "CREATE":
+					err = w.tree.Scan(ev.Path, ActionCreate, false)
+				case "CLOSE":
+					var bytesWritten int
+					bytesWritten, err = strconv.Atoi(ev.BytesWritten)
+					if err == nil && bytesWritten > 0 {
+						err = w.tree.Scan(ev.Path, ActionUpdate, false)
+					}
+				case "RENAME":
+					err = w.tree.Scan(ev.Path, ActionMove, false)
+					if warmupErr := w.tree.WarmupIDCache(ev.Path, false, false); warmupErr != nil {
+						w.log.Error().Err(warmupErr).Str("path", ev.Path).Msg("error warming up id cache")
+					}
 				}
-			case "RENAME":
-				go func() {
-					_ = w.tree.Scan(ev.Path, ActionMove, false)
-					_ = w.tree.WarmupIDCache(ev.Path, false, false)
-				}()
-			}
+				if err != nil {
+					w.log.Error().Err(err).Str("line", line).Msg("error unmarshalling line")
+				}
+			}()
+
 		case io.EOF:
 			time.Sleep(1 * time.Second)
 		default:

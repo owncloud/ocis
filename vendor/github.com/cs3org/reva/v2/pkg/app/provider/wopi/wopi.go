@@ -47,7 +47,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/sharedconf"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/templates"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
-	"github.com/golang-jwt/jwt"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
 )
@@ -379,16 +379,16 @@ func getAppURLs(c *config) (map[string]map[string]string, error) {
 
 func (p *wopiProvider) getAccessTokenTTL(ctx context.Context) (string, error) {
 	tkn := ctxpkg.ContextMustGetToken(ctx)
-	token, err := jwt.ParseWithClaims(tkn, &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(tkn, &jwt.RegisteredClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte(p.conf.JWTSecret), nil
 	})
 	if err != nil {
 		return "", err
 	}
 
-	if claims, ok := token.Claims.(*jwt.StandardClaims); ok && token.Valid {
+	if claims, ok := token.Claims.(*jwt.RegisteredClaims); ok && token.Valid {
 		// milliseconds since Jan 1, 1970 UTC as required in https://wopi.readthedocs.io/projects/wopirest/en/latest/concepts.html?highlight=access_token_ttl#term-access-token-ttl
-		return strconv.FormatInt(claims.ExpiresAt*1000, 10), nil
+		return strconv.FormatInt(claims.ExpiresAt.Unix()*1000, 10), nil
 	}
 
 	return "", errtypes.InvalidCredentials("wopi: invalid token present in ctx")

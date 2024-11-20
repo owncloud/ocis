@@ -33,7 +33,7 @@ import (
 
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	"github.com/golang-jwt/jwt"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/pkg/errors"
 	tusd "github.com/tus/tusd/v2/pkg/handler"
 	"go.opentelemetry.io/otel"
@@ -372,17 +372,17 @@ func (session *OcisSession) Cleanup(revertNodeMetadata, cleanBin, cleanInfo bool
 // URL returns a url to download an upload
 func (session *OcisSession) URL(_ context.Context) (string, error) {
 	type transferClaims struct {
-		jwt.StandardClaims
+		jwt.RegisteredClaims
 		Target string `json:"target"`
 	}
 
 	u := joinurl(session.store.tknopts.DownloadEndpoint, "tus/", session.ID())
 	ttl := time.Duration(session.store.tknopts.TransferExpires) * time.Second
 	claims := transferClaims{
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(ttl).Unix(),
-			Audience:  "reva",
-			IssuedAt:  time.Now().Unix(),
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(ttl)),
+			Audience:  jwt.ClaimStrings{"reva"},
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
 		},
 		Target: u,
 	}
