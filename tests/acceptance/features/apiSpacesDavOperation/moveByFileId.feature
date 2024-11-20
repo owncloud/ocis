@@ -12,7 +12,7 @@ Feature: moving/renaming file using file id
     Given user "Alice" has created folder "/folder"
     And user "Alice" has uploaded file with content "some data" to "/textfile.txt"
     And we save it into "FILEID"
-    When user "Alice" moves a file "/textfile.txt" into "/folder" inside space "Personal" using file-id "<<FILEID>>"
+    When user "Alice" moves file with id "<<FILEID>>" as "/textfile.txt" into folder "/folder" inside space "Personal"
     Then the HTTP status code should be "201"
     And for user "Alice" folder "folder" of the space "Personal" should contain these files:
       | textfile.txt |
@@ -25,7 +25,7 @@ Feature: moving/renaming file using file id
     And user "Alice" has created folder "folder/sub-folder"
     And user "Alice" has uploaded file with content "some data" to "/textfile.txt"
     And we save it into "FILEID"
-    When user "Alice" moves a file "/textfile.txt" into "/folder/sub-folder" inside space "Personal" using file-id "<<FILEID>>"
+    When user "Alice" moves file with id "<<FILEID>>" as "/textfile.txt" into folder "/folder/sub-folder" inside space "Personal"
     Then the HTTP status code should be "201"
     And for user "Alice" folder "folder/sub-folder/" of the space "Personal" should contain these files:
       | textfile.txt |
@@ -37,7 +37,7 @@ Feature: moving/renaming file using file id
     Given user "Alice" has created folder "/folder"
     And user "Alice" has uploaded file with content "some data" to "folder/textfile.txt"
     And we save it into "FILEID"
-    When user "Alice" moves a file "folder/textfile.txt" into "/" inside space "Personal" using file-id "<<FILEID>>"
+    When user "Alice" moves file with id "<<FILEID>>" as "textfile.txt" into folder "/" inside space "Personal"
     Then the HTTP status code should be "201"
     And for user "Alice" the space "Personal" should contain these entries:
       | textfile.txt |
@@ -50,7 +50,7 @@ Feature: moving/renaming file using file id
     And user "Alice" has created folder "folder/sub-folder"
     And user "Alice" has uploaded file with content "some data" to "folder/sub-folder/textfile.txt"
     And we save it into "FILEID"
-    When user "Alice" moves a file "folder/sub-folder/textfile.txt" into "/" inside space "Personal" using file-id "<<FILEID>>"
+    When user "Alice" moves file with id "<<FILEID>>" as "textfile.txt" into folder "/" inside space "Personal"
     Then the HTTP status code should be "201"
     And for user "Alice" the space "Personal" should contain these entries:
       | textfile.txt |
@@ -61,7 +61,7 @@ Feature: moving/renaming file using file id
   Scenario: try to move a file into same folder with same name
     And user "Alice" has uploaded file with content "some data" to "textfile.txt"
     And we save it into "FILEID"
-    When user "Alice" moves a file "textfile.txt" into "/" inside space "Personal" using file-id "<<FILEID>>"
+    When user "Alice" moves file with id "<<FILEID>>" as "textfile.txt" into folder "/" inside space "Personal"
     Then the HTTP status code should be "403"
     And as "Alice" file "textfile.txt" should not exist in the trashbin of the space "Personal"
     And for user "Alice" the content of the file "textfile.txt" of the space "Personal" should be "some data"
@@ -79,7 +79,7 @@ Feature: moving/renaming file using file id
     And user "Brian" has a share "folder" synced
     And user "Brian" has uploaded file with content "some data" to "/test.txt"
     And we save it into "FILEID"
-    When user "Brian" moves a file "test.txt" into "folder" inside space "Shares" using file-id "<<FILEID>>"
+    When user "Brian" moves file with id "<<FILEID>>" as "test.txt" into folder "folder" inside space "Shares"
     Then the HTTP status code should be "502"
     And the value of the item "/d:error/s:message" in the response about user "Brian" should be "cross storage moves are not supported, use copy and delete"
     And for user "Brian" folder "/" of the space "Personal" should contain these files:
@@ -103,7 +103,7 @@ Feature: moving/renaming file using file id
       | sharee          | Brian         |
       | shareType       | user          |
       | permissionsRole | <space-role>  |
-    When user "Brian" moves a file "textfile.txt" into "/" inside space "project-space" using file-id "<<FILEID>>"
+    When user "Brian" moves file with id "<<FILEID>>" as "textfile.txt" into folder "/" inside space "project-space"
     Then the HTTP status code should be "<http-status-code>"
     And for user "Brian" folder "/" of the space "Personal" should contain these files:
       | textfile.txt |
@@ -121,7 +121,7 @@ Feature: moving/renaming file using file id
     And user "Alice" has created a space "project-space" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "Personal" with content "some data" to "textfile.txt"
     And we save it into "FILEID"
-    When user "Alice" renames a file "/textfile.txt" into "/renamed.txt" inside space "project-space" using file-id "<<FILEID>>"
+    When user "Alice" renames file with id "<<FILEID>>" to "renamed.txt" inside space "project-space"
     Then the HTTP status code should be "502"
     And the value of the item "/d:error/s:message" in the response about user "Alice" should be "move:error: not supported: cannot move across spaces"
     And for user "Alice" folder "/" of the space "Personal" should contain these files:
@@ -142,7 +142,7 @@ Feature: moving/renaming file using file id
       | sharee          | Brian         |
       | shareType       | user          |
       | permissionsRole | <space-role>  |
-    When user "Brian" moves a file "/textfile.txt" into "/folder" inside space "project-space" using file-id "<<FILEID>>"
+    When user "Brian" moves file with id "<<FILEID>>" as "/textfile.txt" into folder "/folder" inside space "project-space"
     Then the HTTP status code should be "201"
     And for user "Alice" folder "folder" of the space "project-space" should contain these files:
       | textfile.txt |
@@ -165,7 +165,7 @@ Feature: moving/renaming file using file id
       | sharee          | Brian         |
       | shareType       | user          |
       | permissionsRole | <space-role>  |
-    When user "Brian" moves a file "textfile.txt" into "/" inside space "project-space" using file-id "<<FILEID>>"
+    When user "Brian" moves file with id "<<FILEID>>" as "textfile.txt" into folder "/" inside space "project-space"
     Then the HTTP status code should be "403"
     And as "Alice" file "textfile.txt" should not exist in the trashbin of the space "project-space"
     And for user "Brian" the content of the file "textfile.txt" of the space "project-space" should be "some data"
@@ -188,7 +188,7 @@ Feature: moving/renaming file using file id
       | sharee          | Brian         |
       | shareType       | user          |
       | permissionsRole | Space Viewer  |
-    When user "Brian" moves a file "/textfile.txt" into "/folder" inside space "project-space" using file-id "<<FILEID>>"
+    When user "Brian" moves file with id "<<FILEID>>" as "/textfile.txt" into folder "/folder" inside space "project-space"
     Then the HTTP status code should be "403"
     And for user "Alice" the space "project-space" should contain these entries:
       | textfile.txt |
@@ -202,7 +202,7 @@ Feature: moving/renaming file using file id
     And user "Alice" has created a folder "folder/sub-folder" in space "project-space"
     And user "Alice" has uploaded a file inside space "project-space" with content "some data" to "/textfile.txt"
     And we save it into "FILEID"
-    When user "Alice" moves a file "/textfile.txt" into "/folder/sub-folder" inside space "project-space" using file-id "<<FILEID>>"
+    When user "Alice" moves file with id "<<FILEID>>" as "/textfile.txt" into folder "/folder/sub-folder" inside space "project-space"
     Then the HTTP status code should be "201"
     And for user "Alice" folder "folder/sub-folder/" of the space "project-space" should contain these files:
       | textfile.txt |
@@ -216,7 +216,7 @@ Feature: moving/renaming file using file id
     And user "Alice" has created a folder "folder" in space "project-space"
     And user "Alice" has uploaded a file inside space "project-space" with content "some data" to "folder/textfile.txt"
     And we save it into "FILEID"
-    When user "Alice" moves a file "folder/textfile.txt" into "/" inside space "project-space" using file-id "<<FILEID>>"
+    When user "Alice" moves file with id "<<FILEID>>" as "textfile.txt" into folder "/" inside space "project-space"
     Then the HTTP status code should be "201"
     And for user "Alice" the space "project-space" should contain these entries:
       | textfile.txt |
@@ -230,7 +230,7 @@ Feature: moving/renaming file using file id
     And user "Alice" has created a folder "folder/sub-folder" in space "project-space"
     And user "Alice" has uploaded a file inside space "project-space" with content "some data" to "folder/sub-folder/textfile.txt"
     And we save it into "FILEID"
-    When user "Alice" moves a file "folder/sub-folder/textfile.txt" into "/" inside space "project-space" using file-id "<<FILEID>>"
+    When user "Alice" moves file with id "<<FILEID>>" as "textfile.txt" into folder "/" inside space "project-space"
     Then the HTTP status code should be "201"
     And for user "Alice" the space "project-space" should contain these entries:
       | textfile.txt |
@@ -255,7 +255,7 @@ Feature: moving/renaming file using file id
       | sharee          | Brian                |
       | shareType       | user                 |
       | permissionsRole | <to-space-role>      |
-    When user "Brian" moves a file "file.txt" into "/" inside space "second-project-space" using file-id "<<FILEID>>"
+    When user "Brian" moves file with id "<<FILEID>>" as "file.txt" into folder "/" inside space "second-project-space"
     Then the HTTP status code should be "<http-status-code>"
     And for user "Brian" the space "second-project-space" should not contain these entries:
       | file.txt |
@@ -281,7 +281,7 @@ Feature: moving/renaming file using file id
     And user "Alice" has uploaded a file inside space "first-project-space" with content "data from first project space" to "firstProjectSpacetextfile.txt"
     And user "Alice" has uploaded a file inside space "second-project-space" with content "data from second project space" to "secondProjectSpacetextfile.txt"
     And we save it into "FILEID"
-    When user "Alice" renames a file "/secondProjectSpacetextfile.txt" into "/renamedSecondProjectSpacetextfile.txt" inside space "first-project-space" using file-id "<<FILEID>>"
+    When user "Alice" renames file with id "<<FILEID>>" to "/renamedSecondProjectSpacetextfile.txt" inside space "first-project-space"
     Then the HTTP status code should be "502"
     And the value of the item "/d:error/s:message" in the response about user "Alice" should be "move:error: not supported: cannot move across spaces"
     And for user "Alice" folder "/" of the space "first-project-space" should contain these files:
@@ -311,7 +311,7 @@ Feature: moving/renaming file using file id
       | shareType       | user          |
       | permissionsRole | <permissions> |
     And user "Brian" has a share "testshare" synced
-    When user "Brian" moves a file "textfile.txt" into "testshare" inside space "Shares" using file-id "<<FILEID>>"
+    When user "Brian" moves file with id "<<FILEID>>" as "textfile.txt" into folder "testshare" inside space "Shares"
     Then the HTTP status code should be "502"
     And for user "Brian" folder "/" of the space "project-space" should contain these files:
       | textfile.txt |
@@ -338,7 +338,7 @@ Feature: moving/renaming file using file id
       | sharee          | Brian         |
       | shareType       | user          |
       | permissionsRole | <space-role>  |
-    When user "Brian" moves a file "/textfile.txt" into "/" inside space "Personal" using file-id "<<FILEID>>"
+    When user "Brian" moves file with id "<<FILEID>>" as "/textfile.txt" into folder "/" inside space "Personal"
     Then the HTTP status code should be "<http-status-code>"
     And for user "Brian" folder "/" of the space "project-space" should contain these files:
       | textfile.txt |
@@ -356,7 +356,7 @@ Feature: moving/renaming file using file id
     And user "Alice" has created a space "project-space" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "project-space" with content "some data" to "textfile.txt"
     And we save it into "FILEID"
-    When user "Alice" renames a file "/textfile.txt" into "/renamed.txt" inside space "Personal" using file-id "<<FILEID>>"
+    When user "Alice" renames file with id "<<FILEID>>" to "/renamed.txt" inside space "Personal"
     Then the HTTP status code should be "502"
     And the value of the item "/d:error/s:message" in the response about user "Alice" should be "move:error: not supported: cannot move across spaces"
     And for user "Alice" folder "/" of the space "project-space" should contain these files:
@@ -378,7 +378,7 @@ Feature: moving/renaming file using file id
       | shareType       | user     |
       | permissionsRole | Editor   |
     And user "Brian" has a share "folder" synced
-    When user "Brian" moves a file "Shares/folder/test.txt" into "folder/sub-folder" inside space "Shares" using file-id "<<FILEID>>"
+    When user "Brian" moves file with id "<<FILEID>>" as "test.txt" into folder "folder/sub-folder" inside space "Shares"
     Then the HTTP status code should be "201"
     And for user "Brian" folder "folder/sub-folder" of the space "Shares" should contain these files:
       | test.txt |
@@ -402,7 +402,7 @@ Feature: moving/renaming file using file id
       | shareType       | user     |
       | permissionsRole | Editor   |
     And user "Brian" has a share "/folder" synced
-    When user "Brian" moves a file "Shares/folder/test.txt" into "folder" inside space "Shares" using file-id "<<FILEID>>"
+    When user "Brian" moves file with id "<<FILEID>>" as "test.txt" into folder "folder" inside space "Shares"
     Then the HTTP status code should be "403"
     And as "Alice" file "test.txt" should not exist in the trashbin of the space "Personal"
     And for user "Brian" the content of the file "folder/test.txt" of the space "Shares" should be "some data"
@@ -422,7 +422,7 @@ Feature: moving/renaming file using file id
       | shareType       | user     |
       | permissionsRole | Viewer   |
     And user "Brian" has a share "folder" synced
-    When user "Brian" moves a file "Shares/folder/test.txt" into "folder/sub-folder" inside space "Shares" using file-id "<<FILEID>>"
+    When user "Brian" moves file with id "<<FILEID>>" as "test.txt" into folder "folder/sub-folder" inside space "Shares"
     Then the HTTP status code should be "502"
     And for user "Brian" folder "folder/sub-folder" of the space "Shares" should not contain these files:
       | test.txt |
@@ -454,7 +454,7 @@ Feature: moving/renaming file using file id
       | shareType       | user             |
       | permissionsRole | <to-permissions> |
     And user "Brian" has a share "testshare2" synced
-    When user "Brian" moves a file "Shares/testshare1/textfile.txt" into "testshare2" inside space "Shares" using file-id "<<FILEID>>"
+    When user "Brian" moves file with id "<<FILEID>>" as "textfile.txt" into folder "testshare2" inside space "Shares"
     Then the HTTP status code should be "502"
     And for user "Brian" folder "testshare1" of the space "Shares" should contain these files:
       | textfile.txt |
@@ -480,7 +480,7 @@ Feature: moving/renaming file using file id
       | shareType       | user          |
       | permissionsRole | <permissions> |
     And user "Brian" has a share "folder" synced
-    When user "Brian" moves a file "Shares/folder/test.txt" into "/" inside space "Personal" using file-id "<<FILEID>>"
+    When user "Brian" moves file with id "<<FILEID>>" as "test.txt" into folder "/" inside space "Personal"
     Then the HTTP status code should be "<http-status-code>"
     And for user "Brian" folder "folder" of the space "Shares" should contain these files:
       | test.txt |
@@ -511,7 +511,7 @@ Feature: moving/renaming file using file id
       | shareType       | user          |
       | permissionsRole | <permissions> |
     And user "Brian" has a share "testshare" synced
-    When user "Brian" moves a file "Shares/testshare/textfile.txt" into "/" inside space "project-space" using file-id "<<FILEID>>"
+    When user "Brian" moves file with id "<<FILEID>>" as "textfile.txt" into folder "/" inside space "project-space"
     Then the HTTP status code should be "<http-status-code>"
     And for user "Brian" folder "testshare" of the space "Shares" should contain these files:
       | textfile.txt |
@@ -530,7 +530,7 @@ Feature: moving/renaming file using file id
   Scenario: rename a root file inside personal space
     Given user "Alice" has uploaded file with content "some data" to "textfile.txt"
     And we save it into "FILEID"
-    When user "Alice" renames a file "textfile.txt" into "renamed.txt" inside space "Personal" using file-id "<<FILEID>>"
+    When user "Alice" renames file with id "<<FILEID>>" to "renamed.txt" inside space "Personal"
     Then the HTTP status code should be "201"
     And for user "Alice" the space "Personal" should contain these entries:
       | renamed.txt |
@@ -542,7 +542,7 @@ Feature: moving/renaming file using file id
     Given user "Alice" has created folder "/folder"
     And user "Alice" has uploaded file with content "some data" to "/textfile.txt"
     And we save it into "FILEID"
-    When user "Alice" renames a file "textfile.txt" into "/folder/renamed.txt" inside space "Personal" using file-id "<<FILEID>>"
+    When user "Alice" renames file with id "<<FILEID>>" to "/folder/renamed.txt" inside space "Personal"
     Then the HTTP status code should be "201"
     And for user "Alice" folder "folder" of the space "Personal" should contain these files:
       | renamed.txt |
@@ -555,7 +555,7 @@ Feature: moving/renaming file using file id
     And user "Alice" has created folder "folder/sub-folder"
     And user "Alice" has uploaded file with content "some data" to "/textfile.txt"
     And we save it into "FILEID"
-    When user "Alice" renames a file "textfile.txt" into "/folder/sub-folder/renamed.txt" inside space "Personal" using file-id "<<FILEID>>"
+    When user "Alice" renames file with id "<<FILEID>>" to "/folder/sub-folder/renamed.txt" inside space "Personal"
     Then the HTTP status code should be "201"
     And for user "Alice" folder "folder/sub-folder" of the space "Personal" should contain these files:
       | renamed.txt |
@@ -567,7 +567,7 @@ Feature: moving/renaming file using file id
     Given user "Alice" has created folder "/folder"
     And user "Alice" has uploaded file with content "some data" to "folder/textfile.txt"
     And we save it into "FILEID"
-    When user "Alice" renames a file "folder/textfile.txt" into "/renamed.txt" inside space "Personal" using file-id "<<FILEID>>"
+    When user "Alice" renames file with id "<<FILEID>>" to "/renamed.txt" inside space "Personal"
     Then the HTTP status code should be "201"
     And for user "Alice" the space "Personal" should contain these entries:
       | renamed.txt |
@@ -580,7 +580,7 @@ Feature: moving/renaming file using file id
     And user "Alice" has created folder "folder/sub-folder"
     And user "Alice" has uploaded file with content "some data" to "folder/sub-folder/textfile.txt"
     And we save it into "FILEID"
-    When user "Alice" renames a file "folder/sub-folder/textfile.txt" into "/renamed.txt" inside space "Personal" using file-id "<<FILEID>>"
+    When user "Alice" renames file with id "<<FILEID>>" to "/renamed.txt" inside space "Personal"
     Then the HTTP status code should be "201"
     And for user "Alice" the space "Personal" should contain these files:
       | renamed.txt |
@@ -601,7 +601,7 @@ Feature: moving/renaming file using file id
       | shareType       | user     |
       | permissionsRole | Editor   |
     And user "Brian" has a share "folder" synced
-    When user "Brian" renames a file "Shares/folder/test.txt" into "folder/sub-folder/renamed.txt" inside space "Shares" using file-id "<<FILEID>>"
+    When user "Brian" renames file with id "<<FILEID>>" to "folder/sub-folder/renamed.txt" inside space "Shares"
     Then the HTTP status code should be "201"
     And for user "Brian" folder "folder/sub-folder" of the space "Shares" should contain these files:
       | renamed.txt |
@@ -622,7 +622,7 @@ Feature: moving/renaming file using file id
       | shareType       | user     |
       | permissionsRole | Viewer   |
     And user "Brian" has a share "folder" synced
-    When user "Brian" renames a file "Shares/folder/test.txt" into "folder/sub-folder/renamed.txt" inside space "Shares" using file-id "<<FILEID>>"
+    When user "Brian" renames file with id "<<FILEID>>" to "folder/sub-folder/renamed.txt" inside space "Shares"
     Then the HTTP status code should be "502"
     And for user "Brian" folder "folder" of the space "Shares" should contain these files:
       | test.txt |
