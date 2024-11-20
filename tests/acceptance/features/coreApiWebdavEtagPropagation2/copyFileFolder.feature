@@ -119,7 +119,7 @@ Feature: propagation of etags when copying files or folders
     And user "Alice" has stored etag of element "/upload"
     And user "Alice" has stored etag of element "/upload/file.txt"
     And user "Alice" has stored etag of element "/upload/file.txt" on path "/upload/renamedFile.txt"
-    When the public copies file "file.txt" to "/renamedFile.txt" using the new public WebDAV API
+    When the public copies file "file.txt" to "/renamedFile.txt" using the public WebDAV API
     Then the HTTP status code should be "201"
     And these etags should have changed:
       | user  | path                    |

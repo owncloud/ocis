@@ -37,7 +37,7 @@ Feature: changing a public link share
       | space           | Personal |
       | permissionsRole | edit     |
       | password        | %public% |
-    When the public renames file "parent.txt" to "newparent.txt" from the last public link share using the password "%public%" and the new public WebDAV API
+    When the public renames file "parent.txt" to "newparent.txt" from the last public link share using the password "%public%" and the public WebDAV API
     Then the HTTP status code should be "201"
     And as "Alice" file "/PARENT/parent.txt" should not exist
     And as "Alice" file "/PARENT/newparent.txt" should exist
@@ -50,7 +50,7 @@ Feature: changing a public link share
       | space           | Personal |
       | permissionsRole | edit     |
       | password        | %public% |
-    When the public uploads file "lorem.txt" with password "%public%" and content "test" using the new public WebDAV API
+    When the public uploads file "lorem.txt" with password "%public%" and content "test" using the public WebDAV API
     Then the HTTP status code should be "201"
     And the content of file "PARENT/lorem.txt" for user "Alice" should be "test"
 
@@ -86,7 +86,7 @@ Feature: changing a public link share
       | space           | Personal |
       | permissionsRole | edit     |
       | password        | %public% |
-    When the public renames file "parent.txt" to "newparent.txt" from the last public link share using the password "invalid" and the new public WebDAV API
+    When the public renames file "parent.txt" to "newparent.txt" from the last public link share using the password "invalid" and the public WebDAV API
     Then the HTTP status code should be "401"
     And as "Alice" file "/PARENT/newparent.txt" should not exist
     And as "Alice" file "/PARENT/parent.txt" should exist
@@ -99,7 +99,7 @@ Feature: changing a public link share
       | space           | Personal |
       | permissionsRole | edit     |
       | password        | %public% |
-    When the public renames file "parent.txt" to "newparent.txt" from the last public link share using the password "%public%" and the new public WebDAV API
+    When the public renames file "parent.txt" to "newparent.txt" from the last public link share using the password "%public%" and the public WebDAV API
     Then the HTTP status code should be "201"
     And as "Alice" file "/PARENT/newparent.txt" should exist
     And as "Alice" file "/PARENT/parent.txt" should not exist
@@ -112,7 +112,7 @@ Feature: changing a public link share
       | space           | Personal |
       | permissionsRole | edit     |
       | password        | %public% |
-    When the public uploads file "lorem.txt" with password "invalid" and content "test" using the new public WebDAV API
+    When the public uploads file "lorem.txt" with password "invalid" and content "test" using the public WebDAV API
     Then the HTTP status code should be "401"
     And as "Alice" file "/PARENT/lorem.txt" should not exist
 
@@ -124,7 +124,7 @@ Feature: changing a public link share
       | space           | Personal |
       | permissionsRole | edit     |
       | password        | %public% |
-    When the public uploads file "lorem.txt" with password "%public%" and content "test" using the new public WebDAV API
+    When the public uploads file "lorem.txt" with password "%public%" and content "test" using the public WebDAV API
     Then the HTTP status code should be "201"
     And as "Alice" file "/PARENT/lorem.txt" should exist
 
@@ -136,7 +136,7 @@ Feature: changing a public link share
       | space           | Personal   |
       | permissionsRole | createOnly |
       | password        | %public%   |
-    When the public renames file "parent.txt" to "newparent.txt" from the last public link share using the password "%public%" and the new public WebDAV API
+    When the public renames file "parent.txt" to "newparent.txt" from the last public link share using the password "%public%" and the public WebDAV API
     Then the HTTP status code should be "403"
     And as "Alice" file "/PARENT/parent.txt" should exist
     And as "Alice" file "/PARENT/newparent.txt" should not exist
@@ -213,7 +213,7 @@ Feature: changing a public link share
       | password    |         |
     Then the HTTP status code should be "200"
     And the OCS status code should be "<ocs-status-code>"
-    And the public should be able to download file "/parent.txt" from inside the last public link shared folder using the new public WebDAV API with password ""
+    And the public should be able to download file "/parent.txt" from inside the last public link shared folder using the public WebDAV API with password ""
     Examples:
       | ocs-api-version | ocs-status-code |
       | 1               | 100             |

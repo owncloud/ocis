@@ -103,7 +103,7 @@ Feature: antivirus
       | space              | Personal                 |
       | permissionsRole    | edit                     |
       | expirationDateTime | 2040-01-01T23:59:59.000Z |
-    When the public uploads file "filesForUpload/filesWithVirus/<file-name>" to "<new-file-name>" inside last link shared folder using the new WebDAV API
+    When the public uploads file "filesForUpload/filesWithVirus/<file-name>" to "<new-file-name>" inside last link shared folder using the public WebDAV API
     Then the HTTP status code should be "201"
     And user "Alice" should get a notification with subject "Virus found" and message:
       | message                                                                          |
@@ -129,7 +129,7 @@ Feature: antivirus
       | permissionsRole    | edit                     |
       | password           | %public%                 |
       | expirationDateTime | 2040-01-01T23:59:59.000Z |
-    When the public uploads file "filesForUpload/filesWithVirus/<file-name>" to "<new-file-name>" inside last link shared folder with password "%public%" using the new WebDAV API
+    When the public uploads file "filesForUpload/filesWithVirus/<file-name>" to "<new-file-name>" inside last link shared folder with password "%public%" using the public WebDAV API
     Then the HTTP status code should be "201"
     And user "Alice" should get a notification with subject "Virus found" and message:
       | message                                                                          |
@@ -391,7 +391,7 @@ Feature: antivirus
       | resource        | test.txt |
       | space           | Personal |
       | permissionsRole | edit     |
-    When the public overwrites file "test.txt" with content "X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*" using the new WebDAV API
+    When the public overwrites file "test.txt" with content "X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*" using the public WebDAV API
     Then the HTTP status code should be "204"
     And user "Alice" should get a notification with subject "Virus found" and message:
       | message                                                                   |

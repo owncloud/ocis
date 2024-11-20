@@ -71,9 +71,9 @@ Feature: enforce password on public link
     Then the HTTP status code should be "200"
     And the OCS status code should be "<ocs-status-code>"
     And the OCS status message should be "OK"
-    And the public should not be able to download file "/testfile.txt" from inside the last public link shared folder using the new public WebDAV API without a password
-    And the public should not be able to download file "/testfile.txt" from inside the last public link shared folder using the new public WebDAV API with password "wrong pass"
-    But the public should be able to download file "/testfile.txt" from inside the last public link shared folder using the new public WebDAV API with password "%public%"
+    And the public should not be able to download file "/testfile.txt" from inside the last public link shared folder using the public WebDAV API without a password
+    And the public should not be able to download file "/testfile.txt" from inside the last public link shared folder using the public WebDAV API with password "wrong pass"
+    But the public should be able to download file "/testfile.txt" from inside the last public link shared folder using the public WebDAV API with password "%public%"
     Examples:
       | ocs-api-version | ocs-status-code |
       | 1               | 100             |
@@ -99,9 +99,9 @@ Feature: enforce password on public link
     Then the HTTP status code should be "200"
     And the OCS status code should be "<ocs-status-code>"
     And the OCS status message should be "OK"
-    And the public should not be able to download file "/testfile.txt" from inside the last public link shared folder using the new public WebDAV API without a password
-    And the public should not be able to download file "/testfile.txt" from inside the last public link shared folder using the new public WebDAV API with password "wrong pass"
-    But the public should be able to download file "/testfile.txt" from inside the last public link shared folder using the new public WebDAV API with password "3s:5WW9uE5h=A"
+    And the public should not be able to download file "/testfile.txt" from inside the last public link shared folder using the public WebDAV API without a password
+    And the public should not be able to download file "/testfile.txt" from inside the last public link shared folder using the public WebDAV API with password "wrong pass"
+    But the public should be able to download file "/testfile.txt" from inside the last public link shared folder using the public WebDAV API with password "3s:5WW9uE5h=A"
     Examples:
       | ocs-api-version | ocs-status-code |
       | 1               | 100             |
@@ -163,9 +163,9 @@ Feature: enforce password on public link
     Then the HTTP status code should be "200"
     And the OCS status code should be "<ocs-status-code>"
     And the OCS status message should be "OK"
-    And the public should not be able to download file "/testfile.txt" from inside the last public link shared folder using the new public WebDAV API without a password
-    And the public should not be able to download file "/testfile.txt" from inside the last public link shared folder using the new public WebDAV API with password "wrong pass"
-    But the public should be able to download file "/testfile.txt" from inside the last public link shared folder using the new public WebDAV API with password "6a0Q;A3 +i^m["
+    And the public should not be able to download file "/testfile.txt" from inside the last public link shared folder using the public WebDAV API without a password
+    And the public should not be able to download file "/testfile.txt" from inside the last public link shared folder using the public WebDAV API with password "wrong pass"
+    But the public should be able to download file "/testfile.txt" from inside the last public link shared folder using the public WebDAV API with password "6a0Q;A3 +i^m["
     Examples:
       | ocs-api-version | ocs-status-code |
       | 1               | 100             |
@@ -221,9 +221,9 @@ Feature: enforce password on public link
     Then the HTTP status code should be "200"
     And the OCS status code should be "200"
     And the OCS status message should be "OK"
-    And the public should not be able to download file "/testfile.txt" from inside the last public link shared folder using the new public WebDAV API without a password
-    And the public should not be able to download file "/testfile.txt" from inside the last public link shared folder using the new public WebDAV API with password "wrong pass"
-    But the public should be able to download file "/testfile.txt" from inside the last public link shared folder using the new public WebDAV API with password "<password>"
+    And the public should not be able to download file "/testfile.txt" from inside the last public link shared folder using the public WebDAV API without a password
+    And the public should not be able to download file "/testfile.txt" from inside the last public link shared folder using the public WebDAV API with password "wrong pass"
+    But the public should be able to download file "/testfile.txt" from inside the last public link shared folder using the public WebDAV API with password "<password>"
     Examples:
       | config                                        | config-value | password                             |
       | OCIS_PASSWORD_POLICY_MIN_CHARACTERS           | 4            | Ps-1                                 |

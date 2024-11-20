@@ -19,7 +19,7 @@ Feature: upload to a public link share
       | permissionsRole | createOnly |
       | password        | %public%   |
     And user "Alice" has deleted folder "/FOLDER"
-    When the public uploads file "test.txt" with password "%public%" and content "test-file" using the new public WebDAV API
+    When the public uploads file "test.txt" with password "%public%" and content "test-file" using the public WebDAV API
     And the HTTP status code should be "404"
 
     @issue-1268
@@ -37,7 +37,7 @@ Feature: upload to a public link share
       | space           | Personal |
       | permissionsRole | view     |
       | password        | %public% |
-    When the public uploads file "test.txt" with password "%public%" and content "test-file" using the new public WebDAV API
+    When the public uploads file "test.txt" with password "%public%" and content "test-file" using the public WebDAV API
     And the HTTP status code should be "403"
 
   @issue-10331
@@ -48,7 +48,7 @@ Feature: upload to a public link share
       | space           | Personal   |
       | permissionsRole | createOnly |
       | password        | %public%   |
-    When the public uploads file "test.txt" with password "%public%" and content "test-file" using the new public WebDAV API
+    When the public uploads file "test.txt" with password "%public%" and content "test-file" using the public WebDAV API
     Then the HTTP status code should be "201"
     And the content of file "/FOLDER/test.txt" for user "Alice" should be "test-file"
     And the following headers should match these regular expressions
@@ -62,7 +62,7 @@ Feature: upload to a public link share
       | space           | Personal   |
       | permissionsRole | createOnly |
       | password        | %public%   |
-    When the public uploads file "test.txt" with password "%public%" and content "test-file" using the new public WebDAV API
+    When the public uploads file "test.txt" with password "%public%" and content "test-file" using the public WebDAV API
     Then the HTTP status code should be "201"
     And the content of file "/FOLDER/test.txt" for user "Alice" should be "test-file"
 
@@ -74,7 +74,7 @@ Feature: upload to a public link share
       | space           | Personal |
       | permissionsRole | edit     |
       | password        | %public% |
-    When the public uploads file "test.txt" with password "%public%" and content "test-file" using the new public WebDAV API
+    When the public uploads file "test.txt" with password "%public%" and content "test-file" using the public WebDAV API
     Then the HTTP status code should be "201"
     And the content of file "/FOLDER/test.txt" for user "Alice" should be "test-file"
 
@@ -87,7 +87,7 @@ Feature: upload to a public link share
       | permissionsRole | edit     |
       | password        | %public% |
     And user "Admin" has changed the quota of the personal space of "Alice Hansen" space to "1"
-    When the public uploads file "test.txt" with password "%public%" and content "test2" using the new public WebDAV API
+    When the public uploads file "test.txt" with password "%public%" and content "test2" using the public WebDAV API
     Then the HTTP status code should be "507"
 
   @skipOnReva @issue-10331
@@ -99,7 +99,7 @@ Feature: upload to a public link share
       | permissionsRole | createOnly |
       | password        | %public%   |
     And user "Admin" has changed the quota of the personal space of "Alice Hansen" space to "1"
-    When the public uploads file "test.txt" with password "%public%" and content "test2" using the new public WebDAV API
+    When the public uploads file "test.txt" with password "%public%" and content "test2" using the public WebDAV API
     Then the HTTP status code should be "507"
 
   @smokeTest @issue-10331
@@ -110,7 +110,7 @@ Feature: upload to a public link share
       | space           | Personal   |
       | permissionsRole | createOnly |
       | password        | %public%   |
-    When the public uploads file "test.txt" with password "%public%" and content "test2" using the new public WebDAV API
+    When the public uploads file "test.txt" with password "%public%" and content "test2" using the public WebDAV API
     Then the HTTP status code should be "201"
     And the content of file "/FOLDER/test.txt" for user "Alice" should be "test2"
 
@@ -122,11 +122,11 @@ Feature: upload to a public link share
       | space           | Personal   |
       | permissionsRole | createOnly |
       | password        | %public%   |
-    When the public uploads file "test.txt" with password "%public%" and content "test" using the new public WebDAV API
+    When the public uploads file "test.txt" with password "%public%" and content "test" using the public WebDAV API
     Then the HTTP status code should be "201"
     And the following headers should match these regular expressions
       | ETag | /^"[a-f0-9:\.]{1,32}"$/ |
-    When the public uploads file "test.txt" with password "%public%" and content "test2" using the new public WebDAV API
+    When the public uploads file "test.txt" with password "%public%" and content "test2" using the public WebDAV API
     Then the HTTP status code should be "201"
     And the content of file "/FOLDER/test.txt" for user "Alice" should be "test"
     And the content of file "/FOLDER/test (2).txt" for user "Alice" should be "test2"

@@ -118,7 +118,7 @@ Feature: propagation of etags when creating folders
       | permissionsRole | createOnly |
     And user "Alice" has stored etag of element "/"
     And user "Alice" has stored etag of element "/folder"
-    When the public creates folder "created-by-public" using the new public WebDAV API
+    When the public creates folder "created-by-public" using the public WebDAV API
     Then the HTTP status code should be "201"
     And these etags should have changed:
       | user  | path    |

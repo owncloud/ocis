@@ -477,7 +477,7 @@ Feature: lock files
       | space           | Personal |
       | permissionsRole | edit     |
       | password        | %public% |
-    When the public locks "textfile0.txt" in the last public link shared folder using the new public WebDAV API setting the following properties
+    When the public locks "textfile0.txt" in the last public link shared folder using the public WebDAV API setting the following properties
       | lockscope | <lock-scope> |
     Then the HTTP status code should be "200"
     And 1 locks should be reported for file "PARENT/textfile0.txt" of user "Alice" by the WebDAV API
@@ -500,7 +500,7 @@ Feature: lock files
       | space           | Personal |
       | permissionsRole | view     |
       | password        | %public% |
-    When the public tries to lock "textfile0.txt" in the last public link shared folder using the new public WebDAV API setting the following properties
+    When the public tries to lock "textfile0.txt" in the last public link shared folder using the public WebDAV API setting the following properties
       | lockscope | <lock-scope> |
     Then the HTTP status code should be "403"
     And 0 locks should be reported for file "PARENT/textfile0.txt" of user "Alice" by the WebDAV API
