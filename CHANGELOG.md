@@ -1,6 +1,6 @@
 # Table of Contents
 
-* [Changelog for unreleased](#changelog-for-unreleased-unreleased)
+* [Changelog for 7.0.0-rc.3](#changelog-for-700-rc3-2024-11-21)
 * [Changelog for 5.0.9](#changelog-for-509-2024-11-14)
 * [Changelog for 7.0.0-rc.2](#changelog-for-700-rc2-2024-11-12)
 * [Changelog for 7.0.0-rc.1](#changelog-for-700-rc1-2024-11-07)
@@ -54,11 +54,11 @@
 * [Changelog for 1.1.0](#changelog-for-110-2021-01-22)
 * [Changelog for 1.0.0](#changelog-for-100-2020-12-17)
 
-# Changelog for [unreleased] (UNRELEASED)
+# Changelog for [7.0.0-rc.3] (2024-11-21)
 
-The following sections list the changes for unreleased.
+The following sections list the changes for 7.0.0-rc.3.
 
-[unreleased]: https://github.com/owncloud/ocis/compare/v5.0.9...master
+[7.0.0-rc.3]: https://github.com/owncloud/ocis/compare/v5.0.9...v7.0.0-rc.3
 
 ## Summary
 
