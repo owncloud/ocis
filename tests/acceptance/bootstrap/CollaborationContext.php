@@ -357,19 +357,17 @@ class CollaborationContext implements Context {
 	}
 
 	/**
-	 * @Then the app list response should contain the following information:
+	 * @Then the app list response should contain the following template information for office :app:
 	 *
+	 * @param string $app
 	 * @param TableNode $table
 	 *
 	 * @return void
-	 * @throws Exception
 	 */
-	public function theAppListResponseShouldContainTheFollowingInformation(TableNode $table): void {
+	public function theAppListResponseShouldContainTheFollowingTemplateInformationForOffice(string $app, TableNode $table): void {
 		$responseArray = $this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse());
 
-		if (!isset($responseArray['mime-types'])) {
-			throw new Exception(__METHOD__ . "The response does not contain a 'mime-types' key.");
-		}
+		Assert::assertArrayHasKey("mime-types", $responseArray, "Expected 'mime-types' in the response but not found.\n" . print_r($responseArray, true));
 
 		$mimeTypes = $responseArray['mime-types'];
 
@@ -379,44 +377,43 @@ class CollaborationContext implements Context {
 		}
 
 		foreach ($table->getColumnsHash() as $row) {
-			if (!isset($mimeTypeMap[$row['mimeType']])) {
-				throw new Exception("Mime type '{$row['mimeType']}' not found in the response.");
+			Assert::assertArrayHasKey($row['mime-type'], $mimeTypeMap, "Expected mime-type '{$row['mime-type']}' to exist in the response but it doesn't.\n" . print_r($mimeTypeMap, true));
+
+			$mimeType = $mimeTypeMap[$row['mime-type']];
+			$found = false;
+
+			foreach ($mimeType['app_providers'] as $provider) {
+				if ($provider['name'] === $app && isset($row['target-extension'])) {
+					Assert::assertSame(
+						$row['target-extension'],
+						$provider['target_ext'],
+						"Expected 'target_ext' for $app to be '{$row['target-extension']}' but found '{$provider['target_ext']}'"
+					);
+					$found = true;
+					break;
+				}
 			}
 
-			$mimeType = $mimeTypeMap[$row['mimeType']];
-			foreach ($mimeType['app_providers'] as $provider) {
-				if ($provider['name'] === 'OnlyOffice' && $row['onlyOffice']) {
-					Assert::assertSame(
-						$row['onlyOffice'],
-						$provider['target_ext'],
-						"Expected target_ext for OnlyOffice in mimeType '{$row['onlyOffice']} but found '{$provider['target_ext']}"
-					);
-				}
-				if ($provider['name'] === 'Collabora' && $row['collabora']) {
-					Assert::assertSame(
-						$row['collabora'],
-						$provider['target_ext'],
-						"Expected target_ext for Collabora in mimeType '{$row['collabora']} but found '{$provider['target_ext']}"
-					);
-				}
+			if (!$found) {
+				Assert::fail(
+					"Expected response to contain app-provider '$app' with target-extension '{$row['target-extension']}' for mime-type '{$row['mime-type']}', but no matching provider was found.\n" .
+					"App Providers Found: " . print_r($mimeType['app_providers'], true)
+				);
 			}
 		}
 	}
 
 	/**
-	 * @When user :user has created a file :file in space :space using wopi endpoint
+	 * @When user :user has created a file :file using wopi endpoint
 	 *
 	 * @param string $user
 	 * @param string $file
-	 * @param string $space
 	 *
 	 * @return string
 	 * @throws GuzzleException
 	 */
-	public function userHasCreatedAFileInSpaceUsingWopiEndpoint(string $user, string $file, string $space):string {
-		$spaceId = $this->spacesContext->getSpaceIdByName($user, $space);
-		$splitSpaceId = explode('$', $spaceId);
-		$parentContainerId = $splitSpaceId[0] . '$' . $splitSpaceId[1] . '!' . $splitSpaceId[1];
+	public function userHasCreatedAFileInSpaceUsingWopiEndpoint(string $user, string $file):string {
+		$parentContainerId = $this->featureContext->getFileIdForPath($user, "/");
 		$response = CollaborationHelper::createFile(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
@@ -426,8 +423,7 @@ class CollaborationContext implements Context {
 			$file
 		);
 		$this->featureContext->theHTTPStatusCodeShouldBe(200, "", $response);
-		$decodedResponse =  json_decode($response->getBody()->getContents(), true);
-		return $decodedResponse['file_id'];
+		$decodedResponse[] = $this->featureContext->getJsonDecodedResponseBodyContent($response);
+		return $decodedResponse[0]->file_id;
 	}
-
 }

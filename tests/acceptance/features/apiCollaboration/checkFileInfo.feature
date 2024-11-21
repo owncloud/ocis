@@ -1864,17 +1864,22 @@ Feature: check file info with different wopi apps
       | application/octet-stream |
 
 
-  Scenario: check that '/app/list' contain WebOffice template
+  Scenario: check target extensions for template mime types
     When user "Alice" sends HTTP method "GET" to URL "/app/list"
     Then the HTTP status code should be "200"
-    And the app list response should contain the following information:
-      | mimeType                                                                | onlyOffice | collabora |
-      | application/vnd.ms-powerpoint.template.macroenabled.12                  | pptx       |           |
-      | application/vnd.oasis.opendocument.presentation-template                | pptx       | odp       |
-      | application/vnd.openxmlformats-officedocument.spreadsheetml.template    | xlsx       |           |
-      | application/vnd.oasis.opendocument.spreadsheet-template                 | xlsx       | ods       |
-      | application/vnd.openxmlformats-officedocument.presentationml.template   | pptx       |           |
-      | application/vnd.openxmlformats-officedocument.wordprocessingml.template | docx       |           |
-      | application/vnd.ms-word.template.macroenabled.12                        | docx       |           |
-      | application/vnd.oasis.opendocument.text-template                        | docx       | odt       |
-      | application/vnd.ms-excel.template.macroenabled.12                       | xlsx       |           |
+    And the app list response should contain the following template information for office "OnlyOffice":
+      | mime-type                                                               | target-extension |
+      | application/vnd.oasis.opendocument.spreadsheet-template                 | xlsx             |
+      | application/vnd.oasis.opendocument.text-template                        | docx             |
+      | application/vnd.oasis.opendocument.presentation-template                | pptx             |
+      | application/vnd.openxmlformats-officedocument.spreadsheetml.template    | xlsx             |
+      | application/vnd.openxmlformats-officedocument.presentationml.template   | pptx             |
+      | application/vnd.openxmlformats-officedocument.wordprocessingml.template | docx             |
+      | application/vnd.ms-word.template.macroenabled.12                        | docx             |
+      | application/vnd.ms-powerpoint.template.macroenabled.12                  | pptx             |
+      | application/vnd.ms-excel.template.macroenabled.12                       | xlsx             |
+    And the app list response should contain the following template information for office "Collabora":
+      | mime-type                                                | target-extension |
+      | application/vnd.oasis.opendocument.spreadsheet-template  | ods              |
+      | application/vnd.oasis.opendocument.text-template         | odt              |
+      | application/vnd.oasis.opendocument.presentation-template | odp              |

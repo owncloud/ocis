@@ -1082,10 +1082,11 @@ Feature: collaboration (wopi)
       | simple.odt |
 
 
-  Scenario Outline: open file with .potx extension and template
-    Given user "Alice" has uploaded file "filesForUpload/template.xltx" to "template.xltx"
+  Scenario Outline: create a file using a template
+    Given using spaces DAV path
+    And user "Alice" has uploaded file "filesForUpload/<template>" to "<template>"
     And we save it into "TEMPLATEID"
-    And user "Alice" has created a file "template.pptx" in space "Personal" using wopi endpoint
+    And user "Alice" has created a file "<target>" using wopi endpoint
     And we save it into "FILEID"
     When user "Alice" sends HTTP method "POST" to URL "<app-endpoint>"
     Then the HTTP status code should be "200"
@@ -1125,6 +1126,6 @@ Feature: collaboration (wopi)
       }
       """
     Examples:
-      | app-endpoint                                                                                |
-      | /app/open?file_id=<<FILEID>>&app_name=Collabora&view_mode=write&template_id=<<TEMPLATEID>>  |
-      | /app/open?file_id=<<FILEID>>&app_name=OnlyOffice&view_mode=write&template_id=<<TEMPLATEID>> |
+      | app-endpoint                                                                                | template      | target        |
+      | /app/open?file_id=<<FILEID>>&app_name=Collabora&view_mode=write&template_id=<<TEMPLATEID>>  | template.ott  | template.odt  |
+      | /app/open?file_id=<<FILEID>>&app_name=OnlyOffice&view_mode=write&template_id=<<TEMPLATEID>> | template.dotx | template.docx |
