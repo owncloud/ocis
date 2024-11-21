@@ -35,7 +35,7 @@ Once generated, these tokens can be used to authenticate requests to ocis. They 
 
 ### Via API
 
-The `auth-app` service provides an API to create (POST), list (GET) and delete (DELETE) tokens at  the `/auth-app/tokens` endpoint.
+The `auth-app` service provides an API to create (POST), list (GET) and delete (DELETE) tokens at the `/auth-app/tokens` endpoint.
 
 When using curl for the respective command, you need to authenticate with a header. To do so, get from the browsers developer console the currently active bearer token. Consider that this token has a short lifetime. In any example, replace `<your host[:port]>` with the URL:port of your Infinite Scale instance, and `{token}`  `{value}` accordingly. Note that the active bearer token authenticates the user the token was issued for.
 
