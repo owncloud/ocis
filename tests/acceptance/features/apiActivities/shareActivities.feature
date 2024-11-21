@@ -1350,6 +1350,193 @@ Feature: check share activity
       }
       """
 
+  @issue-10011 @issue-10228
+  Scenario: check share update activities of a folder from a project space
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Alice" has created a folder "folderToShare" in space "new-space"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | folderToShare |
+      | space           | new-space     |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Viewer        |
+    And user "Alice" has updated the last resource share with the following properties:
+      | permissionsRole    | Editor                   |
+      | expirationDateTime | 2200-07-15T14:00:00.000Z |
+      | space              | new-space                |
+      | resource           | folderToShare            |
+    When user "Alice" lists the activities of folder "folderToShare" from space "new-space" using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 3,
+            "maxItems": 3,
+            "uniqueItems": true,
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "required": ["id","template","times"],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^%user_id_pattern%$"
+                    },
+                    "template": {
+                      "type": "object",
+                      "required": ["message","variables"],
+                      "properties": {
+                        "message": {
+                          "const": "{user} added {resource} to {folder}"
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["id","template","times"],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^%user_id_pattern%$"
+                    },
+                    "template": {
+                      "type": "object",
+                      "required": ["message","variables"],
+                      "properties": {
+                        "message": {
+                          "const": "{user} shared {resource} with {sharee}"
+                        },
+                        "variables": {
+                          "type": "object",
+                          "required": ["folder","resource","sharee","user"],
+                          "properties": {
+                            "resource": {
+                              "type": "object",
+                              "required": ["id","name"],
+                              "properties": {
+                                "name": {
+                                  "const": "folderToShare"
+                                }
+                              }
+                            },
+                            "sharee": {
+                              "type": "object",
+                              "required": ["id","displayName"],
+                              "properties": {
+                                "displayName": {
+                                  "const": "Brian"
+                                }
+                              }
+                            },
+                            "user": {
+                              "type": "object",
+                              "required": ["id","displayName"],
+                              "properties": {
+                                "displayName": {
+                                  "const": "Alice Hansen"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["id","template","times"],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^%user_id_pattern%$"
+                    },
+                    "template": {
+                      "type": "object",
+                      "required": ["message","variables"],
+                      "properties": {
+                        "message": {
+                          "const": "{user} updated {field} for the {resource}"
+                        },
+                        "variables": {
+                          "type": "object",
+                          "required": ["field","folder","resource","user"],
+                          "properties": {
+                            "field": {
+                              "type": "object",
+                              "required": ["id","name"],
+                              "properties": {
+                                "name": {
+                                  "const": "expiration date, permission"
+                                }
+                              }
+                            },
+                            "folder": {
+                              "type": "object",
+                              "required": ["id","name"],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "%user_id_pattern%"
+                                },
+                                "name": {
+                                  "const": "new-space"
+                                }
+                              }
+                            },
+                            "resource": {
+                              "type": "object",
+                              "required": ["id","name"],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "%file_id_pattern%"
+                                },
+                                "name": {
+                                  "const": "folderToShare"
+                                }
+                              }
+                            },
+                            "user": {
+                              "type": "object",
+                              "required": ["id","displayName"],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "%user_id_pattern%"
+                                },
+                                "displayName": {
+                                  "const": "Alice Hansen"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "times": {
+                      "type": "object",
+                      "required": ["recordedTime"]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+      """
+
   @issue-10012
   Scenario: check link share activities of a file from a project space
     Given using spaces DAV path

@@ -509,16 +509,33 @@ class SharingNgContext implements Context {
 	}
 
 	/**
-	 * @When user :user updates the last resource share with the following using the Graph API:
+	 * @Given user :user has updated the last resource share with the following properties:
 	 *
 	 * @param string $user
 	 * @param TableNode $table
 	 *
 	 * @return void
 	 */
-	public function userUpdatesTheLastShareWithFollowingUsingGraphApi($user, TableNode $table) {
-		$response = $this->featureContext->shareNgGetLastCreatedUserGroupShare();
-		$permissionID = json_decode($response->getBody()->getContents())->value[0]->id;
+	public function userHasUpdatedTheLastResourceShareWithTheFollowingProperties(string $user, TableNode $table): void {
+		$permissionID = $this->featureContext->shareNgGetLastCreatedUserGroupShareID();
+		$response = $this->updateResourceShare(
+			$user,
+			$table,
+			$permissionID
+		);
+		$this->featureContext->theHTTPStatusCodeShouldBe(200, "Expected response status code should be 200", $response);
+	}
+
+	/**
+	 * @When user :user updates the last resource share with the following properties using the Graph API:
+	 *
+	 * @param string $user
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 */
+	public function userUpdatesTheLastShareWithFollowingPropertiesUsingGraphApi($user, TableNode $table) {
+		$permissionID = $this->featureContext->shareNgGetLastCreatedUserGroupShareID();
 		$this->featureContext->setResponse(
 			$this->updateResourceShare(
 				$user,
@@ -678,7 +695,7 @@ class SharingNgContext implements Context {
 	}
 
 	/**
-	 * @Given /^user "([^"]*)" has updated the last resource|space link share with$/
+	 * @Given user :user has updated the last resource/space link share with
 	 *
 	 * @param string $user
 	 * @param TableNode $body

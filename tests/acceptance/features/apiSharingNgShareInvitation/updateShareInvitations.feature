@@ -20,7 +20,7 @@ Feature: Update permission of a share
       | shareType          | user                 |
       | permissionsRole    | Viewer               |
       | expirationDateTime | 2025-07-15T14:00:00Z |
-    When user "Alice" updates the last resource share with the following using the Graph API:
+    When user "Alice" updates the last resource share with the following properties using the Graph API:
       | space              | Personal             |
       | resource           | testfile.txt         |
       | expirationDateTime | 2200-07-15T14:00:00Z |
@@ -92,7 +92,7 @@ Feature: Update permission of a share
       | shareType          | user                 |
       | permissionsRole    | Viewer               |
       | expirationDateTime | 2025-07-15T14:00:00Z |
-    When user "Alice" updates the last resource share with the following using the Graph API:
+    When user "Alice" updates the last resource share with the following properties using the Graph API:
       | space              | Personal   |
       | resource           | <resource> |
       | expirationDateTime |            |
@@ -162,7 +162,7 @@ Feature: Update permission of a share
       | sharee          | Brian              |
       | shareType       | user               |
       | permissionsRole | <permissions-role> |
-    When user "Alice" updates the last resource share with the following using the Graph API:
+    When user "Alice" updates the last resource share with the following properties using the Graph API:
       | permissionsRole | <new-permissions-role> |
       | space           | Personal               |
       | resource        | <resource>             |
@@ -314,7 +314,7 @@ Feature: Update permission of a share
       | sharee          | Brian              |
       | shareType       | user               |
       | permissionsRole | <permissions-role> |
-    When user "Alice" updates the last resource share with the following using the Graph API:
+    When user "Alice" updates the last resource share with the following properties using the Graph API:
       | permissionsRole | <new-permissions-role> |
       | space           | NewSpace               |
       | resource        | <resource>             |
