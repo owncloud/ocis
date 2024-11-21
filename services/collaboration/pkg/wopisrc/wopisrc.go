@@ -5,7 +5,7 @@ import (
 	"net/url"
 	"path"
 
-	"github.com/golang-jwt/jwt/v4"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config"
 )
 
