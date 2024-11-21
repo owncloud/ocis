@@ -317,7 +317,7 @@ Feature: create a public link share
   Scenario Outline: get the mtime of a file shared by public link
     Given the config "OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false"
     And using <dav-path-version> DAV path
-    And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "file.txt" with mtime "Thu, 08 Aug 2019 04:18:13 GMT" using the WebDAV API
+    And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "file.txt" with mtime "Thu, 08 Aug 2019 04:18:13 GMT"
     When user "Alice" creates a public link share using the sharing API with settings
       | path        | file.txt |
       | permissions | read     |
@@ -333,7 +333,7 @@ Feature: create a public link share
     Given the config "OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false"
     And using <dav-path-version> DAV path
     And user "Alice" has created folder "testFolder"
-    And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "testFolder/file.txt" with mtime "Thu, 08 Aug 2019 04:18:13 GMT" using the WebDAV API
+    And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "testFolder/file.txt" with mtime "Thu, 08 Aug 2019 04:18:13 GMT"
     When user "Alice" creates a public link share using the sharing API with settings
       | path        | /testFolder |
       | permissions | read        |

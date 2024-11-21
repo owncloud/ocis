@@ -2278,7 +2278,7 @@ trait WebDav {
 	}
 
 	/**
-	 * @Given user :user has uploaded file :source to :destination with mtime :mtime using the WebDAV API
+	 * @Given user :user has uploaded file :source to :destination with mtime :mtime
 	 *
 	 * @param string $user
 	 * @param string $source

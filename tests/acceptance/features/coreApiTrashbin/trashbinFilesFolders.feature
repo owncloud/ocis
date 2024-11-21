@@ -305,7 +305,7 @@ Feature: files and folders exist in the trashbin after being deleted
   @issue-541
   Scenario Outline: deleted file has appropriate deletion time information
     Given using <dav-path-version> DAV path
-    And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "file.txt" with mtime "Thu, 08 Aug 2018 04:18:13 GMT" using the WebDAV API
+    And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "file.txt" with mtime "Thu, 08 Aug 2018 04:18:13 GMT"
     And user "Alice" has deleted file "file.txt"
     When user "Alice" tries to list the trashbin content for user "Alice"
     Then the HTTP status code should be "207"

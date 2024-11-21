@@ -385,3 +385,18 @@ Feature: upload file
     When the public uploads file "test.txt" with password "%public%" and content "test-file" using the public WebDAV API
     Then the HTTP status code should be "201"
     And for user "Alice" the content of the file "/test.txt" of the space "new-space" should be "test-file"
+
+  @issue-10496
+  Scenario Outline: upload a file with the same mtime and different content multiple times (atleast 3 times)
+    Given using <dav-path-version> DAV path
+    And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "file.txt" with mtime "Thu, 08 Aug 2019 04:18:13 GMT"
+    And user "Alice" has uploaded file "filesForUpload/davtest.txt" to "file.txt" with mtime "Thu, 08 Aug 2019 04:18:13 GMT"
+    When user "Alice" uploads file "filesForUpload/lorem.txt" to "file.txt" with mtime "Thu, 08 Aug 2019 04:18:13 GMT" using the WebDAV API
+    Then the HTTP status code should be "204"
+    And as "Alice" the mtime of the file "file.txt" should be "Thu, 08 Aug 2019 04:18:13 GMT"
+    And the version folder of file "file.txt" for user "Alice" should contain "2" element
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
