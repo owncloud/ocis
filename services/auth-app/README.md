@@ -46,8 +46,8 @@ When using curl for the respective command, you need to authenticate with a head
   * An active bearer token
   ```bash
   curl --request POST 'https://<your host:9200>/auth-app/tokens?expiry={value}' \
-       --header 'Accept: application/json' \
-       --header 'Authorization: bearer {token}'
+       --header 'accept: application/json' \
+       --header 'authorization: Bearer {token}'
   ```
   Example output:
   ```
@@ -64,8 +64,8 @@ When using curl for the respective command, you need to authenticate with a head
   Note that `--request GET` is technically not required because it is curl default. 
   ```bash
   curl --request GET 'https://<your host:9200>/auth-app/tokens' \
-       --header 'Accept: application/json' \
-       --header 'Authorization: bearer {token}'
+       --header 'accept: application/json' \
+       --header 'authorization: Bearer {token}'
   ```
   Example output:
   ```
@@ -92,8 +92,8 @@ When using curl for the respective command, you need to authenticate with a head
   * An active bearer token
   ```bash
   curl --request GET 'https://<your host:9200>/auth-app/tokens?token={value}' \
-       --header 'Accept: application/json' \
-       --header 'Authorization: bearer {token}'
+       --header 'accept: application/json' \
+       --header 'authorization: Bearer {token}'
   ```
 
 ### Via Impersonation API
@@ -114,6 +114,6 @@ Example:\
 A final create request would then look like:
 ```bash
 curl --request POST 'https://<your host:9200>/auth-app/tokens?expiry={value}?userName={value}' \
-     --header 'Accept: application/json' \
-     --header 'Authorization: bearer {token}'
+     --header 'accept: application/json' \
+     --header 'authorization: Bearer {token}'
 ```
