@@ -1,4 +1,4 @@
-@provisioning_api-app-required  @skipOnGraph @skipOnReva
+@skipOnReva
 Feature: add user
   As an admin
   I want to be able to add users and store their password with the full hash difficulty
