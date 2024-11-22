@@ -66,7 +66,7 @@ Feature: upload file
       | new              |
       | spaces           |
 
-  @issue-10346
+  @issue-10346 @issue-10496
   Scenario Outline: upload a file with the same mtime and different content multiple times (atleast 3 times)
     Given using <dav-path-version> DAV path
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "file.txt" with mtime "Thu, 08 Aug 2019 04:18:13 GMT" using the TUS protocol

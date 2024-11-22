@@ -169,7 +169,7 @@ Feature: create a public link share
       | 1               | 100             |
       | 2               | 200             |
 
-
+  @issue-10331
   Scenario Outline: creating a link share with no specified permissions defaults to read permissions when public upload is disabled globally and accessing using the public WebDAV API
     Given using OCS API version "<ocs-api-version>"
     And user "Alice" has created folder "/afolder"
