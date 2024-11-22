@@ -42,7 +42,6 @@ class BehatHelper {
 		try {
 			return $environment->getContext($class);
 		} catch (ContextNotFoundException $e) {
-			print_r("[INFO] '$class' context not found. Registering...\n");
 			$context = new $class();
 			$environment->registerContext($context);
 			if (\method_exists($context, 'before')) {

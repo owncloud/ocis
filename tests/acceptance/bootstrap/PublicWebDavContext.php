@@ -216,7 +216,6 @@ class PublicWebDavContext implements Context {
 	 * @return void
 	 */
 	public function thePublicRenamesFileFromTheLastPublicShareUsingThePasswordPasswordAndOldPublicWebdavApi(string $fileName, string $toName, string $password):void {
-
 		$this->featureContext->setResponse(
 			$this->renameFileFromPublicShare($fileName, $toName, $password)
 		);
@@ -496,7 +495,6 @@ class PublicWebDavContext implements Context {
 	 * @return void
 	 */
 	public function thePublicOverwritesFileWithContentUsingWebDavApi(string $filename, string $body):void {
-
 		$response = $this->publicUploadContent($filename, '', $body);
 		$this->featureContext->setResponse($response);
 	}
@@ -544,7 +542,6 @@ class PublicWebDavContext implements Context {
 		string $password,
 		string $expectedContent
 	):void {
-
 		$response = $this->downloadPublicFileWithRange(
 			"",
 			$password
@@ -617,7 +614,6 @@ class PublicWebDavContext implements Context {
 		string $password,
 		string $content
 	):void {
-
 		$response = $this->downloadFileFromPublicFolder(
 			$path,
 			$password,

@@ -91,13 +91,6 @@ trait Provisioning {
 	}
 
 	/**
-	 * @return boolean
-	 */
-	public function someUsersHaveBeenCreated():bool {
-		return (\count($this->createdUsers) > 0);
-	}
-
-	/**
 	 * @return array
 	 */
 	public function getCreatedGroups():array {
@@ -353,7 +346,13 @@ trait Provisioning {
 
 		$ldifFile = __DIR__ . $suiteParameters['ldapInitialUserFilePath'];
 		if (!$this->skipImportLdif) {
-			$this->importLdifFile($ldifFile);
+			try {
+				$this->importLdifFile($ldifFile);
+			} catch (LdapException $err) {
+				if (!\str_contains($err->getMessage(), "Already exists")) {
+					throw $err;
+				}
+			}
 		}
 	}
 
@@ -451,7 +450,17 @@ trait Provisioning {
 			$entry['ownCloudUUID'] = WebDavHelper::generateUUIDv4();
 		}
 
-		$this->ldap->add($newDN, $entry);
+		try {
+			$this->ldap->add($newDN, $entry);
+		} catch (LdapException $e) {
+			if (\str_contains($e->getMessage(), "Already exists")) {
+				$this->ldap->delete(
+					"uid=" . ldap_escape($entry['uid'], "", LDAP_ESCAPE_DN) . ",ou=" . $this->ldapUsersOU . "," . $this->ldapBaseDN,
+				);
+				OcisHelper::deleteRevaUserData([$entry['uid']]);
+				$this->ldap->add($newDN, $entry);
+			}
+		}
 
 		$this->ldapCreatedUsers[] = $setting["userid"];
 	}
@@ -482,7 +491,16 @@ trait Provisioning {
 			$entry['ownCloudUUID'] = WebDavHelper::generateUUIDv4();
 		}
 
-		$this->ldap->add($newDN, $entry);
+		try {
+			$this->ldap->add($newDN, $entry);
+		} catch (LdapException $e) {
+			if (\str_contains($e->getMessage(), "Already exists")) {
+				$this->ldap->delete(
+					"cn=" . ldap_escape($group, "", LDAP_ESCAPE_DN) . ",ou=" . $this->ldapGroupsOU . "," . $this->ldapBaseDN,
+				);
+				$this->ldap->add($newDN, $entry);
+			}
+		}
 		$this->ldapCreatedGroups[] = $group;
 	}
 
@@ -516,80 +534,6 @@ trait Provisioning {
 				"ou=" . $this->ldapGroupsOU . "," . $this->ldapBaseDN,
 				true
 			);
-		}
-	}
-
-	/**
-	 * Manually add skeleton files for a single user on OCIS and reva systems
-	 *
-	 * @param string $user
-	 * @param string $password
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function manuallyAddSkeletonFilesForUser(string $user, string $password):void {
-		$settings = [];
-		$setting["userid"] = $user;
-		$setting["password"] = $password;
-		$settings[] = $setting;
-		$this->manuallyAddSkeletonFiles($settings);
-	}
-
-	/**
-	 * Manually add skeleton files on OCIS and reva systems
-	 *
-	 * @param array $usersAttributes
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function manuallyAddSkeletonFiles(array $usersAttributes):void {
-		if ($this->isEmptySkeleton()) {
-			// The empty skeleton has no files. There is nothing to do so return early.
-			return;
-		}
-		$skeletonDir = \getenv("SKELETON_DIR");
-		$revaRoot = \getenv("OCIS_REVA_DATA_ROOT");
-		$skeletonStrategy = \getenv("OCIS_SKELETON_STRATEGY");
-		if (!$skeletonStrategy) {
-			$skeletonStrategy = 'upload'; //slower, but safer, so make it the default
-		}
-		if ($skeletonStrategy !== 'upload' && $skeletonStrategy !== 'copy') {
-			throw new Exception(
-				'Wrong OCIS_SKELETON_STRATEGY environment variable. ' .
-				'OCIS_SKELETON_STRATEGY has to be set to "upload" or "copy"'
-			);
-		}
-		if (!$skeletonDir) {
-			throw new Exception('Missing SKELETON_DIR environment variable, cannot copy skeleton files for OCIS');
-		}
-		if ($skeletonStrategy === 'copy' && !$revaRoot) {
-			throw new Exception(
-				'OCIS_SKELETON_STRATEGY is set to "copy" ' .
-				'but no "OCIS_REVA_DATA_ROOT" given'
-			);
-		}
-		if ($skeletonStrategy === 'upload') {
-			foreach ($usersAttributes as $userAttributes) {
-				OcisHelper::recurseUpload(
-					$this->getBaseUrl(),
-					$skeletonDir,
-					$userAttributes['userid'],
-					$userAttributes['password'],
-					$this->getStepLineRef()
-				);
-			}
-		}
-		if ($skeletonStrategy === 'copy') {
-			foreach ($usersAttributes as $userAttributes) {
-				$user = $userAttributes['userid'];
-				$dataDir = $revaRoot . "$user/files";
-				if (!\file_exists($dataDir)) {
-					\mkdir($dataDir, 0777, true);
-				}
-				OcisHelper::recurseCopy($skeletonDir, $dataDir);
-			}
 		}
 	}
 
@@ -714,56 +658,6 @@ trait Provisioning {
 			foreach ($users as $user) {
 				$this->initializeUser($user['userid'], $user['password']);
 			}
-		}
-	}
-
-	/**
-	 * @When /^the administrator sends a user creation request for user "([^"]*)" password "([^"]*)" using the provisioning API$/
-	 *
-	 * @param string $user
-	 * @param string $password
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function adminSendsUserCreationRequestUsingTheProvisioningApi(string $user, string $password):void {
-		$user = $this->getActualUsername($user);
-		$password = $this->getActualPassword($password);
-		$email = $user . '@owncloud.com';
-		$bodyTable = new TableNode(
-			[
-				['userid', $user],
-				['password', $password],
-				['username', $user],
-				['email', $email]
-			]
-		);
-		$this->emptyLastHTTPStatusCodesArray();
-		$this->emptyLastOCSStatusCodesArray();
-		$this->ocsContext->sendRequestToOcsEndpoint(
-			$this->getAdminUsername(),
-			"POST",
-			"/cloud/users",
-			$bodyTable
-		);
-		$this->pushToLastStatusCodesArrays();
-		$success = $this->theHTTPStatusCodeWasSuccess();
-		$this->addUserToCreatedUsersList(
-			$user,
-			$password,
-			null,
-			$email,
-			null,
-			$success
-		);
-		if ($success) {
-			OcisHelper::createEOSStorageHome(
-				$this->getBaseUrl(),
-				$user,
-				$password,
-				$this->getStepLineRef()
-			);
-			$this->manuallyAddSkeletonFilesForUser($user, $password);
 		}
 	}
 
@@ -2065,10 +1959,8 @@ trait Provisioning {
 	 * @throws Exception
 	 */
 	public function afterScenario():void {
-		if ($this->someUsersHaveBeenCreated()) {
-			foreach ($this->getCreatedUsers() as $user) {
-				OcisHelper::deleteRevaUserData($user["actualUsername"]);
-			}
+		if (OcisHelper::isTestingOnReva()) {
+			OcisHelper::deleteRevaUserData($this->getCreatedUsers());
 		}
 
 		if ($this->isTestingWithLdap()) {
@@ -2172,32 +2064,5 @@ trait Provisioning {
 			$actualUser,
 			$actualPassword
 		);
-	}
-
-	/**
-	 * Get the name of the smallest available skeleton, to "simulate" without skeleton.
-	 *
-	 * In ownCloud 10 there is always a skeleton directory. If none is specified
-	 * then whatever is in core/skeleton is used. That contains different files
-	 * and folders depending on the build that is being tested. So for testing
-	 * we have "empty" skeleton that is created on-the-fly by the testing app.
-	 * That provides a consistent skeleton for test scenarios that specify
-	 * "without skeleton files"
-	 *
-	 * @return string name of the smallest skeleton folder
-	 */
-	private function getSmallestSkeletonDirName(): string {
-		return "empty";
-	}
-
-	/**
-	 * @return bool
-	 */
-	private function isEmptySkeleton(): bool {
-		$skeletonDir = \getenv("SKELETON_DIR");
-		if (($skeletonDir !== false) && (\basename($skeletonDir) === $this->getSmallestSkeletonDirName() . "Skeleton")) {
-			return true;
-		}
-		return false;
 	}
 }

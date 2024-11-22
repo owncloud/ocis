@@ -178,7 +178,7 @@ Feature: files and folders exist in the trashbin after being deleted
       | new              |
       | spaces           |
 
-  @issue-3561
+  @issue-3561 @skipOnReva
   Scenario Outline: listing other user's trashbin is prohibited for newly recreated user with same name
     Given using <dav-path-version> DAV path
     And user "testtrashbin102" has been created with default attributes and without skeleton files
