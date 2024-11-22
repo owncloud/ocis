@@ -4,8 +4,7 @@ services:
     environment:
       ANTIVIRUS_SCANNER_TYPE: "clamav"
       ANTIVIRUS_CLAMAV_SOCKET: "/var/run/clamav/clamd.sock"
-      # enable the antivirus service
-      OCIS_ADD_RUN_SERVICES: "antivirus"
+      # the antivirus service needs manual startup, see .env and ocis.yaml for START_ADDITIONAL_SERVICES
       # configure the antivirus service
       POSTPROCESSING_STEPS: "virusscan"
       # PROXY_TLS is set to "false", the download url has no https
