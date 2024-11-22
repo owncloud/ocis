@@ -68,8 +68,6 @@ trait WebDav {
 
 	private int $httpRequestTimeout = 0;
 
-	private ?int $chunkingToUse = null;
-
 	/**
 	 * The ability to do requests with depth infinity is disabled by default.
 	 * This remembers when the setting dav.propfind.depth_infinity has been
@@ -1636,10 +1634,6 @@ trait WebDav {
 		?array $headers = [],
 		?int $noOfChunks = 0
 	):void {
-		$chunkingVersion = $this->chunkingToUse;
-		if ($noOfChunks <= 0) {
-			$chunkingVersion = null;
-		}
 		try {
 			$this->pauseUploadDelete();
 			$this->response = UploadHelper::upload(
@@ -1651,7 +1645,7 @@ trait WebDav {
 				$this->getStepLineRef(),
 				$headers,
 				$this->getDavPathVersion(),
-				$chunkingVersion,
+				$noOfChunks <= 0 ? null : 1,
 				$noOfChunks
 			);
 			$this->lastUploadDeleteTime = \time();
@@ -1685,9 +1679,6 @@ trait WebDav {
 			$noOfChunks,
 			"What does it mean to have $noOfChunks chunks?"
 		);
-
-		// use chunking version 1 as default, since version 2 uses "remote.php/dav/uploads" endpoint and it doesn't exist in oCIS
-		$this->chunkingToUse = 1;
 
 		if ($async === true) {
 			$headers['OC-LazyOps'] = 'true';
