@@ -8,15 +8,12 @@ Feature: add user
   See https://github.com/owncloud/ocis/issues/1542 and https://github.com/owncloud/ocis/pull/839
 
 
-  Scenario Outline: admin creates a user
-    Given using OCS API version "<ocs-api-version>"
-    And user "brand-new-user" has been deleted
-    When the administrator sends a user creation request for user "brand-new-user" password "%alt1%" using the provisioning API
-    Then the OCS status code should be "<ocs-status-code>"
-    And the HTTP status code should be "200"
+  Scenario: admin creates a user
+    When the user "Admin" creates a new user with the following attributes using the Graph API:
+      | userName       | brand-new-user  |
+      | displayName    | Brand New User  |
+      | email          | new@example.org |
+      | password       | %alt1%          |
+    Then the HTTP status code should be "201"
     And user "brand-new-user" should exist
-    And user "brand-new-user" should be able to access a skeleton file
-    Examples:
-      | ocs-api-version | ocs-status-code |
-      | 1               | 100             |
-      | 2               | 200             |
+    And user "brand-new-user" should be able to upload file "filesForUpload/lorem.txt" to "lorem.txt"
