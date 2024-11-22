@@ -394,6 +394,7 @@ default:
         - OcisConfigContext:
         - NotificationContext:
         - SettingsContext:
+        - SpacesTUSContext:
 
     apiActivities:
       paths:

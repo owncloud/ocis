@@ -255,20 +255,61 @@ class SpacesContext implements Context {
 	}
 
 	/**
+	 * @param string $user
+	 * @param string $share
+	 *
+	 * @return string
+	 *
+	 * @throws Exception|GuzzleException
+	 */
+	public function getSharesRemoteItemId(string $user, string $share): string {
+		$credentials = $this->featureContext->graphContext->getAdminOrUserCredentials($user);
+		$response = GraphHelper::getSharesSharedWithMe(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$credentials['username'],
+			$credentials['password']
+		);
+
+		$jsonBody = $this->featureContext->getJsonDecodedResponseBodyContent($response);
+
+		// Search remoteItem ID of a given share
+		foreach ($jsonBody->value as $item) {
+			if (isset($item->name) && $item->name === $share) {
+				if (isset($item->remoteItem->id)) {
+					return $item->remoteItem->id;
+				}
+				throw new Exception("Failed to find remoteItem ID for share: $share");
+			}
+		}
+
+		throw new Exception("Cannot find share: $share");
+	}
+
+	/**
 	 * The method finds file by fileName and spaceName and returns data of file which contains in responseHeader
 	 * fileName contains the path, if the file is in the folder
 	 *
 	 * @param string $user
 	 * @param string $spaceName
 	 * @param string $fileName
+	 * @param bool $federatedShare
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
-	public function getFileData(string $user, string $spaceName, string $fileName): ResponseInterface {
-		$space = $this->getSpaceByName($user, $spaceName);
+	public function getFileData(string $user, string $spaceName, string $fileName, bool $federatedShare = false): ResponseInterface {
 		$baseUrl = $this->featureContext->getBaseUrl();
-		$davPath = WebdavHelper::getDavPath(WebDavHelper::DAV_VERSION_SPACES, $space["id"]);
+
+		if ($federatedShare) {
+			$remoteItemId = $this->getSharesRemoteItemId($user, $spaceName);
+			$spaceId = \rawurlencode($remoteItemId);
+		} else {
+			$space = $this->getSpaceByName($user, $spaceName);
+			$spaceId = $space["id"];
+		}
+
+		$davPath = WebdavHelper::getDavPath(WebDavHelper::DAV_VERSION_SPACES, $spaceId);
 		$fullUrl = "$baseUrl/$davPath/$fileName";
 
 		return HttpRequestHelper::get(
@@ -872,6 +913,28 @@ class SpacesContext implements Context {
 	): void {
 		$actualFileContent = $this->getFileData($user, $spaceName, $file)->getBody()->getContents();
 		Assert::assertEquals($fileContent, $actualFileContent, "$file does not contain $fileContent");
+	}
+
+	/**
+	 * @Then /^for user "([^"]*)" the content of file "([^"]*)" of federated share "([^"]*)" should be "([^"]*)"$/
+	 *
+	 * @param string $user
+	 * @param string $file
+	 * @param string $share
+	 * @param string $fileContent
+	 *
+	 * @return void
+	 *
+	 * @throws Exception|GuzzleException
+	 */
+	public function forUserTheContentOfFileOfFederatedShareShouldBe(
+		string $user,
+		string $file,
+		string $share,
+		string $fileContent
+	): void {
+		$actualFileContent = $this->getFileData($user, $share, $file, true)->getBody()->getContents();
+		Assert::assertEquals($fileContent, $actualFileContent, "File content did not match");
 	}
 
 	/**

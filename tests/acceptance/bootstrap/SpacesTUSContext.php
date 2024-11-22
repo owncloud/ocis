@@ -16,6 +16,8 @@ use GuzzleHttp\Exception\GuzzleException;
 use PHPUnit\Framework\Assert;
 use TestHelpers\WebDavHelper;
 use TestHelpers\BehatHelper;
+use TestHelpers\GraphHelper;
+use TestHelpers\HttpRequestHelper;
 
 require_once 'bootstrap.php';
 
@@ -89,11 +91,10 @@ class SpacesTUSContext implements Context {
 	}
 
 	/**
-	 * @Given user :user has created a new TUS resource for the space :spaceName with content :content using the WebDAV API with these headers:
+	 * @Given user :user has created a new TUS resource in the space :spaceName with the following headers:
 	 *
 	 * @param string $user
 	 * @param string $spaceName
-	 * @param string $content
 	 * @param TableNode $headers
 	 *
 	 * @return void
@@ -104,11 +105,10 @@ class SpacesTUSContext implements Context {
 	public function userHasCreatedANewTusResourceForTheSpaceUsingTheWebdavApiWithTheseHeaders(
 		string $user,
 		string $spaceName,
-		string $content,
 		TableNode $headers
 	): void {
 		$spaceId = $this->spacesContext->getSpaceIdByName($user, $spaceName);
-		$response = $this->tusContext->createNewTUSResourceWithHeaders($user, $headers, $content, $spaceId);
+		$response = $this->tusContext->createNewTUSResourceWithHeaders($user, $headers, '', $spaceId);
 		$this->featureContext->theHTTPStatusCodeShouldBe(201, "Expected response status code should be 201", $response);
 	}
 
@@ -161,6 +161,31 @@ class SpacesTUSContext implements Context {
 		} catch (Exception $e) {
 			Assert::assertStringContainsString('Unable to create resource', (string)$e);
 		}
+		\unlink($tmpFile);
+	}
+
+	/**
+	 * @When /^user "([^"]*)" uploads a file with content "([^"]*)" to "([^"]*)" inside federated share "([^"]*)" via TUS using the WebDAV API$/
+	 *
+	 * @param string $user
+	 * @param string $content
+	 * @param string $file
+	 * @param string $destination
+	 *
+	 * @return void
+	 * @throws Exception|GuzzleException
+	 */
+	public function userUploadsAFileWithContentToInsideFederatedShareViaTusUsingTheWebdavApi(string $user, string $content, string $file, string $destination): void {
+		$remoteItemId = $this->spacesContext->getSharesRemoteItemId($user, $destination);
+		$remoteItemId = \rawurlencode($remoteItemId);
+		$tmpFile = $this->tusContext->writeDataToTempFile($content);
+		$this->tusContext->uploadFileUsingTus(
+			$user,
+			\basename($tmpFile),
+			$file,
+			$remoteItemId
+		);
+		$this->featureContext->setLastUploadDeleteTime(\time());
 		\unlink($tmpFile);
 	}
 
@@ -330,11 +355,10 @@ class SpacesTUSContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" sends a chunk to the last created TUS Location with data "([^"]*)" inside of the space "([^"]*)" with headers:$/
+	 * @When /^user "([^"]*)" sends a chunk to the last created TUS Location with data "([^"]*)" with the following headers:$/
 	 *
 	 * @param string $user
 	 * @param string $data
-	 * @param string $spaceName
 	 * @param TableNode $headers
 	 *
 	 * @return void
@@ -343,7 +367,6 @@ class SpacesTUSContext implements Context {
 	public function userSendsAChunkToTheLastCreatedTusLocationWithDataInsideOfTheSpaceWithHeaders(
 		string $user,
 		string $data,
-		string $spaceName,
 		TableNode $headers
 	): void {
 		$rows = $headers->getRowsHash();

@@ -135,7 +135,7 @@ Feature: List upload sessions via CLI command
       | POSTPROCESSING_DELAY             | 10s       |
     And user "Alice" has uploaded file "filesForUpload/filesWithVirus/eicar.com" to "/virusFile.txt"
     And user "Alice" has uploaded file with content "upload content" to "/file1.txt"
-    And user "Alice" has created a new TUS resource for the space "Personal" with content "" using the WebDAV API with these headers:
+    And user "Alice" has created a new TUS resource in the space "Personal" with the following headers:
       | Upload-Length   | 10                        |
       #    dGV4dEZpbGUudHh0 is the base64 encode of textFile.txt
       | Upload-Metadata | filename dGV4dEZpbGUudHh0 |
