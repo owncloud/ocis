@@ -27,6 +27,7 @@ func TestPermissionsToCS3ResourcePermissions(t *testing.T) {
 		cs3Conversions.RoleFileEditorListGrants: {cs3Conversions.NewFileEditorListGrantsRole(), unifiedrole.RoleFileEditorListGrants, true},
 		cs3Conversions.RoleManager:              {cs3Conversions.NewManagerRole(), unifiedrole.RoleManager, true},
 		cs3Conversions.RoleSecureViewer:         {cs3Conversions.NewSecureViewerRole(), unifiedrole.RoleSecureViewer, true},
+		cs3Conversions.RoleDenied:               {cs3Conversions.NewDeniedRole(), unifiedrole.RoleDenied, true},
 		"no match":                              {cs3Conversions.NewFileEditorRole(), unifiedrole.RoleManager, false},
 	}
 
@@ -66,6 +67,7 @@ func TestCS3ResourcePermissionsToRole(t *testing.T) {
 		cs3Conversions.RoleSpaceEditor:        {cs3Conversions.NewSpaceEditorRole().CS3ResourcePermissions(), unifiedrole.RoleSpaceEditor, unifiedrole.UnifiedRoleConditionDrive},
 		cs3Conversions.RoleSecureViewer + "1": {cs3Conversions.NewSecureViewerRole().CS3ResourcePermissions(), unifiedrole.RoleSecureViewer, unifiedrole.UnifiedRoleConditionFile},
 		cs3Conversions.RoleSecureViewer + "2": {cs3Conversions.NewSecureViewerRole().CS3ResourcePermissions(), unifiedrole.RoleSecureViewer, unifiedrole.UnifiedRoleConditionFolder},
+		cs3Conversions.RoleDenied:             {cs3Conversions.NewDeniedRole().CS3ResourcePermissions(), unifiedrole.RoleDenied, unifiedrole.UnifiedRoleConditionFolder},
 		"custom 1":                            {&provider.ResourcePermissions{GetPath: true}, nil, unifiedrole.UnifiedRoleConditionFolder},
 	}
 

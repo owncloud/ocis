@@ -172,6 +172,7 @@ func TestGetRolesByPermissions(t *testing.T) {
 			givenActions: getRoleActions(unifiedrole.BuildInRoles...),
 			constraints:  unifiedrole.UnifiedRoleConditionFolder,
 			unifiedRoleDefinition: []*libregraph.UnifiedRoleDefinition{
+				unifiedrole.RoleDenied,
 				unifiedrole.RoleSecureViewer,
 				unifiedrole.RoleViewer,
 				unifiedrole.RoleViewerListGrants,

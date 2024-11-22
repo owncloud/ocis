@@ -21,6 +21,7 @@ var (
 		unifiedrole.UnifiedRoleViewerListGrantsID,
 		unifiedrole.UnifiedRoleEditorListGrantsID,
 		unifiedrole.UnifiedRoleFileEditorListGrantsID,
+		unifiedrole.UnifiedRoleDeniedID,
 	}
 )
 

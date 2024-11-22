@@ -38,6 +38,8 @@ const (
 	UnifiedRoleManagerID = "312c0871-5ef7-4b3a-85b6-0e4074c64049"
 	// UnifiedRoleSecureViewerID Unified role secure viewer id.
 	UnifiedRoleSecureViewerID = "aa97fe03-7980-45ac-9e50-b325749fd7e6"
+	// UnifiedRoleDeniedID Unified role to deny all access.
+	UnifiedRoleDeniedID = "63e64e19-8d43-42ec-a738-2b6af2610efa"
 
 	// Wile the below conditions follow the SDDL syntax, they are not parsed anywhere. We use them as strings to
 	// represent the constraints that a role definition applies to. For the actual syntax, see the SDDL documentation
@@ -161,6 +163,12 @@ var (
 	// UnifiedRole SecureViewer, Role DisplayName (resolves directly)
 	_secureViewerUnifiedRoleDisplayName = l10n.Template("Can view (secure)")
 
+	// UnifiedRole FullDenial, Role Description (resolves directly)
+	_deniedUnifiedRoleDescription = l10n.Template("Deny all access.")
+
+	// UnifiedRole FullDenial, Role DisplayName (resolves directly)
+	_deniedUnifiedRoleDisplayName = l10n.Template("Cannot access")
+
 	// legacyNames contains the legacy role names.
 	legacyNames = map[string]string{
 		UnifiedRoleViewerID: conversions.RoleViewer,
@@ -190,6 +198,7 @@ var (
 		roleEditorLite,
 		roleManager,
 		roleSecureViewer,
+		roleDenied,
 	}
 
 	// roleViewer creates a viewer role.
@@ -439,6 +448,22 @@ var (
 			LibreGraphWeight: proto.Int32(0),
 		}
 	}()
+	// roleDenied creates a secure viewer role
+	roleDenied = func() *libregraph.UnifiedRoleDefinition {
+		r := conversions.NewDeniedRole()
+		return &libregraph.UnifiedRoleDefinition{
+			Id:          proto.String(UnifiedRoleDeniedID),
+			Description: proto.String(_deniedUnifiedRoleDescription),
+			DisplayName: proto.String(cs3RoleToDisplayName(r)),
+			RolePermissions: []libregraph.UnifiedRolePermission{
+				{
+					AllowedResourceActions: CS3ResourcePermissionsToLibregraphActions(r.CS3ResourcePermissions()),
+					Condition:              proto.String(UnifiedRoleConditionFolder),
+				},
+			},
+			LibreGraphWeight: proto.Int32(0),
+		}
+	}()
 )
 
 // GetRoles returns a role filter that matches the provided resources
@@ -484,7 +509,9 @@ func GetRolesByPermissions(roleSet []*libregraph.UnifiedRoleDefinition, actions 
 					match = true
 				}
 			}
-
+			if role.GetId() == UnifiedRoleDeniedID && slices.Contains(actions, DriveItemPermissionsDeny) {
+				match = true
+			}
 			if match {
 				break
 			}

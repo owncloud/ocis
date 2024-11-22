@@ -65,6 +65,10 @@ var themeDefaults = KV{
 				"label":    "UnifiedRoleSecureView",
 				"iconName": "shield",
 			},
+			unifiedrole.UnifiedRoleDeniedID: KV{
+				"label":    "UnifiedRoleFullDenial",
+				"iconName": "stop-circle",
+			},
 		},
 	},
 }
