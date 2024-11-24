@@ -91,7 +91,7 @@ When using curl for the respective command, you need to authenticate with a head
     Example: `token=Z3s2K7816M4vuSpd5`
   * An active bearer token
   ```bash
-  curl --request GET 'https://<your host:9200>/auth-app/tokens?token={value}' \
+  curl --request DELETE 'https://<your host:9200>/auth-app/tokens?token={value}' \
        --header 'accept: application/json' \
        --header 'authorization: Bearer {token}'
   ```
