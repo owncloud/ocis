@@ -1,6 +1,6 @@
 ---
 title: Auth-App
-date: 2024-11-24T01:03:52.498995715Z
+date: 2024-11-24T19:52:46.038509932Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/auth-app
@@ -115,7 +115,7 @@ When using curl for the respective command, you need to authenticate with a head
     Example: `token=Z3s2K7816M4vuSpd5`
   * An active bearer token
   ```bash
-  curl --request GET 'https://<your host:9200>/auth-app/tokens?token={value}' \
+  curl --request DELETE 'https://<your host:9200>/auth-app/tokens?token={value}' \
        --header 'accept: application/json' \
        --header 'authorization: Bearer {token}'
   ```
