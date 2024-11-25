@@ -231,6 +231,16 @@ The default `role_claim` (or `PROXY_ROLE_ASSIGNMENT_OIDC_CLAIM`) is `roles`. The
 
 In a production deployment, you want to have basic authentication (`PROXY_ENABLE_BASIC_AUTH`) disabled which is the default state. You also want to setup a firewall to only allow requests to the proxy service or the reverse proxy if you have one. Requests to the other services should be blocked by the firewall.
 
+### Content Security Policy
+
+For Infinite Scale, external resources like an IDP (e.g. Keycloak) or when using web office documents or web apps, require defining a CSP. If not defined, the referenced services will not work.
+
+To create a Content Security Policy (CSP), you need to create a yaml file containing the CSP definitions. To activate the settings, reference the file as value in the `PROXY_CSP_CONFIG_FILE_LOCATION` environment variable. For each change, a restart of the Infinite Scale deployment or the proxy service is required.
+
+A working example for a CSP can be found in a sub path of the `config` directory of the [ocis_full](https://github.com/owncloud/ocis/tree/master/deployments/examples/ocis_full/config) deployment example.
+
+See the [Content Security Policy (CSP) Quick Reference Guide](https://content-security-policy.com) for a description of directives.
+
 ## Caching
 
 The `proxy` service can use a configured store via `PROXY_OIDC_USERINFO_CACHE_STORE`. Possible stores are:
