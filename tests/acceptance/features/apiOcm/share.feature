@@ -697,7 +697,7 @@ Feature: an user shares resources using ScienceMesh application
       }
       """
 
-  @issue-10285 @issue-10536
+  @issue-10285 @issue-10536 @issue-10305
   Scenario: federation user uploads file to a federated shared folder via TUS
     Given using spaces DAV path
     And using server "LOCAL"
