@@ -80,7 +80,7 @@ require (
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/afero v1.11.0
 	github.com/spf13/cobra v1.8.1
-	github.com/stretchr/testify v1.9.0
+	github.com/stretchr/testify v1.10.0
 	github.com/test-go/testify v1.1.4
 	github.com/thejerf/suture/v4 v4.0.5
 	github.com/tidwall/gjson v1.18.0
