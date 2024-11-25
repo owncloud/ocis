@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2024-11-24 00:23+0000\n"
+"POT-Creation-Date: 2024-11-25 19:13+0000\n"
 "PO-Revision-Date: 2024-04-04 00:17+0000\n"
 "Last-Translator: Keram, 2024\n"
 "Language-Team: Uyghur (https://app.transifex.com/owncloud-org/teams/6149/ug/)\n"
@@ -26,40 +26,50 @@ msgstr ""
 #. UnifiedRole SpaseEditor, Role DisplayName (resolves directly)
 #. UnifiedRole FileEditor, Role DisplayName (resolves directly)
 #. UnifiedRole FileEditorListGrants, Role DisplayName (resolves directly)
-#: pkg/unifiedrole/roles.go:114 pkg/unifiedrole/roles.go:120
-#: pkg/unifiedrole/roles.go:126 pkg/unifiedrole/roles.go:138
-#: pkg/unifiedrole/roles.go:144
+#: pkg/unifiedrole/roles.go:116 pkg/unifiedrole/roles.go:122
+#: pkg/unifiedrole/roles.go:128 pkg/unifiedrole/roles.go:140
+#: pkg/unifiedrole/roles.go:146
 msgid "Can edit"
 msgstr "تەھرىرلىيەلەيدۇ"
 
 #. UnifiedRole SpaseEditorWithoutVersions, Role DisplayName (resolves
 #. directly)
-#: pkg/unifiedrole/roles.go:132
+#: pkg/unifiedrole/roles.go:134
 msgid "Can edit without versions"
 msgstr "نەشرىسىز تەھرىرلىيەلەيدۇ"
 
 #. UnifiedRole Manager, Role DisplayName (resolves directly)
-#: pkg/unifiedrole/roles.go:156
+#: pkg/unifiedrole/roles.go:158
 msgid "Can manage"
 msgstr "باشقۇرالايدۇ"
 
 #. UnifiedRole EditorLite, Role DisplayName (resolves directly)
-#: pkg/unifiedrole/roles.go:150
+#: pkg/unifiedrole/roles.go:152
 msgid "Can upload"
 msgstr "يۈكلىيەلەيدۇ"
 
 #. UnifiedRole Viewer, Role DisplayName (resolves directly)
 #. UnifiedRole Viewer, Role DisplayName (resolves directly)
 #. UnifiedRole SpaseViewer, Role DisplayName (resolves directly)
-#: pkg/unifiedrole/roles.go:96 pkg/unifiedrole/roles.go:102
-#: pkg/unifiedrole/roles.go:108
+#: pkg/unifiedrole/roles.go:98 pkg/unifiedrole/roles.go:104
+#: pkg/unifiedrole/roles.go:110
 msgid "Can view"
 msgstr "كۆرەلەيدۇ"
 
 #. UnifiedRole SecureViewer, Role DisplayName (resolves directly)
-#: pkg/unifiedrole/roles.go:162
+#: pkg/unifiedrole/roles.go:164
 msgid "Can view (secure)"
 msgstr "كۆرەلەيدۇ (بىخەتەر)"
+
+#. UnifiedRole FullDenial, Role DisplayName (resolves directly)
+#: pkg/unifiedrole/roles.go:170
+msgid "Cannot access"
+msgstr ""
+
+#. UnifiedRole FullDenial, Role Description (resolves directly)
+#: pkg/unifiedrole/roles.go:167
+msgid "Deny all access."
+msgstr ""
 
 #. default description for new spaces
 #: pkg/service/v0/spacetemplates.go:32
@@ -68,58 +78,58 @@ msgstr "بۇ يەردە سىز بۇ بوشلۇققا چۈشەندۈرۈش قوش
 
 #. UnifiedRole Viewer, Role Description (resolves directly)
 #. UnifiedRole SpaceViewer, Role Description (resolves directly)
-#: pkg/unifiedrole/roles.go:93 pkg/unifiedrole/roles.go:105
+#: pkg/unifiedrole/roles.go:95 pkg/unifiedrole/roles.go:107
 msgid "View and download."
 msgstr "كۆرۈش ۋە چۈشۈرۈش."
 
 #. UnifiedRole SecureViewer, Role Description (resolves directly)
-#: pkg/unifiedrole/roles.go:159
+#: pkg/unifiedrole/roles.go:161
 msgid "View only documents, images and PDFs. Watermarks will be applied."
 msgstr "پەقەت ھۆججەت ، رەسىم ۋە PDF لارنىلا كۆرۈڭ. سۇ بەلگىسى قوللىنىلىدۇ."
 
 #. UnifiedRole FileEditor, Role Description (resolves directly)
-#: pkg/unifiedrole/roles.go:135
+#: pkg/unifiedrole/roles.go:137
 msgid "View, download and edit."
 msgstr "كۆرۈش ، چۈشۈرۈش ۋە تەھرىرلەش."
 
 #. UnifiedRole ViewerListGrants, Role Description (resolves directly)
-#: pkg/unifiedrole/roles.go:99
+#: pkg/unifiedrole/roles.go:101
 msgid "View, download and show all invited people."
 msgstr "تەكلىپ قىلىنغان كىشىلەرنىڭ ھەممىسىنى كۆرۈش ، چۈشۈرۈش ۋە كۆرسىتىش."
 
 #. UnifiedRole EditorLite, Role Description (resolves directly)
-#: pkg/unifiedrole/roles.go:147
+#: pkg/unifiedrole/roles.go:149
 msgid "View, download and upload."
 msgstr "كۆرۈش ، چۈشۈرۈش ۋە يوللاش."
 
 #. UnifiedRole FileEditorListGrants, Role Description (resolves directly)
-#: pkg/unifiedrole/roles.go:141
+#: pkg/unifiedrole/roles.go:143
 msgid "View, download, edit and show all invited people."
 msgstr "تەكلىپ قىلىنغان كىشىلەرنى كۆرۈش ، چۈشۈرۈش ، تەھرىرلەش ۋە كۆرسىتىش."
 
 #. UnifiedRole Editor, Role Description (resolves directly)
 #. UnifiedRole SpaseEditorWithoutVersions, Role Description (resolves
 #. directly)
-#: pkg/unifiedrole/roles.go:111 pkg/unifiedrole/roles.go:129
+#: pkg/unifiedrole/roles.go:113 pkg/unifiedrole/roles.go:131
 msgid "View, download, upload, edit, add and delete."
 msgstr "كۆرۈش ، چۈشۈرۈش ، يوللاش ، تەھرىرلەش ، قوشۇش ۋە ئۆچۈرۈش."
 
 #. UnifiedRole Manager, Role Description (resolves directly)
-#: pkg/unifiedrole/roles.go:153
+#: pkg/unifiedrole/roles.go:155
 msgid "View, download, upload, edit, add, delete and manage members."
 msgstr ""
 "ئەزالارنى كۆرۈش ، چۈشۈرۈش ، يوللاش ، تەھرىرلەش ، قوشۇش ، ئۆچۈرۈش ۋە "
 "باشقۇرۇش."
 
 #. UnifiedRoleListGrants Editor, Role Description (resolves directly)
-#: pkg/unifiedrole/roles.go:117
+#: pkg/unifiedrole/roles.go:119
 msgid "View, download, upload, edit, add, delete and show all invited people."
 msgstr ""
 "تەكلىپ قىلىنغان كىشىلەرنى كۆرۈش ، چۈشۈرۈش ، يوللاش ، تەھرىرلەش ، قوشۇش ، "
 "ئۆچۈرۈش ۋە كۆرسىتىش."
 
 #. UnifiedRole SpaseEditor, Role Description (resolves directly)
-#: pkg/unifiedrole/roles.go:123
+#: pkg/unifiedrole/roles.go:125
 msgid "View, download, upload, edit, add, delete including the history."
 msgstr ""
 "تارىخنى ئۆز ئىچىگە ئالغان كۆرۈش ، چۈشۈرۈش ، يوللاش ، تەھرىرلەش ، قوشۇش ، "
