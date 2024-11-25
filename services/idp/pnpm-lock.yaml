@@ -160,8 +160,8 @@ importers:
         specifier: ^5.10.0
         version: 5.10.0(eslint@7.32.0)
       eslint-plugin-i18next:
-        specifier: ^6.0.9
-        version: 6.0.9
+        specifier: ^6.1.1
+        version: 6.1.1
       eslint-plugin-import:
         specifier: ^2.30.0
         version: 2.30.0(@typescript-eslint/parser@4.33.0(eslint@7.32.0)(typescript@4.9.5))(eslint@7.32.0)
@@ -2953,8 +2953,8 @@ packages:
     peerDependencies:
       eslint: ^7.1.0
 
-  eslint-plugin-i18next@6.0.9:
-    resolution: {integrity: sha512-tAof/p58sN4Az+P6kqu+RijqddalHhz0X6fe+exyBJAUvN9Yk1plOKl8XMySCIQS+vnRWbzzThgHXeDe++uEXQ==}
+  eslint-plugin-i18next@6.1.1:
+    resolution: {integrity: sha512-/Vy6BfX44njxpRnbJm7bbph0KaNJF2eillqN5W+u03hHuxmh9BjtjdPSrI9HPtyoEbG4j5nBn9gXm/dg99mz3Q==}
     engines: {node: '>=0.10.0'}
 
   eslint-plugin-import@2.30.0:
@@ -10000,7 +10000,7 @@ snapshots:
       lodash: 4.17.21
       string-natural-compare: 3.0.1
 
-  eslint-plugin-i18next@6.0.9:
+  eslint-plugin-i18next@6.1.1:
     dependencies:
       lodash: 4.17.21
       requireindex: 1.1.0
