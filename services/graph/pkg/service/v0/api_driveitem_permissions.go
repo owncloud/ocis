@@ -119,7 +119,7 @@ func (s DriveItemPermissionsService) Invite(ctx context.Context, resourceId *sto
 		}
 
 		allowedResourceActions := unifiedrole.GetAllowedResourceActions(role, condition)
-		if len(allowedResourceActions) == 0 {
+		if len(allowedResourceActions) == 0 && role.GetId() != unifiedrole.UnifiedRoleDeniedID {
 			return libregraph.Permission{}, errorcode.New(errorcode.InvalidRequest, "role not applicable to this resource")
 		}
 

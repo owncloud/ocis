@@ -226,6 +226,8 @@ func cs3RoleToDisplayName(role *conversions.Role) string {
 		return _managerUnifiedRoleDisplayName
 	case conversions.RoleSecureViewer:
 		return _secureViewerUnifiedRoleDisplayName
+	case conversions.RoleDenied:
+		return _deniedUnifiedRoleDisplayName
 	default:
 		return ""
 	}

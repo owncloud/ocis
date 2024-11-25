@@ -482,6 +482,10 @@ func (g BaseGraphService) cs3UserShareToPermission(ctx context.Context, share *c
 		perm.SetRoles([]string{role.GetId()})
 	} else {
 		actions := unifiedrole.CS3ResourcePermissionsToLibregraphActions(share.GetPermissions().GetPermissions())
+		// neither a role nor actions are set, we need to return "none" as a hint in the actions
+		if len(actions) == 0 {
+			actions = []string{"none"}
+		}
 		perm.SetLibreGraphPermissionsActions(actions)
 		perm.SetRoles(nil)
 	}
@@ -1079,7 +1083,7 @@ func (g BaseGraphService) updateUserShare(ctx context.Context, permissionID stri
 			}
 
 			allowedResourceActions = unifiedrole.GetAllowedResourceActions(role, condition)
-			if len(allowedResourceActions) == 0 {
+			if len(allowedResourceActions) == 0 && role.GetId() != unifiedrole.UnifiedRoleDeniedID {
 				return nil, errorcode.New(errorcode.InvalidRequest, "role not applicable to this resource")
 			}
 		}

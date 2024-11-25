@@ -21,6 +21,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	libregraph "github.com/owncloud/libre-graph-api-go"
+	"github.com/owncloud/ocis/v2/services/graph/pkg/config"
 	"github.com/stretchr/testify/mock"
 	"github.com/tidwall/gjson"
 	"google.golang.org/grpc"
@@ -59,6 +60,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 		statResponse *provider.StatResponse
 		driveItemId  *provider.ResourceId
 		ctx          context.Context
+		cfg          *config.Config
 	)
 
 	BeforeEach(func() {
@@ -70,7 +72,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 
 		cache = identity.NewIdentityCache(identity.IdentityCacheWithGatewaySelector(gatewaySelector))
 
-		cfg := defaults.FullDefaultConfig()
+		cfg = defaults.FullDefaultConfig()
 		service, err := svc.NewDriveItemPermissionsService(logger, gatewaySelector, cache, cfg)
 		Expect(err).ToNot(HaveOccurred())
 		driveItemPermissionsService = service
@@ -435,6 +437,79 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			Expect(len(permissions.LibreGraphPermissionsActionsAllowedValues)).ToNot(BeZero())
 			Expect(len(permissions.LibreGraphPermissionsRolesAllowedValues)).ToNot(BeZero())
 			Expect(len(permissions.Value)).To(Equal(2))
+		})
+		It("returns role denied", func() {
+			statResponse.Info.PermissionSet = roleconversions.NewManagerRole().CS3ResourcePermissions()
+			cfg.UnifiedRoles.AvailableRoles = []string{unifiedrole.UnifiedRoleViewerID, unifiedrole.UnifiedRoleDeniedID, unifiedrole.UnifiedRoleManagerID}
+			listSharesResponse.Shares = []*collaboration.Share{
+				{
+					Id: &collaboration.ShareId{OpaqueId: "1"},
+					Permissions: &collaboration.SharePermissions{
+						Permissions: roleconversions.NewDeniedRole().CS3ResourcePermissions(),
+					},
+					ResourceId: &provider.ResourceId{
+						StorageId: "1",
+						SpaceId:   "2",
+						OpaqueId:  "3",
+					},
+					Grantee: &provider.Grantee{
+						Type: provider.GranteeType_GRANTEE_TYPE_USER,
+						Id: &provider.Grantee_UserId{
+							UserId: &userpb.UserId{
+								OpaqueId: "user-id",
+							},
+						},
+					},
+				},
+			}
+			listPublicSharesResponse.Share = []*link.PublicShare{}
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(statResponse, nil)
+			gatewayClient.On("ListShares", mock.Anything, mock.Anything).Return(listSharesResponse, nil)
+			gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(getUserResponse, nil)
+			gatewayClient.On("ListPublicShares", mock.Anything, mock.Anything).Return(listPublicSharesResponse, nil)
+			permissions, err := driveItemPermissionsService.ListPermissions(context.Background(), itemID, false, false)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(len(permissions.LibreGraphPermissionsActionsAllowedValues)).ToNot(BeZero())
+			Expect(len(permissions.LibreGraphPermissionsRolesAllowedValues)).ToNot(BeZero())
+			Expect(len(permissions.Value)).To(Equal(1))
+			Expect(permissions.Value[0].GetRoles()[0]).To(Equal(unifiedrole.UnifiedRoleDeniedID))
+		})
+		It("returns access denied when no role and no actions are set (full denial)", func() {
+			statResponse.Info.PermissionSet = roleconversions.NewManagerRole().CS3ResourcePermissions()
+			listSharesResponse.Shares = []*collaboration.Share{
+				{
+					Id: &collaboration.ShareId{OpaqueId: "1"},
+					Permissions: &collaboration.SharePermissions{
+						Permissions: roleconversions.NewDeniedRole().CS3ResourcePermissions(),
+					},
+					ResourceId: &provider.ResourceId{
+						StorageId: "1",
+						SpaceId:   "2",
+						OpaqueId:  "3",
+					},
+					Grantee: &provider.Grantee{
+						Type: provider.GranteeType_GRANTEE_TYPE_USER,
+						Id: &provider.Grantee_UserId{
+							UserId: &userpb.UserId{
+								OpaqueId: "user-id",
+							},
+						},
+					},
+				},
+			}
+			listPublicSharesResponse.Share = []*link.PublicShare{}
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(statResponse, nil)
+			gatewayClient.On("ListShares", mock.Anything, mock.Anything).Return(listSharesResponse, nil)
+			gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(getUserResponse, nil)
+			gatewayClient.On("ListPublicShares", mock.Anything, mock.Anything).Return(listPublicSharesResponse, nil)
+			permissions, err := driveItemPermissionsService.ListPermissions(context.Background(), itemID, false, false)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(len(permissions.LibreGraphPermissionsActionsAllowedValues)).ToNot(BeZero())
+			Expect(len(permissions.LibreGraphPermissionsRolesAllowedValues)).ToNot(BeZero())
+			Expect(len(permissions.Value)).To(Equal(1))
+			Expect(permissions.Value[0].GetLibreGraphPermissionsActions()[0]).To(Equal("none"))
 		})
 	})
 	Describe("ListSpaceRootPermissions", func() {

@@ -13,6 +13,7 @@ var (
 	RoleEditorLite                 = roleEditorLite
 	RoleManager                    = roleManager
 	RoleSecureViewer               = roleSecureViewer
+	RoleDenied                     = roleDenied
 
 	BuildInRoles = buildInRoles
 
