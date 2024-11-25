@@ -3712,6 +3712,41 @@ trait WebDav {
 	}
 
 	/**
+	 * @When user :user downloads the preview of federated share image :path with width :width and height :height using the WebDAV API
+	 *
+	 * @param string $user
+	 * @param string $path
+	 * @param string $width
+	 * @param string $height
+	 *
+	 * @return void
+	 */
+	public function userDownloadsThePreviewOfFederatedShareImageWithWidthHeightUsingWebDAVAPI(string $user, string $path, string $width, string $height): void {
+		$user = $this->getActualUsername($user);
+		$urlParameter = [
+			'x' => $width,
+			'y' => $height,
+			'preview' => '1'
+		];
+		$spaceId = $this->spacesContext->getSharesRemoteItemId($user, $path);
+		$this->setResponse(
+			$this->makeDavRequest(
+				$user,
+				"GET",
+				$path,
+				[],
+				null,
+				$spaceId,
+				"files",
+				null,
+				false,
+				null,
+				$urlParameter,
+			)
+		);
+	}
+
+	/**
 	 * @Given user :user has downloaded the preview of shared resource :path with width :width and height :height
 	 *
 	 * @param string $user
