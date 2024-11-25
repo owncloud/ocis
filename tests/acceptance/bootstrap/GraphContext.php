@@ -800,7 +800,7 @@ class GraphContext implements Context {
 	 * @return void
 	 */
 	public function theUserTriesToAddAnotherUserToGroupUsingTheGraphAPI(string $byUser, string $user, string $group): void {
-		$this->featureContext->setResponse($this->addUserToGroup($group, $byUser, $user));
+		$this->featureContext->setResponse($this->addUserToGroup($group, $user, $byUser));
 	}
 
 	/**
