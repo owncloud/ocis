@@ -1,5 +1,6 @@
 # Table of Contents
 
+* [Changelog for unreleased](#changelog-for-unreleased-unreleased)
 * [Changelog for 7.0.0-rc.3](#changelog-for-700-rc3-2024-11-21)
 * [Changelog for 5.0.9](#changelog-for-509-2024-11-14)
 * [Changelog for 7.0.0-rc.2](#changelog-for-700-rc2-2024-11-12)
@@ -53,6 +54,27 @@
 * [Changelog for 1.2.0](#changelog-for-120-2021-02-17)
 * [Changelog for 1.1.0](#changelog-for-110-2021-01-22)
 * [Changelog for 1.0.0](#changelog-for-100-2020-12-17)
+
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes for unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis/compare/v7.0.0-rc.3...master
+
+## Summary
+
+* Bugfix - Fix deny access for graph roles: [#10627](https://github.com/owncloud/ocis/pull/10627)
+
+## Details
+
+* Bugfix - Fix deny access for graph roles: [#10627](https://github.com/owncloud/ocis/pull/10627)
+
+   We added a unified role "Cannot access" to prevent a regression when switching
+   the share implementation to the graph API. This role is now used to deny access
+   to a resource.The new role is not enabled by default. The whole deny feature is
+   still experimental.
+
+   https://github.com/owncloud/ocis/pull/10627
 
 # Changelog for [7.0.0-rc.3] (2024-11-21)
 
