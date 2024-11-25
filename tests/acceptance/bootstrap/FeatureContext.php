@@ -729,7 +729,7 @@ class FeatureContext extends BehatVariablesContext {
 	}
 
 	/**
-	 * removes the port rom the ocis URL
+	 * removes the port from the ocis URL
 	 *
 	 * @param string $url
 	 *

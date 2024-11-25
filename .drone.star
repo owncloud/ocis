@@ -2350,7 +2350,7 @@ def ocisServer(storage = "ocis", accounts_hash_difficulty = 4, volumes = [], dep
         "SEARCH_DEBUG_ADDR": "0.0.0.0:9224",
         "SETTINGS_DEBUG_ADDR": "0.0.0.0:9194",
         "SHARING_DEBUG_ADDR": "0.0.0.0:9151",
-        "SSE_DEBUG_ADDR": "0.0.0.0:9135",
+        "SSE_DEBUG_ADDR": "0.0.0.0:9139",
         "STORAGE_PUBLICLINK_DEBUG_ADDR": "0.0.0.0:9179",
         "STORAGE_SHARES_DEBUG_ADDR": "0.0.0.0:9156",
         "STORAGE_SYSTEM_DEBUG_ADDR": "0.0.0.0:9217",
