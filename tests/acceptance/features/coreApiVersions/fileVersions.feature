@@ -20,18 +20,12 @@ Feature: dav-versions
       | spaces           |
 
 
-  Scenario Outline: upload file and no version is available using various chunking methods (except new chunking)
-    Given using <dav-path-version> DAV path
-    When user "Alice" uploads file "filesForUpload/davtest.txt" to filenames based on "/davtest.txt" with all mechanisms except new chunking using the WebDAV API
+  Scenario: upload file and no version is available using various chunking methods
+    When user "Alice" uploads file "filesForUpload/davtest.txt" to filenames based on "/davtest.txt" with all mechanisms using the WebDAV API
     Then the HTTP status code of all upload responses should be "201"
-    And the version folder of file "/davtest.txt-olddav-regular" for user "Alice" should contain "0" elements
-    And the version folder of file "/davtest.txt-newdav-regular" for user "Alice" should contain "0" elements
-    And the version folder of file "/davtest.txt-olddav-oldchunking" for user "Alice" should contain "0" elements
-    Examples:
-      | dav-path-version |
-      | old              |
-      | new              |
-      | spaces           |
+    And the version folder of file "/davtest.txt-1dav-regular" for user "Alice" should contain "0" elements
+    And the version folder of file "/davtest.txt-2dav-regular" for user "Alice" should contain "0" elements
+    And the version folder of file "/davtest.txt-3dav-3chunking" for user "Alice" should contain "0" elements
 
   @smokeTest
   Scenario Outline: upload a file twice and versions are available
@@ -48,19 +42,13 @@ Feature: dav-versions
       | spaces           |
 
 
-  Scenario Outline: upload a file twice and versions are available using various chunking methods (except new chunking)
-    Given using <dav-path-version> DAV path
-    When user "Alice" uploads file "filesForUpload/davtest.txt" to filenames based on "/davtest.txt" with all mechanisms except new chunking using the WebDAV API
-    And user "Alice" uploads file "filesForUpload/davtest.txt" to filenames based on "/davtest.txt" with all mechanisms except new chunking using the WebDAV API
+  Scenario: upload a file twice and versions are available using various chunking methods
+    When user "Alice" uploads file "filesForUpload/davtest.txt" to filenames based on "/davtest.txt" with all mechanisms using the WebDAV API
+    And user "Alice" uploads file "filesForUpload/davtest.txt" to filenames based on "/davtest.txt" with all mechanisms using the WebDAV API
     Then the HTTP status code of all upload responses should be between "201" and "204"
-    And the version folder of file "/davtest.txt-olddav-regular" for user "Alice" should contain "1" element
-    And the version folder of file "/davtest.txt-newdav-regular" for user "Alice" should contain "1" element
-    And the version folder of file "/davtest.txt-olddav-oldchunking" for user "Alice" should contain "1" element
-    Examples:
-      | dav-path-version |
-      | old              |
-      | new              |
-      | spaces           |
+    And the version folder of file "/davtest.txt-1dav-regular" for user "Alice" should contain "1" element
+    And the version folder of file "/davtest.txt-2dav-regular" for user "Alice" should contain "1" element
+    And the version folder of file "/davtest.txt-3dav-3chunking" for user "Alice" should contain "1" element
 
   @smokeTest
   Scenario Outline: remove a file

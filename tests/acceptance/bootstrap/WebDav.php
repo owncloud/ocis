@@ -1645,7 +1645,6 @@ trait WebDav {
 				$this->getStepLineRef(),
 				$headers,
 				$this->getDavPathVersion(),
-				$noOfChunks <= 0 ? null : 1,
 				$noOfChunks
 			);
 			$this->lastUploadDeleteTime = \time();
@@ -1698,7 +1697,7 @@ trait WebDav {
 	 * Except do not do the new-DAV-new-chunking combination. That is not being
 	 * supported on all implementations.
 	 *
-	 * @When user :user uploads file :source to filenames based on :destination with all mechanisms except new chunking using the WebDAV API
+	 * @When user :user uploads file :source to filenames based on :destination with all mechanisms using the WebDAV API
 	 *
 	 * @param string $user
 	 * @param string $source
@@ -1706,6 +1705,7 @@ trait WebDav {
 	 *
 	 * @return void
 	 * @throws Exception
+	 * @throws GuzzleException
 	 */
 	public function userUploadsAFileToWithAllMechanismsExceptNewChunking(
 		string $user,
@@ -1721,7 +1721,6 @@ trait WebDav {
 			$destination,
 			$this->getStepLineRef(),
 			false,
-			'new'
 		);
 	}
 
@@ -2194,7 +2193,6 @@ trait WebDav {
 			$this->getStepLineRef(),
 			["X-OC-Mtime" => $mtime],
 			$this->getDavPathVersion(),
-			null,
 			1,
 			$isGivenStep
 		);
@@ -2229,7 +2227,6 @@ trait WebDav {
 			$this->getStepLineRef(),
 			["X-OC-Mtime" => $mtime],
 			$this->getDavPathVersion(),
-			null,
 			1,
 			true
 		);

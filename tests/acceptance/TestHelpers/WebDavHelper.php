@@ -817,34 +817,6 @@ class WebDavHelper {
 	}
 
 	/**
-	 * Decides if the proposed dav version and chunking version are
-	 * a valid combination.
-	 * If no chunkingVersion is specified, then any dav version is valid.
-	 * If a chunkingVersion is specified, then it has to match the dav version.
-	 * Note: in future, the dav and chunking versions might or might not
-	 * move together and/or be supported together. So a more complex
-	 * matrix could be needed here.
-	 *
-	 * @param string|int $davPathVersion
-	 * @param string|int|null $chunkingVersion
-	 *
-	 * @return boolean is this a valid combination
-	 */
-	public static function isValidDavChunkingCombination(
-		$davPathVersion,
-		$chunkingVersion
-	): bool {
-		if ($davPathVersion === self::DAV_VERSION_SPACES) {
-			// allow only old chunking version when using the spaces dav
-			return $chunkingVersion === 1;
-		}
-		return (
-			($chunkingVersion === 'no' || $chunkingVersion === null) ||
-			($davPathVersion === $chunkingVersion)
-		);
-	}
-
-	/**
 	 * get Mtime of File in a public link share
 	 *
 	 * @param string|null $baseUrl
