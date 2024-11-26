@@ -871,8 +871,8 @@ github.com/onsi/ginkgo/v2 v2.22.0/go.mod h1:7Du3c42kxCUegi0IImZ1wUQzMBVecgIHjR1C
 github.com/onsi/gomega v1.4.3/go.mod h1:ex+gbHU/CVuBBDIJjb2X0qEXbFg53c61hWP/1CpauHY=
 github.com/onsi/gomega v1.7.1/go.mod h1:XdKZgCCFLUoM/7CFJVPcG8C1xQ1AJ0vpAezJrB7JYyY=
 github.com/onsi/gomega v1.10.1/go.mod h1:iN09h71vgCQne3DLsj+A5owkum+a2tYe+TOCB1ybHNo=
-github.com/onsi/gomega v1.35.1 h1:Cwbd75ZBPxFSuZ6T+rN/WCb/gOc6YgFBXLlZLhC7Ds4=
-github.com/onsi/gomega v1.35.1/go.mod h1:PvZbdDc8J6XJEpDK4HCuRBm8a6Fzp9/DmhC9C7yFlog=
+github.com/onsi/gomega v1.36.0 h1:Pb12RlruUtj4XUuPUqeEWc6j5DkVVVA49Uf6YLfC95Y=
+github.com/onsi/gomega v1.36.0/go.mod h1:PvZbdDc8J6XJEpDK4HCuRBm8a6Fzp9/DmhC9C7yFlog=
 github.com/open-policy-agent/opa v0.70.0 h1:B3cqCN2iQAyKxK6+GI+N40uqkin+wzIrM7YA60t9x1U=
 github.com/open-policy-agent/opa v0.70.0/go.mod h1:Y/nm5NY0BX0BqjBriKUiV81sCl8XOjjvqQG7dXrggtI=
 github.com/opencontainers/runtime-spec v1.1.0 h1:HHUyrt9mwHUjtasSbXSMvs4cyFxh+Bll4AjJ9odEGpg=
