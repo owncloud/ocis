@@ -68,7 +68,7 @@ class AuthAppContext implements Context {
 	}
 
 	/**
-	 * @Given user :user has created app token with expiration time :expiration
+	 * @Given user :user has created app token with expiration time :expiration using the auth-app API
 	 *
 	 * @param string $user
 	 * @param string $expiration
