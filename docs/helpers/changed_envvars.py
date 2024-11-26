@@ -94,19 +94,20 @@ def get_deprecated(fileNew):
 			deprecatedWith[key] = value
 	return deprecatedWith
 
-def create_adoc_start(type_text, from_version, to_version, creation_date, default):
+def create_adoc_start(type_text, from_version, to_version, creation_date, columns, closing):
 	# create the page/table header
+	# 'closing' contains variable column names dependen if added/removed ir deprecated
 	a = '''// # {ftype} Variables between oCIS {ffrom} and oCIS {fto}
 // commenting the headline to make it better includable
 
 // table created per {fdate}
 // the table should be recreated/updated on source () changes
 
-[width="100%",cols="~,~,~,~",options="header"]
+[width="100%",cols="{fcolumns}",options="header"]
 |===
-| Service| Variable| Description| {fdefault}
+| Service | Variable | Description | {fclosing}
 
-'''.format(ftype = type_text, ffrom = from_version, fto = to_version, fdate = creation_date, fdefault = default)
+'''.format(ftype = type_text, ffrom = from_version, fto = to_version, fdate = creation_date, fcolumns = columns, fclosing = closing)
 	return a
 
 def create_adoc_end():
@@ -116,38 +117,77 @@ def create_adoc_end():
 '''
 	return a
 
-def add_adoc_line(service, variable, description, default):
-	# add a table line
+def add_adoc_line_1(service, variable, description, value):
+	# add a table line for added/removed
+	# the dummy values are only here to have the same number of parameters as add_adoc_line_2
 	a = '''| {fservice}
 | {fvariable}
 | {fdescription}
-| {fdefault}
+| {fvalue}
 
-'''.format(fservice = service, fvariable = variable, fdescription = description, fdefault = default)
+'''.format(fservice = service, fvariable = variable, fdescription = description, fvalue = value)
 	return a
 
-def create_table(type_text, source_dict, from_version, to_version, date_today, default = 'Default'):
+def add_adoc_line_2(service, variable, description, removalVersion, deprecationInfo):
+	# add a table line for deprecated, this has different columns
+	a = '''| {fservice}
+| {fvariable}
+| {fdescription}
+| {fremovalVersion}
+| {fdeprecationInfo}
+
+'''.format(fservice = service, fvariable = variable, fdescription = description, fremovalVersion = removalVersion, fdeprecationInfo = deprecationInfo)
+	return a
+
+def create_table(type_text, source_dict, from_version, to_version, date_today, type = False):
 	# get the table header
-	a = create_adoc_start(type_text, from_version, to_version, date_today, default)
-	cond_value = 'defaultValue' if default == 'Default' else 'removalVersion'
-	# first add all ocis_
-	for key, value in source_dict.items():
-		if key.startswith('OCIS_'):
-			a += add_adoc_line(
-					'xref:deployment/services/env-vars-special-scope.adoc[Special Scope Envvars]',
-					key,
-					value['description'],
-					value[cond_value]
-				)
-	# then add all others
-	for key, value in source_dict.items():
-		if not key.startswith('OCIS_'):
-			a += add_adoc_line(
-					'xref:{s-path}/xxx.adoc[xxx]',
-					key,
-					value['description'],
-					value[cond_value]
-				)
+	columns = '~,~,~,~' if type == False else '~,~,~,~,~'
+	closing = 'Default' if type == False else 'Removal Version | Deprecation Info'
+	a = create_adoc_start(type_text, from_version, to_version, date_today, columns, closing)
+
+	if not type:
+	# added and removed envvars
+		# first add all ocis_
+		for key, value in source_dict.items():
+			if key.startswith('OCIS_'):
+				a += add_adoc_line_1(
+						'xref:deployment/services/env-vars-special-scope.adoc[Special Scope Envvars]',
+						key,
+						value['description'],
+						value['defaultValue']
+					)
+		# then add all others
+		for key, value in source_dict.items():
+			if not key.startswith('OCIS_'):
+				a += add_adoc_line_1(
+						'xref:{s-path}/xxx.adoc[xxx]',
+						key,
+						value['description'],
+						value['defaultValue']
+					)
+	else:
+	# deprecated envvars
+		# first add all ocis_
+		for key, value in source_dict.items():
+			if key.startswith('OCIS_'):
+				a += add_adoc_line_2(
+						'xref:deployment/services/env-vars-special-scope.adoc[Special Scope Envvars]',
+						key,
+						value['description'],
+						value['removalVersion'],
+						value['deprecationInfo']
+					)
+		# then add all others
+		for key, value in source_dict.items():
+			if not key.startswith('OCIS_'):
+				a += add_adoc_line_2(
+						'xref:{s-path}/xxx.adoc[xxx]',
+						key,
+						value['description'],
+						value['removalVersion'],
+						value['deprecationInfo']
+					)
+
 	# finally close the table
 	a += create_adoc_end()
 	return a
@@ -172,7 +212,7 @@ deprecatedWith = get_deprecated(fileNew)
 
 a = create_table('Added', addedWith, from_version, to_version, date.today().strftime('%Y.%m.%d'))
 r = create_table('Removed', removedWith, from_version, to_version, date.today().strftime('%Y.%m.%d'))
-d = create_table('Deprecated', deprecatedWith, from_version, to_version, date.today().strftime('%Y.%m.%d'), 'Removalversion')
+d = create_table('Deprecated', deprecatedWith, from_version, to_version, date.today().strftime('%Y.%m.%d'), True)
 
 write_output(a, 'added')
 write_output(r, 'removed')
