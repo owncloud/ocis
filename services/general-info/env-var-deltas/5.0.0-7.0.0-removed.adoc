@@ -6,7 +6,7 @@
 
 [width="100%",cols="~,~,~,~",options="header"]
 |===
-| Service| Variable| Description| Default
+| Service | Variable | Description | Default
 
 | xref:deployment/services/env-vars-special-scope.adoc[Special Scope Envvars]
 | OCIS_CACHE_SIZE
