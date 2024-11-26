@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2024-11-25 19:13+0000\n"
+"POT-Creation-Date: 2024-11-26 00:18+0000\n"
 "PO-Revision-Date: 2024-04-04 00:17+0000\n"
 "Last-Translator: Michael Barz <mbarz@owncloud.com>, 2024\n"
 "Language-Team: German (https://app.transifex.com/owncloud-org/teams/6149/de/)\n"
@@ -65,12 +65,12 @@ msgstr "Kann anzeigen (sichere Ansicht)"
 #. UnifiedRole FullDenial, Role DisplayName (resolves directly)
 #: pkg/unifiedrole/roles.go:170
 msgid "Cannot access"
-msgstr ""
+msgstr "Kann nicht zugreifen"
 
 #. UnifiedRole FullDenial, Role Description (resolves directly)
 #: pkg/unifiedrole/roles.go:167
 msgid "Deny all access."
-msgstr ""
+msgstr "Jeder Zugriff ist verboten."
 
 #. default description for new spaces
 #: pkg/service/v0/spacetemplates.go:32
