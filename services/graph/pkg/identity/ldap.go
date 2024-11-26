@@ -217,7 +217,7 @@ func (i *LDAP) CreateUser(ctx context.Context, user libregraph.User) (*libregrap
 	}
 
 	// Read	back user from LDAP to get the generated UUID
-	e, err := i.getUserByDN(ar.DN)
+	e, err := i.getUserByDN(ar.DN, "")
 	if err != nil {
 		return nil, err
 	}
@@ -390,7 +390,7 @@ func (i *LDAP) UpdateUser(ctx context.Context, nameOrID string, user libregraph.
 	}
 
 	// Read	back user from LDAP to get the generated UUID
-	e, err = i.getUserByDN(e.DN)
+	e, err = i.getUserByDN(e.DN, "")
 	if err != nil {
 		return nil, err
 	}
@@ -406,11 +406,27 @@ func (i *LDAP) UpdateUser(ctx context.Context, nameOrID string, user libregraph.
 	return returnUser, nil
 }
 
-func (i *LDAP) getUserByDN(dn string) (*ldap.Entry, error) {
-	filter := fmt.Sprintf("(objectClass=%s)", i.userObjectClass)
+func (i *LDAP) getUserByDN(dn, searchTerm string) (*ldap.Entry, error) {
+	baseFilter := fmt.Sprintf("(objectClass=%s)", i.userObjectClass)
 
+	userFilter := ""
 	if i.userFilter != "" {
-		filter = fmt.Sprintf("(&%s(%s))", filter, i.userFilter)
+		userFilter = fmt.Sprintf("(%s)", i.userFilter)
+	}
+	searchFilter := ""
+	if searchTerm != "" {
+		searchTerm = ldap.EscapeFilter(searchTerm)
+		searchFilter = fmt.Sprintf(
+			"(|(%s=*%s*)(%s=*%s*)(%s=*%s*))",
+			i.userAttributeMap.userName, searchTerm,
+			i.userAttributeMap.mail, searchTerm,
+			i.userAttributeMap.displayName, searchTerm,
+		)
+	}
+
+	filter := baseFilter
+	if userFilter != "" || searchFilter != "" {
+		filter = fmt.Sprintf("(&%s%s%s)", baseFilter, userFilter, searchFilter)
 	}
 
 	return i.getEntryByDN(dn, i.getUserAttrTypesForSearch(), filter)
@@ -722,7 +738,7 @@ func (i *LDAP) changeUserName(ctx context.Context, dn, originalUserName, newUser
 		return nil, err
 	}
 
-	u, err := i.getUserByDN(newFullDN)
+	u, err := i.getUserByDN(newFullDN, "")
 	if err != nil {
 		return nil, err
 	}
@@ -1071,7 +1087,7 @@ func (i *LDAP) removeEntryByDNAndAttributeFromEntry(entry *ldap.Entry, dn string
 }
 
 // expandLDAPAttributeEntries reads an attribute from a ldap entry and expands to users
-func (i *LDAP) expandLDAPAttributeEntries(ctx context.Context, e *ldap.Entry, attribute string) ([]*ldap.Entry, error) {
+func (i *LDAP) expandLDAPAttributeEntries(ctx context.Context, e *ldap.Entry, attribute, searchTerm string) ([]*ldap.Entry, error) {
 	logger := i.logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "ldap").Msg("ExpandLDAPAttributeEntries")
 	result := []*ldap.Entry{}
@@ -1081,7 +1097,7 @@ func (i *LDAP) expandLDAPAttributeEntries(ctx context.Context, e *ldap.Entry, at
 			continue
 		}
 		logger.Debug().Str("entryDN", entryDN).Msg("lookup")
-		ue, err := i.getUserByDN(entryDN)
+		ue, err := i.getUserByDN(entryDN, searchTerm)
 		if err != nil {
 			// Ignore errors when reading a specific entry fails, just log them and continue
 			logger.Debug().Err(err).Str("entry", entryDN).Msg("error reading attribute member entry")

@@ -38,7 +38,7 @@ func (i *LDAP) GetGroup(ctx context.Context, nameOrID string, queryParam url.Val
 		return nil, errorcode.New(errorcode.ItemNotFound, "not found")
 	}
 	if slices.Contains(sel, "members") || slices.Contains(exp, "members") {
-		members, err := i.expandLDAPAttributeEntries(ctx, e, i.groupAttributeMap.member)
+		members, err := i.expandLDAPAttributeEntries(ctx, e, i.groupAttributeMap.member, "")
 		if err != nil {
 			return nil, err
 		}
@@ -123,7 +123,7 @@ func (i *LDAP) GetGroups(ctx context.Context, oreq *godata.GoDataRequest) ([]*li
 			continue
 		}
 		if expandMembers {
-			members, err := i.expandLDAPAttributeEntries(ctx, e, i.groupAttributeMap.member)
+			members, err := i.expandLDAPAttributeEntries(ctx, e, i.groupAttributeMap.member, "")
 			if err != nil {
 				return nil, err
 			}
@@ -156,7 +156,12 @@ func (i *LDAP) GetGroupMembers(ctx context.Context, groupID string, req *godata.
 		return nil, err
 	}
 
-	memberEntries, err := i.expandLDAPAttributeEntries(ctx, e, i.groupAttributeMap.member)
+	searchTerm, err := GetSearchValues(req.Query)
+	if err != nil {
+		return nil, err
+	}
+
+	memberEntries, err := i.expandLDAPAttributeEntries(ctx, e, i.groupAttributeMap.member, searchTerm)
 	result := make([]*libregraph.User, 0, len(memberEntries))
 	if err != nil {
 		return nil, err
