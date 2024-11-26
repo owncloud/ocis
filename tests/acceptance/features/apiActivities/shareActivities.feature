@@ -1161,8 +1161,7 @@ Feature: check share activity
                                   "pattern": "%user_id_pattern%"
                                 },
                                 "name": {
-                                  "type": "string",
-                                  "pattern": "[a-zA-z]{15}"
+                                  "type": "string"
                                 }
                               }
                             },
@@ -1235,8 +1234,7 @@ Feature: check share activity
                                   "pattern": "%user_id_pattern%"
                                 },
                                 "name": {
-                                  "type": "string",
-                                  "pattern": "[a-zA-z]{15}"
+                                  "type": "string"
                                 }
                               }
                             },
@@ -1309,8 +1307,7 @@ Feature: check share activity
                                   "pattern": "%user_id_pattern%"
                                 },
                                 "name": {
-                                  "type": "string",
-                                  "pattern": "[a-zA-z]{15}"
+                                  "type": "string"
                                 }
                               }
                             },
@@ -1473,8 +1470,7 @@ Feature: check share activity
                                   "pattern": "%user_id_pattern%"
                                 },
                                 "name": {
-                                  "type": "string",
-                                  "pattern": "[a-zA-z]{15}"
+                                  "type": "string"
                                 }
                               }
                             },
@@ -1547,8 +1543,7 @@ Feature: check share activity
                                   "pattern": "%user_id_pattern%"
                                 },
                                 "name": {
-                                  "type": "string",
-                                  "pattern": "[a-zA-z]{15}"
+                                  "type": "string"
                                 }
                               }
                             },
@@ -1621,8 +1616,7 @@ Feature: check share activity
                                   "pattern": "%user_id_pattern%"
                                 },
                                 "name": {
-                                  "type": "string",
-                                  "pattern": "[a-zA-z]{15}"
+                                  "type": "string"
                                 }
                               }
                             },
