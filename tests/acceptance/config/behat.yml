@@ -750,10 +750,10 @@ default:
         - SharingNgContext:
         - WebDavPropertiesContext:
         - OcisConfigContext:
-    
-    serviceAvailability:
+
+    apiServiceAvailability:
       paths:
-        - "%paths.base%/../features/serviceAvailability"
+        - "%paths.base%/../features/apiServiceAvailability"
       context: *common_ldap_suite_context
       contexts:
         - FeatureContext: *common_feature_context_params

@@ -88,7 +88,7 @@ config = {
                 "apiDepthInfinity",
                 "apiLocks",
                 "apiActivities",
-                "serviceAvailability",
+                "apiServiceAvailability",
             ],
             "skip": False,
         },
