@@ -88,13 +88,13 @@ config = {
                 "apiDepthInfinity",
                 "apiLocks",
                 "apiActivities",
-                "apiServiceAvailability",
             ],
             "skip": False,
         },
         "graph": {
             "suites": [
                 "apiGraph",
+                "apiServiceAvailability",
             ],
             "skip": False,
             "withRemotePhp": [True],
@@ -240,7 +240,6 @@ config = {
             "collaborationServiceNeeded": True,
             "extraServerEnvironment": {
                 "GATEWAY_GRPC_ADDR": "0.0.0.0:9142",
-                "COLLABORATION_DEBUG_ADDR": "0.0.0.0:9304",
             },
         },
         "cliCommands": {
@@ -1033,6 +1032,7 @@ def localApiTests(ctx, name, suites, storage = "ocis", extra_environment = {}, w
         "UPLOAD_DELETE_WAIT_TIME": "1" if storage == "owncloud" else 0,
         "OCIS_WRAPPER_URL": "http://%s:5200" % OCIS_SERVER_NAME,
         "WITH_REMOTE_PHP": with_remote_php,
+        "COLLABORATION_SERVICE_URL": "http://wopi-fakeoffice:9300",
     }
 
     for item in extra_environment:
@@ -2341,6 +2341,7 @@ def ocisServer(storage = "ocis", accounts_hash_difficulty = 4, volumes = [], dep
         "GROUPS_DEBUG_ADDR": "0.0.0.0:9161",
         "IDM_DEBUG_ADDR": "0.0.0.0:9239",
         "IDP_DEBUG_ADDR": "0.0.0.0:9134",
+        "INVITATIONS_DEBUG_ADDR": "0.0.0.0:9269",
         "NATS_DEBUG_ADDR": "0.0.0.0:9234",
         "OCDAV_DEBUG_ADDR": "0.0.0.0:9163",
         "OCM_DEBUG_ADDR": "0.0.0.0:9281",
@@ -2360,6 +2361,7 @@ def ocisServer(storage = "ocis", accounts_hash_difficulty = 4, volumes = [], dep
         "USERS_DEBUG_ADDR": "0.0.0.0:9145",
         "WEB_DEBUG_ADDR": "0.0.0.0:9104",
         "WEBDAV_DEBUG_ADDR": "0.0.0.0:9119",
+        "WEBFINGER_DEBUG_ADDR": "0.0.0.0:9279",
     }
 
     if deploy_type == "":
@@ -3151,7 +3153,6 @@ def wopiCollaborationService(name):
         "COLLABORATION_CS3API_DATAGATEWAY_INSECURE": "true",
         "OCIS_JWT_SECRET": "some-ocis-jwt-secret",
         "COLLABORATION_WOPI_SECRET": "some-wopi-secret",
-        "OCIS_ADD_RUN_SERVICES": "collaboration",
     }
 
     if name == "collabora":
