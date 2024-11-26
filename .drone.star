@@ -242,6 +242,16 @@ config = {
                 "GATEWAY_GRPC_ADDR": "0.0.0.0:9142",
             },
         },
+        "authApp": {
+            "suites": [
+                "apiAuthApp",
+            ],
+            "skip": False,
+            "extraServerEnvironment": {
+                "OCIS_ADD_RUN_SERVICES": "auth-app",
+                "PROXY_ENABLE_APP_AUTH": True,
+            },
+        },
         "cliCommands": {
             "suites": [
                 "cliCommands",
