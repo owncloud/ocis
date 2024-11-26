@@ -1,7 +1,7 @@
 // # Added Variables between oCIS 5.0.0 and oCIS 7.0.0
 // commenting the headline to make it better includable
 
-// table created per 2024.11.15
+// table created per 2024.11.26
 // the table should be recreated/updated on source () changes
 
 [width="100%",cols="~,~,~,~",options="header"]
@@ -14,19 +14,9 @@
 | /var/lib/ocis/web/assets/themes
 
 | 
-| OCIS_DEFAULT_LANGUAGE
-| The default language used by services and the WebUI. If not defined, English will be used as default. See the documentation for more details.
-| 
-
-| 
 | OCIS_DISABLE_VERSIONING
 | Disables versioning of files. When set to true, new uploads with the same filename will overwrite existing files instead of creating a new version.
 | false
-
-| 
-| OCIS_MACHINE_AUTH_API_KEY
-| The machine auth API key used to validate internal requests necessary to access resources from other services.
-| 
 
 | 
 | OCIS_MAX_CONCURRENCY
@@ -34,14 +24,39 @@
 | 1
 
 | 
+| OCIS_PERSISTENT_STORE
+| The type of the store. Supported values are: 'memory', 'nats-js-kv', 'redis-sentinel', 'noop'. See the text description for details.
+| nats-js-kv
+
+| 
+| OCIS_PERSISTENT_STORE_AUTH_PASSWORD
+| The password to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.
+| 
+
+| 
+| OCIS_PERSISTENT_STORE_AUTH_USERNAME
+| The username to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.
+| 
+
+| 
+| OCIS_PERSISTENT_STORE_NODES
+| A list of nodes to access the configured store. This has no effect when 'memory' store is configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details.
+| [127.0.0.1:9233]
+
+| 
+| OCIS_PERSISTENT_STORE_TTL
+| Time to live for events in the store. Defaults to '30m' (30 minutes). See the Environment Variable Types description for more details.
+| 30m0s
+
+| 
 | OCIS_SHOW_USER_EMAIL_IN_RESULTS
 | Include user email addresses in responses. If absent or set to false emails will be omitted from results. Please note that admin users can always see all email addresses.
 | false
 
 | 
-| OCIS_TRANSLATION_PATH
-| (optional) Set this to a path with custom translations to overwrite the builtin translations. Note that file and folder naming rules apply, see the documentation for more details.
-| 
+| OCIS_WOPI_DISABLE_CHAT
+| Disable chat in the office web frontend. This feature applies to OnlyOffice and Microsoft.
+| false
 
 | xref:{s-path}/activitylog.adoc[Activitylog]
 | ACTIVITYLOG_TRANSLATION_PATH
@@ -52,6 +67,11 @@
 | ANTIVIRUS_WORKERS
 | The number of concurrent go routines that fetch events from the event queue.
 | 10
+
+| xref:{s-path}/app-provider.adoc[App-Provider]
+| APP_PROVIDER_WOPI_DISABLE_CHAT
+| Disable chat in the office web frontend. This feature applies to OnlyOffice and Microsoft.
+| false
 
 | xref:{s-path}/auth-app.adoc[Auth-App]
 | AUTH_APP_DEBUG_ADDR
@@ -169,11 +189,6 @@
 | false
 
 | 
-| COLLABORATION_APP_LOCKNAME
-| Name for the app lock
-| com.github.owncloud.collaboration
-
-| 
 | COLLABORATION_APP_NAME
 | The name of the app which is shown to the user. You can chose freely but you are limited to a single word without special characters or whitespaces. We recommend to use pascalCase like 'CollaboraOnline'.
 | Collabora
@@ -197,11 +212,6 @@
 | COLLABORATION_CS3API_DATAGATEWAY_INSECURE
 | Connect to the CS3API data gateway insecurely.
 | false
-
-| 
-| COLLABORATION_CS3API_GATEWAY_NAME
-| CS3 gateway used to look up user metadata.
-| com.owncloud.api.gateway
 
 | 
 | COLLABORATION_DEBUG_ADDR
@@ -449,6 +459,31 @@
 | http://localhost:9280/data
 
 | xref:{s-path}/postprocessing.adoc[Postprocessing]
+| POSTPROCESSING_STORE
+| The type of the store. Supported values are: 'memory', 'nats-js-kv', 'redis-sentinel', 'noop'. See the text description for details.
+| nats-js-kv
+
+| 
+| POSTPROCESSING_STORE_AUTH_PASSWORD
+| The password to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.
+| 
+
+| 
+| POSTPROCESSING_STORE_AUTH_USERNAME
+| The username to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.
+| 
+
+| 
+| POSTPROCESSING_STORE_NODES
+| A list of nodes to access the configured store. This has no effect when 'memory' store is configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details.
+| [127.0.0.1:9233]
+
+| 
+| POSTPROCESSING_STORE_TTL
+| Time to live for events in the store. Defaults to '30m' (30 minutes). See the Environment Variable Types description for more details.
+| 30m0s
+
+| 
 | POSTPROCESSING_WORKERS
 | The number of concurrent go routines that fetch events from the event queue.
 | 3
@@ -534,6 +569,16 @@
 | 
 
 | 
+| STORAGE_USERS_OCIS_MAX_CONCURRENCY
+| Maximum number of concurrent go-routines. Higher values can potentially get work done faster but will also cause more load on the system. Values of 0 or below will be ignored and the default value will be used.
+| 1
+
+| 
+| STORAGE_USERS_OCIS_PERMISSIONS_ENDPOINT
+| Endpoint of the permissions service. The endpoints can differ for 'ocis', 'posix' and 's3ng'.
+| com.owncloud.api.settings
+
+| 
 | STORAGE_USERS_OCIS_PERSONAL_SPACE_PATH_TEMPLATE
 | Template string to construct the paths of the personal space roots.
 | 
@@ -561,7 +606,7 @@
 | 
 | STORAGE_USERS_POSIX_ROOT
 | The directory where the filesystem storage will store its data. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH/storage/users.
-| 
+| /var/lib/ocis/storage/users
 
 | 
 | STORAGE_USERS_POSIX_SCAN_DEBOUNCE_DELAY
