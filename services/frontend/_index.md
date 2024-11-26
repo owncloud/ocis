@@ -1,6 +1,6 @@
 ---
 title: Frontend
-date: 2024-11-26T08:08:00.29982324Z
+date: 2024-11-26T09:11:22.169533929Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/frontend
@@ -66,11 +66,11 @@ Aggregating share information is one of the most time consuming operations in OC
 
 To save network trips the sharing implementation can cache the stat requests with an in memory cache or in Redis. It will shorten the response time by the network round-trip overhead at the cost of the API only eventually being updated.
 
-Setting `FRONTEND_OCS_RESOURCE_INFO_CACHE_TTL=60` would cache the stat info for 60 seconds. Increasing this value makes sense for large deployments with thousands of active users that keep the cache up to date. Low frequency usage scenarios should not expect a noticeable improvement.
+Setting `FRONTEND_OCS_RESOURCE_INFO_CACHE_TTL=60` (deprecated) would cache the stat info for 60 seconds. Increasing this value makes sense for large deployments with thousands of active users that keep the cache up to date. Low frequency usage scenarios should not expect a noticeable improvement.
 
 ## Scalability
 
-While the frontend service does not persist any data, it does cache information about files and filesystem (`Stat()`) responses and user information. Therefore, multiple instances of this service can be spawned in a bigger deployment like when using container orchestration with Kubernetes, when configuring `FRONTEND_OCS_RESOURCE_INFO_CACHE_STORE` and the related config options.
+While the frontend service does not persist any data, it does cache information about files and filesystem (`Stat()`) responses and user information. Therefore, multiple instances of this service can be spawned in a bigger deployment like when using container orchestration with Kubernetes, when configuring `FRONTEND_OCS_RESOURCE_INFO_CACHE_STORE` (deprecated) and the related config options.
 
 ## Define Read-Only Attributes
 
@@ -80,7 +80,7 @@ You can find more details regarding available attributes at the [libre-graph-api
 
 ## Caching
 
-The `frontend` service can use a configured store via `FRONTEND_OCS_STAT_CACHE_STORE`. Possible stores are:
+The `frontend` service can use a configured store via `FRONTEND_OCS_STAT_CACHE_STORE` (deprecated). Possible stores are:
   -   `memory`: Basic in-memory store and the default.
   -   `redis-sentinel`: Stores data in a configured Redis Sentinel cluster.
   -   `nats-js-kv`: Stores data using key-value-store feature of [nats jetstream](https://docs.nats.io/nats-concepts/jetstream/key-value-store)
