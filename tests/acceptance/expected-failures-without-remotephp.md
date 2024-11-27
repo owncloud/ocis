@@ -373,8 +373,8 @@
 
 #### [Public cannot download file preview of unprotected (without password) link share without remote.php](https://github.com/owncloud/ocis/issues/10341)
 
-- [coreApiSharePublicLink1/accessToPublicLinkShare.feature:25](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiSharePublicLink1/accessToPublicLinkShare.feature#L25)
-- [coreApiSharePublicLink1/accessToPublicLinkShare.feature:54](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiSharePublicLink1/accessToPublicLinkShare.feature#L54)
+- [coreApiWebdavPreviews/linkSharePreviews.feature:25](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavPreviews/linkSharePreviews.feature#L25)
+- [coreApiWebdavPreviews/linkSharePreviews.feature:54](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavPreviews/linkSharePreviews.feature#L54)
 
 #### [Trying to create .. resource with /webdav root (old dav path) without remote.php returns html](https://github.com/owncloud/ocis/issues/10339)
 

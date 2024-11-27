@@ -338,7 +338,7 @@ Feature: copy file
     Then the HTTP status code should be "204"
     And as "Alice" folder "/Sample-Folder-A/sample-folder-b/sample-folder-c" should exist
     And as "Alice" folder "/Shares/BRIAN-FOLDER/second-level-folder/third-level-folder/sample-folder-c" should exist
-    And the response when user "Alice" gets the info of the last share should include
+    And as user "Alice" the last share should include the following properties:
       | file_target | /Shares/BRIAN-FOLDER |
     Examples:
       | dav-path-version |
@@ -370,7 +370,7 @@ Feature: copy file
     And as "Alice" file "Sample-Folder-A/sample-folder-b/textfile-c.txt" should exist
     And as "Alice" file "Shares/BRIAN-FOLDER/second-level-folder" should exist
     And the content of file "Shares/BRIAN-FOLDER/second-level-folder" for user "Alice" should be "sample file-c"
-    And the response when user "Alice" gets the info of the last share should include
+    And as user "Alice" the last share should include the following properties:
       | file_target | /Shares/BRIAN-FOLDER |
     Examples:
       | dav-path-version |
@@ -401,7 +401,7 @@ Feature: copy file
     And as "Alice" file "Shares/BRIAN-FOLDER/second-level-file.txt" should exist
     And as "Alice" file "Shares/BRIAN-FOLDER/textfile-c.txt" should not exist
     And the content of file "Shares/BRIAN-FOLDER/second-level-file.txt" for user "Alice" should be "sample file-c"
-    And the response when user "Alice" gets the info of the last share should include
+    And as user "Alice" the last share should include the following properties:
       | file_target | /Shares/BRIAN-FOLDER |
     Examples:
       | dav-path-version |
@@ -432,7 +432,7 @@ Feature: copy file
     And as "Alice" folder "FOLDER/second-level-folder/third-level-folder" should exist
     And as "Alice" folder "Shares/BRIAN-FOLDER/second-level-folder/third-level-file.txt/third-level-folder" should exist
     And as "Alice" folder "Shares/BRIAN-FOLDER/second-level-folder/second-level-folder" should not exist
-    And the response when user "Alice" gets the info of the last share should include
+    And as user "Alice" the last share should include the following properties:
       | file_target | /Shares/BRIAN-FOLDER |
     Examples:
       | dav-path-version |
@@ -521,7 +521,7 @@ Feature: copy file
     Then the HTTP status code should be "204"
     And as "Alice" folder "/Sample-Folder-A/sample-folder-b/sample-folder-c" should exist
     And as "Alice" folder "/Shares/BRIAN-FOLDER/second-level-folder/third-level-folder/sample-folder-c" should exist
-    And the response when user "Alice" gets the info of the last share should include
+    And as user "Alice" the last share should include the following properties:
       | file_target | /Shares/BRIAN-FOLDER |
     Examples:
       | dav-path-version |
@@ -556,7 +556,7 @@ Feature: copy file
     And as "Alice" file "Sample-Folder-A/sample-folder-b/textfile-c.txt" should exist
     And as "Alice" file "Shares/BRIAN-FOLDER/second-level-folder" should exist
     And the content of file "Shares/BRIAN-FOLDER/second-level-folder" for user "Alice" should be "sample file-c"
-    And the response when user "Alice" gets the info of the last share should include
+    And as user "Alice" the last share should include the following properties:
       | file_target | /Shares/BRIAN-FOLDER |
     Examples:
       | dav-path-version |
@@ -590,7 +590,7 @@ Feature: copy file
     And as "Alice" file "Shares/BRIAN-FOLDER/second-level-file.txt" should exist
     And as "Alice" file "Shares/BRIAN-FOLDER/textfile-c.txt" should not exist
     And the content of file "Shares/BRIAN-FOLDER/second-level-file.txt" for user "Alice" should be "sample file-c"
-    And the response when user "Alice" gets the info of the last share should include
+    And as user "Alice" the last share should include the following properties:
       | file_target | /Shares/BRIAN-FOLDER |
     Examples:
       | dav-path-version |
@@ -624,7 +624,7 @@ Feature: copy file
     And as "Alice" folder "FOLDER/second-level-folder/third-level-folder" should exist
     And as "Alice" folder "Shares/BRIAN-FOLDER/second-level-folder/third-level-file.txt/third-level-folder" should exist
     And as "Alice" folder "Shares/BRIAN-FOLDER/second-level-folder/second-level-folder" should not exist
-    And the response when user "Alice" gets the info of the last share should include
+    And as user "Alice" the last share should include the following properties:
       | file_target | /Shares/BRIAN-FOLDER |
     Examples:
       | dav-path-version |

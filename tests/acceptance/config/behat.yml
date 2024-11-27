@@ -692,6 +692,7 @@ default:
         - FeatureContext: *common_feature_context_params
         - SharingNgContext:
         - WebDavPropertiesContext:
+        - OcisConfigContext:
 
     coreApiWebdavProperties:
       paths:

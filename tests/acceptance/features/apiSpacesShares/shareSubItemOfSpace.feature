@@ -30,7 +30,7 @@ Feature: Share a file or folder that is inside a space
     And the OCS status code should be "200"
     And the OCS status message should be "OK"
     And as "Brian" <resource-type> "Shares/<resource>" should exist
-    And the information about the last share for user "Brian" should include
+    And as user "Brian" the last share should include the following properties:
       | expiration | <expiration> |
     Examples:
       | resource | resource-type | space-role | expire-date              | expiration |
@@ -55,7 +55,7 @@ Feature: Share a file or folder that is inside a space
     And the OCS status code should be "200"
     And the OCS status message should be "OK"
     And as "Bob" <resource-type> "Shares/<resource>" should exist
-    And the information about the last share for user "Brian" should include
+    And as user "Brian" the last share should include the following properties:
       | expiration | <expiration> |
     Examples:
       | resource | resource-type | space-role | expire-date              | expiration |
@@ -118,7 +118,7 @@ Feature: Share a file or folder that is inside a space
     And the OCS status code should be "200"
     And the OCS status message should be "OK"
     And as "Brian" folder "Shares/folder" should exist
-    And the information about the last share for user "Brian" should include
+    And as user "Brian" the last share should include the following properties:
       | expiration | 2042-01-01 |
 
 
@@ -135,7 +135,7 @@ Feature: Share a file or folder that is inside a space
       | expireDate | 2044-01-01T23:59:59.999+01:00 |
       | role       | viewer                        |
     Then the HTTP status code should be "200"
-    And the information about the last share for user "Brian" should include
+    And as user "Brian" the last share should include the following properties:
       | expiration | 2044-01-01 |
 
 
@@ -152,7 +152,7 @@ Feature: Share a file or folder that is inside a space
       | expireDate |        |
       | role       | viewer |
     Then the HTTP status code should be "200"
-    And the information about the last share for user "Brian" should include
+    And as user "Brian" the last share should include the following properties:
       | expiration |  |
 
   @issue-8747

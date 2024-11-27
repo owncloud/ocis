@@ -82,6 +82,27 @@ trait WebDav {
 	 */
 	private bool $davPropfindDepthInfinityEnabled = false;
 
+	private array $filePreviews = [];
+
+	/**
+	 * @param string $user
+	 *
+	 * @return string
+	 */
+	public function getFilePreviewContent(string $user): string {
+		return $this->filePreviews[$user];
+	}
+
+	/**
+	 * @param string $user
+	 * @param string $previewContent
+	 *
+	 * @return void
+	 */
+	public function setFilePreviewContent(string $user, string $previewContent): void {
+		$this->filePreviews[$user] = $previewContent;
+	}
+
 	/**
 	 * @return void
 	 */
@@ -3767,7 +3788,7 @@ trait WebDav {
 		$this->checkImageDimensions($width, $height);
 		$response->getBody()->rewind();
 		// save response to user response dictionary for further comparisons
-		$this->userResponseBodyContents[$user] = $response->getBody()->getContents();
+		$this->setFilePreviewContent($user, $response->getBody()->getContents());
 	}
 
 	/**
@@ -3793,11 +3814,11 @@ trait WebDav {
 			$newResponseBodyContents,
 			// different users can download files before and after an update is made to a file
 			// previous response content is fetched from the user response body content array entry for that user
-			$this->userResponseBodyContents[$user],
+			$this->getFilePreviewContent($user),
 			__METHOD__ . " previous and current previews content is same but expected to be different",
 		);
 		// update the saved content for the next comparison
-		$this->userResponseBodyContents[$user] = $newResponseBodyContents;
+		$this->setFilePreviewContent($user, $newResponseBodyContents);
 	}
 
 	/**
@@ -3979,7 +4000,7 @@ trait WebDav {
 		$this->checkImageDimensions($width, $height, $response);
 		$response->getBody()->rewind();
 		// save response to user response dictionary for further comparisons
-		$this->userResponseBodyContents[$user] = $response->getBody()->getContents();
+		$this->setFilePreviewContent($user, $response->getBody()->getContents());
 	}
 
 	/**
@@ -4006,11 +4027,11 @@ trait WebDav {
 			$newResponseBodyContents,
 			// different users can download files before and after an update is made to a file
 			// previous response content is fetched from the user response body content array entry for that user
-			$this->userResponseBodyContents[$user],
+			$this->getFilePreviewContent($user),
 			__METHOD__ . " previous and current previews content is same but expected to be different",
 		);
 		// update the saved content for the next comparison
-		$this->userResponseBodyContents[$user] = $newResponseBodyContents;
+		$this->setFilePreviewContent($user, $newResponseBodyContents);
 	}
 
 	/**

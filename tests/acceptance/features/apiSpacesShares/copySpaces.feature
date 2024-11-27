@@ -760,7 +760,7 @@ Feature: copy file
       | sample-folder-c |
     And for user "Brian" folder "BRIAN-FOLDER/second-level-folder/third-level-folder" of the space "Personal" should contain these entries:
       | sample-folder-c |
-    And the response when user "Alice" gets the info of the last share should include
+    And as user "Alice" the last share should include the following properties:
       | file_target | /Shares/BRIAN-FOLDER |
 
 
@@ -789,7 +789,7 @@ Feature: copy file
       | /second-level-folder |
     And for user "Alice" the content of the file "/BRIAN-FOLDER/second-level-folder" of the space "Shares" should be "sample file-c"
     And for user "Brian" the content of the file "/BRIAN-FOLDER/second-level-folder" of the space "Personal" should be "sample file-c"
-    And the response when user "Alice" gets the info of the last share should include
+    And as user "Alice" the last share should include the following properties:
       | file_target | /Shares/BRIAN-FOLDER |
 
 
@@ -817,7 +817,7 @@ Feature: copy file
       | /textfile-c.txt |
     And for user "Alice" the content of the file "/BRIAN-FOLDER/second-level-file.txt" of the space "Shares" should be "sample file-c"
     And for user "Brian" the content of the file "/BRIAN-FOLDER/second-level-file.txt" of the space "Personal" should be "sample file-c"
-    And the response when user "Alice" gets the info of the last share should include
+    And as user "Alice" the last share should include the following properties:
       | file_target | /Shares/BRIAN-FOLDER |
 
 
@@ -843,7 +843,7 @@ Feature: copy file
       | third-level-folder |
     But for user "Alice" folder "BRIAN-FOLDER/second-level-folder" of the space "Shares" should not contain these entries:
       | second-level-folder |
-    And the response when user "Alice" gets the info of the last share should include
+    And as user "Alice" the last share should include the following properties:
       | file_target | /Shares/BRIAN-FOLDER |
 
 
@@ -871,7 +871,7 @@ Feature: copy file
     And as "Alice" folder "/Sample-Folder-A/sample-folder-b/sample-folder-c" should exist
     And for user "Alice" folder "BRIAN-FOLDER/second-level-folder/third-level-folder" of the space "Shares" should contain these entries:
       | sample-folder-c |
-    And the response when user "Alice" gets the info of the last share should include
+    And as user "Alice" the last share should include the following properties:
       | file_target | /Shares/BRIAN-FOLDER |
 
 
@@ -900,7 +900,7 @@ Feature: copy file
       | third-level-folder |
     And for user "Alice" the content of the file "/BRIAN-FOLDER/second-level-folder" of the space "Shares" should be "sample file-c"
     And for user "Brian" the content of the file "/BRIAN-FOLDER/second-level-folder" of the space "Personal" should be "sample file-c"
-    And the response when user "Alice" gets the info of the last share should include
+    And as user "Alice" the last share should include the following properties:
       | file_target | /Shares/BRIAN-FOLDER |
 
 
@@ -930,7 +930,7 @@ Feature: copy file
     And as "Alice" file "/Sample-Folder-A/sample-folder-b/textfile-c.txt" should exist
     And for user "Alice" the content of the file "/BRIAN-FOLDER/second-level-file.txt" of the space "Shares" should be "sample file-c"
     And for user "Brian" the content of the file "/BRIAN-FOLDER/second-level-file.txt" of the space "Personal" should be "sample file-c"
-    And the response when user "Alice" gets the info of the last share should include
+    And as user "Alice" the last share should include the following properties:
       | file_target | /Shares/BRIAN-FOLDER |
 
 
@@ -962,7 +962,7 @@ Feature: copy file
     And as "Alice" folder "FOLDER/second-level-folder/third-level-folder" should exist
     And for user "Alice" folder "BRIAN-FOLDER" of the space "Shares" should not contain these files:
       | /second-level-folder/second-level-folder |
-    And the response when user "Alice" gets the info of the last share should include
+    And as user "Alice" the last share should include the following properties:
       | file_target | /Shares/BRIAN-FOLDER |
 
 

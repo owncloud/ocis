@@ -242,3 +242,16 @@ Feature: changing a public link share
       | 2               | change      | edit             | 400              |
       | 1               | create      | createOnly       | 200              |
       | 2               | create      | createOnly       | 400              |
+
+  @issue-web-10473
+  Scenario: user tries to download public link file using own basic auth
+    Given user "Alice" has created folder "FOLDER"
+    And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "FOLDER/textfile.txt"
+    And using SharingNG
+    And user "Alice" has created the following resource link share:
+      | resource        | FOLDER   |
+      | space           | Personal |
+      | permissionsRole | edit     |
+      | password        | %public% |
+    When user "Alice" tries to download file "textfile.txt" from the last public link using own basic auth and public WebDAV API
+    Then the HTTP status code should be "401"
