@@ -707,11 +707,11 @@ Feature: an user shares resources using ScienceMesh application
     And using server "LOCAL"
     And user "Alice" has created a folder "FOLDER" in space "Personal"
     And user "Alice" has sent the following resource share invitation to federated user:
-      | resource        | FOLDER                        |
-      | space           | Personal                      |
-      | sharee          | Brian                         |
-      | shareType       | user                          |
-      | permissionsRole | Editor                        |
+      | resource        | FOLDER   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     When using server "REMOTE"
     And user "Brian" uploads a file with content "lorem" to "file.txt" inside federated share "FOLDER" via TUS using the WebDAV API
     Then for user "Brian" the content of file "file.txt" of federated share "FOLDER" should be "lorem"
@@ -725,11 +725,31 @@ Feature: an user shares resources using ScienceMesh application
     And "Brian" has accepted invitation
     And user "Brian" has created a folder "FOLDER" in space "Personal"
     And user "Brian" has sent the following resource share invitation to federated user:
-      | resource        | FOLDER                        |
-      | space           | Personal                      |
-      | sharee          | Alice                         |
-      | shareType       | user                          |
-      | permissionsRole | Editor                        |
+      | resource        | FOLDER   |
+      | space           | Personal |
+      | sharee          | Alice    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
     When using server "LOCAL"
     And user "Alice" uploads a file with content "lorem" to "file.txt" inside federated share "FOLDER" via TUS using the WebDAV API
     Then for user "Alice" the content of file "file.txt" of federated share "FOLDER" should be "lorem"
+
+  @issue-10495
+  Scenario: local user downloads thumbnail preview of a federated shared image
+    Given using spaces DAV path
+    And using server "LOCAL"
+    And "Alice" has created the federation share invitation
+    And using server "REMOTE"
+    And "Brian" has accepted invitation
+    And user "Brian" has uploaded file "filesForUpload/testavatar.jpg" to "testavatar.jpg"
+    And user "Brian" has sent the following resource share invitation to federated user:
+      | resource        | testavatar.jpg |
+      | space           | Personal       |
+      | sharee          | Alice          |
+      | shareType       | user           |
+      | permissionsRole | Viewer         |
+    And using server "LOCAL"
+    When user "Alice" downloads the preview of federated share image "testavatar.jpg" with width "32" and height "32" using the WebDAV API
+    Then the HTTP status code should be "200"
+    And the downloaded image should be "32" pixels wide and "32" pixels high
+    And the downloaded preview content should match with "thumbnail.png" fixtures preview content
