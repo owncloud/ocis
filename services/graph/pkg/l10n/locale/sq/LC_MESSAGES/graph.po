@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2024-11-25 19:13+0000\n"
+"POT-Creation-Date: 2024-11-27 00:20+0000\n"
 "PO-Revision-Date: 2024-04-04 00:17+0000\n"
 "Last-Translator: Besnik Bleta <besnik@programeshqip.org>, 2024\n"
 "Language-Team: Albanian (https://app.transifex.com/owncloud-org/teams/6149/sq/)\n"
@@ -64,12 +64,12 @@ msgstr "Mund të shohë (e siguruar)"
 #. UnifiedRole FullDenial, Role DisplayName (resolves directly)
 #: pkg/unifiedrole/roles.go:170
 msgid "Cannot access"
-msgstr ""
+msgstr "S’mund ta përdorë"
 
 #. UnifiedRole FullDenial, Role Description (resolves directly)
 #: pkg/unifiedrole/roles.go:167
 msgid "Deny all access."
-msgstr ""
+msgstr "Mohoji krejt hyrjet."
 
 #. default description for new spaces
 #: pkg/service/v0/spacetemplates.go:32
