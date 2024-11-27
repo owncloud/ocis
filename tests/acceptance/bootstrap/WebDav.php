@@ -100,7 +100,7 @@ trait WebDav {
 	 * @return void
 	 */
 	public function setFilePreviewContent(string $user, string $previewContent): void {
-		$filePreviews[$user] = $previewContent;
+		$this->filePreviews[$user] = $previewContent;
 	}
 
 	/**

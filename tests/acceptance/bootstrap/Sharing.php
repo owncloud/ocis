@@ -1858,7 +1858,7 @@ trait Sharing {
 	}
 
 	/**
-	 * @Then the information about the last share for user :user should include
+	 * @Then as user :user the last share should include the following properties:
 	 *
 	 * @param string $user
 	 * @param TableNode $table
@@ -1868,8 +1868,24 @@ trait Sharing {
 	 */
 	public function userGetsTheLastShareSharedWithHimUsingTheSharingApi(string $user, TableNode $table):void {
 		$user = $this->getActualUsername($user);
-		$shareId = ($this->isUsingSharingNG()) ? $this->shareNgGetLastCreatedUserGroupShareID() : $this->getLastCreatedUserGroupShareId();
-		$response = $this->getShareData($user, $shareId);
+		$this->verifyTableNodeRows($table, [], $this->shareResponseFields);
+		$share_id = ($this->isUsingSharingNG()) ? $this->shareNgGetLastCreatedUserGroupShareID() : $this->getLastCreatedUserGroupShareId();
+
+		$response = $this->getShareData($user, $share_id);
+		$this->theHTTPStatusCodeShouldBe(
+			200,
+			"Error getting info of last share for user $user",
+			$response
+		);
+		$this->ocsContext->assertOCSResponseIndicatesSuccess(
+			__METHOD__ .
+			' Error getting info of last share for user $user\n' .
+			$this->ocsContext->getOCSResponseStatusMessage(
+				$response
+			) . '"',
+			$response
+		);
+
 		$this->checkTheFields($user, $table, $response);
 	}
 
@@ -2029,39 +2045,6 @@ trait Sharing {
 	 */
 	public function userGetsAllTheSharesInsideTheFolderUsingTheSharingApi(string $user, string $path):void {
 		$this->setResponse($this->getAllShares($user, "?path=$path&subfiles=true"));
-	}
-
-	/**
-	 * @Then /^the response when user "([^"]*)" gets the info of the last share should include$/
-	 *
-	 * @param string $user
-	 * @param TableNode|null $body
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function theResponseWhenUserGetsInfoOfLastShareShouldInclude(
-		string $user,
-		?TableNode $body
-	):void {
-		$user = $this->getActualUsername($user);
-		$this->verifyTableNodeRows($body, [], $this->shareResponseFields);
-		$share_id = ($this->isUsingSharingNG()) ? $this->shareNgGetLastCreatedUserGroupShareID() : $this->getLastCreatedUserGroupShareId();
-		$response = $this->getShareData($user, $share_id);
-		$this->theHTTPStatusCodeShouldBe(
-			200,
-			"Error getting info of last share for user $user",
-			$response
-		);
-		$this->ocsContext->assertOCSResponseIndicatesSuccess(
-			__METHOD__ .
-			' Error getting info of last share for user $user\n' .
-			$this->ocsContext->getOCSResponseStatusMessage(
-				$response
-			) . '"',
-			$response
-		);
-		$this->checkTheFields($user, $body, $response);
 	}
 
 	/**
