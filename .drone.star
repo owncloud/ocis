@@ -23,7 +23,7 @@ OC_CI_GOLANG = "owncloudci/golang:1.22"
 OC_CI_NODEJS = "owncloudci/nodejs:%s"
 OC_CI_PHP = "owncloudci/php:%s"
 OC_CI_WAIT_FOR = "owncloudci/wait-for:latest"
-OC_CS3_API_VALIDATOR = "owncloud/cs3api-validator:0.2.1"
+OC_CS3_API_VALIDATOR = "owncloud/cs3api-validator:0.3.0"
 OC_LITMUS = "owncloudci/litmus:latest"
 OC_UBUNTU = "owncloud/ubuntu:20.04"
 ONLYOFFICE_DOCUMENT_SERVER = "onlyoffice/documentserver:7.5.1"
@@ -1065,7 +1065,7 @@ def cs3ApiTests(ctx, storage, accounts_hash_difficulty = 4):
                          "image": OC_CS3_API_VALIDATOR,
                          "environment": {},
                          "commands": [
-                             "/usr/bin/cs3api-validator /var/lib/cs3api-validator --endpoint=%s:9142" % OCIS_SERVER_NAME,
+                             "/usr/bin/cs3api-validator /var/lib/cs3api-validator --async-propagation=true --endpoint=%s:9142" % OCIS_SERVER_NAME,
                          ],
                      },
                  ],
