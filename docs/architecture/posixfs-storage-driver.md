@@ -129,8 +129,6 @@ If the underlying file system handles deleted files in a trash bin that allows r
 
 If not available it will follow the [the Free Desktop Trash specificaton](https://specifications.freedesktop.org/trash-spec/trashspec-latest.html).
 
-In the current state of the Posix FS Storage Driver, trash bin is not supported.
-
 ## Limitations
 
 As of Q2/2024 the Posix FS Storage Driver is not officially supported and in technical preview state.
