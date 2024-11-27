@@ -1273,3 +1273,27 @@ Feature: an user shares resources using ScienceMesh application
     When user "Brian" lists all available spaces via the Graph API
     Then the HTTP status code should be "200"
     And the json responded should not contain a space with name "folderToShare"
+
+  @issue-10213
+  Scenario Outline: local user removes access of federated user from a resource
+    Given using spaces DAV path
+    And using server "REMOTE"
+    And "Brian" has created the federation share invitation
+    And using server "LOCAL"
+    And "Alice" has accepted invitation
+    And user "Alice" has created a folder "FOLDER" in space "Personal"
+    And user "Alice" has sent the following resource share invitation to federated user:
+      | resource        | FOLDER            |
+      | space           | Personal          |
+      | sharee          | Brian             |
+      | shareType       | user              |
+      | permissionsRole | <permissionsRole> |
+    When user "Alice" removes the access of user "Brian" from resource "FOLDER" of space "Personal" using the Graph API
+    Then the HTTP status code should be "204"
+    And using server "REMOTE"
+    And user "Brian" should not have a federated share "FOLDER" shared by user "Alice" from space "Personal"
+    Examples:
+      | permissionsRole |
+      | Viewer          |
+      | Uploader        |
+      | Editor          |

@@ -1738,13 +1738,14 @@ class SharingNgContext implements Context {
 	 * @param string $sharer
 	 * @param string $space
 	 * @param bool $shouldExist
+	 * @param bool $federatedShare
 	 *
 	 * @return void
 	 * @throws GuzzleException
 	 * @throws JsonException
 	 * @throws Exception
 	 */
-	public function checkIfShareExists(string $share, string $sharee, string $sharer, string $space, bool $shouldExist = true): void {
+	public function checkIfShareExists(string $share, string $sharee, string $sharer, string $space, bool $shouldExist = true, bool $federatedShare = false): void {
 		$share = \ltrim($share, "/");
 		if (\strtolower($space) === "personal") {
 			$remoteDriveAlias = "personal/" . \strtolower($sharer);
@@ -1752,22 +1753,24 @@ class SharingNgContext implements Context {
 			$remoteDriveAlias = "project/" . \strtolower($space);
 		}
 
-		// check share mountpoint
-		$response = GraphHelper::getMySpaces(
-			$this->featureContext->getBaseUrl(),
-			$sharee,
-			$this->featureContext->getPasswordForUser($sharee),
-			"",
-			$this->featureContext->getStepLineRef()
-		);
-		$driveList = HttpRequestHelper::getJsonDecodedResponseBodyContent($response)->value;
-		$foundShareMountpoint = false;
-		foreach ($driveList as $drive) {
-			if ($drive->driveType === "mountpoint" && $drive->name === $share && $drive->root->remoteItem->driveAlias === $remoteDriveAlias) {
-				$foundShareMountpoint = true;
+		if (!$federatedShare) {
+			// check share mountpoint
+			$response = GraphHelper::getMySpaces(
+				$this->featureContext->getBaseUrl(),
+				$sharee,
+				$this->featureContext->getPasswordForUser($sharee),
+				"",
+				$this->featureContext->getStepLineRef()
+			);
+			$driveList = HttpRequestHelper::getJsonDecodedResponseBodyContent($response)->value;
+			$foundShareMountpoint = false;
+			foreach ($driveList as $drive) {
+				if ($drive->driveType === "mountpoint" && $drive->name === $share && $drive->root->remoteItem->driveAlias === $remoteDriveAlias) {
+					$foundShareMountpoint = true;
+				}
 			}
+			Assert::assertSame($shouldExist, $foundShareMountpoint, "Share mountpoint '$share' was not found in the drives list.");
 		}
-		Assert::assertSame($shouldExist, $foundShareMountpoint, "Share mountpoint '$share' was not found in the drives list.");
 
 		// check share in shared-with-me list
 		$response = GraphHelper::getSharesSharedWithMe(
@@ -1806,6 +1809,21 @@ class SharingNgContext implements Context {
 	 */
 	public function userShouldHaveShareSharedByUserFromSpace(string $sharee, string $shouldOrNot, string $share, string $sharer, string $space): void {
 		$this->checkIfShareExists($share, $sharee, $sharer, $space, $shouldOrNot === "should");
+	}
+
+	/**
+	 * @Then /^user "([^"]*)" (should|should not) have a federated share "([^"]*)" shared by user "([^"]*)" from space "([^"]*)"$/
+	 *
+	 * @param string $sharee
+	 * @param string $shouldOrNot
+	 * @param string $share
+	 * @param string $sharer
+	 * @param string $space
+	 *
+	 * @return void
+	 */
+	public function userShouldOrShouldNotHaveFederatedShareSharedByUserFromSpace(string $sharee, string $shouldOrNot, string $share, string $sharer, string $space): void {
+		$this->checkIfShareExists($share, $sharee, $sharer, $space, $shouldOrNot === "should", true);
 	}
 
 	/**
