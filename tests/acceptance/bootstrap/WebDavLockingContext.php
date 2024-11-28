@@ -123,7 +123,7 @@ class WebDavLockingContext implements Context {
 			);
 		}
 
-		$responseXml = $this->featureContext->getResponseXml($response, __METHOD__);
+		$responseXml = HttpRequestHelper::getResponseXml($response, __METHOD__);
 		$xmlPart = $responseXml->xpath("//d:locktoken/d:href");
 		if (isset($xmlPart[0])) {
 			$this->tokenOfLastLock[$user][$file] = (string) $xmlPart[0];
@@ -556,7 +556,7 @@ class WebDavLockingContext implements Context {
 			$body,
 			$this->featureContext->getDavPathVersion()
 		);
-		$responseXml = $this->featureContext->getResponseXml($response, __METHOD__);
+		$responseXml = HttpRequestHelper::getResponseXml($response, __METHOD__);
 		$xmlPart = $responseXml->xpath("//d:response//d:lockdiscovery/d:activelock");
 		if (\is_array($xmlPart)) {
 			return \count($xmlPart);
@@ -904,7 +904,7 @@ class WebDavLockingContext implements Context {
 	public function numberOfLockShouldBeReportedInProjectSpace(int $count, string $file, string $spaceName, string $user) {
 		$response = $this->spacesContext->sendPropfindRequestToSpace($user, $spaceName, $file, null, '0');
 		$this->featureContext->theHTTPStatusCodeShouldBe(207, "", $response);
-		$responseXml = $this->featureContext->getResponseXml($response);
+		$responseXml = HttpRequestHelper::getResponseXml($response, __METHOD__);
 		$xmlPart = $responseXml->xpath("//d:response//d:lockdiscovery/d:activelock");
 		if (\is_array($xmlPart)) {
 			$lockCount = \count($xmlPart);

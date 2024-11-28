@@ -28,6 +28,7 @@ use Psr\Http\Message\ResponseInterface;
 use TestHelpers\Asserts\WebDav as WebDavTest;
 use TestHelpers\WebDavHelper;
 use TestHelpers\BehatHelper;
+use TestHelpers\HttpRequestHelper;
 
 require_once 'bootstrap.php';
 
@@ -636,7 +637,8 @@ class WebDavPropertiesContext implements Context {
 	 * @throws Exception
 	 */
 	public function checkResponseContainsProperty(ResponseInterface $response, string $key, string $namespaceString = null): SimpleXMLElement {
-		$xmlPart = $this->featureContext->getResponseXml($response);
+		$xmlPart = HttpRequestHelper::getResponseXml($response, __METHOD__);
+		;
 
 		if ($namespaceString !== null) {
 			$ns = WebDavHelper::parseNamespace($namespaceString);
@@ -871,7 +873,7 @@ class WebDavPropertiesContext implements Context {
 		$response = $this->getPropertiesOfEntryFromLastLinkShare($path, $propertiesTable);
 		$this->featureContext->theHTTPStatusCodeShouldBe('207', "", $response);
 		$this->assertXpathValueMatchesPattern(
-			$this->featureContext->getResponseXml($response),
+			HttpRequestHelper::getResponseXml($response, __METHOD__),
 			$xpath,
 			$pattern
 		);
@@ -1020,7 +1022,7 @@ class WebDavPropertiesContext implements Context {
 		);
 		$this->featureContext->theHTTPStatusCodeShouldBe('207', '', $response);
 		$this->assertXpathValueMatchesPattern(
-			$this->featureContext->getResponseXml($response),
+			HttpRequestHelper::getResponseXml($response, __METHOD__),
 			$xpath,
 			$pattern,
 			$user
@@ -1189,7 +1191,7 @@ class WebDavPropertiesContext implements Context {
 			$spaceId,
 			$propertiesTable
 		);
-		$xmlObject = $this->featureContext->getResponseXml($response);
+		$xmlObject = HttpRequestHelper::getResponseXml($response, __METHOD__);
 		$this->storedETAG[$user][$storePath]
 			= $this->featureContext->getEtagFromResponseXmlObject($xmlObject);
 		return $xmlObject;
@@ -1339,7 +1341,7 @@ class WebDavPropertiesContext implements Context {
 			null,
 			$propertiesTable
 		);
-		return $this->featureContext->getEtagFromResponseXmlObject($this->featureContext->getResponseXml($response));
+		return $this->featureContext->getEtagFromResponseXmlObject(HttpRequestHelper::getResponseXml($response, __METHOD__));
 	}
 
 	/**

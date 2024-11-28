@@ -137,13 +137,6 @@ class SpacesContext implements Context {
 	private array $responseXml = [];
 
 	/**
-	 * @return array
-	 */
-	public function getResponseXml(): array {
-		return $this->responseXml;
-	}
-
-	/**
 	 * @param array $responseXml
 	 *
 	 * @return void
@@ -369,7 +362,7 @@ class SpacesContext implements Context {
 		);
 
 		$this->featureContext->theHttpStatusCodeShouldBe(207, '', $response);
-		$xmlResponse = $this->featureContext->getResponseXml($response);
+		$xmlResponse = HttpRequestHelper::getResponseXml($response, __METHOD__);
 		$fileId = $xmlResponse->xpath("//d:response/d:propstat/d:prop/oc:fileid")[0];
 		return $fileId->__toString();
 	}
@@ -396,7 +389,7 @@ class SpacesContext implements Context {
 			"files",
 			WebDavHelper::DAV_VERSION_SPACES
 		);
-		$responseArray = json_decode(json_encode($this->featureContext->getResponseXml($response)->xpath("//d:response/d:propstat/d:prop/oc:privatelink")), true, 512, JSON_THROW_ON_ERROR);
+		$responseArray = json_decode(json_encode(HttpRequestHelper::getResponseXml($response, __METHOD__)->xpath("//d:response/d:propstat/d:prop/oc:privatelink")), true, 512, JSON_THROW_ON_ERROR);
 		Assert::assertNotEmpty($responseArray, "the PROPFIND response for $spaceName is empty");
 		return $responseArray[0][0];
 	}
@@ -2424,7 +2417,7 @@ class SpacesContext implements Context {
 			$body,
 			$this->featureContext->getStepLineRef()
 		);
-		$responseXml = $this->featureContext->getResponseXml($response, __METHOD__);
+		$responseXml = HttpRequestHelper::getResponseXml($response, __METHOD__);
 		$sharer = (string) $responseXml->data->uid_owner;
 		$this->featureContext->addToCreatedUserGroupshares($sharer, $responseXml->data);
 		return $response;
@@ -2587,7 +2580,7 @@ class SpacesContext implements Context {
 			$this->featureContext->getStepLineRef()
 		);
 
-		$responseXml = $this->featureContext->getResponseXml($response, __METHOD__);
+		$responseXml = HttpRequestHelper::getResponseXml($response, __METHOD__);
 		$this->featureContext->addToCreatedPublicShares($responseXml->data);
 		return $response;
 	}
@@ -3101,7 +3094,7 @@ class SpacesContext implements Context {
 			$response
 		);
 		return $this->trashbinContext->getTrashbinContentFromResponseXml(
-			$this->featureContext->getResponseXml($response)
+			HttpRequestHelper::getResponseXml($response, __METHOD__)
 		);
 	}
 
@@ -3572,7 +3565,7 @@ class SpacesContext implements Context {
 			$this->featureContext->getStepLineRef()
 		);
 
-		$responseXml = $this->featureContext->getResponseXml($response, __METHOD__);
+		$responseXml = HttpRequestHelper::getResponseXml($response, __METHOD__);
 		$this->featureContext->addToCreatedPublicShares($responseXml->data);
 		return $response;
 	}
@@ -3663,7 +3656,7 @@ class SpacesContext implements Context {
 		);
 
 		$should = ($shouldOrNot !== "not");
-		$responseArray = json_decode(json_encode($this->featureContext->getResponseXml($response)->data), true, 512, JSON_THROW_ON_ERROR);
+		$responseArray = json_decode(json_encode(HttpRequestHelper::getResponseXml($response, __METHOD__)->data), true, 512, JSON_THROW_ON_ERROR);
 
 		if ($should) {
 			Assert::assertNotEmpty($responseArray, __METHOD__ . ' Response should contain a link, but it is empty');
@@ -4032,7 +4025,7 @@ class SpacesContext implements Context {
 	 * @throws JsonException
 	 */
 	public function theXMLResponseShouldContain(string $resource, array $properties): void {
-		$xmlResponse = $this->featureContext->getResponseXml();
+		$xmlResponse = HttpRequestHelper::getResponseXml($response, __METHOD__);
 		$hrefs = array_map(fn ($href) => $href->__toString(), $xmlResponse->xpath("//d:response/d:href"));
 
 		$currentHref = '';
@@ -4151,7 +4144,7 @@ class SpacesContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function asUserTheKeyFromPropfindResponseShouldMatchWithSharedwithmeDriveitemidOfShare(string $user, string $key, string $resource): void {
-		$xmlResponse = $this->featureContext->getResponseXml();
+		$xmlResponse = HttpRequestHelper::getResponseXml($response, __METHOD__);
 		$fileId = $xmlResponse->xpath("//oc:name[text()='$resource']/preceding-sibling::$key")[0]->__toString();
 
 		$jsonResponse = GraphHelper::getSharesSharedWithMe(

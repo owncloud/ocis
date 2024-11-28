@@ -141,15 +141,6 @@ trait WebDav {
 	}
 
 	/**
-	 * @param SimpleXMLElement $responseXmlObject
-	 *
-	 * @return void
-	 */
-	public function setResponseXmlObject(SimpleXMLElement $responseXmlObject):void {
-		$this->responseXmlObject = $responseXmlObject;
-	}
-
-	/**
 	 * @return void
 	 */
 	public function clearResponseXmlObject():void {

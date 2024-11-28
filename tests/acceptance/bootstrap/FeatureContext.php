@@ -1033,26 +1033,6 @@ class FeatureContext extends BehatVariablesContext {
 	}
 
 	/**
-	 * Parses the response as XML
-	 *
-	 * @param ResponseInterface|null $response
-	 * @param string|null $exceptionText text to put at the front of exception messages
-	 *
-	 * @return SimpleXMLElement
-	 * @throws Exception
-	 */
-	public function getResponseXml(?ResponseInterface $response = null, ?string $exceptionText = ''): SimpleXMLElement {
-		if ($response === null) {
-			$response = $this->response;
-		}
-
-		if ($exceptionText === '') {
-			$exceptionText = __METHOD__;
-		}
-		return HttpRequestHelper::getResponseXml($response, $exceptionText);
-	}
-
-	/**
 	 * @param JsonSchema $schemaObj
 	 *
 	 * @return void

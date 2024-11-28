@@ -29,6 +29,7 @@ use Psr\Http\Message\ResponseInterface;
 use PHPUnit\Framework\Assert;
 use TestHelpers\OcsApiHelper;
 use TestHelpers\BehatHelper;
+use TestHelpers\HttpRequestHelper;
 
 require_once 'bootstrap.php';
 
@@ -213,7 +214,7 @@ class CapabilitiesContext implements Context {
 
 		$response = $this->userGetsCapabilities($this->getAdminUsernameForCapabilitiesCheck());
 		$this->featureContext->theHTTPStatusCodeShouldBe(200, '', $response);
-		$responseXml = $this->featureContext->getResponseXml($response)->data->capabilities;
+		$responseXml = HttpRequestHelper::getResponseXml($response, __METHOD__)->data->capabilities;
 		$edition = $this->getParameterValueFromXml(
 			$responseXml,
 			'core',

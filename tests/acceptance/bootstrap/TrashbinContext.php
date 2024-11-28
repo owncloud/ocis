@@ -345,7 +345,7 @@ class TrashbinContext implements Context {
 	 */
 	public function theTrashbinDavResponseShouldNotContainTheseNodes(TableNode $table):void {
 		$this->featureContext->verifyTableNodeColumns($table, ['name']);
-		$responseXml = $this->featureContext->getResponseXml();
+		$responseXml = HttpRequestHelper::getResponseXml($response, __METHOD__);
 		$files = $this->getTrashbinContentFromResponseXml($responseXml);
 
 		foreach ($table->getHash() as $row) {
@@ -368,7 +368,7 @@ class TrashbinContext implements Context {
 	 */
 	public function theTrashbinDavResponseShouldContainTheseNodes(TableNode $table):void {
 		$this->featureContext->verifyTableNodeColumns($table, ['name']);
-		$responseXml = $this->featureContext->getResponseXml();
+		$responseXml = HttpRequestHelper::getResponseXml($response, __METHOD__);
 
 		$files = $this->getTrashbinContentFromResponseXml($responseXml);
 
@@ -460,7 +460,7 @@ class TrashbinContext implements Context {
 	 * @return void
 	 */
 	public function theLastWebdavResponseShouldContainFollowingElements(TableNode $elements):void {
-		$files = $this->getTrashbinContentFromResponseXml($this->featureContext->getResponseXml());
+		$files = $this->getTrashbinContentFromResponseXml(HttpRequestHelper::getResponseXml($response, __METHOD__));
 		$elementRows = $elements->getHash();
 		foreach ($elementRows as $expectedElement) {
 			$found = false;

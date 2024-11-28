@@ -28,6 +28,7 @@ use Behat\Gherkin\Node\TableNode;
 use Psr\Http\Message\ResponseInterface;
 use PHPUnit\Framework\Assert;
 use TestHelpers\BehatHelper;
+use TestHelpers\HttpRequestHelper;
 
 require_once 'bootstrap.php';
 
@@ -155,7 +156,7 @@ class ShareesContext implements Context {
 		ResponseInterface $response,
 		string $shareeType
 	):array {
-		$elements = $this->featureContext->getResponseXml($response, __METHOD__)->data;
+		$elements = HttpRequestHelper::getResponseXml($response, __METHOD__)->data;
 		$elements = \json_decode(\json_encode($elements), true);
 		if (\strpos($shareeType, 'exact ') === 0) {
 			$elements = $elements['exact'];
