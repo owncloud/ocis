@@ -1971,7 +1971,6 @@ class SpacesContext implements Context {
 		string $fileName,
 		string $spaceName
 	):void {
-		$this->getSpaceIdByName($user, $spaceName);
 		$response = $this->featureContext->downloadFileAsUserUsingPassword($user, $fileName, $this->featureContext->getPasswordForUser($user));
 		Assert::assertGreaterThanOrEqual(
 			400,
