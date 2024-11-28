@@ -572,53 +572,16 @@ class WebDavHelper {
 				$user,
 				$password
 			);
-			// we expect to get a multipart XML response with status 207
-			$status = $response->getStatusCode();
-			if ($status === 401) {
-				throw new SpaceNotFoundException(__METHOD__ . " Personal space not found for user " . $user);
-			} elseif ($status !== 207) {
-				throw new Exception(
-					__METHOD__ . " webdav propfind for user $user failed with status $status - so the personal space id cannot be discovered"
-				);
-			}
+			Assert::assertEquals(207, $response->getStatusCode(), "PROPFIND for user '$user' failed so the personal space id cannot be discovered");
+
 			$responseXmlObject = HttpRequestHelper::getResponseXml(
 				$response,
 				__METHOD__
 			);
-			$xmlPart = $responseXmlObject->xpath("/d:multistatus/d:response[1]/d:propstat/d:prop/oc:id");
-			if ($xmlPart === false) {
-				throw new Exception(
-					__METHOD__ . " oc:id not found in webdav propfind for user $user - so the personal space id cannot be discovered"
-				);
-			}
-			$ocIdRawString = $xmlPart[0]->__toString();
-			$separator = "!";
-			if (\strpos($ocIdRawString, $separator) !== false) {
-				// The string is not base64-encoded, because the exclamation mark is not in the base64 alphabet.
-				// We expect to have a string with 2 parts separated by the exclamation mark.
-				// This is the format introduced in 2022-02
-				// oc:id should be something like:
-				// "7464caf6-1799-103c-9046-c7b74deb5f63!7464caf6-1799-103c-9046-c7b74deb5f63"
-				// There is no encoding to decode.
-				$decodedId = $ocIdRawString;
-			} else {
-				// fall-back to assuming that the oc:id is base64-encoded
-				// That is the format used before and up to 2022-02
-				// This can be removed after both the edge and master branches of cs3org/reva are using the new format.
-				// oc:id should be some base64 encoded string like:
-				// "NzQ2NGNhZjYtMTc5OS0xMDNjLTkwNDYtYzdiNzRkZWI1ZjYzOjc0NjRjYWY2LTE3OTktMTAzYy05MDQ2LWM3Yjc0ZGViNWY2Mw=="
-				// That should decode to something like:
-				// "7464caf6-1799-103c-9046-c7b74deb5f63:7464caf6-1799-103c-9046-c7b74deb5f63"
-				$decodedId = base64_decode($ocIdRawString);
-				$separator = ":";
-			}
-			$ocIdParts = \explode($separator, $decodedId);
-			if (\count($ocIdParts) !== 2) {
-				throw new Exception(
-					__METHOD__ . " the oc:id $decodedId for user $user does not have 2 parts separated by '$separator', so the personal space id cannot be discovered"
-				);
-			}
-			$personalSpaceId = $ocIdParts[0];
+			$xmlPart = $responseXmlObject->xpath("/d:multistatus/d:response[1]/d:propstat/d:prop/oc:spaceid");
+			Assert::assertNotEmpty($xmlPart, "The 'oc:spaceid' for user '$user' was not found in the PROPFIND response");
+
+			$personalSpaceId = $xmlPart[0]->__toString();
 		} else {
 			foreach ($json->value as $spaces) {
 				if ($spaces->driveType === "personal") {
@@ -627,18 +590,12 @@ class WebDavHelper {
 				}
 			}
 		}
-		if ($personalSpaceId) {
-			// If env var LOG_PERSONAL_SPACE_ID is defined, then output the details of the personal space id.
-			// This is a useful debugging tool to have confidence that the personal space id is found correctly.
-			if (\getenv('LOG_PERSONAL_SPACE_ID') !== false) {
-				echo __METHOD__ . " personal space id of user $user is $personalSpaceId\n";
-			}
-			self::$spacesIdRef[$user] = [];
-			self::$spacesIdRef[$user]["personal"] = $personalSpaceId;
-			return $personalSpaceId;
-		} else {
-			throw new SpaceNotFoundException(__METHOD__ . " Personal space not found for user " . $user);
-		}
+
+		Assert::assertNotEmpty($personalSpaceId, "The personal space id for user '$user' was not found");
+
+		self::$spacesIdRef[$user] = [];
+		self::$spacesIdRef[$user]["personal"] = $personalSpaceId;
+		return $personalSpaceId;
 	}
 
 	/**
