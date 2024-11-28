@@ -1346,6 +1346,33 @@ class SpacesContext implements Context {
 	}
 
 	/**
+	 * @When user :user updates the content of federated share :share with :content using the WebDAV API
+	 *
+	 * @param string $user
+	 * @param string $share
+	 * @param string $content
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws Exception
+	 */
+	public function userUpdatesTheContentOfFederatedShareWithUsingTheWebdavApi(
+		string $user,
+		string $share,
+		string $content,
+	): void {
+		$spaceId = $this->getSharesRemoteItemId($user, $share);
+		$this->featureContext->setResponse(
+			$this->featureContext->uploadFileWithContent(
+				$user,
+				$content,
+				'',
+				$spaceId
+			)
+		);
+	}
+
+	/**
 	 * @When /^user "([^"]*)" uploads a file "([^"]*)" to "([^"]*)" in space "([^"]*)" using the WebDAV API$/
 	 *
 	 * @param string $user
