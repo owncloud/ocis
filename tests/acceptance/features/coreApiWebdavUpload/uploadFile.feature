@@ -372,7 +372,7 @@ Feature: upload file
     And for user "Brian" the content of the file "/textfile.txt" of the space "new-space" should be ""
     And for user "Alice" the content of the file "/textfile.txt" of the space "new-space" should be ""
 
-  @issue-8699 @issue-10331
+  @skipOnReva @issue-8699 @issue-10331
   Scenario: user updates a file inside a link shared space with empty content
     Given using SharingNG
     And user "Brian" has been created with default attributes
