@@ -251,7 +251,7 @@ class OcmContext implements Context {
 	}
 
 	/**
-	 * @When the user waits :number seconds for the token to expire
+	 * @When the user waits :number seconds for the invitation token to expire
 	 *
 	 * @param int $number
 	 *

@@ -31,19 +31,17 @@ Feature: accepting invitation
   Scenario: two users can accept one invitation
     Given using server "LOCAL"
     And "Alice" has created the federation share invitation
-    When using server "REMOTE"
-    And "Brian" accepts the last federation share invitation
+    And using server "REMOTE"
+    And "Brian" has accepted invitation
+    When "Carol" accepts the last federation share invitation
     Then the HTTP status code should be "200"
-    And "Carol" accepts the last federation share invitation
-    And the HTTP status code should be "200"
 
 
   Scenario: user tries to accept the invitation twice
     Given using server "LOCAL"
     And "Alice" has created the federation share invitation
-    When using server "REMOTE"
-    And "Brian" accepts the last federation share invitation
-    Then the HTTP status code should be "200"
+    And using server "REMOTE"
+    And "Brian" has accepted invitation
     When "Brian" tries to accept the last federation share invitation
     Then the HTTP status code should be "409"
     And the JSON data of the response should match
@@ -100,7 +98,7 @@ Feature: accepting invitation
     And the config "OCM_OCM_INVITE_MANAGER_TOKEN_EXPIRATION" has been set to "1s"
     And "Alice" has created the federation share invitation
     When using server "REMOTE"
-    And the user waits "2" seconds for the token to expire
+    And the user waits "2" seconds for the invitation token to expire
     And "Brian" tries to accept the last federation share invitation
     Then the HTTP status code should be "400"
     And the JSON data of the response should match

@@ -250,8 +250,8 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 
 #### [OCM. federated connection is not dropped when one of the users deletes the connection](https://github.com/owncloud/ocis/issues/10216)
 
-- [apiOcm/deleteFederatedConnections.feature:39](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/deleteFederatedConnections.feature#L39)
-- [apiOcm/deleteFederatedConnections.feature:66](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/deleteFederatedConnections.feature#L66)
+- [apiOcm/deleteFederatedConnections.feature:21](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/deleteFederatedConnections.feature#L21)
+- [apiOcm/deleteFederatedConnections.feature:67](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/deleteFederatedConnections.feature#L67)
 
 #### [OCM. server crash after deleting share for ocm user](https://github.com/owncloud/ocis/issues/10213)
 
