@@ -729,6 +729,18 @@ class FeatureContext extends BehatVariablesContext {
 	}
 
 	/**
+	 * removes the port from the ocis URL
+	 *
+	 * @param string $url
+	 *
+	 * @return string
+	 */
+	public function removeSchemeAndPortFromUrl(string $url): string {
+		$parsedUrl = parse_url($url);
+		return $parsedUrl["host"];
+	}
+
+	/**
 	 * returns the base URL (which is without a slash at the end)
 	 *
 	 * @return string
@@ -781,6 +793,24 @@ class FeatureContext extends BehatVariablesContext {
 	 */
 	public function getBaseUrlWithoutScheme(): string {
 		return $this->removeSchemeFromUrl($this->getBaseUrl());
+	}
+
+	/**
+	 * returns the base URL but without "http(s)://" and port
+	 *
+	 * @return string
+	 */
+	public function getBaseUrlHostName(): string {
+		return $this->removeSchemeAndPortFromUrl($this->getBaseUrl());
+	}
+
+	/**
+	 * returns the base URL but without "http(s)://" and port
+	 *
+	 * @return string
+	 */
+	public function getCollaborationHostName(): string {
+		return $this->removeSchemeAndPortFromUrl(OcisHelper::getCollaborationServiceUrl());
 	}
 
 	/**
@@ -2175,6 +2205,22 @@ class FeatureContext extends BehatVariablesContext {
 				"function" => [
 					$this,
 					"getBaseUrlWithoutScheme"
+				],
+				"parameter" => []
+			],
+			[
+				"code" => "%base_url_hostname%",
+				"function" => [
+					$this,
+					"getBaseUrlHostName"
+				],
+				"parameter" => []
+			],
+			[
+				"code" => "%collaboration_hostname%",
+				"function" => [
+					$this,
+					"getCollaborationHostName"
 				],
 				"parameter" => []
 			],

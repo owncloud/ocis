@@ -94,6 +94,7 @@ config = {
         "graph": {
             "suites": [
                 "apiGraph",
+                "apiServiceAvailability",
             ],
             "skip": False,
             "withRemotePhp": [True],
@@ -180,6 +181,7 @@ config = {
                 "NOTIFICATIONS_SMTP_PORT": "2500",
                 "NOTIFICATIONS_SMTP_INSECURE": "true",
                 "NOTIFICATIONS_SMTP_SENDER": "ownCloud <noreply@example.com>",
+                "NOTIFICATIONS_DEBUG_ADDR": "0.0.0.0:9174",
             },
         },
         "antivirus": {
@@ -194,6 +196,7 @@ config = {
                 "POSTPROCESSING_STEPS": "virusscan",
                 "OCIS_ASYNC_UPLOADS": True,
                 "OCIS_ADD_RUN_SERVICES": "antivirus",
+                "ANTIVIRUS_DEBUG_ADDR": "0.0.0.0:9297",
             },
         },
         "searchContent": {
@@ -1029,6 +1032,7 @@ def localApiTests(ctx, name, suites, storage = "ocis", extra_environment = {}, w
         "UPLOAD_DELETE_WAIT_TIME": "1" if storage == "owncloud" else 0,
         "OCIS_WRAPPER_URL": "http://%s:5200" % OCIS_SERVER_NAME,
         "WITH_REMOTE_PHP": with_remote_php,
+        "COLLABORATION_SERVICE_URL": "http://wopi-fakeoffice:9300",
     }
 
     for item in extra_environment:
@@ -2322,6 +2326,42 @@ def ocisServer(storage = "ocis", accounts_hash_difficulty = 4, volumes = [], dep
         "OCIS_JWT_SECRET": "some-ocis-jwt-secret",
         "EVENTHISTORY_STORE": "memory",
         "OCIS_TRANSLATION_PATH": "%s/tests/config/translations" % dirs["base"],
+        # debug addresses required for running services health tests
+        "ACTIVITYLOG_DEBUG_ADDR": "0.0.0.0:9197",
+        "APP_PROVIDER_DEBUG_ADDR": "0.0.0.0:9165",
+        "APP_REGISTRY_DEBUG_ADDR": "0.0.0.0:9243",
+        "AUTH_BASIC_DEBUG_ADDR": "0.0.0.0:9147",
+        "AUTH_MACHINE_DEBUG_ADDR": "0.0.0.0:9167",
+        "AUTH_SERVICE_DEBUG_ADDR": "0.0.0.0:9198",
+        "CLIENTLOG_DEBUG_ADDR": "0.0.0.0:9260",
+        "EVENTHISTORY_DEBUG_ADDR": "0.0.0.0:9270",
+        "FRONTEND_DEBUG_ADDR": "0.0.0.0:9141",
+        "GATEWAY_DEBUG_ADDR": "0.0.0.0:9143",
+        "GRAPH_DEBUG_ADDR": "0.0.0.0:9124",
+        "GROUPS_DEBUG_ADDR": "0.0.0.0:9161",
+        "IDM_DEBUG_ADDR": "0.0.0.0:9239",
+        "IDP_DEBUG_ADDR": "0.0.0.0:9134",
+        "INVITATIONS_DEBUG_ADDR": "0.0.0.0:9269",
+        "NATS_DEBUG_ADDR": "0.0.0.0:9234",
+        "OCDAV_DEBUG_ADDR": "0.0.0.0:9163",
+        "OCM_DEBUG_ADDR": "0.0.0.0:9281",
+        "OCS_DEBUG_ADDR": "0.0.0.0:9114",
+        "POSTPROCESSING_DEBUG_ADDR": "0.0.0.0:9255",
+        "PROXY_DEBUG_ADDR": "0.0.0.0:9205",
+        "SEARCH_DEBUG_ADDR": "0.0.0.0:9224",
+        "SETTINGS_DEBUG_ADDR": "0.0.0.0:9194",
+        "SHARING_DEBUG_ADDR": "0.0.0.0:9151",
+        "SSE_DEBUG_ADDR": "0.0.0.0:9139",
+        "STORAGE_PUBLICLINK_DEBUG_ADDR": "0.0.0.0:9179",
+        "STORAGE_SHARES_DEBUG_ADDR": "0.0.0.0:9156",
+        "STORAGE_SYSTEM_DEBUG_ADDR": "0.0.0.0:9217",
+        "STORAGE_USERS_DEBUG_ADDR": "0.0.0.0:9159",
+        "THUMBNAILS_DEBUG_ADDR": "0.0.0.0:9189",
+        "USERLOG_DEBUG_ADDR": "0.0.0.0:9214",
+        "USERS_DEBUG_ADDR": "0.0.0.0:9145",
+        "WEB_DEBUG_ADDR": "0.0.0.0:9104",
+        "WEBDAV_DEBUG_ADDR": "0.0.0.0:9119",
+        "WEBFINGER_DEBUG_ADDR": "0.0.0.0:9279",
     }
 
     if deploy_type == "":

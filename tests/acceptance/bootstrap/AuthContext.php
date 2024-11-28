@@ -205,9 +205,14 @@ class AuthContext implements Context {
 	 * @throws Exception
 	 */
 	public function userRequestsEndpointsWithNoAuthentication(string $method, TableNode $table):void {
-		$this->featureContext->verifyTableNodeColumns($table, ['endpoint']);
+		$this->featureContext->verifyTableNodeColumns($table, ['endpoint'], ['service']);
 		foreach ($table->getHash() as $row) {
-			$this->featureContext->setResponse($this->sendRequest($row['endpoint'], $method));
+			$this->featureContext->setResponse(
+				$this->sendRequest(
+					$this->featureContext->substituteInLineCodes($row['endpoint']),
+					$method
+				)
+			);
 			$this->featureContext->pushToLastStatusCodesArrays();
 		}
 	}

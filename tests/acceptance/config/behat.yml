@@ -416,6 +416,14 @@ default:
         - CollaborationContext:
         - TrashbinContext:
 
+    apiServiceAvailability:
+      paths:
+        - "%paths.base%/../features/apiServiceAvailability"
+      context: *common_ldap_suite_context
+      contexts:
+        - FeatureContext: *common_feature_context_params
+        - OcisConfigContext:
+
     cliCommands:
       paths:
         - "%paths.base%/../features/cliCommands"

@@ -75,6 +75,16 @@ class OcisHelper {
 	}
 
 	/**
+	 * @return string
+	 */
+	public static function getCollaborationServiceUrl(): string {
+		if (\getenv("COLLABORATION_SERVICE_URL")) {
+			return \getenv("COLLABORATION_SERVICE_URL");
+		}
+		return "http://localhost:9300";
+	}
+
+	/**
 	 * @return bool
 	 */
 	public static function isTestingOnReva():bool {
