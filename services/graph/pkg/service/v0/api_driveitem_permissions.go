@@ -378,7 +378,14 @@ func (s DriveItemPermissionsService) ListPermissions(ctx context.Context, itemID
 		return collectionOfPermissions, nil
 	}
 
-	driveItems := make(driveItemsByResourceID)
+	driveItems := make(driveItemsByResourceID, 1)
+	// we can use the statResponse to build the drive item before fetching the shares
+	item, err := cs3ResourceToDriveItem(s.logger, statResponse.GetInfo())
+	if err != nil {
+		return collectionOfPermissions, err
+	}
+	driveItems[storagespace.FormatResourceID(statResponse.GetInfo().GetId())] = *item
+
 	if IsSpaceRoot(statResponse.GetInfo().GetId()) {
 		permissions, err := s.getSpaceRootPermissions(ctx, statResponse.GetInfo().GetSpace().GetId())
 		if err != nil {

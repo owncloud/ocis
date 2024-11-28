@@ -121,6 +121,7 @@ func DefaultConfig() *config.Config {
 			Cluster:   "ocis-cluster",
 			EnableTLS: false,
 		},
+		MaxConcurrency: 20,
 		UnifiedRoles: config.UnifiedRoles{
 			AvailableRoles: nil, // will be populated with defaults in EnsureDefaults
 		},

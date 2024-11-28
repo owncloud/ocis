@@ -31,6 +31,7 @@ type Config struct {
 	IncludeOCMSharees bool         `yaml:"include_ocm_sharees" env:"OCIS_ENABLE_OCM;GRAPH_INCLUDE_OCM_SHAREES" desc:"Include OCM sharees when listing users." introductionVersion:"5.0"`
 	Events            Events       `yaml:"events"`
 	UnifiedRoles      UnifiedRoles `yaml:"unified_roles"`
+	MaxConcurrency    int          `yaml:"max_concurrency" env:"OCIS_MAX_CONCURRENCY;GRAPH_MAX_CONCURRENCY" desc:"The maximum number of concurrent requests the service will handle." introductionVersion:"7.0"`
 
 	Keycloak       Keycloak       `yaml:"keycloak"`
 	ServiceAccount ServiceAccount `yaml:"service_account"`
