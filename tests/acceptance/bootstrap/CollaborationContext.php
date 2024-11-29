@@ -423,7 +423,7 @@ class CollaborationContext implements Context {
 			$file
 		);
 		$this->featureContext->theHTTPStatusCodeShouldBe(200, "", $response);
-		$decodedResponse[] = $this->featureContext->getJsonDecodedResponseBodyContent($response);
-		return $decodedResponse[0]->file_id;
+		$decodedResponse = $this->featureContext->getJsonDecodedResponseBodyContent($response);
+		return $decodedResponse->file_id;
 	}
 }

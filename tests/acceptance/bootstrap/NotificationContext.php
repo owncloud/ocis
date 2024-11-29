@@ -204,7 +204,7 @@ class NotificationContext implements Context {
 	 */
 	public function userDeletesNotificationOfResourceAndSubject(string $user, string $resource, string $subject):void {
 		$response = $this->listAllNotifications($user);
-		$this->filterResponseByNotificationSubjectAndResource($subject, $resource, $response);
+		$this->filterNotificationsBySubjectAndResource($subject, $resource, $response);
 		$this->featureContext->setResponse($this->userDeletesNotification($user));
 	}
 
@@ -351,27 +351,23 @@ class NotificationContext implements Context {
 	 *
 	 * @return array
 	 */
-	public function filterResponseByNotificationSubjectAndResource(string $subject, string $resource, ?ResponseInterface $response = null): array {
-		$responseBodyArray = [];
+	public function filterNotificationsBySubjectAndResource(string $subject, string $resource, ?ResponseInterface $response = null): array {
+		$filteredNotifications = [];
 		$response = $response ?? $this->featureContext->getResponse();
-		$statusCode = $response->getStatusCode();
-		if ($statusCode !== 200) {
-			$response = $response->getBody()->getContents();
-			Assert::fail($response . " Response should contain status code 200");
+		$responseObject = $this->featureContext->getJsonDecodedResponseBodyContent($response);
+
+		if (!isset($responseObject->ocs->data)) {
+			Assert::fail("Response doesn't contain notification: " . print_r($responseObject, true));
 		}
-		if (isset($this->featureContext->getJsonDecodedResponseBodyContent($response)->ocs->data)) {
-			$responseBody = $this->featureContext->getJsonDecodedResponseBodyContent($response)->ocs->data;
-			foreach ($responseBody as $value) {
-				if (isset($value->subject) && $value->subject === $subject && isset($value->messageRichParameters->resource->name) && $value->messageRichParameters->resource->name === $resource) {
-					$this->notificationIds[] = $value->notification_id;
-					$responseBodyArray[] = $value;
-				}
+
+		$notifications = $responseObject->ocs->data;
+		foreach ($notifications as $notification) {
+			if (isset($notification->subject) && $notification->subject === $subject && isset($notification->messageRichParameters->resource->name) && $notification->messageRichParameters->resource->name === $resource) {
+				$this->notificationIds[] = $notification->notification_id;
+				$filteredNotifications[] = $notification;
 			}
-		} else {
-			$responseBodyArray[] = $this->featureContext->getJsonDecodedResponseBodyContent($response);
-			Assert::fail("Response should contain notification but found: " . print_r($responseBodyArray, true));
 		}
-		return $responseBodyArray;
+		return $filteredNotifications;
 	}
 
 	/**
@@ -423,7 +419,7 @@ class NotificationContext implements Context {
 	 */
 	public function userShouldGetNotificationForResourceWithMessage(string $user, string $resource, string $subject, TableNode $table):void {
 		$response = $this->listAllNotifications($user);
-		$notification = $this->filterResponseByNotificationSubjectAndResource($subject, $resource, $response);
+		$notification = $this->filterNotificationsBySubjectAndResource($subject, $resource, $response);
 
 		if (\count($notification) === 1) {
 			$actualMessage = str_replace(["\r", "\r"], " ", $notification[0]->message);
@@ -453,7 +449,7 @@ class NotificationContext implements Context {
 	 */
 	public function userShouldNotHaveANotificationRelatedToResourceWithSubject(string $user, string $resource, string $subject):void {
 		$response = $this->listAllNotifications($user);
-		$filteredResponse = $this->filterResponseByNotificationSubjectAndResource($subject, $resource, $response);
+		$filteredResponse = $this->filterNotificationsBySubjectAndResource($subject, $resource, $response);
 		Assert::assertCount(0, $filteredResponse, "Response should not contain notification related to resource '$resource' with subject '$subject' but found" . print_r($filteredResponse, true));
 	}
 
