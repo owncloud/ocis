@@ -1,6 +1,6 @@
 ---
 title: Antivirus
-date: 2024-11-29T10:48:07.285878306Z
+date: 2024-11-29T11:15:38.047069748Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/antivirus
@@ -18,6 +18,7 @@ The `antivirus` service is responsible for scanning files for viruses.
 
 ## Table of Contents
 
+* [Memory Considerations](#memory-considerations)
 * [Configuration](#configuration)
   * [Antivirus Scanner Type](#antivirus-scanner-type)
   * [Maximum Scan Size](#maximum-scan-size)
@@ -28,6 +29,19 @@ The `antivirus` service is responsible for scanning files for viruses.
   * [Postprocessing](#postprocessing)
   * [Scaling in Kubernetes](#scaling-in-kubernetes)
 * [Example Yaml Config](#example-yaml-config)
+
+## Memory Considerations
+
+The antivirus service can consume considerably amounts of memory. This is relevant to provide or define sufficient memory for the deployment selected. To avoid out of memory (OOM) situations, the following equation gives a rough overview based on experiences made. The memory calculation comes without any guarantee, is intended as overview only and subject of change.
+
+`memory limit` = `max file size` x `workers` x `factor 8 - 14`
+
+With:
+`ANTIVIRUS_WORKERS` == 1
+```plaintext
+ 50MB file --> factor 14   --> 700MB memory
+844MB file --> factor  8,3 -->   7GB memory
+```
 
 ## Configuration
 
