@@ -130,22 +130,6 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * response content parsed from XML to an array
-	 *
-	 * @var array
-	 */
-	private array $responseXml = [];
-
-	/**
-	 * @param array $responseXml
-	 *
-	 * @return void
-	 */
-	public function setResponseXml(array $responseXml): void {
-		$this->responseXml = $responseXml;
-	}
-
-	/**
 	 * Get SpaceId by Name
 	 *
 	 * @param $name string
@@ -362,8 +346,8 @@ class SpacesContext implements Context {
 		);
 
 		$this->featureContext->theHttpStatusCodeShouldBe(207, '', $response);
-		$xmlResponse = HttpRequestHelper::getResponseXml($response, __METHOD__);
-		$fileId = $xmlResponse->xpath("//d:response/d:propstat/d:prop/oc:fileid")[0];
+		$responseXmlObject = HttpRequestHelper::getResponseXml($response, __METHOD__);
+		$fileId = $responseXmlObject->xpath("//d:response/d:propstat/d:prop/oc:fileid")[0];
 		return $fileId->__toString();
 	}
 
@@ -2417,9 +2401,9 @@ class SpacesContext implements Context {
 			$body,
 			$this->featureContext->getStepLineRef()
 		);
-		$responseXml = HttpRequestHelper::getResponseXml($response, __METHOD__);
-		$sharer = (string) $responseXml->data->uid_owner;
-		$this->featureContext->addToCreatedUserGroupshares($sharer, $responseXml->data);
+		$responseXmlObject = HttpRequestHelper::getResponseXml($response, __METHOD__);
+		$sharer = (string) $responseXmlObject->data->uid_owner;
+		$this->featureContext->addToCreatedUserGroupshares($sharer, $responseXmlObject->data);
 		return $response;
 	}
 
@@ -2580,8 +2564,8 @@ class SpacesContext implements Context {
 			$this->featureContext->getStepLineRef()
 		);
 
-		$responseXml = HttpRequestHelper::getResponseXml($response, __METHOD__);
-		$this->featureContext->addToCreatedPublicShares($responseXml->data);
+		$responseXmlObject = HttpRequestHelper::getResponseXml($response, __METHOD__);
+		$this->featureContext->addToCreatedPublicShares($responseXmlObject->data);
 		return $response;
 	}
 
@@ -3565,8 +3549,7 @@ class SpacesContext implements Context {
 			$this->featureContext->getStepLineRef()
 		);
 
-		$responseXml = HttpRequestHelper::getResponseXml($response, __METHOD__);
-		$this->featureContext->addToCreatedPublicShares($responseXml->data);
+		$this->featureContext->addToCreatedPublicShares(HttpRequestHelper::getResponseXml($response, __METHOD__)->data);
 		return $response;
 	}
 
@@ -3830,7 +3813,7 @@ class SpacesContext implements Context {
 	 */
 	public function searchResultShouldContainSpace(string $user, string $spaceName): void {
 		// get a response after a Report request (called in the core)
-		$responseArray = json_decode(json_encode($this->featureContext->getResponseXml()->xpath("//d:response/d:href")), true, 512, JSON_THROW_ON_ERROR);
+		$responseArray = json_decode(json_encode(HttpRequestHelper::getResponseXml($this->featureContext->getResponse())->xpath("//d:response/d:href")), true, 512, JSON_THROW_ON_ERROR);
 		Assert::assertNotEmpty($responseArray, "search result is empty");
 
 		// for mountpoint, id looks a little different than for project space
@@ -4017,16 +4000,16 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @param string $resource	// can be resource name, space id or file id
-	 * @param array $properties	// ["key" => "value"]
+	 * @param string $resource // can be resource name, space id or file id
+	 * @param array $properties // ["key" => "value"]
 	 *
 	 * @return void
 	 * @throws GuzzleException
 	 * @throws JsonException
 	 */
 	public function theXMLResponseShouldContain(string $resource, array $properties): void {
-		$xmlResponse = HttpRequestHelper::getResponseXml($response, __METHOD__);
-		$hrefs = array_map(fn ($href) => $href->__toString(), $xmlResponse->xpath("//d:response/d:href"));
+		$responseXmlObject = HttpRequestHelper::getResponseXml($this->featureContext->getResponse(), __METHOD__);
+		$hrefs = array_map(fn ($href) => $href->__toString(), $responseXmlObject->xpath("//d:response/d:href"));
 
 		$currentHref = '';
 		foreach ($hrefs as $href) {
@@ -4062,14 +4045,14 @@ class SpacesContext implements Context {
 				// check every xpath
 				foreach ($xpaths as $key => $path) {
 					$xpath = "{$path}{$itemToFind}";
-					$foundXmlItem = $xmlResponse->xpath($xpath);
+					$foundXmlItem = $responseXmlObject->xpath($xpath);
 					$xpaths[$key] = $xpath;
 					if (\count($foundXmlItem)) {
 						break;
 					}
 				}
 			} else {
-				$foundXmlItem = $xmlResponse->xpath($xpath);
+				$foundXmlItem = $responseXmlObject->xpath($xpath);
 				$xpaths[] = $xpath;
 			}
 
@@ -4079,7 +4062,7 @@ class SpacesContext implements Context {
 				"Using xpaths:\n\t- " . \join("\n\t- ", $xpaths)
 				. "\n"
 				. "Could not find '<$itemToFind>' element in the XML response\n\t"
-				. "'" . \trim($xmlResponse->asXML()) . "'"
+				. "'" . \trim($responseXmlObject->asXML()) . "'"
 			);
 
 			$actualValue = $foundXmlItem[0]->__toString();
@@ -4144,8 +4127,8 @@ class SpacesContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function asUserTheKeyFromPropfindResponseShouldMatchWithSharedwithmeDriveitemidOfShare(string $user, string $key, string $resource): void {
-		$xmlResponse = HttpRequestHelper::getResponseXml($response, __METHOD__);
-		$fileId = $xmlResponse->xpath("//oc:name[text()='$resource']/preceding-sibling::$key")[0]->__toString();
+		$responseXmlObject = HttpRequestHelper::getResponseXml($this->featureContext->getResponse(), __METHOD__);
+		$fileId = $responseXmlObject->xpath("//oc:name[text()='$resource']/preceding-sibling::$key")[0]->__toString();
 
 		$jsonResponse = GraphHelper::getSharesSharedWithMe(
 			$this->featureContext->getBaseUrl(),
@@ -4172,25 +4155,30 @@ class SpacesContext implements Context {
 	 * @param string $resource
 	 *
 	 * @return void
-	 * @throws GuzzleException|JsonException
+	 * @throws GuzzleException
+	 * @throws Exception
 	 */
 	public function publicDownloadsTheFolderFromTheLastCreatedPublicLink(string $resource) {
 		$token = ($this->featureContext->isUsingSharingNG()) ? $this->featureContext->shareNgGetLastCreatedLinkShareToken() : $this->featureContext->getLastCreatedPublicShareToken();
-		$response = $this->featureContext->listFolderAndReturnResponseXml(
-			$token,
-			$resource,
-			'0',
-			['oc:fileid'],
-			"public-files"
+
+		$responseXmlObject = HttpRequestHelper::getResponseXml(
+			$this->featureContext->listFolder(
+				$token,
+				$resource,
+				'0',
+				['oc:fileid'],
+				null,
+				"public-files"
+			)
 		);
-		$resourceId = json_decode(json_encode($response->xpath("//d:response/d:propstat/d:prop/oc:fileid")), true, 512, JSON_THROW_ON_ERROR);
+		$resourceId = $responseXmlObject->xpath("//d:response/d:propstat/d:prop/oc:fileid");
 		$queryString = 'public-token=' . $token . '&id=' . $resourceId[0][0];
 		$this->featureContext->setResponse(
 			HttpRequestHelper::get(
 				$this->archiverContext->getArchiverUrl($queryString),
 				$this->featureContext->getStepLineRef(),
 				'',
-				'',
+				''
 			)
 		);
 	}
@@ -4211,11 +4199,9 @@ class SpacesContext implements Context {
 				$quotaAmount,
 				"Expected relative quota amount to be $quotaAmount but found to be $data->quota->relative"
 			);
-		} else {
-			throw new Exception(
-				"No relative quota amount found in responseXml"
-			);
+			return;
 		}
+		Assert::fail("No relative quota amount found in response");
 	}
 
 	/**

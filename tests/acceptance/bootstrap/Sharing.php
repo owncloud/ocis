@@ -271,7 +271,7 @@ trait Sharing {
 	 * @throws Exception
 	 */
 	public function getServerShareTimeFromLastResponse():int {
-		$stime = $this->getResponseXml(null, __METHOD__)->xpath("//stime");
+		$stime = HttpRequestHelper::getResponseXml($this->response, __METHOD__)->xpath("//stime");
 		if ($stime) {
 			return (int) $stime[0];
 		}
@@ -921,13 +921,13 @@ trait Sharing {
 		if (($response->getStatusCode() === 200)
 			&& \in_array($this->ocsContext->getOCSResponseStatusCode($response), ['100', '200'])
 		) {
-			$xmlResponse = $this->getResponseXml($response);
-			if (isset($xmlResponse->data)) {
-				$shareData = $xmlResponse->data;
+			$responseXmlObject = HttpRequestHelper::getResponseXml($response);
+			if (isset($responseXmlObject->data)) {
+				$shareData = $responseXmlObject->data;
 				if ($shareType === 'public_link') {
 					$this->addToCreatedPublicShares($shareData);
 				} else {
-					$sharer = (string) $xmlResponse->data->uid_owner;
+					$sharer = (string) $responseXmlObject->data->uid_owner;
 					$this->addToCreatedUserGroupshares($sharer, $shareData);
 				}
 			}
@@ -981,7 +981,7 @@ trait Sharing {
 	 */
 	public function isFieldInResponse(string $field, ?string $contentExpected, bool $expectSuccess = true, ?SimpleXMLElement $data = null):bool {
 		if ($data === null) {
-			$data = $this->getResponseXml(null, __METHOD__)->data[0];
+			$data = HttpRequestHelper::getResponseXml($this->response, __METHOD__)->data[0];
 		}
 		Assert::assertIsObject($data, __METHOD__ . " data not found in response XML");
 
@@ -1053,7 +1053,7 @@ trait Sharing {
 	 * @return void
 	 */
 	public function checkNoFilesFoldersInResponse():void {
-		$data = $this->getResponseXml(null, __METHOD__)->data[0];
+		$data = HttpRequestHelper::getResponseXml($this->response, __METHOD__)->data[0];
 		Assert::assertIsObject($data, __METHOD__ . " data not found in response XML");
 		Assert::assertCount(0, $data);
 	}
@@ -1067,7 +1067,7 @@ trait Sharing {
 	 */
 	public function checkCountFilesFoldersInResponse(string $count):void {
 		$count = (int) $count;
-		$data = $this->getResponseXml(null, __METHOD__)->data[0];
+		$data = HttpRequestHelper::getResponseXml($this->response, __METHOD__)->data[0];
 		Assert::assertIsObject($data, __METHOD__ . " data not found in response XML");
 		Assert::assertCount($count, $data, __METHOD__ . " the response does not contain $count entries");
 	}
@@ -2212,7 +2212,7 @@ trait Sharing {
 	 * @return void
 	 */
 	public function responseShouldNotContainAnyShareIds(ResponseInterface $response):void {
-		$data = $this->getResponseXml($response, __METHOD__)->data[0];
+		$data = HttpRequestHelper::getResponseXml($response, __METHOD__)->data[0];
 		$fieldIsSet = false;
 		$receivedShareCount = 0;
 
@@ -2275,7 +2275,7 @@ trait Sharing {
 	 * @return void
 	 */
 	public function checkingTheResponseEntriesCount(int $count):void {
-		$actualCount = \count($this->getResponseXml(null, __METHOD__)->data[0]);
+		$actualCount = \count(HttpRequestHelper::getResponseXml($this->response, __METHOD__)->data[0]);
 		Assert::assertEquals(
 			$count,
 			$actualCount,
@@ -2305,7 +2305,7 @@ trait Sharing {
 	 */
 	public function checkTheFields(string $user, ?TableNode $body, ?ResponseInterface $response = null):void {
 		$response = $response ?? $this->getResponse();
-		$data = $this->getResponseXml($response, __METHOD__)->data[0];
+		$data = HttpRequestHelper::getResponseXml($response, __METHOD__)->data[0];
 		$this->verifyTableNodeColumnsCount($body, 2);
 		$bodyRows = $body->getRowsHash();
 		$userRelatedFieldNames = [
@@ -2359,7 +2359,7 @@ trait Sharing {
 			"space_id"
 		];
 
-		$response = $this->getResponseXml(null, __METHOD__);
+		$response = HttpRequestHelper::getResponseXml($this->response, __METHOD__);
 		$this->addToCreatedPublicShares($response->data);
 		foreach ($bodyRows as $field => $value) {
 			if (\in_array($field, $userRelatedFieldNames)) {
@@ -2440,7 +2440,7 @@ trait Sharing {
 	 * @return void
 	 */
 	public function theFieldsOfTheLastResponseShouldBeEmpty():void {
-		$data = $this->getResponseXml(null, __METHOD__)->data[0];
+		$data = HttpRequestHelper::getResponseXml($this->response, __METHOD__)->data[0];
 		Assert::assertEquals(
 			\count($data->element),
 			0,
@@ -2455,8 +2455,8 @@ trait Sharing {
 	 * @throws Exception
 	 */
 	public function getSharingAttributesFromLastResponse():string {
-		$responseXml = $this->getResponseXml(null, __METHOD__)->data[0];
-		$actualAttributesElement = $responseXml->xpath('//attributes');
+		$responseXmlObject = HttpRequestHelper::getResponseXml($this->response, __METHOD__)->data[0];
+		$actualAttributesElement = $responseXmlObject->xpath('//attributes');
 
 		if ($actualAttributesElement) {
 			$actualAttributes = (array) $actualAttributesElement[0];
@@ -2543,7 +2543,7 @@ trait Sharing {
 	public function userDownloadsFailWithMessage(string $fileName, string $user, PyStringNode $errorMessage):void {
 		$user = $this->getActualUsername($user);
 		$response = $this->downloadFileAsUserUsingPassword($user, $fileName);
-		$receivedErrorMessage = $this->getResponseXml($response, __METHOD__)->xpath('//s:message');
+		$receivedErrorMessage = HttpRequestHelper::getResponseXml($response, __METHOD__)->xpath('//s:message');
 		Assert::assertEquals(
 			$errorMessage,
 			(string) $receivedErrorMessage[0],
@@ -2600,7 +2600,7 @@ trait Sharing {
 			[],
 			$this->ocsApiVersion
 		);
-		return $this->getResponseXml($response, __METHOD__)->data->element;
+		return HttpRequestHelper::getResponseXml($response, __METHOD__)->data->element;
 	}
 
 	/**

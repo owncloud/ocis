@@ -85,12 +85,12 @@ class TrashbinContext implements Context {
 	/**
 	 * Get files list from the response from trashbin api
 	 *
-	 * @param SimpleXMLElement|null $responseXml
+	 * @param SimpleXMLElement|null $responseXmlObject
 	 *
 	 * @return array
 	 */
-	public function getTrashbinContentFromResponseXml(?SimpleXMLElement $responseXml): array {
-		$xmlElements = $responseXml->xpath('//d:response');
+	public function getTrashbinContentFromResponseXml(?SimpleXMLElement $responseXmlObject): array {
+		$xmlElements = $responseXmlObject->xpath('//d:response');
 		$files = \array_map(
 			static function (SimpleXMLElement $element) {
 				$href = $element->xpath('./d:href')[0];
@@ -178,13 +178,13 @@ class TrashbinContext implements Context {
 			$davPathVersion
 		);
 		$this->featureContext->setResponse($response);
-		$responseXml = HttpRequestHelper::getResponseXml(
-			$response,
-			__METHOD__
-		);
 
-		$this->featureContext->setResponseXmlObject($responseXml);
-		$files = $this->getTrashbinContentFromResponseXml($responseXml);
+		$files = $this->getTrashbinContentFromResponseXml(
+			HttpRequestHelper::getResponseXml(
+				$response,
+				__METHOD__
+			)
+		);
 		// filter root element
 		$files = \array_filter(
 			$files,
@@ -253,12 +253,12 @@ class TrashbinContext implements Context {
 		$respBody = $response->getBody()->getContents();
 		Assert::assertEquals("207", $statusCode, "Expected status code to be '207' but got $statusCode \nResponse\n$respBody");
 
-		$responseXml = HttpRequestHelper::getResponseXml(
-			$response,
-			__METHOD__ . " $collectionPath"
+		$files = $this->getTrashbinContentFromResponseXml(
+			HttpRequestHelper::getResponseXml(
+				$response,
+				__METHOD__ . " $collectionPath"
+			)
 		);
-
-		$files = $this->getTrashbinContentFromResponseXml($responseXml);
 
 		$suffixPath = $user;
 		if ($davPathVersion === WebDavHelper::DAV_VERSION_SPACES) {
@@ -345,8 +345,7 @@ class TrashbinContext implements Context {
 	 */
 	public function theTrashbinDavResponseShouldNotContainTheseNodes(TableNode $table):void {
 		$this->featureContext->verifyTableNodeColumns($table, ['name']);
-		$responseXml = HttpRequestHelper::getResponseXml($response, __METHOD__);
-		$files = $this->getTrashbinContentFromResponseXml($responseXml);
+		$files = $this->getTrashbinContentFromResponseXml(HttpRequestHelper::getResponseXml($this->featureContext->getResponse(), __METHOD__));
 
 		foreach ($table->getHash() as $row) {
 			$path = trim((string)$row['name'], "/");
@@ -368,9 +367,8 @@ class TrashbinContext implements Context {
 	 */
 	public function theTrashbinDavResponseShouldContainTheseNodes(TableNode $table):void {
 		$this->featureContext->verifyTableNodeColumns($table, ['name']);
-		$responseXml = HttpRequestHelper::getResponseXml($response, __METHOD__);
 
-		$files = $this->getTrashbinContentFromResponseXml($responseXml);
+		$files = $this->getTrashbinContentFromResponseXml(HttpRequestHelper::getResponseXml($this->featureContext->getResponse(), __METHOD__));
 
 		foreach ($table->getHash() as $row) {
 			$path = trim($row['name'], "/");
@@ -484,7 +482,7 @@ class TrashbinContext implements Context {
 	 * @throws Exception
 	 */
 	public function theLastWebdavResponseShouldNotContainFollowingElements(TableNode $elements):void {
-		$files = $this->getTrashbinContentFromResponseXml($this->featureContext->getResponseXml());
+		$files = $this->getTrashbinContentFromResponseXml(HttpRequestHelper::getResponseXml($this->featureContext->getResponse()));
 
 		// 'user' is also allowed in the table even though it is not used anywhere
 		// This for better readability in feature files
@@ -869,44 +867,29 @@ class TrashbinContext implements Context {
 	 * @param $user string
 	 * @param $originalPath string
 	 *
-	 * @return ResponseInterface
+	 * @return void
 	 * @throws Exception
 	 */
-	public function userRestoresResourceWithOriginalPathWithoutSpecifyingDestinationUsingTrashbinApi(string $user, string $originalPath):ResponseInterface {
-		$asUser = $asUser ?? $user;
+	public function userRestoresResourceWithOriginalPathWithoutSpecifyingDestinationUsingTrashbinApi(string $user, string $originalPath):void {
 		$listing = $this->listTrashbinFolder($user);
 		$originalPath = \trim($originalPath, '/');
 
 		foreach ($listing as $entry) {
 			if ($entry['original-location'] === $originalPath) {
 				$trashItemHRef = $this->convertTrashbinHref($entry['href']);
-				$response = $this->featureContext->makeDavRequest(
-					$asUser,
-					'MOVE',
-					$trashItemHRef,
-					[],
-					null,
-					null,
-					'trash-bin'
+				$this->featureContext->setResponse(
+					$this->featureContext->makeDavRequest(
+						$user,
+						'MOVE',
+						$trashItemHRef,
+						[],
+						null,
+						null,
+						'trash-bin'
+					)
 				);
-				$this->featureContext->setResponse($response);
-				// this gives empty response in ocis
-				try {
-					$responseXml = HttpRequestHelper::getResponseXml(
-						$response,
-						__METHOD__
-					);
-					$this->featureContext->setResponseXmlObject($responseXml);
-				} catch (Exception $e) {
-				}
-
-				return $response;
 			}
 		}
-		throw new \Exception(
-			__METHOD__
-			. " cannot restore from trashbin because no element was found for user $user at original path $originalPath"
-		);
 	}
 
 	/**
@@ -1150,7 +1133,7 @@ class TrashbinContext implements Context {
 	 */
 	public function theDeletedFileFolderShouldHaveCorrectDeletionMtimeInTheResponse(string $resource):void {
 		$files = $this->getTrashbinContentFromResponseXml(
-			$this->featureContext->getResponseXml()
+			HttpRequestHelper::getResponseXml($this->featureContext->getResponse())
 		);
 
 		$found = false;

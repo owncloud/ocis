@@ -54,7 +54,6 @@ use Swaggest\JsonSchema\Exception\NumericException;
 use Swaggest\JsonSchema\Exception\ObjectException;
 use Swaggest\JsonSchema\Exception\StringException;
 use Swaggest\JsonSchema\Exception\TypeException;
-use Swaggest\JsonSchema\Exception\Error as JsonSchemaError;
 
 require_once 'bootstrap.php';
 
@@ -998,11 +997,6 @@ class FeatureContext extends BehatVariablesContext {
 		string             $username = ""
 	): void {
 		$this->response = $response;
-		//after a new response reset the response xml
-		$this->responseXml = [];
-		//after a new response reset the response xml object
-		$this->responseXmlObject = null;
-		// remember the user that received the response
 		$this->responseUser = $username;
 	}
 
@@ -2589,30 +2583,6 @@ class FeatureContext extends BehatVariablesContext {
 	 */
 	public function workStorageDirLocation(): string {
 		return $this->acceptanceTestsDirLocation() . $this->temporaryStorageSubfolderName() . "/";
-	}
-
-	/**
-	 * Parse list of config keys from the given XML response
-	 *
-	 * @param SimpleXMLElement $responseXml
-	 *
-	 * @return array
-	 */
-	public function parseConfigListFromResponseXml(SimpleXMLElement $responseXml): array {
-		$configkeyData = \json_decode(\json_encode($responseXml->data), true);
-		if (isset($configkeyData['element'])) {
-			$configkeyData = $configkeyData['element'];
-		} else {
-			// There are no keys for the app
-			return [];
-		}
-		if (isset($configkeyData[0])) {
-			$configkeyValues = $configkeyData;
-		} else {
-			// There is just 1 key for the app
-			$configkeyValues[0] = $configkeyData;
-		}
-		return $configkeyValues;
 	}
 
 	/**

@@ -214,9 +214,10 @@ class CapabilitiesContext implements Context {
 
 		$response = $this->userGetsCapabilities($this->getAdminUsernameForCapabilitiesCheck());
 		$this->featureContext->theHTTPStatusCodeShouldBe(200, '', $response);
-		$responseXml = HttpRequestHelper::getResponseXml($response, __METHOD__)->data->capabilities;
+
+		$responseXmlObject = HttpRequestHelper::getResponseXml($response, __METHOD__)->data->capabilities;
 		$edition = $this->getParameterValueFromXml(
-			$responseXml,
+			$responseXmlObject,
 			'core',
 			'status@@@edition'
 		);
@@ -228,7 +229,7 @@ class CapabilitiesContext implements Context {
 		}
 
 		$product = $this->getParameterValueFromXml(
-			$responseXml,
+			$responseXmlObject,
 			'core',
 			'status@@@product'
 		);
@@ -239,7 +240,7 @@ class CapabilitiesContext implements Context {
 		}
 
 		$productName = $this->getParameterValueFromXml(
-			$responseXml,
+			$responseXmlObject,
 			'core',
 			'status@@@productname'
 		);
@@ -257,7 +258,7 @@ class CapabilitiesContext implements Context {
 		// We are on oCIS or reva or some other implementation. We cannot do "occ status".
 		// So get the expected version values by looking in the capabilities response.
 		$version = $this->getParameterValueFromXml(
-			$responseXml,
+			$responseXmlObject,
 			'core',
 			'status@@@version'
 		);
@@ -269,7 +270,7 @@ class CapabilitiesContext implements Context {
 		}
 
 		$versionString = $this->getParameterValueFromXml(
-			$responseXml,
+			$responseXmlObject,
 			'core',
 			'status@@@versionstring'
 		);
@@ -323,7 +324,7 @@ class CapabilitiesContext implements Context {
 		Assert::assertStringStartsWith(
 			$majorMinorPatchVersion,
 			$versionString,
-			"versionstring should start with $majorMinorPatchVersion but is $versionString"
+			"version string should start with $majorMinorPatchVersion but is $versionString"
 		);
 	}
 }

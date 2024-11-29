@@ -32,7 +32,7 @@ class WebDav extends Assert {
 	 *
 	 * @param string|null $element exception|message|reason
 	 * @param string|null $expectedValue
-	 * @param array|null $responseXml
+	 * @param array|null $responseXmlArray
 	 * @param string|null $extraErrorText
 	 *
 	 * @return void
@@ -40,7 +40,7 @@ class WebDav extends Assert {
 	public static function assertDavResponseElementIs(
 		?string $element,
 		?string $expectedValue,
-		?array $responseXml,
+		?array $responseXmlArray,
 		?string $extraErrorText = ''
 	):void {
 		if ($extraErrorText !== '') {
@@ -48,15 +48,15 @@ class WebDav extends Assert {
 		}
 		self::assertArrayHasKey(
 			'value',
-			$responseXml,
+			$responseXmlArray,
 			$extraErrorText . "responseXml does not have key 'value'"
 		);
 		if ($element === "exception") {
-			$result = $responseXml['value'][0]['value'];
+			$result = $responseXmlArray['value'][0]['value'];
 		} elseif ($element === "message") {
-			$result = $responseXml['value'][1]['value'];
+			$result = $responseXmlArray['value'][1]['value'];
 		} elseif ($element === "reason") {
-			$result = $responseXml['value'][3]['value'];
+			$result = $responseXmlArray['value'][3]['value'];
 		} else {
 			self::fail(__METHOD__ . " element must be one of exception, response or reason. But '$element' was passed in.");
 		}

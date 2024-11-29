@@ -148,23 +148,23 @@ class CollaborationContext implements Context {
 	 *
 	 * @return void
 	 * @throws GuzzleException
+	 * @throws Exception
 	 */
 	public function createFile(string $file, string $password, string $folder = ""): void {
 		$token = $this->featureContext->shareNgGetLastCreatedLinkShareToken();
 		$baseUrl = $this->featureContext->getBaseUrl();
 		$davPath = WebDavHelper::getDavPath(WebDavHelper::DAV_VERSION_NEW, $token, "public-files");
-		$response = HttpRequestHelper::sendRequest(
-			"$baseUrl/$davPath/$folder",
-			$this->featureContext->getStepLineRef(),
-			"PROPFIND",
-			"public",
-			$this->featureContext->getActualPassword($password)
+
+		$responseXmlObject = HttpRequestHelper::getResponseXml(
+			HttpRequestHelper::sendRequest(
+				"$baseUrl/$davPath/$folder",
+				$this->featureContext->getStepLineRef(),
+				"PROPFIND",
+				"public",
+				$this->featureContext->getActualPassword($password)
+			)
 		);
-		$responseXml = HttpRequestHelper::getResponseXml(
-			$response,
-			__METHOD__
-		);
-		$xmlPart = $responseXml->xpath("//d:prop/oc:fileid");
+		$xmlPart = $responseXmlObject->xpath("//d:prop/oc:fileid");
 		$parentContainerId = (string) $xmlPart[0];
 
 		$headers = [
