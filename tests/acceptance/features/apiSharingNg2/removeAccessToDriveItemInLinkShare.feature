@@ -2,7 +2,7 @@ Feature: Remove access to a drive item
   https://owncloud.dev/libre-graph-api/#/drives.permissions/DeletePermission
 
   Background:
-    Given these users have been created with default attributes and without skeleton files:
+    Given these users have been created with default attributes:
       | username |
       | Alice    |
       | Brian    |

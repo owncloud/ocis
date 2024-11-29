@@ -4,7 +4,7 @@ Feature: delete file/folder
   So that I can remove redundant resources
 
   Background:
-    Given these users have been created with default attributes and without skeleton files:
+    Given these users have been created with default attributes:
       | username |
       | Alice    |
       | Brian    |

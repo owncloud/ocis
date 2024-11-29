@@ -4,7 +4,7 @@ Feature: get user's own information
   So that I can see my information
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
 
 
   Scenario: user gets his/her own information with no group involvement

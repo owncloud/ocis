@@ -4,7 +4,7 @@ Feature: move folders
   So that I can organise my data structure
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
 
   @issue-10346
   Scenario Outline: uploading file into a moved folder

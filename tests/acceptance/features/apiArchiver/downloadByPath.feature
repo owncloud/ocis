@@ -8,7 +8,7 @@ Feature: download multiple resources bundled into an archive
   So that I don't have to know the ID of the resource
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
 
   @issue-4637
   Scenario Outline: download a single file
@@ -71,7 +71,7 @@ Feature: download multiple resources bundled into an archive
 
   @issue-4637
   Scenario: download multiple shared items as share receiver
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And user "Alice" has uploaded file with content "some data" to "/textfile0.txt"
     And user "Alice" has uploaded file with content "other data" to "/textfile1.txt"
     And user "Alice" has created folder "my_data"
@@ -121,7 +121,7 @@ Feature: download multiple resources bundled into an archive
 
   @issue-4637
   Scenario Outline: download the Shares folder as share receiver
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And user "Alice" has uploaded file with content "some data" to "/textfile0.txt"
     And user "Alice" has uploaded file with content "other data" to "/textfile1.txt"
     And user "Alice" has created folder "my_data"

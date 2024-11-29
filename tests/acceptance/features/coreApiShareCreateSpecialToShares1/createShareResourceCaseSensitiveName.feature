@@ -5,7 +5,7 @@ Feature: Sharing resources with different case names with the sharee and checkin
   So that I can make sure that the shares aren't case sensitive
 
   Background:
-    Given these users have been created with default attributes and without skeleton files:
+    Given these users have been created with default attributes:
       | username |
       | Alice    |
       | Brian    |

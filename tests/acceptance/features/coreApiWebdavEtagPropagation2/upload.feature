@@ -4,7 +4,7 @@ Feature: propagation of etags when uploading data
   So that the client app can know to re-scan and sync the content of the folder(s)
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
     And user "Alice" has created folder "/upload"
 
   @issue-4251
@@ -46,7 +46,7 @@ Feature: propagation of etags when uploading data
 
   @issue-4251 @skipOnReva
   Scenario Outline: sharee uploading a file inside a received shared folder should update etags for all collaborators
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And using <dav-path-version> DAV path
     And user "Alice" has sent the following resource share invitation:
       | resource        | upload   |
@@ -76,7 +76,7 @@ Feature: propagation of etags when uploading data
 
   @issue-4251 @skipOnReva
   Scenario Outline: sharer uploading a file inside a shared folder should update etags for all collaborators
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And using <dav-path-version> DAV path
     And user "Alice" has sent the following resource share invitation:
       | resource        | upload   |
@@ -106,7 +106,7 @@ Feature: propagation of etags when uploading data
 
   @skipOnReva
   Scenario Outline: sharee overwriting a file inside a received shared folder should update etags for all collaborators
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And using <dav-path-version> DAV path
     And user "Alice" has uploaded file with content "uploaded content" to "/upload/file.txt"
     And user "Alice" has sent the following resource share invitation:
@@ -137,7 +137,7 @@ Feature: propagation of etags when uploading data
 
   @skipOnReva
   Scenario Outline: sharer overwriting a file inside a shared folder should update etags for all collaborators
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And using <dav-path-version> DAV path
     And user "Alice" has uploaded file with content "uploaded content" to "/upload/file.txt"
     And user "Alice" has sent the following resource share invitation:

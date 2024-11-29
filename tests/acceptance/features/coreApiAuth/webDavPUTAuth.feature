@@ -4,7 +4,7 @@ Feature: PUT file/folder
   So that I can ensure the endpoints are well authenticated
 
   Background:
-    Given these users have been created with default attributes and without skeleton files:
+    Given these users have been created with default attributes:
       | username |
       | Alice    |
       | Brian    |

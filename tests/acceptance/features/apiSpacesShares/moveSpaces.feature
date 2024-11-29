@@ -4,7 +4,7 @@ Feature: move (rename) file
   So that I can manage my file system
 
   Background:
-    Given these users have been created with default attributes and without skeleton files:
+    Given these users have been created with default attributes:
       | username |
       | Alice    |
       | Brian    |

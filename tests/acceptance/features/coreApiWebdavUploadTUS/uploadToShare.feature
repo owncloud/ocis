@@ -5,7 +5,7 @@ Feature: upload file to shared folder
   So that other user with access on the shared folder can access the resource
 
   Background:
-    Given these users have been created with default attributes and without skeleton files:
+    Given these users have been created with default attributes:
       | username |
       | Alice    |
       | Brian    |

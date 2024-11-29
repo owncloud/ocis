@@ -4,7 +4,7 @@ Feature: edit group name
   So that I can manage group name
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
     And the administrator has assigned the role "Admin" to user "Alice" using the Graph API
 
   @issue-5977

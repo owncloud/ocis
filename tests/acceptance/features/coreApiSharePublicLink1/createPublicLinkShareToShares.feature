@@ -4,7 +4,7 @@ Feature: create a public link share when share_folder is set to Shares
   So that I can share resources to people who aren't owncloud users
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
 
 
   Scenario Outline: creating a new public link share of a file gives the correct response

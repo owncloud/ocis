@@ -4,7 +4,7 @@ Feature: Public can download folders from project space public link
   So that I can gain access to it's contents
 
   Background:
-    Given these users have been created with default attributes and without skeleton files:
+    Given these users have been created with default attributes:
       | username |
       | Alice    |
       | Brian    |

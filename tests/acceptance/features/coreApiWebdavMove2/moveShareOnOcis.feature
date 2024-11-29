@@ -6,12 +6,12 @@ Feature: move (rename) file
 
   Background:
     Given using OCS API version "1"
-    And user "Alice" has been created with default attributes and without skeleton files
+    And user "Alice" has been created with default attributes
 
 
   Scenario Outline: sharer moves a file into a shared folder
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Brian" has created folder "/testshare"
     And user "Brian" has sent the following resource share invitation:
       | resource        | testshare          |
@@ -41,7 +41,7 @@ Feature: move (rename) file
 
   Scenario Outline: sharee tries to move a file into a shared folder
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Brian" has created folder "/testshare"
     And user "Brian" has sent the following resource share invitation:
       | resource        | testshare          |
@@ -71,7 +71,7 @@ Feature: move (rename) file
 
   Scenario Outline: moving a file out of a shared folder as the sharer
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Brian" has created folder "/testshare"
     And user "Brian" has uploaded file with content "test data" to "/testshare/testfile.txt"
     And user "Brian" has sent the following resource share invitation:
@@ -101,7 +101,7 @@ Feature: move (rename) file
 
   Scenario Outline: moving a file out of a shared folder as the sharee
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Brian" has created folder "/testshare"
     And user "Brian" has uploaded file with content "test data" to "/testshare/testfile.txt"
     And user "Brian" has sent the following resource share invitation:
@@ -130,7 +130,7 @@ Feature: move (rename) file
 
   Scenario Outline: moving a folder into a shared folder the sharer
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Brian" has created folder "/testshare"
     And user "Brian" has sent the following resource share invitation:
       | resource        | testshare          |
@@ -161,7 +161,7 @@ Feature: move (rename) file
 
   Scenario Outline: moving a folder into a shared folder as the sharee
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Brian" has created folder "/testshare"
     And user "Brian" has sent the following resource share invitation:
       | resource        | testshare          |
@@ -192,7 +192,7 @@ Feature: move (rename) file
 
   Scenario Outline: moving a folder out of a shared folder as the sharer
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Brian" has created the following folders
       | path                     |
       | /testshare               |
@@ -225,7 +225,7 @@ Feature: move (rename) file
 
   Scenario Outline: moving a folder out of a shared folder as the sharee
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Brian" has created the following folders
       | path                     |
       | /testshare               |
@@ -257,7 +257,7 @@ Feature: move (rename) file
 
   Scenario Outline: sharee moves a file within a shared folder (change/all permissions)
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Brian" has created folder "testshare"
     And user "Brian" has created folder "testshare/child"
     And user "Brian" has uploaded file with content "test data" to "testshare/testfile.txt"
@@ -286,7 +286,7 @@ Feature: move (rename) file
 
   Scenario Outline: sharee tries to move a file within a shared folder (read permissions)
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Brian" has created folder "testshare"
     And user "Brian" has created folder "testshare/child"
     And user "Brian" has uploaded file with content "test data" to "testshare/testfile.txt"
@@ -312,7 +312,7 @@ Feature: move (rename) file
   @issue-1976
   Scenario Outline: sharee tries to move a file into same shared folder with same name
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Brian" has created folder "testshare"
     And user "Brian" has uploaded file with content "test data" to "testshare/testfile.txt"
     And user "Brian" has sent the following resource share invitation:

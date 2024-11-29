@@ -5,7 +5,7 @@ Feature: previews of files downloaded through the webdav API
   So that I can view the contents of the files
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
 
 
   Scenario Outline: download previews with invalid width
@@ -137,7 +137,7 @@ Feature: previews of files downloaded through the webdav API
 
   Scenario Outline: download previews of shared files (to shares folder)
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Alice" has uploaded file "filesForUpload/<file-name>" to "/<file-name>"
     And user "Alice" has sent the following resource share invitation:
       | resource        | <file-name> |
@@ -161,7 +161,7 @@ Feature: previews of files downloaded through the webdav API
 
   Scenario Outline: user tries to download previews of other users files
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Alice" has uploaded file "filesForUpload/lorem.txt" to "/parent.txt"
     When user "Brian" downloads the preview of "/parent.txt" of "Alice" with width "32" and height "32" using the WebDAV API
     Then the HTTP status code should be "404"
@@ -217,7 +217,7 @@ Feature: previews of files downloaded through the webdav API
   @issue-2538
   Scenario Outline: when owner updates a shared file, previews for sharee are also updated (to shared folder)
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Alice" has uploaded file "filesForUpload/lorem.txt" to "/parent.txt"
     And user "Alice" has sent the following resource share invitation:
       | resource        | parent.txt  |
@@ -254,7 +254,7 @@ Feature: previews of files downloaded through the webdav API
 
   Scenario Outline: updates to a file should change the preview for both sharees and sharers
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Alice" has created folder "FOLDER"
     And user "Alice" has uploaded file with content "file to upload" to "/FOLDER/lorem.txt"
     And user "Alice" has sent the following resource share invitation:
@@ -284,8 +284,8 @@ Feature: previews of files downloaded through the webdav API
   Scenario Outline: updates to a group shared file should change the preview for both sharees and sharers
     Given using <dav-path-version> DAV path
     And group "grp1" has been created
-    And user "Brian" has been created with default attributes and without skeleton files
-    And user "Carol" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
+    And user "Carol" has been created with default attributes
     And user "Brian" has been added to group "grp1"
     And user "Carol" has been added to group "grp1"
     And user "Alice" has created folder "FOLDER"

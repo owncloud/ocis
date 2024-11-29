@@ -5,7 +5,7 @@ Feature: an user changes its own password
 
 
   Scenario Outline: change own password
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
     When the user "Alice" changes its own password "<current-password>" to "<new-password>" using the Graph API
     Then the HTTP status code should be "<http-status-code>"
     Examples:

@@ -5,7 +5,7 @@ Feature: Deprovisioning notification
   So they can download and save their data in time
 
   Background:
-    Given these users have been created with default attributes and without skeleton files:
+    Given these users have been created with default attributes:
       | username |
       | Alice    |
 

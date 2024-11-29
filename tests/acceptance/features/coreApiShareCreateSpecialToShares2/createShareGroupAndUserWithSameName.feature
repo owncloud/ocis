@@ -5,11 +5,11 @@ Feature: sharing works when a username and group name are the same
   So that I can make sure that the sharing works
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
 
 
   Scenario: creating a new share with user and a group having same name
-    Given these users have been created with default attributes and without skeleton files:
+    Given these users have been created with default attributes:
       | username |
       | Brian    |
       | Carol    |
@@ -35,7 +35,7 @@ Feature: sharing works when a username and group name are the same
 
 
   Scenario: creating a new share with group and a user having same name
-    Given these users have been created with default attributes and without skeleton files:
+    Given these users have been created with default attributes:
       | username |
       | Brian    |
       | Carol    |
@@ -61,7 +61,7 @@ Feature: sharing works when a username and group name are the same
 
 
   Scenario: creating a new share with user and a group having same name but different case
-    Given these users have been created with default attributes and without skeleton files:
+    Given these users have been created with default attributes:
       | username |
       | Brian    |
       | Carol    |
@@ -87,7 +87,7 @@ Feature: sharing works when a username and group name are the same
 
 
   Scenario: creating a new share with group and a user having same name but different case
-    Given these users have been created with default attributes and without skeleton files:
+    Given these users have been created with default attributes:
       | username |
       | Brian    |
       | Carol    |

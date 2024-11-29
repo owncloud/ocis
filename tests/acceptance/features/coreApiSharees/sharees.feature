@@ -4,7 +4,7 @@ Feature: search sharees
   So that I can find them quickly
 
   Background:
-    Given these users have been created with default attributes and without skeleton files:
+    Given these users have been created with default attributes:
       | username |
       | Alice    |
       | sharee1  |
@@ -162,7 +162,7 @@ Feature: search sharees
 
   Scenario Outline: enumerate only group members - only show partial results from member of groups
     Given using OCS API version "<ocs-api-version>"
-    And these users have been created with default attributes and without skeleton files:
+    And these users have been created with default attributes:
       | username | displayname |
       | another  | Another     |
     And user "Another" has been added to group "ShareeGroup2"
@@ -185,7 +185,7 @@ Feature: search sharees
 
 
   Scenario Outline: search without exact match such that the search string matches the user getting the sharees
-    Given user "sharee2" has been created with default attributes and without skeleton files
+    Given user "sharee2" has been created with default attributes
     And using OCS API version "<ocs-api-version>"
     When user "sharee1" gets the sharees using the sharing API with parameters
       | search   | sharee |
@@ -209,7 +209,7 @@ Feature: search sharees
 
   @env-config
   Scenario Outline: search other users when OCIS_SHOW_USER_EMAIL_IN_RESULTS config is enabled
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And the config "OCIS_SHOW_USER_EMAIL_IN_RESULTS" has been set to "true"
     And using OCS API version "<ocs-api-version>"
     When user "Alice" gets the sharees using the sharing API with parameters
@@ -226,7 +226,7 @@ Feature: search sharees
 
   @env-config
   Scenario Outline: search other users when OCIS_SHOW_USER_EMAIL_IN_RESULTS config is disabled
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And the config "OCIS_SHOW_USER_EMAIL_IN_RESULTS" has been set to "false"
     And using OCS API version "<ocs-api-version>"
     When user "Alice" gets the sharees using the sharing API with parameters

@@ -5,7 +5,7 @@ Feature: sharing
   So that I can know I have proper access to them
 
   Background:
-    Given these users have been created with default attributes and without skeleton files:
+    Given these users have been created with default attributes:
       | username |
       | Alice    |
       | Brian    |
@@ -51,7 +51,7 @@ Feature: sharing
   @smokeTest
   Scenario Outline: getting all shares of a file
     Given using OCS API version "<ocs-api-version>"
-    And these users have been created with default attributes and without skeleton files:
+    And these users have been created with default attributes:
       | username |
       | Carol    |
       | David    |
@@ -118,7 +118,7 @@ Feature: sharing
   @issue-1233
   Scenario Outline: get a share with a user that didn't receive the share
     Given using OCS API version "<ocs-api-version>"
-    And user "Carol" has been created with default attributes and without skeleton files
+    And user "Carol" has been created with default attributes
     And user "Alice" has uploaded file with content "some data" to "/textfile0.txt"
     And user "Alice" has sent the following resource share invitation:
       | resource        | textfile0.txt |
@@ -139,7 +139,7 @@ Feature: sharing
   @issue-1289
   Scenario: share a folder to a group, and remove user from that group
     Given using OCS API version "1"
-    And user "Carol" has been created with default attributes and without skeleton files
+    And user "Carol" has been created with default attributes
     And group "group0" has been created
     And user "Brian" has been added to group "group0"
     And user "Carol" has been added to group "group0"

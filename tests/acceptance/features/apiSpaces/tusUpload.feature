@@ -4,7 +4,7 @@ Feature: upload resources using TUS protocol
   So that I can store and share files between multiple client systems
 
   Background:
-    Given these users have been created with default attributes and without skeleton files:
+    Given these users have been created with default attributes:
       | username |
       | Alice    |
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
@@ -43,7 +43,7 @@ Feature: upload resources using TUS protocol
   @issue-10346
   Scenario Outline: upload a zero-byte file inside a shared folder
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Alice" has created folder "testFolder"
     And user "Alice" has sent the following resource share invitation:
       | resource        | testFolder |
@@ -63,7 +63,7 @@ Feature: upload resources using TUS protocol
 
   Scenario: upload a zero-byte file inside a shared folder (spaces dav path)
     Given using spaces DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Alice" has created folder "testFolder"
     And user "Alice" has sent the following resource share invitation:
       | resource        | testFolder |
@@ -87,7 +87,7 @@ Feature: upload resources using TUS protocol
   @issue-8003 @issue-10346
   Scenario Outline: replace a shared file with zero-byte file
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Alice" has uploaded file with content "This is TUS upload" to "textfile.txt"
     And user "Alice" has sent the following resource share invitation:
       | resource        | textfile.txt |
@@ -107,7 +107,7 @@ Feature: upload resources using TUS protocol
   @issue-8003
   Scenario: replace a shared file with zero-byte file (spaces dav path)
     Given using spaces DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Alice" has uploaded file with content "This is TUS upload" to "textfile.txt"
     And user "Alice" has sent the following resource share invitation:
       | resource        | textfile.txt |
@@ -132,7 +132,7 @@ Feature: upload resources using TUS protocol
   @issue-8003
   Scenario: replace a file inside a shared project space with zero-byte file
     Given using spaces DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "new-space" with content "This is TUS upload" to "textfile.txt"

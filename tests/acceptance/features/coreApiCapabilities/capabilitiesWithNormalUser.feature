@@ -5,7 +5,7 @@ Feature: default capabilities for normal user
 
   Background:
     Given using OCS API version "1"
-    And user "Alice" has been created with default attributes and without skeleton files
+    And user "Alice" has been created with default attributes
 
   # adjust this scenario after fixing tagged issues as its just created to show difference
   # in the response items in different environment (core & ocis-reva)

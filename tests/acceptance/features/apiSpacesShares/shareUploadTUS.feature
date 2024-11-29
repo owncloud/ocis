@@ -5,7 +5,7 @@ Feature: upload resources on share using TUS protocol
 
   Background:
     Given using spaces DAV path
-    And these users have been created with default attributes and without skeleton files:
+    And these users have been created with default attributes:
       | username |
       | Alice    |
       | Brian    |

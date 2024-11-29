@@ -5,7 +5,7 @@ Feature: copy file
 
   Background:
     Given using OCS API version "1"
-    And user "Alice" has been created with default attributes and without skeleton files
+    And user "Alice" has been created with default attributes
     And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
     And user "Alice" has uploaded file with content "ownCloud test text file 1" to "/textfile1.txt"
     And user "Alice" has created folder "/FOLDER"
@@ -52,7 +52,7 @@ Feature: copy file
   Scenario Outline: copying a file to a folder with no permissions
     Given using <dav-path-version> DAV path
     And the administrator has enabled the permissions role "Secure Viewer"
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Brian" has created folder "/testshare"
     And user "Brian" has sent the following resource share invitation:
       | resource        | testshare          |
@@ -76,7 +76,7 @@ Feature: copy file
   @skipOnReva
   Scenario Outline: copying a file to overwrite a file into a folder with no permissions
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Brian" has created folder "/testshare"
     And user "Brian" has uploaded file with content "ownCloud test text file 1" to "textfile1.txt"
     And user "Brian" has sent the following resource share invitation:
@@ -219,7 +219,7 @@ Feature: copy file
   @issue-1239 @issue-3874 @issue-9753 @skipOnReva
   Scenario Outline: copy a file over the top of an existing folder received as a user share
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Brian" has created folder "/BRIAN-Folder"
     And user "Brian" has created folder "BRIAN-Folder/sample-folder"
     And user "Brian" has sent the following resource share invitation:
@@ -245,7 +245,7 @@ Feature: copy file
   Scenario Outline: copy a file over the top of an existing file received as a share
     Given using <dav-path-version> DAV path
     And user "Alice" has uploaded file with content "file to copy" to "copy.txt"
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Brian" has uploaded file with content "file to share" to "lorem.txt"
     And user "Brian" has sent the following resource share invitation:
       | resource        | lorem.txt   |
@@ -268,7 +268,7 @@ Feature: copy file
   @issue-1239 @issue-6999 @issue-9753 @skipOnReva
   Scenario Outline: copy a folder over the top of an existing file received as a user share
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Brian" has uploaded file with content "file to share" to "/sharedfile1.txt"
     And user "Brian" has sent the following resource share invitation:
       | resource        | sharedfile1.txt |
@@ -293,7 +293,7 @@ Feature: copy file
   @issue-6999 @issue-9753 @skipOnReva
   Scenario Outline: copy a folder over the top of an existing folder received as a share
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Brian" has created folder "BRIAN-Folder"
     And user "Brian" has created folder "BRIAN-Folder/brian-folder"
     And user "Brian" has sent the following resource share invitation:
@@ -319,7 +319,7 @@ Feature: copy file
   @issue-1239 @skipOnReva
   Scenario Outline: copy a folder into another folder at different level which is received as a user share
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Brian" has created folder "BRIAN-FOLDER"
     And user "Brian" has created folder "BRIAN-FOLDER/second-level-folder"
     And user "Brian" has created folder "BRIAN-FOLDER/second-level-folder/third-level-folder"
@@ -349,7 +349,7 @@ Feature: copy file
   @issue-1239 @skipOnReva
   Scenario Outline: copy a file into a folder at different level received as a user share
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Brian" has created folder "BRIAN-FOLDER"
     And user "Brian" has created folder "BRIAN-FOLDER/second-level-folder"
     And user "Brian" has created folder "BRIAN-FOLDER/second-level-folder/third-level-folder"
@@ -381,7 +381,7 @@ Feature: copy file
   @issue-1239 @skipOnReva
   Scenario Outline: copy a file into a file at different level received as a user share
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Brian" has created folder "BRIAN-FOLDER"
     And user "Brian" has uploaded file with content "file at second level" to "BRIAN-FOLDER/second-level-file.txt"
     And using SharingNG
@@ -412,7 +412,7 @@ Feature: copy file
   @issue-1239 @skipOnReva
   Scenario Outline: copy a folder into a file at different level received as a user share
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Brian" has created folder "BRIAN-FOLDER"
     And user "Brian" has created folder "BRIAN-FOLDER/second-level-folder"
     And user "Brian" has uploaded file with content "file at third level" to "BRIAN-FOLDER/second-level-folder/third-level-file.txt"
@@ -443,7 +443,7 @@ Feature: copy file
   @issue-1239 @issue-9753 @skipOnReva
   Scenario Outline: copy a file over the top of an existing folder received as a group share
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And group "grp1" has been created
     And user "Alice" has been added to group "grp1"
     And user "Brian" has been added to group "grp1"
@@ -471,7 +471,7 @@ Feature: copy file
   @issue-1239 @issue-6999 @issue-9753 @skipOnReva
   Scenario Outline: copy a folder over the top of an existing file received as a group share
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And group "grp1" has been created
     And user "Alice" has been added to group "grp1"
     And user "Brian" has been added to group "grp1"
@@ -499,7 +499,7 @@ Feature: copy file
   @issue-1239 @skipOnReva
   Scenario Outline: copy a folder into another folder at different level which is received as a group share
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And group "grp1" has been created
     And user "Alice" has been added to group "grp1"
     And user "Brian" has been added to group "grp1"
@@ -532,7 +532,7 @@ Feature: copy file
   @issue-1239 @skipOnReva
   Scenario Outline: copy a file into a folder at different level received as a group share
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And group "grp1" has been created
     And user "Alice" has been added to group "grp1"
     And user "Brian" has been added to group "grp1"
@@ -567,7 +567,7 @@ Feature: copy file
   @issue-1239 @skipOnReva
   Scenario Outline: copy a file into a file at different level received as a group share
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And group "grp1" has been created
     And user "Alice" has been added to group "grp1"
     And user "Brian" has been added to group "grp1"
@@ -601,7 +601,7 @@ Feature: copy file
   @issue-1239 @skipOnReva
   Scenario Outline: copy a folder into a file at different level received as a group share
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And group "grp1" has been created
     And user "Alice" has been added to group "grp1"
     And user "Brian" has been added to group "grp1"
@@ -689,7 +689,7 @@ Feature: copy file
   @skipOnReva
   Scenario Outline: copying a file into a shared folder as the sharee
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Brian" has created folder "/testshare"
     And user "Brian" has sent the following resource share invitation:
       | resource        | testshare |
@@ -711,7 +711,7 @@ Feature: copy file
   @skipOnReva
   Scenario Outline: copying a file into a shared folder as the sharer
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Brian" has created folder "/testshare"
     And user "Brian" has sent the following resource share invitation:
       | resource        | testshare |
@@ -734,7 +734,7 @@ Feature: copy file
   @skipOnReva
   Scenario Outline: copying a file out of a shared folder as the sharee
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Brian" has created folder "/testshare"
     And user "Brian" has sent the following resource share invitation:
       | resource        | testshare |
@@ -758,7 +758,7 @@ Feature: copy file
   @skipOnReva
   Scenario Outline: sharee copies a file from a shared folder, shared with  viewer permission
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Brian" has created folder "/testshare"
     And user "Brian" has uploaded file with content "hello world" to "testshare/fileInsideShare.txt"
     And user "Brian" has sent the following resource share invitation:
@@ -781,7 +781,7 @@ Feature: copy file
   Scenario Outline: sharee copies a file from a shared folder, shared with secure viewer permission
     Given using <dav-path-version> DAV path
     And the administrator has enabled the permissions role "Secure Viewer"
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Brian" has created folder "/testshare"
     And user "Brian" has uploaded file with content "hello world" to "testshare/fileInsideShare.txt"
     And user "Brian" has sent the following resource share invitation:
@@ -803,7 +803,7 @@ Feature: copy file
   @skipOnReva
   Scenario Outline: copying a file out of a shared folder as the sharer
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Brian" has created folder "/testshare"
     And user "Brian" has uploaded file with content "ownCloud test text file inside share" to "/testshare/fileInsideShare.txt"
     And user "Brian" has sent the following resource share invitation:
@@ -850,8 +850,8 @@ Feature: copy file
   @skipOnReva
   Scenario Outline: copying a file between shares received from different users
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
-    And user "Carol" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
+    And user "Carol" has been created with default attributes
     And user "Brian" has created folder "/testshare0"
     And user "Brian" has uploaded file with content "content inside testshare0" to "/testshare0/testshare0.txt"
     And user "Carol" has created folder "/testshare1"
@@ -885,8 +885,8 @@ Feature: copy file
   Scenario Outline: copying a file between shares received from different users when one share is shared via Viewer and Secure viewer permission
     Given using <dav-path-version> DAV path
     And the administrator has enabled the permissions role "Secure Viewer"
-    And user "Brian" has been created with default attributes and without skeleton files
-    And user "Carol" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
+    And user "Carol" has been created with default attributes
     And user "Brian" has created folder "/testshare0"
     And user "Brian" has uploaded file with content "content inside testshare0" to "/testshare0/testshare0.txt"
     And user "Brian" has created folder "/testshare0/folder_to_copy/"
@@ -930,8 +930,8 @@ Feature: copy file
   @skipOnReva
   Scenario Outline: copying a folder between shares received from different users
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
-    And user "Carol" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
+    And user "Carol" has been created with default attributes
     And user "Brian" has created folder "/testshare0"
     And user "Brian" has created folder "/testshare0/folder_to_copy/"
     And user "Brian" has uploaded file with content "content inside testshare0" to "/testshare0/folder_to_copy/testshare0.txt"
@@ -965,8 +965,8 @@ Feature: copy file
   @skipOnReva
   Scenario Outline: copying a file to a folder that is shared with multiple users
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
-    And user "Carol" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
+    And user "Carol" has been created with default attributes
     And user "Alice" has created folder "/testshare"
     And user "Alice" has sent the following resource share invitation:
       | resource        | testshare |

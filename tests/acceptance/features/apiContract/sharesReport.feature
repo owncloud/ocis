@@ -4,7 +4,7 @@ Feature: REPORT request to Shares space
   So that I can make sure that the response contains all the relevant details for shares
 
   Background:
-    Given these users have been created with default attributes and without skeleton files:
+    Given these users have been created with default attributes:
       | username |
       | Alice    |
       | Brian    |

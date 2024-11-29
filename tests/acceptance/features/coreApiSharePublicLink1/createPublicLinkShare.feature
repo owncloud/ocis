@@ -6,7 +6,7 @@ Feature: create a public link share
   So that I can share resources to people who aren't owncloud users
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
 
   @smokeTest @skipOnReva
   Scenario Outline: creating public link share of a file or a folder using the default permissions without password using the public WebDAV API

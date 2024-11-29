@@ -4,7 +4,7 @@ Feature: user GDPR (General Data Protection Regulation) report
   So that I can review what events are stored by the server
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
     And using spaces DAV path
 
 
@@ -495,7 +495,7 @@ Feature: user GDPR (General Data Protection Regulation) report
 
 
   Scenario Outline: user tries to generate GDPR report of other users
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And the administrator has assigned the role "<user-role>" to user "Alice" using the Graph API
     And the administrator has assigned the role "<new-user-role>" to user "Brian" using the Graph API
     When user "Alice" tries to export GDPR report of user "Brian" to "/.personal_data_export.json" using Graph API
@@ -585,7 +585,7 @@ Feature: user GDPR (General Data Protection Regulation) report
 
 
   Scenario: generate a GDPR report and check events when a user shares a folder
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And user "Alice" has created folder "/folderMain"
     And user "Alice" has sent the following resource share invitation:
       | resource        | folderMain |
@@ -714,7 +714,7 @@ Feature: user GDPR (General Data Protection Regulation) report
 
 
   Scenario: generate a GDPR report and check events when a user creates a public link share
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And user "Alice" has created folder "/folderMain"
     And user "Alice" has created the following resource link share:
       | resource        | folderMain |
@@ -860,7 +860,7 @@ Feature: user GDPR (General Data Protection Regulation) report
 
 
   Scenario: generate a GDPR report and check events when a space is shared
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "GDPR Space" with the default quota using the Graph API
     And user "Alice" has sent the following space share invitation:

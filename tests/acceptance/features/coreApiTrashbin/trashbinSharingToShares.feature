@@ -5,13 +5,13 @@ Feature: using trashbin together with sharing
   So that I can restore the resources that were accidentally deleted
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
     And user "Alice" has uploaded file with content "file to delete" to "/textfile0.txt"
 
   @smokeTest @issue-7555
   Scenario Outline: deleting a received folder doesn't move it to trashbin
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Alice" has created folder "/shared"
     And user "Alice" has moved file "/textfile0.txt" to "/shared/shared_file.txt"
     And user "Alice" has sent the following resource share invitation:
@@ -34,7 +34,7 @@ Feature: using trashbin together with sharing
   @issue-1124 @issue-7555
   Scenario Outline: sharee deleting a file in a received folder after renaming the shared folder moves it to trashbin of both users
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Alice" has created folder "/shared"
     And user "Alice" has moved file "/textfile0.txt" to "/shared/shared_file.txt"
     And user "Alice" has sent the following resource share invitation:
@@ -58,8 +58,8 @@ Feature: using trashbin together with sharing
   @issue-1124
   Scenario Outline: sharee deleting a file in a group-shared folder moves it to the trashbin of sharee and sharer only
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
-    And user "Carol" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
+    And user "Carol" has been created with default attributes
     And group "grp1" has been created
     And user "Brian" has been added to group "grp1"
     And user "Carol" has been added to group "grp1"
@@ -87,8 +87,8 @@ Feature: using trashbin together with sharing
 
   Scenario Outline: sharer deleting a file in a group-shared folder moves it to the trashbin of sharer only
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
-    And user "Carol" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
+    And user "Carol" has been created with default attributes
     And group "grp1" has been created
     And user "Brian" has been added to group "grp1"
     And user "Carol" has been added to group "grp1"
@@ -116,8 +116,8 @@ Feature: using trashbin together with sharing
   @issue-1124
   Scenario Outline: sharee deleting a folder in a group-shared folder moves it to the trashbin of sharee and sharer only
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
-    And user "Carol" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
+    And user "Carol" has been created with default attributes
     And group "grp1" has been created
     And user "Brian" has been added to group "grp1"
     And user "Carol" has been added to group "grp1"
@@ -146,8 +146,8 @@ Feature: using trashbin together with sharing
 
   Scenario Outline: sharer deleting a folder in a group-shared folder moves it to the trashbin of sharer only
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
-    And user "Carol" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
+    And user "Carol" has been created with default attributes
     And group "grp1" has been created
     And user "Brian" has been added to group "grp1"
     And user "Carol" has been added to group "grp1"
@@ -176,7 +176,7 @@ Feature: using trashbin together with sharing
   @issue-1124 @issue-7555
   Scenario Outline: deleting a file in a received folder when restored it comes back to the original path
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Alice" has created folder "/shared"
     And user "Alice" has moved file "/textfile0.txt" to "/shared/shared_file.txt"
     And user "Alice" has sent the following resource share invitation:
@@ -205,7 +205,7 @@ Feature: using trashbin together with sharing
 
   Scenario Outline: restoring personal file to a read-only folder
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Brian" has created folder "shareFolderParent"
     And user "Brian" has uploaded file with content "file to delete" to "shareFolderParent/textfile0.txt"
     And user "Brian" has sent the following resource share invitation:
@@ -230,7 +230,7 @@ Feature: using trashbin together with sharing
 
   Scenario Outline: restoring personal file to a read-only sub-folder
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Brian" has created folder "shareFolderParent"
     And user "Brian" has created folder "shareFolderParent/shareFolderChild"
     And user "Brian" has sent the following resource share invitation:
@@ -255,7 +255,7 @@ Feature: using trashbin together with sharing
   @issue-10356
   Scenario Outline: try to restore personal file to a shared folder as an editor
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Brian" has created folder "shareFolderParent"
     And user "Brian" has uploaded file with content "file to delete" to "shareFolderParent/textfile0.txt"
     And user "Brian" has sent the following resource share invitation:

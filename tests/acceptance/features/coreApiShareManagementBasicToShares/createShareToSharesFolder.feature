@@ -5,12 +5,12 @@ Feature: sharing
   So that they can have access on them
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
 
   @smokeTest
   Scenario Outline: creating a share of a file with a user, the default permissions are read(1)+update(2)
     Given using OCS API version "<ocs-api-version>"
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
     When user "Alice" shares file "textfile0.txt" with user "Brian" using the sharing API
     Then the OCS status code should be "<ocs-status-code>"
@@ -37,7 +37,7 @@ Feature: sharing
   @smokeTest @issue-2133
   Scenario Outline: creating a share of a file containing commas in the filename, with a user, the default permissions are read(1)+update(2)+can-share(16)
     Given using OCS API version "<ocs-api-version>"
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Alice" has uploaded file with content "file with comma in filename" to "/sample,1.txt"
     When user "Alice" shares file "sample,1.txt" with user "Brian" using the sharing API
     Then the OCS status code should be "<ocs-status-code>"
@@ -63,7 +63,7 @@ Feature: sharing
   @issue-2133 @issue-1270 @issue-1271
   Scenario Outline: creating a share of a file with a user and asking for various permission combinations
     Given using OCS API version "<ocs-api-version>"
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
     When user "Alice" shares file "textfile0.txt" with user "Brian" with permissions <requested-permissions> using the sharing API
     Then the OCS status code should be "<ocs-status-code>"
@@ -98,7 +98,7 @@ Feature: sharing
 
   Scenario Outline: creating a share of a file with no permissions should fail
     Given using OCS API version "<ocs-api-version>"
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Alice" has uploaded file with content "Random data" to "randomfile.txt"
     When user "Alice" shares file "randomfile.txt" with user "Brian" with permissions "0" using the sharing API
     Then the OCS status code should be "400"
@@ -114,7 +114,7 @@ Feature: sharing
 
   Scenario Outline: creating a share of a folder with no permissions should fail
     Given using OCS API version "<ocs-api-version>"
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Alice" has created folder "/afolder"
     When user "Alice" shares folder "afolder" with user "Brian" with permissions "0" using the sharing API
     Then the OCS status code should be "400"
@@ -130,7 +130,7 @@ Feature: sharing
   @issue-2133
   Scenario Outline: creating a share of a folder with a user, the default permissions are all permissions(15)
     Given using OCS API version "<ocs-api-version>"
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Alice" has created folder "/FOLDER"
     When user "Alice" shares folder "/FOLDER" with user "Brian" using the sharing API
     Then the OCS status code should be "<ocs-status-code>"
@@ -204,7 +204,7 @@ Feature: sharing
 
   @smokeTest
   Scenario: share of folder to a group
-    Given these users have been created with default attributes and without skeleton files:
+    Given these users have been created with default attributes:
       | username |
       | Brian    |
       | Carol    |
@@ -234,7 +234,7 @@ Feature: sharing
 
   @smokeTest
   Scenario: user included in multiple groups, shares a folder with a group
-    Given these users have been created with default attributes and without skeleton files:
+    Given these users have been created with default attributes:
       | username |
       | Brian    |
     And group "grp1" has been created
@@ -251,7 +251,7 @@ Feature: sharing
 
 
   Scenario: sharing again an own file while belonging to a group
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And group "grp1" has been created
     And user "Alice" has been added to group "grp1"
     And user "Brian" has been added to group "grp1"
@@ -269,7 +269,7 @@ Feature: sharing
   @issue-2201
   Scenario Outline: sharing subfolder of already shared folder, GET result is correct
     Given using OCS API version "<ocs-api-version>"
-    And these users have been created with default attributes and without skeleton files:
+    And these users have been created with default attributes:
       | username |
       | Brian    |
       | Carol    |
@@ -321,7 +321,7 @@ Feature: sharing
 
   Scenario Outline: user shares a file with file name longer than 64 chars to another user
     Given using OCS API version "<ocs-api-version>"
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
     And user "Alice" has moved file "textfile0.txt" to "aquickbrownfoxjumpsoveraverylazydogaquickbrownfoxjumpsoveralazydog.txt"
     When user "Alice" shares file "aquickbrownfoxjumpsoveraverylazydogaquickbrownfoxjumpsoveralazydog.txt" with user "Brian" using the sharing API
@@ -335,7 +335,7 @@ Feature: sharing
   Scenario Outline: user shares a file with file name longer than 64 chars to a group
     Given using OCS API version "<ocs-api-version>"
     And group "grp1" has been created
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Brian" has been added to group "grp1"
     And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
     And user "Alice" has moved file "textfile0.txt" to "aquickbrownfoxjumpsoveraverylazydogaquickbrownfoxjumpsoveralazydog.txt"
@@ -349,7 +349,7 @@ Feature: sharing
 
   Scenario Outline: user shares a folder with folder name longer than 64 chars to another user
     Given using OCS API version "<ocs-api-version>"
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Alice" has uploaded file with content "ownCloud test" to "/textfile0.txt"
     And user "Alice" has created folder "/aquickbrownfoxjumpsoveraverylazydogaquickbrownfoxjumpsoveralazydog"
     And user "Alice" has moved file "textfile0.txt" to "aquickbrownfoxjumpsoveraverylazydogaquickbrownfoxjumpsoveralazydog/textfile0.txt"
@@ -364,7 +364,7 @@ Feature: sharing
   Scenario Outline: user shares a folder with folder name longer than 64 chars to a group
     Given using OCS API version "<ocs-api-version>"
     And group "grp1" has been created
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Brian" has been added to group "grp1"
     And user "Alice" has uploaded file with content "ownCloud test" to "/textfile0.txt"
     And user "Alice" has created folder "/aquickbrownfoxjumpsoveraverylazydogaquickbrownfoxjumpsoveralazydog"
@@ -378,7 +378,7 @@ Feature: sharing
 
 
   Scenario: share with user when username contains capital letters
-    Given these users have been created with default attributes and without skeleton files:
+    Given these users have been created with default attributes:
       | username |
       | brian    |
     And user "Alice" has uploaded file with content "Random data" to "/randomfile.txt"
@@ -397,7 +397,7 @@ Feature: sharing
 
 
   Scenario: creating a new share with user of a group when group name contains capital letters
-    Given these users have been created with default attributes and without skeleton files:
+    Given these users have been created with default attributes:
       | username |
       | Brian    |
     And group "GROUP" has been created
@@ -413,7 +413,7 @@ Feature: sharing
 
   Scenario Outline: share of folder to a group with emoji in the name
     Given using OCS API version "<ocs-api-version>"
-    And these users have been created with default attributes and without skeleton files:
+    And these users have been created with default attributes:
       | username |
       | Brian    |
       | Carol    |
@@ -439,7 +439,7 @@ Feature: sharing
   @skipOnReva
   Scenario Outline: share with a group and then add a user to that group
     Given using OCS API version "<ocs-api-version>"
-    And these users have been created with default attributes and without skeleton files:
+    And these users have been created with default attributes:
       | username |
       | Brian    |
       | Carol    |
@@ -467,7 +467,7 @@ Feature: sharing
   @issue-2441
   Scenario Outline: shares shared to deleted group should not be available
     Given using OCS API version "<ocs-api-version>"
-    And these users have been created with default attributes and without skeleton files:
+    And these users have been created with default attributes:
       | username |
       | Brian    |
       | Carol    |
@@ -507,7 +507,7 @@ Feature: sharing
   @issue-764 @issue-7555
   Scenario Outline: share a file by multiple channels and download from sub-folder and direct file share
     Given using <dav-path-version> DAV path
-    And these users have been created with default attributes and without skeleton files:
+    And these users have been created with default attributes:
       | username |
       | Brian    |
       | Carol    |
@@ -551,7 +551,7 @@ Feature: sharing
   @smokeTest
   Scenario Outline: creating a share of a renamed file
     Given using OCS API version "<ocs-api-version>"
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
     And user "Alice" has moved file "/textfile0.txt" to "/renamed.txt"
     When user "Alice" shares file "renamed.txt" with user "Brian" using the sharing API
@@ -578,7 +578,7 @@ Feature: sharing
   @issue-903
   Scenario Outline: shares to a deleted user should not be listed as shares for the sharer
     Given using OCS API version "<ocs-api-version>"
-    And these users have been created with default attributes and without skeleton files:
+    And these users have been created with default attributes:
       | username |
       | Brian    |
       | Carol    |
@@ -609,7 +609,7 @@ Feature: sharing
   @issue-719
   Scenario Outline: creating a share of a renamed file when another share exists
     Given using OCS API version "<ocs-api-version>"
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Alice" has created folder "/Folder1"
     And user "Alice" has created folder "/Folder2"
     And user "Alice" has sent the following resource share invitation:

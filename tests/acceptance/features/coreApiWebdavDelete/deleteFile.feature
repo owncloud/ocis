@@ -4,7 +4,7 @@ Feature: delete file
   So that I can remove unwanted data
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
 
   @smokeTest
   Scenario Outline: delete a file

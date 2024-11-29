@@ -4,7 +4,7 @@ Feature: create space
   So that I can organize a set of resources in a hierarchical tree
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
 
   @issue-5938
   Scenario Outline: user with role user and user light can't create space via Graph API

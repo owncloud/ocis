@@ -6,7 +6,7 @@ Feature: Send a sharing invitations
   https://owncloud.dev/libre-graph-api/#/drives.permissions/Invite
 
   Background:
-    Given these users have been created with default attributes and without skeleton files:
+    Given these users have been created with default attributes:
       | username |
       | Alice    |
       | Brian    |
@@ -97,7 +97,7 @@ Feature: Send a sharing invitations
 
 
   Scenario Outline: send share invitation to group with different roles
-    Given user "Carol" has been created with default attributes and without skeleton files
+    Given user "Carol" has been created with default attributes
     And group "grp1" has been created
     And the following users have been added to the following groups
       | username | groupname |
@@ -368,7 +368,7 @@ Feature: Send a sharing invitations
 
 
   Scenario Outline: send share invitation for a file to group with different permissions
-    Given user "Carol" has been created with default attributes and without skeleton files
+    Given user "Carol" has been created with default attributes
     And group "grp1" has been created
     And the following users have been added to the following groups
       | username | groupname |
@@ -462,7 +462,7 @@ Feature: Send a sharing invitations
 
 
   Scenario Outline: send share invitation for a folder to group with different permissions
-    Given user "Carol" has been created with default attributes and without skeleton files
+    Given user "Carol" has been created with default attributes
     And group "grp1" has been created
     And the following users have been added to the following groups
       | username | groupname |
@@ -649,7 +649,7 @@ Feature: Send a sharing invitations
 
 
   Scenario Outline: send share invitation with expiration date to group with different roles
-    Given user "Carol" has been created with default attributes and without skeleton files
+    Given user "Carol" has been created with default attributes
     And group "grp1" has been created
     And the following users have been added to the following groups
       | username | groupname |
@@ -828,7 +828,7 @@ Feature: Send a sharing invitations
 
 
   Scenario Outline: send sharing invitation to a deleted group with different roles
-    Given user "Carol" has been created with default attributes and without skeleton files
+    Given user "Carol" has been created with default attributes
     And group "grp1" has been created
     And the following users have been added to the following groups
       | username | groupname |
@@ -927,7 +927,7 @@ Feature: Send a sharing invitations
 
 
   Scenario Outline: try to send sharing invitation to multiple groups
-    Given these users have been created with default attributes and without skeleton files:
+    Given these users have been created with default attributes:
       | username |
       | Carol    |
       | Bob      |
@@ -984,7 +984,7 @@ Feature: Send a sharing invitations
 
 
   Scenario Outline: try to send sharing invitation to user and group at once
-    Given these users have been created with default attributes and without skeleton files:
+    Given these users have been created with default attributes:
       | username |
       | Carol    |
       | Bob      |
@@ -1083,7 +1083,7 @@ Feature: Send a sharing invitations
 
 
   Scenario Outline: send sharing invitation to already shared group
-    Given user "Carol" has been created with default attributes and without skeleton files
+    Given user "Carol" has been created with default attributes
     And group "grp1" has been created
     And the following users have been added to the following groups
       | username | groupname |
@@ -1267,7 +1267,7 @@ Feature: Send a sharing invitations
 
 
   Scenario Outline: send share invitation to group with wrong recipient type
-    Given user "Carol" has been created with default attributes and without skeleton files
+    Given user "Carol" has been created with default attributes
     And user "Alice" has uploaded file with content "to share" to "textfile1.txt"
     And user "Alice" has created folder "FolderToShare"
     And group "grp1" has been created
@@ -1357,7 +1357,7 @@ Feature: Send a sharing invitations
 
 
   Scenario Outline: send share invitation to group with empty recipient type
-    Given user "Carol" has been created with default attributes and without skeleton files
+    Given user "Carol" has been created with default attributes
     And user "Alice" has uploaded file with content "to share" to "textfile1.txt"
     And user "Alice" has created folder "FolderToShare"
     And group "grp1" has been created
@@ -1707,7 +1707,7 @@ Feature: Send a sharing invitations
 
   Scenario Outline: send share invitation for project space to group with different roles (permissions endpoint)
     Given using spaces DAV path
-    And user "Carol" has been created with default attributes and without skeleton files
+    And user "Carol" has been created with default attributes
     And group "grp1" has been created
     And the following users have been added to the following groups
       | username | groupname |
@@ -1793,7 +1793,7 @@ Feature: Send a sharing invitations
 
   Scenario Outline: send share invitation for disabled project space to group with different roles (permissions endpoint)
     Given using spaces DAV path
-    And user "Carol" has been created with default attributes and without skeleton files
+    And user "Carol" has been created with default attributes
     And group "grp1" has been created
     And the following users have been added to the following groups
       | username | groupname |
@@ -1844,7 +1844,7 @@ Feature: Send a sharing invitations
 
   Scenario Outline: send share invitation for deleted project space to group with different roles (permissions endpoint)
     Given using spaces DAV path
-    And user "Carol" has been created with default attributes and without skeleton files
+    And user "Carol" has been created with default attributes
     And group "grp1" has been created
     And the following users have been added to the following groups
       | username | groupname |
@@ -1934,7 +1934,7 @@ Feature: Send a sharing invitations
 
 
   Scenario: send share invitation to group for deleted file
-    Given user "Carol" has been created with default attributes and without skeleton files
+    Given user "Carol" has been created with default attributes
     And group "grp1" has been created
     And the following users have been added to the following groups
       | username | groupname |
@@ -2065,7 +2065,7 @@ Feature: Send a sharing invitations
 
   Scenario Outline: send share invitation for project space resource to group with different roles (permissions endpoint)
     Given using spaces DAV path
-    And user "Carol" has been created with default attributes and without skeleton files
+    And user "Carol" has been created with default attributes
     And group "grp1" has been created
     And the following users have been added to the following groups
       | username | groupname |
@@ -2437,7 +2437,7 @@ Feature: Send a sharing invitations
 
   Scenario Outline: try to invite multiple users to project space with different roles using root endpoint
     Given using spaces DAV path
-    And user "Carol" has been created with default attributes and without skeleton files
+    And user "Carol" has been created with default attributes
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
     When user "Alice" tries to send the following space share invitation using root endpoint of the Graph API:
@@ -2536,7 +2536,7 @@ Feature: Send a sharing invitations
 
   Scenario Outline: try to invite multiple groups at once to project space with different roles using root endpoint
     Given using spaces DAV path
-    And user "Carol" has been created with default attributes and without skeleton files
+    And user "Carol" has been created with default attributes
     And group "grp1" has been created
     And group "grp2" has been created
     And the following users have been added to the following groups
@@ -2645,7 +2645,7 @@ Feature: Send a sharing invitations
 
   Scenario Outline: try to invite user and group at once to project space with different roles using root endpoint
     Given using spaces DAV path
-    And user "Carol" has been created with default attributes and without skeleton files
+    And user "Carol" has been created with default attributes
     And group "grp1" has been created
     And the following users have been added to the following groups
       | username | groupname |
@@ -3106,7 +3106,7 @@ Feature: Send a sharing invitations
 
 
   Scenario: share a file to user and group having same name (Personal space)
-    Given user "Carol" has been created with default attributes and without skeleton files
+    Given user "Carol" has been created with default attributes
     And group "Brian" has been created
     And the following users have been added to the following groups
       | username | groupname |
@@ -3151,7 +3151,7 @@ Feature: Send a sharing invitations
 
   Scenario: share a file to user and group having same name (Project space)
     Given using spaces DAV path
-    And user "Carol" has been created with default attributes and without skeleton files
+    And user "Carol" has been created with default attributes
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "NewSpace" with content "lorem" to "textfile.txt"

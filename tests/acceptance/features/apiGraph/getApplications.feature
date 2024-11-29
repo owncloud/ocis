@@ -4,7 +4,7 @@ Feature: get applications
   So that I can see which role belongs to what user
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
 
 
   Scenario Outline: admin user lists all the groups

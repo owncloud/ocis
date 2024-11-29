@@ -4,7 +4,7 @@ Feature: propagation of etags when deleting a file or folder
   So that the client app can know to re-scan and sync the content of the folder(s)
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
     And user "Alice" has created folder "/upload"
 
 
@@ -73,7 +73,7 @@ Feature: propagation of etags when deleting a file or folder
 
   @skipOnReva
   Scenario Outline: sharee deleting a file changes the etags of all parents for all collaborators
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And using <dav-path-version> DAV path
     And user "Alice" has created folder "/upload/sub"
     And user "Alice" has uploaded file with content "uploaded content" to "/upload/sub/file.txt"
@@ -109,7 +109,7 @@ Feature: propagation of etags when deleting a file or folder
 
   @skipOnReva
   Scenario Outline: sharer deleting a file changes the etags of all parents for all collaborators
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And using <dav-path-version> DAV path
     And user "Alice" has created folder "/upload/sub"
     And user "Alice" has uploaded file with content "uploaded content" to "/upload/sub/file.txt"
@@ -145,7 +145,7 @@ Feature: propagation of etags when deleting a file or folder
 
   @issue-4251 @skipOnReva
   Scenario Outline: sharee deleting a folder changes the etags of all parents for all collaborators
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And using <dav-path-version> DAV path
     And user "Alice" has created folder "/upload/sub"
     And user "Alice" has created folder "/upload/sub/toDelete"
@@ -181,7 +181,7 @@ Feature: propagation of etags when deleting a file or folder
 
   @issue-4251 @skipOnReva
   Scenario Outline: sharer deleting a folder changes the etags of all parents for all collaborators
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And using <dav-path-version> DAV path
     And user "Alice" has created folder "/upload/sub"
     And user "Alice" has created folder "/upload/sub/toDelete"

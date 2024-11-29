@@ -829,25 +829,6 @@ trait WebDav {
 	}
 
 	/**
-	 * @Then /^user "([^"]*)" should be able to access a skeleton file$/
-	 *
-	 * @param string $user
-	 *
-	 * @return void
-	 */
-	public function userShouldBeAbleToAccessASkeletonFile(string $user):void {
-		$user = $this->getActualUsername($user);
-		$response = $this->downloadFileAsUserUsingPassword($user, "textfile0.txt");
-		$actualStatus = $response->getStatusCode();
-		Assert::assertEquals(
-			200,
-			$actualStatus,
-			"Expected status code to be '200', but got '$actualStatus'"
-		);
-		$this->checkDownloadedContentMatches("ownCloud test text file 0\n", '', $response);
-	}
-
-	/**
 	 * @Then the size of the downloaded file should be :size bytes
 	 *
 	 * @param string $size

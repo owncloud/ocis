@@ -5,7 +5,7 @@ Feature: delete a public link share
   So that the public won't have access to the resource inside it
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
 
   @issue-1275
   Scenario Outline: deleting a public link of a file

@@ -4,9 +4,9 @@ Feature: checksums
   So that I can make sure that the files are uploaded with correct checksums
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
     And using spaces DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
 
   @issue-1291
   Scenario: sharing a file with checksum should return the checksum in the propfind using new DAV path

@@ -4,7 +4,7 @@ Feature: media type search
   So that I can find the files with specific media type
 
   Background:
-    Given these users have been created with default attributes and without skeleton files:
+    Given these users have been created with default attributes:
       | username |
       | Alice    |
       | Brian    |

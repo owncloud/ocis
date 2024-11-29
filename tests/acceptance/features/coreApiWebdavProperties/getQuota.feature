@@ -6,7 +6,7 @@ Feature: get quota
 
   Background:
     Given using OCS API version "1"
-    And user "Alice" has been created with default attributes and without skeleton files
+    And user "Alice" has been created with default attributes
 
 
   Scenario Outline: retrieving folder quota when no quota is set
@@ -35,7 +35,7 @@ Feature: get quota
   @issue-8197
   Scenario Outline: retrieving folder quota of shared folder with quota when no quota is set for recipient
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Admin" has changed the quota of the personal space of "Alice Hansen" space to "0"
     And user "Admin" has changed the quota of the personal space of "Brian Murphy" space to "10000"
     And user "Brian" has created folder "/testquota"
@@ -77,7 +77,7 @@ Feature: get quota
 
   Scenario Outline: retrieving folder quota when quota is set and a file was received
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Admin" has changed the quota of the personal space of "Brian Murphy" space to "10000"
     And user "Alice" has uploaded file "/Alice.txt" of size 93 bytes
     And user "Alice" has sent the following resource share invitation:

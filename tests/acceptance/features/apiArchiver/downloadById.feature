@@ -8,7 +8,7 @@ Feature: download multiple resources bundled into an archive
   So that I don't have to know the full path of the resource
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
 
 
   Scenario Outline: download a single file
@@ -66,14 +66,14 @@ Feature: download multiple resources bundled into an archive
 
 
   Scenario: download a single file as different user
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And user "Alice" has uploaded file with content "some data" to "/textfile0.txt"
     When user "Brian" downloads the archive of "/textfile0.txt" of user "Alice" using the resource id
     Then the HTTP status code should be "404"
 
 
   Scenario: download multiple shared items as share receiver
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And user "Alice" has uploaded file with content "some data" to "/textfile0.txt"
     And user "Alice" has uploaded file with content "other data" to "/textfile1.txt"
     And user "Alice" has created folder "my_data"
@@ -123,7 +123,7 @@ Feature: download multiple resources bundled into an archive
 
   @issue-4636
   Scenario Outline: download the Shares folder as share receiver
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And user "Alice" has uploaded file with content "some data" to "/textfile0.txt"
     And user "Alice" has uploaded file with content "other data" to "/textfile1.txt"
     And user "Alice" has created folder "my_data"

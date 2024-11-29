@@ -5,7 +5,7 @@ Feature: Update permission of a share
   https://owncloud.dev/libre-graph-api/#/drives.permissions/UpdatePermission
 
   Background:
-    Given these users have been created with default attributes and without skeleton files:
+    Given these users have been created with default attributes:
       | username |
       | Alice    |
       | Brian    |

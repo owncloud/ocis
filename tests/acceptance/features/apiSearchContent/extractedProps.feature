@@ -5,7 +5,7 @@ Feature: propfind extracted props
   So that I can make sure that the response contains audio, location, image and photo properties
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
     And using spaces DAV path
 
 
@@ -78,7 +78,7 @@ Feature: propfind extracted props
 
 
   Scenario: check extracted properties of a file by sharee from shares space
-    Given these users have been created with default attributes and without skeleton files:
+    Given these users have been created with default attributes:
       | username |
       | Brian    |
     And user "Alice" has uploaded file "filesForUpload/testaudio.mp3" to "testaudio.mp3"
@@ -392,7 +392,7 @@ Feature: propfind extracted props
 
 
   Scenario: GET extracted properties of an audio file (Shares space)
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And user "Alice" has uploaded a file "filesForUpload/testaudio.mp3" to "testaudio.mp3" in space "Personal"
     And user "Alice" has sent the following resource share invitation:
       | resource           | testaudio.mp3        |
@@ -448,7 +448,7 @@ Feature: propfind extracted props
 
 
   Scenario: GET extracted properties of an image file (Shares space)
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And user "Alice" has uploaded a file "filesForUpload/testavatar.jpg" to "testavatar.jpg" in space "Personal"
     And user "Alice" has sent the following resource share invitation:
       | resource           | testavatar.jpg       |

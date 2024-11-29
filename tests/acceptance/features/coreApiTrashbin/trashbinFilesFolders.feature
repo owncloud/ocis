@@ -5,7 +5,7 @@ Feature: files and folders exist in the trashbin after being deleted
   So that I can recover data easily
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
     And user "Alice" has uploaded file with content "to delete" to "/textfile0.txt"
 
   @smokeTest
@@ -50,7 +50,7 @@ Feature: files and folders exist in the trashbin after being deleted
   @skipOnReva
   Scenario Outline: deleting a file in a shared folder moves it to the trashbin root
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Alice" has created folder "/shared"
     And user "Alice" has moved file "/textfile0.txt" to "/shared/shared_file.txt"
     And user "Alice" has sent the following resource share invitation:
@@ -73,7 +73,7 @@ Feature: files and folders exist in the trashbin after being deleted
   @skipOnReva
   Scenario Outline: deleting a shared folder moves it to trashbin
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Alice" has created folder "/shared"
     And user "Alice" has moved file "/textfile0.txt" to "/shared/shared_file.txt"
     And user "Alice" has sent the following resource share invitation:
@@ -144,9 +144,9 @@ Feature: files and folders exist in the trashbin after being deleted
   @issue-3561
   Scenario Outline: listing other user's trashbin is prohibited
     Given using <dav-path-version> DAV path
-    And user "testtrashbin100" has been created with default attributes and without skeleton files
+    And user "testtrashbin100" has been created with default attributes
     And user "testtrashbin100" has uploaded file "filesForUpload/textfile.txt" to "/textfile1.txt"
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "testtrashbin100" has deleted file "/textfile1.txt"
     When user "Brian" tries to list the trashbin content for user "testtrashbin100"
     Then the HTTP status code should be "404"
@@ -161,10 +161,10 @@ Feature: files and folders exist in the trashbin after being deleted
   @issue-3561 @smokeTest
   Scenario Outline: listing other user's trashbin is prohibited with multiple files on trashbin
     Given using <dav-path-version> DAV path
-    And user "testtrashbin101" has been created with default attributes and without skeleton files
+    And user "testtrashbin101" has been created with default attributes
     And user "testtrashbin101" has uploaded file "filesForUpload/textfile.txt" to "/textfile0.txt"
     And user "testtrashbin101" has uploaded file "filesForUpload/textfile.txt" to "/textfile2.txt"
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "testtrashbin101" has deleted file "/textfile0.txt"
     And user "testtrashbin101" has deleted file "/textfile2.txt"
     When user "Brian" tries to list the trashbin content for user "testtrashbin101"
@@ -181,14 +181,14 @@ Feature: files and folders exist in the trashbin after being deleted
   @issue-3561 @skipOnReva
   Scenario Outline: listing other user's trashbin is prohibited for newly recreated user with same name
     Given using <dav-path-version> DAV path
-    And user "testtrashbin102" has been created with default attributes and without skeleton files
+    And user "testtrashbin102" has been created with default attributes
     And user "testtrashbin102" has uploaded file "filesForUpload/textfile.txt" to "/textfile0.txt"
     And user "testtrashbin102" has uploaded file "filesForUpload/textfile.txt" to "/textfile2.txt"
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "testtrashbin102" has deleted file "/textfile0.txt"
     And user "testtrashbin102" has deleted file "/textfile2.txt"
     And user "testtrashbin102" has been deleted
-    And user "testtrashbin102" has been created with default attributes and without skeleton files
+    And user "testtrashbin102" has been created with default attributes
     And user "testtrashbin102" has uploaded file "filesForUpload/textfile.txt" to "/textfile3.txt"
     And user "testtrashbin102" has deleted file "/textfile3.txt"
     When user "Brian" tries to list the trashbin content for user "testtrashbin102"
@@ -206,7 +206,7 @@ Feature: files and folders exist in the trashbin after being deleted
   @issue-3561
   Scenario Outline: listing other user's empty unused trashbin is prohibited
     Given using <dav-path-version> DAV path
-    And user "testtrashbinempty" has been created with default attributes and without skeleton files
+    And user "testtrashbinempty" has been created with default attributes
     And user "testtrashbinempty" has uploaded file "filesForUpload/textfile.txt" to "/textfile1.txt"
     When user "Alice" tries to list the trashbin content for user "testtrashbinempty"
     Then the HTTP status code should be "404"
@@ -258,7 +258,7 @@ Feature: files and folders exist in the trashbin after being deleted
 
   Scenario Outline: user with unusual username deletes a file
     Given using <dav-path-version> DAV path
-    And user "<user>" has been created with default attributes and without skeleton files
+    And user "<user>" has been created with default attributes
     And user "<user>" has uploaded file with content "to delete" to "/textfile0.txt"
     When user "<user>" deletes file "/textfile0.txt" using the WebDAV API
     Then the HTTP status code should be "204"

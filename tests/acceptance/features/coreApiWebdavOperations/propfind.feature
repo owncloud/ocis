@@ -5,7 +5,7 @@ Feature: PROPFIND
 
   @issue-751
   Scenario Outline: send PROPFIND request to "/dav/(files|spaces)"
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
     When user "Alice" requests "<dav-path>" with "PROPFIND" using basic auth
     Then the HTTP status code should be "405"
     Examples:
@@ -15,7 +15,7 @@ Feature: PROPFIND
 
   @issue-10334
   Scenario Outline: send PROPFIND request to "/dav/(files|spaces)" with depth header
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
     When user "Alice" requests "<dav-path>" with "PROPFIND" using basic auth and with headers
       | header | value   |
       | depth  | <depth> |
@@ -38,7 +38,7 @@ Feature: PROPFIND
 
   @skipOnReva @issue-10071 @issue-10331
   Scenario: send PROPFIND request to a public link shared with password
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
     And user "Alice" has created folder "/PARENT"
     And using SharingNG
     And user "Alice" has created the following resource link share:
@@ -53,7 +53,7 @@ Feature: PROPFIND
 
   @skipOnReva @issue-10071 @issue-10331
   Scenario: send PROPFIND request to a public link shared with password (request without password)
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
     And user "Alice" has created folder "/PARENT"
     And using SharingNG
     And user "Alice" has created the following resource link share:
@@ -67,7 +67,7 @@ Feature: PROPFIND
 
   @skipOnReva @issue-10071 @issue-10331
   Scenario: send PROPFIND request to a public link shared with password (request with incorrect password)
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
     And user "Alice" has created folder "/PARENT"
     And using SharingNG
     And user "Alice" has created the following resource link share:

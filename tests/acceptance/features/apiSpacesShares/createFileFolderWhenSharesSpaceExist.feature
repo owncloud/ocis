@@ -4,7 +4,7 @@ Feature: create file or folder named similar to Shares folder
   So that I can organise the files in my file system
 
   Background:
-    Given these users have been created with default attributes and without skeleton files:
+    Given these users have been created with default attributes:
       | username |
       | Alice    |
       | Brian    |

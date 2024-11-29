@@ -5,7 +5,7 @@ Feature: restore deleted files/folders
   So that I can recover accidentally deleted files/folders in ownCloud
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
     And user "Alice" has uploaded file with content "file to delete" to "/textfile0.txt"
 
   @smokeTest
@@ -133,7 +133,7 @@ Feature: restore deleted files/folders
   @smokeTest
   Scenario Outline: deleted file cannot be restored by a different user
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Alice" has deleted file "/textfile0.txt"
     When user "Brian" tries to restore the file with original path "/textfile0.txt" from the trashbin of user "Alice" using the trashbin API
     Then the HTTP status code should be "<http-status-code>"
@@ -148,7 +148,7 @@ Feature: restore deleted files/folders
   @smokeTest
   Scenario Outline: deleted file cannot be restored with invalid password
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Alice" has deleted file "/textfile0.txt"
     When user "Alice" tries to restore the file with original path "/textfile0.txt" from the trashbin of user "Alice" using the password "invalid" and the trashbin API
     Then the HTTP status code should be "401"
@@ -163,7 +163,7 @@ Feature: restore deleted files/folders
   @smokeTest
   Scenario Outline: deleted file cannot be restored without using a password
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Alice" has deleted file "/textfile0.txt"
     When user "Alice" tries to restore the file with original path "/textfile0.txt" from the trashbin of user "Alice" using the password "" and the trashbin API
     Then the HTTP status code should be "401"

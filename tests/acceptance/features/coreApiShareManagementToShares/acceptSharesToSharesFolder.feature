@@ -7,7 +7,7 @@ Feature: accept/decline shares coming from internal users to the Shares folder
   Background:
     Given using OCS API version "1"
     And using new DAV path
-    And these users have been created with default attributes and without skeleton files:
+    And these users have been created with default attributes:
       | username |
       | Alice    |
       | Brian    |

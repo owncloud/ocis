@@ -2,7 +2,7 @@ Feature: List a sharing permissions
   https://owncloud.dev/libre-graph-api/#/drives.permissions/ListPermissions
 
   Background:
-    Given these users have been created with default attributes and without skeleton files:
+    Given these users have been created with default attributes:
       | username |
       | Alice    |
 
@@ -168,7 +168,7 @@ Feature: List a sharing permissions
 
   Scenario: user lists permissions of a project space
     Given using spaces DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
     When user "Alice" lists the permissions of space "new-space" using permissions endpoint of the Graph API
@@ -291,7 +291,7 @@ Feature: List a sharing permissions
   @issues-8352
   Scenario Outline: sharer lists permissions of a shared project space
     Given using spaces DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
     And user "Alice" has sent the following space share invitation:
@@ -897,7 +897,7 @@ Feature: List a sharing permissions
   @issues-8331
   Scenario: user sends share invitation with all allowed roles for a file
     Given user "Alice" has uploaded file with content "hello text" to "textfile.txt"
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     When user "Alice" gets permissions list for file "textfile.txt" of the space "Personal" using the Graph API
     Then the HTTP status code should be "200"
     And user "Alice" should be able to send the following resource share invitation with all allowed permission roles
@@ -909,7 +909,7 @@ Feature: List a sharing permissions
   @issues-8331
   Scenario: user sends share invitation with all allowed roles for a folder
     Given user "Alice" has created folder "folder"
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     When user "Alice" gets permissions list for folder "folder" of the space "Personal" using the Graph API
     Then the HTTP status code should be "200"
     And user "Alice" should be able to send the following resource share invitation with all allowed permission roles
@@ -1191,7 +1191,7 @@ Feature: List a sharing permissions
     Given using spaces DAV path
     And the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     When user "Alice" lists the permissions of space "new-space" using permissions endpoint of the Graph API
     Then the HTTP status code should be "200"
     And user "Alice" should be able to send the following resource share invitation with all allowed permission roles
@@ -1205,7 +1205,7 @@ Feature: List a sharing permissions
     And the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "new-space" with content "hello world" to "textfile.txt"
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     When user "Alice" gets permissions list for file "textfile.txt" of the space "new-space" using the Graph API
     Then the HTTP status code should be "200"
     And user "Alice" should be able to send the following resource share invitation with all allowed permission roles
@@ -1218,7 +1218,7 @@ Feature: List a sharing permissions
   Scenario: non-member user tries to list the permissions of a project space using permissions endpoint
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
     When user "Brian" tries to list the permissions of space "new-space" owned by "Alice" using permissions endpoint of the Graph API
     Then the HTTP status code should be "404"
@@ -1262,7 +1262,7 @@ Feature: List a sharing permissions
     And the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
     And user "Alice" has created a folder "folder" in space "new-space"
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     When user "Alice" gets permissions list for folder "folder" of the space "new-space" using the Graph API
     Then the HTTP status code should be "200"
     And user "Alice" should be able to send the following resource share invitation with all allowed permission roles
@@ -1274,7 +1274,7 @@ Feature: List a sharing permissions
 
   Scenario: try to list the permissions of other user's personal space
     Given using spaces DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     When user "Brian" tries to list the permissions of space "Personal" owned by "Alice" using permissions endpoint of the Graph API
     Then the HTTP status code should be "404"
     And the JSON data of the response should match
@@ -1314,7 +1314,7 @@ Feature: List a sharing permissions
 
   Scenario Outline: sharer lists permissions of a shared project space using root endpoint
     Given using spaces DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
     And user "Alice" has sent the following space share invitation:
@@ -1593,7 +1593,7 @@ Feature: List a sharing permissions
     Given using spaces DAV path
     And the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     When user "Alice" lists the permissions of space "new-space" using root endpoint of the Graph API
     Then the HTTP status code should be "200"
     And user "Alice" should be able to send the following space share invitation with all allowed permission roles using root endpoint of the Graph API
@@ -1605,7 +1605,7 @@ Feature: List a sharing permissions
   Scenario: non-member user tries to list the permissions of a project space using root endpoint
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
     When user "Brian" tries to list the permissions of space "new-space" owned by "Alice" using root endpoint of the Graph API
     Then the HTTP status code should be "404"
@@ -1784,7 +1784,7 @@ Feature: List a sharing permissions
 
   @issues-8428
   Scenario: user lists permissions of a shared folder in personal space
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And user "Alice" has created folder "folder"
     And user "Alice" has sent the following resource share invitation:
       | resource        | folder   |
@@ -1889,7 +1889,7 @@ Feature: List a sharing permissions
 
   @issues-8428
   Scenario: user lists permissions of a shared file in personal space
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And user "Alice" has uploaded file with content "hello world" to "/textfile0.txt"
     And user "Alice" has sent the following resource share invitation:
       | resource        | textfile0.txt |
@@ -1991,7 +1991,7 @@ Feature: List a sharing permissions
   @issues-8428
   Scenario: user lists permissions of a shared folder in project space
     Given using spaces DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
     And user "Alice" has created a folder "folder" in space "new-space"
@@ -2099,7 +2099,7 @@ Feature: List a sharing permissions
   @issues-8428
   Scenario: user lists permissions of a shared file in project space
     Given using spaces DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "new-space" with content "hello world" to "textfile0.txt"

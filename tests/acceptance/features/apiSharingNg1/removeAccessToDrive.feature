@@ -2,7 +2,7 @@ Feature: Remove access to a drive
   https://owncloud.dev/libre-graph-api/#/drives.root/DeletePermissionSpaceRoot
 
   Background:
-    Given these users have been created with default attributes and without skeleton files:
+    Given these users have been created with default attributes:
       | username |
       | Alice    |
       | Brian    |

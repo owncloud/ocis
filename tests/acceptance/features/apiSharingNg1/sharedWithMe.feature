@@ -6,7 +6,7 @@ Feature: an user gets the resources shared to them
   https://owncloud.dev/libre-graph-api/#/me.drive/ListSharedWithMe
 
   Background:
-    Given these users have been created with default attributes and without skeleton files:
+    Given these users have been created with default attributes:
       | username |
       | Alice    |
       | Brian    |
@@ -1855,7 +1855,7 @@ Feature: an user gets the resources shared to them
 
 
   Scenario: sharee lists the same name file shares received from different users (Personal space)
-    Given user "Carol" has been created with default attributes and without skeleton files
+    Given user "Carol" has been created with default attributes
     And user "Alice" has uploaded file with content "to share" to "textfile.txt"
     And user "Carol" has uploaded file with content "to share" to "textfile.txt"
     And user "Alice" has sent the following resource share invitation:
@@ -2137,7 +2137,7 @@ Feature: an user gets the resources shared to them
 
 
   Scenario: sharee lists the same name folder shares received from different users (Personal space)
-    Given user "Carol" has been created with default attributes and without skeleton files
+    Given user "Carol" has been created with default attributes
     And user "Alice" has created folder "folderToShare"
     And user "Carol" has created folder "folderToShare"
     And user "Alice" has sent the following resource share invitation:
@@ -2419,7 +2419,7 @@ Feature: an user gets the resources shared to them
   @issue-8471
   Scenario: sharee lists the same name file and folder shares received from different users (Personal space)
     Given using spaces DAV path
-    And user "Carol" has been created with default attributes and without skeleton files
+    And user "Carol" has been created with default attributes
     And user "Brian" has created folder "folder"
     And user "Brian" has uploaded file with content "hello world" to "/textfile.txt"
     And user "Carol" has created folder "folder"

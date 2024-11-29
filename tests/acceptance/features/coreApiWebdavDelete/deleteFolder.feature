@@ -4,7 +4,7 @@ Feature: delete folder
   So that I can quickly remove unwanted data
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
     And user "Alice" creates folder "/PARENT" using the WebDAV API
 
   @smokeTest

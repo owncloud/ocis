@@ -5,7 +5,7 @@ Feature: favorite
 
   Background:
     Given using OCS API version "1"
-    And user "Alice" has been created with default attributes and without skeleton files
+    And user "Alice" has been created with default attributes
     And user "Alice" has uploaded file with content "some data" to "/textfile0.txt"
     And user "Alice" has uploaded file with content "some data" to "/textfile1.txt"
     And user "Alice" has uploaded file with content "some data" to "/textfile2.txt"

@@ -5,7 +5,7 @@ Feature: update files using file id
 
   Background:
     Given using spaces DAV path
-    And user "Alice" has been created with default attributes and without skeleton files
+    And user "Alice" has been created with default attributes
 
 
   Scenario Outline: update content of a file
@@ -45,7 +45,7 @@ Feature: update files using file id
 
 
   Scenario Outline: sharee updates content of a shared file
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And user "Alice" has uploaded file with content "some data" to "/textfile.txt"
     And we save it into "FILEID"
     And user "Alice" has sent the following resource share invitation:
@@ -65,7 +65,7 @@ Feature: update files using file id
 
 
   Scenario Outline: sharee updates content of a file inside a shared folder
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And user "Alice" has created folder "uploadFolder"
     And user "Alice" has uploaded file with content "some data" to "uploadFolder/textfile.txt"
     And we save it into "FILEID"
@@ -86,7 +86,7 @@ Feature: update files using file id
 
 
   Scenario Outline: sharee with different role tries to update content of a file inside a shared space
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "new-space" with content "some data" to "/textfile.txt"
@@ -106,7 +106,7 @@ Feature: update files using file id
 
 
   Scenario Outline: user tries to update content of a file owned by others
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And user "Alice" has uploaded file with content "some data" to "/textfile.txt"
     And we save it into "FILEID"
     When user "Brian" sends HTTP method "PUT" to URL "<dav-path>" with content "updated content"

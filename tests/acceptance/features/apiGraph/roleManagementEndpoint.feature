@@ -4,7 +4,7 @@ Feature: permissions role definitions
   So that I can find out if those endpoints are working correctly or not
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
 
 
   Scenario: get a list of permissions role definitions

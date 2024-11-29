@@ -5,7 +5,7 @@ Feature: checking file versions
   So that I can manage the changes made to the files
 
   Background:
-    Given these users have been created with default attributes and without skeleton files:
+    Given these users have been created with default attributes:
       | username |
       | Alice    |
       | Brian    |

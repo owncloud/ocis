@@ -5,7 +5,7 @@ Feature: share access by ID
   So that the app can more easily manage shares
 
   Background:
-    Given these users have been created with default attributes and without skeleton files:
+    Given these users have been created with default attributes:
       | username |
       | Alice    |
       | Brian    |

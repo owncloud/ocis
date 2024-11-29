@@ -6,12 +6,12 @@ Feature: sharing
 
   Background:
     Given using OCS API version "1"
-    And user "Alice" has been created with default attributes and without skeleton files
+    And user "Alice" has been created with default attributes
 
   @issue-1289 @issue-7555
   Scenario Outline: keep group permissions in sync when the share is renamed by the receiver and then the permissions are updated by sharer
     Given using OCS API version "<ocs-api-version>"
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And group "grp1" has been created
     And user "Brian" has been added to group "grp1"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/textfile0.txt"
@@ -71,7 +71,7 @@ Feature: sharing
   @issue-2173
   Scenario Outline: cannot update a share of a file with a user to have only create and/or delete permission
     Given using OCS API version "<ocs-api-version>"
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/textfile0.txt"
     And user "Alice" has sent the following resource share invitation:
       | resource        | textfile0.txt |
@@ -99,7 +99,7 @@ Feature: sharing
   @issue-2173
   Scenario Outline: cannot update a share of a file with a group to have only create and/or delete permission
     Given using OCS API version "<ocs-api-version>"
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And group "grp1" has been created
     And user "Brian" has been added to group "grp1"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/textfile0.txt"
@@ -129,7 +129,7 @@ Feature: sharing
   @issue-2442
   Scenario Outline: share ownership change after moving a shared file to another share
     Given using <dav-path-version> DAV path
-    And these users have been created with default attributes and without skeleton files:
+    And these users have been created with default attributes:
       | username |
       | Brian    |
       | Carol    |
@@ -161,7 +161,7 @@ Feature: sharing
   @issue-1253 @issue-1224 @issue-1225
   Scenario Outline: change the permission of the share and check the API response
     Given using OCS API version "<ocs-api-version>"
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Alice" has created folder "/Alice-folder"
     And user "Alice" has sent the following resource share invitation:
       | resource        | Alice-folder |
@@ -211,8 +211,8 @@ Feature: sharing
 
   Scenario Outline: increasing permissions is allowed for owner
     Given using OCS API version "<ocs-api-version>"
-    And user "Brian" has been created with default attributes and without skeleton files
-    And user "Carol" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
+    And user "Carol" has been created with default attributes
     And group "grp1" has been created
     And user "Brian" has been added to group "grp1"
     And user "Carol" has been added to group "grp1"
@@ -240,7 +240,7 @@ Feature: sharing
 
   Scenario Outline: sharer deletes file uploaded with upload-only permission by sharee to a shared folder
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Alice" has created folder "/FOLDER"
     And user "Alice" has sent the following resource share invitation:
       | resource        | FOLDER   |

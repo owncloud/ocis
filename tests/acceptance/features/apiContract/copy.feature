@@ -5,7 +5,7 @@ Feature: Copy test
 
 
   Background:
-    Given these users have been created with default attributes and without skeleton files:
+    Given these users have been created with default attributes:
       | username |
       | Alice    |
     And using spaces DAV path

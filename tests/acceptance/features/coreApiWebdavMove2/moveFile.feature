@@ -5,7 +5,7 @@ Feature: move (rename) file
 
   Background:
     Given using OCS API version "1"
-    And user "Alice" has been created with default attributes and without skeleton files
+    And user "Alice" has been created with default attributes
 
   @smokeTest
   Scenario Outline: moving a file

@@ -4,7 +4,7 @@ Feature: LOCK file/folder
   So that I can ensure that the resources won't be changed unexpectedly
 
   Background:
-    Given these users have been created with default attributes and without skeleton files:
+    Given these users have been created with default attributes:
       | username |
       | Alice    |
       | Brian    |

@@ -5,12 +5,12 @@ Feature: search federation users
 
 
   Background:
-    Given these users have been created with default attributes and without skeleton files:
+    Given these users have been created with default attributes:
       | username |
       | Alice    |
       | Carol    |
     And using server "REMOTE"
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
 
 
   Scenario: users search for federation users by display name

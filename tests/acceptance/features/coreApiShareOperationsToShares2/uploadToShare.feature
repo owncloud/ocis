@@ -5,12 +5,12 @@ Feature: sharing
   So that other people can access the resource
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
 
 
   Scenario Outline: uploading file to a user read-only share folder does not work
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Alice" has created folder "FOLDER"
     And user "Alice" has sent the following resource share invitation:
       | resource        | FOLDER   |
@@ -30,7 +30,7 @@ Feature: sharing
 
   Scenario Outline: uploading file to a group read-only share folder does not work
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And group "grp1" has been created
     And user "Brian" has been added to group "grp1"
     And user "Alice" has created folder "FOLDER"
@@ -54,7 +54,7 @@ Feature: sharing
 
   Scenario Outline: uploading file to a user upload-only share folder works
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Alice" has created folder "FOLDER"
     And user "Alice" has sent the following resource share invitation:
       | resource        | FOLDER   |
@@ -82,7 +82,7 @@ Feature: sharing
 
   Scenario Outline: uploading file to a group upload-only share folder works
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And group "grp1" has been created
     And user "Brian" has been added to group "grp1"
     And user "Alice" has created folder "FOLDER"
@@ -112,7 +112,7 @@ Feature: sharing
   @smokeTest
   Scenario Outline: uploading file to a user read/write share folder works
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Alice" has created folder "FOLDER"
     And user "Alice" has sent the following resource share invitation:
       | resource        | FOLDER   |
@@ -138,7 +138,7 @@ Feature: sharing
 
   Scenario Outline: uploading file to a group read/write share folder works
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And group "grp1" has been created
     And user "Brian" has been added to group "grp1"
     And user "Alice" has created folder "FOLDER"
@@ -166,7 +166,7 @@ Feature: sharing
   @smokeTest
   Scenario Outline: check quota of owners parent directory of a shared file
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Admin" has changed the quota of the personal space of "Brian Murphy" space to "0"
     And user "Alice" has uploaded file "filesForUpload/lorem.txt" to "/myfile.txt"
     And user "Alice" has sent the following resource share invitation:
@@ -195,7 +195,7 @@ Feature: sharing
 
   Scenario Outline: uploading to a user shared folder with read/write permission when the sharer has insufficient quota does not work
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Alice" has created folder "FOLDER"
     And user "Alice" has sent the following resource share invitation:
       | resource        | FOLDER   |
@@ -217,7 +217,7 @@ Feature: sharing
 
   Scenario Outline: uploading to a group shared folder with read/write permission when the sharer has insufficient quota does not work
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And group "grp1" has been created
     And user "Brian" has been added to group "grp1"
     And user "Alice" has created folder "FOLDER"
@@ -241,7 +241,7 @@ Feature: sharing
 
   Scenario Outline: uploading to a user shared folder with upload-only permission when the sharer has insufficient quota does not work
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Alice" has created folder "FOLDER"
     And user "Alice" has sent the following resource share invitation:
       | resource        | FOLDER   |
@@ -263,7 +263,7 @@ Feature: sharing
 
   Scenario Outline: uploading to a group shared folder with upload-only permission when the sharer has insufficient quota does not work
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And group "grp1" has been created
     And user "Brian" has been added to group "grp1"
     And user "Alice" has created folder "FOLDER"
@@ -287,7 +287,7 @@ Feature: sharing
 
   Scenario Outline: sharer can download file uploaded with different permission by sharee to a shared folder
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Alice" has created folder "FOLDER"
     And user "Alice" has sent the following resource share invitation:
       | resource        | FOLDER             |
@@ -312,7 +312,7 @@ Feature: sharing
 
   Scenario Outline: upload an empty file (size zero byte) to a shared folder
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Brian" has created folder "/folder-to-share"
     And user "Brian" has sent the following resource share invitation:
       | resource        | folder-to-share |

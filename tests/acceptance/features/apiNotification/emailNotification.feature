@@ -5,7 +5,7 @@ Feature: Email notification
   So that I can stay updated about the events
 
   Background:
-    Given these users have been created with default attributes and without skeleton files:
+    Given these users have been created with default attributes:
       | username |
       | Alice    |
       | Brian    |
@@ -45,7 +45,7 @@ Feature: Email notification
 
   Scenario: group members get an email notification when someone shares a project space with the group
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
-    And user "Carol" has been created with default attributes and without skeleton files
+    And user "Carol" has been created with default attributes
     And group "group1" has been created
     And user "Brian" has been added to group "group1"
     And user "Carol" has been added to group "group1"
@@ -74,7 +74,7 @@ Feature: Email notification
 
 
   Scenario: group members get an email notification in their respective languages when someone shares a folder with the group
-    Given user "Carol" has been created with default attributes and without skeleton files
+    Given user "Carol" has been created with default attributes
     And group "group1" has been created
     And user "Brian" has been added to group "group1"
     And user "Carol" has been added to group "group1"
@@ -103,7 +103,7 @@ Feature: Email notification
 
 
   Scenario: group members get an email notification in their respective languages when someone shares a file with the group
-    Given user "Carol" has been created with default attributes and without skeleton files
+    Given user "Carol" has been created with default attributes
     And group "group1" has been created
     And user "Brian" has been added to group "group1"
     And user "Carol" has been added to group "group1"
@@ -133,7 +133,7 @@ Feature: Email notification
   @skipOnStable3.0
   Scenario: group members get an email notification in their respective languages when someone shares a space with the group
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
-    And user "Carol" has been created with default attributes and without skeleton files
+    And user "Carol" has been created with default attributes
     And group "group1" has been created
     And user "Brian" has been added to group "group1"
     And user "Carol" has been added to group "group1"
@@ -186,7 +186,7 @@ Feature: Email notification
   @env-config
   Scenario: group members get an email notification in default language when someone shares a file with the group
     Given the config "OCIS_DEFAULT_LANGUAGE" has been set to "de"
-    And user "Carol" has been created with default attributes and without skeleton files
+    And user "Carol" has been created with default attributes
     And group "group1" has been created
     And user "Brian" has been added to group "group1"
     And user "Carol" has been added to group "group1"

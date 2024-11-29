@@ -5,7 +5,7 @@ Feature: delay post-processing of uploaded files
   So that I can check the early request
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
     And async upload has been enabled with post-processing delayed to "30" seconds
 
   @issue-5326

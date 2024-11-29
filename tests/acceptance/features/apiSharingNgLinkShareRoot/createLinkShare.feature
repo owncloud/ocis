@@ -2,7 +2,7 @@ Feature: Create a link share for a resource
   https://owncloud.dev/libre-graph-api/#/drives.permissions/CreateLink
 
   Background:
-    Given these users have been created with default attributes and without skeleton files:
+    Given these users have been created with default attributes:
       | username |
       | Alice    |
 

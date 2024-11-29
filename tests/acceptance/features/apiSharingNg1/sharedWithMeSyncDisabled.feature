@@ -6,7 +6,7 @@ Feature: listing sharedWithMe when auto-sync is disabled
   https://owncloud.dev/libre-graph-api/#/me.drive/ListSharedWithMe
 
   Background:
-    Given these users have been created with default attributes and without skeleton files:
+    Given these users have been created with default attributes:
       | username |
       | Alice    |
       | Brian    |
@@ -2223,7 +2223,7 @@ Feature: listing sharedWithMe when auto-sync is disabled
 
 
   Scenario: user lists the file with same name shared by two users with him/her
-    Given user "Carol" has been created with default attributes and without skeleton files
+    Given user "Carol" has been created with default attributes
     And user "Alice" has uploaded file with content "to share" to "textfile.txt"
     And user "Carol" has uploaded file with content "to share" to "textfile.txt"
     And user "Alice" has sent the following resource share invitation:
@@ -2520,7 +2520,7 @@ Feature: listing sharedWithMe when auto-sync is disabled
 
 
   Scenario: user lists the folder with same name shared by two users with him/her
-    Given user "Carol" has been created with default attributes and without skeleton files
+    Given user "Carol" has been created with default attributes
     And user "Alice" has created folder "folderToShare"
     And user "Carol" has created folder "folderToShare"
     And user "Alice" has sent the following resource share invitation:
@@ -3160,7 +3160,7 @@ Feature: listing sharedWithMe when auto-sync is disabled
 
 
   Scenario: sharee lists the files with same name shared from different project-spaces
-    Given user "Carol" has been created with default attributes and without skeleton files
+    Given user "Carol" has been created with default attributes
     And using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And the administrator has assigned the role "Space Admin" to user "Carol" using the Graph API
@@ -3479,7 +3479,7 @@ Feature: listing sharedWithMe when auto-sync is disabled
 
 
   Scenario: sharee lists the folders with same name shared from different project-spaces
-    Given user "Carol" has been created with default attributes and without skeleton files
+    Given user "Carol" has been created with default attributes
     And using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And the administrator has assigned the role "Space Admin" to user "Carol" using the Graph API

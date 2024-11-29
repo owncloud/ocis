@@ -4,7 +4,7 @@ Feature: auth
   So that I can make sure the endpoints need proper authentication
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
 
   @issue-1337 @smokeTest
   Scenario: send POST requests to OCS endpoints as normal user with wrong password

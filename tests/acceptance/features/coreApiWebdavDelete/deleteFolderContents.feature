@@ -4,7 +4,7 @@ Feature: delete folder contents
   So that I can quickly remove unwanted data
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
 
 
   Scenario Outline: removing everything from a folder

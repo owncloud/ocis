@@ -4,7 +4,7 @@ Feature: check share activity
   So that I can track activities of a file
 
   Background:
-    Given these users have been created with default attributes and without skeleton files:
+    Given these users have been created with default attributes:
       | username |
       | Alice    |
       | Brian    |

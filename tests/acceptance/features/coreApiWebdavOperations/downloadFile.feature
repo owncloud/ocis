@@ -4,7 +4,7 @@ Feature: download file
   So that I can work wih local copies of files on my client system
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
     And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
     And user "Alice" has uploaded file with content "Welcome this is just an example file for developers." to "/welcome.txt"
 

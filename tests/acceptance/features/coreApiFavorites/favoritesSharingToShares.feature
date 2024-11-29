@@ -5,14 +5,14 @@ Feature: favorite
   So that I can access them quickly
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
     And user "Alice" has created folder "/PARENT"
     And user "Alice" has uploaded file with content "some data" to "/PARENT/parent.txt"
 
 
   Scenario Outline: favorite a file inside of a received share
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Alice" has sent the following resource share invitation:
       | resource        | PARENT   |
       | space           | Personal |
@@ -32,7 +32,7 @@ Feature: favorite
 
   Scenario Outline: favorite a folder inside of a received share
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Alice" has created folder "/PARENT/sub-folder"
     And user "Alice" has sent the following resource share invitation:
       | resource        | PARENT   |
@@ -53,7 +53,7 @@ Feature: favorite
 
   Scenario Outline: favorite a received share itself
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Alice" has sent the following resource share invitation:
       | resource        | PARENT   |
       | space           | Personal |
@@ -73,7 +73,7 @@ Feature: favorite
   @issue-1228
   Scenario Outline: moving a favorite file out of a share keeps favorite state
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Alice" has sent the following resource share invitation:
       | resource        | PARENT   |
       | space           | Personal |
@@ -95,7 +95,7 @@ Feature: favorite
 
   Scenario Outline: sharee file favorite state should not change the favorite state of sharer
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Alice" has sent the following resource share invitation:
       | resource        | PARENT/parent.txt |
       | space           | Personal          |

@@ -5,7 +5,7 @@ Feature: moving/renaming file using file id
 
   Background:
     Given using spaces DAV path
-    And user "Alice" has been created with default attributes and without skeleton files
+    And user "Alice" has been created with default attributes
 
 
   Scenario: move a file into a folder inside personal space
@@ -68,7 +68,7 @@ Feature: moving/renaming file using file id
 
 
   Scenario Outline: move a file from personal to share space
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And user "Alice" has created folder "/folder"
     And user "Alice" has sent the following resource share invitation:
       | resource        | folder        |
@@ -93,7 +93,7 @@ Feature: moving/renaming file using file id
 
   @issue-7618
   Scenario Outline: move a file from personal to project space
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "project-space" with the default quota using the Graph API
     And user "Brian" has uploaded a file inside space "Personal" with content "some data" to "textfile.txt"
@@ -132,7 +132,7 @@ Feature: moving/renaming file using file id
 
   Scenario Outline: move a file into a folder inside project space (manager/editor)
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Alice" has created a space "project-space" with the default quota using the Graph API
     And user "Alice" has created a folder "/folder" in space "project-space"
     And user "Alice" has uploaded a file inside space "project-space" with content "some data" to "textfile.txt"
@@ -156,7 +156,7 @@ Feature: moving/renaming file using file id
   @issue-1976
   Scenario Outline: try to move a file within a project space into a folder with same name
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Alice" has created a space "project-space" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "project-space" with content "some data" to "textfile.txt"
     And we save it into "FILEID"
@@ -178,7 +178,7 @@ Feature: moving/renaming file using file id
 
   Scenario: try to move a file into a folder inside project space (viewer)
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Alice" has created a space "project-space" with the default quota using the Graph API
     And user "Alice" has created a folder "/folder" in space "project-space"
     And user "Alice" has uploaded a file inside space "project-space" with content "some data" to "textfile.txt"
@@ -239,7 +239,7 @@ Feature: moving/renaming file using file id
 
   @issue-8116
   Scenario Outline: move a file between two project spaces
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "first-project-space" with the default quota using the Graph API
     And user "Alice" has created a space "second-project-space" with the default quota using the Graph API
@@ -293,7 +293,7 @@ Feature: moving/renaming file using file id
 
 
   Scenario Outline: move a file from project to shares space
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "project-space" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "project-space" with content "some data" to "textfile.txt"
@@ -328,7 +328,7 @@ Feature: moving/renaming file using file id
 
   @issue-7618
   Scenario Outline: move a file from project to personal space
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "project-space" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "project-space" with content "some data" to "textfile.txt"
@@ -366,7 +366,7 @@ Feature: moving/renaming file using file id
 
   @issue-7617
   Scenario: move a file into a folder within a shared folder (edit permissions)
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And user "Alice" has created folder "folder"
     And user "Alice" has created folder "folder/sub-folder"
     And user "Alice" has uploaded file with content "some data" to "folder/test.txt"
@@ -391,7 +391,7 @@ Feature: moving/renaming file using file id
 
   @issue-1976
   Scenario: sharee tries to move a file into same shared folder with same name
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And user "Alice" has created folder "folder"
     And user "Alice" has uploaded file with content "some data" to "folder/test.txt"
     And we save it into "FILEID"
@@ -410,7 +410,7 @@ Feature: moving/renaming file using file id
 
 
   Scenario: try to move a file into a folder within a shared folder (read permissions)
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And user "Alice" has created folder "folder"
     And user "Alice" has created folder "folder/sub-folder"
     And user "Alice" has uploaded file with content "some data" to "folder/test.txt"
@@ -435,7 +435,7 @@ Feature: moving/renaming file using file id
 
 
   Scenario Outline: move a file from one shared folder to another shared folder
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And user "Alice" has created folder "testshare1"
     And user "Alice" has created folder "testshare2"
     And user "Alice" has uploaded file with content "some data" to "testshare1/textfile.txt"
@@ -469,7 +469,7 @@ Feature: moving/renaming file using file id
 
   @issue-8124
   Scenario Outline: move a file from share to personal space
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And user "Alice" has created folder "/folder"
     And user "Alice" has uploaded file with content "some data" to "/folder/test.txt"
     And we save it into "FILEID"
@@ -493,7 +493,7 @@ Feature: moving/renaming file using file id
 
   @issue-8125
   Scenario Outline: move a file from shares to project space
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "project-space" with the default quota using the Graph API
     And user "Alice" has sent the following space share invitation:
@@ -589,7 +589,7 @@ Feature: moving/renaming file using file id
 
   @issue-7617
   Scenario: move a file to a different name into a sub-folder inside share space (editor permissions)
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And user "Alice" has created folder "/folder"
     And user "Alice" has created folder "/folder/sub-folder"
     And user "Alice" has uploaded file with content "some data" to "/folder/test.txt"
@@ -610,7 +610,7 @@ Feature: moving/renaming file using file id
 
 
   Scenario: move a file to a different name into a sub-folder inside share space (read permissions)
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And user "Alice" has created folder "/folder"
     And user "Alice" has created folder "/folder/sub-folder"
     And user "Alice" has uploaded file with content "some data" to "/folder/test.txt"
