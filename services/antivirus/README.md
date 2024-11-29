@@ -2,6 +2,19 @@
 
 The `antivirus` service is responsible for scanning files for viruses.
 
+## Memory Considerations
+
+The antivirus service can consume considerably amounts of memory. This is relevant to provide or define sufficient memory for the deployment selected. To avoid out of memory (OOM) situations, the following equation gives a rough overview based on experiences made. The memory calculation comes without any guarantee, is intended as overview only and subject of change.
+
+`memory limit` = `max file size` x `workers` x `factor 8 - 14`
+
+With:
+`ANTIVIRUS_WORKERS` == 1
+```plaintext
+ 50MB file --> factor 14   --> 700MB memory
+844MB file --> factor  8,3 -->   7GB memory
+```
+
 ## Configuration
 
 ### Antivirus Scanner Type
