@@ -206,11 +206,7 @@ function run_behat_tests() {
 	BEHAT_EXIT_STATUS=${PIPESTATUS[0]}
 
 	# remove nullbytes from the test log
-	TEMP_CONTENT=$(tr < ${TEST_LOG_FILE} -d '\000')
-	OLD_IFS="${IFS}"
-	IFS=""
-	echo ${TEMP_CONTENT} > ${TEST_LOG_FILE}
-	IFS="${OLD_IFS}"
+	sed -i 's/\x0//g' ${TEST_LOG_FILE}
 
 	# Find the count of scenarios that passed
 	SCENARIO_RESULTS_COLORED=`grep -Ea '^[0-9]+[[:space:]]scenario(|s)[[:space:]]\(' ${TEST_LOG_FILE}`
