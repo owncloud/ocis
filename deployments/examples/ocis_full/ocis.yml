@@ -7,6 +7,8 @@ services:
           - ${OCIS_DOMAIN:-ocis.owncloud.test}
   ocis:
     image: ${OCIS_DOCKER_IMAGE:-owncloud/ocis}:${OCIS_DOCKER_TAG:-latest}
+    # changelog: https://github.com/owncloud/ocis/tree/master/changelog
+    # release notes: https://doc.owncloud.com/ocis_release_notes.html
     networks:
       ocis-net:
     entrypoint:

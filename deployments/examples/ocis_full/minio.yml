@@ -2,6 +2,7 @@
 services:
   minio:
     image: minio/minio:latest
+    # release notes: https://github.com/minio/minio/releases
     networks:
       ocis-net:
     entrypoint:
