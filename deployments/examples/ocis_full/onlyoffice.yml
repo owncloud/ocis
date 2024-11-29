@@ -51,7 +51,8 @@ services:
   onlyoffice:
     # if you want to use oo enterprise edition, use: onlyoffice/documentserver-ee:<version>
     # note, you also need to add a volume, see below
-    image: onlyoffice/documentserver:8.2.1
+    image: onlyoffice/documentserver:8.2.2
+    # changelog https://github.com/ONLYOFFICE/DocumentServer/releases
     networks:
       ocis-net:
     entrypoint:

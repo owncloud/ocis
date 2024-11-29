@@ -11,6 +11,7 @@ services:
 
   inbucket:
     image: inbucket/inbucket
+    # changelog: https://github.com/inbucket/inbucket/blob/main/CHANGELOG.md
     networks:
       - ocis-net
     entrypoint:

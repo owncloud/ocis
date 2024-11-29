@@ -2,6 +2,7 @@
 services:
   tika:
     image: ${TIKA_IMAGE:-apache/tika:latest-full}
+    # release notes: https://tika.apache.org
     networks:
       ocis-net:
     restart: always
