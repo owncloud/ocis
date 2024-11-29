@@ -30,44 +30,32 @@ func Middleware(serverName string, opts ...Option) func(next http.Handler) http.
 	for _, opt := range opts {
 		opt.apply(&cfg)
 	}
-	if cfg.TracerProvider == nil {
-		cfg.TracerProvider = otel.GetTracerProvider()
+	if cfg.tracerProvider == nil {
+		cfg.tracerProvider = otel.GetTracerProvider()
 	}
-	tracer := cfg.TracerProvider.Tracer(
+	tracer := cfg.tracerProvider.Tracer(
 		tracerName,
 		oteltrace.WithInstrumentationVersion(Version()),
 	)
-	if cfg.Propagators == nil {
-		cfg.Propagators = otel.GetTextMapPropagator()
+	if cfg.propagators == nil {
+		cfg.propagators = otel.GetTextMapPropagator()
 	}
 
 	return func(handler http.Handler) http.Handler {
 		return traceware{
-			serverName:                    serverName,
-			tracer:                        tracer,
-			propagators:                   cfg.Propagators,
-			handler:                       handler,
-			chiRoutes:                     cfg.ChiRoutes,
-			reqMethodInSpanName:           cfg.RequestMethodInSpanName,
-			filters:                       cfg.Filters,
-			traceIDResponseHeaderKey:      cfg.TraceIDResponseHeaderKey,
-			traceSampledResponseHeaderKey: cfg.TraceSampledResponseHeaderKey,
-			publicEndpointFn:              cfg.PublicEndpointFn,
+			config:     cfg,
+			serverName: serverName,
+			tracer:     tracer,
+			handler:    handler,
 		}
 	}
 }
 
 type traceware struct {
-	serverName                    string
-	tracer                        oteltrace.Tracer
-	propagators                   propagation.TextMapPropagator
-	handler                       http.Handler
-	chiRoutes                     chi.Routes
-	reqMethodInSpanName           bool
-	filters                       []Filter
-	traceIDResponseHeaderKey      string
-	traceSampledResponseHeaderKey string
-	publicEndpointFn              func(r *http.Request) bool
+	config
+	serverName string
+	tracer     oteltrace.Tracer
+	handler    http.Handler
 }
 
 type recordingResponseWriter struct {
@@ -144,7 +132,7 @@ func (tw traceware) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		rctx := chi.NewRouteContext()
 		if tw.chiRoutes.Match(rctx, r.Method, r.URL.Path) {
 			routePattern = rctx.RoutePattern()
-			spanName = addPrefixToSpanName(tw.reqMethodInSpanName, r.Method, routePattern)
+			spanName = addPrefixToSpanName(tw.requestMethodInSpanName, r.Method, routePattern)
 			spanAttributes = append(spanAttributes, semconv.HTTPRoute(routePattern))
 		}
 	}
@@ -200,7 +188,7 @@ func (tw traceware) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		routePattern = chi.RouteContext(r.Context()).RoutePattern()
 		span.SetAttributes(semconv.HTTPRoute(routePattern))
 
-		spanName = addPrefixToSpanName(tw.reqMethodInSpanName, r.Method, routePattern)
+		spanName = addPrefixToSpanName(tw.requestMethodInSpanName, r.Method, routePattern)
 		span.SetName(spanName)
 	}
 

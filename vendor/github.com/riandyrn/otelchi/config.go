@@ -16,14 +16,14 @@ const (
 
 // config is used to configure the mux middleware.
 type config struct {
-	TracerProvider                oteltrace.TracerProvider
-	Propagators                   propagation.TextMapPropagator
-	ChiRoutes                     chi.Routes
-	RequestMethodInSpanName       bool
-	Filters                       []Filter
-	TraceIDResponseHeaderKey      string
-	TraceSampledResponseHeaderKey string
-	PublicEndpointFn              func(r *http.Request) bool
+	tracerProvider                oteltrace.TracerProvider
+	propagators                   propagation.TextMapPropagator
+	chiRoutes                     chi.Routes
+	requestMethodInSpanName       bool
+	filters                       []Filter
+	traceIDResponseHeaderKey      string
+	traceSampledResponseHeaderKey string
+	publicEndpointFn              func(r *http.Request) bool
 }
 
 // Option specifies instrumentation configuration options.
@@ -46,7 +46,7 @@ type Filter func(*http.Request) bool
 // ones will be used.
 func WithPropagators(propagators propagation.TextMapPropagator) Option {
 	return optionFunc(func(cfg *config) {
-		cfg.Propagators = propagators
+		cfg.propagators = propagators
 	})
 }
 
@@ -54,7 +54,7 @@ func WithPropagators(propagators propagation.TextMapPropagator) Option {
 // If none is specified, the global provider is used.
 func WithTracerProvider(provider oteltrace.TracerProvider) Option {
 	return optionFunc(func(cfg *config) {
-		cfg.TracerProvider = provider
+		cfg.tracerProvider = provider
 	})
 }
 
@@ -66,7 +66,7 @@ func WithTracerProvider(provider oteltrace.TracerProvider) Option {
 // is possible for them to override the span name.
 func WithChiRoutes(routes chi.Routes) Option {
 	return optionFunc(func(cfg *config) {
-		cfg.ChiRoutes = routes
+		cfg.chiRoutes = routes
 	})
 }
 
@@ -81,7 +81,7 @@ func WithChiRoutes(routes chi.Routes) Option {
 // - https://github.com/riandyrn/otelchi/issues/6#issuecomment-1034461912
 func WithRequestMethodInSpanName(isActive bool) Option {
 	return optionFunc(func(cfg *config) {
-		cfg.RequestMethodInSpanName = isActive
+		cfg.requestMethodInSpanName = isActive
 	})
 }
 
@@ -93,7 +93,7 @@ func WithRequestMethodInSpanName(isActive bool) Option {
 // simple and fast.
 func WithFilter(filter Filter) Option {
 	return optionFunc(func(cfg *config) {
-		cfg.Filters = append(cfg.Filters, filter)
+		cfg.filters = append(cfg.filters, filter)
 	})
 }
 
@@ -125,14 +125,14 @@ type TraceHeaderConfig struct {
 // be used for the respective headers.
 func WithTraceResponseHeaders(cfg TraceHeaderConfig) Option {
 	return optionFunc(func(c *config) {
-		c.TraceIDResponseHeaderKey = cfg.TraceIDHeader
-		if c.TraceIDResponseHeaderKey == "" {
-			c.TraceIDResponseHeaderKey = DefaultTraceIDResponseHeaderKey
+		c.traceIDResponseHeaderKey = cfg.TraceIDHeader
+		if c.traceIDResponseHeaderKey == "" {
+			c.traceIDResponseHeaderKey = DefaultTraceIDResponseHeaderKey
 		}
 
-		c.TraceSampledResponseHeaderKey = cfg.TraceSampledHeader
-		if c.TraceSampledResponseHeaderKey == "" {
-			c.TraceSampledResponseHeaderKey = DefaultTraceSampledResponseHeaderKey
+		c.traceSampledResponseHeaderKey = cfg.TraceSampledHeader
+		if c.traceSampledResponseHeaderKey == "" {
+			c.traceSampledResponseHeaderKey = DefaultTraceSampledResponseHeaderKey
 		}
 	})
 }
@@ -174,6 +174,6 @@ func WithPublicEndpoint() Option {
 // more flexibility.
 func WithPublicEndpointFn(fn func(r *http.Request) bool) Option {
 	return optionFunc(func(cfg *config) {
-		cfg.PublicEndpointFn = fn
+		cfg.publicEndpointFn = fn
 	})
 }
