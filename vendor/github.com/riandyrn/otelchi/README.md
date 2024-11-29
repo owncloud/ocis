@@ -8,7 +8,7 @@ OpenTelemetry instrumentation for [go-chi/chi](https://github.com/go-chi/chi).
 
 Essentially this is an adaptation from [otelmux](https://github.com/open-telemetry/opentelemetry-go-contrib/tree/main/instrumentation/github.com/gorilla/mux/otelmux) but instead of using `gorilla/mux`, we use `go-chi/chi`.
 
-Currently, this library can only instrument traces.
+Currently, this library can only instrument traces and metrics.
 
 Contributions are welcomed!
 

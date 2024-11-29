@@ -1670,7 +1670,7 @@ github.com/r3labs/sse/v2
 # github.com/rcrowley/go-metrics v0.0.0-20200313005456-10cdbea86bc0
 ## explicit
 github.com/rcrowley/go-metrics
-# github.com/riandyrn/otelchi v0.10.1
+# github.com/riandyrn/otelchi v0.11.0
 ## explicit; go 1.22.0
 github.com/riandyrn/otelchi
 # github.com/rivo/uniseg v0.4.7
