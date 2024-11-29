@@ -62,14 +62,29 @@ func (s FileSystem) Put(key string, img []byte) error {
 	}
 
 	if _, err := os.Stat(imgPath); os.IsNotExist(err) {
-		f, err := os.Create(imgPath)
+		f, err := os.CreateTemp(dir, "tmpthumb")
 		if err != nil {
-			return errors.Wrapf(err, "could not create file \"%s\"", key)
+			return errors.Wrapf(err, "could not create temporary file for \"%s\"", key)
 		}
-		defer f.Close()
 
-		if _, err = f.Write(img); err != nil {
-			return errors.Wrapf(err, "could not write to file \"%s\"", key)
+		_, writeErr := f.Write(img) // write the thumbnail in the temporary file
+		f.Close()                   // close the file regardless of the error
+
+		// if there was a problem writing, remove the temporary file
+		if writeErr != nil {
+			if remErr := os.Remove(f.Name()); remErr != nil {
+				return errors.Wrapf(remErr, "could not cleanup temporary file for \"%s\"", key)
+			}
+			return errors.Wrapf(writeErr, "could not write to temporary file for \"%s\"", key)
+		}
+
+		// rename the temporary file to the final file
+		if renErr := os.Rename(f.Name(), imgPath); renErr != nil {
+			// if we couldn't rename, remove the temporary file
+			if remErr := os.Remove(f.Name()); remErr != nil {
+				return errors.Wrapf(remErr, "rename failed and could not cleanup temporary file for \"%s\"", key)
+			}
+			return errors.Wrapf(err, "could not rename temporary file to \"%s\"", key)
 		}
 	}
 
