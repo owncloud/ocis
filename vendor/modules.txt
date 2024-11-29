@@ -1168,7 +1168,7 @@ github.com/grpc-ecosystem/grpc-gateway/v2/utilities
 # github.com/hashicorp/go-hclog v1.6.3
 ## explicit; go 1.13
 github.com/hashicorp/go-hclog
-# github.com/hashicorp/go-plugin v1.6.1
+# github.com/hashicorp/go-plugin v1.6.2
 ## explicit; go 1.17
 github.com/hashicorp/go-plugin
 github.com/hashicorp/go-plugin/internal/cmdrunner
@@ -1355,9 +1355,6 @@ github.com/minio/minio-go/v7/pkg/tags
 # github.com/mitchellh/copystructure v1.2.0
 ## explicit; go 1.15
 github.com/mitchellh/copystructure
-# github.com/mitchellh/go-testing-interface v1.14.1
-## explicit; go 1.14
-github.com/mitchellh/go-testing-interface
 # github.com/mitchellh/mapstructure v1.5.0
 ## explicit; go 1.14
 github.com/mitchellh/mapstructure
@@ -1849,8 +1846,8 @@ github.com/trustelem/zxcvbn/internal/mathutils
 github.com/trustelem/zxcvbn/match
 github.com/trustelem/zxcvbn/matching
 github.com/trustelem/zxcvbn/scoring
-# github.com/tus/tusd/v2 v2.5.0
-## explicit; go 1.20
+# github.com/tus/tusd/v2 v2.6.0
+## explicit; go 1.21.0
 github.com/tus/tusd/v2/pkg/handler
 # github.com/unrolled/secure v1.16.0 => github.com/DeepDiver1975/secure v0.0.0-20240611112133-abc838fb797c
 ## explicit; go 1.13
