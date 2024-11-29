@@ -28,8 +28,11 @@ Use this checklist with copy/paste in your PR - right from the beginning. It ren
 - [ ] If new global envvars are introduced, the name must start with `OCIS_`.
 - [ ] Add the service to the makefile in the ocis repo root.
 - [ ] Service startup:
-  - For automatic startup: `ocis/pkg/runtime` (service/service.go)
-  - Exclude from automatic startup, add it to the `populate optional services` block
+  - add it to `ocis/pkg/command/services.go`
+  - Include for automatic startup:
+    - add it to `ocis/pkg/runtime/service/service.go`
+  - Exclude from automatic startup:
+    - add it to the `populate optional services` block in `ocis/pkg/runtime/service/service.go`
   - Add the service config to `ocis-pkg/config/defaultconfig.go`
 - [ ] If the service is using service accounts, add it to `ocis/pkg/init/init.go`
 - [ ] Check that the service properly responds to `ocis <service-name> health` and has `/healthz` and `/readyz` endpoints
