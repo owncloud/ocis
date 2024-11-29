@@ -22,7 +22,7 @@ Feature: Send a sharing invitations
       | shareType       | user               |
       | permissionsRole | <permissions-role> |
     Then the HTTP status code should be "200"
-    And user "Brian" should have a share "<resource>" shared by user "Alice"
+    And user "Brian" should have a share "<resource>" shared by user "Alice" from space "Personal"
     And the JSON data of the response should match
       """
       {
@@ -111,9 +111,8 @@ Feature: Send a sharing invitations
       | shareType       | group              |
       | permissionsRole | <permissions-role> |
     Then the HTTP status code should be "200"
-    And user "Brian" should have a share "<resource>" shared by user "Alice"
-    And for user "Carol" the space Shares should contain these entries:
-      | <resource> |
+    And user "Brian" should have a share "<resource>" shared by user "Alice" from space "Personal"
+    And user "Carol" should have a share "<resource>" shared by user "Alice" from space "Personal"
     And the JSON data of the response should match
       """
       {
@@ -1901,8 +1900,7 @@ Feature: Send a sharing invitations
       | shareType       | user     |
       | permissionsRole | Viewer   |
     Then the HTTP status code should be "404"
-    And for user "Brian" the space Shares should not contain these entries:
-      | textfile1.txt |
+    And user "Brian" should not have a share "textfile1.txt" shared by user "Alice" from space "Personal"
     And the JSON data of the response should match
       """
       {
@@ -1947,10 +1945,8 @@ Feature: Send a sharing invitations
       | shareType       | group    |
       | permissionsRole | Viewer   |
     Then the HTTP status code should be "404"
-    And for user "Brian" the space Shares should not contain these entries:
-      | textfile1.txt |
-    And for user "Carol" the space Shares should not contain these entries:
-      | textfile1.txt |
+    And user "Brian" should not have a share "textfile1.txt" shared by user "Alice" from space "Personal"
+    And user "Carol" should not have a share "textfile1.txt" shared by user "Alice" from space "Personal"
     And the JSON data of the response should match
       """
       {
@@ -1992,7 +1988,7 @@ Feature: Send a sharing invitations
       | shareType       | user               |
       | permissionsRole | <permissions-role> |
     Then the HTTP status code should be "200"
-    And user "Brian" should have a share "<resource>" shared by user "Alice"
+    And user "Brian" should have a share "<resource>" shared by user "Alice" from space "NewSpace"
     And the JSON data of the response should match
       """
       {
@@ -2079,9 +2075,8 @@ Feature: Send a sharing invitations
       | shareType       | group              |
       | permissionsRole | <permissions-role> |
     Then the HTTP status code should be "200"
-    And user "Brian" should have a share "<resource>" shared by user "Alice"
-    And for user "Carol" the space Shares should contain these entries:
-      | <resource> |
+    And user "Brian" should have a share "<resource>" shared by user "Alice" from space "NewSpace"
+    And user "Carol" should have a share "<resource>" shared by user "Alice" from space "NewSpace"
     And the JSON data of the response should match
       """
       {
@@ -2240,10 +2235,10 @@ Feature: Send a sharing invitations
       }
       """
     Examples:
-      | permissions-role | error-message                                                                                      |
-      | Space Viewer     | role not applicable to this resource                                                               |
-      | Space Editor     | role not applicable to this resource                                                               |
-      | Manager          | role not applicable to this resource                                                               |
+      | permissions-role | error-message                        |
+      | Space Viewer     | role not applicable to this resource |
+      | Space Editor     | role not applicable to this resource |
+      | Manager          | role not applicable to this resource |
 
 
   Scenario Outline: try to send share invitation with different re-sharing permissions
@@ -3115,7 +3110,7 @@ Feature: Send a sharing invitations
       | shareType       | user         |
       | permissionsRole | Viewer       |
     Then the HTTP status code should be "200"
-    And user "Brian" should have a share "<resource>" shared by user "Alice"
+    And user "Brian" should have a share "textfile.txt" shared by user "Alice" from space "Personal"
     When user "Alice" sends the following resource share invitation using the Graph API:
       | resource        | textfile.txt |
       | space           | Personal     |
@@ -3123,8 +3118,7 @@ Feature: Send a sharing invitations
       | shareType       | group        |
       | permissionsRole | Viewer       |
     Then the HTTP status code should be "200"
-    And for user "Carol" the space Shares should contain these entries:
-      | textfile.txt |
+    And user "Carol" should have a share "textfile.txt" shared by user "Alice" from space "Personal"
 
 
   Scenario: share a file to group containing special characters in name (Personal space)
@@ -3140,7 +3134,7 @@ Feature: Send a sharing invitations
       | shareType       | group        |
       | permissionsRole | Viewer       |
     Then the HTTP status code should be "200"
-    And user "Brian" should have a share "textfile.txt" shared by user "Alice"
+    And user "Brian" should have a share "textfile.txt" shared by user "Alice" from space "Personal"
 
 
   Scenario: share a file to user and group having same name (Project space)
@@ -3160,7 +3154,7 @@ Feature: Send a sharing invitations
       | shareType       | user         |
       | permissionsRole | Viewer       |
     Then the HTTP status code should be "200"
-    And user "Brian" should have a share "textfile.txt" shared by user "Alice"
+    And user "Brian" should have a share "textfile.txt" shared by user "Alice" from space "NewSpace"
     When user "Alice" sends the following resource share invitation using the Graph API:
       | resource        | textfile.txt |
       | space           | NewSpace     |
@@ -3168,8 +3162,7 @@ Feature: Send a sharing invitations
       | shareType       | group        |
       | permissionsRole | Viewer       |
     Then the HTTP status code should be "200"
-    And for user "Carol" the space Shares should contain these entries:
-      | textfile.txt |
+    And user "Carol" should have a share "textfile.txt" shared by user "Alice" from space "NewSpace"
 
 
   Scenario: share a file to group containing special characters in name (Project space)
@@ -3188,4 +3181,4 @@ Feature: Send a sharing invitations
       | shareType       | group        |
       | permissionsRole | Viewer       |
     Then the HTTP status code should be "200"
-    And user "Brian" should have a share "textfile.txt" shared by user "Alice"
+    And user "Brian" should have a share "textfile.txt" shared by user "Alice" from space "NewSpace"

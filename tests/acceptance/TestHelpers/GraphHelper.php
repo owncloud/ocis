@@ -45,6 +45,8 @@ class GraphHelper {
 		'Space Editor Without Versions' => '3284f2d5-0070-4ad8-ac40-c247f7c1fb27',
 	];
 
+	public const SHARES_SPACE_ID = 'a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668';
+
 	/**
 	 * @return string[]
 	 */

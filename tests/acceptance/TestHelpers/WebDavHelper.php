@@ -505,35 +505,6 @@ class WebDavHelper {
 	}
 
 	/**
-	 *
-	 * @param string $baseUrl
-	 * @param string $user
-	 * @param string $password
-	 * @param string $xRequestId
-	 *
-	 * @return string
-	 * @throws GuzzleException
-	 * @throws Exception
-	 */
-	public static function getSharesSpaceIdForUser(string $baseUrl, string $user, string $password, string $xRequestId): string {
-		if (\array_key_exists($user, self::$spacesIdRef) && \array_key_exists("virtual", self::$spacesIdRef[$user])) {
-			return self::$spacesIdRef[$user]["virtual"];
-		}
-
-		$response = GraphHelper::getMySpaces($baseUrl, $user, $password, '', $xRequestId);
-		$body = HttpRequestHelper::getJsonDecodedResponseBodyContent($response);
-
-		$spaceId = null;
-		foreach ($body->value as $spaces) {
-			if ($spaces->driveType === "virtual") {
-				$spaceId = $spaces->id;
-				break;
-			}
-		}
-		return $spaceId;
-	}
-
-	/**
 	 * fetches personal space id for provided user
 	 *
 	 * @param string $baseUrl
@@ -558,10 +529,18 @@ class WebDavHelper {
 			$user,
 			$password
 		);
-		$bodyContents = $response->getBody()->getContents();
-		$json = \json_decode($bodyContents);
+		Assert::assertEquals(200, $response->getStatusCode(), "Cannot list drives for user '$user'");
+
 		$personalSpaceId = '';
-		if ($json === null) {
+		$drives = HttpRequestHelper::getJsonDecodedResponseBodyContent($response);
+		foreach ($drives->value as $drive) {
+			if ($drive->driveType === "personal") {
+				$personalSpaceId = $drive->id;
+				break;
+			}
+		}
+
+		if (!$personalSpaceId) {
 			// the graph endpoint did not give a useful answer
 			// try getting the information from the webdav endpoint
 			$fullUrl = "$trimmedBaseUrl/" . self::getDavPath(self::DAV_VERSION_NEW, $user);
@@ -582,13 +561,6 @@ class WebDavHelper {
 			Assert::assertNotEmpty($xmlPart, "The 'oc:spaceid' for user '$user' was not found in the PROPFIND response");
 
 			$personalSpaceId = $xmlPart[0]->__toString();
-		} else {
-			foreach ($json->value as $spaces) {
-				if ($spaces->driveType === "personal") {
-					$personalSpaceId = $spaces->id;
-					break;
-				}
-			}
 		}
 
 		Assert::assertNotEmpty($personalSpaceId, "The personal space id for user '$user' was not found");
@@ -611,21 +583,16 @@ class WebDavHelper {
 	 * @throws Exception|GuzzleException
 	 */
 	public static function getPersonalSpaceIdForUserOrFakeIfNotFound(string $baseUrl, string $user, string $password, string $xRequestId):string {
-		try {
-			$spaceId = self::getPersonalSpaceIdForUser(
-				$baseUrl,
-				$user,
-				$password,
-				$xRequestId,
-			);
-		} catch (SpaceNotFoundException $e) {
-			// if the fetch fails, and the user is not found, then a fake space id is prepared
-			// this is useful for testing when the personal space is of a non-existing user
-			$fakeSpaceId = self::generateUUIDv4();
-			self::$spacesIdRef[$user]["personal"] = $fakeSpaceId;
-			$spaceId = $fakeSpaceId;
+		if (\str_starts_with($user, "non-exist") || \str_starts_with($user, "nonexist")) {
+			return self::generateUUIDv4();
 		}
-		return $spaceId;
+
+		return self::getPersonalSpaceIdForUser(
+			$baseUrl,
+			$user,
+			$password,
+			$xRequestId,
+		);
 	}
 
 	/**
@@ -692,12 +659,7 @@ class WebDavHelper {
 		if ($spaceId === null && $davPathVersionToUse === self::DAV_VERSION_SPACES && !\in_array($type, ["public-files", "versions"])) {
 			$path = \ltrim($path, "/");
 			if (\str_starts_with($path, "Shares/")) {
-				$spaceId = self::getSharesSpaceIdForUser(
-					$baseUrl,
-					$user,
-					$password,
-					$xRequestId
-				);
+				$spaceId = GraphHelper::SHARES_SPACE_ID;
 				$path = "/" . preg_replace("/^Shares\//", "", $path);
 			} else {
 				$spaceId = self::getPersonalSpaceIdForUserOrFakeIfNotFound(

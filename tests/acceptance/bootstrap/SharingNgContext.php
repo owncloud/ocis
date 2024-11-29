@@ -1124,7 +1124,7 @@ class SharingNgContext implements Context {
 	 * @throws JsonException
 	 */
 	public function hideOrUnhideSharedResource(string $sharee, string $shareID, bool $hide = true): ResponseInterface {
-		$shareSpaceId = FeatureContext::SHARES_SPACE_ID;
+		$shareSpaceId = GraphHelper::SHARES_SPACE_ID;
 		$itemId = $shareSpaceId . '!' . $shareID;
 		$body['@UI.Hidden'] = $hide;
 		return GraphHelper::hideOrUnhideShare(
@@ -1148,7 +1148,7 @@ class SharingNgContext implements Context {
 	 */
 	public function userHasDisabledSyncOfLastSharedResource(string $user):void {
 		$shareItemId = $this->featureContext->shareNgGetLastCreatedUserGroupShareID();
-		$shareSpaceId = FeatureContext::SHARES_SPACE_ID;
+		$shareSpaceId = GraphHelper::SHARES_SPACE_ID;
 		$itemId = $shareSpaceId . '!' . $shareItemId;
 		$response = GraphHelper::disableShareSync(
 			$this->featureContext->getBaseUrl(),
@@ -1172,7 +1172,7 @@ class SharingNgContext implements Context {
 	 */
 	public function userDisablesSyncOfShareUsingTheGraphApi(string $user):void {
 		$shareItemId = $this->featureContext->shareNgGetLastCreatedUserGroupShareID();
-		$shareSpaceId = FeatureContext::SHARES_SPACE_ID;
+		$shareSpaceId = GraphHelper::SHARES_SPACE_ID;
 		$itemId = $shareSpaceId . '!' . $shareItemId;
 		$response = GraphHelper::disableShareSync(
 			$this->featureContext->getBaseUrl(),
@@ -1247,7 +1247,7 @@ class SharingNgContext implements Context {
 	public function userEnablesSyncOfShareUsingTheGraphApi(string $user, string $share, string $offeredBy, string $space):void {
 		$share = ltrim($share, '/');
 		$itemId = $this->spacesContext->getResourceId($offeredBy, $space, $share);
-		$shareSpaceId = FeatureContext::SHARES_SPACE_ID;
+		$shareSpaceId = GraphHelper::SHARES_SPACE_ID;
 		$response =  GraphHelper::enableShareSync(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
@@ -1272,7 +1272,7 @@ class SharingNgContext implements Context {
 	 * @throws Exception|GuzzleException
 	 */
 	public function userTriesToEnableShareSyncOfResourceUsingTheGraphApi(string $user, string $resource):void {
-		$shareSpaceId = FeatureContext::SHARES_SPACE_ID;
+		$shareSpaceId = GraphHelper::SHARES_SPACE_ID;
 		$itemId = ($resource === 'nonexistent') ? WebDavHelper::generateUUIDv4() : $resource;
 
 		$response =  GraphHelper::enableShareSync(
@@ -1296,7 +1296,7 @@ class SharingNgContext implements Context {
 	 * @throws Exception|GuzzleException
 	 */
 	public function userTriesToDisableShareSyncOfResourceUsingTheGraphApi(string $user, string $resource):void {
-		$shareSpaceId = FeatureContext::SHARES_SPACE_ID;
+		$shareSpaceId = GraphHelper::SHARES_SPACE_ID;
 		$shareID = ($resource === 'nonexistent') ? WebDavHelper::generateUUIDv4() : $resource;
 		$itemId = $shareSpaceId . '!' . $shareID;
 		$response =  GraphHelper::disableShareSync(
@@ -1736,13 +1736,22 @@ class SharingNgContext implements Context {
 	 * @param string $share
 	 * @param string $sharee
 	 * @param string $sharer
+	 * @param string $space
+	 * @param bool $shouldExist
 	 *
 	 * @return void
 	 * @throws GuzzleException
 	 * @throws JsonException
 	 * @throws Exception
 	 */
-	public function checkIfShareExists(string $share, string $sharee, string $sharer): void {
+	public function checkIfShareExists(string $share, string $sharee, string $sharer, string $space, bool $shouldExist = true): void {
+		$share = \ltrim($share, "/");
+		if (\strtolower($space) === "personal") {
+			$remoteDriveAlias = "personal/" . \strtolower($sharer);
+		} else {
+			$remoteDriveAlias = "project/" . \strtolower($space);
+		}
+
 		// check share mountpoint
 		$response = GraphHelper::getMySpaces(
 			$this->featureContext->getBaseUrl(),
@@ -1754,11 +1763,11 @@ class SharingNgContext implements Context {
 		$driveList = HttpRequestHelper::getJsonDecodedResponseBodyContent($response)->value;
 		$foundShareMountpoint = false;
 		foreach ($driveList as $drive) {
-			if ($drive->driveType === "mountpoint" && $drive->name === $share && $drive->root->remoteItem->driveAlias === "personal/" . \strtolower($sharer)) {
+			if ($drive->driveType === "mountpoint" && $drive->name === $share && $drive->root->remoteItem->driveAlias === $remoteDriveAlias) {
 				$foundShareMountpoint = true;
 			}
 		}
-		Assert::assertTrue($foundShareMountpoint, "Share mountpoint '$share' was not found in the drives list.");
+		Assert::assertSame($shouldExist, $foundShareMountpoint, "Share mountpoint '$share' was not found in the drives list.");
 
 		// check share in shared-with-me list
 		$response = GraphHelper::getSharesSharedWithMe(
@@ -1770,24 +1779,46 @@ class SharingNgContext implements Context {
 		$sharedWithMeList = HttpRequestHelper::getJsonDecodedResponseBodyContent($response)->value;
 		$foundShareInSharedWithMe = false;
 		foreach ($sharedWithMeList as $item) {
-			if ($item->name === $share && $item->createdBy->user->displayName === $this->featureContext->getDisplayNameForUser($sharer)) {
-				$foundShareInSharedWithMe = true;
+			if ($item->name === $share) {
+				foreach ($item->remoteItem->permissions as $permission) {
+					$shareCreator = $permission->invitation->invitedBy->user->displayName;
+					if ($shareCreator === $this->featureContext->getDisplayNameForUser($sharer)) {
+						$foundShareInSharedWithMe = true;
+						break;
+					}
+				}
+				break;
 			}
 		}
-		Assert::assertTrue($foundShareInSharedWithMe, "Share '$share' was not found in the shared-with-me list");
+		Assert::assertSame($shouldExist, $foundShareInSharedWithMe, "Share '$share' was not found in the shared-with-me list");
 	}
 
 	/**
-	 * @Then user :sharee should have a share :share shared by user :sharer
+	 * @Then user :sharee should have a share :share shared by user :sharer from space :space
 	 *
 	 * @param string $sharee
 	 * @param string $share
 	 * @param string $sharer
+	 * @param string $space
 	 *
 	 * @return void
 	 */
-	public function userShouldHaveShare(string $sharee, string $share, string $sharer): void {
-		$this->checkIfShareExists($share, $sharee, $sharer);
+	public function userShouldHaveShareSharedByUserFromSpace(string $sharee, string $share, string $sharer, string $space): void {
+		$this->checkIfShareExists($share, $sharee, $sharer, $space);
+	}
+
+	/**
+	 * @Then user :sharee should not have a share :share shared by user :sharer from space :space
+	 *
+	 * @param string $sharee
+	 * @param string $share
+	 * @param string $sharer
+	 * @param string $space
+	 *
+	 * @return void
+	 */
+	public function userShouldNotHaveShareSharedByUserFromSpace(string $sharee, string $share, string $sharer, string $space): void {
+		$this->checkIfShareExists($share, $sharee, $sharer, $space, false);
 	}
 
 	/**
