@@ -136,7 +136,7 @@ As of Q2/2024 the Posix FS Storage Driver is not officially supported and in tec
 The tech preview comes with the following limitations:
 
 1. Only inotify and GPFS file system change notification methods are supported
-1. Advanced features versioning and trashbin are not supported yet
+1. Versioning is not supported yet
 1. The space/project folders in the filesystem are named after the UUID, not the real space name
 1. No CephFS support yet
 1. Postprocessing (ie. anti virus check) does not happen for file actions outside of Infinite Scale
