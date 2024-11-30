@@ -7,15 +7,16 @@
 # Martin <github@diemattels.at>, 2024
 # Laura Arjona Reina <larjona@larjona.net>, 2024
 # Jesús Recio <jrecio@solidgear.es>, 2024
+# Juan Carlos Garrote, 2024
 # 
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2024-11-25 19:13+0000\n"
+"POT-Creation-Date: 2024-11-30 00:18+0000\n"
 "PO-Revision-Date: 2024-04-04 00:17+0000\n"
-"Last-Translator: Jesús Recio <jrecio@solidgear.es>, 2024\n"
+"Last-Translator: Juan Carlos Garrote, 2024\n"
 "Language-Team: Spanish (https://app.transifex.com/owncloud-org/teams/6149/es/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -66,12 +67,12 @@ msgstr "Puede ver (de manera segura)"
 #. UnifiedRole FullDenial, Role DisplayName (resolves directly)
 #: pkg/unifiedrole/roles.go:170
 msgid "Cannot access"
-msgstr ""
+msgstr "No puede acceder"
 
 #. UnifiedRole FullDenial, Role Description (resolves directly)
 #: pkg/unifiedrole/roles.go:167
 msgid "Deny all access."
-msgstr ""
+msgstr "Denegar todo el acceso."
 
 #. default description for new spaces
 #: pkg/service/v0/spacetemplates.go:32
