@@ -202,8 +202,8 @@ importers:
         specifier: 4.3.0
         version: 4.3.0
       mini-css-extract-plugin:
-        specifier: 1.6.2
-        version: 1.6.2(webpack@5.96.1)
+        specifier: 2.9.2
+        version: 2.9.2(webpack@5.96.1)
       pnp-webpack-plugin:
         specifier: 1.7.0
         version: 1.7.0(typescript@4.9.5)
@@ -4187,11 +4187,11 @@ packages:
       prop-types: ^15.0.0
       react: ^0.14.0 || ^15.0.0 || ^16.0.0 || ^17.0.0
 
-  mini-css-extract-plugin@1.6.2:
-    resolution: {integrity: sha512-WhDvO3SjGm40oV5y26GjMJYjd2UMqrLAGKy5YS2/3QKJy2F7jgynuHTir/tgUUOiNQu5saXHdc8reo7YuhhT4Q==}
-    engines: {node: '>= 10.13.0'}
+  mini-css-extract-plugin@2.9.2:
+    resolution: {integrity: sha512-GJuACcS//jtq4kCtd5ii/M0SZf7OZRH+BxdqXZHaJfb8TJiVl+NgQRPwiYt2EuqeSkNydn/7vP+bcE27C5mb9w==}
+    engines: {node: '>= 12.13.0'}
     peerDependencies:
-      webpack: ^4.4.0 || ^5.0.0
+      webpack: ^5.0.0
 
   minimatch@3.1.2:
     resolution: {integrity: sha512-J7p63hRiAjw1NDEww1W7i37+ByIrOWO5XQQAzZ3VOcL0PNybwpfmV/N05zFAzwQ9USyEcX6t3UO+K5aqBQOIHw==}
@@ -11564,12 +11564,11 @@ snapshots:
       react: 17.0.2
       tiny-warning: 1.0.3
 
-  mini-css-extract-plugin@1.6.2(webpack@5.96.1):
+  mini-css-extract-plugin@2.9.2(webpack@5.96.1):
     dependencies:
-      loader-utils: 2.0.4
-      schema-utils: 3.3.0
+      schema-utils: 4.2.0
+      tapable: 2.2.1
       webpack: 5.96.1
-      webpack-sources: 1.4.3
 
   minimatch@3.1.2:
     dependencies:
