@@ -64,6 +64,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Fix deny access for graph roles: [#10627](https://github.com/owncloud/ocis/pull/10627)
+* Bugfix - Skip fetching members: [#10701](https://github.com/owncloud/ocis/pull/10701)
 
 ## Details
 
@@ -75,6 +76,12 @@ The following sections list the changes for unreleased.
    still experimental.
 
    https://github.com/owncloud/ocis/pull/10627
+
+* Bugfix - Skip fetching members: [#10701](https://github.com/owncloud/ocis/pull/10701)
+
+   We now skip fetching group members when they are not needed.
+
+   https://github.com/owncloud/ocis/pull/10701
 
 # Changelog for [7.0.0-rc.3] (2024-11-21)
 
