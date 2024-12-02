@@ -149,7 +149,8 @@ func (cache IdentityCache) GetGroup(ctx context.Context, groupID string) (libreg
 			OpaqueId: groupID,
 		}
 		req := cs3Group.GetGroupRequest{
-			GroupId: cs3GroupID,
+			GroupId:             cs3GroupID,
+			SkipFetchingMembers: true,
 		}
 		res, err := gatewayClient.GetGroup(ctx, &req)
 		if err != nil {
