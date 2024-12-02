@@ -5,7 +5,7 @@ Feature: dav-versions
 
   Background:
     Given using OCS API version "2"
-    And user "Alice" has been created with default attributes and without skeleton files
+    And user "Alice" has been created with default attributes
 
 
   Scenario Outline: upload file and no version is available
@@ -119,7 +119,7 @@ Feature: dav-versions
 
 
   Scenario: user cannot access meta folder of a file which is owned by somebody else
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And user "Alice" has uploaded file with content "123" to "/davtest.txt"
     And we save it into "FILEID"
     When user "Brian" sends HTTP method "PROPFIND" to URL "/dav/meta/<<FILEID>>"
@@ -127,13 +127,13 @@ Feature: dav-versions
 
 
   Scenario: user cannot access meta folder of a file which does not exist
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     When user "Brian" sends HTTP method "PROPFIND" to URL "/dav/meta/MTI4NGQyMzgtYWE5Mi00MmNlLWJkYzQtMGIwMDAwMDA5MTU2OjhjY2QyNzUxLTkwYTQtNDBmMi1iOWYzLTYxZWRmODQ0MjFmNA=="
     Then the HTTP status code should be "400" or "404"
 
 
   Scenario Outline: user cannot access meta folder of a file with invalid fileid
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     When user "Brian" sends HTTP method "PROPFIND" to URL "/dav/meta/<file-id>/v"
     Then the HTTP status code should be "400" or "404"
     Examples:
@@ -241,7 +241,7 @@ Feature: dav-versions
 
 
   Scenario: user cannot retrieve meta information of a file which is owned by somebody else
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And user "Alice" has uploaded file with content "123" to "/davtest.txt "
     And we save it into "FILEID"
     When user "Brian" retrieves the meta information of fileId "<<FILEID>>" using the meta API
@@ -312,7 +312,7 @@ Feature: dav-versions
 
   @skipOnReva
   Scenario: sharer of a file can see the old version information when the sharee changes the content of the file
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And user "Alice" has uploaded file with content "First content" to "sharefile.txt"
     And user "Alice" has sent the following resource share invitation:
       | resource        | sharefile.txt |
@@ -329,7 +329,7 @@ Feature: dav-versions
 
   @skipOnReva
   Scenario: sharer of a file can restore the original content of a shared file after the file has been modified by the sharee
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And user "Alice" has uploaded file with content "First content" to "sharefile.txt"
     And user "Alice" has sent the following resource share invitation:
       | resource        | sharefile.txt |
@@ -346,7 +346,7 @@ Feature: dav-versions
 
   @skipOnReva
   Scenario: sharer can restore a file inside a shared folder modified by sharee
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And user "Alice" has created folder "/sharingfolder"
     And user "Alice" has sent the following resource share invitation:
       | resource        | sharingfolder |
@@ -364,7 +364,7 @@ Feature: dav-versions
 
   @skipOnReva
   Scenario: sharee cannot see a version of a file inside a shared folder when modified by sharee
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And user "Alice" has created folder "/sharingfolder"
     And user "Alice" has sent the following resource share invitation:
       | resource        | sharingfolder |
@@ -382,7 +382,7 @@ Feature: dav-versions
 
   @skipOnReva
   Scenario: sharer can restore a file inside a shared folder created by sharee and modified by sharer
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And user "Alice" has created folder "/sharingfolder"
     And user "Alice" has sent the following resource share invitation:
       | resource        | sharingfolder |
@@ -400,7 +400,7 @@ Feature: dav-versions
 
   @skipOnReva
   Scenario: sharer can restore a file inside a shared folder created by sharee and modified by sharee
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And user "Alice" has created folder "/sharingfolder"
     And user "Alice" has sent the following resource share invitation:
       | resource        | sharingfolder |
@@ -418,8 +418,8 @@ Feature: dav-versions
 
   @skipOnReva
   Scenario: sharer can restore a file inside a group shared folder modified by sharee
-    Given user "Brian" has been created with default attributes and without skeleton files
-    And user "Carol" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
+    And user "Carol" has been created with default attributes
     And group "grp1" has been created
     And user "Brian" has been added to group "grp1"
     And user "Carol" has been added to group "grp1"
@@ -444,7 +444,7 @@ Feature: dav-versions
   @skipOnReva
   Scenario Outline: moving a file (with versions) into a shared folder as the sharer
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Brian" has created folder "/testshare"
     And user "Brian" has sent the following resource share invitation:
       | resource        | testshare          |
@@ -477,7 +477,7 @@ Feature: dav-versions
 
   @skipOnReva
   Scenario: sharee tries to get file versions of file not shared by the sharer
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And user "Alice" has uploaded file with content "textfile0" to "textfile0.txt"
     And user "Alice" has uploaded file with content "textfile1" to "textfile1.txt"
     And user "Alice" has sent the following resource share invitation:
@@ -493,7 +493,7 @@ Feature: dav-versions
 
   @skipOnStorage:ceph @skipOnReva
   Scenario: receiver tries get file versions of shared file from the sharer
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And user "Alice" has uploaded file with content "textfile0" to "textfile0.txt"
     And user "Alice" has uploaded file with content "version 1" to "textfile0.txt"
     And user "Alice" has uploaded file with content "version 2" to "textfile0.txt"
@@ -510,7 +510,7 @@ Feature: dav-versions
 
   @skipOnReva
   Scenario: receiver tries get file versions of shared file before receiving it
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And user "Alice" has uploaded file with content "textfile0" to "textfile0.txt"
     And user "Alice" has uploaded file with content "version 1" to "textfile0.txt"
     And user "Alice" has uploaded file with content "version 2" to "textfile0.txt"

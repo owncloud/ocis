@@ -4,7 +4,7 @@ Feature: get users
   So that I can see the information
 
   Background:
-    Given these users have been created with default attributes and without skeleton files:
+    Given these users have been created with default attributes:
       | username |
       | Alice    |
       | Brian    |
@@ -667,7 +667,7 @@ Feature: get users
 
   Scenario: admin user gets all users of certain groups
     Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
-    And user "Carol" has been created with default attributes and without skeleton files
+    And user "Carol" has been created with default attributes
     And the user "Alice" has disabled user "Carol"
     And group "tea-lover" has been created
     And group "coffee-lover" has been created
@@ -817,7 +817,7 @@ Feature: get users
 
   Scenario: admin user gets all users of two groups
     Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
-    And user "Carol" has been created with default attributes and without skeleton files
+    And user "Carol" has been created with default attributes
     And group "tea-lover" has been created
     And group "coffee-lover" has been created
     And group "wine-lover" has been created
@@ -938,7 +938,7 @@ Feature: get users
 
   Scenario: admin user gets all users with certain roles and members of a certain group
     Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
-    And user "Carol" has been created with default attributes and without skeleton files
+    And user "Carol" has been created with default attributes
     And the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
     And the administrator has assigned the role "Space Admin" to user "Carol" using the Graph API
     And group "tea-lover" has been created
@@ -1421,7 +1421,7 @@ Feature: get users
 
   @issue-7990
   Scenario Outline: user tries to search other users with invalid characters/token (search term without quotation)
-    Given user "<user>" has been created with default attributes and without skeleton files
+    Given user "<user>" has been created with default attributes
     When user "Brian" tries to search for user "<user>" using Graph API
     Then the HTTP status code should be "400"
     And the JSON data of the response should match

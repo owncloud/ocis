@@ -4,7 +4,7 @@ Feature: Set quota
   So that users can only take up a certain amount of storage space
 
   Background:
-    Given these users have been created with default attributes and without skeleton files:
+    Given these users have been created with default attributes:
       | username |
       | Alice    |
       | Brian    |

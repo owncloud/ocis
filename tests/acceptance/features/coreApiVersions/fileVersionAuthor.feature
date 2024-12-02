@@ -6,13 +6,13 @@ Feature: file versions remember the author of each version
 
   Background:
     Given using OCS API version "2"
-    And user "Alice" has been created with default attributes and without skeleton files
-    And user "Brian" has been created with default attributes and without skeleton files
-    And user "Carol" has been created with default attributes and without skeleton files
+    And user "Alice" has been created with default attributes
+    And user "Brian" has been created with default attributes
+    And user "Carol" has been created with default attributes
 
 
   Scenario: enable file versioning and check the history of changes from multiple users
-    Given user "David" has been created with default attributes and without skeleton files
+    Given user "David" has been created with default attributes
     And user "Alice" has created folder "/test"
     And user "Alice" has sent the following resource share invitation:
       | resource        | test     |
@@ -272,7 +272,7 @@ Feature: file versions remember the author of each version
 
 
   Scenario: enable file versioning and check the history of changes from multiple users who have a matching folder/file
-    Given user "David" has been created with default attributes and without skeleton files
+    Given user "David" has been created with default attributes
     And user "Brian" has created folder "/test"
     And user "Brian" has uploaded file with content "duplicate brian" to "/test/textfile0.txt"
     And user "Brian" has uploaded file with content "overwrite brian" to "/test/textfile0.txt"
@@ -354,7 +354,7 @@ Feature: file versions remember the author of each version
 
 
   Scenario: enable file versioning and check the history of changes from multiple users who have a matching file
-    Given user "David" has been created with default attributes and without skeleton files
+    Given user "David" has been created with default attributes
     And user "Brian" has uploaded file with content "duplicate brian" to "/textfile0.txt"
     And user "Brian" has uploaded file with content "overwrite brian" to "/textfile0.txt"
     And user "Brian" has sent the following resource share invitation:

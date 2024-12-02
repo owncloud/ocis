@@ -5,7 +5,7 @@ Feature: content search
   So that I can find the files with the content I am looking for
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
 
   @issue-10329
   Scenario Outline: search files by content
@@ -86,7 +86,7 @@ Feature: content search
   @issue-10329
   Scenario Outline: sharee searches files by content
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Alice" has created folder "uploadFolder"
     And user "Alice" has uploaded file with content "hello world from nepal" to "uploadFolder/keywordAtStart.txt"
     And user "Alice" has uploaded file with content "saying hello to the world" to "uploadFolder/keywordAtMiddle.txt"
@@ -189,7 +189,7 @@ Feature: content search
   @issue-10329
   Scenario Outline: sharee searches shared project space files by content
     Given using spaces DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "project-space" with the default quota using the Graph API
     And user "Alice" has sent the following space share invitation:

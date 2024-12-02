@@ -4,7 +4,7 @@ Feature: tests of the creation extension see https://tus.io/protocols/resumable-
   So that I can provide basic information about the resources to the server
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
 
 
   Scenario Outline: creating a new upload resource using creation with upload extension

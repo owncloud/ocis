@@ -5,7 +5,7 @@ Feature: copying file using file id
 
   Background:
     Given using spaces DAV path
-    And user "Alice" has been created with default attributes and without skeleton files
+    And user "Alice" has been created with default attributes
 
 
   Scenario: copy a file into a folder in personal space
@@ -128,7 +128,7 @@ Feature: copying file using file id
 
 
   Scenario: copy a file from sub-folder to root folder inside Shares space
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And user "Alice" has created folder "/folder"
     And user "Alice" has created folder "folder/sub-folder"
     And user "Alice" has uploaded file with content "some data" to "/folder/sub-folder/test.txt"
@@ -153,7 +153,7 @@ Feature: copying file using file id
 
 
   Scenario: copy a file from personal to share space
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And user "Alice" has created folder "/folder"
     And user "Alice" has sent the following resource share invitation:
       | resource        | folder   |
@@ -176,7 +176,7 @@ Feature: copying file using file id
 
 
   Scenario Outline: copy a file from share to personal space
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And user "Alice" has created folder "/folder"
     And user "Alice" has uploaded file with content "some data" to "/folder/test.txt"
     And we save it into "FILEID"
@@ -203,7 +203,7 @@ Feature: copying file using file id
 
 
   Scenario: sharee tries to copy a file from shares space with secure viewer to personal space
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And the administrator has enabled the permissions role "Secure Viewer"
     And user "Alice" has created folder "/folder"
     And user "Alice" has uploaded file with content "some data" to "/folder/test.txt"
@@ -224,7 +224,7 @@ Feature: copying file using file id
 
 
   Scenario Outline: sharee copies a file from shares to project space
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created folder "/folder"
     And user "Alice" has uploaded file with content "some data" to "/folder/test.txt"
@@ -261,7 +261,7 @@ Feature: copying file using file id
 
   @env-config
   Scenario Outline: sharee tries to copy a file from shares to project space
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And the administrator has enabled the permissions role "Secure Viewer"
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created folder "/folder"
@@ -299,7 +299,7 @@ Feature: copying file using file id
 
 
   Scenario Outline: sharee copies a file between shares spaces
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And user "Alice" has created folder "/share1"
     And user "Alice" has created folder "/share2"
     And user "Alice" has uploaded file with content "some data" to "/share1/test.txt"
@@ -339,7 +339,7 @@ Feature: copying file using file id
 
   @env-config
   Scenario Outline: sharee tries to copy a file between shares space
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And the administrator has enabled the permissions role "Secure Viewer"
     And user "Alice" has created folder "/share1"
     And user "Alice" has created folder "/share2"
@@ -384,7 +384,7 @@ Feature: copying file using file id
 
 
   Scenario Outline: copy a file from project to personal space
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "project-space" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "project-space" with content "some data" to "textfile.txt"
@@ -408,7 +408,7 @@ Feature: copying file using file id
 
 
   Scenario Outline: copy a file between two project spaces
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "first-project-space" with the default quota using the Graph API
     And user "Alice" has created a space "second-project-space" with the default quota using the Graph API
@@ -443,7 +443,7 @@ Feature: copying file using file id
 
 
   Scenario Outline: try to copy a file from a project to another project space with read permission
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "first-project-space" with the default quota using the Graph API
     And user "Alice" has created a space "second-project-space" with the default quota using the Graph API
@@ -475,7 +475,7 @@ Feature: copying file using file id
 
 
   Scenario Outline: copy a file from project to shares space
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "project-space" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "project-space" with content "some data" to "textfile.txt"
@@ -512,7 +512,7 @@ Feature: copying file using file id
 
   @env-config
   Scenario Outline: try to copy a file from project to shares space with read permission
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And the administrator has enabled the permissions role "Secure Viewer"
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "project-space" with the default quota using the Graph API

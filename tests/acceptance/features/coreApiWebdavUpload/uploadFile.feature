@@ -5,7 +5,7 @@ Feature: upload file
 
   Background:
     Given using OCS API version "1"
-    And user "Alice" has been created with default attributes and without skeleton files
+    And user "Alice" has been created with default attributes
 
   @smokeTest
   Scenario Outline: upload a file and check etag and download content
@@ -326,7 +326,7 @@ Feature: upload file
   @skipOnReva @issue-7257
   Scenario Outline: user updates a shared file with empty content
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Alice" has uploaded file with content "file with content" to "/textfile.txt"
     And user "Alice" has sent the following resource share invitation:
       | resource        | textfile.txt |
@@ -358,7 +358,7 @@ Feature: upload file
   @skipOnReva @issue-7257
   Scenario: user updates a file inside a shared space with empty content
     Given using spaces DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "new-space" with content "file with content" to "textfile.txt"
@@ -375,7 +375,7 @@ Feature: upload file
   @issue-8699 @issue-10331
   Scenario: user updates a file inside a link shared space with empty content
     Given using SharingNG
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
     And user "Alice" has created the following space link share:

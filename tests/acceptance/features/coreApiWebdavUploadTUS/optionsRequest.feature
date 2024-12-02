@@ -4,7 +4,7 @@ Feature: OPTIONS request
   So that I can get information about communication options for target resource
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
 
 
   Scenario: send OPTIONS request to webDav endpoints using the TUS protocol with valid password and username
@@ -53,7 +53,7 @@ Feature: OPTIONS request
 
   @issue-1012
   Scenario: send OPTIONS requests to webDav endpoints using valid password and username of different user
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     When user "Brian" requests these endpoints with "OPTIONS" including body "doesnotmatter" using the password of user "Alice"
       | endpoint               |
       | /webdav/               |

@@ -4,7 +4,7 @@ Feature: check etag propagation after different file alterations
   So that I can make sure that they are correct after different file alterations
 
   Background:
-    Given these users have been created with default attributes and without skeleton files:
+    Given these users have been created with default attributes:
       | username |
       | Alice    |
       | Brian    |

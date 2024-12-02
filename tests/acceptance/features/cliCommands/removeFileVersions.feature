@@ -2,7 +2,7 @@
 Feature: remove file versions via CLI command
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
 
 
   Scenario: remove all file versions

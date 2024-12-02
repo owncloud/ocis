@@ -10,7 +10,7 @@ Feature: upload file
 
   Scenario Outline: upload a file and check download content
     Given using OCS API version "<ocs-api-version>"
-    And user "Alice" has been created with default attributes and without skeleton files
+    And user "Alice" has been created with default attributes
     And using <dav-path-version> DAV path
     When user "Alice" uploads file with content "uploaded content" to "/upload.txt" using the WebDAV API
     Then the content of file "/upload.txt" for user "Alice" should be "uploaded content"

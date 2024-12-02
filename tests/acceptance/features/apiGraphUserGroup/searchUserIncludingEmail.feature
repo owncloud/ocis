@@ -2,7 +2,7 @@
 Feature: edit/search user including email
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
     And the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     And the user "Alice" has created a new user with the following attributes:
       | userName    | Brian             |

@@ -5,7 +5,7 @@ Feature: files and folders can be deleted from the trashbin
   So that I can control my trashbin space and which files are kept in that space
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
     And user "Alice" has uploaded file with content "to delete" to "/textfile0.txt"
     And user "Alice" has uploaded file with content "to delete" to "/textfile1.txt"
     And user "Alice" has created folder "PARENT"
@@ -75,7 +75,7 @@ Feature: files and folders can be deleted from the trashbin
   @issue-3544 @issue-9791
   Scenario Outline: user tries to delete another user's trashbin
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Alice" has deleted file "/textfile0.txt"
     And user "Alice" has deleted file "/textfile1.txt"
     And user "Alice" has deleted file "/PARENT/parent.txt"
@@ -94,7 +94,7 @@ Feature: files and folders can be deleted from the trashbin
 
   Scenario Outline: user tries to delete trashbin file using invalid password
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Alice" has deleted file "/textfile0.txt"
     And user "Alice" has deleted file "/textfile1.txt"
     And user "Alice" has deleted file "/PARENT/parent.txt"
@@ -113,7 +113,7 @@ Feature: files and folders can be deleted from the trashbin
 
   Scenario Outline: user tries to delete trashbin file using no password
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Alice" has deleted file "/textfile0.txt"
     And user "Alice" has deleted file "/textfile1.txt"
     And user "Alice" has deleted file "/PARENT/parent.txt"

@@ -7,7 +7,7 @@ Feature: Preview file in project space
   See https://github.com/owncloud/ocis/issues/1542 and https://github.com/owncloud/ocis/pull/839
 
   Background:
-    Given these users have been created with default attributes and without skeleton files:
+    Given these users have been created with default attributes:
       | username |
       | Alice    |
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
@@ -44,7 +44,7 @@ Feature: Preview file in project space
 
 
   Scenario Outline: download preview of shared file inside project space
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And user "Alice" has uploaded a file from "<source>" to "<destination>" via TUS inside of the space "previews of the files" using the WebDAV API
     And user "Alice" has sent the following resource share invitation:
       | resource        | <destination>         |
@@ -63,7 +63,7 @@ Feature: Preview file in project space
 
   @env-config
   Scenario Outline: download preview of shared file shared via Secure viewer permission role
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And the administrator has enabled the permissions role "Secure Viewer"
     And user "Alice" has uploaded a file from "<source>" to "<destination>" via TUS inside of the space "Alice Hansen" using the WebDAV API
     And user "Alice" has sent the following resource share invitation:
@@ -82,7 +82,7 @@ Feature: Preview file in project space
 
 
   Scenario: download preview of file inside shared folder in project space
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And user "Alice" has created a folder "folder" in space "previews of the files"
     And user "Alice" has uploaded a file inside space "previews of the files" with content "test" to "/folder/lorem.txt"
     And user "Alice" has sent the following resource share invitation:

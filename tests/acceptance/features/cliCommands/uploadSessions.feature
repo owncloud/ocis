@@ -5,7 +5,7 @@ Feature: List upload sessions via CLI command
   So that I can manage the upload sessions
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
 
 
   Scenario: list all upload sessions

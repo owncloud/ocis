@@ -4,11 +4,11 @@ Feature: unassign user role
   So that the role of user is set to default
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
 
 
   Scenario Outline: admin user unassigns the role of another user
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     And the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
     When user "Alice" unassigns the role of user "Brian" using the Graph API
@@ -32,7 +32,7 @@ Feature: unassign user role
 
 
   Scenario: non-admin user tries to unassign role of another user
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     When user "Alice" tries to unassign the role of user "Brian" using the Graph API
     Then the HTTP status code should be "403"
     And user "Brian" should have the role "User" assigned

@@ -7,7 +7,7 @@ Feature: edit user
   See https://github.com/owncloud/ocis/issues/1542 and https://github.com/owncloud/ocis/pull/839
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
     And the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     And the user "Alice" has created a new user with the following attributes:
       | userName    | Brian             |
@@ -17,7 +17,7 @@ Feature: edit user
 
   @issue-7044
   Scenario Outline: admin user can edit another user's name
-    Given user "Carol" has been created with default attributes and without skeleton files
+    Given user "Carol" has been created with default attributes
     When the user "Alice" changes the user name of user "Carol" to "<user>" using the Graph API
     Then the HTTP status code should be "<http-status-code>"
     And the user information of "<new-user>" should match this JSON schema
@@ -277,7 +277,7 @@ Feature: edit user
 
 
   Scenario Outline: normal user should not be able to disable another user
-    Given user "Carol" has been created with default attributes and without skeleton files
+    Given user "Carol" has been created with default attributes
     And the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
     When the user "Brian" tries to disable user "Carol" using the Graph API
     Then the HTTP status code should be "403"
@@ -359,7 +359,7 @@ Feature: edit user
 
 
   Scenario Outline: normal user should not be able to enable another user
-    Given user "Carol" has been created with default attributes and without skeleton files
+    Given user "Carol" has been created with default attributes
     And the user "Alice" has disabled user "Carol"
     And the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
     When the user "Brian" tries to enable user "Carol" using the Graph API

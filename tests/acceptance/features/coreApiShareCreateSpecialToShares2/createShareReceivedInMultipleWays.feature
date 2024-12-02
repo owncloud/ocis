@@ -5,7 +5,7 @@ Feature: share resources where the sharee receives the share in multiple ways
   So that I can make sure that the sharing works
 
   Background:
-    Given these users have been created with default attributes and without skeleton files:
+    Given these users have been created with default attributes:
       | username |
       | Alice    |
       | Brian    |
@@ -113,7 +113,7 @@ Feature: share resources where the sharee receives the share in multiple ways
   @issue-2131
   Scenario Outline: multiple users share a file with the same name but different permissions to a user
     Given using OCS API version "<ocs-api-version>"
-    And user "Carol" has been created with default attributes and without skeleton files
+    And user "Carol" has been created with default attributes
     And user "Brian" has uploaded file with content "First data" to "/randomfile.txt"
     And user "Carol" has uploaded file with content "Second data" to "/randomfile.txt"
     When user "Brian" shares file "randomfile.txt" with user "Alice" with permissions "read" using the sharing API
@@ -144,7 +144,7 @@ Feature: share resources where the sharee receives the share in multiple ways
   @issue-2131
   Scenario Outline: multiple users share a folder with the same name to a user
     Given using OCS API version "<ocs-api-version>"
-    And user "Carol" has been created with default attributes and without skeleton files
+    And user "Carol" has been created with default attributes
     And user "Brian" has created folder "/zzzfolder"
     And user "Brian" has created folder "zzzfolder/Brian"
     And user "Carol" has created folder "/zzzfolder"
@@ -177,7 +177,7 @@ Feature: share resources where the sharee receives the share in multiple ways
   @skipOnReva
   Scenario Outline: share with a group and then add a user to that group that already has a file with the shared name
     Given using OCS API version "<ocs-api-version>"
-    And user "Carol" has been created with default attributes and without skeleton files
+    And user "Carol" has been created with default attributes
     And user "Carol" has disabled auto-accepting
     And these groups have been created:
       | groupname |
@@ -206,7 +206,7 @@ Feature: share resources where the sharee receives the share in multiple ways
   @issue-2440
   Scenario: sharing parent folder to user with all permissions and its child folder to group with read permission then check create operation
     Given group "grp1" has been created
-    And user "Carol" has been created with default attributes and without skeleton files
+    And user "Carol" has been created with default attributes
     And user "Carol" has created the following folders
       | path                  |
       | /parent               |
@@ -236,7 +236,7 @@ Feature: share resources where the sharee receives the share in multiple ways
   @issue-2440
   Scenario: sharing parent folder to user with all permissions and its child folder to group with read permission then check rename operation
     Given group "grp1" has been created
-    And user "Carol" has been created with default attributes and without skeleton files
+    And user "Carol" has been created with default attributes
     And user "Carol" has created the following folders
       | path                  |
       | /parent               |
@@ -267,7 +267,7 @@ Feature: share resources where the sharee receives the share in multiple ways
   @issue-2440
   Scenario: sharing parent folder to user with all permissions and its child folder to group with read permission then check delete operation
     Given group "grp1" has been created
-    And user "Carol" has been created with default attributes and without skeleton files
+    And user "Carol" has been created with default attributes
     And user "Carol" has created the following folders
       | path                         |
       | /parent                      |
@@ -299,7 +299,7 @@ Feature: share resources where the sharee receives the share in multiple ways
 
   Scenario: sharing parent folder to group with read permission and its child folder to user with all permissions then check create operation
     Given group "grp1" has been created
-    And user "Carol" has been created with default attributes and without skeleton files
+    And user "Carol" has been created with default attributes
     And user "Carol" has created the following folders
       | path                  |
       | /parent               |
@@ -331,7 +331,7 @@ Feature: share resources where the sharee receives the share in multiple ways
   @issue-2440
   Scenario: sharing parent folder to group with read permission and its child folder to user with all permissions then check rename operation
     Given group "grp1" has been created
-    And user "Carol" has been created with default attributes and without skeleton files
+    And user "Carol" has been created with default attributes
     And user "Carol" has created the following folders
       | path                  |
       | /parent               |
@@ -362,7 +362,7 @@ Feature: share resources where the sharee receives the share in multiple ways
   @issue-2440
   Scenario: sharing parent folder to group with read permission and its child folder to user with all permissions then check delete operation
     Given group "grp1" has been created
-    And user "Carol" has been created with default attributes and without skeleton files
+    And user "Carol" has been created with default attributes
     And user "Carol" has created the following folders
       | path                  |
       | /parent               |
@@ -397,7 +397,7 @@ Feature: share resources where the sharee receives the share in multiple ways
       | grp1      |
       | grp2      |
       | grp3      |
-    And user "Carol" has been created with default attributes and without skeleton files
+    And user "Carol" has been created with default attributes
     And user "Carol" has created the following folders
       | path                  |
       | /parent               |

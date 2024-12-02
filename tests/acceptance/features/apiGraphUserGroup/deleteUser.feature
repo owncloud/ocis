@@ -7,7 +7,7 @@ Feature: delete user
   See https://github.com/owncloud/ocis/issues/1542 and https://github.com/owncloud/ocis/pull/839
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
 
 
   Scenario Outline: admin user deletes a user
@@ -28,7 +28,7 @@ Feature: delete user
 
 
   Scenario: delete a user and specify the user name in different case
-    Given user "brand-new-user" has been created with default attributes and without skeleton files
+    Given user "brand-new-user" has been created with default attributes
     And the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     When the user "Alice" deletes a user "Brand-New-User" using the Graph API
     Then the HTTP status code should be "204"
@@ -36,7 +36,7 @@ Feature: delete user
 
 
   Scenario Outline: admin user deletes another user with different role
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     And the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
     When the user "Alice" deletes a user "Brian" using the Graph API
@@ -87,7 +87,7 @@ Feature: delete user
 
 
   Scenario Outline: non-admin user tries to delete another user with different role
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And the administrator has assigned the role "<user-role-2>" to user "Brian" using the Graph API
     And the administrator has assigned the role "<user-role>" to user "Alice" using the Graph API
     When the user "Alice" deletes a user "Brian" using the Graph API
@@ -111,7 +111,7 @@ Feature: delete user
 
   Scenario: admin user deletes a disabled user
     Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And the user "Alice" has disabled user "Brian"
     When the user "Alice" deletes a user "Brian" using the Graph API
     Then the HTTP status code should be "204"
@@ -120,8 +120,8 @@ Feature: delete user
 
   Scenario Outline: normal user tries to delete a disabled user
     Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
-    And user "Brian" has been created with default attributes and without skeleton files
-    And user "Carol" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
+    And user "Carol" has been created with default attributes
     And the administrator has assigned the role "<user-role-2>" to user "Brian" using the Graph API
     And the administrator has assigned the role "<user-role>" to user "Carol" using the Graph API
     And the user "Alice" has disabled user "Brian"
@@ -146,7 +146,7 @@ Feature: delete user
 
   Scenario: personal space is deleted automatically when the user is deleted
     Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     When the user "Alice" deletes a user "Brian" using the Graph API
     Then the HTTP status code should be "204"
     When user "Alice" lists all spaces via the Graph API with query "$filter=driveType eq 'personal'"
@@ -155,7 +155,7 @@ Feature: delete user
 
   Scenario: accepted share is deleted automatically when the user is deleted
     Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Brian" has created folder "new"
     And user "Brian" has sent the following resource share invitation:
       | resource        | new      |

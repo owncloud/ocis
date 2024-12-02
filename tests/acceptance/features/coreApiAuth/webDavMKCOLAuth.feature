@@ -4,7 +4,7 @@ Feature: create folder using MKCOL
   So that I can organise resources in folders
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
     And user "Alice" has uploaded file with content "some data" to "/textfile0.txt"
     And user "Alice" has created folder "/PARENT"
     And user "Alice" has created folder "/FOLDER"
@@ -40,7 +40,7 @@ Feature: create folder using MKCOL
 
   @issue-5049 @issue-1347 @issue-1292
   Scenario: send MKCOL requests to another user's webDav endpoints as normal user
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     When user "Brian" requests these endpoints with "MKCOL" including body "" about user "Alice"
       | endpoint                                |
       | /dav/files/%username%/textfile0.txt     |
@@ -51,7 +51,7 @@ Feature: create folder using MKCOL
 
   @issue-5049 @issue-1347 @issue-1292
   Scenario: send MKCOL requests to non-existent user's webDav endpoints as normal user
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     When user "Brian" requests these endpoints with "MKCOL" including body "" about user "non-existent-user"
       | endpoint                                       |
       | /dav/files/non-existent-user/textfile0.txt     |
@@ -62,7 +62,7 @@ Feature: create folder using MKCOL
 
   @issue-1347 @issue-1292
   Scenario: send MKCOL requests to another user's webDav endpoints as normal user using the spaces WebDAV API
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     When user "Brian" requests these endpoints with "MKCOL" including body "" about user "Alice"
       | endpoint                                |
       | /dav/spaces/%spaceid%/textfile0.txt     |
@@ -73,7 +73,7 @@ Feature: create folder using MKCOL
 
   @issue-5049  @issue-1347 @issue-1292
   Scenario: send MKCOL requests to non-existent user's webDav endpoints as normal user using the spaces WebDAV API
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     When user "Brian" requests these endpoints with "MKCOL" including body "" about user "non-existent-user"
       | endpoint                                |
       | /dav/spaces/%spaceid%/textfile0.txt     |
@@ -98,7 +98,7 @@ Feature: create folder using MKCOL
 
 
   Scenario: send MKCOL requests to webDav endpoints using valid password and username of different user
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     When user "Brian" requests these endpoints with "MKCOL" including body "doesnotmatter" using the password of user "Alice"
       | endpoint                                |
       | /webdav/textfile0.txt                   |

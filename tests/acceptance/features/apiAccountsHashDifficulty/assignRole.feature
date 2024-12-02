@@ -5,7 +5,7 @@ Feature: assign role
 
 
   Scenario Outline: only admin user can see all existing roles
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
     And the administrator has given "Alice" the role "<user-role>" using the settings api
     When user "Alice" tries to get all existing roles
     Then the HTTP status code should be "<http-status-code>"
@@ -17,7 +17,7 @@ Feature: assign role
 
   @issue-5032
   Scenario Outline: only admin user can see assignments list
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
     And the administrator has given "Alice" the role "<user-role>" using the settings api
     When user "Alice" tries to get list of assignment
     Then the HTTP status code should be "<http-status-code>"
@@ -29,7 +29,7 @@ Feature: assign role
 
 
   Scenario Outline: a user cannot change own role
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
     And the administrator has given "Alice" the role "<user-role>" using the settings api
     When user "Alice" changes his own role to "<desired-role>"
     Then the HTTP status code should be "400"
@@ -45,7 +45,7 @@ Feature: assign role
 
 
   Scenario Outline: only admin user can change the role for another user
-    Given these users have been created with default attributes and without skeleton files:
+    Given these users have been created with default attributes:
       | username |
       | Alice    |
       | Brian    |

@@ -8,7 +8,7 @@ Feature: sizing of previews of files downloaded through the webdav API
   but oC10 does not do this auto-fix of the aspect ratio.
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
 
 
   Scenario Outline: download different sizes of previews of file

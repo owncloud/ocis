@@ -5,7 +5,7 @@ Feature: accessing a public link share
   So that I can see a small preview of the file before deciding to download it
 
   Background:
-    Given these users have been created with default attributes and without skeleton files:
+    Given these users have been created with default attributes:
       | username |
       | Alice    |
 

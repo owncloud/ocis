@@ -4,9 +4,9 @@ Feature: accepting invitation
   I can accept invitations from users of other ocis instances
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
     And using server "REMOTE"
-    And these users have been created with default attributes and without skeleton files:
+    And these users have been created with default attributes:
       | username |
       | Brian    |
       | Carol    |

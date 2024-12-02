@@ -7,7 +7,7 @@ Feature: accept/decline shares coming from internal users
   Background:
     Given using OCS API version "1"
     And using new DAV path
-    And these users have been created with default attributes and without skeleton files:
+    And these users have been created with default attributes:
       | username |
       | Alice    |
       | Brian    |
@@ -347,7 +347,7 @@ Feature: accept/decline shares coming from internal users
 
   Scenario: user accepts shares received from multiple users with the same name when auto-accept share is disabled
     Given user "Alice" has disabled auto-accepting
-    And user "David" has been created with default attributes and without skeleton files
+    And user "David" has been created with default attributes
     And user "David" has created folder "PARENT"
     And user "Brian" has sent the following resource share invitation:
       | resource        | PARENT   |
@@ -522,7 +522,7 @@ Feature: accept/decline shares coming from internal users
 
 
   Scenario: user shares folder with matching folder name to  a user before that user has logged in
-    Given these users have been created without skeleton files and not initialized:
+    Given these users have been created without being initialized:
       | username |
       | David    |
     And user "David" has disabled auto-accepting

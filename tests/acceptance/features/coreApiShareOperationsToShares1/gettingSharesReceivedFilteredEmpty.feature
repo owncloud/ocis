@@ -5,7 +5,7 @@ Feature: get the received shares filtered by type (user, group etc)
   So that I can know about the status of the shares I've received
 
   Background:
-    Given these users have been created with default attributes and without skeleton files:
+    Given these users have been created with default attributes:
       | username |
       | Alice    |
       | Brian    |

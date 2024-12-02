@@ -4,7 +4,7 @@ Feature: check activities
   So that I can track modifications
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
     And using spaces DAV path
 
 

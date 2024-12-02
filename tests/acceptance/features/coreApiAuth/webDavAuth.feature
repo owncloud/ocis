@@ -4,7 +4,7 @@ Feature: auth
   So that I can make sure it's secure
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
 
   @smokeTest @issue-10334
   Scenario Outline: using WebDAV anonymously

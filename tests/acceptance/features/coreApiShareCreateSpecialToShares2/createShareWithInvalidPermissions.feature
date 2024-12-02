@@ -4,14 +4,14 @@ Feature: cannot share resources with invalid permissions
   So that I can make sure it doesn't work
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
     And user "Alice" has uploaded file with content "some data" to "/textfile0.txt"
     And user "Alice" has created folder "/PARENT"
 
 
   Scenario Outline: cannot create a share of a file or folder with invalid permissions
     Given using OCS API version "<ocs-api-version>"
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     When user "Alice" creates a share using the sharing API with settings
       | path        | <resource>    |
       | shareWith   | Brian         |
@@ -36,7 +36,7 @@ Feature: cannot share resources with invalid permissions
 
   Scenario Outline: cannot create a share of a file with a user with only create permission
     Given using OCS API version "<ocs-api-version>"
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     When user "Alice" creates a share using the sharing API with settings
       | path        | textfile0.txt |
       | shareWith   | Brian         |
@@ -55,7 +55,7 @@ Feature: cannot share resources with invalid permissions
 
   Scenario Outline: cannot create a share of a file with a user with only (create,delete) permission
     Given using OCS API version "<ocs-api-version>"
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     When user "Alice" creates a share using the sharing API with settings
       | path        | textfile0.txt |
       | shareWith   | Brian         |
@@ -76,7 +76,7 @@ Feature: cannot share resources with invalid permissions
 
   Scenario Outline: cannot create a share of a file with a group with only create permission
     Given using OCS API version "<ocs-api-version>"
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And group "grp1" has been created
     And user "Brian" has been added to group "grp1"
     When user "Alice" creates a share using the sharing API with settings
@@ -97,7 +97,7 @@ Feature: cannot share resources with invalid permissions
 
   Scenario Outline: cannot create a share of a file with a group with only (create,delete) permission
     Given using OCS API version "<ocs-api-version>"
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And group "grp1" has been created
     And user "Brian" has been added to group "grp1"
     When user "Alice" creates a share using the sharing API with settings

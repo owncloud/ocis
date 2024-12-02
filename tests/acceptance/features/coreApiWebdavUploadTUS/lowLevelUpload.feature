@@ -4,7 +4,7 @@ Feature: low level tests for upload of chunks
   So that I can manage my resources
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
 
 
   Scenario Outline: upload a chunk twice

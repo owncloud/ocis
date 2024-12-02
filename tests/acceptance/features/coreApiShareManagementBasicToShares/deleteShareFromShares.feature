@@ -5,7 +5,7 @@ Feature: sharing
   So that I don't have redundant shares
 
   Background:
-    Given these users have been created with default attributes and without skeleton files:
+    Given these users have been created with default attributes:
       | username |
       | Alice    |
       | Brian    |
@@ -131,7 +131,7 @@ Feature: sharing
   @smokeTest
   Scenario: unshare from self
     And group "grp1" has been created
-    And these users have been created with default attributes and without skeleton files:
+    And these users have been created with default attributes:
       | username |
       | Carol    |
     And user "Brian" has been added to group "grp1"
@@ -223,7 +223,7 @@ Feature: sharing
   Scenario Outline: group share recipient tries to delete the share
     Given using OCS API version "<ocs-api-version>"
     And group "grp1" has been created
-    And these users have been created with default attributes and without skeleton files:
+    And these users have been created with default attributes:
       | username |
       | Carol    |
     And user "Brian" has been added to group "grp1"

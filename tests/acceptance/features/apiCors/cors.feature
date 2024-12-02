@@ -6,7 +6,7 @@ Feature: CORS headers
   So that I can check if the correct headers are set
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
     And the config "OCIS_CORS_ALLOW_ORIGINS" has been set to "https://aphno.badal"
 
   @issue-5195

@@ -4,7 +4,7 @@ Feature: assign role
   So that users without an admin role cannot get the list of roles, assignments list and assign roles to users
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
 
 
   Scenario Outline: get assigned role of a user
@@ -47,12 +47,12 @@ Feature: assign role
 
 
   Scenario: non-admin user tries to get assigned role of another user
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     When user "Alice" tries to get the assigned role of user "Brian" using the Graph API
     Then the HTTP status code should be "403"
 
 
   Scenario: non-admin user tries to get assigned role of nonexistent user
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     When user "Alice" tries to get the assigned role of user "nonexistent" using the Graph API
     Then the HTTP status code should be "403"

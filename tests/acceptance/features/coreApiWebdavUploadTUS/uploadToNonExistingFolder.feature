@@ -5,7 +5,7 @@ Feature: upload file
 
   Background:
     Given using OCS API version "1"
-    And user "Alice" has been created with default attributes and without skeleton files
+    And user "Alice" has been created with default attributes
 
 
   Scenario Outline: attempt to upload a file into a nonexistent shares
@@ -42,7 +42,7 @@ Feature: upload file
   @skipOnReva
   Scenario Outline: attempt to upload a file into a nonexistent folder within correctly received share
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Alice" has created folder "/FOLDER"
     And user "Alice" has sent the following resource share invitation:
       | resource        | FOLDER   |
@@ -63,7 +63,7 @@ Feature: upload file
   @skipOnReva
   Scenario Outline: attempt to upload a file into a nonexistent folder within correctly received read only share
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Alice" has created folder "/FOLDER"
     And user "Alice" has sent the following resource share invitation:
       | resource        | FOLDER   |

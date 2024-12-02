@@ -4,7 +4,7 @@ Feature: upload file
   So that I can store and share files between multiple client systems
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
 
   @issue-10346
   Scenario Outline: upload a file and check download content

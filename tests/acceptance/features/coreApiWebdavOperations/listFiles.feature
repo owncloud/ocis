@@ -4,7 +4,7 @@ Feature: list files
   So that I can understand my file structure in owncloud
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
     And user "Alice" has created the following folders
       | path                                        |
       | simple-folder                               |

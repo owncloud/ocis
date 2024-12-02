@@ -5,12 +5,12 @@ Feature: shares are received in the default folder for received shares
   So that I can make sure it does not work
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
 
 
   Scenario Outline: do not allow sharing of the entire share folder
     Given using OCS API version "<ocs-api-version>"
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Alice" has created folder "FOLDER"
     When user "Alice" shares folder "/FOLDER" with user "Brian" using the sharing API
     And user "Brian" declines share "/Shares/FOLDER" offered by user "Alice" using the sharing API

@@ -4,7 +4,7 @@ Feature: get groups and their members
   So that I can see all the groups and their members
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
     And the administrator has assigned the role "Admin" to user "Alice" using the Graph API
 
 
@@ -21,7 +21,7 @@ Feature: get groups and their members
 
   @issue-5938
   Scenario Outline: user other than the admin shouldn't get the groups list
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
     And group "tea-lover" has been created
     And group "coffee-lover" has been created
@@ -59,7 +59,7 @@ Feature: get groups and their members
 
 
   Scenario: admin user gets users of a group
-    Given these users have been created with default attributes and without skeleton files:
+    Given these users have been created with default attributes:
       | username |
       | Brian    |
       | Carol    |
@@ -74,7 +74,7 @@ Feature: get groups and their members
 
   @issue-5938
   Scenario Outline: user other than the admin shouldn't get users of a group
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
     And group "tea-lover" has been created
     When user "Brian" gets all the members of group "tea-lover" using the Graph API
@@ -110,7 +110,7 @@ Feature: get groups and their members
 
 
   Scenario: admin user gets all groups along with its member's information
-    Given these users have been created with default attributes and without skeleton files:
+    Given these users have been created with default attributes:
       | username |
       | Brian    |
       | Carol    |
@@ -242,7 +242,7 @@ Feature: get groups and their members
 
   @issue-5938
   Scenario Outline: user other than the admin shouldn't get all groups along with its member's information
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
     And group "tea-lover" has been created
     And group "coffee-lover" has been created
@@ -281,7 +281,7 @@ Feature: get groups and their members
 
 
   Scenario: admin user gets a group along with its member's information
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And group "tea-lover" has been created
     And user "Alice" has been added to group "tea-lover"
     And user "Brian" has been added to group "tea-lover"
@@ -364,7 +364,7 @@ Feature: get groups and their members
 
   @issue-5604
   Scenario Outline: user other than the admin gets a group along with its member's information
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
     And group "tea-lover" has been created
     And user "Alice" has been added to group "tea-lover"
@@ -511,7 +511,7 @@ Feature: get groups and their members
 
 
   Scenario Outline: non-admin user searches for a group by group name
-    Given these users have been created with default attributes and without skeleton files:
+    Given these users have been created with default attributes:
       | username |
       | Brian    |
     And group "tea-lover" has been created
@@ -561,7 +561,7 @@ Feature: get groups and their members
 
 
   Scenario: non-admin user tries to search for a group by group name with less than 3 characters
-    Given these users have been created with default attributes and without skeleton files:
+    Given these users have been created with default attributes:
       | username |
       | Brian    |
     And group "tea-lover" has been created
@@ -593,7 +593,7 @@ Feature: get groups and their members
 
   @issue-7990
   Scenario Outline: user tries to search for groups with invalid characters/token (search term without quotation)
-    Given these users have been created with default attributes and without skeleton files:
+    Given these users have been created with default attributes:
       | username |
       | Brian    |
     And group "<group>" has been created
@@ -629,7 +629,7 @@ Feature: get groups and their members
 
   @issue-7990
   Scenario Outline: user searches for groups with special characters (search term with quotation)
-    Given these users have been created with default attributes and without skeleton files:
+    Given these users have been created with default attributes:
       | username |
       | Brian    |
     And group "<group>" has been created

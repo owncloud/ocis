@@ -3,7 +3,7 @@ Feature: date search
   I want to do search resources by date
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
 
   @issue-7060 @issue-10329
   Scenario Outline: search resources using different dav path
@@ -51,7 +51,7 @@ Feature: date search
 
   @issue-10329
   Scenario: search resources using different search patterns (KQL feature) in the shares folder
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And using spaces DAV path
     And user "Alice" has created folder "sharedFolder"
     And user "Alice" uploads a file "filesForUpload/textfile.txt" to "/sharedFolder/yesterday.txt" with mtime "yesterday" via TUS inside of the space "Personal" using the WebDAV API

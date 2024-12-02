@@ -4,7 +4,7 @@ Feature: unlock locked items
   So that other users can make changes to the resources
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
 
 
   Scenario Outline: unlock file locked by the user
@@ -93,7 +93,7 @@ Feature: unlock locked items
 
   @issue-7767
   Scenario Outline: trying to unlock a shared file that has been locked by the file owner
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And using <dav-path-version> DAV path
     And user "Alice" has created folder "PARENT"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "PARENT/parent.txt"
@@ -121,7 +121,7 @@ Feature: unlock locked items
 
   @issue-7767
   Scenario Outline: trying to unlock a file inside the shared folder that has been locked by the file owner
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And using <dav-path-version> DAV path
     And user "Alice" has created folder "PARENT"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "PARENT/parent.txt"
@@ -149,7 +149,7 @@ Feature: unlock locked items
 
   @issue-7599
   Scenario Outline: sharee unlocks a shared file
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And using <dav-path-version> DAV path
     And user "Alice" has created folder "PARENT"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "PARENT/parent.txt"
@@ -177,7 +177,7 @@ Feature: unlock locked items
 
   @issue-7599
   Scenario Outline: try to unlock a shared file locked by the receiver
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And using <dav-path-version> DAV path
     And user "Alice" has created folder "PARENT"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "PARENT/parent.txt"
@@ -205,7 +205,7 @@ Feature: unlock locked items
 
   @issue-7599
   Scenario Outline: try to unlock a file in a shared folder, which was locked by the sharee as the owner
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And using <dav-path-version> DAV path
     And user "Alice" has created folder "PARENT"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "PARENT/parent.txt"
@@ -276,7 +276,7 @@ Feature: unlock locked items
 
 
   Scenario: unlock a file in the shares using file-id
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And using spaces DAV path
     And user "Alice" has uploaded a file inside space "Alice Hansen" with content "some content" to "textfile.txt"
     And we save it into "FILEID"

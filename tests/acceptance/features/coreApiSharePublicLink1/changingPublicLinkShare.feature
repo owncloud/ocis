@@ -5,7 +5,7 @@ Feature: changing a public link share
   So that people who have the public link only have the designated authorization
 
   Background:
-    Given these users have been created with default attributes and without skeleton files:
+    Given these users have been created with default attributes:
       | username |
       | Alice    |
     And user "Alice" has created folder "PARENT"

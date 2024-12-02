@@ -8,7 +8,7 @@ Feature: attempt to PUT files with invalid password
   See https://github.com/owncloud/ocis/issues/1542 and https://github.com/owncloud/ocis/pull/839
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
     And user "Alice" has created folder "/PARENT"
 
 

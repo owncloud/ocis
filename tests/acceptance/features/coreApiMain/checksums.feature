@@ -4,7 +4,7 @@ Feature: checksums
   So that I can make sure that the files are uploaded with correct checksums
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
 
 
   Scenario Outline: uploading a file with checksum should work
@@ -142,7 +142,7 @@ Feature: checksums
   @issue-1291 @skipOnReva
   Scenario Outline: sharing a file with checksum should return the checksum in the propfind using new DAV path
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/myChecksumFile.txt" with checksum "MD5:d70b40f177b14b470d1756a3c12b963a"
     And user "Alice" has sent the following resource share invitation:
       | resource        | myChecksumFile.txt |
@@ -163,7 +163,7 @@ Feature: checksums
   @issue-1291 @skipOnReva
   Scenario Outline: modifying a shared file should return correct checksum in the propfind using new DAV path
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/myChecksumFile.txt" with checksum "MD5:d70b40f177b14b470d1756a3c12b963a"
     And user "Alice" has sent the following resource share invitation:
       | resource        | myChecksumFile.txt |

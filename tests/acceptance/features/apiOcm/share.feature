@@ -4,9 +4,9 @@ Feature: an user shares resources using ScienceMesh application
   I want to share resources between different ocis instances
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
     And using server "REMOTE"
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
 
   @issue-9534
   Scenario Outline: local user shares resources to federation user

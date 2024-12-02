@@ -6,7 +6,7 @@ Feature: propagation of etags when restoring a version of a file
 
   Background:
     Given using OCS API version "2"
-    And user "Alice" has been created with default attributes and without skeleton files
+    And user "Alice" has been created with default attributes
 
   @skipOnStorage:ceph @skipOnStorage:scality
   Scenario: restoring a file changes the etags of all parents

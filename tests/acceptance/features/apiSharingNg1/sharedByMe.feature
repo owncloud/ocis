@@ -6,7 +6,7 @@ Feature: resources shared by user
   https://owncloud.dev/libre-graph-api/#/me.drive/ListSharedByMe
 
   Background:
-    Given these users have been created with default attributes and without skeleton files:
+    Given these users have been created with default attributes:
       | username |
       | Alice    |
       | Brian    |

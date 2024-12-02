@@ -4,9 +4,9 @@ Feature: delete federated connections
   I want to delete federated connections if they are no longer needed
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
     And using server "REMOTE"
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
 
 
   Scenario: federated user deletes the federated connection

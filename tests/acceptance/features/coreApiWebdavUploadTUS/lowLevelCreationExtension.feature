@@ -4,7 +4,7 @@ Feature: low level tests of the creation extension see https://tus.io/protocols/
   So that I can manage my resources
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
 
 
   Scenario Outline: creating a new upload resource

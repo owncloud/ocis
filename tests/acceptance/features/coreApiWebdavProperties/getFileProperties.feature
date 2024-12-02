@@ -5,7 +5,7 @@ Feature: get file properties
 
   Background:
     Given using OCS API version "1"
-    And user "Alice" has been created with default attributes and without skeleton files
+    And user "Alice" has been created with default attributes
 
   @smokeTest
   Scenario Outline: user sends a PROPFIND request on various file names
@@ -146,7 +146,7 @@ Feature: get file properties
   @skipOnReva
   Scenario Outline: resource that is shared to a user has a share-types property
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Alice" has created folder "/test"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/textfile.txt"
     And user "Alice" has sent the following resource share invitation:
@@ -225,7 +225,7 @@ Feature: get file properties
   @skipOnReva
   Scenario Outline: resource that is shared by user,group and link has a share-types property
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And group "grp1" has been created
     And user "Alice" has created folder "/test"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/textfile.txt"

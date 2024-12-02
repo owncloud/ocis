@@ -7,7 +7,7 @@ Feature: Change data of space
   See https://github.com/owncloud/ocis/issues/1542 and https://github.com/owncloud/ocis/pull/839
 
   Background:
-    Given these users have been created with default attributes and without skeleton files:
+    Given these users have been created with default attributes:
       | username |
       | Alice    |
       | Brian    |
@@ -570,7 +570,7 @@ Feature: Change data of space
 
 
   Scenario: user sends PATCH request to other user's space that they don't have access to
-    Given these users have been created with default attributes and without skeleton files:
+    Given these users have been created with default attributes:
       | username |
       | Carol    |
     When user "Carol" sends PATCH request to the space "Personal" of user "Alice" with data "{}"
@@ -581,7 +581,7 @@ Feature: Change data of space
   @env-config
   Scenario Outline: space member with role 'Space Editor Without Versions' and Space Editor edits the space
     Given the administrator has enabled the permissions role "Space Editor Without Versions"
-    And these users have been created with default attributes and without skeleton files:
+    And these users have been created with default attributes:
       | username |
       | Carol    |
     And user "Alice" has sent the following space share invitation:

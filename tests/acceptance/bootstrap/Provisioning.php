@@ -188,7 +188,7 @@ trait Provisioning {
 	}
 
 	/**
-	 * @Given user :user has been created with default attributes and without skeleton files
+	 * @Given user :user has been created with default attributes
 	 *
 	 * @param string $user
 	 *
@@ -202,7 +202,7 @@ trait Provisioning {
 	}
 
 	/**
-	 * @Given these users have been created without skeleton files and not initialized:
+	 * @Given these users have been created without being initialized:
 	 *
 	 * @param TableNode $table
 	 *
@@ -216,7 +216,7 @@ trait Provisioning {
 	}
 
 	/**
-	 * @Given these users have been created with default attributes and without skeleton files:
+	 * @Given these users have been created with default attributes:
 	 * expects a table of users with the heading
 	 * "|username|"
 	 *

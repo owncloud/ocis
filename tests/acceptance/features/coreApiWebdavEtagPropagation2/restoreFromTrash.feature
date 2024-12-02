@@ -4,7 +4,7 @@ Feature: propagation of etags when restoring a file or folder from trash
   So that the client app can know to re-scan and sync the content of the folder(s)
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
     And user "Alice" has created folder "/upload"
 
 

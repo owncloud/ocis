@@ -4,11 +4,11 @@ Feature: change role
   So that I can manage the role of user
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
 
 
   Scenario Outline: admin user changes the role of another user with different roles
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     And the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
     When user "Alice" changes the role of user "Brian" to role "<new-user-role>" using the Graph API
@@ -49,7 +49,7 @@ Feature: change role
 
   Scenario Outline: non-admin cannot change the user role
     Given the administrator has assigned the role "<user-role>" to user "Alice" using the Graph API
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     When user "Alice" tries to change the role of user "Alice" to role "Admin" using the Graph API
     Then the HTTP status code should be "403"
     And user "Brian" should have the role "User"
@@ -62,7 +62,7 @@ Feature: change role
 
   Scenario Outline: non-admin user tries to change the role of nonexistent user
     Given the administrator has assigned the role "<user-role>" to user "Alice" using the Graph API
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     When user "Alice" tries to change the role of user "nonexistent" to role "Admin" using the Graph API
     Then the HTTP status code should be "403"
     Examples:

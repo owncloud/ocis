@@ -4,7 +4,7 @@ Feature:  enable or disable sync of incoming shares
   So that I can filter out the files and folder shared with Me
 
   Background:
-    Given these users have been created with default attributes and without skeleton files:
+    Given these users have been created with default attributes:
       | username |
       | Alice    |
       | Brian    |
@@ -91,7 +91,7 @@ Feature:  enable or disable sync of incoming shares
 
 
   Scenario Outline: enable a group share sync by only one user in a group
-    Given user "Carol" has been created with default attributes and without skeleton files
+    Given user "Carol" has been created with default attributes
     And group "grp1" has been created
     And user "Alice" has been added to group "grp1"
     And user "Brian" has been added to group "grp1"
@@ -130,7 +130,7 @@ Feature:  enable or disable sync of incoming shares
 
 
   Scenario Outline: disable group share sync by only one user in a group
-    Given user "Carol" has been created with default attributes and without skeleton files
+    Given user "Carol" has been created with default attributes
     And group "grp1" has been created
     And user "Alice" has been added to group "grp1"
     And user "Brian" has been added to group "grp1"
@@ -237,7 +237,7 @@ Feature:  enable or disable sync of incoming shares
 
 
   Scenario Outline: enable a group share sync shared from Project Space by only one user in a group
-    Given user "Carol" has been created with default attributes and without skeleton files
+    Given user "Carol" has been created with default attributes
     And the administrator has assigned the role "Space Admin" to user "Carol" using the Graph API
     And group "grp1" has been created
     And user "Alice" has been added to group "grp1"
@@ -278,7 +278,7 @@ Feature:  enable or disable sync of incoming shares
 
 
   Scenario Outline: disable group share sync shared from Project space by only one user in a group
-    Given user "Carol" has been created with default attributes and without skeleton files
+    Given user "Carol" has been created with default attributes
     And the administrator has assigned the role "Space Admin" to user "Carol" using the Graph API
     And group "grp1" has been created
     And user "Alice" has been added to group "grp1"

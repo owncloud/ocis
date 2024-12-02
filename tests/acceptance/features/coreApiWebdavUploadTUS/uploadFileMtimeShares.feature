@@ -5,7 +5,7 @@ Feature: upload file
   So that I can find files by their real creation date
 
   Background:
-    Given these users have been created with default attributes and without skeleton files:
+    Given these users have been created with default attributes:
       | username |
       | Alice    |
       | Brian    |

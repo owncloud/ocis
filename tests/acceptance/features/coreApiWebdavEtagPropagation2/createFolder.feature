@@ -4,7 +4,7 @@ Feature: propagation of etags when creating folders
   So that the client app can know to re-scan and sync the content of the folder(s)
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
 
   @issue-4251
   Scenario Outline: creating a folder inside a folder changes its etag
@@ -47,7 +47,7 @@ Feature: propagation of etags when creating folders
 
   @issue-4251 @skipOnReva
   Scenario Outline: sharee creating a folder inside a folder received as a share changes its etag for all collaborators
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And using <dav-path-version> DAV path
     And user "Alice" has created folder "/folder"
     And user "Alice" has sent the following resource share invitation:
@@ -78,7 +78,7 @@ Feature: propagation of etags when creating folders
 
   @issue-4251 @skipOnReva
   Scenario Outline: sharer creating a folder inside a shared folder changes etag for all collaborators
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And using <dav-path-version> DAV path
     And user "Alice" has created folder "/folder"
     And user "Alice" has sent the following resource share invitation:

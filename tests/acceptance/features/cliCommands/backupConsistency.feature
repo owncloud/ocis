@@ -5,11 +5,11 @@ Feature: backup consistency
   So that I can backup my data
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
 
 
   Scenario: check backup consistency via CLI command
-    Given these users have been created with default attributes and without skeleton files:
+    Given these users have been created with default attributes:
       | username |
       | Brian    |
       | Carol    |

@@ -4,7 +4,7 @@ Feature: upload file
   So that I can find files by their real creation date
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
 
   @issue-10346
   Scenario Outline: upload file with mtime

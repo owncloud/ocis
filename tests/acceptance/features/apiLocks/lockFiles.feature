@@ -3,7 +3,7 @@ Feature: lock files
   I want to lock files
 
   Background:
-    Given these users have been created with default attributes and without skeleton files:
+    Given these users have been created with default attributes:
       | username |
       | Alice    |
       | Brian    |
@@ -335,7 +335,7 @@ Feature: lock files
   @issue-7638 @issue-7599
   Scenario Outline: locking a file in a received share does not lock other items with the same name in other received shares (shares from different users)
     Given using <dav-path-version> DAV path
-    And user "Carol" has been created with default attributes and without skeleton files
+    And user "Carol" has been created with default attributes
     And user "Alice" has created folder "FromAlice"
     And user "Brian" has created folder "FromBrian"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/FromAlice/textfile0.txt"

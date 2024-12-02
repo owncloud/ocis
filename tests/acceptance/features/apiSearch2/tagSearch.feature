@@ -4,7 +4,7 @@ Feature: tag search
   So that I can find the files with the tag I am looking for
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
 
   @issue-10329
   Scenario Outline: search files by tag
@@ -118,7 +118,7 @@ Feature: tag search
   @issue-10329
   Scenario Outline: sharee searches shared files using a tag
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Alice" has created folder "uploadFolder"
     And user "Alice" has uploaded file with content "hello world" to "uploadFolder/file1.txt"
     And user "Alice" has uploaded file with content "Namaste nepal" to "uploadFolder/file2.txt"
@@ -152,7 +152,7 @@ Feature: tag search
   @issue-10329
   Scenario Outline: sharee searches shared project space files using a tag
     Given using spaces DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "tag-space" with the default quota using the Graph API
     And user "Alice" has sent the following space share invitation:

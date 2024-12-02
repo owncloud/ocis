@@ -4,7 +4,7 @@ Feature: add users to group
   So that I can give a user access to the resources of the group
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
 
 
   Scenario: adding a user to a group
@@ -155,7 +155,7 @@ Feature: add users to group
 
   @issue-5938
   Scenario Outline: user other than the admin tries to add other user to a group
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
     And group "groupA" has been created
     When user "Alice" tries to add user "Brian" to group "groupA" using the Graph API
@@ -196,7 +196,7 @@ Feature: add users to group
 
   @issue-5939
   Scenario Outline: user other than the admin tries to add user to a nonexistent group
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And the administrator has assigned the role "<user-role>" to user "Alice" using the Graph API
     When user "Alice" tries to add user "Brian" to a nonexistent group using the Graph API
     Then the HTTP status code should be "403"
@@ -226,7 +226,7 @@ Feature: add users to group
 
   Scenario: add multiple users to a group at once
     Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
-    And these users have been created with default attributes and without skeleton files:
+    And these users have been created with default attributes:
       | username |
       | Brian    |
       | Carol    |
@@ -244,7 +244,7 @@ Feature: add users to group
 
   Scenario: admin tries to add users to a nonexistent group at once
     Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
-    And these users have been created with default attributes and without skeleton files:
+    And these users have been created with default attributes:
       | username |
       | Brian    |
       | Carol    |
@@ -267,7 +267,7 @@ Feature: add users to group
 
   Scenario: admin tries to add nonexistent and existing users to a group at once
     Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
-    And these users have been created with default attributes and without skeleton files:
+    And these users have been created with default attributes:
       | username |
       | Brian    |
     And user "Alice" has created a group "grp1" using the Graph API
@@ -294,7 +294,7 @@ Feature: add users to group
   @issue-5702
   Scenario: try to add users to a group twice
     Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
-    And these users have been created with default attributes and without skeleton files:
+    And these users have been created with default attributes:
       | username |
       | Brian    |
       | Carol    |
@@ -316,7 +316,7 @@ Feature: add users to group
   @issue-5793
   Scenario: try to add a group to another group with PATCH request
     Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
-    And these users have been created with default attributes and without skeleton files:
+    And these users have been created with default attributes:
       | username |
       | Brian    |
     And these groups have been created:
@@ -330,7 +330,7 @@ Feature: add users to group
   @issue-5793
   Scenario: try to add a group to another group with POST request
     Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
-    And these users have been created with default attributes and without skeleton files:
+    And these users have been created with default attributes:
       | username |
       | Brian    |
     And these groups have been created:
@@ -344,7 +344,7 @@ Feature: add users to group
 
   Scenario Outline: admin tries to add a user to a group with invalid JSON
     Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
-    And these users have been created with default attributes and without skeleton files:
+    And these users have been created with default attributes:
       | username |
       | Brian    |
     And user "Alice" has created a group "grp1" using the Graph API
@@ -359,7 +359,7 @@ Feature: add users to group
 
   Scenario Outline: admin tries to add multiple users to a group at once with invalid JSON
     Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
-    And these users have been created with default attributes and without skeleton files:
+    And these users have been created with default attributes:
       | username |
       | Brian    |
       | Carol    |
@@ -378,7 +378,7 @@ Feature: add users to group
   @issue-5871
   Scenario: admin tries to add multiple users with wrong host
     Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
-    And these users have been created with default attributes and without skeleton files:
+    And these users have been created with default attributes:
       | username |
       | Brian    |
       | Carol    |
@@ -392,7 +392,7 @@ Feature: add users to group
   @issue-5871
   Scenario: admin tries to add single user with wrong host
     Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
-    And these users have been created with default attributes and without skeleton files:
+    And these users have been created with default attributes:
       | username |
       | Brian    |
     And user "Alice" has created a group "grp1" using the Graph API
@@ -429,7 +429,7 @@ Feature: add users to group
   @issue-5855
   Scenario: add same user twice to a group at once
     Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
-    And these users have been created with default attributes and without skeleton files:
+    And these users have been created with default attributes:
       | username |
       | Brian    |
     And user "Alice" has created a group "grp1" using the Graph API

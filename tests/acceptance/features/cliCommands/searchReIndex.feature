@@ -5,7 +5,7 @@ Feature: reindex space via CLI command
     So that I can improve search performance by ensuring that the index is up-to-date
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
     And using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the Graph API

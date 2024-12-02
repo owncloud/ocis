@@ -18,7 +18,7 @@ Feature: enforce password on public link
       | config                                                 | value |
       | OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD           | false |
       | OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD | true  |
-    And user "Alice" has been created with default attributes and without skeleton files
+    And user "Alice" has been created with default attributes
     And user "Alice" has uploaded file with content "test file" to "/testfile.txt"
     And using OCS API version "<ocs-api-version>"
     When user "Alice" creates a public link share using the sharing API with settings
@@ -38,7 +38,7 @@ Feature: enforce password on public link
       | config                                                 | value |
       | OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD           | false |
       | OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD | true  |
-    And user "Alice" has been created with default attributes and without skeleton files
+    And user "Alice" has been created with default attributes
     And user "Alice" has uploaded file with content "test file" to "/testfile.txt"
     And using OCS API version "<ocs-api-version>"
     When user "Alice" creates a public link share using the sharing API with settings
@@ -57,7 +57,7 @@ Feature: enforce password on public link
       | config                                                 | value |
       | OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD           | false |
       | OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD | true  |
-    And user "Alice" has been created with default attributes and without skeleton files
+    And user "Alice" has been created with default attributes
     And user "Alice" has uploaded file with content "test file" to "/testfile.txt"
     And using OCS API version "<ocs-api-version>"
     And using SharingNG
@@ -89,7 +89,7 @@ Feature: enforce password on public link
       | OCIS_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS          | 2     |
       | OCIS_PASSWORD_POLICY_MIN_DIGITS                        | 2     |
       | OCIS_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS            | 2     |
-    And user "Alice" has been created with default attributes and without skeleton files
+    And user "Alice" has been created with default attributes
     And user "Alice" has uploaded file with content "test file" to "/testfile.txt"
     And using OCS API version "<ocs-api-version>"
     When user "Alice" creates a public link share using the sharing API with settings
@@ -116,7 +116,7 @@ Feature: enforce password on public link
       | OCIS_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS | 2     |
       | OCIS_PASSWORD_POLICY_MIN_DIGITS               | 2     |
       | OCIS_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS   | 2     |
-    And user "Alice" has been created with default attributes and without skeleton files
+    And user "Alice" has been created with default attributes
     And user "Alice" has uploaded file with content "test file" to "/testfile.txt"
     And using OCS API version "<ocs-api-version>"
     When user "Alice" creates a public link share using the sharing API with settings
@@ -149,7 +149,7 @@ Feature: enforce password on public link
       | OCIS_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS          | 2     |
       | OCIS_PASSWORD_POLICY_MIN_DIGITS                        | 1     |
       | OCIS_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS            | 2     |
-    And user "Alice" has been created with default attributes and without skeleton files
+    And user "Alice" has been created with default attributes
     And user "Alice" has uploaded file with content "test file" to "/testfile.txt"
     And using OCS API version "<ocs-api-version>"
     And using SharingNG
@@ -182,7 +182,7 @@ Feature: enforce password on public link
       | OCIS_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS          | 2     |
       | OCIS_PASSWORD_POLICY_MIN_DIGITS                        | 1     |
       | OCIS_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS            | 2     |
-    And user "Alice" has been created with default attributes and without skeleton files
+    And user "Alice" has been created with default attributes
     And user "Alice" has uploaded file with content "test file" to "/testfile.txt"
     And using OCS API version "<ocs-api-version>"
     And using SharingNG
@@ -212,7 +212,7 @@ Feature: enforce password on public link
   Scenario Outline: create a public link with a password in accordance with the password policy (valid cases)
     Given the config "<config>" has been set to "<config-value>"
     And using OCS API version "2"
-    And user "Alice" has been created with default attributes and without skeleton files
+    And user "Alice" has been created with default attributes
     And user "Alice" has uploaded file with content "test file" to "/testfile.txt"
     When user "Alice" creates a public link share using the sharing API with settings
       | path        | /testfile.txt |
@@ -238,7 +238,7 @@ Feature: enforce password on public link
 
   Scenario Outline: try to create a public link with a password that does not comply with the password policy (invalid cases)
     Given using OCS API version "2"
-    And user "Alice" has been created with default attributes and without skeleton files
+    And user "Alice" has been created with default attributes
     And user "Alice" has uploaded file with content "test file" to "/testfile.txt"
     When user "Alice" creates a public link share using the sharing API with settings
       | path        | /testfile.txt |
@@ -258,7 +258,7 @@ Feature: enforce password on public link
   Scenario Outline: update a public link with a password that is listed in the Banned-Password-List
     Given the config "OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/drone/banned-password-list.txt"
     And using OCS API version "2"
-    And user "Alice" has been created with default attributes and without skeleton files
+    And user "Alice" has been created with default attributes
     And user "Alice" has uploaded file with content "test file" to "/testfile.txt"
     And using SharingNG
     And user "Alice" has created the following resource link share:
@@ -281,7 +281,7 @@ Feature: enforce password on public link
   Scenario Outline: create  a public link with a password that is listed in the Banned-Password-List
     Given the config "OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/drone/banned-password-list.txt"
     And using OCS API version "2"
-    And user "Alice" has been created with default attributes and without skeleton files
+    And user "Alice" has been created with default attributes
     And user "Alice" has uploaded file with content "test file" to "/testfile.txt"
     When user "Alice" creates a public link share using the sharing API with settings
       | path        | /testfile.txt |

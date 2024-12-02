@@ -4,7 +4,7 @@ Feature: delete groups
   So that I can remove unnecessary groups
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
     And the administrator has assigned the role "Admin" to user "Alice" using the Graph API
 
 
@@ -56,7 +56,7 @@ Feature: delete groups
 
   @issue-5938
   Scenario Outline: user other than the admin can't delete a group
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
     And group "new-group" has been created
     When user "Brian" tries to delete group "new-group" using the Graph API
@@ -105,7 +105,7 @@ Feature: delete groups
 
   Scenario: user should not see share received via deleted group
     Given user "Alice" has uploaded file with content "sample text" to "lorem.txt"
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And group "grp1" has been created
     And user "Brian" has been added to group "grp1"
     And user "Alice" has sent the following resource share invitation:

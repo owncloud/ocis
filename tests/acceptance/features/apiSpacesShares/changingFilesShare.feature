@@ -5,14 +5,14 @@ Feature: change shared resource
 
   Background:
     Given using spaces DAV path
-    And these users have been created with default attributes and without skeleton files:
+    And these users have been created with default attributes:
       | username |
       | Alice    |
       | Brian    |
 
   @issue-4421
   Scenario: move files between shares by different users
-    Given user "Carol" has been created with default attributes and without skeleton files
+    Given user "Carol" has been created with default attributes
     And user "Alice" has uploaded file with content "some data" to "/textfile0.txt"
     And user "Alice" has created folder "/PARENT"
     And user "Brian" has created folder "/PARENT"

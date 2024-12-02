@@ -7,7 +7,7 @@ Feature: create user
   See https://github.com/owncloud/ocis/issues/1542 and https://github.com/owncloud/ocis/pull/839
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
 
   @issue-3516
   Scenario Outline: admin creates a user
@@ -66,7 +66,7 @@ Feature: create user
 
 
   Scenario: user cannot be created with the name of the disabled user
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     And the user "Alice" has disabled user "Brian"
     When the user "Alice" creates a new user with the following attributes using the Graph API:
@@ -79,7 +79,7 @@ Feature: create user
 
 
   Scenario: user can be created with the name of the deleted user
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     And the user "Alice" has deleted a user "Brian"
     When the user "Alice" creates a new user with the following attributes using the Graph API:

@@ -10,9 +10,9 @@ Feature: sharing
 
   Scenario Outline: creating a share of a file with a user
     Given using OCS API version "<ocs-api-version>"
-    And user "Alice" has been created with default attributes and without skeleton files
+    And user "Alice" has been created with default attributes
     And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     When user "Alice" shares file "textfile0.txt" with user "Brian" using the sharing API
     And the content of file "/Shares/textfile0.txt" for user "Brian" should be "ownCloud test text file 0"
     Examples:

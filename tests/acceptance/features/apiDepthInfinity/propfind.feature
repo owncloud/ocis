@@ -6,7 +6,7 @@ Feature: PROPFIND with depth:infinity
 
   Background:
     Given the config "OCDAV_ALLOW_PROPFIND_DEPTH_INFINITY" has been set to "true"
-    And user "Alice" has been created with default attributes and without skeleton files
+    And user "Alice" has been created with default attributes
     And user "Alice" has created the following folders
       | path                                        |
       | simple-folder                               |

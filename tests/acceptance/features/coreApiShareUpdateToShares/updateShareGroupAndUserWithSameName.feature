@@ -5,7 +5,7 @@ Feature: updating shares to users and groups that have the same name
   So that I can decide what resources can be shared with which permission
 
   Background:
-    Given these users have been created with default attributes and without skeleton files:
+    Given these users have been created with default attributes:
       | username |
       | Alice    |
       | Brian    |

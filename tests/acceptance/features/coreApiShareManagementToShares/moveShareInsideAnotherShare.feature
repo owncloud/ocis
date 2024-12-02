@@ -6,7 +6,7 @@ Feature: moving a share inside another share
 
   Background:
     Given using OCS API version "1"
-    And these users have been created with default attributes and without skeleton files:
+    And these users have been created with default attributes:
       | username |
       | Alice    |
       | Brian    |

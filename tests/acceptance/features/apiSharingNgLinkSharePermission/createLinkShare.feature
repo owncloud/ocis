@@ -2,7 +2,7 @@ Feature: Create a link share for a resource
   https://owncloud.dev/libre-graph-api/#/drives.permissions/CreateLink
 
   Background:
-    Given these users have been created with default attributes and without skeleton files:
+    Given these users have been created with default attributes:
       | username |
       | Alice    |
 
@@ -2389,7 +2389,7 @@ Feature: Create a link share for a resource
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "projectSpace" with content "to share" to "textfile.txt"
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Alice" has sent the following space share invitation:
       | space           | projectSpace       |
       | sharee          | Brian              |
@@ -2458,7 +2458,7 @@ Feature: Create a link share for a resource
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "projectSpace" with content "to share" to "textfile.txt"
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Alice" has sent the following space share invitation:
       | space           | projectSpace       |
       | sharee          | Brian              |
@@ -2527,7 +2527,7 @@ Feature: Create a link share for a resource
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "projectSpace" with content "to share" to "textfile.txt"
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Alice" has sent the following space share invitation:
       | space           | projectSpace       |
       | sharee          | Brian              |
@@ -2598,7 +2598,7 @@ Feature: Create a link share for a resource
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "projectSpace" with content "to share" to "textfile.txt"
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Alice" has sent the following space share invitation:
       | space           | projectSpace       |
       | sharee          | Brian              |
@@ -2669,7 +2669,7 @@ Feature: Create a link share for a resource
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "projectSpace" with content "to share" to "textfile.txt"
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Alice" has sent the following space share invitation:
       | space           | projectSpace       |
       | sharee          | Brian              |
@@ -2720,7 +2720,7 @@ Feature: Create a link share for a resource
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "projectSpace" with content "to share" to "textfile.txt"
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Alice" has sent the following space share invitation:
       | space           | projectSpace       |
       | sharee          | Brian              |

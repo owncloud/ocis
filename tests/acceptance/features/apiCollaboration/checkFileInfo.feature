@@ -4,7 +4,7 @@ Feature: check file info with different wopi apps
   So that I can get all the information of a file
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
 
 
   Scenario: check file info with fakeOffice

@@ -7,7 +7,7 @@ Feature: List and create spaces
   See https://github.com/owncloud/ocis/issues/1542 and https://github.com/owncloud/ocis/pull/839
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
     And using spaces DAV path
 
 
@@ -78,7 +78,7 @@ Feature: List and create spaces
 
 
   Scenario: ordinary user can request information about their Space via the Graph API using a filter
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And user "Brian" has created folder "folder"
     And user "Brian" has sent the following resource share invitation:
       | resource        | folder   |
@@ -443,7 +443,7 @@ Feature: List and create spaces
 
   @issue-7160
   Scenario Outline: get share jail space information of the user when user has a pending share
-    Given user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes
     And user "Alice" has disabled auto-accepting
     And user "Brian" has uploaded file with content "this is a test file." to "test.txt"
     And the administrator has assigned the role "<user-role>" to user "Alice" using the Graph API

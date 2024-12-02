@@ -4,7 +4,7 @@ Feature: checksums
   So that the integrity of the uploaded resources is maintained
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
 
 
   Scenario Outline: uploading a file with checksum should work

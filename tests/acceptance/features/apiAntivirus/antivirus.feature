@@ -5,7 +5,7 @@ Feature: antivirus
   So that I can prevent files with viruses from being uploaded
 
   Background:
-    Given user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes
 
 
   Scenario Outline: upload a normal file without virus
@@ -147,7 +147,7 @@ Feature: antivirus
 
   Scenario Outline: upload a file with virus to a user share
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Alice" has created folder "uploadFolder"
     And user "Alice" has sent the following resource share invitation:
       | resource        | uploadFolder |
@@ -175,7 +175,7 @@ Feature: antivirus
 
   Scenario Outline: upload a file with virus to a group share
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And group "group1" has been created
     And user "Brian" has been added to group "group1"
     And user "Alice" has created folder "uploadFolder"
@@ -230,7 +230,7 @@ Feature: antivirus
 
   Scenario Outline: upload a file with virus to a shared project space
     Given using spaces DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
     And user "Alice" has sent the following space share invitation:
@@ -360,7 +360,7 @@ Feature: antivirus
 
   Scenario Outline: try to overwrite a file with the virus content in group share
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And group "group1" has been created
     And user "Brian" has been added to group "group1"
     And user "Alice" has been added to group "group1"
@@ -388,7 +388,7 @@ Feature: antivirus
 
   Scenario Outline: try to overwrite a file with the virus content in user share
     Given using <dav-path-version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Alice" has created folder "uploadFolder"
     And user "Alice" has uploaded file with content "this is a test file." to "uploadFolder/test.txt"
     And user "Alice" has sent the following resource share invitation:
@@ -444,7 +444,7 @@ Feature: antivirus
   Scenario: try to overwrite the .space/readme.md file in space share
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
     And user "Alice" has sent the following space share invitation:
       | space           | new-space    |
@@ -466,7 +466,7 @@ Feature: antivirus
   Scenario: member of a project space tries to overwrite a file with virus content
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
-    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Brian" has been created with default attributes
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
     And user "Alice" has sent the following space share invitation:
       | space           | new-space    |

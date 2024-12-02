@@ -4,7 +4,7 @@ Feature: MOVE file/folder
   So that I can organise resources according to my preference
 
   Background:
-    Given these users have been created with default attributes and without skeleton files:
+    Given these users have been created with default attributes:
       | username |
       | Alice    |
       | Brian    |
