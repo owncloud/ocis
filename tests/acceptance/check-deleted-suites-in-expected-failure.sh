@@ -18,7 +18,7 @@ log_success() {
 
 SCRIPT_PATH=$(dirname "$0")
 PATH_TO_SUITES="${SCRIPT_PATH}/features"
-EXPECTED_FAILURE_FILES=("expected-failures-localAPI-on-OCIS-storage.md" "expected-failures-API-on-OCIS-storage.md")
+EXPECTED_FAILURE_FILES=("expected-failures-localAPI-on-OCIS-storage.md" "expected-failures-API-on-OCIS-storage.md" "expected-failures-without-remotephp.md")
 # contains all the suites names inside tests/acceptance/features
 AVAILABLE_SUITES=($(ls -l "$PATH_TO_SUITES" | grep '^d' | awk '{print $NF}'))
 
@@ -45,7 +45,7 @@ for expected_failure_file in "${EXPECTED_FAILURE_FILES[@]}"; do
   NONEXISTING_SCENARIOS=()
   for suite in "${EXPECTED_FAILURE_SUITES[@]}"; do
     if [[ " ${AVAILABLE_SUITES[*]} " != *" $suite "* ]]; then
-      pattern="(${suite}/[a-zA-Z0-9]+\\.feature:[0-9]+)"
+      pattern="(\\b${suite}/[a-zA-Z0-9]+\\.feature:[0-9]+)"
       NONEXISTING_SCENARIOS+=($(grep -Eo ${pattern} ${PATH_TO_EXPECTED_FAILURE_FILE}))
     fi
   done
