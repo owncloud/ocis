@@ -199,8 +199,8 @@ importers:
         specifier: 29.7.0
         version: 29.7.0(@types/node@20.14.11)(babel-plugin-macros@3.1.0)
       license-checker-rseidelsohn:
-        specifier: 4.3.0
-        version: 4.3.0
+        specifier: 4.4.2
+        version: 4.4.2
       mini-css-extract-plugin:
         specifier: 2.9.2
         version: 2.9.2(webpack@5.96.1)
@@ -4031,8 +4031,8 @@ packages:
     resolution: {integrity: sha512-+bT2uH4E5LGE7h/n3evcS/sQlJXCpIp6ym8OWJ5eV6+67Dsql/LaaT7qJBAt2rzfoa/5QBGBhxDix1dMt2kQKQ==}
     engines: {node: '>= 0.8.0'}
 
-  license-checker-rseidelsohn@4.3.0:
-    resolution: {integrity: sha512-A2LQ+3kUIG1hCJ/hh4WUvPsyhooT7o5mFhNyTean0cqH3rZeB1ZUCthxlcdgWESSqx+3DLC6J/8ghbiWRYKdUA==}
+  license-checker-rseidelsohn@4.4.2:
+    resolution: {integrity: sha512-Sf8WaJhd2vELvCne+frS9AXqnY/vv591s2/nZcJDwTnoNgltG4mAmoenffVb8L2YPRYbxARLyrHJBC38AVfpuA==}
     engines: {node: '>=18', npm: '>=8'}
     hasBin: true
 
@@ -11419,7 +11419,7 @@ snapshots:
       prelude-ls: 1.2.1
       type-check: 0.4.0
 
-  license-checker-rseidelsohn@4.3.0:
+  license-checker-rseidelsohn@4.4.2:
     dependencies:
       chalk: 4.1.2
       debug: 4.3.5
