@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2024-12-02-13-07-08]
+[#deprecation-note-2024-12-02-15-52-42]
 [caption=]
 .Deprecation notes for the graph service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -786,7 +786,7 @@ LDAP Attribute to use for the email address of users.
 a|`OCIS_LDAP_USER_SCHEMA_DISPLAYNAME` +
 `LDAP_USER_SCHEMA_DISPLAY_NAME` +
 `GRAPH_LDAP_USER_DISPLAYNAME_ATTRIBUTE` +
-xref:deprecation-note-2024-12-02-13-07-08[Deprecation Note]
+xref:deprecation-note-2024-12-02-15-52-42[Deprecation Note]
 a| [subs=-attributes]
 ++pre5.0 ++
 a| [subs=-attributes]
@@ -1192,6 +1192,18 @@ a| [subs=-attributes]
 ++[b1e2218d-eef8-4d4c-b82d-0f1a1b48f3b5 a8d5fe5e-96e3-418d-825b-534dbdf22b99 fb6c3e19-e378-47e5-b277-9732f9de6e21 58c63c02-1d89-4572-916a-870abc5a1b7d 2d00ce52-1fc2-4dbc-8b95-a73b73395f5a 1c996275-f1c9-4e71-abdf-a42f6495e960 312c0871-5ef7-4b3a-85b6-0e4074c64049] ++
 a| [subs=-attributes]
 A comma separated list of roles that are available for assignment.
+
+a|`OCIS_MAX_CONCURRENCY` +
+`GRAPH_MAX_CONCURRENCY` +
+
+a| [subs=-attributes]
+++7.0.0 ++
+a| [subs=-attributes]
+++int ++
+a| [subs=-attributes]
+++20 ++
+a| [subs=-attributes]
+The maximum number of concurrent requests the service will handle.
 
 a|`OCIS_KEYCLOAK_BASE_PATH` +
 `GRAPH_KEYCLOAK_BASE_PATH` +

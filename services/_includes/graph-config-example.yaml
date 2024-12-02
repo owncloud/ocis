@@ -143,6 +143,7 @@ unified_roles:
   - 2d00ce52-1fc2-4dbc-8b95-a73b73395f5a
   - 1c996275-f1c9-4e71-abdf-a42f6495e960
   - 312c0871-5ef7-4b3a-85b6-0e4074c64049
+max_concurrency: 20
 keycloak:
   base_path: ""
   client_id: ""
