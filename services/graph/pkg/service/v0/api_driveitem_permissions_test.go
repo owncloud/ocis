@@ -419,10 +419,11 @@ var _ = Describe("DriveItemPermissionsService", func() {
 						OpaqueId: "public-share-id",
 					},
 					Token: "public-share-token",
+					// the link shares the same resource id
 					ResourceId: &provider.ResourceId{
-						StorageId: "storageid",
-						SpaceId:   "spaceid",
-						OpaqueId:  "public-share-opaqueid",
+						StorageId: "1",
+						SpaceId:   "2",
+						OpaqueId:  "3",
 					},
 					Permissions: &link.PublicSharePermissions{Permissions: roleconversions.NewViewerRole().CS3ResourcePermissions()},
 				},
