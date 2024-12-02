@@ -65,6 +65,7 @@ The following sections list the changes for unreleased.
 
 * Bugfix - Fix deny access for graph roles: [#10627](https://github.com/owncloud/ocis/pull/10627)
 * Bugfix - Skip fetching members: [#10701](https://github.com/owncloud/ocis/pull/10701)
+* Enhancement - Fetch shared resource metadata concurrently in graph: [#10683](https://github.com/owncloud/ocis/pull/10683)
 
 ## Details
 
@@ -82,6 +83,12 @@ The following sections list the changes for unreleased.
    We now skip fetching group members when they are not needed.
 
    https://github.com/owncloud/ocis/pull/10701
+
+* Enhancement - Fetch shared resource metadata concurrently in graph: [#10683](https://github.com/owncloud/ocis/pull/10683)
+
+   We now concurrently stat shared resources when listing shares
+
+   https://github.com/owncloud/ocis/pull/10683
 
 # Changelog for [7.0.0-rc.3] (2024-11-21)
 
