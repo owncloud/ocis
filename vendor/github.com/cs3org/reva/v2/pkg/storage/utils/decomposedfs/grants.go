@@ -38,6 +38,8 @@ import (
 
 // DenyGrant denies access to a resource.
 func (fs *Decomposedfs) DenyGrant(ctx context.Context, ref *provider.Reference, grantee *provider.Grantee) error {
+	_, span := tracer.Start(ctx, "DenyGrant")
+	defer span.End()
 	log := appctx.GetLogger(ctx)
 
 	log.Debug().Interface("ref", ref).Interface("grantee", grantee).Msg("DenyGrant()")
@@ -74,6 +76,8 @@ func (fs *Decomposedfs) DenyGrant(ctx context.Context, ref *provider.Reference, 
 
 // AddGrant adds a grant to a resource
 func (fs *Decomposedfs) AddGrant(ctx context.Context, ref *provider.Reference, g *provider.Grant) (err error) {
+	_, span := tracer.Start(ctx, "AddGrant")
+	defer span.End()
 	log := appctx.GetLogger(ctx)
 	log.Debug().Interface("ref", ref).Interface("grant", g).Msg("AddGrant()")
 	grantNode, unlockFunc, grant, err := fs.loadGrant(ctx, ref, g)
@@ -119,6 +123,8 @@ func (fs *Decomposedfs) AddGrant(ctx context.Context, ref *provider.Reference, g
 
 // ListGrants lists the grants on the specified resource
 func (fs *Decomposedfs) ListGrants(ctx context.Context, ref *provider.Reference) (grants []*provider.Grant, err error) {
+	_, span := tracer.Start(ctx, "ListGrants")
+	defer span.End()
 	var grantNode *node.Node
 	if grantNode, err = fs.lu.NodeFromResource(ctx, ref); err != nil {
 		return
@@ -174,6 +180,8 @@ func (fs *Decomposedfs) ListGrants(ctx context.Context, ref *provider.Reference)
 
 // RemoveGrant removes a grant from resource
 func (fs *Decomposedfs) RemoveGrant(ctx context.Context, ref *provider.Reference, g *provider.Grant) (err error) {
+	_, span := tracer.Start(ctx, "RemoveGrant")
+	defer span.End()
 	grantNode, unlockFunc, grant, err := fs.loadGrant(ctx, ref, g)
 	if err != nil {
 		return err
@@ -235,6 +243,8 @@ func isShareGrant(ctx context.Context) bool {
 // UpdateGrant updates a grant on a resource
 // TODO remove AddGrant or UpdateGrant grant from CS3 api, redundant? tracked in https://github.com/cs3org/cs3apis/issues/92
 func (fs *Decomposedfs) UpdateGrant(ctx context.Context, ref *provider.Reference, g *provider.Grant) error {
+	_, span := tracer.Start(ctx, "UpdateGrant")
+	defer span.End()
 	log := appctx.GetLogger(ctx)
 	log.Debug().Interface("ref", ref).Interface("grant", g).Msg("UpdateGrant()")
 
@@ -272,6 +282,8 @@ func (fs *Decomposedfs) UpdateGrant(ctx context.Context, ref *provider.Reference
 
 // checks if the given grant exists and returns it. Nil grant means it doesn't exist
 func (fs *Decomposedfs) loadGrant(ctx context.Context, ref *provider.Reference, g *provider.Grant) (*node.Node, metadata.UnlockFunc, *provider.Grant, error) {
+	_, span := tracer.Start(ctx, "loadGrant")
+	defer span.End()
 	n, err := fs.lu.NodeFromResource(ctx, ref)
 	if err != nil {
 		return nil, nil, nil, err
@@ -308,6 +320,8 @@ func (fs *Decomposedfs) loadGrant(ctx context.Context, ref *provider.Reference, 
 }
 
 func (fs *Decomposedfs) storeGrant(ctx context.Context, n *node.Node, g *provider.Grant) error {
+	_, span := tracer.Start(ctx, "storeGrant")
+	defer span.End()
 	// if is a grant to a space root, the receiver needs the space type to update the indexes
 	spaceType, ok := storageprovider.SpaceTypeFromContext(ctx)
 	if !ok {

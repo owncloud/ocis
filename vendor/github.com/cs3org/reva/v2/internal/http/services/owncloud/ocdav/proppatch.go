@@ -133,12 +133,14 @@ func (s *svc) handleProppatch(ctx context.Context, w http.ResponseWriter, r *htt
 	rreq := &provider.UnsetArbitraryMetadataRequest{
 		Ref:                   ref,
 		ArbitraryMetadataKeys: []string{""},
+		LockId:                requestLockToken(r),
 	}
 	sreq := &provider.SetArbitraryMetadataRequest{
 		Ref: ref,
 		ArbitraryMetadata: &provider.ArbitraryMetadata{
 			Metadata: map[string]string{},
 		},
+		LockId: requestLockToken(r),
 	}
 
 	acceptedProps := []xml.Name{}

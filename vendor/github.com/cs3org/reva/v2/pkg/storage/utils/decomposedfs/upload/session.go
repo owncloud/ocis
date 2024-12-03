@@ -81,6 +81,8 @@ func (s *OcisSession) executantUser() *userpb.User {
 
 // Purge deletes the upload session metadata and written binary data
 func (s *OcisSession) Purge(ctx context.Context) error {
+	_, span := tracer.Start(ctx, "Purge")
+	defer span.End()
 	sessionPath := sessionPath(s.store.root, s.info.ID)
 	f, err := lockedfile.OpenFile(sessionPath+".lock", os.O_RDWR|os.O_TRUNC|os.O_CREATE, 0600)
 	if err != nil {
@@ -112,6 +114,8 @@ func (s *OcisSession) TouchBin() error {
 // events can update the scan outcome and the finished event might read an empty file because of race conditions
 // so we need to lock the file while writing and use atomic writes
 func (s *OcisSession) Persist(ctx context.Context) error {
+	_, span := tracer.Start(ctx, "Persist")
+	defer span.End()
 	sessionPath := sessionPath(s.store.root, s.info.ID)
 	// create folder structure (if needed)
 	if err := os.MkdirAll(filepath.Dir(sessionPath), 0700); err != nil {

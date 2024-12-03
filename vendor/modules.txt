@@ -367,7 +367,7 @@ github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1
 github.com/cs3org/go-cs3apis/cs3/storage/registry/v1beta1
 github.com/cs3org/go-cs3apis/cs3/tx/v1beta1
 github.com/cs3org/go-cs3apis/cs3/types/v1beta1
-# github.com/cs3org/reva/v2 v2.26.7
+# github.com/cs3org/reva/v2 v2.26.7 => github.com/rhafer/reva/v2 v2.0.0-20241203123710-81776b1f3103
 ## explicit; go 1.22.0
 github.com/cs3org/reva/v2/cmd/revad/internal/grace
 github.com/cs3org/reva/v2/cmd/revad/runtime
@@ -1813,7 +1813,7 @@ github.com/stretchr/testify/assert
 github.com/stretchr/testify/assert/yaml
 github.com/stretchr/testify/mock
 github.com/stretchr/testify/require
-# github.com/studio-b12/gowebdav v0.9.0 => github.com/aduffeck/gowebdav v0.0.0-20231215102054-212d4a4374f6
+# github.com/studio-b12/gowebdav v0.9.0 => github.com/aduffeck/gowebdav v0.0.0-20241122070217-29b328c136b1
 ## explicit; go 1.17
 github.com/studio-b12/gowebdav
 # github.com/tchap/go-patricia/v2 v2.3.1
@@ -2398,8 +2398,9 @@ sigs.k8s.io/yaml/goyaml.v2
 # stash.kopano.io/kgol/rndm v1.1.2
 ## explicit; go 1.13
 stash.kopano.io/kgol/rndm
-# github.com/studio-b12/gowebdav => github.com/aduffeck/gowebdav v0.0.0-20231215102054-212d4a4374f6
+# github.com/studio-b12/gowebdav => github.com/aduffeck/gowebdav v0.0.0-20241122070217-29b328c136b1
 # github.com/egirna/icap-client => github.com/fschade/icap-client v0.0.0-20240802074440-aade4a234387
 # github.com/unrolled/secure => github.com/DeepDiver1975/secure v0.0.0-20240611112133-abc838fb797c
 # github.com/go-micro/plugins/v4/store/nats-js-kv => github.com/kobergj/plugins/v4/store/nats-js-kv v0.0.0-20240807130109-f62bb67e8c90
 # go-micro.dev/v4 => github.com/butonic/go-micro/v4 v4.11.1-0.20241115112658-b5d4de5ed9b3
+# github.com/cs3org/reva/v2 => github.com/rhafer/reva/v2 v2.0.0-20241203123710-81776b1f3103

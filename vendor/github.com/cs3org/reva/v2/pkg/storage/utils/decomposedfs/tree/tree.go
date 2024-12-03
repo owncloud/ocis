@@ -106,6 +106,8 @@ func (t *Tree) Setup() error {
 
 // GetMD returns the metadata of a node in the tree
 func (t *Tree) GetMD(ctx context.Context, n *node.Node) (os.FileInfo, error) {
+	_, span := tracer.Start(ctx, "GetMD")
+	defer span.End()
 	md, err := os.Stat(n.InternalPath())
 	if err != nil {
 		if errors.Is(err, fs.ErrNotExist) {
@@ -119,6 +121,8 @@ func (t *Tree) GetMD(ctx context.Context, n *node.Node) (os.FileInfo, error) {
 
 // TouchFile creates a new empty file
 func (t *Tree) TouchFile(ctx context.Context, n *node.Node, markprocessing bool, mtime string) error {
+	_, span := tracer.Start(ctx, "TouchFile")
+	defer span.End()
 	if n.Exists {
 		if markprocessing {
 			return n.SetXattr(ctx, prefixes.StatusPrefix, []byte(node.ProcessingStatus))
@@ -223,6 +227,8 @@ func (t *Tree) CreateDir(ctx context.Context, n *node.Node) (err error) {
 
 // Move replaces the target with the source
 func (t *Tree) Move(ctx context.Context, oldNode *node.Node, newNode *node.Node) (err error) {
+	_, span := tracer.Start(ctx, "Move")
+	defer span.End()
 	if oldNode.SpaceID != newNode.SpaceID {
 		// WebDAV RFC https://www.rfc-editor.org/rfc/rfc4918#section-9.9.4 says to use
 		// > 502 (Bad Gateway) - This may occur when the destination is on another
@@ -432,6 +438,8 @@ func (t *Tree) ListFolder(ctx context.Context, n *node.Node) ([]*node.Node, erro
 
 // Delete deletes a node in the tree by moving it to the trash
 func (t *Tree) Delete(ctx context.Context, n *node.Node) (err error) {
+	_, span := tracer.Start(ctx, "Delete")
+	defer span.End()
 	path := filepath.Join(n.ParentPath(), n.Name)
 	// remove entry from cache immediately to avoid inconsistencies
 	defer func() { _ = t.idCache.Delete(path) }()
@@ -524,6 +532,8 @@ func (t *Tree) Delete(ctx context.Context, n *node.Node) (err error) {
 
 // RestoreRecycleItemFunc returns a node and a function to restore it from the trash.
 func (t *Tree) RestoreRecycleItemFunc(ctx context.Context, spaceid, key, trashPath string, targetNode *node.Node) (*node.Node, *node.Node, func() error, error) {
+	_, span := tracer.Start(ctx, "RestoreRecycleItemFunc")
+	defer span.End()
 	logger := appctx.GetLogger(ctx)
 
 	recycleNode, trashItem, deletedNodePath, origin, err := t.readRecycleItem(ctx, spaceid, key, trashPath)
@@ -623,6 +633,8 @@ func (t *Tree) RestoreRecycleItemFunc(ctx context.Context, spaceid, key, trashPa
 
 // PurgeRecycleItemFunc returns a node and a function to purge it from the trash
 func (t *Tree) PurgeRecycleItemFunc(ctx context.Context, spaceid, key string, path string) (*node.Node, func() error, error) {
+	_, span := tracer.Start(ctx, "PurgeRecycleItemFunc")
+	defer span.End()
 	logger := appctx.GetLogger(ctx)
 
 	rn, trashItem, deletedNodePath, _, err := t.readRecycleItem(ctx, spaceid, key, path)
@@ -664,25 +676,38 @@ func (t *Tree) PurgeRecycleItemFunc(ctx context.Context, spaceid, key string, pa
 
 // InitNewNode initializes a new node
 func (t *Tree) InitNewNode(ctx context.Context, n *node.Node, fsize uint64) (metadata.UnlockFunc, error) {
+	_, span := tracer.Start(ctx, "InitNewNode")
+	defer span.End()
 	// create folder structure (if needed)
-	if err := os.MkdirAll(filepath.Dir(n.InternalPath()), 0700); err != nil {
+
+	_, subspan := tracer.Start(ctx, "os.MkdirAll")
+	err := os.MkdirAll(filepath.Dir(n.InternalPath()), 0700)
+	subspan.End()
+	if err != nil {
 		return nil, err
 	}
 
 	// create and write lock new node metadata
+	_, subspan = tracer.Start(ctx, "metadata.Lock")
 	unlock, err := t.lookup.MetadataBackend().Lock(n.InternalPath())
+	subspan.End()
 	if err != nil {
 		return nil, err
 	}
 
 	// we also need to touch the actual node file here it stores the mtime of the resource
+	_, subspan = tracer.Start(ctx, "os.OpenFile")
 	h, err := os.OpenFile(n.InternalPath(), os.O_CREATE|os.O_EXCL, 0600)
+	subspan.End()
 	if err != nil {
 		return unlock, err
 	}
 	h.Close()
 
-	if _, err := node.CheckQuota(ctx, n.SpaceRoot, false, 0, fsize); err != nil {
+	_, subspan = tracer.Start(ctx, "node.CheckQuota")
+	_, err = node.CheckQuota(ctx, n.SpaceRoot, false, 0, fsize)
+	subspan.End()
+	if err != nil {
 		return unlock, err
 	}
 
@@ -692,7 +717,10 @@ func (t *Tree) InitNewNode(ctx context.Context, n *node.Node, fsize uint64) (met
 	log := appctx.GetLogger(ctx).With().Str("childNameLink", childNameLink).Str("relativeNodePath", relativeNodePath).Logger()
 	log.Info().Msg("initNewNode: creating symlink")
 
-	if err = os.Symlink(relativeNodePath, childNameLink); err != nil {
+	_, subspan = tracer.Start(ctx, "os.Symlink")
+	err = os.Symlink(relativeNodePath, childNameLink)
+	subspan.End()
+	if err != nil {
 		log.Info().Err(err).Msg("initNewNode: symlink failed")
 		if errors.Is(err, fs.ErrExist) {
 			log.Info().Err(err).Msg("initNewNode: symlink already exists")
@@ -854,6 +882,8 @@ var nodeIDRegep = regexp.MustCompile(`.*/nodes/([^.]*).*`)
 
 // TODO refactor the returned params into Node properties? would make all the path transformations go away...
 func (t *Tree) readRecycleItem(ctx context.Context, spaceID, key, path string) (recycleNode *node.Node, trashItem string, deletedNodePath string, origin string, err error) {
+	_, span := tracer.Start(ctx, "readRecycleItem")
+	defer span.End()
 	logger := appctx.GetLogger(ctx)
 
 	if key == "" {

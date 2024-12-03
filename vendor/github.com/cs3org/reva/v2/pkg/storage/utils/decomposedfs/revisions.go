@@ -48,6 +48,8 @@ import (
 
 // ListRevisions lists the revisions of the given resource
 func (fs *Decomposedfs) ListRevisions(ctx context.Context, ref *provider.Reference) (revisions []*provider.FileVersion, err error) {
+	_, span := tracer.Start(ctx, "ListRevisions")
+	defer span.End()
 	var n *node.Node
 	if n, err = fs.lu.NodeFromResource(ctx, ref); err != nil {
 		return
@@ -115,6 +117,8 @@ func (fs *Decomposedfs) ListRevisions(ctx context.Context, ref *provider.Referen
 // DownloadRevision returns a reader for the specified revision
 // FIXME the CS3 api should explicitly allow initiating revision and trash download, a related issue is https://github.com/cs3org/reva/issues/1813
 func (fs *Decomposedfs) DownloadRevision(ctx context.Context, ref *provider.Reference, revisionKey string, openReaderFunc func(md *provider.ResourceInfo) bool) (*provider.ResourceInfo, io.ReadCloser, error) {
+	_, span := tracer.Start(ctx, "DownloadRevision")
+	defer span.End()
 	log := appctx.GetLogger(ctx)
 
 	// verify revision key format
@@ -186,6 +190,8 @@ func (fs *Decomposedfs) DownloadRevision(ctx context.Context, ref *provider.Refe
 
 // RestoreRevision restores the specified revision of the resource
 func (fs *Decomposedfs) RestoreRevision(ctx context.Context, ref *provider.Reference, revisionKey string) (returnErr error) {
+	_, span := tracer.Start(ctx, "RestoreRevision")
+	defer span.End()
 	log := appctx.GetLogger(ctx)
 
 	// verify revision key format
@@ -330,6 +336,8 @@ func (fs *Decomposedfs) RestoreRevision(ctx context.Context, ref *provider.Refer
 
 // DeleteRevision deletes the specified revision of the resource
 func (fs *Decomposedfs) DeleteRevision(ctx context.Context, ref *provider.Reference, revisionKey string) error {
+	_, span := tracer.Start(ctx, "DeleteRevision")
+	defer span.End()
 	n, err := fs.getRevisionNode(ctx, ref, revisionKey, func(rp *provider.ResourcePermissions) bool {
 		return rp.RestoreFileVersion
 	})
@@ -345,6 +353,8 @@ func (fs *Decomposedfs) DeleteRevision(ctx context.Context, ref *provider.Refere
 }
 
 func (fs *Decomposedfs) getRevisionNode(ctx context.Context, ref *provider.Reference, revisionKey string, hasPermission func(*provider.ResourcePermissions) bool) (*node.Node, error) {
+	_, span := tracer.Start(ctx, "getRevisionNode")
+	defer span.End()
 	log := appctx.GetLogger(ctx)
 
 	// verify revision key format

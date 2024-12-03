@@ -704,6 +704,8 @@ func (t *Tree) ResolveSpaceIDIndexEntry(spaceid, entry string) (string, string, 
 
 // InitNewNode initializes a new node
 func (t *Tree) InitNewNode(ctx context.Context, n *node.Node, fsize uint64) (metadata.UnlockFunc, error) {
+	_, span := tracer.Start(ctx, "InitNewNode")
+	defer span.End()
 	// create folder structure (if needed)
 	if err := os.MkdirAll(filepath.Dir(n.InternalPath()), 0700); err != nil {
 		return nil, err

@@ -25,6 +25,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strings"
 	"sync"
 	"time"
 
@@ -319,6 +320,36 @@ func (c *Cache) Get(ctx context.Context, storageID, spaceID, shareID string, ski
 	return space.Shares[shareID], nil
 }
 
+// All returns all entries in the storage
+func (c *Cache) All(ctx context.Context) (*mtimesyncedcache.Map[string, *Spaces], error) {
+	ctx, span := tracer.Start(ctx, "All")
+	defer span.End()
+
+	providers, err := c.storage.ListDir(ctx, "/storages")
+	if err != nil {
+		return nil, err
+	}
+	for _, provider := range providers {
+		storageID := provider.Name
+		spaces, err := c.storage.ListDir(ctx, path.Join("/storages", storageID))
+		if err != nil {
+			return nil, err
+		}
+		for _, space := range spaces {
+			spaceID := strings.TrimSuffix(space.Name, ".json")
+
+			unlock := c.LockSpace(spaceID)
+			span.AddEvent("got lock for space " + spaceID)
+			if err := c.syncWithLock(ctx, storageID, spaceID); err != nil {
+				return nil, err
+			}
+			unlock()
+		}
+	}
+
+	return &c.Providers, nil
+}
+
 // ListSpace returns the list of shares in a given space
 func (c *Cache) ListSpace(ctx context.Context, storageID, spaceID string) (*Shares, error) {
 	ctx, span := tracer.Start(ctx, "ListSpace")
@@ -416,6 +447,35 @@ func (c *Cache) Persist(ctx context.Context, storageID, spaceID string) error {
 	}
 	log.Debug().Str("AfterEtag", space.Etag).Interface("Shares", shares).Msg("persisted provider cache")
 	return nil
+}
+
+// PurgeSpace removes a space from the cache
+func (c *Cache) PurgeSpace(ctx context.Context, storageID, spaceID string) error {
+	ctx, span := tracer.Start(ctx, "PurgeSpace")
+	defer span.End()
+
+	unlock := c.LockSpace(spaceID)
+	defer unlock()
+	span.AddEvent("got lock")
+
+	if !c.isSpaceCached(storageID, spaceID) {
+		err := c.syncWithLock(ctx, storageID, spaceID)
+		if err != nil {
+			return err
+		}
+	}
+
+	spaces, ok := c.Providers.Load(storageID)
+	if !ok {
+		return nil
+	}
+	newShares := &Shares{}
+	if space, ok := spaces.Spaces.Load(spaceID); ok {
+		newShares.Etag = space.Etag // keep the etag to allow overwriting the state on the server
+	}
+	spaces.Spaces.Store(spaceID, newShares)
+
+	return c.Persist(ctx, storageID, spaceID)
 }
 
 func (c *Cache) syncWithLock(ctx context.Context, storageID, spaceID string) error {

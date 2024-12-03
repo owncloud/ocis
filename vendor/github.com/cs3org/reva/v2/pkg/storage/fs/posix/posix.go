@@ -134,7 +134,7 @@ func New(m map[string]interface{}, stream events.Stream, log *zerolog.Logger) (s
 		Trashbin:          trashbin,
 	}
 
-	dfs, err := decomposedfs.New(&o.Options, aspects)
+	dfs, err := decomposedfs.New(&o.Options, aspects, log)
 	if err != nil {
 		return nil, err
 	}
