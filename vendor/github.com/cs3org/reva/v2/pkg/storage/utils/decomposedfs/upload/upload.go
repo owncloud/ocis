@@ -184,7 +184,7 @@ func (session *OcisSession) FinishUploadDecomposed(ctx context.Context) error {
 		}
 	}
 
-	n, err := session.store.CreateNodeForUpload(session, attrs)
+	n, err := session.store.CreateNodeForUpload(ctx, session, attrs)
 	if err != nil {
 		return err
 	}
@@ -226,7 +226,7 @@ func (session *OcisSession) FinishUploadDecomposed(ctx context.Context) error {
 	// for 0-byte uploads we take a shortcut and finalize isn't called elsewhere
 	if !session.store.async || session.info.Size == 0 {
 		// handle postprocessing synchronously
-		err = session.Finalize()
+		err = session.Finalize(ctx)
 		session.store.Cleanup(ctx, session, err != nil, false, err == nil)
 		if err != nil {
 			log.Error().Err(err).Msg("failed to upload")
@@ -279,8 +279,8 @@ func (session *OcisSession) ConcatUploads(_ context.Context, uploads []tusd.Uplo
 }
 
 // Finalize finalizes the upload (eg moves the file to the internal destination)
-func (session *OcisSession) Finalize() (err error) {
-	ctx, span := tracer.Start(session.Context(context.Background()), "Finalize")
+func (session *OcisSession) Finalize(ctx context.Context) (err error) {
+	ctx, span := tracer.Start(session.Context(ctx), "Finalize")
 	defer span.End()
 
 	revisionNode := node.New(session.SpaceID(), session.NodeID(), "", "", session.Size(), session.ID(),

@@ -68,6 +68,8 @@ func (md Attributes) Time(key string) (time.Time, error) {
 
 // SetXattrs sets multiple extended attributes on the write-through cache/node
 func (n *Node) SetXattrsWithContext(ctx context.Context, attribs map[string][]byte, acquireLock bool) (err error) {
+	_, span := tracer.Start(ctx, "SetXattrsWithContext")
+	defer span.End()
 	if n.xattrsCache != nil {
 		for k, v := range attribs {
 			n.xattrsCache[k] = v

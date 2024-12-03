@@ -199,8 +199,8 @@ func (store OcisStore) Cleanup(ctx context.Context, session Session, revertNodeM
 // CreateNodeForUpload will create the target node for the Upload
 // TODO move this to the node package as NodeFromUpload?
 // should we in InitiateUpload create the node first? and then the upload?
-func (store OcisStore) CreateNodeForUpload(session *OcisSession, initAttrs node.Attributes) (*node.Node, error) {
-	ctx, span := tracer.Start(session.Context(context.Background()), "CreateNodeForUpload")
+func (store OcisStore) CreateNodeForUpload(ctx context.Context, session *OcisSession, initAttrs node.Attributes) (*node.Node, error) {
+	ctx, span := tracer.Start(session.Context(ctx), "CreateNodeForUpload")
 	defer span.End()
 	n := node.New(
 		session.SpaceID(),
@@ -303,6 +303,8 @@ func (store OcisStore) CreateNodeForUpload(session *OcisSession, initAttrs node.
 }
 
 func (store OcisStore) updateExistingNode(ctx context.Context, session *OcisSession, n *node.Node, spaceID string, fsize uint64) (metadata.UnlockFunc, error) {
+	_, span := tracer.Start(ctx, "updateExistingNode")
+	defer span.End()
 	targetPath := n.InternalPath()
 
 	// write lock existing node before reading any metadata
@@ -388,6 +390,7 @@ func (store OcisStore) updateExistingNode(ctx context.Context, session *OcisSess
 			}
 
 			// clean revision file
+			span.AddEvent("os.Create")
 			if _, err := os.Create(versionPath); err != nil {
 				return unlock, err
 			}
@@ -405,6 +408,7 @@ func (store OcisStore) updateExistingNode(ctx context.Context, session *OcisSess
 		}
 		session.info.MetaData["versionsPath"] = versionPath
 		// keep mtime from previous version
+		span.AddEvent("os.Chtimes")
 		if err := os.Chtimes(session.info.MetaData["versionsPath"], oldNodeMtime, oldNodeMtime); err != nil {
 			return unlock, errtypes.InternalError(fmt.Sprintf("failed to change mtime of version node: %s", err))
 		}

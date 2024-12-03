@@ -36,7 +36,7 @@ func init() {
 
 // New returns an implementation to of the storage.FS interface that talk to
 // a local filesystem.
-func New(m map[string]interface{}, stream events.Stream, _ *zerolog.Logger) (storage.FS, error) {
+func New(m map[string]interface{}, stream events.Stream, log *zerolog.Logger) (storage.FS, error) {
 	o, err := options.New(m)
 	if err != nil {
 		return nil, err
@@ -47,5 +47,5 @@ func New(m map[string]interface{}, stream events.Stream, _ *zerolog.Logger) (sto
 		return nil, err
 	}
 
-	return decomposedfs.NewDefault(m, bs, stream)
+	return decomposedfs.NewDefault(m, bs, stream, log)
 }
