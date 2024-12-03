@@ -120,10 +120,8 @@ following:
     exits it
   - When a service fails to stop
 
-A slog-based EventHook is provided in the submodule sutureslog. Note
-that it is a separate Go module, in order to avoid imposing a Go 1.21
-requirement on this module, so a separate go get step will be
-necessary to use it.
+A default hook for slog is provided with the [sutureslog
+module](https://github.com/thejerf/sutureslog).
 
 The failureRate, failureThreshold, and failureBackoff controls how failures
 are handled, in order to avoid the supervisor failure case where the
@@ -365,7 +363,8 @@ func (s *Supervisor) Serve(ctx context.Context) error {
 				_, monitored := s.services[msg.id]
 				if monitored {
 					cancel := s.cancellations[msg.id]
-					if isErr(msg.err, ErrDoNotRestart) || isErr(msg.err, context.Canceled) || isErr(msg.err, context.DeadlineExceeded) {
+
+					if isErr(msg.err, ErrDoNotRestart) || ctx.Err() != nil {
 						delete(s.services, msg.id)
 						delete(s.cancellations, msg.id)
 						go cancel()
@@ -377,7 +376,11 @@ func (s *Supervisor) Serve(ctx context.Context) error {
 							return msg.err
 						}
 					} else {
-						s.handleFailedService(ctx, msg.id, msg.err, nil, false)
+						err := msg.err
+						if isErr(msg.err, context.DeadlineExceeded) || isErr(msg.err, context.Canceled) {
+							err = fmt.Errorf("from some other context, not the service's context, so service is being restarted: %w", msg.err)
+						}
+						s.handleFailedService(ctx, msg.id, err, nil, false)
 					}
 				}
 			case addService:
