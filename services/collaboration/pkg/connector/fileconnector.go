@@ -1206,7 +1206,7 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (*ConnectorResponse, 
 		}
 	}
 
-	breadcrumbFolderName := path.Dir(statRes.Info.Path)
+	breadcrumbFolderName := path.Dir(statRes.GetInfo().GetPath())
 	if breadcrumbFolderName == "." || breadcrumbFolderName == "" || breadcrumbFolderName == "/" {
 		breadcrumbFolderName = statRes.GetInfo().GetSpace().GetName()
 	}
@@ -1222,6 +1222,12 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (*ConnectorResponse, 
 	privateLinkURL := &url.URL{}
 	*privateLinkURL = *ocisURL
 	privateLinkURL.Path = path.Join(ocisURL.Path, "f", storagespace.FormatResourceID(statRes.GetInfo().GetId()))
+	parentFolderURL := &url.URL{}
+	*parentFolderURL = *ocisURL
+	parentFolderURL.Path = path.Join(ocisURL.Path, "f", storagespace.FormatResourceID(statRes.GetInfo().GetParentId()))
+	if publicShare := wopiContext.GetPublicShare(); publicShare != nil && isPublicShare {
+		parentFolderURL.Path = path.Join(ocisURL.Path, "s", publicShare.GetToken())
+	}
 	// fileinfo map
 	infoMap := map[string]interface{}{
 		fileinfo.KeyOwnerID:           hexEncodedOwnerId,
@@ -1231,7 +1237,7 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (*ConnectorResponse, 
 		fileinfo.KeyBreadcrumbDocName: path.Base(statRes.GetInfo().GetPath()),
 		// to get the folder we actually need to do a GetPath() request
 		fileinfo.KeyBreadcrumbFolderName: breadcrumbFolderName,
-		fileinfo.KeyBreadcrumbFolderURL:  privateLinkURL.String(),
+		fileinfo.KeyBreadcrumbFolderURL:  parentFolderURL.String(),
 
 		fileinfo.KeyHostViewURL:    createHostUrl("view", ocisURL, f.cfg.App.Name, statRes.GetInfo()),
 		fileinfo.KeyHostEditURL:    createHostUrl("write", ocisURL, f.cfg.App.Name, statRes.GetInfo()),

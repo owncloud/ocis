@@ -1686,6 +1686,11 @@ var _ = Describe("FileConnector", func() {
 						OpaqueId:  "opaqueid",
 						SpaceId:   "spaceid",
 					},
+					ParentId: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "parentopaqueid",
+						SpaceId:   "spaceid",
+					},
 				},
 			}, nil)
 
@@ -1696,7 +1701,7 @@ var _ = Describe("FileConnector", func() {
 				BaseFileName:               "test.txt",
 				BreadcrumbDocName:          "test.txt",
 				BreadcrumbFolderName:       "/path/to",
-				BreadcrumbFolderURL:        "https://ocis.example.prv/f/storageid$spaceid%21opaqueid",
+				BreadcrumbFolderURL:        "https://ocis.example.prv/f/storageid$spaceid%21parentopaqueid",
 				UserCanNotWriteRelative:    false,
 				SupportsExtendedLockLength: true,
 				SupportsGetLock:            true,
@@ -1753,6 +1758,11 @@ var _ = Describe("FileConnector", func() {
 					Id: &providerv1beta1.ResourceId{
 						StorageId: "storageid",
 						OpaqueId:  "opaqueid",
+						SpaceId:   "spaceid",
+					},
+					ParentId: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "parentopaqueid",
 						SpaceId:   "spaceid",
 					},
 					// Other properties aren't used for now.
@@ -1830,6 +1840,11 @@ var _ = Describe("FileConnector", func() {
 						OpaqueId:  "opaqueid",
 						SpaceId:   "spaceid",
 					},
+					ParentId: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "parentopaqueid",
+						SpaceId:   "spaceid",
+					},
 				},
 			}, nil)
 
@@ -1898,6 +1913,11 @@ var _ = Describe("FileConnector", func() {
 						OpaqueId:  "opaqueid",
 						SpaceId:   "spaceid",
 					},
+					ParentId: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "parentopaqueid",
+						SpaceId:   "spaceid",
+					},
 				},
 			}, nil)
 
@@ -1906,7 +1926,7 @@ var _ = Describe("FileConnector", func() {
 				BaseFileName:            "test.txt",
 				BreadcrumbDocName:       "test.txt",
 				BreadcrumbFolderName:    "/path/to",
-				BreadcrumbFolderURL:     "https://ocis.example.prv/f/storageid$spaceid%21opaqueid",
+				BreadcrumbFolderURL:     "https://ocis.example.prv/f/storageid$spaceid%21parentopaqueid",
 				UserCanNotWriteRelative: false,
 				SupportsLocks:           true,
 				SupportsUpdate:          true,

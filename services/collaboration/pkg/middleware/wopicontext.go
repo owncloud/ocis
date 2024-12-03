@@ -12,9 +12,11 @@ import (
 	"time"
 
 	appproviderv1beta1 "github.com/cs3org/go-cs3apis/cs3/app/provider/v1beta1"
+	link "github.com/cs3org/go-cs3apis/cs3/sharing/link/v1beta1"
 	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	rjwt "github.com/cs3org/reva/v2/pkg/token/manager/jwt"
+	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/helpers"
@@ -36,6 +38,23 @@ type WopiContext struct {
 	FileReference     *providerv1beta1.Reference
 	TemplateReference *providerv1beta1.Reference
 	ViewMode          appproviderv1beta1.ViewMode
+	publicShare       *link.PublicShare
+}
+
+// GetPublicShare returns the public share from the WopiContext or nil if it doesn't exist
+func (w *WopiContext) GetPublicShare() *link.PublicShare {
+	if w != nil {
+		return w.publicShare
+	}
+	return nil
+}
+
+// EvaluatePublicShare unmashals the public share from the scope and
+func (w *WopiContext) EvaluatePublicShare() *link.PublicShare {
+	if w != nil {
+		return w.publicShare
+	}
+	return nil
 }
 
 // WopiContextAuthMiddleware will prepare an HTTP handler to be used as
@@ -120,12 +139,26 @@ func WopiContextAuthMiddleware(cfg *config.Config, st microstore.Store, next htt
 			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 			return
 		}
-		user, _, err := tokenManager.DismantleToken(ctx, wopiContextAccessToken)
+		user, scope, err := tokenManager.DismantleToken(ctx, wopiContextAccessToken)
 		if err != nil {
 			wopiLogger.Error().Err(err).Msg("failed to dismantle reva token manager")
 			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 			return
 		}
+
+		for k, v := range scope {
+			if strings.HasPrefix(k, "publicshare:") && v.Resource.Decoder == "json" {
+				share := &link.PublicShare{}
+				err := utils.UnmarshalJSONToProtoV1(v.Resource.Value, share)
+				if err != nil {
+					wopiLogger.Error().Err(err).Msg("can't unmarshal public share from scope")
+				} else {
+					claims.WopiContext.publicShare = share
+				}
+				break
+			}
+		}
+
 		claims.WopiContext.AccessToken = wopiContextAccessToken
 
 		ctx = context.WithValue(ctx, wopiContextKey, claims.WopiContext)
