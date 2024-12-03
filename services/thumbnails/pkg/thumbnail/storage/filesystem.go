@@ -66,16 +66,19 @@ func (s FileSystem) Put(key string, img []byte) error {
 		if err != nil {
 			return errors.Wrapf(err, "could not create temporary file for \"%s\"", key)
 		}
-
-		_, writeErr := f.Write(img) // write the thumbnail in the temporary file
-		f.Close()                   // close the file regardless of the error
+		defer f.Close()
 
 		// if there was a problem writing, remove the temporary file
-		if writeErr != nil {
+		if _, writeErr := f.Write(img); writeErr != nil {
 			if remErr := os.Remove(f.Name()); remErr != nil {
 				return errors.Wrapf(remErr, "could not cleanup temporary file for \"%s\"", key)
 			}
 			return errors.Wrapf(writeErr, "could not write to temporary file for \"%s\"", key)
+		}
+
+		// if there wasn't a problem, ensure the data is written into disk
+		if synErr := f.Sync(); synErr != nil {
+			return errors.Wrapf(synErr, "could not sync temporary file data into the disk for \"%s\"", key)
 		}
 
 		// rename the temporary file to the final file
@@ -84,7 +87,7 @@ func (s FileSystem) Put(key string, img []byte) error {
 			if remErr := os.Remove(f.Name()); remErr != nil {
 				return errors.Wrapf(remErr, "rename failed and could not cleanup temporary file for \"%s\"", key)
 			}
-			return errors.Wrapf(err, "could not rename temporary file to \"%s\"", key)
+			return errors.Wrapf(renErr, "could not rename temporary file to \"%s\"", key)
 		}
 	}
 
