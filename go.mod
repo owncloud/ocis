@@ -82,7 +82,7 @@ require (
 	github.com/spf13/cobra v1.8.1
 	github.com/stretchr/testify v1.10.0
 	github.com/test-go/testify v1.1.4
-	github.com/thejerf/suture/v4 v4.0.5
+	github.com/thejerf/suture/v4 v4.0.6
 	github.com/tidwall/gjson v1.18.0
 	github.com/tus/tusd/v2 v2.6.0
 	github.com/unrolled/secure v1.16.0

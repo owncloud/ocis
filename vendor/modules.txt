@@ -1822,7 +1822,7 @@ github.com/tchap/go-patricia/v2/patricia
 # github.com/test-go/testify v1.1.4
 ## explicit
 github.com/test-go/testify/require
-# github.com/thejerf/suture/v4 v4.0.5
+# github.com/thejerf/suture/v4 v4.0.6
 ## explicit; go 1.9
 github.com/thejerf/suture/v4
 # github.com/tidwall/gjson v1.18.0
