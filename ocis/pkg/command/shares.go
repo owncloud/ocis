@@ -3,6 +3,7 @@ package command
 import (
 	"errors"
 
+	"github.com/rs/zerolog"
 	"github.com/urfave/cli/v2"
 
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
@@ -115,6 +116,11 @@ func cleanup(c *cli.Context, cfg *config.Config) error {
 	if err != nil {
 		return configlog.ReturnError(err)
 	}
+
+	l := logger()
+
+	zerolog.SetGlobalLevel(zerolog.InfoLevel)
+	serviceUserCtx = l.WithContext(serviceUserCtx)
 
 	mgr.(*jsoncs3.Manager).CleanupStaleShares(serviceUserCtx)
 
