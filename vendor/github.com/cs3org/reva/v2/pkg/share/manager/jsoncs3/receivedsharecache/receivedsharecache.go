@@ -185,6 +185,74 @@ func (c *Cache) Get(ctx context.Context, userID, spaceID, shareID string) (*Stat
 	return rss.Spaces[spaceID].States[shareID], nil
 }
 
+// Remove removes an entry from the cache
+func (c *Cache) Remove(ctx context.Context, userID, spaceID, shareID string) error {
+	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "Grab lock")
+	unlock := c.lockUser(userID)
+	span.End()
+	span.SetAttributes(attribute.String("cs3.userid", userID))
+	defer unlock()
+
+	ctx, span = appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "Add")
+	defer span.End()
+	span.SetAttributes(attribute.String("cs3.userid", userID), attribute.String("cs3.spaceid", spaceID))
+
+	persistFunc := func() error {
+		c.initializeIfNeeded(userID, spaceID)
+
+		rss, _ := c.ReceivedSpaces.Load(userID)
+		receivedSpace := rss.Spaces[spaceID]
+		if receivedSpace.States == nil {
+			receivedSpace.States = map[string]*State{}
+		}
+		delete(receivedSpace.States, shareID)
+		if len(receivedSpace.States) == 0 {
+			delete(rss.Spaces, spaceID)
+		}
+
+		return c.persist(ctx, userID)
+	}
+
+	log := appctx.GetLogger(ctx).With().
+		Str("hostname", os.Getenv("HOSTNAME")).
+		Str("userID", userID).
+		Str("spaceID", spaceID).Logger()
+
+	var err error
+	for retries := 100; retries > 0; retries-- {
+		err = persistFunc()
+		switch err.(type) {
+		case nil:
+			span.SetStatus(codes.Ok, "")
+			return nil
+		case errtypes.Aborted:
+			log.Debug().Msg("aborted when persisting added received share: etag changed. retrying...")
+			// this is the expected status code from the server when the if-match etag check fails
+			// continue with sync below
+		case errtypes.PreconditionFailed:
+			log.Debug().Msg("precondition failed when persisting added received share: etag changed. retrying...")
+			// actually, this is the wrong status code and we treat it like errtypes.Aborted because of inconsistencies on the server side
+			// continue with sync below
+		case errtypes.AlreadyExists:
+			log.Debug().Msg("already exists when persisting added received share. retrying...")
+			// CS3 uses an already exists error instead of precondition failed when using an If-None-Match=* header / IfExists flag in the InitiateFileUpload call.
+			// Thas happens when the cache thinks there is no file.
+			// continue with sync below
+		default:
+			span.SetStatus(codes.Error, fmt.Sprintf("persisting added received share failed. giving up: %s", err.Error()))
+			log.Error().Err(err).Msg("persisting added received share failed")
+			return err
+		}
+		if err := c.syncWithLock(ctx, userID); err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, err.Error())
+			log.Error().Err(err).Msg("persisting added received share failed. giving up.")
+			return err
+		}
+	}
+	return err
+}
+
 // List returns a list of received shares for a given user
 // The return list is guaranteed to be thread-safe
 func (c *Cache) List(ctx context.Context, userID string) (map[string]*Space, error) {

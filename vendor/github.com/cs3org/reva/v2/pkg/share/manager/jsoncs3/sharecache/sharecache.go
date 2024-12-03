@@ -214,6 +214,11 @@ func (c *Cache) Remove(ctx context.Context, userid, shareID string) error {
 			log.Debug().Msg("precondition failed when persisting removed share: etag changed. retrying...")
 			// actually, this is the wrong status code and we treat it like errtypes.Aborted because of inconsistencies on the server side
 			// continue with sync below
+		case errtypes.AlreadyExists:
+			log.Debug().Msg("file already existed when persisting removed share. retrying...")
+			// CS3 uses an already exists error instead of precondition failed when using an If-None-Match=* header / IfExists flag in the InitiateFileUpload call.
+			// Thas happens when the cache thinks there is no file.
+			// continue with sync below
 		default:
 			span.SetStatus(codes.Error, fmt.Sprintf("persisting removed share failed. giving up: %s", err.Error()))
 			log.Error().Err(err).Msg("persisting removed share failed")

@@ -38,6 +38,8 @@ import (
 
 // SetArbitraryMetadata sets the metadata on a resource
 func (fs *Decomposedfs) SetArbitraryMetadata(ctx context.Context, ref *provider.Reference, md *provider.ArbitraryMetadata) (err error) {
+	_, span := tracer.Start(ctx, "SetArbitraryMetadata")
+	defer span.End()
 	n, err := fs.lu.NodeFromResource(ctx, ref)
 	if err != nil {
 		return errors.Wrap(err, "Decomposedfs: error resolving ref")
@@ -131,6 +133,8 @@ func (fs *Decomposedfs) SetArbitraryMetadata(ctx context.Context, ref *provider.
 
 // UnsetArbitraryMetadata unsets the metadata on the given resource
 func (fs *Decomposedfs) UnsetArbitraryMetadata(ctx context.Context, ref *provider.Reference, keys []string) (err error) {
+	_, span := tracer.Start(ctx, "UnsetArbitraryMetadata")
+	defer span.End()
 	n, err := fs.lu.NodeFromResource(ctx, ref)
 	if err != nil {
 		return errors.Wrap(err, "Decomposedfs: error resolving ref")

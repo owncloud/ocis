@@ -552,7 +552,11 @@ func (cs3 *CS3) getAuthContext(ctx context.Context) (context.Context, error) {
 	authCtx, span := tracer.Start(authCtx, "getAuthContext", trace.WithLinks(trace.LinkFromContext(ctx)))
 	defer span.End()
 
-	client, err := pool.GetGatewayServiceClient(cs3.gatewayAddr)
+	selector, err := pool.GatewaySelector(cs3.gatewayAddr)
+	if err != nil {
+		return nil, err
+	}
+	client, err := selector.Next()
 	if err != nil {
 		return nil, err
 	}

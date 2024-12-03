@@ -34,3 +34,12 @@ func (m *Map[K, V]) Range(f func(key K, value V) bool) {
 }
 
 func (m *Map[K, V]) Store(key K, value V) { m.m.Store(key, value) }
+
+func (m *Map[K, V]) Count() int {
+	l := 0
+	m.Range(func(_ K, _ V) bool {
+		l++
+		return true
+	})
+	return l
+}

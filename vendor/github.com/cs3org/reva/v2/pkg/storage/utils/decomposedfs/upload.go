@@ -47,6 +47,8 @@ import (
 // TODO Upload (and InitiateUpload) needs a way to receive the expected checksum.
 // Maybe in metadata as 'checksum' => 'sha1 aeosvp45w5xaeoe' = lowercase, space separated?
 func (fs *Decomposedfs) Upload(ctx context.Context, req storage.UploadRequest, uff storage.UploadFinishedFunc) (*provider.ResourceInfo, error) {
+	_, span := tracer.Start(ctx, "Upload")
+	defer span.End()
 	up, err := fs.GetUpload(ctx, req.Ref.GetPath())
 	if err != nil {
 		return &provider.ResourceInfo{}, errors.Wrap(err, "Decomposedfs: error retrieving upload")
@@ -130,6 +132,8 @@ func (fs *Decomposedfs) Upload(ctx context.Context, req storage.UploadRequest, u
 // TODO read optional content for small files in this request
 // TODO InitiateUpload (and Upload) needs a way to receive the expected checksum. Maybe in metadata as 'checksum' => 'sha1 aeosvp45w5xaeoe' = lowercase, space separated?
 func (fs *Decomposedfs) InitiateUpload(ctx context.Context, ref *provider.Reference, uploadLength int64, metadata map[string]string) (map[string]string, error) {
+	_, span := tracer.Start(ctx, "InitiateUpload")
+	defer span.End()
 	log := appctx.GetLogger(ctx)
 
 	// remember the path from the reference

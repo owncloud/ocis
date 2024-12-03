@@ -520,12 +520,7 @@ func (s *service) UpdateReceivedShare(ctx context.Context, req *collaboration.Up
 	isMountPointSet := slices.Contains(req.GetUpdateMask().GetPaths(), _fieldMaskPathMountPoint) && req.GetShare().GetMountPoint().GetPath() != ""
 	// we calculate a valid mountpoint only if the share should be accepted and the mount point is not set explicitly
 	if isStateTransitionShareAccepted && !isMountPointSet {
-		gatewayClient, err := s.gatewaySelector.Next()
-		if err != nil {
-			return nil, err
-		}
-
-		s, err := setReceivedShareMountPoint(ctx, gatewayClient, req)
+		s, err := s.setReceivedShareMountPoint(ctx, req)
 		switch {
 		case err != nil:
 			fallthrough
@@ -556,7 +551,11 @@ func (s *service) UpdateReceivedShare(ctx context.Context, req *collaboration.Up
 	}
 }
 
-func setReceivedShareMountPoint(ctx context.Context, gwc gateway.GatewayAPIClient, req *collaboration.UpdateReceivedShareRequest) (*rpc.Status, error) {
+func (s *service) setReceivedShareMountPoint(ctx context.Context, req *collaboration.UpdateReceivedShareRequest) (*rpc.Status, error) {
+	gwc, err := s.gatewaySelector.Next()
+	if err != nil {
+		return nil, err
+	}
 	receivedShare, err := gwc.GetReceivedShare(ctx, &collaboration.GetReceivedShareRequest{
 		Ref: &collaboration.ShareReference{
 			Spec: &collaboration.ShareReference_Id{
@@ -575,6 +574,10 @@ func setReceivedShareMountPoint(ctx context.Context, gwc gateway.GatewayAPIClien
 		return status.NewOK(ctx), nil
 	}
 
+	gwc, err = s.gatewaySelector.Next()
+	if err != nil {
+		return nil, err
+	}
 	resourceStat, err := gwc.Stat(ctx, &provider.StatRequest{
 		Ref: &provider.Reference{
 			ResourceId: receivedShare.GetShare().GetShare().GetResourceId(),
@@ -592,11 +595,15 @@ func setReceivedShareMountPoint(ctx context.Context, gwc gateway.GatewayAPIClien
 		var userID *userpb.UserId
 		_ = utils.ReadJSONFromOpaque(req.Opaque, "userid", &userID)
 
+		receivedShares, err := s.sm.ListReceivedShares(ctx, []*collaboration.Filter{}, userID)
+		if err != nil {
+			return nil, err
+		}
+
 		// check if the requested mount point is available and if not, find a suitable one
-		availableMountpoint, _, err := GetMountpointAndUnmountedShares(ctx, gwc,
+		availableMountpoint, _, err := getMountpointAndUnmountedShares(ctx, receivedShares, s.gatewaySelector, nil,
 			resourceStat.GetInfo().GetId(),
 			resourceStat.GetInfo().GetName(),
-			userID,
 		)
 		if err != nil {
 			return status.NewInternal(ctx, err.Error()), nil
@@ -620,7 +627,6 @@ func GetMountpointAndUnmountedShares(ctx context.Context, gwc gateway.GatewayAPI
 	if userId != nil {
 		listReceivedSharesReq.Opaque = utils.AppendJSONToOpaque(nil, "userid", userId)
 	}
-
 	listReceivedSharesRes, err := gwc.ListReceivedShares(ctx, listReceivedSharesReq)
 	if err != nil {
 		return "", nil, errtypes.InternalError("grpc list received shares request failed")
@@ -630,17 +636,30 @@ func GetMountpointAndUnmountedShares(ctx context.Context, gwc gateway.GatewayAPI
 		return "", nil, err
 	}
 
+	return getMountpointAndUnmountedShares(ctx, listReceivedSharesRes.GetShares(), nil, gwc, id, name)
+}
+
+// GetMountpointAndUnmountedShares returns a new or existing mountpoint for the given info and produces a list of unmounted received shares for the same resource
+func getMountpointAndUnmountedShares(ctx context.Context, receivedShares []*collaboration.ReceivedShare, gatewaySelector pool.Selectable[gateway.GatewayAPIClient], gwc gateway.GatewayAPIClient, id *provider.ResourceId, name string) (string, []*collaboration.ReceivedShare, error) {
+
 	unmountedShares := []*collaboration.ReceivedShare{}
 	base := filepath.Clean(name)
 	mount := base
 	existingMountpoint := ""
-	mountedShares := make([]string, 0, len(listReceivedSharesRes.GetShares()))
+	mountedShares := make([]string, 0, len(receivedShares))
 	var pathExists bool
+	var err error
 
-	for _, s := range listReceivedSharesRes.GetShares() {
+	for _, s := range receivedShares {
 		resourceIDEqual := utils.ResourceIDEqual(s.GetShare().GetResourceId(), id)
 
 		if resourceIDEqual && s.State == collaboration.ShareState_SHARE_STATE_ACCEPTED {
+			if gatewaySelector != nil {
+				gwc, err = gatewaySelector.Next()
+				if err != nil {
+					return "", nil, err
+				}
+			}
 			// a share to the resource already exists and is mounted, remembers the mount point
 			_, err := utils.GetResourceByID(ctx, s.GetShare().GetResourceId(), gwc)
 			if err == nil {
@@ -658,6 +677,12 @@ func GetMountpointAndUnmountedShares(ctx context.Context, gwc gateway.GatewayAPI
 			mountedShares = append(mountedShares, s.GetMountPoint().GetPath())
 			if s.GetMountPoint().GetPath() == mount {
 				// does the shared resource still exist?
+				if gatewaySelector != nil {
+					gwc, err = gatewaySelector.Next()
+					if err != nil {
+						return "", nil, err
+					}
+				}
 				_, err := utils.GetResourceByID(ctx, s.GetShare().GetResourceId(), gwc)
 				if err == nil {
 					pathExists = true

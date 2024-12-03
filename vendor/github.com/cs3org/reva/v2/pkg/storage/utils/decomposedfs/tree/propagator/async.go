@@ -183,7 +183,7 @@ func (p AsyncPropagator) queuePropagation(ctx context.Context, spaceID, nodeID s
 			ready = true
 			break
 		}
-		log.Error().Err(err).Msg("failed to write Change to disk (retrying)")
+		log.Debug().Err(err).Msg("failed to write Change to disk (retrying)")
 		err = os.Mkdir(filepath.Dir(changePath), 0700)
 		triggerPropagation = err == nil || os.IsExist(err) // only the first goroutine, which succeeds to create the directory, is supposed to actually trigger the propagation
 	}
@@ -386,7 +386,7 @@ func (p AsyncPropagator) propagate(ctx context.Context, spaceID, nodeID string, 
 			// a negative new treesize. Something must have gone wrong with the accounting.
 			// Reset the current treesize to 0.
 			log.Error().Uint64("treeSize", treeSize).Int64("sizeDiff", pc.SizeDiff).
-				Msg("Error when updating treesize of node. Updated treesize < 0. Reestting to 0")
+				Msg("Error when updating treesize of node. Updated treesize < 0. Resetting to 0")
 			newSize = 0
 		default:
 			newSize = treeSize - uint64(-pc.SizeDiff)
@@ -414,7 +414,7 @@ func (p AsyncPropagator) propagate(ctx context.Context, spaceID, nodeID string, 
 	log.Info().Msg("Propagation done. cleaning up")
 	cleanup()
 
-	if !n.IsSpaceRoot(ctx) { // This does not seem robust as it checks the space name property
+	if !n.IsSpaceRoot(ctx) {
 		p.queuePropagation(ctx, n.SpaceID, n.ParentID, pc, log)
 	}
 

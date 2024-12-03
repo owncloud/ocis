@@ -35,6 +35,7 @@ import (
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/jellydator/ttlcache/v2"
 	"github.com/pkg/errors"
+	"github.com/rs/zerolog"
 	tusd "github.com/tus/tusd/v2/pkg/handler"
 	microstore "go-micro.dev/v4/store"
 	"go.opentelemetry.io/otel"
@@ -125,10 +126,12 @@ type Decomposedfs struct {
 	userSpaceIndex  *spaceidindex.Index
 	groupSpaceIndex *spaceidindex.Index
 	spaceTypeIndex  *spaceidindex.Index
+
+	log *zerolog.Logger
 }
 
 // NewDefault returns an instance with default components
-func NewDefault(m map[string]interface{}, bs tree.Blobstore, es events.Stream) (storage.FS, error) {
+func NewDefault(m map[string]interface{}, bs tree.Blobstore, es events.Stream, log *zerolog.Logger) (storage.FS, error) {
 	o, err := options.New(m)
 	if err != nil {
 		return nil, err
@@ -169,14 +172,12 @@ func NewDefault(m map[string]interface{}, bs tree.Blobstore, es events.Stream) (
 		Trashbin:          &DecomposedfsTrashbin{},
 	}
 
-	return New(o, aspects)
+	return New(o, aspects, log)
 }
 
 // New returns an implementation of the storage.FS interface that talks to
 // a local filesystem.
-func New(o *options.Options, aspects aspects.Aspects) (storage.FS, error) {
-	log := logger.New()
-
+func New(o *options.Options, aspects aspects.Aspects, log *zerolog.Logger) (storage.FS, error) {
 	err := aspects.Tree.Setup()
 	if err != nil {
 		log.Error().Err(err).Msg("could not setup tree")
@@ -235,6 +236,7 @@ func New(o *options.Options, aspects aspects.Aspects) (storage.FS, error) {
 		userSpaceIndex:  userSpaceIndex,
 		groupSpaceIndex: groupSpaceIndex,
 		spaceTypeIndex:  spaceTypeIndex,
+		log:             log,
 	}
 	fs.sessionStore = upload.NewSessionStore(fs, aspects, o.Root, o.AsyncFileUploads, o.Tokens)
 	if err = fs.trashbin.Setup(fs); err != nil {
@@ -311,7 +313,7 @@ func (fs *Decomposedfs) Postprocessing(ch <-chan events.Event) {
 				keepUpload = true
 				metrics.UploadSessionsAborted.Inc()
 			case events.PPOutcomeContinue:
-				if err := session.Finalize(); err != nil {
+				if err := session.Finalize(ctx); err != nil {
 					sublog.Error().Err(err).Msg("could not finalize upload")
 					failed = true
 					revertNodeMetadata = false

@@ -38,6 +38,8 @@ import (
 
 // SetLock sets a lock on the node
 func (n *Node) SetLock(ctx context.Context, lock *provider.Lock) error {
+	ctx, span := tracer.Start(ctx, "SetLock")
+	defer span.End()
 	lockFilePath := n.LockFilePath()
 
 	// ensure parent path exists
@@ -89,22 +91,31 @@ func (n *Node) SetLock(ctx context.Context, lock *provider.Lock) error {
 
 // ReadLock reads the lock id for a node
 func (n Node) ReadLock(ctx context.Context, skipFileLock bool) (*provider.Lock, error) {
+	ctx, span := tracer.Start(ctx, "ReadLock")
+	defer span.End()
 
 	// ensure parent path exists
-	if err := os.MkdirAll(filepath.Dir(n.InternalPath()), 0700); err != nil {
+	_, subspan := tracer.Start(ctx, "os.MkdirAll")
+	err := os.MkdirAll(filepath.Dir(n.InternalPath()), 0700)
+	subspan.End()
+	if err != nil {
 		return nil, errors.Wrap(err, "Decomposedfs: error creating parent folder for lock")
 	}
 
 	// the caller of ReadLock already may hold a file lock
 	if !skipFileLock {
+		_, subspan := tracer.Start(ctx, "filelocks.AcquireReadLock")
 		fileLock, err := filelocks.AcquireReadLock(n.InternalPath())
+		subspan.End()
 
 		if err != nil {
 			return nil, err
 		}
 
 		defer func() {
+			_, subspan := tracer.Start(ctx, "filelocks.ReleaseLock")
 			rerr := filelocks.ReleaseLock(fileLock)
+			subspan.End()
 
 			// if err is non nil we do not overwrite that
 			if err == nil {
@@ -113,7 +124,10 @@ func (n Node) ReadLock(ctx context.Context, skipFileLock bool) (*provider.Lock, 
 		}()
 	}
 
+	_, subspan = tracer.Start(ctx, "os.Open")
 	f, err := os.Open(n.LockFilePath())
+	subspan.End()
+
 	if err != nil {
 		if errors.Is(err, fs.ErrNotExist) {
 			return nil, errtypes.NotFound("no lock found")
@@ -130,7 +144,11 @@ func (n Node) ReadLock(ctx context.Context, skipFileLock bool) (*provider.Lock, 
 
 	// lock already expired
 	if lock.Expiration != nil && time.Now().After(time.Unix(int64(lock.Expiration.Seconds), int64(lock.Expiration.Nanos))) {
-		if err = os.Remove(f.Name()); err != nil {
+
+		_, subspan = tracer.Start(ctx, "os.Remove")
+		err = os.Remove(f.Name())
+		subspan.End()
+		if err != nil {
 			return nil, errors.Wrap(err, "Decomposedfs: could not remove expired lock file")
 		}
 		// we successfully deleted the expired lock
@@ -142,6 +160,8 @@ func (n Node) ReadLock(ctx context.Context, skipFileLock bool) (*provider.Lock, 
 
 // RefreshLock refreshes the node's lock
 func (n *Node) RefreshLock(ctx context.Context, lock *provider.Lock, existingLockID string) error {
+	ctx, span := tracer.Start(ctx, "RefreshLock")
+	defer span.End()
 
 	// ensure parent path exists
 	if err := os.MkdirAll(filepath.Dir(n.InternalPath()), 0700); err != nil {
@@ -204,6 +224,8 @@ func (n *Node) RefreshLock(ctx context.Context, lock *provider.Lock, existingLoc
 
 // Unlock unlocks the node
 func (n *Node) Unlock(ctx context.Context, lock *provider.Lock) error {
+	ctx, span := tracer.Start(ctx, "Unlock")
+	defer span.End()
 
 	// ensure parent path exists
 	if err := os.MkdirAll(filepath.Dir(n.InternalPath()), 0700); err != nil {

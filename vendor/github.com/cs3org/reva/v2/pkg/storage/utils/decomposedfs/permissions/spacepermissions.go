@@ -60,6 +60,8 @@ func (p Permissions) AssemblePermissions(ctx context.Context, n *node.Node) (*pr
 
 // AssembleTrashPermissions is used to assemble file permissions
 func (p Permissions) AssembleTrashPermissions(ctx context.Context, n *node.Node) (*provider.ResourcePermissions, error) {
+	_, span := tracer.Start(ctx, "AssembleTrashPermissions")
+	defer span.End()
 	return p.item.AssembleTrashPermissions(ctx, n)
 }
 

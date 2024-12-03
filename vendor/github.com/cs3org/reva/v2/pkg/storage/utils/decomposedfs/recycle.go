@@ -64,7 +64,8 @@ func (tb *DecomposedfsTrashbin) Setup(fs storage.FS) error {
 // ListRecycle returns the list of available recycle items
 // ref -> the space (= resourceid), key -> deleted node id, relativePath = relative to key
 func (tb *DecomposedfsTrashbin) ListRecycle(ctx context.Context, ref *provider.Reference, key, relativePath string) ([]*provider.RecycleItem, error) {
-
+	_, span := tracer.Start(ctx, "ListRecycle")
+	defer span.End()
 	if ref == nil || ref.ResourceId == nil || ref.ResourceId.OpaqueId == "" {
 		return nil, errtypes.BadRequest("spaceid required")
 	}
@@ -346,6 +347,8 @@ func (tb *DecomposedfsTrashbin) listTrashRoot(ctx context.Context, spaceID strin
 
 // RestoreRecycleItem restores the specified item
 func (tb *DecomposedfsTrashbin) RestoreRecycleItem(ctx context.Context, ref *provider.Reference, key, relativePath string, restoreRef *provider.Reference) error {
+	_, span := tracer.Start(ctx, "RestoreRecycleItem")
+	defer span.End()
 	if ref == nil {
 		return errtypes.BadRequest("missing reference, needs a space id")
 	}
@@ -399,6 +402,8 @@ func (tb *DecomposedfsTrashbin) RestoreRecycleItem(ctx context.Context, ref *pro
 
 // PurgeRecycleItem purges the specified item, all its children and all their revisions
 func (tb *DecomposedfsTrashbin) PurgeRecycleItem(ctx context.Context, ref *provider.Reference, key, relativePath string) error {
+	_, span := tracer.Start(ctx, "PurgeRecycleItem")
+	defer span.End()
 	if ref == nil {
 		return errtypes.BadRequest("missing reference, needs a space id")
 	}
@@ -429,6 +434,8 @@ func (tb *DecomposedfsTrashbin) PurgeRecycleItem(ctx context.Context, ref *provi
 
 // EmptyRecycle empties the trash
 func (tb *DecomposedfsTrashbin) EmptyRecycle(ctx context.Context, ref *provider.Reference) error {
+	_, span := tracer.Start(ctx, "EmptyRecycle")
+	defer span.End()
 	if ref == nil || ref.ResourceId == nil || ref.ResourceId.OpaqueId == "" {
 		return errtypes.BadRequest("spaceid must be set")
 	}
