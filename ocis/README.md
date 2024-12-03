@@ -59,6 +59,14 @@ Allows specifying the blobstore to use. Defaults to `ocis`. Empty blobs will not
 * `--fail`\
 Exits with non-zero exit code if inconsistencies are found. Useful for automation.
 
+### Cleanup Orphaned Shares
+
+When a shared space or directory got deleted, use the `shares cleanup` command to remove those share orphans. This can't be done automatically at the moment.
+
+```bash
+ocis shares cleanup
+```
+
 ### Revisions CLI
 
 The revisions command allows removing the revisions of files in the storage.
