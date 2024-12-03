@@ -64,6 +64,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Fix deny access for graph roles: [#10627](https://github.com/owncloud/ocis/pull/10627)
+* Bugfix - Fix possible race condition when a thumbnails is stored in the FS: [#10693](https://github.com/owncloud/ocis/pull/10693)
 * Bugfix - Skip fetching members: [#10701](https://github.com/owncloud/ocis/pull/10701)
 * Enhancement - Fetch shared resource metadata concurrently in graph: [#10683](https://github.com/owncloud/ocis/pull/10683)
 
@@ -77,6 +78,15 @@ The following sections list the changes for unreleased.
    still experimental.
 
    https://github.com/owncloud/ocis/pull/10627
+
+* Bugfix - Fix possible race condition when a thumbnails is stored in the FS: [#10693](https://github.com/owncloud/ocis/pull/10693)
+
+   A race condition could cause the thumbnail service to return a thumbnail with 0
+   bytes or with partial content. In order to fix this, the service will create a
+   temporary file with the contents and then rename that file to its final
+   location.
+
+   https://github.com/owncloud/ocis/pull/10693
 
 * Bugfix - Skip fetching members: [#10701](https://github.com/owncloud/ocis/pull/10701)
 
