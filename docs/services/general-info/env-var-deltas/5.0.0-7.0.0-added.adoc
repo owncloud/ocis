@@ -1,7 +1,7 @@
 // # Added Variables between oCIS 5.0.0 and oCIS 7.0.0
 // commenting the headline to make it better includable
 
-// table created per 2024.11.26
+// table created per 2024.12.02
 // the table should be recreated/updated on source () changes
 
 [width="100%",cols="~,~,~,~",options="header"]
@@ -18,40 +18,15 @@
 | Disables versioning of files. When set to true, new uploads with the same filename will overwrite existing files instead of creating a new version.
 | false
 
-| 
-| OCIS_MAX_CONCURRENCY
-| Maximum number of concurrent go-routines. Higher values can potentially get work done faster but will also cause more load on the system. Values of 0 or below will be ignored and the default value will be used.
-| 1
-
-| 
-| OCIS_PERSISTENT_STORE
-| The type of the store. Supported values are: 'memory', 'nats-js-kv', 'redis-sentinel', 'noop'. See the text description for details.
-| nats-js-kv
-
-| 
-| OCIS_PERSISTENT_STORE_AUTH_PASSWORD
-| The password to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.
-| 
-
-| 
-| OCIS_PERSISTENT_STORE_AUTH_USERNAME
-| The username to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.
-| 
-
-| 
-| OCIS_PERSISTENT_STORE_NODES
-| A list of nodes to access the configured store. This has no effect when 'memory' store is configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details.
-| [127.0.0.1:9233]
-
-| 
-| OCIS_PERSISTENT_STORE_TTL
-| Time to live for events in the store. Defaults to '30m' (30 minutes). See the Environment Variable Types description for more details.
-| 30m0s
-
-| 
+| xref:deployment/services/env-vars-special-scope.adoc[Special Scope Envvars]
 | OCIS_SHOW_USER_EMAIL_IN_RESULTS
 | Include user email addresses in responses. If absent or set to false emails will be omitted from results. Please note that admin users can always see all email addresses.
 | false
+
+| 
+| OCIS_TRANSLATION_PATH
+| (optional) Set this to a path with custom translations to overwrite the builtin translations. Note that file and folder naming rules apply, see the documentation for more details.
+| 
 
 | 
 | OCIS_WOPI_DISABLE_CHAT
@@ -67,11 +42,6 @@
 | ANTIVIRUS_WORKERS
 | The number of concurrent go routines that fetch events from the event queue.
 | 10
-
-| xref:{s-path}/app-provider.adoc[App-Provider]
-| APP_PROVIDER_WOPI_DISABLE_CHAT
-| Disable chat in the office web frontend. This feature applies to OnlyOffice and Microsoft.
-| false
 
 | xref:{s-path}/auth-app.adoc[Auth-App]
 | AUTH_APP_DEBUG_ADDR
@@ -439,6 +409,11 @@
 | [b1e2218d-eef8-4d4c-b82d-0f1a1b48f3b5 a8d5fe5e-96e3-418d-825b-534dbdf22b99 fb6c3e19-e378-47e5-b277-9732f9de6e21 58c63c02-1d89-4572-916a-870abc5a1b7d 2d00ce52-1fc2-4dbc-8b95-a73b73395f5a 1c996275-f1c9-4e71-abdf-a42f6495e960 312c0871-5ef7-4b3a-85b6-0e4074c64049]
 
 | 
+| GRAPH_MAX_CONCURRENCY
+| The maximum number of concurrent requests the service will handle.
+| 20
+
+| 
 | GRAPH_TRANSLATION_PATH
 | (optional) Set this to a path with custom translations to overwrite the builtin translations. Note that file and folder naming rules apply, see the documentation for more details.
 | 
@@ -459,31 +434,6 @@
 | http://localhost:9280/data
 
 | xref:{s-path}/postprocessing.adoc[Postprocessing]
-| POSTPROCESSING_STORE
-| The type of the store. Supported values are: 'memory', 'nats-js-kv', 'redis-sentinel', 'noop'. See the text description for details.
-| nats-js-kv
-
-| 
-| POSTPROCESSING_STORE_AUTH_PASSWORD
-| The password to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.
-| 
-
-| 
-| POSTPROCESSING_STORE_AUTH_USERNAME
-| The username to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.
-| 
-
-| 
-| POSTPROCESSING_STORE_NODES
-| A list of nodes to access the configured store. This has no effect when 'memory' store is configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details.
-| [127.0.0.1:9233]
-
-| 
-| POSTPROCESSING_STORE_TTL
-| Time to live for events in the store. Defaults to '30m' (30 minutes). See the Environment Variable Types description for more details.
-| 30m0s
-
-| 
 | POSTPROCESSING_WORKERS
 | The number of concurrent go routines that fetch events from the event queue.
 | 3
@@ -572,11 +522,6 @@
 | STORAGE_USERS_OCIS_MAX_CONCURRENCY
 | Maximum number of concurrent go-routines. Higher values can potentially get work done faster but will also cause more load on the system. Values of 0 or below will be ignored and the default value will be used.
 | 1
-
-| 
-| STORAGE_USERS_OCIS_PERMISSIONS_ENDPOINT
-| Endpoint of the permissions service. The endpoints can differ for 'ocis', 'posix' and 's3ng'.
-| com.owncloud.api.settings
 
 | 
 | STORAGE_USERS_OCIS_PERSONAL_SPACE_PATH_TEMPLATE
