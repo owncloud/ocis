@@ -16,6 +16,7 @@ import (
 	gatewayv1beta1 "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
+	link "github.com/cs3org/go-cs3apis/cs3/sharing/link/v1beta1"
 	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
@@ -1224,8 +1225,14 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (*ConnectorResponse, 
 	privateLinkURL.Path = path.Join(ocisURL.Path, "f", storagespace.FormatResourceID(statRes.GetInfo().GetId()))
 	parentFolderURL := &url.URL{}
 	*parentFolderURL = *ocisURL
-	parentFolderURL.Path = path.Join(ocisURL.Path, "f", storagespace.FormatResourceID(statRes.GetInfo().GetParentId()))
-	if publicShare := wopiContext.GetPublicShare(); publicShare != nil && isPublicShare {
+	if !isPublicShare {
+		parentFolderURL.Path = path.Join(ocisURL.Path, "f", storagespace.FormatResourceID(statRes.GetInfo().GetParentId()))
+	} else {
+		publicShare := &link.PublicShare{}
+		err := wopiContext.GetScopeByKeyPrefix("publicshare:", publicShare)
+		if err != nil {
+			logger.Error().Err(err).Msg("CheckFileInfo: error getting public share scope")
+		}
 		parentFolderURL.Path = path.Join(ocisURL.Path, "s", publicShare.GetToken())
 	}
 	// fileinfo map
