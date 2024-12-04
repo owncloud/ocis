@@ -45,7 +45,9 @@ Feature: an user shares resources using ScienceMesh application
                 "@UI.Hidden",
                 "@client.synchronize",
                 "createdBy",
-                "name"
+                "name",
+                "eTag",
+                "remoteItem"
               ],
               "properties": {
                 "@UI.Hidden": {
@@ -87,6 +89,10 @@ Feature: an user shares resources using ScienceMesh application
                 },
                 "name": {
                   "const": "<resource>"
+                },
+                "eTag": {
+                  "type": "string",
+                  "pattern": "%etag_pattern%"
                 }
               }
             }
@@ -136,7 +142,9 @@ Feature: an user shares resources using ScienceMesh application
                 "@UI.Hidden",
                 "@client.synchronize",
                 "createdBy",
-                "name"
+                "name",
+                "eTag",
+                "remoteItem"
               ],
               "properties": {
                 "@UI.Hidden": {
@@ -166,6 +174,10 @@ Feature: an user shares resources using ScienceMesh application
                 },
                 "name": {
                   "const": "folderToShare"
+                },
+                "eTag": {
+                  "type": "string",
+                  "pattern": "%etag_pattern%"
                 }
               }
             }
@@ -210,7 +222,9 @@ Feature: an user shares resources using ScienceMesh application
                 "@UI.Hidden",
                 "@client.synchronize",
                 "createdBy",
-                "name"
+                "name",
+                "eTag",
+                "remoteItem"
               ],
               "properties": {
                 "@UI.Hidden": {
@@ -251,6 +265,10 @@ Feature: an user shares resources using ScienceMesh application
                 },
                 "name": {
                   "const": "<resource>"
+                },
+                "eTag": {
+                  "type": "string",
+                  "pattern": "%etag_pattern%"
                 }
               }
             }
@@ -399,6 +417,8 @@ Feature: an user shares resources using ScienceMesh application
           "parentReference",
           "permissions",
           "name",
+          "eTag",
+          "file",
           "size"
         ],
         "properties": {
@@ -488,6 +508,19 @@ Feature: an user shares resources using ScienceMesh application
           },
           "name": {
             "const": "textfile.txt"
+          },
+          "eTag": {
+            "type": "string",
+            "pattern": "%etag_pattern%"
+          },
+          "file": {
+            "type": "object",
+            "required": ["mimeType"],
+            "properties": {
+              "mimeType": {
+                "const": "text/plain"
+              }
+            }
           },
           "size": {
             "const": 8
@@ -691,9 +724,7 @@ Feature: an user shares resources using ScienceMesh application
                     },
                     "file": {
                       "type": "object",
-                      "required": [
-                        "mimeType"
-                      ],
+                      "required": ["mimeType"],
                       "properties": {
                         "mimeType": {
                           "const": "image/jpeg"
@@ -715,9 +746,7 @@ Feature: an user shares resources using ScienceMesh application
                       "properties": {
                         "file": {
                           "type": "object",
-                          "required": [
-                            "mimeType"
-                          ],
+                          "required": ["mimeType"],
                           "properties": {
                             "mimeType": {
                               "const": "image/jpeg"
