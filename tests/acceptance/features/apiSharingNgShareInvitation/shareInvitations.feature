@@ -3194,3 +3194,47 @@ Feature: Send a sharing invitations
       | permissionsRole | Viewer       |
     Then the HTTP status code should be "200"
     And user "Brian" should have a share "textfile.txt" shared by user "Alice" from space "NewSpace"
+
+  @env-config
+  Scenario Outline: resource shared with denied permission role should not be visible when the sharee lists all drives (Personal space)
+    Given using spaces DAV path
+    And the administrator has enabled the permissions role "Denied"
+    And user "Alice" has created folder "FolderToShare"
+    And user "Alice" has uploaded file with content "personal space" to "lorem.txt"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | <resource> |
+      | space           | Personal   |
+      | sharee          | Brian      |
+      | shareType       | user       |
+      | permissionsRole | Denied     |
+    When user "Brian" lists all spaces via the Graph API
+    Then the HTTP status code should be "200"
+    And the json response should not contain the following shares:
+      | <resource> |
+    Examples:
+      | resource      |
+      | FolderToShare |
+      | lorem.txt     |
+
+  @env-config
+  Scenario Outline: resource shared with denied permission role should not be visible when the sharee lists all drives (Project space)
+    Given using spaces DAV path
+    And the administrator has enabled the permissions role "Denied"
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
+    And user "Alice" has created a folder "FolderToShare" in space "NewSpace"
+    And user "Alice" has uploaded a file inside space "NewSpace" with content "lorem" to "lorem.txt"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | <resource> |
+      | space           | NewSpace   |
+      | sharee          | Brian      |
+      | shareType       | user       |
+      | permissionsRole | Denied     |
+    When user "Brian" lists all spaces via the Graph API
+    Then the HTTP status code should be "200"
+    And the json response should not contain the following shares:
+      | <resource> |
+    Examples:
+      | resource      |
+      | FolderToShare |
+      | lorem.txt     |

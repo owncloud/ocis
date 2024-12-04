@@ -2067,13 +2067,17 @@ class SharingNgContext implements Context {
 	}
 
 	/**
-	 * @Then the json response should contain the following shares:
+	 * @Then /^the json response (should|should not) contain the following shares:$/
 	 *
+	 * @param string $shouldOrNot
 	 * @param TableNode $table
 	 *
 	 * @return void
 	 */
-	public function theJsonResponseShouldContainTheFollowingShares(TableNode $table): void {
+	public function theJsonResponseShouldOrShouldNotContainTheFollowingShares(
+		string $shouldOrNot,
+		TableNode $table
+	): void {
 		$responseBody = $this->featureContext->getJsonDecodedResponseBodyContent();
 
 		$resourceNames = [];
@@ -2088,10 +2092,17 @@ class SharingNgContext implements Context {
 		$expectedShares = $table->getColumn(0);
 
 		foreach ($expectedShares as $expectedShare) {
-			Assert::assertTrue(
-				\in_array($expectedShare, $resourceNames),
-				"The share '$expectedShare' was not found in the response."
-			);
+			if ($shouldOrNot === "should not") {
+				Assert::assertFalse(
+					\in_array($expectedShare, $resourceNames),
+					"The share '$expectedShare' was found in the response."
+				);
+			} else {
+				Assert::assertTrue(
+					\in_array($expectedShare, $resourceNames),
+					"The share '$expectedShare' was not found in the response."
+				);
+			}
 		}
 	}
 
