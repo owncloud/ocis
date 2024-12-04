@@ -1794,31 +1794,18 @@ class SharingNgContext implements Context {
 	}
 
 	/**
-	 * @Then user :sharee should have a share :share shared by user :sharer from space :space
+	 * @Then /^user "([^"]*)" (should|should not) have a share "([^"]*)" shared by user "([^"]*)" from space "([^"]*)"$/
 	 *
 	 * @param string $sharee
+	 * @param string $shouldOrNot
 	 * @param string $share
 	 * @param string $sharer
 	 * @param string $space
 	 *
 	 * @return void
 	 */
-	public function userShouldHaveShareSharedByUserFromSpace(string $sharee, string $share, string $sharer, string $space): void {
-		$this->checkIfShareExists($share, $sharee, $sharer, $space);
-	}
-
-	/**
-	 * @Then user :sharee should not have a share :share shared by user :sharer from space :space
-	 *
-	 * @param string $sharee
-	 * @param string $share
-	 * @param string $sharer
-	 * @param string $space
-	 *
-	 * @return void
-	 */
-	public function userShouldNotHaveShareSharedByUserFromSpace(string $sharee, string $share, string $sharer, string $space): void {
-		$this->checkIfShareExists($share, $sharee, $sharer, $space, false);
+	public function userShouldHaveShareSharedByUserFromSpace(string $sharee, string $shouldOrNot, string $share, string $sharer, string $space): void {
+		$this->checkIfShareExists($share, $sharee, $sharer, $space, $shouldOrNot === "should");
 	}
 
 	/**

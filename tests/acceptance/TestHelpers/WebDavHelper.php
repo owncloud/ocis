@@ -520,30 +520,25 @@ class WebDavHelper {
 		if (\array_key_exists($user, self::$spacesIdRef) && \array_key_exists("personal", self::$spacesIdRef[$user])) {
 			return self::$spacesIdRef[$user]["personal"];
 		}
-		$trimmedBaseUrl = \trim($baseUrl, "/");
-		$drivesPath = '/graph/v1.0/me/drives';
-		$fullUrl = $trimmedBaseUrl . $drivesPath;
-		$response = HttpRequestHelper::get(
-			$fullUrl,
-			$xRequestId,
-			$user,
-			$password
-		);
-		Assert::assertEquals(200, $response->getStatusCode(), "Cannot list drives for user '$user'");
 
 		$personalSpaceId = '';
-		$drives = HttpRequestHelper::getJsonDecodedResponseBodyContent($response);
-		foreach ($drives->value as $drive) {
-			if ($drive->driveType === "personal") {
-				$personalSpaceId = $drive->id;
-				break;
+		if (!OcisHelper::isTestingOnReva()) {
+			$response = GraphHelper::getMySpaces($baseUrl, $user, $password, '', $xRequestId);
+			Assert::assertEquals(200, $response->getStatusCode(), "Cannot list drives for user '$user'");
+
+			$drives = HttpRequestHelper::getJsonDecodedResponseBodyContent($response);
+			foreach ($drives->value as $drive) {
+				if ($drive->driveType === "personal") {
+					$personalSpaceId = $drive->id;
+					break;
+				}
 			}
 		}
 
 		if (!$personalSpaceId) {
 			// the graph endpoint did not give a useful answer
 			// try getting the information from the webdav endpoint
-			$fullUrl = "$trimmedBaseUrl/" . self::getDavPath(self::DAV_VERSION_NEW, $user);
+			$fullUrl = "$baseUrl/" . self::getDavPath(self::DAV_VERSION_NEW, $user);
 			$response = HttpRequestHelper::sendRequest(
 				$fullUrl,
 				$xRequestId,
