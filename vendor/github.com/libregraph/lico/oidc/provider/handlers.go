@@ -239,7 +239,7 @@ func (p *Provider) AuthorizeResponse(rw http.ResponseWriter, req *http.Request, 
 
 	// Create access token when requested.
 	if _, ok := ar.ResponseTypes[oidc.ResponseTypeToken]; ok {
-		accessTokenString, err = p.makeAccessToken(ctx, ar.ClientID, auth, nil)
+		accessTokenString, err = p.makeAccessToken(ctx, ar.ClientID, auth, nil, nil)
 		if err != nil {
 			goto done
 		}
@@ -248,7 +248,7 @@ func (p *Provider) AuthorizeResponse(rw http.ResponseWriter, req *http.Request, 
 	// Create ID token when requested and granted.
 	if authorizedScopes[oidc.ScopeOpenID] {
 		if _, ok := ar.ResponseTypes[oidc.ResponseTypeIDToken]; ok {
-			idTokenString, err = p.makeIDToken(ctx, ar, auth, session, accessTokenString, codeString, nil)
+			idTokenString, err = p.makeIDToken(ctx, ar, auth, session, accessTokenString, codeString, nil, nil)
 			if err != nil {
 				goto done
 			}
@@ -330,6 +330,7 @@ func (p *Provider) TokenHandler(rw http.ResponseWriter, req *http.Request) {
 	var accessTokenString string
 	var idTokenString string
 	var refreshTokenString string
+	var refreshTokenClaims *konnect.RefreshTokenClaims
 	var approvedScopes map[string]bool
 	var authorizedScopes map[string]bool
 	var clientDetails *clients.Details
@@ -498,22 +499,25 @@ func (p *Provider) TokenHandler(rw http.ResponseWriter, req *http.Request) {
 			ClientID: claims.Audience,
 		}
 
+		// Remember refresh token claims, for use in access and id token generators later on.
+		refreshTokenClaims = claims
+
 	default:
 		err = konnectoidc.NewOAuth2Error(oidc.ErrorCodeOAuth2UnsupportedGrantType, "grant_type value not implemented")
 		goto done
 	}
 
 	// Create access token.
-	accessTokenString, err = p.makeAccessToken(ctx, ar.ClientID, auth, signinMethod)
+	accessTokenString, err = p.makeAccessToken(ctx, ar.ClientID, auth, signinMethod, refreshTokenClaims)
 	if err != nil {
 		goto done
 	}
 
 	switch tr.GrantType {
-	case oidc.GrantTypeAuthorizationCode:
+	case oidc.GrantTypeAuthorizationCode, oidc.GrantTypeRefreshToken:
 		// Create ID token when not previously requested amd openid scope is authorized.
 		if !ar.ResponseTypes[oidc.ResponseTypeIDToken] && authorizedScopes[oidc.ScopeOpenID] {
-			idTokenString, err = p.makeIDToken(ctx, ar, auth, session, accessTokenString, "", signinMethod)
+			idTokenString, err = p.makeIDToken(ctx, ar, auth, session, accessTokenString, "", signinMethod, refreshTokenClaims)
 			if err != nil {
 				goto done
 			}

@@ -332,7 +332,7 @@ func (ar *AuthenticationRequest) Validate(keyFunc jwt.Keyfunc) error {
 	}
 	// TODO(longsleep): implement client_id white list.
 
-	if ar.RedirectURI == nil || ar.RedirectURI.Host == "" || ar.RedirectURI.Scheme == "" {
+	if ar.RedirectURI == nil || !ar.RedirectURI.IsAbs() {
 		return ar.NewBadRequest(oidc.ErrorCodeOAuth2InvalidRequest, "invalid or missing redirect_uri")
 	}
 

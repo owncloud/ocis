@@ -35,10 +35,10 @@ import (
 
 // MakeAccessToken implements the oidc.AccessTokenProvider interface.
 func (p *Provider) MakeAccessToken(ctx context.Context, audience string, auth identity.AuthRecord) (string, error) {
-	return p.makeAccessToken(ctx, audience, auth, nil)
+	return p.makeAccessToken(ctx, audience, auth, nil, nil)
 }
 
-func (p *Provider) makeAccessToken(ctx context.Context, audience string, auth identity.AuthRecord, signingMethod jwt.SigningMethod) (string, error) {
+func (p *Provider) makeAccessToken(ctx context.Context, audience string, auth identity.AuthRecord, signingMethod jwt.SigningMethod, refreshTokenClaims *konnect.RefreshTokenClaims) (string, error) {
 	sk, ok := p.getSigningKey(signingMethod)
 	if !ok {
 		return "", fmt.Errorf("no signing key")
@@ -67,6 +67,17 @@ func (p *Provider) makeAccessToken(ctx context.Context, audience string, auth id
 			accessTokenClaims.IdentityClaims = userWithClaims.Claims()
 		}
 		accessTokenClaims.IdentityProvider = auth.Manager().Name()
+		if accessTokenClaims.IdentityClaims != nil && refreshTokenClaims != nil && refreshTokenClaims.IdentityClaims != nil {
+			if refreshTokenClaims.IdentityProvider != accessTokenClaims.IdentityProvider {
+				return "", fmt.Errorf("refresh token claims provider mismatch")
+			}
+			for k, v := range refreshTokenClaims.IdentityClaims {
+				// Force to use refresh token identity claim values. This also locks all
+				// the extra claims for id and access tokens to the ones provided from
+				// the refresh token claims (which currently includes the session id).
+				accessTokenClaims.IdentityClaims[k] = v
+			}
+		}
 	}
 
 	// Support additional custom user specific claims.
@@ -113,7 +124,7 @@ func (p *Provider) makeAccessToken(ctx context.Context, audience string, auth id
 	return accessToken.SignedString(sk.PrivateKey)
 }
 
-func (p *Provider) makeIDToken(ctx context.Context, ar *payload.AuthenticationRequest, auth identity.AuthRecord, session *payload.Session, accessTokenString string, codeString string, signingMethod jwt.SigningMethod) (string, error) {
+func (p *Provider) makeIDToken(ctx context.Context, ar *payload.AuthenticationRequest, auth identity.AuthRecord, session *payload.Session, accessTokenString string, codeString string, signingMethod jwt.SigningMethod, refreshTokenClaims *konnect.RefreshTokenClaims) (string, error) {
 	sk, ok := p.getSigningKey(signingMethod)
 	if !ok {
 		return "", fmt.Errorf("no signing key")
@@ -159,6 +170,18 @@ func (p *Provider) makeIDToken(ctx context.Context, ar *payload.AuthenticationRe
 	}
 	if userWithClaims, ok := user.(identity.UserWithClaims); ok {
 		accessTokenClaims.IdentityClaims = userWithClaims.Claims()
+	}
+	accessTokenClaims.IdentityProvider = auth.Manager().Name()
+	if accessTokenClaims.IdentityClaims != nil && refreshTokenClaims != nil && refreshTokenClaims.IdentityClaims != nil {
+		if refreshTokenClaims.IdentityProvider != accessTokenClaims.IdentityProvider {
+			return "", fmt.Errorf("refresh token claims provider mismatch")
+		}
+		for k, v := range refreshTokenClaims.IdentityClaims {
+			// Force to use refresh token identity claim values. This also locks all
+			// the extra claims for id and access tokens to the ones provided from
+			// the refresh token claims (which currently includes the session id).
+			accessTokenClaims.IdentityClaims[k] = v
+		}
 	}
 
 	if withIDTokenClaimsRequest {
