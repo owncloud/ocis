@@ -35,10 +35,10 @@ func (i *Identifier) writeWebappIndexHTML(rw http.ResponseWriter, req *http.Requ
 	// FIXME(longsleep): Set a secure CSP. Right now we need `data:` for images
 	// since it is used. Since `data:` URLs possibly could allow xss, a better
 	// way should be found for our early loading inline SVG stuff.
-	rw.Header().Set("Content-Security-Policy", fmt.Sprintf("default-src 'self'; img-src 'self' data:; font-src 'self' data:; script-src 'self'; style-src 'self' 'nonce-%s'; base-uri 'none'; frame-ancestors 'none';", nonce))
+	rw.Header().Set("Content-Security-Policy", fmt.Sprintf("default-src 'self'; img-src 'self' data:; font-src 'self' data:; script-src 'self' 'nonce-%s'; style-src 'self' 'nonce-%s'; base-uri 'none'; frame-ancestors 'none';", nonce, nonce))
 
 	// Write index with random nonce to response.
-	index := bytes.Replace(i.webappIndexHTML, []byte("__CSP_NONCE__"), []byte(nonce), 1)
+	index := bytes.ReplaceAll(i.webappIndexHTML, []byte("__CSP_NONCE__"), []byte(nonce))
 	rw.Write(index)
 }
 

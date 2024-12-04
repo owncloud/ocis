@@ -25,6 +25,7 @@
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.4.2",
     "render-if": "^0.1.1",
+    "validator": "^13.12.0",
     "web-vitals": "^1.1.2"
   },
   "scripts": {
@@ -47,9 +48,11 @@
     "@types/react-dom": "^17.0.23",
     "@types/react-redux": "^7.1.25",
     "@types/redux-logger": "^3.0.12",
+    "@types/validator": "^13",
     "@typescript-eslint/eslint-plugin": "^6.11.0",
     "@typescript-eslint/parser": "^6.9.0",
     "@typescript-eslint/typescript-estree": "^6.11.0",
+    "@vitejs/plugin-legacy": "^4.0.0",
     "@vitejs/plugin-react": "^4.1.1",
     "cldr": "^7.4.0",
     "eslint": "^8.53.0",
@@ -60,6 +63,7 @@
     "if-node-version": "^1.1.1",
     "jsdom": "^22.1.0",
     "source-map-explorer": "^2.5.3",
+    "terser": "^5.30.4",
     "typescript": "^5.2.2",
     "vite": "^4.5.2",
     "vite-plugin-checker": "^0.6.2",

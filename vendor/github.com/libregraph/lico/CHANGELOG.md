@@ -4,7 +4,21 @@
 
 
 
-## v0.64.0 (2024-09-18)
+## v0.65.0 (2024-11-26)
+
+- Add login hint support
+- Add legacy support via plugin
+- Allow client redirect URI with only a scheme
+- Bump braces from 3.0.2 to 3.0.3 in /identifier
+- Bump path-to-regexp from 1.8.0 to 1.9.0 in /identifier
+- Bump ws from 8.14.2 to 8.17.1 in /identifier
+- Bump rollup from 2.79.1 to 2.79.2 in /identifier
+- Bump github.com/golang-jwt/jwt/v4 from 4.5.0 to 4.5.1
+- Keep extra backend provided id and access token claims on refresh
+- Return id token when grant type is refresh token
+
+
+## v0.64.0 (2024-09-19)
 
 - Implement refresh and revoke for lg identifier backend session
 - Pass real src ip and user agent to lg identifier backend
