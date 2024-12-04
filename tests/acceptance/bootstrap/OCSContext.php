@@ -26,6 +26,7 @@ use Behat\Gherkin\Node\PyStringNode;
 use Behat\Gherkin\Node\TableNode;
 use Psr\Http\Message\ResponseInterface;
 use PHPUnit\Framework\Assert;
+use TestHelpers\HttpRequestHelper;
 use TestHelpers\OcsApiHelper;
 use TestHelpers\TranslationHelper;
 use TestHelpers\BehatHelper;
@@ -564,13 +565,11 @@ class OCSContext implements Context {
 			return (string) $jsonResponse->ocs->meta->statuscode;
 		}
 		// go to xml response when json response is null (it means not formatted and get status code)
-		$responseXml = $this->featureContext->getResponseXml($response, __METHOD__);
-		if (isset($responseXml->meta[0], $responseXml->meta[0]->statuscode)) {
-			return (string) $responseXml->meta[0]->statuscode;
+		$responseXmlObject = HttpRequestHelper::getResponseXml($response, __METHOD__);
+		if (isset($responseXmlObject->meta[0], $responseXmlObject->meta[0]->statuscode)) {
+			return (string) $responseXmlObject->meta[0]->statuscode;
 		}
-		throw new Exception(
-			"No OCS status code found in response"
-		);
+		Assert::fail("No OCS status code found in response");
 	}
 
 	/**
@@ -582,13 +581,11 @@ class OCSContext implements Context {
 	 * @throws Exception
 	 */
 	public function getOCSResponseData(ResponseInterface $response): SimpleXMLElement {
-		$responseXml = $this->featureContext->getResponseXml($response, __METHOD__);
-		if (isset($responseXml->data)) {
-			return $responseXml->data;
+		$responseXmlObject = HttpRequestHelper::getResponseXml($response, __METHOD__);
+		if (isset($responseXmlObject->data)) {
+			return $responseXmlObject->data;
 		}
-		throw new Exception(
-			"No OCS data items found in responseXml"
-		);
+		Assert::fail("No OCS data items found in response");
 	}
 
 	/**
@@ -600,7 +597,7 @@ class OCSContext implements Context {
 	 * @return string
 	 */
 	public function getOCSResponseStatusMessage(ResponseInterface $response):string {
-		return (string) $this->featureContext->getResponseXml($response, __METHOD__)->meta[0]->message;
+		return (string) HttpRequestHelper::getResponseXml($response, __METHOD__)->meta[0]->message;
 	}
 
 	/**

@@ -1905,8 +1905,7 @@ trait Provisioning {
 	 * @throws Exception
 	 */
 	public function getArrayOfUsersResponded(ResponseInterface $resp):array {
-		$listCheckedElements
-			= $this->getResponseXml($resp, __METHOD__)->data[0]->users[0]->element;
+		$listCheckedElements = HttpRequestHelper::getResponseXml($resp, __METHOD__)->data[0]->users[0]->element;
 		return \json_decode(\json_encode($listCheckedElements), true);
 	}
 
@@ -1920,7 +1919,7 @@ trait Provisioning {
 	 */
 	public function getArrayOfGroupsResponded(ResponseInterface $resp):array {
 		$listCheckedElements
-			= $this->getResponseXml($resp, __METHOD__)->data[0]->groups[0]->element;
+			= HttpRequestHelper::getResponseXml($resp, __METHOD__)->data[0]->groups[0]->element;
 		return \json_decode(\json_encode($listCheckedElements), true);
 	}
 
@@ -1933,8 +1932,7 @@ trait Provisioning {
 	 * @throws Exception
 	 */
 	public function getArrayOfAppsResponded(ResponseInterface $resp):array {
-		$listCheckedElements
-			= $this->getResponseXml($resp, __METHOD__)->data[0]->apps[0]->element;
+		$listCheckedElements = HttpRequestHelper::getResponseXml($resp, __METHOD__)->data[0]->apps[0]->element;
 		return \json_decode(\json_encode($listCheckedElements), true);
 	}
 
@@ -1945,7 +1943,7 @@ trait Provisioning {
 	 * @throws Exception
 	 */
 	public function theApiShouldNotReturnAnyData():void {
-		$responseData = $this->getResponseXml(null, __METHOD__)->data[0];
+		$responseData = HttpRequestHelper::getResponseXml($this->response, __METHOD__)->data[0];
 		Assert::assertEmpty(
 			$responseData,
 			"Response data is not empty but it should be empty"

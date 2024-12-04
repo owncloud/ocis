@@ -54,11 +54,6 @@ trait WebDav {
 	private ?int $lastUploadDeleteTime = null;
 
 	/**
-	 * response content parsed from XML to an array
-	 */
-	private array $responseXml = [];
-
-	/**
 	 * add resource created by admin in an array
 	 * This array is used while cleaning up the resource created by admin during test run
 	 * As of now it tracks only for (files|folder) creation
@@ -141,22 +136,6 @@ trait WebDav {
 	}
 
 	/**
-	 * @param SimpleXMLElement $responseXmlObject
-	 *
-	 * @return void
-	 */
-	public function setResponseXmlObject(SimpleXMLElement $responseXmlObject):void {
-		$this->responseXmlObject = $responseXmlObject;
-	}
-
-	/**
-	 * @return void
-	 */
-	public function clearResponseXmlObject():void {
-		$this->responseXmlObject = null;
-	}
-
-	/**
 	 * @param string $fileID
 	 *
 	 * @return void
@@ -178,7 +157,7 @@ trait WebDav {
 	 * @return string the etag or an empty string if the getetag property does not exist
 	 */
 	public function getEtagFromResponseXmlObject(?SimpleXMLElement $xmlObject = null): string {
-		$xmlObject = $xmlObject ?? $this->getResponseXml();
+		$xmlObject = $xmlObject ?? HttpRequestHelper::getResponseXml($this->getResponse());
 		$xmlPart = $xmlObject->xpath("//d:prop/d:getetag");
 		if (!\is_array($xmlPart) || (\count($xmlPart) === 0)) {
 			return '';
@@ -199,15 +178,6 @@ trait WebDav {
 		} else {
 			return false;
 		}
-	}
-
-	/**
-	 * @param array $responseXml
-	 *
-	 * @return void
-	 */
-	public function setResponseXml(array $responseXml):void {
-		$this->responseXml = $responseXml;
 	}
 
 	/**
@@ -444,15 +414,8 @@ trait WebDav {
 	 * @throws Exception
 	 */
 	public function theNumberOfVersionsShouldBe(int $number):void {
-		$resXml = $this->getResponseXml();
-		if ($resXml === null) {
-			$resXml = HttpRequestHelper::getResponseXml(
-				$this->getResponse(),
-				__METHOD__
-			);
-			$this->setResponseXmlObject($resXml);
-		}
-		$xmlPart = $resXml->xpath("//d:getlastmodified");
+		$responseXmlObject = HttpRequestHelper::getResponseXml($this->getResponse(), __METHOD__);
+		$xmlPart = $responseXmlObject->xpath("//d:getlastmodified");
 		$actualNumber = \count($xmlPart);
 		Assert::assertEquals(
 			$number,
@@ -470,14 +433,8 @@ trait WebDav {
 	 * @throws Exception
 	 */
 	public function theNumberOfEtagElementInTheResponseShouldBe(int $number):void {
-		$resXml = $this->getResponseXml();
-		if ($resXml === null) {
-			$resXml = HttpRequestHelper::getResponseXml(
-				$this->getResponse(),
-				__METHOD__
-			);
-		}
-		$xmlPart = $resXml->xpath("//d:getetag");
+		$responseXmlObject = HttpRequestHelper::getResponseXml($this->getResponse());
+		$xmlPart = $responseXmlObject->xpath("//d:getetag");
 		$actualNumber = \count($xmlPart);
 		Assert::assertEquals(
 			$number,
@@ -974,8 +931,7 @@ trait WebDav {
 	 * @return void
 	 */
 	public function contentOfFileForUserShouldBe(string $fileName, string $user, string $content):void {
-		$user = $this->getActualUsername($user);
-		$response = $this->downloadFileAsUserUsingPassword($user, $fileName);
+		$response = $this->downloadFileAsUserUsingPassword($this->getActualUsername($user), $fileName);
 		$actualStatus = $response->getStatusCode();
 		if ($actualStatus !== 200) {
 			throw new Exception(
@@ -1159,11 +1115,11 @@ trait WebDav {
 	 * @throws Exception
 	 */
 	public function theSizeOfTheFileShouldBe(string $size):void {
-		$responseXml = HttpRequestHelper::getResponseXml(
+		$responseXmlObject = HttpRequestHelper::getResponseXml(
 			$this->response,
 			__METHOD__
 		);
-		$xmlPart = $responseXml->xpath("//d:prop/d:getcontentlength");
+		$xmlPart = $responseXmlObject->xpath("//d:prop/d:getcontentlength");
 		$actualSize = (string) $xmlPart[0];
 		Assert::assertEquals(
 			$size,
@@ -1277,7 +1233,7 @@ trait WebDav {
 		$statusCode = $response->getStatusCode();
 		if ($statusCode < 400 || $statusCode > 499) {
 			try {
-				$responseXml = HttpRequestHelper::getResponseXml(
+				$responseXmlObject = HttpRequestHelper::getResponseXml(
 					$response,
 					__METHOD__
 				);
@@ -1287,10 +1243,10 @@ trait WebDav {
 				);
 			}
 			Assert::assertTrue(
-				$this->isEtagValid($this->getEtagFromResponseXmlObject($responseXml)),
+				$this->isEtagValid($this->getEtagFromResponseXmlObject($responseXmlObject)),
 				"$entry '$path' should not exist. But API returned $statusCode without an etag in the body"
 			);
-			$isCollection = $responseXml->xpath("//d:prop/d:resourcetype/d:collection");
+			$isCollection = $responseXmlObject->xpath("//d:prop/d:resourcetype/d:collection");
 			if (\count($isCollection) === 0) {
 				$actualResourceType = "file";
 			} else {
@@ -1354,6 +1310,7 @@ trait WebDav {
 	 * @param string|null $type
 	 *
 	 * @return void
+	 * @throws Exception
 	 */
 	public function checkFileOrFolderExistsForUser(
 		string $user,
@@ -1363,18 +1320,22 @@ trait WebDav {
 	):void {
 		$user = $this->getActualUsername($user);
 		$path = $this->substituteInLineCodes($path);
-		$responseXml = $this->listFolderAndReturnResponseXml(
-			$user,
-			$path,
-			'0',
-			null,
-			$type
+		$responseXmlObject = HttpRequestHelper::getResponseXml(
+			$this->listFolder(
+				$user,
+				$path,
+				'0',
+				null,
+				null,
+				$type
+			)
 		);
+
 		Assert::assertTrue(
-			$this->isEtagValid($this->getEtagFromResponseXmlObject($responseXml)),
+			$this->isEtagValid($this->getEtagFromResponseXmlObject($responseXmlObject)),
 			"$entry '$path' expected to exist for user $user but not found"
 		);
-		$isCollection = $responseXml->xpath("//d:prop/d:resourcetype/d:collection");
+		$isCollection = $responseXmlObject->xpath("//d:prop/d:resourcetype/d:collection");
 		if ($entry === "folder") {
 			Assert::assertEquals(\count($isCollection), 1, "Unexpectedly, `$path` is not a folder");
 		} elseif ($entry === "file") {
@@ -1464,37 +1425,6 @@ trait WebDav {
 	}
 
 	/**
-	 *
-	 * @param string $user
-	 * @param string $path
-	 * @param string $folderDepth requires 1 to see elements without children
-	 * @param array|null $properties
-	 * @param string $type
-	 *
-	 * @return SimpleXMLElement
-	 * @throws Exception
-	 */
-	public function listFolderAndReturnResponseXml(
-		string $user,
-		string $path,
-		string $folderDepth,
-		?array $properties = null,
-		string $type = "files"
-	):SimpleXMLElement {
-		return HttpRequestHelper::getResponseXml(
-			$this->listFolder(
-				$user,
-				$path,
-				$folderDepth,
-				$properties,
-				null,
-				$type
-			),
-			__METHOD__
-		);
-	}
-
-	/**
 	 * @Then /^user "([^"]*)" should (not|)\s?see the following elements$/
 	 *
 	 * @param string $user
@@ -1534,10 +1464,12 @@ trait WebDav {
 		if ($this->davPropfindDepthInfinityIsEnabled()) {
 			// get a full "infinite" list of the user's root folder in one request
 			// and process that to check the elements (resources)
-			$responseXmlObject = $this->listFolderAndReturnResponseXml(
-				$user,
-				"/",
-				"infinity"
+			$responseXmlObject = HttpRequestHelper::getResponseXml(
+				$this->listFolder(
+					$user,
+					"/",
+					"infinity"
+				)
 			);
 			foreach ($elementsSimplified as $expectedElement) {
 				// Allow the table of expected elements to have entries that do
@@ -1575,10 +1507,12 @@ trait WebDav {
 				//       /some-folder%20with%20spaces/sub-folder
 				// So we need both $elementToRequest and $expectedElement
 				$expectedElement = $this->encodePath($elementToRequest);
-				$responseXmlObject = $this->listFolderAndReturnResponseXml(
-					$user,
-					$elementToRequest,
-					"1"
+				$responseXmlObject = HttpRequestHelper::getResponseXml(
+					$this->listFolder(
+						$user,
+						$elementToRequest,
+						'1'
+					)
 				);
 
 				$webdavPath = "/" . $this->getFullDavFilesPath($user) . $expectedElement;
@@ -1659,11 +1593,8 @@ trait WebDav {
 	):void {
 		$response = $this->uploadFile($user, $source, $destination);
 		$this->setResponse($response);
-		$this->setResponseXml(
-			HttpRequestHelper::parseResponseAsXml($response)
-		);
 		$this->pushToLastHttpStatusCodesArray(
-			(string) $this->getResponse()->getStatusCode()
+			(string) $response->getStatusCode()
 		);
 	}
 
@@ -1710,7 +1641,6 @@ trait WebDav {
 			$chunkingVersion = null;
 		}
 		try {
-			$this->responseXml = [];
 			$this->pauseUploadDelete();
 			$this->response = UploadHelper::upload(
 				$this->getBaseUrl(),
@@ -3571,6 +3501,7 @@ trait WebDav {
 	 * @param boolean $checkEachDelete
 	 *
 	 * @return void
+	 * @throws Exception
 	 */
 	public function deleteEverythingInFolder(
 		string $user,
@@ -3578,10 +3509,12 @@ trait WebDav {
 		bool $checkEachDelete = false
 	):void {
 		$user = $this->getActualUsername($user);
-		$responseXmlObject = $this->listFolderAndReturnResponseXml(
-			$user,
-			$folder,
-			'1'
+		$responseXmlObject = HttpRequestHelper::getResponseXml(
+			$this->listFolder(
+				$user,
+				$folder,
+				'1'
+			)
 		);
 		$elementList = $responseXmlObject->xpath("//d:response/d:href");
 		if (\is_array($elementList) && \count($elementList)) {
@@ -3953,9 +3886,8 @@ trait WebDav {
 	 */
 	public function theDownloadedPreviewContentShouldMatchWithFixturesPreviewContentFor(string $filename):void {
 		$expectedPreview = \file_get_contents(__DIR__ . "/../fixtures/" . $filename);
-		$response = $response ?? $this->getResponse();
-		$response->getBody()->rewind();
-		$responseBodyContent = $response->getBody()->getContents();
+		$this->getResponse()->getBody()->rewind();
+		$responseBodyContent = $this->getResponse()->getBody()->getContents();
 		Assert::assertEquals($expectedPreview, $responseBodyContent);
 	}
 
@@ -4081,11 +4013,11 @@ trait WebDav {
 	 * @throws Exception
 	 */
 	public function theDavElementShouldBe(string $element, string $message):void {
-		$resXmlArray = HttpRequestHelper::parseResponseAsXml($this->getResponse());
+		$responseXmlArray = HttpRequestHelper::parseResponseAsXml($this->getResponse());
 		WebDavAssert::assertDavResponseElementIs(
 			$element,
 			$message,
-			$resXmlArray,
+			$responseXmlArray,
 			__METHOD__
 		);
 	}
@@ -4220,23 +4152,18 @@ trait WebDav {
 	 * @return void
 	 */
 	public function checkIFResponseContainsNumberEntries(int $numFiles):void {
-		//if we are using that step the second time in a scenario e.g. 'But ... should not'
-		//then don't parse the result again, because the result in a ResponseInterface
-		if (empty($this->responseXml)) {
-			$this->setResponseXml(
-				HttpRequestHelper::parseResponseAsXml($this->response)
-			);
-		}
+		$responseXmlArray = HttpRequestHelper::parseResponseAsXml($this->response);
+
 		Assert::assertIsArray(
-			$this->responseXml,
-			__METHOD__ . " responseXml is not an array"
+			$responseXmlArray,
+			__METHOD__ . " is not an array"
 		);
 		Assert::assertArrayHasKey(
 			"value",
-			$this->responseXml,
-			__METHOD__ . " responseXml does not have key 'value'"
+			$responseXmlArray,
+			__METHOD__ . " does not have key 'value'"
 		);
-		$multistatusResults = $this->responseXml["value"];
+		$multistatusResults = $responseXmlArray["value"];
 		if ($multistatusResults === null) {
 			$multistatusResults = [];
 		}
@@ -4342,7 +4269,6 @@ trait WebDav {
 			$depth
 		);
 		$this->setResponse($response);
-		$this->setResponseXml(HttpRequestHelper::parseResponseAsXml($this->response));
 	}
 
 	/**
@@ -4429,16 +4355,16 @@ trait WebDav {
 	 */
 	public function thePublicListsTheResourcesInTheLastCreatedPublicLinkWithDepthUsingTheWebdavApi(string $depth):void {
 		$token = ($this->isUsingSharingNG()) ? $this->shareNgGetLastCreatedLinkShareToken() : $this->getLastCreatedPublicShareToken();
-		$response = $this->listFolder(
-			$token,
-			'/',
-			$depth,
-			null,
-			null,
-			"public-files"
+		$this->setResponse(
+			$this->listFolder(
+				$token,
+				'/',
+				$depth,
+				null,
+				null,
+				"public-files"
+			)
 		);
-		$this->setResponse($response);
-		$this->setResponseXml(HttpRequestHelper::parseResponseAsXml($this->response));
 	}
 
 	/**
@@ -4447,7 +4373,7 @@ trait WebDav {
 	 * @return array
 	 */
 	public function findEntryFromReportResponse(?string $user):array {
-		$responseXmlObj = $this->getResponseXml();
+		$responseXmlObj = HttpRequestHelper::getResponseXml($this->getResponse());
 		$responseResources = [];
 		$hrefs = $responseXmlObj->xpath('//d:href');
 		foreach ($hrefs as $href) {
@@ -4488,28 +4414,22 @@ trait WebDav {
 	public function getMultiStatusResultFromPropfindResult(
 		?string $user = null
 	):array {
-		//if we are using that step the second time in a scenario e.g. 'But ... should not'
-		//then don't parse the result again, because the result in a ResponseInterface
-		if (empty($this->responseXml)) {
-			$this->setResponseXml(
-				HttpRequestHelper::parseResponseAsXml($this->response)
-			);
-		}
-		Assert::assertNotEmpty($this->responseXml, __METHOD__ . ' Response is empty');
+		$responseXmlArray = HttpRequestHelper::parseResponseAsXml($this->response);
+
+		Assert::assertNotEmpty($responseXmlArray, __METHOD__ . ' Response is empty');
 		if ($user === null) {
 			$user = $this->getCurrentUser();
 		}
-
 		Assert::assertIsArray(
-			$this->responseXml,
-			__METHOD__ . " responseXml for user $user is not an array"
+			$responseXmlArray,
+			__METHOD__ . " response for user $user is not an array"
 		);
 		Assert::assertArrayHasKey(
 			"value",
-			$this->responseXml,
-			__METHOD__ . " responseXml for user $user does not have key 'value'"
+			$responseXmlArray,
+			__METHOD__ . " response for user $user does not have key 'value'"
 		);
-		$multistatus = $this->responseXml["value"];
+		$multistatus = $responseXmlArray["value"];
 		if ($multistatus == null) {
 			$multistatus = [];
 		}
@@ -4573,7 +4493,9 @@ trait WebDav {
 			default:
 				throw new Exception("error");
 		}
+
 		$multistatusResults = $this->getMultiStatusResultFromPropfindResult($user);
+
 		$results = [];
 		foreach ($multistatusResults as $multistatusResult) {
 			$entryPath = $multistatusResult['value'][0]['value'];
@@ -4627,7 +4549,8 @@ trait WebDav {
 		}
 		$hrefRegex = "/^" . $hrefRegex . "/";
 
-		$searchResults = $this->getResponseXml()->xpath("//d:multistatus/d:response");
+		$searchResults = HttpRequestHelper::getResponseXml($this->getResponse())->xpath("//d:multistatus/d:response");
+
 		$results = [];
 		foreach ($searchResults as $item) {
 			$href = (string)$item->xpath("d:href")[0];
@@ -4707,17 +4630,13 @@ trait WebDav {
 	 */
 	public function checkAuthorOfAVersionOfFile(string $index, string $expectedUsername):void {
 		$expectedUserDisplayName = $this->getUserDisplayName($expectedUsername);
-		$resXml = $this->getResponseXml();
-		if ($resXml === null) {
-			$resXml = HttpRequestHelper::getResponseXml(
-				$this->getResponse(),
-				__METHOD__
-			);
-			$this->setResponseXmlObject($resXml);
-		}
+		$responseXmlObject = HttpRequestHelper::getResponseXml(
+			$this->getResponse(),
+			__METHOD__
+		);
 
 		// the username should be in oc:meta-version-edited-by
-		$xmlPart = $resXml->xpath("//oc:meta-version-edited-by");
+		$xmlPart = $responseXmlObject->xpath("//oc:meta-version-edited-by");
 		$authors = [];
 		foreach ($xmlPart as $idx => $author) {
 			// The first element is the root path element which is not a version
@@ -4739,7 +4658,7 @@ trait WebDav {
 		);
 
 		// the user's display name should be in oc:meta-version-edited-by-name
-		$xmlPart = $resXml->xpath("//oc:meta-version-edited-by-name");
+		$xmlPart = $responseXmlObject->xpath("//oc:meta-version-edited-by-name");
 		$displaynames = [];
 		foreach ($xmlPart as $idx => $displayname) {
 			// The first element is the root path element which is not a version

@@ -219,11 +219,11 @@ class FilesVersionsContext implements Context {
 		$fileId = $this->featureContext->getFileIdForPath($user, $path);
 		Assert::assertNotNull($fileId, __METHOD__ . " fileid of file $path user $user not found (the file may not exist)");
 		$response = $this->listVersionFolder($user, $fileId, 1);
-		$responseXml = HttpRequestHelper::getResponseXml(
+		$responseXmlObject = HttpRequestHelper::getResponseXml(
 			$response,
 			__METHOD__
 		);
-		$xmlPart = $responseXml->xpath("//d:response/d:href");
+		$xmlPart = $responseXmlObject->xpath("//d:response/d:href");
 		//restoring the version only works with DAV path v2
 		$destinationUrl = $this->featureContext->getBaseUrl() . "/" .
 			WebDavHelper::getDavPath(WebDavHelper::DAV_VERSION_NEW, $user) . \trim($path, "/");
@@ -281,18 +281,18 @@ class FilesVersionsContext implements Context {
 	 */
 	public function assertFileVersionsCount(string $user, string $fileId, int $expectedCount):void {
 		$response = $this->listVersionFolder($user, $fileId, 1);
-		$responseXml = HttpRequestHelper::getResponseXml(
+		$responseXmlObject = HttpRequestHelper::getResponseXml(
 			$response,
 			__METHOD__
 		);
-		$actualCount = \count($responseXml->xpath("//d:prop/d:getetag")) - 1;
+		$actualCount = \count($responseXmlObject->xpath("//d:prop/d:getetag")) - 1;
 		if ($actualCount === -1) {
 			$actualCount = 0;
 		}
 		Assert::assertEquals(
 			$expectedCount,
 			$actualCount,
-			"Expected $expectedCount versions but found $actualCount in \n" . $responseXml->asXML()
+			"Expected $expectedCount versions but found $actualCount in \n" . $responseXmlObject->asXML()
 		);
 	}
 
@@ -356,11 +356,11 @@ class FilesVersionsContext implements Context {
 		$fileId = $this->featureContext->getFileIdForPath($user, $path);
 		Assert::assertNotNull($fileId, __METHOD__ . " fileid of file $path user $user not found (the file may not exist)");
 		$response = $this->listVersionFolder($user, $fileId, 1, ['d:getcontentlength']);
-		$responseXml = HttpRequestHelper::getResponseXml(
+		$responseXmlObject = HttpRequestHelper::getResponseXml(
 			$response,
 			__METHOD__
 		);
-		$xmlPart = $responseXml->xpath("//d:prop/d:getcontentlength");
+		$xmlPart = $responseXmlObject->xpath("//d:prop/d:getcontentlength");
 		Assert::assertEquals(
 			$length,
 			(int) $xmlPart[$index],
@@ -422,8 +422,8 @@ class FilesVersionsContext implements Context {
 		if ($response->getStatusCode() === 403) {
 			return $response;
 		}
-		$responseXml = new SimpleXMLElement($response->getBody()->getContents());
-		$xmlPart = $responseXml->xpath("//d:response/d:href");
+		$responseXmlObject = new SimpleXMLElement($response->getBody()->getContents());
+		$xmlPart = $responseXmlObject->xpath("//d:response/d:href");
 		if (!isset($xmlPart[$index])) {
 			Assert::fail(
 				'could not find version of path "' . $path . '" with index "' . $index . '"'
@@ -519,11 +519,6 @@ class FilesVersionsContext implements Context {
 			null
 		);
 		$this->featureContext->setResponse($response);
-		$responseXml = HttpRequestHelper::getResponseXml(
-			$response,
-			__METHOD__
-		);
-		$this->featureContext->setResponseXmlObject($responseXml);
 	}
 
 	/**
