@@ -645,6 +645,10 @@ func (g Graph) formatDrives(ctx context.Context, baseURL *url.URL, storageSpaces
 	for i := 0; i < numWorkers; i++ {
 		errg.Go(func() error {
 			for storageSpace := range work {
+				if storageSpace.GetRoot().GetStorageId() == utils.OCMStorageProviderID {
+					// skip OCM shares they are no supposed to show up in the drives list
+					continue
+				}
 				res, err := g.cs3StorageSpaceToDrive(ctx, baseURL, storageSpace, apiVersion)
 				if err != nil {
 					return err
@@ -679,11 +683,9 @@ func (g Graph) formatDrives(ctx context.Context, baseURL *url.URL, storageSpaces
 		close(results)
 	}()
 
-	responses := make([]*libregraph.Drive, len(storageSpaces))
-	i := 0
+	responses := make([]*libregraph.Drive, 0, len(storageSpaces))
 	for r := range results {
-		responses[i] = r
-		i++
+		responses = append(responses, r)
 	}
 
 	if err := errg.Wait(); err != nil {
