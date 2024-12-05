@@ -1,11 +1,14 @@
 Feature: create auth token
-  As a admin
+  As a user
   I want to create App Tokens
   So that I can use 3rd party apps
 
+  Background:
+    Given user "Alice" has been created with default attributes
 
-  Scenario: admin creates app token
-    When the administrator creates app token with expiration time "72h" using the API
+
+  Scenario: user creates app token
+    When user "Alice" creates app token with expiration time "72h" using the auth-app API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
       """
@@ -30,16 +33,18 @@ Feature: create auth token
       """
 
 
-  Scenario: admin lists app token
-    Given the administrator has created app token with expiration time "72h" using the API
-    When admin lists all created tokens
+  Scenario: user lists app tokens
+    Given user "Alice" has created app token with expiration time "72h"
+    And user "Alice" has created app token with expiration time "2h"
+    When user "Alice" lists all created tokens using the auth-app API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
       """
       {
         "type": "array",
-        "minItems": 1,
-        "maxItems": 1,
+        "minItems": 2,
+        "maxItems": 2,
+        "uniqueItems": true,
         "items": {
           "type": "object",
           "required": [

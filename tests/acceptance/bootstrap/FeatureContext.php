@@ -1132,9 +1132,11 @@ class FeatureContext extends BehatVariablesContext {
 							Assert::fail("'$validator' should be an object not an array");
 						}
 						Assert::assertFalse($value->allOf || $value->anyOf, "'allOf' and 'anyOf' are not allowed in array");
-						Assert::assertNotNull($value->oneOf, "'oneOf' is required to assert more than one elements");
-						Assert::assertTrue(\is_array($value->oneOf), "'oneOf' should be an array");
-						Assert::assertEquals($schemaObj->maxItems, \count($value->oneOf), "Expected " . $schemaObj->maxItems . " 'oneOf' items but got " . \count($value->oneOf));
+						if ($value->oneOf) {
+							Assert::assertNotNull($value->oneOf, "'oneOf' is required to assert more than one elements");
+							Assert::assertTrue(\is_array($value->oneOf), "'oneOf' should be an array");
+							Assert::assertEquals($schemaObj->maxItems, \count($value->oneOf), "Expected " . $schemaObj->maxItems . " 'oneOf' items but got " . \count($value->oneOf));
+						}
 					}
 					Assert::assertTrue(\is_object($value), "'$validator' should be an object when expecting 1 element");
 					break;
@@ -1226,7 +1228,7 @@ class FeatureContext extends BehatVariablesContext {
 		$errors = $this->getJsonSchemaErrors($e);
 		$messages = ["JSON Schema validation failed:"];
 
-		$previousPointer = '';
+		$previousPointer = null;
 		$errorCount = 0;
 		foreach ($errors as $error) {
 			$expected = $error->constraint;
@@ -1236,6 +1238,9 @@ class FeatureContext extends BehatVariablesContext {
 			$dataPointer = \str_replace("/", ".", \trim($error->getDataPointer(), "/"));
 
 			$pointer = \str_contains($schemaPointer, "additionalProperties") ? $dataPointer : $schemaPointer;
+			if ($pointer === '') {
+				$pointer = "{root}";
+			}
 			if ($pointer === $previousPointer) {
 				continue;
 			}

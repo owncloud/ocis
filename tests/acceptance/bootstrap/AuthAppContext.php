@@ -33,7 +33,6 @@ require_once 'bootstrap.php';
  */
 class AuthAppContext implements Context {
 	private FeatureContext $featureContext;
-	private array $allCreatedTokens = [];
 
 	/**
 	 * @BeforeScenario
@@ -50,89 +49,56 @@ class AuthAppContext implements Context {
 	}
 
 	/**
-	 * @When the administrator creates app token with expiration time :expiration using the API
+	 * @When user :user creates app token with expiration time :expiration using the auth-app API
 	 *
+	 * @param string $user
 	 * @param string $expiration
 	 *
 	 * @return void
 	 */
-	public function theAdministratorCreatesAppTokenForUserWithExpirationTimeUsingTheApi(string $expiration): void {
+	public function userCreatesAppTokenWithExpirationTimeUsingTheAuthAppApi(string $user, string $expiration): void {
 		$this->featureContext->setResponse(
 			AuthAppHelper::createAppAuthToken(
 				$this->featureContext->getBaseUrl(),
-				$this->featureContext->getAdminUsername(),
-				$this->featureContext->getAdminPassword(),
+				$this->featureContext->getActualUsername($user),
+				$this->featureContext->getPasswordForUser($user),
 				$expiration,
 			)
 		);
 	}
 
 	/**
-	 * @Given the administrator has created app token with expiration time :expiration using the API
+	 * @Given user :user has created app token with expiration time :expiration
 	 *
+	 * @param string $user
 	 * @param string $expiration
 	 *
 	 * @return void
 	 */
-	public function theAdministratorHasCreatedAppTokenWithExpirationTimeUsingTheApi(string $expiration): void {
+	public function userHasCreatedAppTokenWithExpirationTime(string $user, string $expiration): void {
 		$response = AuthAppHelper::createAppAuthToken(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getAdminUsername(),
-			$this->featureContext->getAdminPassword(),
+			$this->featureContext->getActualUsername($user),
+			$this->featureContext->getPasswordForUser($user),
 			$expiration,
 		);
 		$this->featureContext->theHTTPStatusCodeShouldBe(200, "", $response);
 	}
 
 	/**
-	 * @When admin lists all created tokens
+	 * @When user :user lists all created tokens using the auth-app API
+	 *
+	 * @param string $user
 	 *
 	 * @return void
 	 */
-	public function adminListsAllCreatedTokens(): void {
+	public function userListsAllCreatedTokensUsingTheAuthAppApi(string $user): void {
 		$this->featureContext->setResponse(
-			AuthAppHelper::listAllAppAuthToken(
+			AuthAppHelper::listAllAppAuthTokensForUser(
 				$this->featureContext->getBaseUrl(),
-				$this->featureContext->getAdminUsername(),
-				$this->featureContext->getAdminPassword(),
+				$this->featureContext->getActualUsername($user),
+				$this->featureContext->getPasswordForUser($user),
 			)
 		);
-	}
-
-	/**
-	 * @return void
-	 */
-	public function deleteAllToken() : void {
-		$response = AuthAppHelper::listAllAppAuthToken(
-			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getAdminUsername(),
-			$this->featureContext->getAdminPassword(),
-		);
-		$this->featureContext->theHTTPStatusCodeShouldBe(200, "", $response);
-		$rawBody =  $response->getBody()->getContents();
-		$tokens = json_decode($rawBody);
-		foreach ($tokens as $token) {
-			$this->featureContext->theHTTPStatusCodeShouldBe(
-				200,
-				"",
-				AuthAppHelper::deleteAppAuthToken(
-					$this->featureContext->getBaseUrl(),
-					$this->featureContext->getAdminUsername(),
-					$this->featureContext->getAdminPassword(),
-					$token->token
-				)
-			);
-		}
-	}
-
-	/**
-	 * @AfterScenario
-	 *
-	 * @return void
-	 *
-	 * @throws Exception|GuzzleException
-	 */
-	public function cleanDataAfterTests(): void {
-		$this->deleteAllToken();
 	}
 }

@@ -247,6 +247,7 @@ config = {
                 "apiAuthApp",
             ],
             "skip": False,
+            "withRemotePhp": [True],
             "extraServerEnvironment": {
                 "OCIS_ADD_RUN_SERVICES": "auth-app",
                 "PROXY_ENABLE_APP_AUTH": True,
