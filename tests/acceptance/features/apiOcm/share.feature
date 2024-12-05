@@ -814,3 +814,99 @@ Feature: an user shares resources using ScienceMesh application
     And for user "Brian" the content of file "textfile.txt" of federated share "textfile.txt" should be "this is a new content"
     And using server "LOCAL"
     And for user "Alice" the content of the file "textfile.txt" of the space "Personal" should be "this is a new content"
+
+  @issue-10488
+  Scenario Outline: local user shares a folder copied from an already shared folder to federation user
+    Given using server "REMOTE"
+    And "Brian" has created the federation share invitation
+    And using server "LOCAL"
+    And "Alice" has accepted invitation
+    And user "Alice" has created folder "folderToShare"
+    And user "Alice" has sent the following resource share invitation to federated user:
+      | resource        | folderToShare        |
+      | space           | Personal             |
+      | sharee          | Brian                |
+      | shareType       | user                 |
+      | permissionsRole | <permissions-role-1> |
+    And user "Alice" has copied folder "folderToShare" to "folderToShareCopy"
+    And user "Alice" has sent the following resource share invitation to federated user:
+      | resource        | folderToShareCopy    |
+      | space           | Personal             |
+      | sharee          | Brian                |
+      | shareType       | user                 |
+      | permissionsRole | <permissions-role-2> |
+    And using server "REMOTE"
+    When user "Brian" lists the shares shared with him using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "value"
+        ],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "uniqueItems": true,
+            "items": {
+              "oneOf":[
+                {
+                  "type": "object",
+                  "required": [
+                    "@UI.Hidden",
+                    "@client.synchronize",
+                    "createdBy",
+                    "eTag",
+                    "folder",
+                    "id",
+                    "lastModifiedDateTime",
+                    "name",
+                    "parentReference",
+                    "remoteItem"
+                  ],
+                  "properties": {
+                    "name": {
+                      "const": "folderToShare"
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": [
+                    "@UI.Hidden",
+                    "@client.synchronize",
+                    "createdBy",
+                    "eTag",
+                    "folder",
+                    "id",
+                    "lastModifiedDateTime",
+                    "name",
+                    "parentReference",
+                    "remoteItem"
+                  ],
+                  "properties": {
+                    "name": {
+                      "const": "folderToShareCopy"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | permissions-role-1 | permissions-role-2 |
+      | Editor             | Viewer             |
+      | Editor             | Uploader           |
+      | Editor             | Editor             |
+      | Uploader           | Editor             |
+      | Uploader           | Viewer             |
+      | Uploader           | Uploader           |
+      | Viewer             | Uploader           |
+      | Viewer             | Editor             |
+      | Viewer             | Viewer             |

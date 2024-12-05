@@ -670,7 +670,7 @@ trait WebDav {
 	}
 
 	/**
-	 * @Given /^user "([^"]*)" has copied file "([^"]*)" to "([^"]*)"$/
+	 * @Given /^user "([^"]*)" has copied (?:file|folder) "([^"]*)" to "([^"]*)"$/
 	 *
 	 * @param string $user
 	 * @param string $fileSource
@@ -686,7 +686,7 @@ trait WebDav {
 		$response = $this->copyFile($user, $fileSource, $fileDestination);
 		$this->theHTTPStatusCodeShouldBe(
 			["201", "204"],
-			"HTTP status code was not 201 or 204 while trying to copy file '$fileSource' to '$fileDestination' for user '$user'",
+			"HTTP status code was not 201 or 204 while trying to copy resource '$fileSource' to '$fileDestination' for user '$user'",
 			$response
 		);
 	}
