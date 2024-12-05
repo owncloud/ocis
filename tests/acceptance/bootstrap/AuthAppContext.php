@@ -23,7 +23,6 @@
 use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use TestHelpers\BehatHelper;
-use GuzzleHttp\Exception\GuzzleException;
 use TestHelpers\AuthAppHelper;
 
 require_once 'bootstrap.php';
@@ -62,7 +61,7 @@ class AuthAppContext implements Context {
 				$this->featureContext->getBaseUrl(),
 				$this->featureContext->getActualUsername($user),
 				$this->featureContext->getPasswordForUser($user),
-				$expiration,
+				["expiry" => $expiration],
 			)
 		);
 	}
@@ -80,7 +79,7 @@ class AuthAppContext implements Context {
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getActualUsername($user),
 			$this->featureContext->getPasswordForUser($user),
-			$expiration,
+			["expiry" => $expiration]
 		);
 		$this->featureContext->theHTTPStatusCodeShouldBe(200, "", $response);
 	}
@@ -98,6 +97,60 @@ class AuthAppContext implements Context {
 				$this->featureContext->getBaseUrl(),
 				$this->featureContext->getActualUsername($user),
 				$this->featureContext->getPasswordForUser($user),
+			)
+		);
+	}
+
+	/**
+	 * @Given the administrator has created app token for user :impersonatedUser with expiration time :expiration using the auth-app API
+	 *
+	 * @param string $impersonatedUser
+	 * @param string $expiration
+	 *
+	 * @return void
+	 */
+	public function theAdministratorHasCreatedAppTokenWithExpirationTimeImpersonatingUserUsingTheAuthAppApi(
+		string $impersonatedUser,
+		string $expiration,
+	): void {
+		$response = AuthAppHelper::createAppAuthToken(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getAdminUsername(),
+			$this->featureContext->getAdminPassword(),
+			[
+				"expiry" => $expiration,
+				"userName" => $this->featureContext->getActualUsername($impersonatedUser)
+			],
+		);
+		$this->featureContext->theHTTPStatusCodeShouldBe(
+			200,
+			"Failed creating auth-app token\n"
+			. "HTTP status code 200 is not the expected value " . $response->getStatusCode(),
+			$response
+		);
+	}
+
+	/**
+	 * @When the administrator creates app token for user :impersonatedUser with expiration time :expiration using the auth-app API
+	 *
+	 * @param string $impersonatedUser
+	 * @param string $expiration
+	 *
+	 * @return void
+	 */
+	public function theAdministratorCreatesAppTokenForUserWithExpirationTimeViaAuthAppApi(
+		string $impersonatedUser,
+		string $expiration,
+	): void {
+		$this->featureContext->setResponse(
+			AuthAppHelper::createAppAuthToken(
+				$this->featureContext->getBaseUrl(),
+				$this->featureContext->getAdminUsername(),
+				$this->featureContext->getAdminPassword(),
+				[
+					"expiry" => $expiration,
+					"userName" => $this->featureContext->getActualUsername($impersonatedUser)
+				],
 			)
 		);
 	}

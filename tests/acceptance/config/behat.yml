@@ -432,6 +432,7 @@ default:
         - FeatureContext: *common_feature_context_params
         - AuthAppContext:
         - CliContext:
+        - OcisConfigContext:
 
     cliCommands:
       paths:
