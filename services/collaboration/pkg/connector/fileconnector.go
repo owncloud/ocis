@@ -1228,12 +1228,16 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (*ConnectorResponse, 
 	if !isPublicShare {
 		parentFolderURL.Path = path.Join(ocisURL.Path, "f", storagespace.FormatResourceID(statRes.GetInfo().GetParentId()))
 	} else {
-		publicShare := &link.PublicShare{}
-		err := wopiContext.GetScopeByKeyPrefix("publicshare:", publicShare)
-		if err != nil {
-			logger.Error().Err(err).Msg("CheckFileInfo: error getting public share scope")
+		if scopes, ok := ctxpkg.ContextGetScopes(ctx); ok {
+			publicShare := &link.PublicShare{}
+			if err := helpers.GetScopeByKeyPrefix(scopes, "publicshare:", publicShare); err == nil {
+				parentFolderURL.Path = path.Join(ocisURL.Path, "s", publicShare.GetToken())
+			} else {
+				logger.Error().Err(err).Msg("CheckFileInfo: error getting public share scope")
+			}
+		} else {
+			logger.Error().Err(err).Msg("CheckFileInfo: error getting scopes from the context")
 		}
-		parentFolderURL.Path = path.Join(ocisURL.Path, "s", publicShare.GetToken())
 	}
 	// fileinfo map
 	infoMap := map[string]interface{}{
