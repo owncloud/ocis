@@ -46,7 +46,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-ID of the user that should receive admin privileges. Consider that the UUID can be encoded in some LDAP deployment configurations like in .ldif files. These need to be decoded beforehand.
+ID of the user who collects all necessary information for deletion. Consider that the UUID can be encoded in some LDAP deployment configurations like in .ldif files. These need to be decoded beforehand.
 a| `OCIS_ASYNC_UPLOADS`
 
 a| [subs=-attributes]
@@ -90,7 +90,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-Password for the configured store. Only applies when store type 'nats-js-kv' is configured.
+The password to authenticate with the cache store. Only applies when store type 'nats-js-kv' is configured.
 a| `OCIS_CACHE_AUTH_USERNAME`
 
 a| [subs=-attributes]
@@ -116,7 +116,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-Username for the configured store. Only applies when store type 'nats-js-kv' is configured.
+The username to authenticate with the cache store. Only applies when store type 'nats-js-kv' is configured.
 a| `OCIS_CACHE_DATABASE`
 
 a| [subs=-attributes]
@@ -136,7 +136,7 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++storage-system ++
+++storage-users ++
 
 a| [subs=-attributes]
 The database name the configured store should use.
@@ -246,7 +246,7 @@ Default time to live for user info in the user info cache. Only applied when acc
 a| `OCIS_CORS_ALLOW_CREDENTIALS`
 
 a| [subs=-attributes]
-++5.0 ++
+++pre5.0 ++
 
 a| [subs=attributes+]
 * xref:{s-path}/activitylog.adoc[activitylog] +
@@ -270,14 +270,14 @@ a| [subs=-attributes]
 ++bool ++
 
 a| [subs=-attributes]
-++true ++
+++false ++
 
 a| [subs=-attributes]
 Allow credentials for CORS.See following chapter for more details: *Access-Control-Allow-Credentials* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials.
 a| `OCIS_CORS_ALLOW_HEADERS`
 
 a| [subs=-attributes]
-++5.0 ++
+++pre5.0 ++
 
 a| [subs=attributes+]
 * xref:{s-path}/activitylog.adoc[activitylog] +
@@ -301,14 +301,14 @@ a| [subs=-attributes]
 ++[]string ++
 
 a| [subs=-attributes]
-++[Authorization Origin Content-Type Accept X-Requested-With X-Request-Id Ocs-Apirequest] ++
+++[Authorization Origin X-Requested-With X-Request-Id X-HTTP-Method-Override Content-Type Upload-Length Upload-Offset Tus-Resumable Upload-Metadata Upload-Defer-Length Upload-Concat Upload-Incomplete Upload-Draft-Interop-Version] ++
 
 a| [subs=-attributes]
 A list of allowed CORS headers. See following chapter for more details: *Access-Control-Request-Headers* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers. See the Environment Variable Types description for more details.
 a| `OCIS_CORS_ALLOW_METHODS`
 
 a| [subs=-attributes]
-++5.0 ++
+++pre5.0 ++
 
 a| [subs=attributes+]
 * xref:{s-path}/activitylog.adoc[activitylog] +
@@ -332,14 +332,14 @@ a| [subs=-attributes]
 ++[]string ++
 
 a| [subs=-attributes]
-++[GET] ++
+++[POST HEAD PATCH OPTIONS GET DELETE] ++
 
 a| [subs=-attributes]
 A list of allowed CORS methods. See following chapter for more details: *Access-Control-Request-Method* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method. See the Environment Variable Types description for more details.
 a| `OCIS_CORS_ALLOW_ORIGINS`
 
 a| [subs=-attributes]
-++5.0 ++
+++pre5.0 ++
 
 a| [subs=attributes+]
 * xref:{s-path}/activitylog.adoc[activitylog] +
@@ -363,7 +363,7 @@ a| [subs=-attributes]
 ++[]string ++
 
 a| [subs=-attributes]
-++[*] ++
+++[https://localhost:9200] ++
 
 a| [subs=-attributes]
 A list of allowed CORS origins. See following chapter for more details: *Access-Control-Allow-Origin* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin. See the Environment Variable Types description for more details.
@@ -441,7 +441,7 @@ Edition of oCIS. Used for branding purposes.
 a| `OCIS_ENABLE_OCM`
 
 a| [subs=-attributes]
-++5.0 ++
+++pre5.0 ++
 
 a| [subs=attributes+]
 * xref:{s-path}/frontend.adoc[frontend] +
@@ -457,7 +457,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Include OCM sharees when listing users.
+Changing this value is NOT supported. Enables support for incoming federated sharing for clients. The backend behaviour is not changed.
 a| `OCIS_EVENTS_AUTH_PASSWORD`
 
 a| [subs=-attributes]
@@ -489,7 +489,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-Password for the events broker.
+The password to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.
 a| `OCIS_EVENTS_AUTH_USERNAME`
 
 a| [subs=-attributes]
@@ -521,7 +521,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-Username for the events broker.
+The username to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.
 a| `OCIS_EVENTS_CLUSTER`
 
 a| [subs=-attributes]
@@ -649,11 +649,11 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The root CA certificate used to validate the server's TLS certificate. If provided SHARING_EVENTS_TLS_INSECURE will be seen as false.
+The root CA certificate used to validate the server's TLS certificate. If provided NOTIFICATIONS_EVENTS_TLS_INSECURE will be seen as false.
 a| `OCIS_GATEWAY_GRPC_ADDR`
 
 a| [subs=-attributes]
-++pre5.0 ++
+++5.0 ++
 
 a| [subs=attributes+]
 * xref:{s-path}/gateway.adoc[gateway] +
@@ -666,7 +666,7 @@ a| [subs=-attributes]
 ++127.0.0.1:9142 ++
 
 a| [subs=-attributes]
-The bind address of the GRPC service.
+The bind address of the gateway GRPC address.
 a| `OCIS_GRPC_CLIENT_TLS_CACERT`
 
 a| [subs=-attributes]
@@ -746,7 +746,7 @@ TLS mode for grpc connection to the go-micro based grpc services. Possible value
 a| `OCIS_GRPC_PROTOCOL`
 
 a| [subs=-attributes]
-++pre5.0 ++
+++7.0.0 ++
 
 a| [subs=attributes+]
 * xref:{s-path}/app-provider.adoc[app-provider] +
@@ -900,7 +900,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Whether the NATS server should skip the client certificate verification during the TLS handshake.
+Whether to verify the server TLS certificates.
 a| `OCIS_JWT_SECRET`
 
 a| [subs=-attributes]
@@ -978,7 +978,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The client id to authenticate with keycloak.
+The client ID to authenticate with keycloak.
 a| `OCIS_KEYCLOAK_CLIENT_REALM`
 
 a| [subs=-attributes]
@@ -1063,7 +1063,7 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++uid=idp,ou=sysusers,o=libregraph-idm ++
+++uid=reva,ou=sysusers,o=libregraph-idm ++
 
 a| [subs=-attributes]
 LDAP DN to use for simple bind authentication with the target LDAP server.
@@ -1106,7 +1106,7 @@ a| [subs=-attributes]
 ++/var/lib/ocis/idm/ldap.crt ++
 
 a| [subs=-attributes]
-Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the LDAP service. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH/idp.
+Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the LDAP service. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH/idm.
 a| `OCIS_LDAP_DISABLED_USERS_GROUP_DN`
 
 a| [subs=-attributes]
@@ -1387,7 +1387,7 @@ a| [subs=-attributes]
 ++ldaps://localhost:9235 ++
 
 a| [subs=-attributes]
-Url of the LDAP service to use as IDP.
+URI of the LDAP Server to connect to. Supported URI schemes are 'ldaps://' and 'ldap://'
 a| `OCIS_LDAP_USER_BASE_DN`
 
 a| [subs=-attributes]
@@ -1426,7 +1426,7 @@ a| [subs=-attributes]
 ++ownCloudUserEnabled ++
 
 a| [subs=-attributes]
-LDAP Attribute to use as a flag telling if the user is enabled or disabled.
+LDAP attribute to use as a flag telling if the user is enabled or disabled.
 a| `OCIS_LDAP_USER_FILTER`
 
 a| [subs=-attributes]
@@ -1466,7 +1466,7 @@ a| [subs=-attributes]
 ++inetOrgPerson ++
 
 a| [subs=-attributes]
-LDAP User ObjectClass like 'inetOrgPerson'.
+The object class to use for users in the default user search filter ('inetOrgPerson').
 a| `OCIS_LDAP_USER_SCHEMA_DISPLAYNAME`
 
 a| [subs=-attributes]
@@ -1502,10 +1502,10 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++ownCloudUUID ++
+++ownclouduuid ++
 
 a| [subs=-attributes]
-LDAP User UUID attribute like 'uid'.
+LDAP Attribute to use as the unique ID for users. This should be a stable globally unique ID like a UUID.
 a| `OCIS_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING`
 
 a| [subs=-attributes]
@@ -1544,7 +1544,7 @@ a| [subs=-attributes]
 ++mail ++
 
 a| [subs=-attributes]
-LDAP User email attribute like 'mail'.
+LDAP Attribute to use for the email address of users.
 a| `OCIS_LDAP_USER_SCHEMA_USERNAME`
 
 a| [subs=-attributes]
@@ -1561,10 +1561,10 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++displayName ++
+++uid ++
 
 a| [subs=-attributes]
-LDAP User name attribute like 'displayName'.
+LDAP Attribute to use for username of users.
 a| `OCIS_LDAP_USER_SCHEMA_USER_TYPE`
 
 a| [subs=-attributes]
@@ -1601,11 +1601,11 @@ a| [subs=-attributes]
 ++sub ++
 
 a| [subs=-attributes]
-LDAP search scope to use when looking up users. Supported scopes are 'base', 'one' and 'sub'.
+LDAP search scope to use when looking up users. Supported values are 'base', 'one' and 'sub'.
 a| `OCIS_LOG_COLOR`
 
 a| [subs=-attributes]
-++pre5.0 ++
+++6.0.0 ++
 
 a| [subs=attributes+]
 * xref:{s-path}/activitylog.adoc[activitylog] +
@@ -1662,7 +1662,7 @@ Activates colorized log output.
 a| `OCIS_LOG_FILE`
 
 a| [subs=-attributes]
-++pre5.0 ++
+++6.0.0 ++
 
 a| [subs=attributes+]
 * xref:{s-path}/activitylog.adoc[activitylog] +
@@ -1719,7 +1719,7 @@ The path to the log file. Activates logging to this file if set.
 a| `OCIS_LOG_LEVEL`
 
 a| [subs=-attributes]
-++pre5.0 ++
+++6.0.0 ++
 
 a| [subs=attributes+]
 * xref:{s-path}/activitylog.adoc[activitylog] +
@@ -1776,7 +1776,7 @@ The log level. Valid values are: 'panic', 'fatal', 'error', 'warn', 'info', 'deb
 a| `OCIS_LOG_PRETTY`
 
 a| [subs=-attributes]
-++pre5.0 ++
+++6.0.0 ++
 
 a| [subs=attributes+]
 * xref:{s-path}/activitylog.adoc[activitylog] +
@@ -1833,7 +1833,7 @@ Activates pretty log output.
 a| `OCIS_MACHINE_AUTH_API_KEY`
 
 a| [subs=-attributes]
-++pre5.0 ++
+++5.0 ++
 
 a| [subs=attributes+]
 * xref:{s-path}/auth-app.adoc[auth-app] +
@@ -1896,7 +1896,7 @@ a| [subs=-attributes]
 ++https://localhost:9200 ++
 
 a| [subs=-attributes]
-The OIDC issuer URL to use.
+The identity provider href for the openid-discovery relation.
 a| `OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST`
 
 a| [subs=-attributes]
@@ -2019,7 +2019,7 @@ Define the minimum number of lowercase letters. Defaults to 1 if not set.
 a| `OCIS_PERSISTENT_STORE`
 
 a| [subs=-attributes]
-++pre5.0 ++
+++7.0.0 ++
 
 a| [subs=attributes+]
 * xref:{s-path}/activitylog.adoc[activitylog] +
@@ -2035,11 +2035,11 @@ a| [subs=-attributes]
 ++nats-js-kv ++
 
 a| [subs=-attributes]
-The type of the store. Supported values are: 'memory', 'redis-sentinel', 'nats-js-kv', 'noop'. See the text description for details.
+The type of the store. Supported values are: 'memory', 'nats-js-kv', 'redis-sentinel', 'noop'. See the text description for details.
 a| `OCIS_PERSISTENT_STORE_AUTH_PASSWORD`
 
 a| [subs=-attributes]
-++5.0 ++
+++7.0.0 ++
 
 a| [subs=attributes+]
 * xref:{s-path}/activitylog.adoc[activitylog] +
@@ -2059,7 +2059,7 @@ The password to authenticate with the store. Only applies when store type 'nats-
 a| `OCIS_PERSISTENT_STORE_AUTH_USERNAME`
 
 a| [subs=-attributes]
-++5.0 ++
+++7.0.0 ++
 
 a| [subs=attributes+]
 * xref:{s-path}/activitylog.adoc[activitylog] +
@@ -2079,7 +2079,7 @@ The username to authenticate with the store. Only applies when store type 'nats-
 a| `OCIS_PERSISTENT_STORE_NODES`
 
 a| [subs=-attributes]
-++pre5.0 ++
+++7.0.0 ++
 
 a| [subs=attributes+]
 * xref:{s-path}/activitylog.adoc[activitylog] +
@@ -2099,7 +2099,7 @@ A list of nodes to access the configured store. This has no effect when 'memory'
 a| `OCIS_PERSISTENT_STORE_TTL`
 
 a| [subs=-attributes]
-++pre5.0 ++
+++7.0.0 ++
 
 a| [subs=attributes+]
 * xref:{s-path}/activitylog.adoc[activitylog] +
@@ -2112,14 +2112,14 @@ a| [subs=-attributes]
 ++Duration ++
 
 a| [subs=-attributes]
-++0s ++
+++30m0s ++
 
 a| [subs=-attributes]
-Time to live for events in the store. See the Environment Variable Types description for more details.
+Time to live for events in the store. Defaults to '30m' (30 minutes). See the Environment Variable Types description for more details.
 a| `OCIS_REVA_GATEWAY`
 
 a| [subs=-attributes]
-++pre5.0 ++
+++6.0.0 ++
 
 a| [subs=attributes+]
 * xref:{s-path}/activitylog.adoc[activitylog] +
@@ -2159,7 +2159,7 @@ a| [subs=-attributes]
 ++com.owncloud.api.gateway ++
 
 a| [subs=-attributes]
-The CS3 gateway endpoint.
+CS3 gateway used to look up user metadata.
 a| `OCIS_SERVICE_ACCOUNT_ID`
 
 a| [subs=-attributes]
@@ -2346,7 +2346,7 @@ IDP of the oCIS STORAGE-SYSTEM system user.
 a| `OCIS_TRACING_COLLECTOR`
 
 a| [subs=-attributes]
-++pre5.0 ++
+++6.0.0 ++
 
 a| [subs=attributes+]
 * xref:{s-path}/activitylog.adoc[activitylog] +
@@ -2403,7 +2403,7 @@ The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger
 a| `OCIS_TRACING_ENABLED`
 
 a| [subs=-attributes]
-++pre5.0 ++
+++6.0.0 ++
 
 a| [subs=attributes+]
 * xref:{s-path}/activitylog.adoc[activitylog] +
@@ -2460,7 +2460,7 @@ Activates tracing.
 a| `OCIS_TRACING_ENDPOINT`
 
 a| [subs=-attributes]
-++pre5.0 ++
+++6.0.0 ++
 
 a| [subs=attributes+]
 * xref:{s-path}/activitylog.adoc[activitylog] +
@@ -2517,7 +2517,7 @@ The endpoint of the tracing agent.
 a| `OCIS_TRACING_TYPE`
 
 a| [subs=-attributes]
-++pre5.0 ++
+++6.0.0 ++
 
 a| [subs=attributes+]
 * xref:{s-path}/activitylog.adoc[activitylog] +
@@ -2587,11 +2587,11 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The storage transfer secret.
+Transfer secret for signing file up- and download requests.
 a| `OCIS_TRANSLATION_PATH`
 
 a| [subs=-attributes]
-++7.0.0 ++
+++pre5.0 ++
 
 a| [subs=attributes+]
 * xref:{s-path}/activitylog.adoc[activitylog] +
@@ -2640,11 +2640,11 @@ a| [subs=-attributes]
 ++https://localhost:9200 ++
 
 a| [subs=-attributes]
-The OIDC issuer URL to use.
+The public facing URL of the oCIS Web UI, used e.g. when sending notification eMails
 a| `OCIS_WOPI_DISABLE_CHAT`
 
 a| [subs=-attributes]
-++pre5.0 ++
+++7.0.0 ++
 
 a| [subs=attributes+]
 * xref:{s-path}/app-provider.adoc[app-provider] +
@@ -2657,7 +2657,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Disable the chat functionality of the office app.
+Disable chat in the office web frontend. This feature applies to OnlyOffice and Microsoft.
 a| `STORAGE_USERS_ASYNC_PROPAGATOR_PROPAGATION_DELAY`
 
 a| [subs=-attributes]
