@@ -43,9 +43,9 @@ services:
       - ${OCIS_CONFIG_DIR:-ocis-config}:/etc/ocis
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.collaboration.entrypoints=letsencrypt_https"
+      - "traefik.http.routers.collaboration.entrypoints=https"
       - "traefik.http.routers.collaboration.rule=Host(`${WOPISERVER_DOMAIN:-wopiserver.owncloud.test}`)"
-      - "traefik.http.routers.collaboration.tls.certresolver=letsencrypt_http"
+      - "traefik.http.routers.collaboration.tls.certresolver=http"
       - "traefik.http.routers.collaboration.service=collaboration"
       - "traefik.http.services.collaboration.loadbalancer.server.port=9300"
     logging:
@@ -53,7 +53,7 @@ services:
     restart: always
 
   collabora:
-    image: collabora/code:24.04.10.2.1
+    image: collabora/code:24.04.10.1.1
     # release notes: https://www.collaboraonline.com/release-notes/
     networks:
       ocis-net:
@@ -72,9 +72,9 @@ services:
       - MKNOD
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.collabora.entrypoints=letsencrypt_https"
+      - "traefik.http.routers.collabora.entrypoints=https"
       - "traefik.http.routers.collabora.rule=Host(`${COLLABORA_DOMAIN:-collabora.owncloud.test}`)"
-      - "traefik.http.routers.collabora.tls.certresolver=letsencrypt_http"
+      - "traefik.http.routers.collabora.tls.certresolver=http"
       - "traefik.http.routers.collabora.service=collabora"
       - "traefik.http.services.collabora.loadbalancer.server.port=9980"
     logging:

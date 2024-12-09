@@ -39,9 +39,9 @@ services:
       - ${OCIS_CONFIG_DIR:-ocis-config}:/etc/ocis
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.collaboration-oo.entrypoints=letsencrypt_https"
+      - "traefik.http.routers.collaboration-oo.entrypoints=https"
       - "traefik.http.routers.collaboration-oo.rule=Host(`${WOPISERVER_ONLYOFFICE_DOMAIN:-wopiserver-oo.owncloud.test}`)"
-      - "traefik.http.routers.collaboration-oo.tls.certresolver=letsencrypt_http"
+      - "traefik.http.routers.collaboration-oo.tls.certresolver=http"
       - "traefik.http.routers.collaboration-oo.service=collaboration-oo"
       - "traefik.http.services.collaboration-oo.loadbalancer.server.port=9300"
     logging:
@@ -71,9 +71,9 @@ services:
       # https://helpcenter.onlyoffice.com/installation/docs-enterprise-install-docker.aspx
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.onlyoffice.entrypoints=letsencrypt_https"
+      - "traefik.http.routers.onlyoffice.entrypoints=https"
       - "traefik.http.routers.onlyoffice.rule=Host(`${ONLYOFFICE_DOMAIN:-onlyoffice.owncloud.test}`)"
-      - "traefik.http.routers.onlyoffice.tls.certresolver=letsencrypt_http"
+      - "traefik.http.routers.onlyoffice.tls.certresolver=http"
       - "traefik.http.routers.onlyoffice.service=onlyoffice"
       - "traefik.http.services.onlyoffice.loadbalancer.server.port=80"
       # websockets can't be opened when this is omitted

@@ -39,9 +39,9 @@ services:
       - companion-data:/tmp/companion/
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.companion.entrypoints=letsencrypt_https"
+      - "traefik.http.routers.companion.entrypoints=https"
       - "traefik.http.routers.companion.rule=Host(`${COMPANION_DOMAIN:-companion.owncloud.test}`)"
-      - "traefik.http.routers.companion.tls.certresolver=letsencrypt_http"
+      - "traefik.http.routers.companion.tls.certresolver=http"
       - "traefik.http.routers.companion.service=companion"
       - "traefik.http.services.companion.loadbalancer.server.port=3020"
     logging:
