@@ -96,6 +96,25 @@ class SpacesTUSContext implements Context {
 	}
 
 	/**
+	 * @When the public uploads a file from :source to :destination via TUS inside last link shared folder with password :password using the WebDAV API
+	 *
+	 * @param string $source
+	 * @param string $destination
+	 * @param string $password
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function publicUploadsAFileViaTusInsideOfTheSpaceUsingTheWebdavApi(
+		string $source,
+		string $destination,
+		string $password
+	): void {
+		$this->tusContext->publicUploadFileUsingTus($source, $destination, $password);
+		$this->featureContext->setLastUploadDeleteTime(\time());
+	}
+
+	/**
 	 * @Given user :user has created a new TUS resource in the space :spaceName with the following headers:
 	 *
 	 * @param string $user

@@ -345,6 +345,44 @@ class TUSContext implements Context {
 	}
 
 	/**
+	 * @param string $source
+	 * @param string $destination
+	 * @param string|null $password
+	 *
+	 * @return void
+	 */
+	public function publicUploadFileUsingTus(
+		string  $source,
+		string  $destination,
+		?string $password,
+	):void {
+		$password = $this->featureContext->getActualPassword($password);
+		if ($this->featureContext->isUsingSharingNG()) {
+			$token = $this->featureContext->shareNgGetLastCreatedLinkShareToken();
+		} else {
+			$token = $this->featureContext->getLastCreatedPublicShareToken();
+		}
+		$headers = [
+			'Authorization' => 'Basic ' . \base64_encode("public" . ':' . $password),
+		];
+		$sourceFile = $this->featureContext->acceptanceTestsDirLocation() . $source;
+		$davPath = WebdavHelper::getDavPath(WebDavHelper::DAV_VERSION_SPACES, $token, "public-files");
+		$url = $davPath;
+
+		$client = new Client(
+			$this->featureContext->getBaseUrl(),
+			[
+				'verify' => false,
+				'headers' => $headers
+			]
+		);
+
+		$client->setApiPath($url);
+		$client->setKey((string)rand())->file($sourceFile, $destination);
+		$client->file($sourceFile, $destination)->createWithUpload("", 0);
+	}
+
+	/**
 	 * @When user :user uploads file with content :content to :destination using the TUS protocol on the WebDAV API
 	 *
 	 * @param string $user
