@@ -1,6 +1,6 @@
 ---
 title: Auth-App
-date: 2024-12-09T10:19:41.71585628Z
+date: 2024-12-09T10:33:46.526796771Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/auth-app
@@ -137,7 +137,7 @@ To impersonate, the respective requests from the CLI commands above extend with 
 Example:\
 A final create request would then look like:
 ```bash
-curl --request POST 'https://<your host:9200>/auth-app/tokens?expiry={value}?userName={value}' \
+curl --request POST 'https://<your host:9200>/auth-app/tokens?expiry={value}&userName={value}' \
      --header 'accept: application/json' \
      --header 'authorization: Bearer {token}'
 ```
