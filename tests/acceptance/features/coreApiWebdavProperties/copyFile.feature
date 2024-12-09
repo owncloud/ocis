@@ -233,7 +233,7 @@ Feature: copy file
     Then the HTTP status code should be "400"
     And as "Alice" folder "/Shares/BRIAN-Folder/sample-folder" should exist
     And as "Alice" file "/Shares/BRIAN-Folder" should not exist
-    And user "Alice" should have a share "BRIAN-Folder" shared by user "Brian"
+    And user "Alice" should have a share "BRIAN-Folder" shared by user "Brian" from space "Personal"
     And as "Brian" folder "BRIAN-Folder" should exist
     Examples:
       | dav-path-version |
@@ -257,7 +257,7 @@ Feature: copy file
     When user "Alice" copies file "copy.txt" to "Shares/lorem.txt" using the WebDAV API
     Then the HTTP status code should be "204"
     And the content of file "Shares/lorem.txt" for user "Alice" should be "file to copy"
-    And user "Alice" should have a share "lorem.txt" shared by user "Brian"
+    And user "Alice" should have a share "lorem.txt" shared by user "Brian" from space "Personal"
     And the content of file "lorem.txt" for user "Brian" should be "file to copy"
     Examples:
       | dav-path-version |
@@ -282,7 +282,7 @@ Feature: copy file
     Then the HTTP status code should be "400"
     And the content of file "Shares/sharedfile1.txt" for user "Alice" should be "file to share"
     And as "Alice" folder "/Shares/sharedfile1.txt" should not exist
-    And user "Alice" should have a share "sharedfile1.txt" shared by user "Brian"
+    And user "Alice" should have a share "sharedfile1.txt" shared by user "Brian" from space "Personal"
     And the content of file "sharedfile1.txt" for user "Brian" should be "file to share"
     Examples:
       | dav-path-version |
@@ -308,7 +308,7 @@ Feature: copy file
     Then the HTTP status code should be "400"
     And as "Alice" folder "Shares/BRIAN-Folder/brian-folder" should exist
     And as "Alice" folder "Shares/BRIAN-Folder/alice-folder" should not exist
-    And user "Alice" should have a share "BRIAN-Folder" shared by user "Brian"
+    And user "Alice" should have a share "BRIAN-Folder" shared by user "Brian" from space "Personal"
     And as "Brian" folder "BRIAN-Folder" should exist
     Examples:
       | dav-path-version |
@@ -460,7 +460,7 @@ Feature: copy file
     Then the HTTP status code should be "400"
     And as "Alice" folder "/Shares/BRIAN-Folder/sample-folder" should exist
     And as "Alice" file "/Shares/BRIAN-Folder" should not exist
-    And user "Alice" should have a share "BRIAN-Folder" shared by user "Brian"
+    And user "Alice" should have a share "BRIAN-Folder" shared by user "Brian" from space "Personal"
     And as "Brian" folder "BRIAN-Folder/sample-folder" should exist
     Examples:
       | dav-path-version |
@@ -488,7 +488,7 @@ Feature: copy file
     Then the HTTP status code should be "400"
     And as "Alice" file "/Shares/sharedfile1.txt" should exist
     And as "Alice" folder "/Shares/sharedfile1.txt" should not exist
-    And user "Alice" should have a share "sharedfile1.txt" shared by user "Brian"
+    And user "Alice" should have a share "sharedfile1.txt" shared by user "Brian" from space "Personal"
     And as "Brian" file "sharedfile1.txt" should exist
     Examples:
       | dav-path-version |

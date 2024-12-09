@@ -714,7 +714,7 @@ Feature: copy file
     And as "Brian" folder "BRIAN-Folder/sample-folder" should exist
     But as "Alice" file "Shares/BRIAN-Folder" should not exist
     And as "Alice" file "Shares/textfile1.txt" should not exist
-    And user "Alice" should have a share "BRIAN-Folder" shared by user "Brian"
+    And user "Alice" should have a share "BRIAN-Folder" shared by user "Brian" from space "Personal"
 
   @issue-7208
   Scenario: copy a folder over the top of an existing file received as a user share
@@ -734,7 +734,7 @@ Feature: copy file
     And for user "Alice" the content of the file "sharedfile1.txt" of the space "Shares" should be "file to share"
     And for user "Brian" the content of the file "sharedfile1.txt" of the space "Personal" should be "file to share"
     But as "Alice" folder "Shares/FOLDER/sample-folder" should not exist
-    And user "Alice" should have a share "sharedfile1.txt" shared by user "Brian"
+    And user "Alice" should have a share "sharedfile1.txt" shared by user "Brian" from space "Personal"
 
 
   Scenario: copy a folder into another folder at different level which is received as a user share

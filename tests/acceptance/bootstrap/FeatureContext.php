@@ -207,7 +207,6 @@ class FeatureContext extends BehatVariablesContext {
 		$this->autoSyncSettings[$user] = $value;
 	}
 
-	public const SHARES_SPACE_ID = 'a0ca6a90-a365-4782-871e-d44447bbc668$a0ca6a90-a365-4782-871e-d44447bbc668';
 	private bool $useSharingNG = false;
 
 	/**

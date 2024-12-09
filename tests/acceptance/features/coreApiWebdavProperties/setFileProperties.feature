@@ -61,7 +61,7 @@ Feature: set file properties
       | new              |
       | spaces           |
 
-  @issue-1297
+  @skipOnReva @issue-1297
   Scenario Outline: setting custom DAV property on a shared file as an owner and reading as a recipient
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes

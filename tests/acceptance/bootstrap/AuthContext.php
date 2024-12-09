@@ -24,7 +24,6 @@ use Behat\Gherkin\Node\TableNode;
 use Behat\Behat\Context\Context;
 use Psr\Http\Message\ResponseInterface;
 use TestHelpers\HttpRequestHelper;
-use TestHelpers\SetupHelper;
 use TestHelpers\BehatHelper;
 use TestHelpers\WebDavHelper;
 
@@ -596,12 +595,12 @@ class AuthContext implements Context {
 		$headers = [];
 		if ($method === 'MOVE' || $method === 'COPY') {
 			$baseUrl = $this->featureContext->getBaseUrl();
-			$suffix = "";
+			$suffix = $user;
 			if ($this->featureContext->getDavPathVersion() === WebDavHelper::DAV_VERSION_SPACES) {
-				$suffix = $this->featureContext->spacesContext->getSpaceIdByName($user, "Personal");
+				$suffix = $this->featureContext->getPersonalSpaceIdForUser($user);
 			}
-			$davPath = WebDavHelper::getDavPath($this->featureContext->getDavPathVersion(), $user);
-			$headers['Destination'] = "$baseUrl/$davPath/$suffix/moved";
+			$davPath = WebDavHelper::getDavPath($this->featureContext->getDavPathVersion(), $suffix);
+			$headers['Destination'] = "$baseUrl/$davPath/moved";
 		}
 
 		foreach ($table->getHash() as $row) {

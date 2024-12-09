@@ -218,7 +218,7 @@ Feature: files and folders exist in the trashbin after being deleted
   @issue-3561
   Scenario Outline: listing non-existent user's trashbin is prohibited
     Given using <dav-path-version> DAV path
-    When user "Alice" tries to list the trashbin content for user "testtrashbinnotauser"
+    When user "Alice" tries to list the trashbin content for user "nonexistent"
     Then the HTTP status code should be "404"
     Examples:
       | dav-path-version |

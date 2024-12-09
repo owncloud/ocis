@@ -505,35 +505,6 @@ class WebDavHelper {
 	}
 
 	/**
-	 *
-	 * @param string $baseUrl
-	 * @param string $user
-	 * @param string $password
-	 * @param string $xRequestId
-	 *
-	 * @return string
-	 * @throws GuzzleException
-	 * @throws Exception
-	 */
-	public static function getSharesSpaceIdForUser(string $baseUrl, string $user, string $password, string $xRequestId): string {
-		if (\array_key_exists($user, self::$spacesIdRef) && \array_key_exists("virtual", self::$spacesIdRef[$user])) {
-			return self::$spacesIdRef[$user]["virtual"];
-		}
-
-		$response = GraphHelper::getMySpaces($baseUrl, $user, $password, '', $xRequestId);
-		$body = HttpRequestHelper::getJsonDecodedResponseBodyContent($response);
-
-		$spaceId = null;
-		foreach ($body->value as $spaces) {
-			if ($spaces->driveType === "virtual") {
-				$spaceId = $spaces->id;
-				break;
-			}
-		}
-		return $spaceId;
-	}
-
-	/**
 	 * fetches personal space id for provided user
 	 *
 	 * @param string $baseUrl
@@ -549,22 +520,25 @@ class WebDavHelper {
 		if (\array_key_exists($user, self::$spacesIdRef) && \array_key_exists("personal", self::$spacesIdRef[$user])) {
 			return self::$spacesIdRef[$user]["personal"];
 		}
-		$trimmedBaseUrl = \trim($baseUrl, "/");
-		$drivesPath = '/graph/v1.0/me/drives';
-		$fullUrl = $trimmedBaseUrl . $drivesPath;
-		$response = HttpRequestHelper::get(
-			$fullUrl,
-			$xRequestId,
-			$user,
-			$password
-		);
-		$bodyContents = $response->getBody()->getContents();
-		$json = \json_decode($bodyContents);
+
 		$personalSpaceId = '';
-		if ($json === null) {
+		if (!OcisHelper::isTestingOnReva()) {
+			$response = GraphHelper::getMySpaces($baseUrl, $user, $password, '', $xRequestId);
+			Assert::assertEquals(200, $response->getStatusCode(), "Cannot list drives for user '$user'");
+
+			$drives = HttpRequestHelper::getJsonDecodedResponseBodyContent($response);
+			foreach ($drives->value as $drive) {
+				if ($drive->driveType === "personal") {
+					$personalSpaceId = $drive->id;
+					break;
+				}
+			}
+		}
+
+		if (!$personalSpaceId) {
 			// the graph endpoint did not give a useful answer
 			// try getting the information from the webdav endpoint
-			$fullUrl = "$trimmedBaseUrl/" . self::getDavPath(self::DAV_VERSION_NEW, $user);
+			$fullUrl = "$baseUrl/" . self::getDavPath(self::DAV_VERSION_NEW, $user);
 			$response = HttpRequestHelper::sendRequest(
 				$fullUrl,
 				$xRequestId,
@@ -572,73 +546,23 @@ class WebDavHelper {
 				$user,
 				$password
 			);
-			// we expect to get a multipart XML response with status 207
-			$status = $response->getStatusCode();
-			if ($status === 401) {
-				throw new SpaceNotFoundException(__METHOD__ . " Personal space not found for user " . $user);
-			} elseif ($status !== 207) {
-				throw new Exception(
-					__METHOD__ . " webdav propfind for user $user failed with status $status - so the personal space id cannot be discovered"
-				);
-			}
+			Assert::assertEquals(207, $response->getStatusCode(), "PROPFIND for user '$user' failed so the personal space id cannot be discovered");
+
 			$responseXmlObject = HttpRequestHelper::getResponseXml(
 				$response,
 				__METHOD__
 			);
-			$xmlPart = $responseXmlObject->xpath("/d:multistatus/d:response[1]/d:propstat/d:prop/oc:id");
-			if ($xmlPart === false) {
-				throw new Exception(
-					__METHOD__ . " oc:id not found in webdav propfind for user $user - so the personal space id cannot be discovered"
-				);
-			}
-			$ocIdRawString = $xmlPart[0]->__toString();
-			$separator = "!";
-			if (\strpos($ocIdRawString, $separator) !== false) {
-				// The string is not base64-encoded, because the exclamation mark is not in the base64 alphabet.
-				// We expect to have a string with 2 parts separated by the exclamation mark.
-				// This is the format introduced in 2022-02
-				// oc:id should be something like:
-				// "7464caf6-1799-103c-9046-c7b74deb5f63!7464caf6-1799-103c-9046-c7b74deb5f63"
-				// There is no encoding to decode.
-				$decodedId = $ocIdRawString;
-			} else {
-				// fall-back to assuming that the oc:id is base64-encoded
-				// That is the format used before and up to 2022-02
-				// This can be removed after both the edge and master branches of cs3org/reva are using the new format.
-				// oc:id should be some base64 encoded string like:
-				// "NzQ2NGNhZjYtMTc5OS0xMDNjLTkwNDYtYzdiNzRkZWI1ZjYzOjc0NjRjYWY2LTE3OTktMTAzYy05MDQ2LWM3Yjc0ZGViNWY2Mw=="
-				// That should decode to something like:
-				// "7464caf6-1799-103c-9046-c7b74deb5f63:7464caf6-1799-103c-9046-c7b74deb5f63"
-				$decodedId = base64_decode($ocIdRawString);
-				$separator = ":";
-			}
-			$ocIdParts = \explode($separator, $decodedId);
-			if (\count($ocIdParts) !== 2) {
-				throw new Exception(
-					__METHOD__ . " the oc:id $decodedId for user $user does not have 2 parts separated by '$separator', so the personal space id cannot be discovered"
-				);
-			}
-			$personalSpaceId = $ocIdParts[0];
-		} else {
-			foreach ($json->value as $spaces) {
-				if ($spaces->driveType === "personal") {
-					$personalSpaceId = $spaces->id;
-					break;
-				}
-			}
+			$xmlPart = $responseXmlObject->xpath("/d:multistatus/d:response[1]/d:propstat/d:prop/oc:spaceid");
+			Assert::assertNotEmpty($xmlPart, "The 'oc:spaceid' for user '$user' was not found in the PROPFIND response");
+
+			$personalSpaceId = $xmlPart[0]->__toString();
 		}
-		if ($personalSpaceId) {
-			// If env var LOG_PERSONAL_SPACE_ID is defined, then output the details of the personal space id.
-			// This is a useful debugging tool to have confidence that the personal space id is found correctly.
-			if (\getenv('LOG_PERSONAL_SPACE_ID') !== false) {
-				echo __METHOD__ . " personal space id of user $user is $personalSpaceId\n";
-			}
-			self::$spacesIdRef[$user] = [];
-			self::$spacesIdRef[$user]["personal"] = $personalSpaceId;
-			return $personalSpaceId;
-		} else {
-			throw new SpaceNotFoundException(__METHOD__ . " Personal space not found for user " . $user);
-		}
+
+		Assert::assertNotEmpty($personalSpaceId, "The personal space id for user '$user' was not found");
+
+		self::$spacesIdRef[$user] = [];
+		self::$spacesIdRef[$user]["personal"] = $personalSpaceId;
+		return $personalSpaceId;
 	}
 
 	/**
@@ -654,21 +578,16 @@ class WebDavHelper {
 	 * @throws Exception|GuzzleException
 	 */
 	public static function getPersonalSpaceIdForUserOrFakeIfNotFound(string $baseUrl, string $user, string $password, string $xRequestId):string {
-		try {
-			$spaceId = self::getPersonalSpaceIdForUser(
-				$baseUrl,
-				$user,
-				$password,
-				$xRequestId,
-			);
-		} catch (SpaceNotFoundException $e) {
-			// if the fetch fails, and the user is not found, then a fake space id is prepared
-			// this is useful for testing when the personal space is of a non-existing user
-			$fakeSpaceId = self::generateUUIDv4();
-			self::$spacesIdRef[$user]["personal"] = $fakeSpaceId;
-			$spaceId = $fakeSpaceId;
+		if (\str_starts_with($user, "non-exist") || \str_starts_with($user, "nonexist")) {
+			return self::generateUUIDv4();
 		}
-		return $spaceId;
+
+		return self::getPersonalSpaceIdForUser(
+			$baseUrl,
+			$user,
+			$password,
+			$xRequestId,
+		);
 	}
 
 	/**
@@ -735,12 +654,7 @@ class WebDavHelper {
 		if ($spaceId === null && $davPathVersionToUse === self::DAV_VERSION_SPACES && !\in_array($type, ["public-files", "versions"])) {
 			$path = \ltrim($path, "/");
 			if (\str_starts_with($path, "Shares/")) {
-				$spaceId = self::getSharesSpaceIdForUser(
-					$baseUrl,
-					$user,
-					$password,
-					$xRequestId
-				);
+				$spaceId = GraphHelper::SHARES_SPACE_ID;
 				$path = "/" . preg_replace("/^Shares\//", "", $path);
 			} else {
 				$spaceId = self::getPersonalSpaceIdForUserOrFakeIfNotFound(
