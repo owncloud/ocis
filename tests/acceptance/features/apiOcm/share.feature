@@ -9,20 +9,19 @@ Feature: an user shares resources using ScienceMesh application
     And user "Brian" has been created with default attributes
 
   @issue-9534
-  Scenario Outline: local user shares resources to federation user
+  Scenario: local user shares a folder to federation user
     Given using server "LOCAL"
     And "Alice" has created the federation share invitation
     And using server "REMOTE"
     And "Brian" has accepted invitation
     And using server "LOCAL"
     And user "Alice" has created folder "folderToShare"
-    And user "Alice" has uploaded file with content "ocm test" to "/textfile.txt"
     When user "Alice" sends the following resource share invitation to federated user using the Graph API:
-      | resource        | <resource> |
-      | space           | Personal   |
-      | sharee          | Brian      |
-      | shareType       | user       |
-      | permissionsRole | Viewer     |
+      | resource        | folderToShare |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Viewer        |
     Then the HTTP status code should be "200"
     When using server "REMOTE"
     And user "Brian" lists the shares shared with him without retry using the Graph API
@@ -31,9 +30,7 @@ Feature: an user shares resources using ScienceMesh application
       """
       {
         "type": "object",
-        "required": [
-          "value"
-        ],
+        "required": ["value"],
         "properties": {
           "value": {
             "type": "array",
@@ -45,54 +42,139 @@ Feature: an user shares resources using ScienceMesh application
                 "@UI.Hidden",
                 "@client.synchronize",
                 "createdBy",
-                "name",
                 "eTag",
+                "folder",
+                "id",
+                "lastModifiedDateTime",
+                "name",
+                "parentReference",
                 "remoteItem"
               ],
               "properties": {
-                "@UI.Hidden": {
-                  "type": "boolean",
-                  "enum": [
-                    false
-                  ]
-                },
-                "@client.synchronize": {
-                  "type": "boolean",
-                  "enum": [
-                    false
-                  ]
-                },
+                "@UI.Hidden": { "const": false },
+                "@client.synchronize": { "const": false },
                 "createdBy": {
                   "type": "object",
-                  "required": [
-                    "user"
-                  ],
+                  "required": ["user"],
                   "properties": {
                     "user": {
                       "type": "object",
-                      "required": [
-                        "displayName",
-                        "id"
-                      ],
+                      "required": ["displayName", "id", "@libre.graph.userType"],
                       "properties": {
-                        "displayName": {
-                          "type": "string",
-                          "const": "Alice Hansen"
-                        },
-                        "id": {
-                          "type": "string",
-                          "pattern": "^%federated_user_id_pattern%$"
-                        }
+                        "displayName": { "const": "Alice Hansen" },
+                        "id": { "pattern": "^%federated_user_id_pattern%$" },
+                        "@libre.graph.userType": { "const": "Federated" }
                       }
                     }
                   }
                 },
-                "name": {
-                  "const": "<resource>"
+                "eTag": { "pattern": "%etag_pattern%" },
+                "folder": { "const": {} },
+                "id": { "pattern": "^%file_id_pattern%$" },
+                "name": { "const": "folderToShare" },
+                "parentReference": {
+                  "type": "object",
+                  "required": ["driveId", "driveType", "id"],
+                  "properties": {
+                    "driveId": { "pattern": "^%space_id_pattern%$" },
+                    "driveType": { "const": "virtual" },
+                    "id": { "pattern": "^%file_id_pattern%$" }
+                  }
                 },
-                "eTag": {
-                  "type": "string",
-                  "pattern": "%etag_pattern%"
+                "remoteItem": {
+                  "type": "object",
+                  "required": [
+                    "createdBy",
+                    "eTag",
+                    "folder",
+                    "id",
+                    "lastModifiedDateTime",
+                    "name",
+                    "permissions"
+                  ],
+                  "properties": {
+                    "createdBy": {
+                      "type": "object",
+                      "required": ["user"],
+                      "properties": {
+                        "user": {
+                          "type": "object",
+                          "required": ["id", "displayName", "@libre.graph.userType"],
+                          "properties": {
+                            "id": { "pattern": "^%federated_user_id_pattern%$" },
+                            "displayName": { "const": "Alice Hansen" },
+                            "@libre.graph.userType": { "const": "Federated" }
+                          }
+                        }
+                      }
+                    },
+                    "eTag": { "pattern": "%etag_pattern%" },
+                    "folder": { "const": {} },
+                    "id": { "pattern": "^%federated_file_id_pattern%$" },
+                    "name": { "const": "folderToShare" },
+                    "permissions": {
+                      "type": "array",
+                      "minItems": 1,
+                      "maxItems": 1,
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "createdDateTime",
+                          "grantedToV2",
+                          "id",
+                          "invitation",
+                          "roles"
+                        ],
+                        "properties": {
+                          "grantedToV2": {
+                            "type": "object",
+                            "required": ["user"],
+                            "properties": {
+                              "user": {
+                                "type": "object",
+                                "required": ["displayName", "id", "@libre.graph.userType"],
+                                "properties": {
+                                  "displayName": { "const": "Brian Murphy" },
+                                  "id": { "pattern": "^%user_id_pattern%$" },
+                                  "@libre.graph.userType": { "const": "Member" }
+                                }
+                              }
+                            }
+                          },
+                          "id": { "pattern": "^%uuidv4_pattern%$" },
+                          "invitation": {
+                            "type": "object",
+                            "required": ["invitedBy"],
+                            "properties": {
+                              "invitedBy": {
+                                "type": "object",
+                                "required": ["user"],
+                                "properties": {
+                                  "user": {
+                                    "type": "object",
+                                    "required": ["displayName", "id", "@libre.graph.userType"],
+                                    "properties": {
+                                      "displayName": { "const": "Alice Hansen" },
+                                      "id": { "pattern": "^%federated_user_id_pattern%$" },
+                                      "@libre.graph.userType": { "const": "Federated" }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "roles": {
+                            "type": "array",
+                            "minItems": 1,
+                            "maxItems": 1,
+                            "items": {
+                              "pattern": "^%role_id_pattern%$"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -100,13 +182,196 @@ Feature: an user shares resources using ScienceMesh application
         }
       }
       """
-    Examples:
-      | resource      |
-      | folderToShare |
-      | textfile.txt  |
+
+  @issue-9534
+  Scenario: local user shares a file to federation user
+    Given using server "LOCAL"
+    And "Alice" has created the federation share invitation
+    And using server "REMOTE"
+    And "Brian" has accepted invitation
+    And using server "LOCAL"
+    And user "Alice" has uploaded file with content "ocm test" to "textfile.txt"
+    When user "Alice" sends the following resource share invitation to federated user using the Graph API:
+      | resource        | textfile.txt |
+      | space           | Personal     |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | Viewer       |
+    Then the HTTP status code should be "200"
+    When using server "REMOTE"
+    And user "Brian" lists the shares shared with him without retry using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "@UI.Hidden",
+                "@client.synchronize",
+                "createdBy",
+                "eTag",
+                "file",
+                "id",
+                "lastModifiedDateTime",
+                "name",
+                "parentReference",
+                "remoteItem"
+              ],
+              "properties": {
+                "@UI.Hidden": { "const": false },
+                "@client.synchronize": { "const": false },
+                "createdBy": {
+                  "type": "object",
+                  "required": ["user"],
+                  "properties": {
+                    "user": {
+                      "type": "object",
+                      "required": ["displayName", "id", "@libre.graph.userType"],
+                      "properties": {
+                        "displayName": { "const": "Alice Hansen" },
+                        "id": { "pattern": "^%federated_user_id_pattern%$" },
+                        "@libre.graph.userType": { "const": "Federated" }
+                      }
+                    }
+                  }
+                },
+                "eTag": { "pattern": "%etag_pattern%" },
+                "file": {
+                  "type": "object",
+                  "required": ["mimeType"],
+                  "properties": {
+                    "mimeType": { "const": "text/plain" }
+                  }
+                },
+                "id": { "pattern": "^%file_id_pattern%$" },
+                "name": { "const": "textfile.txt" },
+                "parentReference": {
+                  "type": "object",
+                  "required": ["driveId", "driveType", "id"],
+                  "properties": {
+                    "driveId": { "pattern": "^%space_id_pattern%$" },
+                    "driveType": { "const": "virtual" },
+                    "id": { "pattern": "^%file_id_pattern%$" }
+                  }
+                },
+                "remoteItem": {
+                  "type": "object",
+                  "required": [
+                    "createdBy",
+                    "eTag",
+                    "file",
+                    "id",
+                    "lastModifiedDateTime",
+                    "name",
+                    "permissions"
+                  ],
+                  "properties": {
+                    "createdBy": {
+                      "type": "object",
+                      "required": ["user"],
+                      "properties": {
+                        "user": {
+                          "type": "object",
+                          "required": ["id", "displayName", "@libre.graph.userType"],
+                          "properties": {
+                            "id": { "pattern": "^%federated_user_id_pattern%$" },
+                            "displayName": { "const": "Alice Hansen" },
+                            "@libre.graph.userType": { "const": "Federated" }
+                          }
+                        }
+                      }
+                    },
+                    "eTag": { "pattern": "%etag_pattern%" },
+                    "file": {
+                      "type": "object",
+                      "required": ["mimeType"],
+                      "properties": {
+                        "mimeType": { "const": "text/plain" }
+                      }
+                    },
+                    "id": { "pattern": "^%federated_file_id_pattern%$" },
+                    "name": { "const": "textfile.txt" },
+                    "permissions": {
+                      "type": "array",
+                      "minItems": 1,
+                      "maxItems": 1,
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "createdDateTime",
+                          "grantedToV2",
+                          "id",
+                          "invitation",
+                          "roles"
+                        ],
+                        "properties": {
+                          "grantedToV2": {
+                            "type": "object",
+                            "required": ["user"],
+                            "properties": {
+                              "user": {
+                                "type": "object",
+                                "required": ["displayName", "id", "@libre.graph.userType"],
+                                "properties": {
+                                  "displayName": { "const": "Brian Murphy" },
+                                  "id": { "pattern": "^%user_id_pattern%$" },
+                                  "@libre.graph.userType": { "const": "Member" }
+                                }
+                              }
+                            }
+                          },
+                          "id": { "pattern": "^%uuidv4_pattern%$" },
+                          "invitation": {
+                            "type": "object",
+                            "required": ["invitedBy"],
+                            "properties": {
+                              "invitedBy": {
+                                "type": "object",
+                                "required": ["user"],
+                                "properties": {
+                                  "user": {
+                                    "type": "object",
+                                    "required": ["displayName", "id", "@libre.graph.userType"],
+                                    "properties": {
+                                      "displayName": { "const": "Alice Hansen" },
+                                      "id": { "pattern": "^%federated_user_id_pattern%$" },
+                                      "@libre.graph.userType": { "const": "Federated" }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "roles": {
+                            "type": "array",
+                            "minItems": 1,
+                            "maxItems": 1,
+                            "items": {
+                              "pattern": "^%role_id_pattern%$"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      """
 
 
-  Scenario: local user shares resources from project space to federation user
+  Scenario: local user shares a folder from project space to federation user
     Given using server "LOCAL"
     And "Alice" has created the federation share invitation
     And using server "REMOTE"
@@ -130,7 +395,7 @@ Feature: an user shares resources using ScienceMesh application
       """
       {
         "type": "object",
-        "required": [ "value" ],
+        "required": ["value"],
         "properties": {
           "value": {
             "type": "array",
@@ -142,133 +407,139 @@ Feature: an user shares resources using ScienceMesh application
                 "@UI.Hidden",
                 "@client.synchronize",
                 "createdBy",
-                "name",
                 "eTag",
+                "folder",
+                "id",
+                "lastModifiedDateTime",
+                "name",
+                "parentReference",
                 "remoteItem"
               ],
               "properties": {
-                "@UI.Hidden": {
-                  "const": false
-                },
-                "@client.synchronize": {
-                  "const": false
-                },
+                "@UI.Hidden": { "const": false },
+                "@client.synchronize": { "const": false },
                 "createdBy": {
                   "type": "object",
-                  "required": [ "user" ],
+                  "required": ["user"],
                   "properties": {
                     "user": {
                       "type": "object",
-                      "required": [ "displayName", "id" ],
+                      "required": ["displayName", "id", "@libre.graph.userType"],
                       "properties": {
-                        "displayName": {
-                          "const": "Alice Hansen"
-                        },
-                        "id": {
-                          "type": "string",
-                          "pattern": "^%federated_user_id_pattern%$"
-                        }
+                        "displayName": { "const": "Alice Hansen" },
+                        "id": { "pattern": "^%federated_user_id_pattern%$" },
+                        "@libre.graph.userType": { "const": "Federated" }
                       }
                     }
                   }
                 },
-                "name": {
-                  "const": "folderToShare"
+                "eTag": { "pattern": "%etag_pattern%" },
+                "folder": { "const": {} },
+                "id": { "pattern": "^%file_id_pattern%$" },
+                "name": { "const": "folderToShare" },
+                "parentReference": {
+                  "type": "object",
+                  "required": ["driveId", "driveType", "id"],
+                  "properties": {
+                    "driveId": { "pattern": "^%space_id_pattern%$" },
+                    "driveType": { "const": "virtual" },
+                    "id": { "pattern": "^%file_id_pattern%$" }
+                  }
                 },
-                "eTag": {
-                  "type": "string",
-                  "pattern": "%etag_pattern%"
-                }
-              }
-            }
-          }
-        }
-      }
-      """
-
-  @issue-9534
-  Scenario Outline: federation user shares resource to local user after accepting invitation
-    Given using server "LOCAL"
-    And "Alice" has created the federation share invitation
-    And using server "REMOTE"
-    And "Brian" has accepted invitation
-    And user "Brian" has created folder "folderToShare"
-    And user "Brian" has uploaded file with content "ocm test" to "/textfile.txt"
-    When user "Brian" sends the following resource share invitation to federated user using the Graph API:
-      | resource        | <resource> |
-      | space           | Personal   |
-      | sharee          | Alice      |
-      | shareType       | user       |
-      | permissionsRole | Viewer     |
-    Then the HTTP status code should be "200"
-    When using server "LOCAL"
-    And user "Alice" lists the shares shared with her without retry using the Graph API
-    Then the HTTP status code should be "200"
-    And the JSON data of the response should match
-      """
-      {
-        "type": "object",
-        "required": [
-          "value"
-        ],
-        "properties": {
-          "value": {
-            "type": "array",
-            "minItems": 1,
-            "maxItems": 1,
-            "items": {
-              "type": "object",
-              "required": [
-                "@UI.Hidden",
-                "@client.synchronize",
-                "createdBy",
-                "name",
-                "eTag",
-                "remoteItem"
-              ],
-              "properties": {
-                "@UI.Hidden": {
-                  "type": "boolean",
-                  "enum": [
-                    false
-                  ]
-                },
-                "@client.synchronize": {
-                  "type": "boolean",
-                  "enum": [
-                    false
-                  ]
-                },
-                "createdBy": {
+                "remoteItem": {
                   "type": "object",
                   "required": [
-                    "user"
+                    "createdBy",
+                    "eTag",
+                    "folder",
+                    "id",
+                    "lastModifiedDateTime",
+                    "name",
+                    "permissions"
                   ],
                   "properties": {
-                    "user": {
+                    "createdBy": {
                       "type": "object",
-                      "required": [
-                        "displayName",
-                        "id"
-                      ],
+                      "required": ["user"],
                       "properties": {
-                        "displayName": {
-                          "const": "Brian Murphy"
-                        },
-                        "id": {
-                          "type": "string",
-                          "pattern": "^%federated_user_id_pattern%$"
+                        "user": {
+                          "type": "object",
+                          "required": ["id", "displayName", "@libre.graph.userType"],
+                          "properties": {
+                            "id": { "pattern": "^%federated_user_id_pattern%$" },
+                            "displayName": { "const": "Alice Hansen" },
+                            "@libre.graph.userType": { "const": "Federated" }
+                          }
+                        }
+                      }
+                    },
+                    "eTag": { "pattern": "%etag_pattern%" },
+                    "folder": { "const": {} },
+                    "id": { "pattern": "^%federated_file_id_pattern%$" },
+                    "name": { "const": "folderToShare" },
+                    "permissions": {
+                      "type": "array",
+                      "minItems": 1,
+                      "maxItems": 1,
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "createdDateTime",
+                          "grantedToV2",
+                          "id",
+                          "invitation",
+                          "roles"
+                        ],
+                        "properties": {
+                          "grantedToV2": {
+                            "type": "object",
+                            "required": ["user"],
+                            "properties": {
+                              "user": {
+                                "type": "object",
+                                "required": ["displayName", "id", "@libre.graph.userType"],
+                                "properties": {
+                                  "displayName": { "const": "Brian Murphy" },
+                                  "id": { "pattern": "^%user_id_pattern%$" },
+                                  "@libre.graph.userType": { "const": "Member" }
+                                }
+                              }
+                            }
+                          },
+                          "id": { "pattern": "^%uuidv4_pattern%$" },
+                          "invitation": {
+                            "type": "object",
+                            "required": ["invitedBy"],
+                            "properties": {
+                              "invitedBy": {
+                                "type": "object",
+                                "required": ["user"],
+                                "properties": {
+                                  "user": {
+                                    "type": "object",
+                                    "required": ["displayName", "id", "@libre.graph.userType"],
+                                    "properties": {
+                                      "displayName": { "const": "Alice Hansen" },
+                                      "id": { "pattern": "^%federated_user_id_pattern%$" },
+                                      "@libre.graph.userType": { "const": "Federated" }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "roles": {
+                            "type": "array",
+                            "minItems": 1,
+                            "maxItems": 1,
+                            "items": {
+                              "pattern": "^%role_id_pattern%$"
+                            }
+                          }
                         }
                       }
                     }
                   }
-                },
-                "name": {
-                  "const": "<resource>"
-                },
-                "eTag": {
-                  "type": "string",
-                  "pattern": "%etag_pattern%"
                 }
               }
             }
@@ -276,10 +547,6 @@ Feature: an user shares resources using ScienceMesh application
         }
       }
       """
-    Examples:
-      | resource      |
-      | folderToShare |
-      | textfile.txt  |
 
   @issue-10051
   Scenario Outline: try to add federated user as a member of a project space (permissions endpoint)
@@ -845,25 +1112,25 @@ Feature: an user shares resources using ScienceMesh application
     And for user "Alice" the content of the file "textfile.txt" of the space "Personal" should be "this is a new content"
 
   @issue-10488
-  Scenario Outline: local user shares a folder copied from an already shared folder to federation user
+  Scenario: local user shares a folder copied from an already shared folder to federation user
     Given using server "REMOTE"
     And "Brian" has created the federation share invitation
     And using server "LOCAL"
     And "Alice" has accepted invitation
     And user "Alice" has created folder "folderToShare"
     And user "Alice" has sent the following resource share invitation to federated user:
-      | resource        | folderToShare        |
-      | space           | Personal             |
-      | sharee          | Brian                |
-      | shareType       | user                 |
-      | permissionsRole | <permissions-role-1> |
+      | resource        | folderToShare |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Editor        |
     And user "Alice" has copied folder "folderToShare" to "folderToShareCopy"
     And user "Alice" has sent the following resource share invitation to federated user:
-      | resource        | folderToShareCopy    |
-      | space           | Personal             |
-      | sharee          | Brian                |
-      | shareType       | user                 |
-      | permissionsRole | <permissions-role-2> |
+      | resource        | folderToShareCopy |
+      | space           | Personal          |
+      | sharee          | Brian             |
+      | shareType       | user              |
+      | permissionsRole | Viewer            |
     And using server "REMOTE"
     When user "Brian" lists the shares shared with him using the Graph API
     Then the HTTP status code should be "200"
@@ -899,6 +1166,21 @@ Feature: an user shares resources using ScienceMesh application
                   "properties": {
                     "name": {
                       "const": "folderToShare"
+                    },
+                    "remoteItem": {
+                      "type": "object",
+                      "required": ["permissions"],
+                      "properties": {
+                        "permissions": {
+                          "type": "array",
+                          "minItems": 1,
+                          "maxItems": 1,
+                          "items": {
+                            "type": "object",
+                            "required": ["@libre.graph.permissions.actions"]
+                          }
+                        }
+                      }
                     }
                   }
                 },
@@ -919,6 +1201,25 @@ Feature: an user shares resources using ScienceMesh application
                   "properties": {
                     "name": {
                       "const": "folderToShareCopy"
+                    },
+                    "remoteItem": {
+                      "type": "object",
+                      "required": ["permissions"],
+                      "properties": {
+                        "permissions": {
+                          "type": "array",
+                          "minItems": 1,
+                          "maxItems": 1,
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "@libre.graph.permissions.actions": {
+                                "type": "null"
+                              }
+                            }
+                          }
+                        }
+                      }
                     }
                   }
                 }
@@ -928,14 +1229,3 @@ Feature: an user shares resources using ScienceMesh application
         }
       }
       """
-    Examples:
-      | permissions-role-1 | permissions-role-2 |
-      | Editor             | Viewer             |
-      | Editor             | Uploader           |
-      | Editor             | Editor             |
-      | Uploader           | Editor             |
-      | Uploader           | Viewer             |
-      | Uploader           | Uploader           |
-      | Viewer             | Uploader           |
-      | Viewer             | Editor             |
-      | Viewer             | Viewer             |
