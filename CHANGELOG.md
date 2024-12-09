@@ -66,6 +66,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix deny access for graph roles: [#10627](https://github.com/owncloud/ocis/pull/10627)
 * Bugfix - Fix possible race condition when a thumbnails is stored in the FS: [#10693](https://github.com/owncloud/ocis/pull/10693)
 * Bugfix - Skip fetching members: [#10701](https://github.com/owncloud/ocis/pull/10701)
+* Bugfix - Fix FileInfo BreadcrumbFolderURL: [#10718](https://github.com/owncloud/ocis/pull/10718)
 * Bugfix - Bump Reva: [#10735](https://github.com/owncloud/ocis/pull/10735)
 * Enhancement - Fetch shared resource metadata concurrently in graph: [#10683](https://github.com/owncloud/ocis/pull/10683)
 
@@ -94,6 +95,12 @@ The following sections list the changes for unreleased.
    We now skip fetching group members when they are not needed.
 
    https://github.com/owncloud/ocis/pull/10701
+
+* Bugfix - Fix FileInfo BreadcrumbFolderURL: [#10718](https://github.com/owncloud/ocis/pull/10718)
+
+   We fixed the FileInfo.BreadcrumbFolderURL in a collaboration api"
+
+   https://github.com/owncloud/ocis/pull/10718
 
 * Bugfix - Bump Reva: [#10735](https://github.com/owncloud/ocis/pull/10735)
 
