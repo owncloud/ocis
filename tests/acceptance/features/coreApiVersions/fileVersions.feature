@@ -20,12 +20,15 @@ Feature: dav-versions
       | spaces           |
 
 
-  Scenario: upload file and no version is available using various chunking methods
-    When user "Alice" uploads file "filesForUpload/davtest.txt" to filenames based on "/davtest.txt" with all mechanisms using the WebDAV API
-    Then the HTTP status code of all upload responses should be "201"
-    And the version folder of file "/davtest.txt-1dav-regular" for user "Alice" should contain "0" elements
-    And the version folder of file "/davtest.txt-2dav-regular" for user "Alice" should contain "0" elements
-    And the version folder of file "/davtest.txt-3dav-3chunking" for user "Alice" should contain "0" elements
+  Scenario Outline: no version is available while uploading a file with multiple chunks
+    Given using <dav-path-version> DAV path
+    When user "Alice" uploads file "filesForUpload/davtest.txt" to "lorem.txt" in 2 chunks using the WebDAV API
+    Then the version folder of file "lorem.txt" for user "Alice" should contain "0" elements
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
 
   @smokeTest
   Scenario Outline: upload a file twice and versions are available
@@ -42,13 +45,17 @@ Feature: dav-versions
       | spaces           |
 
 
-  Scenario: upload a file twice and versions are available using various chunking methods
-    When user "Alice" uploads file "filesForUpload/davtest.txt" to filenames based on "/davtest.txt" with all mechanisms using the WebDAV API
-    And user "Alice" uploads file "filesForUpload/davtest.txt" to filenames based on "/davtest.txt" with all mechanisms using the WebDAV API
-    Then the HTTP status code of all upload responses should be between "201" and "204"
-    And the version folder of file "/davtest.txt-1dav-regular" for user "Alice" should contain "1" element
-    And the version folder of file "/davtest.txt-2dav-regular" for user "Alice" should contain "1" element
-    And the version folder of file "/davtest.txt-3dav-3chunking" for user "Alice" should contain "1" element
+  Scenario Outline: versions are available while uploading a file twice with multiple chunks
+    Given using <dav-path-version> DAV path
+    When user "Alice" uploads file "filesForUpload/davtest.txt" to "lorem.txt" in 2 chunks using the WebDAV API
+    And user "Alice" uploads file "filesForUpload/davtest.txt" to "lorem.txt" in 3 chunks using the WebDAV API
+    Then the HTTP status code of responses on all endpoints should be "201"
+    And the version folder of file "lorem.txt" for user "Alice" should contain "1" element
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
 
   @smokeTest
   Scenario Outline: remove a file

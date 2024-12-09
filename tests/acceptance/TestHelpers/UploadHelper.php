@@ -46,6 +46,7 @@ class UploadHelper extends Assert {
 	 * @param string|null $xRequestId
 	 * @param array|null $headers
 	 * @param int|null $davPathVersionToUse (1|2)
+	 * @param bool $doChunkUpload
 	 * @param int|null $noOfChunks how many chunks to upload
 	 * @param bool|null $isGivenStep
 	 *
@@ -61,10 +62,11 @@ class UploadHelper extends Assert {
 		?string $xRequestId = '',
 		?array $headers = [],
 		?int $davPathVersionToUse = 1,
+		bool $doChunkUpload = false,
 		?int $noOfChunks = 1,
-		?bool $isGivenStep = false
+		?bool $isGivenStep = false,
 	): ResponseInterface {
-		if ($noOfChunks === 1) {
+		if (!$doChunkUpload) {
 			$data = \file_get_contents($source);
 			return WebDavHelper::makeDavRequest(
 				$baseUrl,
@@ -125,55 +127,6 @@ class UploadHelper extends Assert {
 
 		self::assertNotNull($result, __METHOD__ . " chunking was requested but no upload was done.");
 		return $result;
-	}
-
-	/**
-	 * Upload the same file multiple times with different mechanisms.
-	 *
-	 * @param string|null $baseUrl URL of owncloud
-	 * @param string|null $user user who uploads
-	 * @param string|null $password
-	 * @param string|null $source source file path
-	 * @param string|null $destination destination path on the server
-	 * @param string|null $xRequestId
-	 * @param bool $overwriteMode when false creates separate files to test uploading brand-new files,
-	 *                            when true it just overwrites the same file over and over again with the same name
-	 *
-	 * @return array of ResponseInterface
-	 * @throws GuzzleException
-	 */
-	public static function uploadWithAllMechanisms(
-		?string $baseUrl,
-		?string $user,
-		?string $password,
-		?string $source,
-		?string $destination,
-		?string $xRequestId = '',
-		?bool $overwriteMode = false,
-	):array {
-		$responses = [];
-		foreach ([WebDavHelper::DAV_VERSION_OLD, WebDavHelper::DAV_VERSION_NEW, WebDavHelper::DAV_VERSION_SPACES] as $davPathVersion) {
-			foreach ([false, true] as $chunkingUse) {
-				$finalDestination = $destination;
-				if (!$overwriteMode && $chunkingUse) {
-					$finalDestination .= "-{$davPathVersion}dav-{$davPathVersion}chunking";
-				} elseif (!$overwriteMode && !$chunkingUse) {
-					$finalDestination .= "-{$davPathVersion}dav-regular";
-				}
-				$responses[] = self::upload(
-					$baseUrl,
-					$user,
-					$password,
-					$source,
-					$finalDestination,
-					$xRequestId,
-					[],
-					$davPathVersion,
-					2
-				);
-			}
-		}
-		return $responses;
 	}
 
 	/**
