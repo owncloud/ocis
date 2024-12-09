@@ -366,8 +366,7 @@ class TUSContext implements Context {
 			'Authorization' => 'Basic ' . \base64_encode("public" . ':' . $password),
 		];
 		$sourceFile = $this->featureContext->acceptanceTestsDirLocation() . $source;
-		$davPath = WebdavHelper::getDavPath(WebDavHelper::DAV_VERSION_SPACES, $token, "public-files");
-		$url = $davPath;
+		$url = WebdavHelper::getDavPath(WebDavHelper::DAV_VERSION_SPACES, $token, "public-files");
 
 		$client = new Client(
 			$this->featureContext->getBaseUrl(),
