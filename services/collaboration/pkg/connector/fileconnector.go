@@ -16,6 +16,7 @@ import (
 	gatewayv1beta1 "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
+	link "github.com/cs3org/go-cs3apis/cs3/sharing/link/v1beta1"
 	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
@@ -1206,7 +1207,7 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (*ConnectorResponse, 
 		}
 	}
 
-	breadcrumbFolderName := path.Dir(statRes.Info.Path)
+	breadcrumbFolderName := path.Dir(statRes.GetInfo().GetPath())
 	if breadcrumbFolderName == "." || breadcrumbFolderName == "" || breadcrumbFolderName == "/" {
 		breadcrumbFolderName = statRes.GetInfo().GetSpace().GetName()
 	}
@@ -1222,6 +1223,22 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (*ConnectorResponse, 
 	privateLinkURL := &url.URL{}
 	*privateLinkURL = *ocisURL
 	privateLinkURL.Path = path.Join(ocisURL.Path, "f", storagespace.FormatResourceID(statRes.GetInfo().GetId()))
+	parentFolderURL := &url.URL{}
+	*parentFolderURL = *ocisURL
+	if !isPublicShare {
+		parentFolderURL.Path = path.Join(ocisURL.Path, "f", storagespace.FormatResourceID(statRes.GetInfo().GetParentId()))
+	} else {
+		if scopes, ok := ctxpkg.ContextGetScopes(ctx); ok {
+			publicShare := &link.PublicShare{}
+			if err := helpers.GetScopeByKeyPrefix(scopes, "publicshare:", publicShare); err == nil {
+				parentFolderURL.Path = path.Join(ocisURL.Path, "s", publicShare.GetToken())
+			} else {
+				logger.Error().Err(err).Msg("CheckFileInfo: error getting public share scope")
+			}
+		} else {
+			logger.Error().Err(err).Msg("CheckFileInfo: error getting scopes from the context")
+		}
+	}
 	// fileinfo map
 	infoMap := map[string]interface{}{
 		fileinfo.KeyOwnerID:           hexEncodedOwnerId,
@@ -1231,7 +1248,7 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (*ConnectorResponse, 
 		fileinfo.KeyBreadcrumbDocName: path.Base(statRes.GetInfo().GetPath()),
 		// to get the folder we actually need to do a GetPath() request
 		fileinfo.KeyBreadcrumbFolderName: breadcrumbFolderName,
-		fileinfo.KeyBreadcrumbFolderURL:  privateLinkURL.String(),
+		fileinfo.KeyBreadcrumbFolderURL:  parentFolderURL.String(),
 
 		fileinfo.KeyHostViewURL:    createHostUrl("view", ocisURL, f.cfg.App.Name, statRes.GetInfo()),
 		fileinfo.KeyHostEditURL:    createHostUrl("write", ocisURL, f.cfg.App.Name, statRes.GetInfo()),

@@ -10,12 +10,15 @@ import (
 	"strings"
 
 	appproviderv1beta1 "github.com/cs3org/go-cs3apis/cs3/app/provider/v1beta1"
+	auth "github.com/cs3org/go-cs3apis/cs3/auth/provider/v1beta1"
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	link "github.com/cs3org/go-cs3apis/cs3/sharing/link/v1beta1"
 	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
+	"github.com/cs3org/reva/v2/pkg/utils"
 	cs3mocks "github.com/cs3org/reva/v2/tests/cs3mocks/mocks"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -1686,6 +1689,11 @@ var _ = Describe("FileConnector", func() {
 						OpaqueId:  "opaqueid",
 						SpaceId:   "spaceid",
 					},
+					ParentId: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "parentopaqueid",
+						SpaceId:   "spaceid",
+					},
 				},
 			}, nil)
 
@@ -1696,7 +1704,7 @@ var _ = Describe("FileConnector", func() {
 				BaseFileName:               "test.txt",
 				BreadcrumbDocName:          "test.txt",
 				BreadcrumbFolderName:       "/path/to",
-				BreadcrumbFolderURL:        "https://ocis.example.prv/f/storageid$spaceid%21opaqueid",
+				BreadcrumbFolderURL:        "https://ocis.example.prv/f/storageid$spaceid%21parentopaqueid",
 				UserCanNotWriteRelative:    false,
 				SupportsExtendedLockLength: true,
 				SupportsGetLock:            true,
@@ -1755,6 +1763,11 @@ var _ = Describe("FileConnector", func() {
 						OpaqueId:  "opaqueid",
 						SpaceId:   "spaceid",
 					},
+					ParentId: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "parentopaqueid",
+						SpaceId:   "spaceid",
+					},
 					// Other properties aren't used for now.
 				},
 			}, nil)
@@ -1796,6 +1809,109 @@ var _ = Describe("FileConnector", func() {
 			Expect(response.Body.(*fileinfo.Collabora)).To(Equal(expectedFileInfo))
 		})
 
+		It("Stat success guests", func() {
+			ResourceId := &providerv1beta1.ResourceId{
+				StorageId: "storageid",
+				OpaqueId:  "opaqueid",
+				SpaceId:   "spaceid",
+			}
+
+			// add user's opaque to include public-share-role
+			u := &userv1beta1.User{}
+			u.Opaque = &typesv1beta1.Opaque{
+				Map: map[string]*typesv1beta1.OpaqueEntry{
+					"public-share-role": {
+						Decoder: "plain",
+						Value:   []byte("viewer"),
+					},
+				},
+			}
+			// Create a new "scope share" to only expose the required fields `ResourceId` and `Token` to the scope.
+			scopeShare := &link.PublicShare{ResourceId: ResourceId, Token: "ABC123"}
+			val, err := utils.MarshalProtoV1ToJSON(scopeShare)
+			Expect(err).ToNot(HaveOccurred())
+
+			scopes := map[string]*auth.Scope{
+				"publicshare:ABC123": {
+					Resource: &typesv1beta1.OpaqueEntry{
+						Decoder: "json",
+						Value:   val,
+					},
+					Role: auth.Role(appproviderv1beta1.ViewMode_VIEW_MODE_VIEW_ONLY), //
+				},
+			}
+			// change view mode to view only
+			wopiCtx.ViewMode = appproviderv1beta1.ViewMode_VIEW_MODE_VIEW_ONLY
+
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+			ctx = ctxpkg.ContextSetUser(ctx, u)
+			ctx = ctxpkg.ContextSetScopes(ctx, scopes)
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Owner: &userv1beta1.UserId{
+						Idp:      "customIdp",
+						OpaqueId: "aabbcc",
+						Type:     userv1beta1.UserType_USER_TYPE_PRIMARY,
+					},
+					Size: uint64(998877),
+					Mtime: &typesv1beta1.Timestamp{
+						Seconds: uint64(16273849),
+					},
+					Path: "/path/to/test.txt",
+					Id:   ResourceId,
+					ParentId: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "parentopaqueid",
+						SpaceId:   "spaceid",
+					},
+					// Other properties aren't used for now.
+				},
+			}, nil)
+
+			// change wopi app provider
+			cfg.App.Name = "OnlyOffice"
+			cfg.App.Product = "OnlyOffice"
+
+			expectedFileInfo := &fileinfo.OnlyOffice{
+				Version:                 "v162738490",
+				BaseFileName:            "test.txt",
+				BreadcrumbDocName:       "test.txt",
+				BreadcrumbFolderName:    "/path/to",
+				BreadcrumbFolderURL:     "https://ocis.example.prv/s/ABC123",
+				DisablePrint:            true,
+				UserCanNotWriteRelative: false,
+				SupportsLocks:           true,
+				SupportsUpdate:          true,
+				SupportsRename:          true,
+				IsAnonymousUser:         true,
+				UserCanRename:           false,
+				UserCanReview:           false,
+				UserCanWrite:            false,
+				EnableInsertRemoteImage: false,
+				UserID:                  "guest-zzz000",
+				UserFriendlyName:        "guest zzz000",
+				FileSharingURL:          "https://ocis.example.prv/f/storageid$spaceid%21opaqueid?details=sharing",
+				FileVersionURL:          "https://ocis.example.prv/f/storageid$spaceid%21opaqueid?details=versions",
+				HostEditURL:             "https://ocis.example.prv/external-onlyoffice/path/to/test.txt?fileId=storageid%24spaceid%21opaqueid&view_mode=write",
+				PostMessageOrigin:       "https://ocis.example.prv",
+			}
+
+			response, err := fc.CheckFileInfo(ctx)
+
+			// UserID and UserFriendlyName have random Ids generated which are impossible to guess
+			// Check both separately
+			Expect(response.Body.(*fileinfo.OnlyOffice).UserID).To(HavePrefix(hex.EncodeToString([]byte("guest-"))))
+			Expect(response.Body.(*fileinfo.OnlyOffice).UserFriendlyName).To(HavePrefix("Guest "))
+			// overwrite UserID and UserFriendlyName here for easier matching
+			response.Body.(*fileinfo.OnlyOffice).UserID = "guest-zzz000"
+			response.Body.(*fileinfo.OnlyOffice).UserFriendlyName = "guest zzz000"
+			Expect(err).ToNot(HaveOccurred())
+			Expect(response.Status).To(Equal(200))
+			Expect(response.Body.(*fileinfo.OnlyOffice)).To(Equal(expectedFileInfo))
+		})
+
 		It("Stat success authenticated user", func() {
 			// change view mode to view only
 			wopiCtx.ViewMode = appproviderv1beta1.ViewMode_VIEW_MODE_VIEW_ONLY
@@ -1828,6 +1944,11 @@ var _ = Describe("FileConnector", func() {
 					Id: &providerv1beta1.ResourceId{
 						StorageId: "storageid",
 						OpaqueId:  "opaqueid",
+						SpaceId:   "spaceid",
+					},
+					ParentId: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "parentopaqueid",
 						SpaceId:   "spaceid",
 					},
 				},
@@ -1898,6 +2019,11 @@ var _ = Describe("FileConnector", func() {
 						OpaqueId:  "opaqueid",
 						SpaceId:   "spaceid",
 					},
+					ParentId: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "parentopaqueid",
+						SpaceId:   "spaceid",
+					},
 				},
 			}, nil)
 
@@ -1906,7 +2032,7 @@ var _ = Describe("FileConnector", func() {
 				BaseFileName:            "test.txt",
 				BreadcrumbDocName:       "test.txt",
 				BreadcrumbFolderName:    "/path/to",
-				BreadcrumbFolderURL:     "https://ocis.example.prv/f/storageid$spaceid%21opaqueid",
+				BreadcrumbFolderURL:     "https://ocis.example.prv/f/storageid$spaceid%21parentopaqueid",
 				UserCanNotWriteRelative: false,
 				SupportsLocks:           true,
 				SupportsUpdate:          true,

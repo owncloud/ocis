@@ -120,18 +120,20 @@ func WopiContextAuthMiddleware(cfg *config.Config, st microstore.Store, next htt
 			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 			return
 		}
-		user, _, err := tokenManager.DismantleToken(ctx, wopiContextAccessToken)
+		user, scopes, err := tokenManager.DismantleToken(ctx, wopiContextAccessToken)
 		if err != nil {
 			wopiLogger.Error().Err(err).Msg("failed to dismantle reva token manager")
 			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 			return
 		}
+
 		claims.WopiContext.AccessToken = wopiContextAccessToken
 
 		ctx = context.WithValue(ctx, wopiContextKey, claims.WopiContext)
 		// authentication for the CS3 api
 		ctx = metadata.AppendToOutgoingContext(ctx, ctxpkg.TokenHeader, claims.WopiContext.AccessToken)
 		ctx = ctxpkg.ContextSetUser(ctx, user)
+		ctx = ctxpkg.ContextSetScopes(ctx, scopes)
 
 		// include additional info in the context's logger
 		wopiLogger = wopiLogger.With().
