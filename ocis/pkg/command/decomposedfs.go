@@ -24,6 +24,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/store"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config"
 	"github.com/owncloud/ocis/v2/ocis/pkg/register"
+	"github.com/rs/zerolog"
 	"github.com/urfave/cli/v2"
 )
 
@@ -96,7 +97,7 @@ func check(c *cli.Context) error {
 		return err
 	}
 
-	tree := tree.New(lu, bs, o, store.Create())
+	tree := tree.New(lu, bs, o, store.Create(), &zerolog.Logger{})
 
 	nId := c.String("node")
 	n, err := lu.NodeFromSpaceID(context.Background(), nId)
