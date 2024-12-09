@@ -66,6 +66,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix deny access for graph roles: [#10627](https://github.com/owncloud/ocis/pull/10627)
 * Bugfix - Fix possible race condition when a thumbnails is stored in the FS: [#10693](https://github.com/owncloud/ocis/pull/10693)
 * Bugfix - Skip fetching members: [#10701](https://github.com/owncloud/ocis/pull/10701)
+* Bugfix - Bump Reva: [#10735](https://github.com/owncloud/ocis/pull/10735)
 * Enhancement - Fetch shared resource metadata concurrently in graph: [#10683](https://github.com/owncloud/ocis/pull/10683)
 
 ## Details
@@ -93,6 +94,20 @@ The following sections list the changes for unreleased.
    We now skip fetching group members when they are not needed.
 
    https://github.com/owncloud/ocis/pull/10701
+
+* Bugfix - Bump Reva: [#10735](https://github.com/owncloud/ocis/pull/10735)
+
+   Bumps reva version to 2.26.8
+
+  *   Fix [cs3org/reva#4983](https://github.com/cs3org/reva/pull/4983): Delete stale shares in the jsoncs3 share manager
+  *   Fix [cs3org/reva#4963](https://github.com/cs3org/reva/pull/4963): Fix name and displayName in an ocm
+  *   Fix [cs3org/reva#4968](https://github.com/cs3org/reva/pull/4968): Jsoncs3 cache fixes
+  *   Fix [cs3org/reva#4928](https://github.com/cs3org/reva/pull/4928): Propagate lock in PROPPATCH
+  *   Fix [cs3org/reva#4971](https://github.com/cs3org/reva/pull/4971): Use manager to list shares
+  *   Fix [cs3org/reva#4978](https://github.com/cs3org/reva/pull/4978): We added more trace spans in decomposedfs
+  *   Fix [cs3org/reva#4921](https://github.com/cs3org/reva/pull/4921): Polish propagation related code
+
+   https://github.com/owncloud/ocis/pull/10735
 
 * Enhancement - Fetch shared resource metadata concurrently in graph: [#10683](https://github.com/owncloud/ocis/pull/10683)
 
