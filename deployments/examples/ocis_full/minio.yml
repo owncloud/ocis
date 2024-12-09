@@ -19,9 +19,9 @@ services:
       MINIO_SECRET_KEY: ${S3NG_SECRET_KEY:-ocis-secret-key}
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.minio.entrypoints=https"
+      - "traefik.http.routers.minio.entrypoints=letsencrypt_https"
       - "traefik.http.routers.minio.rule=Host(`${MINIO_DOMAIN:-minio.owncloud.test}`)"
-      - "traefik.http.routers.minio.tls.certresolver=http"
+      - "traefik.http.routers.minio.tls.certresolver=letsencrypt_http"
       - "traefik.http.routers.minio.service=minio"
       - "traefik.http.services.minio.loadbalancer.server.port=9001"
     logging:
