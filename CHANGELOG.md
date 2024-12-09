@@ -67,6 +67,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix possible race condition when a thumbnails is stored in the FS: [#10693](https://github.com/owncloud/ocis/pull/10693)
 * Bugfix - Skip fetching members: [#10701](https://github.com/owncloud/ocis/pull/10701)
 * Bugfix - Fix FileInfo BreadcrumbFolderURL: [#10718](https://github.com/owncloud/ocis/pull/10718)
+* Bugfix - Fix graph drives response for federated shares: [#10730](https://github.com/owncloud/ocis/pull/10730)
 * Bugfix - Bump Reva: [#10735](https://github.com/owncloud/ocis/pull/10735)
 * Enhancement - Fetch shared resource metadata concurrently in graph: [#10683](https://github.com/owncloud/ocis/pull/10683)
 
@@ -101,6 +102,14 @@ The following sections list the changes for unreleased.
    We fixed the FileInfo.BreadcrumbFolderURL in a collaboration api"
 
    https://github.com/owncloud/ocis/pull/10718
+
+* Bugfix - Fix graph drives response for federated shares: [#10730](https://github.com/owncloud/ocis/pull/10730)
+
+   Federated shares where erroneously showing up in the /me/drives response on the
+   graph API.
+
+   https://github.com/owncloud/ocis/issues/10689
+   https://github.com/owncloud/ocis/pull/10730
 
 * Bugfix - Bump Reva: [#10735](https://github.com/owncloud/ocis/pull/10735)
 
