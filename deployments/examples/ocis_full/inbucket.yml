@@ -24,9 +24,9 @@ services:
       INBUCKET_STORAGE_MAILBOXMSGCAP: 1000
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.inbucket.entrypoints=https"
+      - "traefik.http.routers.inbucket.entrypoints=letsencrypt_https"
       - "traefik.http.routers.inbucket.rule=Host(`${INBUCKET_DOMAIN:-mail.owncloud.test}`)"
-      - "traefik.http.routers.inbucket.tls.certresolver=http"
+      - "traefik.http.routers.inbucket.tls.certresolver=letsencrypt_http"
       - "traefik.http.routers.inbucket.service=inbucket"
       - "traefik.http.services.inbucket.loadbalancer.server.port=9000"
     logging:
