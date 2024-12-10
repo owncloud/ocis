@@ -204,7 +204,7 @@ func (s *ActivitylogService) HandleGetItemActivities(w http.ResponseWriter, r *h
 				WithVar("resource", storagespace.FormatResourceID(ev.ItemID), ev.ResourceName),
 				WithUser(ev.Executant, nil, nil),
 				WithTranslation(&t, loc, "field", []string{ev.FieldUpdated}),
-				WithVar("token", ev.ItemID.GetOpaqueId(), ev.Token))
+				WithVar("token", ev.ItemID.GetOpaqueId(), ev.DisplayName))
 		case events.LinkRemoved:
 			message = MessageLinkDeleted
 			ts = utils.TSToTime(ev.Timestamp)
