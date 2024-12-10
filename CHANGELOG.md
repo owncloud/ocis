@@ -66,6 +66,7 @@ The following sections list the changes for unreleased.
 
 * Bugfix - Fix link activity message: [#10663](https://github.com/owncloud/ocis/pull/10663)
 * Bugfix - Fix graph drives response for federated shares: [#10730](https://github.com/owncloud/ocis/pull/10730)
+* Bugfix - GetLastModified property in the REPORT response will use RFC1123 format: [#10738](https://github.com/owncloud/ocis/pull/10738)
 * Enhancement - Update web to v11.0.6: [#10755](https://github.com/owncloud/ocis/pull/10755)
 
 ## Details
@@ -84,6 +85,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/10689
    https://github.com/owncloud/ocis/pull/10730
+
+* Bugfix - GetLastModified property in the REPORT response will use RFC1123 format: [#10738](https://github.com/owncloud/ocis/pull/10738)
+
+   This will follow the standard and will also match the format of the same
+   property in the PROPFIND response
+
+   https://github.com/owncloud/ocis/pull/10738
 
 * Enhancement - Update web to v11.0.6: [#10755](https://github.com/owncloud/ocis/pull/10755)
 
