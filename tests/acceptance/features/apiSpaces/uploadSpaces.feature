@@ -94,7 +94,7 @@ Feature: Upload files into a space
       | foo/bar     |
       | foo/bar/baz |
 
-  @issue-10649
+  @issue-10331 @issue-10469
   Scenario: public uploads a zero byte file to a public share folder
     Given using SharingNG
     And user "Alice" has created folder "/uploadFolder"
@@ -110,15 +110,15 @@ Feature: Upload files into a space
     And for user "Alice" folder "uploadFolder" of the space "Personal" should not contain these files:
       | textfile (1).txt |
 
-  @issue-10649
+  @issue-10331 @issue-10469
   Scenario: public uploads a zero byte file to a public share folder inside project space
     Given using SharingNG
     And user "Alice" has created a folder "/uploadFolder" in space "Project Ceres"
     And user "Alice" has created the following resource link share:
-      | resource        | uploadFolder |
-      | space           | Project Ceres     |
-      | permissionsRole | createOnly   |
-      | password        | %public%     |
+      | resource        | uploadFolder  |
+      | space           | Project Ceres |
+      | permissionsRole | createOnly    |
+      | password        | %public%      |
     When the public uploads file "filesForUpload/zerobyte.txt" to "textfile.txt" inside last link shared folder with password "%public%" using the public WebDAV API
     Then the HTTP status code should be "201"
     And for user "Alice" folder "uploadFolder" of the space "Project Ceres" should contain these files:
@@ -126,13 +126,13 @@ Feature: Upload files into a space
     And for user "Alice" folder "uploadFolder" of the space "Project Ceres" should not contain these files:
       | textfile (1).txt |
 
-  @issue-10649
+  @issue-10331 @issue-10469
   Scenario: public uploads a zero byte file to a public share project space
     Given using SharingNG
     And user "Alice" has created the following space link share:
-      | space           | Project Ceres  |
-      | permissionsRole | createOnly     |
-      | password        | %public% |
+      | space           | Project Ceres |
+      | permissionsRole | createOnly    |
+      | password        | %public%      |
     When the public uploads file "filesForUpload/zerobyte.txt" to "textfile.txt" inside last link shared folder with password "%public%" using the public WebDAV API
     Then the HTTP status code should be "201"
     And for user "Alice" the space "Project Ceres" should contain these files:

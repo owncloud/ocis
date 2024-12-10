@@ -403,7 +403,7 @@ Feature: upload resources on share using TUS protocol
     Then the HTTP status code should be "460"
     And for user "Alice" the content of the file "/textFile.txt" of the space "Personal" should be "original content"
 
-  @issue-10649
+  @issue-10331 @issue-10469
   Scenario: public uploads a zero byte file to a public share folder
     Given using SharingNG
     And user "Alice" has created folder "/uploadFolder"
@@ -418,7 +418,7 @@ Feature: upload resources on share using TUS protocol
     And for user "Alice" folder "uploadFolder" of the space "Personal" should not contain these files:
       | textfile (1).txt |
 
-  @issue-10649
+  @issue-10331 @issue-10469
   Scenario: public uploads a zero-byte file to a shared folder inside project space
     Given using SharingNG
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
@@ -426,7 +426,7 @@ Feature: upload resources on share using TUS protocol
     And user "Alice" has created a folder "/uploadFolder" in space "Project"
     And user "Alice" has created the following resource link share:
       | resource        | uploadFolder |
-      | space           | Project     |
+      | space           | Project      |
       | permissionsRole | createOnly   |
       | password        | %public%     |
     When the public uploads a file from "filesForUpload/zerobyte.txt" to "textfile.txt" via TUS inside last link shared folder with password "%public%" using the WebDAV API
@@ -435,7 +435,7 @@ Feature: upload resources on share using TUS protocol
     And for user "Alice" folder "uploadFolder" of the space "Project" should not contain these files:
       | textfile (1).txt |
 
-  @issue-10649
+  @issue-10331 @issue-10469
   Scenario: public uploads a zero-byte file to a public share project space
     Given using SharingNG
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
