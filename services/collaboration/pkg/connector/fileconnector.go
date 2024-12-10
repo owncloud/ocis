@@ -6,6 +6,7 @@ import (
 	"encoding/base64"
 	"encoding/binary"
 	"encoding/hex"
+	"fmt"
 	"io"
 	"net/url"
 	"path"
@@ -13,6 +14,7 @@ import (
 	"time"
 
 	appproviderv1beta1 "github.com/cs3org/go-cs3apis/cs3/app/provider/v1beta1"
+	auth "github.com/cs3org/go-cs3apis/cs3/auth/provider/v1beta1"
 	gatewayv1beta1 "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
@@ -23,6 +25,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
+	"github.com/golang/protobuf/proto"
 	"github.com/google/uuid"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/connector/fileinfo"
@@ -1230,7 +1233,7 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (*ConnectorResponse, 
 	} else {
 		if scopes, ok := ctxpkg.ContextGetScopes(ctx); ok {
 			publicShare := &link.PublicShare{}
-			if err := helpers.GetScopeByKeyPrefix(scopes, "publicshare:", publicShare); err == nil {
+			if err := f.getScopeByKeyPrefix(scopes, "publicshare:", publicShare); err == nil {
 				parentFolderURL.Path = path.Join(ocisURL.Path, "s", publicShare.GetToken())
 			} else {
 				logger.Error().Err(err).Msg("CheckFileInfo: error getting public share scope")
@@ -1482,4 +1485,18 @@ func (f *FileConnector) adjustWopiReference(ctx context.Context, wopiContext *mi
 	}
 
 	return newStatRes.GetInfo(), nil
+}
+
+// getScopeByKeyPrefix returns the scope from the AccessToken Scope map by key prefix
+func (f *FileConnector) getScopeByKeyPrefix(scopes map[string]*auth.Scope, keyPrefix string, m proto.Message) error {
+	for k, v := range scopes {
+		if strings.HasPrefix(k, keyPrefix) && v.Resource.Decoder == "json" {
+			err := utils.UnmarshalJSONToProtoV1(v.Resource.Value, m)
+			if err != nil {
+				return fmt.Errorf("can't unmarshal public share from scope: %w", err)
+			}
+			return nil
+		}
+	}
+	return fmt.Errorf("scope %s not found", keyPrefix)
 }
