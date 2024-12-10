@@ -15,6 +15,7 @@ Feature: enable disable permissions role
     Given the administrator has enabled the permissions role "Secure Viewer"
     And user "Alice" has uploaded file with content "some content" to "textfile.txt"
     And user "Alice" has created folder "folderToShare"
+    And user "Alice" has uploaded file with content "hello world" to "folderToShare/textfile1.txt"
     And user "Alice" has sent the following resource share invitation:
       | resource        | <resource>    |
       | space           | Personal      |
@@ -135,15 +136,24 @@ Feature: enable disable permissions role
         }
       }
       """
+    And user "Brian" should have a share "<resource>" shared by user "Alice" from space "Personal"
+    When user "Brian" sends PROPFIND request from the space "Shares" to the resource "<resource>" with depth "0" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And as user "Brian" the PROPFIND response should contain a resource "<resource>" with these key and value pairs:
+      | key            | value      |
+      | oc:name        | <resource> |
+      | oc:permissions | SX         |
+    And user "Brian" should not be able to download file "<resource-to-download>" from space "Shares"
     Examples:
-      | resource      | resource-type |
-      | textfile.txt  | file          |
-      | folderToShare | folder        |
+      | resource      | resource-type | resource-to-download        |
+      | textfile.txt  | file          | textfile.txt                |
+      | folderToShare | folder        | folderToShare/textfile1.txt |
 
 
   Scenario: users list the shares shared with Denied after the role is disabled (Personal Space)
     Given the administrator has enabled the permissions role "Denied"
     And user "Alice" has created folder "folderToShare"
+    And user "Alice" has uploaded file with content "hello world" to "folderToShare/textfile1.txt"
     And user "Alice" has sent the following resource share invitation:
       | resource        | folderToShare |
       | space           | Personal      |
@@ -202,6 +212,10 @@ Feature: enable disable permissions role
         }
       }
       """
+    And user "Brian" should not have a share "folderToShare" shared by user "Alice" from space "Personal"
+    When user "Brian" sends PROPFIND request from the space "Shares" to the resource "folderToShare" with depth "0" using the WebDAV API
+    Then the HTTP status code should be "404"
+    And user "Brian" should not be able to download file "folderToShare/textfile1.txt" from space "Shares"
 
 
   Scenario Outline: users list the shares shared with Secure Viewer after the role is disabled (Project Space)
@@ -211,6 +225,7 @@ Feature: enable disable permissions role
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "new-space" with content "some content" to "textfile.txt"
     And user "Alice" has created a folder "folderToShare" in space "new-space"
+    And user "Alice" has uploaded a file inside space "new-space" with content "hello world" to "folderToShare/textfile1.txt"
     And user "Alice" has sent the following resource share invitation:
       | resource        | <resource>    |
       | space           | new-space     |
@@ -329,10 +344,18 @@ Feature: enable disable permissions role
         }
       }
       """
+    And user "Brian" should have a share "<resource>" shared by user "Alice" from space "new-space"
+    When user "Brian" sends PROPFIND request from the space "Shares" to the resource "<resource>" with depth "0" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And as user "Brian" the PROPFIND response should contain a resource "<resource>" with these key and value pairs:
+      | key            | value      |
+      | oc:name        | <resource> |
+      | oc:permissions | SX         |
+    And user "Brian" should not be able to download file "<resource-to-download>" from space "Shares"
     Examples:
-      | resource      | resource-type |
-      | textfile.txt  | file          |
-      | folderToShare | folder        |
+      | resource      | resource-type | resource-to-download        |
+      | textfile.txt  | file          | textfile.txt                |
+      | folderToShare | folder        | folderToShare/textfile1.txt |
 
 
   Scenario: users list the shares shared with Denied after the role is disabled (Project Space)
@@ -341,6 +364,7 @@ Feature: enable disable permissions role
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
     And user "Alice" has created a folder "folderToShare" in space "new-space"
+    And user "Alice" has uploaded a file inside space "new-space" with content "hello world" to "folderToShare/textfile1.txt"
     And user "Alice" has sent the following resource share invitation:
       | resource        | folderToShare |
       | space           | new-space     |
@@ -399,3 +423,127 @@ Feature: enable disable permissions role
         }
       }
       """
+    And user "Brian" should not have a share "folderToShare" shared by user "Alice" from space "Personal"
+    When user "Brian" sends PROPFIND request from the space "Shares" to the resource "folderToShare" with depth "0" using the WebDAV API
+    Then the HTTP status code should be "404"
+    And user "Brian" should not be able to download file "folderToShare/textfile1.txt" from space "Shares"
+
+
+  Scenario: sharee lists drives after the share role Space Editor Without Versions has been disabled
+    Given using spaces DAV path
+    And the administrator has enabled the permissions role "Space Editor Without Versions"
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Alice" has uploaded a file inside space "new-space" with content "hello world" to "textfile1.txt"
+    And user "Alice" has sent the following space share invitation:
+      | space           | new-space                     |
+      | sharee          | Brian                         |
+      | shareType       | user                          |
+      | permissionsRole | Space Editor Without Versions |
+    And the administrator has disabled the permissions role "Space Editor Without Versions"
+    When user "Brian" lists all available spaces via the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON response should contain space called "new-space" and match
+      """
+      {
+        "type": "object",
+        "required": [
+          "driveType",
+          "driveAlias",
+          "name",
+          "id",
+          "quota",
+          "root",
+          "webUrl"
+        ],
+        "properties": {
+          "root": {
+            "type": "object",
+            "required": [
+              "eTag",
+              "id",
+              "permissions",
+              "webDavUrl"
+            ],
+            "properties": {
+              "permissions": {
+                "type": "array",
+                "minItems": 2,
+                "maxItems": 2,
+                "uniqueItems": true,
+                "items": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "required": ["grantedToV2", "roles"],
+                      "properties": {
+                        "grantedToV2": {
+                          "type": "object",
+                          "required": ["user"],
+                          "properties": {
+                            "user" : {
+                              "type": "object",
+                              "required": ["@libre.graph.userType", "displayName", "id"],
+                              "properties": {
+                                "@libre.graph.userType": { "const": "Member" },
+                                "displayName": { "const": "Alice Hansen" },
+                                "id": { "pattern": "^%user_id_pattern%$" }
+                              }
+                            }
+                          }
+                        },
+                        "roles": { "pattern": "^%role_id_pattern%$" }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "required": ["@libre.graph.permissions.actions", "grantedToV2"],
+                      "properties": {
+                        "@libre.graph.permissions.actions": {
+                          "const": [
+                            "libre.graph/driveItem/children/create",
+                            "libre.graph/driveItem/standard/delete",
+                            "libre.graph/driveItem/path/read",
+                            "libre.graph/driveItem/quota/read",
+                            "libre.graph/driveItem/content/read",
+                            "libre.graph/driveItem/upload/create",
+                            "libre.graph/driveItem/permissions/read",
+                            "libre.graph/driveItem/children/read",
+                            "libre.graph/driveItem/deleted/read",
+                            "libre.graph/driveItem/path/update",
+                            "libre.graph/driveItem/deleted/update",
+                            "libre.graph/driveItem/basic/read"
+                          ]
+                        },
+                        "grantedToV2": {
+                          "type": "object",
+                          "required": ["user"],
+                          "properties": {
+                            "user": {
+                              "type": "object",
+                              "required": ["@libre.graph.userType", "displayName", "id"],
+                              "properties": {
+                                "@libre.graph.userType": { "const": "Member" },
+                                "displayName": { "const": "Brian Murphy" },
+                                "id": { "pattern": "^%user_id_pattern%$" }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+      """
+    When user "Brian" sends PROPFIND request to space "new-space" with depth "0" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And as user "Brian" the PROPFIND response should contain a space "new-space" with these key and value pairs:
+      | key            | value     |
+      | oc:name        | new-space |
+      | oc:permissions | DNVCK     |
+    And user "Brian" should be able to download file "textfile1.txt" from space "new-space"

@@ -2049,9 +2049,10 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @Then /^user "([^"]*)" should not be able to download file "([^"]*)" from space "([^"]*)"$/
+	 * @Then /^user "([^"]*)" (should|should not) be able to download file "([^"]*)" from space "([^"]*)"$/
 	 *
 	 * @param string $user
+	 * @param string $shouldOrNot
 	 * @param string $fileName
 	 * @param string $spaceName
 	 *
@@ -2060,6 +2061,7 @@ class SpacesContext implements Context {
 	 */
 	public function userShouldOrShouldNotBeAbleToDownloadFileFromSpace(
 		string $user,
+		string $shouldOrNot,
 		string $fileName,
 		string $spaceName
 	): void {
@@ -2071,19 +2073,27 @@ class SpacesContext implements Context {
 			null,
 			$spaceId
 		);
-		Assert::assertGreaterThanOrEqual(
-			400,
-			$response->getStatusCode(),
-			__METHOD__
-			. ' download must fail'
-		);
-		Assert::assertLessThanOrEqual(
-			499,
-			$response->getStatusCode(),
-			__METHOD__
-			. ' 4xx error expected but got status code "'
-			. $response->getStatusCode() . '"'
-		);
+		if ($shouldOrNot === 'should') {
+			$this->featureContext->theHTTPStatusCodeShouldBe(
+				200,
+				__METHOD__ . "Expected response status code is 200 but got " . $response->getStatusCode(),
+				$response
+			);
+		} else {
+			Assert::assertGreaterThanOrEqual(
+				400,
+				$response->getStatusCode(),
+				__METHOD__
+				. ' download must fail'
+			);
+			Assert::assertLessThanOrEqual(
+				499,
+				$response->getStatusCode(),
+				__METHOD__
+				. ' 4xx error expected but got status code "'
+				. $response->getStatusCode() . '"'
+			);
+		}
 	}
 
 	/**
