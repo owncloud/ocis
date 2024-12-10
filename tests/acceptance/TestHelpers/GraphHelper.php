@@ -126,7 +126,14 @@ class GraphHelper {
 	 * @return string
 	 */
 	public static function getFederatedUserRegex(): string {
-		return '^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{4})$';
+		return '(?=(.{4})*$)[A-Za-z0-9+/]*={0,2}$';
+	}
+
+	/**
+	 * @return string
+	 */
+	public static function getFederatedFileIdRegex(): string {
+		return self::getSpaceIdRegex() . '!(?=(.{4})*$)[A-Za-z0-9+/]*={0,2}';
 	}
 
 	/**

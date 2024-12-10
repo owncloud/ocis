@@ -2340,6 +2340,14 @@ class FeatureContext extends BehatVariablesContext {
 				"parameter" => []
 			],
 			[
+				"code" => "%federated_file_id_pattern%",
+				"function" => [
+					__NAMESPACE__ . '\TestHelpers\GraphHelper',
+					"getFederatedFileIdRegex"
+				],
+				"parameter" => []
+			],
+			[
 				"code" => "%group_id_pattern%",
 				"function" => [
 					__NAMESPACE__ . '\TestHelpers\GraphHelper',
