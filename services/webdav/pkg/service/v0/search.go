@@ -9,7 +9,6 @@ import (
 	"path"
 	"strconv"
 	"strings"
-	"time"
 
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	merrors "go-micro.dev/v4/errors"
@@ -21,6 +20,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/utils"
 	searchmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"
 	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
+	"github.com/owncloud/ocis/v2/services/webdav/pkg/constants"
 	"github.com/owncloud/ocis/v2/services/webdav/pkg/net"
 	"github.com/owncloud/ocis/v2/services/webdav/pkg/prop"
 	"github.com/owncloud/ocis/v2/services/webdav/pkg/propfind"
@@ -192,7 +192,7 @@ func matchToPropResponse(ctx context.Context, match *searchmsg.Match) (*propfind
 		})))
 	}
 	propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:name", match.Entity.Name))
-	propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("d:getlastmodified", match.Entity.LastModifiedTime.AsTime().Format(time.RFC1123)))
+	propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("d:getlastmodified", match.Entity.LastModifiedTime.AsTime().Format(constants.RFC1123)))
 	propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("d:getcontenttype", match.Entity.MimeType))
 	propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:permissions", match.Entity.Permissions))
 	propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:highlights", match.Entity.Highlights))
