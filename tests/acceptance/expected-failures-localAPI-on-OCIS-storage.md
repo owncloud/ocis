@@ -318,5 +318,9 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiSearchContent/contentSearch.feature:266](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearchContent/contentSearch.feature#L266)
 - [apiSearchContent/contentSearch.feature:267](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearchContent/contentSearch.feature#L267)
 
+#### [Shares Jail PROPFIND returns different File IDs for the same item](https://github.com/owncloud/ocis/issues/9933)
+
+- [apiSharingNg1/propfindShares.feature:149](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg1/propfindShares.feature#L149)
+
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.
