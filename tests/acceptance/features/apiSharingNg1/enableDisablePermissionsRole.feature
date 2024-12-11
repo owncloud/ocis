@@ -547,3 +547,171 @@ Feature: enable disable permissions role
       | oc:name        | new-space |
       | oc:permissions | DNVCK     |
     And user "Brian" should be able to download file "textfile1.txt" from space "new-space"
+
+
+  Scenario Outline: update share role of a file to an existing role after assigned share role Secure Viewer is disabled (Personal Space)
+    Given using spaces DAV path
+    And the administrator has enabled the permissions role "Secure Viewer"
+    And user "Alice" has uploaded file with content "some content" to "textfile.txt"
+    And user "Alice" has created folder "folderToShare"
+    And user "Alice" has uploaded file with content "hello world" to "folderToShare/textfile1.txt"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | <resource>    |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Secure Viewer |
+    And user "Brian" has a share "<resource>" synced
+    And the administrator has disabled the permissions role "Secure Viewer"
+    When user "Alice" updates the last resource share with the following properties using the Graph API:
+      | permissionsRole | <permissions-role> |
+      | space           | Personal           |
+      | resource        | <resource>         |
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "grantedToV2",
+          "id",
+          "roles"
+        ],
+        "properties": {
+          "roles": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "const": "<role-id>"
+            }
+          }
+        }
+      }
+      """
+    And user "Brian" should have a share "<resource>" shared by user "Alice" from space "Personal"
+    When user "Brian" sends PROPFIND request from the space "Shares" to the resource "<resource>" with depth "0" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And as user "Brian" the PROPFIND response should contain a resource "<resource>" with these key and value pairs:
+      | key            | value         |
+      | oc:name        | <resource>    |
+      | oc:permissions | <permissions> |
+    And user "Brian" should be able to download file "<resource-to-download>" from space "Shares"
+    Examples:
+      | resource      | permissions-role | permissions | resource-to-download        | role-id                              |
+      | textfile.txt  | Viewer           | S           | textfile.txt                | b1e2218d-eef8-4d4c-b82d-0f1a1b48f3b5 |
+      | folderToShare | Uploader         | SCK         | folderToShare/textfile1.txt | 1c996275-f1c9-4e71-abdf-a42f6495e960 |
+      | folderToShare | Editor           | SDNVCK      | folderToShare/textfile1.txt | fb6c3e19-e378-47e5-b277-9732f9de6e21 |
+      | folderToShare | Viewer           | S           | folderToShare/textfile1.txt | b1e2218d-eef8-4d4c-b82d-0f1a1b48f3b5 |
+
+
+  Scenario Outline: update share role of a file to an existing role after assigned share role Secure Viewer is disabled (Project Space)
+    Given using spaces DAV path
+    And the administrator has enabled the permissions role "Secure Viewer"
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Alice" has uploaded a file inside space "new-space" with content "some content" to "textfile.txt"
+    And user "Alice" has created a folder "folderToShare" in space "new-space"
+    And user "Alice" has uploaded a file inside space "new-space" with content "hello world" to "folderToShare/textfile1.txt"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | <resource>    |
+      | space           | new-space     |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Secure Viewer |
+    And user "Brian" has a share "<resource>" synced
+    And the administrator has disabled the permissions role "Secure Viewer"
+    When user "Alice" updates the last resource share with the following properties using the Graph API:
+      | permissionsRole | <permissions-role> |
+      | space           | new-space          |
+      | resource        | <resource>         |
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "grantedToV2",
+          "id",
+          "roles"
+        ],
+        "properties": {
+          "roles": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "const": "<role-id>"
+            }
+          }
+        }
+      }
+      """
+    And user "Brian" should have a share "<resource>" shared by user "Alice" from space "new-space"
+    When user "Brian" sends PROPFIND request from the space "Shares" to the resource "<resource>" with depth "0" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And as user "Brian" the PROPFIND response should contain a resource "<resource>" with these key and value pairs:
+      | key            | value         |
+      | oc:name        | <resource>    |
+      | oc:permissions | <permissions> |
+    And user "Brian" should be able to download file "<resource-to-download>" from space "Shares"
+    Examples:
+      | resource      | permissions-role | permissions | resource-to-download        | role-id                              |
+      | textfile.txt  | File Editor      | SNVW        | textfile.txt                | 2d00ce52-1fc2-4dbc-8b95-a73b73395f5a |
+      | textfile.txt  | Viewer           | S           | textfile.txt                | b1e2218d-eef8-4d4c-b82d-0f1a1b48f3b5 |
+      | folderToShare | Uploader         | SCK         | folderToShare/textfile1.txt | 1c996275-f1c9-4e71-abdf-a42f6495e960 |
+      | folderToShare | Editor           | SDNVCK      | folderToShare/textfile1.txt | fb6c3e19-e378-47e5-b277-9732f9de6e21 |
+      | folderToShare | Viewer           | S           | folderToShare/textfile1.txt | b1e2218d-eef8-4d4c-b82d-0f1a1b48f3b5 |
+
+
+  Scenario Outline: update share role of a project space to an existing role after assigned share role is disabled
+    Given using spaces DAV path
+    And the administrator has enabled the permissions role "Space Editor Without Versions"
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Alice" has uploaded a file inside space "new-space" with content "some content" to "textfile.txt"
+    And user "Alice" has sent the following space share invitation:
+      | space           | new-space                     |
+      | sharee          | Brian                         |
+      | shareType       | user                          |
+      | permissionsRole | Space Editor Without Versions |
+    And the administrator has disabled the permissions role "Space Editor Without Versions"
+    When user "Alice" updates the last drive share with the following using root endpoint of the Graph API:
+      | permissionsRole | <permissions-role> |
+      | space           | new-space          |
+      | shareType       | user               |
+      | sharee          | Brian              |
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "grantedToV2",
+          "id",
+          "roles"
+        ],
+        "properties": {
+          "roles": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "const": "<role-id>"
+            }
+          }
+        }
+      }
+      """
+    When user "Brian" sends PROPFIND request to space "new-space" with depth "0" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And as user "Brian" the PROPFIND response should contain a space "new-space" with these key and value pairs:
+      | key            | value         |
+      | oc:name        | new-space     |
+      | oc:permissions | <permissions> |
+    And user "Brian" should be able to download file "textfile.txt" from space "new-space"
+    Examples:
+      | permissions-role | permissions | role-id                              |
+      | Space Viewer     |             | a8d5fe5e-96e3-418d-825b-534dbdf22b99 |
+      | Space Editor     | DNVCK       | 58c63c02-1d89-4572-916a-870abc5a1b7d |
+      | Manager          | RDNVCKZP    | 312c0871-5ef7-4b3a-85b6-0e4074c64049 |
