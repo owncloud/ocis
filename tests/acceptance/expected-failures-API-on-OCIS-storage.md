@@ -79,7 +79,7 @@ _ocdav: api compatibility, return correct status code_
 - [coreApiAuth/webDavLOCKAuth.feature:46](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuth/webDavLOCKAuth.feature#L46)
 - [coreApiAuth/webDavLOCKAuth.feature:58](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuth/webDavLOCKAuth.feature#L58)
 
-#### [Missing properties in REPORT response](https://github.com/owncloud/ocis/issues/9780), [REPORT response has different date format for d:getlastmodified](https://github.com/owncloud/ocis/issues/9781), [d:getetag property has empty value in REPORT response](https://github.com/owncloud/ocis/issues/9783)
+#### [Missing properties in REPORT response](https://github.com/owncloud/ocis/issues/9780), [d:getetag property has empty value in REPORT response](https://github.com/owncloud/ocis/issues/9783)
 
 - [coreApiWebdavOperations/search.feature:180](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavOperations/search.feature#L180)
 - [coreApiWebdavOperations/search.feature:181](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavOperations/search.feature#L181)
