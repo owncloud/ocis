@@ -67,6 +67,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix link activity message: [#10663](https://github.com/owncloud/ocis/pull/10663)
 * Bugfix - Fix graph drives response for federated shares: [#10730](https://github.com/owncloud/ocis/pull/10730)
 * Bugfix - GetLastModified property in the REPORT response will use RFC1123 format: [#10738](https://github.com/owncloud/ocis/pull/10738)
+* Bugfix - Unifi logging: [#10743](https://github.com/owncloud/ocis/pull/10743/)
 * Bugfix - Fix FileInfo BreadcrumbFolderURL upd: [#10757](https://github.com/owncloud/ocis/pull/10757)
 * Enhancement - Update web to v11.0.6: [#10755](https://github.com/owncloud/ocis/pull/10755)
 
@@ -93,6 +94,12 @@ The following sections list the changes for unreleased.
    property in the PROPFIND response
 
    https://github.com/owncloud/ocis/pull/10738
+
+* Bugfix - Unifi logging: [#10743](https://github.com/owncloud/ocis/pull/10743/)
+
+   We fixed some cases where we did not use the correct logger.
+
+   https://github.com/owncloud/ocis/pull/10743/
 
 * Bugfix - Fix FileInfo BreadcrumbFolderURL upd: [#10757](https://github.com/owncloud/ocis/pull/10757)
 
