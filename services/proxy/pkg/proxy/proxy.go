@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"errors"
+	stdlog "log"
 	"net"
 	"net/http"
 	"net/http/httputil"
@@ -32,6 +33,9 @@ func NewMultiHostReverseProxy(opts ...Option) (*MultiHostReverseProxy, error) {
 	options := newOptions(opts...)
 
 	rp := &MultiHostReverseProxy{
+		ReverseProxy: httputil.ReverseProxy{
+			ErrorLog: stdlog.New(options.Logger, "", 0),
+		},
 		Directors: make(map[string]map[config.RouteType]map[string]map[string]func(req *http.Request)),
 		logger:    options.Logger,
 		config:    options.Config,

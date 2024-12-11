@@ -27,7 +27,6 @@ import (
 	"time"
 
 	"github.com/cs3org/reva/v2/pkg/appctx"
-	"github.com/cs3org/reva/v2/pkg/logger"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/lookup"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/metadata"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/metadata/prefixes"
@@ -49,6 +48,7 @@ type AsyncPropagator struct {
 	treeTimeAccounting bool
 	propagationDelay   time.Duration
 	lookup             node.PathLookup
+	log                *zerolog.Logger
 }
 
 // Change represents a change to the tree
@@ -58,15 +58,14 @@ type Change struct {
 }
 
 // NewAsyncPropagator returns a new AsyncPropagator instance
-func NewAsyncPropagator(treeSizeAccounting, treeTimeAccounting bool, o options.AsyncPropagatorOptions, lookup node.PathLookup) AsyncPropagator {
+func NewAsyncPropagator(treeSizeAccounting, treeTimeAccounting bool, o options.AsyncPropagatorOptions, lookup node.PathLookup, log *zerolog.Logger) AsyncPropagator {
 	p := AsyncPropagator{
 		treeSizeAccounting: treeSizeAccounting,
 		treeTimeAccounting: treeTimeAccounting,
 		propagationDelay:   o.PropagationDelay,
 		lookup:             lookup,
+		log:                log,
 	}
-
-	log := logger.New()
 
 	log.Info().Msg("async propagator starting up...")
 

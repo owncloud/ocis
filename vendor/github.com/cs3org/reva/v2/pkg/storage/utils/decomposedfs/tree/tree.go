@@ -42,6 +42,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
+	"github.com/rs/zerolog"
 	"go-micro.dev/v4/store"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/trace"
@@ -76,13 +77,13 @@ type Tree struct {
 type PermissionCheckFunc func(rp *provider.ResourcePermissions) bool
 
 // New returns a new instance of Tree
-func New(lu node.PathLookup, bs Blobstore, o *options.Options, cache store.Store) *Tree {
+func New(lu node.PathLookup, bs Blobstore, o *options.Options, cache store.Store, log *zerolog.Logger) *Tree {
 	return &Tree{
 		lookup:     lu,
 		blobstore:  bs,
 		options:    o,
 		idCache:    cache,
-		propagator: propagator.New(lu, o),
+		propagator: propagator.New(lu, o, log),
 	}
 }
 
