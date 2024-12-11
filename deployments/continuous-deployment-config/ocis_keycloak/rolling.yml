@@ -22,7 +22,6 @@
       - https://github.com/fschade.keys
       - https://github.com/kulmann.keys
       - https://github.com/micbar.keys
-      - https://github.com/rhafer.keys
       - https://github.com/wkloucek.keys
     docker_compose_projects:
       - name: ocis
