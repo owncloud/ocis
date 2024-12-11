@@ -91,7 +91,7 @@ func parseLevel(v string) zerolog.Level {
 
 func InitLoggerOrDie(v interface{}, logLevel string) *zerolog.Logger {
 	conf := ParseLogConfOrDie(v, logLevel)
-	log, err := FromConfig(conf)
+	log, err := fromConfig(conf)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error creating logger, exiting ...")
 		os.Exit(1)
@@ -125,7 +125,7 @@ type LogConf struct {
 	Level  string `mapstructure:"level"`
 }
 
-func FromConfig(conf *LogConf) (*zerolog.Logger, error) {
+func fromConfig(conf *LogConf) (*zerolog.Logger, error) {
 	if conf.Level == "" {
 		conf.Level = zerolog.DebugLevel.String()
 	}

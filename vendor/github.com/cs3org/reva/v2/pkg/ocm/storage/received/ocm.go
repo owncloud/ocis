@@ -33,7 +33,6 @@ import (
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
-	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	ocmpb "github.com/cs3org/go-cs3apis/cs3/sharing/ocm/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
@@ -539,7 +538,7 @@ func (d *driver) ListStorageSpaces(ctx context.Context, filters []*provider.List
 						OpaqueId: storagespace.FormatResourceID(root),
 					},
 					SpaceType: "mountpoint",
-					Owner: &userv1beta1.User{
+					Owner: &userpb.User{
 						Id: share.Grantee.GetUserId(),
 					},
 					Root: root,
@@ -558,7 +557,7 @@ func (d *driver) ListStorageSpaces(ctx context.Context, filters []*provider.List
 						OpaqueId: storagespace.FormatResourceID(root),
 					},
 					SpaceType: "mountpoint",
-					Owner: &userv1beta1.User{
+					Owner: &userpb.User{
 						Id: share.Grantee.GetUserId(),
 					},
 					Root: root,

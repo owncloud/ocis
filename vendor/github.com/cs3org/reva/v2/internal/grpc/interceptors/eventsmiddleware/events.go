@@ -23,6 +23,7 @@ import (
 	"fmt"
 
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	ocmcore "github.com/cs3org/go-cs3apis/cs3/ocm/core/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
 	link "github.com/cs3org/go-cs3apis/cs3/sharing/link/v1beta1"
@@ -111,6 +112,10 @@ func NewUnary(m map[string]interface{}) (grpc.UnaryServerInterceptor, int, error
 				ev = LinkAccessed(v, executant)
 			} else {
 				ev = LinkAccessFailed(v, req.(*link.GetPublicShareByTokenRequest), executant)
+			}
+		case *ocmcore.CreateOCMCoreShareResponse:
+			if isSuccess(v) {
+				ev = OCMCoreShareCreated(v, req.(*ocmcore.CreateOCMCoreShareRequest), executant)
 			}
 		case *provider.AddGrantResponse:
 			// TODO: update CS3 APIs

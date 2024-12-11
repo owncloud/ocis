@@ -27,7 +27,6 @@ import (
 	"time"
 
 	"github.com/google/renameio/v2"
-	"github.com/rogpeppe/go-internal/lockedfile"
 	tusd "github.com/tus/tusd/v2/pkg/handler"
 
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
@@ -35,7 +34,6 @@ import (
 	typespb "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/appctx"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
-	"github.com/cs3org/reva/v2/pkg/logger"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/node"
 	"github.com/cs3org/reva/v2/pkg/utils"
 )
@@ -49,12 +47,7 @@ type OcisSession struct {
 
 // Context returns a context with the user, logger and lockid used when initiating the upload session
 func (s *OcisSession) Context(ctx context.Context) context.Context { // restore logger from file info
-	log, _ := logger.FromConfig(&logger.LogConf{
-		Output: "stderr", // TODO use config from decomposedfs
-		Mode:   "json",   // TODO use config from decomposedfs
-		Level:  s.info.Storage["LogLevel"],
-	})
-	sub := log.With().Int("pid", os.Getpid()).Logger()
+	sub := s.store.log.With().Int("pid", os.Getpid()).Logger()
 	ctx = appctx.WithLogger(ctx, &sub)
 	ctx = ctxpkg.ContextSetLockID(ctx, s.lockID())
 	ctx = ctxpkg.ContextSetUser(ctx, s.executantUser())
@@ -84,14 +77,6 @@ func (s *OcisSession) Purge(ctx context.Context) error {
 	_, span := tracer.Start(ctx, "Purge")
 	defer span.End()
 	sessionPath := sessionPath(s.store.root, s.info.ID)
-	f, err := lockedfile.OpenFile(sessionPath+".lock", os.O_RDWR|os.O_TRUNC|os.O_CREATE, 0600)
-	if err != nil {
-		return err
-	}
-	defer func() {
-		f.Close()
-		os.Remove(sessionPath + ".lock")
-	}()
 	if err := os.Remove(sessionPath); err != nil {
 		return err
 	}
@@ -127,11 +112,6 @@ func (s *OcisSession) Persist(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	f, err := lockedfile.OpenFile(sessionPath+".lock", os.O_RDWR|os.O_TRUNC|os.O_CREATE, 0600)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
 	return renameio.WriteFile(sessionPath, d, 0600)
 }
 

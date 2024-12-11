@@ -30,6 +30,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/node"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/options"
 	"github.com/pkg/errors"
+	"github.com/rs/zerolog"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -44,10 +45,10 @@ type Propagator interface {
 	Propagate(ctx context.Context, node *node.Node, sizediff int64) error
 }
 
-func New(lookup node.PathLookup, o *options.Options) Propagator {
+func New(lookup node.PathLookup, o *options.Options, log *zerolog.Logger) Propagator {
 	switch o.Propagator {
 	case "async":
-		return NewAsyncPropagator(o.TreeSizeAccounting, o.TreeTimeAccounting, o.AsyncPropagatorOptions, lookup)
+		return NewAsyncPropagator(o.TreeSizeAccounting, o.TreeTimeAccounting, o.AsyncPropagatorOptions, lookup, log)
 	default:
 		return NewSyncPropagator(o.TreeSizeAccounting, o.TreeTimeAccounting, lookup)
 	}

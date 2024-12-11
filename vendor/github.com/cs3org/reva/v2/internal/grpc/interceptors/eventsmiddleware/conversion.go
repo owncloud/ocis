@@ -23,6 +23,7 @@ import (
 
 	group "github.com/cs3org/go-cs3apis/cs3/identity/group/v1beta1"
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	ocmcore "github.com/cs3org/go-cs3apis/cs3/ocm/core/v1beta1"
 	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
 	link "github.com/cs3org/go-cs3apis/cs3/sharing/link/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
@@ -188,6 +189,26 @@ func LinkRemoved(r *link.RemovePublicShareResponse, req *link.RemovePublicShareR
 		Timestamp:    utils.TSNow(),
 		ItemID:       rid,
 		ResourceName: utils.ReadPlainFromOpaque(r.Opaque, "resourcename"),
+	}
+}
+
+func OCMCoreShareCreated(r *ocmcore.CreateOCMCoreShareResponse, req *ocmcore.CreateOCMCoreShareRequest, executant *user.User) events.OCMCoreShareCreated {
+	var permissions *provider.ResourcePermissions
+	for _, p := range req.GetProtocols() {
+		if p.GetWebdavOptions() != nil {
+			permissions = p.GetWebdavOptions().GetPermissions().GetPermissions()
+			break
+		}
+	}
+	return events.OCMCoreShareCreated{
+		ShareID:       r.GetId(),
+		Executant:     executant.GetId(),
+		Sharer:        req.GetSender(),
+		GranteeUserID: req.GetShareWith(),
+		ItemID:        req.GetResourceId(),
+		ResourceName:  req.GetName(),
+		CTime:         r.GetCreated(),
+		Permissions:   permissions,
 	}
 }
 
