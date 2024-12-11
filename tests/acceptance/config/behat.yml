@@ -424,6 +424,14 @@ default:
         - FeatureContext: *common_feature_context_params
         - OcisConfigContext:
 
+    apiAuthApp:
+      paths:
+        - "%paths.base%/../features/apiAuthApp"
+      context: *common_ldap_suite_context
+      contexts:
+        - FeatureContext: *common_feature_context_params
+        - AuthAppContext:
+
     cliCommands:
       paths:
         - "%paths.base%/../features/cliCommands"
