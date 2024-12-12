@@ -20,7 +20,7 @@ Feature: State of the quota
 
 
   Scenario Outline: quota information is returned in the list of spaces returned via the Graph API
-    Given user "Alice" has created a space "<space-name>" of type "project" with quota "100"
+    Given user "Alice" has created a space "<space-name>" of type "project" with quota "<quota>"
     When user "Alice" uploads a file inside space "<space-name>" with content "<file-content>" to "test.txt" using the WebDAV API
     And user "Alice" lists all available spaces via the Graph API
     Then the JSON response should contain space called "<space-name>" and match
@@ -51,7 +51,7 @@ Feature: State of the quota
               },
               "total" : {
                 "type": "number",
-                "enum": [100]
+                "enum": [<quota>]
               },
               "remaining" : {
                 "type": "number",
@@ -67,14 +67,15 @@ Feature: State of the quota
       }
       """
     Examples:
-      | space-name | file-content                                                                                         | state    | remaining | used |
-      | Quota1%    | 1                                                                                                    | normal   | 99        | 1    |
-      | Quota75%   | 123456789 123456789 123456789 123456789 123456789 123456789 123456789 12345                          | normal   | 25        | 75   |
-      | Quota76%   | 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456                         | nearing  | 24        | 76   |
-      | Quota90%   | 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 1234567890           | nearing  | 10        | 90   |
-      | Quota91%   | 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 1          | critical | 9         | 91   |
-      | Quota99%   | 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789  | critical | 1         | 99   |
-      | Quota100%  | 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 1234567890 | exceeded | 0         | 100  |
+      | space-name | file-content                                                                                         | state    | remaining     | used | quota         |
+      | Quota1%    | 1                                                                                                    | normal   | 99            | 1    | 100           |
+      | Quota75%   | 123456789 123456789 123456789 123456789 123456789 123456789 123456789 12345                          | normal   | 25            | 75   | 100           |
+      | Quota76%   | 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456                         | nearing  | 24            | 76   | 100           |
+      | Quota90%   | 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 1234567890           | nearing  | 10            | 90   | 100           |
+      | Quota91%   | 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 1          | critical | 9             | 91   | 100           |
+      | Quota99%   | 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789  | critical | 1             | 99   | 100           |
+      | Quota100%  | 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 1234567890 | exceeded | 0             | 100  | 100           |
+      | Quota1     | 0                                                                                                    | normal   | 2499999999999 |    1 | 2500000000000 |
 
 
   Scenario: file cannot be uploaded if there is insufficient quota
