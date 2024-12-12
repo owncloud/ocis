@@ -69,6 +69,7 @@ The following sections list the changes for unreleased.
 * Bugfix - GetLastModified property in the REPORT response will use RFC1123 format: [#10738](https://github.com/owncloud/ocis/pull/10738)
 * Bugfix - Unifi logging: [#10743](https://github.com/owncloud/ocis/pull/10743/)
 * Bugfix - Fix FileInfo BreadcrumbFolderURL upd: [#10757](https://github.com/owncloud/ocis/pull/10757)
+* Bugfix - Bump Reva: [#10766](https://github.com/owncloud/ocis/pull/10766)
 * Enhancement - Update web to v11.0.6: [#10755](https://github.com/owncloud/ocis/pull/10755)
 
 ## Details
@@ -106,6 +107,18 @@ The following sections list the changes for unreleased.
    Made GetScopeByKeyPrefix function as a private method of the FileConnector
 
    https://github.com/owncloud/ocis/pull/10757
+
+* Bugfix - Bump Reva: [#10766](https://github.com/owncloud/ocis/pull/10766)
+
+   Bumps reva version to 2.27.0
+
+  *   Bugfix [cs3org/reva#4985](https://github.com/cs3org/reva/pull/4985): Drop unneeded session locks
+  *   Bugfix [cs3org/reva#5000](https://github.com/cs3org/reva/pull/5000): Fix ceph build
+  *   Bugfix [cs3org/reva#4989](https://github.com/cs3org/reva/pull/4989): Deleting OCM share also updates storageprovider
+  *   Enhancement [cs3org/reva#4998](https://github.com/cs3org/reva/pull/4998): Emit event when an ocm share is received
+  *   Enhancement [cs3org/reva#4996](https://github.com/cs3org/reva/pull/4996): Get rid of some cases of unstructured logging
+
+   https://github.com/owncloud/ocis/pull/10766
 
 * Enhancement - Update web to v11.0.6: [#10755](https://github.com/owncloud/ocis/pull/10755)
 
