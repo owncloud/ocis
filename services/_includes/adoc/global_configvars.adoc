@@ -46,7 +46,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-ID of the user who collects all necessary information for deletion. Consider that the UUID can be encoded in some LDAP deployment configurations like in .ldif files. These need to be decoded beforehand.
+ID of the user that should receive admin privileges. Consider that the UUID can be encoded in some LDAP deployment configurations like in .ldif files. These need to be decoded beforehand.
 a| `OCIS_ASYNC_UPLOADS`
 
 a| [subs=-attributes]
@@ -90,7 +90,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The password to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.
+The password to authenticate with the cache. Only applies when store type 'nats-js-kv' is configured.
 a| `OCIS_CACHE_AUTH_USERNAME`
 
 a| [subs=-attributes]
@@ -116,7 +116,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The username to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.
+The username to authenticate with the cache. Only applies when store type 'nats-js-kv' is configured.
 a| `OCIS_CACHE_DATABASE`
 
 a| [subs=-attributes]
@@ -136,7 +136,7 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++storage-users ++
+++storage-system ++
 
 a| [subs=-attributes]
 The database name the configured store should use.
@@ -168,7 +168,7 @@ Disables persistence of the cache. Only applies when store type 'nats-js-kv' is 
 a| `OCIS_CACHE_STORE`
 
 a| [subs=-attributes]
-++5.0 ++
+++pre5.0 ++
 
 a| [subs=attributes+]
 * xref:{s-path}/frontend.adoc[frontend] +
@@ -187,14 +187,14 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++nats-js-kv ++
+++memory ++
 
 a| [subs=-attributes]
-The type of the signing key store. Supported values are: 'redis-sentinel' and 'nats-js-kv'. See the text description for details.
+The type of the cache store. Supported values are: 'memory', 'redis-sentinel', 'nats-js-kv', 'noop'. See the text description for details.
 a| `OCIS_CACHE_STORE_NODES`
 
 a| [subs=-attributes]
-++5.0 ++
+++pre5.0 ++
 
 a| [subs=attributes+]
 * xref:{s-path}/frontend.adoc[frontend] +
@@ -216,11 +216,11 @@ a| [subs=-attributes]
 ++[127.0.0.1:9233] ++
 
 a| [subs=-attributes]
-A list of nodes to access the configured store. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details.
+A list of nodes to access the configured store. This has no effect when 'memory' store are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details.
 a| `OCIS_CACHE_TTL`
 
 a| [subs=-attributes]
-++5.0 ++
+++pre5.0 ++
 
 a| [subs=attributes+]
 * xref:{s-path}/frontend.adoc[frontend] +
@@ -239,10 +239,10 @@ a| [subs=-attributes]
 ++Duration ++
 
 a| [subs=-attributes]
-++12h0m0s ++
+++336h0m0s ++
 
 a| [subs=-attributes]
-Default time to live for signing keys. See the Environment Variable Types description for more details.
+Time to live for cache records in the graph. Defaults to '336h' (2 weeks). See the Environment Variable Types description for more details.
 a| `OCIS_CORS_ALLOW_CREDENTIALS`
 
 a| [subs=-attributes]
@@ -301,7 +301,7 @@ a| [subs=-attributes]
 ++[]string ++
 
 a| [subs=-attributes]
-++[Authorization Origin Content-Type Accept X-Requested-With X-Request-Id Cache-Control] ++
+++[Authorization Origin Content-Type Accept X-Requested-With X-Request-Id Purge Restore] ++
 
 a| [subs=-attributes]
 A list of allowed CORS headers. See following chapter for more details: *Access-Control-Request-Headers* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers. See the Environment Variable Types description for more details.
@@ -387,7 +387,7 @@ The propagator used for decomposedfs. At the moment, only 'sync' is fully suppor
 a| `OCIS_DEFAULT_LANGUAGE`
 
 a| [subs=-attributes]
-++7.0.0 ++
+++5.0 ++
 
 a| [subs=attributes+]
 * xref:{s-path}/activitylog.adoc[activitylog] +
@@ -400,7 +400,7 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++en ++
+++ ++
 
 a| [subs=-attributes]
 The default language used by services and the WebUI. If not defined, English will be used as default. See the documentation for more details.
@@ -441,7 +441,7 @@ Edition of oCIS. Used for branding purposes.
 a| `OCIS_ENABLE_OCM`
 
 a| [subs=-attributes]
-++pre5.0 ++
+++5.0 ++
 
 a| [subs=attributes+]
 * xref:{s-path}/frontend.adoc[frontend] +
@@ -457,7 +457,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Changing this value is NOT supported. Enables support for incoming federated sharing for clients. The backend behaviour is not changed.
+Include OCM sharees when listing users.
 a| `OCIS_EVENTS_AUTH_PASSWORD`
 
 a| [subs=-attributes]
@@ -649,7 +649,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The root CA certificate used to validate the server's TLS certificate. If provided STORAGE_USERS_EVENTS_TLS_INSECURE will be seen as false.
+The root CA certificate used to validate the server's TLS certificate. Will be seen as empty if NOTIFICATIONS_EVENTS_TLS_INSECURE is provided.
 a| `OCIS_GATEWAY_GRPC_ADDR`
 
 a| [subs=-attributes]
@@ -978,7 +978,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The client ID to authenticate with keycloak.
+The client id to authenticate with keycloak.
 a| `OCIS_KEYCLOAK_CLIENT_REALM`
 
 a| [subs=-attributes]
@@ -1063,7 +1063,7 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++uid=idp,ou=sysusers,o=libregraph-idm ++
+++uid=libregraph,ou=sysusers,o=libregraph-idm ++
 
 a| [subs=-attributes]
 LDAP DN to use for simple bind authentication with the target LDAP server.
@@ -1106,7 +1106,7 @@ a| [subs=-attributes]
 ++/var/lib/ocis/idm/ldap.crt ++
 
 a| [subs=-attributes]
-Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the LDAP service. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH/idp.
+Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the LDAP service. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH/idm.
 a| `OCIS_LDAP_DISABLED_USERS_GROUP_DN`
 
 a| [subs=-attributes]
@@ -1387,7 +1387,7 @@ a| [subs=-attributes]
 ++ldaps://localhost:9235 ++
 
 a| [subs=-attributes]
-Url of the LDAP service to use as IDP.
+URI of the LDAP Server to connect to. Supported URI schemes are 'ldaps://' and 'ldap://'
 a| `OCIS_LDAP_USER_BASE_DN`
 
 a| [subs=-attributes]
@@ -1466,7 +1466,7 @@ a| [subs=-attributes]
 ++inetOrgPerson ++
 
 a| [subs=-attributes]
-LDAP User ObjectClass like 'inetOrgPerson'.
+The object class to use for users in the default user search filter ('inetOrgPerson').
 a| `OCIS_LDAP_USER_SCHEMA_DISPLAYNAME`
 
 a| [subs=-attributes]
@@ -1502,10 +1502,10 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++ownCloudUUID ++
+++owncloudUUID ++
 
 a| [subs=-attributes]
-LDAP User UUID attribute like 'uid'.
+LDAP Attribute to use as the unique ID for users. This should be a stable globally unique ID like a UUID.
 a| `OCIS_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING`
 
 a| [subs=-attributes]
@@ -1544,7 +1544,7 @@ a| [subs=-attributes]
 ++mail ++
 
 a| [subs=-attributes]
-LDAP User email attribute like 'mail'.
+LDAP Attribute to use for the email address of users.
 a| `OCIS_LDAP_USER_SCHEMA_USERNAME`
 
 a| [subs=-attributes]
@@ -1561,10 +1561,10 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++displayName ++
+++uid ++
 
 a| [subs=-attributes]
-LDAP User name attribute like 'displayName'.
+LDAP Attribute to use for username of users.
 a| `OCIS_LDAP_USER_SCHEMA_USER_TYPE`
 
 a| [subs=-attributes]
@@ -1833,7 +1833,7 @@ Activates pretty log output.
 a| `OCIS_MACHINE_AUTH_API_KEY`
 
 a| [subs=-attributes]
-++5.0 ++
+++pre5.0 ++
 
 a| [subs=attributes+]
 * xref:{s-path}/auth-app.adoc[auth-app] +
@@ -1851,11 +1851,11 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-Machine auth API key used to validate internal requests necessary for the access to resources from other services.
+The machine auth API key used to validate internal requests necessary to access resources from other services.
 a| `OCIS_MAX_CONCURRENCY`
 
 a| [subs=-attributes]
-++pre5.0 ++
+++7.0.0 ++
 
 a| [subs=attributes+]
 * xref:{s-path}/frontend.adoc[frontend] +
@@ -1869,10 +1869,10 @@ a| [subs=-attributes]
 ++int ++
 
 a| [subs=-attributes]
-++5 ++
+++20 ++
 
 a| [subs=-attributes]
-Maximum number of concurrent go-routines. Higher values can potentially get work done faster but will also cause more load on the system. Values of 0 or below will be ignored and the default value will be used.
+The maximum number of concurrent requests the service will handle.
 a| `OCIS_OIDC_ISSUER`
 
 a| [subs=-attributes]
@@ -2112,10 +2112,10 @@ a| [subs=-attributes]
 ++Duration ++
 
 a| [subs=-attributes]
-++0s ++
+++336h0m0s ++
 
 a| [subs=-attributes]
-Time to live for events in the store. See the Environment Variable Types description for more details.
+Time to live for events in the store. Defaults to '336h' (2 weeks). See the Environment Variable Types description for more details.
 a| `OCIS_REVA_GATEWAY`
 
 a| [subs=-attributes]
@@ -2280,7 +2280,7 @@ a| [subs=-attributes]
 ++0 ++
 
 a| [subs=-attributes]
-Set a global max quota for spaces in bytes. A value of 0 equals unlimited. If not using the global OCIS_SPACES_MAX_QUOTA, you must define the FRONTEND_MAX_QUOTA in the frontend service.
+Set the global max quota value in bytes. A value of 0 equals unlimited. The value is provided via capabilities.
 a| `OCIS_SYSTEM_USER_API_KEY`
 
 a| [subs=-attributes]
@@ -2587,7 +2587,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The storage transfer secret.
+Transfer secret for signing file up- and download requests.
 a| `OCIS_TRANSLATION_PATH`
 
 a| [subs=-attributes]
