@@ -96,7 +96,7 @@ class SpacesTUSContext implements Context {
 	}
 
 	/**
-	 * @When the public uploads a file from :source to :destination via TUS inside last link shared folder with password :password using the WebDAV API
+	 * @When the public uploads file :source to :destination via TUS inside last link shared folder with password :password using the WebDAV API
 	 *
 	 * @param string $source
 	 * @param string $destination
@@ -105,7 +105,7 @@ class SpacesTUSContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function publicUploadsAFileViaTusInsideOfTheSpaceUsingTheWebdavApi(
+	public function thePublicUploadsFileViaTusInsideLastSharedFolderWithPasswordUsingTheWebdavApi(
 		string $source,
 		string $destination,
 		string $password

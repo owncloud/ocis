@@ -352,10 +352,10 @@ class TUSContext implements Context {
 	 * @return void
 	 */
 	public function publicUploadFileUsingTus(
-		string  $source,
-		string  $destination,
+		string $source,
+		string $destination,
 		string $password,
-	):void {
+	): void {
 		$password = $this->featureContext->getActualPassword($password);
 		if ($this->featureContext->isUsingSharingNG()) {
 			$token = $this->featureContext->shareNgGetLastCreatedLinkShareToken();
