@@ -46,8 +46,7 @@ class UploadHelper extends Assert {
 	 * @param string|null $xRequestId
 	 * @param array|null $headers
 	 * @param int|null $davPathVersionToUse (1|2)
-	 * @param int|null $chunkingVersion (1|2|null)
-	 *                                  if set to null chunking will not be used
+	 * @param bool $doChunkUpload
 	 * @param int|null $noOfChunks how many chunks to upload
 	 * @param bool|null $isGivenStep
 	 *
@@ -63,12 +62,11 @@ class UploadHelper extends Assert {
 		?string $xRequestId = '',
 		?array $headers = [],
 		?int $davPathVersionToUse = 1,
-		?int $chunkingVersion = null,
+		bool $doChunkUpload = false,
 		?int $noOfChunks = 1,
-		?bool $isGivenStep = false
+		?bool $isGivenStep = false,
 	): ResponseInterface {
-		//simple upload with no chunking
-		if ($chunkingVersion === null) {
+		if (!$doChunkUpload) {
 			$data = \file_get_contents($source);
 			return WebDavHelper::makeDavRequest(
 				$baseUrl,
@@ -91,56 +89,16 @@ class UploadHelper extends Assert {
 				null,
 				$isGivenStep
 			);
-		} else {
-			//prepare chunking
-			$chunks = self::chunkFile($source, $noOfChunks);
-			$chunkingId = 'chunking-' . \rand(1000, 9999);
-			$v2ChunksDestination = '/uploads/' . $user . '/' . $chunkingId;
 		}
 
+		//prepare chunking
+		$chunks = self::chunkFile($source, $noOfChunks);
+		$chunkingId = 'chunking-' . \rand(1000, 9999);
 		$result = null;
-
-		//prepare chunking version specific stuff
-		if ($chunkingVersion === 1) {
-			$headers['OC-Chunked'] = '1';
-		} elseif ($chunkingVersion === 2) {
-			$result = WebDavHelper::makeDavRequest(
-				$baseUrl,
-				$user,
-				$password,
-				'MKCOL',
-				$v2ChunksDestination,
-				$headers,
-				null,
-				$xRequestId,
-				null,
-				$davPathVersionToUse,
-				"uploads",
-				null,
-				"basic",
-				false,
-				0,
-				null,
-				[],
-				null,
-				$isGivenStep
-			);
-			if ($result->getStatusCode() >= 400) {
-				return $result;
-			}
-		}
 
 		//upload chunks
 		foreach ($chunks as $index => $chunk) {
-			if ($chunkingVersion === 1) {
-				$filename = $destination . "-" . $chunkingId . "-" .
-					\count($chunks) . '-' . $index;
-				$davRequestType = "files";
-			} else {
-				// do chunking version 2
-				$filename = $v2ChunksDestination . '/' . $index;
-				$davRequestType = "uploads";
-			}
+			$filename = $destination . "-" . $chunkingId . "-" . \count($chunks) . '-' . $index;
 			$result = WebDavHelper::makeDavRequest(
 				$baseUrl,
 				$user,
@@ -152,7 +110,7 @@ class UploadHelper extends Assert {
 				$xRequestId,
 				$chunk,
 				$davPathVersionToUse,
-				$davRequestType,
+				"files",
 				null,
 				"basic",
 				false,
@@ -166,119 +124,9 @@ class UploadHelper extends Assert {
 				return $result;
 			}
 		}
-		//finish upload for new chunking
-		if ($chunkingVersion === 2) {
-			$source = $v2ChunksDestination . '/.file';
-			$headers['Destination'] = $baseUrl . "/" .
-				WebDavHelper::getDavPath($davPathVersionToUse, $user) .
-				$destination;
-			$result = WebDavHelper::makeDavRequest(
-				$baseUrl,
-				$user,
-				$password,
-				'MOVE',
-				$source,
-				$headers,
-				null,
-				$xRequestId,
-				null,
-				$davPathVersionToUse,
-				"uploads",
-				null,
-				"basic",
-				false,
-				0,
-				null,
-				[],
-				null,
-				$isGivenStep
-			);
-			if ($result->getStatusCode() >= 400) {
-				return $result;
-			}
-		}
-		self::assertNotNull($result, __METHOD__ . " chunking version $chunkingVersion was requested but no upload was done.");
+
+		self::assertNotNull($result, __METHOD__ . " chunking was requested but no upload was done.");
 		return $result;
-	}
-
-	/**
-	 * Upload the same file multiple times with different mechanisms.
-	 *
-	 * @param string|null $baseUrl URL of owncloud
-	 * @param string|null $user user who uploads
-	 * @param string|null $password
-	 * @param string|null $source source file path
-	 * @param string|null $destination destination path on the server
-	 * @param string|null $xRequestId
-	 * @param bool $overwriteMode when false creates separate files to test uploading brand-new files,
-	 *                            when true it just overwrites the same file over and over again with the same name
-	 * @param string|null $exceptChunkingType empty string or "old" or "new"
-	 *
-	 * @return array of ResponseInterface
-	 * @throws GuzzleException
-	 */
-	public static function uploadWithAllMechanisms(
-		?string $baseUrl,
-		?string $user,
-		?string $password,
-		?string $source,
-		?string $destination,
-		?string $xRequestId = '',
-		?bool $overwriteMode = false,
-		?string $exceptChunkingType = ''
-	):array {
-		$responses = [];
-		foreach ([1, 2] as $davPathVersion) {
-			if ($davPathVersion === 1) {
-				$davHuman = 'old';
-			} else {
-				$davHuman = 'new';
-			}
-
-			switch ($exceptChunkingType) {
-				case 'old':
-					$exceptChunkingVersion = 1;
-					break;
-				case 'new':
-					$exceptChunkingVersion = 2;
-					break;
-				default:
-					$exceptChunkingVersion = -1;
-					break;
-			}
-
-			foreach ([null, 1, 2] as $chunkingVersion) {
-				if ($chunkingVersion === $exceptChunkingVersion) {
-					continue;
-				}
-				$valid = WebDavHelper::isValidDavChunkingCombination(
-					$davPathVersion,
-					$chunkingVersion
-				);
-				if ($valid === false) {
-					continue;
-				}
-				$finalDestination = $destination;
-				if (!$overwriteMode && $chunkingVersion !== null) {
-					$finalDestination .= "-{$davHuman}dav-{$davHuman}chunking";
-				} elseif (!$overwriteMode && $chunkingVersion === null) {
-					$finalDestination .= "-{$davHuman}dav-regular";
-				}
-				$responses[] = self::upload(
-					$baseUrl,
-					$user,
-					$password,
-					$source,
-					$finalDestination,
-					$xRequestId,
-					[],
-					$davPathVersion,
-					$chunkingVersion,
-					2
-				);
-			}
-		}
-		return $responses;
 	}
 
 	/**

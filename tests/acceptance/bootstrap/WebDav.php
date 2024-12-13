@@ -68,8 +68,6 @@ trait WebDav {
 
 	private int $httpRequestTimeout = 0;
 
-	private ?int $chunkingToUse = null;
-
 	/**
 	 * The ability to do requests with depth infinity is disabled by default.
 	 * This remembers when the setting dav.propfind.depth_infinity has been
@@ -1626,7 +1624,7 @@ trait WebDav {
 	 * @param array|null $headers
 	 * @param int|null $noOfChunks Only use for chunked upload when $this->chunkingToUse is not null
 	 *
-	 * @return void
+	 * @return ResponseInterface
 	 * @throws Exception
 	 */
 	public function uploadFileWithHeaders(
@@ -1635,30 +1633,27 @@ trait WebDav {
 		string $destination,
 		?array $headers = [],
 		?int $noOfChunks = 0
-	):void {
-		$chunkingVersion = $this->chunkingToUse;
+	): ResponseInterface {
+		$doChunkUpload = true;
 		if ($noOfChunks <= 0) {
-			$chunkingVersion = null;
+			$doChunkUpload = false;
 		}
-		try {
-			$this->pauseUploadDelete();
-			$this->response = UploadHelper::upload(
-				$this->getBaseUrl(),
-				$this->getActualUsername($user),
-				$this->getUserPassword($user),
-				$source,
-				$destination,
-				$this->getStepLineRef(),
-				$headers,
-				$this->getDavPathVersion(),
-				$chunkingVersion,
-				$noOfChunks
-			);
-			$this->lastUploadDeleteTime = \time();
-		} catch (BadResponseException $e) {
-			// 4xx and 5xx responses cause an exception
-			$this->response = $e->getResponse();
-		}
+
+		$this->pauseUploadDelete();
+		$response = UploadHelper::upload(
+			$this->getBaseUrl(),
+			$this->getActualUsername($user),
+			$this->getUserPassword($user),
+			$source,
+			$destination,
+			$this->getStepLineRef(),
+			$headers,
+			$this->getDavPathVersion(),
+			$doChunkUpload,
+			$noOfChunks,
+		);
+		$this->lastUploadDeleteTime = \time();
+		return $response;
 	}
 
 	/**
@@ -1669,7 +1664,7 @@ trait WebDav {
 	 * @param boolean $async
 	 * @param array|null $headers
 	 *
-	 * @return void
+	 * @return ResponseInterface
 	 */
 	public function userUploadsAFileInChunk(
 		string $user,
@@ -1678,7 +1673,7 @@ trait WebDav {
 		int $noOfChunks = 2,
 		bool $async = false,
 		?array $headers = []
-	):void {
+	): ResponseInterface {
 		$user = $this->getActualUsername($user);
 		Assert::assertGreaterThan(
 			0,
@@ -1686,51 +1681,15 @@ trait WebDav {
 			"What does it mean to have $noOfChunks chunks?"
 		);
 
-		// use chunking version 1 as default, since version 2 uses "remote.php/dav/uploads" endpoint and it doesn't exist in oCIS
-		$this->chunkingToUse = 1;
-
 		if ($async === true) {
 			$headers['OC-LazyOps'] = 'true';
 		}
-		$this->uploadFileWithHeaders(
+		return $this->uploadFileWithHeaders(
 			$user,
 			$this->acceptanceTestsDirLocation() . $source,
 			$destination,
 			$headers,
 			$noOfChunks
-		);
-		$this->pushToLastStatusCodesArrays();
-	}
-
-	/**
-	 * Uploading with old/new DAV and chunked/non-chunked.
-	 * Except do not do the new-DAV-new-chunking combination. That is not being
-	 * supported on all implementations.
-	 *
-	 * @When user :user uploads file :source to filenames based on :destination with all mechanisms except new chunking using the WebDAV API
-	 *
-	 * @param string $user
-	 * @param string $source
-	 * @param string $destination
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function userUploadsAFileToWithAllMechanismsExceptNewChunking(
-		string $user,
-		string $source,
-		string $destination
-	):void {
-		$user = $this->getActualUsername($user);
-		$this->uploadResponses = UploadHelper::uploadWithAllMechanisms(
-			$this->getBaseUrl(),
-			$this->getActualUsername($user),
-			$this->getUserPassword($user),
-			$this->acceptanceTestsDirLocation() . $source,
-			$destination,
-			$this->getStepLineRef(),
-			false,
-			'new'
 		);
 	}
 
@@ -1751,24 +1710,9 @@ trait WebDav {
 		string $destination,
 		int $noOfChunks = 2
 	):void {
-		$this->userUploadsAFileInChunk($user, $source, $destination, $noOfChunks);
-	}
-
-	/**
-	 * @Then /^the HTTP status code of all upload responses should be "([^"]*)"$/
-	 *
-	 * @param int $statusCode
-	 *
-	 * @return void
-	 */
-	public function theHTTPStatusCodeOfAllUploadResponsesShouldBe(int $statusCode):void {
-		foreach ($this->uploadResponses as $response) {
-			Assert::assertEquals(
-				$statusCode,
-				$response->getStatusCode(),
-				'Response did not return expected status code'
-			);
-		}
+		$response = $this->userUploadsAFileInChunk($user, $source, $destination, $noOfChunks);
+		$this->setResponse($response);
+		$this->pushToLastStatusCodesArrays();
 	}
 
 	/**
@@ -1957,32 +1901,6 @@ trait WebDav {
 			);
 		} else {
 			$this->checkFileOrFolderDoesNotExistsForUser($user, "file", $destination);
-		}
-	}
-
-	/**
-	 * @Then /^the HTTP status code of all upload responses should be between "(\d+)" and "(\d+)"$/
-	 *
-	 * @param int $minStatusCode
-	 * @param int $maxStatusCode
-	 *
-	 * @return void
-	 */
-	public function theHTTPStatusCodeOfAllUploadResponsesShouldBeBetween(
-		int $minStatusCode,
-		int $maxStatusCode
-	):void {
-		foreach ($this->uploadResponses as $response) {
-			Assert::assertGreaterThanOrEqual(
-				$minStatusCode,
-				$response->getStatusCode(),
-				'Response did not return expected status code'
-			);
-			Assert::assertLessThanOrEqual(
-				$maxStatusCode,
-				$response->getStatusCode(),
-				'Response did not return expected status code'
-			);
 		}
 	}
 
@@ -2203,7 +2121,7 @@ trait WebDav {
 			$this->getStepLineRef(),
 			["X-OC-Mtime" => $mtime],
 			$this->getDavPathVersion(),
-			null,
+			false,
 			1,
 			$isGivenStep
 		);
@@ -2238,7 +2156,7 @@ trait WebDav {
 			$this->getStepLineRef(),
 			["X-OC-Mtime" => $mtime],
 			$this->getDavPathVersion(),
-			null,
+			false,
 			1,
 			true
 		);
