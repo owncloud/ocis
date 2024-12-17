@@ -149,8 +149,8 @@ Feature: List and create spaces
         }
       }
       """
-    And the json responded should not contain a space with name "Shares"
-    And the json responded should only contain spaces of type "personal"
+    And the json response should not contain a space with name "Shares"
+    And the json response should only contain spaces of type "personal"
 
 
   Scenario: ordinary user will not see any space when using a filter for project
@@ -183,7 +183,7 @@ Feature: List and create spaces
         }
       }
       """
-    And the json responded should not contain a space with name "Alice Hansen"
+    And the json response should not contain a space with name "Alice Hansen"
 
 
   Scenario: ordinary user can access their space via the webDav API
@@ -435,7 +435,7 @@ Feature: List and create spaces
     And user "Admin" has created a space "Project Venus" with the default quota using the Graph API
     When user "Alice" tries to look up the single space "Project Venus" owned by the user "Admin" by using its id
     Then the HTTP status code should be "404"
-    And the json responded should not contain a space with name "Project Venus"
+    And the json response should not contain a space with name "Project Venus"
     Examples:
       | user-role  |
       | User       |

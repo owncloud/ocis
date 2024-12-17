@@ -1272,7 +1272,7 @@ Feature: an user shares resources using ScienceMesh application
     And using server "REMOTE"
     When user "Brian" lists all available spaces via the Graph API
     Then the HTTP status code should be "200"
-    And the json responded should not contain a space with name "folderToShare"
+    And the json response should not contain a space with name "folderToShare"
 
   @issue-10213
   Scenario Outline: local user removes access of federated user from a resource
