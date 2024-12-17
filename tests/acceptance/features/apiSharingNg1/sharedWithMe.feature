@@ -5232,3 +5232,39 @@ Feature: an user gets the resources shared to them
     And the json response should contain the following shares:
       | textfile.txt  |
       | FolderToShare |
+
+  @env-config
+  Scenario: share a folder with denied permission role (Personal Space)
+    Given using spaces DAV path
+    And the administrator has enabled the permissions role "Denied"
+    And user "Alice" has created folder "FolderToShare"
+    And user "Alice" has uploaded file with content "hello world" to "FolderToShare/lorem.txt"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | FolderToShare |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Denied        |
+    When user "Brian" lists the shares shared with him using the Graph API
+    Then the HTTP status code should be "200"
+    And user "Brian" should not have a share "FolderToShare" shared by user "Alice" from space "Personal"
+    And user "Brian" should not be able to download file "FolderToShare/lorem.txt" from space "Shares"
+
+  @env-config
+  Scenario: share a folder with denied permission role (Project Space)
+    Given using spaces DAV path
+    And the administrator has enabled the permissions role "Denied"
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
+    And user "Alice" has created a folder "FolderToShare" in space "NewSpace"
+    And user "Alice" has uploaded a file inside space "NewSpace" with content "hello world" to "FolderToShare/lorem.txt"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | FolderToShare |
+      | space           | NewSpace      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Denied        |
+    When user "Brian" lists the shares shared with him using the Graph API
+    Then the HTTP status code should be "200"
+    And user "Brian" should not have a share "FolderToShare" shared by user "Alice" from space "NewSpace"
+    And user "Brian" should not be able to download file "FolderToShare/lorem.txt" from space "Shares"
