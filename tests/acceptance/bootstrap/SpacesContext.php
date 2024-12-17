@@ -1026,7 +1026,7 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @Then /^the json responded should not contain a space with name "([^"]*)"$/
+	 * @Then /^the json response should not contain a space with name "([^"]*)"$/
 	 *
 	 * @param string $spaceName
 	 *
@@ -1103,7 +1103,7 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @Then /^the json responded should (not|only|)\s?contain spaces of type "([^"]*)"$/
+	 * @Then /^the json response should (not|only|)\s?contain spaces of type "([^"]*)"$/
 	 *
 	 * @param string $onlyOrNot (not|only|)
 	 * @param string $type

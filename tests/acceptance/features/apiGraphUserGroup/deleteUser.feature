@@ -150,7 +150,7 @@ Feature: delete user
     When the user "Alice" deletes a user "Brian" using the Graph API
     Then the HTTP status code should be "204"
     When user "Alice" lists all spaces via the Graph API with query "$filter=driveType eq 'personal'"
-    Then the json responded should not contain a space with name "Brian Murphy"
+    Then the json response should not contain a space with name "Brian Murphy"
 
 
   Scenario: accepted share is deleted automatically when the user is deleted
