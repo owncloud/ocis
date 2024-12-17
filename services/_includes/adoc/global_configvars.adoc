@@ -28,7 +28,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-The default role assignments the demo users should be setup.
+Flag to enable or disable the creation of the demo users.
 a| `OCIS_ADMIN_USER_ID`
 
 a| [subs=-attributes]
@@ -90,7 +90,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The password to use for authentication. Only applies when store type 'nats-js-kv' is configured.
+The password to use for authentication. Only applies when using the 'nats-js-kv' store type.
 a| `OCIS_CACHE_AUTH_USERNAME`
 
 a| [subs=-attributes]
@@ -116,7 +116,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The username to use for authentication. Only applies when store type 'nats-js-kv' is configured.
+The username to use for authentication. Only applies when using the 'nats-js-kv' store type.
 a| `OCIS_CACHE_DATABASE`
 
 a| [subs=-attributes]
@@ -136,7 +136,7 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++cache-providers ++
+++cache-stat ++
 
 a| [subs=-attributes]
 The database name the configured store should use.
@@ -164,7 +164,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Disables persistence of the provider cache. Only applies when store type 'nats-js-kv' is configured. Defaults to false.
+Disable persistence of the cache. Only applies when using the 'nats-js-kv' store type. Defaults to false.
 a| `OCIS_CACHE_STORE`
 
 a| [subs=-attributes]
@@ -187,7 +187,7 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++noop ++
+++memory ++
 
 a| [subs=-attributes]
 The type of the cache store. Supported values are: 'memory', 'redis-sentinel', 'nats-js-kv', 'noop'. See the text description for details.
@@ -270,7 +270,7 @@ a| [subs=-attributes]
 ++bool ++
 
 a| [subs=-attributes]
-++true ++
+++false ++
 
 a| [subs=-attributes]
 Allow credentials for CORS.See following chapter for more details: *Access-Control-Allow-Credentials* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials.
@@ -301,7 +301,7 @@ a| [subs=-attributes]
 ++[]string ++
 
 a| [subs=-attributes]
-++[Authorization Origin Content-Type Accept X-Requested-With X-Request-Id Ocs-Apirequest] ++
+++[Origin Accept Content-Type Depth Authorization Ocs-Apirequest If-None-Match If-Match Destination Overwrite X-Request-Id X-Requested-With Tus-Resumable Tus-Checksum-Algorithm Upload-Concat Upload-Length Upload-Metadata Upload-Defer-Length Upload-Expires Upload-Checksum Upload-Offset X-HTTP-Method-Override Cache-Control] ++
 
 a| [subs=-attributes]
 A list of allowed CORS headers. See following chapter for more details: *Access-Control-Request-Headers* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers. See the Environment Variable Types description for more details.
@@ -332,7 +332,7 @@ a| [subs=-attributes]
 ++[]string ++
 
 a| [subs=-attributes]
-++[GET POST DELETE] ++
+++[OPTIONS HEAD GET PUT POST PATCH DELETE MKCOL PROPFIND PROPPATCH MOVE COPY REPORT SEARCH] ++
 
 a| [subs=-attributes]
 A list of allowed CORS methods. See following chapter for more details: *Access-Control-Request-Method* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method. See the Environment Variable Types description for more details.
@@ -363,7 +363,7 @@ a| [subs=-attributes]
 ++[]string ++
 
 a| [subs=-attributes]
-++[*] ++
+++[https://localhost:9200] ++
 
 a| [subs=-attributes]
 A list of allowed CORS origins. See following chapter for more details: *Access-Control-Allow-Origin* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin. See the Environment Variable Types description for more details.
@@ -441,7 +441,7 @@ Edition of oCIS. Used for branding purposes.
 a| `OCIS_ENABLE_OCM`
 
 a| [subs=-attributes]
-++5.0 ++
+++pre5.0 ++
 
 a| [subs=attributes+]
 * xref:{s-path}/frontend.adoc[frontend] +
@@ -457,7 +457,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Include OCM sharees when listing users.
+Changing this value is NOT supported. Enables support for incoming federated sharing for clients. The backend behaviour is not changed.
 a| `OCIS_EVENTS_AUTH_PASSWORD`
 
 a| [subs=-attributes]
@@ -525,7 +525,7 @@ The username to authenticate with the events broker. The events broker is the oc
 a| `OCIS_EVENTS_CLUSTER`
 
 a| [subs=-attributes]
-++pre5.0 ++
+++5.0 ++
 
 a| [subs=attributes+]
 * xref:{s-path}/activitylog.adoc[activitylog] +
@@ -557,7 +557,7 @@ The clusterID of the event system. The event system is the message queuing servi
 a| `OCIS_EVENTS_ENABLE_TLS`
 
 a| [subs=-attributes]
-++pre5.0 ++
+++5.0 ++
 
 a| [subs=attributes+]
 * xref:{s-path}/activitylog.adoc[activitylog] +
@@ -590,7 +590,7 @@ Enable TLS for the connection to the events broker. The events broker is the oci
 a| `OCIS_EVENTS_ENDPOINT`
 
 a| [subs=-attributes]
-++pre5.0 ++
+++5.0 ++
 
 a| [subs=attributes+]
 * xref:{s-path}/activitylog.adoc[activitylog] +
@@ -649,7 +649,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The root CA certificate used to validate the server's TLS certificate. If provided ANTIVIRUS_EVENTS_TLS_INSECURE will be seen as false.
+The root CA certificate used to validate the server's TLS certificate. If provided POLICIES_EVENTS_TLS_INSECURE will be seen as false.
 a| `OCIS_GATEWAY_GRPC_ADDR`
 
 a| [subs=-attributes]
@@ -746,7 +746,7 @@ TLS mode for grpc connection to the go-micro based grpc services. Possible value
 a| `OCIS_GRPC_PROTOCOL`
 
 a| [subs=-attributes]
-++7.0.0 ++
+++pre5.0 ++
 
 a| [subs=attributes+]
 * xref:{s-path}/app-provider.adoc[app-provider] +
@@ -900,11 +900,11 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Whether to verify the server TLS certificates.
+Allow insecure connections to the OIDC issuer.
 a| `OCIS_JWT_SECRET`
 
 a| [subs=-attributes]
-++7.0.0 ++
+++pre5.0 ++
 
 a| [subs=attributes+]
 * xref:{s-path}/activitylog.adoc[activitylog] +
@@ -1063,7 +1063,7 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++uid=reva,ou=sysusers,o=libregraph-idm ++
+++uid=libregraph,ou=sysusers,o=libregraph-idm ++
 
 a| [subs=-attributes]
 LDAP DN to use for simple bind authentication with the target LDAP server.
@@ -1142,7 +1142,7 @@ a| [subs=-attributes]
 ++attribute ++
 
 a| [subs=-attributes]
-An option to control the behavior for disabling users. Valid options are 'none', 'attribute' and 'group'. If set to 'group', disabling a user via API will add the user to the configured group for disabled users, if set to 'attribute' this will be done in the ldap user entry, if set to 'none' the disable request is not processed.
+An option to control the behavior for disabling users. Supported options are 'none', 'attribute' and 'group'. If set to 'group', disabling a user via API will add the user to the configured group for disabled users, if set to 'attribute' this will be done in the ldap user entry, if set to 'none' the disable request is not processed. Default is 'attribute'.
 a| `OCIS_LDAP_GROUP_BASE_DN`
 
 a| [subs=-attributes]
@@ -1252,10 +1252,10 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++ownclouduuid ++
+++owncloudUUID ++
 
 a| [subs=-attributes]
-LDAP Attribute to use as the unique id for groups. This should be a stable globally unique id (e.g. a UUID).
+LDAP Attribute to use as the unique id for groups. This should be a stable globally unique ID like a UUID.
 a| `OCIS_LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING`
 
 a| [subs=-attributes]
@@ -1274,7 +1274,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Set this to true if the defined 'id' attribute for groups is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the group IDs.
+Set this to true if the defined 'ID' attribute for groups is of the 'OCTETSTRING' syntax. This is required when using the 'objectGUID' attribute of Active Directory for the group ID's.
 a| `OCIS_LDAP_GROUP_SCHEMA_MAIL`
 
 a| [subs=-attributes]
@@ -1330,7 +1330,7 @@ a| [subs=-attributes]
 ++sub ++
 
 a| [subs=-attributes]
-LDAP search scope to use when looking up groups. Supported values are 'base', 'one' and 'sub'.
+LDAP search scope to use when looking up groups. Supported scopes are 'base', 'one' and 'sub'.
 a| `OCIS_LDAP_INSECURE`
 
 a| [subs=-attributes]
@@ -1426,7 +1426,7 @@ a| [subs=-attributes]
 ++ownCloudUserEnabled ++
 
 a| [subs=-attributes]
-LDAP attribute to use as a flag telling if the user is enabled or disabled.
+LDAP Attribute to use as a flag telling if the user is enabled or disabled.
 a| `OCIS_LDAP_USER_FILTER`
 
 a| [subs=-attributes]
@@ -1482,10 +1482,10 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++displayname ++
+++displayName ++
 
 a| [subs=-attributes]
-LDAP Attribute to use for the displayname of users.
+LDAP Attribute to use for the display name of users.
 a| `OCIS_LDAP_USER_SCHEMA_ID`
 
 a| [subs=-attributes]
@@ -1502,7 +1502,7 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++ownclouduuid ++
+++owncloudUUID ++
 
 a| [subs=-attributes]
 LDAP Attribute to use as the unique ID for users. This should be a stable globally unique ID like a UUID.
@@ -1524,7 +1524,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Set this to true if the defined 'ID' attribute for users is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the user IDs.
+Set this to true if the defined 'ID' attribute for users is of the 'OCTETSTRING' syntax. This is required when using the 'objectGUID' attribute of Active Directory for the user ID's.
 a| `OCIS_LDAP_USER_SCHEMA_MAIL`
 
 a| [subs=-attributes]
@@ -1601,7 +1601,7 @@ a| [subs=-attributes]
 ++sub ++
 
 a| [subs=-attributes]
-LDAP search scope to use when looking up users. Supported values are 'base', 'one' and 'sub'.
+LDAP search scope to use when looking up users. Supported scopes are 'base', 'one' and 'sub'.
 a| `OCIS_LOG_COLOR`
 
 a| [subs=-attributes]
@@ -1833,7 +1833,7 @@ Activates pretty log output.
 a| `OCIS_MACHINE_AUTH_API_KEY`
 
 a| [subs=-attributes]
-++7.0.0 ++
+++pre5.0 ++
 
 a| [subs=attributes+]
 * xref:{s-path}/auth-app.adoc[auth-app] +
@@ -1896,7 +1896,7 @@ a| [subs=-attributes]
 ++https://localhost:9200 ++
 
 a| [subs=-attributes]
-The identity provider value to set in the userids of the CS3 user objects for users returned by this user provider.
+URL of the OIDC issuer. It defaults to URL of the builtin IDP.
 a| `OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST`
 
 a| [subs=-attributes]
@@ -2019,7 +2019,7 @@ Define the minimum number of lowercase letters. Defaults to 1 if not set.
 a| `OCIS_PERSISTENT_STORE`
 
 a| [subs=-attributes]
-++7.0.0 ++
+++pre5.0 ++
 
 a| [subs=attributes+]
 * xref:{s-path}/activitylog.adoc[activitylog] +
@@ -2039,7 +2039,7 @@ The type of the store. Supported values are: 'memory', 'nats-js-kv', 'redis-sent
 a| `OCIS_PERSISTENT_STORE_AUTH_PASSWORD`
 
 a| [subs=-attributes]
-++7.0.0 ++
+++5.0 ++
 
 a| [subs=attributes+]
 * xref:{s-path}/activitylog.adoc[activitylog] +
@@ -2059,7 +2059,7 @@ The password to authenticate with the store. Only applies when store type 'nats-
 a| `OCIS_PERSISTENT_STORE_AUTH_USERNAME`
 
 a| [subs=-attributes]
-++7.0.0 ++
+++5.0 ++
 
 a| [subs=attributes+]
 * xref:{s-path}/activitylog.adoc[activitylog] +
@@ -2079,7 +2079,7 @@ The username to authenticate with the store. Only applies when store type 'nats-
 a| `OCIS_PERSISTENT_STORE_NODES`
 
 a| [subs=-attributes]
-++7.0.0 ++
+++pre5.0 ++
 
 a| [subs=attributes+]
 * xref:{s-path}/activitylog.adoc[activitylog] +
@@ -2099,7 +2099,7 @@ A list of nodes to access the configured store. This has no effect when 'memory'
 a| `OCIS_PERSISTENT_STORE_TTL`
 
 a| [subs=-attributes]
-++7.0.0 ++
+++pre5.0 ++
 
 a| [subs=attributes+]
 * xref:{s-path}/activitylog.adoc[activitylog] +
@@ -2112,10 +2112,10 @@ a| [subs=-attributes]
 ++Duration ++
 
 a| [subs=-attributes]
-++30m0s ++
+++0s ++
 
 a| [subs=-attributes]
-Time to live for events in the store. Defaults to '30m' (30 minutes). See the Environment Variable Types description for more details.
+Time to live for events in the store. See the Environment Variable Types description for more details.
 a| `OCIS_REVA_GATEWAY`
 
 a| [subs=-attributes]
@@ -2246,7 +2246,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Set this to true if you want to enforce passwords on Uploader, Editor or Contributor shares. If not using the global OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD, you must define the FRONTEND_OCS_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD (deprecated) in the frontend service.
+Set this to true if you want to enforce passwords for writable shares. Only effective if the setting for 'passwords on all public shares' is set to false.
 a| `OCIS_SHOW_USER_EMAIL_IN_RESULTS`
 
 a| [subs=-attributes]
@@ -2280,7 +2280,7 @@ a| [subs=-attributes]
 ++0 ++
 
 a| [subs=-attributes]
-Set a global max quota for spaces in bytes. A value of 0 equals unlimited. If not using the global OCIS_SPACES_MAX_QUOTA, you must define the FRONTEND_MAX_QUOTA in the frontend service.
+Set the global max quota value in bytes. A value of 0 equals unlimited. The value is provided via capabilities.
 a| `OCIS_SYSTEM_USER_API_KEY`
 
 a| [subs=-attributes]
@@ -2587,7 +2587,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The storage transfer secret.
+Transfer secret for signing file up- and download requests.
 a| `OCIS_TRANSLATION_PATH`
 
 a| [subs=-attributes]
@@ -2640,11 +2640,11 @@ a| [subs=-attributes]
 ++https://localhost:9200 ++
 
 a| [subs=-attributes]
-The identity provider value to set in the userids of the CS3 user objects for users returned by this user provider.
+URL of the OIDC issuer. It defaults to URL of the builtin IDP.
 a| `OCIS_WOPI_DISABLE_CHAT`
 
 a| [subs=-attributes]
-++pre5.0 ++
+++7.0.0 ++
 
 a| [subs=attributes+]
 * xref:{s-path}/app-provider.adoc[app-provider] +
@@ -2657,7 +2657,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Disable the chat functionality of the office app.
+Disable chat in the office web frontend. This feature applies to OnlyOffice and Microsoft.
 a| `STORAGE_USERS_ASYNC_PROPAGATOR_PROPAGATION_DELAY`
 
 a| [subs=-attributes]
