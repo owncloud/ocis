@@ -31,6 +31,24 @@ use PHPUnit\Framework\Assert;
  * steps needed to re-configure oCIS server
  */
 class OcisConfigContext implements Context {
+	private array $enabledPermissionsRoles = [];
+
+	/**
+	 * @return array
+	 */
+	public function getEnabledPermissionsRoles(): array {
+		return $this->enabledPermissionsRoles;
+	}
+
+	/**
+	 * @param array $enabledPermissionsRoles
+	 *
+	 * @return void
+	 */
+	public function setEnabledPermissionsRoles(array $enabledPermissionsRoles): void {
+		$this->enabledPermissionsRoles = $enabledPermissionsRoles;
+	}
+
 	/**
 	 * @Given async upload has been enabled with post-processing delayed to :delayTime seconds
 	 *
@@ -99,6 +117,33 @@ class OcisConfigContext implements Context {
 			$response->getStatusCode(),
 			"Failed to enable role $role"
 		);
+		$this->setEnabledPermissionsRoles($defaultRoles);
+	}
+
+	/**
+	 * @Given the administrator has disabled the permissions role :role
+	 *
+	 * @param string $role
+	 *
+	 * @return void
+	 */
+	public function theAdministratorHasDisabledThePermissionsRole(string $role): void {
+		$roleId = GraphHelper::getPermissionsRoleIdByName($role);
+		$availableRoles = $this->getEnabledPermissionsRoles();
+
+		if ($key = array_search($roleId, $availableRoles)) {
+			unset($availableRoles[$key]);
+		}
+		$envs = [
+			"GRAPH_AVAILABLE_ROLES" => implode(',', $availableRoles),
+		];
+		$response =  OcisConfigHelper::reConfigureOcis($envs);
+		Assert::assertEquals(
+			200,
+			$response->getStatusCode(),
+			"Failed to disable role $role"
+		);
+		$this->setEnabledPermissionsRoles($availableRoles);
 	}
 
 	/**
