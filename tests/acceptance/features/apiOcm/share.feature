@@ -1255,3 +1255,21 @@ Feature: an user shares resources using ScienceMesh application
     Then the HTTP status code should be "500"
     And using server "LOCAL"
     And the content of file "textfile.txt" for user "Alice" should be "ocm test"
+
+  @issue-10689
+  Scenario: federation user lists all the spaces
+    Given using server "REMOTE"
+    And "Brian" has created the federation share invitation
+    And using server "LOCAL"
+    And "Alice" has accepted invitation
+    And user "Alice" has created folder "folderToShare"
+    And user "Alice" has sent the following resource share invitation to federated user:
+      | resource        | folderToShare |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Editor        |
+    And using server "REMOTE"
+    When user "Brian" lists all available spaces via the Graph API
+    Then the HTTP status code should be "200"
+    And the json responded should not contain a space with name "folderToShare"
