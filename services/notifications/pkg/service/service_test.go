@@ -2,6 +2,7 @@ package service_test
 
 import (
 	"context"
+	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 	"time"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
@@ -68,7 +69,22 @@ var _ = Describe("Notifications", func() {
 		gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(&provider.StatResponse{Status: &rpc.Status{Code: rpc.Code_CODE_OK}, Info: &provider.ResourceInfo{Name: "secrets of the board", Space: &provider.StorageSpace{Name: "secret space"}}}, nil)
 		vs = &settingssvc.MockValueService{}
 		vs.GetValueByUniqueIdentifiersFunc = func(ctx context.Context, req *settingssvc.GetValueByUniqueIdentifiersRequest, opts ...client.CallOption) (*settingssvc.GetValueResponse, error) {
-			return nil, nil
+			return &settingssvc.GetValueResponse{
+				Value: &settingsmsg.ValueWithIdentifier{
+					Value: &settingsmsg.Value{
+						Value: &settingsmsg.Value_CollectionValue{
+							CollectionValue: &settingsmsg.CollectionValue{
+								Values: []*settingsmsg.CollectionOption{
+									{
+										Key:    "mail",
+										Option: &settingsmsg.CollectionOption_BoolValue{BoolValue: true},
+									},
+								},
+							},
+						},
+					},
+				},
+			}, nil
 		}
 	})
 
@@ -266,7 +282,22 @@ var _ = Describe("Notifications X-Site Scripting", func() {
 		}, nil)
 		vs = &settingssvc.MockValueService{}
 		vs.GetValueByUniqueIdentifiersFunc = func(ctx context.Context, req *settingssvc.GetValueByUniqueIdentifiersRequest, opts ...client.CallOption) (*settingssvc.GetValueResponse, error) {
-			return nil, nil
+			return &settingssvc.GetValueResponse{
+				Value: &settingsmsg.ValueWithIdentifier{
+					Value: &settingsmsg.Value{
+						Value: &settingsmsg.Value_CollectionValue{
+							CollectionValue: &settingsmsg.CollectionValue{
+								Values: []*settingsmsg.CollectionOption{
+									{
+										Key:    "mail",
+										Option: &settingsmsg.CollectionOption_BoolValue{BoolValue: true},
+									},
+								},
+							},
+						},
+					},
+				},
+			}, nil
 		}
 	})
 

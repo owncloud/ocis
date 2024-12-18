@@ -5,6 +5,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/owncloud/ocis/v2/services/notifications/pkg/email"
+	"github.com/owncloud/ocis/v2/services/settings/pkg/store/defaults"
 )
 
 func (s eventsNotifier) handleSpaceShared(e events.SpaceShared) {
@@ -63,7 +64,8 @@ func (s eventsNotifier) handleSpaceShared(e events.SpaceShared) {
 	// the Grantees of the shares. Ideally the notfication service would use some kind of service
 	// user for this.
 	granteeList := s.ensureGranteeList(ctx, executant.GetId(), e.GranteeUserID, e.GranteeGroupID)
-	if granteeList == nil {
+	filteredGrantees := s.filter.execute(ctx, granteeList, defaults.SettingUUIDProfileEventSpaceShared)
+	if filteredGrantees == nil {
 		return
 	}
 
@@ -74,7 +76,7 @@ func (s eventsNotifier) handleSpaceShared(e events.SpaceShared) {
 			"SpaceSharer": sharerDisplayName,
 			"SpaceName":   resourceInfo.GetSpace().GetName(),
 			"ShareLink":   shareLink,
-		}, granteeList, sharerDisplayName)
+		}, filteredGrantees, sharerDisplayName)
 	if err != nil {
 		s.logger.Error().Err(err).Str("event", "SharedSpace").Msg("could not get render the email")
 		return
@@ -136,7 +138,8 @@ func (s eventsNotifier) handleSpaceUnshared(e events.SpaceUnshared) {
 	// the Grantees of the shares. Ideally the notfication service would use some kind of service
 	// user for this.
 	granteeList := s.ensureGranteeList(ctx, executant.GetId(), e.GranteeUserID, e.GranteeGroupID)
-	if granteeList == nil {
+	filteredGrantees := s.filter.execute(ctx, granteeList, defaults.SettingUUIDProfileEventSpaceUnshared)
+	if filteredGrantees == nil {
 		return
 	}
 
@@ -147,7 +150,7 @@ func (s eventsNotifier) handleSpaceUnshared(e events.SpaceUnshared) {
 			"SpaceSharer": sharerDisplayName,
 			"SpaceName":   resourceInfo.GetSpace().Name,
 			"ShareLink":   shareLink,
-		}, granteeList, sharerDisplayName)
+		}, filteredGrantees, sharerDisplayName)
 	if err != nil {
 		s.logger.Error().Err(err).Str("event", "UnsharedSpace").Msg("Could not get render the email")
 		return
@@ -185,13 +188,17 @@ func (s eventsNotifier) handleSpaceMembershipExpired(e events.SpaceMembershipExp
 	if granteeList == nil {
 		return
 	}
+	filteredGrantees := s.filter.execute(ctx, granteeList, defaults.SettingUUIDProfileEventSpaceMembershipExpired)
+	if filteredGrantees == nil {
+		return
+	}
 
 	recipientList, err := s.render(ctx, email.MembershipExpired,
 		"SpaceGrantee",
 		map[string]string{
 			"SpaceName": e.SpaceName,
 			"ExpiredAt": e.ExpiredAt.Format("2006-01-02 15:04:05"),
-		}, granteeList, owner.GetDisplayName())
+		}, filteredGrantees, owner.GetDisplayName())
 	if err != nil {
 		s.logger.Error().Err(err).Str("event", "SpaceUnshared").Msg("could not get render the email")
 		return
