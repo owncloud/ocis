@@ -113,31 +113,32 @@ func (s *defaultLanguageDecorator) withDefaultProfileValueList(ctx context.Conte
 	bundle := defaults.GenerateDefaultProfileBundle()
 
 	for _, setting := range bundle.GetSettings() {
-		if v, ok := requested[setting.GetId()]; ok && v == nil {
-			if setting.GetId() == defaults.SettingUUIDProfileLanguage {
-				requested[setting.GetId()] = s.withDefaultLanguageSetting(accountUUID)
-				continue
-			}
+		if v, ok := requested[setting.GetId()]; !ok || v != nil {
+			continue
+		}
+		if setting.GetId() == defaults.SettingUUIDProfileLanguage {
+			requested[setting.GetId()] = s.withDefaultLanguageSetting(accountUUID)
+			continue
+		}
 
-			newVal := &settingsmsg.ValueWithIdentifier{
-				Identifier: &settingsmsg.Identifier{
-					Extension: bundle.GetExtension(),
-					Bundle:    bundle.GetName(),
-					Setting:   setting.GetName(),
-				},
-				Value: &settingsmsg.Value{
-					BundleId:    bundle.GetId(),
-					SettingId:   setting.GetId(),
-					AccountUuid: accountUUID,
-					Resource:    setting.GetResource(),
-				},
-			}
+		newVal := &settingsmsg.ValueWithIdentifier{
+			Identifier: &settingsmsg.Identifier{
+				Extension: bundle.GetExtension(),
+				Bundle:    bundle.GetName(),
+				Setting:   setting.GetName(),
+			},
+			Value: &settingsmsg.Value{
+				BundleId:    bundle.GetId(),
+				SettingId:   setting.GetId(),
+				AccountUuid: accountUUID,
+				Resource:    setting.GetResource(),
+			},
+		}
 
-			switch val := setting.GetValue().(type) {
-			case *settingsmsg.Setting_MultiChoiceCollectionValue:
-				newVal.Value.Value = multiChoiceCollectionToValue(val.MultiChoiceCollectionValue)
-				requested[setting.GetId()] = newVal
-			}
+		switch val := setting.GetValue().(type) {
+		case *settingsmsg.Setting_MultiChoiceCollectionValue:
+			newVal.Value.Value = multiChoiceCollectionToValue(val.MultiChoiceCollectionValue)
+			requested[setting.GetId()] = newVal
 		}
 	}
 
@@ -172,15 +173,14 @@ func getDefaultValueList() map[string]*settingsmsg.ValueWithIdentifier {
 		// specific profile settings should be handled individually
 		defaults.SettingUUIDProfileLanguage: nil,
 		// all other profile settings that populated from the bundle based on type
-		defaults.SettingUUIDProfileEventShareCreated:                    nil,
-		defaults.SettingUUIDProfileEventShareRemoved:                    nil,
-		defaults.SettingUUIDProfileEventShareExpired:                    nil,
-		defaults.SettingUUIDProfileEventSpaceShared:                     nil,
-		defaults.SettingUUIDProfileEventSpaceUnshared:                   nil,
-		defaults.SettingUUIDProfileEventSpaceMembershipExpired:          nil,
-		defaults.SettingUUIDProfileEventSpaceDisabled:                   nil,
-		defaults.SettingUUIDProfileEventSpaceDeleted:                    nil,
-		defaults.SettingUUIDProfileEventPostprocessingStepFinished:      nil,
-		defaults.SettingUUIDProfileEventScienceMeshInviteTokenGenerated: nil,
+		defaults.SettingUUIDProfileEventShareCreated:               nil,
+		defaults.SettingUUIDProfileEventShareRemoved:               nil,
+		defaults.SettingUUIDProfileEventShareExpired:               nil,
+		defaults.SettingUUIDProfileEventSpaceShared:                nil,
+		defaults.SettingUUIDProfileEventSpaceUnshared:              nil,
+		defaults.SettingUUIDProfileEventSpaceMembershipExpired:     nil,
+		defaults.SettingUUIDProfileEventSpaceDisabled:              nil,
+		defaults.SettingUUIDProfileEventSpaceDeleted:               nil,
+		defaults.SettingUUIDProfileEventPostprocessingStepFinished: nil,
 	}
 }

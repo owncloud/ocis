@@ -390,25 +390,6 @@ func ProfileEventPostprocessingStepFinishedPermission(c settingsmsg.Permission_C
 	}
 }
 
-// ProfileEventScienceMeshInviteTokenGeneratedPermission is the permission to set the email sending interval
-func ProfileEventScienceMeshInviteTokenGeneratedPermission(c settingsmsg.Permission_Constraint) *settingsmsg.Setting {
-	return &settingsmsg.Setting{
-		Id:          "da3ff1c5-5bb4-4829-b9bd-a91542737151",
-		Name:        "Event.ScienceMeshInviteTokenGenerated.ReadWrite",
-		DisplayName: "Event Science Mesh Invite Token Generated",
-		Resource: &settingsmsg.Resource{
-			Type: settingsmsg.Resource_TYPE_SETTING,
-			Id:   SettingUUIDProfileEventScienceMeshInviteTokenGenerated,
-		},
-		Value: &settingsmsg.Setting_PermissionValue{
-			PermissionValue: &settingsmsg.Permission{
-				Operation:  settingsmsg.Permission_OPERATION_READWRITE,
-				Constraint: c,
-			},
-		},
-	}
-}
-
 // GroupManagementPermission is the permission to manage groups
 func GroupManagementPermission(c settingsmsg.Permission_Constraint) *settingsmsg.Setting {
 	return &settingsmsg.Setting{

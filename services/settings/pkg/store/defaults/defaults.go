@@ -45,8 +45,6 @@ const (
 	SettingUUIDProfileEventSpaceDeleted = "094ceca9-5a00-40ba-bb1a-bbc7bccd39ee"
 	// SettingUUIDProfileEventPostprocessingStepFinished is the hardcoded setting UUID for the send in mail setting
 	SettingUUIDProfileEventPostprocessingStepFinished = "fe0a3011-d886-49c8-b797-33d02fa426ef"
-	// SettingUUIDProfileEventScienceMeshInviteTokenGenerated is the hardcoded setting UUID for the send in mail setting
-	SettingUUIDProfileEventScienceMeshInviteTokenGenerated = "b441ffb1-f5ee-4733-a08f-48d03f6e7f22"
 )
 
 // GenerateBundlesDefaultRoles bootstraps the default roles.
@@ -132,7 +130,6 @@ func generateBundleAdminRole() *settingsmsg.Bundle {
 			ProfileEventSpaceDisabledPermission(Own),
 			ProfileEventSpaceDeletedPermission(Own),
 			ProfileEventPostprocessingStepFinishedPermission(Own),
-			ProfileEventScienceMeshInviteTokenGeneratedPermission(Own),
 			GroupManagementPermission(All),
 			LanguageManagementPermission(All),
 			ListFavoritesPermission(Own),
@@ -176,7 +173,6 @@ func generateBundleSpaceAdminRole() *settingsmsg.Bundle {
 			ProfileEventSpaceDisabledPermission(Own),
 			ProfileEventSpaceDeletedPermission(Own),
 			ProfileEventPostprocessingStepFinishedPermission(Own),
-			ProfileEventScienceMeshInviteTokenGeneratedPermission(Own),
 			LanguageManagementPermission(Own),
 			ListFavoritesPermission(Own),
 			ListSpacesPermission(All),
@@ -215,7 +211,6 @@ func generateBundleUserRole() *settingsmsg.Bundle {
 			ProfileEventSpaceDisabledPermission(Own),
 			ProfileEventSpaceDeletedPermission(Own),
 			ProfileEventPostprocessingStepFinishedPermission(Own),
-			ProfileEventScienceMeshInviteTokenGeneratedPermission(Own),
 			LanguageManagementPermission(Own),
 			ListFavoritesPermission(Own),
 			SelfManagementPermission(Own),
@@ -298,7 +293,7 @@ func generateBundleProfileRequest() *settingsmsg.Bundle {
 				Id:          SettingUUIDProfileEventShareCreated,
 				Name:        "event-share-created-options",
 				DisplayName: "Share created",
-				Description: "Send In-App",
+				Description: "Share created",
 				Resource: &settingsmsg.Resource{
 					Type: settingsmsg.Resource_TYPE_USER,
 				},
@@ -315,7 +310,7 @@ func generateBundleProfileRequest() *settingsmsg.Bundle {
 				Id:          SettingUUIDProfileEventShareRemoved,
 				Name:        "event-share-removed-options",
 				DisplayName: "Share removed",
-				Description: "Send In-App",
+				Description: "Share removed",
 				Resource: &settingsmsg.Resource{
 					Type: settingsmsg.Resource_TYPE_USER,
 				},
@@ -332,7 +327,7 @@ func generateBundleProfileRequest() *settingsmsg.Bundle {
 				Id:          SettingUUIDProfileEventShareExpired,
 				Name:        "event-share-expired-options",
 				DisplayName: "Share expired",
-				Description: "Send In-App",
+				Description: "Share expired",
 				Resource: &settingsmsg.Resource{
 					Type: settingsmsg.Resource_TYPE_USER,
 				},
@@ -349,7 +344,7 @@ func generateBundleProfileRequest() *settingsmsg.Bundle {
 				Id:          SettingUUIDProfileEventSpaceShared,
 				Name:        "event-space-shared-options",
 				DisplayName: "Space shared",
-				Description: "Send In-App",
+				Description: "Space shared",
 				Resource: &settingsmsg.Resource{
 					Type: settingsmsg.Resource_TYPE_USER,
 				},
@@ -366,7 +361,7 @@ func generateBundleProfileRequest() *settingsmsg.Bundle {
 				Id:          SettingUUIDProfileEventSpaceUnshared,
 				Name:        "event-space-unshared-options",
 				DisplayName: "Space unshared",
-				Description: "Send In-App",
+				Description: "Space unshared",
 				Resource: &settingsmsg.Resource{
 					Type: settingsmsg.Resource_TYPE_USER,
 				},
@@ -383,7 +378,7 @@ func generateBundleProfileRequest() *settingsmsg.Bundle {
 				Id:          SettingUUIDProfileEventSpaceMembershipExpired,
 				Name:        "event-space-membership-expired-options",
 				DisplayName: "Space membership expired",
-				Description: "Send In-App",
+				Description: "Space membership expired",
 				Resource: &settingsmsg.Resource{
 					Type: settingsmsg.Resource_TYPE_USER,
 				},
@@ -400,7 +395,7 @@ func generateBundleProfileRequest() *settingsmsg.Bundle {
 				Id:          SettingUUIDProfileEventSpaceDisabled,
 				Name:        "event-space-disabled-options",
 				DisplayName: "Space disabled",
-				Description: "Send In-App",
+				Description: "Space disabled",
 				Resource: &settingsmsg.Resource{
 					Type: settingsmsg.Resource_TYPE_USER,
 				},
@@ -417,7 +412,7 @@ func generateBundleProfileRequest() *settingsmsg.Bundle {
 				Id:          SettingUUIDProfileEventSpaceDeleted,
 				Name:        "event-space-deleted-options",
 				DisplayName: "Space deleted",
-				Description: "Send In-App",
+				Description: "Space deleted",
 				Resource: &settingsmsg.Resource{
 					Type: settingsmsg.Resource_TYPE_USER,
 				},
@@ -443,23 +438,6 @@ func generateBundleProfileRequest() *settingsmsg.Bundle {
 						Options: []*settingsmsg.MultiChoiceCollectionOption{
 							&optionInAppTrue,
 							&optionMailFalseDisabled,
-						},
-					},
-				},
-			},
-			{
-				Id:          SettingUUIDProfileEventScienceMeshInviteTokenGenerated,
-				Name:        "event-Science-mesh-invite-token-generated-options",
-				DisplayName: "Science Mesh Invite Token Generated",
-				Description: "Science Mesh Invite Token Generated",
-				Resource: &settingsmsg.Resource{
-					Type: settingsmsg.Resource_TYPE_USER,
-				},
-				Value: &settingsmsg.Setting_MultiChoiceCollectionValue{
-					MultiChoiceCollectionValue: &settingsmsg.MultiChoiceCollection{
-						Options: []*settingsmsg.MultiChoiceCollectionOption{
-							&optionInAppTrue,
-							&optionMailTrue,
 						},
 					},
 				},
