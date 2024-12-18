@@ -459,7 +459,7 @@ def cachePipeline(name, steps):
         "steps": steps,
         "trigger": {
             "ref": [
-                "refs/heads/master",
+                "refs/heads/stable-*",
                 "refs/tags/**",
                 "refs/pull/**",
             ],
@@ -666,7 +666,7 @@ def testOcis(ctx):
         "steps": steps,
         "trigger": {
             "ref": [
-                "refs/heads/master",
+                "refs/heads/stable-*",
                 "refs/pull/**",
             ],
         },
@@ -698,7 +698,7 @@ def scanOcis(ctx):
         "steps": steps,
         "trigger": {
             "ref": [
-                "refs/heads/master",
+                "refs/heads/stable-*",
                 "refs/pull/**",
             ],
         },
@@ -722,7 +722,7 @@ def buildOcisBinaryForTesting(ctx):
                  rebuildBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin"),
         "trigger": {
             "ref": [
-                "refs/heads/master",
+                "refs/heads/stable-*",
                 "refs/pull/**",
             ],
         },
@@ -809,7 +809,7 @@ def uploadScanResults(ctx):
         ],
         "trigger": {
             "ref": [
-                "refs/heads/master",
+                "refs/heads/stable-*",
                 "refs/pull/**",
             ],
             "status": [
@@ -952,7 +952,7 @@ def codestyle(ctx):
                 "depends_on": [],
                 "trigger": {
                     "ref": [
-                        "refs/heads/master",
+                        "refs/heads/stable-*",
                         "refs/pull/**",
                     ],
                 },
@@ -1019,7 +1019,7 @@ def localApiTestPipeline(ctx):
                             "depends_on": getPipelineNames(buildOcisBinaryForTesting(ctx)),
                             "trigger": {
                                 "ref": [
-                                    "refs/heads/master",
+                                    "refs/heads/stable-*",
                                     "refs/pull/**",
                                 ],
                             },
@@ -1085,7 +1085,7 @@ def cs3ApiTests(ctx, storage, accounts_hash_difficulty = 4):
         "depends_on": getPipelineNames(buildOcisBinaryForTesting(ctx)),
         "trigger": {
             "ref": [
-                "refs/heads/master",
+                "refs/heads/stable-*",
                 "refs/pull/**",
             ],
         },
@@ -1204,7 +1204,7 @@ def wopiValidatorTests(ctx, storage, wopiServerType, accounts_hash_difficulty = 
         "depends_on": getPipelineNames(buildOcisBinaryForTesting(ctx)),
         "trigger": {
             "ref": [
-                "refs/heads/master",
+                "refs/heads/stable-*",
                 "refs/pull/**",
             ],
         },
@@ -1256,7 +1256,7 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, with_remote_php = Fa
         "depends_on": getPipelineNames(buildOcisBinaryForTesting(ctx)),
         "trigger": {
             "ref": [
-                "refs/heads/master",
+                "refs/heads/stable-*",
                 "refs/pull/**",
             ],
         },
@@ -1297,7 +1297,7 @@ def e2eTestPipeline(ctx):
 
     e2e_trigger = {
         "ref": [
-            "refs/heads/master",
+            "refs/heads/stable-*",
             "refs/tags/**",
             "refs/pull/**",
         ],
@@ -1700,7 +1700,7 @@ def dockerRelease(ctx, arch, repo, build_type):
         "depends_on": depends_on,
         "trigger": {
             "ref": [
-                "refs/heads/master",
+                "refs/heads/stable-*",
                 "refs/tags/v*",
                 "refs/pull/**",
             ],
@@ -1861,7 +1861,7 @@ def binaryRelease(ctx, arch, build_type, target, depends_on = []):
         "depends_on": depends_on,
         "trigger": {
             "ref": [
-                "refs/heads/master",
+                "refs/heads/stable-*",
                 "refs/tags/v*",
                 "refs/pull/**",
             ],
@@ -1995,7 +1995,7 @@ def licenseCheck(ctx):
         ],
         "trigger": {
             "ref": [
-                "refs/heads/master",
+                "refs/heads/stable-*",
                 "refs/tags/v*",
                 "refs/pull/**",
             ],
@@ -2062,7 +2062,7 @@ def releaseDockerManifest(ctx, repo, build_type):
         "steps": steps,
         "trigger": {
             "ref": [
-                "refs/heads/master",
+                "refs/heads/stable-*",
                 "refs/tags/v*",
             ],
         },
@@ -2131,7 +2131,7 @@ def changelog():
         ],
         "trigger": {
             "ref": [
-                "refs/heads/master",
+                "refs/heads/stable-*",
                 "refs/pull/**",
             ],
         },
@@ -2165,7 +2165,7 @@ def releaseDockerReadme(ctx, repo, build_type):
         ],
         "trigger": {
             "ref": [
-                "refs/heads/master",
+                "refs/heads/stable-*",
                 "refs/tags/v*",
             ],
         },
@@ -2215,7 +2215,7 @@ def docs():
                     },
                     "pages_directory": "docs/hugo/content/",
                     "copy_contents": "true",
-                    "target_branch": "docs",
+                    "target_branch": "docs-stable-7.0",
                     "delete": "true",
                 },
                 "when": {
@@ -2237,7 +2237,7 @@ def docs():
         ],
         "trigger": {
             "ref": [
-                "refs/heads/master",
+                "refs/heads/stable-*",
                 "refs/pull/**",
             ],
         },
@@ -2309,7 +2309,7 @@ def notify(ctx):
         "depends_on": [],
         "trigger": {
             "ref": [
-                "refs/heads/master",
+                "refs/heads/stable-*",
                 "refs/heads/release*",
                 "refs/tags/**",
             ],
@@ -2741,7 +2741,7 @@ def genericCachePurge(flush_path):
         ],
         "trigger": {
             "ref": [
-                "refs/heads/master",
+                "refs/heads/stable-*",
                 "refs/pull/**",
             ],
             "status": [
@@ -2934,7 +2934,7 @@ def litmus(ctx, storage):
         "depends_on": getPipelineNames(buildOcisBinaryForTesting(ctx)),
         "trigger": {
             "ref": [
-                "refs/heads/master",
+                "refs/heads/stable-*",
                 "refs/pull/**",
             ],
         },
