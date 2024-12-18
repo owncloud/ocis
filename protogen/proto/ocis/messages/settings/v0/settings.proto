@@ -94,6 +94,7 @@ message Setting {
     SingleChoiceList single_choice_value = 8; // @gotags: yaml:"single_choice_value"
     MultiChoiceList multi_choice_value = 9; // @gotags: yaml:"multi_choice_value"
     Permission permission_value = 10; // @gotags: yaml:"permission_value"
+    MultiChoiceCollection multi_choice_collection_value = 12; // @gotags: yaml:"multi_choice_collection_value"
   }
   Resource resource = 11; // @gotags: yaml:"resource"
 }
@@ -133,6 +134,25 @@ message ListOption {
   string display_value = 3; // @gotags: yaml:"display_value"
 }
 
+message MultiChoiceCollection {
+  repeated MultiChoiceCollectionOption options = 1; // @gotags: yaml:"options"
+}
+
+message MultiChoiceCollectionOption {
+  MultiChoiceCollectionOptionValue value = 1; // @gotags: yaml:"value"
+  string key = 2; // @gotags: yaml:"key"
+  string attribute = 3; // @gotags: yaml:"attribute"
+  string display_value = 4; // @gotags: yaml:"display_value"
+}
+
+message MultiChoiceCollectionOptionValue {
+  oneof option {
+    Int int_value = 1; // @gotags: yaml:"int_value"
+    String string_value = 2; // @gotags: yaml:"string_value"
+    Bool bool_value = 3; // @gotags: yaml:"bool_value"
+  }
+}
+
 message Permission {
   enum Operation {
     OPERATION_UNKNOWN = 0;
@@ -170,6 +190,7 @@ message Value {
     int64 int_value = 7; // @gotags: yaml:"int_value"
     string string_value = 8; // @gotags: yaml:"string_value"
     ListValue list_value = 9; // @gotags: yaml:"list_value"
+    CollectionValue collection_value = 10; // @gotags: yaml:"collection_value"
   }
 }
 
@@ -181,5 +202,20 @@ message ListOptionValue {
   oneof option {
     string string_value = 1; // @gotags: yaml:"string_value"
     int64 int_value = 2; // @gotags: yaml:"int_value"
+    bool bool_value = 3; // @gotags: yaml:"bool_value"
+  }
+}
+
+message CollectionValue {
+  repeated CollectionOption values = 1; // @gotags: yaml:"values"
+}
+
+message CollectionOption {
+  // required
+  string key = 1; // @gotags: yaml:"key"
+  oneof option {
+    int64 int_value = 2; // @gotags: yaml:"int_value"
+    string string_value = 3; // @gotags: yaml:"string_value"
+    bool bool_value = 4; // @gotags: yaml:"bool_value"
   }
 }

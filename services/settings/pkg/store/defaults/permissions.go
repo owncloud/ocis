@@ -200,6 +200,215 @@ func DisableEmailNotificationsPermission(c settingsmsg.Permission_Constraint) *s
 	}
 }
 
+// ProfileEmailSendingIntervalPermission is the permission to set the email sending interval
+func ProfileEmailSendingIntervalPermission(c settingsmsg.Permission_Constraint) *settingsmsg.Setting {
+	return &settingsmsg.Setting{
+		Id:          "7dc204ee-799a-43b6-b85d-425fb3b1fa5a",
+		Name:        "EmailSendingInterval.ReadWrite",
+		DisplayName: "Email Sending Interval",
+		Resource: &settingsmsg.Resource{
+			Type: settingsmsg.Resource_TYPE_SETTING,
+			Id:   SettingUUIDProfileEmailSendingInterval,
+		},
+		Value: &settingsmsg.Setting_PermissionValue{
+			PermissionValue: &settingsmsg.Permission{
+				Operation:  settingsmsg.Permission_OPERATION_READWRITE,
+				Constraint: c,
+			},
+		},
+	}
+}
+
+// ProfileEventShareCreatedPermission is
+func ProfileEventShareCreatedPermission(c settingsmsg.Permission_Constraint) *settingsmsg.Setting {
+	return &settingsmsg.Setting{
+		Id:          "8a50540c-1cdd-481f-b85f-44654393c8f0",
+		Name:        "Event.ShareCreated.ReadWrite",
+		DisplayName: "Event Share Created",
+		Resource: &settingsmsg.Resource{
+			Type: settingsmsg.Resource_TYPE_SETTING,
+			Id:   SettingUUIDProfileEventShareCreated,
+		},
+		Value: &settingsmsg.Setting_PermissionValue{
+			PermissionValue: &settingsmsg.Permission{
+				Operation:  settingsmsg.Permission_OPERATION_READWRITE,
+				Constraint: c,
+			},
+		},
+	}
+}
+
+// ProfileEventShareRemovedPermission is the permission to set the email sending interval
+func ProfileEventShareRemovedPermission(c settingsmsg.Permission_Constraint) *settingsmsg.Setting {
+	return &settingsmsg.Setting{
+		Id:          "5ef55465-8e39-4a6c-ba97-1d19f5b07116",
+		Name:        "Event.ShareRemoved.ReadWrite",
+		DisplayName: "Event Share Removed",
+		Resource: &settingsmsg.Resource{
+			Type: settingsmsg.Resource_TYPE_SETTING,
+			Id:   SettingUUIDProfileEventShareRemoved,
+		},
+		Value: &settingsmsg.Setting_PermissionValue{
+			PermissionValue: &settingsmsg.Permission{
+				Operation:  settingsmsg.Permission_OPERATION_READWRITE,
+				Constraint: c,
+			},
+		},
+	}
+}
+
+// ProfileEventShareExpiredPermission is the permission to set the email sending interval
+func ProfileEventShareExpiredPermission(c settingsmsg.Permission_Constraint) *settingsmsg.Setting {
+	return &settingsmsg.Setting{
+		Id:          "7d4f961b-d471-451b-b1fd-ac6a9d59ce88",
+		Name:        "Event.ShareExpired.ReadWrite",
+		DisplayName: "Event Share Expired",
+		Resource: &settingsmsg.Resource{
+			Type: settingsmsg.Resource_TYPE_SETTING,
+			Id:   SettingUUIDProfileEventShareExpired,
+		},
+		Value: &settingsmsg.Setting_PermissionValue{
+			PermissionValue: &settingsmsg.Permission{
+				Operation:  settingsmsg.Permission_OPERATION_READWRITE,
+				Constraint: c,
+			},
+		},
+	}
+}
+
+// ProfileEventSpaceSharedPermission is the permission to set the email sending interval
+func ProfileEventSpaceSharedPermission(c settingsmsg.Permission_Constraint) *settingsmsg.Setting {
+	return &settingsmsg.Setting{
+		Id:          "feb16d2c-614c-4f79-ac37-755a028f5616",
+		Name:        "Event.SpaceShared.ReadWrite",
+		DisplayName: "Event Space Shared",
+		Resource: &settingsmsg.Resource{
+			Type: settingsmsg.Resource_TYPE_SETTING,
+			Id:   SettingUUIDProfileEventSpaceShared,
+		},
+		Value: &settingsmsg.Setting_PermissionValue{
+			PermissionValue: &settingsmsg.Permission{
+				Operation:  settingsmsg.Permission_OPERATION_READWRITE,
+				Constraint: c,
+			},
+		},
+	}
+}
+
+// ProfileEventSpaceUnsharedPermission is the permission to set the email sending interval
+func ProfileEventSpaceUnsharedPermission(c settingsmsg.Permission_Constraint) *settingsmsg.Setting {
+	return &settingsmsg.Setting{
+		Id:          "4f979732-631b-4f27-9be7-a89fb223a6d2",
+		Name:        "Event.SpaceUnshared.ReadWrite",
+		DisplayName: "Event Space Unshared",
+		Resource: &settingsmsg.Resource{
+			Type: settingsmsg.Resource_TYPE_SETTING,
+			Id:   SettingUUIDProfileEventSpaceUnshared,
+		},
+		Value: &settingsmsg.Setting_PermissionValue{
+			PermissionValue: &settingsmsg.Permission{
+				Operation:  settingsmsg.Permission_OPERATION_READWRITE,
+				Constraint: c,
+			},
+		},
+	}
+}
+
+// ProfileEventSpaceMembershipExpiredPermission is the permission to set the email sending interval
+func ProfileEventSpaceMembershipExpiredPermission(c settingsmsg.Permission_Constraint) *settingsmsg.Setting {
+	return &settingsmsg.Setting{
+		Id:          "a3cc45bf-9720-4e08-b403-b9133fe33f0b",
+		Name:        "Event.SpaceMembershipExpired.ReadWrite",
+		DisplayName: "Event Space Membership Expired",
+		Resource: &settingsmsg.Resource{
+			Type: settingsmsg.Resource_TYPE_SETTING,
+			Id:   SettingUUIDProfileEventSpaceMembershipExpired,
+		},
+		Value: &settingsmsg.Setting_PermissionValue{
+			PermissionValue: &settingsmsg.Permission{
+				Operation:  settingsmsg.Permission_OPERATION_READWRITE,
+				Constraint: c,
+			},
+		},
+	}
+}
+
+// ProfileEventSpaceDisabledPermission is the permission to set the email sending interval
+func ProfileEventSpaceDisabledPermission(c settingsmsg.Permission_Constraint) *settingsmsg.Setting {
+	return &settingsmsg.Setting{
+		Id:          "896194c2-5055-4ea3-94a3-0a1419187a00",
+		Name:        "Event.SpaceDisabled.ReadWrite",
+		DisplayName: "Event Space Disabled",
+		Resource: &settingsmsg.Resource{
+			Type: settingsmsg.Resource_TYPE_SETTING,
+			Id:   SettingUUIDProfileEventSpaceDisabled,
+		},
+		Value: &settingsmsg.Setting_PermissionValue{
+			PermissionValue: &settingsmsg.Permission{
+				Operation:  settingsmsg.Permission_OPERATION_READWRITE,
+				Constraint: c,
+			},
+		},
+	}
+}
+
+// ProfileEventSpaceDeletedPermission is the permission to set the email sending interval
+func ProfileEventSpaceDeletedPermission(c settingsmsg.Permission_Constraint) *settingsmsg.Setting {
+	return &settingsmsg.Setting{
+		Id:          "2083c280-b140-4b73-a931-9a4af2931531",
+		Name:        "Event.SpaceDeleted.ReadWrite",
+		DisplayName: "Event Space Deleted",
+		Resource: &settingsmsg.Resource{
+			Type: settingsmsg.Resource_TYPE_SETTING,
+			Id:   SettingUUIDProfileEventSpaceDeleted,
+		},
+		Value: &settingsmsg.Setting_PermissionValue{
+			PermissionValue: &settingsmsg.Permission{
+				Operation:  settingsmsg.Permission_OPERATION_READWRITE,
+				Constraint: c,
+			},
+		},
+	}
+}
+
+// ProfileEventPostprocessingStepFinishedPermission is the permission to set the email sending interval
+func ProfileEventPostprocessingStepFinishedPermission(c settingsmsg.Permission_Constraint) *settingsmsg.Setting {
+	return &settingsmsg.Setting{
+		Id:          "27ba8e97-0bdf-4b18-97d4-df44c9568cda",
+		Name:        "Event.PostprocessingStepFinished.ReadWrite",
+		DisplayName: "Event Postprocessing Step Finished",
+		Resource: &settingsmsg.Resource{
+			Type: settingsmsg.Resource_TYPE_SETTING,
+			Id:   SettingUUIDProfileEventPostprocessingStepFinished,
+		},
+		Value: &settingsmsg.Setting_PermissionValue{
+			PermissionValue: &settingsmsg.Permission{
+				Operation:  settingsmsg.Permission_OPERATION_READWRITE,
+				Constraint: c,
+			},
+		},
+	}
+}
+
+// ProfileEventScienceMeshInviteTokenGeneratedPermission is the permission to set the email sending interval
+func ProfileEventScienceMeshInviteTokenGeneratedPermission(c settingsmsg.Permission_Constraint) *settingsmsg.Setting {
+	return &settingsmsg.Setting{
+		Id:          "da3ff1c5-5bb4-4829-b9bd-a91542737151",
+		Name:        "Event.ScienceMeshInviteTokenGenerated.ReadWrite",
+		DisplayName: "Event Science Mesh Invite Token Generated",
+		Resource: &settingsmsg.Resource{
+			Type: settingsmsg.Resource_TYPE_SETTING,
+			Id:   SettingUUIDProfileEventScienceMeshInviteTokenGenerated,
+		},
+		Value: &settingsmsg.Setting_PermissionValue{
+			PermissionValue: &settingsmsg.Permission{
+				Operation:  settingsmsg.Permission_OPERATION_READWRITE,
+				Constraint: c,
+			},
+		},
+	}
+}
+
 // GroupManagementPermission is the permission to manage groups
 func GroupManagementPermission(c settingsmsg.Permission_Constraint) *settingsmsg.Setting {
 	return &settingsmsg.Setting{

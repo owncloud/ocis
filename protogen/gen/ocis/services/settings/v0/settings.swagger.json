@@ -674,6 +674,10 @@
         "listValue": {
           "$ref": "#/definitions/settingsv0ListValue",
           "title": "@gotags: yaml:\"list_value\""
+        },
+        "collectionValue": {
+          "$ref": "#/definitions/v0CollectionValue",
+          "title": "@gotags: yaml:\"collection_value\""
         }
       }
     },
@@ -773,6 +777,41 @@
         "TYPE_ROLE"
       ],
       "default": "TYPE_UNKNOWN"
+    },
+    "v0CollectionOption": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "@gotags: yaml:\"key\"",
+          "title": "required"
+        },
+        "intValue": {
+          "type": "string",
+          "format": "int64",
+          "title": "@gotags: yaml:\"int_value\""
+        },
+        "stringValue": {
+          "type": "string",
+          "title": "@gotags: yaml:\"string_value\""
+        },
+        "boolValue": {
+          "type": "boolean",
+          "title": "@gotags: yaml:\"bool_value\""
+        }
+      }
+    },
+    "v0CollectionValue": {
+      "type": "object",
+      "properties": {
+        "values": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v0CollectionOption"
+          },
+          "title": "@gotags: yaml:\"values\""
+        }
+      }
     },
     "v0GetBundleRequest": {
       "type": "object",
@@ -926,6 +965,10 @@
           "type": "string",
           "format": "int64",
           "title": "@gotags: yaml:\"int_value\""
+        },
+        "boolValue": {
+          "type": "boolean",
+          "title": "@gotags: yaml:\"bool_value\""
         }
       }
     },
@@ -1016,6 +1059,56 @@
           "items": {
             "$ref": "#/definitions/v0ValueWithIdentifier"
           }
+        }
+      }
+    },
+    "v0MultiChoiceCollection": {
+      "type": "object",
+      "properties": {
+        "options": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v0MultiChoiceCollectionOption"
+          },
+          "title": "@gotags: yaml:\"options\""
+        }
+      }
+    },
+    "v0MultiChoiceCollectionOption": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "$ref": "#/definitions/v0MultiChoiceCollectionOptionValue",
+          "title": "@gotags: yaml:\"value\""
+        },
+        "key": {
+          "type": "string",
+          "title": "@gotags: yaml:\"key\""
+        },
+        "attribute": {
+          "type": "string",
+          "title": "@gotags: yaml:\"attribute\""
+        },
+        "displayValue": {
+          "type": "string",
+          "title": "@gotags: yaml:\"display_value\""
+        }
+      }
+    },
+    "v0MultiChoiceCollectionOptionValue": {
+      "type": "object",
+      "properties": {
+        "intValue": {
+          "$ref": "#/definitions/v0Int",
+          "title": "@gotags: yaml:\"int_value\""
+        },
+        "stringValue": {
+          "$ref": "#/definitions/v0String",
+          "title": "@gotags: yaml:\"string_value\""
+        },
+        "boolValue": {
+          "$ref": "#/definitions/v0Bool",
+          "title": "@gotags: yaml:\"bool_value\""
         }
       }
     },
@@ -1177,6 +1270,10 @@
         "permissionValue": {
           "$ref": "#/definitions/v0Permission",
           "title": "@gotags: yaml:\"permission_value\""
+        },
+        "multiChoiceCollectionValue": {
+          "$ref": "#/definitions/v0MultiChoiceCollection",
+          "title": "@gotags: yaml:\"multi_choice_collection_value\""
         },
         "resource": {
           "$ref": "#/definitions/v0Resource",

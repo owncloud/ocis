@@ -24,6 +24,29 @@ const (
 	SettingUUIDProfileDisableNotifications = "33ffb5d6-cd07-4dc0-afb0-84f7559ae438"
 	// SettingUUIDProfileAutoAcceptShares is the hardcoded setting UUID for the disable notifications setting
 	SettingUUIDProfileAutoAcceptShares = "ec3ed4a3-3946-4efc-8f9f-76d38b12d3a9"
+
+	// SettingUUIDProfileEmailSendingInterval is the hardcoded setting UUID for the email sending interval setting
+	SettingUUIDProfileEmailSendingInterval = "08dec2fe-3f97-42a9-9d1b-500855e92f25"
+	// SettingUUIDProfileEventShareCreated it the hardcoded setting UUID for the send in app setting
+	SettingUUIDProfileEventShareCreated = "872d8ef6-6f2a-42ab-af7d-f53cc81d7046"
+	// SettingUUIDProfileEventShareRemoved is the hardcoded setting UUID for the send in app setting
+	SettingUUIDProfileEventShareRemoved = "d7484394-8321-4c84-9677-741ba71e1f80"
+	// SettingUUIDProfileEventShareExpired is the hardcoded setting UUID for the send in app setting
+	SettingUUIDProfileEventShareExpired = "e1aa0b7c-1b0f-4072-9325-c643c89fee4e"
+	// SettingUUIDProfileEventSpaceShared is the hardcoded setting UUID for the send in app setting
+	SettingUUIDProfileEventSpaceShared = "694d5ee1-a41c-448c-8d14-396b95d2a918"
+	// SettingUUIDProfileEventSpaceUnshared is the hardcoded setting UUID for the send in app setting
+	SettingUUIDProfileEventSpaceUnshared = "26c20e0e-98df-4483-8a77-759b3a766af0"
+	// SettingUUIDProfileEventSpaceMembershipExpired is the hardcoded setting UUID for the send in app setting
+	SettingUUIDProfileEventSpaceMembershipExpired = "7275921e-b737-4074-ba91-3c2983be3edd"
+	// SettingUUIDProfileEventSpaceDisabled is the hardcoded setting UUID for the send in app setting
+	SettingUUIDProfileEventSpaceDisabled = "eb5c716e-03be-42c6-9ed1-1105d24e109f"
+	// SettingUUIDProfileEventSpaceDeleted is the hardcoded setting UUID for the send in app setting
+	SettingUUIDProfileEventSpaceDeleted = "094ceca9-5a00-40ba-bb1a-bbc7bccd39ee"
+	// SettingUUIDProfileEventPostprocessingStepFinished is the hardcoded setting UUID for the send in mail setting
+	SettingUUIDProfileEventPostprocessingStepFinished = "fe0a3011-d886-49c8-b797-33d02fa426ef"
+	// SettingUUIDProfileEventScienceMeshInviteTokenGenerated is the hardcoded setting UUID for the send in mail setting
+	SettingUUIDProfileEventScienceMeshInviteTokenGenerated = "b441ffb1-f5ee-4733-a08f-48d03f6e7f22"
 )
 
 // GenerateBundlesDefaultRoles bootstraps the default roles.
@@ -35,6 +58,11 @@ func GenerateBundlesDefaultRoles() []*settingsmsg.Bundle {
 		generateBundleProfileRequest(),
 		generateBundleSpaceAdminRole(),
 	}
+}
+
+// GenerateDefaultProfileBundle return the default profile bundle.
+func GenerateDefaultProfileBundle() *settingsmsg.Bundle {
+	return generateBundleProfileRequest()
 }
 
 // ServiceAccountBundle returns the service account bundle
@@ -94,6 +122,17 @@ func generateBundleAdminRole() *settingsmsg.Bundle {
 			DeleteProjectSpacesPermission(All),
 			DeleteReadOnlyPublicLinkPasswordPermission(All),
 			DisableEmailNotificationsPermission(Own),
+			ProfileEmailSendingIntervalPermission(Own),
+			ProfileEventShareCreatedPermission(Own),
+			ProfileEventShareRemovedPermission(Own),
+			ProfileEventShareExpiredPermission(Own),
+			ProfileEventSpaceSharedPermission(Own),
+			ProfileEventSpaceUnsharedPermission(Own),
+			ProfileEventSpaceMembershipExpiredPermission(Own),
+			ProfileEventSpaceDisabledPermission(Own),
+			ProfileEventSpaceDeletedPermission(Own),
+			ProfileEventPostprocessingStepFinishedPermission(Own),
+			ProfileEventScienceMeshInviteTokenGeneratedPermission(Own),
 			GroupManagementPermission(All),
 			LanguageManagementPermission(All),
 			ListFavoritesPermission(Own),
@@ -127,6 +166,17 @@ func generateBundleSpaceAdminRole() *settingsmsg.Bundle {
 			DeleteProjectSpacesPermission(All),
 			DeleteReadOnlyPublicLinkPasswordPermission(All),
 			DisableEmailNotificationsPermission(Own),
+			ProfileEmailSendingIntervalPermission(Own),
+			ProfileEventShareCreatedPermission(Own),
+			ProfileEventShareRemovedPermission(Own),
+			ProfileEventShareExpiredPermission(Own),
+			ProfileEventSpaceSharedPermission(Own),
+			ProfileEventSpaceUnsharedPermission(Own),
+			ProfileEventSpaceMembershipExpiredPermission(Own),
+			ProfileEventSpaceDisabledPermission(Own),
+			ProfileEventSpaceDeletedPermission(Own),
+			ProfileEventPostprocessingStepFinishedPermission(Own),
+			ProfileEventScienceMeshInviteTokenGeneratedPermission(Own),
 			LanguageManagementPermission(Own),
 			ListFavoritesPermission(Own),
 			ListSpacesPermission(All),
@@ -155,6 +205,17 @@ func generateBundleUserRole() *settingsmsg.Bundle {
 			CreateSharePermission(All),
 			CreateSpacesPermission(Own),
 			DisableEmailNotificationsPermission(Own),
+			ProfileEmailSendingIntervalPermission(Own),
+			ProfileEventShareCreatedPermission(Own),
+			ProfileEventShareRemovedPermission(Own),
+			ProfileEventShareExpiredPermission(Own),
+			ProfileEventSpaceSharedPermission(Own),
+			ProfileEventSpaceUnsharedPermission(Own),
+			ProfileEventSpaceMembershipExpiredPermission(Own),
+			ProfileEventSpaceDisabledPermission(Own),
+			ProfileEventSpaceDeletedPermission(Own),
+			ProfileEventPostprocessingStepFinishedPermission(Own),
+			ProfileEventScienceMeshInviteTokenGeneratedPermission(Own),
 			LanguageManagementPermission(Own),
 			ListFavoritesPermission(Own),
 			SelfManagementPermission(Own),
@@ -176,6 +237,7 @@ func generateBundleUserLightRole() *settingsmsg.Bundle {
 		Settings: []*settingsmsg.Setting{
 			AutoAcceptSharesPermission(Own),
 			DisableEmailNotificationsPermission(Own),
+			ProfileEmailSendingIntervalPermission(Own),
 			LanguageManagementPermission(Own),
 		},
 	}
@@ -222,8 +284,265 @@ func generateBundleProfileRequest() *settingsmsg.Bundle {
 				},
 				Value: &settingsmsg.Setting_BoolValue{BoolValue: &settingsmsg.Bool{Default: true, Label: "auto accept shares"}},
 			},
+			{
+				Id:          SettingUUIDProfileEmailSendingInterval,
+				Name:        "email-sending-interval-options",
+				DisplayName: "Email Notifications options",
+				Description: "Email notifications options",
+				Resource: &settingsmsg.Resource{
+					Type: settingsmsg.Resource_TYPE_USER,
+				},
+				Value: &sendEmailOptions,
+			},
+			{
+				Id:          SettingUUIDProfileEventShareCreated,
+				Name:        "event-share-created-options",
+				DisplayName: "Share created",
+				Description: "Send In-App",
+				Resource: &settingsmsg.Resource{
+					Type: settingsmsg.Resource_TYPE_USER,
+				},
+				Value: &settingsmsg.Setting_MultiChoiceCollectionValue{
+					MultiChoiceCollectionValue: &settingsmsg.MultiChoiceCollection{
+						Options: []*settingsmsg.MultiChoiceCollectionOption{
+							&optionInAppTrue,
+							&optionMailTrue,
+						},
+					},
+				},
+			},
+			{
+				Id:          SettingUUIDProfileEventShareRemoved,
+				Name:        "event-share-removed-options",
+				DisplayName: "Share removed",
+				Description: "Send In-App",
+				Resource: &settingsmsg.Resource{
+					Type: settingsmsg.Resource_TYPE_USER,
+				},
+				Value: &settingsmsg.Setting_MultiChoiceCollectionValue{
+					MultiChoiceCollectionValue: &settingsmsg.MultiChoiceCollection{
+						Options: []*settingsmsg.MultiChoiceCollectionOption{
+							&optionInAppTrue,
+							&optionMailFalseDisabled,
+						},
+					},
+				},
+			},
+			{
+				Id:          SettingUUIDProfileEventShareExpired,
+				Name:        "event-share-expired-options",
+				DisplayName: "Share expired",
+				Description: "Send In-App",
+				Resource: &settingsmsg.Resource{
+					Type: settingsmsg.Resource_TYPE_USER,
+				},
+				Value: &settingsmsg.Setting_MultiChoiceCollectionValue{
+					MultiChoiceCollectionValue: &settingsmsg.MultiChoiceCollection{
+						Options: []*settingsmsg.MultiChoiceCollectionOption{
+							&optionInAppTrue,
+							&optionMailTrue,
+						},
+					},
+				},
+			},
+			{
+				Id:          SettingUUIDProfileEventSpaceShared,
+				Name:        "event-space-shared-options",
+				DisplayName: "Space shared",
+				Description: "Send In-App",
+				Resource: &settingsmsg.Resource{
+					Type: settingsmsg.Resource_TYPE_USER,
+				},
+				Value: &settingsmsg.Setting_MultiChoiceCollectionValue{
+					MultiChoiceCollectionValue: &settingsmsg.MultiChoiceCollection{
+						Options: []*settingsmsg.MultiChoiceCollectionOption{
+							&optionInAppTrue,
+							&optionMailTrue,
+						},
+					},
+				},
+			},
+			{
+				Id:          SettingUUIDProfileEventSpaceUnshared,
+				Name:        "event-space-unshared-options",
+				DisplayName: "Space unshared",
+				Description: "Send In-App",
+				Resource: &settingsmsg.Resource{
+					Type: settingsmsg.Resource_TYPE_USER,
+				},
+				Value: &settingsmsg.Setting_MultiChoiceCollectionValue{
+					MultiChoiceCollectionValue: &settingsmsg.MultiChoiceCollection{
+						Options: []*settingsmsg.MultiChoiceCollectionOption{
+							&optionInAppTrue,
+							&optionMailTrue,
+						},
+					},
+				},
+			},
+			{
+				Id:          SettingUUIDProfileEventSpaceMembershipExpired,
+				Name:        "event-space-membership-expired-options",
+				DisplayName: "Space membership expired",
+				Description: "Send In-App",
+				Resource: &settingsmsg.Resource{
+					Type: settingsmsg.Resource_TYPE_USER,
+				},
+				Value: &settingsmsg.Setting_MultiChoiceCollectionValue{
+					MultiChoiceCollectionValue: &settingsmsg.MultiChoiceCollection{
+						Options: []*settingsmsg.MultiChoiceCollectionOption{
+							&optionInAppTrue,
+							&optionMailTrue,
+						},
+					},
+				},
+			},
+			{
+				Id:          SettingUUIDProfileEventSpaceDisabled,
+				Name:        "event-space-disabled-options",
+				DisplayName: "Space disabled",
+				Description: "Send In-App",
+				Resource: &settingsmsg.Resource{
+					Type: settingsmsg.Resource_TYPE_USER,
+				},
+				Value: &settingsmsg.Setting_MultiChoiceCollectionValue{
+					MultiChoiceCollectionValue: &settingsmsg.MultiChoiceCollection{
+						Options: []*settingsmsg.MultiChoiceCollectionOption{
+							&optionInAppTrue,
+							&optionMailFalseDisabled,
+						},
+					},
+				},
+			},
+			{
+				Id:          SettingUUIDProfileEventSpaceDeleted,
+				Name:        "event-space-deleted-options",
+				DisplayName: "Space deleted",
+				Description: "Send In-App",
+				Resource: &settingsmsg.Resource{
+					Type: settingsmsg.Resource_TYPE_USER,
+				},
+				Value: &settingsmsg.Setting_MultiChoiceCollectionValue{
+					MultiChoiceCollectionValue: &settingsmsg.MultiChoiceCollection{
+						Options: []*settingsmsg.MultiChoiceCollectionOption{
+							&optionInAppTrue,
+							&optionMailFalseDisabled,
+						},
+					},
+				},
+			},
+			{
+				Id:          SettingUUIDProfileEventPostprocessingStepFinished,
+				Name:        "event-postprocessing-step-finished-options",
+				DisplayName: "Postprocessing Step Finished",
+				Description: "Postprocessing Step Finished",
+				Resource: &settingsmsg.Resource{
+					Type: settingsmsg.Resource_TYPE_USER,
+				},
+				Value: &settingsmsg.Setting_MultiChoiceCollectionValue{
+					MultiChoiceCollectionValue: &settingsmsg.MultiChoiceCollection{
+						Options: []*settingsmsg.MultiChoiceCollectionOption{
+							&optionInAppTrue,
+							&optionMailFalseDisabled,
+						},
+					},
+				},
+			},
+			{
+				Id:          SettingUUIDProfileEventScienceMeshInviteTokenGenerated,
+				Name:        "event-Science-mesh-invite-token-generated-options",
+				DisplayName: "Science Mesh Invite Token Generated",
+				Description: "Science Mesh Invite Token Generated",
+				Resource: &settingsmsg.Resource{
+					Type: settingsmsg.Resource_TYPE_USER,
+				},
+				Value: &settingsmsg.Setting_MultiChoiceCollectionValue{
+					MultiChoiceCollectionValue: &settingsmsg.MultiChoiceCollection{
+						Options: []*settingsmsg.MultiChoiceCollectionOption{
+							&optionInAppTrue,
+							&optionMailTrue,
+						},
+					},
+				},
+			},
 		},
 	}
+}
+
+var sendEmailOptions = settingsmsg.Setting_SingleChoiceValue{
+	SingleChoiceValue: &settingsmsg.SingleChoiceList{
+		Options: []*settingsmsg.ListOption{
+			{
+				Value: &settingsmsg.ListOptionValue{
+					Option: &settingsmsg.ListOptionValue_StringValue{
+						StringValue: "instant",
+					},
+				},
+				DisplayValue: "Instant",
+				Default:      true,
+			},
+			{
+				Value: &settingsmsg.ListOptionValue{
+					Option: &settingsmsg.ListOptionValue_StringValue{
+						StringValue: "daily",
+					},
+				},
+				DisplayValue: "Daily",
+			},
+			{
+				Value: &settingsmsg.ListOptionValue{
+					Option: &settingsmsg.ListOptionValue_StringValue{
+						StringValue: "weekly",
+					},
+				},
+				DisplayValue: "Weekly",
+			},
+			{
+				Value: &settingsmsg.ListOptionValue{
+					Option: &settingsmsg.ListOptionValue_StringValue{
+						StringValue: "never",
+					},
+				},
+				DisplayValue: "Never",
+			},
+		},
+	},
+}
+
+var optionInAppTrue = settingsmsg.MultiChoiceCollectionOption{
+	Key:          "in-app",
+	DisplayValue: "In-App",
+	Value: &settingsmsg.MultiChoiceCollectionOptionValue{
+		Option: &settingsmsg.MultiChoiceCollectionOptionValue_BoolValue{
+			BoolValue: &settingsmsg.Bool{
+				Default: true,
+			},
+		},
+	},
+}
+
+var optionMailTrue = settingsmsg.MultiChoiceCollectionOption{
+	Key:          "mail",
+	DisplayValue: "Mail",
+	Value: &settingsmsg.MultiChoiceCollectionOptionValue{
+		Option: &settingsmsg.MultiChoiceCollectionOptionValue_BoolValue{
+			BoolValue: &settingsmsg.Bool{
+				Default: true,
+			},
+		},
+	},
+}
+
+var optionMailFalseDisabled = settingsmsg.MultiChoiceCollectionOption{
+	Key:          "mail",
+	Attribute:    "disabled",
+	DisplayValue: "Mail",
+	Value: &settingsmsg.MultiChoiceCollectionOptionValue{
+		Option: &settingsmsg.MultiChoiceCollectionOptionValue_BoolValue{
+			BoolValue: &settingsmsg.Bool{
+				Default: false,
+			},
+		},
+	},
 }
 
 // TODO: languageSetting needed?
