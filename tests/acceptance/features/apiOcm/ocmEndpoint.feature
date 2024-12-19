@@ -1,7 +1,7 @@
 @ocm
-Feature: OCM Well-Known Endpoint
+Feature: ocm well-known URI
   As a user
-  I want to verify the response of the .well-known/ocm endpoint
+  I want to verify the response of well-known URI
   So that I can ensure the configuration works correctly
 
 
