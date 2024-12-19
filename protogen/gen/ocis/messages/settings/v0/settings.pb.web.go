@@ -478,6 +478,114 @@ func (m *ListOption) UnmarshalJSON(b []byte) error {
 
 var _ json.Unmarshaler = (*ListOption)(nil)
 
+// MultiChoiceCollectionJSONMarshaler describes the default jsonpb.Marshaler used by all
+// instances of MultiChoiceCollection. This struct is safe to replace or modify but
+// should not be done so concurrently.
+var MultiChoiceCollectionJSONMarshaler = new(jsonpb.Marshaler)
+
+// MarshalJSON satisfies the encoding/json Marshaler interface. This method
+// uses the more correct jsonpb package to correctly marshal the message.
+func (m *MultiChoiceCollection) MarshalJSON() ([]byte, error) {
+	if m == nil {
+		return json.Marshal(nil)
+	}
+
+	buf := &bytes.Buffer{}
+
+	if err := MultiChoiceCollectionJSONMarshaler.Marshal(buf, m); err != nil {
+		return nil, err
+	}
+
+	return buf.Bytes(), nil
+}
+
+var _ json.Marshaler = (*MultiChoiceCollection)(nil)
+
+// MultiChoiceCollectionJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
+// instances of MultiChoiceCollection. This struct is safe to replace or modify but
+// should not be done so concurrently.
+var MultiChoiceCollectionJSONUnmarshaler = new(jsonpb.Unmarshaler)
+
+// UnmarshalJSON satisfies the encoding/json Unmarshaler interface. This method
+// uses the more correct jsonpb package to correctly unmarshal the message.
+func (m *MultiChoiceCollection) UnmarshalJSON(b []byte) error {
+	return MultiChoiceCollectionJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
+}
+
+var _ json.Unmarshaler = (*MultiChoiceCollection)(nil)
+
+// MultiChoiceCollectionOptionJSONMarshaler describes the default jsonpb.Marshaler used by all
+// instances of MultiChoiceCollectionOption. This struct is safe to replace or modify but
+// should not be done so concurrently.
+var MultiChoiceCollectionOptionJSONMarshaler = new(jsonpb.Marshaler)
+
+// MarshalJSON satisfies the encoding/json Marshaler interface. This method
+// uses the more correct jsonpb package to correctly marshal the message.
+func (m *MultiChoiceCollectionOption) MarshalJSON() ([]byte, error) {
+	if m == nil {
+		return json.Marshal(nil)
+	}
+
+	buf := &bytes.Buffer{}
+
+	if err := MultiChoiceCollectionOptionJSONMarshaler.Marshal(buf, m); err != nil {
+		return nil, err
+	}
+
+	return buf.Bytes(), nil
+}
+
+var _ json.Marshaler = (*MultiChoiceCollectionOption)(nil)
+
+// MultiChoiceCollectionOptionJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
+// instances of MultiChoiceCollectionOption. This struct is safe to replace or modify but
+// should not be done so concurrently.
+var MultiChoiceCollectionOptionJSONUnmarshaler = new(jsonpb.Unmarshaler)
+
+// UnmarshalJSON satisfies the encoding/json Unmarshaler interface. This method
+// uses the more correct jsonpb package to correctly unmarshal the message.
+func (m *MultiChoiceCollectionOption) UnmarshalJSON(b []byte) error {
+	return MultiChoiceCollectionOptionJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
+}
+
+var _ json.Unmarshaler = (*MultiChoiceCollectionOption)(nil)
+
+// MultiChoiceCollectionOptionValueJSONMarshaler describes the default jsonpb.Marshaler used by all
+// instances of MultiChoiceCollectionOptionValue. This struct is safe to replace or modify but
+// should not be done so concurrently.
+var MultiChoiceCollectionOptionValueJSONMarshaler = new(jsonpb.Marshaler)
+
+// MarshalJSON satisfies the encoding/json Marshaler interface. This method
+// uses the more correct jsonpb package to correctly marshal the message.
+func (m *MultiChoiceCollectionOptionValue) MarshalJSON() ([]byte, error) {
+	if m == nil {
+		return json.Marshal(nil)
+	}
+
+	buf := &bytes.Buffer{}
+
+	if err := MultiChoiceCollectionOptionValueJSONMarshaler.Marshal(buf, m); err != nil {
+		return nil, err
+	}
+
+	return buf.Bytes(), nil
+}
+
+var _ json.Marshaler = (*MultiChoiceCollectionOptionValue)(nil)
+
+// MultiChoiceCollectionOptionValueJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
+// instances of MultiChoiceCollectionOptionValue. This struct is safe to replace or modify but
+// should not be done so concurrently.
+var MultiChoiceCollectionOptionValueJSONUnmarshaler = new(jsonpb.Unmarshaler)
+
+// UnmarshalJSON satisfies the encoding/json Unmarshaler interface. This method
+// uses the more correct jsonpb package to correctly unmarshal the message.
+func (m *MultiChoiceCollectionOptionValue) UnmarshalJSON(b []byte) error {
+	return MultiChoiceCollectionOptionValueJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
+}
+
+var _ json.Unmarshaler = (*MultiChoiceCollectionOptionValue)(nil)
+
 // PermissionJSONMarshaler describes the default jsonpb.Marshaler used by all
 // instances of Permission. This struct is safe to replace or modify but
 // should not be done so concurrently.
@@ -621,3 +729,75 @@ func (m *ListOptionValue) UnmarshalJSON(b []byte) error {
 }
 
 var _ json.Unmarshaler = (*ListOptionValue)(nil)
+
+// CollectionValueJSONMarshaler describes the default jsonpb.Marshaler used by all
+// instances of CollectionValue. This struct is safe to replace or modify but
+// should not be done so concurrently.
+var CollectionValueJSONMarshaler = new(jsonpb.Marshaler)
+
+// MarshalJSON satisfies the encoding/json Marshaler interface. This method
+// uses the more correct jsonpb package to correctly marshal the message.
+func (m *CollectionValue) MarshalJSON() ([]byte, error) {
+	if m == nil {
+		return json.Marshal(nil)
+	}
+
+	buf := &bytes.Buffer{}
+
+	if err := CollectionValueJSONMarshaler.Marshal(buf, m); err != nil {
+		return nil, err
+	}
+
+	return buf.Bytes(), nil
+}
+
+var _ json.Marshaler = (*CollectionValue)(nil)
+
+// CollectionValueJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
+// instances of CollectionValue. This struct is safe to replace or modify but
+// should not be done so concurrently.
+var CollectionValueJSONUnmarshaler = new(jsonpb.Unmarshaler)
+
+// UnmarshalJSON satisfies the encoding/json Unmarshaler interface. This method
+// uses the more correct jsonpb package to correctly unmarshal the message.
+func (m *CollectionValue) UnmarshalJSON(b []byte) error {
+	return CollectionValueJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
+}
+
+var _ json.Unmarshaler = (*CollectionValue)(nil)
+
+// CollectionOptionJSONMarshaler describes the default jsonpb.Marshaler used by all
+// instances of CollectionOption. This struct is safe to replace or modify but
+// should not be done so concurrently.
+var CollectionOptionJSONMarshaler = new(jsonpb.Marshaler)
+
+// MarshalJSON satisfies the encoding/json Marshaler interface. This method
+// uses the more correct jsonpb package to correctly marshal the message.
+func (m *CollectionOption) MarshalJSON() ([]byte, error) {
+	if m == nil {
+		return json.Marshal(nil)
+	}
+
+	buf := &bytes.Buffer{}
+
+	if err := CollectionOptionJSONMarshaler.Marshal(buf, m); err != nil {
+		return nil, err
+	}
+
+	return buf.Bytes(), nil
+}
+
+var _ json.Marshaler = (*CollectionOption)(nil)
+
+// CollectionOptionJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
+// instances of CollectionOption. This struct is safe to replace or modify but
+// should not be done so concurrently.
+var CollectionOptionJSONUnmarshaler = new(jsonpb.Unmarshaler)
+
+// UnmarshalJSON satisfies the encoding/json Unmarshaler interface. This method
+// uses the more correct jsonpb package to correctly unmarshal the message.
+func (m *CollectionOption) UnmarshalJSON(b []byte) error {
+	return CollectionOptionJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
+}
+
+var _ json.Unmarshaler = (*CollectionOption)(nil)
