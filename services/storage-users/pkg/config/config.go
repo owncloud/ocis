@@ -157,7 +157,7 @@ type S3NGDriver struct {
 	SendContentMd5        bool   `yaml:"put_object_send_content_md5" env:"STORAGE_USERS_S3NG_PUT_OBJECT_SEND_CONTENT_MD5" desc:"Send a Content-MD5 header when copying objects to S3." introductionVersion:"5.0"`
 	ConcurrentStreamParts bool   `yaml:"put_object_concurrent_stream_parts" env:"STORAGE_USERS_S3NG_PUT_OBJECT_CONCURRENT_STREAM_PARTS" desc:"Always precreate parts when copying objects to S3." introductionVersion:"5.0"`
 	NumThreads            uint   `yaml:"put_object_num_threads" env:"STORAGE_USERS_S3NG_PUT_OBJECT_NUM_THREADS" desc:"Number of concurrent uploads to use when copying objects to S3." introductionVersion:"5.0"`
-	PartSize              uint64 `yaml:"put_object_part_size" env:"STORAGE_USERS_S3NG_PUT_OBJECT_PART_SIZE" desc:"Part size for concurrent uploads to S3. If no value or 0 is set, the library's default value of 16MB is used. The value range is min 5MB and max 5GB)" introductionVersion:"5.0"`
+	PartSize              uint64 `yaml:"put_object_part_size" env:"STORAGE_USERS_S3NG_PUT_OBJECT_PART_SIZE" desc:"Part size for concurrent uploads to S3. If no value or 0 is set, the library's default value of 16MB is used. The value range is min 5MB and max 5GB.)" introductionVersion:"5.0"`
 	// PersonalSpaceAliasTemplate  contains the template used to construct
 	// the personal space alias, eg: `"{{.SpaceType}}/{{.User.Username | lower}}"`
 	PersonalSpaceAliasTemplate string `yaml:"personalspacealias_template" env:"STORAGE_USERS_S3NG_PERSONAL_SPACE_ALIAS_TEMPLATE" desc:"Template string to construct personal space aliases." introductionVersion:"pre5.0"`
