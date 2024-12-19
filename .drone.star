@@ -75,7 +75,7 @@ config = {
         "skip": False,
     },
     "k6LoadTests": {
-        "skip": False,
+        "skip": True,
     },
     "localApiTests": {
         "basic": {
@@ -2109,7 +2109,7 @@ def changelog():
                         "push",
                     ],
                     "message": "Automated changelog update [skip ci]",
-                    "branch": "master",
+                    "branch": "stable-7.0",
                     "author_email": "devops@owncloud.com",
                     "author_name": "ownClouders",
                     "netrc_machine": "github.com",
