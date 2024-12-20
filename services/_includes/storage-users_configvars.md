@@ -63,7 +63,7 @@
 | STORAGE_USERS_S3NG_PUT_OBJECT_SEND_CONTENT_MD5 | bool | true | Send a Content-MD5 header when copying objects to S3.|
 | STORAGE_USERS_S3NG_PUT_OBJECT_CONCURRENT_STREAM_PARTS | bool | true | Always precreate parts when copying objects to S3.|
 | STORAGE_USERS_S3NG_PUT_OBJECT_NUM_THREADS | uint | 4 | Number of concurrent uploads to use when copying objects to S3.|
-| STORAGE_USERS_S3NG_PUT_OBJECT_PART_SIZE | uint64 | 0 | Part size for concurrent uploads to S3.|
+| STORAGE_USERS_S3NG_PUT_OBJECT_PART_SIZE | uint64 | 0 | Part size for concurrent uploads to S3. If no value or 0 is set, the library's default value of 16MB is used. The value range is min 5MB and max 5GB.|
 | STORAGE_USERS_S3NG_PERSONAL_SPACE_ALIAS_TEMPLATE | string | {{.SpaceType}}/{{.User.Username \| lower}} | Template string to construct personal space aliases.|
 | STORAGE_USERS_S3NG_PERSONAL_SPACE_PATH_TEMPLATE | string |  | Template string to construct the paths of the personal space roots.|
 | STORAGE_USERS_S3NG_GENERAL_SPACE_ALIAS_TEMPLATE | string | {{.SpaceType}}/{{.SpaceName \| replace &#34; &#34; &#34;-&#34; \| lower}} | Template string to construct general space aliases.|
