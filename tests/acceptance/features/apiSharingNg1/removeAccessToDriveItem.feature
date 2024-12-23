@@ -223,3 +223,91 @@ Feature: Remove access to a drive item
     Then the HTTP status code should be "204"
     And for user "Brian" the space "Shares" should not contain these entries:
       | folderToShare |
+
+  @env-config
+  Scenario Outline: remove share from group after the share role Secure Viewer has been disabled (Personal Space)
+    Given the administrator has enabled the permissions role "Secure Viewer"
+    And group "group1" has been created
+    And user "Brian" has been added to group "group1"
+    And user "Alice" has uploaded file with content "some content" to "textfile.txt"
+    And user "Alice" has created folder "folderToShare"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | <resource>    |
+      | space           | Personal      |
+      | sharee          | group1        |
+      | shareType       | group         |
+      | permissionsRole | Secure Viewer |
+    And the administrator has disabled the permissions role "Secure Viewer"
+    When user "Alice" removes the access of group "group1" from resource "<resource>" of space "Personal" using the Graph API
+    Then the HTTP status code should be "204"
+    And for user "Brian" the space "Shares" should not contain these entries:
+      | <resource> |
+    Examples:
+      | resource      |
+      | textfile.txt  |
+      | folderToShare |
+
+  @env-config
+  Scenario: remove share from group after the share role Denied has been disabled (Personal Space)
+    Given the administrator has enabled the permissions role "Denied"
+    And group "group1" has been created
+    And user "Brian" has been added to group "group1"
+    And user "Alice" has created folder "folderToShare"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | folderToShare |
+      | space           | Personal      |
+      | sharee          | group1        |
+      | shareType       | group         |
+      | permissionsRole | Denied        |
+    And the administrator has disabled the permissions role "Denied"
+    When user "Alice" removes the access of group "group1" from resource "folderToShare" of space "Personal" using the Graph API
+    Then the HTTP status code should be "204"
+    And for user "Brian" the space "Shares" should not contain these entries:
+      | folderToShare |
+
+  @env-config
+  Scenario Outline: remove share from group after the share role Secure Viewer has been disabled (Project Space)
+    Given using spaces DAV path
+    And the administrator has enabled the permissions role "Secure Viewer"
+    And group "group1" has been created
+    And user "Brian" has been added to group "group1"
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Alice" has uploaded a file inside space "new-space" with content "some content" to "textfile.txt"
+    And user "Alice" has created a folder "folderToShare" in space "new-space"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | <resource>    |
+      | space           | new-space     |
+      | sharee          | group1        |
+      | shareType       | group         |
+      | permissionsRole | Secure Viewer |
+    And the administrator has disabled the permissions role "Secure Viewer"
+    When user "Alice" removes the access of group "group1" from resource "<resource>" of space "new-space" using the Graph API
+    Then the HTTP status code should be "204"
+    And for user "Brian" the space "Shares" should not contain these entries:
+      | <resource> |
+    Examples:
+      | resource      |
+      | textfile.txt  |
+      | folderToShare |
+
+  @env-config
+  Scenario: remove share from group after the share role Denied has been disabled (Project Space)
+    Given using spaces DAV path
+    And the administrator has enabled the permissions role "Denied"
+    And group "group1" has been created
+    And user "Brian" has been added to group "group1"
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Alice" has created a folder "folderToShare" in space "new-space"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | folderToShare |
+      | space           | new-space     |
+      | sharee          | group1        |
+      | shareType       | group         |
+      | permissionsRole | Denied        |
+    And the administrator has disabled the permissions role "Denied"
+    When user "Alice" removes the access of group "group1" from resource "folderToShare" of space "new-space" using the Graph API
+    Then the HTTP status code should be "204"
+    And for user "Brian" the space "Shares" should not contain these entries:
+      | folderToShare |
