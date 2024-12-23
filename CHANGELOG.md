@@ -61,12 +61,20 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Share creation date is missing in invite response: [#10780](https://github.com/owncloud/ocis/pull/10780)
 * Bugfix - Bump some golang dependencies: [#10795](https://github.com/owncloud/ocis/pull/10795)
 * Enhancement - Part I: The user settings are extended by notifications preferences: [#10706](https://github.com/owncloud/ocis/pull/10706)
 * Enhancement - Part II: Filtering of in-app notifications: [#10779](https://github.com/owncloud/ocis/pull/10779)
 * Enhancement - Part III: Filtering of mail notifications: [#10792](https://github.com/owncloud/ocis/pull/10792)
 
 ## Details
+
+* Bugfix - Share creation date is missing in invite response: [#10780](https://github.com/owncloud/ocis/pull/10780)
+
+   The graph drives invite response now includes the `createdDateTime` field.
+
+   https://github.com/owncloud/ocis/issues/10739
+   https://github.com/owncloud/ocis/pull/10780
 
 * Bugfix - Bump some golang dependencies: [#10795](https://github.com/owncloud/ocis/pull/10795)
 
