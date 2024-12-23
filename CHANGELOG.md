@@ -61,9 +61,16 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Bump some golang dependencies: [#10793](https://github.com/owncloud/ocis/pull/10793)
 * Enhancement - Part I: The user settings are extended by notifications preferences: [#10706](https://github.com/owncloud/ocis/pull/10706)
 
 ## Details
+
+* Bugfix - Bump some golang dependencies: [#10793](https://github.com/owncloud/ocis/pull/10793)
+
+   Bump dependencies "golang.org/x/crypto" and "golang.org/x/net"
+
+   https://github.com/owncloud/ocis/pull/10793
 
 * Enhancement - Part I: The user settings are extended by notifications preferences: [#10706](https://github.com/owncloud/ocis/pull/10706)
 
