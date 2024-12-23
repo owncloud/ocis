@@ -61,16 +61,18 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
-* Bugfix - Bump some golang dependencies: [#10793](https://github.com/owncloud/ocis/pull/10793)
+* Bugfix - Bump some golang dependencies: [#10795](https://github.com/owncloud/ocis/pull/10795)
 * Enhancement - Part I: The user settings are extended by notifications preferences: [#10706](https://github.com/owncloud/ocis/pull/10706)
+* Enhancement - Part II: Filtering of in-app notifications: [#10779](https://github.com/owncloud/ocis/pull/10779)
+* Enhancement - Part III: Filtering of mail notifications: [#10792](https://github.com/owncloud/ocis/pull/10792)
 
 ## Details
 
-* Bugfix - Bump some golang dependencies: [#10793](https://github.com/owncloud/ocis/pull/10793)
+* Bugfix - Bump some golang dependencies: [#10795](https://github.com/owncloud/ocis/pull/10795)
 
    Bump dependencies "golang.org/x/crypto" and "golang.org/x/net"
 
-   https://github.com/owncloud/ocis/pull/10793
+   https://github.com/owncloud/ocis/pull/10795
 
 * Enhancement - Part I: The user settings are extended by notifications preferences: [#10706](https://github.com/owncloud/ocis/pull/10706)
 
@@ -78,6 +80,22 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/10669
    https://github.com/owncloud/ocis/pull/10706
+
+* Enhancement - Part II: Filtering of in-app notifications: [#10779](https://github.com/owncloud/ocis/pull/10779)
+
+   Part II: In-app notifications are now filtered based on the notification
+   preferences in the user settings
+
+   https://github.com/owncloud/ocis/issues/10769
+   https://github.com/owncloud/ocis/pull/10779
+
+* Enhancement - Part III: Filtering of mail notifications: [#10792](https://github.com/owncloud/ocis/pull/10792)
+
+   Part III: Mail notifications are now filtered based on the notification
+   preferences in the user settings
+
+   https://github.com/owncloud/ocis/issues/10790
+   https://github.com/owncloud/ocis/pull/10792
 
 # Changelog for [7.0.0] (2024-12-17)
 
