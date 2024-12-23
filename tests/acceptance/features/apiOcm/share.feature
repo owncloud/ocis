@@ -1297,3 +1297,36 @@ Feature: an user shares resources using ScienceMesh application
       | Viewer          |
       | Uploader        |
       | Editor          |
+
+  @issue-10272
+  Scenario: federated user downloads shared resources as an archive
+    Given using spaces DAV path
+    And using server "REMOTE"
+    And "Brian" has created the federation share invitation
+    And using server "LOCAL"
+    And "Alice" has accepted invitation
+    And user "Alice" has uploaded file with content "some data" to "textfile.txt"
+    And user "Alice" has created folder "imageFolder"
+    And user "Alice" has uploaded file "filesForUpload/testavatar.png" to "imageFolder/testavatar.png"
+    And user "Alice" has sent the following resource share invitation to federated user:
+      | resource        | textfile.txt |
+      | space           | Personal     |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | Viewer       |
+    And user "Alice" has sent the following resource share invitation to federated user:
+      | resource        | imageFolder |
+      | space           | Personal    |
+      | sharee          | Brian       |
+      | shareType       | user        |
+      | permissionsRole | Viewer      |
+    And using server "REMOTE"
+    When user "Brian" downloads the archive of these items using the resource remoteItemIds
+      | textfile.txt |
+      | imageFolder  |
+    Then the HTTP status code should be "200"
+    And the downloaded zip archive should contain these files:
+      | name                       | content    |
+      | textfile.txt               | some data  |
+      | imageFolder                |            |
+      | imageFolder/testavatar.png |            |

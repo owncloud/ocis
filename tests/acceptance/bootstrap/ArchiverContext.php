@@ -43,6 +43,7 @@ class ArchiverContext implements Context {
 	 * @var FeatureContext
 	 */
 	private FeatureContext $featureContext;
+	private SpacesContext $spacesContext;
 
 	/**
 	 * @BeforeScenario
@@ -58,6 +59,7 @@ class ArchiverContext implements Context {
 		$environment = $scope->getEnvironment();
 		// Get all the contexts you need in this context
 		$this->featureContext = BehatHelper::getContext($scope, $environment, 'FeatureContext');
+		$this->spacesContext = BehatHelper::getContext($scope, $environment, 'SpacesContext');
 	}
 
 	/**
@@ -120,13 +122,15 @@ class ArchiverContext implements Context {
 			case 'id':
 			case 'ids':
 				return 'id=' . $this->featureContext->getFileIdForPath($user, $resource);
+			case 'remoteItemIds':
+				return 'id=' . $this->spacesContext->getSharesRemoteItemId($user, $resource);
 			case 'path':
 			case 'paths':
 				return 'path=' . $resource;
 			default:
 				throw new Exception(
 					'"' . $addressType .
-					'" is not a legal value for $addressType, must be id|ids|path|paths'
+					'" is not a legal value for $addressType, must be id|ids|remoteItemIds|path|paths'
 				);
 		}
 	}
@@ -276,7 +280,7 @@ class ArchiverContext implements Context {
 		$tar = $this->getArchiveClass($type);
 		$tar->open($tempFile);
 		$archiveData = $tar->contents();
-		
+
 		// extract the archive
 		$tar->open($tempFile);
 		$tar->extract($tempExtractFolder);
@@ -291,13 +295,22 @@ class ArchiverContext implements Context {
 
 				if ($expectedPath === $actualPath) {
 					if (!$info->getIsdir()) {
-						$fileContent = \file_get_contents("$tempExtractFolder/$actualPath");
-						Assert::assertEquals(
-							$expectedItem['content'],
-							$fileContent,
-							__METHOD__ .
-							" content of '" . $expectedPath . "' not as expected"
-						);
+						$fileFullPath = "$tempExtractFolder/$actualPath";
+						$fileMimeType = \mime_content_type($fileFullPath);
+
+						if ($fileMimeType === "text/plain") {
+							$fileContent = \file_get_contents($fileFullPath);
+							Assert::assertEquals(
+								$expectedItem['content'],
+								$fileContent,
+								__METHOD__ . " content of '" . $expectedPath . "' not as expected"
+							);
+						} else {
+							Assert::assertFileExists(
+								$fileFullPath,
+								__METHOD__ . " File '" . $expectedPath . "' is not in the downloaded archive."
+							);
+						}
 					}
 					$found = true;
 					break;
