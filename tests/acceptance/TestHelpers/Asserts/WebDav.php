@@ -42,7 +42,7 @@ class WebDav extends Assert {
 		?string $expectedValue,
 		?array $responseXmlArray,
 		?string $extraErrorText = ''
-	):void {
+	): void {
 		if ($extraErrorText !== '') {
 			$extraErrorText = $extraErrorText . " ";
 		}
@@ -58,7 +58,9 @@ class WebDav extends Assert {
 		} elseif ($element === "reason") {
 			$result = $responseXmlArray['value'][3]['value'];
 		} else {
-			self::fail(__METHOD__ . " element must be one of exception, response or reason. But '$element' was passed in.");
+			self::fail(
+				__METHOD__ . " element must be one of exception, response or reason. But '$element' was passed in."
+			);
 		}
 
 		self::assertEquals(
@@ -78,7 +80,7 @@ class WebDav extends Assert {
 	public static function assertResponseContainsShareTypes(
 		SimpleXMLElement $responseXmlObject,
 		?array $expectedShareTypes
-	):void {
+	): void {
 		foreach ($expectedShareTypes as $row) {
 			$xmlPart = $responseXmlObject->xpath(
 				"//d:prop/oc:share-types/oc:share-type[.=" . $row[0] . "]"

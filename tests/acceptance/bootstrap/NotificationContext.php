@@ -36,14 +36,14 @@ class NotificationContext implements Context {
 	/**
 	 * @return array[]
 	 */
-	public function getNotificationIds():array {
+	public function getNotificationIds(): array {
 		return $this->notificationIds;
 	}
 
 	/**
 	 * @return array[]
 	 */
-	public function getLastNotificationId():array {
+	public function getLastNotificationId(): array {
 		return \end($this->notificationIds);
 	}
 
@@ -95,7 +95,7 @@ class NotificationContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function before(BeforeScenarioScope $scope):void {
+	public function before(BeforeScenarioScope $scope): void {
 		// Get the environment
 		$environment = $scope->getEnvironment();
 		// Get all the contexts you need in this context
@@ -109,7 +109,7 @@ class NotificationContext implements Context {
 	 *
 	 * @return ResponseInterface
 	 */
-	public function listAllNotifications(string $user):ResponseInterface {
+	public function listAllNotifications(string $user): ResponseInterface {
 		$this->setUserRecipient($user);
 		$language = SettingsHelper::getLanguageSettingValue(
 			$this->featureContext->getBaseUrl(),
@@ -138,7 +138,7 @@ class NotificationContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function userListAllNotifications(string $user):void {
+	public function userListAllNotifications(string $user): void {
 		$response = $this->listAllNotifications($user);
 		$this->featureContext->setResponse($response);
 		$this->featureContext->pushToLastHttpStatusCodesArray();
@@ -151,7 +151,7 @@ class NotificationContext implements Context {
 	 * @throws GuzzleException
 	 * @throws JsonException
 	 */
-	public function deleteAllNotifications(string $user):ResponseInterface {
+	public function deleteAllNotifications(string $user): ResponseInterface {
 		$response = $this->listAllNotifications($user);
 		if (isset($this->featureContext->getJsonDecodedResponseBodyContent($response)->ocs->data)) {
 			$responseBody = $this->featureContext->getJsonDecodedResponseBodyContent($response)->ocs->data;
@@ -172,7 +172,7 @@ class NotificationContext implements Context {
 	 * @throws GuzzleException
 	 * @throws JsonException
 	 */
-	public function userDeletesAllNotifications(string $user):void {
+	public function userDeletesAllNotifications(string $user): void {
 		$response = $this->deleteAllNotifications($user);
 		$this->featureContext->setResponse($response);
 	}
@@ -186,7 +186,7 @@ class NotificationContext implements Context {
 	 * @throws GuzzleException
 	 * @throws JsonException
 	 */
-	public function userHasDeletedAllNotifications(string $user):void {
+	public function userHasDeletedAllNotifications(string $user): void {
 		$response = $this->deleteAllNotifications($user);
 		$this->featureContext->theHTTPStatusCodeShouldBe(200, "", $response);
 	}
@@ -202,7 +202,7 @@ class NotificationContext implements Context {
 	 * @throws GuzzleException
 	 * @throws JsonException
 	 */
-	public function userDeletesNotificationOfResourceAndSubject(string $user, string $resource, string $subject):void {
+	public function userDeletesNotificationOfResourceAndSubject(string $user, string $resource, string $subject): void {
 		$response = $this->listAllNotifications($user);
 		$this->filterNotificationsBySubjectAndResource($subject, $resource, $response);
 		$this->featureContext->setResponse($this->userDeletesNotification($user));
@@ -217,7 +217,7 @@ class NotificationContext implements Context {
 	 * @throws GuzzleException
 	 * @throws JsonException
 	 */
-	public function userDeletesNotification(string $user):ResponseInterface {
+	public function userDeletesNotification(string $user): ResponseInterface {
 		$this->setUserRecipient($user);
 		$payload["ids"] = $this->getNotificationIds();
 		return OcsApiHelper::sendRequest(
@@ -324,7 +324,10 @@ class NotificationContext implements Context {
 	 *
 	 * @return object
 	 */
-	public function filterResponseAccordingToNotificationSubject(string $subject, ?ResponseInterface $response = null): object {
+	public function filterResponseAccordingToNotificationSubject(
+		string $subject,
+		?ResponseInterface $response = null
+	): object {
 		$response = $response ?? $this->featureContext->getResponse();
 		if (isset($this->featureContext->getJsonDecodedResponseBodyContent($response)->ocs->data)) {
 			$responseBody = $this->featureContext->getJsonDecodedResponseBodyContent($response)->ocs->data;
@@ -351,7 +354,11 @@ class NotificationContext implements Context {
 	 *
 	 * @return array
 	 */
-	public function filterNotificationsBySubjectAndResource(string $subject, string $resource, ?ResponseInterface $response = null): array {
+	public function filterNotificationsBySubjectAndResource(
+		string $subject,
+		string $resource,
+		?ResponseInterface $response = null
+	): array {
 		$filteredNotifications = [];
 		$response = $response ?? $this->featureContext->getResponse();
 		$responseObject = $this->featureContext->getJsonDecodedResponseBodyContent($response);
@@ -362,7 +369,10 @@ class NotificationContext implements Context {
 
 		$notifications = $responseObject->ocs->data;
 		foreach ($notifications as $notification) {
-			if (isset($notification->subject) && $notification->subject === $subject && isset($notification->messageRichParameters->resource->name) && $notification->messageRichParameters->resource->name === $resource) {
+			if (isset($notification->subject) && $notification->subject === $subject
+				&& isset($notification->messageRichParameters->resource->name)
+				&& $notification->messageRichParameters->resource->name === $resource
+			) {
 				$this->notificationIds[] = $notification->notification_id;
 				$filteredNotifications[] = $notification;
 			}
@@ -380,7 +390,7 @@ class NotificationContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userShouldGetANotificationWithMessage(string $user, string $subject, TableNode $table):void {
+	public function userShouldGetANotificationWithMessage(string $user, string $subject, TableNode $table): void {
 		$count = 0;
 		// Sometimes the test might try to get the notifications before the server has created the notification.
 		// To prevent the test from failing because of that, try to list the notifications again
@@ -392,9 +402,15 @@ class NotificationContext implements Context {
 			$response = $this->listAllNotifications($user);
 			$this->featureContext->theHTTPStatusCodeShouldBe(200, "", $response);
 			++$count;
-		} while (!isset($this->filterResponseAccordingToNotificationSubject($subject, $response)->message) && $count <= 5);
+		} while (!isset($this->filterResponseAccordingToNotificationSubject($subject, $response)->message)
+			&& $count <= 5
+		);
 		if (isset($this->filterResponseAccordingToNotificationSubject($subject, $response)->message)) {
-			$actualMessage = str_replace(["\r", "\n"], " ", $this->filterResponseAccordingToNotificationSubject($subject, $response)->message);
+			$actualMessage = str_replace(
+				["\r", "\n"],
+				" ",
+				$this->filterResponseAccordingToNotificationSubject($subject, $response)->message
+			);
 		} else {
 			throw new \Exception("Notification was not found even after retrying for 5 seconds.");
 		}
@@ -417,7 +433,12 @@ class NotificationContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userShouldGetNotificationForResourceWithMessage(string $user, string $resource, string $subject, TableNode $table):void {
+	public function userShouldGetNotificationForResourceWithMessage(
+		string $user,
+		string $resource,
+		string $subject,
+		TableNode $table
+	): void {
 		$response = $this->listAllNotifications($user);
 		$notification = $this->filterNotificationsBySubjectAndResource($subject, $resource, $response);
 
@@ -432,9 +453,15 @@ class NotificationContext implements Context {
 			$response = $this->userDeletesNotification($user);
 			$this->featureContext->theHTTPStatusCodeShouldBe(200, '', $response);
 		} elseif (\count($notification) === 0) {
-			throw new \Exception("Response doesn't contain any notification with resource '$resource' and subject '$subject'.\n" . print_r($notification, true));
+			throw new \Exception(
+				"Response doesn't contain any notification with resource '$resource' and subject '$subject'.\n"
+				. print_r($notification, true)
+			);
 		} else {
-			throw new \Exception("Response contains more than one notification with resource '$resource' and subject '$subject'.\n" . print_r($notification, true));
+			throw new \Exception(
+				"Response contains more than one notification with resource '$resource' and subject '$subject'.\n"
+				. print_r($notification, true)
+			);
 		}
 	}
 
@@ -447,10 +474,19 @@ class NotificationContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function userShouldNotHaveANotificationRelatedToResourceWithSubject(string $user, string $resource, string $subject):void {
+	public function userShouldNotHaveANotificationRelatedToResourceWithSubject(
+		string $user,
+		string $resource,
+		string $subject
+	): void {
 		$response = $this->listAllNotifications($user);
 		$filteredResponse = $this->filterNotificationsBySubjectAndResource($subject, $resource, $response);
-		Assert::assertCount(0, $filteredResponse, "Response should not contain notification related to resource '$resource' with subject '$subject' but found" . print_r($filteredResponse, true));
+		Assert::assertCount(
+			0,
+			$filteredResponse,
+			"Response should not contain notification related to resource '$resource' with subject '$subject' but found"
+			. print_r($filteredResponse, true)
+		);
 	}
 
 	/**
@@ -464,7 +500,12 @@ class NotificationContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userShouldHaveReceivedTheFollowingEmailFromUserAboutTheShareOfProjectSpace(string $user, string $sender, string $spaceName, PyStringNode $content):void {
+	public function userShouldHaveReceivedTheFollowingEmailFromUserAboutTheShareOfProjectSpace(
+		string $user,
+		string $sender,
+		string $spaceName,
+		PyStringNode $content
+	): void {
 		$rawExpectedEmailBodyContent = \str_replace("\r\n", "\n", $content->getRaw());
 		$this->featureContext->setResponse(
 			GraphHelper::getMySpaces(
@@ -501,7 +542,11 @@ class NotificationContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userShouldHaveReceivedTheFollowingEmailFromUser(string $user, string $sender, PyStringNode $content):void {
+	public function userShouldHaveReceivedTheFollowingEmailFromUser(
+		string $user,
+		string $sender,
+		PyStringNode $content
+	): void {
 		$rawExpectedEmailBodyContent = \str_replace("\r\n", "\n", $content->getRaw());
 		$expectedEmailBodyContent = $this->featureContext->substituteInLineCodes(
 			$rawExpectedEmailBodyContent,
@@ -520,7 +565,11 @@ class NotificationContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userShouldHaveReceivedTheFollowingEmailFromUserIgnoringWhitespaces(string $user, string $sender, PyStringNode $content):void {
+	public function userShouldHaveReceivedTheFollowingEmailFromUserIgnoringWhitespaces(
+		string $user,
+		string $sender,
+		PyStringNode $content
+	): void {
 		$rawExpectedEmailBodyContent = \str_replace("\r\n", "\n", $content->getRaw());
 		$expectedEmailBodyContent = $this->featureContext->substituteInLineCodes(
 			$rawExpectedEmailBodyContent,
@@ -537,7 +586,11 @@ class NotificationContext implements Context {
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function assertEmailContains(string $user, string $expectedEmailBodyContent, $ignoreWhiteSpace = false):void {
+	public function assertEmailContains(
+		string $user,
+		string $expectedEmailBodyContent,
+		$ignoreWhiteSpace = false
+	): void {
 		$address = $this->featureContext->getEmailAddressForUser($user);
 		$this->featureContext->pushEmailRecipientAsMailBox($address);
 		$actualEmailBodyContent = EmailHelper::getBodyOfLastEmail($address, $this->featureContext->getStepLineRef());
@@ -548,7 +601,8 @@ class NotificationContext implements Context {
 		Assert::assertStringContainsString(
 			$expectedEmailBodyContent,
 			$actualEmailBodyContent,
-			"The email address '$address' should have received an email with the body containing $expectedEmailBodyContent
+			"The email address '$address' should have received an"
+			. "email with the body containing $expectedEmailBodyContent
 			but the received email is $actualEmailBodyContent"
 		);
 	}
@@ -560,7 +614,7 @@ class NotificationContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function clearInbucketMessages():void {
+	public function clearInbucketMessages(): void {
 		try {
 			if (!empty($this->featureContext->emailRecipients)) {
 				foreach ($this->featureContext->emailRecipients as $emailRecipient) {
@@ -594,9 +648,10 @@ class NotificationContext implements Context {
 		?string $user = null,
 		?string $deprovision_date = "2043-07-04T11:23:12Z",
 		?string $deprovision_date_format= "2006-01-02T15:04:05Z07:00"
-	):ResponseInterface {
+	): ResponseInterface {
 		$payload["type"] = "deprovision";
-		$payload["data"] = ["deprovision_date" => $deprovision_date, "deprovision_date_format" => $deprovision_date_format];
+		$payload["data"] = [
+			"deprovision_date" => $deprovision_date, "deprovision_date_format" => $deprovision_date_format];
 		return OcsApiHelper::sendRequest(
 			$this->featureContext->getBaseUrl(),
 			$user ? $this->featureContext->getActualUsername($user) : $this->featureContext->getAdminUsername(),
@@ -636,7 +691,10 @@ class NotificationContext implements Context {
 	 * @throws GuzzleException
 	 * @throws JsonException
 	 */
-	public function theAdministratorCreatesADeprovisioningNotificationUsingDateFormat($deprovision_date, $deprovision_date_format) {
+	public function theAdministratorCreatesADeprovisioningNotificationUsingDateFormat(
+		$deprovision_date,
+		$deprovision_date_format
+	) {
 		$response = $this->userCreatesDeprovisioningNotification(null, $deprovision_date, $deprovision_date_format);
 		$this->featureContext->setResponse($response);
 		$this->featureContext->pushToLastHttpStatusCodesArray();
@@ -647,7 +705,7 @@ class NotificationContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function userHasCreatedDeprovisioningNotification():void {
+	public function userHasCreatedDeprovisioningNotification(): void {
 		$response = $this->userCreatesDeprovisioningNotification();
 		$this->featureContext->theHTTPStatusCodeShouldBe(200, "", $response);
 	}
@@ -660,7 +718,7 @@ class NotificationContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function userDeletesDeprovisioningNotification(?string $user = null):void {
+	public function userDeletesDeprovisioningNotification(?string $user = null): void {
 		$payload["ids"] = ["deprovision"];
 
 		$response = OcsApiHelper::sendRequest(

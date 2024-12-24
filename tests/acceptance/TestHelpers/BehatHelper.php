@@ -38,7 +38,11 @@ class BehatHelper {
 	 *
 	 * @return Context
 	 */
-	public static function getContext(ScenarioScope $scope, InitializedContextEnvironment $environment, string $class): Context {
+	public static function getContext(
+		ScenarioScope $scope,
+		InitializedContextEnvironment $environment,
+		string $class
+	): Context {
 		try {
 			return $environment->getContext($class);
 		} catch (ContextNotFoundException $e) {

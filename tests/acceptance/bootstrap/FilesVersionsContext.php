@@ -48,7 +48,7 @@ class FilesVersionsContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function before(BeforeScenarioScope $scope):void {
+	public function before(BeforeScenarioScope $scope): void {
 		// Get the environment
 		$environment = $scope->getEnvironment();
 		// Get all the contexts you need in this context
@@ -66,7 +66,7 @@ class FilesVersionsContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userTriesToGetFileVersions(string $user, string $file, string $fileOwner):void {
+	public function userTriesToGetFileVersions(string $user, string $file, string $fileOwner): void {
 		$this->featureContext->setResponse($this->getFileVersions($user, $file, $fileOwner));
 	}
 
@@ -79,7 +79,7 @@ class FilesVersionsContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userGetsFileVersions(string $user, string $file):void {
+	public function userGetsFileVersions(string $user, string $file): void {
 		$this->featureContext->setResponse($this->getFileVersions($user, $file));
 	}
 
@@ -92,7 +92,11 @@ class FilesVersionsContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function thePublicTriesToGetTheNumberOfVersionsOfFileWithPasswordUsingFileId(string $file, string $password, string $fileId): void {
+	public function thePublicTriesToGetTheNumberOfVersionsOfFileWithPasswordUsingFileId(
+		string $file,
+		string $password,
+		string $fileId
+	): void {
 		$password = $this->featureContext->getActualPassword($password);
 		$this->featureContext->setResponse(
 			$this->featureContext->makeDavRequest(
@@ -129,7 +133,11 @@ class FilesVersionsContext implements Context {
 		$user = $this->featureContext->getActualUsername($user);
 		$fileOwner = $fileOwner ? $this->featureContext->getActualUsername($fileOwner) : $user;
 		$fileId = $this->featureContext->getFileIdForPath($fileOwner, $file, $spaceId);
-		Assert::assertNotNull($fileId, __METHOD__ . " fileid of file $file user $fileOwner not found (the file may not exist)");
+		Assert::assertNotNull(
+			$fileId,
+			__METHOD__
+			. " fileid of file $file user $fileOwner not found (the file may not exist)"
+		);
 		return $this->featureContext->makeDavRequest(
 			$user,
 			"PROPFIND",
@@ -150,7 +158,7 @@ class FilesVersionsContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function userGetsTheNumberOfVersionsOfFileOfTheSpace(string $user, string $fileId):void {
+	public function userGetsTheNumberOfVersionsOfFileOfTheSpace(string $user, string $fileId): void {
 		$this->featureContext->setResponse(
 			$this->featureContext->makeDavRequest(
 				$user,
@@ -173,7 +181,7 @@ class FilesVersionsContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userGetsVersionMetadataOfFile(string $user, string $file):void {
+	public function userGetsVersionMetadataOfFile(string $user, string $file): void {
 		$response = $this->getFileVersionMetadata($user, $file);
 		$this->featureContext->setResponse($response, $user);
 	}
@@ -184,10 +192,14 @@ class FilesVersionsContext implements Context {
 	 *
 	 * @return ResponseInterface
 	 */
-	public function getFileVersionMetadata(string $user, string $file) : ResponseInterface {
+	public function getFileVersionMetadata(string $user, string $file): ResponseInterface {
 		$user = $this->featureContext->getActualUsername($user);
 		$fileId = $this->featureContext->getFileIdForPath($user, $file);
-		Assert::assertNotNull($fileId, __METHOD__ . " fileid of file $file user $user not found (the file may not exist)");
+		Assert::assertNotNull(
+			$fileId,
+			__METHOD__
+			. " fileid of file $file user $user not found (the file may not exist)"
+		);
 		$body = '<?xml version="1.0"?>
                 <d:propfind  xmlns:d="DAV:" xmlns:oc="http://owncloud.org/ns">
                   <d:prop>
@@ -214,10 +226,14 @@ class FilesVersionsContext implements Context {
 	 * @return ResponseInterface
 	 * @throws Exception
 	 */
-	public function restoreVersionIndexOfFile(string $user, int $versionIndex, string $path):ResponseInterface {
+	public function restoreVersionIndexOfFile(string $user, int $versionIndex, string $path): ResponseInterface {
 		$user = $this->featureContext->getActualUsername($user);
 		$fileId = $this->featureContext->getFileIdForPath($user, $path);
-		Assert::assertNotNull($fileId, __METHOD__ . " fileid of file $path user $user not found (the file may not exist)");
+		Assert::assertNotNull(
+			$fileId,
+			__METHOD__
+			. " fileid of file $path user $user not found (the file may not exist)"
+		);
 		$response = $this->listVersionFolder($user, $fileId, 1);
 		$responseXmlObject = HttpRequestHelper::getResponseXml(
 			$response,
@@ -249,7 +265,7 @@ class FilesVersionsContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userHasRestoredVersionIndexOfFile(string $user, int $versionIndex, string $path):void {
+	public function userHasRestoredVersionIndexOfFile(string $user, int $versionIndex, string $path): void {
 		$response = $this->restoreVersionIndexOfFile($user, $versionIndex, $path);
 		$this->featureContext->theHTTPStatusCodeShouldBe(204, "", $response);
 	}
@@ -264,7 +280,7 @@ class FilesVersionsContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userRestoresVersionIndexOfFile(string $user, int $versionIndex, string $path):void {
+	public function userRestoresVersionIndexOfFile(string $user, int $versionIndex, string $path): void {
 		$response = $this->restoreVersionIndexOfFile($user, $versionIndex, $path);
 		$this->featureContext->setResponse($response, $user);
 	}
@@ -279,7 +295,7 @@ class FilesVersionsContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function assertFileVersionsCount(string $user, string $fileId, int $expectedCount):void {
+	public function assertFileVersionsCount(string $user, string $fileId, int $expectedCount): void {
 		$response = $this->listVersionFolder($user, $fileId, 1);
 		$responseXmlObject = HttpRequestHelper::getResponseXml(
 			$response,
@@ -310,10 +326,14 @@ class FilesVersionsContext implements Context {
 		string $path,
 		string $user,
 		int $count
-	):void {
+	): void {
 		$user = $this->featureContext->getActualUsername($user);
 		$fileId = $this->featureContext->getFileIdForPath($user, $path);
-		Assert::assertNotNull($fileId, __METHOD__ . ". file '$path' for user '$user' not found (the file may not exist)");
+		Assert::assertNotNull(
+			$fileId,
+			__METHOD__
+			. ". file '$path' for user '$user' not found (the file may not exist)"
+		);
 		$this->assertFileVersionsCount($user, $fileId, $count);
 	}
 
@@ -331,7 +351,7 @@ class FilesVersionsContext implements Context {
 		string $fileId,
 		string $user,
 		int $count
-	):void {
+	): void {
 		$this->assertFileVersionsCount($user, $fileId, $count);
 	}
 
@@ -351,10 +371,14 @@ class FilesVersionsContext implements Context {
 		int $index,
 		string $user,
 		int $length
-	):void {
+	): void {
 		$user = $this->featureContext->getActualUsername($user);
 		$fileId = $this->featureContext->getFileIdForPath($user, $path);
-		Assert::assertNotNull($fileId, __METHOD__ . " fileid of file $path user $user not found (the file may not exist)");
+		Assert::assertNotNull(
+			$fileId,
+			__METHOD__
+			. " fileid of file $path user $user not found (the file may not exist)"
+		);
 		$response = $this->listVersionFolder($user, $fileId, 1, ['d:getcontentlength']);
 		$responseXmlObject = HttpRequestHelper::getResponseXml(
 			$response,
@@ -413,10 +437,19 @@ class FilesVersionsContext implements Context {
 	 * @return ResponseInterface
 	 * @throws Exception
 	 */
-	public function downloadVersion(string $user, string $path, string $index, ?string $spaceId = null):ResponseInterface {
+	public function downloadVersion(
+		string $user,
+		string $path,
+		string $index,
+		?string $spaceId = null
+	): ResponseInterface {
 		$user = $this->featureContext->getActualUsername($user);
 		$fileId = $this->featureContext->getFileIdForPath($user, $path, $spaceId);
-		Assert::assertNotNull($fileId, __METHOD__ . " fileid of file $path user $user not found (the file may not exist)");
+		Assert::assertNotNull(
+			$fileId,
+			__METHOD__
+			. " fileid of file $path user $user not found (the file may not exist)"
+		);
 		$index = (int)$index;
 		$response = $this->listVersionFolder($user, $fileId, 1);
 		if ($response->getStatusCode() === 403) {
@@ -451,7 +484,7 @@ class FilesVersionsContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userDownloadsVersion(string $user, string $path, string $index):void {
+	public function userDownloadsVersion(string $user, string $path, string $index): void {
 		$this->featureContext->setResponse($this->downloadVersion($user, $path, $index), $user);
 	}
 
@@ -486,7 +519,7 @@ class FilesVersionsContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function userGetMetaInfo(string $user, string $fileOrFileId, string $path):void {
+	public function userGetMetaInfo(string $user, string $fileOrFileId, string $path): void {
 		$user = $this->featureContext->getActualUsername($user);
 		$baseUrl = $this->featureContext->getBaseUrl();
 		$password = $this->featureContext->getPasswordForUser($user);
@@ -538,7 +571,7 @@ class FilesVersionsContext implements Context {
 		string $fileId,
 		int $folderDepth,
 		?array $properties = null
-	):ResponseInterface {
+	): ResponseInterface {
 		if (!$properties) {
 			$properties = [
 				'd:getetag'

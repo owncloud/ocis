@@ -84,7 +84,11 @@ class SearchContext implements Context {
 				$spaceId = $this->featureContext->spacesContext->getSpaceIdByName($user, $scope);
 				$pattern .= " scope:$spaceId";
 			} else {
-				$resourceID = $this->featureContext->spacesContext->getResourceId($user, $spaceName ?? "Personal", $scope);
+				$resourceID = $this->featureContext->spacesContext->getResourceId(
+					$user,
+					$spaceName ?? "Personal",
+					$scope
+				);
 				$pattern .= " scope:$resourceID";
 			}
 		}

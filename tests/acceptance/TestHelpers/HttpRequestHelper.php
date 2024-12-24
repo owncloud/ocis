@@ -55,7 +55,7 @@ class HttpRequestHelper {
 	 *
 	 * @return int
 	 */
-	public static function numRetriesOnHttpTooEarly():int {
+	public static function numRetriesOnHttpTooEarly(): int {
 		// Currently reva and oCIS may return HTTP_TOO_EARLY
 		// So try up to 10 times before giving up.
 		return 10;
@@ -93,7 +93,7 @@ class HttpRequestHelper {
 		bool $stream = false,
 		?int $timeout = 0,
 		?Client $client =  null
-	):ResponseInterface {
+	): ResponseInterface {
 		if ($client === null) {
 			$client = self::createClient(
 				$user,
@@ -196,7 +196,7 @@ class HttpRequestHelper {
 		?int $timeout = 0,
 		?Client $client =  null,
 		?bool $isGivenStep = false
-	):ResponseInterface {
+	): ResponseInterface {
 		if ((\getenv('DEBUG_ACCEPTANCE_RESPONSES') !== false) || (\getenv('DEBUG_ACCEPTANCE_API_CALLS') !== false)) {
 			$debugResponses = true;
 		} else {
@@ -222,7 +222,10 @@ class HttpRequestHelper {
 				$client
 			);
 
-			if ($response->getStatusCode() >= 400 && $response->getStatusCode() !== self::HTTP_TOO_EARLY && $response->getStatusCode() !== self::HTTP_CONFLICT) {
+			if ($response->getStatusCode() >= 400
+				&& $response->getStatusCode() !== self::HTTP_TOO_EARLY
+				&& $response->getStatusCode() !== self::HTTP_CONFLICT
+			) {
 				$sendExceptionHappened = true;
 			}
 
@@ -261,7 +264,7 @@ class HttpRequestHelper {
 	 *
 	 * @return void
 	 */
-	private static function debugRequest(?RequestInterface $request, ?string $user, ?string $password):void {
+	private static function debugRequest(?RequestInterface $request, ?string $user, ?string $password): void {
 		print("### AUTH: $user:$password\n");
 		print("### REQUEST: " . $request->getMethod() . " " . $request->getUri() . "\n");
 		self::printHeaders($request->getHeaders());
@@ -276,7 +279,7 @@ class HttpRequestHelper {
 	 *
 	 * @return void
 	 */
-	private static function debugResponse(?ResponseInterface $response):void {
+	private static function debugResponse(?ResponseInterface $response): void {
 		print("### RESPONSE\n");
 		print("Status: " . $response->getStatusCode() . "\n");
 		self::printHeaders($response->getHeaders());
@@ -291,7 +294,7 @@ class HttpRequestHelper {
 	 *
 	 * @return void
 	 */
-	private static function printHeaders(?array $headers):void {
+	private static function printHeaders(?array $headers): void {
 		if ($headers) {
 			print("Headers:\n");
 			foreach ($headers as $header => $value) {
@@ -313,7 +316,7 @@ class HttpRequestHelper {
 	 *
 	 * @return void
 	 */
-	private static function printBody(?StreamInterface $body):void {
+	private static function printBody(?StreamInterface $body): void {
 		print("Body:\n");
 		\var_dump($body->getContents());
 		// Rewind the stream so that later code can read from the start.
@@ -333,7 +336,7 @@ class HttpRequestHelper {
 	public static function sendBatchRequest(
 		?array $requests,
 		?Client $client
-	):array {
+	): array {
 		return Pool::batch($client, $requests);
 	}
 
@@ -358,7 +361,7 @@ class HttpRequestHelper {
 		?CookieJar $cookies = null,
 		?bool $stream = false,
 		?int $timeout = 0
-	):Client {
+	): Client {
 		$options = [];
 		if ($user !== null) {
 			$options['auth'] = [$user, $password];
@@ -396,7 +399,7 @@ class HttpRequestHelper {
 		?string $method = 'GET',
 		?array $headers = null,
 		$body = null
-	):RequestInterface {
+	): RequestInterface {
 		if ($headers === null) {
 			$headers = [];
 		}
@@ -449,7 +452,7 @@ class HttpRequestHelper {
 		?array $config = null,
 		?CookieJar $cookies = null,
 		?bool $stream = false
-	):ResponseInterface {
+	): ResponseInterface {
 		return self::sendRequest(
 			$url,
 			$xRequestId,
@@ -491,7 +494,7 @@ class HttpRequestHelper {
 		?array $config = null,
 		?CookieJar $cookies = null,
 		?bool $stream = false
-	):ResponseInterface {
+	): ResponseInterface {
 		return self::sendRequest(
 			$url,
 			$xRequestId,
@@ -533,7 +536,7 @@ class HttpRequestHelper {
 		?array $config = null,
 		?CookieJar $cookies = null,
 		?bool $stream = false
-	):ResponseInterface {
+	): ResponseInterface {
 		return self::sendRequest(
 			$url,
 			$xRequestId,
@@ -576,7 +579,7 @@ class HttpRequestHelper {
 		?array $config = null,
 		?CookieJar $cookies = null,
 		?bool $stream = false
-	):ResponseInterface {
+	): ResponseInterface {
 		return self::sendRequest(
 			$url,
 			$xRequestId,
@@ -605,7 +608,7 @@ class HttpRequestHelper {
 	 * @return SimpleXMLElement
 	 * @throws Exception
 	 */
-	public static function getResponseXml(ResponseInterface $response, ?string $exceptionText = ''):SimpleXMLElement {
+	public static function getResponseXml(ResponseInterface $response, ?string $exceptionText = ''): SimpleXMLElement {
 		// rewind just to make sure we can reparse it in case it was parsed already...
 		$response->getBody()->rewind();
 		$contents = $response->getBody()->getContents();
@@ -647,7 +650,7 @@ class HttpRequestHelper {
 	 *
 	 * @return array
 	 */
-	public static function parseResponseAsXml(ResponseInterface $response):array {
+	public static function parseResponseAsXml(ResponseInterface $response): array {
 		// rewind so that we can reparse it if it was parsed already
 		$response->getBody()->rewind();
 		$body = $response->getBody()->getContents();

@@ -90,14 +90,14 @@ trait Sharing {
 	/**
 	 * @return string
 	 */
-	public function getLastCreatedPublicShareToken():string {
+	public function getLastCreatedPublicShareToken(): string {
 		return (string) $this->getLastCreatedPublicShare()->token;
 	}
 
 	/**
 	 * @return SimpleXMLElement|null
 	 */
-	public function getLastCreatedPublicShare():?SimpleXMLElement {
+	public function getLastCreatedPublicShare(): ?SimpleXMLElement {
 		return \end($this->createdPublicShares);
 	}
 
@@ -122,7 +122,7 @@ trait Sharing {
 	/**
 	 * @return ResponseInterface|null
 	 */
-	public function shareNgGetLastCreatedLinkShare():?ResponseInterface {
+	public function shareNgGetLastCreatedLinkShare(): ?ResponseInterface {
 		return \end($this->shareNgCreatedLinkShares);
 	}
 
@@ -138,7 +138,7 @@ trait Sharing {
 	/**
 	 * @return ResponseInterface|null
 	 */
-	public function shareNgGetLastCreatedUserGroupShare():?ResponseInterface {
+	public function shareNgGetLastCreatedUserGroupShare(): ?ResponseInterface {
 		return \end($this->shareNgCreatedUserGroupShares);
 	}
 
@@ -169,7 +169,7 @@ trait Sharing {
 	/**
 	 * @return void
 	 */
-	public function emptyCreatedPublicShares():void {
+	public function emptyCreatedPublicShares(): void {
 		$this->createdPublicShares = [];
 	}
 
@@ -183,7 +183,7 @@ trait Sharing {
 	/**
 	 * @return float|null
 	 */
-	public function getLocalLastShareTime():?float {
+	public function getLocalLastShareTime(): ?float {
 		return $this->localLastShareTime;
 	}
 
@@ -192,7 +192,7 @@ trait Sharing {
 	 *
 	 * @return string
 	 */
-	public function getSharesEndpointPath(?string $postfix = ''):string {
+	public function getSharesEndpointPath(?string $postfix = ''): string {
 		return "/apps/files_sharing/api/v$this->sharingApiVersion/shares$postfix";
 	}
 
@@ -213,7 +213,11 @@ trait Sharing {
 	public function shareNgGetLastCreatedLinkShareToken(): string {
 		$lastResponse = $this->shareNgGetLastCreatedLinkShare();
 		if (!isset($this->getJsonDecodedResponse($lastResponse)['link']['webUrl'])) {
-			throw new Error('Response did not contain share id ' . $this->getJsonDecodedResponse($lastResponse)['link']['webUrl'] . ' for the created public link');
+			throw new Error(
+				'Response did not contain share id '
+				. $this->getJsonDecodedResponse($lastResponse)['link']['webUrl']
+				. ' for the created public link'
+			);
 		}
 		$last_created_link_webURL =  $this->getJsonDecodedResponse($lastResponse)['link']['webUrl'];
 		return substr(strrchr($last_created_link_webURL, "/"), 1);
@@ -237,7 +241,7 @@ trait Sharing {
 	 *
 	 * @return string[]
 	 */
-	private function splitPermissionsString(string $str):array {
+	private function splitPermissionsString(string $str): array {
 		$str = \trim($str);
 		$permissions = \array_map('trim', \explode(',', $str));
 
@@ -270,7 +274,7 @@ trait Sharing {
 	 *
 	 * @throws Exception
 	 */
-	public function getServerShareTimeFromLastResponse():int {
+	public function getServerShareTimeFromLastResponse(): int {
 		$stime = HttpRequestHelper::getResponseXml($this->response, __METHOD__)->xpath("//stime");
 		if ($stime) {
 			return (int) $stime[0];
@@ -281,7 +285,7 @@ trait Sharing {
 	/**
 	 * @return void
 	 */
-	private function waitToCreateShare():void {
+	private function waitToCreateShare(): void {
 		if (($this->localLastShareTime !== null)
 			&& ((\microtime(true) - $this->localLastShareTime) < 1)
 		) {
@@ -341,8 +345,14 @@ trait Sharing {
 		$bodyRows['name'] = \array_key_exists('name', $bodyRows) ? $bodyRows['name'] : null;
 		$bodyRows['shareWith'] = \array_key_exists('shareWith', $bodyRows) ? $bodyRows['shareWith'] : null;
 		$bodyRows['shareWith'] = $this->getActualUsername($bodyRows['shareWith']);
-		$bodyRows['publicUpload'] = \array_key_exists('publicUpload', $bodyRows) ? $bodyRows['publicUpload'] === 'true' : null;
-		$bodyRows['password'] = \array_key_exists('password', $bodyRows) ? $this->getActualPassword($bodyRows['password']) : null;
+		$bodyRows['publicUpload'] = \array_key_exists(
+			'publicUpload',
+			$bodyRows
+		) ? $bodyRows['publicUpload'] === 'true' : null;
+		$bodyRows['password'] = \array_key_exists(
+			'password',
+			$bodyRows
+		) ? $this->getActualPassword($bodyRows['password']) : null;
 
 		if (\array_key_exists('permissions', $bodyRows)) {
 			if (\is_numeric($bodyRows['permissions'])) {
@@ -390,7 +400,7 @@ trait Sharing {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userCreatesAShareWithSettings(string $user, ?TableNode $body):void {
+	public function userCreatesAShareWithSettings(string $user, ?TableNode $body): void {
 		$user = $this->getActualUsername($user);
 		$response = $this->createShareWithSettings(
 			$user,
@@ -441,7 +451,7 @@ trait Sharing {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userCreatesAPublicLinkShareWithSettings(string $user, TableNode $body):void {
+	public function userCreatesAPublicLinkShareWithSettings(string $user, TableNode $body): void {
 		$this->setResponse($this->createPublicLinkShare($user, $body));
 		$this->pushToLastStatusCodesArrays();
 	}
@@ -455,7 +465,7 @@ trait Sharing {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userHasCreatedAPublicLinkShareWithSettings(string $user, TableNode $body):void {
+	public function userHasCreatedAPublicLinkShareWithSettings(string $user, TableNode $body): void {
 		$response = $this->createPublicLinkShare($user, $body);
 		$this->theHTTPStatusCodeShouldBe(200, "", $response);
 		$this->ocsContext->theOCSStatusCodeShouldBe("100,200", "", $response);
@@ -470,7 +480,7 @@ trait Sharing {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function theUserCreatesAPublicLinkShareWithSettings(TableNode $body):void {
+	public function theUserCreatesAPublicLinkShareWithSettings(TableNode $body): void {
 		$this->setResponse($this->createPublicLinkShare($this->currentUser, $body));
 		$this->pushToLastStatusCodesArrays();
 	}
@@ -483,7 +493,7 @@ trait Sharing {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function theUserHasCreatedAPublicLinkShareWithSettings(TableNode $body):void {
+	public function theUserHasCreatedAPublicLinkShareWithSettings(TableNode $body): void {
 		$response = $this->createPublicLinkShare($this->currentUser, $body);
 		$this->theHTTPStatusCodeShouldBe(200, "", $response);
 		$this->ocsContext->theOCSStatusCodeShouldBe("100,200", "", $response);
@@ -530,7 +540,7 @@ trait Sharing {
 	 *
 	 * @return void
 	 */
-	public function userCreatesAPublicLinkShareOf(string $user, string $path):void {
+	public function userCreatesAPublicLinkShareOf(string $user, string $path): void {
 		$response = $this->createAPublicShare($user, $path);
 		$this->setResponse($response);
 	}
@@ -543,7 +553,7 @@ trait Sharing {
 	 *
 	 * @return void
 	 */
-	public function userHasCreatedAPublicLinkShareOf(string $user, string $path):void {
+	public function userHasCreatedAPublicLinkShareOf(string $user, string $path): void {
 		$response = $this->createAPublicShare($user, $path);
 		$this->theHTTPStatusCodeShouldBe(200, "", $response);
 		$this->ocsContext->theOCSStatusCodeShouldBe("100,200", "", $response);
@@ -562,7 +572,7 @@ trait Sharing {
 		string $user,
 		string $path,
 		$permissions
-	):void {
+	): void {
 		$response = $this->createAPublicShare($user, $path, true, null, $permissions);
 		$this->setResponse($response);
 	}
@@ -580,7 +590,7 @@ trait Sharing {
 		string $user,
 		string $path,
 		$permissions
-	):void {
+	): void {
 		$response = $this->createAPublicShare($user, $path, true, null, $permissions);
 		$this->theHTTPStatusCodeShouldBe(200, "", $response);
 		$this->ocsContext->theOCSStatusCodeShouldBe("100,200", "", $response);
@@ -597,7 +607,7 @@ trait Sharing {
 		string $user,
 		string $path,
 		string $expiryDate
-	):void {
+	): void {
 		$this->createAPublicShare(
 			$user,
 			$path,
@@ -622,7 +632,7 @@ trait Sharing {
 		string $user,
 		string $path,
 		string $expiryDate
-	):void {
+	): void {
 		$this->createPublicLinkShareOfResourceWithExpiry(
 			$user,
 			$path,
@@ -643,7 +653,7 @@ trait Sharing {
 		string $user,
 		string $path,
 		string $expiryDate
-	):void {
+	): void {
 		$this->createPublicLinkShareOfResourceWithExpiry(
 			$user,
 			$path,
@@ -661,7 +671,7 @@ trait Sharing {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function shouldNotBeAbleToCreatePublicLinkShare(string $sharer, string $filepath):void {
+	public function shouldNotBeAbleToCreatePublicLinkShare(string $sharer, string $filepath): void {
 		$this->createAPublicShare($sharer, $filepath);
 		Assert::assertEquals(
 			404,
@@ -679,7 +689,7 @@ trait Sharing {
 	 * @return ResponseInterface
 	 * @throws Exception
 	 */
-	public function updateLastShareByCurrentUser(?TableNode $body):ResponseInterface {
+	public function updateLastShareByCurrentUser(?TableNode $body): ResponseInterface {
 		return $this->updateLastShareWithSettings($this->currentUser, $body);
 	}
 
@@ -691,7 +701,7 @@ trait Sharing {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function theUserUpdatesTheLastShareWith(?TableNode $body):void {
+	public function theUserUpdatesTheLastShareWith(?TableNode $body): void {
 		$this->setResponse($this->updateLastShareByCurrentUser($body));
 	}
 
@@ -703,7 +713,7 @@ trait Sharing {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function theUserHasUpdatedTheLastShareWith(?TableNode $body):void {
+	public function theUserHasUpdatedTheLastShareWith(?TableNode $body): void {
 		$response = $this->updateLastShareByCurrentUser($body);
 		$this->theHTTPStatusCodeShouldBeBetween(200, 299, $response);
 	}
@@ -718,7 +728,8 @@ trait Sharing {
 	 */
 	public function getLastCreatedUserGroupShareId(?string $user = null): string {
 		if ($user === null) {
-			$shareId = $this->isUsingSharingNG() ? $this->shareNgGetLastCreatedUserGroupShareID() : $this->getLastCreatedUserGroupShare()->id;
+			$shareId = $this->isUsingSharingNG()
+			? $this->shareNgGetLastCreatedUserGroupShareID() : $this->getLastCreatedUserGroupShare()->id;
 			return (string) $shareId;
 		}
 		$createdShares = $this->getCreatedUserGroupShares();
@@ -742,14 +753,16 @@ trait Sharing {
 		?TableNode $body,
 		?string $shareOwner = null,
 		?bool $updateLastPublicLink = false
-	):ResponseInterface {
+	): ResponseInterface {
 		$user = $this->getActualUsername($user);
 
 		if ($updateLastPublicLink) {
-			$share_id = ($this->isUsingSharingNG()) ? $this->shareNgGetLastCreatedLinkShareID() : (string) $this->getLastCreatedPublicShare()->id;
+			$share_id = ($this->isUsingSharingNG())
+			? $this->shareNgGetLastCreatedLinkShareID() : (string) $this->getLastCreatedPublicShare()->id;
 		} else {
 			if ($shareOwner === null) {
-				$share_id = ($this->isUsingSharingNG()) ? $this->shareNgGetLastCreatedUserGroupShareID() : $this->getLastCreatedUserGroupShareId();
+				$share_id = ($this->isUsingSharingNG())
+				? $this->shareNgGetLastCreatedUserGroupShareID() : $this->getLastCreatedUserGroupShareId();
 			} else {
 				$share_id = $this->getLastCreatedUserGroupShareId($shareOwner);
 			}
@@ -794,7 +807,7 @@ trait Sharing {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userUpdatesTheLastShareWith(string $user, ?TableNode $body):void {
+	public function userUpdatesTheLastShareWith(string $user, ?TableNode $body): void {
 		$this->setResponse($this->updateLastShareWithSettings($user, $body));
 		$this->pushToLastStatusCodesArrays();
 	}
@@ -808,7 +821,7 @@ trait Sharing {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userUpdatesTheLastPublicLinkShareWith(string $user, ?TableNode $body):void {
+	public function userUpdatesTheLastPublicLinkShareWith(string $user, ?TableNode $body): void {
 		$this->response = $this->updateLastShareWithSettings($user, $body, null, true);
 		$this->pushToLastStatusCodesArrays();
 	}
@@ -822,7 +835,7 @@ trait Sharing {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userHasUpdatedTheLastShareWith(string $user, ?TableNode $body):void {
+	public function userHasUpdatedTheLastShareWith(string $user, ?TableNode $body): void {
 		$response = $this->updateLastShareWithSettings($user, $body);
 		$this->theHTTPStatusCodeShouldBeBetween(200, 299, $response);
 	}
@@ -836,7 +849,7 @@ trait Sharing {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userHasUpdatedTheLastPublicLinkShareWith(string $user, ?TableNode $body):void {
+	public function userHasUpdatedTheLastPublicLinkShareWith(string $user, ?TableNode $body): void {
 		$response = $this->updateLastShareWithSettings($user, $body, null, true);
 		$this->theHTTPStatusCodeShouldBeBetween(200, 299, $response);
 	}
@@ -851,7 +864,7 @@ trait Sharing {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userHasUpdatedTheLastShareOfWith(string $user, string $shareOwner, ?TableNode $body):void {
+	public function userHasUpdatedTheLastShareOfWith(string $user, string $shareOwner, ?TableNode $body): void {
 		$response = $this->updateLastShareWithSettings($user, $body, $shareOwner);
 		$this->theHTTPStatusCodeShouldBeBetween(200, 299, $response);
 		if ($this->ocsApiVersion == 1) {
@@ -951,7 +964,7 @@ trait Sharing {
 		string $value,
 		string $contentExpected,
 		bool $expectSuccess = true
-	):bool {
+	): bool {
 		if (($contentExpected === "ANY_VALUE")
 			|| (($contentExpected === "A_TOKEN") && (\strlen($value) === 15))
 			|| (($contentExpected === "A_NUMBER") && \is_numeric($value))
@@ -979,7 +992,12 @@ trait Sharing {
 	 * @return bool
 	 * @throws Exception
 	 */
-	public function isFieldInResponse(string $field, ?string $contentExpected, bool $expectSuccess = true, ?SimpleXMLElement $data = null):bool {
+	public function isFieldInResponse(
+		string $field,
+		?string $contentExpected,
+		bool $expectSuccess = true,
+		?SimpleXMLElement $data = null
+	): bool {
 		if ($data === null) {
 			$data = HttpRequestHelper::getResponseXml($this->response, __METHOD__)->data[0];
 		}
@@ -1052,7 +1070,7 @@ trait Sharing {
 	 *
 	 * @return void
 	 */
-	public function checkNoFilesFoldersInResponse():void {
+	public function checkNoFilesFoldersInResponse(): void {
 		$data = HttpRequestHelper::getResponseXml($this->response, __METHOD__)->data[0];
 		Assert::assertIsObject($data, __METHOD__ . " data not found in response XML");
 		Assert::assertCount(0, $data);
@@ -1065,7 +1083,7 @@ trait Sharing {
 	 *
 	 * @return void
 	 */
-	public function checkCountFilesFoldersInResponse(string $count):void {
+	public function checkCountFilesFoldersInResponse(string $count): void {
 		$count = (int) $count;
 		$data = HttpRequestHelper::getResponseXml($this->response, __METHOD__)->data[0];
 		Assert::assertIsObject($data, __METHOD__ . " data not found in response XML");
@@ -1080,7 +1098,7 @@ trait Sharing {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function checkSharedFileInResponse(string $filename):void {
+	public function checkSharedFileInResponse(string $filename): void {
 		$filename = "/" . \ltrim($filename, '/');
 		Assert::assertTrue(
 			$this->isFieldInResponse('file_target', "$filename"),
@@ -1096,7 +1114,7 @@ trait Sharing {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function checkSharedFileNotInResponse(string $filename):void {
+	public function checkSharedFileNotInResponse(string $filename): void {
 		$filename = "/" . \ltrim($filename, '/');
 		Assert::assertFalse(
 			$this->isFieldInResponse('file_target', "$filename", false),
@@ -1112,7 +1130,7 @@ trait Sharing {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function checkSharedFileAsPathInResponse(string $filename):void {
+	public function checkSharedFileAsPathInResponse(string $filename): void {
 		$filename = "/" . \ltrim($filename, '/');
 		Assert::assertTrue(
 			$this->isFieldInResponse('path', "$filename"),
@@ -1128,7 +1146,7 @@ trait Sharing {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function checkSharedFileAsPathNotInResponse(string $filename):void {
+	public function checkSharedFileAsPathNotInResponse(string $filename): void {
 		$filename = "/" . \ltrim($filename, '/');
 		Assert::assertFalse(
 			$this->isFieldInResponse('path', "$filename", false),
@@ -1145,7 +1163,7 @@ trait Sharing {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function checkSharedUserOrGroupInResponse(string $type, string $user):void {
+	public function checkSharedUserOrGroupInResponse(string $type, string $user): void {
 		if ($type === 'user') {
 			$user = $this->getActualUsername($user);
 		}
@@ -1164,7 +1182,7 @@ trait Sharing {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function checkSharedUserOrGroupNotInResponse(string $userOrGroup):void {
+	public function checkSharedUserOrGroupNotInResponse(string $userOrGroup): void {
 		Assert::assertFalse(
 			$this->isFieldInResponse('share_with', "$userOrGroup", false),
 			"'share_with' value '$userOrGroup' was unexpectedly found in response"
@@ -1213,7 +1231,7 @@ trait Sharing {
 		string $filepath,
 		string $sharee,
 		$permissions = null
-	):void {
+	): void {
 		$response = $this->createAUserShare(
 			$sharer,
 			$filepath,
@@ -1241,7 +1259,7 @@ trait Sharing {
 		string $sharee,
 		TableNode $table,
 		$permissions = null
-	):void {
+	): void {
 		$this->verifyTableNodeColumns($table, ["path"]);
 		$paths = $table->getHash();
 
@@ -1274,7 +1292,7 @@ trait Sharing {
 		string $filepath,
 		string $sharee,
 		$permissions = null
-	):void {
+	): void {
 		$response = $this->createAUserShare(
 			$sharer,
 			$filepath,
@@ -1299,7 +1317,7 @@ trait Sharing {
 		string $sharer,
 		string $filepath,
 		$permissions = null
-	):void {
+	): void {
 		$admin = $this->getAdminUsername();
 		$response = $this->createAUserShare(
 			$sharer,
@@ -1350,7 +1368,7 @@ trait Sharing {
 		string $filepath,
 		string $user2,
 		$permissions = null
-	):void {
+	): void {
 		$user2 = $this->getActualUsername($user2);
 		$response = $this->createAUserShare(
 			$this->getCurrentUser(),
@@ -1376,7 +1394,7 @@ trait Sharing {
 		string $filepath,
 		string $group,
 		$permissions = null
-	):void {
+	): void {
 		$response = $this->createAGroupShare(
 			$this->currentUser,
 			$filepath,
@@ -1401,7 +1419,7 @@ trait Sharing {
 		string $filepath,
 		string $group,
 		$permissions = null
-	):void {
+	): void {
 		$response = $this->createAGroupShare(
 			$this->currentUser,
 			$filepath,
@@ -1534,7 +1552,7 @@ trait Sharing {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userTriesToUpdateTheLastShareUsingTheSharingApiWith(string $user, ?TableNode $body):void {
+	public function userTriesToUpdateTheLastShareUsingTheSharingApiWith(string $user, ?TableNode $body): void {
 		$this->response = $this->updateLastShareWithSettings($user, $body);
 	}
 
@@ -1547,7 +1565,10 @@ trait Sharing {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userTriesToUpdateTheLastPublicLinkShareUsingTheSharingApiWith(string $user, ?TableNode $body):void {
+	public function userTriesToUpdateTheLastPublicLinkShareUsingTheSharingApiWith(
+		string $user,
+		?TableNode $body
+	): void {
 		$this->response = $this->updateLastShareWithSettings($user, $body, null, true);
 	}
 
@@ -1570,7 +1591,7 @@ trait Sharing {
 		string $userOrGroupShareType,
 		string $sharee,
 		$permissions = null
-	):void {
+	): void {
 		$sharee = $this->getActualUsername($sharee);
 		$response = $this->createShare(
 			$sharer,
@@ -1607,7 +1628,7 @@ trait Sharing {
 		string $userOrGroupShareType,
 		string $sharee,
 		$permissions = null
-	):void {
+	): void {
 		$sharee = $this->getActualUsername($sharee);
 		$response = $this->createShare(
 			$sharer,
@@ -1631,7 +1652,7 @@ trait Sharing {
 	 *
 	 * @return void
 	 */
-	public function theUserDeletesLastShareUsingTheSharingAPI():void {
+	public function theUserDeletesLastShareUsingTheSharingAPI(): void {
 		$this->setResponse($this->deleteLastShareUsingSharingApiByCurrentUser());
 	}
 
@@ -1640,7 +1661,7 @@ trait Sharing {
 	 *
 	 * @return void
 	 */
-	public function theUserHasDeletedLastShareUsingTheSharingAPI():void {
+	public function theUserHasDeletedLastShareUsingTheSharingAPI(): void {
 		$response = $this->deleteLastShareUsingSharingApiByCurrentUser();
 		$this->theHTTPStatusCodeShouldBeBetween(200, 299, $response);
 	}
@@ -1652,15 +1673,21 @@ trait Sharing {
 	 *
 	 * @return ResponseInterface
 	 */
-	public function deleteLastShareUsingSharingApi(string $user, string $sharer = null, bool $deleteLastPublicLink = false):ResponseInterface {
+	public function deleteLastShareUsingSharingApi(
+		string $user,
+		string $sharer = null,
+		bool $deleteLastPublicLink = false
+	): ResponseInterface {
 		$user = $this->getActualUsername($user);
 		if ($deleteLastPublicLink) {
 			$shareId = (string) $this->getLastCreatedPublicShare()->id;
 		} else {
 			if ($sharer === null) {
-				$shareId = ($this->isUsingSharingNG()) ? $this->shareNgGetLastCreatedUserGroupShareID() : $this->getLastCreatedUserGroupShareId();
+				$shareId = ($this->isUsingSharingNG())
+				? $this->shareNgGetLastCreatedUserGroupShareID() : $this->getLastCreatedUserGroupShareId();
 			} else {
-				$shareId = ($this->isUsingSharingNG()) ? $this->shareNgGetLastCreatedUserGroupShareID() : $this->getLastCreatedUserGroupShareId($sharer);
+				$shareId = ($this->isUsingSharingNG())
+				? $this->shareNgGetLastCreatedUserGroupShareID() : $this->getLastCreatedUserGroupShareId($sharer);
 			}
 		}
 		$url = $this->getSharesEndpointPath("/$shareId");
@@ -1674,7 +1701,7 @@ trait Sharing {
 	/**
 	 * @return ResponseInterface
 	 */
-	public function deleteLastShareUsingSharingApiByCurrentUser():ResponseInterface {
+	public function deleteLastShareUsingSharingApiByCurrentUser(): ResponseInterface {
 		return $this->deleteLastShareUsingSharingApi($this->currentUser);
 	}
 
@@ -1686,7 +1713,7 @@ trait Sharing {
 	 *
 	 * @return void
 	 */
-	public function userDeletesLastShareUsingTheSharingApi(string $user):void {
+	public function userDeletesLastShareUsingTheSharingApi(string $user): void {
 		$this->setResponse($this->deleteLastShareUsingSharingApi($user));
 		$this->pushToLastStatusCodesArrays();
 	}
@@ -1699,7 +1726,7 @@ trait Sharing {
 	 *
 	 * @return void
 	 */
-	public function userDeletesLastPublicLinkShareUsingTheSharingApi(string $user):void {
+	public function userDeletesLastPublicLinkShareUsingTheSharingApi(string $user): void {
 		$this->setResponse($this->deleteLastShareUsingSharingApi($user, null, true));
 		$this->pushToLastStatusCodesArrays();
 	}
@@ -1713,7 +1740,7 @@ trait Sharing {
 	 *
 	 * @return void
 	 */
-	public function userDeletesLastShareOfUserUsingTheSharingApi(string $user, string $sharer):void {
+	public function userDeletesLastShareOfUserUsingTheSharingApi(string $user, string $sharer): void {
 		$this->setResponse($this->deleteLastShareUsingSharingApi($user, $sharer));
 		$this->pushToLastStatusCodesArrays();
 	}
@@ -1725,7 +1752,7 @@ trait Sharing {
 	 *
 	 * @return void
 	 */
-	public function userHasDeletedLastShareUsingTheSharingApi(string $user):void {
+	public function userHasDeletedLastShareUsingTheSharingApi(string $user): void {
 		$response = $this->deleteLastShareUsingSharingApi($user);
 		$this->theHTTPStatusCodeShouldBeBetween(200, 299, $response);
 	}
@@ -1739,9 +1766,11 @@ trait Sharing {
 	 */
 	public function getLastShareInfo(string $user, string $shareType, ?string $language = null): ResponseInterface {
 		if ($shareType !== "link") {
-			$shareId = $this->isUsingSharingNg() ? $this->shareNgGetLastCreatedUserGroupShareID() : $this->getLastCreatedUserGroupShareId();
+			$shareId = $this->isUsingSharingNg()
+			? $this->shareNgGetLastCreatedUserGroupShareID() : $this->getLastCreatedUserGroupShareId();
 		} else {
-			$shareId = ($this->isUsingSharingNG()) ? $this->shareNgGetLastCreatedLinkShareID() : (string) $this->getLastCreatedPublicShare()->id;
+			$shareId = ($this->isUsingSharingNG())
+			? $this->shareNgGetLastCreatedLinkShareID() : (string) $this->getLastCreatedPublicShare()->id;
 		}
 		if ($shareId === null) {
 			throw new Exception(
@@ -1761,7 +1790,7 @@ trait Sharing {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userGetsInfoOfLastShareUsingTheSharingApi(string $user):void {
+	public function userGetsInfoOfLastShareUsingTheSharingApi(string $user): void {
 		$response = $this->getLastShareInfo($user, "user");
 		$this->setResponse($response);
 		$this->pushToLastStatusCodesArrays();
@@ -1776,7 +1805,7 @@ trait Sharing {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userGetsInfoOfLastPublicLinkShareUsingTheSharingApi(string $user):void {
+	public function userGetsInfoOfLastPublicLinkShareUsingTheSharingApi(string $user): void {
 		$response = $this->getLastShareInfo($user, "link");
 		$this->setResponse($response);
 		$this->pushToLastStatusCodesArrays();
@@ -1814,7 +1843,7 @@ trait Sharing {
 	 *
 	 * @return ResponseInterface
 	 */
-	public function getShareData(string $user, string $share_id, ?string $language = null):ResponseInterface {
+	public function getShareData(string $user, string $share_id, ?string $language = null): ResponseInterface {
 		$user = $this->getActualUsername($user);
 		$url = $this->getSharesEndpointPath("/$share_id");
 		$headers = [];
@@ -1836,7 +1865,7 @@ trait Sharing {
 	 *
 	 * @return ResponseInterface
 	 */
-	public function getSharedWithMeShares(string $user):ResponseInterface {
+	public function getSharedWithMeShares(string $user): ResponseInterface {
 		$user = $this->getActualUsername($user);
 		$url = "/apps/files_sharing/api/v1/shares?shared_with_me=true";
 		return $this->ocsContext->sendRequestToOcsEndpoint(
@@ -1853,7 +1882,7 @@ trait Sharing {
 	 *
 	 * @return void
 	 */
-	public function userGetsAllTheSharesSharedWithHimUsingTheSharingApi(string $user):void {
+	public function userGetsAllTheSharesSharedWithHimUsingTheSharingApi(string $user): void {
 		$this->setResponse($this->getSharedWithMeShares($user));
 	}
 
@@ -1866,10 +1895,11 @@ trait Sharing {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userGetsTheLastShareSharedWithHimUsingTheSharingApi(string $user, TableNode $table):void {
+	public function userGetsTheLastShareSharedWithHimUsingTheSharingApi(string $user, TableNode $table): void {
 		$user = $this->getActualUsername($user);
 		$this->verifyTableNodeRows($table, [], $this->shareResponseFields);
-		$share_id = ($this->isUsingSharingNG()) ? $this->shareNgGetLastCreatedUserGroupShareID() : $this->getLastCreatedUserGroupShareId();
+		$share_id = ($this->isUsingSharingNG())
+		? $this->shareNgGetLastCreatedUserGroupShareID() : $this->getLastCreatedUserGroupShareId();
 
 		$response = $this->getShareData($user, $share_id);
 		$this->theHTTPStatusCodeShouldBe(
@@ -1898,7 +1928,11 @@ trait Sharing {
 	 *
 	 * @return void
 	 */
-	public function userGetsFilteredSharesSharedWithHimUsingTheSharingApi(string $user, string $pending, string $shareType):void {
+	public function userGetsFilteredSharesSharedWithHimUsingTheSharingApi(
+		string $user,
+		string $pending,
+		string $shareType
+	): void {
 		$user = $this->getActualUsername($user);
 		if ($pending === "pending") {
 			$pendingClause = "&state=" . SharingHelper::SHARE_STATES['pending'];
@@ -1931,7 +1965,10 @@ trait Sharing {
 	 *
 	 * @return void
 	 */
-	public function userGetsAllSharesSharedWithHimFromFileOrFolderUsingTheProvisioningApi(string $user, string $path):void {
+	public function userGetsAllSharesSharedWithHimFromFileOrFolderUsingTheProvisioningApi(
+		string $user,
+		string $path
+	): void {
 		$user = $this->getActualUsername($user);
 		$url = "/apps/files_sharing/api/"
 			. "v$this->sharingApiVersion/shares?shared_with_me=true&path=$path";
@@ -1975,7 +2012,7 @@ trait Sharing {
 	 *
 	 * @return void
 	 */
-	public function userGetsAllSharesSharedByHimUsingTheSharingApi(string $user):void {
+	public function userGetsAllSharesSharedByHimUsingTheSharingApi(string $user): void {
 		$this->setResponse($this->getAllshares($user));
 	}
 
@@ -1984,7 +2021,7 @@ trait Sharing {
 	 *
 	 * @return void
 	 */
-	public function theAdministratorGetsAllSharesSharedByHimUsingTheSharingApi():void {
+	public function theAdministratorGetsAllSharesSharedByHimUsingTheSharingApi(): void {
 		$this->setResponse($this->getAllShares($this->getAdminUsername()));
 	}
 
@@ -1996,7 +2033,7 @@ trait Sharing {
 	 *
 	 * @return void
 	 */
-	public function userGetsFilteredSharesSharedByHimUsingTheSharingApi(string $user, string $shareType):void {
+	public function userGetsFilteredSharesSharedByHimUsingTheSharingApi(string $user, string $shareType): void {
 		if ($shareType === 'public link') {
 			$shareType = 'public_link';
 		}
@@ -2016,7 +2053,7 @@ trait Sharing {
 	 *
 	 * @return void
 	 */
-	public function userGetsAllTheSharesFromTheFileUsingTheSharingApi(string $user, string $path):void {
+	public function userGetsAllTheSharesFromTheFileUsingTheSharingApi(string $user, string $path): void {
 		$this->setResponse($this->getAllShares($user, "?path=$path"));
 	}
 
@@ -2031,7 +2068,7 @@ trait Sharing {
 	public function userGetsAllTheSharesWithResharesFromTheFileUsingTheSharingApi(
 		string $user,
 		string $path
-	):void {
+	): void {
 		$this->setResponse($this->getAllShares($user, "?reshares=true&path=$path"));
 	}
 
@@ -2043,7 +2080,7 @@ trait Sharing {
 	 *
 	 * @return void
 	 */
-	public function userGetsAllTheSharesInsideTheFolderUsingTheSharingApi(string $user, string $path):void {
+	public function userGetsAllTheSharesInsideTheFolderUsingTheSharingApi(string $user, string $path): void {
 		$this->setResponse($this->getAllShares($user, "?path=$path&subfiles=true"));
 	}
 
@@ -2059,7 +2096,7 @@ trait Sharing {
 	public function theResponseWhenUserGetsInfoOfLastPublicLinkShareShouldInclude(
 		string $user,
 		?TableNode $body
-	):void {
+	): void {
 		$user = $this->getActualUsername($user);
 		$this->verifyTableNodeRows($body, [], $this->shareResponseFields);
 		$this->getShareData($user, (string) $this->getLastCreatedPublicShare()->id);
@@ -2089,7 +2126,7 @@ trait Sharing {
 	public function informationOfLastShareShouldInclude(
 		string $user,
 		TableNode $body
-	):void {
+	): void {
 		$user = $this->getActualUsername($user);
 		$shareId = $this->getLastCreatedUserGroupShareId($user);
 		$this->getShareData($user, $shareId);
@@ -2119,7 +2156,7 @@ trait Sharing {
 		string $fileName,
 		string $type,
 		TableNode $body
-	):void {
+	): void {
 		$user = $this->getActualUsername($user);
 		$this->verifyTableNodeColumnsCount($body, 2);
 		$fileName = $fileName[0] === "/" ? $fileName : '/' . $fileName;
@@ -2166,8 +2203,9 @@ trait Sharing {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function checkingLastShareIDIsIncluded():void {
-		$shareId = ($this->isUsingSharingNG()) ? $this->shareNgGetLastCreatedUserGroupShareID() : $this->getLastCreatedUserGroupShareId();
+	public function checkingLastShareIDIsIncluded(): void {
+		$shareId = ($this->isUsingSharingNG())
+		? $this->shareNgGetLastCreatedUserGroupShareID() : $this->getLastCreatedUserGroupShareId();
 		if (!$this->isFieldInResponse('id', $shareId)) {
 			Assert::fail(
 				"Share id $shareId not found in response"
@@ -2181,8 +2219,9 @@ trait Sharing {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function checkLastShareIDIsNotIncluded():void {
-		$shareId = $this->isUsingSharingNG() ? $this->shareNgGetLastCreatedUserGroupShareID() : $this->getLastCreatedUserGroupShareId();
+	public function checkLastShareIDIsNotIncluded(): void {
+		$shareId = $this->isUsingSharingNG()
+		? $this->shareNgGetLastCreatedUserGroupShareID() : $this->getLastCreatedUserGroupShareId();
 		if ($this->isFieldInResponse('id', $shareId, false)) {
 			Assert::fail(
 				"Share id $shareId has been found in response"
@@ -2196,7 +2235,7 @@ trait Sharing {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function checkLastPublicLinkShareIDIsNotIncluded():void {
+	public function checkLastPublicLinkShareIDIsNotIncluded(): void {
 		$shareId = (string) $this->getLastCreatedPublicShare()->id;
 		if ($this->isFieldInResponse('id', $shareId, false)) {
 			Assert::fail(
@@ -2211,7 +2250,7 @@ trait Sharing {
 	 *
 	 * @return void
 	 */
-	public function responseShouldNotContainAnyShareIds(ResponseInterface $response):void {
+	public function responseShouldNotContainAnyShareIds(ResponseInterface $response): void {
 		$data = HttpRequestHelper::getResponseXml($response, __METHOD__)->data[0];
 		$fieldIsSet = false;
 		$receivedShareCount = 0;
@@ -2243,10 +2282,11 @@ trait Sharing {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userShouldNotSeeShareIdOfLastShare(string $user):void {
+	public function userShouldNotSeeShareIdOfLastShare(string $user): void {
 		$response = $this->getSharedWithMeShares($user);
 		$this->theHTTPStatusCodeShouldBe(200, "", $response);
-		$shareId = $this->isUsingSharingNG() ? $this->shareNgGetLastCreatedUserGroupShareID() : $this->getLastCreatedUserGroupShareId();
+		$shareId = $this->isUsingSharingNG()
+		? $this->shareNgGetLastCreatedUserGroupShareID() : $this->getLastCreatedUserGroupShareId();
 		if ($this->isFieldInResponse('id', $shareId, false)) {
 			Assert::fail(
 				"Share id $shareId has been found in response"
@@ -2261,7 +2301,7 @@ trait Sharing {
 	 *
 	 * @return void
 	 */
-	public function userShouldNotHaveAnyReceivedShares(string $user):void {
+	public function userShouldNotHaveAnyReceivedShares(string $user): void {
 		$response = $this->getSharedWithMeShares($user);
 		$this->theHTTPStatusCodeShouldBe(200, "", $response);
 		$this->responseShouldNotContainAnyShareIds($response);
@@ -2274,7 +2314,7 @@ trait Sharing {
 	 *
 	 * @return void
 	 */
-	public function checkingTheResponseEntriesCount(int $count):void {
+	public function checkingTheResponseEntriesCount(int $count): void {
 		$actualCount = \count(HttpRequestHelper::getResponseXml($this->response, __METHOD__)->data[0]);
 		Assert::assertEquals(
 			$count,
@@ -2292,7 +2332,7 @@ trait Sharing {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function checkFields(string $user, ?TableNode $body):void {
+	public function checkFields(string $user, ?TableNode $body): void {
 		$this->checkTheFields($user, $body);
 	}
 
@@ -2303,7 +2343,7 @@ trait Sharing {
 	 *
 	 * @return void
 	 */
-	public function checkTheFields(string $user, ?TableNode $body, ?ResponseInterface $response = null):void {
+	public function checkTheFields(string $user, ?TableNode $body, ?ResponseInterface $response = null): void {
 		$response = $response ?? $this->getResponse();
 		$data = HttpRequestHelper::getResponseXml($response, __METHOD__)->data[0];
 		$this->verifyTableNodeColumnsCount($body, 2);
@@ -2342,7 +2382,7 @@ trait Sharing {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function checkFieldsOfSpaceSharingResponse(string $user, string $space, ?TableNode $body):void {
+	public function checkFieldsOfSpaceSharingResponse(string $user, string $space, ?TableNode $body): void {
 		$this->verifyTableNodeColumnsCount($body, 2);
 
 		$bodyRows = $body->getRowsHash();
@@ -2406,7 +2446,7 @@ trait Sharing {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function checkFieldsOfLastResponseToUser(string $sharer, string $sharee, ?TableNode $body):void {
+	public function checkFieldsOfLastResponseToUser(string $sharer, string $sharee, ?TableNode $body): void {
 		$this->checkTheFieldsOfLastResponseToUser($sharer, $sharee, $body);
 	}
 
@@ -2417,13 +2457,29 @@ trait Sharing {
 	 *
 	 * @return void
 	 */
-	public function checkTheFieldsOfLastResponseToUser(string $sharer, string $sharee, ?TableNode $body):void {
+	public function checkTheFieldsOfLastResponseToUser(string $sharer, string $sharee, ?TableNode $body): void {
 		$this->verifyTableNodeColumnsCount($body, 2);
 		$bodyRows = $body->getRowsHash();
 		foreach ($bodyRows as $field => $value) {
-			if (\in_array($field, ["displayname_owner", "displayname_file_owner", "owner", "uid_owner", "uid_file_owner", "additional_info_owner", "additional_info_file_owner"])) {
+			if (\in_array(
+				$field,
+				[
+					"displayname_owner",
+					 "displayname_file_owner",
+					 "owner",
+					 "uid_owner",
+					 "uid_file_owner",
+					  "additional_info_owner",
+					  "additional_info_file_owner"
+					  ]
+			)
+			) {
 				$value = $this->substituteInLineCodes($value, $sharer);
-			} elseif (\in_array($field, ["share_with", "share_with_displayname", "user", "share_with_additional_info"])) {
+			} elseif (\in_array(
+				$field,
+				["share_with", "share_with_displayname", "user", "share_with_additional_info"]
+			)
+			) {
 				$value = $this->substituteInLineCodes($value, $sharee);
 			}
 			$value = $this->replaceValuesFromTable($field, $value);
@@ -2439,7 +2495,7 @@ trait Sharing {
 	 *
 	 * @return void
 	 */
-	public function theFieldsOfTheLastResponseShouldBeEmpty():void {
+	public function theFieldsOfTheLastResponseShouldBeEmpty(): void {
 		$data = HttpRequestHelper::getResponseXml($this->response, __METHOD__)->data[0];
 		Assert::assertEquals(
 			\count($data->element),
@@ -2454,7 +2510,7 @@ trait Sharing {
 	 *
 	 * @throws Exception
 	 */
-	public function getSharingAttributesFromLastResponse():string {
+	public function getSharingAttributesFromLastResponse(): string {
 		$responseXmlObject = HttpRequestHelper::getResponseXml($this->response, __METHOD__)->data[0];
 		$actualAttributesElement = $responseXmlObject->xpath('//attributes');
 
@@ -2479,7 +2535,7 @@ trait Sharing {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function checkingAttributesInLastShareResponse(TableNode $attributes):void {
+	public function checkingAttributesInLastShareResponse(TableNode $attributes): void {
 		$this->verifyTableNodeColumns($attributes, ['scope', 'key', 'enabled']);
 		$attributes = $attributes->getHash();
 
@@ -2540,7 +2596,7 @@ trait Sharing {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userDownloadsFailWithMessage(string $fileName, string $user, PyStringNode $errorMessage):void {
+	public function userDownloadsFailWithMessage(string $fileName, string $user, PyStringNode $errorMessage): void {
 		$user = $this->getActualUsername($user);
 		$response = $this->downloadFileAsUserUsingPassword($user, $fileName);
 		$receivedErrorMessage = HttpRequestHelper::getResponseXml($response, __METHOD__)->xpath('//s:message');
@@ -2561,7 +2617,7 @@ trait Sharing {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function checkFieldsNotInResponse(?TableNode $body):void {
+	public function checkFieldsNotInResponse(?TableNode $body): void {
 		$this->verifyTableNodeColumnsCount($body, 2);
 		$bodyRows = $body->getRowsHash();
 
@@ -2589,7 +2645,7 @@ trait Sharing {
 	 *
 	 * @return SimpleXMLElement
 	 */
-	public function getShares(string $user, string $path):SimpleXMLElement {
+	public function getShares(string $user, string $path): SimpleXMLElement {
 		$response = OcsApiHelper::sendRequest(
 			$this->getBaseUrl(),
 			$user,
@@ -2613,7 +2669,7 @@ trait Sharing {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function checkPublicShares(string $user, string $path, ?TableNode $TableNode):void {
+	public function checkPublicShares(string $user, string $path, ?TableNode $TableNode): void {
 		$user = $this->getActualUsername($user);
 		$response = $this->getShares($user, $path);
 
@@ -2662,7 +2718,7 @@ trait Sharing {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function checkPublicSharesAreEmpty(string $user, string $path):void {
+	public function checkPublicSharesAreEmpty(string $user, string $path): void {
 		$user = $this->getActualUsername($user);
 		$response = $this->getShares($user, $path);
 		//It shouldn't have public shares
@@ -2683,7 +2739,7 @@ trait Sharing {
 	 *
 	 * @return string|null
 	 */
-	public function getPublicShareIDByName(string $user, string $path, string $name):?string {
+	public function getPublicShareIDByName(string $user, string $path, string $name): ?string {
 		$response = $this->getShares($user, $path);
 		foreach ($response as $elementResponded) {
 			if ((string) $elementResponded->name[0] === $name) {
@@ -2704,7 +2760,7 @@ trait Sharing {
 		string $user,
 		string $name,
 		string $path
-	):ResponseInterface {
+	): ResponseInterface {
 		$user = $this->getActualUsername($user);
 		$share_id = $this->getPublicShareIDByName($user, $path, $name);
 		$url = $this->getSharesEndpointPath("/$share_id");
@@ -2728,7 +2784,7 @@ trait Sharing {
 		string $user,
 		string $name,
 		string $path
-	):void {
+	): void {
 		$response = $this->deletePublicLinkShareUsingTheSharingApi(
 			$user,
 			$name,
@@ -2750,7 +2806,7 @@ trait Sharing {
 		string $user,
 		string $name,
 		string $path
-	):void {
+	): void {
 		$response = $this->deletePublicLinkShareUsingTheSharingApi(
 			$user,
 			$name,
@@ -2768,7 +2824,13 @@ trait Sharing {
 	 *
 	 * @return ResponseInterface
 	 */
-	public function reactToShareOfferedBy(string $user, string $action, string $share, string $offeredBy, ?string $state = ''):ResponseInterface {
+	public function reactToShareOfferedBy(
+		string $user,
+		string $action,
+		string $share,
+		string $offeredBy,
+		?string $state = ''
+	): ResponseInterface {
 		$user = $this->getActualUsername($user);
 		$offeredBy = $this->getActualUsername($offeredBy);
 
@@ -2830,7 +2892,13 @@ trait Sharing {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userReactsToShareOfferedBy(string $user, string $action, string $share, string $offeredBy, ?string $state = ''):void {
+	public function userReactsToShareOfferedBy(
+		string $user,
+		string $action,
+		string $share,
+		string $offeredBy,
+		?string $state = ''
+	): void {
 		$response = $this->reactToShareOfferedBy(
 			$user,
 			$action,
@@ -2853,7 +2921,13 @@ trait Sharing {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userAcceptsTheAlreadyAcceptedShareOfferedByUsingTheSharingApi(string $user, string $action, string $share, string $offeredBy, ?string $state = ''):void {
+	public function userAcceptsTheAlreadyAcceptedShareOfferedByUsingTheSharingApi(
+		string $user,
+		string $action,
+		string $share,
+		string $offeredBy,
+		?string $state = ''
+	): void {
 		$response = $this->reactToShareOfferedBy(
 			$user,
 			$action,
@@ -2875,7 +2949,12 @@ trait Sharing {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userReactsToTheFollowingSharesOfferedBy(string $user, string $action, string $offeredBy, TableNode $table):void {
+	public function userReactsToTheFollowingSharesOfferedBy(
+		string $user,
+		string $action,
+		string $offeredBy,
+		TableNode $table
+	): void {
 		$this->verifyTableNodeColumns($table, ["path"]);
 		$paths = $table->getHash();
 
@@ -2902,7 +2981,7 @@ trait Sharing {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userReactsToShareWithShareIDOfferedBy(string $user, string $action, string $share_id):void {
+	public function userReactsToShareWithShareIDOfferedBy(string $user, string $action, string $share_id): void {
 		$user = $this->getActualUsername($user);
 
 		$shareId = $this->substituteInLineCodes($share_id, $user);
@@ -2935,7 +3014,12 @@ trait Sharing {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userHasReactedToShareOfferedBy(string $user, string $action, string $share, string $offeredBy):void {
+	public function userHasReactedToShareOfferedBy(
+		string $user,
+		string $action,
+		string $share,
+		string $offeredBy
+	): void {
 		$response = $this->reactToShareOfferedBy(
 			$user,
 			$action,
@@ -2966,7 +3050,7 @@ trait Sharing {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userAcceptsThePendingShareOfferedBy(string $user, string $share, string $offeredBy):void {
+	public function userAcceptsThePendingShareOfferedBy(string $user, string $share, string $offeredBy): void {
 		$response = $this->reactToShareOfferedBy($user, 'accepts', $share, $offeredBy, 'pending');
 		$this->setResponse($response);
 		$this->pushToLastStatusCodesArrays();
@@ -3043,7 +3127,7 @@ trait Sharing {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function assertSharesOfUserAreInState(string $user, string $state, TableNode $table):void {
+	public function assertSharesOfUserAreInState(string $user, string $state, TableNode $table): void {
 		$this->verifyTableNodeColumns($table, ["path"], $this->shareResponseFields);
 		$usersShares = $this->getAllSharesSharedWithUser($user, $state);
 		foreach ($table as $row) {
@@ -3079,7 +3163,7 @@ trait Sharing {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function assertNoSharesOfUserAreInState(string $user, string $state):void {
+	public function assertNoSharesOfUserAreInState(string $user, string $state): void {
 		$usersShares = $this->getAllSharesSharedWithUser($user, $state);
 		Assert::assertEmpty(
 			$usersShares,
@@ -3141,7 +3225,7 @@ trait Sharing {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function assertThatNoSharesAreSharedWithUser(string $user):void {
+	public function assertThatNoSharesAreSharedWithUser(string $user): void {
 		$usersShares = $this->getAllSharesSharedWithUser($user);
 		Assert::assertEmpty(
 			$usersShares,
@@ -3157,7 +3241,10 @@ trait Sharing {
 	 *
 	 * @return ResponseInterface|null
 	 */
-	public function userGetsTheLastShareWithTheShareIdUsingTheSharingApi(string $user, string $share_id): ?ResponseInterface {
+	public function userGetsTheLastShareWithTheShareIdUsingTheSharingApi(
+		string $user,
+		string $share_id
+	): ?ResponseInterface {
 		$user = $this->getActualUsername($user);
 		$share_id = $this->substituteInLineCodes($share_id, $user);
 		$url = $this->getSharesEndpointPath("/$share_id");
@@ -3228,7 +3315,7 @@ trait Sharing {
 	 *
 	 * @return ResponseInterface
 	 */
-	public function getPublicPreviewOfFile(string $fileName, string $token):ResponseInterface {
+	public function getPublicPreviewOfFile(string $fileName, string $token): ResponseInterface {
 		$baseUrl = $this->getBaseUrl();
 		$davPath = WebdavHelper::getDavPath($this->getDavPathVersion(), $token, "public-files");
 		$url = "$baseUrl/$davPath/$fileName?preview=1";
@@ -3245,8 +3332,9 @@ trait Sharing {
 	 *
 	 * @return void
 	 */
-	public function thePublicAccessesThePreviewOfTheSharedFileUsingTheSharingApi(string $path):void {
-		$token = ($this->isUsingSharingNG()) ? $this->shareNgGetLastCreatedLinkShareToken() : $this->getLastCreatedPublicShareToken();
+	public function thePublicAccessesThePreviewOfTheSharedFileUsingTheSharingApi(string $path): void {
+		$token = ($this->isUsingSharingNG())
+		? $this->shareNgGetLastCreatedLinkShareToken() : $this->getLastCreatedPublicShareToken();
 		$response = $this->getPublicPreviewOfFile($path, $token);
 		$this->setResponse($response);
 		$this->pushToLastStatusCodesArrays();
@@ -3262,13 +3350,14 @@ trait Sharing {
 	 */
 	public function thePublicAccessesThePreviewOfTheFollowingSharedFileUsingTheSharingApi(
 		TableNode $table
-	):void {
+	): void {
 		$this->verifyTableNodeColumns($table, ["path"]);
 		$paths = $table->getHash();
 		$this->emptyLastHTTPStatusCodesArray();
 		$this->emptyLastOCSStatusCodesArray();
 		foreach ($paths as $path) {
-			$token = ($this->isUsingSharingNG()) ? $this->shareNgGetLastCreatedLinkShareToken() : $this->getLastCreatedPublicShareToken();
+			$token = ($this->isUsingSharingNG())
+			? $this->shareNgGetLastCreatedLinkShareToken() : $this->getLastCreatedPublicShareToken();
 			$response = $this->getPublicPreviewOfFile($path["path"], $token);
 			$this->setResponse($response);
 			$this->pushToLastStatusCodesArrays();
@@ -3286,7 +3375,7 @@ trait Sharing {
 		string $user,
 		string $shareServer,
 		?string $password = ""
-	):ResponseInterface {
+	): ResponseInterface {
 		$user = $this->getActualUsername($user);
 		$userPassword = $this->getPasswordForUser($user);
 
@@ -3336,7 +3425,7 @@ trait Sharing {
 	 *
 	 * @return void
 	 */
-	public function userHasAddedPublicShareCreatedByUser(string $user, string $shareServer):void {
+	public function userHasAddedPublicShareCreatedByUser(string $user, string $shareServer): void {
 		$this->saveLastSharedPublicLinkShare($user, $shareServer);
 
 		$resBody = json_decode($this->response->getBody()->getContents());
@@ -3371,7 +3460,12 @@ trait Sharing {
 	 *
 	 * @return array
 	 */
-	public function preparePublicQuickLinkPayload(string $user, string $path, string $type, int $permissions = 1): array {
+	public function preparePublicQuickLinkPayload(
+		string $user,
+		string $path,
+		string $type,
+		int $permissions = 1
+	): array {
 		return [
 			"permissions" => $permissions,
 			"expireDate" => "",
@@ -3400,7 +3494,7 @@ trait Sharing {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function theUserHasCreatedAReadOnlyPublicLinkForFileFolder(string $user, string $type, string $path):void {
+	public function theUserHasCreatedAReadOnlyPublicLinkForFileFolder(string $user, string $type, string $path): void {
 		$user = $this->getActualUsername($user);
 		$userPassword = $this->getPasswordForUser($user);
 
@@ -3426,7 +3520,7 @@ trait Sharing {
 	 *
 	 * @return void
 	 */
-	public function userAddsPublicShareCreatedByUser(string $user, string $shareServer):void {
+	public function userAddsPublicShareCreatedByUser(string $user, string $shareServer): void {
 		$this->setResponse($this->saveLastSharedPublicLinkShare($user, $shareServer));
 	}
 
@@ -3436,7 +3530,7 @@ trait Sharing {
 	 * @return void
 	 * @throws ResponseInterface
 	 */
-	public function expireLastCreatedPublicLinkShare():ResponseInterface {
+	public function expireLastCreatedPublicLinkShare(): ResponseInterface {
 		$shareId = (string) $this->getLastCreatedPublicShare()->id;
 		return $this->expireShare($shareId);
 	}
@@ -3449,7 +3543,7 @@ trait Sharing {
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
-	public function expireShare(string $shareId = null):ResponseInterface {
+	public function expireShare(string $shareId = null): ResponseInterface {
 		$adminUser = $this->getAdminUsername();
 		if ($shareId === null) {
 			$shareId = $this->getLastCreatedUserGroupShareId();
@@ -3473,7 +3567,7 @@ trait Sharing {
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function theAdministratorHasExpiredTheLastCreatedShare():void {
+	public function theAdministratorHasExpiredTheLastCreatedShare(): void {
 		$this->expireShare();
 		$httpStatus = $this->getResponse()->getStatusCode();
 		Assert::assertSame(
@@ -3499,7 +3593,7 @@ trait Sharing {
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function theAdministratorHasExpiredTheLastCreatedPublicLinkShare():void {
+	public function theAdministratorHasExpiredTheLastCreatedPublicLinkShare(): void {
 		$this->expireLastCreatedPublicLinkShare();
 		$httpStatus = $this->getResponse()->getStatusCode();
 		Assert::assertSame(
@@ -3525,7 +3619,7 @@ trait Sharing {
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function theAdministratorExpiresTheLastCreatedShare():void {
+	public function theAdministratorExpiresTheLastCreatedShare(): void {
 		$this->setResponse($this->expireShare());
 	}
 
@@ -3535,7 +3629,7 @@ trait Sharing {
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function theAdministratorExpiresTheLastCreatedPublicLinkShare():void {
+	public function theAdministratorExpiresTheLastCreatedPublicLinkShare(): void {
 		$this->setResponse($this->expireLastCreatedPublicLinkShare());
 	}
 
@@ -3547,7 +3641,7 @@ trait Sharing {
 	 *
 	 * @return string
 	 */
-	public function replaceValuesFromTable(string $field, string $value):string {
+	public function replaceValuesFromTable(string $field, string $value): string {
 		if (\substr($field, 0, 10) === "share_with") {
 			$value = \str_replace(
 				"REMOTE",
@@ -3587,7 +3681,7 @@ trait Sharing {
 	/**
 	 * @return array of common sharing capability settings for testing
 	 */
-	protected function getCommonSharingConfigs():array {
+	protected function getCommonSharingConfigs(): array {
 		return [
 			[
 				'capabilitiesApp' => 'files_sharing',

@@ -47,7 +47,7 @@ class ChecksumContext implements Context {
 		string  $source,
 		string  $destination,
 		string  $checksum
-	):ResponseInterface {
+	): ResponseInterface {
 		$file = \file_get_contents(
 			$this->featureContext->acceptanceTestsDirLocation() . $source
 		);
@@ -75,8 +75,10 @@ class ChecksumContext implements Context {
 		string  $source,
 		string  $destination,
 		string  $checksum
-	):void {
-		$this->featureContext->setResponse($this->uploadFileToWithChecksumUsingTheAPI($user, $source, $destination, $checksum));
+	): void {
+		$this->featureContext->setResponse(
+			$this->uploadFileToWithChecksumUsingTheAPI($user, $source, $destination, $checksum)
+		);
 	}
 
 	/**
@@ -94,7 +96,7 @@ class ChecksumContext implements Context {
 		string $source,
 		string $destination,
 		string $checksum
-	):void {
+	): void {
 		$user = $this->featureContext->getActualUsername($user);
 		$response = $this->uploadFileToWithChecksumUsingTheAPI(
 			$user,
@@ -118,7 +120,7 @@ class ChecksumContext implements Context {
 		string $content,
 		string $checksum,
 		string $destination
-	):ResponseInterface {
+	): ResponseInterface {
 		return $this->featureContext->makeDavRequest(
 			$user,
 			'PUT',
@@ -143,7 +145,7 @@ class ChecksumContext implements Context {
 		string $content,
 		string $checksum,
 		string $destination
-	):void {
+	): void {
 		$user = $this->featureContext->getActualUsername($user);
 		$response = $this->uploadFileWithContentAndChecksumToUsingTheAPI($user, $content, $checksum, $destination);
 		$this->featureContext->theHTTPStatusCodeShouldBe(201, '', $response);
@@ -157,7 +159,7 @@ class ChecksumContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function userRequestsTheChecksumOfViaPropfind(string $user, string $path):void {
+	public function userRequestsTheChecksumOfViaPropfind(string $user, string $path): void {
 		$this->featureContext->setResponse($this->propfindResourceChecksum($user, $path));
 	}
 
@@ -168,7 +170,7 @@ class ChecksumContext implements Context {
 	 *
 	 * @return ResponseInterface
 	 */
-	public function propfindResourceChecksum(string $user, string $path, ?string $spaceId = null) : ResponseInterface {
+	public function propfindResourceChecksum(string $user, string $path, ?string $spaceId = null): ResponseInterface {
 		$user = $this->featureContext->getActualUsername($user);
 		$body = '<?xml version="1.0"?>
 			<d:propfind  xmlns:d="DAV:" xmlns:oc="http://owncloud.org/ns">
@@ -199,7 +201,7 @@ class ChecksumContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function theWebdavChecksumShouldMatch(string $expectedChecksum):void {
+	public function theWebdavChecksumShouldMatch(string $expectedChecksum): void {
 		$bodyContents = $this->featureContext->getResponse()->getBody()->getContents();
 		$this->validateChecksum($bodyContents, $expectedChecksum);
 	}
@@ -214,7 +216,11 @@ class ChecksumContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function asUserTheWebdavChecksumOfPathViaPropfindShouldMatch(string $user, string $path, string $expectedChecksum):void {
+	public function asUserTheWebdavChecksumOfPathViaPropfindShouldMatch(
+		string $user,
+		string $path,
+		string $expectedChecksum
+	): void {
 		$user = $this->featureContext->getActualUsername($user);
 		$resource = $this->propfindResourceChecksum($user, $path);
 		$bodyContents = $resource->getBody()->getContents();
@@ -226,7 +232,7 @@ class ChecksumContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function validateChecksum(string $bodyContents, string $expectedChecksum):void {
+	public function validateChecksum(string $bodyContents, string $expectedChecksum): void {
 		$service = new Sabre\Xml\Service();
 		$parsed = $service->parse($bodyContents);
 
@@ -243,7 +249,8 @@ class ChecksumContext implements Context {
 
 		Assert::assertIsArray(
 			$parsed,
-			__METHOD__ . " could not parse response as XML. Expected parsed XML to be an array but found " . $bodyContents
+			__METHOD__
+			. " could not parse response as XML. Expected parsed XML to be an array but found " . $bodyContents
 		);
 		Assert::assertArrayHasKey(
 			0,
@@ -320,7 +327,7 @@ class ChecksumContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function theHeaderChecksumShouldMatch(string $expectedChecksum):void {
+	public function theHeaderChecksumShouldMatch(string $expectedChecksum): void {
 		$headerChecksums
 			= $this->featureContext->getResponse()->getHeader('OC-Checksum');
 
@@ -360,7 +367,11 @@ class ChecksumContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function theHeaderChecksumWhenUserDownloadsFileUsingTheWebdavApiShouldMatch(string $user, string $fileName, string $expectedChecksum):void {
+	public function theHeaderChecksumWhenUserDownloadsFileUsingTheWebdavApiShouldMatch(
+		string $user,
+		string $fileName,
+		string $expectedChecksum
+	): void {
 		$response = $this->featureContext->downloadFileAsUserUsingPassword($user, $fileName);
 		$headerChecksums = $response->getHeader('OC-Checksum');
 
@@ -407,7 +418,7 @@ class ChecksumContext implements Context {
 		string $data,
 		string $destination,
 		string $expectedChecksum
-	):ResponseInterface {
+	): ResponseInterface {
 		$user = $this->featureContext->getActualUsername($user);
 		$num -= 1;
 		$file = "$destination-chunking-42-$total-$num";
@@ -439,8 +450,15 @@ class ChecksumContext implements Context {
 		string $data,
 		string $destination,
 		string $expectedChecksum
-	):void {
-		$response = $this->uploadChunkFileOfWithToWithChecksum($user, $num, $total, $data, $destination, $expectedChecksum);
+	): void {
+		$response = $this->uploadChunkFileOfWithToWithChecksum(
+			$user,
+			$num,
+			$total,
+			$data,
+			$destination,
+			$expectedChecksum
+		);
 		$this->featureContext->setResponse($response);
 	}
 
@@ -463,8 +481,15 @@ class ChecksumContext implements Context {
 		string $data,
 		string $destination,
 		string $expectedChecksum
-	):void {
-		$response = $this->uploadChunkFileOfWithToWithChecksum($user, $num, $total, $data, $destination, $expectedChecksum);
+	): void {
+		$response = $this->uploadChunkFileOfWithToWithChecksum(
+			$user,
+			$num,
+			$total,
+			$data,
+			$destination,
+			$expectedChecksum
+		);
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			[201, 206],
 			'',
@@ -482,7 +507,7 @@ class ChecksumContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function before(BeforeScenarioScope $scope):void {
+	public function before(BeforeScenarioScope $scope): void {
 		// Get the environment
 		$environment = $scope->getEnvironment();
 		// Get all the contexts you need in this context

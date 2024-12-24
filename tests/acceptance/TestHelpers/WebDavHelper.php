@@ -86,7 +86,7 @@ class WebDavHelper {
 	 */
 	public static function removeSpaceIdReferenceForUser(
 		?string $user
-	):void {
+	): void {
 		if (\array_key_exists($user, self::$spacesIdRef)) {
 			unset(self::$spacesIdRef[$user]);
 		}
@@ -245,7 +245,7 @@ class WebDavHelper {
 		?int $davPathVersionToUse = self::DAV_VERSION_NEW,
 		?string $doDavRequestAsUser = null,
 		?array $headers = []
-	):ResponseInterface {
+	): ResponseInterface {
 		$body = self::getBodyForPropfind($properties);
 		$folderDepth = (string) $folderDepth;
 		if ($folderDepth !== '0' && $folderDepth !== '1' && $folderDepth !== 'infinity') {
@@ -307,7 +307,7 @@ class WebDavHelper {
 		?int $davPathVersionToUse = self::DAV_VERSION_NEW,
 		?string $type="files",
 		?string $spaceId = null,
-	):ResponseInterface {
+	): ResponseInterface {
 		if ($namespaceString !== null) {
 			$ns = self::parseNamespace($namespaceString);
 			$propertyBody = "<$ns->prefix:$propertyName" .
@@ -348,7 +348,7 @@ class WebDavHelper {
 	 *
 	 * @return array
 	 */
-	public static function getPropertyWithNamespaceInfo(string $namespaceString = "", string $property = ""):array {
+	public static function getPropertyWithNamespaceInfo(string $namespaceString = "", string $property = ""): array {
 		$namespace = "";
 		$namespacePrefix = "";
 		if (\is_int($namespaceString)) {
@@ -396,7 +396,7 @@ class WebDavHelper {
 		?int  $davPathVersion = null,
 		?string  $namespaceString = null,
 		?string  $type="files"
-	):ResponseInterface {
+	): ResponseInterface {
 		$propertyBody = "";
 		foreach ($propertiesArray as $propertyArray) {
 			$property = $propertyArray["propertyName"];
@@ -466,7 +466,7 @@ class WebDavHelper {
 		?array $properties = null,
 		?string $type = "files",
 		?int $davPathVersionToUse = self::DAV_VERSION_NEW
-	):ResponseInterface {
+	): ResponseInterface {
 		if (!$properties) {
 			$properties = [
 				'd:getetag', 'd:resourcetype'
@@ -493,7 +493,7 @@ class WebDavHelper {
 	 * @return string
 	 * @throws Exception
 	 */
-	public static function generateUUIDv4():string {
+	public static function generateUUIDv4(): string {
 		// generate 16 bytes (128 bits) of random data or use the data passed into the function.
 		$data = random_bytes(16);
 		\assert(\strlen($data) == 16);
@@ -516,7 +516,12 @@ class WebDavHelper {
 	 * @throws GuzzleException
 	 * @throws Exception
 	 */
-	public static function getPersonalSpaceIdForUser(string $baseUrl, string $user, string $password, string $xRequestId):string {
+	public static function getPersonalSpaceIdForUser(
+		string $baseUrl,
+		string $user,
+		string $password,
+		string $xRequestId
+	): string {
 		if (\array_key_exists($user, self::$spacesIdRef) && \array_key_exists("personal", self::$spacesIdRef[$user])) {
 			return self::$spacesIdRef[$user]["personal"];
 		}
@@ -546,14 +551,21 @@ class WebDavHelper {
 				$user,
 				$password
 			);
-			Assert::assertEquals(207, $response->getStatusCode(), "PROPFIND for user '$user' failed so the personal space id cannot be discovered");
+			Assert::assertEquals(
+				207,
+				$response->getStatusCode(),
+				"PROPFIND for user '$user' failed so the personal space id cannot be discovered"
+			);
 
 			$responseXmlObject = HttpRequestHelper::getResponseXml(
 				$response,
 				__METHOD__
 			);
 			$xmlPart = $responseXmlObject->xpath("/d:multistatus/d:response[1]/d:propstat/d:prop/oc:spaceid");
-			Assert::assertNotEmpty($xmlPart, "The 'oc:spaceid' for user '$user' was not found in the PROPFIND response");
+			Assert::assertNotEmpty(
+				$xmlPart,
+				"The 'oc:spaceid' for user '$user' was not found in the PROPFIND response"
+			);
 
 			$personalSpaceId = $xmlPart[0]->__toString();
 		}
@@ -577,7 +589,12 @@ class WebDavHelper {
 	 * @return string
 	 * @throws Exception|GuzzleException
 	 */
-	public static function getPersonalSpaceIdForUserOrFakeIfNotFound(string $baseUrl, string $user, string $password, string $xRequestId):string {
+	public static function getPersonalSpaceIdForUserOrFakeIfNotFound(
+		string $baseUrl,
+		string $user,
+		string $password,
+		string $xRequestId
+	): string {
 		if (\str_starts_with($user, "non-exist") || \str_starts_with($user, "nonexist")) {
 			return self::generateUUIDv4();
 		}
@@ -641,7 +658,7 @@ class WebDavHelper {
 		?array $urlParameter = [],
 		?string $doDavRequestAsUser = null,
 		?bool $isGivenStep = false,
-	):ResponseInterface {
+	): ResponseInterface {
 		$baseUrl = self::sanitizeUrl($baseUrl, true);
 
 		// We need to manipulate and use path as a string.
@@ -651,7 +668,9 @@ class WebDavHelper {
 		}
 
 		// get space id if testing with spaces dav
-		if ($spaceId === null && $davPathVersionToUse === self::DAV_VERSION_SPACES && !\in_array($type, ["public-files", "versions"])) {
+		if ($spaceId === null && $davPathVersionToUse === self::DAV_VERSION_SPACES
+			&& !\in_array($type, ["public-files", "versions"])
+		) {
 			$path = \ltrim($path, "/");
 			if (\str_starts_with($path, "Shares/")) {
 				$spaceId = GraphHelper::SHARES_SPACE_ID;
@@ -667,7 +686,9 @@ class WebDavHelper {
 		}
 
 		$suffixPath = $user;
-		if ($davPathVersionToUse === self::DAV_VERSION_SPACES && !\in_array($type, ["archive", "versions", "public-files"])) {
+		if ($davPathVersionToUse === self::DAV_VERSION_SPACES
+			&& !\in_array($type, ["archive", "versions", "public-files"])
+		) {
 			$suffixPath = $spaceId;
 		} elseif ($type === "versions") {
 			// $path is file-id in case of versions
@@ -751,7 +772,7 @@ class WebDavHelper {
 		int $davPathVersion,
 		?string $userOrItemIdOrSpaceIdOrToken = null,
 		?string $type = "files"
-	):string {
+	): string {
 		switch ($type) {
 			case 'archive':
 				return self::prefixRemotePhp("dav/archive/$userOrItemIdOrSpaceIdOrToken/files");
@@ -807,7 +828,7 @@ class WebDavHelper {
 	 *
 	 * @return string
 	 */
-	public static function sanitizeUrl(?string $url, ?bool $trailingSlash = false):string {
+	public static function sanitizeUrl(?string $url, ?bool $trailingSlash = false): string {
 		if ($trailingSlash === true) {
 			$url = $url . "/";
 		} else {
@@ -834,7 +855,7 @@ class WebDavHelper {
 		?string $token,
 		?string $xRequestId = '',
 		?int $davVersionToUse = self::DAV_VERSION_NEW
-	):string {
+	): string {
 		$response = self::propfind(
 			$baseUrl,
 			null,
@@ -879,7 +900,7 @@ class WebDavHelper {
 		?string $xRequestId = '',
 		?int $davPathVersionToUse = self::DAV_VERSION_NEW,
 		?string $spaceId = null,
-	):string {
+	): string {
 		$response = self::propfind(
 			$baseUrl,
 			$user,
@@ -900,7 +921,9 @@ class WebDavHelper {
 		Assert::assertArrayHasKey(
 			0,
 			$xmlPart,
-			__METHOD__ . " XML part does not have key 0. Expected a value at index 0 of 'xmlPart' but, found: " . json_encode($xmlPart)
+			__METHOD__
+			. " XML part does not have key 0. Expected a value at index 0 of 'xmlPart' but, found: "
+			. json_encode($xmlPart)
 		);
 		$mtime = new DateTime($xmlPart[0]->__toString());
 		return $mtime->format('U');

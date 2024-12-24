@@ -12,6 +12,20 @@ $finder = PhpCsFixer\Finder::create()
     ->exclude($excludeDirs)
     ->in(__DIR__);
 
-$config = new OC\CodingStandard\Config();
+$ocRule = (new OC\CodingStandard\Config())->getRules();
+$config = new PhpCsFixer\Config();
+$config->setFinder($finder)
+    ->setIndent("\t")
+    ->setRules(
+        array_merge(
+            $ocRule,
+            [
+                "return_type_declaration" => [
+                    "space_before" => "none",
+                ],
+                'single_space_around_construct' => true
+            ]
+        )
+    );
 $config->setFinder($finder);
 return $config;

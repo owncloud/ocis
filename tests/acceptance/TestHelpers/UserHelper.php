@@ -56,7 +56,7 @@ class UserHelper {
 		string $adminPassword,
 		string $xRequestId  = '',
 		?int $ocsApiVersion = 2
-	):ResponseInterface {
+	): ResponseInterface {
 		return OcsApiHelper::sendRequest(
 			$baseUrl,
 			$adminUser,
@@ -90,7 +90,7 @@ class UserHelper {
 		?string $adminPassword,
 		?string $xRequestId = '',
 		?int $ocsApiVersion = 2
-	):array {
+	): array {
 		$requests = [];
 		$client = HttpRequestHelper::createClient(
 			$adminUser,
@@ -143,7 +143,7 @@ class UserHelper {
 		?string $adminPassword,
 		?string $xRequestId = '',
 		?int $ocsApiVersion = 2
-	):ResponseInterface {
+	): ResponseInterface {
 		return OcsApiHelper::sendRequest(
 			$baseUrl,
 			$adminUser,
@@ -175,7 +175,7 @@ class UserHelper {
 		?string $adminPassword,
 		?string $xRequestId = '',
 		?int $ocsApiVersion = 2
-	):ResponseInterface {
+	): ResponseInterface {
 		return OcsApiHelper::sendRequest(
 			$baseUrl,
 			$adminUser,
@@ -209,7 +209,7 @@ class UserHelper {
 		?string $adminPassword,
 		?string $xRequestId = '',
 		?int $ocsApiVersion = 2
-	):ResponseInterface {
+	): ResponseInterface {
 		return OcsApiHelper::sendRequest(
 			$baseUrl,
 			$adminUser,
@@ -243,7 +243,7 @@ class UserHelper {
 		?string $adminPassword,
 		?string $xRequestId,
 		?int $ocsApiVersion = 2
-	):ResponseInterface {
+	): ResponseInterface {
 		return OcsApiHelper::sendRequest(
 			$baseUrl,
 			$adminUser,
@@ -273,7 +273,7 @@ class UserHelper {
 		?string $adminPassword,
 		?string $xRequestId = '',
 		?string $search =""
-	):ResponseInterface {
+	): ResponseInterface {
 		return OcsApiHelper::sendRequest(
 			$baseUrl,
 			$adminUser,
@@ -301,7 +301,7 @@ class UserHelper {
 		?string $adminPassword,
 		?string $xRequestId = '',
 		?string $search = ""
-	):array {
+	): array {
 		$result = self::getGroups(
 			$baseUrl,
 			$adminUser,

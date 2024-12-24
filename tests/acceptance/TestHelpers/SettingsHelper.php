@@ -55,7 +55,13 @@ class SettingsHelper {
 	 * @throws GuzzleException
 	 * @throws Exception
 	 */
-	public static function getBundlesList(string $baseUrl, string $user, string $password, string $xRequestId, array $headers = []): ResponseInterface {
+	public static function getBundlesList(
+		string $baseUrl,
+		string $user,
+		string $password,
+		string $xRequestId,
+		array $headers = []
+	): ResponseInterface {
 		$fullUrl = self::buildFullUrl($baseUrl, "bundles-list");
 		return HttpRequestHelper::post(
 			$fullUrl,
@@ -79,7 +85,13 @@ class SettingsHelper {
 	 * @throws GuzzleException
 	 * @throws Exception
 	 */
-	public static function getBundleByName(string $baseUrl, string $user, string $password, string $bundleName, string $xRequestId): array {
+	public static function getBundleByName(
+		string $baseUrl,
+		string $user,
+		string $password,
+		string $bundleName,
+		string $xRequestId
+	): array {
 		$response = self::getBundlesList($baseUrl, $user, $password, $xRequestId);
 		Assert::assertEquals(201, $response->getStatusCode(), "Failed to get bundles list");
 
@@ -104,7 +116,13 @@ class SettingsHelper {
 	 * @throws GuzzleException
 	 * @throws Exception
 	 */
-	public static function getRolesList(string $baseUrl, string $user, string $password, string $xRequestId, array $headers = []): ResponseInterface {
+	public static function getRolesList(
+		string $baseUrl,
+		string $user,
+		string $password,
+		string $xRequestId,
+		array $headers = []
+	): ResponseInterface {
 		$fullUrl = self::buildFullUrl($baseUrl, "roles-list");
 		return HttpRequestHelper::post(
 			$fullUrl,
@@ -130,7 +148,15 @@ class SettingsHelper {
 	 * @throws GuzzleException
 	 * @throws Exception
 	 */
-	public static function assignRoleToUser(string $baseUrl, string $user, string $password, string $assigneeId, string $roleId, string $xRequestId, array $headers = []): ResponseInterface {
+	public static function assignRoleToUser(
+		string $baseUrl,
+		string $user,
+		string $password,
+		string $assigneeId,
+		string $roleId,
+		string $xRequestId,
+		array $headers = []
+	): ResponseInterface {
 		$fullUrl = self::buildFullUrl($baseUrl, "assignments-add");
 		$body = json_encode(["account_uuid" => $assigneeId, "role_id" => $roleId], JSON_THROW_ON_ERROR);
 		return HttpRequestHelper::post(
@@ -156,7 +182,14 @@ class SettingsHelper {
 	 * @throws GuzzleException
 	 * @throws Exception
 	 */
-	public static function getAssignmentsList(string $baseUrl, string $user, string $password, string $userId, string $xRequestId, array $headers = []): ResponseInterface {
+	public static function getAssignmentsList(
+		string $baseUrl,
+		string $user,
+		string $password,
+		string $userId,
+		string $xRequestId,
+		array $headers = []
+	): ResponseInterface {
 		$fullUrl = self::buildFullUrl($baseUrl, "assignments-list");
 		$body = json_encode(["account_uuid" => $userId], JSON_THROW_ON_ERROR);
 		return HttpRequestHelper::post(
@@ -181,7 +214,13 @@ class SettingsHelper {
 	 * @throws GuzzleException
 	 * @throws Exception
 	 */
-	public static function getValuesList(string $baseUrl, string $user, string $password, string $xRequestId, array $headers = []): ResponseInterface {
+	public static function getValuesList(
+		string $baseUrl,
+		string $user,
+		string $password,
+		string $xRequestId,
+		array $headers = []
+	): ResponseInterface {
 		$fullUrl = self::buildFullUrl($baseUrl, "values-list");
 		$body = json_encode(["account_uuid" => "me"], JSON_THROW_ON_ERROR);
 		return HttpRequestHelper::post(
@@ -205,7 +244,12 @@ class SettingsHelper {
 	 * @throws GuzzleException
 	 * @throws Exception
 	 */
-	public static function getAutoAcceptSharesSettingValue(string $baseUrl, string $user, string $password, string $xRequestId): bool {
+	public static function getAutoAcceptSharesSettingValue(
+		string $baseUrl,
+		string $user,
+		string $password,
+		string $xRequestId
+	): bool {
 		$response = self::getValuesList($baseUrl, $user, $password, $xRequestId);
 		Assert::assertEquals(201, $response->getStatusCode(), "Failed to get values list");
 
@@ -235,7 +279,12 @@ class SettingsHelper {
 	 * @throws GuzzleException
 	 * @throws Exception
 	 */
-	public static function getLanguageSettingValue(string $baseUrl, string $user, string $password, string $xRequestId): string {
+	public static function getLanguageSettingValue(
+		string $baseUrl,
+		string $user,
+		string $password,
+		string $xRequestId
+	): string {
 		$response = self::getValuesList($baseUrl, $user, $password, $xRequestId);
 		Assert::assertEquals(201, $response->getStatusCode(), "Failed to get values list");
 
@@ -267,7 +316,14 @@ class SettingsHelper {
 	 * @throws GuzzleException
 	 * @throws Exception
 	 */
-	public static function updateSettings(string $baseUrl, string $user, string $password, string $body, string $xRequestId, array $headers = []): ResponseInterface {
+	public static function updateSettings(
+		string $baseUrl,
+		string $user,
+		string $password,
+		string $body,
+		string $xRequestId,
+		array $headers = []
+	): ResponseInterface {
 		$fullUrl = self::buildFullUrl($baseUrl, "values-save");
 		return HttpRequestHelper::post(
 			$fullUrl,

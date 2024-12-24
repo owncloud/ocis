@@ -56,7 +56,7 @@ class OcmContext implements Context {
 	 * @return string
 	 * @throws Exception
 	 */
-	public function getLastFederatedInvitationToken():string {
+	public function getLastFederatedInvitationToken(): string {
 		if (empty($this->invitationToken)) {
 			throw new Exception(__METHOD__ . " token not found");
 		}
@@ -286,7 +286,11 @@ class OcmContext implements Context {
 	 */
 	public function userHasDeletedFederatedConnectionWithUser(string $user, string $ocmUser): void {
 		$response = $this->deleteConnection($user, $ocmUser);
-		$this->featureContext->theHTTPStatusCodeShouldBe(200, "failed while deleting connection with user $ocmUser", $response);
+		$this->featureContext->theHTTPStatusCodeShouldBe(
+			200,
+			"failed while deleting connection with user $ocmUser",
+			$response
+		);
 	}
 
 	/**
