@@ -121,6 +121,45 @@ class CliContext implements Context {
 		];
 		$this->featureContext->setResponse(CliHelper::runCommand($body));
 	}
+	
+	/**
+	 * @When the administrator creates app token for user :user with expiration time :expirationTime using the auth-app CLI
+	 *
+	 * @param string $user
+	 * @param string $expirationTime
+	 *
+	 * @return void
+	 */
+	public function theAdministratorCreatesAppTokenForUserWithExpirationTimeUsingTheAuthAppCLI(string $user, string $expirationTime): void {
+		$user = $this->featureContext->getActualUserName($user);
+		$command = "auth-app create --user-name=$user --expiration=$expirationTime";
+		$body = [
+			"command" => $command
+		];
+		$this->featureContext->setResponse(CliHelper::runCommand($body));
+	}
+
+	/**
+	 * @Given user :user has created app token with expiration time :expirationTime using the auth-app CLI
+	 *
+	 * @param string $user
+	 * @param string $expirationTime
+	 *
+	 * @return void
+	 */
+	public function userHasCreatedAppTokenWithExpirationTimeUsingTheAuthAppCLI(string $user, string $expirationTime): void {
+		$user = $this->featureContext->getActualUserName($user);
+		$command = "auth-app create --user-name=$user --expiration=$expirationTime";
+		$body = [
+			"command" => $command
+		];
+
+		$response = CliHelper::runCommand($body);
+		$this->featureContext->theHTTPStatusCodeShouldBe(200, '', $response);
+		$jsonResponse = $this->featureContext->getJsonDecodedResponse($response);
+		Assert::assertSame("OK", $jsonResponse["status"]);
+		Assert::assertSame(0, $jsonResponse["exitCode"], "Expected exit code to be 0, but got " . $jsonResponse["exitCode"]);
+	}
 
 	/**
 	 * @When the administrator removes all the file versions using the CLI
