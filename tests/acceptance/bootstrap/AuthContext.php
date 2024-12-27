@@ -213,11 +213,34 @@ class AuthContext implements Context {
 	 * @throws Exception
 	 */
 	public function userRequestsEndpointsWithNoAuthentication(string $method, TableNode $table): void {
-		$this->featureContext->verifyTableNodeColumns($table, ['endpoint'], ['service']);
+		$this->featureContext->verifyTableNodeColumns($table, ['endpoint']);
 		foreach ($table->getHash() as $row) {
 			$this->featureContext->setResponse(
 				$this->sendRequest(
 					$this->featureContext->substituteInLineCodes($row['endpoint']),
+					$method
+				)
+			);
+			$this->featureContext->pushToLastStatusCodesArrays();
+		}
+	}
+
+	/**
+	 * @When a user requests these URLs with :method and no authentication
+	 *
+	 * @param $method
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function aUserRequestsTheseUrlsWithAndNoAuthentication($method, TableNode $table): void {
+		$this->featureContext->verifyTableNodeColumns($table, ['endpoint'], ['service']);
+		foreach ($table->getHash() as $row) {
+			$this->featureContext->setResponse(
+				HttpRequestHelper::sendRequest(
+					$this->featureContext->substituteInLineCodes($row['endpoint']),
+					$this->featureContext->getStepLineRef(),
 					$method
 				)
 			);
