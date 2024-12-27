@@ -269,7 +269,9 @@ config = {
         },
     },
     "apiTests": {
+        "numberOfParts": 7,
         "skip": False,
+        "skipExceptParts": [],
     },
     "e2eTests": {
         "part": {
@@ -1208,7 +1210,7 @@ def wopiValidatorTests(ctx, storage, wopiServerType, accounts_hash_difficulty = 
         },
     }
 
-def coreApiTests(ctx, with_remote_php = False, storage = "ocis", accounts_hash_difficulty = 4):
+def coreApiTests(ctx, part_number = 1, number_of_parts = 1, with_remote_php = False, storage = "ocis", accounts_hash_difficulty = 4):
     filterTags = "~@skipOnGraph&&~@skipOnOcis-%s-Storage" % ("OC" if storage == "owncloud" else "OCIS")
     test_dir = "%s/tests/acceptance" % dirs["base"]
     expected_failures_file = "%s/expected-failures-API-on-%s-storage.md" % (test_dir, storage.upper())
@@ -1216,7 +1218,7 @@ def coreApiTests(ctx, with_remote_php = False, storage = "ocis", accounts_hash_d
     return {
         "kind": "pipeline",
         "type": "docker",
-        "name": "Core-API-Tests%s" % ("-withoutRemotePhp" if not with_remote_php else ""),
+        "name": "Core-API-Tests-%s%s" % (part_number, "-withoutRemotePhp" if not with_remote_php else ""),
         "platform": {
             "os": "linux",
             "arch": "amd64",
@@ -1226,15 +1228,16 @@ def coreApiTests(ctx, with_remote_php = False, storage = "ocis", accounts_hash_d
                  ocisServer(storage, accounts_hash_difficulty, with_wrapper = True) +
                  [
                      {
-                         "name": "oC10ApiTests",
+                         "name": "oC10ApiTests-%s" % part_number,
                          "image": OC_CI_PHP % DEFAULT_PHP_VERSION,
                          "environment": {
                              "TEST_SERVER_URL": OCIS_URL,
                              "OCIS_REVA_DATA_ROOT": "%s" % (dirs["ocisRevaDataRoot"] if storage == "owncloud" else ""),
                              "SEND_SCENARIO_LINE_REFERENCES": "true",
                              "STORAGE_DRIVER": storage,
-                             "BEHAT_FEATURE": "tests/acceptance/features/coreApiShareOperationsToShares2/test.feature",
                              "BEHAT_FILTER_TAGS": filterTags,
+                             "DIVIDE_INTO_NUM_PARTS": number_of_parts,
+                             "RUN_PART": part_number,
                              "ACCEPTANCE_TEST_TYPE": "core-api",
                              "EXPECTED_FAILURES_FILE": expected_failures_file,
                              "UPLOAD_DELETE_WAIT_TIME": "1" if storage == "owncloud" else 0,
@@ -1261,8 +1264,8 @@ def coreApiTests(ctx, with_remote_php = False, storage = "ocis", accounts_hash_d
 
 def apiTests(ctx):
     pipelines = []
-    # debugParts = config["apiTests"]["skipExceptParts"]
-    # debugPartsEnabled = (len(debugParts) != 0)
+    debugParts = config["apiTests"]["skipExceptParts"]
+    debugPartsEnabled = (len(debugParts) != 0)
 
     with_remote_php = [True]
     if ctx.build.event == "cron" or "full-ci" in ctx.build.title.lower():
@@ -1272,8 +1275,10 @@ def apiTests(ctx):
         "withRemotePhp": with_remote_php,
     }
 
-    for run_with_remote_php in defaults["withRemotePhp"]:
-        pipelines.append(coreApiTests(ctx, run_with_remote_php))
+    for runPart in range(1, config["apiTests"]["numberOfParts"] + 1):
+        for run_with_remote_php in defaults["withRemotePhp"]:
+            if (not debugPartsEnabled or (debugPartsEnabled and runPart in debugParts)):
+                pipelines.append(coreApiTests(ctx, runPart, config["apiTests"]["numberOfParts"], run_with_remote_php))
 
     return pipelines
 
