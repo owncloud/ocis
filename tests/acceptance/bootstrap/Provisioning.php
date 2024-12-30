@@ -59,7 +59,7 @@ trait Provisioning {
 	 *
 	 * @return boolean
 	 */
-	public function isLocalAdminGroup(string $groupname):bool {
+	public function isLocalAdminGroup(string $groupname): bool {
 		return ($groupname === "admin");
 	}
 
@@ -72,28 +72,28 @@ trait Provisioning {
 	 *
 	 * @return string
 	 */
-	public function normalizeUsername(?string $username):string {
+	public function normalizeUsername(?string $username): string {
 		return \strtolower((string)$username);
 	}
 
 	/**
 	 * @return array
 	 */
-	public function getCreatedUsers():array {
+	public function getCreatedUsers(): array {
 		return $this->createdUsers;
 	}
 
 	/**
 	 * @return array
 	 */
-	public function getAllCreatedUsers():array {
+	public function getAllCreatedUsers(): array {
 		return array_merge($this->createdUsers, $this->createdRemoteUsers);
 	}
 
 	/**
 	 * @return array
 	 */
-	public function getCreatedGroups():array {
+	public function getCreatedGroups(): array {
 		return $this->createdGroups;
 	}
 
@@ -105,7 +105,7 @@ trait Provisioning {
 	 *
 	 * @return string
 	 */
-	public function getUserDisplayName(string $username):string {
+	public function getUserDisplayName(string $username): string {
 		$normalizedUsername = $this->normalizeUsername($username);
 		$users = $this->getAllCreatedUsers();
 		if (isset($users[$normalizedUsername]['displayname'])) {
@@ -169,7 +169,7 @@ trait Provisioning {
 	 * @return string password
 	 * @throws Exception
 	 */
-	public function getUserPassword(string $username):string {
+	public function getUserPassword(string $username): string {
 		$normalizedUsername = $this->normalizeUsername($username);
 		if ($normalizedUsername === $this->getAdminUsername()) {
 			$password = $this->getAdminPassword();
@@ -197,7 +197,7 @@ trait Provisioning {
 	 */
 	public function userHasBeenCreatedWithDefaultAttributes(
 		string $user
-	):void {
+	): void {
 		$this->userHasBeenCreated(["userName" => $user]);
 	}
 
@@ -211,7 +211,7 @@ trait Provisioning {
 	 */
 	public function userHasBeenCreatedWithDefaultAttributesAndNotInitialized(
 		TableNode $table
-	):void {
+	): void {
 		$this->usersHaveBeenCreated($table, true, false);
 	}
 
@@ -225,7 +225,7 @@ trait Provisioning {
 	 * @return void
 	 * @throws Exception|GuzzleException
 	 */
-	public function theseUsersHaveBeenCreatedWithDefaultAttributesAndWithoutSkeletonFiles(TableNode $table):void {
+	public function theseUsersHaveBeenCreatedWithDefaultAttributesAndWithoutSkeletonFiles(TableNode $table): void {
 		$this->usersHaveBeenCreated($table);
 	}
 
@@ -253,7 +253,7 @@ trait Provisioning {
 	 * @return boolean
 	 * @throws Exception
 	 */
-	public function theGroupShouldBeAbleToBeDeleted(string $groupname):bool {
+	public function theGroupShouldBeAbleToBeDeleted(string $groupname): bool {
 		if (\array_key_exists($groupname, $this->createdGroups)) {
 			return $this->createdGroups[$groupname]['possibleToDelete'] ?? true;
 		}
@@ -274,7 +274,7 @@ trait Provisioning {
 	 *
 	 * @return void
 	 */
-	public function importLdifFile(string $path):void {
+	public function importLdifFile(string $path): void {
 		$ldifData = \file_get_contents($path);
 		$this->importLdifData($ldifData);
 	}
@@ -286,7 +286,7 @@ trait Provisioning {
 	 *
 	 * @return void
 	 */
-	public function importLdifData(string $ldifData):void {
+	public function importLdifData(string $ldifData): void {
 		$items = Laminas\Ldap\Ldif\Encoder::decode($ldifData);
 		if (isset($items['dn'])) {
 			//only one item in the ldif data
@@ -314,7 +314,7 @@ trait Provisioning {
 	 * @throws Exception
 	 * @throws \LdapException
 	 */
-	public function connectToLdap(array $suiteParameters):void {
+	public function connectToLdap(array $suiteParameters): void {
 		$this->ldapBaseDN = OcisHelper::getBaseDN();
 		$this->ldapUsersOU = OcisHelper::getUsersOU();
 		$this->ldapGroupsOU = OcisHelper::getGroupsOU();
@@ -365,7 +365,7 @@ trait Provisioning {
 	 * @return array
 	 * @throws JsonException
 	 */
-	public function buildUsersAttributesArray(bool $setDefaultAttributes, array $table):array {
+	public function buildUsersAttributesArray(bool $setDefaultAttributes, array $table): array {
 		$usersAttributes = [];
 		foreach ($table as $row) {
 			$userAttribute['userid'] = $this->getActualUsername($row['username']);
@@ -412,7 +412,7 @@ trait Provisioning {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function createLdapUser(array $setting):void {
+	public function createLdapUser(array $setting): void {
 		$ou =  $this->ldapUsersOU ;
 		// Some special characters need to be escaped in LDAP DN and attributes
 		// The special characters allowed in a username (UID) are +_.@-
@@ -455,7 +455,11 @@ trait Provisioning {
 		} catch (LdapException $e) {
 			if (\str_contains($e->getMessage(), "Already exists")) {
 				$this->ldap->delete(
-					"uid=" . ldap_escape($entry['uid'], "", LDAP_ESCAPE_DN) . ",ou=" . $this->ldapUsersOU . "," . $this->ldapBaseDN,
+					"uid=" . ldap_escape(
+						$entry['uid'],
+						"",
+						LDAP_ESCAPE_DN
+					) . ",ou=" . $this->ldapUsersOU . "," . $this->ldapBaseDN,
 				);
 				OcisHelper::deleteRevaUserData([$entry['uid']]);
 				$this->ldap->add($newDN, $entry);
@@ -472,7 +476,7 @@ trait Provisioning {
 	 * @throws Exception
 	 * @throws LdapException
 	 */
-	public function createLdapGroup(string $group):void {
+	public function createLdapGroup(string $group): void {
 		$baseDN = $this->getLdapBaseDN();
 		$newDN = 'cn=' . $group . ',ou=' . $this->ldapGroupsOU . ',' . $baseDN;
 		$entry = [];
@@ -496,7 +500,8 @@ trait Provisioning {
 		} catch (LdapException $e) {
 			if (\str_contains($e->getMessage(), "Already exists")) {
 				$this->ldap->delete(
-					"cn=" . ldap_escape($group, "", LDAP_ESCAPE_DN) . ",ou=" . $this->ldapGroupsOU . "," . $this->ldapBaseDN,
+					"cn=" . ldap_escape($group, "", LDAP_ESCAPE_DN)
+					. ",ou=" . $this->ldapGroupsOU . "," . $this->ldapBaseDN,
 				);
 				$this->ldap->add($newDN, $entry);
 			}
@@ -510,7 +515,7 @@ trait Provisioning {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function deleteLdapUsersAndGroups():void {
+	public function deleteLdapUsersAndGroups(): void {
 		foreach ($this->ldapCreatedUsers as $user) {
 			$this->ldap->delete(
 				"uid=" . ldap_escape($user, "", LDAP_ESCAPE_DN) . ",ou=" . $this->ldapUsersOU . "," . $this->ldapBaseDN,
@@ -519,7 +524,8 @@ trait Provisioning {
 		}
 		foreach ($this->ldapCreatedGroups as $group) {
 			$this->ldap->delete(
-				"cn=" . ldap_escape($group, "", LDAP_ESCAPE_DN) . ",ou=" . $this->ldapGroupsOU . "," . $this->ldapBaseDN,
+				"cn=" . ldap_escape($group, "", LDAP_ESCAPE_DN)
+				. ",ou=" . $this->ldapGroupsOU . "," . $this->ldapBaseDN,
 			);
 			$this->rememberThatGroupIsNotExpectedToExist($group);
 		}
@@ -667,7 +673,7 @@ trait Provisioning {
 	 *
 	 * @return void
 	 */
-	public function resetUserPasswordAsAdminUsingTheProvisioningApi(string $username, ?string $password):void {
+	public function resetUserPasswordAsAdminUsingTheProvisioningApi(string $username, ?string $password): void {
 		$this->userResetUserPasswordUsingProvisioningApi(
 			$this->getAdminUsername(),
 			$username,
@@ -682,7 +688,11 @@ trait Provisioning {
 	 *
 	 * @return void
 	 */
-	public function userResetUserPasswordUsingProvisioningApi(?string $user, ?string $username, ?string $password):void {
+	public function userResetUserPasswordUsingProvisioningApi(
+		?string $user,
+		?string $username,
+		?string $password
+	): void {
 		$targetUsername = $this->getActualUsername($username);
 		$password = $this->getActualPassword($password);
 		$this->userTriesToResetUserPasswordUsingTheProvisioningApi(
@@ -700,7 +710,11 @@ trait Provisioning {
 	 *
 	 * @return void
 	 */
-	public function userTriesToResetUserPasswordUsingTheProvisioningApi(?string $user, ?string $username, ?string $password):void {
+	public function userTriesToResetUserPasswordUsingTheProvisioningApi(
+		?string $user,
+		?string $username,
+		?string $password
+	): void {
 		$password = $this->getActualPassword($password);
 		$bodyTable = new TableNode([['key', 'password'], ['value', $password]]);
 		$this->ocsContext->sendRequestToOcsEndpoint(
@@ -719,7 +733,7 @@ trait Provisioning {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function theAdminDeletesUserUsingTheProvisioningApi(string $user):void {
+	public function theAdminDeletesUserUsingTheProvisioningApi(string $user): void {
 		$user = $this->getActualUsername($user);
 		$this->setResponse($this->deleteUser($user));
 		$this->pushToLastHttpStatusCodesArray();
@@ -733,7 +747,7 @@ trait Provisioning {
 	 * @return void
 	 * @throws JsonException
 	 */
-	public function userShouldExist(string $user):void {
+	public function userShouldExist(string $user): void {
 		Assert::assertTrue(
 			$this->userExists($user),
 			"User '$user' should exist but does not exist"
@@ -748,7 +762,7 @@ trait Provisioning {
 	 * @return void
 	 * @throws JsonException
 	 */
-	public function userShouldNotExist(string $user):void {
+	public function userShouldNotExist(string $user): void {
 		$user = $this->getActualUsername($user);
 		Assert::assertFalse(
 			$this->userExists($user),
@@ -766,7 +780,7 @@ trait Provisioning {
 	 * @throws Exception
 	 * @throws GuzzleException
 	 */
-	public function groupShouldExist(string $group):void {
+	public function groupShouldExist(string $group): void {
 		Assert::assertTrue(
 			$this->groupExists($group),
 			"Group '$group' should exist but does not exist"
@@ -782,7 +796,7 @@ trait Provisioning {
 	 * @throws Exception
 	 * @throws GuzzleException
 	 */
-	public function groupShouldNotExist(string $group):void {
+	public function groupShouldNotExist(string $group): void {
 		Assert::assertFalse(
 			$this->groupExists($group),
 			"Group '$group' should not exist but does exist"
@@ -799,7 +813,7 @@ trait Provisioning {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function theseGroupsShouldNotExist(string $shouldOrNot, TableNode $table):void {
+	public function theseGroupsShouldNotExist(string $shouldOrNot, TableNode $table): void {
 		$should = ($shouldOrNot !== "not");
 		$this->verifyTableNodeColumns($table, ['groupname']);
 		if ($this->isTestingWithLdap()) {
@@ -826,7 +840,7 @@ trait Provisioning {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userHasBeenDeleted(string $user):void {
+	public function userHasBeenDeleted(string $user): void {
 		$user = $this->getActualUsername($user);
 		if ($this->userExists($user)) {
 			if ($this->isTestingWithLdap() && \in_array($user, $this->ldapCreatedUsers)) {
@@ -853,7 +867,7 @@ trait Provisioning {
 	 *
 	 * @return void
 	 */
-	public function theseUsersHaveBeenInitialized(TableNode $table):void {
+	public function theseUsersHaveBeenInitialized(TableNode $table): void {
 		foreach ($table as $row) {
 			if (!isset($row ['password'])) {
 				$password = $this->getPasswordForUser($row ['username']);
@@ -872,7 +886,7 @@ trait Provisioning {
 	 *
 	 * @return ResponseInterface
 	 */
-	public function getAllGroups():ResponseInterface {
+	public function getAllGroups(): ResponseInterface {
 		$fullUrl = $this->getBaseUrl() . "/ocs/v$this->ocsApiVersion.php/cloud/groups";
 		return HttpRequestHelper::get(
 			$fullUrl,
@@ -888,7 +902,7 @@ trait Provisioning {
 	 *
 	 * @return void
 	 */
-	public function userGetsAllTheGroupsOfUser(string $user, string $otherUser):void {
+	public function userGetsAllTheGroupsOfUser(string $user, string $otherUser): void {
 		$actualOtherUser = $this->getActualUsername($otherUser);
 		$fullUrl = $this->getBaseUrl() . "/ocs/v$this->ocsApiVersion.php/cloud/users/$actualOtherUser/groups";
 		$actualUser = $this->getActualUsername($user);
@@ -909,7 +923,7 @@ trait Provisioning {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userGetsTheListOfAllUsersUsingTheProvisioningApi(string $user):void {
+	public function userGetsTheListOfAllUsersUsingTheProvisioningApi(string $user): void {
 		$this->featureContext->setResponse(
 			$this->userGetsTheListOfAllUsers($user)
 		);
@@ -920,7 +934,7 @@ trait Provisioning {
 	 *
 	 * @return ResponseInterface
 	 */
-	public function userGetsTheListOfAllUsers(string $user):ResponseInterface {
+	public function userGetsTheListOfAllUsers(string $user): ResponseInterface {
 		$fullUrl = $this->getBaseUrl() . "/ocs/v$this->ocsApiVersion.php/cloud/users";
 		$actualUser = $this->getActualUsername($user);
 		$actualPassword = $this->getUserPassword($actualUser);
@@ -941,7 +955,7 @@ trait Provisioning {
 	 *
 	 * @return void
 	 */
-	public function initializeUser(string $user, string $password):void {
+	public function initializeUser(string $user, string $password): void {
 		$url = $this->getBaseUrl() . "/graph/v1.0/users/$user";
 
 		if (OcisHelper::isTestingOnReva()) {
@@ -979,7 +993,7 @@ trait Provisioning {
 		?string $email = null,
 		?string $userId = null,
 		bool $shouldExist = true
-	):void {
+	): void {
 		$user = $this->getActualUsername($user);
 		$normalizedUsername = $this->normalizeUsername($user);
 		$userData = [
@@ -1021,7 +1035,7 @@ trait Provisioning {
 	public function rememberUserPassword(
 		string $user,
 		string $password
-	):void {
+	): void {
 		$normalizedUsername = $this->normalizeUsername($user);
 		if ($this->currentServer === 'LOCAL') {
 			if (\array_key_exists($normalizedUsername, $this->createdUsers)) {
@@ -1040,7 +1054,7 @@ trait Provisioning {
 	 *
 	 * @return void
 	 */
-	public function updateUsernameInCreatedUserList(string $oldUserName, string $newUserName) :void {
+	public function updateUsernameInCreatedUserList(string $oldUserName, string $newUserName): void {
 		$normalizedUsername = $this->normalizeUsername($oldUserName);
 		$normalizeNewUserName = $this->normalizeUsername($newUserName);
 		if (\array_key_exists($normalizedUsername, $this->createdUsers)) {
@@ -1064,7 +1078,7 @@ trait Provisioning {
 	 *
 	 * @return void
 	 */
-	public function rememberThatUserIsNotExpectedToExist(string $user):void {
+	public function rememberThatUserIsNotExpectedToExist(string $user): void {
 		$user = $this->getActualUsername($user);
 		$normalizedUsername = $this->normalizeUsername($user);
 		if (\array_key_exists($normalizedUsername, $this->createdUsers)) {
@@ -1085,7 +1099,7 @@ trait Provisioning {
 	public function userHasBeenCreated(
 		array $userData,
 		string $byUser = null
-	):void {
+	): void {
 		$userId = null;
 
 		$user = $userData["userName"];
@@ -1167,7 +1181,7 @@ trait Provisioning {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function adminRemovesUserFromGroupUsingTheProvisioningApi(string $user, string $group):void {
+	public function adminRemovesUserFromGroupUsingTheProvisioningApi(string $user, string $group): void {
 		$user = $this->getActualUsername($user);
 		if (OcisHelper::isTestingOnReva()) {
 			$this->response = UserHelper::removeUserFromGroup(
@@ -1199,7 +1213,7 @@ trait Provisioning {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function theExtraGroupsShouldBe(TableNode $groupsList):void {
+	public function theExtraGroupsShouldBe(TableNode $groupsList): void {
 		$this->verifyTableNodeColumnsCount($groupsList, 1);
 		$groups = $groupsList->getRows();
 		$groupsSimplified = $this->simplifyArray($groups);
@@ -1227,7 +1241,7 @@ trait Provisioning {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function cleanupGroup(string $group):void {
+	public function cleanupGroup(string $group): void {
 		try {
 			if ($this->isTestingWithLdap()) {
 				$this->deleteLdapGroup($group);
@@ -1259,7 +1273,7 @@ trait Provisioning {
 	 * @return bool
 	 * @throws JsonException
 	 */
-	public function userExists(string $user):bool {
+	public function userExists(string $user): bool {
 		$path = (!OcisHelper::isTestingOnReva())
 			? "/graph/v1.0"
 			: "/ocs/v2.php/cloud";
@@ -1294,7 +1308,7 @@ trait Provisioning {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userShouldBelongToGroup(string $user, string $group):void {
+	public function userShouldBelongToGroup(string $user, string $group): void {
 		$user = $this->getActualUsername($user);
 		if (OcisHelper::isTestingOnReva()) {
 			$this->userGetsAllTheGroupsOfUser($this->getAdminUsername(), $user);
@@ -1331,7 +1345,7 @@ trait Provisioning {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function theTheFollowingUserShouldNotBelongToTheFollowingGroup(TableNode $table):void {
+	public function theTheFollowingUserShouldNotBelongToTheFollowingGroup(TableNode $table): void {
 		$this->verifyTableNodeColumns($table, ["username", "groupname"]);
 		$rows = $table->getHash();
 		foreach ($rows as $row) {
@@ -1366,7 +1380,7 @@ trait Provisioning {
 	 *
 	 * @return void
 	 */
-	public function groupShouldNotContainUser(string $group, string $username):void {
+	public function groupShouldNotContainUser(string $group, string $username): void {
 		$username = $this->getActualUsername($username);
 		$fullUrl = $this->getBaseUrl() . "/ocs/v2.php/cloud/groups/$group";
 		$response = HttpRequestHelper::get(
@@ -1387,7 +1401,7 @@ trait Provisioning {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function adminAddsUserToGroupUsingTheProvisioningApi(string $user, string $group):void {
+	public function adminAddsUserToGroupUsingTheProvisioningApi(string $user, string $group): void {
 		$response = $this->graphContext->addUserToGroup($group, $user);
 		$this->setResponse($response);
 	}
@@ -1401,7 +1415,7 @@ trait Provisioning {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userHasBeenAddedToGroup(string $user, string $group):void {
+	public function userHasBeenAddedToGroup(string $user, string $group): void {
 		$user = $this->getActualUsername($user);
 		if ($this->isTestingWithLdap()) {
 			try {
@@ -1428,7 +1442,7 @@ trait Provisioning {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function theFollowingUserHaveBeenAddedToTheFollowingGroup(TableNode $table):void {
+	public function theFollowingUserHaveBeenAddedToTheFollowingGroup(TableNode $table): void {
 		$this->verifyTableNodeColumns($table, ['username', 'groupname']);
 		foreach ($table as $row) {
 			$user = $row['username'];
@@ -1465,7 +1479,7 @@ trait Provisioning {
 		bool $shouldExist = true,
 		bool $possibleToDelete = true,
 		?string $id = null
-	):void {
+	): void {
 		$groupData = [
 			"shouldExist" => $shouldExist,
 			"possibleToDelete" => $possibleToDelete
@@ -1491,7 +1505,7 @@ trait Provisioning {
 	 *
 	 * @return void
 	 */
-	public function rememberThatGroupIsNotExpectedToExist(string $group):void {
+	public function rememberThatGroupIsNotExpectedToExist(string $group): void {
 		if (\array_key_exists($group, $this->createdGroups)) {
 			$this->createdGroups[$group]['shouldExist'] = false;
 			$this->createdGroups[$group]['possibleToDelete'] = false;
@@ -1507,7 +1521,7 @@ trait Provisioning {
 	 * @throws Exception
 	 * @throws GuzzleException
 	 */
-	public function groupHasBeenCreated(string $group):void {
+	public function groupHasBeenCreated(string $group): void {
 		$this->createTheGroup($group);
 		Assert::assertTrue(
 			$this->groupExists($group),
@@ -1524,7 +1538,7 @@ trait Provisioning {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function theseGroupsHaveBeenCreated(TableNode $table):void {
+	public function theseGroupsHaveBeenCreated(TableNode $table): void {
 		$this->verifyTableNodeColumns($table, ['groupname'], ['comment']);
 		foreach ($table as $row) {
 			$this->createTheGroup($row['groupname']);
@@ -1540,7 +1554,7 @@ trait Provisioning {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function createTheGroup(string $group, ?string $method = null):void {
+	public function createTheGroup(string $group, ?string $method = null): void {
 		//guess yourself
 		if ($method === null) {
 			if ($this->isTestingWithLdap()) {
@@ -1594,7 +1608,7 @@ trait Provisioning {
 		string $entry,
 		string $value,
 		bool $append = false
-	):void {
+	): void {
 		$ldapEntry = $this->ldap->getEntry($entry . "," . $this->ldapBaseDN);
 		Laminas\Ldap\Attribute::setAttribute($ldapEntry, $attribute, $value, $append);
 		$this->ldap->update($entry . "," . $this->ldapBaseDN, $ldapEntry);
@@ -1608,7 +1622,7 @@ trait Provisioning {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function addUserToLdapGroup(string $user, string $group, ?string $ou = null):void {
+	public function addUserToLdapGroup(string $user, string $group, ?string $ou = null): void {
 		if ($ou === null) {
 			$ou = $this->getLdapGroupsOU();
 		}
@@ -1635,7 +1649,7 @@ trait Provisioning {
 	 *
 	 * @return void
 	 */
-	public function deleteValueFromLdapAttribute(string $value, string $attribute, string $entry):void {
+	public function deleteValueFromLdapAttribute(string $value, string $attribute, string $entry): void {
 		$this->ldap->deleteAttributes(
 			$entry . "," . $this->ldapBaseDN,
 			[$attribute => [$value]]
@@ -1650,7 +1664,7 @@ trait Provisioning {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function removeUserFromLdapGroup(string $user, string $group, ?string $ou = null):void {
+	public function removeUserFromLdapGroup(string $user, string $group, ?string $ou = null): void {
 		if ($ou === null) {
 			$ou = $this->getLdapGroupsOU();
 		}
@@ -1675,7 +1689,7 @@ trait Provisioning {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function deleteTheLdapEntry(string $entry):void {
+	public function deleteTheLdapEntry(string $entry): void {
 		$this->ldap->delete($entry . "," . $this->ldapBaseDN);
 	}
 
@@ -1687,7 +1701,7 @@ trait Provisioning {
 	 * @throws LdapException
 	 * @throws Exception
 	 */
-	public function deleteLdapGroup(string $group, ?string $ou = null):void {
+	public function deleteLdapGroup(string $group, ?string $ou = null): void {
 		if ($ou === null) {
 			$ou = $this->getLdapGroupsOU();
 		}
@@ -1706,7 +1720,7 @@ trait Provisioning {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function deleteLdapUser(?string $username, ?string $ou = null):void {
+	public function deleteLdapUser(?string $username, ?string $ou = null): void {
 		if (!\in_array($username, $this->ldapCreatedUsers)) {
 			throw new Error(
 				"User " . $username . " was not created using Ldap and does not exist as an Ldap User"
@@ -1732,12 +1746,20 @@ trait Provisioning {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function adminHasDisabledUserUsingTheProvisioningApi(?string $user):void {
+	public function adminHasDisabledUserUsingTheProvisioningApi(?string $user): void {
 		$user = $this->getActualUsername($user);
 		if (OcisHelper::isTestingOnReva()) {
 			$response = $this->disableOrEnableUser($this->getAdminUsername(), $user, 'disable');
 		} else {
-			$response = $this->graphContext->editUserUsingTheGraphApi($this->getAdminUsername(), $user, null, null, null, null, false);
+			$response = $this->graphContext->editUserUsingTheGraphApi(
+				$this->getAdminUsername(),
+				$user,
+				null,
+				null,
+				null,
+				null,
+				false
+			);
 		}
 		Assert::assertEquals(
 			200,
@@ -1754,7 +1776,7 @@ trait Provisioning {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function deleteUser(string $user):ResponseInterface {
+	public function deleteUser(string $user): ResponseInterface {
 		// Always try to delete the user
 		if (OcisHelper::isTestingOnReva()) {
 			$response = UserHelper::deleteUser(
@@ -1781,7 +1803,7 @@ trait Provisioning {
 	 * @throws Exception
 	 * @throws GuzzleException
 	 */
-	public function groupHasBeenDeleted(string $group):void {
+	public function groupHasBeenDeleted(string $group): void {
 		if ($this->isTestingWithLdap()) {
 			$this->deleteLdapGroup($group);
 		} else {
@@ -1802,7 +1824,7 @@ trait Provisioning {
 	 * @throws Exception
 	 * @throws GuzzleException
 	 */
-	public function groupExists(string $group):bool {
+	public function groupExists(string $group): bool {
 		if ($this->isTestingWithLdap()) {
 			$baseDN = $this->getLdapBaseDN();
 			$newDN = 'cn=' . $group . ',ou=' . $this->ldapGroupsOU . ',' . $baseDN;
@@ -1834,7 +1856,7 @@ trait Provisioning {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function adminHasRemovedUserFromGroup(string $user, string $group):void {
+	public function adminHasRemovedUserFromGroup(string $user, string $group): void {
 		$user = $this->getActualUsername($user);
 		if ($this->isTestingWithLdap()
 			&& !$this->isLocalAdminGroup($group)
@@ -1874,7 +1896,7 @@ trait Provisioning {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function theUsersShouldBe(TableNode $usersList):void {
+	public function theUsersShouldBe(TableNode $usersList): void {
 		$this->verifyTableNodeColumnsCount($usersList, 1);
 		$users = $usersList->getRows();
 		$usersSimplified = \array_map(
@@ -1904,7 +1926,7 @@ trait Provisioning {
 	 * @return array
 	 * @throws Exception
 	 */
-	public function getArrayOfUsersResponded(ResponseInterface $resp):array {
+	public function getArrayOfUsersResponded(ResponseInterface $resp): array {
 		$listCheckedElements = HttpRequestHelper::getResponseXml($resp, __METHOD__)->data[0]->users[0]->element;
 		return \json_decode(\json_encode($listCheckedElements), true);
 	}
@@ -1917,7 +1939,7 @@ trait Provisioning {
 	 * @return array
 	 * @throws Exception
 	 */
-	public function getArrayOfGroupsResponded(ResponseInterface $resp):array {
+	public function getArrayOfGroupsResponded(ResponseInterface $resp): array {
 		$listCheckedElements
 			= HttpRequestHelper::getResponseXml($resp, __METHOD__)->data[0]->groups[0]->element;
 		return \json_decode(\json_encode($listCheckedElements), true);
@@ -1931,7 +1953,7 @@ trait Provisioning {
 	 * @return array
 	 * @throws Exception
 	 */
-	public function getArrayOfAppsResponded(ResponseInterface $resp):array {
+	public function getArrayOfAppsResponded(ResponseInterface $resp): array {
 		$listCheckedElements = HttpRequestHelper::getResponseXml($resp, __METHOD__)->data[0]->apps[0]->element;
 		return \json_decode(\json_encode($listCheckedElements), true);
 	}
@@ -1942,7 +1964,7 @@ trait Provisioning {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function theApiShouldNotReturnAnyData():void {
+	public function theApiShouldNotReturnAnyData(): void {
 		$responseData = HttpRequestHelper::getResponseXml($this->response, __METHOD__)->data[0];
 		Assert::assertEmpty(
 			$responseData,
@@ -1956,7 +1978,7 @@ trait Provisioning {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function afterScenario():void {
+	public function afterScenario(): void {
 		if (OcisHelper::isTestingOnReva()) {
 			OcisHelper::deleteRevaUserData($this->getCreatedUsers());
 		}
@@ -1973,7 +1995,7 @@ trait Provisioning {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function cleanupDatabaseUsers():void {
+	public function cleanupDatabaseUsers(): void {
 		$previousServer = $this->currentServer;
 		$this->usingServer('LOCAL');
 		foreach ($this->createdUsers as $userData) {
@@ -2003,7 +2025,7 @@ trait Provisioning {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function cleanupDatabaseGroups():void {
+	public function cleanupDatabaseGroups(): void {
 		$previousServer = $this->currentServer;
 		$this->usingServer('LOCAL');
 		foreach ($this->createdGroups as $group => $groupData) {
@@ -2036,7 +2058,7 @@ trait Provisioning {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function rememberGroupsThatExistAtTheStartOfTheScenario():void {
+	public function rememberGroupsThatExistAtTheStartOfTheScenario(): void {
 		$this->startingGroups = $this->getArrayOfGroupsResponded($this->getAllGroups());
 	}
 

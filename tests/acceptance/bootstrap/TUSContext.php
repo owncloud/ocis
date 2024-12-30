@@ -97,7 +97,12 @@ class TUSContext implements Context {
 	 * @throws Exception
 	 * @throws GuzzleException
 	 */
-	public function createNewTUSResourceWithHeaders(string $user, TableNode $headersTable, string $content = '', ?string $spaceId = null): ResponseInterface {
+	public function createNewTUSResourceWithHeaders(
+		string $user,
+		TableNode $headersTable,
+		string $content = '',
+		?string $spaceId = null
+	): ResponseInterface {
 		$this->featureContext->verifyTableNodeColumnsCount($headersTable, 2);
 		$user = $this->featureContext->getActualUsername($user);
 		$password = $this->featureContext->getUserPassword($user);
@@ -163,7 +168,7 @@ class TUSContext implements Context {
 	 *
 	 * @return ResponseInterface
 	 */
-	public function createNewTUSResource(string $user, TableNode $headers, ?string $spaceId = null):ResponseInterface {
+	public function createNewTUSResource(string $user, TableNode $headers, ?string $spaceId = null): ResponseInterface {
 		$rows = $headers->getRows();
 		$rows[] = ['Tus-Resumable', '1.0.0'];
 		return $this->createNewTUSResourceWithHeaders($user, new TableNode($rows), '', $spaceId);
@@ -182,7 +187,14 @@ class TUSContext implements Context {
 	 * @throws GuzzleException
 	 * @throws JsonException
 	 */
-	public function uploadChunkToTUSLocation(string $user, string $resourceLocation, string $offset, string $data, string $checksum = '', ?array $extraHeaders = null): ResponseInterface {
+	public function uploadChunkToTUSLocation(
+		string $user,
+		string $resourceLocation,
+		string $offset,
+		string $data,
+		string $checksum = '',
+		?array $extraHeaders = null
+	): ResponseInterface {
 		$user = $this->featureContext->getActualUsername($user);
 		$password = $this->featureContext->getUserPassword($user);
 		$headers = [
@@ -631,7 +643,12 @@ class TUSContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userUploadsChunkFileWithChecksum(string $user, string $offset, string $data, string $checksum): void {
+	public function userUploadsChunkFileWithChecksum(
+		string $user,
+		string $offset,
+		string $data,
+		string $checksum
+	): void {
 		$resourceLocation = $this->getLastTusResourceLocation();
 		$response = $this->uploadChunkToTUSLocation($user, $resourceLocation, $offset, $data, $checksum);
 		$this->featureContext->setResponse($response);
@@ -648,7 +665,12 @@ class TUSContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userHasUploadedChunkFileWithChecksum(string $user, string $offset, string $data, string $checksum): void {
+	public function userHasUploadedChunkFileWithChecksum(
+		string $user,
+		string $offset,
+		string $data,
+		string $checksum
+	): void {
 		$resourceLocation = $this->getLastTusResourceLocation();
 		$response = $this->uploadChunkToTUSLocation($user, $resourceLocation, $offset, $data, $checksum);
 		$this->featureContext->theHTTPStatusCodeShouldBe(204, "", $response);
@@ -669,7 +691,13 @@ class TUSContext implements Context {
 	 * @throws GuzzleException
 	 * @throws Exception
 	 */
-	public function userOverwritesFileWithChecksum(string $user, string $offset, string $data, string $checksum, TableNode $headers): void {
+	public function userOverwritesFileWithChecksum(
+		string $user,
+		string $offset,
+		string $data,
+		string $checksum,
+		TableNode $headers
+	): void {
 		$createResponse = $this->createNewTUSResource($user, $headers);
 		$this->featureContext->theHTTPStatusCodeShouldBe(201, "", $createResponse);
 		$resourceLocation = $this->getLastTusResourceLocation();

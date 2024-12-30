@@ -1034,7 +1034,11 @@ class FeatureContext extends BehatVariablesContext {
 	private function checkInvalidValidator(JsonSchema $schemaObj): void {
 		$validators = \array_keys((array)$schemaObj->jsonSerialize());
 		foreach ($validators as $validator) {
-			Assert::assertContains(\ltrim($validator, "$"), $this->jsonSchemaValidators, "Invalid schema validator: '$validator'");
+			Assert::assertContains(
+				\ltrim($validator, "$"),
+				$this->jsonSchemaValidators,
+				"Invalid schema validator: '$validator'"
+			);
 		}
 	}
 
@@ -1091,7 +1095,9 @@ class FeatureContext extends BehatVariablesContext {
 			return;
 		}
 
-		$hasTwoElementValidator = ($schemaObj->enum && $schemaObj->const) || ($schemaObj->enum && $schemaObj->items) || ($schemaObj->const && $schemaObj->items);
+		$hasTwoElementValidator = ($schemaObj->enum && $schemaObj->const)
+		|| ($schemaObj->enum && $schemaObj->items)
+		|| ($schemaObj->const && $schemaObj->items);
 		Assert::assertFalse($hasTwoElementValidator, "'items', 'enum' and 'const' should not be used together");
 		if ($schemaObj->enum || $schemaObj->const) {
 			// do not try to validate of enum or const is present
@@ -1113,7 +1119,11 @@ class FeatureContext extends BehatVariablesContext {
 			Assert::assertNotNull($schemaObj->$validator, \sprintf($errMsg, $validator));
 		}
 
-		Assert::assertEquals($schemaObj->minItems, $schemaObj->maxItems, "'minItems' and 'maxItems' should be equal for strict assertion");
+		Assert::assertEquals(
+			$schemaObj->minItems,
+			$schemaObj->maxItems,
+			"'minItems' and 'maxItems' should be equal for strict assertion"
+		);
 
 		// check optional validators
 		foreach ($optionalValidators as $validator) {
@@ -1127,18 +1137,34 @@ class FeatureContext extends BehatVariablesContext {
 					if ($schemaObj->maxItems > 1) {
 						if (\is_array($value)) {
 							foreach ($value as $element) {
-								Assert::assertNotNull($element->oneOf, "'oneOf' is required to assert more than one elements");
+								Assert::assertNotNull(
+									$element->oneOf,
+									"'oneOf' is required to assert more than one elements"
+								);
 							}
 							Assert::fail("'$validator' should be an object not an array");
 						}
-						Assert::assertFalse($value->allOf || $value->anyOf, "'allOf' and 'anyOf' are not allowed in array");
+						Assert::assertFalse(
+							$value->allOf || $value->anyOf,
+							"'allOf' and 'anyOf' are not allowed in array"
+						);
 						if ($value->oneOf) {
-							Assert::assertNotNull($value->oneOf, "'oneOf' is required to assert more than one elements");
+							Assert::assertNotNull(
+								$value->oneOf,
+								"'oneOf' is required to assert more than one elements"
+							);
 							Assert::assertTrue(\is_array($value->oneOf), "'oneOf' should be an array");
-							Assert::assertEquals($schemaObj->maxItems, \count($value->oneOf), "Expected " . $schemaObj->maxItems . " 'oneOf' items but got " . \count($value->oneOf));
+							Assert::assertEquals(
+								$schemaObj->maxItems,
+								\count($value->oneOf),
+								"Expected " . $schemaObj->maxItems . " 'oneOf' items but got " . \count($value->oneOf)
+							);
 						}
 					}
-					Assert::assertTrue(\is_object($value), "'$validator' should be an object when expecting 1 element");
+					Assert::assertTrue(
+						\is_object($value),
+						"'$validator' should be an object when expecting 1 element"
+					);
 					break;
 				case "uniqueItems":
 					if ($schemaObj->minItems > 1) {
@@ -1340,7 +1366,12 @@ class FeatureContext extends BehatVariablesContext {
 	 * @throws GuzzleException
 	 * @throws JsonException
 	 */
-	public function userSendsHTTPMethodToUrlWithHeaders(string $user, string $verb, string $url, TableNode $headersTable): void {
+	public function userSendsHTTPMethodToUrlWithHeaders(
+		string $user,
+		string $verb,
+		string $url,
+		TableNode $headersTable
+	): void {
 		$this->verifyTableNodeColumns(
 			$headersTable,
 			['header', 'value']
@@ -1385,7 +1416,12 @@ class FeatureContext extends BehatVariablesContext {
 	 *
 	 * @return void
 	 */
-	public function userSendsHttpMethodToUrlWithContent(string $user, string $method, string $davPath, string $content): void {
+	public function userSendsHttpMethodToUrlWithContent(
+		string $user,
+		string $method,
+		string $davPath,
+		string $content
+	): void {
 		$this->setResponse($this->sendingToWithDirectUrl($user, $method, $davPath, $content));
 	}
 
@@ -1399,7 +1435,12 @@ class FeatureContext extends BehatVariablesContext {
 	 *
 	 * @return void
 	 */
-	public function userSendsHTTPMethodToUrlWithPassword(string $user, string $verb, string $url, string $password): void {
+	public function userSendsHTTPMethodToUrlWithPassword(
+		string $user,
+		string $verb,
+		string $url,
+		string $password
+	): void {
 		$this->setResponse($this->sendingToWithDirectUrl($user, $verb, $url, null, $password));
 	}
 
@@ -1414,7 +1455,14 @@ class FeatureContext extends BehatVariablesContext {
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
-	public function sendingToWithDirectUrl(string $user, string $verb, string $url, ?string $body = null, ?string $password = null, ?array $headers = null): ResponseInterface {
+	public function sendingToWithDirectUrl(
+		string $user,
+		string $verb,
+		string $url,
+		?string $body = null,
+		?string $password = null,
+		?array $headers = null
+	): ResponseInterface {
 		$url = \ltrim($url, '/');
 		if (WebdavHelper::isDAVRequest($url)) {
 			$url = WebdavHelper::prefixRemotePhp($url);
@@ -1498,12 +1546,17 @@ class FeatureContext extends BehatVariablesContext {
 	 *
 	 * @return void
 	 */
-	public function theHTTPStatusCodeShouldBe($expectedStatusCode, ?string $message = "", ?ResponseInterface $response = null): void {
+	public function theHTTPStatusCodeShouldBe(
+		$expectedStatusCode,
+		?string $message = "",
+		?ResponseInterface $response = null
+	): void {
 		$response = $response ?? $this->response;
 		$actualStatusCode = $response->getStatusCode();
 		if (\is_array($expectedStatusCode)) {
 			if ($message === "") {
-				$message = "HTTP status code $actualStatusCode is not one of the expected values " . \implode(" or ", $expectedStatusCode);
+				$message = "HTTP status code $actualStatusCode is not one of the expected values "
+				. \implode(" or ", $expectedStatusCode);
 			}
 
 			Assert::assertContainsEquals(
@@ -2745,7 +2798,11 @@ class FeatureContext extends BehatVariablesContext {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function verifyTableNodeColumns(?TableNode $table, ?array $requiredHeader = [], ?array $allowedHeader = []): void {
+	public function verifyTableNodeColumns(
+		?TableNode $table,
+		?array $requiredHeader = [],
+		?array $allowedHeader = []
+	): void {
 		if ($table === null || \count($table->getHash()) < 1) {
 			throw new Exception("Table should have at least one row.");
 		}
@@ -2830,14 +2887,17 @@ class FeatureContext extends BehatVariablesContext {
 	public function getBodyForOCSRequest(string $method, string $property): ?string {
 		$body = null;
 		if ($method === 'PROPFIND') {
-			$body = '<?xml version="1.0"?><d:propfind  xmlns:d="DAV:" xmlns:oc="http://owncloud.org/ns"><d:prop><' . $property . '/></d:prop></d:propfind>';
+			$body = '<?xml version="1.0"?><d:propfind  xmlns:d="DAV:" xmlns:oc="http://owncloud.org/ns"><d:prop><'
+			. $property . '/></d:prop></d:propfind>';
 		} elseif ($method === 'LOCK') {
-			$body = "<?xml version='1.0' encoding='UTF-8'?><d:lockinfo xmlns:d='DAV:'> <d:lockscope><" . $property . " /></d:lockscope></d:lockinfo>";
+			$body = "<?xml version='1.0' encoding='UTF-8'?><d:lockinfo xmlns:d='DAV:'> <d:lockscope><"
+			. $property . " /></d:lockscope></d:lockinfo>";
 		} elseif ($method === 'PROPPATCH') {
 			if ($property === 'favorite') {
 				$property = '<oc:favorite xmlns:oc="http://owncloud.org/ns">1</oc:favorite>';
 			}
-			$body = '<?xml version="1.0"?><d:propertyupdate xmlns:d="DAV:" xmlns:oc="http://owncloud.org/ns"><d:set><d:prop>' . $property . '</d:prop></d:set></d:propertyupdate>';
+			$body = '<?xml version="1.0"?><d:propertyupdate xmlns:d="DAV:" xmlns:oc="http://owncloud.org/ns"><d:set>'
+			. "<d:prop>" . $property . '</d:prop></d:set></d:propertyupdate>';
 		}
 		if ($property === '') {
 			$body = '';
@@ -2877,7 +2937,7 @@ class FeatureContext extends BehatVariablesContext {
 	 * @return string
 	 * @throws Exception|GuzzleException
 	 */
-	public function getGroupIdByGroupName(string $groupName):string {
+	public function getGroupIdByGroupName(string $groupName): string {
 		$response = GraphHelper::getGroup(
 			$this->getBaseUrl(),
 			$this->getStepLineRef(),

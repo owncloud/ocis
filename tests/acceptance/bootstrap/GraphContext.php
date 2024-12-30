@@ -81,7 +81,11 @@ class GraphContext implements Context {
 	 * @throws GuzzleException
 	 * @throws Exception
 	 */
-	public function theUserChangesTheDisplayNameOfUserToUsingTheGraphApi(string $byUser, string $user, string $displayName): void {
+	public function theUserChangesTheDisplayNameOfUserToUsingTheGraphApi(
+		string $byUser,
+		string $user,
+		string $displayName
+	): void {
 		$response = $this->editUserUsingTheGraphApi($byUser, $user, null, null, null, $displayName);
 		$this->featureContext->setResponse($response);
 	}
@@ -98,7 +102,11 @@ class GraphContext implements Context {
 	 * @throws GuzzleException
 	 * @throws Exception
 	 */
-	public function theUserChangesTheUserNameOfUserToUsingTheGraphApi(string $byUser, string $user, string $userName): void {
+	public function theUserChangesTheUserNameOfUserToUsingTheGraphApi(
+		string $byUser,
+		string $user,
+		string $userName
+	): void {
 		$response = $this->editUserUsingTheGraphApi($byUser, $user, $userName);
 		$this->featureContext->setResponse($response);
 		// need to add user to list to delete him after test
@@ -189,7 +197,16 @@ class GraphContext implements Context {
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function editUserUsingTheGraphApi(string $byUser, string $user, string $userName = null, string $password = null, string $email = null, string $displayName = null, bool $accountEnabled = true, string $method="PATCH"): ResponseInterface {
+	public function editUserUsingTheGraphApi(
+		string $byUser,
+		string $user,
+		string $userName = null,
+		string $password = null,
+		string $email = null,
+		string $displayName = null,
+		bool $accountEnabled = true,
+		string $method="PATCH"
+	): ResponseInterface {
 		$user = $this->featureContext->getActualUsername($user);
 		$userId = $this->featureContext->getAttributeOfCreatedUser($user, 'id') ?: $user;
 		return GraphHelper::editUser(
@@ -528,8 +545,10 @@ class GraphContext implements Context {
 	 * @return array
 	 */
 	public function getAdminOrUserCredentials(?string $user): array {
-		$credentials["username"] = $user ? $this->featureContext->getActualUsername($user) : $this->featureContext->getAdminUsername();
-		$credentials["password"] = $user ? $this->featureContext->getPasswordForUser($user) : $this->featureContext->getAdminPassword();
+		$credentials["username"] = $user ? $this->featureContext->getActualUsername($user)
+		: $this->featureContext->getAdminUsername();
+		$credentials["password"] = $user ? $this->featureContext->getPasswordForUser($user)
+		: $this->featureContext->getAdminPassword();
 		return $credentials;
 	}
 	/**
@@ -574,7 +593,7 @@ class GraphContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function adminHasRetrievedGroupListUsingTheGraphApi(): array {
-		return  $this->getArrayOfGroupsResponded($this->listGroups());
+		return $this->getArrayOfGroupsResponded($this->listGroups());
 	}
 
 	/**
@@ -605,7 +624,10 @@ class GraphContext implements Context {
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
-	public function listSingleOrAllGroupsAlongWithAllMemberInformation(string $user, ?string $group = null): ResponseInterface {
+	public function listSingleOrAllGroupsAlongWithAllMemberInformation(
+		string $user,
+		?string $group = null
+	): ResponseInterface {
 		$credentials = $this->getAdminOrUserCredentials($user);
 
 		return GraphHelper::getSingleOrAllGroupsAlongWithMembers(
@@ -759,7 +781,10 @@ class GraphContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function theAdministratorTriesToAddNonExistentUserToGroupUsingTheGraphAPI(string $group, ?string $byUser = null): void {
+	public function theAdministratorTriesToAddNonExistentUserToGroupUsingTheGraphAPI(
+		string $group,
+		?string $byUser = null
+	): void {
 		$this->featureContext->setResponse($this->addUserToGroup($group, "nonexistent", $byUser));
 	}
 
@@ -774,7 +799,10 @@ class GraphContext implements Context {
 	 *
 	 * @throws GuzzleException | Exception
 	 */
-	public function theAdministratorTriesToAddUserToNonExistentGroupUsingTheGraphAPI(string $user, ?string $byUser = null): void {
+	public function theAdministratorTriesToAddUserToNonExistentGroupUsingTheGraphAPI(
+		string $user,
+		?string $byUser = null
+	): void {
 		$this->featureContext->setResponse($this->addUserToGroup("nonexistent", $user, $byUser));
 	}
 
@@ -799,7 +827,11 @@ class GraphContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function theUserTriesToAddAnotherUserToGroupUsingTheGraphAPI(string $byUser, string $user, string $group): void {
+	public function theUserTriesToAddAnotherUserToGroupUsingTheGraphAPI(
+		string $byUser,
+		string $user,
+		string $group
+	): void {
 		$this->featureContext->setResponse($this->addUserToGroup($group, $user, $byUser));
 	}
 
@@ -1032,7 +1064,8 @@ class GraphContext implements Context {
 			Assert::assertTrue(
 				$exists,
 				__METHOD__
-				. "\nExpected user '" . $userGroup['username'] . "' to be in group '" . $userGroup['groupname'] . "'. But not found."
+				. "\nExpected user '" . $userGroup['username'] . "' to be in group '"
+				. $userGroup['groupname'] . "'. But not found."
 			);
 		}
 	}
@@ -1098,12 +1131,16 @@ class GraphContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function theAdministratorRemovesTheFollowingUsersFromTheFollowingGroupsUsingTheGraphApi(TableNode $table): void {
+	public function theAdministratorRemovesTheFollowingUsersFromTheFollowingGroupsUsingTheGraphApi(
+		TableNode $table
+	): void {
 		$this->featureContext->verifyTableNodeColumns($table, ['username', 'groupname']);
 		$usersGroups = $table->getColumnsHash();
 
 		foreach ($usersGroups as $userGroup) {
-			$this->featureContext->setResponse($this->removeUserFromGroup($userGroup['groupname'], $userGroup['username']));
+			$this->featureContext->setResponse(
+				$this->removeUserFromGroup($userGroup['groupname'], $userGroup['username'])
+			);
 			$this->featureContext->pushToLastHttpStatusCodesArray();
 		}
 	}
@@ -1118,7 +1155,11 @@ class GraphContext implements Context {
 	 * @return void
 	 * @throws Exception | GuzzleException
 	 */
-	public function theUserTriesToRemoveAnotherUserFromGroupUsingTheGraphAPI(string $user, string $group, ?string $byUser = null): void {
+	public function theUserTriesToRemoveAnotherUserFromGroupUsingTheGraphAPI(
+		string $user,
+		string $group,
+		?string $byUser = null
+	): void {
 		$this->featureContext->setResponse($this->removeUserFromGroup($group, $user, $byUser));
 	}
 
@@ -1132,7 +1173,10 @@ class GraphContext implements Context {
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function theUserTriesToRemoveAnotherUserFromNonExistentGroupUsingTheGraphAPI(string $user, ?string $byUser = null): void {
+	public function theUserTriesToRemoveAnotherUserFromNonExistentGroupUsingTheGraphAPI(
+		string $user,
+		?string $byUser = null
+	): void {
 		$this->featureContext->setResponse($this->removeUserFromGroup('', $user, $byUser));
 	}
 
@@ -1145,7 +1189,7 @@ class GraphContext implements Context {
 	 */
 	public function retrieveUserInformationUsingGraphApi(
 		string $user
-	):ResponseInterface {
+	): ResponseInterface {
 		$credentials = $this->getAdminOrUserCredentials($user);
 		return GraphHelper::getOwnInformationAndGroupMemberships(
 			$this->featureContext->getBaseUrl(),
@@ -1165,7 +1209,7 @@ class GraphContext implements Context {
 	 */
 	public function userRetrievesHisOrHerInformationOfUserUsingGraphApi(
 		string $user
-	):void {
+	): void {
 		$response = $this->retrieveUserInformationUsingGraphApi($user);
 		$this->featureContext->setResponse($response);
 	}
@@ -1266,7 +1310,7 @@ class GraphContext implements Context {
 	public function retrieveUserInformationAlongWithDriveUsingGraphApi(
 		string $byUser,
 		?string $user = null
-	):ResponseInterface {
+	): ResponseInterface {
 		$user = $user ?? $byUser;
 		$credentials = $this->getAdminOrUserCredentials($user);
 		return GraphHelper::getUserWithDriveInformation(
@@ -1289,7 +1333,7 @@ class GraphContext implements Context {
 	public function retrieveUserInformationAlongWithGroupUsingGraphApi(
 		string $byUser,
 		?string $user = null
-	):ResponseInterface {
+	): ResponseInterface {
 		$user = $user ?? $byUser;
 		$credentials = $this->getAdminOrUserCredentials($user);
 		return GraphHelper::getUserWithGroupInformation(
@@ -1351,7 +1395,11 @@ class GraphContext implements Context {
 	 * @throws GuzzleException
 	 * @throws Exception
 	 */
-	public function addMultipleUsersToGroup(string $user, array $userIds, string $groupId): ResponseInterface {
+	public function addMultipleUsersToGroup(
+		string $user,
+		array $userIds,
+		string $groupId
+	): ResponseInterface {
 		$credentials = $this->getAdminOrUserCredentials($user);
 
 		return GraphHelper::addUsersToGroup(
@@ -1375,7 +1423,11 @@ class GraphContext implements Context {
 	 * @throws Exception
 	 * @throws GuzzleException
 	 */
-	public function theAdministratorAddsTheFollowingUsersToAGroupInASingleRequestUsingTheGraphApi(string $user, string $group, TableNode $table): void {
+	public function theAdministratorAddsTheFollowingUsersToAGroupInASingleRequestUsingTheGraphApi(
+		string $user,
+		string $group,
+		TableNode $table
+	): void {
 		$userIds = [];
 		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
 		foreach ($table->getHash() as $row) {
@@ -1397,7 +1449,11 @@ class GraphContext implements Context {
 	 * @throws Exception
 	 * @throws GuzzleException
 	 */
-	public function userTriesToAddTheFollowingUsersToAGroupAtOnceWithInvalidHostUsingTheGraphApi(string $user, string $group, TableNode $table): void {
+	public function userTriesToAddTheFollowingUsersToAGroupAtOnceWithInvalidHostUsingTheGraphApi(
+		string $user,
+		string $group,
+		TableNode $table
+	): void {
 		$userIds = [];
 		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
 		$credentials = $this->getAdminOrUserCredentials($user);
@@ -1436,7 +1492,11 @@ class GraphContext implements Context {
 	 * @throws Exception
 	 * @throws GuzzleException
 	 */
-	public function userTriesToAddUserToGroupWithInvalidHostUsingTheGraphApi(string $adminUser, string $user, string $group): void {
+	public function userTriesToAddUserToGroupWithInvalidHostUsingTheGraphApi(
+		string $adminUser,
+		string $user,
+		string $group
+	): void {
 		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
 		$userId = $this->featureContext->getAttributeOfCreatedUser($user, "id");
 		$credentials = $this->getAdminOrUserCredentials($adminUser);
@@ -1467,7 +1527,10 @@ class GraphContext implements Context {
 	 * @throws GuzzleException
 	 * @throws Exception
 	 */
-	public function theAdministratorTriesToAddsTheFollowingUsersToANonExistingGroupAtOnceUsingTheGraphApi(string $user, TableNode $table): void {
+	public function theAdministratorTriesToAddsTheFollowingUsersToANonExistingGroupAtOnceUsingTheGraphApi(
+		string $user,
+		TableNode $table
+	): void {
 		$userIds = [];
 		$groupId = WebDavHelper::generateUUIDv4();
 		foreach ($table->getHash() as $row) {
@@ -1489,7 +1552,11 @@ class GraphContext implements Context {
 	 * @throws GuzzleException
 	 * @throws Exception
 	 */
-	public function theAdministratorTriesToAddTheFollowingNonExistingUsersToAGroupAtOnceUsingTheGraphApi(string $user, string $group, TableNode $table): void {
+	public function theAdministratorTriesToAddTheFollowingNonExistingUsersToAGroupAtOnceUsingTheGraphApi(
+		string $user,
+		string $group,
+		TableNode $table
+	): void {
 		$userIds = [];
 		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
 		foreach ($table->getHash() as $row) {
@@ -1512,7 +1579,11 @@ class GraphContext implements Context {
 	 * @throws GuzzleException
 	 * @throws Exception
 	 */
-	public function theAdministratorTriesToAddTheFollowingUsersToAGroupAtOnceUsingTheGraphApi(string $user, string $group, TableNode $table): void {
+	public function theAdministratorTriesToAddTheFollowingUsersToAGroupAtOnceUsingTheGraphApi(
+		string $user,
+		string $group,
+		TableNode $table
+	): void {
 		$userIds = [];
 		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
 		foreach ($table->getHash() as $row) {
@@ -1550,7 +1621,11 @@ class GraphContext implements Context {
 	 * @return void
 	 */
 	public function theResponseShouldContainTheFollowingApplicationInformation(TableNode $table): void {
-		Assert::assertIsArray($responseArray = ($this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse()))['value'][0]);
+		Assert::assertIsArray(
+			$responseArray = (
+				$this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse())
+			)['value'][0]
+		);
 		foreach ($table->getHash() as $row) {
 			$key = $row["key"];
 			if ($key === 'id') {
@@ -1572,7 +1647,11 @@ class GraphContext implements Context {
 	 * @return void
 	 */
 	public function theResponseShouldContainTheFollowingAppRolesInformation(TableNode $table): void {
-		Assert::assertIsArray($responseArray = ($this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse()))['value'][0]);
+		Assert::assertIsArray(
+			$responseArray = (
+				$this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse())
+			)['value'][0]
+		);
 		foreach ($table->getRows() as $row) {
 			$foundRoleInResponse = false;
 			foreach ($responseArray['appRoles'] as $role) {
@@ -1640,7 +1719,11 @@ class GraphContext implements Context {
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function userGetsAllUsersOfFirstGroupOderSecondGroupUsingTheGraphApi(string $user, string $firstGroup, string $secondGroup) {
+	public function userGetsAllUsersOfFirstGroupOderSecondGroupUsingTheGraphApi(
+		string $user,
+		string $firstGroup,
+		string $secondGroup
+	) {
 		$response = GraphHelper::getUsersFromOneOrOtherGroup(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
@@ -1708,7 +1791,11 @@ class GraphContext implements Context {
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function userGetsAllUsersWithRoleAndMemberOfGroupUsingTheGraphApi(string $user, string $role, string $group) {
+	public function userGetsAllUsersWithRoleAndMemberOfGroupUsingTheGraphApi(
+		string $user,
+		string $role,
+		string $group
+	) {
 		$response = GraphHelper::getUsersWithFilterRolesAssignmentAndMemberOf(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
@@ -1841,7 +1928,8 @@ class GraphContext implements Context {
 			$this->appEntity["appRoles"][$role],
 			$response['appRoleId'],
 			__METHOD__
-			. "\nExpected rolId for role '$role'' to be '" . $this->appEntity["appRoles"][$role] . "' but got '" . $response['appRoleId'] . "'"
+			. "\nExpected rolId for role '$role'' to be '" . $this->appEntity["appRoles"][$role]
+			 . "' but got '" . $response['appRoleId'] . "'"
 		);
 	}
 
@@ -1890,7 +1978,7 @@ class GraphContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function userSearchesForGroupUsingGraphApi(string $user, string $searchTerm):void {
+	public function userSearchesForGroupUsingGraphApi(string $user, string $searchTerm): void {
 		$credentials = $this->getAdminOrUserCredentials($user);
 		$this->featureContext->setResponse(
 			GraphHelper::searchGroup(
@@ -1953,7 +2041,11 @@ class GraphContext implements Context {
 	 * @throws GuzzleException
 	 * @throws Exception
 	 */
-	public function theAdministratorHasAddedTheFollowingUsersToAGroupAtOnceUsingTheGraphApi(string $user, string $group, TableNode $table) {
+	public function theAdministratorHasAddedTheFollowingUsersToAGroupAtOnceUsingTheGraphApi(
+		string $user,
+		string $group,
+		TableNode $table
+	) {
 		$userIds = [];
 		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
 		foreach ($table->getHash() as $row) {
@@ -1975,13 +2067,18 @@ class GraphContext implements Context {
 	 * @throws GuzzleException
 	 * @throws Exception
 	 */
-	public function theAdministratorTriesToAddGroupToAGroupAtOnceUsingTheGraphApi(string $user, string $groupToAdd, string $group) {
+	public function theAdministratorTriesToAddGroupToAGroupAtOnceUsingTheGraphApi(
+		string $user,
+		string $groupToAdd,
+		string $group
+	) {
 		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
 		$groupIdToAdd = $this->featureContext->getAttributeOfCreatedGroup($groupToAdd, "id");
 		$credentials = $this->getAdminOrUserCredentials($user);
 
 		$payload = [
-			"members@odata.bind" => [GraphHelper::getFullUrl($this->featureContext->getBaseUrl(), 'groups/' . $groupIdToAdd)]
+			"members@odata.bind" => [
+				GraphHelper::getFullUrl($this->featureContext->getBaseUrl(), 'groups/' . $groupIdToAdd)]
 		];
 
 		$this->featureContext->setResponse(
@@ -2008,7 +2105,11 @@ class GraphContext implements Context {
 	 * @throws GuzzleException
 	 * @throws Exception
 	 */
-	public function theAdministratorTriesToAddAGroupToAGroupThroughPostRequestUsingTheGraphApi(string $user, string $groupToAdd, string $group) {
+	public function theAdministratorTriesToAddAGroupToAGroupThroughPostRequestUsingTheGraphApi(
+		string $user,
+		string $groupToAdd,
+		string $group
+	) {
 		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
 		$groupIdToAdd = $this->featureContext->getAttributeOfCreatedGroup($groupToAdd, "id");
 		$credentials = $this->getAdminOrUserCredentials($user);
@@ -2041,7 +2142,12 @@ class GraphContext implements Context {
 	 * @throws Exception
 	 * @throws GuzzleException
 	 */
-	public function userTriesToAddUserToGroupWithInvalidJsonUsingTheGraphApi(string $adminUser, string $user, string $group, string $invalidJSON): void {
+	public function userTriesToAddUserToGroupWithInvalidJsonUsingTheGraphApi(
+		string $adminUser,
+		string $user,
+		string $group,
+		string $invalidJSON
+	): void {
 		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
 		$credentials = $this->getAdminOrUserCredentials($adminUser);
 
@@ -2078,7 +2184,12 @@ class GraphContext implements Context {
 	 * @throws Exception
 	 * @throws GuzzleException
 	 */
-	public function userTriesToAddTheFollowingUsersToAGroupAtOnceWithInvalidJsonUsingTheGraphApi(string $user, string $group, string $invalidJSON, TableNode $table): void {
+	public function userTriesToAddTheFollowingUsersToAGroupAtOnceWithInvalidJsonUsingTheGraphApi(
+		string $user,
+		string $group,
+		string $invalidJSON,
+		TableNode $table
+	): void {
 		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
 		$credentials = $this->getAdminOrUserCredentials($user);
 		foreach ($table->getHash() as $row) {
@@ -2116,7 +2227,11 @@ class GraphContext implements Context {
 	 * @throws GuzzleException
 	 * @throws Exception
 	 */
-	public function theAdministratorTriesToAddTheFollowingUserIdWithInvalidCharacterToAGroup(string $user, string $group, TableNode $table) {
+	public function theAdministratorTriesToAddTheFollowingUserIdWithInvalidCharacterToAGroup(
+		string $user,
+		string $group,
+		TableNode $table
+	) {
 		$userIds = [];
 		$credentials = $this->getAdminOrUserCredentials($user);
 		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
@@ -2146,7 +2261,11 @@ class GraphContext implements Context {
 	 * @throws GuzzleException
 	 * @throws Exception
 	 */
-	public function theAdministratorTriesToAddUserIdWithInvalidCharactersToAGroup(string $user, string $userId, string $group): void {
+	public function theAdministratorTriesToAddUserIdWithInvalidCharactersToAGroup(
+		string $user,
+		string $userId,
+		string $group
+	): void {
 		$credentials = $this->getAdminOrUserCredentials($user);
 		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
 		$this->featureContext->setResponse(
@@ -2183,7 +2302,8 @@ class GraphContext implements Context {
 		Assert::assertEquals(
 			1,
 			$count,
-			"Expected user '" . $user . "' to be added once to group '" . $group . "' but the user is listed '" . $count . "' times"
+			"Expected user '" . $user . "' to be added once to group '"
+			. $group . "' but the user is listed '" . $count . "' times"
 		);
 	}
 
@@ -2248,7 +2368,11 @@ class GraphContext implements Context {
 	 * @throws Exception
 	 *
 	 */
-	public function downloadedJsonContentShouldContainEventTypeInItemAndShouldMatch(string $eventType, ?string $spaceType=null, PyStringNode $schemaString=null): void {
+	public function downloadedJsonContentShouldContainEventTypeInItemAndShouldMatch(
+		string $eventType,
+		?string $spaceType=null,
+		PyStringNode $schemaString=null
+	): void {
 		$actualResponseToAssert = null;
 		$events = $this->featureContext->getJsonDecodedResponseBodyContent()->events;
 		foreach ($events as $event) {
@@ -2307,7 +2431,11 @@ class GraphContext implements Context {
 	 * @return void
 	 *
 	 */
-	public function userTriesToExportGdprReportOfAnotherUserUsingGraphApi(string $user, string $ofUser, string $path): void {
+	public function userTriesToExportGdprReportOfAnotherUserUsingGraphApi(
+		string $user,
+		string $ofUser,
+		string $path
+	): void {
 		$credentials = $this->getAdminOrUserCredentials($user);
 		$this->featureContext->setResponse(
 			GraphHelper::generateGDPRReport(
@@ -2328,7 +2456,8 @@ class GraphContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function getAssignedRole(string $user): ResponseInterface {
-		$userId = $this->featureContext->getAttributeOfCreatedUser($user, 'id') ?: $this->featureContext->getUserIdByUserName($user);
+		$userId = $this->featureContext->getAttributeOfCreatedUser($user, 'id')
+		?: $this->featureContext->getUserIdByUserName($user);
 		return (
 			GraphHelper::getAssignedRole(
 				$this->featureContext->getBAseUrl(),
@@ -2359,7 +2488,9 @@ class GraphContext implements Context {
 		if (!$userId && $ofUser !== $this->featureContext->getAdminUsername()) {
 			$appRoleAssignmentId = $this->getRoleIdByRoleName("User");
 		} else {
-			$appRoleAssignmentId = $this->featureContext->getJsonDecodedResponse($this->getAssignedRole($ofUser))["value"][0]["id"];
+			$appRoleAssignmentId = $this->featureContext->getJsonDecodedResponse(
+				$this->getAssignedRole($ofUser)
+			)["value"][0]["id"];
 		}
 
 		$userId = $userId ?: $ofUser;
@@ -2508,7 +2639,11 @@ class GraphContext implements Context {
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function userListsTheResourcesSharedWithThemUsingGraphApi(string $user, string $cacheStepString, string $retryOption): void {
+	public function userListsTheResourcesSharedWithThemUsingGraphApi(
+		string $user,
+		string $cacheStepString,
+		string $retryOption
+	): void {
 		if ($cacheStepString !== '') {
 			// ENV (GRAPH_SPACES_GROUPS_CACHE_TTL | GRAPH_SPACES_USERS_CACHE_TTL) is set default to 60 sec
 			// which means 60 sec is required to clean up all the user|group cache once they are deleted
@@ -2537,7 +2672,9 @@ class GraphContext implements Context {
 			if ($retryEnabled) {
 				foreach ($jsonBody->value as $share) {
 					$autoSync = $this->featureContext->getUserAutoSyncSetting($credentials['username']);
-					$tryAgain = !$share->{'@client.synchronize'} && $autoSync && $retried < HttpRequestHelper::numRetriesOnHttpTooEarly();
+					$tryAgain = !$share->{'@client.synchronize'}
+					&& $autoSync
+					&& $retried < HttpRequestHelper::numRetriesOnHttpTooEarly();
 
 					if ($tryAgain) {
 						$retried += 1;
@@ -2676,7 +2813,11 @@ class GraphContext implements Context {
 	 * @throws GuzzleException
 	 * @throws JsonException
 	 */
-	public function userUsingPasswordShouldBeAbleToCreateANewUserWithDefaultAttributes(string $byUser, string $password, string $user): void {
+	public function userUsingPasswordShouldBeAbleToCreateANewUserWithDefaultAttributes(
+		string $byUser,
+		string $password,
+		string $user
+	): void {
 		$response = GraphHelper::createUser(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
@@ -2749,7 +2890,7 @@ class GraphContext implements Context {
 	 * @throws GuzzleException
 	 * @throws Exception
 	 */
-	public function getPermissionRoleDefinitionUsingGraphAPI(string $user, string $permissionRole):void {
+	public function getPermissionRoleDefinitionUsingGraphAPI(string $user, string $permissionRole): void {
 		$credentials = $this->getAdminOrUserCredentials($user);
 		$this->featureContext->setResponse(
 			GraphHelper::getPermissionRoleDefinition(
@@ -2772,7 +2913,11 @@ class GraphContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userListsTheActivitiesForResourceOfSpaceUsingTheGraphAPI(string $user, string $resource, string $spaceName): void {
+	public function userListsTheActivitiesForResourceOfSpaceUsingTheGraphAPI(
+		string $user,
+		string $resource,
+		string $spaceName
+	): void {
 		$resourceId = $this->featureContext->spacesContext->getResourceId($user, $spaceName, $resource);
 		$response = GraphHelper::getActivities(
 			$this->featureContext->getBaseUrl(),
@@ -2792,7 +2937,10 @@ class GraphContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function userTriesToListTheActivitiesOfFolderWithShareMountIdPointIdUsingTheGraphApi(string $user, string $folder): void {
+	public function userTriesToListTheActivitiesOfFolderWithShareMountIdPointIdUsingTheGraphApi(
+		string $user,
+		string $folder
+	): void {
 		$resourceId = GraphHelper::getShareMountId(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
@@ -2820,7 +2968,12 @@ class GraphContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function userTriesToListActivitiesOfFileFromSpaceOwnedByUserUsingTheGraphApi(string $user, string $file, string $owner, string $spaceName): void {
+	public function userTriesToListActivitiesOfFileFromSpaceOwnedByUserUsingTheGraphApi(
+		string $user,
+		string $file,
+		string $owner,
+		string $spaceName
+	): void {
 		$resourceId = $this->featureContext->spacesContext->getResourceId($owner, $spaceName, $file);
 		$response = GraphHelper::getActivities(
 			$this->featureContext->getBaseUrl(),
@@ -2861,7 +3014,11 @@ class GraphContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function thePublicTriesToCheckTheActivitiesOfSpaceOwnedByUserWithPasswordUsingGraphApi(string $spaceName, string $user, string $password): void {
+	public function thePublicTriesToCheckTheActivitiesOfSpaceOwnedByUserWithPasswordUsingGraphApi(
+		string $spaceName,
+		string $user,
+		string $password
+	): void {
 		$response = GraphHelper::getActivities(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
@@ -2882,7 +3039,12 @@ class GraphContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function thePublicTriesToCheckTheActivitiesOfResourceFromSpaceOwnedByUserWithPasswordUsingGraphApi(string $resource, string $space, string $owner, string $password): void {
+	public function thePublicTriesToCheckTheActivitiesOfResourceFromSpaceOwnedByUserWithPasswordUsingGraphApi(
+		string $resource,
+		string $space,
+		string $owner,
+		string $password
+	): void {
 		$response = GraphHelper::getActivities(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
@@ -2904,7 +3066,13 @@ class GraphContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function userListsTheActivitiesForFolderOfSpaceWithDepthOrLimitUsingTheGraphApi(string $user, string $resource, string $spaceName, string $filterType, string $filterValue): void {
+	public function userListsTheActivitiesForFolderOfSpaceWithDepthOrLimitUsingTheGraphApi(
+		string $user,
+		string $resource,
+		string $spaceName,
+		string $filterType,
+		string $filterValue
+	): void {
 		$resourceId = $this->featureContext->spacesContext->getResourceId($user, $spaceName, $resource);
 		$response = GraphHelper::getActivities(
 			$this->featureContext->getBaseUrl(),
@@ -2932,7 +3100,8 @@ class GraphContext implements Context {
 		foreach ($table->getHash() as $index => $expectedValue) {
 			$actualActivity = $activities[$index];
 			$expectedActivity = $expectedValue['resource'] . ":" . $expectedValue['message'];
-			$actualActivity = $actualActivity->template->variables->resource->name . ":" . $actualActivity->template->message;
+			$actualActivity = $actualActivity->template->variables->resource->name
+			. ":" . $actualActivity->template->message;
 			Assert::assertEquals($expectedActivity, $actualActivity, "Activity didn't match");
 		}
 	}

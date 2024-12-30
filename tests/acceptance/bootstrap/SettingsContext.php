@@ -263,7 +263,11 @@ class SettingsContext implements Context {
 		$assignmentResponse = $this->featureContext->getJsonDecodedResponseBodyContent($response);
 		if (isset($assignmentResponse->assignments[0]->roleId)) {
 			$actualRoleId = $assignmentResponse->assignments[0]->roleId;
-			Assert::assertEquals($this->getRoleIdByRoleName($this->featureContext->getAdminUserName(), $role), $actualRoleId, "user $user has no role $role");
+			Assert::assertEquals(
+				$this->getRoleIdByRoleName($this->featureContext->getAdminUserName(), $role),
+				$actualRoleId,
+				"user $user has no role $role"
+			);
 		} else {
 			Assert::fail("Response should contain user role but not found.\n" . json_encode($assignmentResponse));
 		}
@@ -279,8 +283,14 @@ class SettingsContext implements Context {
 	 * @throws Exception
 	 */
 	public function theSettingApiResponseShouldHaveTheRole(string $role): void {
-		$assignmentRoleId = $this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse())["assignments"][0]["roleId"];
-		Assert::assertEquals($this->getRoleIdByRoleName($this->featureContext->getAdminUserName(), $role), $assignmentRoleId, "user has no role $role");
+		$assignmentRoleId = $this->featureContext->getJsonDecodedResponse(
+			$this->featureContext->getResponse()
+		)["assignments"][0]["roleId"];
+		Assert::assertEquals(
+			$this->getRoleIdByRoleName($this->featureContext->getAdminUserName(), $role),
+			$assignmentRoleId,
+			"user has no role $role"
+		);
 	}
 
 	/**

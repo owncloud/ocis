@@ -86,7 +86,13 @@ class CollaborationContext implements Context {
 	 *
 	 * @throws GuzzleException
 	 */
-	public function userChecksTheInformationOfFileOfSpaceUsingOffice(string $user, string $file, string $space, string $app, string $viewMode = null): void {
+	public function userChecksTheInformationOfFileOfSpaceUsingOffice(
+		string $user,
+		string $file,
+		string $space,
+		string $app,
+		string $viewMode = null
+	): void {
 		$fileId = $this->spacesContext->getFileId($user, $space, $file);
 		$response = \json_decode(
 			CollaborationHelper::sendPOSTRequestToAppOpen(
@@ -127,7 +133,12 @@ class CollaborationContext implements Context {
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function userCreatesFileInsideFolderInSpaceUsingWopiEndpoint(string $user, string $file, string $folder, string $space): void {
+	public function userCreatesFileInsideFolderInSpaceUsingWopiEndpoint(
+		string $user,
+		string $file,
+		string $folder,
+		string $space
+	): void {
 		$parentContainerId = $this->spacesContext->getResourceId($user, $space, $folder);
 		$this->featureContext->setResponse(
 			CollaborationHelper::createFile(
@@ -193,7 +204,10 @@ class CollaborationContext implements Context {
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function thePublicCreatesAFileInsideTheLastSharedPublicLinkFolderWithPasswordUsingWopiEndpoint(string $file, string $password): void {
+	public function thePublicCreatesAFileInsideTheLastSharedPublicLinkFolderWithPasswordUsingWopiEndpoint(
+		string $file,
+		string $password
+	): void {
 		$this->createFile($file, $password);
 	}
 
@@ -208,7 +222,11 @@ class CollaborationContext implements Context {
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function thePublicCreatesAFileInsideFolderInTheLastSharedPublicLinkSpaceWithPasswordUsingWopiEndpoint(string $file, string $folder, string $password): void {
+	public function thePublicCreatesAFileInsideFolderInTheLastSharedPublicLinkSpaceWithPasswordUsingWopiEndpoint(
+		string $file,
+		string $folder,
+		string $password
+	): void {
 		$this->createFile($file, $password, $folder);
 	}
 
@@ -225,7 +243,12 @@ class CollaborationContext implements Context {
 	 * @throws GuzzleException
 	 * @throws JsonException
 	 */
-	public function userTriesToCheckTheInformationOfFileOfSpaceUsingOfficeWithInvalidFileId(string $user, string $file, string $space, string $app): void {
+	public function userTriesToCheckTheInformationOfFileOfSpaceUsingOfficeWithInvalidFileId(
+		string $user,
+		string $file,
+		string $space,
+		string $app
+	): void {
 		$response = \json_decode(
 			CollaborationHelper::sendPOSTRequestToAppOpen(
 				$this->spacesContext->getFileId($user, $space, $file),
@@ -335,9 +358,11 @@ class CollaborationContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function theFollowingMimeTypesShouldExistForUser(string $shouldOrNot, TableNode $table):void {
+	public function theFollowingMimeTypesShouldExistForUser(string $shouldOrNot, TableNode $table): void {
 		$rows = $table->getRows();
-		$responseArray = $this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse())['mime-types'];
+		$responseArray = $this->featureContext->getJsonDecodedResponse(
+			$this->featureContext->getResponse()
+		)['mime-types'];
 		$mimeTypes = \array_column($responseArray, 'mime_type');
 		foreach ($rows as $row) {
 			if ($shouldOrNot === "should not") {
@@ -364,10 +389,17 @@ class CollaborationContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function theAppListResponseShouldContainTheFollowingTemplateInformationForOffice(string $app, TableNode $table): void {
+	public function theAppListResponseShouldContainTheFollowingTemplateInformationForOffice(
+		string $app,
+		TableNode $table
+	): void {
 		$responseArray = $this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse());
 
-		Assert::assertArrayHasKey("mime-types", $responseArray, "Expected 'mime-types' in the response but not found.\n" . print_r($responseArray, true));
+		Assert::assertArrayHasKey(
+			"mime-types",
+			$responseArray,
+			"Expected 'mime-types' in the response but not found.\n" . print_r($responseArray, true)
+		);
 
 		$mimeTypes = $responseArray['mime-types'];
 
@@ -377,7 +409,12 @@ class CollaborationContext implements Context {
 		}
 
 		foreach ($table->getColumnsHash() as $row) {
-			Assert::assertArrayHasKey($row['mime-type'], $mimeTypeMap, "Expected mime-type '{$row['mime-type']}' to exist in the response but it doesn't.\n" . print_r($mimeTypeMap, true));
+			Assert::assertArrayHasKey(
+				$row['mime-type'],
+				$mimeTypeMap,
+				"Expected mime-type '{$row['mime-type']}' to exist in the response but it doesn't.\n"
+				. print_r($mimeTypeMap, true)
+			);
 
 			$mimeType = $mimeTypeMap[$row['mime-type']];
 			$found = false;
@@ -387,7 +424,8 @@ class CollaborationContext implements Context {
 					Assert::assertSame(
 						$row['target-extension'],
 						$provider['target_ext'],
-						"Expected 'target_ext' for $app to be '{$row['target-extension']}' but found '{$provider['target_ext']}'"
+						"Expected 'target_ext' for $app to be '{$row['target-extension']}'"
+						. " but found '{$provider['target_ext']}'"
 					);
 					$found = true;
 					break;
@@ -396,8 +434,10 @@ class CollaborationContext implements Context {
 
 			if (!$found) {
 				Assert::fail(
-					"Expected response to contain app-provider '$app' with target-extension '{$row['target-extension']}' for mime-type '{$row['mime-type']}', but no matching provider was found.\n" .
-					"App Providers Found: " . print_r($mimeType['app_providers'], true)
+					"Expected response to contain app-provider '$app' with target-extension "
+					. "'{$row['target-extension']}' for mime-type '{$row['mime-type']}',"
+					. " but no matching provider was found.\n App Providers Found: "
+					. print_r($mimeType['app_providers'], true)
 				);
 			}
 		}
@@ -412,7 +452,7 @@ class CollaborationContext implements Context {
 	 * @return string
 	 * @throws GuzzleException
 	 */
-	public function userHasCreatedAFileInSpaceUsingWopiEndpoint(string $user, string $file):string {
+	public function userHasCreatedAFileInSpaceUsingWopiEndpoint(string $user, string $file): string {
 		$parentContainerId = $this->featureContext->getFileIdForPath($user, "/");
 		$response = CollaborationHelper::createFile(
 			$this->featureContext->getBaseUrl(),

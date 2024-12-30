@@ -164,7 +164,9 @@ class ArchiverContext implements Context {
 		foreach ($headersTable as $row) {
 			$headers[$row['header']] = $row ['value'];
 		}
-		$this->featureContext->setResponse($this->downloadArchive($user, $resource, $addressType, $archiveType, null, $headers));
+		$this->featureContext->setResponse(
+			$this->downloadArchive($user, $resource, $addressType, $archiveType, null, $headers)
+		);
 	}
 
 	/**
@@ -267,7 +269,7 @@ class ArchiverContext implements Context {
 	 *
 	 * @throws Exception
 	 */
-	public function theDownloadedArchiveShouldContainTheseFiles(string $type, TableNode $expectedFiles):void {
+	public function theDownloadedArchiveShouldContainTheseFiles(string $type, TableNode $expectedFiles): void {
 		$this->featureContext->verifyTableNodeColumns($expectedFiles, ['name', 'content']);
 		$contents = $this->featureContext->getResponse()->getBody()->getContents();
 		$tempFile = \tempnam(\sys_get_temp_dir(), 'OcAcceptanceTests_');

@@ -40,7 +40,7 @@ class AuthContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function before(BeforeScenarioScope $scope):void {
+	public function before(BeforeScenarioScope $scope): void {
 		// Get the environment
 		$environment = $scope->getEnvironment();
 		// Get all the contexts you need in this context
@@ -141,7 +141,7 @@ class AuthContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function userRequestsURLWithNoAuth(string $url, string $method):void {
+	public function userRequestsURLWithNoAuth(string $url, string $method): void {
 		$this->featureContext->setResponse($this->sendRequest($url, $method));
 	}
 
@@ -156,7 +156,12 @@ class AuthContext implements Context {
 	 * @return void
 	 * @throws JsonException
 	 */
-	public function userRequestsEndpointsWithBodyAndNoAuthThenStatusCodeAboutUser(string $method, string $body, string $ofUser, TableNode $table): void {
+	public function userRequestsEndpointsWithBodyAndNoAuthThenStatusCodeAboutUser(
+		string $method,
+		string $body,
+		string $ofUser,
+		TableNode $table
+	): void {
 		$ofUser = \strtolower($this->featureContext->getActualUsername($ofUser));
 		$this->featureContext->verifyTableNodeColumns($table, ['endpoint']);
 		foreach ($table->getHash() as $row) {
@@ -180,7 +185,11 @@ class AuthContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userRequestsEndpointsWithoutBodyAndNoAuthAboutUser(string $method, string $ofUser, TableNode $table): void {
+	public function userRequestsEndpointsWithoutBodyAndNoAuthAboutUser(
+		string $method,
+		string $ofUser,
+		TableNode $table
+	): void {
 		$ofUser = \strtolower($this->featureContext->getActualUsername($ofUser));
 		$this->featureContext->verifyTableNodeColumns($table, ['endpoint']);
 		foreach ($table->getHash() as $row) {
@@ -203,7 +212,7 @@ class AuthContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userRequestsEndpointsWithNoAuthentication(string $method, TableNode $table):void {
+	public function userRequestsEndpointsWithNoAuthentication(string $method, TableNode $table): void {
 		$this->featureContext->verifyTableNodeColumns($table, ['endpoint'], ['service']);
 		foreach ($table->getHash() as $row) {
 			$this->featureContext->setResponse(
@@ -226,7 +235,7 @@ class AuthContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userRequestsEndpointsWithBasicAuth(string $user, string $method, TableNode $table):void {
+	public function userRequestsEndpointsWithBasicAuth(string $user, string $method, TableNode $table): void {
 		$this->featureContext->verifyTableNodeColumns($table, ['endpoint']);
 		foreach ($table->getHash() as $row) {
 			$response = $this->requestUrlWithBasicAuth($user, $row['endpoint'], $method);
@@ -253,7 +262,7 @@ class AuthContext implements Context {
 		string $property,
 		string $ofUser,
 		TableNode $table
-	):void {
+	): void {
 		$this->featureContext->verifyTableNodeColumns($table, ['endpoint']);
 
 		foreach ($table->getHash() as $row) {
@@ -276,7 +285,7 @@ class AuthContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function theAdminRequestsTheseEndpointsWithMethod(string $method, TableNode $table):void {
+	public function theAdminRequestsTheseEndpointsWithMethod(string $method, TableNode $table): void {
 		$this->featureContext->verifyTableNodeColumns($table, ['endpoint']);
 		foreach ($table->getHash() as $row) {
 			$response = $this->requestUrlWithBasicAuth(
@@ -302,7 +311,7 @@ class AuthContext implements Context {
 		string $user,
 		string $url,
 		string $method
-	):void {
+	): void {
 		$response = $this->requestUrlWithBasicAuth($user, $url, $method);
 		$this->featureContext->setResponse($response);
 	}
@@ -318,7 +327,12 @@ class AuthContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userRequestsURLWithUsingBasicAuthAndDepthHeader(string $user, string $url, string $method, TableNode $headersTable):void {
+	public function userRequestsURLWithUsingBasicAuthAndDepthHeader(
+		string $user,
+		string $url,
+		string $method,
+		TableNode $headersTable
+	): void {
 		$user = $this->featureContext->getActualUsername($user);
 		$url = $this->featureContext->substituteInLineCodes(
 			$url,
@@ -390,7 +404,7 @@ class AuthContext implements Context {
 		string $password,
 		string $ofUser,
 		TableNode $table
-	):void {
+	): void {
 		$user = $this->featureContext->getActualUsername($user);
 		$ofUser = $this->featureContext->getActualUsername($ofUser);
 		$this->featureContext->verifyTableNodeColumns($table, ['endpoint'], ['destination']);
@@ -407,7 +421,8 @@ class AuthContext implements Context {
 					$row['destination'],
 					$ofUser
 				);
-				$headers['Destination'] = $this->featureContext->getBaseUrl() . "/" . WebdavHelper::prefixRemotePhp(\ltrim($destination, "/"));
+				$headers['Destination'] = $this->featureContext->getBaseUrl()
+				. "/" . WebdavHelper::prefixRemotePhp(\ltrim($destination, "/"));
 			}
 			$response = $this->sendRequest(
 				$row['endpoint'],
@@ -440,7 +455,7 @@ class AuthContext implements Context {
 		string $password,
 		string $ofUser,
 		TableNode $table
-	):void {
+	): void {
 		$user = $this->featureContext->getActualUsername($user);
 		$ofUser = $this->featureContext->getActualUsername($ofUser);
 		$this->featureContext->verifyTableNodeColumns($table, ['endpoint'], ['destination']);
@@ -457,7 +472,8 @@ class AuthContext implements Context {
 					$row['destination'],
 					$ofUser
 				);
-				$headers['Destination'] = $this->featureContext->getBaseUrl() . "/" . WebdavHelper::prefixRemotePhp(\ltrim($destination, "/"));
+				$headers['Destination'] = $this->featureContext->getBaseUrl()
+				. "/" . WebdavHelper::prefixRemotePhp(\ltrim($destination, "/"));
 			}
 			$response = $this->sendRequest(
 				$row['endpoint'],
@@ -482,7 +498,13 @@ class AuthContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userRequestsTheseEndpointsIncludingBodyAboutUser(string $user, string $method, string $body, string $ofUser, TableNode $table):void {
+	public function userRequestsTheseEndpointsIncludingBodyAboutUser(
+		string $user,
+		string $method,
+		string $body,
+		string $ofUser,
+		TableNode $table
+	): void {
 		$user = $this->featureContext->getActualUsername($user);
 		$ofUser = $this->featureContext->getActualUsername($ofUser);
 		$this->featureContext->verifyTableNodeColumns($table, ['endpoint']);
@@ -520,7 +542,12 @@ class AuthContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userRequestsTheseEndpointsWithoutBodyUsingThePasswordOfUser(string $asUser, string $method, string $ofUser, TableNode $table):void {
+	public function userRequestsTheseEndpointsWithoutBodyUsingThePasswordOfUser(
+		string $asUser,
+		string $method,
+		string $ofUser,
+		TableNode $table
+	): void {
 		$asUser = $this->featureContext->getActualUsername($asUser);
 		$ofUser = $this->featureContext->getActualUsername($ofUser);
 		$this->featureContext->verifyTableNodeColumns($table, ['endpoint']);
@@ -556,7 +583,13 @@ class AuthContext implements Context {
 	 * @return void
 	 * @throws JsonException
 	 */
-	public function userRequestsTheseEndpointsIncludingBodyUsingPasswordOfUser(string $asUser, string $method, ?string $body, string $ofUser, TableNode $table):void {
+	public function userRequestsTheseEndpointsIncludingBodyUsingPasswordOfUser(
+		string $asUser,
+		string $method,
+		?string $body,
+		string $ofUser,
+		TableNode $table
+	): void {
 		$asUser = $this->featureContext->getActualUsername($asUser);
 		$ofUser = $this->featureContext->getActualUsername($ofUser);
 		$this->featureContext->verifyTableNodeColumns($table, ['endpoint']);
@@ -591,7 +624,12 @@ class AuthContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userRequestsTheseEndpointsAboutUser(string $user, string $method, string $ofUser, TableNode $table):void {
+	public function userRequestsTheseEndpointsAboutUser(
+		string $user,
+		string $method,
+		string $ofUser,
+		TableNode $table
+	): void {
 		$headers = [];
 		if ($method === 'MOVE' || $method === 'COPY') {
 			$baseUrl = $this->featureContext->getBaseUrl();
@@ -633,7 +671,7 @@ class AuthContext implements Context {
 		string $user,
 		string $endpoint,
 		string $method
-	):void {
+	): void {
 		$username = $this->featureContext->getActualUsername($user);
 		$endpoint = $this->featureContext->substituteInLineCodes(
 			$endpoint,

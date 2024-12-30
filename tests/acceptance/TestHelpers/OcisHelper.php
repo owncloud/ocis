@@ -87,7 +87,7 @@ class OcisHelper {
 	/**
 	 * @return bool
 	 */
-	public static function isTestingOnReva():bool {
+	public static function isTestingOnReva(): bool {
 		return (\getenv("TEST_REVA") === "true");
 	}
 
@@ -106,7 +106,7 @@ class OcisHelper {
 	 * @return string
 	 * @throws Exception
 	 */
-	public static function getStorageDriver():string {
+	public static function getStorageDriver(): string {
 		$storageDriver = (\getenv("STORAGE_DRIVER"));
 		if ($storageDriver === false) {
 			return StorageDriver::OWNCLOUD;
@@ -166,7 +166,7 @@ class OcisHelper {
 	 *
 	 * @return void
 	 */
-	public static function recurseCopy(?string $source, ?string $destination):void {
+	public static function recurseCopy(?string $source, ?string $destination): void {
 		$dir = \opendir($source);
 		@\mkdir($destination);
 		while (($file = \readdir($dir)) !== false) {
@@ -184,7 +184,7 @@ class OcisHelper {
 	/**
 	 * @return int
 	 */
-	public static function getLdapPort():int {
+	public static function getLdapPort(): int {
 		$port = \getenv("REVA_LDAP_PORT");
 		return $port ? (int)$port : 636;
 	}
@@ -192,7 +192,7 @@ class OcisHelper {
 	/**
 	 * @return bool
 	 */
-	public static function useSsl():bool {
+	public static function useSsl(): bool {
 		$useSsl = \getenv("REVA_LDAP_USESSL");
 		if ($useSsl === false) {
 			return (self::getLdapPort() === 636);
@@ -204,7 +204,7 @@ class OcisHelper {
 	/**
 	 * @return string
 	 */
-	public static function getBaseDN():string {
+	public static function getBaseDN(): string {
 		$dn = \getenv("REVA_LDAP_BASE_DN");
 		return $dn ?: "dc=owncloud,dc=com";
 	}
@@ -212,7 +212,7 @@ class OcisHelper {
 	/**
 	 * @return string
 	 */
-	public static function getGroupsOU():string {
+	public static function getGroupsOU(): string {
 		$ou = \getenv("REVA_LDAP_GROUPS_OU");
 		return $ou ?: "TestGroups";
 	}
@@ -220,7 +220,7 @@ class OcisHelper {
 	/**
 	 * @return string
 	 */
-	public static function getUsersOU():string {
+	public static function getUsersOU(): string {
 		$ou = \getenv("REVA_LDAP_USERS_OU");
 		return $ou ?: "TestUsers";
 	}
@@ -228,14 +228,14 @@ class OcisHelper {
 	/**
 	 * @return string
 	 */
-	public static function getGroupSchema():string {
+	public static function getGroupSchema(): string {
 		$schema = \getenv("REVA_LDAP_GROUP_SCHEMA");
 		return $schema ?: "rfc2307";
 	}
 	/**
 	 * @return string
 	 */
-	public static function getHostname():string {
+	public static function getHostname(): string {
 		$hostname = \getenv("REVA_LDAP_HOSTNAME");
 		return $hostname ?: "localhost";
 	}
@@ -243,7 +243,7 @@ class OcisHelper {
 	/**
 	 * @return string
 	 */
-	public static function getBindDN():string {
+	public static function getBindDN(): string {
 		$dn = \getenv("REVA_LDAP_BIND_DN");
 		return $dn ?: "cn=admin,dc=owncloud,dc=com";
 	}
@@ -251,7 +251,7 @@ class OcisHelper {
 	/**
 	 * @return string
 	 */
-	public static function getBindPassword():string {
+	public static function getBindPassword(): string {
 		$pw = \getenv("REVA_LDAP_BIND_PASSWORD");
 		return $pw ?: "";
 	}
@@ -259,7 +259,7 @@ class OcisHelper {
 	/**
 	 * @return string
 	 */
-	private static function getOcisRevaDataRoot():string {
+	private static function getOcisRevaDataRoot(): string {
 		$root = \getenv("OCIS_REVA_DATA_ROOT");
 		if ($root === false || $root === "") {
 			$root = "/var/tmp/ocis/owncloud/";
@@ -275,7 +275,7 @@ class OcisHelper {
 	 *
 	 * @return bool
 	 */
-	private static function recurseRmdir(?string $dir):bool {
+	private static function recurseRmdir(?string $dir): bool {
 		if (\file_exists($dir) === true) {
 			$files = \array_diff(\scandir($dir), ['.', '..']);
 			foreach ($files as $file) {
@@ -307,7 +307,7 @@ class OcisHelper {
 		?string $user,
 		?string $password,
 		?string $xRequestId = ''
-	):void {
+	): void {
 		HttpRequestHelper::get(
 			$baseUrl . "/ocs/v2.php/apps/notifications/api/v1/notifications",
 			$xRequestId,

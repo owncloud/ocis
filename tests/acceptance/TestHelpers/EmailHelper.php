@@ -35,7 +35,7 @@ class EmailHelper {
 	 *
 	 * @return string
 	 */
-	public static function getMailBoxFromEmail(string $emailAddress):string {
+	public static function getMailBoxFromEmail(string $emailAddress): string {
 		return explode("@", $emailAddress)[0];
 	}
 
@@ -45,7 +45,7 @@ class EmailHelper {
 	 *
 	 * @return string
 	 */
-	public static function getLocalEmailUrl():string {
+	public static function getLocalEmailUrl(): string {
 		$localEmailHost = self::getLocalEmailHost();
 		$emailPort = \getenv('EMAIL_PORT');
 		if ($emailPort === false) {
@@ -60,7 +60,7 @@ class EmailHelper {
 	 *
 	 * @return string
 	 */
-	public static function getEmailHost():string {
+	public static function getEmailHost(): string {
 		$emailHost = \getenv('EMAIL_HOST');
 		if ($emailHost === false) {
 			$emailHost = "127.0.0.1";
@@ -74,7 +74,7 @@ class EmailHelper {
 	 *
 	 * @return string
 	 */
-	public static function getLocalEmailHost():string {
+	public static function getLocalEmailHost(): string {
 		$localEmailHost = \getenv('LOCAL_EMAIL_HOST');
 		if ($localEmailHost === false) {
 			$localEmailHost = self::getEmailHost();
@@ -92,7 +92,7 @@ class EmailHelper {
 	 * @return array
 	 * @throws GuzzleException
 	 */
-	public static function getMailBoxInformation(string $mailBox, ?string $xRequestId = null):array {
+	public static function getMailBoxInformation(string $mailBox, ?string $xRequestId = null): array {
 		$response = HttpRequestHelper::get(
 			self::getLocalEmailUrl() . "/api/v1/mailbox/" . $mailBox,
 			$xRequestId,
@@ -113,7 +113,11 @@ class EmailHelper {
 	 * @return object
 	 * @throws GuzzleException
 	 */
-	public static function getBodyOfAnEmailById(string $mailBox, string $mailboxId, ?string $xRequestId = null):object {
+	public static function getBodyOfAnEmailById(
+		string $mailBox,
+		string $mailboxId,
+		?string $xRequestId = null
+	): object {
 		$response = HttpRequestHelper::get(
 			self::getLocalEmailUrl() . "/api/v1/mailbox/" . $mailBox . "/" . $mailboxId,
 			$xRequestId,
@@ -142,7 +146,7 @@ class EmailHelper {
 		string $xRequestId,
 		?int $emailNumber = 1,
 		?int $waitTimeSec = EMAIL_WAIT_TIMEOUT_SEC
-	):string {
+	): string {
 		$currentTime = \time();
 		$endTime = $currentTime + $waitTimeSec;
 		$mailBox = self::getMailBoxFromEmail($emailAddress);
@@ -178,7 +182,7 @@ class EmailHelper {
 		string $localInbucketUrl,
 		?string $xRequestId,
 		string $mailBox
-	):ResponseInterface {
+	): ResponseInterface {
 		return HttpRequestHelper::delete(
 			$localInbucketUrl . "/api/v1/mailbox/" . $mailBox,
 			$xRequestId

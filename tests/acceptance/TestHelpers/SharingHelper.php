@@ -192,7 +192,7 @@ class SharingHelper {
 	 * @throws InvalidArgumentException
 	 *
 	 */
-	public static function getPermissionSum($permissions):int {
+	public static function getPermissionSum($permissions): int {
 		if (\is_numeric($permissions)) {
 			// Allow any permission number so that test scenarios can
 			// specifically test invalid permission values
@@ -230,7 +230,7 @@ class SharingHelper {
 	 * @throws InvalidArgumentException
 	 *
 	 */
-	public static function getShareType($shareType):int {
+	public static function getShareType($shareType): int {
 		if (\array_key_exists($shareType, self::SHARE_TYPES)) {
 			return self::SHARE_TYPES[$shareType];
 		} else {
@@ -259,7 +259,7 @@ class SharingHelper {
 	public static function getLastShareIdFromResponse(
 		SimpleXMLElement $responseXmlObject,
 		string $errorMessage = "cannot find share id in response"
-	):string {
+	): string {
 		$xmlPart = $responseXmlObject->xpath("//data/element[last()]/id");
 
 		if (!\is_array($xmlPart) || (\count($xmlPart) === 0)) {

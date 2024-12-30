@@ -138,7 +138,7 @@ class UploadHelper extends Assert {
 	 *
 	 * @return array $string
 	 */
-	public static function chunkFile(?string $file, ?int $noOfChunks = 1):array {
+	public static function chunkFile(?string $file, ?int $noOfChunks = 1): array {
 		$size = \filesize($file);
 		$chunkSize = \ceil($size / $noOfChunks);
 		$chunks = [];
@@ -162,7 +162,7 @@ class UploadHelper extends Assert {
 	 *
 	 * @return void
 	 */
-	public static function createFileSpecificSize(?string $name, ?int $size):void {
+	public static function createFileSpecificSize(?string $name, ?int $size): void {
 		if (\file_exists($name)) {
 			\unlink($name);
 		}
@@ -190,7 +190,7 @@ class UploadHelper extends Assert {
 	 *
 	 * @return void
 	 */
-	public static function createFileWithText(?string $name, ?string $text):void {
+	public static function createFileWithText(?string $name, ?string $text): void {
 		$file = \fopen($name, 'w');
 		\fwrite($file, $text);
 		\fclose($file);
@@ -207,7 +207,7 @@ class UploadHelper extends Assert {
 	 *
 	 * @return string
 	 */
-	public static function getUploadFilesDir(?string $name):string {
+	public static function getUploadFilesDir(?string $name): string {
 		return \getenv("FILES_FOR_UPLOAD") . $name;
 	}
 }

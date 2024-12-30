@@ -80,7 +80,11 @@ class CliContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function theAdministratorResetsThePasswordOfUserUsingTheCLI(string $status, string $user, string $password): void {
+	public function theAdministratorResetsThePasswordOfUserUsingTheCLI(
+		string $status,
+		string $user,
+		string $password
+	): void {
 		$command = "idm resetpassword -u $user";
 		$body = [
 			"command" => $command,
@@ -99,7 +103,7 @@ class CliContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function theAdministratorDeletesEmptyTrashbinFoldersUsingTheCli():void {
+	public function theAdministratorDeletesEmptyTrashbinFoldersUsingTheCli(): void {
 		$path = $this->featureContext->getStorageUsersRoot();
 		$command = "trash purge-empty-dirs -p $path --dry-run=false";
 		$body = [
@@ -113,7 +117,7 @@ class CliContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function theAdministratorChecksTheBackupConsistencyUsingTheCli():void {
+	public function theAdministratorChecksTheBackupConsistencyUsingTheCli(): void {
 		$path = $this->featureContext->getStorageUsersRoot();
 		$command = "backup consistency -p $path";
 		$body = [
@@ -121,7 +125,7 @@ class CliContext implements Context {
 		];
 		$this->featureContext->setResponse(CliHelper::runCommand($body));
 	}
-	
+
 	/**
 	 * @When the administrator creates app token for user :user with expiration time :expirationTime using the auth-app CLI
 	 *
@@ -130,7 +134,10 @@ class CliContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function theAdministratorCreatesAppTokenForUserWithExpirationTimeUsingTheAuthAppCLI(string $user, string $expirationTime): void {
+	public function theAdministratorCreatesAppTokenForUserWithExpirationTimeUsingTheAuthAppCLI(
+		string $user,
+		string $expirationTime
+	): void {
 		$user = $this->featureContext->getActualUserName($user);
 		$command = "auth-app create --user-name=$user --expiration=$expirationTime";
 		$body = [
@@ -147,7 +154,10 @@ class CliContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function userHasCreatedAppTokenWithExpirationTimeUsingTheAuthAppCLI(string $user, string $expirationTime): void {
+	public function userHasCreatedAppTokenWithExpirationTimeUsingTheAuthAppCLI(
+		string $user,
+		string $expirationTime
+	): void {
 		$user = $this->featureContext->getActualUserName($user);
 		$command = "auth-app create --user-name=$user --expiration=$expirationTime";
 		$body = [
@@ -158,7 +168,11 @@ class CliContext implements Context {
 		$this->featureContext->theHTTPStatusCodeShouldBe(200, '', $response);
 		$jsonResponse = $this->featureContext->getJsonDecodedResponse($response);
 		Assert::assertSame("OK", $jsonResponse["status"]);
-		Assert::assertSame(0, $jsonResponse["exitCode"], "Expected exit code to be 0, but got " . $jsonResponse["exitCode"]);
+		Assert::assertSame(
+			0,
+			$jsonResponse["exitCode"],
+			"Expected exit code to be 0, but got " . $jsonResponse["exitCode"]
+		);
 	}
 
 	/**
@@ -230,7 +244,7 @@ class CliContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function theAdministratorRemovesTheVersionsOfFilesInSpaceUsingSpaceId(string $space):void {
+	public function theAdministratorRemovesTheVersionsOfFilesInSpaceUsingSpaceId(string $space): void {
 		$path = $this->featureContext->getStorageUsersRoot();
 		$adminUsername = $this->featureContext->getAdminUsername();
 		$spaceId = $this->spacesContext->getSpaceIdByName($adminUsername, $space);
@@ -253,7 +267,11 @@ class CliContext implements Context {
 		$jsonResponse = $this->featureContext->getJsonDecodedResponse($response);
 
 		Assert::assertSame("OK", $jsonResponse["status"]);
-		Assert::assertSame(0, $jsonResponse["exitCode"], "Expected exit code to be 0, but got " . $jsonResponse["exitCode"]);
+		Assert::assertSame(
+			0,
+			$jsonResponse["exitCode"],
+			"Expected exit code to be 0, but got " . $jsonResponse["exitCode"]
+		);
 	}
 
 	/**

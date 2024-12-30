@@ -43,7 +43,7 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 	 *
 	 * @return array of suite context parameters
 	 */
-	public static function getSuiteParameters(HookScope $scope):array {
+	public static function getSuiteParameters(HookScope $scope): array {
 		return $scope->getEnvironment()->getSuite()
 			->getSettings() ['context'] ['parameters'];
 	}
@@ -90,7 +90,7 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 		?string $adminUsername,
 		?string $adminPassword,
 		?string $xRequestId = ''
-	):SimpleXMLElement {
+	): SimpleXMLElement {
 		$result = OcsApiHelper::sendRequest(
 			$baseUrl,
 			$adminUsername,
@@ -122,7 +122,7 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 		?string $adminUsername,
 		?string $adminPassword,
 		?string $xRequestId = ''
-	):string {
+	): string {
 		$sysInfo = self::getSysInfo(
 			$baseUrl,
 			$adminUsername,
@@ -141,7 +141,7 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 	 * @return string
 	 * @throws Exception
 	 */
-	private static function checkAdminUsername(?string $adminUsername, ?string $callerName):?string {
+	private static function checkAdminUsername(?string $adminUsername, ?string $callerName): ?string {
 		if (self::$adminUsername === null
 			&& $adminUsername === null
 		) {
@@ -162,7 +162,7 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 	 * @return string
 	 * @throws Exception
 	 */
-	private static function checkAdminPassword(?string $adminPassword, ?string $callerName):string {
+	private static function checkAdminPassword(?string $adminPassword, ?string $callerName): string {
 		if (self::$adminPassword === null
 			&& $adminPassword === null
 		) {
@@ -183,7 +183,7 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 	 * @return string
 	 * @throws Exception
 	 */
-	private static function checkBaseUrl(?string $baseUrl, ?string $callerName):?string {
+	private static function checkBaseUrl(?string $baseUrl, ?string $callerName): ?string {
 		if (self::$baseUrl === null
 			&& $baseUrl === null
 		) {
@@ -215,7 +215,7 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 		?string $baseUrl = null,
 		?string $adminUsername = null,
 		?string $adminPassword = null
-	):void {
+	): void {
 		$baseUrl = self::checkBaseUrl($baseUrl, "mkDirOnServer");
 		$adminUsername = self::checkAdminUsername($adminUsername, "mkDirOnServer");
 		$adminPassword = self::checkAdminPassword($adminPassword, "mkDirOnServer");
@@ -254,7 +254,7 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 		?string $baseUrl = null,
 		?string $adminUsername = null,
 		?string $adminPassword = null
-	):void {
+	): void {
 		$baseUrl = self::checkBaseUrl($baseUrl, "rmDirOnServer");
 		$adminUsername = self::checkAdminUsername($adminUsername, "rmDirOnServer");
 		$adminPassword = self::checkAdminPassword($adminPassword, "rmDirOnServer");
@@ -295,7 +295,7 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 		?string $baseUrl = null,
 		?string $adminUsername = null,
 		?string $adminPassword = null
-	):void {
+	): void {
 		$baseUrl = self::checkBaseUrl($baseUrl, "createFileOnServer");
 		$adminUsername = self::checkAdminUsername($adminUsername, "createFileOnServer");
 		$adminPassword = self::checkAdminPassword($adminPassword, "createFileOnServer");
@@ -337,7 +337,7 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 		?string $baseUrl = null,
 		?string $adminUsername = null,
 		?string $adminPassword = null
-	):void {
+	): void {
 		$baseUrl = self::checkBaseUrl($baseUrl, "deleteFileOnServer");
 		$adminUsername = self::checkAdminUsername($adminUsername, "deleteFileOnServer");
 		$adminPassword = self::checkAdminPassword($adminPassword, "deleteFileOnServer");
@@ -377,7 +377,7 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 		?string $baseUrl  = null,
 		?string $adminUsername = null,
 		?string $adminPassword = null
-	):string {
+	): string {
 		$baseUrl = self::checkBaseUrl($baseUrl, "readFile");
 		$adminUsername = self::checkAdminUsername(
 			$adminUsername,
