@@ -109,6 +109,7 @@ Feature: Upload files into a space
       | textfile.txt |
     And for user "Alice" folder "uploadFolder" of the space "Personal" should not contain these files:
       | textfile (1).txt |
+      | textfile (2).txt |
 
   @issue-10331 @issue-10469
   Scenario: public uploads a zero byte file to a public share folder inside project space
@@ -125,6 +126,7 @@ Feature: Upload files into a space
       | textfile.txt |
     And for user "Alice" folder "uploadFolder" of the space "Project Ceres" should not contain these files:
       | textfile (1).txt |
+      | textfile (2).txt |
 
   @issue-10331 @issue-10469
   Scenario: public uploads a zero byte file to a public share project space
@@ -139,3 +141,4 @@ Feature: Upload files into a space
       | textfile.txt |
     And for user "Alice" the space "Project Ceres" should not contain these files:
       | textfile (1).txt |
+      | textfile (2).txt |
