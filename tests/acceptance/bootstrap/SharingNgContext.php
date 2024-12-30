@@ -151,6 +151,7 @@ class SharingNgContext implements Context {
 	 * @param string $fileOrFolder (file|folder)
 	 * @param string $space
 	 * @param string|null $resource
+	 * @param string|null $query
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
@@ -159,7 +160,8 @@ class SharingNgContext implements Context {
 		string $user,
 		string $fileOrFolder,
 		string $space,
-		?string $resource = ''
+		?string $resource = '',
+		?string $query = null
 	): ResponseInterface {
 		$spaceId = ($this->spacesContext->getSpaceByName($user, $space))["id"];
 
@@ -175,7 +177,8 @@ class SharingNgContext implements Context {
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$spaceId,
-			$itemId
+			$itemId,
+			$query
 		);
 	}
 
@@ -2090,5 +2093,30 @@ class SharingNgContext implements Context {
 				"The share '$expectedShare' was not found in the response."
 			);
 		}
+	}
+
+	/**
+	 * @When /^user "([^"]*)" gets the allowed roles for federated user of (folder|file) "([^"]*)" from the space "([^"]*)" using the Graph API$/
+	 *
+	 * @param string $user
+	 * @param string $fileOrFolder (file|folder)
+	 * @param string $resource
+	 * @param string $space
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function userGetsFederatedPermissionsListForFileOfTheSpaceUsingTheGraphApi(
+		string $user,
+		string $fileOrFolder,
+		string $resource,
+		string $space
+	): void {
+		$query = '$filter=@libre.graph.permissions.roles.allowedValues'
+			. '/rolePermissions/any(p:contains(p/condition,+\'@Subject.UserType=="Federated"\'))'
+			. '&$select=@libre.graph.permissions.roles.allowedValues';
+		$this->featureContext->setResponse(
+			$this->getPermissionsList($user, $fileOrFolder, $space, $resource, $query)
+		);
 	}
 }
