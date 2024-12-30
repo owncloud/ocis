@@ -282,8 +282,8 @@ func generateBundleProfileRequest() *settingsmsg.Bundle {
 			{
 				Id:          SettingUUIDProfileEmailSendingInterval,
 				Name:        "email-sending-interval-options",
-				DisplayName: "Email Notifications options",
-				Description: "Email notifications options",
+				DisplayName: TemplateEmailSendingInterval,
+				Description: TemplateEmailSendingIntervalDescription,
 				Resource: &settingsmsg.Resource{
 					Type: settingsmsg.Resource_TYPE_USER,
 				},
@@ -292,8 +292,8 @@ func generateBundleProfileRequest() *settingsmsg.Bundle {
 			{
 				Id:          SettingUUIDProfileEventShareCreated,
 				Name:        "event-share-created-options",
-				DisplayName: "Share created",
-				Description: "Share created",
+				DisplayName: TemplateShareCreated,
+				Description: TemplateShareCreatedDescription,
 				Resource: &settingsmsg.Resource{
 					Type: settingsmsg.Resource_TYPE_USER,
 				},
@@ -309,8 +309,8 @@ func generateBundleProfileRequest() *settingsmsg.Bundle {
 			{
 				Id:          SettingUUIDProfileEventShareRemoved,
 				Name:        "event-share-removed-options",
-				DisplayName: "Share removed",
-				Description: "Share removed",
+				DisplayName: TemplateShareRemoved,
+				Description: TemplateShareRemovedDescription,
 				Resource: &settingsmsg.Resource{
 					Type: settingsmsg.Resource_TYPE_USER,
 				},
@@ -326,8 +326,8 @@ func generateBundleProfileRequest() *settingsmsg.Bundle {
 			{
 				Id:          SettingUUIDProfileEventShareExpired,
 				Name:        "event-share-expired-options",
-				DisplayName: "Share expired",
-				Description: "Share expired",
+				DisplayName: TemplateShareExpired,
+				Description: TemplateShareExpiredDescription,
 				Resource: &settingsmsg.Resource{
 					Type: settingsmsg.Resource_TYPE_USER,
 				},
@@ -343,8 +343,8 @@ func generateBundleProfileRequest() *settingsmsg.Bundle {
 			{
 				Id:          SettingUUIDProfileEventSpaceShared,
 				Name:        "event-space-shared-options",
-				DisplayName: "Space shared",
-				Description: "Space shared",
+				DisplayName: TemplateSpaceShared,
+				Description: TemplateSpaceSharedDescription,
 				Resource: &settingsmsg.Resource{
 					Type: settingsmsg.Resource_TYPE_USER,
 				},
@@ -360,8 +360,8 @@ func generateBundleProfileRequest() *settingsmsg.Bundle {
 			{
 				Id:          SettingUUIDProfileEventSpaceUnshared,
 				Name:        "event-space-unshared-options",
-				DisplayName: "Space unshared",
-				Description: "Space unshared",
+				DisplayName: TemplateSpaceUnshared,
+				Description: TemplateSpaceUnsharedDescription,
 				Resource: &settingsmsg.Resource{
 					Type: settingsmsg.Resource_TYPE_USER,
 				},
@@ -377,8 +377,8 @@ func generateBundleProfileRequest() *settingsmsg.Bundle {
 			{
 				Id:          SettingUUIDProfileEventSpaceMembershipExpired,
 				Name:        "event-space-membership-expired-options",
-				DisplayName: "Space membership expired",
-				Description: "Space membership expired",
+				DisplayName: TemplateSpaceMembershipExpired,
+				Description: TemplateSpaceMembershipExpiredDescription,
 				Resource: &settingsmsg.Resource{
 					Type: settingsmsg.Resource_TYPE_USER,
 				},
@@ -394,8 +394,8 @@ func generateBundleProfileRequest() *settingsmsg.Bundle {
 			{
 				Id:          SettingUUIDProfileEventSpaceDisabled,
 				Name:        "event-space-disabled-options",
-				DisplayName: "Space disabled",
-				Description: "Space disabled",
+				DisplayName: TemplateSpaceDisabled,
+				Description: TemplateSpaceDisabledDescription,
 				Resource: &settingsmsg.Resource{
 					Type: settingsmsg.Resource_TYPE_USER,
 				},
@@ -411,8 +411,8 @@ func generateBundleProfileRequest() *settingsmsg.Bundle {
 			{
 				Id:          SettingUUIDProfileEventSpaceDeleted,
 				Name:        "event-space-deleted-options",
-				DisplayName: "Space deleted",
-				Description: "Space deleted",
+				DisplayName: TemplateSpaceDeleted,
+				Description: TemplateSpaceDeletedDescription,
 				Resource: &settingsmsg.Resource{
 					Type: settingsmsg.Resource_TYPE_USER,
 				},
@@ -428,8 +428,8 @@ func generateBundleProfileRequest() *settingsmsg.Bundle {
 			{
 				Id:          SettingUUIDProfileEventPostprocessingStepFinished,
 				Name:        "event-postprocessing-step-finished-options",
-				DisplayName: "Postprocessing Step Finished",
-				Description: "Postprocessing Step Finished",
+				DisplayName: TemplateFileRejected,
+				Description: TemplateFileRejectedDescription,
 				Resource: &settingsmsg.Resource{
 					Type: settingsmsg.Resource_TYPE_USER,
 				},
@@ -455,7 +455,7 @@ var sendEmailOptions = settingsmsg.Setting_SingleChoiceValue{
 						StringValue: "instant",
 					},
 				},
-				DisplayValue: "Instant",
+				DisplayValue: TemplateIntervalInstant,
 				Default:      true,
 			},
 			{
@@ -464,7 +464,7 @@ var sendEmailOptions = settingsmsg.Setting_SingleChoiceValue{
 						StringValue: "daily",
 					},
 				},
-				DisplayValue: "Daily",
+				DisplayValue: TemplateIntervalDaily,
 			},
 			{
 				Value: &settingsmsg.ListOptionValue{
@@ -472,7 +472,7 @@ var sendEmailOptions = settingsmsg.Setting_SingleChoiceValue{
 						StringValue: "weekly",
 					},
 				},
-				DisplayValue: "Weekly",
+				DisplayValue: TemplateIntervalWeekly,
 			},
 			{
 				Value: &settingsmsg.ListOptionValue{
@@ -480,7 +480,7 @@ var sendEmailOptions = settingsmsg.Setting_SingleChoiceValue{
 						StringValue: "never",
 					},
 				},
-				DisplayValue: "Never",
+				DisplayValue: TemplateIntervalNever,
 			},
 		},
 	},

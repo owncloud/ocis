@@ -2,13 +2,17 @@ package svc
 
 import (
 	"context"
+	"embed"
 	"errors"
 	"fmt"
 	"strings"
 
 	cs3permissions "github.com/cs3org/go-cs3apis/cs3/permissions/v1beta1"
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
+	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
+	"github.com/leonelquinteros/gotext"
+	"github.com/owncloud/ocis/v2/ocis-pkg/l10n"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/v2/ocis-pkg/roles"
@@ -22,6 +26,11 @@ import (
 	"go-micro.dev/v4/metadata"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
+
+//go:embed l10n/locale
+var _translationFS embed.FS
+
+var _domain = "settings"
 
 // Service represents a service.
 type Service struct {
@@ -134,18 +143,29 @@ func (g Service) ListBundles(ctx context.Context, req *settingssvc.ListBundlesRe
 	if validationError := validateListBundles(req); validationError != nil {
 		return merrors.BadRequest(g.id, "%s", validationError)
 	}
-	bundles, err := g.manager.ListBundles(settingsmsg.Bundle_TYPE_DEFAULT, req.BundleIds)
+	bundles, err := g.manager.ListBundles(settingsmsg.Bundle_TYPE_DEFAULT, req.GetBundleIds())
 	if err != nil {
 		return merrors.NotFound(g.id, "%s", err)
 	}
 	roleIDs := g.getRoleIDs(ctx)
 
+	// find user locale
+	var locale string
+	if u, ok := ctxpkg.ContextGetUser(ctx); ok {
+		var err error
+		locale, err = g.getUserLocale(ctx, u.GetId().GetOpaqueId())
+		if err != nil {
+			g.logger.Error().Err(err).Str("userid", u.GetId().GetOpaqueId()).Msg("failed to get user locale")
+		}
+	}
+
 	// filter settings in bundles that are allowed according to roles
 	var filteredBundles []*settingsmsg.Bundle
 	for _, bundle := range bundles {
 		filteredBundle := g.getFilteredBundle(roleIDs, bundle)
-		if len(filteredBundle.Settings) > 0 {
-			filteredBundles = append(filteredBundles, filteredBundle)
+		if len(filteredBundle.GetSettings()) > 0 {
+			t := l10n.NewTranslatorFromCommonConfig(g.config.DefaultLanguage, _domain, g.config.TranslationPath, _translationFS, "l10n/locale").Locale(locale)
+			filteredBundles = append(filteredBundles, translateBundle(filteredBundle, t))
 		}
 	}
 
@@ -642,7 +662,58 @@ func (g Service) canManageRoles(ctx context.Context) bool {
 	return g.hasStaticPermission(ctx, RoleManagementPermissionID)
 }
 
+func (g Service) getUserLocale(ctx context.Context, userID string) (string, error) {
+	var resp settingssvc.GetValueResponse
+	err := g.GetValueByUniqueIdentifiers(
+		ctx,
+		&settingssvc.GetValueByUniqueIdentifiersRequest{
+			AccountUuid: userID,
+			SettingId:   defaults.SettingUUIDProfileLanguage,
+		},
+		&resp,
+	)
+	if err != nil {
+		return "", err
+	}
+	val := resp.GetValue().GetValue().GetListValue().GetValues()
+	if len(val) == 0 {
+		return "", errors.New("no language setting found")
+	}
+	return val[0].GetStringValue(), nil
+}
+
 func formatPermissionName(setting *settingsmsg.Setting) string {
 	constraint := strings.TrimPrefix(setting.GetPermissionValue().GetConstraint().String(), "CONSTRAINT_")
 	return setting.Name + "." + strings.ToLower(constraint)
+}
+
+func translateBundle(bundle *settingsmsg.Bundle, t *gotext.Locale) *settingsmsg.Bundle {
+	for i, set := range bundle.GetSettings() {
+		switch set.GetId() {
+		default:
+			continue
+		case defaults.SettingUUIDProfileEmailSendingInterval:
+			// translate interval names ('Instant', 'Daily', 'Weekly', 'Never')
+			value := set.GetSingleChoiceValue()
+			for i, v := range value.GetOptions() {
+				value.Options[i].DisplayValue = t.Get(v.GetDisplayValue())
+			}
+			set.Value = &settingsmsg.Setting_SingleChoiceValue{SingleChoiceValue: value}
+			fallthrough
+		case defaults.SettingUUIDProfileEventShareCreated,
+			defaults.SettingUUIDProfileEventShareRemoved,
+			defaults.SettingUUIDProfileEventShareExpired,
+			defaults.SettingUUIDProfileEventSpaceShared,
+			defaults.SettingUUIDProfileEventSpaceUnshared,
+			defaults.SettingUUIDProfileEventSpaceMembershipExpired,
+			defaults.SettingUUIDProfileEventSpaceDisabled,
+			defaults.SettingUUIDProfileEventSpaceDeleted:
+			// translate event names ('Share Received', 'Share Removed', ...)
+			set.DisplayName = t.Get(set.GetDisplayName())
+			// translate event descriptions ('Notify me when I receive a share', ...)
+			set.Description = t.Get(set.GetDescription())
+			bundle.Settings[i] = set
+		}
+	}
+	return bundle
 }
