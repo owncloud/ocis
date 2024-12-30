@@ -55,14 +55,14 @@ func NewService(cfg *config.Config, logger log.Logger) settings.ServiceHandler {
 // CheckPermission implements the CS3 API Permssions service.
 // It's used to check if a subject (user or group) has a permission.
 func (g Service) CheckPermission(ctx context.Context, req *cs3permissions.CheckPermissionRequest) (*cs3permissions.CheckPermissionResponse, error) {
-	spec := req.SubjectRef.Spec
+	spec := req.GetSubjectRef().GetSpec()
 
 	var accountID string
 	switch ref := spec.(type) {
 	case *cs3permissions.SubjectReference_UserId:
-		accountID = ref.UserId.OpaqueId
+		accountID = ref.UserId.GetOpaqueId()
 	case *cs3permissions.SubjectReference_GroupId:
-		accountID = ref.GroupId.OpaqueId
+		accountID = ref.GroupId.GetOpaqueId()
 	}
 
 	assignments, err := g.manager.ListRoleAssignments(accountID)
@@ -74,10 +74,10 @@ func (g Service) CheckPermission(ctx context.Context, req *cs3permissions.CheckP
 
 	roleIDs := make([]string, 0, len(assignments))
 	for _, a := range assignments {
-		roleIDs = append(roleIDs, a.RoleId)
+		roleIDs = append(roleIDs, a.GetRoleId())
 	}
 
-	permission, err := g.manager.ReadPermissionByName(req.Permission, roleIDs)
+	permission, err := g.manager.ReadPermissionByName(req.GetPermission(), roleIDs)
 	if err != nil {
 		if !errors.Is(err, settings.ErrNotFound) {
 			return &cs3permissions.CheckPermissionResponse{
@@ -103,15 +103,15 @@ func (g Service) CheckPermission(ctx context.Context, req *cs3permissions.CheckP
 
 // SaveBundle implements the BundleServiceHandler interface
 func (g Service) SaveBundle(ctx context.Context, req *settingssvc.SaveBundleRequest, res *settingssvc.SaveBundleResponse) error {
-	cleanUpResource(ctx, req.Bundle.Resource)
-	if err := g.checkStaticPermissionsByBundleType(ctx, req.Bundle.Type); err != nil {
+	cleanUpResource(ctx, req.GetBundle().GetResource())
+	if err := g.checkStaticPermissionsByBundleType(ctx, req.GetBundle().GetType()); err != nil {
 		return err
 	}
 	if validationError := validateSaveBundle(req); validationError != nil {
 		return merrors.BadRequest(g.id, "%s", validationError)
 	}
 
-	r, err := g.manager.WriteBundle(req.Bundle)
+	r, err := g.manager.WriteBundle(req.GetBundle())
 	if err != nil {
 		return merrors.BadRequest(g.id, "%s", err)
 	}
@@ -124,13 +124,13 @@ func (g Service) GetBundle(ctx context.Context, req *settingssvc.GetBundleReques
 	if validationError := validateGetBundle(req); validationError != nil {
 		return merrors.BadRequest(g.id, "%s", validationError)
 	}
-	bundle, err := g.manager.ReadBundle(req.BundleId)
+	bundle, err := g.manager.ReadBundle(req.GetBundleId())
 	if err != nil {
 		return merrors.NotFound(g.id, "%s", err)
 	}
 	filteredBundle := g.getFilteredBundle(g.getRoleIDs(ctx), bundle)
-	if len(filteredBundle.Settings) == 0 {
-		err = fmt.Errorf("could not read bundle: %s", req.BundleId)
+	if len(filteredBundle.GetSettings()) == 0 {
+		err = fmt.Errorf("could not read bundle: %s", req.GetBundleId())
 		return merrors.NotFound(g.id, "%s", err)
 	}
 	res.Bundle = filteredBundle
@@ -177,7 +177,7 @@ func (g Service) getFilteredBundle(roleIDs []string, bundle *settingsmsg.Bundle)
 	// check if full bundle is whitelisted
 	bundleResource := &settingsmsg.Resource{
 		Type: settingsmsg.Resource_TYPE_BUNDLE,
-		Id:   bundle.Id,
+		Id:   bundle.GetId(),
 	}
 	if g.hasPermission(
 		roleIDs,
@@ -190,10 +190,10 @@ func (g Service) getFilteredBundle(roleIDs []string, bundle *settingsmsg.Bundle)
 
 	// filter settings based on permissions
 	var filteredSettings []*settingsmsg.Setting
-	for _, setting := range bundle.Settings {
+	for _, setting := range bundle.GetSettings() {
 		settingResource := &settingsmsg.Resource{
 			Type: settingsmsg.Resource_TYPE_SETTING,
-			Id:   setting.Id,
+			Id:   setting.GetId(),
 		}
 		if g.hasPermission(
 			roleIDs,
@@ -210,15 +210,15 @@ func (g Service) getFilteredBundle(roleIDs []string, bundle *settingsmsg.Bundle)
 
 // AddSettingToBundle implements the BundleServiceHandler interface
 func (g Service) AddSettingToBundle(ctx context.Context, req *settingssvc.AddSettingToBundleRequest, res *settingssvc.AddSettingToBundleResponse) error {
-	cleanUpResource(ctx, req.Setting.Resource)
-	if err := g.checkStaticPermissionsByBundleID(ctx, req.BundleId); err != nil {
+	cleanUpResource(ctx, req.GetSetting().GetResource())
+	if err := g.checkStaticPermissionsByBundleID(ctx, req.GetBundleId()); err != nil {
 		return err
 	}
 	if validationError := validateAddSettingToBundle(req); validationError != nil {
 		return merrors.BadRequest(g.id, "%s", validationError)
 	}
 
-	r, err := g.manager.AddSettingToBundle(req.BundleId, req.Setting)
+	r, err := g.manager.AddSettingToBundle(req.GetBundleId(), req.GetSetting())
 	if err != nil {
 		return merrors.BadRequest(g.id, "%s", err)
 	}
@@ -228,14 +228,14 @@ func (g Service) AddSettingToBundle(ctx context.Context, req *settingssvc.AddSet
 
 // RemoveSettingFromBundle implements the BundleServiceHandler interface
 func (g Service) RemoveSettingFromBundle(ctx context.Context, req *settingssvc.RemoveSettingFromBundleRequest, _ *emptypb.Empty) error {
-	if err := g.checkStaticPermissionsByBundleID(ctx, req.BundleId); err != nil {
+	if err := g.checkStaticPermissionsByBundleID(ctx, req.GetBundleId()); err != nil {
 		return err
 	}
 	if validationError := validateRemoveSettingFromBundle(req); validationError != nil {
 		return merrors.BadRequest(g.id, "%s", validationError)
 	}
 
-	if err := g.manager.RemoveSettingFromBundle(req.BundleId, req.SettingId); err != nil {
+	if err := g.manager.RemoveSettingFromBundle(req.GetBundleId(), req.GetSettingId()); err != nil {
 		return merrors.BadRequest(g.id, "%s", err)
 	}
 
@@ -244,17 +244,17 @@ func (g Service) RemoveSettingFromBundle(ctx context.Context, req *settingssvc.R
 
 // SaveValue implements the ValueServiceHandler interface
 func (g Service) SaveValue(ctx context.Context, req *settingssvc.SaveValueRequest, res *settingssvc.SaveValueResponse) error {
-	req.Value.AccountUuid = getValidatedAccountUUID(ctx, req.Value.AccountUuid)
-	if !g.isCurrentUser(ctx, req.Value.AccountUuid) {
+	req.Value.AccountUuid = getValidatedAccountUUID(ctx, req.GetValue().GetAccountUuid())
+	if !g.isCurrentUser(ctx, req.GetValue().GetAccountUuid()) {
 		return merrors.Forbidden(g.id, "can't save value for another user")
 	}
 
-	cleanUpResource(ctx, req.Value.Resource)
+	cleanUpResource(ctx, req.GetValue().GetResource())
 	// TODO: we need to check, if the authenticated user has permission to write the value for the specified resource (e.g. global, file with id xy, ...)
 	if validationError := validateSaveValue(req); validationError != nil {
 		return merrors.BadRequest(g.id, validationError.Error())
 	}
-	r, err := g.manager.WriteValue(req.Value)
+	r, err := g.manager.WriteValue(req.GetValue())
 	if err != nil {
 		return merrors.BadRequest(g.id, err.Error())
 	}
@@ -267,11 +267,11 @@ func (g Service) SaveValue(ctx context.Context, req *settingssvc.SaveValueReques
 }
 
 // GetValue implements the ValueServiceHandler interface
-func (g Service) GetValue(ctx context.Context, req *settingssvc.GetValueRequest, res *settingssvc.GetValueResponse) error {
+func (g Service) GetValue(_ context.Context, req *settingssvc.GetValueRequest, res *settingssvc.GetValueResponse) error {
 	if validationError := validateGetValue(req); validationError != nil {
 		return merrors.BadRequest(g.id, "%s", validationError)
 	}
-	r, err := g.manager.ReadValue(req.Id)
+	r, err := g.manager.ReadValue(req.GetId())
 	if err != nil {
 		return merrors.NotFound(g.id, "%s", err)
 	}
@@ -285,19 +285,19 @@ func (g Service) GetValue(ctx context.Context, req *settingssvc.GetValueRequest,
 
 // GetValueByUniqueIdentifiers implements the ValueService interface
 func (g Service) GetValueByUniqueIdentifiers(ctx context.Context, req *settingssvc.GetValueByUniqueIdentifiersRequest, res *settingssvc.GetValueResponse) error {
-	req.AccountUuid = getValidatedAccountUUID(ctx, req.AccountUuid)
-	if !g.isCurrentUser(ctx, req.AccountUuid) {
+	req.AccountUuid = getValidatedAccountUUID(ctx, req.GetAccountUuid())
+	if !g.isCurrentUser(ctx, req.GetAccountUuid()) {
 		return merrors.Forbidden(g.id, "can't get value of another user")
 	}
 	if validationError := validateGetValueByUniqueIdentifiers(req); validationError != nil {
 		return merrors.BadRequest(g.id, validationError.Error())
 	}
-	v, err := g.manager.ReadValueByUniqueIdentifiers(req.AccountUuid, req.SettingId)
+	v, err := g.manager.ReadValueByUniqueIdentifiers(req.GetAccountUuid(), req.GetSettingId())
 	if err != nil {
 		return merrors.NotFound(g.id, err.Error())
 	}
 
-	if v.BundleId != "" {
+	if v.GetBundleId() != "" {
 		valueWithIdentifier, err := g.getValueWithIdentifier(v)
 		if err != nil {
 			return merrors.NotFound(g.id, err.Error())
@@ -310,15 +310,15 @@ func (g Service) GetValueByUniqueIdentifiers(ctx context.Context, req *settingss
 
 // ListValues implements the ValueServiceHandler interface
 func (g Service) ListValues(ctx context.Context, req *settingssvc.ListValuesRequest, res *settingssvc.ListValuesResponse) error {
-	req.AccountUuid = getValidatedAccountUUID(ctx, req.AccountUuid)
-	if !g.isCurrentUser(ctx, req.AccountUuid) {
+	req.AccountUuid = getValidatedAccountUUID(ctx, req.GetAccountUuid())
+	if !g.isCurrentUser(ctx, req.GetAccountUuid()) {
 		return merrors.Forbidden(g.id, "can't list values of another user")
 	}
 
 	if validationError := validateListValues(req); validationError != nil {
 		return merrors.BadRequest(g.id, validationError.Error())
 	}
-	values, err := g.manager.ListValues(req.BundleId, req.AccountUuid)
+	values, err := g.manager.ListValues(req.GetBundleId(), req.GetAccountUuid())
 	if err != nil {
 		return merrors.NotFound(g.id, err.Error())
 	}
@@ -334,12 +334,12 @@ func (g Service) ListValues(ctx context.Context, req *settingssvc.ListValuesRequ
 }
 
 // ListRoles implements the RoleServiceHandler interface
-func (g Service) ListRoles(c context.Context, req *settingssvc.ListBundlesRequest, res *settingssvc.ListBundlesResponse) error {
+func (g Service) ListRoles(_ context.Context, req *settingssvc.ListBundlesRequest, res *settingssvc.ListBundlesResponse) error {
 	//accountUUID := getValidatedAccountUUID(c, "me")
 	if validationError := validateListRoles(req); validationError != nil {
 		return merrors.BadRequest(g.id, "%s", validationError)
 	}
-	r, err := g.manager.ListBundles(settingsmsg.Bundle_TYPE_ROLE, req.BundleIds)
+	r, err := g.manager.ListBundles(settingsmsg.Bundle_TYPE_ROLE, req.GetBundleIds())
 	if err != nil {
 		return merrors.NotFound(g.id, "%s", err)
 	}
@@ -350,11 +350,11 @@ func (g Service) ListRoles(c context.Context, req *settingssvc.ListBundlesReques
 
 // ListRoleAssignments implements the RoleServiceHandler interface
 func (g Service) ListRoleAssignments(ctx context.Context, req *settingssvc.ListRoleAssignmentsRequest, res *settingssvc.ListRoleAssignmentsResponse) error {
-	req.AccountUuid = getValidatedAccountUUID(ctx, req.AccountUuid)
+	req.AccountUuid = getValidatedAccountUUID(ctx, req.GetAccountUuid())
 	if validationError := validateListRoleAssignments(req); validationError != nil {
 		return merrors.BadRequest(g.id, "%s", validationError)
 	}
-	r, err := g.manager.ListRoleAssignments(req.AccountUuid)
+	r, err := g.manager.ListRoleAssignments(req.GetAccountUuid())
 	if err != nil {
 		return merrors.NotFound(g.id, "%s", err)
 	}
@@ -362,6 +362,7 @@ func (g Service) ListRoleAssignments(ctx context.Context, req *settingssvc.ListR
 	return nil
 }
 
+// ListRoleAssignmentsFiltered implements the RoleServiceHandler interface. Who made this up? And why is everyone copying it? So this methods lists role assignments filtered by account or role.
 func (g Service) ListRoleAssignmentsFiltered(ctx context.Context, req *settingssvc.ListRoleAssignmentsFilteredRequest, res *settingssvc.ListRoleAssignmentsResponse) error {
 	if validationError := validateListRoleAssignmentsFiltered(req); validationError != nil {
 		return merrors.BadRequest(g.id, "%s", validationError)
@@ -387,7 +388,7 @@ func (g Service) ListRoleAssignmentsFiltered(ctx context.Context, req *settingss
 
 // AssignRoleToUser implements the RoleServiceHandler interface
 func (g Service) AssignRoleToUser(ctx context.Context, req *settingssvc.AssignRoleToUserRequest, res *settingssvc.AssignRoleToUserResponse) error {
-	req.AccountUuid = getValidatedAccountUUID(ctx, req.AccountUuid)
+	req.AccountUuid = getValidatedAccountUUID(ctx, req.GetAccountUuid())
 	if validationError := validateAssignRoleToUser(req); validationError != nil {
 		return merrors.BadRequest(g.id, validationError.Error())
 	}
@@ -399,13 +400,13 @@ func (g Service) AssignRoleToUser(ctx context.Context, req *settingssvc.AssignRo
 	}
 
 	switch {
-	case ownAccountUUID == req.AccountUuid:
+	case ownAccountUUID == req.GetAccountUuid():
 		// Allow users to assign themself to the user or user light role
 		// deny any other attempt to change	the user's own assignment
-		if r, err := g.manager.ListRoleAssignments(req.AccountUuid); err == nil && len(r) > 0 {
+		if r, err := g.manager.ListRoleAssignments(req.GetAccountUuid()); err == nil && len(r) > 0 {
 			return merrors.Forbidden(g.id, "Changing own role assignment forbidden")
 		}
-		if req.RoleId != defaults.BundleUUIDRoleUser && req.RoleId != defaults.BundleUUIDRoleUserLight {
+		if req.GetRoleId() != defaults.BundleUUIDRoleUser && req.GetRoleId() != defaults.BundleUUIDRoleUserLight {
 			return merrors.Forbidden(g.id, "Changing own role assignment forbidden")
 		}
 		g.logger.Debug().Str("userid", ownAccountUUID).Msg("Self-assignment for default 'user' role permitted")
@@ -414,7 +415,7 @@ func (g Service) AssignRoleToUser(ctx context.Context, req *settingssvc.AssignRo
 		return merrors.Forbidden(g.id, "user has no role management permission")
 	}
 
-	r, err := g.manager.WriteRoleAssignment(req.AccountUuid, req.RoleId)
+	r, err := g.manager.WriteRoleAssignment(req.GetAccountUuid(), req.GetRoleId())
 	if err != nil {
 		return merrors.BadRequest(g.id, err.Error())
 	}
@@ -445,13 +446,13 @@ func (g Service) RemoveRoleFromUser(ctx context.Context, req *settingssvc.Remove
 	}
 
 	for _, a := range al {
-		if a.Id == req.Id {
+		if a.GetId() == req.GetId() {
 			g.logger.Debug().Str("id", g.id).Msg("Removing own role assignment forbidden")
 			return merrors.Forbidden(g.id, "Removing own role assignment forbidden")
 		}
 	}
 
-	if err := g.manager.RemoveRoleAssignment(req.Id); err != nil {
+	if err := g.manager.RemoveRoleAssignment(req.GetId()); err != nil {
 		return merrors.BadRequest(g.id, err.Error())
 	}
 	return nil
@@ -465,11 +466,11 @@ func (g Service) ListPermissions(ctx context.Context, req *settingssvc.ListPermi
 		return merrors.InternalServerError(g.id, "user not in context")
 	}
 
-	if ownAccountUUID != req.AccountUuid {
-		return merrors.NotFound(g.id, "user not found: %s", req.AccountUuid)
+	if ownAccountUUID != req.GetAccountUuid() {
+		return merrors.NotFound(g.id, "user not found: %s", req.GetAccountUuid())
 	}
 
-	assignments, err := g.manager.ListRoleAssignments(req.AccountUuid)
+	assignments, err := g.manager.ListRoleAssignments(req.GetAccountUuid())
 	if err != nil {
 		return err
 	}
@@ -477,7 +478,7 @@ func (g Service) ListPermissions(ctx context.Context, req *settingssvc.ListPermi
 	// deduplicate role ids
 	roleIDs := map[string]struct{}{}
 	for _, a := range assignments {
-		roleIDs[a.RoleId] = struct{}{}
+		roleIDs[a.GetRoleId()] = struct{}{}
 	}
 
 	// deduplicate permission names
@@ -511,7 +512,7 @@ func (g Service) ListPermissionsByResource(ctx context.Context, req *settingssvc
 	if validationError := validateListPermissionsByResource(req); validationError != nil {
 		return merrors.BadRequest(g.id, "%s", validationError)
 	}
-	permissions, err := g.manager.ListPermissionsByResource(req.Resource, g.getRoleIDs(ctx))
+	permissions, err := g.manager.ListPermissionsByResource(req.GetResource(), g.getRoleIDs(ctx))
 	if err != nil {
 		return merrors.BadRequest(g.id, "%s", err)
 	}
@@ -524,12 +525,12 @@ func (g Service) GetPermissionByID(ctx context.Context, req *settingssvc.GetPerm
 	if validationError := validateGetPermissionByID(req); validationError != nil {
 		return merrors.BadRequest(g.id, "%s", validationError)
 	}
-	permission, err := g.manager.ReadPermissionByID(req.PermissionId, g.getRoleIDs(ctx))
+	permission, err := g.manager.ReadPermissionByID(req.GetPermissionId(), g.getRoleIDs(ctx))
 	if err != nil {
 		return merrors.BadRequest(g.id, "%s", err)
 	}
 	if permission == nil {
-		return merrors.NotFound(g.id, "%s", fmt.Errorf("permission %s not found in roles", req.PermissionId))
+		return merrors.NotFound(g.id, "%s", fmt.Errorf("permission %s not found in roles", req.GetPermissionId()))
 	}
 	res.Permission = permission
 	return nil
@@ -537,8 +538,8 @@ func (g Service) GetPermissionByID(ctx context.Context, req *settingssvc.GetPerm
 
 // cleanUpResource makes sure that the account uuid of the authenticated user is injected if needed.
 func cleanUpResource(ctx context.Context, resource *settingsmsg.Resource) {
-	if resource != nil && resource.Type == settingsmsg.Resource_TYPE_USER {
-		resource.Id = getValidatedAccountUUID(ctx, resource.Id)
+	if resource != nil && resource.GetType() == settingsmsg.Resource_TYPE_USER {
+		resource.Id = getValidatedAccountUUID(ctx, resource.GetId())
 	}
 }
 
@@ -571,7 +572,7 @@ func (g Service) getRoleIDs(ctx context.Context) []string {
 
 		ownRoleIDs := make([]string, 0, len(assignments))
 		for _, a := range assignments {
-			ownRoleIDs = append(ownRoleIDs, a.RoleId)
+			ownRoleIDs = append(ownRoleIDs, a.GetRoleId())
 		}
 		return ownRoleIDs
 	}
@@ -580,19 +581,19 @@ func (g Service) getRoleIDs(ctx context.Context) []string {
 }
 
 func (g Service) getValueWithIdentifier(value *settingsmsg.Value) (*settingsmsg.ValueWithIdentifier, error) {
-	bundle, err := g.manager.ReadBundle(value.BundleId)
+	bundle, err := g.manager.ReadBundle(value.GetBundleId())
 	if err != nil {
 		return nil, err
 	}
-	setting, err := g.manager.ReadSetting(value.SettingId)
+	setting, err := g.manager.ReadSetting(value.GetSettingId())
 	if err != nil {
 		return nil, err
 	}
 	return &settingsmsg.ValueWithIdentifier{
 		Identifier: &settingsmsg.Identifier{
-			Extension: bundle.Extension,
-			Bundle:    bundle.Name,
-			Setting:   setting.Name,
+			Extension: bundle.GetExtension(),
+			Bundle:    bundle.GetName(),
+			Setting:   setting.GetName(),
 		},
 		Value: value,
 	}, nil
@@ -616,12 +617,12 @@ func (g Service) hasStaticPermission(ctx context.Context, permissionID string) b
 		}
 
 		// deduplicate roleids
-		uniqueRoleIds := make(map[string]struct{})
+		uniqueRoleIDs := make(map[string]struct{})
 		for _, a := range assignments {
-			uniqueRoleIds[a.GetRoleId()] = struct{}{}
+			uniqueRoleIDs[a.GetRoleId()] = struct{}{}
 		}
-		roleIDs = make([]string, 0, len(uniqueRoleIds))
-		for a := range uniqueRoleIds {
+		roleIDs = make([]string, 0, len(uniqueRoleIDs))
+		for a := range uniqueRoleIDs {
 			roleIDs = append(roleIDs, a)
 		}
 	}
@@ -634,7 +635,7 @@ func (g Service) checkStaticPermissionsByBundleID(ctx context.Context, bundleID 
 	if err != nil {
 		return merrors.NotFound(g.id, "bundle not found: %s", err)
 	}
-	return g.checkStaticPermissionsByBundleType(ctx, bundle.Type)
+	return g.checkStaticPermissionsByBundleType(ctx, bundle.GetType())
 }
 
 func (g Service) checkStaticPermissionsByBundleType(ctx context.Context, bundleType settingsmsg.Bundle_Type) error {
@@ -684,7 +685,7 @@ func (g Service) getUserLocale(ctx context.Context, userID string) (string, erro
 
 func formatPermissionName(setting *settingsmsg.Setting) string {
 	constraint := strings.TrimPrefix(setting.GetPermissionValue().GetConstraint().String(), "CONSTRAINT_")
-	return setting.Name + "." + strings.ToLower(constraint)
+	return setting.GetName() + "." + strings.ToLower(constraint)
 }
 
 func translateBundle(bundle *settingsmsg.Bundle, t *gotext.Locale) *settingsmsg.Bundle {
