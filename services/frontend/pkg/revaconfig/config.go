@@ -333,7 +333,8 @@ func FrontendConfigFromStruct(cfg *config.Config, logger log.Logger) (map[string
 							},
 							"password_policy": passwordPolicyCfg,
 							"notifications": map[string]interface{}{
-								"endpoints": []string{"list", "get", "delete"},
+								"endpoints":    []string{"list", "get", "delete"},
+								"configurable": cfg.ConfigurableNotifications,
 							},
 						},
 						"version": map[string]interface{}{
