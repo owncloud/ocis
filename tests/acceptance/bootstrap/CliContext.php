@@ -147,6 +147,36 @@ class CliContext implements Context {
 	}
 
 	/**
+	 * @Given the administrator has created app token for user :user with expiration time :expirationTime using the auth-app CLI
+	 *
+	 * @param string $user
+	 * @param string $expirationTime
+	 *
+	 * @return void
+	 */
+	public function theAdministratorHasCreatedAppTokenForUserWithExpirationTimeUsingTheAuthAppCli(
+		$user,
+		$expirationTime
+	): void {
+		$user = $this->featureContext->getActualUserName($user);
+		$command = "auth-app create --user-name=$user --expiration=$expirationTime";
+		$body = [
+			"command" => $command
+		];
+		$response = CliHelper::runCommand($body);
+		$this->featureContext->theHTTPStatusCodeShouldBe(200, '', $response);
+		$jsonResponse = $this->featureContext->getJsonDecodedResponse($response);
+		Assert::assertSame("OK", $jsonResponse["status"]);
+		Assert::assertSame(
+			0,
+			$jsonResponse["exitCode"],
+			"Expected exit code to be 0, but got " . $jsonResponse["exitCode"]
+		);
+		$output = $this->featureContext->substituteInLineCodes("App token created for $user");
+		Assert::assertStringContainsString($output, $jsonResponse["message"]);
+	}
+
+	/**
 	 * @Given user :user has created app token with expiration time :expirationTime using the auth-app CLI
 	 *
 	 * @param string $user
