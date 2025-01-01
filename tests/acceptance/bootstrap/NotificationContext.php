@@ -556,6 +556,22 @@ class NotificationContext implements Context {
 	}
 
 	/**
+	 * @Then user :user should have :count emails
+	 *
+	 * @param string $user
+	 * @param int $count
+	 *
+	 * @return void
+	 */
+	public function userShouldHaveEmail(string $user, int $count): void {
+		$address = $this->featureContext->getEmailAddressForUser($user);
+		$this->featureContext->pushEmailRecipientAsMailBox($address);
+		$mailBox = EmailHelper::getMailBoxFromEmail($address);
+		$mailboxResponse = EmailHelper::getMailboxInformation($mailBox, $this->featureContext->getStepLineRef());
+		Assert::assertCount($count, $mailboxResponse);
+	}
+
+	/**
 	 * @Then user :user should have received the following email from user :sender ignoring whitespaces
 	 *
 	 * @param string $user

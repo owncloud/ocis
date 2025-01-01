@@ -359,6 +359,8 @@ default:
         - FeatureContext: *common_feature_context_params
         - GraphContext:
         - SettingsContext:
+        - SharingNgContext:
+        - NotificationContext:
 
     apiSharingNgShareInvitation:
       paths:
