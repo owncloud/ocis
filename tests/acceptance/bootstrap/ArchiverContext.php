@@ -113,7 +113,7 @@ class ArchiverContext implements Context {
 	 *
 	 * @throws Exception
 	 */
-	private function getArchiverQueryString(
+	public function getArchiverQueryString(
 		string $user,
 		string $resource,
 		string $addressType

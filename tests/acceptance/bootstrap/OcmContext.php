@@ -27,12 +27,15 @@ use TestHelpers\OcisHelper;
 use TestHelpers\OcmHelper;
 use TestHelpers\WebDavHelper;
 use TestHelpers\BehatHelper;
+use TestHelpers\HttpRequestHelper;
 
 /**
  * Acceptance test steps related to testing federation share(ocm) features
  */
 class OcmContext implements Context {
 	private FeatureContext $featureContext;
+	private SpacesContext $spacesContext;
+	private ArchiverContext $archiverContext;
 	private string $invitationToken;
 
 	/**
@@ -50,6 +53,8 @@ class OcmContext implements Context {
 		$environment = $scope->getEnvironment();
 		// Get all the contexts you need in this context from here
 		$this->featureContext = BehatHelper::getContext($scope, $environment, 'FeatureContext');
+		$this->spacesContext = BehatHelper::getContext($scope, $environment, 'SpacesContext');
+		$this->archiverContext = BehatHelper::getContext($scope, $environment, 'ArchiverContext');
 	}
 
 	/**
@@ -333,5 +338,69 @@ class OcmContext implements Context {
 			$ocmUser['user_id'],
 			$ocmUser['idp']
 		);
+	}
+
+	/**
+	 * @Then user :user should be able to download federated shared file :resource
+	 *
+	 * @param string $user
+	 * @param string $resource
+	 *
+	 * @return void
+	 */
+	public function userShouldBeAbleToDownloadFederatedSharedFile(string $user, string $resource): void {
+		$remoteItemId = $this->spacesContext->getSharesRemoteItemId($user, $resource);
+		$baseUrl = $this->featureContext->getRemoteBaseUrl();
+		$davPath = WebDavHelper::getDavPath($this->featureContext->getDavPathVersion());
+		$response = HttpRequestHelper::get(
+			"$baseUrl/$davPath/$remoteItemId",
+			$this->featureContext->getStepLineRef(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+		);
+		$this->featureContext->theHTTPStatusCodeShouldBe(200, "Failed to download resource $resource", $response);
+	}
+
+	/**
+	 * @Then user :user should be able to download archive of federated shared folder :resource
+	 *
+	 * @param string $user
+	 * @param string $resource
+	 *
+	 * @return void
+	 */
+	public function userShouldBeAbleToDownloadArchiveOfFederatedSharedFolder(string $user, string $resource): void {
+		$queryString = $this->archiverContext->getArchiverQueryString($user, $resource, 'remoteItemIds');
+		$response = HttpRequestHelper::get(
+			$this->archiverContext->getArchiverUrl($queryString),
+			$this->featureContext->getStepLineRef(),
+			$user,
+			$this->featureContext->getPasswordForUser($user)
+		);
+		$this->featureContext->theHTTPStatusCodeShouldBe(
+			200,
+			"Failed to download archive of resource $resource",
+			$response
+		);
+	}
+
+	/**
+	 * @When user :user sends PROPFIND request to federated share :share with depth :folderDepth using the WebDAV API
+	 *
+	 * @param string $user
+	 * @param string $share
+	 * @param string $folderDepth
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws JsonException
+	 */
+	public function userSendsPropfindRequestToFederatedShareWithDepthUsingTheWebdavApi(
+		string $user,
+		string $share,
+		string $folderDepth
+	): void {
+		$response = $this->spacesContext->sendPropfindRequestToSpace($user, "", $share, null, $folderDepth, true);
+		$this->featureContext->setResponse($response);
 	}
 }
