@@ -209,6 +209,18 @@ _ocdav: api compatibility, return correct status code_
 - [coreApiWebdavMove2/moveShareOnOcis.feature:281](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove2/moveShareOnOcis.feature#L281)
 - [coreApiWebdavMove2/moveShareOnOcis.feature:283](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove2/moveShareOnOcis.feature#L283)
 
+#### [Space image not uploaded if larger than 7MB](https://github.com/owncloud/web/issues/13295)
+
+- [coreApiWebdavPreviews/previews.feature:383](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavPreviews/previews.feature#L383)
+- [coreApiWebdavPreviews/previews.feature:384](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavPreviews/previews.feature#L384)
+- [coreApiWebdavPreviews/previews.feature:385](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavPreviews/previews.feature#L385)
+- [coreApiWebdavPreviews/previews.feature:386](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavPreviews/previews.feature#L386)
+- [coreApiWebdavPreviews/previews.feature:387](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavPreviews/previews.feature#L387)
+- [coreApiWebdavPreviews/previews.feature:388](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavPreviews/previews.feature#L388)
+- [coreApiWebdavPreviews/previews.feature:389](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavPreviews/previews.feature#L389)
+- [coreApiWebdavPreviews/previews.feature:390](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavPreviews/previews.feature#L390)
+- [coreApiWebdavPreviews/previews.feature:391](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavPreviews/previews.feature#L391)
+
 ### Won't fix
 
 Not everything needs to be implemented for ocis. While the oc10 testsuite covers these things we are not looking at them right now.
