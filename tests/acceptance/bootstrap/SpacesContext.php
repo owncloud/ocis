@@ -2111,6 +2111,27 @@ class SpacesContext implements Context {
 	}
 
 	/**
+	 * @Then user :user should be able to download federated shared file :resource
+	 *
+	 * @param string $user
+	 * @param string $resource
+	 *
+	 * @return void
+	 */
+	public function userShouldBeAbleToDownloadFederatedSharedFile(string $user, string $resource): void {
+		$remoteItemId = $this->getSharesRemoteItemId($user, $resource);
+		$baseUrl = $this->featureContext->getRemoteBaseUrl();
+		$davPath = WebDavHelper::getDavPath($this->featureContext->getDavPathVersion());
+		$response = HttpRequestHelper::get(
+			"$baseUrl/$davPath/$remoteItemId",
+			$this->featureContext->getStepLineRef(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+		);
+		$this->featureContext->theHTTPStatusCodeShouldBe(200, "Failed to download resource $resource", $response);
+	}
+
+	/**
 	 * @When /^user "([^"]*)" moves (?:file|folder) "([^"]*)" from space "([^"]*)" to "([^"]*)" inside space "([^"]*)" using the WebDAV API$/
 	 *
 	 * @param string $user
@@ -4174,6 +4195,26 @@ class SpacesContext implements Context {
 	}
 
 	/**
+	 * @When user :user sends PROPFIND request to federated share :share with depth :folderDepth using the WebDAV API
+	 *
+	 * @param string $user
+	 * @param string $share
+	 * @param string $folderDepth
+	 *
+	 * @return void
+	 * @throws JsonException
+	 * @throws GuzzleException
+	 */
+	public function userSendsPropfindRequestToFederatedShareWithDepthUsingTheWebdavApi(
+		string $user,
+		string $share,
+		string $folderDepth
+	): void {
+		$response = $this->sendPropfindRequestToSpace($user, "", $share, null, $folderDepth, true);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
 	 * @When /^user "([^"]*)" sends PROPFIND request to space "([^"]*)" with headers using the WebDAV API$/
 	 *
 	 * @param string $user
@@ -4210,6 +4251,7 @@ class SpacesContext implements Context {
 	 * @param string|null $resource
 	 * @param array|null $headers
 	 * @param string|null $folderDepth
+	 * @param bool $federatedShare
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
@@ -4218,12 +4260,20 @@ class SpacesContext implements Context {
 	 */
 	public function sendPropfindRequestToSpace(
 		string $user,
-		string $spaceName,
+		?string $spaceName = "",
 		?string $resource = "",
 		?array $headers = [],
-		?string $folderDepth = "1"
+		?string $folderDepth = "1",
+		bool $federatedShare = false
 	): ResponseInterface {
-		$spaceId = $this->getSpaceIdByName($user, $spaceName);
+		// PROPFIND request to federated share via normal webdav path "remote.php/dav/spaces/{shares-space-id}/{resource}" returns 404 status code
+		// the federated share is only accessible using "remote-item-id", i.e. "remote.php/dav/spaces/{remote-item-id}"
+		if ($federatedShare) {
+			$spaceId = $this->getSharesRemoteItemId($user, $resource);
+			$resource = null;
+		} else {
+			$spaceId = $this->getSpaceIdByName($user, $spaceName);
+		}
 		$properties = [
 			'oc:id',
 			'oc:fileid',

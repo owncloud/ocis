@@ -332,5 +332,9 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiOcm/share.feature:1154](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L1154)
 - [apiOcm/share.feature:1174](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L1174)
 
+#### [[OCM] federated user trying to download file shared with permissions role Secure Viewer returns 500 status code](https://github.com/owncloud/ocis/issues/10822)
+- [apiOcm/enableDisablePermissionsRole.feature:18](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/enableDisablePermissionsRole.feature#L18)
+- [apiOcm/enableDisablePermissionsRole.feature:58](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/enableDisablePermissionsRole.feature#L58)
+
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.
