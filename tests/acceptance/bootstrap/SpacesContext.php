@@ -2058,15 +2058,18 @@ class SpacesContext implements Context {
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function userShouldNotBeAbleToDownloadFileInsideSpace(
+	public function userShouldOrShouldNotBeAbleToDownloadFileFromSpace(
 		string $user,
 		string $fileName,
 		string $spaceName
 	): void {
+		$spaceId = $this->getSpaceIdByName($user, $spaceName);
 		$response = $this->featureContext->downloadFileAsUserUsingPassword(
 			$user,
 			$fileName,
-			$this->featureContext->getPasswordForUser($user)
+			$this->featureContext->getPasswordForUser($user),
+			null,
+			$spaceId
 		);
 		Assert::assertGreaterThanOrEqual(
 			400,
