@@ -22,7 +22,7 @@ Feature: assign role
   @issue-5032
   Scenario Outline: get assigned role of a user via setting api
     Given the administrator has assigned the role "<user-role>" to user "Alice" using the Graph API
-    When user "Alice" tries to get list of assignment
+    When user "Alice" tries to get list of assignment using the settings API
     Then the HTTP status code should be "<http-status-code>"
     And the setting API response should have the role "<user-role>"
     Examples:

@@ -63,7 +63,7 @@ class SettingsContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" tries to get all existing roles$/
+	 * @When /^user "([^"]*)" tries to get all existing roles using the settings API$/
 	 *
 	 * @param string $user
 	 *
@@ -137,6 +137,30 @@ class SettingsContext implements Context {
 			"Expected response status code should be 201",
 			$response
 		);
+	}
+
+	/**
+	 * @When user :assigner assigns the role :role to user :assignee using the settings API
+	 *
+	 * @param string $assigner
+	 * @param string $role
+	 * @param string $assignee
+	 *
+	 * @return void
+	 *
+	 * @throws Exception
+	 */
+	public function userAssignsTheRoleToUserUsingTheSettingsApi(
+		string $assigner,
+		string $role,
+		string $assignee
+	): void {
+		$response = $this->assignRoleToUser(
+			$assigner,
+			$this->featureContext->getAttributeOfCreatedUser($assignee, 'id'),
+			$this->getRoleIdByRoleName($assigner, $role)
+		);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -232,7 +256,7 @@ class SettingsContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" tries to get list of assignment$/
+	 * @When /^user "([^"]*)" tries to get list of assignment using the settings API$/
 	 *
 	 * @param string $user
 	 *
@@ -445,6 +469,22 @@ class SettingsContext implements Context {
 	}
 
 	/**
+	 * @When user :user switches the system language to :language using the settings API
+	 *
+	 * @param string $user
+	 * @param string $language
+	 *
+	 * @return void
+	 *
+	 * @throws Exception
+	 * @throws GuzzleException
+	 */
+	public function userSwitchesTheSystemLanguageUsingTheSettingsApi(string $user, string $language): void {
+		$response = $this->sendRequestToSwitchSystemLanguage($user, $language);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
 	 * @param string $user
 	 *
 	 * @return ResponseInterface
@@ -495,6 +535,22 @@ class SettingsContext implements Context {
 			"Expected response status code should be 201",
 			$response
 		);
+		$this->featureContext->rememberUserAutoSyncSetting($user, false);
+	}
+
+	/**
+	 * @When user :user disables the auto-sync share using the settings API
+	 *
+	 * @param string $user
+	 *
+	 * @return void
+	 *
+	 * @throws Exception
+	 * @throws GuzzleException
+	 */
+	public function userDisablesAutoAcceptingUsingSettingsApi(string $user): void {
+		$response = $this->sendRequestToDisableAutoAccepting($user);
+		$this->featureContext->setResponse($response);
 		$this->featureContext->rememberUserAutoSyncSetting($user, false);
 	}
 }
