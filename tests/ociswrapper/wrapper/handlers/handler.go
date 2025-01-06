@@ -9,7 +9,6 @@ import (
 	"net/http"
 	"ociswrapper/common"
 	"ociswrapper/ocis"
-	"os"
 	"strings"
 )
 
