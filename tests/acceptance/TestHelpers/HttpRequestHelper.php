@@ -251,7 +251,6 @@ class HttpRequestHelper {
 				\sleep(1);
 			}
 		} while ($loopAgain);
-
 		return $response;
 	}
 
