@@ -340,7 +340,7 @@ require (
 	sigs.k8s.io/yaml v1.4.0 // indirect
 )
 
-replace github.com/studio-b12/gowebdav => github.com/aduffeck/gowebdav v0.0.0-20231215102054-212d4a4374f6
+replace github.com/studio-b12/gowebdav => github.com/kobergj/gowebdav v0.0.0-20250102091030-aa65266db202
 
 replace github.com/egirna/icap-client => github.com/fschade/icap-client v0.0.0-20240802074440-aade4a234387
 
