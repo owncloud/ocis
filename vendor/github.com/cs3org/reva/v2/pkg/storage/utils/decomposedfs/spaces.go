@@ -50,6 +50,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/pkg/errors"
+	"github.com/shamaton/msgpack/v2"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -744,12 +745,58 @@ func (fs *Decomposedfs) DeleteStorageSpace(ctx context.Context, req *provider.De
 			return err
 		}
 
-		// remove space metadata
-		if err := os.RemoveAll(fs.getSpaceRoot(spaceID)); err != nil {
+		root := fs.getSpaceRoot(spaceID)
+
+		// walkfn will delete the blob if the node has one
+		walkfn := func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+
+			if filepath.Ext(path) != ".mpk" {
+				return nil
+			}
+
+			b, err := os.ReadFile(path)
+			if err != nil {
+				return err
+			}
+
+			m := map[string][]byte{}
+			if err := msgpack.Unmarshal(b, &m); err != nil {
+				return err
+			}
+
+			bid := m["user.ocis.blobid"]
+			if string(bid) == "" {
+				return nil
+			}
+
+			if err := fs.tp.DeleteBlob(&node.Node{
+				BlobID:  string(bid),
+				SpaceID: spaceID,
+			}); err != nil {
+				return err
+			}
+
+			// remove .mpk file so subsequent attempts will not try to delete the blob again
+			return os.Remove(path)
+		}
+
+		// This is deletes all blobs of the space
+		// NOTE: This isn't needed when no s3 is used, but we can't differentiate that here...
+		if err := filepath.Walk(root, walkfn); err != nil {
 			return err
 		}
 
-		// TODO remove space blobs with s3 backend by adding a purge method to the Blobstore interface
+		// remove space metadata
+		if err := os.RemoveAll(root); err != nil {
+			return err
+		}
+
+		// try removing the space root node
+		// Note that this will fail when there are other spaceids starting with the same two digits.
+		_ = os.Remove(filepath.Dir(root))
 
 		return nil
 	}

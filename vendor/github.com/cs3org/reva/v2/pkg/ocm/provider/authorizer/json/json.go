@@ -24,6 +24,7 @@ import (
 	"net"
 	"net/url"
 	"os"
+	"regexp"
 	"strings"
 	"sync"
 
@@ -130,7 +131,7 @@ func (a *authorizer) IsProviderAllowed(ctx context.Context, pi *ocmprovider.Prov
 	var providerAuthorized bool
 	if normalizedDomain != "" {
 		for _, p := range a.providers {
-			if p.Domain == normalizedDomain {
+			if ok, err := regexp.MatchString(p.Domain, normalizedDomain); ok && err == nil {
 				providerAuthorized = true
 				break
 			}

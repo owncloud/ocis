@@ -288,7 +288,8 @@ type CapabilitiesFilesSharingFederation struct {
 
 // CapabilitiesNotifications holds a list of notification endpoints
 type CapabilitiesNotifications struct {
-	Endpoints []string `json:"ocs-endpoints,omitempty" xml:"ocs-endpoints>element,omitempty" mapstructure:"endpoints"`
+	Endpoints    []string `json:"ocs-endpoints,omitempty" xml:"ocs-endpoints>element,omitempty" mapstructure:"endpoints"`
+	Configurable bool     `json:"configurable" xml:"configurable,omitempty" mapstructure:"configurable"`
 }
 
 // CapabilitiesTheme holds theming capabilities

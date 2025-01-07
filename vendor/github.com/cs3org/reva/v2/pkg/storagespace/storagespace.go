@@ -75,8 +75,8 @@ func SplitStorageID(sid string) (storageID, spaceID string) {
 // The result format will look like:
 // <storageid>$<spaceid>!<opaqueid>
 func FormatResourceID(sid *provider.ResourceId) string {
-	if sid.OpaqueId == "" {
-		return FormatStorageID(sid.StorageId, sid.SpaceId)
+	if sid.GetOpaqueId() == "" {
+		return FormatStorageID(sid.GetStorageId(), sid.GetSpaceId())
 	}
 	return strings.Join([]string{FormatStorageID(sid.StorageId, sid.SpaceId), sid.OpaqueId}, _idDelimiter)
 }
