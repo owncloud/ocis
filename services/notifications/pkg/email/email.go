@@ -67,12 +67,71 @@ func RenderEmailTemplate(mt MessageTemplate, locale, defaultLocale string, email
 	}, nil
 }
 
+// RenderGroupedEmailTemplate is responsible to prepare a message which than can be used to notify the user via email.
+func RenderGroupedEmailTemplate(gmt GroupedMessageTemplate, vars map[string]string, locale, defaultLocale string, emailTemplatePath string, translationPath string, mts []MessageTemplate, mtsVars []map[string]string) (*channels.Message, error) {
+	textMt, err := NewGroupedTextTemplate(gmt, vars, locale, defaultLocale, translationPath, mts, mtsVars)
+	if err != nil {
+		return nil, err
+	}
+	tpl, err := parseTemplate(emailTemplatePath, gmt.textTemplate)
+	if err != nil {
+		return nil, err
+	}
+	textBody, err := groupedEmailTemplate(tpl, textMt)
+	if err != nil {
+		return nil, err
+	}
+
+	var escapedMtsVars []map[string]string
+	for _, m := range mtsVars {
+		escapedMtsVars = append(escapedMtsVars, escapeStringMap(m))
+	}
+	htmlMt, err := NewGroupedHTMLTemplate(gmt, escapeStringMap(vars), locale, defaultLocale, translationPath, mts, escapedMtsVars)
+	if err != nil {
+		return nil, err
+	}
+	htmlTpl, err := parseTemplate(emailTemplatePath, gmt.htmlTemplate)
+	if err != nil {
+		return nil, err
+	}
+	htmlBody, err := groupedEmailTemplate(htmlTpl, htmlMt)
+	if err != nil {
+		return nil, err
+	}
+	var data map[string][]byte
+	if emailTemplatePath != "" {
+		data, err = readImages(emailTemplatePath)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return &channels.Message{
+		Subject:      textMt.Subject,
+		TextBody:     textBody,
+		HTMLBody:     htmlBody,
+		AttachInline: data,
+	}, nil
+}
+
 // emailTemplate builds the email template. It does not use any user provided input, so it is safe to use template.HTML.
 func emailTemplate(tpl *template.Template, mt MessageTemplate) (string, error) {
 	str, err := executeTemplate(tpl, map[string]interface{}{
 		"Greeting":     template.HTML(strings.TrimSpace(mt.Greeting)),     // #nosec G203
 		"MessageBody":  template.HTML(strings.TrimSpace(mt.MessageBody)),  // #nosec G203
 		"CallToAction": template.HTML(strings.TrimSpace(mt.CallToAction)), // #nosec G203
+	})
+	if err != nil {
+		return "", err
+	}
+	return str, err
+}
+
+// groupedEmailTemplate builds the email template. It does not use any user provided input, so it is safe to use template.HTML.
+func groupedEmailTemplate(tpl *template.Template, gmt GroupedMessageTemplate) (string, error) {
+	str, err := executeTemplate(tpl, map[string]interface{}{
+		"Greeting":    template.HTML(strings.TrimSpace(gmt.Greeting)),    // #nosec G203
+		"MessageBody": template.HTML(strings.TrimSpace(gmt.MessageBody)), // #nosec G203
 	})
 	if err != nil {
 		return "", err

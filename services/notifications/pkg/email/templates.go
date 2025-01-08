@@ -2,12 +2,17 @@ package email
 
 import "github.com/owncloud/ocis/v2/ocis-pkg/l10n"
 
+const (
+	_textTemplate = "templates/text/email.text.tmpl"
+	_htmlTemplate = "templates/html/email.html.tmpl"
+)
+
 // the available templates
 var (
 	// Shares
 	ShareCreated = MessageTemplate{
-		textTemplate: "templates/text/email.text.tmpl",
-		htmlTemplate: "templates/html/email.html.tmpl",
+		textTemplate: _textTemplate,
+		htmlTemplate: _htmlTemplate,
 		// ShareCreated email template, Subject field (resolves directly)
 		Subject: l10n.Template(`{ShareSharer} shared '{ShareFolder}' with you`),
 		// ShareCreated email template, resolves via {{ .Greeting }}
@@ -19,8 +24,8 @@ var (
 	}
 
 	ShareExpired = MessageTemplate{
-		textTemplate: "templates/text/email.text.tmpl",
-		htmlTemplate: "templates/html/email.html.tmpl",
+		textTemplate: _textTemplate,
+		htmlTemplate: _htmlTemplate,
 		// ShareExpired email template, Subject field (resolves directly)
 		Subject: l10n.Template(`Share to '{ShareFolder}' expired at {ExpiredAt}`),
 		// ShareExpired email template, resolves via {{ .Greeting }}
@@ -33,8 +38,8 @@ Even though this share has been revoked you still might have access through othe
 
 	// Spaces templates
 	SharedSpace = MessageTemplate{
-		textTemplate: "templates/text/email.text.tmpl",
-		htmlTemplate: "templates/html/email.html.tmpl",
+		textTemplate: _textTemplate,
+		htmlTemplate: _htmlTemplate,
 		// SharedSpace email template, Subject field (resolves directly)
 		Subject: l10n.Template("{SpaceSharer} invited you to join {SpaceName}"),
 		// SharedSpace email template, resolves via {{ .Greeting }}
@@ -46,8 +51,8 @@ Even though this share has been revoked you still might have access through othe
 	}
 
 	UnsharedSpace = MessageTemplate{
-		textTemplate: "templates/text/email.text.tmpl",
-		htmlTemplate: "templates/html/email.html.tmpl",
+		textTemplate: _textTemplate,
+		htmlTemplate: _htmlTemplate,
 		// UnsharedSpace email template, Subject field (resolves directly)
 		Subject: l10n.Template(`{SpaceSharer} removed you from {SpaceName}`),
 		// UnsharedSpace email template, resolves via {{ .Greeting }}
@@ -61,8 +66,8 @@ You might still have access through your other groups or direct membership.`),
 	}
 
 	MembershipExpired = MessageTemplate{
-		textTemplate: "templates/text/email.text.tmpl",
-		htmlTemplate: "templates/html/email.html.tmpl",
+		textTemplate: _textTemplate,
+		htmlTemplate: _htmlTemplate,
 		// MembershipExpired email template, Subject field (resolves directly)
 		Subject: l10n.Template(`Membership of '{SpaceName}' expired at {ExpiredAt}`),
 		// MembershipExpired email template, resolves via {{ .Greeting }}
@@ -74,8 +79,8 @@ Even though this membership has expired you still might have access through othe
 	}
 
 	ScienceMeshInviteTokenGenerated = MessageTemplate{
-		textTemplate: "templates/text/email.text.tmpl",
-		htmlTemplate: "templates/html/email.html.tmpl",
+		textTemplate: _textTemplate,
+		htmlTemplate: _htmlTemplate,
 		// ScienceMeshInviteTokenGenerated email template, Subject field (resolves directly)
 		Subject: l10n.Template(`ScienceMesh: {InitiatorName} wants to collaborate with you`),
 		// ScienceMeshInviteTokenGenerated email template, resolves via {{ .Greeting }}
@@ -91,8 +96,8 @@ Alternatively, you can visit your federation settings and use the following deta
 	}
 
 	ScienceMeshInviteTokenGeneratedWithoutShareLink = MessageTemplate{
-		textTemplate: "templates/text/email.text.tmpl",
-		htmlTemplate: "templates/html/email.html.tmpl",
+		textTemplate: _textTemplate,
+		htmlTemplate: _htmlTemplate,
 		// ScienceMeshInviteTokenGeneratedWithoutShareLink email template, Subject field (resolves directly)
 		Subject: l10n.Template(`ScienceMesh: {InitiatorName} wants to collaborate with you`),
 		// ScienceMeshInviteTokenGeneratedWithoutShareLink email template, resolves via {{ .Greeting }}
@@ -102,6 +107,17 @@ Alternatively, you can visit your federation settings and use the following deta
 Please visit your federation settings and use the following details:
   Token: {Token}
   ProviderDomain: {ProviderDomain}`),
+	}
+
+	Grouped = GroupedMessageTemplate{
+		textTemplate: _textTemplate,
+		htmlTemplate: _htmlTemplate,
+		// Grouped email template, Subject field (resolves directly)
+		Subject: l10n.Template(`Report`), // TODO find meaningful subject
+		// Grouped email template, resolves via {{ .Greeting }}
+		Greeting:         l10n.Template(`Hi {DisplayName},`),
+		MessageBody:      "", // is generated using the GroupedTemplates
+		GroupedTemplates: []MessageTemplate{ShareCreated, ShareExpired, SharedSpace, UnsharedSpace, MembershipExpired},
 	}
 )
 
@@ -118,6 +134,7 @@ var _placeholders = map[string]string{
 	"{ShareSharerMail}": "{{ .ShareSharerMail }}",
 	"{ProviderDomain}":  "{{ .ProviderDomain }}",
 	"{Token}":           "{{ .Token }}",
+	"{DisplayName}":     "{{ .DisplayName }}",
 }
 
 // MessageTemplate is the data structure for the email
@@ -131,4 +148,16 @@ type MessageTemplate struct {
 	Greeting     string
 	MessageBody  string
 	CallToAction string
+}
+
+type GroupedMessageTemplate struct {
+	// textTemplate represent the path to text plain .tmpl file
+	textTemplate string
+	// htmlTemplate represent the path to html .tmpl file
+	htmlTemplate string
+	// The fields below represent the placeholders for the translatable templates
+	Subject          string
+	Greeting         string
+	MessageBody      string
+	GroupedTemplates []MessageTemplate
 }

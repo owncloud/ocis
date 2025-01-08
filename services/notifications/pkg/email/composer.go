@@ -3,6 +3,7 @@ package email
 import (
 	"bytes"
 	"embed"
+	"github.com/pkg/errors"
 	"strings"
 	"text/template"
 
@@ -59,6 +60,65 @@ func NewHTMLTemplate(mt MessageTemplate, locale, defaultLocale string, translati
 		return mt, err
 	}
 	return mt, nil
+}
+
+// NewGroupedTextTemplate replace the body message template placeholders with the translated template
+func NewGroupedTextTemplate(gmt GroupedMessageTemplate, vars map[string]string, locale, defaultLocale string, translationPath string, mts []MessageTemplate, mtsVars []map[string]string) (GroupedMessageTemplate, error) {
+	if len(mts) != len(mtsVars) {
+		return gmt, errors.New("number of templates does not match number of variables")
+	}
+
+	var err error
+	t := l10n.NewTranslatorFromCommonConfig(defaultLocale, _domain, translationPath, _translationFS, "l10n/locale").Locale(locale)
+	gmt.Subject, err = composeMessage(t.Get(gmt.Subject), vars)
+	if err != nil {
+		return gmt, err
+	}
+	gmt.Greeting, err = composeMessage(t.Get(gmt.Greeting), vars)
+	if err != nil {
+		return gmt, err
+	}
+
+	var bodyParts []string
+	for i, mt := range mts {
+		bodyPart, err := composeMessage(t.Get(mt.MessageBody), mtsVars[i])
+		if err != nil {
+			return gmt, err
+		}
+		bodyParts = append(bodyParts, bodyPart)
+	}
+	gmt.MessageBody = strings.Join(bodyParts, "\n\n\n")
+	return gmt, nil
+}
+
+// NewGroupedHTMLTemplate replace the body message template placeholders with the translated template
+func NewGroupedHTMLTemplate(gmt GroupedMessageTemplate, vars map[string]string, locale, defaultLocale string, translationPath string, mts []MessageTemplate, mtsVars []map[string]string) (GroupedMessageTemplate, error) {
+	if len(mts) != len(mtsVars) {
+		return gmt, errors.New("number of templates does not match number of variables")
+	}
+
+	var err error
+	t := l10n.NewTranslatorFromCommonConfig(defaultLocale, _domain, translationPath, _translationFS, "l10n/locale").Locale(locale)
+	gmt.Subject, err = composeMessage(t.Get(gmt.Subject), vars)
+	if err != nil {
+		return gmt, err
+	}
+	gmt.Greeting, err = composeMessage(newlineToBr(t.Get(gmt.Greeting)), vars)
+	if err != nil {
+		return gmt, err
+	}
+
+	var bodyParts []string
+	for i, mt := range mts {
+		bodyPart, err := composeMessage(t.Get(mt.MessageBody), mtsVars[i])
+		if err != nil {
+			return gmt, err
+		}
+		bodyParts = append(bodyParts, bodyPart)
+	}
+	gmt.MessageBody = strings.Join(bodyParts, "<br><br><br>")
+
+	return gmt, nil
 }
 
 // composeMessage renders the message based on template

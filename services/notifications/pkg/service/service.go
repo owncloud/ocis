@@ -119,6 +119,8 @@ func (s eventsNotifier) Run() error {
 					s.handleShareExpired(e, evt.ID)
 				case events.ScienceMeshInviteTokenGenerated:
 					s.handleScienceMeshInviteTokenGenerated(e)
+				case events.SendEmailsEvent:
+					s.sendGroupedEmailsJob(e, evt.ID)
 				}
 			}()
 		case <-s.signals:
