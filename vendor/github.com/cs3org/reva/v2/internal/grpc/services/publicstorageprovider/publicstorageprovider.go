@@ -315,6 +315,7 @@ func (s *service) InitiateFileUpload(ctx context.Context, req *provider.Initiate
 	uReq := &provider.InitiateFileUploadRequest{
 		Ref:    cs3Ref,
 		Opaque: req.Opaque,
+		LockId: req.LockId,
 	}
 
 	gatewayClient, err := s.gatewaySelector.Next()
