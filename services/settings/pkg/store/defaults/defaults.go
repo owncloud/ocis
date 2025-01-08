@@ -500,7 +500,7 @@ var optionInAppTrue = settingsmsg.MultiChoiceCollectionOption{
 
 var optionMailTrue = settingsmsg.MultiChoiceCollectionOption{
 	Key:          "mail",
-	DisplayValue: "Mail",
+	DisplayValue: "Email",
 	Value: &settingsmsg.MultiChoiceCollectionOptionValue{
 		Option: &settingsmsg.MultiChoiceCollectionOptionValue_BoolValue{
 			BoolValue: &settingsmsg.Bool{
@@ -513,7 +513,7 @@ var optionMailTrue = settingsmsg.MultiChoiceCollectionOption{
 var optionMailFalseDisabled = settingsmsg.MultiChoiceCollectionOption{
 	Key:          "mail",
 	Attribute:    "disabled",
-	DisplayValue: "Mail",
+	DisplayValue: "Email",
 	Value: &settingsmsg.MultiChoiceCollectionOptionValue{
 		Option: &settingsmsg.MultiChoiceCollectionOptionValue_BoolValue{
 			BoolValue: &settingsmsg.Bool{
