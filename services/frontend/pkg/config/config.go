@@ -58,6 +58,8 @@ type Config struct {
 
 	PasswordPolicy PasswordPolicy `yaml:"password_policy"`
 
+	ConfigurableNotifications bool `yaml:"configurable_notifications" env:"FRONTEND_CONFIGURABLE_NOTIFICATIONS" desc:"Allow configuring notifications via web client." introductionVersion:"7.1"`
+
 	Context context.Context `yaml:"-"`
 }
 

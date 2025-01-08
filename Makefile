@@ -17,7 +17,8 @@ L10N_MODULES := \
 	services/activitylog \
 	services/graph \
 	services/notifications \
-	services/userlog
+	services/userlog \
+	services/settings
 
 # if you add a module here please also add it to the .drone.star file
 OCIS_MODULES = \
