@@ -2119,4 +2119,29 @@ class SharingNgContext implements Context {
 			$this->getPermissionsList($user, $fileOrFolder, $space, $resource, $query)
 		);
 	}
+
+	/**
+	 * @When /^user "([^"]*)" lists permissions with following filters for (folder|file) "([^"]*)" of the space "([^"]*)" using the Graph API:$/
+	 *
+	 * @param string $user
+	 * @param string $fileOrFolder (file|folder)
+	 * @param string $resource
+	 * @param string $space
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userListsPermissionsWithFollowingFiltersForFileOrFolderOfTheSpaceUsingTheGraphApi(
+		string $user,
+		string $fileOrFolder,
+		string $resource,
+		string $space,
+		TableNode $table
+	): void {
+		$query = implode('&', $table->getColumn(0));
+		$this->featureContext->setResponse(
+			$this->getPermissionsList($user, $fileOrFolder, $space, $resource, $query)
+		);
+	}
 }
