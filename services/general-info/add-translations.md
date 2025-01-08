@@ -29,7 +29,13 @@ Translations have a `context` and a `translatable string`. The context is shown 
 * Add the `OCIS_DEFAULT_LANGUAGE` envvar in `services/<service-name>/pkg/config/config.go`.\
   For details see the userlog or notifications service code.
 
-* Use `"github.com/owncloud/ocis/v2/ocis-pkg/l10n"` for the translation.
+* Add the `<SERVICE_NAME>_TRANSLATION_PATH` envvar in `services/<service-name>/pkg/config/config.go`.\
+  For details see the userlog or notifications service code.
+
+* Use `"github.com/owncloud/ocis/v2/ocis-pkg/l10n"` for the translation.\
+  Use `l10n.Template` to define the translation string.\
+  Use `l10n.NewTranslator` or `l10n.NewTranslatorFromCommonConfig` to get the translator.\
+  Use `t.Get` to translate the string. See package for more advanced usage.
 
 * Create a config in `services/<service-name>/pkg/service/l10n/.tx/config` with the following content. Note that it is important to stick with `ocis-<service-name>` to easily identify all ocis translations on Transifex:
   ```
@@ -46,9 +52,11 @@ Translations have a `context` and a `translatable string`. The context is shown 
   ```
   Note: o: organization, p: project, r: resource
 
-* Create a go file like `templates.go` in `ocis/services/<service-name>/pkg/service` that will define your translation sources like the following:
+* Create an empty file `services/<service-name>/pkg/service/l10n/locale/en/LC_MESSAGES/<service-name>.po`. This is required for ocis to build. This file will be replaced nightly with the latest translations from Transifex.
+
+* Create a go file like `templates.go` in e.g. `ocis/services/<service-name>/pkg/service` that will define your translation sources like the following:
   ```
-  // context string
+  // this comment will appear in transifex as context
   var yourString = l10n.Template("Translation String")
   ```
 
@@ -85,7 +93,7 @@ Translations have a `context` and a `translatable string`. The context is shown 
   l10n-read: $(GO_XGETTEXT)
   	go-xgettext -o $(OUTPUT_DIR)/<service-name>.pot \
   	--keyword=l10n.Template --add-comments -s \
-  	ocis/services/<service-name>/pkg/service/templates.go
+  	pkg/service/templates.go
 
   .PHONY: l10n-write
   l10n-write:

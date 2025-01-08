@@ -1,7 +1,7 @@
 ---
 title: "ocis.messages.settings.v0"
 url: /apis/grpc_apis/ocis_messages_settings_v0
-date: 2025-01-08T00:34:40Z
+date: 2025-01-08T12:32:12Z
 weight: 50
 geekdocRepo: https://github.com/owncloud/ocis
 ---
@@ -34,6 +34,25 @@ geekdocRepo: https://github.com/owncloud/ocis
 | display_name | [string](#string) |  | @gotags: yaml:"display_name" |
 | settings | [Setting](#setting) | repeated | @gotags: yaml:"settings" |
 | resource | [Resource](#resource) |  | @gotags: yaml:"resource" |
+
+### CollectionOption
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| key | [string](#string) |  | required<br><br>@gotags: yaml:"key" |
+| int_value | [int64](#int64) |  | @gotags: yaml:"int_value" |
+| string_value | [string](#string) |  | @gotags: yaml:"string_value" |
+| bool_value | [bool](#bool) |  | @gotags: yaml:"bool_value" |
+
+### CollectionValue
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| values | [CollectionOption](#collectionoption) | repeated | @gotags: yaml:"values" |
 
 ### Identifier
 
@@ -75,6 +94,7 @@ geekdocRepo: https://github.com/owncloud/ocis
 | ----- | ---- | ----- | ----------- |
 | string_value | [string](#string) |  | @gotags: yaml:"string_value" |
 | int_value | [int64](#int64) |  | @gotags: yaml:"int_value" |
+| bool_value | [bool](#bool) |  | @gotags: yaml:"bool_value" |
 
 ### ListValue
 
@@ -83,6 +103,35 @@ geekdocRepo: https://github.com/owncloud/ocis
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | values | [ListOptionValue](#listoptionvalue) | repeated | @gotags: yaml:"values" |
+
+### MultiChoiceCollection
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| options | [MultiChoiceCollectionOption](#multichoicecollectionoption) | repeated | @gotags: yaml:"options" |
+
+### MultiChoiceCollectionOption
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| value | [MultiChoiceCollectionOptionValue](#multichoicecollectionoptionvalue) |  | @gotags: yaml:"value" |
+| key | [string](#string) |  | @gotags: yaml:"key" |
+| attribute | [string](#string) |  | @gotags: yaml:"attribute" |
+| display_value | [string](#string) |  | @gotags: yaml:"display_value" |
+
+### MultiChoiceCollectionOptionValue
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| int_value | [Int](#int) |  | @gotags: yaml:"int_value" |
+| string_value | [String](#string) |  | @gotags: yaml:"string_value" |
+| bool_value | [Bool](#bool) |  | @gotags: yaml:"bool_value" |
 
 ### MultiChoiceList
 
@@ -126,6 +175,7 @@ geekdocRepo: https://github.com/owncloud/ocis
 | single_choice_value | [SingleChoiceList](#singlechoicelist) |  | @gotags: yaml:"single_choice_value" |
 | multi_choice_value | [MultiChoiceList](#multichoicelist) |  | @gotags: yaml:"multi_choice_value" |
 | permission_value | [Permission](#permission) |  | @gotags: yaml:"permission_value" |
+| multi_choice_collection_value | [MultiChoiceCollection](#multichoicecollection) |  | @gotags: yaml:"multi_choice_collection_value" |
 | resource | [Resource](#resource) |  | @gotags: yaml:"resource" |
 
 ### SingleChoiceList
@@ -183,6 +233,7 @@ geekdocRepo: https://github.com/owncloud/ocis
 | int_value | [int64](#int64) |  | @gotags: yaml:"int_value" |
 | string_value | [string](#string) |  | @gotags: yaml:"string_value" |
 | list_value | [ListValue](#listvalue) |  | @gotags: yaml:"list_value" |
+| collection_value | [CollectionValue](#collectionvalue) |  | @gotags: yaml:"collection_value" |
 
 ### ValueWithIdentifier
 
