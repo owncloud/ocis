@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2025-01-08-09-29-02]
+[#deprecation-note-2025-01-08-09-44-39]
 [caption=]
 .Deprecation notes for the settings service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -518,5 +518,17 @@ a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 The default language used by services and the WebUI. If not defined, English will be used as default. See the documentation for more details.
+
+a|`OCIS_TRANSLATION_PATH` +
+`SETTINGS_TRANSLATION_PATH` +
+
+a| [subs=-attributes]
+++7.1 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+(optional) Set this to a path with custom translations to overwrite the builtin translations. Note that file and folder naming rules apply, see the documentation for more details.
 |===
 

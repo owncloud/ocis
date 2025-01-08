@@ -1,6 +1,6 @@
 ---
 title: Settings
-date: 2025-01-08T09:29:04.07561966Z
+date: 2025-01-08T09:44:41.503567133Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/settings
@@ -23,6 +23,8 @@ The `settings` service provides functionality for other services to register new
 * [Settings Management](#settings-management)
 * [Settings Usage](#settings-usage)
 * [Service Accounts](#service-accounts)
+* [Translations](#translations)
+  * [Translation Rules](#translation-rules)
 * [Default Language](#default-language)
 * [Custom Roles](#custom-roles)
 * [Example Yaml Config](#example-yaml-config)
@@ -88,6 +90,28 @@ Services can set or query Infinite Scale *setting values* of a user from setting
 ## Service Accounts
 
 The settings service needs to know the IDs of service accounts but it doesn't need their secrets. They can be configured using the `SETTINGS_SERVICE_ACCOUNTS_IDS` envvar. When only using one service account `OCIS_SERVICE_ACCOUNT_ID` can also be used. All configured service accounts will get a hidden 'service-account' role. This role contains all permissions the service account needs but will not appear calls to the list roles endpoint. It is not possible to assign the 'service-account' role to a normal user.
+
+## Translations
+
+The `settings` service has embedded translations sourced via transifex to provide a basic set of translated languages. These embedded translations are available for all deployment scenarios. In addition, the service supports custom translations, though it is currently not possible to just add custom translations to embedded ones. If custom translations are configured, the embedded ones are not used. To configure custom translations, the `SETTINGS_TRANSLATION_PATH` environment variable needs to point to a base folder that will contain the translation files. This path must be available from all instances of the userlog service, a shared storage is recommended. Translation files must be of type  [.po](https://www.gnu.org/software/gettext/manual/html_node/PO-Files.html#PO-Files) or [.mo](https://www.gnu.org/software/gettext/manual/html_node/Binaries.html). For each language, the filename needs to be `settings.po` (or `settings.mo`) and stored in a folder structure defining the language code. In general the path/name pattern for a translation file needs to be:
+
+```text
+{SETTINGS_TRANSLATION_PATH}/{language-code}/LC_MESSAGES/settings.po
+```
+
+The language code pattern is composed of `language[_territory]` where  `language` is the base language and `_territory` is optional and defines a country.
+
+For example, for the language `de`, one needs to place the corresponding translation files to `{SETTINGS_TRANSLATION_PATH}/de_DE/LC_MESSAGES/settings.po`.
+
+<!-- also see the notifications readme -->
+
+Important: For the time being, the embedded ownCloud Web frontend only supports the main language code but does not handle any territory. When strings are available in the language code `language_territory`, the web frontend does not see it as it only requests `language`. In consequence, any translations made must exist in the requested `language` to avoid a fallback to the default.
+
+### Translation Rules
+
+*   If a requested language code is not available, the service tries to fall back to the base language if available. For example, if the requested language-code `de_DE` is not available, the service tries to fall back to translations in the `de` folder.
+*   If the base language `de` is also not available, the service falls back to the system's default English (`en`),
+which is the source of the texts provided by the code.
 
 ## Default Language
 

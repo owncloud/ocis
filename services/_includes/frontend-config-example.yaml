@@ -147,3 +147,4 @@ password_policy:
   min_digits: 1
   min_special_characters: 1
   banned_passwords_list: ""
+configurable_notifications: false
