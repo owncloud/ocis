@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	ehsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/eventhistory/v0"
+	"go-micro.dev/v4/store"
 	"net/url"
 	"os"
 	"os/signal"
@@ -50,7 +52,10 @@ func NewEventsNotifier(
 	logger log.Logger,
 	gatewaySelector pool.Selectable[gateway.GatewayAPIClient],
 	valueService settingssvc.ValueService,
-	serviceAccountID, serviceAccountSecret, emailTemplatePath, defaultLanguage, ocisURL, translationPath string) Service {
+	serviceAccountID, serviceAccountSecret, emailTemplatePath, defaultLanguage, ocisURL, translationPath, emailSender string,
+	store store.Store,
+	historyClient ehsvc.EventHistoryService,
+	registeredEvents map[string]events.Unmarshaller) Service {
 
 	return eventsNotifier{
 		logger:               logger,
@@ -63,9 +68,13 @@ func NewEventsNotifier(
 		serviceAccountSecret: serviceAccountSecret,
 		emailTemplatePath:    emailTemplatePath,
 		defaultLanguage:      defaultLanguage,
+		defaultEmailSender:   emailSender,
 		ocisURL:              ocisURL,
 		translationPath:      translationPath,
 		filter:               newNotificationFilter(logger, valueService),
+		splitter:             newIntervalSplitter(logger, valueService),
+		userEventStore:       newUserEventStore(logger, store, historyClient),
+		registeredEvents:     registeredEvents,
 	}
 }
 
@@ -79,10 +88,14 @@ type eventsNotifier struct {
 	emailTemplatePath    string
 	translationPath      string
 	defaultLanguage      string
+	defaultEmailSender   string
 	ocisURL              string
 	serviceAccountID     string
 	serviceAccountSecret string
 	filter               *notificationFilter
+	splitter             *intervalSplitter
+	userEventStore       *userEventStore
+	registeredEvents     map[string]events.Unmarshaller
 }
 
 func (s eventsNotifier) Run() error {
@@ -95,15 +108,15 @@ func (s eventsNotifier) Run() error {
 			go func() {
 				switch e := evt.Event.(type) {
 				case events.SpaceShared:
-					s.handleSpaceShared(e)
+					s.handleSpaceShared(e, evt.ID)
 				case events.SpaceUnshared:
-					s.handleSpaceUnshared(e)
+					s.handleSpaceUnshared(e, evt.ID)
 				case events.SpaceMembershipExpired:
-					s.handleSpaceMembershipExpired(e)
+					s.handleSpaceMembershipExpired(e, evt.ID)
 				case events.ShareCreated:
-					s.handleShareCreated(e)
+					s.handleShareCreated(e, evt.ID)
 				case events.ShareExpired:
-					s.handleShareExpired(e)
+					s.handleShareExpired(e, evt.ID)
 				case events.ScienceMeshInviteTokenGenerated:
 					s.handleScienceMeshInviteTokenGenerated(e)
 				}
@@ -135,8 +148,8 @@ func (s eventsNotifier) render(ctx context.Context, template email.MessageTempla
 	return messageList, nil
 }
 
-func (s eventsNotifier) send(ctx context.Context, recipientList []*channels.Message) {
-	for _, r := range recipientList {
+func (s eventsNotifier) send(ctx context.Context, emails []*channels.Message) {
+	for _, r := range emails {
 		err := s.channel.SendMessage(ctx, r)
 		if err != nil {
 			s.logger.Error().Err(err).Str("event", "SendEmail").Msg("failed to send a message")
