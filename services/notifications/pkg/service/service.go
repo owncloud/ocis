@@ -65,6 +65,7 @@ func NewEventsNotifier(
 		defaultLanguage:      defaultLanguage,
 		ocisURL:              ocisURL,
 		translationPath:      translationPath,
+		filter:               newNotificationFilter(logger, valueService),
 	}
 }
 
@@ -81,6 +82,7 @@ type eventsNotifier struct {
 	ocisURL              string
 	serviceAccountID     string
 	serviceAccountSecret string
+	filter               *notificationFilter
 }
 
 func (s eventsNotifier) Run() error {

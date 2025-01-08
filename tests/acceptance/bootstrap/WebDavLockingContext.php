@@ -69,7 +69,7 @@ class WebDavLockingContext implements Context {
 		bool $public = false,
 		bool $expectToSucceed = true,
 		?string $spaceId = null
-	):ResponseInterface {
+	): ResponseInterface {
 		$user = $this->featureContext->getActualUsername($user);
 		if ($public === true) {
 			$type = "public-files";
@@ -146,7 +146,9 @@ class WebDavLockingContext implements Context {
 	 */
 	public function userLocksFileSettingPropertiesUsingWebDavAPI(string $user, string $file, TableNode $properties) {
 		$spaceId = null;
-		if (\str_starts_with($file, "Shares/") && $this->featureContext->getDavPathVersion() === WebDavHelper::DAV_VERSION_SPACES) {
+		if (\str_starts_with($file, "Shares/")
+			&& $this->featureContext->getDavPathVersion() === WebDavHelper::DAV_VERSION_SPACES
+		) {
 			$spaceId = $this->spacesContext->getSpaceIdByName($user, "Shares");
 			$file = \str_replace("Shares/", "", $file);
 		}
@@ -163,7 +165,11 @@ class WebDavLockingContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function userTriesToLockFileSettingPropertiesUsingWebDavAPI(string $user, string $file, TableNode $properties) {
+	public function userTriesToLockFileSettingPropertiesUsingWebDavAPI(
+		string $user,
+		string $file,
+		TableNode $properties
+	) {
 		$response = $this->lockFile($user, $file, $properties, null, false, false);
 		$this->featureContext->setResponse($response);
 	}
@@ -179,7 +185,12 @@ class WebDavLockingContext implements Context {
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function userLocksFileInProjectSpaceUsingWebDavAPI(string $user, string $file, string $space, TableNode $properties) {
+	public function userLocksFileInProjectSpaceUsingWebDavAPI(
+		string $user,
+		string $file,
+		string $space,
+		TableNode $properties
+	) {
 		$this->featureContext->setResponse($this->userLocksFileInProjectSpace($user, $file, $space, $properties));
 	}
 
@@ -193,7 +204,12 @@ class WebDavLockingContext implements Context {
 	 *
 	 * @throws GuzzleException
 	 */
-	public function userLocksFileInProjectSpace(string $user, string $file, string $space, TableNode $properties): ?ResponseInterface {
+	public function userLocksFileInProjectSpace(
+		string $user,
+		string $file,
+		string $space,
+		TableNode $properties
+	): ?ResponseInterface {
 		$spaceId = $this->spacesContext->getSpaceIdByName($user, $space);
 		$baseUrl = $this->featureContext->getBaseUrl();
 		$davPathVersion = $this->featureContext->getDavPathVersion();
@@ -218,7 +234,12 @@ class WebDavLockingContext implements Context {
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function userHasLockedFileInProjectSpaceUsingWebDavAPI(string $user, string $file, string $space, TableNode $properties): void {
+	public function userHasLockedFileInProjectSpaceUsingWebDavAPI(
+		string $user,
+		string $file,
+		string $space,
+		TableNode $properties
+	): void {
 		$response = $this->userLocksFileInProjectSpace($user, $file, $space, $properties);
 		$this->featureContext->theHTTPStatusCodeShouldBe(200, '', $response);
 	}
@@ -233,7 +254,12 @@ class WebDavLockingContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function userTriesToLockFileInProjectSpaceUsingWebDavAPI(string $user, string $file, string $space, TableNode $properties) {
+	public function userTriesToLockFileInProjectSpaceUsingWebDavAPI(
+		string $user,
+		string $file,
+		string $space,
+		TableNode $properties
+	) {
 		$spaceId = $this->spacesContext->getSpaceIdByName($user, $space);
 		$davPathVersion = $this->featureContext->getDavPathVersion();
 		$suffixPath = $user;
@@ -257,7 +283,12 @@ class WebDavLockingContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function userLocksFileUsingFileIdUsingWebDavAPISettingFollowingProperties(string $user, string $file, string $fileId, TableNode $properties) {
+	public function userLocksFileUsingFileIdUsingWebDavAPISettingFollowingProperties(
+		string $user,
+		string $file,
+		string $fileId,
+		TableNode $properties
+	) {
 		$davPath = WebdavHelper::getDavPath($this->featureContext->getDavPathVersion());
 		$davPath = \rtrim($davPath, '/');
 		$fullUrl = $this->featureContext->getBaseUrl() . "/$davPath/$fileId";
@@ -275,7 +306,12 @@ class WebDavLockingContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function userTriesToLockFileUsingFileIdUsingWebDavAPI(string $user, string $file, string $fileId, TableNode $properties) {
+	public function userTriesToLockFileUsingFileIdUsingWebDavAPI(
+		string $user,
+		string $file,
+		string $fileId,
+		TableNode $properties
+	) {
 		$davPath = WebdavHelper::getDavPath($this->featureContext->getDavPathVersion());
 		$davPath = \rtrim($davPath, '/');
 		$fullUrl = $this->featureContext->getBaseUrl() . "/$davPath/$fileId";
@@ -307,7 +343,12 @@ class WebDavLockingContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function userHasLockedFileInsideSpaceSettingTheFollowingProperties(string $user, string $file, string $spaceName, TableNode $properties) {
+	public function userHasLockedFileInsideSpaceSettingTheFollowingProperties(
+		string $user,
+		string $file,
+		string $spaceName,
+		TableNode $properties
+	) {
 		$spaceId = $this->spacesContext->getSpaceIdByName($this->featureContext->getActualUsername($user), $spaceName);
 		$response = $this->lockFile($user, $file, $properties, null, false, true, $spaceId);
 		$this->featureContext->theHTTPStatusCodeShouldBe(200, '', $response);
@@ -358,7 +399,9 @@ class WebDavLockingContext implements Context {
 	 * @return void
 	 */
 	public function publicLocksLastSharedFile(TableNode $properties) {
-		$token = ($this->featureContext->isUsingSharingNG()) ? $this->featureContext->shareNgGetLastCreatedLinkShareToken() : $this->featureContext->getLastCreatedPublicShareToken();
+		$token = ($this->featureContext->isUsingSharingNG())
+		? $this->featureContext->shareNgGetLastCreatedLinkShareToken()
+		: $this->featureContext->getLastCreatedPublicShareToken();
 		$response = $this->lockFile(
 			$token,
 			"/",
@@ -382,7 +425,9 @@ class WebDavLockingContext implements Context {
 		string    $file,
 		TableNode $properties
 	) {
-		$token = ($this->featureContext->isUsingSharingNG()) ? $this->featureContext->shareNgGetLastCreatedLinkShareToken() : $this->featureContext->getLastCreatedPublicShareToken();
+		$token = ($this->featureContext->isUsingSharingNG())
+		? $this->featureContext->shareNgGetLastCreatedLinkShareToken()
+		: $this->featureContext->getLastCreatedPublicShareToken();
 		$response = $this->lockFile(
 			$token,
 			$file,
@@ -406,7 +451,9 @@ class WebDavLockingContext implements Context {
 		string $file,
 		TableNode $properties
 	) {
-		$token = ($this->featureContext->isUsingSharingNG()) ? $this->featureContext->shareNgGetLastCreatedLinkShareToken() : $this->featureContext->getLastCreatedPublicShareToken();
+		$token = ($this->featureContext->isUsingSharingNG())
+		? $this->featureContext->shareNgGetLastCreatedLinkShareToken()
+		: $this->featureContext->getLastCreatedPublicShareToken();
 		$response = $this->lockFile(
 			$token,
 			$file,
@@ -445,7 +492,11 @@ class WebDavLockingContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function userUnlocksTheLastCreatedLockOfFileInsideSpaceUsingTheWebdavApi(string $user, string $spaceName, string $file) {
+	public function userUnlocksTheLastCreatedLockOfFileInsideSpaceUsingTheWebdavApi(
+		string $user,
+		string $spaceName,
+		string $file
+	) {
 		$spaceId = $this->spacesContext->getSpaceIdByName($this->featureContext->getActualUsername($user), $spaceName);
 		$response = $this->unlockItemWithLastLockOfUserAndItemUsingWebDavAPI(
 			$user,
@@ -468,11 +519,22 @@ class WebDavLockingContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function userUnlocksTheLastCreatedLockOfFileWithFileIdPathUsingTheWebdavApi(string $user, string $itemToUnlock, string $fileId) {
+	public function userUnlocksTheLastCreatedLockOfFileWithFileIdPathUsingTheWebdavApi(
+		string $user,
+		string $itemToUnlock,
+		string $fileId
+	) {
 		$davPath = WebdavHelper::getDavPath($this->featureContext->getDavPathVersion());
 		$davPath = \rtrim($davPath, '/');
 		$fullUrl = $this->featureContext->getBaseUrl() . "/$davPath/$fileId";
-		$response = $this->unlockItemWithLastLockOfUserAndItemUsingWebDavAPI($user, $itemToUnlock, $user, $itemToUnlock, false, $fullUrl);
+		$response = $this->unlockItemWithLastLockOfUserAndItemUsingWebDavAPI(
+			$user,
+			$itemToUnlock,
+			$user,
+			$itemToUnlock,
+			false,
+			$fullUrl
+		);
 		$this->featureContext->setResponse($response);
 	}
 
@@ -535,7 +597,7 @@ class WebDavLockingContext implements Context {
 	private function countLockOfResources(
 		string $user,
 		string $itemToUnlock
-	):int {
+	): int {
 		$user = $this->featureContext->getActualUsername($user);
 		$baseUrl = $this->featureContext->getBaseUrl();
 		$password = $this->featureContext->getPasswordForUser($user);
@@ -625,7 +687,7 @@ class WebDavLockingContext implements Context {
 		bool $public = false,
 		string $fullUrl = null,
 		?string $spaceId = null,
-	):ResponseInterface {
+	): ResponseInterface {
 		$user = $this->featureContext->getActualUsername($user);
 		$lockOwner = $this->featureContext->getActualUsername($lockOwner);
 		if ($public === true) {
@@ -711,7 +773,9 @@ class WebDavLockingContext implements Context {
 		string $lockOwner,
 		string $itemToUseLockOf
 	) {
-		$token = ($this->featureContext->isUsingSharingNG()) ? $this->featureContext->shareNgGetLastCreatedLinkShareToken() : $this->featureContext->getLastCreatedPublicShareToken();
+		$token = ($this->featureContext->isUsingSharingNG())
+		? $this->featureContext->shareNgGetLastCreatedLinkShareToken()
+		: $this->featureContext->getLastCreatedPublicShareToken();
 		$response = $this->unlockItemWithLastLockOfUserAndItemUsingWebDavAPI(
 			$token,
 			$itemToUnlock,
@@ -730,7 +794,9 @@ class WebDavLockingContext implements Context {
 	 * @return void
 	 */
 	public function unlockItemAsPublicUsingWebDavAPI(string $itemToUnlock) {
-		$token = ($this->featureContext->isUsingSharingNG()) ? $this->featureContext->shareNgGetLastCreatedLinkShareToken() : $this->featureContext->getLastCreatedPublicShareToken();
+		$token = ($this->featureContext->isUsingSharingNG())
+		? $this->featureContext->shareNgGetLastCreatedLinkShareToken()
+		: $this->featureContext->getLastCreatedPublicShareToken();
 		$response = $this->unlockItemWithLastLockOfUserAndItemUsingWebDavAPI(
 			$token,
 			$itemToUnlock,
@@ -782,7 +848,7 @@ class WebDavLockingContext implements Context {
 		string $fileDestination,
 		string $itemToUseLockOf,
 		string $lockOwner
-	):ResponseInterface {
+	): ResponseInterface {
 		$user = $this->featureContext->getActualUsername($user);
 		$lockOwner = $this->featureContext->getActualUsername($lockOwner);
 		$destination = $this->featureContext->destinationHeaderValue(
@@ -901,7 +967,12 @@ class WebDavLockingContext implements Context {
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function numberOfLockShouldBeReportedInProjectSpace(int $count, string $file, string $spaceName, string $user) {
+	public function numberOfLockShouldBeReportedInProjectSpace(
+		int $count,
+		string $file,
+		string $spaceName,
+		string $user
+	) {
 		$response = $this->spacesContext->sendPropfindRequestToSpace($user, $spaceName, $file, null, '0');
 		$this->featureContext->theHTTPStatusCodeShouldBe(207, "", $response);
 		$responseXmlObject = HttpRequestHelper::getResponseXml($response, __METHOD__);

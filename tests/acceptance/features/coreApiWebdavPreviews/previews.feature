@@ -367,3 +367,39 @@ Feature: previews of files downloaded through the webdav API
       | spaces           | fill      | fill.png       |
       | spaces           | resize    | resize.png     |
       | spaces           | thumbnail | thumbnail.png  |
+
+  @issue-10589 @env-config
+  Scenario Outline: try to download an image preview when the maximum thumbnail input value in the environment is set to a small value
+    Given the following configs have been set:
+      | config                               | value |
+      | THUMBNAILS_MAX_INPUT_IMAGE_FILE_SIZE | 1KB   |
+      | THUMBNAILS_MAX_INPUT_WIDTH           | 200   |
+      | THUMBNAILS_MAX_INPUT_HEIGHT          | 200   |
+    And using <dav-path-version> DAV path
+    And user "Alice" has uploaded file "filesForUpload/testavatar.jpg" to "/testimage.jpg"
+    When user "Alice" downloads the preview of "/testimage.jpg" with width "36" and height "36" and processor thumbnail using the WebDAV API
+    Then the HTTP status code should be "403"
+    And the value of the item "/d:error/s:message" in the response should be "thumbnails: image is too large"
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
+
+  @issue-10589 @env-config
+  Scenario Outline: try to download a file preview when the maximum thumbnail input value in the environment is set to a small value
+    Given the following configs have been set:
+      | config                               | value |
+      | THUMBNAILS_MAX_INPUT_IMAGE_FILE_SIZE | 1KB   |
+      | THUMBNAILS_MAX_INPUT_WIDTH           | 200   |
+      | THUMBNAILS_MAX_INPUT_HEIGHT          | 200   |
+    And using <dav-path-version> DAV path
+    And user "Alice" has uploaded file "filesForUpload/lorem-big.txt" to "/lorem-big.txt"
+    When user "Alice" downloads the preview of "/lorem-big.txt" with width "36" and height "36" and processor thumbnail using the WebDAV API
+    Then the HTTP status code should be "403"
+    And the value of the item "/d:error/s:message" in the response should be "thumbnails: image is too large"
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |

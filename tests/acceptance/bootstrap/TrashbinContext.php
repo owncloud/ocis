@@ -42,7 +42,7 @@ class TrashbinContext implements Context {
 	 *
 	 * @return ResponseInterface
 	 */
-	public function emptyTrashbin(?string $user):ResponseInterface {
+	public function emptyTrashbin(?string $user): ResponseInterface {
 		$user = $this->featureContext->getActualUsername($user);
 		$davPathVersion = $this->featureContext->getDavPathVersion();
 		return WebDavHelper::makeDavRequest(
@@ -77,7 +77,7 @@ class TrashbinContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function userHasEmptiedTrashbin(string $user):void {
+	public function userHasEmptiedTrashbin(string $user): void {
 		$response = $this->emptyTrashbin($user);
 		$this->featureContext->theHTTPStatusCodeShouldBe(204, '', $response);
 	}
@@ -109,7 +109,9 @@ class TrashbinContext implements Context {
 					$name = $successPropStat->xpath('./d:prop/oc:trashbin-original-filename');
 					$mtime = $successPropStat->xpath('./d:prop/oc:trashbin-delete-timestamp');
 					$resourcetype = $successPropStat->xpath('./d:prop/d:resourcetype');
-					if (\array_key_exists(0, $resourcetype) && ($resourcetype[0]->asXML() === "<d:resourcetype><d:collection/></d:resourcetype>")) {
+					if (\array_key_exists(0, $resourcetype)
+						&& ($resourcetype[0]->asXML() === "<d:resourcetype><d:collection/></d:resourcetype>")
+					) {
 						$collection[0] = true;
 					} else {
 						$collection[0] = false;
@@ -145,7 +147,7 @@ class TrashbinContext implements Context {
 	 * @return array response
 	 * @throws Exception
 	 */
-	public function listTopOfTrashbinFolder(?string $user, string $depth = "1"):array {
+	public function listTopOfTrashbinFolder(?string $user, string $depth = "1"): array {
 		$password = $this->featureContext->getPasswordForUser($user);
 		$davPathVersion = $this->featureContext->getDavPathVersion();
 
@@ -205,7 +207,7 @@ class TrashbinContext implements Context {
 	 * @return array of all the items in the trashbin of the user
 	 * @throws Exception
 	 */
-	public function listTrashbinFolder(?string $user, string $depth = "1"):array {
+	public function listTrashbinFolder(?string $user, string $depth = "1"): array {
 		return $this->listTrashbinFolderCollection(
 			$user,
 			"",
@@ -224,7 +226,12 @@ class TrashbinContext implements Context {
 	 * @return array response
 	 * @throws Exception
 	 */
-	public function listTrashbinFolderCollection(?string $user, ?string $collectionPath = "", string $depth = "1", int $level = 1):array {
+	public function listTrashbinFolderCollection(
+		?string $user,
+		?string $collectionPath = "",
+		string $depth = "1",
+		int $level = 1
+	): array {
 		// $collectionPath should be some list of file-ids like 2147497661/2147497662
 		// or the empty string, which will list the whole trashbin from the top.
 		$collectionPath = \trim($collectionPath, "/");
@@ -251,7 +258,11 @@ class TrashbinContext implements Context {
 		$response->getBody()->rewind();
 		$statusCode = $response->getStatusCode();
 		$respBody = $response->getBody()->getContents();
-		Assert::assertEquals("207", $statusCode, "Expected status code to be '207' but got $statusCode \nResponse\n$respBody");
+		Assert::assertEquals(
+			"207",
+			$statusCode,
+			"Expected status code to be '207' but got $statusCode \nResponse\n$respBody"
+		);
 
 		$files = $this->getTrashbinContentFromResponseXml(
 			HttpRequestHelper::getResponseXml(
@@ -331,7 +342,7 @@ class TrashbinContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userGetsFilesInTheTrashbinWithDepthUsingTheWebdavApi(string $user, string $depth):void {
+	public function userGetsFilesInTheTrashbinWithDepthUsingTheWebdavApi(string $user, string $depth): void {
 		$this->listTopOfTrashbinFolder($user, $depth);
 	}
 
@@ -343,9 +354,11 @@ class TrashbinContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function theTrashbinDavResponseShouldNotContainTheseNodes(TableNode $table):void {
+	public function theTrashbinDavResponseShouldNotContainTheseNodes(TableNode $table): void {
 		$this->featureContext->verifyTableNodeColumns($table, ['name']);
-		$files = $this->getTrashbinContentFromResponseXml(HttpRequestHelper::getResponseXml($this->featureContext->getResponse(), __METHOD__));
+		$files = $this->getTrashbinContentFromResponseXml(
+			HttpRequestHelper::getResponseXml($this->featureContext->getResponse(), __METHOD__)
+		);
 
 		foreach ($table->getHash() as $row) {
 			$path = trim((string)$row['name'], "/");
@@ -365,10 +378,12 @@ class TrashbinContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function theTrashbinDavResponseShouldContainTheseNodes(TableNode $table):void {
+	public function theTrashbinDavResponseShouldContainTheseNodes(TableNode $table): void {
 		$this->featureContext->verifyTableNodeColumns($table, ['name']);
 
-		$files = $this->getTrashbinContentFromResponseXml(HttpRequestHelper::getResponseXml($this->featureContext->getResponse(), __METHOD__));
+		$files = $this->getTrashbinContentFromResponseXml(
+			HttpRequestHelper::getResponseXml($this->featureContext->getResponse(), __METHOD__)
+		);
 
 		foreach ($table->getHash() as $row) {
 			$path = trim($row['name'], "/");
@@ -395,7 +410,11 @@ class TrashbinContext implements Context {
 	 * @return ResponseInterface
 	 * @throws Exception
 	 */
-	public function sendTrashbinListRequest(string $user, ?string $asUser = null, ?string $password = null): ResponseInterface {
+	public function sendTrashbinListRequest(
+		string $user,
+		?string $asUser = null,
+		?string $password = null
+	): ResponseInterface {
 		$asUser = $asUser ?? $user;
 		$password = $password ?? $this->featureContext->getPasswordForUser($asUser);
 
@@ -445,7 +464,11 @@ class TrashbinContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userTriesToListTheTrashbinContentForUserUsingPassword(string $asUser, string $user, string $password):void {
+	public function userTriesToListTheTrashbinContentForUserUsingPassword(
+		string $asUser,
+		string $user,
+		string $password
+	): void {
 		$response = $this->sendTrashbinListRequest($user, $asUser, $password);
 		$this->featureContext->setResponse($response);
 	}
@@ -457,7 +480,7 @@ class TrashbinContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function theLastWebdavResponseShouldContainFollowingElements(TableNode $elements):void {
+	public function theLastWebdavResponseShouldContainFollowingElements(TableNode $elements): void {
 		$files = $this->getTrashbinContentFromResponseXml(HttpRequestHelper::getResponseXml($response, __METHOD__));
 		$elementRows = $elements->getHash();
 		foreach ($elementRows as $expectedElement) {
@@ -481,8 +504,10 @@ class TrashbinContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function theLastWebdavResponseShouldNotContainFollowingElements(TableNode $elements):void {
-		$files = $this->getTrashbinContentFromResponseXml(HttpRequestHelper::getResponseXml($this->featureContext->getResponse()));
+	public function theLastWebdavResponseShouldNotContainFollowingElements(TableNode $elements): void {
+		$files = $this->getTrashbinContentFromResponseXml(
+			HttpRequestHelper::getResponseXml($this->featureContext->getResponse())
+		);
 
 		// 'user' is also allowed in the table even though it is not used anywhere
 		// This for better readability in feature files
@@ -513,7 +538,7 @@ class TrashbinContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userTriesToDeleteFromTrashbinOfUser(string $user, string $path, string $ofUser):void {
+	public function userTriesToDeleteFromTrashbinOfUser(string $user, string $path, string $ofUser): void {
 		$response = $this->deleteItemFromTrashbin($user, $path, $ofUser);
 		$this->featureContext->setResponse($response);
 	}
@@ -530,7 +555,12 @@ class TrashbinContext implements Context {
 	 * @throws JsonException
 	 * @throws Exception
 	 */
-	public function userTriesToDeleteFromTrashbinOfUserUsingPassword(string $user, string $path, string $ofUser, string $password):void {
+	public function userTriesToDeleteFromTrashbinOfUserUsingPassword(
+		string $user,
+		string $path,
+		string $ofUser,
+		string $password
+	): void {
 		$response = $this->deleteItemFromTrashbin($user, $path, $ofUser, $password);
 		$this->featureContext->setResponse($response);
 	}
@@ -546,7 +576,7 @@ class TrashbinContext implements Context {
 	 * @throws JsonException
 	 * @throws Exception
 	 */
-	public function userTriesToRestoreFromTrashbinOfUser(?string $asUser, ?string $path, ?string $user):void {
+	public function userTriesToRestoreFromTrashbinOfUser(?string $asUser, ?string $path, ?string $user): void {
 		$user = $this->featureContext->getActualUsername($user);
 		$asUser = $this->featureContext->getActualUsername($asUser);
 		$response = $this->restoreElement($user, $path, null, $asUser);
@@ -565,7 +595,12 @@ class TrashbinContext implements Context {
 	 * @throws JsonException
 	 * @throws Exception
 	 */
-	public function userTriesToRestoreFromTrashbinOfUserUsingPassword(?string $asUser, ?string $path, ?string $user, ?string $password):void {
+	public function userTriesToRestoreFromTrashbinOfUserUsingPassword(
+		?string $asUser,
+		?string $path,
+		?string $user,
+		?string $password
+	): void {
 		$asUser = $this->featureContext->getActualUsername($asUser);
 		$user = $this->featureContext->getActualUsername($user);
 		$response = $this->restoreElement($user, $path, null, $asUser, $password);
@@ -579,7 +614,7 @@ class TrashbinContext implements Context {
 	 *
 	 * @return string
 	 */
-	private function convertTrashbinHref(string $href):string {
+	private function convertTrashbinHref(string $href): string {
 		$trashItemHRef = \trim($href, '/');
 		$trashItemHRef = \strstr($trashItemHRef, '/trash-bin');
 		$trashItemHRef = \trim($trashItemHRef, '/');
@@ -596,7 +631,10 @@ class TrashbinContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function userTriesToDeleteFileWithOriginalPathFromTrashbinUsingTrashbinAPI(string $user, string $originalPath):void {
+	public function userTriesToDeleteFileWithOriginalPathFromTrashbinUsingTrashbinAPI(
+		string $user,
+		string $originalPath
+	): void {
 		$response = $this->deleteItemFromTrashbin($user, $originalPath);
 		$this->featureContext->setResponse($response);
 	}
@@ -609,7 +647,12 @@ class TrashbinContext implements Context {
 	 *
 	 * @return ResponseInterface
 	 */
-	public function deleteItemFromTrashbin(string $user, string $originalPath, ?string $ofUser = null, ?string $password = null): ResponseInterface {
+	public function deleteItemFromTrashbin(
+		string $user,
+		string $originalPath,
+		?string $ofUser = null,
+		?string $password = null
+	): ResponseInterface {
 		$ofUser = $ofUser ?? $user;
 		$user = $this->featureContext->getActualUsername($user);
 		$ofUser = $this->featureContext->getActualUsername($ofUser);
@@ -656,7 +699,7 @@ class TrashbinContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function deleteFileFromTrashbin(string $user, string $originalPath):void {
+	public function deleteFileFromTrashbin(string $user, string $originalPath): void {
 		$response = $this->deleteItemFromTrashbin($user, $originalPath);
 		$this->featureContext->setResponse($response);
 		$this->featureContext->pushToLastStatusCodesArrays();
@@ -671,7 +714,7 @@ class TrashbinContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userHasDeletedTheFolderWithOriginalPathFromTheTrashbin(string $user, string $originalPath):void {
+	public function userHasDeletedTheFolderWithOriginalPathFromTheTrashbin(string $user, string $originalPath): void {
 		$response = $this->deleteItemFromTrashbin($user, $originalPath);
 		$this->featureContext->theHTTPStatusCodeShouldBe(204, '', $response);
 	}
@@ -685,7 +728,7 @@ class TrashbinContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function deleteFollowingFilesFromTrashbin(string $user, TableNode $table):void {
+	public function deleteFollowingFilesFromTrashbin(string $user, TableNode $table): void {
 		$this->featureContext->verifyTableNodeColumns($table, ["path"]);
 		$paths = $table->getHash();
 
@@ -706,7 +749,7 @@ class TrashbinContext implements Context {
 	 * @throws JsonException
 	 * @throws Exception
 	 */
-	public function asFileOrFolderExistsInTrash(?string $user, ?string $path):void {
+	public function asFileOrFolderExistsInTrash(?string $user, ?string $path): void {
 		$user = $this->featureContext->getActualUsername($user);
 		$path = \trim($path, '/');
 		$sections = \explode('/', $path, 2);
@@ -756,7 +799,7 @@ class TrashbinContext implements Context {
 	 * @return bool
 	 * @throws Exception
 	 */
-	private function isInTrash(?string $user, ?string $originalPath):bool {
+	private function isInTrash(?string $user, ?string $originalPath): bool {
 		$listing = $this->listTrashbinFolder($user);
 
 		// we don't care if the test step writes a leading "/" or not
@@ -781,7 +824,13 @@ class TrashbinContext implements Context {
 	 * @throws JsonException
 	 * @throws GuzzleException
 	 */
-	private function sendUndeleteRequest(string $user, string $trashItemHRef, string $destinationPath, ?string $asUser = null, ?string $password = null):ResponseInterface {
+	private function sendUndeleteRequest(
+		string $user,
+		string $trashItemHRef,
+		string $destinationPath,
+		?string $asUser = null,
+		?string $password = null
+	): ResponseInterface {
 		$asUser = $asUser ?? $user;
 		$password = $password ?? $this->featureContext->getPasswordForUser($asUser);
 		$destinationPath = \trim($destinationPath, '/');
@@ -834,7 +883,13 @@ class TrashbinContext implements Context {
 	 * @throws JsonException
 	 * @throws GuzzleException
 	 */
-	private function restoreElement(string $user, string $originalPath, ?string $destinationPath = null, ?string $asUser = null, ?string $password = null):ResponseInterface {
+	private function restoreElement(
+		string $user,
+		string $originalPath,
+		?string $destinationPath = null,
+		?string $asUser = null,
+		?string $password = null
+	): ResponseInterface {
 		$asUser = $asUser ?? $user;
 		$listing = $this->listTrashbinFolder($user);
 		$originalPath = \trim($originalPath, '/');
@@ -870,7 +925,10 @@ class TrashbinContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userRestoresResourceWithOriginalPathWithoutSpecifyingDestinationUsingTrashbinApi(string $user, string $originalPath):void {
+	public function userRestoresResourceWithOriginalPathWithoutSpecifyingDestinationUsingTrashbinApi(
+		string $user,
+		string $originalPath
+	): void {
 		$listing = $this->listTrashbinFolder($user);
 		$originalPath = \trim($originalPath, '/');
 
@@ -912,7 +970,7 @@ class TrashbinContext implements Context {
 		?string $user,
 		?string $content,
 		?string $alternativeContent
-	):void {
+	): void {
 		$isInTrash = $this->isInTrash($user, $fileName);
 		$user = $this->featureContext->getActualUsername($user);
 		$response = $this->featureContext->downloadFileAsUserUsingPassword($user, $fileName);
@@ -933,7 +991,7 @@ class TrashbinContext implements Context {
 	 * @throws JsonException
 	 * @throws Exception
 	 */
-	public function elementInTrashIsRestored(?string $user, string $originalPath):void {
+	public function elementInTrashIsRestored(?string $user, string $originalPath): void {
 		$user = $this->featureContext->getActualUsername($user);
 		$this->featureContext->setResponse($this->restoreElement($user, $originalPath));
 	}
@@ -947,7 +1005,7 @@ class TrashbinContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userRestoresFollowingFiles(string $user, TableNode $table):void {
+	public function userRestoresFollowingFiles(string $user, TableNode $table): void {
 		$this->featureContext->verifyTableNodeColumns($table, ["path"]);
 		$paths = $table->getHash();
 
@@ -967,7 +1025,7 @@ class TrashbinContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function elementInTrashHasBeenRestored(string $user, string $originalPath):void {
+	public function elementInTrashHasBeenRestored(string $user, string $originalPath): void {
 		$response = $this->restoreElement($user, $originalPath);
 		$this->featureContext->theHTTPStatusCodeShouldBe(201, "", $response);
 		if ($this->isInTrash($user, $originalPath)) {
@@ -990,7 +1048,7 @@ class TrashbinContext implements Context {
 		?string $user,
 		?string $originalPath,
 		?string $destinationPath
-	):void {
+	): void {
 		$user = $this->featureContext->getActualUsername($user);
 		$this->featureContext->setResponse($this->restoreElement($user, $originalPath, $destinationPath));
 	}
@@ -1008,7 +1066,7 @@ class TrashbinContext implements Context {
 	public function elementIsInTrashCheckingOriginalPath(
 		?string $user,
 		?string $originalPath
-	):void {
+	): void {
 		$user = $this->featureContext->getActualUsername($user);
 		Assert::assertTrue(
 			$this->isInTrash($user, $originalPath),
@@ -1028,7 +1086,7 @@ class TrashbinContext implements Context {
 	public function elementIsNotInTrashCheckingOriginalPath(
 		?string $user,
 		string $originalPath
-	):void {
+	): void {
 		$user = $this->featureContext->getActualUsername($user);
 		Assert::assertFalse(
 			$this->isInTrash($user, $originalPath),
@@ -1048,7 +1106,7 @@ class TrashbinContext implements Context {
 	public function followingElementsAreNotInTrashCheckingOriginalPath(
 		string $user,
 		TableNode $table
-	):void {
+	): void {
 		$this->featureContext->verifyTableNodeColumns($table, ["path"]);
 		$paths = $table->getHash();
 
@@ -1073,7 +1131,7 @@ class TrashbinContext implements Context {
 	public function followingElementsAreInTrashCheckingOriginalPath(
 		string $user,
 		TableNode $table
-	):void {
+	): void {
 		$this->featureContext->verifyTableNodeColumns($table, ["path"]);
 		$paths = $table->getHash();
 
@@ -1095,7 +1153,7 @@ class TrashbinContext implements Context {
 	 * @return array|null real entry name with timestamp suffix or null if not found
 	 * @throws Exception
 	 */
-	private function findFirstTrashedEntry(string $user, string $name):?array {
+	private function findFirstTrashedEntry(string $user, string $name): ?array {
 		$listing = $this->listTrashbinFolder($user);
 
 		foreach ($listing as $entry) {
@@ -1117,7 +1175,7 @@ class TrashbinContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function before(BeforeScenarioScope $scope):void {
+	public function before(BeforeScenarioScope $scope): void {
 		// Get the environment
 		$environment = $scope->getEnvironment();
 		// Get all the contexts you need in this context
@@ -1131,7 +1189,7 @@ class TrashbinContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function theDeletedFileFolderShouldHaveCorrectDeletionMtimeInTheResponse(string $resource):void {
+	public function theDeletedFileFolderShouldHaveCorrectDeletionMtimeInTheResponse(string $resource): void {
 		$files = $this->getTrashbinContentFromResponseXml(
 			HttpRequestHelper::getResponseXml($this->featureContext->getResponse())
 		);

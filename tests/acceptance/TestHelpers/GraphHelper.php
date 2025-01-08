@@ -110,7 +110,8 @@ class GraphHelper {
 	 * @return string
 	 */
 	public static function getShareIdRegex(): string {
-		return self::getUUIDv4Regex() . '\\\$' . self::getUUIDv4Regex() . '!' . self::getUUIDv4Regex() . ':' . self::getUUIDv4Regex() . ':' . self::getUUIDv4Regex();
+		return self::getUUIDv4Regex() . '\\\$' . self::getUUIDv4Regex() . '!'
+		. self::getUUIDv4Regex() . ':' . self::getUUIDv4Regex() . ':' . self::getUUIDv4Regex();
 	}
 
 	/**
@@ -1387,7 +1388,11 @@ class GraphHelper {
 		string $password,
 		array $groupIdArray
 	): ResponseInterface {
-		$url = self::getFullUrl($baseUrl, 'users' . '?$filter=memberOf/any(m:m/id ' . "eq '$groupIdArray[0]') " . "and memberOf/any(m:m/id eq '$groupIdArray[1]')");
+		$url = self::getFullUrl(
+			$baseUrl,
+			'users' . '?$filter=memberOf/any(m:m/id ' . "eq '$groupIdArray[0]') "
+			. "and memberOf/any(m:m/id eq '$groupIdArray[1]')"
+		);
 		return HttpRequestHelper::get(
 			$url,
 			$xRequestId,
@@ -1416,7 +1421,11 @@ class GraphHelper {
 		string $firstGroup,
 		string $secondGroup
 	): ResponseInterface {
-		$url = self::getFullUrl($baseUrl, 'users' . '?$filter=memberOf/any(m:m/id ' . "eq '$firstGroup') " . "or memberOf/any(m:m/id eq '$secondGroup')");
+		$url = self::getFullUrl(
+			$baseUrl,
+			'users' . '?$filter=memberOf/any(m:m/id '
+			. "eq '$firstGroup') " . "or memberOf/any(m:m/id eq '$secondGroup')"
+		);
 		return HttpRequestHelper::get(
 			$url,
 			$xRequestId,
@@ -1472,7 +1481,11 @@ class GraphHelper {
 		string $roleId,
 		string $groupId
 	): ResponseInterface {
-		$url = self::getFullUrl($baseUrl, 'users' . '?$filter=appRoleAssignments/any(m:m/appRoleId ' . "eq '$roleId') " . "and memberOf/any(m:m/id eq '$groupId')");
+		$url = self::getFullUrl(
+			$baseUrl,
+			'users' . '?$filter=appRoleAssignments/any(m:m/appRoleId '
+			. "eq '$roleId') " . "and memberOf/any(m:m/id eq '$groupId')"
+		);
 		return HttpRequestHelper::get(
 			$url,
 			$xRequestId,
@@ -1669,7 +1682,15 @@ class GraphHelper {
 	): ResponseInterface {
 		$fullUrl = self::getFullUrl($baseUrl, 'me');
 		$payload['preferredLanguage'] = $language;
-		return HttpRequestHelper::sendRequest($fullUrl, $xRequestId, 'PATCH', $user, $password, null, \json_encode($payload));
+		return HttpRequestHelper::sendRequest(
+			$fullUrl,
+			$xRequestId,
+			'PATCH',
+			$user,
+			$password,
+			null,
+			\json_encode($payload)
+		);
 	}
 
 	/**
@@ -1679,6 +1700,7 @@ class GraphHelper {
 	 * @param string $password
 	 * @param string $spaceId
 	 * @param string $itemId
+	 * @param string|null $query
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
@@ -1689,9 +1711,14 @@ class GraphHelper {
 		string $user,
 		string $password,
 		string $spaceId,
-		string $itemId
+		string $itemId,
+		?string $query = null
 	): ResponseInterface {
 		$url = self::getBetaFullUrl($baseUrl, "drives/$spaceId/items/$itemId/permissions");
+		if (!empty($query)) {
+			$url .= "?$query";
+		}
+
 		return HttpRequestHelper::get(
 			$url,
 			$xRequestId,
@@ -1810,7 +1837,13 @@ class GraphHelper {
 		?string $expirationDateTime
 	): ResponseInterface {
 		$url = self::getBetaFullUrl($baseUrl, "drives/$spaceId/items/$itemId/invite");
-		$body = self::createShareInviteBody($shareeIds, $shareTypes, $permissionsRole, $permissionsAction, $expirationDateTime);
+		$body = self::createShareInviteBody(
+			$shareeIds,
+			$shareTypes,
+			$permissionsRole,
+			$permissionsAction,
+			$expirationDateTime
+		);
 		return HttpRequestHelper::post(
 			$url,
 			$xRequestId,
@@ -2052,7 +2085,7 @@ class GraphHelper {
 		string $password,
 		string $itemId,
 		string $shareSpaceId
-	):ResponseInterface {
+	): ResponseInterface {
 		$url = self::getBetaFullUrl($baseUrl, "drives/$shareSpaceId/items/$itemId");
 		return HttpRequestHelper::delete(
 			$url,
@@ -2083,7 +2116,7 @@ class GraphHelper {
 		string $itemId,
 		string $shareSpaceId,
 		array $body
-	):ResponseInterface {
+	): ResponseInterface {
 		$url = self::getBetaFullUrl($baseUrl, "drives/$shareSpaceId/items/$itemId");
 		return HttpRequestHelper::sendRequest(
 			$url,
@@ -2186,7 +2219,13 @@ class GraphHelper {
 		?string $expirationDateTime
 	): ResponseInterface {
 		$url = self::getBetaFullUrl($baseUrl, "drives/$spaceId/root/invite");
-		$body = self::createShareInviteBody($shareeIds, $shareTypes, $permissionsRole, $permissionsAction, $expirationDateTime);
+		$body = self::createShareInviteBody(
+			$shareeIds,
+			$shareTypes,
+			$permissionsRole,
+			$permissionsAction,
+			$expirationDateTime
+		);
 
 		return HttpRequestHelper::post(
 			$url,

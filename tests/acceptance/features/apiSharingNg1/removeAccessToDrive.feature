@@ -246,3 +246,37 @@ Feature: Remove access to a drive
     When user "Alice" removes the last link share of space "projectSpace" using permissions endpoint of the Graph API
     Then the HTTP status code should be "204"
     And user "Alice" should not have any "link" permissions on space "projectSpace"
+
+  @env-config
+  Scenario: remove space share after the share role Space Editor Without Versions has been disabled
+    Given using spaces DAV path
+    And the administrator has enabled the permissions role "Space Editor Without Versions"
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Alice" has sent the following space share invitation:
+      | space           | new-space                     |
+      | sharee          | Brian                         |
+      | shareType       | user                          |
+      | permissionsRole | Space Editor Without Versions |
+    And the administrator has disabled the permissions role "Space Editor Without Versions"
+    When user "Alice" removes the access of user "Brian" from space "new-space" using root endpoint of the Graph API
+    Then the HTTP status code should be "204"
+    And the user "Brian" should not have a space called "NewSpace"
+
+  @env-config
+  Scenario: remove space share from group after the share role Space Editor Without Versions has been disabled
+    Given using spaces DAV path
+    And the administrator has enabled the permissions role "Space Editor Without Versions"
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And group "group1" has been created
+    And user "Brian" has been added to group "group1"
+    And user "Alice" has sent the following space share invitation:
+      | space           | new-space                     |
+      | sharee          | group1                        |
+      | shareType       | group                         |
+      | permissionsRole | Space Editor Without Versions |
+    And the administrator has disabled the permissions role "Space Editor Without Versions"
+    When user "Alice" removes the access of group "group1" from space "new-space" using root endpoint of the Graph API
+    Then the HTTP status code should be "204"
+    And the user "Brian" should not have a space called "new-space"

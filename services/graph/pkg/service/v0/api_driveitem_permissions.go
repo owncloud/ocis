@@ -143,6 +143,7 @@ func (s DriveItemPermissionsService) Invite(ctx context.Context, resourceId *sto
 
 	var shareid string
 	var expiration *types.Timestamp
+	var cTime *types.Timestamp
 	switch driveRecipient.GetLibreGraphRecipientType() {
 	case "group":
 		group, err := s.identityCache.GetGroup(ctx, objectID)
@@ -166,6 +167,7 @@ func (s DriveItemPermissionsService) Invite(ctx context.Context, resourceId *sto
 			return libregraph.Permission{}, err
 		}
 		shareid = createShareResponse.GetShare().GetId().GetOpaqueId()
+		cTime = createShareResponse.GetShare().GetCtime()
 		expiration = createShareResponse.GetShare().GetExpiration()
 	default:
 		user, err := s.identityCache.GetUser(ctx, objectID)
@@ -209,6 +211,7 @@ func (s DriveItemPermissionsService) Invite(ctx context.Context, resourceId *sto
 				return libregraph.Permission{}, err
 			}
 			shareid = createShareResponse.GetShare().GetId().GetOpaqueId()
+			cTime = createShareResponse.GetShare().GetCtime()
 			expiration = createShareResponse.GetShare().GetExpiration()
 		} else {
 			createShareRequest := createShareRequestToUser(user, statResponse.GetInfo(), cs3ResourcePermissions)
@@ -221,6 +224,7 @@ func (s DriveItemPermissionsService) Invite(ctx context.Context, resourceId *sto
 				return libregraph.Permission{}, err
 			}
 			shareid = createShareResponse.GetShare().GetId().GetOpaqueId()
+			cTime = createShareResponse.GetShare().GetCtime()
 			expiration = createShareResponse.GetShare().GetExpiration()
 		}
 
@@ -236,6 +240,11 @@ func (s DriveItemPermissionsService) Invite(ctx context.Context, resourceId *sto
 
 	if expiration != nil {
 		permission.SetExpirationDateTime(utils.TSToTime(expiration))
+	}
+
+	// set cTime
+	if cTime != nil {
+		permission.SetCreatedDateTime(cs3TimestampToTime(cTime))
 	}
 
 	if user, ok := revactx.ContextGetUser(ctx); ok {

@@ -21,29 +21,26 @@ Feature: List a sharing permissions
         ],
         "properties": {
           "@libre.graph.permissions.actions.allowedValues": {
-            "type": "array",
-            "enum": [
-              [
-                "libre.graph/driveItem/permissions/create",
-                "libre.graph/driveItem/children/create",
-                "libre.graph/driveItem/standard/delete",
-                "libre.graph/driveItem/path/read",
-                "libre.graph/driveItem/quota/read",
-                "libre.graph/driveItem/content/read",
-                "libre.graph/driveItem/upload/create",
-                "libre.graph/driveItem/permissions/read",
-                "libre.graph/driveItem/children/read",
-                "libre.graph/driveItem/versions/read",
-                "libre.graph/driveItem/deleted/read",
-                "libre.graph/driveItem/path/update",
-                "libre.graph/driveItem/permissions/delete",
-                "libre.graph/driveItem/deleted/delete",
-                "libre.graph/driveItem/versions/update",
-                "libre.graph/driveItem/deleted/update",
-                "libre.graph/driveItem/basic/read",
-                "libre.graph/driveItem/permissions/update",
-                "libre.graph/driveItem/permissions/deny"
-              ]
+            "const": [
+              "libre.graph/driveItem/permissions/create",
+              "libre.graph/driveItem/children/create",
+              "libre.graph/driveItem/standard/delete",
+              "libre.graph/driveItem/path/read",
+              "libre.graph/driveItem/quota/read",
+              "libre.graph/driveItem/content/read",
+              "libre.graph/driveItem/upload/create",
+              "libre.graph/driveItem/permissions/read",
+              "libre.graph/driveItem/children/read",
+              "libre.graph/driveItem/versions/read",
+              "libre.graph/driveItem/deleted/read",
+              "libre.graph/driveItem/path/update",
+              "libre.graph/driveItem/permissions/delete",
+              "libre.graph/driveItem/deleted/delete",
+              "libre.graph/driveItem/versions/update",
+              "libre.graph/driveItem/deleted/update",
+              "libre.graph/driveItem/basic/read",
+              "libre.graph/driveItem/permissions/update",
+              "libre.graph/driveItem/permissions/deny"
             ]
           },
           "@libre.graph.permissions.roles.allowedValues": {
@@ -63,28 +60,16 @@ Feature: List a sharing permissions
                   ],
                   "properties": {
                     "@libre.graph.weight": {
-                      "type": "integer",
-                      "enum": [
-                        1
-                      ]
+                      "const": 1
                     },
                     "description": {
-                      "type": "string",
-                      "enum": [
-                        "View and download."
-                      ]
+                      "const": "View and download."
                     },
                     "displayName": {
-                      "type": "string",
-                      "enum": [
-                        "Can view"
-                      ]
+                      "const": "Can view"
                     },
                     "id": {
-                      "type": "string",
-                      "enum": [
-                        "b1e2218d-eef8-4d4c-b82d-0f1a1b48f3b5"
-                      ]
+                      "const": "b1e2218d-eef8-4d4c-b82d-0f1a1b48f3b5"
                     }
                   }
                 },
@@ -98,28 +83,16 @@ Feature: List a sharing permissions
                   ],
                   "properties": {
                     "@libre.graph.weight": {
-                      "type": "integer",
-                      "enum": [
-                        2
-                      ]
+                      "const": 2
                     },
                     "description": {
-                      "type": "string",
-                      "enum": [
-                        "View, download and upload."
-                      ]
+                      "const": "View, download and upload."
                     },
                     "displayName": {
-                      "type": "string",
-                      "enum": [
-                        "Can upload"
-                      ]
+                      "const": "Can upload"
                     },
                     "id": {
-                      "type": "string",
-                      "enum": [
-                        "1c996275-f1c9-4e71-abdf-a42f6495e960"
-                      ]
+                      "const": "1c996275-f1c9-4e71-abdf-a42f6495e960"
                     }
                   }
                 },
@@ -133,28 +106,16 @@ Feature: List a sharing permissions
                   ],
                   "properties": {
                     "@libre.graph.weight": {
-                      "type": "integer",
-                      "enum": [
-                        3
-                      ]
+                      "const": 3
                     },
                     "description": {
-                      "type": "string",
-                      "enum": [
-                        "View, download, upload, edit, add and delete."
-                      ]
+                      "const": "View, download, upload, edit, add and delete."
                     },
                     "displayName": {
-                      "type": "string",
-                      "enum": [
-                        "Can edit"
-                      ]
+                      "const": "Can edit"
                     },
                     "id": {
-                      "type": "string",
-                      "enum": [
-                        "fb6c3e19-e378-47e5-b277-9732f9de6e21"
-                      ]
+                      "const": "fb6c3e19-e378-47e5-b277-9732f9de6e21"
                     }
                   }
                 }
@@ -580,29 +541,26 @@ Feature: List a sharing permissions
         ],
         "properties": {
           "@libre.graph.permissions.actions.allowedValues": {
-            "type": "array",
-            "enum": [
-              [
-                "libre.graph/driveItem/permissions/create",
-                "libre.graph/driveItem/children/create",
-                "libre.graph/driveItem/standard/delete",
-                "libre.graph/driveItem/path/read",
-                "libre.graph/driveItem/quota/read",
-                "libre.graph/driveItem/content/read",
-                "libre.graph/driveItem/upload/create",
-                "libre.graph/driveItem/permissions/read",
-                "libre.graph/driveItem/children/read",
-                "libre.graph/driveItem/versions/read",
-                "libre.graph/driveItem/deleted/read",
-                "libre.graph/driveItem/path/update",
-                "libre.graph/driveItem/permissions/delete",
-                "libre.graph/driveItem/deleted/delete",
-                "libre.graph/driveItem/versions/update",
-                "libre.graph/driveItem/deleted/update",
-                "libre.graph/driveItem/basic/read",
-                "libre.graph/driveItem/permissions/update",
-                "libre.graph/driveItem/permissions/deny"
-              ]
+            "const": [
+              "libre.graph/driveItem/permissions/create",
+              "libre.graph/driveItem/children/create",
+              "libre.graph/driveItem/standard/delete",
+              "libre.graph/driveItem/path/read",
+              "libre.graph/driveItem/quota/read",
+              "libre.graph/driveItem/content/read",
+              "libre.graph/driveItem/upload/create",
+              "libre.graph/driveItem/permissions/read",
+              "libre.graph/driveItem/children/read",
+              "libre.graph/driveItem/versions/read",
+              "libre.graph/driveItem/deleted/read",
+              "libre.graph/driveItem/path/update",
+              "libre.graph/driveItem/permissions/delete",
+              "libre.graph/driveItem/deleted/delete",
+              "libre.graph/driveItem/versions/update",
+              "libre.graph/driveItem/deleted/update",
+              "libre.graph/driveItem/basic/read",
+              "libre.graph/driveItem/permissions/update",
+              "libre.graph/driveItem/permissions/deny"
             ]
           },
           "@libre.graph.permissions.roles.allowedValues": {
@@ -683,30 +641,27 @@ Feature: List a sharing permissions
           ],
           "properties": {
             "@libre.graph.permissions.actions.allowedValues": {
-              "type": "array",
-              "enum": [
-                [
-                  "libre.graph/driveItem/permissions/create",
-                  "libre.graph/driveItem/children/create",
-                  "libre.graph/driveItem/standard/delete",
-                  "libre.graph/driveItem/path/read",
-                  "libre.graph/driveItem/quota/read",
-                  "libre.graph/driveItem/content/read",
-                  "libre.graph/driveItem/upload/create",
-                  "libre.graph/driveItem/permissions/read",
-                  "libre.graph/driveItem/children/read",
-                  "libre.graph/driveItem/versions/read",
-                  "libre.graph/driveItem/deleted/read",
-                  "libre.graph/driveItem/path/update",
-                  "libre.graph/driveItem/permissions/delete",
-                  "libre.graph/driveItem/deleted/delete",
-                  "libre.graph/driveItem/versions/update",
-                  "libre.graph/driveItem/deleted/update",
-                  "libre.graph/driveItem/basic/read",
-                  "libre.graph/driveItem/permissions/update",
-                  "libre.graph/driveItem/permissions/deny"
-                ]
-              ]
+            "const": [
+              "libre.graph/driveItem/permissions/create",
+              "libre.graph/driveItem/children/create",
+              "libre.graph/driveItem/standard/delete",
+              "libre.graph/driveItem/path/read",
+              "libre.graph/driveItem/quota/read",
+              "libre.graph/driveItem/content/read",
+              "libre.graph/driveItem/upload/create",
+              "libre.graph/driveItem/permissions/read",
+              "libre.graph/driveItem/children/read",
+              "libre.graph/driveItem/versions/read",
+              "libre.graph/driveItem/deleted/read",
+              "libre.graph/driveItem/path/update",
+              "libre.graph/driveItem/permissions/delete",
+              "libre.graph/driveItem/deleted/delete",
+              "libre.graph/driveItem/versions/update",
+              "libre.graph/driveItem/deleted/update",
+              "libre.graph/driveItem/basic/read",
+              "libre.graph/driveItem/permissions/update",
+              "libre.graph/driveItem/permissions/deny"
+            ]
             },
             "@libre.graph.permissions.roles.allowedValues": {
               "type": "array",
@@ -809,30 +764,27 @@ Feature: List a sharing permissions
           ],
           "properties": {
             "@libre.graph.permissions.actions.allowedValues": {
-              "type": "array",
-              "enum": [
-                [
-                  "libre.graph/driveItem/permissions/create",
-                  "libre.graph/driveItem/children/create",
-                  "libre.graph/driveItem/standard/delete",
-                  "libre.graph/driveItem/path/read",
-                  "libre.graph/driveItem/quota/read",
-                  "libre.graph/driveItem/content/read",
-                  "libre.graph/driveItem/upload/create",
-                  "libre.graph/driveItem/permissions/read",
-                  "libre.graph/driveItem/children/read",
-                  "libre.graph/driveItem/versions/read",
-                  "libre.graph/driveItem/deleted/read",
-                  "libre.graph/driveItem/path/update",
-                  "libre.graph/driveItem/permissions/delete",
-                  "libre.graph/driveItem/deleted/delete",
-                  "libre.graph/driveItem/versions/update",
-                  "libre.graph/driveItem/deleted/update",
-                  "libre.graph/driveItem/basic/read",
-                  "libre.graph/driveItem/permissions/update",
-                  "libre.graph/driveItem/permissions/deny"
-                ]
-              ]
+            "const": [
+              "libre.graph/driveItem/permissions/create",
+              "libre.graph/driveItem/children/create",
+              "libre.graph/driveItem/standard/delete",
+              "libre.graph/driveItem/path/read",
+              "libre.graph/driveItem/quota/read",
+              "libre.graph/driveItem/content/read",
+              "libre.graph/driveItem/upload/create",
+              "libre.graph/driveItem/permissions/read",
+              "libre.graph/driveItem/children/read",
+              "libre.graph/driveItem/versions/read",
+              "libre.graph/driveItem/deleted/read",
+              "libre.graph/driveItem/path/update",
+              "libre.graph/driveItem/permissions/delete",
+              "libre.graph/driveItem/deleted/delete",
+              "libre.graph/driveItem/versions/update",
+              "libre.graph/driveItem/deleted/update",
+              "libre.graph/driveItem/basic/read",
+              "libre.graph/driveItem/permissions/update",
+              "libre.graph/driveItem/permissions/deny"
+            ]
             },
             "@libre.graph.permissions.roles.allowedValues": {
               "type": "array",
@@ -2578,6 +2530,38 @@ Feature: List a sharing permissions
                   }
                 }
               ]
+            }
+          }
+        }
+      }
+      """
+
+  @issue-9764
+  Scenario: user tries to list permissions of a disabled project space using root endpoint
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Alice" has disabled a space "new-space"
+    When user "Alice" tries to list the permissions of space "new-space" using root endpoint of the Graph API
+    Then the HTTP status code should be "404"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": ["code", "innererror", "message"],
+            "properties": {
+              "code": { "const": "itemNotFound" },
+              "innererror": {
+                "type": "object",
+                "required": ["date", "request-id"]
+              },
+              "message": {
+                "pattern": "stat: error: not found: %user_id_pattern%$"
+              }
             }
           }
         }

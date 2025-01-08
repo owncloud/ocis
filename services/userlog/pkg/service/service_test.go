@@ -3,6 +3,7 @@ package service_test
 import (
 	"context"
 	"encoding/json"
+	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 	"reflect"
 	"time"
 
@@ -77,7 +78,22 @@ var _ = Describe("UserlogService", func() {
 		gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(&user.GetUserResponse{User: &user.User{Id: &user.UserId{OpaqueId: "userid"}}, Status: &rpc.Status{Code: rpc.Code_CODE_OK}}, nil)
 		gatewayClient.On("Authenticate", mock.Anything, mock.Anything).Return(&gateway.AuthenticateResponse{Status: &rpc.Status{Code: rpc.Code_CODE_OK}}, nil)
 		vc.GetValueByUniqueIdentifiersFunc = func(ctx context.Context, req *settingssvc.GetValueByUniqueIdentifiersRequest, opts ...client.CallOption) (*settingssvc.GetValueResponse, error) {
-			return nil, nil
+			return &settingssvc.GetValueResponse{
+				Value: &settingsmsg.ValueWithIdentifier{
+					Value: &settingsmsg.Value{
+						Value: &settingsmsg.Value_CollectionValue{
+							CollectionValue: &settingsmsg.CollectionValue{
+								Values: []*settingsmsg.CollectionOption{
+									{
+										Key:    "in-app",
+										Option: &settingsmsg.CollectionOption_BoolValue{BoolValue: true},
+									},
+								},
+							},
+						},
+					},
+				},
+			}, nil
 		}
 
 		ul, err = service.NewUserlogService(

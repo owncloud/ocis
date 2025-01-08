@@ -42,7 +42,11 @@ class AuthAppHelper {
 	 *
 	 * @return ResponseInterface
 	 */
-	public static function listAllAppAuthTokensForUser(string $baseUrl, string $user, string $password): ResponseInterface {
+	public static function listAllAppAuthTokensForUser(
+		string $baseUrl,
+		string $user,
+		string $password
+	): ResponseInterface {
 		$url = $baseUrl . self::getAuthAppEndpoint();
 		return HttpRequestHelper::sendRequest(
 			$url,
@@ -61,7 +65,12 @@ class AuthAppHelper {
 	 *
 	 * @return ResponseInterface
 	 */
-	public static function createAppAuthToken(string $baseUrl, string $user, string $password, string $expiration): ResponseInterface {
+	public static function createAppAuthToken(
+		string $baseUrl,
+		string $user,
+		string $password,
+		string $expiration
+	): ResponseInterface {
 		$url = $baseUrl . self::getAuthAppEndpoint() . "?expiry=$expiration";
 		return HttpRequestHelper::sendRequest(
 			$url,
@@ -80,7 +89,12 @@ class AuthAppHelper {
 	 *
 	 * @return ResponseInterface
 	 */
-	public static function deleteAppAuthToken(string $baseUrl, string $user, string $password, string $token): ResponseInterface {
+	public static function deleteAppAuthToken(
+		string $baseUrl,
+		string $user,
+		string $password,
+		string $token
+	): ResponseInterface {
 		$url = $baseUrl . self::getAuthAppEndpoint() . "?token=$token";
 		return HttpRequestHelper::sendRequest(
 			$url,

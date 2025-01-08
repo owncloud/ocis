@@ -11,7 +11,6 @@ import (
 	"github.com/leonelquinteros/gotext"
 	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
-	"github.com/owncloud/ocis/v2/services/settings/pkg/store/defaults"
 	micrometadata "go-micro.dev/v4/metadata"
 )
 
@@ -140,7 +139,8 @@ func GetUserLocale(ctx context.Context, userID string, vc settingssvc.ValueServi
 		micrometadata.Set(ctx, middleware.AccountID, userID),
 		&settingssvc.GetValueByUniqueIdentifiersRequest{
 			AccountUuid: userID,
-			SettingId:   defaults.SettingUUIDProfileLanguage,
+			// this defaults.SettingUUIDProfileLanguage. Copied here to avoid import cycles.
+			SettingId: "aa8cfbe5-95d4-4f7e-a032-c3c01f5f062f",
 		},
 	)
 	if err != nil {

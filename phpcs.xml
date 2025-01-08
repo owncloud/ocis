@@ -19,10 +19,6 @@
 		<exclude name="Generic.WhiteSpace.DisallowTabIndent.NonIndentTabsUsed" />
 	</rule>
 
-	<rule ref="Generic.Files.LineLength">
-		<exclude name="Generic.Files.LineLength.TooLong" />
-	</rule>
-
 	<rule ref="PEAR">
 		<exclude name="Generic.Commenting.DocComment.ShortNotCapital" />
 		<exclude name="Generic.Commenting.DocComment.SpacingAfter" />
@@ -77,4 +73,18 @@
 		<exclude-pattern>*/lib/storagewrapper.php</exclude-pattern>
 	</rule>
 
+	<rule ref="Generic.Commenting.Todo">
+		<message>Please review this TODO comment: %s</message>
+		<type>error</type>
+	</rule>
+	<rule ref="Squiz.PHP.NonExecutableCode" />
+	<rule ref="Squiz.WhiteSpace.SuperfluousWhitespace" />
+	<rule ref="Generic.Files.LineLength">
+		<properties>
+			<property name="ignoreComments" value="true" />
+			<type>error</type>
+			<property name="lineLimit" value="120" />
+			<property name="absoluteLineLimit" value="120" />
+		</properties>
+	</rule>
 </ruleset>

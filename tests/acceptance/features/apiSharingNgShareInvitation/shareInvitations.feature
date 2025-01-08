@@ -1,3 +1,4 @@
+@issue-10739
 Feature: Send a sharing invitations
   As the owner of a resource
   I want to be able to send invitations to other users
@@ -38,6 +39,7 @@ Feature: Send a sharing invitations
             "items": {
               "type": "object",
               "required": [
+                "createdDateTime",
                 "id",
                 "roles",
                 "grantedToV2"
@@ -128,6 +130,7 @@ Feature: Send a sharing invitations
             "items": {
               "type": "object",
               "required": [
+                "createdDateTime",
                 "id",
                 "roles",
                 "grantedToV2"
@@ -209,6 +212,7 @@ Feature: Send a sharing invitations
             "items": {
               "type": "object",
               "required": [
+                "createdDateTime",
                 "id",
                 "@libre.graph.permissions.actions",
                 "grantedToV2"
@@ -297,6 +301,7 @@ Feature: Send a sharing invitations
             "items": {
               "type": "object",
               "required": [
+                "createdDateTime",
                 "id",
                 "@libre.graph.permissions.actions",
                 "grantedToV2"
@@ -394,6 +399,7 @@ Feature: Send a sharing invitations
             "items": {
               "type": "object",
               "required": [
+                "createdDateTime",
                 "id",
                 "@libre.graph.permissions.actions",
                 "grantedToV2"
@@ -488,6 +494,7 @@ Feature: Send a sharing invitations
             "items": {
               "type": "object",
               "required": [
+                "createdDateTime",
                 "id",
                 "@libre.graph.permissions.actions",
                 "grantedToV2"
@@ -581,6 +588,7 @@ Feature: Send a sharing invitations
             "items": {
               "type": "object",
               "required": [
+                "createdDateTime",
                 "id",
                 "roles",
                 "grantedToV2",
@@ -677,6 +685,7 @@ Feature: Send a sharing invitations
             "items": {
               "type": "object",
               "required": [
+                "createdDateTime",
                 "id",
                 "roles",
                 "grantedToV2",
@@ -767,6 +776,7 @@ Feature: Send a sharing invitations
             "items": {
               "type": "object",
               "required": [
+                "createdDateTime",
                 "id",
                 "roles",
                 "grantedToV2"
@@ -2004,6 +2014,7 @@ Feature: Send a sharing invitations
             "items": {
               "type": "object",
               "required": [
+                "createdDateTime",
                 "grantedToV2",
                 "roles"
               ],
@@ -2092,6 +2103,7 @@ Feature: Send a sharing invitations
             "items": {
               "type": "object",
               "required": [
+                "createdDateTime",
                 "id",
                 "roles",
                 "grantedToV2"

@@ -56,7 +56,7 @@ class OcsApiHelper {
 		$body = [],
 		?int $ocsApiVersion = 2,
 		?array $headers = []
-	):ResponseInterface {
+	): ResponseInterface {
 		$fullUrl = $baseUrl;
 		if (\substr($fullUrl, -1) !== '/') {
 			$fullUrl .= '/';
@@ -86,7 +86,7 @@ class OcsApiHelper {
 		$body = [],
 		?int $ocsApiVersion = 2,
 		?array $headers = []
-	):RequestInterface {
+	): RequestInterface {
 		$fullUrl = $baseUrl;
 		if (\substr($fullUrl, -1) !== '/') {
 			$fullUrl .= '/';

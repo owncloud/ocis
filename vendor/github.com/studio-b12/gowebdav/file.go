@@ -31,7 +31,7 @@ func newFile(path, name string, p *propstat) *File {
 	}
 	path = FixSlashes(path)
 
-	f.name = name
+	f.name = filepath.Base(name)
 	f.path = filepath.Clean(filepath.Join(path, f.name))
 	f.modified = p.Modified()
 	f.etag = p.ETag()
@@ -96,6 +96,11 @@ func (f File) IsDir() bool {
 // Sys ????
 func (f File) Sys() interface{} {
 	return f.propstat.Props
+}
+
+// Lock returns the files lock
+func (f File) Lock() string {
+	return f.propstat.Lock()
 }
 
 func (f File) StatusCode() int {

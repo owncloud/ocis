@@ -61,7 +61,12 @@ class SpacesTUSContext implements Context {
 	 * @throws Exception
 	 * @throws GuzzleException
 	 */
-	public function userHasUploadedFileViaTusInSpace(string $user, string $source, string $destination, string $spaceName): void {
+	public function userHasUploadedFileViaTusInSpace(
+		string $user,
+		string $source,
+		string $destination,
+		string $spaceName
+	): void {
 		$spaceId = $this->spacesContext->getSpaceIdByName($user, $spaceName);
 		$this->tusContext->uploadFileUsingTus($user, $source, $destination, $spaceId);
 		$this->featureContext->setLastUploadDeleteTime(\time());
@@ -175,7 +180,12 @@ class SpacesTUSContext implements Context {
 	 * @return void
 	 * @throws Exception|GuzzleException
 	 */
-	public function userUploadsAFileWithContentToInsideFederatedShareViaTusUsingTheWebdavApi(string $user, string $content, string $file, string $destination): void {
+	public function userUploadsAFileWithContentToInsideFederatedShareViaTusUsingTheWebdavApi(
+		string $user,
+		string $content,
+		string $file,
+		string $destination
+	): void {
 		$remoteItemId = $this->spacesContext->getSharesRemoteItemId($user, $destination);
 		$remoteItemId = \rawurlencode($remoteItemId);
 		$tmpFile = $this->tusContext->writeDataToTempFile($content);
@@ -293,8 +303,10 @@ class SpacesTUSContext implements Context {
 	 *
 	 * @return void
 	 * @throws Exception|GuzzleException
+	 * @codingStandardsIgnoreStart
 	 */
 	public function userHasUploadedFileWithChecksumToTheLastCreatedTusLocationWithOffsetAndContentViaTusInsideOfTheSpaceUsingTheWebdavApi(
+		// @codingStandardsIgnoreEnd
 		string $user,
 		string $checksum,
 		string $offset,
@@ -317,8 +329,10 @@ class SpacesTUSContext implements Context {
 	 *
 	 * @return void
 	 * @throws Exception|GuzzleException
+	 * @codingStandardsIgnoreStart
 	 */
 	public function userUploadsFileWithChecksumToTheLastCreatedTusLocationWithOffsetAndContentViaTusInsideOfTheSpaceUsingTheWebdavApi(
+		// @codingStandardsIgnoreEnd
 		string $user,
 		string $checksum,
 		string $offset,
@@ -341,8 +355,10 @@ class SpacesTUSContext implements Context {
 	 *
 	 * @return void
 	 * @throws Exception|GuzzleException
+	 * @codingStandardsIgnoreStart
 	 */
 	public function userSendsAChunkToTheLastCreatedTusLocationWithOffsetAndDataWithChecksumViaTusInsideOfTheSpaceUsingTheWebdavApi(
+		// @codingStandardsIgnoreEnd
 		string $user,
 		string $offset,
 		string $data,
@@ -371,7 +387,14 @@ class SpacesTUSContext implements Context {
 	): void {
 		$rows = $headers->getRowsHash();
 		$resourceLocation = $this->tusContext->getLastTusResourceLocation();
-		$response = $this->tusContext->uploadChunkToTUSLocation($user, $resourceLocation, $rows['Upload-Offset'], $data, $rows['Upload-Checksum'], ['Origin' => $rows['Origin']]);
+		$response = $this->tusContext->uploadChunkToTUSLocation(
+			$user,
+			$resourceLocation,
+			$rows['Upload-Offset'],
+			$data,
+			$rows['Upload-Checksum'],
+			['Origin' => $rows['Origin']]
+		);
 		$this->featureContext->setResponse($response);
 	}
 
@@ -387,8 +410,10 @@ class SpacesTUSContext implements Context {
 	 *
 	 * @return void
 	 * @throws GuzzleException
+	 * @codingStandardsIgnoreStart
 	 */
 	public function userOverwritesRecentlySharedFileWithOffsetAndDataWithChecksumViaTusInsideOfTheSpaceUsingTheWebdavApiWithTheseHeaders(
+		// @codingStandardsIgnoreEnd
 		string $user,
 		string $offset,
 		string $data,

@@ -56,7 +56,7 @@ class WebDavPropertiesContext implements Context {
 	public function userGetsThePropertiesOfFolder(
 		string $user,
 		string $path
-	):void {
+	): void {
 		$response = $this->featureContext->listFolder(
 			$user,
 			$path,
@@ -79,7 +79,7 @@ class WebDavPropertiesContext implements Context {
 		string $user,
 		string $path,
 		string $depth
-	):void {
+	): void {
 		$response = $this->featureContext->listFolder(
 			$user,
 			$path,
@@ -133,7 +133,7 @@ class WebDavPropertiesContext implements Context {
 		string $user,
 		string $path,
 		TableNode $propertiesTable
-	):void {
+	): void {
 		$response = $this->getPropertiesOfFolder($user, $path, null, $propertiesTable);
 		$this->featureContext->setResponse($response);
 		$this->featureContext->pushToLastStatusCodesArrays();
@@ -170,7 +170,11 @@ class WebDavPropertiesContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userHasSetFollowingPropertiesUsingProppatch(string $username, string $path, TableNode $propertiesTable) {
+	public function userHasSetFollowingPropertiesUsingProppatch(
+		string $username,
+		string $path,
+		TableNode $propertiesTable
+	) {
 		$username = $this->featureContext->getActualUsername($username);
 		$this->featureContext->verifyTableNodeColumns($propertiesTable, ['propertyName', 'propertyValue']);
 		$properties = $propertiesTable->getColumnsHash();
@@ -200,7 +204,7 @@ class WebDavPropertiesContext implements Context {
 		string $user,
 		string $propertyName,
 		string $path
-	):void {
+	): void {
 		$user = $this->featureContext->getActualUsername($user);
 		$properties = [$propertyName];
 		$response = WebDavHelper::propfind(
@@ -234,7 +238,7 @@ class WebDavPropertiesContext implements Context {
 		string $propertyName,
 		string $namespace,
 		string $path
-	):void {
+	): void {
 		$user = $this->featureContext->getActualUsername($user);
 		$properties = [
 			$namespace => $propertyName
@@ -262,7 +266,9 @@ class WebDavPropertiesContext implements Context {
 	 * @throws Exception
 	 */
 	public function getPropertiesOfEntryFromLastLinkShare(string $path, TableNode $propertiesTable): ResponseInterface {
-		$token = ($this->featureContext->isUsingSharingNG()) ? $this->featureContext->shareNgGetLastCreatedLinkShareToken() : $this->featureContext->getLastCreatedPublicShareToken();
+		$token = ($this->featureContext->isUsingSharingNG())
+		? $this->featureContext->shareNgGetLastCreatedLinkShareToken()
+		: $this->featureContext->getLastCreatedPublicShareToken();
 		$properties = null;
 		foreach ($propertiesTable->getRows() as $row) {
 			$properties[] = $row[0];
@@ -286,7 +292,10 @@ class WebDavPropertiesContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function thePublicGetsFollowingPropertiesOfEntryFromLastLinkShare(string $path, TableNode $propertiesTable):void {
+	public function thePublicGetsFollowingPropertiesOfEntryFromLastLinkShare(
+		string $path,
+		TableNode $propertiesTable
+	): void {
 		$response = $this->getPropertiesOfEntryFromLastLinkShare($path, $propertiesTable);
 		$this->featureContext->setResponse($response);
 	}
@@ -307,7 +316,7 @@ class WebDavPropertiesContext implements Context {
 		string $path,
 		string $propertyValue,
 		string $namespace = null,
-	):ResponseInterface {
+	): ResponseInterface {
 		$user = $this->featureContext->getActualUsername($user);
 		return WebDavHelper::proppatch(
 			$this->featureContext->getBaseUrl(),
@@ -338,7 +347,7 @@ class WebDavPropertiesContext implements Context {
 		string $propertyName,
 		string $path,
 		string $propertyValue
-	):void {
+	): void {
 		$response = $this->setResourceProperty(
 			$user,
 			$propertyName,
@@ -366,7 +375,7 @@ class WebDavPropertiesContext implements Context {
 		string $namespace,
 		string $path,
 		string $propertyValue
-	):void {
+	): void {
 		$response = $this->setResourceProperty(
 			$user,
 			$propertyName,
@@ -393,7 +402,7 @@ class WebDavPropertiesContext implements Context {
 		string $propertyName,
 		string $path,
 		string $propertyValue
-	):void {
+	): void {
 		$response = $this->setResourceProperty(
 			$user,
 			$propertyName,
@@ -421,7 +430,7 @@ class WebDavPropertiesContext implements Context {
 		string $namespace,
 		string $path,
 		string $propertyValue
-	):void {
+	): void {
 		$response = $this->setResourceProperty(
 			$user,
 			$propertyName,
@@ -477,7 +486,7 @@ class WebDavPropertiesContext implements Context {
 		string $propertyName,
 		string $namespaceString,
 		string $propertyValue
-	):void {
+	): void {
 		// let's unescape quotes first
 		$propertyValue = \str_replace('\"', '"', $propertyValue);
 		$responseXmlObject = HttpRequestHelper::getResponseXml(
@@ -518,7 +527,7 @@ class WebDavPropertiesContext implements Context {
 	public function theSingleResponseShouldContainAPropertyWithChildProperty(
 		string $property,
 		string $childProperty
-	):void {
+	): void {
 		$xmlPart = HttpRequestHelper::getResponseXml($this->featureContext->getResponse())->xpath(
 			"//d:prop/$property/$childProperty"
 		);
@@ -572,7 +581,7 @@ class WebDavPropertiesContext implements Context {
 	public function theSingleResponseShouldContainAPropertyWithValue(
 		string $key,
 		string $expectedValue
-	):void {
+	): void {
 		$this->checkResponseContainsAPropertyWithValue(
 			$this->featureContext->getResponse(),
 			$key,
@@ -595,7 +604,7 @@ class WebDavPropertiesContext implements Context {
 		string $user,
 		string $key,
 		string $expectedValue
-	):void {
+	): void {
 		$this->checkResponseContainsAPropertyWithValue(
 			$this->featureContext->getResponse(),
 			$key,
@@ -619,7 +628,7 @@ class WebDavPropertiesContext implements Context {
 		string $key,
 		string $expectedValue,
 		string $altExpectedValue
-	):void {
+	): void {
 		$this->checkResponseContainsAPropertyWithValue(
 			$this->featureContext->getResponse(),
 			$key,
@@ -636,7 +645,11 @@ class WebDavPropertiesContext implements Context {
 	 * @return SimpleXMLElement
 	 * @throws Exception
 	 */
-	public function checkResponseContainsProperty(ResponseInterface $response, string $key, string $namespaceString = null): SimpleXMLElement {
+	public function checkResponseContainsProperty(
+		ResponseInterface $response,
+		string $key,
+		string $namespaceString = null
+	): SimpleXMLElement {
 		$xmlPart = HttpRequestHelper::getResponseXml($response, __METHOD__);
 		;
 
@@ -680,7 +693,7 @@ class WebDavPropertiesContext implements Context {
 		string $expectedValue,
 		string $altExpectedValue,
 		?string $user = null
-	):void {
+	): void {
 		$xmlPart = $this->checkResponseContainsProperty($response, $key);
 		$value = $xmlPart->__toString();
 		$expectedValue = $this->featureContext->substituteInLineCodes(
@@ -708,7 +721,7 @@ class WebDavPropertiesContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function assertValueOfItemInResponseIs(string $xpath, string $expectedValue):void {
+	public function assertValueOfItemInResponseIs(string $xpath, string $expectedValue): void {
 		$this->assertValueOfItemInResponseAboutUserIs(
 			$xpath,
 			null,
@@ -727,7 +740,7 @@ class WebDavPropertiesContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function valueOfItemOfPathShouldBe(string $user, string $xpath, string $path, string $expectedValue):void {
+	public function valueOfItemOfPathShouldBe(string $user, string $xpath, string $path, string $expectedValue): void {
 		$path = $this->featureContext->substituteInLineCodes($path, $user);
 		$path = \ltrim($path, '/');
 		$path = "/" . WebdavHelper::prefixRemotePhp($path);
@@ -749,7 +762,11 @@ class WebDavPropertiesContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function theValueOfTheItemInTheResponseAboutUserShouldBe(string $xpath, string $user, string $expectedValue):void {
+	public function theValueOfTheItemInTheResponseAboutUserShouldBe(
+		string $xpath,
+		string $user,
+		string $expectedValue
+	): void {
 		$this->assertValueOfItemInResponseAboutUserIs($xpath, $user, $expectedValue);
 	}
 
@@ -760,7 +777,7 @@ class WebDavPropertiesContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function assertValueOfItemInResponseAboutUserIs(string $xpath, ?string $user, string $expectedValue):void {
+	public function assertValueOfItemInResponseAboutUserIs(string $xpath, ?string $user, string $expectedValue): void {
 		$responseXmlObject = HttpRequestHelper::getResponseXml(
 			$this->featureContext->getResponse(),
 			__METHOD__
@@ -794,7 +811,12 @@ class WebDavPropertiesContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function assertValueOfItemInResponseAboutUserIsEitherOr(string $xpath, ?string $user, string $expectedValue1, string $expectedValue2):void {
+	public function assertValueOfItemInResponseAboutUserIsEitherOr(
+		string $xpath,
+		?string $user,
+		string $expectedValue1,
+		string $expectedValue2
+	): void {
 		if (!$expectedValue2) {
 			$expectedValue2 = $expectedValue1;
 		}
@@ -820,7 +842,10 @@ class WebDavPropertiesContext implements Context {
 		$expectedValue2 = preg_replace("/^\/\//i", "/", $expectedValue2);
 		$expectedValues = [$expectedValue1, $expectedValue2];
 		$isExpectedValueInMessage = \in_array($value, $expectedValues);
-		Assert::assertTrue($isExpectedValueInMessage, "The actual value \"$value\" is not one of the expected values: \"$expectedValue1\" or \"$expectedValue2\"");
+		Assert::assertTrue(
+			$isExpectedValueInMessage,
+			"The actual value \"$value\" is not one of the expected values: \"$expectedValue1\" or \"$expectedValue2\""
+		);
 	}
 
 	/**
@@ -850,7 +875,7 @@ class WebDavPropertiesContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function assertValueOfItemInResponseRegExp(string $xpath, string $pattern):void {
+	public function assertValueOfItemInResponseRegExp(string $xpath, string $pattern): void {
 		$this->assertXpathValueMatchesPattern(
 			HttpRequestHelper::getResponseXml($this->featureContext->getResponse()),
 			$xpath,
@@ -868,7 +893,11 @@ class WebDavPropertiesContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function publicGetsThePropertiesOfFolderAndAssertValueOfItemInResponseRegExp(string $xpath, string $path, string $pattern):void {
+	public function publicGetsThePropertiesOfFolderAndAssertValueOfItemInResponseRegExp(
+		string $xpath,
+		string $path,
+		string $pattern
+	): void {
 		$propertiesTable = new TableNode([['propertyName'],['d:lockdiscovery']]);
 		$response = $this->getPropertiesOfEntryFromLastLinkShare($path, $propertiesTable);
 		$this->featureContext->theHTTPStatusCodeShouldBe('207', "", $response);
@@ -888,7 +917,7 @@ class WebDavPropertiesContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function assertEntryWithHrefMatchingRegExpInResponseToUser(string $expectedHref, string $user):void {
+	public function assertEntryWithHrefMatchingRegExpInResponseToUser(string $expectedHref, string $user): void {
 		$responseXmlObject = HttpRequestHelper::getResponseXml(
 			$this->featureContext->getResponse(),
 			__METHOD__
@@ -947,7 +976,12 @@ class WebDavPropertiesContext implements Context {
 	 * @return void
 	 * @throws JsonException
 	 */
-	public function assertXpathValueMatchesPattern(SimpleXMLElement $responseXmlObject, string $xpath, string $pattern, ?string $user = null): void {
+	public function assertXpathValueMatchesPattern(
+		SimpleXMLElement $responseXmlObject,
+		string $xpath,
+		string $pattern,
+		?string $user = null
+	): void {
 		$xmlPart = $responseXmlObject->xpath($xpath);
 		Assert::assertTrue(
 			isset($xmlPart[0]),
@@ -955,7 +989,8 @@ class WebDavPropertiesContext implements Context {
 		);
 		$user = $this->featureContext->getActualUsername($user);
 		$value = $xmlPart[0]->__toString();
-		$callback = ($this->featureContext->isUsingSharingNG()) ? "shareNgGetLastCreatedLinkShareToken" : "getLastCreatedPublicShareToken";
+		$callback = ($this->featureContext->isUsingSharingNG())
+		? "shareNgGetLastCreatedLinkShareToken" : "getLastCreatedPublicShareToken";
 
 		if (\str_ends_with($xpath, "d:href")) {
 			$pattern = \preg_replace("/^\//", "", $pattern);
@@ -996,7 +1031,12 @@ class WebDavPropertiesContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userGetsPropertiesOfFolderAndAssertValueOfItemInResponseToUserRegExp(string $user, string $xpath, string $path, string $pattern):void {
+	public function userGetsPropertiesOfFolderAndAssertValueOfItemInResponseToUserRegExp(
+		string $user,
+		string $xpath,
+		string $path,
+		string $pattern
+	): void {
 		$propertiesTable = new TableNode([['propertyName'],['d:lockdiscovery']]);
 		$response = $this->getPropertiesOfFolder(
 			$user,
@@ -1021,7 +1061,7 @@ class WebDavPropertiesContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function assertItemInResponseDoesNotExist(string $xpath):void {
+	public function assertItemInResponseDoesNotExist(string $xpath): void {
 		$xmlPart = HttpRequestHelper::getResponseXml($this->featureContext->getResponse())->xpath($xpath);
 		Assert::assertFalse(
 			isset($xmlPart[0]),
@@ -1047,7 +1087,7 @@ class WebDavPropertiesContext implements Context {
 		string $property,
 		string $expectedValue,
 		?string $altExpectedValue = null
-	):void {
+	): void {
 		$this->checkPropertyOfAFolder($user, $path, $property, $expectedValue, $altExpectedValue);
 	}
 
@@ -1068,7 +1108,7 @@ class WebDavPropertiesContext implements Context {
 		string $expectedValue,
 		?string $altExpectedValue = null,
 		?string $spaceId = null,
-	):void {
+	): void {
 		$response = $this->featureContext->listFolder(
 			$user,
 			$path,
@@ -1099,7 +1139,7 @@ class WebDavPropertiesContext implements Context {
 	public function theSingleResponseShouldContainAPropertyWithValueLike(
 		string $key,
 		string $regex
-	):void {
+	): void {
 		$xmlPart = HttpRequestHelper::getResponseXml($this->featureContext->getResponse())->xpath(
 			"//d:prop/$key"
 		);
@@ -1123,7 +1163,7 @@ class WebDavPropertiesContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function theResponseShouldContainAShareTypesPropertyWith(TableNode $table):void {
+	public function theResponseShouldContainAShareTypesPropertyWith(TableNode $table): void {
 		$this->featureContext->verifyTableNodeColumnsCount($table, 1);
 		WebdavTest::assertResponseContainsShareTypes(
 			HttpRequestHelper::getResponseXml($this->featureContext->getResponse()),
@@ -1139,7 +1179,7 @@ class WebDavPropertiesContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function theResponseShouldContainAnEmptyProperty(string $property):void {
+	public function theResponseShouldContainAnEmptyProperty(string $property): void {
 		$xmlPart = HttpRequestHelper::getResponseXml($this->featureContext->getResponse())->xpath(
 			"//d:prop/$property"
 		);
@@ -1163,7 +1203,12 @@ class WebDavPropertiesContext implements Context {
 	 * @return SimpleXMLElement
 	 * @throws Exception
 	 */
-	public function storeEtagOfElement(string $user, string $path, ?string $storePath = "", ?string  $spaceId = null):SimpleXMLElement {
+	public function storeEtagOfElement(
+		string $user,
+		string $path,
+		?string $storePath = "",
+		?string  $spaceId = null
+	): SimpleXMLElement {
 		if ($storePath === "") {
 			$storePath = $path;
 		}
@@ -1190,7 +1235,7 @@ class WebDavPropertiesContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userStoresEtagOfElement(string $user, string $path):void {
+	public function userStoresEtagOfElement(string $user, string $path): void {
 		$this->storeEtagOfElement(
 			$user,
 			$path
@@ -1207,7 +1252,7 @@ class WebDavPropertiesContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userStoresEtagOfElementOnPath(string $user, string $path, string $storePath):void {
+	public function userStoresEtagOfElementOnPath(string $user, string $path, string $storePath): void {
 		$user = $this->featureContext->getActualUsername($user);
 		$this->storeEtagOfElement(
 			$user,
@@ -1231,7 +1276,7 @@ class WebDavPropertiesContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userHasStoredEtagOfElement(string $user, string $path):void {
+	public function userHasStoredEtagOfElement(string $user, string $path): void {
 		$user = $this->featureContext->getActualUsername($user);
 		$this->storeEtagOfElement(
 			$user,
@@ -1248,7 +1293,7 @@ class WebDavPropertiesContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function thePropertiesResponseShouldContainAnEtag():void {
+	public function thePropertiesResponseShouldContainAnEtag(): void {
 		Assert::assertTrue(
 			$this->featureContext->isEtagValid($this->featureContext->getEtagFromResponseXmlObject()),
 			__METHOD__
@@ -1287,8 +1332,11 @@ class WebDavPropertiesContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function theResponseShouldHavePropertyWithValue(string $username, TableNode $expectedPropTable):void {
-		$this->featureContext->verifyTableNodeColumns($expectedPropTable, ['resource', 'propertyName', 'propertyValue']);
+	public function theResponseShouldHavePropertyWithValue(string $username, TableNode $expectedPropTable): void {
+		$this->featureContext->verifyTableNodeColumns(
+			$expectedPropTable,
+			['resource', 'propertyName', 'propertyValue']
+		);
 		$responseXmlObject = HttpRequestHelper::getResponseXml($this->featureContext->getResponse());
 
 		$href = (string)$responseXmlObject->xpath("//d:href")[0];
@@ -1315,7 +1363,7 @@ class WebDavPropertiesContext implements Context {
 	 * @return string
 	 * @throws Exception
 	 */
-	public function getCurrentEtagOfElement(string $path, string $user):string {
+	public function getCurrentEtagOfElement(string $path, string $user): string {
 		$user = $this->featureContext->getActualUsername($user);
 		$propertiesTable = new TableNode([['propertyName'],['d:getetag']]);
 		$response = $this->getPropertiesOfFolder(
@@ -1324,7 +1372,9 @@ class WebDavPropertiesContext implements Context {
 			null,
 			$propertiesTable
 		);
-		return $this->featureContext->getEtagFromResponseXmlObject(HttpRequestHelper::getResponseXml($response, __METHOD__));
+		return $this->featureContext->getEtagFromResponseXmlObject(
+			HttpRequestHelper::getResponseXml($response, __METHOD__)
+		);
 	}
 
 	/**
@@ -1334,7 +1384,7 @@ class WebDavPropertiesContext implements Context {
 	 *
 	 * @return string
 	 */
-	public function getStoredEtagOfElement(string $path, string $user, string $messageStart = ''):string {
+	public function getStoredEtagOfElement(string $path, string $user, string $messageStart = ''): string {
 		if ($messageStart === '') {
 			$messageStart = __METHOD__;
 		}
@@ -1348,7 +1398,8 @@ class WebDavPropertiesContext implements Context {
 			$path,
 			$this->storedETAG[$user],
 			$messageStart
-			. " Trying to check etag of element $path of user $user but the user does not have a stored etag for the element"
+			. " Trying to check etag of element $path of user "
+			. "$user but the user does not have a stored etag for the element"
 		);
 		return $this->storedETAG[$user][$path];
 	}
@@ -1361,7 +1412,7 @@ class WebDavPropertiesContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function theseEtagsShouldNotHaveChanged(TableNode $etagTable):void {
+	public function theseEtagsShouldNotHaveChanged(TableNode $etagTable): void {
 		$this->featureContext->verifyTableNodeColumns($etagTable, ["user", "path"]);
 		$this->featureContext->verifyTableNodeColumnsCount($etagTable, 2);
 		$changedEtagCount = 0;
@@ -1389,7 +1440,7 @@ class WebDavPropertiesContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function theseEtagsShouldHaveChanged(TableNode $etagTable):void {
+	public function theseEtagsShouldHaveChanged(TableNode $etagTable): void {
 		$this->featureContext->verifyTableNodeColumns($etagTable, ["user", "path"]);
 		$this->featureContext->verifyTableNodeColumnsCount($etagTable, 2);
 		$unchangedEtagCount = 0;
@@ -1419,7 +1470,11 @@ class WebDavPropertiesContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function etagOfElementOfUserShouldOrShouldNotHaveChanged(string $path, string $user, string $shouldShouldNot):void {
+	public function etagOfElementOfUserShouldOrShouldNotHaveChanged(
+		string $path,
+		string $user,
+		string $shouldShouldNot
+	): void {
 		$user = $this->featureContext->getActualUsername($user);
 		$actualEtag = $this->getCurrentEtagOfElement($path, $user);
 		$storedEtag = $this->getStoredEtagOfElement($path, $user, __METHOD__);
@@ -1452,7 +1507,7 @@ class WebDavPropertiesContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function before(BeforeScenarioScope $scope):void {
+	public function before(BeforeScenarioScope $scope): void {
 		// Get the environment
 		$environment = $scope->getEnvironment();
 		// Get all the contexts you need in this context

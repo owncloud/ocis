@@ -39,6 +39,7 @@ type UserlogService struct {
 	tp               trace.TracerProvider
 	tracer           trace.Tracer
 	publisher        events.Publisher
+	filter           *userlogFilter
 }
 
 // NewUserlogService returns an EventHistory service
@@ -69,6 +70,7 @@ func NewUserlogService(opts ...Option) (*UserlogService, error) {
 		tp:               o.TraceProvider,
 		tracer:           o.TraceProvider.Tracer("github.com/owncloud/ocis/services/userlog/pkg/service"),
 		publisher:        o.Stream,
+		filter:           newUserlogFilter(o.Logger, o.ValueClient),
 	}
 
 	for _, e := range o.RegisteredEvents {
@@ -190,10 +192,7 @@ func (ul *UserlogService) processEvent(event events.Event) {
 	}
 
 	// II) filter users who want to receive the event
-	// This step is postponed for later.
-	// For now each user should get all events she is eligible to receive
-	// ...except notifications for their own actions
-	users = removeExecutant(users, executant)
+	users = ul.filter.execute(ctx, event, executant, users)
 
 	// III) store the eventID for each user
 	for _, id := range users {
@@ -460,14 +459,4 @@ func (ul *UserlogService) alterGlobalEvents(ctx context.Context, alter func(map[
 		Key:   "global-events",
 		Value: val,
 	})
-}
-
-func removeExecutant(users []string, executant *user.UserId) []string {
-	var usrs []string
-	for _, u := range users {
-		if u != executant.GetOpaqueId() {
-			usrs = append(usrs, u)
-		}
-	}
-	return usrs
 }

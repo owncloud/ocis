@@ -106,7 +106,8 @@ func (d *driver) Upload(ctx context.Context, req storage.UploadRequest, _ storag
 		}
 	})
 
-	return &provider.ResourceInfo{}, client.WriteStream(rel, req.Body, 0)
+	locktoken, _ := ctxpkg.ContextGetLockID(ctx)
+	return &provider.ResourceInfo{}, client.WriteStream(rel, req.Body, 0, locktoken)
 }
 
 // UseIn tells the tus upload middleware which extensions it supports.
@@ -356,7 +357,7 @@ func (u *upload) FinishUpload(ctx context.Context) error {
 		return err
 	}
 	defer f.Close()
-	return client.WriteStream(rel, f, 0)
+	return client.WriteStream(rel, f, 0, "")
 }
 
 func (u *upload) Terminate(ctx context.Context) error {

@@ -49,7 +49,7 @@ class CapabilitiesContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function before(BeforeScenarioScope $scope):void {
+	public function before(BeforeScenarioScope $scope): void {
 		// Get the environment
 		$environment = $scope->getEnvironment();
 		// Get all the contexts you need in this context
@@ -164,7 +164,7 @@ class CapabilitiesContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function checkVersionMajorMinorMicroResponse():void {
+	public function checkVersionMajorMinorMicroResponse(): void {
 		$jsonResponse = $this->featureContext->getJsonDecodedResponseBodyContent();
 		$versionData = $jsonResponse->ocs->data->version;
 		$versionString = (string) $versionData->string;

@@ -4,6 +4,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/owncloud/ocis/v2/services/notifications/pkg/email"
+	"github.com/owncloud/ocis/v2/services/settings/pkg/store/defaults"
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
 )
 
@@ -48,7 +49,8 @@ func (s eventsNotifier) handleShareCreated(e events.ShareCreated) {
 	}
 
 	granteeList := s.ensureGranteeList(ctx, owner.GetId(), e.GranteeUserID, e.GranteeGroupID)
-	if granteeList == nil {
+	filteredGrantees := s.filter.execute(ctx, granteeList, defaults.SettingUUIDProfileEventShareCreated)
+	if filteredGrantees == nil {
 		return
 	}
 
@@ -59,7 +61,7 @@ func (s eventsNotifier) handleShareCreated(e events.ShareCreated) {
 			"ShareSharer": sharerDisplayName,
 			"ShareFolder": resourceInfo.Name,
 			"ShareLink":   shareLink,
-		}, granteeList, sharerDisplayName)
+		}, filteredGrantees, sharerDisplayName)
 	if err != nil {
 		s.logger.Error().Err(err).Str("event", "ShareCreated").Msg("could not get render the email")
 		return
@@ -100,7 +102,8 @@ func (s eventsNotifier) handleShareExpired(e events.ShareExpired) {
 	}
 
 	granteeList := s.ensureGranteeList(ctx, owner.GetId(), e.GranteeUserID, e.GranteeGroupID)
-	if granteeList == nil {
+	filteredGrantees := s.filter.execute(ctx, granteeList, defaults.SettingUUIDProfileEventShareExpired)
+	if filteredGrantees == nil {
 		return
 	}
 
@@ -109,7 +112,7 @@ func (s eventsNotifier) handleShareExpired(e events.ShareExpired) {
 		map[string]string{
 			"ShareFolder": resourceInfo.GetName(),
 			"ExpiredAt":   e.ExpiredAt.Format("2006-01-02 15:04:05"),
-		}, granteeList, owner.GetDisplayName())
+		}, filteredGrantees, owner.GetDisplayName())
 	if err != nil {
 		s.logger.Error().Err(err).Str("event", "ShareExpired").Msg("could not get render the email")
 		return

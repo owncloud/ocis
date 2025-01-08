@@ -2,6 +2,7 @@ package svc
 
 import (
 	"errors"
+	"fmt"
 	"regexp"
 
 	validation "github.com/invopop/validation"
@@ -83,6 +84,14 @@ func validateSaveValue(req *settingssvc.SaveValueRequest) error {
 
 	if err := validateResource(req.Value.Resource); err != nil {
 		return err
+	}
+
+	if v := req.GetValue().GetCollectionValue().GetValues(); v != nil {
+		for i := range v {
+			if err := validation.Validate(v[i].GetKey(), validation.Required); err != nil {
+				return fmt.Errorf("collectionValue.values[%d].key %w", i, err)
+			}
+		}
 	}
 
 	// TODO: validate values against the respective setting. need to check if constraints of the setting are fulfilled.

@@ -1,5 +1,6 @@
 # Table of Contents
 
+* [Changelog for unreleased](#changelog-for-unreleased-unreleased)
 * [Changelog for 7.0.0](#changelog-for-700-2024-12-17)
 * [Changelog for 5.0.9](#changelog-for-509-2024-11-14)
 * [Changelog for 6.6.1](#changelog-for-661-2024-10-24)
@@ -51,6 +52,72 @@
 * [Changelog for 1.2.0](#changelog-for-120-2021-02-17)
 * [Changelog for 1.1.0](#changelog-for-110-2021-01-22)
 * [Changelog for 1.0.0](#changelog-for-100-2020-12-17)
+
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes for unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis/compare/v7.0.0...master
+
+## Summary
+
+* Bugfix - Share creation date is missing in invite response: [#10780](https://github.com/owncloud/ocis/pull/10780)
+* Bugfix - Bump some golang dependencies: [#10795](https://github.com/owncloud/ocis/pull/10795)
+* Enhancement - Part I: The user settings are extended by notifications preferences: [#10706](https://github.com/owncloud/ocis/pull/10706)
+* Enhancement - Part II: Filtering of in-app notifications: [#10779](https://github.com/owncloud/ocis/pull/10779)
+* Enhancement - Part III: Filtering of mail notifications: [#10792](https://github.com/owncloud/ocis/pull/10792)
+* Enhancement - Translate Notification Settings: [#10812](https://github.com/owncloud/ocis/pull/10812)
+* Enhancement - Bump Reva: [#10830](https://github.com/owncloud/ocis/pull/10830)
+
+## Details
+
+* Bugfix - Share creation date is missing in invite response: [#10780](https://github.com/owncloud/ocis/pull/10780)
+
+   The graph drives invite response now includes the `createdDateTime` field.
+
+   https://github.com/owncloud/ocis/issues/10739
+   https://github.com/owncloud/ocis/pull/10780
+
+* Bugfix - Bump some golang dependencies: [#10795](https://github.com/owncloud/ocis/pull/10795)
+
+   Bump dependencies "golang.org/x/crypto" and "golang.org/x/net"
+
+   https://github.com/owncloud/ocis/pull/10795
+
+* Enhancement - Part I: The user settings are extended by notifications preferences: [#10706](https://github.com/owncloud/ocis/pull/10706)
+
+   Part I: Users can now store their notifications preferences in the user settings
+
+   https://github.com/owncloud/ocis/issues/10669
+   https://github.com/owncloud/ocis/pull/10706
+
+* Enhancement - Part II: Filtering of in-app notifications: [#10779](https://github.com/owncloud/ocis/pull/10779)
+
+   Part II: In-app notifications are now filtered based on the notification
+   preferences in the user settings
+
+   https://github.com/owncloud/ocis/issues/10769
+   https://github.com/owncloud/ocis/pull/10779
+
+* Enhancement - Part III: Filtering of mail notifications: [#10792](https://github.com/owncloud/ocis/pull/10792)
+
+   Part III: Mail notifications are now filtered based on the notification
+   preferences in the user settings
+
+   https://github.com/owncloud/ocis/issues/10790
+   https://github.com/owncloud/ocis/pull/10792
+
+* Enhancement - Translate Notification Settings: [#10812](https://github.com/owncloud/ocis/pull/10812)
+
+   Translates the notification settings according to the users language preference.
+
+   https://github.com/owncloud/ocis/pull/10812
+
+* Enhancement - Bump Reva: [#10830](https://github.com/owncloud/ocis/pull/10830)
+
+   Bumps the reva version
+
+   https://github.com/owncloud/ocis/pull/10830
 
 # Changelog for [7.0.0] (2024-12-17)
 

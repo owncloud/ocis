@@ -105,6 +105,63 @@ func (c *Client) propfind(path string, self bool, body string, resp interface{},
 	return parseXML(rs.Body, resp, parse)
 }
 
+func (c *Client) lock(path string, token string, refresh bool) error {
+	var body io.Reader
+	if !refresh {
+		b := strings.Builder{}
+
+		// build the lockinfo xml
+		b.WriteString("<D:lockinfo>")
+		// always use an exclusive lock
+		b.WriteString("<D:lockscope><D:exclusive/></D:lockscope>")
+		// always use a write lock
+		b.WriteString("<D:locktype><D:write/></D:locktype>")
+		// add the lock token
+		b.WriteString("<d:locktoken><d:href>")
+		b.WriteString(token)
+		b.WriteString("</d:href></d:locktoken>")
+		// close the lockinfo xml
+		b.WriteString("</D:lockinfo>")
+
+		body = strings.NewReader(b.String())
+	}
+
+	rs, err := c.req("LOCK", path, body, func(rq *http.Request) {
+		rq.Header.Add("Content-Type", "application/xml;charset=UTF-8")
+		rq.Header.Add("Accept", "application/xml,text/xml")
+		rq.Header.Add("Accept-Charset", "utf-8")
+		rq.Header.Add("Accept-Encoding", "")
+		if refresh {
+			rq.Header.Add("If", "("+token+")")
+		}
+	})
+	if err != nil {
+		return err
+	}
+	defer rs.Body.Close()
+
+	if rs.StatusCode != 200 {
+		return NewPathError("LOCK", path, rs.StatusCode)
+	}
+
+	return nil
+}
+
+func (c *Client) unlock(path string, token string) error {
+	rs, err := c.req("UNLOCK", path, nil, func(rq *http.Request) {
+		rq.Header.Add("Lock-Token", "<"+token+">")
+	})
+	if err != nil {
+		return err
+	}
+	defer rs.Body.Close()
+
+	if rs.StatusCode != http.StatusNoContent {
+		return NewPathError("UNLOCK", path, rs.StatusCode)
+	}
+	return nil
+}
+
 func (c *Client) doCopyMove(
 	method string,
 	oldpath string,
@@ -160,8 +217,10 @@ func (c *Client) copymove(method string, oldpath string, newpath string, overwri
 	return NewPathError(method, oldpath, s)
 }
 
-func (c *Client) put(path string, stream io.Reader) (status int, err error) {
-	rs, err := c.req("PUT", path, stream, nil)
+func (c *Client) put(path string, stream io.Reader, locktoken string) (status int, err error) {
+	rs, err := c.req("PUT", path, stream, func(rq *http.Request) {
+		rq.Header.Add("Lock-Token", "<"+locktoken+">")
+	})
 	if err != nil {
 		return
 	}

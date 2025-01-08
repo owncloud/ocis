@@ -168,6 +168,7 @@ message GetBundleResponse {
 
 message ListBundlesRequest {
   repeated string bundle_ids = 1;
+  string locale = 2;
 }
 
 message ListBundlesResponse {

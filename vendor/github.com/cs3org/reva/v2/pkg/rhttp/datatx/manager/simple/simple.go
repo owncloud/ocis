@@ -24,6 +24,7 @@ import (
 
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
@@ -108,6 +109,10 @@ func (m *manager) Handler(fs storage.FS) (http.Handler, error) {
 			defer r.Body.Close()
 
 			ref := &provider.Reference{Path: fn}
+
+			if lockID := r.Header.Get("X-Lock-Id"); lockID != "" {
+				ctx = ctxpkg.ContextSetLockID(ctx, lockID)
+			}
 
 			info, err := fs.Upload(ctx, storage.UploadRequest{
 				Ref:    ref,

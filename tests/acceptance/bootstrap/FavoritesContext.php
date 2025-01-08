@@ -43,7 +43,7 @@ class FavoritesContext implements Context {
 	 *
 	 * @return ResponseInterface
 	 */
-	public function userFavoritesElement(string $user, string $path, string $spaceId = null):ResponseInterface {
+	public function userFavoritesElement(string $user, string $path, string $spaceId = null): ResponseInterface {
 		return $this->changeFavStateOfAnElement(
 			$user,
 			$path,
@@ -60,7 +60,7 @@ class FavoritesContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function userFavoritesElementUsingWebDavApi(string $user, string $path):void {
+	public function userFavoritesElementUsingWebDavApi(string $user, string $path): void {
 		$this->featureContext->setResponse($this->userFavoritesElement($user, $path));
 	}
 
@@ -72,7 +72,7 @@ class FavoritesContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function userHasFavoritedElementUsingWebDavApi(string $user, string $path):void {
+	public function userHasFavoritedElementUsingWebDavApi(string $user, string $path): void {
 		$this->featureContext->theHTTPStatusCodeShouldBe(207, '', $this->userFavoritesElement($user, $path));
 	}
 
@@ -82,7 +82,7 @@ class FavoritesContext implements Context {
 	 *
 	 * @return ResponseInterface
 	 */
-	public function userUnfavoritesElement(string $user, string $path):ResponseInterface {
+	public function userUnfavoritesElement(string $user, string $path): ResponseInterface {
 		return $this->changeFavStateOfAnElement(
 			$user,
 			$path,
@@ -99,7 +99,7 @@ class FavoritesContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function userUnfavoritesElementUsingWebDavApi(string $user, string $path):void {
+	public function userUnfavoritesElementUsingWebDavApi(string $user, string $path): void {
 		$this->featureContext->setResponse($this->userUnfavoritesElement($user, $path));
 	}
 
@@ -116,7 +116,7 @@ class FavoritesContext implements Context {
 		string $user,
 		string $shouldOrNot,
 		TableNode $expectedElements
-	):void {
+	): void {
 		$user = $this->featureContext->getActualUsername($user);
 		$this->userListsFavorites($user);
 		$this->featureContext->propfindResultShouldContainEntries(
@@ -134,7 +134,7 @@ class FavoritesContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function userListsFavorites(string $user, ?int $limit = null):void {
+	public function userListsFavorites(string $user, ?int $limit = null): void {
 		$renamedUser = $this->featureContext->getActualUsername($user);
 		$baseUrl = $this->featureContext->getBaseUrl();
 		$password = $this->featureContext->getPasswordForUser($user);
@@ -176,7 +176,12 @@ class FavoritesContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function asUserFileOrFolderShouldBeFavorited(string $user, string $path, int $expectedValue = 1, string $spaceId = null):void {
+	public function asUserFileOrFolderShouldBeFavorited(
+		string $user,
+		string $path,
+		int $expectedValue = 1,
+		string $spaceId = null
+	): void {
 		$property = "oc:favorite";
 		$this->webDavPropertiesContext->checkPropertyOfAFolder(
 			$user,
@@ -196,7 +201,7 @@ class FavoritesContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function asUserFileShouldNotBeFavorited(string $user, string $path):void {
+	public function asUserFileShouldNotBeFavorited(string $user, string $path): void {
 		$this->asUserFileOrFolderShouldBeFavorited($user, $path, 0);
 	}
 
@@ -215,7 +220,7 @@ class FavoritesContext implements Context {
 		string $path,
 		?int $favOrUnfav,
 		?string $spaceId,
-	):ResponseInterface {
+	): ResponseInterface {
 		$renamedUser = $this->featureContext->getActualUsername($user);
 		return WebDavHelper::proppatch(
 			$this->featureContext->getBaseUrl(),
@@ -242,7 +247,7 @@ class FavoritesContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function before(BeforeScenarioScope $scope):void {
+	public function before(BeforeScenarioScope $scope): void {
 		// Get the environment
 		$environment = $scope->getEnvironment();
 		// Get all the contexts you need in this context
