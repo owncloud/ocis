@@ -66,6 +66,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Part I: The user settings are extended by notifications preferences: [#10706](https://github.com/owncloud/ocis/pull/10706)
 * Enhancement - Part II: Filtering of in-app notifications: [#10779](https://github.com/owncloud/ocis/pull/10779)
 * Enhancement - Part III: Filtering of mail notifications: [#10792](https://github.com/owncloud/ocis/pull/10792)
+* Enhancement - Bump Reva: [#10830](https://github.com/owncloud/ocis/pull/10830)
 
 ## Details
 
@@ -104,6 +105,12 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/10790
    https://github.com/owncloud/ocis/pull/10792
+
+* Enhancement - Bump Reva: [#10830](https://github.com/owncloud/ocis/pull/10830)
+
+   Bumps the reva version
+
+   https://github.com/owncloud/ocis/pull/10830
 
 # Changelog for [7.0.0] (2024-12-17)
 
