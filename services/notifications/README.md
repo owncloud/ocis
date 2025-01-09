@@ -46,9 +46,15 @@ Custom email templates referenced via `NOTIFICATIONS_EMAIL_TEMPLATE_PATH` must a
 The `templates/html` subfolder contains a default HTML template provided by ocis. When using a custom HTML template, hosted images can either be linked with standard HTML code like ```<img src="https://raw.githubusercontent.com/owncloud/core/master/core/img/logo-mail.gif" alt="logo-mail"/>``` or embedded as a CID source ```<img src="cid:logo-mail.gif" alt="logo-mail"/>```. In the latter case, image files must be located in the `templates/html/img` subfolder. Supported embedded image types are png, jpeg, and gif.
 Consider that embedding images via a CID resource may not be fully supported in all email web clients.
 
-## Grouped Emails
+## Sending Grouped Emails
 
-The `notifications` service also supports grouped emails on a daily and weekly basis. The event IDs are stored using the `Store` interface. To send the grouped emails the CLI command `notifications send-email` has to be used.
+The `notification` service can initiate sending emails based on events stored in the configured store that are grouped into a `daily` or `weekly` bucket. These groups contain events that get populated e.g. when the user configures `daily` or `weekly` email notifications in his personal settings in the web UI. If a user does not define any of the named groups for notification events, no event is stored.
+
+Grouped events are stored for the TTL defined in `OCIS_PERSISTENT_STORE_TTL`. This TTL can either be configured globally or individually for the notification service via the `NOTIFICATIONS_STORE_TTL` envvar.
+
+Grouped events that have passed the TTL are removed automatically without further notice or sending!
+
+To initiate sending grouped emails like via a cron job, use the `ocis notifications send-email` command. Note that the command mandatory requires at least one option which is `--daily` or `--weekly`. Note that both options can be used together.
 
 ### Storing
 
