@@ -6,16 +6,16 @@ import (
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/notifications/pkg/email"
 	"github.com/owncloud/ocis/v2/services/settings/pkg/store/defaults"
+	"github.com/rs/zerolog"
 )
 
 func (s eventsNotifier) handleSpaceShared(e events.SpaceShared, eventId string) {
-	logger := log.Logger{Logger: s.logger.With().
+	logger := s.logger.With().
 		Str("event", "SpaceShared").
 		Str("itemid", e.ID.OpaqueId).
-		Logger()}
+		Logger()
 	executant, spaceName, shareLink, ctx, err := s.prepareSpaceShared(logger, e)
 	if err != nil {
 		logger.Error().Err(err).Msg("could not prepare vars for email")
@@ -26,8 +26,8 @@ func (s eventsNotifier) handleSpaceShared(e events.SpaceShared, eventId string) 
 	filteredGrantees := s.filter.execute(ctx, granteeList, defaults.SettingUUIDProfileEventSpaceShared)
 
 	recipientsInstant, recipientsDaily, recipientsInstantWeekly := s.splitter.execute(ctx, filteredGrantees)
-	recipientsInstant = append(recipientsInstant, s.userEventStore.persist(intervalDaily, eventId, recipientsDaily)...)
-	recipientsInstant = append(recipientsInstant, s.userEventStore.persist(intervalWeekly, eventId, recipientsInstantWeekly)...)
+	recipientsInstant = append(recipientsInstant, s.userEventStore.persist(_intervalDaily, eventId, recipientsDaily)...)
+	recipientsInstant = append(recipientsInstant, s.userEventStore.persist(_intervalWeekly, eventId, recipientsInstantWeekly)...)
 	if recipientsInstant == nil {
 		return
 	}
@@ -47,7 +47,7 @@ func (s eventsNotifier) handleSpaceShared(e events.SpaceShared, eventId string) 
 	s.send(ctx, emails)
 }
 
-func (s eventsNotifier) prepareSpaceShared(logger log.Logger, e events.SpaceShared) (executant *user.User, spaceName, shareLink string, ctx context.Context, err error) {
+func (s eventsNotifier) prepareSpaceShared(logger zerolog.Logger, e events.SpaceShared) (executant *user.User, spaceName, shareLink string, ctx context.Context, err error) {
 	gatewayClient, err := s.gatewaySelector.Next()
 	if err != nil {
 		logger.Error().Err(err).Msg("could not select next gateway client")
@@ -95,10 +95,10 @@ func (s eventsNotifier) prepareSpaceShared(logger log.Logger, e events.SpaceShar
 }
 
 func (s eventsNotifier) handleSpaceUnshared(e events.SpaceUnshared, eventId string) {
-	logger := log.Logger{Logger: s.logger.With().
+	logger := s.logger.With().
 		Str("event", "SpaceUnshared").
 		Str("itemid", e.ID.OpaqueId).
-		Logger()}
+		Logger()
 
 	executant, spaceName, shareLink, ctx, err := s.prepareSpaceUnshared(logger, e)
 	if err != nil {
@@ -110,8 +110,8 @@ func (s eventsNotifier) handleSpaceUnshared(e events.SpaceUnshared, eventId stri
 	filteredGrantees := s.filter.execute(ctx, granteeList, defaults.SettingUUIDProfileEventSpaceUnshared)
 
 	recipientsInstant, recipientsDaily, recipientsInstantWeekly := s.splitter.execute(ctx, filteredGrantees)
-	recipientsInstant = append(recipientsInstant, s.userEventStore.persist(intervalDaily, eventId, recipientsDaily)...)
-	recipientsInstant = append(recipientsInstant, s.userEventStore.persist(intervalWeekly, eventId, recipientsInstantWeekly)...)
+	recipientsInstant = append(recipientsInstant, s.userEventStore.persist(_intervalDaily, eventId, recipientsDaily)...)
+	recipientsInstant = append(recipientsInstant, s.userEventStore.persist(_intervalWeekly, eventId, recipientsInstantWeekly)...)
 	if recipientsInstant == nil {
 		return
 	}
@@ -131,7 +131,7 @@ func (s eventsNotifier) handleSpaceUnshared(e events.SpaceUnshared, eventId stri
 	s.send(ctx, emails)
 }
 
-func (s eventsNotifier) prepareSpaceUnshared(logger log.Logger, e events.SpaceUnshared) (executant *user.User, spaceName, shareLink string, ctx context.Context, err error) {
+func (s eventsNotifier) prepareSpaceUnshared(logger zerolog.Logger, e events.SpaceUnshared) (executant *user.User, spaceName, shareLink string, ctx context.Context, err error) {
 	gatewayClient, err := s.gatewaySelector.Next()
 	if err != nil {
 		logger.Error().Err(err).Msg("could not select next gateway client")
@@ -211,8 +211,8 @@ func (s eventsNotifier) handleSpaceMembershipExpired(e events.SpaceMembershipExp
 	filteredGrantees := s.filter.execute(ctx, granteeList, defaults.SettingUUIDProfileEventSpaceMembershipExpired)
 
 	recipientsInstant, recipientsDaily, recipientsInstantWeekly := s.splitter.execute(ctx, filteredGrantees)
-	recipientsInstant = append(recipientsInstant, s.userEventStore.persist(intervalDaily, eventId, recipientsDaily)...)
-	recipientsInstant = append(recipientsInstant, s.userEventStore.persist(intervalWeekly, eventId, recipientsInstantWeekly)...)
+	recipientsInstant = append(recipientsInstant, s.userEventStore.persist(_intervalDaily, eventId, recipientsDaily)...)
+	recipientsInstant = append(recipientsInstant, s.userEventStore.persist(_intervalWeekly, eventId, recipientsInstantWeekly)...)
 	if recipientsInstant == nil {
 		return
 	}

@@ -5,17 +5,17 @@ import (
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/utils"
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/notifications/pkg/email"
 	"github.com/owncloud/ocis/v2/services/settings/pkg/store/defaults"
+	"github.com/rs/zerolog"
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
 )
 
 func (s eventsNotifier) handleShareCreated(e events.ShareCreated, eventId string) {
-	logger := log.Logger{Logger: s.logger.With().
+	logger := s.logger.With().
 		Str("event", "ShareCreated").
 		Str("itemid", e.ItemID.OpaqueId).
-		Logger()}
+		Logger()
 
 	owner, shareFolder, shareLink, ctx, err := s.prepareShareCreated(logger, e)
 	if err != nil {
@@ -27,8 +27,8 @@ func (s eventsNotifier) handleShareCreated(e events.ShareCreated, eventId string
 	filteredGrantees := s.filter.execute(ctx, granteeList, defaults.SettingUUIDProfileEventShareCreated)
 
 	recipientsInstant, recipientsDaily, recipientsInstantWeekly := s.splitter.execute(ctx, filteredGrantees)
-	recipientsInstant = append(recipientsInstant, s.userEventStore.persist(intervalDaily, eventId, recipientsDaily)...)
-	recipientsInstant = append(recipientsInstant, s.userEventStore.persist(intervalWeekly, eventId, recipientsInstantWeekly)...)
+	recipientsInstant = append(recipientsInstant, s.userEventStore.persist(_intervalDaily, eventId, recipientsDaily)...)
+	recipientsInstant = append(recipientsInstant, s.userEventStore.persist(_intervalWeekly, eventId, recipientsInstantWeekly)...)
 	if recipientsInstant == nil {
 		return
 	}
@@ -48,7 +48,7 @@ func (s eventsNotifier) handleShareCreated(e events.ShareCreated, eventId string
 	s.send(ctx, emails)
 }
 
-func (s eventsNotifier) prepareShareCreated(logger log.Logger, e events.ShareCreated) (owner *user.User, shareFolder, shareLink string, ctx context.Context, err error) {
+func (s eventsNotifier) prepareShareCreated(logger zerolog.Logger, e events.ShareCreated) (owner *user.User, shareFolder, shareLink string, ctx context.Context, err error) {
 	gatewayClient, err := s.gatewaySelector.Next()
 	if err != nil {
 		logger.Error().Err(err).Msg("could not select next gateway client")
@@ -89,10 +89,10 @@ func (s eventsNotifier) prepareShareCreated(logger log.Logger, e events.ShareCre
 }
 
 func (s eventsNotifier) handleShareExpired(e events.ShareExpired, eventId string) {
-	logger := log.Logger{Logger: s.logger.With().
+	logger := s.logger.With().
 		Str("event", "ShareExpired").
 		Str("itemid", e.ItemID.GetOpaqueId()).
-		Logger()}
+		Logger()
 
 	gatewayClient, err := s.gatewaySelector.Next()
 	if err != nil {
@@ -116,8 +116,8 @@ func (s eventsNotifier) handleShareExpired(e events.ShareExpired, eventId string
 	filteredGrantees := s.filter.execute(ctx, granteeList, defaults.SettingUUIDProfileEventShareExpired)
 
 	recipientsInstant, recipientsDaily, recipientsInstantWeekly := s.splitter.execute(ctx, filteredGrantees)
-	recipientsInstant = append(recipientsInstant, s.userEventStore.persist(intervalDaily, eventId, recipientsDaily)...)
-	recipientsInstant = append(recipientsInstant, s.userEventStore.persist(intervalWeekly, eventId, recipientsInstantWeekly)...)
+	recipientsInstant = append(recipientsInstant, s.userEventStore.persist(_intervalDaily, eventId, recipientsDaily)...)
+	recipientsInstant = append(recipientsInstant, s.userEventStore.persist(_intervalWeekly, eventId, recipientsInstantWeekly)...)
 	if recipientsInstant == nil {
 		return
 	}
@@ -135,7 +135,7 @@ func (s eventsNotifier) handleShareExpired(e events.ShareExpired, eventId string
 	s.send(ctx, emails)
 }
 
-func (s eventsNotifier) prepareShareExpired(logger log.Logger, e events.ShareExpired) (shareFolder string, ctx context.Context, err error) {
+func (s eventsNotifier) prepareShareExpired(logger zerolog.Logger, e events.ShareExpired) (shareFolder string, ctx context.Context, err error) {
 	gatewayClient, err := s.gatewaySelector.Next()
 	if err != nil {
 		logger.Error().Err(err).Msg("could not select next gateway client")

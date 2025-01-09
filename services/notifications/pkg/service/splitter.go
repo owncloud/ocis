@@ -31,9 +31,9 @@ func (s intervalSplitter) execute(ctx context.Context, users []*user.User) (inst
 			instant = append(instant, u)
 		} else if interval == "instant" {
 			instant = append(instant, u)
-		} else if interval == intervalDaily {
+		} else if interval == _intervalDaily {
 			daily = append(daily, u)
-		} else if interval == intervalWeekly {
+		} else if interval == _intervalWeekly {
 			weekly = append(weekly, u)
 		}
 	}

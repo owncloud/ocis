@@ -28,8 +28,8 @@ type userEvents struct {
 }
 
 const (
-	intervalDaily  = "daily"
-	intervalWeekly = "weekly"
+	_intervalDaily  = "daily"
+	_intervalWeekly = "weekly"
 )
 
 func newUserEventStore(l log.Logger, s store.Store, hc ehsvc.EventHistoryService) *userEventStore {

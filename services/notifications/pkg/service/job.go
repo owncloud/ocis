@@ -4,19 +4,19 @@ import (
 	"context"
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/owncloud/ocis/v2/ocis-pkg/l10n"
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	ehmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/eventhistory/v0"
 	"github.com/owncloud/ocis/v2/services/notifications/pkg/channels"
 	"github.com/owncloud/ocis/v2/services/notifications/pkg/email"
+	"github.com/rs/zerolog"
 )
 
 func (s eventsNotifier) sendGroupedEmailsJob(sendEmailsEvent events.SendEmailsEvent, eventId string) {
-	logger := log.Logger{Logger: s.logger.With().
+	logger := s.logger.With().
 		Str("event", "SendEmailsEvent").
 		Str("eventId", eventId).
-		Logger()}
+		Logger()
 
-	if sendEmailsEvent.Interval != intervalDaily && sendEmailsEvent.Interval != intervalWeekly {
+	if sendEmailsEvent.Interval != _intervalDaily && sendEmailsEvent.Interval != _intervalWeekly {
 		logger.Error().Str("interval", sendEmailsEvent.Interval).Msg("unsupported email sending interval")
 		return
 	}
@@ -42,7 +42,7 @@ func (s eventsNotifier) sendGroupedEmailsJob(sendEmailsEvent events.SendEmailsEv
 	}
 }
 
-func (s eventsNotifier) createGroupedMail(ctx context.Context, logger log.Logger, key string) {
+func (s eventsNotifier) createGroupedMail(ctx context.Context, logger zerolog.Logger, key string) {
 	userEvents, err := s.userEventStore.pop(ctx, key)
 	if err != nil {
 		logger.Error().Err(err).Str("key", key).Msg("could not pop user events")
@@ -56,10 +56,10 @@ func (s eventsNotifier) createGroupedMail(ctx context.Context, logger log.Logger
 	for _, e := range userEvents.Events {
 		switch te := s.unwrapEvent(logger, e).(type) {
 		case events.SpaceShared:
-			logger := log.Logger{Logger: logger.With().
+			logger := logger.With().
 				Str("event", "SpaceShared").
 				Str("eventId", te.ID.OpaqueId).
-				Logger()}
+				Logger()
 
 			executant, spaceName, shareLink, _, err := s.prepareSpaceShared(logger, te)
 			if err != nil {
@@ -74,10 +74,10 @@ func (s eventsNotifier) createGroupedMail(ctx context.Context, logger log.Logger
 				"ShareLink":   shareLink,
 			})
 		case events.SpaceUnshared:
-			logger := log.Logger{Logger: logger.With().
+			logger := logger.With().
 				Str("event", "SpaceUnshared").
 				Str("eventId", te.ID.OpaqueId).
-				Logger()}
+				Logger()
 
 			executant, spaceName, shareLink, _, err := s.prepareSpaceUnshared(logger, te)
 			if err != nil {
@@ -97,10 +97,10 @@ func (s eventsNotifier) createGroupedMail(ctx context.Context, logger log.Logger
 				"ExpiredAt": te.ExpiredAt.Format("2006-01-02 15:04:05"),
 			})
 		case events.ShareCreated:
-			logger := log.Logger{Logger: logger.With().
+			logger := logger.With().
 				Str("event", "ShareCreated").
 				Str("eventId", te.ItemID.OpaqueId).
-				Logger()}
+				Logger()
 
 			owner, shareFolder, shareLink, _, err := s.prepareShareCreated(logger, te)
 			if err != nil {
@@ -114,10 +114,10 @@ func (s eventsNotifier) createGroupedMail(ctx context.Context, logger log.Logger
 				"ShareLink":   shareLink,
 			})
 		case events.ShareExpired:
-			logger := log.Logger{Logger: logger.With().
+			logger := logger.With().
 				Str("event", "ShareCreated").
 				Str("eventId", te.ItemID.OpaqueId).
-				Logger()}
+				Logger()
 
 			shareFolder, _, err := s.prepareShareExpired(logger, te)
 			if err != nil {
@@ -144,7 +144,7 @@ func (s eventsNotifier) createGroupedMail(ctx context.Context, logger log.Logger
 	s.send(ctx, []*channels.Message{rendered})
 }
 
-func (s eventsNotifier) unwrapEvent(logger log.Logger, e *ehmsg.Event) any {
+func (s eventsNotifier) unwrapEvent(logger zerolog.Logger, e *ehmsg.Event) any {
 	etype, ok := s.registeredEvents[e.GetType()]
 	if !ok {
 		logger.Error().Str("eventId", e.GetId()).Str("eventType", e.GetType()).Msg("event not registered")
