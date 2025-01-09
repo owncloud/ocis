@@ -115,9 +115,8 @@ Please visit your federation settings and use the following details:
 		// Grouped email template, Subject field (resolves directly)
 		Subject: l10n.Template(`Report`), // TODO find meaningful subject
 		// Grouped email template, resolves via {{ .Greeting }}
-		Greeting:         l10n.Template(`Hi {DisplayName},`),
-		MessageBody:      "", // is generated using the GroupedTemplates
-		GroupedTemplates: []MessageTemplate{ShareCreated, ShareExpired, SharedSpace, UnsharedSpace, MembershipExpired},
+		Greeting:    l10n.Template(`Hi {DisplayName},`),
+		MessageBody: "", // is generated using the GroupedTemplates
 	}
 )
 
@@ -156,8 +155,7 @@ type GroupedMessageTemplate struct {
 	// htmlTemplate represent the path to html .tmpl file
 	htmlTemplate string
 	// The fields below represent the placeholders for the translatable templates
-	Subject          string
-	Greeting         string
-	MessageBody      string
-	GroupedTemplates []MessageTemplate
+	Subject     string
+	Greeting    string
+	MessageBody string
 }
