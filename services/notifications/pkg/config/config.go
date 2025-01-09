@@ -69,12 +69,6 @@ type ServiceAccount struct {
 	ServiceAccountSecret string `yaml:"service_account_secret" env:"OCIS_SERVICE_ACCOUNT_SECRET;NOTIFICATIONS_SERVICE_ACCOUNT_SECRET" desc:"The service account secret." introductionVersion:"5.0"`
 }
 
-// TODO:
-// - README
-// - DOCS
-// - introductionVersion correct?
-// - is TTL mandatory?
-
 // Store configures the store to use
 type Store struct {
 	Store        string        `yaml:"store" env:"OCIS_PERSISTENT_STORE;NOTIFICATIONS_STORE" desc:"The type of the store. Supported values are: 'memory', 'nats-js-kv', 'redis-sentinel', 'noop'. See the text description for details." introductionVersion:"7.1"`

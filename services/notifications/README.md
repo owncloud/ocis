@@ -46,6 +46,29 @@ Custom email templates referenced via `NOTIFICATIONS_EMAIL_TEMPLATE_PATH` must a
 The `templates/html` subfolder contains a default HTML template provided by ocis. When using a custom HTML template, hosted images can either be linked with standard HTML code like ```<img src="https://raw.githubusercontent.com/owncloud/core/master/core/img/logo-mail.gif" alt="logo-mail"/>``` or embedded as a CID source ```<img src="cid:logo-mail.gif" alt="logo-mail"/>```. In the latter case, image files must be located in the `templates/html/img` subfolder. Supported embedded image types are png, jpeg, and gif.
 Consider that embedding images via a CID resource may not be fully supported in all email web clients.
 
+## Grouped Emails
+
+The `notifications` service also supports grouped emails on a daily and weekly basis. The event IDs are stored using the `Store` interface. To send the grouped emails the CLI command `notifications send-email` has to be used.
+
+### Storing
+
+The `notifications` service persists information via the configured store in `NOTIFICATIONS_STORE`. Possible stores are:
+-   `memory`: Basic in-memory store. Will not survive a restart. This is not recommended for this service.
+-   `redis-sentinel`: Stores data in a configured Redis Sentinel cluster.
+-   `nats-js-kv`: Stores data using key-value-store feature of [nats jetstream](https://docs.nats.io/nats-concepts/jetstream/key-value-store). This is the default value.
+-   `noop`: Stores nothing. Useful for testing. Not recommended in production environments.
+
+Other store types may work but are not supported currently.
+
+Note: The service can only be scaled if not using `memory` store and the stores are configured identically over all instances!
+
+Note that if you have used one of the deprecated stores, you should reconfigure to one of the supported ones as the deprecated stores will be removed in a later version.
+
+Store specific notes:
+-   When using `redis-sentinel`, the Redis master to use is configured via e.g. `OCIS_CACHE_STORE_NODES` in the form of `<sentinel-host>:<sentinel-port>/<redis-master>` like `10.10.0.200:26379/mymaster`.
+-   When using `nats-js-kv` it is recommended to set `OCIS_CACHE_STORE_NODES` to the same value as `OCIS_EVENTS_ENDPOINT`. That way the cache uses the same nats instance as the event bus.
+-   When using the `nats-js-kv` store, it is possible to set `OCIS_CACHE_DISABLE_PERSISTENCE` to instruct nats to not persist cache data on disc.
+
 ## Translations
 
 The `notifications` service has embedded translations sourced via transifex to provide a basic set of translated languages. These embedded translations are available for all deployment scenarios.
