@@ -222,12 +222,14 @@ func (s *service) ForwardInvite(ctx context.Context, req *invitepb.ForwardInvite
 		Mail:        remoteUser.Email,
 		DisplayName: remoteUser.Name,
 	}); err != nil {
-		if !errors.Is(err, invite.ErrUserAlreadyAccepted) {
-			// skip error if user was already accepted
+		if errors.Is(err, invite.ErrUserAlreadyAccepted) {
 			return &invitepb.ForwardInviteResponse{
-				Status: status.NewInternal(ctx, err.Error()),
+				Status: status.NewAlreadyExists(ctx, err, err.Error()),
 			}, nil
 		}
+		return &invitepb.ForwardInviteResponse{
+			Status: status.NewInternal(ctx, err.Error()),
+		}, nil
 	}
 
 	return &invitepb.ForwardInviteResponse{
@@ -276,14 +278,12 @@ func (s *service) AcceptInvite(ctx context.Context, req *invitepb.AcceptInviteRe
 	remoteUser := req.GetRemoteUser()
 
 	if err := s.repo.AddRemoteUser(ctx, token.GetUserId(), remoteUser); err != nil {
-		if errors.Is(err, invite.ErrUserAlreadyAccepted) {
+		if !errors.Is(err, invite.ErrUserAlreadyAccepted) {
+			// skip error if user was already accepted
 			return &invitepb.AcceptInviteResponse{
-				Status: status.NewAlreadyExists(ctx, err, err.Error()),
+				Status: status.NewInternal(ctx, err.Error()),
 			}, nil
 		}
-		return &invitepb.AcceptInviteResponse{
-			Status: status.NewInternal(ctx, err.Error()),
-		}, nil
 	}
 
 	return &invitepb.AcceptInviteResponse{
