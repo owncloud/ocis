@@ -127,6 +127,7 @@ The following sections list the changes for unreleased.
    Bumps the reva version
 
    https://github.com/owncloud/ocis/pull/10830
+   https://github.com/owncloud/ocis/pull/10842
 
 # Changelog for [7.0.0] (2024-12-17)
 
