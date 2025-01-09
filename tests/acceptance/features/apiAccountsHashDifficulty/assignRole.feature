@@ -7,7 +7,7 @@ Feature: assign role
   Scenario Outline: only admin user can see all existing roles
     Given user "Alice" has been created with default attributes
     And the administrator has given "Alice" the role "<user-role>" using the settings api
-    When user "Alice" tries to get all existing roles
+    When user "Alice" tries to get all existing roles using the settings API
     Then the HTTP status code should be "<http-status-code>"
     Examples:
       | user-role   | http-status-code |
@@ -19,7 +19,7 @@ Feature: assign role
   Scenario Outline: only admin user can see assignments list
     Given user "Alice" has been created with default attributes
     And the administrator has given "Alice" the role "<user-role>" using the settings api
-    When user "Alice" tries to get list of assignment
+    When user "Alice" tries to get list of assignment using the settings API
     Then the HTTP status code should be "<http-status-code>"
     Examples:
       | user-role   | http-status-code |

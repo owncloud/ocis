@@ -88,6 +88,7 @@ config = {
                 "apiDepthInfinity",
                 "apiLocks",
                 "apiActivities",
+                "apiSettings",
             ],
             "skip": False,
         },
