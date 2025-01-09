@@ -30,17 +30,17 @@ func TestNotificationFilter_execute(t *testing.T) {
 			GetValueByUniqueIdentifiersFunc: func(ctx context.Context, req *settings.GetValueByUniqueIdentifiersRequest, opts ...client.CallOption) (*settings.GetValueResponse, error) {
 				return nil, errors.New("no connection to ValueService")
 			},
-		}, args{users: []*user.User{{Id: &user.UserId{OpaqueId: "foo"}}}, settingId: "bar", ctx: context.TODO()}, []*user.User(nil)},
+		}, args{users: []*user.User{{Id: &user.UserId{OpaqueId: "foo"}}}, settingId: "bar", ctx: context.TODO()}, []*user.User{{Id: &user.UserId{OpaqueId: "foo"}}}},
 		{"no setting in ValueService response", settings.MockValueService{
 			GetValueByUniqueIdentifiersFunc: func(ctx context.Context, req *settings.GetValueByUniqueIdentifiersRequest, opts ...client.CallOption) (*settings.GetValueResponse, error) {
 				return &settings.GetValueResponse{}, nil
 			},
-		}, args{users: []*user.User{{Id: &user.UserId{OpaqueId: "foo"}}}, settingId: "bar", ctx: context.TODO()}, []*user.User(nil)},
+		}, args{users: []*user.User{{Id: &user.UserId{OpaqueId: "foo"}}}, settingId: "bar", ctx: context.TODO()}, []*user.User{{Id: &user.UserId{OpaqueId: "foo"}}}},
 		{"ValueService nil response", settings.MockValueService{
 			GetValueByUniqueIdentifiersFunc: func(ctx context.Context, req *settings.GetValueByUniqueIdentifiersRequest, opts ...client.CallOption) (*settings.GetValueResponse, error) {
 				return nil, nil
 			},
-		}, args{users: []*user.User{{Id: &user.UserId{OpaqueId: "foo"}}}, settingId: "bar", ctx: context.TODO()}, []*user.User(nil)},
+		}, args{users: []*user.User{{Id: &user.UserId{OpaqueId: "foo"}}}, settingId: "bar", ctx: context.TODO()}, []*user.User{{Id: &user.UserId{OpaqueId: "foo"}}}},
 		{"Event enabled", setupMockValueService(true), args{users: []*user.User{{Id: &user.UserId{OpaqueId: "foo"}}}, settingId: "bar", ctx: context.TODO()}, []*user.User{{Id: &user.UserId{OpaqueId: "foo"}}}},
 		{"Event disabled", setupMockValueService(false), args{users: []*user.User{{Id: &user.UserId{OpaqueId: "foo"}}}, settingId: "bar", ctx: context.TODO()}, []*user.User(nil)},
 	}

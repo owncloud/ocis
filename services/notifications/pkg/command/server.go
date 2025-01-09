@@ -3,6 +3,10 @@ package command
 import (
 	"context"
 	"fmt"
+	"github.com/cs3org/reva/v2/pkg/store"
+	ehsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/eventhistory/v0"
+	microstore "go-micro.dev/v4/store"
+	"reflect"
 
 	"github.com/oklog/run"
 	"github.com/urfave/cli/v2"
@@ -81,7 +85,14 @@ func Server(cfg *config.Config) *cli.Command {
 				events.SpaceUnshared{},
 				events.SpaceMembershipExpired{},
 				events.ScienceMeshInviteTokenGenerated{},
+				events.SendEmailsEvent{},
 			}
+			registeredEvents := make(map[string]events.Unmarshaller)
+			for _, e := range evs {
+				typ := reflect.TypeOf(e)
+				registeredEvents[typ.String()] = e
+			}
+
 			client, err := stream.NatsFromConfig(cfg.Service.Name, false, stream.NatsConfig(cfg.Notifications.Events))
 			if err != nil {
 				return err
@@ -109,7 +120,21 @@ func Server(cfg *config.Config) *cli.Command {
 				logger.Fatal().Err(err).Str("addr", cfg.Notifications.RevaGateway).Msg("could not get reva gateway selector")
 			}
 			valueService := settingssvc.NewValueService("com.owncloud.api.settings", grpcClient)
-			svc := service.NewEventsNotifier(evts, channel, logger, gatewaySelector, valueService, cfg.ServiceAccount.ServiceAccountID, cfg.ServiceAccount.ServiceAccountSecret, cfg.Notifications.EmailTemplatePath, cfg.Notifications.DefaultLanguage, cfg.WebUIURL, cfg.Notifications.TranslationPath)
+			historyClient := ehsvc.NewEventHistoryService("com.owncloud.api.eventhistory", grpcClient)
+
+			notificationStore := store.Create(
+				store.Store(cfg.Store.Store),
+				store.TTL(cfg.Store.TTL),
+				microstore.Nodes(cfg.Store.Nodes...),
+				microstore.Database(cfg.Store.Database),
+				microstore.Table(cfg.Store.Table),
+				store.Authentication(cfg.Store.AuthUsername, cfg.Store.AuthPassword),
+			)
+
+			svc := service.NewEventsNotifier(evts, channel, logger, gatewaySelector, valueService,
+				cfg.ServiceAccount.ServiceAccountID, cfg.ServiceAccount.ServiceAccountSecret,
+				cfg.Notifications.EmailTemplatePath, cfg.Notifications.DefaultLanguage, cfg.WebUIURL,
+				cfg.Notifications.TranslationPath, cfg.Notifications.SMTP.Sender, notificationStore, historyClient, registeredEvents)
 
 			gr.Add(svc.Run, func(error) {
 				cancel()

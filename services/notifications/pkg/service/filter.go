@@ -28,6 +28,7 @@ func (nf notificationFilter) execute(ctx context.Context, users []*user.User, se
 		enabled, err := getSetting(ctx, nf.valueClient, userId, settingId)
 		if err != nil {
 			nf.log.Error().Err(err).Str("userId", userId).Str("settingId", settingId).Msg("cannot get user event setting")
+			filteredUsers = append(filteredUsers, u)
 			continue
 		}
 		if enabled {

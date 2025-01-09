@@ -71,7 +71,7 @@ func (s eventsNotifier) handleScienceMeshInviteTokenGenerated(e events.ScienceMe
 		msgENV,
 	)
 	if err != nil {
-		s.logger.Error().Err(err).Msg("building the message has failed")
+		logger.Error().Err(err).Msg("building the message has failed")
 		return
 	}
 

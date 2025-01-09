@@ -1,29 +1,64 @@
 package service
 
 import (
+	"context"
+	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/owncloud/ocis/v2/services/notifications/pkg/email"
 	"github.com/owncloud/ocis/v2/services/settings/pkg/store/defaults"
+	"github.com/rs/zerolog"
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
 )
 
-func (s eventsNotifier) handleShareCreated(e events.ShareCreated) {
+func (s eventsNotifier) handleShareCreated(e events.ShareCreated, eventId string) {
 	logger := s.logger.With().
 		Str("event", "ShareCreated").
 		Str("itemid", e.ItemID.OpaqueId).
 		Logger()
 
-	gatewayClient, err := s.gatewaySelector.Next()
+	owner, shareFolder, shareLink, ctx, err := s.prepareShareCreated(logger, e)
 	if err != nil {
-		logger.Error().Err(err).Msg("could not select next gateway client")
+		logger.Error().Err(err).Msg("could not prepare vars for email")
 		return
 	}
 
-	ctx, err := utils.GetServiceUserContext(s.serviceAccountID, gatewayClient, s.serviceAccountSecret)
-	if err != nil {
-		logger.Error().Err(err).Msg("Could not impersonate service user")
+	granteeList := s.ensureGranteeList(ctx, owner.GetId(), e.GranteeUserID, e.GranteeGroupID)
+	filteredGrantees := s.filter.execute(ctx, granteeList, defaults.SettingUUIDProfileEventShareCreated)
+
+	recipientsInstant, recipientsDaily, recipientsInstantWeekly := s.splitter.execute(ctx, filteredGrantees)
+	recipientsInstant = append(recipientsInstant, s.userEventStore.persist(_intervalDaily, eventId, recipientsDaily)...)
+	recipientsInstant = append(recipientsInstant, s.userEventStore.persist(_intervalWeekly, eventId, recipientsInstantWeekly)...)
+	if recipientsInstant == nil {
 		return
+	}
+
+	sharerDisplayName := owner.GetDisplayName()
+	emails, err := s.render(ctx, email.ShareCreated,
+		"ShareGrantee",
+		map[string]string{
+			"ShareSharer": sharerDisplayName,
+			"ShareFolder": shareFolder,
+			"ShareLink":   shareLink,
+		}, recipientsInstant, sharerDisplayName)
+	if err != nil {
+		logger.Error().Err(err).Msg("could not get render the email")
+		return
+	}
+	s.send(ctx, emails)
+}
+
+func (s eventsNotifier) prepareShareCreated(logger zerolog.Logger, e events.ShareCreated) (owner *user.User, shareFolder, shareLink string, ctx context.Context, err error) {
+	gatewayClient, err := s.gatewaySelector.Next()
+	if err != nil {
+		logger.Error().Err(err).Msg("could not select next gateway client")
+		return owner, shareFolder, shareLink, ctx, err
+	}
+
+	ctx, err = utils.GetServiceUserContextWithContext(context.Background(), gatewayClient, s.serviceAccountID, s.serviceAccountSecret)
+	if err != nil {
+		logger.Error().Err(err).Msg("could not get service user context")
+		return owner, shareFolder, shareLink, ctx, err
 	}
 
 	resourceInfo, err := s.getResourceInfo(ctx, e.ItemID, &fieldmaskpb.FieldMask{Paths: []string{"name"}})
@@ -31,45 +66,30 @@ func (s eventsNotifier) handleShareCreated(e events.ShareCreated) {
 		logger.Error().
 			Err(err).
 			Msg("could not stat resource")
-		return
+		return owner, shareFolder, shareLink, ctx, err
 	}
+	shareFolder = resourceInfo.Name
 
-	shareLink, err := urlJoinPath(s.ocisURL, "files/shares/with-me")
+	shareLink, err = urlJoinPath(s.ocisURL, "files/shares/with-me")
 	if err != nil {
 		logger.Error().
 			Err(err).
 			Msg("could not create link to the share")
-		return
+		return owner, shareFolder, shareLink, ctx, err
 	}
 
-	owner, err := utils.GetUser(e.Sharer, gatewayClient)
+	owner, err = utils.GetUserWithContext(ctx, e.Sharer, gatewayClient)
 	if err != nil {
-		logger.Error().Err(err).Msg("Could not get user")
-		return
+		logger.Error().
+			Err(err).
+			Msg("could not get user")
+		return owner, shareFolder, shareLink, ctx, err
 	}
 
-	granteeList := s.ensureGranteeList(ctx, owner.GetId(), e.GranteeUserID, e.GranteeGroupID)
-	filteredGrantees := s.filter.execute(ctx, granteeList, defaults.SettingUUIDProfileEventShareCreated)
-	if filteredGrantees == nil {
-		return
-	}
-
-	sharerDisplayName := owner.GetDisplayName()
-	recipientList, err := s.render(ctx, email.ShareCreated,
-		"ShareGrantee",
-		map[string]string{
-			"ShareSharer": sharerDisplayName,
-			"ShareFolder": resourceInfo.Name,
-			"ShareLink":   shareLink,
-		}, filteredGrantees, sharerDisplayName)
-	if err != nil {
-		s.logger.Error().Err(err).Str("event", "ShareCreated").Msg("could not get render the email")
-		return
-	}
-	s.send(ctx, recipientList)
+	return owner, shareFolder, shareLink, ctx, err
 }
 
-func (s eventsNotifier) handleShareExpired(e events.ShareExpired) {
+func (s eventsNotifier) handleShareExpired(e events.ShareExpired, eventId string) {
 	logger := s.logger.With().
 		Str("event", "ShareExpired").
 		Str("itemid", e.ItemID.GetOpaqueId()).
@@ -81,21 +101,13 @@ func (s eventsNotifier) handleShareExpired(e events.ShareExpired) {
 		return
 	}
 
-	ctx, err := utils.GetServiceUserContext(s.serviceAccountID, gatewayClient, s.serviceAccountSecret)
+	shareFolder, ctx, err := s.prepareShareExpired(logger, e)
 	if err != nil {
-		logger.Error().Err(err).Msg("Could not impersonate sharer")
+		logger.Error().Err(err).Msg("could not prepare vars for email")
 		return
 	}
 
-	resourceInfo, err := s.getResourceInfo(ctx, e.ItemID, &fieldmaskpb.FieldMask{Paths: []string{"name"}})
-	if err != nil {
-		logger.Error().
-			Err(err).
-			Msg("could not stat resource")
-		return
-	}
-
-	owner, err := utils.GetUser(e.ShareOwner, gatewayClient)
+	owner, err := utils.GetUserWithContext(ctx, e.ShareOwner, gatewayClient)
 	if err != nil {
 		logger.Error().Err(err).Msg("Could not get user")
 		return
@@ -103,19 +115,48 @@ func (s eventsNotifier) handleShareExpired(e events.ShareExpired) {
 
 	granteeList := s.ensureGranteeList(ctx, owner.GetId(), e.GranteeUserID, e.GranteeGroupID)
 	filteredGrantees := s.filter.execute(ctx, granteeList, defaults.SettingUUIDProfileEventShareExpired)
-	if filteredGrantees == nil {
+
+	recipientsInstant, recipientsDaily, recipientsInstantWeekly := s.splitter.execute(ctx, filteredGrantees)
+	recipientsInstant = append(recipientsInstant, s.userEventStore.persist(_intervalDaily, eventId, recipientsDaily)...)
+	recipientsInstant = append(recipientsInstant, s.userEventStore.persist(_intervalWeekly, eventId, recipientsInstantWeekly)...)
+	if recipientsInstant == nil {
 		return
 	}
 
-	recipientList, err := s.render(ctx, email.ShareExpired,
+	emails, err := s.render(ctx, email.ShareExpired,
 		"ShareGrantee",
 		map[string]string{
-			"ShareFolder": resourceInfo.GetName(),
+			"ShareFolder": shareFolder,
 			"ExpiredAt":   e.ExpiredAt.Format("2006-01-02 15:04:05"),
-		}, filteredGrantees, owner.GetDisplayName())
+		}, recipientsInstant, owner.GetDisplayName())
 	if err != nil {
-		s.logger.Error().Err(err).Str("event", "ShareExpired").Msg("could not get render the email")
+		logger.Error().Err(err).Msg("could not get render the email")
 		return
 	}
-	s.send(ctx, recipientList)
+	s.send(ctx, emails)
+}
+
+func (s eventsNotifier) prepareShareExpired(logger zerolog.Logger, e events.ShareExpired) (shareFolder string, ctx context.Context, err error) {
+	gatewayClient, err := s.gatewaySelector.Next()
+	if err != nil {
+		logger.Error().Err(err).Msg("could not select next gateway client")
+		return shareFolder, ctx, err
+	}
+
+	ctx, err = utils.GetServiceUserContextWithContext(context.Background(), gatewayClient, s.serviceAccountID, s.serviceAccountSecret)
+	if err != nil {
+		logger.Error().Err(err).Msg("could not get service user context")
+		return shareFolder, ctx, err
+	}
+
+	resourceInfo, err := s.getResourceInfo(ctx, e.ItemID, &fieldmaskpb.FieldMask{Paths: []string{"name"}})
+	if err != nil {
+		logger.Error().
+			Err(err).
+			Msg("could not stat resource")
+		return shareFolder, ctx, err
+	}
+	shareFolder = resourceInfo.GetName()
+
+	return shareFolder, ctx, err
 }
