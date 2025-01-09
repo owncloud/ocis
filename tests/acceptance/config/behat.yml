@@ -361,6 +361,7 @@ default:
         - SettingsContext:
         - SharingNgContext:
         - NotificationContext:
+        - OcisConfigContext:
 
     apiSharingNgShareInvitation:
       paths:

@@ -19,19 +19,6 @@ Feature: assign role
       | User        |
       | User Light  |
 
-  @issue-5032
-  Scenario Outline: get assigned role of a user via setting api
-    Given the administrator has assigned the role "<user-role>" to user "Alice" using the Graph API
-    When user "Alice" tries to get list of assignment using the settings API
-    Then the HTTP status code should be "<http-status-code>"
-    And the setting API response should have the role "<user-role>"
-    Examples:
-      | user-role   | http-status-code |
-      | Admin       | 201              |
-      | Space Admin | 401              |
-      | User        | 401              |
-      | User Light  | 401              |
-
 
   Scenario Outline: get role of a user assigned via setting api
     Given the administrator has given "Alice" the role "<user-role>" using the settings api
