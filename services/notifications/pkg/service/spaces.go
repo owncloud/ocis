@@ -51,13 +51,13 @@ func (s eventsNotifier) prepareSpaceShared(logger zerolog.Logger, e events.Space
 	gatewayClient, err := s.gatewaySelector.Next()
 	if err != nil {
 		logger.Error().Err(err).Msg("could not select next gateway client")
-		return
+		return executant, spaceName, shareLink, ctx, err
 	}
 
 	ctx, err = utils.GetServiceUserContextWithContext(context.Background(), gatewayClient, s.serviceAccountID, s.serviceAccountSecret)
 	if err != nil {
 		logger.Error().Err(err).Msg("could not get service user context")
-		return
+		return executant, spaceName, shareLink, ctx, err
 	}
 
 	executant, err = utils.GetUserWithContext(ctx, e.Executant, gatewayClient)
@@ -65,7 +65,7 @@ func (s eventsNotifier) prepareSpaceShared(logger zerolog.Logger, e events.Space
 		logger.Error().
 			Err(err).
 			Msg("could not get user")
-		return
+		return executant, spaceName, shareLink, ctx, err
 	}
 
 	resourceID, err := storagespace.ParseID(e.ID.OpaqueId)
@@ -73,7 +73,7 @@ func (s eventsNotifier) prepareSpaceShared(logger zerolog.Logger, e events.Space
 		logger.Error().
 			Err(err).
 			Msg("could not parse resourceid from ItemID ")
-		return
+		return executant, spaceName, shareLink, ctx, err
 	}
 
 	resourceInfo, err := s.getResourceInfo(ctx, &resourceID, nil)
@@ -81,7 +81,7 @@ func (s eventsNotifier) prepareSpaceShared(logger zerolog.Logger, e events.Space
 		logger.Error().
 			Err(err).
 			Msg("could not get space info")
-		return
+		return executant, spaceName, shareLink, ctx, err
 	}
 	spaceName = resourceInfo.GetSpace().GetName()
 
@@ -90,9 +90,9 @@ func (s eventsNotifier) prepareSpaceShared(logger zerolog.Logger, e events.Space
 		logger.Error().
 			Err(err).
 			Msg("could not create link to the share")
-		return
+		return executant, spaceName, shareLink, ctx, err
 	}
-	return
+	return executant, spaceName, shareLink, ctx, err
 }
 
 func (s eventsNotifier) handleSpaceUnshared(e events.SpaceUnshared, eventId string) {
@@ -136,13 +136,13 @@ func (s eventsNotifier) prepareSpaceUnshared(logger zerolog.Logger, e events.Spa
 	gatewayClient, err := s.gatewaySelector.Next()
 	if err != nil {
 		logger.Error().Err(err).Msg("could not select next gateway client")
-		return
+		return executant, spaceName, shareLink, ctx, err
 	}
 
 	ctx, err = utils.GetServiceUserContextWithContext(context.Background(), gatewayClient, s.serviceAccountID, s.serviceAccountSecret)
 	if err != nil {
 		logger.Error().Err(err).Msg("could not get service user context")
-		return
+		return executant, spaceName, shareLink, ctx, err
 	}
 
 	executant, err = utils.GetUserWithContext(ctx, e.Executant, gatewayClient)
@@ -150,7 +150,7 @@ func (s eventsNotifier) prepareSpaceUnshared(logger zerolog.Logger, e events.Spa
 		logger.Error().
 			Err(err).
 			Msg("could not get user")
-		return
+		return executant, spaceName, shareLink, ctx, err
 	}
 
 	resourceID, err := storagespace.ParseID(e.ID.OpaqueId)
@@ -158,7 +158,7 @@ func (s eventsNotifier) prepareSpaceUnshared(logger zerolog.Logger, e events.Spa
 		logger.Error().
 			Err(err).
 			Msg("could not parse resourceid from ItemID ")
-		return
+		return executant, spaceName, shareLink, ctx, err
 	}
 
 	resourceInfo, err := s.getResourceInfo(ctx, &resourceID, nil)
@@ -166,7 +166,7 @@ func (s eventsNotifier) prepareSpaceUnshared(logger zerolog.Logger, e events.Spa
 		logger.Error().
 			Err(err).
 			Msg("could not get space info")
-		return
+		return executant, spaceName, shareLink, ctx, err
 	}
 	spaceName = resourceInfo.GetSpace().GetName()
 
@@ -175,9 +175,9 @@ func (s eventsNotifier) prepareSpaceUnshared(logger zerolog.Logger, e events.Spa
 		logger.Error().
 			Err(err).
 			Msg("could not create link to the share")
-		return
+		return executant, spaceName, shareLink, ctx, err
 	}
-	return
+	return executant, spaceName, shareLink, ctx, err
 }
 
 func (s eventsNotifier) handleSpaceMembershipExpired(e events.SpaceMembershipExpired, eventId string) {

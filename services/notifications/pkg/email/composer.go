@@ -79,7 +79,7 @@ func NewGroupedTextTemplate(gmt GroupedMessageTemplate, vars map[string]string, 
 		return gmt, err
 	}
 
-	var bodyParts []string
+	bodyParts := make([]string, 0, len(mtsVars))
 	for i, mt := range mts {
 		bodyPart, err := composeMessage(t.Get(mt.MessageBody), mtsVars[i])
 		if err != nil {
@@ -108,7 +108,7 @@ func NewGroupedHTMLTemplate(gmt GroupedMessageTemplate, vars map[string]string, 
 		return gmt, err
 	}
 
-	var bodyParts []string
+	bodyParts := make([]string, 0, len(mtsVars))
 	for i, mt := range mts {
 		bodyPart, err := composeMessage(t.Get(mt.MessageBody), mtsVars[i])
 		if err != nil {

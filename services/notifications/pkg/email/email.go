@@ -82,7 +82,7 @@ func RenderGroupedEmailTemplate(gmt GroupedMessageTemplate, vars map[string]stri
 		return nil, err
 	}
 
-	var escapedMtsVars []map[string]string
+	escapedMtsVars := make([]map[string]string, 0, len(mtsVars))
 	for _, m := range mtsVars {
 		escapedMtsVars = append(escapedMtsVars, escapeStringMap(m))
 	}

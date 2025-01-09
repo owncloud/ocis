@@ -52,13 +52,13 @@ func (s eventsNotifier) prepareShareCreated(logger zerolog.Logger, e events.Shar
 	gatewayClient, err := s.gatewaySelector.Next()
 	if err != nil {
 		logger.Error().Err(err).Msg("could not select next gateway client")
-		return
+		return owner, shareFolder, shareLink, ctx, err
 	}
 
 	ctx, err = utils.GetServiceUserContextWithContext(context.Background(), gatewayClient, s.serviceAccountID, s.serviceAccountSecret)
 	if err != nil {
 		logger.Error().Err(err).Msg("could not get service user context")
-		return
+		return owner, shareFolder, shareLink, ctx, err
 	}
 
 	resourceInfo, err := s.getResourceInfo(ctx, e.ItemID, &fieldmaskpb.FieldMask{Paths: []string{"name"}})
@@ -66,7 +66,7 @@ func (s eventsNotifier) prepareShareCreated(logger zerolog.Logger, e events.Shar
 		logger.Error().
 			Err(err).
 			Msg("could not stat resource")
-		return
+		return owner, shareFolder, shareLink, ctx, err
 	}
 	shareFolder = resourceInfo.Name
 
@@ -75,7 +75,7 @@ func (s eventsNotifier) prepareShareCreated(logger zerolog.Logger, e events.Shar
 		logger.Error().
 			Err(err).
 			Msg("could not create link to the share")
-		return
+		return owner, shareFolder, shareLink, ctx, err
 	}
 
 	owner, err = utils.GetUserWithContext(ctx, e.Sharer, gatewayClient)
@@ -83,10 +83,10 @@ func (s eventsNotifier) prepareShareCreated(logger zerolog.Logger, e events.Shar
 		logger.Error().
 			Err(err).
 			Msg("could not get user")
-		return
+		return owner, shareFolder, shareLink, ctx, err
 	}
 
-	return
+	return owner, shareFolder, shareLink, ctx, err
 }
 
 func (s eventsNotifier) handleShareExpired(e events.ShareExpired, eventId string) {
@@ -140,13 +140,13 @@ func (s eventsNotifier) prepareShareExpired(logger zerolog.Logger, e events.Shar
 	gatewayClient, err := s.gatewaySelector.Next()
 	if err != nil {
 		logger.Error().Err(err).Msg("could not select next gateway client")
-		return
+		return shareFolder, ctx, err
 	}
 
 	ctx, err = utils.GetServiceUserContextWithContext(context.Background(), gatewayClient, s.serviceAccountID, s.serviceAccountSecret)
 	if err != nil {
 		logger.Error().Err(err).Msg("could not get service user context")
-		return
+		return shareFolder, ctx, err
 	}
 
 	resourceInfo, err := s.getResourceInfo(ctx, e.ItemID, &fieldmaskpb.FieldMask{Paths: []string{"name"}})
@@ -154,9 +154,9 @@ func (s eventsNotifier) prepareShareExpired(logger zerolog.Logger, e events.Shar
 		logger.Error().
 			Err(err).
 			Msg("could not stat resource")
-		return
+		return shareFolder, ctx, err
 	}
 	shareFolder = resourceInfo.GetName()
 
-	return
+	return shareFolder, ctx, err
 }
