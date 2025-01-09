@@ -58,6 +58,7 @@ func (s eventsNotifier) prepareShareCreated(logger zerolog.Logger, e events.Shar
 	ctx, err = utils.GetServiceUserContextWithContext(context.Background(), gatewayClient, s.serviceAccountID, s.serviceAccountSecret)
 	if err != nil {
 		logger.Error().Err(err).Msg("could not get service user context")
+		return
 	}
 
 	resourceInfo, err := s.getResourceInfo(ctx, e.ItemID, &fieldmaskpb.FieldMask{Paths: []string{"name"}})
@@ -145,6 +146,7 @@ func (s eventsNotifier) prepareShareExpired(logger zerolog.Logger, e events.Shar
 	ctx, err = utils.GetServiceUserContextWithContext(context.Background(), gatewayClient, s.serviceAccountID, s.serviceAccountSecret)
 	if err != nil {
 		logger.Error().Err(err).Msg("could not get service user context")
+		return
 	}
 
 	resourceInfo, err := s.getResourceInfo(ctx, e.ItemID, &fieldmaskpb.FieldMask{Paths: []string{"name"}})

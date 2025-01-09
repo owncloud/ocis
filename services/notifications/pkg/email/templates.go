@@ -149,6 +149,7 @@ type MessageTemplate struct {
 	CallToAction string
 }
 
+// GroupedMessageTemplate is the data structure for the email
 type GroupedMessageTemplate struct {
 	// textTemplate represent the path to text plain .tmpl file
 	textTemplate string

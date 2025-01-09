@@ -12,9 +12,8 @@ import (
 )
 
 type intervalSplitter struct {
-	log                log.Logger
-	valueClient        settingssvc.ValueService
-	persistenceService userEventStore
+	log         log.Logger
+	valueClient settingssvc.ValueService
 }
 
 func newIntervalSplitter(l log.Logger, vc settingssvc.ValueService) *intervalSplitter {

@@ -57,6 +57,7 @@ func (s eventsNotifier) prepareSpaceShared(logger zerolog.Logger, e events.Space
 	ctx, err = utils.GetServiceUserContextWithContext(context.Background(), gatewayClient, s.serviceAccountID, s.serviceAccountSecret)
 	if err != nil {
 		logger.Error().Err(err).Msg("could not get service user context")
+		return
 	}
 
 	executant, err = utils.GetUserWithContext(ctx, e.Executant, gatewayClient)
@@ -141,6 +142,7 @@ func (s eventsNotifier) prepareSpaceUnshared(logger zerolog.Logger, e events.Spa
 	ctx, err = utils.GetServiceUserContextWithContext(context.Background(), gatewayClient, s.serviceAccountID, s.serviceAccountSecret)
 	if err != nil {
 		logger.Error().Err(err).Msg("could not get service user context")
+		return
 	}
 
 	executant, err = utils.GetUserWithContext(ctx, e.Executant, gatewayClient)
