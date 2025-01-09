@@ -6,7 +6,7 @@ services:
         condition: service_completed_successfully
 
   externalsites-init:
-    image: owncloud/web-extensions:external-sites-0.2.0
+    image: owncloud/web-extensions:external-sites-0.3.0
     user: root
     volumes:
       - ocis-apps:/apps
