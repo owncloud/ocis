@@ -2764,3 +2764,40 @@ Feature: Create a link share for a resource
       | Space Viewer     |
       | Space Editor     |
       | Manager          |
+
+  @env-config
+  Scenario: try to create a public link share of a folder with denied permissions role
+    Given using spaces DAV path
+    And the administrator has enabled the permissions role "Denied"
+    And user "Alice" has created folder "FolderToShare"
+    When user "Alice" creates the following resource link share using the Graph API:
+      | resource        | FolderToShare |
+      | space           | Personal      |
+      | permissionsRole | denied        |
+      | password        | %public%      |
+    Then the HTTP status code should be "400"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [ "code", "innererror", "message" ],
+            "properties": {
+              "code": {
+                "const": "invalidRequest"
+              },
+              "innererror": {
+                "type": "object",
+                "required": [ "date", "request-id" ]
+              },
+              "message": {
+                "const": "invalid body schema definition"
+              }
+            }
+          }
+        }
+      }
+      """
