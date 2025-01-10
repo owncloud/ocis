@@ -1,6 +1,6 @@
 ---
 title: Activitylog
-date: 2025-01-10T08:49:27.087274003Z
+date: 2025-01-10T09:38:11.967548591Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/activitylog
