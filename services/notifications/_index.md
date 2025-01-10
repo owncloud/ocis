@@ -1,6 +1,6 @@
 ---
 title: Notification
-date: 2025-01-10T00:50:54.338710083Z
+date: 2025-01-10T12:34:58.130901571Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/notifications
@@ -20,6 +20,8 @@ The notification service is responsible for sending emails to users informing th
 
 * [Email Notification Templates](#email-notification-templates)
   * [Templates subfolder hierarchy](#templates-subfolder-hierarchy)
+* [Sending Grouped Emails](#sending-grouped-emails)
+  * [Storing](#storing)
 * [Translations](#translations)
   * [Translation Rules](#translation-rules)
 * [Default Language](#default-language)
@@ -68,6 +70,35 @@ templates
 Custom email templates referenced via `NOTIFICATIONS_EMAIL_TEMPLATE_PATH` must also be located in subfolder `templates/text` and `templates/html` and must have the same names as the embedded templates. It is important that the names of these files and folders match the embedded ones.
 The `templates/html` subfolder contains a default HTML template provided by ocis. When using a custom HTML template, hosted images can either be linked with standard HTML code like ```<img src="https://raw.githubusercontent.com/owncloud/core/master/core/img/logo-mail.gif" alt="logo-mail"/>``` or embedded as a CID source ```<img src="cid:logo-mail.gif" alt="logo-mail"/>```. In the latter case, image files must be located in the `templates/html/img` subfolder. Supported embedded image types are png, jpeg, and gif.
 Consider that embedding images via a CID resource may not be fully supported in all email web clients.
+
+## Sending Grouped Emails
+
+The `notification` service can initiate sending emails based on events stored in the configured store that are grouped into a `daily` or `weekly` bucket. These groups contain events that get populated e.g. when the user configures `daily` or `weekly` email notifications in his personal settings in the web UI. If a user does not define any of the named groups for notification events, no event is stored.
+
+Grouped events are stored for the TTL defined in `OCIS_PERSISTENT_STORE_TTL`. This TTL can either be configured globally or individually for the notification service via the `NOTIFICATIONS_STORE_TTL` envvar.
+
+Grouped events that have passed the TTL are removed automatically without further notice or sending!
+
+To initiate sending grouped emails like via a cron job, use the `ocis notifications send-email` command. Note that the command mandatory requires at least one option which is `--daily` or `--weekly`. Note that both options can be used together.
+
+### Storing
+
+The `notifications` service persists information via the configured store in `NOTIFICATIONS_STORE`. Possible stores are:
+-   `memory`: Basic in-memory store. Will not survive a restart. This is not recommended for this service.
+-   `redis-sentinel`: Stores data in a configured Redis Sentinel cluster.
+-   `nats-js-kv`: Stores data using key-value-store feature of [nats jetstream](https://docs.nats.io/nats-concepts/jetstream/key-value-store). This is the default value.
+-   `noop`: Stores nothing. Useful for testing. Not recommended in production environments.
+
+Other store types may work but are not supported currently.
+
+Note: The service can only be scaled if not using `memory` store and the stores are configured identically over all instances!
+
+Note that if you have used one of the deprecated stores, you should reconfigure to one of the supported ones as the deprecated stores will be removed in a later version.
+
+Store specific notes:
+-   When using `redis-sentinel`, the Redis master to use is configured via e.g. `OCIS_CACHE_STORE_NODES` in the form of `<sentinel-host>:<sentinel-port>/<redis-master>` like `10.10.0.200:26379/mymaster`.
+-   When using `nats-js-kv` it is recommended to set `OCIS_CACHE_STORE_NODES` to the same value as `OCIS_EVENTS_ENDPOINT`. That way the cache uses the same nats instance as the event bus.
+-   When using the `nats-js-kv` store, it is possible to set `OCIS_CACHE_DISABLE_PERSISTENCE` to instruct nats to not persist cache data on disc.
 
 ## Translations
 
