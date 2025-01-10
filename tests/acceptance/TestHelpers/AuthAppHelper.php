@@ -61,7 +61,7 @@ class AuthAppHelper {
 	 * @param string $baseUrl
 	 * @param string $user
 	 * @param string $password
-	 * @param string $expiration
+	 * @param array $params
 	 *
 	 * @return ResponseInterface
 	 */
@@ -69,9 +69,10 @@ class AuthAppHelper {
 		string $baseUrl,
 		string $user,
 		string $password,
-		string $expiration
+		array $params,
 	): ResponseInterface {
-		$url = $baseUrl . self::getAuthAppEndpoint() . "?expiry=$expiration";
+		$url = $baseUrl . self::getAuthAppEndpoint() . "?"
+		. http_build_query($params);
 		return HttpRequestHelper::sendRequest(
 			$url,
 			null,
