@@ -57,7 +57,7 @@ branches:
         strict: false
         contexts:
           - continuous-integration/drone/pr
-      enforce_admins: null
+      enforce_admins: true
       restrictions:
         apps: []
         users:
@@ -87,4 +87,3 @@ branches:
           - ocis-contractors
 
 ...
-
