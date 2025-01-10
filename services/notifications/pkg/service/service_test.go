@@ -2,6 +2,7 @@ package service_test
 
 import (
 	"context"
+	"github.com/cs3org/reva/v2/pkg/store"
 	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 	"time"
 
@@ -88,12 +89,14 @@ var _ = Describe("Notifications", func() {
 		}
 	})
 
-	DescribeTable("Sending notifications",
+	DescribeTable("Sending userEventIds",
 		func(tc testChannel, ev events.Event) {
 			cfg := defaults.FullDefaultConfig()
 			cfg.GRPCClientTLS = &shared.GRPCClientTLS{}
 			ch := make(chan events.Event)
-			evts := service.NewEventsNotifier(ch, tc, log.NewLogger(), gatewaySelector, vs, "", "", "", "", "", "")
+			evts := service.NewEventsNotifier(ch, tc, log.NewLogger(), gatewaySelector, vs, "",
+				"", "", "", "", "", "",
+				store.Create(), nil, nil)
 			go evts.Run()
 
 			ch <- ev
@@ -301,12 +304,14 @@ var _ = Describe("Notifications X-Site Scripting", func() {
 		}
 	})
 
-	DescribeTable("Sending notifications",
+	DescribeTable("Sending userEventIds",
 		func(tc testChannel, ev events.Event) {
 			cfg := defaults.FullDefaultConfig()
 			cfg.GRPCClientTLS = &shared.GRPCClientTLS{}
 			ch := make(chan events.Event)
-			evts := service.NewEventsNotifier(ch, tc, log.NewLogger(), gatewaySelector, vs, "", "", "", "", "", "")
+			evts := service.NewEventsNotifier(ch, tc, log.NewLogger(), gatewaySelector, vs, "",
+				"", "", "", "", "", "",
+				store.Create(), nil, nil)
 			go evts.Run()
 
 			ch <- ev

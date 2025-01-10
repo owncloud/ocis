@@ -351,6 +351,15 @@ default:
         - OcisConfigContext:
         - SettingsContext:
 
+    apiSettings:
+      paths:
+        - "%paths.base%/../features/apiSettings"
+      context: *common_ldap_suite_context
+      contexts:
+        - FeatureContext: *common_feature_context_params
+        - GraphContext:
+        - SettingsContext:
+
     apiSharingNgShareInvitation:
       paths:
         - "%paths.base%/../features/apiSharingNgShareInvitation"

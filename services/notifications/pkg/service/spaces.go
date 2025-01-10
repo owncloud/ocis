@@ -1,31 +1,71 @@
 package service
 
 import (
+	"context"
+	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/owncloud/ocis/v2/services/notifications/pkg/email"
 	"github.com/owncloud/ocis/v2/services/settings/pkg/store/defaults"
+	"github.com/rs/zerolog"
 )
 
-func (s eventsNotifier) handleSpaceShared(e events.SpaceShared) {
+func (s eventsNotifier) handleSpaceShared(e events.SpaceShared, eventId string) {
 	logger := s.logger.With().
 		Str("event", "SpaceShared").
 		Str("itemid", e.ID.OpaqueId).
 		Logger()
-
-	gatewayClient, err := s.gatewaySelector.Next()
+	executant, spaceName, shareLink, ctx, err := s.prepareSpaceShared(logger, e)
 	if err != nil {
-		logger.Error().Err(err).Msg("could not select next gateway client")
+		logger.Error().Err(err).Msg("could not prepare vars for email")
 		return
 	}
 
-	ctx, err := utils.GetServiceUserContext(s.serviceAccountID, gatewayClient, s.serviceAccountSecret)
+	granteeList := s.ensureGranteeList(ctx, executant.GetId(), e.GranteeUserID, e.GranteeGroupID)
+	filteredGrantees := s.filter.execute(ctx, granteeList, defaults.SettingUUIDProfileEventSpaceShared)
+
+	recipientsInstant, recipientsDaily, recipientsInstantWeekly := s.splitter.execute(ctx, filteredGrantees)
+	recipientsInstant = append(recipientsInstant, s.userEventStore.persist(_intervalDaily, eventId, recipientsDaily)...)
+	recipientsInstant = append(recipientsInstant, s.userEventStore.persist(_intervalWeekly, eventId, recipientsInstantWeekly)...)
+	if recipientsInstant == nil {
+		return
+	}
+
+	sharerDisplayName := executant.GetDisplayName()
+	emails, err := s.render(ctx, email.SharedSpace,
+		"SpaceGrantee",
+		map[string]string{
+			"SpaceSharer": sharerDisplayName,
+			"SpaceName":   spaceName,
+			"ShareLink":   shareLink,
+		}, recipientsInstant, sharerDisplayName)
+	if err != nil {
+		logger.Error().Err(err).Msg("could not get render the email")
+		return
+	}
+	s.send(ctx, emails)
+}
+
+func (s eventsNotifier) prepareSpaceShared(logger zerolog.Logger, e events.SpaceShared) (executant *user.User, spaceName, shareLink string, ctx context.Context, err error) {
+	gatewayClient, err := s.gatewaySelector.Next()
+	if err != nil {
+		logger.Error().Err(err).Msg("could not select next gateway client")
+		return executant, spaceName, shareLink, ctx, err
+	}
+
+	ctx, err = utils.GetServiceUserContextWithContext(context.Background(), gatewayClient, s.serviceAccountID, s.serviceAccountSecret)
+	if err != nil {
+		logger.Error().Err(err).Msg("could not get service user context")
+		return executant, spaceName, shareLink, ctx, err
+	}
+
+	executant, err = utils.GetUserWithContext(ctx, e.Executant, gatewayClient)
 	if err != nil {
 		logger.Error().
 			Err(err).
-			Msg("could not handle space shared event")
-		return
+			Msg("could not get user")
+		return executant, spaceName, shareLink, ctx, err
 	}
 
 	resourceID, err := storagespace.ParseID(e.ID.OpaqueId)
@@ -33,7 +73,7 @@ func (s eventsNotifier) handleSpaceShared(e events.SpaceShared) {
 		logger.Error().
 			Err(err).
 			Msg("could not parse resourceid from ItemID ")
-		return
+		return executant, spaceName, shareLink, ctx, err
 	}
 
 	resourceInfo, err := s.getResourceInfo(ctx, &resourceID, nil)
@@ -41,65 +81,76 @@ func (s eventsNotifier) handleSpaceShared(e events.SpaceShared) {
 		logger.Error().
 			Err(err).
 			Msg("could not get space info")
-		return
+		return executant, spaceName, shareLink, ctx, err
 	}
+	spaceName = resourceInfo.GetSpace().GetName()
 
-	shareLink, err := urlJoinPath(s.ocisURL, "f", e.ID.OpaqueId)
+	shareLink, err = urlJoinPath(s.ocisURL, "f", e.ID.OpaqueId)
 	if err != nil {
 		logger.Error().
 			Err(err).
 			Msg("could not create link to the share")
-		return
+		return executant, spaceName, shareLink, ctx, err
 	}
-
-	executant, err := utils.GetUser(e.Executant, gatewayClient)
-	if err != nil {
-		logger.Error().
-			Err(err).
-			Msg("could not get user")
-		return
-	}
-
-	// Note: We're using the 'executantCtx' (authenticated as the share executant) here for requesting
-	// the Grantees of the shares. Ideally the notfication service would use some kind of service
-	// user for this.
-	granteeList := s.ensureGranteeList(ctx, executant.GetId(), e.GranteeUserID, e.GranteeGroupID)
-	filteredGrantees := s.filter.execute(ctx, granteeList, defaults.SettingUUIDProfileEventSpaceShared)
-	if filteredGrantees == nil {
-		return
-	}
-
-	sharerDisplayName := executant.GetDisplayName()
-	recipientList, err := s.render(ctx, email.SharedSpace,
-		"SpaceGrantee",
-		map[string]string{
-			"SpaceSharer": sharerDisplayName,
-			"SpaceName":   resourceInfo.GetSpace().GetName(),
-			"ShareLink":   shareLink,
-		}, filteredGrantees, sharerDisplayName)
-	if err != nil {
-		s.logger.Error().Err(err).Str("event", "SharedSpace").Msg("could not get render the email")
-		return
-	}
-	s.send(ctx, recipientList)
+	return executant, spaceName, shareLink, ctx, err
 }
 
-func (s eventsNotifier) handleSpaceUnshared(e events.SpaceUnshared) {
+func (s eventsNotifier) handleSpaceUnshared(e events.SpaceUnshared, eventId string) {
 	logger := s.logger.With().
 		Str("event", "SpaceUnshared").
 		Str("itemid", e.ID.OpaqueId).
 		Logger()
 
-	gatewayClient, err := s.gatewaySelector.Next()
+	executant, spaceName, shareLink, ctx, err := s.prepareSpaceUnshared(logger, e)
 	if err != nil {
-		logger.Error().Err(err).Msg("could not select next gateway client")
+		logger.Error().Err(err).Msg("could not prepare vars for email")
 		return
 	}
 
-	ctx, err := utils.GetServiceUserContext(s.serviceAccountID, gatewayClient, s.serviceAccountSecret)
-	if err != nil {
-		logger.Error().Err(err).Msg("could not handle space unshared event")
+	granteeList := s.ensureGranteeList(ctx, executant.GetId(), e.GranteeUserID, e.GranteeGroupID)
+	filteredGrantees := s.filter.execute(ctx, granteeList, defaults.SettingUUIDProfileEventSpaceUnshared)
+
+	recipientsInstant, recipientsDaily, recipientsInstantWeekly := s.splitter.execute(ctx, filteredGrantees)
+	recipientsInstant = append(recipientsInstant, s.userEventStore.persist(_intervalDaily, eventId, recipientsDaily)...)
+	recipientsInstant = append(recipientsInstant, s.userEventStore.persist(_intervalWeekly, eventId, recipientsInstantWeekly)...)
+	if recipientsInstant == nil {
 		return
+	}
+
+	sharerDisplayName := executant.GetDisplayName()
+	emails, err := s.render(ctx, email.UnsharedSpace,
+		"SpaceGrantee",
+		map[string]string{
+			"SpaceSharer": sharerDisplayName,
+			"SpaceName":   spaceName,
+			"ShareLink":   shareLink,
+		}, recipientsInstant, sharerDisplayName)
+	if err != nil {
+		logger.Error().Err(err).Msg("Could not get render the email")
+		return
+	}
+	s.send(ctx, emails)
+}
+
+func (s eventsNotifier) prepareSpaceUnshared(logger zerolog.Logger, e events.SpaceUnshared) (executant *user.User, spaceName, shareLink string, ctx context.Context, err error) {
+	gatewayClient, err := s.gatewaySelector.Next()
+	if err != nil {
+		logger.Error().Err(err).Msg("could not select next gateway client")
+		return executant, spaceName, shareLink, ctx, err
+	}
+
+	ctx, err = utils.GetServiceUserContextWithContext(context.Background(), gatewayClient, s.serviceAccountID, s.serviceAccountSecret)
+	if err != nil {
+		logger.Error().Err(err).Msg("could not get service user context")
+		return executant, spaceName, shareLink, ctx, err
+	}
+
+	executant, err = utils.GetUserWithContext(ctx, e.Executant, gatewayClient)
+	if err != nil {
+		logger.Error().
+			Err(err).
+			Msg("could not get user")
+		return executant, spaceName, shareLink, ctx, err
 	}
 
 	resourceID, err := storagespace.ParseID(e.ID.OpaqueId)
@@ -107,7 +158,7 @@ func (s eventsNotifier) handleSpaceUnshared(e events.SpaceUnshared) {
 		logger.Error().
 			Err(err).
 			Msg("could not parse resourceid from ItemID ")
-		return
+		return executant, spaceName, shareLink, ctx, err
 	}
 
 	resourceInfo, err := s.getResourceInfo(ctx, &resourceID, nil)
@@ -115,50 +166,21 @@ func (s eventsNotifier) handleSpaceUnshared(e events.SpaceUnshared) {
 		logger.Error().
 			Err(err).
 			Msg("could not get space info")
-		return
+		return executant, spaceName, shareLink, ctx, err
 	}
+	spaceName = resourceInfo.GetSpace().GetName()
 
-	shareLink, err := urlJoinPath(s.ocisURL, "f", e.ID.OpaqueId)
+	shareLink, err = urlJoinPath(s.ocisURL, "f", e.ID.OpaqueId)
 	if err != nil {
 		logger.Error().
 			Err(err).
 			Msg("could not create link to the share")
-		return
+		return executant, spaceName, shareLink, ctx, err
 	}
-
-	executant, err := utils.GetUser(e.Executant, gatewayClient)
-	if err != nil {
-		logger.Error().
-			Err(err).
-			Msg("could not get user")
-		return
-	}
-
-	// Note: We're using the 'executantCtx' (authenticated as the share executant) here for requesting
-	// the Grantees of the shares. Ideally the notfication service would use some kind of service
-	// user for this.
-	granteeList := s.ensureGranteeList(ctx, executant.GetId(), e.GranteeUserID, e.GranteeGroupID)
-	filteredGrantees := s.filter.execute(ctx, granteeList, defaults.SettingUUIDProfileEventSpaceUnshared)
-	if filteredGrantees == nil {
-		return
-	}
-
-	sharerDisplayName := executant.GetDisplayName()
-	recipientList, err := s.render(ctx, email.UnsharedSpace,
-		"SpaceGrantee",
-		map[string]string{
-			"SpaceSharer": sharerDisplayName,
-			"SpaceName":   resourceInfo.GetSpace().Name,
-			"ShareLink":   shareLink,
-		}, filteredGrantees, sharerDisplayName)
-	if err != nil {
-		s.logger.Error().Err(err).Str("event", "UnsharedSpace").Msg("Could not get render the email")
-		return
-	}
-	s.send(ctx, recipientList)
+	return executant, spaceName, shareLink, ctx, err
 }
 
-func (s eventsNotifier) handleSpaceMembershipExpired(e events.SpaceMembershipExpired) {
+func (s eventsNotifier) handleSpaceMembershipExpired(e events.SpaceMembershipExpired, eventId string) {
 	logger := s.logger.With().
 		Str("event", "SpaceMembershipExpired").
 		Str("itemid", e.SpaceID.GetOpaqueId()).
@@ -189,19 +211,23 @@ func (s eventsNotifier) handleSpaceMembershipExpired(e events.SpaceMembershipExp
 		return
 	}
 	filteredGrantees := s.filter.execute(ctx, granteeList, defaults.SettingUUIDProfileEventSpaceMembershipExpired)
-	if filteredGrantees == nil {
+
+	recipientsInstant, recipientsDaily, recipientsInstantWeekly := s.splitter.execute(ctx, filteredGrantees)
+	recipientsInstant = append(recipientsInstant, s.userEventStore.persist(_intervalDaily, eventId, recipientsDaily)...)
+	recipientsInstant = append(recipientsInstant, s.userEventStore.persist(_intervalWeekly, eventId, recipientsInstantWeekly)...)
+	if recipientsInstant == nil {
 		return
 	}
 
-	recipientList, err := s.render(ctx, email.MembershipExpired,
+	emails, err := s.render(ctx, email.MembershipExpired,
 		"SpaceGrantee",
 		map[string]string{
 			"SpaceName": e.SpaceName,
 			"ExpiredAt": e.ExpiredAt.Format("2006-01-02 15:04:05"),
-		}, filteredGrantees, owner.GetDisplayName())
+		}, recipientsInstant, owner.GetDisplayName())
 	if err != nil {
-		s.logger.Error().Err(err).Str("event", "SpaceUnshared").Msg("could not get render the email")
+		logger.Error().Err(err).Msg("could not get render the email")
 		return
 	}
-	s.send(ctx, recipientList)
+	s.send(ctx, emails)
 }

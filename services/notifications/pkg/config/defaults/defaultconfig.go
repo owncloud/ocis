@@ -4,6 +4,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	"github.com/owncloud/ocis/v2/ocis-pkg/structs"
 	"github.com/owncloud/ocis/v2/services/notifications/pkg/config"
+	"time"
 )
 
 // FullDefaultConfig returns a fully initialized default configuration
@@ -39,6 +40,13 @@ func DefaultConfig() *config.Config {
 				EnableTLS: false,
 			},
 			RevaGateway: shared.DefaultRevaConfig().Address,
+		},
+		Store: config.Store{
+			Store:    "nats-js-kv",
+			Nodes:    []string{"127.0.0.1:9233"},
+			Database: "notifications",
+			Table:    "",
+			TTL:      336 * time.Hour,
 		},
 	}
 }

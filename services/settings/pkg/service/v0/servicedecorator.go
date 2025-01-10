@@ -139,6 +139,16 @@ func (s *defaultLanguageDecorator) withDefaultProfileValueList(ctx context.Conte
 		case *settingsmsg.Setting_MultiChoiceCollectionValue:
 			newVal.Value.Value = multiChoiceCollectionToValue(val.MultiChoiceCollectionValue)
 			requested[setting.GetId()] = newVal
+		case *settingsmsg.Setting_SingleChoiceValue:
+			sv := &settingsmsg.Value_StringValue{}
+			for _, option := range val.SingleChoiceValue.Options {
+				if option.GetDefault() {
+					sv.StringValue = option.Value.GetStringValue()
+					break
+				}
+			}
+			newVal.Value.Value = sv
+			requested[setting.GetId()] = newVal
 		}
 	}
 
@@ -182,5 +192,6 @@ func getDefaultValueList() map[string]*settingsmsg.ValueWithIdentifier {
 		defaults.SettingUUIDProfileEventSpaceDisabled:              nil,
 		defaults.SettingUUIDProfileEventSpaceDeleted:               nil,
 		defaults.SettingUUIDProfileEventPostprocessingStepFinished: nil,
+		defaults.SettingUUIDProfileEmailSendingInterval:            nil,
 	}
 }
