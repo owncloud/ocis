@@ -63,6 +63,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Fix the mail notifications for the user light: [#10864](https://github.com/owncloud/ocis/pull/10864)
+* Bugfix - Fix filtering of PostprocessingStepFinished events: [#10868](https://github.com/owncloud/ocis/pull/10868)
 
 ## Details
 
@@ -72,6 +73,11 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/10864
    https://github.com/owncloud/ocis/pull/10864
+
+* Bugfix - Fix filtering of PostprocessingStepFinished events: [#10868](https://github.com/owncloud/ocis/pull/10868)
+
+   https://github.com/owncloud/ocis/issues/10867
+   https://github.com/owncloud/ocis/pull/10868
 
 # Changelog for [7.1.0-rc.1] (2025-01-10)
 
