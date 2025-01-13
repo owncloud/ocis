@@ -1,5 +1,6 @@
 # Table of Contents
 
+* [Changelog for unreleased](#changelog-for-unreleased-unreleased)
 * [Changelog for 7.1.0-rc.1](#changelog-for-710-rc1-2025-01-10)
 * [Changelog for 7.0.0](#changelog-for-700-2024-12-17)
 * [Changelog for 5.0.9](#changelog-for-509-2024-11-14)
@@ -52,6 +53,25 @@
 * [Changelog for 1.2.0](#changelog-for-120-2021-02-17)
 * [Changelog for 1.1.0](#changelog-for-110-2021-01-22)
 * [Changelog for 1.0.0](#changelog-for-100-2020-12-17)
+
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes for unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis/compare/v7.1.0-rc.1...master
+
+## Summary
+
+* Bugfix - Fix the mail notifications for the user light: [#10864](https://github.com/owncloud/ocis/pull/10864)
+
+## Details
+
+* Bugfix - Fix the mail notifications for the user light: [#10864](https://github.com/owncloud/ocis/pull/10864)
+
+   Fix the default bundle-list for mail notification settings for the user light.
+
+   https://github.com/owncloud/ocis/issues/10864
+   https://github.com/owncloud/ocis/pull/10864
 
 # Changelog for [7.1.0-rc.1] (2025-01-10)
 
