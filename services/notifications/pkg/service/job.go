@@ -131,6 +131,10 @@ func (s eventsNotifier) createGroupedMail(ctx context.Context, logger zerolog.Lo
 			})
 		}
 	}
+	if len(mts) == 0 && len(mtsVars) == 0 {
+		logger.Error().Msg("no body content for grouped email present")
+		return
+	}
 
 	rendered, err := email.RenderGroupedEmailTemplate(email.Grouped, map[string]string{
 		"DisplayName": userEvents.User.GetDisplayName(),
