@@ -46,7 +46,7 @@ func (d defaultRoleAssigner) UpdateUserRoleAssignment(ctx context.Context, user 
 			if user.Id.Type == cs3.UserType_USER_TYPE_PRIMARY || user.Id.Type == cs3.UserType_USER_TYPE_GUEST {
 				roleId := settingsService.BundleUUIDRoleUser
 				if user.Id.Type == cs3.UserType_USER_TYPE_GUEST {
-					roleId = settingsService.BundleUUIDRoleGuest
+					roleId = settingsService.BundleUUIDRoleUserLight
 				}
 				d.logger.Info().Str("userid", user.Id.OpaqueId).Msg("user has no role assigned, assigning default user role")
 				ctx = metadata.Set(ctx, middleware.AccountID, user.Id.OpaqueId)
