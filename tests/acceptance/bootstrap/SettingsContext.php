@@ -553,4 +553,54 @@ class SettingsContext implements Context {
 		$this->featureContext->setResponse($response);
 		$this->featureContext->rememberUserAutoSyncSetting($user, false);
 	}
+
+	/**
+	 * @When user :user disables email notification using the settings API
+	 *
+	 * @param string $user
+	 *
+	 * @return void
+	 */
+	public function userDisablesEmailNotificationUsingTheSettingsAPI(string $user): void {
+		$response = SettingsHelper::updateSettings(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getActualUsername($user),
+			$this->featureContext->getPasswordForUser($user),
+			json_encode($this->getBodyForNotificationSetting($user)),
+			$this->featureContext->getStepLineRef(),
+		);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @param string $user
+	 *
+	 * @return array
+	 */
+	public function getBodyForNotificationSetting(string $user): array {
+		$settingsValues = (json_decode(
+			SettingsHelper::getBundlesList(
+				$this->featureContext->getBaseUrl(),
+				$this->featureContext->getActualUsername($user),
+				$this->featureContext->getPasswordForUser($user),
+				$this->featureContext->getStepLineRef(),
+			)->getBody()->getContents()
+		));
+		foreach ($settingsValues->bundles[0]->settings as $settingsValue) {
+			if ($settingsValue->name === "disable-email-notifications") {
+				return [
+					"value" => [
+						"account_uuid" => "me",
+						"bundleId" => $settingsValues->bundles[0]->id,
+						"settingId" => $settingsValue->id,
+						"resource" => [
+							"type" => $settingsValue->resource->type
+						],
+						"boolValue" => true
+					]
+				];
+			}
+		}
+		throw new Exception(('`disable-email-notifications` not found in the setting list'));
+	}
 }

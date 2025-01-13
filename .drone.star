@@ -88,9 +88,28 @@ config = {
                 "apiDepthInfinity",
                 "apiLocks",
                 "apiActivities",
+            ],
+            "skip": False,
+        },
+        "settings": {
+            "suites": [
                 "apiSettings",
             ],
             "skip": False,
+            "withRemotePhp": [True],
+            "emailNeeded": True,
+            "extraEnvironment": {
+                "EMAIL_HOST": "email",
+                "EMAIL_PORT": "9000",
+            },
+            "extraServerEnvironment": {
+                "OCIS_ADD_RUN_SERVICES": "notifications",
+                "NOTIFICATIONS_SMTP_HOST": "email",
+                "NOTIFICATIONS_SMTP_PORT": "2500",
+                "NOTIFICATIONS_SMTP_INSECURE": "true",
+                "NOTIFICATIONS_SMTP_SENDER": "ownCloud <noreply@example.com>",
+                "NOTIFICATIONS_DEBUG_ADDR": "0.0.0.0:9174",
+            },
         },
         "graph": {
             "suites": [
