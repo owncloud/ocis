@@ -321,8 +321,8 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiSharingNg1/propfindShares.feature:149](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNg1/propfindShares.feature#L149)
 
 #### [Readiness check for some services returns 500 status code](https://github.com/owncloud/ocis/issues/10661)
-- [apiServiceAvailability/serviceAvailabilityCheck.feature:116](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiServiceAvailability/serviceAvailabilityCheck.feature#L116)
-- [apiServiceAvailability/serviceAvailabilityCheck.feature:125](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiServiceAvailability/serviceAvailabilityCheck.feature#L125)
+- [apiServiceAvailability/serviceAvailabilityCheck.feature:114](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiServiceAvailability/serviceAvailabilityCheck.feature#L114)
+- [apiServiceAvailability/serviceAvailabilityCheck.feature:123](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiServiceAvailability/serviceAvailabilityCheck.feature#L123)
 
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.
