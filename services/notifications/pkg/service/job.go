@@ -21,7 +21,8 @@ func (s eventsNotifier) sendGroupedEmailsJob(sendEmailsEvent events.SendEmailsEv
 		return
 	}
 
-	keys, err := s.userEventStore.listKeys(sendEmailsEvent.Interval)
+	prefix := sendEmailsEvent.Interval + "_"
+	keys, err := s.userEventStore.listKeys(prefix)
 	if err != nil {
 		logger.Error().Err(err).Msg("could not get list of keys")
 		return
