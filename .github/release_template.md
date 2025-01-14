@@ -8,6 +8,7 @@
 * [ ] DEV/QA: Check new strings and align with clients
 * [ ] DEV/DOCS: Create list of pending docs tasks 
 * [ ] DEV: Create branch `release-x.x.x-rc.x` -> CODEFREEZE
+  * [ ] DEV: specify if it is a production release in [.drone.star](https://github.com/owncloud/ocis/blob/b4cf38fa1ba180c58519026dfe762b7c45695466/.drone.star#L8) (if needed)
   * [ ] DEV: bump ocis version in necessary files
   * [ ] DEV: `changelog/CHANGELOG.tmpl`
   * [ ] DEV: `ocis-pkg/version/version.go`
