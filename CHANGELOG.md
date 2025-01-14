@@ -65,6 +65,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix the mail notifications for the user light: [#10864](https://github.com/owncloud/ocis/pull/10864)
 * Bugfix - Fix filtering of PostprocessingStepFinished events: [#10868](https://github.com/owncloud/ocis/pull/10868)
 * Bugfix - Prevent empty email body for grouped email notifications: [#10869](https://github.com/owncloud/ocis/pull/10869)
+* Bugfix - Consistently name roles: [#10871](https://github.com/owncloud/ocis/pull/10871)
 
 ## Details
 
@@ -83,6 +84,13 @@ The following sections list the changes for unreleased.
 * Bugfix - Prevent empty email body for grouped email notifications: [#10869](https://github.com/owncloud/ocis/pull/10869)
 
    https://github.com/owncloud/ocis/pull/10869
+
+* Bugfix - Consistently name roles: [#10871](https://github.com/owncloud/ocis/pull/10871)
+
+   BundleUUIDRoleGuest has been renamed to BundleUUIDRoleUserLight for consistency
+   reasons
+
+   https://github.com/owncloud/ocis/pull/10871
 
 # Changelog for [7.1.0-rc.1] (2025-01-10)
 
