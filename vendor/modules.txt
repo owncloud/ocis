@@ -1880,7 +1880,7 @@ github.com/xrash/smetrics
 # github.com/yashtewari/glob-intersection v0.2.0
 ## explicit; go 1.17
 github.com/yashtewari/glob-intersection
-# go-micro.dev/v4 v4.11.0 => github.com/kobergj/go-micro/v4 v4.0.0-20250116171647-71d591d05282
+# go-micro.dev/v4 v4.11.0 => github.com/kobergj/go-micro/v4 v4.0.0-20250117084952-d07d30666b7c
 ## explicit; go 1.18
 go-micro.dev/v4
 go-micro.dev/v4/api
@@ -1936,6 +1936,7 @@ go-micro.dev/v4/runtime/local/source
 go-micro.dev/v4/selector
 go-micro.dev/v4/server
 go-micro.dev/v4/store
+go-micro.dev/v4/store/mocks
 go-micro.dev/v4/transport
 go-micro.dev/v4/transport/headers
 go-micro.dev/v4/util/addr
@@ -2402,4 +2403,4 @@ stash.kopano.io/kgol/rndm
 # github.com/egirna/icap-client => github.com/kobergj/icap-client v0.0.0-20250116172800-8eaa5022532b
 # github.com/unrolled/secure => github.com/DeepDiver1975/secure v0.0.0-20240611112133-abc838fb797c
 # github.com/go-micro/plugins/v4/store/nats-js-kv => github.com/kobergj/plugins/v4/store/nats-js-kv v0.0.0-20240807130109-f62bb67e8c90
-# go-micro.dev/v4 => github.com/kobergj/go-micro/v4 v4.0.0-20250116171647-71d591d05282
+# go-micro.dev/v4 => github.com/kobergj/go-micro/v4 v4.0.0-20250117084952-d07d30666b7c
