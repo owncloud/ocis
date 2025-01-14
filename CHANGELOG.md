@@ -66,6 +66,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix filtering of PostprocessingStepFinished events: [#10868](https://github.com/owncloud/ocis/pull/10868)
 * Bugfix - Prevent empty email body for grouped email notifications: [#10869](https://github.com/owncloud/ocis/pull/10869)
 * Bugfix - Consistently name roles: [#10871](https://github.com/owncloud/ocis/pull/10871)
+* Bugfix - Fix grouped email notifications store key: [#10873](https://github.com/owncloud/ocis/pull/10873)
 
 ## Details
 
@@ -91,6 +92,13 @@ The following sections list the changes for unreleased.
    reasons
 
    https://github.com/owncloud/ocis/pull/10871
+
+* Bugfix - Fix grouped email notifications store key: [#10873](https://github.com/owncloud/ocis/pull/10873)
+
+   Interval and user id is now separated by `_` (key schema:
+   `${INTERVAL}_${USER_ID}`).
+
+   https://github.com/owncloud/ocis/pull/10873
 
 # Changelog for [7.1.0-rc.1] (2025-01-10)
 
