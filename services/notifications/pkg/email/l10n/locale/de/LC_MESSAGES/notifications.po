@@ -7,16 +7,16 @@
 # Edith Parzefall, 2023
 # Florian Lenz <florian@owncloud.com>, 2023
 # Michael Barz <mbarz@owncloud.com>, 2023
-# Martin <github@diemattels.at>, 2024
+# Martin <github@diemattels.at>, 2025
 # 
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2025-01-10 00:47+0000\n"
+"POT-Creation-Date: 2025-01-14 00:30+0000\n"
 "PO-Revision-Date: 2023-04-19 11:11+0000\n"
-"Last-Translator: Martin <github@diemattels.at>, 2024\n"
+"Last-Translator: Martin <github@diemattels.at>, 2025\n"
 "Language-Team: German (https://app.transifex.com/owncloud-org/teams/6149/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -56,7 +56,7 @@ msgstr "Hallo {SpaceGrantee},"
 #. Grouped email template, resolves via {{ .Greeting }}
 #: pkg/email/templates.go:118
 msgid "Hi {DisplayName},"
-msgstr ""
+msgstr "Hallo {DisplayName},"
 
 #. ScienceMeshInviteTokenGenerated email template, resolves via {{ .Greeting
 #. }}
@@ -74,7 +74,7 @@ msgstr "Die Mitgliedschaft für '{SpaceName}' ist am {ExpiredAt} abgelaufen."
 #. Grouped email template, Subject field (resolves directly)
 #: pkg/email/templates.go:116
 msgid "Report"
-msgstr ""
+msgstr "Bericht"
 
 #. ScienceMeshInviteTokenGenerated email template, Subject field (resolves
 #. directly)
