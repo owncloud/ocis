@@ -367,8 +367,8 @@ github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1
 github.com/cs3org/go-cs3apis/cs3/storage/registry/v1beta1
 github.com/cs3org/go-cs3apis/cs3/tx/v1beta1
 github.com/cs3org/go-cs3apis/cs3/types/v1beta1
-# github.com/cs3org/reva/v2 v2.27.1-0.20250109115603-fe9caac22593
-## explicit; go 1.22.0
+# github.com/cs3org/reva/v2 v2.27.1-0.20250109115603-fe9caac22593 => github.com/2403905/reva/v2 v2.24.1-0.20250115184003-1a1a989e6824
+## explicit; go 1.22.7
 github.com/cs3org/reva/v2/cmd/revad/internal/grace
 github.com/cs3org/reva/v2/cmd/revad/runtime
 github.com/cs3org/reva/v2/internal/grpc/interceptors/appctx
@@ -2403,3 +2403,4 @@ stash.kopano.io/kgol/rndm
 # github.com/unrolled/secure => github.com/DeepDiver1975/secure v0.0.0-20240611112133-abc838fb797c
 # github.com/go-micro/plugins/v4/store/nats-js-kv => github.com/kobergj/plugins/v4/store/nats-js-kv v0.0.0-20240807130109-f62bb67e8c90
 # go-micro.dev/v4 => github.com/butonic/go-micro/v4 v4.11.1-0.20241115112658-b5d4de5ed9b3
+# github.com/cs3org/reva/v2 => github.com/2403905/reva/v2 v2.24.1-0.20250115184003-1a1a989e6824
