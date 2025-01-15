@@ -105,7 +105,7 @@ class OcisConfigContext implements Context {
 		$roleId = GraphHelper::getPermissionsRoleIdByName($role);
 		$defaultRoles = array_values(GraphHelper::DEFAULT_PERMISSIONS_ROLES);
 
-		if (!\in_array($role, $defaultRoles)) {
+		if (!\in_array($roleId, $defaultRoles)) {
 			$defaultRoles[] = $roleId;
 		}
 		$envs = [
