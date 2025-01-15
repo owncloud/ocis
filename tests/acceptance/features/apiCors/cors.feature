@@ -98,16 +98,6 @@ Feature: CORS headers
       | new              |
       | spaces           |
 
-
-  Scenario: CORS headers should be returned when setting CORS domain sending origin header in the settings api
-    When user "Alice" lists values-list with headers using the Settings API
-      | header | value               |
-      | Origin | https://aphno.badal |
-    Then the HTTP status code should be "201"
-    And the following headers should be set
-      | header                      | value               |
-      | Access-Control-Allow-Origin | https://aphno.badal |
-
   @issue-8380
   Scenario: CORS headers should be returned when uploading file using Tus and when CORS domain sending origin header in the Webdav api
     Given user "Alice" has created a new TUS resource in the space "Personal" with the following headers:

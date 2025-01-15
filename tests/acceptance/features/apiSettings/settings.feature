@@ -81,10 +81,11 @@ Feature: settings api
       """
 
   @issue-5032
-  Scenario: user lists assignments
-    Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
+  Scenario Outline: user lists assignments
+    Given the administrator has assigned the role "<user-role>" to user "Alice" using the Graph API
     When user "Alice" tries to get list of assignment using the settings API
-    Then the HTTP status code should be "201"
+    Then the HTTP status code should be "<http-status-code>"
+    And the setting API response should have the role "<user-role>"
     And the JSON data of the response should match
       """
       {
@@ -109,6 +110,12 @@ Feature: settings api
         }
       }
       """
+    Examples:
+      | user-role   | http-status-code |
+      | Admin       | 201              |
+      | Space Admin | 401              |
+      | User        | 401              |
+      | User Light  | 401              |
 
 
   Scenario: switch language
@@ -275,3 +282,14 @@ Feature: settings api
       | Admin       |
       | Space Admin |
       | User        |
+
+
+  Scenario: CORS headers should be returned when setting CORS domain sending origin header in the settings api
+    Given the config "OCIS_CORS_ALLOW_ORIGINS" has been set to "https://aphno.badal"
+    When user "Alice" lists values-list with headers using the Settings API
+      | header | value               |
+      | Origin | https://aphno.badal |
+    Then the HTTP status code should be "201"
+    And the following headers should be set
+      | header                      | value               |
+      | Access-Control-Allow-Origin | https://aphno.badal |

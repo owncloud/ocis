@@ -21,11 +21,9 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 
 #### [Settings service user can list other peoples assignments](https://github.com/owncloud/ocis/issues/5032)
 
-- [apiAccountsHashDifficulty/assignRole.feature:27](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiAccountsHashDifficulty/assignRole.feature#L27)
-- [apiAccountsHashDifficulty/assignRole.feature:28](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiAccountsHashDifficulty/assignRole.feature#L28)
-- [apiGraph/getAssignedRole.feature:31](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getAssignedRole.feature#L31)
-- [apiGraph/getAssignedRole.feature:32](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getAssignedRole.feature#L32)
-- [apiGraph/getAssignedRole.feature:33](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getAssignedRole.feature#L33)
+- [apiSettings/settings.feature:116](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSettings/settings.feature#L116)
+- [apiSettings/settings.feature:117](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSettings/settings.feature#L117)
+- [apiSettings/settings.feature:118](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSettings/settings.feature#L118)
 
 #### [A User can get information of another user with Graph API](https://github.com/owncloud/ocis/issues/5125)
 

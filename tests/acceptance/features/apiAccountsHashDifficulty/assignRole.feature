@@ -4,35 +4,35 @@ Feature: assign role
   So that I can provide them different authority
 
 
-  Scenario Outline: only admin user can see all existing roles
+  Scenario Outline: user can see all existing roles
     Given user "Alice" has been created with default attributes
     And the administrator has given "Alice" the role "<user-role>" using the settings api
-    When user "Alice" tries to get all existing roles using the settings API
+    When user "Alice" gets all applications using the Graph API
     Then the HTTP status code should be "<http-status-code>"
     Examples:
       | user-role   | http-status-code |
-      | Admin       | 201              |
-      | Space Admin | 201              |
-      | User        | 201              |
+      | Admin       | 200              |
+      | Space Admin | 200              |
+      | User        | 200              |
 
-  @issue-5032
+
   Scenario Outline: only admin user can see assignments list
     Given user "Alice" has been created with default attributes
     And the administrator has given "Alice" the role "<user-role>" using the settings api
-    When user "Alice" tries to get list of assignment using the settings API
+    When user "Alice" tries to get the assigned role of user "Alice" using the Graph API
     Then the HTTP status code should be "<http-status-code>"
     Examples:
       | user-role   | http-status-code |
-      | Admin       | 201              |
-      | Space Admin | 401              |
-      | User        | 401              |
+      | Admin       | 200              |
+      | Space Admin | 403              |
+      | User        | 403              |
 
 
   Scenario Outline: a user cannot change own role
     Given user "Alice" has been created with default attributes
     And the administrator has given "Alice" the role "<user-role>" using the settings api
-    When user "Alice" changes his own role to "<desired-role>"
-    Then the HTTP status code should be "400"
+    When user "Alice" tries to change the role of user "Alice" to role "<desired-role>" using the Graph API
+    Then the HTTP status code should be "403"
     And user "Alice" should have the role "<user-role>"
     Examples:
       | user-role   | desired-role |
@@ -50,7 +50,7 @@ Feature: assign role
       | Alice    |
       | Brian    |
     And the administrator has given "Alice" the role "<user-role>" using the settings api
-    When user "Alice" changes the role "<desired-role>" for user "Brian"
+    When user "Alice" changes the role of user "Brian" to role "<desired-role>" using the Graph API
     Then the HTTP status code should be "<http-status-code>"
     And user "Brian" should have the role "<expected-role>"
     Examples:
@@ -58,7 +58,7 @@ Feature: assign role
       | Admin       | User         | 201              | User          |
       | Admin       | Space Admin  | 201              | Space Admin   |
       | Admin       | Admin        | 201              | Admin         |
-      | Space Admin | Admin        | 400              | User          |
-      | Space Admin | Space Admin  | 400              | User          |
-      | User        | Admin        | 400              | User          |
-      | User        | Space Admin  | 400              | User          |
+      | Space Admin | Admin        | 403              | User          |
+      | Space Admin | Space Admin  | 403              | User          |
+      | User        | Admin        | 403              | User          |
+      | User        | Space Admin  | 403              | User          |
