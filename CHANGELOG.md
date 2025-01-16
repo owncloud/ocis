@@ -32,8 +32,8 @@
 * [Changelog for 3.0.0](#changelog-for-300-2023-06-06)
 * [Changelog for 2.0.0](#changelog-for-200-2022-11-30)
 * [Changelog for 1.20.0](#changelog-for-1200-2022-04-13)
-* [Changelog for 1.19.1](#changelog-for-1191-2022-03-29)
 * [Changelog for 1.19.0](#changelog-for-1190-2022-03-29)
+* [Changelog for 1.19.1](#changelog-for-1191-2022-03-29)
 * [Changelog for 1.18.0](#changelog-for-1180-2022-03-03)
 * [Changelog for 1.17.0](#changelog-for-1170-2022-02-16)
 * [Changelog for 1.16.0](#changelog-for-1160-2021-12-10)
@@ -108,7 +108,7 @@ The following sections list the changes for 7.1.0-rc.1.
 
 ## Summary
 
-* Bugfix - Share creation date is missing in invite response: [#10780](https://github.com/owncloud/ocis/pull/10780)
+* Bugfix - Share creation date is missing in invite response: [#10781](https://github.com/owncloud/ocis/pull/10781)
 * Bugfix - Bump some golang dependencies: [#10795](https://github.com/owncloud/ocis/pull/10795)
 * Bugfix - Allow to accepted invite after it was once deleted: [#10834](https://github.com/owncloud/ocis/pull/10834)
 * Enhancement - Part I: The user settings are extended by notifications preferences: [#10706](https://github.com/owncloud/ocis/pull/10706)
@@ -121,12 +121,12 @@ The following sections list the changes for 7.1.0-rc.1.
 
 ## Details
 
-* Bugfix - Share creation date is missing in invite response: [#10780](https://github.com/owncloud/ocis/pull/10780)
+* Bugfix - Share creation date is missing in invite response: [#10781](https://github.com/owncloud/ocis/pull/10781)
 
    The graph drives invite response now includes the `createdDateTime` field.
 
    https://github.com/owncloud/ocis/issues/10739
-   https://github.com/owncloud/ocis/pull/10780
+   https://github.com/owncloud/ocis/pull/10781
 
 * Bugfix - Bump some golang dependencies: [#10795](https://github.com/owncloud/ocis/pull/10795)
 
@@ -10944,7 +10944,7 @@ The following sections list the changes for 2.0.0.
 
 The following sections list the changes for 1.20.0.
 
-[1.20.0]: https://github.com/owncloud/ocis/compare/v1.19.1...v1.20.0
+[1.20.0]: https://github.com/owncloud/ocis/compare/v1.19.0...v1.20.0
 
 ## Summary
 
@@ -11118,29 +11118,11 @@ The following sections list the changes for 1.20.0.
    https://github.com/owncloud/ocis/pull/3509
    https://github.com/owncloud/web/releases/tag/v5.4.0
 
-# Changelog for [1.19.1] (2022-03-29)
-
-The following sections list the changes for 1.19.1.
-
-[1.19.1]: https://github.com/owncloud/ocis/compare/v1.19.0...v1.19.1
-
-## Summary
-
-* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
-
-## Details
-
-* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
-
-   URLs for Special items (space image, readme) were broken.
-
-   https://github.com/owncloud/ocis/pull/3419
-
 # Changelog for [1.19.0] (2022-03-29)
 
 The following sections list the changes for 1.19.0.
 
-[1.19.0]: https://github.com/owncloud/ocis/compare/v1.18.0...v1.19.0
+[1.19.0]: https://github.com/owncloud/ocis/compare/v1.19.1...v1.19.0
 
 ## Summary
 
@@ -11313,6 +11295,24 @@ The following sections list the changes for 1.19.0.
    https://github.com/owncloud/ocis/pull/3291
    https://github.com/owncloud/ocis/pull/3375
    https://github.com/owncloud/web/releases/tag/v5.3.0
+
+# Changelog for [1.19.1] (2022-03-29)
+
+The following sections list the changes for 1.19.1.
+
+[1.19.1]: https://github.com/owncloud/ocis/compare/v1.18.0...v1.19.1
+
+## Summary
+
+* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
+
+## Details
+
+* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
+
+   URLs for Special items (space image, readme) were broken.
+
+   https://github.com/owncloud/ocis/pull/3419
 
 # Changelog for [1.18.0] (2022-03-03)
 
