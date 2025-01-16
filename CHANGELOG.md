@@ -67,6 +67,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Prevent empty email body for grouped email notifications: [#10869](https://github.com/owncloud/ocis/pull/10869)
 * Bugfix - Consistently name roles: [#10871](https://github.com/owncloud/ocis/pull/10871)
 * Bugfix - Fix grouped email notifications store key: [#10873](https://github.com/owncloud/ocis/pull/10873)
+* Bugfix - Fix missing newline in grouped email: [#10883](https://github.com/owncloud/ocis/pull/10883)
 
 ## Details
 
@@ -99,6 +100,12 @@ The following sections list the changes for unreleased.
    `${INTERVAL}_${USER_ID}`).
 
    https://github.com/owncloud/ocis/pull/10873
+
+* Bugfix - Fix missing newline in grouped email: [#10883](https://github.com/owncloud/ocis/pull/10883)
+
+   `\n` is now replaced by `<br>` in the HTML email body
+
+   https://github.com/owncloud/ocis/pull/10883
 
 # Changelog for [7.1.0-rc.1] (2025-01-10)
 
