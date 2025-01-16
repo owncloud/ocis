@@ -116,7 +116,7 @@ func NewGroupedHTMLTemplate(gmt GroupedMessageTemplate, vars map[string]string, 
 		}
 		bodyParts = append(bodyParts, bodyPart)
 	}
-	gmt.MessageBody = strings.Join(bodyParts, "<br><br><br>")
+	gmt.MessageBody = newlineToBr(strings.Join(bodyParts, "<br><br><br>"))
 
 	return gmt, nil
 }
