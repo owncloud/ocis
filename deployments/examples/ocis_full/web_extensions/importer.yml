@@ -14,7 +14,7 @@ services:
         condition: service_completed_successfully
 
   importer-init:
-    image: owncloud/web-extensions:importer-0.1.0
+    image: owncloud/web-extensions:importer-0.3.0
     user: root
     volumes:
       - ocis-apps:/apps
@@ -23,7 +23,7 @@ services:
     command: [ "-c", "cp -R /var/lib/nginx/html/importer/ /apps" ]
 
   companion:
-    image: ${COMPANION_IMAGE:-owncloud/uppy-companion:3.12.13-owncloud}
+    image: ${COMPANION_IMAGE:-transloadit/companion:5.5.0}
     networks:
       - ocis-net
     environment:
@@ -35,6 +35,7 @@ services:
       COMPANION_UPLOAD_URLS: "^https://${OCIS_DOMAIN:-ocis.owncloud.test}/"
       COMPANION_ONEDRIVE_KEY: "${COMPANION_ONEDRIVE_KEY}"
       COMPANION_ONEDRIVE_SECRET: "${COMPANION_ONEDRIVE_SECRET}"
+      COMPANION_TUS_DEFERRED_UPLOAD_LENGTH: 'false'
     volumes:
       - companion-data:/tmp/companion/
     labels:
