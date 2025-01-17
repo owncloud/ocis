@@ -1,6 +1,6 @@
 # Table of Contents
 
-* [Changelog for unreleased](#changelog-for-unreleased-unreleased)
+* [Changelog for 7.1.0-rc.2](#changelog-for-710-rc2-2025-01-17)
 * [Changelog for 7.1.0-rc.1](#changelog-for-710-rc1-2025-01-10)
 * [Changelog for 7.0.0](#changelog-for-700-2024-12-17)
 * [Changelog for 5.0.9](#changelog-for-509-2024-11-14)
@@ -54,11 +54,11 @@
 * [Changelog for 1.1.0](#changelog-for-110-2021-01-22)
 * [Changelog for 1.0.0](#changelog-for-100-2020-12-17)
 
-# Changelog for [unreleased] (UNRELEASED)
+# Changelog for [7.1.0-rc.2] (2025-01-17)
 
-The following sections list the changes for unreleased.
+The following sections list the changes for 7.1.0-rc.2.
 
-[unreleased]: https://github.com/owncloud/ocis/compare/v7.1.0-rc.1...master
+[7.1.0-rc.2]: https://github.com/owncloud/ocis/compare/v7.1.0-rc.1...v7.1.0-rc.2
 
 ## Summary
 
@@ -71,6 +71,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix email templates white spaces & new lines: [#10884](https://github.com/owncloud/ocis/pull/10884)
 * Enhancement - Add tests for grouped emails: [#10885](https://github.com/owncloud/ocis/pull/10885)
 * Enhancement - Use maintained forks: [#10886](https://github.com/owncloud/ocis/pull/10886)
+* Enhancement - Bump Reva: [#10887](https://github.com/owncloud/ocis/pull/10887)
 
 ## Details
 
@@ -126,6 +127,12 @@ The following sections list the changes for unreleased.
    Switches away from unmainatained forks.
 
    https://github.com/owncloud/ocis/pull/10886
+
+* Enhancement - Bump Reva: [#10887](https://github.com/owncloud/ocis/pull/10887)
+
+   Bumps the reva version
+
+   https://github.com/owncloud/ocis/pull/10887
 
 # Changelog for [7.1.0-rc.1] (2025-01-10)
 
