@@ -69,6 +69,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix grouped email notifications store key: [#10873](https://github.com/owncloud/ocis/pull/10873)
 * Bugfix - Fix missing newline in grouped email: [#10883](https://github.com/owncloud/ocis/pull/10883)
 * Bugfix - Fix email templates white spaces & new lines: [#10884](https://github.com/owncloud/ocis/pull/10884)
+* Enhancement - Add tests for grouped emails: [#10885](https://github.com/owncloud/ocis/pull/10885)
 * Enhancement - Use maintained forks: [#10886](https://github.com/owncloud/ocis/pull/10886)
 
 ## Details
@@ -115,6 +116,10 @@ The following sections list the changes for unreleased.
    .CallToAction is nil
 
    https://github.com/owncloud/ocis/pull/10884
+
+* Enhancement - Add tests for grouped emails: [#10885](https://github.com/owncloud/ocis/pull/10885)
+
+   https://github.com/owncloud/ocis/pull/10885
 
 * Enhancement - Use maintained forks: [#10886](https://github.com/owncloud/ocis/pull/10886)
 
