@@ -186,7 +186,7 @@ type SpaceMembershipExpired struct {
 
 // Unmarshal to fulfill umarshaller interface
 func (SpaceMembershipExpired) Unmarshal(v []byte) (interface{}, error) {
-	e := ShareExpired{}
+	e := SpaceMembershipExpired{}
 	err := json.Unmarshal(v, &e)
 	return e, err
 }
