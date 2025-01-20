@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"ociswrapper/common"
 	"ociswrapper/ocis"
-	"os"
 )
 
 type BasicResponse struct {
@@ -113,7 +112,7 @@ func RollbackHandler(res http.ResponseWriter, req *http.Request) {
 
 	var message string
 	ocis.EnvConfigs = []string{}
-	success, _ := ocis.Restart(os.Environ())
+	success, _ := ocis.Restart([]string{})
 	if success {
 		message = "oCIS configuration rolled back successfully"
 		sendResponse(res, http.StatusOK, message)
