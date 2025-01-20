@@ -590,7 +590,7 @@ class SettingsContext implements Context {
 			)->getBody()->getContents()
 		));
 		foreach ($settingsValues->bundles[0]->settings as $settingsValue) {
-			if ($settingsValue->displayName	=== $event) {
+			if ($settingsValue->displayName === $event) {
 				return [
 					"value" => [
 						"account_uuid" => "me",
