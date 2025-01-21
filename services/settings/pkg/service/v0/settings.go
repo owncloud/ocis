@@ -10,8 +10,9 @@ const (
 	// BundleUUIDRoleUser represents the user role.
 	BundleUUIDRoleUser = "d7beeea8-8ff4-406b-8fb6-ab2dd81e6b11"
 
-	// BundleUUIDRoleGuest represents the guest role.
-	BundleUUIDRoleGuest = "38071a68-456a-4553-846a-fa67bf5596cc"
+	// BundleUUIDRoleUserLight represents the light role.
+	// BundleUUIDRoleGuest has been renamed to BundleUUIDRoleUserLight for consistency reasons
+	BundleUUIDRoleUserLight = "38071a68-456a-4553-846a-fa67bf5596cc"
 
 	// RoleManagementPermissionID is the hardcoded setting UUID for the role management permission
 	RoleManagementPermissionID string = "a53e601e-571f-4f86-8fec-d4576ef49c62"

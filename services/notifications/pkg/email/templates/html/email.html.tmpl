@@ -11,8 +11,10 @@
                         {{ .Greeting }}
                         <br><br>
                         {{ .MessageBody }}
-                        {{if ne .CallToAction "" }}<br><br>
-                        {{ .CallToAction }}{{end}}
+                        {{- if .CallToAction }}
+                        <br><br>
+                        {{ .CallToAction }}
+                        {{- end }}
                     </td>
                 </tr>
                 <tr>
