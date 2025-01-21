@@ -380,7 +380,7 @@ Feature: upload file
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
     And user "Alice" has created the following space link share:
       | space           | new-space |
-      | permissionsRole | edit      |
+      | permissionsRole | Edit      |
       | password        | %public%  |
     When the public uploads file "test.txt" with password "%public%" and content "test-file" using the public WebDAV API
     Then the HTTP status code should be "201"

@@ -1044,9 +1044,9 @@ Feature: collaboration (wopi)
       | simple.odt |
     Examples:
       | permissions-role |
-      | edit             |
-      | upload           |
-      | createOnly       |
+      | Edit             |
+      | Upload           |
+      | File Drop        |
 
   @issue-8691 @issue-10126 @issue-10331
   Scenario: public user with permission view tries to create odt file inside folder of public space using wopi endpoint
@@ -1056,7 +1056,7 @@ Feature: collaboration (wopi)
     And user "Alice" has created a folder "testFolder" in space "new-space"
     And user "Alice" has created the following space link share:
       | space           | new-space |
-      | permissionsRole | view      |
+      | permissionsRole | View      |
       | password        | %public%  |
     When the public tries to create a file "simple.odt" inside folder "testFolder" in the last shared public link space with password "%public%" using wopi endpoint
     Then the HTTP status code should be "403"

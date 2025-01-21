@@ -2397,7 +2397,7 @@ Feature: Create a link share for a resource
       | permissionsRole | <permissions-role> |
     When user "Brian" creates the following space link share using root endpoint of the Graph API:
       | space           | projectSpace |
-      | permissionsRole | internal     |
+      | permissionsRole | Internal     |
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
       """
@@ -2536,7 +2536,7 @@ Feature: Create a link share for a resource
       | quickLink       | true               |
     When user "Brian" creates the following space link share using root endpoint of the Graph API:
       | space           | projectSpace |
-      | permissionsRole | internal     |
+      | permissionsRole | Internal     |
       | quickLink       | true         |
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
@@ -2677,7 +2677,7 @@ Feature: Create a link share for a resource
       | permissionsRole | <permissions-role> |
     When user "Brian" creates the following space link share using root endpoint of the Graph API:
       | space           | projectSpace |
-      | permissionsRole | internal     |
+      | permissionsRole | Internal     |
       | quickLink       | true         |
       | password        | %public%     |
     Then the HTTP status code should be "400"

@@ -47,22 +47,22 @@ Feature: Create a link share for a resource
       """
     Examples:
       | permissions-role | drive    |
-      | view             | Shares   |
-      | edit             | Shares   |
-      | upload           | Shares   |
-      | createOnly       | Shares   |
-      | blocksDownload   | Shares   |
-      | view             | Personal |
-      | edit             | Personal |
-      | upload           | Personal |
-      | createOnly       | Personal |
-      | blocksDownload   | Personal |
+      | View             | Shares   |
+      | Edit             | Shares   |
+      | Upload           | Shares   |
+      | File Drop        | Shares   |
+      | Secure View      | Shares   |
+      | View             | Personal |
+      | Edit             | Personal |
+      | Upload           | Personal |
+      | File Drop        | Personal |
+      | Secure View      | Personal |
 
 
   Scenario Outline: try to create an internal link share of a Personal and Share drives using root endpoint
     When user "Alice" tries to create the following space link share using root endpoint of the Graph API:
       | space           | <drive>  |
-      | permissionsRole | internal |
+      | permissionsRole | Internal |
     Then the HTTP status code should be "400"
     And the JSON data of the response should match
       """
@@ -105,7 +105,7 @@ Feature: Create a link share for a resource
   Scenario Outline: try to create an internal link share with password of a Personal and Share drive using root endpoint
     When user "Alice" tries to create the following space link share using root endpoint of the Graph API:
       | space           | <drive>  |
-      | permissionsRole | internal |
+      | permissionsRole | Internal |
       | password        | %public% |
     Then the HTTP status code should be "400"
     And the JSON data of the response should match
@@ -192,7 +192,7 @@ Feature: Create a link share for a resource
                 "const": false
               },
               "type": {
-                "const": "<permissions-role>"
+                "const": "<permissions-role-value>"
               },
               "webUrl": {
                 "type": "string",
@@ -204,12 +204,12 @@ Feature: Create a link share for a resource
       }
       """
     Examples:
-      | permissions-role |
-      | view             |
-      | edit             |
-      | upload           |
-      | createOnly       |
-      | blocksDownload   |
+      | permissions-role | permissions-role-value |
+      | View             | view                   |
+      | Edit             | edit                   |
+      | Upload           | upload                 |
+      | File Drop        | createOnly             |
+      | Secure View      | blocksDownload         |
 
 
   Scenario: create an internal link share of a project-space using root endpoint
@@ -218,7 +218,7 @@ Feature: Create a link share for a resource
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
     When user "Alice" creates the following space link share using root endpoint of the Graph API:
       | space           | projectSpace  |
-      | permissionsRole | internal      |
+      | permissionsRole | Internal      |
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
       """
@@ -275,7 +275,7 @@ Feature: Create a link share for a resource
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
     When user "Alice" tries to create the following space link share using root endpoint of the Graph API:
       | space           | projectSpace  |
-      | permissionsRole | internal      |
+      | permissionsRole | Internal      |
       | password        | %public%      |
     Then the HTTP status code should be "400"
 
@@ -332,7 +332,7 @@ Feature: Create a link share for a resource
                 "const": false
               },
               "type": {
-                "const": "<permissions-role>"
+                "const": "<permissions-role-value>"
               },
               "webUrl": {
                 "type": "string",
@@ -344,12 +344,12 @@ Feature: Create a link share for a resource
       }
       """
     Examples:
-      | permissions-role |
-      | view             |
-      | edit             |
-      | upload           |
-      | createOnly       |
-      | blocksDownload   |
+      | permissions-role | permissions-role-value |
+      | View             | view                   |
+      | Edit             | edit                   |
+      | Upload           | upload                 |
+      | File Drop        | createOnly             |
+      | Secure View      | blocksDownload         |
 
   @issue-7879
   Scenario Outline: try to create a link share of a project-space drive with a password that is listed in the Banned-Password-List using root endpoint
@@ -391,21 +391,21 @@ Feature: Create a link share for a resource
       """
     Examples:
       | banned-password | permissions-role |
-      | 123             | view             |
-      | password        | view             |
-      | ownCloud        | view             |
-      | 123             | edit             |
-      | password        | edit             |
-      | ownCloud        | edit             |
-      | 123             | upload           |
-      | password        | upload           |
-      | ownCloud        | upload           |
-      | 123             | createOnly       |
-      | password        | createOnly       |
-      | ownCloud        | createOnly       |
-      | 123             | blocksDownload   |
-      | password        | blocksDownload   |
-      | ownCloud        | blocksDownload   |
+      | 123             | View             |
+      | password        | View             |
+      | ownCloud        | View             |
+      | 123             | Edit             |
+      | password        | Edit             |
+      | ownCloud        | Edit             |
+      | 123             | Upload           |
+      | password        | Upload           |
+      | ownCloud        | Upload           |
+      | 123             | File Drop        |
+      | password        | File Drop        |
+      | ownCloud        | File Drop        |
+      | 123             | Secure View      |
+      | password        | Secure View      |
+      | ownCloud        | Secure View      |
 
   @env-config @issue-7879
   Scenario Outline: create a link share of a project-space drive without password using root endpoint
@@ -456,7 +456,7 @@ Feature: Create a link share for a resource
                 "const": false
               },
               "type": {
-                "const": "<permissions-role>"
+                "const": "<permissions-role-value>"
               },
               "webUrl": {
                 "type": "string",
@@ -468,12 +468,12 @@ Feature: Create a link share for a resource
       }
       """
     Examples:
-      | permissions-role |
-      | view             |
-      | edit             |
-      | upload           |
-      | createOnly       |
-      | blocksDownload   |
+      | permissions-role | permissions-role-value |
+      | View             | view                   |
+      | Edit             | edit                   |
+      | Upload           | upload                 |
+      | File Drop        | createOnly             |
+      | Secure View      | blocksDownload         |
 
   @issue-7879
   Scenario Outline: create a link share of a project-space drive with display name using root endpoint
@@ -523,7 +523,7 @@ Feature: Create a link share for a resource
                 "const": false
               },
               "type": {
-                "const": "<permissions-role>"
+                "const": "<permissions-role-value>"
               },
               "webUrl": {
                 "type": "string",
@@ -535,12 +535,12 @@ Feature: Create a link share for a resource
       }
       """
     Examples:
-      | permissions-role |
-      | view             |
-      | edit             |
-      | upload           |
-      | createOnly       |
-      | blocksDownload   |
+      | permissions-role | permissions-role-value |
+      | View             | view                   |
+      | Edit             | edit                   |
+      | Upload           | upload                 |
+      | File Drop        | createOnly             |
+      | Secure View      | blocksDownload         |
 
   @issue-7879
   Scenario Outline: create a link share of a project-space drive with expiry date using root endpoint
@@ -594,7 +594,7 @@ Feature: Create a link share for a resource
                 "const": false
               },
               "type": {
-                "const": "<permissions-role>"
+                "const": "<permissions-role-value>"
               },
               "webUrl": {
                 "type": "string",
@@ -606,12 +606,12 @@ Feature: Create a link share for a resource
       }
       """
     Examples:
-      | permissions-role |
-      | view             |
-      | edit             |
-      | upload           |
-      | createOnly       |
-      | blocksDownload   |
+      | permissions-role | permissions-role-value |
+      | View             | view                   |
+      | Edit             | edit                   |
+      | Upload           | upload                 |
+      | File Drop        | createOnly             |
+      | Secure View      | blocksDownload         |
 
 
   Scenario Outline: create quick link share of a project space drive using root endpoint
@@ -661,7 +661,7 @@ Feature: Create a link share for a resource
                 "const": false
               },
               "type": {
-                "const": "<permissions-role>"
+                "const": "<permissions-role-value>"
               },
               "webUrl": {
                 "type": "string",
@@ -673,11 +673,11 @@ Feature: Create a link share for a resource
       }
       """
     Examples:
-      | permissions-role |
-      | view             |
-      | upload           |
-      | edit             |
-      | createOnly       |
+      | permissions-role | permissions-role-value |
+      | View             | view                   |
+      | Upload           | upload                 |
+      | Edit             | edit                   |
+      | File Drop        | createOnly             |
 
 
   Scenario: create an internal quick link share of a project space drive using root endpoint
@@ -686,7 +686,7 @@ Feature: Create a link share for a resource
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
     When user "Alice" creates the following space link share using root endpoint of the Graph API:
       | space           | projectSpace |
-      | permissionsRole | internal     |
+      | permissionsRole | Internal     |
       | displayName     | Link         |
       | quickLink       | true         |
     Then the HTTP status code should be "200"

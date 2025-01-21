@@ -17,7 +17,7 @@ Feature: Update a link share for a resource
     And user "Alice" has uploaded a file inside space "projectSpace" with content "to share" to "textfile.txt"
     And user "Alice" has created the following space link share:
       | space           | projectSpace |
-      | permissionsRole | view         |
+      | permissionsRole | View         |
     When user "Alice" sets the following password for the last space link share using root endpoint of the Graph API:
       | space    | projectSpace |
       | password | %public%     |
@@ -46,7 +46,7 @@ Feature: Update a link share for a resource
     And user "Alice" has uploaded a file inside space "projectSpace" with content "to share" to "textfile.txt"
     And user "Alice" has created the following space link share:
       | space           | projectSpace |
-      | permissionsRole | view         |
+      | permissionsRole | View         |
       | password        | $heLlo*1234* |
     When user "Alice" sets the following password for the last space link share using root endpoint of the Graph API:
       | space    | projectSpace |

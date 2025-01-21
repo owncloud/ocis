@@ -18,7 +18,7 @@ Feature: A manager of the space can edit public link
     And user "Alice" has created a space "edit space" with the default quota using the Graph API
     And user "Alice" has created the following space link share:
       | space              | edit space               |
-      | permissionsRole    | view                     |
+      | permissionsRole    | View                     |
       | password           | %public%                 |
       | expirationDateTime | 2040-01-01T23:59:59.000Z |
       | displayName        | someName                 |

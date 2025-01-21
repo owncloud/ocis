@@ -262,7 +262,7 @@ Feature: List a sharing permissions
       | permissionsRole | <permissions-role> |
     And user "Alice" has created the following space link share:
       | space           | new-space |
-      | permissionsRole | view      |
+      | permissionsRole | View      |
       | password        | %public%  |
     When user "Alice" lists the permissions of space "new-space" using permissions endpoint of the Graph API
     Then the HTTP status code should be "200"
@@ -1276,7 +1276,7 @@ Feature: List a sharing permissions
       | permissionsRole | <permissions-role> |
     And user "Alice" has created the following space link share:
       | space           | new-space |
-      | permissionsRole | view      |
+      | permissionsRole | View      |
       | password        | %public%  |
     When user "Alice" lists the permissions of space "new-space" using root endpoint of the Graph API
     Then the HTTP status code should be "200"

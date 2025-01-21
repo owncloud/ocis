@@ -133,7 +133,7 @@ Feature: Upload files into a space
     Given using SharingNG
     And user "Alice" has created the following space link share:
       | space           | Project Ceres |
-      | permissionsRole | createOnly    |
+      | permissionsRole | File Drop     |
       | password        | %public%      |
     When the public uploads file "filesForUpload/zerobyte.txt" to "textfile.txt" inside last link shared folder with password "%public%" using the public WebDAV API
     Then the HTTP status code should be "201"
