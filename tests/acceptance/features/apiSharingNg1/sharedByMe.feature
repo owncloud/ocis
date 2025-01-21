@@ -3323,7 +3323,7 @@ Feature: resources shared by user
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
     And user "Alice" has created the following space link share:
       | space           | NewSpace      |
-      | permissionsRole | view          |
+      | permissionsRole | View          |
       | password        | %public%      |
     When user "Alice" lists the shares shared by her using the Graph API
     Then the HTTP status code should be "200"

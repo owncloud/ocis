@@ -170,11 +170,11 @@ Feature: Remove access to a drive
     And user "Alice" should not have any "link" permissions on space "NewSpace"
     Examples:
       | permissions-role |
-      | view             |
-      | edit             |
-      | upload           |
-      | createOnly       |
-      | blocksDownload   |
+      | View             |
+      | Edit             |
+      | Upload           |
+      | File Drop        |
+      | Secure View      |
 
 
   Scenario: user removes internal link share from project space using root endpoint
@@ -182,7 +182,7 @@ Feature: Remove access to a drive
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
     And user "Alice" has created the following space link share:
       | space           | NewSpace |
-      | permissionsRole | internal |
+      | permissionsRole | Internal |
     When user "Alice" removes the link from space "NewSpace" using root endpoint of the Graph API
     Then the HTTP status code should be "204"
     And user "Alice" should not have any "link" permissions on space "NewSpace"
@@ -199,11 +199,11 @@ Feature: Remove access to a drive
     Then the HTTP status code should be "404"
     Examples:
       | permissions-role |
-      | view             |
-      | edit             |
-      | upload           |
-      | createOnly       |
-      | blocksDownload   |
+      | View             |
+      | Edit             |
+      | Upload           |
+      | File Drop        |
+      | Secure View      |
 
 
   Scenario: user tries to remove internal link share of project space owned by next user using root endpoint
@@ -211,7 +211,7 @@ Feature: Remove access to a drive
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
     And user "Alice" has created the following space link share:
       | space           | NewSpace |
-      | permissionsRole | internal |
+      | permissionsRole | Internal |
     When user "Brian" tries to remove the link from space "NewSpace" owned by "Alice" using root endpoint of the Graph API
     Then the HTTP status code should be "404"
 
@@ -229,11 +229,11 @@ Feature: Remove access to a drive
     And user "Alice" should not have any "link" permissions on space "projectSpace"
     Examples:
       | permissions-role |
-      | view             |
-      | edit             |
-      | upload           |
-      | createOnly       |
-      | blocksDownload   |
+      | View             |
+      | Edit             |
+      | Upload           |
+      | File Drop        |
+      | Secure View      |
 
 
   Scenario: user removes internal link share of a project drive using permissions endpoint
@@ -242,7 +242,7 @@ Feature: Remove access to a drive
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
     And user "Alice" has created the following space link share:
       | space           | projectSpace |
-      | permissionsRole | internal     |
+      | permissionsRole | Internal     |
     When user "Alice" removes the last link share of space "projectSpace" using permissions endpoint of the Graph API
     Then the HTTP status code should be "204"
     And user "Alice" should not have any "link" permissions on space "projectSpace"

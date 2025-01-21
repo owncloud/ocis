@@ -1067,7 +1067,7 @@ Feature: check share activity
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
     And user "Alice" has created the following space link share:
       | space           | new-space |
-      | permissionsRole | view      |
+      | permissionsRole | View      |
       | password        | %public%  |
     And user "Alice" has updated the last resource link share with
       | space              | new-space                |
@@ -1849,7 +1849,7 @@ Feature: check share activity
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
     And user "Alice" has created the following space link share:
       | space           | new-space |
-      | permissionsRole | view      |
+      | permissionsRole | View      |
       | password        | %public%  |
     And user "Alice" has updated the last resource link share with
       | space              | new-space                |

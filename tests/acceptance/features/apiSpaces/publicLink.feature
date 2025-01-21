@@ -11,7 +11,7 @@ Feature: public link for a space
     And user "Alice" has created a space "public space" with the default quota using the Graph API
     And user "Alice" has created the following space link share:
       | space           | public space |
-      | permissionsRole | view         |
+      | permissionsRole | View         |
     And using SharingNG
 
   @issue-10331

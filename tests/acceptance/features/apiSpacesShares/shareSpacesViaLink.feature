@@ -139,7 +139,7 @@ Feature: Share spaces via link
     And using SharingNG
     And user "Alice" has created the following space link share:
       | space           | share space |
-      | permissionsRole | view        |
+      | permissionsRole | View        |
       | password        | %public%    |
     When user "Alice" updates the last public link share using the sharing API with
       | permissions | 1 |
@@ -168,12 +168,12 @@ Feature: Share spaces via link
     And the OCS status message should be "missing required password"
     Examples:
       | ocs-api-version | permissions | http-status-code | permissions-role |
-      | 1               | 5           | 200              | upload           |
-      | 2               | 5           | 400              | upload           |
-      | 1               | 15          | 200              | edit             |
-      | 2               | 15          | 400              | edit             |
-      | 1               | 4           | 200              | createOnly       |
-      | 2               | 4           | 400              | createOnly       |
+      | 1               | 5           | 200              | Upload           |
+      | 2               | 5           | 400              | Upload           |
+      | 1               | 15          | 200              | Edit             |
+      | 2               | 15          | 400              | Edit             |
+      | 1               | 4           | 200              | File Drop        |
+      | 2               | 4           | 400              | File Drop        |
 
 
   Scenario Outline: space admin removes password of a public link share of a space (invite permission)
@@ -181,7 +181,7 @@ Feature: Share spaces via link
     And using SharingNG
     And user "Alice" has created the following space link share:
       | space           | share space |
-      | permissionsRole | view        |
+      | permissionsRole | View        |
       | password        | %public%    |
     When user "Alice" updates the last public link share using the sharing API with
       | permissions | 0 |
@@ -205,7 +205,7 @@ Feature: Share spaces via link
       | permissionsRole | Manager     |
     And user "Brian" has created the following space link share:
       | space           | share space |
-      | permissionsRole | view        |
+      | permissionsRole | View        |
       | password        | %public%    |
     When user "Brian" updates the last public link share using the sharing API with
       | permissions | 1 |
@@ -239,12 +239,12 @@ Feature: Share spaces via link
     And the OCS status message should be "missing required password"
     Examples:
       | ocs-api-version | permissions | http-status-code | permissions-role |
-      | 1               | 5           | 200              | upload           |
-      | 2               | 5           | 400              | upload           |
-      | 1               | 15          | 200              | edit             |
-      | 2               | 15          | 400              | edit             |
-      | 1               | 4           | 200              | createOnly       |
-      | 2               | 4           | 400              | createOnly       |
+      | 1               | 5           | 200              | Upload           |
+      | 2               | 5           | 400              | Upload           |
+      | 1               | 15          | 200              | Edit             |
+      | 2               | 15          | 400              | Edit             |
+      | 1               | 4           | 200              | File Drop        |
+      | 2               | 4           | 400              | File Drop        |
 
 
   Scenario Outline: space manager removes password of a public link share of a space (invite permission)
@@ -257,7 +257,7 @@ Feature: Share spaces via link
       | permissionsRole | Manager     |
     And user "Brian" has created the following space link share:
       | space           | share space |
-      | permissionsRole | view        |
+      | permissionsRole | View        |
       | password        | %public%    |
     When user "Brian" updates the last public link share using the sharing API with
       | permissions | 0 |
@@ -291,19 +291,19 @@ Feature: Share spaces via link
     And the OCS status message should be "missing permissions to update share"
     Examples:
       | ocs-api-version | http-status-code | space-role   | permissions | permissions-role |
-      | 1               | 200              | Space Viewer | 1           | view             |
-      | 2               | 401              | Space Viewer | 1           | view             |
-      | 1               | 200              | Space Viewer | 5           | upload           |
-      | 2               | 401              | Space Viewer | 5           | upload           |
-      | 1               | 200              | Space Viewer | 15          | edit             |
-      | 2               | 401              | Space Viewer | 15          | edit             |
-      | 1               | 200              | Space Viewer | 4           | createOnly       |
-      | 2               | 401              | Space Viewer | 4           | createOnly       |
-      | 1               | 200              | Space Editor | 1           | view             |
-      | 2               | 401              | Space Editor | 1           | view             |
-      | 1               | 200              | Space Editor | 5           | upload           |
-      | 2               | 401              | Space Editor | 5           | upload           |
-      | 1               | 200              | Space Editor | 15          | edit             |
-      | 2               | 401              | Space Editor | 15          | edit             |
-      | 1               | 200              | Space Editor | 4           | createOnly       |
-      | 2               | 401              | Space Editor | 4           | createOnly       |
+      | 1               | 200              | Space Viewer | 1           | View             |
+      | 2               | 401              | Space Viewer | 1           | View             |
+      | 1               | 200              | Space Viewer | 5           | Upload           |
+      | 2               | 401              | Space Viewer | 5           | Upload           |
+      | 1               | 200              | Space Viewer | 15          | Edit             |
+      | 2               | 401              | Space Viewer | 15          | Edit             |
+      | 1               | 200              | Space Viewer | 4           | File Drop        |
+      | 2               | 401              | Space Viewer | 4           | File Drop        |
+      | 1               | 200              | Space Editor | 1           | View             |
+      | 2               | 401              | Space Editor | 1           | View             |
+      | 1               | 200              | Space Editor | 5           | Upload           |
+      | 2               | 401              | Space Editor | 5           | Upload           |
+      | 1               | 200              | Space Editor | 15          | Edit             |
+      | 2               | 401              | Space Editor | 15          | Edit             |
+      | 1               | 200              | Space Editor | 4           | File Drop        |
+      | 2               | 401              | Space Editor | 4           | File Drop        |

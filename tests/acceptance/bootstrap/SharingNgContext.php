@@ -127,12 +127,14 @@ class SharingNgContext implements Context {
 		$space = $bodyRows['space'];
 
 		$spaceId = ($this->spacesContext->getSpaceByName($user, $space))["id"];
+		$permissionsRole = $bodyRows['permissionsRole'];
 		$bodyRows['quickLink'] = $bodyRows['quickLink'] ?? false;
 		$bodyRows['displayName'] = $bodyRows['displayName'] ?? null;
 		$bodyRows['expirationDateTime'] = $bodyRows['expirationDateTime'] ?? null;
 		$bodyRows['password'] = $bodyRows['password'] ?? null;
+		$type = GraphHelper::SHARING_LINK_TYPE_MAPPINGS[$permissionsRole] ?? $permissionsRole;
 		$body = [
-			'type' => $bodyRows['permissionsRole'],
+			'type' => $type,
 			"@libre.graph.quickLink" => filter_var($bodyRows['quickLink'], FILTER_VALIDATE_BOOLEAN),
 			'displayName' => $bodyRows['displayName'],
 			'expirationDateTime' => $bodyRows['expirationDateTime'],

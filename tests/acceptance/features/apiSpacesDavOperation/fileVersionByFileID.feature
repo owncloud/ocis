@@ -187,8 +187,8 @@ Feature: checking file versions using file id
     Then the HTTP status code should be "401"
     Examples:
       | permissions-role |
-      | view             |
-      | edit             |
+      | View             |
+      | Edit             |
 
 
   Scenario Outline: public tries to check the versions of a file in a personal space shared via link as viewer/editor

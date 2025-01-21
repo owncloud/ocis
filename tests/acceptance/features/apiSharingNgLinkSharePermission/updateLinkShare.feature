@@ -390,19 +390,19 @@ Feature: Update a link share for a resource
       """
     Examples:
       | permissions-role | new-permissions-role | permissions-role-value |
-      | view             | Edit                 | edit                   |
-      | view             | Upload               | upload                 |
-      | view             | File Drop            | createOnly             |
-      | edit             | View                 | view                   |
-      | edit             | Upload               | upload                 |
-      | edit             | File Drop            | createOnly             |
-      | upload           | View                 | view                   |
-      | upload           | Edit                 | edit                   |
-      | upload           | File Drop            | createOnly             |
-      | createOnly       | View                 | view                   |
-      | createOnly       | Edit                 | edit                   |
-      | createOnly       | Upload               | upload                 |
-      | blocksDownload   | Secure View          | blocksDownload         |
+      | View             | Edit                 | edit                   |
+      | View             | Upload               | upload                 |
+      | View             | File Drop            | createOnly             |
+      | Edit             | View                 | view                   |
+      | Edit             | Upload               | upload                 |
+      | Edit             | File Drop            | createOnly             |
+      | Upload           | View                 | view                   |
+      | Upload           | Edit                 | edit                   |
+      | Upload           | File Drop            | createOnly             |
+      | File Drop        | View                 | view                   |
+      | File Drop        | Edit                 | edit                   |
+      | File Drop        | Upload               | upload                 |
+      | Secure View      | Secure View          | blocksDownload         |
 
 
   Scenario Outline: update role of a folder's link share inside project-space using permissions endpoint
