@@ -31,8 +31,8 @@
 * [Changelog for 3.0.0](#changelog-for-300-2023-06-06)
 * [Changelog for 2.0.0](#changelog-for-200-2022-11-30)
 * [Changelog for 1.20.0](#changelog-for-1200-2022-04-13)
-* [Changelog for 1.19.0](#changelog-for-1190-2022-03-29)
 * [Changelog for 1.19.1](#changelog-for-1191-2022-03-29)
+* [Changelog for 1.19.0](#changelog-for-1190-2022-03-29)
 * [Changelog for 1.18.0](#changelog-for-1180-2022-03-03)
 * [Changelog for 1.17.0](#changelog-for-1170-2022-02-16)
 * [Changelog for 1.16.0](#changelog-for-1160-2021-12-10)
@@ -61,6 +61,9 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Share creation date is missing in invite response: [#10780](https://github.com/owncloud/ocis/pull/10780)
+* Bugfix - Bump some golang dependencies: [#10795](https://github.com/owncloud/ocis/pull/10795)
+* Bugfix - Allow to accepted invite after it was once deleted: [#10834](https://github.com/owncloud/ocis/pull/10834)
 * Bugfix - Fix the mail notifications for the user light: [#10864](https://github.com/owncloud/ocis/pull/10864)
 * Bugfix - Fix filtering of PostprocessingStepFinished events: [#10868](https://github.com/owncloud/ocis/pull/10868)
 * Bugfix - Prevent empty email body for grouped email notifications: [#10869](https://github.com/owncloud/ocis/pull/10869)
@@ -68,10 +71,37 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix grouped email notifications store key: [#10873](https://github.com/owncloud/ocis/pull/10873)
 * Bugfix - Fix missing newline in grouped email: [#10883](https://github.com/owncloud/ocis/pull/10883)
 * Bugfix - Fix email templates white spaces & new lines: [#10884](https://github.com/owncloud/ocis/pull/10884)
+* Enhancement - Part I: The user settings are extended by notifications preferences: [#10706](https://github.com/owncloud/ocis/pull/10706)
+* Enhancement - Part II: Filtering of in-app notifications: [#10779](https://github.com/owncloud/ocis/pull/10779)
+* Enhancement - Part III: Filtering of mail notifications: [#10792](https://github.com/owncloud/ocis/pull/10792)
+* Enhancement - Translate Notification Settings: [#10812](https://github.com/owncloud/ocis/pull/10812)
+* Enhancement - Bump Reva: [#10830](https://github.com/owncloud/ocis/pull/10830)
+* Enhancement - Part IV: Grouping of mail notifications: [#10838](https://github.com/owncloud/ocis/pull/10838)
+* Enhancement - Update web to v11.1.0: [#10853](https://github.com/owncloud/ocis/pull/10853)
 * Enhancement - Add tests for grouped emails: [#10885](https://github.com/owncloud/ocis/pull/10885)
-* Enhancement - Use maintained forks: [#10886](https://github.com/owncloud/ocis/pull/10886)
 
 ## Details
+
+* Bugfix - Share creation date is missing in invite response: [#10780](https://github.com/owncloud/ocis/pull/10780)
+
+   The graph drives invite response now includes the `createdDateTime` field.
+
+   https://github.com/owncloud/ocis/issues/10739
+   https://github.com/owncloud/ocis/pull/10780
+
+* Bugfix - Bump some golang dependencies: [#10795](https://github.com/owncloud/ocis/pull/10795)
+
+   Bump dependencies "golang.org/x/crypto" and "golang.org/x/net"
+
+   https://github.com/owncloud/ocis/pull/10795
+
+* Bugfix - Allow to accepted invite after it was once deleted: [#10834](https://github.com/owncloud/ocis/pull/10834)
+
+   Allowed to accepted invite even after it was once deleted on the invite receiver
+   or invite creation side.
+
+   https://github.com/owncloud/ocis/issues/10813
+   https://github.com/owncloud/ocis/pull/10834
 
 * Bugfix - Fix the mail notifications for the user light: [#10864](https://github.com/owncloud/ocis/pull/10864)
 
@@ -116,58 +146,6 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/10884
 
-* Enhancement - Add tests for grouped emails: [#10885](https://github.com/owncloud/ocis/pull/10885)
-
-   https://github.com/owncloud/ocis/pull/10885
-
-* Enhancement - Use maintained forks: [#10886](https://github.com/owncloud/ocis/pull/10886)
-
-   Switches away from unmainatained forks.
-
-   https://github.com/owncloud/ocis/pull/10886
-
-# Changelog for [7.1.0-rc.1] (2025-01-10)
-
-The following sections list the changes for 7.1.0-rc.1.
-
-[7.1.0-rc.1]: https://github.com/owncloud/ocis/compare/v7.0.0...master
-
-## Summary
-
-* Bugfix - Share creation date is missing in invite response: [#10781](https://github.com/owncloud/ocis/pull/10781)
-* Bugfix - Bump some golang dependencies: [#10795](https://github.com/owncloud/ocis/pull/10795)
-* Bugfix - Allow to accepted invite after it was once deleted: [#10834](https://github.com/owncloud/ocis/pull/10834)
-* Enhancement - Part I: The user settings are extended by notifications preferences: [#10706](https://github.com/owncloud/ocis/pull/10706)
-* Enhancement - Part II: Filtering of in-app notifications: [#10779](https://github.com/owncloud/ocis/pull/10779)
-* Enhancement - Part III: Filtering of mail notifications: [#10792](https://github.com/owncloud/ocis/pull/10792)
-* Enhancement - Translate Notification Settings: [#10812](https://github.com/owncloud/ocis/pull/10812)
-* Enhancement - Part IV: Grouping of mail notifications: [#10838](https://github.com/owncloud/ocis/pull/10838)
-* Enhancement - Bump Reva: [#10842](https://github.com/owncloud/ocis/pull/10842)
-* Enhancement - Update web to v11.1.0: [#10853](https://github.com/owncloud/ocis/pull/10853)
-
-## Details
-
-* Bugfix - Share creation date is missing in invite response: [#10781](https://github.com/owncloud/ocis/pull/10781)
-
-   The graph drives invite response now includes the `createdDateTime` field.
-
-   https://github.com/owncloud/ocis/issues/10739
-   https://github.com/owncloud/ocis/pull/10781
-
-* Bugfix - Bump some golang dependencies: [#10795](https://github.com/owncloud/ocis/pull/10795)
-
-   Bump dependencies "golang.org/x/crypto" and "golang.org/x/net"
-
-   https://github.com/owncloud/ocis/pull/10795
-
-* Bugfix - Allow to accepted invite after it was once deleted: [#10834](https://github.com/owncloud/ocis/pull/10834)
-
-   Allowed to accepted invite even after it was once deleted on the invite receiver
-   or invite creation side.
-
-   https://github.com/owncloud/ocis/issues/10813
-   https://github.com/owncloud/ocis/pull/10834
-
 * Enhancement - Part I: The user settings are extended by notifications preferences: [#10706](https://github.com/owncloud/ocis/pull/10706)
 
    Part I: Users can now store their notifications preferences in the user settings
@@ -197,18 +175,19 @@ The following sections list the changes for 7.1.0-rc.1.
 
    https://github.com/owncloud/ocis/pull/10812
 
+* Enhancement - Bump Reva: [#10830](https://github.com/owncloud/ocis/pull/10830)
+
+   Bumps the reva version
+
+   https://github.com/owncloud/ocis/pull/10830
+   https://github.com/owncloud/ocis/pull/10842
+
 * Enhancement - Part IV: Grouping of mail notifications: [#10838](https://github.com/owncloud/ocis/pull/10838)
 
    Part IV: Mail notifications can now be grouped on a daily or weekly basis
 
    https://github.com/owncloud/ocis/issues/10793
    https://github.com/owncloud/ocis/pull/10838
-
-* Enhancement - Bump Reva: [#10842](https://github.com/owncloud/ocis/pull/10842)
-
-   Bumps the reva version
-
-   https://github.com/owncloud/ocis/pull/10842
 
 * Enhancement - Update web to v11.1.0: [#10853](https://github.com/owncloud/ocis/pull/10853)
 
@@ -239,6 +218,10 @@ The following sections list the changes for 7.1.0-rc.1.
 
    https://github.com/owncloud/ocis/pull/10853
    https://github.com/owncloud/web/releases/tag/v11.1.0
+
+* Enhancement - Add tests for grouped emails: [#10885](https://github.com/owncloud/ocis/pull/10885)
+
+   https://github.com/owncloud/ocis/pull/10885
 
 # Changelog for [7.0.0] (2024-12-17)
 
@@ -10970,7 +10953,7 @@ The following sections list the changes for 2.0.0.
 
 The following sections list the changes for 1.20.0.
 
-[1.20.0]: https://github.com/owncloud/ocis/compare/v1.19.0...v1.20.0
+[1.20.0]: https://github.com/owncloud/ocis/compare/v1.19.1...v1.20.0
 
 ## Summary
 
@@ -11144,11 +11127,29 @@ The following sections list the changes for 1.20.0.
    https://github.com/owncloud/ocis/pull/3509
    https://github.com/owncloud/web/releases/tag/v5.4.0
 
+# Changelog for [1.19.1] (2022-03-29)
+
+The following sections list the changes for 1.19.1.
+
+[1.19.1]: https://github.com/owncloud/ocis/compare/v1.19.0...v1.19.1
+
+## Summary
+
+* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
+
+## Details
+
+* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
+
+   URLs for Special items (space image, readme) were broken.
+
+   https://github.com/owncloud/ocis/pull/3419
+
 # Changelog for [1.19.0] (2022-03-29)
 
 The following sections list the changes for 1.19.0.
 
-[1.19.0]: https://github.com/owncloud/ocis/compare/v1.19.1...v1.19.0
+[1.19.0]: https://github.com/owncloud/ocis/compare/v1.18.0...v1.19.0
 
 ## Summary
 
@@ -11321,24 +11322,6 @@ The following sections list the changes for 1.19.0.
    https://github.com/owncloud/ocis/pull/3291
    https://github.com/owncloud/ocis/pull/3375
    https://github.com/owncloud/web/releases/tag/v5.3.0
-
-# Changelog for [1.19.1] (2022-03-29)
-
-The following sections list the changes for 1.19.1.
-
-[1.19.1]: https://github.com/owncloud/ocis/compare/v1.18.0...v1.19.1
-
-## Summary
-
-* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
-
-## Details
-
-* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
-
-   URLs for Special items (space image, readme) were broken.
-
-   https://github.com/owncloud/ocis/pull/3419
 
 # Changelog for [1.18.0] (2022-03-03)
 
