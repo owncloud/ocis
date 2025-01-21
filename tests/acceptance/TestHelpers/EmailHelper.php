@@ -30,6 +30,8 @@ use Psr\Http\Message\ResponseInterface;
  * A helper class for managing emails
  */
 class EmailHelper {
+	public const MAILBOX_ENDPOINT = "/api/v1/mailbox";
+
 	/**
 	 * @param string $emailAddress
 	 *
@@ -93,14 +95,33 @@ class EmailHelper {
 	 * @throws GuzzleException
 	 */
 	public static function getMailBoxInformation(string $mailBox, ?string $xRequestId = null): array {
+		$url = self::getLocalEmailUrl() . self::MAILBOX_ENDPOINT . "/$mailBox";
+		$headers = ['Content-Type' => 'application/json'];
 		$response = HttpRequestHelper::get(
-			self::getLocalEmailUrl() . "/api/v1/mailbox/" . $mailBox,
+			$url,
 			$xRequestId,
 			null,
 			null,
-			['Content-Type' => 'application/json']
+			$headers
 		);
-		return \json_decode($response->getBody()->getContents());
+
+		$emails = \json_decode($response->getBody()->getContents());
+		if (empty($emails)) {
+			echo "[INFO] Mailbox is empty...\n";
+			// Wait for 1 second and try again
+			// the mailbox might not be created yet
+			sleep(1);
+			$response = HttpRequestHelper::get(
+				$url,
+				$xRequestId,
+				null,
+				null,
+				$headers
+			);
+			$emails = \json_decode($response->getBody()->getContents());
+		}
+
+		return $emails;
 	}
 
 	/**
@@ -119,7 +140,7 @@ class EmailHelper {
 		?string $xRequestId = null
 	): object {
 		$response = HttpRequestHelper::get(
-			self::getLocalEmailUrl() . "/api/v1/mailbox/" . $mailBox . "/" . $mailboxId,
+			self::getLocalEmailUrl() . self::MAILBOX_ENDPOINT . "/$mailBox/$mailboxId",
 			$xRequestId,
 			null,
 			null,
@@ -184,7 +205,7 @@ class EmailHelper {
 		string $mailBox
 	): ResponseInterface {
 		return HttpRequestHelper::delete(
-			$localInbucketUrl . "/api/v1/mailbox/" . $mailBox,
+			$localInbucketUrl . self::MAILBOX_ENDPOINT . "/$mailBox",
 			$xRequestId
 		);
 	}
