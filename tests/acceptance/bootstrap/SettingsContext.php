@@ -562,11 +562,13 @@ class SettingsContext implements Context {
 	 * @return void
 	 */
 	public function userDisablesEmailNotificationUsingTheSettingsAPI(string $user): void {
+		$body = $this->getBodyForNotificationSetting($user, "Disable Email Notifications");
+		$body["value"]["boolValue"] = true;
 		$response = SettingsHelper::updateSettings(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getActualUsername($user),
 			$this->featureContext->getPasswordForUser($user),
-			json_encode($this->getBodyForNotificationSetting($user, "Disable Email Notifications")),
+			json_encode($body),
 			$this->featureContext->getStepLineRef(),
 		);
 		$this->featureContext->setResponse($response);
