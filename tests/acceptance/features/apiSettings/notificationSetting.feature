@@ -607,3 +607,131 @@ Feature: Notification Settings
       | message                                   |
       | Alice Hansen added you to Space new-space |
     But user "Brian" should not have a notification related to space "new-space" with subject "Space disabled"
+
+
+  Scenario: disable mail and in-app notification for Added as space member event
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "newSpace" with the default quota using the Graph API
+    When user "Brian" disables notification for the following events using the settings API:
+      | Added as space member | mail,in-app |
+    Then the HTTP status code should be "201"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "object",
+            "required": ["identifier","value"],
+            "properties": {
+              "identifier":{
+                "type": "object",
+                "required": ["extension","bundle","setting"],
+                "properties": {
+                  "extension":{
+                    "const": "ocis-accounts"
+                  },
+                  "bundle":{
+                    "const": "profile"
+                  },
+                  "setting":{
+                    "const": "event-space-shared-options"
+                  }
+                }
+              },
+              "value":{
+                "type": "object",
+                "required": [
+                  "id",
+                  "bundleId",
+                  "settingId",
+                  "accountUuid",
+                  "resource",
+                  "collectionValue"
+                ],
+                "properties":{
+                  "id":{
+                    "pattern":"%user_id_pattern%"
+                  },
+                  "bundleId":{
+                    "pattern":"%user_id_pattern%"
+                  },
+                  "settingId":{
+                    "pattern":"%user_id_pattern%"
+                  },
+                  "accountUuid":{
+                    "pattern":"%user_id_pattern%"
+                  },
+                  "resource":{
+                    "type": "object",
+                    "required":["type"],
+                    "properties": {
+                      "type":{
+                        "const": "TYPE_USER"
+                      }
+                    }
+                  },
+                  "collectionValue":{
+                    "type": "object",
+                    "required":["values"],
+                    "properties": {
+                      "values":{
+                        "type": "array",
+                        "maxItems": 2,
+                        "minItems": 2,
+                        "uniqueItems": true,
+                        "items": {
+                          "oneOf": [
+                            {
+                              "type": "object",
+                              "required": [
+                                "key",
+                                "boolValue"
+                              ],
+                              "properties": {
+                                "key":{
+                                  "const": "mail"
+                                },
+                                "boolValue":{
+                                  "const": false
+                                }
+                              }
+                            },
+                            {
+                              "type": "object",
+                              "required": [
+                                "key",
+                                "boolValue"
+                              ],
+                              "properties": {
+                                "key":{
+                                  "const": "in-app"
+                                },
+                                "boolValue":{
+                                  "const": false
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      """
+    And user "Alice" has sent the following space share invitation:
+      | space           | newSpace     |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | Space Viewer |
+    And user "Brian" should have "0" emails
+    When user "Brian" lists all notifications
+    Then the HTTP status code should be "200"
+    And the notifications should be empty
