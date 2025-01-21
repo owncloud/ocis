@@ -215,21 +215,23 @@ func OcisServiceHandler(res http.ResponseWriter, req *http.Request) {
 			var serviceEnvMap []string
 
 			if req.Body != nil && req.ContentLength > 0 {
- 			   var err error
- 			   envBody, err = parseJsonBody(req.Body)
- 			   if err != nil {
- 			       sendResponse(res, http.StatusBadRequest, "Invalid json body")
- 			       return
- 			   }
+				var err error
+				envBody, err = parseJsonBody(req.Body)
+				if err != nil {
+					sendResponse(res, http.StatusBadRequest, "Invalid json body")
+					return
+				}
 			}
 
 			for key, value := range envBody {
-			    serviceEnvMap = append(serviceEnvMap, fmt.Sprintf("%s=%v", key, value))
+				serviceEnvMap = append(serviceEnvMap, fmt.Sprintf("%s=%v", key, value))
 			}
 
 			log.Println(fmt.Sprintf("Starting oCIS service %s......", serviceName))
 
+			common.Wg.Add(1)
 			go ocis.StartService(serviceName, serviceEnvMap)
+
 			success, _ := ocis.WaitForConnection()
 			if success {
 				sendResponse(res, http.StatusOK, fmt.Sprintf("oCIS service %s started successfully", serviceName))
