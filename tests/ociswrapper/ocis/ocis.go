@@ -37,8 +37,18 @@ func Stop() (bool, string) {
 	log.Println("Stopping oCIS server...")
 	stopSignal = true
 
+	var stopErrors []string
 	for service := range runningServices {
-		go StopService(service)
+		success, message := StopService(service)
+		if !success {
+			stopErrors = append(stopErrors, message)
+		}
+	}
+	if len(stopErrors) > 0 {
+		log.Println("Errors occurred while stopping services:")
+		for _, err := range stopErrors {
+			log.Println(err)
+		}
 	}
 
 	success, message := waitUntilCompleteShutdown()
@@ -134,7 +144,7 @@ func waitUntilCompleteShutdown() (bool, string) {
 	timeout := 30 * time.Second
 	startTime := time.Now()
 
-	c := exec.Command("sh", "-c", "ps ax | grep 'ocis server' | grep -v grep | awk '{print $1}'")
+	c := exec.Command("sh", "-c", "ps ax | grep '[o]cis server' | grep -v grep | awk '{print $1}'")
 	output, err := c.CombinedOutput()
 	if err != nil {
 		log.Println(err.Error())
@@ -223,7 +233,7 @@ func StartService(service string, envMap []string) {
 	}
 
 	err = cmd.Start()
-
+	time.Sleep(300 * time.Millisecond)
 	if err != nil {
 		log.Panic(err)
 	}
@@ -295,24 +305,57 @@ func StartService(service string, envMap []string) {
 
 // Stop oCIS service or a specific service by its unique identifier
 func StopService(service string) (bool, string) {
-	pid, exists := runningServices[service]
-	if !exists {
-		return false, fmt.Sprintf("Running service doesn't not include %s service", service)
-	}
+	stopWg := new(sync.WaitGroup)
+	stopWg.Add(1)
 
-	process, err := os.FindProcess(pid)
-	if err != nil {
-		return false, fmt.Sprintf("Failed to find service %s process running with ID %d", service, pid)
-	}
+	resultChan := make(chan struct {
+		success bool
+		message string
+	}, 1)
 
-	pKillError := process.Signal(syscall.SIGINT)
-	if pKillError != nil {
-		return false, fmt.Sprintf("Failed to stop service with process id %d", pid)
-	} else {
+	go func() {
+		defer stopWg.Done()
+
+		pid, exists := runningServices[service]
+		if !exists {
+			resultChan <- struct {
+				success bool
+				message string
+			}{false, fmt.Sprintf("Service %s is not running", service)}
+			return
+		}
+
+		process, err := os.FindProcess(pid)
+		if err != nil {
+			resultChan <- struct {
+				success bool
+				message string
+			}{false, fmt.Sprintf("Failed to find service %s process running with ID %d", service, pid)}
+			return
+		}
+
+		pKillError := process.Signal(syscall.SIGINT)
+		if pKillError != nil {
+			resultChan <- struct {
+				success bool
+				message string
+			}{false, fmt.Sprintf("Failed to stop service with process id %d", pid)}
+			return
+		}
+
 		delete(runningServices, service)
-
 		log.Println(fmt.Sprintf("oCIS service %s has been stopped successfully", service))
-	}
 
-	return true, fmt.Sprintf("Service %s stopped successfully", service)
+		resultChan <- struct {
+			success bool
+			message string
+		}{true, fmt.Sprintf("Service %s stopped successfully", service)}
+	}()
+
+	// Wait for the goroutine to finish and retrieve the result.
+	stopWg.Wait()
+	result := <-resultChan
+	close(resultChan)
+
+	return result.success, result.message
 }

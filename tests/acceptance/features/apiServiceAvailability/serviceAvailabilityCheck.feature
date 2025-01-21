@@ -43,15 +43,13 @@ Feature: service health check
   @env-config
   Scenario: check extra services health
     Given the following configs have been set:
-      | config                 | value                                           |
-      | OCIS_ADD_RUN_SERVICES  | audit,auth-app,auth-bearer,policies,invitations |
-      | AUDIT_DEBUG_ADDR       | 0.0.0.0:9229                                    |
-      | AUTH_APP_DEBUG_ADDR    | 0.0.0.0:9245                                    |
-      | POLICIES_DEBUG_ADDR    | 0.0.0.0:9129                                    |
-      | INVITATIONS_DEBUG_ADDR | 0.0.0.0:9269                                    |
+      | config                 | value                                     |
+      | OCIS_ADD_RUN_SERVICES  | auth-app,auth-bearer,policies,invitations |
+      | AUTH_APP_DEBUG_ADDR    | 0.0.0.0:9245                              |
+      | POLICIES_DEBUG_ADDR    | 0.0.0.0:9129                              |
+      | INVITATIONS_DEBUG_ADDR | 0.0.0.0:9269                              |
     When a user requests these URLs with "GET" and no authentication
       | endpoint                                | service     |
-      | http://%base_url_hostname%:9229/healthz | audit       |
       | http://%base_url_hostname%:9245/healthz | auth-app    |
       | http://%base_url_hostname%:9269/healthz | invitations |
       | http://%base_url_hostname%:9129/healthz | policies    |
@@ -100,7 +98,6 @@ Feature: service health check
       | config                 | value                         |
       | OCIS_ADD_RUN_SERVICES  | auth-app,policies,invitations |
       | AUTH_APP_DEBUG_ADDR    | 0.0.0.0:9245                  |
-      | AUTH_BEARER_DEBUG_ADDR | 0.0.0.0:9149                  |
       | POLICIES_DEBUG_ADDR    | 0.0.0.0:9129                  |
       | INVITATIONS_DEBUG_ADDR | 0.0.0.0:9269                  |
     When a user requests these URLs with "GET" and no authentication
@@ -136,4 +133,12 @@ Feature: service health check
     When a user requests these URLs with "GET" and no authentication
       | endpoint                                | service |
       | http://%base_url_hostname%:9229/healthz | audit   |
+    Then the HTTP status code of responses on all endpoints should be "200"
+
+  @env-config
+  Scenario: check services readiness while running separately
+    Given the administrator has started service "audit" separately
+    When a user requests these URLs with "GET" and no authentication
+      | endpoint                               | service |
+      | http://%base_url_hostname%:9229/readyz | audit   |
     Then the HTTP status code of responses on all endpoints should be "200"
