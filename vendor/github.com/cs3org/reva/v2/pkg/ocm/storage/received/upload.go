@@ -328,7 +328,11 @@ func (u *upload) FinishUpload(ctx context.Context) error {
 	// shareID, rel := shareInfoFromReference(u.Info.MetaData["ref"])
 	// p := getPathFromShareIDAndRelPath(shareID, rel)
 
-	serviceUserCtx, err := utils.GetServiceUserContext(u.d.c.ServiceAccountID, u.d.gateway, u.d.c.ServiceAccountSecret)
+	gwc, err := u.d.gateway.Next()
+	if err != nil {
+		return err
+	}
+	serviceUserCtx, err := utils.GetServiceUserContext(u.d.c.ServiceAccountID, gwc, u.d.c.ServiceAccountSecret)
 	if err != nil {
 		return err
 	}
