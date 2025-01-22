@@ -227,7 +227,7 @@ func OcisServiceHandler(res http.ResponseWriter, req *http.Request) {
 				serviceEnvMap = append(serviceEnvMap, fmt.Sprintf("%s=%v", key, value))
 			}
 
-			log.Println(fmt.Sprintf("Starting oCIS service %s......", serviceName))
+			log.Println(fmt.Sprintf("[ociswrapper] Starting oCIS service %s......", serviceName))
 
 			common.Wg.Add(1)
 			go ocis.StartService(serviceName, serviceEnvMap)

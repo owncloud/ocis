@@ -248,7 +248,7 @@ func StartService(service string, envMap []string) {
 	}
 
 	for listService, pid := range runningServices {
-		log.Println(fmt.Sprintf("%s service started with process id %v\n", listService, pid))
+		log.Println(fmt.Sprintf("%s service started with process id %v", listService, pid))
 	}
 
 	// Read the logs when the 'ocis server' command is running
@@ -360,67 +360,68 @@ func StopService(service string) (bool, string) {
 }
 
 func WaitUntilPortListens(service string) (bool, error) {
-	// Wait for the service to appear in runningServices if it's not already there
+	// Define the overall timeout for the function
+	overallTimeout := time.After(30 * time.Second)
+
 	for {
-		pid, exists := runningServices[service]
-		if exists {
-			// Construct the command to check the port for the PID
-			command := fmt.Sprintf("lsof -iTCP -sTCP:LISTEN -a -p %s", strconv.Itoa(pid))
+		select {
+		case <-overallTimeout:
+			// Overall timeout reached, return an error
+			errMsg := fmt.Sprintf("Service %s not found in runningServices within the timeout period", service)
+			return false, fmt.Errorf(errMsg)
 
-			// Start a timer for the timeout duration
-			timeoutChan := time.After(30 * time.Second)
+		default:
+			pid, exists := runningServices[service]
+			if exists {
+				// Construct the command to check the port for the PID
+				command := fmt.Sprintf("lsof -iTCP -sTCP:LISTEN -a -p %d", pid)
 
-			// Loop to keep checking the port until we find it or timeout
-			for {
-				// Run the command and capture the combined output (stdout + stderr)
-				cmd := exec.Command("sh", "-c", command)
-				output, _ := cmd.CombinedOutput()
+				// Inner timeout for checking the port
+				timeoutChan := time.After(30 * time.Second)
 
-				// Trim and parse the output to extract the port
-				outputStr := strings.TrimSpace(string(output))
-				if outputStr != "" {
-					// Split the output into lines and parse the relevant columns
-					lines := strings.Split(outputStr, "\n")
-					for _, line := range lines {
-						// Skip any empty lines
-						line = strings.TrimSpace(line)
-						if line == "" {
-							continue
-						}
+				for {
+					// Run the command and capture the combined output (stdout + stderr)
+					cmd := exec.Command("sh", "-c", command)
+					output, _ := cmd.CombinedOutput()
 
-						// The output format is like: TCP *:8080 (LISTEN)
-						// The port is after the colon `:`
-						parts := strings.Fields(line)
-						if len(parts) < 9 {
-							continue // Skip lines that don't have enough fields
-						}
+					// Trim and parse the output to extract the port
+					outputStr := strings.TrimSpace(string(output))
+					if outputStr != "" {
+						lines := strings.Split(outputStr, "\n")
+						for _, line := range lines {
+							line = strings.TrimSpace(line)
+							if line == "" {
+								continue
+							}
 
-						address := parts[8] // The address will be in the format: *:PORT
-						addressParts := strings.Split(address, ":")
-						if len(addressParts) > 1 {
-							// Extract the port
-							port := addressParts[len(addressParts)-1]
-							// Log the port found for this PID
-							log.Println(fmt.Sprintf("Port found for PID %d: %s", pid, port))
-							return true, nil
+							parts := strings.Fields(line)
+							if len(parts) < 9 {
+								continue
+							}
+
+							address := parts[8]
+							addressParts := strings.Split(address, ":")
+							if len(addressParts) > 1 {
+								port := addressParts[len(addressParts)-1]
+								log.Println(fmt.Sprintf("Port found for PID %d: %s", pid, port))
+								return true, nil
+							}
 						}
 					}
-				}
 
 				// If no port found, wait a bit and try again
-				select {
-				case <-timeoutChan:
-					// Timeout reached, return an error
-					errMsg := fmt.Sprintf("timeout reached, no port found for PID %s", pid)
-					return false, fmt.Errorf(errMsg)
-				case <-time.After(1 * time.Second):
-					// Retry after 1 second if no port is found
+					select {
+					case <-timeoutChan:
+						errMsg := fmt.Sprintf("Timeout reached, no port found for PID %d", pid)
+						return false, fmt.Errorf(errMsg)
+					case <-time.After(2 * time.Second):
+					}
 				}
 			}
-		}
 
-		// If service not found in runningServices, wait a bit and try again
-		log.Println(fmt.Sprintf("Service %s not found in runningServices, waiting...", service))
-		time.Sleep(1 * time.Second)
+			// If service not found, wait a bit and retry
+			log.Println(fmt.Sprintf("Service %s not found running, retrying to find service...", service))
+			time.Sleep(2 * time.Second)
+		}
 	}
 }
