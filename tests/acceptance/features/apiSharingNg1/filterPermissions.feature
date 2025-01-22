@@ -484,6 +484,7 @@ Feature: filter sharing permissions
             "@libre.graph.permissions.roles.allowedValues"
           ],
           "properties": {
+            "@libre.graph.permissions.actions.allowedValues": { "const": null },
             "@libre.graph.permissions.roles.allowedValues": {
               "type": "array",
               "minItems": 3,
@@ -582,6 +583,7 @@ Feature: filter sharing permissions
           "@libre.graph.permissions.roles.allowedValues"
         ],
         "properties": {
+          "@libre.graph.permissions.actions.allowedValues": { "const": null },
           "@libre.graph.permissions.roles.allowedValues": {
             "type": "array",
             "minItems": 3,
@@ -956,6 +958,7 @@ Feature: filter sharing permissions
             "@libre.graph.permissions.roles.allowedValues"
           ],
           "properties": {
+            "@libre.graph.permissions.actions.allowedValues": { "const": null },
             "@libre.graph.permissions.roles.allowedValues": {
               "type": "array",
               "minItems": 4,
@@ -1080,6 +1083,7 @@ Feature: filter sharing permissions
           "@libre.graph.permissions.roles.allowedValues"
         ],
         "properties": {
+          "@libre.graph.permissions.actions.allowedValues": { "const": null },
           "@libre.graph.permissions.roles.allowedValues": {
             "type": "array",
             "minItems": 3,
