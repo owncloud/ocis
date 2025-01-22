@@ -161,6 +161,9 @@ func (cl *ClientlogService) processEvent(event events.Event) {
 		fileEv("link-removed", &provider.Reference{ResourceId: e.ItemID})
 	case events.BackchannelLogout:
 		evType, users, data = backchannelLogoutEvent(e)
+	case events.OCMCoreShareCreated:
+		// TODO: implement the OCMCoreShareCreated event
+		evType = "ocm-share-created"
 	}
 
 	if err != nil {
