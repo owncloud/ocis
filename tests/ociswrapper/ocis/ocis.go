@@ -374,39 +374,63 @@ func WaitUntilPortListens(service string) (bool, error) {
 			pid, exists := runningServices[service]
 			if exists {
 				// Construct the command to check the port for the PID
-				command := fmt.Sprintf("lsof -iTCP -sTCP:LISTEN -a -p %d", pid)
+				netFilePath := fmt.Sprintf("/proc/%d/net/tcp", pid)
 
 				// Inner timeout for checking the port
 				timeoutChan := time.After(30 * time.Second)
 
 				for {
-					// Run the command and capture the combined output (stdout + stderr)
-					cmd := exec.Command("sh", "-c", command)
-					output, _ := cmd.CombinedOutput()
+					// Read the /proc/pid/net/tcp file to get the port
+					fileContent, err := os.ReadFile(netFilePath)
+					if err != nil {
+						return false, fmt.Errorf("Error reading %s: %v", netFilePath, err)
+					}
 
-					// Trim and parse the output to extract the port
-					outputStr := strings.TrimSpace(string(output))
-					if outputStr != "" {
-						lines := strings.Split(outputStr, "\n")
-						for _, line := range lines {
-							line = strings.TrimSpace(line)
-							if line == "" {
-								continue
-							}
-
-							parts := strings.Fields(line)
-							if len(parts) < 9 {
-								continue
-							}
-
-							address := parts[8]
-							addressParts := strings.Split(address, ":")
-							if len(addressParts) > 1 {
-								port := addressParts[len(addressParts)-1]
-								log.Println(fmt.Sprintf("Port found for PID %d: %s", pid, port))
-								return true, nil
-							}
+					// Process each line in the file
+					lines := strings.Split(string(fileContent), "\n")
+					for _, line := range lines {
+						line = strings.TrimSpace(line)
+						if line == "" {
+							continue
 						}
+
+						// Skip the first line (header)
+						if strings.HasPrefix(line, "sl") {
+							continue
+						}
+
+						// Extract the information from each line
+						parts := strings.Fields(line)
+						if len(parts) < 10 {
+							continue
+						}
+
+						// Address field is at index 1
+						address := parts[1]
+
+						// Split the address into IP and port parts (IPv4:port format)
+						addressParts := strings.Split(address, ":")
+						if len(addressParts) < 2 {
+							continue
+						}
+
+						// The port is the last part (after ":")
+						portHex := addressParts[len(addressParts)-1]
+
+						// Convert the hexadecimal port to decimal
+						port, err := strconv.ParseInt(portHex, 16, 32)
+						if err != nil {
+							log.Println(fmt.Sprintf("Error converting port from hex: %v", err))
+							continue
+						}
+
+						// Ensure we have a valid port
+						if port == 0 {
+							continue
+						}
+
+						log.Println(fmt.Sprintf("Port found for PID %d: %d", pid, port))
+						return true, nil
 					}
 
 				// If no port found, wait a bit and try again
