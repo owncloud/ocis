@@ -81,6 +81,7 @@ func Server(cfg *config.Config) *cli.Command {
 			evs := []events.Unmarshaller{
 				events.ShareCreated{},
 				events.ShareExpired{},
+				events.ShareRemoved{},
 				events.SpaceShared{},
 				events.SpaceUnshared{},
 				events.SpaceMembershipExpired{},
