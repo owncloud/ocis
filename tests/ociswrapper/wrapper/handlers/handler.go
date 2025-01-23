@@ -232,7 +232,7 @@ func OcisServiceHandler(res http.ResponseWriter, req *http.Request) {
 			common.Wg.Add(1)
 			go ocis.StartService(serviceName, serviceEnvMap)
 
-			success, _ := ocis.WaitUntilPortListens(serviceName)
+			success := ocis.WaitUntilPortListens(serviceName)
 			if success {
 				sendResponse(res, http.StatusOK, fmt.Sprintf("oCIS service %s started successfully", serviceName))
 			} else {
