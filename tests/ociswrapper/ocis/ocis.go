@@ -6,6 +6,7 @@ import (
 	"crypto/tls"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
 	"os"
 	"os/exec"
@@ -233,6 +234,7 @@ func StartService(service string, envMap []string) {
 	}
 
 	err = cmd.Start()
+
 	if err != nil {
 		log.Panic(err)
 	}
@@ -249,6 +251,7 @@ func StartService(service string, envMap []string) {
 
 	for listService, pid := range runningServices {
 		log.Println(fmt.Sprintf("%s service started with process id %v", listService, pid))
+		WaitUntilPortListens(listService)
 	}
 
 	// Read the logs when the 'ocis server' command is running
@@ -359,93 +362,40 @@ func StopService(service string) (bool, string) {
 	return result.success, result.message
 }
 
-func WaitUntilPortListens(service string) (bool, error) {
-	// Define the overall timeout for the function
+var servicePortMap = map[string]int{
+	"ocis":        9250,
+	"audit":       9229,
+	"activitylog": 9197,
+}
+
+// WaitUntilPortListens waits until the port for a given service is listening
+func WaitUntilPortListens(service string) bool {
 	overallTimeout := time.After(30 * time.Second)
+	ticker := time.NewTicker(2 * time.Second)
+	defer ticker.Stop()
+
+	port, exists := servicePortMap[service]
+	if !exists {
+		log.Println(fmt.Sprintf("%s service port not mapped...", service))
+		return false
+	}
 
 	for {
 		select {
 		case <-overallTimeout:
-			// Overall timeout reached, return an error
-			errMsg := fmt.Sprintf("Service %s not found in runningServices within the timeout period", service)
-			return false, fmt.Errorf(errMsg)
-
-		default:
-			pid, exists := runningServices[service]
-			if exists {
-				// Construct the command to check the port for the PID
-				netFilePath := fmt.Sprintf("/proc/%d/net/tcp", pid)
-
-				// Inner timeout for checking the port
-				timeoutChan := time.After(30 * time.Second)
-
-				for {
-					// Read the /proc/pid/net/tcp file to get the port
-					fileContent, err := os.ReadFile(netFilePath)
-					if err != nil {
-						return false, fmt.Errorf("Error reading %s: %v", netFilePath, err)
-					}
-
-					// Process each line in the file
-					lines := strings.Split(string(fileContent), "\n")
-					for _, line := range lines {
-						line = strings.TrimSpace(line)
-						if line == "" {
-							continue
-						}
-
-						// Skip the first line (header)
-						if strings.HasPrefix(line, "sl") {
-							continue
-						}
-
-						// Extract the information from each line
-						parts := strings.Fields(line)
-						if len(parts) < 10 {
-							continue
-						}
-
-						// Address field is at index 1
-						address := parts[1]
-
-						// Split the address into IP and port parts (IPv4:port format)
-						addressParts := strings.Split(address, ":")
-						if len(addressParts) < 2 {
-							continue
-						}
-
-						// The port is the last part (after ":")
-						portHex := addressParts[len(addressParts)-1]
-
-						// Convert the hexadecimal port to decimal
-						port, err := strconv.ParseInt(portHex, 16, 32)
-						if err != nil {
-							log.Println(fmt.Sprintf("Error converting port from hex: %v", err))
-							continue
-						}
-
-						// Ensure we have a valid port
-						if port == 0 {
-							continue
-						}
-
-						log.Println(fmt.Sprintf("Port found for PID %d: %d", pid, port))
-						return true, nil
-					}
-
-				// If no port found, wait a bit and try again
-					select {
-					case <-timeoutChan:
-						errMsg := fmt.Sprintf("Timeout reached, no port found for PID %d", pid)
-						return false, fmt.Errorf(errMsg)
-					case <-time.After(2 * time.Second):
-					}
-				}
+			// Timeout occurred while waiting for the service to be available
+			log.Println(fmt.Errorf("timeout: %s service did not become available within 30 seconds", service).Error())
+			return false
+		case <-ticker.C:
+			address := fmt.Sprintf(":%d", port)
+			log.Println(fmt.Sprintf("Address %s\n", address))
+			// Try to connect to the port
+			conn, err := net.DialTimeout("tcp", address, 1*time.Second)
+			if err == nil {
+				_ = conn.Close()
+				log.Println(fmt.Sprintf("%s service is ready", service))
+				return true
 			}
-
-			// If service not found, wait a bit and retry
-			log.Println(fmt.Sprintf("Service %s not found running, retrying to find service...", service))
-			time.Sleep(2 * time.Second)
 		}
 	}
 }
