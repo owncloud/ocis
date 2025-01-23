@@ -1,5 +1,6 @@
 # Table of Contents
 
+* [Changelog for unreleased](#changelog-for-unreleased-unreleased)
 * [Changelog for 7.1.0-rc.2](#changelog-for-710-rc2-2025-01-17)
 * [Changelog for 7.1.0-rc.1](#changelog-for-710-rc1-2025-01-10)
 * [Changelog for 7.0.0](#changelog-for-700-2024-12-17)
@@ -53,6 +54,32 @@
 * [Changelog for 1.2.0](#changelog-for-120-2021-02-17)
 * [Changelog for 1.1.0](#changelog-for-110-2021-01-22)
 * [Changelog for 1.0.0](#changelog-for-100-2020-12-17)
+
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes for unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis/compare/v7.1.0-rc.2...master
+
+## Summary
+
+* Enhancement - Update Web to v1.11.1: [#10918](https://github.com/owncloud/ocis/pull/10918)
+
+## Details
+
+* Enhancement - Update Web to v1.11.1: [#10918](https://github.com/owncloud/ocis/pull/10918)
+
+   - Bugfix [owncloud/web#12112](https://github.com/owncloud/web/pull/12112):
+   Optionally access preview app route query: #12112 - Bugfix
+   [owncloud/web#12118](https://github.com/owncloud/web/pull/12118): Change
+   federated share icon: #12118 - Bugfix
+   [owncloud/web#12118](https://github.com/owncloud/web/pull/12118): Improve
+   federated share icon contrast: #12118 - Bugfix
+   [owncloud/web#12119](https://github.com/owncloud/web/pull/12119): Show external
+   share indicator: #12119
+
+   https://github.com/owncloud/ocis/pull/10918
+   https://github.com/owncloud/web/releases/tag/v11.1.1
 
 # Changelog for [7.1.0-rc.2] (2025-01-17)
 
