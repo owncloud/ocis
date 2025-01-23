@@ -145,7 +145,7 @@ func waitUntilCompleteShutdown() (bool, string) {
 	timeout := 30 * time.Second
 	startTime := time.Now()
 
-	c := exec.Command("sh", "-c", "ps ax | grep '[o]cis server' | grep -v grep | awk '{print $1}'")
+	c := exec.Command("sh", "-c", "ps ax | grep 'ocis server' | grep -v grep | awk '{print $1}'")
 	output, err := c.CombinedOutput()
 	if err != nil {
 		log.Println(err.Error())
@@ -223,6 +223,7 @@ func StartService(service string, envMap []string) {
 	} else {
 		cmd.Env = append(os.Environ(), envMap...)
 	}
+	log.Println(fmt.Sprintf("%s", cmd.Env))
 
 	logs, err := cmd.StderrPipe()
 	if err != nil {
@@ -251,7 +252,6 @@ func StartService(service string, envMap []string) {
 
 	for listService, pid := range runningServices {
 		log.Println(fmt.Sprintf("%s service started with process id %v", listService, pid))
-		WaitUntilPortListens(listService)
 	}
 
 	// Read the logs when the 'ocis server' command is running
@@ -307,65 +307,25 @@ func StartService(service string, envMap []string) {
 
 // Stop oCIS service or a specific service by its unique identifier
 func StopService(service string) (bool, string) {
-	stopWg := new(sync.WaitGroup)
-	stopWg.Add(1)
+	pid, exists := runningServices[service]
+	if !exists {
+		return false, fmt.Sprintf("Service %s is not running", service)
+	}
 
-	resultChan := make(chan struct {
-		success bool
-		message string
-	}, 1)
+	process, err := os.FindProcess(pid)
+	if err != nil {
+		return false, fmt.Sprintf("Failed to find service %s process running with ID %d", service, pid)
+	}
 
-	go func() {
-		defer stopWg.Done()
+	pKillError := process.Signal(syscall.SIGINT)
+	if pKillError != nil {
+		return false, fmt.Sprintf("Failed to stop service with process id %d", pid)
+	}
 
-		pid, exists := runningServices[service]
-		if !exists {
-			resultChan <- struct {
-				success bool
-				message string
-			}{false, fmt.Sprintf("Service %s is not running", service)}
-			return
-		}
+	delete(runningServices, service)
+	log.Println(fmt.Sprintf("oCIS service %s has been stopped successfully", service))
 
-		process, err := os.FindProcess(pid)
-		if err != nil {
-			resultChan <- struct {
-				success bool
-				message string
-			}{false, fmt.Sprintf("Failed to find service %s process running with ID %d", service, pid)}
-			return
-		}
-
-		pKillError := process.Signal(syscall.SIGINT)
-		if pKillError != nil {
-			resultChan <- struct {
-				success bool
-				message string
-			}{false, fmt.Sprintf("Failed to stop service with process id %d", pid)}
-			return
-		}
-
-		delete(runningServices, service)
-		log.Println(fmt.Sprintf("oCIS service %s has been stopped successfully", service))
-
-		resultChan <- struct {
-			success bool
-			message string
-		}{true, fmt.Sprintf("Service %s stopped successfully", service)}
-	}()
-
-	// Wait for the goroutine to finish and retrieve the result.
-	stopWg.Wait()
-	result := <-resultChan
-	close(resultChan)
-
-	return result.success, result.message
-}
-
-var servicePortMap = map[string]int{
-	"ocis":        9250,
-	"audit":       9229,
-	"activitylog": 9197,
+	return true, fmt.Sprintf("Service %s stopped successfully", service)
 }
 
 // WaitUntilPortListens waits until the port for a given service is listening
@@ -374,11 +334,7 @@ func WaitUntilPortListens(service string) bool {
 	ticker := time.NewTicker(2 * time.Second)
 	defer ticker.Stop()
 
-	port, exists := servicePortMap[service]
-	if !exists {
-		log.Println(fmt.Sprintf("%s service port not mapped...", service))
-		return false
-	}
+	port := config.GetService(service)
 
 	for {
 		select {
@@ -387,15 +343,22 @@ func WaitUntilPortListens(service string) bool {
 			log.Println(fmt.Errorf("timeout: %s service did not become available within 30 seconds", service).Error())
 			return false
 		case <-ticker.C:
+			// Retry if the service is not in `runningServices`
+			if _, exists := runningServices[service]; !exists {
+				log.Println(fmt.Sprintf("Service %s not found in running services. Retrying...\n", service))
+				continue
+			}
+
+			// Check if the port is listening
 			address := fmt.Sprintf(":%d", port)
-			log.Println(fmt.Sprintf("Address %s\n", address))
 			// Try to connect to the port
 			conn, err := net.DialTimeout("tcp", address, 1*time.Second)
 			if err == nil {
 				_ = conn.Close()
-				log.Println(fmt.Sprintf("%s service is ready", service))
+				log.Println(fmt.Sprintf("%s service is ready to listen port %d", service, port))
 				return true
 			}
+			log.Println(fmt.Sprintf("%v port is not ready %v\n", conn, err))
 		}
 	}
 }

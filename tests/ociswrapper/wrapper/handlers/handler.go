@@ -7,8 +7,11 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strings"
+	"strconv"
 	"ociswrapper/common"
 	"ociswrapper/ocis"
+	"ociswrapper/ocis/config"
 )
 
 type BasicResponse struct {
@@ -225,15 +228,21 @@ func OcisServiceHandler(res http.ResponseWriter, req *http.Request) {
 
 			for key, value := range envBody {
 				serviceEnvMap = append(serviceEnvMap, fmt.Sprintf("%s=%v", key, value))
+				if strings.HasSuffix(key, "DEBUG_ADDR") {
+					address := strings.Split(value.(string), ":")
+					port, _ := strconv.Atoi(address[1])
+					config.SetService(serviceName, port)
+				}
 			}
 
-			log.Println(fmt.Sprintf("[ociswrapper] Starting oCIS service %s......", serviceName))
+			log.Println(fmt.Sprintf("Starting oCIS service %s......", serviceName))
 
 			common.Wg.Add(1)
 			go ocis.StartService(serviceName, serviceEnvMap)
 
 			success := ocis.WaitUntilPortListens(serviceName)
 			if success {
+				log.Println(fmt.Sprintf("Found Port for %s......", serviceName))
 				sendResponse(res, http.StatusOK, fmt.Sprintf("oCIS service %s started successfully", serviceName))
 			} else {
 				sendResponse(res, http.StatusInternalServerError, fmt.Sprintf("Failed to start oCIS service %s", serviceName))

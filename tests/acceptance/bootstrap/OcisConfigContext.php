@@ -192,16 +192,24 @@ class OcisConfigContext implements Context {
 	}
 
 	/**
-	 * @Given the administrator has started service :service separately
+	 * @Given the administrator has started service :service separately with the following configs:
 	 *
 	 * @param string $service
+	 * @param TableNode $table
 	 *
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function theAdministratorHasStartedServiceSeparately(string $service): void {
-		$response =  OcisConfigHelper::startService($service);
+	public function theAdministratorHasStartedServiceSeparatelyWithTheFollowingConfig(
+		string $service,
+		TableNode $table
+	): void {
+		$envs = [];
+		foreach ($table->getHash() as $row) {
+			$envs[$row['config']] = $row['value'];
+		}
 
+		$response =  OcisConfigHelper::startService($service, $envs);
 		Assert::assertEquals(
 			200,
 			$response->getStatusCode(),

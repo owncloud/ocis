@@ -123,16 +123,17 @@ class OcisConfigHelper {
 
 	/**
 	 * this method stops the running oCIS instance,
-	 * restarts it while excluding specific services,
+	 * restarts oCIS without specific services,
 	 * and then starts the excluded services separately.
 	 *
 	 * @param string $service
+	 * @param array $envs
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
-	public static function startService(string $service): ResponseInterface {
+	public static function startService(string $service, array $envs = []): ResponseInterface {
 		$url = self::getWrapperUrl() . "/services/" . $service;
-		return self::sendRequest($url, "POST");
+		return self::sendRequest($url, "POST", \json_encode($envs));
 	}
 }
