@@ -666,4 +666,75 @@ class SettingsContext implements Context {
 		);
 		$this->featureContext->setResponse($response);
 	}
+
+	/**
+	 * @param string $user
+	 * @param string $interval
+	 *
+	 * @return ResponseInterface
+	 *
+	 * @throws GuzzleException
+	 * @throws Exception
+	 */
+	public function sendRequestToSwitchEmailSendingInterval(string $user, string $interval): ResponseInterface {
+		$profileBundlesList = $this->getBundleByName($user, "Profile");
+		Assert::assertNotEmpty($profileBundlesList, "bundles list is empty");
+
+		$settingId = '';
+		foreach ($profileBundlesList["settings"] as $value) {
+			if ($value["name"] === "email-sending-interval-options") {
+				$settingId = $value["id"];
+				break;
+			}
+		}
+		Assert::assertNotEmpty($settingId, "settingId is empty");
+
+		$userId = $this->featureContext->getAttributeOfCreatedUser($user, 'id');
+		$body = json_encode(
+			[
+				"value" => [
+					"account_uuid" => "me",
+					"bundleId" => $profileBundlesList["id"],
+					"id" => $userId,
+					"listValue" => [
+						"values" => [
+							[
+								"stringValue" => $interval
+							]
+						]
+					],
+					"resource" => [
+						"type" => "TYPE_USER"
+					],
+					"settingId" => $settingId
+				]
+			],
+			JSON_THROW_ON_ERROR
+		);
+		return SettingsHelper::updateSettings(
+			$this->featureContext->getBaseUrl(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			$body,
+			$this->featureContext->getStepLineRef()
+		);
+	}
+
+	/**
+	 * @Given /^user "([^"]*)" has switched the email sending interval to "([^"]*)" using the settings API$/
+	 *
+	 * @param string $user
+	 * @param string $interval
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userHasSwitchedTheEmailSendingIntervalTo(string $user, string $interval): void {
+		$response = $this->sendRequestToSwitchEmailSendingInterval($user, $interval);
+		$this->featureContext->theHTTPStatusCodeShouldBe(
+			201,
+			"Expected response status code should be 201",
+			$response
+		);
+	}
 }
