@@ -48,8 +48,8 @@
     * [ ] QA: against linux (use auto tests)
   * [ ] QA: android (define version) https://github.com/owncloud/android/releases
   * [ ] QA: ios (define version)
-* [ ] QA: [Smoke test](https://github.com/owncloud/QA/blob/master/Server/Test_Plan_OCIS_Smoke_Web_Office_Test.md) on Web Office (Collabora, Onlyoffice, Microsoft office)
-* [ ] QA: Smoke test Hello extension
+* [ ] QA: [Web Office Smoke test](https://github.com/owncloud/QA/blob/master/Server/Test_Plan_OCIS_Smoke_Web_Office_Test.md) on Web Office (Collabora, Onlyoffice, Microsoft office)
+* [ ] QA: [Smoke test](https://github.com/owncloud/QA/blob/master/Server/Test_Plan_OCIS_Smoke_Test.md) on pre-production server
 * [ ] QA: [Smoke test](https://github.com/owncloud/QA/blob/master/Server/Test_Plan_OCIS_Smoke_Ldap_Test.md) ldap
 * [ ] QA: Collecting errors found
 
