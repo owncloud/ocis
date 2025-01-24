@@ -155,7 +155,7 @@ Feature: Notification Settings
     And the notifications should be empty
 
 
-  Scenario: disable in-app notification for Share Removed event
+  Scenario: disable mail and in-app notification for Share Removed event
     Given user "Alice" has sent the following resource share invitation:
       | resource        | lorem.txt |
       | space           | Personal  |
@@ -163,7 +163,7 @@ Feature: Notification Settings
       | shareType       | user      |
       | permissionsRole | Viewer    |
     When user "Brian" disables notification for the following events using the settings API:
-      | Share Removed | in-app |
+      | Share Removed | mail, in-app |
     Then the HTTP status code should be "201"
     And the JSON data of the response should match
       """
@@ -205,11 +205,19 @@ Feature: Notification Settings
                     "properties": {
                       "values":{
                         "type": "array",
-                        "maxItems": 1,
-                        "minItems": 1,
+                        "maxItems": 2,
+                        "minItems": 2,
                         "uniqueItems": true,
                         "items": {
                           "oneOf": [
+                            {
+                              "type": "object",
+                              "required": ["key","boolValue"],
+                              "properties": {
+                                "key":{ "const": "mail" },
+                                "boolValue":{ "const": false }
+                              }
+                            },
                             {
                               "type": "object",
                               "required": ["key","boolValue"],
@@ -231,6 +239,7 @@ Feature: Notification Settings
       }
       """
     And user "Alice" has removed the access of user "Brian" from resource "lorem.txt" of space "Personal"
+    And user "Brian" should have "1" emails
     When user "Brian" lists all notifications
     Then the HTTP status code should be "200"
     And user "Brian" should get a notification with subject "Resource shared" and message:
@@ -239,7 +248,7 @@ Feature: Notification Settings
     But user "Brian" should not have a notification related to resource "lorem.txt" with subject "Resource unshared"
 
 
-  Scenario: disable in-app notification for Share Removed event (Project space)
+  Scenario: disable mail and in-app notification for Share Removed event (Project space)
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "newSpace" with the default quota using the Graph API
@@ -251,7 +260,7 @@ Feature: Notification Settings
       | shareType       | user            |
       | permissionsRole | Viewer          |
     When user "Brian" disables notification for the following events using the settings API:
-      | Share Removed | in-app |
+      | Share Removed | mail, in-app |
     Then the HTTP status code should be "201"
     And the JSON data of the response should match
       """
@@ -293,11 +302,19 @@ Feature: Notification Settings
                     "properties": {
                       "values":{
                         "type": "array",
-                        "maxItems": 1,
-                        "minItems": 1,
+                        "maxItems": 2,
+                        "minItems": 2,
                         "uniqueItems": true,
                         "items": {
                           "oneOf": [
+                            {
+                              "type": "object",
+                              "required": ["key","boolValue"],
+                              "properties": {
+                                "key":{ "const": "mail" },
+                                "boolValue":{ "const": false }
+                              }
+                            },
                             {
                               "type": "object",
                               "required": ["key","boolValue"],
@@ -319,6 +336,7 @@ Feature: Notification Settings
       }
       """
     And user "Alice" has removed the access of user "Brian" from resource "insideSpace.txt" of space "newSpace"
+    And user "Brian" should have "1" emails
     When user "Brian" lists all notifications
     Then the HTTP status code should be "200"
     And user "Brian" should get a notification with subject "Resource shared" and message:
