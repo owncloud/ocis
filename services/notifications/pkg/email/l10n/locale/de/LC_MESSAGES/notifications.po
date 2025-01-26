@@ -14,7 +14,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2025-01-23 16:29+0000\n"
+"POT-Creation-Date: 2025-01-25 00:53+0000\n"
 "PO-Revision-Date: 2023-04-19 11:11+0000\n"
 "Last-Translator: Martin <github@diemattels.at>, 2025\n"
 "Language-Team: German (https://app.transifex.com/owncloud-org/teams/6149/de/)\n"
@@ -83,7 +83,7 @@ msgstr "Bericht"
 #. field (resolves directly)
 #: pkg/email/templates.go:98 pkg/email/templates.go:115
 msgid "ScienceMesh: {InitiatorName} wants to collaborate with you"
-msgstr "ScienceMesh: {InitiatorName} möchte mir Ihnen gerne zusammenarbeiten"
+msgstr "Vernetzung: {InitiatorName} möchte mit Ihnen gerne zusammenarbeiten"
 
 #. ShareExpired email template, Subject field (resolves directly)
 #: pkg/email/templates.go:30
@@ -158,6 +158,9 @@ msgid ""
 "\n"
 "Even though this share has been revoked you still might have access through other shares and/or space memberships."
 msgstr ""
+"{ShareSharer} hat den Ordner '{ShareFolder}' nicht mehr mit Dir geteilt.\n"
+"\n"
+"Auch wenn diese Freigabe widerrufen wurde, haben Sie möglicherweise noch Zugriff über andere Freigaben und/oder Space Mitgliedschaften."
 
 #. ShareCreated email template, Subject field (resolves directly)
 #: pkg/email/templates.go:17
@@ -168,6 +171,7 @@ msgstr "{ShareSharer} hat \"{ShareFolder}\" mit Ihnen geteilt"
 #: pkg/email/templates.go:43
 msgid "{ShareSharer} unshared '{ShareFolder}' with you"
 msgstr ""
+"{ShareSharer} hat den Ordner '{ShareFolder}' nicht mehr mit Dir geteilt"
 
 #. SharedSpace email template, resolves via {{ .MessageBody }}
 #: pkg/email/templates.go:61
