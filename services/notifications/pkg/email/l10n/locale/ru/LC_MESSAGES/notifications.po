@@ -14,7 +14,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2025-01-23 16:29+0000\n"
+"POT-Creation-Date: 2025-01-25 00:53+0000\n"
 "PO-Revision-Date: 2023-04-19 11:11+0000\n"
 "Last-Translator: Roman Perekhod, 2025\n"
 "Language-Team: Russian (https://app.transifex.com/owncloud-org/teams/6149/ru/)\n"
@@ -158,6 +158,9 @@ msgid ""
 "\n"
 "Even though this share has been revoked you still might have access through other shares and/or space memberships."
 msgstr ""
+"{ShareSharer} удалил ваш общий доступ к '{ShareFolder}'.\n"
+"\n"
+"Несмотря на то, что этот общий доступ удалён, у вас всё еще может быть доступ через другие общие ресурсы и/или членства в пространстве."
 
 #. ShareCreated email template, Subject field (resolves directly)
 #: pkg/email/templates.go:17
@@ -167,7 +170,7 @@ msgstr "{ShareSharer} поделился с вами '{ShareFolder}'"
 #. ShareRemoved email template, Subject field (resolves directly)
 #: pkg/email/templates.go:43
 msgid "{ShareSharer} unshared '{ShareFolder}' with you"
-msgstr ""
+msgstr "{ShareSharer} удалил ваш общий доступ к '{ShareFolder}'"
 
 #. SharedSpace email template, resolves via {{ .MessageBody }}
 #: pkg/email/templates.go:61

@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2025-01-23 16:29+0000\n"
+"POT-Creation-Date: 2025-01-24 00:55+0000\n"
 "PO-Revision-Date: 2023-04-19 11:11+0000\n"
 "Last-Translator: Besnik Bleta <besnik@programeshqip.org>, 2025\n"
 "Language-Team: Albanian (https://app.transifex.com/owncloud-org/teams/6149/sq/)\n"
@@ -72,7 +72,7 @@ msgstr "Anëtarësia në “{SpaceName}” skadoi më {ExpiredAt}"
 #. Grouped email template, Subject field (resolves directly)
 #: pkg/email/templates.go:129
 msgid "Report"
-msgstr ""
+msgstr "Raport "
 
 #. ScienceMeshInviteTokenGenerated email template, Subject field (resolves
 #. directly)
@@ -155,6 +155,9 @@ msgid ""
 "\n"
 "Even though this share has been revoked you still might have access through other shares and/or space memberships."
 msgstr ""
+"{ShareSharer} ka hequr ndarjen e '{ShareFolder}' me ju.\n"
+"\n"
+"Edhe pse kjo ndarje është shfuqizuar, prapë mund ta përdorni përmes ndarjesh dhe/ose anëtarësish në hapësira."
 
 #. ShareCreated email template, Subject field (resolves directly)
 #: pkg/email/templates.go:17
@@ -164,7 +167,7 @@ msgstr "{ShareSharer} ndau “{ShareFolder}” me ju"
 #. ShareRemoved email template, Subject field (resolves directly)
 #: pkg/email/templates.go:43
 msgid "{ShareSharer} unshared '{ShareFolder}' with you"
-msgstr ""
+msgstr "{ShareSharer} hoqi ndarjen e '{ShareFolder}' me ju"
 
 #. SharedSpace email template, resolves via {{ .MessageBody }}
 #: pkg/email/templates.go:61

@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2025-01-23 16:29+0000\n"
+"POT-Creation-Date: 2025-01-25 00:53+0000\n"
 "PO-Revision-Date: 2023-04-19 11:11+0000\n"
 "Last-Translator: Roman Perekhod, 2025\n"
 "Language-Team: Ukrainian (https://app.transifex.com/owncloud-org/teams/6149/uk/)\n"
@@ -107,7 +107,7 @@ msgid ""
 msgstr ""
 "Термін дії вашого спільного доступу до {ShareFolder} закінчився {ExpiredAt}\n"
 "\n"
-"Навіть якщо цей спільний доступ було скасовано, ви все ще можете мати доступ через інші спільні ресурси та/або членство в групі."
+"Навіть якщо цей спільний доступ було скасовано, ви все ще можете мати доступ через інші спільні ресурси та/або членство у просторі."
 
 #. ScienceMeshInviteTokenGeneratedWithoutShareLink email template, resolves
 #. via {{ .MessageBody }}
@@ -155,6 +155,9 @@ msgid ""
 "\n"
 "Even though this share has been revoked you still might have access through other shares and/or space memberships."
 msgstr ""
+"{ShareSharer} скасував спільний доступ до '{ShareFolder}' для вас.\n"
+"\n"
+"Навіть якщо цей спільний доступ було скасовано, ви все ще можете мати доступ через інші спільні ресурси та/або членство у просторі."
 
 #. ShareCreated email template, Subject field (resolves directly)
 #: pkg/email/templates.go:17
@@ -164,7 +167,7 @@ msgstr "{ShareSharer} поділився '{ShareFolder}' з вами"
 #. ShareRemoved email template, Subject field (resolves directly)
 #: pkg/email/templates.go:43
 msgid "{ShareSharer} unshared '{ShareFolder}' with you"
-msgstr ""
+msgstr "{ShareSharer} скасував спільний доступ до '{ShareFolder}' для вас"
 
 #. SharedSpace email template, resolves via {{ .MessageBody }}
 #: pkg/email/templates.go:61
