@@ -381,6 +381,40 @@ class NotificationContext implements Context {
 	}
 
 	/**
+	 * filter notification according to subject and space
+	 *
+	 * @param string $subject
+	 * @param string $space
+	 * @param ResponseInterface|null $response
+	 *
+	 * @return array
+	 */
+	public function filterNotificationsBySubjectAndSpace(
+		string $subject,
+		string $space,
+		?ResponseInterface $response = null
+	): array {
+		$filteredNotifications = [];
+		$response = $response ?? $this->featureContext->getResponse();
+		$responseObject = $this->featureContext->getJsonDecodedResponseBodyContent($response);
+		if (!isset($responseObject->ocs->data)) {
+			Assert::fail("Response doesn't contain notification: " . print_r($responseObject, true));
+		}
+
+		$notifications = $responseObject->ocs->data;
+		foreach ($notifications as $notification) {
+			if (isset($notification->subject) && $notification->subject === $subject
+				&& isset($notification->messageRichParameters->space->name)
+				&& $notification->messageRichParameters->space->name === $space
+			) {
+				$this->notificationIds[] = $notification->notification_id;
+				$filteredNotifications[] = $notification;
+			}
+		}
+		return $filteredNotifications;
+	}
+
+	/**
 	 * @Then /^user "([^"]*)" should (?:get|have) a notification with subject "([^"]*)" and message:$/
 	 *
 	 * @param string $user
@@ -466,21 +500,27 @@ class NotificationContext implements Context {
 	}
 
 	/**
-	 * @Then user :user should not have a notification related to resource :resource with subject :subject
+	 * @Then /^user "([^"]*)" should not have a notification related to (resource|space) "([^"]*)" with subject "([^"]*)"$/
 	 *
 	 * @param string $user
+	 * @param string $resourceOrSpace
 	 * @param string $resource
 	 * @param string $subject
 	 *
 	 * @return void
 	 */
-	public function userShouldNotHaveANotificationRelatedToResourceWithSubject(
+	public function userShouldNotHaveANotificationRelatedToResourceOrSpaceWithSubject(
 		string $user,
+		string $resourceOrSpace,
 		string $resource,
 		string $subject
 	): void {
 		$response = $this->listAllNotifications($user);
-		$filteredResponse = $this->filterNotificationsBySubjectAndResource($subject, $resource, $response);
+		if ($resourceOrSpace === "space") {
+			$filteredResponse = $this->filterNotificationsBySubjectAndSpace($subject, $resource, $response);
+		} else {
+			$filteredResponse = $this->filterNotificationsBySubjectAndResource($subject, $resource, $response);
+		}
 		Assert::assertCount(
 			0,
 			$filteredResponse,
