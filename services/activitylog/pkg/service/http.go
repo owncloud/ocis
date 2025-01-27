@@ -137,19 +137,23 @@ func (s *ActivitylogService) HandleGetItemActivities(w http.ResponseWriter, r *h
 				message = MessageResourceUpdated
 			}
 			ts = utils.TSToTime(ev.Timestamp)
-			vars, err = s.GetVars(ctx, WithResource(ev.FileRef, false, ""), WithUser(nil, ev.ExecutingUser, ev.ImpersonatingUser))
+			vars, err = s.GetVars(ctx, WithResource(ev.FileRef, false, "", &t, loc),
+				WithUser(nil, ev.ExecutingUser, ev.ImpersonatingUser))
 		case events.FileTouched:
 			message = MessageResourceCreated
 			ts = utils.TSToTime(ev.Timestamp)
-			vars, err = s.GetVars(ctx, WithResource(ev.Ref, false, ""), WithUser(ev.Executant, nil, ev.ImpersonatingUser))
+			vars, err = s.GetVars(ctx, WithResource(ev.Ref, false, "", &t, loc),
+				WithUser(ev.Executant, nil, ev.ImpersonatingUser))
 		case events.FileDownloaded:
 			message = MessageResourceDownloaded
 			ts = utils.TSToTime(ev.Timestamp)
-			vars, err = s.GetVars(ctx, WithResource(ev.Ref, false, ""), WithUser(ev.Executant, nil, ev.ImpersonatingUser), WithVar("token", "", ev.ImpersonatingUser.GetId().GetOpaqueId()))
+			vars, err = s.GetVars(ctx, WithResource(ev.Ref, false, "", &t, loc),
+				WithUser(ev.Executant, nil, ev.ImpersonatingUser), WithVar("token", "", ev.ImpersonatingUser.GetId().GetOpaqueId()))
 		case events.ContainerCreated:
 			message = MessageResourceCreated
 			ts = utils.TSToTime(ev.Timestamp)
-			vars, err = s.GetVars(ctx, WithResource(ev.Ref, false, ""), WithUser(ev.Executant, nil, ev.ImpersonatingUser))
+			vars, err = s.GetVars(ctx, WithResource(ev.Ref, false, "", &t, loc),
+				WithUser(ev.Executant, nil, ev.ImpersonatingUser))
 		case events.ItemTrashed:
 			message = MessageResourceTrashed
 			ts = utils.TSToTime(ev.Timestamp)
@@ -158,17 +162,19 @@ func (s *ActivitylogService) HandleGetItemActivities(w http.ResponseWriter, r *h
 			switch isRename(ev.OldReference, ev.Ref) {
 			case true:
 				message = MessageResourceRenamed
-				vars, err = s.GetVars(ctx, WithResource(ev.Ref, false, ""), WithOldResource(ev.OldReference), WithUser(ev.Executant, nil, ev.ImpersonatingUser))
+				vars, err = s.GetVars(ctx, WithResource(ev.Ref, false, "", &t, loc),
+					WithOldResource(ev.OldReference), WithUser(ev.Executant, nil, ev.ImpersonatingUser))
 			case false:
 				message = MessageResourceMoved
-				vars, err = s.GetVars(ctx, WithResource(ev.Ref, false, ""), WithUser(ev.Executant, nil, ev.ImpersonatingUser))
+				vars, err = s.GetVars(ctx, WithResource(ev.Ref, false, "", &t, loc),
+					WithUser(ev.Executant, nil, ev.ImpersonatingUser))
 			}
 			ts = utils.TSToTime(ev.Timestamp)
 		case events.ShareCreated:
 			message = MessageShareCreated
 			ts = utils.TSToTime(ev.CTime)
 			vars, err = s.GetVars(ctx,
-				WithResource(toRef(ev.ItemID), false, ev.ResourceName),
+				WithResource(toRef(ev.ItemID), false, ev.ResourceName, &t, loc),
 				WithUser(ev.Executant, nil, nil),
 				WithSharee(ev.GranteeUserID, ev.GranteeGroupID))
 		case events.ShareUpdated:
@@ -178,21 +184,21 @@ func (s *ActivitylogService) HandleGetItemActivities(w http.ResponseWriter, r *h
 			message = MessageShareUpdated
 			ts = utils.TSToTime(ev.MTime)
 			vars, err = s.GetVars(ctx,
-				WithResource(toRef(ev.ItemID), false, ev.ResourceName),
+				WithResource(toRef(ev.ItemID), false, ev.ResourceName, &t, loc),
 				WithUser(ev.Executant, nil, nil),
 				WithTranslation(&t, loc, "field", ev.UpdateMask))
 		case events.ShareRemoved:
 			message = MessageShareDeleted
 			ts = ev.Timestamp
 			vars, err = s.GetVars(ctx,
-				WithResource(toRef(ev.ItemID), false, ev.ResourceName),
+				WithResource(toRef(ev.ItemID), false, ev.ResourceName, &t, loc),
 				WithUser(ev.Executant, nil, nil),
 				WithSharee(ev.GranteeUserID, ev.GranteeGroupID))
 		case events.LinkCreated:
 			message = MessageLinkCreated
 			ts = utils.TSToTime(ev.CTime)
 			vars, err = s.GetVars(ctx,
-				WithResource(toRef(ev.ItemID), false, ev.ResourceName),
+				WithResource(toRef(ev.ItemID), false, ev.ResourceName, &t, loc),
 				WithUser(ev.Executant, nil, nil))
 		case events.LinkUpdated:
 			if ev.Sharer != nil && ev.ItemID != nil && ev.Sharer.GetOpaqueId() == ev.ItemID.GetSpaceId() {
@@ -208,7 +214,7 @@ func (s *ActivitylogService) HandleGetItemActivities(w http.ResponseWriter, r *h
 		case events.LinkRemoved:
 			message = MessageLinkDeleted
 			ts = utils.TSToTime(ev.Timestamp)
-			vars, err = s.GetVars(ctx, WithResource(toRef(ev.ItemID), false, ""), WithUser(ev.Executant, nil, nil))
+			vars, err = s.GetVars(ctx, WithResource(toRef(ev.ItemID), false, "", &t, loc), WithUser(ev.Executant, nil, nil))
 		case events.SpaceShared:
 			message = MessageSpaceShared
 			ts = ev.Timestamp
