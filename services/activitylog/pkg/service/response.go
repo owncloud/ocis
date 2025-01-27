@@ -42,6 +42,7 @@ var (
 	StrExpirationDate = l10n.Template("expiration date")
 	StrDisplayName    = l10n.Template("display name")
 	StrDescription    = l10n.Template("description")
+	StrFallbackFolder = l10n.Template("shared-with-me")
 )
 
 // GetActivitiesResponse is the response on GET activities requests
@@ -65,7 +66,7 @@ type Actor struct {
 type ActivityOption func(context.Context, gateway.GatewayAPIClient, map[string]interface{}) error
 
 // WithResource sets the resource variable for an activity
-func WithResource(ref *provider.Reference, addSpace bool, explicitResourceName string) ActivityOption {
+func WithResource(ref *provider.Reference, addSpace bool, explicitResourceName string, t *l10n.Translator, locale string) ActivityOption {
 	return func(ctx context.Context, gwc gateway.GatewayAPIClient, vars map[string]interface{}) error {
 		info, err := utils.GetResource(ctx, ref, gwc)
 		if err != nil {
@@ -99,6 +100,9 @@ func WithResource(ref *provider.Reference, addSpace bool, explicitResourceName s
 
 		parent, err := utils.GetResourceByID(ctx, info.GetParentId(), gwc)
 		if err != nil {
+			vars["folder"] = Resource{
+				Name: t.Translate(StrFallbackFolder, locale),
+			}
 			return err
 		}
 		vars["folder"] = Resource{
