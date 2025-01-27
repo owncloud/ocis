@@ -66,6 +66,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix the ocm gateway connection pool: [#10916](https://github.com/owncloud/ocis/pull/10916)
 * Enhancement - Add email notification for share removed event: [#10915](https://github.com/owncloud/ocis/pull/10915)
 * Enhancement - Update Web to v1.11.1: [#10918](https://github.com/owncloud/ocis/pull/10918)
+* Enhancement - Update Web to v1.11.2: [#10930](https://github.com/owncloud/ocis/pull/10930)
 
 ## Details
 
@@ -96,6 +97,14 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/10918
    https://github.com/owncloud/web/releases/tag/v11.1.1
+
+* Enhancement - Update Web to v1.11.2: [#10930](https://github.com/owncloud/ocis/pull/10930)
+
+   - Bugfix [owncloud/ocis#10891](https://github.com/owncloud/ocis/issues/10891):
+   Rename ScienceMesh: #10891
+
+   https://github.com/owncloud/ocis/pull/10930
+   https://github.com/owncloud/web/releases/tag/v11.1.2
 
 # Changelog for [7.1.0-rc.2] (2025-01-17)
 
