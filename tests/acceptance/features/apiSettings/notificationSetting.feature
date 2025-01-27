@@ -503,6 +503,7 @@ Feature: Notification Settings
       }
       """
     And user "Brian" has uploaded a file "filesForUpload/filesWithVirus/eicar.com" to "virusFile.txt" in space "newSpace"
+    And user "Brian" should have "1" emails
     When user "Brian" lists all notifications
     Then the HTTP status code should be "200"
     And user "Brian" should get a notification with subject "Space shared" and message:
@@ -600,6 +601,7 @@ Feature: Notification Settings
       }
       """
     And user "Alice" has disabled a space "new-space"
+    And user "Brian" should have "1" emails
     When user "Brian" lists all notifications
     Then the HTTP status code should be "200"
     And there should be "1" notifications
@@ -607,3 +609,63 @@ Feature: Notification Settings
       | message                                   |
       | Alice Hansen added you to Space new-space |
     But user "Brian" should not have a notification related to space "new-space" with subject "Space disabled"
+
+
+  Scenario: set email sending interval to never
+    When user "Brian" enables notification for the following events using the settings API:
+      | Email sending interval | never |
+    Then the HTTP status code should be "201"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "object",
+            "required": ["identifier","value"],
+            "properties": {
+              "identifier":{
+                "type": "object",
+                "required": ["extension","bundle","setting"],
+                "properties": {
+                  "extension":{ "const": "ocis-accounts" },
+                  "bundle":{ "const": "profile" },
+                  "setting":{ "const": "email-sending-interval-options" }
+                }
+              },
+              "value":{
+                "type": "object",
+                "required": ["id","bundleId","settingId","accountUuid","resource","stringValue"],
+                "properties":{
+                  "id":{ "pattern":"%uuidv4_pattern%" },
+                  "bundleId":{ "pattern":"%uuidv4_pattern%" },
+                  "settingId":{ "pattern":"%uuidv4_pattern%" },
+                  "accountUuid":{ "pattern":"%uuidv4_pattern%" },
+                  "resource":{
+                    "type": "object",
+                    "required":["type"],
+                    "properties": {
+                      "type":{ "const": "TYPE_USER" }
+                    }
+                  },
+                  "stringValue":{ "const":"never" }
+                }
+              }
+            }
+          }
+        }
+      }
+      """
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | lorem.txt |
+      | space           | Personal  |
+      | sharee          | Brian     |
+      | shareType       | user      |
+      | permissionsRole | Viewer    |
+    And user "Brian" should have "0" emails
+    When user "Brian" lists all notifications
+    Then the HTTP status code should be "200"
+    And user "Brian" should get a notification with subject "Resource shared" and message:
+      | message                                |
+      | Alice Hansen shared lorem.txt with you |
