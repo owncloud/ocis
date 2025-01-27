@@ -64,6 +64,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Fix the ocm gateway connection pool: [#10916](https://github.com/owncloud/ocis/pull/10916)
+* Bugfix - Add fallback for folder names: [#10932](https://github.com/owncloud/ocis/pull/10932)
 * Enhancement - Add email notification for share removed event: [#10915](https://github.com/owncloud/ocis/pull/10915)
 * Enhancement - Update Web to v1.11.1: [#10918](https://github.com/owncloud/ocis/pull/10918)
 * Enhancement - Update Web to v1.11.2: [#10930](https://github.com/owncloud/ocis/pull/10930)
@@ -78,6 +79,14 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/issues/10846
    https://github.com/owncloud/ocis/issues/10878
    https://github.com/owncloud/ocis/pull/10916
+
+* Bugfix - Add fallback for folder names: [#10932](https://github.com/owncloud/ocis/pull/10932)
+
+   Add translated `shared-with-me` fallback for folder names in the activitylog to
+   avoid `{folder}` in the output.
+
+   https://github.com/owncloud/ocis/issues/10906
+   https://github.com/owncloud/ocis/pull/10932
 
 * Enhancement - Add email notification for share removed event: [#10915](https://github.com/owncloud/ocis/pull/10915)
 
