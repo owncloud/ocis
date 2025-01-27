@@ -39,6 +39,7 @@ import (
 	ocsconv "github.com/cs3org/reva/v2/pkg/conversions"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
+	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	sdk "github.com/cs3org/reva/v2/pkg/sdk/common"
@@ -905,7 +906,10 @@ func (fs *Decomposedfs) StorageSpaceFromNode(ctx context.Context, n *node.Node, 
 			// This way we don't have to have a cron job checking the grants in regular intervals.
 			// The tradeof obviously is that this code is here.
 			if isGrantExpired(g) {
-				if err := n.DeleteGrant(ctx, g, true); err != nil {
+				var errDeleteGrant, errIndexRemove error
+
+				errDeleteGrant = n.DeleteGrant(ctx, g, true)
+				if errDeleteGrant != nil {
 					sublog.Error().Err(err).Str("grantee", id).
 						Msg("failed to delete expired space grant")
 				}
@@ -914,16 +918,39 @@ func (fs *Decomposedfs) StorageSpaceFromNode(ctx context.Context, n *node.Node, 
 					switch {
 					case g.Grantee.Type == provider.GranteeType_GRANTEE_TYPE_USER:
 						// remove from user index
-						if err := fs.userSpaceIndex.Remove(g.Grantee.GetUserId().GetOpaqueId(), n.SpaceID); err != nil {
+						errIndexRemove = fs.userSpaceIndex.Remove(g.Grantee.GetUserId().GetOpaqueId(), n.SpaceID)
+						if errIndexRemove != nil {
 							sublog.Error().Err(err).Str("grantee", id).
 								Msg("failed to delete expired user space index")
 						}
 					case g.Grantee.Type == provider.GranteeType_GRANTEE_TYPE_GROUP:
 						// remove from group index
-						if err := fs.groupSpaceIndex.Remove(g.Grantee.GetGroupId().GetOpaqueId(), n.SpaceID); err != nil {
+						errIndexRemove = fs.groupSpaceIndex.Remove(g.Grantee.GetGroupId().GetOpaqueId(), n.SpaceID)
+						if errIndexRemove != nil {
 							sublog.Error().Err(err).Str("grantee", id).
 								Msg("failed to delete expired group space index")
 						}
+					}
+				}
+
+				// publish SpaceMembershipExpired event
+				if errDeleteGrant == nil && errIndexRemove == nil {
+					ev := events.SpaceMembershipExpired{
+						SpaceOwner: n.SpaceOwnerOrManager(ctx),
+						SpaceID:    &provider.StorageSpaceId{OpaqueId: n.SpaceID},
+						SpaceName:  sname,
+						ExpiredAt:  time.Unix(int64(g.Expiration.Seconds), int64(g.Expiration.Nanos)),
+						Timestamp:  utils.TSNow(),
+					}
+					switch {
+					case g.Grantee.Type == provider.GranteeType_GRANTEE_TYPE_USER:
+						ev.GranteeUserID = g.Grantee.GetUserId()
+					case g.Grantee.Type == provider.GranteeType_GRANTEE_TYPE_GROUP:
+						ev.GranteeGroupID = g.Grantee.GetGroupId()
+					}
+					err = events.Publish(ctx, fs.stream, ev)
+					if err != nil {
+						sublog.Error().Err(err).Msg("error publishing SpaceMembershipExpired event")
 					}
 				}
 
