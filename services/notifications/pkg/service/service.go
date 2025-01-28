@@ -117,6 +117,8 @@ func (s eventsNotifier) Run() error {
 					s.handleShareCreated(e, evt.ID)
 				case events.ShareExpired:
 					s.handleShareExpired(e, evt.ID)
+				case events.ShareRemoved:
+					s.handleShareRemoved(e, evt.ID)
 				case events.ScienceMeshInviteTokenGenerated:
 					s.handleScienceMeshInviteTokenGenerated(e)
 				case events.SendEmailsEvent:

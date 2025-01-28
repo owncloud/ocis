@@ -166,6 +166,30 @@ https://owncloud.com
 			},
 		}),
 
+		Entry("Share Removed", testChannel{
+			expectedReceipients: []string{sharee.GetMail()},
+			expectedSubject:     "Dr. S. Harer unshared 'secrets of the board' with you",
+			expectedTextBody: `Hello Eric Expireling,
+
+Dr. S. Harer has unshared 'secrets of the board' with you.
+
+Even though this share has been revoked you still might have access through other shares and/or space memberships.
+
+
+---
+ownCloud - Store. Share. Work.
+https://owncloud.com
+`,
+			expectedSender: sharer.GetDisplayName(),
+			done:           make(chan struct{}),
+		}, events.Event{
+			Event: events.ShareRemoved{
+				Executant:     sharer.GetId(),
+				GranteeUserID: sharee.GetId(),
+				ItemID:        resourceid,
+			},
+		}),
+
 		Entry("Added to Space", testChannel{
 			expectedReceipients: []string{sharee.GetMail()},
 			expectedSubject:     "Dr. S. Harer invited you to join secret space",
@@ -643,6 +667,17 @@ var _ = Describe("Notifications grouped store", func() {
 		},
 			"daily"),
 
+		Entry("Share Removed daily", testChannelGroupedStore{
+			done: make(chan struct{}),
+		}, events.Event{
+			Event: events.ShareRemoved{
+				Executant:      executant.GetId(),
+				GranteeGroupID: &group.GroupId{},
+				ItemID:         resourceid,
+			},
+		},
+			"daily"),
+
 		Entry("Added to Space daily", testChannelGroupedStore{
 			done: make(chan struct{}),
 		}, events.Event{
@@ -698,6 +733,17 @@ var _ = Describe("Notifications grouped store", func() {
 				ShareOwner:     executant.GetId(),
 				GranteeGroupID: &group.GroupId{},
 				ExpiredAt:      time.Date(2023, 4, 17, 16, 42, 0, 0, time.UTC),
+				ItemID:         resourceid,
+			},
+		},
+			"weekly"),
+
+		Entry("Share Removed weekly", testChannelGroupedStore{
+			done: make(chan struct{}),
+		}, events.Event{
+			Event: events.ShareRemoved{
+				Executant:      executant.GetId(),
+				GranteeGroupID: &group.GroupId{},
 				ItemID:         resourceid,
 			},
 		},
@@ -840,6 +886,7 @@ var _ = Describe("Notifications grouped send", func() {
 			evs := []events.Unmarshaller{
 				events.ShareCreated{},
 				events.ShareExpired{},
+				events.ShareRemoved{},
 				events.SpaceShared{},
 				events.SpaceUnshared{},
 				events.SpaceMembershipExpired{},
@@ -886,6 +933,7 @@ var _ = Describe("Notifications grouped send", func() {
 				ItemID:        resourceid,
 			},
 		}}, "daily"),
+
 		Entry("Share Expired daily", testChannel{
 			expectedReceipients: []string{receiver.GetMail()},
 			expectedSender:      sender,
@@ -904,6 +952,25 @@ Even though this share has been revoked you still might have access through othe
 				ItemID:         resourceid,
 			},
 		}}, "daily"),
+
+		Entry("Share Removed daily", testChannel{
+			expectedReceipients: []string{receiver.GetMail()},
+			expectedSender:      sender,
+			expectedSubject:     subject,
+			expectedTextBody: buildExpectedTextBodyGrouped(receiver.DisplayName, []string{`executant has unshared 'secrets of the board' with you.
+
+Even though this share has been revoked you still might have access through other shares and/or space memberships.`}),
+			expectedHTMLBody: buildExpectedHTMLBodyGrouped(receiver.DisplayName, []string{`executant has unshared 'secrets of the board' with you.<br><br>Even though this share has been revoked you still might have access through other shares and/or space memberships.`}),
+			done:             make(chan struct{}),
+		}, []events.Event{{
+			Type: reflect.TypeOf(events.ShareRemoved{}).String(),
+			Event: events.ShareRemoved{
+				Executant:      executant.GetId(),
+				GranteeGroupID: &group.GroupId{},
+				ItemID:         resourceid,
+			},
+		}}, "daily"),
+
 		Entry("Added to Space daily", testChannel{
 			expectedReceipients: []string{receiver.GetMail()},
 			expectedSender:      sender,
@@ -920,6 +987,7 @@ Even though this share has been revoked you still might have access through othe
 				ID:             &provider.StorageSpaceId{OpaqueId: "spaceid"},
 			},
 		}}, "daily"),
+
 		Entry("Removed from Space daily", testChannel{
 			expectedReceipients: []string{receiver.GetMail()},
 			expectedSender:      sender,
@@ -937,6 +1005,7 @@ You might still have access through your other groups or direct membership.`}),
 				ID:             &provider.StorageSpaceId{OpaqueId: "spaceid"},
 			},
 		}}, "daily"),
+
 		Entry("Space Expired daily", testChannel{
 			expectedReceipients: []string{receiver.GetMail()},
 			expectedSender:      sender,
@@ -956,6 +1025,7 @@ Even though this membership has expired you still might have access through othe
 				ExpiredAt:      time.Date(2023, 4, 17, 16, 42, 0, 0, time.UTC),
 			},
 		}}, "daily"),
+
 		Entry("Share Created and Space Expired grouped daily", testChannel{
 			expectedReceipients: []string{receiver.GetMail()},
 			expectedSender:      sender,
@@ -1007,6 +1077,7 @@ Even though this membership has expired you still might have access through othe
 				ItemID:        resourceid,
 			},
 		}}, "weekly"),
+
 		Entry("Share Expired weekly", testChannel{
 			expectedReceipients: []string{receiver.GetMail()},
 			expectedSender:      sender,
@@ -1025,6 +1096,25 @@ Even though this share has been revoked you still might have access through othe
 				ItemID:         resourceid,
 			},
 		}}, "weekly"),
+
+		Entry("Share Removed weekly", testChannel{
+			expectedReceipients: []string{receiver.GetMail()},
+			expectedSender:      sender,
+			expectedSubject:     subject,
+			expectedTextBody: buildExpectedTextBodyGrouped(receiver.DisplayName, []string{`executant has unshared 'secrets of the board' with you.
+
+Even though this share has been revoked you still might have access through other shares and/or space memberships.`}),
+			expectedHTMLBody: buildExpectedHTMLBodyGrouped(receiver.DisplayName, []string{`executant has unshared 'secrets of the board' with you.<br><br>Even though this share has been revoked you still might have access through other shares and/or space memberships.`}),
+			done:             make(chan struct{}),
+		}, []events.Event{{
+			Type: reflect.TypeOf(events.ShareRemoved{}).String(),
+			Event: events.ShareRemoved{
+				Executant:      executant.GetId(),
+				GranteeGroupID: &group.GroupId{},
+				ItemID:         resourceid,
+			},
+		}}, "weekly"),
+
 		Entry("Added to Space weekly", testChannel{
 			expectedReceipients: []string{receiver.GetMail()},
 			expectedSender:      sender,
@@ -1041,6 +1131,7 @@ Even though this share has been revoked you still might have access through othe
 				ID:             &provider.StorageSpaceId{OpaqueId: "spaceid"},
 			},
 		}}, "weekly"),
+
 		Entry("Removed from Space weekly", testChannel{
 			expectedReceipients: []string{receiver.GetMail()},
 			expectedSender:      sender,
@@ -1058,6 +1149,7 @@ You might still have access through your other groups or direct membership.`}),
 				ID:             &provider.StorageSpaceId{OpaqueId: "spaceid"},
 			},
 		}}, "weekly"),
+
 		Entry("Space Expired weekly", testChannel{
 			expectedReceipients: []string{receiver.GetMail()},
 			expectedSender:      sender,
@@ -1077,6 +1169,7 @@ Even though this membership has expired you still might have access through othe
 				ExpiredAt:      time.Date(2023, 4, 17, 16, 42, 0, 0, time.UTC),
 			},
 		}}, "weekly"),
+
 		Entry("Share Created and Space Expired grouped weekly", testChannel{
 			expectedReceipients: []string{receiver.GetMail()},
 			expectedSender:      sender,
