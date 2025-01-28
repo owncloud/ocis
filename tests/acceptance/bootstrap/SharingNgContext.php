@@ -385,6 +385,7 @@ class SharingNgContext implements Context {
 				$shareeIds[] = "";
 				continue;
 			}
+
 			$shareeId = "";
 			if ($shareType === "user") {
 				$shareeId = $this->featureContext->getAttributeOfCreatedUser($sharee, 'id');
@@ -2158,6 +2159,52 @@ class SharingNgContext implements Context {
 		$query = implode('&', $table->getColumn(0));
 		$this->featureContext->setResponse(
 			$this->getPermissionsList($user, $fileOrFolder, $space, $resource, $query)
+		);
+	}
+
+	/**
+	 * @When user :user has expired the last created share:
+	 *
+	 * @param string $user
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 */
+	public function userExpiresTheLastCreatedShare(string $user, TableNode $table): void {
+		$permissionID = $this->featureContext->shareNgGetLastCreatedUserGroupShareID();
+		$bodyRows = $table->getRowsHash();
+		if ($bodyRows['space'] === 'Personal' || $bodyRows['space'] === 'Shares') {
+			$space = $this->spacesContext->getSpaceByName($user, $bodyRows['space']);
+		} else {
+			$space = $this->spacesContext->getCreatedSpace($bodyRows['space']);
+		}
+		$spaceId = $space["id"];
+		// for updating role of project space shared, we do not need to provide resource
+		$resource = $bodyRows['resource'] ?? '';
+		if ($resource === '' && !\in_array($bodyRows['space'], ['Personal', 'Shares'])) {
+			$itemId = $space['fileId'];
+		} else {
+			$itemId = $this->spacesContext->getResourceId($user, $bodyRows['space'], $resource);
+		}
+		$body = [];
+		$dateTime = new DateTime("now", new DateTimeZone("UTC"));
+		$body['expirationDateTime'] = $dateTime->modify('-1 day')->format('Y-m-d\TH:i:s\Z');
+
+		$response = GraphHelper::updateShare(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			$spaceId,
+			$itemId,
+			\json_encode($body),
+			$permissionID
+		);
+
+		$this->featureContext->theHttpStatusCodeShouldBe(
+			200,
+			"Failed to update shared permissions for user '$user'.",
+			$response
 		);
 	}
 }

@@ -607,3 +607,220 @@ Feature: Notification Settings
       | message                                   |
       | Alice Hansen added you to Space new-space |
     But user "Brian" should not have a notification related to space "new-space" with subject "Space disabled"
+
+
+  Scenario: check share expired notification for Personal space resource
+    Given user "Alice" has uploaded file with content "hello world" to "testfile.txt"
+    And user "Alice" has sent the following resource share invitation:
+      | resource           | testfile.txt         |
+      | space              | Personal             |
+      | sharee             | Brian                |
+      | shareType          | user                 |
+      | permissionsRole    | Viewer               |
+      | expirationDateTime | 2025-07-15T14:00:00Z |
+    And user "Alice" has expired the last created share:
+      | space              | Personal             |
+      | resource           | testfile.txt         |
+    When user "Brian" lists all notifications
+    Then the HTTP status code should be "200"
+    And the JSON response should contain a notification message with the subject "Membership expired" and the message-details should match
+      """
+      {
+      "type": "object",
+        "required": [
+          "app",
+          "datetime",
+          "message",
+          "messageRich",
+          "messageRichParameters",
+          "notification_id",
+          "object_id",
+          "object_type",
+          "subject",
+          "subjectRich",
+          "user"
+        ],
+        "properties": {
+          "app": {
+            "const": "userlog"
+          },
+          "message": {
+            "const": "Access to Space Alice Hansen lost"
+          },
+          "messageRich": {
+            "const": "Access to Space {space} lost"
+          },
+          "messageRichParameters": {
+            "type": "object",
+            "required": [
+              "space",
+              "user"
+            ],
+            "properties": {
+              "space": {
+                "type": "object",
+                "required": [
+                  "id",
+                  "name"
+                ],
+                "properties": {
+                  "id": {
+                    "pattern": "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}\\$[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}![a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"
+                  },
+                  "name": {
+                    "const": "Alice Hansen"
+                  }
+                }
+              },
+              "user": {
+                "type": "object",
+                "required": [
+                  "displayname",
+                  "id",
+                  "name"
+                ],
+                "properties": {
+                  "displayname": {
+                    "const": "Alice Hansen"
+                  },
+                  "id": {
+                    "pattern": "^%user_id_pattern%$"
+                  },
+                  "name": {
+                    "const": "Alice"
+                  }
+                }
+              }
+            }
+          },
+          "notification_id": {
+            "pattern": "^%user_id_pattern%$"
+          },
+          "object_id": {
+            "pattern": "^%user_id_pattern%$"
+          },
+          "object_type": {
+            "const": "storagespace"
+          },
+          "subject": {
+            "const": "Membership expired"
+          },
+          "subjectRich": {
+            "const": "Membership expired"
+          },
+          "user": {
+            "const": "Alice"
+          }
+        }
+      }
+      """
+
+
+  Scenario: check share expired notification for Personal space resource
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
+    And user "Alice" has uploaded a file inside space "NewSpace" with content "share space items" to "testfile.txt"
+    And user "Alice" has sent the following resource share invitation:
+      | resource           | testfile.txt         |
+      | space              | NewSpace             |
+      | sharee             | Brian                |
+      | shareType          | user                 |
+      | permissionsRole    | Viewer               |
+      | expirationDateTime | 2025-07-15T14:00:00Z |
+    And user "Alice" has expired the last created share:
+      | space              | NewSpace     |
+      | resource           | testfile.txt |
+    When user "Brian" lists all notifications
+    Then the HTTP status code should be "200"
+    And the JSON response should contain a notification message with the subject "Membership expired" and the message-details should match
+      """
+      {
+      "type": "object",
+        "required": [
+          "app",
+          "datetime",
+          "message",
+          "messageRich",
+          "messageRichParameters",
+          "notification_id",
+          "object_id",
+          "object_type",
+          "subject",
+          "subjectRich",
+          "user"
+        ],
+        "properties": {
+          "app": {
+            "const": "userlog"
+          },
+          "message": {
+            "const": "Access to Space NewSpace lost"
+          },
+          "messageRich": {
+            "const": "Access to Space {space} lost"
+          },
+          "messageRichParameters": {
+            "type": "object",
+            "required": [
+              "space",
+              "user"
+            ],
+            "properties": {
+              "space": {
+                "type": "object",
+                "required": [
+                  "id",
+                  "name"
+                ],
+                "properties": {
+                  "id": {
+                    "pattern": "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}\\$[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}![a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"
+                  },
+                  "name": {
+                    "const": "NewSpace"
+                  }
+                }
+              },
+              "user": {
+                "type": "object",
+                "required": [
+                  "displayname",
+                  "id",
+                  "name"
+                ],
+                "properties": {
+                  "displayname": {
+                    "const": "Alice Hansen"
+                  },
+                  "id": {
+                    "pattern": "^%user_id_pattern%$"
+                  },
+                  "name": {
+                    "const": "Alice"
+                  }
+                }
+              }
+            }
+          },
+          "notification_id": {
+            "pattern": "^%user_id_pattern%$"
+          },
+          "object_id": {
+            "pattern": "^%user_id_pattern%$"
+          },
+          "object_type": {
+            "const": "storagespace"
+          },
+          "subject": {
+            "const": "Membership expired"
+          },
+          "subjectRich": {
+            "const": "Membership expired"
+          },
+          "user": {
+            "const": "Alice"
+          }
+        }
+      }
+      """
