@@ -18,7 +18,7 @@ require (
 	github.com/coreos/go-oidc/v3 v3.11.0
 	github.com/cs3org/go-cs3apis v0.0.0-20241105092511-3ad35d174fc1
 	github.com/cs3org/reva/v2 v2.27.3
-	github.com/davidbyttow/govips/v2 v2.15.0
+	github.com/davidbyttow/govips/v2 v2.16.0
 	github.com/dhowden/tag v0.0.0-20240417053706-3d75831295e8
 	github.com/dutchcoders/go-clamd v0.0.0-20170520113014-b970184f4d9e
 	github.com/egirna/icap-client v0.1.1
