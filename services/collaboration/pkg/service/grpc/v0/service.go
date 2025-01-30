@@ -178,7 +178,7 @@ func (s *Service) OpenInApp(
 // string will be returned.
 func (s *Service) getAppUrlFor(action, fileExt string) string {
 	if actionURL, ok := s.appURLs[action]; ok {
-		if actionExtensionURL, ok := actionURL[fileExt]; ok {
+		if actionExtensionURL, ok := actionURL[strings.ToLower(fileExt)]; ok {
 			return actionExtensionURL
 		}
 	}
