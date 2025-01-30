@@ -64,9 +64,18 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Update govips to 2.16.0: [#10378](https://github.com/owncloud/ocis/issues/10378)
 * Enhancement - Implement debug docker for arm64 platform: [#10940](https://github.com/owncloud/ocis/pull/10940)
 
 ## Details
+
+* Bugfix - Update govips to 2.16.0: [#10378](https://github.com/owncloud/ocis/issues/10378)
+
+   The update to govips 2.16.0 removes temporary access to /tmp that was introduced
+   by govips.
+
+   https://github.com/owncloud/ocis/issues/10378
+   https://github.com/owncloud/ocis/pull/10943
 
 * Enhancement - Implement debug docker for arm64 platform: [#10940](https://github.com/owncloud/ocis/pull/10940)
 
