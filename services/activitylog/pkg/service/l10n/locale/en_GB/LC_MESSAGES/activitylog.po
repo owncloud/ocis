@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2025-01-18 00:26+0000\n"
+"POT-Creation-Date: 2025-01-28 00:54+0000\n"
 "PO-Revision-Date: 2024-08-20 10:13+0000\n"
 "Last-Translator: Andi Chandler <andi@gowling.com>, 2024\n"
 "Language-Team: English (United Kingdom) (https://app.transifex.com/owncloud-org/teams/6149/en_GB/)\n"
@@ -40,6 +40,10 @@ msgstr "password"
 #: pkg/service/response.go:40
 msgid "permission"
 msgstr "permission"
+
+#: pkg/service/response.go:45
+msgid "shared-with-me"
+msgstr ""
 
 #: pkg/service/response.go:39
 msgid "some field"
