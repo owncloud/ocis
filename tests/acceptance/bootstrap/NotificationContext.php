@@ -607,6 +607,7 @@ class NotificationContext implements Context {
 		$address = $this->featureContext->getEmailAddressForUser($user);
 		$this->featureContext->pushEmailRecipientAsMailBox($address);
 		$mailBox = EmailHelper::getMailBoxFromEmail($address);
+		sleep(5);
 		$mailboxResponse = EmailHelper::getMailboxInformation($mailBox, $this->featureContext->getStepLineRef());
 		Assert::assertCount($count, $mailboxResponse);
 	}
