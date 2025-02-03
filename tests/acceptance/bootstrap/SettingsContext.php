@@ -668,73 +668,53 @@ class SettingsContext implements Context {
 	}
 
 	/**
-	 * @param string $user
-	 * @param string $interval
-	 *
-	 * @return ResponseInterface
-	 *
-	 * @throws GuzzleException
-	 * @throws Exception
-	 */
-	public function sendRequestToSwitchEmailSendingInterval(string $user, string $interval): ResponseInterface {
-		$profileBundlesList = $this->getBundleByName($user, "Profile");
-		Assert::assertNotEmpty($profileBundlesList, "bundles list is empty");
-
-		$settingId = '';
-		foreach ($profileBundlesList["settings"] as $value) {
-			if ($value["name"] === "email-sending-interval-options") {
-				$settingId = $value["id"];
-				break;
-			}
-		}
-		Assert::assertNotEmpty($settingId, "settingId is empty");
-
-		$userId = $this->featureContext->getAttributeOfCreatedUser($user, 'id');
-		$body = json_encode(
-			[
-				"value" => [
-					"account_uuid" => "me",
-					"bundleId" => $profileBundlesList["id"],
-					"id" => $userId,
-					"listValue" => [
-						"values" => [
-							[
-								"stringValue" => $interval
-							]
-						]
-					],
-					"resource" => [
-						"type" => "TYPE_USER"
-					],
-					"settingId" => $settingId
-				]
-			],
-			JSON_THROW_ON_ERROR
-		);
-		return SettingsHelper::updateSettings(
-			$this->featureContext->getBaseUrl(),
-			$user,
-			$this->featureContext->getPasswordForUser($user),
-			$body,
-			$this->featureContext->getStepLineRef()
-		);
-	}
-
-	/**
-	 * @Given /^user "([^"]*)" has switched the email sending interval to "([^"]*)" using the settings API$/
+	 * @Given /^user "([^"]*)" has (disabled|enabled) notification for the following events using the settings API:$/
 	 *
 	 * @param string $user
-	 * @param string $interval
+	 * @param string $enabledOrDisabled
+	 * @param TableNode $table
 	 *
 	 * @return void
-	 * @throws GuzzleException
+	 * @throws GuzzleException|JsonException
+	 * @throws Exception
 	 */
-	public function userHasSwitchedTheEmailSendingIntervalTo(string $user, string $interval): void {
-		$response = $this->sendRequestToSwitchEmailSendingInterval($user, $interval);
-		$this->featureContext->theHTTPStatusCodeShouldBe(
-			201,
-			"Expected response status code should be 201",
-			$response
-		);
+	public function userHasDisabledOrEnabledNotificationForFollowingEventUsingSettingsApi(
+		string $user,
+		string $enabledOrDisabled,
+		TableNode $table
+	): void {
+		$settings = $table->getRowsHash();
+		Assert::assertCount(1, $settings, "only 1 event should be provided");
+		foreach ($settings as $event => $value) {
+			$body = $this->getBodyForNotificationSetting($user, $event);
+			if (str_contains($value, "mail")) {
+				$body["value"]["collectionValue"]["values"][]
+					= ["key" => "mail","boolValue" => $enabledOrDisabled === "enabled"];
+			}
+			if (str_contains($value, "in-app")) {
+				$body["value"]["collectionValue"]["values"][]
+					= ["key" => "in-app","boolValue" => $enabledOrDisabled === "enabled"];
+			}
+			if (str_contains($value, "instant")) {
+				$body["value"]["stringValue"]
+					= "instant";
+			}
+			if (str_contains($value, "daily")) {
+				$body["value"]["stringValue"]
+					= "daily";
+			}
+			if (str_contains($value, "weekly")) {
+				$body["value"]["stringValue"]
+					= "weekly";
+			}
+			$response = SettingsHelper::updateSettings(
+				$this->featureContext->getBaseUrl(),
+				$this->featureContext->getActualUsername($user),
+				$this->featureContext->getPasswordForUser($user),
+				json_encode($body),
+				$this->featureContext->getStepLineRef(),
+			);
+			$this->featureContext->theHTTPStatusCodeShouldBe(201, "", $response);
+		}
 	}
 }

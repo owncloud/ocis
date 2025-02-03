@@ -2500,6 +2500,14 @@ class FeatureContext extends BehatVariablesContext {
 					"getXRequestIdRegex"
 				],
 				"parameter" => []
+			],
+			[
+				"code" => "%date_time_pattern%",
+				"function" => [
+					__NAMESPACE__ . '\TestHelpers\EmailHelper',
+					"getDateTimeRegex"
+				],
+				"parameter" => []
 			]
 		];
 		if ($user !== null) {
