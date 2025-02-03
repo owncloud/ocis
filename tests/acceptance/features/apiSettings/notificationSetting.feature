@@ -607,3 +607,21 @@ Feature: Notification Settings
       | message                                   |
       | Alice Hansen added you to Space new-space |
     But user "Brian" should not have a notification related to space "new-space" with subject "Space disabled"
+
+
+  Scenario: check share expired in-app and mail notification for Personal space resource
+    Given user "Alice" has uploaded file with content "hello world" to "testfile.txt"
+    And user "Alice" has sent the following resource share invitation:
+      | resource           | testfile.txt         |
+      | space              | Personal             |
+      | sharee             | Brian                |
+      | shareType          | user                 |
+      | permissionsRole    | Viewer               |
+      | expirationDateTime | 2025-07-15T14:00:00Z |
+    When user "Alice" expires the last created share:
+      | space              | Personal             |
+      | resource           | testfile.txt         |
+    Then user "Brian" should have "2" emails
+    And user "Brian" should get a notification with subject "Membership expired" and message:
+      | message                           |
+      | Access to Space Alice Hansen lost |
