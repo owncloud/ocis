@@ -687,6 +687,8 @@ class NotificationContext implements Context {
 			$expectedEmailBodyContent = preg_replace('/\s+/', '', $expectedEmailBodyContent);
 			$actualEmailBodyContent = preg_replace('/\s+/', '', $actualEmailBodyContent);
 		}
+		var_dump("from client: ", $expectedEmailBodyContent);
+		var_dump("from server: ", $actualEmailBodyContent);
 		Assert::assertStringContainsString(
 			$expectedEmailBodyContent,
 			$actualEmailBodyContent,
