@@ -43,15 +43,13 @@ Feature: service health check
   @env-config
   Scenario: check extra services health
     Given the following configs have been set:
-      | config                 | value                                           |
-      | OCIS_ADD_RUN_SERVICES  | audit,auth-app,auth-bearer,policies,invitations |
-      | AUDIT_DEBUG_ADDR       | 0.0.0.0:9229                                    |
-      | AUTH_APP_DEBUG_ADDR    | 0.0.0.0:9245                                    |
-      | POLICIES_DEBUG_ADDR    | 0.0.0.0:9129                                    |
-      | INVITATIONS_DEBUG_ADDR | 0.0.0.0:9269                                    |
+      | config                 | value                         |
+      | OCIS_ADD_RUN_SERVICES  | auth-app,policies,invitations |
+      | AUTH_APP_DEBUG_ADDR    | 0.0.0.0:9245                  |
+      | POLICIES_DEBUG_ADDR    | 0.0.0.0:9129                  |
+      | INVITATIONS_DEBUG_ADDR | 0.0.0.0:9269                  |
     When a user requests these URLs with "GET" and no authentication
       | endpoint                                | service     |
-      | http://%base_url_hostname%:9229/healthz | audit       |
       | http://%base_url_hostname%:9245/healthz | auth-app    |
       | http://%base_url_hostname%:9269/healthz | invitations |
       | http://%base_url_hostname%:9129/healthz | policies    |
@@ -97,23 +95,20 @@ Feature: service health check
   @env-config
   Scenario: check extra services readiness
     Given the following configs have been set:
-      | config                 | value                                           |
-      | OCIS_ADD_RUN_SERVICES  | audit,auth-app,auth-bearer,policies,invitations |
-      | AUDIT_DEBUG_ADDR       | 0.0.0.0:9229                                    |
-      | AUTH_APP_DEBUG_ADDR    | 0.0.0.0:9245                                    |
-      | AUTH_BEARER_DEBUG_ADDR | 0.0.0.0:9149                                    |
-      | POLICIES_DEBUG_ADDR    | 0.0.0.0:9129                                    |
-      | INVITATIONS_DEBUG_ADDR | 0.0.0.0:9269                                    |
+      | config                 | value                         |
+      | OCIS_ADD_RUN_SERVICES  | auth-app,policies,invitations |
+      | AUTH_APP_DEBUG_ADDR    | 0.0.0.0:9245                  |
+      | POLICIES_DEBUG_ADDR    | 0.0.0.0:9129                  |
+      | INVITATIONS_DEBUG_ADDR | 0.0.0.0:9269                  |
     When a user requests these URLs with "GET" and no authentication
       | endpoint                               | service     |
-      | http://%base_url_hostname%:9229/readyz | audit       |
       | http://%base_url_hostname%:9245/readyz | auth-app    |
       | http://%base_url_hostname%:9269/readyz | invitations |
       | http://%base_url_hostname%:9129/readyz | policies    |
     Then the HTTP status code of responses on all endpoints should be "200"
 
   @issue-10661
-  Scenario: check default services readiness
+  Scenario: check default services readiness (graph, idp, proxy)
     When a user requests these URLs with "GET" and no authentication
       | endpoint                               | service |
       | http://%base_url_hostname%:9124/readyz | graph   |
@@ -122,7 +117,18 @@ Feature: service health check
     Then the HTTP status code of responses on all endpoints should be "200"
 
   @env-config @issue-10661
-  Scenario: check extra services readiness
+  Scenario: check auth-bearer service health
+    Given the following configs have been set:
+      | config                 | value        |
+      | OCIS_ADD_RUN_SERVICES  | auth-bearer  |
+      | AUTH_BEARER_DEBUG_ADDR | 0.0.0.0:9149 |
+    When a user requests these URLs with "GET" and no authentication
+      | endpoint                                | service     |
+      | http://%base_url_hostname%:9149/healthz | auth-bearer |
+    Then the HTTP status code should be "200"
+
+  @env-config @issue-10661
+  Scenario: check auth-bearer service readiness
     Given the following configs have been set:
       | config                 | value        |
       | OCIS_ADD_RUN_SERVICES  | auth-bearer  |
@@ -130,4 +136,16 @@ Feature: service health check
     When a user requests these URLs with "GET" and no authentication
       | endpoint                               | service     |
       | http://%base_url_hostname%:9149/readyz | auth-bearer |
+    Then the HTTP status code should be "200"
+
+  @env-config
+  Scenario: check services health and readiness while running separately
+    Given the administrator has started service "audit" separately with the following configs:
+      | config           | value        |
+      | OCIS_LOG_LEVEL   | info         |
+      | AUDIT_DEBUG_ADDR | 0.0.0.0:9229 |
+    When a user requests these URLs with "GET" and no authentication
+      | endpoint                                | service |
+      | http://%base_url_hostname%:9229/healthz | audit   |
+      | http://%base_url_hostname%:9229/readyz  | audit   |
     Then the HTTP status code of responses on all endpoints should be "200"
