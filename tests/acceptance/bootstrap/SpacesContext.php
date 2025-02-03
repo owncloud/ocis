@@ -4761,4 +4761,43 @@ class SpacesContext implements Context {
 			)
 		);
 	}
+
+	/**
+	 * @Given user :user has expired the last share of resource :resource inside of the space :spaceName
+	 *
+	 * @param string $user
+	 * @param string $resource
+	 * @param string $spaceName
+	 *
+	 * @return void
+	 * @throws GuzzleException|JsonException
+	 */
+	public function userHasExpiredTheLastShareOfResourceInsideOfTheSpace(
+		string $user,
+		string $resource,
+		string $spaceName
+	): void {
+		$dateTime = new DateTime('yesterday');
+		$rows['expireDate'] = $dateTime->format('Y-m-d\\TH:i:sP');
+		if ($this->featureContext->isUsingSharingNG()) {
+			$space = $this->getSpaceByName($user, $spaceName);
+			$itemId = $this->getResourceId($user, $spaceName, $resource);
+			$body['expirationDateTime'] = $rows['expireDate'];
+			$permissionID = $this->featureContext->shareNgGetLastCreatedUserGroupShareID();
+			$response = GraphHelper::updateShare(
+				$this->featureContext->getBaseUrl(),
+				$this->featureContext->getStepLineRef(),
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				$space["id"],
+				$itemId,
+				\json_encode($body),
+				$permissionID
+			);
+		} else {
+			$rows['permissions'] = (string)$this->featureContext->getLastCreatedUserGroupShare()->permissions;
+			$response = $this->updateSharedResource($user, $rows);
+		}
+		$this->featureContext->theHTTPStatusCodeShouldBe(200, "", $response);
+	}
 }
