@@ -462,6 +462,7 @@ default:
         - SpacesTUSContext:
         - AuthAppContext:
         - SettingsContext:
+        - NotificationContext:
 
     coreApiMain:
       paths:
