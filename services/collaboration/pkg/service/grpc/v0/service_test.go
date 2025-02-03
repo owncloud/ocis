@@ -142,7 +142,7 @@ var _ = Describe("Discovery", func() {
 
 		DescribeTable(
 			"Success",
-			func(appName, lang string, disableChat bool, expectedAppUrl string) {
+			func(appName, path, lang string, disableChat bool, expectedAppUrl string) {
 				ctx := context.Background()
 				nowTime := time.Now()
 
@@ -161,6 +161,9 @@ var _ = Describe("Discovery", func() {
 					Username: "username",
 				}
 
+				if path == "" {
+					path = "/path/to/file.docx"
+				}
 				req := &appproviderv1beta1.OpenInAppRequest{
 					ResourceInfo: &providerv1beta1.ResourceInfo{
 						Id: &providerv1beta1.ResourceId{
@@ -168,7 +171,7 @@ var _ = Describe("Discovery", func() {
 							OpaqueId:  "storageOpaque001",
 							SpaceId:   "SpaceA",
 						},
-						Path: "/path/to/file.docx",
+						Path: path,
 					},
 					ViewMode:    appproviderv1beta1.ViewMode_VIEW_MODE_READ_WRITE,
 					AccessToken: MintToken(myself, cfg.Wopi.Secret, nowTime),
@@ -189,18 +192,21 @@ var _ = Describe("Discovery", func() {
 				Expect(resp.GetAppUrl().GetAppUrl()).To(Equal(expectedAppUrl))
 				Expect(resp.GetAppUrl().GetFormParameters()["access_token_ttl"]).To(Equal(strconv.FormatInt(nowTime.Add(5*time.Hour).Unix()*1000, 10)))
 			},
-			Entry("Microsoft chat no lang", "Microsoft", "", false, "https://test.server.prv/hosting/wopi/word/edit?WOPISrc=https%3A%2F%2Fwopiserver.test.prv%2Fwopi%2Ffiles%2F2f6ec18696dd1008106749bd94106e5cfad5c09e15de7b77088d03843e71b43e"),
-			Entry("Collabora chat no lang", "Collabora", "", false, "https://test.server.prv/hosting/wopi/word/view?WOPISrc=https%3A%2F%2Fwopiserver.test.prv%2Fwopi%2Ffiles%2F2f6ec18696dd1008106749bd94106e5cfad5c09e15de7b77088d03843e71b43e"),
-			Entry("OnlyOffice chat no lang", "OnlyOffice", "", false, "https://test.server.prv/hosting/wopi/word/edit?WOPISrc=https%3A%2F%2Fwopiserver.test.prv%2Fwopi%2Ffiles%2F2f6ec18696dd1008106749bd94106e5cfad5c09e15de7b77088d03843e71b43e"),
-			Entry("Microsoft chat lang", "Microsoft", "de", false, "https://test.server.prv/hosting/wopi/word/edit?UI_LLCC=de-DE&WOPISrc=https%3A%2F%2Fwopiserver.test.prv%2Fwopi%2Ffiles%2F2f6ec18696dd1008106749bd94106e5cfad5c09e15de7b77088d03843e71b43e"),
-			Entry("Collabora chat lang", "Collabora", "de", false, "https://test.server.prv/hosting/wopi/word/view?WOPISrc=https%3A%2F%2Fwopiserver.test.prv%2Fwopi%2Ffiles%2F2f6ec18696dd1008106749bd94106e5cfad5c09e15de7b77088d03843e71b43e&lang=de-DE"),
-			Entry("OnlyOffice chat lang", "OnlyOffice", "de", false, "https://test.server.prv/hosting/wopi/word/edit?WOPISrc=https%3A%2F%2Fwopiserver.test.prv%2Fwopi%2Ffiles%2F2f6ec18696dd1008106749bd94106e5cfad5c09e15de7b77088d03843e71b43e&ui=de-DE"),
-			Entry("Microsoft no chat no lang", "Microsoft", "", true, "https://test.server.prv/hosting/wopi/word/edit?WOPISrc=https%3A%2F%2Fwopiserver.test.prv%2Fwopi%2Ffiles%2F2f6ec18696dd1008106749bd94106e5cfad5c09e15de7b77088d03843e71b43e&dchat=1"),
-			Entry("Collabora no chat no lang", "Collabora", "", true, "https://test.server.prv/hosting/wopi/word/view?WOPISrc=https%3A%2F%2Fwopiserver.test.prv%2Fwopi%2Ffiles%2F2f6ec18696dd1008106749bd94106e5cfad5c09e15de7b77088d03843e71b43e&dchat=1"),
-			Entry("OnlyOffice no chat no lang", "OnlyOffice", "", true, "https://test.server.prv/hosting/wopi/word/edit?WOPISrc=https%3A%2F%2Fwopiserver.test.prv%2Fwopi%2Ffiles%2F2f6ec18696dd1008106749bd94106e5cfad5c09e15de7b77088d03843e71b43e&dchat=1"),
-			Entry("Microsoft no chat lang", "Microsoft", "de", true, "https://test.server.prv/hosting/wopi/word/edit?UI_LLCC=de-DE&WOPISrc=https%3A%2F%2Fwopiserver.test.prv%2Fwopi%2Ffiles%2F2f6ec18696dd1008106749bd94106e5cfad5c09e15de7b77088d03843e71b43e&dchat=1"),
-			Entry("Collabora no chat lang", "Collabora", "de", true, "https://test.server.prv/hosting/wopi/word/view?WOPISrc=https%3A%2F%2Fwopiserver.test.prv%2Fwopi%2Ffiles%2F2f6ec18696dd1008106749bd94106e5cfad5c09e15de7b77088d03843e71b43e&dchat=1&lang=de-DE"),
-			Entry("OnlyOffice no chat lang", "OnlyOffice", "de", true, "https://test.server.prv/hosting/wopi/word/edit?WOPISrc=https%3A%2F%2Fwopiserver.test.prv%2Fwopi%2Ffiles%2F2f6ec18696dd1008106749bd94106e5cfad5c09e15de7b77088d03843e71b43e&dchat=1&ui=de-DE"),
+			Entry("Microsoft chat no lang", "Microsoft", "", "", false, "https://test.server.prv/hosting/wopi/word/edit?WOPISrc=https%3A%2F%2Fwopiserver.test.prv%2Fwopi%2Ffiles%2F2f6ec18696dd1008106749bd94106e5cfad5c09e15de7b77088d03843e71b43e"),
+			Entry("Collabora chat no lang", "Collabora", "", "", false, "https://test.server.prv/hosting/wopi/word/view?WOPISrc=https%3A%2F%2Fwopiserver.test.prv%2Fwopi%2Ffiles%2F2f6ec18696dd1008106749bd94106e5cfad5c09e15de7b77088d03843e71b43e"),
+			Entry("OnlyOffice chat no lang", "OnlyOffice", "", "", false, "https://test.server.prv/hosting/wopi/word/edit?WOPISrc=https%3A%2F%2Fwopiserver.test.prv%2Fwopi%2Ffiles%2F2f6ec18696dd1008106749bd94106e5cfad5c09e15de7b77088d03843e71b43e"),
+			Entry("Microsoft chat lang", "Microsoft", "", "de", false, "https://test.server.prv/hosting/wopi/word/edit?UI_LLCC=de-DE&WOPISrc=https%3A%2F%2Fwopiserver.test.prv%2Fwopi%2Ffiles%2F2f6ec18696dd1008106749bd94106e5cfad5c09e15de7b77088d03843e71b43e"),
+			Entry("Collabora chat lang", "Collabora", "", "de", false, "https://test.server.prv/hosting/wopi/word/view?WOPISrc=https%3A%2F%2Fwopiserver.test.prv%2Fwopi%2Ffiles%2F2f6ec18696dd1008106749bd94106e5cfad5c09e15de7b77088d03843e71b43e&lang=de-DE"),
+			Entry("OnlyOffice chat lang", "OnlyOffice", "", "de", false, "https://test.server.prv/hosting/wopi/word/edit?WOPISrc=https%3A%2F%2Fwopiserver.test.prv%2Fwopi%2Ffiles%2F2f6ec18696dd1008106749bd94106e5cfad5c09e15de7b77088d03843e71b43e&ui=de-DE"),
+			Entry("Microsoft no chat no lang", "Microsoft", "", "", true, "https://test.server.prv/hosting/wopi/word/edit?WOPISrc=https%3A%2F%2Fwopiserver.test.prv%2Fwopi%2Ffiles%2F2f6ec18696dd1008106749bd94106e5cfad5c09e15de7b77088d03843e71b43e&dchat=1"),
+			Entry("Collabora no chat no lang", "Collabora", "", "", true, "https://test.server.prv/hosting/wopi/word/view?WOPISrc=https%3A%2F%2Fwopiserver.test.prv%2Fwopi%2Ffiles%2F2f6ec18696dd1008106749bd94106e5cfad5c09e15de7b77088d03843e71b43e&dchat=1"),
+			Entry("OnlyOffice no chat no lang", "OnlyOffice", "", "", true, "https://test.server.prv/hosting/wopi/word/edit?WOPISrc=https%3A%2F%2Fwopiserver.test.prv%2Fwopi%2Ffiles%2F2f6ec18696dd1008106749bd94106e5cfad5c09e15de7b77088d03843e71b43e&dchat=1"),
+			Entry("Microsoft no chat lang", "Microsoft", "", "de", true, "https://test.server.prv/hosting/wopi/word/edit?UI_LLCC=de-DE&WOPISrc=https%3A%2F%2Fwopiserver.test.prv%2Fwopi%2Ffiles%2F2f6ec18696dd1008106749bd94106e5cfad5c09e15de7b77088d03843e71b43e&dchat=1"),
+			Entry("Collabora no chat lang", "Collabora", "", "de", true, "https://test.server.prv/hosting/wopi/word/view?WOPISrc=https%3A%2F%2Fwopiserver.test.prv%2Fwopi%2Ffiles%2F2f6ec18696dd1008106749bd94106e5cfad5c09e15de7b77088d03843e71b43e&dchat=1&lang=de-DE"),
+			Entry("OnlyOffice no chat lang", "OnlyOffice", "", "de", true, "https://test.server.prv/hosting/wopi/word/edit?WOPISrc=https%3A%2F%2Fwopiserver.test.prv%2Fwopi%2Ffiles%2F2f6ec18696dd1008106749bd94106e5cfad5c09e15de7b77088d03843e71b43e&dchat=1&ui=de-DE"),
+			Entry("Microsoft no chat lang", "Microsoft", "/path/to/file.DOCX", "de", true, "https://test.server.prv/hosting/wopi/word/edit?UI_LLCC=de-DE&WOPISrc=https%3A%2F%2Fwopiserver.test.prv%2Fwopi%2Ffiles%2F2f6ec18696dd1008106749bd94106e5cfad5c09e15de7b77088d03843e71b43e&dchat=1"),
+			Entry("Collabora no chat lang", "Collabora", "/path/to/file.DOCX", "de", true, "https://test.server.prv/hosting/wopi/word/view?WOPISrc=https%3A%2F%2Fwopiserver.test.prv%2Fwopi%2Ffiles%2F2f6ec18696dd1008106749bd94106e5cfad5c09e15de7b77088d03843e71b43e&dchat=1&lang=de-DE"),
+			Entry("OnlyOffice no chat lang", "OnlyOffice", "/path/to/file.DOCX", "de", true, "https://test.server.prv/hosting/wopi/word/edit?WOPISrc=https%3A%2F%2Fwopiserver.test.prv%2Fwopi%2Ffiles%2F2f6ec18696dd1008106749bd94106e5cfad5c09e15de7b77088d03843e71b43e&dchat=1&ui=de-DE"),
 		)
 		It("Success with Wopi Proxy", func() {
 			ctx := context.Background()
