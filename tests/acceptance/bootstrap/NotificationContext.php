@@ -672,14 +672,13 @@ class NotificationContext implements Context {
 	 */
 	public function clearInbucketMessages(): void {
 		try {
-			if (!empty($this->featureContext->emailRecipients)) {
-				foreach ($this->featureContext->emailRecipients as $emailRecipient) {
-					EmailHelper::deleteAllEmailsForAMailbox(
-						EmailHelper::getLocalEmailUrl(),
-						$this->featureContext->getStepLineRef(),
-						$emailRecipient
-					);
-				}
+			$usersList = $this->featureContext->getAllCreatedUsers();
+			foreach ($usersList as $emailRecipient) {
+				EmailHelper::deleteAllEmailsForAMailbox(
+					EmailHelper::getLocalEmailUrl(),
+					$this->featureContext->getStepLineRef(),
+					$emailRecipient['email']
+				);
 			}
 		} catch (Exception $e) {
 			echo __METHOD__ .
