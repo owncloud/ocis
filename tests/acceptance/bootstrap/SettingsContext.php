@@ -713,4 +713,47 @@ class SettingsContext implements Context {
 			$response
 		);
 	}
+
+	/**
+	 * @Given /^user "([^"]*)" has (disabled|enabled) notification for the following events using the settings API:$/
+	 *
+	 * @param string $user
+	 * @param string $enabledOrDisabled
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws GuzzleException|JsonException
+	 * @throws Exception
+	 */
+	public function userHasDisabledOrEnabledNotificationForFollowingEventUsingSettingsApi(
+		string $user,
+		string $enabledOrDisabled,
+		TableNode $table
+	): void {
+		$settings = $table->getRowsHash();
+		Assert::assertCount(1, $settings, "only 1 event should be provided");
+		foreach ($settings as $event => $value) {
+			$body = $this->getBodyForNotificationSetting($user, $event);
+			if (str_contains($value, "mail")) {
+				$body["value"]["collectionValue"]["values"][]
+					= ["key" => "mail","boolValue" => $enabledOrDisabled === "enabled"];
+			}
+			if (str_contains($value, "in-app")) {
+				$body["value"]["collectionValue"]["values"][]
+					= ["key" => "in-app","boolValue" => $enabledOrDisabled === "enabled"];
+			}
+			if (str_contains($value, "daily")) {
+				$body["value"]["stringValue"]
+					= "daily";
+			}
+			$response = SettingsHelper::updateSettings(
+				$this->featureContext->getBaseUrl(),
+				$this->featureContext->getActualUsername($user),
+				$this->featureContext->getPasswordForUser($user),
+				json_encode($body),
+				$this->featureContext->getStepLineRef(),
+			);
+			$this->featureContext->theHTTPStatusCodeShouldBe(201, "", $response);
+		}
+	}
 }
