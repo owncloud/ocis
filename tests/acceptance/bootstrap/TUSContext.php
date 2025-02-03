@@ -32,6 +32,7 @@ use Psr\Http\Message\ResponseInterface;
 use TestHelpers\HttpRequestHelper;
 use TestHelpers\WebDavHelper;
 use TestHelpers\BehatHelper;
+use TestHelpers\TusClient;
 
 require_once 'bootstrap.php';
 
@@ -264,8 +265,18 @@ class TUSContext implements Context {
 		int     $bytes = null,
 		string  $checksum = ''
 	): void {
-		$this->uploadFileUsingTus($user, $source, $destination, null, $uploadMetadata, $noOfChunks, $bytes, $checksum);
+		$response = $this->uploadFileUsingTus(
+			$user,
+			$source,
+			$destination,
+			null,
+			$uploadMetadata,
+			$noOfChunks,
+			$bytes,
+			$checksum
+		);
 		$this->featureContext->setLastUploadDeleteTime(\time());
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -278,7 +289,7 @@ class TUSContext implements Context {
 	 * @param integer $bytes
 	 * @param string $checksum
 	 *
-	 * @return void
+	 * @return ResponseInterface
 	 */
 	public function uploadFileUsingTus(
 		?string $user,
@@ -288,8 +299,8 @@ class TUSContext implements Context {
 		array   $uploadMetadata = [],
 		int     $noOfChunks = 1,
 		int     $bytes = null,
-		string  $checksum = ''
-	) {
+		string  $checksum = '',
+	): ResponseInterface {
 		$user = $this->featureContext->getActualUsername($user);
 		$password = $this->featureContext->getUserPassword($user);
 		$headers = [
@@ -309,39 +320,110 @@ class TUSContext implements Context {
 			$headers = \array_merge($headers, $checksumHeader);
 		}
 
-		$client = new Client(
-			$this->featureContext->getBaseUrl(),
-			[
-				'verify' => false,
-				'headers' => $headers
-			]
-		);
-
 		$davPathVersion = $this->featureContext->getDavPathVersion();
 		$suffixPath = $user;
 		if ($davPathVersion === WebDavHelper::DAV_VERSION_SPACES) {
 			$suffixPath = $spaceId ?: $this->featureContext->getPersonalSpaceIdForUser($user);
 		}
-
-		$client->setChecksumAlgorithm('sha1');
-		$client->setApiPath(WebDavHelper::getDavPath($davPathVersion, $suffixPath));
-		$client->setMetadata($uploadMetadata);
 		$sourceFile = $this->featureContext->acceptanceTestsDirLocation() . $source;
-		$client->setKey((string)rand())->file($sourceFile, $destination);
+
+		$client = $this->createTusClient(
+			$this->featureContext->getBaseUrl(),
+			$headers,
+			$sourceFile,
+			$destination,
+			WebDavHelper::getDavPath($davPathVersion, $suffixPath),
+			$uploadMetadata
+		);
+
 		$this->featureContext->pauseUploadDelete();
+		$response = null;
 
 		if ($bytes !== null) {
-			$client->file($sourceFile, $destination)->createWithUpload($client->getKey(), $bytes);
+			return $client->file($sourceFile, $destination)
+				->createWithUploadRR($client->getKey(), $bytes);
 		} elseif (\filesize($sourceFile) === 0) {
-			$client->file($sourceFile, $destination)->createWithUpload($client->getKey(), 0);
+			return $client->file($sourceFile, $destination)->createWithUploadRR($client->getKey(), 0);
 		} elseif ($noOfChunks === 1) {
-			$client->file($sourceFile, $destination)->upload();
+			return $client->file($sourceFile, $destination)->uploadRR();
 		} else {
 			$bytesPerChunk = (int)\ceil(\filesize($sourceFile) / $noOfChunks);
 			for ($i = 0; $i < $noOfChunks; $i++) {
-				$client->upload($bytesPerChunk);
+				$response = $client->uploadRR($bytesPerChunk);
 			}
+			return $response;
 		}
+	}
+
+	/**
+	 * @param string $source
+	 * @param string $destination
+	 * @param string $password
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 * @throws ReflectionException
+	 */
+	public function publicUploadFileUsingTus(
+		string $source,
+		string $destination,
+		string $password,
+	): ResponseInterface {
+		$password = $this->featureContext->getActualPassword($password);
+		if ($this->featureContext->isUsingSharingNG()) {
+			$token = $this->featureContext->shareNgGetLastCreatedLinkShareToken();
+		} else {
+			$token = $this->featureContext->getLastCreatedPublicShareToken();
+		}
+		$headers = [
+			'Authorization' => 'Basic ' . \base64_encode("public:$password"),
+		];
+		$sourceFile = $this->featureContext->acceptanceTestsDirLocation() . $source;
+		$url = WebdavHelper::getDavPath(WebDavHelper::DAV_VERSION_SPACES, $token, "public-files");
+		$client = $this->createTusClient(
+			$this->featureContext->getBaseUrl(),
+			$headers,
+			$sourceFile,
+			$destination,
+			$url
+		);
+		$response = $client->createWithUploadRR("", 0);
+		return $response;
+	}
+
+	/**
+	 * Creates the TusClient with API path, headers, metadata, upload key and checksum
+	 *
+	 * @param string $baseUrl
+	 * @param array $headers
+	 * @param string $sourceFile
+	 * @param string $destination
+	 * @param string $path
+	 * @param array $metadata
+	 *
+	 * @return TusClient
+	 * @throws ReflectionException
+	 */
+	private function createTusClient(
+		string $baseUrl,
+		array  $headers,
+		string $sourceFile,
+		string $destination,
+		string $path,
+		array $metadata = []
+	): TusClient {
+		$client = new TusClient(
+			$baseUrl,
+			[
+				'verify' => false,
+				'headers' => $headers,
+			]
+		);
+		$client->setApiPath($path);
+		$client->setMetadata($metadata);
+		$client->setChecksumAlgorithm('sha1');
+		$client->setKey((string)rand())->file($sourceFile, $destination);
+		return $client;
 	}
 
 	/**
