@@ -23,6 +23,7 @@
 use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use TestHelpers\BehatHelper;
+use PHPUnit\Framework\Assert;
 use TestHelpers\AuthAppHelper;
 
 require_once 'bootstrap.php';
@@ -154,4 +155,56 @@ class AuthAppContext implements Context {
 			)
 		);
 	}
+
+	/**
+	 * @When user :user deletes all the created auth-app tokens using the auth-app API
+	 *
+	 * @param string $user
+	 *
+	 * @return void
+	 */
+	public function userDeletesAllCreatedAuthAppTokenUsingAuthAppAPI(string $user): void {
+		$baseUrl = $this->featureContext->getBaseUrl();
+		$user = $this->featureContext->getActualUsername($user);
+		$password = $this->featureContext->getPasswordForUser($user);
+		$response = AuthAppHelper::listAllAppAuthTokensForUser(
+			$baseUrl,
+			$user,
+			$password
+		);
+		$authAppTokens = json_decode($response->getBody()->getContents());
+		foreach ($authAppTokens as $tokenObj) {
+			$deleteResponse = AuthAppHelper::deleteAppAuthToken(
+				$baseUrl,
+				$user,
+				$password,
+				$tokenObj->token
+			);
+			$this->featureContext->setResponse($deleteResponse);
+			$this->featureContext->pushToLastHttpStatusCodesArray((string)$deleteResponse->getStatusCode());
+		}
+	}
+
+	/**
+	 * @Then user :user should have :count auth-app tokens
+	 *
+	 * @param string $user
+	 * @param integer $count
+	 *
+	 * @return void
+	 */
+	public function userShouldHaveAuthAppTokens(string $user, int $count): void {
+		$response = AuthAppHelper::listAllAppAuthTokensForUser(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getActualUsername($user),
+			$this->featureContext->getPasswordForUser($user),
+		);
+		$authAppTokens = json_decode($response->getBody()->getContents());
+		Assert::assertCount(
+			$count,
+			$authAppTokens,
+			"Expected the count to be $count but got " . \count($authAppTokens)
+		);
+	}
+
 }
