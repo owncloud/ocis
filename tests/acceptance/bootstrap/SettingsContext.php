@@ -632,6 +632,10 @@ class SettingsContext implements Context {
 				$body["value"]["collectionValue"]["values"][]
 					= ["key" => "in-app","boolValue" => $enableOrDisable === "enables"];
 			}
+			if (str_contains($value, "never")) {
+				$body["value"]["stringValue"]
+					= "never";
+			}
 			$response = SettingsHelper::updateSettings(
 				$this->featureContext->getBaseUrl(),
 				$this->featureContext->getActualUsername($user),
