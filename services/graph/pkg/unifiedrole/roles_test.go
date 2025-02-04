@@ -166,6 +166,7 @@ func TestGetRolesByPermissions(t *testing.T) {
 				unifiedrole.RoleViewerListGrants,
 				unifiedrole.RoleFileEditor,
 				unifiedrole.RoleFileEditorListGrants,
+				unifiedrole.RoleFileEditorListGrantsWithVersions,
 			},
 		},
 		"BuildInRoles | folder": {
@@ -179,6 +180,7 @@ func TestGetRolesByPermissions(t *testing.T) {
 				unifiedrole.RoleEditorLite,
 				unifiedrole.RoleEditor,
 				unifiedrole.RoleEditorListGrants,
+				unifiedrole.RoleEditorListGrantsWithVersions,
 			},
 		},
 		"BuildInRoles | drive": {

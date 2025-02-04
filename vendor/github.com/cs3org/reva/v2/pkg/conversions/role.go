@@ -45,6 +45,8 @@ const (
 	RoleEditor = "editor"
 	// RoleEditorListGrants grants editor permission on a resource, including folders.
 	RoleEditorListGrants = "editor-list-grants"
+	// RoleEditorListGrantsWithVersions grants editor permission on a resource, including folders.
+	RoleEditorListGrantsWithVersions = "editor-list-grants-with-versions"
 	// RoleSpaceEditor grants editor permission on a space.
 	RoleSpaceEditor = "spaceeditor"
 	// RoleSpaceEditorWithoutVersions grants editor permission without list/restore versions on a space.
@@ -53,6 +55,8 @@ const (
 	RoleFileEditor = "file-editor"
 	// RoleFileEditorListGrants grants editor permission on a single file.
 	RoleFileEditorListGrants = "file-editor-list-grants"
+	// RoleFileEditorListGrantsWithVersions grants editor permission on a single file.
+	RoleFileEditorListGrantsWithVersions = "file-editor-list-grants-with-versions"
 	// RoleCoowner grants co-owner permissions on a resource.
 	RoleCoowner = "coowner"
 	// RoleEditorLite grants permission to upload and download to a resource.
@@ -171,12 +175,16 @@ func RoleFromName(name string) *Role {
 		return NewEditorRole()
 	case RoleEditorListGrants:
 		return NewEditorListGrantsRole()
+	case RoleEditorListGrantsWithVersions:
+		return NewEditorListGrantsWithVersionsRole()
 	case RoleSpaceEditor:
 		return NewSpaceEditorRole()
 	case RoleFileEditor:
 		return NewFileEditorRole()
 	case RoleFileEditorListGrants:
 		return NewFileEditorListGrantsRole()
+	case RoleFileEditorListGrantsWithVersions:
+		return NewFileEditorListGrantsWithVersionsRole()
 	case RoleUploader:
 		return NewUploaderRole()
 	case RoleManager:
@@ -276,6 +284,13 @@ func NewEditorListGrantsRole() *Role {
 	return role
 }
 
+// NewEditorListGrantsWithVersionsRole creates an editor role. `sharing` indicates if sharing permission should be added
+func NewEditorListGrantsWithVersionsRole() *Role {
+	role := NewEditorListGrantsRole()
+	role.cS3ResourcePermissions.ListFileVersions = true
+	return role
+}
+
 // NewSpaceEditorRole creates an editor role
 func NewSpaceEditorRole() *Role {
 	return &Role{
@@ -345,6 +360,13 @@ func NewFileEditorRole() *Role {
 func NewFileEditorListGrantsRole() *Role {
 	role := NewFileEditorRole()
 	role.cS3ResourcePermissions.ListGrants = true
+	return role
+}
+
+// NewFileEditorListGrantsWithVersionsRole creates a file-editor role
+func NewFileEditorListGrantsWithVersionsRole() *Role {
+	role := NewFileEditorListGrantsRole()
+	role.cS3ResourcePermissions.ListFileVersions = true
 	return role
 }
 
@@ -594,6 +616,9 @@ func RoleFromResourcePermissions(rp *provider.ResourcePermissions, islink bool) 
 			r.Name = RoleEditor
 			if rp.ListGrants {
 				r.Name = RoleEditorListGrants
+			}
+			if rp.ListGrants && rp.ListFileVersions {
+				r.Name = RoleEditorListGrantsWithVersions
 			}
 			if rp.RemoveGrant {
 				r.Name = RoleManager
