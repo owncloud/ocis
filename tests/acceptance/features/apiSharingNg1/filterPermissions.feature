@@ -106,8 +106,8 @@ Feature: filter sharing permissions
 
   @env-config
   Scenario: filter lists permissions of a file for federated user type (Personal space)
-    Given user "Alice" has uploaded file with content "hello world" to "/textfile0.txt"
-    And the administrator has enabled the permissions role "Secure Viewer"
+    Given the administrator has enabled the permissions role "Secure Viewer"
+    And user "Alice" has uploaded file with content "hello world" to "/textfile0.txt"
     When user "Alice" lists permissions with following filters for file "textfile0.txt" of the space "Personal" using the Graph API:
       | $filter=@libre.graph.permissions.roles.allowedValues/rolePermissions/any(p:contains(p/condition,+'@Subject.UserType=="Federated"')) |
     Then the HTTP status code should be "200"
@@ -205,8 +205,8 @@ Feature: filter sharing permissions
 
   @env-config
   Scenario: filter lists permissions of a folder for Member user type (Personal space)
-    Given user "Alice" has created folder "folder"
-    And the administrator has enabled the permissions role "Denied"
+    Given the administrator has enabled the permissions role "Denied"
+    And user "Alice" has created folder "folder"
     When user "Alice" lists permissions with following filters for folder "folder" of the space "Personal" using the Graph API:
       | $filter=@libre.graph.permissions.roles.allowedValues/rolePermissions/any(p:contains(p/condition,+'@Subject.UserType=="Member"')) |
     Then the HTTP status code should be "200"
@@ -350,8 +350,8 @@ Feature: filter sharing permissions
 
   @env-config
   Scenario: filter permissions of a file for Member user type (Personal space)
-    Given user "Alice" has uploaded file with content "hello world" to "/textfile0.txt"
-    And the administrator has enabled the permissions role "Secure Viewer"
+    Given the administrator has enabled the permissions role "Secure Viewer"
+    And user "Alice" has uploaded file with content "hello world" to "/textfile0.txt"
     When user "Alice" lists permissions with following filters for file "textfile0.txt" of the space "Personal" using the Graph API:
       | $filter=@libre.graph.permissions.roles.allowedValues/rolePermissions/any(p:contains(p/condition,+'@Subject.UserType=="Member"')) |
     Then the HTTP status code should be "200"
@@ -570,8 +570,8 @@ Feature: filter sharing permissions
 
   @env-config
   Scenario: user lists allowed role permissions of a file (Personal space)
-    Given user "Alice" has uploaded file with content "hello world" to "/textfile0.txt"
-    And the administrator has enabled the permissions role "Secure Viewer"
+    Given the administrator has enabled the permissions role "Secure Viewer"
+    And user "Alice" has uploaded file with content "hello world" to "/textfile0.txt"
     When user "Alice" lists permissions with following filters for file "textfile0.txt" of the space "Personal" using the Graph API:
       | $select=@libre.graph.permissions.roles.allowedValues |
     Then the HTTP status code should be "200"
