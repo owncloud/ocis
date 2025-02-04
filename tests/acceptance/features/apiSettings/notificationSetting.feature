@@ -607,3 +607,63 @@ Feature: Notification Settings
       | message                                   |
       | Alice Hansen added you to Space new-space |
     But user "Brian" should not have a notification related to space "new-space" with subject "Space disabled"
+
+  @issue-10864
+  Scenario: disable email notification for user light
+    Given the administrator has assigned the role "User Light" to user "Brian" using the Graph API
+    When user "Brian" disables email notification using the settings API
+    Then the HTTP status code should be "201"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "object",
+            "required": ["identifier","value"],
+            "properties": {
+              "identifier":{
+                "type": "object",
+                "required": ["extension","bundle","setting"],
+                "properties": {
+                  "extension":{ "const": "ocis-accounts" },
+                  "bundle":{ "const": "profile" },
+                  "setting":{ "const": "disable-email-notifications" }
+                }
+              },
+              "value":{
+                "type": "object",
+                "required": ["id","bundleId","settingId","accountUuid","resource"],
+                "properties":{
+                  "id":{ "pattern": "%uuidv4_pattern%" },
+                  "bundleId":{ "pattern":"%uuidv4_pattern%" },
+                  "settingId":{ "pattern":"%uuidv4_pattern%" },
+                  "accountUuid":{ "pattern":"%uuidv4_pattern%" },
+                  "resource":{
+                    "type": "object",
+                    "required":["type"],
+                    "properties": {
+                      "type":{ "const": "TYPE_USER" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      """
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | lorem.txt |
+      | space           | Personal  |
+      | sharee          | Brian     |
+      | shareType       | user      |
+      | permissionsRole | Viewer    |
+    When user "Brian" lists all notifications
+    Then the HTTP status code should be "200"
+    And there should be "1" notifications
+    And user "Brian" should get a notification with subject "Resource shared" and message:
+      | message                                |
+      | Alice Hansen shared lorem.txt with you |
+    And user "Brian" should have "0" emails
