@@ -2154,6 +2154,11 @@ def changelog():
                 "refs/heads/master",
                 "refs/pull/**",
             ],
+            "event": {
+                "exclude": [
+                    "cron",
+                ],
+            },
         },
     }]
 
