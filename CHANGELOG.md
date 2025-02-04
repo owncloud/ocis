@@ -68,7 +68,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Allow view ocm shares: [#10944](https://github.com/owncloud/ocis/pull/10944)
 * Bugfix - Fix Collaboration file extension check: [#10947](https://github.com/owncloud/ocis/issues/10947)
 * Enhancement - Implement debug docker for arm64 platform: [#10940](https://github.com/owncloud/ocis/pull/10940)
-* Enhancement - Bump Reva: [#10944](https://github.com/owncloud/ocis/pull/10944)
+* Enhancement - Bump Reva: [#10956](https://github.com/owncloud/ocis/pull/10956)
 
 ## Details
 
@@ -98,10 +98,11 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/10940
 
-* Enhancement - Bump Reva: [#10944](https://github.com/owncloud/ocis/pull/10944)
+* Enhancement - Bump Reva: [#10956](https://github.com/owncloud/ocis/pull/10956)
 
    Bumps reva version
 
+   https://github.com/owncloud/ocis/pull/10956
    https://github.com/owncloud/ocis/pull/10944
 
 # Changelog for [7.1.0-rc.3] (2025-01-28)
