@@ -65,7 +65,7 @@ Feature: Notification Settings
     And user "Brian" should have "0" emails
 
 
-  Scenario: disable mail and in-app notification for Share Received event
+  Scenario: disable mail and in-app notification for "Share Received" event
     When user "Brian" disables notification for the following events using the settings API:
       | Share Received | mail,in-app |
     Then the HTTP status code should be "201"
@@ -154,7 +154,7 @@ Feature: Notification Settings
     And the notifications should be empty
 
 
-  Scenario: disable mail and in-app notification for Share Removed event
+  Scenario: disable mail and in-app notification for "Share Removed" event
     Given user "Alice" has sent the following resource share invitation:
       | resource        | lorem.txt |
       | space           | Personal  |
@@ -247,7 +247,7 @@ Feature: Notification Settings
     But user "Brian" should not have a notification related to resource "lorem.txt" with subject "Resource unshared"
 
 
-  Scenario: disable mail and in-app notification for Share Removed event (Project space)
+  Scenario: disable mail and in-app notification for "Share Removed" event (Project space)
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "newSpace" with the default quota using the Graph API
@@ -344,7 +344,7 @@ Feature: Notification Settings
     But user "Brian" should not have a notification related to resource "insideSpace.txt" with subject "Resource unshared"
 
   @antivirus
-  Scenario Outline: disable in-app notification for File rejected event
+  Scenario Outline: disable in-app notification for "File rejected" event
     Given using <dav-path-version> DAV path
     When user "Brian" disables notification for the following events using the settings API:
       | File rejected | in-app |
@@ -425,7 +425,7 @@ Feature: Notification Settings
       | spaces           | eicar.com     | virusFile1.txt |
 
   @antivirus
-  Scenario: disable in-app notification for File rejected event (Project space)
+  Scenario: disable in-app notification for "File rejected" event (Project space)
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "newSpace" with the default quota using the Graph API
@@ -511,7 +511,7 @@ Feature: Notification Settings
     But user "Brian" should not have a notification related to resource "virusFile.txt" with subject "Virus found"
 
 
-  Scenario: disable in-app notification for Space disabled event
+  Scenario: disable in-app notification for "Space disabled" event
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
     And user "Alice" has sent the following space share invitation:
