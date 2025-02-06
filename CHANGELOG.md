@@ -1,5 +1,6 @@
 # Table of Contents
 
+* [Changelog for unreleased](#changelog-for-unreleased-unreleased)
 * [Changelog for 7.1.0-rc.4](#changelog-for-710-rc4-2025-02-04)
 * [Changelog for 7.1.0-rc.3](#changelog-for-710-rc3-2025-01-28)
 * [Changelog for 7.1.0-rc.2](#changelog-for-710-rc2-2025-01-17)
@@ -55,6 +56,25 @@
 * [Changelog for 1.2.0](#changelog-for-120-2021-02-17)
 * [Changelog for 1.1.0](#changelog-for-110-2021-01-22)
 * [Changelog for 1.0.0](#changelog-for-100-2020-12-17)
+
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes for unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis/compare/v7.1.0-rc.4...master
+
+## Summary
+
+* Enhancement - Add roles: [#10964](https://github.com/owncloud/ocis/pull/10964)
+
+## Details
+
+* Enhancement - Add roles: [#10964](https://github.com/owncloud/ocis/pull/10964)
+
+   Add EditorListGrantsWithVersions and FileEditorListGrantsWithVersions roles.
+
+   https://github.com/owncloud/ocis/issues/10747
+   https://github.com/owncloud/ocis/pull/10964
 
 # Changelog for [7.1.0-rc.4] (2025-02-04)
 
