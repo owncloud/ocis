@@ -76,7 +76,7 @@ Feature: create invitation
       | @domain.com                       | 400  |
       | user@domain..com                  | 400  |
 
-  @email @issue-10059
+  @issue-10059 @notification @email
   Scenario: federated user gets an email notification if their email was specified when creating the federation share invitation
     Given using server "REMOTE"
     And user "David" has been created with default attributes

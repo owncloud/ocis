@@ -1,3 +1,4 @@
+@notification
 Feature: Notification
   As a user
   I want to be notified of actions related to space

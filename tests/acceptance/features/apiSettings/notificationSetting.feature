@@ -1,4 +1,4 @@
-@email
+@notification
 Feature: Notification Settings
   As a user
   I want to manage my notification settings
@@ -11,7 +11,7 @@ Feature: Notification Settings
       | Brian    |
     And user "Alice" has uploaded file with content "some data" to "lorem.txt"
 
-
+  @email
   Scenario: disable email notification
     When user "Brian" disables email notification using the settings API
     Then the HTTP status code should be "201"
@@ -64,7 +64,7 @@ Feature: Notification Settings
       | permissionsRole | Viewer    |
     And user "Brian" should have "0" emails
 
-
+  @email
   Scenario: disable mail and in-app notification for "Share Received" event
     When user "Brian" disables notification for the following events using the settings API:
       | Share Received | mail,in-app |
@@ -153,7 +153,7 @@ Feature: Notification Settings
     Then the HTTP status code should be "200"
     And the notifications should be empty
 
-
+  @email
   Scenario: disable mail and in-app notification for "Share Removed" event
     Given user "Alice" has sent the following resource share invitation:
       | resource        | lorem.txt |
@@ -244,7 +244,7 @@ Feature: Notification Settings
       | Alice Hansen shared lorem.txt with you |
     But user "Brian" should not have a notification related to resource "lorem.txt" with subject "Resource unshared"
 
-
+  @email
   Scenario: disable mail and in-app notification for "Share Removed" event (Project space)
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
@@ -654,7 +654,7 @@ Feature: Notification Settings
       | Alice Hansen shared lorem.txt with you |
     And user "Brian" should have "0" emails
 
-
+  @email
   Scenario: disable mail and in-app notification for "Added as space member" event
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
@@ -802,7 +802,7 @@ Feature: Notification Settings
       | Alice Hansen shared lorem.txt with you |
     And user "Brian" should have "0" emails
 
-
+  @email
   Scenario: disable mail and in-app notification for "Removed as space member" event
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
