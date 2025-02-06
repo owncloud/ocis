@@ -1192,32 +1192,22 @@ Feature: filter sharing permissions
                 "oneOf":[
                 {
                   "type": "object",
-                  "required": [
-                    "@libre.graph.weight",
-                    "description",
-                    "displayName",
-                    "id"
-                  ],
+                  "required": ["@libre.graph.weight","description","displayName","id"],
                   "properties": {
-                    "@libre.graph.weight": { "const": 1 },
-                    "description": { "const": "View and download." },
-                    "displayName": { "const": "Can view" },
-                    "id": { "const": "b1e2218d-eef8-4d4c-b82d-0f1a1b48f3b5" }
+                    "@libre.graph.weight": {"const": 1},
+                    "description": {"const": "View and download."},
+                    "displayName": {"const": "Can view"},
+                    "id": {"const": "b1e2218d-eef8-4d4c-b82d-0f1a1b48f3b5"}
                   }
                 },
                 {
                   "type": "object",
-                  "required": [
-                    "@libre.graph.weight",
-                    "description",
-                    "displayName",
-                    "id"
-                  ],
+                  "required": ["@libre.graph.weight","description","displayName","id"],
                   "properties": {
-                    "@libre.graph.weight": { "const": 2 },
-                    "description": { "const": "View, download and edit." },
-                    "displayName": { "const": "Can edit" },
-                    "id": { "const": "2d00ce52-1fc2-4dbc-8b95-a73b73395f5a"  }
+                    "@libre.graph.weight": {"const": 2},
+                    "description": {"const": "View, download and edit."},
+                    "displayName": {"const": "Can edit"},
+                    "id": {"const": "2d00ce52-1fc2-4dbc-8b95-a73b73395f5a" }
                   }
                 }
               ]
@@ -1252,32 +1242,22 @@ Feature: filter sharing permissions
                 "oneOf":[
                 {
                   "type": "object",
-                  "required": [
-                    "@libre.graph.weight",
-                    "description",
-                    "displayName",
-                    "id"
-                  ],
+                  "required": ["@libre.graph.weight","description","displayName","id"],
                   "properties": {
-                    "@libre.graph.weight": { "const": 1 },
-                    "description": { "const": "View and download." },
-                    "displayName": { "const": "Can view" },
-                    "id": { "const": "b1e2218d-eef8-4d4c-b82d-0f1a1b48f3b5" }
+                    "@libre.graph.weight": {"const": 1},
+                    "description": {"const": "View and download."},
+                    "displayName": {"const": "Can view"},
+                    "id": {"const": "b1e2218d-eef8-4d4c-b82d-0f1a1b48f3b5"}
                   }
                 },
                 {
                   "type": "object",
-                  "required": [
-                    "@libre.graph.weight",
-                    "description",
-                    "displayName",
-                    "id"
-                  ],
+                  "required": ["@libre.graph.weight","description","displayName","id"],
                   "properties": {
-                    "@libre.graph.weight": { "const": 2 },
-                    "description": { "const": "View, download, upload, edit, add and delete." },
-                    "displayName": { "const": "Can edit" },
-                    "id": { "const": "fb6c3e19-e378-47e5-b277-9732f9de6e21" }
+                    "@libre.graph.weight": {"const": 2},
+                    "description": {"const": "View, download, upload, edit, add and delete."},
+                    "displayName": {"const": "Can edit"},
+                    "id": {"const": "fb6c3e19-e378-47e5-b277-9732f9de6e21"}
                   }
                 }
               ]
@@ -1315,32 +1295,22 @@ Feature: filter sharing permissions
                 "oneOf":[
                 {
                   "type": "object",
-                  "required": [
-                    "@libre.graph.weight",
-                    "description",
-                    "displayName",
-                    "id"
-                  ],
+                  "required": ["@libre.graph.weight","description","displayName","id"],
                   "properties": {
-                    "@libre.graph.weight": { "const": 1 },
-                    "description": { "const": "View and download." },
-                    "displayName": { "const": "Can view" },
-                    "id": { "const": "b1e2218d-eef8-4d4c-b82d-0f1a1b48f3b5" }
+                    "@libre.graph.weight": {"const": 1},
+                    "description": {"const": "View and download."},
+                    "displayName": {"const": "Can view"},
+                    "id": {"const": "b1e2218d-eef8-4d4c-b82d-0f1a1b48f3b5"}
                   }
                 },
                 {
                   "type": "object",
-                  "required": [
-                    "@libre.graph.weight",
-                    "description",
-                    "displayName",
-                    "id"
-                  ],
+                  "required": ["@libre.graph.weight","description","displayName","id"],
                   "properties": {
-                    "@libre.graph.weight": { "const": 2 },
-                    "description": { "const": "View, download and edit." },
-                    "displayName": { "const": "Can edit" },
-                    "id": { "const": "2d00ce52-1fc2-4dbc-8b95-a73b73395f5a" }
+                    "@libre.graph.weight": {"const": 2},
+                    "description": {"const": "View, download and edit."},
+                    "displayName": {"const": "Can edit"},
+                    "id": {"const": "2d00ce52-1fc2-4dbc-8b95-a73b73395f5a"}
                   }
                 }
               ]
@@ -1378,32 +1348,22 @@ Feature: filter sharing permissions
                 "oneOf":[
                 {
                   "type": "object",
-                  "required": [
-                    "@libre.graph.weight",
-                    "description",
-                    "displayName",
-                    "id"
-                  ],
+                  "required": ["@libre.graph.weight","description","displayName","id"],
                   "properties": {
-                    "@libre.graph.weight": { "const": 1 },
-                    "description": { "const": "View and download." },
-                    "displayName": { "const": "Can view" },
-                    "id": { "const": "b1e2218d-eef8-4d4c-b82d-0f1a1b48f3b5" }
+                    "@libre.graph.weight": {"const": 1},
+                    "description": {"const": "View and download."},
+                    "displayName": {"const": "Can view"},
+                    "id": {"const": "b1e2218d-eef8-4d4c-b82d-0f1a1b48f3b5"}
                   }
                 },
                 {
                   "type": "object",
-                  "required": [
-                    "@libre.graph.weight",
-                    "description",
-                    "displayName",
-                    "id"
-                  ],
+                  "required": ["@libre.graph.weight","description","displayName","id"],
                   "properties": {
-                    "@libre.graph.weight": { "const": 2 },
-                    "description": { "const": "View, download, upload, edit, add and delete." },
-                    "displayName": { "const": "Can edit" },
-                    "id": { "const": "fb6c3e19-e378-47e5-b277-9732f9de6e21" }
+                    "@libre.graph.weight": {"const": 2},
+                    "description": {"const": "View, download, upload, edit, add and delete."},
+                    "displayName": {"const": "Can edit"},
+                    "id": {"const": "fb6c3e19-e378-47e5-b277-9732f9de6e21"}
                   }
                 }
               ]
