@@ -216,6 +216,6 @@ class EmailHelper {
 	 * @return string
 	 */
 	public static function getDateTimeRegex(): string {
-		return '^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$';
+		return '\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}';
 	}
 }

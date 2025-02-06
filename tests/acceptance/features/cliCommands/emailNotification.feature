@@ -50,14 +50,14 @@ Feature: get email notification via CLI command
     And the command output should contain "successfully sent SendEmailsEvent"
     And user "Brian" should have received the following email from user "Alice"
       """
-      Hi Brian Murphy,
+      /Hi Brian Murphy,
 
       %displayname% has shared "lorem.txt" with you.
 
 
       Alice Hansen has unshared 'lorem.txt' with you.
 
-      Even though this share has been revoked you still might have access through other shares and/or space memberships.
+      Even though this share has been revoked you still might have access through other shares and\/or space memberships.
 
 
       Alice Hansen has shared "lorem.txt" with you.
@@ -74,9 +74,9 @@ Feature: get email notification via CLI command
       Alice Hansen has invited you to join "share space".
 
 
-      Your membership of space share space has expired at %date-time-pattern%
+      Your membership of space share space has expired at %date_time_pattern%
 
-      Even though this membership has expired you still might have access through other shares and/or space memberships
+      Even though this membership has expired you still might have access through other shares and\/or space memberships/
       """
 
 
@@ -122,14 +122,14 @@ Feature: get email notification via CLI command
     And the command output should contain "successfully sent SendEmailsEvent"
     And user "Brian" should have received the following email from user "Alice"
       """
-      Hi Brian Murphy,
+      /Hi Brian Murphy,
 
       Alice Hansen has shared "lorem.txt" with you.
 
 
       Alice Hansen has unshared 'lorem.txt' with you.
 
-      Even though this share has been revoked you still might have access through other shares and/or space memberships.
+      Even though this share has been revoked you still might have access through other shares and\/or space memberships.
 
 
       Alice Hansen has shared "lorem.txt" with you.
@@ -148,5 +148,5 @@ Feature: get email notification via CLI command
 
       Your membership of space share space has expired at %date_time_pattern%
 
-      Even though this membership has expired you still might have access through other shares and/or space memberships
+      Even though this membership has expired you still might have access through other shares and\/or space memberships/
       """
