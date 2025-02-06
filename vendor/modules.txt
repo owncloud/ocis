@@ -47,8 +47,8 @@ github.com/Nerzal/gocloak/v13/pkg/jwx
 # github.com/OneOfOne/xxhash v1.2.8
 ## explicit; go 1.11
 github.com/OneOfOne/xxhash
-# github.com/ProtonMail/go-crypto v0.0.0-20230828082145-3c4c8a2d2371
-## explicit; go 1.13
+# github.com/ProtonMail/go-crypto v1.1.3
+## explicit; go 1.17
 github.com/ProtonMail/go-crypto/bitcurves
 github.com/ProtonMail/go-crypto/brainpool
 github.com/ProtonMail/go-crypto/eax
@@ -59,6 +59,8 @@ github.com/ProtonMail/go-crypto/openpgp/aes/keywrap
 github.com/ProtonMail/go-crypto/openpgp/armor
 github.com/ProtonMail/go-crypto/openpgp/ecdh
 github.com/ProtonMail/go-crypto/openpgp/ecdsa
+github.com/ProtonMail/go-crypto/openpgp/ed25519
+github.com/ProtonMail/go-crypto/openpgp/ed448
 github.com/ProtonMail/go-crypto/openpgp/eddsa
 github.com/ProtonMail/go-crypto/openpgp/elgamal
 github.com/ProtonMail/go-crypto/openpgp/errors
@@ -67,6 +69,8 @@ github.com/ProtonMail/go-crypto/openpgp/internal/ecc
 github.com/ProtonMail/go-crypto/openpgp/internal/encoding
 github.com/ProtonMail/go-crypto/openpgp/packet
 github.com/ProtonMail/go-crypto/openpgp/s2k
+github.com/ProtonMail/go-crypto/openpgp/x25519
+github.com/ProtonMail/go-crypto/openpgp/x448
 # github.com/RoaringBitmap/roaring v1.9.3
 ## explicit; go 1.14
 github.com/RoaringBitmap/roaring
@@ -742,7 +746,7 @@ github.com/cs3org/reva/v2/pkg/utils/cfg
 github.com/cs3org/reva/v2/pkg/utils/ldap
 github.com/cs3org/reva/v2/pkg/utils/list
 github.com/cs3org/reva/v2/tests/cs3mocks/mocks
-# github.com/cyphar/filepath-securejoin v0.2.4
+# github.com/cyphar/filepath-securejoin v0.2.5
 ## explicit; go 1.13
 github.com/cyphar/filepath-securejoin
 # github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc
@@ -844,16 +848,16 @@ github.com/go-git/gcfg
 github.com/go-git/gcfg/scanner
 github.com/go-git/gcfg/token
 github.com/go-git/gcfg/types
-# github.com/go-git/go-billy/v5 v5.5.0
-## explicit; go 1.19
+# github.com/go-git/go-billy/v5 v5.6.0
+## explicit; go 1.20
 github.com/go-git/go-billy/v5
 github.com/go-git/go-billy/v5/helper/chroot
 github.com/go-git/go-billy/v5/helper/polyfill
 github.com/go-git/go-billy/v5/memfs
 github.com/go-git/go-billy/v5/osfs
 github.com/go-git/go-billy/v5/util
-# github.com/go-git/go-git/v5 v5.11.0
-## explicit; go 1.19
+# github.com/go-git/go-git/v5 v5.13.0
+## explicit; go 1.21
 github.com/go-git/go-git/v5
 github.com/go-git/go-git/v5/config
 github.com/go-git/go-git/v5/internal/path_util
@@ -1759,8 +1763,8 @@ github.com/segmentio/ksuid
 # github.com/sercand/kuberesolver/v5 v5.1.1
 ## explicit; go 1.18
 github.com/sercand/kuberesolver/v5
-# github.com/sergi/go-diff v1.3.1
-## explicit; go 1.12
+# github.com/sergi/go-diff v1.3.2-0.20230802210424-5b0b94c5c0d3
+## explicit; go 1.13
 github.com/sergi/go-diff/diffmatchpatch
 # github.com/sethvargo/go-password v0.3.1
 ## explicit; go 1.21
@@ -1787,7 +1791,7 @@ github.com/shurcooL/vfsgen
 # github.com/sirupsen/logrus v1.9.3
 ## explicit; go 1.13
 github.com/sirupsen/logrus
-# github.com/skeema/knownhosts v1.2.1
+# github.com/skeema/knownhosts v1.3.0
 ## explicit; go 1.17
 github.com/skeema/knownhosts
 # github.com/spacewander/go-suffix-tree v0.0.0-20191010040751-0865e368c784
