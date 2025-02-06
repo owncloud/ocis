@@ -758,3 +758,60 @@ Feature: Notification Settings
     Then the HTTP status code should be "200"
     And the notifications should be empty
     And user "Brian" should have "0" emails
+
+
+  Scenario: no email should be received when email sending interval is set to never
+    When user "Brian" sets the email sending interval to "never" using the settings API
+    Then the HTTP status code should be "201"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "object",
+            "required": ["identifier","value"],
+            "properties": {
+              "identifier":{
+                "type": "object",
+                "required": ["extension","bundle","setting"],
+                "properties": {
+                  "extension":{ "const": "ocis-accounts" },
+                  "bundle":{ "const": "profile" },
+                  "setting":{ "const": "email-sending-interval-options" }
+                }
+              },
+              "value":{
+                "type": "object",
+                "required": ["id","bundleId","settingId","accountUuid","resource","stringValue"],
+                "properties":{
+                  "id":{ "pattern":"%uuidv4_pattern%" },
+                  "bundleId":{ "pattern":"%uuidv4_pattern%" },
+                  "settingId":{ "pattern":"%uuidv4_pattern%" },
+                  "accountUuid":{ "pattern":"%uuidv4_pattern%" },
+                  "resource":{
+                    "type": "object",
+                    "required":["type"],
+                    "properties": {
+                      "type":{ "const": "TYPE_USER" }
+                    }
+                  },
+                  "stringValue":{ "const":"never" }
+                }
+              }
+            }
+          }
+        }
+      }
+      """
+    When user "Alice" sends the following resource share invitation using the Graph API:
+      | resource        | lorem.txt |
+      | space           | Personal  |
+      | sharee          | Brian     |
+      | shareType       | user      |
+      | permissionsRole | Viewer    |
+    Then user "Brian" should get a notification with subject "Resource shared" and message:
+      | message                                |
+      | Alice Hansen shared lorem.txt with you |
+    And user "Brian" should have "0" emails

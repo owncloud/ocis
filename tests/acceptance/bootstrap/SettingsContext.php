@@ -642,4 +642,28 @@ class SettingsContext implements Context {
 			$this->featureContext->setResponse($response);
 		}
 	}
+
+	/**
+	 * @When /^user "([^"]*)" sets the email sending interval to "([^"]*)" using the settings API$/
+	 *
+	 * @param string $user
+	 * @param string $interval
+	 *
+	 * @return void
+	 */
+	public function userSetsTheEmailSendingIntervalToUsingTheSettingsAPI(
+		string $user,
+		string $interval,
+	): void {
+		$body = $this->getBodyForNotificationSetting($user, "Email sending interval");
+		$body["value"]["stringValue"] = $interval;
+		$response = SettingsHelper::updateSettings(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getActualUsername($user),
+			$this->featureContext->getPasswordForUser($user),
+			json_encode($body),
+			$this->featureContext->getStepLineRef(),
+		);
+		$this->featureContext->setResponse($response);
+	}
 }
