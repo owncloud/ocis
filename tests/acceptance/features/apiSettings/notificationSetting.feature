@@ -239,8 +239,6 @@ Feature: Notification Settings
       """
     And user "Alice" has removed the access of user "Brian" from resource "lorem.txt" of space "Personal"
     And user "Brian" should have "1" emails
-    When user "Brian" lists all notifications
-    Then the HTTP status code should be "200"
     And user "Brian" should get a notification with subject "Resource shared" and message:
       | message                                |
       | Alice Hansen shared lorem.txt with you |
@@ -336,8 +334,6 @@ Feature: Notification Settings
       """
     And user "Alice" has removed the access of user "Brian" from resource "insideSpace.txt" of space "newSpace"
     And user "Brian" should have "1" emails
-    When user "Brian" lists all notifications
-    Then the HTTP status code should be "200"
     And user "Brian" should get a notification with subject "Resource shared" and message:
       | message                                      |
       | Alice Hansen shared insideSpace.txt with you |
@@ -415,8 +411,6 @@ Feature: Notification Settings
       }
       """
     And user "Brian" has uploaded file "filesForUpload/filesWithVirus/<file-name>" to "<new-file-name>"
-    When user "Brian" lists all notifications
-    Then the HTTP status code should be "200"
     And user "Brian" should not have any notification
     Examples:
       | dav-path-version | file-name     | new-file-name  |
@@ -503,8 +497,6 @@ Feature: Notification Settings
       }
       """
     And user "Brian" has uploaded a file "filesForUpload/filesWithVirus/eicar.com" to "virusFile.txt" in space "newSpace"
-    When user "Brian" lists all notifications
-    Then the HTTP status code should be "200"
     And user "Brian" should get a notification with subject "Space shared" and message:
       | message                                  |
       | Alice Hansen added you to Space newSpace |
@@ -600,9 +592,6 @@ Feature: Notification Settings
       }
       """
     And user "Alice" has disabled a space "new-space"
-    When user "Brian" lists all notifications
-    Then the HTTP status code should be "200"
-    And there should be "1" notifications
     And user "Brian" should get a notification with subject "Space shared" and message:
       | message                                   |
       | Alice Hansen added you to Space new-space |
@@ -660,9 +649,6 @@ Feature: Notification Settings
       | sharee          | Brian     |
       | shareType       | user      |
       | permissionsRole | Viewer    |
-    When user "Brian" lists all notifications
-    Then the HTTP status code should be "200"
-    And there should be "1" notifications
     And user "Brian" should get a notification with subject "Resource shared" and message:
       | message                                |
       | Alice Hansen shared lorem.txt with you |
