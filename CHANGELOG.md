@@ -66,6 +66,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Enhancement - Add roles: [#10964](https://github.com/owncloud/ocis/pull/10964)
+* Enhancement - Update Web to v1.11.3: [#10977](https://github.com/owncloud/ocis/pull/10977)
 
 ## Details
 
@@ -75,6 +76,14 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/10747
    https://github.com/owncloud/ocis/pull/10964
+
+* Enhancement - Update Web to v1.11.3: [#10977](https://github.com/owncloud/ocis/pull/10977)
+
+   - Bugfix [owncloud/web#12156](https://github.com/owncloud/web/pull/12156):
+   Replace text editor: #12156
+
+   https://github.com/owncloud/ocis/pull/10977
+   https://github.com/owncloud/web/releases/tag/v11.1.3
 
 # Changelog for [7.1.0-rc.4] (2025-02-04)
 
