@@ -1,4 +1,4 @@
-@ocm
+@ocm @notification
 Feature: accepting invitation
   As a user
   I can accept invitations from users of other ocis instances
