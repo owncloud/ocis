@@ -145,13 +145,4 @@ class EmailHelper {
 			['Content-Type' => 'application/json']
 		);
 	}
-
-	/**
-	 * Returns date-time regex in the format of "YYYY-MM-DD HH:MM:SSZ"
-	 *
-	 * @return string
-	 */
-	public static function getDateTimeRegex(): string {
-		return '\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}';
-	}
 }
