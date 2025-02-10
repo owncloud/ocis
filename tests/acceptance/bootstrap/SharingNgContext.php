@@ -2135,4 +2135,46 @@ class SharingNgContext implements Context {
 			$this->getPermissionsList($user, $fileOrFolder, $space, $resource, $query)
 		);
 	}
+
+	/**
+	 * @When user :user expires the last created share:
+	 *
+	 * @param string $user
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 */
+	public function userExpiresTheLastCreatedShare(string $user, TableNode $table): void {
+		$permissionID = $this->featureContext->shareNgGetLastCreatedUserGroupShareID();
+		$bodyRows = $table->getRowsHash();
+		if ($bodyRows['space'] === 'Personal' || $bodyRows['space'] === 'Shares') {
+			$space = $this->spacesContext->getSpaceByName($user, $bodyRows['space']);
+		} else {
+			$space = $this->spacesContext->getCreatedSpace($bodyRows['space']);
+		}
+		$spaceId = $space["id"];
+
+		$resource = $bodyRows['resource'] ?? '';
+		if ($resource === '' && !\in_array($bodyRows['space'], ['Personal', 'Shares'])) {
+			$itemId = $space['fileId'];
+		} else {
+			$itemId = $this->spacesContext->getResourceId($user, $bodyRows['space'], $resource);
+		}
+		$body = [];
+		$dateTime = new DateTime("now", new DateTimeZone("UTC"));
+		$body['expirationDateTime'] = $dateTime->modify('-5 minutes')->format('Y-m-d\TH:i:s\Z');
+
+		$this->featureContext->setResponse(
+			GraphHelper::updateShare(
+				$this->featureContext->getBaseUrl(),
+				$this->featureContext->getStepLineRef(),
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				$spaceId,
+				$itemId,
+				\json_encode($body),
+				$permissionID
+			)
+		);
+	}
 }

@@ -324,5 +324,8 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiServiceAvailability/serviceAvailabilityCheck.feature:116](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiServiceAvailability/serviceAvailabilityCheck.feature#L116)
 - [apiServiceAvailability/serviceAvailabilityCheck.feature:125](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiServiceAvailability/serviceAvailabilityCheck.feature#L125)
 
+### [Multiple in-app and mail notification generated for Share Expired event of resource inside Project drive ](https://github.com/owncloud/ocis/issues/10936)
+-[apiNotification/shareExpireNotification.feature:33](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiNotification/shareExpireNotification.feature#L33)
+
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.
