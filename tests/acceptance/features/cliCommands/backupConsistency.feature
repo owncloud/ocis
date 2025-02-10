@@ -1,4 +1,4 @@
-@env-config
+@env-config @notification
 Feature: backup consistency
   As a user
   I want to check my data for inconsistencies
@@ -7,7 +7,7 @@ Feature: backup consistency
   Background:
     Given user "Alice" has been created with default attributes
 
-  
+
   Scenario: check backup consistency via CLI command
     Given these users have been created with default attributes:
       | username |
