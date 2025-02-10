@@ -2112,31 +2112,6 @@ class SharingNgContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" gets the allowed roles for federated user of (folder|file) "([^"]*)" from the space "([^"]*)" using the Graph API$/
-	 *
-	 * @param string $user
-	 * @param string $fileOrFolder (file|folder)
-	 * @param string $resource
-	 * @param string $space
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function userGetsFederatedPermissionsListForFileOfTheSpaceUsingTheGraphApi(
-		string $user,
-		string $fileOrFolder,
-		string $resource,
-		string $space
-	): void {
-		$query = '$filter=@libre.graph.permissions.roles.allowedValues'
-			. '/rolePermissions/any(p:contains(p/condition,+\'@Subject.UserType=="Federated"\'))'
-			. '&$select=@libre.graph.permissions.roles.allowedValues';
-		$this->featureContext->setResponse(
-			$this->getPermissionsList($user, $fileOrFolder, $space, $resource, $query)
-		);
-	}
-
-	/**
 	 * @When /^user "([^"]*)" lists permissions with following filters for (folder|file) "([^"]*)" of the space "([^"]*)" using the Graph API:$/
 	 *
 	 * @param string $user
