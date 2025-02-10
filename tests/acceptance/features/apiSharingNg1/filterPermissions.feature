@@ -1166,3 +1166,209 @@ Feature: filter sharing permissions
         }
       }
       """
+
+  @issue-9745 @env-config
+  Scenario: user lists allowed file permissions for federated user
+    Given the administrator has enabled the permissions role "Secure Viewer"
+    And user "Alice" has uploaded file with content "ocm test" to "/textfile.txt"
+    When user "Alice" lists permissions with following filters for file "textfile.txt" of the space "Personal" using the Graph API:
+      | $filter=@libre.graph.permissions.roles.allowedValues/rolePermissions/any(p:contains(p/condition,+'@Subject.UserType=="Federated"')) |
+      | $select=@libre.graph.permissions.roles.allowedValue                                                                                 |
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+          "required": [
+            "@libre.graph.permissions.roles.allowedValues"
+          ],
+          "properties": {
+            "@libre.graph.permissions.roles.allowedValues": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 2,
+              "uniqueItems": true,
+              "items": {
+                "oneOf":[
+                {
+                  "type": "object",
+                  "required": ["@libre.graph.weight","description","displayName","id"],
+                  "properties": {
+                    "@libre.graph.weight": {"const": 1},
+                    "description": {"const": "View and download."},
+                    "displayName": {"const": "Can view"},
+                    "id": {"const": "b1e2218d-eef8-4d4c-b82d-0f1a1b48f3b5"}
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["@libre.graph.weight","description","displayName","id"],
+                  "properties": {
+                    "@libre.graph.weight": {"const": 2},
+                    "description": {"const": "View, download and edit."},
+                    "displayName": {"const": "Can edit"},
+                    "id": {"const": "2d00ce52-1fc2-4dbc-8b95-a73b73395f5a" }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+      """
+
+  @issue-9745 @env-config
+  Scenario: user lists allowed folder permissions for federated user
+    Given the administrator has enabled the permissions role "Denied"
+    And user "Alice" has created folder "folderToShare"
+    When user "Alice" lists permissions with following filters for folder "folderToShare" of the space "Personal" using the Graph API:
+      | $filter=@libre.graph.permissions.roles.allowedValues/rolePermissions/any(p:contains(p/condition,+'@Subject.UserType=="Federated"')) |
+      | $select=@libre.graph.permissions.roles.allowedValue                                                                                 |
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+          "required": [
+            "@libre.graph.permissions.roles.allowedValues"
+          ],
+          "properties": {
+            "@libre.graph.permissions.roles.allowedValues": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 2,
+              "uniqueItems": true,
+              "items": {
+                "oneOf":[
+                {
+                  "type": "object",
+                  "required": ["@libre.graph.weight","description","displayName","id"],
+                  "properties": {
+                    "@libre.graph.weight": {"const": 1},
+                    "description": {"const": "View and download."},
+                    "displayName": {"const": "Can view"},
+                    "id": {"const": "b1e2218d-eef8-4d4c-b82d-0f1a1b48f3b5"}
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["@libre.graph.weight","description","displayName","id"],
+                  "properties": {
+                    "@libre.graph.weight": {"const": 2},
+                    "description": {"const": "View, download, upload, edit, add and delete."},
+                    "displayName": {"const": "Can edit"},
+                    "id": {"const": "fb6c3e19-e378-47e5-b277-9732f9de6e21"}
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+      """
+
+  @issue-9745 @env-config
+  Scenario: user lists allowed file permissions for federated user (Project Space)
+    Given using spaces DAV path
+    And the administrator has enabled the permissions role "Secure Viewer"
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Alice" has uploaded a file inside space "new-space" with content "some content" to "textfile.txt"
+    When user "Alice" lists permissions with following filters for file "textfile.txt" of the space "new-space" using the Graph API:
+      | $filter=@libre.graph.permissions.roles.allowedValues/rolePermissions/any(p:contains(p/condition,+'@Subject.UserType=="Federated"')) |
+      | $select=@libre.graph.permissions.roles.allowedValue                                                                                 |
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+          "required": [
+            "@libre.graph.permissions.roles.allowedValues"
+          ],
+          "properties": {
+            "@libre.graph.permissions.roles.allowedValues": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 2,
+              "uniqueItems": true,
+              "items": {
+                "oneOf":[
+                {
+                  "type": "object",
+                  "required": ["@libre.graph.weight","description","displayName","id"],
+                  "properties": {
+                    "@libre.graph.weight": {"const": 1},
+                    "description": {"const": "View and download."},
+                    "displayName": {"const": "Can view"},
+                    "id": {"const": "b1e2218d-eef8-4d4c-b82d-0f1a1b48f3b5"}
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["@libre.graph.weight","description","displayName","id"],
+                  "properties": {
+                    "@libre.graph.weight": {"const": 2},
+                    "description": {"const": "View, download and edit."},
+                    "displayName": {"const": "Can edit"},
+                    "id": {"const": "2d00ce52-1fc2-4dbc-8b95-a73b73395f5a"}
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+      """
+
+  @issue-9745 @env-config
+  Scenario: user lists allowed folder permissions for federated user (Project Space)
+    Given using spaces DAV path
+    And the administrator has enabled the permissions role "Denied"
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Alice" has created a folder "folderToShare" in space "new-space"
+    When user "Alice" lists permissions with following filters for folder "folderToShare" of the space "new-space" using the Graph API:
+      | $filter=@libre.graph.permissions.roles.allowedValues/rolePermissions/any(p:contains(p/condition,+'@Subject.UserType=="Federated"')) |
+      | $select=@libre.graph.permissions.roles.allowedValue                                                                                 |
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+          "required": [
+            "@libre.graph.permissions.roles.allowedValues"
+          ],
+          "properties": {
+            "@libre.graph.permissions.roles.allowedValues": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 2,
+              "uniqueItems": true,
+              "items": {
+                "oneOf":[
+                {
+                  "type": "object",
+                  "required": ["@libre.graph.weight","description","displayName","id"],
+                  "properties": {
+                    "@libre.graph.weight": {"const": 1},
+                    "description": {"const": "View and download."},
+                    "displayName": {"const": "Can view"},
+                    "id": {"const": "b1e2218d-eef8-4d4c-b82d-0f1a1b48f3b5"}
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["@libre.graph.weight","description","displayName","id"],
+                  "properties": {
+                    "@libre.graph.weight": {"const": 2},
+                    "description": {"const": "View, download, upload, edit, add and delete."},
+                    "displayName": {"const": "Can edit"},
+                    "id": {"const": "fb6c3e19-e378-47e5-b277-9732f9de6e21"}
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+      """
