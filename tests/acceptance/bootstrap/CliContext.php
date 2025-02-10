@@ -127,7 +127,7 @@ class CliContext implements Context {
 	}
 
 	/**
-	 * @When the administrator creates app token for user :user with expiration time :expirationTime using the auth-app CLI
+	 * @When the administrator creates auth-app token for user :user with expiration time :expirationTime using the auth-app CLI
 	 *
 	 * @param string $user
 	 * @param string $expirationTime
