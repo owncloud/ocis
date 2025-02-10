@@ -444,7 +444,6 @@ default:
       contexts:
         - FeatureContext: *common_feature_context_params
         - AuthAppContext:
-        - CliContext:
         - OcisConfigContext:
 
     cliCommands:
@@ -461,6 +460,7 @@ default:
         - TagContext:
         - TrashbinContext:
         - SpacesTUSContext:
+        - AuthAppContext:
 
     coreApiMain:
       paths:
