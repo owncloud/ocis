@@ -478,7 +478,7 @@ class CliContext implements Context {
 	 * @throws \GuzzleHttp\Exception\GuzzleException
 	 */
 	public function theAdministratorTriggersEmailNotificationsUsingTheCLI(string $interval): void {
-		$command = $interval === "daily" ? "notifications send-email --daily" : "notifications send-email --weekly";
+		$command = "notifications send-email --$interval";
 		$body = [
 			"command" => $command
 		];

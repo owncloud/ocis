@@ -668,7 +668,7 @@ class SettingsContext implements Context {
 	}
 
 	/**
-	 * @Given /^user "([^"]*)" has (disabled|enabled) notification for the following events using the settings API:$/
+	 * @Given /^user "([^"]*)" has (disabled|enabled) notification for the following events:$/
 	 *
 	 * @param string $user
 	 * @param string $enabledOrDisabled
