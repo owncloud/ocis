@@ -49,7 +49,7 @@ class AuthAppContext implements Context {
 	}
 
 	/**
-	 * @When user :user creates auth-app token with expiration time :expiration using the auth-app API
+	 * @When /^user "([^"]*)" (?:creates|tries to create) auth-app token with expiration time "([^"]*)" using the auth-app API$/
 	 *
 	 * @param string $user
 	 * @param string $expiration
