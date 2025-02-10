@@ -1,3 +1,4 @@
+@notification
 Feature: service health check
 
 

@@ -1,4 +1,4 @@
-@email
+@notification @email
 Feature: Email notification
   As a user
   I want to get email notification of events related to me
@@ -130,7 +130,7 @@ Feature: Email notification
       Zum Ansehen hier klicken: %base_url%/files/shares/with-me
       """
 
-  @skipOnStable3.0
+
   Scenario: group members get an email notification in their respective languages when someone shares a space with the group
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Carol" has been created with default attributes

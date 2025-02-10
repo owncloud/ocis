@@ -48,9 +48,10 @@ class NotificationContext implements Context {
 	}
 
 	/**
-	 * @AfterScenario
+	 * delete all in-app notifications
 	 *
 	 * @return void
+	 * @throws GuzzleException
 	 */
 	public function deleteDeprovisioningNotification(): void {
 		$payload["ids"] = ["deprovision"];
@@ -64,6 +65,41 @@ class NotificationContext implements Context {
 			$this->featureContext->getStepLineRef(),
 			json_encode($payload)
 		);
+	}
+
+	/**
+	 * Delete all the emails
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function clearAllEmails(): void {
+		try {
+			$usersList = $this->featureContext->getAllCreatedUsers();
+			foreach ($usersList as $emailRecipient) {
+				EmailHelper::deleteAllEmailsForAMailbox(
+					EmailHelper::getLocalEmailUrl(),
+					$this->featureContext->getStepLineRef(),
+					$emailRecipient['email']
+				);
+			}
+		} catch (Exception $e) {
+			echo __METHOD__ .
+				" could not delete inbucket messages, is inbucket set up?\n" .
+				$e->getMessage();
+		}
+	}
+
+	/**
+	 * @AfterScenario @notification
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws JsonException
+	 */
+	public function deleteAllNotifications(): void {
+		$this->deleteDeprovisioningNotification();
+		$this->clearAllEmails();
 	}
 
 	/**
@@ -151,7 +187,7 @@ class NotificationContext implements Context {
 	 * @throws GuzzleException
 	 * @throws JsonException
 	 */
-	public function deleteAllNotifications(string $user): ResponseInterface {
+	public function deleteAllInAppNotifications(string $user): ResponseInterface {
 		$response = $this->listAllNotifications($user);
 		if (isset($this->featureContext->getJsonDecodedResponseBodyContent($response)->ocs->data)) {
 			$responseBody = $this->featureContext->getJsonDecodedResponseBodyContent($response)->ocs->data;
@@ -173,7 +209,7 @@ class NotificationContext implements Context {
 	 * @throws JsonException
 	 */
 	public function userDeletesAllNotifications(string $user): void {
-		$response = $this->deleteAllNotifications($user);
+		$response = $this->deleteAllInAppNotifications($user);
 		$this->featureContext->setResponse($response);
 	}
 
@@ -187,7 +223,7 @@ class NotificationContext implements Context {
 	 * @throws JsonException
 	 */
 	public function userHasDeletedAllNotifications(string $user): void {
-		$response = $this->deleteAllNotifications($user);
+		$response = $this->deleteAllInAppNotifications($user);
 		$this->featureContext->theHTTPStatusCodeShouldBe(200, "", $response);
 	}
 
@@ -333,16 +369,13 @@ class NotificationContext implements Context {
 			$responseBody = $this->featureContext->getJsonDecodedResponseBodyContent($response)->ocs->data;
 			foreach ($responseBody as $value) {
 				if (isset($value->subject) && $value->subject === $subject) {
-					$responseBody = $value;
 					// set notificationId
 					$this->notificationIds[] = $value->notification_id;
-					break;
+					return $value;
 				}
 			}
-		} else {
-			$responseBody = $this->featureContext->getJsonDecodedResponseBodyContent($response);
 		}
-		return $responseBody;
+		return new StdClass();
 	}
 
 	/**
@@ -661,30 +694,6 @@ class NotificationContext implements Context {
 			. "email with the body containing $expectedEmailBodyContent
 			but the received email is $actualEmailBodyContent"
 		);
-	}
-
-	/**
-	 * Delete all the inbucket emails
-	 *
-	 * @AfterScenario @email
-	 *
-	 * @return void
-	 */
-	public function clearInbucketMessages(): void {
-		try {
-			$usersList = $this->featureContext->getAllCreatedUsers();
-			foreach ($usersList as $emailRecipient) {
-				EmailHelper::deleteAllEmailsForAMailbox(
-					EmailHelper::getLocalEmailUrl(),
-					$this->featureContext->getStepLineRef(),
-					$emailRecipient['email']
-				);
-			}
-		} catch (Exception $e) {
-			echo __METHOD__ .
-				" could not delete inbucket messages, is inbucket set up?\n" .
-				$e->getMessage();
-		}
 	}
 
 	/**
