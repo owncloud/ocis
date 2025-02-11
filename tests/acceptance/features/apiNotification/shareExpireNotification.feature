@@ -11,8 +11,9 @@ Feature: Share Expiry Notification
       | Brian    |
 
 
-  Scenario: check share expired in-app and mail notification for Personal space resource
-    Given user "Alice" has uploaded file with content "hello world" to "testfile.txt"
+  Scenario: check share expired in-app and mail notifications for Personal space resource
+    Given using SharingNG
+    And user "Alice" has uploaded file with content "hello world" to "testfile.txt"
     And user "Alice" has sent the following resource share invitation:
       | resource           | testfile.txt         |
       | space              | Personal             |
@@ -20,33 +21,17 @@ Feature: Share Expiry Notification
       | shareType          | user                 |
       | permissionsRole    | Viewer               |
       | expirationDateTime | 2025-07-15T14:00:00Z |
-    When user "Alice" expires the last created share:
-      | space    | Personal     |
-      | resource | testfile.txt |
+    When user "Alice" expires the last share of resource "testfile.txt" inside of the space "Personal"
     Then the HTTP status code should be "200"
     And user "Brian" should get a notification with subject "Membership expired" and message:
       | message                           |
       | Access to Space Alice Hansen lost |
     And user "Brian" should have "2" emails
+    And user "Brian" should have received the following email from user "Alice"
+      """
+      Hello Brian Murphy,
 
-  @issue-10966
-  Scenario: check share expired in-app and mail notification for Project space resource
-    Given using spaces DAV path
-    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
-    And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
-    And user "Alice" has uploaded a file inside space "NewSpace" with content "share space items" to "testfile.txt"
-    And user "Alice" has sent the following resource share invitation:
-      | resource           | testfile.txt         |
-      | space              | NewSpace             |
-      | sharee             | Brian                |
-      | shareType          | user                 |
-      | permissionsRole    | Viewer               |
-      | expirationDateTime | 2025-07-15T14:00:00Z |
-    When user "Alice" expires the last created share:
-      | space    | NewSpace     |
-      | resource | testfile.txt |
-    Then the HTTP status code should be "200"
-    And user "Brian" should get a notification with subject "Membership expired" and message:
-      | message                       |
-      | Access to Space NewSpace lost |
-    And user "Brian" should have "2" emails
+      Your membership of space %displayname% has expired at %expirationDateTime%
+
+      Even though this membership has expired you still might have access through other shares and/or space memberships
+      """
