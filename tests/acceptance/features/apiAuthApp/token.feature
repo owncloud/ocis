@@ -130,3 +130,29 @@ Feature: create auth-app token
         "maxItems": 0
       }
       """
+
+  @env-config
+  Scenario: create auth app token with user-id
+    Given the config "AUTH_APP_ENABLE_IMPERSONATION" has been set to "true"
+    When user "Admin" creates app token with user-id for user "Alice" with expiration time "72h" using the auth-app API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "token",
+          "expiration_date",
+          "created_date",
+          "label"
+        ],
+        "properties": {
+          "token": {
+            "pattern": "^[a-zA-Z0-9]{16}$"
+          },
+          "label": {
+            "const": "Generated via API"
+          }
+        }
+      }
+      """
