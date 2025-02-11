@@ -183,6 +183,49 @@ Feature: Email notification
       Click here to check it: %base_url%/f/%space_id%
       """
 
+  Scenario: user gets an email notification when a file resource is unshared
+    Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "space-to-share" with the default quota using the Graph API
+    And user "Alice" has sent the following space share invitation:
+      | space           | space-to-share |
+      | sharee          | Brian          |
+      | shareType       | user           |
+      | permissionsRole | Space Editor   |
+    When user "Alice" unshares a space "space-to-share" to user "Brian"
+    Then the HTTP status code should be "200"
+    And user "Brian" should have received the following email from user "Alice" about the share of project space "space-to-share"
+      """
+      Hello Brian Murphy,
+
+      %displayname% has removed you from "space-to-share".
+
+      You might still have access through your other groups or direct membership.
+
+      Click here to check it: %base_url%/f/%space_id%
+      """
+
+  @issue-10937
+  Scenario: user gets an email notification when space resource is unshared
+    Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Alice" has sent the following space share invitation:
+      | space           | new-space    |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | Space Viewer |
+    When user "Alice" unshares a space "new-space" to user "Brian"
+    Then the HTTP status code should be "200"
+    And user "Brian" should have received the following email from user "Alice" about the share of project space "new-space"
+      """
+      Hello Brian Murphy,
+
+      %displayname% has removed you from "new-space".
+
+      You might still have access through your other groups or direct membership.
+
+      Click here to check it: %base_url%/f/%space_id%
+      """
+
   @env-config
   Scenario: group members get an email notification in default language when someone shares a file with the group
     Given the config "OCIS_DEFAULT_LANGUAGE" has been set to "de"

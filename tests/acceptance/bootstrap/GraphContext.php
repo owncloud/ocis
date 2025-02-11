@@ -1838,7 +1838,7 @@ class GraphContext implements Context {
 			201,
 			$response->getStatusCode(),
 			__METHOD__
-			. "\nExpected status code '200' but got '" . $response->getStatusCode() . "'"
+			. "\nExpected status code '201' but got '" . $response->getStatusCode() . "'"
 		);
 	}
 
