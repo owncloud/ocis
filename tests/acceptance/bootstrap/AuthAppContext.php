@@ -211,4 +211,30 @@ class AuthAppContext implements Context {
 		);
 	}
 
+	/**
+	 * @When user :user creates app token with user-id for user :impersonatedUser with expiration time :expiration using the auth-app API
+	 *
+	 * @param string $user
+	 * @param string $impersonatedUser
+	 * @param string $expiration
+	 *
+	 * @return void
+	 */
+	public function userCreatesAppTokenWithUserIdForUserWithExpirationTimeUsingTheAuthAppApi(
+		string $user,
+		string $impersonatedUser,
+		string $expiration
+	): void {
+		$this->featureContext->setResponse(
+			AuthAppHelper::createAppAuthToken(
+				$this->featureContext->getBaseUrl(),
+				$this->featureContext->getActualUsername($user),
+				$this->featureContext->getPasswordForUser($user),
+				[
+					"expiry" => $expiration,
+					"userId" => $this->featureContext->getUserIdByUserName($impersonatedUser)
+				],
+			)
+		);
+	}
 }
