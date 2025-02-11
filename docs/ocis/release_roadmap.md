@@ -13,7 +13,7 @@ This page is designed to provide clarity and transparency regarding the scheduli
 
 ## Dates
 
-Note that Version and Notes tagged with UNRELEASED cannot be resolved by design.
+Note that Version and Notes tagged with UNRELEASED are only prepared and cannot be resolved by design.
 <!-- https://www.tablesgenerator.com/markdown_tables -->
 
 | Release Date   | Type           | Version                                                                               | Notes                                                                                                 |
