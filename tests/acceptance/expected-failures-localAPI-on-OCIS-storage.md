@@ -338,5 +338,13 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 #### [Delete user containing + in username returns 404 but user gets deleted](https://github.com/owncloud/ocis/issues/11027)
 - [apiGraphUser/deleteUser.feature:28](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUser/deleteUser.feature#L28)
 
+#### [server returns status code 500 when creating token for non-existent user (Impersonation)](https://github.com/owncloud/ocis/issues/10815)
+- [apiAuthApp/token.feature:241](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiAuthApp/token.feature#L241)
+- [apiAuthApp/token.feature:247](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiAuthApp/token.feature#L247)
+
+#### [Server returns status code 500 when deleting auth-app token of a different user](https://github.com/owncloud/ocis/issues/10921)
+- [apiAuthApp/token.feature:254](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiAuthApp/token.feature#L254)
+- [apiAuthApp/token.feature:260](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiAuthApp/token.feature#L260)
+
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.
