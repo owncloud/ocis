@@ -101,7 +101,7 @@ class SharingNgContext implements Context {
 			'password' => $this->featureContext->getActualPassword($bodyRows['password'])
 		];
 
-		return GraphHelper::createLinkShare(
+		$response = GraphHelper::createLinkShare(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
 			$user,
@@ -110,6 +110,12 @@ class SharingNgContext implements Context {
 			$itemId,
 			\json_encode($body)
 		);
+
+		if ($response->getStatusCode() == 200) {
+			$this->featureContext->shareNgAddToCreatedLinkShares($response);
+		}
+
+		return $response;
 	}
 
 	/**
@@ -681,7 +687,7 @@ class SharingNgContext implements Context {
 			? null : $bodyRows['expirationDateTime'];
 		}
 
-		return GraphHelper::updateShare(
+		$response =  GraphHelper::updateShare(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
 			$user,
@@ -691,6 +697,12 @@ class SharingNgContext implements Context {
 			\json_encode($body),
 			$permissionID
 		);
+
+		if ($response->getStatusCode() === 200) {
+			$this->featureContext->shareNgAddToCreatedUserGroupShares($response);
+		}
+
+		return $response;
 	}
 
 	/**
@@ -763,7 +775,6 @@ class SharingNgContext implements Context {
 		);
 		$response = $this->createLinkShare($user, $body);
 		$this->featureContext->theHTTPStatusCodeShouldBe(200, "Failed while creating public share link!", $response);
-		$this->featureContext->shareNgAddToCreatedLinkShares($response);
 	}
 
 	/**
@@ -859,7 +870,7 @@ class SharingNgContext implements Context {
 			$body['displayName'] = $bodyRows['displayName'];
 		}
 
-		return GraphHelper::updateShare(
+		$response = GraphHelper::updateShare(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
 			$user,
@@ -869,6 +880,12 @@ class SharingNgContext implements Context {
 			\json_encode($body),
 			$permissionID
 		);
+
+		if ($response->getStatusCode() === 200) {
+			$this->featureContext->shareNgAddToCreatedLinkShares($response);
+		}
+
+		return $response;
 	}
 
 	/**
@@ -894,7 +911,7 @@ class SharingNgContext implements Context {
 			throw new Error('Password is missing to set for share link!');
 		}
 
-		return GraphHelper::setLinkSharePassword(
+		$response = GraphHelper::setLinkSharePassword(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
 			$user,
@@ -904,6 +921,11 @@ class SharingNgContext implements Context {
 			\json_encode($body),
 			$permissionID
 		);
+
+		if ($response->getStatusCode() === 200) {
+			$this->featureContext->shareNgAddToCreatedLinkShares($response);
+		}
+		return $response;
 	}
 
 	/**
