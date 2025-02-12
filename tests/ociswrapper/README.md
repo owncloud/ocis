@@ -124,3 +124,39 @@ Also, see `./bin/ociswrapper help` for more information.
 
     - `200 OK` - oCIS server is stopped
     - `500 Internal Server Error` - Unable to stop oCIS server
+
+6. `POST /services/{service-name}`
+
+   Restart oCIS instances without specified service and start that service independently (not covered by the oCIS supervisor).
+
+    Body of the request should be a JSON object with the following structure:
+
+    ```json
+    {
+      "ENV_KEY1": "value1",
+      "ENV_KEY2": "value2"
+    }
+    ```
+
+    > **⚠️ Note:**
+    >
+    > You need to set the proper addresses to access the service from other steps in the CI pipeline.
+    >
+    > `{SERVICE-NAME}_DEBUG_ADDR=0.0.0.0:{DEBUG_PORT}`
+    >
+    > `{SERVICE-NAME}_HTTP_ADDR=0.0.0.0:{HTTP_PORT}`
+
+   Returns:
+
+    - `200 OK` - oCIS service started successfully
+    - `400 Bad Request` - request body is not a valid JSON object
+    - `500 Internal Server Error` - Failed to start oCIS service audit
+
+7. `DELETE /services/{service-name}`
+
+   Stop individually running oCIS service
+
+   Returns:
+
+    - `200 OK` - oCIS service stopped successfully
+    - `500 Internal Server Error` - Unable to stop oCIS service
