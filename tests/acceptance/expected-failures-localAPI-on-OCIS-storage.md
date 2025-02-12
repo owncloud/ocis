@@ -324,5 +324,13 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiServiceAvailability/serviceAvailabilityCheck.feature:116](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiServiceAvailability/serviceAvailabilityCheck.feature#L116)
 - [apiServiceAvailability/serviceAvailabilityCheck.feature:125](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiServiceAvailability/serviceAvailabilityCheck.feature#L125)
 
+#### [server returns status code 500 when creating token for non-existent user (Impersonation)](https://github.com/owncloud/ocis/issues/10815)
+- [apiAuthApp/token.feature:135](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiAuthApp/token.feature#L135)
+- [apiAuthApp/token.feature:141](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiAuthApp/token.feature#L141)
+
+#### [Server returns status code 500 when deleting auth-app token of a different user](https://github.com/owncloud/ocis/issues/10921)
+- [apiAuthApp/token.feature:148](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiAuthApp/token.feature#L148)
+- [apiAuthApp/token.feature:154](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiAuthApp/token.feature#L154)
+
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.

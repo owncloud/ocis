@@ -89,7 +89,7 @@ Feature: create auth-app token
   @env-config
   Scenario: admin creates auth-app token for other user
     Given the config "AUTH_APP_ENABLE_IMPERSONATION" has been set to "true"
-    When the administrator creates app token for user "Alice" with expiration time "72h" using the auth-app API
+    When user "Admin" creates app token for user "Alice" with expiration time "72h" using the auth-app API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
       """
@@ -130,3 +130,29 @@ Feature: create auth-app token
         "maxItems": 0
       }
       """
+
+  @env-config @issue-10815
+  Scenario: try to create auth-app token for non-existing user
+    Given the config "AUTH_APP_ENABLE_IMPERSONATION" has been set to "true"
+    When user "Admin" creates app token for user "Brian" with expiration time "72h" using the auth-app API
+    Then the HTTP status code should be "403"
+
+  @env-config @issue-10815
+  Scenario: try to create auth-app token for non-existing user with impersonation enabled
+    Given the config "AUTH_APP_ENABLE_IMPERSONATION" has been set to "true"
+    And the administrator has created app token for user "Alice" with expiration time "72h" using the auth-app API
+    When user "Admin" tries to deletes last created auth-app tokens using the auth-app API
+    Then the HTTP status code should be "403"
+
+  @issue-10921
+  Scenario: try to delete auth-app token by admin user
+    Given user "Alice" has created app token with expiration time "72h" using the auth-app API
+    When user "Admin" tries to deletes last created auth-app tokens using the auth-app API
+    Then the HTTP status code should be "403"
+
+  @issue-10921
+  Scenario: try to delete auth-app token of a user by another user
+    Given user "Brian" has been created with default attributes
+    And user "Brian" has created app token with expiration time "72h" using the auth-app API
+    When user "Admin" tries to deletes last created auth-app tokens using the auth-app API
+    Then the HTTP status code should be "403"
