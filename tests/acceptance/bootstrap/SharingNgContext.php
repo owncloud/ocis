@@ -1091,6 +1091,30 @@ class SharingNgContext implements Context {
 	}
 
 	/**
+	 * @Given /^user "([^"]*)" has removed the access of (user|group) "([^"]*)" from (?:file|folder|resource) "([^"]*)" of space "([^"]*)" using the Graph API$/
+	 *
+	 * @param string $sharer
+	 * @param string $recipientType (user|group)
+	 * @param string $recipient can be both user or group
+	 * @param string $resource
+	 * @param string $space
+	 *
+	 * @return void
+	 * @throws JsonException
+	 * @throws GuzzleException
+	 */
+	public function userHasRemovedAccessOfUserOrGroupFromResourceOfSpaceUsingGraphAPI(
+		string $sharer,
+		string $recipientType,
+		string $recipient,
+		string $resource,
+		string $space
+	): void {
+		$response = $this->removeAccessToSpaceItem($sharer, $recipientType, $space, $resource, $recipient);
+		$this->featureContext->theHTTPStatusCodeShouldBe(204, "", $response);
+	}
+
+	/**
 	 * @When /^user "([^"]*)" removes the access of (user|group) "([^"]*)" from space "([^"]*)" using permissions endpoint of the Graph API$/
 	 *
 	 * @param string $sharer
