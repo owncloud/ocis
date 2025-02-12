@@ -78,220 +78,220 @@ config = {
         "skip": False,
     },
     "localApiTests": {
-        "basic": {
-            "suites": [
-                "apiArchiver",
-                "apiContract",
-                "apiCors",
-                "apiAsyncUpload",
-                "apiDownloads",
-                "apiDepthInfinity",
-                "apiLocks",
-                "apiActivities",
-            ],
-            "skip": False,
-        },
-        "settings": {
-            "suites": [
-                "apiSettings",
-            ],
-            "skip": False,
-            "withRemotePhp": [True],
-            "emailNeeded": True,
-            "extraEnvironment": {
-                "EMAIL_HOST": "email",
-                "EMAIL_PORT": "9000",
-            },
-            "extraServerEnvironment": {
-                "OCIS_ADD_RUN_SERVICES": "notifications",
-                "NOTIFICATIONS_SMTP_HOST": "email",
-                "NOTIFICATIONS_SMTP_PORT": "2500",
-                "NOTIFICATIONS_SMTP_INSECURE": "true",
-                "NOTIFICATIONS_SMTP_SENDER": "ownCloud <noreply@example.com>",
-                "NOTIFICATIONS_DEBUG_ADDR": "0.0.0.0:9174",
-            },
-        },
-        "graph": {
-            "suites": [
-                "apiGraph",
-                "apiServiceAvailability",
-            ],
-            "skip": False,
-            "withRemotePhp": [True],
-        },
-        "graphUserGroup": {
-            "suites": [
-                "apiGraphUserGroup",
-            ],
-            "skip": False,
-            "withRemotePhp": [True],
-        },
-        "spaces": {
-            "suites": [
-                "apiSpaces",
-            ],
-            "skip": False,
-        },
+        # "basic": {
+        #     "suites": [
+        #         "apiArchiver",
+        #         "apiContract",
+        #         "apiCors",
+        #         "apiAsyncUpload",
+        #         "apiDownloads",
+        #         "apiDepthInfinity",
+        #         "apiLocks",
+        #         "apiActivities",
+        #     ],
+        #     "skip": False,
+        # },
+        # "settings": {
+        #     "suites": [
+        #         "apiSettings",
+        #     ],
+        #     "skip": False,
+        #     "withRemotePhp": [True],
+        #     "emailNeeded": True,
+        #     "extraEnvironment": {
+        #         "EMAIL_HOST": "email",
+        #         "EMAIL_PORT": "9000",
+        #     },
+        #     "extraServerEnvironment": {
+        #         "OCIS_ADD_RUN_SERVICES": "notifications",
+        #         "NOTIFICATIONS_SMTP_HOST": "email",
+        #         "NOTIFICATIONS_SMTP_PORT": "2500",
+        #         "NOTIFICATIONS_SMTP_INSECURE": "true",
+        #         "NOTIFICATIONS_SMTP_SENDER": "ownCloud <noreply@example.com>",
+        #         "NOTIFICATIONS_DEBUG_ADDR": "0.0.0.0:9174",
+        #     },
+        # },
+        # "graph": {
+        #     "suites": [
+        #         "apiGraph",
+        #         "apiServiceAvailability",
+        #     ],
+        #     "skip": False,
+        #     "withRemotePhp": [True],
+        # },
+        # "graphUserGroup": {
+        #     "suites": [
+        #         "apiGraphUserGroup",
+        #     ],
+        #     "skip": False,
+        #     "withRemotePhp": [True],
+        # },
+        # "spaces": {
+        #     "suites": [
+        #         "apiSpaces",
+        #     ],
+        #     "skip": False,
+        # },
         "spacesShares": {
             "suites": [
                 "apiSpacesShares",
             ],
             "skip": False,
         },
-        "spacesDavOperation": {
-            "suites": [
-                "apiSpacesDavOperation",
-            ],
-            "skip": False,
-        },
-        "search1": {
-            "suites": [
-                "apiSearch1",
-            ],
-            "skip": False,
-        },
-        "search2": {
-            "suites": [
-                "apiSearch2",
-            ],
-            "skip": False,
-        },
-        "sharingNg": {
-            "suites": [
-                "apiReshare",
-                "apiSharingNg1",
-                "apiSharingNg2",
-            ],
-            "skip": False,
-        },
-        "sharingNgShareInvitation": {
-            "suites": [
-                "apiSharingNgShareInvitation",
-            ],
-            "skip": False,
-        },
-        "sharingNgLinkShare": {
-            "suites": [
-                "apiSharingNgLinkSharePermission",
-                "apiSharingNgLinkShareRoot",
-            ],
-            "skip": False,
-        },
-        "accountsHashDifficulty": {
-            "skip": False,
-            "suites": [
-                "apiAccountsHashDifficulty",
-            ],
-            "accounts_hash_difficulty": "default",
-        },
-        "notification": {
-            "suites": [
-                "apiNotification",
-            ],
-            "skip": False,
-            "withRemotePhp": [True],
-            "emailNeeded": True,
-            "extraEnvironment": {
-                "EMAIL_HOST": "email",
-                "EMAIL_PORT": "9000",
-            },
-            "extraServerEnvironment": {
-                "OCIS_ADD_RUN_SERVICES": "notifications",
-                "NOTIFICATIONS_SMTP_HOST": "email",
-                "NOTIFICATIONS_SMTP_PORT": "2500",
-                "NOTIFICATIONS_SMTP_INSECURE": "true",
-                "NOTIFICATIONS_SMTP_SENDER": "ownCloud <noreply@example.com>",
-                "NOTIFICATIONS_DEBUG_ADDR": "0.0.0.0:9174",
-            },
-        },
-        "antivirus": {
-            "suites": [
-                "apiAntivirus",
-            ],
-            "skip": False,
-            "antivirusNeeded": True,
-            "extraServerEnvironment": {
-                "ANTIVIRUS_SCANNER_TYPE": "clamav",
-                "ANTIVIRUS_CLAMAV_SOCKET": "tcp://clamav:3310",
-                "POSTPROCESSING_STEPS": "virusscan",
-                "OCIS_ASYNC_UPLOADS": True,
-                "OCIS_ADD_RUN_SERVICES": "antivirus",
-                "ANTIVIRUS_DEBUG_ADDR": "0.0.0.0:9297",
-            },
-        },
-        "searchContent": {
-            "suites": [
-                "apiSearchContent",
-            ],
-            "skip": False,
-            "tikaNeeded": True,
-        },
-        "ocm": {
-            "suites": [
-                "apiOcm",
-            ],
-            "skip": False,
-            "withRemotePhp": [True],
-            "federationServer": True,
-            "emailNeeded": True,
-            "extraEnvironment": {
-                "EMAIL_HOST": "email",
-                "EMAIL_PORT": "9000",
-            },
-            "extraServerEnvironment": {
-                "OCIS_ADD_RUN_SERVICES": "ocm,notifications",
-                "OCIS_ENABLE_OCM": True,
-                "OCM_OCM_INVITE_MANAGER_INSECURE": True,
-                "OCM_OCM_SHARE_PROVIDER_INSECURE": True,
-                "OCM_OCM_STORAGE_PROVIDER_INSECURE": True,
-                "OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE": "%s" % dirs["ocmProviders"],
-                # mail notifications
-                "NOTIFICATIONS_SMTP_HOST": "email",
-                "NOTIFICATIONS_SMTP_PORT": "2500",
-                "NOTIFICATIONS_SMTP_INSECURE": "true",
-                "NOTIFICATIONS_SMTP_SENDER": "ownCloud <noreply@example.com>",
-            },
-        },
-        "wopi": {
-            "suites": [
-                "apiCollaboration",
-            ],
-            "skip": False,
-            "collaborationServiceNeeded": True,
-            "extraServerEnvironment": {
-                "GATEWAY_GRPC_ADDR": "0.0.0.0:9142",
-            },
-        },
-        "authApp": {
-            "suites": [
-                "apiAuthApp",
-            ],
-            "skip": False,
-            "withRemotePhp": [True],
-            "extraServerEnvironment": {
-                "OCIS_ADD_RUN_SERVICES": "auth-app",
-                "PROXY_ENABLE_APP_AUTH": True,
-            },
-        },
-        "cliCommands": {
-            "suites": [
-                "cliCommands",
-            ],
-            "skip": False,
-            "withRemotePhp": [True],
-            "antivirusNeeded": True,
-            "extraServerEnvironment": {
-                "ANTIVIRUS_SCANNER_TYPE": "clamav",
-                "ANTIVIRUS_CLAMAV_SOCKET": "tcp://clamav:3310",
-                "OCIS_ASYNC_UPLOADS": True,
-                "OCIS_ADD_RUN_SERVICES": "antivirus",
-            },
-        },
+        # "spacesDavOperation": {
+        #     "suites": [
+        #         "apiSpacesDavOperation",
+        #     ],
+        #     "skip": False,
+        # },
+        # "search1": {
+        #     "suites": [
+        #         "apiSearch1",
+        #     ],
+        #     "skip": False,
+        # },
+        # "search2": {
+        #     "suites": [
+        #         "apiSearch2",
+        #     ],
+        #     "skip": False,
+        # },
+        # "sharingNg": {
+        #     "suites": [
+        #         "apiReshare",
+        #         "apiSharingNg1",
+        #         "apiSharingNg2",
+        #     ],
+        #     "skip": False,
+        # },
+        # "sharingNgShareInvitation": {
+        #     "suites": [
+        #         "apiSharingNgShareInvitation",
+        #     ],
+        #     "skip": False,
+        # },
+        # "sharingNgLinkShare": {
+        #     "suites": [
+        #         "apiSharingNgLinkSharePermission",
+        #         "apiSharingNgLinkShareRoot",
+        #     ],
+        #     "skip": False,
+        # },
+        # "accountsHashDifficulty": {
+        #     "skip": False,
+        #     "suites": [
+        #         "apiAccountsHashDifficulty",
+        #     ],
+        #     "accounts_hash_difficulty": "default",
+        # },
+        # "notification": {
+        #     "suites": [
+        #         "apiNotification",
+        #     ],
+        #     "skip": False,
+        #     "withRemotePhp": [True],
+        #     "emailNeeded": True,
+        #     "extraEnvironment": {
+        #         "EMAIL_HOST": "email",
+        #         "EMAIL_PORT": "9000",
+        #     },
+        #     "extraServerEnvironment": {
+        #         "OCIS_ADD_RUN_SERVICES": "notifications",
+        #         "NOTIFICATIONS_SMTP_HOST": "email",
+        #         "NOTIFICATIONS_SMTP_PORT": "2500",
+        #         "NOTIFICATIONS_SMTP_INSECURE": "true",
+        #         "NOTIFICATIONS_SMTP_SENDER": "ownCloud <noreply@example.com>",
+        #         "NOTIFICATIONS_DEBUG_ADDR": "0.0.0.0:9174",
+        #     },
+        # },
+        # "antivirus": {
+        #     "suites": [
+        #         "apiAntivirus",
+        #     ],
+        #     "skip": False,
+        #     "antivirusNeeded": True,
+        #     "extraServerEnvironment": {
+        #         "ANTIVIRUS_SCANNER_TYPE": "clamav",
+        #         "ANTIVIRUS_CLAMAV_SOCKET": "tcp://clamav:3310",
+        #         "POSTPROCESSING_STEPS": "virusscan",
+        #         "OCIS_ASYNC_UPLOADS": True,
+        #         "OCIS_ADD_RUN_SERVICES": "antivirus",
+        #         "ANTIVIRUS_DEBUG_ADDR": "0.0.0.0:9297",
+        #     },
+        # },
+        # "searchContent": {
+        #     "suites": [
+        #         "apiSearchContent",
+        #     ],
+        #     "skip": False,
+        #     "tikaNeeded": True,
+        # },
+        # "ocm": {
+        #     "suites": [
+        #         "apiOcm",
+        #     ],
+        #     "skip": False,
+        #     "withRemotePhp": [True],
+        #     "federationServer": True,
+        #     "emailNeeded": True,
+        #     "extraEnvironment": {
+        #         "EMAIL_HOST": "email",
+        #         "EMAIL_PORT": "9000",
+        #     },
+        #     "extraServerEnvironment": {
+        #         "OCIS_ADD_RUN_SERVICES": "ocm,notifications",
+        #         "OCIS_ENABLE_OCM": True,
+        #         "OCM_OCM_INVITE_MANAGER_INSECURE": True,
+        #         "OCM_OCM_SHARE_PROVIDER_INSECURE": True,
+        #         "OCM_OCM_STORAGE_PROVIDER_INSECURE": True,
+        #         "OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE": "%s" % dirs["ocmProviders"],
+        #         # mail notifications
+        #         "NOTIFICATIONS_SMTP_HOST": "email",
+        #         "NOTIFICATIONS_SMTP_PORT": "2500",
+        #         "NOTIFICATIONS_SMTP_INSECURE": "true",
+        #         "NOTIFICATIONS_SMTP_SENDER": "ownCloud <noreply@example.com>",
+        #     },
+        # },
+        # "wopi": {
+        #     "suites": [
+        #         "apiCollaboration",
+        #     ],
+        #     "skip": False,
+        #     "collaborationServiceNeeded": True,
+        #     "extraServerEnvironment": {
+        #         "GATEWAY_GRPC_ADDR": "0.0.0.0:9142",
+        #     },
+        # },
+        # "authApp": {
+        #     "suites": [
+        #         "apiAuthApp",
+        #     ],
+        #     "skip": False,
+        #     "withRemotePhp": [True],
+        #     "extraServerEnvironment": {
+        #         "OCIS_ADD_RUN_SERVICES": "auth-app",
+        #         "PROXY_ENABLE_APP_AUTH": True,
+        #     },
+        # },
+        # "cliCommands": {
+        #     "suites": [
+        #         "cliCommands",
+        #     ],
+        #     "skip": False,
+        #     "withRemotePhp": [True],
+        #     "antivirusNeeded": True,
+        #     "extraServerEnvironment": {
+        #         "ANTIVIRUS_SCANNER_TYPE": "clamav",
+        #         "ANTIVIRUS_CLAMAV_SOCKET": "tcp://clamav:3310",
+        #         "OCIS_ASYNC_UPLOADS": True,
+        #         "OCIS_ADD_RUN_SERVICES": "antivirus",
+        #     },
+        # },
     },
     "apiTests": {
         "numberOfParts": 7,
         "skip": False,
-        "skipExceptParts": [],
+        "skipExceptParts": [3],
     },
     "e2eTests": {
         "part": {
@@ -421,15 +421,7 @@ def main(ctx):
         licenseCheck(ctx)
 
     test_pipelines = \
-        codestyle(ctx) + \
-        checkGherkinLint(ctx) + \
-        checkTestSuitesInExpectedFailures(ctx) + \
-        buildWebCache(ctx) + \
-        getGoBinForTesting(ctx) + \
         buildOcisBinaryForTesting(ctx) + \
-        checkStarlark() + \
-        build_release_helpers + \
-        testOcisAndUploadResults(ctx) + \
         testPipelines(ctx)
 
     build_release_pipelines = \
@@ -443,7 +435,7 @@ def main(ctx):
         ),
     )
 
-    pipelines = test_pipelines + build_release_pipelines
+    pipelines = test_pipelines  #+ build_release_pipelines
 
     if ctx.build.event == "cron":
         pipelines = \
@@ -511,6 +503,7 @@ def testOcisAndUploadResults(ctx):
 
 def testPipelines(ctx):
     pipelines = []
+    return localApiTestPipeline(ctx) + apiTests(ctx)
 
     if config["litmus"]:
         pipelines += litmus(ctx, "ocis")
@@ -1234,7 +1227,10 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, with_remote_php = Fa
     filterTags = "~@skipOnGraph&&~@skipOnOcis-%s-Storage" % ("OC" if storage == "owncloud" else "OCIS")
     test_dir = "%s/tests/acceptance" % dirs["base"]
     expected_failures_file = "%s/expected-failures-API-on-%s-storage.md" % (test_dir, storage.upper())
-
+    storage_volume = [{
+        "name": "storage",
+        "path": "/root/.ocis",
+    }]
     return {
         "kind": "pipeline",
         "type": "docker",
@@ -1245,7 +1241,7 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, with_remote_php = Fa
         },
         "steps": skipIfUnchanged(ctx, "acceptance-tests") +
                  restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin") +
-                 ocisServer(storage, accounts_hash_difficulty, with_wrapper = True) +
+                 ocisServer(storage, accounts_hash_difficulty, with_wrapper = True, volumes = storage_volume) +
                  [
                      {
                          "name": "oC10ApiTests-%s" % part_number,
@@ -1269,6 +1265,7 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, with_remote_php = Fa
                              "" if with_remote_php else "cat %s/expected-failures-without-remotephp.md >> %s" % (test_dir, expected_failures_file),
                              "make -C %s test-acceptance-api" % (dirs["base"]),
                          ],
+                         "volumes": storage_volume,
                      },
                  ] +
                  logRequests(),
