@@ -342,5 +342,13 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiOcm/deleteFederatedConnections.feature:123](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/deleteFederatedConnections.feature#L123)
 - [apiOcm/deleteFederatedConnections.feature:130](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/deleteFederatedConnections.feature#L130)
 
+#### [server returns status code 500 when creating token for non-existent user (Impersonation)](https://github.com/owncloud/ocis/issues/10815)
+- [apiAuthApp/token.feature:250](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiAuthApp/token.feature#L250)
+- [apiAuthApp/token.feature:256](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiAuthApp/token.feature#L256)
+
+#### [Server returns status code 500 when deleting auth-app token of a different user](https://github.com/owncloud/ocis/issues/10921)
+- [apiAuthApp/token.feature:263](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiAuthApp/token.feature#L263)
+- [apiAuthApp/token.feature:269](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiAuthApp/token.feature#L269)
+
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.

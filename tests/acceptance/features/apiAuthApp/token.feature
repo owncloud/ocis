@@ -245,3 +245,29 @@ Feature: create auth-app token
       """
       error parsing expiry. Use e.g. 30m or 72h
       """
+
+  @env-config @issue-10815
+  Scenario: try to create auth-app token for non-existing user
+    Given the config "AUTH_APP_ENABLE_IMPERSONATION" has been set to "true"
+    When user "Admin" creates auth-app token for user "Brian" with expiration time "72h" using the auth-app API
+    Then the HTTP status code should be "403"
+
+  @env-config @issue-10815
+  Scenario: try to create auth-app token for non-existing user with impersonation enabled
+    Given the config "AUTH_APP_ENABLE_IMPERSONATION" has been set to "true"
+    And user "Admin" has created auth-app token for user "Alice" with expiration time "72h" using the auth-app API
+    When user "Admin" tries to delete the last created auth-app token using the auth-app API
+    Then the HTTP status code should be "403"
+
+  @issue-10921
+  Scenario: try to delete auth-app token of a normal user by admin user
+    Given user "Alice" has created auth-app token with expiration time "72h" using the auth-app API
+    When user "Admin" tries to delete the last created auth-app token using the auth-app API
+    Then the HTTP status code should be "403"
+
+  @issue-10921
+  Scenario: try to delete auth-app token of a user by another non-admin user
+    Given user "Brian" has been created with default attributes
+    And user "Brian" has created auth-app token with expiration time "72h" using the auth-app API
+    When user "Admin" tries to delete the last created auth-app token using the auth-app API
+    Then the HTTP status code should be "403"
