@@ -325,4 +325,23 @@ class ArchiverContext implements Context {
 		\unlink($tempFile);
 		$this->removeDir($tempExtractFolder);
 	}
+
+	/**
+	 * @Then user :user should be able to download archive of federated shared folder :resource
+	 *
+	 * @param string $user
+	 * @param string $resource
+	 *
+	 * @return void
+	 */
+	public function userShouldBeAbleToDownloadArchiveFederatedSharedFolder(string $user, string $resource): void {
+		$queryString = $this->getArchiverQueryString($user, $resource, 'remoteItemIds');
+		$response = HttpRequestHelper::get(
+			$this->getArchiverUrl($queryString),
+			$this->featureContext->getStepLineRef(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+		);
+		Assert::assertEquals("200", $response->getStatusCode(), "Failed to download archive of resource $resource");
+	}
 }
