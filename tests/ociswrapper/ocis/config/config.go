@@ -13,7 +13,7 @@ var services = map[string]int{
 	"activitylog":        9197,
 	"app-provider":       9165,
 	"app-registry":       9243,
-	"audit":              9149,
+	"audit":              9229,
 	"auth-app":           9245,
 	"auth-bearer":        9149,
 	"auth-basic":         9147,

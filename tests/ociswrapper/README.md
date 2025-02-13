@@ -160,3 +160,20 @@ Also, see `./bin/ociswrapper help` for more information.
 
     - `200 OK` - oCIS service stopped successfully
     - `500 Internal Server Error` - Unable to stop oCIS service
+
+8. `PATCH /services/{service-name}`
+
+    Updates the configuration of the running service instance.
+    Body of the request should be a JSON object with the following structure:
+
+    ```json
+    {
+      "ENV_KEY1": "value1",
+      "ENV_KEY2": "value2"
+    }
+    ```
+
+    Returns:
+
+    - `200 OK` - service is successfully reconfigured
+    - `500 Internal Server Error` - service is not running
