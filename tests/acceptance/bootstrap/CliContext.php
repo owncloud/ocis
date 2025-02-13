@@ -23,6 +23,7 @@
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Behat\Context\Context;
 use Behat\Gherkin\Node\TableNode;
+use GuzzleHttp\Exception\GuzzleException;
 use PHPUnit\Framework\Assert;
 use TestHelpers\CliHelper;
 use TestHelpers\OcisConfigHelper;
@@ -475,7 +476,7 @@ class CliContext implements Context {
 	 * @param string $interval
 	 *
 	 * @return void
-	 * @throws \GuzzleHttp\Exception\GuzzleException
+	 * @throws GuzzleException
 	 */
 	public function theAdministratorTriggersEmailNotificationsUsingTheCLI(string $interval): void {
 		$command = "notifications send-email --$interval";

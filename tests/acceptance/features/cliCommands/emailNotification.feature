@@ -1,5 +1,9 @@
 @env-config @email @notification
-Feature: get email notification via CLI command
+Feature: get grouped email notification
+  As a user
+  I want to get email notification of grouped events related to me either daily or weekly
+  So that I can stay updated about the events either once a day or once a week
+
 
   Background:
     Given using spaces DAV path
@@ -10,13 +14,11 @@ Feature: get email notification via CLI command
       | Brian    |
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "share space" with the default quota using the Graph API
-    And user "Alice" has created folder "FolderToShare"
     And user "Alice" has uploaded file with content "some data" to "lorem.txt"
 
 
-  Scenario: get daily grouped email notification via CLI command
-    Given user "Brian" has enabled notification for the following events:
-      | Email sending interval | daily |
+  Scenario: get daily grouped email notification
+    Given user "Brian" has set the email sending interval to "daily" using the settings API
     And user "Alice" has sent the following resource share invitation:
       | resource        | lorem.txt |
       | space           | Personal  |
@@ -31,7 +33,6 @@ Feature: get email notification via CLI command
       | shareType          | user                     |
       | permissionsRole    | Viewer                   |
       | expirationDateTime | 2042-01-01T23:59:59.000Z |
-    And user "Alice" has expired the last share of resource "lorem.txt" inside of the space "Personal"
     And user "Alice" has sent the following space share invitation:
       | space           | share space  |
       | sharee          | Brian        |
@@ -82,9 +83,8 @@ Feature: get email notification via CLI command
       """
 
 
-  Scenario: get weekly grouped email notification via CLI command
-    Given user "Brian" has enabled notification for the following events:
-      | Email sending interval | weekly |
+  Scenario: get weekly grouped email notification
+    Given user "Brian" has set the email sending interval to "weekly" using the settings API
     And user "Alice" has sent the following resource share invitation:
       | resource        | lorem.txt |
       | space           | Personal  |
@@ -99,7 +99,6 @@ Feature: get email notification via CLI command
       | shareType          | user                     |
       | permissionsRole    | Viewer                   |
       | expirationDateTime | 2042-01-01T23:59:59.000Z |
-    And user "Alice" has expired the last share of resource "lorem.txt" inside of the space "Personal"
     And user "Alice" has sent the following space share invitation:
       | space           | share space  |
       | sharee          | Brian        |
