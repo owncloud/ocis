@@ -210,39 +210,37 @@ func OcisServiceHandler(res http.ResponseWriter, req *http.Request) {
 	serviceName := req.PathValue("service")
 	envMap := []string{fmt.Sprintf("OCIS_EXCLUDE_RUN_SERVICES=%s", serviceName)}
 
+    var envBody map[string]interface{}
+    var serviceEnvMap []string
+
+	if req.Body != nil && req.ContentLength > 0 {
+		var err error
+		envBody, err = parseJsonBody(req.Body)
+		if err != nil {
+			sendResponse(res, http.StatusBadRequest, "Invalid json body")
+			return
+		}
+	}
+
 	if req.Method == http.MethodPost {
 		// restart oCIS without service that need to start separately
-		success, _ := ocis.Restart(envMap)
+		success, _ := ocis.Restart(append(ocis.EnvConfigs, envMap...))
 		if success {
-			var envBody map[string]interface{}
-			var serviceEnvMap []string
-
-			if req.Body != nil && req.ContentLength > 0 {
-				var err error
-				envBody, err = parseJsonBody(req.Body)
-				if err != nil {
-					sendResponse(res, http.StatusBadRequest, "Invalid json body")
-					return
-				}
-			}
-
 			for key, value := range envBody {
-				serviceEnvMap = append(serviceEnvMap, fmt.Sprintf("%s=%v", key, value))
+				ocis.ServiceEnvConfigs = append(serviceEnvMap, fmt.Sprintf("%s=%v", key, value))
 				if strings.HasSuffix(key, "DEBUG_ADDR") {
 					address := strings.Split(value.(string), ":")
 					port, _ := strconv.Atoi(address[1])
 					config.SetServiceDebugPort(serviceName, port)
 				}
 			}
-
 			log.Println(fmt.Sprintf("Starting oCIS service %s...", serviceName))
 
 			common.Wg.Add(1)
-			go ocis.StartService(serviceName, serviceEnvMap)
+			go ocis.StartService(serviceName, ocis.ServiceEnvConfigs)
 
 			success := ocis.WaitForServiceStatus(serviceName, true)
 			if success {
-				log.Println(fmt.Sprintf("Found Port for %s...", serviceName))
 				sendResponse(res, http.StatusOK, fmt.Sprintf("oCIS service %s started successfully", serviceName))
 			} else {
 				sendResponse(res, http.StatusInternalServerError, fmt.Sprintf("Failed to start oCIS service %s", serviceName))
@@ -254,10 +252,34 @@ func OcisServiceHandler(res http.ResponseWriter, req *http.Request) {
 	} else if req.Method == http.MethodDelete {
 		success, message := ocis.StopService(serviceName)
 		if success {
-			sendResponse(res, http.StatusOK, fmt.Sprintf("oCIS service %s stopped successfully", serviceName))
+			sendResponse(res, http.StatusOK, message)
 		} else {
 			sendResponse(res, http.StatusInternalServerError, message)
 		}
+		return
+	} else if req.Method == http.MethodPatch {
+		success, message := ocis.StopService(serviceName)
+		if success {
+			for key, value := range envBody {
+				serviceEnvMap = append(serviceEnvMap, fmt.Sprintf("%s=%v", key, value))
+				if strings.HasSuffix(key, "DEBUG_ADDR") {
+					address := strings.Split(value.(string), ":")
+					port, _ := strconv.Atoi(address[1])
+					config.SetServiceDebugPort(serviceName, port)
+				}
+				serviceEnvMap = append(ocis.ServiceEnvConfigs, serviceEnvMap...)
+			}
+			common.Wg.Add(1)
+			log.Println(fmt.Sprintf("Restarting oCIS service %s...", serviceName))
+			go ocis.StartService(serviceName, serviceEnvMap)
+
+			success := ocis.WaitForServiceStatus(serviceName, true)
+			if success {
+            	sendResponse(res, http.StatusOK, fmt.Sprintf("oCIS service %s started successfully", serviceName))
+            	return
+            }
+		}
+		sendResponse(res, http.StatusInternalServerError, message)
 		return
 	}
 	sendResponse(res, http.StatusMethodNotAllowed, "Method Not Allowed")
