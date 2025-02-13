@@ -1623,8 +1623,7 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @Given /^user "([^"]*)" has changed the quota of the personal space of "([^"]*)" space to "([^"]*)"$/
-	 * @Given /^user "([^"]*)" has changed the quota of the "([^"]*)" space to "([^"]*)"$/
+	 * @Given /^user "([^"]*)" has changed the quota of space "([^"]*)" to "([^"]*)"$/
 	 *
 	 * @param string $user
 	 * @param string $spaceName
@@ -1641,6 +1640,11 @@ class SpacesContext implements Context {
 	): void {
 		$bodyData = ["quota" => ["total" => $newQuota]];
 		$response = $this->updateSpace($user, $spaceName, $bodyData);
+		if ($response->getStatusCode() !== 200) {
+			$storage = $this->featureContext->getStorageUsersRoot();
+			$out = \shell_exec("ls -R $storage/spaces");
+			var_dump($out);
+		}
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			200,
 			"Expected response status code should be 200",
