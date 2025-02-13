@@ -188,6 +188,24 @@ func OCMConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]inter
 					},
 				},
 			},
+			"interceptors": map[string]interface{}{
+				"eventsmiddleware": map[string]interface{}{
+					"group":            "ocm",
+					"type":             "nats",
+					"address":          cfg.Events.Endpoint,
+					"clusterID":        cfg.Events.Cluster,
+					"tls-insecure":     cfg.Events.TLSInsecure,
+					"tls-root-ca-cert": cfg.Events.TLSRootCACertificate,
+					"enable-tls":       cfg.Events.EnableTLS,
+					"name":             "ocm-eventsmiddleware",
+					"username":         cfg.Events.AuthUsername,
+					"password":         cfg.Events.AuthPassword,
+				},
+				"prometheus": map[string]interface{}{
+					"namespace": "ocis",
+					"subsystem": "ocm",
+				},
+			},
 		},
 	}
 }
