@@ -9,7 +9,6 @@ Feature: Notification
       | username |
       | Alice    |
       | Brian    |
-      | Carol    |
     And user "Alice" has uploaded file with content "other data" to "/textfile1.txt"
     And user "Alice" has created folder "my_data"
 

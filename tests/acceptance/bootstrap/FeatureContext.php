@@ -2500,6 +2500,14 @@ class FeatureContext extends BehatVariablesContext {
 					"getXRequestIdRegex"
 				],
 				"parameter" => []
+			],
+			[
+				"code" => "%expirationDateTime%",
+				"function" => [
+					$this->spacesContext,
+					"getLastShareExpirationDateTime"
+				],
+				"parameter" => []
 			]
 		];
 		if ($user !== null) {
@@ -2546,16 +2554,18 @@ class FeatureContext extends BehatVariablesContext {
 					"parameter" => [$user, true]
 				],
 				[
-				"code" => "%user_id%",
-				"function" =>
-				[$this, "getUserIdByUserName"],
-				"parameter" => [$userName]
+					"code" => "%user_id%",
+					"function" => [
+						$this, "getUserIdByUserName"
+					],
+					"parameter" => [$userName]
 				],
 				[
-				"code" => "%group_id%",
-				"function" =>
-				[$this, "getGroupIdByGroupName"],
-				"parameter" => [$group]
+					"code" => "%group_id%",
+					"function" => [
+						$this, "getGroupIdByGroupName"
+					],
+					"parameter" => [$group]
 				]
 			);
 
