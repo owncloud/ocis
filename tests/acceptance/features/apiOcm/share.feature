@@ -1237,3 +1237,53 @@ Feature: an user shares resources using ScienceMesh application
         }
       }
       """
+
+  @issue-10582
+  Scenario Outline: federation user creates folder inside shared folder (Personal Space)
+    Given using server "LOCAL"
+    And user "Alice" has created folder "folderToShare"
+    And user "Alice" has sent the following resource share invitation to federated user:
+      | resource        | folderToShare |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Editor        |
+    And using server "REMOTE"
+    When user "Brian" creates a folder "newFolder" inside federated share "folderToShare" using the WebDav API
+    Then the HTTP status code should be "201"
+    And using server "LOCAL"
+    And as "Alice" folder "folderToShare/newFolder" should exist
+    When user "Alice" requests "<dav-path>" with "PROPFIND" without retrying
+    Then the HTTP status code should be "207"
+    And as user "Alice" the PROPFIND response should contain a resource "newFolder" with these key and value pairs:
+      | key     | value     |
+      | oc:name | newFolder |
+    Examples:
+      | dav-path                            |
+      | /webdav/folderToShare               |
+      | /dav/files/%username%/folderToShare |
+      | /dav/spaces/%spaceid%/folderToShare |
+
+  @issue-10582
+  Scenario: federation user creates folder inside shared folder (Project Space)
+    Given using server "LOCAL"
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
+    And user "Alice" has created a folder "folderToShare" in space "projectSpace"
+    And user "Alice" has sent the following resource share invitation to federated user:
+      | resource        | folderToShare |
+      | space           | projectSpace  |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Editor        |
+    And using server "REMOTE"
+    When user "Brian" creates a folder "newFolder" inside federated share "folderToShare" using the WebDav API
+    Then the HTTP status code should be "201"
+    And using server "LOCAL"
+    And for user "Alice" folder "folderToShare" of the space "projectSpace" should contain these entries:
+      | newFolder |
+    When user "Alice" sends PROPFIND request from the space "projectSpace" to the resource "folderToShare" with depth "1" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And as user "Alice" the PROPFIND response should contain a resource "newFolder" with these key and value pairs:
+      | key     | value     |
+      | oc:name | newFolder |
