@@ -183,26 +183,169 @@ Feature: Email notification
       Click here to check it: %base_url%/f/%space_id%
       """
 
-  Scenario: user gets an email notification when a file resource is unshared
-    Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
-    And user "Alice" has created a space "space-to-share" with the default quota using the Graph API
-    And user "Alice" has sent the following space share invitation:
-      | space           | space-to-share |
+  Scenario: user gets an email notification when a folder is unshared
+    Given user "Alice" has created folder "/SHARED-FOLDER"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | /SHARED-FOLDER |
+      | space           | Personal       |
       | sharee          | Brian          |
       | shareType       | user           |
-      | permissionsRole | Space Editor   |
-    When user "Alice" unshares a space "space-to-share" to user "Brian"
+      | permissionsRole | Viewer         |
+    And user "Alice" has removed the access of user "Brian" from resource "/SHARED-FOLDER" of space "Personal"
+    When user "Alice" lists the activities of folder "/SHARED-FOLDER" from space "Personal" using the Graph API
     Then the HTTP status code should be "200"
-    And user "Brian" should have received the following email from user "Alice" about the share of project space "space-to-share"
+    And the JSON data of the response should match
       """
-      Hello Brian Murphy,
-
-      %displayname% has removed you from "space-to-share".
-
-      You might still have access through your other groups or direct membership.
-
-      Click here to check it: %base_url%/f/%space_id%
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 3,
+            "maxItems": 3,
+            "uniqueItems": true,
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "required": ["id","template","times"],
+                  "properties": {
+                    "template": {
+                      "type": "object",
+                      "required": ["message","variables"],
+                      "properties": {
+                        "message": {
+                          "const": "{user} added {resource} to {folder}"
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["id","template","times"],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^%user_id_pattern%$"
+                    },
+                    "template": {
+                      "type": "object",
+                      "required": ["message","variables"],
+                      "properties": {
+                        "message": {
+                          "const": "{user} shared {resource} with {sharee}"
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["id","template","times"],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^%user_id_pattern%$"
+                    },
+                    "template": {
+                      "type": "object",
+                      "required": ["message","variables"],
+                      "properties": {
+                        "message": {
+                          "const": "{user} removed {sharee} from {resource}"
+                        },
+                        "variables": {
+                          "type": "object",
+                          "required": ["resource","sharee","user"],
+                          "properties": {
+                            "resource": {
+                              "type": "object",
+                              "required": ["id","name"],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "%file_id_pattern%"
+                                },
+                                "name": {
+                                  "const": "SHARED-FOLDER"
+                                }
+                              }
+                            },
+                            "sharee": {
+                              "type": "object",
+                              "required": ["id","displayName"],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "%user_id_pattern%"
+                                },
+                                "displayName": {
+                                  "const": "Brian"
+                                }
+                              }
+                            },
+                            "user": {
+                              "type": "object",
+                              "required": ["id","displayName"],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "%user_id_pattern%"
+                                },
+                                "displayName": {
+                                  "const": "Alice Hansen"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "times": {
+                      "type": "object",
+                      "required": ["recordedTime"],
+                      "properties": {
+                        "recordedTime": {
+                          "type": "string",
+                          "format": "date-time"
+                        }
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
       """
+    # When user "Alice" has removed the access of user "Brian" from resource "/SHARED-FOLDER" of space "Personal"
+    # Then the HTTP status code should be "200"
+    # And the OCS status code should be "100"
+    # And user "Brian" should have received the following email from user "Alice" about the share of project space "/SHARED-FOLDER"
+    #   """
+    #   Hello Brian Murphy,
+
+    #   %displayname% has removed you from "/SHARED-FOLDER".
+
+    #   You might still have access through your other groups or direct membership.
+
+    #   Click here to check it: %base_url%/f/%space_id%
+    #   """
+    # When user "Alice" has removed the access of user "Brian" from resource "/SHARED-FOLDER" of space "Personal"
+    # Then the HTTP status code should be "200"
+    # And user "Brian" should have received the following email from user "Alice" about the share of project space "Personal"
+    #   """
+    #   Hello Brian Murphy,
+
+    #   %displayname% has removed you from "new-space".
+
+    #   You might still have access through your other groups or direct membership.
+
+    #   Click here to check it: %base_url%/f/%space_id%
+    #   """
 
   @issue-10937
   Scenario: user gets an email notification when space resource is unshared

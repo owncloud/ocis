@@ -2858,6 +2858,32 @@ class SpacesContext implements Context {
 	}
 
 	/**
+	 * @param  string $user
+	 * @param  string $spaceName
+	 * @param  string $resourceName
+	 * @param  string $recipient
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public function sendUnshareResourceRequest(
+		string $user,
+		string $spaceName,
+		string $resourceName,
+		string $recipient
+	): ResponseInterface {
+		$resourceId = $this->getResourceId($user, $spaceName, $resourceName);
+		$fullUrl = $this->featureContext->getBaseUrl()
+		. $this->ocsApiUrl . "/" . $resourceName['id'] . "?shareWith=" . $recipient;
+
+		return HttpRequestHelper::delete(
+			$fullUrl,
+			$this->featureContext->getStepLineRef(),
+			$user,
+			$this->featureContext->getPasswordForUser($user)
+		);
+	}
+
+	/**
 	 * @When /^user "([^"]*)" unshares a space "([^"]*)" to (?:user|group) "([^"]*)"$/
 	 *
 	 * @param  string $user
@@ -2874,6 +2900,26 @@ class SpacesContext implements Context {
 	): void {
 		$this->featureContext->setResponse(
 			$this->sendUnshareSpaceRequest($user, $spaceName, $recipient)
+		);
+	}
+
+	/**
+	 * @When /^user "([^"]*)" unshares a resource "([^"]*)" to (?:user|group) "([^"]*)"$/
+	 *
+	 * @param  string $user
+	 * @param  string $resourceName
+	 * @param  string $recipient
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userUnsharesResource(
+		string $user,
+		string $resourceName,
+		string $recipient
+	): void {
+		$this->featureContext->setResponse(
+			$this->sendUnshareSpaceRequest($user, $resourceName, $recipient)
 		);
 	}
 
