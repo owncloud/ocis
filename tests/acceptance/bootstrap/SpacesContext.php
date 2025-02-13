@@ -4761,4 +4761,24 @@ class SpacesContext implements Context {
 			)
 		);
 	}
+
+	/**
+	 * @Given /^user "([^"]*)" has updated the space "([^"]*)" with settings:$/
+	 *
+	 * @param  string $user
+	 * @param  string $spaceName
+	 * @param  TableNode $table
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userHasUpdatedTheSpaceWithSettings(
+		string $user,
+		string $spaceName,
+		TableNode $table
+	): void {
+		$rows = $table->getRowsHash();
+		$response = $this->shareSpace($user, $spaceName, $rows);
+		$this->featureContext->theHTTPStatusCodeShouldBe(200, "", $response);
+	}
 }
