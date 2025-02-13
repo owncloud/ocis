@@ -902,3 +902,135 @@ Feature: Notification Settings
 
       Click here to view it: %base_url%/f/%space_id%
       """
+
+
+  Scenario: no in-app and mail notification should appear when Share Expired notification is disabled (Personal space)
+    Given using SharingNG
+    And user "Alice" has uploaded file with content "hello world" to "testfile.txt"
+    When user "Brian" disables notification for the following events using the settings API:
+      | Share Expired | mail,in-app |
+    Then the HTTP status code should be "201"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "object",
+            "required": ["identifier","value"],
+            "properties": {
+              "identifier":{
+                "type": "object",
+                "required": ["extension","bundle","setting"],
+                "properties": {
+                  "extension":{ "const": "ocis-accounts" },
+                  "bundle":{ "const": "profile" },
+                  "setting":{
+                    "const": "event-share-expired-options"
+                  }
+                }
+              },
+              "value":{
+                "type": "object",
+                "required": ["id","bundleId","settingId","accountUuid","resource","collectionValue"],
+                "properties":{
+                  "id":{ "pattern":"%uuidv4_pattern%" },
+                  "bundleId":{ "pattern":"%uuidv4_pattern%" },
+                  "settingId":{ "pattern":"%uuidv4_pattern%" },
+                  "accountUuid":{ "pattern":"%uuidv4_pattern%" },
+                  "resource":{
+                    "type": "object",
+                    "required":["type"],
+                    "properties": {
+                      "type":{ "const": "TYPE_USER" }
+                    }
+                  },
+                  "collectionValue":{
+                    "type": "object",
+                    "required":["values"],
+                    "properties": {
+                      "values":{
+                        "type": "array",
+                        "maxItems": 2,
+                        "minItems": 2,
+                        "uniqueItems": true,
+                        "items": {
+                          "oneOf": [
+                            {
+                              "type": "object",
+                              "required": ["key","boolValue"],
+                              "properties": {
+                                "key":{ "const": "mail" },
+                                "boolValue":{ "const": false }
+                              }
+                            },
+                            {
+                              "type": "object",
+                              "required": ["key","boolValue"],
+                              "properties": {
+                                "key":{ "const": "in-app" },
+                                "boolValue":{ "const": false }
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      """
+    And user "Alice" has sent the following resource share invitation:
+      | resource           | testfile.txt         |
+      | space              | Personal             |
+      | sharee             | Brian                |
+      | shareType          | user                 |
+      | permissionsRole    | Viewer               |
+      | expirationDateTime | 2025-07-15T14:00:00Z |
+    When user "Alice" expires the last share of resource "testfile.txt" inside of the space "Personal"
+    Then the HTTP status code should be "200"
+    And user "Brian" should have "1" emails
+    And user "Brian" should have received the following email from user "Alice"
+      """
+      Hello Brian Murphy
+
+      %displayname% has shared "testfile.txt" with you.
+
+      Click here to view it: %base_url%/files/shares/with-me
+      """
+    But user "Brian" should not have a notification related to space "Alice Hansen" with subject "Membership expired"
+
+
+  Scenario: no in-app and mail notification should appear when Share Expired notification is disabled (Project space)
+    Given using spaces DAV path
+    And using SharingNG
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
+    And user "Alice" has uploaded a file inside space "NewSpace" with content "share space items" to "testfile.txt"
+    And user "Alice" has sent the following resource share invitation:
+      | resource           | testfile.txt         |
+      | space              | NewSpace             |
+      | sharee             | Brian                |
+      | shareType          | user                 |
+      | permissionsRole    | Viewer               |
+      | expirationDateTime | 2025-07-15T14:00:00Z |
+    When user "Brian" disables notification for the following events using the settings API:
+      | Share Expired | mail,in-app |
+    Then the HTTP status code should be "201"
+    When user "Alice" expires the last share of resource "testfile.txt" inside of the space "NewSpace"
+    Then the HTTP status code should be "200"
+    And user "Brian" should have "1" emails
+    And user "Brian" should have received the following email from user "Alice" about the share of project space "NewSpace"
+      """
+      Hello Brian Murphy
+
+      %displayname% has shared "testfile.txt" with you.
+
+      Click here to view it: %base_url%/files/shares/with-me
+      """
+    But user "Brian" should not have a notification related to space "NewSpace" with subject "Membership expired"
