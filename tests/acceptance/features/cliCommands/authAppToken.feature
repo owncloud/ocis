@@ -34,3 +34,9 @@ Feature: create auth-app token
         "maxItems": 0
       }
       """
+
+
+  Scenario: try to creates auth-app token without expiry via CLI
+    When the administrator tries to create app token for user "Alice" with expiration time "" using the auth-app CLI
+    Then the command should be unsuccessful
+    And the command output should contain "time: invalid duration"
