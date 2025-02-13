@@ -668,53 +668,27 @@ class SettingsContext implements Context {
 	}
 
 	/**
-	 * @Given /^user "([^"]*)" has (disabled|enabled) notification for the following events:$/
+	 * @Given /^user "([^"]*)" has set the email sending interval to "([^"]*)" using the settings API$/
 	 *
 	 * @param string $user
-	 * @param string $enabledOrDisabled
-	 * @param TableNode $table
+	 * @param string $interval
 	 *
 	 * @return void
-	 * @throws GuzzleException|JsonException
-	 * @throws Exception
+	 * @throws Exception|GuzzleException
 	 */
-	public function userHasDisabledOrEnabledNotificationForFollowingEventUsingSettingsApi(
+	public function userHasSetTheEmailSendingIntervalToUsingTheSettingsAPI(
 		string $user,
-		string $enabledOrDisabled,
-		TableNode $table
+		string $interval,
 	): void {
-		$settings = $table->getRowsHash();
-		Assert::assertCount(1, $settings, "only 1 event should be provided");
-		foreach ($settings as $event => $value) {
-			$body = $this->getBodyForNotificationSetting($user, $event);
-			if (str_contains($value, "mail")) {
-				$body["value"]["collectionValue"]["values"][]
-					= ["key" => "mail","boolValue" => $enabledOrDisabled === "enabled"];
-			}
-			if (str_contains($value, "in-app")) {
-				$body["value"]["collectionValue"]["values"][]
-					= ["key" => "in-app","boolValue" => $enabledOrDisabled === "enabled"];
-			}
-			if (str_contains($value, "instant")) {
-				$body["value"]["stringValue"]
-					= "instant";
-			}
-			if (str_contains($value, "daily")) {
-				$body["value"]["stringValue"]
-					= "daily";
-			}
-			if (str_contains($value, "weekly")) {
-				$body["value"]["stringValue"]
-					= "weekly";
-			}
-			$response = SettingsHelper::updateSettings(
-				$this->featureContext->getBaseUrl(),
-				$this->featureContext->getActualUsername($user),
-				$this->featureContext->getPasswordForUser($user),
-				json_encode($body),
-				$this->featureContext->getStepLineRef(),
-			);
-			$this->featureContext->theHTTPStatusCodeShouldBe(201, "", $response);
-		}
+		$body = $this->getBodyForNotificationSetting($user, "Email sending interval");
+		$body["value"]["stringValue"] = $interval;
+		$response = SettingsHelper::updateSettings(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getActualUsername($user),
+			$this->featureContext->getPasswordForUser($user),
+			json_encode($body),
+			$this->featureContext->getStepLineRef(),
+		);
+		$this->featureContext->theHTTPStatusCodeShouldBe(201, "", $response);
 	}
 }
