@@ -22,14 +22,17 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"net/url"
+	"strconv"
 	"time"
 
 	"github.com/cs3org/reva/v2/internal/http/services/ocmd"
 	"github.com/cs3org/reva/v2/pkg/appctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
+	"github.com/cs3org/reva/v2/pkg/ocm/payload"
 	"github.com/cs3org/reva/v2/pkg/rhttp"
 	"github.com/pkg/errors"
 )
@@ -277,4 +280,69 @@ func (c *OCMClient) Discovery(ctx context.Context, endpoint string) (*Capabiliti
 	}
 
 	return &cap, nil
+}
+
+// NotifyRemote sends a notification to a remote OCM instance.
+// Send a notification to a remote party about a previously known entity
+// Notifications are optional messages. They are expected to be used to inform the other party about a change about a previously known entity,
+// such as a share or a trusted user. For example, a notification MAY be sent by a recipient to let the provider know that
+// the recipient declined a share. In this case, the provider site MAY mark the share as declined for its user(s). Similarly,
+// it MAY be sent by a provider to let the recipient know that the provider removed a given share, such that the recipient MAY clean it up from its database.
+// A notification MAY also be sent to let a recipient know that the provider removed that recipient from the list of trusted users, along with any related share.
+// The recipient MAY reciprocally remove that provider from the list of trusted users, along with any related share.
+// https://cs3org.github.io/OCM-API/docs.html?branch=develop&repo=OCM-API&user=cs3org#/paths/~1notifications/post
+func (c *OCMClient) NotifyRemote(ctx context.Context, endpoint string, r *payload.NotificationRequest) error {
+	url, err := url.JoinPath(endpoint, "notifications")
+	if err != nil {
+		return err
+	}
+	body, err := r.ToJSON()
+	if err != nil {
+		return err
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, body)
+	if err != nil {
+		return errors.Wrap(err, "error creating request")
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := c.client.Do(req)
+	if err != nil {
+		return errors.Wrap(err, "error doing request")
+	}
+	defer resp.Body.Close()
+
+	err = c.parseNotifyRemoteResponse(resp, nil)
+	if err != nil {
+		appctx.GetLogger(ctx).Err(err).Msg("error notifying remote OCM instance")
+		return err
+	}
+	return nil
+}
+
+func (c *OCMClient) parseNotifyRemoteResponse(r *http.Response, resp any) error {
+	var err error
+	switch r.StatusCode {
+	case http.StatusOK, http.StatusCreated:
+		if resp == nil {
+			return nil
+		}
+		err := json.NewDecoder(r.Body).Decode(&resp)
+		if err != nil {
+			return errors.Wrap(err, fmt.Sprintf("http status code: %v, error decoding response body", r.StatusCode))
+		}
+		return nil
+	case http.StatusBadRequest:
+		err = ErrInvalidParameters
+	case http.StatusUnauthorized, http.StatusForbidden:
+		err = ErrServiceNotTrusted
+	default:
+		err = errtypes.InternalError("request finished whit code " + strconv.Itoa(r.StatusCode))
+	}
+
+	body, err2 := io.ReadAll(r.Body)
+	if err2 != nil {
+		return errors.Wrap(err, "error reading response body "+err2.Error())
+	}
+	return errors.Wrap(err, string(body))
 }
