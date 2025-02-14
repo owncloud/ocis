@@ -37,7 +37,6 @@ use TusPhp\Tus\Client;
  */
 
 class TusClient extends Client {
-
 	/**
 	 * creates a resource with a post request and returns response.
 	 *

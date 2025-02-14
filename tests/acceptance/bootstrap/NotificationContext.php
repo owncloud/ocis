@@ -18,6 +18,7 @@ use TestHelpers\OcsApiHelper;
 use TestHelpers\GraphHelper;
 use TestHelpers\SettingsHelper;
 use TestHelpers\BehatHelper;
+use TestHelpers\HttpRequestHelper;
 
 require_once 'bootstrap.php';
 
@@ -138,6 +139,18 @@ class NotificationContext implements Context {
 		$this->featureContext = BehatHelper::getContext($scope, $environment, 'FeatureContext');
 		$this->spacesContext = BehatHelper::getContext($scope, $environment, 'SpacesContext');
 		$this->settingsContext = BehatHelper::getContext($scope, $environment, 'SettingsContext');
+	}
+
+	/**
+	 * @BeforeScenario @email
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws JsonException
+	 */
+	public function deleteAllEmailNotifications(): void {
+		$this->clearAllEmails();
+		var_dump("hello");
 	}
 
 	/**
