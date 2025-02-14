@@ -699,7 +699,7 @@ class SharingNgContext implements Context {
 		);
 
 		if ($response->getStatusCode() === 200) {
-			$this->featureContext->shareNgAddToCreatedUserGroupShares($response);
+			$this->featureContext->shareNgUpdateCreatedUserGroupShare($permissionID, $response);
 		}
 
 		return $response;
@@ -882,7 +882,7 @@ class SharingNgContext implements Context {
 		);
 
 		if ($response->getStatusCode() === 200) {
-			$this->featureContext->shareNgAddToCreatedLinkShares($response);
+			$this->featureContext->shareNgUpdatedCreatedLinkShare($permissionID, $response);
 		}
 
 		return $response;
@@ -923,7 +923,7 @@ class SharingNgContext implements Context {
 		);
 
 		if ($response->getStatusCode() === 200) {
-			$this->featureContext->shareNgAddToCreatedLinkShares($response);
+			$this->featureContext->shareNgUpdatedCreatedLinkShare($permissionID, $response);
 		}
 		return $response;
 	}
