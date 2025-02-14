@@ -183,6 +183,26 @@ Feature: Email notification
       Click here to check it: %base_url%/f/%space_id%
       """
 
+    Scenario: user gets an email notification when a folder is unshared
+    Given user "Alice" has created folder "SHARED-FOLDER"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | SHARED-FOLDER |
+      | space           | Personal       |
+      | sharee          | Brian          |
+      | shareType       | user           |
+      | permissionsRole | Viewer         |
+    And user "Alice" has removed the access of user "Brian" from resource "SHARED-FOLDER" of space "Personal"
+    When user "Alice" lists the activities of folder "SHARED-FOLDER" from space "Personal" using the Graph API
+    Then the HTTP status code should be "200"
+    And user "Brian" should have received the following email from user "Alice" about the share of project space "SHARED-FOLDER"
+      """
+      Hello Brian Murphy,
+
+      %displayname% has unshared 'SHARED-FOLDER' with you.
+
+      Even though this share has been revoked you still might have access through other shares and/or space memberships.
+      """
+
   @env-config
   Scenario: group members get an email notification in default language when someone shares a file with the group
     Given the config "OCIS_DEFAULT_LANGUAGE" has been set to "de"
