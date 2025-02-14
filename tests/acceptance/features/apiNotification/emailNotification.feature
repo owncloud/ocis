@@ -203,6 +203,26 @@ Feature: Email notification
       Even though this share has been revoked you still might have access through other shares and/or space memberships.
       """
 
+    Scenario: user gets an email notification when a file is unshared
+    Given user "Alice" has uploaded file with content "Sample data" to "/file-to-share.txt"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | /file-to-share.txt |
+      | space           | Personal           |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | Viewer             |
+    And user "Alice" has removed the access of user "Brian" from resource "/file-to-share.txt" of space "Personal"
+    When user "Alice" lists the activities of file "/file-to-share.txt" from space "Personal" using the Graph API
+    Then the HTTP status code should be "200"
+    And user "Brian" should have received the following email from user "Alice" about the share of project space "/file-to-share.txt"
+      """
+      Hello Brian Murphy,
+
+      %displayname% has unshared 'file-to-share.txt' with you.
+
+      Even though this share has been revoked you still might have access through other shares and/or space memberships.
+      """
+
   @env-config
   Scenario: group members get an email notification in default language when someone shares a file with the group
     Given the config "OCIS_DEFAULT_LANGUAGE" has been set to "de"
