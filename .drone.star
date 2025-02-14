@@ -2135,6 +2135,11 @@ def changelog():
                 "refs/heads/stable-*",
                 "refs/pull/**",
             ],
+            "event": {
+                "exclude": [
+                    "cron",
+                ],
+            },
         },
     }]
 
