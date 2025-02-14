@@ -141,6 +141,17 @@ class NotificationContext implements Context {
 	}
 
 	/**
+	 * @BeforeScenario @email
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws JsonException
+	 */
+	public function deleteAllEmailNotifications(): void {
+		$this->clearAllEmails();
+	}
+
+	/**
 	 * @param string $user
 	 *
 	 * @return ResponseInterface
