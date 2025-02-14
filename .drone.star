@@ -1036,6 +1036,10 @@ def localApiTestPipeline(ctx):
                                     "refs/pull/**",
                                 ],
                             },
+                            "volumes": [{
+                                "name": "storage",
+                                "temp": {},
+                            }],
                         }
                         pipelines.append(pipeline)
     return pipelines
@@ -1062,6 +1066,10 @@ def localApiTests(ctx, name, suites, storage = "ocis", extra_environment = {}, w
     for item in extra_environment:
         environment[item] = extra_environment[item]
 
+    storage_volume = [{
+        "name": "storage",
+        "path": "/root/.ocis",
+    }]
     return [{
         "name": "localApiTests-%s" % name,
         "image": OC_CI_PHP % DEFAULT_PHP_VERSION,
@@ -1071,6 +1079,7 @@ def localApiTests(ctx, name, suites, storage = "ocis", extra_environment = {}, w
             "" if with_remote_php else "cat %s/expected-failures-without-remotephp.md >> %s" % (test_dir, expected_failures_file),
             "make -C %s test-acceptance-api" % (dirs["base"]),
         ],
+        "volumes": storage_volume,
     }]
 
 def cs3ApiTests(ctx, storage, accounts_hash_difficulty = 4):
@@ -1277,6 +1286,10 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, with_remote_php = Fa
                 "refs/pull/**",
             ],
         },
+        "volumes": [{
+            "name": "storage",
+            "temp": {},
+        }],
     }
 
 def apiTests(ctx):
