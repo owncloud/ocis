@@ -2659,29 +2659,7 @@ class SpacesContext implements Context {
 		string $resource,
 		string $spaceName
 	): void {
-		$dateTime = new DateTime('yesterday');
-		$rows['expireDate'] = $dateTime->format('Y-m-d\\TH:i:sP');
-		if ($this->featureContext->isUsingSharingNG()) {
-			$space = $this->getSpaceByName($user, $spaceName);
-			$itemId = $this->getResourceId($user, $spaceName, $resource);
-			$body['expirationDateTime'] = $rows['expireDate'];
-			$permissionID = $this->featureContext->shareNgGetLastCreatedUserGroupShareID();
-			$this->featureContext->setResponse(
-				GraphHelper::updateShare(
-					$this->featureContext->getBaseUrl(),
-					$this->featureContext->getStepLineRef(),
-					$user,
-					$this->featureContext->getPasswordForUser($user),
-					$space["id"],
-					$itemId,
-					\json_encode($body),
-					$permissionID
-				)
-			);
-		} else {
-			$rows['permissions'] = (string)$this->featureContext->getLastCreatedUserGroupShare()->permissions;
-			$this->featureContext->setResponse($this->updateSharedResource($user, $rows));
-		}
+		$this->featureContext->setResponse($this->expireResourceShare($user, $resource, $spaceName));
 	}
 
 	/**
@@ -4779,6 +4757,57 @@ class SpacesContext implements Context {
 	): void {
 		$rows = $table->getRowsHash();
 		$response = $this->shareSpace($user, $spaceName, $rows);
+		$this->featureContext->theHTTPStatusCodeShouldBe(200, "", $response);
+	}
+
+	/**
+	 * @param string $user
+	 * @param string $resource
+	 * @param string $spaceName
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException|JsonException
+	 */
+	public function expireResourceShare(string $user, string $resource, string $spaceName): ResponseInterface {
+		$dateTime = new DateTime('yesterday');
+		$rows['expireDate'] = $dateTime->format('Y-m-d\\TH:i:sP');
+		if ($this->featureContext->isUsingSharingNG()) {
+			$space = $this->getSpaceByName($user, $spaceName);
+			$itemId = $this->getResourceId($user, $spaceName, $resource);
+			$body['expirationDateTime'] = $rows['expireDate'];
+			$permissionID = $this->featureContext->shareNgGetLastCreatedUserGroupShareID();
+			return GraphHelper::updateShare(
+				$this->featureContext->getBaseUrl(),
+				$this->featureContext->getStepLineRef(),
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				$space["id"],
+				$itemId,
+				\json_encode($body),
+				$permissionID
+			);
+		} else {
+			$rows['permissions'] = (string)$this->featureContext->getLastCreatedUserGroupShare()->permissions;
+			return $this->updateSharedResource($user, $rows);
+		}
+	}
+
+	/**
+	 * @Given user :user has expired the last share of resource :resource inside of the space :spaceName
+	 *
+	 * @param string $user
+	 * @param string $resource
+	 * @param string $spaceName
+	 *
+	 * @return void
+	 * @throws GuzzleException|JsonException
+	 */
+	public function userHasExpiredTheLastShareOfResourceInsideOfTheSpace(
+		string $user,
+		string $resource,
+		string $spaceName
+	): void {
+		$response = $this->expireResourceShare($user, $resource, $spaceName);
 		$this->featureContext->theHTTPStatusCodeShouldBe(200, "", $response);
 	}
 }
