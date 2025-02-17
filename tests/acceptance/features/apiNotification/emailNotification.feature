@@ -191,9 +191,8 @@ Feature: Email notification
       | sharee          | Brian          |
       | shareType       | user           |
       | permissionsRole | Viewer         |
-    And user "Alice" has removed the access of user "Brian" from resource "SHARED-FOLDER" of space "Personal"
-    When user "Alice" lists the activities of folder "SHARED-FOLDER" from space "Personal" using the Graph API
-    Then the HTTP status code should be "200"
+    When user "Alice" removes the access of user "Brian" from resource "SHARED-FOLDER" of space "Personal" using the Graph API
+    Then the HTTP status code should be "204"
     And user "Brian" should have received the following email from user "Alice" about the share of project space "SHARED-FOLDER"
       """
       Hello Brian Murphy,
@@ -211,9 +210,8 @@ Feature: Email notification
       | sharee          | Brian              |
       | shareType       | user               |
       | permissionsRole | Viewer             |
-    And user "Alice" has removed the access of user "Brian" from resource "/file-to-share.txt" of space "Personal"
-    When user "Alice" lists the activities of file "/file-to-share.txt" from space "Personal" using the Graph API
-    Then the HTTP status code should be "200"
+    When user "Alice" removes the access of user "Brian" from resource "/file-to-share.txt" of space "Personal" using the Graph API
+    Then the HTTP status code should be "204"
     And user "Brian" should have received the following email from user "Alice" about the share of project space "/file-to-share.txt"
       """
       Hello Brian Murphy,
