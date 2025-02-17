@@ -68,6 +68,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Add Identities to education user: [#11016](https://github.com/owncloud/ocis/pull/11016)
 * Enhancement - Add roles: [#10964](https://github.com/owncloud/ocis/pull/10964)
 * Enhancement - Update Web to v1.11.3: [#10977](https://github.com/owncloud/ocis/pull/10977)
+* Enhancement - Add the ocm notification handler: [#11005](https://github.com/owncloud/ocis/pull/11005)
 
 ## Details
 
@@ -92,6 +93,14 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/10977
    https://github.com/owncloud/web/releases/tag/v11.1.3
+
+* Enhancement - Add the ocm notification handler: [#11005](https://github.com/owncloud/ocis/pull/11005)
+
+   Added the ocm notification handler that allows receiving a notification from a
+   remote party about changes to a previously known entity.
+
+   https://github.com/owncloud/enterprise/issues/7075
+   https://github.com/owncloud/ocis/pull/11005
 
 # Changelog for [7.1.0-rc.4] (2025-02-04)
 
