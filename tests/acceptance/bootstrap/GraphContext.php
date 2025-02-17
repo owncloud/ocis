@@ -2537,7 +2537,9 @@ class GraphContext implements Context {
 			if ($retryEnabled) {
 				foreach ($jsonBody->value as $share) {
 					$autoSync = $this->featureContext->getUserAutoSyncSetting($credentials['username']);
-					$tryAgain = !$share->{'@client.synchronize'} && $autoSync && $retried < HttpRequestHelper::numRetriesOnHttpTooEarly();
+					$tryAgain = !$share->{'@client.synchronize'}
+					&& $autoSync
+					&& $retried < HttpRequestHelper::maxHTTPRequestRetries();
 
 					if ($tryAgain) {
 						$retried += 1;
@@ -2772,8 +2774,12 @@ class GraphContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userListsTheActivitiesForResourceOfSpaceUsingTheGraphAPI(string $user, string $resource, string $spaceName): void {
-		$resourceId = $this->featureContext->spacesContext->getResourceId($user, $spaceName, $resource);
+	public function userListsTheActivitiesForResourceOfSpaceUsingTheGraphAPI(
+		string $user,
+		string $resource,
+		string $spaceName
+	): void {
+		$resourceId = $this->spacesContext->getResourceId($user, $spaceName, $resource);
 		$response = GraphHelper::getActivities(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
@@ -2820,8 +2826,13 @@ class GraphContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function userTriesToListActivitiesOfFileFromSpaceOwnedByUserUsingTheGraphApi(string $user, string $file, string $owner, string $spaceName): void {
-		$resourceId = $this->featureContext->spacesContext->getResourceId($owner, $spaceName, $file);
+	public function userTriesToListActivitiesOfFileFromSpaceOwnedByUserUsingTheGraphApi(
+		string $user,
+		string $file,
+		string $owner,
+		string $spaceName
+	): void {
+		$resourceId = $this->spacesContext->getResourceId($owner, $spaceName, $file);
 		$response = GraphHelper::getActivities(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
@@ -2841,7 +2852,7 @@ class GraphContext implements Context {
 	 * @return void
 	 */
 	public function userListsTheActivitiesOfSpaceUsingTheGraphApi(string $user, string $spaceName): void {
-		$spaceId = ($this->featureContext->spacesContext->getSpaceByName($user, $spaceName))["id"];
+		$spaceId = ($this->spacesContext->getSpaceByName($user, $spaceName))->id;
 		$response = GraphHelper::getActivities(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
@@ -2904,8 +2915,14 @@ class GraphContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function userListsTheActivitiesForFolderOfSpaceWithDepthOrLimitUsingTheGraphApi(string $user, string $resource, string $spaceName, string $filterType, string $filterValue): void {
-		$resourceId = $this->featureContext->spacesContext->getResourceId($user, $spaceName, $resource);
+	public function userListsTheActivitiesForFolderOfSpaceWithDepthOrLimitUsingTheGraphApi(
+		string $user,
+		string $resource,
+		string $spaceName,
+		string $filterType,
+		string $filterValue
+	): void {
+		$resourceId = $this->spacesContext->getResourceId($user, $spaceName, $resource);
 		$response = GraphHelper::getActivities(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
