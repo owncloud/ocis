@@ -2,4 +2,4 @@ Bugfix: bump libregraph api
 
 Bump the libregraph api to avoid a regression.
 
-https://github.com/owncloud/ocis/pull/11019
+https://github.com/owncloud/ocis/pull/11021

@@ -53,9 +53,11 @@ func TestCreateEducationClass(t *testing.T) {
 	b, err := getMockedBackend(lm, eduConfig, &logger)
 	assert.Nil(t, err)
 	assert.NotEqual(t, "", b.educationConfig.classObjectClass)
-	class := libregraph.NewEducationClass("Math", "course")
+	class := libregraph.NewEducationClass()
 	class.SetExternalId("Math0123")
 	class.SetId("abcd-defg")
+	class.SetDisplayName("Math")
+	class.SetClassification("course")
 	resClass, err := b.CreateEducationClass(context.Background(), *class)
 	lm.AssertNumberOfCalls(t, "Add", 1)
 	lm.AssertNumberOfCalls(t, "Search", 1)
@@ -311,6 +313,7 @@ func TestGetEducationClassMembers(t *testing.T) {
 func TestLDAP_UpdateEducationClass(t *testing.T) {
 	externalIDs := []string{"Math3210"}
 	changeString := "xxxx-xxxx"
+	displayNameString := "Math-2"
 	type args struct {
 		id    string
 		class libregraph.EducationClass
@@ -340,7 +343,7 @@ func TestLDAP_UpdateEducationClass(t *testing.T) {
 			args: args{
 				id: "abcd-defg",
 				class: libregraph.EducationClass{
-					DisplayName: "Math-2",
+					DisplayName: &displayNameString,
 				},
 			},
 			assertion: func(tt assert.TestingT, err error, i ...interface{}) bool { return assert.Nil(tt, err) },
@@ -402,7 +405,7 @@ func TestLDAP_UpdateEducationClass(t *testing.T) {
 			args: args{
 				id: "abcd-defg",
 				class: libregraph.EducationClass{
-					DisplayName: "Math-2",
+					DisplayName: &displayNameString,
 					ExternalId:  &externalIDs[0],
 				},
 			},
@@ -488,7 +491,7 @@ func TestLDAP_UpdateEducationClass(t *testing.T) {
 			args: args{
 				id: "abcd-defg",
 				class: libregraph.EducationClass{
-					Classification: changeString,
+					Classification: &changeString,
 				},
 			},
 			assertion: func(tt assert.TestingT, err error, i ...interface{}) bool { return assert.Error(tt, err) },

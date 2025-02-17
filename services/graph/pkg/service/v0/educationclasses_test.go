@@ -65,9 +65,11 @@ var _ = Describe("EducationClass", func() {
 
 		identityEducationBackend = &identitymocks.EducationBackend{}
 		identityBackend = &identitymocks.Backend{}
-		newClass = libregraph.NewEducationClass("math", "course")
+		newClass = libregraph.NewEducationClass()
 		newClass.SetMembersodataBind([]string{"/users/user1"})
 		newClass.SetId("math")
+		newClass.SetClassification("course")
+		newClass.SetDisplayName("math")
 
 		rr = httptest.NewRecorder()
 		ctx = context.Background()

@@ -274,7 +274,10 @@ func (i *LDAP) educationClassToAddRequest(class libregraph.EducationClass) (*lda
 
 func (i *LDAP) educationClassToGroup(class libregraph.EducationClass) *libregraph.Group {
 	group := libregraph.NewGroup()
-	group.SetDisplayName(class.DisplayName)
+
+	if class.DisplayName != nil {
+		group.SetDisplayName(*class.DisplayName)
+	}
 
 	return group
 }
@@ -321,8 +324,9 @@ func (i *LDAP) createEducationClassModelFromLDAP(e *ldap.Entry) *libregraph.Educ
 }
 
 func (i *LDAP) groupToEducationClass(group libregraph.Group, e *ldap.Entry) *libregraph.EducationClass {
-	class := libregraph.NewEducationClass(group.GetDisplayName(), "")
+	class := libregraph.NewEducationClass()
 	class.SetId(group.GetId())
+	class.SetDisplayName(group.GetDisplayName())
 
 	if e != nil {
 		// Set the education User specific Attributes from the supplied LDAP Entry
