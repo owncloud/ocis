@@ -1734,8 +1734,6 @@ class FeatureContext extends BehatVariablesContext {
 			return $this->getAdminPassword();
 		} elseif (\array_key_exists($username, $this->createdUsers)) {
 			return (string)$this->createdUsers[$username]['password'];
-		} elseif (\array_key_exists($username, $this->createdRemoteUsers)) {
-			return (string)$this->createdRemoteUsers[$username]['password'];
 		}
 
 		// The user has not been created yet, see if there is a replacement
@@ -1810,12 +1808,6 @@ class FeatureContext extends BehatVariablesContext {
 			}
 			return $userName;
 		}
-		if (\array_key_exists($username, $this->createdRemoteUsers)) {
-			if (isset($this->createdRemoteUsers[$username]['displayname'])) {
-				return (string)$this->createdRemoteUsers[$username]['displayname'];
-			}
-			return $userName;
-		}
 
 		// The user has not been created yet, see if there is a replacement
 		// defined for the user.
@@ -1870,9 +1862,6 @@ class FeatureContext extends BehatVariablesContext {
 		$username = $this->getActualUsername($userNameNormalized);
 		if (\array_key_exists($username, $this->createdUsers)) {
 			return (string)$this->createdUsers[$username]['email'];
-		}
-		if (\array_key_exists($username, $this->createdRemoteUsers)) {
-			return (string)$this->createdRemoteUsers[$username]['email'];
 		}
 
 		// The user has not been created yet, see if there is a replacement
@@ -2917,8 +2906,6 @@ class FeatureContext extends BehatVariablesContext {
 	 * @throws Exception
 	 */
 	public static function checkScenario(AfterScenarioScope $scope): void {
-		var_dump("Before running...");
-		var_dump($this->personalSpaces);
 		if (($scope->getTestResult()->getResultCode() !== 0)
 			&& (!self::isExpectedToFail(self::getScenarioLine($scope)))
 		) {
