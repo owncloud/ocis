@@ -132,3 +132,13 @@ Feature: delete federated connections
         }
       }
       """
+
+  @issue-10223
+  Scenario: federated user tries to delete previously deleted federated connection
+    Given using server "LOCAL"
+    And "Alice" has created the federation share invitation
+    And using server "REMOTE"
+    And "Brian" has accepted invitation
+    And user "Brian" has deleted federated connection with user "Alice"
+    When user "Brian" tries to delete federated connection with user "Alice" using the Graph API
+    Then the HTTP status code should be "404"

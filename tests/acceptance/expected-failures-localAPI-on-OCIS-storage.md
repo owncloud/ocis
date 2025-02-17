@@ -325,5 +325,8 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiServiceAvailability/serviceAvailabilityCheck.feature:120](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiServiceAvailability/serviceAvailabilityCheck.feature#L120)
 - [apiServiceAvailability/serviceAvailabilityCheck.feature:131](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiServiceAvailability/serviceAvailabilityCheck.feature#L131)
 
+#### [OCM. delete-accepted-user endpoint always returns 200](https://github.com/owncloud/ocis/issues/10223)
+- [apiOcm/deleteFederatedConnections.feature:137](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/deleteFederatedConnections.feature#L137)
+
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.
