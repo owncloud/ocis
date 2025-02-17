@@ -248,12 +248,12 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 
 #### [OCM. federated connection is not dropped when one of the users deletes the connection](https://github.com/owncloud/ocis/issues/10216)
 
-- [apiOcm/deleteFederatedConnections.feature:21](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/deleteFederatedConnections.feature#L21)
-- [apiOcm/deleteFederatedConnections.feature:67](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/deleteFederatedConnections.feature#L67)
+- [apiOcm/deleteFederatedConnections.feature:19](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/deleteFederatedConnections.feature#L19)
+- [apiOcm/deleteFederatedConnections.feature:61](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/deleteFederatedConnections.feature#L61)
 
 #### [OCM. server crash after deleting share for ocm user](https://github.com/owncloud/ocis/issues/10213)
 
-- [apiOcm/deleteFederatedConnections.feature:102](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/deleteFederatedConnections.feature#L102)
+- [apiOcm/deleteFederatedConnections.feature:92](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/deleteFederatedConnections.feature#L92)
 
 #### [same href in REPORT request for all dav-path-version](https://github.com/owncloud/ocis/issues/7060)
 
@@ -331,6 +331,9 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 #### [[OCM] Sharee can access expired federated share](https://github.com/owncloud/ocis/issues/11033)
 - [apiOcm/share.feature:1154](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L1154)
 - [apiOcm/share.feature:1174](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L1174)
+
+#### [OCM. delete-accepted-user endpoint always returns 200](https://github.com/owncloud/ocis/issues/10223)
+- [apiOcm/deleteFederatedConnections.feature:123](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/deleteFederatedConnections.feature#L123)
 
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.
