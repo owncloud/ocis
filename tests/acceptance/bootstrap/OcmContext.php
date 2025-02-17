@@ -179,6 +179,29 @@ class OcmContext implements Context {
 	}
 
 	/**
+	 * @When :user tries to accept the federation share invitation from same instance
+	 *
+	 * @param string $user
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function triesToAcceptTheFederationShareInvitationFromSameInstance(string $user): void {
+		$providerDomain = $this->featureContext->getLocalBaseUrlWithoutScheme();
+		$token = $this->getLastFederatedInvitationToken();
+		$this->featureContext->setResponse(
+			OcmHelper::acceptInvitation(
+				$this->featureContext->getBaseUrl(),
+				$this->featureContext->getStepLineRef(),
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				$token,
+				$providerDomain
+			)
+		);
+	}
+
+	/**
 	 * @param string $user
 	 *
 	 * @return ResponseInterface
