@@ -203,7 +203,30 @@ Feature: Email notification
       Even though this share has been revoked you still might have access through other shares and/or space memberships.
       """
 
+  @issue-10904
+  Scenario: user gets an email notification when space admin unshares a folder
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "shared-space" with the default quota using the Graph API
+    And user "Alice" has created a folder "SHARED-FOLDER" in space "shared-space"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | SHARED-FOLDER |
+      | space           | shared-space  |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Viewer        |
+    When user "Alice" removes the access of user "Brian" from resource "SHARED-FOLDER" of space "shared-space" using the Graph API
+    Then the HTTP status code should be "204"
+    And user "Brian" should have received the following email from user "Alice" about the share of project space "shared-space"
+      """
+      Hello Brian Murphy,
 
+      %displayname% has unshared 'SHARED-FOLDER' with you.
+
+      Even though this share has been revoked you still might have access through other shares and/or space memberships.
+      """
+
+  @issue-10904
   Scenario: user gets an email notification when a file is unshared
     Given user "Alice" has uploaded file with content "Sample data" to "/file-to-share.txt"
     And user "Alice" has sent the following resource share invitation:
