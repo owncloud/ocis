@@ -54,7 +54,7 @@ class SpacesContext implements Context {
 	/**
 	 * key is space name and value is the username that created the space
 	 */
-	private array $createdSpaces;
+	private array $createdSpaces = [];
 	private string $ocsApiUrl = '/ocs/v2.php/apps/files_sharing/api/v1/shares';
 
 	/**
@@ -75,6 +75,26 @@ class SpacesContext implements Context {
 	private array $storedEtags = [];
 
 	/**
+	 * @param string $spaceCreator
+	 * @param object $space
+	 *
+	 * @return void
+	 */
+	public function addToCreatedSpace(string $spaceCreator, object $space): void {
+		$spaceName = $space->name;
+		$this->createdSpaces[$spaceName] = $space;
+		$this->createdSpaces[$spaceName]->spaceCreator = $spaceCreator;
+		$this->createdSpaces[$spaceName]->fileId = $space->id . '!' . $space->owner->user->id;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getCreatedSpaces(): array {
+		return $this->createdSpaces;
+	}
+
+	/**
 	 * @param string $spaceName
 	 *
 	 * @return string name of the user that created the space
@@ -87,46 +107,30 @@ class SpacesContext implements Context {
 		return $this->createdSpaces[$spaceName]['spaceCreator'];
 	}
 
+	private array $personalSpaces = [];
+
 	/**
-	 * @param string $spaceCreator
-	 * @param ResponseInterface $response
+	 * @param string $user
+	 *
+	 * @return object|null
+	 */
+	public function getPersonalSpaceForUser(string $user): ?object {
+		$spaceName = $this->featureContext->getUserDisplayName($user);
+		if (!isset($this->personalSpaces[$spaceName])) {
+			return null;
+		}
+		return $this->personalSpaces[$spaceName];
+	}
+
+	/**
+	 * @param string $user
+	 * @param object $space
 	 *
 	 * @return void
 	 */
-	public function addCreatedSpace(string $spaceCreator, ResponseInterface $response): void {
-		$response = $this->featureContext->getJsonDecodedResponseBodyContent($response);
-		$spaceName = $response->name;
-		$this->createdSpaces[$spaceName] = [];
-		$this->createdSpaces[$spaceName]['id'] = $response->id;
-		$this->createdSpaces[$spaceName]['spaceCreator'] = $spaceCreator;
-		$this->createdSpaces[$spaceName]['fileId'] = $response->id . '!' . $response->owner->user->id;
-	}
-
-	/**
-	 * @param string $spaceName
-	 *
-	 * @return array
-	 */
-	public function getCreatedSpace(string $spaceName): array {
-		return $this->createdSpaces[$spaceName];
-	}
-
-	private array $availableSpaces = [];
-
-	/**
-	 * @return array
-	 */
-	public function getAvailableSpaces(): array {
-		return $this->availableSpaces;
-	}
-
-	/**
-	 * @param array $availableSpaces
-	 *
-	 * @return void
-	 */
-	public function setAvailableSpaces(array $availableSpaces): void {
-		$this->availableSpaces = $availableSpaces;
+	public function addPersonalSpaceForUser(string $user, object $space): void {
+		$spaceName = $this->featureContext->getUserDisplayName($user);
+		$this->personalSpaces[$spaceName] = $space;
 	}
 
 	/**
@@ -175,8 +179,6 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * The method finds available spaces to the user and returns the space by spaceName
-	 *
 	 * @param string $user
 	 * @param string $spaceName
 	 *
@@ -184,27 +186,48 @@ class SpacesContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function getSpaceByName(string $user, string $spaceName): array {
+		$createdSpaces = $this->getCreatedSpaces();
+		$personalSpace = $this->getPersonalSpaceForUser($user);
+		$allSpaces = \array_merge($createdSpaces, [$personalSpace]);
+
+		$storeSpaceFn = 'addToCreatedSpace';
 		if ($spaceName === "Personal") {
 			$spaceName = $this->featureContext->getUserDisplayName($user);
+			$storeSpaceFn = 'addPersonalSpaceForUser';
 		}
-		if (strtolower($user) === 'admin') {
-			$listSpacesFn = 'listAllAvailableSpaces';
-		} else {
-			$listSpacesFn = 'listAllAvailableSpacesOfUser';
+
+		if (isset($allSpaces[$spaceName])) {
+			return (array) $allSpaces[$spaceName];
 		}
 
 		// Sometimes listing available spaces might not return newly created/shared spaces.
 		// So we try again until we find the space or we reach the max number of retries (i.e. 10)
 		$retried = 0;
 		do {
-			// empty the available spaces array
-			$this->setAvailableSpaces([]);
+			$response = GraphHelper::getAllSpaces(
+				$this->featureContext->getBaseUrl(),
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				"",
+				$this->featureContext->getStepLineRef()
+			);
+			$spaces = $this->featureContext->getJsonDecodedResponseBodyContent($response)->value;
 
-			$this->$listSpacesFn($user);
-			$spaces = $this->getAvailableSpaces();
+			$found = false;
+			$foundSpace = [];
+			foreach ($spaces as $space) {
+				if ($space->name === "Shares") {
+					$this->addPersonalSpaceForUser("Shares", $space);
+				}
+				if ($space->name === $spaceName) {
+					$found = true;
+					$foundSpace = $space;
+					$this->$storeSpaceFn($user, $space);
+					break;
+				}
+			}
 
-			$tryAgain = !\array_key_exists($spaceName, $spaces)
-			&& $retried < HttpRequestHelper::numRetriesOnHttpTooEarly();
+			$tryAgain = !$found && $retried < HttpRequestHelper::maxHTTPRequestRetries();
 			if ($tryAgain) {
 				$retried += 1;
 				echo "Space '$spaceName' not found for user '$user', retrying ($retried)...\n";
@@ -213,12 +236,7 @@ class SpacesContext implements Context {
 			}
 		} while ($tryAgain);
 
-		Assert::assertArrayHasKey($spaceName, $spaces, "Space with name '$spaceName' for user '$user' not found");
-		Assert::assertNotEmpty(
-			$spaces[$spaceName]["root"]["webDavUrl"],
-			"WebDavUrl for space with name '$spaceName' for user '$user' not found"
-		);
-		return $spaces[$spaceName];
+		return (array) $foundSpace;
 	}
 
 	/**
@@ -467,22 +485,16 @@ class SpacesContext implements Context {
 	 * @throws Exception|GuzzleException
 	 */
 	public function deleteAllProjectSpaces(): void {
-		$query = "\$filter=driveType eq project";
 		$userAdmin = $this->featureContext->getAdminUsername();
+		$drives = $this->getCreatedSpaces();
 
-		$this->listAllAvailableSpaces(
-			$userAdmin,
-			$query
-		);
-		$drives = $this->getAvailableSpaces();
-
-		foreach ($drives as $value) {
-			if (!\array_key_exists("deleted", $value["root"])) {
+		foreach ($drives as $drive) {
+			if (!isset($drive->root->deleted)) {
 				GraphHelper::disableSpace(
 					$this->featureContext->getBaseUrl(),
 					$userAdmin,
 					$this->featureContext->getPasswordForUser($userAdmin),
-					$value["id"],
+					$drive->id,
 					$this->featureContext->getStepLineRef()
 				);
 			}
@@ -490,7 +502,7 @@ class SpacesContext implements Context {
 				$this->featureContext->getBaseUrl(),
 				$userAdmin,
 				$this->featureContext->getPasswordForUser($userAdmin),
-				$value["id"],
+				$drive->id,
 				$this->featureContext->getStepLineRef()
 			);
 		}
@@ -556,22 +568,20 @@ class SpacesContext implements Context {
 	 * @throws GuzzleException
 	 * @throws Exception
 	 */
-	public function listAllAvailableSpacesOfUser(
+	public function listAllMySpaces(
 		string $user,
 		string $query = '',
 		array $headers = []
 	): ResponseInterface {
-		$response = GraphHelper::getMySpaces(
+		return GraphHelper::getMySpaces(
 			$this->featureContext->getBaseUrl(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
-			"?" . $query,
+			$query,
 			$this->featureContext->getStepLineRef(),
 			[],
 			$headers
 		);
-		$this->rememberTheAvailableSpaces($response);
-		return $response;
 	}
 
 	/**
@@ -587,7 +597,7 @@ class SpacesContext implements Context {
 	 * @throws Exception
 	 */
 	public function theUserListsAllHisAvailableSpacesUsingTheGraphApi(string $user, string $query = ''): void {
-		$this->featureContext->setResponse($this->listAllAvailableSpacesOfUser($user, $query));
+		$this->featureContext->setResponse($this->listAllMySpaces($user, $query));
 	}
 
 	/**
@@ -613,30 +623,7 @@ class SpacesContext implements Context {
 		foreach ($headersTable as $row) {
 			$headers[$row['header']] = $row ['value'];
 		}
-		$this->featureContext->setResponse($this->listAllAvailableSpacesOfUser($user, '', $headers));
-	}
-
-	/**
-	 * The method is used on the administration setting tab, which only the Admin user and the Space admin user have access to
-	 *
-	 * @param string $user
-	 * @param string $query
-	 *
-	 * @return ResponseInterface
-	 *
-	 * @throws GuzzleException
-	 * @throws Exception
-	 */
-	public function listAllAvailableSpaces(string $user, string $query = ''): ResponseInterface {
-		$response = GraphHelper::getAllSpaces(
-			$this->featureContext->getBaseUrl(),
-			$user,
-			$this->featureContext->getPasswordForUser($user),
-			"?" . $query,
-			$this->featureContext->getStepLineRef()
-		);
-		$this->rememberTheAvailableSpaces($response);
-		return $response;
+		$this->featureContext->setResponse($this->listAllMySpaces($user, '', $headers));
 	}
 
 	/**
@@ -653,9 +640,14 @@ class SpacesContext implements Context {
 	 * @throws Exception
 	 */
 	public function theUserListsAllAvailableSpacesUsingTheGraphApi(string $user, string $query = ''): void {
-		$this->featureContext->setResponse(
-			$this->listAllAvailableSpaces($user, $query)
+		$response = GraphHelper::getAllSpaces(
+			$this->featureContext->getBaseUrl(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			$query,
+			$this->featureContext->getStepLineRef()
 		);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -721,35 +713,9 @@ class SpacesContext implements Context {
 		);
 		$this->featureContext->setResponse($response);
 		if ($response->getStatusCode() === 201) {
-			$this->addCreatedSpace($user, $response);
+			$space = $this->featureContext->getJsonDecodedResponseBodyContent($response);
+			$this->addToCreatedSpace($user, $space);
 		}
-	}
-
-	/**
-	 * Remember the available Spaces
-	 *
-	 * @param ResponseInterface|null $response
-	 *
-	 * @return void
-	 *
-	 * @throws Exception
-	 */
-	public function rememberTheAvailableSpaces(?ResponseInterface $response = null): void {
-		if ($response) {
-			$rawBody =  $response->getBody()->getContents();
-		} else {
-			$rawBody =  $this->featureContext->getResponse()->getBody()->getContents();
-		}
-		$drives = json_decode($rawBody, true, 512, JSON_THROW_ON_ERROR);
-		if (isset($drives["value"])) {
-			$drives = $drives["value"];
-		}
-
-		$spaces = [];
-		foreach ($drives as $drive) {
-			$spaces[$drive["name"]] = $drive;
-		}
-		$this->setAvailableSpaces($spaces);
 	}
 
 	/**
@@ -1049,7 +1015,7 @@ class SpacesContext implements Context {
 		string $grantedUser,
 		string $role
 	): void {
-		$response = $this->listAllAvailableSpacesOfUser($user);
+		$response = $this->listAllMySpaces($user);
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			200,
 			"Expected response status code should be 200",
@@ -1105,7 +1071,7 @@ class SpacesContext implements Context {
 		string $shouldOrNot,
 		string $spaceName
 	): void {
-		$response = $this->listAllAvailableSpacesOfUser($user);
+		$response = $this->listAllMySpaces($user);
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			200,
 			"Expected response status code should be 200",
@@ -1137,7 +1103,7 @@ class SpacesContext implements Context {
 		string $user,
 		string $spaceName
 	): void {
-		$response = $this->listAllAvailableSpacesOfUser($user);
+		$response = $this->listAllMySpaces($user);
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			200,
 			"Expected response status code should be 200",
@@ -1758,12 +1724,13 @@ class SpacesContext implements Context {
 	): void {
 		$space = ["name" => $spaceName, "driveType" => $spaceType, "quota" => ["total" => $quota]];
 		$response = $this->createSpace($user, $space);
-		$this->addCreatedSpace($user, $response);
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			201,
 			"Expected response status code should be 201 (Created)",
 			$response
 		);
+		$space = $this->featureContext->getJsonDecodedResponseBodyContent($response);
+		$this->addToCreatedSpace($user, $space);
 	}
 
 	/**
@@ -1783,12 +1750,13 @@ class SpacesContext implements Context {
 	): void {
 		$space = ["name" => $spaceName];
 		$response = $this->createSpace($user, $space);
-		$this->addCreatedSpace($user, $response);
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			201,
 			"Expected response status code should be 201 (Created)",
 			$response
 		);
+		$space = $this->featureContext->getJsonDecodedResponseBodyContent($response);
+		$this->addToCreatedSpace($user, $response);
 	}
 
 	/**
@@ -2420,14 +2388,12 @@ class SpacesContext implements Context {
 		string $fileContent,
 		string $destination
 	): array {
-		$response = $this->listAllAvailableSpacesOfUser($user);
-		$this->featureContext->theHTTPStatusCodeShouldBe(200, "", $response);
-		$spaceId = $this->getSpaceIdByName($user, $spaceName);
+		$space = $this->getSpaceByName($user, $spaceName);
 		$response = $this->featureContext->uploadFileWithContent(
 			$user,
 			$fileContent,
 			$destination,
-			$spaceId,
+			$space["id"],
 			true
 		);
 		$this->featureContext->theHTTPStatusCodeShouldBe(['201', '204'], "", $response);
@@ -4626,7 +4592,7 @@ class SpacesContext implements Context {
 		string $role,
 		string $expirationDate = null
 	): void {
-		$response = $this->listAllAvailableSpacesOfUser($user);
+		$response = $this->listAllMySpaces($user);
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			200,
 			"Expected response status code should be 200",

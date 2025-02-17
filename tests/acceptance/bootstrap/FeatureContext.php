@@ -2977,6 +2977,8 @@ class FeatureContext extends BehatVariablesContext {
 	 * @throws Exception
 	 */
 	public static function checkScenario(AfterScenarioScope $scope): void {
+		var_dump("Before running...");
+		var_dump($this->personalSpaces);
 		if (($scope->getTestResult()->getResultCode() !== 0)
 			&& (!self::isExpectedToFail(self::getScenarioLine($scope)))
 		) {
