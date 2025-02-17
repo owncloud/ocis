@@ -2674,7 +2674,7 @@ class GraphContext implements Context {
 					$autoSync = $this->featureContext->getUserAutoSyncSetting($credentials['username']);
 					$tryAgain = !$share->{'@client.synchronize'}
 					&& $autoSync
-					&& $retried < HttpRequestHelper::numRetriesOnHttpTooEarly();
+					&& $retried < HttpRequestHelper::maxHTTPRequestRetries();
 
 					if ($tryAgain) {
 						$retried += 1;
@@ -2918,7 +2918,7 @@ class GraphContext implements Context {
 		string $resource,
 		string $spaceName
 	): void {
-		$resourceId = $this->featureContext->spacesContext->getResourceId($user, $spaceName, $resource);
+		$resourceId = $this->spacesContext->getResourceId($user, $spaceName, $resource);
 		$response = GraphHelper::getActivities(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
@@ -2974,7 +2974,7 @@ class GraphContext implements Context {
 		string $owner,
 		string $spaceName
 	): void {
-		$resourceId = $this->featureContext->spacesContext->getResourceId($owner, $spaceName, $file);
+		$resourceId = $this->spacesContext->getResourceId($owner, $spaceName, $file);
 		$response = GraphHelper::getActivities(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
@@ -2994,7 +2994,7 @@ class GraphContext implements Context {
 	 * @return void
 	 */
 	public function userListsTheActivitiesOfSpaceUsingTheGraphApi(string $user, string $spaceName): void {
-		$spaceId = ($this->featureContext->spacesContext->getSpaceByName($user, $spaceName))["id"];
+		$spaceId = ($this->spacesContext->getSpaceByName($user, $spaceName))->id;
 		$response = GraphHelper::getActivities(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
@@ -3073,7 +3073,7 @@ class GraphContext implements Context {
 		string $filterType,
 		string $filterValue
 	): void {
-		$resourceId = $this->featureContext->spacesContext->getResourceId($user, $spaceName, $resource);
+		$resourceId = $this->spacesContext->getResourceId($user, $spaceName, $resource);
 		$response = GraphHelper::getActivities(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
