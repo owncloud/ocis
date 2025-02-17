@@ -183,6 +183,7 @@ Feature: Email notification
       Click here to check it: %base_url%/f/%space_id%
       """
 
+
     Scenario: user gets an email notification when a folder is unshared
     Given user "Alice" has created folder "SHARED-FOLDER"
     And user "Alice" has sent the following resource share invitation:
@@ -201,6 +202,7 @@ Feature: Email notification
 
       Even though this share has been revoked you still might have access through other shares and/or space memberships.
       """
+
 
     Scenario: user gets an email notification when a file is unshared
     Given user "Alice" has uploaded file with content "Sample data" to "/file-to-share.txt"
