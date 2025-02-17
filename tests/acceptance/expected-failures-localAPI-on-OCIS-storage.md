@@ -321,14 +321,9 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiServiceAvailability/serviceAvailabilityCheck.feature:131](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiServiceAvailability/serviceAvailabilityCheck.feature#L131)
 
 #### [[OCM] Hide & Enable Sync fail with received federated shares](https://github.com/owncloud/ocis/issues/10719)
-<<<<<<< HEAD
 - [apiOcm/share.feature:1204](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L1204)
 - [apiOcm/share.feature:1228](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L1228)
 - [apiOcm/share.feature:1339](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L1339)
-=======
-- [apiOcm/share.feature:1198](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L1198)
-- [apiOcm/share.feature:1222](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L1222)
->>>>>>> e06ea85420e (Fix the OCM role editor permission set. The redundant permissions have been removed.)
 
 #### [[OCM] federated user trying to download file shared with permissions role Secure Viewer returns 500 status code](https://github.com/owncloud/ocis/issues/10822)
 - [apiOcm/enableDisablePermissionsRole.feature:18](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/enableDisablePermissionsRole.feature#L18)
@@ -354,10 +349,6 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 #### [Server returns status code 500 when deleting auth-app token of a different user](https://github.com/owncloud/ocis/issues/10921)
 - [apiAuthApp/token.feature:263](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiAuthApp/token.feature#L263)
 - [apiAuthApp/token.feature:269](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiAuthApp/token.feature#L269)
-
-#### [[OCM] Hide & Enable Sync fail with received federated shares](https://github.com/owncloud/ocis/issues/10719)
-- [apiOcm/share.feature:1194](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L1194)
-- [apiOcm/share.feature:1218](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L1218)
 
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.
