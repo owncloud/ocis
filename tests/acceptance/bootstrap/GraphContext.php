@@ -96,7 +96,7 @@ class GraphContext implements Context {
 	 *
 	 * @param string $byUser
 	 * @param string $user
-	 * @param string $userName
+	 * @param string $newUsername
 	 *
 	 * @return void
 	 * @throws GuzzleException
@@ -105,13 +105,18 @@ class GraphContext implements Context {
 	public function theUserChangesTheUserNameOfUserToUsingTheGraphApi(
 		string $byUser,
 		string $user,
-		string $userName
+		string $newUsername
 	): void {
-		$response = $this->editUserUsingTheGraphApi($byUser, $user, $userName);
+		$response = $this->editUserUsingTheGraphApi($byUser, $user, $newUsername);
 		$this->featureContext->setResponse($response);
-		// need to add user to list to delete him after test
-		if (!empty($userName) && $this->featureContext->getAttributeOfCreatedUser($userName, 'id')) {
-			$this->featureContext->addUserToCreatedUsersList($userName, $this->featureContext->getUserPassword($user));
+
+		// save the updated user
+		if (!empty($newUsername) && $response->getStatusCode() === 200) {
+			$this->featureContext->rememberThatUserIsNotExpectedToExist($user);
+			$this->featureContext->addUserToCreatedUsersList(
+				$newUsername,
+				$this->featureContext->getUserPassword($user)
+			);
 		}
 	}
 
@@ -291,13 +296,17 @@ class GraphContext implements Context {
 	 */
 	public function adminDeletesUserUsingTheGraphApi(string $user, ?string $byUser = null): ResponseInterface {
 		$credentials = $this->getAdminOrUserCredentials($byUser);
-		return GraphHelper::deleteUser(
+		$response = GraphHelper::deleteUser(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
 			$credentials["username"],
 			$credentials["password"],
 			$user
 		);
+		if ($response->getStatusCode() === 204) {
+			$this->featureContext->rememberThatUserIsNotExpectedToExist($user);
+		}
+		return $response;
 	}
 
 	/**
@@ -327,21 +336,30 @@ class GraphContext implements Context {
 	/**
 	 * sends a request to delete a user with the help of userID using the Graph API
 	 *
-	 * @param string $userId
+	 * @param string $user
 	 * @param string $byUser
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
-	public function deleteUserByUserIdUsingTheGraphApi(string $userId, string $byUser): ResponseInterface {
+	public function deleteUserByUserId(string $user, string $byUser): ResponseInterface {
+		if ($user === "nonexistent") {
+			$userId = WebDavHelper::generateUUIDv4();
+		} else {
+			$userId = $this->featureContext->getUserIdByUserName($user);
+		}
 		$credentials = $this->getAdminOrUserCredentials($byUser);
-		return GraphHelper::deleteUserByUserId(
+		$response = GraphHelper::deleteUserByUserId(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
 			$credentials["username"],
 			$credentials["password"],
 			$userId
 		);
+		if ($response->getStatusCode() === 204) {
+			$this->featureContext->rememberThatUserIsNotExpectedToExist($user);
+		}
+		return $response;
 	}
 
 	/**
@@ -355,8 +373,7 @@ class GraphContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function theUserDeletesAUserUsingTheGraphAPI(string $byUser, string $user): void {
-		$userId = $this->featureContext->getUserIdByUserName($user);
-		$this->featureContext->setResponse($this->deleteUserByUserIdUsingTheGraphApi($userId, $byUser));
+		$this->featureContext->setResponse($this->deleteUserByUserId($user, $byUser));
 	}
 
 	/**
@@ -369,8 +386,7 @@ class GraphContext implements Context {
 	 * @throws Exception
 	 */
 	public function theUserTriesToDeleteNonExistingUser(string $byUser): void {
-		$userId = WebDavHelper::generateUUIDv4();
-		$this->featureContext->setResponse($this->deleteUserByUserIdUsingTheGraphApi($userId, $byUser));
+		$this->featureContext->setResponse($this->deleteUserByUserId("nonexistent", $byUser));
 	}
 
 	/**
@@ -689,11 +705,12 @@ class GraphContext implements Context {
 			$rows["email"],
 			$rows["displayName"]
 		);
+		$this->featureContext->setResponse($response);
 
 		// add created user to list except for the user with an empty name
 		// because request /graph/v1.0/users/emptyUserName exits with 200
 		// and we cannot check that the user with empty name doesn't exist
-		if (!empty($rows["userName"])) {
+		if (!empty($rows["userName"]) && $response->getStatusCode() === 201) {
 			$this->featureContext->addUserToCreatedUsersList(
 				$rows["userName"],
 				$rows["password"],
@@ -701,7 +718,6 @@ class GraphContext implements Context {
 				$rows["email"]
 			);
 		}
-		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -2994,7 +3010,7 @@ class GraphContext implements Context {
 	 * @return void
 	 */
 	public function userListsTheActivitiesOfSpaceUsingTheGraphApi(string $user, string $spaceName): void {
-		$spaceId = ($this->spacesContext->getSpaceByName($user, $spaceName))->id;
+		$spaceId = ($this->spacesContext->getSpaceByName($user, $spaceName))["id"];
 		$response = GraphHelper::getActivities(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
