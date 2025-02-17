@@ -188,10 +188,10 @@ Feature: Email notification
     Given user "Alice" has created folder "SHARED-FOLDER"
     And user "Alice" has sent the following resource share invitation:
       | resource        | SHARED-FOLDER |
-      | space           | Personal       |
-      | sharee          | Brian          |
-      | shareType       | user           |
-      | permissionsRole | Viewer         |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Viewer        |
     When user "Alice" removes the access of user "Brian" from resource "SHARED-FOLDER" of space "Personal" using the Graph API
     Then the HTTP status code should be "204"
     And user "Brian" should have received the following email from user "Alice" about the share of project space "SHARED-FOLDER"
