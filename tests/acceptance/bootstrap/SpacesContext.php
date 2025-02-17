@@ -85,6 +85,7 @@ class SpacesContext implements Context {
 		$this->createdSpaces[$spaceName] = $space;
 		$this->createdSpaces[$spaceName]->spaceCreator = $spaceCreator;
 		$this->createdSpaces[$spaceName]->fileId = $space->id . '!' . $space->owner->user->id;
+		$this->createdSpaces[$spaceName]->serverType = $this->featureContext->getCurrentServer();
 	}
 
 	/**
@@ -110,6 +111,13 @@ class SpacesContext implements Context {
 	private array $personalSpaces = [];
 
 	/**
+	 * @return array
+	 */
+	public function getPersonalSpaces(): array {
+		return $this->personalSpaces;
+	}
+
+	/**
 	 * @param string $user
 	 *
 	 * @return object|null
@@ -131,6 +139,7 @@ class SpacesContext implements Context {
 	public function addPersonalSpaceForUser(string $user, object $space): void {
 		$spaceName = $this->featureContext->getUserDisplayName($user);
 		$this->personalSpaces[$spaceName] = $space;
+		$this->personalSpaces[$spaceName]->serverType = $this->featureContext->getCurrentServer();
 	}
 
 	/**
@@ -186,43 +195,60 @@ class SpacesContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function getSpaceByName(string $user, string $spaceName): array {
+		$password = $this->featureContext->getPasswordForUser($user);
 		$createdSpaces = $this->getCreatedSpaces();
-		$personalSpace = $this->getPersonalSpaceForUser($user);
-		$allSpaces = \array_merge($createdSpaces, [$personalSpace]);
+		$personalSpaces = $this->getPersonalSpaces();
+		$allSpaces = \array_merge($createdSpaces, $personalSpaces);
 
-		$storeSpaceFn = 'addToCreatedSpace';
 		if ($spaceName === "Personal") {
 			$spaceName = $this->featureContext->getUserDisplayName($user);
-			$storeSpaceFn = 'addPersonalSpaceForUser';
 		}
 
-		if (isset($allSpaces[$spaceName])) {
-			return (array) $allSpaces[$spaceName];
+		if (isset($allSpaces[$spaceName])
+			&& $allSpaces[$spaceName]->serverType === $this->featureContext->getCurrentServer()
+		) {
+			return json_decode(json_encode($allSpaces[$spaceName]), true);
 		}
 
 		// Sometimes listing available spaces might not return newly created/shared spaces.
 		// So we try again until we find the space or we reach the max number of retries (i.e. 10)
 		$retried = 0;
 		do {
-			$response = GraphHelper::getAllSpaces(
+			// list 'me/drives' as given user
+			$response = GraphHelper::getMySpaces(
 				$this->featureContext->getBaseUrl(),
 				$user,
-				$this->featureContext->getPasswordForUser($user),
+				$password,
 				"",
 				$this->featureContext->getStepLineRef()
+			);
+			// NOTE: user can be created with empty password
+			// so if that's the case, the user won't be able request using empty password
+			// and user won't have personal space.
+			if ($response->getStatusCode() === 401 && !$password) {
+				return [];
+			}
+			$this->featureContext->theHttpStatusCodeShouldBe(
+				200,
+				"Failed to fetch me/drives for user '$user'",
+				$response
 			);
 			$spaces = $this->featureContext->getJsonDecodedResponseBodyContent($response)->value;
 
 			$found = false;
 			$foundSpace = [];
 			foreach ($spaces as $space) {
-				if ($space->name === "Shares") {
+				if ($space->name === "Shares" && !\array_key_exists("Shares", $allSpaces)) {
 					$this->addPersonalSpaceForUser("Shares", $space);
 				}
 				if ($space->name === $spaceName) {
 					$found = true;
 					$foundSpace = $space;
-					$this->$storeSpaceFn($user, $space);
+					if ($space->driveType === "project") {
+						$this->addToCreatedSpace($user, $space);
+					} else {
+						$this->addPersonalSpaceForUser($user, $space);
+					}
 					break;
 				}
 			}
@@ -236,7 +262,8 @@ class SpacesContext implements Context {
 			}
 		} while ($tryAgain);
 
-		return (array) $foundSpace;
+		Assert::assertTrue($found, "Space '$spaceName' not found for user '$user'");
+		return json_decode(json_encode($foundSpace), true);
 	}
 
 	/**
@@ -667,7 +694,6 @@ class SpacesContext implements Context {
 		string $ownerUser = ''
 	): void {
 		$space = $this->getSpaceByName(($ownerUser !== "") ? $ownerUser : $user, $spaceName);
-		Assert::assertIsArray($space);
 		Assert::assertNotEmpty($space["id"]);
 		Assert::assertNotEmpty($space["root"]["webDavUrl"]);
 		$this->featureContext->setResponse(
@@ -1756,7 +1782,7 @@ class SpacesContext implements Context {
 			$response
 		);
 		$space = $this->featureContext->getJsonDecodedResponseBodyContent($response);
-		$this->addToCreatedSpace($user, $response);
+		$this->addToCreatedSpace($user, $space);
 	}
 
 	/**
