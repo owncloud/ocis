@@ -271,6 +271,7 @@ func (i *LDAP) userToEducationUser(user libregraph.User, e *ldap.Entry) *libregr
 	eduUser.DisplayName = &user.DisplayName
 	eduUser.Mail = user.Mail
 	eduUser.UserType = user.UserType
+	eduUser.Identities = user.Identities
 
 	if e != nil {
 		// Set the education User specific Attributes from the supplied LDAP Entry
