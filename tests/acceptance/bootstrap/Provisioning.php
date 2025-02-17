@@ -956,19 +956,20 @@ trait Provisioning {
 	 * @return void
 	 */
 	public function initializeUser(string $user, string $password): void {
-		$url = $this->getBaseUrl() . "/graph/v1.0/users/$user";
-
 		if (OcisHelper::isTestingOnReva()) {
-			$url = $this->getBaseUrl()
-				. "/ocs/v$this->ocsApiVersion.php/cloud/users/$user";
+			$url = $this->getBaseUrl() . "/ocs/v$this->ocsApiVersion.php/cloud/users/$user";
+			HttpRequestHelper::get(
+				$url,
+				$this->getStepLineRef(),
+				$user,
+				$password
+			);
+			return;
 		}
 
-		HttpRequestHelper::get(
-			$url,
-			$this->getStepLineRef(),
-			$user,
-			$password
-		);
+		// initialize user by requesting drives
+		// saves the Personal drive id
+		$this->spacesContext->getSpaceByName($user, 'Personal');
 	}
 
 	/**
@@ -2000,7 +2001,8 @@ trait Provisioning {
 		$this->usingServer('LOCAL');
 		foreach ($this->createdUsers as $userData) {
 			$user = $userData['actualUsername'];
-			$this->deleteUser($user);
+			$response = $this->deleteUser($user);
+			$this->theHTTPStatusCodeShouldBe(204, "Failed to delete user '$user'", $response);
 			Assert::assertFalse(
 				$this->userExists($user),
 				"User '$user' should not exist but does exist"
@@ -2010,7 +2012,8 @@ trait Provisioning {
 		$this->usingServer('REMOTE');
 		foreach ($this->createdRemoteUsers as $userData) {
 			$user = $userData['actualUsername'];
-			$this->deleteUser($user);
+			$response = $this->deleteUser($user);
+			$this->theHTTPStatusCodeShouldBe(204, "Failed to delete user '$user'", $response);
 			Assert::assertFalse(
 				$this->userExists($user),
 				"User '$user' should not exist but does exist"

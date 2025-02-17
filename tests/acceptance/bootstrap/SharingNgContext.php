@@ -72,11 +72,7 @@ class SharingNgContext implements Context {
 		$bodyRows = $body->getRowsHash();
 		$resource = $bodyRows['resource'] ?? "";
 
-		if ($bodyRows['space'] === 'Personal' || $bodyRows['space'] === 'Shares') {
-			$space = $this->spacesContext->getSpaceByName($user, $bodyRows['space']);
-		} else {
-			$space = $this->spacesContext->getCreatedSpace($bodyRows['space']);
-		}
+		$space = $this->spacesContext->getSpaceByName($user, $bodyRows['space']);
 		$spaceId = $space['id'];
 
 		if ($resource === '' && !\in_array($bodyRows['space'], ['Personal', 'Shares'])) {
@@ -269,11 +265,7 @@ class SharingNgContext implements Context {
 		string $fileId = null,
 		bool $federatedShare = false
 	): ResponseInterface {
-		if ($shareInfo['space'] === 'Personal' || $shareInfo['space'] === 'Shares') {
-			$space = $this->spacesContext->getSpaceByName($user, $shareInfo['space']);
-		} else {
-			$space = $this->spacesContext->getCreatedSpace($shareInfo['space']);
-		}
+		$space = $this->spacesContext->getSpaceByName($user, $shareInfo['space']);
 		$spaceId = $space['id'];
 
 		// $fileId is used for trying to share deleted files
@@ -363,11 +355,7 @@ class SharingNgContext implements Context {
 	): ResponseInterface {
 		$shareeIds = [];
 		$rows = $table->getRowsHash();
-		if ($rows['space'] === 'Personal' || $rows['space'] === 'Shares') {
-			$space = $this->spacesContext->getSpaceByName($user, $rows['space']);
-		} else {
-			$space = $this->spacesContext->getCreatedSpace($rows['space']);
-		}
+		$space = $this->spacesContext->getSpaceByName($user, $rows['space']);
 		$spaceId = $space['id'];
 
 		$sharees = array_map('trim', explode(',', $rows['sharee']));
@@ -653,11 +641,7 @@ class SharingNgContext implements Context {
 	 */
 	public function updateResourceShare(string $user, TableNode  $body, string $permissionID): ResponseInterface {
 		$bodyRows = $body->getRowsHash();
-		if ($bodyRows['space'] === 'Personal' || $bodyRows['space'] === 'Shares') {
-			$space = $this->spacesContext->getSpaceByName($user, $bodyRows['space']);
-		} else {
-			$space = $this->spacesContext->getCreatedSpace($bodyRows['space']);
-		}
+		$space = $this->spacesContext->getSpaceByName($user, $bodyRows['space']);
 		$spaceId = $space["id"];
 		// for updating role of project space shared, we do not need to provide resource
 		$resource = $bodyRows['resource'] ?? '';
@@ -1467,7 +1451,7 @@ class SharingNgContext implements Context {
 				return;
 			}
 
-			$tryAgain = !$shareSynced && $retried < HttpRequestHelper::numRetriesOnHttpTooEarly();
+			$tryAgain = !$shareSynced && $retried < HttpRequestHelper::maxHTTPRequestRetries();
 			if ($tryAgain) {
 				$retried += 1;
 				echo "[INFO] Wait for share sync status...";
