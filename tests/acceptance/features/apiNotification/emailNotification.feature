@@ -161,7 +161,7 @@ Feature: Email notification
       Zum Ansehen hier klicken: %base_url%/f/%space_id%
       """
 
-
+  @issue-10904
   Scenario: user gets an email notification when space admin unshares a space
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
@@ -183,7 +183,7 @@ Feature: Email notification
       Click here to check it: %base_url%/f/%space_id%
       """
 
-
+  @issue-10904
   Scenario: user gets an email notification when a folder is unshared
     Given user "Alice" has created folder "SHARED-FOLDER"
     And user "Alice" has sent the following resource share invitation:
