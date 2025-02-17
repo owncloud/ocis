@@ -379,6 +379,12 @@ func receivedShareEqual(ref *ocm.ShareReference, s *ocm.ReceivedShare) bool {
 			return true
 		}
 	}
+	// Match the reserved share by the remote share id
+	if ref.GetId() != nil && s.RemoteShareId != "" {
+		if ref.GetId().GetOpaqueId() == s.RemoteShareId {
+			return true
+		}
+	}
 	return false
 }
 
@@ -587,6 +593,23 @@ func (m *mgr) GetReceivedShare(ctx context.Context, user *userpb.User, ref *ocm.
 		}
 	}
 	return nil, errtypes.NotFound(ref.String())
+}
+
+func (m *mgr) DeleteReceivedShare(ctx context.Context, user *userpb.User, ref *ocm.ShareReference) error {
+	m.Lock()
+	defer m.Unlock()
+
+	if err := m.load(); err != nil {
+		return err
+	}
+
+	for id, share := range m.model.ReceivedShares {
+		if receivedShareEqual(ref, share) && utils.UserEqual(user.Id, share.GetGrantee().GetUserId()) {
+			delete(m.model.ReceivedShares, id)
+			return m.save()
+		}
+	}
+	return errtypes.NotFound(ref.String())
 }
 
 func (m *mgr) UpdateReceivedShare(ctx context.Context, user *userpb.User, share *ocm.ReceivedShare, fieldMask *field_mask.FieldMask) (*ocm.ReceivedShare, error) {
