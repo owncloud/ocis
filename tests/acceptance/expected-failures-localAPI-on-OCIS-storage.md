@@ -328,5 +328,8 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 #### [[OCM] Users can invite themselves to their own federated connection](https://github.com/owncloud/ocis/issues/11004)
 - [apiOcm/acceptInvitation.feature:148](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/acceptInvitation.feature#L148)
 
+#### [OCM. delete-accepted-user endpoint always returns 200](https://github.com/owncloud/ocis/issues/10223)
+- [apiOcm/deleteFederatedConnections.feature:137](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/deleteFederatedConnections.feature#L137)
+
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.
