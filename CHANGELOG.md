@@ -66,6 +66,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Add Identities to education user: [#11016](https://github.com/owncloud/ocis/pull/11016)
+* Bugfix - Bump libregraph api: [#11021](https://github.com/owncloud/ocis/pull/11021)
 * Enhancement - Add roles: [#10964](https://github.com/owncloud/ocis/pull/10964)
 * Enhancement - Update Web to v1.11.3: [#10977](https://github.com/owncloud/ocis/pull/10977)
 * Enhancement - Add the ocm notification handler: [#11005](https://github.com/owncloud/ocis/pull/11005)
@@ -78,6 +79,12 @@ The following sections list the changes for unreleased.
    field
 
    https://github.com/owncloud/ocis/pull/11016
+
+* Bugfix - Bump libregraph api: [#11021](https://github.com/owncloud/ocis/pull/11021)
+
+   Bump the libregraph api to avoid a regression.
+
+   https://github.com/owncloud/ocis/pull/11021
 
 * Enhancement - Add roles: [#10964](https://github.com/owncloud/ocis/pull/10964)
 
