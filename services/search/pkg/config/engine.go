@@ -9,4 +9,5 @@ type Engine struct {
 // EngineBleve configures the bleve engine
 type EngineBleve struct {
 	Datapath string `yaml:"data_path" env:"SEARCH_ENGINE_BLEVE_DATA_PATH" desc:"The directory where the filesystem will store search data. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH/search." introductionVersion:"pre5.0"`
+	Scale    bool   `yaml:"scale" env:"SEARCH_ENGINE_BLEVE_SCALE" desc:"Enable scaling of the bleve index. If set to false, the service will have exclusive write access to the index as long as the service is running, locking out other processes. Defaults to false." introductionVersion:"%%NEXT%%"`
 }

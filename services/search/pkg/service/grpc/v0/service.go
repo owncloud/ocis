@@ -45,16 +45,16 @@ func NewHandler(opts ...Option) (searchsvc.SearchProviderHandler, func(), error)
 	var eng engine.Engine
 	switch cfg.Engine.Type {
 	case "bleve":
-		idx, err := engine.NewBleveIndex(cfg.Engine.Bleve.Datapath)
+		bleveEngine, err := engine.NewBleveEngine(cfg.Engine.Bleve.Datapath, bleve.DefaultCreator, cfg.Engine.Bleve.Scale)
 		if err != nil {
 			return nil, teardown, err
 		}
 
 		teardown = func() {
-			_ = idx.Close()
+			_ = bleveEngine.Close()
 		}
+		eng = bleveEngine
 
-		eng = engine.NewBleveEngine(idx, bleve.DefaultCreator)
 	default:
 		return nil, teardown, fmt.Errorf("unknown search engine: %s", cfg.Engine.Type)
 	}
