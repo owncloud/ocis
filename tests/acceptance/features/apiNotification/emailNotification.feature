@@ -227,7 +227,7 @@ Feature: Email notification
       """
 
   @issue-10904
-  Scenario: user gets an email notification when a file is unshared
+  Scenario: user gets an email notification when a file is unshared (Personal Space)
     Given user "Alice" has uploaded file with content "Sample data" to "/file-to-share.txt"
     And user "Alice" has sent the following resource share invitation:
       | resource        | /file-to-share.txt |
