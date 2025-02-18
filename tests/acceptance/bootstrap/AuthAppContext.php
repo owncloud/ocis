@@ -33,6 +33,7 @@ require_once 'bootstrap.php';
  */
 class AuthAppContext implements Context {
 	private FeatureContext $featureContext;
+	private array $createdAuthAppToken = [];
 
 	/**
 	 * @BeforeScenario
@@ -83,6 +84,7 @@ class AuthAppContext implements Context {
 			["expiry" => $expiration]
 		);
 		$this->featureContext->theHTTPStatusCodeShouldBe(200, "", $response);
+		$this->createdAuthAppToken[] = $response;
 	}
 
 	/**
@@ -129,25 +131,28 @@ class AuthAppContext implements Context {
 			. "HTTP status code 200 is not the expected value " . $response->getStatusCode(),
 			$response
 		);
+		$this->createdAuthAppToken[] = $response;
 	}
 
 	/**
-	 * @When the administrator creates app token for user :impersonatedUser with expiration time :expiration using the auth-app API
+	 * @When user :user creates app token for user :impersonatedUser with expiration time :expiration using the auth-app API
 	 *
+	 * @param string $user
 	 * @param string $impersonatedUser
 	 * @param string $expiration
 	 *
 	 * @return void
 	 */
 	public function theAdministratorCreatesAppTokenForUserWithExpirationTimeViaAuthAppApi(
+		string $user,
 		string $impersonatedUser,
 		string $expiration,
 	): void {
 		$this->featureContext->setResponse(
 			AuthAppHelper::createAppAuthToken(
 				$this->featureContext->getBaseUrl(),
-				$this->featureContext->getAdminUsername(),
-				$this->featureContext->getAdminPassword(),
+				$this->featureContext->getActualUsername($user),
+				$this->featureContext->getPasswordForUser($user),
 				[
 					"expiry" => $expiration,
 					"userName" => $this->featureContext->getActualUsername($impersonatedUser)
@@ -207,4 +212,26 @@ class AuthAppContext implements Context {
 		);
 	}
 
+	/**
+	 * @When user :user tries to deletes last created auth-app tokens using the auth-app API
+	 *
+	 * @param string $user
+	 *
+	 * @return void
+	 */
+	public function userTriesToDeletesLastCreatedAuthAppTokensUsingTheAuthAppApi(string $user): void {
+		$baseUrl = $this->featureContext->getBaseUrl();
+		$user = $this->featureContext->getActualUsername($user);
+		$password = $this->featureContext->getPasswordForUser($user);
+		$response = \end($this->createdAuthAppToken);
+		$authAppTokens = json_decode($response->getBody()->getContents());
+		$deleteResponse = AuthAppHelper::deleteAppAuthToken(
+			$baseUrl,
+			$user,
+			$password,
+			$authAppTokens->token
+		);
+		$this->featureContext->setResponse($deleteResponse);
+		$this->featureContext->pushToLastHttpStatusCodesArray((string)$deleteResponse->getStatusCode());
+	}
 }
