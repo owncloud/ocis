@@ -1216,3 +1216,49 @@ Feature: an user shares resources using ScienceMesh application
       | textfile.txt               | some data  |
       | imageFolder                |            |
       | imageFolder/testavatar.png |            |
+
+  @issue-10719
+  Scenario: enable sync of federated shared resource
+    Given using spaces DAV path
+    And "Brian" has created the federation share invitation
+    And using server "LOCAL"
+    And "Alice" has accepted invitation
+    And user "Alice" has created folder "FolderToShare"
+    And user "Alice" has sent the following resource share invitation to federated user:
+      | resource        | FolderToShare |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Viewer        |
+    And using server "REMOTE"
+    When user "Brian" enables sync of federated share "FolderToShare" using the Graph API
+    Then the HTTP status code should be "201"
+    When user "Brian" lists the shares shared with him using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "value"
+        ],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "@client.synchronize"
+              ],
+              "properties": {
+                "@client.synchronize": {
+                  "const": true
+                }
+              }
+            }
+          }
+        }
+      }
+      """
