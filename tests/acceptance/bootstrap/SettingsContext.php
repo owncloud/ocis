@@ -607,7 +607,7 @@ class SettingsContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" (disables|enables) notification for the following events using the settings API:$/
+	 * @Given /^user "([^"]*)" (disables|enables) notification for the following events using the settings API:$/
 	 *
 	 * @param string $user
 	 * @param string $enableOrDisable
@@ -620,27 +620,8 @@ class SettingsContext implements Context {
 		string $enableOrDisable,
 		TableNode $table
 	): void {
-		$settings = $table->getRowsHash();
-		Assert::assertCount(1, $settings, "only 1 event should be provided");
-		foreach ($settings as $event => $value) {
-			$body = $this->getBodyForNotificationSetting($user, $event);
-			if (str_contains($value, "mail")) {
-				$body["value"]["collectionValue"]["values"][]
-					= ["key" => "mail","boolValue" => $enableOrDisable === "enables"];
-			}
-			if (str_contains($value, "in-app")) {
-				$body["value"]["collectionValue"]["values"][]
-					= ["key" => "in-app","boolValue" => $enableOrDisable === "enables"];
-			}
-			$response = SettingsHelper::updateSettings(
-				$this->featureContext->getBaseUrl(),
-				$this->featureContext->getActualUsername($user),
-				$this->featureContext->getPasswordForUser($user),
-				json_encode($body),
-				$this->featureContext->getStepLineRef(),
-			);
-			$this->featureContext->setResponse($response);
-		}
+		$response = $this->enableOrDisableNotification($user, $enableOrDisable, $table);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -665,5 +646,60 @@ class SettingsContext implements Context {
 			$this->featureContext->getStepLineRef(),
 		);
 		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @When /^user "([^"]*)" has (disabled|enabled) notification for the following events using the settings API:$/
+	 *
+	 * @param string $user
+	 * @param string $enableOrDisable
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 */
+	public function userHasDisabledNotificationForTheFollowingEventsUsingTheSettingsApi(
+		string $user,
+		string $enableOrDisable,
+		TableNode $table
+	): void {
+		$response = $this->enableOrDisableNotification($user, $enableOrDisable, $table);
+		$this->featureContext->theHTTPStatusCodeShouldBe(201, "", $response);
+	}
+
+	/**
+	 * @param string $user
+	 * @param string $enableOrDisable
+	 * @param TableNode $events
+	 *
+	 * @return ResponseInterface
+	 *
+	 * @throws GuzzleException
+	 * @throws JsonException
+	 */
+	public function enableOrDisableNotification(
+		string $user,
+		string $enableOrDisable,
+		TableNode $events
+	): ResponseInterface {
+		$settings = $events->getRowsHash();
+		Assert::assertCount(1, $settings, "only 1 event should be provided");
+		foreach ($settings as $event => $value) {
+			$body = $this->getBodyForNotificationSetting($user, $event);
+			if (str_contains($value, "mail")) {
+				$body["value"]["collectionValue"]["values"][]
+					= ["key" => "mail","boolValue" => $enableOrDisable === "enables"];
+			}
+			if (str_contains($value, "in-app")) {
+				$body["value"]["collectionValue"]["values"][]
+					= ["key" => "in-app","boolValue" => $enableOrDisable === "enables"];
+			}
+			return SettingsHelper::updateSettings(
+				$this->featureContext->getBaseUrl(),
+				$this->featureContext->getActualUsername($user),
+				$this->featureContext->getPasswordForUser($user),
+				json_encode($body),
+				$this->featureContext->getStepLineRef(),
+			);
+		}
 	}
 }
