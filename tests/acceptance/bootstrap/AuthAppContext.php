@@ -210,5 +210,4 @@ class AuthAppContext implements Context {
 			"Expected the count to be $count but got " . \count($authAppTokens)
 		);
 	}
-
 }
