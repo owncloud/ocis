@@ -13,7 +13,7 @@ Feature: get grouped email notification
       | Alice    |
       | Brian    |
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
-    And user "Alice" has created a space "share space" with the default quota using the Graph API
+    And user "Alice" has created a space "New-Space" with the default quota using the Graph API
     And user "Alice" has uploaded file with content "some data" to "lorem.txt"
 
 
@@ -26,32 +26,23 @@ Feature: get grouped email notification
       | shareType       | user      |
       | permissionsRole | Viewer    |
     And user "Alice" has removed the access of user "Brian" from resource "lorem.txt" of space "Personal"
-    And user "Alice" has sent the following resource share invitation:
-      | resource           | lorem.txt                |
-      | space              | Personal                 |
-      | sharee             | Brian                    |
-      | shareType          | user                     |
-      | permissionsRole    | Viewer                   |
-      | expirationDateTime | 2042-01-01T23:59:59.000Z |
     And user "Alice" has sent the following space share invitation:
-      | space           | share space  |
+      | space           | New-Space    |
       | sharee          | Brian        |
       | shareType       | user         |
       | permissionsRole | Space Viewer |
-    And user "Alice" has removed the access of user "Brian" from space "share space"
+    And user "Alice" has removed the access of user "Brian" from space "New-Space"
     And user "Alice" has sent the following space share invitation:
-      | space              | share space              |
+      | space              | New-Space                |
       | sharee             | Brian                    |
       | shareType          | user                     |
       | permissionsRole    | Space Viewer             |
       | expirationDateTime | 2042-03-25T23:59:59.000Z |
-    And user "Alice" has updated the space "share space" with settings:
-      | shareWith  | Brian                         |
-      | expireDate | 2024-01-01T23:59:59.999+01:00 |
+    And user "Alice" has expired the membership of user "Brian" from space "New-Space"
     When the administrator triggers "daily" email notifications using the CLI
     Then the command should be successful
     And the command output should contain "successfully sent SendEmailsEvent"
-    And user "Brian" should have received the following email from user "Alice"
+    And user "Brian" should have received the following grouped email
       """
       Hi Brian Murphy,
 
@@ -63,21 +54,18 @@ Feature: get grouped email notification
       Even though this share has been revoked you still might have access through other shares and/or space memberships.
 
 
-      Alice Hansen has shared "lorem.txt" with you.
+      Alice Hansen has invited you to join "New-Space".
 
 
-      Alice Hansen has invited you to join "share space".
-
-
-      Alice Hansen has removed you from "share space".
+      Alice Hansen has removed you from "New-Space".
 
       You might still have access through your other groups or direct membership.
 
 
-      Alice Hansen has invited you to join "share space".
+      Alice Hansen has invited you to join "New-Space".
 
 
-      Your membership of space share space has expired at 2024-01-01 22:59:59
+      Your membership of space New-Space has expired at %date_time_pattern%
 
       Even though this membership has expired you still might have access through other shares and/or space memberships
       """
@@ -92,32 +80,23 @@ Feature: get grouped email notification
       | shareType       | user      |
       | permissionsRole | Viewer    |
     And user "Alice" has removed the access of user "Brian" from resource "lorem.txt" of space "Personal"
-    And user "Alice" has sent the following resource share invitation:
-      | resource           | lorem.txt                |
-      | space              | Personal                 |
-      | sharee             | Brian                    |
-      | shareType          | user                     |
-      | permissionsRole    | Viewer                   |
-      | expirationDateTime | 2042-01-01T23:59:59.000Z |
     And user "Alice" has sent the following space share invitation:
-      | space           | share space  |
+      | space           | New-Space    |
       | sharee          | Brian        |
       | shareType       | user         |
       | permissionsRole | Space Viewer |
-    And user "Alice" has removed the access of user "Brian" from space "share space"
+    And user "Alice" has removed the access of user "Brian" from space "New-Space"
     And user "Alice" has sent the following space share invitation:
-      | space              | share space              |
+      | space              | New-Space                |
       | sharee             | Brian                    |
       | shareType          | user                     |
       | permissionsRole    | Space Viewer             |
       | expirationDateTime | 2042-03-25T23:59:59.000Z |
-    And user "Alice" has updated the space "share space" with settings:
-      | shareWith  | Brian                         |
-      | expireDate | 2024-01-01T23:59:59.999+01:00 |
+    And user "Alice" has expired the membership of user "Brian" from space "New-Space"
     When the administrator triggers "weekly" email notifications using the CLI
     Then the command should be successful
     And the command output should contain "successfully sent SendEmailsEvent"
-    And user "Brian" should have received the following email from user "Alice"
+    And user "Brian" should have received the following grouped email
       """
       Hi Brian Murphy,
 
@@ -129,21 +108,18 @@ Feature: get grouped email notification
       Even though this share has been revoked you still might have access through other shares and/or space memberships.
 
 
-      Alice Hansen has shared "lorem.txt" with you.
+      Alice Hansen has invited you to join "New-Space".
 
 
-      Alice Hansen has invited you to join "share space".
-
-
-      Alice Hansen has removed you from "share space".
+      Alice Hansen has removed you from "New-Space".
 
       You might still have access through your other groups or direct membership.
 
 
-      Alice Hansen has invited you to join "share space".
+      Alice Hansen has invited you to join "New-Space".
 
 
-      Your membership of space share space has expired at 2024-01-01 22:59:59
+      Your membership of space New-Space has expired at %date_time_pattern%
 
       Even though this membership has expired you still might have access through other shares and/or space memberships
       """
