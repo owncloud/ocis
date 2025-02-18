@@ -89,7 +89,7 @@ Feature: create auth-app token
   @env-config
   Scenario: admin creates auth-app token for other user
     Given the config "AUTH_APP_ENABLE_IMPERSONATION" has been set to "true"
-    When the administrator creates app token for user "Alice" with expiration time "72h" using the auth-app API
+    When user "Admin" creates app token for user "Alice" with expiration time "72h" using the auth-app API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
       """
@@ -130,3 +130,10 @@ Feature: create auth-app token
         "maxItems": 0
       }
       """
+
+  @env-config
+  Scenario: try to create with normal user
+    Given user "Brian" has been created with default attributes
+    And the config "AUTH_APP_ENABLE_IMPERSONATION" has been set to "true"
+    When user "Alice" creates app token for user "Brian" with expiration time "72h" using the auth-app API
+    Then the HTTP status code should be "403"
