@@ -1216,3 +1216,31 @@ Feature: an user shares resources using ScienceMesh application
       | textfile.txt               | some data  |
       | imageFolder                |            |
       | imageFolder/testavatar.png |            |
+
+  @issue-10719
+  Scenario: federated user hides the shared resource
+    And "Brian" has created the federation share invitation
+    And using server "LOCAL"
+    And "Alice" has accepted invitation
+    And user "Alice" has uploaded file with content "hello world" to "testfile.txt"
+    And user "Alice" has sent the following resource share invitation to federated user:
+      | resource        | testfile.txt |
+      | space           | Personal     |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | Viewer       |
+    And using server "REMOTE"
+    When user "Brian" hides the federated share "testfile.txt" using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["@UI.Hidden"],
+        "properties": {
+          "@UI.Hidden": {
+            "const": true
+          }
+        }
+      }
+      """
