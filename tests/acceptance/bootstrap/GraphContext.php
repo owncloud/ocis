@@ -113,7 +113,10 @@ class GraphContext implements Context {
 		// save the updated user
 		if (!empty($newUsername) && $response->getStatusCode() === 200) {
 			$this->featureContext->rememberThatUserIsNotExpectedToExist($user);
-			$this->featureContext->addUserToCreatedUsersList($newUsername, $this->featureContext->getUserPassword($user));
+			$this->featureContext->addUserToCreatedUsersList(
+				$newUsername,
+				$this->featureContext->getUserPassword($user)
+			);
 		}
 	}
 
