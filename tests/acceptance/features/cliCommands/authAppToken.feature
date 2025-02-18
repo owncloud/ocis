@@ -13,7 +13,7 @@ Feature: create auth-app token
 
 
   Scenario: creates auth-app token via CLI
-    When the administrator creates app token for user "Alice" with expiration time "72h" using the auth-app CLI
+    When the administrator creates auth-app token for user "Alice" with expiration time "72h" using the auth-app CLI
     Then the command should be successful
     And the command output should contain "App token created for Alice"
 
