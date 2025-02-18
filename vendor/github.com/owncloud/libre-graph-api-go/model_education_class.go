@@ -11,9 +11,7 @@ API version: v1.0.4
 package libregraph
 
 import (
-	"bytes"
 	"encoding/json"
-	"fmt"
 )
 
 // checks if the EducationClass type satisfies the MappedNullable interface at compile time
@@ -26,27 +24,23 @@ type EducationClass struct {
 	// An optional description for the group. Returned by default.
 	Description *string `json:"description,omitempty"`
 	// The display name for the group. This property is required when a group is created and cannot be cleared during updates. Returned by default. Supports $search and $orderBy.
-	DisplayName string `json:"displayName"`
+	DisplayName *string `json:"displayName,omitempty"`
 	// Users and groups that are members of this group. HTTP Methods: GET (supported for all groups), Nullable. Supports $expand.
 	Members []User `json:"members,omitempty"`
 	// A list of member references to the members to be added. Up to 20 members can be added with a single request
 	MembersodataBind []string `json:"members@odata.bind,omitempty"`
 	// Classification of the group, i.e. \"class\" or \"course\"
-	Classification string `json:"classification"`
+	Classification *string `json:"classification,omitempty"`
 	// An external unique ID for the class
 	ExternalId *string `json:"externalId,omitempty"`
 }
-
-type _EducationClass EducationClass
 
 // NewEducationClass instantiates a new EducationClass object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewEducationClass(displayName string, classification string) *EducationClass {
+func NewEducationClass() *EducationClass {
 	this := EducationClass{}
-	this.DisplayName = displayName
-	this.Classification = classification
 	return &this
 }
 
@@ -122,28 +116,36 @@ func (o *EducationClass) SetDescription(v string) {
 	o.Description = &v
 }
 
-// GetDisplayName returns the DisplayName field value
+// GetDisplayName returns the DisplayName field value if set, zero value otherwise.
 func (o *EducationClass) GetDisplayName() string {
-	if o == nil {
+	if o == nil || IsNil(o.DisplayName) {
 		var ret string
 		return ret
 	}
-
-	return o.DisplayName
+	return *o.DisplayName
 }
 
-// GetDisplayNameOk returns a tuple with the DisplayName field value
+// GetDisplayNameOk returns a tuple with the DisplayName field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *EducationClass) GetDisplayNameOk() (*string, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.DisplayName) {
 		return nil, false
 	}
-	return &o.DisplayName, true
+	return o.DisplayName, true
 }
 
-// SetDisplayName sets field value
+// HasDisplayName returns a boolean if a field has been set.
+func (o *EducationClass) HasDisplayName() bool {
+	if o != nil && !IsNil(o.DisplayName) {
+		return true
+	}
+
+	return false
+}
+
+// SetDisplayName gets a reference to the given string and assigns it to the DisplayName field.
 func (o *EducationClass) SetDisplayName(v string) {
-	o.DisplayName = v
+	o.DisplayName = &v
 }
 
 // GetMembers returns the Members field value if set, zero value otherwise.
@@ -210,28 +212,36 @@ func (o *EducationClass) SetMembersodataBind(v []string) {
 	o.MembersodataBind = v
 }
 
-// GetClassification returns the Classification field value
+// GetClassification returns the Classification field value if set, zero value otherwise.
 func (o *EducationClass) GetClassification() string {
-	if o == nil {
+	if o == nil || IsNil(o.Classification) {
 		var ret string
 		return ret
 	}
-
-	return o.Classification
+	return *o.Classification
 }
 
-// GetClassificationOk returns a tuple with the Classification field value
+// GetClassificationOk returns a tuple with the Classification field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *EducationClass) GetClassificationOk() (*string, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.Classification) {
 		return nil, false
 	}
-	return &o.Classification, true
+	return o.Classification, true
 }
 
-// SetClassification sets field value
+// HasClassification returns a boolean if a field has been set.
+func (o *EducationClass) HasClassification() bool {
+	if o != nil && !IsNil(o.Classification) {
+		return true
+	}
+
+	return false
+}
+
+// SetClassification gets a reference to the given string and assigns it to the Classification field.
 func (o *EducationClass) SetClassification(v string) {
-	o.Classification = v
+	o.Classification = &v
 }
 
 // GetExternalId returns the ExternalId field value if set, zero value otherwise.
@@ -282,56 +292,22 @@ func (o EducationClass) ToMap() (map[string]interface{}, error) {
 	if !IsNil(o.Description) {
 		toSerialize["description"] = o.Description
 	}
-	toSerialize["displayName"] = o.DisplayName
+	if !IsNil(o.DisplayName) {
+		toSerialize["displayName"] = o.DisplayName
+	}
 	if !IsNil(o.Members) {
 		toSerialize["members"] = o.Members
 	}
 	if !IsNil(o.MembersodataBind) {
 		toSerialize["members@odata.bind"] = o.MembersodataBind
 	}
-	toSerialize["classification"] = o.Classification
+	if !IsNil(o.Classification) {
+		toSerialize["classification"] = o.Classification
+	}
 	if !IsNil(o.ExternalId) {
 		toSerialize["externalId"] = o.ExternalId
 	}
 	return toSerialize, nil
-}
-
-func (o *EducationClass) UnmarshalJSON(data []byte) (err error) {
-	// This validates that all required properties are included in the JSON object
-	// by unmarshalling the object into a generic map with string keys and checking
-	// that every required field exists as a key in the generic map.
-	requiredProperties := []string{
-		"displayName",
-		"classification",
-	}
-
-	allProperties := make(map[string]interface{})
-
-	err = json.Unmarshal(data, &allProperties)
-
-	if err != nil {
-		return err
-	}
-
-	for _, requiredProperty := range requiredProperties {
-		if _, exists := allProperties[requiredProperty]; !exists {
-			return fmt.Errorf("no value given for required property %v", requiredProperty)
-		}
-	}
-
-	varEducationClass := _EducationClass{}
-
-	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
-	err = decoder.Decode(&varEducationClass)
-
-	if err != nil {
-		return err
-	}
-
-	*o = EducationClass(varEducationClass)
-
-	return err
 }
 
 type NullableEducationClass struct {
