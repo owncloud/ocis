@@ -2716,7 +2716,6 @@ class SpacesContext implements Context {
 				$this->featureContext->shareNgAddToCreatedUserGroupShares($response);
 			}
 			$this->featureContext->setResponse($response);
-
 		} else {
 			$rows['permissions'] = (string)$this->featureContext->getLastCreatedUserGroupShare()->permissions;
 			$this->featureContext->setResponse($this->updateSharedResource($user, $rows));
@@ -4811,22 +4810,24 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @Given /^user "([^"]*)" has updated the space "([^"]*)" with settings:$/
+	 * @Given /^user "([^"]*)" has expired the membership of user "([^"]*)" from space "([^"]*)"$/
 	 *
 	 * @param  string $user
+	 * @param  string $memberUser
 	 * @param  string $spaceName
-	 * @param  TableNode $table
 	 *
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function userHasUpdatedTheSpaceWithSettings(
+	public function userHasExpiredTheMembershipOfUserFromSpace(
 		string $user,
-		string $spaceName,
-		TableNode $table
+		string $memberUser,
+		string $spaceName
 	): void {
-		$rows = $table->getRowsHash();
-		$response = $this->shareSpace($user, $spaceName, $rows);
-		$this->featureContext->theHTTPStatusCodeShouldBe(200, "", $response);
+		$dateTime = new DateTime('yesterday');
+		$this->featureContext->setExpiryDateTime($dateTime);
+		$rows['expireDate'] = $dateTime->format('Y-m-d\\TH:i:sP');
+		$rows['shareWith'] = $memberUser;
+		$this->featureContext->setResponse($this->shareSpace($user, $spaceName, $rows));
 	}
 }

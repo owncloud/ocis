@@ -466,6 +466,7 @@ default:
         - AuthAppContext:
         - SettingsContext:
         - NotificationContext:
+        - EmailContext:
 
     coreApiMain:
       paths:

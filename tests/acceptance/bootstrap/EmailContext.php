@@ -247,4 +247,24 @@ class EmailContext implements Context {
 		}
 		throw new Exception("Could not find the email to the address: " . $emailAddress);
 	}
+
+	/**
+	 * @Then user :user should have received the following grouped email
+	 *
+	 * @param string $user
+	 * @param PyStringNode $content
+	 *
+	 * @return void
+	 * @throws Exception|GuzzleException
+	 */
+	public function userShouldHaveReceivedTheFollowingGroupedEmail(
+		string $user,
+		PyStringNode $content
+	): void {
+		$rawExpectedEmailBodyContent = \str_replace("\r\n", "\n", $content->getRaw());
+		$expectedEmailBodyContent = $this->featureContext->substituteInLineCodes(
+			$rawExpectedEmailBodyContent
+		);
+		$this->assertEmailContains($user, $expectedEmailBodyContent);
+	}
 }

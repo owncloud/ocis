@@ -78,6 +78,7 @@ class FeatureContext extends BehatVariablesContext {
 	private string $adminUsername;
 	private string $adminPassword;
 	private string $originalAdminPassword;
+	private DateTime $expiryDateTime;
 
 	/**
 	 * An array of values of replacement values of user attributes.
@@ -194,6 +195,15 @@ class FeatureContext extends BehatVariablesContext {
 		$this->autoSyncSettings[$user] = $autoSyncSetting;
 
 		return $autoSyncSetting;
+	}
+
+	/**
+	 * @param DateTime $date
+	 *
+	 * @return void
+	 */
+	public function setExpiryDateTime(DateTime $date): void {
+		$this->expiryDateTime = $date;
 	}
 
 	/**
@@ -2476,6 +2486,13 @@ class FeatureContext extends BehatVariablesContext {
 					"getXRequestIdRegex"
 				],
 				"parameter" => []
+			],
+			[
+				"code" => "%expiry_date_time%",
+				"function" => [
+					$this, "getExpiryDateTime"
+				],
+				"parameter" =>  []
 			]
 		];
 		if ($user !== null) {
@@ -3003,5 +3020,12 @@ class FeatureContext extends BehatVariablesContext {
 			\fclose($reader);
 		}
 		return false;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getExpiryDateTime(): string {
+		return $this->expiryDateTime->format('Y-m-d H:i:s');
 	}
 }
