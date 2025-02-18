@@ -27,6 +27,7 @@ var cmd *exec.Cmd
 var retryCount = 0
 var stopSignal = false
 var EnvConfigs = []string{}
+var ServiceEnvConfigs = []string{}
 var runningServices = make(map[string]int)
 
 func Start(envMap []string) {
@@ -93,7 +94,6 @@ func waitAllServices(startTime time.Time, timeout time.Duration) {
 		}
 		return
 	}
-	log.Println("All services are up")
 }
 
 func WaitForConnection() (bool, string) {
@@ -249,10 +249,6 @@ func StartService(service string, envMap []string) {
 		runningServices[service] = cmd.Process.Pid
 	}
 
-	for listService, pid := range runningServices {
-		log.Println(fmt.Sprintf("%s service started with process id %v", listService, pid))
-	}
-
 	// Read the logs when the 'ocis server' command is running
 	go func() {
 		defer wg.Done()
@@ -327,8 +323,9 @@ func StopService(service string) (bool, string) {
 	}
 
 	delete(runningServices, service)
-
-	return true, fmt.Sprintf("Service %s stopped successfully", service)
+	message := fmt.Sprintf("Service %s stopped successfully", service)
+	log.Println(message)
+	return true, fmt.Sprintf(message)
 }
 
 func WaitForServiceStatus(service string, waitForUp bool) bool {
@@ -364,7 +361,7 @@ func WaitForServiceStatus(service string, waitForUp bool) bool {
 				log.Println(fmt.Sprintf("%s service is not ready on port %d. %v", service, port, err))
 			} else {
 				if err != nil {
-					log.Println(fmt.Sprintf("%s service port %d is no longer reachable", service, port))
+				    log.Println(fmt.Sprintf("%s service port %d is no longer reachable", service, port))
 					return true
 				}
 				_ = conn.Close()
