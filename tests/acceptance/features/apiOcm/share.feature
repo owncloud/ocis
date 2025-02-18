@@ -1216,3 +1216,44 @@ Feature: an user shares resources using ScienceMesh application
       | textfile.txt               | some data  |
       | imageFolder                |            |
       | imageFolder/testavatar.png |            |
+
+  @issue-10582
+  Scenario: federation user creates folder inside shared folder
+    Given using spaces DAV path
+    And "Brian" has created the federation share invitation
+    And using server "LOCAL"
+    And "Alice" has accepted invitation
+    And user "Alice" has created folder "folderToShare"
+    And user "Alice" has sent the following resource share invitation to federated user:
+      | resource        | folderToShare |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Editor        |
+    And using server "REMOTE"
+    When user "Brian" creates a folder "newFolder" inside federated share "folderToShare" using the WebDav Api
+    Then the HTTP status code should be "201"
+    And using server "LOCAL"
+    And as "Alice" folder "folderToShare/newFolder" should exist
+
+  @issue-10582
+  Scenario: federation user creates folder inside shared folder (Project Space)
+    Given using spaces DAV path
+    And "Brian" has created the federation share invitation
+    And using server "LOCAL"
+    And "Alice" has accepted invitation
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
+    And user "Alice" has created a folder "folderToShare" in space "projectSpace"
+    And user "Alice" has sent the following resource share invitation to federated user:
+      | resource        | folderToShare |
+      | space           | projectSpace  |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Editor        |
+    And using server "REMOTE"
+    When user "Brian" creates a folder "newFolder" inside federated share "folderToShare" using the WebDav Api
+    Then the HTTP status code should be "201"
+    And using server "LOCAL"
+    And for user "Alice" folder "folderToShare" of the space "projectSpace" should contain these entries:
+      | newFolder |
