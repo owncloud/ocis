@@ -184,7 +184,7 @@ Feature: Email notification
       """
 
   @issue-10904
-  Scenario: user gets an email notification when a folder is unshared
+  Scenario: user gets an email notification when a folder is unshared (Personal Space)
     Given user "Alice" has created folder "SHARED-FOLDER"
     And user "Alice" has sent the following resource share invitation:
       | resource        | SHARED-FOLDER |
