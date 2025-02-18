@@ -4763,22 +4763,26 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @Given /^user "([^"]*)" has updated the space "([^"]*)" with settings:$/
+	 * @Given /^user "([^"]*)" has expired the (user|group) share of space "([^"]*)" for (?:user|group) "([^"]*)"$/
 	 *
 	 * @param  string $user
+	 * @param  string $shareType
 	 * @param  string $spaceName
-	 * @param  TableNode $table
+	 * @param  string $memberUser
 	 *
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function userHasUpdatedTheSpaceWithSettings(
+	public function userHasExpiredTheShareOfSpaceForUser(
 		string $user,
+		string $shareType,
 		string $spaceName,
-		TableNode $table
+		string $memberUser
 	): void {
-		$rows = $table->getRowsHash();
-		$response = $this->shareSpace($user, $spaceName, $rows);
-		$this->featureContext->theHTTPStatusCodeShouldBe(200, "", $response);
+		$dateTime = new DateTime('yesterday');
+		$rows['expireDate'] = $dateTime->format('Y-m-d\\TH:i:sP');
+		$rows['shareWith'] = $memberUser;
+		$rows['shareType'] = ($shareType === 'user') ? 7 : 8;
+		$this->featureContext->setResponse($this->shareSpace($user, $spaceName, $rows));
 	}
 }
