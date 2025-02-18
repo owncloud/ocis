@@ -144,3 +144,37 @@ Feature: accepting invitation
       }
       """
 
+  @issue-11004
+  Scenario: user cannot accept federation share invitation from same instance
+    Given using server "LOCAL"
+    And "Alice" has created the federation share invitation
+    When "Alice" tries to accept the federation share invitation from same instance
+    Then the HTTP status code should be "409"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "code",
+          "message"
+        ],
+        "properties": {
+          "code": {
+            "const": "ALREADY_EXIST"
+          },
+          "message": {
+            "const": "user already known"
+          }
+        }
+      }
+      """
+    When "Alice" searches for accepted users
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "array",
+        "minItems": 0,
+        "maxItems": 0
+      }
+      """
