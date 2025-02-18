@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2025-02-18-00-36-57]
+[#deprecation-note-2025-02-18-05-58-31]
 [caption=]
 .Deprecation notes for the groups service
 [width="100%",cols="~,~,~,~",options="header"]
