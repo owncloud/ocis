@@ -1380,6 +1380,33 @@ class SharingNgContext implements Context {
 	}
 
 	/**
+	 * @When user :user enables sync of federated share :share using the Graph API
+	 *
+	 * @param string $user
+	 * @param string $share
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function userEnablesSyncOfFederatedShareUsingTheGraphApi(
+		string $user,
+		string $share,
+	): void {
+		$share = ltrim($share, '/');
+		$remoteItemId = $this->spacesContext->getSharesRemoteItemId($user, $share);
+		$shareSpaceId = GraphHelper::SHARES_SPACE_ID;
+		$response =  GraphHelper::enableShareSync(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$this->featureContext->getActualUsername($user),
+			$this->featureContext->getPasswordForUser($user),
+			$remoteItemId,
+			$shareSpaceId
+		);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
 	 * step definition for enabling sync for items for non-existing group|user|space sharer
 	 *
 	 * @When user :user tries to enable share sync of a resource :resource using the Graph API
