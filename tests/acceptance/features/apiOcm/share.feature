@@ -1189,3 +1189,51 @@ Feature: an user shares resources using ScienceMesh application
     And user "Brian" should not have a federated share "folderToShare" shared by user "Alice" from space "Personal"
     And using server "LOCAL"
     And as "Alice" file "folderToShare/file.txt" should not exist
+
+  @issue-10719
+  Scenario: federated user hides the file shared by local user
+    Given using server "LOCAL"
+    And user "Alice" has uploaded file with content "hello world" to "testfile.txt"
+    And user "Alice" has sent the following resource share invitation to federated user:
+      | resource        | testfile.txt |
+      | space           | Personal     |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | Viewer       |
+    And using server "REMOTE"
+    When user "Brian" hides the federated share "testfile.txt" using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["@UI.Hidden"],
+        "properties": {
+          "@UI.Hidden": { "const": true }
+        }
+      }
+      """
+
+  @issue-10719
+  Scenario: federated user hides the folder shared by local user
+    Given using server "LOCAL"
+    And user "Alice" has created folder "folderToShare"
+    And user "Alice" has sent the following resource share invitation to federated user:
+      | resource        | folderToShare |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Viewer        |
+    And using server "REMOTE"
+    When user "Brian" hides the federated share "folderToShare" using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["@UI.Hidden"],
+        "properties": {
+          "@UI.Hidden": { "const": true }
+        }
+      }
+      """

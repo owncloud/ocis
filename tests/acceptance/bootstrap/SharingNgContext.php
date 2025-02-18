@@ -1229,14 +1229,24 @@ class SharingNgContext implements Context {
 	 * @param string $sharee
 	 * @param string $shareID
 	 * @param bool $hide
+	 * @param bool $federatedShare
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 * @throws JsonException
 	 */
-	public function hideOrUnhideSharedResource(string $sharee, string $shareID, bool $hide = true): ResponseInterface {
+	public function hideOrUnhideSharedResource(
+		string $sharee,
+		string $shareID,
+		bool $hide = true,
+		bool $federatedShare = false
+	): ResponseInterface {
 		$shareSpaceId = GraphHelper::SHARES_SPACE_ID;
-		$itemId = $shareSpaceId . '!' . $shareID;
+		if ($federatedShare) {
+			$itemId = $shareID;
+		} else {
+			$itemId = $shareSpaceId . '!' . $shareID;
+		}
 		$body['@UI.Hidden'] = $hide;
 		return GraphHelper::hideOrUnhideShare(
 			$this->featureContext->getBaseUrl(),
@@ -1315,6 +1325,22 @@ class SharingNgContext implements Context {
 	public function userHidesTheSharedResourceUsingTheGraphApi(string $user): void {
 		$shareItemId = $this->featureContext->shareNgGetLastCreatedUserGroupShareID();
 		$response = $this->hideOrUnhideSharedResource($user, $shareItemId);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @When user :user hides the federated share :share using the Graph API
+	 *
+	 * @param string $user
+	 * @param string $share
+	 *
+	 * @return void
+	 * @throws Exception
+	 * @throws GuzzleException
+	 */
+	public function userHidesTheFederatedShareUsingTheGraphApi(string $user, string $share): void {
+		$remoteItemId = $this->spacesContext->getSharesRemoteItemId($user, $share);
+		$response = $this->hideOrUnhideSharedResource($user, $remoteItemId, true, true);
 		$this->featureContext->setResponse($response);
 	}
 
