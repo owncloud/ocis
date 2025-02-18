@@ -36,15 +36,16 @@ import (
 
 // Bleve represents a search engine which utilizes bleve to search and store resources.
 type Bleve struct {
+	indexPath    string
 	index        bleve.Index
 	queryCreator searchQuery.Creator[query.Query]
 }
 
-// NewBleveIndex returns a new bleve index
+// newBleveIndex returns a new bleve index
 // given path must exist.
-func NewBleveIndex(root string) (bleve.Index, error) {
+func newBleveIndex(root string, params map[string]interface{}) (bleve.Index, error) {
 	destination := filepath.Join(root, "bleve")
-	index, err := bleve.Open(destination)
+	index, err := bleve.OpenUsing(destination, params)
 	if errors.Is(bleve.ErrorIndexPathDoesNotExist, err) {
 		m, err := BuildBleveMapping()
 		if err != nil {
@@ -62,11 +63,34 @@ func NewBleveIndex(root string) (bleve.Index, error) {
 }
 
 // NewBleveEngine creates a new Bleve instance
-func NewBleveEngine(index bleve.Index, queryCreator searchQuery.Creator[query.Query]) *Bleve {
-	return &Bleve{
-		index:        index,
-		queryCreator: queryCreator,
+// If scalable is set to true, one connection to the index is created and
+// closed per operation, so multiple operations can be executed in parallel.
+// If set to false, only one write connection is created for the whole
+// service, which will lock the index for other processes. In this case,
+// you must close the engine yourself.
+func NewBleveEngine(indexPath string, queryCreator searchQuery.Creator[query.Query], scalable bool) (*Bleve, error) {
+	var idx bleve.Index
+	var err error
+
+	if !scalable {
+		idx, err = newBleveIndex(indexPath, nil)
+		if err != nil {
+			return nil, err
+		}
 	}
+
+	return &Bleve{
+		indexPath:    indexPath,
+		index:        idx,
+		queryCreator: queryCreator,
+	}, nil
+}
+
+func (b *Bleve) Close() error {
+	if b.index != nil {
+		return b.index.Close()
+	}
+	return nil
 }
 
 // BuildBleveMapping builds a bleve index mapping which can be used for indexing
@@ -123,6 +147,21 @@ func BuildBleveMapping() (mapping.IndexMapping, error) {
 // Search executes a search request operation within the index.
 // Returns a SearchIndexResponse object or an error.
 func (b *Bleve) Search(ctx context.Context, sir *searchService.SearchIndexRequest) (*searchService.SearchIndexResponse, error) {
+	var bleveIndex bleve.Index
+	var biErr error
+
+	if b.index == nil {
+		bleveIndex, biErr = newBleveIndex(b.indexPath, map[string]interface{}{
+			"read_only": true,
+		})
+		if biErr != nil {
+			return nil, biErr
+		}
+		defer bleveIndex.Close()
+	} else {
+		bleveIndex = b.index
+	}
+
 	createdQuery, err := b.queryCreator.Create(sir.Query)
 	if err != nil {
 		if searchQuery.IsValidationError(err) {
@@ -169,7 +208,7 @@ func (b *Bleve) Search(ctx context.Context, sir *searchService.SearchIndexReques
 	}
 
 	bleveReq.Fields = []string{"*"}
-	res, err := b.index.Search(bleveReq)
+	res, err := bleveIndex.Search(bleveReq)
 	if err != nil {
 		return nil, err
 	}
@@ -237,19 +276,45 @@ func (b *Bleve) Search(ctx context.Context, sir *searchService.SearchIndexReques
 
 // Upsert indexes or stores Resource data fields.
 func (b *Bleve) Upsert(id string, r Resource) error {
-	return b.index.Index(id, r)
+	var bleveIndex bleve.Index
+	var biErr error
+
+	if b.index == nil {
+		bleveIndex, biErr = newBleveIndex(b.indexPath, nil)
+		if biErr != nil {
+			return biErr
+		}
+		defer bleveIndex.Close()
+	} else {
+		bleveIndex = b.index
+	}
+
+	return bleveIndex.Index(id, r)
 }
 
 // Move updates the resource location and all of its necessary fields.
 func (b *Bleve) Move(id string, parentid string, target string) error {
-	r, err := b.getResource(id)
+	var bleveIndex bleve.Index
+	var biErr error
+
+	if b.index == nil {
+		bleveIndex, biErr = newBleveIndex(b.indexPath, nil)
+		if biErr != nil {
+			return biErr
+		}
+		defer bleveIndex.Close()
+	} else {
+		bleveIndex = b.index
+	}
+
+	r, err := b.getResource(bleveIndex, id)
 	if err != nil {
 		return err
 	}
 	currentPath := r.Path
 	nextPath := utils.MakeRelativePath(target)
 
-	r, err = b.updateEntity(id, func(r *Resource) {
+	r, err = b.updateEntity(bleveIndex, id, func(r *Resource) {
 		r.Path = nextPath
 		r.Name = path.Base(nextPath)
 		r.ParentID = parentid
@@ -266,13 +331,13 @@ func (b *Bleve) Move(id string, parentid string, target string) error {
 		bleveReq := bleve.NewSearchRequest(q)
 		bleveReq.Size = math.MaxInt
 		bleveReq.Fields = []string{"*"}
-		res, err := b.index.Search(bleveReq)
+		res, err := bleveIndex.Search(bleveReq)
 		if err != nil {
 			return err
 		}
 
 		for _, h := range res.Hits {
-			_, err := b.updateEntity(h.ID, func(r *Resource) {
+			_, err := b.updateEntity(bleveIndex, h.ID, func(r *Resource) {
 				r.Path = strings.Replace(r.Path, currentPath, nextPath, 1)
 			})
 			if err != nil {
@@ -289,29 +354,83 @@ func (b *Bleve) Move(id string, parentid string, target string) error {
 // instead of removing the resource it just marks it as deleted!
 // can be undone
 func (b *Bleve) Delete(id string) error {
-	return b.setDeleted(id, true)
+	var bleveIndex bleve.Index
+	var biErr error
+
+	if b.index == nil {
+		bleveIndex, biErr = newBleveIndex(b.indexPath, nil)
+		if biErr != nil {
+			return biErr
+		}
+		defer bleveIndex.Close()
+	} else {
+		bleveIndex = b.index
+	}
+
+	return b.setDeleted(bleveIndex, id, true)
 }
 
 // Restore is the counterpart to Delete.
 // It restores the resource which makes it available again.
 func (b *Bleve) Restore(id string) error {
-	return b.setDeleted(id, false)
+	var bleveIndex bleve.Index
+	var biErr error
+
+	if b.index == nil {
+		bleveIndex, biErr = newBleveIndex(b.indexPath, nil)
+		if biErr != nil {
+			return biErr
+		}
+		defer bleveIndex.Close()
+	} else {
+		bleveIndex = b.index
+	}
+
+	return b.setDeleted(bleveIndex, id, false)
 }
 
 // Purge removes a resource from the index, irreversible operation.
 func (b *Bleve) Purge(id string) error {
-	return b.index.Delete(id)
+	var bleveIndex bleve.Index
+	var biErr error
+
+	if b.index == nil {
+		bleveIndex, biErr = newBleveIndex(b.indexPath, nil)
+		if biErr != nil {
+			return biErr
+		}
+		defer bleveIndex.Close()
+	} else {
+		bleveIndex = b.index
+	}
+
+	return bleveIndex.Delete(id)
 }
 
 // DocCount returns the number of resources in the index.
 func (b *Bleve) DocCount() (uint64, error) {
-	return b.index.DocCount()
+	var bleveIndex bleve.Index
+	var biErr error
+
+	if b.index == nil {
+		bleveIndex, biErr = newBleveIndex(b.indexPath, map[string]interface{}{
+			"read_only": true,
+		})
+		if biErr != nil {
+			return 0, biErr
+		}
+		defer bleveIndex.Close()
+	} else {
+		bleveIndex = b.index
+	}
+
+	return bleveIndex.DocCount()
 }
 
-func (b *Bleve) getResource(id string) (*Resource, error) {
+func (b *Bleve) getResource(bleveIndex bleve.Index, id string) (*Resource, error) {
 	req := bleve.NewSearchRequest(bleve.NewDocIDQuery([]string{id}))
 	req.Fields = []string{"*"}
-	res, err := b.index.Search(req)
+	res, err := bleveIndex.Search(req)
 	if err != nil {
 		return nil, err
 	}
@@ -446,19 +565,19 @@ func getPhotoValue[T any](fields map[string]interface{}) *T {
 	return nil
 }
 
-func (b *Bleve) updateEntity(id string, mutateFunc func(r *Resource)) (*Resource, error) {
-	it, err := b.getResource(id)
+func (b *Bleve) updateEntity(bleveIndex bleve.Index, id string, mutateFunc func(r *Resource)) (*Resource, error) {
+	it, err := b.getResource(bleveIndex, id)
 	if err != nil {
 		return nil, err
 	}
 
 	mutateFunc(it)
 
-	return it, b.index.Index(it.ID, it)
+	return it, bleveIndex.Index(it.ID, it)
 }
 
-func (b *Bleve) setDeleted(id string, deleted bool) error {
-	it, err := b.updateEntity(id, func(r *Resource) {
+func (b *Bleve) setDeleted(bleveIndex bleve.Index, id string, deleted bool) error {
+	it, err := b.updateEntity(bleveIndex, id, func(r *Resource) {
 		r.Deleted = deleted
 	})
 	if err != nil {
@@ -473,13 +592,13 @@ func (b *Bleve) setDeleted(id string, deleted bool) error {
 		bleveReq := bleve.NewSearchRequest(q)
 		bleveReq.Size = math.MaxInt
 		bleveReq.Fields = []string{"*"}
-		res, err := b.index.Search(bleveReq)
+		res, err := bleveIndex.Search(bleveReq)
 		if err != nil {
 			return err
 		}
 
 		for _, h := range res.Hits {
-			_, err := b.updateEntity(h.ID, func(r *Resource) {
+			_, err := b.updateEntity(bleveIndex, h.ID, func(r *Resource) {
 				r.Deleted = deleted
 			})
 			if err != nil {
