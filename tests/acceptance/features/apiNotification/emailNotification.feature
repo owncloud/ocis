@@ -247,7 +247,7 @@ Feature: Email notification
       """
 
   @issue-10904
-  Scenario: user gets an email notification when space admin unshares a file
+  Scenario: user gets an email notification when a file is unshared (Project Space)
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "shared-space" with the default quota using the Graph API
