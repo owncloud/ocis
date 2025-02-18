@@ -228,16 +228,16 @@ Feature: Email notification
 
   @issue-10904
   Scenario: user gets an email notification when a file is unshared (Personal Space)
-    Given user "Alice" has uploaded file with content "Sample data" to "/file-to-share.txt"
+    Given user "Alice" has uploaded file with content "Sample data" to "file-to-share.txt"
     And user "Alice" has sent the following resource share invitation:
-      | resource        | /file-to-share.txt |
+      | resource        | file-to-share.txt  |
       | space           | Personal           |
       | sharee          | Brian              |
       | shareType       | user               |
       | permissionsRole | Viewer             |
-    When user "Alice" removes the access of user "Brian" from resource "/file-to-share.txt" of space "Personal" using the Graph API
+    When user "Alice" removes the access of user "Brian" from resource "file-to-share.txt" of space "Personal" using the Graph API
     Then the HTTP status code should be "204"
-    And user "Brian" should have received the following email from user "Alice" about the share of project space "/file-to-share.txt"
+    And user "Brian" should have received the following email from user "Alice" about the share of project space "file-to-share.txt"
       """
       Hello Brian Murphy,
 
