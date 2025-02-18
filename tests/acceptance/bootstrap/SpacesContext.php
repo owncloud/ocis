@@ -74,6 +74,15 @@ class SpacesContext implements Context {
 	 */
 	private array $storedEtags = [];
 
+	private string $lastShareExpirationDateTime = '';
+
+	/**
+	 * @return string
+	 */
+	public function getLastShareExpirationDateTime(): string {
+		return $this->lastShareExpirationDateTime;
+	}
+
 	/**
 	 * @param string $spaceName
 	 *
@@ -2666,18 +2675,23 @@ class SpacesContext implements Context {
 			$itemId = $this->getResourceId($user, $spaceName, $resource);
 			$body['expirationDateTime'] = $rows['expireDate'];
 			$permissionID = $this->featureContext->shareNgGetLastCreatedUserGroupShareID();
-			$this->featureContext->setResponse(
-				GraphHelper::updateShare(
-					$this->featureContext->getBaseUrl(),
-					$this->featureContext->getStepLineRef(),
-					$user,
-					$this->featureContext->getPasswordForUser($user),
-					$space["id"],
-					$itemId,
-					\json_encode($body),
-					$permissionID
-				)
+			$response = GraphHelper::updateShare(
+				$this->featureContext->getBaseUrl(),
+				$this->featureContext->getStepLineRef(),
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				$space["id"],
+				$itemId,
+				\json_encode($body),
+				$permissionID
 			);
+
+			if ($response->getStatusCode() === 200) {
+				$shareExpireResponse = json_decode($response->getBody()->getContents(), true);
+				$date = new DateTimeImmutable($shareExpireResponse['expirationDateTime']);
+				$this->lastShareExpirationDateTime = $date->format('Y-m-d H:i:s');
+			}
+			$this->featureContext->setResponse($response);
 		} else {
 			$rows['permissions'] = (string)$this->featureContext->getLastCreatedUserGroupShare()->permissions;
 			$this->featureContext->setResponse($this->updateSharedResource($user, $rows));
