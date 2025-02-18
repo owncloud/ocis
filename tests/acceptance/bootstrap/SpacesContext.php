@@ -4761,4 +4761,28 @@ class SpacesContext implements Context {
 			)
 		);
 	}
+
+	/**
+	 * @Given /^user "([^"]*)" has expired the (user|group) share of space "([^"]*)" for (?:user|group) "([^"]*)"$/
+	 *
+	 * @param  string $user
+	 * @param  string $shareType
+	 * @param  string $spaceName
+	 * @param  string $memberUser
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userHasExpiredTheShareOfSpaceForUser(
+		string $user,
+		string $shareType,
+		string $spaceName,
+		string $memberUser
+	): void {
+		$dateTime = new DateTime('yesterday');
+		$rows['expireDate'] = $dateTime->format('Y-m-d\\TH:i:sP');
+		$rows['shareWith'] = $memberUser;
+		$rows['shareType'] = ($shareType === 'user') ? 7 : 8;
+		$this->featureContext->setResponse($this->shareSpace($user, $spaceName, $rows));
+	}
 }
