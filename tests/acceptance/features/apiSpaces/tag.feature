@@ -57,7 +57,7 @@ Feature: Tag
 
   Scenario: user creates tags for resources in the personal space
     Given user "Alice" has created a folder "folderMain" in space "Alice Hansen"
-    And user "Alice" has uploaded a file inside space "Alice Hansen" with content "some content" to "file.txt"
+    And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "file.txt"
     When user "Alice" creates the following tags for folder "folderMain" of space "Alice Hansen":
       | my tag    |
       | important |

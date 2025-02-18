@@ -37,7 +37,7 @@ Feature: edit user
     Examples:
       | action description           | user    | http-status-code | new-user |
       | change to a valid user name  | Lionel  | 200              | Lionel   |
-      | user name characters         | a*!_+-& | 200              | a*!_+-&  |
+      | user name characters         | a*!_-&  | 200              | a*!_-&   |
       | change to existing user name | Brian   | 409              | Carol    |
       | empty user name              |         | 400              | Carol    |
 

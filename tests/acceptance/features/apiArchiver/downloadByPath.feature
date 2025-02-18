@@ -13,7 +13,7 @@ Feature: download multiple resources bundled into an archive
   @issue-4637
   Scenario Outline: download a single file
     Given user "Alice" has uploaded file with content "some data" to "/textfile0.txt"
-    When user "Alice" downloads the <archive-type> archive of "/home/textfile0.txt" using the resource path and setting these headers:
+    When user "Alice" downloads the <archive-type> archive of "textfile0.txt" using the resource path and setting these headers:
       | header     | value        |
       | User-Agent | <user-agent> |
     Then the HTTP status code should be "200"
@@ -30,7 +30,7 @@ Feature: download multiple resources bundled into an archive
     Given user "Alice" has created folder "my_data"
     And user "Alice" has uploaded file with content "some data" to "/my_data/textfile0.txt"
     And user "Alice" has uploaded file with content "more data" to "/my_data/an_other_file.txt"
-    When user "Alice" downloads the <archive-type> archive of "/home/my_data" using the resource path and setting these headers:
+    When user "Alice" downloads the <archive-type> archive of "my_data" using the resource path and setting these headers:
       | header     | value        |
       | User-Agent | <user-agent> |
     Then the HTTP status code should be "200"
@@ -52,10 +52,10 @@ Feature: download multiple resources bundled into an archive
     And user "Alice" has created folder "more_data"
     And user "Alice" has uploaded file with content "more data" to "/more_data/an_other_file.txt"
     When user "Alice" downloads the archive of these items using the resource paths
-      | /home/textfile0.txt |
-      | /home/textfile1.txt |
-      | /home/my_data       |
-      | /home/more_data     |
+      | textfile0.txt |
+      | textfile1.txt |
+      | my_data       |
+      | more_data     |
     Then the HTTP status code should be "200"
     And the downloaded tar archive should contain these files:
       | name                        | content    |
@@ -107,10 +107,10 @@ Feature: download multiple resources bundled into an archive
       | permissionsRole | Viewer    |
     And user "Brian" has a share "more_data" synced
     When user "Brian" downloads the archive of these items using the resource path
-      | /home/Shares/textfile0.txt |
-      | /home/Shares/textfile1.txt |
-      | /home/Shares/my_data       |
-      | /home/Shares/more_data     |
+      | Shares/textfile0.txt |
+      | Shares/textfile1.txt |
+      | Shares/my_data       |
+      | Shares/more_data     |
     Then the HTTP status code should be "200"
     And the downloaded tar archive should contain these files:
       | name                        | content    |
@@ -156,7 +156,7 @@ Feature: download multiple resources bundled into an archive
       | shareType       | user      |
       | permissionsRole | Viewer    |
     And user "Brian" has a share "more_data" synced
-    When user "Brian" downloads the <archive-type> archive of "/home/Shares" using the resource path and setting these headers:
+    When user "Brian" downloads the <archive-type> archive of "Shares" using the resource path and setting these headers:
       | header     | value        |
       | User-Agent | <user-agent> |
     Then the HTTP status code should be "200"
