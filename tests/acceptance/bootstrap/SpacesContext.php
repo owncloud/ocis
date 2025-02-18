@@ -210,6 +210,8 @@ class SpacesContext implements Context {
 			return json_decode(json_encode($allSpaces[$spaceName]), true);
 		}
 
+		var_dump("Not found. Request drives....");
+
 		// Sometimes listing available spaces might not return newly created/shared spaces.
 		// So we try again until we find the space or we reach the max number of retries (i.e. 10)
 		$retried = 0;
