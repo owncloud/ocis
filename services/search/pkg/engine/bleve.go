@@ -5,7 +5,6 @@ import (
 	"errors"
 	"math"
 	"path"
-	"path/filepath"
 	"reflect"
 	"strings"
 	"time"
@@ -31,35 +30,14 @@ import (
 	searchMessage "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"
 	searchService "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
 	"github.com/owncloud/ocis/v2/services/search/pkg/content"
+	bleveEngine "github.com/owncloud/ocis/v2/services/search/pkg/engine/bleve"
 	searchQuery "github.com/owncloud/ocis/v2/services/search/pkg/query"
 )
 
 // Bleve represents a search engine which utilizes bleve to search and store resources.
 type Bleve struct {
-	indexPath    string
-	index        bleve.Index
+	indexGetter  bleveEngine.IndexGetter
 	queryCreator searchQuery.Creator[query.Query]
-}
-
-// newBleveIndex returns a new bleve index
-// given path must exist.
-func newBleveIndex(root string, params map[string]interface{}) (bleve.Index, error) {
-	destination := filepath.Join(root, "bleve")
-	index, err := bleve.OpenUsing(destination, params)
-	if errors.Is(bleve.ErrorIndexPathDoesNotExist, err) {
-		m, err := BuildBleveMapping()
-		if err != nil {
-			return nil, err
-		}
-		index, err = bleve.New(destination, m)
-		if err != nil {
-			return nil, err
-		}
-
-		return index, nil
-	}
-
-	return index, err
 }
 
 // NewBleveEngine creates a new Bleve instance
@@ -68,29 +46,25 @@ func newBleveIndex(root string, params map[string]interface{}) (bleve.Index, err
 // If set to false, only one write connection is created for the whole
 // service, which will lock the index for other processes. In this case,
 // you must close the engine yourself.
-func NewBleveEngine(indexPath string, queryCreator searchQuery.Creator[query.Query], scalable bool) (*Bleve, error) {
-	var idx bleve.Index
-	var err error
-
-	if !scalable {
-		idx, err = newBleveIndex(indexPath, nil)
-		if err != nil {
-			return nil, err
-		}
-	}
-
+func NewBleveEngine(indexGetter bleveEngine.IndexGetter, queryCreator searchQuery.Creator[query.Query]) *Bleve {
 	return &Bleve{
-		indexPath:    indexPath,
-		index:        idx,
+		indexGetter:  indexGetter,
 		queryCreator: queryCreator,
-	}, nil
+	}
 }
 
+// Close will get the index and close it. If the indexGetter is returning
+// new instances, this method will close just the new returned instance but
+// not any other instances that might be in use.
+//
+// This method is useful if "memory" and "persistent" (not "persistentScale")
+// index getters are used.
 func (b *Bleve) Close() error {
-	if b.index != nil {
-		return b.index.Close()
+	bleveIndex, err := b.indexGetter.GetIndex()
+	if err != nil {
+		return err
 	}
-	return nil
+	return bleveIndex.Close()
 }
 
 // BuildBleveMapping builds a bleve index mapping which can be used for indexing
@@ -147,19 +121,12 @@ func BuildBleveMapping() (mapping.IndexMapping, error) {
 // Search executes a search request operation within the index.
 // Returns a SearchIndexResponse object or an error.
 func (b *Bleve) Search(ctx context.Context, sir *searchService.SearchIndexRequest) (*searchService.SearchIndexResponse, error) {
-	var bleveIndex bleve.Index
-	var biErr error
-
-	if b.index == nil {
-		bleveIndex, biErr = newBleveIndex(b.indexPath, map[string]interface{}{
-			"read_only": true,
-		})
-		if biErr != nil {
-			return nil, biErr
-		}
+	bleveIndex, err := b.indexGetter.GetIndex(bleveEngine.ReadOnly(true))
+	if err != nil {
+		return nil, err
+	}
+	if b.indexGetter.IndexCanBeClosed() {
 		defer bleveIndex.Close()
-	} else {
-		bleveIndex = b.index
 	}
 
 	createdQuery, err := b.queryCreator.Create(sir.Query)
@@ -276,17 +243,12 @@ func (b *Bleve) Search(ctx context.Context, sir *searchService.SearchIndexReques
 
 // Upsert indexes or stores Resource data fields.
 func (b *Bleve) Upsert(id string, r Resource) error {
-	var bleveIndex bleve.Index
-	var biErr error
-
-	if b.index == nil {
-		bleveIndex, biErr = newBleveIndex(b.indexPath, nil)
-		if biErr != nil {
-			return biErr
-		}
+	bleveIndex, err := b.indexGetter.GetIndex()
+	if err != nil {
+		return err
+	}
+	if b.indexGetter.IndexCanBeClosed() {
 		defer bleveIndex.Close()
-	} else {
-		bleveIndex = b.index
 	}
 
 	return bleveIndex.Index(id, r)
@@ -294,17 +256,12 @@ func (b *Bleve) Upsert(id string, r Resource) error {
 
 // Move updates the resource location and all of its necessary fields.
 func (b *Bleve) Move(id string, parentid string, target string) error {
-	var bleveIndex bleve.Index
-	var biErr error
-
-	if b.index == nil {
-		bleveIndex, biErr = newBleveIndex(b.indexPath, nil)
-		if biErr != nil {
-			return biErr
-		}
+	bleveIndex, err := b.indexGetter.GetIndex()
+	if err != nil {
+		return err
+	}
+	if b.indexGetter.IndexCanBeClosed() {
 		defer bleveIndex.Close()
-	} else {
-		bleveIndex = b.index
 	}
 
 	r, err := b.getResource(bleveIndex, id)
@@ -354,17 +311,12 @@ func (b *Bleve) Move(id string, parentid string, target string) error {
 // instead of removing the resource it just marks it as deleted!
 // can be undone
 func (b *Bleve) Delete(id string) error {
-	var bleveIndex bleve.Index
-	var biErr error
-
-	if b.index == nil {
-		bleveIndex, biErr = newBleveIndex(b.indexPath, nil)
-		if biErr != nil {
-			return biErr
-		}
+	bleveIndex, err := b.indexGetter.GetIndex()
+	if err != nil {
+		return err
+	}
+	if b.indexGetter.IndexCanBeClosed() {
 		defer bleveIndex.Close()
-	} else {
-		bleveIndex = b.index
 	}
 
 	return b.setDeleted(bleveIndex, id, true)
@@ -373,17 +325,12 @@ func (b *Bleve) Delete(id string) error {
 // Restore is the counterpart to Delete.
 // It restores the resource which makes it available again.
 func (b *Bleve) Restore(id string) error {
-	var bleveIndex bleve.Index
-	var biErr error
-
-	if b.index == nil {
-		bleveIndex, biErr = newBleveIndex(b.indexPath, nil)
-		if biErr != nil {
-			return biErr
-		}
+	bleveIndex, err := b.indexGetter.GetIndex()
+	if err != nil {
+		return err
+	}
+	if b.indexGetter.IndexCanBeClosed() {
 		defer bleveIndex.Close()
-	} else {
-		bleveIndex = b.index
 	}
 
 	return b.setDeleted(bleveIndex, id, false)
@@ -391,17 +338,12 @@ func (b *Bleve) Restore(id string) error {
 
 // Purge removes a resource from the index, irreversible operation.
 func (b *Bleve) Purge(id string) error {
-	var bleveIndex bleve.Index
-	var biErr error
-
-	if b.index == nil {
-		bleveIndex, biErr = newBleveIndex(b.indexPath, nil)
-		if biErr != nil {
-			return biErr
-		}
+	bleveIndex, err := b.indexGetter.GetIndex()
+	if err != nil {
+		return err
+	}
+	if b.indexGetter.IndexCanBeClosed() {
 		defer bleveIndex.Close()
-	} else {
-		bleveIndex = b.index
 	}
 
 	return bleveIndex.Delete(id)
@@ -409,19 +351,12 @@ func (b *Bleve) Purge(id string) error {
 
 // DocCount returns the number of resources in the index.
 func (b *Bleve) DocCount() (uint64, error) {
-	var bleveIndex bleve.Index
-	var biErr error
-
-	if b.index == nil {
-		bleveIndex, biErr = newBleveIndex(b.indexPath, map[string]interface{}{
-			"read_only": true,
-		})
-		if biErr != nil {
-			return 0, biErr
-		}
+	bleveIndex, err := b.indexGetter.GetIndex(bleveEngine.ReadOnly(true))
+	if err != nil {
+		return 0, err
+	}
+	if b.indexGetter.IndexCanBeClosed() {
 		defer bleveIndex.Close()
-	} else {
-		bleveIndex = b.index
 	}
 
 	return bleveIndex.DocCount()
