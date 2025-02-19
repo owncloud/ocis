@@ -690,7 +690,7 @@ class NotificationContext implements Context {
 		Assert::assertStringContainsString(
 			$expectedEmailBodyContent,
 			$actualEmailBodyContent,
-			"The email address '$address' should have received an"
+			"The email address '$address' should have received an "
 			. "email with the body containing $expectedEmailBodyContent
 			but the received email is $actualEmailBodyContent"
 		);
