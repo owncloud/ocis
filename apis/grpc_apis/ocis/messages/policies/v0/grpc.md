@@ -1,7 +1,7 @@
 ---
 title: "ocis.messages.policies.v0"
 url: /apis/grpc_apis/ocis_messages_policies_v0
-date: 2025-02-19T00:37:32Z
+date: 2025-02-19T03:22:55Z
 weight: 50
 geekdocRepo: https://github.com/owncloud/ocis
 ---
