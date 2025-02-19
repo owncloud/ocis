@@ -223,7 +223,7 @@ class SpacesContext implements Context {
 				$this->featureContext->getStepLineRef()
 			);
 			// NOTE: user can be created with empty password
-			// so if that's the case, the user won't be able request using empty password
+			// so if that's the case, the user won't be able to request using empty password
 			// and user won't have personal space.
 			if ($response->getStatusCode() === 401 && !$password) {
 				return [];
@@ -237,16 +237,25 @@ class SpacesContext implements Context {
 
 			$found = false;
 			$foundSpace = [];
-			foreach ($spaces as $space) {
-				if ($space->name === "Shares" && !\array_key_exists("Shares", $allSpaces)) {
-					$this->addPersonalSpaceForUser("Shares", $space);
+
+			// update the Shares space with other properties
+			// NOTE: the order of drives list can be different
+			// so this extra loop is needed to find and update the Shares space properties
+			if ($allSpaces["Shares"]->name !== "Shares") {
+				foreach ($spaces as $space) {
+					if ($space->name === "Shares") {
+						$this->addPersonalSpaceForUser("Shares", $space);
+						break;
+					}
 				}
+			}
+			foreach ($spaces as $space) {
 				if ($space->name === $spaceName) {
 					$found = true;
 					$foundSpace = $space;
 					if ($space->driveType === "project") {
 						$this->addToCreatedSpace($user, $space);
-					} else {
+					} elseif (!($space->name === "Shares" && $space->driveType === "virtual")) {
 						$this->addPersonalSpaceForUser($user, $space);
 					}
 					break;
@@ -475,6 +484,18 @@ class SpacesContext implements Context {
 		$this->checksumContext = BehatHelper::getContext($scope, $environment, 'ChecksumContext');
 		$this->filesVersionsContext = BehatHelper::getContext($scope, $environment, 'FilesVersionsContext');
 		$this->archiverContext = BehatHelper::getContext($scope, $environment, 'ArchiverContext');
+
+		// add Shares space as its drive-id is known
+		// NOTE: this cannot be moved into a constructor method
+		// because it uses the $this->featureContext object
+		$this->personalSpaces = [
+			"Shares" => (object)[
+				"id" => GraphHelper::SHARES_SPACE_ID,
+				// let 'name' be empty, it is used to update the shares space later on
+				"name" => "",
+				"serverType" => $this->featureContext->getCurrentServer()
+			]
+		];
 	}
 
 	/**
