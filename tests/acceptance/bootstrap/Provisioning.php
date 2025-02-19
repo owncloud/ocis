@@ -951,7 +951,8 @@ trait Provisioning {
 		}
 
 		// initialize user by requesting drives
-		// saves the Personal drive id
+		// NOTE: this should not be removed,
+		// as it will save the Personal and Shares drives information
 		$this->spacesContext->getSpaceByName($user, 'Personal');
 	}
 
