@@ -183,6 +183,92 @@ Feature: Email notification
       Click here to check it: %base_url%/f/%space_id%
       """
 
+  @issue-10904
+  Scenario: user gets an email notification when a folder is unshared (Personal Space)
+    Given user "Alice" has created folder "SHARED-FOLDER"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | SHARED-FOLDER |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Viewer        |
+    When user "Alice" removes the access of user "Brian" from resource "SHARED-FOLDER" of space "Personal" using the Graph API
+    Then the HTTP status code should be "204"
+    And user "Brian" should have received the following email from user "Alice" about the share of project space "SHARED-FOLDER"
+      """
+      Hello Brian Murphy,
+
+      %displayname% has unshared 'SHARED-FOLDER' with you.
+
+      Even though this share has been revoked you still might have access through other shares and/or space memberships.
+      """
+
+  @issue-10904
+  Scenario: user gets an email notification when a folder is unshared (Project Space)
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "shared-space" with the default quota using the Graph API
+    And user "Alice" has created a folder "SHARED-FOLDER" in space "shared-space"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | SHARED-FOLDER |
+      | space           | shared-space  |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Viewer        |
+    When user "Alice" removes the access of user "Brian" from resource "SHARED-FOLDER" of space "shared-space" using the Graph API
+    Then the HTTP status code should be "204"
+    And user "Brian" should have received the following email from user "Alice" about the share of project space "shared-space"
+      """
+      Hello Brian Murphy,
+
+      %displayname% has unshared 'SHARED-FOLDER' with you.
+
+      Even though this share has been revoked you still might have access through other shares and/or space memberships.
+      """
+
+  @issue-10904
+  Scenario: user gets an email notification when a file is unshared (Personal Space)
+    Given user "Alice" has uploaded file with content "Sample data" to "file-to-share.txt"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | file-to-share.txt  |
+      | space           | Personal           |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | Viewer             |
+    When user "Alice" removes the access of user "Brian" from resource "file-to-share.txt" of space "Personal" using the Graph API
+    Then the HTTP status code should be "204"
+    And user "Brian" should have received the following email from user "Alice" about the share of project space "file-to-share.txt"
+      """
+      Hello Brian Murphy,
+
+      %displayname% has unshared 'file-to-share.txt' with you.
+
+      Even though this share has been revoked you still might have access through other shares and/or space memberships.
+      """
+
+  @issue-10904
+  Scenario: user gets an email notification when a file is unshared (Project Space)
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "shared-space" with the default quota using the Graph API
+    And user "Alice" has uploaded a file inside space "shared-space" with content "Sample data" to "file-to-share.txt"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | file-to-share.txt |
+      | space           | shared-space      |
+      | sharee          | Brian             |
+      | shareType       | user              |
+      | permissionsRole | Viewer            |
+    When user "Alice" removes the access of user "Brian" from resource "file-to-share.txt" of space "shared-space" using the Graph API
+    Then the HTTP status code should be "204"
+    And user "Brian" should have received the following email from user "Alice" about the share of project space "file-to-share.txt"
+      """
+      Hello Brian Murphy,
+
+      %displayname% has unshared 'file-to-share.txt' with you.
+
+      Even though this share has been revoked you still might have access through other shares and/or space memberships.
+      """
+
   @env-config
   Scenario: group members get an email notification in default language when someone shares a file with the group
     Given the config "OCIS_DEFAULT_LANGUAGE" has been set to "de"
