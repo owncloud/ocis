@@ -139,3 +139,22 @@ Feature: create auth-app token
       """
       impersonation is not allowed
       """
+
+
+  Scenario: try to create auth-app token without expiry
+    When user "Alice" tries to create auth-app token with expiration time "" using the auth-app API
+    Then the HTTP status code should be "400"
+    And the content in the response should include the following content:
+      """
+      error parsing expiry. Use e.g. 30m or 72h
+      """
+
+  @env-config
+  Scenario: admin tries to create auth-app token for other users without expiry
+    Given the config "AUTH_APP_ENABLE_IMPERSONATION" has been set to "true"
+    When user "Admin" tries to create auth-app token for user "Alice" with expiration time "" using the auth-app API
+    Then the HTTP status code should be "400"
+    And the content in the response should include the following content:
+      """
+      error parsing expiry. Use e.g. 30m or 72h
+      """
