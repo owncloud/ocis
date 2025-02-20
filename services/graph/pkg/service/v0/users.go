@@ -660,7 +660,7 @@ func (g Graph) DeleteUser(w http.ResponseWriter, r *http.Request) {
 			// Deleting a space a two step process (1. disabling/trashing, 2. purging)
 			// Do the "disable/trash" step only if the space is not marked as trashed yet:
 			if _, ok := sp.Opaque.Map[_spaceStateTrashed]; !ok {
-				_, err := client.DeleteStorageSpace(r.Context(), &storageprovider.DeleteStorageSpaceRequest{
+				resp, err := client.DeleteStorageSpace(r.Context(), &storageprovider.DeleteStorageSpaceRequest{
 					Id: &storageprovider.StorageSpaceId{
 						OpaqueId: sp.Id.OpaqueId,
 					},
@@ -670,9 +670,17 @@ func (g Graph) DeleteUser(w http.ResponseWriter, r *http.Request) {
 					errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "could not disable homespace, aborting")
 					return
 				}
+				switch resp.GetStatus().GetCode() {
+				case cs3rpc.Code_CODE_OK:
+					// nothing to do
+				default:
+					logger.Error().Str("message", resp.GetStatus().GetMessage()).Interface("code", resp.GetStatus().GetCode()).Msg("could not disable home space: unexpected status code")
+					errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "could not disable homespace, aborting")
+					return
+				}
 			}
 			purgeFlag := utils.AppendPlainToOpaque(nil, "purge", "")
-			_, err := client.DeleteStorageSpace(r.Context(), &storageprovider.DeleteStorageSpaceRequest{
+			resp, err := client.DeleteStorageSpace(r.Context(), &storageprovider.DeleteStorageSpaceRequest{
 				Opaque: purgeFlag,
 				Id: &storageprovider.StorageSpaceId{
 					OpaqueId: sp.Id.OpaqueId,
@@ -682,6 +690,14 @@ func (g Graph) DeleteUser(w http.ResponseWriter, r *http.Request) {
 				// transport error, log as error
 				logger.Error().Err(err).Msg("could not delete homespace: transport error")
 				errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "could not delete homespace, aborting")
+				return
+			}
+			switch resp.GetStatus().GetCode() {
+			case cs3rpc.Code_CODE_OK:
+				// nothing to do
+			default:
+				logger.Error().Str("message", resp.GetStatus().GetMessage()).Interface("code", resp.GetStatus().GetCode()).Msg("could not disable home space: unexpected status code")
+				errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "could not disable homespace, aborting")
 				return
 			}
 			break
