@@ -47,7 +47,7 @@ class EmailHelper {
 	 */
 	public static function getEmailBaseUrl(): string {
 		$localEmailHost = self::getLocalEmailHost();
-		$emailPort = \getenv('EMAIL_PORT') ?: "9000";
+		$emailPort = \getenv('EMAIL_PORT') ?: "8025";
 		return "http://$localEmailHost:$emailPort";
 	}
 
