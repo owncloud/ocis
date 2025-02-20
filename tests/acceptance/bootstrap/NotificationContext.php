@@ -75,17 +75,10 @@ class NotificationContext implements Context {
 	 */
 	public function clearAllEmails(): void {
 		try {
-			$usersList = $this->featureContext->getCreatedUsers();
-			foreach ($usersList as $emailRecipient) {
-				EmailHelper::deleteAllEmailsForAMailbox(
-					EmailHelper::getLocalEmailUrl(),
-					$this->featureContext->getStepLineRef(),
-					$emailRecipient['email']
-				);
-			}
+			EmailHelper::deleteAllEmails($this->featureContext->getStepLineRef());
 		} catch (Exception $e) {
 			echo __METHOD__ .
-				" could not delete inbucket messages, is inbucket set up?\n" .
+				" could not delete email messages?\n" .
 				$e->getMessage();
 		}
 	}
@@ -635,13 +628,18 @@ class NotificationContext implements Context {
 	 * @param int $count
 	 *
 	 * @return void
+	 * @throws GuzzleException
 	 */
 	public function userShouldHaveEmail(string $user, int $count): void {
 		$address = $this->featureContext->getEmailAddressForUser($user);
-		$this->featureContext->pushEmailRecipientAsMailBox($address);
-		$mailBox = EmailHelper::getMailBoxFromEmail($address);
-		$mailboxResponse = EmailHelper::getMailboxInformation($mailBox, $this->featureContext->getStepLineRef());
-		Assert::assertCount($count, $mailboxResponse);
+		$query = 'to:' . $address;
+		$mailResponse = EmailHelper::searchEmails($query, $this->featureContext->getStepLineRef());
+		$totalMail = $this->featureContext->getJsonDecodedResponse($mailResponse)["messages_count"];
+		Assert::assertSame(
+			$count,
+			$totalMail,
+			"Expected '$address' received mail total '$count' mail but got '$totalMail' mail"
+		);
 	}
 
 	/**
