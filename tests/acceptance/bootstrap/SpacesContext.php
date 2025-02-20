@@ -1625,6 +1625,7 @@ class SpacesContext implements Context {
 	/**
 	 * @Given /^user "([^"]*)" has changed the quota of the personal space of "([^"]*)" space to "([^"]*)"$/
 	 * @Given /^user "([^"]*)" has changed the quota of the "([^"]*)" space to "([^"]*)"$/
+	 * @Given /^user "([^"]*)" has changed the quota of space "([^"]*)" to "([^"]*)"$/
 	 *
 	 * @param string $user
 	 * @param string $spaceName

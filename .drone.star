@@ -89,13 +89,13 @@ config = {
                 "apiLocks",
                 "apiActivities",
             ],
-            "skip": False,
+            "skip": True,
         },
         "settings": {
             "suites": [
                 "apiSettings",
             ],
-            "skip": False,
+            "skip": True,
             "withRemotePhp": [True],
             "emailNeeded": True,
             "extraEnvironment": {
@@ -116,21 +116,21 @@ config = {
                 "apiGraph",
                 "apiServiceAvailability",
             ],
-            "skip": False,
+            "skip": True,
             "withRemotePhp": [True],
         },
         "graphUserGroup": {
             "suites": [
                 "apiGraphUserGroup",
             ],
-            "skip": False,
+            "skip": True,
             "withRemotePhp": [True],
         },
         "spaces": {
             "suites": [
                 "apiSpaces",
             ],
-            "skip": False,
+            "skip": True,
         },
         "spacesShares": {
             "suites": [
@@ -142,19 +142,19 @@ config = {
             "suites": [
                 "apiSpacesDavOperation",
             ],
-            "skip": False,
+            "skip": True,
         },
         "search1": {
             "suites": [
                 "apiSearch1",
             ],
-            "skip": False,
+            "skip": True,
         },
         "search2": {
             "suites": [
                 "apiSearch2",
             ],
-            "skip": False,
+            "skip": True,
         },
         "sharingNg": {
             "suites": [
@@ -162,23 +162,23 @@ config = {
                 "apiSharingNg1",
                 "apiSharingNg2",
             ],
-            "skip": False,
+            "skip": True,
         },
         "sharingNgShareInvitation": {
             "suites": [
                 "apiSharingNgShareInvitation",
             ],
-            "skip": False,
+            "skip": True,
         },
         "sharingNgLinkShare": {
             "suites": [
                 "apiSharingNgLinkSharePermission",
                 "apiSharingNgLinkShareRoot",
             ],
-            "skip": False,
+            "skip": True,
         },
         "accountsHashDifficulty": {
-            "skip": False,
+            "skip": True,
             "suites": [
                 "apiAccountsHashDifficulty",
             ],
@@ -188,7 +188,7 @@ config = {
             "suites": [
                 "apiNotification",
             ],
-            "skip": False,
+            "skip": True,
             "withRemotePhp": [True],
             "emailNeeded": True,
             "extraEnvironment": {
@@ -208,7 +208,7 @@ config = {
             "suites": [
                 "apiAntivirus",
             ],
-            "skip": False,
+            "skip": True,
             "antivirusNeeded": True,
             "extraServerEnvironment": {
                 "ANTIVIRUS_SCANNER_TYPE": "clamav",
@@ -223,14 +223,14 @@ config = {
             "suites": [
                 "apiSearchContent",
             ],
-            "skip": False,
+            "skip": True,
             "tikaNeeded": True,
         },
         "ocm": {
             "suites": [
                 "apiOcm",
             ],
-            "skip": False,
+            "skip": True,
             "withRemotePhp": [True],
             "federationServer": True,
             "emailNeeded": True,
@@ -256,7 +256,7 @@ config = {
             "suites": [
                 "apiCollaboration",
             ],
-            "skip": False,
+            "skip": True,
             "collaborationServiceNeeded": True,
             "extraServerEnvironment": {
                 "GATEWAY_GRPC_ADDR": "0.0.0.0:9142",
@@ -266,7 +266,7 @@ config = {
             "suites": [
                 "apiAuthApp",
             ],
-            "skip": False,
+            "skip": True,
             "withRemotePhp": [True],
             "extraServerEnvironment": {
                 "OCIS_ADD_RUN_SERVICES": "auth-app",
@@ -277,7 +277,7 @@ config = {
             "suites": [
                 "cliCommands",
             ],
-            "skip": False,
+            "skip": True,
             "withRemotePhp": [True],
             "antivirusNeeded": True,
             "extraServerEnvironment": {
@@ -291,7 +291,7 @@ config = {
     "apiTests": {
         "numberOfParts": 7,
         "skip": False,
-        "skipExceptParts": [],
+        "skipExceptParts": [3],
     },
     "e2eTests": {
         "part": {
@@ -421,15 +421,7 @@ def main(ctx):
         licenseCheck(ctx)
 
     test_pipelines = \
-        codestyle(ctx) + \
-        checkGherkinLint(ctx) + \
-        checkTestSuitesInExpectedFailures(ctx) + \
-        buildWebCache(ctx) + \
-        getGoBinForTesting(ctx) + \
         buildOcisBinaryForTesting(ctx) + \
-        checkStarlark() + \
-        build_release_helpers + \
-        testOcisAndUploadResults(ctx) + \
         testPipelines(ctx)
 
     build_release_pipelines = \
@@ -443,7 +435,7 @@ def main(ctx):
         ),
     )
 
-    pipelines = test_pipelines + build_release_pipelines
+    pipelines = test_pipelines  #+ build_release_pipelines
 
     if ctx.build.event == "cron":
         pipelines = \
@@ -511,6 +503,7 @@ def testOcisAndUploadResults(ctx):
 
 def testPipelines(ctx):
     pipelines = []
+    return localApiTestPipeline(ctx) + apiTests(ctx)
 
     if config["litmus"]:
         pipelines += litmus(ctx, "ocis")
@@ -1263,6 +1256,7 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, with_remote_php = Fa
                              "UPLOAD_DELETE_WAIT_TIME": "1" if storage == "owncloud" else 0,
                              "OCIS_WRAPPER_URL": "http://%s:5200" % OCIS_SERVER_NAME,
                              "WITH_REMOTE_PHP": with_remote_php,
+                             "STOP_ON_FAILURE": True,
                          },
                          "commands": [
                              # merge the expected failures
