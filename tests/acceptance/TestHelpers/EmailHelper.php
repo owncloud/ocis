@@ -3,7 +3,8 @@
  * ownCloud
  *
  * @author Prajwol Amatya <prajwol@jankaritech.com>
- * @copyright Copyright (c) 2023 Prajwol Amatya prajwol@jankaritech.com
+ * @author Amrita Shrestha <amrita@jankaritech.com>
+ * @copyright Copyright (c) 2023 JankariTech
  *
  * This code is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License,
@@ -22,7 +23,6 @@
 
 namespace TestHelpers;
 
-use Exception;
 use GuzzleHttp\Exception\GuzzleException;
 use Psr\Http\Message\ResponseInterface;
 
@@ -30,15 +30,13 @@ use Psr\Http\Message\ResponseInterface;
  * A helper class for managing emails
  */
 class EmailHelper {
-	public const MAILBOX_ENDPOINT = "/api/v1/mailbox";
-
 	/**
-	 * @param string $emailAddress
+	 * @param string $path
 	 *
 	 * @return string
 	 */
-	public static function getMailBoxFromEmail(string $emailAddress): string {
-		return explode("@", $emailAddress)[0];
+	public static function getEmailAPIUrl(string $path): string {
+		return self::getEmailBaseUrl() . '/api/v1/' . $path;
 	}
 
 	/**
@@ -47,27 +45,10 @@ class EmailHelper {
 	 *
 	 * @return string
 	 */
-	public static function getLocalEmailUrl(): string {
-		$localEmailHost = self::getLocalEmailHost();
-		$emailPort = \getenv('EMAIL_PORT');
-		if ($emailPort === false) {
-			$emailPort = "9000";
-		}
-		return "http://$localEmailHost:$emailPort";
-	}
-
-	/**
-	 * Returns the host name or address of the Email server as seen from the
-	 * point of view of the system-under-test.
-	 *
-	 * @return string
-	 */
-	public static function getEmailHost(): string {
-		$emailHost = \getenv('EMAIL_HOST');
-		if ($emailHost === false) {
-			$emailHost = "127.0.0.1";
-		}
-		return $emailHost;
+	public static function getEmailBaseUrl(): string {
+		$emailHost = self::getEmailHost();
+		$emailPort = \getenv('EMAIL_PORT') ?: "8025";
+		return "http://$emailHost:$emailPort";
 	}
 
 	/**
@@ -76,137 +57,92 @@ class EmailHelper {
 	 *
 	 * @return string
 	 */
-	public static function getLocalEmailHost(): string {
-		$localEmailHost = \getenv('LOCAL_EMAIL_HOST');
-		if ($localEmailHost === false) {
-			$localEmailHost = self::getEmailHost();
-		}
-		return $localEmailHost;
+	public static function getEmailHost(): string {
+		return \getenv('LOCAL_EMAIL_HOST') ?? \getenv('EMAIL_HOST') ?? "127.0.0.1";
 	}
 
 	/**
-	 * Returns general response information about the provided mailbox
-	 * A mailbox is created automatically in InBucket for every unique email sender|receiver
+	 * list all email
 	 *
-	 * @param string $mailBox
 	 * @param string|null $xRequestId
 	 *
-	 * @return array
+	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
-	public static function getMailBoxInformation(string $mailBox, ?string $xRequestId = null): array {
-		$url = self::getLocalEmailUrl() . self::MAILBOX_ENDPOINT . "/$mailBox";
-		$headers = ['Content-Type' => 'application/json'];
-		$response = HttpRequestHelper::get(
-			$url,
-			$xRequestId,
-			null,
-			null,
-			$headers
-		);
-
-		$emails = \json_decode($response->getBody()->getContents());
-		if (empty($emails)) {
-			echo "[INFO] Mailbox is empty...\n";
-			// Wait for 1 second and try again
-			// the mailbox might not be created yet
-			sleep(1);
-			$response = HttpRequestHelper::get(
-				$url,
-				$xRequestId,
-				null,
-				null,
-				$headers
-			);
-			$emails = \json_decode($response->getBody()->getContents());
-		}
-
-		return $emails;
-	}
-
-	/**
-	 * returns body content of a specific email (mailBox) with email ID (mailbox Id)
-	 *
-	 * @param string $mailBox
-	 * @param string $mailboxId
-	 * @param string|null $xRequestId
-	 *
-	 * @return object
-	 * @throws GuzzleException
-	 */
-	public static function getBodyOfAnEmailById(
-		string $mailBox,
-		string $mailboxId,
-		?string $xRequestId = null
-	): object {
-		$response = HttpRequestHelper::get(
-			self::getLocalEmailUrl() . self::MAILBOX_ENDPOINT . "/$mailBox/$mailboxId",
+	public static function listAllEmails(
+		?string $xRequestId,
+	): ResponseInterface {
+		return HttpRequestHelper::get(
+			self::getEmailAPIUrl("messages"),
 			$xRequestId,
 			null,
 			null,
 			['Content-Type' => 'application/json']
 		);
-		return \json_decode($response->getBody()->getContents());
 	}
 
 	/**
-	 * Returns the body of the last received email for the provided receiver according to the provided email address and the serial number
-	 * For email number, 1 means the latest one
-	 *
-	 * @param string $emailAddress
+	 * @param string $id when $id set to 'latest' returns the latest message.
+	 * @param string $query
 	 * @param string|null $xRequestId
-	 * @param int|null $emailNumber For email number, 1 means the latest one
-	 * @param int|null $waitTimeSec Time to wait for the email if the email has been delivered
-	 *
-	 * @return string
-	 * @throws GuzzleException
-	 * @throws Exception
-	 */
-	public static function getBodyOfLastEmail(
-		string $emailAddress,
-		string $xRequestId,
-		?int $emailNumber = 1,
-		?int $waitTimeSec = EMAIL_WAIT_TIMEOUT_SEC
-	): string {
-		$currentTime = \time();
-		$endTime = $currentTime + $waitTimeSec;
-		$mailBox = self::getMailBoxFromEmail($emailAddress);
-		while ($currentTime <= $endTime) {
-			$mailboxResponse = self::getMailboxInformation($mailBox, $xRequestId);
-			if (!empty($mailboxResponse) && \sizeof($mailboxResponse) >= $emailNumber) {
-				$mailboxId = $mailboxResponse[\sizeof($mailboxResponse) - $emailNumber]->id;
-				$response = self::getBodyOfAnEmailById($mailBox, $mailboxId, $xRequestId);
-				$body = \str_replace(
-					"\r\n",
-					"\n",
-					\quoted_printable_decode($response->body->text . "\n" . $response->body->html)
-				);
-				return $body;
-			}
-			\usleep(STANDARD_SLEEP_TIME_MICROSEC * 50);
-			$currentTime = \time();
-		}
-		throw new Exception("Could not find the email to the address: " . $emailAddress);
-	}
-
-	/**
-	 * Deletes all the emails for the provided mailbox
-	 *
-	 * @param string $localInbucketUrl
-	 * @param string|null $xRequestId
-	 * @param string $mailBox
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
-	public static function deleteAllEmailsForAMailbox(
-		string $localInbucketUrl,
+	public static function getEmailById(
+		string $id,
+		string $query,
 		?string $xRequestId,
-		string $mailBox
+	): ResponseInterface {
+		return HttpRequestHelper::get(
+			self::getEmailAPIUrl("message/$id") . "?query=$query",
+			$xRequestId,
+			null,
+			null,
+			['Content-Type' => 'application/json']
+		);
+	}
+
+	/**
+	 * search email
+	 *
+	 * @param string $query
+	 * @param string|null $xRequestId
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public static function searchEmails(
+		string $query,
+		?string $xRequestId,
+	): ResponseInterface {
+		$url = self::getEmailAPIUrl("search") . "?query=$query";
+		return HttpRequestHelper::get(
+			$url,
+			$xRequestId,
+			null,
+			null,
+			['Content-Type' => 'application/json']
+		);
+	}
+
+	/**
+	 * Deletes all email
+	 *
+	 * @param string|null $xRequestId
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public static function deleteAllEmails(
+		?string $xRequestId,
 	): ResponseInterface {
 		return HttpRequestHelper::delete(
-			$localInbucketUrl . self::MAILBOX_ENDPOINT . "/$mailBox",
-			$xRequestId
+			self::getEmailAPIUrl("messages"),
+			$xRequestId,
+			null,
+			null,
+			['Content-Type' => 'application/json']
 		);
 	}
 }

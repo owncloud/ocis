@@ -22,11 +22,8 @@
 
 namespace TestHelpers;
 
-use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\GuzzleException;
-use GuzzleHttp\Psr7\Request;
 use Psr\Http\Message\ResponseInterface;
-use TestHelpers\OcisConfigHelper;
 
 /**
  * A helper class for running oCIS CLI commands

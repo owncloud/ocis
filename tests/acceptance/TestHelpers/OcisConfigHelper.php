@@ -23,7 +23,6 @@
 namespace TestHelpers;
 
 use GuzzleHttp\Exception\ConnectException;
-use TestHelpers\HttpRequestHelper;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Request;
 use Psr\Http\Message\ResponseInterface;
