@@ -25,22 +25,6 @@ class EmailContext implements Context {
 	private SpacesContext $spacesContext;
 
 	/**
-	 * @AfterScenario @email
-	 *
-	 * @return void
-	 * @throws GuzzleException
-	 */
-	public function clearAllEmails(): void {
-		try {
-			EmailHelper::deleteAllEmails($this->featureContext->getStepLineRef());
-		} catch (Exception $e) {
-			echo __METHOD__ .
-				" could not delete email messages?\n" .
-				$e->getMessage();
-		}
-	}
-
-	/**
 	 * @BeforeScenario
 	 *
 	 * @param BeforeScenarioScope $scope
@@ -54,6 +38,26 @@ class EmailContext implements Context {
 		// Get all the contexts you need in this context
 		$this->featureContext = BehatHelper::getContext($scope, $environment, 'FeatureContext');
 		$this->spacesContext = BehatHelper::getContext($scope, $environment, 'SpacesContext');
+		// if oCIS has been setup with notification configuration
+		// event related step generates emails
+		// so deleting all email
+		$this->clearAllEmails();
+	}
+
+	/**
+	 * @AfterScenario @email
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function clearAllEmails(): void {
+		try {
+			EmailHelper::deleteAllEmails($this->featureContext->getStepLineRef());
+		} catch (Exception $e) {
+			echo __METHOD__ .
+				" could not delete email messages?\n" .
+				$e->getMessage();
+		}
 	}
 
 	/**
@@ -134,12 +138,21 @@ class EmailContext implements Context {
 	public function userShouldHaveEmail(string $user, int $count): void {
 		$address = $this->featureContext->getEmailAddressForUser($user);
 		$query = 'to:' . $address;
-		$mailResponse = EmailHelper::searchEmails($query, $this->featureContext->getStepLineRef());
-		$totalMail = $this->featureContext->getJsonDecodedResponse($mailResponse)["messages_count"];
+		$response = EmailHelper::searchEmails($query, $this->featureContext->getStepLineRef());
+		$emails = $this->featureContext->getJsonDecodedResponse($response);
+		if ($emails["messages_count"] <= $count) {
+			echo "[INFO] Mailbox is empty...\n";
+			// Wait for 1 second and try again
+			// the mailbox might not be created yet
+			sleep(1);
+			$response = EmailHelper::searchEmails($query, $this->featureContext->getStepLineRef());
+			$emails = $this->featureContext->getJsonDecodedResponse($response);
+		}
+
 		Assert::assertSame(
 			$count,
-			$totalMail,
-			"Expected '$address' received mail total '$count' mail but got '$totalMail' mail"
+			$emails["messages_count"],
+			"Expected '$address' received mail total '$count' email but got " . $emails["messages_count"] . " email"
 		);
 	}
 
@@ -180,8 +193,7 @@ class EmailContext implements Context {
 		$ignoreWhiteSpace = false
 	): void {
 		$address = $this->featureContext->getEmailAddressForUser($user);
-		$this->featureContext->pushEmailRecipientAsMailBox($address);
-		$actualEmailBodyContent = EmailHelper::getBodyOfLastEmail($address, $this->featureContext->getStepLineRef());
+		$actualEmailBodyContent = $this->getBodyOfLastEmail($address, $this->featureContext->getStepLineRef());
 		if ($ignoreWhiteSpace) {
 			$expectedEmailBodyContent = preg_replace('/\s+/', '', $expectedEmailBodyContent);
 			$actualEmailBodyContent = preg_replace('/\s+/', '', $actualEmailBodyContent);
@@ -195,4 +207,44 @@ class EmailContext implements Context {
 		);
 	}
 
+	/**
+	 * Returns the body of the last received email for the provided receiver according to the provided email address and the serial number
+	 * For email number, 1 means the latest one
+	 *
+	 * @param string $emailAddress
+	 * @param string|null $xRequestId
+	 * @param int|null $waitTimeSec Time to wait for the email if the email has been delivered
+	 *
+	 * @return string
+	 * @throws GuzzleException
+	 * @throws Exception
+	 */
+	public function getBodyOfLastEmail(
+		string $emailAddress,
+		?string $xRequestId,
+		?int $waitTimeSec = EMAIL_WAIT_TIMEOUT_SEC
+	): string {
+		$currentTime = \time();
+		$endTime = $currentTime + $waitTimeSec;
+		while ($currentTime <= $endTime) {
+			$query = 'to:' . $emailAddress;
+			$mailResponse = $this->featureContext->getJsonDecodedResponse(
+				EmailHelper::searchEmails($query, $xRequestId)
+			);
+			if ($mailResponse["messages_count"] > 0) {
+				$lastEmail = $this->featureContext->getJsonDecodedResponse(
+					EmailHelper::getEmailById("latest", $query, $xRequestId)
+				);
+				$body = \str_replace(
+					"\r\n",
+					"\n",
+					\quoted_printable_decode($lastEmail["Text"] . "\n" . $lastEmail["HTML"])
+				);
+				return $body;
+			}
+			\usleep(STANDARD_SLEEP_TIME_MICROSEC * 50);
+			$currentTime = \time();
+		}
+		throw new Exception("Could not find the email to the address: " . $emailAddress);
+	}
 }

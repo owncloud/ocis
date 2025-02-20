@@ -503,11 +503,7 @@ if [ -z "${LOCAL_EMAIL_HOST}" ]
 then
 	LOCAL_EMAIL_HOST="${EMAIL_HOST}"
 fi
-
-if [ -z "${EMAIL_SMTP_PORT}" ]
-then
-	EMAIL_SMTP_PORT="2500"
-fi
+export LOCAL_EMAIL_HOST
 
 # If the caller did not mention specific tags, skip the skipped tests by default
 if [ "${BEHAT_TAGS_OPTION_FOUND}" = false ]

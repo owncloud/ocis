@@ -22,7 +22,6 @@
 
 namespace TestHelpers;
 
-use Exception;
 use GuzzleHttp\Exception\GuzzleException;
 use Psr\Http\Message\ResponseInterface;
 
@@ -46,9 +45,9 @@ class EmailHelper {
 	 * @return string
 	 */
 	public static function getEmailBaseUrl(): string {
-		$localEmailHost = self::getLocalEmailHost();
+		$emailHost = self::getEmailHost();
 		$emailPort = \getenv('EMAIL_PORT') ?: "8025";
-		return "http://$localEmailHost:$emailPort";
+		return "http://$emailHost:$emailPort";
 	}
 
 	/**
@@ -57,8 +56,8 @@ class EmailHelper {
 	 *
 	 * @return string
 	 */
-	public static function getLocalEmailHost(): string {
-		return \getenv('LOCAL_EMAIL_HOST') ?: "127.0.0.1";
+	public static function getEmailHost(): string {
+		return \getenv('LOCAL_EMAIL_HOST') ?? \getenv('EMAIL_HOST') ?? "127.0.0.1";
 	}
 
 	/**
@@ -82,66 +81,25 @@ class EmailHelper {
 	}
 
 	/**
-	 * @param string $id
+	 * @param string $id when $id set to 'latest' returns the latest message.
+	 * @param string $query
 	 * @param string|null $xRequestId
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
-	public static function getBodyOfAnEmailById(
+	public static function getEmailById(
 		string $id,
+		string $query,
 		?string $xRequestId,
 	): ResponseInterface {
-		return HttpRequestHelper::getJsonDecodedResponseBodyContent(
-			HttpRequestHelper::get(
-				self::getEmailFullUrl("message/$id"),
-				$xRequestId,
-				null,
-				null,
-				['Content-Type' => 'application/json']
-			)
+		return HttpRequestHelper::get(
+			self::getEmailFullUrl("message/$id") . "?query=$query",
+			$xRequestId,
+			null,
+			null,
+			['Content-Type' => 'application/json']
 		);
-	}
-
-	//    move to context
-	/**
-	 * Returns the body of the last received email for the provided receiver according to the provided email address and the serial number
-	 * For email number, 1 means the latest one
-	 *
-	 * @param string $emailAddress
-	 * @param string|null $xRequestId
-	 * @param int|null $emailNumber For email number, 1 means the latest one
-	 * @param int|null $waitTimeSec Time to wait for the email if the email has been delivered
-	 *
-	 * @return string
-	 * @throws GuzzleException
-	 * @throws Exception
-	 */
-	public static function getBodyOfLastEmail(
-		string $emailAddress,
-		string $xRequestId,
-		?int $emailNumber = 1,
-		?int $waitTimeSec = EMAIL_WAIT_TIMEOUT_SEC
-	): string {
-		$currentTime = \time();
-		$endTime = $currentTime + $waitTimeSec;
-		//        $mailBox = self::getMailBoxFromEmail($emailAddress);
-		while ($currentTime <= $endTime) {
-			$query = 'to:' . $emailAddress;
-			$mailResponse = self::searchEmails($query, $xRequestId);
-			if (!empty($mailResponse) && \sizeof($mailResponse) >= $emailNumber) {
-				$response = self::getBodyOfAnEmailById("latest", $xRequestId);
-				$body = \str_replace(
-					"\r\n",
-					"\n",
-					\quoted_printable_decode($response->Text . "\n" . $response->HTML)
-				);
-				return $body;
-			}
-			\usleep(STANDARD_SLEEP_TIME_MICROSEC * 50);
-			$currentTime = \time();
-		}
-		throw new Exception("Could not find the email to the address: " . $emailAddress);
 	}
 
 	/**

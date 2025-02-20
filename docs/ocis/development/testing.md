@@ -335,7 +335,7 @@ While writing tests for a new oCIS ENV configuration, please make sure to follow
 
 ## Running Test Suite With Email Service (@email)
 
-Test suites that are tagged with `@email` require an email service. We use inbucket as the email service in our tests.
+Test suites that are tagged with `@email` require an email service. We use mailpit as the email service in our tests.
 
 ### Setup Mailpit
 

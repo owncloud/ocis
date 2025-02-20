@@ -24,12 +24,28 @@ require_once 'bootstrap.php';
  */
 class NotificationContext implements Context {
 	private FeatureContext $featureContext;
-	private SpacesContext $spacesContext;
-	private SettingsContext $settingsContext;
 	private string $notificationEndpointPath = '/apps/notifications/api/v1/notifications?format=json';
 	private string $globalNotificationEndpointPath = '/apps/notifications/api/v1/notifications/global';
 
 	private array $notificationIds;
+
+	private string $userRecipient;
+
+	/**
+	 * @param string $userRecipient
+	 *
+	 * @return void
+	 */
+	public function setUserRecipient(string $userRecipient): void {
+		$this->userRecipient = $userRecipient;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getUserRecipient(): string {
+		return $this->userRecipient;
+	}
 
 	/**
 	 * @return array[]
@@ -43,6 +59,21 @@ class NotificationContext implements Context {
 	 */
 	public function getLastNotificationId(): array {
 		return \end($this->notificationIds);
+	}
+
+	/**
+	 * @BeforeScenario
+	 *
+	 * @param BeforeScenarioScope $scope
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function before(BeforeScenarioScope $scope): void {
+		// Get the environment
+		$environment = $scope->getEnvironment();
+		// Get all the contexts you need in this context
+		$this->featureContext = BehatHelper::getContext($scope, $environment, 'FeatureContext');
 	}
 
 	/**
@@ -65,44 +96,6 @@ class NotificationContext implements Context {
 			$this->featureContext->getStepLineRef(),
 			json_encode($payload)
 		);
-	}
-
-	/**
-	 * @var string
-	 */
-	private string $userRecipient;
-
-	/**
-	 * @param string $userRecipient
-	 *
-	 * @return void
-	 */
-	public function setUserRecipient(string $userRecipient): void {
-		$this->userRecipient = $userRecipient;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getUserRecipient(): string {
-		return $this->userRecipient;
-	}
-
-	/**
-	 * @BeforeScenario
-	 *
-	 * @param BeforeScenarioScope $scope
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function before(BeforeScenarioScope $scope): void {
-		// Get the environment
-		$environment = $scope->getEnvironment();
-		// Get all the contexts you need in this context
-		$this->featureContext = BehatHelper::getContext($scope, $environment, 'FeatureContext');
-		$this->spacesContext = BehatHelper::getContext($scope, $environment, 'SpacesContext');
-		$this->settingsContext = BehatHelper::getContext($scope, $environment, 'SettingsContext');
 	}
 
 	/**
