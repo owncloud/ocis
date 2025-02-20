@@ -4,17 +4,16 @@ Feature: an user shares resources using ScienceMesh application
   I want to share resources between different ocis instances
 
   Background:
-    Given user "Alice" has been created with default attributes
+    Given using spaces DAV path
+    And user "Alice" has been created with default attributes
+    And "Alice" has created the federation share invitation
     And using server "REMOTE"
     And user "Brian" has been created with default attributes
+    And "Brian" has accepted invitation
 
   @issue-9534
   Scenario: local user shares a folder to federation user
     Given using server "LOCAL"
-    And "Alice" has created the federation share invitation
-    And using server "REMOTE"
-    And "Brian" has accepted invitation
-    And using server "LOCAL"
     And user "Alice" has created folder "folderToShare"
     When user "Alice" sends the following resource share invitation to federated user using the Graph API:
       | resource        | folderToShare |
@@ -186,10 +185,6 @@ Feature: an user shares resources using ScienceMesh application
   @issue-9534
   Scenario: local user shares a file to federation user
     Given using server "LOCAL"
-    And "Alice" has created the federation share invitation
-    And using server "REMOTE"
-    And "Brian" has accepted invitation
-    And using server "LOCAL"
     And user "Alice" has uploaded file with content "ocm test" to "textfile.txt"
     When user "Alice" sends the following resource share invitation to federated user using the Graph API:
       | resource        | textfile.txt |
@@ -373,11 +368,6 @@ Feature: an user shares resources using ScienceMesh application
 
   Scenario: local user shares a folder from project space to federation user
     Given using server "LOCAL"
-    And "Alice" has created the federation share invitation
-    And using server "REMOTE"
-    And "Brian" has accepted invitation
-    And using server "LOCAL"
-    And using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
     And user "Alice" has created a folder "folderToShare" in space "projectSpace"
@@ -551,11 +541,6 @@ Feature: an user shares resources using ScienceMesh application
   @issue-10051
   Scenario Outline: try to add federated user as a member of a project space (permissions endpoint)
     Given using server "LOCAL"
-    And "Alice" has created the federation share invitation
-    And using server "REMOTE"
-    And "Brian" has accepted invitation
-    And using server "LOCAL"
-    And using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "alice's space" with the default quota using the Graph API
     When user "Alice" tries to send the following space share invitation to federated user using permissions endpoint of the Graph API:
@@ -607,13 +592,8 @@ Feature: an user shares resources using ScienceMesh application
   @issue-10051
   Scenario Outline: try to add federated user as a member of a project space (root endpoint)
     Given using server "LOCAL"
-    And using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "alice's space" with the default quota using the Graph API
-    And "Alice" has created the federation share invitation
-    And using server "REMOTE"
-    And "Brian" has accepted invitation
-    And using server "LOCAL"
     When user "Alice" tries to send the following space share invitation to federated user using root endpoint of the Graph API:
       | space           | alice's space      |
       | sharee          | Brian              |
@@ -664,10 +644,6 @@ Feature: an user shares resources using ScienceMesh application
   Scenario: sharer lists the shares shared to a federated user
     Given using server "LOCAL"
     And user "Alice" has uploaded file with content "ocm test" to "/textfile.txt"
-    And "Alice" has created the federation share invitation
-    And using server "REMOTE"
-    And "Brian" has accepted invitation
-    And using server "LOCAL"
     And user "Alice" has sent the following resource share invitation to federated user:
       | resource        | textfile.txt |
       | space           | Personal     |
@@ -798,11 +774,7 @@ Feature: an user shares resources using ScienceMesh application
 
   @issue-10222 @issue-10495
   Scenario: local user lists multiple federation shares
-    Given using server "LOCAL"
-    And "Alice" has created the federation share invitation
-    And using server "REMOTE"
-    And "Brian" has accepted invitation
-    And user "Brian" has uploaded file "filesForUpload/testavatar.jpg" to "testavatar.jpg"
+    Given user "Brian" has uploaded file "filesForUpload/testavatar.jpg" to "testavatar.jpg"
     And user "Brian" has created folder "folderToShare"
     And user "Brian" has sent the following resource share invitation to federated user:
       | resource        | folderToShare |
@@ -917,12 +889,7 @@ Feature: an user shares resources using ScienceMesh application
 
   @issue-10285 @issue-10536 @issue-10305
   Scenario: federation user uploads file to a federated shared folder via TUS
-    Given using spaces DAV path
-    And using server "LOCAL"
-    And "Alice" has created the federation share invitation
-    And using server "REMOTE"
-    And "Brian" has accepted invitation
-    And using server "LOCAL"
+    Given using server "LOCAL"
     And user "Alice" has created a folder "FOLDER" in space "Personal"
     And user "Alice" has sent the following resource share invitation to federated user:
       | resource        | FOLDER   |
@@ -937,12 +904,7 @@ Feature: an user shares resources using ScienceMesh application
 
   @issue-10285 @issue-10536
   Scenario: local user uploads file to a federated shared folder via TUS
-    Given using spaces DAV path
-    And using server "LOCAL"
-    And "Alice" has created the federation share invitation
-    And using server "REMOTE"
-    And "Brian" has accepted invitation
-    And user "Brian" has created a folder "FOLDER" in space "Personal"
+    Given user "Brian" has created a folder "FOLDER" in space "Personal"
     And user "Brian" has sent the following resource share invitation to federated user:
       | resource        | FOLDER   |
       | space           | Personal |
@@ -956,12 +918,7 @@ Feature: an user shares resources using ScienceMesh application
 
   @issue-10495
   Scenario: local user downloads thumbnail preview of a federated shared image
-    Given using spaces DAV path
-    And using server "LOCAL"
-    And "Alice" has created the federation share invitation
-    And using server "REMOTE"
-    And "Brian" has accepted invitation
-    And user "Brian" has uploaded file "filesForUpload/testavatar.jpg" to "testavatar.jpg"
+    Given user "Brian" has uploaded file "filesForUpload/testavatar.jpg" to "testavatar.jpg"
     And user "Brian" has sent the following resource share invitation to federated user:
       | resource        | testavatar.jpg |
       | space           | Personal       |
@@ -976,12 +933,7 @@ Feature: an user shares resources using ScienceMesh application
 
   @issue-10358
   Scenario: user edits content of a federated share file
-    Given using spaces DAV path
-    And using server "LOCAL"
-    And "Alice" has created the federation share invitation
-    And using server "REMOTE"
-    And "Brian" has accepted invitation
-    And using server "LOCAL"
+    Given using server "LOCAL"
     And user "Alice" has uploaded file with content "ocm test" to "/textfile.txt"
     And user "Alice" has sent the following resource share invitation to federated user:
       | resource        | textfile.txt |
@@ -999,10 +951,7 @@ Feature: an user shares resources using ScienceMesh application
 
   @issue-10488
   Scenario: local user shares a folder copied from an already shared folder to federation user
-    Given using server "REMOTE"
-    And "Brian" has created the federation share invitation
-    And using server "LOCAL"
-    And "Alice" has accepted invitation
+    Given using server "LOCAL"
     And user "Alice" has created folder "folderToShare"
     And user "Alice" has sent the following resource share invitation to federated user:
       | resource        | folderToShare |
@@ -1118,12 +1067,7 @@ Feature: an user shares resources using ScienceMesh application
 
   @issue-9926
   Scenario: federated user tries to update a shared file after local user updates role
-    Given using spaces DAV path
-    And using server "LOCAL"
-    And "Alice" has created the federation share invitation
-    And using server "REMOTE"
-    And "Brian" has accepted invitation
-    And using server "LOCAL"
+    Given using server "LOCAL"
     And user "Alice" has uploaded file with content "ocm test" to "/textfile.txt"
     And user "Alice" has sent the following resource share invitation to federated user:
       | resource        | textfile.txt |
@@ -1144,10 +1088,7 @@ Feature: an user shares resources using ScienceMesh application
 
   @issue-10689
   Scenario: federation user lists all the spaces
-    Given using server "REMOTE"
-    And "Brian" has created the federation share invitation
-    And using server "LOCAL"
-    And "Alice" has accepted invitation
+    Given using server "LOCAL"
     And user "Alice" has created folder "folderToShare"
     And user "Alice" has sent the following resource share invitation to federated user:
       | resource        | folderToShare |
@@ -1162,11 +1103,7 @@ Feature: an user shares resources using ScienceMesh application
 
   @issue-10213
   Scenario Outline: local user removes access of federated user from a resource
-    Given using spaces DAV path
-    And using server "REMOTE"
-    And "Brian" has created the federation share invitation
-    And using server "LOCAL"
-    And "Alice" has accepted invitation
+    Given using server "LOCAL"
     And user "Alice" has created a folder "FOLDER" in space "Personal"
     And user "Alice" has sent the following resource share invitation to federated user:
       | resource        | FOLDER            |
@@ -1186,11 +1123,7 @@ Feature: an user shares resources using ScienceMesh application
 
   @issue-10272
   Scenario: federated user downloads shared resources as an archive
-    Given using spaces DAV path
-    And using server "REMOTE"
-    And "Brian" has created the federation share invitation
-    And using server "LOCAL"
-    And "Alice" has accepted invitation
+    Given using server "LOCAL"
     And user "Alice" has uploaded file with content "some data" to "textfile.txt"
     And user "Alice" has created folder "imageFolder"
     And user "Alice" has uploaded file "filesForUpload/testavatar.png" to "imageFolder/testavatar.png"
@@ -1212,7 +1145,47 @@ Feature: an user shares resources using ScienceMesh application
       | imageFolder  |
     Then the HTTP status code should be "200"
     And the downloaded zip archive should contain these files:
-      | name                       | content    |
-      | textfile.txt               | some data  |
-      | imageFolder                |            |
-      | imageFolder/testavatar.png |            |
+      | name                       | content   |
+      | textfile.txt               | some data |
+      | imageFolder                |           |
+      | imageFolder/testavatar.png |           |
+
+  @issue-11033
+  Scenario: external sharee shouldn't be able to the access file when federated share expires
+    Given using SharingNG
+    And using server "LOCAL"
+    And user "Alice" has uploaded file with content "ocm test" to "/textfile.txt"
+    And user "Alice" has sent the following resource share invitation to federated user:
+      | resource        | textfile.txt |
+      | space           | Personal     |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | File Editor  |
+    When user "Alice" expires the last share of resource "textfile.txt" inside of the space "Personal"
+    Then the HTTP status code should be "200"
+    And using server "REMOTE"
+    When user "Brian" updates the content of federated share "textfile.txt" with "this is a new content" using the WebDAV API
+    Then the HTTP status code should be "404"
+    And user "Brian" should not have a federated share "textfile.txt" shared by user "Alice" from space "Personal"
+    And using server "LOCAL"
+    And for user "Alice" the content of the file "textfile.txt" of the space "Personal" should be "ocm test"
+
+  @issue-11033
+  Scenario: external sharee shouldn't be able to the access folder when federated share expires
+    Given using SharingNG
+    And using server "LOCAL"
+    And user "Alice" has created folder "folderToShare"
+    And user "Alice" has sent the following resource share invitation to federated user:
+      | resource        | folderToShare |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Editor        |
+    When user "Alice" expires the last share of resource "folderToShare" inside of the space "Personal"
+    Then the HTTP status code should be "200"
+    And using server "REMOTE"
+    When user "Brian" uploads a file with content "lorem" to "file.txt" inside federated share "folderToShare" via TUS using the WebDAV API
+    Then the HTTP status code should be "404"
+    And user "Brian" should not have a federated share "folderToShare" shared by user "Alice" from space "Personal"
+    And using server "LOCAL"
+    And as "Alice" file "folderToShare/file.txt" should not exist

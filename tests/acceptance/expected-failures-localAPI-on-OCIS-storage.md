@@ -328,5 +328,9 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 #### [[OCM] Users can invite themselves to their own federated connection](https://github.com/owncloud/ocis/issues/11004)
 - [apiOcm/acceptInvitation.feature:148](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/acceptInvitation.feature#L148)
 
+#### [[OCM] Sharee can access expired federated share](https://github.com/owncloud/ocis/issues/11033)
+- [apiOcm/share.feature:1154](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L1154)
+- [apiOcm/share.feature:1174](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L1174)
+
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.
