@@ -30,6 +30,7 @@ use TestHelpers\OcisHelper;
 use TestHelpers\WebDavHelper;
 use TestHelpers\HttpRequestHelper;
 use TestHelpers\BehatHelper;
+use GuzzleHttp\Exception\ClientException;
 
 require_once 'bootstrap.php';
 
@@ -522,6 +523,73 @@ class SharingNgContext implements Context {
 		$this->featureContext->setResponse(
 			$this->sendShareInvitation($user, $rows, null, true)
 		);
+	}
+
+	/**
+	 * @When user :user sends the following resources share invitation concurrently to federated user using the Graph API:
+	 *
+	 * @param string $user
+	 * @param TableNode $table
+	 */
+	public function userSendsTheFollowingResourcesShareInvitationConcurrentlyToFederatedUserUsingTheGraphApi(string $user, TableNode $table): void {
+		$table = $table->getColumnsHash();
+		foreach ($table as $shareInfo) {
+			if ($shareInfo['space'] === 'Personal' || $shareInfo['space'] === 'Shares') {
+				$space = $this->spacesContext->getSpaceByName($user, $shareInfo['space']);
+			} else {
+				$space = $this->spacesContext->getCreatedSpace($shareInfo['space']);
+			}
+			$spaceId = $space['id'];
+
+			$resource = $shareInfo['resource'] ?? '';
+			$itemId = $this->spacesContext->getResourceId($user, $shareInfo['space'], $resource);
+
+			$shareeId = (
+				$this->featureContext->ocmContext->getAcceptedUserByName(
+					$user,
+					$shareInfo["sharee"]
+				)
+			)['user_id'];
+
+            $shareeIds[] = $shareeId;
+            $shareTypes[] = $shareInfo['shareType'];
+			$permissionsRole = $shareInfo['permissionsRole'] ?? null;
+			$permissionsAction = $shareInfo['permissionsAction'] ?? null;
+
+			$body = GraphHelper::createShareInviteBody(
+				$shareeIds,
+                $shareTypes,
+				$permissionsRole,
+				$permissionsAction
+			);
+
+//			$request = GraphHelper::createRequest(
+//				$this->featureContext->getBaseUrl(),
+//				$this->featureContext->getStepLineRef(),
+//				"POST",
+//				"drives/$spaceId/items/$itemId/invite",
+//				$body,
+//			);
+            $fullUrl = GraphHelper::getBetaFullUrl($this->featureContext->getBaseUrl(), "drives/$spaceId/items/$itemId/invite");
+            $request = HttpRequestHelper::createRequest(
+                $fullUrl,
+                $this->featureContext->getStepLineRef(),
+                "POST",
+                [],
+                $body
+            );
+			$requests[] = $request;
+		}
+//        var_dump($requests);
+
+        $client = HttpRequestHelper::createClient(
+            $this->featureContext->getActualUsername($user),
+            $this->featureContext->getPasswordForUser($user)
+        );
+//        var_dump($client);
+
+        $results = HttpRequestHelper::sendBatchRequest($requests, $client);
+        var_dump($results);
 	}
 
 	/**
