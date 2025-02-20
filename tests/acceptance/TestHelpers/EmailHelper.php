@@ -24,7 +24,6 @@ namespace TestHelpers;
 
 use Exception;
 use GuzzleHttp\Exception\GuzzleException;
-use JsonException;
 use Psr\Http\Message\ResponseInterface;
 
 /**
@@ -88,7 +87,6 @@ class EmailHelper {
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
-	 * @throws JsonException
 	 */
 	public static function getBodyOfAnEmailById(
 		string $id,
