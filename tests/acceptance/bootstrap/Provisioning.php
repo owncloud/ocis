@@ -41,12 +41,6 @@ trait Provisioning {
 	 * key is the lowercase username, value is an array of user attributes
 	 */
 	private array $createdUsers = [];
-
-	/**
-	 * list of users that were created on the remote server during test runs
-	 * key is the lowercase username, value is an array of user attributes
-	 */
-	private array $createdRemoteUsers = [];
 	private array $startingGroups = [];
 	private array $createdRemoteGroups = [];
 	private array $createdGroups = [];
@@ -86,13 +80,6 @@ trait Provisioning {
 	/**
 	 * @return array
 	 */
-	public function getAllCreatedUsers(): array {
-		return array_merge($this->createdUsers, $this->createdRemoteUsers);
-	}
-
-	/**
-	 * @return array
-	 */
 	public function getCreatedGroups(): array {
 		return $this->createdGroups;
 	}
@@ -107,7 +94,7 @@ trait Provisioning {
 	 */
 	public function getUserDisplayName(string $username): string {
 		$normalizedUsername = $this->normalizeUsername($username);
-		$users = $this->getAllCreatedUsers();
+		$users = $this->getCreatedUsers();
 		if (isset($users[$normalizedUsername]['displayname'])) {
 			$displayName = (string) $users[$normalizedUsername]['displayname'];
 			if ($displayName !== '') {
@@ -125,7 +112,7 @@ trait Provisioning {
 	 * @throws Exception
 	 */
 	public function getAttributeOfCreatedUser(string $user, string $attribute) {
-		$usersList = $this->getAllCreatedUsers();
+		$usersList = $this->getCreatedUsers();
 		$normalizedUsername = $this->normalizeUsername($user);
 		if (\array_key_exists($normalizedUsername, $usersList)) {
 			if (\array_key_exists($attribute, $usersList[$normalizedUsername])) {
@@ -175,8 +162,6 @@ trait Provisioning {
 			$password = $this->getAdminPassword();
 		} elseif (\array_key_exists($normalizedUsername, $this->createdUsers)) {
 			$password = $this->createdUsers[$normalizedUsername]['password'];
-		} elseif (\array_key_exists($normalizedUsername, $this->createdRemoteUsers)) {
-			$password = $this->createdRemoteUsers[$normalizedUsername]['password'];
 		} else {
 			throw new Exception(
 				"user '$username' was not created by this test run"
@@ -768,7 +753,6 @@ trait Provisioning {
 			$this->userExists($user),
 			"User '$user' should not exist but does exist"
 		);
-		$this->rememberThatUserIsNotExpectedToExist($user);
 	}
 
 	/**
@@ -855,7 +839,6 @@ trait Provisioning {
 			$this->userExists($user),
 			"User '$user' should not exist but does exist"
 		);
-		$this->rememberThatUserIsNotExpectedToExist($user);
 	}
 
 	/**
@@ -956,19 +939,21 @@ trait Provisioning {
 	 * @return void
 	 */
 	public function initializeUser(string $user, string $password): void {
-		$url = $this->getBaseUrl() . "/graph/v1.0/users/$user";
-
 		if (OcisHelper::isTestingOnReva()) {
-			$url = $this->getBaseUrl()
-				. "/ocs/v$this->ocsApiVersion.php/cloud/users/$user";
+			$url = $this->getBaseUrl() . "/ocs/v$this->ocsApiVersion.php/cloud/users/$user";
+			HttpRequestHelper::get(
+				$url,
+				$this->getStepLineRef(),
+				$user,
+				$password
+			);
+			return;
 		}
 
-		HttpRequestHelper::get(
-			$url,
-			$this->getStepLineRef(),
-			$user,
-			$password
-		);
+		// initialize user by requesting drives
+		// NOTE: this should not be removed,
+		// as it will save the Personal and Shares drives information
+		$this->spacesContext->getSpaceByName($user, 'Personal');
 	}
 
 	/**
@@ -976,8 +961,8 @@ trait Provisioning {
 	 * makes it possible to use this list in other test steps
 	 * or to delete them at the end of the test
 	 *
-	 * @param string|null $user
-	 * @param string|null $password
+	 * @param string $user
+	 * @param string $password
 	 * @param string|null $displayName
 	 * @param string|null $email
 	 * @param string|null $userId only set for the users created using the Graph API
@@ -987,8 +972,8 @@ trait Provisioning {
 	 * @throws JsonException
 	 */
 	public function addUserToCreatedUsersList(
-		?string $user,
-		?string $password,
+		string $user,
+		string $password,
 		?string $displayName = null,
 		?string $email = null,
 		?string $userId = null,
@@ -996,30 +981,17 @@ trait Provisioning {
 	): void {
 		$user = $this->getActualUsername($user);
 		$normalizedUsername = $this->normalizeUsername($user);
-		$userData = [
-			"password" => $password,
-			"displayname" => $displayName,
-			"email" => $email,
-			"shouldExist" => $shouldExist,
-			"actualUsername" => $user,
-			"id" => $userId
-		];
 
-		if ($this->currentServer === 'LOCAL') {
-			// Only remember this user creation if it was expected to have been successful
-			// or the user has not been processed before. Some tests create a user the
-			// first time (successfully) and then purposely try to create the user again.
-			// The 2nd user creation is expected to fail, and in that case we want to
-			// still remember the details of the first user creation.
-			if ($shouldExist || !\array_key_exists($normalizedUsername, $this->createdUsers)) {
-				$this->createdUsers[$normalizedUsername] = $userData;
-			}
-		} elseif ($this->currentServer === 'REMOTE') {
-			// See comment above about the LOCAL case. The logic is the same for the remote case.
-			if ($shouldExist || !\array_key_exists($normalizedUsername, $this->createdRemoteUsers)) {
-				$this->createdRemoteUsers[$normalizedUsername] = $userData;
-				$this->createdUsers[$normalizedUsername] = $userData;
-			}
+		if ($shouldExist || !\array_key_exists($normalizedUsername, $this->createdUsers)) {
+			$this->createdUsers[$normalizedUsername] = [
+				"password" => $password,
+				"displayname" => $displayName,
+				"email" => $email,
+				"shouldExist" => $shouldExist,
+				"actualUsername" => $user,
+				"id" => $userId,
+				"serverType" => $this->currentServer
+			];
 		}
 	}
 
@@ -1037,14 +1009,8 @@ trait Provisioning {
 		string $password
 	): void {
 		$normalizedUsername = $this->normalizeUsername($user);
-		if ($this->currentServer === 'LOCAL') {
-			if (\array_key_exists($normalizedUsername, $this->createdUsers)) {
-				$this->createdUsers[$normalizedUsername]['password'] = $password;
-			}
-		} elseif ($this->currentServer === 'REMOTE') {
-			if (\array_key_exists($normalizedUsername, $this->createdRemoteUsers)) {
-				$this->createdRemoteUsers[$user]['password'] = $password;
-			}
+		if (\array_key_exists($normalizedUsername, $this->createdUsers)) {
+			$this->createdUsers[$normalizedUsername]['password'] = $password;
 		}
 	}
 
@@ -1791,6 +1757,9 @@ trait Provisioning {
 			// users can be deleted using the username in the GraphApi too
 			$response = $this->graphContext->adminDeletesUserUsingTheGraphApi($user);
 		}
+		if ($response->getStatusCode() === 204) {
+			$this->rememberThatUserIsNotExpectedToExist($user);
+		}
 		return $response;
 	}
 
@@ -1997,25 +1966,20 @@ trait Provisioning {
 	 */
 	public function cleanupDatabaseUsers(): void {
 		$previousServer = $this->currentServer;
-		$this->usingServer('LOCAL');
 		foreach ($this->createdUsers as $userData) {
+			// do not try to delete if user doesn't exist
+			if (!$userData["shouldExist"]) {
+				continue;
+			}
+			$this->usingServer($userData["serverType"]);
+
 			$user = $userData['actualUsername'];
-			$this->deleteUser($user);
+			$response = $this->deleteUser($user);
+			$this->theHTTPStatusCodeShouldBe(204, "Failed to delete user '$user'", $response);
 			Assert::assertFalse(
 				$this->userExists($user),
 				"User '$user' should not exist but does exist"
 			);
-			$this->rememberThatUserIsNotExpectedToExist($user);
-		}
-		$this->usingServer('REMOTE');
-		foreach ($this->createdRemoteUsers as $userData) {
-			$user = $userData['actualUsername'];
-			$this->deleteUser($user);
-			Assert::assertFalse(
-				$this->userExists($user),
-				"User '$user' should not exist but does exist"
-			);
-			$this->rememberThatUserIsNotExpectedToExist($user);
 		}
 		$this->usingServer($previousServer);
 	}

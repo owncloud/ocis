@@ -75,7 +75,7 @@ class NotificationContext implements Context {
 	 */
 	public function clearAllEmails(): void {
 		try {
-			$usersList = $this->featureContext->getAllCreatedUsers();
+			$usersList = $this->featureContext->getCreatedUsers();
 			foreach ($usersList as $emailRecipient) {
 				EmailHelper::deleteAllEmailsForAMailbox(
 					EmailHelper::getLocalEmailUrl(),
