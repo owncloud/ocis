@@ -26,6 +26,23 @@ Feature: Email notification
 
       Click here to view it: %base_url%/f/%space_id%
       """
+  
+  Scenario: user gets an email notification when space membership expire
+    Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Alice" shares a space "new-space" with settings:
+      | shareWith          | Brian                |
+      | role               | Editor               |
+      | expirationDateTime | 2025-07-15T14:00:00Z |
+    Then the HTTP status code should be "200"
+    And user "Brian" should have received the following email from user "Alice" about the share of project space "new-space"
+      """
+      Hello Brian Murphy,
+
+      %displayname% has invited you to join "new-space".
+
+      Click here to view it: %base_url%/f/%space_id%
+      """
 
 
   Scenario: user gets an email notification when someone shares a file

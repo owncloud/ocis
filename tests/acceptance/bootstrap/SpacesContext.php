@@ -1325,6 +1325,25 @@ class SpacesContext implements Context {
 	}
 
 	/**
+	 * @Given /^user "([^"]*)" shares a space "([^"]*)" with settings:$/
+	 *
+	 * @param  string $user
+	 * @param  string $spaceName
+	 * @param  TableNode $table
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function shareSpaceRequest(
+		string $user,
+		string $spaceName,
+		TableNode $table
+	): void {
+		$rows = $table->getRowsHash();
+		$this->shareSpace($user, $spaceName, $rows);
+	}
+
+	/**
 	 * @param string $user
 	 * @param string $folder
 	 * @param string $spaceName
