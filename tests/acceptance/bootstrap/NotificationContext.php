@@ -13,9 +13,7 @@ use Behat\Gherkin\Node\PyStringNode;
 use PHPUnit\Framework\Assert;
 use GuzzleHttp\Exception\GuzzleException;
 use Psr\Http\Message\ResponseInterface;
-use TestHelpers\EmailHelper;
 use TestHelpers\OcsApiHelper;
-use TestHelpers\GraphHelper;
 use TestHelpers\SettingsHelper;
 use TestHelpers\BehatHelper;
 
@@ -50,6 +48,8 @@ class NotificationContext implements Context {
 	/**
 	 * delete all in-app notifications
 	 *
+	 * @AfterScenario @notification
+	 *
 	 * @return void
 	 * @throws GuzzleException
 	 */
@@ -65,34 +65,6 @@ class NotificationContext implements Context {
 			$this->featureContext->getStepLineRef(),
 			json_encode($payload)
 		);
-	}
-
-	/**
-	 * Delete all the emails
-	 *
-	 * @return void
-	 * @throws GuzzleException
-	 */
-	public function clearAllEmails(): void {
-		try {
-			EmailHelper::deleteAllEmails($this->featureContext->getStepLineRef());
-		} catch (Exception $e) {
-			echo __METHOD__ .
-				" could not delete email messages?\n" .
-				$e->getMessage();
-		}
-	}
-
-	/**
-	 * @AfterScenario @notification
-	 *
-	 * @return void
-	 * @throws GuzzleException
-	 * @throws JsonException
-	 */
-	public function deleteAllNotifications(): void {
-		$this->deleteDeprovisioningNotification();
-		$this->clearAllEmails();
 	}
 
 	/**
@@ -552,145 +524,6 @@ class NotificationContext implements Context {
 			$filteredResponse,
 			"Response should not contain notification related to resource '$resource' with subject '$subject' but found"
 			. print_r($filteredResponse, true)
-		);
-	}
-
-	/**
-	 * @Then user :user should have received the following email from user :sender about the share of project space :spaceName
-	 *
-	 * @param string $user
-	 * @param string $sender
-	 * @param string $spaceName
-	 * @param PyStringNode $content
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function userShouldHaveReceivedTheFollowingEmailFromUserAboutTheShareOfProjectSpace(
-		string $user,
-		string $sender,
-		string $spaceName,
-		PyStringNode $content
-	): void {
-		$rawExpectedEmailBodyContent = \str_replace("\r\n", "\n", $content->getRaw());
-		$this->featureContext->setResponse(
-			GraphHelper::getMySpaces(
-				$this->featureContext->getBaseUrl(),
-				$user,
-				$this->featureContext->getPasswordForUser($user),
-				'',
-				$this->featureContext->getStepLineRef()
-			)
-		);
-		$expectedEmailBodyContent = $this->featureContext->substituteInLineCodes(
-			$rawExpectedEmailBodyContent,
-			$sender,
-			[],
-			[
-				[
-					"code" => "%space_id%",
-					"function" =>
-						[$this->spacesContext, "getSpaceIdByName"],
-					"parameter" => [$sender, $spaceName]
-				],
-			]
-		);
-		$this->assertEmailContains($user, $expectedEmailBodyContent);
-	}
-
-	/**
-	 * @Then user :user should have received the following email from user :sender
-	 *
-	 * @param string $user
-	 * @param string $sender
-	 * @param PyStringNode $content
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function userShouldHaveReceivedTheFollowingEmailFromUser(
-		string $user,
-		string $sender,
-		PyStringNode $content
-	): void {
-		$rawExpectedEmailBodyContent = \str_replace("\r\n", "\n", $content->getRaw());
-		$expectedEmailBodyContent = $this->featureContext->substituteInLineCodes(
-			$rawExpectedEmailBodyContent,
-			$sender
-		);
-		$this->assertEmailContains($user, $expectedEmailBodyContent);
-	}
-
-	/**
-	 * @Then user :user should have :count emails
-	 *
-	 * @param string $user
-	 * @param int $count
-	 *
-	 * @return void
-	 * @throws GuzzleException
-	 */
-	public function userShouldHaveEmail(string $user, int $count): void {
-		$address = $this->featureContext->getEmailAddressForUser($user);
-		$query = 'to:' . $address;
-		$mailResponse = EmailHelper::searchEmails($query, $this->featureContext->getStepLineRef());
-		$totalMail = $this->featureContext->getJsonDecodedResponse($mailResponse)["messages_count"];
-		Assert::assertSame(
-			$count,
-			$totalMail,
-			"Expected '$address' received mail total '$count' mail but got '$totalMail' mail"
-		);
-	}
-
-	/**
-	 * @Then user :user should have received the following email from user :sender ignoring whitespaces
-	 *
-	 * @param string $user
-	 * @param string $sender
-	 * @param PyStringNode $content
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function userShouldHaveReceivedTheFollowingEmailFromUserIgnoringWhitespaces(
-		string $user,
-		string $sender,
-		PyStringNode $content
-	): void {
-		$rawExpectedEmailBodyContent = \str_replace("\r\n", "\n", $content->getRaw());
-		$expectedEmailBodyContent = $this->featureContext->substituteInLineCodes(
-			$rawExpectedEmailBodyContent,
-			$sender
-		);
-		$this->assertEmailContains($user, $expectedEmailBodyContent, true);
-	}
-
-	/***
-	 * @param string $user
-	 * @param string $expectedEmailBodyContent
-	 * @param bool $ignoreWhiteSpace
-	 *
-	 * @return void
-	 * @throws GuzzleException
-	 */
-	public function assertEmailContains(
-		string $user,
-		string $expectedEmailBodyContent,
-		$ignoreWhiteSpace = false
-	): void {
-		$address = $this->featureContext->getEmailAddressForUser($user);
-		$this->featureContext->pushEmailRecipientAsMailBox($address);
-		$actualEmailBodyContent = EmailHelper::getBodyOfLastEmail($address, $this->featureContext->getStepLineRef());
-		if ($ignoreWhiteSpace) {
-			$expectedEmailBodyContent = preg_replace('/\s+/', '', $expectedEmailBodyContent);
-			$actualEmailBodyContent = preg_replace('/\s+/', '', $actualEmailBodyContent);
-		}
-		Assert::assertStringContainsString(
-			$expectedEmailBodyContent,
-			$actualEmailBodyContent,
-			"The email address '$address' should have received an"
-			. "email with the body containing $expectedEmailBodyContent
-			but the received email is $actualEmailBodyContent"
 		);
 	}
 
