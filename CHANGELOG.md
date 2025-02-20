@@ -70,6 +70,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add roles: [#10964](https://github.com/owncloud/ocis/pull/10964)
 * Enhancement - Update Web to v1.11.3: [#10977](https://github.com/owncloud/ocis/pull/10977)
 * Enhancement - Add the ocm notification handler: [#11005](https://github.com/owncloud/ocis/pull/11005)
+* Enhancement - Add logging when a users space gets deleted: [#11037](https://github.com/owncloud/ocis/pull/11037)
 
 ## Details
 
@@ -108,6 +109,14 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/enterprise/issues/7075
    https://github.com/owncloud/ocis/pull/11005
+
+* Enhancement - Add logging when a users space gets deleted: [#11037](https://github.com/owncloud/ocis/pull/11037)
+
+   When deleting a user, their personal space will also be deleted. When this
+   operation fails the logging in the graph service was insufficient. We added some
+   logs.
+
+   https://github.com/owncloud/ocis/pull/11037
 
 # Changelog for [7.1.0-rc.4] (2025-02-04)
 
