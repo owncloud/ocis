@@ -213,7 +213,7 @@ class GraphHelper {
 	 * @param string $xRequestId
 	 * @param string $method
 	 * @param string $path
-	 * @param string|null $body
+	 * @param string|array|null $body
 	 * @param array|null $headers
 	 *
 	 * @return RequestInterface
@@ -223,7 +223,7 @@ class GraphHelper {
 		string $xRequestId,
 		string $method,
 		string $path,
-		?string $body = null,
+		$body = null,
 		?array $headers = []
 	): RequestInterface {
 		$fullUrl = self::getFullUrl($baseUrl, $path);
@@ -1790,7 +1790,7 @@ class GraphHelper {
 		array $shareTypes,
 		?string $permissionsRole,
 		?string $permissionsAction,
-		?string $expirationDateTime
+		?string $expirationDateTime = null
 	): array {
 		$body = [];
 

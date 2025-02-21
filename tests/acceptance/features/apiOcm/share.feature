@@ -1189,3 +1189,17 @@ Feature: an user shares resources using ScienceMesh application
     And user "Brian" should not have a federated share "folderToShare" shared by user "Alice" from space "Personal"
     And using server "LOCAL"
     And as "Alice" file "folderToShare/file.txt" should not exist
+
+
+  Scenario: concurrent sharing
+    Given using server "LOCAL"
+    And user "Alice" has created the following folders
+      | path           |
+      | folderToShare1 |
+      | folderToShare2 |
+      | folderToShare3 |
+    When user "Alice" sends the following resources share invitation concurrently to federated user using the Graph API:
+      | resource       | space    | sharee | shareType | permissionsRole |
+      | folderToShare1 | Personal | Brian  | user      | Viewer          |
+      | folderToShare2 | Personal | Brian  | user      | Viewer          |
+      | folderToShare3 | Personal | Brian  | user      | Viewer          |
