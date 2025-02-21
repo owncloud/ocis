@@ -2481,4 +2481,11 @@ class GraphHelper {
 			self::getRequestHeaders()
 		);
 	}
+
+	/**
+	 * @return string
+	 */
+	public static function getDateTimePattern(): string {
+		return "\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}";
+	}
 }

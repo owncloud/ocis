@@ -690,7 +690,7 @@ class NotificationContext implements Context {
 		Assert::assertStringContainsString(
 			$expectedEmailBodyContent,
 			$actualEmailBodyContent,
-			"The email address '$address' should have received an"
+			"The email address '$address' should have received an "
 			. "email with the body containing $expectedEmailBodyContent
 			but the received email is $actualEmailBodyContent"
 		);
@@ -795,5 +795,49 @@ class NotificationContext implements Context {
 			json_encode($payload)
 		);
 		$this->featureContext->setResponse($response);
+	}
+
+	/***
+	 * @param string $user
+	 * @param string $expectedEmailBodyContent
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function assertGroupedEmailContains(
+		string $user,
+		string $expectedEmailBodyContent
+	): void {
+		$address = $this->featureContext->getEmailAddressForUser($user);
+		$this->featureContext->pushEmailRecipientAsMailBox($address);
+		$actualEmailBodyContent = EmailHelper::getBodyOfLastEmail($address, $this->featureContext->getStepLineRef());
+		$expectedEmailBodyContent = str_replace("/", "\/", $expectedEmailBodyContent);
+		Assert::assertMatchesRegularExpression(
+			"/$expectedEmailBodyContent/",
+			$actualEmailBodyContent,
+			"The email address '$address' should have received an "
+			. "email with the body containing '$expectedEmailBodyContent' "
+			. "but the received email is '$actualEmailBodyContent'"
+		);
+	}
+
+	/**
+	 * @Then user :user should have received the following grouped email
+	 *
+	 * @param string $user
+	 * @param PyStringNode $content
+	 *
+	 * @return void
+	 * @throws Exception|GuzzleException
+	 */
+	public function userShouldHaveReceivedTheFollowingGroupedEmail(
+		string $user,
+		PyStringNode $content
+	): void {
+		$rawExpectedEmailBodyContent = \str_replace("\r\n", "\n", $content->getRaw());
+		$expectedEmailBodyContent = $this->featureContext->substituteInLineCodes(
+			$rawExpectedEmailBodyContent
+		);
+		$this->assertGroupedEmailContains($user, $expectedEmailBodyContent);
 	}
 }
