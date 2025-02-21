@@ -332,5 +332,8 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiOcm/share.feature:1154](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L1154)
 - [apiOcm/share.feature:1174](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L1174)
 
+#### [[OCM] no notification for federated share removed event](https://github.com/owncloud/ocis/issues/11042)
+- [apiOcm/ocmNotifications.feature:109](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/ocmNotifications.feature#L109)
+
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.
