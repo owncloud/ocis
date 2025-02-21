@@ -488,26 +488,22 @@ then
 	BEHAT_FILTER_TAGS="${BEHAT_FILTER_TAGS#&&}"
 fi
 
-# EMAIL_HOST defines where the system-under-test can find the email server (inbucket)
+# EMAIL_HOST defines where the system-under-test can find the email server (mailpit)
 # for sending email.
 if [ -z "${EMAIL_HOST}" ]
 then
 	EMAIL_HOST="127.0.0.1"
 fi
 
-# LOCAL_INBUCKET_HOST defines where this test script can find the Inbucket server
-# for sending email. When testing a remote system, the Inbucket server somewhere
+# LOCAL_EMAIL_HOST defines where this test script can find the mailpit server
+# for sending email. When testing a remote system, the mailpit server somewhere
 # "in the middle" might have a different host name from the point of view of
 # the test script.
 if [ -z "${LOCAL_EMAIL_HOST}" ]
 then
 	LOCAL_EMAIL_HOST="${EMAIL_HOST}"
 fi
-
-if [ -z "${EMAIL_SMTP_PORT}" ]
-then
-	EMAIL_SMTP_PORT="2500"
-fi
+export LOCAL_EMAIL_HOST
 
 # If the caller did not mention specific tags, skip the skipped tests by default
 if [ "${BEHAT_TAGS_OPTION_FOUND}" = false ]

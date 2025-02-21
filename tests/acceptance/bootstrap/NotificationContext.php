@@ -13,9 +13,7 @@ use Behat\Gherkin\Node\PyStringNode;
 use PHPUnit\Framework\Assert;
 use GuzzleHttp\Exception\GuzzleException;
 use Psr\Http\Message\ResponseInterface;
-use TestHelpers\EmailHelper;
 use TestHelpers\OcsApiHelper;
-use TestHelpers\GraphHelper;
 use TestHelpers\SettingsHelper;
 use TestHelpers\BehatHelper;
 
@@ -26,85 +24,11 @@ require_once 'bootstrap.php';
  */
 class NotificationContext implements Context {
 	private FeatureContext $featureContext;
-	private SpacesContext $spacesContext;
-	private SettingsContext $settingsContext;
 	private string $notificationEndpointPath = '/apps/notifications/api/v1/notifications?format=json';
 	private string $globalNotificationEndpointPath = '/apps/notifications/api/v1/notifications/global';
 
 	private array $notificationIds;
 
-	/**
-	 * @return array[]
-	 */
-	public function getNotificationIds(): array {
-		return $this->notificationIds;
-	}
-
-	/**
-	 * @return array[]
-	 */
-	public function getLastNotificationId(): array {
-		return \end($this->notificationIds);
-	}
-
-	/**
-	 * delete all in-app notifications
-	 *
-	 * @return void
-	 * @throws GuzzleException
-	 */
-	public function deleteDeprovisioningNotification(): void {
-		$payload["ids"] = ["deprovision"];
-
-		OcsApiHelper::sendRequest(
-			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getAdminUsername(),
-			$this->featureContext->getAdminPassword(),
-			'DELETE',
-			$this->globalNotificationEndpointPath,
-			$this->featureContext->getStepLineRef(),
-			json_encode($payload)
-		);
-	}
-
-	/**
-	 * Delete all the emails
-	 *
-	 * @return void
-	 * @throws GuzzleException
-	 */
-	public function clearAllEmails(): void {
-		try {
-			$usersList = $this->featureContext->getCreatedUsers();
-			foreach ($usersList as $emailRecipient) {
-				EmailHelper::deleteAllEmailsForAMailbox(
-					EmailHelper::getLocalEmailUrl(),
-					$this->featureContext->getStepLineRef(),
-					$emailRecipient['email']
-				);
-			}
-		} catch (Exception $e) {
-			echo __METHOD__ .
-				" could not delete inbucket messages, is inbucket set up?\n" .
-				$e->getMessage();
-		}
-	}
-
-	/**
-	 * @AfterScenario @notification
-	 *
-	 * @return void
-	 * @throws GuzzleException
-	 * @throws JsonException
-	 */
-	public function deleteAllNotifications(): void {
-		$this->deleteDeprovisioningNotification();
-		$this->clearAllEmails();
-	}
-
-	/**
-	 * @var string
-	 */
 	private string $userRecipient;
 
 	/**
@@ -124,6 +48,20 @@ class NotificationContext implements Context {
 	}
 
 	/**
+	 * @return array[]
+	 */
+	public function getNotificationIds(): array {
+		return $this->notificationIds;
+	}
+
+	/**
+	 * @return array[]
+	 */
+	public function getLastNotificationId(): array {
+		return \end($this->notificationIds);
+	}
+
+	/**
 	 * @BeforeScenario
 	 *
 	 * @param BeforeScenarioScope $scope
@@ -136,8 +74,28 @@ class NotificationContext implements Context {
 		$environment = $scope->getEnvironment();
 		// Get all the contexts you need in this context
 		$this->featureContext = BehatHelper::getContext($scope, $environment, 'FeatureContext');
-		$this->spacesContext = BehatHelper::getContext($scope, $environment, 'SpacesContext');
-		$this->settingsContext = BehatHelper::getContext($scope, $environment, 'SettingsContext');
+	}
+
+	/**
+	 * delete all in-app notifications
+	 *
+	 * @AfterScenario @notification
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function deleteDeprovisioningNotification(): void {
+		$payload["ids"] = ["deprovision"];
+
+		OcsApiHelper::sendRequest(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getAdminUsername(),
+			$this->featureContext->getAdminPassword(),
+			'DELETE',
+			$this->globalNotificationEndpointPath,
+			$this->featureContext->getStepLineRef(),
+			json_encode($payload)
+		);
 	}
 
 	/**
@@ -559,140 +517,6 @@ class NotificationContext implements Context {
 			$filteredResponse,
 			"Response should not contain notification related to resource '$resource' with subject '$subject' but found"
 			. print_r($filteredResponse, true)
-		);
-	}
-
-	/**
-	 * @Then user :user should have received the following email from user :sender about the share of project space :spaceName
-	 *
-	 * @param string $user
-	 * @param string $sender
-	 * @param string $spaceName
-	 * @param PyStringNode $content
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function userShouldHaveReceivedTheFollowingEmailFromUserAboutTheShareOfProjectSpace(
-		string $user,
-		string $sender,
-		string $spaceName,
-		PyStringNode $content
-	): void {
-		$rawExpectedEmailBodyContent = \str_replace("\r\n", "\n", $content->getRaw());
-		$this->featureContext->setResponse(
-			GraphHelper::getMySpaces(
-				$this->featureContext->getBaseUrl(),
-				$user,
-				$this->featureContext->getPasswordForUser($user),
-				'',
-				$this->featureContext->getStepLineRef()
-			)
-		);
-		$expectedEmailBodyContent = $this->featureContext->substituteInLineCodes(
-			$rawExpectedEmailBodyContent,
-			$sender,
-			[],
-			[
-				[
-					"code" => "%space_id%",
-					"function" =>
-						[$this->spacesContext, "getSpaceIdByName"],
-					"parameter" => [$sender, $spaceName]
-				],
-			]
-		);
-		$this->assertEmailContains($user, $expectedEmailBodyContent);
-	}
-
-	/**
-	 * @Then user :user should have received the following email from user :sender
-	 *
-	 * @param string $user
-	 * @param string $sender
-	 * @param PyStringNode $content
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function userShouldHaveReceivedTheFollowingEmailFromUser(
-		string $user,
-		string $sender,
-		PyStringNode $content
-	): void {
-		$rawExpectedEmailBodyContent = \str_replace("\r\n", "\n", $content->getRaw());
-		$expectedEmailBodyContent = $this->featureContext->substituteInLineCodes(
-			$rawExpectedEmailBodyContent,
-			$sender
-		);
-		$this->assertEmailContains($user, $expectedEmailBodyContent);
-	}
-
-	/**
-	 * @Then user :user should have :count emails
-	 *
-	 * @param string $user
-	 * @param int $count
-	 *
-	 * @return void
-	 */
-	public function userShouldHaveEmail(string $user, int $count): void {
-		$address = $this->featureContext->getEmailAddressForUser($user);
-		$this->featureContext->pushEmailRecipientAsMailBox($address);
-		$mailBox = EmailHelper::getMailBoxFromEmail($address);
-		$mailboxResponse = EmailHelper::getMailboxInformation($mailBox, $this->featureContext->getStepLineRef());
-		Assert::assertCount($count, $mailboxResponse);
-	}
-
-	/**
-	 * @Then user :user should have received the following email from user :sender ignoring whitespaces
-	 *
-	 * @param string $user
-	 * @param string $sender
-	 * @param PyStringNode $content
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function userShouldHaveReceivedTheFollowingEmailFromUserIgnoringWhitespaces(
-		string $user,
-		string $sender,
-		PyStringNode $content
-	): void {
-		$rawExpectedEmailBodyContent = \str_replace("\r\n", "\n", $content->getRaw());
-		$expectedEmailBodyContent = $this->featureContext->substituteInLineCodes(
-			$rawExpectedEmailBodyContent,
-			$sender
-		);
-		$this->assertEmailContains($user, $expectedEmailBodyContent, true);
-	}
-
-	/***
-	 * @param string $user
-	 * @param string $expectedEmailBodyContent
-	 * @param bool $ignoreWhiteSpace
-	 *
-	 * @return void
-	 * @throws GuzzleException
-	 */
-	public function assertEmailContains(
-		string $user,
-		string $expectedEmailBodyContent,
-		$ignoreWhiteSpace = false
-	): void {
-		$address = $this->featureContext->getEmailAddressForUser($user);
-		$this->featureContext->pushEmailRecipientAsMailBox($address);
-		$actualEmailBodyContent = EmailHelper::getBodyOfLastEmail($address, $this->featureContext->getStepLineRef());
-		if ($ignoreWhiteSpace) {
-			$expectedEmailBodyContent = preg_replace('/\s+/', '', $expectedEmailBodyContent);
-			$actualEmailBodyContent = preg_replace('/\s+/', '', $actualEmailBodyContent);
-		}
-		Assert::assertStringContainsString(
-			$expectedEmailBodyContent,
-			$actualEmailBodyContent,
-			"The email address '$address' should have received an"
-			. "email with the body containing $expectedEmailBodyContent
-			but the received email is $actualEmailBodyContent"
 		);
 	}
 

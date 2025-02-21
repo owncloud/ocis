@@ -12,7 +12,7 @@ ALPINE_GIT = "alpine/git:latest"
 APACHE_TIKA = "apache/tika:2.8.0.0"
 CHKO_DOCKER_PUSHRM = "chko/docker-pushrm:1"
 COLLABORA_CODE = "collabora/code:24.04.5.1.1"
-INBUCKET_INBUCKET = "inbucket/inbucket"
+AXLLENT_MAILPIT = "axllent/mailpit:v1.22.3"
 MINIO_MC = "minio/mc:RELEASE.2021-10-07T04-19-58Z"
 OC_CI_ALPINE = "owncloudci/alpine:latest"
 OC_CI_BAZEL_BUILDIFIER = "owncloudci/bazel-buildifier:latest"
@@ -100,12 +100,12 @@ config = {
             "emailNeeded": True,
             "extraEnvironment": {
                 "EMAIL_HOST": "email",
-                "EMAIL_PORT": "9000",
+                "EMAIL_PORT": "8025",
             },
             "extraServerEnvironment": {
                 "OCIS_ADD_RUN_SERVICES": "notifications",
                 "NOTIFICATIONS_SMTP_HOST": "email",
-                "NOTIFICATIONS_SMTP_PORT": "2500",
+                "NOTIFICATIONS_SMTP_PORT": "1025",
                 "NOTIFICATIONS_SMTP_INSECURE": "true",
                 "NOTIFICATIONS_SMTP_SENDER": "ownCloud <noreply@example.com>",
                 "NOTIFICATIONS_DEBUG_ADDR": "0.0.0.0:9174",
@@ -193,12 +193,12 @@ config = {
             "emailNeeded": True,
             "extraEnvironment": {
                 "EMAIL_HOST": "email",
-                "EMAIL_PORT": "9000",
+                "EMAIL_PORT": "8025",
             },
             "extraServerEnvironment": {
                 "OCIS_ADD_RUN_SERVICES": "notifications",
                 "NOTIFICATIONS_SMTP_HOST": "email",
-                "NOTIFICATIONS_SMTP_PORT": "2500",
+                "NOTIFICATIONS_SMTP_PORT": "1025",
                 "NOTIFICATIONS_SMTP_INSECURE": "true",
                 "NOTIFICATIONS_SMTP_SENDER": "ownCloud <noreply@example.com>",
                 "NOTIFICATIONS_DEBUG_ADDR": "0.0.0.0:9174",
@@ -236,7 +236,7 @@ config = {
             "emailNeeded": True,
             "extraEnvironment": {
                 "EMAIL_HOST": "email",
-                "EMAIL_PORT": "9000",
+                "EMAIL_PORT": "8025",
             },
             "extraServerEnvironment": {
                 "OCIS_ADD_RUN_SERVICES": "ocm,notifications",
@@ -247,7 +247,7 @@ config = {
                 "OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE": "%s" % dirs["ocmProviders"],
                 # mail notifications
                 "NOTIFICATIONS_SMTP_HOST": "email",
-                "NOTIFICATIONS_SMTP_PORT": "2500",
+                "NOTIFICATIONS_SMTP_PORT": "1025",
                 "NOTIFICATIONS_SMTP_INSECURE": "true",
                 "NOTIFICATIONS_SMTP_SENDER": "ownCloud <noreply@example.com>",
             },
@@ -3134,7 +3134,7 @@ def restoreWebPnpmCache():
 def emailService():
     return [{
         "name": "email",
-        "image": INBUCKET_INBUCKET,
+        "image": AXLLENT_MAILPIT,
     }]
 
 def waitForEmailService():
@@ -3142,7 +3142,7 @@ def waitForEmailService():
         "name": "wait-for-email",
         "image": OC_CI_WAIT_FOR,
         "commands": [
-            "wait-for -it email:9000 -t 600",
+            "wait-for -it email:8025 -t 600",
         ],
     }]
 

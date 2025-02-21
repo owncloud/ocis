@@ -335,14 +335,14 @@ While writing tests for a new oCIS ENV configuration, please make sure to follow
 
 ## Running Test Suite With Email Service (@email)
 
-Test suites that are tagged with `@email` require an email service. We use inbucket as the email service in our tests.
+Test suites that are tagged with `@email` require an email service. We use mailpit as the email service in our tests.
 
-### Setup Inbucket
+### Setup Mailpit
 
-Run the following command to setup inbucket
+Run the following command to setup mailpit
 
 ```bash
-docker run -d -p9000:9000 -p2500:2500 --name inbucket inbucket/inbucket
+docker run -d --restart unless-stopped --name=mailpit -p 8025:8025 -p 1025:1025 axllent/mailpit:v1.22.3
 ```
 
 ### Run oCIS
@@ -371,7 +371,7 @@ Run the acceptance test with the following command:
 ```bash
 TEST_SERVER_URL="https://localhost:9200" \
 EMAIL_HOST="localhost" \
-EMAIL_PORT=9000 \
+EMAIL_PORT=8025 \
 BEHAT_FEATURE="tests/acceptance/features/apiNotification/emailNotification.feature" \
 make test-acceptance-api
 ```
