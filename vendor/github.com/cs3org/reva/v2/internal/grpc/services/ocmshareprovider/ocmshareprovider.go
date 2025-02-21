@@ -20,6 +20,7 @@ package ocmshareprovider
 
 import (
 	"context"
+	"fmt"
 	"net/url"
 	"path/filepath"
 	"strings"
@@ -38,7 +39,6 @@ import (
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/cs3org/reva/v2/pkg/ocm/client"
-	"github.com/cs3org/reva/v2/pkg/ocm/payload"
 	"github.com/cs3org/reva/v2/pkg/ocm/share"
 	"github.com/cs3org/reva/v2/pkg/ocm/share/repository/registry"
 	ocmuser "github.com/cs3org/reva/v2/pkg/ocm/user"
@@ -381,19 +381,16 @@ func (s *service) CreateOCMShare(ctx context.Context, req *ocm.CreateOCMShareReq
 
 func (s *service) RemoveOCMShare(ctx context.Context, req *ocm.RemoveOCMShareRequest) (*ocm.RemoveOCMShareResponse, error) {
 	user := ctxpkg.ContextMustGetUser(ctx)
-	getShareRes, err := s.GetOCMShare(ctx, &ocm.GetOCMShareRequest{
-		Ref: req.Ref,
-	})
+	getShareRes, err := s.GetOCMShare(ctx, &ocm.GetOCMShareRequest{Ref: req.Ref})
 	if err != nil {
 		return &ocm.RemoveOCMShareResponse{
 			Status: status.NewInternal(ctx, "error getting ocm share"),
 		}, nil
 	}
 	if getShareRes.Status.Code != rpc.Code_CODE_OK {
-		res := &ocm.RemoveOCMShareResponse{
+		return &ocm.RemoveOCMShareResponse{
 			Status: getShareRes.GetStatus(),
-		}
-		return res, nil
+		}, nil
 	}
 
 	if err := s.repo.DeleteShare(ctx, user, req.Ref); err != nil {
@@ -407,47 +404,9 @@ func (s *service) RemoveOCMShare(ctx context.Context, req *ocm.RemoveOCMShareReq
 		}, nil
 	}
 
-	// TODO: We should not fail the whole operation if the notification fails
-	gatewayClient, err := s.gatewaySelector.Next()
+	err = s.notify(ctx, client.SHARE_UNSHARED, getShareRes.GetShare())
 	if err != nil {
-		return &ocm.RemoveOCMShareResponse{
-			Status: status.NewInternal(ctx, "error getting gateway client"),
-		}, nil
-	}
-
-	providerInfoResp, err := gatewayClient.GetInfoByDomain(ctx, &ocmprovider.GetInfoByDomainRequest{
-		Domain: getShareRes.GetShare().GetGrantee().GetUserId().GetIdp(),
-	})
-	if err != nil {
-		return &ocm.RemoveOCMShareResponse{
-			Status: status.NewInternal(ctx, "error getting provider info"),
-		}, nil
-	}
-
-	if providerInfoResp.Status.Code != rpc.Code_CODE_OK {
-		return &ocm.RemoveOCMShareResponse{
-			Status: providerInfoResp.Status,
-		}, nil
-	}
-
-	ocmEndpoint, err := getOCMEndpoint(providerInfoResp.GetProviderInfo())
-	if err != nil {
-		return &ocm.RemoveOCMShareResponse{
-			Status: status.NewInternal(ctx, "the selected provider does not have an OCM endpoint"),
-		}, nil
-	}
-	newShareReq := &payload.NotificationRequest{
-		NotificationType: payload.SHARE_UNSHARED,
-		ResourceType:     "file", // use type "file" for shared files or folders
-		ProviderId:       getShareRes.GetShare().GetId().GetOpaqueId(),
-		Notification: &payload.Notification{
-			Grantee: getShareRes.GetShare().GetGrantee().GetUserId().GetOpaqueId(),
-		},
-	}
-	// https://cs3org.github.io/OCM-API/docs.html?branch=develop&repo=OCM-API&user=cs3org#/paths/~1notifications/post
-	err = s.client.NotifyRemote(ctx, ocmEndpoint, newShareReq)
-	if err != nil {
-		// Continue even if the notification fails
+		// Continue even if the notification fails. The share has been removed locally.
 		appctx.GetLogger(ctx).Err(err).Msg("error notifying ocm remote provider")
 	}
 
@@ -526,7 +485,20 @@ func (s *service) UpdateOCMShare(ctx context.Context, req *ocm.UpdateOCMShareReq
 			Status: status.NewOK(ctx),
 		}, nil
 	}
-	_, err := s.repo.UpdateShare(ctx, user, req.Ref, req.Field...)
+
+	getShareRes, err := s.GetOCMShare(ctx, &ocm.GetOCMShareRequest{Ref: req.Ref})
+	if err != nil {
+		return &ocm.UpdateOCMShareResponse{
+			Status: status.NewInternal(ctx, "error getting ocm share"),
+		}, nil
+	}
+	if getShareRes.Status.Code != rpc.Code_CODE_OK {
+		return &ocm.UpdateOCMShareResponse{
+			Status: getShareRes.GetStatus(),
+		}, nil
+	}
+
+	uShare, err := s.repo.UpdateShare(ctx, user, req.Ref, req.Field...)
 	if err != nil {
 		if errors.Is(err, share.ErrShareNotFound) {
 			return &ocm.UpdateOCMShareResponse{
@@ -538,10 +510,25 @@ func (s *service) UpdateOCMShare(ctx context.Context, req *ocm.UpdateOCMShareReq
 		}, nil
 	}
 
-	res := &ocm.UpdateOCMShareResponse{
-		Status: status.NewOK(ctx),
+	err = s.notify(ctx, client.SHARE_CHANGE_PERMISSION, uShare)
+	if err != nil {
+		// Disallow update if the remoter provider could not be notified to avoid inconsistencies
+		// between the local and remote shares. User still can delete the share.
+		err = fmt.Errorf("error notifying ocm remote provider: %w", err)
+		appctx.GetLogger(ctx).Err(err).Send()
+
+		// Revert the share changes.
+		if _, err := s.repo.StoreShare(ctx, getShareRes.GetShare()); err != nil {
+			appctx.GetLogger(ctx).Err(err).Msg("error reverting ocm share changes")
+		}
+		return &ocm.UpdateOCMShareResponse{
+			Status: status.NewInternal(ctx, err.Error()),
+		}, nil
 	}
-	return res, nil
+
+	return &ocm.UpdateOCMShareResponse{
+		Status: status.NewOK(ctx),
+	}, nil
 }
 
 func (s *service) ListReceivedOCMShares(ctx context.Context, req *ocm.ListReceivedOCMSharesRequest) (*ocm.ListReceivedOCMSharesResponse, error) {
@@ -607,4 +594,49 @@ func (s *service) GetReceivedOCMShare(ctx context.Context, req *ocm.GetReceivedO
 		Share:  ocmshare,
 	}
 	return res, nil
+}
+
+// https://cs3org.github.io/OCM-API/docs.html?branch=develop&repo=OCM-API&user=cs3org#/paths/~1notifications/post
+func (s *service) notify(ctx context.Context, notificationType string, share *ocm.Share) error {
+	gatewayClient, err := s.gatewaySelector.Next()
+	if err != nil {
+		return err
+	}
+	providerInfoResp, err := gatewayClient.GetInfoByDomain(ctx, &ocmprovider.GetInfoByDomainRequest{
+		Domain: share.GetGrantee().GetUserId().GetIdp(),
+	})
+	if err != nil {
+		return err
+	}
+	if providerInfoResp.Status.Code != rpc.Code_CODE_OK {
+		return fmt.Errorf("error getting provider info: %s", providerInfoResp.Status.Message)
+	}
+	ocmEndpoint, err := getOCMEndpoint(providerInfoResp.GetProviderInfo())
+	if err != nil {
+		return err
+	}
+
+	notification := &client.Notification{}
+	switch notificationType {
+	case client.SHARE_UNSHARED:
+		notification.Grantee = share.GetGrantee().GetUserId().GetOpaqueId()
+	case client.SHARE_CHANGE_PERMISSION:
+		notification.Grantee = share.GetGrantee().GetUserId().GetOpaqueId()
+		notification.Protocols = s.getProtocols(ctx, share)
+	default:
+		return fmt.Errorf("unknown notification type: %s", notificationType)
+	}
+
+	newShareReq := &client.NotificationRequest{
+		NotificationType: notificationType,
+		ResourceType:     "file", // use type "file" for shared files or folders
+		ProviderId:       share.GetId().GetOpaqueId(),
+		Notification:     notification,
+	}
+	err = s.client.NotifyRemote(ctx, ocmEndpoint, newShareReq)
+	if err != nil {
+		appctx.GetLogger(ctx).Err(err).Msg("error notifying ocm remote provider")
+		return err
+	}
+	return nil
 }
