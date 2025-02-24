@@ -4,10 +4,12 @@ Feature: ocm notifications
   I want to manage my notification settings
   So that I do not get notified of unimportant events
 
+  Background:
+    Given user "Alice" has been created with default attributes
+
 
   Scenario: federated user disables mail and in-app notification for "Share Received" event
-    Given user "Alice" has been created with default attributes
-    And user "Alice" has uploaded file with content "ocm test" to "textfile.txt"
+    Given user "Alice" has uploaded file with content "ocm test" to "textfile.txt"
     And "Alice" has created the federation share invitation
     And using server "REMOTE"
     And user "Brian" has been created with default attributes
@@ -100,3 +102,20 @@ Feature: ocm notifications
     Then the HTTP status code should be "200"
     And the notifications should be empty
     And user "Brian" should have "0" emails
+
+  @issue-10059
+  Scenario: federated user gets an email notification if their email was specified when creating the federation share invitation
+    Given using server "REMOTE"
+    And user "David" has been created with default attributes
+    And using server "LOCAL"
+    When "Alice" has created the federation share invitation with email "david@example.org" and description "a share invitation from Alice"
+    And user "David" should have received the following email from user "Alice" ignoring whitespaces
+      """
+      Hi,
+
+      Alice Hansen (alice@example.org) wants to start sharing collaboration resources with you.
+
+      Please visit your federation settings and use the following details:
+        Token: %fed_invitation_token%
+        ProviderDomain: %local_base_url%
+      """

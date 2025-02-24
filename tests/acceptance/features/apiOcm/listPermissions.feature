@@ -1,4 +1,4 @@
-@ocm @notification @issue-9898
+@ocm @issue-9898
 Feature: List a federated sharing permissions
   As a user
   I want to list the permissions for federated share
