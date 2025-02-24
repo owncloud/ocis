@@ -629,12 +629,15 @@ func (m *mgr) UpdateReceivedShare(ctx context.Context, user *userpb.User, share 
 		switch mask {
 		case "state":
 			rs.State = share.State
-			m.model.ReceivedShares[share.Id.OpaqueId].State = share.State
+			m.model.ReceivedShares[rs.Id.OpaqueId].State = share.State
+		case "protocols":
+			m.model.ReceivedShares[rs.Id.OpaqueId].Protocols = share.Protocols
 		// TODO case "mount_point":
 		default:
 			return nil, errtypes.NotSupported("updating " + mask + " is not supported")
 		}
 	}
+	m.model.ReceivedShares[rs.Id.OpaqueId].Mtime = &typespb.Timestamp{Seconds: uint64(time.Now().Second())}
 
 	if err := m.save(); err != nil {
 		return nil, errors.Wrap(err, "error saving model")

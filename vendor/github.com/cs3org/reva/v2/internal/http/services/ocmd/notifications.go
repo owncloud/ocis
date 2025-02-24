@@ -30,10 +30,14 @@ import (
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/appctx"
-	"github.com/cs3org/reva/v2/pkg/ocm/payload"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/go-chi/render"
+)
+
+const (
+	SHARE_UNSHARED          = "SHARE_UNSHARED"
+	SHARE_CHANGE_PERMISSION = "SHARE_CHANGE_PERMISSION"
 )
 
 // var validate = validator.New()
@@ -52,13 +56,44 @@ func (h *notifHandler) init(c *config) error {
 	return nil
 }
 
+// https://cs3org.github.io/OCM-API/docs.html?branch=develop&repo=OCM-API&user=cs3org#/paths/~1notifications/post
+type notificationRequest struct {
+	NotificationType string `json:"notificationType" validate:"required"`
+	ResourceType     string `json:"resourceType" validate:"required"`
+	// Identifier to identify the shared resource at the provider side. This is unique per provider such that if the same resource is shared twice, this providerId will not be repeated.
+	ProviderId string `json:"providerId" validate:"required"`
+	// Optional additional parameters, depending on the notification and the resource type.
+	Notification *notification `json:"notification,omitempty"`
+}
+
+type notification struct {
+	Owner        string    `json:"owner,omitempty"`
+	Grantee      string    `json:"grantee,omitempty"`
+	SharedSecret string    `json:"sharedSecret,omitempty"`
+	Expiration   uint64    `json:"expiration,omitempty"`
+	Protocols    Protocols `json:"protocol,omitempty" validate:"required"`
+}
+
+// ErrorMessageResponse is the response returned by the OCM API in case of an error.
+// https://cs3org.github.io/OCM-API/docs.html?branch=develop&repo=OCM-API&user=cs3org#/paths/~1notifications/post
+type ErrorMessageResponse struct {
+	Message          string             `json:"message"`
+	ValidationErrors []*ValidationError `json:"validationErrors,omitempty"`
+}
+
+// ValidationError is the payload for the validationErrors field in the ErrorMessageResponse.
+type ValidationError struct {
+	Name    string `json:"name"`
+	Message string `json:"message"`
+}
+
 // Notifications dispatches any notifications received from remote OCM sites
 // according to the specifications at:
 // https://cs3org.github.io/OCM-API/docs.html?branch=v1.1.0&repo=OCM-API&user=cs3org#/paths/~1notifications/post
 func (h *notifHandler) Notifications(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	log := appctx.GetLogger(ctx)
-	req, err := getNotification(w, r)
+	req, err := getNotification(r)
 	if err != nil {
 		renderErrorBadRequest(w, r, http.StatusBadRequest, err.Error())
 		return
@@ -68,20 +103,22 @@ func (h *notifHandler) Notifications(w http.ResponseWriter, r *http.Request) {
 	log.Debug().Msgf("Received OCM notification: %+v", req)
 
 	var status *rpc.Status
+	if req.Notification.Grantee == "" {
+		renderErrorBadRequest(w, r, http.StatusBadRequest, "grantee is required")
+	}
 	switch req.NotificationType {
-	case payload.SHARE_UNSHARED:
-		if req.Notification.Grantee == "" {
-			renderErrorBadRequest(w, r, http.StatusBadRequest, "grantee is required")
-		}
+	case SHARE_UNSHARED:
 		status, err = h.handleShareUnshared(ctx, req)
 		if err != nil {
-			log.Err(err).Any("NotificationRequest", req).Msg("error getting gateway client")
+			log.Err(err).Any("notificationRequest", req).Msg("error getting gateway client")
 			renderErrorBadRequest(w, r, http.StatusInternalServerError, status.GetMessage())
 		}
-	case payload.SHARE_CHANGE_PERMISSION:
-		// TODO implement the SHARE_CHANGE_PERMISSION
-		w.WriteHeader(http.StatusNotImplemented)
-		return
+	case SHARE_CHANGE_PERMISSION:
+		status, err = h.handleShareChangePermission(ctx, req)
+		if err != nil {
+			log.Err(err).Any("notificationRequest", req).Msg("error getting gateway client")
+			renderErrorBadRequest(w, r, http.StatusInternalServerError, status.GetMessage())
+		}
 	default:
 		renderErrorBadRequest(w, r, http.StatusBadRequest, "NotificationType "+req.NotificationType+" is not supported")
 		return
@@ -106,7 +143,7 @@ func (h *notifHandler) Notifications(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (h *notifHandler) handleShareUnshared(ctx context.Context, req *payload.NotificationRequest) (*rpc.Status, error) {
+func (h *notifHandler) handleShareUnshared(ctx context.Context, req *notificationRequest) (*rpc.Status, error) {
 	gatewayClient, err := h.gatewaySelector.Next()
 	if err != nil {
 		return nil, fmt.Errorf("error getting gateway client: %w", err)
@@ -125,10 +162,34 @@ func (h *notifHandler) handleShareUnshared(ctx context.Context, req *payload.Not
 	return res.GetStatus(), nil
 }
 
-func getNotification(w http.ResponseWriter, r *http.Request) (*payload.NotificationRequest, error) {
+func (h *notifHandler) handleShareChangePermission(ctx context.Context, req *notificationRequest) (*rpc.Status, error) {
+	gatewayClient, err := h.gatewaySelector.Next()
+	if err != nil {
+		return nil, fmt.Errorf("error getting gateway client: %w", err)
+	}
+
+	if req.Notification == nil || req.Notification.Protocols == nil {
+		return nil, fmt.Errorf("error getting protocols from notification")
+	}
+
+	o := &typesv1beta1.Opaque{}
+	utils.AppendPlainToOpaque(o, "grantee", req.Notification.Grantee)
+
+	res, err := gatewayClient.UpdateOCMCoreShare(ctx, &ocmcore.UpdateOCMCoreShareRequest{
+		OcmShareId: req.ProviderId,
+		Protocols:  getProtocols(req.Notification.Protocols),
+		Opaque:     o,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("error calling DeleteOCMCoreShare: %w", err)
+	}
+	return res.GetStatus(), nil
+}
+
+func getNotification(r *http.Request) (*notificationRequest, error) {
 	contentType, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
 	if err == nil && contentType == "application/json" {
-		n := &payload.NotificationRequest{}
+		n := &notificationRequest{}
 		err := json.NewDecoder(r.Body).Decode(&n)
 		if err != nil {
 			return nil, err
@@ -144,11 +205,11 @@ func renderJSON(w http.ResponseWriter, r *http.Request, statusCode int, resp any
 }
 
 func renderErrorBadRequest(w http.ResponseWriter, r *http.Request, statusCode int, message string) {
-	resp := &payload.ErrorMessageResponse{
+	resp := &ErrorMessageResponse{
 		Message: "BAD_REQUEST",
-		ValidationErrors: []*payload.ValidationError{
+		ValidationErrors: []*ValidationError{
 			{
-				Name:    "Notification",
+				Name:    "notification",
 				Message: message,
 			},
 		},

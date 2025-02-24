@@ -39,6 +39,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/utils/cfg"
 	"github.com/rs/zerolog"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/fieldmaskpb"
 )
 
 func init() {
@@ -148,7 +149,34 @@ func (s *service) CreateOCMCoreShare(ctx context.Context, req *ocmcore.CreateOCM
 }
 
 func (s *service) UpdateOCMCoreShare(ctx context.Context, req *ocmcore.UpdateOCMCoreShareRequest) (*ocmcore.UpdateOCMCoreShareResponse, error) {
-	return nil, errtypes.NotSupported("not implemented")
+	grantee := utils.ReadPlainFromOpaque(req.GetOpaque(), "grantee")
+	if grantee == "" {
+		return nil, errtypes.UserRequired("missing remote user id in a metadata")
+	}
+	if req == nil || len(req.Protocols) == 0 {
+		return nil, errtypes.PreconditionFailed("missing protocols in a request")
+	}
+	fileMask := &fieldmaskpb.FieldMask{Paths: []string{"protocols"}}
+
+	user := &userpb.User{Id: ocmuser.RemoteID(&userpb.UserId{OpaqueId: grantee})}
+	_, err := s.repo.UpdateReceivedShare(ctx, user, &ocm.ReceivedShare{
+		Id: &ocm.ShareId{
+			OpaqueId: req.GetOcmShareId(),
+		},
+		Protocols: req.Protocols,
+	}, fileMask)
+	res := &ocmcore.UpdateOCMCoreShareResponse{}
+	if err == nil {
+		res.Status = status.NewOK(ctx)
+	} else {
+		var notFound errtypes.NotFound
+		if errors.As(err, &notFound) {
+			res.Status = status.NewNotFound(ctx, "remote ocm share not found")
+		} else {
+			res.Status = status.NewInternal(ctx, "error deleting remote ocm share")
+		}
+	}
+	return res, nil
 }
 
 func (s *service) DeleteOCMCoreShare(ctx context.Context, req *ocmcore.DeleteOCMCoreShareRequest) (*ocmcore.DeleteOCMCoreShareResponse, error) {
