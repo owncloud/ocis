@@ -358,7 +358,7 @@ ocis/bin/ocis init --insecure true
 PROXY_ENABLE_BASIC_AUTH=true \
 OCIS_ADD_RUN_SERVICES=notifications \
 NOTIFICATIONS_SMTP_HOST=localhost \
-NOTIFICATIONS_SMTP_PORT=2500 \
+NOTIFICATIONS_SMTP_PORT=1025 \
 NOTIFICATIONS_SMTP_INSECURE=true \
 NOTIFICATIONS_SMTP_SENDER="owncloud <noreply@example.com>" \
 ocis/bin/ocis server
