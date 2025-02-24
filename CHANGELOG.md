@@ -71,6 +71,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Update Web to v1.11.3: [#10977](https://github.com/owncloud/ocis/pull/10977)
 * Enhancement - Add the ocm notification handler: [#11005](https://github.com/owncloud/ocis/pull/11005)
 * Enhancement - Add logging when a users space gets deleted: [#11037](https://github.com/owncloud/ocis/pull/11037)
+* Enhancement - Add the ocm notification ShareChangePermission: [#11041](https://github.com/owncloud/ocis/pull/11041)
 
 ## Details
 
@@ -117,6 +118,13 @@ The following sections list the changes for unreleased.
    logs.
 
    https://github.com/owncloud/ocis/pull/11037
+
+* Enhancement - Add the ocm notification ShareChangePermission: [#11041](https://github.com/owncloud/ocis/pull/11041)
+
+   Added the ocm notification ShareChangePermission that allows to synchronize the
+   permissions of a share between the federated instances.
+
+   https://github.com/owncloud/ocis/pull/11041
 
 # Changelog for [7.1.0-rc.4] (2025-02-04)
 
