@@ -250,7 +250,7 @@ class SpacesContext implements Context {
 				}
 			}
 			foreach ($spaces as $space) {
-				if ($space->name === $spaceName) {
+				if ($space->name === $spaceName && !isset($space->root->deleted)) {
 					$found = true;
 					$foundSpace = $space;
 					if ($space->driveType === "project") {
