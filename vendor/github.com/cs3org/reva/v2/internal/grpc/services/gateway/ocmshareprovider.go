@@ -56,6 +56,9 @@ func (s *svc) CreateOCMShare(ctx context.Context, req *ocm.CreateOCMShareRequest
 	if err != nil {
 		return nil, errors.Wrap(err, "gateway: error calling CreateOCMShare")
 	}
+	if res.GetStatus().GetCode() != rpc.Code_CODE_OK {
+		return res, nil
+	}
 
 	// add a grant to the storage provider so the share can efficiently be listed
 	// the grant does not grant any permissions. access is granted by the OCM link token
