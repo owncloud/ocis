@@ -15,7 +15,7 @@ services:
       RUN_PART: $RUN_PART
       # email
       EMAIL_HOST: email
-      EMAIL_PORT: 9000
+      EMAIL_PORT: 8025
     env_file:
       - ../../../../.drone.env
     volumes:
