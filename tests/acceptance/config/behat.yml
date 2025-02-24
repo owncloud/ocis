@@ -191,6 +191,7 @@ default:
       context: *common_ldap_suite_context
       contexts:
         - NotificationContext:
+        - EmailContext:
         - FeatureContext: *common_feature_context_params
         - SpacesContext:
         - OCSContext:
@@ -361,6 +362,7 @@ default:
         - SettingsContext:
         - SharingNgContext:
         - NotificationContext:
+        - EmailContext:
         - OcisConfigContext:
 
     apiSharingNgShareInvitation:
@@ -406,6 +408,7 @@ default:
         - SpacesContext:
         - OcisConfigContext:
         - NotificationContext:
+        - EmailContext:
         - SettingsContext:
         - SpacesTUSContext:
 

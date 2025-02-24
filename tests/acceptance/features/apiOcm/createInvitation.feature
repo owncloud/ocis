@@ -81,7 +81,7 @@ Feature: create invitation
     Given using server "REMOTE"
     And user "David" has been created with default attributes
     And using server "LOCAL"
-    When "Alice" has created the federation share invitation with email "david@example.com" and description "a share invitation from Alice"
+    When "Alice" has created the federation share invitation with email "david@example.org" and description "a share invitation from Alice"
     And user "David" should have received the following email from user "Alice" ignoring whitespaces
       """
       Hi,

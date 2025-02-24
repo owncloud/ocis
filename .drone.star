@@ -12,7 +12,7 @@ ALPINE_GIT = "alpine/git:latest"
 APACHE_TIKA = "apache/tika:2.8.0.0"
 CHKO_DOCKER_PUSHRM = "chko/docker-pushrm:1"
 COLLABORA_CODE = "collabora/code:24.04.5.1.1"
-INBUCKET_INBUCKET = "inbucket/inbucket"
+AXLLENT_MAILPIT = "axllent/mailpit:v1.22.3"
 MINIO_MC = "minio/mc:RELEASE.2021-10-07T04-19-58Z"
 OC_CI_ALPINE = "owncloudci/alpine:latest"
 OC_CI_BAZEL_BUILDIFIER = "owncloudci/bazel-buildifier:latest"
@@ -66,6 +66,12 @@ FED_OCIS_SERVER_NAME = "federation-ocis-server"
 OCIS_FED_URL = "https://%s:10200" % FED_OCIS_SERVER_NAME
 OCIS_FED_DOMAIN = "%s:10200" % FED_OCIS_SERVER_NAME
 
+# emails
+EMAIL_PORT = "8025"
+EMAIL_SMTP_PORT = "1025"
+EMAIL_SMTP_HOST = "email"
+EMAIL_SMTP_SENDER = "ownCloud <noreply@example.com>"
+
 # configuration
 config = {
     "cs3ApiTests": {
@@ -99,15 +105,15 @@ config = {
             "withRemotePhp": [True],
             "emailNeeded": True,
             "extraEnvironment": {
-                "EMAIL_HOST": "email",
-                "EMAIL_PORT": "9000",
+                "EMAIL_HOST": EMAIL_SMTP_HOST,
+                "EMAIL_PORT": EMAIL_PORT,
             },
             "extraServerEnvironment": {
                 "OCIS_ADD_RUN_SERVICES": "notifications",
-                "NOTIFICATIONS_SMTP_HOST": "email",
-                "NOTIFICATIONS_SMTP_PORT": "2500",
+                "NOTIFICATIONS_SMTP_HOST": EMAIL_SMTP_HOST,
+                "NOTIFICATIONS_SMTP_PORT": EMAIL_SMTP_PORT,
                 "NOTIFICATIONS_SMTP_INSECURE": "true",
-                "NOTIFICATIONS_SMTP_SENDER": "ownCloud <noreply@example.com>",
+                "NOTIFICATIONS_SMTP_SENDER": EMAIL_SMTP_SENDER,
                 "NOTIFICATIONS_DEBUG_ADDR": "0.0.0.0:9174",
             },
         },
@@ -192,15 +198,15 @@ config = {
             "withRemotePhp": [True],
             "emailNeeded": True,
             "extraEnvironment": {
-                "EMAIL_HOST": "email",
-                "EMAIL_PORT": "9000",
+                "EMAIL_HOST": EMAIL_SMTP_HOST,
+                "EMAIL_PORT": EMAIL_PORT,
             },
             "extraServerEnvironment": {
                 "OCIS_ADD_RUN_SERVICES": "notifications",
-                "NOTIFICATIONS_SMTP_HOST": "email",
-                "NOTIFICATIONS_SMTP_PORT": "2500",
+                "NOTIFICATIONS_SMTP_HOST": EMAIL_SMTP_HOST,
+                "NOTIFICATIONS_SMTP_PORT": EMAIL_SMTP_PORT,
                 "NOTIFICATIONS_SMTP_INSECURE": "true",
-                "NOTIFICATIONS_SMTP_SENDER": "ownCloud <noreply@example.com>",
+                "NOTIFICATIONS_SMTP_SENDER": EMAIL_SMTP_SENDER,
                 "NOTIFICATIONS_DEBUG_ADDR": "0.0.0.0:9174",
             },
         },
@@ -235,8 +241,8 @@ config = {
             "federationServer": True,
             "emailNeeded": True,
             "extraEnvironment": {
-                "EMAIL_HOST": "email",
-                "EMAIL_PORT": "9000",
+                "EMAIL_HOST": EMAIL_SMTP_HOST,
+                "EMAIL_PORT": EMAIL_PORT,
             },
             "extraServerEnvironment": {
                 "OCIS_ADD_RUN_SERVICES": "ocm,notifications",
@@ -246,10 +252,10 @@ config = {
                 "OCM_OCM_STORAGE_PROVIDER_INSECURE": True,
                 "OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE": "%s" % dirs["ocmProviders"],
                 # mail notifications
-                "NOTIFICATIONS_SMTP_HOST": "email",
-                "NOTIFICATIONS_SMTP_PORT": "2500",
+                "NOTIFICATIONS_SMTP_HOST": EMAIL_SMTP_HOST,
+                "NOTIFICATIONS_SMTP_PORT": EMAIL_SMTP_PORT,
                 "NOTIFICATIONS_SMTP_INSECURE": "true",
-                "NOTIFICATIONS_SMTP_SENDER": "ownCloud <noreply@example.com>",
+                "NOTIFICATIONS_SMTP_SENDER": EMAIL_SMTP_SENDER,
             },
         },
         "wopi": {
@@ -3133,8 +3139,8 @@ def restoreWebPnpmCache():
 
 def emailService():
     return [{
-        "name": "email",
-        "image": INBUCKET_INBUCKET,
+        "name": EMAIL_SMTP_HOST,
+        "image": AXLLENT_MAILPIT,
     }]
 
 def waitForEmailService():
@@ -3142,7 +3148,7 @@ def waitForEmailService():
         "name": "wait-for-email",
         "image": OC_CI_WAIT_FOR,
         "commands": [
-            "wait-for -it email:9000 -t 600",
+            "wait-for -it email:%s -t 600" % EMAIL_PORT,
         ],
     }]
 
