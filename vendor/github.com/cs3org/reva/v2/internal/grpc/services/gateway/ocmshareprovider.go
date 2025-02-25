@@ -192,6 +192,39 @@ func (s *svc) UpdateOCMShare(ctx context.Context, req *ocm.UpdateOCMShareRequest
 		return nil, errors.Wrap(err, "gateway: error calling UpdateOCMShare")
 	}
 
+	gRes, err := c.GetOCMShare(ctx, &ocm.GetOCMShareRequest{
+		Ref: req.Ref,
+	})
+	if err != nil {
+		return nil, errors.Wrap(err, "gateway: error calling GetOCMShare")
+	}
+	if gRes.GetStatus().GetCode() != rpc.Code_CODE_OK {
+		return &ocm.UpdateOCMShareResponse{
+			Status: gRes.GetStatus(),
+		}, nil
+	}
+
+	creator, ok := ctxpkg.ContextGetUser(ctx)
+	if !ok {
+		return nil, errors.New("gateway: user not found in context")
+	}
+
+	grant := &provider.Grant{
+		Grantee:     gRes.GetShare().GetGrantee(),
+		Permissions: gRes.GetShare().GetAccessMethods()[0].GetWebdavOptions().GetPermissions(),
+		Expiration:  gRes.GetShare().GetExpiration(),
+		Creator:     creator.GetId(),
+	}
+	updateGrantStatus, err := s.updateGrant(ctx, gRes.GetShare().GetResourceId(), grant, nil)
+	if err != nil {
+		return nil, errors.Wrap(err, "gateway: error calling updateGrant")
+	}
+	if updateGrantStatus.GetCode() != rpc.Code_CODE_OK {
+		return &ocm.UpdateOCMShareResponse{
+			Status: updateGrantStatus,
+		}, nil
+	}
+
 	return res, nil
 }
 
