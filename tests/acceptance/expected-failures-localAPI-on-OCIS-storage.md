@@ -339,5 +339,13 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 #### [Delete user containing + in username returns 404 but user gets deleted](https://github.com/owncloud/ocis/issues/11027)
 - [apiGraphUserGroup/deleteUser.feature:28](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/deleteUser.feature#L28)
 
+#### [[OCM] roles id not available on sharedWithMe response when listing shares shared with editor role](https://github.com/owncloud/ocis/issues/11054)
+- [apiOcm/share.feature:1368](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L1368)
+- [apiOcm/share.feature:1369](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L1369)
+- [apiOcm/share.feature:1370](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L1370)
+- [apiOcm/share.feature:1371](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L1371)
+- [apiOcm/share.feature:1560](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L1560)
+- [apiOcm/share.feature:1561](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L1561)
+
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.
