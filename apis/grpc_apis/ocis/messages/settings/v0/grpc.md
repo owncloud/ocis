@@ -1,7 +1,7 @@
 ---
 title: "ocis.messages.settings.v0"
 url: /apis/grpc_apis/ocis_messages_settings_v0
-date: 2025-02-25T11:32:05Z
+date: 2025-02-25T14:21:45Z
 weight: 50
 geekdocRepo: https://github.com/owncloud/ocis
 ---
