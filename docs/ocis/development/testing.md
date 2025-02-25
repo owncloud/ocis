@@ -74,6 +74,7 @@ To run the tests that require an email server (tests tagged with `@email`), you 
 
 ```bash
 START_EMAIL=true \
+OCIS_ADD_RUN_SERVICES=notifications \
 BEHAT_FEATURE='tests/acceptance/features/apiNotification/emailNotification.feature' \
 make -C tests/acceptance/docker test-ocis-feature-ocis-storage
 ```

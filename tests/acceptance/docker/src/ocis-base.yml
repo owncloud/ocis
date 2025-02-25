@@ -32,7 +32,7 @@ services:
       STORAGE_USERS_S3NG_BUCKET: test
       # email
       NOTIFICATIONS_SMTP_HOST: email
-      NOTIFICATIONS_SMTP_PORT: 2500
+      NOTIFICATIONS_SMTP_PORT: 1025
       NOTIFICATIONS_SMTP_INSECURE: "true"
       NOTIFICATIONS_SMTP_SENDER: "owncloud <noreply@example.com>"
 
