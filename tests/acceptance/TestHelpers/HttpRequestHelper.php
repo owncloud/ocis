@@ -55,7 +55,7 @@ class HttpRequestHelper {
 	 *
 	 * @return int
 	 */
-	public static function numRetriesOnHttpTooEarly(): int {
+	public static function maxHTTPRequestRetries(): int {
 		// Currently reva and oCIS may return HTTP_TOO_EARLY
 		// So try up to 10 times before giving up.
 		return 10;
@@ -203,7 +203,7 @@ class HttpRequestHelper {
 			$debugResponses = false;
 		}
 
-		$sendRetryLimit = self::numRetriesOnHttpTooEarly();
+		$sendRetryLimit = self::maxHTTPRequestRetries();
 		$sendCount = 0;
 		$sendExceptionHappened = false;
 		do {
