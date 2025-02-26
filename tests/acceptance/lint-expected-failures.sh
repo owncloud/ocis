@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 log_error() {
-	if [ -n "${PLAIN_OUTPUT}" ]
+	if [ -n "${PLAIN_OUTPUT}" ] && [ "${PLAIN_OUTPUT}" == "true" ]
 	then
 		echo -e "$1"
 	else
@@ -10,7 +10,7 @@ log_error() {
 }
 
 log_info() {
-	if [ -n "${PLAIN_OUTPUT}" ]
+	if [ -n "${PLAIN_OUTPUT}" ] && [ "${PLAIN_OUTPUT}" == "true" ]
 	then
 		echo -e "$1"
 	else
@@ -19,7 +19,7 @@ log_info() {
 }
 
 log_success() {
-	if [ -n "${PLAIN_OUTPUT}" ]
+	if [ -n "${PLAIN_OUTPUT}" ] && [ "${PLAIN_OUTPUT}" == "true" ]
 	then
 		echo -e "$1"
 	else

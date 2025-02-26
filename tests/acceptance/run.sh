@@ -17,17 +17,17 @@ else
 fi
 BEHAT_TAGS_OPTION_FOUND=false
 
-if [ -n "${STEP_THROUGH}" ]
+if [ -n "${STEP_THROUGH}" ] && [ "${STEP_THROUGH}" == "true" ]
 then
 	STEP_THROUGH_OPTION="--step-through"
 fi
 
-if [ -n "${STOP_ON_FAILURE}" ]
+if [ -n "${STOP_ON_FAILURE}" ] && [ "${STOP_ON_FAILURE}" == "true" ]
 then
 	STOP_OPTION="--stop-on-failure"
 fi
 
-if [ -n "${PLAIN_OUTPUT}" ]
+if [ -n "${PLAIN_OUTPUT}" ] && [ "${PLAIN_OUTPUT}" == "true" ]
 then
 	# explicitly tell Behat to not do colored output
 	COLORS_OPTION="--no-colors"
@@ -670,6 +670,7 @@ fi
 
 # # If we are running in drone CI, then sleep for a bit to (hopefully) let the
 # # drone agent send all the output to the drone server.
+# NOTE: Not using this anymore, please enable it if needed
 # if [ -n "${CI_REPO}" ]
 # then
 # 	echo "sleeping for 30 seconds at end of test run"
