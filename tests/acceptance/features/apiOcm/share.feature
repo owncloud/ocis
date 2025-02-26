@@ -1012,7 +1012,11 @@ Feature: an user shares resources using ScienceMesh application
                           "maxItems": 1,
                           "items": {
                             "type": "object",
-                            "required": ["@libre.graph.permissions.actions"]
+                            "properties": {
+                              "@libre.graph.permissions.actions": {
+                                "type": "null"
+                              }
+                            }
                           }
                         }
                       }
