@@ -597,7 +597,7 @@ Feature: Notification Settings
       | Alice Hansen added you to Space new-space |
     But user "Brian" should not have a notification related to space "new-space" with subject "Space disabled"
 
-  @issue-10864
+  @issue-10864 @email
   Scenario: disable email notification for user light
     Given the administrator has assigned the role "User Light" to user "Brian" using the Graph API
     When user "Brian" disables email notification using the settings API
@@ -745,7 +745,7 @@ Feature: Notification Settings
     And the notifications should be empty
     And user "Brian" should have "0" emails
 
-
+  @email
   Scenario: no email should be received when email sending interval is set to never
     When user "Brian" sets the email sending interval to "never" using the settings API
     Then the HTTP status code should be "201"

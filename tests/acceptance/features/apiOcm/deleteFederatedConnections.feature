@@ -1,4 +1,4 @@
-@ocm @notification
+@ocm
 Feature: delete federated connections
   As a user
   I want to delete federated connections if they are no longer needed
