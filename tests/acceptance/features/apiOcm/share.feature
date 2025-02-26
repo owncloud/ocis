@@ -1065,8 +1065,8 @@ Feature: an user shares resources using ScienceMesh application
       }
       """
 
-  @issue-9926
-  Scenario: federated user tries to update a shared file after local user updates role
+  @issue-9926 @issue-11022
+  Scenario: federated user updates a shared file after sharer has updated the role
     Given using server "LOCAL"
     And user "Alice" has uploaded file with content "ocm test" to "/textfile.txt"
     And user "Alice" has sent the following resource share invitation to federated user:
