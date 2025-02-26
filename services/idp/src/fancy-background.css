@@ -1,0 +1,17 @@
+/* not so fancy background */
+
+#bg {
+  background-color: white;
+}
+
+#bg > div {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-image: url(./images/background.jpg);
+  z-index: 0;
+}

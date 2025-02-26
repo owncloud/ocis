@@ -1,0 +1,8 @@
+services:
+  start_email:
+    image: dadarek/wait-for-dependencies
+    depends_on:
+      - email
+    command: email:8025
+  email:
+    image: axllent/mailpit:v1.22.3

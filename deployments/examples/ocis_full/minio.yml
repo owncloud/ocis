@@ -1,0 +1,32 @@
+---
+services:
+  minio:
+    image: minio/minio:latest
+    # release notes: https://github.com/minio/minio/releases
+    networks:
+      ocis-net:
+    entrypoint:
+      - /bin/sh
+    command:
+      [
+        "-c",
+        "mkdir -p /data/${S3NG_BUCKET:-ocis-bucket} && minio server --console-address ':9001' /data",
+      ]
+    volumes:
+      - minio-data:/data
+    environment:
+      MINIO_ACCESS_KEY: ${S3NG_ACCESS_KEY:-ocis}
+      MINIO_SECRET_KEY: ${S3NG_SECRET_KEY:-ocis-secret-key}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.minio.entrypoints=https"
+      - "traefik.http.routers.minio.rule=Host(`${MINIO_DOMAIN:-minio.owncloud.test}`)"
+      - "traefik.http.routers.minio.tls.certresolver=http"
+      - "traefik.http.routers.minio.service=minio"
+      - "traefik.http.services.minio.loadbalancer.server.port=9001"
+    logging:
+      driver: ${LOG_DRIVER:-local}
+    restart: always
+
+volumes:
+  minio-data:

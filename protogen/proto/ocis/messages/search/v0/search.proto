@@ -1,0 +1,89 @@
+syntax = "proto3";
+
+package ocis.messages.search.v0;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0";
+
+message ResourceID {
+	string storage_id = 1;
+	string opaque_id = 2;
+	string space_id = 3;
+}
+
+message Reference {
+	ResourceID resource_id = 1;
+	string path = 2;
+}
+
+message Audio {
+	optional string album = 1;
+	optional string albumArtist = 2;
+	optional string artist = 3;
+	optional int64 bitrate = 4;
+	optional string composers = 5;
+	optional string copyright = 6;
+	optional int32 disc = 7;
+	optional int32 discCount = 8;
+	optional int64 duration = 9;
+	optional string genre = 10;
+	optional bool hasDrm = 11;
+	optional bool isVariableBitrate = 12;
+	optional string title = 13;
+	optional int32 track = 14;
+	optional int32 trackCount = 15;
+	optional int32 year = 16;
+}
+
+message Image {
+	optional int32 width = 1;
+	optional int32 height = 2;
+}
+
+message GeoCoordinates {
+  optional double altitude  = 1;
+  optional double latitude = 2;
+  optional double longitude = 3;
+}
+
+message Photo {
+	optional string cameraMake = 1;
+	optional string cameraModel = 2;
+	optional float exposureDenominator = 3;
+	optional float exposureNumerator = 4;
+	optional float fNumber = 5;
+	optional float focalLength = 6;
+	optional int32 iso = 7;
+	optional int32 orientation = 8;
+	optional google.protobuf.Timestamp takenDateTime = 9;
+}
+
+message Entity {
+	Reference ref = 1;
+	ResourceID id = 2;
+	string name = 3;
+	string etag = 4;
+	uint64 size = 5;
+	google.protobuf.Timestamp last_modified_time = 6;
+	string mime_type = 7;
+	string permissions = 8;
+	uint64 type = 9;
+	bool deleted = 10;
+	string shareRootName = 11;
+	ResourceID parent_id = 12;
+	repeated string tags = 13;
+	string highlights = 14;
+	Audio audio = 15;
+	GeoCoordinates location = 16;
+	ResourceID remote_item_id = 17;
+	Image image = 18;
+	Photo photo = 19;
+}
+
+message Match {
+	// the matched entity
+	Entity entity = 1;
+	// the match score
+	float score = 2;
+}

@@ -1,0 +1,7 @@
+Enhancement: allow to skip service listing
+
+The ocis version cmd listed all services by default. This is not always intended,
+so we allow to skip the listing of the services by using the --skip-services flag.
+
+https://github.com/owncloud/ocis/pull/8408
+https://github.com/owncloud/ocis/issues/8070
