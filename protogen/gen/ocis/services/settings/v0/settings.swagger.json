@@ -923,6 +923,9 @@
           "items": {
             "type": "string"
           }
+        },
+        "locale": {
+          "type": "string"
         }
       }
     },
