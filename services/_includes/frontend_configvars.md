@@ -87,4 +87,3 @@
 | OCIS_PASSWORD_POLICY_MIN_DIGITS<br/>FRONTEND_PASSWORD_POLICY_MIN_DIGITS | int | 1 | Define the minimum number of digits. Defaults to 1 if not set.|
 | OCIS_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS<br/>FRONTEND_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS | int | 1 | Define the minimum number of characters from the special characters list to be present. Defaults to 1 if not set.|
 | OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST<br/>FRONTEND_PASSWORD_POLICY_BANNED_PASSWORDS_LIST | string |  | Path to the 'banned passwords list' file. This only impacts public link password validation. See the documentation for more details.|
-| FRONTEND_CONFIGURABLE_NOTIFICATIONS | bool | false | Allow configuring notifications via web client.|

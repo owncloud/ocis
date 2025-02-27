@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2025-02-27-04-00-21]
+[#deprecation-note-2025-02-27-12-33-24]
 [caption=]
 .Deprecation notes for the storage-users service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -733,7 +733,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++0 ++
 a| [subs=-attributes]
-Part size for concurrent uploads to S3. If no value or 0 is set, the library's default value of 16MB is used. The value range is min 5MB and max 5GB.
+Part size for concurrent uploads to S3.
 
 a|`STORAGE_USERS_S3NG_PERSONAL_SPACE_ALIAS_TEMPLATE` +
 

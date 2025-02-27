@@ -38,10 +38,3 @@
 | OCIS_GRPC_CLIENT_TLS_CACERT | string |  | Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the go-micro based grpc services.|
 | OCIS_SERVICE_ACCOUNT_ID<br/>NOTIFICATIONS_SERVICE_ACCOUNT_ID | string |  | The ID of the service account the service should use. See the 'auth-service' service description for more details.|
 | OCIS_SERVICE_ACCOUNT_SECRET<br/>NOTIFICATIONS_SERVICE_ACCOUNT_SECRET | string |  | The service account secret.|
-| OCIS_PERSISTENT_STORE<br/>NOTIFICATIONS_STORE | string | nats-js-kv | The type of the store. Supported values are: 'memory', 'nats-js-kv', 'redis-sentinel', 'noop'. See the text description for details.|
-| OCIS_PERSISTENT_STORE_NODES<br/>NOTIFICATIONS_STORE_NODES | []string | [127.0.0.1:9233] | A list of nodes to access the configured store. This has no effect when 'memory' store is configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details.|
-| NOTIFICATIONS_STORE_DATABASE | string | notifications | The database name the configured store should use.|
-| NOTIFICATIONS_STORE_TABLE | string |  | The database table the store should use.|
-| OCIS_PERSISTENT_STORE_TTL<br/>NOTIFICATIONS_STORE_TTL | Duration | 336h0m0s | Time to live for notifications in the store. Defaults to '336h' (2 weeks). See the Environment Variable Types description for more details.|
-| OCIS_PERSISTENT_STORE_AUTH_USERNAME<br/>NOTIFICATIONS_STORE_AUTH_USERNAME | string |  | The username to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.|
-| OCIS_PERSISTENT_STORE_AUTH_PASSWORD<br/>NOTIFICATIONS_STORE_AUTH_PASSWORD | string |  | The password to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.|

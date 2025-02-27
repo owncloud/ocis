@@ -18,7 +18,7 @@
 | Disables versioning of files. When set to true, new uploads with the same filename will overwrite existing files instead of creating a new version.
 | false
 
-|
+| xref:deployment/services/env-vars-special-scope.adoc[Special Scope Envvars]
 | OCIS_SHOW_USER_EMAIL_IN_RESULTS
 | Include user email addresses in responses. If absent or set to false emails will be omitted from results. Please note that admin users can always see all email addresses.
 | false

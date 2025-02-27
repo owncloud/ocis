@@ -46,12 +46,3 @@ grpc_client_tls:
 service_account:
   service_account_id: ""
   service_account_secret: ""
-store:
-  store: nats-js-kv
-  nodes:
-  - 127.0.0.1:9233
-  database: notifications
-  table: ""
-  ttl: 336h0m0s
-  username: ""
-  password: ""

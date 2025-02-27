@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2025-02-27-04-00-21]
+[#deprecation-note-2025-02-27-12-33-24]
 [caption=]
 .Deprecation notes for the notifications service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -446,87 +446,5 @@ a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 The service account secret.
-
-a|`OCIS_PERSISTENT_STORE` +
-`NOTIFICATIONS_STORE` +
-
-a| [subs=-attributes]
-++7.1 ++
-a| [subs=-attributes]
-++string ++
-a| [subs=-attributes]
-++nats-js-kv ++
-a| [subs=-attributes]
-The type of the store. Supported values are: 'memory', 'nats-js-kv', 'redis-sentinel', 'noop'. See the text description for details.
-
-a|`OCIS_PERSISTENT_STORE_NODES` +
-`NOTIFICATIONS_STORE_NODES` +
-
-a| [subs=-attributes]
-++7.1 ++
-a| [subs=-attributes]
-++[]string ++
-a| [subs=-attributes]
-++[127.0.0.1:9233] ++
-a| [subs=-attributes]
-A list of nodes to access the configured store. This has no effect when 'memory' store is configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details.
-
-a|`NOTIFICATIONS_STORE_DATABASE` +
-
-a| [subs=-attributes]
-++7.1 ++
-a| [subs=-attributes]
-++string ++
-a| [subs=-attributes]
-++notifications ++
-a| [subs=-attributes]
-The database name the configured store should use.
-
-a|`NOTIFICATIONS_STORE_TABLE` +
-
-a| [subs=-attributes]
-++7.1 ++
-a| [subs=-attributes]
-++string ++
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-The database table the store should use.
-
-a|`OCIS_PERSISTENT_STORE_TTL` +
-`NOTIFICATIONS_STORE_TTL` +
-
-a| [subs=-attributes]
-++7.1 ++
-a| [subs=-attributes]
-++Duration ++
-a| [subs=-attributes]
-++336h0m0s ++
-a| [subs=-attributes]
-Time to live for notifications in the store. Defaults to '336h' (2 weeks). See the Environment Variable Types description for more details.
-
-a|`OCIS_PERSISTENT_STORE_AUTH_USERNAME` +
-`NOTIFICATIONS_STORE_AUTH_USERNAME` +
-
-a| [subs=-attributes]
-++7.1 ++
-a| [subs=-attributes]
-++string ++
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-The username to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.
-
-a|`OCIS_PERSISTENT_STORE_AUTH_PASSWORD` +
-`NOTIFICATIONS_STORE_AUTH_PASSWORD` +
-
-a| [subs=-attributes]
-++7.1 ++
-a| [subs=-attributes]
-++string ++
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-The password to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.
 |===
 

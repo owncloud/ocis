@@ -70,4 +70,3 @@ set_default_assignments: false
 service_account_ids:
 - service-user-id
 default_language: ""
-translation_path: ""
