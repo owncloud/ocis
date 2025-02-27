@@ -1,11 +1,8 @@
 # Table of Contents
 
-* [Changelog for 7.0.0-rc.5](#changelog-for-700-rc5-2024-12-16)
-* [Changelog for 7.0.0-rc.4](#changelog-for-700-rc4-2024-12-09)
-* [Changelog for 7.0.0-rc.3](#changelog-for-700-rc3-2024-11-21)
+* [Changelog for 7.0.1](#changelog-for-701-2025-02-07)
+* [Changelog for 7.0.0](#changelog-for-700-2024-12-17)
 * [Changelog for 5.0.9](#changelog-for-509-2024-11-14)
-* [Changelog for 7.0.0-rc.2](#changelog-for-700-rc2-2024-11-12)
-* [Changelog for 7.0.0-rc.1](#changelog-for-700-rc1-2024-11-07)
 * [Changelog for 6.6.1](#changelog-for-661-2024-10-24)
 * [Changelog for 6.6.0](#changelog-for-660-2024-10-21)
 * [Changelog for 6.5.0](#changelog-for-650-2024-10-01)
@@ -56,179 +53,52 @@
 * [Changelog for 1.1.0](#changelog-for-110-2021-01-22)
 * [Changelog for 1.0.0](#changelog-for-100-2020-12-17)
 
-# Changelog for [7.0.0-rc.5] (2024-12-16)
+# Changelog for [7.0.1] (2025-02-07)
 
-The following sections list the changes for 7.0.0-rc.5.
+The following sections list the changes for 7.0.1.
 
-[7.0.0-rc.5]: https://github.com/owncloud/ocis/compare/v7.0.0-rc.4...v7.0.0-rc.5
+[7.0.1]: https://github.com/owncloud/ocis/compare/v7.0.0...v7.0.1
 
 ## Summary
 
-* Bugfix - Fix link activity message: [#10663](https://github.com/owncloud/ocis/pull/10663)
-* Bugfix - Fix graph drives response for federated shares: [#10730](https://github.com/owncloud/ocis/pull/10730)
-* Bugfix - GetLastModified property in the REPORT response will use RFC1123 format: [#10738](https://github.com/owncloud/ocis/pull/10738)
-* Bugfix - Unifi logging: [#10743](https://github.com/owncloud/ocis/pull/10743/)
-* Bugfix - Fix FileInfo BreadcrumbFolderURL upd: [#10757](https://github.com/owncloud/ocis/pull/10757)
-* Bugfix - Bump Reva: [#10766](https://github.com/owncloud/ocis/pull/10766)
-* Enhancement - Update web to v11.0.6: [#10755](https://github.com/owncloud/ocis/pull/10755)
+* Enhancement - Update Web to v11.0.7: [#10978](https://github.com/owncloud/ocis/pull/10978)
 
 ## Details
 
-* Bugfix - Fix link activity message: [#10663](https://github.com/owncloud/ocis/pull/10663)
+* Enhancement - Update Web to v11.0.7: [#10978](https://github.com/owncloud/ocis/pull/10978)
 
-   We changed the link token to display name in the activity message.
+   - Bugfix [owncloud/web#12167](https://github.com/owncloud/web/pull/12167):
+   Replace text editor: #12167
 
-   https://github.com/owncloud/ocis/issues/10295
-   https://github.com/owncloud/ocis/pull/10663
+   https://github.com/owncloud/ocis/pull/10978
+   https://github.com/owncloud/web/releases/tag/v11.0.7
 
-* Bugfix - Fix graph drives response for federated shares: [#10730](https://github.com/owncloud/ocis/pull/10730)
+# Changelog for [7.0.0] (2024-12-17)
 
-   Federated shares where erroneously showing up in the /me/drives response on the
-   graph API.
+The following sections list the changes for 7.0.0.
 
-   https://github.com/owncloud/ocis/issues/10689
-   https://github.com/owncloud/ocis/pull/10730
-
-* Bugfix - GetLastModified property in the REPORT response will use RFC1123 format: [#10738](https://github.com/owncloud/ocis/pull/10738)
-
-   This will follow the standard and will also match the format of the same
-   property in the PROPFIND response
-
-   https://github.com/owncloud/ocis/pull/10738
-
-* Bugfix - Unifi logging: [#10743](https://github.com/owncloud/ocis/pull/10743/)
-
-   We fixed some cases where we did not use the correct logger.
-
-   https://github.com/owncloud/ocis/pull/10743/
-
-* Bugfix - Fix FileInfo BreadcrumbFolderURL upd: [#10757](https://github.com/owncloud/ocis/pull/10757)
-
-   Made GetScopeByKeyPrefix function as a private method of the FileConnector
-
-   https://github.com/owncloud/ocis/pull/10757
-
-* Bugfix - Bump Reva: [#10766](https://github.com/owncloud/ocis/pull/10766)
-
-   Bumps reva version to 2.27.0
-
-  *   Bugfix [cs3org/reva#4985](https://github.com/cs3org/reva/pull/4985): Drop unneeded session locks
-  *   Bugfix [cs3org/reva#5000](https://github.com/cs3org/reva/pull/5000): Fix ceph build
-  *   Bugfix [cs3org/reva#4989](https://github.com/cs3org/reva/pull/4989): Deleting OCM share also updates storageprovider
-  *   Enhancement [cs3org/reva#4998](https://github.com/cs3org/reva/pull/4998): Emit event when an ocm share is received
-  *   Enhancement [cs3org/reva#4996](https://github.com/cs3org/reva/pull/4996): Get rid of some cases of unstructured logging
-
-   https://github.com/owncloud/ocis/pull/10766
-
-* Enhancement - Update web to v11.0.6: [#10755](https://github.com/owncloud/ocis/pull/10755)
-
-   Tags: web
-
-   We updated ownCloud Web to v11.0.6. Please refer to the changelog (linked) for
-   details on the web release.
-
-   - Bugfix [owncloud/web#11992](https://github.com/owncloud/web/pull/11992): OCM
-   invite flow - Bugfix
-   [owncloud/web#11997](https://github.com/owncloud/web/pull/11997): Change search
-   scope without search term - Bugfix
-   [owncloud/web#11998](https://github.com/owncloud/web/pull/11998): Do not load
-   version when sidebar is closed - Bugfix
-   [owncloud/web#12000](https://github.com/owncloud/web/pull/12000): Use only space
-   resource with driveType "project" as space in sidebar - Bugfix
-   [owncloud/web#12002](https://github.com/owncloud/web/pull/12002): OCM share
-   editing - Bugfix
-   [owncloud/web#12002](https://github.com/owncloud/web/pull/12002): OCM share
-   recipient issuer - Bugfix
-   [owncloud/web#12008](https://github.com/owncloud/web/pull/12008): Missing
-   activities on Shared with me page - Bugfix
-   [owncloud/web#12010](https://github.com/owncloud/web/pull/12010): Sidebar file
-   info for shares - Bugfix
-   [owncloud/web#12012](https://github.com/owncloud/web/pull/12012): Show missing
-   role name in link share panel - Bugfix
-   [owncloud/web#12013](https://github.com/owncloud/web/pull/12013): Missing
-   translations for share type filters - Bugfix
-   [owncloud/web#12022](https://github.com/owncloud/web/pull/12022): Permanent link
-   for shares
-
-   https://github.com/owncloud/ocis/pull/10755
-   https://github.com/owncloud/web/releases/tag/v11.0.6
-
-# Changelog for [7.0.0-rc.4] (2024-12-09)
-
-The following sections list the changes for 7.0.0-rc.4.
-
-[7.0.0-rc.4]: https://github.com/owncloud/ocis/compare/v7.0.0-rc.3...v7.0.0-rc.4
+[7.0.0]: https://github.com/owncloud/ocis/compare/v5.0.9...v7.0.0
 
 ## Summary
 
-* Bugfix - Fix deny access for graph roles: [#10627](https://github.com/owncloud/ocis/pull/10627)
-* Bugfix - Fix possible race condition when a thumbnails is stored in the FS: [#10693](https://github.com/owncloud/ocis/pull/10693)
-* Bugfix - Skip fetching members: [#10701](https://github.com/owncloud/ocis/pull/10701)
-* Bugfix - Fix FileInfo BreadcrumbFolderURL: [#10718](https://github.com/owncloud/ocis/pull/10718)
-* Bugfix - Bump Reva: [#10735](https://github.com/owncloud/ocis/pull/10735)
-* Enhancement - Fetch shared resource metadata concurrently in graph: [#10683](https://github.com/owncloud/ocis/pull/10683)
-
-## Details
-
-* Bugfix - Fix deny access for graph roles: [#10627](https://github.com/owncloud/ocis/pull/10627)
-
-   We added a unified role "Cannot access" to prevent a regression when switching
-   the share implementation to the graph API. This role is now used to deny access
-   to a resource.The new role is not enabled by default. The whole deny feature is
-   still experimental.
-
-   https://github.com/owncloud/ocis/pull/10627
-
-* Bugfix - Fix possible race condition when a thumbnails is stored in the FS: [#10693](https://github.com/owncloud/ocis/pull/10693)
-
-   A race condition could cause the thumbnail service to return a thumbnail with 0
-   bytes or with partial content. In order to fix this, the service will create a
-   temporary file with the contents and then rename that file to its final
-   location.
-
-   https://github.com/owncloud/ocis/pull/10693
-
-* Bugfix - Skip fetching members: [#10701](https://github.com/owncloud/ocis/pull/10701)
-
-   We now skip fetching group members when they are not needed.
-
-   https://github.com/owncloud/ocis/pull/10701
-
-* Bugfix - Fix FileInfo BreadcrumbFolderURL: [#10718](https://github.com/owncloud/ocis/pull/10718)
-
-   We fixed the FileInfo.BreadcrumbFolderURL in a collaboration api"
-
-   https://github.com/owncloud/ocis/pull/10718
-
-* Bugfix - Bump Reva: [#10735](https://github.com/owncloud/ocis/pull/10735)
-
-   Bumps reva version to 2.26.8
-
-  *   Fix [cs3org/reva#4983](https://github.com/cs3org/reva/pull/4983): Delete stale shares in the jsoncs3 share manager
-  *   Fix [cs3org/reva#4963](https://github.com/cs3org/reva/pull/4963): Fix name and displayName in an ocm
-  *   Fix [cs3org/reva#4968](https://github.com/cs3org/reva/pull/4968): Jsoncs3 cache fixes
-  *   Fix [cs3org/reva#4928](https://github.com/cs3org/reva/pull/4928): Propagate lock in PROPPATCH
-  *   Fix [cs3org/reva#4971](https://github.com/cs3org/reva/pull/4971): Use manager to list shares
-  *   Fix [cs3org/reva#4978](https://github.com/cs3org/reva/pull/4978): We added more trace spans in decomposedfs
-  *   Fix [cs3org/reva#4921](https://github.com/cs3org/reva/pull/4921): Polish propagation related code
-
-   https://github.com/owncloud/ocis/pull/10735
-
-* Enhancement - Fetch shared resource metadata concurrently in graph: [#10683](https://github.com/owncloud/ocis/pull/10683)
-
-   We now concurrently stat shared resources when listing shares
-
-   https://github.com/owncloud/ocis/pull/10683
-
-# Changelog for [7.0.0-rc.3] (2024-11-21)
-
-The following sections list the changes for 7.0.0-rc.3.
-
-[7.0.0-rc.3]: https://github.com/owncloud/ocis/compare/v5.0.9...v7.0.0-rc.3
-
-## Summary
-
+* Bugfix - Generate short tokens to be used as access tokens for WOPI: [#10391](https://github.com/owncloud/ocis/pull/10391)
+* Bugfix - Fix put relative wopi operation for microsoft: [#10403](https://github.com/owncloud/ocis/pull/10403)
+* Bugfix - Make SSE keepalive interval configurable: [#10411](https://github.com/owncloud/ocis/pull/10411)
+* Bugfix - Removed 'OCM_OCM_PROVIDER_AUTHORIZER_VERIFY_REQUEST_HOSTNAME' setting: [#10425](https://github.com/owncloud/ocis/pull/10425)
+* Bugfix - Micro registry cache fixes: [#10429](https://github.com/owncloud/ocis/pull/10429)
+* Bugfix - Fix the memlimit loglevel: [#10433](https://github.com/owncloud/ocis/pull/10433)
 * Bugfix - Log GRPC requests in debug mode: [#10438](https://github.com/owncloud/ocis/pull/10438)
+* Bugfix - Restart Postprocessing properly: [#10439](https://github.com/owncloud/ocis/pull/10439)
+* Bugfix - Allow to configure data server URL for ocm: [#10440](https://github.com/owncloud/ocis/pull/10440)
+* Bugfix - Respect proxy url when validating proofkeys: [#10462](https://github.com/owncloud/ocis/pull/10462)
+* Bugfix - Return wopi lock header in get lock response: [#10470](https://github.com/owncloud/ocis/pull/10470)
+* Bugfix - 'ocis backup consistency' fixed for file revisions: [#10493](https://github.com/owncloud/ocis/pull/10493)
+* Bugfix - Wait for services to be ready before registering them: [#10498](https://github.com/owncloud/ocis/pull/10498)
+* Bugfix - Fix 0-byte file uploads: [#10500](https://github.com/owncloud/ocis/pull/10500)
+* Bugfix - Fixed `sharedWithMe` response for OCM shares: [#10501](https://github.com/owncloud/ocis/pull/10501)
+* Bugfix - Fix gateway nats checks: [#10502](https://github.com/owncloud/ocis/pull/10502)
+* Bugfix - Fix idp guest role default assignment: [#10511](https://github.com/owncloud/ocis/pull/10511)
+* Bugfix - Remove mbreaker: [#10524](https://github.com/owncloud/ocis/pull/10524)
 * Bugfix - Fix impersonated request user mismatch: [#10548](https://github.com/owncloud/ocis/pull/10548)
 * Bugfix - Fix federated sharing when using an external IDP: [#10567](https://github.com/owncloud/ocis/pull/10567)
 * Bugfix - Fix node cache ttl updates: [#10575](https://github.com/owncloud/ocis/pull/10575)
@@ -239,16 +109,161 @@ The following sections list the changes for 7.0.0-rc.3.
 * Bugfix - Return an error if we can't get the keys and ensure they're cached: [#10590](https://github.com/owncloud/ocis/pull/10590)
 * Bugfix - Fix status code for thumbnail requests: [#10592](https://github.com/owncloud/ocis/pull/10592)
 * Bugfix - Fix the activity field mapping: [#10593](https://github.com/owncloud/ocis/pull/10593)
-* Bugfix - Bump Reva to v2.26.7: [#10612](https://github.com/owncloud/ocis/pull/10612)
-* Enhancement - Update web to v11.0.4: [#10569](https://github.com/owncloud/ocis/pull/10569)
+* Bugfix - Fix deny access for graph roles: [#10627](https://github.com/owncloud/ocis/pull/10627)
+* Bugfix - Fix link activity message: [#10663](https://github.com/owncloud/ocis/pull/10663)
+* Bugfix - Fix possible race condition when a thumbnails is stored in the FS: [#10693](https://github.com/owncloud/ocis/pull/10693)
+* Bugfix - Skip fetching members: [#10701](https://github.com/owncloud/ocis/pull/10701)
+* Bugfix - Fix FileInfo BreadcrumbFolderURL: [#10718](https://github.com/owncloud/ocis/pull/10718)
+* Bugfix - Fix graph drives response for federated shares: [#10730](https://github.com/owncloud/ocis/pull/10730)
+* Bugfix - GetLastModified property in the REPORT response will use RFC1123 format: [#10738](https://github.com/owncloud/ocis/pull/10738)
+* Bugfix - Unifi logging: [#10743](https://github.com/owncloud/ocis/pull/10743/)
+* Bugfix - Fix FileInfo BreadcrumbFolderURL upd: [#10757](https://github.com/owncloud/ocis/pull/10757)
+* Bugfix - Bump Reva: [#10766](https://github.com/owncloud/ocis/pull/10766)
+* Enhancement - Create thumbnails for GGP MIME types: [#10304](https://github.com/owncloud/ocis/pull/10304)
+* Enhancement - Include a product name in the collaboration service: [#10335](https://github.com/owncloud/ocis/pull/10335)
+* Enhancement - Add web extensions to the ocis_full example: [#10399](https://github.com/owncloud/ocis/pull/10399)
+* Enhancement - Remove deprecated CLI commands: [#10432](https://github.com/owncloud/ocis/pull/10432)
+* Enhancement - Bump cs3api: [#10449](https://github.com/owncloud/ocis/pull/10449)
+* Enhancement - Bump reva to latest: [#10472](https://github.com/owncloud/ocis/pull/10472)
+* Enhancement - Concurrent userlog processing: [#10504](https://github.com/owncloud/ocis/pull/10504)
+* Enhancement - Concurrent autoaccept for shares: [#10507](https://github.com/owncloud/ocis/pull/10507)
+* Enhancement - Fetch shared resource metadata concurrently in graph: [#10683](https://github.com/owncloud/ocis/pull/10683)
+* Enhancement - Update web to v11.0.6: [#10755](https://github.com/owncloud/ocis/pull/10755)
 
 ## Details
+
+* Bugfix - Generate short tokens to be used as access tokens for WOPI: [#10391](https://github.com/owncloud/ocis/pull/10391)
+
+   Currently, the access tokens being used might be too long. In particular,
+   Microsoft Office Online complains about the URL (which contains the access
+   token) is too long and refuses to work.
+
+   https://github.com/owncloud/ocis/pull/10391
+
+* Bugfix - Fix put relative wopi operation for microsoft: [#10403](https://github.com/owncloud/ocis/pull/10403)
+
+   We fixed a bug in the put relative wopi operation for microsoft. The response
+   now contains the correct properties.
+
+   https://github.com/owncloud/ocis/pull/10403
+
+* Bugfix - Make SSE keepalive interval configurable: [#10411](https://github.com/owncloud/ocis/pull/10411)
+
+   To prevent intermediate proxies from closing the SSE connection admins can now
+   configure a `SSE_KEEPALIVE_INTERVAL`.
+
+   https://github.com/owncloud/ocis/pull/10411
+
+* Bugfix - Removed 'OCM_OCM_PROVIDER_AUTHORIZER_VERIFY_REQUEST_HOSTNAME' setting: [#10425](https://github.com/owncloud/ocis/pull/10425)
+
+   The config option 'OCM_OCM_PROVIDER_AUTHORIZER_VERIFY_REQUEST_HOSTNAME' was
+   removed from the OCM service. The additional security provided by this setting
+   is somewhat questionable and only provided in very specific setups.
+
+   We are not going through the normal deprecation process for this setting, as it
+   was never really working anyway. If you have this setting in your configuration,
+   it will be ignored. You can safely remove it.
+
+   https://github.com/owncloud/ocis/issues/10355
+   https://github.com/owncloud/ocis/pull/10425
+
+* Bugfix - Micro registry cache fixes: [#10429](https://github.com/owncloud/ocis/pull/10429)
+
+   We now invalidate cache entries when any of the nodes was not updated.
+
+   https://github.com/owncloud/ocis/pull/10429
+
+* Bugfix - Fix the memlimit loglevel: [#10433](https://github.com/owncloud/ocis/pull/10433)
+
+   We set the memlimit default loglevel to error.
+
+   https://github.com/owncloud/ocis/issues/10427
+   https://github.com/owncloud/ocis/pull/10433
 
 * Bugfix - Log GRPC requests in debug mode: [#10438](https://github.com/owncloud/ocis/pull/10438)
 
    When log level is set to debug we will now also log grpc requests.
 
    https://github.com/owncloud/ocis/pull/10438
+
+* Bugfix - Restart Postprocessing properly: [#10439](https://github.com/owncloud/ocis/pull/10439)
+
+   Properly differentiate between resume and restart postprocessing.
+
+   https://github.com/owncloud/ocis/pull/10439
+
+* Bugfix - Allow to configure data server URL for ocm: [#10440](https://github.com/owncloud/ocis/pull/10440)
+
+   We introduced the `OCM_OCM_STORAGE_DATA_SERVER_URL` setting to fix a bug when
+   downloading files from an OCM share. Before the data server URL defaulted to the
+   listen address of the OCM server, which did not work when using 0.0.0.0 as the
+   listen address.
+
+   https://github.com/owncloud/ocis/issues/10358
+   https://github.com/owncloud/ocis/pull/10440
+
+* Bugfix - Respect proxy url when validating proofkeys: [#10462](https://github.com/owncloud/ocis/pull/10462)
+
+   We fixed a bug where the proxied wopi URL was not used when validating
+   proofkeys. This caused the validation to fail when the proxy was used.
+
+   https://github.com/owncloud/ocis/pull/10462
+
+* Bugfix - Return wopi lock header in get lock response: [#10470](https://github.com/owncloud/ocis/pull/10470)
+
+   We fixed a bug where the wopi lock header was not returned in the get lock
+   response. This is now fixed and the wopi validator tests are passing.
+
+   https://github.com/owncloud/ocis/pull/10470
+
+* Bugfix - 'ocis backup consistency' fixed for file revisions: [#10493](https://github.com/owncloud/ocis/pull/10493)
+
+   A bug was fixed that caused the 'ocis backup consistency' command to incorrectly
+   report inconistencies when file revisions with a zero value for the nano-second
+   part of the timestamp were present.
+
+   https://github.com/owncloud/ocis/issues/9498
+   https://github.com/owncloud/ocis/pull/10493
+
+* Bugfix - Wait for services to be ready before registering them: [#10498](https://github.com/owncloud/ocis/pull/10498)
+
+   https://github.com/owncloud/ocis/pull/10498
+
+* Bugfix - Fix 0-byte file uploads: [#10500](https://github.com/owncloud/ocis/pull/10500)
+
+   We fixed an issue where 0-byte files upload did not return the Location header.
+
+   https://github.com/owncloud/ocis/issues/10469
+   https://github.com/owncloud/ocis/pull/10500
+
+* Bugfix - Fixed `sharedWithMe` response for OCM shares: [#10501](https://github.com/owncloud/ocis/pull/10501)
+
+   OCM shares returned in the `sharedWithMe` response did not have the `mimeType`
+   property populated correctly.
+
+   https://github.com/owncloud/ocis/issues/10495
+   https://github.com/owncloud/ocis/pull/10501
+
+* Bugfix - Fix gateway nats checks: [#10502](https://github.com/owncloud/ocis/pull/10502)
+
+   We now only check if nats is available when the gateway actually uses it.
+   Furthermore, we added a backoff for checking the readys endpoint.
+
+   https://github.com/owncloud/ocis/pull/10502
+
+* Bugfix - Fix idp guest role default assignment: [#10511](https://github.com/owncloud/ocis/pull/10511)
+
+   We fixed an idp guest role default assignment.
+
+   https://github.com/owncloud/ocis/issues/10474
+   https://github.com/owncloud/ocis/pull/10511
+
+* Bugfix - Remove mbreaker: [#10524](https://github.com/owncloud/ocis/pull/10524)
+
+   The circuit breaker is not handle correctly and leads therefore to more issues
+   than it solves. We removed it.
+
+   https://github.com/owncloud/ocis/pull/10524
 
 * Bugfix - Fix impersonated request user mismatch: [#10548](https://github.com/owncloud/ocis/pull/10548)
 
@@ -331,7 +346,91 @@ The following sections list the changes for 7.0.0-rc.3.
    field
    mapping
 
-* Bugfix - Bump Reva to v2.26.7: [#10612](https://github.com/owncloud/ocis/pull/10612)
+* Bugfix - Fix deny access for graph roles: [#10627](https://github.com/owncloud/ocis/pull/10627)
+
+   We added a unified role "Cannot access" to prevent a regression when switching
+   the share implementation to the graph API. This role is now used to deny access
+   to a resource.The new role is not enabled by default. The whole deny feature is
+   still experimental.
+
+   https://github.com/owncloud/ocis/pull/10627
+
+* Bugfix - Fix link activity message: [#10663](https://github.com/owncloud/ocis/pull/10663)
+
+   We changed the link token to display name in the activity message.
+
+   https://github.com/owncloud/ocis/issues/10295
+   https://github.com/owncloud/ocis/pull/10663
+
+* Bugfix - Fix possible race condition when a thumbnails is stored in the FS: [#10693](https://github.com/owncloud/ocis/pull/10693)
+
+   A race condition could cause the thumbnail service to return a thumbnail with 0
+   bytes or with partial content. In order to fix this, the service will create a
+   temporary file with the contents and then rename that file to its final
+   location.
+
+   https://github.com/owncloud/ocis/pull/10693
+
+* Bugfix - Skip fetching members: [#10701](https://github.com/owncloud/ocis/pull/10701)
+
+   We now skip fetching group members when they are not needed.
+
+   https://github.com/owncloud/ocis/pull/10701
+
+* Bugfix - Fix FileInfo BreadcrumbFolderURL: [#10718](https://github.com/owncloud/ocis/pull/10718)
+
+   We fixed the FileInfo.BreadcrumbFolderURL in a collaboration api"
+
+   https://github.com/owncloud/ocis/pull/10718
+
+* Bugfix - Fix graph drives response for federated shares: [#10730](https://github.com/owncloud/ocis/pull/10730)
+
+   Federated shares where erroneously showing up in the /me/drives response on the
+   graph API.
+
+   https://github.com/owncloud/ocis/issues/10689
+   https://github.com/owncloud/ocis/pull/10730
+
+* Bugfix - GetLastModified property in the REPORT response will use RFC1123 format: [#10738](https://github.com/owncloud/ocis/pull/10738)
+
+   This will follow the standard and will also match the format of the same
+   property in the PROPFIND response
+
+   https://github.com/owncloud/ocis/pull/10738
+
+* Bugfix - Unifi logging: [#10743](https://github.com/owncloud/ocis/pull/10743/)
+
+   We fixed some cases where we did not use the correct logger.
+
+   https://github.com/owncloud/ocis/pull/10743/
+
+* Bugfix - Fix FileInfo BreadcrumbFolderURL upd: [#10757](https://github.com/owncloud/ocis/pull/10757)
+
+   Made GetScopeByKeyPrefix function as a private method of the FileConnector
+
+   https://github.com/owncloud/ocis/pull/10757
+
+* Bugfix - Bump Reva: [#10766](https://github.com/owncloud/ocis/pull/10766)
+
+   Bumps reva version to 2.27.0
+
+  *   Bugfix [cs3org/reva#4985](https://github.com/cs3org/reva/pull/4985): Drop unneeded session locks
+  *   Bugfix [cs3org/reva#5000](https://github.com/cs3org/reva/pull/5000): Fix ceph build
+  *   Bugfix [cs3org/reva#4989](https://github.com/cs3org/reva/pull/4989): Deleting OCM share also updates storageprovider
+  *   Enhancement [cs3org/reva#4998](https://github.com/cs3org/reva/pull/4998): Emit event when an ocm share is received
+  *   Enhancement [cs3org/reva#4996](https://github.com/cs3org/reva/pull/4996): Get rid of some cases of unstructured logging
+
+   Bumps reva version to 2.26.8
+
+  *   Fix [cs3org/reva#4983](https://github.com/cs3org/reva/pull/4983): Delete stale shares in the jsoncs3 share manager
+  *   Fix [cs3org/reva#4963](https://github.com/cs3org/reva/pull/4963): Fix name and displayName in an ocm
+  *   Fix [cs3org/reva#4968](https://github.com/cs3org/reva/pull/4968): Jsoncs3 cache fixes
+  *   Fix [cs3org/reva#4928](https://github.com/cs3org/reva/pull/4928): Propagate lock in PROPPATCH
+  *   Fix [cs3org/reva#4971](https://github.com/cs3org/reva/pull/4971): Use manager to list shares
+  *   Fix [cs3org/reva#4978](https://github.com/cs3org/reva/pull/4978): We added more trace spans in decomposedfs
+  *   Fix [cs3org/reva#4921](https://github.com/cs3org/reva/pull/4921): Polish propagation related code
+
+   Bugfix: Bump Reva to v2.26.7
 
   * Fix [cs3org/reva#4964](https://github.com/cs3org/reva/issues/4964): Fix a wrong error code when approvider creates a new file
 
@@ -348,11 +447,128 @@ The following sections list the changes for 7.0.0-rc.3.
   * Fix [cs3org/reva#4956](https://github.com/cs3org/reva/issues/4956): Improve posixfs error handling and logging
   * Fix [cs3org/reva#4951](https://github.com/cs3org/reva/issues/4951): Pass the initialized logger down the stack
 
+   Bugfix: Bump Reva to v2.26.5
+
+  * Fix [cs3org/reva#4926](https://github.com/cs3org/reva/issues/4926): Make etag always match content on downloads
+  * Fix [cs3org/reva#4920](https://github.com/cs3org/reva/issues/4920): Return correct status codes for simple uploads
+  * Fix [cs3org/reva#4924](https://github.com/cs3org/reva/issues/4924): Fix sync propagation
+  * Fix [cs3org/reva#4916](https://github.com/cs3org/reva/issues/4916): Improve posixfs stability and performanc
+
+   Enhancement: Bump reva to 2.26.4
+
+  *   Bugfix [cs3org/reva#4917](https://github.com/cs3org/reva/pull/4917): Fix 0-byte file uploads
+  *   Bugfix [cs3org/reva#4918](https://github.com/cs3org/reva/pull/4918): Fix app templates
+
+   Bump reva to 2.26.3
+
+  *   Bugfix [cs3org/reva#4908](https://github.com/cs3org/reva/pull/4908): Add checksum to OCM storageprovider responses
+  *   Enhancement [cs3org/reva#4910](https://github.com/cs3org/reva/pull/4910): Bump cs3api
+  *   Enhancement [cs3org/reva#4909](https://github.com/cs3org/reva/pull/4909): Bump cs3api
+  *   Enhancement [cs3org/reva#4906](https://github.com/cs3org/reva/pull/4906): Bump cs3api
+
+   Bump reva to 2.26.2
+
+  *   Enhancement [cs3org/reva#4897](https://github.com/cs3org/reva/pull/4897): Fix remaining quota calculation
+  *   Bugfix      [cs3org/reva#4902](https://github.com/cs3org/reva/pull/4902): Fix quota calculation
+
+   https://github.com/owncloud/ocis/pull/10766
+   https://github.com/owncloud/ocis/pull/10735
    https://github.com/owncloud/ocis/pull/10612
+   https://github.com/owncloud/ocis/pull/10552
+   https://github.com/owncloud/ocis/pull/10539
+   https://github.com/owncloud/ocis/pull/10419
 
-* Enhancement - Update web to v11.0.4: [#10569](https://github.com/owncloud/ocis/pull/10569)
+* Enhancement - Create thumbnails for GGP MIME types: [#10304](https://github.com/owncloud/ocis/pull/10304)
 
-   Tags: web
+   Creates thumbnails for newly added ggp files
+
+   https://github.com/owncloud/ocis/pull/10304
+
+* Enhancement - Include a product name in the collaboration service: [#10335](https://github.com/owncloud/ocis/pull/10335)
+
+   The product name will allow using a different app name. For example, a "CoolBox"
+   app name might use a branded Collabora instance by using "Collabora" as product
+   name.
+
+   https://github.com/owncloud/ocis/pull/10335
+   https://github.com/owncloud/ocis/pull/10490
+
+* Enhancement - Add web extensions to the ocis_full example: [#10399](https://github.com/owncloud/ocis/pull/10399)
+
+   We added some of the web extensions from ownCloud to the ocis_full docker
+   compose example.
+
+   - importer - draw-io - external-sites - json-viewer - unzip - progressbars
+
+   These can be enabled in the .env file one by one.
+
+   Read more about ocis extensions in
+   https://github.com/owncloud/web-extensions/blob/main/README.md
+
+   https://github.com/owncloud/ocis/pull/10399
+
+* Enhancement - Remove deprecated CLI commands: [#10432](https://github.com/owncloud/ocis/pull/10432)
+
+   We removed the following deprecated CLI commands: `ocis storage-users uploads
+   list` `ocis storage-users uploads clean`
+
+   https://github.com/owncloud/ocis/issues/10428
+   https://github.com/owncloud/ocis/pull/10432
+
+* Enhancement - Bump cs3api: [#10449](https://github.com/owncloud/ocis/pull/10449)
+
+   https://github.com/owncloud/ocis/pull/10449
+
+* Enhancement - Bump reva to latest: [#10472](https://github.com/owncloud/ocis/pull/10472)
+
+   https://github.com/owncloud/ocis/pull/10472
+
+* Enhancement - Concurrent userlog processing: [#10504](https://github.com/owncloud/ocis/pull/10504)
+
+   We now start multiple go routines that process events. The default of 5
+   goroutines can be changed with the new `USERLOG_MAX_CONCURRENCY` environment
+   variable.
+
+   https://github.com/owncloud/ocis/pull/10504
+
+* Enhancement - Concurrent autoaccept for shares: [#10507](https://github.com/owncloud/ocis/pull/10507)
+
+   Shares for groups are now concurrently accepted. Tha default of 25 goroutinges
+   can be changed with the new `FRONTEND_MAX_CONCURRENCY` environment variable.
+
+   https://github.com/owncloud/ocis/pull/10507
+   https://github.com/owncloud/ocis/pull/10476
+
+* Enhancement - Fetch shared resource metadata concurrently in graph: [#10683](https://github.com/owncloud/ocis/pull/10683)
+
+   We now concurrently stat shared resources when listing shares
+
+   https://github.com/owncloud/ocis/pull/10683
+
+* Enhancement - Update web to v11.0.6: [#10755](https://github.com/owncloud/ocis/pull/10755)
+
+   - Bugfix [owncloud/web#11992](https://github.com/owncloud/web/pull/11992): OCM
+   invite flow - Bugfix
+   [owncloud/web#11997](https://github.com/owncloud/web/pull/11997): Change search
+   scope without search term - Bugfix
+   [owncloud/web#11998](https://github.com/owncloud/web/pull/11998): Do not load
+   version when sidebar is closed - Bugfix
+   [owncloud/web#12000](https://github.com/owncloud/web/pull/12000): Use only space
+   resource with driveType "project" as space in sidebar - Bugfix
+   [owncloud/web#12002](https://github.com/owncloud/web/pull/12002): OCM share
+   editing - Bugfix
+   [owncloud/web#12002](https://github.com/owncloud/web/pull/12002): OCM share
+   recipient issuer - Bugfix
+   [owncloud/web#12008](https://github.com/owncloud/web/pull/12008): Missing
+   activities on Shared with me page - Bugfix
+   [owncloud/web#12010](https://github.com/owncloud/web/pull/12010): Sidebar file
+   info for shares - Bugfix
+   [owncloud/web#12012](https://github.com/owncloud/web/pull/12012): Show missing
+   role name in link share panel - Bugfix
+   [owncloud/web#12013](https://github.com/owncloud/web/pull/12013): Missing
+   translations for share type filters - Bugfix
+   [owncloud/web#12022](https://github.com/owncloud/web/pull/12022): Permanent link
+   for shares
 
    We updated ownCloud Web to v11.0.4. Please refer to the changelog (linked) for
    details on the web release.
@@ -378,16 +594,44 @@ The following sections list the changes for 7.0.0-rc.3.
    [owncloud/web#11929](https://github.com/owncloud/web/issues/11929): Unique
    request ids
 
+   We updated ownCloud Web to v11.0.2. Please refer to the changelog (linked) for
+   details on the web release.
+
+   - Bugfix [owncloud/web#11803](https://github.com/owncloud/web/issues/11803):
+   Files appearing in file list - Bugfix
+   [owncloud/web#11804](https://github.com/owncloud/web/pull/11804): Add missing
+   translations - Bugfix
+   [owncloud/web#11806](https://github.com/owncloud/web/issues/11806): Folder size
+   mismatch - Bugfix
+   [owncloud/web#11813](https://github.com/owncloud/web/pull/11813): Preview image
+   retries - Bugfix
+   [owncloud/web#11817](https://github.com/owncloud/web/pull/11817): Respect post
+   logout url - Bugfix
+   [owncloud/web#11830](https://github.com/owncloud/web/issues/11830): Right side
+   bar cut off - Bugfix
+   [owncloud/web#11831](https://github.com/owncloud/web/pull/11831): Sidebar
+   showing wrong shares - Bugfix
+   [owncloud/web#11853](https://github.com/owncloud/web/issues/11853): Context menu
+   "Open app in new tab" broken - Bugfix
+   [owncloud/web#11008](https://github.com/owncloud/web/issues/11008): Show lock
+   information in file details
+
+   https://github.com/owncloud/ocis/pull/10755
    https://github.com/owncloud/ocis/pull/10569
    https://github.com/owncloud/ocis/pull/10604
+   https://github.com/owncloud/ocis/pull/10467
+   https://github.com/owncloud/ocis/pull/10503
+   https://github.com/owncloud/web/releases/tag/v11.0.6
    https://github.com/owncloud/web/releases/tag/v11.0.3
    https://github.com/owncloud/web/releases/tag/v11.0.4
+   https://github.com/owncloud/web/releases/tag/v11.0.1
+   https://github.com/owncloud/web/releases/tag/v11.0.2
 
 # Changelog for [5.0.9] (2024-11-14)
 
 The following sections list the changes for 5.0.9.
 
-[5.0.9]: https://github.com/owncloud/ocis/compare/v7.0.0-rc.2...v5.0.9
+[5.0.9]: https://github.com/owncloud/ocis/compare/v6.6.1...v5.0.9
 
 ## Summary
 
@@ -424,304 +668,6 @@ The following sections list the changes for 5.0.9.
    https://github.com/owncloud/ocis/pull/9360
    https://github.com/owncloud/ocis/pull/9035
    https://github.com/owncloud/ocis/pull/9069
-
-# Changelog for [7.0.0-rc.2] (2024-11-12)
-
-The following sections list the changes for 7.0.0-rc.2.
-
-[7.0.0-rc.2]: https://github.com/owncloud/ocis/compare/v7.0.0-rc.1...v7.0.0-rc.2
-
-## Summary
-
-* Bugfix - Fix idp guest role default assignment: [#10511](https://github.com/owncloud/ocis/pull/10511)
-* Bugfix - Remove mbreaker: [#10524](https://github.com/owncloud/ocis/pull/10524)
-* Bugfix - Bump Reva to v2.26.5: [#10552](https://github.com/owncloud/ocis/pull/10552)
-
-## Details
-
-* Bugfix - Fix idp guest role default assignment: [#10511](https://github.com/owncloud/ocis/pull/10511)
-
-   We fixed an idp guest role default assignment.
-
-   https://github.com/owncloud/ocis/issues/10474
-   https://github.com/owncloud/ocis/pull/10511
-
-* Bugfix - Remove mbreaker: [#10524](https://github.com/owncloud/ocis/pull/10524)
-
-   The circuit breaker is not handle correctly and leads therefore to more issues
-   than it solves. We removed it.
-
-   https://github.com/owncloud/ocis/pull/10524
-
-* Bugfix - Bump Reva to v2.26.5: [#10552](https://github.com/owncloud/ocis/pull/10552)
-
-  * Fix [cs3org/reva#4926](https://github.com/cs3org/reva/issues/4926): Make etag always match content on downloads
-  * Fix [cs3org/reva#4920](https://github.com/cs3org/reva/issues/4920): Return correct status codes for simple uploads
-  * Fix [cs3org/reva#4924](https://github.com/cs3org/reva/issues/4924): Fix sync propagation
-  * Fix [cs3org/reva#4916](https://github.com/cs3org/reva/issues/4916): Improve posixfs stability and performanc
-
-   https://github.com/owncloud/ocis/pull/10552
-   https://github.com/owncloud/ocis/pull/10539
-
-# Changelog for [7.0.0-rc.1] (2024-11-07)
-
-The following sections list the changes for 7.0.0-rc.1.
-
-[7.0.0-rc.1]: https://github.com/owncloud/ocis/compare/v6.6.1...v7.0.0-rc.1
-
-## Summary
-
-* Bugfix - Generate short tokens to be used as access tokens for WOPI: [#10391](https://github.com/owncloud/ocis/pull/10391)
-* Bugfix - Fix put relative wopi operation for microsoft: [#10403](https://github.com/owncloud/ocis/pull/10403)
-* Bugfix - Make SSE keepalive interval configurable: [#10411](https://github.com/owncloud/ocis/pull/10411)
-* Bugfix - Removed 'OCM_OCM_PROVIDER_AUTHORIZER_VERIFY_REQUEST_HOSTNAME' setting: [#10425](https://github.com/owncloud/ocis/pull/10425)
-* Bugfix - Micro registry cache fixes: [#10429](https://github.com/owncloud/ocis/pull/10429)
-* Bugfix - Fix the memlimit loglevel: [#10433](https://github.com/owncloud/ocis/pull/10433)
-* Bugfix - Restart Postprocessing properly: [#10439](https://github.com/owncloud/ocis/pull/10439)
-* Bugfix - Allow to configure data server URL for ocm: [#10440](https://github.com/owncloud/ocis/pull/10440)
-* Bugfix - Respect proxy url when validating proofkeys: [#10462](https://github.com/owncloud/ocis/pull/10462)
-* Bugfix - Return wopi lock header in get lock response: [#10470](https://github.com/owncloud/ocis/pull/10470)
-* Bugfix - 'ocis backup consistency' fixed for file revisions: [#10493](https://github.com/owncloud/ocis/pull/10493)
-* Bugfix - Wait for services to be ready before registering them: [#10498](https://github.com/owncloud/ocis/pull/10498)
-* Bugfix - Fix 0-byte file uploads: [#10500](https://github.com/owncloud/ocis/pull/10500)
-* Bugfix - Fixed `sharedWithMe` response for OCM shares: [#10501](https://github.com/owncloud/ocis/pull/10501)
-* Bugfix - Fix gateway nats checks: [#10502](https://github.com/owncloud/ocis/pull/10502)
-* Enhancement - Create thumbnails for GGP MIME types: [#10304](https://github.com/owncloud/ocis/pull/10304)
-* Enhancement - Include a product name in the collaboration service: [#10335](https://github.com/owncloud/ocis/pull/10335)
-* Enhancement - Add web extensions to the ocis_full example: [#10399](https://github.com/owncloud/ocis/pull/10399)
-* Enhancement - Bump reva to 2.26.4: [#10419](https://github.com/owncloud/ocis/pull/10419)
-* Enhancement - Remove deprecated CLI commands: [#10432](https://github.com/owncloud/ocis/pull/10432)
-* Enhancement - Bump cs3api: [#10449](https://github.com/owncloud/ocis/pull/10449)
-* Enhancement - Update web to v11.0.2: [#10467](https://github.com/owncloud/ocis/pull/10467)
-* Enhancement - Bump reva to latest: [#10472](https://github.com/owncloud/ocis/pull/10472)
-* Enhancement - Concurrent userlog processing: [#10504](https://github.com/owncloud/ocis/pull/10504)
-* Enhancement - Concurrent autoaccept for shares: [#10507](https://github.com/owncloud/ocis/pull/10507)
-
-## Details
-
-* Bugfix - Generate short tokens to be used as access tokens for WOPI: [#10391](https://github.com/owncloud/ocis/pull/10391)
-
-   Currently, the access tokens being used might be too long. In particular,
-   Microsoft Office Online complains about the URL (which contains the access
-   token) is too long and refuses to work.
-
-   https://github.com/owncloud/ocis/pull/10391
-
-* Bugfix - Fix put relative wopi operation for microsoft: [#10403](https://github.com/owncloud/ocis/pull/10403)
-
-   We fixed a bug in the put relative wopi operation for microsoft. The response
-   now contains the correct properties.
-
-   https://github.com/owncloud/ocis/pull/10403
-
-* Bugfix - Make SSE keepalive interval configurable: [#10411](https://github.com/owncloud/ocis/pull/10411)
-
-   To prevent intermediate proxies from closing the SSE connection admins can now
-   configure a `SSE_KEEPALIVE_INTERVAL`.
-
-   https://github.com/owncloud/ocis/pull/10411
-
-* Bugfix - Removed 'OCM_OCM_PROVIDER_AUTHORIZER_VERIFY_REQUEST_HOSTNAME' setting: [#10425](https://github.com/owncloud/ocis/pull/10425)
-
-   The config option 'OCM_OCM_PROVIDER_AUTHORIZER_VERIFY_REQUEST_HOSTNAME' was
-   removed from the OCM service. The additional security provided by this setting
-   is somewhat questionable and only provided in very specific setups.
-
-   We are not going through the normal deprecation process for this setting, as it
-   was never really working anyway. If you have this setting in your configuration,
-   it will be ignored. You can safely remove it.
-
-   https://github.com/owncloud/ocis/issues/10355
-   https://github.com/owncloud/ocis/pull/10425
-
-* Bugfix - Micro registry cache fixes: [#10429](https://github.com/owncloud/ocis/pull/10429)
-
-   We now invalidate cache entries when any of the nodes was not updated.
-
-   https://github.com/owncloud/ocis/pull/10429
-
-* Bugfix - Fix the memlimit loglevel: [#10433](https://github.com/owncloud/ocis/pull/10433)
-
-   We set the memlimit default loglevel to error.
-
-   https://github.com/owncloud/ocis/issues/10427
-   https://github.com/owncloud/ocis/pull/10433
-
-* Bugfix - Restart Postprocessing properly: [#10439](https://github.com/owncloud/ocis/pull/10439)
-
-   Properly differentiate between resume and restart postprocessing.
-
-   https://github.com/owncloud/ocis/pull/10439
-
-* Bugfix - Allow to configure data server URL for ocm: [#10440](https://github.com/owncloud/ocis/pull/10440)
-
-   We introduced the `OCM_OCM_STORAGE_DATA_SERVER_URL` setting to fix a bug when
-   downloading files from an OCM share. Before the data server URL defaulted to the
-   listen address of the OCM server, which did not work when using 0.0.0.0 as the
-   listen address.
-
-   https://github.com/owncloud/ocis/issues/10358
-   https://github.com/owncloud/ocis/pull/10440
-
-* Bugfix - Respect proxy url when validating proofkeys: [#10462](https://github.com/owncloud/ocis/pull/10462)
-
-   We fixed a bug where the proxied wopi URL was not used when validating
-   proofkeys. This caused the validation to fail when the proxy was used.
-
-   https://github.com/owncloud/ocis/pull/10462
-
-* Bugfix - Return wopi lock header in get lock response: [#10470](https://github.com/owncloud/ocis/pull/10470)
-
-   We fixed a bug where the wopi lock header was not returned in the get lock
-   response. This is now fixed and the wopi validator tests are passing.
-
-   https://github.com/owncloud/ocis/pull/10470
-
-* Bugfix - 'ocis backup consistency' fixed for file revisions: [#10493](https://github.com/owncloud/ocis/pull/10493)
-
-   A bug was fixed that caused the 'ocis backup consistency' command to incorrectly
-   report inconistencies when file revisions with a zero value for the nano-second
-   part of the timestamp were present.
-
-   https://github.com/owncloud/ocis/issues/9498
-   https://github.com/owncloud/ocis/pull/10493
-
-* Bugfix - Wait for services to be ready before registering them: [#10498](https://github.com/owncloud/ocis/pull/10498)
-
-   https://github.com/owncloud/ocis/pull/10498
-
-* Bugfix - Fix 0-byte file uploads: [#10500](https://github.com/owncloud/ocis/pull/10500)
-
-   We fixed an issue where 0-byte files upload did not return the Location header.
-
-   https://github.com/owncloud/ocis/issues/10469
-   https://github.com/owncloud/ocis/pull/10500
-
-* Bugfix - Fixed `sharedWithMe` response for OCM shares: [#10501](https://github.com/owncloud/ocis/pull/10501)
-
-   OCM shares returned in the `sharedWithMe` response did not have the `mimeType`
-   property populated correctly.
-
-   https://github.com/owncloud/ocis/issues/10495
-   https://github.com/owncloud/ocis/pull/10501
-
-* Bugfix - Fix gateway nats checks: [#10502](https://github.com/owncloud/ocis/pull/10502)
-
-   We now only check if nats is available when the gateway actually uses it.
-   Furthermore, we added a backoff for checking the readys endpoint.
-
-   https://github.com/owncloud/ocis/pull/10502
-
-* Enhancement - Create thumbnails for GGP MIME types: [#10304](https://github.com/owncloud/ocis/pull/10304)
-
-   Creates thumbnails for newly added ggp files
-
-   https://github.com/owncloud/ocis/pull/10304
-
-* Enhancement - Include a product name in the collaboration service: [#10335](https://github.com/owncloud/ocis/pull/10335)
-
-   The product name will allow using a different app name. For example, a "CoolBox"
-   app name might use a branded Collabora instance by using "Collabora" as product
-   name.
-
-   https://github.com/owncloud/ocis/pull/10335
-   https://github.com/owncloud/ocis/pull/10490
-
-* Enhancement - Add web extensions to the ocis_full example: [#10399](https://github.com/owncloud/ocis/pull/10399)
-
-   We added some of the web extensions from ownCloud to the ocis_full docker
-   compose example.
-
-   - importer - draw-io - external-sites - json-viewer - unzip - progressbars
-
-   These can be enabled in the .env file one by one.
-
-   Read more about ocis extensions in
-   https://github.com/owncloud/web-extensions/blob/main/README.md
-
-   https://github.com/owncloud/ocis/pull/10399
-
-* Enhancement - Bump reva to 2.26.4: [#10419](https://github.com/owncloud/ocis/pull/10419)
-
-  *   Bugfix [cs3org/reva#4917](https://github.com/cs3org/reva/pull/4917): Fix 0-byte file uploads
-  *   Bugfix [cs3org/reva#4918](https://github.com/cs3org/reva/pull/4918): Fix app templates
-
-   Bump reva to 2.26.3
-
-  *   Bugfix [cs3org/reva#4908](https://github.com/cs3org/reva/pull/4908): Add checksum to OCM storageprovider responses
-  *   Enhancement [cs3org/reva#4910](https://github.com/cs3org/reva/pull/4910): Bump cs3api
-  *   Enhancement [cs3org/reva#4909](https://github.com/cs3org/reva/pull/4909): Bump cs3api
-  *   Enhancement [cs3org/reva#4906](https://github.com/cs3org/reva/pull/4906): Bump cs3api
-
-   Bump reva to 2.26.2
-
-  *   Enhancement [cs3org/reva#4897](https://github.com/cs3org/reva/pull/4897): Fix remaining quota calculation
-  *   Bugfix      [cs3org/reva#4902](https://github.com/cs3org/reva/pull/4902): Fix quota calculation
-
-   https://github.com/owncloud/ocis/pull/10419
-
-* Enhancement - Remove deprecated CLI commands: [#10432](https://github.com/owncloud/ocis/pull/10432)
-
-   We removed the following deprecated CLI commands: `ocis storage-users uploads
-   list` `ocis storage-users uploads clean`
-
-   https://github.com/owncloud/ocis/issues/10428
-   https://github.com/owncloud/ocis/pull/10432
-
-* Enhancement - Bump cs3api: [#10449](https://github.com/owncloud/ocis/pull/10449)
-
-   https://github.com/owncloud/ocis/pull/10449
-
-* Enhancement - Update web to v11.0.2: [#10467](https://github.com/owncloud/ocis/pull/10467)
-
-   Tags: web
-
-   We updated ownCloud Web to v11.0.2. Please refer to the changelog (linked) for
-   details on the web release.
-
-   - Bugfix [owncloud/web#11803](https://github.com/owncloud/web/issues/11803):
-   Files appearing in file list - Bugfix
-   [owncloud/web#11804](https://github.com/owncloud/web/pull/11804): Add missing
-   translations - Bugfix
-   [owncloud/web#11806](https://github.com/owncloud/web/issues/11806): Folder size
-   mismatch - Bugfix
-   [owncloud/web#11813](https://github.com/owncloud/web/pull/11813): Preview image
-   retries - Bugfix
-   [owncloud/web#11817](https://github.com/owncloud/web/pull/11817): Respect post
-   logout url - Bugfix
-   [owncloud/web#11830](https://github.com/owncloud/web/issues/11830): Right side
-   bar cut off - Bugfix
-   [owncloud/web#11831](https://github.com/owncloud/web/pull/11831): Sidebar
-   showing wrong shares - Bugfix
-   [owncloud/web#11853](https://github.com/owncloud/web/issues/11853): Context menu
-   "Open app in new tab" broken - Bugfix
-   [owncloud/web#11008](https://github.com/owncloud/web/issues/11008): Show lock
-   information in file details
-
-   https://github.com/owncloud/ocis/pull/10467
-   https://github.com/owncloud/ocis/pull/10503
-   https://github.com/owncloud/web/releases/tag/v11.0.1
-   https://github.com/owncloud/web/releases/tag/v11.0.2
-
-* Enhancement - Bump reva to latest: [#10472](https://github.com/owncloud/ocis/pull/10472)
-
-   https://github.com/owncloud/ocis/pull/10472
-
-* Enhancement - Concurrent userlog processing: [#10504](https://github.com/owncloud/ocis/pull/10504)
-
-   We now start multiple go routines that process events. The default of 5
-   goroutines can be changed with the new `USERLOG_MAX_CONCURRENCY` environment
-   variable.
-
-   https://github.com/owncloud/ocis/pull/10504
-
-* Enhancement - Concurrent autoaccept for shares: [#10507](https://github.com/owncloud/ocis/pull/10507)
-
-   Shares for groups are now concurrently accepted. Tha default of 25 goroutinges
-   can be changed with the new `FRONTEND_MAX_CONCURRENCY` environment variable.
-
-   https://github.com/owncloud/ocis/pull/10507
-   https://github.com/owncloud/ocis/pull/10476
 
 # Changelog for [6.6.1] (2024-10-24)
 
