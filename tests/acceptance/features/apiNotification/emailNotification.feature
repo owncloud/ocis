@@ -37,16 +37,16 @@ Feature: Email notification
       | role               | viewer               |
       | permissionsRole    | Space Viewer         |
       | expirationDateTime | 2025-02-25T14:00:00Z |
-    Then the HTTP status code should be "200"
-    And the user "Alice" should have a space called "new-space" granted to "Brian" with role "viewer"
-    # And the user "Alice" should have a space called "new-space" granted to user "Brian" with role "viewer" and expiration date "2025-02-26"
-    # And user "Brian" should have received the following email from user "Alice" about the share of project space "new-space"
-    #   """
-    #   Hello Brian Murphy,
+    When user "Alice" has expired the membership of user "Brian" from space "new-space"
+    Then user "Brian" should have received the following email from user "Alice" about the share of project space "new-space"
+      """
+      Hello Brian Murphy,
 
-    #   %displayname% has invited you to join "new-space".
-    #   """
+      Your membership of space new-space has expired at 2025-02-26 02:00:00
 
+      Even though this membership has expired you still might have access through other shares and/or space memberships
+      """
+  
 
   Scenario: user gets an email notification when someone shares a file
     Given user "Alice" has uploaded file with content "sample text" to "lorem.txt"
