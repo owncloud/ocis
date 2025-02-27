@@ -158,3 +158,10 @@ Feature: create auth-app token
       """
       error parsing expiry. Use e.g. 30m or 72h
       """
+
+  @env-config
+  Scenario: try to create an auth-app token for a user by a non-admin user
+    Given user "Brian" has been created with default attributes
+    And the config "AUTH_APP_ENABLE_IMPERSONATION" has been set to "true"
+    When user "Alice" tries to create auth-app token for user "Brian" with expiration time "72h" using the auth-app API
+    Then the HTTP status code should be "403"
