@@ -37,7 +37,7 @@ Feature: Email notification
       | role               | viewer               |
       | permissionsRole    | Space Viewer         |
       | expirationDateTime | 2025-02-25T14:00:00Z |
-    When user "Alice" has expired the membership of user "Brian" from space "new-space"
+    When user "Alice" expires the user share of space "new-space" for user "Brian"
     Then user "Brian" should have received the following email from user "Alice" about the share of project space "new-space"
       """
       Hello Brian Murphy,
