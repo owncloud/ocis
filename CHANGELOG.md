@@ -1,5 +1,6 @@
 # Table of Contents
 
+* [Changelog for unreleased](#changelog-for-unreleased-unreleased)
 * [Changelog for 7.1.0-rc.5](#changelog-for-710-rc5-2025-02-25)
 * [Changelog for 7.1.0-rc.4](#changelog-for-710-rc4-2025-02-04)
 * [Changelog for 7.1.0-rc.3](#changelog-for-710-rc3-2025-01-28)
@@ -56,6 +57,25 @@
 * [Changelog for 1.2.0](#changelog-for-120-2021-02-17)
 * [Changelog for 1.1.0](#changelog-for-110-2021-01-22)
 * [Changelog for 1.0.0](#changelog-for-100-2020-12-17)
+
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes for unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis/compare/v7.1.0-rc.5...master
+
+## Summary
+
+* Enhancement - Update Mockery to 2.52.3: [#11070](https://github.com/owncloud/ocis/pull/11070)
+
+## Details
+
+* Enhancement - Update Mockery to 2.52.3: [#11070](https://github.com/owncloud/ocis/pull/11070)
+
+   Without updating ocis will not build on go 1.24. This requires also updating the
+   go version to 1.24
+
+   https://github.com/owncloud/ocis/pull/11070
 
 # Changelog for [7.1.0-rc.5] (2025-02-25)
 
