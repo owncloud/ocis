@@ -4210,6 +4210,7 @@ class SpacesContext implements Context {
 	 * @param string|null $resource
 	 * @param array|null $headers
 	 * @param string|null $folderDepth
+	 * @param bool $federatedShare
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
@@ -4218,12 +4219,20 @@ class SpacesContext implements Context {
 	 */
 	public function sendPropfindRequestToSpace(
 		string $user,
-		string $spaceName,
+		?string $spaceName = "",
 		?string $resource = "",
 		?array $headers = [],
-		?string $folderDepth = "1"
+		?string $folderDepth = "1",
+		bool $federatedShare = false
 	): ResponseInterface {
-		$spaceId = $this->getSpaceIdByName($user, $spaceName);
+		// PROPFIND request to federated share via normal webdav path "remote.php/dav/spaces/{shares-space-id}/{resource}" returns 404 status code
+		// the federated share is only accessible using "remote-item-id", i.e. "remote.php/dav/spaces/{remote-item-id}"
+		if ($federatedShare) {
+			$spaceId = $this->getSharesRemoteItemId($user, $resource);
+			$resource = null;
+		} else {
+			$spaceId = $this->getSpaceIdByName($user, $spaceName);
+		}
 		$properties = [
 			'oc:id',
 			'oc:fileid',
