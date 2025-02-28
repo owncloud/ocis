@@ -46,8 +46,8 @@ func init() {
 }
 
 type manager struct {
-	c  *config
-	gw gateway.GatewayAPIClient
+	c       *config
+	gateway *pool.Selector[gateway.GatewayAPIClient]
 }
 
 type config struct {
@@ -64,11 +64,11 @@ func New(m map[string]interface{}) (auth.Manager, error) {
 	if err := mgr.Configure(m); err != nil {
 		return nil, err
 	}
-	gw, err := pool.GetGatewayServiceClient(mgr.c.GatewayAddr)
+	gw, err := pool.GatewaySelector(mgr.c.GatewayAddr)
 	if err != nil {
 		return nil, err
 	}
-	mgr.gw = gw
+	mgr.gateway = gw
 
 	return &mgr, nil
 }
@@ -84,8 +84,13 @@ func (m *manager) Configure(ml map[string]interface{}) error {
 
 func (m *manager) Authenticate(ctx context.Context, ocmshare, sharedSecret string) (*userpb.User, map[string]*authpb.Scope, error) {
 	log := appctx.GetLogger(ctx).With().Str("ocmshare", ocmshare).Logger()
+	gwc, err := m.gateway.Next()
+	if err != nil {
+		return nil, nil, err
+	}
+
 	// We need to use GetOCMShareByToken, as GetOCMShare would require a user in the context
-	shareRes, err := m.gw.GetOCMShareByToken(ctx, &ocm.GetOCMShareByTokenRequest{
+	shareRes, err := gwc.GetOCMShareByToken(ctx, &ocm.GetOCMShareByTokenRequest{
 		Token: sharedSecret,
 	})
 
@@ -128,7 +133,7 @@ func (m *manager) Authenticate(ctx context.Context, ocmshare, sharedSecret strin
 		},
 	}
 
-	userRes, err := m.gw.GetAcceptedUser(ctx, &ocminvite.GetAcceptedUserRequest{
+	userRes, err := gwc.GetAcceptedUser(ctx, &ocminvite.GetAcceptedUserRequest{
 		RemoteUserId: u,
 		Opaque:       o,
 	})
