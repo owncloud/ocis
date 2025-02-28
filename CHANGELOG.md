@@ -68,6 +68,7 @@ The following sections list the changes for unreleased.
 
 * Bugfix - Fix the OCM role editor: [#11071](https://github.com/owncloud/ocis/pull/11071)
 * Enhancement - Update Mockery to 2.52.3: [#11070](https://github.com/owncloud/ocis/pull/11070)
+* Enhancement - Bump Reva: [#11083](https://github.com/owncloud/ocis/pull/11083)
 
 ## Details
 
@@ -85,6 +86,12 @@ The following sections list the changes for unreleased.
    go version to 1.24
 
    https://github.com/owncloud/ocis/pull/11070
+
+* Enhancement - Bump Reva: [#11083](https://github.com/owncloud/ocis/pull/11083)
+
+   Bumps reva version to 2.27.7
+
+   https://github.com/owncloud/ocis/pull/11083
 
 # Changelog for [7.1.0-rc.5] (2025-02-25)
 
