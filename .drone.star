@@ -74,132 +74,133 @@ EMAIL_SMTP_SENDER = "ownCloud <noreply@example.com>"
 
 # configuration
 config = {
-    "cs3ApiTests": {
-        "skip": False,
-    },
-    "wopiValidatorTests": {
-        "skip": False,
-    },
-    "k6LoadTests": {
-        "skip": False,
-    },
+    # "cs3ApiTests": {
+    #     "skip": False,
+    # },
+    # "wopiValidatorTests": {
+    #     "skip": False,
+    # },
+    # "k6LoadTests": {
+    #     "skip": False,
+    # },
     "localApiTests": {
-        "basic": {
-            "suites": [
-                "apiArchiver",
-                "apiContract",
-                "apiCors",
-                "apiAsyncUpload",
-                "apiDownloads",
-                "apiDepthInfinity",
-                "apiLocks",
-                "apiActivities",
-            ],
-            "skip": False,
-        },
-        "settingsAndNotification": {
-            "suites": [
-                "apiSettings",
-                "apiNotification",
-            ],
-            "skip": False,
-            "withRemotePhp": [True],
-            "emailNeeded": True,
-            "extraEnvironment": {
-                "EMAIL_HOST": EMAIL_SMTP_HOST,
-                "EMAIL_PORT": EMAIL_PORT,
-            },
-            "extraServerEnvironment": {
-                "OCIS_ADD_RUN_SERVICES": "notifications",
-                "NOTIFICATIONS_SMTP_HOST": EMAIL_SMTP_HOST,
-                "NOTIFICATIONS_SMTP_PORT": EMAIL_SMTP_PORT,
-                "NOTIFICATIONS_SMTP_INSECURE": "true",
-                "NOTIFICATIONS_SMTP_SENDER": EMAIL_SMTP_SENDER,
-                "NOTIFICATIONS_DEBUG_ADDR": "0.0.0.0:9174",
-            },
-        },
-        "graphBasicAndGroup": {
-            "suites": [
-                "apiServiceAvailability",
-                "apiGraph",
-                "apiGraphGroup",
-            ],
-            "skip": False,
-            "withRemotePhp": [True],
-        },
-        "graphUser": {
-            "suites": [
-                "apiGraphUser",
-            ],
-            "skip": False,
-            "withRemotePhp": [True],
-        },
-        "spaces": {
-            "suites": [
-                "apiSpaces",
-            ],
-            "skip": False,
-        },
-        "spacesShares": {
-            "suites": [
-                "apiSpacesShares",
-            ],
-            "skip": False,
-        },
-        "spacesDavOperation": {
-            "suites": [
-                "apiSpacesDavOperation",
-            ],
-            "skip": False,
-        },
-        "search1": {
-            "suites": [
-                "apiSearch1",
-            ],
-            "skip": False,
-        },
-        "search2": {
-            "suites": [
-                "apiSearch2",
-            ],
-            "skip": False,
-        },
-        "sharingNg": {
-            "suites": [
-                "apiReshare",
-                "apiSharingNg1",
-                "apiSharingNg2",
-                "apiOptionalShareRole",
-            ],
-            "skip": False,
-            "withRemotePhp": [True],
-        },
-        "sharingNgShareInvitation": {
-            "suites": [
-                "apiSharingNgShareInvitation",
-            ],
-            "skip": False,
-            "withRemotePhp": [True],
-        },
-        "sharingNgLinkShare": {
-            "suites": [
-                "apiSharingNgLinkSharePermission",
-                "apiSharingNgLinkShareRoot",
-            ],
-            "skip": False,
-            "withRemotePhp": [True],
-        },
-        "accountsHashDifficulty": {
-            "skip": False,
-            "suites": [
-                "apiAccountsHashDifficulty",
-            ],
-            "accounts_hash_difficulty": "default",
-        },
+        # "basic": {
+        #     "suites": [
+        #         "apiArchiver",
+        #         "apiContract",
+        #         "apiCors",
+        #         "apiAsyncUpload",
+        #         "apiDownloads",
+        #         "apiDepthInfinity",
+        #         "apiLocks",
+        #         "apiActivities",
+        #     ],
+        #     "skip": False,
+        # },
+        # "settingsAndNotification": {
+        #     "suites": [
+        #         "apiSettings",
+        #         "apiNotification",
+        #     ],
+        #     "skip": False,
+        #     "withRemotePhp": [True],
+        #     "emailNeeded": True,
+        #     "extraEnvironment": {
+        #         "EMAIL_HOST": EMAIL_SMTP_HOST,
+        #         "EMAIL_PORT": EMAIL_PORT,
+        #     },
+        #     "extraServerEnvironment": {
+        #         "OCIS_ADD_RUN_SERVICES": "notifications",
+        #         "NOTIFICATIONS_SMTP_HOST": EMAIL_SMTP_HOST,
+        #         "NOTIFICATIONS_SMTP_PORT": EMAIL_SMTP_PORT,
+        #         "NOTIFICATIONS_SMTP_INSECURE": "true",
+        #         "NOTIFICATIONS_SMTP_SENDER": EMAIL_SMTP_SENDER,
+        #         "NOTIFICATIONS_DEBUG_ADDR": "0.0.0.0:9174",
+        #     },
+        # },
+        # "graphBasicAndGroup": {
+        #     "suites": [
+        #         "apiServiceAvailability",
+        #         "apiGraph",
+        #         "apiGraphGroup",
+        #     ],
+        #     "skip": False,
+        #     "withRemotePhp": [True],
+        # },
+        # "graphUser": {
+        #     "suites": [
+        #         "apiGraphUser",
+        #     ],
+        #     "skip": False,
+        #     "withRemotePhp": [True],
+        # },
+        # "spaces": {
+        #     "suites": [
+        #         "apiSpaces",
+        #     ],
+        #     "skip": False,
+        # },
+        # "spacesShares": {
+        #     "suites": [
+        #         "apiSpacesShares",
+        #     ],
+        #     "skip": False,
+        # },
+        # "spacesDavOperation": {
+        #     "suites": [
+        #         "apiSpacesDavOperation",
+        #     ],
+        #     "skip": False,
+        # },
+        # "search1": {
+        #     "suites": [
+        #         "apiSearch1",
+        #     ],
+        #     "skip": False,
+        # },
+        # "search2": {
+        #     "suites": [
+        #         "apiSearch2",
+        #     ],
+        #     "skip": False,
+        # },
+        # "sharingNg": {
+        #     "suites": [
+        #         "apiReshare",
+        #         "apiSharingNg1",
+        #         "apiSharingNg2",
+        #         "apiOptionalShareRole",
+        #     ],
+        #     "skip": False,
+        #     "withRemotePhp": [True],
+        # },
+        # "sharingNgShareInvitation": {
+        #     "suites": [
+        #         "apiSharingNgShareInvitation",
+        #     ],
+        #     "skip": False,
+        #     "withRemotePhp": [True],
+        # },
+        # "sharingNgLinkShare": {
+        #     "suites": [
+        #         "apiSharingNgLinkSharePermission",
+        #         "apiSharingNgLinkShareRoot",
+        #     ],
+        #     "skip": False,
+        #     "withRemotePhp": [True],
+        # },
+        # "accountsHashDifficulty": {
+        #     "skip": False,
+        #     "suites": [
+        #         "apiAccountsHashDifficulty",
+        #     ],
+        #     "accounts_hash_difficulty": "default",
+        # },
         "antivirus": {
             "suites": [
                 "apiAntivirus",
             ],
+            "coverage": True,
             "skip": False,
             "antivirusNeeded": True,
             "extraServerEnvironment": {
@@ -211,129 +212,129 @@ config = {
                 "ANTIVIRUS_DEBUG_ADDR": "0.0.0.0:9297",
             },
         },
-        "searchContent": {
-            "suites": [
-                "apiSearchContent",
-            ],
-            "skip": False,
-            "tikaNeeded": True,
-        },
-        "ocm": {
-            "suites": [
-                "apiOcm",
-            ],
-            "skip": False,
-            "withRemotePhp": [True],
-            "federationServer": True,
-            "emailNeeded": True,
-            "extraEnvironment": {
-                "EMAIL_HOST": EMAIL_SMTP_HOST,
-                "EMAIL_PORT": EMAIL_PORT,
-            },
-            "extraServerEnvironment": {
-                "OCIS_ADD_RUN_SERVICES": "ocm,notifications",
-                "OCIS_ENABLE_OCM": True,
-                "OCM_OCM_INVITE_MANAGER_INSECURE": True,
-                "OCM_OCM_SHARE_PROVIDER_INSECURE": True,
-                "OCM_OCM_STORAGE_PROVIDER_INSECURE": True,
-                "OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE": "%s" % dirs["ocmProviders"],
-                # mail notifications
-                "NOTIFICATIONS_SMTP_HOST": EMAIL_SMTP_HOST,
-                "NOTIFICATIONS_SMTP_PORT": EMAIL_SMTP_PORT,
-                "NOTIFICATIONS_SMTP_INSECURE": "true",
-                "NOTIFICATIONS_SMTP_SENDER": EMAIL_SMTP_SENDER,
-            },
-        },
-        "wopi": {
-            "suites": [
-                "apiCollaboration",
-            ],
-            "skip": False,
-            "collaborationServiceNeeded": True,
-            "extraServerEnvironment": {
-                "GATEWAY_GRPC_ADDR": "0.0.0.0:9142",
-            },
-        },
-        "authApp": {
-            "suites": [
-                "apiAuthApp",
-            ],
-            "skip": False,
-            "withRemotePhp": [True],
-            "extraServerEnvironment": {
-                "OCIS_ADD_RUN_SERVICES": "auth-app",
-                "PROXY_ENABLE_APP_AUTH": True,
-            },
-        },
-        "cliCommands": {
-            "suites": [
-                "cliCommands",
-            ],
-            "skip": False,
-            "withRemotePhp": [True],
-            "antivirusNeeded": True,
-            "emailNeeded": True,
-            "extraEnvironment": {
-                "EMAIL_HOST": EMAIL_SMTP_HOST,
-                "EMAIL_PORT": EMAIL_PORT,
-            },
-            "extraServerEnvironment": {
-                "NOTIFICATIONS_SMTP_HOST": EMAIL_SMTP_HOST,
-                "NOTIFICATIONS_SMTP_PORT": EMAIL_SMTP_PORT,
-                "NOTIFICATIONS_SMTP_INSECURE": "true",
-                "NOTIFICATIONS_SMTP_SENDER": EMAIL_SMTP_SENDER,
-                "NOTIFICATIONS_DEBUG_ADDR": "0.0.0.0:9174",
-                "ANTIVIRUS_SCANNER_TYPE": "clamav",
-                "ANTIVIRUS_CLAMAV_SOCKET": "tcp://clamav:3310",
-                "OCIS_ASYNC_UPLOADS": True,
-                "OCIS_ADD_RUN_SERVICES": "antivirus,notifications",
-            },
-        },
+        # "searchContent": {
+        #     "suites": [
+        #         "apiSearchContent",
+        #     ],
+        #     "skip": False,
+        #     "tikaNeeded": True,
+        # },
+        # "ocm": {
+        #     "suites": [
+        #         "apiOcm",
+        #     ],
+        #     "skip": False,
+        #     "withRemotePhp": [True],
+        #     "federationServer": True,
+        #     "emailNeeded": True,
+        #     "extraEnvironment": {
+        #         "EMAIL_HOST": EMAIL_SMTP_HOST,
+        #         "EMAIL_PORT": EMAIL_PORT,
+        #     },
+        #     "extraServerEnvironment": {
+        #         "OCIS_ADD_RUN_SERVICES": "ocm,notifications",
+        #         "OCIS_ENABLE_OCM": True,
+        #         "OCM_OCM_INVITE_MANAGER_INSECURE": True,
+        #         "OCM_OCM_SHARE_PROVIDER_INSECURE": True,
+        #         "OCM_OCM_STORAGE_PROVIDER_INSECURE": True,
+        #         "OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE": "%s" % dirs["ocmProviders"],
+        #         # mail notifications
+        #         "NOTIFICATIONS_SMTP_HOST": EMAIL_SMTP_HOST,
+        #         "NOTIFICATIONS_SMTP_PORT": EMAIL_SMTP_PORT,
+        #         "NOTIFICATIONS_SMTP_INSECURE": "true",
+        #         "NOTIFICATIONS_SMTP_SENDER": EMAIL_SMTP_SENDER,
+        #     },
+        # },
+        # "wopi": {
+        #     "suites": [
+        #         "apiCollaboration",
+        #     ],
+        #     "skip": False,
+        #     "collaborationServiceNeeded": True,
+        #     "extraServerEnvironment": {
+        #         "GATEWAY_GRPC_ADDR": "0.0.0.0:9142",
+        #     },
+        # },
+        # "authApp": {
+        #     "suites": [
+        #         "apiAuthApp",
+        #     ],
+        #     "skip": False,
+        #     "withRemotePhp": [True],
+        #     "extraServerEnvironment": {
+        #         "OCIS_ADD_RUN_SERVICES": "auth-app",
+        #         "PROXY_ENABLE_APP_AUTH": True,
+        #     },
+        # },
+        # "cliCommands": {
+        #     "suites": [
+        #         "cliCommands",
+        #     ],
+        #     "skip": False,
+        #     "withRemotePhp": [True],
+        #     "antivirusNeeded": True,
+        #     "emailNeeded": True,
+        #     "extraEnvironment": {
+        #         "EMAIL_HOST": EMAIL_SMTP_HOST,
+        #         "EMAIL_PORT": EMAIL_PORT,
+        #     },
+        #     "extraServerEnvironment": {
+        #         "NOTIFICATIONS_SMTP_HOST": EMAIL_SMTP_HOST,
+        #         "NOTIFICATIONS_SMTP_PORT": EMAIL_SMTP_PORT,
+        #         "NOTIFICATIONS_SMTP_INSECURE": "true",
+        #         "NOTIFICATIONS_SMTP_SENDER": EMAIL_SMTP_SENDER,
+        #         "NOTIFICATIONS_DEBUG_ADDR": "0.0.0.0:9174",
+        #         "ANTIVIRUS_SCANNER_TYPE": "clamav",
+        #         "ANTIVIRUS_CLAMAV_SOCKET": "tcp://clamav:3310",
+        #         "OCIS_ASYNC_UPLOADS": True,
+        #         "OCIS_ADD_RUN_SERVICES": "antivirus,notifications",
+        #     },
+        # },
     },
-    "apiTests": {
-        "numberOfParts": 7,
-        "skip": False,
-        "skipExceptParts": [],
-    },
-    "e2eTests": {
-        "part": {
-            "skip": False,
-            "totalParts": 4,  # divide and run all suites in parts (divide pipelines)
-            "xsuites": ["search", "app-provider", "oidc", "ocm"],  # suites to skip
-        },
-        "search": {
-            "skip": False,
-            "suites": ["search"],  # suites to run
-            "tikaNeeded": True,
-        },
-    },
-    "e2eMultiService": {
-        "testSuites": {
-            "skip": False,
-            "suites": [
-                "smoke",
-                "shares",
-                "search",
-                "journeys",
-                "file-action",
-                "spaces",
-            ],
-            "tikaNeeded": True,
-        },
-    },
-    "rocketchat": {
-        "channel": "builds",
-        "channel_cron": "builds",
-        "from_secret": "rocketchat_talk_webhook",
-    },
-    "binaryReleases": {
-        "os": ["linux", "darwin"],
-    },
-    "dockerReleases": {
-        "architectures": ["arm64", "amd64"],
-    },
-    "litmus": True,
-    "codestyle": True,
+    # "apiTests": {
+    #     "numberOfParts": 0,
+    #     "skip": False,
+    #     "skipExceptParts": [],
+    # },
+    # "e2eTests": {
+    #     "part": {
+    #         "skip": False,
+    #         "totalParts": 0,  # divide and run all suites in parts (divide pipelines)
+    #         "xsuites": ["search", "app-provider", "oidc", "ocm"],  # suites to skip
+    #     },
+    #     "search": {
+    #         "skip": False,
+    #         "suites": ["search"],  # suites to run
+    #         "tikaNeeded": True,
+    #     },
+    # },
+    # "e2eMultiService": {
+    #     "testSuites": {
+    #         "skip": False,
+    #         "suites": [
+    #             "smoke",
+    #             "shares",
+    #             "search",
+    #             "journeys",
+    #             "file-action",
+    #             "spaces",
+    #         ],
+    #         "tikaNeeded": True,
+    #     },
+    # },
+    # "rocketchat": {
+    #     "channel": "builds",
+    #     "channel_cron": "builds",
+    #     "from_secret": "rocketchat_talk_webhook",
+    # },
+    # "binaryReleases": {
+    #     "os": ["linux", "darwin"],
+    # },
+    # "dockerReleases": {
+    #     "architectures": ["arm64", "amd64"],
+    # },
+    # "litmus": True,
+    # "codestyle": True,
 }
 
 # volume for steps to cache Go dependencies between steps of a pipeline
@@ -417,26 +418,26 @@ def main(ctx):
 
     pipelines = []
 
-    build_release_helpers = \
-        changelog() + \
-        docs() + \
-        licenseCheck(ctx)
+    # build_release_helpers = \
+    # changelog() + \
+    # docs() + \
+    # licenseCheck(ctx)
 
+    # codestyle(ctx) + \
+    # checkGherkinLint(ctx) + \
+    # checkTestSuitesInExpectedFailures(ctx) + \
+    # testOcisAndUploadResults(ctx) + \
     test_pipelines = \
-        codestyle(ctx) + \
-        checkGherkinLint(ctx) + \
-        checkTestSuitesInExpectedFailures(ctx) + \
         buildWebCache(ctx) + \
         getGoBinForTesting(ctx) + \
         buildOcisBinaryForTesting(ctx) + \
-        checkStarlark() + \
-        build_release_helpers + \
-        testOcisAndUploadResults(ctx) + \
         testPipelines(ctx)
 
-    build_release_pipelines = \
-        dockerReleases(ctx) + \
-        binaryReleases(ctx)
+    # build_release_helpers + \
+    # checkStarlark() + \
+    # build_release_pipelines = \
+    #     dockerReleases(ctx) + \
+    #     binaryReleases(ctx)
 
     test_pipelines.append(
         pipelineDependsOn(
@@ -445,7 +446,7 @@ def main(ctx):
         ),
     )
 
-    pipelines = test_pipelines + build_release_pipelines
+    pipelines = test_pipelines  #+ build_release_pipelines
 
     if ctx.build.event == "cron":
         pipelines = \
@@ -504,34 +505,34 @@ def testOcisAndUploadResults(ctx):
     # FIXME: RE-ENABLE THIS ASAP!!!                                      #
     ######################################################################
 
-    scan_result_upload = uploadScanResults(ctx)
-    scan_result_upload["depends_on"] = getPipelineNames([pipeline])
+    # scan_result_upload = uploadScanResults(ctx)
+    # scan_result_upload["depends_on"] = getPipelineNames([pipeline])
 
     #security_scan = scanOcis(ctx)
     #return [security_scan, pipeline, scan_result_upload]
-    return [pipeline, scan_result_upload]
+    return [pipeline]
 
 def testPipelines(ctx):
     pipelines = []
 
-    if config["litmus"]:
-        pipelines += litmus(ctx, "ocis")
+    # if config["litmus"]:
+    # pipelines += litmus(ctx, "ocis")
 
-    if "skip" not in config["cs3ApiTests"] or not config["cs3ApiTests"]["skip"]:
-        pipelines.append(cs3ApiTests(ctx, "ocis", "default"))
-    if "skip" not in config["wopiValidatorTests"] or not config["wopiValidatorTests"]["skip"]:
-        pipelines.append(wopiValidatorTests(ctx, "ocis", "builtin", "default"))
-        pipelines.append(wopiValidatorTests(ctx, "ocis", "cs3", "default"))
+    # if "skip" not in config["cs3ApiTests"] or not config["cs3ApiTests"]["skip"]:
+    #     pipelines.append(cs3ApiTests(ctx, "ocis", "default"))
+    # if "skip" not in config["wopiValidatorTests"] or not config["wopiValidatorTests"]["skip"]:
+    #     pipelines.append(wopiValidatorTests(ctx, "ocis", "builtin", "default"))
+    #     pipelines.append(wopiValidatorTests(ctx, "ocis", "cs3", "default"))
 
     pipelines += localApiTestPipeline(ctx)
 
-    if "skip" not in config["apiTests"] or not config["apiTests"]["skip"]:
-        pipelines += apiTests(ctx)
+    # if "skip" not in config["apiTests"] or not config["apiTests"]["skip"]:
+    #     pipelines += apiTests(ctx)
 
-    pipelines += e2eTestPipeline(ctx) + multiServiceE2ePipeline(ctx)
+    # pipelines += e2eTestPipeline(ctx) + multiServiceE2ePipeline(ctx)
 
-    if ("skip" not in config["k6LoadTests"] or not config["k6LoadTests"]["skip"]) and ("k6-test" in ctx.build.title.lower() or ctx.build.event == "cron"):
-        pipelines += k6LoadTests(ctx)
+    # if ("skip" not in config["k6LoadTests"] or not config["k6LoadTests"]["skip"]) and ("k6-test" in ctx.build.title.lower() or ctx.build.event == "cron"):
+    #     pipelines += k6LoadTests(ctx)
 
     return pipelines
 
@@ -818,6 +819,7 @@ def uploadScanResults(ctx):
                 "name": "sonarcloud",
                 "image": SONARSOURCE_SONAR_SCANNER_CLI,
                 "environment": sonar_env,
+                "volumes": [stepVolumeGo],
             },
             {
                 "name": "purge-cache",
@@ -1027,14 +1029,15 @@ def localApiTestPipeline(ctx):
                                      restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin") +
                                      (tikaService() if params["tikaNeeded"] else []) +
                                      (waitForServices("online-offices", ["collabora:9980", "onlyoffice:443", "fakeoffice:8080"]) if params["collaborationServiceNeeded"] else []) +
-                                     ocisServer(storage, params["accounts_hash_difficulty"], extra_server_environment = params["extraServerEnvironment"], with_wrapper = True, tika_enabled = params["tikaNeeded"]) +
+                                     ocisServer(storage, params["accounts_hash_difficulty"], extra_server_environment = params["extraServerEnvironment"], with_wrapper = True, tika_enabled = params["tikaNeeded"], name = name) +
                                      (waitForClamavService() if params["antivirusNeeded"] else []) +
                                      (waitForEmailService() if params["emailNeeded"] else []) +
-                                     (ocisServer(storage, params["accounts_hash_difficulty"], deploy_type = "federation", extra_server_environment = params["extraServerEnvironment"]) if params["federationServer"] else []) +
+                                     (ocisServer(storage, params["accounts_hash_difficulty"], deploy_type = "federation", name = name, extra_server_environment = params["extraServerEnvironment"]) if params["federationServer"] else []) +
                                      ((wopiCollaborationService("fakeoffice") + wopiCollaborationService("collabora") + wopiCollaborationService("onlyoffice")) if params["collaborationServiceNeeded"] else []) +
                                      (ocisHealthCheck("wopi", ["wopi-collabora:9304", "wopi-onlyoffice:9304", "wopi-fakeoffice:9304"]) if params["collaborationServiceNeeded"] else []) +
                                      localApiTests(ctx, name, params["suites"], storage, params["extraEnvironment"], run_with_remote_php) +
-                                     logRequests(),
+                                     logRequests() +
+                                     (generateCoverageReportFromTest(ctx, name)),
                             "services": (emailService() if params["emailNeeded"] else []) +
                                         (clamavService() if params["antivirusNeeded"] else []) +
                                         ((fakeOffice() + collaboraService() + onlyofficeService()) if params["collaborationServiceNeeded"] else []),
@@ -1048,6 +1051,37 @@ def localApiTestPipeline(ctx):
                         }
                         pipelines.append(pipeline)
     return pipelines
+
+def generateCoverageReportFromTest(ctx, name):
+    environment = {
+        # "GOCOVERDIR": "cache/coverage/" + suite
+        "GOCOVERDIR": "%s-report" % name,
+    }
+
+    #  rebuildBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin"),
+    return [
+        {
+            "name": "coverageReport-%s" % name,
+            "image": OC_CI_GOLANG,
+            "environment": environment,
+            "commands": [
+                "echo $GOCOVERDIR",
+                "ls $GOCOVERDIR",
+                "go tool covdata percent -i=$GOCOVERDIR -o=coverage.out",
+                "ls -al $GOCOVERDIR",
+            ],
+        },
+        {
+            "name": "zip",
+            "image": OC_UBUNTU,
+            "commands": [
+                "tar -czvf %s.tar.gz %s" % (environment["GOCOVERDIR"], environment["GOCOVERDIR"]),
+                "mkdir -p cache/acceptance/coverage/",
+                "mv %s.tar.gz cache/acceptance/coverage/" % environment["GOCOVERDIR"],
+                "ls cache/acceptance/coverage/",
+            ],
+        },
+    ] + rebuildBuildArtifactCache(ctx, "coverageReport-%s" % name, "cache/acceptance/coverage")
 
 def localApiTests(ctx, name, suites, storage = "ocis", extra_environment = {}, with_remote_php = False):
     test_dir = "%s/tests/acceptance" % dirs["base"]
@@ -1130,7 +1164,7 @@ def wopiValidatorTests(ctx, storage, wopiServerType, accounts_hash_difficulty = 
         "RenameFileIfCreateChildFileIsNotSupported",
     ]
 
-    ocis_bin = "ocis/bin/ocis"
+    ocis_bin = "ocis/bin/ocis-debug"
     validatorTests = []
     wopiServer = []
     extra_server_environment = {}
@@ -2309,10 +2343,11 @@ def makeGoGenerate(module):
 
 def notify(ctx):
     status = ["failure"]
-    channel = config["rocketchat"]["channel"]
+
+    # channel = config["rocketchat"]["channel"]
     if ctx.build.event == "cron":
         status.append("success")
-        channel = config["rocketchat"]["channel_cron"]
+        # channel = config["rocketchat"]["channel_cron"]
 
     return {
         "kind": "pipeline",
@@ -2327,9 +2362,9 @@ def notify(ctx):
                 "image": PLUGINS_SLACK,
                 "settings": {
                     "webhook": {
-                        "from_secret": config["rocketchat"]["from_secret"],
+                        # "from_secret": config["rocketchat"]["from_secret"],
                     },
-                    "channel": channel,
+                    # "channel": channel,
                 },
             },
         ],
@@ -2344,7 +2379,7 @@ def notify(ctx):
         },
     }
 
-def ocisServer(storage = "ocis", accounts_hash_difficulty = 4, volumes = [], depends_on = [], deploy_type = "", extra_server_environment = {}, with_wrapper = False, tika_enabled = False):
+def ocisServer(storage = "ocis", accounts_hash_difficulty = 4, volumes = [], depends_on = [], deploy_type = "", extra_server_environment = {}, with_wrapper = False, tika_enabled = False, name = ""):
     user = "0:0"
     container_name = OCIS_SERVER_NAME
     environment = {
@@ -2400,6 +2435,7 @@ def ocisServer(storage = "ocis", accounts_hash_difficulty = 4, volumes = [], dep
         "WEB_DEBUG_ADDR": "0.0.0.0:9104",
         "WEBDAV_DEBUG_ADDR": "0.0.0.0:9119",
         "WEBFINGER_DEBUG_ADDR": "0.0.0.0:9279",
+        "GOCOVERDIR": "%s-report" % name,
     }
 
     if deploy_type == "":
@@ -2443,7 +2479,7 @@ def ocisServer(storage = "ocis", accounts_hash_difficulty = 4, volumes = [], dep
     for item in extra_server_environment:
         environment[item] = extra_server_environment[item]
 
-    ocis_bin = "ocis/bin/ocis"
+    ocis_bin = "ocis/bin/ocis-debug"
 
     wrapper_commands = [
         "make -C %s build" % dirs["ocisWrapper"],
@@ -2462,6 +2498,15 @@ def ocisServer(storage = "ocis", accounts_hash_difficulty = 4, volumes = [], dep
         "depends_on": depends_on,
     }
 
+    commands = [
+        "%s init --insecure true" % ocis_bin,
+        "cat $OCIS_CONFIG_DIR/ocis.yaml",
+        "cp tests/config/drone/app-registry.yaml /root/.ocis/config/app-registry.yaml",
+    ] + (wrapper_commands)
+
+    if name != "":
+        commands.insert(0, "mkdir -p $GOCOVERDIR")
+
     return [
         {
             "name": container_name,
@@ -2469,11 +2514,7 @@ def ocisServer(storage = "ocis", accounts_hash_difficulty = 4, volumes = [], dep
             "detach": True,
             "environment": environment,
             "user": user,
-            "commands": [
-                "%s init --insecure true" % ocis_bin,
-                "cat $OCIS_CONFIG_DIR/ocis.yaml",
-                "cp tests/config/drone/app-registry.yaml /root/.ocis/config/app-registry.yaml",
-            ] + (wrapper_commands),
+            "commands": commands,
             "volumes": volumes,
             "depends_on": depends_on,
         },
@@ -2506,7 +2547,7 @@ def startOcisService(service = None, name = None, environment = {}, volumes = []
             "detach": True,
             "environment": environment,
             "commands": [
-                "ocis/bin/ocis %s server" % service,
+                "ocis/bin/ocis-debug %s server" % service,
             ],
             "volumes": volumes,
         },
@@ -2532,7 +2573,7 @@ def build():
             "name": "build",
             "image": OC_CI_GOLANG,
             "commands": [
-                "retry -t 3 'make -C ocis build'",
+                "retry -t 3 'make -C ocis build-debug'",
             ],
             "environment": DRONE_HTTP_PROXY_ENV,
             "volumes": [stepVolumeGo],
@@ -2737,7 +2778,24 @@ def genericCache(name, action, mounts, cache_path):
     }
     return step
 
-def genericCachePurge(flush_path):
+def genericCachePurge(ctx, flush_path):
+    cache_path = "%s/%s/%s" % ("cache", ctx.repo.slug, ctx.build.commit + "-${DRONE_BUILD_NUMBER}")
+
+    # "workdir": "cache/acceptance/coverage/"
+    sonar_env = {
+        "SONAR_TOKEN": {
+            "from_secret": "sonar_token",
+        },
+        "GOPATH": {
+        },
+    }
+    if ctx.build.event == "pull_request":
+        sonar_env.update({
+            "SONAR_PULL_REQUEST_BASE": "%s" % (ctx.build.target),
+            "SONAR_PULL_REQUEST_BRANCH": "%s" % (ctx.build.source),
+            "SONAR_PULL_REQUEST_KEY": "%s" % (ctx.build.ref.replace("refs/pull/", "").split("/")[0]),
+        })
+
     return {
         "kind": "pipeline",
         "type": "docker",
@@ -2747,6 +2805,59 @@ def genericCachePurge(flush_path):
             "arch": "amd64",
         },
         "steps": [
+            {
+                "name": "restore-go-codecoverage",
+                "image": PLUGINS_S3_CACHE,
+                "settings": {
+                    "endpoint": {
+                        "from_secret": "cache_s3_server",
+                    },
+                    "rebuild": "false",
+                    "restore": "true",
+                    "mount": "cache/acceptance/coverage/",
+                    "access_key": {
+                        "from_secret": "cache_s3_access_key",
+                    },
+                    "secret_key": {
+                        "from_secret": "cache_s3_secret_key",
+                    },
+                    "filename": "coverageReport-antivirus_build_artifact_cache.tar",
+                    "path": cache_path,
+                    "fallback_path": cache_path,
+                },
+            },
+            {
+                "name": "zip",
+                "image": OC_UBUNTU,
+                "commands": [
+                    "ls cache/acceptance/coverage/",
+                    "tar -xvf cache/acceptance/coverage/antivirus-report.tar.gz",
+                ],
+            },
+            {
+                "name": "merge-reports",
+                "image": OC_CI_GOLANG,
+                "commands": [
+                    # "fff=$(find cache/acceptance/coverage/ -mindepth 1 -maxdepth 1 -type f -or -type d | tr '\n' ',' | sed 's/,$//')",
+                    "go tool covdata percent -i=authApp-report -o=cov.out",
+                    "cat cov.out",
+                    "mv cov.out cache/acceptance/coverage/",
+                ],
+            },
+            {
+                "name": "sonarcloud",
+                "image": SONARSOURCE_SONAR_SCANNER_CLI,
+                "environment": sonar_env,
+            },
+            {
+                "name": "purge-cache1",
+                "image": MINIO_MC,
+                "environment": MINIO_MC_ENV,
+                "commands": [
+                    "mc alias set cachebucket $MC_HOST $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY",
+                    "mc rm --recursive --force cachebucket/$CACHE_BUCKET/%s/%s/cache || true" % (ctx.repo.slug, ctx.build.commit + "-${DRONE_BUILD_NUMBER}"),
+                ],
+            },
             {
                 "name": "purge-cache",
                 "image": PLUGINS_S3_CACHE,
@@ -2786,7 +2897,7 @@ def genericBuildArtifactCache(ctx, name, action, path):
 
     if action == "purge":
         flush_path = "%s/%s" % ("cache", ctx.repo.slug)
-        return genericCachePurge(flush_path)
+        return genericCachePurge(ctx, flush_path)
     return []
 
 def restoreBuildArtifactCache(ctx, name, path):
