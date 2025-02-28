@@ -3238,3 +3238,127 @@ Feature: Send a sharing invitations
       | resource      |
       | FolderToShare |
       | lorem.txt     |
+
+  @env-config
+  Scenario Outline: try to share resource after disabling the role (Personal Space)
+    Given the administrator has disabled the permissions role "<permissions-role>"
+    And user "Alice" has created folder "folderToShare"
+    And user "Alice" has uploaded file with content "some content" to "textfile.txt"
+    When user "Alice" sends the following resource share invitation using the Graph API:
+      | resource        | <resource>         |
+      | space           | Personal           |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+    Then the HTTP status code should be "400"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": ["code", "innererror", "message"],
+            "properties": {
+              "code": { "const": "invalidRequest" },
+              "innererror": {
+                "type": "object",
+                "required": ["date", "request-id"]
+              },
+              "message": { "const": "Key: 'DriveItemInvite.Roles' Error:Field validation for 'Roles' failed on the 'available_role' tag" }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | resource      | permissions-role |
+      | folderToShare | Viewer           |
+      | folderToShare | Editor           |
+      | folderToShare | Uploader         |
+      | textfile.txt  | Viewer           |
+      | textfile.txt  | File Editor      |
+
+  @env-config
+  Scenario Outline: try to share resource after disabling the role (Project Space)
+    Given the administrator has disabled the permissions role "<permissions-role>"
+    And using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Alice" has created a folder "folderToShare" in space "new-space"
+    And user "Alice" has uploaded a file inside space "new-space" with content "some content" to "textfile.txt"
+    When user "Alice" sends the following resource share invitation using the Graph API:
+      | resource        | <resource>         |
+      | space           | new-space          |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+    Then the HTTP status code should be "400"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": ["code", "innererror", "message"],
+            "properties": {
+              "code": { "const": "invalidRequest" },
+              "innererror": {
+                "type": "object",
+                "required": ["date", "request-id"]
+              },
+              "message": { "const": "Key: 'DriveItemInvite.Roles' Error:Field validation for 'Roles' failed on the 'available_role' tag" }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | resource      | permissions-role |
+      | folderToShare | Viewer           |
+      | folderToShare | Editor           |
+      | folderToShare | Uploader         |
+      | textfile.txt  | Viewer           |
+      | textfile.txt  | File Editor      |
+
+  @env-config
+  Scenario Outline: try to invite to the project space after disabling the role
+    Given the administrator has disabled the permissions role "<permissions-role>"
+    And using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    When user "Alice" sends the following space share invitation using permissions endpoint of the Graph API:
+      | space           | new-space          |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+    Then the HTTP status code should be "400"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": ["code", "innererror", "message"],
+            "properties": {
+              "code": { "const": "invalidRequest" },
+              "innererror": {
+                "type": "object",
+                "required": ["date", "request-id"]
+              },
+              "message": { "const": "Key: 'DriveItemInvite.Roles' Error:Field validation for 'Roles' failed on the 'available_role' tag" }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | permissions-role |
+      | Space Viewer     |
+      | Space Editor     |
+      | Manager          |
