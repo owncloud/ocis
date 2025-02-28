@@ -1275,6 +1275,29 @@ class SpacesContext implements Context {
 	}
 
 	/**
+	 * @When /^user "([^"]*)" creates a folder "([^"]*)" inside federated share "([^"]*)" using the WebDav API$/
+	 *
+	 * @param string $user
+	 * @param string $folder
+	 * @param string $federatedShare
+	 *
+	 * @return void
+	 *
+	 * @throws GuzzleException
+	 */
+	public function userCreatesAFolderInsideFederatedShareUsingTheWebDavApi(
+		string $user,
+		string $folder,
+		string $federatedShare
+	): void {
+		$folder = \trim($folder, '/');
+		$remoteItemId = $this->featureContext->spacesContext->getSharesRemoteItemId($user, $federatedShare);
+		$remoteItemId = \rawurlencode($remoteItemId);
+		$response = $this->featureContext->createFolder($user, $folder, false, null, $remoteItemId);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
 	 * @When /^user "([^"]*)" tries to create subfolder "([^"]*)" in a nonexistent folder of the space "([^"]*)" using the WebDav Api$/
 	 *
 	 * @param string $user
