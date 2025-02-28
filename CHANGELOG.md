@@ -66,9 +66,18 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Fix the OCM role editor: [#11071](https://github.com/owncloud/ocis/pull/11071)
 * Enhancement - Update Mockery to 2.52.3: [#11070](https://github.com/owncloud/ocis/pull/11070)
 
 ## Details
+
+* Bugfix - Fix the OCM role editor: [#11071](https://github.com/owncloud/ocis/pull/11071)
+
+   Fix the OCM role editor permission set. The redundant permissions have been
+   removed.
+
+   https://github.com/owncloud/ocis/issues/11054
+   https://github.com/owncloud/ocis/pull/11071
 
 * Enhancement - Update Mockery to 2.52.3: [#11070](https://github.com/owncloud/ocis/pull/11070)
 
