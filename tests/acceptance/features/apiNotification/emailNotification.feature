@@ -36,13 +36,13 @@ Feature: Email notification
       | space              | new-space            |
       | role               | viewer               |
       | permissionsRole    | Space Viewer         |
-      | expirationDateTime | 2025-02-25T14:00:00Z |
+      | expirationDateTime | 2200-07-15T14:00:00Z |
     When user "Alice" expires the user share of space "new-space" for user "Brian"
     Then user "Brian" should have received the following email from user "Alice" about the share of project space "new-space"
       """
       Hello Brian Murphy,
 
-      Your membership of space new-space has expired at 2025-02-26 02:00:00
+      Your membership of space new-space has expired at 2025-02-27 02:00:00
 
       Even though this membership has expired you still might have access through other shares and/or space memberships
       """
