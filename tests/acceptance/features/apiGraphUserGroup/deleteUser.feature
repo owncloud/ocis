@@ -9,7 +9,7 @@ Feature: delete user
   Background:
     Given user "Alice" has been created with default attributes
 
-
+  @issue-11027
   Scenario Outline: admin user deletes a user
     Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     And the user "Alice" has created a new user with the following attributes:
@@ -25,6 +25,7 @@ Feature: delete user
       | SameDisplayName      | Alice Hansen    | new@example.org     | containsCharacters(*:!;_+-&) |
       | withoutPassSameEmail | without pass    | alice@example.org   |                              |
       | name                 | pass with space | example@example.org | my pass                      |
+      | user+name            | Alex Hudson     | demo@example.org    | root                         |
 
 
   Scenario: delete a user and specify the user name in different case

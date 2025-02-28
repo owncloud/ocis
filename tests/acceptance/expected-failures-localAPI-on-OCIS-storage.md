@@ -340,5 +340,8 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiOcm/enableDisablePermissionsRole.feature:18](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/enableDisablePermissionsRole.feature#L18)
 - [apiOcm/enableDisablePermissionsRole.feature:58](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/enableDisablePermissionsRole.feature#L58)
 
+#### [Delete user containing + in username returns 404 but user gets deleted](https://github.com/owncloud/ocis/issues/11027)
+- [apiGraphUserGroup/deleteUser.feature:28](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/deleteUser.feature#L28)
+
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.
