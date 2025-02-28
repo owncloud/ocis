@@ -329,12 +329,12 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiOcm/acceptInvitation.feature:148](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/acceptInvitation.feature#L148)
 
 #### [[OCM] Sharee can access expired federated share](https://github.com/owncloud/ocis/issues/11033)
-- [apiOcm/share.feature:1154](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L1154)
-- [apiOcm/share.feature:1174](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L1174)
+- [apiOcm/share.feature:1158](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L1158)
+- [apiOcm/share.feature:1178](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L1178)
 
 #### [[OCM] Hide & Enable Sync fail with received federated shares](https://github.com/owncloud/ocis/issues/10719)
-- [apiOcm/share.feature:1194](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L1194)
-- [apiOcm/share.feature:1218](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L1218)
+- [apiOcm/share.feature:1198](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L1198)
+- [apiOcm/share.feature:1222](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L1222)
 
 #### [[OCM] federated user trying to download file shared with permissions role Secure Viewer returns 500 status code](https://github.com/owncloud/ocis/issues/10822)
 - [apiOcm/enableDisablePermissionsRole.feature:18](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/enableDisablePermissionsRole.feature#L18)
