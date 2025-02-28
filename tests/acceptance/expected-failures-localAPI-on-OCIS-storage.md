@@ -332,5 +332,9 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiOcm/share.feature:1154](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L1154)
 - [apiOcm/share.feature:1174](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L1174)
 
+#### [[OCM] Hide & Enable Sync fail with received federated shares](https://github.com/owncloud/ocis/issues/10719)
+- [apiOcm/share.feature:1194](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L1194)
+- [apiOcm/share.feature:1218](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L1218)
+
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.
