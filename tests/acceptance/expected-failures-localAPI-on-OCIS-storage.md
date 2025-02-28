@@ -330,6 +330,11 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiOcm/enableDisablePermissionsRole.feature:18](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/enableDisablePermissionsRole.feature#L18)
 - [apiOcm/enableDisablePermissionsRole.feature:58](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/enableDisablePermissionsRole.feature#L58)
 
+#### Commented out when backport the release-7.1.1 to master
+#### [[OCM] Sharee can access expired federated share](https://github.com/owncloud/ocis/issues/11033)
+# - [apiOcm/share.feature:1158](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L1158)
+# - [apiOcm/share.feature:1178](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L1178)
+
 #### [Delete user containing + in username returns 404 but user gets deleted](https://github.com/owncloud/ocis/issues/11027)
 - [apiGraphUserGroup/deleteUser.feature:28](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/deleteUser.feature#L28)
 
