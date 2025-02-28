@@ -847,20 +847,10 @@ func (fs *Decomposedfs) linkStorageSpaceType(ctx context.Context, spaceType, spa
 
 func (fs *Decomposedfs) StorageSpaceFromNode(ctx context.Context, n *node.Node, checkPermissions bool) (*provider.StorageSpace, error) {
 	user := ctxpkg.ContextMustGetUser(ctx)
-	if checkPermissions {
+	if checkPermissions && n.SpaceRoot.IsDisabled(ctx) {
 		rp, err := fs.p.AssemblePermissions(ctx, n)
-		switch {
-		case err != nil:
-			return nil, err
-		case !rp.Stat:
-			return nil, errtypes.NotFound(fmt.Sprintf("space %s not found", n.ID))
-		}
-
-		if n.SpaceRoot.IsDisabled(ctx) {
-			rp, err := fs.p.AssemblePermissions(ctx, n)
-			if err != nil || !permissions.IsManager(rp) {
-				return nil, errtypes.PermissionDenied(fmt.Sprintf("user %s is not allowed to list deleted spaces %s", user.Username, n.ID))
-			}
+		if err != nil || !permissions.IsManager(rp) {
+			return nil, errtypes.PermissionDenied(fmt.Sprintf("user %s is not allowed to list deleted spaces %s", user.Username, n.ID))
 		}
 	}
 
@@ -934,7 +924,7 @@ func (fs *Decomposedfs) StorageSpaceFromNode(ctx context.Context, n *node.Node, 
 				}
 
 				// publish SpaceMembershipExpired event
-				if errDeleteGrant == nil && errIndexRemove == nil {
+				if errDeleteGrant == nil {
 					ev := events.SpaceMembershipExpired{
 						SpaceOwner: n.SpaceOwnerOrManager(ctx),
 						SpaceID:    &provider.StorageSpaceId{OpaqueId: n.SpaceID},
@@ -959,6 +949,17 @@ func (fs *Decomposedfs) StorageSpaceFromNode(ctx context.Context, n *node.Node, 
 			grantExpiration[id] = g.Expiration
 		}
 		grantMap[id] = g.Permissions
+	}
+
+	// check permissions after expired grants have been removed
+	if checkPermissions {
+		rp, err := fs.p.AssemblePermissions(ctx, n)
+		switch {
+		case err != nil:
+			return nil, err
+		case !rp.Stat:
+			return nil, errtypes.NotFound(fmt.Sprintf("space %s not found", n.ID))
+		}
 	}
 
 	grantMapJSON, err := json.Marshal(grantMap)
