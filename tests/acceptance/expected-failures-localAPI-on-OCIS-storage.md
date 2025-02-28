@@ -329,8 +329,8 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiOcm/acceptInvitation.feature:148](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/acceptInvitation.feature#L148)
 
 #### [[OCM] Sharee can access expired federated share](https://github.com/owncloud/ocis/issues/11033)
-- [apiOcm/share.feature:1154](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L1154)
-- [apiOcm/share.feature:1174](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L1174)
+- [apiOcm/share.feature:1158](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L1158)
+- [apiOcm/share.feature:1178](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L1178)
 
 #### [[OCM] Hide & Enable Sync fail with received federated shares](https://github.com/owncloud/ocis/issues/10719)
 - [apiOcm/share.feature:1194](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L1194)
