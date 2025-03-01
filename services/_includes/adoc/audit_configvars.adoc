@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2025-02-28-00-05-50]
+[#deprecation-note-2025-03-01-00-06-24]
 [caption=]
 .Deprecation notes for the audit service
 [width="100%",cols="~,~,~,~",options="header"]
