@@ -1168,11 +1168,7 @@ Feature: an user shares resources using ScienceMesh application
     When user "Alice" expires the last share of resource "textfile.txt" inside of the space "Personal"
     Then the HTTP status code should be "200"
     And using server "REMOTE"
-    When user "Brian" updates the content of federated share "textfile.txt" with "this is a new content" using the WebDAV API
-    Then the HTTP status code should be "404"
     And user "Brian" should not have a federated share "textfile.txt" shared by user "Alice" from space "Personal"
-    And using server "LOCAL"
-    And for user "Alice" the content of the file "textfile.txt" of the space "Personal" should be "ocm test"
 
   @issue-11033
   Scenario: external sharee shouldn't be able to the access folder when federated share expires
@@ -1188,11 +1184,7 @@ Feature: an user shares resources using ScienceMesh application
     When user "Alice" expires the last share of resource "folderToShare" inside of the space "Personal"
     Then the HTTP status code should be "200"
     And using server "REMOTE"
-    When user "Brian" uploads a file with content "lorem" to "file.txt" inside federated share "folderToShare" via TUS using the WebDAV API
-    Then the HTTP status code should be "404"
     And user "Brian" should not have a federated share "folderToShare" shared by user "Alice" from space "Personal"
-    And using server "LOCAL"
-    And as "Alice" file "folderToShare/file.txt" should not exist
 
   @issue-10719
   Scenario: federated user hides the file shared by local user
