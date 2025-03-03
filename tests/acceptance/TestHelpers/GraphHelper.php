@@ -44,6 +44,8 @@ class GraphHelper {
 		'Secure Viewer' => 'aa97fe03-7980-45ac-9e50-b325749fd7e6',
 		'Space Editor Without Versions' => '3284f2d5-0070-4ad8-ac40-c247f7c1fb27',
 		'Denied' => '63e64e19-8d43-42ec-a738-2b6af2610efa',
+		'Editor With Versions' => '0911d62b-1e3f-4778-8b1b-903b7e4e8476',
+		'File Editor With Versions' => 'b173329d-cf2e-42f0-a595-ee410645d840'
 	];
 
 	public const SHARING_LINK_TYPE_MAPPINGS = [

@@ -365,6 +365,16 @@ default:
         - EmailContext:
         - OcisConfigContext:
 
+    apiOptionalShareRole:
+      paths:
+        - "%paths.base%/../features/apiOptionalShareRole"
+      context: *common_ldap_suite_context
+      contexts:
+        - FeatureContext: *common_feature_context_params
+        - GraphContext:
+        - SharingNgContext:
+        - OcisConfigContext:
+
     apiSharingNgShareInvitation:
       paths:
         - "%paths.base%/../features/apiSharingNgShareInvitation"
