@@ -328,13 +328,9 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 #### [[OCM] Users can invite themselves to their own federated connection](https://github.com/owncloud/ocis/issues/11004)
 - [apiOcm/acceptInvitation.feature:148](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/acceptInvitation.feature#L148)
 
-#### [[OCM] Sharee can access expired federated share](https://github.com/owncloud/ocis/issues/11033)
-- [apiOcm/share.feature:1158](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L1158)
-- [apiOcm/share.feature:1178](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L1178)
-
 #### [[OCM] Hide & Enable Sync fail with received federated shares](https://github.com/owncloud/ocis/issues/10719)
-- [apiOcm/share.feature:1198](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L1198)
-- [apiOcm/share.feature:1222](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L1222)
+- [apiOcm/share.feature:1190](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L1190)
+- [apiOcm/share.feature:1214](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L1214)
 
 #### [[OCM] federated user trying to download file shared with permissions role Secure Viewer returns 500 status code](https://github.com/owncloud/ocis/issues/10822)
 - [apiOcm/enableDisablePermissionsRole.feature:18](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/enableDisablePermissionsRole.feature#L18)
