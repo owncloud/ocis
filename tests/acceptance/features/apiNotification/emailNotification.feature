@@ -17,7 +17,7 @@ Feature: Email notification
     When user "Alice" shares a space "new-space" with settings:
       | shareWith | Brian  |
       | role      | Editor |
-    Then the HTTP status code should be "200"
+    Then the HTTP status code should be "200"§
     And user "Brian" should have received the following email from user "Alice" about the share of project space "new-space"
       """
       Hello Brian Murphy,
@@ -42,7 +42,7 @@ Feature: Email notification
       """
       Hello Brian Murphy,
 
-      Your membership of space new-space has expired at 2025-02-27 02:00:00
+      Your membership of space new-space has expired at 2025-03-03 02:00:00
 
       Even though this membership has expired you still might have access through other shares and/or space memberships
       """
