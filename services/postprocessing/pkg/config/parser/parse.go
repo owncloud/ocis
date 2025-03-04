@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/cs3org/reva/v2/pkg/events"
 	ociscfg "github.com/owncloud/ocis/v2/ocis-pkg/config"
 	"github.com/owncloud/ocis/v2/services/postprocessing/pkg/config"
 	"github.com/owncloud/ocis/v2/services/postprocessing/pkg/config/defaults"
+	"github.com/owncloud/reva/v2/pkg/events"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/envdecode"
 )

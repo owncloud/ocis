@@ -5,7 +5,7 @@ import (
 	"encoding/hex"
 
 	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	"github.com/cs3org/reva/v2/pkg/storagespace"
+	"github.com/owncloud/reva/v2/pkg/storagespace"
 )
 
 // HashResourceId builds a urlsafe and stable file reference that can be used for proxy routing,

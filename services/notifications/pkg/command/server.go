@@ -3,17 +3,18 @@ package command
 import (
 	"context"
 	"fmt"
-	"github.com/cs3org/reva/v2/pkg/store"
-	ehsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/eventhistory/v0"
-	microstore "go-micro.dev/v4/store"
 	"reflect"
+
+	ehsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/eventhistory/v0"
+	"github.com/owncloud/reva/v2/pkg/store"
+	microstore "go-micro.dev/v4/store"
 
 	"github.com/oklog/run"
 	"github.com/urfave/cli/v2"
 
-	"github.com/cs3org/reva/v2/pkg/events"
-	"github.com/cs3org/reva/v2/pkg/events/stream"
-	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
+	"github.com/owncloud/reva/v2/pkg/events"
+	"github.com/owncloud/reva/v2/pkg/events/stream"
+	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"

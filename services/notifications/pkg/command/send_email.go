@@ -2,9 +2,10 @@ package command
 
 import (
 	"fmt"
-	"github.com/cs3org/reva/v2/pkg/events"
-	"github.com/cs3org/reva/v2/pkg/events/stream"
+
 	"github.com/owncloud/ocis/v2/services/notifications/pkg/config"
+	"github.com/owncloud/reva/v2/pkg/events"
+	"github.com/owncloud/reva/v2/pkg/events/stream"
 	"github.com/pkg/errors"
 	"github.com/urfave/cli/v2"
 )

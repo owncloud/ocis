@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
-	"github.com/cs3org/reva/v2/pkg/store"
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	registry "github.com/owncloud/ocis/v2/ocis-pkg/registry"
@@ -19,6 +17,8 @@ import (
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/server/debug"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/server/grpc"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/server/http"
+	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
+	"github.com/owncloud/reva/v2/pkg/store"
 	"github.com/urfave/cli/v2"
 	microstore "go-micro.dev/v4/store"
 )

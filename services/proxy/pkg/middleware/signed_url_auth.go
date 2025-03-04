@@ -10,11 +10,11 @@ import (
 	"strings"
 	"time"
 
-	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/user/backend"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/userroles"
+	revactx "github.com/owncloud/reva/v2/pkg/ctx"
 	microstore "go-micro.dev/v4/store"
 	"golang.org/x/crypto/pbkdf2"
 )

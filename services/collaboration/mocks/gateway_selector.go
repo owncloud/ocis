@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	pool "github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
+	pool "github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
 	mock "github.com/stretchr/testify/mock"
 )
 

@@ -3,21 +3,23 @@ package service
 import (
 	"context"
 	"encoding/json"
+	"reflect"
+
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
-	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	event "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/eventhistory/v0"
 	ehsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/eventhistory/v0"
 	"github.com/owncloud/ocis/v2/protogen/gen/ocis/services/eventhistory/v0/mocks"
+	"github.com/owncloud/reva/v2/pkg/events"
 	"github.com/stretchr/testify/mock"
-	"reflect"
+
+	"testing"
 
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"go-micro.dev/v4/store"
 	storemocks "go-micro.dev/v4/store/mocks"
-	"testing"
 )
 
 func Test_userEventStore_persist(t *testing.T) {

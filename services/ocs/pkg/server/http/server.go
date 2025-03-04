@@ -2,13 +2,14 @@ package http
 
 import (
 	"fmt"
-	"github.com/cs3org/reva/v2/pkg/store"
+
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/owncloud/ocis/v2/ocis-pkg/cors"
 	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/http"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	svc "github.com/owncloud/ocis/v2/services/ocs/pkg/service/v0"
+	"github.com/owncloud/reva/v2/pkg/store"
 	"go-micro.dev/v4"
 	microstore "go-micro.dev/v4/store"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"

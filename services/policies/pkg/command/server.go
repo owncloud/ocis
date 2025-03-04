@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/cs3org/reva/v2/pkg/events/stream"
 	"github.com/oklog/run"
+	"github.com/owncloud/reva/v2/pkg/events/stream"
 	"github.com/urfave/cli/v2"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"

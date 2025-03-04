@@ -4,10 +4,10 @@ import (
 	"testing"
 
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	cs3Conversions "github.com/cs3org/reva/v2/pkg/conversions"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/types"
 	libregraph "github.com/owncloud/libre-graph-api-go"
+	cs3Conversions "github.com/owncloud/reva/v2/pkg/conversions"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/conversions"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/unifiedrole"

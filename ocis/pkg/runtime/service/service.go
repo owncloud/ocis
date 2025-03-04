@@ -14,12 +14,12 @@ import (
 	authapp "github.com/owncloud/ocis/v2/services/auth-app/pkg/command"
 
 	"github.com/cenkalti/backoff"
-	"github.com/cs3org/reva/v2/pkg/events/stream"
-	"github.com/cs3org/reva/v2/pkg/logger"
-	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/mohae/deepcopy"
 	"github.com/olekukonko/tablewriter"
 	notifications "github.com/owncloud/ocis/v2/services/notifications/pkg/command"
+	"github.com/owncloud/reva/v2/pkg/events/stream"
+	"github.com/owncloud/reva/v2/pkg/logger"
+	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/thejerf/suture/v4"
 
 	ociscfg "github.com/owncloud/ocis/v2/ocis-pkg/config"

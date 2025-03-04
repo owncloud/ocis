@@ -1,7 +1,7 @@
 package shared
 
 import (
-	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
+	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
 )
 
 var defaultRevaConfig = Reva{

@@ -8,22 +8,22 @@ import (
 	"strings"
 	"time"
 
-	"github.com/cs3org/reva/v2/pkg/utils"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/owncloud/ocis/v2/services/collaboration/mocks"
+	"github.com/owncloud/reva/v2/pkg/utils"
 	"github.com/stretchr/testify/mock"
 
 	appproviderv1beta1 "github.com/cs3org/go-cs3apis/cs3/app/provider/v1beta1"
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	revactx "github.com/cs3org/reva/v2/pkg/ctx"
-	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/connector"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/middleware"
+	revactx "github.com/owncloud/reva/v2/pkg/ctx"
+	"github.com/owncloud/reva/v2/pkg/rgrpc/status"
 
-	cs3mocks "github.com/cs3org/reva/v2/tests/cs3mocks/mocks"
+	cs3mocks "github.com/owncloud/reva/v2/tests/cs3mocks/mocks"
 )
 
 var _ = Describe("ContentConnector", func() {

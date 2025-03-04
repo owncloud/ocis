@@ -26,12 +26,12 @@ import (
 	"github.com/tidwall/gjson"
 	"google.golang.org/grpc"
 
-	roleconversions "github.com/cs3org/reva/v2/pkg/conversions"
-	revactx "github.com/cs3org/reva/v2/pkg/ctx"
-	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
-	"github.com/cs3org/reva/v2/pkg/storagespace"
-	"github.com/cs3org/reva/v2/pkg/utils"
-	cs3mocks "github.com/cs3org/reva/v2/tests/cs3mocks/mocks"
+	roleconversions "github.com/owncloud/reva/v2/pkg/conversions"
+	revactx "github.com/owncloud/reva/v2/pkg/ctx"
+	"github.com/owncloud/reva/v2/pkg/rgrpc/status"
+	"github.com/owncloud/reva/v2/pkg/storagespace"
+	"github.com/owncloud/reva/v2/pkg/utils"
+	cs3mocks "github.com/owncloud/reva/v2/tests/cs3mocks/mocks"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/graph/mocks"

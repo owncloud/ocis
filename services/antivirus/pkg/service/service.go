@@ -12,11 +12,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/cs3org/reva/v2/pkg/bytesize"
-	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
-	"github.com/cs3org/reva/v2/pkg/events"
-	"github.com/cs3org/reva/v2/pkg/events/stream"
-	"github.com/cs3org/reva/v2/pkg/rhttp"
+	"github.com/owncloud/reva/v2/pkg/bytesize"
+	ctxpkg "github.com/owncloud/reva/v2/pkg/ctx"
+	"github.com/owncloud/reva/v2/pkg/events"
+	"github.com/owncloud/reva/v2/pkg/events/stream"
+	"github.com/owncloud/reva/v2/pkg/rhttp"
 	"go.opentelemetry.io/otel/trace"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"

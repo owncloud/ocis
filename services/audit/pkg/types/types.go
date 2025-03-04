@@ -1,6 +1,6 @@
 package types
 
-import "github.com/cs3org/reva/v2/pkg/events"
+import "github.com/owncloud/reva/v2/pkg/events"
 
 // AuditEvent is the basic audit event
 type AuditEvent struct {
