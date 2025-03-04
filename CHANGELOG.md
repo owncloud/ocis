@@ -67,6 +67,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Fix the OCM role editor: [#11071](https://github.com/owncloud/ocis/pull/11071)
+* Bugfix - Fix the SpaceMembershipExpired event: [#11078](https://github.com/owncloud/ocis/pull/11078)
 * Enhancement - Update Mockery to 2.52.3: [#11070](https://github.com/owncloud/ocis/pull/11070)
 * Enhancement - Bump Reva: [#11083](https://github.com/owncloud/ocis/pull/11083)
 
@@ -79,6 +80,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/11054
    https://github.com/owncloud/ocis/pull/11071
+
+* Bugfix - Fix the SpaceMembershipExpired event: [#11078](https://github.com/owncloud/ocis/pull/11078)
+
+   We fixed the SpaceMembershipExpired event emitting.
+
+   https://github.com/owncloud/ocis/issues/10882
+   https://github.com/owncloud/ocis/pull/11078
 
 * Enhancement - Update Mockery to 2.52.3: [#11070](https://github.com/owncloud/ocis/pull/11070)
 
