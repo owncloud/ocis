@@ -17,7 +17,6 @@ require (
 	github.com/cenkalti/backoff v2.2.1+incompatible
 	github.com/coreos/go-oidc/v3 v3.11.0
 	github.com/cs3org/go-cs3apis v0.0.0-20241105092511-3ad35d174fc1
-	github.com/cs3org/reva/v2 v2.27.8-0.20250304105945-35ccd7c61cc0
 	github.com/davidbyttow/govips/v2 v2.16.0
 	github.com/dhowden/tag v0.0.0-20240417053706-3d75831295e8
 	github.com/dutchcoders/go-clamd v0.0.0-20170520113014-b970184f4d9e
@@ -68,6 +67,7 @@ require (
 	github.com/open-policy-agent/opa v0.70.0
 	github.com/orcaman/concurrent-map v1.0.0
 	github.com/owncloud/libre-graph-api-go v1.0.5-0.20250217093259-fa3804be6c27
+	github.com/owncloud/reva/v2 v2.0.0-20250306080849-10d8d8fcd5c1
 	github.com/pkg/errors v0.9.1
 	github.com/pkg/xattr v0.4.10
 	github.com/prometheus/client_golang v1.20.5
