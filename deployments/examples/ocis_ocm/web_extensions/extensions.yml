@@ -1,0 +1,7 @@
+services:
+  ocis:
+    volumes:
+      - ocis-apps:/var/lib/ocis/web/assets/apps
+
+volumes:
+  ocis-apps:

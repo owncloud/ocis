@@ -1,0 +1,37 @@
+[
+  {
+    "name": "ocis-server",
+    "full_name": "first-ocis-instance",
+    "organization": "Owncloud",
+    "domain": ".*.owncloud.test",
+    "homepage": "https://owncloud.com",
+    "services": [
+      {
+        "endpoint": {
+          "type": {
+            "name": "OCM",
+            "description": "ocis.owncloud.test Open Cloud Mesh API"
+          },
+          "name": "ocis - OCM API",
+          "path": "https://.*.owncloud.test/ocm/",
+          "is_monitored": true
+        },
+        "api_version": "0.0.1",
+        "host": ".*.owncloud.test"
+      },
+      {
+        "endpoint": {
+          "type": {
+            "name": "Webdav",
+            "description": ".*.owncloud.test Webdav API"
+          },
+          "name": "ocis - Webdav API",
+          "path": "https://.*.owncloud.test/dav/",
+          "is_monitored": true
+        },
+        "api_version": "0.0.1",
+        "host": ".*.owncloud.test"
+      }
+    ]
+  }
+]
