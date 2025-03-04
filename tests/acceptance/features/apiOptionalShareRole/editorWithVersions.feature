@@ -524,3 +524,673 @@ Feature: an user shares resources
         }
       }
       """
+
+
+  Scenario: sharee lists the file share shared with FileEditorWithVersions permission role (Personal Space)
+    Given the administrator has enabled the permissions role "File Editor With Versions"
+    And user "Alice" has uploaded file with content "hello world" to "textfile.txt"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | textfile.txt              |
+      | space           | Personal                  |
+      | sharee          | Brian                     |
+      | shareType       | user                      |
+      | permissionsRole | File Editor With Versions |
+    When user "Brian" lists the shares shared with him using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "@UI.Hidden",
+                "@client.synchronize",
+                "createdBy",
+                "eTag",
+                "file",
+                "id",
+                "lastModifiedDateTime",
+                "name",
+                "parentReference",
+                "remoteItem",
+                "size"
+              ],
+              "properties": {
+                "@UI.Hidden": { "const": false },
+                "@client.synchronize": { "const": true },
+                "createdBy": {
+                  "type": "object",
+                  "required": ["user"],
+                  "properties": {
+                    "user": {
+                      "type": "object",
+                      "required": ["displayName", "id"],
+                      "properties": {
+                        "displayName": { "const": "Alice Hansen" },
+                        "id": { "pattern": "^%user_id_pattern%$" }
+                      }
+                    }
+                  }
+                },
+                "eTag": { "pattern": "%etag_pattern%" },
+                "file": {
+                  "type": "object",
+                  "required": ["mimeType"],
+                  "properties": { "mimeType": { "const": "text/plain" } }
+                },
+                "id": { "pattern": "^%share_id_pattern%$" },
+                "name": { "const": "textfile.txt" },
+                "parentReference": {
+                  "type": "object",
+                  "required": ["driveId", "driveType", "id"],
+                  "properties": {
+                    "driveId": { "pattern": "^%space_id_pattern%$" },
+                    "driveType": { "const": "virtual" },
+                    "id": { "pattern": "^%file_id_pattern%$" }
+                  }
+                },
+                "remoteItem": {
+                  "type": "object",
+                  "required": [
+                    "createdBy",
+                    "eTag",
+                    "file",
+                    "id",
+                    "lastModifiedDateTime",
+                    "name",
+                    "parentReference",
+                    "permissions",
+                    "size"
+                  ],
+                  "properties": {
+                    "createdBy": {
+                      "type": "object",
+                      "required": ["user"],
+                      "properties": {
+                        "user": {
+                          "type": "object",
+                          "required": ["id", "displayName"],
+                          "properties": {
+                            "id": { "pattern": "^%user_id_pattern%$" },
+                            "displayName": { "const": "Alice Hansen" }
+                          }
+                        }
+                      }
+                    },
+                    "eTag": { "pattern": "%etag_pattern%" },
+                    "file": {
+                      "type": "object",
+                      "required": ["mimeType"],
+                      "properties": {
+                        "mimeType": { "const": "text/plain" }
+                      }
+                    },
+                    "id": { "pattern": "^%file_id_pattern%$" },
+                    "name": { "const": "textfile.txt" },
+                    "parentReference": {
+                      "type": "object",
+                      "required": ["driveId", "driveType"],
+                      "properties": {
+                        "driveId": { "pattern": "^%file_id_pattern%$" },
+                        "driveType": { "const": "personal" }
+                      }
+                    },
+                    "permissions": {
+                      "type": "array",
+                      "minItems": 1,
+                      "maxItems": 1,
+                      "items": {
+                        "type": "object",
+                        "required": ["grantedToV2", "id", "invitation", "roles"],
+                        "properties": {
+                          "id": { "pattern": "^%permissions_id_pattern%$" },
+                          "grantedToV2": {
+                            "type": "object",
+                            "required": ["user"],
+                            "properties": {
+                              "user": {
+                                "type": "object",
+                                "required": ["displayName", "id"],
+                                "properties": {
+                                  "displayName": { "const": "Brian Murphy" },
+                                  "id": { "pattern": "^%user_id_pattern%$" }
+                                }
+                              }
+                            }
+                          },
+                          "invitation": {
+                            "type": "object",
+                            "properties": {
+                              "invitedBy": {
+                                "type": "object",
+                                "properties": {
+                                  "user": {
+                                    "type": "object",
+                                    "properties": {
+                                      "displayName": { "const": "Alice Hansen" },
+                                      "id": { "pattern": "^%user_id_pattern%$" }
+                                    },
+                                    "required": ["displayName", "id"]
+                                  }
+                                },
+                                "required": ["user"]
+                              }
+                            },
+                            "required": ["invitedBy"]
+                          },
+                          "roles": {
+                            "type": "array",
+                            "minItems": 1,
+                            "maxItems": 1,
+                            "items": { "const": "b173329d-cf2e-42f0-a595-ee410645d840" }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "size": { "const": 11 }
+              }
+            }
+          }
+        }
+      }
+      """
+
+
+  Scenario: sharee lists the file share shared with FileEditorWithVersions permission role (Project Space)
+    Given using spaces DAV path
+    And the administrator has enabled the permissions role "File Editor With Versions"
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Alice" has uploaded a file inside space "new-space" with content "some content" to "testfile.txt"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | testfile.txt              |
+      | space           | new-space                 |
+      | sharee          | Brian                     |
+      | shareType       | user                      |
+      | permissionsRole | File Editor With Versions |
+    When user "Brian" lists the shares shared with him using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "@UI.Hidden",
+                "@client.synchronize",
+                "eTag",
+                "file",
+                "id",
+                "lastModifiedDateTime",
+                "name",
+                "parentReference",
+                "remoteItem",
+                "size"
+              ],
+              "properties": {
+                "@UI.Hidden": { "const": false },
+                "@client.synchronize": { "const": true },
+                "eTag": { "pattern": "%etag_pattern%" },
+                "file": {
+                  "type": "object",
+                  "required": ["mimeType"],
+                  "properties": { "mimeType": { "const": "text/plain" } }
+                },
+                "id": { "pattern": "^%share_id_pattern%$" },
+                "name": { "const": "testfile.txt" },
+                "parentReference": {
+                  "type": "object",
+                  "required": ["driveId", "driveType"],
+                  "properties": {
+                    "driveId": { "pattern": "^%space_id_pattern%$" },
+                    "driveType": { "const": "virtual" },
+                    "id": { "pattern": "^%file_id_pattern%$" }
+                  }
+                },
+                "remoteItem": {
+                  "type": "object",
+                  "required": [
+                    "eTag",
+                    "file",
+                    "id",
+                    "lastModifiedDateTime",
+                    "name",
+                    "parentReference",
+                    "permissions",
+                    "size"
+                  ],
+                  "properties": {
+                    "createdBy": {
+                      "type": "object",
+                      "required": ["user"],
+                      "properties": {
+                        "user": {
+                          "type": "object",
+                          "required": ["id", "displayName"],
+                          "properties": {
+                            "id": { "pattern": "^%user_id_pattern%$" },
+                            "displayName": { "const": "Alice Hansen" }
+                          }
+                        }
+                      }
+                    },
+                    "eTag": { "pattern": "%etag_pattern%" },
+                    "file": {
+                      "type": "object",
+                      "required": ["mimeType"],
+                      "properties": {
+                        "mimeType": { "const": "text/plain" }
+                      }
+                    },
+                    "id": { "pattern": "^%file_id_pattern%$" },
+                    "name": { "const": "testfile.txt" },
+                    "parentReference": {
+                      "type": "object",
+                      "required": ["driveId", "driveType"],
+                      "properties": {
+                        "driveId": { "pattern": "^%file_id_pattern%$" },
+                        "driveType": { "const": "project" }
+                      }
+                    },
+                    "permissions": {
+                      "type": "array",
+                      "minItems": 1,
+                      "maxItems": 1,
+                      "items": {
+                        "type": "object",
+                        "required": ["grantedToV2", "id", "invitation", "roles"],
+                        "properties": {
+                          "id": { "pattern": "^%permissions_id_pattern%$" },
+                          "grantedToV2": {
+                            "type": "object",
+                            "required": ["user"],
+                            "properties": {
+                              "user": {
+                                "type": "object",
+                                "required": ["displayName", "id"],
+                                "properties": {
+                                  "displayName": { "const": "Brian Murphy" },
+                                  "id": { "pattern": "^%user_id_pattern%$" }
+                                }
+                              }
+                            }
+                          },
+                          "invitation": {
+                            "type": "object",
+                            "properties": {
+                              "invitedBy": {
+                                "type": "object",
+                                "properties": {
+                                  "user": {
+                                    "type": "object",
+                                    "properties": {
+                                      "displayName": { "const": "Alice Hansen" },
+                                      "id": { "pattern": "^%user_id_pattern%$" }
+                                    },
+                                    "required": ["displayName", "id"]
+                                  }
+                                },
+                                "required": ["user"]
+                              }
+                            },
+                            "required": ["invitedBy"]
+                          },
+                          "roles": {
+                            "type": "array",
+                            "minItems": 1,
+                            "maxItems": 1,
+                            "items": { "const": "b173329d-cf2e-42f0-a595-ee410645d840" }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "size": { "const": 12 }
+              }
+            }
+          }
+        }
+      }
+      """
+
+
+  Scenario: sharee lists the folder share shared with EditorWithVersions permission role (Personal Space)
+    Given the administrator has enabled the permissions role "Editor With Versions"
+    And user "Alice" has created folder "folder"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | folder               |
+      | space           | Personal             |
+      | sharee          | Brian                |
+      | shareType       | user                 |
+      | permissionsRole | Editor With Versions |
+    When user "Brian" lists the shares shared with him using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "value"
+        ],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "@UI.Hidden",
+                "@client.synchronize",
+                "createdBy",
+                "eTag",
+                "folder",
+                "id",
+                "lastModifiedDateTime",
+                "name",
+                "parentReference",
+                "remoteItem"
+              ],
+              "properties": {
+                "@UI.Hidden": { "const": false },
+                "@client.synchronize": { "const": true },
+                "createdBy": {
+                  "type": "object",
+                  "required": ["user"],
+                  "properties": {
+                    "user": {
+                      "type": "object",
+                      "required": ["displayName", "id"],
+                      "properties": {
+                        "displayName": { "const": "Alice Hansen" },
+                        "id": { "pattern": "^%user_id_pattern%$" }
+                      }
+                    }
+                  }
+                },
+                "eTag": { "pattern": "%etag_pattern%" },
+                "folder": {
+                  "const": {}
+                },
+                "id": { "pattern": "^%share_id_pattern%$" },
+                "name": { "const": "folder" },
+                "parentReference": {
+                  "type": "object",
+                  "required": ["driveId", "driveType", "id"],
+                  "properties": {
+                    "driveId": { "pattern": "^%space_id_pattern%$" },
+                    "driveType": { "const": "virtual" },
+                    "id": { "pattern": "^%file_id_pattern%$" }
+                  }
+                },
+                "remoteItem": {
+                  "type": "object",
+                  "required": [
+                    "createdBy",
+                    "eTag",
+                    "folder",
+                    "id",
+                    "lastModifiedDateTime",
+                    "name",
+                    "parentReference",
+                    "permissions"
+                  ],
+                  "properties": {
+                    "createdBy": {
+                      "type": "object",
+                      "required": ["user"],
+                      "properties": {
+                        "user": {
+                          "type": "object",
+                          "required": ["id", "displayName"],
+                          "properties": {
+                            "id": { "pattern": "^%user_id_pattern%$" },
+                            "displayName": { "const": "Alice Hansen" }
+                          }
+                        }
+                      }
+                    },
+                    "eTag": { "pattern": "%etag_pattern%" },
+                    "file": {
+                      "type": "object",
+                      "required": ["mimeType"],
+                      "properties": {
+                        "mimeType": { "const": "text/plain" }
+                      }
+                    },
+                    "id": { "pattern": "^%file_id_pattern%$" },
+                    "name": { "const": "folder" },
+                    "parentReference": {
+                      "type": "object",
+                      "required": ["driveId", "driveType"],
+                      "properties": {
+                        "driveId": { "pattern": "^%file_id_pattern%$" },
+                        "driveType": { "const": "personal" }
+                      }
+                    },
+                    "permissions": {
+                      "type": "array",
+                      "minItems": 1,
+                      "maxItems": 1,
+                      "items": {
+                        "type": "object",
+                        "required": ["grantedToV2", "id", "invitation", "roles"],
+                        "properties": {
+                          "id": { "pattern": "^%permissions_id_pattern%$" },
+                          "grantedToV2": {
+                            "type": "object",
+                            "required": ["user"],
+                            "properties": {
+                              "user": {
+                                "type": "object",
+                                "properties": {
+                                  "displayName": { "const": "Brian Murphy" },
+                                  "id": { "pattern": "^%user_id_pattern%$" }
+                                },
+                                "required": ["displayName", "id"]
+                              }
+                            }
+                          },
+                          "invitation": {
+                            "type": "object",
+                            "properties": {
+                              "invitedBy": {
+                                "type": "object",
+                                "properties": {
+                                  "user": {
+                                    "type": "object",
+                                    "properties": {
+                                      "displayName": { "const": "Alice Hansen" },
+                                      "id": { "pattern": "^%user_id_pattern%$" }
+                                    },
+                                    "required": ["displayName", "id"]
+                                  }
+                                },
+                                "required": ["user"]
+                              }
+                            },
+                            "required": ["invitedBy"]
+                          },
+                          "roles": {
+                            "type": "array",
+                            "minItems": 1,
+                            "maxItems": 1,
+                            "items": { "const": "0911d62b-1e3f-4778-8b1b-903b7e4e8476" }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      """
+
+
+  Scenario: sharee lists the folder share shared with EditorWithVersions permission role (Project Space)
+    Given using spaces DAV path
+    And the administrator has enabled the permissions role "Editor With Versions"
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Alice" has created a folder "folder" in space "new-space"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | folder               |
+      | space           | new-space            |
+      | sharee          | Brian                |
+      | shareType       | user                 |
+      | permissionsRole | Editor With Versions |
+    When user "Brian" lists the shares shared with him using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "value"
+        ],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "@UI.Hidden",
+                "@client.synchronize",
+                "eTag",
+                "folder",
+                "id",
+                "lastModifiedDateTime",
+                "name",
+                "parentReference",
+                "remoteItem"
+              ],
+              "properties": {
+                "@UI.Hidden": { "const": false },
+                "@client.synchronize": { "const": true },
+                "eTag": { "pattern": "%etag_pattern%" },
+                "folder": {
+                  "const": {}
+                },
+                "id": { "pattern": "^%share_id_pattern%$" },
+                "name": { "const": "folder" },
+                "parentReference": {
+                  "type": "object",
+                  "required": ["driveId", "driveType", "id"],
+                  "properties": {
+                    "driveId": { "pattern": "^%space_id_pattern%$" },
+                    "driveType": { "const": "virtual" },
+                    "id": { "pattern": "^%file_id_pattern%$" }
+                  }
+                },
+                "remoteItem": {
+                  "type": "object",
+                  "required": [
+                    "eTag",
+                    "folder",
+                    "id",
+                    "lastModifiedDateTime",
+                    "name",
+                    "parentReference",
+                    "permissions"
+                  ],
+                  "properties": {
+                    "eTag": { "pattern": "%etag_pattern%" },
+                    "file": {
+                      "type": "object",
+                      "required": ["mimeType"],
+                      "properties": {
+                        "mimeType": { "const": "text/plain" }
+                      }
+                    },
+                    "id": { "pattern": "^%file_id_pattern%$" },
+                    "name": { "const": "folder" },
+                    "parentReference": {
+                      "type": "object",
+                      "required": ["driveId", "driveType"],
+                      "properties": {
+                        "driveId": { "pattern": "^%file_id_pattern%$" },
+                        "driveType": { "const": "project" }
+                      }
+                    },
+                    "permissions": {
+                      "type": "array",
+                      "minItems": 1,
+                      "maxItems": 1,
+                      "items": {
+                        "type": "object",
+                        "required": ["grantedToV2", "id", "invitation", "roles"],
+                        "properties": {
+                          "id": { "pattern": "^%permissions_id_pattern%$" },
+                          "grantedToV2": {
+                            "type": "object",
+                            "required": ["user"],
+                            "properties": {
+                              "user": {
+                                "type": "object",
+                                "properties": {
+                                  "displayName": { "const": "Brian Murphy" },
+                                  "id": { "pattern": "^%user_id_pattern%$" }
+                                },
+                                "required": ["displayName", "id"]
+                              }
+                            }
+                          },
+                          "invitation": {
+                            "type": "object",
+                            "properties": {
+                              "invitedBy": {
+                                "type": "object",
+                                "properties": {
+                                  "user": {
+                                    "type": "object",
+                                    "properties": {
+                                      "displayName": { "const": "Alice Hansen" },
+                                      "id": { "pattern": "^%user_id_pattern%$" }
+                                    },
+                                    "required": ["displayName", "id"]
+                                  }
+                                },
+                                "required": ["user"]
+                              }
+                            },
+                            "required": ["invitedBy"]
+                          },
+                          "roles": {
+                            "type": "array",
+                            "minItems": 1,
+                            "maxItems": 1,
+                            "items": { "const": "0911d62b-1e3f-4778-8b1b-903b7e4e8476" }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      """
