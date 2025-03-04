@@ -174,10 +174,11 @@ func (h *notifHandler) handleShareChangePermission(ctx context.Context, req *not
 
 	o := &typesv1beta1.Opaque{}
 	utils.AppendPlainToOpaque(o, "grantee", req.Notification.Grantee)
+	utils.AppendPlainToOpaque(o, "resourceType", req.ResourceType)
 
 	res, err := gatewayClient.UpdateOCMCoreShare(ctx, &ocmcore.UpdateOCMCoreShareRequest{
 		OcmShareId: req.ProviderId,
-		Protocols:  getProtocols(req.Notification.Protocols),
+		Protocols:  getProtocols(req.Notification.Protocols, o),
 		Opaque:     o,
 	})
 	if err != nil {

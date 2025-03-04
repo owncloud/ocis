@@ -154,6 +154,9 @@ func (h *sharesHandler) CreateShare(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	o := &types.Opaque{}
+	utils.AppendPlainToOpaque(o, "resourceType", req.ResourceType)
+
 	createShareReq := &ocmcore.CreateOCMCoreShareRequest{
 		Description:  req.Description,
 		Name:         req.Name,
@@ -163,7 +166,7 @@ func (h *sharesHandler) CreateShare(w http.ResponseWriter, r *http.Request) {
 		ShareWith:    userRes.User.Id,
 		ResourceType: getResourceTypeFromOCMRequest(req.ResourceType),
 		ShareType:    getOCMShareType(req.ShareType),
-		Protocols:    getProtocols(req.Protocols),
+		Protocols:    getProtocols(req.Protocols, o),
 	}
 
 	if req.Expiration != 0 {
@@ -251,10 +254,10 @@ func getOCMShareType(t string) ocm.ShareType {
 	return ocm.ShareType_SHARE_TYPE_GROUP
 }
 
-func getProtocols(p Protocols) []*ocm.Protocol {
+func getProtocols(p Protocols, o *types.Opaque) []*ocm.Protocol {
 	prot := make([]*ocm.Protocol, 0, len(p))
 	for _, data := range p {
-		prot = append(prot, data.ToOCMProtocol())
+		prot = append(prot, data.ToOCMProtocol(o))
 	}
 	return prot
 }
