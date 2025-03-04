@@ -11,16 +11,16 @@ Feature: an user shares resources using ScienceMesh application
     And user "Brian" has been created with default attributes
     And "Brian" has accepted invitation
 
-  @issue-9534
-  Scenario: local user shares a folder to federation user
+  @issue-9534 @issue-11054
+  Scenario Outline: local user shares a folder to federation user
     Given using server "LOCAL"
     And user "Alice" has created folder "folderToShare"
     When user "Alice" sends the following resource share invitation to federated user using the Graph API:
-      | resource        | folderToShare |
-      | space           | Personal      |
-      | sharee          | Brian         |
-      | shareType       | user          |
-      | permissionsRole | Viewer        |
+      | resource        | folderToShare      |
+      | space           | Personal           |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
     Then the HTTP status code should be "200"
     When using server "REMOTE"
     And user "Brian" lists the shares shared with him without retry using the Graph API
@@ -181,17 +181,22 @@ Feature: an user shares resources using ScienceMesh application
         }
       }
       """
+    Examples:
+      | permissions-role |
+      | Viewer           |
+      | Editor           |
+      | Uploader         |
 
-  @issue-9534
-  Scenario: local user shares a file to federation user
+  @issue-9534 @issue-11054
+  Scenario Outline: local user shares a file to federation user
     Given using server "LOCAL"
     And user "Alice" has uploaded file with content "ocm test" to "textfile.txt"
     When user "Alice" sends the following resource share invitation to federated user using the Graph API:
-      | resource        | textfile.txt |
-      | space           | Personal     |
-      | sharee          | Brian        |
-      | shareType       | user         |
-      | permissionsRole | Viewer       |
+      | resource        | textfile.txt       |
+      | space           | Personal           |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
     Then the HTTP status code should be "200"
     When using server "REMOTE"
     And user "Brian" lists the shares shared with him without retry using the Graph API
@@ -364,19 +369,23 @@ Feature: an user shares resources using ScienceMesh application
         }
       }
       """
+    Examples:
+      | permissions-role |
+      | Viewer           |
+      | File Editor      |
 
-
-  Scenario: local user shares a folder from project space to federation user
+  @issue-11054
+  Scenario Outline: local user shares a folder from project space to federation user
     Given using server "LOCAL"
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API
     And user "Alice" has created a folder "folderToShare" in space "projectSpace"
     When user "Alice" sends the following resource share invitation to federated user using the Graph API:
-      | resource        | folderToShare |
-      | space           | projectSpace  |
-      | sharee          | Brian         |
-      | shareType       | user          |
-      | permissionsRole | Viewer        |
+      | resource        | folderToShare      |
+      | space           | projectSpace       |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
     Then the HTTP status code should be "200"
     When using server "REMOTE"
     And user "Brian" lists the shares shared with him without retry using the Graph API
@@ -537,6 +546,11 @@ Feature: an user shares resources using ScienceMesh application
         }
       }
       """
+    Examples:
+      | permissions-role |
+      | Viewer           |
+      | Editor           |
+      | Uploader         |
 
   @issue-10051
   Scenario Outline: try to add federated user as a member of a project space (permissions endpoint)

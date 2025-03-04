@@ -329,8 +329,8 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiOcm/acceptInvitation.feature:148](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/acceptInvitation.feature#L148)
 
 #### [[OCM] Hide & Enable Sync fail with received federated shares](https://github.com/owncloud/ocis/issues/10719)
-- [apiOcm/share.feature:1190](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L1190)
-- [apiOcm/share.feature:1214](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L1214)
+- [apiOcm/share.feature:1204](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L1204)
+- [apiOcm/share.feature:1228](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L1228)
 
 #### [[OCM] federated user trying to download file shared with permissions role Secure Viewer returns 500 status code](https://github.com/owncloud/ocis/issues/10822)
 - [apiOcm/enableDisablePermissionsRole.feature:18](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/enableDisablePermissionsRole.feature#L18)
@@ -338,6 +338,9 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 
 #### [Delete user containing + in username returns 404 but user gets deleted](https://github.com/owncloud/ocis/issues/11027)
 - [apiGraphUserGroup/deleteUser.feature:28](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUserGroup/deleteUser.feature#L28)
+
+#### [[OCM] roles id not available on sharedWithMe response when listing shares shared with editor role](https://github.com/owncloud/ocis/issues/11054)
+- [apiOcm/share.feature:375](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L375)
 
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.
