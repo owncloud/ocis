@@ -42,7 +42,7 @@ Feature: Email notification
       """
       Hello Brian Murphy,
 
-      Your membership of space new-space has expired at 2025-03-03 02:00:00
+      Your membership of space new-space has expired at 2025-03-04 02:00:00
 
       Even though this membership has expired you still might have access through other shares and/or space memberships
       """
