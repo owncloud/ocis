@@ -104,7 +104,7 @@ var (
 	// UnifiedRole ViewerListGrants, Role Description (resolves directly)
 	_viewerListGrantsUnifiedRoleDescription = l10n.Template("View, download and show all invited people.")
 
-	// UnifiedRole Viewer, Role DisplayName (resolves directly)
+	// UnifiedRole ViewerListGrants, Role DisplayName (resolves directly)
 	_viewerListGrantsUnifiedRoleDisplayName = l10n.Template("Can view")
 
 	// UnifiedRole SpaceViewer, Role Description (resolves directly)
@@ -117,18 +117,18 @@ var (
 	_editorUnifiedRoleDescription = l10n.Template("View, download, upload, edit, add and delete.")
 
 	// UnifiedRole Editor, Role DisplayName (resolves directly)
-	_editorUnifiedRoleDisplayName = l10n.Template("Can edit")
+	_editorUnifiedRoleDisplayName = l10n.Template("Can edit without versions")
 
-	// UnifiedRoleListGrants Editor, Role Description (resolves directly)
+	// UnifiedRole EditorListGrants Editor, Role Description (resolves directly)
 	_editorListGrantsUnifiedRoleDescription = l10n.Template("View, download, upload, edit, add, delete and show all invited people.")
 
 	// UnifiedRole EditorListGrants, Role DisplayName (resolves directly)
-	_editorListGrantsUnifiedRoleDisplayName = l10n.Template("Can edit")
+	_editorListGrantsUnifiedRoleDisplayName = l10n.Template("Can edit without versions")
 
-	// UnifiedRoleListGrants Editor, Role Description (resolves directly)
+	// UnifiedRole EditorListGrantsWithVersions, Role Description (resolves directly)
 	_editorListGrantsWithVersionsUnifiedRoleDescription = l10n.Template("View, download, upload, edit, delete and show all invited people, show all versions.")
 
-	// UnifiedRole EditorListGrants, Role DisplayName (resolves directly)
+	// UnifiedRole EditorListGrantsWithVersions, Role DisplayName (resolves directly)
 	_editorListGrantsWithVersionsUnifiedRoleDisplayName = l10n.Template("Can edit")
 
 	// UnifiedRole SpaseEditor, Role Description (resolves directly)
@@ -147,13 +147,13 @@ var (
 	_fileEditorUnifiedRoleDescription = l10n.Template("View, download and edit.")
 
 	// UnifiedRole FileEditor, Role DisplayName (resolves directly)
-	_fileEditorUnifiedRoleDisplayName = l10n.Template("Can edit")
+	_fileEditorUnifiedRoleDisplayName = l10n.Template("Can edit without versions")
 
 	// UnifiedRole FileEditorListGrants, Role Description (resolves directly)
 	_fileEditorListGrantsUnifiedRoleDescription = l10n.Template("View, download, edit and show all invited people.")
 
 	// UnifiedRole FileEditorListGrants, Role DisplayName (resolves directly)
-	_fileEditorListGrantsUnifiedRoleDisplayName = l10n.Template("Can edit")
+	_fileEditorListGrantsUnifiedRoleDisplayName = l10n.Template("Can edit without versions")
 
 	// UnifiedRole FileEditorListGrants, Role Description (resolves directly)
 	_fileEditorListGrantsWithVersionsUnifiedRoleDescription = l10n.Template("View, download, edit and show all invited people, show all versions.")
@@ -336,9 +336,11 @@ var (
 		}
 	}()
 
-	// roleEditorListGrantsWithVersions creates an editor role.
+	// roleEditorListGrantsWithVersions creates an editor-list-grants-with-versions role.
 	roleEditorListGrantsWithVersions = func() *libregraph.UnifiedRoleDefinition {
 		r := conversions.NewEditorListGrantsWithVersionsRole()
+		// TODO: Workaround to avoid reva bump - fix in reva
+		r.Name = conversions.RoleEditorListGrantsWithVersions
 		return &libregraph.UnifiedRoleDefinition{
 			Id:          proto.String(UnifiedRoleEditorListGrantsWithVersionsID),
 			Description: proto.String(_editorListGrantsWithVersionsUnifiedRoleDescription),
@@ -436,6 +438,8 @@ var (
 	// roleFileEditorListGrantsWithVersions creates a file-editor role
 	roleFileEditorListGrantsWithVersions = func() *libregraph.UnifiedRoleDefinition {
 		r := conversions.NewFileEditorListGrantsWithVersionsRole()
+		// TODO: Workaround to avoid reva bump - fix in reva
+		r.Name = conversions.RoleFileEditorListGrantsWithVersions
 		return &libregraph.UnifiedRoleDefinition{
 			Id:          proto.String(UnifiedRoleFileEditorListGrantsWithVersionsID),
 			Description: proto.String(_fileEditorListGrantsWithVersionsUnifiedRoleDescription),
