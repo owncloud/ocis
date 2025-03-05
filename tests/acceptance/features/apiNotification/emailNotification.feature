@@ -22,7 +22,7 @@ Feature: Email notification
       """
       Hello Brian Murphy,
 
-      %displayname% has invited you to join "new-space".
+      %displayname% has invited you to join "new-space".  
 
       Click here to view it: %base_url%/f/%space_id%
       """
@@ -37,12 +37,12 @@ Feature: Email notification
       | role               | viewer               |
       | permissionsRole    | Space Viewer         |
       | expirationDateTime | 2200-07-15T14:00:00Z |
-    When user "Alice" expires the user share of space "new-space" for user "Brian"
+    When user "Alice" has expired the membership of user "Brian" from space "new-space"
     Then user "Brian" should have received the following email from user "Alice" about the share of project space "new-space"
       """
       Hello Brian Murphy,
 
-      Your membership of space new-space has expired at 2025-03-04 02:00:00
+      Your membership of space new-space has expired at %expiry_date_time%
 
       Even though this membership has expired you still might have access through other shares and/or space memberships
       """
