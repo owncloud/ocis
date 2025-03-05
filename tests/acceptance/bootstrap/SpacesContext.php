@@ -2716,7 +2716,6 @@ class SpacesContext implements Context {
 				$this->featureContext->shareNgAddToCreatedUserGroupShares($response);
 			}
 			$this->featureContext->setResponse($response);
-
 		} else {
 			$rows['permissions'] = (string)$this->featureContext->getLastCreatedUserGroupShare()->permissions;
 			$this->featureContext->setResponse($this->updateSharedResource($user, $rows));
@@ -4808,5 +4807,27 @@ class SpacesContext implements Context {
 				$this->featureContext->getPasswordForUser($user),
 			)
 		);
+	}
+
+	/**
+	 * @Given /^user "([^"]*)" has expired the membership of user "([^"]*)" from space "([^"]*)"$/
+	 *
+	 * @param  string $user
+	 * @param  string $memberUser
+	 * @param  string $spaceName
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userHasExpiredTheMembershipOfUserFromSpace(
+		string $user,
+		string $memberUser,
+		string $spaceName
+	): void {
+		$dateTime = new DateTime('yesterday');
+		$this->featureContext->setExpiryDateTime($dateTime);
+		$rows['expireDate'] = $dateTime->format('Y-m-d\\TH:i:sP');
+		$rows['shareWith'] = $memberUser;
+		$this->featureContext->setResponse($this->shareSpace($user, $spaceName, $rows));
 	}
 }
