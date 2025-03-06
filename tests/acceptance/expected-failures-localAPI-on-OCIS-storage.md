@@ -331,6 +331,7 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 #### [[OCM] Hide & Enable Sync fail with received federated shares](https://github.com/owncloud/ocis/issues/10719)
 - [apiOcm/share.feature:1204](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L1204)
 - [apiOcm/share.feature:1228](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L1228)
+- [apiOcm/share.feature:1339](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L1339)
 
 #### [[OCM] federated user trying to download file shared with permissions role Secure Viewer returns 500 status code](https://github.com/owncloud/ocis/issues/10822)
 - [apiOcm/enableDisablePermissionsRole.feature:18](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/enableDisablePermissionsRole.feature#L18)

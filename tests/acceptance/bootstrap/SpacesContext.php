@@ -298,6 +298,7 @@ class SpacesContext implements Context {
 	 * @throws Exception|GuzzleException
 	 */
 	public function getSharesRemoteItemId(string $user, string $share): string {
+		$share = ltrim($share, '/');
 		$credentials = $this->featureContext->graphContext->getAdminOrUserCredentials($user);
 		$response = GraphHelper::getSharesSharedWithMe(
 			$this->featureContext->getBaseUrl(),
