@@ -588,11 +588,19 @@ The following sections list the changes for 7.1.0.
    https://github.com/owncloud/ocis/pull/11058
    https://github.com/owncloud/web/releases/tag/v11.3.0
 
+<<<<<<< HEAD
 * Enhancement - Bump Reva: [#11083](https://github.com/owncloud/ocis/pull/11083)
 
    Bumps reva version to 2.27.7
 
    https://github.com/owncloud/ocis/pull/11083
+=======
+* Enhancement - Bump Reva: [#11078](https://github.com/owncloud/ocis/pull/11078)
+
+   Bumps reva version to 2.27.7
+
+   https://github.com/owncloud/ocis/pull/11078
+>>>>>>> 177625b67a2 (Automated changelog update [skip ci])
 
 # Changelog for [7.0.0] (2024-12-17)
 
