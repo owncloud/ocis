@@ -66,6 +66,7 @@ services:
       - "traefik.http.routers.ocis.rule=Host(`${OCIS_DOMAIN:-ocis.owncloud.test}`)"
       - "traefik.http.routers.ocis.tls.certresolver=http"
       - "traefik.http.routers.ocis.service=ocis"
+      - "traefik.http.routers.ocis.middlewares=maintenance"
       - "traefik.http.services.ocis.loadbalancer.server.port=9200"
     logging:
       driver: ${LOG_DRIVER:-local}
