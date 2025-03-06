@@ -140,7 +140,10 @@ Feature: service health check
 
   @env-config
   Scenario: check services health and readiness while running separately
-    Given the administrator has started service "audit" separately with the following configs:
+    Given the following configs have been set:
+      | config                    | value |
+      | OCIS_EXCLUDE_RUN_SERVICES | audit |
+    And the administrator has started service "audit" separately with the following configs:
       | config           | value        |
       | OCIS_LOG_LEVEL   | info         |
       | AUDIT_DEBUG_ADDR | 0.0.0.0:9229 |

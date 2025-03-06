@@ -26,7 +26,7 @@ import (
 var cmd *exec.Cmd
 var retryCount = 0
 var stopSignal = false
-var EnvConfigs = []string{}
+var ServiceEnvConfigs = make(map[string][]string)
 var runningServices = make(map[string]int)
 
 func Start(envMap []string) {
@@ -93,7 +93,6 @@ func waitAllServices(startTime time.Time, timeout time.Duration) {
 		}
 		return
 	}
-	log.Println("All services are up")
 }
 
 func WaitForConnection() (bool, string) {
@@ -218,8 +217,10 @@ func StartService(service string, envMap []string) {
 
 	cmd = exec.Command(config.Get("bin"), cmdArgs...)
 
-	if len(envMap) == 0 {
-		cmd.Env = append(os.Environ(), EnvConfigs...)
+	if len(envMap) == 0 && service == "" {
+		cmd.Env = append(os.Environ(), ServiceEnvConfigs["ocis"]...)
+	} else if len(envMap) == 0 && service != "" {
+		cmd.Env = append(os.Environ(), ServiceEnvConfigs[service]...)
 	} else {
 		cmd.Env = append(os.Environ(), envMap...)
 	}
@@ -247,10 +248,6 @@ func StartService(service string, envMap []string) {
 		runningServices["ocis"] = cmd.Process.Pid
 	} else {
 		runningServices[service] = cmd.Process.Pid
-	}
-
-	for listService, pid := range runningServices {
-		log.Println(fmt.Sprintf("%s service started with process id %v", listService, pid))
 	}
 
 	// Read the logs when the 'ocis server' command is running
@@ -327,8 +324,7 @@ func StopService(service string) (bool, string) {
 	}
 
 	delete(runningServices, service)
-
-	return true, fmt.Sprintf("Service %s stopped successfully", service)
+	return true, fmt.Sprintf(fmt.Sprintf("%s service stopped successfully", service))
 }
 
 func WaitForServiceStatus(service string, waitForUp bool) bool {

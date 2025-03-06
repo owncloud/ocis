@@ -93,11 +93,11 @@ func SetEnvHandler(res http.ResponseWriter, req *http.Request) {
 	for key, value := range envBody {
 		envMap = append(envMap, fmt.Sprintf("%s=%v", key, value))
 	}
-	ocis.EnvConfigs = append(ocis.EnvConfigs, envMap...)
+	ocis.ServiceEnvConfigs["ocis"] = append(ocis.ServiceEnvConfigs["ocis"], envMap...)
 
 	var message string
 
-	success, _ := ocis.Restart(ocis.EnvConfigs)
+	success, _ := ocis.Restart(ocis.ServiceEnvConfigs["ocis"])
 	if success {
 		message = "oCIS configured successfully"
 		sendResponse(res, http.StatusOK, message)
@@ -115,7 +115,7 @@ func RollbackHandler(res http.ResponseWriter, req *http.Request) {
 	}
 
 	var message string
-	ocis.EnvConfigs = []string{}
+	ocis.ServiceEnvConfigs["ocis"] = []string{}
 	success, _ := ocis.Restart([]string{})
 	if success {
 		message = "oCIS configuration rolled back successfully"
@@ -208,24 +208,52 @@ func CommandHandler(res http.ResponseWriter, req *http.Request) {
 
 func OcisServiceHandler(res http.ResponseWriter, req *http.Request) {
 	serviceName := req.PathValue("service")
-	envMap := []string{fmt.Sprintf("OCIS_EXCLUDE_RUN_SERVICES=%s", serviceName)}
+
+    var envBody map[string]interface{}
+    var serviceEnvMap []string
+
+	if req.Body != nil && req.ContentLength > 0 {
+		var err error
+		envBody, err = parseJsonBody(req.Body)
+		if err != nil {
+			sendResponse(res, http.StatusBadRequest, "Invalid json body")
+			return
+		}
+	}
 
 	if req.Method == http.MethodPost {
-		// restart oCIS without service that need to start separately
-		success, _ := ocis.Restart(envMap)
-		if success {
-			var envBody map[string]interface{}
-			var serviceEnvMap []string
-
-			if req.Body != nil && req.ContentLength > 0 {
-				var err error
-				envBody, err = parseJsonBody(req.Body)
-				if err != nil {
-					sendResponse(res, http.StatusBadRequest, "Invalid json body")
-					return
-				}
+		for key, value := range envBody {
+			ocis.ServiceEnvConfigs[serviceName] = append(serviceEnvMap, fmt.Sprintf("%s=%v", key, value))
+			if strings.HasSuffix(key, "DEBUG_ADDR") {
+				address := strings.Split(value.(string), ":")
+				port, _ := strconv.Atoi(address[1])
+				config.SetServiceDebugPort(serviceName, port)
 			}
+		}
+		log.Println(fmt.Sprintf("Starting %s service...", serviceName))
 
+		common.Wg.Add(1)
+		go ocis.StartService(serviceName, ocis.ServiceEnvConfigs[serviceName])
+
+		success := ocis.WaitForServiceStatus(serviceName, true)
+		if success {
+			sendResponse(res, http.StatusOK, fmt.Sprintf("%s service started successfully", serviceName))
+		} else {
+			sendResponse(res, http.StatusInternalServerError, fmt.Sprintf("Failed to start %s service.", serviceName))
+		}
+		return
+	} else if req.Method == http.MethodDelete {
+		success, message := ocis.StopService(serviceName)
+		log.Println(message)
+		if success {
+			sendResponse(res, http.StatusOK, message)
+		} else {
+			sendResponse(res, http.StatusInternalServerError, message)
+		}
+		return
+	} else if req.Method == http.MethodPatch {
+		success, message := ocis.StopService(serviceName)
+		if success {
 			for key, value := range envBody {
 				serviceEnvMap = append(serviceEnvMap, fmt.Sprintf("%s=%v", key, value))
 				if strings.HasSuffix(key, "DEBUG_ADDR") {
@@ -233,31 +261,19 @@ func OcisServiceHandler(res http.ResponseWriter, req *http.Request) {
 					port, _ := strconv.Atoi(address[1])
 					config.SetServiceDebugPort(serviceName, port)
 				}
+				serviceEnvMap = append(ocis.ServiceEnvConfigs[serviceName], serviceEnvMap...)
 			}
-
-			log.Println(fmt.Sprintf("Starting oCIS service %s...", serviceName))
-
 			common.Wg.Add(1)
+			log.Println(fmt.Sprintf("%s service restarting...", serviceName))
 			go ocis.StartService(serviceName, serviceEnvMap)
 
 			success := ocis.WaitForServiceStatus(serviceName, true)
 			if success {
-				log.Println(fmt.Sprintf("Found Port for %s...", serviceName))
-				sendResponse(res, http.StatusOK, fmt.Sprintf("oCIS service %s started successfully", serviceName))
-			} else {
-				sendResponse(res, http.StatusInternalServerError, fmt.Sprintf("Failed to start oCIS service %s", serviceName))
-			}
-			return
+            	sendResponse(res, http.StatusOK, fmt.Sprintf("%s service updated successfully", serviceName))
+            	return
+            }
 		}
-		sendResponse(res, http.StatusInternalServerError, fmt.Sprintf("Failed to restart oCIS without service %s", serviceName))
-		return
-	} else if req.Method == http.MethodDelete {
-		success, message := ocis.StopService(serviceName)
-		if success {
-			sendResponse(res, http.StatusOK, fmt.Sprintf("oCIS service %s stopped successfully", serviceName))
-		} else {
-			sendResponse(res, http.StatusInternalServerError, message)
-		}
+		sendResponse(res, http.StatusInternalServerError, message)
 		return
 	}
 	sendResponse(res, http.StatusMethodNotAllowed, "Method Not Allowed")
