@@ -1,11 +1,6 @@
 # Table of Contents
 
-* [Changelog for 7.1.0-rc.6](#changelog-for-710-rc6-2025-02-27)
-* [Changelog for 7.1.0-rc.5](#changelog-for-710-rc5-2025-02-25)
-* [Changelog for 7.1.0-rc.4](#changelog-for-710-rc4-2025-02-04)
-* [Changelog for 7.1.0-rc.3](#changelog-for-710-rc3-2025-01-28)
-* [Changelog for 7.1.0-rc.2](#changelog-for-710-rc2-2025-01-17)
-* [Changelog for 7.1.0-rc.1](#changelog-for-710-rc1-2025-01-10)
+* [Changelog for 7.1.0](#changelog-for-710-2025-03-06)
 * [Changelog for 7.0.0](#changelog-for-700-2024-12-17)
 * [Changelog for 5.0.9](#changelog-for-509-2024-11-14)
 * [Changelog for 6.6.1](#changelog-for-661-2024-10-24)
@@ -58,46 +53,158 @@
 * [Changelog for 1.1.0](#changelog-for-110-2021-01-22)
 * [Changelog for 1.0.0](#changelog-for-100-2020-12-17)
 
-# Changelog for [7.1.0-rc.6] (2025-02-27)
+# Changelog for [7.1.0] (2025-03-06)
 
-The following sections list the changes for 7.1.0-rc.6.
+The following sections list the changes for 7.1.0.
 
-[7.1.0-rc.6]: https://github.com/owncloud/ocis/compare/v7.1.0-rc.5...v7.1.0-rc.6
-
-## Summary
-
-* Enhancement - Bump Reva: [#11078](https://github.com/owncloud/ocis/pull/11078)
-
-## Details
-
-* Enhancement - Bump Reva: [#11078](https://github.com/owncloud/ocis/pull/11078)
-
-   Bumps reva version to 2.27.7
-
-   https://github.com/owncloud/ocis/pull/11078
-
-# Changelog for [7.1.0-rc.5] (2025-02-25)
-
-The following sections list the changes for 7.1.0-rc.5.
-
-[7.1.0-rc.5]: https://github.com/owncloud/ocis/compare/v7.1.0-rc.4...v7.1.0-rc.5
+[7.1.0]: https://github.com/owncloud/ocis/compare/v7.0.0...v7.1.0
 
 ## Summary
 
+* Bugfix - Update govips to 2.16.0: [#10378](https://github.com/owncloud/ocis/issues/10378)
+* Bugfix - Share creation date is missing in invite response: [#10781](https://github.com/owncloud/ocis/pull/10781)
+* Bugfix - Bump some golang dependencies: [#10795](https://github.com/owncloud/ocis/pull/10795)
+* Bugfix - Allow to accepted invite after it was once deleted: [#10834](https://github.com/owncloud/ocis/pull/10834)
+* Bugfix - Fix the mail notifications for the user light: [#10865](https://github.com/owncloud/ocis/pull/10865)
+* Bugfix - Fix filtering of PostprocessingStepFinished events: [#10868](https://github.com/owncloud/ocis/pull/10868)
+* Bugfix - Prevent empty email body for grouped email notifications: [#10869](https://github.com/owncloud/ocis/pull/10869)
+* Bugfix - Consistently name roles: [#10871](https://github.com/owncloud/ocis/pull/10871)
+* Bugfix - Fix grouped email notifications store key: [#10873](https://github.com/owncloud/ocis/pull/10873)
+* Bugfix - Fix missing newline in grouped email: [#10883](https://github.com/owncloud/ocis/pull/10883)
+* Bugfix - Fix email templates white spaces & new lines: [#10884](https://github.com/owncloud/ocis/pull/10884)
+* Bugfix - Fix the ocm gateway connection pool: [#10916](https://github.com/owncloud/ocis/pull/10916)
+* Bugfix - Add fallback for folder names: [#10932](https://github.com/owncloud/ocis/pull/10932)
+* Bugfix - Allow view ocm shares: [#10944](https://github.com/owncloud/ocis/pull/10944)
+* Bugfix - Fix Collaboration file extension check: [#10947](https://github.com/owncloud/ocis/issues/10947)
 * Bugfix - Add Identities to education user: [#11016](https://github.com/owncloud/ocis/pull/11016)
 * Bugfix - Bump libregraph api: [#11021](https://github.com/owncloud/ocis/pull/11021)
 * Bugfix - Fix OCM create share: [#11047](https://github.com/owncloud/ocis/pull/11047)
 * Bugfix - Fix update grants for  the OCM share: [#11052](https://github.com/owncloud/ocis/pull/11052)
+* Enhancement - Part I: The user settings are extended by notifications preferences: [#10706](https://github.com/owncloud/ocis/pull/10706)
+* Enhancement - Part II: Filtering of in-app notifications: [#10779](https://github.com/owncloud/ocis/pull/10779)
+* Enhancement - Part III: Filtering of mail notifications: [#10792](https://github.com/owncloud/ocis/pull/10792)
+* Enhancement - Translate Notification Settings: [#10812](https://github.com/owncloud/ocis/pull/10812)
+* Enhancement - Part IV: Grouping of mail notifications: [#10838](https://github.com/owncloud/ocis/pull/10838)
+* Enhancement - Update web to v11.1.0: [#10853](https://github.com/owncloud/ocis/pull/10853)
+* Enhancement - Add tests for grouped emails: [#10885](https://github.com/owncloud/ocis/pull/10885)
+* Enhancement - Use maintained forks: [#10886](https://github.com/owncloud/ocis/pull/10886)
+* Enhancement - Add email notification for share removed event: [#10915](https://github.com/owncloud/ocis/pull/10915)
+* Enhancement - Update Web to v1.11.1: [#10918](https://github.com/owncloud/ocis/pull/10918)
+* Enhancement - Update Web to v1.11.2: [#10930](https://github.com/owncloud/ocis/pull/10930)
+* Enhancement - Implement debug docker for arm64 platform: [#10940](https://github.com/owncloud/ocis/pull/10940)
 * Enhancement - Add roles: [#10964](https://github.com/owncloud/ocis/pull/10964)
 * Enhancement - Update Web to v1.11.3: [#10977](https://github.com/owncloud/ocis/pull/10977)
 * Enhancement - Add the ocm notification handler: [#11005](https://github.com/owncloud/ocis/pull/11005)
 * Enhancement - Add logging when a users space gets deleted: [#11037](https://github.com/owncloud/ocis/pull/11037)
 * Enhancement - Add the ocm notification ShareChangePermission: [#11041](https://github.com/owncloud/ocis/pull/11041)
 * Enhancement - Update Web to v11.2.0: [#11049](https://github.com/owncloud/ocis/pull/11049)
-* Enhancement - Bump reva version: [#11051](https://github.com/owncloud/ocis/pull/11051)
 * Enhancement - Update Web to v11.3.0: [#11058](https://github.com/owncloud/ocis/pull/11058)
+* Enhancement - Bump Reva: [#11078](https://github.com/owncloud/ocis/pull/11078)
 
 ## Details
+
+* Bugfix - Update govips to 2.16.0: [#10378](https://github.com/owncloud/ocis/issues/10378)
+
+   The update to govips 2.16.0 removes temporary access to /tmp that was introduced
+   by govips.
+
+   https://github.com/owncloud/ocis/issues/10378
+   https://github.com/owncloud/ocis/pull/10943
+
+* Bugfix - Share creation date is missing in invite response: [#10781](https://github.com/owncloud/ocis/pull/10781)
+
+   The graph drives invite response now includes the `createdDateTime` field.
+
+   https://github.com/owncloud/ocis/issues/10739
+   https://github.com/owncloud/ocis/pull/10781
+
+* Bugfix - Bump some golang dependencies: [#10795](https://github.com/owncloud/ocis/pull/10795)
+
+   Bump dependencies "golang.org/x/crypto" and "golang.org/x/net"
+
+   https://github.com/owncloud/ocis/pull/10795
+
+* Bugfix - Allow to accepted invite after it was once deleted: [#10834](https://github.com/owncloud/ocis/pull/10834)
+
+   Allowed to accepted invite even after it was once deleted on the invite receiver
+   or invite creation side.
+
+   https://github.com/owncloud/ocis/issues/10813
+   https://github.com/owncloud/ocis/pull/10834
+
+* Bugfix - Fix the mail notifications for the user light: [#10865](https://github.com/owncloud/ocis/pull/10865)
+
+   Fix the default bundle-list for mail notification settings for the user light.
+
+   https://github.com/owncloud/ocis/issues/10864
+   https://github.com/owncloud/ocis/pull/10865
+
+* Bugfix - Fix filtering of PostprocessingStepFinished events: [#10868](https://github.com/owncloud/ocis/pull/10868)
+
+   https://github.com/owncloud/ocis/issues/10867
+   https://github.com/owncloud/ocis/pull/10868
+
+* Bugfix - Prevent empty email body for grouped email notifications: [#10869](https://github.com/owncloud/ocis/pull/10869)
+
+   https://github.com/owncloud/ocis/pull/10869
+
+* Bugfix - Consistently name roles: [#10871](https://github.com/owncloud/ocis/pull/10871)
+
+   BundleUUIDRoleGuest has been renamed to BundleUUIDRoleUserLight for consistency
+   reasons
+
+   https://github.com/owncloud/ocis/pull/10871
+
+* Bugfix - Fix grouped email notifications store key: [#10873](https://github.com/owncloud/ocis/pull/10873)
+
+   Interval and user id is now separated by `_` (key schema:
+   `${INTERVAL}_${USER_ID}`).
+
+   https://github.com/owncloud/ocis/pull/10873
+
+* Bugfix - Fix missing newline in grouped email: [#10883](https://github.com/owncloud/ocis/pull/10883)
+
+   `\n` is now replaced by `<br>` in the HTML email body
+
+   https://github.com/owncloud/ocis/pull/10883
+
+* Bugfix - Fix email templates white spaces & new lines: [#10884](https://github.com/owncloud/ocis/pull/10884)
+
+   Email templates now contain no unwanted white spaces & new lines if
+   .CallToAction is nil
+
+   https://github.com/owncloud/ocis/pull/10884
+
+* Bugfix - Fix the ocm gateway connection pool: [#10916](https://github.com/owncloud/ocis/pull/10916)
+
+   Fix the ocm gateway connection pool. Fix ocis dependency in the reva go.mod
+   file. Bump the ocis version accordingly to the major version.
+
+   https://github.com/owncloud/ocis/issues/10846
+   https://github.com/owncloud/ocis/issues/10878
+   https://github.com/owncloud/ocis/pull/10916
+
+* Bugfix - Add fallback for folder names: [#10932](https://github.com/owncloud/ocis/pull/10932)
+
+   Add translated `shared-with-me` fallback for folder names in the activitylog to
+   avoid `{folder}` in the output.
+
+   https://github.com/owncloud/ocis/issues/10906
+   https://github.com/owncloud/ocis/pull/10932
+
+* Bugfix - Allow view ocm shares: [#10944](https://github.com/owncloud/ocis/pull/10944)
+
+   OCM shares with `view` permissions did not work. When opening them in weboffice
+   an error would occur. This has been fixed.
+
+   https://github.com/owncloud/ocis/pull/10944
+
+* Bugfix - Fix Collaboration file extension check: [#10947](https://github.com/owncloud/ocis/issues/10947)
+
+   Fixed Collaboration file extension check to case-insensitive comparison.
+
+   https://github.com/owncloud/ocis/issues/10947
+   https://github.com/owncloud/ocis/pull/10945
 
 * Bugfix - Add Identities to education user: [#11016](https://github.com/owncloud/ocis/pull/11016)
 
@@ -126,6 +233,113 @@ The following sections list the changes for 7.1.0-rc.5.
 
    https://github.com/owncloud/ocis/issues/11022
    https://github.com/owncloud/ocis/pull/11052
+
+* Enhancement - Part I: The user settings are extended by notifications preferences: [#10706](https://github.com/owncloud/ocis/pull/10706)
+
+   Part I: Users can now store their notifications preferences in the user settings
+
+   https://github.com/owncloud/ocis/issues/10669
+   https://github.com/owncloud/ocis/pull/10706
+
+* Enhancement - Part II: Filtering of in-app notifications: [#10779](https://github.com/owncloud/ocis/pull/10779)
+
+   Part II: In-app notifications are now filtered based on the notification
+   preferences in the user settings
+
+   https://github.com/owncloud/ocis/issues/10769
+   https://github.com/owncloud/ocis/pull/10779
+
+* Enhancement - Part III: Filtering of mail notifications: [#10792](https://github.com/owncloud/ocis/pull/10792)
+
+   Part III: Mail notifications are now filtered based on the notification
+   preferences in the user settings
+
+   https://github.com/owncloud/ocis/issues/10790
+   https://github.com/owncloud/ocis/pull/10792
+
+* Enhancement - Translate Notification Settings: [#10812](https://github.com/owncloud/ocis/pull/10812)
+
+   Translates the notification settings according to the users language preference.
+
+   https://github.com/owncloud/ocis/pull/10812
+
+* Enhancement - Part IV: Grouping of mail notifications: [#10838](https://github.com/owncloud/ocis/pull/10838)
+
+   Part IV: Mail notifications can now be grouped on a daily or weekly basis
+
+   https://github.com/owncloud/ocis/issues/10793
+   https://github.com/owncloud/ocis/pull/10838
+
+* Enhancement - Update web to v11.1.0: [#10853](https://github.com/owncloud/ocis/pull/10853)
+
+   - Bugfix [owncloud/web#12040](https://github.com/owncloud/web/pull/12040):
+   Preview app files visibility: #12040 - Bugfix
+   [owncloud/web#12044](https://github.com/owncloud/web/pull/12044): Disable paste
+   action in same folder: #12044 - Bugfix
+   [owncloud/web#12045](https://github.com/owncloud/web/pull/12045): Do not push
+   sidebar close action away: #12045 - Bugfix
+   [owncloud/web#12045](https://github.com/owncloud/web/pull/12045): Update sidebar
+   width on resize: #12045 - Bugfix
+   [owncloud/web#12045](https://github.com/owncloud/web/pull/12045): Use correct
+   breakpoints in sidebar: #12045 - Bugfix
+   [owncloud/web#12050](https://github.com/owncloud/web/pull/12050): Show indirect
+   shares on search page: #12050 - Bugfix
+   [owncloud/web#12055](https://github.com/owncloud/web/pull/12055): Add more
+   padding to input when clear action is visible: #12055 - Bugfix
+   [owncloud/web#12058](https://github.com/owncloud/web/pull/12058): Use local
+   state in sidebar in embed mode: #12058 - Bugfix
+   [owncloud/web#12063](https://github.com/owncloud/web/pull/12063): Change opacity
+   of disabled checkboxes: #12063 - Bugfix
+   [owncloud/web#12074](https://github.com/owncloud/web/pull/12074): Refetch
+   notifications settings on locale change: #12074 - Enhancement
+   [owncloud/web#12010](https://github.com/owncloud/web/pull/12010): Add
+   notifications settings: #12010 - Enhancement
+   [owncloud/web#12054](https://github.com/owncloud/web/pull/12054): Use generic
+   private link error: #12054
+
+   https://github.com/owncloud/ocis/pull/10853
+   https://github.com/owncloud/web/releases/tag/v11.1.0
+
+* Enhancement - Add tests for grouped emails: [#10885](https://github.com/owncloud/ocis/pull/10885)
+
+   https://github.com/owncloud/ocis/pull/10885
+
+* Enhancement - Use maintained forks: [#10886](https://github.com/owncloud/ocis/pull/10886)
+
+   Switches away from unmainatained forks.
+
+   https://github.com/owncloud/ocis/pull/10886
+
+* Enhancement - Add email notification for share removed event: [#10915](https://github.com/owncloud/ocis/pull/10915)
+
+   https://github.com/owncloud/ocis/issues/10904
+   https://github.com/owncloud/ocis/pull/10915
+
+* Enhancement - Update Web to v1.11.1: [#10918](https://github.com/owncloud/ocis/pull/10918)
+
+   - Bugfix [owncloud/web#12112](https://github.com/owncloud/web/pull/12112):
+   Optionally access preview app route query: #12112 - Bugfix
+   [owncloud/web#12118](https://github.com/owncloud/web/pull/12118): Change
+   federated share icon: #12118 - Bugfix
+   [owncloud/web#12118](https://github.com/owncloud/web/pull/12118): Improve
+   federated share icon contrast: #12118 - Bugfix
+   [owncloud/web#12119](https://github.com/owncloud/web/pull/12119): Show external
+   share indicator: #12119
+
+   https://github.com/owncloud/ocis/pull/10918
+   https://github.com/owncloud/web/releases/tag/v11.1.1
+
+* Enhancement - Update Web to v1.11.2: [#10930](https://github.com/owncloud/ocis/pull/10930)
+
+   - Bugfix [owncloud/ocis#10891](https://github.com/owncloud/ocis/issues/10891):
+   Rename ScienceMesh: #10891
+
+   https://github.com/owncloud/ocis/pull/10930
+   https://github.com/owncloud/web/releases/tag/v11.1.2
+
+* Enhancement - Implement debug docker for arm64 platform: [#10940](https://github.com/owncloud/ocis/pull/10940)
+
+   https://github.com/owncloud/ocis/pull/10940
 
 * Enhancement - Add roles: [#10964](https://github.com/owncloud/ocis/pull/10964)
 
@@ -213,12 +427,6 @@ The following sections list the changes for 7.1.0-rc.5.
    https://github.com/owncloud/ocis/pull/11049
    https://github.com/owncloud/web/releases/tag/v11.2.0
 
-* Enhancement - Bump reva version: [#11051](https://github.com/owncloud/ocis/pull/11051)
-
-   Bumps reva version to fixed 2.27.5
-
-   https://github.com/owncloud/ocis/pull/11051
-
 * Enhancement - Update Web to v11.3.0: [#11058](https://github.com/owncloud/ocis/pull/11058)
 
    - Enhancement [owncloud/web#12104](https://github.com/owncloud/web/pull/12104):
@@ -231,310 +439,11 @@ The following sections list the changes for 7.1.0-rc.5.
    https://github.com/owncloud/ocis/pull/11058
    https://github.com/owncloud/web/releases/tag/v11.3.0
 
-# Changelog for [7.1.0-rc.4] (2025-02-04)
+* Enhancement - Bump Reva: [#11078](https://github.com/owncloud/ocis/pull/11078)
 
-The following sections list the changes for 7.1.0-rc.4.
+   Bumps reva version to 2.27.7
 
-[7.1.0-rc.4]: https://github.com/owncloud/ocis/compare/v7.1.0-rc.3...v7.1.0-rc.4
-
-## Summary
-
-* Bugfix - Update govips to 2.16.0: [#10378](https://github.com/owncloud/ocis/issues/10378)
-* Bugfix - Allow view ocm shares: [#10944](https://github.com/owncloud/ocis/pull/10944)
-* Bugfix - Fix Collaboration file extension check: [#10947](https://github.com/owncloud/ocis/issues/10947)
-* Enhancement - Implement debug docker for arm64 platform: [#10940](https://github.com/owncloud/ocis/pull/10940)
-* Enhancement - Bump Reva: [#10957](https://github.com/owncloud/ocis/pull/10957)
-
-## Details
-
-* Bugfix - Update govips to 2.16.0: [#10378](https://github.com/owncloud/ocis/issues/10378)
-
-   The update to govips 2.16.0 removes temporary access to /tmp that was introduced
-   by govips.
-
-   https://github.com/owncloud/ocis/issues/10378
-   https://github.com/owncloud/ocis/pull/10943
-
-* Bugfix - Allow view ocm shares: [#10944](https://github.com/owncloud/ocis/pull/10944)
-
-   OCM shares with `view` permissions did not work. When opening them in weboffice
-   an error would occur. This has been fixed.
-
-   https://github.com/owncloud/ocis/pull/10944
-
-* Bugfix - Fix Collaboration file extension check: [#10947](https://github.com/owncloud/ocis/issues/10947)
-
-   Fixed Collaboration file extension check to case-insensitive comparison.
-
-   https://github.com/owncloud/ocis/issues/10947
-   https://github.com/owncloud/ocis/pull/10945
-
-* Enhancement - Implement debug docker for arm64 platform: [#10940](https://github.com/owncloud/ocis/pull/10940)
-
-   https://github.com/owncloud/ocis/pull/10940
-
-* Enhancement - Bump Reva: [#10957](https://github.com/owncloud/ocis/pull/10957)
-
-   Changelog for reva 2.27.4
-
-  *   Bugfix [cs3org/reva#5061](https://github.com/cs3org/reva/pull/5061): OCM Wildcards
-  *   Bugfix [cs3org/reva#5055](https://github.com/cs3org/reva/pull/5055): Fix view&download permission issue
-
-   https://github.com/owncloud/ocis/pull/10957
-
-# Changelog for [7.1.0-rc.3] (2025-01-28)
-
-The following sections list the changes for 7.1.0-rc.3.
-
-[7.1.0-rc.3]: https://github.com/owncloud/ocis/compare/v7.1.0-rc.2...v7.1.0-rc.3
-
-## Summary
-
-* Bugfix - Fix the ocm gateway connection pool: [#10916](https://github.com/owncloud/ocis/pull/10916)
-* Bugfix - Add fallback for folder names: [#10932](https://github.com/owncloud/ocis/pull/10932)
-* Enhancement - Add email notification for share removed event: [#10915](https://github.com/owncloud/ocis/pull/10915)
-* Enhancement - Update Web to v1.11.1: [#10918](https://github.com/owncloud/ocis/pull/10918)
-* Enhancement - Update Web to v1.11.2: [#10930](https://github.com/owncloud/ocis/pull/10930)
-
-## Details
-
-* Bugfix - Fix the ocm gateway connection pool: [#10916](https://github.com/owncloud/ocis/pull/10916)
-
-   Fix the ocm gateway connection pool. Fix ocis dependency in the reva go.mod
-   file. Bump the ocis version accordingly to the major version.
-
-   https://github.com/owncloud/ocis/issues/10846
-   https://github.com/owncloud/ocis/issues/10878
-   https://github.com/owncloud/ocis/pull/10916
-
-* Bugfix - Add fallback for folder names: [#10932](https://github.com/owncloud/ocis/pull/10932)
-
-   Add translated `shared-with-me` fallback for folder names in the activitylog to
-   avoid `{folder}` in the output.
-
-   https://github.com/owncloud/ocis/issues/10906
-   https://github.com/owncloud/ocis/pull/10932
-
-* Enhancement - Add email notification for share removed event: [#10915](https://github.com/owncloud/ocis/pull/10915)
-
-   https://github.com/owncloud/ocis/issues/10904
-   https://github.com/owncloud/ocis/pull/10915
-
-* Enhancement - Update Web to v1.11.1: [#10918](https://github.com/owncloud/ocis/pull/10918)
-
-   - Bugfix [owncloud/web#12112](https://github.com/owncloud/web/pull/12112):
-   Optionally access preview app route query: #12112 - Bugfix
-   [owncloud/web#12118](https://github.com/owncloud/web/pull/12118): Change
-   federated share icon: #12118 - Bugfix
-   [owncloud/web#12118](https://github.com/owncloud/web/pull/12118): Improve
-   federated share icon contrast: #12118 - Bugfix
-   [owncloud/web#12119](https://github.com/owncloud/web/pull/12119): Show external
-   share indicator: #12119
-
-   https://github.com/owncloud/ocis/pull/10918
-   https://github.com/owncloud/web/releases/tag/v11.1.1
-
-* Enhancement - Update Web to v1.11.2: [#10930](https://github.com/owncloud/ocis/pull/10930)
-
-   - Bugfix [owncloud/ocis#10891](https://github.com/owncloud/ocis/issues/10891):
-   Rename ScienceMesh: #10891
-
-   https://github.com/owncloud/ocis/pull/10930
-   https://github.com/owncloud/web/releases/tag/v11.1.2
-
-# Changelog for [7.1.0-rc.2] (2025-01-17)
-
-The following sections list the changes for 7.1.0-rc.2.
-
-[7.1.0-rc.2]: https://github.com/owncloud/ocis/compare/v7.1.0-rc.1...v7.1.0-rc.2
-
-## Summary
-
-* Bugfix - Fix the mail notifications for the user light: [#10865](https://github.com/owncloud/ocis/pull/10865)
-* Bugfix - Fix filtering of PostprocessingStepFinished events: [#10868](https://github.com/owncloud/ocis/pull/10868)
-* Bugfix - Prevent empty email body for grouped email notifications: [#10869](https://github.com/owncloud/ocis/pull/10869)
-* Bugfix - Consistently name roles: [#10871](https://github.com/owncloud/ocis/pull/10871)
-* Bugfix - Fix grouped email notifications store key: [#10873](https://github.com/owncloud/ocis/pull/10873)
-* Bugfix - Fix missing newline in grouped email: [#10883](https://github.com/owncloud/ocis/pull/10883)
-* Bugfix - Fix email templates white spaces & new lines: [#10884](https://github.com/owncloud/ocis/pull/10884)
-* Enhancement - Add tests for grouped emails: [#10885](https://github.com/owncloud/ocis/pull/10885)
-* Enhancement - Use maintained forks: [#10886](https://github.com/owncloud/ocis/pull/10886)
-* Enhancement - Bump Reva: [#10887](https://github.com/owncloud/ocis/pull/10887)
-
-## Details
-
-* Bugfix - Fix the mail notifications for the user light: [#10865](https://github.com/owncloud/ocis/pull/10865)
-
-   Fix the default bundle-list for mail notification settings for the user light.
-
-   https://github.com/owncloud/ocis/issues/10864
-   https://github.com/owncloud/ocis/pull/10865
-
-* Bugfix - Fix filtering of PostprocessingStepFinished events: [#10868](https://github.com/owncloud/ocis/pull/10868)
-
-   https://github.com/owncloud/ocis/issues/10867
-   https://github.com/owncloud/ocis/pull/10868
-
-* Bugfix - Prevent empty email body for grouped email notifications: [#10869](https://github.com/owncloud/ocis/pull/10869)
-
-   https://github.com/owncloud/ocis/pull/10869
-
-* Bugfix - Consistently name roles: [#10871](https://github.com/owncloud/ocis/pull/10871)
-
-   BundleUUIDRoleGuest has been renamed to BundleUUIDRoleUserLight for consistency
-   reasons
-
-   https://github.com/owncloud/ocis/pull/10871
-
-* Bugfix - Fix grouped email notifications store key: [#10873](https://github.com/owncloud/ocis/pull/10873)
-
-   Interval and user id is now separated by `_` (key schema:
-   `${INTERVAL}_${USER_ID}`).
-
-   https://github.com/owncloud/ocis/pull/10873
-
-* Bugfix - Fix missing newline in grouped email: [#10883](https://github.com/owncloud/ocis/pull/10883)
-
-   `\n` is now replaced by `<br>` in the HTML email body
-
-   https://github.com/owncloud/ocis/pull/10883
-
-* Bugfix - Fix email templates white spaces & new lines: [#10884](https://github.com/owncloud/ocis/pull/10884)
-
-   Email templates now contain no unwanted white spaces & new lines if
-   .CallToAction is nil
-
-   https://github.com/owncloud/ocis/pull/10884
-
-* Enhancement - Add tests for grouped emails: [#10885](https://github.com/owncloud/ocis/pull/10885)
-
-   https://github.com/owncloud/ocis/pull/10885
-
-* Enhancement - Use maintained forks: [#10886](https://github.com/owncloud/ocis/pull/10886)
-
-   Switches away from unmainatained forks.
-
-   https://github.com/owncloud/ocis/pull/10886
-
-* Enhancement - Bump Reva: [#10887](https://github.com/owncloud/ocis/pull/10887)
-
-   Bumps the reva version
-
-   https://github.com/owncloud/ocis/pull/10887
-
-# Changelog for [7.1.0-rc.1] (2025-01-10)
-
-The following sections list the changes for 7.1.0-rc.1.
-
-[7.1.0-rc.1]: https://github.com/owncloud/ocis/compare/v7.0.0...v7.1.0-rc.1
-
-## Summary
-
-* Bugfix - Share creation date is missing in invite response: [#10781](https://github.com/owncloud/ocis/pull/10781)
-* Bugfix - Bump some golang dependencies: [#10795](https://github.com/owncloud/ocis/pull/10795)
-* Bugfix - Allow to accepted invite after it was once deleted: [#10834](https://github.com/owncloud/ocis/pull/10834)
-* Enhancement - Part I: The user settings are extended by notifications preferences: [#10706](https://github.com/owncloud/ocis/pull/10706)
-* Enhancement - Part II: Filtering of in-app notifications: [#10779](https://github.com/owncloud/ocis/pull/10779)
-* Enhancement - Part III: Filtering of mail notifications: [#10792](https://github.com/owncloud/ocis/pull/10792)
-* Enhancement - Translate Notification Settings: [#10812](https://github.com/owncloud/ocis/pull/10812)
-* Enhancement - Part IV: Grouping of mail notifications: [#10838](https://github.com/owncloud/ocis/pull/10838)
-* Enhancement - Bump Reva: [#10842](https://github.com/owncloud/ocis/pull/10842)
-* Enhancement - Update web to v11.1.0: [#10853](https://github.com/owncloud/ocis/pull/10853)
-
-## Details
-
-* Bugfix - Share creation date is missing in invite response: [#10781](https://github.com/owncloud/ocis/pull/10781)
-
-   The graph drives invite response now includes the `createdDateTime` field.
-
-   https://github.com/owncloud/ocis/issues/10739
-   https://github.com/owncloud/ocis/pull/10781
-
-* Bugfix - Bump some golang dependencies: [#10795](https://github.com/owncloud/ocis/pull/10795)
-
-   Bump dependencies "golang.org/x/crypto" and "golang.org/x/net"
-
-   https://github.com/owncloud/ocis/pull/10795
-
-* Bugfix - Allow to accepted invite after it was once deleted: [#10834](https://github.com/owncloud/ocis/pull/10834)
-
-   Allowed to accepted invite even after it was once deleted on the invite receiver
-   or invite creation side.
-
-   https://github.com/owncloud/ocis/issues/10813
-   https://github.com/owncloud/ocis/pull/10834
-
-* Enhancement - Part I: The user settings are extended by notifications preferences: [#10706](https://github.com/owncloud/ocis/pull/10706)
-
-   Part I: Users can now store their notifications preferences in the user settings
-
-   https://github.com/owncloud/ocis/issues/10669
-   https://github.com/owncloud/ocis/pull/10706
-
-* Enhancement - Part II: Filtering of in-app notifications: [#10779](https://github.com/owncloud/ocis/pull/10779)
-
-   Part II: In-app notifications are now filtered based on the notification
-   preferences in the user settings
-
-   https://github.com/owncloud/ocis/issues/10769
-   https://github.com/owncloud/ocis/pull/10779
-
-* Enhancement - Part III: Filtering of mail notifications: [#10792](https://github.com/owncloud/ocis/pull/10792)
-
-   Part III: Mail notifications are now filtered based on the notification
-   preferences in the user settings
-
-   https://github.com/owncloud/ocis/issues/10790
-   https://github.com/owncloud/ocis/pull/10792
-
-* Enhancement - Translate Notification Settings: [#10812](https://github.com/owncloud/ocis/pull/10812)
-
-   Translates the notification settings according to the users language preference.
-
-   https://github.com/owncloud/ocis/pull/10812
-
-* Enhancement - Part IV: Grouping of mail notifications: [#10838](https://github.com/owncloud/ocis/pull/10838)
-
-   Part IV: Mail notifications can now be grouped on a daily or weekly basis
-
-   https://github.com/owncloud/ocis/issues/10793
-   https://github.com/owncloud/ocis/pull/10838
-
-* Enhancement - Bump Reva: [#10842](https://github.com/owncloud/ocis/pull/10842)
-
-   Bumps the reva version
-
-   https://github.com/owncloud/ocis/pull/10842
-
-* Enhancement - Update web to v11.1.0: [#10853](https://github.com/owncloud/ocis/pull/10853)
-
-   - Bugfix [owncloud/web#12040](https://github.com/owncloud/web/pull/12040):
-   Preview app files visibility: #12040 - Bugfix
-   [owncloud/web#12044](https://github.com/owncloud/web/pull/12044): Disable paste
-   action in same folder: #12044 - Bugfix
-   [owncloud/web#12045](https://github.com/owncloud/web/pull/12045): Do not push
-   sidebar close action away: #12045 - Bugfix
-   [owncloud/web#12045](https://github.com/owncloud/web/pull/12045): Update sidebar
-   width on resize: #12045 - Bugfix
-   [owncloud/web#12045](https://github.com/owncloud/web/pull/12045): Use correct
-   breakpoints in sidebar: #12045 - Bugfix
-   [owncloud/web#12050](https://github.com/owncloud/web/pull/12050): Show indirect
-   shares on search page: #12050 - Bugfix
-   [owncloud/web#12055](https://github.com/owncloud/web/pull/12055): Add more
-   padding to input when clear action is visible: #12055 - Bugfix
-   [owncloud/web#12058](https://github.com/owncloud/web/pull/12058): Use local
-   state in sidebar in embed mode: #12058 - Bugfix
-   [owncloud/web#12063](https://github.com/owncloud/web/pull/12063): Change opacity
-   of disabled checkboxes: #12063 - Bugfix
-   [owncloud/web#12074](https://github.com/owncloud/web/pull/12074): Refetch
-   notifications settings on locale change: #12074 - Enhancement
-   [owncloud/web#12010](https://github.com/owncloud/web/pull/12010): Add
-   notifications settings: #12010 - Enhancement
-   [owncloud/web#12054](https://github.com/owncloud/web/pull/12054): Use generic
-   private link error: #12054
-
-   https://github.com/owncloud/ocis/pull/10853
-   https://github.com/owncloud/web/releases/tag/v11.1.0
+   https://github.com/owncloud/ocis/pull/11078
 
 # Changelog for [7.0.0] (2024-12-17)
 
