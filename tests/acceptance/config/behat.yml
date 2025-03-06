@@ -464,6 +464,9 @@ default:
         - TrashbinContext:
         - SpacesTUSContext:
         - AuthAppContext:
+        - SettingsContext:
+        - NotificationContext:
+        - EmailContext:
 
     coreApiMain:
       paths:

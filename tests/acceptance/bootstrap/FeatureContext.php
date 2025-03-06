@@ -78,6 +78,7 @@ class FeatureContext extends BehatVariablesContext {
 	private string $adminUsername;
 	private string $adminPassword;
 	private string $originalAdminPassword;
+	private DateTime $expiryDateTime;
 
 	/**
 	 * An array of values of replacement values of user attributes.
@@ -454,6 +455,7 @@ class FeatureContext extends BehatVariablesContext {
 		$this->regularUserPassword = $regularUserPassword;
 		$this->currentServer = 'LOCAL';
 		$this->cookieJar = new CookieJar();
+		$this->expiryDateTime = new DateTime('yesterday');
 
 		// These passwords are referenced in tests and can be overridden by
 		// setting environment variables.
@@ -901,6 +903,22 @@ class FeatureContext extends BehatVariablesContext {
 			$this->guzzleClientHeaders,
 			$guzzleClientHeaders
 		);
+	}
+
+	/**
+	 * @return DateTime
+	 */
+	public function getExpiryDateTime(): DateTime {
+		return $this->expiryDateTime;
+	}
+
+	/**
+	 * @param string $format
+	 *
+	 * @return string
+	 */
+	public function formatExpiryDateTime(string $format = 'Y-m-d H:i:sP'): string {
+		return $this->getExpiryDateTime()->format($format);
 	}
 
 	/**
@@ -2476,6 +2494,13 @@ class FeatureContext extends BehatVariablesContext {
 					"getXRequestIdRegex"
 				],
 				"parameter" => []
+			],
+			[
+				"code" => "%expiry_date_in_mail%",
+				"function" => [
+					$this, "formatExpiryDateTime"
+				],
+				"parameter" =>  ['Y-m-d H:i:s']
 			]
 		];
 		if ($user !== null) {
