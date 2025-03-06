@@ -321,9 +321,6 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiServiceAvailability/serviceAvailabilityCheck.feature:120](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiServiceAvailability/serviceAvailabilityCheck.feature#L120)
 - [apiServiceAvailability/serviceAvailabilityCheck.feature:131](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiServiceAvailability/serviceAvailabilityCheck.feature#L131)
 
-#### [[OCM] Users can invite themselves to their own federated connection](https://github.com/owncloud/ocis/issues/11004)
-- [apiOcm/acceptInvitation.feature:148](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/acceptInvitation.feature#L148)
-
 #### [[OCM] Hide & Enable Sync fail with received federated shares](https://github.com/owncloud/ocis/issues/10719)
 - [apiOcm/share.feature:1204](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L1204)
 - [apiOcm/share.feature:1228](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L1228)
