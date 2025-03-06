@@ -278,3 +278,35 @@ func OcisServiceHandler(res http.ResponseWriter, req *http.Request) {
 	}
 	sendResponse(res, http.StatusMethodNotAllowed, "Method Not Allowed")
 }
+
+func RollbackServicesHandler(res http.ResponseWriter, req *http.Request) {
+	if req.Method != http.MethodDelete {
+		sendResponse(res, http.StatusMethodNotAllowed, "")
+		return
+	}
+
+	var rollbackFailed bool
+	var message string
+
+	for serviceName := range ocis.ServiceEnvConfigs {
+		if serviceName != "ocis" {
+			if success := ocis.WaitForServiceStatus(serviceName, true); success {
+				success, message := ocis.StopService(serviceName)
+				log.Println(message)
+				if !success {
+					rollbackFailed = true
+					break
+				}
+				delete(ocis.ServiceEnvConfigs, serviceName)
+			}
+		}
+	}
+
+	if rollbackFailed {
+		sendResponse(res, http.StatusInternalServerError, message)
+	} else {
+		sendResponse(res, http.StatusOK, "All services have been rolled back successfully")
+	}
+}
+
+
