@@ -167,6 +167,7 @@ config = {
                 "apiReshare",
                 "apiSharingNg1",
                 "apiSharingNg2",
+                "apiOptionalShareRole",
             ],
             "skip": False,
         },
