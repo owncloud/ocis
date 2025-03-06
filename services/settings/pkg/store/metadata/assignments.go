@@ -6,11 +6,11 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/gofrs/uuid"
 	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 	"github.com/owncloud/ocis/v2/services/settings/pkg/settings"
 	"github.com/owncloud/ocis/v2/services/settings/pkg/store/defaults"
+	"github.com/owncloud/reva/v2/pkg/errtypes"
 )
 
 // ListRoleAssignments loads and returns all role assignments matching the given assignment identifier.

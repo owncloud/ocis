@@ -2,15 +2,16 @@ package service
 
 import (
 	"context"
+	"testing"
+
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
-	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 	settings "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
+	"github.com/owncloud/reva/v2/pkg/events"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"go-micro.dev/v4/client"
-	"testing"
 )
 
 var testLogger = log.NewLogger()

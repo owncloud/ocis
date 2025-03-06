@@ -7,7 +7,6 @@ import (
 	"path"
 	"path/filepath"
 
-	"github.com/cs3org/reva/v2/cmd/revad/runtime"
 	"github.com/gofrs/uuid"
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
@@ -19,6 +18,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/sharing/pkg/logging"
 	"github.com/owncloud/ocis/v2/services/sharing/pkg/revaconfig"
 	"github.com/owncloud/ocis/v2/services/sharing/pkg/server/debug"
+	"github.com/owncloud/reva/v2/cmd/revad/runtime"
 	"github.com/urfave/cli/v2"
 )
 

@@ -10,10 +10,10 @@ import (
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
-	"github.com/cs3org/reva/v2/pkg/events"
-	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
-	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/go-chi/chi/v5"
+	"github.com/owncloud/reva/v2/pkg/events"
+	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
+	"github.com/owncloud/reva/v2/pkg/utils"
 	"go-micro.dev/v4/store"
 	"go.opentelemetry.io/otel/trace"
 

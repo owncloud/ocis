@@ -6,9 +6,9 @@ import (
 
 	bleveSearch "github.com/blevesearch/bleve/v2"
 	sprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	"github.com/cs3org/reva/v2/pkg/storagespace"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"github.com/owncloud/reva/v2/pkg/storagespace"
 
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	searchmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"

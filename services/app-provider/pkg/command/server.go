@@ -6,9 +6,9 @@ import (
 	"os"
 	"path"
 
-	"github.com/cs3org/reva/v2/cmd/revad/runtime"
 	"github.com/gofrs/uuid"
 	"github.com/oklog/run"
+	"github.com/owncloud/reva/v2/cmd/revad/runtime"
 	"github.com/urfave/cli/v2"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"

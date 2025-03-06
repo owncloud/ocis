@@ -5,8 +5,8 @@ import (
 
 	linkv1beta1 "github.com/cs3org/go-cs3apis/cs3/sharing/link/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	"github.com/cs3org/reva/v2/pkg/storage/utils/grants"
 	libregraph "github.com/owncloud/libre-graph-api-go"
+	"github.com/owncloud/reva/v2/pkg/storage/utils/grants"
 
 	"github.com/owncloud/ocis/v2/services/graph/pkg/unifiedrole"
 )

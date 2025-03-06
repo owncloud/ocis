@@ -4,9 +4,9 @@ import (
 	"context"
 	"path"
 
-	"github.com/cs3org/reva/v2/pkg/store"
 	olog "github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/settings/pkg/config"
+	"github.com/owncloud/reva/v2/pkg/store"
 	"github.com/shamaton/msgpack/v2"
 	microstore "go-micro.dev/v4/store"
 )

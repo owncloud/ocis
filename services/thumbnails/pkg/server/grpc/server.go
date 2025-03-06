@@ -1,8 +1,6 @@
 package grpc
 
 import (
-	"github.com/cs3org/reva/v2/pkg/bytesize"
-	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc/handler/ratelimiter"
@@ -12,6 +10,8 @@ import (
 	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/service/grpc/v0/decorators"
 	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/thumbnail/imgsource"
 	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/thumbnail/storage"
+	"github.com/owncloud/reva/v2/pkg/bytesize"
+	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
 )
 
 // NewService initializes the grpc service and server.

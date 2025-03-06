@@ -6,7 +6,7 @@ import (
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
-	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
+	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
 	"google.golang.org/grpc"
 
 	. "github.com/onsi/ginkgo/v2"

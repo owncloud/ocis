@@ -8,11 +8,11 @@ import (
 	cs3Group "github.com/cs3org/go-cs3apis/cs3/identity/group/v1beta1"
 	cs3User "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
-	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
-	revautils "github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/jellydator/ttlcache/v3"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
+	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
+	revautils "github.com/owncloud/reva/v2/pkg/utils"
 )
 
 // IdentityCache implements a simple ttl based cache for looking up users and groups by ID

@@ -7,14 +7,14 @@ import (
 	"testing"
 
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
-	"github.com/cs3org/reva/v2/pkg/auth/scope"
-	revactx "github.com/cs3org/reva/v2/pkg/ctx"
-	"github.com/cs3org/reva/v2/pkg/token/manager/jwt"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/user/backend"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/user/backend/mocks"
 	userRoleMocks "github.com/owncloud/ocis/v2/services/proxy/pkg/userroles/mocks"
+	"github.com/owncloud/reva/v2/pkg/auth/scope"
+	revactx "github.com/owncloud/reva/v2/pkg/ctx"
+	"github.com/owncloud/reva/v2/pkg/token/manager/jwt"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )

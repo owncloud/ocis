@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/cs3org/reva/v2/pkg/events/stream"
-	"github.com/cs3org/reva/v2/pkg/store"
 	"github.com/oklog/run"
+	"github.com/owncloud/reva/v2/pkg/events/stream"
+	"github.com/owncloud/reva/v2/pkg/store"
 	"github.com/urfave/cli/v2"
 	microstore "go-micro.dev/v4/store"
 

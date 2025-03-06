@@ -324,8 +324,8 @@ import (
     "time"
 
 
-    "github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
-    cs3mocks "github.com/cs3org/reva/v2/tests/cs3mocks/mocks"
+    "github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
+    cs3mocks "github.com/owncloud/reva/v2/tests/cs3mocks/mocks"
     . "github.com/onsi/ginkgo/v2"
     . "github.com/onsi/gomega"
     "google.golang.org/grpc"

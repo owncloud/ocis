@@ -6,10 +6,10 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/audit/pkg/config"
 	"github.com/owncloud/ocis/v2/services/audit/pkg/types"
+	"github.com/owncloud/reva/v2/pkg/events"
 )
 
 // Log is used to log to different outputs

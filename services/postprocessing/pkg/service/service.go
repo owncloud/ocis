@@ -8,12 +8,12 @@ import (
 	"sync"
 	"time"
 
-	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
-	"github.com/cs3org/reva/v2/pkg/events"
-	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/postprocessing/pkg/config"
 	"github.com/owncloud/ocis/v2/services/postprocessing/pkg/postprocessing"
+	ctxpkg "github.com/owncloud/reva/v2/pkg/ctx"
+	"github.com/owncloud/reva/v2/pkg/events"
+	"github.com/owncloud/reva/v2/pkg/utils"
 	"go-micro.dev/v4/store"
 	"go.opentelemetry.io/otel/trace"
 )

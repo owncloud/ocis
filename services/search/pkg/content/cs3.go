@@ -10,9 +10,9 @@ import (
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	revactx "github.com/cs3org/reva/v2/pkg/ctx"
-	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	revactx "github.com/owncloud/reva/v2/pkg/ctx"
+	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
 )
 
 type cs3 struct {

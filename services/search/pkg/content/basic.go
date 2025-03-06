@@ -5,9 +5,9 @@ import (
 	"time"
 
 	storageProvider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	"github.com/cs3org/reva/v2/pkg/tags"
-	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/reva/v2/pkg/tags"
+	"github.com/owncloud/reva/v2/pkg/utils"
 )
 
 // Basic is the simplest Extractor implementation.

@@ -20,12 +20,12 @@ import (
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 
-	revactx "github.com/cs3org/reva/v2/pkg/ctx"
-	"github.com/cs3org/reva/v2/pkg/publicshare"
-	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
-	"github.com/cs3org/reva/v2/pkg/share"
-	"github.com/cs3org/reva/v2/pkg/storagespace"
-	"github.com/cs3org/reva/v2/pkg/utils"
+	revactx "github.com/owncloud/reva/v2/pkg/ctx"
+	"github.com/owncloud/reva/v2/pkg/publicshare"
+	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
+	"github.com/owncloud/reva/v2/pkg/share"
+	"github.com/owncloud/reva/v2/pkg/storagespace"
+	"github.com/owncloud/reva/v2/pkg/utils"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/l10n"
 	l10n_pkg "github.com/owncloud/ocis/v2/services/graph/pkg/l10n"

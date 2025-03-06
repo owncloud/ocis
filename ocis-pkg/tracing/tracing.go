@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	rtrace "github.com/cs3org/reva/v2/pkg/trace"
+	rtrace "github.com/owncloud/reva/v2/pkg/trace"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/jaeger"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"

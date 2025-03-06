@@ -9,7 +9,7 @@ import (
 	"regexp"
 	"time"
 
-	"github.com/cs3org/reva/v2/pkg/mime"
+	"github.com/owncloud/reva/v2/pkg/mime"
 
 	ic "github.com/egirna/icap-client"
 )

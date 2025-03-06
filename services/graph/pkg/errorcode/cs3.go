@@ -6,7 +6,7 @@ import (
 	cs3rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 
-	"github.com/cs3org/reva/v2/pkg/utils"
+	"github.com/owncloud/reva/v2/pkg/utils"
 )
 
 // FromCS3Status converts a CS3 status code and an error into a corresponding local Error representation.

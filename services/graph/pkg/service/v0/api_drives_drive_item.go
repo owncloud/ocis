@@ -14,9 +14,9 @@ import (
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
 
-	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
-	"github.com/cs3org/reva/v2/pkg/storagespace"
-	"github.com/cs3org/reva/v2/pkg/utils"
+	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
+	"github.com/owncloud/reva/v2/pkg/storagespace"
+	"github.com/owncloud/reva/v2/pkg/utils"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"

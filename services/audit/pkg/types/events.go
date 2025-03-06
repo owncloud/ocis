@@ -1,7 +1,7 @@
 package types
 
 import (
-	"github.com/cs3org/reva/v2/pkg/events"
+	"github.com/owncloud/reva/v2/pkg/events"
 )
 
 // RegisteredEvents returns the events the service is registered for

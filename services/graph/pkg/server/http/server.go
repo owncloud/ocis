@@ -5,9 +5,9 @@ import (
 	stdhttp "net/http"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
-	"github.com/cs3org/reva/v2/pkg/events/stream"
-	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
+	"github.com/owncloud/reva/v2/pkg/events/stream"
+	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/pkg/errors"
 	"go-micro.dev/v4"
 	"go-micro.dev/v4/events"

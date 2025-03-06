@@ -6,15 +6,15 @@ import (
 	"net/http/httptest"
 
 	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
-	rConversions "github.com/cs3org/reva/v2/pkg/conversions"
-	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/go-chi/chi/v5"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	libregraph "github.com/owncloud/libre-graph-api-go"
+	rConversions "github.com/owncloud/reva/v2/pkg/conversions"
+	"github.com/owncloud/reva/v2/pkg/utils"
 
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	"github.com/cs3org/reva/v2/pkg/storagespace"
+	"github.com/owncloud/reva/v2/pkg/storagespace"
 	"google.golang.org/protobuf/testing/protocmp"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/conversions"

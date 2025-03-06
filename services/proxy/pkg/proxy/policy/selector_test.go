@@ -7,9 +7,9 @@ import (
 	"testing"
 
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
-	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
+	revactx "github.com/owncloud/reva/v2/pkg/ctx"
 )
 
 func TestLoadSelector(t *testing.T) {

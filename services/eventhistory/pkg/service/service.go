@@ -7,11 +7,11 @@ import (
 	"fmt"
 	"regexp"
 
-	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	ehmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/eventhistory/v0"
 	ehsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/eventhistory/v0"
 	"github.com/owncloud/ocis/v2/services/eventhistory/pkg/config"
+	"github.com/owncloud/reva/v2/pkg/events"
 	"go-micro.dev/v4/store"
 )
 

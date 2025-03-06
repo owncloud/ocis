@@ -6,8 +6,6 @@ import (
 	"os"
 	"path"
 
-	"github.com/cs3org/reva/v2/cmd/revad/runtime"
-	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/gofrs/uuid"
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
@@ -22,6 +20,8 @@ import (
 	"github.com/owncloud/ocis/v2/services/auth-app/pkg/revaconfig"
 	"github.com/owncloud/ocis/v2/services/auth-app/pkg/server/debug"
 	"github.com/owncloud/ocis/v2/services/auth-app/pkg/server/http"
+	"github.com/owncloud/reva/v2/cmd/revad/runtime"
+	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/urfave/cli/v2"
 )
 

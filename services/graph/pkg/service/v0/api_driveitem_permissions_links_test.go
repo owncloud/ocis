@@ -9,10 +9,6 @@ import (
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	link "github.com/cs3org/go-cs3apis/cs3/sharing/link/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	revactx "github.com/cs3org/reva/v2/pkg/ctx"
-	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
-	"github.com/cs3org/reva/v2/pkg/utils"
-	cs3mocks "github.com/cs3org/reva/v2/tests/cs3mocks/mocks"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	libregraph "github.com/owncloud/libre-graph-api-go"
@@ -23,6 +19,10 @@ import (
 	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/linktype"
 	service "github.com/owncloud/ocis/v2/services/graph/pkg/service/v0"
+	revactx "github.com/owncloud/reva/v2/pkg/ctx"
+	"github.com/owncloud/reva/v2/pkg/rgrpc/status"
+	"github.com/owncloud/reva/v2/pkg/utils"
+	cs3mocks "github.com/owncloud/reva/v2/tests/cs3mocks/mocks"
 	"github.com/stretchr/testify/mock"
 )
 

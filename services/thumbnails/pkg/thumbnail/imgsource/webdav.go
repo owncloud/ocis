@@ -11,9 +11,9 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/cs3org/reva/v2/pkg/bytesize"
 	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/config"
 	thumbnailerErrors "github.com/owncloud/ocis/v2/services/thumbnails/pkg/errors"
+	"github.com/owncloud/reva/v2/pkg/bytesize"
 	"github.com/pkg/errors"
 )
 

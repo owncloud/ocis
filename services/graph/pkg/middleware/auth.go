@@ -6,14 +6,14 @@ import (
 	gmmetadata "go-micro.dev/v4/metadata"
 	"google.golang.org/grpc/metadata"
 
-	"github.com/cs3org/reva/v2/pkg/auth/scope"
-	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
-	revactx "github.com/cs3org/reva/v2/pkg/ctx"
-	"github.com/cs3org/reva/v2/pkg/token/manager/jwt"
 	"github.com/owncloud/ocis/v2/ocis-pkg/account"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	opkgm "github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
+	"github.com/owncloud/reva/v2/pkg/auth/scope"
+	ctxpkg "github.com/owncloud/reva/v2/pkg/ctx"
+	revactx "github.com/owncloud/reva/v2/pkg/ctx"
+	"github.com/owncloud/reva/v2/pkg/token/manager/jwt"
 )
 
 // authOptions initializes the available default options.

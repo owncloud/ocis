@@ -7,8 +7,8 @@ import (
 	registryv1beta1 "github.com/cs3org/go-cs3apis/cs3/app/registry/v1beta1"
 	gatewayv1beta1 "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
-	"github.com/cs3org/reva/v2/pkg/mime"
-	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
+	"github.com/owncloud/reva/v2/pkg/mime"
+	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"

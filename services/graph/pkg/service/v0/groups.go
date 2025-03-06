@@ -12,10 +12,10 @@ import (
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
 
-	revactx "github.com/cs3org/reva/v2/pkg/ctx"
-	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
+	revactx "github.com/owncloud/reva/v2/pkg/ctx"
+	"github.com/owncloud/reva/v2/pkg/events"
 )
 
 const memberTypeUsers = "users"

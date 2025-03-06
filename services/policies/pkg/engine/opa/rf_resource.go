@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/cs3org/reva/v2/pkg/rhttp"
 	"github.com/open-policy-agent/opa/ast"
 	"github.com/open-policy-agent/opa/rego"
 	"github.com/open-policy-agent/opa/types"
+	"github.com/owncloud/reva/v2/pkg/rhttp"
 )
 
 // RFResourceDownload extends the rego dictionary with the possibility to download oCis resources.

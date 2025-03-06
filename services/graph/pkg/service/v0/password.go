@@ -10,9 +10,9 @@ import (
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 
-	revactx "github.com/cs3org/reva/v2/pkg/ctx"
-	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
+	revactx "github.com/owncloud/reva/v2/pkg/ctx"
+	"github.com/owncloud/reva/v2/pkg/events"
 )
 
 // ChangeOwnPassword implements the Service interface. It allows the user to change

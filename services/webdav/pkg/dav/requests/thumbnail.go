@@ -8,9 +8,9 @@ import (
 	"strconv"
 
 	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	"github.com/cs3org/reva/v2/pkg/storagespace"
-	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/go-chi/chi/v5"
+	"github.com/owncloud/reva/v2/pkg/storagespace"
+	"github.com/owncloud/reva/v2/pkg/utils"
 
 	"github.com/owncloud/ocis/v2/services/webdav/pkg/constants"
 )

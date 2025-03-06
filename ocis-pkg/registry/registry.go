@@ -7,9 +7,9 @@ import (
 	"sync"
 	"time"
 
-	rRegistry "github.com/cs3org/reva/v2/pkg/registry"
 	memr "github.com/go-micro/plugins/v4/registry/memory"
 	"github.com/owncloud/ocis/v2/ocis-pkg/natsjsregistry"
+	rRegistry "github.com/owncloud/reva/v2/pkg/registry"
 	mRegistry "go-micro.dev/v4/registry"
 	"go-micro.dev/v4/registry/cache"
 )

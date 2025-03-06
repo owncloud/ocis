@@ -19,11 +19,11 @@ import (
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc"
 
-	revactx "github.com/cs3org/reva/v2/pkg/ctx"
-	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
-	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
-	"github.com/cs3org/reva/v2/pkg/utils"
-	cs3mocks "github.com/cs3org/reva/v2/tests/cs3mocks/mocks"
+	revactx "github.com/owncloud/reva/v2/pkg/ctx"
+	"github.com/owncloud/reva/v2/pkg/rgrpc/status"
+	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
+	"github.com/owncloud/reva/v2/pkg/utils"
+	cs3mocks "github.com/owncloud/reva/v2/tests/cs3mocks/mocks"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	"github.com/owncloud/ocis/v2/services/graph/mocks"

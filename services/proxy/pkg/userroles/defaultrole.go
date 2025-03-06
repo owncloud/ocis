@@ -4,10 +4,10 @@ import (
 	"context"
 
 	cs3 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
-	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	settingsService "github.com/owncloud/ocis/v2/services/settings/pkg/service/v0"
+	"github.com/owncloud/reva/v2/pkg/utils"
 	"go-micro.dev/v4/metadata"
 )
 

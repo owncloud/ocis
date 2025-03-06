@@ -6,11 +6,11 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/cs3org/reva/v2/pkg/errtypes"
 	. "github.com/onsi/gomega"
 	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 	"github.com/owncloud/ocis/v2/services/settings/pkg/config/defaults"
 	rdefaults "github.com/owncloud/ocis/v2/services/settings/pkg/store/defaults"
+	"github.com/owncloud/reva/v2/pkg/errtypes"
 )
 
 const (

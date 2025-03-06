@@ -4,8 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/cs3org/reva/v2/pkg/micro/ocdav"
-	"github.com/cs3org/reva/v2/pkg/sharedconf"
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/v2/ocis-pkg/broker"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
@@ -16,6 +14,8 @@ import (
 	"github.com/owncloud/ocis/v2/services/ocdav/pkg/config/parser"
 	"github.com/owncloud/ocis/v2/services/ocdav/pkg/logging"
 	"github.com/owncloud/ocis/v2/services/ocdav/pkg/server/debug"
+	"github.com/owncloud/reva/v2/pkg/micro/ocdav"
+	"github.com/owncloud/reva/v2/pkg/sharedconf"
 	"github.com/urfave/cli/v2"
 )
 
