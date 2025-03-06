@@ -13,7 +13,7 @@ services:
       - "--certificatesResolvers.http.acme.httpChallenge.entryPoint=http"
       - "--certificatesResolvers.http.acme.caserver=${TRAEFIK_ACME_CASERVER:-https://acme-v02.api.letsencrypt.org/directory}"
       # enable dashboard
-      - "--api.dashboard=true"
+      - "--api.dashboard=${TRAEFIK_DASHBOARD:-false}"
       # define entrypoints
       - "--entryPoints.http.address=:80"
       - "--entryPoints.http.http.redirections.entryPoint.to=https"
@@ -41,7 +41,7 @@ services:
       - "${DOCKER_SOCKET_PATH:-/var/run/docker.sock}:/var/run/docker.sock:ro"
       - "certs:/certs"
     labels:
-      - "traefik.enable=${TRAEFIK_DASHBOARD:-false}"
+      - "traefik.enable=true"
        # defaults to admin:admin
       - "traefik.http.middlewares.traefik-auth.basicauth.users=${TRAEFIK_BASIC_AUTH_USERS:-admin:$$apr1$$4vqie50r$$YQAmQdtmz5n9rEALhxJ4l.}"
       - "traefik.http.routers.traefik.entrypoints=https"
