@@ -497,8 +497,8 @@ class SettingsContext implements Context {
 			[
 				"value" => [
 					"account_uuid" => "me",
-					"bundleId" => "2a506de7-99bd-4f0d-994e-c38e72c28fd9",
-					"settingId" => "ec3ed4a3-3946-4efc-8f9f-76d38b12d3a9",
+					"bundleId" => SettingsHelper::getBundleId(),
+					"settingId" => SettingsHelper::getSettingIdUsingEventName("Auto Accept Shares"),
 					"resource" => [
 						"type" => "TYPE_USER"
 					],
@@ -562,8 +562,17 @@ class SettingsContext implements Context {
 	 * @return void
 	 */
 	public function userDisablesEmailNotificationUsingTheSettingsAPI(string $user): void {
-		$body = $this->getBodyForNotificationSetting($user, "Disable Email Notifications");
-		$body["value"]["boolValue"] = true;
+		$body = [
+			"value" => [
+				"account_uuid" => "me",
+				"bundleId" => SettingsHelper::getBundleId(),
+				"settingId" => SettingsHelper::getSettingIdUsingEventName("Disable Email Notifications"),
+				"resource" => [
+					"type" => "TYPE_USER"
+				],
+				"boolValue" => true
+			]
+		];
 		$response = SettingsHelper::updateSettings(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getActualUsername($user),
@@ -572,38 +581,6 @@ class SettingsContext implements Context {
 			$this->featureContext->getStepLineRef(),
 		);
 		$this->featureContext->setResponse($response);
-	}
-
-	/**
-	 * @param string $user
-	 * @param string $event
-	 *
-	 * @return array
-	 */
-	public function getBodyForNotificationSetting(string $user, string $event): array {
-		$settingsValues = (json_decode(
-			SettingsHelper::getBundlesList(
-				$this->featureContext->getBaseUrl(),
-				$this->featureContext->getActualUsername($user),
-				$this->featureContext->getPasswordForUser($user),
-				$this->featureContext->getStepLineRef(),
-			)->getBody()->getContents()
-		));
-		foreach ($settingsValues->bundles[0]->settings as $settingsValue) {
-			if ($settingsValue->displayName === $event) {
-				return [
-					"value" => [
-						"account_uuid" => "me",
-						"bundleId" => $settingsValues->bundles[0]->id,
-						"settingId" => $settingsValue->id,
-						"resource" => [
-							"type" => $settingsValue->resource->type
-						],
-					]
-				];
-			}
-		}
-		throw new Exception("'$event' not found in the setting list");
 	}
 
 	/**
@@ -623,7 +600,16 @@ class SettingsContext implements Context {
 		$settings = $table->getRowsHash();
 		Assert::assertCount(1, $settings, "only 1 event should be provided");
 		foreach ($settings as $event => $value) {
-			$body = $this->getBodyForNotificationSetting($user, $event);
+			$body = [
+				"value" => [
+					"account_uuid" => "me",
+					"bundleId" => SettingsHelper::getBundleId(),
+					"settingId" => SettingsHelper::getSettingIdUsingEventName($event),
+					"resource" => [
+						"type" => "TYPE_USER"
+					]
+				]
+			];
 			if (str_contains($value, "mail")) {
 				$body["value"]["collectionValue"]["values"][]
 					= ["key" => "mail","boolValue" => $enableOrDisable === "enables"];
@@ -644,26 +630,48 @@ class SettingsContext implements Context {
 	}
 
 	/**
+	 * @param string $user
+	 * @param string $interval
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 * @throws JsonException
+	 */
+	public function setEmailSendingInterval(string $user, string $interval): ResponseInterface {
+		$body = [
+			"value" => [
+				"account_uuid" => "me",
+				"bundleId" => SettingsHelper::getBundleId(),
+				"settingId" => SettingsHelper::getSettingIdUsingEventName("Email Sending Interval"),
+				"resource" => [
+					"type" => "TYPE_USER"
+				],
+				"stringValue" => $interval
+			]
+		];
+		return SettingsHelper::updateSettings(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getActualUsername($user),
+			$this->featureContext->getPasswordForUser($user),
+			json_encode($body, JSON_THROW_ON_ERROR),
+			$this->featureContext->getStepLineRef()
+		);
+	}
+
+	/**
 	 * @When /^user "([^"]*)" sets the email sending interval to "([^"]*)" using the settings API$/
 	 *
 	 * @param string $user
 	 * @param string $interval
 	 *
 	 * @return void
+	 * @throws Exception|GuzzleException
 	 */
 	public function userSetsTheEmailSendingIntervalToUsingTheSettingsAPI(
 		string $user,
 		string $interval,
 	): void {
-		$body = $this->getBodyForNotificationSetting($user, "Email sending interval");
-		$body["value"]["stringValue"] = $interval;
-		$response = SettingsHelper::updateSettings(
-			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getActualUsername($user),
-			$this->featureContext->getPasswordForUser($user),
-			json_encode($body),
-			$this->featureContext->getStepLineRef(),
-		);
+		$response = $this->setEmailSendingInterval($user, $interval);
 		$this->featureContext->setResponse($response);
 	}
 
@@ -680,15 +688,7 @@ class SettingsContext implements Context {
 		string $user,
 		string $interval,
 	): void {
-		$body = $this->getBodyForNotificationSetting($user, "Email sending interval");
-		$body["value"]["stringValue"] = $interval;
-		$response = SettingsHelper::updateSettings(
-			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getActualUsername($user),
-			$this->featureContext->getPasswordForUser($user),
-			json_encode($body),
-			$this->featureContext->getStepLineRef(),
-		);
+		$response = $this->setEmailSendingInterval($user, $interval);
 		$this->featureContext->theHTTPStatusCodeShouldBe(201, "", $response);
 	}
 }
