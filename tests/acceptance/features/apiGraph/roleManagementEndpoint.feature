@@ -211,7 +211,7 @@ Feature: permissions role definitions
                   "const": "View, download, upload, edit, add and delete."
                 },
                 "displayName": {
-                  "const": "Can edit"
+                  "const": "Can edit without versions"
                 },
                 "id": {
                   "const": "fb6c3e19-e378-47e5-b277-9732f9de6e21"
@@ -359,7 +359,7 @@ Feature: permissions role definitions
                   "const": "View, download and edit."
                 },
                 "displayName": {
-                  "const": "Can edit"
+                  "const": "Can edit without versions"
                 },
                 "id": {
                   "const": "2d00ce52-1fc2-4dbc-8b95-a73b73395f5a"
