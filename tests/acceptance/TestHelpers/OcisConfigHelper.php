@@ -135,4 +135,13 @@ class OcisConfigHelper {
 		$url = self::getWrapperUrl() . "/services/" . $service;
 		return self::sendRequest($url, "POST", \json_encode($envs));
 	}
+
+	/**
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public static function rollbackServices(): ResponseInterface {
+		$url = self::getWrapperUrl() . "/services/rollback";
+		return self::sendRequest($url, "DELETE");
+	}
 }
