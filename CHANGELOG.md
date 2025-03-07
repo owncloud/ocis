@@ -67,6 +67,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix the OCM role file editor: [#11093](https://github.com/owncloud/ocis/pull/11093)
 * Enhancement - Update Mockery to 2.52.3: [#11070](https://github.com/owncloud/ocis/pull/11070)
 * Enhancement - Bump Reva: [#11083](https://github.com/owncloud/ocis/pull/11083)
+* Enhancement - Improve postprocessing logs: [#11108](https://github.com/owncloud/ocis/pull/11108)
 
 ## Details
 
@@ -105,6 +106,13 @@ The following sections list the changes for unreleased.
    Bumps reva version to 2.27.7
 
    https://github.com/owncloud/ocis/pull/11083
+
+* Enhancement - Improve postprocessing logs: [#11108](https://github.com/owncloud/ocis/pull/11108)
+
+   Improve postprocessing logs to easily trace successful and failing uploads/
+
+   https://github.com/owncloud/ocis/issues/10998
+   https://github.com/owncloud/ocis/pull/11108
 
 # Changelog for [7.1.0] (2025-03-06)
 
