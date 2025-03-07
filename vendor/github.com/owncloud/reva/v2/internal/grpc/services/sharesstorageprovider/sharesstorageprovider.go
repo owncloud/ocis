@@ -748,11 +748,11 @@ func (s *service) Stat(ctx context.Context, req *provider.StatRequest) (*provide
 					SpaceId:   utils.ShareStorageSpaceID,
 					OpaqueId:  utils.ShareStorageSpaceID,
 				},
-				Type:          provider.ResourceType_RESOURCE_TYPE_CONTAINER,
-				Mtime:         mtime,
-				Path:          "/",
-				MimeType:      "httpd/unix-directory",
-				Size:          0,
+				Type:     provider.ResourceType_RESOURCE_TYPE_CONTAINER,
+				Mtime:    mtime,
+				Path:     "/",
+				MimeType: "httpd/unix-directory",
+				Size:     0,
 				PermissionSet: &provider.ResourcePermissions{
 					// TODO
 				},
@@ -866,6 +866,12 @@ func (s *service) ListContainer(ctx context.Context, req *provider.ListContainer
 				StorageId: utils.ShareStorageProviderID,
 				SpaceId:   utils.ShareStorageSpaceID,
 				OpaqueId:  share.GetShare().GetId().GetOpaqueId(),
+			}
+			// overwrite parent id with the share jail root
+			info.ParentId = &provider.ResourceId{
+				StorageId: utils.ShareStorageProviderID,
+				SpaceId:   utils.ShareStorageSpaceID,
+				OpaqueId:  utils.ShareStorageSpaceID,
 			}
 			info.Path = filepath.Base(share.MountPoint.Path)
 			info.Name = info.Path
