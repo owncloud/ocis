@@ -158,6 +158,13 @@ The following sections list the changes for unreleased
    https://github.com/owncloud/ocis/issues/10989
    https://github.com/owncloud/ocis/pull/11115
 
+* Enhancement - Improve postprocessing logs: [#11108](https://github.com/owncloud/ocis/pull/11108)
+
+   Improve postprocessing logs to easily trace successful and failing uploads/
+
+   https://github.com/owncloud/ocis/issues/10998
+   https://github.com/owncloud/ocis/pull/11108
+
 # Changelog for [7.1.2] (2025-03-28)
 
 The following sections list the changes for 7.1.2.
