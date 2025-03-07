@@ -323,6 +323,7 @@ func StopService(service string) (bool, string) {
 		StopService(service)
 	}
 
+	delete(ServiceEnvConfigs, service)
 	delete(runningServices, service)
 	return true, fmt.Sprintf(fmt.Sprintf("%s service stopped successfully", service))
 }
