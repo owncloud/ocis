@@ -13,7 +13,7 @@ services:
       - "--certificatesResolvers.http.acme.httpChallenge.entryPoint=http"
       - "--certificatesResolvers.http.acme.caserver=${TRAEFIK_ACME_CASERVER:-https://acme-v02.api.letsencrypt.org/directory}"
       # enable dashboard
-      - "--api.dashboard=true"
+      - "--api.dashboard=${TRAEFIK_DASHBOARD:-false}"
       # define entrypoints
       - "--entryPoints.http.address=:80"
       - "--entryPoints.http.http.redirections.entryPoint.to=https"
@@ -31,6 +31,9 @@ services:
       - "--accessLog=true"
       - "--accessLog.format=json"
       - "--accessLog.fields.headers.names.X-Request-Id=keep"
+      # maintenance page
+      - "--experimental.plugins.traefik-maintenance.modulename=github.com/TRIMM/traefik-maintenance"
+      - "--experimental.plugins.traefik-maintenance.version=v1.0.1"
     ports:
       - "80:80"
       - "443:443"
@@ -38,7 +41,7 @@ services:
       - "${DOCKER_SOCKET_PATH:-/var/run/docker.sock}:/var/run/docker.sock:ro"
       - "certs:/certs"
     labels:
-      - "traefik.enable=${TRAEFIK_DASHBOARD:-false}"
+      - "traefik.enable=true"
        # defaults to admin:admin
       - "traefik.http.middlewares.traefik-auth.basicauth.users=${TRAEFIK_BASIC_AUTH_USERS:-admin:$$apr1$$4vqie50r$$YQAmQdtmz5n9rEALhxJ4l.}"
       - "traefik.http.routers.traefik.entrypoints=https"
@@ -46,6 +49,12 @@ services:
       - "traefik.http.routers.traefik.middlewares=traefik-auth"
       - "traefik.http.routers.traefik.tls.certresolver=http"
       - "traefik.http.routers.traefik.service=api@internal"
+      # maintenance configuration
+      - "traefik.http.middlewares.maintenance.plugin.traefik-maintenance.enabled=true"
+      - "traefik.http.middlewares.maintenance.plugin.traefik-maintenance.httpResponseCode=503"
+      - "traefik.http.middlewares.maintenance.plugin.traefik-maintenance.filename=/maintenance/content.txt"
+      - "traefik.http.middlewares.maintenance.plugin.traefik-maintenance.triggerFilename=/maintenance/content.txt.trigger"
+      - "traefik.http.middlewares.maintenance.plugin.traefik-maintenance.httpContentType=text/plain; charset=utf-8"
     logging:
       driver: ${LOG_DRIVER:-local}
     restart: always
