@@ -24,6 +24,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config"
 	"github.com/stretchr/testify/mock"
 	"github.com/tidwall/gjson"
+	"go.opentelemetry.io/otel"
 	"google.golang.org/grpc"
 
 	roleconversions "github.com/owncloud/reva/v2/pkg/conversions"
@@ -73,7 +74,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 		cache = identity.NewIdentityCache(identity.IdentityCacheWithGatewaySelector(gatewaySelector))
 
 		cfg = defaults.FullDefaultConfig()
-		service, err := svc.NewDriveItemPermissionsService(logger, gatewaySelector, cache, cfg)
+		service, err := svc.NewDriveItemPermissionsService(logger, gatewaySelector, cache, cfg, otel.GetTracerProvider())
 		Expect(err).ToNot(HaveOccurred())
 		driveItemPermissionsService = service
 		ctx = revactx.ContextSetUser(context.Background(), currentUser)
@@ -264,7 +265,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 				// SecureViewer is enabled in ci, we need to remove it in the unit test
 				return s != unifiedrole.UnifiedRoleSecureViewerID
 			})
-			service, err := svc.NewDriveItemPermissionsService(log.NewLogger(), gatewaySelector, cache, cfg)
+			service, err := svc.NewDriveItemPermissionsService(log.NewLogger(), gatewaySelector, cache, cfg, otel.GetTracerProvider())
 			Expect(err).ToNot(HaveOccurred())
 
 			driveItemInvite.Roles = []string{unifiedrole.UnifiedRoleViewerID, unifiedrole.UnifiedRoleSecureViewerID}
