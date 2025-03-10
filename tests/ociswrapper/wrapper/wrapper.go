@@ -28,6 +28,7 @@ func Start(port string) {
 	mux.HandleFunc("/stop", handlers.StopOcisHandler)
 	mux.HandleFunc("/start", handlers.StartOcisHandler)
 	mux.HandleFunc("/services/{service}", handlers.OcisServiceHandler)
+	mux.HandleFunc("/services/rollback", handlers.RollbackServicesHandler)
 
 	httpServer.Handler = mux
 
