@@ -230,6 +230,7 @@ func (api DriveItemPermissionsApi) SetLinkPassword(w http.ResponseWriter, r *htt
 
 	newPermission, err := api.driveItemPermissionsService.SetPublicLinkPassword(ctx, itemID, permissionID, password.GetPassword())
 	if err != nil {
+		api.logger.Error().Err(err).Str("permissionID", permissionID).Str("storageID", itemID.GetStorageId()).Msg(err.Error())
 		errorcode.RenderError(w, r, err)
 		return
 	}
@@ -264,6 +265,7 @@ func (api DriveItemPermissionsApi) SetSpaceRootLinkPassword(w http.ResponseWrite
 	ctx := r.Context()
 	newPermission, err := api.driveItemPermissionsService.SetPublicLinkPasswordOnSpaceRoot(ctx, &driveID, permissionID, password.GetPassword())
 	if err != nil {
+		api.logger.Error().Err(err).Str("permissionID", permissionID).Str("storageID", driveID.GetStorageId()).Msg(err.Error())
 		errorcode.RenderError(w, r, err)
 		return
 	}
