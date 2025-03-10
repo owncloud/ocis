@@ -32,6 +32,39 @@ use PHPUnit\Framework\Assert;
 class SettingsHelper {
 	private static string $settingsEndpoint = '/api/v0/settings/';
 
+	private const BUNDLE_ID = "2a506de7-99bd-4f0d-994e-c38e72c28fd9";
+
+	private const DEFAULT_SETTING_EVENTS = [
+		'Disable Email Notifications' => '33ffb5d6-cd07-4dc0-afb0-84f7559ae438',
+		'Auto Accept Shares' => 'ec3ed4a3-3946-4efc-8f9f-76d38b12d3a9',
+		'File Rejected' => 'fe0a3011-d886-49c8-b797-33d02fa426ef',
+		'Email Sending Interval' => '08dec2fe-3f97-42a9-9d1b-500855e92f25',
+		'Share Received' => '872d8ef6-6f2a-42ab-af7d-f53cc81d7046',
+		'Share Removed' => 'd7484394-8321-4c84-9677-741ba71e1f80',
+		'Share Expired' => 'e1aa0b7c-1b0f-4072-9325-c643c89fee4e',
+		'Added As Space Member' => '694d5ee1-a41c-448c-8d14-396b95d2a918',
+		'Removed As Space Member' => '26c20e0e-98df-4483-8a77-759b3a766af0',
+		'Space Deleted' => '094ceca9-5a00-40ba-bb1a-bbc7bccd39ee',
+		'Space Disabled' => 'eb5c716e-03be-42c6-9ed1-1105d24e109f',
+		'Space Membership Expired' => '7275921e-b737-4074-ba91-3c2983be3edd'
+	];
+
+	/**
+	 * @return string
+	 */
+	public static function getBundleId(): string {
+		return self::BUNDLE_ID;
+	}
+
+	/**
+	 * @param string $event
+	 *
+	 * @return string
+	 */
+	public static function getSettingIdUsingEventName(string $event): string {
+		return self::DEFAULT_SETTING_EVENTS[$event];
+	}
+
 	/**
 	 * @param string $baseUrl
 	 * @param string $path
