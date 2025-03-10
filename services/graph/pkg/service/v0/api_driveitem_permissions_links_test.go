@@ -24,6 +24,7 @@ import (
 	"github.com/owncloud/reva/v2/pkg/utils"
 	cs3mocks "github.com/owncloud/reva/v2/tests/cs3mocks/mocks"
 	"github.com/stretchr/testify/mock"
+	"go.opentelemetry.io/otel"
 )
 
 var _ = Describe("createLinkTests", func() {
@@ -54,7 +55,7 @@ var _ = Describe("createLinkTests", func() {
 		cache := identity.NewIdentityCache(identity.IdentityCacheWithGatewaySelector(gatewaySelector))
 
 		cfg := defaults.FullDefaultConfig()
-		svc, err = service.NewDriveItemPermissionsService(logger, gatewaySelector, cache, cfg)
+		svc, err = service.NewDriveItemPermissionsService(logger, gatewaySelector, cache, cfg, otel.GetTracerProvider())
 		Expect(err).ToNot(HaveOccurred())
 		driveItemId = &provider.ResourceId{
 			StorageId: "1",

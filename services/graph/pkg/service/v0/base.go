@@ -820,7 +820,7 @@ func (g BaseGraphService) getLinkPermissionResourceID(ctx context.Context, permi
 func (g BaseGraphService) getCS3PublicShareByID(ctx context.Context, permissionID string) (*link.PublicShare, error) {
 	gatewayClient, err := g.gatewaySelector.Next()
 	if err != nil {
-		g.logger.Debug().Err(err).Msg("selecting gatewaySelector failed")
+		g.logger.Error().Err(err).Str("permissionID", permissionID).Msg("selecting gatewaySelector failed")
 		return nil, err
 	}
 
@@ -836,6 +836,7 @@ func (g BaseGraphService) getCS3PublicShareByID(ctx context.Context, permissionI
 		},
 	)
 	if err := errorcode.FromCS3Status(getPublicShareResp.GetStatus(), err); err != nil {
+		g.logger.Error().Err(err).Str("permissionID", permissionID).Msg("GetPublicShare failed")
 		return nil, err
 	}
 
@@ -845,7 +846,7 @@ func (g BaseGraphService) getCS3PublicShareByID(ctx context.Context, permissionI
 func (g BaseGraphService) removeOCMPermission(ctx context.Context, permissionID string) error {
 	gatewayClient, err := g.gatewaySelector.Next()
 	if err != nil {
-		g.logger.Debug().Err(err).Msg("selecting gatewaySelector failed")
+		g.logger.Error().Err(err).Str("permissionID", permissionID).Msg("selecting gatewaySelector failed")
 		return err
 	}
 
@@ -861,6 +862,7 @@ func (g BaseGraphService) removeOCMPermission(ctx context.Context, permissionID 
 		},
 	)
 	if err := errorcode.FromCS3Status(removePublicShareResp.GetStatus(), err); err != nil {
+		g.logger.Error().Err(err).Str("permissionID", permissionID).Msg("RemoveOCMShare failed")
 		return err
 	}
 
@@ -871,7 +873,7 @@ func (g BaseGraphService) removeOCMPermission(ctx context.Context, permissionID 
 func (g BaseGraphService) removePublicShare(ctx context.Context, permissionID string) error {
 	gatewayClient, err := g.gatewaySelector.Next()
 	if err != nil {
-		g.logger.Debug().Err(err).Msg("selecting gatewaySelector failed")
+		g.logger.Error().Err(err).Str("permissionID", permissionID).Msg("selecting gatewaySelector failed")
 		return err
 	}
 
@@ -887,6 +889,7 @@ func (g BaseGraphService) removePublicShare(ctx context.Context, permissionID st
 		},
 	)
 	if err := errorcode.FromCS3Status(removePublicShareResp.GetStatus(), err); err != nil {
+		g.logger.Error().Err(err).Str("permissionID", permissionID).Msg("RemovePublicShare failed")
 		return err
 	}
 
@@ -897,7 +900,7 @@ func (g BaseGraphService) removePublicShare(ctx context.Context, permissionID st
 func (g BaseGraphService) removeUserShare(ctx context.Context, permissionID string) error {
 	gatewayClient, err := g.gatewaySelector.Next()
 	if err != nil {
-		g.logger.Debug().Err(err).Msg("selecting gatewaySelector failed")
+		g.logger.Error().Err(err).Str("permissionID", permissionID).Msg("selecting gatewaySelector failed")
 		return err
 	}
 
@@ -913,6 +916,7 @@ func (g BaseGraphService) removeUserShare(ctx context.Context, permissionID stri
 		},
 	)
 	if err := errorcode.FromCS3Status(removeShareResp.GetStatus(), err); err != nil {
+		g.logger.Error().Err(err).Str("permissionID", permissionID).Msg("RemoveShare failed")
 		return err
 	}
 
@@ -928,7 +932,7 @@ func (g BaseGraphService) removeSpacePermission(ctx context.Context, permissionI
 
 	gatewayClient, err := g.gatewaySelector.Next()
 	if err != nil {
-		g.logger.Debug().Err(err).Msg("selecting gatewaySelector failed")
+		g.logger.Error().Err(err).Str("permissionID", permissionID).Msg("selecting gatewaySelector failed")
 		return err
 	}
 	removeShareResp, err := gatewayClient.RemoveShare(ctx, &collaboration.RemoveShareRequest{
@@ -942,6 +946,7 @@ func (g BaseGraphService) removeSpacePermission(ctx context.Context, permissionI
 		},
 	})
 	if err := errorcode.FromCS3Status(removeShareResp.GetStatus(), err); err != nil {
+		g.logger.Error().Err(err).Str("permissionID", permissionID).Msg("RemoveShare failed")
 		return err
 	}
 
@@ -961,7 +966,7 @@ func (g BaseGraphService) getOCMPermissionResourceID(ctx context.Context, permis
 func (g BaseGraphService) getCS3OCMShareByID(ctx context.Context, permissionID string) (*ocm.Share, error) {
 	gatewayClient, err := g.gatewaySelector.Next()
 	if err != nil {
-		g.logger.Debug().Err(err).Msg("selecting gatewaySelector failed")
+		g.logger.Error().Err(err).Str("permissionID", permissionID).Msg("selecting gatewaySelector failed")
 		return nil, err
 	}
 
@@ -977,6 +982,7 @@ func (g BaseGraphService) getCS3OCMShareByID(ctx context.Context, permissionID s
 		},
 	)
 	if err := errorcode.FromCS3Status(getShareResp.GetStatus(), err); err != nil {
+		g.logger.Error().Err(err).Str("permissionID", permissionID).Msg("GetOCMShare failed")
 		return nil, err
 	}
 
@@ -986,6 +992,7 @@ func (g BaseGraphService) getCS3OCMShareByID(ctx context.Context, permissionID s
 func (g BaseGraphService) getUserPermissionResourceID(ctx context.Context, permissionID string) (*storageprovider.ResourceId, error) {
 	cs3Share, err := g.getCS3UserShareByID(ctx, permissionID)
 	if err != nil {
+		g.logger.Error().Err(err).Str("permissionID", permissionID).Msg("getCS3UserShareByID failed")
 		return nil, err
 	}
 
@@ -995,7 +1002,7 @@ func (g BaseGraphService) getUserPermissionResourceID(ctx context.Context, permi
 func (g BaseGraphService) getCS3UserShareByID(ctx context.Context, permissionID string) (*collaboration.Share, error) {
 	gatewayClient, err := g.gatewaySelector.Next()
 	if err != nil {
-		g.logger.Debug().Err(err).Msg("selecting gatewaySelector failed")
+		g.logger.Error().Err(err).Msg("selecting gatewaySelector failed")
 		return nil, err
 	}
 
@@ -1011,6 +1018,7 @@ func (g BaseGraphService) getCS3UserShareByID(ctx context.Context, permissionID 
 		},
 	)
 	if err := errorcode.FromCS3Status(getShareResp.GetStatus(), err); err != nil {
+		g.logger.Error().Err(err).Str("permissionID", permissionID).Msg("GetShare failed")
 		return nil, err
 	}
 
@@ -1051,7 +1059,7 @@ func (g BaseGraphService) getPermissionByID(ctx context.Context, permissionID st
 	var errcode errorcode.Error
 	gatewayClient, err := g.gatewaySelector.Next()
 	if err != nil {
-		g.logger.Debug().Err(err).Msg("selecting gatewaySelector failed")
+		g.logger.Error().Err(err).Str("permissionID", permissionID).Msg("selecting gatewaySelector failed")
 		return nil, nil, err
 	}
 	publicShare, err := g.getCS3PublicShareByID(ctx, permissionID)
