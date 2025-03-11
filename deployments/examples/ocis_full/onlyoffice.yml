@@ -78,7 +78,7 @@ services:
       - "traefik.http.services.onlyoffice.loadbalancer.server.port=80"
       # websockets can't be opened when this is omitted
       - "traefik.http.middlewares.onlyoffice.headers.customrequestheaders.X-Forwarded-Proto=https"
-      - "traefik.http.routers.onlyoffice.middlewares=onlyoffice,maintenance"
+      - "traefik.http.routers.onlyoffice.middlewares=onlyoffice,maintenance@file"
     logging:
       driver: ${LOG_DRIVER:-local}
     restart: always

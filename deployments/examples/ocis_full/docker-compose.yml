@@ -25,8 +25,10 @@ services:
       - "--entryPoints.https.transport.respondingTimeouts.writeTimeout=12h"
       - "--entryPoints.https.transport.respondingTimeouts.idleTimeout=3m"
       # docker provider (get configuration from container labels)
+      - "--providers.docker=true"
       - "--providers.docker.endpoint=unix:///var/run/docker.sock"
       - "--providers.docker.exposedByDefault=false"
+      - "--providers.file.directory=/etc/traefik/dynamic"
       # access log
       - "--accessLog=true"
       - "--accessLog.format=json"
@@ -40,6 +42,7 @@ services:
     volumes:
       - "${DOCKER_SOCKET_PATH:-/var/run/docker.sock}:/var/run/docker.sock:ro"
       - "certs:/certs"
+      - "./config/traefik/:/etc/traefik/dynamic/"
     labels:
       - "traefik.enable=true"
        # defaults to admin:admin
@@ -49,12 +52,13 @@ services:
       - "traefik.http.routers.traefik.middlewares=traefik-auth"
       - "traefik.http.routers.traefik.tls.certresolver=http"
       - "traefik.http.routers.traefik.service=api@internal"
-      # maintenance configuration
-      - "traefik.http.middlewares.maintenance.plugin.traefik-maintenance.enabled=true"
-      - "traefik.http.middlewares.maintenance.plugin.traefik-maintenance.httpResponseCode=503"
-      - "traefik.http.middlewares.maintenance.plugin.traefik-maintenance.filename=/maintenance/content.txt"
-      - "traefik.http.middlewares.maintenance.plugin.traefik-maintenance.triggerFilename=/maintenance/content.txt.trigger"
-      - "traefik.http.middlewares.maintenance.plugin.traefik-maintenance.httpContentType=text/plain; charset=utf-8"
+      # catchall configuration to return 503 for all requests if container is not available (except for traefik)
+      - "traefik.http.routers.catchall.entrypoints=https"
+      - "traefik.http.routers.catchall.rule=PathPrefix(`/`) && !Host(`${TRAEFIK_DOMAIN:-traefik.owncloud.test}`)"
+      - "traefik.http.routers.catchall.priority=1"
+      - "traefik.http.routers.catchall.middlewares=maintenance@file"
+      - "traefik.http.routers.catchall.tls.certresolver=http"
+      - "traefik.http.routers.catchall.service=unavailable@file"
     logging:
       driver: ${LOG_DRIVER:-local}
     restart: always

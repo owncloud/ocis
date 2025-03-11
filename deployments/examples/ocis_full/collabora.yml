@@ -76,7 +76,7 @@ services:
       - "traefik.http.routers.collabora.rule=Host(`${COLLABORA_DOMAIN:-collabora.owncloud.test}`)"
       - "traefik.http.routers.collabora.tls.certresolver=http"
       - "traefik.http.routers.collabora.service=collabora"
-      - "traefik.http.routers.collabora.middlewares=maintenance"
+      - "traefik.http.routers.collabora.middlewares=maintenance@file"
       - "traefik.http.services.collabora.loadbalancer.server.port=9980"
     logging:
       driver: ${LOG_DRIVER:-local}
