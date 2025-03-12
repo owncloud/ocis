@@ -165,6 +165,13 @@ The following sections list the changes for unreleased
    https://github.com/owncloud/ocis/issues/10998
    https://github.com/owncloud/ocis/pull/11108
 
+* Enhancement - Improve graph space management logs: [#11115](https://github.com/owncloud/ocis/pull/11115)
+
+   Improve graph space management logs to help troubleshooting user operations
+
+   https://github.com/owncloud/ocis/issues/10989
+   https://github.com/owncloud/ocis/pull/11115
+
 # Changelog for [7.1.2] (2025-03-28)
 
 The following sections list the changes for 7.1.2.
