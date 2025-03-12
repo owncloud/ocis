@@ -70,6 +70,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Update Mockery to 2.52.3: [#11070](https://github.com/owncloud/ocis/pull/11070)
 * Enhancement - Bump Reva: [#11083](https://github.com/owncloud/ocis/pull/11083)
 * Enhancement - Improve postprocessing logs: [#11108](https://github.com/owncloud/ocis/pull/11108)
+* Enhancement - Improve graph space management logs: [#11115](https://github.com/owncloud/ocis/pull/11115)
 
 ## Details
 
@@ -129,6 +130,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/10998
    https://github.com/owncloud/ocis/pull/11108
+
+* Enhancement - Improve graph space management logs: [#11115](https://github.com/owncloud/ocis/pull/11115)
+
+   Improve graph space management logs to help troubleshooting user operations
+
+   https://github.com/owncloud/ocis/issues/10989
+   https://github.com/owncloud/ocis/pull/11115
 
 # Changelog for [7.1.0] (2025-03-06)
 
