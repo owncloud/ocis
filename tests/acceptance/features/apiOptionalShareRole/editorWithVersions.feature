@@ -12,7 +12,7 @@ Feature: an user shares resources
 
 
   Scenario: sharee checks version of a file shared with FileEditorWithVersions role
-    Given the administrator has enabled the permissions role 'File Editor With Versions'
+    Given the administrator has enabled the permissions role "File Editor With Versions"
     And user "Alice" has uploaded file with content "to share" to "textfile.txt"
     And we save it into "FILEID"
     When user "Alice" sends the following resource share invitation using the Graph API:
@@ -92,7 +92,7 @@ Feature: an user shares resources
 
 
   Scenario: sharee checks version of a file inside a folder shared with EditorWithVersions role
-    Given the administrator has enabled the permissions role 'Editor With Versions'
+    Given the administrator has enabled the permissions role "Editor With Versions"
     And user "Alice" has created folder "folderToShare"
     And user "Alice" has uploaded file with content "to share" to "folderToShare/textfile.txt"
     And we save it into "FILEID"
@@ -170,3 +170,357 @@ Feature: an user shares resources
     When user "Brian" gets the number of versions of file "textfile.txt" using file-id "<<FILEID>>"
     Then the HTTP status code should be "207"
     And the number of versions should be "1"
+
+
+  Scenario: user lists permissions of a file in personal space after enabling FileEditorWithVersions role
+    Given the administrator has enabled the permissions role "File Editor With Versions"
+    And user "Alice" has uploaded file with content "hello world" to "textfile0.txt"
+    When user "Alice" gets permissions list for file "textfile0.txt" of the space "Personal" using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "@libre.graph.permissions.actions.allowedValues",
+          "@libre.graph.permissions.roles.allowedValues"
+        ],
+        "properties": {
+          "@libre.graph.permissions.actions.allowedValues": {
+            "const": [
+              "libre.graph/driveItem/permissions/create",
+              "libre.graph/driveItem/children/create",
+              "libre.graph/driveItem/standard/delete",
+              "libre.graph/driveItem/path/read",
+              "libre.graph/driveItem/quota/read",
+              "libre.graph/driveItem/content/read",
+              "libre.graph/driveItem/upload/create",
+              "libre.graph/driveItem/permissions/read",
+              "libre.graph/driveItem/children/read",
+              "libre.graph/driveItem/versions/read",
+              "libre.graph/driveItem/deleted/read",
+              "libre.graph/driveItem/path/update",
+              "libre.graph/driveItem/permissions/delete",
+              "libre.graph/driveItem/deleted/delete",
+              "libre.graph/driveItem/versions/update",
+              "libre.graph/driveItem/deleted/update",
+              "libre.graph/driveItem/basic/read",
+              "libre.graph/driveItem/permissions/update",
+              "libre.graph/driveItem/permissions/deny"
+            ]
+          },
+          "@libre.graph.permissions.roles.allowedValues": {
+            "type": "array",
+            "minItems": 3,
+            "maxItems": 3,
+            "uniqueItems": true,
+            "items": {
+              "oneOf":[
+                {
+                  "type": "object",
+                  "required": ["@libre.graph.weight", "description", "displayName", "id"],
+                  "properties": {
+                    "@libre.graph.weight": { "const": 1 },
+                    "description": { "const": "View and download." },
+                    "displayName": { "const": "Can view" },
+                    "id": { "const": "b1e2218d-eef8-4d4c-b82d-0f1a1b48f3b5" }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["@libre.graph.weight", "description", "displayName", "id" ],
+                  "properties": {
+                    "@libre.graph.weight": { "const": 2 },
+                    "description": { "const": "View, download and edit." },
+                    "displayName": { "const": "Can edit" },
+                    "id": { "const": "2d00ce52-1fc2-4dbc-8b95-a73b73395f5a" }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["@libre.graph.weight", "description", "displayName", "id"],
+                  "properties": {
+                    "@libre.graph.weight": { "const": 3 },
+                    "description": { "const": "View, download, edit and show all invited people, show all versions." },
+                    "displayName": { "const": "Can edit" },
+                    "id": { "const": "b173329d-cf2e-42f0-a595-ee410645d840" }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+      """
+
+
+  Scenario: user lists permissions of a file in project space after enabling FileEditorWithVersions role
+    Given using spaces DAV path
+    And the administrator has enabled the permissions role "File Editor With Versions"
+    And the administrator has assigned the role "Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Alice" has uploaded a file inside space "new-space" with content "hello world" to "textfile0.txt"
+    When user "Alice" gets permissions list for file "textfile0.txt" of the space "new-space" using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+          "required": [
+            "@libre.graph.permissions.actions.allowedValues",
+            "@libre.graph.permissions.roles.allowedValues"
+          ],
+          "properties": {
+            "@libre.graph.permissions.actions.allowedValues": {
+            "const": [
+              "libre.graph/driveItem/permissions/create",
+              "libre.graph/driveItem/children/create",
+              "libre.graph/driveItem/standard/delete",
+              "libre.graph/driveItem/path/read",
+              "libre.graph/driveItem/quota/read",
+              "libre.graph/driveItem/content/read",
+              "libre.graph/driveItem/upload/create",
+              "libre.graph/driveItem/permissions/read",
+              "libre.graph/driveItem/children/read",
+              "libre.graph/driveItem/versions/read",
+              "libre.graph/driveItem/deleted/read",
+              "libre.graph/driveItem/path/update",
+              "libre.graph/driveItem/permissions/delete",
+              "libre.graph/driveItem/deleted/delete",
+              "libre.graph/driveItem/versions/update",
+              "libre.graph/driveItem/deleted/update",
+              "libre.graph/driveItem/basic/read",
+              "libre.graph/driveItem/permissions/update",
+              "libre.graph/driveItem/permissions/deny"
+            ]
+            },
+            "@libre.graph.permissions.roles.allowedValues": {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 3,
+              "uniqueItems": true,
+              "items": {
+                "oneOf":[
+                {
+                  "type": "object",
+                  "required": ["@libre.graph.weight", "description", "displayName", "id"],
+                  "properties": {
+                    "@libre.graph.weight": { "const": 1 },
+                    "description": { "const": "View and download." },
+                    "displayName": { "const": "Can view" },
+                    "id": { "const": "b1e2218d-eef8-4d4c-b82d-0f1a1b48f3b5" }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["@libre.graph.weight", "description", "displayName", "id"],
+                  "properties": {
+                    "@libre.graph.weight": { "const": 2 },
+                    "description": { "const": "View, download and edit." },
+                    "displayName": { "const": "Can edit" },
+                    "id": { "const": "2d00ce52-1fc2-4dbc-8b95-a73b73395f5a" }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["@libre.graph.weight", "description", "displayName", "id"],
+                  "properties": {
+                    "@libre.graph.weight": { "const": 3 },
+                    "description": { "const": "View, download, edit and show all invited people, show all versions." },
+                    "displayName": { "const": "Can edit" },
+                    "id": { "const": "b173329d-cf2e-42f0-a595-ee410645d840" }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+      """
+
+
+  Scenario: user lists permissions of a folder in personal space after enabling EditorWithVersions role
+    Given the administrator has enabled the permissions role "Editor With Versions"
+    And user "Alice" has created folder "folderToShare"
+    When user "Alice" gets permissions list for folder "folderToShare" of the space "Personal" using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "@libre.graph.permissions.actions.allowedValues",
+          "@libre.graph.permissions.roles.allowedValues"
+        ],
+        "properties": {
+          "@libre.graph.permissions.actions.allowedValues": {
+            "const": [
+              "libre.graph/driveItem/permissions/create",
+              "libre.graph/driveItem/children/create",
+              "libre.graph/driveItem/standard/delete",
+              "libre.graph/driveItem/path/read",
+              "libre.graph/driveItem/quota/read",
+              "libre.graph/driveItem/content/read",
+              "libre.graph/driveItem/upload/create",
+              "libre.graph/driveItem/permissions/read",
+              "libre.graph/driveItem/children/read",
+              "libre.graph/driveItem/versions/read",
+              "libre.graph/driveItem/deleted/read",
+              "libre.graph/driveItem/path/update",
+              "libre.graph/driveItem/permissions/delete",
+              "libre.graph/driveItem/deleted/delete",
+              "libre.graph/driveItem/versions/update",
+              "libre.graph/driveItem/deleted/update",
+              "libre.graph/driveItem/basic/read",
+              "libre.graph/driveItem/permissions/update",
+              "libre.graph/driveItem/permissions/deny"
+            ]
+          },
+          "@libre.graph.permissions.roles.allowedValues": {
+            "type": "array",
+            "minItems": 4,
+            "maxItems": 4,
+            "uniqueItems": true,
+            "items": {
+              "oneOf":[
+                {
+                  "type": "object",
+                  "required": ["@libre.graph.weight", "description", "displayName", "id"],
+                  "properties": {
+                    "@libre.graph.weight": { "const": 1 },
+                    "description": { "const": "View and download." },
+                    "displayName": { "const": "Can view" },
+                    "id": { "const": "b1e2218d-eef8-4d4c-b82d-0f1a1b48f3b5" }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["@libre.graph.weight", "description", "displayName", "id"],
+                  "properties": {
+                    "@libre.graph.weight": { "const": 2 },
+                    "description": { "const": "View, download and upload." },
+                    "displayName": { "const": "Can upload" },
+                    "id": { "const": "1c996275-f1c9-4e71-abdf-a42f6495e960" }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["@libre.graph.weight", "description", "displayName", "id"],
+                  "properties": {
+                    "@libre.graph.weight": { "const": 3 },
+                    "description": { "const": "View, download, upload, edit, add and delete." },
+                    "displayName": { "const": "Can edit" },
+                    "id": { "const": "fb6c3e19-e378-47e5-b277-9732f9de6e21" }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["@libre.graph.weight", "description", "displayName", "id"],
+                  "properties": {
+                    "@libre.graph.weight": { "const": 4 },
+                    "description": { "const": "View, download, upload, edit, delete and show all invited people, show all versions." },
+                    "displayName": { "const": "Can edit" },
+                    "id": { "const": "0911d62b-1e3f-4778-8b1b-903b7e4e8476" }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+      """
+
+
+  Scenario: user lists permissions of a folder in project space after enabling EditorWithVersions role
+    Given using spaces DAV path
+    And the administrator has enabled the permissions role "Editor With Versions"
+    And the administrator has assigned the role "Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Alice" has created a folder "folder" in space "new-space"
+    When user "Alice" gets permissions list for folder "folder" of the space "new-space" using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+          "required": [
+            "@libre.graph.permissions.actions.allowedValues",
+            "@libre.graph.permissions.roles.allowedValues"
+          ],
+          "properties": {
+            "@libre.graph.permissions.actions.allowedValues": {
+            "const": [
+              "libre.graph/driveItem/permissions/create",
+              "libre.graph/driveItem/children/create",
+              "libre.graph/driveItem/standard/delete",
+              "libre.graph/driveItem/path/read",
+              "libre.graph/driveItem/quota/read",
+              "libre.graph/driveItem/content/read",
+              "libre.graph/driveItem/upload/create",
+              "libre.graph/driveItem/permissions/read",
+              "libre.graph/driveItem/children/read",
+              "libre.graph/driveItem/versions/read",
+              "libre.graph/driveItem/deleted/read",
+              "libre.graph/driveItem/path/update",
+              "libre.graph/driveItem/permissions/delete",
+              "libre.graph/driveItem/deleted/delete",
+              "libre.graph/driveItem/versions/update",
+              "libre.graph/driveItem/deleted/update",
+              "libre.graph/driveItem/basic/read",
+              "libre.graph/driveItem/permissions/update",
+              "libre.graph/driveItem/permissions/deny"
+            ]
+            },
+            "@libre.graph.permissions.roles.allowedValues": {
+              "type": "array",
+              "minItems": 4,
+              "maxItems": 4,
+              "uniqueItems": true,
+              "items": {
+                "oneOf":[
+                {
+                  "type": "object",
+                  "required": ["@libre.graph.weight", "description", "displayName", "id"],
+                  "properties": {
+                    "@libre.graph.weight": { "const": 1 },
+                    "description": { "const": "View and download." },
+                    "displayName": { "const": "Can view" },
+                    "id": { "const": "b1e2218d-eef8-4d4c-b82d-0f1a1b48f3b5" }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["@libre.graph.weight", "description", "displayName", "id"],
+                  "properties": {
+                    "@libre.graph.weight": { "const": 2 },
+                    "description": { "const": "View, download and upload." },
+                    "displayName": { "const": "Can upload" },
+                    "id": { "const": "1c996275-f1c9-4e71-abdf-a42f6495e960" }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["@libre.graph.weight", "description", "displayName", "id"],
+                  "properties": {
+                    "@libre.graph.weight": { "const": 3 },
+                    "description": { "const": "View, download, upload, edit, add and delete." },
+                    "displayName": { "const": "Can edit" },
+                    "id": { "const": "fb6c3e19-e378-47e5-b277-9732f9de6e21" }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["@libre.graph.weight", "description", "displayName", "id"],
+                  "properties": {
+                    "@libre.graph.weight": { "const": 4 },
+                    "description": { "const": "View, download, upload, edit, delete and show all invited people, show all versions." },
+                    "displayName": { "const": "Can edit" },
+                    "id": { "const": "0911d62b-1e3f-4778-8b1b-903b7e4e8476" }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+      """
