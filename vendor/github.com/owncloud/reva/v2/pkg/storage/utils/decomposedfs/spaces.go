@@ -921,26 +921,26 @@ func (fs *Decomposedfs) StorageSpaceFromNode(ctx context.Context, n *node.Node, 
 								Msg("failed to delete expired group space index")
 						}
 					}
-				}
 
-				// publish SpaceMembershipExpired event
-				if errDeleteGrant == nil {
-					ev := events.SpaceMembershipExpired{
-						SpaceOwner: n.SpaceOwnerOrManager(ctx),
-						SpaceID:    &provider.StorageSpaceId{OpaqueId: n.SpaceID},
-						SpaceName:  sname,
-						ExpiredAt:  time.Unix(int64(g.Expiration.Seconds), int64(g.Expiration.Nanos)),
-						Timestamp:  utils.TSNow(),
-					}
-					switch {
-					case g.Grantee.Type == provider.GranteeType_GRANTEE_TYPE_USER:
-						ev.GranteeUserID = g.Grantee.GetUserId()
-					case g.Grantee.Type == provider.GranteeType_GRANTEE_TYPE_GROUP:
-						ev.GranteeGroupID = g.Grantee.GetGroupId()
-					}
-					err = events.Publish(ctx, fs.stream, ev)
-					if err != nil {
-						sublog.Error().Err(err).Msg("error publishing SpaceMembershipExpired event")
+					// publish SpaceMembershipExpired event
+					if errDeleteGrant == nil {
+						ev := events.SpaceMembershipExpired{
+							SpaceOwner: n.SpaceOwnerOrManager(ctx),
+							SpaceID:    &provider.StorageSpaceId{OpaqueId: n.SpaceID},
+							SpaceName:  sname,
+							ExpiredAt:  time.Unix(int64(g.Expiration.Seconds), int64(g.Expiration.Nanos)),
+							Timestamp:  utils.TSNow(),
+						}
+						switch {
+						case g.Grantee.Type == provider.GranteeType_GRANTEE_TYPE_USER:
+							ev.GranteeUserID = g.Grantee.GetUserId()
+						case g.Grantee.Type == provider.GranteeType_GRANTEE_TYPE_GROUP:
+							ev.GranteeGroupID = g.Grantee.GetGroupId()
+						}
+						err = events.Publish(ctx, fs.stream, ev)
+						if err != nil {
+							sublog.Error().Err(err).Msg("error publishing SpaceMembershipExpired event")
+						}
 					}
 				}
 
