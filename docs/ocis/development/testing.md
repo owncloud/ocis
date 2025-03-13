@@ -483,7 +483,7 @@ ANTIVIRUS_SCANNER_TYPE="clamav" \
 ANTIVIRUS_CLAMAV_SOCKET="tcp://host.docker.internal:3310" \
 POSTPROCESSING_STEPS="virusscan" \
 OCIS_ASYNC_UPLOADS=true \
-OCIS_ADD_RUN_SERVICES="antivirus"
+OCIS_ADD_RUN_SERVICES="antivirus" \
 ocis/bin/ocis server
 ```
 

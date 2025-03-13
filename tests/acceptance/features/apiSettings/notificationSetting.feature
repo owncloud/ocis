@@ -66,8 +66,9 @@ Feature: Notification Settings
 
   @email
   Scenario: disable mail and in-app notification for "Share Received" event
-    When user "Brian" disables notification for the following events using the settings API:
-      | Share Received | mail,in-app |
+    When user "Brian" disables notification for the following event using the settings API:
+      | event             | Share Received |
+      | notificationTypes | mail,in-app    |
     Then the HTTP status code should be "201"
     And the JSON data of the response should match
       """
@@ -161,8 +162,9 @@ Feature: Notification Settings
       | sharee          | Brian     |
       | shareType       | user      |
       | permissionsRole | Viewer    |
-    When user "Brian" disables notification for the following events using the settings API:
-      | Share Removed | mail, in-app |
+    When user "Brian" disables notification for the following event using the settings API:
+      | event             | Share Removed |
+      | notificationTypes | mail,in-app  |
     Then the HTTP status code should be "201"
     And the JSON data of the response should match
       """
@@ -256,8 +258,9 @@ Feature: Notification Settings
       | sharee          | Brian           |
       | shareType       | user            |
       | permissionsRole | Viewer          |
-    When user "Brian" disables notification for the following events using the settings API:
-      | Share Removed | mail, in-app |
+    When user "Brian" disables notification for the following event using the settings API:
+      | event             | Share Removed |
+      | notificationTypes | mail,in-app  |
     Then the HTTP status code should be "201"
     And the JSON data of the response should match
       """
@@ -348,8 +351,9 @@ Feature: Notification Settings
       | sharee          | Brian        |
       | shareType       | user         |
       | permissionsRole | Space Viewer |
-    When user "Brian" disables notification for the following events using the settings API:
-      | Space Disabled | in-app |
+    When user "Brian" disables notification for the following event using the settings API:
+      | event             | Space Disabled |
+      | notificationTypes | in-app         |
     Then the HTTP status code should be "201"
     And the JSON data of the response should match
       """
@@ -496,8 +500,9 @@ Feature: Notification Settings
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "newSpace" with the default quota using the Graph API
-    When user "Brian" disables notification for the following events using the settings API:
-      | Added As Space Member | mail,in-app |
+    When user "Brian" disables notification for the following event using the settings API:
+      | event             | Added As Space Member |
+      | notificationTypes | mail,in-app           |
     Then the HTTP status code should be "201"
     And the JSON data of the response should match
       """
@@ -649,8 +654,9 @@ Feature: Notification Settings
       | sharee          | Brian        |
       | shareType       | user         |
       | permissionsRole | Space Viewer |
-    When user "Brian" disables notification for the following events using the settings API:
-      | Removed As Space Member | mail,in-app |
+    When user "Brian" disables notification for the following event using the settings API:
+      | event             | Removed As Space Member |
+      | notificationTypes | mail,in-app             |
     Then the HTTP status code should be "201"
     And the JSON data of the response should match
       """
@@ -750,8 +756,9 @@ Feature: Notification Settings
       | sharee          | Brian        |
       | shareType       | user         |
       | permissionsRole | Space Viewer |
-    When user "Brian" disables notification for the following events using the settings API:
-      | Space Membership Expired | mail,in-app |
+    When user "Brian" disables notification for the following event using the settings API:
+      | event             | Space Membership Expired |
+      | notificationTypes | mail,in-app              |
     Then the HTTP status code should be "201"
     And the JSON data of the response should match
       """

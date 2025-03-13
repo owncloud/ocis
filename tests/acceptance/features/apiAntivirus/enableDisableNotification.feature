@@ -13,8 +13,9 @@ Feature: enable/disable malware related notification
 
   Scenario Outline: disable in-app notification for "File rejected" event
     Given using <dav-path-version> DAV path
-    When user "Brian" disables notification for the following events using the settings API:
-      | File Rejected | in-app |
+    When user "Brian" disables notification for the following event using the settings API:
+      | event             | File Rejected |
+      | notificationTypes | in-app        |
     Then the HTTP status code should be "201"
     And the JSON data of the response should match
       """
@@ -99,8 +100,9 @@ Feature: enable/disable malware related notification
       | sharee          | Brian        |
       | shareType       | user         |
       | permissionsRole | Space Editor |
-    When user "Brian" disables notification for the following events using the settings API:
-      | File Rejected | in-app |
+    When user "Brian" disables notification for the following event using the settings API:
+      | event             | File Rejected |
+      | notificationTypes | in-app        |
     Then the HTTP status code should be "201"
     And the JSON data of the response should match
       """

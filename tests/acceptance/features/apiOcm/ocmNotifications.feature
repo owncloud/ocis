@@ -14,8 +14,9 @@ Feature: ocm notifications
     And using server "REMOTE"
     And user "Brian" has been created with default attributes
     And "Brian" has accepted invitation
-    When user "Brian" disables notification for the following events using the settings API:
-      | Share Received | mail,in-app |
+    When user "Brian" disables notification for the following event using the settings API:
+      | event             | Share Received |
+      | notificationTypes | mail,in-app    |
     Then the HTTP status code should be "201"
     And the JSON data of the response should match
       """
