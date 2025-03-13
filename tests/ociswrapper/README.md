@@ -177,3 +177,12 @@ Also, see `./bin/ociswrapper help` for more information.
 
     - `200 OK` - service is successfully reconfigured
     - `500 Internal Server Error` - service is not running
+
+9. `DELETE /services/rollback`
+
+    Stop and rollback all service configurations to the starting point.
+
+    Returns:
+
+    - `200 OK` - rollback is successful
+    - `500 Internal Server Error` - oCIS server is not running

@@ -221,6 +221,16 @@ class OcisConfigContext implements Context {
 	 * @AfterScenario @env-config
 	 *
 	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function rollback(): void {
+		$this->rollbackServices();
+		$this->rollbackOcis();
+	}
+
+	/**
+	 * @return void
+	 * @throws GuzzleException
 	 */
 	public function rollbackOcis(): void {
 		$response = OcisConfigHelper::rollbackOcis();
@@ -228,6 +238,19 @@ class OcisConfigContext implements Context {
 			200,
 			$response->getStatusCode(),
 			"Failed to rollback ocis server. Check if oCIS is started with ociswrapper."
+		);
+	}
+
+	/**
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function rollbackServices(): void {
+		$response = OcisConfigHelper::rollbackServices();
+		Assert::assertEquals(
+			200,
+			$response->getStatusCode(),
+			"Failed to rollback services."
 		);
 	}
 }
