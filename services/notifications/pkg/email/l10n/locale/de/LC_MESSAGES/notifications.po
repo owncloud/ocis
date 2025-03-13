@@ -14,7 +14,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2025-03-08 00:02+0000\n"
+"POT-Creation-Date: 2025-03-13 00:51+0000\n"
 "PO-Revision-Date: 2023-04-19 11:11+0000\n"
 "Last-Translator: Martin <github@diemattels.at>, 2025\n"
 "Language-Team: German (https://app.transifex.com/owncloud-org/teams/6149/de/)\n"
@@ -70,7 +70,7 @@ msgstr "Hallo,"
 #. MembershipExpired email template, Subject field (resolves directly)
 #: pkg/email/templates.go:85
 msgid "Membership of '{SpaceName}' expired at {ExpiredAt}"
-msgstr "Die Mitgliedschaft für '{SpaceName}' ist am {ExpiredAt} abgelaufen."
+msgstr "Die Mitgliedschaft für '{SpaceName}' ist am {ExpiredAt} abgelaufen"
 
 #. Grouped email template, Subject field (resolves directly)
 #: pkg/email/templates.go:129
@@ -98,7 +98,7 @@ msgid ""
 "Even though this membership has expired you still might have access through other shares and/or space memberships"
 msgstr ""
 "Ihre Mitgliedschaft im Space {SpaceName} ist am {ExpiredAt} abgelaufen.\n"
-"Über eventuelle weitere Freigaben oder Space-Mitgliedschaften kann der Zugriff trotzdem weiterhin möglich sein."
+"Über eventuelle weitere Freigaben oder Space-Mitgliedschaften kann der Zugriff trotzdem weiterhin möglich sein"
 
 #. ShareExpired email template, resolves via {{ .MessageBody }}
 #: pkg/email/templates.go:34
@@ -192,9 +192,9 @@ msgstr ""
 #. SharedSpace email template, Subject field (resolves directly)
 #: pkg/email/templates.go:57
 msgid "{SpaceSharer} invited you to join {SpaceName}"
-msgstr "{SpaceSharer} hat Sie eingeladen, dem Space {SpaceName} beizutreten."
+msgstr "{SpaceSharer} hat Sie eingeladen, dem Space {SpaceName} beizutreten"
 
 #. UnsharedSpace email template, Subject field (resolves directly)
 #: pkg/email/templates.go:70
 msgid "{SpaceSharer} removed you from {SpaceName}"
-msgstr "{SpaceSharer} hat Sie aus dem Space {SpaceName} entfernt."
+msgstr "{SpaceSharer} hat Sie aus dem Space {SpaceName} entfernt"
