@@ -2104,6 +2104,11 @@ class SpacesContext implements Context {
 		string $spaceName
 	): void {
 		$spaceId = $this->getSpaceIdByName($user, $spaceName);
+		if ($spaceName === "Shares"
+			&& $this->featureContext->getDavPathVersion() !== WebDavHelper::DAV_VERSION_SPACES
+		) {
+			$fileName = "Shares/$fileName";
+		}
 		$response = $this->featureContext->downloadFileAsUserUsingPassword(
 			$user,
 			$fileName,
