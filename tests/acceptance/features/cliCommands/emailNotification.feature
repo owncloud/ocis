@@ -26,6 +26,14 @@ Feature: get grouped email notification
       | shareType       | user      |
       | permissionsRole | Viewer    |
     And user "Alice" has removed the access of user "Brian" from resource "lorem.txt" of space "Personal"
+    And user "Alice" has sent the following resource share invitation:
+      | resource           | lorem.txt                |
+      | space              | Personal                 |
+      | sharee             | Brian                    |
+      | shareType          | user                     |
+      | permissionsRole    | Viewer                   |
+      | expirationDateTime | 2042-01-01T23:59:59.000Z |
+    And user "Alice" has expired the last share of resource "lorem.txt" inside of the space "Personal"
     And user "Alice" has sent the following space share invitation:
       | space           | New-Space    |
       | sharee          | Brian        |
@@ -50,6 +58,11 @@ Feature: get grouped email notification
 
 
       Alice Hansen has unshared 'lorem.txt' with you.
+
+      Even though this share has been revoked you still might have access through other shares and/or space memberships.
+
+
+      Your share to "lorem.txt" has expired at %expiry_date_in_mail%
 
       Even though this share has been revoked you still might have access through other shares and/or space memberships.
 
@@ -80,6 +93,14 @@ Feature: get grouped email notification
       | shareType       | user      |
       | permissionsRole | Viewer    |
     And user "Alice" has removed the access of user "Brian" from resource "lorem.txt" of space "Personal"
+    And user "Alice" has sent the following resource share invitation:
+      | resource           | lorem.txt                |
+      | space              | Personal                 |
+      | sharee             | Brian                    |
+      | shareType          | user                     |
+      | permissionsRole    | Viewer                   |
+      | expirationDateTime | 2042-01-01T23:59:59.000Z |
+    And user "Alice" has expired the last share of resource "lorem.txt" inside of the space "Personal"
     And user "Alice" has sent the following space share invitation:
       | space           | New-Space    |
       | sharee          | Brian        |
@@ -104,6 +125,11 @@ Feature: get grouped email notification
 
 
       Alice Hansen has unshared 'lorem.txt' with you.
+
+      Even though this share has been revoked you still might have access through other shares and/or space memberships.
+
+
+      Your share to "lorem.txt" has expired at %expiry_date_in_mail%
 
       Even though this share has been revoked you still might have access through other shares and/or space memberships.
 
