@@ -67,6 +67,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix the OCM role file editor: [#11093](https://github.com/owncloud/ocis/pull/11093)
 * Bugfix - Fix the parent-id for the share-jail root: [#11101](https://github.com/owncloud/ocis/pull/11101)
 * Bugfix - Adjust the capabilities according to full text search config: [#11111](https://github.com/owncloud/ocis/pull/11111)
+* Bugfix - Fix the SpaceMembershipExpired duplicate event: [#11127](https://github.com/owncloud/ocis/pull/11127)
 * Enhancement - Update Mockery to 2.52.3: [#11070](https://github.com/owncloud/ocis/pull/11070)
 * Enhancement - Bump Reva: [#11083](https://github.com/owncloud/ocis/pull/11083)
 * Enhancement - Improve postprocessing logs: [#11108](https://github.com/owncloud/ocis/pull/11108)
@@ -110,6 +111,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/11059
    https://github.com/owncloud/ocis/pull/11111
+
+* Bugfix - Fix the SpaceMembershipExpired duplicate event: [#11127](https://github.com/owncloud/ocis/pull/11127)
+
+   We fixed the SpaceMembershipExpired event duplication issue.
+
+   https://github.com/owncloud/ocis/issues/10966
+   https://github.com/owncloud/ocis/pull/11127
 
 * Enhancement - Update Mockery to 2.52.3: [#11070](https://github.com/owncloud/ocis/pull/11070)
 
