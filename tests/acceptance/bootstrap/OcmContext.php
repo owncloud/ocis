@@ -292,6 +292,7 @@ class OcmContext implements Context {
 
 	/**
 	 * @When user :user deletes federated connection with user :ocmUser using the Graph API
+	 * @When user :user tries to delete federated connection with user :ocmUser using the Graph API
 	 *
 	 * @param string $user
 	 * @param string $ocmUser
