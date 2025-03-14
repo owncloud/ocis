@@ -65,7 +65,7 @@ func Authentication(auths []Authenticator, opts ...Option) func(next http.Handle
 			r = r.WithContext(ctx)
 
 			ri := router.ContextRoutingInfo(ctx)
-			if isOIDCTokenAuth(r) || ri.IsRouteUnprotected() || r.Method == "OPTIONS" {
+			if isOIDCTokenAuth(r) || ri.IsRouteUnprotected() || r.Method == http.MethodOptions {
 				// Either this is a request that does not need any authentication or
 				// the authentication for this request is handled by the IdP.
 				next.ServeHTTP(w, r)
@@ -146,7 +146,7 @@ func configureSupportedChallenges(options Options) {
 		SupportedAuthStrategies = append(SupportedAuthStrategies, "bearer")
 	}
 
-	if options.EnableBasicAuth {
+	if options.EnableBasicAuth || options.AllowAppAuth {
 		SupportedAuthStrategies = append(SupportedAuthStrategies, "basic")
 	}
 }

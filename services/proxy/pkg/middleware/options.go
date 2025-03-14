@@ -53,6 +53,8 @@ type Options struct {
 	AutoprovisionAccounts bool
 	// EnableBasicAuth to allow basic auth
 	EnableBasicAuth bool
+	// AllowAppAuth specifies whether authentication using application tokens is permitted.
+	AllowAppAuth bool
 	// DefaultAccessTokenTTL is used to calculate the expiration when an access token has no expiration set
 	DefaultAccessTokenTTL time.Duration
 	// UserInfoCache sets the access token cache store
@@ -180,6 +182,13 @@ func AutoprovisionAccounts(val bool) Option {
 func EnableBasicAuth(enableBasicAuth bool) Option {
 	return func(o *Options) {
 		o.EnableBasicAuth = enableBasicAuth
+	}
+}
+
+// AllowAppAuth provides a function to set the AllowAppAuth config
+func AllowAppAuth(allowAppAuth bool) Option {
+	return func(o *Options) {
+		o.AllowAppAuth = allowAppAuth
 	}
 }
 

@@ -353,6 +353,7 @@ func loadMiddlewares(logger log.Logger, cfg *config.Config,
 			middleware.Logger(logger),
 			middleware.OIDCIss(cfg.OIDC.Issuer),
 			middleware.EnableBasicAuth(cfg.EnableBasicAuth),
+			middleware.AllowAppAuth(cfg.AuthMiddleware.AllowAppAuth),
 			middleware.TraceProvider(traceProvider),
 		),
 		middleware.AccountResolver(
