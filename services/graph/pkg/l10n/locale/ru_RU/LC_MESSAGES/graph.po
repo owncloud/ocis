@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2025-02-28 00:01+0000\n"
+"POT-Creation-Date: 2025-03-15 00:51+0000\n"
 "PO-Revision-Date: 2024-04-04 00:17+0000\n"
 "Last-Translator: dutty5, 2025\n"
 "Language-Team: Russian (Russia) (https://app.transifex.com/owncloud-org/teams/6149/ru_RU/)\n"
@@ -22,23 +22,24 @@ msgstr ""
 "Language: ru_RU\n"
 "Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n%100>=11 && n%100<=14)? 2 : 3);\n"
 
-#. UnifiedRole Editor, Role DisplayName (resolves directly)
-#. UnifiedRole EditorListGrants, Role DisplayName (resolves directly)
-#. UnifiedRole EditorListGrants, Role DisplayName (resolves directly)
+#. UnifiedRole EditorListGrantsWithVersions, Role DisplayName (resolves
+#. directly)
 #. UnifiedRole SpaseEditor, Role DisplayName (resolves directly)
-#. UnifiedRole FileEditor, Role DisplayName (resolves directly)
 #. UnifiedRole FileEditorListGrants, Role DisplayName (resolves directly)
-#. UnifiedRole FileEditorListGrants, Role DisplayName (resolves directly)
-#: pkg/unifiedrole/roles.go:120 pkg/unifiedrole/roles.go:126
 #: pkg/unifiedrole/roles.go:132 pkg/unifiedrole/roles.go:138
-#: pkg/unifiedrole/roles.go:150 pkg/unifiedrole/roles.go:156
 #: pkg/unifiedrole/roles.go:162
 msgid "Can edit"
 msgstr "Может редактировать"
 
+#. UnifiedRole Editor, Role DisplayName (resolves directly)
+#. UnifiedRole EditorListGrants, Role DisplayName (resolves directly)
 #. UnifiedRole SpaseEditorWithoutVersions, Role DisplayName (resolves
 #. directly)
-#: pkg/unifiedrole/roles.go:144
+#. UnifiedRole FileEditor, Role DisplayName (resolves directly)
+#. UnifiedRole FileEditorListGrants, Role DisplayName (resolves directly)
+#: pkg/unifiedrole/roles.go:120 pkg/unifiedrole/roles.go:126
+#: pkg/unifiedrole/roles.go:144 pkg/unifiedrole/roles.go:150
+#: pkg/unifiedrole/roles.go:156
 msgid "Can edit without versions"
 msgstr "Может редактировать, без версий"
 
@@ -53,7 +54,7 @@ msgid "Can upload"
 msgstr "Может загружать"
 
 #. UnifiedRole Viewer, Role DisplayName (resolves directly)
-#. UnifiedRole Viewer, Role DisplayName (resolves directly)
+#. UnifiedRole ViewerListGrants, Role DisplayName (resolves directly)
 #. UnifiedRole SpaseViewer, Role DisplayName (resolves directly)
 #: pkg/unifiedrole/roles.go:102 pkg/unifiedrole/roles.go:108
 #: pkg/unifiedrole/roles.go:114
@@ -133,7 +134,7 @@ msgstr ""
 "Просматривать, скачивать, загружать, редактировать, добавлять, удалять и "
 "управлять участниками."
 
-#. UnifiedRoleListGrants Editor, Role Description (resolves directly)
+#. UnifiedRole EditorListGrants Editor, Role Description (resolves directly)
 #: pkg/unifiedrole/roles.go:123
 msgid "View, download, upload, edit, add, delete and show all invited people."
 msgstr ""
@@ -147,7 +148,8 @@ msgstr ""
 "Просматривать, скачивать, загружать, редактировать, добавлять, удалять, "
 "включая историю."
 
-#. UnifiedRoleListGrants Editor, Role Description (resolves directly)
+#. UnifiedRole EditorListGrantsWithVersions, Role Description (resolves
+#. directly)
 #: pkg/unifiedrole/roles.go:129
 msgid ""
 "View, download, upload, edit, delete and show all invited people, show all "
