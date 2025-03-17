@@ -331,3 +331,53 @@ Feature: Notification
       | resource      |
       | textfile1.txt |
       | my_data       |
+
+  @issue-10966
+  Scenario: check share expired in-app and mail notifications for Personal space file
+    Given using SharingNG
+    And user "Alice" has uploaded file with content "hello world" to "testfile.txt"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | testfile.txt |
+      | space           | Personal     |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | Viewer       |
+    When user "Alice" expires the last share of resource "testfile.txt" inside of the space "Personal"
+    Then the HTTP status code should be "200"
+    And as "Brian" file "Shares/testfile.txt" should not exist
+    And user "Brian" should get a notification with subject "Share expired" and message:
+      | message                        |
+      | Access to testfile.txt expired |
+    And user "Brian" should have received the following email from user "Alice"
+      """
+      Hello Brian Murphy,
+
+      Your share to testfile.txt has expired at %expiry_date_in_mail%
+
+      Even though this share has been revoked you still might have access through other shares and/or space memberships.
+      """
+
+  @issue-10966
+  Scenario: check share expired in-app and mail notifications for Personal space folder
+    Given using SharingNG
+    And user "Alice" has created folder "folderToShare"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | folderToShare |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Viewer        |
+    When user "Alice" expires the last share of resource "folderToShare" inside of the space "Personal"
+    Then the HTTP status code should be "200"
+    And as "Brian" file "Shares/folderToShare" should not exist
+    And user "Brian" should get a notification with subject "Share expired" and message:
+      | message                         |
+      | Access to folderToShare expired |
+    And user "Brian" should have received the following email from user "Alice"
+      """
+      Hello Brian Murphy,
+
+      Your share to folderToShare has expired at %expiry_date_in_mail%
+
+      Even though this share has been revoked you still might have access through other shares and/or space memberships.
+      """
