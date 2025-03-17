@@ -149,7 +149,7 @@ Feature: accepting invitation
     Given using server "LOCAL"
     And "Alice" has created the federation share invitation
     When "Alice" tries to accept the federation share invitation from same instance
-    Then the HTTP status code should be "409"
+    Then the HTTP status code should be "400"
     And the JSON data of the response should match
       """
       {
@@ -160,10 +160,10 @@ Feature: accepting invitation
         ],
         "properties": {
           "code": {
-            "const": "ALREADY_EXIST"
+            "const": "INVALID_PARAMETER"
           },
           "message": {
-            "const": "user already known"
+            "const": "can not accept an invite from the same instance"
           }
         }
       }
