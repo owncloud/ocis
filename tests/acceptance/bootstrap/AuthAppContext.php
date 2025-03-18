@@ -232,7 +232,7 @@ class AuthAppContext implements Context {
 				$this->featureContext->getPasswordForUser($user),
 				[
 					"expiry" => $expiration,
-					"userId" => $this->featureContext->getUserIdByUserName($impersonatedUser)
+					"userID" => $this->featureContext->getUserIdByUserName($impersonatedUser)
 				],
 			)
 		);
