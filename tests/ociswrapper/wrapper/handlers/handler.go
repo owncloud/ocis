@@ -235,11 +235,12 @@ func OcisServiceHandler(res http.ResponseWriter, req *http.Request) {
 		common.Wg.Add(1)
 		go ocis.StartService(serviceName, ocis.ServiceEnvConfigs[serviceName])
 
-		success := ocis.WaitForServiceStatus(serviceName, true)
+		success, message := ocis.WaitForServiceStatus(serviceName, true)
+		log.Println(message)
 		if success {
-			sendResponse(res, http.StatusOK, fmt.Sprintf("%s service started successfully", serviceName))
+			sendResponse(res, http.StatusOK, message)
 		} else {
-			sendResponse(res, http.StatusInternalServerError, fmt.Sprintf("Failed to start %s service.", serviceName))
+			sendResponse(res, http.StatusInternalServerError, message)
 		}
 		return
 	} else if req.Method == http.MethodDelete {
@@ -267,7 +268,8 @@ func OcisServiceHandler(res http.ResponseWriter, req *http.Request) {
 			log.Println(fmt.Sprintf("%s service restarting...", serviceName))
 			go ocis.StartService(serviceName, serviceEnvMap)
 
-			success := ocis.WaitForServiceStatus(serviceName, true)
+			success, message := ocis.WaitForServiceStatus(serviceName, true)
+			log.Println(message)
 			if success {
             	sendResponse(res, http.StatusOK, fmt.Sprintf("%s service updated successfully", serviceName))
             	return
@@ -290,7 +292,7 @@ func RollbackServicesHandler(res http.ResponseWriter, req *http.Request) {
 
 	for serviceName := range ocis.ServiceEnvConfigs {
 		if serviceName != "ocis" {
-			if success := ocis.WaitForServiceStatus(serviceName, true); success {
+			if success,_ := ocis.WaitForServiceStatus(serviceName, true); success {
 				success, message := ocis.StopService(serviceName)
 				log.Println(message)
 				if !success {

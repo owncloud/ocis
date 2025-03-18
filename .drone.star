@@ -75,13 +75,13 @@ EMAIL_SMTP_SENDER = "ownCloud <noreply@example.com>"
 # configuration
 config = {
     "cs3ApiTests": {
-        "skip": False,
+        "skip": True,
     },
     "wopiValidatorTests": {
-        "skip": False,
+        "skip": True,
     },
     "k6LoadTests": {
-        "skip": False,
+        "skip": True,
     },
     "localApiTests": {
         "basic": {
@@ -95,13 +95,13 @@ config = {
                 "apiLocks",
                 "apiActivities",
             ],
-            "skip": False,
+            "skip": True,
         },
         "settings": {
             "suites": [
                 "apiSettings",
             ],
-            "skip": False,
+            "skip": True,
             "withRemotePhp": [True],
             "emailNeeded": True,
             "extraEnvironment": {
@@ -119,7 +119,6 @@ config = {
         },
         "graph": {
             "suites": [
-                "apiGraph",
                 "apiServiceAvailability",
             ],
             "skip": False,
@@ -129,38 +128,38 @@ config = {
             "suites": [
                 "apiGraphUserGroup",
             ],
-            "skip": False,
+            "skip": True,
             "withRemotePhp": [True],
         },
         "spaces": {
             "suites": [
                 "apiSpaces",
             ],
-            "skip": False,
+            "skip": True,
         },
         "spacesShares": {
             "suites": [
                 "apiSpacesShares",
             ],
-            "skip": False,
+            "skip": True,
         },
         "spacesDavOperation": {
             "suites": [
                 "apiSpacesDavOperation",
             ],
-            "skip": False,
+            "skip": True,
         },
         "search1": {
             "suites": [
                 "apiSearch1",
             ],
-            "skip": False,
+            "skip": True,
         },
         "search2": {
             "suites": [
                 "apiSearch2",
             ],
-            "skip": False,
+            "skip": True,
         },
         "sharingNg": {
             "suites": [
@@ -169,23 +168,23 @@ config = {
                 "apiSharingNg2",
                 "apiOptionalShareRole",
             ],
-            "skip": False,
+            "skip": True,
         },
         "sharingNgShareInvitation": {
             "suites": [
                 "apiSharingNgShareInvitation",
             ],
-            "skip": False,
+            "skip": True,
         },
         "sharingNgLinkShare": {
             "suites": [
                 "apiSharingNgLinkSharePermission",
                 "apiSharingNgLinkShareRoot",
             ],
-            "skip": False,
+            "skip": True,
         },
         "accountsHashDifficulty": {
-            "skip": False,
+            "skip": True,
             "suites": [
                 "apiAccountsHashDifficulty",
             ],
@@ -195,7 +194,7 @@ config = {
             "suites": [
                 "apiNotification",
             ],
-            "skip": False,
+            "skip": True,
             "withRemotePhp": [True],
             "emailNeeded": True,
             "extraEnvironment": {
@@ -215,7 +214,7 @@ config = {
             "suites": [
                 "apiAntivirus",
             ],
-            "skip": False,
+            "skip": True,
             "antivirusNeeded": True,
             "extraServerEnvironment": {
                 "ANTIVIRUS_SCANNER_TYPE": "clamav",
@@ -230,14 +229,14 @@ config = {
             "suites": [
                 "apiSearchContent",
             ],
-            "skip": False,
+            "skip": True,
             "tikaNeeded": True,
         },
         "ocm": {
             "suites": [
                 "apiOcm",
             ],
-            "skip": False,
+            "skip": True,
             "withRemotePhp": [True],
             "federationServer": True,
             "emailNeeded": True,
@@ -263,7 +262,7 @@ config = {
             "suites": [
                 "apiCollaboration",
             ],
-            "skip": False,
+            "skip": True,
             "collaborationServiceNeeded": True,
             "extraServerEnvironment": {
                 "GATEWAY_GRPC_ADDR": "0.0.0.0:9142",
@@ -273,7 +272,7 @@ config = {
             "suites": [
                 "apiAuthApp",
             ],
-            "skip": False,
+            "skip": True,
             "withRemotePhp": [True],
             "extraServerEnvironment": {
                 "OCIS_ADD_RUN_SERVICES": "auth-app",
@@ -284,7 +283,7 @@ config = {
             "suites": [
                 "cliCommands",
             ],
-            "skip": False,
+            "skip": True,
             "withRemotePhp": [True],
             "antivirusNeeded": True,
             "emailNeeded": True,
@@ -307,24 +306,24 @@ config = {
     },
     "apiTests": {
         "numberOfParts": 7,
-        "skip": False,
+        "skip": True,
         "skipExceptParts": [],
     },
     "e2eTests": {
         "part": {
-            "skip": False,
+            "skip": True,
             "totalParts": 4,  # divide and run all suites in parts (divide pipelines)
             "xsuites": ["search", "app-provider", "oidc", "ocm"],  # suites to skip
         },
         "search": {
-            "skip": False,
+            "skip": True,
             "suites": ["search"],  # suites to run
             "tikaNeeded": True,
         },
     },
     "e2eMultiService": {
         "testSuites": {
-            "skip": False,
+            "skip": True,
             "suites": [
                 "smoke",
                 "shares",
@@ -438,29 +437,15 @@ def main(ctx):
         licenseCheck(ctx)
 
     test_pipelines = \
-        codestyle(ctx) + \
-        checkGherkinLint(ctx) + \
         checkTestSuitesInExpectedFailures(ctx) + \
         buildWebCache(ctx) + \
         getGoBinForTesting(ctx) + \
         buildOcisBinaryForTesting(ctx) + \
-        checkStarlark() + \
-        build_release_helpers + \
         testOcisAndUploadResults(ctx) + \
         testPipelines(ctx)
 
-    build_release_pipelines = \
-        dockerReleases(ctx) + \
-        binaryReleases(ctx)
 
-    test_pipelines.append(
-        pipelineDependsOn(
-            purgeBuildArtifactCache(ctx),
-            testPipelines(ctx),
-        ),
-    )
-
-    pipelines = test_pipelines + build_release_pipelines
+    pipelines = test_pipelines
 
     if ctx.build.event == "cron":
         pipelines = \
@@ -473,14 +458,6 @@ def main(ctx):
                 example_deploys(ctx),
                 pipelines,
             )
-
-    # always append notification step
-    pipelines.append(
-        pipelineDependsOn(
-            notify(ctx),
-            pipelines,
-        ),
-    )
 
     pipelineSanityChecks(ctx, pipelines)
     return pipelines

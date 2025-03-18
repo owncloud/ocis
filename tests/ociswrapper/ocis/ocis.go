@@ -318,16 +318,16 @@ func StopService(service string) (bool, string) {
 		return false, fmt.Sprintf("Failed to stop service with process id %d", pid)
 	}
 
-	success := WaitForServiceStatus(service, false)
+	success,_ := WaitForServiceStatus(service, false)
 	if !success {
 		StopService(service)
 	}
 
 	delete(runningServices, service)
-	return true, fmt.Sprintf(fmt.Sprintf("%s service stopped successfully", service))
+	return true, fmt.Sprintf("%s service stopped successfully", service)
 }
 
-func WaitForServiceStatus(service string, waitForUp bool) bool {
+func WaitForServiceStatus(service string, waitForUp bool) (bool, string) {
 	overallTimeout := time.After(30 * time.Second)
 	ticker := time.NewTicker(2 * time.Second)
 	defer ticker.Stop()
@@ -341,8 +341,7 @@ func WaitForServiceStatus(service string, waitForUp bool) bool {
 			if !waitForUp {
 				status = "shut down"
 			}
-			log.Println(fmt.Errorf("Timeout: %s service did not %s within 30 seconds", service, status).Error())
-			return false
+			return false, fmt.Errorf("Timeout: %s service did not %s within 30 seconds", service, status).Error()
 		case <-ticker.C:
 			if _, exists := runningServices[service]; !exists {
 				log.Println(fmt.Sprintf("Service %s not found in running services. Retrying...", service))
@@ -354,14 +353,12 @@ func WaitForServiceStatus(service string, waitForUp bool) bool {
 			if waitForUp {
 				if err == nil {
 					_ = conn.Close()
-					log.Println(fmt.Sprintf("%s service is ready to listen on port %d", service, port))
-					return true
+					return true, fmt.Sprintf("%s service is ready to listen on port %d", service, port)
 				}
 				log.Println(fmt.Sprintf("%s service is not ready on port %d. %v", service, port, err))
 			} else {
 				if err != nil {
-					log.Println(fmt.Sprintf("%s service port %d is no longer reachable", service, port))
-					return true
+					return true, fmt.Sprintf("%s service port %d is no longer reachable", service, port)
 				}
 				_ = conn.Close()
 				log.Println(fmt.Sprintf("%s service port %d is still active. Retrying...", service, port))
