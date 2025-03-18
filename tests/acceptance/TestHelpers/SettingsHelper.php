@@ -33,6 +33,7 @@ class SettingsHelper {
 	private static string $settingsEndpoint = '/api/v0/settings/';
 
 	private const BUNDLE_ID = "2a506de7-99bd-4f0d-994e-c38e72c28fd9";
+	private const PROFILE_LANGUAGE_ID = "aa8cfbe5-95d4-4f7e-a032-c3c01f5f062f";
 
 	private const DEFAULT_SETTING_EVENTS = [
 		'Disable Email Notifications' => '33ffb5d6-cd07-4dc0-afb0-84f7559ae438',
@@ -317,19 +318,23 @@ class SettingsHelper {
 		string $password,
 		string $xRequestId
 	): string {
-		$response = self::getValuesList($baseUrl, $user, $password, $xRequestId);
+		$response = self::getValuesBySettingID(
+			$baseUrl,
+			self::PROFILE_LANGUAGE_ID,
+			$user,
+			$password,
+			$xRequestId
+		);
 		Assert::assertEquals(201, $response->getStatusCode(), "Failed to get values list");
 
 		$valuesList = HttpRequestHelper::getJsonDecodedResponseBodyContent($response);
 
-		// if no language is set, the request body is empty return English as the default language
-		if (empty($valuesList)) {
+		// if no language is set, return English as the default language
+		if (empty($valuesList) || empty($valuesList->value)) {
 			return "en";
 		}
-		foreach ($valuesList->values as $value) {
-			if ($value->identifier->setting === "language") {
-				return $value->value->listValue->values[0]->stringValue;
-			}
+		if ($valuesList->value->identifier->setting === "language") {
+			return $valuesList->value->value->listValue->values[0]->stringValue;
 		}
 		// if a language setting was still not found, return English
 		return "en";
@@ -363,6 +368,43 @@ class SettingsHelper {
 			$user,
 			$password,
 			$headers,
+			$body
+		);
+	}
+
+	/**
+	 * @param string $baseUrl
+	 * @param string $settingId
+	 * @param string $user
+	 * @param string $password
+	 * @param string $xRequestId
+	 *
+	 * @return ResponseInterface
+	 *
+	 * @throws GuzzleException
+	 * @throws \JsonException
+	 */
+	public static function getValuesBySettingID(
+		string $baseUrl,
+		string $settingId,
+		string $user,
+		string $password,
+		string $xRequestId,
+	): ResponseInterface {
+		$fullUrl = self::buildFullUrl($baseUrl, "values-get-by-unique-identifiers");
+		$body = json_encode(
+			[
+			"accountUuid" => "me",
+			"settingId" => $settingId
+			],
+			JSON_THROW_ON_ERROR
+		);
+		return HttpRequestHelper::post(
+			$fullUrl,
+			$xRequestId,
+			$user,
+			$password,
+			[],
 			$body
 		);
 	}
