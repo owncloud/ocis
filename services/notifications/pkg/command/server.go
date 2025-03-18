@@ -17,6 +17,7 @@ import (
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
+	"github.com/owncloud/ocis/v2/ocis-pkg/generators"
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
@@ -95,7 +96,8 @@ func Server(cfg *config.Config) *cli.Command {
 				registeredEvents[typ.String()] = e
 			}
 
-			client, err := stream.NatsFromConfig(cfg.Service.Name, false, stream.NatsConfig(cfg.Notifications.Events))
+			connName := generators.GenerateConnectionName(cfg.Service.Name, generators.NTYPE_BUS)
+			client, err := stream.NatsFromConfig(connName, false, stream.NatsConfig(cfg.Notifications.Events))
 			if err != nil {
 				return err
 			}

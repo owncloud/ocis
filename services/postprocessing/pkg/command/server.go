@@ -11,6 +11,7 @@ import (
 	"github.com/urfave/cli/v2"
 	microstore "go-micro.dev/v4/store"
 
+	"github.com/owncloud/ocis/v2/ocis-pkg/generators"
 	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
 	"github.com/owncloud/ocis/v2/services/postprocessing/pkg/config"
 	"github.com/owncloud/ocis/v2/services/postprocessing/pkg/config/parser"
@@ -47,7 +48,8 @@ func Server(cfg *config.Config) *cli.Command {
 			}
 
 			{
-				bus, err := stream.NatsFromConfig(cfg.Service.Name, false, stream.NatsConfig(cfg.Postprocessing.Events))
+				connName := generators.GenerateConnectionName(cfg.Service.Name, generators.NTYPE_BUS)
+				bus, err := stream.NatsFromConfig(connName, false, stream.NatsConfig(cfg.Postprocessing.Events))
 				if err != nil {
 					return err
 				}

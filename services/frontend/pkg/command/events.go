@@ -18,6 +18,7 @@ import (
 	"go-micro.dev/v4/metadata"
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
 
+	"github.com/owncloud/ocis/v2/ocis-pkg/generators"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
@@ -34,7 +35,8 @@ var _registeredEvents = []events.Unmarshaller{
 
 // ListenForEvents listens for events and acts accordingly
 func ListenForEvents(ctx context.Context, cfg *config.Config, l log.Logger) error {
-	bus, err := stream.NatsFromConfig(cfg.Service.Name, false, stream.NatsConfig(cfg.Events))
+	connName := generators.GenerateConnectionName(cfg.Service.Name, generators.NTYPE_BUS)
+	bus, err := stream.NatsFromConfig(connName, false, stream.NatsConfig(cfg.Events))
 	if err != nil {
 		l.Error().Err(err).Msg("cannot connect to nats")
 		return err
