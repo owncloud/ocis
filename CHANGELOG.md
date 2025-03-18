@@ -1,6 +1,7 @@
 # Table of Contents
 
 * [Changelog for unreleased](#changelog-for-unreleased-unreleased)
+* [Changelog for 7.1.1](#changelog-for-711-2025-03-14)
 * [Changelog for 7.1.0](#changelog-for-710-2025-03-06)
 * [Changelog for 7.0.0](#changelog-for-700-2024-12-17)
 * [Changelog for 5.0.9](#changelog-for-509-2024-11-14)
@@ -32,8 +33,8 @@
 * [Changelog for 3.0.0](#changelog-for-300-2023-06-06)
 * [Changelog for 2.0.0](#changelog-for-200-2022-11-30)
 * [Changelog for 1.20.0](#changelog-for-1200-2022-04-13)
-* [Changelog for 1.19.0](#changelog-for-1190-2022-03-29)
 * [Changelog for 1.19.1](#changelog-for-1191-2022-03-29)
+* [Changelog for 1.19.0](#changelog-for-1190-2022-03-29)
 * [Changelog for 1.18.0](#changelog-for-1180-2022-03-03)
 * [Changelog for 1.17.0](#changelog-for-1170-2022-02-16)
 * [Changelog for 1.16.0](#changelog-for-1160-2021-12-10)
@@ -58,7 +59,7 @@
 
 The following sections list the changes for unreleased.
 
-[unreleased]: https://github.com/owncloud/ocis/compare/v7.1.0...master
+[unreleased]: https://github.com/owncloud/ocis/compare/v7.1.1...master
 
 ## Summary
 
@@ -67,14 +68,12 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix the OCM role file editor: [#11093](https://github.com/owncloud/ocis/pull/11093)
 * Bugfix - Fix the parent-id for the share-jail root: [#11101](https://github.com/owncloud/ocis/pull/11101)
 * Bugfix - Adjust the capabilities according to full text search config: [#11111](https://github.com/owncloud/ocis/pull/11111)
-* Bugfix - Fix translations of editor roles: [#11116](https://github.com/owncloud/ocis/pull/11116)
 * Bugfix - Fix app-auth: [#11123](https://github.com/owncloud/ocis/pull/11123)
 * Bugfix - Fix the SpaceMembershipExpired duplicate event: [#11127](https://github.com/owncloud/ocis/pull/11127)
 * Enhancement - Update Mockery to 2.52.3: [#11070](https://github.com/owncloud/ocis/pull/11070)
 * Enhancement - Bump Reva: [#11083](https://github.com/owncloud/ocis/pull/11083)
 * Enhancement - Improve postprocessing logs: [#11108](https://github.com/owncloud/ocis/pull/11108)
 * Enhancement - Improve graph space management logs: [#11115](https://github.com/owncloud/ocis/pull/11115)
-* Enhancement - Update Web to v11.3.1: [#11131](https://github.com/owncloud/ocis/pull/11131)
 
 ## Details
 
@@ -161,6 +160,25 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/10989
    https://github.com/owncloud/ocis/pull/11115
+
+# Changelog for [7.1.1] (2025-03-14)
+
+The following sections list the changes for 7.1.1.
+
+[7.1.1]: https://github.com/owncloud/ocis/compare/v7.1.0...v7.1.1
+
+## Summary
+
+* Bugfix - Fix translations of editor roles: [#11116](https://github.com/owncloud/ocis/pull/11116)
+* Enhancement - Update Web to v11.3.1: [#11131](https://github.com/owncloud/ocis/pull/11131)
+
+## Details
+
+* Bugfix - Fix translations of editor roles: [#11116](https://github.com/owncloud/ocis/pull/11116)
+
+   Uses the correct translations strings for ocis roles
+
+   https://github.com/owncloud/ocis/pull/11116
 
 * Enhancement - Update Web to v11.3.1: [#11131](https://github.com/owncloud/ocis/pull/11131)
 
