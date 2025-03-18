@@ -1390,3 +1390,103 @@ Feature: an user shares resources using ScienceMesh application
         }
       }
       """
+
+
+  Scenario: local user shares multiple resources concurrently to a single federated user (Personal Space)
+    Given using server "LOCAL"
+    And user "Alice" has created the following folders
+      | path           |
+      | folderToShare1 |
+      | folderToShare2 |
+    And user "Alice" has uploaded file with content "some content" to "textfile1.txt"
+    And user "Alice" has uploaded file with content "hello world" to "textfile2.txt"
+    When user "Alice" sends the following concurrent resource share invitations to federated user using the Graph API:
+      | resource       | space    | sharee | shareType | permissionsRole |
+      | folderToShare1 | Personal | Brian  | user      | Viewer          |
+      | folderToShare2 | Personal | Brian  | user      | Editor          |
+      | textfile1.txt  | Personal | Brian  | user      | Viewer          |
+      | textfile2.txt  | Personal | Brian  | user      | File Editor     |
+    Then the HTTP status code of responses on each endpoint should be "200, 200, 200, 200" respectively
+    And using server "REMOTE"
+    And user "Brian" should have the following federated shares:
+      | resource       | permissionsRole | sharer |
+      | folderToShare1 | Viewer          | Alice  |
+      | folderToShare2 | Editor          | Alice  |
+      | textfile1.txt  | Viewer          | Alice  |
+      | textfile2.txt  | File Editor     | Alice  |
+
+
+  Scenario: local user shares multiple resources concurrently to a single federated user (Project Space)
+    Given using server "LOCAL"
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Alice" has created a folder "folderToShare1" in space "new-space"
+    And user "Alice" has created a folder "folderToShare2" in space "new-space"
+    And user "Alice" has uploaded a file inside space "new-space" with content "some content" to "textfile1.txt"
+    And user "Alice" has uploaded a file inside space "new-space" with content "hello world" to "textfile2.txt"
+    When user "Alice" sends the following concurrent resource share invitations to federated user using the Graph API:
+      | resource       | space     | sharee | shareType | permissionsRole |
+      | folderToShare1 | new-space | Brian  | user      | Viewer          |
+      | folderToShare2 | new-space | Brian  | user      | Editor          |
+      | textfile1.txt  | new-space | Brian  | user      | Viewer          |
+      | textfile2.txt  | new-space | Brian  | user      | File Editor     |
+    Then the HTTP status code of responses on each endpoint should be "200, 200, 200, 200" respectively
+    And using server "REMOTE"
+    And user "Brian" should have the following federated shares:
+      | resource       | permissionsRole | sharer |
+      | folderToShare1 | Viewer          | Alice  |
+      | folderToShare2 | Editor          | Alice  |
+      | textfile1.txt  | Viewer          | Alice  |
+      | textfile2.txt  | File Editor     | Alice  |
+
+
+  Scenario: local user shares multiple resources form different spaces concurrently to a single federated user
+    Given using server "LOCAL"
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Alice" has created folder "folderToShare1"
+    And user "Alice" has uploaded file with content "some content" to "textfile1.txt"
+    And user "Alice" has created a folder "folderToShare2" in space "new-space"
+    And user "Alice" has uploaded a file inside space "new-space" with content "hello world" to "textfile2.txt"
+    When user "Alice" sends the following concurrent resource share invitations to federated user using the Graph API:
+      | resource       | space     | sharee | shareType | permissionsRole |
+      | folderToShare1 | Personal  | Brian  | user      | Viewer          |
+      | folderToShare2 | new-space | Brian  | user      | Editor          |
+      | textfile1.txt  | Personal  | Brian  | user      | Viewer          |
+      | textfile2.txt  | new-space | Brian  | user      | File Editor     |
+    Then the HTTP status code of responses on each endpoint should be "200, 200, 200, 200" respectively
+    And using server "REMOTE"
+    And user "Brian" should have the following federated shares:
+      | resource       | permissionsRole | sharer |
+      | folderToShare1 | Viewer          | Alice  |
+      | folderToShare2 | Editor          | Alice  |
+      | textfile1.txt  | Viewer          | Alice  |
+      | textfile2.txt  | File Editor     | Alice  |
+
+
+  Scenario: local user shares multiple resources concurrently to multiple federated users
+    Given user "Carol" has been created with default attributes
+    And "Carol" has accepted invitation
+    And using server "LOCAL"
+    And user "Alice" has created the following folders
+      | path           |
+      | folderToShare1 |
+      | folderToShare2 |
+    And user "Alice" has uploaded file with content "some content" to "textfile1.txt"
+    And user "Alice" has uploaded file with content "hello world" to "textfile2.txt"
+    When user "Alice" sends the following concurrent resource share invitations to federated user using the Graph API:
+      | resource       | space    | sharee | shareType | permissionsRole |
+      | folderToShare1 | Personal | Brian  | user      | Viewer          |
+      | folderToShare2 | Personal | Carol  | user      | Editor          |
+      | textfile1.txt  | Personal | Brian  | user      | Viewer          |
+      | textfile2.txt  | Personal | Carol  | user      | File Editor     |
+    Then the HTTP status code of responses on each endpoint should be "200, 200, 200, 200" respectively
+    And using server "REMOTE"
+    And user "Brian" should have the following federated shares:
+      | resource       | permissionsRole | sharer |
+      | folderToShare1 | Viewer          | Alice  |
+      | textfile1.txt  | Viewer          | Alice  |
+    And user "Carol" should have the following federated shares:
+      | resource       | permissionsRole | sharer |
+      | folderToShare2 | Editor          | Alice  |
+      | textfile2.txt  | File Editor     | Alice  |

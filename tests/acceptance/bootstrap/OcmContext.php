@@ -28,6 +28,9 @@ use TestHelpers\OcmHelper;
 use TestHelpers\WebDavHelper;
 use TestHelpers\BehatHelper;
 use TestHelpers\HttpRequestHelper;
+use Behat\Gherkin\Node\TableNode;
+use TestHelpers\GraphHelper;
+use PHPUnit\Framework\Assert;
 
 /**
  * Acceptance test steps related to testing federation share(ocm) features
@@ -402,5 +405,51 @@ class OcmContext implements Context {
 	): void {
 		$response = $this->spacesContext->sendPropfindRequestToSpace($user, "", $share, null, $folderDepth, true);
 		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @Then user :sharee should have the following federated shares:
+	 *
+	 * @param string $sharee
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws Exception
+	 */
+	public function userShouldHaveTheFollowingFederatedShares(string $sharee, TableNode $table): void {
+		$shares = $table->getColumnsHash();
+		$response = GraphHelper::getSharesSharedWithMe(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$sharee,
+			$this->featureContext->getPasswordForUser($sharee)
+		);
+		$sharedWithMeList = HttpRequestHelper::getJsonDecodedResponseBodyContent($response)->value;
+		foreach ($shares as $share) {
+			$foundShareInSharedWithMe = false;
+			foreach ($sharedWithMeList as $item) {
+				if ($item->name === $share["resource"]) {
+					foreach ($item->remoteItem->permissions as $permission) {
+						$shareCreator = $permission->invitation->invitedBy->user->displayName;
+						if ($shareCreator === $this->featureContext->getDisplayNameForUser($share["sharer"])) {
+							$foundShareInSharedWithMe = true;
+							$permissionsRole = $permission->roles[0];
+						}
+					}
+				}
+			}
+			Assert::assertSame(
+				true,
+				$foundShareInSharedWithMe,
+				"Share " . $share["resource"] . " was not found in the shared-with-me list"
+			);
+			Assert::assertSame(
+				$share["permissionsRole"],
+				GraphHelper::getPermissionNameByPermissionRoleId($permissionsRole),
+				"Expected permissions role " . $share["permissionsRole"] .
+				" was not set for resource " . $share["resource"]
+			);
+		}
 	}
 }

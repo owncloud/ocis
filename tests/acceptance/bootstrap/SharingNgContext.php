@@ -525,6 +525,82 @@ class SharingNgContext implements Context {
 	}
 
 	/**
+	 * @When user :user sends the following concurrent resource share invitations to federated user using the Graph API:
+	 *
+	 * @param string $user
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 */
+	public function userSendsTheFollowingResourcesShareInvitationConcurrentlyToFederatedUserUsingTheGraphApi(
+		string $user,
+		TableNode $table
+	): void {
+		$results = $this->sendConcurrentShareInvitation($user, $table);
+		foreach ($results as $result) {
+			$this->featureContext->pushToLastHttpStatusCodesArray((string)$result->getStatusCode());
+		}
+	}
+
+	/**
+	 * @param string $user
+	 * @param TableNode $table
+	 *
+	 * @return array
+	 * @throws GuzzleException
+	 * @throws JsonException
+	 */
+	public function sendConcurrentShareInvitation(string $user, TableNode $table): array {
+		$table = $table->getColumnsHash();
+		foreach ($table as $shareInfo) {
+			$space = $this->spacesContext->getSpaceByName($user, $shareInfo['space']);
+			$spaceId = $space['id'];
+
+			$resource = $shareInfo['resource'] ?? '';
+			$itemId = $this->spacesContext->getResourceId($user, $shareInfo['space'], $resource);
+
+			$shareeId = (
+				$this->featureContext->ocmContext->getAcceptedUserByName(
+					$user,
+					$shareInfo["sharee"]
+				)
+			)['user_id'];
+
+			$shareType = $shareInfo['shareType'];
+			$permissionsRole = $shareInfo['permissionsRole'] ?? null;
+			$roleId = GraphHelper::getPermissionsRoleIdByName($permissionsRole);
+
+			$body = [];
+			$body['recipients'][] = [
+				"@libre.graph.recipient.type" => $shareType,
+				"objectId" => $shareeId
+			];
+			$body['roles'] = [$roleId];
+
+			$fullUrl = GraphHelper::getBetaFullUrl(
+				$this->featureContext->getBaseUrl(),
+				"drives/$spaceId/items/$itemId/invite"
+			);
+
+			$request = HttpRequestHelper::createRequest(
+				$fullUrl,
+				$this->featureContext->getStepLineRef(),
+				"POST",
+				['Content-Type' => 'application/json'],
+				\json_encode($body)
+			);
+			$requests[] = $request;
+		}
+
+		$client = HttpRequestHelper::createClient(
+			$this->featureContext->getActualUsername($user),
+			$this->featureContext->getPasswordForUser($user)
+		);
+
+		return HttpRequestHelper::sendBatchRequest($requests, $client);
+	}
+
+	/**
 	 * @When /^user "([^"]*)" sends the following space share invitation using permissions endpoint of the Graph API:$/
 	 *
 	 * @param string $user
