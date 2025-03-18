@@ -99,7 +99,7 @@ func RebuildJSONCS3Indexes(cfg *config.Config) *cli.Command {
 				err = errors.Wrap(err, "error creating a new manager")
 				return err
 			}
-			s, err := metadata.NewCS3Storage(conf.GatewayAddr, conf.ProviderAddr, conf.ServiceUserID, conf.ServiceUserIdp, conf.MachineAuthAPIKey)
+			s, err := metadata.NewCS3Storage(conf.ProviderAddr, conf.ProviderAddr, conf.ServiceUserID, conf.ServiceUserIdp, conf.MachineAuthAPIKey)
 			if err != nil {
 				return err
 			}
