@@ -19,6 +19,7 @@ import (
 	"github.com/owncloud/reva/v2/pkg/rhttp"
 	"go.opentelemetry.io/otel/trace"
 
+	"github.com/owncloud/ocis/v2/ocis-pkg/generators"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/antivirus/pkg/config"
 	"github.com/owncloud/ocis/v2/services/antivirus/pkg/scanners"
@@ -107,7 +108,8 @@ func (av Antivirus) Run() error {
 		av.c.Events.TLSInsecure = false
 	}
 
-	natsStream, err := stream.NatsFromConfig(av.c.Service.Name, false, stream.NatsConfig(av.c.Events))
+	connName := generators.GenerateConnectionName(av.c.Service.Name, generators.NTYPE_BUS)
+	natsStream, err := stream.NatsFromConfig(connName, false, stream.NatsConfig(av.c.Events))
 	if err != nil {
 		return err
 	}

@@ -22,6 +22,7 @@ import (
 	"go-micro.dev/v4/metadata"
 	grpcmetadata "google.golang.org/grpc/metadata"
 
+	"github.com/owncloud/ocis/v2/ocis-pkg/generators"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	v0 "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"
@@ -79,7 +80,8 @@ func NewHandler(opts ...Option) (searchsvc.SearchProviderHandler, func(), error)
 		return nil, teardown, fmt.Errorf("unknown search extractor: %s", cfg.Extractor.Type)
 	}
 
-	bus, err := stream.NatsFromConfig(cfg.Service.Name, false, stream.NatsConfig{
+	connName := generators.GenerateConnectionName(cfg.Service.Name, generators.NTYPE_BUS)
+	bus, err := stream.NatsFromConfig(connName, false, stream.NatsConfig{
 		Endpoint:             cfg.Events.Endpoint,
 		Cluster:              cfg.Events.Cluster,
 		EnableTLS:            cfg.Events.EnableTLS,
