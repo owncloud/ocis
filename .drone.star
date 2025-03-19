@@ -164,27 +164,34 @@ config = {
             ],
             "skip": False,
         },
-        "sharingNg": {
+        "sharingNg1": {
             "suites": [
+                "apiSharingNgShares",
+            ],
+            "skip": False,
+            "withRemotePhp": [True],
+        },
+        "sharingNg2": {
+            "suites": [
+                "apiSharingNgPermissions",
                 "apiReshare",
-                "apiSharingNg1",
-                "apiSharingNg2",
-                "apiOptionalShareRole",
+                "apiSharingNgAdditionalShareRole",
             ],
             "skip": False,
             "withRemotePhp": [True],
         },
         "sharingNgShareInvitation": {
             "suites": [
-                "apiSharingNgShareInvitation",
+                "apiSharingNgDriveInvitation",
+                "apiSharingNgItemInvitation",
             ],
             "skip": False,
             "withRemotePhp": [True],
         },
         "sharingNgLinkShare": {
             "suites": [
-                "apiSharingNgLinkSharePermission",
-                "apiSharingNgLinkShareRoot",
+                "apiSharingNgDriveLinkShare",
+                "apiSharingNgItemLinkShare",
             ],
             "skip": False,
             "withRemotePhp": [True],
