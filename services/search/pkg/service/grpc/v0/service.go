@@ -80,7 +80,7 @@ func NewHandler(opts ...Option) (searchsvc.SearchProviderHandler, func(), error)
 		return nil, teardown, fmt.Errorf("unknown search extractor: %s", cfg.Extractor.Type)
 	}
 
-	connName := generators.GenerateConnectionName(cfg.Service.Name, generators.NTYPE_BUS)
+	connName := generators.GenerateConnectionName(cfg.Service.Name, generators.NTypeBus)
 	bus, err := stream.NatsFromConfig(connName, false, stream.NatsConfig{
 		Endpoint:             cfg.Events.Endpoint,
 		Cluster:              cfg.Events.Cluster,

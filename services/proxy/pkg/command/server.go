@@ -157,7 +157,7 @@ func Server(cfg *config.Config) *cli.Command {
 			var publisher events.Stream
 			if cfg.Events.Endpoint != "" {
 				var err error
-				connName := generators.GenerateConnectionName(cfg.Service.Name, generators.NTYPE_BUS)
+				connName := generators.GenerateConnectionName(cfg.Service.Name, generators.NTypeBus)
 				publisher, err = stream.NatsFromConfig(connName, false, stream.NatsConfig(cfg.Events))
 				if err != nil {
 					logger.Error().
