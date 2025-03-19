@@ -162,25 +162,31 @@ config = {
             ],
             "skip": False,
         },
-        "sharingNg": {
+        "sharingNg1": {
             "suites": [
+                "apiShareNgShares",
+            ],
+            "skip": False,
+        },
+        "sharingNg2": {
+            "suites": [
+                "apiPermissions",
                 "apiReshare",
-                "apiSharingNg1",
-                "apiSharingNg2",
                 "apiOptionalShareRole",
             ],
             "skip": False,
         },
         "sharingNgShareInvitation": {
             "suites": [
-                "apiSharingNgShareInvitation",
+                "apiShareNgDriveInvitation",
+                "apiShareNgItemInvitation",
             ],
             "skip": False,
         },
         "sharingNgLinkShare": {
             "suites": [
-                "apiSharingNgLinkSharePermission",
-                "apiSharingNgLinkShareRoot",
+                "apiShareNgDriveLinkShare",
+                "apiShareNgItemLinkShare",
             ],
             "skip": False,
         },
