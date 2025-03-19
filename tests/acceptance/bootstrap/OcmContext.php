@@ -58,6 +58,7 @@ class OcmContext implements Context {
 		$this->featureContext = BehatHelper::getContext($scope, $environment, 'FeatureContext');
 		$this->spacesContext = BehatHelper::getContext($scope, $environment, 'SpacesContext');
 		$this->archiverContext = BehatHelper::getContext($scope, $environment, 'ArchiverContext');
+		$this->sharingNgContext = BehatHelper::getContext($scope, $environment, 'SharingNgContext');
 	}
 
 	/**
@@ -419,36 +420,15 @@ class OcmContext implements Context {
 	 */
 	public function userShouldHaveTheFollowingFederatedShares(string $sharee, TableNode $table): void {
 		$shares = $table->getColumnsHash();
-		$response = GraphHelper::getSharesSharedWithMe(
-			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
-			$sharee,
-			$this->featureContext->getPasswordForUser($sharee)
-		);
-		$sharedWithMeList = HttpRequestHelper::getJsonDecodedResponseBodyContent($response)->value;
 		foreach ($shares as $share) {
-			$foundShareInSharedWithMe = false;
-			foreach ($sharedWithMeList as $item) {
-				if ($item->name === $share["resource"]) {
-					foreach ($item->remoteItem->permissions as $permission) {
-						$shareCreator = $permission->invitation->invitedBy->user->displayName;
-						if ($shareCreator === $this->featureContext->getDisplayNameForUser($share["sharer"])) {
-							$foundShareInSharedWithMe = true;
-							$permissionsRole = $permission->roles[0];
-						}
-					}
-				}
-			}
-			Assert::assertSame(
+			$this->sharingNgContext->checkIfShareExists(
+				$share["resource"],
+				$sharee,
+				$share["sharer"],
+				'',
 				true,
-				$foundShareInSharedWithMe,
-				"Share " . $share["resource"] . " was not found in the shared-with-me list"
-			);
-			Assert::assertSame(
+				true,
 				$share["permissionsRole"],
-				GraphHelper::getPermissionNameByPermissionRoleId($permissionsRole),
-				"Expected permissions role " . $share["permissionsRole"] .
-				" was not set for resource " . $share["resource"]
 			);
 		}
 	}

@@ -23,7 +23,6 @@ Feature: Send a sharing invitations
       | shareType       | user               |
       | permissionsRole | <permissions-role> |
     Then the HTTP status code should be "200"
-    And user "Brian" should have a share "<resource>" shared by user "Alice" from space "Personal"
     And the JSON data of the response should match
       """
       {
@@ -88,6 +87,10 @@ Feature: Send a sharing invitations
         }
       }
       """
+    And user "Brian" should have a share "<resource>" synced
+    And user "Brian" should have the following resource shares:
+      | resource   | permissionsRole    | sharer | space    |
+      | <resource> | <permissions-role> | Alice  | Personal |
     Examples:
       | permissions-role | resource       |
       | Viewer           | /textfile1.txt |
