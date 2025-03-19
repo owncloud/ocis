@@ -31,7 +31,6 @@ func NewService(opts ...Option) grpc.Service {
 		grpc.Version(version.GetString()),
 		grpc.Address(options.Address),
 		grpc.Context(options.Context),
-		grpc.Version(version.GetString()),
 		grpc.TraceProvider(options.TraceProvider),
 		grpc.HandlerWrappers(ratelimiter.NewHandlerWrapper(options.MaxConcurrentRequests)),
 	)
