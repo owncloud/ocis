@@ -479,21 +479,3 @@ class CliContext implements Context {
 		$response = CliHelper::runCommand($body);
 		Assert::assertEquals("200", $response->getStatusCode(), "Failed to clean upload sessions");
 	}
-
-	/**
-	 * @When /^the administrator triggers "([^"]*)" email notifications using the CLI$/
-	 *
-	 * @param string $interval
-	 *
-	 * @return void
-	 * @throws GuzzleException
-	 */
-	public function theAdministratorTriggersEmailNotificationsUsingTheCLI(string $interval): void {
-		$command = "notifications send-email --$interval";
-		$body = [
-			"command" => $command
-		];
-
-		$this->featureContext->setResponse(CliHelper::runCommand($body));
-	}
-}
