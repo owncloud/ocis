@@ -198,6 +198,7 @@ class EmailContext implements Context {
 			$expectedEmailBodyContent = preg_replace('/\s+/', '', $expectedEmailBodyContent);
 			$actualEmailBodyContent = preg_replace('/\s+/', '', $actualEmailBodyContent);
 		}
+        var_dump($actualEmailBodyContent);
 		Assert::assertStringContainsString(
 			$expectedEmailBodyContent,
 			$actualEmailBodyContent,

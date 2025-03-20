@@ -294,6 +294,7 @@ class NotificationContext implements Context {
 		PyStringNode $schemaString
 	): void {
 		$responseBody = $this->filterResponseAccordingToNotificationSubject($subject);
+        var_dump($responseBody);
 		// substitute the value here
 		$schemaString = $schemaString->getRaw();
 		$schemaString = $this->featureContext->substituteInLineCodes(
@@ -427,6 +428,7 @@ class NotificationContext implements Context {
 			$response = $this->listAllNotifications($user);
 			$this->featureContext->theHTTPStatusCodeShouldBe(200, "", $response);
 			++$count;
+            var_dump($response->getBody()->getContents());
 		} while (!isset($this->filterResponseAccordingToNotificationSubject($subject, $response)->message)
 			&& $count <= 5
 		);
