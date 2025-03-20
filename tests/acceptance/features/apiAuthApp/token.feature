@@ -178,7 +178,7 @@ Feature: create auth-app token
         "required": ["token","expiration_date","created_date","label"],
         "properties": {
           "token": { "pattern": "^[a-zA-Z0-9]{16}$" },
-          "label": { "const": "Generated via API" }
+          "label": { "const": "Generated via Impersonation API" }
         }
       }
       """
@@ -205,7 +205,7 @@ Feature: create auth-app token
                   "pattern": "^\\$2a\\$11\\$[A-Za-z0-9./]{53}$"
                 },
                 "label": {
-                  "const": "Generated via API"
+                  "const": "Generated via Impersonation API"
                 }
               }
             }
@@ -215,51 +215,10 @@ Feature: create auth-app token
       """
 
 
-  Scenario: user creates auth-app token with user-id
+  Scenario: non-admin user tries to create own auth-app token with user-id using impersonation API
+    Given the config "AUTH_APP_ENABLE_IMPERSONATION" has been set to "true"
     When user "Alice" creates app token with user-id for user "Alice" with expiration time "72h" using the auth-app API
-    Then the HTTP status code should be "200"
-    And the JSON data of the response should match
-      """
-      {
-        "type": "object",
-        "required": ["token","expiration_date","created_date","label"],
-        "properties": {
-          "token": { "pattern": "^[a-zA-Z0-9]{16}$" },
-          "label": { "const": "Generated via API" }
-        }
-      }
-      """
-    When user "Alice" lists all created tokens using the auth-app API
-    Then the HTTP status code should be "200"
-    And the JSON data of the response should match
-      """
-      {
-        "type": "array",
-        "minItems": 1,
-        "maxItems": 1,
-        "items": {
-          "oneOf": [
-            {
-              "type": "object",
-              "required": [
-                "token",
-                "expiration_date",
-                "created_date",
-                "label"
-              ],
-              "properties": {
-                "token": {
-                  "pattern": "^\\$2a\\$11\\$[A-Za-z0-9./]{53}$"
-                },
-                "label": {
-                  "const": "Generated via API"
-                }
-              }
-            }
-          ]
-        }
-      }
-      """
+    Then the HTTP status code should be "403"
 
   @env-config @issue-11063
   Scenario: non-admin user tries to creates auth-app token with user-id for an another user
