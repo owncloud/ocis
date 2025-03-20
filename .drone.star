@@ -170,12 +170,14 @@ config = {
                 "apiOptionalShareRole",
             ],
             "skip": False,
+            "withRemotePhp": [True],
         },
         "sharingNgShareInvitation": {
             "suites": [
                 "apiSharingNgShareInvitation",
             ],
             "skip": False,
+            "withRemotePhp": [True],
         },
         "sharingNgLinkShare": {
             "suites": [
@@ -183,6 +185,7 @@ config = {
                 "apiSharingNgLinkShareRoot",
             ],
             "skip": False,
+            "withRemotePhp": [True],
         },
         "accountsHashDifficulty": {
             "skip": False,
