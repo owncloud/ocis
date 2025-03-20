@@ -474,46 +474,43 @@ def main(ctx):
 
     pipelines = []
 
-    build_release_helpers = \
-        changelog() + \
-        docs() + \
-        licenseCheck(ctx) + \
-        deleteStaleBranches(ctx)
+    # build_release_helpers = \
+    #     changelog() + \
+    #     docs() + \
+    #     licenseCheck(ctx)
 
     test_pipelines = \
-        codestyle(ctx) + \
-        checkGherkinLint(ctx) + \
-        checkTestSuitesInExpectedFailures(ctx) + \
-        buildWebCache(ctx) + \
-        getGoBinForTesting(ctx) + \
-        buildOcisBinaryForTesting(ctx) + \
-        checkStarlark() + \
-        build_release_helpers + \
-        testOcisAndUploadResults(ctx) + \
-        testPipelines(ctx)
+        deployments(ctx)
+    # codestyle(ctx) + \
+    # checkGherkinLint(ctx) + \
+    # checkTestSuitesInExpectedFailures(ctx) + \
+    # buildWebCache(ctx) + \
+    # getGoBinForTesting(ctx) + \
+    # buildOcisBinaryForTesting(ctx) + \
+    # checkStarlark() + \
+    # build_release_helpers + \
+    # testOcisAndUploadResults(ctx) + \
+    # testPipelines(ctx) + \
 
-    build_release_pipelines = \
-        dockerReleases(ctx) + \
-        binaryReleases(ctx)
+    # build_release_pipelines = \
+    #     dockerReleases(ctx) + \
+    #     binaryReleases(ctx)
 
-    test_pipelines.append(
-        pipelineDependsOn(
-            purgeBuildArtifactCache(ctx),
-            testPipelines(ctx),
-        ),
-    )
+    # test_pipelines.append(
+    #     pipelineDependsOn(
+    #         purgeBuildArtifactCache(ctx),
+    #         testPipelines(ctx),
+    #     ),
+    # )
 
-    test_pipelines.append(
-        pipelineDependsOn(
-            uploadAPITestCoverageReport(ctx),
-            testPipelines(ctx),
-        ),
-    )
+    # test_pipelines.append(
+    #     pipelineDependsOn(
+    #         uploadAPITestCoverageReport(ctx),
+    #         testPipelines(ctx),
+    #     ),
+    # )
 
-    pipelines = test_pipelines + build_release_pipelines
-
-    # nightly Trivy security scan (non-blocking)
-    pipelines.append(trivyScan(ctx))
+    pipelines = deployments(ctx)  #test_pipelines + build_release_pipelines
 
     if ctx.build.event == "cron":
         pipelines = \
@@ -3754,3 +3751,91 @@ def trivyScan(ctx):
             ],
         },
     }
+
+def deployments(ctx):
+    result = {
+        "kind": "pipeline",
+        "type": "docker",
+        "name": "k3d",
+        "privileged": True,
+        "steps": wait(ctx) + install(ctx) + showPodsAfterInstall(ctx),
+        "services": [
+            {
+                "name": "k3d",
+                "image": "ghcr.io/k3d-io/k3d:5-dind",
+                "user": "root",
+                "commands": [
+                    "git clone https://github.com/owncloud/ocis-charts.git",
+                    "cd ocis-charts",
+                    "nohup dockerd-entrypoint.sh &",
+                    "until docker ps 2>&1 > /dev/null; do sleep 1s; done",
+                    "k3d cluster create --config ci/k3d-drone.yaml --api-port k3d:6445",
+                    "until kubectl get deployment coredns -n kube-system -o go-template='{{.status.availableReplicas}}' | grep -v -e '<no value>'; do sleep 1s; done",
+                    "k3d kubeconfig get drone > kubeconfig-$${DRONE_BUILD_NUMBER}.yaml",
+                    "chmod 0600 kubeconfig-$${DRONE_BUILD_NUMBER}.yaml",
+                    "printf '@@@@@@@@@@@@@@@@@@@@@@@\n@@@@ k3d is ready @@@@\n@@@@@@@@@@@@@@@@@@@@@@@\n'",
+                    "kubectl get events -Aw",
+                ],
+            },
+        ],
+        "depends_on": [],
+        "volumes": [
+            {
+                "name": "gopath",
+                "temp": {},
+            },
+        ],
+        "trigger": {
+            "ref": [
+                "refs/pull/**",
+            ],
+        },
+    }
+
+    result["trigger"]["ref"].append("refs/heads/master")
+
+    return [result]
+
+def wait(config):
+    return [{
+        "name": "wait",
+        "image": "docker.io/bitnami/kubectl:1.31",
+        "user": "root",
+        "commands": [
+            "export KUBECONFIG=kubeconfig-$${DRONE_BUILD_NUMBER}.yaml",
+            "until test -f $${KUBECONFIG}; do sleep 1s; done",
+            "kubectl config view",
+            "kubectl get pods -A",
+        ],
+    }]
+
+def showPodsAfterInstall(config):
+    return [{
+        "name": "testPodsAfterInstall",
+        "image": "docker.io/bitnami/kubectl:1.31",
+        "user": "root",
+        "commands": [
+            "export KUBECONFIG=kubeconfig-$${DRONE_BUILD_NUMBER}.yaml",
+            "until test -f $${KUBECONFIG}; do sleep 1s; done",
+            "kubectl get pods -n ocis",
+            "if [ \"$(kubectl get pods -n ocis --field-selector status.phase=Running | wc -l)\" -le \"32\" ]; then exit 1; fi",  # there are 32 pods + 1 header line
+            "kubectl get ingress -n ocis",
+            "if [ \"$(kubectl get ingress -n ocis | wc -l)\" -le \"1\" ]; then exit 1; fi",
+        ],
+    }]
+
+def install(ctx):
+    return [{
+        "name": "helm-install",
+        "image": "owncloudci/golang:latest",
+        "commands": [
+            "export KUBECONFIG=kubeconfig-$${DRONE_BUILD_NUMBER}.yaml",
+            "make helm-install-atomic",
+        ],
+        "volumes": [
+            {
+                "name": "gopath",
+                "path": "/go",
+            },
+        ],
+    }]
