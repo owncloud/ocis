@@ -1617,7 +1617,8 @@ class SharingNgContext implements Context {
 	}
 
 	/**
-	 * @Then /^user "([^"]*)" has a share "([^"]*)" synced$/
+	 * @Given /^user "([^"]*)" has a share "([^"]*)" synced$/
+	 * @Then user :user should have a share :resource synced
 	 *
 	 * @param string $user
 	 * @param string $resource
@@ -2053,6 +2054,7 @@ class SharingNgContext implements Context {
 	 * @param string $space
 	 * @param bool $shouldExist
 	 * @param bool $federatedShare
+	 * @param string $role	compares share role if provided
 	 *
 	 * @return void
 	 * @throws GuzzleException
@@ -2063,18 +2065,20 @@ class SharingNgContext implements Context {
 		string $share,
 		string $sharee,
 		string $sharer,
-		string $space,
+		string $space = '',
 		bool $shouldExist = true,
-		bool $federatedShare = false
+		bool $federatedShare = false,
+		string $role = ''
 	): void {
 		$share = \ltrim($share, "/");
-		if (\strtolower($space) === "personal") {
-			$remoteDriveAlias = "personal/" . \strtolower($sharer);
-		} else {
-			$remoteDriveAlias = "project/" . \strtolower($space);
-		}
-
+		$wasOrNot = $shouldExist ? "was not" : "was";
 		if (!$federatedShare) {
+			if (\strtolower($space) === "personal") {
+				$remoteDriveAlias = "personal/" . \strtolower($sharer);
+			} else {
+				$remoteDriveAlias = "project/" . \strtolower($space);
+			}
+
 			// check share mountpoint
 			$response = GraphHelper::getMySpaces(
 				$this->featureContext->getBaseUrl(),
@@ -2096,7 +2100,7 @@ class SharingNgContext implements Context {
 			Assert::assertSame(
 				$shouldExist,
 				$foundShareMountpoint,
-				"Share mountpoint '$share' was not found in the drives list."
+				"Share mountpoint '$share' $wasOrNot found in the following drives list.\n" . json_encode($driveList)
 			);
 		}
 
@@ -2115,6 +2119,15 @@ class SharingNgContext implements Context {
 					$shareCreator = $permission->invitation->invitedBy->user->displayName;
 					if ($shareCreator === $this->featureContext->getDisplayNameForUser($sharer)) {
 						$foundShareInSharedWithMe = true;
+						if ($shouldExist && $role) {
+							$actualRoleId = $permission->roles[0];
+							$actualRole = GraphHelper::getPermissionNameByPermissionRoleId($actualRoleId);
+							Assert::assertSame(
+								$role,
+								$actualRole,
+								"Expected role '$role' for share '$share' but found '$actualRole'."
+							);
+						}
 						break;
 					}
 				}
@@ -2124,7 +2137,7 @@ class SharingNgContext implements Context {
 		Assert::assertSame(
 			$shouldExist,
 			$foundShareInSharedWithMe,
-			"Share '$share' was not found in the shared-with-me list"
+			"Share '$share' $wasOrNot found in the shared-with-me list.\n" . json_encode($sharedWithMeList)
 		);
 	}
 
@@ -2147,6 +2160,33 @@ class SharingNgContext implements Context {
 		string $space
 	): void {
 		$this->checkIfShareExists($share, $sharee, $sharer, $space, $shouldOrNot === "should");
+	}
+
+	/**
+	 * @Then user :sharee should have the following resource shares:
+	 *
+	 * @param string $sharee
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws Exception
+	 */
+	public function userShouldHaveTheFollowingResourceShares(string $sharee, TableNode $table): void {
+		$shares = $table->getColumnsHash();
+		// set default space to personal if not provided
+		$space = $shares[0]['space'] ?? 'personal';
+		foreach ($shares as $share) {
+			$this->checkIfShareExists(
+				$share["resource"],
+				$sharee,
+				$share["sharer"],
+				$space,
+				true,
+				false,
+				$share["permissionsRole"],
+			);
+		}
 	}
 
 	/**
