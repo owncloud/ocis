@@ -2700,8 +2700,7 @@ class SpacesContext implements Context {
 		string $resource,
 		string $spaceName
 	): void {
-		$dateTime = new DateTime('yesterday');
-		$rows['expireDate'] = $dateTime->format('Y-m-d\\TH:i:sP');
+		$rows['expireDate'] = $this->featureContext->formatExpiryDateTime('Y-m-d\\TH:i:sP');
 		if ($this->featureContext->isUsingSharingNG()) {
 			$space = $this->getSpaceByName($user, $spaceName);
 			$itemId = $this->getResourceId($user, $spaceName, $resource);
