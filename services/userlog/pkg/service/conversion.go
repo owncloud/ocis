@@ -12,6 +12,9 @@ import (
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	invitepb "github.com/cs3org/go-cs3apis/cs3/ocm/invite/v1beta1"
+	typespb "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+
 	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/owncloud/ocis/v2/ocis-pkg/l10n"
@@ -28,7 +31,6 @@ var (
 	_resourceTypeResource = "resource"
 	_resourceTypeSpace    = "storagespace"
 	_resourceTypeShare    = "share"
-	_resourceTypeGlobal   = "global"
 
 	_domain = "userlog"
 )
@@ -115,6 +117,10 @@ func (c *Converter) ConvertEvent(eventid string, event interface{}) (OC10Notific
 		return c.shareMessage(eventid, ShareExpired, ev.ShareOwner, ev.ItemID, ev.ShareID, ev.ExpiredAt)
 	case events.ShareRemoved:
 		return c.shareMessage(eventid, ShareRemoved, ev.Executant, ev.ItemID, ev.ShareID, ev.Timestamp)
+	case events.OCMCoreShareCreated:
+		return c.omcShareCreatedMessage(ev, eventid)
+	case events.OCMCoreShareDelete:
+		return c.omcShareDeleteMessage(ev, eventid)
 	}
 }
 
@@ -231,6 +237,95 @@ func (c *Converter) shareMessage(eventid string, nt NotificationTemplate, execut
 		MessageRaw:     msgraw,
 		MessageDetails: generateDetails(usr, nil, info, shareid),
 	}, nil
+}
+
+func (c *Converter) omcShareCreatedMessage(ev events.OCMCoreShareCreated, eventid string) (OC10Notification, error) {
+	sharerUser, err := c.getOCMUser(ev.Sharer, ev.GranteeUserID)
+	if err != nil {
+		return OC10Notification{}, err
+	}
+
+	shareid := &collaboration.ShareId{OpaqueId: ev.ShareID}
+	subj, subjraw, msg, msgraw, err := composeMessage(ShareCreated, c.locale, c.defaultLanguage, c.translationPath, map[string]interface{}{
+		"username":     sharerUser.GetDisplayName(),
+		"resourcename": ev.ResourceName,
+	})
+	if err != nil {
+		return OC10Notification{}, err
+	}
+
+	return OC10Notification{
+		EventID:        eventid,
+		Service:        c.serviceName,
+		UserName:       sharerUser.GetDisplayName(),
+		Timestamp:      utils.TSToTime(ev.CTime).Format(time.RFC3339Nano),
+		ResourceID:     ev.ItemID,
+		ResourceType:   _resourceTypeShare,
+		Subject:        subj,
+		SubjectRaw:     subjraw,
+		Message:        msg,
+		MessageRaw:     msgraw,
+		MessageDetails: generateDetails(sharerUser, nil, nil, shareid),
+	}, nil
+}
+
+func (c *Converter) omcShareDeleteMessage(ev events.OCMCoreShareDelete, eventid string) (OC10Notification, error) {
+	sharerUser, err := c.getOCMUser(ev.Sharer, ev.Grantee)
+	if err != nil {
+		return OC10Notification{}, err
+	}
+
+	shareid := &collaboration.ShareId{OpaqueId: ev.ShareID}
+	subj, subjraw, msg, msgraw, err := composeMessage(ShareRemoved, c.locale, c.defaultLanguage, c.translationPath, map[string]interface{}{
+		"username":     sharerUser.GetDisplayName(),
+		"resourcename": ev.ResourceName,
+	})
+	if err != nil {
+		return OC10Notification{}, err
+	}
+
+	return OC10Notification{
+		EventID:        eventid,
+		Service:        c.serviceName,
+		UserName:       sharerUser.GetDisplayName(),
+		Timestamp:      utils.TSToTime(ev.CTime).Format(time.RFC3339Nano),
+		ResourceID:     ev.ShareID,
+		ResourceType:   _resourceTypeShare,
+		Subject:        subj,
+		SubjectRaw:     subjraw,
+		Message:        msg,
+		MessageRaw:     msgraw,
+		MessageDetails: generateDetails(sharerUser, nil, nil, shareid),
+	}, nil
+}
+
+func (c *Converter) getOCMUser(sharer *user.UserId, grantee *user.UserId) (*user.User, error) {
+	gwc, err := c.gatewaySelector.Next()
+	if err != nil {
+		return nil, err
+	}
+
+	// Context c.serviceAccountContext will cause the user to be not found.
+	// GetAcceptedUser() calls getUserFilter() that gets the user from the context
+	// and use it as 'initiator' parameter in the GetRemoteUser() call.
+	// The 'initiator' should be ev.Grantee.
+	granteeJson, _ := json.Marshal(grantee)
+	rspSharer, err := gwc.GetAcceptedUser(context.Background(), &invitepb.GetAcceptedUserRequest{
+		RemoteUserId: sharer,
+		Opaque: &typespb.Opaque{
+			Map: map[string]*typespb.OpaqueEntry{
+				"user-filter": {
+					Decoder: "json",
+					Value:   granteeJson,
+				},
+			},
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return rspSharer.GetRemoteUser(), nil
 }
 
 func (c *Converter) virusMessage(eventid string, nt NotificationTemplate, executant *user.User, rid *storageprovider.ResourceId, filename string, virus string, ts time.Time) (OC10Notification, error) {

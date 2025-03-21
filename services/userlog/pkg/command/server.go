@@ -43,6 +43,8 @@ var _registeredEvents = []events.Unmarshaller{
 	events.ShareCreated{},
 	events.ShareRemoved{},
 	events.ShareExpired{},
+	events.OCMCoreShareCreated{},
+	events.OCMCoreShareDelete{},
 }
 
 // Server is the entrypoint for the server command.

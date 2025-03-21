@@ -183,8 +183,16 @@ func (ul *UserlogService) processEvent(event events.Event) {
 		users, err = utils.ResolveID(ctx, e.GranteeUserID, e.GranteeGroupID, gwc)
 	case events.ShareExpired:
 		users, err = utils.ResolveID(ctx, e.GranteeUserID, e.GranteeGroupID, gwc)
-	}
 
+	// ocmcore share related
+	case events.OCMCoreShareCreated:
+		executant = e.Sharer
+		users = append(users, e.GranteeUserID.GetOpaqueId())
+	case events.OCMCoreShareDelete:
+		fmt.Println("### userlog processEvent OCMCoreShareDelete", e.Sharer, e.Grantee)
+		executant = e.Sharer
+		users = append(users, e.Grantee.GetOpaqueId())
+	}
 	if err != nil {
 		// TODO: Find out why this errors on ci pipeline
 		ul.log.Debug().Err(err).Interface("event", event).Msg("error gathering members for event")
