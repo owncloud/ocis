@@ -33,6 +33,7 @@ require_once 'bootstrap.php';
  */
 class AuthAppContext implements Context {
 	private FeatureContext $featureContext;
+	private array $createdAuthAppToken = [];
 
 	/**
 	 * @BeforeScenario
@@ -83,6 +84,7 @@ class AuthAppContext implements Context {
 			["expiry" => $expiration]
 		);
 		$this->featureContext->theHTTPStatusCodeShouldBe(200, "", $response);
+		$this->createdAuthAppToken[] = $response;
 	}
 
 	/**
@@ -131,6 +133,7 @@ class AuthAppContext implements Context {
 			. "HTTP status code 200 is not the expected value " . $response->getStatusCode(),
 			$response
 		);
+		$this->createdAuthAppToken[] = $response;
 	}
 
 	/**
@@ -236,5 +239,27 @@ class AuthAppContext implements Context {
 				],
 			)
 		);
+	}
+	/**
+	 * @When user :user tries to deletes last created auth-app tokens using the auth-app API
+	 *
+	 * @param string $user
+	 *
+	 * @return void
+	 */
+	public function userTriesToDeletesLastCreatedAuthAppTokensUsingTheAuthAppApi(string $user): void {
+		$baseUrl = $this->featureContext->getBaseUrl();
+		$user = $this->featureContext->getActualUsername($user);
+		$password = $this->featureContext->getPasswordForUser($user);
+		$response = \end($this->createdAuthAppToken);
+		$authAppTokens = json_decode($response->getBody()->getContents());
+		$deleteResponse = AuthAppHelper::deleteAppAuthToken(
+			$baseUrl,
+			$user,
+			$password,
+			$authAppTokens->token
+		);
+		$this->featureContext->setResponse($deleteResponse);
+		$this->featureContext->pushToLastHttpStatusCodesArray((string)$deleteResponse->getStatusCode());
 	}
 }
