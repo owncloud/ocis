@@ -2,10 +2,12 @@ package service
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"reflect"
+	"strings"
 	"time"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
@@ -183,8 +185,33 @@ func (ul *UserlogService) processEvent(event events.Event) {
 		users, err = utils.ResolveID(ctx, e.GranteeUserID, e.GranteeGroupID, gwc)
 	case events.ShareExpired:
 		users, err = utils.ResolveID(ctx, e.GranteeUserID, e.GranteeGroupID, gwc)
-	}
 
+	case events.OCMCoreShareCreated:
+		executant = e.Executant
+		users = append(users, e.GranteeUserID.GetOpaqueId())
+
+	case events.OCMCoreShareDelete:
+
+		decoded, err := base64.StdEncoding.DecodeString(e.ExecutantUserID)
+		if err != nil {
+			ul.log.Error().Err(err).Msg("failed to decode ExecutantUserID")
+			return
+		}
+
+		decodedStr := string(decoded)
+		parts := strings.SplitN(decodedStr, "@", 2)
+		if len(parts) != 2 {
+			ul.log.Error().Str("decoded", decodedStr).Msg("invalid ExecutantUserID format")
+			return
+		}
+
+		executant = &user.UserId{
+			OpaqueId: parts[0],
+			Idp:      parts[1],
+			Type:     user.UserType_USER_TYPE_FEDERATED,
+		}
+		users = append(users, e.GranteeUserID)
+	}
 	if err != nil {
 		// TODO: Find out why this errors on ci pipeline
 		ul.log.Debug().Err(err).Interface("event", event).Msg("error gathering members for event")

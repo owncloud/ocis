@@ -161,6 +161,24 @@ func (cl *ClientlogService) processEvent(event events.Event) {
 		fileEv("link-removed", &provider.Reference{ResourceId: e.ItemID})
 	case events.BackchannelLogout:
 		evType, users, data = backchannelLogoutEvent(e)
+
+	case events.OCMCoreShareCreated:
+		// QUESTION: How is the event used? So the useful fields are filled
+		evType = "ocm-share-created"
+		users = []string{e.GranteeUserID.GetOpaqueId()}
+		data = FileEvent{
+			ItemID:          e.ItemID,
+			AffectedUserIDs: []string{e.GranteeUserID.GetOpaqueId()},
+		}
+
+	case events.OCMCoreShareDelete:
+		// QUESTION: How is the event used? So the useful fields are filled
+		evType = "ocm-share-delete"
+		users = []string{e.GranteeUserID}
+		data = FileEvent{
+			ItemName:        e.ResourceName,
+			AffectedUserIDs: []string{e.GranteeUserID},
+		}
 	}
 
 	if err != nil {
