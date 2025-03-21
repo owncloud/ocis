@@ -124,9 +124,28 @@ default:
         - TrashbinContext:
         - SharingNgContext:
 
-    apiGraphUserGroup:
+    apiGraphUser:
       paths:
-        - "%paths.base%/../features/apiGraphUserGroup"
+        - "%paths.base%/../features/apiGraphUser"
+      context: *common_ldap_suite_context
+      contexts:
+        - FeatureContext: *common_feature_context_params
+        - SettingsContext:
+        - GraphContext:
+        - SpacesContext:
+        - CapabilitiesContext:
+        - FilesVersionsContext:
+        - OCSContext:
+        - PublicWebDavContext:
+        - TUSContext:
+        - SpacesTUSContext:
+        - OcisConfigContext:
+        - TrashbinContext:
+        - SharingNgContext:
+
+    apiGraphGroup:
+      paths:
+        - "%paths.base%/../features/apiGraphGroup"
       context: *common_ldap_suite_context
       contexts:
         - FeatureContext: *common_feature_context_params

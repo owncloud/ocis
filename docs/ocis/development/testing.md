@@ -62,7 +62,7 @@ While running the tests, oCIS server is started with [ociswrapper](https://githu
 
 ```bash
 WITH_WRAPPER=false \
-BEHAT_FEATURE='tests/acceptance/features/apiGraphUserGroup/createUser.feature:26' \
+BEHAT_FEATURE='tests/acceptance/features/apiGraphUser/createUser.feature:26' \
 make -C tests/acceptance/docker test-ocis-feature-ocis-storage
 ```
 
@@ -119,7 +119,7 @@ The tests for a single feature (a feature file) can also be run against the diff
 For example;
 
 ```bash
-BEHAT_FEATURE='tests/acceptance/features/apiGraphUserGroup/createUser.feature' \
+BEHAT_FEATURE='tests/acceptance/features/apiGraphUser/createUser.feature' \
 make -C tests/acceptance/docker test-ocis-feature-ocis-storage
 ```
 
@@ -130,11 +130,11 @@ make -C tests/acceptance/docker test-ocis-feature-ocis-storage
 And to run a single scenario in a feature, you can do:
 
 {{< hint info >}}
-A specific scenario from a feature can be run by adding `:<line-number>` at the end of the feature file path. For example, to run the scenario at line 26 of the feature file `apiGraphUserGroup/createUser.feature`, simply add the line number like this: `apiGraphUserGroup/createUser.feature:26`. Note that the line numbers mentioned in the examples might not always point to a scenario, so always check the line numbers before running the test.
+A specific scenario from a feature can be run by adding `:<line-number>` at the end of the feature file path. For example, to run the scenario at line 26 of the feature file `apiGraphUser/createUser.feature`, simply add the line number like this: `apiGraphUser/createUser.feature:26`. Note that the line numbers mentioned in the examples might not always point to a scenario, so always check the line numbers before running the test.
 {{< /hint >}}
 
 ```bash
-BEHAT_FEATURE='tests/acceptance/features/apiGraphUserGroup/createUser.feature:26' \
+BEHAT_FEATURE='tests/acceptance/features/apiGraphUser/createUser.feature:26' \
 make -C tests/acceptance/docker test-ocis-feature-ocis-storage
 ```
 
@@ -142,11 +142,11 @@ Similarly, with S3 storage;
 
 ```bash
 # run a whole feature
-BEHAT_FEATURE='tests/acceptance/features/apiGraphUserGroup/createUser.feature' \
+BEHAT_FEATURE='tests/acceptance/features/apiGraphUser/createUser.feature' \
 make -C tests/acceptance/docker test-ocis-feature-s3ng-storage
 
 # run a single scenario
-BEHAT_FEATURE='tests/acceptance/features/apiGraphUserGroup/createUser.feature:26' \
+BEHAT_FEATURE='tests/acceptance/features/apiGraphUser/createUser.feature:26' \
 make -C tests/acceptance/docker test-ocis-feature-s3ng-storage
 ```
 
@@ -227,16 +227,16 @@ Useful environment variables:
 `BEHAT_FEATURE`: to run a single feature
 
 {{< hint info >}}
-A specific scenario from a feature can be run by adding `:<line-number>` at the end of the feature file path. For example, to run the scenario at line 26 of the feature file `apiGraphUserGroup/createUser.feature`, simply add the line number like this: `apiGraphUserGroup/createUser.feature:26`. Note that the line numbers mentioned in the examples might not always point to a scenario, so always check the line numbers before running the test.
+A specific scenario from a feature can be run by adding `:<line-number>` at the end of the feature file path. For example, to run the scenario at line 26 of the feature file `apiGraphUser/createUser.feature`, simply add the line number like this: `apiGraphUser/createUser.feature:26`. Note that the line numbers mentioned in the examples might not always point to a scenario, so always check the line numbers before running the test.
 {{< /hint >}}
 
 > Example:
 >
-> BEHAT_FEATURE=tests/acceptance/features/apiGraphUserGroup/createUser.feature
+> BEHAT_FEATURE=tests/acceptance/features/apiGraphUser/createUser.feature
 >
 > Or
 >
-> BEHAT_FEATURE=tests/acceptance/features/apiGraphUserGroup/createUser.feature:13
+> BEHAT_FEATURE=tests/acceptance/features/apiGraphUser/createUser.feature:13
 
 `BEHAT_SUITE`: to run a single suite
 
