@@ -14,6 +14,7 @@ import (
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/account"
 	"github.com/owncloud/ocis/v2/ocis-pkg/cors"
+	"github.com/owncloud/ocis/v2/ocis-pkg/generators"
 	"github.com/owncloud/ocis/v2/ocis-pkg/keycloak"
 	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
@@ -53,7 +54,8 @@ func Server(opts ...Option) (http.Service, error) {
 
 	if options.Config.Events.Endpoint != "" {
 		var err error
-		eventsStream, err = stream.NatsFromConfig(options.Config.Service.Name, false, stream.NatsConfig(options.Config.Events))
+		connName := generators.GenerateConnectionName(options.Config.Service.Name, generators.NTypeBus)
+		eventsStream, err = stream.NatsFromConfig(connName, false, stream.NatsConfig(options.Config.Events))
 		if err != nil {
 			options.Logger.Error().
 				Err(err).

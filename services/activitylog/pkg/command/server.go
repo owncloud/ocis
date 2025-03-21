@@ -13,6 +13,7 @@ import (
 	microstore "go-micro.dev/v4/store"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
+	"github.com/owncloud/ocis/v2/ocis-pkg/generators"
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	ogrpc "github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
@@ -70,7 +71,8 @@ func Server(cfg *config.Config) *cli.Command {
 
 			defer cancel()
 
-			evStream, err := stream.NatsFromConfig(cfg.Service.Name, false, stream.NatsConfig(cfg.Events))
+			connName := generators.GenerateConnectionName(cfg.Service.Name, generators.NTypeBus)
+			evStream, err := stream.NatsFromConfig(connName, false, stream.NatsConfig(cfg.Events))
 			if err != nil {
 				logger.Error().Err(err).Msg("Failed to initialize event stream")
 				return err

@@ -3,6 +3,7 @@ package command
 import (
 	"fmt"
 
+	"github.com/owncloud/ocis/v2/ocis-pkg/generators"
 	"github.com/owncloud/ocis/v2/services/notifications/pkg/config"
 	"github.com/owncloud/reva/v2/pkg/events"
 	"github.com/owncloud/reva/v2/pkg/events/stream"
@@ -33,7 +34,8 @@ func SendEmail(cfg *config.Config) *cli.Command {
 			if !daily && !weekly {
 				return errors.New("at least one of '--daily' or '--weekly' must be set")
 			}
-			s, err := stream.NatsFromConfig(cfg.Service.Name, false, stream.NatsConfig(cfg.Notifications.Events))
+			connName := generators.GenerateConnectionName(cfg.Service.Name, generators.NTypeBus)
+			s, err := stream.NatsFromConfig(connName, false, stream.NatsConfig(cfg.Notifications.Events))
 			if err != nil {
 				return err
 			}
