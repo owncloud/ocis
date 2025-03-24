@@ -341,6 +341,12 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 #### [OCM. delete-accepted-user endpoint always returns 200](https://github.com/owncloud/ocis/issues/10223)
 - [apiOcm/deleteFederatedConnections.feature:123](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/deleteFederatedConnections.feature#L123)
 - [apiOcm/deleteFederatedConnections.feature:130](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/deleteFederatedConnections.feature#L130)
+- [apiOcm/deleteFederatedConnections.feature:143](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/deleteFederatedConnections.feature#L143)
+- [apiOcm/deleteFederatedConnections.feature:144](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/deleteFederatedConnections.feature#L144)
+- [apiOcm/deleteFederatedConnections.feature:145](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/deleteFederatedConnections.feature#L145)
+- [apiOcm/deleteFederatedConnections.feature:154](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/deleteFederatedConnections.feature#L154)
+- [apiOcm/deleteFederatedConnections.feature:155](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/deleteFederatedConnections.feature#L155)
+- [apiOcm/deleteFederatedConnections.feature:156](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/deleteFederatedConnections.feature#L156)
 
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.

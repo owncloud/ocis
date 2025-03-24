@@ -328,7 +328,7 @@ class OcmContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function userDeletesFederatedConnectionWithUserUsingTheGraphApi(string $user, string $ocmUser): void {
-		$this->featureContext->setResponse($this->deleteConnection($user, $ocmUser));
+		$this->featureContext->setResponse($this->deleteConnection($user, $ocmUser, null));
 	}
 
 	/**
@@ -341,7 +341,7 @@ class OcmContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function userHasDeletedFederatedConnectionWithUser(string $user, string $ocmUser): void {
-		$response = $this->deleteConnection($user, $ocmUser);
+		$response = $this->deleteConnection($user, $ocmUser, null);
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			200,
 			"failed while deleting connection with user $ocmUser",
@@ -352,12 +352,14 @@ class OcmContext implements Context {
 	/**
 	 * @param string $user
 	 * @param string $ocmUser
+	 * @param string|null $idp
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
-	public function deleteConnection(string $user, string $ocmUser): ResponseInterface {
+	public function deleteConnection(string $user, string $ocmUser, ?string $idp): ResponseInterface {
 		$ocmUser = $this->getAcceptedUserByName($user, $ocmUser);
+		$ocmUser['idp'] = $idp ?? $ocmUser['idp'];
 		return OcmHelper::deleteConnection(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
@@ -455,5 +457,23 @@ class OcmContext implements Context {
 				$share["permissionsRole"],
 			);
 		}
+	}
+
+	/**
+	 * @When user :user tries to delete federated connection with user :ocmUser with idp :idp using the Graph API
+	 *
+	 * @param string $user
+	 * @param string $ocmUser
+	 * @param string $idp
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userDeletesFederatedConnectionWithUserWithIdpUsingTheGraphApi(
+		string $user,
+		string $ocmUser,
+		string $idp
+	): void {
+		$this->featureContext->setResponse($this->deleteConnection($user, $ocmUser, $idp));
 	}
 }
