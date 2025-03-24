@@ -236,3 +236,12 @@ Feature: create auth-app token
       """
       impersonation is not allowed
       """
+
+
+  Scenario: user tries to create auth-app token with user-id and without expiry
+    When user "Alice" creates app token with user-id for user "Alice" with expiration time "" using the auth-app API
+    Then the HTTP status code should be "400"
+    And the content in the response should include the following content:
+      """
+      error parsing expiry. Use e.g. 30m or 72h
+      """
