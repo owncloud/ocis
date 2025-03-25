@@ -56,6 +56,9 @@ Feature: upload resources using TUS protocol
     And user "Brian" has a share "testFolder" synced
     When user "Brian" uploads file "filesForUpload/zerobyte.txt" to "Shares/testFolder/textfile.txt" using the TUS protocol on the WebDAV API
     Then the HTTP status code should be "201"
+    And the following headers should be set
+      | header                        | value                                  |
+      | Access-Control-Expose-Headers | Tus-Resumable, Upload-Offset, Location |
     And the content of file "Shares/testFolder/textfile.txt" for user "Brian" should be ""
     And the content of file "testFolder/textfile.txt" for user "Alice" should be ""
     Examples:
@@ -77,6 +80,9 @@ Feature: upload resources using TUS protocol
     And user "Brian" has a share "testFolder" synced
     When user "Brian" uploads a file from "filesForUpload/zerobyte.txt" to "testFolder/textfile.txt" via TUS inside of the space "Shares" using the WebDAV API
     Then the HTTP status code should be "201"
+    And the following headers should be set
+      | header                        | value                                  |
+      | Access-Control-Expose-Headers | Tus-Resumable, Upload-Offset, Location |
     And for user "Brian" the content of the file "testFolder/textfile.txt" of the space "Shares" should be ""
     And for user "Alice" the content of the file "testFolder/textfile.txt" of the space "Personal" should be ""
 
@@ -87,6 +93,9 @@ Feature: upload resources using TUS protocol
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
     When user "Alice" uploads a file from "filesForUpload/zerobyte.txt" to "textfile.txt" via TUS inside of the space "new-space" using the WebDAV API
     Then the HTTP status code should be "201"
+    And the following headers should be set
+      | header                        | value                                  |
+      | Access-Control-Expose-Headers | Tus-Resumable, Upload-Offset, Location |
     And for user "Alice" the content of the file "textfile.txt" of the space "new-space" should be ""
 
   @issue-8003 @issue-10346
@@ -103,6 +112,9 @@ Feature: upload resources using TUS protocol
     And user "Brian" has a share "textfile.txt" synced
     When user "Brian" uploads file "filesForUpload/zerobyte.txt" to "Shares/textfile.txt" using the TUS protocol on the WebDAV API
     Then the HTTP status code should be "201"
+    And the following headers should be set
+      | header                        | value                                  |
+      | Access-Control-Expose-Headers | Tus-Resumable, Upload-Offset, Location |
     And the content of file "Shares/textfile.txt" for user "Brian" should be ""
     And the content of file "textfile.txt" for user "Alice" should be ""
     Examples:
@@ -124,6 +136,9 @@ Feature: upload resources using TUS protocol
     And user "Brian" has a share "textfile.txt" synced
     When user "Brian" uploads a file from "filesForUpload/zerobyte.txt" to "textfile.txt" via TUS inside of the space "Shares" using the WebDAV API
     Then the HTTP status code should be "201"
+    And the following headers should be set
+      | header                        | value                                  |
+      | Access-Control-Expose-Headers | Tus-Resumable, Upload-Offset, Location |
     And for user "Brian" the content of the file "textfile.txt" of the space "Shares" should be ""
     And for user "Alice" the content of the file "textfile.txt" of the space "Personal" should be ""
 
@@ -135,6 +150,9 @@ Feature: upload resources using TUS protocol
     And user "Alice" has uploaded a file inside space "new-space" with content "This is TUS upload" to "textfile.txt"
     When user "Alice" uploads a file from "filesForUpload/zerobyte.txt" to "textfile.txt" via TUS inside of the space "new-space" using the WebDAV API
     Then the HTTP status code should be "201"
+    And the following headers should be set
+      | header                        | value                                  |
+      | Access-Control-Expose-Headers | Tus-Resumable, Upload-Offset, Location |
     And for user "Alice" the content of the file "textfile.txt" of the space "new-space" should be ""
 
   @issue-8003
@@ -151,5 +169,8 @@ Feature: upload resources using TUS protocol
       | permissionsRole | Space Editor |
     When user "Brian" uploads a file from "filesForUpload/zerobyte.txt" to "textfile.txt" via TUS inside of the space "new-space" using the WebDAV API
     Then the HTTP status code should be "201"
+    And the following headers should be set
+      | header                        | value                                  |
+      | Access-Control-Expose-Headers | Tus-Resumable, Upload-Offset, Location |
     And for user "Brian" the content of the file "textfile.txt" of the space "new-space" should be ""
     And for user "Alice" the content of the file "textfile.txt" of the space "new-space" should be ""
