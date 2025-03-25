@@ -10,6 +10,7 @@ import (
 	"github.com/urfave/cli/v2"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
+	"github.com/owncloud/ocis/v2/ocis-pkg/generators"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
 	"github.com/owncloud/ocis/v2/services/sse/pkg/config"
@@ -52,7 +53,8 @@ func Server(cfg *config.Config) *cli.Command {
 			}
 
 			{
-				natsStream, err := stream.NatsFromConfig(cfg.Service.Name, true, stream.NatsConfig(cfg.Events))
+				connName := generators.GenerateConnectionName(cfg.Service.Name, generators.NTypeBus)
+				natsStream, err := stream.NatsFromConfig(connName, true, stream.NatsConfig(cfg.Events))
 				if err != nil {
 					return err
 				}
