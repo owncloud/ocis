@@ -22,6 +22,7 @@ import (
 	cs3mocks "github.com/cs3org/reva/v2/tests/cs3mocks/mocks"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"github.com/owncloud/ocis/v2/ocis-pkg/conversions"
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	collabmocks "github.com/owncloud/ocis/v2/services/collaboration/mocks"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config"
@@ -1876,6 +1877,7 @@ var _ = Describe("FileConnector", func() {
 
 			expectedFileInfo := &fileinfo.OnlyOffice{
 				Version:                 "v162738490",
+				Size:                    conversions.ToPointer(int64(998877)),
 				BaseFileName:            "test.txt",
 				BreadcrumbDocName:       "test.txt",
 				BreadcrumbFolderName:    "/path/to",
