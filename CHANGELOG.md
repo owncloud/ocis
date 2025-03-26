@@ -71,6 +71,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix app-auth: [#11123](https://github.com/owncloud/ocis/pull/11123)
 * Bugfix - Fix the SpaceMembershipExpired duplicate event: [#11127](https://github.com/owncloud/ocis/pull/11127)
 * Bugfix - Fix migrate rebuild-jsoncs3-indexes cli: [#11145](https://github.com/owncloud/ocis/pull/11145)
+* Bugfix - Fix pdf form creation: [#11163](https://github.com/owncloud/ocis/pull/11163)
 * Enhancement - Update Mockery to 2.52.3: [#11070](https://github.com/owncloud/ocis/pull/11070)
 * Enhancement - Improve postprocessing logs: [#11108](https://github.com/owncloud/ocis/pull/11108)
 * Enhancement - Improve graph space management logs: [#11115](https://github.com/owncloud/ocis/pull/11115)
@@ -134,6 +135,14 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/11145
    https://github.com/owncloud/ocis/pull/11145
+
+* Bugfix - Fix pdf form creation: [#11163](https://github.com/owncloud/ocis/pull/11163)
+
+   Fix pdf form creation for Onlyoffice. Adjust the file extension for Form to be
+   PDF instead of DOCXF
+
+   https://github.com/owncloud/ocis/issues/11164
+   https://github.com/owncloud/ocis/pull/11163
 
 * Enhancement - Update Mockery to 2.52.3: [#11070](https://github.com/owncloud/ocis/pull/11070)
 
