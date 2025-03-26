@@ -33,7 +33,8 @@ require_once 'bootstrap.php';
  */
 class AuthAppContext implements Context {
 	private FeatureContext $featureContext;
-	private string $lastCreatedToken;
+	private array $lastCreatedToken = [];
+	private bool $usingAuthAppToken = false;
 
 	/**
 	 * @BeforeScenario
@@ -47,6 +48,20 @@ class AuthAppContext implements Context {
 		$environment = $scope->getEnvironment();
 		// Get all the contexts you need in this context
 		$this->featureContext = BehatHelper::getContext($scope, $environment, 'FeatureContext');
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getLastCreatedToken(): array {
+		return $this->lastCreatedToken;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function isUsingAuthAppToken(): bool {
+		return $this->usingAuthAppToken;
 	}
 
 	/**
@@ -84,7 +99,10 @@ class AuthAppContext implements Context {
 			["expiry" => $expiration]
 		);
 		$this->featureContext->theHTTPStatusCodeShouldBe(200, "", $response);
-		$this->lastCreatedToken = json_decode($response->getBody()->getContents())->token;
+		$this->lastCreatedToken = [
+			"user" => strtolower($user),
+			"token" => json_decode($response->getBody()->getContents())->token
+		];
 	}
 
 	/**
@@ -133,7 +151,10 @@ class AuthAppContext implements Context {
 			. "HTTP status code 200 is not the expected value " . $response->getStatusCode(),
 			$response
 		);
-		$this->lastCreatedToken = json_decode($response->getBody()->getContents())->token;
+		$this->lastCreatedToken = [
+			"user" => strtolower($impersonatedUser),
+			"token" => json_decode($response->getBody()->getContents())->token
+		];
 	}
 
 	/**
@@ -256,9 +277,18 @@ class AuthAppContext implements Context {
 			$baseUrl,
 			$user,
 			$password,
-			$this->lastCreatedToken,
+			$this->getLastCreatedToken()['token'],
 		);
 		$this->featureContext->setResponse($deleteResponse);
 		$this->featureContext->pushToLastHttpStatusCodesArray((string)$deleteResponse->getStatusCode());
+	}
+
+	/**
+	 * @Given using auth-app token
+	 *
+	 * @return void
+	 */
+	public function usingAuthAppToken(): void {
+		$this->usingAuthAppToken = true;
 	}
 }
