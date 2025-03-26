@@ -500,13 +500,13 @@ func (s *Service) UpsertItem(ref *provider.Reference) {
 		return
 	}
 
-	if slices.Contains(_skipPathNames, path) {
+	if slices.Contains(_skipPathNames, path) || slices.Contains(_skipPathDirs, path) {
 		s.logger.Info().Str("path", path).Msg("file won't be indexed")
 		return
 	}
 
 	for _, skipPath := range _skipPathDirs {
-		if strings.HasPrefix(path, skipPath) {
+		if strings.HasPrefix(path, skipPath+"/") {
 			s.logger.Info().Str("path", path).Msg("file is in a directory that won't be indexed")
 			return
 		}
