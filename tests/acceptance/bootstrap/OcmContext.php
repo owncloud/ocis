@@ -352,12 +352,14 @@ class OcmContext implements Context {
 	/**
 	 * @param string $user
 	 * @param string $ocmUser
+	 * @param string|null $idp
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
-	public function deleteConnection(string $user, string $ocmUser): ResponseInterface {
+	public function deleteConnection(string $user, string $ocmUser, string $idp = null): ResponseInterface {
 		$ocmUser = $this->getAcceptedUserByName($user, $ocmUser);
+		$ocmUser['idp'] = $idp ?? $ocmUser['idp'];
 		return OcmHelper::deleteConnection(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
@@ -455,5 +457,23 @@ class OcmContext implements Context {
 				$share["permissionsRole"],
 			);
 		}
+	}
+
+	/**
+	 * @When user :user tries to delete federated connection with user :ocmUser and provider :idp using the Graph API
+	 *
+	 * @param string $user
+	 * @param string $ocmUser
+	 * @param string $idp
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userDeletesFederatedConnectionWithUserAndProviderUsingTheGraphApi(
+		string $user,
+		string $ocmUser,
+		string $idp
+	): void {
+		$this->featureContext->setResponse($this->deleteConnection($user, $ocmUser, $idp));
 	}
 }
