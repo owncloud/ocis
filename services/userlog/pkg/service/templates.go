@@ -49,6 +49,16 @@ var (
 		Message: l10n.Template("{user} unshared {resource} with you"),
 	}
 
+	OCMShareCreated = NotificationTemplate{
+		Subject: l10n.Template("Resource shared"),
+		Message: l10n.Template("Federated {resource} was shared with you"),
+	}
+
+	OCMShareRemove = NotificationTemplate{
+		Subject: l10n.Template("Resource unshared"),
+		Message: l10n.Template("Federated {resource} was unshared with you"),
+	}
+
 	ShareExpired = NotificationTemplate{
 		Subject: l10n.Template("Share expired"),
 		Message: l10n.Template("Access to {resource} expired"),

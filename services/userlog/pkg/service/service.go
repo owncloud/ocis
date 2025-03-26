@@ -2,12 +2,10 @@ package service
 
 import (
 	"context"
-	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"reflect"
-	"strings"
 	"time"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
@@ -26,6 +24,7 @@ import (
 	ehsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/eventhistory/v0"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/userlog/pkg/config"
+	ocmuser "github.com/owncloud/reva/v2/pkg/ocm/user"
 )
 
 // UserlogService is the service responsible for user activities
@@ -191,25 +190,7 @@ func (ul *UserlogService) processEvent(event events.Event) {
 		users = append(users, e.GranteeUserID.GetOpaqueId())
 
 	case events.OCMCoreShareDelete:
-
-		decoded, err := base64.StdEncoding.DecodeString(e.ExecutantUserID)
-		if err != nil {
-			ul.log.Error().Err(err).Msg("failed to decode ExecutantUserID")
-			return
-		}
-
-		decodedStr := string(decoded)
-		parts := strings.SplitN(decodedStr, "@", 2)
-		if len(parts) != 2 {
-			ul.log.Error().Str("decoded", decodedStr).Msg("invalid ExecutantUserID format")
-			return
-		}
-
-		executant = &user.UserId{
-			OpaqueId: parts[0],
-			Idp:      parts[1],
-			Type:     user.UserType_USER_TYPE_FEDERATED,
-		}
+		executant = ocmuser.RemoteIDFromOpaqueID(e.ExecutantUserID)
 		users = append(users, e.GranteeUserID)
 	}
 	if err != nil {

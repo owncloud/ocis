@@ -115,6 +115,10 @@ func (c *Converter) ConvertEvent(eventid string, event interface{}) (OC10Notific
 		return c.shareMessage(eventid, ShareExpired, ev.ShareOwner, ev.ItemID, ev.ShareID, ev.ExpiredAt)
 	case events.ShareRemoved:
 		return c.shareMessage(eventid, ShareRemoved, ev.Executant, ev.ItemID, ev.ShareID, ev.Timestamp)
+	case events.OCMCoreShareCreated:
+		return c.omcShareCreatedMessage(ev, eventid)
+	case events.OCMCoreShareDelete:
+		return c.omcShareRemoveMessage(ev, eventid)
 	}
 }
 
@@ -230,6 +234,47 @@ func (c *Converter) shareMessage(eventid string, nt NotificationTemplate, execut
 		Message:        msg,
 		MessageRaw:     msgraw,
 		MessageDetails: generateDetails(usr, nil, info, shareid),
+	}, nil
+}
+
+func (c *Converter) omcShareCreatedMessage(ev events.OCMCoreShareCreated, eventid string) (OC10Notification, error) {
+	// TOOD: resolve the username and reuse "Share" template message with localisation
+	nt := OCMShareCreated
+	shareid := &collaboration.ShareId{OpaqueId: ev.ShareID}
+	subj, subjraw, msg, msgraw, _ := composeMessage(nt, c.locale, c.defaultLanguage, c.translationPath, map[string]interface{}{
+		"resourcename": ev.ResourceName,
+	})
+
+	return OC10Notification{
+		EventID:        eventid,
+		Service:        c.serviceName,
+		Timestamp:      utils.TSToTime(ev.CTime).Format(time.RFC3339Nano),
+		ResourceID:     ev.ItemID,
+		ResourceType:   _resourceTypeShare,
+		Subject:        subj,
+		SubjectRaw:     subjraw,
+		Message:        msg,
+		MessageRaw:     msgraw,
+		MessageDetails: generateDetails(nil, nil, nil, shareid),
+	}, nil
+}
+
+func (c *Converter) omcShareRemoveMessage(ev events.OCMCoreShareDelete, eventid string) (OC10Notification, error) {
+	// TOOD: resolve the username and reuse "Share" template message with localisation
+	nt := OCMShareRemove
+	subj, subjraw, msg, msgraw, _ := composeMessage(nt, c.locale, c.defaultLanguage, c.translationPath, map[string]interface{}{
+		"resourcename": ev.ResourceName,
+	})
+	return OC10Notification{
+		EventID:        eventid,
+		Service:        c.serviceName,
+		Timestamp:      utils.TSToTime(ev.CTime).Format(time.RFC3339Nano),
+		ResourceType:   _resourceTypeShare,
+		Subject:        subj,
+		SubjectRaw:     subjraw,
+		Message:        msg,
+		MessageRaw:     msgraw,
+		MessageDetails: generateDetails(nil, nil, nil, nil),
 	}, nil
 }
 
