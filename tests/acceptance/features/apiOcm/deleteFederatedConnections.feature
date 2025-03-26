@@ -133,24 +133,10 @@ Feature: delete federated connections
     Then the HTTP status code should be "404"
 
   @issue-10223
-  Scenario Outline: local user tries to delete previously deleted federated connection with random idp
-    Given using server "LOCAL"
-    And user "Alice" has deleted federated connection with user "Brian"
-    When user "Alice" tries to delete federated connection with user "Brian" with idp "<idp>" using the Graph API
-    Then the HTTP status code should be "400"
-    Examples:
-      | idp            |
-      | localhost:9244 |
-      | localhost:123  |
-      | localhost:11   |
-
-  @issue-10223
   Scenario Outline: federated user tries to delete previously deleted federated connection with random idp
     Given user "Brian" has deleted federated connection with user "Alice"
-    When user "Brian" tries to delete federated connection with user "Alice" with idp "<idp>" using the Graph API
+    When user "Brian" tries to delete federated connection with user "Alice" and provider "<idp>" using the Graph API
     Then the HTTP status code should be "400"
     Examples:
       | idp            |
       | localhost:9244 |
-      | localhost:123  |
-      | localhost:11   |

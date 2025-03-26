@@ -328,7 +328,7 @@ class OcmContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function userDeletesFederatedConnectionWithUserUsingTheGraphApi(string $user, string $ocmUser): void {
-		$this->featureContext->setResponse($this->deleteConnection($user, $ocmUser, null));
+		$this->featureContext->setResponse($this->deleteConnection($user, $ocmUser));
 	}
 
 	/**
@@ -341,7 +341,7 @@ class OcmContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function userHasDeletedFederatedConnectionWithUser(string $user, string $ocmUser): void {
-		$response = $this->deleteConnection($user, $ocmUser, null);
+		$response = $this->deleteConnection($user, $ocmUser);
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			200,
 			"failed while deleting connection with user $ocmUser",
@@ -357,7 +357,7 @@ class OcmContext implements Context {
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
-	public function deleteConnection(string $user, string $ocmUser, ?string $idp): ResponseInterface {
+	public function deleteConnection(string $user, string $ocmUser, string $idp = null): ResponseInterface {
 		$ocmUser = $this->getAcceptedUserByName($user, $ocmUser);
 		$ocmUser['idp'] = $idp ?? $ocmUser['idp'];
 		return OcmHelper::deleteConnection(
@@ -460,7 +460,7 @@ class OcmContext implements Context {
 	}
 
 	/**
-	 * @When user :user tries to delete federated connection with user :ocmUser with idp :idp using the Graph API
+	 * @When user :user tries to delete federated connection with user :ocmUser and provider :idp using the Graph API
 	 *
 	 * @param string $user
 	 * @param string $ocmUser
@@ -469,7 +469,7 @@ class OcmContext implements Context {
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function userDeletesFederatedConnectionWithUserWithIdpUsingTheGraphApi(
+	public function userDeletesFederatedConnectionWithUserAndProviderUsingTheGraphApi(
 		string $user,
 		string $ocmUser,
 		string $idp
