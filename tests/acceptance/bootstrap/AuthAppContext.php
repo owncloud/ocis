@@ -25,6 +25,7 @@ use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use TestHelpers\BehatHelper;
 use PHPUnit\Framework\Assert;
 use TestHelpers\AuthAppHelper;
+use TestHelpers\GraphHelper;
 
 require_once 'bootstrap.php';
 
@@ -260,5 +261,45 @@ class AuthAppContext implements Context {
 		);
 		$this->featureContext->setResponse($deleteResponse);
 		$this->featureContext->pushToLastHttpStatusCodesArray((string)$deleteResponse->getStatusCode());
+	}
+
+	/**
+	 * @When the administrator creates user :user using last created auth-app token
+	 *
+	 * @param string $user
+	 *
+	 * @return void
+	 */
+	public function theAdministratorCreatesUserUsingAuthAppToken(string $user): void {
+		$this->featureContext->setResponse(
+			GraphHelper::createUser(
+				$this->featureContext->getBaseUrl(),
+				$this->featureContext->getStepLineRef(),
+				$this->featureContext->getAdminUsername(),
+				$this->lastCreatedToken,
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+			)
+		);
+		$this->featureContext->addUserToCreatedUsersList($user, $this->featureContext->getPasswordForUser($user));
+	}
+
+	/**
+	 * @When user :user lists all her/his drives using last created auth-app token
+	 *
+	 * @param string $user
+	 *
+	 * @return void
+	 */
+	public function userListsAllDrivesUsingAuthAppToken(string $user): void {
+		$this->featureContext->setResponse(
+			GraphHelper::getMySpaces(
+				$this->featureContext->getBaseUrl(),
+				$this->featureContext->getActualUsername($user),
+				$this->lastCreatedToken,
+				'',
+				$this->featureContext->getStepLineRef(),
+			)
+		);
 	}
 }

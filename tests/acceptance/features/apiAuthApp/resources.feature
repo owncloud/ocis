@@ -1,0 +1,57 @@
+Feature: create auth-app token
+  As a user
+  I want to create auth-app Tokens
+  So that I can let 3rd party apps use my account
+
+  Background:
+    Given user "Alice" has been created with default attributes
+
+
+  Scenario: admin creates user using auth-app token
+    And user "Admin" has created auth-app token with expiration time "1h" using the auth-app API
+    When the administrator creates user "Brian" using last created auth-app token
+    Then the HTTP status code should be "201"
+
+
+  Scenario: user lists their drives using auth-app token
+    Given user "Alice" has created auth-app token with expiration time "1h" using the auth-app API
+    When user "Alice" lists all her drives using last created auth-app token
+    Then the HTTP status code should be "200"
+    And the JSON response should contain space called "Alice Hansen" and match
+      """
+      {
+        "type": "object",
+        "required": [
+          "driveType",
+          "driveAlias",
+          "name",
+          "id",
+          "quota",
+          "root",
+          "webUrl"
+        ],
+        "properties": {
+          "name": { "const": "Alice Hansen" },
+          "driveType": { "const": "personal" },
+          "driveAlias": { "const": "personal/alice" },
+          "id": { "pattern": "%space_id_pattern%" },
+          "quota": {
+             "type": "object",
+             "required": ["state"],
+             "properties": {
+                "state": { "const": "normal" }
+             }
+          },
+          "root": {
+            "type": "object",
+            "required": ["webDavUrl"],
+            "properties": {
+                "webDavUrl": { "const": "%base_url%/dav/spaces/%space_id%" }
+             }
+          },
+          "webUrl": {
+            "const": "%base_url%/f/%space_id%"
+          }
+        }
+      }
+      """
