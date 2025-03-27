@@ -13,8 +13,8 @@ Feature: Notification
     And user "Alice" has uploaded file with content "other data" to "/textfile1.txt"
     And user "Alice" has created folder "my_data"
 
-
-  Scenario Outline: user gets a notification of resource sharing
+  @email
+  Scenario Outline: user gets in-app and mail notifications of resource sharing
     Given user "Alice" has sent the following resource share invitation:
       | resource        | <resource> |
       | space           | Personal   |
@@ -41,209 +41,48 @@ Feature: Notification
           "user"
         ],
         "properties": {
-          "app": {
-            "type": "string",
-            "enum": ["userlog"]
-          },
-          "message": {
-            "type": "string",
-            "enum": ["Alice Hansen shared <resource> with you"]
-          },
-          "messageRich": {
-            "type": "string",
-            "enum": ["{user} shared {resource} with you"]
-          },
+          "app": {"const": "userlog"},
+          "message": {"const": "Alice Hansen shared <resource> with you"},
+          "messageRich": {"const": "{user} shared {resource} with you"},
           "messageRichParameters": {
             "type": "object",
-            "required": [
-              "resource",
-              "user"
-            ],
+            "required": ["resource","user"],
             "properties": {
               "resource": {
                 "type": "object",
-                "required": [
-                  "id",
-                  "name"
-                ],
+                "required": ["id","name"],
                 "properties": {
-                  "id": {
-                    "type": "string",
-                    "pattern": "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}\\$[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}![a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"
-                  },
-                  "name": {
-                    "type": "string",
-                    "enum": ["<resource>"]
-                  }
+                  "id": {"pattern": "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}\\$[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}![a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"},
+                  "name": {"const": "<resource>"}
                 }
               },
               "user": {
                 "type": "object",
-                "required": [
-                  "displayname",
-                  "id",
-                  "name"
-                ],
+                "required": ["displayname","id","name"],
                 "properties": {
-                  "displayname": {
-                    "type": "string",
-                    "enum": ["Alice Hansen"]
-                  },
-                  "id": {
-                    "type": "string",
-                    "pattern": "^%user_id_pattern%$"
-                  },
-                  "name": {
-                    "type": "string",
-                    "enum": ["Alice"]
-                  }
+                  "displayname": {"const": "Alice Hansen"},
+                  "id": {"pattern": "^%user_id_pattern%$"},
+                  "name": {"const": "Alice"}
                 }
               }
             }
           },
-          "notification_id": {
-            "type": "string"
-          },
-          "object_id": {
-            "type": "string"
-          },
-          "object_type": {
-            "type": "string",
-            "enum": ["share"]
-          },
-          "subject": {
-            "type": "string",
-            "enum": ["Resource shared"]
-          },
-          "subjectRich": {
-            "type": "string",
-            "enum": ["Resource shared"]
-          },
-          "user": {
-            "type": "string",
-            "enum": ["Alice"]
-          }
+          "notification_id": {"type": "string"},
+          "object_id": {"type": "string"},
+          "object_type": {"const": "share"},
+          "subject": {"const": "Resource shared"},
+          "subjectRich": {"const": "Resource shared"},
+          "user": {"const": "Alice"}
         }
       }
       """
-    Examples:
-      | resource      |
-      | textfile1.txt |
-      | my_data       |
-
-
-  Scenario Outline: user gets a notification of unsharing resource
-    Given user "Alice" has sent the following resource share invitation:
-      | resource        | <resource> |
-      | space           | Personal   |
-      | sharee          | Brian      |
-      | shareType       | user       |
-      | permissionsRole | Viewer     |
-    And user "Alice" has removed the access of user "Brian" from resource "<resource>" of space "Personal"
-    When user "Brian" lists all notifications
-    Then the HTTP status code should be "200"
-    And the JSON response should contain a notification message with the subject "Resource unshared" and the message-details should match
+    And user "Brian" should have received the following email from user "Alice"
       """
-      {
-      "type": "object",
-        "required": [
-          "app",
-          "datetime",
-          "message",
-          "messageRich",
-          "messageRichParameters",
-          "notification_id",
-          "object_id",
-          "object_type",
-          "subject",
-          "subjectRich",
-          "user"
-        ],
-        "properties": {
-          "app": {
-            "type": "string",
-            "enum": ["userlog"]
-          },
-          "message": {
-            "type": "string",
-            "enum": ["Alice Hansen unshared <resource> with you"]
-          },
-          "messageRich": {
-            "type": "string",
-            "enum": ["{user} unshared {resource} with you"]
-          },
-          "messageRichParameters": {
-            "type": "object",
-            "required": [
-              "resource",
-              "user"
-            ],
-            "properties": {
-              "resource": {
-                "type": "object",
-                "required": [
-                  "id",
-                  "name"
-                ],
-                "properties": {
-                  "id": {
-                    "type": "string",
-                    "pattern": "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}\\$[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}![a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"
-                  },
-                  "name": {
-                    "type": "string",
-                    "enum": ["<resource>"]
-                  }
-                }
-              },
-              "user": {
-                "type": "object",
-                "required": [
-                  "displayname",
-                  "id",
-                  "name"
-                ],
-                "properties": {
-                  "displayname": {
-                    "type": "string",
-                    "enum": ["Alice Hansen"]
-                  },
-                  "id": {
-                    "type": "string",
-                    "pattern": "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"
-                  },
-                  "name": {
-                    "type": "string",
-                    "enum": ["Alice"]
-                  }
-                }
-              }
-            }
-          },
-          "notification_id": {
-            "type": "string"
-          },
-          "object_id": {
-            "type": "string"
-          },
-          "object_type": {
-            "type": "string",
-            "enum": ["share"]
-          },
-          "subject": {
-            "type": "string",
-            "enum": ["Resource unshared"]
-          },
-          "subjectRich": {
-            "type": "string",
-            "enum": ["Resource unshared"]
-          },
-          "user": {
-            "type": "string",
-            "enum": ["Alice"]
-          }
-        }
-      }
+      Hello Brian Murphy
+
+      %displayname% has shared "<resource>" with you.
+
+      Click here to view it: %base_url%/files/shares/with-me
       """
     Examples:
       | resource      |
@@ -315,7 +154,7 @@ Feature: Notification
       """
 
 
-  Scenario Outline: notifications related to a resource get deleted when the resource is deleted
+  Scenario Outline: in-app notifications related to a resource get deleted when the resource is deleted
     Given user "Alice" has sent the following resource share invitation:
       | resource        | <resource> |
       | space           | Personal   |
@@ -332,7 +171,7 @@ Feature: Notification
       | textfile1.txt |
       | my_data       |
 
-  @issue-10966
+  @issue-10966 @email
   Scenario: check share expired in-app and mail notifications for Personal space file
     Given using SharingNG
     And user "Alice" has uploaded file with content "hello world" to "testfile.txt"
@@ -357,7 +196,7 @@ Feature: Notification
       Even though this share has been revoked you still might have access through other shares and/or space memberships.
       """
 
-  @issue-10966
+  @issue-10966 @email
   Scenario: check share expired in-app and mail notifications for Personal space folder
     Given using SharingNG
     And user "Alice" has created folder "folderToShare"
@@ -381,3 +220,173 @@ Feature: Notification
 
       Even though this share has been revoked you still might have access through other shares and/or space memberships.
       """
+
+  @issue-10904 @email
+  Scenario Outline: user gets an in-app and mail notifications of unsharing resource
+    Given user "Alice" has sent the following resource share invitation:
+      | resource        | <resource> |
+      | space           | Personal   |
+      | sharee          | Brian      |
+      | shareType       | user       |
+      | permissionsRole | Viewer     |
+    When user "Alice" removes the access of user "Brian" from resource "<resource>" of space "Personal" using the Graph API
+    Then the HTTP status code should be "204"
+    And user "Brian" should get a notification with subject "Resource unshared" and message:
+      | message                                   |
+      | Alice Hansen unshared <resource> with you |
+    And user "Brian" should have received the following email from user "Alice" about the share of project space "<resource>"
+      """
+      Hello Brian Murphy,
+
+      %displayname% has unshared '<resource>' with you.
+
+      Even though this share has been revoked you still might have access through other shares and/or space memberships.
+      """
+    Examples:
+      | resource      |
+      | textfile1.txt |
+      | my_data       |
+
+  @issue-10904 @email
+  Scenario Outline: user gets in-app and mail notifications when a resource is unshared (Project Space)
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "shared-space" with the default quota using the Graph API
+    And user "Alice" has created a folder "SHARED-FOLDER" in space "shared-space"
+    And user "Alice" has uploaded a file inside space "shared-space" with content "Sample data" to "file-to-share.txt"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | <resource>   |
+      | space           | shared-space |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | Viewer       |
+    When user "Alice" removes the access of user "Brian" from resource "<resource>" of space "shared-space" using the Graph API
+    Then the HTTP status code should be "204"
+    And user "Brian" should get a notification with subject "Resource unshared" and message:
+      | message                                   |
+      | Alice Hansen unshared <resource> with you |
+    And user "Brian" should have received the following email from user "Alice" about the share of project space "<resource>"
+      """
+      Hello Brian Murphy,
+
+      %displayname% has unshared '<resource>' with you.
+
+      Even though this share has been revoked you still might have access through other shares and/or space memberships.
+      """
+    Examples:
+      | resource          |
+      | file-to-share.txt |
+      | SHARED-FOLDER     |
+
+  @issue-9530 @email
+  Scenario: user gets an in-app and mail notifications when someone with comma in display name shares a file
+    Given the administrator has assigned the role "Admin" to user "Brian" using the Graph API
+    And the user "Brian" has created a new user with the following attributes:
+      | userName    | David             |
+      | displayName | David, Lopez      |
+      | email       | david@example.com |
+      | password    | 1234              |
+    And user "David" has uploaded file with content "sample text" to "lorem.txt"
+    When user "David" sends the following resource share invitation using the Graph API:
+      | resource        | lorem.txt |
+      | space           | Personal  |
+      | sharee          | Brian     |
+      | shareType       | user      |
+      | permissionsRole | Viewer    |
+    Then the HTTP status code should be "200"
+    And user "Brian" should get a notification with subject "Resource shared" and message:
+      | message                                |
+      | David, Lopez shared lorem.txt with you |
+    And user "Brian" should have received the following email from user "David"
+      """
+      Hello Brian Murphy
+
+      David, Lopez has shared "lorem.txt" with you.
+
+      Click here to view it: %base_url%/files/shares/with-me
+      """
+
+  @email
+  Scenario Outline: group members gets an in-app and mail notifications in their respective languages when someone shares resources with the group
+    Given group "group1" has been created
+    And user "Brian" has been added to group "group1"
+    And user "Carol" has been added to group "group1"
+    And user "Brian" has switched the system language to "es" using the Graph API
+    And user "Carol" has switched the system language to "de" using the Graph API
+    And user "Alice" has created folder "HelloWorld"
+    And user "Alice" has uploaded file with content "hello world" to "text.txt"
+    When user "Alice" sends the following resource share invitation using the Graph API:
+      | resource        | <resource> |
+      | space           | Personal   |
+      | sharee          | group1     |
+      | shareType       | group      |
+      | permissionsRole | Viewer     |
+    Then the HTTP status code should be "200"
+    And user "Brian" should get a notification with subject "Recurso compartido" and message:
+      | message                                   |
+      | Alice Hansen compartió <resource> contigo |
+    And user "Carol" should get a notification with subject "Neue Freigabe" and message:
+      | message                                   |
+      | Alice Hansen hat <resource> mit Ihnen geteilt |
+    And user "Brian" should have received the following email from user "Alice"
+      """
+      Hola Brian Murphy
+
+      %displayname% ha compartido "<resource>" contigo.
+
+      Click aquí para verlo: %base_url%/files/shares/with-me
+      """
+    And user "Carol" should have received the following email from user "Alice"
+      """
+      Hallo Carol King
+
+      %displayname% hat "<resource>" mit Ihnen geteilt.
+
+      Zum Ansehen hier klicken: %base_url%/files/shares/with-me
+      """
+    Examples:
+      | resource   |
+      | HelloWorld |
+      | text.txt   |
+
+  @env-config @email
+  Scenario Outline: group members gets an in-app and mail notifications in default language when someone shares a file with the group
+    Given the config "OCIS_DEFAULT_LANGUAGE" has been set to "de"
+    And group "group1" has been created
+    And user "Brian" has been added to group "group1"
+    And user "Carol" has been added to group "group1"
+    And user "Alice" has created folder "HelloWorld"
+    And user "Alice" has uploaded file with content "hello world" to "text.txt"
+    When user "Alice" sends the following resource share invitation using the Graph API:
+      | resource        | <resource> |
+      | space           | Personal   |
+      | sharee          | group1     |
+      | shareType       | group      |
+      | permissionsRole | Viewer     |
+    Then the HTTP status code should be "200"
+    And user "Brian" should get a notification with subject "Neue Freigabe" and message:
+      | message                                     |
+      | Alice Hansen hat <resource> mit Ihnen geteilt |
+    And user "Carol" should get a notification with subject "Neue Freigabe" and message:
+      | message                                     |
+      | Alice Hansen hat <resource> mit Ihnen geteilt |
+    And user "Brian" should have received the following email from user "Alice"
+      """
+      Hallo Brian Murphy
+
+      %displayname% hat "<resource>" mit Ihnen geteilt.
+
+      Zum Ansehen hier klicken: %base_url%/files/shares/with-me
+      """
+    And user "Carol" should have received the following email from user "Alice"
+      """
+      Hallo Carol King
+
+      %displayname% hat "<resource>" mit Ihnen geteilt.
+
+      Zum Ansehen hier klicken: %base_url%/files/shares/with-me
+      """
+    Examples:
+      | resource   |
+      | HelloWorld |
+      | text.txt   |
