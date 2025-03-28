@@ -75,7 +75,7 @@ To run the tests that require an email server (tests tagged with `@email`), you 
 ```bash
 START_EMAIL=true \
 OCIS_ADD_RUN_SERVICES=notifications \
-BEHAT_FEATURE='tests/acceptance/features/apiNotification/emailNotification.feature' \
+BEHAT_FEATURE='tests/acceptance/features/apiNotification/notification.feature' \
 make -C tests/acceptance/docker test-ocis-feature-ocis-storage
 ```
 
@@ -373,7 +373,7 @@ Run the acceptance test with the following command:
 TEST_SERVER_URL="https://localhost:9200" \
 EMAIL_HOST="localhost" \
 EMAIL_PORT=8025 \
-BEHAT_FEATURE="tests/acceptance/features/apiNotification/emailNotification.feature" \
+BEHAT_FEATURE="tests/acceptance/features/apiNotification/notification.feature" \
 make test-acceptance-api
 ```
 
