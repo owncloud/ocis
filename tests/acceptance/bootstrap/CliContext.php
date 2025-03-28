@@ -129,6 +129,7 @@ class CliContext implements Context {
 
 	/**
 	 * @When the administrator creates auth-app token for user :user with expiration time :expirationTime using the auth-app CLI
+	 * @When the administrator tries to create auth-app token for user :user with expiration time :expirationTime using the auth-app CLI
 	 *
 	 * @param string $user
 	 * @param string $expirationTime
@@ -287,19 +288,28 @@ class CliContext implements Context {
 	}
 
 	/**
-	 * @Then the command should be successful
+	 * @Then /^the command should be (successful|unsuccessful)$/
+	 *
+	 * @param string $successfulOrNot
 	 *
 	 * @return void
 	 */
-	public function theCommandShouldBeSuccessful(): void {
+	public function theCommandShouldBeSuccessful(string $successfulOrNot): void {
 		$response = $this->featureContext->getResponse();
 		$this->featureContext->theHTTPStatusCodeShouldBe(200, '', $response);
 
 		$jsonResponse = $this->featureContext->getJsonDecodedResponse($response);
 
-		Assert::assertSame("OK", $jsonResponse["status"]);
+		$expectedStatus = 'OK';
+		$expectedExitCode = 0;
+		if ($successfulOrNot === "unsuccessful") {
+			$expectedStatus = "ERROR";
+			$expectedExitCode = 1;
+		}
+
+		Assert::assertSame($expectedStatus, $jsonResponse["status"]);
 		Assert::assertSame(
-			0,
+			$expectedExitCode,
 			$jsonResponse["exitCode"],
 			"Expected exit code to be 0, but got " . $jsonResponse["exitCode"]
 		);
