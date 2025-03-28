@@ -29,13 +29,6 @@ reva:
     cacert: ""
 app_registry:
   mimetypes:
-  - mime_type: application/pdf
-    extension: pdf
-    name: PDF
-    description: PDF document
-    icon: ""
-    default_app: ""
-    allow_creation: false
   - mime_type: application/vnd.oasis.opendocument.text
     extension: odt
     name: OpenDocument
@@ -70,7 +63,7 @@ app_registry:
     description: Form Document
     icon: ""
     default_app: ""
-    allow_creation: true
+    allow_creation: false
   - mime_type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
     extension: xlsx
     name: Microsoft Excel
@@ -82,6 +75,13 @@ app_registry:
     extension: pptx
     name: Microsoft PowerPoint
     description: Microsoft PowerPoint document
+    icon: ""
+    default_app: ""
+    allow_creation: true
+  - mime_type: application/pdf
+    extension: pdf
+    name: PDF form
+    description: PDF form document
     icon: ""
     default_app: ""
     allow_creation: true
