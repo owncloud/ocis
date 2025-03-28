@@ -1243,9 +1243,20 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (*ConnectorResponse, 
 		}
 	}
 	// fileinfo map
+	var size interface{}
+	size = int64(statRes.GetInfo().GetSize())
+	// OnlyOffice requires a 0 size of files for "pdf" files, for extensions "docx", "xlsx", "pptx" it is optional
+	// For other extensions like "ods", "odt", "odp" the 0 size should be omitted
+	if strings.ToLower(f.cfg.App.Product) == "onlyoffice" && statRes.GetInfo().GetSize() == 0 {
+		ext := strings.ToLower(path.Ext(statRes.GetInfo().GetPath()))
+		if ext != ".pdf" {
+			size = nil
+		}
+	}
+
 	infoMap := map[string]interface{}{
 		fileinfo.KeyOwnerID:           hexEncodedOwnerId,
-		fileinfo.KeySize:              int64(statRes.GetInfo().GetSize()),
+		fileinfo.KeySize:              size,
 		fileinfo.KeyVersion:           getVersion(statRes.GetInfo().GetMtime()),
 		fileinfo.KeyBaseFileName:      path.Base(statRes.GetInfo().GetPath()),
 		fileinfo.KeyBreadcrumbDocName: path.Base(statRes.GetInfo().GetPath()),
