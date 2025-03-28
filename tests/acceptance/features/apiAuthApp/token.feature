@@ -271,3 +271,15 @@ Feature: create auth-app token
     And user "Brian" has created auth-app token with expiration time "72h" using the auth-app API
     When user "Admin" tries to delete the last created auth-app token using the auth-app API
     Then the HTTP status code should be "403"
+
+
+  Scenario: admin user creates user using auth-app token
+    And user "Admin" has created auth-app token with expiration time "1h" using the auth-app API
+    When the administrator creates user "Brian" using the auth-app token
+    Then the HTTP status code should be "201"
+
+
+  Scenario: user lists their drives using auth-app token
+    Given user "Alice" has created auth-app token with expiration time "1h" using the auth-app API
+    When user "Alice" lists all her drives using the auth-app token
+    Then the HTTP status code should be "200"
