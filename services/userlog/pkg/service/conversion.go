@@ -240,26 +240,14 @@ func (c *Converter) shareMessage(eventid string, nt NotificationTemplate, execut
 }
 
 func (c *Converter) omcShareCreatedMessage(ev events.OCMCoreShareCreated, eventid string) (OC10Notification, error) {
-	gwc, err := c.gatewaySelector.Next()
-	if err != nil {
-		return OC10Notification{}, err
-	}
-
-	// Context c.serviceAccountContext will cause the user to be not found.
-	// GetAcceptedUser() calls getUserFilter() that gets the user from the context
-	// and use it as 'initiator' parameter in the GetRemoteUser() call.
-	// The 'initiator' should be ev.Grantee.
-	rspSharer, err := gwc.GetAcceptedUser(context.Background(), &invitepb.GetAcceptedUserRequest{
-		RemoteUserId: ev.Sharer,
-		Opaque:       utils.AppendJSONToOpaque(nil, "user-filter", ev.Grantee),
-	})
+	sharerUser, err := c.getOCMUser(ev.Sharer, ev.Grantee)
 	if err != nil {
 		return OC10Notification{}, err
 	}
 
 	shareid := &collaboration.ShareId{OpaqueId: ev.ShareID}
 	subj, subjraw, msg, msgraw, err := composeMessage(ShareCreated, c.locale, c.defaultLanguage, c.translationPath, map[string]interface{}{
-		"username":     rspSharer.RemoteUser.GetDisplayName(),
+		"username":     sharerUser.GetDisplayName(),
 		"resourcename": ev.ResourceName,
 	})
 	if err != nil {
@@ -269,7 +257,7 @@ func (c *Converter) omcShareCreatedMessage(ev events.OCMCoreShareCreated, eventi
 	return OC10Notification{
 		EventID:        eventid,
 		Service:        c.serviceName,
-		UserName:       rspSharer.RemoteUser.GetDisplayName(),
+		UserName:       sharerUser.GetDisplayName(),
 		Timestamp:      utils.TSToTime(ev.CTime).Format(time.RFC3339Nano),
 		ResourceID:     ev.ItemID,
 		ResourceType:   _resourceTypeShare,
@@ -277,31 +265,19 @@ func (c *Converter) omcShareCreatedMessage(ev events.OCMCoreShareCreated, eventi
 		SubjectRaw:     subjraw,
 		Message:        msg,
 		MessageRaw:     msgraw,
-		MessageDetails: generateDetails(rspSharer.GetRemoteUser(), nil, nil, shareid),
+		MessageDetails: generateDetails(sharerUser, nil, nil, shareid),
 	}, nil
 }
 
 func (c *Converter) omcShareDeleteMessage(ev events.OCMCoreShareDelete, eventid string) (OC10Notification, error) {
-	gwc, err := c.gatewaySelector.Next()
-	if err != nil {
-		return OC10Notification{}, err
-	}
-
-	// Context c.serviceAccountContext will cause the user to be not found.
-	// GetAcceptedUser() calls getUserFilter() that gets the user from the context
-	// and use it as 'initiator' parameter in the GetRemoteUser() call.
-	// The 'initiator' should be ev.Grantee.
-	rspSharer, err := gwc.GetAcceptedUser(context.Background(), &invitepb.GetAcceptedUserRequest{
-		RemoteUserId: ev.Sharer,
-		Opaque:       utils.AppendJSONToOpaque(nil, "user-filter", ev.Grantee),
-	})
+	sharerUser, err := c.getOCMUser(ev.Sharer, ev.Grantee)
 	if err != nil {
 		return OC10Notification{}, err
 	}
 
 	shareid := &collaboration.ShareId{OpaqueId: ev.ShareID}
 	subj, subjraw, msg, msgraw, err := composeMessage(ShareRemoved, c.locale, c.defaultLanguage, c.translationPath, map[string]interface{}{
-		"username":     rspSharer.RemoteUser.GetDisplayName(),
+		"username":     sharerUser.GetDisplayName(),
 		"resourcename": ev.ResourceName,
 	})
 	if err != nil {
@@ -311,7 +287,7 @@ func (c *Converter) omcShareDeleteMessage(ev events.OCMCoreShareDelete, eventid 
 	return OC10Notification{
 		EventID:        eventid,
 		Service:        c.serviceName,
-		UserName:       rspSharer.RemoteUser.GetDisplayName(),
+		UserName:       sharerUser.GetDisplayName(),
 		Timestamp:      utils.TSToTime(ev.CTime).Format(time.RFC3339Nano),
 		ResourceID:     ev.ShareID,
 		ResourceType:   _resourceTypeShare,
@@ -319,7 +295,7 @@ func (c *Converter) omcShareDeleteMessage(ev events.OCMCoreShareDelete, eventid 
 		SubjectRaw:     subjraw,
 		Message:        msg,
 		MessageRaw:     msgraw,
-		MessageDetails: generateDetails(rspSharer.GetRemoteUser(), nil, nil, shareid),
+		MessageDetails: generateDetails(sharerUser, nil, nil, shareid),
 	}, nil
 }
 
@@ -405,6 +381,26 @@ func (c *Converter) deprovisionMessage(nt NotificationTemplate, deproDate string
 		MessageRaw:     msgraw,
 		MessageDetails: map[string]interface{}{},
 	}, nil
+}
+
+func (c *Converter) getOCMUser(sharer *user.UserId, grantee *user.UserId) (*user.User, error) {
+	gwc, err := c.gatewaySelector.Next()
+	if err != nil {
+		return nil, err
+	}
+
+	// Context c.serviceAccountContext will cause the user to be not found.
+	// GetAcceptedUser() calls getUserFilter() that gets the user from the context
+	// and use it as 'initiator' parameter in the GetRemoteUser() call.
+	// The 'initiator' should be ev.Grantee.
+	rspSharer, err := gwc.GetAcceptedUser(context.Background(), &invitepb.GetAcceptedUserRequest{
+		RemoteUserId: sharer,
+		Opaque:       utils.AppendJSONToOpaque(nil, "user-filter", grantee),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return rspSharer.GetRemoteUser(), nil
 }
 
 func (c *Converter) getSpace(ctx context.Context, spaceID string) (*storageprovider.StorageSpace, error) {
