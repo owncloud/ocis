@@ -10,6 +10,7 @@ import (
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/owncloud/reva/v2/pkg/events"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
@@ -183,8 +184,16 @@ func (ul *UserlogService) processEvent(event events.Event) {
 		users, err = utils.ResolveID(ctx, e.GranteeUserID, e.GranteeGroupID, gwc)
 	case events.ShareExpired:
 		users, err = utils.ResolveID(ctx, e.GranteeUserID, e.GranteeGroupID, gwc)
-	}
 
+	// ocmcore share related
+	case events.OCMCoreShareCreated:
+		executant = e.Sharer
+		users = append(users, e.Grantee.GetOpaqueId())
+	case events.OCMCoreShareDelete:
+		fmt.Println("### userlog processEvent OCMCoreShareDelete", e.Sharer, e.Grantee)
+		executant = e.Sharer
+		users = append(users, e.Grantee.GetOpaqueId())
+	}
 	if err != nil {
 		// TODO: Find out why this errors on ci pipeline
 		ul.log.Debug().Err(err).Interface("event", event).Msg("error gathering members for event")
