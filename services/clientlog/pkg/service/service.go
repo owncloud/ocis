@@ -165,19 +165,18 @@ func (cl *ClientlogService) processEvent(event events.Event) {
 	case events.OCMCoreShareCreated:
 		// QUESTION: How is the event used? So the useful fields are filled
 		evType = "ocm-share-created"
-		users = []string{e.GranteeUserID.GetOpaqueId()}
+		users = []string{e.Grantee.GetOpaqueId()}
 		data = FileEvent{
 			ItemID:          e.ItemID,
-			AffectedUserIDs: []string{e.GranteeUserID.GetOpaqueId()},
+			AffectedUserIDs: []string{e.Grantee.GetOpaqueId()},
 		}
-
 	case events.OCMCoreShareDelete:
 		// QUESTION: How is the event used? So the useful fields are filled
 		evType = "ocm-share-delete"
-		users = []string{e.GranteeUserID}
+		users = []string{e.Grantee.GetOpaqueId()}
 		data = FileEvent{
 			ItemName:        e.ResourceName,
-			AffectedUserIDs: []string{e.GranteeUserID},
+			AffectedUserIDs: []string{e.Grantee.GetOpaqueId()},
 		}
 	}
 

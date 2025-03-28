@@ -10,6 +10,7 @@ import (
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/owncloud/reva/v2/pkg/events"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
@@ -24,7 +25,6 @@ import (
 	ehsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/eventhistory/v0"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/userlog/pkg/config"
-	ocmuser "github.com/owncloud/reva/v2/pkg/ocm/user"
 )
 
 // UserlogService is the service responsible for user activities
@@ -185,13 +185,14 @@ func (ul *UserlogService) processEvent(event events.Event) {
 	case events.ShareExpired:
 		users, err = utils.ResolveID(ctx, e.GranteeUserID, e.GranteeGroupID, gwc)
 
+	// ocmcore share related
 	case events.OCMCoreShareCreated:
-		executant = e.Executant
-		users = append(users, e.GranteeUserID.GetOpaqueId())
-
+		executant = e.Sharer
+		users = append(users, e.Grantee.GetOpaqueId())
 	case events.OCMCoreShareDelete:
-		executant = ocmuser.RemoteIDFromOpaqueID(e.ExecutantUserID)
-		users = append(users, e.GranteeUserID)
+		fmt.Println("### userlog processEvent OCMCoreShareDelete", e.Sharer, e.Grantee)
+		executant = e.Sharer
+		users = append(users, e.Grantee.GetOpaqueId())
 	}
 	if err != nil {
 		// TODO: Find out why this errors on ci pipeline
@@ -229,7 +230,6 @@ func (ul *UserlogService) GetEvents(ctx context.Context, userid string) ([]*ehms
 	}
 
 	if len(rec) == 0 {
-		// no events available
 		return []*ehmsg.Event{}, nil
 	}
 

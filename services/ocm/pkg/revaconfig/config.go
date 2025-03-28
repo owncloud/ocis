@@ -168,6 +168,9 @@ func OCMConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]inter
 							"file": cfg.OCMCore.Drivers.JSON.File,
 						},
 					},
+					"service_account_id":     cfg.ServiceAccount.ID,
+					"service_account_secret": cfg.ServiceAccount.Secret,
+					"gateway_endpoint":       cfg.Reva.Address,
 				},
 				"storageprovider": map[string]interface{}{
 					"driver": "ocmreceived",

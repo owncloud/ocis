@@ -12,6 +12,9 @@ import (
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	invitepb "github.com/cs3org/go-cs3apis/cs3/ocm/invite/v1beta1"
+	typespb "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+
 	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/owncloud/ocis/v2/ocis-pkg/l10n"
@@ -118,7 +121,7 @@ func (c *Converter) ConvertEvent(eventid string, event interface{}) (OC10Notific
 	case events.OCMCoreShareCreated:
 		return c.omcShareCreatedMessage(ev, eventid)
 	case events.OCMCoreShareDelete:
-		return c.omcShareRemoveMessage(ev, eventid)
+		return c.omcShareDeleteMessage(ev, eventid)
 	}
 }
 
@@ -238,16 +241,44 @@ func (c *Converter) shareMessage(eventid string, nt NotificationTemplate, execut
 }
 
 func (c *Converter) omcShareCreatedMessage(ev events.OCMCoreShareCreated, eventid string) (OC10Notification, error) {
-	// TOOD: resolve the username and reuse "Share" template message with localisation
-	nt := OCMShareCreated
+	gwc, err := c.gatewaySelector.Next()
+	if err != nil {
+		return OC10Notification{}, err
+	}
+
+	// Context c.serviceAccountContext will cause the user to be not found.
+	// GetAcceptedUser() calls getUserFilter() that gets the user from the context
+	// and use it as 'initiator' parameter in the GetRemoteUser() call.
+	// The 'initiator' should be ev.Grantee.
+	granteeJson, _ := json.Marshal(ev.Grantee)
+	rspSharer, err := gwc.GetAcceptedUser(context.Background(), &invitepb.GetAcceptedUserRequest{
+		RemoteUserId: ev.Sharer,
+		Opaque: &typespb.Opaque{
+			Map: map[string]*typespb.OpaqueEntry{
+				"user-filter": {
+					Decoder: "json",
+					Value:   granteeJson,
+				},
+			},
+		},
+	})
+	if err != nil {
+		return OC10Notification{}, err
+	}
+
 	shareid := &collaboration.ShareId{OpaqueId: ev.ShareID}
-	subj, subjraw, msg, msgraw, _ := composeMessage(nt, c.locale, c.defaultLanguage, c.translationPath, map[string]interface{}{
+	subj, subjraw, msg, msgraw, err := composeMessage(ShareCreated, c.locale, c.defaultLanguage, c.translationPath, map[string]interface{}{
+		"username":     rspSharer.RemoteUser.GetDisplayName(),
 		"resourcename": ev.ResourceName,
 	})
+	if err != nil {
+		return OC10Notification{}, err
+	}
 
 	return OC10Notification{
 		EventID:        eventid,
 		Service:        c.serviceName,
+		UserName:       rspSharer.RemoteUser.GetDisplayName(),
 		Timestamp:      utils.TSToTime(ev.CTime).Format(time.RFC3339Nano),
 		ResourceID:     ev.ItemID,
 		ResourceType:   _resourceTypeShare,
@@ -255,26 +286,57 @@ func (c *Converter) omcShareCreatedMessage(ev events.OCMCoreShareCreated, eventi
 		SubjectRaw:     subjraw,
 		Message:        msg,
 		MessageRaw:     msgraw,
-		MessageDetails: generateDetails(nil, nil, nil, shareid),
+		MessageDetails: generateDetails(rspSharer.GetRemoteUser(), nil, nil, shareid),
 	}, nil
 }
 
-func (c *Converter) omcShareRemoveMessage(ev events.OCMCoreShareDelete, eventid string) (OC10Notification, error) {
-	// TOOD: resolve the username and reuse "Share" template message with localisation
-	nt := OCMShareRemove
-	subj, subjraw, msg, msgraw, _ := composeMessage(nt, c.locale, c.defaultLanguage, c.translationPath, map[string]interface{}{
+func (c *Converter) omcShareDeleteMessage(ev events.OCMCoreShareDelete, eventid string) (OC10Notification, error) {
+	gwc, err := c.gatewaySelector.Next()
+	if err != nil {
+		return OC10Notification{}, err
+	}
+
+	// Context c.serviceAccountContext will cause the user to be not found.
+	// GetAcceptedUser() calls getUserFilter() that gets the user from the context
+	// and use it as 'initiator' parameter in the GetRemoteUser() call.
+	// The 'initiator' should be ev.Grantee.
+	granteeJson, _ := json.Marshal(ev.Grantee)
+	rspSharer, err := gwc.GetAcceptedUser(context.Background(), &invitepb.GetAcceptedUserRequest{
+		RemoteUserId: ev.Sharer,
+		Opaque: &typespb.Opaque{
+			Map: map[string]*typespb.OpaqueEntry{
+				"user-filter": {
+					Decoder: "json",
+					Value:   granteeJson,
+				},
+			},
+		},
+	})
+	if err != nil {
+		return OC10Notification{}, err
+	}
+
+	shareid := &collaboration.ShareId{OpaqueId: ev.ShareID}
+	subj, subjraw, msg, msgraw, err := composeMessage(ShareRemoved, c.locale, c.defaultLanguage, c.translationPath, map[string]interface{}{
+		"username":     rspSharer.RemoteUser.GetDisplayName(),
 		"resourcename": ev.ResourceName,
 	})
+	if err != nil {
+		return OC10Notification{}, err
+	}
+
 	return OC10Notification{
 		EventID:        eventid,
 		Service:        c.serviceName,
+		UserName:       rspSharer.RemoteUser.GetDisplayName(),
 		Timestamp:      utils.TSToTime(ev.CTime).Format(time.RFC3339Nano),
+		ResourceID:     ev.ShareID,
 		ResourceType:   _resourceTypeShare,
 		Subject:        subj,
 		SubjectRaw:     subjraw,
 		Message:        msg,
 		MessageRaw:     msgraw,
-		MessageDetails: generateDetails(nil, nil, nil, nil),
+		MessageDetails: generateDetails(rspSharer.GetRemoteUser(), nil, nil, shareid),
 	}, nil
 }
 
