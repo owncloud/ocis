@@ -16,6 +16,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/search/pkg/config"
 	"github.com/owncloud/ocis/v2/services/search/pkg/content"
 	contentMocks "github.com/owncloud/ocis/v2/services/search/pkg/content/mocks"
+	"github.com/owncloud/ocis/v2/services/search/pkg/engine"
 	engineMocks "github.com/owncloud/ocis/v2/services/search/pkg/engine/mocks"
 	"github.com/owncloud/ocis/v2/services/search/pkg/search"
 	revactx "github.com/owncloud/reva/v2/pkg/ctx"
@@ -63,13 +64,49 @@ var _ = Describe("Searchprovider", func() {
 		ri = &sprovider.ResourceInfo{
 			Id: &sprovider.ResourceId{
 				StorageId: "storageid",
+				SpaceId:   "spaceid",
 				OpaqueId:  "opaqueid",
 			},
 			ParentId: &sprovider.ResourceId{
 				StorageId: "storageid",
+				SpaceId:   "spaceid",
 				OpaqueId:  "parentopaqueid",
 			},
-			Path:  "foo.pdf",
+			Path:  "./foo.pdf",
+			Size:  12345,
+			Mtime: &typesv1beta1.Timestamp{Seconds: 4000},
+		}
+
+		ri2 = &sprovider.ResourceInfo{
+			Id: &sprovider.ResourceId{
+				StorageId: "storageid",
+				SpaceId:   "spaceid",
+				OpaqueId:  "opaqueid",
+			},
+			ParentId: &sprovider.ResourceId{
+				StorageId: "storageid",
+				SpaceId:   "spaceid",
+				OpaqueId:  "parentopaqueid",
+			},
+			Type:  sprovider.ResourceType_RESOURCE_TYPE_CONTAINER,
+			Path:  "./.space",
+			Size:  12345,
+			Mtime: &typesv1beta1.Timestamp{Seconds: 4000},
+		}
+
+		ri2_1 = &sprovider.ResourceInfo{
+			Id: &sprovider.ResourceId{
+				StorageId: "storageid",
+				SpaceId:   "spaceid",
+				OpaqueId:  "opaqueid_1",
+			},
+			ParentId: &sprovider.ResourceId{
+				StorageId: "storageid",
+				SpaceId:   "spaceid",
+				OpaqueId:  "opaqueid",
+			},
+			Type:  sprovider.ResourceType_RESOURCE_TYPE_FILE,
+			Path:  "./.space/file.pdf",
 			Size:  12345,
 			Mtime: &typesv1beta1.Timestamp{Seconds: 4000},
 		}
@@ -122,12 +159,43 @@ var _ = Describe("Searchprovider", func() {
 				User:   user,
 			}, nil)
 			extractor.On("Extract", mock.Anything, mock.Anything, mock.Anything).Return(content.Document{}, nil)
-			indexClient.On("Upsert", mock.Anything, mock.Anything).Return(nil)
+			indexClient.On("Upsert", mock.Anything, mock.MatchedBy(func(r engine.Resource) bool {
+				return r.ID == "storageid$spaceid!opaqueid" && r.Path == "./foo.pdf"
+			})).Return(nil)
 			indexClient.On("Search", mock.Anything, mock.Anything).Return(&searchsvc.SearchIndexResponse{}, nil)
-			gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(&sprovider.StatResponse{
+			gatewayClient.On("Stat", mock.Anything, mock.MatchedBy(func(sreq *sprovider.StatRequest) bool {
+				return sreq.Ref.ResourceId.StorageId == "storageid" &&
+					sreq.Ref.ResourceId.OpaqueId == "spaceid" &&
+					sreq.Ref.ResourceId.SpaceId == "spaceid"
+			})).Return(&sprovider.StatResponse{
 				Status: status.NewOK(context.Background()),
 				Info:   ri,
 			}, nil)
+			err := s.IndexSpace(&sprovider.StorageSpaceId{OpaqueId: "storageid$spaceid!spaceid"})
+			Expect(err).ShouldNot(HaveOccurred())
+		})
+
+		It("walks the space skipping .space directory", func() {
+			gatewayClient.On("GetUserByClaim", mock.Anything, mock.Anything).Return(&userv1beta1.GetUserByClaimResponse{
+				Status: status.NewOK(context.Background()),
+				User:   user,
+			}, nil)
+			extractor.On("Extract", mock.Anything, mock.Anything, mock.Anything).Return(content.Document{}, nil)
+			gatewayClient.On("ListContainer", mock.Anything, mock.Anything).Return(&sprovider.ListContainerResponse{
+				Status: status.NewOK(context.Background()),
+				Infos:  []*sprovider.ResourceInfo{ri2_1},
+			}, nil)
+			gatewayClient.On("Stat", mock.Anything, mock.MatchedBy(func(sreq *sprovider.StatRequest) bool {
+				return sreq.Ref.ResourceId.StorageId == "storageid" &&
+					sreq.Ref.ResourceId.OpaqueId == "spaceid" &&
+					sreq.Ref.ResourceId.SpaceId == "spaceid"
+			})).Return(&sprovider.StatResponse{
+				Status: status.NewOK(context.Background()),
+				Info:   ri2,
+			}, nil)
+
+			indexClient.AssertNotCalled(GinkgoT(), "Upsert", mock.Anything, mock.Anything)
+			indexClient.AssertNotCalled(GinkgoT(), "Search", mock.Anything, mock.Anything)
 			err := s.IndexSpace(&sprovider.StorageSpaceId{OpaqueId: "storageid$spaceid!spaceid"})
 			Expect(err).ShouldNot(HaveOccurred())
 		})
