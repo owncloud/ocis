@@ -1,6 +1,6 @@
 ---
 title: Postprocessing
-date: 2025-03-28T07:05:47.136836065Z
+date: 2025-03-28T08:52:56.779444244Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/postprocessing
