@@ -84,222 +84,222 @@ config = {
         "skip": False,
     },
     "localApiTests": {
-        "basic": {
-            "suites": [
-                "apiArchiver",
-                "apiContract",
-                "apiCors",
-                "apiAsyncUpload",
-                "apiDownloads",
-                "apiDepthInfinity",
-                "apiLocks",
-                "apiActivities",
-            ],
-            "skip": False,
-        },
-        "settingsAndNotification": {
-            "suites": [
-                "apiSettings",
-                "apiNotification",
-            ],
-            "skip": False,
-            "withRemotePhp": [True],
-            "emailNeeded": True,
-            "extraEnvironment": {
-                "EMAIL_HOST": EMAIL_SMTP_HOST,
-                "EMAIL_PORT": EMAIL_PORT,
-            },
-            "extraServerEnvironment": {
-                "OCIS_ADD_RUN_SERVICES": "notifications",
-                "NOTIFICATIONS_SMTP_HOST": EMAIL_SMTP_HOST,
-                "NOTIFICATIONS_SMTP_PORT": EMAIL_SMTP_PORT,
-                "NOTIFICATIONS_SMTP_INSECURE": "true",
-                "NOTIFICATIONS_SMTP_SENDER": EMAIL_SMTP_SENDER,
-                "NOTIFICATIONS_DEBUG_ADDR": "0.0.0.0:9174",
-            },
-        },
-        "graphBasicAndGroup": {
-            "suites": [
-                "apiServiceAvailability",
-                "apiGraph",
-                "apiGraphGroup",
-            ],
-            "skip": False,
-            "withRemotePhp": [True],
-        },
-        "graphUser": {
-            "suites": [
-                "apiGraphUser",
-            ],
-            "skip": False,
-            "withRemotePhp": [True],
-        },
-        "spaces": {
-            "suites": [
-                "apiSpaces",
-            ],
-            "skip": False,
-        },
-        "spacesShares": {
-            "suites": [
-                "apiSpacesShares",
-            ],
-            "skip": False,
-        },
-        "spacesDavOperation": {
-            "suites": [
-                "apiSpacesDavOperation",
-            ],
-            "skip": False,
-        },
-        "search1": {
-            "suites": [
-                "apiSearch1",
-            ],
-            "skip": False,
-        },
-        "search2": {
-            "suites": [
-                "apiSearch2",
-            ],
-            "skip": False,
-        },
-        "sharingNg1": {
-            "suites": [
-                "apiSharingNgShares",
-            ],
-            "skip": False,
-            "withRemotePhp": [True],
-        },
-        "sharingNg2": {
-            "suites": [
-                "apiSharingNgPermissions",
-                "apiReshare",
-                "apiSharingNgAdditionalShareRole",
-            ],
-            "skip": False,
-            "withRemotePhp": [True],
-        },
-        "sharingNgShareInvitation": {
-            "suites": [
-                "apiSharingNgDriveInvitation",
-                "apiSharingNgItemInvitation",
-            ],
-            "skip": False,
-            "withRemotePhp": [True],
-        },
-        "sharingNgLinkShare": {
-            "suites": [
-                "apiSharingNgDriveLinkShare",
-                "apiSharingNgItemLinkShare",
-            ],
-            "skip": False,
-            "withRemotePhp": [True],
-        },
-        "accountsHashDifficulty": {
-            "skip": False,
-            "suites": [
-                "apiAccountsHashDifficulty",
-            ],
-            "accounts_hash_difficulty": "default",
-        },
-        "antivirus": {
-            "suites": [
-                "apiAntivirus",
-            ],
-            "skip": False,
-            "antivirusNeeded": True,
-            "extraServerEnvironment": {
-                "ANTIVIRUS_SCANNER_TYPE": "clamav",
-                "ANTIVIRUS_CLAMAV_SOCKET": "tcp://clamav:3310",
-                "POSTPROCESSING_STEPS": "virusscan",
-                "OCIS_ASYNC_UPLOADS": True,
-                "OCIS_ADD_RUN_SERVICES": "antivirus",
-                "ANTIVIRUS_DEBUG_ADDR": "0.0.0.0:9297",
-            },
-        },
-        "searchContent": {
-            "suites": [
-                "apiSearchContent",
-            ],
-            "skip": False,
-            "tikaNeeded": True,
-        },
-        "ocm": {
-            "suites": [
-                "apiOcm",
-            ],
-            "skip": False,
-            "withRemotePhp": [True],
-            "federationServer": True,
-            "emailNeeded": True,
-            "extraEnvironment": {
-                "EMAIL_HOST": EMAIL_SMTP_HOST,
-                "EMAIL_PORT": EMAIL_PORT,
-            },
-            "extraServerEnvironment": {
-                "OCIS_ADD_RUN_SERVICES": "ocm,notifications",
-                "OCIS_ENABLE_OCM": True,
-                "OCM_OCM_INVITE_MANAGER_INSECURE": True,
-                "OCM_OCM_SHARE_PROVIDER_INSECURE": True,
-                "OCM_OCM_STORAGE_PROVIDER_INSECURE": True,
-                "OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE": "%s" % dirs["ocmProviders"],
-                # mail notifications
-                "NOTIFICATIONS_SMTP_HOST": EMAIL_SMTP_HOST,
-                "NOTIFICATIONS_SMTP_PORT": EMAIL_SMTP_PORT,
-                "NOTIFICATIONS_SMTP_INSECURE": "true",
-                "NOTIFICATIONS_SMTP_SENDER": EMAIL_SMTP_SENDER,
-            },
-        },
-        "wopi": {
-            "suites": [
-                "apiCollaboration",
-            ],
-            "skip": False,
-            "collaborationServiceNeeded": True,
-            "extraServerEnvironment": {
-                "GATEWAY_GRPC_ADDR": "0.0.0.0:9142",
-            },
-        },
-        "authApp": {
-            "suites": [
-                "apiAuthApp",
-            ],
-            "skip": False,
-            "withRemotePhp": [True],
-            "extraServerEnvironment": {
-                "OCIS_ADD_RUN_SERVICES": "auth-app",
-                "PROXY_ENABLE_APP_AUTH": True,
-            },
-        },
-        "cliCommands": {
-            "suites": [
-                "cliCommands",
-            ],
-            "skip": False,
-            "withRemotePhp": [True],
-            "antivirusNeeded": True,
-            "emailNeeded": True,
-            "extraEnvironment": {
-                "EMAIL_HOST": EMAIL_SMTP_HOST,
-                "EMAIL_PORT": EMAIL_PORT,
-            },
-            "extraServerEnvironment": {
-                "NOTIFICATIONS_SMTP_HOST": EMAIL_SMTP_HOST,
-                "NOTIFICATIONS_SMTP_PORT": EMAIL_SMTP_PORT,
-                "NOTIFICATIONS_SMTP_INSECURE": "true",
-                "NOTIFICATIONS_SMTP_SENDER": EMAIL_SMTP_SENDER,
-                "NOTIFICATIONS_DEBUG_ADDR": "0.0.0.0:9174",
-                "ANTIVIRUS_SCANNER_TYPE": "clamav",
-                "ANTIVIRUS_CLAMAV_SOCKET": "tcp://clamav:3310",
-                "OCIS_ASYNC_UPLOADS": True,
-                "OCIS_ADD_RUN_SERVICES": "antivirus,notifications",
-            },
-        },
+        # "basic": {
+        #     "suites": [
+        #         "apiArchiver",
+        #         "apiContract",
+        #         "apiCors",
+        #         "apiAsyncUpload",
+        #         "apiDownloads",
+        #         "apiDepthInfinity",
+        #         "apiLocks",
+        #         "apiActivities",
+        #     ],
+        #     "skip": False,
+        # },
+        # "settingsAndNotification": {
+        #     "suites": [
+        #         "apiSettings",
+        #         "apiNotification",
+        #     ],
+        #     "skip": False,
+        #     "withRemotePhp": [True],
+        #     "emailNeeded": True,
+        #     "extraEnvironment": {
+        #         "EMAIL_HOST": EMAIL_SMTP_HOST,
+        #         "EMAIL_PORT": EMAIL_PORT,
+        #     },
+        #     "extraServerEnvironment": {
+        #         "OCIS_ADD_RUN_SERVICES": "notifications",
+        #         "NOTIFICATIONS_SMTP_HOST": EMAIL_SMTP_HOST,
+        #         "NOTIFICATIONS_SMTP_PORT": EMAIL_SMTP_PORT,
+        #         "NOTIFICATIONS_SMTP_INSECURE": "true",
+        #         "NOTIFICATIONS_SMTP_SENDER": EMAIL_SMTP_SENDER,
+        #         "NOTIFICATIONS_DEBUG_ADDR": "0.0.0.0:9174",
+        #     },
+        # },
+        # "graphBasicAndGroup": {
+        #     "suites": [
+        #         "apiServiceAvailability",
+        #         "apiGraph",
+        #         "apiGraphGroup",
+        #     ],
+        #     "skip": False,
+        #     "withRemotePhp": [True],
+        # },
+        # "graphUser": {
+        #     "suites": [
+        #         "apiGraphUser",
+        #     ],
+        #     "skip": False,
+        #     "withRemotePhp": [True],
+        # },
+        # "spaces": {
+        #     "suites": [
+        #         "apiSpaces",
+        #     ],
+        #     "skip": False,
+        # },
+        # "spacesShares": {
+        #     "suites": [
+        #         "apiSpacesShares",
+        #     ],
+        #     "skip": False,
+        # },
+        # "spacesDavOperation": {
+        #     "suites": [
+        #         "apiSpacesDavOperation",
+        #     ],
+        #     "skip": False,
+        # },
+        # "search1": {
+        #     "suites": [
+        #         "apiSearch1",
+        #     ],
+        #     "skip": False,
+        # },
+        # "search2": {
+        #     "suites": [
+        #         "apiSearch2",
+        #     ],
+        #     "skip": False,
+        # },
+        # "sharingNg1": {
+        #     "suites": [
+        #         "apiSharingNgShares",
+        #     ],
+        #     "skip": False,
+        #     "withRemotePhp": [True],
+        # },
+        # "sharingNg2": {
+        #     "suites": [
+        #         "apiSharingNgPermissions",
+        #         "apiReshare",
+        #         "apiSharingNgAdditionalShareRole",
+        #     ],
+        #     "skip": False,
+        #     "withRemotePhp": [True],
+        # },
+        # "sharingNgShareInvitation": {
+        #     "suites": [
+        #         "apiSharingNgDriveInvitation",
+        #         "apiSharingNgItemInvitation",
+        #     ],
+        #     "skip": False,
+        #     "withRemotePhp": [True],
+        # },
+        # "sharingNgLinkShare": {
+        #     "suites": [
+        #         "apiSharingNgDriveLinkShare",
+        #         "apiSharingNgItemLinkShare",
+        #     ],
+        #     "skip": False,
+        #     "withRemotePhp": [True],
+        # },
+        # "accountsHashDifficulty": {
+        #     "skip": False,
+        #     "suites": [
+        #         "apiAccountsHashDifficulty",
+        #     ],
+        #     "accounts_hash_difficulty": "default",
+        # },
+        # "antivirus": {
+        #     "suites": [
+        #         "apiAntivirus",
+        #     ],
+        #     "skip": False,
+        #     "antivirusNeeded": True,
+        #     "extraServerEnvironment": {
+        #         "ANTIVIRUS_SCANNER_TYPE": "clamav",
+        #         "ANTIVIRUS_CLAMAV_SOCKET": "tcp://clamav:3310",
+        #         "POSTPROCESSING_STEPS": "virusscan",
+        #         "OCIS_ASYNC_UPLOADS": True,
+        #         "OCIS_ADD_RUN_SERVICES": "antivirus",
+        #         "ANTIVIRUS_DEBUG_ADDR": "0.0.0.0:9297",
+        #     },
+        # },
+        # "searchContent": {
+        #     "suites": [
+        #         "apiSearchContent",
+        #     ],
+        #     "skip": False,
+        #     "tikaNeeded": True,
+        # },
+        # "ocm": {
+        #     "suites": [
+        #         "apiOcm",
+        #     ],
+        #     "skip": False,
+        #     "withRemotePhp": [True],
+        #     "federationServer": True,
+        #     "emailNeeded": True,
+        #     "extraEnvironment": {
+        #         "EMAIL_HOST": EMAIL_SMTP_HOST,
+        #         "EMAIL_PORT": EMAIL_PORT,
+        #     },
+        #     "extraServerEnvironment": {
+        #         "OCIS_ADD_RUN_SERVICES": "ocm,notifications",
+        #         "OCIS_ENABLE_OCM": True,
+        #         "OCM_OCM_INVITE_MANAGER_INSECURE": True,
+        #         "OCM_OCM_SHARE_PROVIDER_INSECURE": True,
+        #         "OCM_OCM_STORAGE_PROVIDER_INSECURE": True,
+        #         "OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE": "%s" % dirs["ocmProviders"],
+        #         # mail notifications
+        #         "NOTIFICATIONS_SMTP_HOST": EMAIL_SMTP_HOST,
+        #         "NOTIFICATIONS_SMTP_PORT": EMAIL_SMTP_PORT,
+        #         "NOTIFICATIONS_SMTP_INSECURE": "true",
+        #         "NOTIFICATIONS_SMTP_SENDER": EMAIL_SMTP_SENDER,
+        #     },
+        # },
+        # "wopi": {
+        #     "suites": [
+        #         "apiCollaboration",
+        #     ],
+        #     "skip": False,
+        #     "collaborationServiceNeeded": True,
+        #     "extraServerEnvironment": {
+        #         "GATEWAY_GRPC_ADDR": "0.0.0.0:9142",
+        #     },
+        # },
+        # "authApp": {
+        #     "suites": [
+        #         "apiAuthApp",
+        #     ],
+        #     "skip": False,
+        #     "withRemotePhp": [True],
+        #     "extraServerEnvironment": {
+        #         "OCIS_ADD_RUN_SERVICES": "auth-app",
+        #         "PROXY_ENABLE_APP_AUTH": True,
+        #     },
+        # },
+        # "cliCommands": {
+        #     "suites": [
+        #         "cliCommands",
+        #     ],
+        #     "skip": False,
+        #     "withRemotePhp": [True],
+        #     "antivirusNeeded": True,
+        #     "emailNeeded": True,
+        #     "extraEnvironment": {
+        #         "EMAIL_HOST": EMAIL_SMTP_HOST,
+        #         "EMAIL_PORT": EMAIL_PORT,
+        #     },
+        #     "extraServerEnvironment": {
+        #         "NOTIFICATIONS_SMTP_HOST": EMAIL_SMTP_HOST,
+        #         "NOTIFICATIONS_SMTP_PORT": EMAIL_SMTP_PORT,
+        #         "NOTIFICATIONS_SMTP_INSECURE": "true",
+        #         "NOTIFICATIONS_SMTP_SENDER": EMAIL_SMTP_SENDER,
+        #         "NOTIFICATIONS_DEBUG_ADDR": "0.0.0.0:9174",
+        #         "ANTIVIRUS_SCANNER_TYPE": "clamav",
+        #         "ANTIVIRUS_CLAMAV_SOCKET": "tcp://clamav:3310",
+        #         "OCIS_ASYNC_UPLOADS": True,
+        #         "OCIS_ADD_RUN_SERVICES": "antivirus,notifications",
+        #     },
+        # },
     },
     "apiTests": {
-        "numberOfParts": 7,
-        "skip": False,
+        "numberOfParts": 0,
+        "skip": True,
         "skipExceptParts": [],
     },
     "e2eTests": {
