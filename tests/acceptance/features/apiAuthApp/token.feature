@@ -191,3 +191,11 @@ Feature: create auth-app token
     And user "Brian" has created auth-app token with expiration time "72h" using the auth-app API
     When user "Admin" tries to delete the last created auth-app token using the auth-app API
     Then the HTTP status code should be "403"
+
+
+  @env-config
+  Scenario: try to create auth-app token for non-existing user
+    Given the config "AUTH_APP_ENABLE_IMPERSONATION" has been set to "true"
+    And user "Admin" has created auth-app token for user "Alice" with expiration time "72h" using the auth-app API
+    When user "Alice" lists the all her drives using the auth-app token
+    Then the HTTP status code should be "200"
