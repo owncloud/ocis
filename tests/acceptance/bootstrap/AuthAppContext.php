@@ -106,6 +106,18 @@ class AuthAppContext implements Context {
 	}
 
 	/**
+	 * @Given user :user has waited :expiration second(s) for auth-app token to expire
+	 *
+	 * @param string $user
+	 * @param string $expiration
+	 *
+	 * @return void
+	 */
+	public function userWaitSecondForAuthAppTokenToExpire($user, $expiration): void {
+		sleep((int)$expiration);
+	}
+
+	/**
 	 * @When user :user lists all created tokens using the auth-app API
 	 *
 	 * @param string $user

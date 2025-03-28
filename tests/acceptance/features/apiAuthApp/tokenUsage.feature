@@ -134,3 +134,10 @@ Feature: create auth-app token
       | /dav/files/%username%/textfile.txt |
       | /dav/spaces/%spaceid%/textfile.txt |
     Then the HTTP status code of responses on all endpoints should be "401"
+
+
+  Scenario: user tries to use expired auth-app token
+    Given user "Alice" has created auth-app token with expiration time "1s" using the auth-app API
+    And user "Alice" has waited "1" second for auth-app token to expire
+    When user "Alice" lists all available spaces via the Graph API
+    Then the HTTP status code should be "401"
