@@ -250,17 +250,9 @@ func (c *Converter) omcShareCreatedMessage(ev events.OCMCoreShareCreated, eventi
 	// GetAcceptedUser() calls getUserFilter() that gets the user from the context
 	// and use it as 'initiator' parameter in the GetRemoteUser() call.
 	// The 'initiator' should be ev.Grantee.
-	granteeJson, _ := json.Marshal(ev.Grantee)
 	rspSharer, err := gwc.GetAcceptedUser(context.Background(), &invitepb.GetAcceptedUserRequest{
 		RemoteUserId: ev.Sharer,
-		Opaque: &typespb.Opaque{
-			Map: map[string]*typespb.OpaqueEntry{
-				"user-filter": {
-					Decoder: "json",
-					Value:   granteeJson,
-				},
-			},
-		},
+		Opaque:       utils.AppendJSONToOpaque(nil, "user-filter", ev.Grantee),
 	})
 	if err != nil {
 		return OC10Notification{}, err
@@ -300,17 +292,9 @@ func (c *Converter) omcShareDeleteMessage(ev events.OCMCoreShareDelete, eventid 
 	// GetAcceptedUser() calls getUserFilter() that gets the user from the context
 	// and use it as 'initiator' parameter in the GetRemoteUser() call.
 	// The 'initiator' should be ev.Grantee.
-	granteeJson, _ := json.Marshal(ev.Grantee)
 	rspSharer, err := gwc.GetAcceptedUser(context.Background(), &invitepb.GetAcceptedUserRequest{
 		RemoteUserId: ev.Sharer,
-		Opaque: &typespb.Opaque{
-			Map: map[string]*typespb.OpaqueEntry{
-				"user-filter": {
-					Decoder: "json",
-					Value:   granteeJson,
-				},
-			},
-		},
+		Opaque:       utils.AppendJSONToOpaque(nil, "user-filter", ev.Grantee),
 	})
 	if err != nil {
 		return OC10Notification{}, err
