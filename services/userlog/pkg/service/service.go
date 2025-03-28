@@ -230,6 +230,7 @@ func (ul *UserlogService) GetEvents(ctx context.Context, userid string) ([]*ehms
 	}
 
 	if len(rec) == 0 {
+		// no events available
 		return []*ehmsg.Event{}, nil
 	}
 
