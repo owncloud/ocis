@@ -271,3 +271,28 @@ Feature: create auth-app token
     And user "Brian" has created auth-app token with expiration time "72h" using the auth-app API
     When user "Admin" tries to delete the last created auth-app token using the auth-app API
     Then the HTTP status code should be "403"
+
+  @env-config
+  Scenario: try to create auth-app token with user-id without expiry by admin user
+    Given the config "AUTH_APP_ENABLE_IMPERSONATION" has been set to "true"
+    When user "Admin" creates app token with user-id for user "Alice" with expiration time "" using the auth-app API
+    Then the HTTP status code should be "400"
+    And the content in the response should include the following content:
+      """
+      error parsing expiry. Use e.g. 30m or 72h
+      """
+
+
+  Scenario: try to create auth-app token with user-id and without expiry by non-existent user
+    When user "Brian" creates app token with user-id for user "Alice" with expiration time "" using the auth-app API
+    Then the HTTP status code should be "401"
+
+
+  Scenario: try to create auth-app token with user-id and without expiry by another non-admin user
+    Given user "Brian" has been created with default attributes
+    When user "Brian" creates app token with user-id for user "Alice" with expiration time "" using the auth-app API
+    Then the HTTP status code should be "400"
+    And the content in the response should include the following content:
+      """
+      error parsing expiry. Use e.g. 30m or 72h
+      """
