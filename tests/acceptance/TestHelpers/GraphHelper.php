@@ -45,7 +45,10 @@ class GraphHelper {
 		'Space Editor Without Versions' => '3284f2d5-0070-4ad8-ac40-c247f7c1fb27',
 		'Denied' => '63e64e19-8d43-42ec-a738-2b6af2610efa',
 		'Editor With Versions' => '0911d62b-1e3f-4778-8b1b-903b7e4e8476',
-		'File Editor With Versions' => 'b173329d-cf2e-42f0-a595-ee410645d840'
+		'File Editor With Versions' => 'b173329d-cf2e-42f0-a595-ee410645d840',
+		'Viewer With ListGrants' => 'd5041006-ebb3-4b4a-b6a4-7c180ecfb17d',
+		'Editor With ListGrants' => 'e8ea8b21-abd4-45d2-b893-8d1546378e9e',
+		'File Editor With ListGrants' => 'c1235aea-d106-42db-8458-7d5610fb0a67'
 	];
 
 	public const SHARING_LINK_TYPE_MAPPINGS = [
