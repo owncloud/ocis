@@ -97,14 +97,14 @@ Feature: Search
       | new              |
       | spaces           |
 
-  @issue-10329
-  Scenario Outline: user can search hidden files
+  @issue-10329 @issue-11028
+  Scenario Outline: user can't search hidden files
     Given using <dav-path-version> DAV path
     And user "Alice" has created a folder ".space" in space "project101"
     When user "Alice" searches for "*.sp*" using the WebDAV API
     Then the HTTP status code should be "207"
-    And the search result should contain "1" entries
-    And the search result of user "Alice" should contain these entries:
+    And the search result should contain "0" entries
+    And the search result of user "Alice" should not contain these entries:
       | /.space |
     Examples:
       | dav-path-version |
@@ -172,13 +172,12 @@ Feature: Search
       | new              |
       | spaces           |
 
-  @issue-10329
-  Scenario: user can search project space by name
+  @issue-10329 @issue-11028
+  Scenario: user can't search project space by name
     Given using spaces DAV path
     When user "Alice" searches for '*project101*' using the WebDAV API
     Then the HTTP status code should be "207"
-    And the search result should contain "1" entries
-    And for user "Alice" the search result should contain space "project101"
+    And the search result should contain "0" entries
 
   @issue-10329
   Scenario Outline: user can search inside folder in space
