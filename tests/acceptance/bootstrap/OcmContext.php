@@ -39,6 +39,7 @@ class OcmContext implements Context {
 	private FeatureContext $featureContext;
 	private SpacesContext $spacesContext;
 	private ArchiverContext $archiverContext;
+	private SharingNgContext $sharingNgContext;
 	private string $invitationToken;
 	private array $acceptedUsers = ["LOCAL" => [], "REMOTE" => []];
 
