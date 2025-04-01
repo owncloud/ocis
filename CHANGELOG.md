@@ -1,6 +1,7 @@
 # Table of Contents
 
 * [Changelog for unreleased](#changelog-for-unreleased-unreleased)
+* [Changelog for 7.1.2](#changelog-for-712-2025-03-28)
 * [Changelog for 7.1.1](#changelog-for-711-2025-03-14)
 * [Changelog for 7.1.0](#changelog-for-710-2025-03-06)
 * [Changelog for 7.0.0](#changelog-for-700-2024-12-17)
@@ -33,8 +34,8 @@
 * [Changelog for 3.0.0](#changelog-for-300-2023-06-06)
 * [Changelog for 2.0.0](#changelog-for-200-2022-11-30)
 * [Changelog for 1.20.0](#changelog-for-1200-2022-04-13)
-* [Changelog for 1.19.0](#changelog-for-1190-2022-03-29)
 * [Changelog for 1.19.1](#changelog-for-1191-2022-03-29)
+* [Changelog for 1.19.0](#changelog-for-1190-2022-03-29)
 * [Changelog for 1.18.0](#changelog-for-1180-2022-03-03)
 * [Changelog for 1.17.0](#changelog-for-1170-2022-02-16)
 * [Changelog for 1.16.0](#changelog-for-1160-2021-12-10)
@@ -55,11 +56,11 @@
 * [Changelog for 1.1.0](#changelog-for-110-2021-01-22)
 * [Changelog for 1.0.0](#changelog-for-100-2020-12-17)
 
-# Changelog for [unreleased] (UNRELEASED)
+# Changelog for [unreleased] (#changelog-for-unreleased-unreleased)
 
-The following sections list the changes for unreleased.
+The following sections list the changes for unreleased
 
-[unreleased]: https://github.com/owncloud/ocis/compare/v7.1.1...master
+[unreleased]: https://github.com/owncloud/ocis/compare/v7.1.2...master
 
 ## Summary
 
@@ -136,14 +137,6 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/issues/11145
    https://github.com/owncloud/ocis/pull/11145
 
-* Bugfix - Fix pdf form creation: [#11163](https://github.com/owncloud/ocis/pull/11163)
-
-   Fix pdf form creation for Onlyoffice. Adjust the file extension for Form to be
-   PDF instead of DOCXF
-
-   https://github.com/owncloud/ocis/issues/11164
-   https://github.com/owncloud/ocis/pull/11163
-
 * Enhancement - Update Mockery to 2.52.3: [#11070](https://github.com/owncloud/ocis/pull/11070)
 
    Without updating ocis will not build on go 1.24. This requires also updating the
@@ -164,6 +157,40 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/10989
    https://github.com/owncloud/ocis/pull/11115
+
+* Enhancement - Improve postprocessing logs: [#11108](https://github.com/owncloud/ocis/pull/11108)
+
+   Improve postprocessing logs to easily trace successful and failing uploads/
+
+   https://github.com/owncloud/ocis/issues/10998
+   https://github.com/owncloud/ocis/pull/11108
+
+* Enhancement - Improve graph space management logs: [#11115](https://github.com/owncloud/ocis/pull/11115)
+
+   Improve graph space management logs to help troubleshooting user operations
+
+   https://github.com/owncloud/ocis/issues/10989
+   https://github.com/owncloud/ocis/pull/11115
+
+# Changelog for [7.1.2] (2025-03-28)
+
+The following sections list the changes for 7.1.2.
+
+[7.1.2]: https://github.com/owncloud/ocis/compare/v7.1.1...v7.1.2
+
+## Summary
+
+* Bugfix - Fix pdf form creation: [#11163](https://github.com/owncloud/ocis/pull/11163)
+
+## Details
+
+* Bugfix - Fix pdf form creation: [#11163](https://github.com/owncloud/ocis/pull/11163)
+
+   Fix pdf form creation for Onlyoffice. Adjust the file extension for Form to be
+   PDF instead of DOCXF
+
+   https://github.com/owncloud/ocis/issues/11164
+   https://github.com/owncloud/ocis/pull/11163
 
 # Changelog for [7.1.1] (2025-03-14)
 
