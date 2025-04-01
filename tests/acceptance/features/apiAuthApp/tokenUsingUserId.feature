@@ -57,20 +57,20 @@ Feature: create auth-app token using user-id
 
   Scenario: non-admin user tries to create own auth-app token using user-id with impersonation enabled
     Given the config "AUTH_APP_ENABLE_IMPERSONATION" has been set to "true"
-    When user "Alice" creates app token with user-id for user "Alice" with expiration time "72h" using the auth-app API
+    When user "Alice" tries to create app token with user-id for user "Alice" with expiration time "72h" using the auth-app API
     Then the HTTP status code should be "403"
 
   @env-config @issue-11063
   Scenario: non-admin user tries to creates auth-app token for another user using user-id
     Given the config "AUTH_APP_ENABLE_IMPERSONATION" has been set to "true"
     And user "Brian" has been created with default attributes
-    When user "Brian" creates app token with user-id for user "Alice" with expiration time "72h" using the auth-app API
+    When user "Brian" tries to create app token with user-id for user "Alice" with expiration time "72h" using the auth-app API
     Then the HTTP status code should be "403"
 
   @issue-11063
   Scenario: non-admin user tries to creates auth-app token for another user using user-id without impersonation enabled
     Given user "Brian" has been created with default attributes
-    When user "Brian" creates app token with user-id for user "Alice" with expiration time "72h" using the auth-app API
+    When user "Brian" tries to create app token with user-id for user "Alice" with expiration time "72h" using the auth-app API
     Then the HTTP status code should be "403"
     And the content in the response should include the following content:
       """
@@ -79,7 +79,7 @@ Feature: create auth-app token using user-id
 
 
   Scenario: non-admin user tries to create own auth-app token using user-id and without expiry
-    When user "Alice" creates app token with user-id for user "Alice" with expiration time "" using the auth-app API
+    When user "Alice" tries to create app token with user-id for user "Alice" with expiration time "" using the auth-app API
     Then the HTTP status code should be "400"
     And the content in the response should include the following content:
       """
@@ -89,7 +89,18 @@ Feature: create auth-app token using user-id
   @env-config
   Scenario: admin tries to create auth-app token for another user with user-id and without expiry
     Given the config "AUTH_APP_ENABLE_IMPERSONATION" has been set to "true"
-    When user "Admin" creates app token with user-id for user "Alice" with expiration time "" using the auth-app API
+    When user "Admin" tries to create app token with user-id for user "Alice" with expiration time "" using the auth-app API
+    Then the HTTP status code should be "400"
+    And the content in the response should include the following content:
+      """
+      error parsing expiry. Use e.g. 30m or 72h
+      """
+
+
+  Scenario: non-admin user tries to create auth-app token for another user using user-id and without expiry
+    Given the config "AUTH_APP_ENABLE_IMPERSONATION" has been set to "true"
+    And user "Brian" has been created with default attributes
+    When user "Brian" tries to create app token with user-id for user "Alice" with expiration time "" using the auth-app API
     Then the HTTP status code should be "400"
     And the content in the response should include the following content:
       """
@@ -98,16 +109,10 @@ Feature: create auth-app token using user-id
 
 
   Scenario: non-existent user tries to create auth-app token for another user using user-id and without expiry
-    When user "Brian" creates app token with user-id for user "Alice" with expiration time "" using the auth-app API
+    When user "Brian" tries to create app token with user-id for user "Alice" with expiration time "" using the auth-app API
     Then the HTTP status code should be "401"
 
 
-  Scenario: non-admin user tries to create auth-app token for another user using user-id and without expiry
-    Given the config "AUTH_APP_ENABLE_IMPERSONATION" has been set to "true"
-    And user "Brian" has been created with default attributes
-    When user "Brian" creates app token with user-id for user "Alice" with expiration time "" using the auth-app API
-    Then the HTTP status code should be "400"
-    And the content in the response should include the following content:
-      """
-      error parsing expiry. Use e.g. 30m or 72h
-      """
+  Scenario: non-existent user tries to create auth-app token for another user using user-id
+    When user "Brian" tries to create app token with user-id for user "Alice" with expiration time "72h" using the auth-app API
+    Then the HTTP status code should be "401"

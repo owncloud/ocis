@@ -216,6 +216,7 @@ class AuthAppContext implements Context {
 
 	/**
 	 * @When user :user creates app token with user-id for user :impersonatedUser with expiration time :expiration using the auth-app API
+	 * @When user :user tries to create app token with user-id for user :impersonatedUser with expiration time :expiration using the auth-app API
 	 *
 	 * @param string $user
 	 * @param string $impersonatedUser
