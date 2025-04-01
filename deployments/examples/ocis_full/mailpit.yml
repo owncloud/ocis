@@ -1,0 +1,26 @@
+services:
+  ocis:
+    environment:
+      NOTIFICATIONS_SMTP_HOST: mailpit
+      NOTIFICATIONS_SMTP_PORT: 1025
+      NOTIFICATIONS_SMTP_SENDER: oCIS notifications <notifications@${OCIS_DOMAIN:-ocis.owncloud.test}>
+      NOTIFICATIONS_SMTP_USERNAME: notifications@${OCIS_DOMAIN:-ocis.owncloud.test}
+      NOTIFICATIONS_SMTP_INSECURE: "true"
+
+  mailpit:
+    image: axllent/mailpit:v1.22.3
+    networks:
+      - ocis-net
+    ports:
+      - "8025:8025" # Web UI
+      - "1025:1025" # SMTP
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.mailpit.entrypoints=https"
+      - "traefik.http.routers.mailpit.rule=Host(`${MAILPIT_DOMAIN:-mail.owncloud.test}`)"
+      - "traefik.http.routers.mailpit.tls.certresolver=http"
+      - "traefik.http.routers.mailpit.service=mailpit"
+      - "traefik.http.services.mailpit.loadbalancer.server.port=8025"
+    logging:
+      driver: ${LOG_DRIVER:-local}
+    restart: always
