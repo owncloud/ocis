@@ -168,7 +168,7 @@ Feature: media type search
       | *rar*   | /data.rar       |
       | *bzip2* | /data.tar.bz2   |
 
-  @issue-10329
+  @issue-10329 @issue-11028
   Scenario: search files with different mediatype filter
     Given user "Alice" has created folder "testFolder"
     And user "Alice" has uploaded file "filesForUpload/lorem.txt" to "lorem.txt"
@@ -184,9 +184,8 @@ Feature: media type search
     And user "Alice" has uploaded file "filesForUpload/data.tar.bz2" to "data.tar.bz2"
     When user "Alice" searches for "mediatype:folder" using the WebDAV API
     Then the HTTP status code should be "207"
-    And the search result should contain "2" entries
+    And the search result should contain "1" entries
     And the search result of user "Alice" should contain these entries:
-      | %spaceid%  |
       | testFolder |
     When user "Alice" searches for "mediatype:document" using the WebDAV API
     Then the HTTP status code should be "207"
