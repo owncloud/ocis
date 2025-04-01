@@ -12,6 +12,7 @@ import (
 	"github.com/justinas/alice"
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
+	"github.com/owncloud/ocis/v2/ocis-pkg/generators"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	pkgmiddleware "github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
@@ -156,7 +157,8 @@ func Server(cfg *config.Config) *cli.Command {
 			var publisher events.Stream
 			if cfg.Events.Endpoint != "" {
 				var err error
-				publisher, err = stream.NatsFromConfig(cfg.Service.Name, false, stream.NatsConfig(cfg.Events))
+				connName := generators.GenerateConnectionName(cfg.Service.Name, generators.NTypeBus)
+				publisher, err = stream.NatsFromConfig(connName, false, stream.NatsConfig(cfg.Events))
 				if err != nil {
 					logger.Error().
 						Err(err).
