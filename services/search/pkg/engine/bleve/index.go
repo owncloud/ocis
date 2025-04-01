@@ -12,16 +12,26 @@ import (
 // Implementations might differ in how the index is created and how the
 // index is gotten (reused, created on the fly, etc).
 //
+// The GetIndex method returns a function that must be called to close the index.
 // Some implementations might require the index to be kept opened, meaning
 // the index should be closed only when the application is shutting down. In
-// this case, IndexCanBeClosed should return false. If the index can be
-// closed and reopened safely at any time, IndexCanBeClosed should
-// return true.
+// this case, the returned function to close the index should do nothing (not
+// closing the index). If the index can be closed and reopened safely at any
+// time, the returned function should close the index.
+// Calling the returned function to close the index is fine regardless of the
+// implementation, and it will act as a no-op if the index should be kept opened.
 type IndexGetter interface {
-	GetIndex(opts ...GetIndexOption) (bleve.Index, error)
-	IndexCanBeClosed() bool
+	GetIndex(opts ...GetIndexOption) (bleve.Index, func(), error)
 }
 
+// IndexGetterMemory is an implementation of IndexGetter that uses an in-memory
+// index. The implementation caches the index and returns the same index every
+// time GetIndex is called.
+// The data won't be persisted between runs, and closing the index will wipe
+// the data.
+// The close function returned by GetIndex won't do anything. The index should
+// be kept opened until the application is shutting down.
+// This is useful for testing and small datasets.
 type IndexGetterMemory struct {
 	mapping mapping.IndexMapping
 	index   bleve.Index
@@ -39,25 +49,26 @@ func NewIndexGetterMemory(mapping mapping.IndexMapping) *IndexGetterMemory {
 
 // GetIndex creates a new in-memory index every time it is called.
 // The options are ignored in this implementation.
-func (i *IndexGetterMemory) GetIndex(opts ...GetIndexOption) (bleve.Index, error) {
+func (i *IndexGetterMemory) GetIndex(opts ...GetIndexOption) (bleve.Index, func(), error) {
+	closeFn := func() {} // no-op
 	if i.index != nil {
-		return i.index, nil
+		return i.index, closeFn, nil
 	}
 
 	index, err := bleve.NewMemOnly(i.mapping)
 	if err != nil {
-		return nil, err
+		return nil, closeFn, err
 	}
 
 	i.index = index
-	return i.index, nil
+	return i.index, closeFn, nil
 }
 
-// IndexCanBeClosed returns false, meaning the index must be kept opened.
-func (i *IndexGetterMemory) IndexCanBeClosed() bool {
-	return false
-}
-
+// IndexGetterPersistent is an implementation of IndexGetter that persists the
+// index on the filesystem. The implementation caches the index and returns the
+// same index every time GetIndex is called.
+// The close function returned by GetIndex won't do anything. The index should
+// be kept opened until the application is shutting down.
 type IndexGetterPersistent struct {
 	rootDir string
 	mapping mapping.IndexMapping
@@ -79,9 +90,10 @@ func NewIndexGetterPersistent(rootDir string, mapping mapping.IndexMapping) *Ind
 
 // GetIndex returns the cached index. The options are ignored in this
 // implementation.
-func (i *IndexGetterPersistent) GetIndex(opts ...GetIndexOption) (bleve.Index, error) {
+func (i *IndexGetterPersistent) GetIndex(opts ...GetIndexOption) (bleve.Index, func(), error) {
+	closeFn := func() {} // no-op
 	if i.index != nil {
-		return i.index, nil
+		return i.index, closeFn, nil
 	}
 
 	destination := filepath.Join(i.rootDir, "bleve")
@@ -89,19 +101,19 @@ func (i *IndexGetterPersistent) GetIndex(opts ...GetIndexOption) (bleve.Index, e
 	if errors.Is(bleve.ErrorIndexPathDoesNotExist, err) {
 		index, err = bleve.New(destination, i.mapping)
 		if err != nil {
-			return nil, err
+			return nil, closeFn, err
 		}
 	}
 
 	i.index = index
-	return i.index, nil
+	return i.index, closeFn, nil
 }
 
-// IndexCanBeClosed returns false, meaning the index must be kept opened.
-func (i *IndexGetterPersistent) IndexCanBeClosed() bool {
-	return false
-}
-
+// IndexGetterPersistentScale is an implementation of IndexGetter that persists
+// the index on the filesystem. The implementation does not cache the index and
+// creates a new connection to the index every time GetIndex is called.
+// The close function returned by GetIndex must be called to close the index, as
+// soon as you the operations on the index are done.
 type IndexGetterPersistentScale struct {
 	rootDir string
 	mapping mapping.IndexMapping
@@ -124,7 +136,7 @@ func NewIndexGetterPersistentScale(rootDir string, mapping mapping.IndexMapping)
 // allow read-only operations to be performed in parallel.
 // In order to avoid blocking write operations, you should close the index
 // as soon as you are done with it.
-func (i *IndexGetterPersistentScale) GetIndex(opts ...GetIndexOption) (bleve.Index, error) {
+func (i *IndexGetterPersistentScale) GetIndex(opts ...GetIndexOption) (bleve.Index, func(), error) {
 	options := newGetIndexOptions(opts...)
 	destination := filepath.Join(i.rootDir, "bleve")
 	params := map[string]interface{}{
@@ -134,17 +146,12 @@ func (i *IndexGetterPersistentScale) GetIndex(opts ...GetIndexOption) (bleve.Ind
 	if errors.Is(bleve.ErrorIndexPathDoesNotExist, err) {
 		index, err = bleve.New(destination, i.mapping)
 		if err != nil {
-			return nil, err
+			closeFn := func() {} // no-op
+			return nil, closeFn, err
 		}
 
-		return index, nil
+		return index, func() { index.Close() }, nil
 	}
 
-	return index, err
-}
-
-// IndexCanBeClosed returns true, meaning the index can be closed and
-// reopened. You should close the index as soon as you are done with it.
-func (i *IndexGetterPersistentScale) IndexCanBeClosed() bool {
-	return true
+	return index, func() { index.Close() }, err
 }
