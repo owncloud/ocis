@@ -3029,4 +3029,15 @@ class FeatureContext extends BehatVariablesContext {
 		}
 		return false;
 	}
+
+	/**
+	 * @Given the system waits for :arg1 seconds
+	 *
+	 * @param string $seconds
+	 *
+	 * @return void
+	 */
+	public function theSystemWaitsForSeconds(string $seconds): void {
+		\sleep((int)$seconds);
+	}
 }
