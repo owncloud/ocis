@@ -3317,14 +3317,14 @@ Feature: resources shared by user
       """
 
   @issue-8355
-  Scenario: sharer lists the link share of a project space
+  Scenario: sharer lists the link share of a project space (root endpoint)
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
     And user "Alice" has created the following space link share:
-      | space           | NewSpace      |
-      | permissionsRole | View          |
-      | password        | %public%      |
+      | space           | NewSpace |
+      | permissionsRole | View     |
+      | password        | %public% |
     When user "Alice" lists the shares shared by her using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
@@ -3351,7 +3351,7 @@ Feature: resources shared by user
               ],
               "properties": {
                 "name": {
-                  "const": "."
+                  "const": "NewSpace"
                 },
                 "folder": {
                   "const": {}
@@ -3859,6 +3859,76 @@ Feature: resources shared by user
           },
           "name": {
             "const": "FolderToShare"
+          }
+        }
+      }
+      """
+
+  @issue-8355
+  Scenario: sharer lists the link share of a project space (permissions endpoint)
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
+    And user "Alice" has created the following space link share using permissions endpoint of the Graph API:
+      | space           | NewSpace |
+      | permissionsRole | view     |
+      | password        | %public% |
+    When user "Alice" lists the shares shared by her using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": ["parentReference", "permissions", "name", "id", "eTag", "folder", "lastModifiedDateTime", "size"],
+              "properties": {
+                "name": {"const": "NewSpace"},
+                "folder": {"const": {}},
+                "id": {"pattern": "^%file_id_pattern%$"},
+                "parentReference": {
+                  "type": "object",
+                  "required": ["driveId", "driveType", "id", "name", "path"],
+                  "properties": {
+                    "driveId": {"pattern": "^%space_id_pattern%$"},
+                    "driveType": {"const": "project"},
+                    "path": {"const": "."},
+                    "name": {"const": "."},
+                    "id": {"pattern": "^%space_id_pattern%$"}
+                  }
+                },
+                "permissions": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 1,
+                  "items": {
+                    "type": "object",
+                    "required": ["hasPassword", "id", "link", "createdDateTime"],
+                    "properties": {
+                      "link": {
+                        "type": "object",
+                        "required": ["@libre.graph.displayName", "@libre.graph.quickLink", "preventsDownload", "type", "webUrl"],
+                        "properties": {
+                          "@libre.graph.displayName": {"const": ""},
+                          "@libre.graph.quickLink": {"const": false},
+                          "preventsDownload": {"const": false},
+                          "type": {"const": "view"},
+                          "webUrl": {"pattern": "^%base_url%/s/[a-zA-Z]+$"}
+                        }
+                      },
+                      "id": {"pattern": "[a-zA-Z]+"},
+                      "hasPassword": {"const": true}
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }

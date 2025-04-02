@@ -818,6 +818,23 @@ class SharingNgContext implements Context {
 	}
 
 	/**
+	 * @Given user :user has created the following space link share using permissions endpoint of the Graph API:
+	 *
+	 * @param string $user
+	 * @param TableNode $body
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userHasCreatedTheFollowingSpaceLinkShareUsingPermissionsEndpointOfTheGraphApi(
+		string $user,
+		TableNode $body
+	): void {
+		$response = $this->createLinkShare($user, $body);
+		$this->featureContext->theHTTPStatusCodeShouldBe(200, "Failed while creating public share link!", $response);
+	}
+
+	/**
 	 * @Given /^user "([^"]*)" has created the following resource link share:$/
 	 *
 	 * @param string $user
