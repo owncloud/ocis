@@ -62,7 +62,7 @@ var _ = Describe("Bleve", func() {
 
 		indexGetter := bleveEngine.NewIndexGetterMemory(mapping)
 
-		idx, err = indexGetter.GetIndex()
+		idx, _, err = indexGetter.GetIndex() // IndexGetterMemory ignores closeFn
 		Expect(err).ToNot(HaveOccurred())
 
 		eng = engine.NewBleveEngine(indexGetter, bleve.DefaultCreator)
