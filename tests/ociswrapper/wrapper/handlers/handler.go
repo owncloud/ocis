@@ -210,7 +210,6 @@ func OcisServiceHandler(res http.ResponseWriter, req *http.Request) {
 	serviceName := req.PathValue("service")
 
     var envBody map[string]interface{}
-    var serviceEnvMap []string
 
 	if req.Body != nil && req.ContentLength > 0 {
 		var err error
@@ -223,7 +222,7 @@ func OcisServiceHandler(res http.ResponseWriter, req *http.Request) {
 
 	if req.Method == http.MethodPost {
 		for key, value := range envBody {
-			ocis.ServiceEnvConfigs[serviceName] = append(serviceEnvMap, fmt.Sprintf("%s=%v", key, value))
+			ocis.ServiceEnvConfigs[serviceName] = append(ocis.ServiceEnvConfigs[serviceName], fmt.Sprintf("%s=%v", key, value))
 			if strings.HasSuffix(key, "DEBUG_ADDR") {
 				address := strings.Split(value.(string), ":")
 				port, _ := strconv.Atoi(address[1])
@@ -254,6 +253,7 @@ func OcisServiceHandler(res http.ResponseWriter, req *http.Request) {
 	} else if req.Method == http.MethodPatch {
 		success, message := ocis.StopService(serviceName)
 		if success {
+			var serviceEnvMap []string
 			for key, value := range envBody {
 				serviceEnvMap = append(serviceEnvMap, fmt.Sprintf("%s=%v", key, value))
 				if strings.HasSuffix(key, "DEBUG_ADDR") {
