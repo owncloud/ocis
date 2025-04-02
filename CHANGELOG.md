@@ -74,6 +74,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix migrate rebuild-jsoncs3-indexes cli: [#11145](https://github.com/owncloud/ocis/pull/11145)
 * Bugfix - OCM Share Notifications: [#11162](https://github.com/owncloud/ocis/pull/11162)
 * Bugfix - Fix pdf form creation: [#11163](https://github.com/owncloud/ocis/pull/11163)
+* Bugfix - Fix app-auth, REST status code: [#11190](https://github.com/owncloud/ocis/pull/11190)
 * Enhancement - Update Mockery to 2.52.3: [#11070](https://github.com/owncloud/ocis/pull/11070)
 * Enhancement - Improve postprocessing logs: [#11108](https://github.com/owncloud/ocis/pull/11108)
 * Enhancement - Improve graph space management logs: [#11115](https://github.com/owncloud/ocis/pull/11115)
@@ -153,6 +154,14 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/11164
    https://github.com/owncloud/ocis/pull/11163
+
+* Bugfix - Fix app-auth, REST status code: [#11190](https://github.com/owncloud/ocis/pull/11190)
+
+   Now app-auth REST returns status code 404 when creating token for non-existent
+   user (Impersonation)
+
+   https://github.com/owncloud/ocis/issues/10815
+   https://github.com/owncloud/ocis/pull/11190
 
 * Enhancement - Update Mockery to 2.52.3: [#11070](https://github.com/owncloud/ocis/pull/11070)
 
