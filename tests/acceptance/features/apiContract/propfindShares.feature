@@ -170,3 +170,55 @@ Feature: propfind a shares
       | old              |
       | new              |
       | spaces           |
+
+  @issue-9463
+  Scenario Outline: sharer checks share-types property after sharee is deleted (Personal Space)
+    Given using <dav-path-version> DAV path
+    And user "Alice" has created folder "folderToShare"
+    And user "Alice" has uploaded file with content "some content" to "testfile.txt"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | <resource> |
+      | space           | Personal   |
+      | sharee          | Brian      |
+      | shareType       | user       |
+      | permissionsRole | Viewer     |
+    And user "Brian" has a share "<resource>" synced
+    And the user "Admin" has deleted a user "Brian"
+    When user "Alice" gets the following properties of resource "<resource>" inside space "Personal" using the WebDAV API
+      | propertyName   |
+      | oc:share-types |
+    Then the HTTP status code should be "207"
+    And the single response should contain a property "oc:share-types" without a child property "oc:share-type"
+    Examples:
+      | dav-path-version | resource      |
+      | old              | folderToShare |
+      | old              | testfile.txt  |
+      | new              | folderToShare |
+      | new              | testfile.txt  |
+      | spaces           | folderToShare |
+      | spaces           | testfile.txt  |
+
+  @issue-9463
+  Scenario Outline: sharer checks share-types property after sharee is deleted (Project Space)
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
+    And user "Alice" has created a folder "folderToShare" in space "NewSpace"
+    And user "Alice" has uploaded a file inside space "NewSpace" with content "some content" to "testfile.txt"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | <resource> |
+      | space           | NewSpace   |
+      | sharee          | Brian      |
+      | shareType       | user       |
+      | permissionsRole | Viewer     |
+    And user "Brian" has a share "<resource>" synced
+    And the user "Admin" has deleted a user "Brian"
+    When user "Alice" gets the following properties of resource "<resource>" inside space "NewSpace" using the WebDAV API
+      | propertyName   |
+      | oc:share-types |
+    Then the HTTP status code should be "207"
+    And the single response should contain a property "oc:share-types" without a child property "oc:share-type"
+    Examples:
+      | resource      |
+      | folderToShare |
+      | testfile.txt  |
