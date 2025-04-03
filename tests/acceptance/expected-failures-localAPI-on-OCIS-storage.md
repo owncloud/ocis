@@ -348,5 +348,9 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiAuthApp/token.feature:183](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiAuthApp/token.feature#L183)
 - [apiAuthApp/token.feature:189](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiAuthApp/token.feature#L189)
 
+#### [[Sharing NG] sharedByMe endpoint is missing data for drives shared via link](https://github.com/owncloud/ocis/issues/8355)
+- [apiSharingNgShares/sharedByMe.feature:3320](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNgShares/sharedByMe.feature#L3320)
+- [apiSharingNgShares/sharedByMe.feature:3868](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNgShares/sharedByMe.feature#L3868)
+
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.
