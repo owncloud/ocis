@@ -357,6 +357,10 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiContract/propfindShares.feature:171](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiContract/propfindShares.feature#L171)
 - [apiContract/propfindShares.feature:172](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiContract/propfindShares.feature#L172)
 
+#### [Folder shared with Secure view can be downloaded.](https://github.com/owncloud/ocis/issues/9369)
+- [apiSpacesShares/shareOperations.feature:488](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareOperations.feature#L488)
+- [apiSpacesShares/shareOperations.feature:503](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareOperations.feature#L503)
+
 #### [PROPFIND request to resource shared with user when deleted retains it's <oc:share-type> property](https://github.com/owncloud/ocis/issues/9463)
 - [apiContract/propfindShares.feature:194](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiContract/propfindShares.feature#L194)
 - [apiContract/propfindShares.feature:195](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiContract/propfindShares.feature#L195)

@@ -483,3 +483,34 @@ Feature: sharing
       | ocs-api-version | ocs-status-code |
       | 1               | 100             |
       | 2               | 200             |
+
+  @issue-9369 @env-config
+  Scenario: sharee cannot download empty folder shared with Secure Viewer permission
+    Given the administrator has enabled the permissions role "Secure Viewer"
+    And user "Alice" has created folder "folderToShare"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | folderToShare |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Secure Viewer |
+    And user "Brian" has a share "folderToShare" synced
+    When user "Brian" tries to download the archive of these items using the resource ids
+      | Shares/folderToShare |
+    Then the HTTP status code should be "403"
+
+  @issue-9369 @env-config
+  Scenario: sharee cannot download non-empty folder shared with Secure Viewer permission
+    Given the administrator has enabled the permissions role "Secure Viewer"
+    And user "Alice" has created folder "folderToShare"
+    And user "Alice" has uploaded file with content "some content" to "folderToShare/testfile.txt"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | folderToShare |
+      | space           | Personal      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Secure Viewer |
+    And user "Brian" has a share "folderToShare" synced
+    When user "Brian" tries to download the archive of these items using the resource ids
+      | Shares/folderToShare |
+    Then the HTTP status code should be "403"

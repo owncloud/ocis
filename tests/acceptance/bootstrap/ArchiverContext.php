@@ -228,6 +228,7 @@ class ArchiverContext implements Context {
 
 	/**
 	 * @When user :user downloads the archive of these items using the resource :addressType
+	 * @When user :user tries to download the archive of these items using the resource :addressType
 	 *
 	 * @param string $user
 	 * @param string $addressType ids|paths
