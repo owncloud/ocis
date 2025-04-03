@@ -390,6 +390,7 @@ class SpacesContext implements Context {
 	 */
 	public function getResourceId(string $user, string $spaceName, string $folderName): string {
 		$space = $this->getSpaceByName($user, $spaceName);
+        var_dump($space);
 		// For a level 1 folder, the parent is space so $folderName = ''
 		if ($folderName === $space["name"]) {
 			$folderName = '';
@@ -400,6 +401,8 @@ class SpacesContext implements Context {
 		$davPath = WebDavHelper::getDavPath(WebDavHelper::DAV_VERSION_SPACES, $space["id"]);
 		$fullUrl = "$baseUrl/$davPath/$encodedName";
 
+        var_dump($fullUrl);
+
 		$response = HttpRequestHelper::sendRequest(
 			$fullUrl,
 			$this->featureContext->getStepLineRef(),
@@ -408,7 +411,7 @@ class SpacesContext implements Context {
 			$this->featureContext->getPasswordForUser($user),
 			['Depth' => '0'],
 		);
-
+        var_dump($response->getBody()->getContents());
 		$this->featureContext->theHttpStatusCodeShouldBe(207, '', $response);
 		$responseXmlObject = HttpRequestHelper::getResponseXml($response, __METHOD__);
 		$fileId = $responseXmlObject->xpath("//d:response/d:propstat/d:prop/oc:fileid")[0];

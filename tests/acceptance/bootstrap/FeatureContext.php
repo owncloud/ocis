@@ -1639,6 +1639,7 @@ class FeatureContext extends BehatVariablesContext {
 	 */
 	public function theJsonDataOfTheResponseShouldMatch(PyStringNode $schemaString): void {
 		$responseBody = $this->getJsonDecodedResponseBodyContent();
+        var_dump($responseBody);
 		$this->assertJsonDocumentMatchesSchema(
 			$responseBody,
 			$this->getJSONSchema($schemaString)

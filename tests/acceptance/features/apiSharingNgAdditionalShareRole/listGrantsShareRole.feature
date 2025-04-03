@@ -1604,3 +1604,190 @@ Feature: ListGrants role
         }
       }
       """
+
+
+  Scenario Outline: sharee with listGrant roles can see activities (Personal space)
+    Given the administrator has enabled the permissions role "<permissions-role>"
+    And using spaces DAV path
+    And using SharingNG
+    And user "Alice" has created folder "folder"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | folder             |
+      | space           | Personal           |
+      | sharee          | Brian              |
+      | shareType       | user               |
+      | permissionsRole | <permissions-role> |
+    And user "Brian" has a share "folder" synced
+    When user "Brian" lists the activities of folder "folder" from space "Shares" using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 3,
+            "maxItems": 3,
+            "uniqueItems": true,
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "required": ["id","template","times"],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^%user_id_pattern%$"
+                    },
+                    "template": {
+                      "type": "object",
+                      "required": ["message","variables"],
+                      "properties": {
+                        "message": {
+                          "const": "{user} added {resource} to {folder}"
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["id","template","times"],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^%user_id_pattern%$"
+                    },
+                    "template": {
+                      "type": "object",
+                      "required": ["message","variables"],
+                      "properties": {
+                        "message": {
+                          "const": "{user} shared {resource} with {sharee}"
+                        },
+                        "variables": {
+                          "type": "object",
+                          "required": ["folder","resource","sharee","user"],
+                          "properties": {
+                            "resource": {
+                              "type": "object",
+                              "required": ["id","name"],
+                              "properties": {
+                                "name": {
+                                  "const": "folderToShare"
+                                }
+                              }
+                            },
+                            "sharee": {
+                              "type": "object",
+                              "required": ["id","displayName"],
+                              "properties": {
+                                "displayName": {
+                                  "const": "Brian"
+                                }
+                              }
+                            },
+                            "user": {
+                              "type": "object",
+                              "required": ["id","displayName"],
+                              "properties": {
+                                "displayName": {
+                                  "const": "Alice Hansen"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["id","template","times"],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^%user_id_pattern%$"
+                    },
+                    "template": {
+                      "type": "object",
+                      "required": ["message","variables"],
+                      "properties": {
+                        "message": {
+                          "const": "{user} updated {field} for the {resource}"
+                        },
+                        "variables": {
+                          "type": "object",
+                          "required": ["field","folder","resource","user"],
+                          "properties": {
+                            "field": {
+                              "type": "object",
+                              "required": ["id","name"],
+                              "properties": {
+                                "name": {
+                                  "const": "expiration date, permission"
+                                }
+                              }
+                            },
+                            "folder": {
+                              "type": "object",
+                              "required": ["id","name"],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "%user_id_pattern%"
+                                },
+                                "name": {
+                                  "const": "new-space"
+                                }
+                              }
+                            },
+                            "resource": {
+                              "type": "object",
+                              "required": ["id","name"],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "%file_id_pattern%"
+                                },
+                                "name": {
+                                  "const": "folderToShare"
+                                }
+                              }
+                            },
+                            "user": {
+                              "type": "object",
+                              "required": ["id","displayName"],
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "pattern": "%user_id_pattern%"
+                                },
+                                "displayName": {
+                                  "const": "Alice Hansen"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "times": {
+                      "type": "object",
+                      "required": ["recordedTime"]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | permissions-role       |
+      | Viewer With ListGrants |
+      | Editor With ListGrants |
