@@ -26,6 +26,7 @@ use TestHelpers\BehatHelper;
 use PHPUnit\Framework\Assert;
 use TestHelpers\AuthAppHelper;
 use TestHelpers\GraphHelper;
+use Behat\Gherkin\Node\TableNode;
 
 require_once 'bootstrap.php';
 
@@ -301,5 +302,45 @@ class AuthAppContext implements Context {
 				$this->featureContext->getStepLineRef(),
 			)
 		);
+	}
+
+	/**
+	 * @When user :asUser requests these endpoints with :method using the token of user :ofUser
+	 *
+	 * @param string $asUser
+	 * @param string $method
+	 * @param string $ofUser
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function userRequestsTheseEndpointsWithoutBodyUsingThePasswordOfUser(
+		string $asUser,
+		string $method,
+		string $ofUser,
+		TableNode $table
+	): void {
+		$asUser = $this->featureContext->getActualUsername($asUser);
+		$ofUser = $this->featureContext->getActualUsername($ofUser);
+		$this->featureContext->verifyTableNodeColumns($table, ['endpoint']);
+
+		// do request as $asUser using token of $ofUser
+		$authHeader = $this->featureContext->authContext->createBasicAuthHeader($asUser, $this->lastCreatedToken);
+
+		foreach ($table->getHash() as $row) {
+			$row['endpoint'] = $this->featureContext->substituteInLineCodes(
+				$row['endpoint'],
+				$ofUser
+			);
+			$response = $this->featureContext->authContext->sendRequest(
+				$row['endpoint'],
+				$method,
+				null,
+				$authHeader
+			);
+			$this->featureContext->setResponse($response);
+			$this->featureContext->pushToLastStatusCodesArrays();
+		}
 	}
 }
