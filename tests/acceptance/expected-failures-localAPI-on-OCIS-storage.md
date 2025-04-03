@@ -352,5 +352,10 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiSharingNgShares/sharedByMe.feature:3320](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNgShares/sharedByMe.feature#L3320)
 - [apiSharingNgShares/sharedByMe.feature:3868](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNgShares/sharedByMe.feature#L3868)
 
+#### [Missing shareid on response of a PROPFIND on the sharejail root](https://github.com/owncloud/ocis/issues/8510)
+- [apiContract/propfindShares.feature:170](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiContract/propfindShares.feature#L170)
+- [apiContract/propfindShares.feature:171](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiContract/propfindShares.feature#L171)
+- [apiContract/propfindShares.feature:172](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiContract/propfindShares.feature#L172)
+
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.

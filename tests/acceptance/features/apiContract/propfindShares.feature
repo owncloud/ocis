@@ -147,3 +147,26 @@ Feature: propfind a shares
       | old              | %file_id_pattern%  |
       | new              | %file_id_pattern%  |
       | spaces           | %share_id_pattern% |
+
+  @issue-8510
+  Scenario Outline: check share-id from PROPFIND request to shared items
+    Given using <dav-path-version> DAV path
+    And using SharingNG
+    And user "Alice" has uploaded file with content "some content" to "testfile.txt"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | testfile.txt |
+      | space           | Personal     |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | Viewer       |
+    And user "Brian" has a share "testfile.txt" synced
+    When user "Brian" sends PROPFIND request from the space "Shares" to the resource "/" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And as user "Brian" the PROPFIND response should contain a resource "testfile.txt" with these key and value pairs:
+      | key        | value           |
+      | oc:shareid | %last_share_id% |
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
