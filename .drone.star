@@ -167,14 +167,14 @@ config = {
         "sharingNg1": {
             "suites": [
                 "apiSharingNgShares",
+                "apiReshare",
+                "apiSharingNgPermissions",
             ],
             "skip": False,
             "withRemotePhp": [True],
         },
-        "sharingNg2": {
+        "sharingNgAdditionalShareRole": {
             "suites": [
-                "apiSharingNgPermissions",
-                "apiReshare",
                 "apiSharingNgAdditionalShareRole",
             ],
             "skip": False,

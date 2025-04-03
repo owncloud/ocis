@@ -62,6 +62,9 @@ Feature: ListGrants role
         }
       }
       """
+    And user "Brian" should have the following shares of the file "textfile1.txt":
+      | sharee | shareType | permissionsRole    |
+      | Brian  | user      | <permissions-role> |
     Examples:
       | permissions-role            |
       | Viewer With ListGrants      |
@@ -119,6 +122,9 @@ Feature: ListGrants role
         }
       }
       """
+    And user "Brian" should have the following shares of the folder "FolderToShare":
+      | sharee | shareType | permissionsRole    |
+      | Brian  | user      | <permissions-role> |
     Examples:
       | permissions-role       |
       | Viewer With ListGrants |
@@ -179,6 +185,9 @@ Feature: ListGrants role
         }
       }
       """
+    And user "Brian" should have the following shares of the file "textfile1.txt":
+      | sharee | shareType | permissionsRole    |
+      | Brian  | user      | <permissions-role> |
     Examples:
       | permissions-role            |
       | Viewer With ListGrants      |
@@ -239,6 +248,9 @@ Feature: ListGrants role
         }
       }
       """
+    And user "Brian" should have the following shares of the folder "FolderToShare":
+      | sharee | shareType | permissionsRole    |
+      | Brian  | user      | <permissions-role> |
     Examples:
       | permissions-role       |
       | Viewer With ListGrants |
@@ -289,6 +301,9 @@ Feature: ListGrants role
         }
       }
       """
+    And user "Brian" should have the following shares of the file "textfile1.txt":
+      | sharee | shareType | permissionsRole        |
+      | Brian  | user      | <new-permissions-role> |
     Examples:
       | permissions-role | new-permissions-role        |
       | Viewer           | Viewer With ListGrants      |
@@ -341,6 +356,9 @@ Feature: ListGrants role
         }
       }
       """
+    And user "Brian" should have the following shares of the folder "FolderToShare":
+      | sharee | shareType | permissionsRole        |
+      | Brian  | user      | <new-permissions-role> |
     Examples:
       | permissions-role | new-permissions-role   |
       | Viewer           | Viewer With ListGrants |
@@ -398,6 +416,9 @@ Feature: ListGrants role
         }
       }
       """
+    And user "Brian" should have the following shares of the file "textfile1.txt":
+      | sharee | shareType | permissionsRole        |
+      | Brian  | user      | <new-permissions-role> |
     Examples:
       | permissions-role | new-permissions-role        |
       | Viewer           | Viewer With ListGrants      |
@@ -453,6 +474,9 @@ Feature: ListGrants role
         }
       }
       """
+    And user "Brian" should have the following shares of the folder "FolderToShare":
+      | sharee | shareType | permissionsRole        |
+      | Brian  | user      | <new-permissions-role> |
     Examples:
       | permissions-role | new-permissions-role   |
       | Viewer           | Viewer With ListGrants |
@@ -507,6 +531,9 @@ Feature: ListGrants role
         }
       }
       """
+    And user "Brian" should have the following shares of the file "textfile1.txt":
+      | sharee | shareType | permissionsRole        |
+      | Brian  | user      | <new-permissions-role> |
     Examples:
       | permissions-role            | new-permissions-role |
       | Viewer With ListGrants      | Viewer               |
@@ -559,6 +586,9 @@ Feature: ListGrants role
         }
       }
       """
+    And user "Brian" should have the following shares of the folder "FolderToShare":
+      | sharee | shareType | permissionsRole        |
+      | Brian  | user      | <new-permissions-role> |
     Examples:
       | permissions-role       | new-permissions-role |
       | Viewer With ListGrants | Viewer               |
@@ -616,6 +646,9 @@ Feature: ListGrants role
         }
       }
       """
+    And user "Brian" should have the following shares of the file "textfile1.txt":
+      | sharee | shareType | permissionsRole        |
+      | Brian  | user      | <new-permissions-role> |
     Examples:
       | new-permissions-role        | permissions-role |
       | Viewer With ListGrants      | Viewer           |
@@ -671,6 +704,9 @@ Feature: ListGrants role
         }
       }
       """
+    And user "Brian" should have the following shares of the folder "FolderToShare":
+      | sharee | shareType | permissionsRole        |
+      | Brian  | user      | <new-permissions-role> |
     Examples:
       | new-permissions-role   | permissions-role |
       | Viewer With ListGrants | Viewer           |
@@ -1266,6 +1302,10 @@ Feature: ListGrants role
         }
       }
       """
+    And user "Brian" should have the following shares of the folder "folder":
+      | sharee | shareType | permissionsRole    |
+      | Brian  | user      | Viewer             |
+      | grp1   | group     | <permissions-role> |
     Examples:
       | permissions-role       |
       | Viewer With ListGrants |
@@ -1456,8 +1496,7 @@ Feature: ListGrants role
                   "properties": {
                     "user": {
                       "type": "object",
-                      "required": ["displayName","id"
-                      ],
+                      "required": ["displayName","id"],
                       "properties": {
                         "displayName": {"const": "Brian Murphy"}
                       }
@@ -1604,3 +1643,125 @@ Feature: ListGrants role
       | permissions-role       |
       | Viewer With ListGrants |
       | Editor With ListGrants |
+
+
+  Scenario: user lists permissions of a folder after enabling 'Viewer With ListGrants' role (Personal space)
+    Given the administrator has enabled the permissions role "Viewer With ListGrants"
+    And user "Alice" has created folder "folder"
+    When user "Alice" gets permissions list for folder "folder" of the space "Personal" using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "@libre.graph.permissions.actions.allowedValues",
+          "@libre.graph.permissions.roles.allowedValues"
+        ],
+        "properties": {
+          "@libre.graph.permissions.roles.allowedValues": {
+            "type": "array",
+            "minItems": 4,
+            "maxItems": 4,
+            "uniqueItems": true,
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "required": ["@libre.graph.weight","description","displayName","id"],
+                  "properties": {
+                    "@libre.graph.weight": {"const": 1},
+                    "description": {"const": "View and download."},
+                    "displayName": {"const": "Can view"},
+                    "id": {"const": "b1e2218d-eef8-4d4c-b82d-0f1a1b48f3b5"}
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["@libre.graph.weight","description","displayName","id"],
+                  "properties": {
+                    "@libre.graph.weight": {"const": 2},
+                    "description": {"const": "View, download and show all invited people."},
+                    "displayName": {"const": "Can view"},
+                    "id": {"const": "d5041006-ebb3-4b4a-b6a4-7c180ecfb17d"}
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["@libre.graph.weight","description","displayName","id"],
+                  "properties": {
+                    "displayName": {"const": "Can upload"}
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["@libre.graph.weight","description","displayName","id"],
+                  "properties": {
+                    "displayName": {"const": "Can edit without versions"}
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+      """
+
+
+  Scenario: user lists permissions of a file after enabling 'File Editor With ListGrants' role (Project space)
+    Given the administrator has enabled the permissions role "File Editor With ListGrants"
+    And using spaces DAV path
+    And the administrator has assigned the role "Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Alice" has uploaded a file inside space "new-space" with content "hello world" to "textfile0.txt"
+    When user "Alice" gets permissions list for file "textfile0.txt" of the space "new-space" using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "@libre.graph.permissions.actions.allowedValues",
+          "@libre.graph.permissions.roles.allowedValues"
+        ],
+        "properties": {
+          "@libre.graph.permissions.roles.allowedValues": {
+            "type": "array",
+            "minItems": 3,
+            "maxItems": 3,
+            "uniqueItems": true,
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "required": ["@libre.graph.weight","description","displayName","id"],
+                  "properties": {
+                    "@libre.graph.weight": {"const": 1},
+                    "displayName": {"const": "Can view"}
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["@libre.graph.weight","description","displayName","id"],
+                  "properties": {
+                    "@libre.graph.weight": {"const": 2},
+                    "displayName": {"const": "Can edit without versions"},
+                    "id": {"const": "2d00ce52-1fc2-4dbc-8b95-a73b73395f5a"}
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["@libre.graph.weight","description","displayName","id"],
+                  "properties": {
+                    "@libre.graph.weight": {"const": 3},
+                    "description": {"const": "View, download, edit and show all invited people."},
+                    "displayName": {"const": "Can edit without versions"},
+                    "id": {"const": "c1235aea-d106-42db-8458-7d5610fb0a67"}
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+      """
