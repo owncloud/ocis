@@ -357,5 +357,15 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiContract/propfindShares.feature:171](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiContract/propfindShares.feature#L171)
 - [apiContract/propfindShares.feature:172](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiContract/propfindShares.feature#L172)
 
+#### [PROPFIND request to resource shared with user when deleted retains it's <oc:share-type> property](https://github.com/owncloud/ocis/issues/9463)
+- [apiContract/propfindShares.feature:194](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiContract/propfindShares.feature#L194)
+- [apiContract/propfindShares.feature:195](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiContract/propfindShares.feature#L195)
+- [apiContract/propfindShares.feature:196](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiContract/propfindShares.feature#L196)
+- [apiContract/propfindShares.feature:197](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiContract/propfindShares.feature#L197)
+- [apiContract/propfindShares.feature:198](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiContract/propfindShares.feature#L198)
+- [apiContract/propfindShares.feature:199](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiContract/propfindShares.feature#L199)
+- [apiContract/propfindShares.feature:223](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiContract/propfindShares.feature#L223)
+- [apiContract/propfindShares.feature:224](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiContract/propfindShares.feature#L224)
+
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.
