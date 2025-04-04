@@ -1,7 +1,7 @@
 ---
 title: "ocis.services.eventhistory.v0"
 url: /apis/grpc_apis/ocis_services_eventhistory_v0
-date: 2025-04-03T12:55:28Z
+date: 2025-04-04T00:53:55Z
 weight: 50
 geekdocRepo: https://github.com/owncloud/ocis
 ---
