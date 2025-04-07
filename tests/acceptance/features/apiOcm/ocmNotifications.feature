@@ -211,3 +211,23 @@ Feature: ocm notifications
       | message                                   |
       | Alice Hansen shared textfile.txt with you |
     And user "Brian" should not have a notification related to resource "textfile.txt" with subject "Resource unshared"
+
+  @issue-10718
+  Scenario: federation user gets an in-app notification for share received from local user
+    Given using server "REMOTE"
+    And user "Brian" has been created with default attributes
+    And "Brian" has created the federation share invitation
+    And using server "LOCAL"
+    And user "Alice" has uploaded file with content "ocm test" to "textfile.txt"
+    And "Alice" has accepted invitation
+    When user "Alice" sends the following resource share invitation to federated user using the Graph API:
+      | resource        | textfile.txt |
+      | space           | Personal     |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | Viewer       |
+    Then the HTTP status code should be "200"
+    And using server "REMOTE"
+    And user "Brian" should get a notification with subject "Resource shared" and message:
+      | message                                   |
+      | Alice Hansen shared textfile.txt with you |
