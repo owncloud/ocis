@@ -99,7 +99,6 @@ class SharingNgContext implements Context {
 
 		$response = GraphHelper::createLinkShare(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$spaceId,
@@ -145,7 +144,6 @@ class SharingNgContext implements Context {
 
 		return GraphHelper::createDriveShareLink(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$spaceId,
@@ -178,7 +176,6 @@ class SharingNgContext implements Context {
 
 		return GraphHelper::getPermissionsList(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$spaceId,
@@ -222,7 +219,6 @@ class SharingNgContext implements Context {
 		$this->featureContext->setResponse(
 			GraphHelper::getPermissionsList(
 				$this->featureContext->getBaseUrl(),
-				$this->featureContext->getStepLineRef(),
 				$user,
 				$this->featureContext->getPasswordForUser($user),
 				$spaceId,
@@ -253,7 +249,6 @@ class SharingNgContext implements Context {
 		$this->featureContext->setResponse(
 			GraphHelper::getPermissionsList(
 				$this->featureContext->getBaseUrl(),
-				$this->featureContext->getStepLineRef(),
 				$user,
 				$this->featureContext->getPasswordForUser($user),
 				$spaceId,
@@ -335,7 +330,6 @@ class SharingNgContext implements Context {
 
 		$response = GraphHelper::sendSharingInvitation(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$spaceId,
@@ -404,7 +398,6 @@ class SharingNgContext implements Context {
 
 		return GraphHelper::sendSharingInvitationForDrive(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$spaceId,
@@ -590,7 +583,6 @@ class SharingNgContext implements Context {
 
 			$request = HttpRequestHelper::createRequest(
 				$fullUrl,
-				$this->featureContext->getStepLineRef(),
 				"POST",
 				['Content-Type' => 'application/json'],
 				\json_encode($body)
@@ -755,7 +747,6 @@ class SharingNgContext implements Context {
 
 		$response =  GraphHelper::updateShare(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$spaceId,
@@ -955,7 +946,6 @@ class SharingNgContext implements Context {
 
 		$response = GraphHelper::updateShare(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$spaceId,
@@ -996,7 +986,6 @@ class SharingNgContext implements Context {
 
 		$response = GraphHelper::setLinkSharePassword(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$spaceId,
@@ -1099,7 +1088,6 @@ class SharingNgContext implements Context {
 		return
 			GraphHelper::removeAccessToSpaceItem(
 				$this->featureContext->getBaseUrl(),
-				$this->featureContext->getStepLineRef(),
 				$sharer,
 				$this->featureContext->getPasswordForUser($sharer),
 				$spaceId,
@@ -1138,7 +1126,6 @@ class SharingNgContext implements Context {
 		return
 			GraphHelper::removeAccessToSpace(
 				$this->featureContext->getBaseUrl(),
-				$this->featureContext->getStepLineRef(),
 				$sharer,
 				$this->featureContext->getPasswordForUser($sharer),
 				$spaceId,
@@ -1349,7 +1336,6 @@ class SharingNgContext implements Context {
 		$body['@UI.Hidden'] = $hide;
 		return GraphHelper::hideOrUnhideShare(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$this->featureContext->getActualUsername($sharee),
 			$this->featureContext->getPasswordForUser($sharee),
 			$itemId,
@@ -1372,7 +1358,6 @@ class SharingNgContext implements Context {
 		$itemId = $shareSpaceId . '!' . $shareItemId;
 		$response = GraphHelper::disableShareSync(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$this->featureContext->getActualUsername($user),
 			$this->featureContext->getPasswordForUser($user),
 			$itemId,
@@ -1400,7 +1385,6 @@ class SharingNgContext implements Context {
 		$itemId = $shareSpaceId . '!' . $shareItemId;
 		$response = GraphHelper::disableShareSync(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$this->featureContext->getActualUsername($user),
 			$this->featureContext->getPasswordForUser($user),
 			$itemId,
@@ -1495,7 +1479,6 @@ class SharingNgContext implements Context {
 		$shareSpaceId = GraphHelper::SHARES_SPACE_ID;
 		$response =  GraphHelper::enableShareSync(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$this->featureContext->getActualUsername($user),
 			$this->featureContext->getPasswordForUser($user),
 			$itemId,
@@ -1520,7 +1503,6 @@ class SharingNgContext implements Context {
 		$remoteItemId = $this->spacesContext->getSharesRemoteItemId($user, $share);
 		$response =  GraphHelper::enableShareSync(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$this->featureContext->getActualUsername($user),
 			$this->featureContext->getPasswordForUser($user),
 			$remoteItemId,
@@ -1547,7 +1529,6 @@ class SharingNgContext implements Context {
 
 		$response =  GraphHelper::enableShareSync(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$this->featureContext->getActualUsername($user),
 			$this->featureContext->getPasswordForUser($user),
 			$itemId,
@@ -1571,7 +1552,6 @@ class SharingNgContext implements Context {
 		$itemId = $shareSpaceId . '!' . $shareID;
 		$response =  GraphHelper::disableShareSync(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$this->featureContext->getActualUsername($user),
 			$this->featureContext->getPasswordForUser($user),
 			$itemId,
@@ -1591,7 +1571,6 @@ class SharingNgContext implements Context {
 		$resource = \trim($resource, '/');
 		$response = GraphHelper::getSharesSharedWithMe(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$user,
 			$this->featureContext->getPasswordForUser($user)
 		);
@@ -1743,7 +1722,6 @@ class SharingNgContext implements Context {
 
 		$response = GraphHelper::getDrivePermissionsList(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$spaceId
@@ -1820,7 +1798,6 @@ class SharingNgContext implements Context {
 		$this->featureContext->setResponse(
 			GraphHelper::updateDriveShare(
 				$this->featureContext->getBaseUrl(),
-				$this->featureContext->getStepLineRef(),
 				$user,
 				$this->featureContext->getPasswordForUser($user),
 				$spaceId,
@@ -1884,7 +1861,6 @@ class SharingNgContext implements Context {
 
 		$response = GraphHelper::setDriveLinkSharePassword(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$spaceId,
@@ -1914,7 +1890,6 @@ class SharingNgContext implements Context {
 
 		$response = GraphHelper::removeAccessToSpace(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$spaceId,
@@ -1938,7 +1913,6 @@ class SharingNgContext implements Context {
 
 		$response = GraphHelper::getDrivePermissionsList(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$spaceId
@@ -2045,7 +2019,6 @@ class SharingNgContext implements Context {
 
 		$response = GraphHelper::getDrivePermissionsList(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$spaceId
@@ -2107,8 +2080,7 @@ class SharingNgContext implements Context {
 				$this->featureContext->getBaseUrl(),
 				$sharee,
 				$this->featureContext->getPasswordForUser($sharee),
-				"",
-				$this->featureContext->getStepLineRef()
+				""
 			);
 			$driveList = HttpRequestHelper::getJsonDecodedResponseBodyContent($response)->value;
 			$foundShareMountpoint = false;
@@ -2130,7 +2102,6 @@ class SharingNgContext implements Context {
 		// check share in shared-with-me list
 		$response = GraphHelper::getSharesSharedWithMe(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$sharee,
 			$this->featureContext->getPasswordForUser($sharee)
 		);

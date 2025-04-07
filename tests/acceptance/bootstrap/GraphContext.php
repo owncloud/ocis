@@ -216,7 +216,6 @@ class GraphContext implements Context {
 		$userId = $this->featureContext->getAttributeOfCreatedUser($user, 'id') ?: $user;
 		return GraphHelper::editUser(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$byUser,
 			$this->featureContext->getPasswordForUser($byUser),
 			$userId,
@@ -242,7 +241,6 @@ class GraphContext implements Context {
 		$userId = $userId ?: $user;
 		return GraphHelper::getUser(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$this->featureContext->getAdminUsername(),
 			$this->featureContext->getAdminPassword(),
 			$userId
@@ -264,7 +262,6 @@ class GraphContext implements Context {
 
 		return GraphHelper::deleteGroup(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$credentials["username"],
 			$credentials["password"],
 			$groupId
@@ -298,7 +295,6 @@ class GraphContext implements Context {
 		$credentials = $this->getAdminOrUserCredentials($byUser);
 		$response = GraphHelper::deleteUser(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$credentials["username"],
 			$credentials["password"],
 			$user
@@ -325,7 +321,6 @@ class GraphContext implements Context {
 		$credentials = $this->getAdminOrUserCredentials($byUser);
 		return GraphHelper::removeUserFromGroup(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$credentials['username'],
 			$credentials['password'],
 			$userId,
@@ -351,7 +346,6 @@ class GraphContext implements Context {
 		$credentials = $this->getAdminOrUserCredentials($byUser);
 		$response = GraphHelper::deleteUserByUserId(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$credentials["username"],
 			$credentials["password"],
 			$userId
@@ -487,7 +481,6 @@ class GraphContext implements Context {
 		$userId = $this->featureContext->getAttributeOfCreatedUser($user, "id") ?: $user;
 		return GraphHelper::editUser(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$credentials["username"],
 			$credentials["password"],
 			$userId,
@@ -579,7 +572,6 @@ class GraphContext implements Context {
 
 		return GraphHelper::getGroups(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$credentials["username"],
 			$credentials["password"]
 		);
@@ -625,7 +617,6 @@ class GraphContext implements Context {
 
 		return GraphHelper::getMembersList(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$credentials["username"],
 			$credentials["password"],
 			$this->featureContext->getAttributeOfCreatedGroup($group, 'id')
@@ -648,7 +639,6 @@ class GraphContext implements Context {
 
 		return GraphHelper::getSingleOrAllGroupsAlongWithMembers(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$credentials["username"],
 			$credentials["password"],
 			($group) ? $this->featureContext->getAttributeOfCreatedGroup($group, 'id') : null
@@ -697,7 +687,6 @@ class GraphContext implements Context {
 		$rows = $table->getRowsHash();
 		$response = GraphHelper::createUser(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$rows["userName"],
@@ -745,7 +734,6 @@ class GraphContext implements Context {
 		}
 		return GraphHelper::addUserToGroup(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$credentials['username'],
 			$credentials['password'],
 			$userId,
@@ -864,7 +852,6 @@ class GraphContext implements Context {
 
 		return GraphHelper::createGroup(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$credentials["username"],
 			$credentials["password"],
 			$group,
@@ -990,7 +977,6 @@ class GraphContext implements Context {
 	public function userChangesOwnPassword(string $user, string $currentPassword, string $newPassword): void {
 		$response = GraphHelper::changeOwnPassword(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$currentPassword,
@@ -1101,7 +1087,6 @@ class GraphContext implements Context {
 
 		return GraphHelper::updateGroup(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$credentials['username'],
 			$credentials['password'],
 			$oldGroupId,
@@ -1209,7 +1194,6 @@ class GraphContext implements Context {
 		$credentials = $this->getAdminOrUserCredentials($user);
 		return GraphHelper::getOwnInformationAndGroupMemberships(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$credentials["username"],
 			$credentials["password"],
 		);
@@ -1244,7 +1228,6 @@ class GraphContext implements Context {
 		$credentials = $this->getAdminOrUserCredentials($byUser);
 		$response = GraphHelper::getUser(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$credentials['username'],
 			$credentials['password'],
 			$user
@@ -1260,13 +1243,11 @@ class GraphContext implements Context {
 	 * @param string $searchTerm
 	 *
 	 * @return void
-	 * @throws GuzzleException
 	 */
 	public function userSearchesForUserUsingGraphApi(string $byUser, string $searchTerm): void {
 		$credentials = $this->getAdminOrUserCredentials($byUser);
 		$response = GraphHelper::searchUser(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$credentials['username'],
 			$credentials['password'],
 			$searchTerm,
@@ -1287,7 +1268,6 @@ class GraphContext implements Context {
 		$credentials = $this->getAdminOrUserCredentials($byUser);
 		$response = GraphHelper::searchFederatedUser(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$credentials['username'],
 			$credentials['password'],
 			$searchTerm,
@@ -1304,11 +1284,10 @@ class GraphContext implements Context {
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function userGetsAllUserUsingTheGraphApi(string $user) {
+	public function userGetsAllUserUsingTheGraphApi(string $user): void {
 		$credentials = $this->getAdminOrUserCredentials($user);
 		$response = GraphHelper::getUsers(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$credentials['username'],
 			$credentials['password'],
 		);
@@ -1331,7 +1310,6 @@ class GraphContext implements Context {
 		$credentials = $this->getAdminOrUserCredentials($user);
 		return GraphHelper::getUserWithDriveInformation(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$credentials["username"],
 			$credentials["password"],
 			$user
@@ -1354,7 +1332,6 @@ class GraphContext implements Context {
 		$credentials = $this->getAdminOrUserCredentials($user);
 		return GraphHelper::getUserWithGroupInformation(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$credentials["username"],
 			$credentials["password"],
 			$user
@@ -1369,7 +1346,7 @@ class GraphContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function userTriesToGetInformationOfUserAlongWithHisDriveData(string $byUser, string $user) {
+	public function userTriesToGetInformationOfUserAlongWithHisDriveData(string $byUser, string $user): void {
 		$response = $this->retrieveUserInformationAlongWithDriveUsingGraphApi($byUser, $user);
 		$this->featureContext->setResponse($response);
 	}
@@ -1382,7 +1359,7 @@ class GraphContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function userTriesToGetInformationOfUserAlongWithHisGroup(string $byUser, string $user) {
+	public function userTriesToGetInformationOfUserAlongWithHisGroup(string $byUser, string $user): void {
 		$response = $this->retrieveUserInformationAlongWithGroupUsingGraphApi($byUser, $user);
 		$this->featureContext->setResponse($response);
 	}
@@ -1420,7 +1397,6 @@ class GraphContext implements Context {
 
 		return GraphHelper::addUsersToGroup(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$credentials["username"],
 			$credentials["password"],
 			$groupId,
@@ -1487,7 +1463,6 @@ class GraphContext implements Context {
 		$this->featureContext->setResponse(
 			HttpRequestHelper::sendRequest(
 				GraphHelper::getFullUrl($this->featureContext->getBaseUrl(), 'groups/' . $groupId),
-				$this->featureContext->getStepLineRef(),
 				'PATCH',
 				$credentials["username"],
 				$credentials["password"],
@@ -1524,7 +1499,6 @@ class GraphContext implements Context {
 		$this->featureContext->setResponse(
 			HttpRequestHelper::post(
 				GraphHelper::getFullUrl($this->featureContext->getBaseUrl(), 'groups/' . $groupId . '/members/$ref'),
-				$this->featureContext->getStepLineRef(),
 				$credentials["username"],
 				$credentials["password"],
 				['Content-Type' => 'application/json'],
@@ -1622,7 +1596,6 @@ class GraphContext implements Context {
 	public function userGetsAllApplicationsUsingTheGraphApi(string $user) {
 		$response = GraphHelper::getApplications(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 		);
@@ -1693,7 +1666,6 @@ class GraphContext implements Context {
 		$groupId = $this->featureContext->getGroupIdByGroupName($group);
 		$response = GraphHelper::getUsersWithFilterMemberOf(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$groupId
@@ -1717,7 +1689,6 @@ class GraphContext implements Context {
 		}
 		$response = GraphHelper::getUsersOfTwoGroups(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$groupsIdArray
@@ -1742,7 +1713,6 @@ class GraphContext implements Context {
 	) {
 		$response = GraphHelper::getUsersFromOneOrOtherGroup(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$firstGroup,
@@ -1762,7 +1732,6 @@ class GraphContext implements Context {
 	public function getRoleIdByRoleName(string $role): string {
 		$response = GraphHelper::getApplications(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$this->featureContext->getAdminUsername(),
 			$this->featureContext->getAdminPassword()
 		);
@@ -1789,7 +1758,6 @@ class GraphContext implements Context {
 	public function userGetsAllUsersWithRoleUsingTheGraphApi(string $user, string $role) {
 		$response = GraphHelper::getUsersWithFilterRoleAssignment(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$this->getRoleIdByRoleName($role)
@@ -1814,7 +1782,6 @@ class GraphContext implements Context {
 	) {
 		$response = GraphHelper::getUsersWithFilterRolesAssignmentAndMemberOf(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$this->getRoleIdByRoleName($role),
@@ -1843,7 +1810,6 @@ class GraphContext implements Context {
 
 		$response = GraphHelper::assignRole(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$this->featureContext->getAdminUsername(),
 			$this->featureContext->getAdminPassword(),
 			$this->appEntity["appRoles"][$role],
@@ -1872,7 +1838,6 @@ class GraphContext implements Context {
 		$this->featureContext->setResponse(
 			GraphHelper::getAssignedRole(
 				$this->featureContext->getBaseUrl(),
-				$this->featureContext->getStepLineRef(),
 				$admin,
 				$this->featureContext->getPasswordForUser($admin),
 				$userId
@@ -1895,7 +1860,6 @@ class GraphContext implements Context {
 		$this->featureContext->setResponse(
 			GraphHelper::getAssignedRole(
 				$this->featureContext->getBaseUrl(),
-				$this->featureContext->getStepLineRef(),
 				$credentials['username'],
 				$credentials['password'],
 				$userId
@@ -1914,7 +1878,6 @@ class GraphContext implements Context {
 			$this->featureContext->getJsonDecodedResponse(
 				GraphHelper::getApplications(
 					$this->featureContext->getBaseUrl(),
-					$this->featureContext->getStepLineRef(),
 					$this->featureContext->getAdminUsername(),
 					$this->featureContext->getAdminPassword(),
 				)
@@ -1977,7 +1940,6 @@ class GraphContext implements Context {
 		$this->featureContext->setResponse(
 			GraphHelper::getGroup(
 				$this->featureContext->getBaseUrl(),
-				$this->featureContext->getStepLineRef(),
 				$credentials["username"],
 				$credentials["password"],
 				$groupName
@@ -1999,7 +1961,6 @@ class GraphContext implements Context {
 		$this->featureContext->setResponse(
 			GraphHelper::searchGroup(
 				$this->featureContext->getBaseUrl(),
-				$this->featureContext->getStepLineRef(),
 				$credentials["username"],
 				$credentials["password"],
 				$searchTerm
@@ -2100,7 +2061,6 @@ class GraphContext implements Context {
 		$this->featureContext->setResponse(
 			HttpRequestHelper::sendRequest(
 				GraphHelper::getFullUrl($this->featureContext->getBaseUrl(), 'groups/' . $groupId),
-				$this->featureContext->getStepLineRef(),
 				'PATCH',
 				$credentials["username"],
 				$credentials["password"],
@@ -2137,7 +2097,6 @@ class GraphContext implements Context {
 		$this->featureContext->setResponse(
 			HttpRequestHelper::post(
 				GraphHelper::getFullUrl($this->featureContext->getBaseUrl(), 'groups/' . $groupId . '/members/$ref'),
-				$this->featureContext->getStepLineRef(),
 				$credentials["username"],
 				$credentials["password"],
 				['Content-Type' => 'application/json'],
@@ -2179,7 +2138,6 @@ class GraphContext implements Context {
 		$this->featureContext->setResponse(
 			HttpRequestHelper::post(
 				GraphHelper::getFullUrl($this->featureContext->getBaseUrl(), 'groups/' . $groupId . '/members/$ref'),
-				$this->featureContext->getStepLineRef(),
 				$credentials["username"],
 				$credentials["password"],
 				['Content-Type' => 'application/json'],
@@ -2222,7 +2180,6 @@ class GraphContext implements Context {
 		$this->featureContext->setResponse(
 			HttpRequestHelper::sendRequest(
 				GraphHelper::getFullUrl($this->featureContext->getBaseUrl(), 'groups/' . $groupId),
-				$this->featureContext->getStepLineRef(),
 				'PATCH',
 				$credentials["username"],
 				$credentials["password"],
@@ -2257,7 +2214,6 @@ class GraphContext implements Context {
 		$this->featureContext->setResponse(
 			GraphHelper::addUsersToGroup(
 				$this->featureContext->getBaseUrl(),
-				$this->featureContext->getStepLineRef(),
 				$credentials["username"],
 				$credentials["password"],
 				$groupId,
@@ -2287,7 +2243,6 @@ class GraphContext implements Context {
 		$this->featureContext->setResponse(
 			GraphHelper::addUserToGroup(
 				$this->featureContext->getBaseUrl(),
-				$this->featureContext->getStepLineRef(),
 				$credentials['username'],
 				$credentials['password'],
 				$userId,
@@ -2339,7 +2294,6 @@ class GraphContext implements Context {
 		$this->featureContext->setResponse(
 			GraphHelper::getPersonalDriveInformationByUserId(
 				$this->featureContext->getBaseUrl(),
-				$this->featureContext->getStepLineRef(),
 				$credentials["username"],
 				$credentials["password"],
 				$userId
@@ -2362,7 +2316,6 @@ class GraphContext implements Context {
 		$this->featureContext->setResponse(
 			GraphHelper::generateGDPRReport(
 				$this->featureContext->getBaseUrl(),
-				$this->featureContext->getStepLineRef(),
 				$credentials['username'],
 				$credentials['password'],
 				$userId,
@@ -2456,7 +2409,6 @@ class GraphContext implements Context {
 		$this->featureContext->setResponse(
 			GraphHelper::generateGDPRReport(
 				$this->featureContext->getBaseUrl(),
-				$this->featureContext->getStepLineRef(),
 				$credentials['username'],
 				$credentials['password'],
 				$this->featureContext->getAttributeOfCreatedUser($ofUser, 'id'),
@@ -2477,7 +2429,6 @@ class GraphContext implements Context {
 		return (
 			GraphHelper::getAssignedRole(
 				$this->featureContext->getBAseUrl(),
-				$this->featureContext->getStepLineRef(),
 				$this->featureContext->getAdminUsername(),
 				$this->featureContext->getAdminPassword(),
 				$userId
@@ -2514,7 +2465,6 @@ class GraphContext implements Context {
 		$this->featureContext->setResponse(
 			GraphHelper::unassignRole(
 				$this->featureContext->getBaseUrl(),
-				$this->featureContext->getStepLineRef(),
 				$credentials['username'],
 				$credentials['password'],
 				$appRoleAssignmentId,
@@ -2588,7 +2538,6 @@ class GraphContext implements Context {
 		$this->featureContext->setResponse(
 			GraphHelper::assignRole(
 				$this->featureContext->getBaseUrl(),
-				$this->featureContext->getStepLineRef(),
 				$credentials['username'],
 				$credentials['password'],
 				$this->appEntity["appRoles"][$role],
@@ -2611,7 +2560,6 @@ class GraphContext implements Context {
 		$credentials = $this->getAdminOrUserCredentials($user);
 		$response =  GraphHelper::switchSystemLanguage(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$credentials['username'],
 			$credentials['password'],
 			$language
@@ -2637,7 +2585,6 @@ class GraphContext implements Context {
 		$this->featureContext->setResponse(
 			GraphHelper::switchSystemLanguage(
 				$this->featureContext->getBaseUrl(),
-				$this->featureContext->getStepLineRef(),
 				$credentials['username'],
 				$credentials['password'],
 				$language
@@ -2678,7 +2625,6 @@ class GraphContext implements Context {
 		do {
 			$response = GraphHelper::getSharesSharedWithMe(
 				$this->featureContext->getBaseUrl(),
-				$this->featureContext->getStepLineRef(),
 				$credentials['username'],
 				$credentials['password']
 			);
@@ -2725,7 +2671,6 @@ class GraphContext implements Context {
 		}
 		return GraphHelper::getSharesSharedByMe(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$credentials['username'],
 			$credentials['password']
 		);
@@ -2836,7 +2781,6 @@ class GraphContext implements Context {
 	): void {
 		$response = GraphHelper::createUser(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$byUser,
 			$password,
 			$user,
@@ -2865,7 +2809,6 @@ class GraphContext implements Context {
 		$userId = $this->featureContext->getUserIdByUserName($byUser);
 		$response = GraphHelper::editUser(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$byUser,
 			$this->featureContext->getPasswordForUser($byUser),
 			$userId,
@@ -2889,7 +2832,6 @@ class GraphContext implements Context {
 		$this->featureContext->setResponse(
 			GraphHelper::getPermissionsRoleDefinitions(
 				$this->featureContext->getBaseUrl(),
-				$this->featureContext->getStepLineRef(),
 				$credentials['username'],
 				$credentials['password'],
 			)
@@ -2912,7 +2854,6 @@ class GraphContext implements Context {
 			GraphHelper::getPermissionRoleDefinition(
 				$permissionRole,
 				$this->featureContext->getBaseUrl(),
-				$this->featureContext->getStepLineRef(),
 				$credentials['username'],
 				$credentials['password'],
 			)
@@ -2940,7 +2881,6 @@ class GraphContext implements Context {
 		}
 		return GraphHelper::getActivities(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$resourceId
@@ -3043,14 +2983,12 @@ class GraphContext implements Context {
 	): void {
 		$resourceId = GraphHelper::getShareMountId(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$folder
 		);
 		$response = GraphHelper::getActivities(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$resourceId
@@ -3077,7 +3015,6 @@ class GraphContext implements Context {
 		$resourceId = $this->spacesContext->getResourceId($owner, $spaceName, $file);
 		$response = GraphHelper::getActivities(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$resourceId
@@ -3097,7 +3034,6 @@ class GraphContext implements Context {
 		$spaceId = ($this->spacesContext->getSpaceByName($user, $spaceName))["id"];
 		$response = GraphHelper::getActivities(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$spaceId
@@ -3121,7 +3057,6 @@ class GraphContext implements Context {
 	): void {
 		$response = GraphHelper::getActivities(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			"public",
 			$this->featureContext->getActualPassword($password),
 			$this->spacesContext->getSpaceIdByName($user, $spaceName)
@@ -3147,7 +3082,6 @@ class GraphContext implements Context {
 	): void {
 		$response = GraphHelper::getActivities(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			"public",
 			$this->featureContext->getPasswordForUser($owner),
 			$this->spacesContext->getResourceId($owner, $space, $resource)
@@ -3176,7 +3110,6 @@ class GraphContext implements Context {
 		$resourceId = $this->spacesContext->getResourceId($user, $spaceName, $resource);
 		$response = GraphHelper::getActivities(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$resourceId,
@@ -3230,7 +3163,6 @@ class GraphContext implements Context {
 		$resourceId = $this->spacesContext->getResourceId($user, $spaceName, $resource);
 		$response = GraphHelper::getActivities(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$resourceId,
@@ -3252,7 +3184,6 @@ class GraphContext implements Context {
 
 		$response = GraphHelper::getFederatedUsers(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$credentials['username'],
 			$credentials['password']
 		);
@@ -3273,7 +3204,6 @@ class GraphContext implements Context {
 
 		$response = GraphHelper::getAllUsers(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$credentials['username'],
 			$credentials['password']
 		);

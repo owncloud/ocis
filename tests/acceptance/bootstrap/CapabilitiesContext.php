@@ -74,7 +74,6 @@ class CapabilitiesContext implements Context {
 			$password,
 			'GET',
 			'/cloud/capabilities' . ($formatJson ? '?format=json' : ''),
-			$this->featureContext->getStepLineRef(),
 			[],
 			$this->featureContext->getOcsApiVersion()
 		);

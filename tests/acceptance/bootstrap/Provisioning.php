@@ -582,7 +582,6 @@ trait Provisioning {
 				);
 				$request = GraphHelper::createRequest(
 					$this->getBaseUrl(),
-					$this->getStepLineRef(),
 					"POST",
 					'users',
 					$body,
@@ -873,7 +872,6 @@ trait Provisioning {
 		$fullUrl = $this->getBaseUrl() . "/ocs/v$this->ocsApiVersion.php/cloud/groups";
 		return HttpRequestHelper::get(
 			$fullUrl,
-			$this->getStepLineRef(),
 			$this->getAdminUsername(),
 			$this->getAdminPassword()
 		);
@@ -892,7 +890,6 @@ trait Provisioning {
 		$actualPassword = $this->getUserPassword($actualUser);
 		$this->response = HttpRequestHelper::get(
 			$fullUrl,
-			$this->getStepLineRef(),
 			$actualUser,
 			$actualPassword
 		);
@@ -923,7 +920,6 @@ trait Provisioning {
 		$actualPassword = $this->getUserPassword($actualUser);
 		return HttpRequestHelper::get(
 			$fullUrl,
-			$this->getStepLineRef(),
 			$actualUser,
 			$actualPassword
 		);
@@ -943,7 +939,6 @@ trait Provisioning {
 			$url = $this->getBaseUrl() . "/ocs/v$this->ocsApiVersion.php/cloud/users/$user";
 			HttpRequestHelper::get(
 				$url,
-				$this->getStepLineRef(),
 				$user,
 				$password
 			);
@@ -1111,7 +1106,6 @@ trait Provisioning {
 			$reqUser = $byUser ? $this->getActualUsername($byUser) : $this->getAdminUsername();
 			$response = GraphHelper::createUser(
 				$this->getBaseUrl(),
-				$this->getStepLineRef(),
 				$reqUser,
 				$this->getPasswordForUser($reqUser),
 				$user,
@@ -1156,7 +1150,6 @@ trait Provisioning {
 				$group,
 				$this->getAdminUsername(),
 				$this->getAdminPassword(),
-				$this->getStepLineRef(),
 				$this->ocsApiVersion
 			);
 		} else {
@@ -1255,7 +1248,6 @@ trait Provisioning {
 
 		$response = HttpRequestHelper::get(
 			$fullUrl,
-			$this->getStepLineRef(),
 			$requestingUser,
 			$requestingPassword
 		);
@@ -1321,7 +1313,6 @@ trait Provisioning {
 				$fullUrl = $this->getBaseUrl() . "/ocs/v2.php/cloud/users/$user/groups";
 				$response = HttpRequestHelper::get(
 					$fullUrl,
-					$this->getStepLineRef(),
 					$this->getAdminUsername(),
 					$this->getAdminPassword()
 				);
@@ -1351,7 +1342,6 @@ trait Provisioning {
 		$fullUrl = $this->getBaseUrl() . "/ocs/v2.php/cloud/groups/$group";
 		$response = HttpRequestHelper::get(
 			$fullUrl,
-			$this->getStepLineRef(),
 			$this->getAdminUsername(),
 			$this->getAdminPassword()
 		);
@@ -1750,7 +1740,6 @@ trait Provisioning {
 				$user,
 				$this->getAdminUsername(),
 				$this->getAdminPassword(),
-				$this->getStepLineRef(),
 				$this->ocsApiVersion
 			);
 		} else {
@@ -1806,7 +1795,6 @@ trait Provisioning {
 		$fullUrl = $this->getBaseUrl() . "/graph/v1.0/groups/$group";
 		$this->response = HttpRequestHelper::get(
 			$fullUrl,
-			$this->getStepLineRef(),
 			$this->getAdminUsername(),
 			$this->getAdminPassword()
 		);
@@ -1841,7 +1829,6 @@ trait Provisioning {
 			$fullUrl = $this->getBaseUrl() . "/ocs/v2.php/cloud/users/$user/groups";
 			$response = HttpRequestHelper::get(
 				$fullUrl,
-				$this->getStepLineRef(),
 				$this->getAdminUsername(),
 				$this->getAdminPassword()
 			);
@@ -2044,7 +2031,6 @@ trait Provisioning {
 			. "/ocs/v$this->ocsApiVersion.php/cloud/users/$actualOtherUser/$action";
 		return HttpRequestHelper::put(
 			$fullUrl,
-			$this->getStepLineRef(),
 			$actualUser,
 			$actualPassword
 		);

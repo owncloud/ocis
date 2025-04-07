@@ -41,7 +41,6 @@ class UserHelper {
 	 * @param string $value
 	 * @param string $adminUser
 	 * @param string $adminPassword
-	 * @param string $xRequestId
 	 * @param int|null $ocsApiVersion
 	 *
 	 * @return ResponseInterface
@@ -54,7 +53,6 @@ class UserHelper {
 		string $value,
 		string 	$adminUser,
 		string $adminPassword,
-		string $xRequestId  = '',
 		?int $ocsApiVersion = 2
 	): ResponseInterface {
 		return OcsApiHelper::sendRequest(
@@ -63,7 +61,6 @@ class UserHelper {
 			$adminPassword,
 			"PUT",
 			"/cloud/users/" . $user,
-			$xRequestId,
 			["key" => $key, "value" => $value],
 			$ocsApiVersion
 		);
@@ -77,7 +74,6 @@ class UserHelper {
 	 * @param array|null $editData ['user' => '', 'key' => '', 'value' => '']
 	 * @param string|null $adminUser
 	 * @param string|null $adminPassword
-	 * @param string|null $xRequestId
 	 * @param int|null $ocsApiVersion
 	 *
 	 * @return array
@@ -88,7 +84,6 @@ class UserHelper {
 		?array $editData,
 		?string $adminUser,
 		?string $adminPassword,
-		?string $xRequestId = '',
 		?int $ocsApiVersion = 2
 	): array {
 		$requests = [];
@@ -105,7 +100,6 @@ class UserHelper {
 				$baseUrl,
 				'PUT',
 				$path,
-				$xRequestId,
 				$body
 			);
 		}
@@ -130,7 +124,6 @@ class UserHelper {
 	 * @param string|null $userName
 	 * @param string|null $adminUser
 	 * @param string|null $adminPassword
-	 * @param string|null $xRequestId
 	 * @param int|null $ocsApiVersion
 	 *
 	 * @return ResponseInterface
@@ -141,7 +134,6 @@ class UserHelper {
 		?string $userName,
 		?string $adminUser,
 		?string $adminPassword,
-		?string $xRequestId = '',
 		?int $ocsApiVersion = 2
 	): ResponseInterface {
 		return OcsApiHelper::sendRequest(
@@ -150,7 +142,6 @@ class UserHelper {
 			$adminPassword,
 			"GET",
 			"/cloud/users/" . $userName,
-			$xRequestId,
 			[],
 			$ocsApiVersion
 		);
@@ -162,7 +153,6 @@ class UserHelper {
 	 * @param string|null $userName
 	 * @param string|null $adminUser
 	 * @param string|null $adminPassword
-	 * @param string|null $xRequestId
 	 * @param int|null $ocsApiVersion
 	 *
 	 * @return ResponseInterface
@@ -173,7 +163,6 @@ class UserHelper {
 		?string $userName,
 		?string $adminUser,
 		?string $adminPassword,
-		?string $xRequestId = '',
 		?int $ocsApiVersion = 2
 	): ResponseInterface {
 		return OcsApiHelper::sendRequest(
@@ -182,7 +171,6 @@ class UserHelper {
 			$adminPassword,
 			"DELETE",
 			"/cloud/users/" . $userName,
-			$xRequestId,
 			[],
 			$ocsApiVersion
 		);
@@ -195,7 +183,6 @@ class UserHelper {
 	 * @param string|null $group
 	 * @param string|null $adminUser
 	 * @param string|null $adminPassword
-	 * @param string|null $xRequestId
 	 * @param int|null $ocsApiVersion (1|2)
 	 *
 	 * @return ResponseInterface
@@ -207,7 +194,6 @@ class UserHelper {
 		?string $group,
 		?string $adminUser,
 		?string $adminPassword,
-		?string $xRequestId = '',
 		?int $ocsApiVersion = 2
 	): ResponseInterface {
 		return OcsApiHelper::sendRequest(
@@ -216,7 +202,6 @@ class UserHelper {
 			$adminPassword,
 			"POST",
 			"/cloud/users/" . $user . "/groups",
-			$xRequestId,
 			['groupid' => $group],
 			$ocsApiVersion
 		);
@@ -229,7 +214,6 @@ class UserHelper {
 	 * @param string|null $group
 	 * @param string|null $adminUser
 	 * @param string|null $adminPassword
-	 * @param string|null $xRequestId
 	 * @param int|null $ocsApiVersion (1|2)
 	 *
 	 * @return ResponseInterface
@@ -241,7 +225,6 @@ class UserHelper {
 		?string $group,
 		?string $adminUser,
 		?string $adminPassword,
-		?string $xRequestId,
 		?int $ocsApiVersion = 2
 	): ResponseInterface {
 		return OcsApiHelper::sendRequest(
@@ -250,7 +233,6 @@ class UserHelper {
 			$adminPassword,
 			"DELETE",
 			"/cloud/users/" . $user . "/groups",
-			$xRequestId,
 			['groupid' => $group],
 			$ocsApiVersion
 		);
@@ -261,7 +243,6 @@ class UserHelper {
 	 * @param string|null $baseUrl
 	 * @param string|null $adminUser
 	 * @param string|null $adminPassword
-	 * @param string|null $xRequestId
 	 * @param string|null $search
 	 *
 	 * @return ResponseInterface
@@ -271,7 +252,6 @@ class UserHelper {
 		?string $baseUrl,
 		?string $adminUser,
 		?string $adminPassword,
-		?string $xRequestId = '',
 		?string $search =""
 	): ResponseInterface {
 		return OcsApiHelper::sendRequest(
@@ -280,7 +260,6 @@ class UserHelper {
 			$adminPassword,
 			"GET",
 			"/cloud/groups?search=" . $search,
-			$xRequestId
 		);
 	}
 
@@ -289,7 +268,6 @@ class UserHelper {
 	 * @param string|null $baseUrl
 	 * @param string|null $adminUser
 	 * @param string|null $adminPassword
-	 * @param string|null $xRequestId
 	 * @param string|null $search
 	 *
 	 * @return string[]
@@ -299,14 +277,12 @@ class UserHelper {
 		?string $baseUrl,
 		?string $adminUser,
 		?string $adminPassword,
-		?string $xRequestId = '',
 		?string $search = ""
 	): array {
 		$result = self::getGroups(
 			$baseUrl,
 			$adminUser,
 			$adminPassword,
-			$xRequestId,
 			$search
 		);
 		$groups = HttpRequestHelper::getResponseXml($result, __METHOD__)->xpath(".//groups")[0];

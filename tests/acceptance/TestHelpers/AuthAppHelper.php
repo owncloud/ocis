@@ -50,7 +50,6 @@ class AuthAppHelper {
 		$url = $baseUrl . self::getAuthAppEndpoint();
 		return HttpRequestHelper::sendRequest(
 			$url,
-			null,
 			"GET",
 			$user,
 			$password,
@@ -75,7 +74,6 @@ class AuthAppHelper {
 		. http_build_query($params);
 		return HttpRequestHelper::sendRequest(
 			$url,
-			null,
 			"POST",
 			$user,
 			$password,
@@ -99,7 +97,6 @@ class AuthAppHelper {
 		$url = $baseUrl . self::getAuthAppEndpoint() . "?token=$token";
 		return HttpRequestHelper::sendRequest(
 			$url,
-			null,
 			"DELETE",
 			$user,
 			$password,

@@ -55,7 +55,6 @@ class OcmHelper {
 
 	/**
 	 * @param string $baseUrl
-	 * @param string $xRequestId
 	 * @param string $user
 	 * @param string $password
 	 * @param string|null $email
@@ -66,7 +65,6 @@ class OcmHelper {
 	 */
 	public static function createInvitation(
 		string $baseUrl,
-		string $xRequestId,
 		string $user,
 		string $password,
 		?string $email = null,
@@ -79,7 +77,6 @@ class OcmHelper {
 		$url = self::getFullUrl($baseUrl, 'generate-invite');
 		return HttpRequestHelper::post(
 			$url,
-			$xRequestId,
 			$user,
 			$password,
 			self::getRequestHeaders(),
@@ -89,7 +86,6 @@ class OcmHelper {
 
 	/**
 	 * @param string $baseUrl
-	 * @param string $xRequestId
 	 * @param string $user
 	 * @param string $password
 	 * @param string $token
@@ -100,7 +96,6 @@ class OcmHelper {
 	 */
 	public static function acceptInvitation(
 		string $baseUrl,
-		string $xRequestId,
 		string $user,
 		string $password,
 		string $token,
@@ -113,7 +108,6 @@ class OcmHelper {
 		$url = self::getFullUrl($baseUrl, 'accept-invite');
 		return HttpRequestHelper::post(
 			$url,
-			$xRequestId,
 			$user,
 			$password,
 			self::getRequestHeaders(),
@@ -123,7 +117,6 @@ class OcmHelper {
 
 	/**
 	 * @param string $baseUrl
-	 * @param string $xRequestId
 	 * @param string $user
 	 * @param string $password
 	 *
@@ -132,14 +125,12 @@ class OcmHelper {
 	 */
 	public static function findAcceptedUsers(
 		string $baseUrl,
-		string $xRequestId,
 		string $user,
 		string $password
 	): ResponseInterface {
 		$url = self::getFullUrl($baseUrl, 'find-accepted-users');
 		return HttpRequestHelper::get(
 			$url,
-			$xRequestId,
 			$user,
 			$password,
 			self::getRequestHeaders()
@@ -148,7 +139,6 @@ class OcmHelper {
 
 	/**
 	 * @param string $baseUrl
-	 * @param string $xRequestId
 	 * @param string $user
 	 * @param string $password
 	 *
@@ -157,14 +147,12 @@ class OcmHelper {
 	 */
 	public static function listInvite(
 		string $baseUrl,
-		string $xRequestId,
 		string $user,
 		string $password
 	): ResponseInterface {
 		$url = self::getFullUrl($baseUrl, 'list-invite');
 		return HttpRequestHelper::get(
 			$url,
-			$xRequestId,
 			$user,
 			$password,
 			self::getRequestHeaders()
@@ -173,7 +161,6 @@ class OcmHelper {
 
 	/**
 	 * @param string $baseUrl
-	 * @param string $xRequestId
 	 * @param string $user
 	 * @param string $password
 	 * @param string $userId
@@ -184,7 +171,6 @@ class OcmHelper {
 	 */
 	public static function deleteConnection(
 		string $baseUrl,
-		string $xRequestId,
 		string $user,
 		string $password,
 		string $userId,
@@ -197,7 +183,6 @@ class OcmHelper {
 		];
 		return HttpRequestHelper::delete(
 			$url,
-			$xRequestId,
 			$user,
 			$password,
 			self::getRequestHeaders(),

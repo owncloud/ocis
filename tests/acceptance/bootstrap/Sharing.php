@@ -823,7 +823,6 @@ trait Sharing {
 			$this->getPasswordForUser($user),
 			"PUT",
 			$this->getSharesEndpointPath("/$share_id"),
-			$this->getStepLineRef(),
 			$bodyRows,
 			$this->ocsApiVersion
 		);
@@ -948,7 +947,6 @@ trait Sharing {
 			$this->getPasswordForUser($user),
 			$path,
 			$shareType,
-			$this->getStepLineRef(),
 			$shareWith,
 			$publicUpload,
 			$sharePassword,
@@ -2030,7 +2028,6 @@ trait Sharing {
 			$this->getPasswordForUser($user),
 			"GET",
 			$this->getSharesEndpointPath($endpointPath),
-			$this->getStepLineRef(),
 			[],
 			$this->ocsApiVersion
 		);
@@ -2683,7 +2680,6 @@ trait Sharing {
 			$this->getPasswordForUser($user),
 			"GET",
 			$this->getSharesEndpointPath("?path=$path"),
-			$this->getStepLineRef(),
 			[],
 			$this->ocsApiVersion
 		);
@@ -3286,7 +3282,6 @@ trait Sharing {
 			$this->getPasswordForUser($user),
 			"GET",
 			$url,
-			$this->getStepLineRef(),
 			[],
 			$this->ocsApiVersion
 		);
@@ -3352,7 +3347,6 @@ trait Sharing {
 		$url = "$baseUrl/$davPath/$fileName?preview=1";
 		return HttpRequestHelper::get(
 			$url,
-			$this->getStepLineRef()
 		);
 	}
 
@@ -3439,7 +3433,6 @@ trait Sharing {
 
 		$response = HttpRequestHelper::post(
 			$url,
-			$this->getStepLineRef(),
 			$user,
 			$userPassword,
 			null,
@@ -3534,7 +3527,6 @@ trait Sharing {
 
 		$response = HttpRequestHelper::post(
 			$url,
-			$this->getStepLineRef(),
 			$user,
 			$userPassword,
 			null,

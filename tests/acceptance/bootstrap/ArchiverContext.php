@@ -219,7 +219,6 @@ class ArchiverContext implements Context {
 		}
 		return HttpRequestHelper::get(
 			$this->getArchiverUrl($queryString),
-			$this->featureContext->getStepLineRef(),
 			$downloader,
 			$this->featureContext->getPasswordForUser($downloader),
 			$headers
@@ -253,7 +252,6 @@ class ArchiverContext implements Context {
 		$this->featureContext->setResponse(
 			HttpRequestHelper::get(
 				$this->getArchiverUrl($queryString),
-				$this->featureContext->getStepLineRef(),
 				$user,
 				$this->featureContext->getPasswordForUser($user),
 			)

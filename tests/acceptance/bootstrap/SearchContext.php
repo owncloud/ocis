@@ -118,7 +118,6 @@ class SearchContext implements Context {
 
 		return HttpRequestHelper::sendRequest(
 			$fullUrl,
-			$this->featureContext->getStepLineRef(),
 			'REPORT',
 			$user,
 			$password,

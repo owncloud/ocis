@@ -112,7 +112,6 @@ class WebDavHelper {
 	 * @param string|null $password
 	 * @param string|null $path
 	 * @param string|null $spaceId
-	 * @param string|null $xRequestId
 	 * @param int|null $davPathVersionToUse
 	 *
 	 * @return string
@@ -124,7 +123,6 @@ class WebDavHelper {
 		?string $password,
 		?string $path,
 		?string $spaceId = null,
-		?string $xRequestId = '',
 		?int $davPathVersionToUse = self::DAV_VERSION_NEW
 	): string {
 		$body
@@ -142,7 +140,6 @@ class WebDavHelper {
 			$path,
 			null,
 			$spaceId,
-			$xRequestId,
 			$body,
 			$davPathVersionToUse
 		);
@@ -220,7 +217,6 @@ class WebDavHelper {
 	 *        string can contain namespace prefix,
 	 *        if no prefix is given 'd:' is used as prefix
 	 *        if an associative array is used, then the key will be used as namespace
-	 * @param string|null $xRequestId
 	 * @param string|null $folderDepth
 	 * @param string|null $spaceId
 	 * @param string|null $type
@@ -238,7 +234,6 @@ class WebDavHelper {
 		?string $password,
 		?string $path,
 		?array $properties,
-		?string $xRequestId = '',
 		?string $folderDepth = '1',
 		?string $spaceId = null,
 		?string $type = "files",
@@ -263,7 +258,6 @@ class WebDavHelper {
 			$path,
 			$headers,
 			$spaceId,
-			$xRequestId,
 			$body,
 			$davPathVersionToUse,
 			$type,
@@ -285,7 +279,6 @@ class WebDavHelper {
 	 * @param string|null $path
 	 * @param string|null $propertyName
 	 * @param string|null $propertyValue
-	 * @param string|null $xRequestId
 	 * @param string|null $namespaceString string containing prefix and namespace
 	 *                                     e.g "x1='http://whatever.org/ns'"
 	 * @param int|null $davPathVersionToUse
@@ -302,7 +295,6 @@ class WebDavHelper {
 		?string $path,
 		?string $propertyName,
 		?string $propertyValue,
-		?string $xRequestId = '',
 		?string $namespaceString = null,
 		?int $davPathVersionToUse = self::DAV_VERSION_NEW,
 		?string $type="files",
@@ -332,7 +324,6 @@ class WebDavHelper {
 			$path,
 			[],
 			$spaceId,
-			$xRequestId,
 			$body,
 			$davPathVersionToUse,
 			$type
@@ -378,7 +369,6 @@ class WebDavHelper {
 	 * @param string|null $password
 	 * @param string $path
 	 * @param array|null $propertiesArray
-	 * @param string|null $xRequestId
 	 * @param int|null $davPathVersion
 	 * @param string|null $namespaceString
 	 * @param string|null $type
@@ -392,7 +382,6 @@ class WebDavHelper {
 		?string $password,
 		string  $path,
 		?array $propertiesArray,
-		?string $xRequestId = '',
 		?int  $davPathVersion = null,
 		?string  $namespaceString = null,
 		?string  $type="files"
@@ -431,7 +420,6 @@ class WebDavHelper {
 			$path,
 			[],
 			null,
-			$xRequestId,
 			$body,
 			$davPathVersion,
 			$type
@@ -447,7 +435,6 @@ class WebDavHelper {
 	 * @param string|null $path
 	 * @param string|null $folderDepth
 	 * @param string|null $spaceId
-	 * @param string|null $xRequestId
 	 * @param string[] $properties
 	 * @param string|null $type
 	 * @param int|null $davPathVersionToUse
@@ -462,7 +449,6 @@ class WebDavHelper {
 		?string $path,
 		?string $folderDepth,
 		?string $spaceId = null,
-		?string $xRequestId = '',
 		?array $properties = null,
 		?string $type = "files",
 		?int $davPathVersionToUse = self::DAV_VERSION_NEW
@@ -478,7 +464,6 @@ class WebDavHelper {
 			$password,
 			$path,
 			$properties,
-			$xRequestId,
 			$folderDepth,
 			$spaceId,
 			$type,
@@ -510,7 +495,6 @@ class WebDavHelper {
 	 * @param string $baseUrl
 	 * @param string $user
 	 * @param string $password
-	 * @param string $xRequestId
 	 *
 	 * @return string
 	 * @throws GuzzleException
@@ -520,7 +504,6 @@ class WebDavHelper {
 		string $baseUrl,
 		string $user,
 		string $password,
-		string $xRequestId
 	): string {
 		if (\array_key_exists($user, self::$spacesIdRef) && \array_key_exists("personal", self::$spacesIdRef[$user])) {
 			return self::$spacesIdRef[$user]["personal"];
@@ -528,7 +511,7 @@ class WebDavHelper {
 
 		$personalSpaceId = '';
 		if (!OcisHelper::isTestingOnReva()) {
-			$response = GraphHelper::getMySpaces($baseUrl, $user, $password, '', $xRequestId);
+			$response = GraphHelper::getMySpaces($baseUrl, $user, $password, '');
 			Assert::assertEquals(200, $response->getStatusCode(), "Cannot list drives for user '$user'");
 
 			$drives = HttpRequestHelper::getJsonDecodedResponseBodyContent($response);
@@ -546,7 +529,6 @@ class WebDavHelper {
 			$fullUrl = "$baseUrl/" . self::getDavPath(self::DAV_VERSION_NEW, $user);
 			$response = HttpRequestHelper::sendRequest(
 				$fullUrl,
-				$xRequestId,
 				'PROPFIND',
 				$user,
 				$password
@@ -584,7 +566,6 @@ class WebDavHelper {
 	 * @param string $baseUrl
 	 * @param string $user
 	 * @param string $password
-	 * @param string $xRequestId
 	 *
 	 * @return string
 	 * @throws Exception|GuzzleException
@@ -593,7 +574,6 @@ class WebDavHelper {
 		string $baseUrl,
 		string $user,
 		string $password,
-		string $xRequestId
 	): string {
 		if (\str_starts_with($user, "non-exist") || \str_starts_with($user, "nonexist")) {
 			return self::generateUUIDv4();
@@ -602,8 +582,7 @@ class WebDavHelper {
 		return self::getPersonalSpaceIdForUser(
 			$baseUrl,
 			$user,
-			$password,
-			$xRequestId,
+			$password
 		);
 	}
 
@@ -620,7 +599,6 @@ class WebDavHelper {
 	 * @param string|null $path
 	 * @param array|null $headers
 	 * @param string|null $spaceId
-	 * @param string|null $xRequestId
 	 * @param string|null|resource|StreamInterface $body
 	 * @param int|null $davPathVersionToUse (1|2|3)
 	 * @param string|null $type of request
@@ -646,7 +624,6 @@ class WebDavHelper {
 		?string $path,
 		?array $headers,
 		?string $spaceId = null,
-		?string $xRequestId = '',
 		$body = null,
 		?int $davPathVersionToUse = self::DAV_VERSION_OLD,
 		?string $type = "files",
@@ -680,7 +657,6 @@ class WebDavHelper {
 					$baseUrl,
 					$user,
 					$password,
-					$xRequestId
 				);
 			}
 		}
@@ -744,7 +720,6 @@ class WebDavHelper {
 
 		return HttpRequestHelper::sendRequest(
 			$fullUrl,
-			$xRequestId,
 			$method,
 			$doDavRequestAsUser ?? $user,
 			$password,
@@ -843,7 +818,6 @@ class WebDavHelper {
 	 * @param string|null $baseUrl
 	 * @param string|null $fileName
 	 * @param string|null $token
-	 * @param string|null $xRequestId
 	 * @param int|null $davVersionToUse
 	 *
 	 * @return string
@@ -853,7 +827,6 @@ class WebDavHelper {
 		?string $baseUrl,
 		?string $fileName,
 		?string $token,
-		?string $xRequestId = '',
 		?int $davVersionToUse = self::DAV_VERSION_NEW
 	): string {
 		$response = self::propfind(
@@ -862,7 +835,6 @@ class WebDavHelper {
 			null,
 			"$token/$fileName",
 			['d:getlastmodified'],
-			$xRequestId,
 			'1',
 			null,
 			"public-files",
@@ -884,7 +856,6 @@ class WebDavHelper {
 	 * @param string|null $password
 	 * @param string|null $baseUrl
 	 * @param string|null $resource
-	 * @param string|null $xRequestId
 	 * @param int|null $davPathVersionToUse
 	 * @param string|null $spaceId
 	 *
@@ -897,7 +868,6 @@ class WebDavHelper {
 		?string $password,
 		?string $baseUrl,
 		?string $resource,
-		?string $xRequestId = '',
 		?int $davPathVersionToUse = self::DAV_VERSION_NEW,
 		?string $spaceId = null,
 	): string {
@@ -907,7 +877,6 @@ class WebDavHelper {
 			$password,
 			$resource,
 			["d:getlastmodified"],
-			$xRequestId,
 			"0",
 			$spaceId,
 			"files",

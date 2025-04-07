@@ -66,7 +66,6 @@ class SharingHelper {
 	 *                              0 = user, 1 = group, 3 = public (link),
 	 *                              6 = federated (cloud share).
 	 *                              Pass either the number or the keyword.
-	 * @param string $xRequestId
 	 * @param string|null $shareWith The user or group id with which the file should
 	 *                               be shared.
 	 * @param boolean|null $publicUpload Whether to allow public upload to a public
@@ -98,7 +97,6 @@ class SharingHelper {
 		string $password,
 		string  $path,
 		$shareType,
-		string $xRequestId = '',
 		?string $shareWith = null,
 		?bool	$publicUpload = false,
 		string $sharePassword = null,
@@ -168,7 +166,6 @@ class SharingHelper {
 		$headers = ['OCS-APIREQUEST' => 'true'];
 		return HttpRequestHelper::post(
 			$fullUrl,
-			$xRequestId,
 			$user,
 			$password,
 			$headers,

@@ -218,7 +218,6 @@ trait WebDav {
 				$this->getBaseUrl(),
 				$user,
 				$this->getPasswordForUser($user),
-				$this->getStepLineRef()
 			);
 		}
 
@@ -321,7 +320,6 @@ trait WebDav {
 			$path,
 			$headers,
 			$spaceId,
-			$this->getStepLineRef(),
 			$body,
 			$davPathVersion,
 			$type,
@@ -1098,7 +1096,6 @@ trait WebDav {
 		$url = "{$this->getBaseUrl()}/$davPath";
 		$this->response = HttpRequestHelper::sendRequest(
 			$url,
-			$this->getStepLineRef(),
 			"PROPFIND"
 		);
 	}
@@ -1121,7 +1118,6 @@ trait WebDav {
 			$password,
 			$resource,
 			[],
-			$this->getStepLineRef(),
 			"0",
 			null,
 			"files",
@@ -1440,7 +1436,6 @@ trait WebDav {
 			$path,
 			$folderDepth,
 			$spaceId,
-			$this->getStepLineRef(),
 			$properties,
 			$type,
 			$this->getDavPathVersion()
@@ -1672,7 +1667,6 @@ trait WebDav {
 			$this->getUserPassword($user),
 			$source,
 			$destination,
-			$this->getStepLineRef(),
 			$headers,
 			$this->getDavPathVersion(),
 			$doChunkUpload,
@@ -2155,7 +2149,6 @@ trait WebDav {
 			$this->getPasswordForUser($user),
 			$this->acceptanceTestsDirLocation() . $source,
 			$destination,
-			$this->getStepLineRef(),
 			["X-OC-Mtime" => $mtime],
 			$this->getDavPathVersion(),
 			false,
@@ -2190,7 +2183,6 @@ trait WebDav {
 			$this->getPasswordForUser($user),
 			$this->acceptanceTestsDirLocation() . $source,
 			$destination,
-			$this->getStepLineRef(),
 			["X-OC-Mtime" => $mtime],
 			$this->getDavPathVersion(),
 			false,
@@ -2231,7 +2223,6 @@ trait WebDav {
 				$password,
 				$baseUrl,
 				$resource,
-				$this->getStepLineRef(),
 				$this->getDavPathVersion()
 			)
 		);
@@ -2519,7 +2510,6 @@ trait WebDav {
 		$fullUrl = "$baseUrl/$davPath/$fileId";
 		$response = HttpRequestHelper::sendRequest(
 			$fullUrl,
-			null,
 			'DELETE',
 			$user,
 			$password
@@ -2543,7 +2533,6 @@ trait WebDav {
 		$fullUrl = "$baseUrl/$sourceDavPath/$fileId";
 		$response = HttpRequestHelper::sendRequest(
 			$fullUrl,
-			$this->getStepLineRef(),
 			'PUT',
 			$user,
 			$this->getPasswordForUser($user),
@@ -3776,7 +3765,6 @@ trait WebDav {
 
 		$shareMountId = GraphHelper::getShareMountId(
 			$this->getBaseUrl(),
-			$this->getStepLineRef(),
 			$user,
 			$this->getPasswordForUser($user),
 			$sharedFolder
@@ -3828,7 +3816,6 @@ trait WebDav {
 
 		return HttpRequestHelper::sendRequest(
 			$fullUrl,
-			$this->getStepLineRef(),
 			'GET',
 			$user,
 			$this->getPasswordForUser($user)
@@ -3989,7 +3976,6 @@ trait WebDav {
 				$this->getPasswordForUser($user),
 				$path,
 				$spaceId,
-				$this->getStepLineRef(),
 				$this->getDavPathVersion()
 			);
 		} catch (Exception $e) {
@@ -4012,11 +3998,12 @@ trait WebDav {
 	/**
 	 * @Then /^user "([^"]*)" (file|folder) "([^"]*)" should have the previously stored id$/
 	 *
-	 * @param string370 $user
+	 * @param string $user
 	 * @param string $fileOrFolder
 	 * @param string $path
 	 *
 	 * @return void
+	 * @throws JsonException
 	 */
 	public function userFileShouldHaveStoredId(string $user, string $fileOrFolder, string $path): void {
 		$user = $this->getActualUsername($user);

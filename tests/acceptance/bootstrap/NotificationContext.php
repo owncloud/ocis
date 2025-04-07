@@ -93,7 +93,6 @@ class NotificationContext implements Context {
 			$this->featureContext->getAdminPassword(),
 			'DELETE',
 			$this->globalNotificationEndpointPath,
-			$this->featureContext->getStepLineRef(),
 			json_encode($payload)
 		);
 	}
@@ -109,7 +108,6 @@ class NotificationContext implements Context {
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getActualUsername($user),
 			$this->featureContext->getPasswordForUser($user),
-			$this->featureContext->getStepLineRef()
 		);
 		$headers = ["accept-language" => $language];
 		return OcsApiHelper::sendRequest(
@@ -118,7 +116,6 @@ class NotificationContext implements Context {
 			$this->featureContext->getPasswordForUser($user),
 			'GET',
 			$this->notificationEndpointPath,
-			$this->featureContext->getStepLineRef(),
 			[],
 			2,
 			$headers
@@ -220,7 +217,6 @@ class NotificationContext implements Context {
 			$this->featureContext->getPasswordForUser($user),
 			'DELETE',
 			$this->notificationEndpointPath,
-			$this->featureContext->getStepLineRef(),
 			\json_encode($payload),
 			2
 		);
@@ -546,7 +542,6 @@ class NotificationContext implements Context {
 			$user ? $this->featureContext->getPasswordForUser($user) : $this->featureContext->getAdminPassword(),
 			'POST',
 			$this->globalNotificationEndpointPath,
-			$this->featureContext->getStepLineRef(),
 			json_encode($payload)
 		);
 	}
@@ -615,7 +610,6 @@ class NotificationContext implements Context {
 			$user ? $this->featureContext->getPasswordForUser($user) : $this->featureContext->getAdminPassword(),
 			'DELETE',
 			$this->globalNotificationEndpointPath,
-			$this->featureContext->getStepLineRef(),
 			json_encode($payload)
 		);
 		$this->featureContext->setResponse($response);

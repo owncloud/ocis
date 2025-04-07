@@ -220,7 +220,6 @@ class SpacesContext implements Context {
 				$user,
 				$password,
 				"",
-				$this->featureContext->getStepLineRef()
 			);
 			// NOTE: user can be created with empty password
 			// so if that's the case, the user won't be able to request using empty password
@@ -302,7 +301,6 @@ class SpacesContext implements Context {
 		$credentials = $this->featureContext->graphContext->getAdminOrUserCredentials($user);
 		$response = GraphHelper::getSharesSharedWithMe(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$credentials['username'],
 			$credentials['password']
 		);
@@ -384,7 +382,6 @@ class SpacesContext implements Context {
 
 		return HttpRequestHelper::get(
 			$fullUrl,
-			$this->featureContext->getStepLineRef(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			[],
@@ -431,7 +428,6 @@ class SpacesContext implements Context {
 
 		$response = HttpRequestHelper::sendRequest(
 			$fullUrl,
-			$this->featureContext->getStepLineRef(),
 			'PROPFIND',
 			$user,
 			$this->featureContext->getPasswordForUser($user),
@@ -460,7 +456,6 @@ class SpacesContext implements Context {
 			$this->featureContext->getPasswordForUser($user),
 			"",
 			['oc:privatelink'],
-			$this->featureContext->getStepLineRef(),
 			"0",
 			$spaceId,
 			"files",
@@ -573,7 +568,6 @@ class SpacesContext implements Context {
 					$userAdmin,
 					$this->featureContext->getPasswordForUser($userAdmin),
 					$drive->id,
-					$this->featureContext->getStepLineRef()
 				);
 			}
 			GraphHelper::deleteSpace(
@@ -581,7 +575,6 @@ class SpacesContext implements Context {
 				$userAdmin,
 				$this->featureContext->getPasswordForUser($userAdmin),
 				$drive->id,
-				$this->featureContext->getStepLineRef()
 			);
 		}
 	}
@@ -593,7 +586,6 @@ class SpacesContext implements Context {
 	 * @param string $user
 	 * @param string $password
 	 * @param mixed $body
-	 * @param string $xRequestId
 	 * @param array $headers
 	 *
 	 * @return ResponseInterface
@@ -605,10 +597,9 @@ class SpacesContext implements Context {
 		string $user,
 		string $password,
 		$body,
-		string $xRequestId = '',
 		array $headers = []
 	): ResponseInterface {
-		return HttpRequestHelper::post($fullUrl, $xRequestId, $user, $password, $headers, $body);
+		return HttpRequestHelper::post($fullUrl, $user, $password, $headers, $body);
 	}
 
 	/**
@@ -618,7 +609,6 @@ class SpacesContext implements Context {
 	 * @param  string $method
 	 * @param  string $user
 	 * @param  string $password
-	 * @param  string $xRequestId
 	 * @param  array  $headers
 	 *
 	 * @return ResponseInterface
@@ -630,10 +620,9 @@ class SpacesContext implements Context {
 		string $method,
 		string $user,
 		string $password,
-		string $xRequestId = '',
 		array $headers = []
 	): ResponseInterface {
-		return HttpRequestHelper::sendRequest($fullUrl, $xRequestId, $method, $user, $password, $headers);
+		return HttpRequestHelper::sendRequest($fullUrl, $method, $user, $password, $headers);
 	}
 
 	/**
@@ -656,7 +645,6 @@ class SpacesContext implements Context {
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$query,
-			$this->featureContext->getStepLineRef(),
 			[],
 			$headers
 		);
@@ -723,7 +711,6 @@ class SpacesContext implements Context {
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$query,
-			$this->featureContext->getStepLineRef()
 		);
 		$this->featureContext->setResponse($response);
 	}
@@ -754,7 +741,6 @@ class SpacesContext implements Context {
 				$this->featureContext->getPasswordForUser($user),
 				$space["id"],
 				'',
-				$this->featureContext->getStepLineRef()
 			)
 		);
 	}
@@ -786,7 +772,6 @@ class SpacesContext implements Context {
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$body,
-			$this->featureContext->getStepLineRef()
 		);
 		$this->featureContext->setResponse($response);
 		if ($response->getStatusCode() === 201) {
@@ -811,7 +796,6 @@ class SpacesContext implements Context {
 			$this->featureContext->getPasswordForUser($user),
 			$foldersPath,
 			[],
-			$this->featureContext->getStepLineRef(),
 			null,
 			$spaceId,
 			'files',
@@ -861,7 +845,6 @@ class SpacesContext implements Context {
 		$this->featureContext->setResponse(
 			HttpRequestHelper::sendRequest(
 				$url,
-				$this->featureContext->getStepLineRef(),
 				"PATCH",
 				$this->featureContext->getActualUsername($user),
 				$this->featureContext->getPasswordForUser($user),
@@ -1584,7 +1567,6 @@ class SpacesContext implements Context {
 			$this->featureContext->getPasswordForUser($user),
 			$body,
 			$spaceId,
-			$this->featureContext->getStepLineRef()
 		);
 	}
 
@@ -1747,7 +1729,6 @@ class SpacesContext implements Context {
 			$this->featureContext->getPasswordForUser($user),
 			$body,
 			$spaceId,
-			$this->featureContext->getStepLineRef()
 		);
 	}
 
@@ -1877,7 +1858,6 @@ class SpacesContext implements Context {
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$body,
-			$this->featureContext->getStepLineRef()
 		);
 	}
 
@@ -2017,7 +1997,6 @@ class SpacesContext implements Context {
 	public function moveFilesAndFoldersRequest(string $user, string $fullUrl, array $headers): ResponseInterface {
 		return HttpRequestHelper::sendRequest(
 			$fullUrl,
-			$this->featureContext->getStepLineRef(),
 			'MOVE',
 			$user,
 			$this->featureContext->getPasswordForUser($user),
@@ -2240,7 +2219,6 @@ class SpacesContext implements Context {
 	public function copyFilesAndFoldersRequest(string $user, string $fullUrl, array $headers): ResponseInterface {
 		return HttpRequestHelper::sendRequest(
 			$fullUrl,
-			$this->featureContext->getStepLineRef(),
 			'COPY',
 			$user,
 			$this->featureContext->getPasswordForUser($user),
@@ -2559,7 +2537,6 @@ class SpacesContext implements Context {
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$body,
-			$this->featureContext->getStepLineRef()
 		);
 	}
 
@@ -2625,7 +2602,6 @@ class SpacesContext implements Context {
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$body,
-			$this->featureContext->getStepLineRef()
 		);
 		$responseXmlObject = HttpRequestHelper::getResponseXml($response, __METHOD__);
 		$sharer = (string) $responseXmlObject->data->uid_owner;
@@ -2705,7 +2681,6 @@ class SpacesContext implements Context {
 		$fullUrl = $this->featureContext->getBaseUrl() . $this->ocsApiUrl . '/' . $shareId;
 		return HttpRequestHelper::sendRequest(
 			$fullUrl,
-			$this->featureContext->getStepLineRef(),
 			"PUT",
 			$this->featureContext->getActualUsername($user),
 			$this->featureContext->getPasswordForUser($user),
@@ -2737,7 +2712,6 @@ class SpacesContext implements Context {
 			$permissionID = $this->featureContext->shareNgGetLastCreatedUserGroupShareID();
 			$response = GraphHelper::updateShare(
 				$this->featureContext->getBaseUrl(),
-				$this->featureContext->getStepLineRef(),
 				$user,
 				$this->featureContext->getPasswordForUser($user),
 				$space["id"],
@@ -2796,7 +2770,6 @@ class SpacesContext implements Context {
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$body,
-			$this->featureContext->getStepLineRef()
 		);
 
 		$responseXmlObject = HttpRequestHelper::getResponseXml($response, __METHOD__);
@@ -2923,7 +2896,6 @@ class SpacesContext implements Context {
 
 		return HttpRequestHelper::delete(
 			$fullUrl,
-			$this->featureContext->getStepLineRef(),
 			$user,
 			$this->featureContext->getPasswordForUser($user)
 		);
@@ -2971,7 +2943,6 @@ class SpacesContext implements Context {
 
 		return HttpRequestHelper::delete(
 			$fullUrl,
-			$this->featureContext->getStepLineRef(),
 			$user,
 			$this->featureContext->getPasswordForUser($user)
 		);
@@ -3037,7 +3008,6 @@ class SpacesContext implements Context {
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$space["id"],
-			$this->featureContext->getStepLineRef()
 		);
 	}
 
@@ -3128,7 +3098,6 @@ class SpacesContext implements Context {
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$space["id"],
-			$this->featureContext->getStepLineRef()
 		);
 	}
 
@@ -3172,7 +3141,6 @@ class SpacesContext implements Context {
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$space["id"],
-			$this->featureContext->getStepLineRef()
 		);
 	}
 
@@ -3240,7 +3208,6 @@ class SpacesContext implements Context {
 		$fullUrl = "$baseUrl/$davPath";
 		return HttpRequestHelper::sendRequest(
 			$fullUrl,
-			$this->featureContext->getStepLineRef(),
 			'PROPFIND',
 			$user,
 			$this->featureContext->getPasswordForUser($user)
@@ -3290,7 +3257,6 @@ class SpacesContext implements Context {
 		$this->featureContext->setResponse(
 			HttpRequestHelper::sendRequest(
 				$fullUrl,
-				$this->featureContext->getStepLineRef(),
 				'PROPFIND',
 				$user,
 				$this->featureContext->getPasswordForUser($user)
@@ -3408,7 +3374,6 @@ class SpacesContext implements Context {
 		$this->featureContext->setResponse(
 			HttpRequestHelper::sendRequest(
 				$fullUrl,
-				$this->featureContext->getStepLineRef(),
 				'MOVE',
 				$user,
 				$this->featureContext->getPasswordForUser($user),
@@ -3454,7 +3419,6 @@ class SpacesContext implements Context {
 		$this->featureContext->setResponse(
 			HttpRequestHelper::sendRequest(
 				$fullUrl,
-				$this->featureContext->getStepLineRef(),
 				'DELETE',
 				$user,
 				$this->featureContext->getPasswordForUser($user),
@@ -3503,7 +3467,6 @@ class SpacesContext implements Context {
 		$this->featureContext->setResponse(
 			HttpRequestHelper::get(
 				$fullUrl,
-				$this->featureContext->getStepLineRef(),
 				$user,
 				$this->featureContext->getPasswordForUser($user)
 			)
@@ -3832,7 +3795,6 @@ class SpacesContext implements Context {
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$body,
-			$this->featureContext->getStepLineRef()
 		);
 
 		$this->featureContext->addToCreatedPublicShares(
@@ -4327,7 +4289,6 @@ class SpacesContext implements Context {
 			$this->featureContext->getPasswordForUser($user),
 			$resource,
 			$properties,
-			$this->featureContext->getStepLineRef(),
 			$folderDepth,
 			$spaceId,
 			"files",
@@ -4607,7 +4568,6 @@ class SpacesContext implements Context {
 
 		$jsonResponse = GraphHelper::getSharesSharedWithMe(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$user,
 			$this->featureContext->getPasswordForUser($user)
 		);
@@ -4653,7 +4613,6 @@ class SpacesContext implements Context {
 		$this->featureContext->setResponse(
 			HttpRequestHelper::get(
 				$this->archiverContext->getArchiverUrl($queryString),
-				$this->featureContext->getStepLineRef(),
 				'',
 				''
 			)
@@ -4755,7 +4714,6 @@ class SpacesContext implements Context {
 		$this->featureContext->setResponse(
 			HttpRequestHelper::get(
 				$url,
-				$this->featureContext->getStepLineRef(),
 				$user,
 				$this->featureContext->getPasswordForUser($user),
 			)
@@ -4821,7 +4779,6 @@ class SpacesContext implements Context {
 		if ($space === "Shares") {
 			$itemId = GraphHelper::getShareMountId(
 				$this->featureContext->getBaseUrl(),
-				$this->featureContext->getStepLineRef(),
 				$user,
 				$this->featureContext->getPasswordForUser($user),
 				$file
@@ -4836,7 +4793,6 @@ class SpacesContext implements Context {
 		$this->featureContext->setResponse(
 			HttpRequestHelper::get(
 				$url,
-				$this->featureContext->getStepLineRef(),
 				$user,
 				$this->featureContext->getPasswordForUser($user),
 			)
