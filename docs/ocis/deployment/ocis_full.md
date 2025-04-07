@@ -178,7 +178,7 @@ See also [example server setup]({{< ref "preparing_server" >}})
   # Define SMPT settings if you would like to send Infinite Scale email notifications.
   # For more details see:
   # https://doc.owncloud.com/ocis/latest/deployment/services/s-list/notifications.html
-  # NOTE: when configuring Inbucket, these settings have no effect, see inbucket.yml for details.
+  # NOTE: when configuring mail server, these settings have no effect, see mailserver.yml for details.
   # SMTP host to connect to.
   SMTP_HOST=
   # Port of the SMTP host to connect to.
