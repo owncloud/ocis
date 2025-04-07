@@ -57,8 +57,7 @@ class SettingsContext implements Context {
 		return SettingsHelper::getRolesList(
 			$this->featureContext->getBaseUrl(),
 			$user,
-			$this->featureContext->getPasswordForUser($user),
-			$this->featureContext->getStepLineRef()
+			$this->featureContext->getPasswordForUser($user)
 		);
 	}
 
@@ -93,8 +92,7 @@ class SettingsContext implements Context {
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$userId,
-			$roleId,
-			$this->featureContext->getStepLineRef(),
+			$roleId
 		);
 	}
 
@@ -112,8 +110,7 @@ class SettingsContext implements Context {
 			$this->featureContext->getBaseUrl(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
-			$userId,
-			$this->featureContext->getStepLineRef(),
+			$userId
 		);
 	}
 
@@ -329,8 +326,7 @@ class SettingsContext implements Context {
 		return SettingsHelper::getBundlesList(
 			$this->featureContext->getBaseUrl(),
 			$user,
-			$this->featureContext->getPasswordForUser($user),
-			$this->featureContext->getStepLineRef(),
+			$this->featureContext->getPasswordForUser($user)
 		);
 	}
 
@@ -348,8 +344,7 @@ class SettingsContext implements Context {
 			$this->featureContext->getBaseUrl(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
-			$bundleName,
-			$this->featureContext->getStepLineRef()
+			$bundleName
 		);
 	}
 
@@ -367,7 +362,6 @@ class SettingsContext implements Context {
 			$this->featureContext->getBaseUrl(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
-			$this->featureContext->getStepLineRef(),
 			$headers
 		);
 	}
@@ -443,8 +437,7 @@ class SettingsContext implements Context {
 			$this->featureContext->getBaseUrl(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
-			$body,
-			$this->featureContext->getStepLineRef()
+			$body
 		);
 	}
 
@@ -512,8 +505,7 @@ class SettingsContext implements Context {
 			$this->featureContext->getBaseUrl(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
-			$body,
-			$this->featureContext->getStepLineRef()
+			$body
 		);
 	}
 
@@ -577,8 +569,7 @@ class SettingsContext implements Context {
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getActualUsername($user),
 			$this->featureContext->getPasswordForUser($user),
-			json_encode($body),
-			$this->featureContext->getStepLineRef(),
+			json_encode($body)
 		);
 		$this->featureContext->setResponse($response);
 	}
@@ -628,8 +619,7 @@ class SettingsContext implements Context {
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getActualUsername($user),
 			$this->featureContext->getPasswordForUser($user),
-			json_encode($body),
-			$this->featureContext->getStepLineRef(),
+			json_encode($body)
 		);
 	}
 
@@ -695,8 +685,7 @@ class SettingsContext implements Context {
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getActualUsername($user),
 			$this->featureContext->getPasswordForUser($user),
-			json_encode($body, JSON_THROW_ON_ERROR),
-			$this->featureContext->getStepLineRef()
+			json_encode($body, JSON_THROW_ON_ERROR)
 		);
 	}
 

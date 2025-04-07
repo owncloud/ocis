@@ -99,7 +99,6 @@ class WebDavLockingContext implements Context {
 		if (isset($fullUrl)) {
 			$response = HttpRequestHelper::sendRequest(
 				$fullUrl,
-				$this->featureContext->getStepLineRef(),
 				"LOCK",
 				$this->featureContext->getActualUsername($user),
 				$this->featureContext->getPasswordForUser($user),
@@ -116,7 +115,6 @@ class WebDavLockingContext implements Context {
 				$file,
 				$headers,
 				$spaceId,
-				$this->featureContext->getStepLineRef(),
 				$body,
 				$this->featureContext->getDavPathVersion(),
 				$type
@@ -614,7 +612,6 @@ class WebDavLockingContext implements Context {
 			$itemToUnlock,
 			null,
 			null,
-			$this->featureContext->getStepLineRef(),
 			$body,
 			$this->featureContext->getDavPathVersion()
 		);
@@ -710,7 +707,6 @@ class WebDavLockingContext implements Context {
 		if (isset($fullUrl)) {
 			$response = HttpRequestHelper::sendRequest(
 				$fullUrl,
-				$this->featureContext->getStepLineRef(),
 				"UNLOCK",
 				$this->featureContext->getActualUsername($user),
 				$this->featureContext->getPasswordForUser($user),
@@ -725,7 +721,6 @@ class WebDavLockingContext implements Context {
 				$itemToUnlock,
 				$headers,
 				$spaceId,
-				$this->featureContext->getStepLineRef(),
 				null,
 				$this->featureContext->getDavPathVersion(),
 				$type

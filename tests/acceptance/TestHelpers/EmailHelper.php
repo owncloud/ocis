@@ -64,17 +64,12 @@ class EmailHelper {
 	/**
 	 * list all email
 	 *
-	 * @param string|null $xRequestId
-	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
-	public static function listAllEmails(
-		?string $xRequestId,
-	): ResponseInterface {
+	public static function listAllEmails(): ResponseInterface {
 		return HttpRequestHelper::get(
 			self::getEmailAPIUrl("messages"),
-			$xRequestId,
 			null,
 			null,
 			['Content-Type' => 'application/json']
@@ -84,7 +79,6 @@ class EmailHelper {
 	/**
 	 * @param string $id when $id set to 'latest' returns the latest message.
 	 * @param string $query
-	 * @param string|null $xRequestId
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
@@ -92,11 +86,9 @@ class EmailHelper {
 	public static function getEmailById(
 		string $id,
 		string $query,
-		?string $xRequestId,
 	): ResponseInterface {
 		return HttpRequestHelper::get(
 			self::getEmailAPIUrl("message/$id") . "?query=$query",
-			$xRequestId,
 			null,
 			null,
 			['Content-Type' => 'application/json']
@@ -107,19 +99,16 @@ class EmailHelper {
 	 * search email
 	 *
 	 * @param string $query
-	 * @param string|null $xRequestId
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
 	public static function searchEmails(
 		string $query,
-		?string $xRequestId,
 	): ResponseInterface {
 		$url = self::getEmailAPIUrl("search") . "?query=$query";
 		return HttpRequestHelper::get(
 			$url,
-			$xRequestId,
 			null,
 			null,
 			['Content-Type' => 'application/json']
@@ -129,17 +118,12 @@ class EmailHelper {
 	/**
 	 * Deletes all email
 	 *
-	 * @param string|null $xRequestId
-	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
-	public static function deleteAllEmails(
-		?string $xRequestId,
-	): ResponseInterface {
+	public static function deleteAllEmails(): ResponseInterface {
 		return HttpRequestHelper::delete(
 			self::getEmailAPIUrl("messages"),
-			$xRequestId,
 			null,
 			null,
 			['Content-Type' => 'application/json']

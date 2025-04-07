@@ -143,7 +143,6 @@ class PublicWebDavContext implements Context {
 		];
 		return HttpRequestHelper::delete(
 			$fullUrl,
-			$this->featureContext->getStepLineRef(),
 			$userName,
 			$password,
 			$headers
@@ -217,7 +216,6 @@ class PublicWebDavContext implements Context {
 		];
 		return HttpRequestHelper::sendRequest(
 			$fullUrl,
-			$this->featureContext->getStepLineRef(),
 			"MOVE",
 			$userName,
 			$password,
@@ -291,7 +289,6 @@ class PublicWebDavContext implements Context {
 
 		return HttpRequestHelper::get(
 			$fullUrl,
-			$this->featureContext->getStepLineRef(),
 			$username,
 			$password
 		);
@@ -336,7 +333,6 @@ class PublicWebDavContext implements Context {
 		}
 		return HttpRequestHelper::get(
 			$fullUrl,
-			$this->featureContext->getStepLineRef(),
 			$userName,
 			$password,
 			$headers
@@ -381,7 +377,6 @@ class PublicWebDavContext implements Context {
 		$headers["Destination"] = $fullDestUrl;
 		return HttpRequestHelper::sendRequest(
 			$fullSourceUrl,
-			$this->featureContext->getStepLineRef(),
 			"COPY",
 			null,
 			null,
@@ -1015,7 +1010,6 @@ class PublicWebDavContext implements Context {
 
 		return HttpRequestHelper::sendRequest(
 			$url,
-			$this->featureContext->getStepLineRef(),
 			'MKCOL',
 			$userName,
 			$password
@@ -1097,8 +1091,7 @@ class PublicWebDavContext implements Context {
 			WebDavHelper::getMtimeOfFileInPublicLinkShare(
 				$baseUrl,
 				$fileName,
-				$token,
-				$this->featureContext->getStepLineRef()
+				$token
 			)
 		);
 	}
@@ -1123,8 +1116,7 @@ class PublicWebDavContext implements Context {
 			WebDavHelper::getMtimeOfFileInPublicLinkShare(
 				$baseUrl,
 				$fileName,
-				$token,
-				$this->featureContext->getStepLineRef()
+				$token
 			)
 		);
 	}
@@ -1181,7 +1173,6 @@ class PublicWebDavContext implements Context {
 		$headers = \array_merge($headers, $additionalHeaders);
 		return HttpRequestHelper::put(
 			$url,
-			$this->featureContext->getStepLineRef(),
 			$userName,
 			$password,
 			$headers,
@@ -1262,7 +1253,6 @@ class PublicWebDavContext implements Context {
 		$fullUrl = $this->featureContext->getBaseUrl() . "/$davPath";
 		$response = HttpRequestHelper::sendRequest(
 			$fullUrl,
-			$this->featureContext->getStepLineRef(),
 			$method,
 			$username,
 			$password,
