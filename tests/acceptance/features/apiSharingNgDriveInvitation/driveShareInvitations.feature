@@ -466,11 +466,7 @@ Feature: Send a drive invitations
         "properties": {
           "error": {
             "type": "object",
-            "required": [
-              "code",
-              "innererror",
-              "message"
-            ],
+            "required": ["code", "innererror", "message"],
             "properties": {
               "code": {
                 "const": "invalidRequest"
@@ -512,11 +508,7 @@ Feature: Send a drive invitations
         "properties": {
           "error": {
             "type": "object",
-            "required": [
-              "code",
-              "innererror",
-              "message"
-            ],
+            "required": ["code", "innererror", "message"],
             "properties": {
               "code": {
                 "const": "invalidRequest"
@@ -718,11 +710,7 @@ Feature: Send a drive invitations
         "properties": {
           "error": {
             "type": "object",
-            "required": [
-              "code",
-              "innererror",
-              "message"
-            ],
+            "required": ["code", "innererror", "message"],
             "properties": {
               "code": {
                 "const": "invalidRequest"
@@ -767,11 +755,7 @@ Feature: Send a drive invitations
         "properties": {
           "error": {
             "type": "object",
-            "required": [
-              "code",
-              "innererror",
-              "message"
-            ],
+            "required": ["code", "innererror", "message"],
             "properties": {
               "code": {
                 "const": "invalidRequest"
@@ -823,11 +807,7 @@ Feature: Send a drive invitations
         "properties": {
           "error": {
             "type": "object",
-            "required": [
-              "code",
-              "innererror",
-              "message"
-            ],
+            "required": ["code", "innererror", "message"],
             "properties": {
               "code": {
                 "const": "invalidRequest"
@@ -876,11 +856,7 @@ Feature: Send a drive invitations
         "properties": {
           "error": {
             "type": "object",
-            "required": [
-              "code",
-              "innererror",
-              "message"
-            ],
+            "required": ["code", "innererror", "message"],
             "properties": {
               "code": {
                 "const": "invalidRequest"
@@ -930,11 +906,7 @@ Feature: Send a drive invitations
         "properties": {
           "error": {
             "type": "object",
-            "required": [
-              "code",
-              "innererror",
-              "message"
-            ],
+            "required": ["code", "innererror", "message"],
             "properties": {
               "code": {
                 "const": "invalidRequest"
@@ -976,11 +948,7 @@ Feature: Send a drive invitations
         "properties": {
           "error": {
             "type": "object",
-            "required": [
-              "code",
-              "innererror",
-              "message"
-            ],
+            "required": ["code", "innererror", "message"],
             "properties": {
               "code": {
                 "const": "invalidRequest"
@@ -1028,11 +996,7 @@ Feature: Send a drive invitations
         "properties": {
           "error": {
             "type": "object",
-            "required": [
-              "code",
-              "innererror",
-              "message"
-            ],
+            "required": ["code", "innererror", "message"],
             "properties": {
               "code": {
                 "const": "invalidRequest"
@@ -1076,11 +1040,7 @@ Feature: Send a drive invitations
         "properties": {
           "error": {
             "type": "object",
-            "required": [
-              "code",
-              "innererror",
-              "message"
-            ],
+            "required": ["code", "innererror", "message"],
             "properties": {
               "code": {
                 "const": "invalidRequest"
@@ -1127,11 +1087,7 @@ Feature: Send a drive invitations
         "properties": {
           "error": {
             "type": "object",
-            "required": [
-              "code",
-              "innererror",
-              "message"
-            ],
+            "required": ["code", "innererror", "message"],
             "properties": {
               "code": {
                 "const": "invalidRequest"
@@ -1174,11 +1130,7 @@ Feature: Send a drive invitations
         "properties": {
           "error": {
             "type": "object",
-            "required": [
-              "code",
-              "innererror",
-              "message"
-            ],
+            "required": ["code", "innererror", "message"],
             "properties": {
               "code": {
                 "const": "invalidRequest"
@@ -1227,11 +1179,7 @@ Feature: Send a drive invitations
         "properties": {
           "error": {
             "type": "object",
-            "required": [
-              "code",
-              "innererror",
-              "message"
-            ],
+            "required": ["code", "innererror", "message"],
             "properties": {
               "code": {
                 "const": "invalidRequest"
@@ -1283,11 +1231,7 @@ Feature: Send a drive invitations
         "properties": {
           "error": {
             "type": "object",
-            "required": [
-              "code",
-              "innererror",
-              "message"
-            ],
+            "required": ["code", "innererror", "message"],
             "properties": {
               "code": {
                 "const": "invalidRequest"
@@ -1335,11 +1279,7 @@ Feature: Send a drive invitations
         "properties": {
           "error": {
             "type": "object",
-            "required": [
-              "code",
-              "innererror",
-              "message"
-            ],
+            "required": ["code", "innererror", "message"],
             "properties": {
               "code": {
                 "const": "invalidRequest"
@@ -1406,3 +1346,85 @@ Feature: Send a drive invitations
       | Space Viewer     |
       | Space Editor     |
       | Manager          |
+
+  @issue-9303
+  Scenario: try to invite user to project space with permissions role Secure Viewer using root endpoint
+    Given using spaces DAV path
+    And the administrator has enabled the permissions role "Secure Viewer"
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
+    When user "Alice" tries to send the following space share invitation using root endpoint of the Graph API:
+      | space           | NewSpace      |
+      | sharee          | Alice         |
+      | shareType       | user          |
+      | permissionsRole | Secure Viewer |
+    Then the HTTP status code should be "400"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": ["code", "innererror", "message"],
+            "properties": {
+              "code": {
+                "const": "invalidRequest"
+              },
+              "innererror": {
+                "type": "object",
+                "required": [
+                  "date",
+                  "request-id"
+                ]
+              },
+              "message": {
+                "const": "role not applicable to this resource"
+              }
+            }
+          }
+        }
+      }
+      """
+
+  @issue-9303
+  Scenario: try to invite user to project space with permissions role Secure Viewer (permissions endpoint)
+    Given using spaces DAV path
+    And the administrator has enabled the permissions role "Secure Viewer"
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
+    When user "Alice" sends the following space share invitation using permissions endpoint of the Graph API:
+      | space           | NewSpace      |
+      | sharee          | Brian         |
+      | shareType       | user          |
+      | permissionsRole | Secure Viewer |
+    Then the HTTP status code should be "400"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": ["code", "innererror", "message"],
+            "properties": {
+              "code": {
+                "const": "invalidRequest"
+              },
+              "innererror": {
+                "type": "object",
+                "required": [
+                  "date",
+                  "request-id"
+                ]
+              },
+              "message": {
+                "const": "role not applicable to this resource"
+              }
+            }
+          }
+        }
+      }
+      """
