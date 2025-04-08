@@ -842,10 +842,6 @@ class FeatureContext extends BehatVariablesContext {
 	 * @return string
 	 */
 	public function getStepLineRef(): string {
-		if (!HttpRequestHelper::sendScenarioLineReferencesInXRequestId()) {
-			return '';
-		}
-
 		// If we are in BeforeScenario and possibly before any particular step
 		// is being executed, then stepLineRef might be empty. In that case
 		// return just the string for the scenario.
@@ -2679,9 +2675,7 @@ class FeatureContext extends BehatVariablesContext {
 		$featureFile = $scope->getFeature()->getFile();
 		$suiteName = $scope->getSuite()->getName();
 		$featureFileName = \basename($featureFile);
-		if (HttpRequestHelper::sendScenarioLineReferencesInXRequestId()) {
-			$this->scenarioString = $suiteName . '/' . $featureFileName . ':' . $scenarioLine;
-		}
+		$this->scenarioString = $suiteName . '/' . $featureFileName . ':' . $scenarioLine;
 
 		// Initialize SetupHelper
 		SetupHelper::init(
@@ -2706,11 +2700,7 @@ class FeatureContext extends BehatVariablesContext {
 	 * @return void
 	 */
 	public function beforeEachStep(BeforeStepScope $scope): void {
-		if (HttpRequestHelper::sendScenarioLineReferencesInXRequestId()) {
-			$this->stepLineRef = $this->scenarioString . '-' . $scope->getStep()->getLine();
-		} else {
-			$this->stepLineRef = '';
-		}
+		$this->stepLineRef = $this->scenarioString . '-' . $scope->getStep()->getLine();
 	}
 
 	/**
