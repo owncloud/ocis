@@ -556,6 +556,7 @@ class AuthContext implements Context {
 
 	/**
 	 * @When user :asUser requests these endpoints with :method using the password of user :ofUser
+	 * @When user :asUser requests these endpoints with :method using the auth-app token of user :ofUser
 	 *
 	 * @param string $asUser
 	 * @param string $method
@@ -565,7 +566,7 @@ class AuthContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userRequestsTheseEndpointsWithoutBodyUsingThePasswordOfUser(
+	public function userRequestsTheseEndpointsWithoutBodyUsingThePasswordOrAuthAppTokenOfUser(
 		string $asUser,
 		string $method,
 		string $ofUser,
