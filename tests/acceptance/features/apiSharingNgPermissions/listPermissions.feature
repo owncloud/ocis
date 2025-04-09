@@ -870,7 +870,7 @@ Feature: List a sharing permissions
       | sharee       | Brian    |
       | shareType    | user     |
 
-  @issues-8351
+  @issues-8351 @issue-10077
   Scenario: user lists permissions of a project space using root endpoint
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
@@ -922,7 +922,8 @@ Feature: List a sharing permissions
                     "@libre.graph.weight",
                     "description",
                     "displayName",
-                    "id"
+                    "id",
+                    "createdDateTime"
                   ],
                   "properties": {
                     "@libre.graph.weight": {
@@ -945,7 +946,8 @@ Feature: List a sharing permissions
                     "@libre.graph.weight",
                     "description",
                     "displayName",
-                    "id"
+                    "id",
+                    "createdDateTime"
                   ],
                   "properties": {
                     "@libre.graph.weight": {
@@ -968,7 +970,8 @@ Feature: List a sharing permissions
                     "@libre.graph.weight",
                     "description",
                     "displayName",
-                    "id"
+                    "id",
+                    "createdDateTime"
                   ],
                   "properties": {
                     "@libre.graph.weight": {
@@ -1263,7 +1266,7 @@ Feature: List a sharing permissions
       }
       """
 
-
+  @issue-10077
   Scenario Outline: sharer lists permissions of a shared project space using root endpoint
     Given using spaces DAV path
     And user "Brian" has been created with default attributes
@@ -1326,7 +1329,8 @@ Feature: List a sharing permissions
                     "@libre.graph.weight",
                     "description",
                     "displayName",
-                    "id"
+                    "id",
+                    "createdDateTime"
                   ],
                   "properties": {
                     "@libre.graph.weight": {
@@ -1349,7 +1353,8 @@ Feature: List a sharing permissions
                     "@libre.graph.weight",
                     "description",
                     "displayName",
-                    "id"
+                    "id",
+                    "createdDateTime"
                   ],
                   "properties": {
                     "@libre.graph.weight": {
@@ -1372,7 +1377,8 @@ Feature: List a sharing permissions
                     "@libre.graph.weight",
                     "description",
                     "displayName",
-                    "id"
+                    "id",
+                    "createdDateTime"
                   ],
                   "properties": {
                     "@libre.graph.weight": {
@@ -1404,7 +1410,8 @@ Feature: List a sharing permissions
                   "required": [
                     "grantedToV2",
                     "id",
-                    "roles"
+                    "roles",
+                    "createdDateTime"
                   ],
                   "properties": {
                     "grantedToV2": {
@@ -1446,7 +1453,8 @@ Feature: List a sharing permissions
                   "required": [
                     "grantedToV2",
                     "id",
-                    "roles"
+                    "roles",
+                    "createdDateTime"
                   ],
                   "properties": {
                     "grantedToV2": {
@@ -1488,7 +1496,8 @@ Feature: List a sharing permissions
                   "required": [
                     "hasPassword",
                     "id",
-                    "link"
+                    "link",
+                    "createdDateTime"
                   ],
                   "properties": {
                     "hasPassword": {
@@ -2250,7 +2259,7 @@ Feature: List a sharing permissions
       }
       """
 
-
+  @env-config @issue-10077
   Scenario: user lists permissions of a space after enabling 'Space Editor Without Versions' role
     Given the administrator has enabled the permissions role "Space Editor Without Versions"
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
@@ -2279,7 +2288,8 @@ Feature: List a sharing permissions
                     "@libre.graph.weight",
                     "description",
                     "displayName",
-                    "id"
+                    "id",
+                    "createdDateTime"
                   ],
                   "properties": {
                     "displayName": {
@@ -2293,7 +2303,8 @@ Feature: List a sharing permissions
                     "@libre.graph.weight",
                     "description",
                     "displayName",
-                    "id"
+                    "id",
+                    "createdDateTime"
                   ],
                   "properties": {
                     "@libre.graph.weight": {
@@ -2316,7 +2327,8 @@ Feature: List a sharing permissions
                     "@libre.graph.weight",
                     "description",
                     "displayName",
-                    "id"
+                    "id",
+                    "createdDateTime"
                   ],
                   "properties": {
                     "displayName": {
@@ -2330,7 +2342,8 @@ Feature: List a sharing permissions
                     "@libre.graph.weight",
                     "description",
                     "displayName",
-                    "id"
+                    "id",
+                    "createdDateTime"
                   ],
                   "properties": {
                     "displayName": {
