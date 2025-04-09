@@ -191,10 +191,10 @@ Feature: Space management
   Scenario: user gets an email notification when space membership expires
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
-    And user "Alice" shares a space "new-space" with settings:
-      | shareWith          | Brian                    |
+    And user "Alice" has sent the following space share invitation:
       | space              | new-space                |
-      | role               | viewer                   |
+      | sharee             | Brian                    |
+      | shareType          | user                     |
       | permissionsRole    | Space Viewer             |
       | expirationDateTime | 2042-03-25T23:59:59.000Z |
     When user "Alice" has expired the membership of user "Brian" from space "new-space"
