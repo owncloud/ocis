@@ -284,7 +284,6 @@ Feature: Notification
       | sharee             | Brian                    |
       | shareType          | user                     |
       | permissionsRole    | Space Viewer             |
-      | expirationDateTime | 2042-03-25T23:59:59.000Z |
     When user "Alice" has expired the membership of user "Brian" from space "new-space"
     Then user "Brian" should have received the following email from user "Alice" about the share of project space "new-space"
       """
