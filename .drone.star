@@ -567,16 +567,10 @@ def getGoBinForTesting(ctx):
 def checkGoBinCache():
     return [{
         "name": "check-go-bin-cache",
-        "image": OC_UBUNTU,
-        "environment": {
-            "CACHE_ENDPOINT": {
-                "from_secret": "cache_s3_server",
-            },
-            "CACHE_BUCKET": {
-                "from_secret": "cache_s3_bucket",
-            },
-        },
+        "image": MINIO_MC,
+        "environment": MINIO_MC_ENV,
         "commands": [
+            "mc alias set s3 $MC_HOST $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY",
             "bash -x %s/tests/config/drone/check_go_bin_cache.sh %s %s" % (dirs["base"], dirs["base"], dirs["gobinTar"]),
         ],
     }]
@@ -3004,17 +2998,11 @@ def getDroneEnvAndCheckScript(ctx):
 def checkForWebCache(name):
     return {
         "name": "check-for-%s-cache" % name,
-        "image": OC_UBUNTU,
-        "environment": {
-            "CACHE_ENDPOINT": {
-                "from_secret": "cache_s3_server",
-            },
-            "CACHE_BUCKET": {
-                "from_secret": "cache_s3_bucket",
-            },
-        },
+        "image": MINIO_MC,
+        "environment": MINIO_MC_ENV,
         "commands": [
-            "bash -x check_web_cache.sh %s" % name,
+            "mc alias set s3 $MC_HOST $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY",
+            "bash -x check_web_cache.sh web.tar.gz",
         ],
     }
 
