@@ -274,3 +274,23 @@ Feature: Notification
 
       Zum Ansehen hier klicken: %base_url%/f/%space_id%
       """
+
+  @email @issue-10882
+  Scenario: user gets an email notification when space membership expires
+    Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Alice" has sent the following space share invitation:
+      | space              | new-space                |
+      | sharee             | Brian                    |
+      | shareType          | user                     |
+      | permissionsRole    | Space Viewer             |
+      | expirationDateTime | 2042-03-25T23:59:59.000Z |
+    When user "Alice" has expired the membership of user "Brian" from space "new-space"
+    Then user "Brian" should have received the following email from user "Alice" about the share of project space "new-space"
+      """
+      Hello Brian Murphy,
+
+      Your membership of space new-space has expired at %expiry_date_in_mail%
+
+      Even though this membership has expired you still might have access through other shares and/or space memberships
+      """
