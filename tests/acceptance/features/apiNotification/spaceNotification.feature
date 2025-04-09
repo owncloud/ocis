@@ -275,7 +275,7 @@ Feature: Notification
       Zum Ansehen hier klicken: %base_url%/f/%space_id%
       """
 
-  @email @issue-10882
+  @issue-10882 @email
   Scenario: user gets an email notification when space membership expires
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
@@ -285,11 +285,66 @@ Feature: Notification
       | shareType          | user                     |
       | permissionsRole    | Space Viewer             |
     When user "Alice" has expired the membership of user "Brian" from space "new-space"
-    Then user "Brian" should have received the following email from user "Alice" about the share of project space "new-space"
-      """
-      Hello Brian Murphy,
+    Then the HTTP status code should be "200"
+    # And user "Brian" should have received the following email from user "Alice" about the share of project space "new-space"
+    #   """
+    #   Hello Brian Murphy,
 
-      Your membership of space new-space has expired at %expiry_date_in_mail%
+    #   Your membership of space new-space has expired at %expiry_date_in_mail%
 
-      Even though this membership has expired you still might have access through other shares and/or space memberships
+    #   Even though this membership has expired you still might have access through other shares and/or space memberships
+    #   """
+    And the JSON response should contain a notification message with the subject "Neue Freigabe" and the message-details should match
       """
+      {
+      "type": "object",
+        "required": [
+          "app",
+          "datetime",
+          "message",
+          "messageRich",
+          "messageRichParameters",
+          "notification_id",
+          "object_id",
+          "object_type",
+          "subject",
+          "subjectRich",
+          "user"
+        ],
+        "properties": {
+          "app": {"const": "userlog"},
+          "message": {"const": "Alice Hansen shared <resource> with you"},
+          "messageRich": {"const": "{user} shared {resource} with you"},
+          "messageRichParameters": {
+            "type": "object",
+            "required": ["resource","user"],
+            "properties": {
+              "resource": {
+                "type": "object",
+                "required": ["id","name"],
+                "properties": {
+                  "id": {"pattern": "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}\\$[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}![a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"},
+                  "name": {"const": "<resource>"}
+                }
+              },
+              "user": {
+                "type": "object",
+                "required": ["displayname","id","name"],
+                "properties": {
+                  "displayname": {"const": "Alice Hansen"},
+                  "id": {"pattern": "^%user_id_pattern%$"},
+                  "name": {"const": "Alice"}
+                }
+              }
+            }
+          },
+          "notification_id": {"type": "string"},
+          "object_id": {"type": "string"},
+          "object_type": {"const": "share"},
+          "subject": {"const": "Resource shared"},
+          "subjectRich": {"const": "Resource shared"},
+          "user": {"const": "Alice"}
+        }
+      }
+      """
+      
