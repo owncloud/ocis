@@ -231,3 +231,27 @@ Feature: ocm notifications
     And user "Brian" should get a notification with subject "Resource shared" and message:
       | message                                   |
       | Alice Hansen shared textfile.txt with you |
+
+  @issue-11042
+  Scenario: federation user gets an in-app notification for share removed from local user
+    Given using server "REMOTE"
+    And user "Brian" has been created with default attributes
+    And "Brian" has created the federation share invitation
+    And using server "LOCAL"
+    And user "Alice" has uploaded file with content "ocm test" to "textfile.txt"
+    And "Alice" has accepted invitation
+    And user "Alice" has sent the following resource share invitation to federated user:
+      | resource        | textfile.txt |
+      | space           | Personal     |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | Viewer       |
+    When user "Alice" removes the access of user "Brian" from resource "textfile.txt" of space "Personal" using the Graph API
+    Then the HTTP status code should be "204"
+    And using server "REMOTE"
+    And user "Brian" should get a notification with subject "Resource shared" and message:
+      | message                                   |
+      | Alice Hansen shared textfile.txt with you |
+    And user "Brian" should get a notification with subject "Resource unshared" and message:
+      | message                                   |
+      | Alice Hansen unshared textfile.txt with you |
