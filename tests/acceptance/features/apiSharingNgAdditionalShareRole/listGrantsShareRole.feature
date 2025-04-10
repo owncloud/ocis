@@ -289,6 +289,9 @@ Feature: ListGrants role
         }
       }
       """
+    And user "Brian" should see the following activities of folder "textfile1.txt" from space "Shares" using the Graph API:
+      | {user} shared {resource} with {sharee} |
+      | {user} added {resource} to {folder}    |
     Examples:
       | permissions-role | new-permissions-role        |
       | Viewer           | Viewer With ListGrants      |
