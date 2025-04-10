@@ -10,6 +10,9 @@ geekdocFilePath: testing.md
 {{< toc >}}
 
 To run tests in the test suite you have two options. You may go the easy way and just run the test suite in docker. But for some tasks you could also need to install the test suite natively, which requires a little more setup since PHP and some dependencies need to be installed.
+{{< hint info >}}
+To run the tests PHP version ">= 8.2.0" is required.
+{{< /hint >}}
 
 Both ways to run tests with the test suites are described here.
 
