@@ -85,7 +85,6 @@ class OcmContext implements Context {
 	public function createInvitation(string $user, $email = null, $description = null): ResponseInterface {
 		$response = OcmHelper::createInvitation(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$email,
@@ -143,7 +142,6 @@ class OcmContext implements Context {
 		}
 		return OcmHelper::acceptInvitation(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$token ? $token : $this->getLastFederatedInvitationToken(),
@@ -203,7 +201,6 @@ class OcmContext implements Context {
 		$this->featureContext->setResponse(
 			OcmHelper::acceptInvitation(
 				$this->featureContext->getBaseUrl(),
-				$this->featureContext->getStepLineRef(),
 				$user,
 				$this->featureContext->getPasswordForUser($user),
 				$token,
@@ -222,7 +219,6 @@ class OcmContext implements Context {
 		$currentServer = $this->featureContext->getCurrentServer();
 		$response = OcmHelper::findAcceptedUsers(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$user,
 			$this->featureContext->getPasswordForUser($user)
 		);
@@ -288,7 +284,6 @@ class OcmContext implements Context {
 	public function listInvitations(string $user): ResponseInterface {
 		return OcmHelper::listInvite(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$user,
 			$this->featureContext->getPasswordForUser($user)
 		);
@@ -363,7 +358,6 @@ class OcmContext implements Context {
 		$ocmUser['idp'] = $idp ?? $ocmUser['idp'];
 		return OcmHelper::deleteConnection(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$ocmUser['user_id'],
@@ -385,7 +379,6 @@ class OcmContext implements Context {
 		$davPath = WebDavHelper::getDavPath($this->featureContext->getDavPathVersion());
 		$response = HttpRequestHelper::get(
 			"$baseUrl/$davPath/$remoteItemId",
-			$this->featureContext->getStepLineRef(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 		);
@@ -404,7 +397,6 @@ class OcmContext implements Context {
 		$queryString = $this->archiverContext->getArchiverQueryString($user, $resource, 'remoteItemIds');
 		$response = HttpRequestHelper::get(
 			$this->archiverContext->getArchiverUrl($queryString),
-			$this->featureContext->getStepLineRef(),
 			$user,
 			$this->featureContext->getPasswordForUser($user)
 		);

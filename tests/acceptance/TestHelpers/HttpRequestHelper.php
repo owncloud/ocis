@@ -44,6 +44,33 @@ class HttpRequestHelper {
 	public const HTTP_CONFLICT = 409;
 
 	/**
+	 * Stores the current scenario reference to use as X-Request-ID
+	 *
+	 * @var string
+	 */
+	private static string $currentScenarioRef = '';
+
+	/**
+	 * Set the current scenario reference
+	 *
+	 * @param string $scenarioRef
+	 *
+	 * @return void
+	 */
+	public static function setCurrentScenarioRef(string $scenarioRef): void {
+		self::$currentScenarioRef = $scenarioRef;
+	}
+
+	/**
+	 * Get the current scenario reference
+	 *
+	 * @return string
+	 */
+	public static function getCurrentScenarioRef(): string {
+		return self::$currentScenarioRef;
+	}
+
+	/**
 	 * Some systems-under-test do async post-processing of operations like upload,
 	 * move, etc. If a client does a request on the resource before the post-processing
 	 * is finished, then the server should return HTTP_TOO_EARLY "425". Clients are
@@ -64,7 +91,6 @@ class HttpRequestHelper {
 	/**
 	 *
 	 * @param string|null $url
-	 * @param string|null $xRequestId
 	 * @param string|null $method
 	 * @param string|null $user
 	 * @param string|null $password
@@ -82,7 +108,6 @@ class HttpRequestHelper {
 	 */
 	public static function sendRequestOnce(
 		?string $url,
-		?string $xRequestId,
 		?string $method = 'GET',
 		?string $user = null,
 		?string $password = null,
@@ -126,7 +151,6 @@ class HttpRequestHelper {
 
 		$request = self::createRequest(
 			$url,
-			$xRequestId,
 			$method,
 			$headers,
 			$body
@@ -164,7 +188,6 @@ class HttpRequestHelper {
 
 	/**
 	 * @param string|null $url
-	 * @param string|null $xRequestId
 	 * @param string|null $method
 	 * @param string|null $user
 	 * @param string|null $password
@@ -184,7 +207,6 @@ class HttpRequestHelper {
 	 */
 	public static function sendRequest(
 		?string $url,
-		?string $xRequestId,
 		?string $method = 'GET',
 		?string $user = null,
 		?string $password = null,
@@ -209,7 +231,6 @@ class HttpRequestHelper {
 		do {
 			$response = self::sendRequestOnce(
 				$url,
-				$xRequestId,
 				$method,
 				$user,
 				$password,
@@ -383,7 +404,6 @@ class HttpRequestHelper {
 	 * This enables us to create multiple requests in advance so that we can send them to the server at once in parallel.
 	 *
 	 * @param string|null $url
-	 * @param string|null $xRequestId
 	 * @param string|null $method
 	 * @param array|null $headers ['X-MyHeader' => 'value']
 	 * @param string|array $body either the actual string to send in the body,
@@ -394,7 +414,6 @@ class HttpRequestHelper {
 	 */
 	public static function createRequest(
 		?string $url,
-		?string $xRequestId = '',
 		?string $method = 'GET',
 		?array $headers = null,
 		$body = null
@@ -402,9 +421,7 @@ class HttpRequestHelper {
 		if ($headers === null) {
 			$headers = [];
 		}
-		if ($xRequestId !== '') {
-			$headers['X-Request-ID'] = $xRequestId;
-		}
+		$headers['X-Request-ID'] = self::$currentScenarioRef;
 		if (\is_array($body)) {
 			// When creating the client, it is possible to set 'form_params' and
 			// the Client constructor sorts out doing this http_build_query stuff.
@@ -428,7 +445,6 @@ class HttpRequestHelper {
 	 * same as HttpRequestHelper::sendRequest() but with "GET" as method
 	 *
 	 * @param string|null $url
-	 * @param string|null $xRequestId
 	 * @param string|null $user
 	 * @param string|null $password
 	 * @param array|null $headers ['X-MyHeader' => 'value']
@@ -443,7 +459,6 @@ class HttpRequestHelper {
 	 */
 	public static function get(
 		?string $url,
-		?string $xRequestId,
 		?string $user = null,
 		?string $password = null,
 		?array $headers = null,
@@ -454,7 +469,6 @@ class HttpRequestHelper {
 	): ResponseInterface {
 		return self::sendRequest(
 			$url,
-			$xRequestId,
 			'GET',
 			$user,
 			$password,
@@ -470,7 +484,6 @@ class HttpRequestHelper {
 	 * same as HttpRequestHelper::sendRequest() but with "POST" as method
 	 *
 	 * @param string|null $url
-	 * @param string|null $xRequestId
 	 * @param string|null $user
 	 * @param string|null $password
 	 * @param array|null $headers ['X-MyHeader' => 'value']
@@ -485,7 +498,6 @@ class HttpRequestHelper {
 	 */
 	public static function post(
 		?string $url,
-		?string $xRequestId,
 		?string $user = null,
 		?string $password = null,
 		?array $headers = null,
@@ -496,7 +508,6 @@ class HttpRequestHelper {
 	): ResponseInterface {
 		return self::sendRequest(
 			$url,
-			$xRequestId,
 			'POST',
 			$user,
 			$password,
@@ -512,7 +523,6 @@ class HttpRequestHelper {
 	 * same as HttpRequestHelper::sendRequest() but with "PUT" as method
 	 *
 	 * @param string|null $url
-	 * @param string|null $xRequestId
 	 * @param string|null $user
 	 * @param string|null $password
 	 * @param array|null $headers ['X-MyHeader' => 'value']
@@ -527,7 +537,6 @@ class HttpRequestHelper {
 	 */
 	public static function put(
 		?string $url,
-		?string $xRequestId,
 		?string $user = null,
 		?string $password = null,
 		?array $headers = null,
@@ -538,7 +547,6 @@ class HttpRequestHelper {
 	): ResponseInterface {
 		return self::sendRequest(
 			$url,
-			$xRequestId,
 			'PUT',
 			$user,
 			$password,
@@ -554,7 +562,6 @@ class HttpRequestHelper {
 	 * same as HttpRequestHelper::sendRequest() but with "DELETE" as method
 	 *
 	 * @param string|null $url
-	 * @param string|null $xRequestId
 	 * @param string|null $user
 	 * @param string|null $password
 	 * @param array|null $headers ['X-MyHeader' => 'value']
@@ -570,7 +577,6 @@ class HttpRequestHelper {
 	 */
 	public static function delete(
 		?string $url,
-		?string $xRequestId,
 		?string $user = null,
 		?string $password = null,
 		?array $headers = null,
@@ -581,7 +587,6 @@ class HttpRequestHelper {
 	): ResponseInterface {
 		return self::sendRequest(
 			$url,
-			$xRequestId,
 			'DELETE',
 			$user,
 			$password,
