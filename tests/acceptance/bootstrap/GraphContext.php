@@ -2934,7 +2934,11 @@ class GraphContext implements Context {
 		string $resource,
 		string $spaceName
 	): void {
-		$resourceId = $this->spacesContext->getResourceId($user, $spaceName, $resource);
+		if ($spaceName === "Shares") {
+			$resourceId = $this->spacesContext->getSharesRemoteItemId($user, $resource);
+		} else {
+			$resourceId = $this->spacesContext->getResourceId($user, $spaceName, $resource);
+		}
 		$response = GraphHelper::getActivities(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
