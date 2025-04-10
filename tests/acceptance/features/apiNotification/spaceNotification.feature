@@ -274,3 +274,26 @@ Feature: Notification
 
       Zum Ansehen hier klicken: %base_url%/f/%space_id%
       """
+
+  @issue-10882 @email
+  Scenario: user gets in-app and email notifications when space membership expires
+    Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Alice" has sent the following space share invitation:
+      | space              | new-space                |
+      | sharee             | Brian                    |
+      | shareType          | user                     |
+      | permissionsRole    | Space Viewer             |
+    When user "Alice" has expired the membership of user "Brian" from space "new-space"
+    Then the HTTP status code should be "200"
+    And user "Brian" should get a notification with subject "Membership expired" and message:
+      | message                        |
+      | Access to Space new-space lost |
+    And user "Brian" should have received the following email from user "Alice" about the share of project space "new-space"
+      """
+      Hello Brian Murphy,
+
+      Your membership of space new-space has expired at %expiry_date_in_mail%
+
+      Even though this membership has expired you still might have access through other shares and/or space memberships
+      """
