@@ -1,6 +1,6 @@
 ## oCIS Wrapper
 
-A tool that wraps the oCIS binary and provides a way to re-configure the running oCIS instance.
+The oCIS wrapper is a tool that wraps the oCIS binary and allows to dynamically reconfigure or extend the running instance. This is done by sending JSON payloads with updated environment variables.
 
 When run, **ociswrapper** starts an API server that exposes some endpoints to re-configure the oCIS server.
 
@@ -25,11 +25,13 @@ When run, **ociswrapper** starts an API server that exposes some endpoints to re
     ```
 
     ```bash
+     --bin string              Full oCIS binary path (default "/usr/bin/ocis")
      --url string              oCIS server url (default "https://localhost:9200")
      --retry string            Number of retries to start oCIS server (default "5")
      -p, --port string         Wrapper API server port (default "5200")
      --admin-username string   admin username for oCIS server
      --admin-password string   admin password for oCIS server
+     --skip-ocis-run           Skip running oCIS server
     ```
 
 Access the API server at `http://localhost:5200`.
@@ -38,7 +40,7 @@ Also, see `./bin/ociswrapper help` for more information.
 
 ### API
 
-**ociswrapper** exposes two endpoints:
+**ociswrapper** exposes the following endpoints:
 
 1.  `PUT /config`
 
