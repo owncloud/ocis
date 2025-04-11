@@ -86,3 +86,51 @@ Feature: create auth-app token
         }
       }
       """
+
+
+  Scenario: admin tries to access resource of another user using auth-app token
+    Given user "Alice" has created auth-app token with expiration time "72h" using the auth-app API
+    And user "Alice" has uploaded file with content "ownCloud test text file" to "textfile.txt"
+    When user "Admin" requests these endpoints with "PROPFIND" using the auth-app token of user "Alice"
+      | endpoint                           |
+      | /webdav/textfile.txt               |
+      | /dav/files/%username%/textfile.txt |
+      | /dav/spaces/%spaceid%/textfile.txt |
+    Then the HTTP status code of responses on all endpoints should be "401"
+
+
+  Scenario: non-admin user tries to access resource of another user using auth-app token
+    Given user "Alice" has created auth-app token with expiration time "72h" using the auth-app API
+    And user "Alice" has uploaded file with content "ownCloud test text file" to "textfile.txt"
+    And user "Brian" has been created with default attributes
+    When user "Brian" requests these endpoints with "PROPFIND" using the auth-app token of user "Alice"
+      | endpoint                           |
+      | /webdav/textfile.txt               |
+      | /dav/files/%username%/textfile.txt |
+      | /dav/spaces/%spaceid%/textfile.txt |
+    Then the HTTP status code of responses on all endpoints should be "401"
+
+  @env-config
+  Scenario: admin tries to access resource of another user using impersonation token
+    Given the config "AUTH_APP_ENABLE_IMPERSONATION" has been set to "true"
+    And user "Admin" has created auth-app token for user "Alice" with expiration time "72h" using the auth-app API
+    And user "Alice" has uploaded file with content "ownCloud test text file" to "textfile.txt"
+    When user "Admin" requests these endpoints with "PROPFIND" using the auth-app token of user "Alice"
+      | endpoint                           |
+      | /webdav/textfile.txt               |
+      | /dav/files/%username%/textfile.txt |
+      | /dav/spaces/%spaceid%/textfile.txt |
+    Then the HTTP status code of responses on all endpoints should be "401"
+
+  @env-config
+  Scenario: non-admin user tries to access resource of another user using impersonation token
+    Given the config "AUTH_APP_ENABLE_IMPERSONATION" has been set to "true"
+    And user "Admin" has created auth-app token for user "Alice" with expiration time "72h" using the auth-app API
+    And user "Alice" has uploaded file with content "ownCloud test text file" to "textfile.txt"
+    And user "Brian" has been created with default attributes
+    When user "Brian" requests these endpoints with "PROPFIND" using the auth-app token of user "Alice"
+      | endpoint                           |
+      | /webdav/textfile.txt               |
+      | /dav/files/%username%/textfile.txt |
+      | /dav/spaces/%spaceid%/textfile.txt |
+    Then the HTTP status code of responses on all endpoints should be "401"
