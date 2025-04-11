@@ -3250,9 +3250,11 @@ def k6LoadTests(ctx):
     script_link = "%s/%s/tests/config/drone/run_k6_tests.sh" % (ocis_git_base_url, ctx.build.commit)
 
     event_array = ["cron"]
+    trigger_ref = ["refs/heads/master"]
 
     if "k6-test" in ctx.build.title.lower():
         event_array.append("pull_request")
+        trigger_ref.append("refs/pull/**")
 
     return [{
         "kind": "pipeline",
@@ -3305,6 +3307,7 @@ def k6LoadTests(ctx):
         "depends_on": [],
         "trigger": {
             "event": event_array,
+            "ref": trigger_ref,
         },
     }]
 
