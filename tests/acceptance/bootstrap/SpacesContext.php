@@ -293,11 +293,11 @@ class SpacesContext implements Context {
 	 * @param string $user
 	 * @param string $share
 	 *
-	 * @return string
+	 * @return object
 	 *
 	 * @throws Exception|GuzzleException
 	 */
-	public function getSharesRemoteItemId(string $user, string $share): string {
+	public function getSharesRemoteItem(string $user, string $share): object {
 		$share = ltrim($share, '/');
 		$credentials = $this->featureContext->graphContext->getAdminOrUserCredentials($user);
 		$response = GraphHelper::getSharesSharedWithMe(
@@ -312,14 +312,43 @@ class SpacesContext implements Context {
 		// Search remoteItem ID of a given share
 		foreach ($jsonBody->value as $item) {
 			if (isset($item->name) && $item->name === $share) {
-				if (isset($item->remoteItem->id)) {
-					return $item->remoteItem->id;
-				}
-				throw new Exception("Failed to find remoteItem ID for share: $share");
+				return $item->remoteItem;
 			}
 		}
 
 		throw new Exception("Cannot find share: $share");
+	}
+
+	/**
+	 * @param string $user
+	 * @param string $share
+	 *
+	 * @return string
+	 *
+	 * @throws Exception|GuzzleException
+	 */
+	public function getSharesRemoteItemId(string $user, string $share): string {
+		$remoteItem = $this->getSharesRemoteItem($user, $share);
+		if (isset($remoteItem->id)) {
+			return $remoteItem->id;
+		}
+		throw new Exception("Failed to find remoteItem ID for share: $share");
+	}
+
+	/**
+	 * @param string $user
+	 * @param string $share
+	 *
+	 * @return string
+	 *
+	 * @throws Exception|GuzzleException
+	 */
+	public function getSharesRemoteItemParentDriveId(string $user, string $share): string {
+		$remoteItem = $this->getSharesRemoteItem($user, $share);
+		if (isset($remoteItem->parentReference->driveId)) {
+			return $remoteItem->parentReference->driveId;
+		}
+		throw new Exception("Failed to find remoteItem ID for share: $share");
 	}
 
 	/**
