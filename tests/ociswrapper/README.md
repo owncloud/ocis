@@ -6,9 +6,11 @@ When run, **ociswrapper** starts an API server that exposes some endpoints to re
 
 ### Usage
 
-1.  Build
+1.  Build the wrapper
+# working dir: ocis repo root dir
 
     ```bash
+    cd tests/ociswrapper
     make build
     ```
 
@@ -25,11 +27,13 @@ When run, **ociswrapper** starts an API server that exposes some endpoints to re
     ```
 
     ```bash
+     --bin string              Full oCIS binary path (default "/usr/bin/ocis")
      --url string              oCIS server url (default "https://localhost:9200")
      --retry string            Number of retries to start oCIS server (default "5")
      -p, --port string         Wrapper API server port (default "5200")
      --admin-username string   admin username for oCIS server
      --admin-password string   admin password for oCIS server
+     --skip-ocis-run           Skip running oCIS server
     ```
 
 Access the API server at `http://localhost:5200`.
