@@ -585,3 +585,39 @@ The sample `fontsMap.json` file is located in `tests/config/drone/fontsMap.json`
   "defaultFont": "/path/to/ocis/tests/config/drone/NotoSans.ttf"
 }
 ```
+
+## Generating Code Coverage Report by Running Acceptance Tests
+
+To find out what oCIS code is covered by the API tests, first create a debug build of oCIS.
+
+```shell
+make -c ocis build-debug
+```
+
+oCIS should be served by the debug binary.
+
+```shell
+ocis/bin/ocis-debug server
+```
+
+Then define a folder to store the coverage report.
+
+```shell
+export GOCOVERDIR=coveragedatafiles
+```
+
+Running the tests will generate the coverage report inside the `coveragedatafiles` directory.
+
+To view the report in human readable form, enter the following command or refer to the official [documentation](https://go.dev/doc/build-cover#working) for more formats.
+
+```
+go tool covdata textfmt -i=coveragedatafiles -o=cov.txt
+```
+
+You can also view the report in a web UI using the following command.
+
+```
+go tool cover -html=cov.txt
+```
+
+This command should open a browser with the code report.

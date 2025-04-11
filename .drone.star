@@ -452,6 +452,13 @@ def main(ctx):
         ),
     )
 
+    test_pipelines.append(
+        pipelineDependsOn(
+            uploadAPITestCoverageReport(ctx),
+            testPipelines(ctx),
+        ),
+    )
+
     pipelines = test_pipelines + build_release_pipelines
 
     if ctx.build.event == "cron":
@@ -742,6 +749,7 @@ def buildOcisBinaryForTesting(ctx):
                  makeNodeGenerate("") +
                  makeGoGenerate("") +
                  build() +
+                 buildDebug() +
                  rebuildBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin"),
         "trigger": {
             "ref": [
@@ -1035,7 +1043,8 @@ def localApiTestPipeline(ctx):
                                      ((wopiCollaborationService("fakeoffice") + wopiCollaborationService("collabora") + wopiCollaborationService("onlyoffice")) if params["collaborationServiceNeeded"] else []) +
                                      (ocisHealthCheck("wopi", ["wopi-collabora:9304", "wopi-onlyoffice:9304", "wopi-fakeoffice:9304"]) if params["collaborationServiceNeeded"] else []) +
                                      localApiTests(ctx, name, params["suites"], storage, params["extraEnvironment"], run_with_remote_php) +
-                                     logRequests(),
+                                     logRequests() +
+                                     generateCoverageFromAPITest(ctx, name),
                             "services": (emailService() if params["emailNeeded"] else []) +
                                         (clamavService() if params["antivirusNeeded"] else []) +
                                         ((fakeOffice() + collaboraService() + onlyofficeService()) if params["collaborationServiceNeeded"] else []),
@@ -1049,6 +1058,49 @@ def localApiTestPipeline(ctx):
                         }
                         pipelines.append(pipeline)
     return pipelines
+
+def generateCoverageFromAPITest(ctx, name):
+    environment = {
+        "GOCOVERDIR": "reports",
+    }
+
+    return [
+        {
+            "name": "coverageReport-%s" % name,
+            "image": OC_CI_GOLANG,
+            "environment": environment,
+            "commands": [
+                "go tool covdata percent -i=$GOCOVERDIR -o=coverage-%s.out" % name,
+            ],
+        },
+        {
+            "name": "coverage-locate",
+            "image": OC_UBUNTU,
+            "commands": [
+                "mkdir -p cache/acceptance/coverage/",
+                "mv coverage-%s.out cache/acceptance/coverage/" % name,
+            ],
+        },
+        {
+            "name": "coverage-cache-1",
+            "image": PLUGINS_S3,
+            "settings": {
+                "endpoint": {
+                    "from_secret": "cache_s3_server",
+                },
+                "bucket": "cache",
+                "source": "cache/acceptance/coverage/coverage-%s.out" % name,
+                "target": "%s/%s/coverage" % (ctx.repo.slug, ctx.build.commit + "-${DRONE_BUILD_NUMBER}"),
+                "path_style": True,
+                "access_key": {
+                    "from_secret": "cache_s3_access_key",
+                },
+                "secret_key": {
+                    "from_secret": "cache_s3_secret_key",
+                },
+            },
+        },
+    ]
 
 def localApiTests(ctx, name, suites, storage = "ocis", extra_environment = {}, with_remote_php = False):
     test_dir = "%s/tests/acceptance" % dirs["base"]
@@ -1130,7 +1182,6 @@ def wopiValidatorTests(ctx, storage, wopiServerType, accounts_hash_difficulty = 
         "RenameFileIfCreateChildFileIsNotSupported",
     ]
 
-    ocis_bin = "ocis/bin/ocis"
     validatorTests = []
     wopiServer = []
     extra_server_environment = {}
@@ -1272,7 +1323,8 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, with_remote_php = Fa
                          ],
                      },
                  ] +
-                 logRequests(),
+                 logRequests() +
+                 generateCoverageFromAPITest(ctx, part_number),
         "services": redisForOCStorage(storage),
         "depends_on": getPipelineNames(buildOcisBinaryForTesting(ctx)),
         "trigger": {
@@ -1367,7 +1419,7 @@ def e2eTestPipeline(ctx):
             restoreWebCache() + \
             restoreWebPnpmCache() + \
             (tikaService() if params["tikaNeeded"] else []) + \
-            ocisServer(extra_server_environment = extra_server_environment, tika_enabled = params["tikaNeeded"])
+            ocisServer(extra_server_environment = extra_server_environment, tika_enabled = params["tikaNeeded"], debug = False)
 
         step_e2e = {
             "name": "e2e-tests",
@@ -1515,7 +1567,7 @@ def multiServiceE2ePipeline(ctx):
             restoreWebCache() + \
             restoreWebPnpmCache() + \
             tikaService() + \
-            ocisServer(extra_server_environment = extra_server_environment, tika_enabled = params["tikaNeeded"]) + \
+            ocisServer(extra_server_environment = extra_server_environment, tika_enabled = params["tikaNeeded"], debug = False) + \
             storage_users_services + \
             [{
                 "name": "e2e-tests",
@@ -2343,7 +2395,7 @@ def notify(ctx):
         },
     }
 
-def ocisServer(storage = "ocis", accounts_hash_difficulty = 4, volumes = [], depends_on = [], deploy_type = "", extra_server_environment = {}, with_wrapper = False, tika_enabled = False):
+def ocisServer(storage = "ocis", accounts_hash_difficulty = 4, volumes = [], depends_on = [], deploy_type = "", extra_server_environment = {}, with_wrapper = False, tika_enabled = False, debug = True):
     user = "0:0"
     container_name = OCIS_SERVER_NAME
     environment = {
@@ -2399,6 +2451,7 @@ def ocisServer(storage = "ocis", accounts_hash_difficulty = 4, volumes = [], dep
         "WEB_DEBUG_ADDR": "0.0.0.0:9104",
         "WEBDAV_DEBUG_ADDR": "0.0.0.0:9119",
         "WEBFINGER_DEBUG_ADDR": "0.0.0.0:9279",
+        "GOCOVERDIR": "reports",
     }
 
     if deploy_type == "":
@@ -2443,6 +2496,8 @@ def ocisServer(storage = "ocis", accounts_hash_difficulty = 4, volumes = [], dep
         environment[item] = extra_server_environment[item]
 
     ocis_bin = "ocis/bin/ocis"
+    if debug:
+        ocis_bin = "ocis/bin/ocis-debug"
 
     wrapper_commands = [
         "make -C %s build" % dirs["ocisWrapper"],
@@ -2461,6 +2516,13 @@ def ocisServer(storage = "ocis", accounts_hash_difficulty = 4, volumes = [], dep
         "depends_on": depends_on,
     }
 
+    commands = [
+        "mkdir -p $GOCOVERDIR",
+        "%s init --insecure true" % ocis_bin,
+        "cat $OCIS_CONFIG_DIR/ocis.yaml",
+        "cp tests/config/drone/app-registry.yaml /root/.ocis/config/app-registry.yaml",
+    ] + (wrapper_commands)
+
     return [
         {
             "name": container_name,
@@ -2468,11 +2530,7 @@ def ocisServer(storage = "ocis", accounts_hash_difficulty = 4, volumes = [], dep
             "detach": True,
             "environment": environment,
             "user": user,
-            "commands": [
-                "%s init --insecure true" % ocis_bin,
-                "cat $OCIS_CONFIG_DIR/ocis.yaml",
-                "cp tests/config/drone/app-registry.yaml /root/.ocis/config/app-registry.yaml",
-            ] + (wrapper_commands),
+            "commands": commands,
             "volumes": volumes,
             "depends_on": depends_on,
         },
@@ -2505,7 +2563,7 @@ def startOcisService(service = None, name = None, environment = {}, volumes = []
             "detach": True,
             "environment": environment,
             "commands": [
-                "ocis/bin/ocis %s server" % service,
+                "ocis/bin/ocis-debug %s server" % service,
             ],
             "volumes": volumes,
         },
@@ -2532,6 +2590,19 @@ def build():
             "image": OC_CI_GOLANG,
             "commands": [
                 "retry -t 3 'make -C ocis build'",
+            ],
+            "environment": DRONE_HTTP_PROXY_ENV,
+            "volumes": [stepVolumeGo],
+        },
+    ]
+
+def buildDebug():
+    return [
+        {
+            "name": "build debug binary",
+            "image": OC_CI_GOLANG,
+            "commands": [
+                "retry -t 3 'make -C ocis build-debug'",
             ],
             "environment": DRONE_HTTP_PROXY_ENV,
             "volumes": [stepVolumeGo],
@@ -2735,6 +2806,75 @@ def genericCache(name, action, mounts, cache_path):
         },
     }
     return step
+
+def uploadAPITestCoverageReport(ctx):
+    cache_path = "%s/%s/%s" % ("cache", ctx.repo.slug, ctx.build.commit + "-${DRONE_BUILD_NUMBER}")
+
+    sonar_env = {
+        "SONAR_TOKEN": {
+            "from_secret": "sonarcloud_acceptance_tests",
+        },
+    }
+
+    if ctx.build.event == "pull_request":
+        sonar_env.update({
+            "SONAR_PULL_REQUEST_BASE": "%s" % (ctx.build.target),
+            "SONAR_PULL_REQUEST_BRANCH": "%s" % (ctx.build.source),
+            "SONAR_PULL_REQUEST_KEY": "%s" % (ctx.build.ref.replace("refs/pull/", "").split("/")[0]),
+        })
+
+    return {
+        "kind": "pipeline",
+        "type": "docker",
+        "name": "sonarcloud",
+        "platform": {
+            "os": "linux",
+            "arch": "amd64",
+        },
+        "steps": [
+            {
+                "name": "sync-from-cache",
+                "image": MINIO_MC,
+                "environment": MINIO_MC_ENV,
+                "commands": [
+                    "mkdir -p results",
+                    "mc alias set cache $MC_HOST $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY",
+                    "mc mirror cache/$CACHE_BUCKET/%s/%s/coverage results/" % (ctx.repo.slug, ctx.build.commit + "-${DRONE_BUILD_NUMBER}"),
+                ],
+            },
+            {
+                "name": "sonarcloud-properties",
+                "image": OC_UBUNTU,
+                "commands": [
+                    "mv sonar-project.properties sonar-project.properties.skip",
+                    "mv tests/acceptance/sonar-project.properties sonar-project.properties",
+                ],
+            },
+            {
+                "name": "sonarcloud",
+                "image": SONARSOURCE_SONAR_SCANNER_CLI,
+                "environment": sonar_env,
+            },
+            {
+                "name": "purge-cache",
+                "image": MINIO_MC,
+                "environment": MINIO_MC_ENV,
+                "commands": [
+                    "mc alias set cache $MC_HOST $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY",
+                    "mc rm --recursive --force cache/$CACHE_BUCKET/%s/%s" % (ctx.repo.slug, ctx.build.commit + "-${DRONE_BUILD_NUMBER}"),
+                ],
+            },
+        ],
+        "trigger": {
+            "ref": [
+                "refs/heads/master",
+            ],
+            "status": [
+                "success",
+                "failure",
+            ],
+        },
+    }
 
 def genericCachePurge(flush_path):
     return {
