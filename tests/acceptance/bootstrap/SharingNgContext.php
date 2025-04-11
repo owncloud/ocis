@@ -2331,7 +2331,7 @@ class SharingNgContext implements Context {
 	}
 
 	/**
-	 * @Then /^user "([^"]*)" should have the following shares of the (?:folder|file) "([^"]*)":$/
+	 * @Then for user :user file/folder :resource should have the following shares:
 	 *
 	 * @param string $user
 	 * @param string $resource

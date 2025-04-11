@@ -62,7 +62,7 @@ Feature: ListGrants role
         }
       }
       """
-    And user "Brian" should have the following shares of the file "textfile1.txt":
+    And for user "Brian" file "textfile1.txt" should have the following shares:
       | sharee | shareType | permissionsRole    |
       | Brian  | user      | <permissions-role> |
     Examples:
@@ -122,7 +122,7 @@ Feature: ListGrants role
         }
       }
       """
-    And user "Brian" should have the following shares of the folder "FolderToShare":
+    And for user "Brian" folder "FolderToShare" should have the following shares:
       | sharee | shareType | permissionsRole    |
       | Brian  | user      | <permissions-role> |
     Examples:
@@ -185,7 +185,7 @@ Feature: ListGrants role
         }
       }
       """
-    And user "Brian" should have the following shares of the file "textfile1.txt":
+    And for user "Brian" file "textfile1.txt" should have the following shares:
       | sharee | shareType | permissionsRole    |
       | Brian  | user      | <permissions-role> |
     Examples:
@@ -248,7 +248,7 @@ Feature: ListGrants role
         }
       }
       """
-    And user "Brian" should have the following shares of the folder "FolderToShare":
+    And for user "Brian" folder "FolderToShare" should have the following shares:
       | sharee | shareType | permissionsRole    |
       | Brian  | user      | <permissions-role> |
     Examples:
@@ -301,7 +301,7 @@ Feature: ListGrants role
         }
       }
       """
-    And user "Brian" should have the following shares of the file "textfile1.txt":
+    And for user "Brian" file "textfile1.txt" should have the following shares:
       | sharee | shareType | permissionsRole        |
       | Brian  | user      | <new-permissions-role> |
     Examples:
@@ -356,7 +356,7 @@ Feature: ListGrants role
         }
       }
       """
-    And user "Brian" should have the following shares of the folder "FolderToShare":
+    And for user "Brian" folder "FolderToShare" should have the following shares:
       | sharee | shareType | permissionsRole        |
       | Brian  | user      | <new-permissions-role> |
     Examples:
@@ -416,7 +416,7 @@ Feature: ListGrants role
         }
       }
       """
-    And user "Brian" should have the following shares of the file "textfile1.txt":
+    And for user "Brian" file "textfile1.txt" should have the following shares:
       | sharee | shareType | permissionsRole        |
       | Brian  | user      | <new-permissions-role> |
     Examples:
@@ -474,7 +474,7 @@ Feature: ListGrants role
         }
       }
       """
-    And user "Brian" should have the following shares of the folder "FolderToShare":
+    And for user "Brian" folder "FolderToShare" should have the following shares:
       | sharee | shareType | permissionsRole        |
       | Brian  | user      | <new-permissions-role> |
     Examples:
@@ -531,7 +531,7 @@ Feature: ListGrants role
         }
       }
       """
-    And user "Brian" should have the following shares of the file "textfile1.txt":
+    And for user "Brian" file "textfile1.txt" should have the following shares:
       | sharee | shareType | permissionsRole        |
       | Brian  | user      | <new-permissions-role> |
     Examples:
@@ -586,7 +586,7 @@ Feature: ListGrants role
         }
       }
       """
-    And user "Brian" should have the following shares of the folder "FolderToShare":
+    And for user "Brian" folder "FolderToShare" should have the following shares:
       | sharee | shareType | permissionsRole        |
       | Brian  | user      | <new-permissions-role> |
     Examples:
@@ -646,7 +646,7 @@ Feature: ListGrants role
         }
       }
       """
-    And user "Brian" should have the following shares of the file "textfile1.txt":
+    And for user "Brian" file "textfile1.txt" should have the following shares:
       | sharee | shareType | permissionsRole        |
       | Brian  | user      | <new-permissions-role> |
     Examples:
@@ -704,7 +704,7 @@ Feature: ListGrants role
         }
       }
       """
-    And user "Brian" should have the following shares of the folder "FolderToShare":
+    And for user "Brian" folder "FolderToShare" should have the following shares:
       | sharee | shareType | permissionsRole        |
       | Brian  | user      | <new-permissions-role> |
     Examples:
@@ -1302,7 +1302,7 @@ Feature: ListGrants role
         }
       }
       """
-    And user "Brian" should have the following shares of the folder "folder":
+    And for user "Brian" folder "folder" should have the following shares:
       | sharee | shareType | permissionsRole    |
       | Brian  | user      | Viewer             |
       | grp1   | group     | <permissions-role> |
