@@ -57,6 +57,7 @@ type Config struct {
 	ServiceAccount   ServiceAccount        `yaml:"service_account"`
 
 	PasswordPolicy PasswordPolicy `yaml:"password_policy"`
+	Validation     Validation     `yaml:"validation"`
 
 	ConfigurableNotifications bool `yaml:"configurable_notifications" env:"FRONTEND_CONFIGURABLE_NOTIFICATIONS" desc:"Allow configuring notifications via web client." introductionVersion:"7.1"`
 
@@ -192,4 +193,8 @@ type PasswordPolicy struct {
 	MinDigits              int    `yaml:"min_digits" env:"OCIS_PASSWORD_POLICY_MIN_DIGITS;FRONTEND_PASSWORD_POLICY_MIN_DIGITS" desc:"Define the minimum number of digits. Defaults to 1 if not set." introductionVersion:"5.0"`
 	MinSpecialCharacters   int    `yaml:"min_special_characters" env:"OCIS_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS;FRONTEND_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS" desc:"Define the minimum number of characters from the special characters list to be present. Defaults to 1 if not set." introductionVersion:"5.0"`
 	BannedPasswordsList    string `yaml:"banned_passwords_list" env:"OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST;FRONTEND_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" desc:"Path to the 'banned passwords list' file. This only impacts public link password validation. See the documentation for more details." introductionVersion:"5.0"`
+}
+
+type Validation struct {
+	MaxTagLength int `yaml:"max_tag_length" env:"OCIS_MAX_TAG_LENGTH" desc:"Define the maximum tag length. Defaults to 100 if not set. Set to 0 to not limit the tag length. Changes only impact the validation of new tags." introductionVersion:"%%NEXT%%"`
 }

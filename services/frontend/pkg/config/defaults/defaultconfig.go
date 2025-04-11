@@ -138,6 +138,9 @@ func DefaultConfig() *config.Config {
 			MinDigits:              1,
 			MinSpecialCharacters:   1,
 		},
+		Validation: config.Validation{
+			MaxTagLength: 100,
+		},
 	}
 }
 
