@@ -297,7 +297,6 @@ class OcisHelper {
 	 * @param string|null $baseUrl
 	 * @param string|null $user
 	 * @param string|null $password
-	 * @param string|null $xRequestId
 	 *
 	 * @return void
 	 * @throws GuzzleException
@@ -305,12 +304,10 @@ class OcisHelper {
 	public static function createEOSStorageHome(
 		?string $baseUrl,
 		?string $user,
-		?string $password,
-		?string $xRequestId = ''
+		?string $password
 	): void {
 		HttpRequestHelper::get(
 			$baseUrl . "/ocs/v2.php/apps/notifications/api/v1/notifications",
-			$xRequestId,
 			$user,
 			$password
 		);

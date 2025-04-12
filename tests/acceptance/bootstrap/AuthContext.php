@@ -86,7 +86,6 @@ class AuthContext implements Context {
 		$fullUrl = $this->featureContext->getBaseUrl() . "/$url";
 		return HttpRequestHelper::sendRequest(
 			$fullUrl,
-			$this->featureContext->getStepLineRef(),
 			$method,
 			null,
 			null,
@@ -240,7 +239,6 @@ class AuthContext implements Context {
 			$this->featureContext->setResponse(
 				HttpRequestHelper::sendRequest(
 					$this->featureContext->substituteInLineCodes($row['endpoint']),
-					$this->featureContext->getStepLineRef(),
 					$method
 				)
 			);
@@ -708,7 +706,6 @@ class AuthContext implements Context {
 		$fullUrl = $this->featureContext->getBaseUrl() . "/$endpoint";
 		$response = HttpRequestHelper::sendRequestOnce(
 			$fullUrl,
-			$this->featureContext->getStepLineRef(),
 			$method,
 			$username,
 			$this->featureContext->getPasswordForUser($user)

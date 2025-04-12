@@ -101,7 +101,6 @@ class CollaborationContext implements Context {
 				$this->featureContext->getActualUsername($user),
 				$this->featureContext->getPasswordForUser($user),
 				$this->featureContext->getBaseUrl(),
-				$this->featureContext->getStepLineRef(),
 				$viewMode
 			)->getBody()->getContents()
 		);
@@ -115,8 +114,7 @@ class CollaborationContext implements Context {
 
 		$this->featureContext->setResponse(
 			HttpRequestHelper::get(
-				$wopiSrc . "?access_token=$accessToken",
-				$this->featureContext->getStepLineRef()
+				$wopiSrc . "?access_token=$accessToken"
 			)
 		);
 	}
@@ -143,7 +141,6 @@ class CollaborationContext implements Context {
 		$this->featureContext->setResponse(
 			CollaborationHelper::createFile(
 				$this->featureContext->getBaseUrl(),
-				$this->featureContext->getStepLineRef(),
 				$user,
 				$this->featureContext->getPasswordForUser($user),
 				$parentContainerId,
@@ -169,7 +166,6 @@ class CollaborationContext implements Context {
 		$responseXmlObject = HttpRequestHelper::getResponseXml(
 			HttpRequestHelper::sendRequest(
 				"$baseUrl/$davPath/$folder",
-				$this->featureContext->getStepLineRef(),
 				"PROPFIND",
 				"public",
 				$this->featureContext->getActualPassword($password)
@@ -184,7 +180,6 @@ class CollaborationContext implements Context {
 		$this->featureContext->setResponse(
 			CollaborationHelper::createFile(
 				$this->featureContext->getBaseUrl(),
-				$this->featureContext->getStepLineRef(),
 				"public",
 				$this->featureContext->getActualPassword($password),
 				$parentContainerId,
@@ -255,8 +250,7 @@ class CollaborationContext implements Context {
 				$app,
 				$this->featureContext->getActualUsername($user),
 				$this->featureContext->getPasswordForUser($user),
-				$this->featureContext->getBaseUrl(),
-				$this->featureContext->getStepLineRef()
+				$this->featureContext->getBaseUrl()
 			)->getBody()->getContents()
 		);
 		$accessToken = $response->form_parameters->access_token;
@@ -271,8 +265,7 @@ class CollaborationContext implements Context {
 		$fullUrl = substr($wopiSrc, 0, $position) . WebDavHelper::generateUUIDv4();
 		$this->featureContext->setResponse(
 			HttpRequestHelper::get(
-				$fullUrl . "?access_token=$accessToken",
-				$this->featureContext->getStepLineRef()
+				$fullUrl . "?access_token=$accessToken"
 			)
 		);
 	}
@@ -291,7 +284,6 @@ class CollaborationContext implements Context {
 		$this->featureContext->setResponse(
 			CollaborationHelper::createFile(
 				$this->featureContext->getBaseUrl(),
-				$this->featureContext->getStepLineRef(),
 				$user,
 				$this->featureContext->getPasswordForUser($user),
 				$parentContainerId,
@@ -316,8 +308,7 @@ class CollaborationContext implements Context {
 			$rows['app'],
 			$this->featureContext->getActualUsername($user),
 			$this->featureContext->getPasswordForUser($user),
-			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef()
+			$this->featureContext->getBaseUrl()
 		);
 		$this->featureContext->theHTTPStatusCodeShouldBe(200, '', $appResponse);
 		$this->setLastAppOpenData($appResponse->getBody()->getContents());
@@ -343,8 +334,7 @@ class CollaborationContext implements Context {
 
 		$this->featureContext->setResponse(
 			HttpRequestHelper::get(
-				$wopiSrc . "?access_token=$accessToken",
-				$this->featureContext->getStepLineRef()
+				$wopiSrc . "?access_token=$accessToken"
 			)
 		);
 	}
@@ -456,7 +446,6 @@ class CollaborationContext implements Context {
 		$parentContainerId = $this->featureContext->getFileIdForPath($user, "/");
 		$response = CollaborationHelper::createFile(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$parentContainerId,
