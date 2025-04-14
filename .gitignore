@@ -29,6 +29,10 @@ ocis/cmd/ocis/config/
 # IDEs
 .idea
 
+# Visual Studio Code
+.vscode
+!.vscode/launch-example.json
+
 # Composer - used for API acceptance tests
 composer.lock
 vendor-bin/**/vendor
