@@ -36,6 +36,8 @@ type Config struct {
 	Keycloak       Keycloak       `yaml:"keycloak"`
 	ServiceAccount ServiceAccount `yaml:"service_account"`
 
+	Validation Validation `yaml:"validation"`
+
 	Context context.Context `yaml:"-"`
 }
 
@@ -152,4 +154,8 @@ type Keycloak struct {
 type ServiceAccount struct {
 	ServiceAccountID     string `yaml:"service_account_id" env:"OCIS_SERVICE_ACCOUNT_ID;GRAPH_SERVICE_ACCOUNT_ID" desc:"The ID of the service account the service should use. See the 'auth-service' service description for more details." introductionVersion:"5.0"`
 	ServiceAccountSecret string `yaml:"service_account_secret" env:"OCIS_SERVICE_ACCOUNT_SECRET;GRAPH_SERVICE_ACCOUNT_SECRET" desc:"The service account secret." introductionVersion:"5.0"`
+}
+
+type Validation struct {
+	MaxTagLength int `yaml:"max_tag_length" env:"OCIS_MAX_TAG_LENGTH" desc:"Define the maximum tag length. Defaults to 100 if not set. Set to 0 to not limit the tag length. Changes only impact the validation of new tags." introductionVersion:"%%NEXT%%"`
 }

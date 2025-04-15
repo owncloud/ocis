@@ -114,6 +114,7 @@ type CapabilitiesCore struct {
 type CapabilitiesGraph struct {
 	PersonalDataExport ocsBool                `json:"personal-data-export" xml:"personal-data-export" mapstructure:"personal_data_export"`
 	Users              CapabilitiesGraphUsers `json:"users" xml:"users" mapstructure:"users"`
+	Tags               CapabilitiesGraphTags  `json:"tags" xml:"tags" mapstructure:"tags"`
 }
 
 // CapabilitiesPasswordPolicy hold the password policy capabilities
@@ -133,6 +134,11 @@ type CapabilitiesGraphUsers struct {
 	CreateDisabled             ocsBool  `json:"create_disabled" xml:"create_disabled" mapstructure:"create_disabled"`
 	DeleteDisabled             ocsBool  `json:"delete_disabled" xml:"delete_disabled" mapstructure:"delete_disabled"`
 	ChangePasswordSelfDisabled ocsBool  `json:"change_password_self_disabled" xml:"change_password_self_disabled" mapstructure:"change_password_self_disabled"`
+}
+
+// CapabilitiesGraphTags holds the graph tags capabilities
+type CapabilitiesGraphTags struct {
+	MaxTagLength int `json:"max_tag_length" xml:"max_tag_length" mapstructure:"max_tag_length"`
 }
 
 // Status holds basic status information
