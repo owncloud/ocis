@@ -1,4 +1,4 @@
-// Copyright 2023-2024 The NATS Authors
+// Copyright 2023-2025 The NATS Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -54,12 +54,4 @@ func pivot[N position](subject []byte, pos N) byte {
 		return noPivot
 	}
 	return subject[pos]
-}
-
-// TODO(dlc) - Can be removed with Go 1.21 once server is on Go 1.22.
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
 }

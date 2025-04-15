@@ -205,6 +205,11 @@ type RemoteLeafOpts struct {
 	DenyImports       []string         `json:"-"`
 	DenyExports       []string         `json:"-"`
 
+	// FirstInfoTimeout is the amount of time the server will wait for the
+	// initial INFO protocol from the remote server before closing the
+	// connection.
+	FirstInfoTimeout time.Duration `json:"-"`
+
 	// Compression options for this remote. Each remote could have a different
 	// setting and also be different from the LeafNode options.
 	Compression CompressionOpts `json:"-"`
@@ -290,6 +295,7 @@ type Options struct {
 	MaxControlLine             int32         `json:"max_control_line"`
 	MaxPayload                 int32         `json:"max_payload"`
 	MaxPending                 int64         `json:"max_pending"`
+	NoFastProducerStall        bool          `json:"-"`
 	Cluster                    ClusterOpts   `json:"cluster,omitempty"`
 	Gateway                    GatewayOpts   `json:"gateway,omitempty"`
 	LeafNode                   LeafNodeOpts  `json:"leaf,omitempty"`
@@ -657,26 +663,28 @@ type authorization struct {
 // TLSConfigOpts holds the parsed tls config information,
 // used with flag parsing
 type TLSConfigOpts struct {
-	CertFile          string
-	KeyFile           string
-	CaFile            string
-	Verify            bool
-	Insecure          bool
-	Map               bool
-	TLSCheckKnownURLs bool
-	HandshakeFirst    bool          // Indicate that the TLS handshake should occur first, before sending the INFO protocol.
-	FallbackDelay     time.Duration // Where supported, indicates how long to wait for the handshake before falling back to sending the INFO protocol first.
-	Timeout           float64
-	RateLimit         int64
-	Ciphers           []uint16
-	CurvePreferences  []tls.CurveID
-	PinnedCerts       PinnedCertSet
-	CertStore         certstore.StoreType
-	CertMatchBy       certstore.MatchByType
-	CertMatch         string
-	OCSPPeerConfig    *certidp.OCSPPeerConfig
-	Certificates      []*TLSCertPairOpt
-	MinVersion        uint16
+	CertFile             string
+	KeyFile              string
+	CaFile               string
+	Verify               bool
+	Insecure             bool
+	Map                  bool
+	TLSCheckKnownURLs    bool
+	HandshakeFirst       bool          // Indicate that the TLS handshake should occur first, before sending the INFO protocol.
+	FallbackDelay        time.Duration // Where supported, indicates how long to wait for the handshake before falling back to sending the INFO protocol first.
+	Timeout              float64
+	RateLimit            int64
+	Ciphers              []uint16
+	CurvePreferences     []tls.CurveID
+	PinnedCerts          PinnedCertSet
+	CertStore            certstore.StoreType
+	CertMatchBy          certstore.MatchByType
+	CertMatch            string
+	CertMatchSkipInvalid bool
+	CaCertsMatch         []string
+	OCSPPeerConfig       *certidp.OCSPPeerConfig
+	Certificates         []*TLSCertPairOpt
+	MinVersion           uint16
 }
 
 // TLSCertPairOpt are the paths to a certificate and private key.
@@ -1568,6 +1576,10 @@ func (o *Options) processConfigFileLine(k string, v any, errors *[]error, warnin
 			*errors = append(*errors, err)
 			return
 		}
+	case "no_fast_producer_stall":
+		o.NoFastProducerStall = v.(bool)
+	case "max_closed_clients":
+		o.MaxClosedClients = int(v.(int64))
 	default:
 		if au := atomic.LoadInt32(&allowUnknownTopLevelField); au == 0 && !tk.IsUsedVariable() {
 			err := &unknownConfigFieldErr{
@@ -2605,6 +2617,8 @@ func parseRemoteLeafNodes(v any, errors *[]error, warnings *[]error) ([]*RemoteL
 					*errors = append(*errors, err)
 					continue
 				}
+			case "first_info_timeout":
+				remote.FirstInfoTimeout = parseDuration(k, tk, v, errors, warnings)
 			default:
 				if !tk.IsUsedVariable() {
 					err := &unknownConfigFieldErr{
@@ -4419,6 +4433,28 @@ func parseTLS(v any, isClientCtx bool) (t *TLSConfigOpts, retErr error) {
 				return nil, &configErr{tk, certstore.ErrBadCertMatchField.Error()}
 			}
 			tc.CertMatch = certMatch
+		case "ca_certs_match":
+			rv := []string{}
+			switch mv := mv.(type) {
+			case string:
+				rv = append(rv, mv)
+			case []string:
+				rv = append(rv, mv...)
+			case []interface{}:
+				for _, t := range mv {
+					if token, ok := t.(token); ok {
+						if ts, ok := token.Value().(string); ok {
+							rv = append(rv, ts)
+							continue
+						} else {
+							return nil, &configErr{tk, fmt.Sprintf("error parsing ca_cert_match: unsupported type %T where string is expected", token)}
+						}
+					} else {
+						return nil, &configErr{tk, fmt.Sprintf("error parsing ca_cert_match: unsupported type %T", t)}
+					}
+				}
+			}
+			tc.CaCertsMatch = rv
 		case "handshake_first", "first", "immediate":
 			switch mv := mv.(type) {
 			case bool:
@@ -4444,6 +4480,12 @@ func parseTLS(v any, isClientCtx bool) (t *TLSConfigOpts, retErr error) {
 			default:
 				return nil, &configErr{tk, fmt.Sprintf("field %q should be a boolean or a string, got %T", mk, mv)}
 			}
+		case "cert_match_skip_invalid":
+			certMatchSkipInvalid, ok := mv.(bool)
+			if !ok {
+				return nil, &configErr{tk, certstore.ErrBadCertMatchSkipInvalidField.Error()}
+			}
+			tc.CertMatchSkipInvalid = certMatchSkipInvalid
 		case "ocsp_peer":
 			switch vv := mv.(type) {
 			case bool:
@@ -4819,7 +4861,7 @@ func GenTLSConfig(tc *TLSConfigOpts) (*tls.Config, error) {
 		}
 		config.Certificates = []tls.Certificate{cert}
 	case tc.CertStore != certstore.STOREEMPTY:
-		err := certstore.TLSConfig(tc.CertStore, tc.CertMatchBy, tc.CertMatch, &config)
+		err := certstore.TLSConfig(tc.CertStore, tc.CertMatchBy, tc.CertMatch, tc.CaCertsMatch, tc.CertMatchSkipInvalid, &config)
 		if err != nil {
 			return nil, err
 		}
@@ -5162,6 +5204,10 @@ func setBaselineOptions(opts *Options) {
 				} else {
 					c.Mode = CompressionS2Auto
 				}
+			}
+			// Set default first info timeout value if not set.
+			if r.FirstInfoTimeout <= 0 {
+				r.FirstInfoTimeout = DEFAULT_LEAFNODE_INFO_WAIT
 			}
 		}
 	}

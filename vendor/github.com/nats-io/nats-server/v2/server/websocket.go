@@ -1,4 +1,4 @@
-// Copyright 2020-2023 The NATS Authors
+// Copyright 2020-2025 The NATS Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -67,7 +67,6 @@ const (
 	wsCloseStatusProtocolError      = 1002
 	wsCloseStatusUnsupportedData    = 1003
 	wsCloseStatusNoStatusReceived   = 1005
-	wsCloseStatusAbnormalClosure    = 1006
 	wsCloseStatusInvalidPayloadData = 1007
 	wsCloseStatusPolicyViolation    = 1008
 	wsCloseStatusMessageTooBig      = 1009
@@ -458,9 +457,21 @@ func (c *client) wsHandleControlFrame(r *wsReadInfo, frameType wsOpCode, nc io.R
 				}
 			}
 		}
-		clm := wsCreateCloseMessage(status, body)
+		// If the status indicates that nothing was received, then we don't
+		// send anything back.
+		// From https://datatracker.ietf.org/doc/html/rfc6455#section-7.4
+		// it says that code 1005 is a reserved value and MUST NOT be set as a
+		// status code in a Close control frame by an endpoint.  It is
+		// designated for use in applications expecting a status code to indicate
+		// that no status code was actually present.
+		var clm []byte
+		if status != wsCloseStatusNoStatusReceived {
+			clm = wsCreateCloseMessage(status, body)
+		}
 		c.wsEnqueueControlMessage(wsCloseMessage, clm)
-		nbPoolPut(clm) // wsEnqueueControlMessage has taken a copy.
+		if len(clm) > 0 {
+			nbPoolPut(clm) // wsEnqueueControlMessage has taken a copy.
+		}
 		// Return io.EOF so that readLoop will close the connection as ClientClosed
 		// after processing pending buffers.
 		return pos, io.EOF
@@ -647,10 +658,11 @@ func (c *client) wsEnqueueCloseMessage(reason ClosedState) {
 		status = wsCloseStatusProtocolError
 	case MaxPayloadExceeded:
 		status = wsCloseStatusMessageTooBig
-	case ServerShutdown:
+	case WriteError, ReadError, StaleConnection, ServerShutdown:
+		// We used to have WriteError, ReadError and StaleConnection result in
+		// code 1006, which the spec says that it must not be used to set the
+		// status in the close message. So using this one instead.
 		status = wsCloseStatusGoingAway
-	case WriteError, ReadError, StaleConnection:
-		status = wsCloseStatusAbnormalClosure
 	default:
 		status = wsCloseStatusInternalSrvError
 	}
@@ -1299,6 +1311,9 @@ func (c *client) wsCollapsePtoNB() (net.Buffers, int64) {
 		}
 		if usz <= wsCompressThreshold {
 			compress = false
+			if cp := c.ws.compressor; cp != nil {
+				cp.Reset(nil)
+			}
 		}
 	}
 	if compress && len(nb) > 0 {
@@ -1316,12 +1331,23 @@ func (c *client) wsCollapsePtoNB() (net.Buffers, int64) {
 		}
 		var csz int
 		for _, b := range nb {
-			cp.Write(b)
+			for len(b) > 0 {
+				n, err := cp.Write(b)
+				if err != nil {
+					// Whatever this error is, it'll be handled by the cp.Flush()
+					// call below, as the same error will be returned there.
+					// Let the outer loop return all the buffers back to the pool
+					// and fall through naturally.
+					break
+				}
+				b = b[n:]
+			}
 			nbPoolPut(b) // No longer needed as contents written to compressor.
 		}
 		if err := cp.Flush(); err != nil {
 			c.Errorf("Error during compression: %v", err)
 			c.markConnAsClosed(WriteError)
+			cp.Reset(nil)
 			return nil, 0
 		}
 		b := buf.Bytes()
@@ -1437,6 +1463,7 @@ func (c *client) wsCollapsePtoNB() (net.Buffers, int64) {
 		bufs = append(bufs, c.ws.closeMsg)
 		c.ws.fs += int64(len(c.ws.closeMsg))
 		c.ws.closeMsg = nil
+		c.ws.compressor = nil
 	}
 	c.ws.frames = nil
 	return bufs, c.ws.fs

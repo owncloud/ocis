@@ -1,4 +1,4 @@
-// Copyright 2018-2023 The NATS Authors
+// Copyright 2018-2025 The NATS Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -313,6 +313,37 @@ type ClientInfo struct {
 	ClientType string        `json:"client_type,omitempty"`
 	MQTTClient string        `json:"client_id,omitempty"` // This is the MQTT client ID
 	Nonce      string        `json:"nonce,omitempty"`
+}
+
+// forAssignmentSnap returns the minimum amount of ClientInfo we need for assignment snapshots.
+func (ci *ClientInfo) forAssignmentSnap() *ClientInfo {
+	return &ClientInfo{
+		Account: ci.Account,
+		Service: ci.Service,
+		Cluster: ci.Cluster,
+	}
+}
+
+// forProposal returns the minimum amount of ClientInfo we need for assignment proposals.
+func (ci *ClientInfo) forProposal() *ClientInfo {
+	if ci == nil {
+		return nil
+	}
+	cci := *ci
+	cci.Jwt = _EMPTY_
+	cci.IssuerKey = _EMPTY_
+	return &cci
+}
+
+// forAdvisory returns the minimum amount of ClientInfo we need for JS advisory events.
+func (ci *ClientInfo) forAdvisory() *ClientInfo {
+	if ci == nil {
+		return nil
+	}
+	cci := *ci
+	cci.Jwt = _EMPTY_
+	cci.Alternates = nil
+	return &cci
 }
 
 // ServerStats hold various statistics that we will periodically send out.
@@ -1184,6 +1215,14 @@ func (s *Server) initEventTracking() {
 			optz := &ExpvarzEventOptions{}
 			s.zReq(c, reply, hdr, msg, &optz.EventFilterOptions, optz, func() (any, error) { return s.expvarz(optz), nil })
 		},
+		"IPQUEUESZ": func(sub *subscription, c *client, _ *Account, subject, reply string, hdr, msg []byte) {
+			optz := &IpqueueszEventOptions{}
+			s.zReq(c, reply, hdr, msg, &optz.EventFilterOptions, optz, func() (any, error) { return s.Ipqueuesz(&optz.IpqueueszOptions), nil })
+		},
+		"RAFTZ": func(sub *subscription, c *client, _ *Account, subject, reply string, hdr, msg []byte) {
+			optz := &RaftzEventOptions{}
+			s.zReq(c, reply, hdr, msg, &optz.EventFilterOptions, optz, func() (any, error) { return s.Raftz(&optz.RaftzOptions), nil })
+		},
 	}
 	profilez := func(_ *subscription, c *client, _ *Account, _, rply string, rmsg []byte) {
 		hdr, msg := c.msgParts(rmsg)
@@ -1890,6 +1929,18 @@ type ExpvarzEventOptions struct {
 	EventFilterOptions
 }
 
+// In the context of system events, IpqueueszEventOptions are options passed to Ipqueuesz
+type IpqueueszEventOptions struct {
+	EventFilterOptions
+	IpqueueszOptions
+}
+
+// In the context of system events, RaftzEventOptions are options passed to Raftz
+type RaftzEventOptions struct {
+	EventFilterOptions
+	RaftzOptions
+}
+
 // returns true if the request does NOT apply to this server and can be ignored.
 // DO NOT hold the server lock when
 func (s *Server) filterRequest(fOpts *EventFilterOptions) bool {
@@ -1938,13 +1989,92 @@ type ServerAPIResponse struct {
 	compress compressionType
 }
 
-// Specialized response types for unmarshalling.
+// Specialized response types for unmarshalling. These structures are not
+// used in the server code and only there for users of the Z endpoints to
+// unmarshal the data without having to create these structs in their code
 
 // ServerAPIConnzResponse is the response type connz
 type ServerAPIConnzResponse struct {
 	Server *ServerInfo `json:"server"`
 	Data   *Connz      `json:"data,omitempty"`
 	Error  *ApiError   `json:"error,omitempty"`
+}
+
+// ServerAPIRoutezResponse is the response type for routez
+type ServerAPIRoutezResponse struct {
+	Server *ServerInfo `json:"server"`
+	Data   *Routez     `json:"data,omitempty"`
+	Error  *ApiError   `json:"error,omitempty"`
+}
+
+// ServerAPIGatewayzResponse is the response type for gatewayz
+type ServerAPIGatewayzResponse struct {
+	Server *ServerInfo `json:"server"`
+	Data   *Gatewayz   `json:"data,omitempty"`
+	Error  *ApiError   `json:"error,omitempty"`
+}
+
+// ServerAPIJszResponse is the response type for jsz
+type ServerAPIJszResponse struct {
+	Server *ServerInfo `json:"server"`
+	Data   *JSInfo     `json:"data,omitempty"`
+	Error  *ApiError   `json:"error,omitempty"`
+}
+
+// ServerAPIHealthzResponse is the response type for healthz
+type ServerAPIHealthzResponse struct {
+	Server *ServerInfo   `json:"server"`
+	Data   *HealthStatus `json:"data,omitempty"`
+	Error  *ApiError     `json:"error,omitempty"`
+}
+
+// ServerAPIVarzResponse is the response type for varz
+type ServerAPIVarzResponse struct {
+	Server *ServerInfo `json:"server"`
+	Data   *Varz       `json:"data,omitempty"`
+	Error  *ApiError   `json:"error,omitempty"`
+}
+
+// ServerAPISubszResponse is the response type for subsz
+type ServerAPISubszResponse struct {
+	Server *ServerInfo `json:"server"`
+	Data   *Subsz      `json:"data,omitempty"`
+	Error  *ApiError   `json:"error,omitempty"`
+}
+
+// ServerAPILeafzResponse is the response type for leafz
+type ServerAPILeafzResponse struct {
+	Server *ServerInfo `json:"server"`
+	Data   *Leafz      `json:"data,omitempty"`
+	Error  *ApiError   `json:"error,omitempty"`
+}
+
+// ServerAPIAccountzResponse is the response type for accountz
+type ServerAPIAccountzResponse struct {
+	Server *ServerInfo `json:"server"`
+	Data   *Accountz   `json:"data,omitempty"`
+	Error  *ApiError   `json:"error,omitempty"`
+}
+
+// ServerAPIExpvarzResponse is the response type for expvarz
+type ServerAPIExpvarzResponse struct {
+	Server *ServerInfo    `json:"server"`
+	Data   *ExpvarzStatus `json:"data,omitempty"`
+	Error  *ApiError      `json:"error,omitempty"`
+}
+
+// ServerAPIpqueueszResponse is the response type for ipqueuesz
+type ServerAPIpqueueszResponse struct {
+	Server *ServerInfo      `json:"server"`
+	Data   *IpqueueszStatus `json:"data,omitempty"`
+	Error  *ApiError        `json:"error,omitempty"`
+}
+
+// ServerAPIRaftzResponse is the response type for raftz
+type ServerAPIRaftzResponse struct {
+	Server *ServerInfo  `json:"server"`
+	Data   *RaftzStatus `json:"data,omitempty"`
+	Error  *ApiError    `json:"error,omitempty"`
 }
 
 // statszReq is a request for us to respond with current statsz.
