@@ -5,7 +5,6 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
-	"io"
 	"net"
 	"net/http"
 	"os"
@@ -19,8 +18,6 @@ import (
 	"ociswrapper/common"
 	"ociswrapper/log"
 	"ociswrapper/ocis/config"
-
-	"github.com/creack/pty"
 )
 
 var cmd *exec.Cmd
@@ -162,7 +159,6 @@ func waitUntilCompleteShutdown() (bool, string) {
 }
 
 func RunCommand(command string, inputs []string) (int, string) {
-	logs := new(strings.Builder)
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
@@ -170,33 +166,15 @@ func RunCommand(command string, inputs []string) (int, string) {
 	cmdArgs := strings.Split(command, " ")
 	c := exec.CommandContext(ctx, config.Get("bin"), cmdArgs...)
 
-	// Start the command with a pty (pseudo terminal)
-	// This is required to interact with the command
-	ptyF, err := pty.Start(c)
+	var statusCode int
+	output, err := c.CombinedOutput()
 	if err != nil {
-		log.Panic(err)
-	}
-	defer ptyF.Close()
-
-	for _, input := range inputs {
-		fmt.Fprintf(ptyF, "%s\n", input)
-	}
-
-	var cmdOutput string
-	if err := c.Wait(); err != nil {
-		if ctx.Err() == context.DeadlineExceeded {
-			cmdOutput = "Command timed out:\n"
+		if exitErr, ok := err.(*exec.ExitError); ok {
+			statusCode = exitErr.ExitCode()
 		}
 	}
 
-	// Copy the logs from the pty
-	io.Copy(logs, ptyF)
-	cmdOutput += logs.String()
-
-	// TODO: find if there is a better way to remove stdins from the output
-	cmdOutput = strings.TrimLeft(cmdOutput, strings.Join(inputs, "\r\n"))
-
-	return c.ProcessState.ExitCode(), cmdOutput
+	return statusCode, string(output)
 }
 
 func StartService(service string, envMap []string) {
