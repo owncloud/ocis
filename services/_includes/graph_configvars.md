@@ -111,3 +111,4 @@
 | OCIS_KEYCLOAK_INSECURE_SKIP_VERIFY<br/>GRAPH_KEYCLOAK_INSECURE_SKIP_VERIFY | bool | false | Disable TLS certificate validation for Keycloak connections. Do not set this in production environments.|
 | OCIS_SERVICE_ACCOUNT_ID<br/>GRAPH_SERVICE_ACCOUNT_ID | string |  | The ID of the service account the service should use. See the 'auth-service' service description for more details.|
 | OCIS_SERVICE_ACCOUNT_SECRET<br/>GRAPH_SERVICE_ACCOUNT_SECRET | string |  | The service account secret.|
+| OCIS_MAX_TAG_LENGTH | int | 100 | Define the maximum tag length. Defaults to 100 if not set. Set to 0 to not limit the tag length. Changes only impact the validation of new tags.|

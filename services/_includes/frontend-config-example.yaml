@@ -147,4 +147,6 @@ password_policy:
   min_digits: 1
   min_special_characters: 1
   banned_passwords_list: ""
+validation:
+  max_tag_length: 100
 configurable_notifications: false
