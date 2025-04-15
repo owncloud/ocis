@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 The NATS Authors
+ * Copyright 2018-2024 The NATS Authors
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -68,10 +68,16 @@ func IsGenericClaimType(s string) bool {
 	}
 }
 
+// SignFn is used in an external sign environment. The function should be
+// able to locate the private key for the specified pub key specified and sign the
+// specified data returning the signature as generated.
+type SignFn func(pub string, data []byte) ([]byte, error)
+
 // Claims is a JWT claims
 type Claims interface {
 	Claims() *ClaimsData
 	Encode(kp nkeys.KeyPair) (string, error)
+	EncodeWithSigner(pair nkeys.KeyPair, fn SignFn) (string, error)
 	ExpectedPrefixes() []nkeys.PrefixByte
 	Payload() interface{}
 	String() string
@@ -121,7 +127,7 @@ func serialize(v interface{}) (string, error) {
 	return encodeToString(j), nil
 }
 
-func (c *ClaimsData) doEncode(header *Header, kp nkeys.KeyPair, claim Claims) (string, error) {
+func (c *ClaimsData) doEncode(header *Header, kp nkeys.KeyPair, claim Claims, fn SignFn) (string, error) {
 	if header == nil {
 		return "", errors.New("header is required")
 	}
@@ -200,9 +206,21 @@ func (c *ClaimsData) doEncode(header *Header, kp nkeys.KeyPair, claim Claims) (s
 	if header.Algorithm == AlgorithmNkeyOld {
 		return "", errors.New(AlgorithmNkeyOld + " not supported to write jwtV2")
 	} else if header.Algorithm == AlgorithmNkey {
-		sig, err := kp.Sign([]byte(toSign))
-		if err != nil {
-			return "", err
+		var sig []byte
+		if fn != nil {
+			pk, err := kp.PublicKey()
+			if err != nil {
+				return "", err
+			}
+			sig, err = fn(pk, []byte(toSign))
+			if err != nil {
+				return "", err
+			}
+		} else {
+			sig, err = kp.Sign([]byte(toSign))
+			if err != nil {
+				return "", err
+			}
 		}
 		eSig = encodeToString(sig)
 	} else {
@@ -224,8 +242,8 @@ func (c *ClaimsData) hash() (string, error) {
 
 // Encode encodes a claim into a JWT token. The claim is signed with the
 // provided nkey's private key
-func (c *ClaimsData) encode(kp nkeys.KeyPair, payload Claims) (string, error) {
-	return c.doEncode(&Header{TokenTypeJwt, AlgorithmNkey}, kp, payload)
+func (c *ClaimsData) encode(kp nkeys.KeyPair, payload Claims, fn SignFn) (string, error) {
+	return c.doEncode(&Header{TokenTypeJwt, AlgorithmNkey}, kp, payload, fn)
 }
 
 // Returns a JSON representation of the claim

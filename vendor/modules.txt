@@ -853,14 +853,15 @@ github.com/justinas/alice
 # github.com/kevinburke/ssh_config v1.2.0
 ## explicit
 github.com/kevinburke/ssh_config
-# github.com/klauspost/compress v1.17.11
-## explicit; go 1.21
+# github.com/klauspost/compress v1.18.0
+## explicit; go 1.22
 github.com/klauspost/compress
 github.com/klauspost/compress/flate
 github.com/klauspost/compress/fse
 github.com/klauspost/compress/gzip
 github.com/klauspost/compress/huff0
 github.com/klauspost/compress/internal/cpuinfo
+github.com/klauspost/compress/internal/le
 github.com/klauspost/compress/internal/race
 github.com/klauspost/compress/internal/snapref
 github.com/klauspost/compress/s2
@@ -1010,11 +1011,11 @@ github.com/mschoch/smat
 # github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822
 ## explicit
 github.com/munnerz/goautoneg
-# github.com/nats-io/jwt/v2 v2.5.8
-## explicit; go 1.18
+# github.com/nats-io/jwt/v2 v2.7.3
+## explicit; go 1.22
 github.com/nats-io/jwt/v2
-# github.com/nats-io/nats-server/v2 v2.10.22
-## explicit; go 1.21.0
+# github.com/nats-io/nats-server/v2 v2.10.27
+## explicit; go 1.23.0
 github.com/nats-io/nats-server/v2/conf
 github.com/nats-io/nats-server/v2/internal/fastrand
 github.com/nats-io/nats-server/v2/internal/ldap
@@ -1023,16 +1024,17 @@ github.com/nats-io/nats-server/v2/server
 github.com/nats-io/nats-server/v2/server/avl
 github.com/nats-io/nats-server/v2/server/certidp
 github.com/nats-io/nats-server/v2/server/certstore
+github.com/nats-io/nats-server/v2/server/gsl
 github.com/nats-io/nats-server/v2/server/pse
 github.com/nats-io/nats-server/v2/server/stree
 github.com/nats-io/nats-server/v2/server/sysmem
-# github.com/nats-io/nats.go v1.37.0
-## explicit; go 1.20
+# github.com/nats-io/nats.go v1.39.1
+## explicit; go 1.22.0
 github.com/nats-io/nats.go
 github.com/nats-io/nats.go/encoders/builtin
 github.com/nats-io/nats.go/internal/parser
 github.com/nats-io/nats.go/util
-# github.com/nats-io/nkeys v0.4.7
+# github.com/nats-io/nkeys v0.4.10
 ## explicit; go 1.20
 github.com/nats-io/nkeys
 # github.com/nats-io/nuid v1.0.1
@@ -2218,7 +2220,7 @@ golang.org/x/text/transform
 golang.org/x/text/unicode/bidi
 golang.org/x/text/unicode/norm
 golang.org/x/text/width
-# golang.org/x/time v0.7.0
+# golang.org/x/time v0.10.0
 ## explicit; go 1.18
 golang.org/x/time/rate
 # golang.org/x/tools v0.26.0
