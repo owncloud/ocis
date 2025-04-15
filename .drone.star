@@ -511,25 +511,25 @@ def main(ctx):
 
     pipelines = deployments(ctx)  #test_pipelines + build_release_pipelines
 
-    if ctx.build.event == "cron":
-        pipelines = \
-            pipelines + \
-            example_deploys(ctx)
-    else:
-        pipelines = \
-            pipelines + \
-            pipelinesDependsOn(
-                example_deploys(ctx),
-                pipelines,
-            )
+    # if ctx.build.event == "cron":
+    #     pipelines = \
+    #         pipelines + \
+    #         example_deploys(ctx)
+    # else:
+    #     pipelines = \
+    #         pipelines + \
+    #         pipelinesDependsOn(
+    #             example_deploys(ctx),
+    #             pipelines,
+    #         )
 
     # always append notification step
-    pipelines.append(
-        pipelineDependsOn(
-            notify(ctx),
-            pipelines,
-        ),
-    )
+    # pipelines.append(
+    #     pipelineDependsOn(
+    #         notify(ctx),
+    #         pipelines,
+    #     ),
+    # )
 
     pipelineSanityChecks(ctx, pipelines)
     return pipelines
@@ -3658,19 +3658,22 @@ def deployments(ctx):
         "kind": "pipeline",
         "type": "docker",
         "name": "k3d",
-        "privileged": True,
-        "steps": wait(ctx) + install(ctx) + showPodsAfterInstall(ctx),
+        "steps": wait(ctx) + install(ctx) + showPodsAfterInstall(ctx) + aftr(ctx),
         "services": [
             {
                 "name": "k3d",
                 "image": "ghcr.io/k3d-io/k3d:5-dind",
                 "user": "root",
+                "privileged": True,
                 "commands": [
                     "git clone https://github.com/owncloud/ocis-charts.git",
-                    "cd ocis-charts",
+                    "cp -r /drone/src/tests/config/drone/authbasic /drone/src/ocis-charts/charts/ocis/templates",
+                    "rm /drone/src/ocis-charts/charts/ocis/templates/proxy/deployment.yaml",
+                    "cp -r /drone/src/tests/config/drone/proxy.yaml /drone/src/ocis-charts/charts/ocis/templates/proxy/deployment.yaml",
+                    "cp -r /drone/src/tests/config/drone/idm.yaml /drone/src/ocis-charts/charts/ocis/templates/idm/deployment.yaml",
                     "nohup dockerd-entrypoint.sh &",
                     "until docker ps 2>&1 > /dev/null; do sleep 1s; done",
-                    "k3d cluster create --config ci/k3d-drone.yaml --api-port k3d:6445",
+                    "k3d cluster create --config ./ocis-charts/ci/k3d-drone.yaml --api-port k3d:6445",
                     "until kubectl get deployment coredns -n kube-system -o go-template='{{.status.availableReplicas}}' | grep -v -e '<no value>'; do sleep 1s; done",
                     "k3d kubeconfig get drone > kubeconfig-$${DRONE_BUILD_NUMBER}.yaml",
                     "chmod 0600 kubeconfig-$${DRONE_BUILD_NUMBER}.yaml",
@@ -3688,12 +3691,12 @@ def deployments(ctx):
         ],
         "trigger": {
             "ref": [
+                "refs/heads/master",
+                "refs/tags/**",
                 "refs/pull/**",
             ],
         },
     }
-
-    result["trigger"]["ref"].append("refs/heads/master")
 
     return [result]
 
@@ -3708,6 +3711,12 @@ def wait(config):
             "kubectl config view",
             "kubectl get pods -A",
         ],
+        "volumes": [
+            {
+                "name": "gopath",
+                "path": "/go",
+            },
+        ],
     }]
 
 def showPodsAfterInstall(config):
@@ -3719,19 +3728,47 @@ def showPodsAfterInstall(config):
             "export KUBECONFIG=kubeconfig-$${DRONE_BUILD_NUMBER}.yaml",
             "until test -f $${KUBECONFIG}; do sleep 1s; done",
             "kubectl get pods -n ocis",
-            "if [ \"$(kubectl get pods -n ocis --field-selector status.phase=Running | wc -l)\" -le \"32\" ]; then exit 1; fi",  # there are 32 pods + 1 header line
+            "if [ \"$(kubectl get pods -n ocis --field-selector status.phase=Running | wc -l)\" -le \"33\" ]; then exit 1; fi",  # there are 32 pods + 1 header line
             "kubectl get ingress -n ocis",
             "if [ \"$(kubectl get ingress -n ocis | wc -l)\" -le \"1\" ]; then exit 1; fi",
+            "kubectl get services",
+        ],
+        "volumes": [
+            {
+                "name": "gopath",
+                "path": "/go",
+            },
         ],
     }]
 
 def install(ctx):
     return [{
-        "name": "helm-install",
+        "name": "ocis",
         "image": "owncloudci/golang:latest",
         "commands": [
-            "export KUBECONFIG=kubeconfig-$${DRONE_BUILD_NUMBER}.yaml",
+            "cd /drone/src/ocis-charts",
+            "cp /drone/src/tests/config/drone/values.yaml ./charts/ocis/ci/deployment-values.yaml",
+            "sed -i '/authservice/ i\\  {{- $_ := set .scope \"appNameAuthBasic\" \"authbasic\" -}}' /drone/src/ocis-charts/charts/ocis/templates/_common/_tplvalues.tpl",
+            "export KUBECONFIG=/drone/src/kubeconfig-$${DRONE_BUILD_NUMBER}.yaml",
             "make helm-install-atomic",
+            "curl -kv https://k3d:6445/graph/v1.0/me -uadmin:admin",
+        ],
+        "volumes": [
+            {
+                "name": "gopath",
+                "path": "/go",
+            },
+        ],
+    }]
+
+def aftr(ctx):
+    return [{
+        "name": "aftr",
+        "image": "owncloudci/golang:latest",
+        "commands": [
+            "export KUBECONFIG=/drone/src/kubeconfig-$${DRONE_BUILD_NUMBER}.yaml",
+            "kubectl get services",
+            "curl -kv https://ocis/graph/v1.0/me -uadmin:admin",
         ],
         "volumes": [
             {
