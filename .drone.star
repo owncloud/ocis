@@ -3519,13 +3519,13 @@ def deployments(ctx):
         "kind": "pipeline",
         "type": "docker",
         "name": "k3d",
-        "privileged": True,
         "steps": wait(ctx) + install(ctx) + showPodsAfterInstall(ctx),
         "services": [
             {
                 "name": "k3d",
                 "image": "ghcr.io/k3d-io/k3d:5-dind",
                 "user": "root",
+                "privileged": True,
                 "commands": [
                     "git clone https://github.com/owncloud/ocis-charts.git",
                     "cd ocis-charts",
