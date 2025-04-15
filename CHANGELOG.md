@@ -78,6 +78,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Update Mockery to 2.52.3: [#11070](https://github.com/owncloud/ocis/pull/11070)
 * Enhancement - Improve postprocessing logs: [#11108](https://github.com/owncloud/ocis/pull/11108)
 * Enhancement - Improve graph space management logs: [#11115](https://github.com/owncloud/ocis/pull/11115)
+* Enhancement - CLI, storage-users uploads delete-stale-nodes: [#11216](https://github.com/owncloud/ocis/pull/11216)
 
 ## Details
 
@@ -183,6 +184,14 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/10989
    https://github.com/owncloud/ocis/pull/11115
+
+* Enhancement - CLI, storage-users uploads delete-stale-nodes: [#11216](https://github.com/owncloud/ocis/pull/11216)
+
+   An oCIS command that deletes stale nodes: in processing state wihout connected
+   upload info.
+
+   https://github.com/owncloud/enterprise/issues/7178
+   https://github.com/owncloud/ocis/pull/11216
 
 # Changelog for [7.1.2] (2025-03-28)
 
