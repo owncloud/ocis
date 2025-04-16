@@ -35,10 +35,30 @@ func RoleFilterIDs(ids ...string) RoleFilter {
 
 // filterRoles filters the provided roles by the provided filter
 func filterRoles(roles []*libregraph.UnifiedRoleDefinition, f RoleFilter) []*libregraph.UnifiedRoleDefinition {
-	return slices.DeleteFunc(
-		slices.Clone(roles),
+	return slices.DeleteFunc(roles,
 		func(r *libregraph.UnifiedRoleDefinition) bool {
 			return !f(r)
 		},
 	)
+}
+
+// buildInRoles contains the built-in roles.
+func buildInRoles() []*libregraph.UnifiedRoleDefinition {
+	return []*libregraph.UnifiedRoleDefinition{
+		roleViewer(),
+		roleViewerListGrants(),
+		roleSpaceViewer(),
+		roleEditor(),
+		roleEditorListGrants(),
+		roleEditorListGrantsWithVersions(),
+		roleSpaceEditor(),
+		roleSpaceEditorWithoutVersions(),
+		roleFileEditor(),
+		roleFileEditorListGrants(),
+		roleFileEditorListGrantsWithVersions(),
+		roleEditorLite(),
+		roleManager(),
+		roleSecureViewer(),
+		roleDenied(),
+	}
 }
