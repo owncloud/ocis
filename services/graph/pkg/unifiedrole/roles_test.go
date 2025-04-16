@@ -19,11 +19,11 @@ func TestGetDefinition(t *testing.T) {
 	}{
 		"pass single": {
 			ids:                   []string{unifiedrole.UnifiedRoleViewerID},
-			unifiedRoleDefinition: unifiedrole.RoleViewer,
+			unifiedRoleDefinition: unifiedrole.RoleViewer(),
 		},
 		"pass many": {
 			ids:                   []string{unifiedrole.UnifiedRoleViewerID, unifiedrole.UnifiedRoleEditorID},
-			unifiedRoleDefinition: unifiedrole.RoleViewer,
+			unifiedRoleDefinition: unifiedrole.RoleViewer(),
 		},
 		"fail unknown": {
 			ids:         []string{"unknown"},
@@ -55,26 +55,26 @@ func TestWeightDefinitions(t *testing.T) {
 	}{
 		"ascending": {
 			[]*libregraph.UnifiedRoleDefinition{
-				unifiedrole.RoleViewer,
-				unifiedrole.RoleFileEditor,
+				unifiedrole.RoleViewer(),
+				unifiedrole.RoleFileEditor(),
 			},
 			unifiedrole.UnifiedRoleConditionFile,
 			false,
 			[]*libregraph.UnifiedRoleDefinition{
-				unifiedrole.RoleViewer,
-				unifiedrole.RoleFileEditor,
+				unifiedrole.RoleViewer(),
+				unifiedrole.RoleFileEditor(),
 			},
 		},
 		"descending": {
 			[]*libregraph.UnifiedRoleDefinition{
-				unifiedrole.RoleViewer,
-				unifiedrole.RoleFileEditor,
+				unifiedrole.RoleViewer(),
+				unifiedrole.RoleFileEditor(),
 			},
 			unifiedrole.UnifiedRoleConditionFile,
 			true,
 			[]*libregraph.UnifiedRoleDefinition{
-				unifiedrole.RoleFileEditor,
-				unifiedrole.RoleViewer,
+				unifiedrole.RoleFileEditor(),
+				unifiedrole.RoleViewer(),
 			},
 		},
 	}
@@ -97,100 +97,100 @@ func TestGetRolesByPermissions(t *testing.T) {
 		unifiedRoleDefinition []*libregraph.UnifiedRoleDefinition
 	}{
 		"RoleViewer | folder": {
-			givenActions: getRoleActions(unifiedrole.RoleViewer),
+			givenActions: getRoleActions(unifiedrole.RoleViewer()),
 			constraints:  unifiedrole.UnifiedRoleConditionFolder,
 			unifiedRoleDefinition: []*libregraph.UnifiedRoleDefinition{
-				unifiedrole.RoleSecureViewer,
-				unifiedrole.RoleViewer,
+				unifiedrole.RoleSecureViewer(),
+				unifiedrole.RoleViewer(),
 			},
 		},
 		"RoleViewer | file": {
-			givenActions: getRoleActions(unifiedrole.RoleViewer),
+			givenActions: getRoleActions(unifiedrole.RoleViewer()),
 			constraints:  unifiedrole.UnifiedRoleConditionFile,
 			unifiedRoleDefinition: []*libregraph.UnifiedRoleDefinition{
-				unifiedrole.RoleSecureViewer,
-				unifiedrole.RoleViewer,
+				unifiedrole.RoleSecureViewer(),
+				unifiedrole.RoleViewer(),
 			},
 		},
 		"RoleViewer | file | federated": {
-			givenActions:       getRoleActions(unifiedrole.RoleViewer),
+			givenActions:       getRoleActions(unifiedrole.RoleViewer()),
 			constraints:        unifiedrole.UnifiedRoleConditionFile,
 			listFederatedRoles: true,
 			unifiedRoleDefinition: []*libregraph.UnifiedRoleDefinition{
-				unifiedrole.RoleViewer,
+				unifiedrole.RoleViewer(),
 			},
 		},
 		"RoleFileEditor | file": {
-			givenActions: getRoleActions(unifiedrole.RoleFileEditor),
+			givenActions: getRoleActions(unifiedrole.RoleFileEditor()),
 			constraints:  unifiedrole.UnifiedRoleConditionFile,
 			unifiedRoleDefinition: []*libregraph.UnifiedRoleDefinition{
-				unifiedrole.RoleSecureViewer,
-				unifiedrole.RoleViewer,
-				unifiedrole.RoleFileEditor,
+				unifiedrole.RoleSecureViewer(),
+				unifiedrole.RoleViewer(),
+				unifiedrole.RoleFileEditor(),
 			},
 		},
 		"RoleEditor | folder": {
-			givenActions: getRoleActions(unifiedrole.RoleEditor),
+			givenActions: getRoleActions(unifiedrole.RoleEditor()),
 			constraints:  unifiedrole.UnifiedRoleConditionFolder,
 			unifiedRoleDefinition: []*libregraph.UnifiedRoleDefinition{
-				unifiedrole.RoleSecureViewer,
-				unifiedrole.RoleViewer,
-				unifiedrole.RoleEditorLite,
-				unifiedrole.RoleEditor,
+				unifiedrole.RoleSecureViewer(),
+				unifiedrole.RoleViewer(),
+				unifiedrole.RoleEditorLite(),
+				unifiedrole.RoleEditor(),
 			},
 		},
 		"RoleEditor | folder | federated": {
-			givenActions:       getRoleActions(unifiedrole.RoleEditor),
+			givenActions:       getRoleActions(unifiedrole.RoleEditor()),
 			constraints:        unifiedrole.UnifiedRoleConditionFolder,
 			listFederatedRoles: true,
 			unifiedRoleDefinition: []*libregraph.UnifiedRoleDefinition{
-				unifiedrole.RoleViewer,
-				unifiedrole.RoleEditor,
+				unifiedrole.RoleViewer(),
+				unifiedrole.RoleEditor(),
 			},
 		},
 		"RoleEditor | file | federated": {
-			givenActions:       getRoleActions(unifiedrole.RoleEditor),
+			givenActions:       getRoleActions(unifiedrole.RoleEditor()),
 			constraints:        unifiedrole.UnifiedRoleConditionFile,
 			listFederatedRoles: true,
 			unifiedRoleDefinition: []*libregraph.UnifiedRoleDefinition{
-				unifiedrole.RoleViewer,
-				unifiedrole.RoleFileEditor,
+				unifiedrole.RoleViewer(),
+				unifiedrole.RoleFileEditor(),
 			},
 		},
 		"BuildInRoles | file": {
-			givenActions: getRoleActions(unifiedrole.BuildInRoles...),
+			givenActions: getRoleActions(unifiedrole.BuildInRoles()...),
 			constraints:  unifiedrole.UnifiedRoleConditionFile,
 			unifiedRoleDefinition: []*libregraph.UnifiedRoleDefinition{
-				unifiedrole.RoleSecureViewer,
-				unifiedrole.RoleViewer,
-				unifiedrole.RoleViewerListGrants,
-				unifiedrole.RoleFileEditor,
-				unifiedrole.RoleFileEditorListGrants,
-				unifiedrole.RoleFileEditorListGrantsWithVersions,
+				unifiedrole.RoleSecureViewer(),
+				unifiedrole.RoleViewer(),
+				unifiedrole.RoleViewerListGrants(),
+				unifiedrole.RoleFileEditor(),
+				unifiedrole.RoleFileEditorListGrants(),
+				unifiedrole.RoleFileEditorListGrantsWithVersions(),
 			},
 		},
 		"BuildInRoles | folder": {
-			givenActions: getRoleActions(unifiedrole.BuildInRoles...),
+			givenActions: getRoleActions(unifiedrole.BuildInRoles()...),
 			constraints:  unifiedrole.UnifiedRoleConditionFolder,
 			unifiedRoleDefinition: []*libregraph.UnifiedRoleDefinition{
-				unifiedrole.RoleDenied,
-				unifiedrole.RoleSecureViewer,
-				unifiedrole.RoleViewer,
-				unifiedrole.RoleViewerListGrants,
-				unifiedrole.RoleEditorLite,
-				unifiedrole.RoleEditor,
-				unifiedrole.RoleEditorListGrants,
-				unifiedrole.RoleEditorListGrantsWithVersions,
+				unifiedrole.RoleDenied(),
+				unifiedrole.RoleSecureViewer(),
+				unifiedrole.RoleViewer(),
+				unifiedrole.RoleViewerListGrants(),
+				unifiedrole.RoleEditorLite(),
+				unifiedrole.RoleEditor(),
+				unifiedrole.RoleEditorListGrants(),
+				unifiedrole.RoleEditorListGrantsWithVersions(),
 			},
 		},
 		"BuildInRoles | drive": {
-			givenActions: getRoleActions(unifiedrole.BuildInRoles...),
+			givenActions: getRoleActions(unifiedrole.BuildInRoles()...),
 			constraints:  unifiedrole.UnifiedRoleConditionDrive,
 			unifiedRoleDefinition: []*libregraph.UnifiedRoleDefinition{
-				unifiedrole.RoleSpaceViewer,
-				unifiedrole.RoleSpaceEditorWithoutVersions,
-				unifiedrole.RoleSpaceEditor,
-				unifiedrole.RoleManager,
+				unifiedrole.RoleSpaceViewer(),
+				unifiedrole.RoleSpaceEditorWithoutVersions(),
+				unifiedrole.RoleSpaceEditor(),
+				unifiedrole.RoleManager(),
 			},
 		},
 		"custom | file": {
@@ -199,11 +199,11 @@ func TestGetRolesByPermissions(t *testing.T) {
 			unifiedRoleDefinition: []*libregraph.UnifiedRoleDefinition{},
 		},
 		"RoleEditorLite and custom | folder": {
-			givenActions: append(getRoleActions(unifiedrole.RoleEditorLite), unifiedrole.DriveItemQuotaRead),
+			givenActions: append(getRoleActions(unifiedrole.RoleEditorLite()), unifiedrole.DriveItemQuotaRead),
 			constraints:  unifiedrole.UnifiedRoleConditionFolder,
 			unifiedRoleDefinition: []*libregraph.UnifiedRoleDefinition{
-				unifiedrole.RoleSecureViewer,
-				unifiedrole.RoleEditorLite,
+				unifiedrole.RoleSecureViewer(),
+				unifiedrole.RoleEditorLite(),
 			},
 		},
 	}
@@ -211,7 +211,7 @@ func TestGetRolesByPermissions(t *testing.T) {
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			g := NewWithT(t)
-			generatedDefinitions := unifiedrole.GetRolesByPermissions(unifiedrole.BuildInRoles, tc.givenActions, tc.constraints, tc.listFederatedRoles, false)
+			generatedDefinitions := unifiedrole.GetRolesByPermissions(unifiedrole.BuildInRoles(), tc.givenActions, tc.constraints, tc.listFederatedRoles, false)
 
 			g.Expect(len(generatedDefinitions)).To(Equal(len(tc.unifiedRoleDefinition)))
 

@@ -200,25 +200,6 @@ var (
 		UnifiedRoleSecureViewerID:               conversions.RoleSecureViewer,
 	}
 
-	// buildInRoles contains the built-in roles.
-	buildInRoles = []*libregraph.UnifiedRoleDefinition{
-		roleViewer,
-		roleViewerListGrants,
-		roleSpaceViewer,
-		roleEditor,
-		roleEditorListGrants,
-		roleEditorListGrantsWithVersions,
-		roleSpaceEditor,
-		roleSpaceEditorWithoutVersions,
-		roleFileEditor,
-		roleFileEditorListGrants,
-		roleFileEditorListGrantsWithVersions,
-		roleEditorLite,
-		roleManager,
-		roleSecureViewer,
-		roleDenied,
-	}
-
 	// roleViewer creates a viewer role.
 	roleViewer = func() *libregraph.UnifiedRoleDefinition {
 		r := conversions.NewViewerRole()
@@ -246,7 +227,7 @@ var (
 			},
 			LibreGraphWeight: proto.Int32(0),
 		}
-	}()
+	}
 
 	// roleViewerListGrants creates a viewer role.
 	roleViewerListGrants = func() *libregraph.UnifiedRoleDefinition {
@@ -275,7 +256,7 @@ var (
 			},
 			LibreGraphWeight: proto.Int32(0),
 		}
-	}()
+	}
 
 	// roleSpaceViewer creates a spaceviewer role
 	roleSpaceViewer = func() *libregraph.UnifiedRoleDefinition {
@@ -292,7 +273,7 @@ var (
 			},
 			LibreGraphWeight: proto.Int32(0),
 		}
-	}()
+	}
 
 	// roleEditor creates an editor role.
 	roleEditor = func() *libregraph.UnifiedRoleDefinition {
@@ -313,7 +294,7 @@ var (
 			},
 			LibreGraphWeight: proto.Int32(0),
 		}
-	}()
+	}
 
 	// roleEditorListGrants creates an editor role.
 	roleEditorListGrants = func() *libregraph.UnifiedRoleDefinition {
@@ -334,7 +315,7 @@ var (
 			},
 			LibreGraphWeight: proto.Int32(0),
 		}
-	}()
+	}
 
 	// roleEditorListGrantsWithVersions creates an editor-list-grants-with-versions role.
 	roleEditorListGrantsWithVersions = func() *libregraph.UnifiedRoleDefinition {
@@ -357,7 +338,7 @@ var (
 			},
 			LibreGraphWeight: proto.Int32(0),
 		}
-	}()
+	}
 
 	// roleSpaceEditor creates an editor role
 	roleSpaceEditor = func() *libregraph.UnifiedRoleDefinition {
@@ -374,7 +355,7 @@ var (
 			},
 			LibreGraphWeight: proto.Int32(0),
 		}
-	}()
+	}
 
 	// roleSpaceEditorWithoutVersions creates an editor without versions role
 	roleSpaceEditorWithoutVersions = func() *libregraph.UnifiedRoleDefinition {
@@ -391,7 +372,7 @@ var (
 			},
 			LibreGraphWeight: proto.Int32(0),
 		}
-	}()
+	}
 
 	// roleFileEditor creates a file-editor role
 	roleFileEditor = func() *libregraph.UnifiedRoleDefinition {
@@ -412,7 +393,7 @@ var (
 			},
 			LibreGraphWeight: proto.Int32(0),
 		}
-	}()
+	}
 
 	// roleFileEditorListGrants creates a file-editor role
 	roleFileEditorListGrants = func() *libregraph.UnifiedRoleDefinition {
@@ -433,7 +414,7 @@ var (
 			},
 			LibreGraphWeight: proto.Int32(0),
 		}
-	}()
+	}
 
 	// roleFileEditorListGrantsWithVersions creates a file-editor role
 	roleFileEditorListGrantsWithVersions = func() *libregraph.UnifiedRoleDefinition {
@@ -456,7 +437,7 @@ var (
 			},
 			LibreGraphWeight: proto.Int32(0),
 		}
-	}()
+	}
 
 	// roleEditorLite creates an editor-lite role
 	roleEditorLite = func() *libregraph.UnifiedRoleDefinition {
@@ -473,7 +454,7 @@ var (
 			},
 			LibreGraphWeight: proto.Int32(0),
 		}
-	}()
+	}
 
 	// roleManager creates a manager role
 	roleManager = func() *libregraph.UnifiedRoleDefinition {
@@ -490,7 +471,7 @@ var (
 			},
 			LibreGraphWeight: proto.Int32(0),
 		}
-	}()
+	}
 
 	// roleSecureViewer creates a secure viewer role
 	roleSecureViewer = func() *libregraph.UnifiedRoleDefinition {
@@ -511,7 +492,8 @@ var (
 			},
 			LibreGraphWeight: proto.Int32(0),
 		}
-	}()
+	}
+
 	// roleDenied creates a secure viewer role
 	roleDenied = func() *libregraph.UnifiedRoleDefinition {
 		r := conversions.NewDeniedRole()
@@ -527,17 +509,17 @@ var (
 			},
 			LibreGraphWeight: proto.Int32(0),
 		}
-	}()
+	}
 )
 
 // GetRoles returns a role filter that matches the provided resources
 func GetRoles(f RoleFilter) []*libregraph.UnifiedRoleDefinition {
-	return filterRoles(buildInRoles, f)
+	return filterRoles(buildInRoles(), f)
 }
 
 // GetRole returns a role filter that matches the provided resources
 func GetRole(f RoleFilter) (*libregraph.UnifiedRoleDefinition, error) {
-	roles := filterRoles(buildInRoles, f)
+	roles := filterRoles(buildInRoles(), f)
 	if len(roles) == 0 {
 		return nil, ErrUnknownRole
 	}
