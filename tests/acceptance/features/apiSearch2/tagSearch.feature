@@ -61,10 +61,6 @@ Feature: tag search
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnStable3.0
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @issue-10329
@@ -109,10 +105,6 @@ Feature: tag search
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnStable3.0
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @issue-10329
@@ -143,10 +135,6 @@ Feature: tag search
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnStable3.0
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @issue-10329
@@ -181,10 +169,6 @@ Feature: tag search
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnStable3.0
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
