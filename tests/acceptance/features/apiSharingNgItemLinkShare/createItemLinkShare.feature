@@ -55,7 +55,7 @@ Feature: Link share for resources
           "createdDateTime": {"format": "date-time"},
           "hasPassword": {"const": true},
           "id": {"pattern": "^[a-zA-Z]{15}$"},
-          "expirationDateTime": {"const": "2200-07-15T23:59:59Z"},
+          "expirationDateTime": {"const": "2200-07-15T14:00:00Z"},
           "link": {
             "type": "object",
             "required": ["@libre.graph.displayName","@libre.graph.quickLink","preventsDownload","type","webUrl"],
@@ -157,7 +157,7 @@ Feature: Link share for resources
           "createdDateTime": {"format": "date-time"},
           "hasPassword": {"const": true},
           "id": {"pattern": "^[a-zA-Z]{15}$"},
-          "expirationDateTime": {"const": "2200-07-15T23:59:59Z"},
+          "expirationDateTime": {"const": "2200-07-15T14:00:00Z"},
           "link": {
             "type": "object",
             "required": ["@libre.graph.displayName","@libre.graph.quickLink","preventsDownload","type","webUrl"],
@@ -258,7 +258,7 @@ Feature: Link share for resources
         "properties": {
           "hasPassword": {"const": true},
           "id": {"pattern": "^[a-zA-Z]{15}$"},
-          "expirationDateTime": {"const": "2200-07-15T23:59:59Z"},
+          "expirationDateTime": {"const": "2200-07-15T14:00:00Z"},
           "link": {
             "type": "object",
             "required": ["@libre.graph.displayName","@libre.graph.quickLink","preventsDownload","type","webUrl"],
@@ -360,7 +360,7 @@ Feature: Link share for resources
         "properties": {
           "hasPassword": {"const": true},
           "id": {"pattern": "^[a-zA-Z]{15}$"},
-          "expirationDateTime": {"const": "2200-07-15T23:59:59Z"},
+          "expirationDateTime": {"const": "2200-07-15T14:00:00Z"},
           "link": {
             "type": "object",
             "required": ["@libre.graph.displayName","@libre.graph.quickLink","preventsDownload","type","webUrl"],
