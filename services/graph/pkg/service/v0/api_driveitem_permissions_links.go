@@ -5,12 +5,10 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
-	"time"
 
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	link "github.com/cs3org/go-cs3apis/cs3/sharing/link/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
@@ -62,7 +60,7 @@ func (s DriveItemPermissionsService) CreateLink(ctx context.Context, driveItemID
 	}
 	expirationDate, isSet := createLink.GetExpirationDateTimeOk()
 	if isSet {
-		expireTime := parseAndFillUpTime(expirationDate)
+		expireTime := utils.TimeToTS(*expirationDate)
 		if expireTime == nil {
 			s.logger.Debug().Interface("createLink", createLink).Send()
 			return libregraph.Permission{}, errorcode.New(errorcode.InvalidRequest, "invalid expiration date")
@@ -298,7 +296,7 @@ func (s DriveItemPermissionsService) updatePublicLinkPermission(ctx context.Cont
 		expirationDate := newPermission.GetExpirationDateTime()
 		update := &link.UpdatePublicShareRequest_Update{
 			Type:  link.UpdatePublicShareRequest_Update_TYPE_EXPIRATION,
-			Grant: &link.Grant{Expiration: parseAndFillUpTime(&expirationDate)},
+			Grant: &link.Grant{Expiration: utils.TimeToTS(expirationDate)},
 		}
 		perm, err = s.updatePublicLink(ctx, permissionID, update)
 		if err != nil {
@@ -408,21 +406,4 @@ func (s DriveItemPermissionsService) updatePublicLink(ctx context.Context, permi
 		return nil, err
 	}
 	return permission, nil
-}
-
-func parseAndFillUpTime(t *time.Time) *types.Timestamp {
-	if t == nil || t.IsZero() {
-		return nil
-	}
-
-	// the link needs to be valid for the whole day
-	tLink := time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, t.Location())
-	tLink = tLink.Add(23*time.Hour + 59*time.Minute + 59*time.Second)
-
-	final := tLink.UnixNano()
-
-	return &types.Timestamp{
-		Seconds: uint64(final / 1000000000),
-		Nanos:   uint32(final % 1000000000),
-	}
 }
