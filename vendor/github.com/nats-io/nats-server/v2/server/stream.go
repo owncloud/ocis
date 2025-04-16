@@ -1,4 +1,4 @@
-// Copyright 2019-2024 The NATS Authors
+// Copyright 2019-2025 The NATS Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -16,7 +16,6 @@ package server
 import (
 	"archive/tar"
 	"bytes"
-	"encoding/binary"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -33,8 +32,17 @@ import (
 	"time"
 
 	"github.com/klauspost/compress/s2"
+	"github.com/nats-io/nats-server/v2/server/gsl"
 	"github.com/nats-io/nuid"
 )
+
+// StreamConfigRequest is used to create or update a stream.
+type StreamConfigRequest struct {
+	StreamConfig
+	// This is not part of the StreamConfig, because its scoped to request,
+	// and not to the stream itself.
+	Pedantic bool `json:"pedantic,omitempty"`
+}
 
 // StreamConfig will determine the name, subjects and retention policy
 // for a given stream. If subjects is empty the name will be used.
@@ -92,8 +100,52 @@ type StreamConfig struct {
 	// TODO(nat): Can/should we name these better?
 	ConsumerLimits StreamConsumerLimits `json:"consumer_limits"`
 
+	// AllowMsgTTL allows header initiated per-message TTLs. If disabled,
+	// then the `NATS-TTL` header will be ignored.
+	AllowMsgTTL bool `json:"allow_msg_ttl"`
+
+	// SubjectDeleteMarkerTTL sets the TTL of delete marker messages left behind by
+	// subject delete markers.
+	SubjectDeleteMarkerTTL time.Duration `json:"subject_delete_marker_ttl,omitempty"`
+
 	// Metadata is additional metadata for the Stream.
 	Metadata map[string]string `json:"metadata,omitempty"`
+}
+
+// clone performs a deep copy of the StreamConfig struct, returning a new clone with
+// all values copied.
+func (cfg *StreamConfig) clone() *StreamConfig {
+	clone := *cfg
+	if cfg.Placement != nil {
+		placement := *cfg.Placement
+		clone.Placement = &placement
+	}
+	if cfg.Mirror != nil {
+		mirror := *cfg.Mirror
+		clone.Mirror = &mirror
+	}
+	if len(cfg.Sources) > 0 {
+		clone.Sources = make([]*StreamSource, len(cfg.Sources))
+		for i, cfgSource := range cfg.Sources {
+			source := *cfgSource
+			clone.Sources[i] = &source
+		}
+	}
+	if cfg.SubjectTransform != nil {
+		transform := *cfg.SubjectTransform
+		clone.SubjectTransform = &transform
+	}
+	if cfg.RePublish != nil {
+		rePublish := *cfg.RePublish
+		clone.RePublish = &rePublish
+	}
+	if cfg.Metadata != nil {
+		clone.Metadata = make(map[string]string, len(cfg.Metadata))
+		for k, v := range cfg.Metadata {
+			clone.Metadata[k] = v
+		}
+	}
+	return &clone
 }
 
 type StreamConsumerLimits struct {
@@ -210,6 +262,12 @@ type ExternalStream struct {
 	DeliverPrefix string `json:"deliver"`
 }
 
+// For managing stream ingest.
+const (
+	streamDefaultMaxQueueMsgs  = 10_000
+	streamDefaultMaxQueueBytes = 1024 * 1024 * 128
+)
+
 // Stream is a jetstream stream of messages. When we receive a message internally destined
 // for a Stream we will direct link from the client to this structure.
 type stream struct {
@@ -271,10 +329,14 @@ type stream struct {
 
 	// For processing consumers without main stream lock.
 	clsMu sync.RWMutex
-	cList []*consumer     // Consumer list.
-	sch   chan struct{}   // Channel to signal consumers.
-	sigq  *ipQueue[*cMsg] // Intra-process queue for the messages to signal to the consumers.
-	csl   *Sublist        // Consumer subscription list.
+	cList []*consumer                    // Consumer list.
+	sch   chan struct{}                  // Channel to signal consumers.
+	sigq  *ipQueue[*cMsg]                // Intra-process queue for the messages to signal to the consumers.
+	csl   *gsl.GenericSublist[*consumer] // Consumer subscription list.
+
+	// Leader will store seq/msgTrace in clustering mode. Used in applyStreamEntries
+	// to know if trace event should be sent after processing.
+	mt map[uint64]*msgTrace
 
 	// For non limits policy streams when they process an ack before the actual msg.
 	// Can happen in stretch clusters, multi-cloud, or during catchup for a restarted server.
@@ -282,20 +344,22 @@ type stream struct {
 
 	// TODO(dlc) - Hide everything below behind two pointers.
 	// Clustered mode.
-	sa         *streamAssignment // What the meta controller uses to assign streams to peers.
-	node       RaftNode          // Our RAFT node for the stream's group.
-	catchup    atomic.Bool       // Used to signal we are in catchup mode.
-	catchups   map[string]uint64 // The number of messages that need to be caught per peer.
-	syncSub    *subscription     // Internal subscription for sync messages (on "$JSC.SYNC").
-	infoSub    *subscription     // Internal subscription for stream info requests.
-	clMu       sync.Mutex        // The mutex for clseq and clfs.
-	clseq      uint64            // The current last seq being proposed to the NRG layer.
-	clfs       uint64            // The count (offset) of the number of failed NRG sequences used to compute clseq.
-	inflight   map[uint64]uint64 // Inflight message sizes per clseq.
-	lqsent     time.Time         // The time at which the last lost quorum advisory was sent. Used to rate limit.
-	uch        chan struct{}     // The channel to signal updates to the monitor routine.
-	compressOK bool              // True if we can do message compression in RAFT and catchup logic
-	inMonitor  bool              // True if the monitor routine has been started.
+	sa        *streamAssignment // What the meta controller uses to assign streams to peers.
+	node      RaftNode          // Our RAFT node for the stream's group.
+	catchup   atomic.Bool       // Used to signal we are in catchup mode.
+	catchups  map[string]uint64 // The number of messages that need to be caught per peer.
+	syncSub   *subscription     // Internal subscription for sync messages (on "$JSC.SYNC").
+	infoSub   *subscription     // Internal subscription for stream info requests.
+	clMu      sync.Mutex        // The mutex for clseq and clfs.
+	clseq     uint64            // The current last seq being proposed to the NRG layer.
+	clfs      uint64            // The count (offset) of the number of failed NRG sequences used to compute clseq.
+	inflight  map[uint64]uint64 // Inflight message sizes per clseq.
+	lqsent    time.Time         // The time at which the last lost quorum advisory was sent. Used to rate limit.
+	uch       chan struct{}     // The channel to signal updates to the monitor routine.
+	inMonitor bool              // True if the monitor routine has been started.
+
+	expectedPerSubjectSequence  map[uint64]string   // Inflight 'expected per subject' subjects per clseq.
+	expectedPerSubjectInProcess map[string]struct{} // Current 'expected per subject' subjects in process.
 
 	// Direct get subscription.
 	directSub *subscription
@@ -342,18 +406,21 @@ const (
 
 // Headers for published messages.
 const (
-	JSMsgId               = "Nats-Msg-Id"
-	JSExpectedStream      = "Nats-Expected-Stream"
-	JSExpectedLastSeq     = "Nats-Expected-Last-Sequence"
-	JSExpectedLastSubjSeq = "Nats-Expected-Last-Subject-Sequence"
-	JSExpectedLastMsgId   = "Nats-Expected-Last-Msg-Id"
-	JSStreamSource        = "Nats-Stream-Source"
-	JSLastConsumerSeq     = "Nats-Last-Consumer"
-	JSLastStreamSeq       = "Nats-Last-Stream"
-	JSConsumerStalled     = "Nats-Consumer-Stalled"
-	JSMsgRollup           = "Nats-Rollup"
-	JSMsgSize             = "Nats-Msg-Size"
-	JSResponseType        = "Nats-Response-Type"
+	JSMsgId                   = "Nats-Msg-Id"
+	JSExpectedStream          = "Nats-Expected-Stream"
+	JSExpectedLastSeq         = "Nats-Expected-Last-Sequence"
+	JSExpectedLastSubjSeq     = "Nats-Expected-Last-Subject-Sequence"
+	JSExpectedLastSubjSeqSubj = "Nats-Expected-Last-Subject-Sequence-Subject"
+	JSExpectedLastMsgId       = "Nats-Expected-Last-Msg-Id"
+	JSStreamSource            = "Nats-Stream-Source"
+	JSLastConsumerSeq         = "Nats-Last-Consumer"
+	JSLastStreamSeq           = "Nats-Last-Stream"
+	JSConsumerStalled         = "Nats-Consumer-Stalled"
+	JSMsgRollup               = "Nats-Rollup"
+	JSMsgSize                 = "Nats-Msg-Size"
+	JSResponseType            = "Nats-Response-Type"
+	JSMessageTTL              = "Nats-TTL"
+	JSMarkerReason            = "Nats-Marker-Reason"
 )
 
 // Headers for republished messages and direct gets.
@@ -363,12 +430,21 @@ const (
 	JSTimeStamp    = "Nats-Time-Stamp"
 	JSSubject      = "Nats-Subject"
 	JSLastSequence = "Nats-Last-Sequence"
+	JSNumPending   = "Nats-Num-Pending"
+	JSUpToSequence = "Nats-UpTo-Sequence"
 )
 
 // Rollups, can be subject only or all messages.
 const (
 	JSMsgRollupSubject = "sub"
 	JSMsgRollupAll     = "all"
+)
+
+// Applied limits in the Nats-Applied-Limit header.
+const (
+	JSMarkerReasonMaxAge = "MaxAge"
+	JSMarkerReasonPurge  = "Purge"
+	JSMarkerReasonRemove = "Remove"
 )
 
 const (
@@ -387,15 +463,19 @@ const StreamMaxReplicas = 5
 
 // AddStream adds a stream for the given account.
 func (a *Account) addStream(config *StreamConfig) (*stream, error) {
-	return a.addStreamWithAssignment(config, nil, nil)
+	return a.addStreamWithAssignment(config, nil, nil, false)
 }
 
 // AddStreamWithStore adds a stream for the given account with custome store config options.
 func (a *Account) addStreamWithStore(config *StreamConfig, fsConfig *FileStoreConfig) (*stream, error) {
-	return a.addStreamWithAssignment(config, fsConfig, nil)
+	return a.addStreamWithAssignment(config, fsConfig, nil, false)
 }
 
-func (a *Account) addStreamWithAssignment(config *StreamConfig, fsConfig *FileStoreConfig, sa *streamAssignment) (*stream, error) {
+func (a *Account) addStreamPedantic(config *StreamConfig, pedantic bool) (*stream, error) {
+	return a.addStreamWithAssignment(config, nil, nil, pedantic)
+}
+
+func (a *Account) addStreamWithAssignment(config *StreamConfig, fsConfig *FileStoreConfig, sa *streamAssignment, pedantic bool) (*stream, error) {
 	s, jsa, err := a.checkForJetStream()
 	if err != nil {
 		return nil, err
@@ -409,7 +489,7 @@ func (a *Account) addStreamWithAssignment(config *StreamConfig, fsConfig *FileSt
 	}
 
 	// Sensible defaults.
-	cfg, apiErr := s.checkStreamCfg(config, a)
+	cfg, apiErr := s.checkStreamCfg(config, a, pedantic)
 	if apiErr != nil {
 		return nil, apiErr
 	}
@@ -557,6 +637,16 @@ func (a *Account) addStreamWithAssignment(config *StreamConfig, fsConfig *FileSt
 	c := s.createInternalJetStreamClient()
 	ic := s.createInternalJetStreamClient()
 
+	// Work out the stream ingest limits.
+	mlen := s.opts.StreamMaxBufferedMsgs
+	msz := uint64(s.opts.StreamMaxBufferedSize)
+	if mlen == 0 {
+		mlen = streamDefaultMaxQueueMsgs
+	}
+	if msz == 0 {
+		msz = streamDefaultMaxQueueBytes
+	}
+
 	qpfx := fmt.Sprintf("[ACC:%s] stream '%s' ", a.Name, config.Name)
 	mset := &stream{
 		acc:       a,
@@ -569,12 +659,18 @@ func (a *Account) addStreamWithAssignment(config *StreamConfig, fsConfig *FileSt
 		tier:      tier,
 		stype:     cfg.Storage,
 		consumers: make(map[string]*consumer),
-		msgs:      newIPQueue[*inMsg](s, qpfx+"messages"),
-		gets:      newIPQueue[*directGetReq](s, qpfx+"direct gets"),
-		qch:       make(chan struct{}),
-		mqch:      make(chan struct{}),
-		uch:       make(chan struct{}, 4),
-		sch:       make(chan struct{}, 1),
+		msgs: newIPQueue[*inMsg](s, qpfx+"messages",
+			ipqSizeCalculation(func(msg *inMsg) uint64 {
+				return uint64(len(msg.hdr) + len(msg.msg) + len(msg.rply) + len(msg.subj))
+			}),
+			ipqLimitByLen[*inMsg](mlen),
+			ipqLimitBySize[*inMsg](msz),
+		),
+		gets: newIPQueue[*directGetReq](s, qpfx+"direct gets"),
+		qch:  make(chan struct{}),
+		mqch: make(chan struct{}),
+		uch:  make(chan struct{}, 4),
+		sch:  make(chan struct{}, 1),
 	}
 
 	// Start our signaling routine to process consumers.
@@ -660,15 +756,25 @@ func (a *Account) addStreamWithAssignment(config *StreamConfig, fsConfig *FileSt
 	}
 
 	// Set our stream assignment if in clustered mode.
+	reserveResources := true
 	if sa != nil {
 		mset.setStreamAssignment(sa)
+
+		// If the stream is resetting we must not double-account resources, they were already accounted for.
+		js.mu.Lock()
+		if sa.resetting {
+			reserveResources, sa.resetting = false, false
+		}
+		js.mu.Unlock()
 	}
 
 	// Setup our internal send go routine.
 	mset.setupSendCapabilities()
 
 	// Reserve resources if MaxBytes present.
-	mset.js.reserveStreamResources(&mset.cfg)
+	if reserveResources {
+		mset.js.reserveStreamResources(&mset.cfg)
+	}
 
 	// Call directly to set leader if not in clustered mode.
 	// This can be called though before we actually setup clustering, so check both.
@@ -834,7 +940,19 @@ func (mset *stream) isLeader() bool {
 	return true
 }
 
-// TODO(dlc) - Check to see if we can accept being the leader or we should should step down.
+// isLeaderNodeState should NOT be used normally, use isLeader instead.
+// Returns whether the node thinks it is the leader, regardless of whether applies are up-to-date yet
+// (unlike isLeader, which requires applies to be caught up).
+// May be used to respond to clients after a leader change, when applying entries from a former leader.
+// Lock should be held.
+func (mset *stream) isLeaderNodeState() bool {
+	if mset.isClustered() {
+		return mset.node.State() == Leader
+	}
+	return true
+}
+
+// TODO(dlc) - Check to see if we can accept being the leader or we should step down.
 func (mset *stream) setLeader(isLeader bool) error {
 	mset.mu.Lock()
 	// If we are here we have a change in leader status.
@@ -1039,10 +1157,10 @@ func (mset *stream) lastSeq() uint64 {
 	return mset.lseq
 }
 
+// Set last seq.
+// Write lock should be held.
 func (mset *stream) setLastSeq(lseq uint64) {
-	mset.mu.Lock()
 	mset.lseq = lseq
-	mset.mu.Unlock()
 }
 
 func (mset *stream) sendCreateAdvisory() {
@@ -1163,7 +1281,7 @@ func (jsa *jsAccount) subjectsOverlap(subjects []string, self *stream) bool {
 // StreamDefaultDuplicatesWindow default duplicates window.
 const StreamDefaultDuplicatesWindow = 2 * time.Minute
 
-func (s *Server) checkStreamCfg(config *StreamConfig, acc *Account) (StreamConfig, *ApiError) {
+func (s *Server) checkStreamCfg(config *StreamConfig, acc *Account, pedantic bool) (StreamConfig, *ApiError) {
 	lim := &s.getOpts().JetStreamLimits
 
 	if config == nil {
@@ -1220,9 +1338,15 @@ func (s *Server) checkStreamCfg(config *StreamConfig, acc *Account) (StreamConfi
 	if cfg.Duplicates == 0 && cfg.Mirror == nil {
 		maxWindow := StreamDefaultDuplicatesWindow
 		if lim.Duplicates > 0 && maxWindow > lim.Duplicates {
+			if pedantic {
+				return StreamConfig{}, NewJSPedanticError(fmt.Errorf("pedantic mode: duplicate window limits are higher than current limits"))
+			}
 			maxWindow = lim.Duplicates
 		}
 		if cfg.MaxAge != 0 && cfg.MaxAge < maxWindow {
+			if pedantic {
+				return StreamConfig{}, NewJSPedanticError(fmt.Errorf("pedantic mode: duplicate window cannot be bigger than max age"))
+			}
 			cfg.Duplicates = cfg.MaxAge
 		} else {
 			cfg.Duplicates = maxWindow
@@ -1260,6 +1384,17 @@ func (s *Server) checkStreamCfg(config *StreamConfig, acc *Account) (StreamConfi
 		}
 	}
 
+	if cfg.SubjectDeleteMarkerTTL > 0 {
+		if !cfg.AllowMsgTTL {
+			return StreamConfig{}, NewJSStreamInvalidConfigError(fmt.Errorf("subject marker delete cannot be set if message TTLs are disabled"))
+		}
+		if cfg.SubjectDeleteMarkerTTL < time.Second {
+			return StreamConfig{}, NewJSStreamInvalidConfigError(fmt.Errorf("subject marker delete TTL must be at least 1 second"))
+		}
+	} else if cfg.SubjectDeleteMarkerTTL < 0 {
+		return StreamConfig{}, NewJSStreamInvalidConfigError(fmt.Errorf("subject marker delete TTL must not be negative"))
+	}
+
 	getStream := func(streamName string) (bool, StreamConfig) {
 		var exists bool
 		var cfg StreamConfig
@@ -1267,7 +1402,7 @@ func (s *Server) checkStreamCfg(config *StreamConfig, acc *Account) (StreamConfi
 			if js, _ := s.getJetStreamCluster(); js != nil {
 				js.mu.RLock()
 				if sa := js.streamAssignment(acc.Name, streamName); sa != nil {
-					cfg = *sa.Config
+					cfg = *sa.Config.clone()
 					exists = true
 				}
 				js.mu.RUnlock()
@@ -1302,11 +1437,23 @@ func (s *Server) checkStreamCfg(config *StreamConfig, acc *Account) (StreamConfi
 		if cfg.Mirror.FilterSubject != _EMPTY_ && len(cfg.Mirror.SubjectTransforms) != 0 {
 			return StreamConfig{}, NewJSMirrorMultipleFiltersNotAllowedError()
 		}
+		if cfg.SubjectDeleteMarkerTTL > 0 {
+			// Delete markers cannot be configured on a mirror as it would result in new
+			// tombstones which would use up sequence numbers, diverging from the origin
+			// stream.
+			return StreamConfig{}, NewJSStreamInvalidConfigError(fmt.Errorf("subject delete markers forbidden on mirrors"))
+		}
 		// Check subject filters overlap.
 		for outer, tr := range cfg.Mirror.SubjectTransforms {
-			if !IsValidSubject(tr.Source) {
-				return StreamConfig{}, NewJSMirrorInvalidSubjectFilterError()
+			if tr.Source != _EMPTY_ && !IsValidSubject(tr.Source) {
+				return StreamConfig{}, NewJSMirrorInvalidSubjectFilterError(fmt.Errorf("%w %s", ErrBadSubject, tr.Source))
 			}
+
+			err := ValidateMapping(tr.Source, tr.Destination)
+			if err != nil {
+				return StreamConfig{}, NewJSMirrorInvalidTransformDestinationError(err)
+			}
+
 			for inner, innertr := range cfg.Mirror.SubjectTransforms {
 				if inner != outer && SubjectsCollide(tr.Source, innertr.Source) {
 					return StreamConfig{}, NewJSMirrorOverlappingSubjectFiltersError()
@@ -1331,6 +1478,9 @@ func (s *Server) checkStreamCfg(config *StreamConfig, acc *Account) (StreamConfi
 			}
 			// Determine if we are inheriting direct gets.
 			if exists, ocfg := getStream(cfg.Mirror.Name); exists {
+				if pedantic && cfg.MirrorDirect != ocfg.AllowDirect {
+					return StreamConfig{}, NewJSPedanticError(fmt.Errorf("origin stream has direct get set, mirror has it disabled"))
+				}
 				cfg.MirrorDirect = ocfg.AllowDirect
 			} else if js := s.getJetStream(); js != nil && js.isClustered() {
 				// Could not find it here. If we are clustered we can look it up.
@@ -1338,6 +1488,10 @@ func (s *Server) checkStreamCfg(config *StreamConfig, acc *Account) (StreamConfi
 				if cc := js.cluster; cc != nil {
 					if as := cc.streams[acc.Name]; as != nil {
 						if sa := as[cfg.Mirror.Name]; sa != nil {
+							if pedantic && cfg.MirrorDirect != sa.Config.AllowDirect {
+								js.mu.RUnlock()
+								return StreamConfig{}, NewJSPedanticError(fmt.Errorf("origin stream has direct get set, mirror has it disabled"))
+							}
 							cfg.MirrorDirect = sa.Config.AllowDirect
 						}
 					}
@@ -1348,10 +1502,10 @@ func (s *Server) checkStreamCfg(config *StreamConfig, acc *Account) (StreamConfi
 			if cfg.Mirror.External.DeliverPrefix != _EMPTY_ {
 				deliveryPrefixes = append(deliveryPrefixes, cfg.Mirror.External.DeliverPrefix)
 			}
+
 			if cfg.Mirror.External.ApiPrefix != _EMPTY_ {
 				apiPrefixes = append(apiPrefixes, cfg.Mirror.External.ApiPrefix)
 			}
-
 		}
 	}
 
@@ -1384,17 +1538,18 @@ func (s *Server) checkStreamCfg(config *StreamConfig, acc *Account) (StreamConfi
 			}
 
 			for _, tr := range src.SubjectTransforms {
-				err := ValidateMappingDestination(tr.Destination)
+				if tr.Source != _EMPTY_ && !IsValidSubject(tr.Source) {
+					return StreamConfig{}, NewJSSourceInvalidSubjectFilterError(fmt.Errorf("%w %s", ErrBadSubject, tr.Source))
+				}
+
+				err := ValidateMapping(tr.Source, tr.Destination)
 				if err != nil {
-					return StreamConfig{}, NewJSSourceInvalidTransformDestinationError()
+					return StreamConfig{}, NewJSSourceInvalidTransformDestinationError(err)
 				}
 			}
 
 			// Check subject filters overlap.
 			for outer, tr := range src.SubjectTransforms {
-				if !IsValidSubject(tr.Source) {
-					return StreamConfig{}, NewJSSourceInvalidSubjectFilterError()
-				}
 				for inner, innertr := range src.SubjectTransforms {
 					if inner != outer && subjectIsSubsetMatch(tr.Source, innertr.Source) {
 						return StreamConfig{}, NewJSSourceOverlappingSubjectFiltersError()
@@ -1558,6 +1713,9 @@ func (s *Server) checkStreamCfg(config *StreamConfig, acc *Account) (StreamConfi
 		// Also make sure it does not form a cycle.
 		// Empty same as all.
 		if cfg.RePublish.Source == _EMPTY_ {
+			if pedantic {
+				return StreamConfig{}, NewJSPedanticError(fmt.Errorf("pedantic mode: republish source can not be empty"))
+			}
 			cfg.RePublish.Source = fwcs
 		}
 		var formsCycle bool
@@ -1575,13 +1733,30 @@ func (s *Server) checkStreamCfg(config *StreamConfig, acc *Account) (StreamConfi
 		}
 	}
 
+	// Check the subject transform if any
+	if cfg.SubjectTransform != nil {
+		if cfg.SubjectTransform.Source != _EMPTY_ && !IsValidSubject(cfg.SubjectTransform.Source) {
+			return StreamConfig{}, NewJSStreamTransformInvalidSourceError(fmt.Errorf("%w %s", ErrBadSubject, cfg.SubjectTransform.Source))
+		}
+
+		err := ValidateMapping(cfg.SubjectTransform.Source, cfg.SubjectTransform.Destination)
+		if err != nil {
+			return StreamConfig{}, NewJSStreamTransformInvalidDestinationError(err)
+		}
+	}
+
+	// For now don't allow preferred server in placement.
+	if cfg.Placement != nil && cfg.Placement.Preferred != _EMPTY_ {
+		return StreamConfig{}, NewJSStreamInvalidConfigError(fmt.Errorf("preferred server not permitted in placement"))
+	}
+
 	return cfg, nil
 }
 
 // Config returns the stream's configuration.
 func (mset *stream) config() StreamConfig {
-	mset.mu.RLock()
-	defer mset.mu.RUnlock()
+	mset.cfgMu.RLock()
+	defer mset.cfgMu.RUnlock()
 	return mset.cfg
 }
 
@@ -1596,8 +1771,8 @@ func (mset *stream) fileStoreConfig() (FileStoreConfig, error) {
 }
 
 // Do not hold jsAccount or jetStream lock
-func (jsa *jsAccount) configUpdateCheck(old, new *StreamConfig, s *Server) (*StreamConfig, error) {
-	cfg, apiErr := s.checkStreamCfg(new, jsa.acc())
+func (jsa *jsAccount) configUpdateCheck(old, new *StreamConfig, s *Server, pedantic bool) (*StreamConfig, error) {
+	cfg, apiErr := s.checkStreamCfg(new, jsa.acc(), pedantic)
 	if apiErr != nil {
 		return nil, apiErr
 	}
@@ -1654,7 +1829,13 @@ func (jsa *jsAccount) configUpdateCheck(old, new *StreamConfig, s *Server) (*Str
 		}
 	}
 
+	// Check on the allowed message TTL status.
+	if cfg.AllowMsgTTL != old.AllowMsgTTL {
+		return nil, NewJSStreamInvalidConfigError(fmt.Errorf("message TTL status can not be changed after stream creation"))
+	}
+
 	// Do some adjustments for being sealed.
+	// Pedantic mode will allow those changes to be made, as they are determinictic and important to get a sealed stream.
 	if cfg.Sealed {
 		cfg.MaxAge = 0
 		cfg.Discard = DiscardNew
@@ -1723,11 +1904,15 @@ func (jsa *jsAccount) configUpdateCheck(old, new *StreamConfig, s *Server) (*Str
 
 // Update will allow certain configuration properties of an existing stream to be updated.
 func (mset *stream) update(config *StreamConfig) error {
-	return mset.updateWithAdvisory(config, true)
+	return mset.updateWithAdvisory(config, true, false)
+}
+
+func (mset *stream) updatePedantic(config *StreamConfig, pedantic bool) error {
+	return mset.updateWithAdvisory(config, true, pedantic)
 }
 
 // Update will allow certain configuration properties of an existing stream to be updated.
-func (mset *stream) updateWithAdvisory(config *StreamConfig, sendAdvisory bool) error {
+func (mset *stream) updateWithAdvisory(config *StreamConfig, sendAdvisory bool, pedantic bool) error {
 	_, jsa, err := mset.acc.checkForJetStream()
 	if err != nil {
 		return err
@@ -1738,7 +1923,7 @@ func (mset *stream) updateWithAdvisory(config *StreamConfig, sendAdvisory bool) 
 	s := mset.srv
 	mset.mu.RUnlock()
 
-	cfg, err := mset.jsa.configUpdateCheck(&ocfg, config, s)
+	cfg, err := mset.jsa.configUpdateCheck(&ocfg, config, s, pedantic)
 	if err != nil {
 		return NewJSStreamInvalidConfigError(err, Unless(err))
 	}
@@ -2038,7 +2223,7 @@ func (mset *stream) purge(preq *JSApiStreamPurgeRequest) (purged uint64, err err
 	mset.mu.RUnlock()
 
 	if preq != nil {
-		purged, err = mset.store.PurgeEx(preq.Subject, preq.Sequence, preq.Keep)
+		purged, err = mset.store.PurgeEx(preq.Subject, preq.Sequence, preq.Keep, false /*preq.NoMarkers*/)
 	} else {
 		purged, err = mset.store.Purge()
 	}
@@ -2051,10 +2236,15 @@ func (mset *stream) purge(preq *JSApiStreamPurgeRequest) (purged uint64, err err
 	store.FastState(&state)
 	fseq, lseq := state.FirstSeq, state.LastSeq
 
+	mset.mu.Lock()
 	// Check if our last has moved past what our original last sequence was, if so reset.
 	if lseq > mlseq {
 		mset.setLastSeq(lseq)
 	}
+
+	// Clear any pending acks below first seq.
+	mset.clearAllPreAcksBelowFloor(fseq)
+	mset.mu.Unlock()
 
 	// Purge consumers.
 	// Check for filtered purge.
@@ -2102,7 +2292,14 @@ func (mset *stream) deleteMsg(seq uint64) (bool, error) {
 	if mset.closed.Load() {
 		return false, errStreamClosed
 	}
-	return mset.store.RemoveMsg(seq)
+	removed, err := mset.store.RemoveMsg(seq)
+	if err != nil {
+		return removed, err
+	}
+	mset.mu.Lock()
+	mset.clearAllPreAcks(seq)
+	mset.mu.Unlock()
+	return removed, err
 }
 
 // EraseMsg will securely remove a message and rewrite the data with random data.
@@ -2110,7 +2307,14 @@ func (mset *stream) eraseMsg(seq uint64) (bool, error) {
 	if mset.closed.Load() {
 		return false, errStreamClosed
 	}
-	return mset.store.EraseMsg(seq)
+	removed, err := mset.store.EraseMsg(seq)
+	if err != nil {
+		return removed, err
+	}
+	mset.mu.Lock()
+	mset.clearAllPreAcks(seq)
+	mset.mu.Unlock()
+	return removed, err
 }
 
 // Are we a mirror?
@@ -2375,10 +2579,10 @@ func (mset *stream) processInboundMirrorMsg(m *inMsg) bool {
 			s.resourcesExceededError()
 			err = ApiErrors[JSInsufficientResourcesErr]
 		} else {
-			err = node.Propose(encodeStreamMsg(m.subj, _EMPTY_, m.hdr, m.msg, sseq-1, ts))
+			err = node.Propose(encodeStreamMsg(m.subj, _EMPTY_, m.hdr, m.msg, sseq-1, ts, true))
 		}
 	} else {
-		err = mset.processJetStreamMsg(m.subj, _EMPTY_, m.hdr, m.msg, sseq-1, ts)
+		err = mset.processJetStreamMsg(m.subj, _EMPTY_, m.hdr, m.msg, sseq-1, ts, nil, true)
 	}
 	if err != nil {
 		if strings.Contains(err.Error(), "no space left") {
@@ -2457,7 +2661,7 @@ func (mset *stream) skipMsgs(start, end uint64) {
 	// With syncRequest was easy to add bool into request.
 	var entries []*Entry
 	for seq := start; seq <= end; seq++ {
-		entries = append(entries, newEntry(EntryNormal, encodeStreamMsg(_EMPTY_, _EMPTY_, nil, nil, seq-1, 0)))
+		entries = append(entries, newEntry(EntryNormal, encodeStreamMsg(_EMPTY_, _EMPTY_, nil, nil, seq-1, 0, false)))
 		// So a single message does not get too big.
 		if len(entries) > 10_000 {
 			node.ProposeMulti(entries)
@@ -2545,12 +2749,13 @@ func (mset *stream) setupMirrorConsumer() error {
 	} else {
 		mset.cancelSourceInfo(mset.mirror)
 		mset.mirror.sseq = mset.lseq
-
-		// If we are no longer the leader stop trying.
-		if !mset.isLeader() {
-			return nil
-		}
 	}
+
+	// If we are no longer the leader stop trying.
+	if !mset.isLeader() {
+		return nil
+	}
+
 	mirror := mset.mirror
 
 	// We want to throttle here in terms of how fast we request new consumers,
@@ -2729,7 +2934,7 @@ func (mset *stream) setupMirrorConsumer() error {
 				msgs := mirror.msgs
 				sub, err := mset.subscribeInternal(deliverSubject, func(sub *subscription, c *client, _ *Account, subject, reply string, rmsg []byte) {
 					hdr, msg := c.msgParts(copyBytes(rmsg)) // Need to copy.
-					mset.queueInbound(msgs, subject, reply, hdr, msg, nil)
+					mset.queueInbound(msgs, subject, reply, hdr, msg, nil, nil)
 					mirror.last.Store(time.Now().UnixNano())
 				})
 				if err != nil {
@@ -2751,7 +2956,7 @@ func (mset *stream) setupMirrorConsumer() error {
 					// Check to see if delivered is past our last and we have no msgs. This will help the
 					// case when mirroring a stream that has a very high starting sequence number.
 					if state.Msgs == 0 && ccr.ConsumerInfo.Delivered.Stream > state.LastSeq {
-						mset.store.PurgeEx(_EMPTY_, ccr.ConsumerInfo.Delivered.Stream+1, 0)
+						mset.store.PurgeEx(_EMPTY_, ccr.ConsumerInfo.Delivered.Stream+1, 0, true)
 						mset.lseq = ccr.ConsumerInfo.Delivered.Stream
 					} else {
 						mset.skipMsgs(state.LastSeq+1, ccr.ConsumerInfo.Delivered.Stream)
@@ -3102,7 +3307,7 @@ func (mset *stream) trySetupSourceConsumer(iname string, seq uint64, startTime t
 					msgs := mset.smsgs
 					sub, err := mset.subscribeInternal(deliverSubject, func(sub *subscription, c *client, _ *Account, subject, reply string, rmsg []byte) {
 						hdr, msg := c.msgParts(copyBytes(rmsg)) // Need to copy.
-						mset.queueInbound(msgs, subject, reply, hdr, msg, si)
+						mset.queueInbound(msgs, subject, reply, hdr, msg, si, nil)
 						si.last.Store(time.Now().UnixNano())
 					})
 					if err != nil {
@@ -3163,6 +3368,7 @@ func (mset *stream) processAllSourceMsgs() {
 				if !mset.processInboundSourceMsg(im.si, im) {
 					// If we are no longer leader bail.
 					if !mset.IsLeader() {
+						msgs.recycle(&ims)
 						cleanUp()
 						return
 					}
@@ -3229,7 +3435,7 @@ func (mset *stream) sendFlowControlReply(reply string) {
 func (mset *stream) handleFlowControl(m *inMsg) {
 	// If we are clustered we will send the flow control message through the replication stack.
 	if mset.isClustered() {
-		mset.node.Propose(encodeStreamMsg(_EMPTY_, m.rply, m.hdr, nil, 0, 0))
+		mset.node.Propose(encodeStreamMsg(_EMPTY_, m.rply, m.hdr, nil, 0, 0, false))
 	} else {
 		mset.outq.sendMsg(m.rply, nil)
 	}
@@ -3335,9 +3541,9 @@ func (mset *stream) processInboundSourceMsg(si *sourceInfo, m *inMsg) bool {
 	var err error
 	// If we are clustered we need to propose this message to the underlying raft group.
 	if node != nil {
-		err = mset.processClusteredInboundMsg(m.subj, _EMPTY_, hdr, msg)
+		err = mset.processClusteredInboundMsg(m.subj, _EMPTY_, hdr, msg, nil, true)
 	} else {
-		err = mset.processJetStreamMsg(m.subj, _EMPTY_, hdr, msg, 0, 0)
+		err = mset.processJetStreamMsg(m.subj, _EMPTY_, hdr, msg, 0, 0, nil, true)
 	}
 
 	if err != nil {
@@ -3353,7 +3559,7 @@ func (mset *stream) processInboundSourceMsg(si *sourceInfo, m *inMsg) bool {
 			// Can happen temporarily all the time during normal operations when the sourcing stream
 			// is working queue/interest with a limit and discard new.
 			// TODO - Improve sourcing to WQ with limit and new to use flow control rather than re-creating the consumer.
-			if errors.Is(err, ErrMaxMsgs) {
+			if errors.Is(err, ErrMaxMsgs) || errors.Is(err, ErrMaxBytes) {
 				// Do not need to do a full retry that includes finding the last sequence in the stream
 				// for that source. Just re-create starting with the seq we couldn't store instead.
 				mset.mu.Lock()
@@ -3469,16 +3675,21 @@ func (mset *stream) setStartingSequenceForSources(iNames map[string]struct{}) {
 	}
 
 	var smv StoreMsg
-	for seq := state.LastSeq; seq >= state.FirstSeq; seq-- {
-		sm, err := mset.store.LoadMsg(seq, &smv)
-		if err != nil || len(sm.hdr) == 0 {
+	for seq := state.LastSeq; seq >= state.FirstSeq; {
+		sm, err := mset.store.LoadPrevMsg(seq, &smv)
+		if err == ErrStoreEOF || err != nil {
+			break
+		}
+		seq = sm.seq - 1
+		if len(sm.hdr) == 0 {
 			continue
 		}
+
 		ss := getHeader(JSStreamSource, sm.hdr)
 		if len(ss) == 0 {
 			continue
 		}
-		streamName, indexName, sseq := streamAndSeq(string(ss))
+		streamName, indexName, sseq := streamAndSeq(bytesToString(ss))
 
 		if _, ok := iNames[indexName]; ok {
 			si := mset.sources[indexName]
@@ -3536,7 +3747,6 @@ func (mset *stream) resetSourceInfo() {
 	}
 }
 
-// Lock should be held.
 // This will do a reverse scan on startup or leader election
 // searching for the starting sequence number.
 // This can be slow in degenerative cases.
@@ -3575,10 +3785,23 @@ func (mset *stream) startingSequenceForSources() {
 		}
 	}()
 
+	update := func(iName string, seq uint64) {
+		// Only update active in case we have older ones in here that got configured out.
+		if si := mset.sources[iName]; si != nil {
+			if _, ok := seqs[iName]; !ok {
+				seqs[iName] = seq
+			}
+		}
+	}
+
 	var smv StoreMsg
-	for seq := state.LastSeq; seq >= state.FirstSeq; seq-- {
-		sm, err := mset.store.LoadMsg(seq, &smv)
-		if err != nil || sm == nil || len(sm.hdr) == 0 {
+	for seq := state.LastSeq; ; {
+		sm, err := mset.store.LoadPrevMsg(seq, &smv)
+		if err == ErrStoreEOF || err != nil {
+			break
+		}
+		seq = sm.seq - 1
+		if len(sm.hdr) == 0 {
 			continue
 		}
 		ss := getHeader(JSStreamSource, sm.hdr)
@@ -3586,16 +3809,7 @@ func (mset *stream) startingSequenceForSources() {
 			continue
 		}
 
-		var update = func(iName string, seq uint64) {
-			// Only update active in case we have older ones in here that got configured out.
-			if si := mset.sources[iName]; si != nil {
-				if _, ok := seqs[iName]; !ok {
-					seqs[iName] = seq
-				}
-			}
-		}
-
-		streamName, iName, sseq := streamAndSeq(string(ss))
+		streamName, iName, sseq := streamAndSeq(bytesToString(ss))
 		if iName == _EMPTY_ { // Pre-2.10 message header means it's a match for any source using that stream name
 			for _, ssi := range mset.cfg.Sources {
 				if streamName == ssi.Name || (ssi.External != nil && streamName == ssi.Name+":"+getHash(ssi.External.ApiPrefix)) {
@@ -3676,12 +3890,17 @@ func (mset *stream) subscribeToStream() error {
 	} else if len(mset.cfg.Sources) > 0 && mset.sourcesConsumerSetup == nil {
 		// Setup the initial source infos for the sources
 		mset.resetSourceInfo()
-		// Delay the actual source consumer(s) creation(s) for after a delay
-		mset.sourcesConsumerSetup = time.AfterFunc(time.Duration(rand.Intn(int(500*time.Millisecond)))+100*time.Millisecond, func() {
-			mset.mu.Lock()
+		// Delay the actual source consumer(s) creation(s) for after a delay if a replicated stream.
+		// If it's an R1, this is done at startup and we will do inline.
+		if mset.cfg.Replicas == 1 {
 			mset.setupSourceConsumers()
-			mset.mu.Unlock()
-		})
+		} else {
+			mset.sourcesConsumerSetup = time.AfterFunc(time.Duration(rand.Intn(int(500*time.Millisecond)))+100*time.Millisecond, func() {
+				mset.mu.Lock()
+				mset.setupSourceConsumers()
+				mset.mu.Unlock()
+			})
+		}
 	}
 	// Check for direct get access.
 	// We spin up followers for clustered streams in monitorStream().
@@ -3894,6 +4113,15 @@ func (mset *stream) setupStore(fsCfg *FileStoreConfig) error {
 	}
 	// This will fire the callback but we do not require the lock since md will be 0 here.
 	mset.store.RegisterStorageUpdates(mset.storeUpdates)
+	mset.store.RegisterSubjectDeleteMarkerUpdates(func(im *inMsg) {
+		if mset.IsClustered() {
+			if mset.IsLeader() {
+				mset.processClusteredInboundMsg(im.subj, im.rply, im.hdr, im.msg, im.mt, false)
+			}
+		} else {
+			mset.processJetStreamMsg(im.subj, im.rply, im.hdr, im.msg, 0, 0, im.mt, false)
+		}
+	})
 	mset.mu.Unlock()
 
 	return nil
@@ -3909,9 +4137,14 @@ func (mset *stream) storeUpdates(md, bd int64, seq uint64, subj string) {
 	if md == -1 && seq > 0 && subj != _EMPTY_ {
 		// We use our consumer list mutex here instead of the main stream lock since it may be held already.
 		mset.clsMu.RLock()
-		// TODO(dlc) - Do sublist like signaling so we do not have to match?
-		for _, o := range mset.cList {
-			o.decStreamPending(seq, subj)
+		if mset.csl != nil {
+			mset.csl.Match(subj, func(o *consumer) {
+				o.decStreamPending(seq, subj)
+			})
+		} else {
+			for _, o := range mset.cList {
+				o.decStreamPending(seq, subj)
+			}
 		}
 		mset.clsMu.RUnlock()
 	} else if md < 0 {
@@ -3996,15 +4229,8 @@ func (mset *stream) purgeMsgIds() {
 	}
 }
 
-// storeMsgId will store the message id for duplicate detection.
-func (mset *stream) storeMsgId(dde *ddentry) {
-	mset.mu.Lock()
-	defer mset.mu.Unlock()
-	mset.storeMsgIdLocked(dde)
-}
-
 // storeMsgIdLocked will store the message id for duplicate detection.
-// Lock should he held.
+// Lock should be held.
 func (mset *stream) storeMsgIdLocked(dde *ddentry) {
 	if mset.ddmap == nil {
 		mset.ddmap = make(map[string]*ddentry)
@@ -4058,6 +4284,48 @@ func getExpectedLastSeqPerSubject(hdr []byte) (uint64, bool) {
 	return uint64(parseInt64(bseq)), true
 }
 
+// Fast lookup of expected subject for the expected stream sequence per subject.
+func getExpectedLastSeqPerSubjectForSubject(hdr []byte) string {
+	return string(getHeader(JSExpectedLastSubjSeqSubj, hdr))
+}
+
+// Fast lookup of the message TTL from headers:
+// - Positive return value: duration in seconds.
+// - Zero return value: no TTL or parse error.
+// - Negative return value: never expires.
+func getMessageTTL(hdr []byte) (int64, error) {
+	ttl := getHeader(JSMessageTTL, hdr)
+	if len(ttl) == 0 {
+		return 0, nil
+	}
+	return parseMessageTTL(bytesToString(ttl))
+}
+
+// - Positive return value: duration in seconds.
+// - Zero return value: no TTL or parse error.
+// - Negative return value: never expires.
+func parseMessageTTL(ttl string) (int64, error) {
+	if strings.ToLower(ttl) == "never" {
+		return -1, nil
+	}
+	dur, err := time.ParseDuration(ttl)
+	if err == nil {
+		if dur < time.Second {
+			return 0, NewJSMessageTTLInvalidError()
+		}
+		return int64(dur.Seconds()), nil
+	}
+	t := parseInt64(stringToBytes(ttl))
+	if t < 0 {
+		// This probably means a parse failure, hence why
+		// we have a special case "never" for returning -1.
+		// Otherwise we can't know if it's a genuine TTL
+		// that says never expire or if it's a parse error.
+		return 0, NewJSMessageTTLInvalidError()
+	}
+	return t, nil
+}
+
 // Signal if we are clustered. Will acquire rlock.
 func (mset *stream) IsClustered() bool {
 	mset.mu.RLock()
@@ -4077,6 +4345,7 @@ type inMsg struct {
 	hdr  []byte
 	msg  []byte
 	si   *sourceInfo
+	mt   *msgTrace
 }
 
 var inMsgPool = sync.Pool{
@@ -4086,14 +4355,22 @@ var inMsgPool = sync.Pool{
 }
 
 func (im *inMsg) returnToPool() {
-	im.subj, im.rply, im.hdr, im.msg, im.si = _EMPTY_, _EMPTY_, nil, nil, nil
+	im.subj, im.rply, im.hdr, im.msg, im.si, im.mt = _EMPTY_, _EMPTY_, nil, nil, nil, nil
 	inMsgPool.Put(im)
 }
 
-func (mset *stream) queueInbound(ib *ipQueue[*inMsg], subj, rply string, hdr, msg []byte, si *sourceInfo) {
+func (mset *stream) queueInbound(ib *ipQueue[*inMsg], subj, rply string, hdr, msg []byte, si *sourceInfo, mt *msgTrace) {
 	im := inMsgPool.Get().(*inMsg)
-	im.subj, im.rply, im.hdr, im.msg, im.si = subj, rply, hdr, msg, si
-	ib.push(im)
+	im.subj, im.rply, im.hdr, im.msg, im.si, im.mt = subj, rply, hdr, msg, si, mt
+	if _, err := ib.push(im); err != nil {
+		im.returnToPool()
+		mset.srv.RateLimitWarnf("Dropping messages due to excessive stream ingest rate on '%s' > '%s': %s", mset.acc.Name, mset.name(), err)
+		if rply != _EMPTY_ {
+			hdr := []byte("NATS/1.0 429 Too Many Requests\r\n\r\n")
+			b, _ := json.Marshal(&JSPubAckResponse{PubAck: &PubAck{Stream: mset.cfg.Name}, Error: NewJSStreamTooManyRequestsError()})
+			mset.outq.send(newJSPubMsg(rply, _EMPTY_, _EMPTY_, hdr, b, nil, 0))
+		}
+	}
 }
 
 var dgPool = sync.Pool{
@@ -4128,18 +4405,21 @@ func (mset *stream) processDirectGetRequest(_ *subscription, c *client, _ *Accou
 		return
 	}
 	// Check if nothing set.
-	if req.Seq == 0 && req.LastFor == _EMPTY_ && req.NextFor == _EMPTY_ {
+	if req.Seq == 0 && req.LastFor == _EMPTY_ && req.NextFor == _EMPTY_ && len(req.MultiLastFor) == 0 && req.StartTime == nil {
 		hdr := []byte("NATS/1.0 408 Empty Request\r\n\r\n")
 		mset.outq.send(newJSPubMsg(reply, _EMPTY_, _EMPTY_, hdr, nil, nil, 0))
 		return
 	}
-	// Check that we do not have both options set.
-	if req.Seq > 0 && req.LastFor != _EMPTY_ {
-		hdr := []byte("NATS/1.0 408 Bad Request\r\n\r\n")
-		mset.outq.send(newJSPubMsg(reply, _EMPTY_, _EMPTY_, hdr, nil, nil, 0))
-		return
-	}
-	if req.LastFor != _EMPTY_ && req.NextFor != _EMPTY_ {
+	// Check we don't have conflicting options set.
+	// We do not allow batch mode for lastFor requests.
+	if (req.Seq > 0 && req.LastFor != _EMPTY_) ||
+		(req.Seq > 0 && req.StartTime != nil) ||
+		(req.StartTime != nil && req.LastFor != _EMPTY_) ||
+		(req.LastFor != _EMPTY_ && req.NextFor != _EMPTY_) ||
+		(req.LastFor != _EMPTY_ && req.Batch > 0) ||
+		(req.LastFor != _EMPTY_ && len(req.MultiLastFor) > 0) ||
+		(req.NextFor != _EMPTY_ && len(req.MultiLastFor) > 0) ||
+		(req.UpToSeq > 0 && req.UpToTime != nil) {
 		hdr := []byte("NATS/1.0 408 Bad Request\r\n\r\n")
 		mset.outq.send(newJSPubMsg(reply, _EMPTY_, _EMPTY_, hdr, nil, nil, 0))
 		return
@@ -4198,50 +4478,262 @@ func (mset *stream) processDirectGetLastBySubjectRequest(_ *subscription, c *cli
 	}
 }
 
-// Do actual work on a direct msg request.
-// This could be called in a Go routine if we are inline for a non-client connection.
-func (mset *stream) getDirectRequest(req *JSApiMsgGetRequest, reply string) {
-	var svp StoreMsg
-	var sm *StoreMsg
-	var err error
+// For direct get batch and multi requests.
+const (
+	dg   = "NATS/1.0\r\nNats-Stream: %s\r\nNats-Subject: %s\r\nNats-Sequence: %d\r\nNats-Time-Stamp: %s\r\n\r\n"
+	dgb  = "NATS/1.0\r\nNats-Stream: %s\r\nNats-Subject: %s\r\nNats-Sequence: %d\r\nNats-Time-Stamp: %s\r\nNats-Num-Pending: %d\r\nNats-Last-Sequence: %d\r\n\r\n"
+	eob  = "NATS/1.0 204 EOB\r\nNats-Num-Pending: %d\r\nNats-Last-Sequence: %d\r\n\r\n"
+	eobm = "NATS/1.0 204 EOB\r\nNats-Num-Pending: %d\r\nNats-Last-Sequence: %d\r\nNats-UpTo-Sequence: %d\r\n\r\n"
+)
 
+// Handle a multi request.
+func (mset *stream) getDirectMulti(req *JSApiMsgGetRequest, reply string) {
+	// TODO(dlc) - Make configurable?
+	const maxAllowedResponses = 1024
+
+	// We hold the lock here to try to avoid changes out from underneath of us.
 	mset.mu.RLock()
-	store, name := mset.store, mset.cfg.Name
-	mset.mu.RUnlock()
+	defer mset.mu.RUnlock()
+	// Grab store and name.
+	store, name, s := mset.store, mset.cfg.Name, mset.srv
 
-	if req.Seq > 0 && req.NextFor == _EMPTY_ {
-		sm, err = store.LoadMsg(req.Seq, &svp)
-	} else if req.NextFor != _EMPTY_ {
-		sm, _, err = store.LoadNextMsg(req.NextFor, subjectHasWildcard(req.NextFor), req.Seq, &svp)
-	} else {
-		sm, err = store.LoadLastMsg(req.LastFor, &svp)
+	// Grab MaxBytes
+	mb := req.MaxBytes
+	if mb == 0 && s != nil {
+		// Fill in with the server's MaxPending.
+		mb = int(s.opts.MaxPending)
 	}
+
+	upToSeq := req.UpToSeq
+	// If we have UpToTime set get the proper sequence.
+	if req.UpToTime != nil {
+		upToSeq = store.GetSeqFromTime((*req.UpToTime).UTC())
+		// We need to back off one since this is used to determine start sequence normally,
+		// were as here we want it to be the ceiling.
+		upToSeq--
+	}
+	// If not set, set to the last sequence and remember that for EOB.
+	if upToSeq == 0 {
+		var state StreamState
+		mset.store.FastState(&state)
+		upToSeq = state.LastSeq
+	}
+
+	seqs, err := store.MultiLastSeqs(req.MultiLastFor, upToSeq, maxAllowedResponses)
 	if err != nil {
-		hdr := []byte("NATS/1.0 404 Message Not Found\r\n\r\n")
+		var hdr []byte
+		if err == ErrTooManyResults {
+			hdr = []byte("NATS/1.0 413 Too Many Results\r\n\r\n")
+		} else {
+			hdr = []byte(fmt.Sprintf("NATS/1.0 500 %v\r\n\r\n", err))
+		}
+		mset.outq.send(newJSPubMsg(reply, _EMPTY_, _EMPTY_, hdr, nil, nil, 0))
+		return
+	}
+	if len(seqs) == 0 {
+		hdr := []byte("NATS/1.0 404 No Results\r\n\r\n")
 		mset.outq.send(newJSPubMsg(reply, _EMPTY_, _EMPTY_, hdr, nil, nil, 0))
 		return
 	}
 
-	hdr := sm.hdr
-	ts := time.Unix(0, sm.ts).UTC()
+	np, lseq, sentBytes, sent := uint64(len(seqs)-1), uint64(0), 0, 0
+	for _, seq := range seqs {
+		if seq < req.Seq {
+			if np > 0 {
+				np--
+			}
+			continue
+		}
+		var svp StoreMsg
+		sm, err := store.LoadMsg(seq, &svp)
+		if err != nil {
+			hdr := []byte("NATS/1.0 404 Message Not Found\r\n\r\n")
+			mset.outq.send(newJSPubMsg(reply, _EMPTY_, _EMPTY_, hdr, nil, nil, 0))
+			return
+		}
 
-	if len(hdr) == 0 {
-		const ht = "NATS/1.0\r\nNats-Stream: %s\r\nNats-Subject: %s\r\nNats-Sequence: %d\r\nNats-Time-Stamp: %s\r\n\r\n"
-		hdr = fmt.Appendf(nil, ht, name, sm.subj, sm.seq, ts.Format(time.RFC3339Nano))
-	} else {
-		hdr = copyBytes(hdr)
-		hdr = genHeader(hdr, JSStream, name)
-		hdr = genHeader(hdr, JSSubject, sm.subj)
-		hdr = genHeader(hdr, JSSequence, strconv.FormatUint(sm.seq, 10))
-		hdr = genHeader(hdr, JSTimeStamp, ts.Format(time.RFC3339Nano))
+		hdr := sm.hdr
+		ts := time.Unix(0, sm.ts).UTC()
+
+		if len(hdr) == 0 {
+			hdr = fmt.Appendf(nil, dgb, name, sm.subj, sm.seq, ts.Format(time.RFC3339Nano), np, lseq)
+		} else {
+			hdr = copyBytes(hdr)
+			hdr = genHeader(hdr, JSStream, name)
+			hdr = genHeader(hdr, JSSubject, sm.subj)
+			hdr = genHeader(hdr, JSSequence, strconv.FormatUint(sm.seq, 10))
+			hdr = genHeader(hdr, JSTimeStamp, ts.Format(time.RFC3339Nano))
+			hdr = genHeader(hdr, JSNumPending, strconv.FormatUint(np, 10))
+			hdr = genHeader(hdr, JSLastSequence, strconv.FormatUint(lseq, 10))
+		}
+		// Decrement num pending. This is optimization and we do not continue to look it up for these operations.
+		if np > 0 {
+			np--
+		}
+		// Track our lseq
+		lseq = sm.seq
+		// Send out our message.
+		mset.outq.send(newJSPubMsg(reply, _EMPTY_, _EMPTY_, hdr, sm.msg, nil, 0))
+		// Check if we have exceeded max bytes.
+		sentBytes += len(sm.subj) + len(sm.hdr) + len(sm.msg)
+		if sentBytes >= mb {
+			break
+		}
+		sent++
+		if req.Batch > 0 && sent >= req.Batch {
+			break
+		}
 	}
-	mset.outq.send(newJSPubMsg(reply, _EMPTY_, _EMPTY_, hdr, sm.msg, nil, 0))
+
+	// Send out EOB
+	hdr := fmt.Appendf(nil, eobm, np, lseq, upToSeq)
+	mset.outq.send(newJSPubMsg(reply, _EMPTY_, _EMPTY_, hdr, nil, nil, 0))
+}
+
+// Do actual work on a direct msg request.
+// This could be called in a Go routine if we are inline for a non-client connection.
+func (mset *stream) getDirectRequest(req *JSApiMsgGetRequest, reply string) {
+	// Handle multi in separate function.
+	if len(req.MultiLastFor) > 0 {
+		mset.getDirectMulti(req, reply)
+		return
+	}
+
+	mset.mu.RLock()
+	store, name, s := mset.store, mset.cfg.Name, mset.srv
+	mset.mu.RUnlock()
+
+	var seq uint64
+	// Lookup start seq if AsOfTime is set.
+	if req.StartTime != nil {
+		seq = store.GetSeqFromTime(*req.StartTime)
+	} else {
+		seq = req.Seq
+	}
+
+	wc := subjectHasWildcard(req.NextFor)
+	// For tracking num pending if we are batch.
+	var np, lseq, validThrough uint64
+	var isBatchRequest bool
+	batch := req.Batch
+	if batch == 0 {
+		batch = 1
+	} else {
+		// This is a batch request, capture initial numPending.
+		isBatchRequest = true
+		np, validThrough = store.NumPending(seq, req.NextFor, false)
+	}
+
+	// Grab MaxBytes
+	mb := req.MaxBytes
+	if mb == 0 && s != nil {
+		// Fill in with the server's MaxPending.
+		mb = int(s.opts.MaxPending)
+	}
+	// Track what we have sent.
+	var sentBytes int
+
+	// Loop over batch, which defaults to 1.
+	for i := 0; i < batch; i++ {
+		var (
+			svp StoreMsg
+			sm  *StoreMsg
+			err error
+		)
+		if seq > 0 && req.NextFor == _EMPTY_ {
+			// Only do direct lookup for first in a batch.
+			if i == 0 {
+				sm, err = store.LoadMsg(seq, &svp)
+			} else {
+				// We want to use load next with fwcs to step over deleted msgs.
+				sm, seq, err = store.LoadNextMsg(fwcs, true, seq, &svp)
+			}
+			// Bump for next loop if applicable.
+			seq++
+		} else if req.NextFor != _EMPTY_ {
+			sm, seq, err = store.LoadNextMsg(req.NextFor, wc, seq, &svp)
+			seq++
+		} else {
+			// Batch is not applicable here, this is checked before we get here.
+			sm, err = store.LoadLastMsg(req.LastFor, &svp)
+		}
+		if err != nil {
+			// For batches, if we stop early we want to do EOB logic below.
+			if batch > 1 && i > 0 {
+				break
+			}
+			hdr := []byte("NATS/1.0 404 Message Not Found\r\n\r\n")
+			mset.outq.send(newJSPubMsg(reply, _EMPTY_, _EMPTY_, hdr, nil, nil, 0))
+			return
+		}
+
+		hdr := sm.hdr
+		ts := time.Unix(0, sm.ts).UTC()
+
+		if isBatchRequest {
+			if len(hdr) == 0 {
+				hdr = fmt.Appendf(nil, dgb, name, sm.subj, sm.seq, ts.Format(time.RFC3339Nano), np, lseq)
+			} else {
+				hdr = copyBytes(hdr)
+				hdr = genHeader(hdr, JSStream, name)
+				hdr = genHeader(hdr, JSSubject, sm.subj)
+				hdr = genHeader(hdr, JSSequence, strconv.FormatUint(sm.seq, 10))
+				hdr = genHeader(hdr, JSTimeStamp, ts.Format(time.RFC3339Nano))
+				hdr = genHeader(hdr, JSNumPending, strconv.FormatUint(np, 10))
+				hdr = genHeader(hdr, JSLastSequence, strconv.FormatUint(lseq, 10))
+			}
+			// Decrement num pending. This is optimization and we do not continue to look it up for these operations.
+			np--
+		} else {
+			if len(hdr) == 0 {
+				hdr = fmt.Appendf(nil, dg, name, sm.subj, sm.seq, ts.Format(time.RFC3339Nano))
+			} else {
+				hdr = copyBytes(hdr)
+				hdr = genHeader(hdr, JSStream, name)
+				hdr = genHeader(hdr, JSSubject, sm.subj)
+				hdr = genHeader(hdr, JSSequence, strconv.FormatUint(sm.seq, 10))
+				hdr = genHeader(hdr, JSTimeStamp, ts.Format(time.RFC3339Nano))
+			}
+		}
+		// Track our lseq
+		lseq = sm.seq
+		// Send out our message.
+		mset.outq.send(newJSPubMsg(reply, _EMPTY_, _EMPTY_, hdr, sm.msg, nil, 0))
+		// Check if we have exceeded max bytes.
+		sentBytes += len(sm.subj) + len(sm.hdr) + len(sm.msg)
+		if sentBytes >= mb {
+			break
+		}
+	}
+
+	// If batch was requested send EOB.
+	if isBatchRequest {
+		// Update if the stream's lasts sequence has moved past our validThrough.
+		if mset.lastSeq() > validThrough {
+			np, _ = store.NumPending(seq, req.NextFor, false)
+		}
+		hdr := fmt.Appendf(nil, eob, np, lseq)
+		mset.outq.send(newJSPubMsg(reply, _EMPTY_, _EMPTY_, hdr, nil, nil, 0))
+	}
 }
 
 // processInboundJetStreamMsg handles processing messages bound for a stream.
 func (mset *stream) processInboundJetStreamMsg(_ *subscription, c *client, _ *Account, subject, reply string, rmsg []byte) {
 	hdr, msg := c.msgParts(copyBytes(rmsg)) // Need to copy.
-	mset.queueInbound(mset.msgs, subject, reply, hdr, msg, nil)
+	if mt, traceOnly := c.isMsgTraceEnabled(); mt != nil {
+		// If message is delivered, we need to disable the message trace headers
+		// to prevent a trace event to be generated when a stored message
+		// is delivered to a consumer and routed.
+		if !traceOnly {
+			disableTraceHeaders(c, hdr)
+		}
+		// This will add the jetstream event while in the client read loop.
+		// Since the event will be updated in a different go routine, the
+		// tracing object will have a separate reference to the JS trace
+		// object.
+		mt.addJetStreamEvent(mset.name())
+	}
+	mset.queueInbound(mset.msgs, subject, reply, hdr, msg, nil, c.pa.trace)
 }
 
 var (
@@ -4250,10 +4742,19 @@ var (
 	errStreamClosed      = errors.New("stream closed")
 	errInvalidMsgHandler = errors.New("undefined message handler")
 	errStreamMismatch    = errors.New("expected stream does not match")
+	errMsgTTLDisabled    = errors.New("message TTL disabled")
 )
 
 // processJetStreamMsg is where we try to actually process the stream msg.
-func (mset *stream) processJetStreamMsg(subject, reply string, hdr, msg []byte, lseq uint64, ts int64) error {
+func (mset *stream) processJetStreamMsg(subject, reply string, hdr, msg []byte, lseq uint64, ts int64, mt *msgTrace, sourced bool) (retErr error) {
+	if mt != nil {
+		// Only the leader/standalone will have mt!=nil. On exit, send the
+		// message trace event.
+		defer func() {
+			mt.sendEventFromJetStream(retErr)
+		}()
+	}
+
 	if mset.closed.Load() {
 		return errStreamClosed
 	}
@@ -4261,11 +4762,17 @@ func (mset *stream) processJetStreamMsg(subject, reply string, hdr, msg []byte, 
 	mset.mu.Lock()
 	s, store := mset.srv, mset.store
 
+	traceOnly := mt.traceOnly()
 	bumpCLFS := func() {
+		// Do not bump if tracing and not doing message delivery.
+		if traceOnly {
+			return
+		}
 		mset.clMu.Lock()
 		mset.clfs++
 		mset.clMu.Unlock()
 	}
+
 	// Apply the input subject transform if any
 	if mset.itr != nil {
 		ts, err := mset.itr.Match(subject)
@@ -4286,7 +4793,7 @@ func (mset *stream) processJetStreamMsg(subject, reply string, hdr, msg []byte, 
 	numConsumers := len(mset.consumers)
 	interestRetention := mset.cfg.Retention == InterestPolicy
 	// Snapshot if we are the leader and if we can respond.
-	isLeader, isSealed := mset.isLeader(), mset.cfg.Sealed
+	isLeader, isSealed := mset.isLeaderNodeState(), mset.cfg.Sealed
 	canRespond := doAck && len(reply) > 0 && isLeader
 
 	var resp = &JSPubAckResponse{}
@@ -4357,7 +4864,9 @@ func (mset *stream) processJetStreamMsg(subject, reply string, hdr, msg []byte, 
 		outq := mset.outq
 
 		// Certain checks have already been performed if in clustered mode, so only check if not.
-		if !isClustered {
+		// Note, for cluster mode but with message tracing (without message delivery), we need
+		// to do this check here since it was not done in processClusteredInboundMsg().
+		if !isClustered || traceOnly {
 			// Expected stream.
 			if sname := getExpectedStream(hdr); sname != _EMPTY_ && sname != name {
 				mset.mu.Unlock()
@@ -4372,11 +4881,26 @@ func (mset *stream) processJetStreamMsg(subject, reply string, hdr, msg []byte, 
 			}
 		}
 
+		// TTL'd messages are rejected entirely if TTLs are not enabled on the stream.
+		// Shouldn't happen in clustered mode since we should have already caught this
+		// in processClusteredInboundMsg, but needed here for non-clustered etc.
+		if ttl, _ := getMessageTTL(hdr); !sourced && ttl != 0 && !mset.cfg.AllowMsgTTL {
+			mset.mu.Unlock()
+			bumpCLFS()
+			if canRespond {
+				resp.PubAck = &PubAck{Stream: name}
+				resp.Error = NewJSMessageTTLDisabledError()
+				b, _ := json.Marshal(resp)
+				outq.sendMsg(reply, b)
+			}
+			return errMsgTTLDisabled
+		}
+
 		// Dedupe detection. This is done at the cluster level for dedupe detectiom above the
 		// lower layers. But we still need to pull out the msgId.
 		if msgId = getMsgId(hdr); msgId != _EMPTY_ {
 			// Do real check only if not clustered or traceOnly flag is set.
-			if !isClustered {
+			if !isClustered || traceOnly {
 				if dde := mset.checkMsgId(msgId); dde != nil {
 					mset.mu.Unlock()
 					bumpCLFS()
@@ -4392,10 +4916,16 @@ func (mset *stream) processJetStreamMsg(subject, reply string, hdr, msg []byte, 
 
 		// Expected last sequence per subject.
 		if seq, exists := getExpectedLastSeqPerSubject(hdr); exists {
+			// Allow override of the subject used for the check.
+			seqSubj := subject
+			if optSubj := getExpectedLastSeqPerSubjectForSubject(hdr); optSubj != _EMPTY_ {
+				seqSubj = optSubj
+			}
+
 			// TODO(dlc) - We could make a new store func that does this all in one.
 			var smv StoreMsg
 			var fseq uint64
-			sm, err := store.LoadLastMsg(subject, &smv)
+			sm, err := store.LoadLastMsg(seqSubj, &smv)
 			if sm != nil {
 				fseq = sm.seq
 			}
@@ -4476,7 +5006,14 @@ func (mset *stream) processJetStreamMsg(subject, reply string, hdr, msg []byte, 
 			default:
 				mset.mu.Unlock()
 				bumpCLFS()
-				return fmt.Errorf("rollup value invalid: %q", rollup)
+				err := fmt.Errorf("rollup value invalid: %q", rollup)
+				if canRespond {
+					resp.PubAck = &PubAck{Stream: name}
+					resp.Error = NewJSStreamRollupFailedError(err)
+					b, _ := json.Marshal(resp)
+					outq.sendMsg(reply, b)
+				}
+				return err
 			}
 		}
 	}
@@ -4545,6 +5082,12 @@ func (mset *stream) processJetStreamMsg(subject, reply string, hdr, msg []byte, 
 		ts = time.Now().UnixNano()
 	}
 
+	mt.updateJetStreamEvent(subject, noInterest)
+	if traceOnly {
+		mset.mu.Unlock()
+		return nil
+	}
+
 	// Skip msg here.
 	if noInterest {
 		mset.lseq = store.SkipMsg()
@@ -4608,22 +5151,41 @@ func (mset *stream) processJetStreamMsg(subject, reply string, hdr, msg []byte, 
 		}
 	}
 
+	// Find the message TTL if any.
+	ttl, err := getMessageTTL(hdr)
+	if err != nil {
+		if canRespond {
+			resp.PubAck = &PubAck{Stream: name}
+			resp.Error = NewJSMessageTTLInvalidError()
+			response, _ = json.Marshal(resp)
+			mset.outq.send(newJSPubMsg(reply, _EMPTY_, _EMPTY_, nil, response, nil, 0))
+		}
+		mset.mu.Unlock()
+		return err
+	}
+
 	// Store actual msg.
 	if lseq == 0 && ts == 0 {
-		seq, ts, err = store.StoreMsg(subject, hdr, msg)
+		seq, ts, err = store.StoreMsg(subject, hdr, msg, ttl)
 	} else {
 		// Make sure to take into account any message assignments that we had to skip (clfs).
 		seq = lseq + 1 - clfs
-		// Check for preAcks and the need to skip vs store.
+		// Check for preAcks and the need to clear it.
 		if mset.hasAllPreAcks(seq, subject) {
 			mset.clearAllPreAcks(seq)
-			store.SkipMsg()
-		} else {
-			err = store.StoreRawMsg(subject, hdr, msg, seq, ts)
 		}
+		err = store.StoreRawMsg(subject, hdr, msg, seq, ts, ttl)
 	}
 
 	if err != nil {
+		if isPermissionError(err) {
+			mset.mu.Unlock()
+			// messages in block cache could be lost in the worst case.
+			// In the clustered mode it is very highly unlikely as a result of replication.
+			mset.srv.DisableJetStream()
+			mset.srv.Warnf("Filesystem permission denied while writing msg, disabling JetStream: %v", err)
+			return err
+		}
 		// If we did not succeed put those values back and increment clfs in case we are clustered.
 		var state StreamState
 		mset.store.FastState(&state)
@@ -4676,11 +5238,14 @@ func (mset *stream) processJetStreamMsg(subject, reply string, hdr, msg []byte, 
 
 	// Check for republish.
 	if republish {
+		const ht = "NATS/1.0\r\nNats-Stream: %s\r\nNats-Subject: %s\r\nNats-Sequence: %d\r\nNats-Time-Stamp: %s\r\nNats-Last-Sequence: %d\r\n\r\n"
+		const htho = "NATS/1.0\r\nNats-Stream: %s\r\nNats-Subject: %s\r\nNats-Sequence: %d\r\nNats-Time-Stamp: %s\r\nNats-Last-Sequence: %d\r\nNats-Msg-Size: %d\r\n\r\n"
+		// When adding to existing headers, will use the fmt.Append version so this skips the headers from above.
+		const hoff = 10
+
 		tsStr := time.Unix(0, ts).UTC().Format(time.RFC3339Nano)
 		var rpMsg []byte
 		if len(hdr) == 0 {
-			const ht = "NATS/1.0\r\nNats-Stream: %s\r\nNats-Subject: %s\r\nNats-Sequence: %d\r\nNats-Time-Stamp: %s\r\nNats-Last-Sequence: %d\r\n\r\n"
-			const htho = "NATS/1.0\r\nNats-Stream: %s\r\nNats-Subject: %s\r\nNats-Sequence: %d\r\nNats-Time-Stamp: %s\r\nNats-Last-Sequence: %d\r\nNats-Msg-Size: %d\r\n\r\n"
 			if !thdrsOnly {
 				hdr = fmt.Appendf(nil, ht, name, subject, seq, tsStr, tlseq)
 				rpMsg = copyBytes(msg)
@@ -4688,19 +5253,16 @@ func (mset *stream) processJetStreamMsg(subject, reply string, hdr, msg []byte, 
 				hdr = fmt.Appendf(nil, htho, name, subject, seq, tsStr, tlseq, len(msg))
 			}
 		} else {
-			// Slow path.
-			hdr = genHeader(hdr, JSStream, name)
-			hdr = genHeader(hdr, JSSubject, subject)
-			hdr = genHeader(hdr, JSSequence, strconv.FormatUint(seq, 10))
-			hdr = genHeader(hdr, JSTimeStamp, tsStr)
-			hdr = genHeader(hdr, JSLastSequence, strconv.FormatUint(tlseq, 10))
+			// use hdr[:end:end] to make sure as we add we copy the original hdr.
+			end := len(hdr) - LEN_CR_LF
 			if !thdrsOnly {
+				hdr = fmt.Appendf(hdr[:end:end], ht[hoff:], name, subject, seq, tsStr, tlseq)
 				rpMsg = copyBytes(msg)
 			} else {
-				hdr = genHeader(hdr, JSMsgSize, strconv.Itoa(len(msg)))
+				hdr = fmt.Appendf(hdr[:end:end], htho[hoff:], name, subject, seq, tsStr, tlseq, len(msg))
 			}
 		}
-		mset.outq.send(newJSPubMsg(tsubj, _EMPTY_, _EMPTY_, copyBytes(hdr), rpMsg, nil, seq))
+		mset.outq.send(newJSPubMsg(tsubj, _EMPTY_, _EMPTY_, hdr, rpMsg, nil, seq))
 	}
 
 	// Send response here.
@@ -4782,24 +5344,14 @@ func (mset *stream) signalConsumersLoop() {
 // This will update and signal all consumers that match.
 func (mset *stream) signalConsumers(subj string, seq uint64) {
 	mset.clsMu.RLock()
-	if mset.csl == nil {
-		mset.clsMu.RUnlock()
+	defer mset.clsMu.RUnlock()
+	csl := mset.csl
+	if csl == nil {
 		return
 	}
-	r := mset.csl.Match(subj)
-	mset.clsMu.RUnlock()
-
-	if len(r.psubs) == 0 {
-		return
-	}
-	// Encode the sequence here.
-	var eseq [8]byte
-	var le = binary.LittleEndian
-	le.PutUint64(eseq[:], seq)
-	msg := eseq[:]
-	for _, sub := range r.psubs {
-		sub.icb(sub, nil, nil, subj, _EMPTY_, msg)
-	}
+	csl.Match(subj, func(o *consumer) {
+		o.processStreamSignal(seq)
+	})
 }
 
 // Internal message for use by jetstream subsystem.
@@ -4819,6 +5371,9 @@ func newJSPubMsg(dsubj, subj, reply string, hdr, msg []byte, o *consumer, seq ui
 	if pm != nil {
 		m = pm.(*jsPubMsg)
 		buf = m.buf[:0]
+		if hdr != nil {
+			hdr = append(m.hdr[:0], hdr...)
+		}
 	} else {
 		m = new(jsPubMsg)
 	}
@@ -4846,6 +5401,9 @@ func (pm *jsPubMsg) returnToPool() {
 	pm.subj, pm.dsubj, pm.reply, pm.hdr, pm.msg, pm.o = _EMPTY_, _EMPTY_, _EMPTY_, nil, nil, nil
 	if len(pm.buf) > 0 {
 		pm.buf = pm.buf[:0]
+	}
+	if len(pm.hdr) > 0 {
+		pm.hdr = pm.hdr[:0]
 	}
 	jsPubMsgPool.Put(pm)
 }
@@ -5024,9 +5582,9 @@ func (mset *stream) internalLoop() {
 			for _, im := range ims {
 				// If we are clustered we need to propose this message to the underlying raft group.
 				if isClustered {
-					mset.processClusteredInboundMsg(im.subj, im.rply, im.hdr, im.msg)
+					mset.processClusteredInboundMsg(im.subj, im.rply, im.hdr, im.msg, im.mt, false)
 				} else {
-					mset.processJetStreamMsg(im.subj, im.rply, im.hdr, im.msg, 0, 0)
+					mset.processJetStreamMsg(im.subj, im.rply, im.hdr, im.msg, 0, 0, im.mt, false)
 				}
 				im.returnToPool()
 			}
@@ -5064,9 +5622,7 @@ func (mset *stream) resetAndWaitOnConsumers() {
 
 	for _, o := range consumers {
 		if node := o.raftNode(); node != nil {
-			if o.IsLeader() {
-				node.StepDown()
-			}
+			node.StepDown()
 			node.Delete()
 		}
 		if o.isMonitorRunning() {
@@ -5178,8 +5734,6 @@ func (mset *stream) stop(deleteFlag, advisory bool) error {
 			n.Delete()
 			sa = mset.sa
 		} else {
-			// Always attempt snapshot on clean exit.
-			n.InstallSnapshot(mset.stateSnapshotLocked())
 			n.Stop()
 		}
 	}
@@ -5296,6 +5850,17 @@ func (mset *stream) getPublicConsumers() []*consumer {
 	return obs
 }
 
+// 2 minutes plus up to 30s jitter.
+const (
+	defaultCheckInterestStateT = 2 * time.Minute
+	defaultCheckInterestStateJ = 30
+)
+
+var (
+	checkInterestStateT = defaultCheckInterestStateT // Interval
+	checkInterestStateJ = defaultCheckInterestStateJ // Jitter (secs)
+)
+
 // Will check for interest retention and make sure messages
 // that have been acked are processed and removed.
 // This will check the ack floors of all consumers, and adjust our first sequence accordingly.
@@ -5339,10 +5904,10 @@ func (mset *stream) setConsumer(o *consumer) {
 	mset.clsMu.Lock()
 	mset.cList = append(mset.cList, o)
 	if mset.csl == nil {
-		mset.csl = NewSublistWithCache()
+		mset.csl = gsl.NewSublist[*consumer]()
 	}
 	for _, sub := range o.signalSubs() {
-		mset.csl.Insert(sub)
+		mset.csl.Insert(sub, o)
 	}
 	mset.clsMu.Unlock()
 }
@@ -5368,7 +5933,7 @@ func (mset *stream) removeConsumer(o *consumer) {
 		// Always remove from the leader sublist.
 		if mset.csl != nil {
 			for _, sub := range o.signalSubs() {
-				mset.csl.Remove(sub)
+				mset.csl.Remove(sub, o)
 			}
 		}
 		mset.clsMu.Unlock()
@@ -5390,7 +5955,7 @@ func (mset *stream) swapSigSubs(o *consumer, newFilters []string) {
 	if o.sigSubs != nil {
 		if mset.csl != nil {
 			for _, sub := range o.sigSubs {
-				mset.csl.Remove(sub)
+				mset.csl.Remove(sub, o)
 			}
 		}
 		o.sigSubs = nil
@@ -5398,19 +5963,17 @@ func (mset *stream) swapSigSubs(o *consumer, newFilters []string) {
 
 	if o.isLeader() {
 		if mset.csl == nil {
-			mset.csl = NewSublistWithCache()
+			mset.csl = gsl.NewSublist[*consumer]()
 		}
 		// If no filters are preset, add fwcs to sublist for that consumer.
 		if newFilters == nil {
-			sub := &subscription{subject: []byte(fwcs), icb: o.processStreamSignal}
-			mset.csl.Insert(sub)
-			o.sigSubs = append(o.sigSubs, sub)
+			mset.csl.Insert(fwcs, o)
+			o.sigSubs = append(o.sigSubs, fwcs)
 			// If there are filters, add their subjects to sublist.
 		} else {
 			for _, filter := range newFilters {
-				sub := &subscription{subject: []byte(filter), icb: o.processStreamSignal}
-				mset.csl.Insert(sub)
-				o.sigSubs = append(o.sigSubs, sub)
+				mset.csl.Insert(filter, o)
+				o.sigSubs = append(o.sigSubs, filter)
 			}
 		}
 	}
@@ -5643,16 +6206,18 @@ func (mset *stream) clearPreAck(o *consumer, seq uint64) {
 }
 
 // ackMsg is called into from a consumer when we have a WorkQueue or Interest Retention Policy.
-func (mset *stream) ackMsg(o *consumer, seq uint64) {
+// Returns whether the message at seq was removed as a result of the ACK.
+// (Or should be removed in the case of clustered streams, since it requires a message delete proposal)
+func (mset *stream) ackMsg(o *consumer, seq uint64) bool {
 	if seq == 0 {
-		return
+		return false
 	}
 
 	// Don't make this RLock(). We need to have only 1 running at a time to gauge interest across all consumers.
 	mset.mu.Lock()
 	if mset.closed.Load() || mset.cfg.Retention == LimitsPolicy {
 		mset.mu.Unlock()
-		return
+		return false
 	}
 
 	store := mset.store
@@ -5663,7 +6228,9 @@ func (mset *stream) ackMsg(o *consumer, seq uint64) {
 	if seq > state.LastSeq {
 		mset.registerPreAck(o, seq)
 		mset.mu.Unlock()
-		return
+		// We have not removed the message, but should still signal so we could retry later
+		// since we potentially need to remove it then.
+		return true
 	}
 
 	// Always clear pre-ack if here.
@@ -5672,7 +6239,7 @@ func (mset *stream) ackMsg(o *consumer, seq uint64) {
 	// Make sure this sequence is not below our first sequence.
 	if seq < state.FirstSeq {
 		mset.mu.Unlock()
-		return
+		return false
 	}
 
 	var shouldRemove bool
@@ -5684,18 +6251,35 @@ func (mset *stream) ackMsg(o *consumer, seq uint64) {
 	case InterestPolicy:
 		shouldRemove = mset.noInterest(seq, o)
 	}
-	mset.mu.Unlock()
 
 	// If nothing else to do.
 	if !shouldRemove {
-		return
+		mset.mu.Unlock()
+		return false
 	}
 
-	// If we are here we should attempt to remove.
-	if _, err := store.RemoveMsg(seq); err == ErrStoreEOF {
-		// This should not happen, but being pedantic.
-		mset.registerPreAckLock(o, seq)
+	if !mset.isClustered() {
+		mset.mu.Unlock()
+		// If we are here we should attempt to remove.
+		if _, err := store.RemoveMsg(seq); err == ErrStoreEOF {
+			// This should not happen, but being pedantic.
+			mset.registerPreAckLock(o, seq)
+		}
+		return true
 	}
+
+	// Only propose message deletion to the stream if we're consumer leader, otherwise all followers would also propose.
+	// We must be the consumer leader, since we know for sure we've stored the message and don't register as pre-ack.
+	if o != nil && !o.IsLeader() {
+		mset.mu.Unlock()
+		// Must still mark as removal if follower. If we become leader later, we must be able to retry the proposal.
+		return true
+	}
+
+	md := streamMsgDelete{Seq: seq, NoErase: true, Stream: mset.cfg.Name}
+	mset.node.ForwardProposal(encodeMsgDelete(&md))
+	mset.mu.Unlock()
+	return true
 }
 
 // Snapshot creates a snapshot for the stream and possibly consumers.
@@ -5719,8 +6303,12 @@ func (a *Account) RestoreStream(ncfg *StreamConfig, r io.Reader) (*stream, error
 	if err != nil {
 		return nil, err
 	}
+	js := jsa.js
+	if js == nil {
+		return nil, NewJSNotEnabledForAccountError()
+	}
 
-	cfg, apiErr := s.checkStreamCfg(ncfg, a)
+	cfg, apiErr := s.checkStreamCfg(ncfg, a, false)
 	if apiErr != nil {
 		return nil, apiErr
 	}
@@ -5753,6 +6341,22 @@ func (a *Account) RestoreStream(ncfg *StreamConfig, r io.Reader) (*stream, error
 	}
 	sdirCheck := filepath.Clean(sdir) + string(os.PathSeparator)
 
+	_, isClustered := jsa.jetStreamAndClustered()
+	jsa.usageMu.RLock()
+	selected, tier, hasTier := jsa.selectLimits(cfg.Replicas)
+	jsa.usageMu.RUnlock()
+	reserved := int64(0)
+	if hasTier {
+		if isClustered {
+			js.mu.RLock()
+			_, reserved = tieredStreamAndReservationCount(js.cluster.streams[a.Name], tier, &cfg)
+			js.mu.RUnlock()
+		} else {
+			reserved = jsa.tieredReservation(tier, &cfg)
+		}
+	}
+
+	var bc int64
 	tr := tar.NewReader(s2.NewReader(r))
 	for {
 		hdr, err := tr.Next()
@@ -5764,6 +6368,13 @@ func (a *Account) RestoreStream(ncfg *StreamConfig, r io.Reader) (*stream, error
 		}
 		if hdr.Typeflag != tar.TypeReg {
 			return nil, logAndReturnError()
+		}
+		bc += hdr.Size
+		js.mu.RLock()
+		err = js.checkAllLimits(&selected, &cfg, reserved, bc)
+		js.mu.RUnlock()
+		if err != nil {
+			return nil, err
 		}
 		fpath := filepath.Join(sdir, filepath.Clean(hdr.Name))
 		if !strings.HasPrefix(fpath, sdirCheck) {

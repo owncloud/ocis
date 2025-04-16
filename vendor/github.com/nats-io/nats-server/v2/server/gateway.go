@@ -1,4 +1,4 @@
-// Copyright 2018-2023 The NATS Authors
+// Copyright 2018-2024 The NATS Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -19,12 +19,14 @@ import (
 	"crypto/sha256"
 	"crypto/tls"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"math/rand"
 	"net"
 	"net/url"
 	"slices"
 	"strconv"
+	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -217,6 +219,8 @@ type gateway struct {
 	// interest-only mode "immediately", so the outbound should disregard
 	// the optimistic mode when checking for interest.
 	interestOnlyMode bool
+	// Name of the remote server
+	remoteName string
 }
 
 // Outbound subject interest entry.
@@ -298,17 +302,20 @@ func (r *RemoteGatewayOpts) clone() *RemoteGatewayOpts {
 
 // Ensure that gateway is properly configured.
 func validateGatewayOptions(o *Options) error {
-	if o.Gateway.Name == "" && o.Gateway.Port == 0 {
+	if o.Gateway.Name == _EMPTY_ && o.Gateway.Port == 0 {
 		return nil
 	}
-	if o.Gateway.Name == "" {
-		return fmt.Errorf("gateway has no name")
+	if o.Gateway.Name == _EMPTY_ {
+		return errors.New("gateway has no name")
+	}
+	if strings.Contains(o.Gateway.Name, " ") {
+		return ErrGatewayNameHasSpaces
 	}
 	if o.Gateway.Port == 0 {
 		return fmt.Errorf("gateway %q has no port specified (select -1 for random port)", o.Gateway.Name)
 	}
 	for i, g := range o.Gateway.Gateways {
-		if g.Name == "" {
+		if g.Name == _EMPTY_ {
 			return fmt.Errorf("gateway in the list %d has no name", i)
 		}
 		if len(g.URLs) == 0 {
@@ -528,6 +535,7 @@ func (s *Server) startGatewayAcceptLoop() {
 		Gateway:      opts.Gateway.Name,
 		GatewayNRP:   true,
 		Headers:      s.supportsHeaders(),
+		Proto:        s.getServerProto(),
 	}
 	// Unless in some tests we want to keep the old behavior, we are now
 	// (since v2.9.0) indicate that this server will switch all accounts
@@ -1035,6 +1043,10 @@ func (c *client) processGatewayInfo(info *Info) {
 	}
 	if isFirstINFO {
 		c.opts.Name = info.ID
+		// Get the protocol version from the INFO protocol. This will be checked
+		// to see if this connection supports message tracing for instance.
+		c.opts.Protocol = info.Proto
+		c.gw.remoteName = info.Name
 	}
 	c.mu.Unlock()
 
@@ -1900,7 +1912,7 @@ func (c *client) processGatewayAccountSub(accName string) error {
 // the sublist if present.
 // <Invoked from outbound connection's readLoop>
 func (c *client) processGatewayRUnsub(arg []byte) error {
-	accName, subject, queue, err := c.parseUnsubProto(arg)
+	_, accName, subject, queue, err := c.parseUnsubProto(arg, true, false)
 	if err != nil {
 		return fmt.Errorf("processGatewaySubjectUnsub %s", err.Error())
 	}
@@ -2400,7 +2412,7 @@ func (s *Server) gatewayUpdateSubInterest(accName string, sub *subscription, cha
 		if change < 0 {
 			return
 		}
-		entry = &sitally{n: 1, q: sub.queue != nil}
+		entry = &sitally{n: change, q: sub.queue != nil}
 		st[string(key)] = entry
 		first = true
 	} else {
@@ -2499,8 +2511,13 @@ var subPool = &sync.Pool{
 // that the message is not sent to a given gateway if for instance
 // it is known that this gateway has no interest in the account or
 // subject, etc..
+// When invoked from a LEAF connection, `checkLeafQF` should be passed as `true`
+// so that we skip any queue subscription interest that is not part of the
+// `c.pa.queues` filter (similar to what we do in `processMsgResults`). However,
+// when processing service imports, then this boolean should be passes as `false`,
+// regardless if it is a LEAF connection or not.
 // <Invoked from any client connection's readLoop>
-func (c *client) sendMsgToGateways(acc *Account, msg, subject, reply []byte, qgroups [][]byte) bool {
+func (c *client) sendMsgToGateways(acc *Account, msg, subject, reply []byte, qgroups [][]byte, checkLeafQF bool) bool {
 	// We had some times when we were sending across a GW with no subject, and the other side would break
 	// due to parser error. These need to be fixed upstream but also double check here.
 	if len(subject) == 0 {
@@ -2523,6 +2540,14 @@ func (c *client) sendMsgToGateways(acc *Account, msg, subject, reply []byte, qgr
 	if len(gws) == 0 {
 		return false
 	}
+
+	mt, _ := c.isMsgTraceEnabled()
+	if mt != nil {
+		pa := c.pa
+		msg = mt.setOriginAccountHeaderIfNeeded(c, acc, msg)
+		defer func() { c.pa = pa }()
+	}
+
 	var (
 		queuesa    = [512]byte{}
 		queues     = queuesa[:0]
@@ -2577,6 +2602,21 @@ func (c *client) sendMsgToGateways(acc *Account, msg, subject, reply []byte, qgr
 					qsubs := qr.qsubs[i]
 					if len(qsubs) > 0 {
 						queue := qsubs[0].queue
+						if checkLeafQF {
+							// Skip any queue that is not in the leaf's queue filter.
+							skip := true
+							for _, qn := range c.pa.queues {
+								if bytes.Equal(queue, qn) {
+									skip = false
+									break
+								}
+							}
+							if skip {
+								continue
+							}
+							// Now we still need to check that it was not delivered
+							// locally by checking the given `qgroups`.
+						}
 						add := true
 						for _, qn := range qgroups {
 							if bytes.Equal(queue, qn) {
@@ -2615,6 +2655,11 @@ func (c *client) sendMsgToGateways(acc *Account, msg, subject, reply []byte, qgr
 				mreply = append(mreply, reply...)
 			}
 		}
+
+		if mt != nil {
+			msg = mt.setHopHeader(c, msg)
+		}
+
 		// Setup the message header.
 		// Make sure we are an 'R' proto by default
 		c.msgb[0] = 'R'
@@ -2969,7 +3014,7 @@ func (c *client) handleGatewayReply(msg []byte) (processed bool) {
 		// we now need to send the message with the real subject to
 		// gateways in case they have interest on that reply subject.
 		if !isServiceReply {
-			c.sendMsgToGateways(acc, msg, c.pa.subject, c.pa.reply, queues)
+			c.sendMsgToGateways(acc, msg, c.pa.subject, c.pa.reply, queues, false)
 		}
 	} else if c.kind == GATEWAY {
 		// Only if we are a gateway connection should we try to route

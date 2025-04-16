@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 The NATS Authors
+ * Copyright 2022-2024 The NATS Authors
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -113,8 +113,12 @@ func (ac *AuthorizationRequestClaims) Validate(vr *ValidationResults) {
 
 // Encode tries to turn the auth request claims into a JWT string.
 func (ac *AuthorizationRequestClaims) Encode(pair nkeys.KeyPair) (string, error) {
+	return ac.EncodeWithSigner(pair, nil)
+}
+
+func (ac *AuthorizationRequestClaims) EncodeWithSigner(pair nkeys.KeyPair, fn SignFn) (string, error) {
 	ac.Type = AuthorizationRequestClaim
-	return ac.ClaimsData.encode(pair, ac)
+	return ac.ClaimsData.encode(pair, ac, fn)
 }
 
 // DecodeAuthorizationRequestClaims tries to parse an auth request claims from a JWT string
@@ -242,6 +246,10 @@ func (ar *AuthorizationResponseClaims) Validate(vr *ValidationResults) {
 
 // Encode tries to turn the auth request claims into a JWT string.
 func (ar *AuthorizationResponseClaims) Encode(pair nkeys.KeyPair) (string, error) {
+	return ar.EncodeWithSigner(pair, nil)
+}
+
+func (ar *AuthorizationResponseClaims) EncodeWithSigner(pair nkeys.KeyPair, fn SignFn) (string, error) {
 	ar.Type = AuthorizationResponseClaim
-	return ar.ClaimsData.encode(pair, ar)
+	return ar.ClaimsData.encode(pair, ar, fn)
 }

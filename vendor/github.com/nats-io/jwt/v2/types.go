@@ -309,7 +309,7 @@ func (l *Limits) Validate(vr *ValidationResults) {
 		}
 	}
 
-	if l.Times != nil && len(l.Times) > 0 {
+	if len(l.Times) > 0 {
 		for _, t := range l.Times {
 			t.Validate(vr)
 		}

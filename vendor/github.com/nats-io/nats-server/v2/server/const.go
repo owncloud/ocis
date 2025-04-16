@@ -1,4 +1,4 @@
-// Copyright 2012-2023 The NATS Authors
+// Copyright 2012-2024 The NATS Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -14,6 +14,7 @@
 package server
 
 import (
+	"regexp"
 	"runtime/debug"
 	"time"
 )
@@ -38,6 +39,8 @@ var (
 	gitCommit, serverVersion string
 	// trustedKeys is a whitespace separated array of trusted operator's public nkeys.
 	trustedKeys string
+	// SemVer regexp to validate the VERSION.
+	semVerRe = regexp.MustCompile(`^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$`)
 )
 
 func init() {
@@ -55,7 +58,7 @@ func init() {
 
 const (
 	// VERSION is the current version for the server.
-	VERSION = "2.10.22"
+	VERSION = "2.11.1"
 
 	// PROTO is the currently supported protocol.
 	// 0 was the original
@@ -170,6 +173,9 @@ const (
 
 	// MAX_HPUB_ARGS Maximum possible number of arguments from HPUB proto.
 	MAX_HPUB_ARGS = 4
+
+	// MAX_RSUB_ARGS Maximum possible number of arguments from a RS+/LS+ proto.
+	MAX_RSUB_ARGS = 6
 
 	// DEFAULT_MAX_CLOSED_CLIENTS is the maximum number of closed connections we hold onto.
 	DEFAULT_MAX_CLOSED_CLIENTS = 10000
