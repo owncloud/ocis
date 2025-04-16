@@ -1,4 +1,4 @@
-// Copyright 2017-2023 The NATS Authors
+// Copyright 2017-2024 The NATS Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -848,6 +848,7 @@ func (l *leafNodeOption) Apply(s *Server) {
 	opts := s.getOpts()
 	if l.tlsFirstChanged {
 		s.Noticef("Reloaded: LeafNode TLS HandshakeFirst value is: %v", opts.LeafNode.TLSHandshakeFirst)
+		s.Noticef("Reloaded: LeafNode TLS HandshakeFirstFallback value is: %v", opts.LeafNode.TLSHandshakeFirstFallback)
 		for _, r := range opts.LeafNode.Remotes {
 			s.Noticef("Reloaded: LeafNode Remote to %v TLS HandshakeFirst value is: %v", r.URLs, r.TLSHandshakeFirst)
 		}
@@ -914,6 +915,19 @@ func (l *leafNodeOption) Apply(s *Server) {
 		}
 		s.Noticef("Reloaded: LeafNode compression settings")
 	}
+}
+
+type noFastProdStallReload struct {
+	noopOption
+	noStall bool
+}
+
+func (l *noFastProdStallReload) Apply(s *Server) {
+	var not string
+	if l.noStall {
+		not = "not "
+	}
+	s.Noticef("Reloaded: fast producers will %sbe stalled", not)
 }
 
 // Compares options and disconnects clients that are no longer listed in pinned certs. Lock must not be held.
@@ -1155,6 +1169,7 @@ func imposeOrder(value any) error {
 		*OCSPConfig, map[string]string, JSLimitOpts, StoreCipher, *OCSPResponseCacheConfig:
 		// explicitly skipped types
 	case *AuthCallout:
+	case JSTpmOpts:
 	default:
 		// this will fail during unit tests
 		return fmt.Errorf("OnReload, sort or explicitly skip type: %s",
@@ -1354,14 +1369,16 @@ func (s *Server) diffOptions(newOpts *Options) ([]option, error) {
 			tmpNew.TLSConfig = nil
 			tmpOld.tlsConfigOpts = nil
 			tmpNew.tlsConfigOpts = nil
-			// We will allow TLSHandshakeFirst to me config reloaded. First,
+			// We will allow TLSHandshakeFirst to be config reloaded. First,
 			// we just want to detect if there was a change in the leafnodes{}
 			// block, and if not, we will check the remotes.
-			handshakeFirstChanged := tmpOld.TLSHandshakeFirst != tmpNew.TLSHandshakeFirst
+			handshakeFirstChanged := tmpOld.TLSHandshakeFirst != tmpNew.TLSHandshakeFirst ||
+				tmpOld.TLSHandshakeFirstFallback != tmpNew.TLSHandshakeFirstFallback
 			// If changed, set them (in the temporary variables) to false so that the
 			// rest of the comparison does not fail.
 			if handshakeFirstChanged {
 				tmpOld.TLSHandshakeFirst, tmpNew.TLSHandshakeFirst = false, false
+				tmpOld.TLSHandshakeFirstFallback, tmpNew.TLSHandshakeFirstFallback = 0, 0
 			} else if len(tmpOld.Remotes) == len(tmpNew.Remotes) {
 				// Since we don't support changes in the remotes, we will do a
 				// simple pass to see if there was a change of this field.
@@ -1623,6 +1640,12 @@ func (s *Server) diffOptions(newOpts *Options) ([]option, error) {
 			if new != old {
 				diffOpts = append(diffOpts, &profBlockRateReload{newValue: new})
 			}
+		case "configdigest":
+			// skip changes in config digest, this is handled already while
+			// processing the config.
+			continue
+		case "nofastproducerstall":
+			diffOpts = append(diffOpts, &noFastProdStallReload{noStall: newValue.(bool)})
 		default:
 			// TODO(ik): Implement String() on those options to have a nice print.
 			// %v is difficult to figure what's what, %+v print private fields and
@@ -1770,8 +1793,11 @@ func (s *Server) applyOptions(ctx *reloadContext, opts []option) {
 	if err := s.reloadOCSP(); err != nil {
 		s.Warnf("Can't restart OCSP features: %v", err)
 	}
-
-	s.Noticef("Reloaded server configuration")
+	var cd string
+	if newOpts.configDigest != "" {
+		cd = fmt.Sprintf("(%s)", newOpts.configDigest)
+	}
+	s.Noticef("Reloaded server configuration %s", cd)
 }
 
 // This will send a reset to the internal send loop.
@@ -2172,15 +2198,22 @@ func (s *Server) reloadClusterPermissions(oldPerms *RoutePermissions) {
 		}
 		deleteRoutedSubs = deleteRoutedSubs[:0]
 		route.mu.Lock()
+		pa, _, hasSubType := route.getRoutedSubKeyInfo()
 		for key, sub := range route.subs {
-			if an := strings.Fields(key)[0]; an != accName {
-				continue
+			// If this is not a pinned-account route, we need to get the
+			// account name from the key to see if we collect this sub.
+			if !pa {
+				if an := getAccNameFromRoutedSubKey(sub, key, hasSubType); an != accName {
+					continue
+				}
 			}
 			// If we can't export, we need to drop the subscriptions that
 			// we have on behalf of this route.
+			// Need to make a string cast here since canExport call sl.Match()
 			subj := string(sub.subject)
 			if !route.canExport(subj) {
-				delete(route.subs, string(sub.sid))
+				// We can use bytesToString() here.
+				delete(route.subs, bytesToString(sub.sid))
 				deleteRoutedSubs = append(deleteRoutedSubs, sub)
 			}
 		}

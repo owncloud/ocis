@@ -1,4 +1,4 @@
-// Copyright 2013-2024 The NATS Authors
+// Copyright 2013-2025 The NATS Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -415,14 +415,13 @@ func (s *Server) Connz(opts *ConnzOptions) (*Connz, error) {
 		// Fill in user if auth requested.
 		if auth {
 			ci.AuthorizedUser = client.getRawAuthUser()
-			// Add in account iff not the global account.
-			if client.acc != nil && (client.acc.Name != globalAccountName) {
-				ci.Account = client.acc.Name
+			if name := client.acc.GetName(); name != globalAccountName {
+				ci.Account = name
 			}
 			ci.JWT = client.opts.JWT
 			ci.IssuerKey = issuerForClient(client)
 			ci.Tags = client.tags
-			ci.NameTag = client.nameTag
+			ci.NameTag = client.acc.getNameTag()
 		}
 		client.mu.Unlock()
 		pconns[i] = ci
@@ -465,9 +464,11 @@ func (s *Server) Connz(opts *ConnzOptions) (*Connz, error) {
 		// Fill in user if auth requested.
 		if auth {
 			cc.AuthorizedUser = cc.user
-			// Add in account iff not the global account.
 			if cc.acc != _EMPTY_ && (cc.acc != globalAccountName) {
 				cc.Account = cc.acc
+				if acc, err := s.LookupAccount(cc.acc); err == nil {
+					cc.NameTag = acc.getNameTag()
+				}
 			}
 		}
 		pconns[i] = &cc.ConnInfo
@@ -831,6 +832,7 @@ func (s *Server) Routez(routezOpts *RoutezOptions) (*Routez, error) {
 			OutBytes:     r.outBytes,
 			NumSubs:      uint32(len(r.subs)),
 			Import:       r.opts.Import,
+			Pending:      int(r.out.pb),
 			Export:       r.opts.Export,
 			RTT:          r.getRTT().String(),
 			Start:        r.start,
@@ -925,21 +927,21 @@ type SubszOptions struct {
 
 // SubDetail is for verbose information for subscriptions.
 type SubDetail struct {
-	Account string `json:"account,omitempty"`
-	Subject string `json:"subject"`
-	Queue   string `json:"qgroup,omitempty"`
-	Sid     string `json:"sid"`
-	Msgs    int64  `json:"msgs"`
-	Max     int64  `json:"max,omitempty"`
-	Cid     uint64 `json:"cid"`
+	Account    string `json:"account,omitempty"`
+	AccountTag string `json:"account_tag,omitempty"`
+	Subject    string `json:"subject"`
+	Queue      string `json:"qgroup,omitempty"`
+	Sid        string `json:"sid"`
+	Msgs       int64  `json:"msgs"`
+	Max        int64  `json:"max,omitempty"`
+	Cid        uint64 `json:"cid"`
 }
 
 // Subscription client should be locked and guaranteed to be present.
 func newSubDetail(sub *subscription) SubDetail {
 	sd := newClientSubDetail(sub)
-	if sub.client.acc != nil {
-		sd.Account = sub.client.acc.Name
-	}
+	sd.Account = sub.client.acc.GetName()
+	sd.AccountTag = sub.client.acc.getNameTag()
 	return sd
 }
 
@@ -1122,20 +1124,16 @@ func (s *Server) HandleStacksz(w http.ResponseWriter, r *http.Request) {
 	ResponseHandler(w, r, buf[:n])
 }
 
-type monitorIPQueue struct {
+type IpqueueszStatusIPQ struct {
 	Pending    int `json:"pending"`
 	InProgress int `json:"in_progress,omitempty"`
 }
 
-func (s *Server) HandleIPQueuesz(w http.ResponseWriter, r *http.Request) {
-	all, err := decodeBool(w, r, "all")
-	if err != nil {
-		return
-	}
-	qfilter := r.URL.Query().Get("queues")
+type IpqueueszStatus map[string]IpqueueszStatusIPQ
 
-	queues := map[string]monitorIPQueue{}
-
+func (s *Server) Ipqueuesz(opts *IpqueueszOptions) *IpqueueszStatus {
+	all, qfilter := opts.All, opts.Filter
+	queues := IpqueueszStatus{}
 	s.ipQueues.Range(func(k, v any) bool {
 		var pending, inProgress int
 		name := k.(string)
@@ -1152,8 +1150,22 @@ func (s *Server) HandleIPQueuesz(w http.ResponseWriter, r *http.Request) {
 		} else if qfilter != _EMPTY_ && !strings.Contains(name, qfilter) {
 			return true
 		}
-		queues[name] = monitorIPQueue{Pending: pending, InProgress: inProgress}
+		queues[name] = IpqueueszStatusIPQ{Pending: pending, InProgress: inProgress}
 		return true
+	})
+	return &queues
+}
+
+func (s *Server) HandleIPQueuesz(w http.ResponseWriter, r *http.Request) {
+	all, err := decodeBool(w, r, "all")
+	if err != nil {
+		return
+	}
+	qfilter := r.URL.Query().Get("queues")
+
+	queues := s.Ipqueuesz(&IpqueueszOptions{
+		All:    all,
+		Filter: qfilter,
 	})
 
 	b, _ := json.MarshalIndent(queues, "", "   ")
@@ -1217,6 +1229,7 @@ type Varz struct {
 	Subscriptions         uint32                 `json:"subscriptions"`
 	HTTPReqStats          map[string]uint64      `json:"http_req_stats"`
 	ConfigLoadTime        time.Time              `json:"config_load_time"`
+	ConfigDigest          string                 `json:"config_digest"`
 	Tags                  jwt.TagList            `json:"tags,omitempty"`
 	TrustedOperatorsJwt   []string               `json:"trusted_operators_jwt,omitempty"`
 	TrustedOperatorsClaim []*jwt.OperatorClaims  `json:"trusted_operators_claim,omitempty"`
@@ -1231,6 +1244,7 @@ type JetStreamVarz struct {
 	Config *JetStreamConfig `json:"config,omitempty"`
 	Stats  *JetStreamStats  `json:"stats,omitempty"`
 	Meta   *MetaClusterInfo `json:"meta,omitempty"`
+	Limits *JSLimitOpts     `json:"limits,omitempty"`
 }
 
 // ClusterOptsVarz contains monitoring cluster information
@@ -1456,6 +1470,7 @@ func (s *Server) updateJszVarz(js *jetStream, v *JetStreamVarz, doConfig bool) {
 		js.mu.RUnlock()
 	}
 	v.Stats = js.usageStats()
+	v.Limits = &s.getOpts().JetStreamLimits
 	if mg := js.getMetaGroup(); mg != nil {
 		if ci := s.raftNodeToClusterInfo(mg); ci != nil {
 			v.Meta = &MetaClusterInfo{Name: ci.Name, Leader: ci.Leader, Peer: getHash(ci.Leader), Size: mg.ClusterSize()}
@@ -1590,6 +1605,11 @@ func (s *Server) createVarz(pcpu float64, rss int64) *Varz {
 		TrustedOperatorsJwt:   opts.operatorJWT,
 		TrustedOperatorsClaim: opts.TrustedOperators,
 	}
+	// If this is a leaf without cluster, reset the cluster name (that is otherwise
+	// set to the server name).
+	if s.leafNoCluster {
+		varz.Cluster.Name = _EMPTY_
+	}
 	if len(opts.Routes) > 0 {
 		varz.Cluster.URLs = urlsToStrings(opts.Routes)
 	}
@@ -1664,6 +1684,7 @@ func (s *Server) updateVarzConfigReloadableFields(v *Varz) {
 	v.TLSTimeout = opts.TLSTimeout
 	v.WriteDeadline = opts.WriteDeadline
 	v.ConfigLoadTime = s.configTime.UTC()
+	v.ConfigDigest = opts.configDigest
 	// Update route URLs if applicable
 	if s.varzUpdateRouteURLs {
 		v.Cluster.URLs = urlsToStrings(opts.Routes)
@@ -1833,6 +1854,7 @@ func (s *Server) HandleVarz(w http.ResponseWriter, r *http.Request) {
 		}
 		sv.Stats = v.Stats
 		sv.Meta = v.Meta
+		sv.Limits = v.Limits
 		s.mu.RUnlock()
 	}
 
@@ -1858,6 +1880,14 @@ type GatewayzOptions struct {
 
 	// AccountName will limit the list of accounts to that account name (makes Accounts implicit)
 	AccountName string `json:"account_name"`
+
+	// AccountSubscriptions indicates if subscriptions should be included in the results.
+	// Note: This is used only if `Accounts` or `AccountName` are specified.
+	AccountSubscriptions bool `json:"subscriptions"`
+
+	// AccountSubscriptionsDetail indicates if subscription details should be included in the results.
+	// Note: This is used only if `Accounts` or `AccountName` are specified.
+	AccountSubscriptionsDetail bool `json:"subscriptions_detail"`
 }
 
 // Gatewayz represents detailed information on Gateways
@@ -1880,12 +1910,14 @@ type RemoteGatewayz struct {
 
 // AccountGatewayz represents interest mode for this account
 type AccountGatewayz struct {
-	Name                  string `json:"name"`
-	InterestMode          string `json:"interest_mode"`
-	NoInterestCount       int    `json:"no_interest_count,omitempty"`
-	InterestOnlyThreshold int    `json:"interest_only_threshold,omitempty"`
-	TotalSubscriptions    int    `json:"num_subs,omitempty"`
-	NumQueueSubscriptions int    `json:"num_queue_subs,omitempty"`
+	Name                  string      `json:"name"`
+	InterestMode          string      `json:"interest_mode"`
+	NoInterestCount       int         `json:"no_interest_count,omitempty"`
+	InterestOnlyThreshold int         `json:"interest_only_threshold,omitempty"`
+	TotalSubscriptions    int         `json:"num_subs,omitempty"`
+	NumQueueSubscriptions int         `json:"num_queue_subs,omitempty"`
+	Subs                  []string    `json:"subscriptions_list,omitempty"`
+	SubsDetail            []SubDetail `json:"subscriptions_list_detail,omitempty"`
 }
 
 // Gatewayz returns a Gatewayz struct containing information about gateways.
@@ -2011,14 +2043,14 @@ func createOutboundAccountsGatewayz(opts *GatewayzOptions, gw *gateway) []*Accou
 		if !ok {
 			return nil
 		}
-		a := createAccountOutboundGatewayz(accName, ei)
+		a := createAccountOutboundGatewayz(opts, accName, ei)
 		return []*AccountGatewayz{a}
 	}
 
 	accs := make([]*AccountGatewayz, 0, 4)
 	gw.outsim.Range(func(k, v any) bool {
 		name := k.(string)
-		a := createAccountOutboundGatewayz(name, v)
+		a := createAccountOutboundGatewayz(opts, name, v)
 		accs = append(accs, a)
 		return true
 	})
@@ -2026,7 +2058,7 @@ func createOutboundAccountsGatewayz(opts *GatewayzOptions, gw *gateway) []*Accou
 }
 
 // Returns an AccountGatewayz for this gateway outbound connection
-func createAccountOutboundGatewayz(name string, ei any) *AccountGatewayz {
+func createAccountOutboundGatewayz(opts *GatewayzOptions, name string, ei any) *AccountGatewayz {
 	a := &AccountGatewayz{
 		Name:                  name,
 		InterestOnlyThreshold: gatewayMaxRUnsubBeforeSwitch,
@@ -2038,6 +2070,23 @@ func createAccountOutboundGatewayz(name string, ei any) *AccountGatewayz {
 		a.NoInterestCount = len(e.ni)
 		a.NumQueueSubscriptions = e.qsubs
 		a.TotalSubscriptions = int(e.sl.Count())
+		if opts.AccountSubscriptions || opts.AccountSubscriptionsDetail {
+			var subsa [4096]*subscription
+			subs := subsa[:0]
+			e.sl.All(&subs)
+			if opts.AccountSubscriptions {
+				a.Subs = make([]string, 0, len(subs))
+			} else {
+				a.SubsDetail = make([]SubDetail, 0, len(subs))
+			}
+			for _, sub := range subs {
+				if opts.AccountSubscriptions {
+					a.Subs = append(a.Subs, string(sub.subject))
+				} else {
+					a.SubsDetail = append(a.SubsDetail, newClientSubDetail(sub))
+				}
+			}
+		}
 		e.RUnlock()
 	} else {
 		a.InterestMode = Optimistic.String()
@@ -2129,6 +2178,10 @@ func (s *Server) HandleGatewayz(w http.ResponseWriter, r *http.Request) {
 	s.httpReqStats[GatewayzPath]++
 	s.mu.Unlock()
 
+	subs, subsDet, err := decodeSubs(w, r)
+	if err != nil {
+		return
+	}
 	accs, err := decodeBool(w, r, "accs")
 	if err != nil {
 		return
@@ -2140,9 +2193,11 @@ func (s *Server) HandleGatewayz(w http.ResponseWriter, r *http.Request) {
 	}
 
 	opts := &GatewayzOptions{
-		Name:        gwName,
-		Accounts:    accs,
-		AccountName: accName,
+		Name:                       gwName,
+		Accounts:                   accs,
+		AccountName:                accName,
+		AccountSubscriptions:       subs,
+		AccountSubscriptionsDetail: subsDet,
 	}
 	gw, err := s.Gatewayz(opts)
 	if err != nil {
@@ -2282,7 +2337,7 @@ type AccountStatz struct {
 	Accounts []*AccountStat `json:"account_statz"`
 }
 
-// LeafzOptions are options passed to Leafz
+// AccountStatzOptions are options passed to account stats requests.
 type AccountStatzOptions struct {
 	Accounts      []string `json:"accounts"`
 	IncludeUnused bool     `json:"include_unused"`
@@ -2703,27 +2758,27 @@ func (s *Server) accountInfo(accName string) (*AccountInfo, error) {
 		mappings[src] = dests
 	}
 	return &AccountInfo{
-		accName,
-		a.updated.UTC(),
-		isSys,
-		a.expired.Load(),
-		!a.incomplete,
-		a.js != nil,
-		a.numLocalLeafNodes(),
-		a.numLocalConnections(),
-		a.sl.Count(),
-		mappings,
-		exports,
-		imports,
-		a.claimJWT,
-		a.Issuer,
-		a.nameTag,
-		a.tags,
-		claim,
-		vrIssues,
-		collectRevocations(a.usersRevoked),
-		a.sl.Stats(),
-		responses,
+		AccountName: accName,
+		LastUpdate:  a.updated.UTC(),
+		IsSystem:    isSys,
+		Expired:     a.expired.Load(),
+		Complete:    !a.incomplete,
+		JetStream:   a.js != nil,
+		LeafCnt:     a.numLocalLeafNodes(),
+		ClientCnt:   a.numLocalConnections(),
+		SubCnt:      a.sl.Count(),
+		Mappings:    mappings,
+		Exports:     exports,
+		Imports:     imports,
+		Jwt:         a.claimJWT,
+		IssuerKey:   a.Issuer,
+		NameTag:     a.getNameTagLocked(),
+		Tags:        a.tags,
+		Claim:       claim,
+		Vr:          vrIssues,
+		RevokedUser: collectRevocations(a.usersRevoked),
+		Sublist:     a.sl.Stats(),
+		Responses:   responses,
 	}, nil
 }
 
@@ -2747,6 +2802,7 @@ type HealthzOptions struct {
 	JSEnabled     bool   `json:"js-enabled,omitempty"`
 	JSEnabledOnly bool   `json:"js-enabled-only,omitempty"`
 	JSServerOnly  bool   `json:"js-server-only,omitempty"`
+	JSMetaOnly    bool   `json:"js-meta-only,omitempty"`
 	Account       string `json:"account,omitempty"`
 	Stream        string `json:"stream,omitempty"`
 	Consumer      string `json:"consumer,omitempty"`
@@ -2758,6 +2814,18 @@ type ProfilezOptions struct {
 	Name     string        `json:"name"`
 	Debug    int           `json:"debug"`
 	Duration time.Duration `json:"duration,omitempty"`
+}
+
+// IpqueueszOptions are options passed to Ipqueuesz
+type IpqueueszOptions struct {
+	All    bool   `json:"all"`
+	Filter string `json:"filter"`
+}
+
+// RaftzOptions are options passed to Raftz
+type RaftzOptions struct {
+	AccountFilter string `json:"account"`
+	GroupFilter   string `json:"group"`
 }
 
 // StreamDetail shows information about the stream state and its consumers.
@@ -2803,6 +2871,7 @@ type JSInfo struct {
 	Now      time.Time       `json:"now"`
 	Disabled bool            `json:"disabled,omitempty"`
 	Config   JetStreamConfig `json:"config,omitempty"`
+	Limits   *JSLimitOpts    `json:"limits,omitempty"`
 	JetStreamStats
 	Streams   int              `json:"streams"`
 	Consumers int              `json:"consumers"`
@@ -2970,6 +3039,8 @@ func (s *Server) Jsz(opts *JSzOptions) (*JSInfo, error) {
 		jsi.Disabled = true
 		return jsi, nil
 	}
+
+	jsi.Limits = &s.getOpts().JetStreamLimits
 
 	js.mu.RLock()
 	isLeader := js.cluster == nil || js.cluster.isLeader()
@@ -3212,6 +3283,10 @@ func (s *Server) HandleHealthz(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
+	jsMetaOnly, err := decodeBool(w, r, "js-meta-only")
+	if err != nil {
+		return
+	}
 
 	includeDetails, err := decodeBool(w, r, "details")
 	if err != nil {
@@ -3222,16 +3297,18 @@ func (s *Server) HandleHealthz(w http.ResponseWriter, r *http.Request) {
 		JSEnabled:     jsEnabled,
 		JSEnabledOnly: jsEnabledOnly,
 		JSServerOnly:  jsServerOnly,
+		JSMetaOnly:    jsMetaOnly,
 		Account:       r.URL.Query().Get("account"),
 		Stream:        r.URL.Query().Get("stream"),
 		Consumer:      r.URL.Query().Get("consumer"),
 		Details:       includeDetails,
 	})
 
-	code := http.StatusOK
+	code := hs.StatusCode
 	if hs.Error != _EMPTY_ {
 		s.Warnf("Healthcheck failed: %q", hs.Error)
-		code = hs.StatusCode
+	} else if len(hs.Errors) != 0 {
+		s.Warnf("Healthcheck failed: %d errors", len(hs.Errors))
 	}
 	// Remove StatusCode from JSON representation when responding via HTTP
 	// since this is already in the response.
@@ -3311,6 +3388,11 @@ func (s *Server) healthz(opts *HealthzOptions) *HealthStatus {
 				Error: err.Error(),
 			})
 		}
+		return health
+	}
+
+	// If JSServerOnly is true, then do not check further accounts, streams and consumers.
+	if opts.JSServerOnly {
 		return health
 	}
 
@@ -3492,6 +3574,7 @@ func (s *Server) healthz(opts *HealthzOptions) *HealthStatus {
 		}
 		return health
 	}
+
 	// If we are not current with the meta leader.
 	if !meta.Healthy() {
 		if !details {
@@ -3505,11 +3588,6 @@ func (s *Server) healthz(opts *HealthzOptions) *HealthStatus {
 				},
 			}
 		}
-		return health
-	}
-
-	// If JSServerOnly is true, then do not check further accounts, streams and consumers.
-	if opts.JSServerOnly {
 		return health
 	}
 
@@ -3527,6 +3605,11 @@ func (s *Server) healthz(opts *HealthzOptions) *HealthStatus {
 				},
 			}
 		}
+		return health
+	}
+
+	// Skips doing full healthz and only checks the meta leader.
+	if opts.JSMetaOnly {
 		return health
 	}
 
@@ -3675,27 +3758,27 @@ func (s *Server) healthz(opts *HealthzOptions) *HealthStatus {
 
 		for stream, sa := range asa {
 			// Make sure we can look up
-			if !js.isStreamHealthy(acc, sa) {
+			if err := js.isStreamHealthy(acc, sa); err != nil {
 				if !details {
 					health.Status = na
-					health.Error = fmt.Sprintf("JetStream stream '%s > %s' is not current", accName, stream)
+					health.Error = fmt.Sprintf("JetStream stream '%s > %s' is not current: %s", accName, stream, err)
 					return health
 				}
 				health.Errors = append(health.Errors, HealthzError{
 					Type:    HealthzErrorStream,
 					Account: accName,
 					Stream:  stream,
-					Error:   fmt.Sprintf("JetStream stream '%s > %s' is not current", accName, stream),
+					Error:   fmt.Sprintf("JetStream stream '%s > %s' is not current: %s", accName, stream, err),
 				})
 				continue
 			}
 			mset, _ := acc.lookupStream(stream)
 			// Now check consumers.
 			for consumer, ca := range sa.consumers {
-				if !js.isConsumerHealthy(mset, consumer, ca) {
+				if err := js.isConsumerHealthy(mset, consumer, ca); err != nil {
 					if !details {
 						health.Status = na
-						health.Error = fmt.Sprintf("JetStream consumer '%s > %s > %s' is not current", acc, stream, consumer)
+						health.Error = fmt.Sprintf("JetStream consumer '%s > %s > %s' is not current: %s", acc, stream, consumer, err)
 						return health
 					}
 					health.Errors = append(health.Errors, HealthzError{
@@ -3703,7 +3786,7 @@ func (s *Server) healthz(opts *HealthzOptions) *HealthStatus {
 						Account:  accName,
 						Stream:   stream,
 						Consumer: consumer,
-						Error:    fmt.Sprintf("JetStream consumer '%s > %s > %s' is not current", acc, stream, consumer),
+						Error:    fmt.Sprintf("JetStream consumer '%s > %s > %s' is not current: %s", acc, stream, consumer, err),
 					})
 				}
 			}
@@ -3812,6 +3895,8 @@ type RaftzGroupPeer struct {
 	LastSeen            string `json:"last_seen,omitempty"`
 }
 
+type RaftzStatus map[string]map[string]RaftzGroup
+
 func (s *Server) HandleRaftz(w http.ResponseWriter, r *http.Request) {
 	if s.raftNodes == nil {
 		w.WriteHeader(404)
@@ -3819,20 +3904,34 @@ func (s *Server) HandleRaftz(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	gfilter := r.URL.Query().Get("group")
-	afilter := r.URL.Query().Get("acc")
+	groups := s.Raftz(&RaftzOptions{
+		AccountFilter: r.URL.Query().Get("acc"),
+		GroupFilter:   r.URL.Query().Get("group"),
+	})
+
+	if groups == nil {
+		w.WriteHeader(404)
+		w.Write([]byte("No Raft nodes returned, check supplied filters"))
+		return
+	}
+
+	b, _ := json.MarshalIndent(groups, "", "   ")
+	ResponseHandler(w, r, b)
+}
+
+func (s *Server) Raftz(opts *RaftzOptions) *RaftzStatus {
+	afilter, gfilter := opts.AccountFilter, opts.GroupFilter
+
 	if afilter == _EMPTY_ {
 		if sys := s.SystemAccount(); sys != nil {
 			afilter = sys.Name
 		} else {
-			w.WriteHeader(404)
-			w.Write([]byte("System account not found, the server may be shutting down"))
-			return
+			return nil
 		}
 	}
 
 	groups := map[string]RaftNode{}
-	infos := map[string]map[string]RaftzGroup{} // account -> group ID
+	infos := RaftzStatus{} // account -> group ID
 
 	s.rnMu.RLock()
 	if gfilter != _EMPTY_ {
@@ -3858,12 +3957,6 @@ func (s *Server) HandleRaftz(w http.ResponseWriter, r *http.Request) {
 	}
 	s.rnMu.RUnlock()
 
-	if len(groups) == 0 {
-		w.WriteHeader(404)
-		w.Write([]byte("No Raft nodes found, does the specified account/group exist?"))
-		return
-	}
-
 	for name, rg := range groups {
 		n, ok := rg.(*raft)
 		if n == nil || !ok {
@@ -3886,7 +3979,7 @@ func (s *Server) HandleRaftz(w http.ResponseWriter, r *http.Request) {
 			Applied:       n.applied,
 			CatchingUp:    n.catchup != nil,
 			Leader:        n.leader,
-			EverHadLeader: n.pleader,
+			EverHadLeader: n.pleader.Load(),
 			Term:          n.term,
 			Vote:          n.vote,
 			PTerm:         n.pterm,
@@ -3917,6 +4010,5 @@ func (s *Server) HandleRaftz(w http.ResponseWriter, r *http.Request) {
 		infos[n.accName][name] = info
 	}
 
-	b, _ := json.MarshalIndent(infos, "", "   ")
-	ResponseHandler(w, r, b)
+	return &infos
 }

@@ -1,4 +1,4 @@
-// Copyright 2023 The NATS Authors
+// Copyright 2024 The NATS Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -11,19 +11,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//go:build !go1.20
-// +build !go1.20
+//go:build !windows
 
-// A Go client for the NATS messaging system (https://nats.io).
-package nats
+package tpm
 
-import (
-	"math/rand"
-	"time"
-)
+import "fmt"
 
-func init() {
-	// This is not needed since Go 1.20 because now rand.Seed always happens
-	// by default (uses runtime.fastrand64 instead as source).
-	rand.Seed(time.Now().UnixNano())
+// LoadJetStreamEncryptionKeyFromTPM here is a stub for unsupported platforms.
+func LoadJetStreamEncryptionKeyFromTPM(srkPassword, jsKeyFile, jsKeyPassword string, pcr int) (string, error) {
+	return "", fmt.Errorf("TPM functionality is not supported on this platform")
 }
