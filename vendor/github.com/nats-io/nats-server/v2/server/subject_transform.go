@@ -1,4 +1,4 @@
-// Copyright 2023 The NATS Authors
+// Copyright 2023-2024 The NATS Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -459,7 +459,16 @@ func (tr *subjectTransform) TransformTokenizedSubject(tokens []string) string {
 				}
 				b.WriteString(tr.getHashPartition(keyForHashing, int(tr.dtokmfintargs[i])))
 			case Wildcard: // simple substitution
-				b.WriteString(tokens[tr.dtokmftokindexesargs[i][0]])
+				switch {
+				case len(tr.dtokmftokindexesargs) < i:
+					break
+				case len(tr.dtokmftokindexesargs[i]) < 1:
+					break
+				case len(tokens) <= tr.dtokmftokindexesargs[i][0]:
+					break
+				default:
+					b.WriteString(tokens[tr.dtokmftokindexesargs[i][0]])
+				}
 			case SplitFromLeft:
 				sourceToken := tokens[tr.dtokmftokindexesargs[i][0]]
 				sourceTokenLen := len(sourceToken)

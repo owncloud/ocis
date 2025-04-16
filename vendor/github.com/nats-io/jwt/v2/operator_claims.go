@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 The NATS Authors
+ * Copyright 2018-2024 The NATS Authors
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -191,6 +191,10 @@ func (oc *OperatorClaims) DidSign(op Claims) bool {
 
 // Encode the claims into a JWT string
 func (oc *OperatorClaims) Encode(pair nkeys.KeyPair) (string, error) {
+	return oc.EncodeWithSigner(pair, nil)
+}
+
+func (oc *OperatorClaims) EncodeWithSigner(pair nkeys.KeyPair, fn SignFn) (string, error) {
 	if !nkeys.IsValidPublicOperatorKey(oc.Subject) {
 		return "", errors.New("expected subject to be an operator public key")
 	}
@@ -199,7 +203,7 @@ func (oc *OperatorClaims) Encode(pair nkeys.KeyPair) (string, error) {
 		return "", err
 	}
 	oc.Type = OperatorClaim
-	return oc.ClaimsData.encode(pair, oc)
+	return oc.ClaimsData.encode(pair, oc, fn)
 }
 
 func (oc *OperatorClaims) ClaimType() ClaimType {

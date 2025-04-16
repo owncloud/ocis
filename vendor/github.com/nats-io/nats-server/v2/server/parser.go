@@ -1,4 +1,4 @@
-// Copyright 2012-2020 The NATS Authors
+// Copyright 2012-2024 The NATS Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -35,20 +35,22 @@ type parseState struct {
 }
 
 type pubArg struct {
-	arg     []byte
-	pacache []byte
-	origin  []byte
-	account []byte
-	subject []byte
-	deliver []byte
-	mapped  []byte
-	reply   []byte
-	szb     []byte
-	hdb     []byte
-	queues  [][]byte
-	size    int
-	hdr     int
-	psi     []*serviceImport
+	arg       []byte
+	pacache   []byte
+	origin    []byte
+	account   []byte
+	subject   []byte
+	deliver   []byte
+	mapped    []byte
+	reply     []byte
+	szb       []byte
+	hdb       []byte
+	queues    [][]byte
+	size      int
+	hdr       int
+	psi       []*serviceImport
+	trace     *msgTrace
+	delivered bool // Only used for service imports
 }
 
 // Parser constants
@@ -285,7 +287,11 @@ func (c *client) parse(buf []byte) error {
 				if trace {
 					c.traceInOp("HPUB", arg)
 				}
-				if err := c.processHeaderPub(arg); err != nil {
+				var remaining []byte
+				if i < len(buf) {
+					remaining = buf[i+1:]
+				}
+				if err := c.processHeaderPub(arg, remaining); err != nil {
 					return err
 				}
 
@@ -483,11 +489,19 @@ func (c *client) parse(buf []byte) error {
 				c.msgBuf = buf[c.as : i+1]
 			}
 
+			var mt *msgTrace
+			if c.pa.hdr > 0 {
+				mt = c.initMsgTrace()
+			}
 			// Check for mappings.
 			if (c.kind == CLIENT || c.kind == LEAF) && c.in.flags.isSet(hasMappings) {
 				changed := c.selectMappedSubject()
-				if trace && changed {
-					c.traceInOp("MAPPING", []byte(fmt.Sprintf("%s -> %s", c.pa.mapped, c.pa.subject)))
+				if changed {
+					if trace {
+						c.traceInOp("MAPPING", []byte(fmt.Sprintf("%s -> %s", c.pa.mapped, c.pa.subject)))
+					}
+					// c.pa.subject is the subject the original is now mapped to.
+					mt.addSubjectMappingEvent(c.pa.subject)
 				}
 			}
 			if trace {
@@ -495,11 +509,15 @@ func (c *client) parse(buf []byte) error {
 			}
 
 			c.processInboundMsg(c.msgBuf)
+
+			mt.sendEvent()
 			c.argBuf, c.msgBuf, c.header = nil, nil, nil
 			c.drop, c.as, c.state = 0, i+1, OP_START
 			// Drop all pub args
 			c.pa.arg, c.pa.pacache, c.pa.origin, c.pa.account, c.pa.subject, c.pa.mapped = nil, nil, nil, nil, nil, nil
 			c.pa.reply, c.pa.hdr, c.pa.size, c.pa.szb, c.pa.hdb, c.pa.queues = nil, -1, 0, nil, nil, nil
+			c.pa.trace = nil
+			c.pa.delivered = false
 			lmsg = false
 		case OP_A:
 			switch b {
@@ -788,7 +806,8 @@ func (c *client) parse(buf []byte) error {
 							c.traceInOp("LS-", arg)
 						}
 					}
-					err = c.processRemoteUnsub(arg)
+					leafUnsub := c.op == 'L' || c.op == 'l'
+					err = c.processRemoteUnsub(arg, leafUnsub)
 				case GATEWAY:
 					if trace {
 						c.traceInOp("RS-", arg)
@@ -1270,7 +1289,7 @@ func (c *client) clonePubArg(lmsg bool) error {
 		if c.pa.hdr < 0 {
 			return c.processPub(c.argBuf)
 		} else {
-			return c.processHeaderPub(c.argBuf)
+			return c.processHeaderPub(c.argBuf, nil)
 		}
 	}
 }

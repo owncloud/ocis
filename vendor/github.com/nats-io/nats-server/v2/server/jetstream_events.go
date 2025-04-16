@@ -1,4 +1,4 @@
-// Copyright 2020-2021 The NATS Authors
+// Copyright 2020-2025 The NATS Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -18,13 +18,22 @@ import (
 	"time"
 )
 
-func (s *Server) publishAdvisory(acc *Account, subject string, adv any) {
+// publishAdvisory sends the given advisory into the account. Returns true if
+// it was sent, false if not (i.e. due to lack of interest or a marshal error).
+func (s *Server) publishAdvisory(acc *Account, subject string, adv any) bool {
 	if acc == nil {
 		acc = s.SystemAccount()
 		if acc == nil {
-			return
+			return false
 		}
 	}
+
+	// If there is no one listening for this advisory then save ourselves the effort
+	// and don't bother encoding the JSON or sending it.
+	if sl := acc.sl; (sl != nil && !sl.HasInterest(subject)) && !s.hasGatewayInterest(acc.Name, subject) {
+		return false
+	}
+
 	ej, err := json.Marshal(adv)
 	if err == nil {
 		err = s.sendInternalAccountMsg(acc, subject, ej)
@@ -34,6 +43,7 @@ func (s *Server) publishAdvisory(acc *Account, subject string, adv any) {
 	} else {
 		s.Warnf("Advisory could not be serialized for account %q: %v", acc.Name, err)
 	}
+	return err == nil
 }
 
 // JSAPIAudit is an advisory about administrative actions taken on JetStream
@@ -79,6 +89,18 @@ type JSConsumerActionAdvisory struct {
 }
 
 const JSConsumerActionAdvisoryType = "io.nats.jetstream.advisory.v1.consumer_action"
+
+// JSConsumerPauseAdvisory indicates that a consumer was paused or unpaused
+type JSConsumerPauseAdvisory struct {
+	TypedEvent
+	Stream     string    `json:"stream"`
+	Consumer   string    `json:"consumer"`
+	Paused     bool      `json:"paused"`
+	PauseUntil time.Time `json:"pause_until,omitempty"`
+	Domain     string    `json:"domain,omitempty"`
+}
+
+const JSConsumerPauseAdvisoryType = "io.nats.jetstream.advisory.v1.consumer_pause"
 
 // JSConsumerAckMetric is a metric published when a user acknowledges a message, the
 // number of these that will be published is dependent on SampleFrequency
@@ -257,6 +279,33 @@ type JSConsumerQuorumLostAdvisory struct {
 	Consumer string      `json:"consumer"`
 	Replicas []*PeerInfo `json:"replicas"`
 	Domain   string      `json:"domain,omitempty"`
+}
+
+const JSConsumerGroupPinnedAdvisoryType = "io.nats.jetstream.advisory.v1.consumer_group_pinned"
+
+// JSConsumerGroupPinnedAdvisory that a group switched to a new pinned client
+type JSConsumerGroupPinnedAdvisory struct {
+	TypedEvent
+	Account        string `json:"account,omitempty"`
+	Stream         string `json:"stream"`
+	Consumer       string `json:"consumer"`
+	Domain         string `json:"domain,omitempty"`
+	Group          string `json:"group"`
+	PinnedClientId string `json:"pinned_id"`
+}
+
+const JSConsumerGroupUnpinnedAdvisoryType = "io.nats.jetstream.advisory.v1.consumer_group_unpinned"
+
+// JSConsumerGroupUnpinnedAdvisory indicates that a pin was lost
+type JSConsumerGroupUnpinnedAdvisory struct {
+	TypedEvent
+	Account  string `json:"account,omitempty"`
+	Stream   string `json:"stream"`
+	Consumer string `json:"consumer"`
+	Domain   string `json:"domain,omitempty"`
+	Group    string `json:"group"`
+	// one of "admin" or "timeout", could be an enum up to the implementor to decide
+	Reason string `json:"reason"`
 }
 
 // JSServerOutOfStorageAdvisoryType is sent when the server is out of storage space.

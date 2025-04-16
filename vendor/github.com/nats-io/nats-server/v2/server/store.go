@@ -1,4 +1,4 @@
-// Copyright 2019-2024 The NATS Authors
+// Copyright 2019-2025 The NATS Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -18,6 +18,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"os"
 	"strings"
 	"time"
 	"unsafe"
@@ -65,6 +66,8 @@ var (
 	ErrSequenceMismatch = errors.New("expected sequence does not match store")
 	// ErrCorruptStreamState
 	ErrCorruptStreamState = errors.New("stream state snapshot is corrupt")
+	// ErrTooManyResults
+	ErrTooManyResults = errors.New("too many matching results for request")
 )
 
 // StoreMsg is the stored message format for messages that are retained by the Store layer.
@@ -81,32 +84,39 @@ type StoreMsg struct {
 // For the cases where its a single message we will also supply sequence number and subject.
 type StorageUpdateHandler func(msgs, bytes int64, seq uint64, subj string)
 
+// Used to call back into the upper layers to report on newly created subject delete markers.
+type SubjectDeleteMarkerUpdateHandler func(*inMsg)
+
 type StreamStore interface {
-	StoreMsg(subject string, hdr, msg []byte) (uint64, int64, error)
-	StoreRawMsg(subject string, hdr, msg []byte, seq uint64, ts int64) error
+	StoreMsg(subject string, hdr, msg []byte, ttl int64) (uint64, int64, error)
+	StoreRawMsg(subject string, hdr, msg []byte, seq uint64, ts int64, ttl int64) error
 	SkipMsg() uint64
 	SkipMsgs(seq uint64, num uint64) error
 	LoadMsg(seq uint64, sm *StoreMsg) (*StoreMsg, error)
 	LoadNextMsg(filter string, wc bool, start uint64, smp *StoreMsg) (sm *StoreMsg, skip uint64, err error)
 	LoadNextMsgMulti(sl *Sublist, start uint64, smp *StoreMsg) (sm *StoreMsg, skip uint64, err error)
 	LoadLastMsg(subject string, sm *StoreMsg) (*StoreMsg, error)
+	LoadPrevMsg(start uint64, smp *StoreMsg) (sm *StoreMsg, err error)
 	RemoveMsg(seq uint64) (bool, error)
 	EraseMsg(seq uint64) (bool, error)
 	Purge() (uint64, error)
-	PurgeEx(subject string, seq, keep uint64) (uint64, error)
+	PurgeEx(subject string, seq, keep uint64, noMarkers bool) (uint64, error)
 	Compact(seq uint64) (uint64, error)
 	Truncate(seq uint64) error
 	GetSeqFromTime(t time.Time) uint64
 	FilteredState(seq uint64, subject string) SimpleState
 	SubjectsState(filterSubject string) map[string]SimpleState
 	SubjectsTotals(filterSubject string) map[string]uint64
+	MultiLastSeqs(filters []string, maxSeq uint64, maxAllowed int) ([]uint64, error)
 	NumPending(sseq uint64, filter string, lastPerSubject bool) (total, validThrough uint64)
+	NumPendingMulti(sseq uint64, sl *Sublist, lastPerSubject bool) (total, validThrough uint64)
 	State() StreamState
 	FastState(*StreamState)
 	EncodedStreamState(failed uint64) (enc []byte, err error)
 	SyncDeleted(dbs DeleteBlocks)
 	Type() StorageType
 	RegisterStorageUpdates(StorageUpdateHandler)
+	RegisterSubjectDeleteMarkerUpdates(SubjectDeleteMarkerUpdateHandler)
 	UpdateConfig(cfg *StreamConfig) error
 	Delete() error
 	Stop() error
@@ -165,6 +175,8 @@ type SimpleState struct {
 
 	// Internal usage for when the first needs to be updated before use.
 	firstNeedsUpdate bool
+	// Internal usage for when the last needs to be updated before use.
+	lastNeedsUpdate bool
 }
 
 // LostStreamData indicates msgs that have been lost.
@@ -177,6 +189,7 @@ type LostStreamData struct {
 type SnapshotResult struct {
 	Reader io.ReadCloser
 	State  StreamState
+	errCh  chan string
 }
 
 const (
@@ -291,12 +304,16 @@ type DeleteRange struct {
 }
 
 func (dr *DeleteRange) State() (first, last, num uint64) {
-	return dr.First, dr.First + dr.Num, dr.Num
+	deletesAfterFirst := dr.Num
+	if deletesAfterFirst > 0 {
+		deletesAfterFirst--
+	}
+	return dr.First, dr.First + deletesAfterFirst, dr.Num
 }
 
 // Range will range over all the deleted sequences represented by this block.
 func (dr *DeleteRange) Range(f func(uint64) bool) {
-	for seq := dr.First; seq <= dr.First+dr.Num; seq++ {
+	for seq := dr.First; seq < dr.First+dr.Num; seq++ {
 		if !f(seq) {
 			return
 		}
@@ -333,6 +350,7 @@ func (dbs DeleteBlocks) NumDeleted() (total uint64) {
 // ConsumerStore stores state on consumers for streams.
 type ConsumerStore interface {
 	SetStarting(sseq uint64) error
+	UpdateStarting(sseq uint64)
 	HasState() bool
 	UpdateDelivered(dseq, sseq, dc uint64, ts int64) error
 	UpdateAcks(dseq, sseq uint64) error
@@ -772,4 +790,8 @@ func copyString(s string) string {
 	b := make([]byte, len(s))
 	copy(b, s)
 	return bytesToString(b)
+}
+
+func isPermissionError(err error) bool {
+	return err != nil && os.IsPermission(err)
 }
