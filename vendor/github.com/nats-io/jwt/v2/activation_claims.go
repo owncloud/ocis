@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 The NATS Authors
+ * Copyright 2018-2024 The NATS Authors
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -72,11 +72,15 @@ func NewActivationClaims(subject string) *ActivationClaims {
 
 // Encode turns an activation claim into a JWT strimg
 func (a *ActivationClaims) Encode(pair nkeys.KeyPair) (string, error) {
+	return a.EncodeWithSigner(pair, nil)
+}
+
+func (a *ActivationClaims) EncodeWithSigner(pair nkeys.KeyPair, fn SignFn) (string, error) {
 	if !nkeys.IsValidPublicAccountKey(a.ClaimsData.Subject) {
 		return "", errors.New("expected subject to be an account")
 	}
 	a.Type = ActivationClaim
-	return a.ClaimsData.encode(pair, a)
+	return a.ClaimsData.encode(pair, a, fn)
 }
 
 // DecodeActivationClaims tries to create an activation claim from a JWT string
