@@ -65,6 +65,9 @@ Feature: ListGrants role
     And for user "Brian" file "textfile1.txt" should have the following shares:
       | sharee | shareType | permissionsRole    |
       | Brian  | user      | <permissions-role> |
+    And for user "Brian" file "textfile1.txt" of the space "Shares" should have the following activities:
+      | {user} added {resource} to {folder}    |
+      | {user} shared {resource} with {sharee} |
     Examples:
       | permissions-role            |
       | Viewer With ListGrants      |
@@ -125,6 +128,9 @@ Feature: ListGrants role
     And for user "Brian" folder "FolderToShare" should have the following shares:
       | sharee | shareType | permissionsRole    |
       | Brian  | user      | <permissions-role> |
+    And for user "Brian" folder "FolderToShare" of the space "Shares" should have the following activities:
+      | {user} added {resource} to {folder}    |
+      | {user} shared {resource} with {sharee} |
     Examples:
       | permissions-role       |
       | Viewer With ListGrants |
@@ -188,6 +194,9 @@ Feature: ListGrants role
     And for user "Brian" file "textfile1.txt" should have the following shares:
       | sharee | shareType | permissionsRole    |
       | Brian  | user      | <permissions-role> |
+    And for user "Brian" file "textfile1.txt" of the space "Shares" should have the following activities:
+      | {user} added {resource} to {folder}    |
+      | {user} shared {resource} with {sharee} |
     Examples:
       | permissions-role            |
       | Viewer With ListGrants      |
@@ -251,6 +260,9 @@ Feature: ListGrants role
     And for user "Brian" folder "FolderToShare" should have the following shares:
       | sharee | shareType | permissionsRole    |
       | Brian  | user      | <permissions-role> |
+    And for user "Brian" folder "FolderToShare" of the space "Shares" should have the following activities:
+      | {user} added {resource} to {folder}    |
+      | {user} shared {resource} with {sharee} |
     Examples:
       | permissions-role       |
       | Viewer With ListGrants |
@@ -304,6 +316,9 @@ Feature: ListGrants role
     And for user "Brian" file "textfile1.txt" should have the following shares:
       | sharee | shareType | permissionsRole        |
       | Brian  | user      | <new-permissions-role> |
+    And for user "Brian" file "textfile1.txt" of the space "Shares" should have the following activities:
+      | {user} added {resource} to {folder}    |
+      | {user} shared {resource} with {sharee} |
     Examples:
       | permissions-role | new-permissions-role        |
       | Viewer           | Viewer With ListGrants      |
@@ -359,6 +374,9 @@ Feature: ListGrants role
     And for user "Brian" folder "FolderToShare" should have the following shares:
       | sharee | shareType | permissionsRole        |
       | Brian  | user      | <new-permissions-role> |
+    And for user "Brian" folder "FolderToShare" of the space "Shares" should have the following activities:
+      | {user} added {resource} to {folder}    |
+      | {user} shared {resource} with {sharee} |
     Examples:
       | permissions-role | new-permissions-role   |
       | Viewer           | Viewer With ListGrants |
@@ -419,6 +437,10 @@ Feature: ListGrants role
     And for user "Brian" file "textfile1.txt" should have the following shares:
       | sharee | shareType | permissionsRole        |
       | Brian  | user      | <new-permissions-role> |
+    And for user "Brian" file "textfile1.txt" of the space "Shares" should have the following activities:
+      | {user} added {resource} to {folder}       |
+      | {user} shared {resource} with {sharee}    |
+      | {user} updated {field} for the {resource} |
     Examples:
       | permissions-role | new-permissions-role        |
       | Viewer           | Viewer With ListGrants      |
@@ -477,6 +499,10 @@ Feature: ListGrants role
     And for user "Brian" folder "FolderToShare" should have the following shares:
       | sharee | shareType | permissionsRole        |
       | Brian  | user      | <new-permissions-role> |
+    And for user "Brian" folder "FolderToShare" of the space "Shares" should have the following activities:
+      | {user} added {resource} to {folder}       |
+      | {user} shared {resource} with {sharee}    |
+      | {user} updated {field} for the {resource} |
     Examples:
       | permissions-role | new-permissions-role   |
       | Viewer           | Viewer With ListGrants |
@@ -534,6 +560,7 @@ Feature: ListGrants role
     And for user "Brian" file "textfile1.txt" should have the following shares:
       | sharee | shareType | permissionsRole        |
       | Brian  | user      | <new-permissions-role> |
+    And for user "Brian" file "textfile1.txt" of the space "Shares" should not have any activity
     Examples:
       | permissions-role            | new-permissions-role |
       | Viewer With ListGrants      | Viewer               |
@@ -589,6 +616,7 @@ Feature: ListGrants role
     And for user "Brian" folder "FolderToShare" should have the following shares:
       | sharee | shareType | permissionsRole        |
       | Brian  | user      | <new-permissions-role> |
+    And for user "Brian" folder "FolderToShare" of the space "Shares" should not have any activity
     Examples:
       | permissions-role       | new-permissions-role |
       | Viewer With ListGrants | Viewer               |
@@ -649,6 +677,10 @@ Feature: ListGrants role
     And for user "Brian" file "textfile1.txt" should have the following shares:
       | sharee | shareType | permissionsRole        |
       | Brian  | user      | <new-permissions-role> |
+    And for user "Brian" file "textfile1.txt" of the space "Shares" should have the following activities:
+      | {user} added {resource} to {folder}       |
+      | {user} shared {resource} with {sharee}    |
+      | {user} updated {field} for the {resource} |
     Examples:
       | new-permissions-role        | permissions-role |
       | Viewer With ListGrants      | Viewer           |
@@ -707,6 +739,10 @@ Feature: ListGrants role
     And for user "Brian" folder "FolderToShare" should have the following shares:
       | sharee | shareType | permissionsRole        |
       | Brian  | user      | <new-permissions-role> |
+    And for user "Brian" folder "FolderToShare" of the space "Shares" should have the following activities:
+      | {user} added {resource} to {folder}       |
+      | {user} shared {resource} with {sharee}    |
+      | {user} updated {field} for the {resource} |
     Examples:
       | new-permissions-role   | permissions-role |
       | Viewer With ListGrants | Viewer           |
@@ -1306,6 +1342,9 @@ Feature: ListGrants role
       | sharee | shareType | permissionsRole    |
       | Brian  | user      | Viewer             |
       | grp1   | group     | <permissions-role> |
+    And for user "Brian" folder "folder" of the space "Shares" should have the following activities:
+      | {user} added {resource} to {folder}    |
+      | {user} shared {resource} with {sharee} |
     Examples:
       | permissions-role       |
       | Viewer With ListGrants |
