@@ -463,8 +463,19 @@ func (s DriveItemPermissionsService) ListPermissions(ctx context.Context, itemID
 		publicshare.ResourceIDFilter(itemID),
 	}, driveItems)
 	if err != nil {
-		s.logger.Error().Err(err).Str("storageID", itemID.GetStorageId()).Msg("listPublicShares failed")
-		return collectionOfPermissions, err
+		switch err.(type) {
+		case errtypes.AlreadyExists:
+			s.logger.Error().Err(err).Str("storageID", itemID.GetStorageId()).Msg("public share already exists")
+			// Return the list but do not trigger API 500 yet
+			return collectionOfPermissions, nil
+		case errtypes.IsNotFound:
+			s.logger.Error().Err(err).Str("storageID", itemID.GetStorageId()).Msg("public share not found")
+			// Return the list but do not trigger API 500 yet
+			return collectionOfPermissions, nil
+		default:
+			s.logger.Error().Err(err).Str("storageID", itemID.GetStorageId()).Msg("unexpected error listing public shares")
+			return collectionOfPermissions, err
+		}
 	}
 
 	for _, driveItem := range driveItems {
