@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2020 The NATS Authors
+ * Copyright 2018-2024 The NATS Authors
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -107,7 +107,11 @@ func (gc *GenericClaims) Payload() interface{} {
 
 // Encode takes a generic claims and creates a JWT string
 func (gc *GenericClaims) Encode(pair nkeys.KeyPair) (string, error) {
-	return gc.ClaimsData.encode(pair, gc)
+	return gc.ClaimsData.encode(pair, gc, nil)
+}
+
+func (gc *GenericClaims) EncodeWithSigner(pair nkeys.KeyPair, fn SignFn) (string, error) {
+	return gc.ClaimsData.encode(pair, gc, fn)
 }
 
 // Validate checks the generic part of the claims data

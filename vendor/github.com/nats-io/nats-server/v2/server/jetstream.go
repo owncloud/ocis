@@ -1,4 +1,4 @@
-// Copyright 2019-2024 The NATS Authors
+// Copyright 2019-2025 The NATS Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -461,6 +461,8 @@ func (s *Server) enableJetStream(cfg JetStreamConfig) error {
 		if err := s.enableJetStreamClustering(); err != nil {
 			return err
 		}
+		// Set our atomic bool to clustered.
+		s.jsClustered.Store(true)
 	}
 
 	// Mark when we are up and running.
@@ -965,6 +967,8 @@ func (s *Server) shutdownJetStream() {
 			cc.c = nil
 		}
 		cc.meta = nil
+		// Set our atomic bool to false.
+		s.jsClustered.Store(false)
 	}
 	js.mu.Unlock()
 
@@ -1497,12 +1501,14 @@ func (a *Account) filteredStreams(filter string) []*stream {
 	var msets []*stream
 	for _, mset := range jsa.streams {
 		if filter != _EMPTY_ {
+			mset.cfgMu.RLock()
 			for _, subj := range mset.cfg.Subjects {
 				if SubjectsCollide(filter, subj) {
 					msets = append(msets, mset)
 					break
 				}
 			}
+			mset.cfgMu.RUnlock()
 		} else {
 			msets = append(msets, mset)
 		}
@@ -2103,7 +2109,7 @@ func (js *jetStream) wouldExceedLimits(storeType StorageType, sz int) bool {
 	} else {
 		total, max = &js.storeUsed, js.config.MaxStore
 	}
-	return atomic.LoadInt64(total) > (max + int64(sz))
+	return (atomic.LoadInt64(total) + int64(sz)) > max
 }
 
 func (js *jetStream) limitsExceeded(storeType StorageType) bool {
@@ -2143,14 +2149,11 @@ func (jsa *jsAccount) selectLimits(replicas int) (JetStreamAccountLimits, string
 }
 
 // Lock should be held.
-func (jsa *jsAccount) countStreams(tier string, cfg *StreamConfig) int {
-	streams := len(jsa.streams)
-	if tier != _EMPTY_ {
-		streams = 0
-		for _, sa := range jsa.streams {
-			if isSameTier(&sa.cfg, cfg) {
-				streams++
-			}
+func (jsa *jsAccount) countStreams(tier string, cfg *StreamConfig) (streams int) {
+	for _, sa := range jsa.streams {
+		// Don't count the stream toward the limit if it already exists.
+		if (tier == _EMPTY_ || isSameTier(&sa.cfg, cfg)) && sa.cfg.Name != cfg.Name {
+			streams++
 		}
 	}
 	return streams
@@ -2256,7 +2259,7 @@ func (js *jetStream) checkBytesLimits(selectedLimits *JetStreamAccountLimits, ad
 			return NewJSMemoryResourcesExceededError()
 		}
 		// Check if this server can handle request.
-		if checkServer && js.memReserved+addBytes > js.config.MaxMemory {
+		if checkServer && js.memReserved+totalBytes > js.config.MaxMemory {
 			return NewJSMemoryResourcesExceededError()
 		}
 	case FileStorage:
@@ -2265,7 +2268,7 @@ func (js *jetStream) checkBytesLimits(selectedLimits *JetStreamAccountLimits, ad
 			return NewJSStorageResourcesExceededError()
 		}
 		// Check if this server can handle request.
-		if checkServer && js.storeReserved+addBytes > js.config.MaxStore {
+		if checkServer && js.storeReserved+totalBytes > js.config.MaxStore {
 			return NewJSStorageResourcesExceededError()
 		}
 	}
@@ -2968,5 +2971,16 @@ func fixCfgMirrorWithDedupWindow(cfg *StreamConfig) {
 	}
 	if cfg.Duplicates != 0 {
 		cfg.Duplicates = 0
+	}
+}
+
+func (s *Server) handleWritePermissionError() {
+	//TODO Check if we should add s.jetStreamOOSPending in condition
+	if s.JetStreamEnabled() {
+		s.Errorf("File system permission denied while writing, disabling JetStream")
+
+		go s.DisableJetStream()
+
+		//TODO Send respective advisory if needed, same as in handleOutOfSpace
 	}
 }
