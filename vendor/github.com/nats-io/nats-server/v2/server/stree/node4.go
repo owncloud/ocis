@@ -49,7 +49,7 @@ func (n *node4) findChild(c byte) *node {
 func (n *node4) isFull() bool { return n.size >= 4 }
 
 func (n *node4) grow() node {
-	nn := newNode16(n.prefix)
+	nn := newNode10(n.prefix)
 	for i := 0; i < 4; i++ {
 		nn.addChild(n.key[i], n.child[i])
 	}
