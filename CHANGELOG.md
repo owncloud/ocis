@@ -79,6 +79,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Update Mockery to 2.52.3: [#11070](https://github.com/owncloud/ocis/pull/11070)
 * Enhancement - Improve postprocessing logs: [#11108](https://github.com/owncloud/ocis/pull/11108)
 * Enhancement - Improve graph space management logs: [#11115](https://github.com/owncloud/ocis/pull/11115)
+* Enhancement - Delete notification by ID: [#11203](https://github.com/owncloud/ocis/pull/11203)
 * Enhancement - CLI, storage-users uploads delete-stale-nodes: [#11216](https://github.com/owncloud/ocis/pull/11216)
 * Enhancement - Limit length of tags: [#11231](https://github.com/owncloud/ocis/pull/11231)
 
@@ -194,6 +195,14 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/10989
    https://github.com/owncloud/ocis/pull/11115
+
+* Enhancement - Delete notification by ID: [#11203](https://github.com/owncloud/ocis/pull/11203)
+
+   It is now possible to delete a single notification by ID: DELETE
+   /ocs/v2.php/apps/notifications/api/v1/notifications/:id
+
+   https://github.com/owncloud/enterprise/issues/6307
+   https://github.com/owncloud/ocis/pull/11203
 
 * Enhancement - CLI, storage-users uploads delete-stale-nodes: [#11216](https://github.com/owncloud/ocis/pull/11216)
 
