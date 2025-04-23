@@ -141,3 +141,56 @@ Feature: create auth-app token
     And user "Alice" has waited "2" second for auth-app token to expire
     When user "Alice" lists all available spaces via the Graph API
     Then the HTTP status code should be "401"
+
+  @env-config
+  Scenario: user tries to use expired impersonation token created via impersonation token
+    Given the config "AUTH_APP_ENABLE_IMPERSONATION" has been set to "true"
+    And user "Admin" has created auth-app token for user "Alice" with expiration time "1s" using the auth-app API
+    And user "Alice" has waited "2" second for auth-app token to expire
+    When user "Alice" lists all available spaces via the Graph API
+    Then the HTTP status code should be "401"
+
+  @env-config
+  Scenario: user lists their drives using impersonation token
+    Given the config "AUTH_APP_ENABLE_IMPERSONATION" has been set to "true"
+    And user "Admin" has created auth-app token for user "Alice" with expiration time "72h" using the auth-app API
+    When user "Alice" lists all available spaces via the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON response should contain space called "Alice Hansen" and match
+      """
+      {
+        "type": "object",
+        "required": [
+          "driveType",
+          "driveAlias",
+          "name",
+          "id",
+          "quota",
+          "root",
+          "webUrl"
+        ],
+        "properties": {
+          "name": { "const": "Alice Hansen" },
+          "driveType": { "const": "personal" },
+          "driveAlias": { "const": "personal/alice" },
+          "id": { "pattern": "%space_id_pattern%" },
+          "quota": {
+             "type": "object",
+             "required": ["state"],
+             "properties": {
+                "state": { "const": "normal" }
+             }
+          },
+          "root": {
+            "type": "object",
+            "required": ["webDavUrl"],
+            "properties": {
+                "webDavUrl": { "const": "%base_url%/dav/spaces/%space_id%" }
+             }
+          },
+          "webUrl": {
+            "const": "%base_url%/f/%space_id%"
+          }
+        }
+      }
+      """
