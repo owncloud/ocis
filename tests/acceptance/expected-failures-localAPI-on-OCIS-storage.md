@@ -371,5 +371,12 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiContract/propfindShares.feature:223](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiContract/propfindShares.feature#L223)
 - [apiContract/propfindShares.feature:224](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiContract/propfindShares.feature#L224)
 
+#### [Creation date is missing for space members](https://github.com/owncloud/ocis/issues/10077)
+- [apiSharingNgPermissions/listPermissions.feature:874](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNgPermissions/listPermissions.feature#L874)
+- [apiSharingNgPermissions/listPermissions.feature:1548](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNgPermissions/listPermissions.feature#L1548)
+- [apiSharingNgPermissions/listPermissions.feature:1549](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNgPermissions/listPermissions.feature#L1549)
+- [apiSharingNgPermissions/listPermissions.feature:1550](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNgPermissions/listPermissions.feature#L1550)
+- [apiSharingNgPermissions/listPermissions.feature:2263](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNgPermissions/listPermissions.feature#L2263)
+
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.
