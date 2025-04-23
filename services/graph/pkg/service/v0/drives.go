@@ -384,6 +384,10 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 		Quota: getQuota(drive.Quota, g.config.Spaces.DefaultQuota),
 	}
 
+	if drive.Id != nil {
+		csr.Opaque = utils.AppendPlainToOpaque(csr.Opaque, "spaceid", *drive.Id)
+	}
+
 	if drive.Description != nil {
 		csr.Opaque = utils.AppendPlainToOpaque(csr.Opaque, "description", *drive.Description)
 	}
