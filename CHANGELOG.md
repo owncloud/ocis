@@ -82,6 +82,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Delete notification by ID: [#11203](https://github.com/owncloud/ocis/pull/11203)
 * Enhancement - CLI, storage-users uploads delete-stale-nodes: [#11216](https://github.com/owncloud/ocis/pull/11216)
 * Enhancement - Limit length of tags: [#11231](https://github.com/owncloud/ocis/pull/11231)
+* Enhancement - Allow setting driveid through graph API: [#11256](https://github.com/owncloud/ocis/pull/11256)
 
 ## Details
 
@@ -217,6 +218,13 @@ The following sections list the changes for unreleased.
    We limited the length of tags to avoid DOS attacks against the ocis server.
 
    https://github.com/owncloud/ocis/pull/11231
+
+* Enhancement - Allow setting driveid through graph API: [#11256](https://github.com/owncloud/ocis/pull/11256)
+
+   Allow setting the id through the graph API. This should always be a uuid to
+   avoid clashes, but this is the responsibility of the API user.
+
+   https://github.com/owncloud/ocis/pull/11256
 
 # Changelog for [7.1.2] (2025-03-28)
 
