@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/url"
 	"slices"
+	"strings"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	grouppb "github.com/cs3org/go-cs3apis/cs3/identity/group/v1beta1"
@@ -22,6 +23,7 @@ import (
 	"go.opentelemetry.io/otel/trace"
 
 	revactx "github.com/owncloud/reva/v2/pkg/ctx"
+	"github.com/owncloud/reva/v2/pkg/errtypes"
 	"github.com/owncloud/reva/v2/pkg/publicshare"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/owncloud/reva/v2/pkg/share"
@@ -462,7 +464,10 @@ func (s DriveItemPermissionsService) ListPermissions(ctx context.Context, itemID
 	driveItems, err = s.listPublicShares(ctx, []*link.ListPublicSharesRequest_Filter{
 		publicshare.ResourceIDFilter(itemID),
 	}, driveItems)
-	if err != nil {
+	if err != nil && strings.Contains(err.Error(), errtypes.ERR_ALREADY_EXISTS) {
+		s.logger.Info().Err(err).Str("storageID", itemID.GetStorageId()).Msg("listPublicShares error: " + err.Error())
+	}
+	if err != nil && !strings.Contains(err.Error(), errtypes.ERR_ALREADY_EXISTS) {
 		s.logger.Error().Err(err).Str("storageID", itemID.GetStorageId()).Msg("listPublicShares failed")
 		return collectionOfPermissions, err
 	}
