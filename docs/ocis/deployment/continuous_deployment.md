@@ -19,7 +19,7 @@ The configuration for the continuous deployment can be found in the [oCIS reposi
 
 # oCIS with Web Office
 
-This deployment is based on our modular [ocis_full Example](ocis_full.md) and uses the default configuration with Collabora Online as the office suite, traefik reverse proxy, cloudimporter and the inbucket mail catching server to showcase the full feature set of oCIS.
+This deployment is based on our modular [ocis_full Example](ocis_full.md) and uses the default configuration with Collabora Online as the office suite, traefik reverse proxy, cloudimporter and the mailpit mail catching server to showcase the full feature set of oCIS.
 
 Credentials:
 

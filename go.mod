@@ -1,8 +1,8 @@
 module github.com/owncloud/ocis/v2
 
-go 1.22.7
+go 1.23.0
 
-toolchain go1.22.9
+toolchain go1.24.1
 
 require (
 	dario.cat/mergo v1.0.1
@@ -57,8 +57,8 @@ require (
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/mna/pigeon v1.3.0
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
-	github.com/nats-io/nats-server/v2 v2.10.22
-	github.com/nats-io/nats.go v1.37.0
+	github.com/nats-io/nats-server/v2 v2.11.1
+	github.com/nats-io/nats.go v1.39.1
 	github.com/oklog/run v1.1.0
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/onsi/ginkgo v1.16.5
@@ -67,7 +67,7 @@ require (
 	github.com/open-policy-agent/opa v0.70.0
 	github.com/orcaman/concurrent-map v1.0.0
 	github.com/owncloud/libre-graph-api-go v1.0.5-0.20250217093259-fa3804be6c27
-	github.com/owncloud/reva/v2 v2.0.0-20250313103212-d8b4c329554a
+	github.com/owncloud/reva/v2 v2.0.0-20250415081347-32419403823e
 	github.com/pkg/errors v0.9.1
 	github.com/pkg/xattr v0.4.10
 	github.com/prometheus/client_golang v1.20.5
@@ -98,14 +98,14 @@ require (
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.32.0
 	go.opentelemetry.io/otel/sdk v1.32.0
 	go.opentelemetry.io/otel/trace v1.32.0
-	golang.org/x/crypto v0.32.0
+	golang.org/x/crypto v0.36.0
 	golang.org/x/exp v0.0.0-20241009180824-f66d83c29e7c
 	golang.org/x/image v0.22.0
-	golang.org/x/net v0.33.0
+	golang.org/x/net v0.38.0
 	golang.org/x/oauth2 v0.24.0
-	golang.org/x/sync v0.10.0
-	golang.org/x/term v0.28.0
-	golang.org/x/text v0.21.0
+	golang.org/x/sync v0.12.0
+	golang.org/x/term v0.30.0
+	golang.org/x/text v0.23.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20241118233622-e639e219e697
 	google.golang.org/grpc v1.68.0
 	google.golang.org/protobuf v1.35.2
@@ -217,13 +217,14 @@ require (
 	github.com/godbus/dbus/v5 v5.1.0 // indirect
 	github.com/gofrs/flock v0.12.1 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
-	github.com/golang-jwt/jwt/v4 v4.5.1 // indirect
+	github.com/golang-jwt/jwt/v4 v4.5.2 // indirect
 	github.com/golang/geo v0.0.0-20210211234256-740aa86cb551 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/gomodule/redigo v1.9.2 // indirect
 	github.com/google/flatbuffers v2.0.8+incompatible // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
+	github.com/google/go-tpm v0.9.3 // indirect
 	github.com/google/pprof v0.0.0-20241029153458-d1b30febd7db // indirect
 	github.com/google/renameio/v2 v2.0.0 // indirect
 	github.com/gookit/color v1.5.4 // indirect
@@ -244,7 +245,7 @@ require (
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/juliangruber/go-intersect v1.1.0 // indirect
 	github.com/kevinburke/ssh_config v1.2.0 // indirect
-	github.com/klauspost/compress v1.17.11 // indirect
+	github.com/klauspost/compress v1.18.0 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.8 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/libregraph/oidc-go v1.1.0 // indirect
@@ -268,8 +269,8 @@ require (
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/mschoch/smat v0.2.0 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
-	github.com/nats-io/jwt/v2 v2.5.8 // indirect
-	github.com/nats-io/nkeys v0.4.7 // indirect
+	github.com/nats-io/jwt/v2 v2.7.3 // indirect
+	github.com/nats-io/nkeys v0.4.10 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
 	github.com/nxadm/tail v1.4.8 // indirect
 	github.com/opencontainers/runtime-spec v1.1.0 // indirect
@@ -327,8 +328,8 @@ require (
 	go.uber.org/multierr v1.9.0 // indirect
 	go.uber.org/zap v1.23.0 // indirect
 	golang.org/x/mod v0.21.0 // indirect
-	golang.org/x/sys v0.29.0 // indirect
-	golang.org/x/time v0.7.0 // indirect
+	golang.org/x/sys v0.31.0 // indirect
+	golang.org/x/time v0.11.0 // indirect
 	golang.org/x/tools v0.26.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
 	google.golang.org/genproto v0.0.0-20241015192408-796eee8c2d53 // indirect

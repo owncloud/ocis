@@ -87,6 +87,7 @@ func NewUserlogService(opts ...Option) (*UserlogService, error) {
 	ul.m.Route("/ocs/v2.php/apps/notifications/api/v1/notifications", func(r chi.Router) {
 		r.Get("/", ul.HandleGetEvents)
 		r.Delete("/", ul.HandleDeleteEvents)
+		r.Delete("/{id}", ul.HandleDeleteEvent)
 		r.Post("/global", RequireAdminOrSecret(&m, o.Config.GlobalNotificationsSecret)(ul.HandlePostGlobalEvent))
 		r.Delete("/global", RequireAdminOrSecret(&m, o.Config.GlobalNotificationsSecret)(ul.HandleDeleteGlobalEvent))
 	})
@@ -183,8 +184,16 @@ func (ul *UserlogService) processEvent(event events.Event) {
 		users, err = utils.ResolveID(ctx, e.GranteeUserID, e.GranteeGroupID, gwc)
 	case events.ShareExpired:
 		users, err = utils.ResolveID(ctx, e.GranteeUserID, e.GranteeGroupID, gwc)
-	}
 
+	// ocmcore share related
+	case events.OCMCoreShareCreated:
+		executant = e.Sharer
+		users = append(users, e.GranteeUserID.GetOpaqueId())
+	case events.OCMCoreShareDelete:
+		fmt.Println("### userlog processEvent OCMCoreShareDelete", e.Sharer, e.Grantee)
+		executant = e.Sharer
+		users = append(users, e.Grantee.GetOpaqueId())
+	}
 	if err != nil {
 		// TODO: Find out why this errors on ci pipeline
 		ul.log.Debug().Err(err).Interface("event", event).Msg("error gathering members for event")

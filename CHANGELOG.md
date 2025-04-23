@@ -1,6 +1,7 @@
 # Table of Contents
 
 * [Changelog for unreleased](#changelog-for-unreleased-unreleased)
+* [Changelog for 7.1.2](#changelog-for-712-2025-03-28)
 * [Changelog for 7.1.1](#changelog-for-711-2025-03-14)
 * [Changelog for 7.1.0](#changelog-for-710-2025-03-06)
 * [Changelog for 7.0.0](#changelog-for-700-2024-12-17)
@@ -59,7 +60,7 @@
 
 The following sections list the changes for unreleased.
 
-[unreleased]: https://github.com/owncloud/ocis/compare/v7.1.1...master
+[unreleased]: https://github.com/owncloud/ocis/compare/v7.1.2...master
 
 ## Summary
 
@@ -71,9 +72,16 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix app-auth: [#11123](https://github.com/owncloud/ocis/pull/11123)
 * Bugfix - Fix the SpaceMembershipExpired duplicate event: [#11127](https://github.com/owncloud/ocis/pull/11127)
 * Bugfix - Fix migrate rebuild-jsoncs3-indexes cli: [#11145](https://github.com/owncloud/ocis/pull/11145)
+* Bugfix - OCM Share Notifications: [#11162](https://github.com/owncloud/ocis/pull/11162)
+* Bugfix - Fix pdf form creation: [#11163](https://github.com/owncloud/ocis/pull/11163)
+* Bugfix - Fix app-auth, REST status code: [#11190](https://github.com/owncloud/ocis/pull/11190)
+* Bugfix - Fix Share roles translation: [#11241](https://github.com/owncloud/ocis/pull/11241)
 * Enhancement - Update Mockery to 2.52.3: [#11070](https://github.com/owncloud/ocis/pull/11070)
 * Enhancement - Improve postprocessing logs: [#11108](https://github.com/owncloud/ocis/pull/11108)
 * Enhancement - Improve graph space management logs: [#11115](https://github.com/owncloud/ocis/pull/11115)
+* Enhancement - Delete notification by ID: [#11203](https://github.com/owncloud/ocis/pull/11203)
+* Enhancement - CLI, storage-users uploads delete-stale-nodes: [#11216](https://github.com/owncloud/ocis/pull/11216)
+* Enhancement - Limit length of tags: [#11231](https://github.com/owncloud/ocis/pull/11231)
 
 ## Details
 
@@ -135,6 +143,38 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/issues/11145
    https://github.com/owncloud/ocis/pull/11145
 
+* Bugfix - OCM Share Notifications: [#11162](https://github.com/owncloud/ocis/pull/11162)
+
+   Fix no OCM sharing notifications, now share and unshare notifications are
+   created
+
+   https://github.com/owncloud/ocis/issues/11042
+   https://github.com/owncloud/ocis/pull/11162
+
+* Bugfix - Fix pdf form creation: [#11163](https://github.com/owncloud/ocis/pull/11163)
+
+   Fix pdf form creation for Onlyoffice. Adjust the file extension for Form to be
+   PDF instead of DOCXF
+
+   https://github.com/owncloud/ocis/issues/11164
+   https://github.com/owncloud/ocis/pull/11163
+
+* Bugfix - Fix app-auth, REST status code: [#11190](https://github.com/owncloud/ocis/pull/11190)
+
+   Now app-auth REST returns status code 404 when creating token for non-existent
+   user (Impersonation)
+
+   https://github.com/owncloud/ocis/issues/10815
+   https://github.com/owncloud/ocis/pull/11190
+
+* Bugfix - Fix Share roles translation: [#11241](https://github.com/owncloud/ocis/pull/11241)
+
+   We fixed the issue when the Share roles show a wrong translation after the user
+   location has changed back to English.
+
+   https://github.com/owncloud/ocis/issues/11025
+   https://github.com/owncloud/ocis/pull/11241
+
 * Enhancement - Update Mockery to 2.52.3: [#11070](https://github.com/owncloud/ocis/pull/11070)
 
    Without updating ocis will not build on go 1.24. This requires also updating the
@@ -155,6 +195,48 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/10989
    https://github.com/owncloud/ocis/pull/11115
+
+* Enhancement - Delete notification by ID: [#11203](https://github.com/owncloud/ocis/pull/11203)
+
+   It is now possible to delete a single notification by ID: DELETE
+   /ocs/v2.php/apps/notifications/api/v1/notifications/:id
+
+   https://github.com/owncloud/enterprise/issues/6307
+   https://github.com/owncloud/ocis/pull/11203
+
+* Enhancement - CLI, storage-users uploads delete-stale-nodes: [#11216](https://github.com/owncloud/ocis/pull/11216)
+
+   An oCIS command that deletes stale nodes: in processing state wihout connected
+   upload info.
+
+   https://github.com/owncloud/enterprise/issues/7178
+   https://github.com/owncloud/ocis/pull/11216
+
+* Enhancement - Limit length of tags: [#11231](https://github.com/owncloud/ocis/pull/11231)
+
+   We limited the length of tags to avoid DOS attacks against the ocis server.
+
+   https://github.com/owncloud/ocis/pull/11231
+
+# Changelog for [7.1.2] (2025-03-28)
+
+The following sections list the changes for 7.1.2.
+
+[7.1.2]: https://github.com/owncloud/ocis/compare/v7.1.1...v7.1.2
+
+## Summary
+
+* Bugfix - Fix pdf form creation: [#11163](https://github.com/owncloud/ocis/pull/11163)
+
+## Details
+
+* Bugfix - Fix pdf form creation: [#11163](https://github.com/owncloud/ocis/pull/11163)
+
+   Fix pdf form creation for Onlyoffice. Adjust the file extension for Form to be
+   PDF instead of DOCXF
+
+   https://github.com/owncloud/ocis/issues/11164
+   https://github.com/owncloud/ocis/pull/11163
 
 # Changelog for [7.1.1] (2025-03-14)
 

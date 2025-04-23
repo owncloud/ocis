@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/defaults"
+	"github.com/owncloud/ocis/v2/ocis-pkg/generators"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/sharing/pkg/config"
 )
@@ -135,7 +136,7 @@ func SharingConfigFromStruct(cfg *config.Config, logger log.Logger) (map[string]
 					"tls-insecure":     cfg.Events.TLSInsecure,
 					"tls-root-ca-cert": cfg.Events.TLSRootCaCertPath,
 					"enable-tls":       cfg.Events.EnableTLS,
-					"name":             "sharing-eventsmiddleware",
+					"name":             generators.GenerateConnectionName(cfg.Service.Name, generators.NTypeBus),
 					"username":         cfg.Events.AuthUsername,
 					"password":         cfg.Events.AuthPassword,
 				},

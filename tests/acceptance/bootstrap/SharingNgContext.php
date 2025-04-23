@@ -155,7 +155,6 @@ class SharingNgContext implements Context {
 
 	/**
 	 * @param string $user
-	 * @param string $fileOrFolder (file|folder)
 	 * @param string $space
 	 * @param string|null $resource
 	 * @param string|null $query
@@ -165,17 +164,16 @@ class SharingNgContext implements Context {
 	 */
 	public function getPermissionsList(
 		string $user,
-		string $fileOrFolder,
 		string $space,
 		?string $resource = '',
 		?string $query = null
 	): ResponseInterface {
-		$spaceId = ($this->spacesContext->getSpaceByName($user, $space))["id"];
-
-		if ($fileOrFolder === 'folder') {
-			$itemId = $this->spacesContext->getResourceId($user, $space, $resource);
+		if ($space === "Shares") {
+			$spaceId = $this->spacesContext->getSharesRemoteItemParentDriveId($user, $resource);
+			$itemId = $this->spacesContext->getSharesRemoteItemId($user, $resource);
 		} else {
-			$itemId = $this->spacesContext->getFileId($user, $space, $resource);
+			$spaceId = ($this->spacesContext->getSpaceByName($user, $space))["id"];
+			$itemId = $this->spacesContext->getResourceId($user, $space, $resource);
 		}
 
 		return GraphHelper::getPermissionsList(
@@ -190,24 +188,22 @@ class SharingNgContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" gets permissions list for (folder|file) "([^"]*)" of the space "([^"]*)" using the Graph API$/
+	 * @When /^user "([^"]*)" gets permissions list for (?:folder|file) "([^"]*)" of the space "([^"]*)" using the Graph API$/
 	 *
 	 * @param string $user
-	 * @param string $fileOrFolder   (file|folder)
 	 * @param string $resource
 	 * @param string $space
 	 *
 	 * @return void
-	 * @throws Exception
+	 * @throws GuzzleException
 	 */
 	public function userGetsPermissionsListForResourceOfTheSpaceUsingTheGraphAPI(
 		string $user,
-		string $fileOrFolder,
 		string $resource,
 		string $space
 	): void {
 		$this->featureContext->setResponse(
-			$this->getPermissionsList($user, $fileOrFolder, $space, $resource)
+			$this->getPermissionsList($user, $space, $resource)
 		);
 	}
 
@@ -221,8 +217,18 @@ class SharingNgContext implements Context {
 	 * @throws Exception
 	 */
 	public function userListsThePermissionsOfSpaceUsingTheGraphApi(string $user, string $space): void {
+		$spaceId = ($this->spacesContext->getSpaceByName($user, $space))["id"];
+		$itemId = $this->spacesContext->getResourceId($user, $space, '');
 		$this->featureContext->setResponse(
-			$this->getPermissionsList($user, 'folder', $space)
+			GraphHelper::getPermissionsList(
+				$this->featureContext->getBaseUrl(),
+				$this->featureContext->getStepLineRef(),
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				$spaceId,
+				$itemId,
+				null
+			)
 		);
 	}
 
@@ -815,6 +821,23 @@ class SharingNgContext implements Context {
 		TableNode $body
 	): void {
 		$this->featureContext->setResponse($this->createLinkShare($user, $body));
+	}
+
+	/**
+	 * @Given user :user has created the following space link share using permissions endpoint of the Graph API:
+	 *
+	 * @param string $user
+	 * @param TableNode $body
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userHasCreatedTheFollowingSpaceLinkShareUsingPermissionsEndpointOfTheGraphApi(
+		string $user,
+		TableNode $body
+	): void {
+		$response = $this->createLinkShare($user, $body);
+		$this->featureContext->theHTTPStatusCodeShouldBe(200, "Failed while creating public share link!", $response);
 	}
 
 	/**
@@ -2285,10 +2308,9 @@ class SharingNgContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" lists permissions with following filters for (folder|file) "([^"]*)" of the space "([^"]*)" using the Graph API:$/
+	 * @When /^user "([^"]*)" lists permissions with following filters for (?:folder|file) "([^"]*)" of the space "([^"]*)" using the Graph API:$/
 	 *
 	 * @param string $user
-	 * @param string $fileOrFolder (file|folder)
 	 * @param string $resource
 	 * @param string $space
 	 * @param TableNode $table
@@ -2298,14 +2320,70 @@ class SharingNgContext implements Context {
 	 */
 	public function userListsPermissionsWithFollowingFiltersForFileOrFolderOfTheSpaceUsingTheGraphApi(
 		string $user,
-		string $fileOrFolder,
 		string $resource,
 		string $space,
 		TableNode $table
 	): void {
 		$query = implode('&', $table->getColumn(0));
 		$this->featureContext->setResponse(
-			$this->getPermissionsList($user, $fileOrFolder, $space, $resource, $query)
+			$this->getPermissionsList($user, $space, $resource, $query)
 		);
+	}
+
+	/**
+	 * @Then for user :user file/folder :resource should have the following shares:
+	 *
+	 * @param string $user
+	 * @param string $resource
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws JsonException
+	 */
+	public function userGetsAllTheSharesOfTheResource(
+		string $user,
+		string $resource,
+		TableNode $table
+	): void {
+		$permission = $this->getPermissionsList($user, "Shares", $resource);
+		$jsonBody = $this->featureContext->getJsonDecodedResponseBodyContent($permission);
+
+		$errors = [];
+		foreach ($table->getHash() as $row) {
+			$expectedRoleId = GraphHelper::getPermissionsRoleIdByName($row['permissionsRole']);
+			if ($row['shareType'] === 'user') {
+				$expectedSharee = $this->featureContext->getDisplayNameForUser($row['sharee']);
+			} else {
+				$expectedSharee = $row['sharee'];
+			}
+			$found = false;
+			foreach ($jsonBody->value as $share) {
+				$actualSharee = '';
+				if ($row['shareType'] === 'user') {
+					if (isset($share->grantedToV2->user->displayName)) {
+						$actualSharee = $share->grantedToV2->user->displayName;
+					}
+				} else {
+					if (isset($share->grantedToV2->group->displayName)) {
+						$actualSharee = $share->grantedToV2->group->displayName;
+					}
+				}
+				if ($actualSharee === $expectedSharee) {
+					$found = true;
+					if ($share->roles[0] !== $expectedRoleId) {
+						$errors[] = "Expected user $actualSharee share role id to be '$expectedRoleId'
+						but found '$share->roles[0]'";
+					}
+					break;
+				}
+			}
+			if (!$found) {
+				$errors[] = "Expected sharee '$expectedSharee' to be present but found '$actualSharee'";
+			}
+		}
+		if (!empty($errors)) {
+			Assert::fail(implode("\n", $errors));
+		}
 	}
 }

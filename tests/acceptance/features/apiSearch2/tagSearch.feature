@@ -61,10 +61,6 @@ Feature: tag search
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnStable3.0
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @issue-10329
@@ -109,10 +105,6 @@ Feature: tag search
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnStable3.0
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @issue-10329
@@ -143,10 +135,6 @@ Feature: tag search
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnStable3.0
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   @issue-10329
@@ -181,10 +169,6 @@ Feature: tag search
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnStable3.0
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -242,7 +226,7 @@ Feature: tag search
       | new              |
       | spaces           |
 
-  @issue-10329
+  @issue-10329 @issue-11163
   Scenario Outline: search resources using different search patterns (KQL feature)
     Given using spaces DAV path
     And user "Alice" has created the following folders
@@ -278,5 +262,4 @@ Feature: tag search
       | (tag:mathe OR tag:klass10) NOT tag:physik | 2            | /answers           | /verification work |
       | tag:mathe NOT name:exercises              | 1            | /answers           |                    |
       | tag:mathe AND NOT name:exercises          | 1            | /answers           |                    |
-      # The third finding is the personal space itself
-      | NOT tag:mathe                             | 3            | /verification work | /withoutTagFolder  |
+      | NOT tag:mathe                             | 2            | /verification work | /withoutTagFolder  |

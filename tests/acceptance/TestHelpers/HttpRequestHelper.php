@@ -689,20 +689,9 @@ class HttpRequestHelper {
 	}
 
 	/**
-	 * @return bool
-	 */
-	public static function sendScenarioLineReferencesInXRequestId(): bool {
-		return (\getenv("SEND_SCENARIO_LINE_REFERENCES") === "true");
-	}
-
-	/**
 	 * @return string
 	 */
 	public static function getXRequestIdRegex(): string {
-		if (self::sendScenarioLineReferencesInXRequestId()) {
-			return '/^[a-zA-Z]+\/[a-zA-Z]+\.feature:\d+(-\d+)?$/';
-		}
-		$host = gethostname();
-		return "/^$host\/.*$/";
+		return '/^[a-zA-Z]+\/[a-zA-Z]+\.feature:\d+(-\d+)?$/';
 	}
 }

@@ -584,31 +584,31 @@ class SettingsContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" (disables|enables) notification for the following event using the settings API:$/
-	 *
 	 * @param string $user
 	 * @param string $enableOrDisable
-	 * @param TableNode $table
+	 * @param array $event
 	 *
-	 * @return void
+	 * @return ResponseInterface
+	 *
+	 * @throws GuzzleException
+	 * @throws JsonException
 	 */
-	public function userDisablesNotificationForTheFollowingEventUsingSettingsApi(
+	public function enableOrDisableNotification(
 		string $user,
 		string $enableOrDisable,
-		TableNode $table
-	): void {
-		$settings = $table->getRowsHash();
+		array $event
+	): ResponseInterface {
 		$body = [
 			"value" => [
 				"account_uuid" => "me",
 				"bundleId" => SettingsHelper::getBundleId(),
-				"settingId" => SettingsHelper::getSettingIdUsingEventName($settings['event']),
+				"settingId" => SettingsHelper::getSettingIdUsingEventName($event['event']),
 				"resource" => [
 					"type" => "TYPE_USER"
 				]
 			]
 		];
-		$notificationTypes = explode(',', $settings['notificationTypes']);
+		$notificationTypes = explode(',', $event['notificationTypes']);
 
 		foreach ($notificationTypes as $type) {
 			if ($type === "mail") {
@@ -624,13 +624,50 @@ class SettingsContext implements Context {
 			}
 		}
 
-		$response = SettingsHelper::updateSettings(
+		return SettingsHelper::updateSettings(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getActualUsername($user),
 			$this->featureContext->getPasswordForUser($user),
 			json_encode($body),
 			$this->featureContext->getStepLineRef(),
 		);
+	}
+
+	/**
+	 * @Given /^user "([^"]*)" has (disabled|enabled) notification for the following event using the settings API:$/
+	 *
+	 * @param string $user
+	 * @param string $enableOrDisable
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 */
+	public function userHasEnabledOrDisabledNotificationForTheFollowingEventUsingTheSettingsApi(
+		string $user,
+		string $enableOrDisable,
+		TableNode $table
+	): void {
+		$event = $table->getRowsHash();
+		$response = $this->enableOrDisableNotification($user, $enableOrDisable, $event);
+		$this->featureContext->theHTTPStatusCodeShouldBe(201, "", $response);
+	}
+
+	/**
+	 * @When /^user "([^"]*)" (disables|enables) notification for the following event using the settings API:$/
+	 *
+	 * @param string $user
+	 * @param string $enableOrDisable
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 */
+	public function userEnablesOrDisablesNotificationForTheFollowingEventUsingTheSettingsApi(
+		string $user,
+		string $enableOrDisable,
+		TableNode $table
+	): void {
+		$event = $table->getRowsHash();
+		$response = $this->enableOrDisableNotification($user, $enableOrDisable, $event);
 		$this->featureContext->setResponse($response);
 	}
 

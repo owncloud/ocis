@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"path/filepath"
+	"slices"
 	"sort"
 	"strconv"
 	"strings"
@@ -40,6 +41,15 @@ const (
 	_spaceTypeProject    = "project"
 	_spaceTypeGrant      = "grant"
 	_slowQueryDuration   = 500 * time.Millisecond
+)
+
+var (
+	// _skipPathNames is a list of paths that should be skipped when walking the tree.
+	// In case of directories, just the directory itself is skipped, not its content.
+	_skipPathNames = []string{"."}
+	// _skipPathDirs is a list of directories that should be skipped when walking the tree.
+	// The directory itself and its content is skipped.
+	_skipPathDirs = []string{"./.space"}
 )
 
 // Searcher is the interface to the SearchService
@@ -436,8 +446,14 @@ func (s *Service) IndexSpace(spaceID *provider.StorageSpaceId) error {
 			return nil
 		}
 
+		relPath := utils.MakeRelativePath(filepath.Join(wd, info.Path))
+		if slices.Contains(_skipPathDirs, relPath) {
+			s.logger.Info().Str("path", relPath).Msg("skipping directory from being indexed")
+			return filepath.SkipDir
+		}
+
 		ref := &provider.Reference{
-			Path:       utils.MakeRelativePath(filepath.Join(wd, info.Path)),
+			Path:       relPath,
 			ResourceId: &rootID,
 		}
 		s.logger.Debug().Str("path", ref.Path).Msg("Walking tree")
@@ -482,6 +498,18 @@ func (s *Service) UpsertItem(ref *provider.Reference) {
 	ctx, stat, path := s.resInfo(ref)
 	if ctx == nil || stat == nil || path == "" {
 		return
+	}
+
+	if slices.Contains(_skipPathNames, path) || slices.Contains(_skipPathDirs, path) {
+		s.logger.Info().Str("path", path).Msg("file won't be indexed")
+		return
+	}
+
+	for _, skipPath := range _skipPathDirs {
+		if strings.HasPrefix(path, skipPath+"/") {
+			s.logger.Info().Str("path", path).Msg("file is in a directory that won't be indexed")
+			return
+		}
 	}
 
 	doc, err := s.extractor.Extract(ctx, stat.Info)

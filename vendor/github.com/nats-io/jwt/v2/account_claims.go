@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2023 The NATS Authors
+ * Copyright 2018-2024 The NATS Authors
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -133,7 +133,7 @@ func (o *OperatorLimits) Validate(vr *ValidationResults) {
 	}
 }
 
-// Mapping for publishes
+// WeightedMapping for publishes
 type WeightedMapping struct {
 	Subject Subject `json:"subject"`
 	Weight  uint8   `json:"weight,omitempty"`
@@ -177,13 +177,13 @@ func (a *Account) AddMapping(sub Subject, to ...WeightedMapping) {
 	a.Mappings[sub] = to
 }
 
-// Enable external authorization for account users.
+// ExternalAuthorization enables external authorization for account users.
 // AuthUsers are those users specified to bypass the authorization callout and should be used for the authorization service itself.
 // AllowedAccounts specifies which accounts, if any, that the authorization service can bind an authorized user to.
 // The authorization response, a user JWT, will still need to be signed by the correct account.
 // If optional XKey is specified, that is the public xkey (x25519) and the server will encrypt the request such that only the
 // holder of the private key can decrypt. The auth service can also optionally encrypt the response back to the server using it's
-// publick xkey which will be in the authorization request.
+// public xkey which will be in the authorization request.
 type ExternalAuthorization struct {
 	AuthUsers       StringList `json:"auth_users,omitempty"`
 	AllowedAccounts StringList `json:"allowed_accounts,omitempty"`
@@ -194,12 +194,12 @@ func (ac *ExternalAuthorization) IsEnabled() bool {
 	return len(ac.AuthUsers) > 0
 }
 
-// Helper function to determine if external authorization is enabled.
+// HasExternalAuthorization helper function to determine if external authorization is enabled.
 func (a *Account) HasExternalAuthorization() bool {
 	return a.Authorization.IsEnabled()
 }
 
-// Helper function to setup external authorization.
+// EnableExternalAuthorization helper function to setup external authorization.
 func (a *Account) EnableExternalAuthorization(users ...string) {
 	a.Authorization.AuthUsers.Add(users...)
 }
@@ -230,6 +230,20 @@ func (ac *ExternalAuthorization) Validate(vr *ValidationResults) {
 	}
 }
 
+const (
+	ClusterTrafficSystem = "system"
+	ClusterTrafficOwner  = "owner"
+)
+
+type ClusterTraffic string
+
+func (ct ClusterTraffic) Valid() error {
+	if ct == "" || ct == ClusterTrafficSystem || ct == ClusterTrafficOwner {
+		return nil
+	}
+	return fmt.Errorf("unknown cluster traffic option: %q", ct)
+}
+
 // Account holds account specific claims data
 type Account struct {
 	Imports            Imports               `json:"imports,omitempty"`
@@ -241,6 +255,7 @@ type Account struct {
 	Mappings           Mapping               `json:"mappings,omitempty"`
 	Authorization      ExternalAuthorization `json:"authorization,omitempty"`
 	Trace              *MsgTrace             `json:"trace,omitempty"`
+	ClusterTraffic     ClusterTraffic        `json:"cluster_traffic,omitempty"`
 	Info
 	GenericFields
 }
@@ -308,6 +323,10 @@ func (a *Account) Validate(acct *AccountClaims, vr *ValidationResults) {
 	}
 	a.SigningKeys.Validate(vr)
 	a.Info.Validate(vr)
+
+	if err := a.ClusterTraffic.Valid(); err != nil {
+		vr.AddError(err.Error())
+	}
 }
 
 // AccountClaims defines the body of an account JWT
@@ -338,13 +357,17 @@ func NewAccountClaims(subject string) *AccountClaims {
 
 // Encode converts account claims into a JWT string
 func (a *AccountClaims) Encode(pair nkeys.KeyPair) (string, error) {
+	return a.EncodeWithSigner(pair, nil)
+}
+
+func (a *AccountClaims) EncodeWithSigner(pair nkeys.KeyPair, fn SignFn) (string, error) {
 	if !nkeys.IsValidPublicAccountKey(a.Subject) {
 		return "", errors.New("expected subject to be account public key")
 	}
 	sort.Sort(a.Exports)
 	sort.Sort(a.Imports)
 	a.Type = AccountClaim
-	return a.ClaimsData.encode(pair, a)
+	return a.ClaimsData.encode(pair, a, fn)
 }
 
 // DecodeAccountClaims decodes account claims from a JWT string

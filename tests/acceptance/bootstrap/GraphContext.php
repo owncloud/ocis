@@ -2920,6 +2920,34 @@ class GraphContext implements Context {
 	}
 
 	/**
+	 *
+	 * @param string $user
+	 * @param string $resource
+	 * @param string $spaceName
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public function getActivities(
+		string $user,
+		string $resource,
+		string $spaceName
+	): ResponseInterface {
+		if ($spaceName === "Shares") {
+			$resourceId = $this->spacesContext->getSharesRemoteItemId($user, $resource);
+		} else {
+			$resourceId = $this->spacesContext->getResourceId($user, $spaceName, $resource);
+		}
+		return GraphHelper::getActivities(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			$resourceId
+		);
+	}
+
+	/**
 	 * @When /^user "([^"]*)" lists the activities of (?:folder|file) "([^"]*)" from space "([^"]*)" using the Graph API$/
 	 *
 	 * @param string $user
@@ -2928,21 +2956,77 @@ class GraphContext implements Context {
 	 *
 	 * @return void
 	 * @throws Exception
+	 * @throws GuzzleException
 	 */
 	public function userListsTheActivitiesForResourceOfSpaceUsingTheGraphAPI(
 		string $user,
 		string $resource,
 		string $spaceName
 	): void {
-		$resourceId = $this->spacesContext->getResourceId($user, $spaceName, $resource);
-		$response = GraphHelper::getActivities(
-			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
-			$user,
-			$this->featureContext->getPasswordForUser($user),
-			$resourceId
+		$this->featureContext->setResponse($this->getActivities($user, $resource, $spaceName));
+	}
+
+	/**
+	 * @Then /^for user "([^"]*)" (?:folder|file) "([^"]*)" of the space "([^"]*)" should have the following activities:$/
+	 *
+	 * @param string $user
+	 * @param string $resource
+	 * @param string $spaceName
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function forUserFolderOrFileOfTheSpaceShouldHaveTheseActivities(
+		string $user,
+		string $resource,
+		string $spaceName,
+		TableNode $table
+	): void {
+		$unmatchedActivities = [];
+		$activities = $this->featureContext->getJsonDecodedResponse(
+			$this->getActivities($user, $resource, $spaceName)
 		);
-		$this->featureContext->setResponse($response);
+		foreach ($table->getRows() as $expectedActivity) {
+			$matched = false;
+			foreach ($activities['value'] as $activity) {
+				if ($expectedActivity[0] === $activity['template']['message']) {
+					$matched = true;
+					break;
+				}
+			}
+			if (!$matched) {
+				$unmatchedActivities[] = "Expected activity '$expectedActivity[0]' was not found in the response. ";
+			}
+		}
+		if (!empty($unmatchedActivities)) {
+			Assert::fail(implode("\n", $unmatchedActivities));
+		}
+	}
+
+	/**
+	 * @Then /^for user "([^"]*)" (?:folder|file) "([^"]*)" of the space "([^"]*)" should not have any activity$/
+	 *
+	 * @param string $user
+	 * @param string $resource
+	 * @param string $spaceName
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function forUserFileOfTheSpaceShouldNotHaveAnyActivity(
+		string $user,
+		string $resource,
+		string $spaceName
+	): void {
+		$activities = $this->getActivities($user, $resource, $spaceName);
+		$responseBody = $activities->getBody()->getContents();
+		Assert::assertEmpty(
+			$responseBody,
+			__METHOD__
+			. "\nExpected no activity of resource '$resource' for user '$user', but some activities were found\n" .
+			print_r(json_decode($responseBody, true), true)
+		);
 	}
 
 	/**

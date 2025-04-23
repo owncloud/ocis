@@ -47,7 +47,7 @@ import (
 
 // Default Constants
 const (
-	Version                   = "1.37.0"
+	Version                   = "1.39.1"
 	DefaultURL                = "nats://127.0.0.1:4222"
 	DefaultPort               = 4222
 	DefaultMaxReconnect       = 60
@@ -86,6 +86,9 @@ const (
 
 	// MAX_CONNECTIONS_ERR is for when nats server denies the connection due to server max_connections limit
 	MAX_CONNECTIONS_ERR = "maximum connections exceeded"
+
+	// MAX_SUBSCRIPTIONS_ERR is for when nats server denies the connection due to server subscriptions limit
+	MAX_SUBSCRIPTIONS_ERR = "maximum subscriptions exceeded"
 )
 
 // Errors
@@ -106,6 +109,7 @@ var (
 	ErrAuthorization               = errors.New("nats: authorization violation")
 	ErrAuthExpired                 = errors.New("nats: authentication expired")
 	ErrAuthRevoked                 = errors.New("nats: authentication revoked")
+	ErrPermissionViolation         = errors.New("nats: permissions violation")
 	ErrAccountAuthExpired          = errors.New("nats: account authentication expired")
 	ErrNoServers                   = errors.New("nats: no servers available for connection")
 	ErrJsonParse                   = errors.New("nats: connect message, json parse error")
@@ -131,6 +135,7 @@ var (
 	ErrNkeysNotSupported           = errors.New("nats: nkeys not supported by the server")
 	ErrStaleConnection             = errors.New("nats: " + STALE_CONNECTION)
 	ErrTokenAlreadySet             = errors.New("nats: token and token handler both set")
+	ErrUserInfoAlreadySet          = errors.New("nats: cannot set user info callback and user/pass")
 	ErrMsgNotBound                 = errors.New("nats: message is not bound to subscription/connection")
 	ErrMsgNoReply                  = errors.New("nats: message does not have a reply")
 	ErrClientIPNotSupported        = errors.New("nats: client IP not supported by this server")
@@ -140,6 +145,7 @@ var (
 	ErrNoResponders                = errors.New("nats: no responders available for request")
 	ErrMaxConnectionsExceeded      = errors.New("nats: server maximum connections exceeded")
 	ErrConnectionNotTLS            = errors.New("nats: connection is not tls")
+	ErrMaxSubscriptionsExceeded    = errors.New("nats: server maximum subscriptions exceeded")
 )
 
 // GetDefaultOptions returns default configuration options for the client.
@@ -229,6 +235,9 @@ type SignatureHandler func([]byte) ([]byte, error)
 
 // AuthTokenHandler is used to generate a new token.
 type AuthTokenHandler func() string
+
+// UserInfoCB is used to pass the username and password when establishing connection.
+type UserInfoCB func() (string, string)
 
 // ReconnectDelayHandler is used to get from the user the desired
 // delay the library should pause before attempting to reconnect
@@ -443,6 +452,9 @@ type Options struct {
 	// Password sets the password to be used when connecting to a server.
 	Password string
 
+	// UserInfo sets the callback handler that will fetch the username and password.
+	UserInfo UserInfoCB
+
 	// Token sets the token to be used when connecting to a server.
 	Token string
 
@@ -499,6 +511,11 @@ type Options struct {
 
 	// SkipHostLookup skips the DNS lookup for the server hostname.
 	SkipHostLookup bool
+
+	// PermissionErrOnSubscribe - if set to true, the client will return ErrPermissionViolation
+	// from SubscribeSync if the server returns a permissions error for a subscription.
+	// Defaults to false.
+	PermissionErrOnSubscribe bool
 }
 
 const (
@@ -607,17 +624,19 @@ type Subscription struct {
 	// For holding information about a JetStream consumer.
 	jsi *jsSub
 
-	delivered     uint64
-	max           uint64
-	conn          *Conn
-	mcb           MsgHandler
-	mch           chan *Msg
-	closed        bool
-	sc            bool
-	connClosed    bool
-	draining      bool
-	status        SubStatus
-	statListeners map[chan SubStatus][]SubStatus
+	delivered      uint64
+	max            uint64
+	conn           *Conn
+	mcb            MsgHandler
+	mch            chan *Msg
+	errCh          chan (error)
+	closed         bool
+	sc             bool
+	connClosed     bool
+	draining       bool
+	status         SubStatus
+	statListeners  map[chan SubStatus][]SubStatus
+	permissionsErr error
 
 	// Type of Subscription
 	typ SubscriptionType
@@ -1166,6 +1185,13 @@ func UserInfo(user, password string) Option {
 	}
 }
 
+func UserInfoHandler(cb UserInfoCB) Option {
+	return func(o *Options) error {
+		o.UserInfo = cb
+		return nil
+	}
+}
+
 // Token is an Option to set the token to use
 // when a token is not included directly in the URLs
 // and when a token handler is not provided.
@@ -1359,7 +1385,7 @@ func ProxyPath(path string) Option {
 func CustomInboxPrefix(p string) Option {
 	return func(o *Options) error {
 		if p == "" || strings.Contains(p, ">") || strings.Contains(p, "*") || strings.HasSuffix(p, ".") {
-			return fmt.Errorf("nats: invalid custom prefix")
+			return errors.New("nats: invalid custom prefix")
 		}
 		o.InboxPrefix = p
 		return nil
@@ -1379,6 +1405,13 @@ func IgnoreAuthErrorAbort() Option {
 func SkipHostLookup() Option {
 	return func(o *Options) error {
 		o.SkipHostLookup = true
+		return nil
+	}
+}
+
+func PermissionErrOnSubscribe(enabled bool) Option {
+	return func(o *Options) error {
+		o.PermissionErrOnSubscribe = enabled
 		return nil
 	}
 }
@@ -1814,7 +1847,7 @@ func (nc *Conn) addURLToPool(sURL string, implicit, saveTLSName bool) error {
 	if len(nc.srvPool) == 0 {
 		nc.ws = isWS
 	} else if isWS && !nc.ws || !isWS && nc.ws {
-		return fmt.Errorf("mixing of websocket and non websocket URLs is not allowed")
+		return errors.New("mixing of websocket and non websocket URLs is not allowed")
 	}
 
 	var tlsName string
@@ -2563,6 +2596,13 @@ func (nc *Conn) connectProto() (string, error) {
 		pass = o.Password
 		token = o.Token
 		nkey = o.Nkey
+
+		if nc.Opts.UserInfo != nil {
+			if user != _EMPTY_ || pass != _EMPTY_ {
+				return _EMPTY_, ErrUserInfoAlreadySet
+			}
+			user, pass = nc.Opts.UserInfo()
+		}
 	}
 
 	// Look for user jwt.
@@ -2952,11 +2992,11 @@ func (nc *Conn) doReconnect(err error, forceReconnect bool) {
 
 // processOpErr handles errors from reading or parsing the protocol.
 // The lock should not be held entering this function.
-func (nc *Conn) processOpErr(err error) {
+func (nc *Conn) processOpErr(err error) bool {
 	nc.mu.Lock()
+	defer nc.mu.Unlock()
 	if nc.isConnecting() || nc.isClosed() || nc.isReconnecting() {
-		nc.mu.Unlock()
-		return
+		return false
 	}
 
 	if nc.Opts.AllowReconnect && nc.status == CONNECTED {
@@ -2976,14 +3016,12 @@ func (nc *Conn) processOpErr(err error) {
 		nc.clearPendingFlushCalls()
 
 		go nc.doReconnect(err, false)
-		nc.mu.Unlock()
-		return
+		return false
 	}
 
 	nc.changeConnStatus(DISCONNECTED)
 	nc.err = err
-	nc.mu.Unlock()
-	nc.close(CLOSED, true, nil)
+	return true
 }
 
 // dispatch is responsible for calling any async callbacks
@@ -3080,7 +3118,9 @@ func (nc *Conn) readLoop() {
 			err = nc.parse(buf)
 		}
 		if err != nil {
-			nc.processOpErr(err)
+			if shouldClose := nc.processOpErr(err); shouldClose {
+				nc.close(CLOSED, true, nil)
+			}
 			break
 		}
 	}
@@ -3410,15 +3450,41 @@ slowConsumer:
 	}
 }
 
-// processPermissionsViolation is called when the server signals a subject
-// permissions violation on either publish or subscribe.
-func (nc *Conn) processPermissionsViolation(err string) {
+var permissionsRe = regexp.MustCompile(`Subscription to "(\S+)"`)
+var permissionsQueueRe = regexp.MustCompile(`using queue "(\S+)"`)
+
+// processTransientError is called when the server signals a non terminal error
+// which does not close the connection or trigger a reconnect.
+// This will trigger the async error callback if set.
+// These errors include the following:
+// - permissions violation on publish or subscribe
+// - maximum subscriptions exceeded
+func (nc *Conn) processTransientError(err error) {
 	nc.mu.Lock()
-	// create error here so we can pass it as a closure to the async cb dispatcher.
-	e := errors.New("nats: " + err)
-	nc.err = e
+	nc.err = err
+	if errors.Is(err, ErrPermissionViolation) {
+		matches := permissionsRe.FindStringSubmatch(err.Error())
+		if len(matches) >= 2 {
+			queueMatches := permissionsQueueRe.FindStringSubmatch(err.Error())
+			var q string
+			if len(queueMatches) >= 2 {
+				q = queueMatches[1]
+			}
+			subject := matches[1]
+			for _, sub := range nc.subs {
+				if sub.Subject == subject && sub.Queue == q && sub.permissionsErr == nil {
+					sub.mu.Lock()
+					if sub.errCh != nil {
+						sub.errCh <- err
+					}
+					sub.permissionsErr = err
+					sub.mu.Unlock()
+				}
+			}
+		}
+	}
 	if nc.Opts.AsyncErrorCB != nil {
-		nc.ach.push(func() { nc.Opts.AsyncErrorCB(nc, nil, e) })
+		nc.ach.push(func() { nc.Opts.AsyncErrorCB(nc, nil, err) })
 	}
 	nc.mu.Unlock()
 }
@@ -3650,15 +3716,17 @@ func (nc *Conn) processErr(ie string) {
 	// convert to lower case.
 	e := strings.ToLower(ne)
 
-	close := false
+	var close bool
 
 	// FIXME(dlc) - process Slow Consumer signals special.
 	if e == STALE_CONNECTION {
-		nc.processOpErr(ErrStaleConnection)
+		close = nc.processOpErr(ErrStaleConnection)
 	} else if e == MAX_CONNECTIONS_ERR {
-		nc.processOpErr(ErrMaxConnectionsExceeded)
+		close = nc.processOpErr(ErrMaxConnectionsExceeded)
 	} else if strings.HasPrefix(e, PERMISSIONS_ERR) {
-		nc.processPermissionsViolation(ne)
+		nc.processTransientError(fmt.Errorf("%w: %s", ErrPermissionViolation, ne))
+	} else if strings.HasPrefix(e, MAX_SUBSCRIPTIONS_ERR) {
+		nc.processTransientError(ErrMaxSubscriptionsExceeded)
 	} else if authErr := checkAuthError(e); authErr != nil {
 		nc.mu.Lock()
 		close = nc.processAuthError(authErr)
@@ -3999,10 +4067,6 @@ func (nc *Conn) respHandler(m *Msg) {
 // Helper to setup and send new request style requests. Return the chan to receive the response.
 func (nc *Conn) createNewRequestAndSend(subj string, hdr, data []byte) (chan *Msg, string, error) {
 	nc.mu.Lock()
-	// Do setup for the new style if needed.
-	if nc.respMap == nil {
-		nc.initNewResp()
-	}
 	// Create new literal Inbox and map to a chan msg.
 	mch := make(chan *Msg, RequestChanLen)
 	respInbox := nc.newRespInbox()
@@ -4013,7 +4077,7 @@ func (nc *Conn) createNewRequestAndSend(subj string, hdr, data []byte) (chan *Ms
 		// Create the response subscription we will use for all new style responses.
 		// This will be on an _INBOX with an additional terminal token. The subscription
 		// will be on a wildcard.
-		s, err := nc.subscribeLocked(nc.respSub, _EMPTY_, nc.respHandler, nil, false, nil)
+		s, err := nc.subscribeLocked(nc.respSub, _EMPTY_, nc.respHandler, nil, nil, false, nil)
 		if err != nil {
 			nc.mu.Unlock()
 			return nil, token, err
@@ -4111,7 +4175,7 @@ func (nc *Conn) oldRequest(subj string, hdr, data []byte, timeout time.Duration)
 	inbox := nc.NewInbox()
 	ch := make(chan *Msg, RequestChanLen)
 
-	s, err := nc.subscribe(inbox, _EMPTY_, nil, ch, true, nil)
+	s, err := nc.subscribe(inbox, _EMPTY_, nil, ch, nil, true, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -4217,14 +4281,14 @@ func (nc *Conn) respToken(respInbox string) string {
 // since it can't match more than one token.
 // Messages will be delivered to the associated MsgHandler.
 func (nc *Conn) Subscribe(subj string, cb MsgHandler) (*Subscription, error) {
-	return nc.subscribe(subj, _EMPTY_, cb, nil, false, nil)
+	return nc.subscribe(subj, _EMPTY_, cb, nil, nil, false, nil)
 }
 
 // ChanSubscribe will express interest in the given subject and place
 // all messages received on the channel.
 // You should not close the channel until sub.Unsubscribe() has been called.
 func (nc *Conn) ChanSubscribe(subj string, ch chan *Msg) (*Subscription, error) {
-	return nc.subscribe(subj, _EMPTY_, nil, ch, false, nil)
+	return nc.subscribe(subj, _EMPTY_, nil, ch, nil, false, nil)
 }
 
 // ChanQueueSubscribe will express interest in the given subject.
@@ -4234,7 +4298,7 @@ func (nc *Conn) ChanSubscribe(subj string, ch chan *Msg) (*Subscription, error) 
 // You should not close the channel until sub.Unsubscribe() has been called.
 // Note: This is the same than QueueSubscribeSyncWithChan.
 func (nc *Conn) ChanQueueSubscribe(subj, group string, ch chan *Msg) (*Subscription, error) {
-	return nc.subscribe(subj, group, nil, ch, false, nil)
+	return nc.subscribe(subj, group, nil, ch, nil, false, nil)
 }
 
 // SubscribeSync will express interest on the given subject. Messages will
@@ -4244,7 +4308,11 @@ func (nc *Conn) SubscribeSync(subj string) (*Subscription, error) {
 		return nil, ErrInvalidConnection
 	}
 	mch := make(chan *Msg, nc.Opts.SubChanLen)
-	return nc.subscribe(subj, _EMPTY_, nil, mch, true, nil)
+	var errCh chan error
+	if nc.Opts.PermissionErrOnSubscribe {
+		errCh = make(chan error, 100)
+	}
+	return nc.subscribe(subj, _EMPTY_, nil, mch, errCh, true, nil)
 }
 
 // QueueSubscribe creates an asynchronous queue subscriber on the given subject.
@@ -4252,7 +4320,7 @@ func (nc *Conn) SubscribeSync(subj string) (*Subscription, error) {
 // only one member of the group will be selected to receive any given
 // message asynchronously.
 func (nc *Conn) QueueSubscribe(subj, queue string, cb MsgHandler) (*Subscription, error) {
-	return nc.subscribe(subj, queue, cb, nil, false, nil)
+	return nc.subscribe(subj, queue, cb, nil, nil, false, nil)
 }
 
 // QueueSubscribeSync creates a synchronous queue subscriber on the given
@@ -4261,7 +4329,11 @@ func (nc *Conn) QueueSubscribe(subj, queue string, cb MsgHandler) (*Subscription
 // given message synchronously using Subscription.NextMsg().
 func (nc *Conn) QueueSubscribeSync(subj, queue string) (*Subscription, error) {
 	mch := make(chan *Msg, nc.Opts.SubChanLen)
-	return nc.subscribe(subj, queue, nil, mch, true, nil)
+	var errCh chan error
+	if nc.Opts.PermissionErrOnSubscribe {
+		errCh = make(chan error, 100)
+	}
+	return nc.subscribe(subj, queue, nil, mch, errCh, true, nil)
 }
 
 // QueueSubscribeSyncWithChan will express interest in the given subject.
@@ -4271,7 +4343,7 @@ func (nc *Conn) QueueSubscribeSync(subj, queue string) (*Subscription, error) {
 // You should not close the channel until sub.Unsubscribe() has been called.
 // Note: This is the same than ChanQueueSubscribe.
 func (nc *Conn) QueueSubscribeSyncWithChan(subj, queue string, ch chan *Msg) (*Subscription, error) {
-	return nc.subscribe(subj, queue, nil, ch, false, nil)
+	return nc.subscribe(subj, queue, nil, ch, nil, false, nil)
 }
 
 // badSubject will do quick test on whether a subject is acceptable.
@@ -4295,16 +4367,16 @@ func badQueue(qname string) bool {
 }
 
 // subscribe is the internal subscribe function that indicates interest in a subject.
-func (nc *Conn) subscribe(subj, queue string, cb MsgHandler, ch chan *Msg, isSync bool, js *jsSub) (*Subscription, error) {
+func (nc *Conn) subscribe(subj, queue string, cb MsgHandler, ch chan *Msg, errCh chan (error), isSync bool, js *jsSub) (*Subscription, error) {
 	if nc == nil {
 		return nil, ErrInvalidConnection
 	}
 	nc.mu.Lock()
 	defer nc.mu.Unlock()
-	return nc.subscribeLocked(subj, queue, cb, ch, isSync, js)
+	return nc.subscribeLocked(subj, queue, cb, ch, errCh, isSync, js)
 }
 
-func (nc *Conn) subscribeLocked(subj, queue string, cb MsgHandler, ch chan *Msg, isSync bool, js *jsSub) (*Subscription, error) {
+func (nc *Conn) subscribeLocked(subj, queue string, cb MsgHandler, ch chan *Msg, errCh chan (error), isSync bool, js *jsSub) (*Subscription, error) {
 	if nc == nil {
 		return nil, ErrInvalidConnection
 	}
@@ -4355,6 +4427,7 @@ func (nc *Conn) subscribeLocked(subj, queue string, cb MsgHandler, ch chan *Msg,
 	} else { // Sync Subscription
 		sub.typ = SyncSubscription
 		sub.mch = ch
+		sub.errCh = errCh
 	}
 
 	nc.subsMu.Lock()
@@ -4612,14 +4685,14 @@ func (s *Subscription) Unsubscribe() error {
 // checkDrained will watch for a subscription to be fully drained
 // and then remove it.
 func (nc *Conn) checkDrained(sub *Subscription) {
+	if nc == nil || sub == nil {
+		return
+	}
 	defer func() {
 		sub.mu.Lock()
 		defer sub.mu.Unlock()
 		sub.draining = false
 	}()
-	if nc == nil || sub == nil {
-		return
-	}
 
 	// This allows us to know that whatever we have in the client pending
 	// is correct and the server will not send additional information.
@@ -4799,6 +4872,59 @@ func (s *Subscription) NextMsg(timeout time.Duration) (*Msg, error) {
 	t := globalTimerPool.Get(timeout)
 	defer globalTimerPool.Put(t)
 
+	if s.errCh != nil {
+		select {
+		case msg, ok = <-mch:
+			if !ok {
+				return nil, s.getNextMsgErr()
+			}
+			if err := s.processNextMsgDelivered(msg); err != nil {
+				return nil, err
+			}
+		case err := <-s.errCh:
+			return nil, err
+		case <-t.C:
+			return nil, ErrTimeout
+		}
+	} else {
+		select {
+		case msg, ok = <-mch:
+			if !ok {
+				return nil, s.getNextMsgErr()
+			}
+			if err := s.processNextMsgDelivered(msg); err != nil {
+				return nil, err
+			}
+		case <-t.C:
+			return nil, ErrTimeout
+		}
+	}
+
+	return msg, nil
+}
+
+// nextMsgNoTimeout works similarly to Subscription.NextMsg() but will not
+// time out. It is only used internally for non-timeout subscription iterator.
+func (s *Subscription) nextMsgNoTimeout() (*Msg, error) {
+	if s == nil {
+		return nil, ErrBadSubscription
+	}
+
+	s.mu.Lock()
+	err := s.validateNextMsgState(false)
+	if err != nil {
+		s.mu.Unlock()
+		return nil, err
+	}
+
+	// snapshot
+	mch := s.mch
+	s.mu.Unlock()
+
+	var ok bool
+	var msg *Msg
+
+	// If something is available right away, let's optimize that case.
 	select {
 	case msg, ok = <-mch:
 		if !ok {
@@ -4806,9 +4932,32 @@ func (s *Subscription) NextMsg(timeout time.Duration) (*Msg, error) {
 		}
 		if err := s.processNextMsgDelivered(msg); err != nil {
 			return nil, err
+		} else {
+			return msg, nil
 		}
-	case <-t.C:
-		return nil, ErrTimeout
+	default:
+	}
+
+	if s.errCh != nil {
+		select {
+		case msg, ok = <-mch:
+			if !ok {
+				return nil, s.getNextMsgErr()
+			}
+			if err := s.processNextMsgDelivered(msg); err != nil {
+				return nil, err
+			}
+		case err := <-s.errCh:
+			return nil, err
+		}
+	} else {
+		msg, ok = <-mch
+		if !ok {
+			return nil, s.getNextMsgErr()
+		}
+		if err := s.processNextMsgDelivered(msg); err != nil {
+			return nil, err
+		}
 	}
 
 	return msg, nil
@@ -4830,6 +4979,12 @@ func (s *Subscription) validateNextMsgState(pullSubInternal bool) error {
 	}
 	if s.mcb != nil {
 		return ErrSyncSubRequired
+	}
+	// if this subscription previously had a permissions error
+	// and no reconnect has been attempted, return the permissions error
+	// since the subscription does not exist on the server
+	if s.conn.Opts.PermissionErrOnSubscribe && s.permissionsErr != nil {
+		return s.permissionsErr
 	}
 	if s.sc {
 		s.changeSubStatus(SubscriptionActive)
@@ -5107,7 +5262,9 @@ func (nc *Conn) processPingTimer() {
 	nc.pout++
 	if nc.pout > nc.Opts.MaxPingsOut {
 		nc.mu.Unlock()
-		nc.processOpErr(ErrStaleConnection)
+		if shouldClose := nc.processOpErr(ErrStaleConnection); shouldClose {
+			nc.close(CLOSED, true, nil)
+		}
 		return
 	}
 
@@ -5204,6 +5361,9 @@ func (nc *Conn) resendSubscriptions() {
 	for _, s := range subs {
 		adjustedMax := uint64(0)
 		s.mu.Lock()
+		// when resending subscriptions, the permissions error should be cleared
+		// since the user may have fixed the permissions issue
+		s.permissionsErr = nil
 		if s.max > 0 {
 			if s.delivered < s.max {
 				adjustedMax = s.max - s.delivered
@@ -5242,9 +5402,6 @@ func (nc *Conn) clearPendingFlushCalls() {
 // This will clear any pending Request calls.
 // Lock is assumed to be held by the caller.
 func (nc *Conn) clearPendingRequestCalls() {
-	if nc.respMap == nil {
-		return
-	}
 	for key, ch := range nc.respMap {
 		if ch != nil {
 			close(ch)
@@ -5792,7 +5949,7 @@ func NkeyOptionFromSeed(seedFile string) (Option, error) {
 		return nil, err
 	}
 	if !nkeys.IsValidPublicUserKey(pub) {
-		return nil, fmt.Errorf("nats: Not a valid nkey user seed")
+		return nil, errors.New("nats: Not a valid nkey user seed")
 	}
 	sigCB := func(nonce []byte) ([]byte, error) {
 		return sigHandler(nonce, seedFile)

@@ -132,7 +132,7 @@ Feature: create auth-app token
       """
 
 
-  Scenario: try to create auth-app token for other user without impersonation enabled
+  Scenario: admin tries to create auth-app token for other user without impersonation enabled
     When user "Admin" tries to create auth-app token for user "Alice" with expiration time "72h" using the auth-app API
     Then the HTTP status code should be "403"
     And the content in the response should include the following content:
@@ -141,7 +141,7 @@ Feature: create auth-app token
       """
 
 
-  Scenario: try to create auth-app token without expiry
+  Scenario: non-admin user tries to create auth-app token without expiry
     When user "Alice" tries to create auth-app token with expiration time "" using the auth-app API
     Then the HTTP status code should be "400"
     And the content in the response should include the following content:
@@ -160,79 +160,34 @@ Feature: create auth-app token
       """
 
   @env-config
-  Scenario: try to create an auth-app token for a user by a non-admin user
+  Scenario: non-admin user tries to create an auth-app token for another user
     Given user "Brian" has been created with default attributes
     And the config "AUTH_APP_ENABLE_IMPERSONATION" has been set to "true"
     When user "Alice" tries to create auth-app token for user "Brian" with expiration time "72h" using the auth-app API
     Then the HTTP status code should be "403"
 
-  @env-config @issue-11063
-  Scenario: admin creates auth-app token with user-id
+  @env-config @issue-10815
+  Scenario: admin tries to create auth-app token for non-existing user
     Given the config "AUTH_APP_ENABLE_IMPERSONATION" has been set to "true"
-    When user "Admin" creates app token with user-id for user "Alice" with expiration time "72h" using the auth-app API
-    Then the HTTP status code should be "200"
-    And the JSON data of the response should match
-      """
-      {
-        "type": "object",
-        "required": ["token","expiration_date","created_date","label"],
-        "properties": {
-          "token": { "pattern": "^[a-zA-Z0-9]{16}$" },
-          "label": { "const": "Generated via Impersonation API" }
-        }
-      }
-      """
-    When user "Alice" lists all created tokens using the auth-app API
-    Then the HTTP status code should be "200"
-    And the JSON data of the response should match
-      """
-      {
-        "type": "array",
-        "minItems": 1,
-        "maxItems": 1,
-        "items": {
-          "oneOf": [
-            {
-              "type": "object",
-              "required": [
-                "token",
-                "expiration_date",
-                "created_date",
-                "label"
-              ],
-              "properties": {
-                "token": {
-                  "pattern": "^\\$2a\\$11\\$[A-Za-z0-9./]{53}$"
-                },
-                "label": {
-                  "const": "Generated via Impersonation API"
-                }
-              }
-            }
-          ]
-        }
-      }
-      """
-
-
-  Scenario: non-admin user tries to create own auth-app token with user-id using impersonation API
-    Given the config "AUTH_APP_ENABLE_IMPERSONATION" has been set to "true"
-    When user "Alice" creates app token with user-id for user "Alice" with expiration time "72h" using the auth-app API
+    When user "Admin" creates auth-app token for user "Brian" with expiration time "72h" using the auth-app API
     Then the HTTP status code should be "403"
 
-  @env-config @issue-11063
-  Scenario: non-admin user tries to creates auth-app token with user-id for an another user
+  @env-config @issue-10815
+  Scenario: admin user tries to delete auth-app token of another user with impersonation enabled
     Given the config "AUTH_APP_ENABLE_IMPERSONATION" has been set to "true"
-    And user "Brian" has been created with default attributes
-    When user "Brian" creates app token with user-id for user "Alice" with expiration time "72h" using the auth-app API
+    And user "Admin" has created auth-app token for user "Alice" with expiration time "72h" using the auth-app API
+    When user "Admin" tries to delete the last created auth-app token using the auth-app API
     Then the HTTP status code should be "403"
 
-  @issue-11063
-  Scenario: non-admin user tries to creates auth-app token with user-id for an another user without impersonation enabled
+  @issue-10921
+  Scenario: admin user tries to delete auth-app token of a normal user
+    Given user "Alice" has created auth-app token with expiration time "72h" using the auth-app API
+    When user "Admin" tries to delete the last created auth-app token using the auth-app API
+    Then the HTTP status code should be "403"
+
+  @issue-10921
+  Scenario: non-admin user tries to delete auth-app token of another user
     Given user "Brian" has been created with default attributes
-    When user "Brian" creates app token with user-id for user "Alice" with expiration time "72h" using the auth-app API
+    And user "Brian" has created auth-app token with expiration time "72h" using the auth-app API
+    When user "Admin" tries to delete the last created auth-app token using the auth-app API
     Then the HTTP status code should be "403"
-    And the content in the response should include the following content:
-      """
-      impersonation is not allowed
-      """

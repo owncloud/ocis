@@ -164,6 +164,7 @@ class FeatureContext extends BehatVariablesContext {
 	public TUSContext $tusContext;
 	public GraphContext $graphContext;
 	public SpacesContext $spacesContext;
+	public AuthAppContext $authAppContext;
 	public OcmContext $ocmContext;
 
 	/**
@@ -842,10 +843,6 @@ class FeatureContext extends BehatVariablesContext {
 	 * @return string
 	 */
 	public function getStepLineRef(): string {
-		if (!HttpRequestHelper::sendScenarioLineReferencesInXRequestId()) {
-			return '';
-		}
-
 		// If we are in BeforeScenario and possibly before any particular step
 		// is being executed, then stepLineRef might be empty. In that case
 		// return just the string for the scenario.
@@ -1788,7 +1785,12 @@ class FeatureContext extends BehatVariablesContext {
 	public function getPasswordForUser(?string $userName): string {
 		$userNameNormalized = $this->normalizeUsername($userName);
 		$username = $this->getActualUsername($userNameNormalized);
-		if ($username === $this->getAdminUsername()) {
+		if ($this->authAppContext->isUsingAuthAppToken()
+			&& $this->authAppContext->getLastCreatedToken() !== []
+			&& strtolower($userName) === $this->authAppContext->getLastCreatedToken()["user"]
+		) {
+			return $this->authAppContext->getLastCreatedToken()["token"];
+		} elseif ($username === $this->getAdminUsername()) {
 			return $this->getAdminPassword();
 		} elseif (\array_key_exists($username, $this->createdUsers)) {
 			return (string)$this->createdUsers[$username]['password'];
@@ -2674,14 +2676,13 @@ class FeatureContext extends BehatVariablesContext {
 		$this->ocmContext = BehatHelper::getContext($scope, $environment, 'OcmContext');
 		$this->graphContext = BehatHelper::getContext($scope, $environment, 'GraphContext');
 		$this->spacesContext = BehatHelper::getContext($scope, $environment, 'SpacesContext');
+		$this->authAppContext = BehatHelper::getContext($scope, $environment, 'AuthAppContext');
 
 		$scenarioLine = $scope->getScenario()->getLine();
 		$featureFile = $scope->getFeature()->getFile();
 		$suiteName = $scope->getSuite()->getName();
 		$featureFileName = \basename($featureFile);
-		if (HttpRequestHelper::sendScenarioLineReferencesInXRequestId()) {
-			$this->scenarioString = $suiteName . '/' . $featureFileName . ':' . $scenarioLine;
-		}
+		$this->scenarioString = $suiteName . '/' . $featureFileName . ':' . $scenarioLine;
 
 		// Initialize SetupHelper
 		SetupHelper::init(
@@ -2706,11 +2707,7 @@ class FeatureContext extends BehatVariablesContext {
 	 * @return void
 	 */
 	public function beforeEachStep(BeforeStepScope $scope): void {
-		if (HttpRequestHelper::sendScenarioLineReferencesInXRequestId()) {
-			$this->stepLineRef = $this->scenarioString . '-' . $scope->getStep()->getLine();
-		} else {
-			$this->stepLineRef = '';
-		}
+		$this->stepLineRef = $this->scenarioString . '-' . $scope->getStep()->getLine();
 	}
 
 	/**
@@ -3028,5 +3025,16 @@ class FeatureContext extends BehatVariablesContext {
 			\fclose($reader);
 		}
 		return false;
+	}
+
+	/**
+	 * @Given the system waits for :arg1 seconds
+	 *
+	 * @param string $seconds
+	 *
+	 * @return void
+	 */
+	public function theSystemWaitsForSeconds(string $seconds): void {
+		\sleep((int)$seconds);
 	}
 }

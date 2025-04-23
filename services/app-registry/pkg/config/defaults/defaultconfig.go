@@ -38,12 +38,6 @@ func DefaultConfig() *config.Config {
 func defaultMimeTypeConfig() []config.MimeTypeConfig {
 	return []config.MimeTypeConfig{
 		{
-			MimeType:    "application/pdf",
-			Extension:   "pdf",
-			Name:        "PDF",
-			Description: "PDF document",
-		},
-		{
 			MimeType:      "application/vnd.oasis.opendocument.text",
 			Extension:     "odt",
 			Name:          "OpenDocument",
@@ -72,11 +66,10 @@ func defaultMimeTypeConfig() []config.MimeTypeConfig {
 			AllowCreation: true,
 		},
 		{
-			MimeType:      "application/vnd.openxmlformats-officedocument.wordprocessingml.form",
-			Extension:     "docxf",
-			Name:          "Form Document",
-			Description:   "Form Document",
-			AllowCreation: true,
+			MimeType:    "application/vnd.openxmlformats-officedocument.wordprocessingml.form",
+			Extension:   "docxf",
+			Name:        "Form Document",
+			Description: "Form Document",
 		},
 		{
 			MimeType:      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -90,6 +83,13 @@ func defaultMimeTypeConfig() []config.MimeTypeConfig {
 			Extension:     "pptx",
 			Name:          "Microsoft PowerPoint",
 			Description:   "Microsoft PowerPoint document",
+			AllowCreation: true,
+		},
+		{
+			MimeType:      "application/pdf",
+			Extension:     "pdf",
+			Name:          "PDF form",
+			Description:   "PDF form document",
 			AllowCreation: true,
 		},
 		{

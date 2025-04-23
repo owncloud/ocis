@@ -515,9 +515,10 @@ class WebDavPropertiesContext implements Context {
 	}
 
 	/**
-	 * @Then the single response should contain a property :property with a child property :childProperty
+	 * @Then /^the single response should contain a property "([^"]*)" (with|without) a child property "([^"]*)"$/
 	 *
 	 * @param string $property
+	 * @param string $withOrWithout
 	 * @param string $childProperty
 	 *
 	 * @return void
@@ -526,15 +527,23 @@ class WebDavPropertiesContext implements Context {
 	 */
 	public function theSingleResponseShouldContainAPropertyWithChildProperty(
 		string $property,
+		string $withOrWithout,
 		string $childProperty
 	): void {
 		$xmlPart = HttpRequestHelper::getResponseXml($this->featureContext->getResponse())->xpath(
 			"//d:prop/$property/$childProperty"
 		);
-		Assert::assertTrue(
-			isset($xmlPart[0]),
-			"Cannot find property \"$property/$childProperty\""
-		);
+		if ($withOrWithout === "with") {
+			Assert::assertTrue(
+				isset($xmlPart[0]),
+				"Cannot find property \"$property/$childProperty\""
+			);
+		} else {
+			Assert::assertFalse(
+				isset($xmlPart[0]),
+				"Found property \"$property/$childProperty\""
+			);
+		}
 	}
 
 	/**
