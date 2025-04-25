@@ -491,7 +491,6 @@ class SpacesTUSContext implements Context {
 				$this->featureContext->getPasswordForUser($user),
 				$this->featureContext->getBaseUrl(),
 				$resource,
-				$this->featureContext->getStepLineRef(),
 				$this->featureContext->getDavPathVersion(),
 				$spaceId,
 			)

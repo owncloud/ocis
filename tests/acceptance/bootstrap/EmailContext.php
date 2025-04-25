@@ -52,7 +52,7 @@ class EmailContext implements Context {
 	 */
 	public function clearAllEmails(): void {
 		try {
-			EmailHelper::deleteAllEmails($this->featureContext->getStepLineRef());
+			EmailHelper::deleteAllEmails();
 		} catch (Exception $e) {
 			echo __METHOD__ .
 				" could not delete email messages?\n" .
@@ -84,7 +84,6 @@ class EmailContext implements Context {
 				$user,
 				$this->featureContext->getPasswordForUser($user),
 				'',
-				$this->featureContext->getStepLineRef()
 			)
 		);
 		$expectedEmailBodyContent = $this->featureContext->substituteInLineCodes(
@@ -138,14 +137,14 @@ class EmailContext implements Context {
 	public function userShouldHaveEmail(string $user, int $count): void {
 		$address = $this->featureContext->getEmailAddressForUser($user);
 		$query = 'to:' . $address;
-		$response = EmailHelper::searchEmails($query, $this->featureContext->getStepLineRef());
+		$response = EmailHelper::searchEmails($query);
 		$emails = $this->featureContext->getJsonDecodedResponse($response);
 		if ($emails["messages_count"] <= $count) {
 			echo "[INFO] Mailbox is empty...\n";
 			// Wait for 1 second and try again
 			// the mailbox might not be created yet
 			sleep(1);
-			$response = EmailHelper::searchEmails($query, $this->featureContext->getStepLineRef());
+			$response = EmailHelper::searchEmails($query);
 			$emails = $this->featureContext->getJsonDecodedResponse($response);
 		}
 
@@ -193,7 +192,7 @@ class EmailContext implements Context {
 		$ignoreWhiteSpace = false
 	): void {
 		$address = $this->featureContext->getEmailAddressForUser($user);
-		$actualEmailBodyContent = $this->getBodyOfLastEmail($address, $this->featureContext->getStepLineRef());
+		$actualEmailBodyContent = $this->getBodyOfLastEmail($address);
 		if ($ignoreWhiteSpace) {
 			$expectedEmailBodyContent = preg_replace('/\s+/', '', $expectedEmailBodyContent);
 			$actualEmailBodyContent = preg_replace('/\s+/', '', $actualEmailBodyContent);
@@ -212,7 +211,6 @@ class EmailContext implements Context {
 	 * For email number, 1 means the latest one
 	 *
 	 * @param string $emailAddress
-	 * @param string|null $xRequestId
 	 * @param int|null $waitTimeSec Time to wait for the email if the email has been delivered
 	 *
 	 * @return string
@@ -221,7 +219,6 @@ class EmailContext implements Context {
 	 */
 	public function getBodyOfLastEmail(
 		string $emailAddress,
-		?string $xRequestId,
 		?int $waitTimeSec = EMAIL_WAIT_TIMEOUT_SEC
 	): string {
 		$currentTime = \time();
@@ -229,11 +226,11 @@ class EmailContext implements Context {
 		while ($currentTime <= $endTime) {
 			$query = 'to:' . $emailAddress;
 			$mailResponse = $this->featureContext->getJsonDecodedResponse(
-				EmailHelper::searchEmails($query, $xRequestId)
+				EmailHelper::searchEmails($query)
 			);
 			if ($mailResponse["messages_count"] > 0) {
 				$lastEmail = $this->featureContext->getJsonDecodedResponse(
-					EmailHelper::getEmailById("latest", $query, $xRequestId)
+					EmailHelper::getEmailById("latest", $query)
 				);
 				$body = \str_replace(
 					"\r\n",

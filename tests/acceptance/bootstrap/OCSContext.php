@@ -116,7 +116,6 @@ class OCSContext implements Context {
 			$password,
 			$verb,
 			$url,
-			$this->featureContext->getStepLineRef(),
 			$bodyArray,
 			$this->featureContext->getOcsApiVersion(),
 			$headers

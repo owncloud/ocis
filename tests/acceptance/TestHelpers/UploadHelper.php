@@ -43,7 +43,6 @@ class UploadHelper extends Assert {
 	 * @param string|null $password
 	 * @param string|null $source
 	 * @param string|null $destination
-	 * @param string|null $xRequestId
 	 * @param array|null $headers
 	 * @param int|null $davPathVersionToUse (1|2)
 	 * @param bool $doChunkUpload
@@ -59,7 +58,6 @@ class UploadHelper extends Assert {
 		?string $password,
 		?string $source,
 		?string $destination,
-		?string $xRequestId = '',
 		?array $headers = [],
 		?int $davPathVersionToUse = 1,
 		bool $doChunkUpload = false,
@@ -76,7 +74,6 @@ class UploadHelper extends Assert {
 				$destination,
 				$headers,
 				null,
-				$xRequestId,
 				$data,
 				$davPathVersionToUse,
 				"files",
@@ -107,7 +104,6 @@ class UploadHelper extends Assert {
 				$filename,
 				$headers,
 				null,
-				$xRequestId,
 				$chunk,
 				$davPathVersionToUse,
 				"files",

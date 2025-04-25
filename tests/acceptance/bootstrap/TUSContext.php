@@ -208,7 +208,6 @@ class TUSContext implements Context {
 
 		return HttpRequestHelper::sendRequest(
 			$resourceLocation,
-			$this->featureContext->getStepLineRef(),
 			'PATCH',
 			$user,
 			$password,

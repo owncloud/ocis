@@ -80,7 +80,6 @@ class SettingsHelper {
 	 * @param string $baseUrl
 	 * @param string $user
 	 * @param string $password
-	 * @param string $xRequestId
 	 * @param array $headers
 	 *
 	 * @return ResponseInterface
@@ -92,13 +91,11 @@ class SettingsHelper {
 		string $baseUrl,
 		string $user,
 		string $password,
-		string $xRequestId,
 		array $headers = []
 	): ResponseInterface {
 		$fullUrl = self::buildFullUrl($baseUrl, "bundles-list");
 		return HttpRequestHelper::post(
 			$fullUrl,
-			$xRequestId,
 			$user,
 			$password,
 			$headers,
@@ -111,7 +108,6 @@ class SettingsHelper {
 	 * @param string $user
 	 * @param string $password
 	 * @param string $bundleName
-	 * @param string $xRequestId
 	 *
 	 * @return array
 	 *
@@ -123,9 +119,8 @@ class SettingsHelper {
 		string $user,
 		string $password,
 		string $bundleName,
-		string $xRequestId
 	): array {
-		$response = self::getBundlesList($baseUrl, $user, $password, $xRequestId);
+		$response = self::getBundlesList($baseUrl, $user, $password);
 		Assert::assertEquals(201, $response->getStatusCode(), "Failed to get bundles list");
 
 		$bundlesList = HttpRequestHelper::getJsonDecodedResponseBodyContent($response);
@@ -141,7 +136,6 @@ class SettingsHelper {
 	 * @param string $baseUrl
 	 * @param string $user
 	 * @param string $password
-	 * @param string $xRequestId
 	 * @param array $headers
 	 *
 	 * @return ResponseInterface
@@ -153,13 +147,11 @@ class SettingsHelper {
 		string $baseUrl,
 		string $user,
 		string $password,
-		string $xRequestId,
 		array $headers = []
 	): ResponseInterface {
 		$fullUrl = self::buildFullUrl($baseUrl, "roles-list");
 		return HttpRequestHelper::post(
 			$fullUrl,
-			$xRequestId,
 			$user,
 			$password,
 			$headers,
@@ -173,7 +165,6 @@ class SettingsHelper {
 	 * @param string $password
 	 * @param string $assigneeId
 	 * @param string $roleId
-	 * @param string $xRequestId
 	 * @param array $headers
 	 *
 	 * @return ResponseInterface
@@ -187,14 +178,12 @@ class SettingsHelper {
 		string $password,
 		string $assigneeId,
 		string $roleId,
-		string $xRequestId,
 		array $headers = []
 	): ResponseInterface {
 		$fullUrl = self::buildFullUrl($baseUrl, "assignments-add");
 		$body = json_encode(["account_uuid" => $assigneeId, "role_id" => $roleId], JSON_THROW_ON_ERROR);
 		return HttpRequestHelper::post(
 			$fullUrl,
-			$xRequestId,
 			$user,
 			$password,
 			$headers,
@@ -207,7 +196,6 @@ class SettingsHelper {
 	 * @param string $user
 	 * @param string $password
 	 * @param string $userId
-	 * @param string $xRequestId
 	 * @param array $headers
 	 *
 	 * @return ResponseInterface
@@ -220,14 +208,12 @@ class SettingsHelper {
 		string $user,
 		string $password,
 		string $userId,
-		string $xRequestId,
 		array $headers = []
 	): ResponseInterface {
 		$fullUrl = self::buildFullUrl($baseUrl, "assignments-list");
 		$body = json_encode(["account_uuid" => $userId], JSON_THROW_ON_ERROR);
 		return HttpRequestHelper::post(
 			$fullUrl,
-			$xRequestId,
 			$user,
 			$password,
 			$headers,
@@ -239,7 +225,6 @@ class SettingsHelper {
 	 * @param string $baseUrl
 	 * @param string $user
 	 * @param string $password
-	 * @param string $xRequestId
 	 * @param array $headers
 	 *
 	 * @return ResponseInterface
@@ -251,14 +236,12 @@ class SettingsHelper {
 		string $baseUrl,
 		string $user,
 		string $password,
-		string $xRequestId,
 		array $headers = []
 	): ResponseInterface {
 		$fullUrl = self::buildFullUrl($baseUrl, "values-list");
 		$body = json_encode(["account_uuid" => "me"], JSON_THROW_ON_ERROR);
 		return HttpRequestHelper::post(
 			$fullUrl,
-			$xRequestId,
 			$user,
 			$password,
 			$headers,
@@ -270,7 +253,6 @@ class SettingsHelper {
 	 * @param string $baseUrl
 	 * @param string $user
 	 * @param string $password
-	 * @param string $xRequestId
 	 *
 	 * @return bool
 	 *
@@ -281,9 +263,8 @@ class SettingsHelper {
 		string $baseUrl,
 		string $user,
 		string $password,
-		string $xRequestId
 	): bool {
-		$response = self::getValuesList($baseUrl, $user, $password, $xRequestId);
+		$response = self::getValuesList($baseUrl, $user, $password);
 		Assert::assertEquals(201, $response->getStatusCode(), "Failed to get values list");
 
 		$valuesList = HttpRequestHelper::getJsonDecodedResponseBodyContent($response);
@@ -305,7 +286,6 @@ class SettingsHelper {
 	 * @param string $baseUrl
 	 * @param string $user
 	 * @param string $password
-	 * @param string $xRequestId
 	 *
 	 * @return string
 	 *
@@ -316,14 +296,12 @@ class SettingsHelper {
 		string $baseUrl,
 		string $user,
 		string $password,
-		string $xRequestId
 	): string {
 		$response = self::getValuesBySettingID(
 			$baseUrl,
 			self::PROFILE_LANGUAGE_ID,
 			$user,
 			$password,
-			$xRequestId
 		);
 		Assert::assertEquals(201, $response->getStatusCode(), "Failed to get values list");
 
@@ -345,7 +323,6 @@ class SettingsHelper {
 	 * @param string $user
 	 * @param string $password
 	 * @param string $body
-	 * @param string $xRequestId
 	 * @param array $headers
 	 *
 	 * @return ResponseInterface
@@ -358,13 +335,11 @@ class SettingsHelper {
 		string $user,
 		string $password,
 		string $body,
-		string $xRequestId,
 		array $headers = []
 	): ResponseInterface {
 		$fullUrl = self::buildFullUrl($baseUrl, "values-save");
 		return HttpRequestHelper::post(
 			$fullUrl,
-			$xRequestId,
 			$user,
 			$password,
 			$headers,
@@ -377,7 +352,6 @@ class SettingsHelper {
 	 * @param string $settingId
 	 * @param string $user
 	 * @param string $password
-	 * @param string $xRequestId
 	 *
 	 * @return ResponseInterface
 	 *
@@ -389,7 +363,6 @@ class SettingsHelper {
 		string $settingId,
 		string $user,
 		string $password,
-		string $xRequestId,
 	): ResponseInterface {
 		$fullUrl = self::buildFullUrl($baseUrl, "values-get-by-unique-identifiers");
 		$body = json_encode(
@@ -401,7 +374,6 @@ class SettingsHelper {
 		);
 		return HttpRequestHelper::post(
 			$fullUrl,
-			$xRequestId,
 			$user,
 			$password,
 			[],

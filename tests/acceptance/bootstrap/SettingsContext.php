@@ -57,8 +57,7 @@ class SettingsContext implements Context {
 		return SettingsHelper::getRolesList(
 			$this->featureContext->getBaseUrl(),
 			$user,
-			$this->featureContext->getPasswordForUser($user),
-			$this->featureContext->getStepLineRef()
+			$this->featureContext->getPasswordForUser($user)
 		);
 	}
 
@@ -94,7 +93,6 @@ class SettingsContext implements Context {
 			$this->featureContext->getPasswordForUser($user),
 			$userId,
 			$roleId,
-			$this->featureContext->getStepLineRef(),
 		);
 	}
 
@@ -113,7 +111,6 @@ class SettingsContext implements Context {
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$userId,
-			$this->featureContext->getStepLineRef(),
 		);
 	}
 
@@ -330,7 +327,6 @@ class SettingsContext implements Context {
 			$this->featureContext->getBaseUrl(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
-			$this->featureContext->getStepLineRef(),
 		);
 	}
 
@@ -349,7 +345,6 @@ class SettingsContext implements Context {
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$bundleName,
-			$this->featureContext->getStepLineRef()
 		);
 	}
 
@@ -367,7 +362,6 @@ class SettingsContext implements Context {
 			$this->featureContext->getBaseUrl(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
-			$this->featureContext->getStepLineRef(),
 			$headers
 		);
 	}
@@ -444,7 +438,6 @@ class SettingsContext implements Context {
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$body,
-			$this->featureContext->getStepLineRef()
 		);
 	}
 
@@ -513,7 +506,6 @@ class SettingsContext implements Context {
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$body,
-			$this->featureContext->getStepLineRef()
 		);
 	}
 
@@ -578,7 +570,6 @@ class SettingsContext implements Context {
 			$this->featureContext->getActualUsername($user),
 			$this->featureContext->getPasswordForUser($user),
 			json_encode($body),
-			$this->featureContext->getStepLineRef(),
 		);
 		$this->featureContext->setResponse($response);
 	}
@@ -629,7 +620,6 @@ class SettingsContext implements Context {
 			$this->featureContext->getActualUsername($user),
 			$this->featureContext->getPasswordForUser($user),
 			json_encode($body),
-			$this->featureContext->getStepLineRef(),
 		);
 	}
 
@@ -696,7 +686,6 @@ class SettingsContext implements Context {
 			$this->featureContext->getActualUsername($user),
 			$this->featureContext->getPasswordForUser($user),
 			json_encode($body, JSON_THROW_ON_ERROR),
-			$this->featureContext->getStepLineRef()
 		);
 	}
 

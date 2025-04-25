@@ -79,7 +79,6 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 	 * @param string|null $baseUrl
 	 * @param string|null $adminUsername
 	 * @param string|null $adminPassword
-	 * @param string|null $xRequestId
 	 *
 	 * @return SimpleXMLElement
 	 * @throws GuzzleException
@@ -89,7 +88,6 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 		?string $baseUrl,
 		?string $adminUsername,
 		?string $adminPassword,
-		?string $xRequestId = ''
 	): SimpleXMLElement {
 		$result = OcsApiHelper::sendRequest(
 			$baseUrl,
@@ -97,7 +95,6 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 			$adminPassword,
 			"GET",
 			"/apps/testing/api/v1/sysinfo",
-			$xRequestId
 		);
 		if ($result->getStatusCode() !== 200) {
 			throw new \Exception(
@@ -112,7 +109,6 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 	 * @param string|null $baseUrl
 	 * @param string|null $adminUsername
 	 * @param string|null $adminPassword
-	 * @param string|null $xRequestId
 	 *
 	 * @return string
 	 * @throws GuzzleException
@@ -121,13 +117,11 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 		?string $baseUrl,
 		?string $adminUsername,
 		?string $adminPassword,
-		?string $xRequestId = ''
 	): string {
 		$sysInfo = self::getSysInfo(
 			$baseUrl,
 			$adminUsername,
 			$adminPassword,
-			$xRequestId
 		);
 		// server_root is a SimpleXMLElement object that "wraps" a string.
 		/// We want the bare string.
@@ -200,7 +194,6 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 	/**
 	 *
 	 * @param string|null $dirPathFromServerRoot e.g. 'apps2/myapp/appinfo'
-	 * @param string|null $xRequestId
 	 * @param string|null $baseUrl
 	 * @param string|null $adminUsername
 	 * @param string|null $adminPassword
@@ -211,7 +204,6 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 	 */
 	public static function mkDirOnServer(
 		?string $dirPathFromServerRoot,
-		?string $xRequestId = '',
 		?string $baseUrl = null,
 		?string $adminUsername = null,
 		?string $adminPassword = null
@@ -225,7 +217,6 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 			$adminPassword,
 			"POST",
 			"/apps/testing/api/v1/dir",
-			$xRequestId,
 			['dir' => $dirPathFromServerRoot]
 		);
 
@@ -239,7 +230,6 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 	/**
 	 *
 	 * @param string|null $dirPathFromServerRoot e.g. 'apps2/myapp/appinfo'
-	 * @param string|null $xRequestId
 	 * @param string|null $baseUrl
 	 * @param string|null $adminUsername
 	 * @param string|null $adminPassword
@@ -250,7 +240,6 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 	 */
 	public static function rmDirOnServer(
 		?string $dirPathFromServerRoot,
-		?string $xRequestId = '',
 		?string $baseUrl = null,
 		?string $adminUsername = null,
 		?string $adminPassword = null
@@ -264,7 +253,6 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 			$adminPassword,
 			"DELETE",
 			"/apps/testing/api/v1/dir",
-			$xRequestId,
 			['dir' => $dirPathFromServerRoot]
 		);
 
@@ -279,7 +267,6 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 	 *
 	 * @param string|null $filePathFromServerRoot e.g. 'app2/myapp/appinfo/info.xml'
 	 * @param string|null $content
-	 * @param string|null $xRequestId
 	 * @param string|null $baseUrl
 	 * @param string|null $adminUsername
 	 * @param string|null $adminPassword
@@ -291,7 +278,6 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 	public static function createFileOnServer(
 		?string $filePathFromServerRoot,
 		?string $content,
-		?string $xRequestId = '',
 		?string $baseUrl = null,
 		?string $adminUsername = null,
 		?string $adminPassword = null
@@ -305,7 +291,6 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 			$adminPassword,
 			"POST",
 			"/apps/testing/api/v1/file",
-			$xRequestId,
 			[
 				'file' => $filePathFromServerRoot,
 				'content' => $content
@@ -322,7 +307,6 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 	/**
 	 *
 	 * @param string|null $filePathFromServerRoot e.g. 'app2/myapp/appinfo/info.xml'
-	 * @param string|null $xRequestId
 	 * @param string|null $baseUrl
 	 * @param string|null $adminUsername
 	 * @param string|null $adminPassword
@@ -333,7 +317,6 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 	 */
 	public static function deleteFileOnServer(
 		?string $filePathFromServerRoot,
-		?string $xRequestId = '',
 		?string $baseUrl = null,
 		?string $adminUsername = null,
 		?string $adminPassword = null
@@ -347,7 +330,6 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 			$adminPassword,
 			"DELETE",
 			"/apps/testing/api/v1/file",
-			$xRequestId,
 			[
 				'file' => $filePathFromServerRoot
 			]
@@ -362,7 +344,6 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 
 	/**
 	 * @param string|null $fileInCore e.g. 'app2/myapp/appinfo/info.xml'
-	 * @param string|null $xRequestId
 	 * @param string|null $baseUrl
 	 * @param string|null $adminUsername
 	 * @param string|null $adminPassword
@@ -373,7 +354,6 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 	 */
 	public static function readFileFromServer(
 		?string $fileInCore,
-		?string $xRequestId = '',
 		?string $baseUrl  = null,
 		?string $adminUsername = null,
 		?string $adminPassword = null
@@ -394,7 +374,6 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 			$adminPassword,
 			'GET',
 			"/apps/testing/api/v1/file?file=$fileInCore",
-			$xRequestId
 		);
 		self::assertSame(
 			200,

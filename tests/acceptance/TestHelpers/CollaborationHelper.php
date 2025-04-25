@@ -35,7 +35,6 @@ class CollaborationHelper {
 	 * @param string $username
 	 * @param string $password
 	 * @param string $baseUrl
-	 * @param string $xRequestId
 	 * @param string|null $viewMode
 	 *
 	 * @return ResponseInterface
@@ -47,7 +46,6 @@ class CollaborationHelper {
 		string $username,
 		string $password,
 		string $baseUrl,
-		string $xRequestId,
 		?string $viewMode = null,
 	): ResponseInterface {
 		$url = $baseUrl . "/app/open?app_name=$app&file_id=$fileId";
@@ -57,7 +55,6 @@ class CollaborationHelper {
 
 		return HttpRequestHelper::post(
 			$url,
-			$xRequestId,
 			$username,
 			$password,
 			['Content-Type' => 'application/json']
@@ -66,7 +63,6 @@ class CollaborationHelper {
 
 	/**
 	 * @param string $baseUrl
-	 * @param string $xRequestId
 	 * @param string $user
 	 * @param string $password
 	 * @param string $parentContainerId
@@ -78,7 +74,6 @@ class CollaborationHelper {
 	 */
 	public static function createFile(
 		string $baseUrl,
-		string $xRequestId,
 		string $user,
 		string $password,
 		string $parentContainerId,
@@ -88,7 +83,6 @@ class CollaborationHelper {
 		$url = $baseUrl . "/app/new?parent_container_id=$parentContainerId&filename=$file";
 		return HttpRequestHelper::post(
 			$url,
-			$xRequestId,
 			$user,
 			$password,
 			$headers

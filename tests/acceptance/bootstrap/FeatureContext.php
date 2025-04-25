@@ -138,14 +138,6 @@ class FeatureContext extends BehatVariablesContext {
 	 */
 	private string $scenarioString = '';
 
-	/**
-	 * A full unique reference to the step that is currently executing.
-	 * Example: apiComments/createComments.feature:24-28
-	 * That is line 28, in the scenario at line 24, in the createComments feature
-	 * in the apiComments suite.
-	 */
-	private string $stepLineRef = '';
-
 	private int $ocsApiVersion = 1;
 	private ?ResponseInterface $response = null;
 	private string $responseUser = '';
@@ -191,7 +183,6 @@ class FeatureContext extends BehatVariablesContext {
 			$this->baseUrl,
 			$user,
 			$this->getPasswordForUser($user),
-			$this->getStepLineRef()
 		);
 		$this->autoSyncSettings[$user] = $autoSyncSetting;
 
@@ -838,21 +829,6 @@ class FeatureContext extends BehatVariablesContext {
 	}
 
 	/**
-	 * returns the reference to the current line being executed.
-	 *
-	 * @return string
-	 */
-	public function getStepLineRef(): string {
-		// If we are in BeforeScenario and possibly before any particular step
-		// is being executed, then stepLineRef might be empty. In that case
-		// return just the string for the scenario.
-		if ($this->stepLineRef === '') {
-			return $this->scenarioString;
-		}
-		return $this->stepLineRef;
-	}
-
-	/**
 	 * returns the base URL without any sub-path e.g. http://localhost:8080
 	 * of the base URL http://localhost:8080/owncloud
 	 *
@@ -1347,7 +1323,6 @@ class FeatureContext extends BehatVariablesContext {
 		$this->setResponse(
 			HttpRequestHelper::sendRequest(
 				$fullUrl,
-				$this->getStepLineRef(),
 				$method,
 				"public",
 				$password,
@@ -1501,7 +1476,6 @@ class FeatureContext extends BehatVariablesContext {
 
 		return HttpRequestHelper::sendRequest(
 			$fullUrl,
-			$this->getStepLineRef(),
 			$verb,
 			$user,
 			$password,
@@ -1756,7 +1730,6 @@ class FeatureContext extends BehatVariablesContext {
 	public function mkDirOnServer(string $dirPathFromServerRoot): void {
 		SetupHelper::mkDirOnServer(
 			$dirPathFromServerRoot,
-			$this->getStepLineRef(),
 			$this->getBaseUrl(),
 			$this->getAdminUsername(),
 			$this->getAdminPassword()
@@ -2041,7 +2014,6 @@ class FeatureContext extends BehatVariablesContext {
 
 		return HttpRequestHelper::get(
 			$fullUrl,
-			$this->getStepLineRef(),
 			$this->getAdminUsername(),
 			$this->getAdminPassword(),
 			$this->guzzleClientHeaders,
@@ -2626,7 +2598,6 @@ class FeatureContext extends BehatVariablesContext {
 				$this->getBaseUrl(),
 				$user,
 				$this->getPasswordForUser($user),
-				$this->getStepLineRef()
 			);
 		}
 		return null;
@@ -2707,7 +2678,8 @@ class FeatureContext extends BehatVariablesContext {
 	 * @return void
 	 */
 	public function beforeEachStep(BeforeStepScope $scope): void {
-		$this->stepLineRef = $this->scenarioString . '-' . $scope->getStep()->getLine();
+		$stepLineRef = $this->scenarioString . '-' . $scope->getStep()->getLine();
+		HttpRequestHelper::setCurrentScenarioRef($stepLineRef);
 	}
 
 	/**
@@ -2757,7 +2729,7 @@ class FeatureContext extends BehatVariablesContext {
 	public function removeTemporaryStorageOnServerAfter(): void {
 		SetupHelper::rmDirOnServer(
 			TEMPORARY_STORAGE_DIR_ON_REMOTE_SERVER,
-			$this->getStepLineRef()
+			HttpRequestHelper::getCurrentScenarioRef()
 		);
 	}
 
@@ -2914,7 +2886,6 @@ class FeatureContext extends BehatVariablesContext {
 	public function getUserIdByUserName(string $userName): string {
 		$response = GraphHelper::getUser(
 			$this->getBaseUrl(),
-			$this->getStepLineRef(),
 			$this->getAdminUsername(),
 			$this->getAdminPassword(),
 			$userName
@@ -2938,7 +2909,6 @@ class FeatureContext extends BehatVariablesContext {
 	public function getGroupIdByGroupName(string $groupName): string {
 		$response = GraphHelper::getGroup(
 			$this->getBaseUrl(),
-			$this->getStepLineRef(),
 			$this->getAdminUsername(),
 			$this->getAdminPassword(),
 			$groupName

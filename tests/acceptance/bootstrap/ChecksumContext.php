@@ -187,7 +187,6 @@ class ChecksumContext implements Context {
 			$path,
 			null,
 			$spaceId,
-			$this->featureContext->getStepLineRef(),
 			$body,
 			$this->featureContext->getDavPathVersion()
 		);

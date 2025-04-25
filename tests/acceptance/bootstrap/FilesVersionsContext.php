@@ -247,7 +247,6 @@ class FilesVersionsContext implements Context {
 			$xmlPart[$versionIndex];
 		return HttpRequestHelper::sendRequest(
 			$fullUrl,
-			$this->featureContext->getStepLineRef(),
 			'COPY',
 			$user,
 			$this->featureContext->getPasswordForUser($user),
@@ -468,7 +467,6 @@ class FilesVersionsContext implements Context {
 		);
 		return HttpRequestHelper::get(
 			$url,
-			$this->featureContext->getStepLineRef(),
 			$user,
 			$this->featureContext->getPasswordForUser($user)
 		);
@@ -546,7 +544,6 @@ class FilesVersionsContext implements Context {
 			$metaPath,
 			['Content-Type' => 'text/xml','Depth' => '0'],
 			null,
-			$this->featureContext->getStepLineRef(),
 			$body,
 			$this->featureContext->getDavPathVersion(),
 			null
@@ -585,7 +582,6 @@ class FilesVersionsContext implements Context {
 			$password,
 			$fileId,
 			$properties,
-			$this->featureContext->getStepLineRef(),
 			(string) $folderDepth,
 			null,
 			"versions"

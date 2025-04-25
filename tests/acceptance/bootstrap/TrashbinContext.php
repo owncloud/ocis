@@ -53,7 +53,6 @@ class TrashbinContext implements Context {
 			null,
 			[],
 			null,
-			$this->featureContext->getStepLineRef(),
 			null,
 			$davPathVersion,
 			'trash-bin'
@@ -158,7 +157,6 @@ class TrashbinContext implements Context {
 				$this->featureContext->getBaseUrl(),
 				$user,
 				$password,
-				$this->featureContext->getStepLineRef()
 			);
 			$suffixPath = $spaceId;
 		}
@@ -169,7 +167,6 @@ class TrashbinContext implements Context {
 			"",
 			$depth,
 			$spaceId,
-			$this->featureContext->getStepLineRef(),
 			[
 				'oc:trashbin-original-filename',
 				'oc:trashbin-original-location',
@@ -244,7 +241,6 @@ class TrashbinContext implements Context {
 			$collectionPath,
 			$depth,
 			null,
-			$this->featureContext->getStepLineRef(),
 			[
 				'oc:trashbin-original-filename',
 				'oc:trashbin-original-location',
@@ -277,7 +273,6 @@ class TrashbinContext implements Context {
 				$this->featureContext->getBaseUrl(),
 				$user,
 				$this->featureContext->getPasswordForUser($user),
-				$this->featureContext->getStepLineRef()
 			);
 		}
 		$endpoint = WebDavHelper::getDavPath($davPathVersion, $suffixPath, "trash-bin");
@@ -429,7 +424,6 @@ class TrashbinContext implements Context {
 				'oc:trashbin-delete-timestamp',
 				'd:getlastmodified'
 			],
-			$this->featureContext->getStepLineRef(),
 			'1',
 			null,
 			'trash-bin',
@@ -683,7 +677,6 @@ class TrashbinContext implements Context {
 
 		return HttpRequestHelper::sendRequest(
 			$fullUrl,
-			$this->featureContext->getStepLineRef(),
 			"DELETE",
 			$user,
 			$password
@@ -847,7 +840,6 @@ class TrashbinContext implements Context {
 					$baseUrl,
 					$asUser,
 					$password,
-					$this->featureContext->getStepLineRef()
 				);
 			}
 		}

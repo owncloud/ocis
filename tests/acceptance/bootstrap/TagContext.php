@@ -83,7 +83,6 @@ class TagContext implements Context {
 
 		return GraphHelper::createTags(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$resourceId,
@@ -180,7 +179,6 @@ class TagContext implements Context {
 				$this->featureContext->getBaseUrl(),
 				$user,
 				$this->featureContext->getPasswordForUser($user),
-				$this->featureContext->getStepLineRef()
 			)
 		);
 	}
@@ -246,7 +244,6 @@ class TagContext implements Context {
 
 		return GraphHelper::deleteTags(
 			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$resourceId,

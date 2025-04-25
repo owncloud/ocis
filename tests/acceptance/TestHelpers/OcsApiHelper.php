@@ -38,7 +38,6 @@ class OcsApiHelper {
 	 * @param string|null $password
 	 * @param string|null $method HTTP Method
 	 * @param string|null $path
-	 * @param string|null $xRequestId
 	 * @param mixed $body array of key, value pairs e.g ['value' => 'yes']
 	 * @param int|null $ocsApiVersion (1|2) default 2
 	 * @param array|null $headers
@@ -52,7 +51,6 @@ class OcsApiHelper {
 		?string $password,
 		?string $method,
 		?string $path,
-		?string $xRequestId = '',
 		$body = [],
 		?int $ocsApiVersion = 2,
 		?array $headers = []
@@ -63,7 +61,7 @@ class OcsApiHelper {
 		}
 		$fullUrl .= "ocs/v$ocsApiVersion.php" . $path;
 		$headers['OCS-APIREQUEST'] = true;
-		return HttpRequestHelper::sendRequest($fullUrl, $xRequestId, $method, $user, $password, $headers, $body);
+		return HttpRequestHelper::sendRequest($fullUrl, $method, $user, $password, $headers, $body);
 	}
 
 	/**
@@ -71,7 +69,6 @@ class OcsApiHelper {
 	 * @param string|null $baseUrl
 	 * @param string|null $method HTTP Method
 	 * @param string|null $path
-	 * @param string|null $xRequestId
 	 * @param mixed $body array of key, value pairs e.g ['value' => 'yes']
 	 * @param int|null $ocsApiVersion (1|2) default 2
 	 * @param array|null $headers
@@ -82,7 +79,6 @@ class OcsApiHelper {
 		?string $baseUrl,
 		?string $method,
 		?string $path,
-		?string $xRequestId = '',
 		$body = [],
 		?int $ocsApiVersion = 2,
 		?array $headers = []
@@ -94,7 +90,6 @@ class OcsApiHelper {
 		$fullUrl .= "ocs/v$ocsApiVersion.php" . $path;
 		return HttpRequestHelper::createRequest(
 			$fullUrl,
-			$xRequestId,
 			$method,
 			$headers,
 			$body
