@@ -64,8 +64,9 @@ Feature: Notification Settings
       | permissionsRole | Viewer    |
     And user "Brian" should have "0" emails
 
-  @email
-  Scenario: disable mail and in-app notification for "Share Received" event
+  @issue-10937 @email
+  Scenario Outline: disable mail and in-app notification for "Share Received" event
+    Given the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
     When user "Brian" disables notification for the following event using the settings API:
       | event             | Share Received |
       | notificationTypes | mail,in-app    |
@@ -153,10 +154,15 @@ Feature: Notification Settings
     When user "Brian" lists all notifications
     Then the HTTP status code should be "200"
     And the notifications should be empty
+    Examples:
+      | user-role  |
+      | User       |
+      | User Light |
 
-  @email
-  Scenario: disable mail and in-app notification for "Share Removed" event
-    Given user "Alice" has sent the following resource share invitation:
+  @issue-10937 @email
+  Scenario Outline: disable mail and in-app notification for "Share Removed" event
+    Given the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
+    And user "Alice" has sent the following resource share invitation:
       | resource        | lorem.txt |
       | space           | Personal  |
       | sharee          | Brian     |
@@ -245,13 +251,18 @@ Feature: Notification Settings
       | message                                |
       | Alice Hansen shared lorem.txt with you |
     But user "Brian" should not have a notification related to resource "lorem.txt" with subject "Resource unshared"
+    Examples:
+      | user-role  |
+      | User       |
+      | User Light |
 
-  @email
-  Scenario: disable mail and in-app notification for "Share Removed" event (Project space)
+  @issue-10937 @email
+  Scenario Outline: disable mail and in-app notification for "Share Removed" event (Project space)
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "newSpace" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "newSpace" with content "some content" to "insideSpace.txt"
+    And the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
     And user "Alice" has sent the following resource share invitation:
       | resource        | insideSpace.txt |
       | space           | newSpace        |
@@ -341,11 +352,16 @@ Feature: Notification Settings
       | message                                      |
       | Alice Hansen shared insideSpace.txt with you |
     But user "Brian" should not have a notification related to resource "insideSpace.txt" with subject "Resource unshared"
+    Examples:
+      | user-role  |
+      | User       |
+      | User Light |
 
-
-  Scenario: disable in-app notification for "Space disabled" event
+  @issue-10937
+  Scenario Outline: disable in-app notification for "Space disabled" event (note: no mail notification)
     Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
     And user "Alice" has sent the following space share invitation:
       | space           | new-space    |
       | sharee          | Brian        |
@@ -437,9 +453,13 @@ Feature: Notification Settings
       | message                                   |
       | Alice Hansen added you to Space new-space |
     But user "Brian" should not have a notification related to space "new-space" with subject "Space disabled"
+    Examples:
+      | user-role  |
+      | User       |
+      | User Light |
 
   @issue-10864 @email
-  Scenario: disable email notification for user light
+  Scenario: disable email notification for User Light mode
     Given the administrator has assigned the role "User Light" to user "Brian" using the Graph API
     When user "Brian" disables email notification using the settings API
     Then the HTTP status code should be "201"
@@ -495,11 +515,12 @@ Feature: Notification Settings
       | Alice Hansen shared lorem.txt with you |
     And user "Brian" should have "0" emails
 
-  @email
-  Scenario: disable mail and in-app notification for "Added as space member" event
+  @issue-10937 @email
+  Scenario Outline: disable mail and in-app notification for "Added as space member" event
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "newSpace" with the default quota using the Graph API
+    And the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
     When user "Brian" disables notification for the following event using the settings API:
       | event             | Added As Space Member |
       | notificationTypes | mail,in-app           |
@@ -586,6 +607,10 @@ Feature: Notification Settings
     Then the HTTP status code should be "200"
     And the notifications should be empty
     And user "Brian" should have "0" emails
+    Examples:
+      | user-role  |
+      | User       |
+      | User Light |
 
   @email
   Scenario: no email should be received when email sending interval is set to never
@@ -644,11 +669,12 @@ Feature: Notification Settings
       | Alice Hansen shared lorem.txt with you |
     And user "Brian" should have "0" emails
 
-  @email
-  Scenario: disable mail and in-app notification for "Removed as space member" event
+  @issue-10937 @email
+  Scenario Outline: disable mail and in-app notification for "Removed as space member" event
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "newSpace" with the default quota using the Graph API
+    And the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
     And user "Alice" has sent the following space share invitation:
       | space           | newSpace     |
       | sharee          | Brian        |
@@ -745,11 +771,16 @@ Feature: Notification Settings
 
       Click here to view it: %base_url%/f/%space_id%
       """
+    Examples:
+      | user-role  |
+      | User       |
+      | User Light |
 
-  @email
-  Scenario: disable mail and in-app notification for "Space Membership Expired" event
+  @issue-10937 @email
+  Scenario Outline: disable mail and in-app notification for "Space Membership Expired" event
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
     And user "Alice" has created a space "newSpace" with the default quota using the Graph API
     And user "Alice" has sent the following space share invitation:
       | space           | newSpace     |
@@ -848,11 +879,16 @@ Feature: Notification Settings
 
       Click here to view it: %base_url%/f/%space_id%
       """
+    Examples:
+      | user-role  |
+      | User       |
+      | User Light |
 
-
-  Scenario: disable share expired in-app and mail notification
+  @issue-10937 @email
+  Scenario Outline: disable mail and in-app notification for "Share Expired" event
     Given using SharingNG
     And user "Alice" has uploaded file with content "hello world" to "testfile.txt"
+    And the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
     When user "Brian" disables notification for the following event using the settings API:
       | event             | Share Expired |
       | notificationTypes | mail,in-app   |
@@ -932,10 +968,15 @@ Feature: Notification Settings
         }
       }
       """
+    Examples:
+      | user-role  |
+      | User       |
+      | User Light |
 
-  @email
-  Scenario Outline: no in-app and mail notification should appear when Share Expired notification is disabled (Personal space)
+  @issue-10937 @email
+  Scenario Outline: no in-app and mail notification should appear when "Share Expired" event is disabled (Personal space)
     Given using SharingNG
+    And the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
     And user "Alice" has created folder "my_data"
     And user "Alice" has uploaded file with content "hello world" to "lorem.txt"
     And user "Brian" has disabled notification for the following event using the settings API:
@@ -963,15 +1004,18 @@ Feature: Notification Settings
       | Alice Hansen shared <resource> with you |
     But user "Brian" should not have a notification related to space "Alice Hansen" with subject "Share expired"
     Examples:
-      | resource  |
-      | lorem.txt |
-      | my_data   |
+      | resource  | user-role  |
+      | lorem.txt | User       |
+      | lorem.txt | User Light |
+      | my_data   | User       |
+      | my_data   | User Light |
 
-  @email
-  Scenario Outline: no in-app and mail notification should appear when Share Expired notification is disabled (Project space)
+  @issue-10937 @email
+  Scenario Outline: no in-app and mail notification should appear when "Share Expired" event is disabled (Project space)
     Given using spaces DAV path
     And using SharingNG
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
     And user "Alice" has created a space "NewSpace" with the default quota using the Graph API
     And user "Alice" has created a folder "uploadFolder" in space "NewSpace"
     And user "Alice" has uploaded a file inside space "NewSpace" with content "share space items" to "lorem.txt"
@@ -1000,6 +1044,8 @@ Feature: Notification Settings
       | Alice Hansen shared <resource> with you |
     But user "Brian" should not have a notification related to space "NewSpace" with subject "Share expired"
     Examples:
-      | resource     |
-      | lorem.txt    |
-      | uploadFolder |
+      | resource     | user-role  |
+      | lorem.txt    | User       |
+      | lorem.txt    | User Light |
+      | uploadFolder | User       |
+      | uploadFolder | User Light |

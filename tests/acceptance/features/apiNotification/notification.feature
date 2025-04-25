@@ -13,9 +13,10 @@ Feature: Notification
     And user "Alice" has uploaded file with content "other data" to "/textfile1.txt"
     And user "Alice" has created folder "my_data"
 
-  @email
+  @issue-10937 @email
   Scenario Outline: user gets in-app and mail notifications of resource sharing
-    Given user "Alice" has sent the following resource share invitation:
+    Given the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
+    And user "Alice" has sent the following resource share invitation:
       | resource        | <resource> |
       | space           | Personal   |
       | sharee          | Brian      |
@@ -85,13 +86,16 @@ Feature: Notification
       Click here to view it: %base_url%/files/shares/with-me
       """
     Examples:
-      | resource      |
-      | textfile1.txt |
-      | my_data       |
+      | user-role     | resource      |
+      | User          | textfile1.txt |
+      | User          | my_data       |
+      | User Light    | textfile1.txt |
+      | User Light    | my_data       |
 
-
-  Scenario Outline: get a notification about a file share in various languages
-    Given user "Brian" has switched the system language to "<language>" using the <api> API
+  @issue-10937 @email
+  Scenario Outline: user gets a notification about a file share in various languages
+    Given the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
+    And user "Brian" has switched the system language to "<language>" using the <api> API
     And user "Alice" has sent the following resource share invitation:
       | resource        | textfile1.txt |
       | space           | Personal      |
@@ -118,11 +122,15 @@ Feature: Notification
       }
       """
     Examples:
-      | language | subject            | message                                          | api      |
-      | de       | Neue Freigabe      | Alice Hansen hat textfile1.txt mit Ihnen geteilt | Graph    |
-      | de       | Neue Freigabe      | Alice Hansen hat textfile1.txt mit Ihnen geteilt | settings |
-      | es       | Recurso compartido | Alice Hansen compartió textfile1.txt contigo     | Graph    |
-      | es       | Recurso compartido | Alice Hansen compartió textfile1.txt contigo     | settings |
+      | user-role     | language | subject            | message                                          | api      |
+      | User          | de       | Neue Freigabe      | Alice Hansen hat textfile1.txt mit Ihnen geteilt | Graph    |
+      | User          | de       | Neue Freigabe      | Alice Hansen hat textfile1.txt mit Ihnen geteilt | settings |
+      | User          | es       | Recurso compartido | Alice Hansen compartió textfile1.txt contigo     | Graph    |
+      | User          | es       | Recurso compartido | Alice Hansen compartió textfile1.txt contigo     | settings |
+      | User Light    | de       | Neue Freigabe      | Alice Hansen hat textfile1.txt mit Ihnen geteilt | Graph    |
+      | User Light    | de       | Neue Freigabe      | Alice Hansen hat textfile1.txt mit Ihnen geteilt | settings |
+      | User Light    | es       | Recurso compartido | Alice Hansen compartió textfile1.txt contigo     | Graph    |
+      | User Light    | es       | Recurso compartido | Alice Hansen compartió textfile1.txt contigo     | settings |
 
   @env-config
   Scenario: get a notification about a file share in default languages
@@ -171,9 +179,10 @@ Feature: Notification
       | textfile1.txt |
       | my_data       |
 
-  @issue-10966 @email
-  Scenario: check share expired in-app and mail notifications for Personal space file
+  @issue-10937 @issue-10966 @email
+  Scenario Outline: check share expired in-app and mail notifications for Personal space file
     Given using SharingNG
+    And the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
     And user "Alice" has uploaded file with content "hello world" to "testfile.txt"
     And user "Alice" has sent the following resource share invitation:
       | resource        | testfile.txt |
@@ -195,10 +204,15 @@ Feature: Notification
 
       Even though this share has been revoked you still might have access through other shares and/or space memberships.
       """
+    Examples:
+      | user-role  |
+      | User       |
+      | User Light |
 
-  @issue-10966 @email
-  Scenario: check share expired in-app and mail notifications for Personal space folder
+  @issue-10937 @issue-10966 @email
+  Scenario Outline: check share expired in-app and mail notifications for Personal space folder
     Given using SharingNG
+    And the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
     And user "Alice" has created folder "folderToShare"
     And user "Alice" has sent the following resource share invitation:
       | resource        | folderToShare |
@@ -220,10 +234,15 @@ Feature: Notification
 
       Even though this share has been revoked you still might have access through other shares and/or space memberships.
       """
+    Examples:
+      | user-role  |
+      | User       |
+      | User Light |
 
-  @issue-10904 @email
+  @issue-10904 @issue-10937 @email
   Scenario Outline: user gets an in-app and mail notifications of unsharing resource
-    Given user "Alice" has sent the following resource share invitation:
+    Given the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
+    And user "Alice" has sent the following resource share invitation:
       | resource        | <resource> |
       | space           | Personal   |
       | sharee          | Brian      |
@@ -243,17 +262,20 @@ Feature: Notification
       Even though this share has been revoked you still might have access through other shares and/or space memberships.
       """
     Examples:
-      | resource      |
-      | textfile1.txt |
-      | my_data       |
+      | user-role  | resource      |
+      | User       | textfile1.txt |
+      | User       | my_data       |
+      | User Light | textfile1.txt |
+      | User Light | my_data       |
 
-  @issue-10904 @email
+  @issue-10904 @issue-10937 @email
   Scenario Outline: user gets in-app and mail notifications when a resource is unshared (Project Space)
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "shared-space" with the default quota using the Graph API
     And user "Alice" has created a folder "SHARED-FOLDER" in space "shared-space"
     And user "Alice" has uploaded a file inside space "shared-space" with content "Sample data" to "file-to-share.txt"
+    And the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
     And user "Alice" has sent the following resource share invitation:
       | resource        | <resource>   |
       | space           | shared-space |
@@ -274,9 +296,11 @@ Feature: Notification
       Even though this share has been revoked you still might have access through other shares and/or space memberships.
       """
     Examples:
-      | resource          |
-      | file-to-share.txt |
-      | SHARED-FOLDER     |
+      | user-role  | resource          |
+      | User       | file-to-share.txt |
+      | User       | SHARED-FOLDER     |
+      | User Light | file-to-share.txt |
+      | User Light | SHARED-FOLDER     |
 
   @issue-9530 @email
   Scenario: user gets an in-app and mail notifications when someone with comma in display name shares a file
