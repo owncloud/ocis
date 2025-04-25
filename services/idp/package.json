@@ -172,7 +172,8 @@
     "overrides": {
       "kpop>cldr": "",
       "kpop>notistack": "^1.0.5",
-      "kpop>react-intl": "^5.25.0"
+      "kpop>react-intl": "^5.25.0",
+      "undici": ">=6.21.1"
     },
     "ignoredBuiltDependencies": [
       "core-js-pure",
