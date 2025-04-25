@@ -173,7 +173,8 @@
       "kpop>cldr": "",
       "kpop>notistack": "^1.0.5",
       "kpop>react-intl": "^5.25.0",
-      "undici": ">=6.21.1"
+      "undici": ">=6.21.1",
+      "vue-template-compiler": "^3.0.0"
     },
     "ignoredBuiltDependencies": [
       "core-js-pure",
