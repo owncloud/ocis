@@ -24,27 +24,28 @@ type Config struct {
 	GRPCClientTLS *shared.GRPCClientTLS `yaml:"grpc_client_tls"`
 	GrpcClient    client.Client         `yaml:"-"`
 
-	RoleQuotas            map[string]uint64   `yaml:"role_quotas"`
-	Policies              []Policy            `yaml:"policies"`
-	AdditionalPolicies    []Policy            `yaml:"additional_policies"`
-	OIDC                  OIDC                `yaml:"oidc"`
-	ServiceAccount        ServiceAccount      `yaml:"service_account"`
-	RoleAssignment        RoleAssignment      `yaml:"role_assignment"`
-	PolicySelector        *PolicySelector     `yaml:"policy_selector"`
-	PreSignedURL          PreSignedURL        `yaml:"pre_signed_url"`
-	AccountBackend        string              `yaml:"account_backend" env:"PROXY_ACCOUNT_BACKEND_TYPE" desc:"Account backend the PROXY service should use. Currently only 'cs3' is possible here." introductionVersion:"pre5.0"`
-	UserOIDCClaim         string              `yaml:"user_oidc_claim" env:"PROXY_USER_OIDC_CLAIM" desc:"The name of an OpenID Connect claim that is used for resolving users with the account backend. The value of the claim must hold a per user unique, stable and non re-assignable identifier. The availability of claims depends on your Identity Provider. There are common claims available for most Identity providers like 'email' or 'preferred_username' but you can also add your own claim." introductionVersion:"pre5.0"`
-	UserCS3Claim          string              `yaml:"user_cs3_claim" env:"PROXY_USER_CS3_CLAIM" desc:"The name of a CS3 user attribute (claim) that should be mapped to the 'user_oidc_claim'. Supported values are 'username', 'mail' and 'userid'." introductionVersion:"pre5.0"`
-	MachineAuthAPIKey     string              `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;PROXY_MACHINE_AUTH_API_KEY" desc:"Machine auth API key used to validate internal requests necessary to access resources from other services." introductionVersion:"pre5.0" mask:"password"`
-	AutoprovisionAccounts bool                `yaml:"auto_provision_accounts" env:"PROXY_AUTOPROVISION_ACCOUNTS" desc:"Set this to 'true' to automatically provision users that do not yet exist in the users service on-demand upon first sign-in. To use this a write-enabled libregraph user backend needs to be setup an running." introductionVersion:"pre5.0"`
-	AutoProvisionClaims   AutoProvisionClaims `yaml:"auto_provision_claims"`
-	EnableBasicAuth       bool                `yaml:"enable_basic_auth" env:"PROXY_ENABLE_BASIC_AUTH" desc:"Set this to true to enable 'basic authentication' (username/password)." introductionVersion:"pre5.0"`
-	InsecureBackends      bool                `yaml:"insecure_backends" env:"PROXY_INSECURE_BACKENDS" desc:"Disable TLS certificate validation for all HTTP backend connections." introductionVersion:"pre5.0"`
-	BackendHTTPSCACert    string              `yaml:"backend_https_cacert" env:"PROXY_HTTPS_CACERT" desc:"Path/File for the root CA certificate used to validate the server’s TLS certificate for https enabled backend services." introductionVersion:"pre5.0"`
-	AuthMiddleware        AuthMiddleware      `yaml:"auth_middleware"`
-	PoliciesMiddleware    PoliciesMiddleware  `yaml:"policies_middleware"`
-	CSPConfigFileLocation string              `yaml:"csp_config_file_location" env:"PROXY_CSP_CONFIG_FILE_LOCATION" desc:"The location of the CSP configuration file." introductionVersion:"6.0.0"`
-	Events                Events              `yaml:"events"`
+	RoleQuotas            map[string]uint64    `yaml:"role_quotas"`
+	Policies              []Policy             `yaml:"policies"`
+	AdditionalPolicies    []Policy             `yaml:"additional_policies"`
+	OIDC                  OIDC                 `yaml:"oidc"`
+	ServiceAccount        ServiceAccount       `yaml:"service_account"`
+	RoleAssignment        RoleAssignment       `yaml:"role_assignment"`
+	PolicySelector        *PolicySelector      `yaml:"policy_selector"`
+	PreSignedURL          PreSignedURL         `yaml:"pre_signed_url"`
+	AccountBackend        string               `yaml:"account_backend" env:"PROXY_ACCOUNT_BACKEND_TYPE" desc:"Account backend the PROXY service should use. Currently only 'cs3' is possible here." introductionVersion:"pre5.0"`
+	UserOIDCClaim         string               `yaml:"user_oidc_claim" env:"PROXY_USER_OIDC_CLAIM" desc:"The name of an OpenID Connect claim that is used for resolving users with the account backend. The value of the claim must hold a per user unique, stable and non re-assignable identifier. The availability of claims depends on your Identity Provider. There are common claims available for most Identity providers like 'email' or 'preferred_username' but you can also add your own claim." introductionVersion:"pre5.0"`
+	UserCS3Claim          string               `yaml:"user_cs3_claim" env:"PROXY_USER_CS3_CLAIM" desc:"The name of a CS3 user attribute (claim) that should be mapped to the 'user_oidc_claim'. Supported values are 'username', 'mail' and 'userid'." introductionVersion:"pre5.0"`
+	MachineAuthAPIKey     string               `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;PROXY_MACHINE_AUTH_API_KEY" desc:"Machine auth API key used to validate internal requests necessary to access resources from other services." introductionVersion:"pre5.0" mask:"password"`
+	AutoprovisionAccounts bool                 `yaml:"auto_provision_accounts" env:"PROXY_AUTOPROVISION_ACCOUNTS" desc:"Set this to 'true' to automatically provision users that do not yet exist in the users service on-demand upon first sign-in. To use this a write-enabled libregraph user backend needs to be setup an running." introductionVersion:"pre5.0"`
+	AutoProvisionClaims   AutoProvisionClaims  `yaml:"auto_provision_claims"`
+	EnableBasicAuth       bool                 `yaml:"enable_basic_auth" env:"PROXY_ENABLE_BASIC_AUTH" desc:"Set this to true to enable 'basic authentication' (username/password)." introductionVersion:"pre5.0"`
+	InsecureBackends      bool                 `yaml:"insecure_backends" env:"PROXY_INSECURE_BACKENDS" desc:"Disable TLS certificate validation for all HTTP backend connections." introductionVersion:"pre5.0"`
+	BackendHTTPSCACert    string               `yaml:"backend_https_cacert" env:"PROXY_HTTPS_CACERT" desc:"Path/File for the root CA certificate used to validate the server’s TLS certificate for https enabled backend services." introductionVersion:"pre5.0"`
+	AuthMiddleware        AuthMiddleware       `yaml:"auth_middleware"`
+	PoliciesMiddleware    PoliciesMiddleware   `yaml:"policies_middleware"`
+	CSPConfigFileLocation string               `yaml:"csp_config_file_location" env:"PROXY_CSP_CONFIG_FILE_LOCATION" desc:"The location of the CSP configuration file." introductionVersion:"6.0.0"`
+	Events                Events               `yaml:"events"`
+	ClaimSpaceManagement  ClaimSpaceManagement `yaml:"claim_space_management"`
 
 	Context context.Context `json:"-" yaml:"-"`
 }
@@ -229,4 +230,12 @@ type Events struct {
 	EnableTLS            bool   `yaml:"enable_tls" env:"OCIS_EVENTS_ENABLE_TLS;PROXY_EVENTS_ENABLE_TLS" desc:"Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services." introductionVersion:"7.0.0"`
 	AuthUsername         string `yaml:"username" env:"OCIS_EVENTS_AUTH_USERNAME;PROXY_EVENTS_AUTH_USERNAME" desc:"The username to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services." introductionVersion:"7.0.0"`
 	AuthPassword         string `yaml:"password" env:"OCIS_EVENTS_AUTH_PASSWORD;PROXY_EVENTS_AUTH_PASSWORD" desc:"The password to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services." introductionVersion:"7.0.0"`
+}
+
+// ClaimSpaceManagement holds the configuration for claim managed spaces
+type ClaimSpaceManagement struct {
+	Enabled bool     `yaml:"enabled" env:"OCIS_CLAIMMANAGEDSPACES_ENABLED" desc:"Enables space management through OIDC claims" introductionVersion:"%%NEXT%%"`
+	Claim   string   `yaml:"claim" env:"OCIS_CLAIMMANAGEDSPACES_CLAIMNAME" desc:"The name of the claim used for space management" introductionVersion:"%%NEXT%%"`
+	Regexp  string   `yaml:"regexp" env:"OCIS_CLAIMMANAGEDSPACES_REGEXP" desc:"The regular expression that extracts spaceid and role from a claim" introductionVersion:"%%NEXT%%"`
+	Mapping []string `yaml:"mapping" env:"OCIS_CLAIMMANAGEDSPACES_MAPPING" desc:"(Optional) Mapping of oidc roles to ocis space roles. Example: 'oidcroleA:viewer,oidcroleB:manager'" introductionVersion:"%%NEXT%%"`
 }
