@@ -363,6 +363,12 @@ pipelineVolumeGo = \
         "temp": {},
     }
 
+stepVolumeOcisStorage = \
+    {
+        "name": "storage",
+        "path": "/root/.ocis",
+    }
+
 # minio mc environment variables
 MINIO_MC_ENV = {
     "CACHE_BUCKET": S3_CACHE_BUCKET,
@@ -1030,7 +1036,7 @@ def localApiTestPipeline(ctx):
                                      restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin") +
                                      (tikaService() if params["tikaNeeded"] else []) +
                                      (waitForServices("online-offices", ["collabora:9980", "onlyoffice:443", "fakeoffice:8080"]) if params["collaborationServiceNeeded"] else []) +
-                                     ocisServer(storage, params["accounts_hash_difficulty"], extra_server_environment = params["extraServerEnvironment"], with_wrapper = True, tika_enabled = params["tikaNeeded"]) +
+                                     ocisServer(storage, params["accounts_hash_difficulty"], extra_server_environment = params["extraServerEnvironment"], with_wrapper = True, tika_enabled = params["tikaNeeded"], volumes = ([stepVolumeOcisStorage] if name.startswith("cli") else [])) +
                                      (waitForClamavService() if params["antivirusNeeded"] else []) +
                                      (waitForEmailService() if params["emailNeeded"] else []) +
                                      (ocisServer(storage, params["accounts_hash_difficulty"], deploy_type = "federation", extra_server_environment = params["extraServerEnvironment"]) if params["federationServer"] else []) +
@@ -1049,6 +1055,10 @@ def localApiTestPipeline(ctx):
                                     "refs/pull/**",
                                 ],
                             },
+                            "volumes": [{
+                                "name": "storage",
+                                "temp": {},
+                            }],
                         }
                         pipelines.append(pipeline)
     return pipelines
@@ -1120,6 +1130,7 @@ def localApiTests(ctx, name, suites, storage = "ocis", extra_environment = {}, w
             "" if with_remote_php else "cat %s/expected-failures-without-remotephp.md >> %s" % (test_dir, expected_failures_file),
             "make -C %s test-acceptance-api" % (dirs["base"]),
         ],
+        "volumes": [stepVolumeOcisStorage],
     }]
 
 def cs3ApiTests(ctx, storage, accounts_hash_difficulty = 4):
@@ -1525,12 +1536,8 @@ def multiServiceE2ePipeline(ctx):
     for item in storage_users_environment:
         storage_users2_environment[item] = storage_users_environment[item]
 
-    storage_volume = [{
-        "name": "storage",
-        "path": "/root/.ocis",
-    }]
-    storage_users_services = startOcisService("storage-users", "storageusers1", storage_users1_environment, storage_volume) + \
-                             startOcisService("storage-users", "storageusers2", storage_users2_environment, storage_volume) + \
+    storage_users_services = startOcisService("storage-users", "storageusers1", storage_users1_environment, [stepVolumeOcisStorage]) + \
+                             startOcisService("storage-users", "storageusers2", storage_users2_environment, [stepVolumeOcisStorage]) + \
                              ocisHealthCheck("storage-users", ["storageusers1:9159", "storageusers2:9159"])
 
     for _, suite in config["e2eMultiService"].items():

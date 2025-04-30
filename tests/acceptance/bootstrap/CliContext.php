@@ -22,6 +22,7 @@
 
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Behat\Context\Context;
+use Behat\Gherkin\Node\PyStringNode;
 use Behat\Gherkin\Node\TableNode;
 use GuzzleHttp\Exception\GuzzleException;
 use PHPUnit\Framework\Assert;
@@ -295,10 +296,8 @@ class CliContext implements Context {
 	 * @return void
 	 */
 	public function theCommandShouldBeSuccessful(string $successfulOrNot): void {
-		$response = $this->featureContext->getResponse();
-		$this->featureContext->theHTTPStatusCodeShouldBe(200, '', $response);
-
-		$jsonResponse = $this->featureContext->getJsonDecodedResponse($response);
+		$this->featureContext->theHTTPStatusCodeShouldBe(200);
+		$jsonResponse = $this->featureContext->getJsonDecodedResponse();
 
 		$expectedStatus = 'OK';
 		$expectedExitCode = 0;
@@ -481,6 +480,16 @@ class CliContext implements Context {
 	}
 
 	/**
+	 * @AfterScenario @cli-stale-uploads
+	 *
+	 * @return void
+	 */
+	public function cleanUpStaleUploads(): void {
+		$response = $this->deleteStaleUploads();
+		$this->featureContext->theHTTPStatusCodeShouldBe(200, "Failed to cleanup stale upload", $response);
+	}
+
+	/**
 	 * @When /^the administrator triggers "([^"]*)" email notifications using the CLI$/
 	 *
 	 * @param string $interval
@@ -495,5 +504,173 @@ class CliContext implements Context {
 		];
 
 		$this->featureContext->setResponse(CliHelper::runCommand($body));
+	}
+
+	/**
+	 * @Given the administrator has created stale upload
+	 *
+	 * @return void
+	 */
+	public function theAdministratorHasCreatedStaleUpload(): void {
+		$folderPath = $this->featureContext->getStorageUsersRoot() . "/uploads";
+		$infoFiles = glob($folderPath . '/*.info');
+		foreach ($infoFiles as $file) {
+			if (!unlink($file)) {
+				Assert::fail("Fail to delete info file");
+			}
+		}
+	}
+
+	/**
+	 * @param string|null $spaceId
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	protected function listStaleUploads(?string $spaceId = null): ResponseInterface {
+		$command = "storage-users uploads delete-stale-nodes --dry-run=true";
+
+		if ($spaceId !== null) {
+			$command .= " --spaceid=$spaceId";
+		}
+
+		$body = [
+			"command" => $command
+		];
+		return CliHelper::runCommand($body);
+	}
+
+	/**
+	 * @param string|null $spaceId
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	protected function deleteStaleUploads(?string $spaceId = null): ResponseInterface {
+		$command = "storage-users uploads delete-stale-nodes --dry-run=false";
+		if ($spaceId !== null) {
+			$command .= " --spaceid=$spaceId";
+		}
+
+		$body = [
+			"command" => $command
+		];
+		return CliHelper::runCommand($body);
+	}
+
+	/**
+	 * @When the administrator lists all the stale uploads
+	 *
+	 * @return void
+	 */
+	public function theAdministratorListsAllTheStaleUploads(): void {
+		$this->featureContext->setResponse($this->listStaleUploads());
+	}
+
+	/**
+	 * @When the administrator lists all the stale uploads of space :space owned by user :user
+	 *
+	 * @param string $spaceName
+	 * @param string $user
+	 *
+	 * @return void
+	 */
+	public function theAdministratorListsTheStaleUploadsOfSpace(
+		string $spaceName,
+		string $user
+	): void {
+		$space = $this->spacesContext->getSpaceByName(
+			$user,
+			$spaceName
+		);
+		$spaceOwnerId = $space["owner"]["user"]["id"];
+		$this->featureContext->setResponse($this->listStaleUploads($spaceOwnerId));
+	}
+
+	/**
+	 * @Then the CLI response should contain the following message:
+	 *
+	 * @param PyStringNode $content
+	 *
+	 * @return void
+	 */
+	public function theCLIResponseShouldContainTheseMessage(PyStringNode $content): void {
+		$response = $this->featureContext->getJsonDecodedResponseBodyContent();
+		$expectedMessage = str_replace("\r\n", "\n", trim($content->getRaw()));
+		$actualMessage = str_replace("\r\n", "\n", trim($response->message ?? ''));
+
+		Assert::assertSame(
+			$expectedMessage,
+			$actualMessage,
+			"Expected cli output to be $expectedMessage but found $actualMessage"
+		);
+	}
+
+	/**
+	 * @When the administrator deletes all the stale uploads
+	 *
+	 * @return void
+	 */
+	public function theAdministratorDeletesAllTheStaleUploads(): void {
+		$this->featureContext->setResponse($this->deleteStaleUploads());
+	}
+
+	/**
+	 * @When the administrator deletes all the stale uploads of space :spaceName owned by user :user
+	 *
+	 * @param string $spaceName
+	 * @param string $user
+	 *
+	 * @return void
+	 */
+	public function theAdministratorDeletesTheStaleUploadsOfSpaceOwnedByUser(
+		string $spaceName,
+		string $user
+	): void {
+		$space = $this->spacesContext->getSpaceByName(
+			$user,
+			$spaceName
+		);
+		$spaceOwnerId = $space["owner"]["user"]["id"];
+		$this->featureContext->setResponse($this->deleteStaleUploads($spaceOwnerId));
+	}
+
+	/**
+	 * @Then there should be :number stale uploads
+	 * @Then there should be :number stale uploads of space :spaceName owned by user :user
+	 *
+	 * @param int $number
+	 * @param string|null $spaceName
+	 * @param string|null $user
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function thereShouldBeStaleUploadsOfSpaceOwnedByUser(
+		int $number,
+		string $spaceName='',
+		string $user=''
+	): void {
+		$spaceOwnerId = null;
+		if ($spaceName !== '' && $user !== '') {
+			$space = $this->spacesContext->getSpaceByName(
+				$user,
+				$spaceName
+			);
+			$spaceOwnerId = $space["owner"]["user"]["id"];
+		}
+
+		$response = $this->listStaleUploads($spaceOwnerId);
+		$jsonDecodedResponse = $this->featureContext->getJsonDecodedResponseBodyContent($response);
+		$this->featureContext->theHTTPStatusCodeShouldBe(200, "", $response);
+
+		$expectedMessage = "Total stale nodes: $number";
+
+		Assert::assertStringContainsString(
+			$expectedMessage,
+			$jsonDecodedResponse->message ?? '',
+			"Expected message to contain '$expectedMessage', but got: " . ($jsonDecodedResponse->message ?? 'null')
+		);
+
 	}
 }
