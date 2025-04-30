@@ -306,3 +306,61 @@ Feature: Tag
       | finance     |
       | hr          |
       | qa          |
+
+
+  Scenario: user creates a tag that exceeds the default max tag length
+    Given user "Alice" has created a folder "folderMain" in space "Alice Hansen"
+    And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "file.txt"
+    When user "Alice" creates the following tags for folder "folderMain" of space "Alice Hansen":
+      | my tag                                                                                                    |
+      | Loremipsumdolorsitametconsecteturadipiscingelitseddoeiusmodtemporincididuntutlaboreetdoloremagnaaliqua,qa |
+    Then the HTTP status code should be "400"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [ "error" ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [ "code", "message" ],
+            "properties": {
+              "code": { "const": "invalidRequest" },
+              "message": {
+                "const": "tag [Loremipsumdolorsitametconsecteturadipiscingelitseddoeiusmodtemporincididuntutlaboreetdoloremagnaaliqua] too long, max length is 100"
+              }
+            }
+          }
+        }
+      }
+      """
+
+  @env-config
+  Scenario: user creates a tag that exceeds the set max tag length
+    Given the config "OCIS_MAX_TAG_LENGTH" has been set to "2"
+    And user "Alice" has created a folder "folderMain" in space "Alice Hansen"
+    And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "file.txt"
+    When user "Alice" creates the following tags for folder "folderMain" of space "Alice Hansen":
+      | my tag |
+      | qa     |
+    Then the HTTP status code should be "400"
+
+  @env-config
+  Scenario: user creates a tag that is under the set max tag length
+    Given the config "OCIS_MAX_TAG_LENGTH" has been set to "10"
+    And user "Alice" has created a folder "folderMain" in space "Alice Hansen"
+    And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "file.txt"
+    When user "Alice" creates the following tags for folder "folderMain" of space "Alice Hansen":
+      | my tag |
+      | qa     |
+    Then the HTTP status code should be "200"
+
+  @env-config
+  Scenario: user creates a tag that exceeds the default max tag length when tag length is set to unlimited
+    Given the config "OCIS_MAX_TAG_LENGTH" has been set to "0"
+    And user "Alice" has created a folder "folderMain" in space "Alice Hansen"
+    And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "file.txt"
+    When user "Alice" creates the following tags for folder "folderMain" of space "Alice Hansen":
+      | my tag                                                                                                    |
+      | Loremipsumdolorsitametconsecteturadipiscingelitseddoeiusmodtemporincididuntutlaboreetdoloremagnaaliqua,qa |
+    Then the HTTP status code should be "200"
