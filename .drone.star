@@ -120,9 +120,9 @@ config = {
         },
         "graphBasicAndGroup": {
             "suites": [
-                "apiServiceAvailability",
                 "apiGraph",
                 "apiGraphGroup",
+                "apiServiceAvailability",
             ],
             "skip": False,
             "withRemotePhp": [True],
