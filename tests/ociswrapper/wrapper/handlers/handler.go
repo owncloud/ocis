@@ -7,11 +7,11 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"strings"
-	"strconv"
 	"ociswrapper/common"
 	"ociswrapper/ocis"
 	"ociswrapper/ocis/config"
+	"strconv"
+	"strings"
 )
 
 type BasicResponse struct {
@@ -209,7 +209,7 @@ func CommandHandler(res http.ResponseWriter, req *http.Request) {
 func OcisServiceHandler(res http.ResponseWriter, req *http.Request) {
 	serviceName := req.PathValue("service")
 
-    var envBody map[string]interface{}
+	var envBody map[string]interface{}
 
 	if req.Body != nil && req.ContentLength > 0 {
 		var err error
@@ -229,16 +229,16 @@ func OcisServiceHandler(res http.ResponseWriter, req *http.Request) {
 				config.SetServiceDebugPort(serviceName, port)
 			}
 		}
-		log.Println(fmt.Sprintf("Starting %s service...", serviceName))
+		log.Println(fmt.Sprintf("Starting '%s' service...", serviceName))
 
 		common.Wg.Add(1)
 		go ocis.StartService(serviceName, ocis.ServiceEnvConfigs[serviceName])
 
 		success := ocis.WaitForServiceStatus(serviceName, true)
 		if success {
-			sendResponse(res, http.StatusOK, fmt.Sprintf("%s service started successfully", serviceName))
+			sendResponse(res, http.StatusOK, fmt.Sprintf("'%s' service started successfully", serviceName))
 		} else {
-			sendResponse(res, http.StatusInternalServerError, fmt.Sprintf("Failed to start %s service.", serviceName))
+			sendResponse(res, http.StatusInternalServerError, fmt.Sprintf("Failed to start '%s' service.", serviceName))
 		}
 		return
 	} else if req.Method == http.MethodDelete {
@@ -264,14 +264,14 @@ func OcisServiceHandler(res http.ResponseWriter, req *http.Request) {
 				serviceEnvMap = append(ocis.ServiceEnvConfigs[serviceName], serviceEnvMap...)
 			}
 			common.Wg.Add(1)
-			log.Println(fmt.Sprintf("%s service restarting...", serviceName))
+			log.Println(fmt.Sprintf("Restarting '%s' service...", serviceName))
 			go ocis.StartService(serviceName, serviceEnvMap)
 
 			success := ocis.WaitForServiceStatus(serviceName, true)
 			if success {
-            	sendResponse(res, http.StatusOK, fmt.Sprintf("%s service updated successfully", serviceName))
-            	return
-            }
+				sendResponse(res, http.StatusOK, fmt.Sprintf("'%s' service updated successfully", serviceName))
+				return
+			}
 		}
 		sendResponse(res, http.StatusInternalServerError, message)
 		return
@@ -308,5 +308,3 @@ func RollbackServicesHandler(res http.ResponseWriter, req *http.Request) {
 		sendResponse(res, http.StatusOK, "All services have been rolled back successfully")
 	}
 }
-
-
