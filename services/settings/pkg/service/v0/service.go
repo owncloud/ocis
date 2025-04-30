@@ -9,7 +9,6 @@ import (
 
 	cs3permissions "github.com/cs3org/go-cs3apis/cs3/permissions/v1beta1"
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
-	"github.com/leonelquinteros/gotext"
 	"github.com/owncloud/ocis/v2/ocis-pkg/l10n"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
@@ -252,15 +251,15 @@ func (g Service) SaveValue(ctx context.Context, req *settingssvc.SaveValueReques
 	cleanUpResource(ctx, req.GetValue().GetResource())
 	// TODO: we need to check, if the authenticated user has permission to write the value for the specified resource (e.g. global, file with id xy, ...)
 	if validationError := validateSaveValue(req); validationError != nil {
-		return merrors.BadRequest(g.id, validationError.Error())
+		return merrors.BadRequest(g.id, "%s", validationError)
 	}
 	r, err := g.manager.WriteValue(req.GetValue())
 	if err != nil {
-		return merrors.BadRequest(g.id, err.Error())
+		return merrors.BadRequest(g.id, "%s", err)
 	}
 	valueWithIdentifier, err := g.getValueWithIdentifier(r)
 	if err != nil {
-		return merrors.NotFound(g.id, err.Error())
+		return merrors.NotFound(g.id, "%s", err)
 	}
 	res.Value = valueWithIdentifier
 	return nil
@@ -290,17 +289,17 @@ func (g Service) GetValueByUniqueIdentifiers(ctx context.Context, req *settingss
 		return merrors.Forbidden(g.id, "can't get value of another user")
 	}
 	if validationError := validateGetValueByUniqueIdentifiers(req); validationError != nil {
-		return merrors.BadRequest(g.id, validationError.Error())
+		return merrors.BadRequest(g.id, "%s", validationError)
 	}
 	v, err := g.manager.ReadValueByUniqueIdentifiers(req.GetAccountUuid(), req.GetSettingId())
 	if err != nil {
-		return merrors.NotFound(g.id, err.Error())
+		return merrors.NotFound(g.id, "%s", err)
 	}
 
 	if v.GetBundleId() != "" {
 		valueWithIdentifier, err := g.getValueWithIdentifier(v)
 		if err != nil {
-			return merrors.NotFound(g.id, err.Error())
+			return merrors.NotFound(g.id, "%s", err)
 		}
 
 		res.Value = valueWithIdentifier
@@ -316,11 +315,11 @@ func (g Service) ListValues(ctx context.Context, req *settingssvc.ListValuesRequ
 	}
 
 	if validationError := validateListValues(req); validationError != nil {
-		return merrors.BadRequest(g.id, validationError.Error())
+		return merrors.BadRequest(g.id, "%s", validationError)
 	}
 	values, err := g.manager.ListValues(req.GetBundleId(), req.GetAccountUuid())
 	if err != nil {
-		return merrors.NotFound(g.id, err.Error())
+		return merrors.NotFound(g.id, "%s", err)
 	}
 	result := make([]*settingsmsg.ValueWithIdentifier, 0, len(values))
 	for _, value := range values {
@@ -335,7 +334,6 @@ func (g Service) ListValues(ctx context.Context, req *settingssvc.ListValuesRequ
 
 // ListRoles implements the RoleServiceHandler interface
 func (g Service) ListRoles(_ context.Context, req *settingssvc.ListBundlesRequest, res *settingssvc.ListBundlesResponse) error {
-	//accountUUID := getValidatedAccountUUID(c, "me")
 	if validationError := validateListRoles(req); validationError != nil {
 		return merrors.BadRequest(g.id, "%s", validationError)
 	}
@@ -390,7 +388,7 @@ func (g Service) ListRoleAssignmentsFiltered(ctx context.Context, req *settingss
 func (g Service) AssignRoleToUser(ctx context.Context, req *settingssvc.AssignRoleToUserRequest, res *settingssvc.AssignRoleToUserResponse) error {
 	req.AccountUuid = getValidatedAccountUUID(ctx, req.GetAccountUuid())
 	if validationError := validateAssignRoleToUser(req); validationError != nil {
-		return merrors.BadRequest(g.id, validationError.Error())
+		return merrors.BadRequest(g.id, "%s", validationError)
 	}
 
 	ownAccountUUID, ok := metadata.Get(ctx, middleware.AccountID)
@@ -417,7 +415,7 @@ func (g Service) AssignRoleToUser(ctx context.Context, req *settingssvc.AssignRo
 
 	r, err := g.manager.WriteRoleAssignment(req.GetAccountUuid(), req.GetRoleId())
 	if err != nil {
-		return merrors.BadRequest(g.id, err.Error())
+		return merrors.BadRequest(g.id, "%s", err)
 	}
 	res.Assignment = r
 	return nil
@@ -430,7 +428,7 @@ func (g Service) RemoveRoleFromUser(ctx context.Context, req *settingssvc.Remove
 	}
 
 	if validationError := validateRemoveRoleFromUser(req); validationError != nil {
-		return merrors.BadRequest(g.id, validationError.Error())
+		return merrors.BadRequest(g.id, "%s", validationError)
 	}
 
 	ownAccountUUID, ok := metadata.Get(ctx, middleware.AccountID)
@@ -442,7 +440,7 @@ func (g Service) RemoveRoleFromUser(ctx context.Context, req *settingssvc.Remove
 	al, err := g.manager.ListRoleAssignments(ownAccountUUID)
 	if err != nil {
 		g.logger.Debug().Err(err).Str("id", g.id).Msg("ListRoleAssignments failed")
-		return merrors.InternalServerError(g.id, err.Error())
+		return merrors.InternalServerError(g.id, "%s", err)
 	}
 
 	for _, a := range al {
@@ -453,7 +451,7 @@ func (g Service) RemoveRoleFromUser(ctx context.Context, req *settingssvc.Remove
 	}
 
 	if err := g.manager.RemoveRoleAssignment(req.GetId()); err != nil {
-		return merrors.BadRequest(g.id, err.Error())
+		return merrors.BadRequest(g.id, "%s", err)
 	}
 	return nil
 }
@@ -688,7 +686,7 @@ func formatPermissionName(setting *settingsmsg.Setting) string {
 	return setting.GetName() + "." + strings.ToLower(constraint)
 }
 
-func translateBundle(bundle *settingsmsg.Bundle, t *gotext.Locale) *settingsmsg.Bundle {
+func translateBundle(bundle *settingsmsg.Bundle, t l10n.OcisLocale) *settingsmsg.Bundle {
 	for i, set := range bundle.GetSettings() {
 		switch set.GetId() {
 		default:

@@ -22,6 +22,16 @@ var (
 	ErrUnsupportedType = errors.New("unsupported type")
 )
 
+// OcisLocale based on gotext.Locale, helps to pass go 1.24 vet on non-constant strings
+// Without the interface, go 1.24 vet will complain about non-constant strings used in gotext printf
+// Alternatives would be to use a different workaround or a different library
+type OcisLocale interface {
+	Get(str string, vars ...interface{}) string
+	GetN(str, plural string, n int, vars ...interface{}) string
+	GetC(str, ctx string, vars ...interface{}) string
+	GetNC(str, plural string, n int, ctx string, vars ...interface{}) string
+}
+
 // Template marks a string as translatable
 func Template(s string) string { return s }
 
@@ -58,7 +68,7 @@ func (t Translator) Translate(str, locale string) string {
 }
 
 // Locale returns the gotext.Locale, use `.Get` method to translate strings
-func (t Translator) Locale(locale string) *gotext.Locale {
+func (t Translator) Locale(locale string) OcisLocale {
 	l := gotext.NewLocaleFS(locale, t.fs)
 	l.AddDomain(t.domain) // make domain configurable only if needed
 	if locale != "en" && len(l.GetTranslations()) == 0 {

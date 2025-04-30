@@ -21,6 +21,8 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
+const ERR_INVALID_AGENT_ENDPOINT = "invalid agent endpoint %s. expected format: hostname:port"
+
 // Propagator ensures the importer module uses the same trace propagation strategy.
 var Propagator = propagation.NewCompositeTextMapPropagator(
 	propagation.Baggage{},
@@ -159,14 +161,14 @@ func parseAgentConfig(ae string) (string, string, error) {
 
 	p := strings.Split(ae, ":")
 	if len(p) != 2 {
-		return "", "", fmt.Errorf(fmt.Sprintf("invalid agent endpoint `%s`. expected format: `hostname:port`", ae))
+		return "", "", fmt.Errorf(ERR_INVALID_AGENT_ENDPOINT, ae)
 	}
 
 	switch {
 	case p[0] == "" && p[1] == "": // case ae = ":"
-		return "", "", fmt.Errorf(fmt.Sprintf("invalid agent endpoint `%s`. expected format: `hostname:port`", ae))
+		return "", "", fmt.Errorf(ERR_INVALID_AGENT_ENDPOINT, ae)
 	case p[0] == "":
-		return "", "", fmt.Errorf(fmt.Sprintf("invalid agent endpoint `%s`. expected format: `hostname:port`", ae))
+		return "", "", fmt.Errorf(ERR_INVALID_AGENT_ENDPOINT, ae)
 	}
 	return p[0], p[1], nil
 }
