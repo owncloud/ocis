@@ -129,7 +129,7 @@ func (g Thumbnail) checkThumbnail(req *thumbnailssvc.GetThumbnailRequest, sRes *
 	}
 	tr, err := thumbnail.PrepareRequest(int(req.GetWidth()), int(req.GetHeight()), tType, sRes.GetInfo().GetChecksum().GetSum(), req.GetProcessor())
 	if err != nil {
-		return "", tr, merrors.BadRequest(g.serviceID, err.Error())
+		return "", tr, merrors.BadRequest(g.serviceID, "%s", err.Error())
 	}
 
 	if key, exists := g.manager.CheckThumbnail(tr); exists {
@@ -158,7 +158,7 @@ func (g Thumbnail) handleCS3Source(ctx context.Context, req *thumbnailssvc.GetTh
 	r, err := g.cs3Source.Get(ctx, src.GetPath())
 	switch {
 	case errors.Is(err, terrors.ErrImageTooLarge):
-		return "", merrors.Forbidden(g.serviceID, err.Error())
+		return "", merrors.Forbidden(g.serviceID, "%s", err.Error())
 	case err != nil:
 		return "", merrors.InternalServerError(g.serviceID, "could not get image from source: %s", err.Error())
 	}
@@ -175,7 +175,7 @@ func (g Thumbnail) handleCS3Source(ctx context.Context, req *thumbnailssvc.GetTh
 
 	key, err = g.manager.Generate(tr, img)
 	if errors.Is(err, terrors.ErrImageTooLarge) {
-		return "", merrors.Forbidden(g.serviceID, err.Error())
+		return "", merrors.Forbidden(g.serviceID, "%s", err.Error())
 	}
 	return key, err
 }
@@ -251,7 +251,7 @@ func (g Thumbnail) handleWebdavSource(ctx context.Context, req *thumbnailssvc.Ge
 	r, err := g.webdavSource.Get(ctx, imgURL.String())
 	switch {
 	case errors.Is(err, terrors.ErrImageTooLarge):
-		return "", merrors.Forbidden(g.serviceID, err.Error())
+		return "", merrors.Forbidden(g.serviceID, "%s", err.Error())
 	case err != nil:
 		return "", merrors.InternalServerError(g.serviceID, "could not get image from source: %s", err.Error())
 	}
@@ -267,7 +267,7 @@ func (g Thumbnail) handleWebdavSource(ctx context.Context, req *thumbnailssvc.Ge
 
 	key, err = g.manager.Generate(tr, img)
 	if errors.Is(err, terrors.ErrImageTooLarge) {
-		return "", merrors.Forbidden(g.serviceID, err.Error())
+		return "", merrors.Forbidden(g.serviceID, "%s", err.Error())
 	}
 	return key, err
 }

@@ -165,9 +165,9 @@ func (s Service) Search(ctx context.Context, in *searchsvc.SearchRequest, out *s
 		if err != nil {
 			switch err.(type) {
 			case errtypes.BadRequest:
-				return merrors.BadRequest(s.id, err.Error())
+				return merrors.BadRequest(s.id, "%s", err.Error())
 			default:
-				return merrors.InternalServerError(s.id, err.Error())
+				return merrors.InternalServerError(s.id, "%s", err.Error())
 			}
 		}
 

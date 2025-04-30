@@ -190,7 +190,6 @@ func (ul *UserlogService) processEvent(event events.Event) {
 		executant = e.Sharer
 		users = append(users, e.GranteeUserID.GetOpaqueId())
 	case events.OCMCoreShareDelete:
-		fmt.Println("### userlog processEvent OCMCoreShareDelete", e.Sharer, e.Grantee)
 		executant = e.Sharer
 		users = append(users, e.Grantee.GetOpaqueId())
 	}
@@ -206,7 +205,7 @@ func (ul *UserlogService) processEvent(event events.Event) {
 	// III) store the eventID for each user
 	for _, id := range users {
 		if err := ul.addEventToUser(id, event); err != nil {
-			ul.log.Error().Err(err).Str("userID", id).Str("eventid", event.ID).Msg("failed to store event for user")
+			ul.log.Error().Err(err).Str("user_id", id).Str("event_id", event.ID).Msg("failed to store event for user")
 			return
 		}
 	}
@@ -214,7 +213,7 @@ func (ul *UserlogService) processEvent(event events.Event) {
 	// IV) send sses
 	if !ul.cfg.DisableSSE {
 		if err := ul.sendSSE(ctx, users, event, ul.gatewaySelector); err != nil {
-			ul.log.Error().Err(err).Interface("userid", users).Str("eventid", event.ID).Msg("cannot create sse event")
+			ul.log.Error().Err(err).Str("user_ids", fmt.Sprintf("%v", users)).Str("event_id", event.ID).Msg("cannot create sse event")
 		}
 	}
 }

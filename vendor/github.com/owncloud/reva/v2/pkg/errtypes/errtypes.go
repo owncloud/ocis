@@ -99,7 +99,9 @@ func (e PreconditionFailed) IsPreconditionFailed() {}
 // AlreadyExists is the error to use when a resource something is not found.
 type AlreadyExists string
 
-func (e AlreadyExists) Error() string { return "error: already exists: " + string(e) }
+const ERR_ALREADY_EXISTS = "error: already exists:"
+
+func (e AlreadyExists) Error() string { return ERR_ALREADY_EXISTS + string(e) }
 
 // IsAlreadyExists implements the IsAlreadyExists interface.
 func (e AlreadyExists) IsAlreadyExists() {}
