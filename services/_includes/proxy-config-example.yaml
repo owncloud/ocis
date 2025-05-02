@@ -200,3 +200,8 @@ events:
   enable_tls: false
   username: ""
   password: ""
+claim_space_management:
+  enabled: false
+  claim: ""
+  regexp: ""
+  mapping: []

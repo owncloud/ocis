@@ -72,3 +72,7 @@
 | OCIS_EVENTS_ENABLE_TLS<br/>PROXY_EVENTS_ENABLE_TLS | bool | false | Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services.|
 | OCIS_EVENTS_AUTH_USERNAME<br/>PROXY_EVENTS_AUTH_USERNAME | string |  | The username to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.|
 | OCIS_EVENTS_AUTH_PASSWORD<br/>PROXY_EVENTS_AUTH_PASSWORD | string |  | The password to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.|
+| OCIS_CLAIM_MANAGED_SPACES_ENABLED | bool | false | Enables space management through OIDC claims.|
+| OCIS_CLAIM_MANAGED_SPACES_CLAIMNAME | string |  | The name of the claim used for space management.|
+| OCIS_CLAIM_MANAGED_SPACES_REGEXP | string |  | The regular expression that extracts spaceid and role from a claim.|
+| OCIS_CLAIM_MANAGED_SPACES_MAPPING | []string | [] | (Optional) Mapping of oidc roles to ocis space roles. Example: 'oidcroleA:viewer,oidcroleB:manager'|

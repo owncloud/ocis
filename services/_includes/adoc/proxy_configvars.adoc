@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2025-05-02-09-55-10]
+[#deprecation-note-2025-05-02-13-01-29]
 [caption=]
 .Deprecation notes for the proxy service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -833,5 +833,49 @@ a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 The password to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.
+
+a|`OCIS_CLAIM_MANAGED_SPACES_ENABLED` +
+
+a| [subs=-attributes]
+++next ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Enables space management through OIDC claims.
+
+a|`OCIS_CLAIM_MANAGED_SPACES_CLAIMNAME` +
+
+a| [subs=-attributes]
+++next ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The name of the claim used for space management.
+
+a|`OCIS_CLAIM_MANAGED_SPACES_REGEXP` +
+
+a| [subs=-attributes]
+++next ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The regular expression that extracts spaceid and role from a claim.
+
+a|`OCIS_CLAIM_MANAGED_SPACES_MAPPING` +
+
+a| [subs=-attributes]
+++next ++
+a| [subs=-attributes]
+++[]string ++
+a| [subs=-attributes]
+++[] ++
+a| [subs=-attributes]
+(Optional) Mapping of oidc roles to ocis space roles. Example: 'oidcroleA:viewer,oidcroleB:manager'
 |===
 
