@@ -30,6 +30,7 @@ var ServiceEnvConfigs = make(map[string][]string)
 var runningServices = make(map[string]int)
 
 func Start(envMap []string) {
+	log.Println("Starting oCIS service...")
 	StartService("", envMap)
 }
 
