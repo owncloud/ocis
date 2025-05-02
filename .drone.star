@@ -72,6 +72,10 @@ EMAIL_SMTP_PORT = "1025"
 EMAIL_SMTP_HOST = "email"
 EMAIL_SMTP_SENDER = "ownCloud <noreply@example.com>"
 
+S3_CACHE_SERVER = "https://cache.owncloud.com"
+S3_CACHE_BUCKET = "cache"
+S3_PUBLIC_CACHE_BUCKET = "public"
+
 # configuration
 config = {
     "cs3ApiTests": {
@@ -361,12 +365,8 @@ pipelineVolumeGo = \
 
 # minio mc environment variables
 MINIO_MC_ENV = {
-    "CACHE_BUCKET": {
-        "from_secret": "cache_s3_bucket",
-    },
-    "MC_HOST": {
-        "from_secret": "cache_s3_server",
-    },
+    "CACHE_BUCKET": S3_CACHE_BUCKET,
+    "MC_HOST": S3_CACHE_SERVER,
     "AWS_ACCESS_KEY_ID": {
         "from_secret": "cache_s3_access_key",
     },
@@ -668,19 +668,13 @@ def testOcis(ctx):
             "name": "scan-result-cache",
             "image": PLUGINS_S3,
             "settings": {
-                "endpoint": {
-                    "from_secret": "cache_s3_server",
-                },
-                "bucket": "cache",
+                "endpoint": MINIO_MC_ENV["MC_HOST"],
+                "bucket": MINIO_MC_ENV["CACHE_BUCKET"],
                 "source": "cache/**/*",
                 "target": "%s/%s" % (ctx.repo.slug, ctx.build.commit + "-${DRONE_BUILD_NUMBER}"),
                 "path_style": True,
-                "access_key": {
-                    "from_secret": "cache_s3_access_key",
-                },
-                "secret_key": {
-                    "from_secret": "cache_s3_secret_key",
-                },
+                "access_key": MINIO_MC_ENV["AWS_ACCESS_KEY_ID"],
+                "secret_key": MINIO_MC_ENV["AWS_SECRET_ACCESS_KEY"],
             },
         },
     ]
@@ -1085,19 +1079,13 @@ def generateCoverageFromAPITest(ctx, name):
             "name": "coverage-cache-1",
             "image": PLUGINS_S3,
             "settings": {
-                "endpoint": {
-                    "from_secret": "cache_s3_server",
-                },
-                "bucket": "cache",
+                "endpoint": MINIO_MC_ENV["MC_HOST"],
+                "bucket": MINIO_MC_ENV["CACHE_BUCKET"],
                 "source": "cache/acceptance/coverage/coverage-%s.out" % name,
                 "target": "%s/%s/coverage" % (ctx.repo.slug, ctx.build.commit + "-${DRONE_BUILD_NUMBER}"),
                 "path_style": True,
-                "access_key": {
-                    "from_secret": "cache_s3_access_key",
-                },
-                "secret_key": {
-                    "from_secret": "cache_s3_secret_key",
-                },
+                "access_key": MINIO_MC_ENV["AWS_ACCESS_KEY_ID"],
+                "secret_key": MINIO_MC_ENV["AWS_SECRET_ACCESS_KEY"],
             },
         },
     ]
@@ -1608,12 +1596,8 @@ def uploadTracingResult(ctx):
         "image": PLUGINS_S3,
         "pull": "if-not-exists",
         "settings": {
-            "bucket": {
-                "from_secret": "cache_public_s3_bucket",
-            },
-            "endpoint": {
-                "from_secret": "cache_public_s3_server",
-            },
+            "bucket": S3_PUBLIC_CACHE_BUCKET,
+            "endpoint": S3_CACHE_SERVER,
             "path_style": True,
             "source": "webTestRunner/reports/e2e/playwright/tracing/**/*",
             "strip_prefix": "webTestRunner/reports/e2e/playwright/tracing",
@@ -2788,18 +2772,12 @@ def genericCache(name, action, mounts, cache_path):
         "name": "%s_%s" % (action, name),
         "image": PLUGINS_S3_CACHE,
         "settings": {
-            "endpoint": {
-                "from_secret": "cache_s3_server",
-            },
+            "endpoint": MINIO_MC_ENV["MC_HOST"],
             "rebuild": rebuild,
             "restore": restore,
             "mount": mounts,
-            "access_key": {
-                "from_secret": "cache_s3_access_key",
-            },
-            "secret_key": {
-                "from_secret": "cache_s3_secret_key",
-            },
+            "access_key": MINIO_MC_ENV["AWS_ACCESS_KEY_ID"],
+            "secret_key": MINIO_MC_ENV["AWS_SECRET_ACCESS_KEY"],
             "filename": "%s.tar" % (name),
             "path": cache_path,
             "fallback_path": cache_path,
@@ -2808,8 +2786,6 @@ def genericCache(name, action, mounts, cache_path):
     return step
 
 def uploadAPITestCoverageReport(ctx):
-    cache_path = "%s/%s/%s" % ("cache", ctx.repo.slug, ctx.build.commit + "-${DRONE_BUILD_NUMBER}")
-
     sonar_env = {
         "SONAR_TOKEN": {
             "from_secret": "sonarcloud_acceptance_tests",
@@ -2890,15 +2866,9 @@ def genericCachePurge(flush_path):
                 "name": "purge-cache",
                 "image": PLUGINS_S3_CACHE,
                 "settings": {
-                    "access_key": {
-                        "from_secret": "cache_s3_access_key",
-                    },
-                    "secret_key": {
-                        "from_secret": "cache_s3_secret_key",
-                    },
-                    "endpoint": {
-                        "from_secret": "cache_s3_server",
-                    },
+                    "access_key": MINIO_MC_ENV["AWS_ACCESS_KEY_ID"],
+                    "secret_key": MINIO_MC_ENV["AWS_SECRET_ACCESS_KEY"],
+                    "endpoint": MINIO_MC_ENV["MC_HOST"],
                     "flush": True,
                     "flush_age": 1,
                     "flush_path": flush_path,
@@ -2919,12 +2889,12 @@ def genericCachePurge(flush_path):
 
 def genericBuildArtifactCache(ctx, name, action, path):
     if action == "rebuild" or action == "restore":
-        cache_path = "%s/%s/%s" % ("cache", ctx.repo.slug, ctx.build.commit + "-${DRONE_BUILD_NUMBER}")
+        cache_path = "%s/%s/%s" % (S3_CACHE_BUCKET, ctx.repo.slug, ctx.build.commit + "-${DRONE_BUILD_NUMBER}")
         name = "%s_build_artifact_cache" % (name)
         return genericCache(name, action, [path], cache_path)
 
     if action == "purge":
-        flush_path = "%s/%s" % ("cache", ctx.repo.slug)
+        flush_path = "%s/%s" % (S3_CACHE_BUCKET, ctx.repo.slug)
         return genericCachePurge(flush_path)
     return []
 
