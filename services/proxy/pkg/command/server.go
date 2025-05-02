@@ -378,11 +378,18 @@ func loadMiddlewares(logger log.Logger, cfg *config.Config,
 			middleware.WithRevaGatewaySelector(gatewaySelector),
 			middleware.PoliciesProviderService(policiesProviderClient),
 		),
-		// finally, trigger home creation when a user logs in
+		// trigger home creation when a user logs in
 		middleware.CreateHome(
 			middleware.Logger(logger),
 			middleware.WithRevaGatewaySelector(gatewaySelector),
 			middleware.RoleQuotas(cfg.RoleQuotas),
+		),
+		// trigger space assignment when a user logs in
+		middleware.SpaceManager(
+			cfg.ClaimSpaceManagement,
+			middleware.Logger(logger),
+			middleware.WithRevaGatewaySelector(gatewaySelector),
+			middleware.ServiceAccount(cfg.ServiceAccount.ServiceAccountID, cfg.ServiceAccount.ServiceAccountSecret),
 		),
 	)
 }

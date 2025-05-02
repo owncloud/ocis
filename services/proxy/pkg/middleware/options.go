@@ -74,6 +74,9 @@ type Options struct {
 	// SkipUserInfo prevents the oidc middleware from querying the userinfo endpoint and read any claims directly from the access token instead
 	SkipUserInfo    bool
 	EventsPublisher events.Publisher
+	// Service Accounts
+	ServiceAccountID     string
+	ServiceAccountSecret string
 }
 
 // newOptions initializes the available default options.
@@ -252,5 +255,13 @@ func SkipUserInfo(val bool) Option {
 func EventsPublisher(ep events.Publisher) Option {
 	return func(o *Options) {
 		o.EventsPublisher = ep
+	}
+}
+
+// ServiceAccount sets the service account user
+func ServiceAccount(id string, secret string) Option {
+	return func(o *Options) {
+		o.ServiceAccountID = id
+		o.ServiceAccountSecret = secret
 	}
 }
