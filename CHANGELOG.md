@@ -84,6 +84,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Limit length of tags: [#11231](https://github.com/owncloud/ocis/pull/11231)
 * Enhancement - Allow setting driveid through graph API: [#11256](https://github.com/owncloud/ocis/pull/11256)
 * Enhancement - Claim managed spaces: [#11280](https://github.com/owncloud/ocis/pull/11280)
+* Enhancement - Bump Reva: [#11283](https://github.com/owncloud/ocis/pull/11283)
 
 ## Details
 
@@ -232,6 +233,12 @@ The following sections list the changes for unreleased.
    Allow managing spaces from oidc claims
 
    https://github.com/owncloud/ocis/pull/11280
+
+* Enhancement - Bump Reva: [#11283](https://github.com/owncloud/ocis/pull/11283)
+
+   Bumps reva version
+
+   https://github.com/owncloud/ocis/pull/11283
 
 # Changelog for [7.1.2] (2025-03-28)
 
