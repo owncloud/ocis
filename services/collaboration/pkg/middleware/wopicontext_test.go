@@ -130,9 +130,12 @@ var _ = Describe("Wopi Context Middleware", func() {
 			AccessToken: token,
 		}
 		// use wrong wopi secret when generating the wopi token
-		wopiToken, ttl, err := middleware.GenerateWopiToken(wopiContext, &config.Config{Wopi: config.Wopi{
-			Secret: "wrongSecret",
-		}}, nil)
+		wopiToken, ttl, err := middleware.GenerateWopiToken(wopiContext, &config.Config{
+			TokenManager: &config.TokenManager{JWTSecret: cfg.TokenManager.JWTSecret},
+			Wopi: config.Wopi{
+				Secret: "wrongSecret",
+			},
+		}, nil)
 		q := req.URL.Query()
 		q.Add("access_token", wopiToken)
 		q.Add("access_token_ttl", strconv.FormatInt(ttl, 10))

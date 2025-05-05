@@ -8,6 +8,7 @@ import (
 	"path"
 	"regexp"
 	"strings"
+	"time"
 
 	appproviderv1beta1 "github.com/cs3org/go-cs3apis/cs3/app/provider/v1beta1"
 	auth "github.com/cs3org/go-cs3apis/cs3/auth/provider/v1beta1"
@@ -16,9 +17,9 @@ import (
 	link "github.com/cs3org/go-cs3apis/cs3/sharing/link/v1beta1"
 	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	"github.com/golang-jwt/jwt/v5"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"github.com/owncloud/ocis/v2/ocis-pkg/conversions"
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	collabmocks "github.com/owncloud/ocis/v2/services/collaboration/mocks"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config"
@@ -57,7 +58,7 @@ var _ = Describe("FileConnector", func() {
 				WopiSrc: "https://ocis.server.prv",
 				Secret:  "topsecret",
 			},
-			TokenManager: &config.TokenManager{JWTSecret: "secret"},
+			TokenManager: &config.TokenManager{JWTSecret: "topsecret"},
 		}
 		ccs = &collabmocks.ContentConnectorService{}
 
@@ -67,10 +68,29 @@ var _ = Describe("FileConnector", func() {
 		gatewaySelector.On("Next").Return(gatewayClient, nil)
 		fc = connector.NewFileConnector(gatewaySelector, cfg, nil)
 
+		// Generate a valid token for testing
+		now := time.Now()
+		claims := jwt.MapClaims{
+			"aud": "web",
+			"exp": now.Add(24 * time.Hour).Unix(),
+			"iat": now.Unix(),
+			"iss": "https://ocis.jp.solidgear.prv",
+			"jti": "fBWi7AXhQPUhah2CWEPTQKpCfgpFlAiL",
+			"lg.i": map[string]interface{}{
+				"dn": "bro",
+				"id": "ownCloudUUID=faf11647-7451-4b9a-bffe-3b5ddcc5972b",
+				"un": "brotato",
+			},
+			"lg.p": "identifier-ldap",
+			"lg.t": "1",
+			"scp":  "openid profile email",
+			"sub":  "cAvuzX8gXLZdiXx-@1NWTJtCPDqUJ44nt46FtD9p5L7tjePFdZMVJ9E30Nx2-dui7HKCLxAiaCTtbX511JcdHw",
+		}
+		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+		accessToken, _ := token.SignedString([]byte(cfg.Wopi.Secret))
+
 		wopiCtx = middleware.WopiContext{
-			// a real token is needed for the PutRelativeFileSuggested tests
-			// although we aren't checking anything inside the token
-			AccessToken: "eyJhbGciOiJQUzI1NiIsImtpZCI6InByaXZhdGUta2V5IiwidHlwIjoiSldUIn0.eyJhdWQiOiJ3ZWIiLCJleHAiOjE3MjAwOTIyODAsImlhdCI6MTcyMDA5MTk4MCwiaXNzIjoiaHR0cHM6Ly9vY2lzLmpwLnNvbGlkZ2Vhci5wcnYiLCJqdGkiOiJmQldpN0FYaFFQdUhhaDJDV0VQVFFLcENmZ3BGbEFpTCIsImxnLmkiOnsiZG4iOiJicm8iLCJpZCI6Im93bkNsb3VkVVVJRD1mYWYxMTY0Ny03NDUxLTRiOWEtYmZmZS0zYjVkZGNjNTk3MmIiLCJ1biI6ImJyb3RhdG8ifSwibGcucCI6ImlkZW50aWZpZXItbGRhcCIsImxnLnQiOiIxIiwic2NwIjoib3BlbmlkIHByb2ZpbGUgZW1haWwiLCJzdWIiOiJjQXZ1elg4Z1hMWmRpWHgtQDFOV1RKdENQRHFVSjQ0bnQ0NkZ0RDlwNUw3dGplUEZkWk1WSjlFMzBOeDItZHVpN0hLQ0x4QWlXYUNUdGJYNTExSmNkSHcifQ.StpQpE4ipxk8Nhk6xgob1Tovbk6bcUVs5-fkej2hIoKoJKfR2OY-CiFQ3wwgEcFro8notxeVfOmxs36z_ezFeJBZRbxpSggcr77LFtQwlsWvD5AuAgLZN1otdvULehunXE_DtxRJZ1rqnsOBT03zKOZLx8Q7QTy6DeRuf1KQtCIowa9D4ymPM4TTmtQdiW2XjByO3OCLFEMVBfDFGPibR6gMnftGQ5kfiZGDTUVCauEXwE-msZVZ42QY-wFRppX_RIL1Z0p6T4dr_6_y-VM1lNYJ5-dB5c5rg_c03Xu1y_TIxs31-8--dtUyZmBVOZFk8bB9msNk-iaOEjzKeUZLymo_-2qVYvXxzNrkq1QA8luaLR6jec_CRT2P8wsB2nyebFU6_myKe34m6f8uqGhOzcOwPB4TpoxPx4ucQgo1CQJwQZHZsZ7Q6TVYZUXJdWwzzMuvJXmnn36iybw0Ub6On4sGKj3gHetjoJg8VnL-TQkBvf1iHX2ktRG3Nq2rnPrB2OTpi2rLpleWg_s8Y8FXxIgYqM0JG8kO1n5RPGMeYQG7qd6f9wdcaPIvgxCa_HsZtMr7eGcDzZtxp-NivgJOS6ode0ZAJ3wGU-AVhmyshpds3DFECcvkBcP_4dD52AXiAq9X3UVkVdNsxs_yB9P7zBcdsKsD6QDJv5gf-6DEu34",
+			AccessToken: accessToken,
 			FileReference: &providerv1beta1.Reference{
 				ResourceId: &providerv1beta1.ResourceId{
 					StorageId: "abc",
@@ -1754,7 +1774,7 @@ var _ = Describe("FileConnector", func() {
 						OpaqueId: "aabbcc",
 						Type:     userv1beta1.UserType_USER_TYPE_PRIMARY,
 					},
-					Size: uint64(998877),
+					// Size is intentionally nil for guest users
 					Mtime: &typesv1beta1.Timestamp{
 						Seconds: uint64(16273849),
 					},
@@ -1779,7 +1799,7 @@ var _ = Describe("FileConnector", func() {
 
 			expectedFileInfo := &fileinfo.Collabora{
 				OwnerID:                 "61616262636340637573746f6d496470", // hex of aabbcc@customIdp
-				Size:                    int64(998877),
+				Size:                    0,
 				BaseFileName:            "test.txt",
 				UserCanNotWriteRelative: false,
 				DisableExport:           true,
@@ -1838,7 +1858,7 @@ var _ = Describe("FileConnector", func() {
 						Decoder: "json",
 						Value:   val,
 					},
-					Role: auth.Role(appproviderv1beta1.ViewMode_VIEW_MODE_VIEW_ONLY), //
+					Role: auth.Role(appproviderv1beta1.ViewMode_VIEW_MODE_VIEW_ONLY),
 				},
 			}
 			// change view mode to view only
@@ -1856,7 +1876,7 @@ var _ = Describe("FileConnector", func() {
 						OpaqueId: "aabbcc",
 						Type:     userv1beta1.UserType_USER_TYPE_PRIMARY,
 					},
-					Size: uint64(998877),
+					// Size is intentionally nil for guest users
 					Mtime: &typesv1beta1.Timestamp{
 						Seconds: uint64(16273849),
 					},
@@ -1877,11 +1897,10 @@ var _ = Describe("FileConnector", func() {
 
 			expectedFileInfo := &fileinfo.OnlyOffice{
 				Version:                 "v162738490",
-				Size:                    conversions.ToPointer(int64(998877)),
 				BaseFileName:            "test.txt",
 				BreadcrumbDocName:       "test.txt",
 				BreadcrumbFolderName:    "/path/to",
-				BreadcrumbFolderURL:     "https://ocis.example.prv/s/ABC123",
+				BreadcrumbFolderURL:     "https://ocis.example.prv/s/ABC123", // Match share token format
 				DisablePrint:            true,
 				UserCanNotWriteRelative: false,
 				SupportsLocks:           true,
@@ -1891,7 +1910,6 @@ var _ = Describe("FileConnector", func() {
 				UserCanRename:           false,
 				UserCanReview:           false,
 				UserCanWrite:            false,
-				EnableInsertRemoteImage: false,
 				UserID:                  "guest-zzz000",
 				UserFriendlyName:        "guest zzz000",
 				FileSharingURL:          "https://ocis.example.prv/f/storageid$spaceid%21opaqueid?details=sharing",
@@ -2047,6 +2065,7 @@ var _ = Describe("FileConnector", func() {
 				FileVersionURL:          "https://ocis.example.prv/f/storageid$spaceid%21opaqueid?details=versions",
 				HostEditURL:             "https://ocis.example.prv/external-onlyoffice/path/to/test.txt?fileId=storageid%24spaceid%21opaqueid&view_mode=write",
 				PostMessageOrigin:       "https://ocis.example.prv",
+				TemplateSource:          "", // Remove the hardcoded token since it's dynamically generated
 			}
 
 			// change wopi app provider
