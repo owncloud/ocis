@@ -74,7 +74,11 @@ var _ = Describe("Discovery", func() {
 	)
 
 	BeforeEach(func() {
-		cfg = &config.Config{}
+		cfg = &config.Config{
+			TokenManager: &config.TokenManager{
+				JWTSecret: "topsecret",
+			},
+		}
 		gatewayClient = &cs3mocks.GatewayAPIClient{}
 
 		gatewaySelector := mocks.NewSelectable[gatewayv1beta1.GatewayAPIClient](GinkgoT())
@@ -147,7 +151,7 @@ var _ = Describe("Discovery", func() {
 				nowTime := time.Now()
 
 				cfg.Wopi.WopiSrc = "https://wopiserver.test.prv"
-				cfg.Wopi.Secret = "my_supa_secret"
+				cfg.Wopi.Secret = "topsecret"
 				cfg.Wopi.DisableChat = disableChat
 				cfg.App.Name = appName
 				cfg.App.Product = appName
@@ -213,7 +217,7 @@ var _ = Describe("Discovery", func() {
 			nowTime := time.Now()
 
 			cfg.Wopi.WopiSrc = "https://wopiserver.test.prv"
-			cfg.Wopi.Secret = "my_supa_secret"
+			cfg.Wopi.Secret = "topsecret"
 			cfg.Wopi.ProxyURL = "https://office.proxy.test.prv"
 			cfg.Wopi.ProxySecret = "your_supa_secret"
 			cfg.App.Name = "Microsoft"
@@ -258,7 +262,7 @@ var _ = Describe("Discovery", func() {
 			nowTime := time.Now()
 
 			cfg.Wopi.WopiSrc = "htttps://wopiserver.test.prv"
-			cfg.Wopi.Secret = "my_supa_secret"
+			cfg.Wopi.Secret = "topsecret"
 			cfg.App.Name = "Microsoft"
 
 			myself := &userv1beta1.User{
@@ -299,7 +303,7 @@ var _ = Describe("Discovery", func() {
 			nowTime := time.Now()
 
 			cfg.Wopi.WopiSrc = "htttps://wopiserver.test.prv"
-			cfg.Wopi.Secret = "my_supa_secret"
+			cfg.Wopi.Secret = "topsecret"
 			cfg.App.Name = "Microsoft"
 
 			myself := &userv1beta1.User{
@@ -341,7 +345,7 @@ var _ = Describe("Discovery", func() {
 			nowTime := time.Now()
 
 			cfg.Wopi.WopiSrc = "htttps://wopiserver.test.prv"
-			cfg.Wopi.Secret = "my_supa_secret"
+			cfg.Wopi.Secret = "topsecret"
 			cfg.App.Name = "OnlyOffice"
 			cfg.App.Product = "OnlyOffice"
 
