@@ -90,10 +90,7 @@ Feature: check activities
                       "type": "object",
                       "required": ["recordedTime"],
                       "properties": {
-                        "recordedTime": {
-                          "type": "string",
-                          "format": "date-time"
-                        }
+                        "recordedTime": { "format": "date-time" }
                       }
                     }
                   }
@@ -215,10 +212,7 @@ Feature: check activities
                       "type": "object",
                       "required": ["recordedTime"],
                       "properties": {
-                        "recordedTime": {
-                          "type": "string",
-                          "format": "date-time"
-                        }
+                        "recordedTime": { "format": "date-time" }
                       }
                     }
                   }
@@ -436,10 +430,7 @@ Feature: check activities
                       "type": "object",
                       "required": ["recordedTime"],
                       "properties": {
-                        "recordedTime": {
-                          "type": "string",
-                          "format": "date-time"
-                        }
+                        "recordedTime": { "format": "date-time" }
                       }
                     }
                   }
@@ -549,10 +540,7 @@ Feature: check activities
                       "type": "object",
                       "required": ["recordedTime"],
                       "properties": {
-                        "recordedTime": {
-                          "type": "string",
-                          "format": "date-time"
-                        }
+                        "recordedTime": { "format": "date-time" }
                       }
                     }
                   }
@@ -670,10 +658,7 @@ Feature: check activities
                       "type": "object",
                       "required": ["recordedTime"],
                       "properties": {
-                        "recordedTime": {
-                          "type": "string",
-                          "format": "date-time"
-                        }
+                        "recordedTime": { "format": "date-time" }
                       }
                     }
                   }
@@ -783,10 +768,7 @@ Feature: check activities
                       "type": "object",
                       "required": ["recordedTime"],
                       "properties": {
-                        "recordedTime": {
-                          "type": "string",
-                          "format": "date-time"
-                        }
+                        "recordedTime": { "format": "date-time" }
                       }
                     }
                   }
@@ -889,10 +871,7 @@ Feature: check activities
                       "type": "object",
                       "required": ["recordedTime"],
                       "properties": {
-                        "recordedTime": {
-                          "type": "string",
-                          "format": "date-time"
-                        }
+                        "recordedTime": { "format": "date-time" }
                       }
                     }
                   }
@@ -1011,10 +990,7 @@ Feature: check activities
                       "type": "object",
                       "required": ["recordedTime"],
                       "properties": {
-                        "recordedTime": {
-                          "type": "string",
-                          "format": "date-time"
-                        }
+                        "recordedTime": { "format": "date-time" }
                       }
                     }
                   }
@@ -1126,10 +1102,7 @@ Feature: check activities
                       "type": "object",
                       "required": ["recordedTime"],
                       "properties": {
-                        "recordedTime": {
-                          "type": "string",
-                          "format": "date-time"
-                        }
+                        "recordedTime": { "format": "date-time" }
                       }
                     }
                   }
@@ -1248,10 +1221,7 @@ Feature: check activities
                       "type": "object",
                       "required": ["recordedTime"],
                       "properties": {
-                        "recordedTime": {
-                          "type": "string",
-                          "format": "date-time"
-                        }
+                        "recordedTime": { "format": "date-time" }
                       }
                     }
                   }
@@ -1363,10 +1333,7 @@ Feature: check activities
                       "type": "object",
                       "required": ["recordedTime"],
                       "properties": {
-                        "recordedTime": {
-                          "type": "string",
-                          "format": "date-time"
-                        }
+                        "recordedTime": { "format": "date-time" }
                       }
                     }
                   }
@@ -1461,10 +1428,7 @@ Feature: check activities
                       "type": "object",
                       "required": ["recordedTime"],
                       "properties": {
-                        "recordedTime": {
-                          "type": "string",
-                          "format": "date-time"
-                        }
+                        "recordedTime": { "format": "date-time" }
                       }
                     }
                   }
@@ -1586,10 +1550,7 @@ Feature: check activities
                       "type": "object",
                       "required": ["recordedTime"],
                       "properties": {
-                        "recordedTime": {
-                          "type": "string",
-                          "format": "date-time"
-                        }
+                        "recordedTime": { "format": "date-time" }
                       }
                     }
                   }
@@ -1684,10 +1645,7 @@ Feature: check activities
                       "type": "object",
                       "required": ["recordedTime"],
                       "properties": {
-                        "recordedTime": {
-                          "type": "string",
-                          "format": "date-time"
-                        }
+                        "recordedTime": { "format": "date-time" }
                       }
                     }
                   }
