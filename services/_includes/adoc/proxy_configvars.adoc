@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2025-05-06-03-58-40]
+[#deprecation-note-2025-05-06-10-01-26]
 [caption=]
 .Deprecation notes for the proxy service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -843,7 +843,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
-Enables space management through OIDC claims.
+Enables Space management through OIDC claims.
 
 a|`OCIS_CLAIM_MANAGED_SPACES_CLAIMNAME` +
 
@@ -854,7 +854,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
-The name of the claim used for space management.
+The name of the claim used to manage Spaces.
 
 a|`OCIS_CLAIM_MANAGED_SPACES_REGEXP` +
 
@@ -865,7 +865,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
-The regular expression that extracts spaceid and role from a claim.
+The regular expression that extracts Space IDs and roles from a claim.
 
 a|`OCIS_CLAIM_MANAGED_SPACES_MAPPING` +
 
@@ -876,6 +876,6 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++[] ++
 a| [subs=-attributes]
-(Optional) Mapping of oidc roles to ocis space roles. Example: 'oidcroleA:viewer,oidcroleB:manager'
+(Optional) Mapping of OIDC roles to ocis Space roles. Example: 'oidcroleA:viewer,oidcroleB:manager'
 |===
 
