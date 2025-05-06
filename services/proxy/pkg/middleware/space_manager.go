@@ -158,14 +158,14 @@ func (csm claimSpaceManager) getSpaceAssignments(ctx context.Context) map[string
 	claims := oidc.FromContext(ctx)
 	values, ok := claims[csm.claimName].([]any)
 	if !ok {
-		csm.logger.Error().Interface("entitlements", claims["entitlements"]).Msg("entitlements claims are not a []string")
+		csm.logger.Error().Interface("claims", claims).Str("claimname", csm.claimName).Msg("configured claims are not an array")
 	}
 
 	assignments := make(map[string]string)
 	for _, ent := range values {
 		e, ok := ent.(string)
 		if !ok {
-			csm.logger.Error().Interface("entitlement", ent).Msg("entitlement is not a sting")
+			csm.logger.Error().Interface("assignment", ent).Msg("assignment is not a string")
 			continue
 		}
 
@@ -173,10 +173,31 @@ func (csm claimSpaceManager) getSpaceAssignments(ctx context.Context) map[string
 		if !match {
 			continue
 		}
-		assignments[spaceid] = role
+		assignments[spaceid] = chooseRole(role, assignments[spaceid])
 	}
 
 	return assignments
+}
+
+// will return the role with the highest permissions.
+func chooseRole(roleA, roleB string) string {
+	if roleA == "" {
+		return roleB
+	}
+
+	if roleB == "" {
+		return roleA
+	}
+
+	permsA := conversions.RoleFromName(roleA).CS3ResourcePermissions()
+	permsB := conversions.RoleFromName(roleB).CS3ResourcePermissions()
+
+	if conversions.SufficientCS3Permissions(permsA, permsB) {
+		return roleA
+	}
+	// Note: This could be an issue if roleB does not contain roleA
+	return roleB
+
 }
 
 func getSpaceMemberStatus(space *storageprovider.StorageSpace, userid string) (bool, *storageprovider.ResourcePermissions, error) {
