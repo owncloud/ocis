@@ -2,6 +2,7 @@ package ocis
 
 import (
 	"bufio"
+	"bytes"
 	"context"
 	"crypto/tls"
 	"fmt"
@@ -161,7 +162,6 @@ func waitUntilCompleteShutdown() (bool, string) {
 }
 
 func RunCommand(command string, inputs []string) (int, string) {
-	logs := new(strings.Builder)
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
@@ -173,26 +173,38 @@ func RunCommand(command string, inputs []string) (int, string) {
 	// This is required to interact with the command
 	ptyF, err := pty.Start(c)
 	if err != nil {
-		log.Panic(err)
+		log.Fatalln(err)
 	}
 	defer ptyF.Close()
 
+	var output bytes.Buffer
+	done := make(chan error, 1)
+	// read concurrently from the pty
+	go func() {
+		_, err := io.Copy(&output, ptyF)
+		done <- err
+	}()
+
+	// send inputs to the command
 	for _, input := range inputs {
 		fmt.Fprintf(ptyF, "%s\n", input)
 	}
 
-	var cmdOutput string
+	var timeoutErr string
 	if err := c.Wait(); err != nil {
 		if ctx.Err() == context.DeadlineExceeded {
-			cmdOutput = "Command timed out:\n"
+			timeoutErr = "[TimeoutError] Command timed out\n"
 		}
 	}
+	// wait for copy to finish
+	<-done
 
-	// Copy the logs from the pty
-	io.Copy(logs, ptyF)
-	cmdOutput += logs.String()
+	cmdOutput := output.String()
+	if timeoutErr != "" {
+		cmdOutput += timeoutErr
+	}
 
-	// TODO: find if there is a better way to remove stdins from the output
+	// remove stdins from the output
 	cmdOutput = strings.TrimLeft(cmdOutput, strings.Join(inputs, "\r\n"))
 
 	return c.ProcessState.ExitCode(), cmdOutput
