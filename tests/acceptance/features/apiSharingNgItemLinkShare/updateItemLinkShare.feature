@@ -347,6 +347,7 @@ Feature: Update a link share for a resource
           "createdDateTime"
         ],
         "properties": {
+          "createdDateTime": { "format": "date-time" },
           "hasPassword": {
             "const": true
           },
@@ -432,6 +433,7 @@ Feature: Update a link share for a resource
           "createdDateTime"
         ],
         "properties": {
+          "createdDateTime": { "format": "date-time" },
           "hasPassword": {
             "const": true
           },
@@ -516,6 +518,7 @@ Feature: Update a link share for a resource
           "createdDateTime"
         ],
         "properties": {
+          "createdDateTime": { "format": "date-time" },
           "hasPassword": {
             "const": true
           },
@@ -587,6 +590,7 @@ Feature: Update a link share for a resource
           "createdDateTime"
         ],
         "properties": {
+          "createdDateTime": { "format": "date-time" },
           "hasPassword": {
             "const": false
           },
@@ -658,6 +662,7 @@ Feature: Update a link share for a resource
           "createdDateTime"
         ],
         "properties": {
+          "createdDateTime": { "format": "date-time" },
           "hasPassword": {
             "const": false
           },
@@ -734,6 +739,7 @@ Feature: Update a link share for a resource
           "createdDateTime"
         ],
         "properties": {
+          "createdDateTime": { "format": "date-time" },
           "hasPassword": {
             "const": true
           },

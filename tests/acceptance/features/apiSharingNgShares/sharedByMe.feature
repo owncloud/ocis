@@ -1992,6 +1992,7 @@ Feature: resources shared by user
           "size"
         ],
         "properties": {
+          "lastModifiedDateTime": { "format": "date-time" },
           "name": {
             "const": "textfile.txt"
           },
@@ -2101,6 +2102,7 @@ Feature: resources shared by user
           "size"
         ],
         "properties": {
+          "lastModifiedDateTime": { "format": "date-time" },
           "name": {
             "const": "FolderToShare"
           },
@@ -2661,6 +2663,7 @@ Feature: resources shared by user
           "size"
         ],
         "properties": {
+          "lastModifiedDateTime": { "format": "date-time" },
           "name": {
             "const": "textfile.txt"
           },
@@ -2773,6 +2776,7 @@ Feature: resources shared by user
           "size"
         ],
         "properties": {
+          "lastModifiedDateTime": { "format": "date-time" },
           "name": {
             "const": "FolderToShare"
           },
@@ -3350,6 +3354,7 @@ Feature: resources shared by user
                 "size"
               ],
               "properties": {
+                "lastModifiedDateTime": { "format": "date-time" },
                 "name": {
                   "const": "NewSpace"
                 },

@@ -19,45 +19,20 @@ Feature: Create a link share for a resource
       """
       {
         "type": "object",
-        "required": [
-          "hasPassword",
-          "id",
-          "link"
-        ],
+        "required": ["createdDateTime","hasPassword","id","link"],
         "properties": {
-          "hasPassword": {
-            "const": true
-          },
-          "id": {
-            "type": "string",
-            "pattern": "^[a-zA-Z]{15}$"
-          },
+          "createdDateTime": { "format": "date-time" },
+          "hasPassword": { "const": true },
+          "id": { "pattern": "^[a-zA-Z]{15}$" },
           "link": {
             "type": "object",
-            "required": [
-              "@libre.graph.displayName",
-              "@libre.graph.quickLink",
-              "preventsDownload",
-              "type",
-              "webUrl"
-            ],
+            "required": ["@libre.graph.displayName","@libre.graph.quickLink","preventsDownload","type","webUrl"],
             "properties": {
-              "@libre.graph.displayName": {
-                "const": ""
-              },
-              "@libre.graph.quickLink": {
-                "const": false
-              },
-              "preventsDownload": {
-                "const": false
-              },
-              "type": {
-                "const": "<permissions-role-value>"
-              },
-              "webUrl": {
-                "type": "string",
-                "pattern": "^%base_url%/s/[a-zA-Z]{15}$"
-              }
+              "@libre.graph.displayName": { "const": "" },
+              "@libre.graph.quickLink": { "const": false },
+              "preventsDownload": { "const": false },
+              "type": { "const": "<permissions-role-value>" },
+              "webUrl": { "pattern": "^%base_url%/s/[a-zA-Z]{15}$" }
             }
           }
         }

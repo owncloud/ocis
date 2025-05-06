@@ -44,6 +44,7 @@ Feature: Send a sharing invitations
                 "grantedToV2"
               ],
               "properties": {
+                "createdDateTime": { "format": "date-time" },
                 "id": {
                   "type": "string",
                   "pattern": "^%permissions_id_pattern%$"
@@ -139,6 +140,7 @@ Feature: Send a sharing invitations
                 "grantedToV2"
               ],
               "properties": {
+                "createdDateTime": { "format": "date-time" },
                 "id": {
                   "type": "string",
                   "pattern": "^%permissions_id_pattern%$"
@@ -221,6 +223,7 @@ Feature: Send a sharing invitations
                 "grantedToV2"
               ],
               "properties": {
+                "createdDateTime": { "format": "date-time" },
                 "id": {
                   "type": "string",
                   "pattern": "^%permissions_id_pattern%$"
@@ -310,6 +313,7 @@ Feature: Send a sharing invitations
                 "grantedToV2"
               ],
               "properties": {
+                "createdDateTime": { "format": "date-time" },
                 "id": {
                   "type": "string",
                   "pattern": "^%permissions_id_pattern%$"
@@ -408,6 +412,7 @@ Feature: Send a sharing invitations
                 "grantedToV2"
               ],
               "properties": {
+                "createdDateTime": { "format": "date-time" },
                 "id": {
                   "type": "string",
                   "pattern": "^%permissions_id_pattern%$"
@@ -503,6 +508,7 @@ Feature: Send a sharing invitations
                 "grantedToV2"
               ],
               "properties": {
+                "createdDateTime": { "format": "date-time" },
                 "id": {
                   "type": "string",
                   "pattern": "^%permissions_id_pattern%$"
@@ -598,6 +604,7 @@ Feature: Send a sharing invitations
                 "expirationDateTime"
               ],
               "properties": {
+                "createdDateTime": { "format": "date-time" },
                 "id": {
                   "type": "string",
                   "pattern": "^%permissions_id_pattern%$"
@@ -695,6 +702,7 @@ Feature: Send a sharing invitations
                 "expirationDateTime"
               ],
               "properties": {
+                "createdDateTime": { "format": "date-time" },
                 "id": {
                   "type": "string",
                   "pattern": "^%permissions_id_pattern%$"
@@ -785,6 +793,7 @@ Feature: Send a sharing invitations
                 "grantedToV2"
               ],
               "properties": {
+                "createdDateTime": { "format": "date-time" },
                 "id": {
                   "type": "string",
                   "pattern": "^%permissions_id_pattern%$"
@@ -1584,6 +1593,7 @@ Feature: Send a sharing invitations
                 "roles"
               ],
               "properties": {
+                "createdDateTime": { "format": "date-time" },
                 "grantedToV2": {
                   "type": "object",
                   "required": [
@@ -1674,6 +1684,7 @@ Feature: Send a sharing invitations
                 "grantedToV2"
               ],
               "properties": {
+                "createdDateTime": { "format": "date-time" },
                 "id": {
                   "type": "string",
                   "pattern": "^%permissions_id_pattern%$"

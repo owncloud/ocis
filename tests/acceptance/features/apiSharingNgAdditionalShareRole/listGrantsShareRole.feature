@@ -35,6 +35,7 @@ Feature: ListGrants role
               "type": "object",
               "required": ["createdDateTime","id","roles","grantedToV2"],
               "properties": {
+                "createdDateTime": { "format": "date-time" },
                 "id": {"pattern": "^%permissions_id_pattern%$"},
                 "roles": {
                   "type": "array",
@@ -98,6 +99,7 @@ Feature: ListGrants role
               "type": "object",
               "required": ["createdDateTime","id","roles","grantedToV2"],
               "properties": {
+                "createdDateTime": { "format": "date-time" },
                 "id": {"pattern": "^%permissions_id_pattern%$"},
                 "roles": {
                   "type": "array",
@@ -164,6 +166,7 @@ Feature: ListGrants role
               "type": "object",
               "required": ["createdDateTime","id","roles","grantedToV2"],
               "properties": {
+                "createdDateTime": { "format": "date-time" },
                 "id": {"pattern": "^%permissions_id_pattern%$"},
                 "roles": {
                   "type": "array",
@@ -230,6 +233,7 @@ Feature: ListGrants role
               "type": "object",
               "required": ["createdDateTime","id","roles","grantedToV2"],
               "properties": {
+                "createdDateTime": { "format": "date-time" },
                 "id": {"pattern": "^%permissions_id_pattern%$"},
                 "roles": {
                   "type": "array",
@@ -871,6 +875,7 @@ Feature: ListGrants role
                   "type": "object",
                   "required": ["createdDateTime","grantedToV2","id","roles","invitation"],
                   "properties": {
+                    "createdDateTime": { "format": "date-time" },
                     "id": {"pattern": "^%permissions_id_pattern%$"},
                     "roles": {
                       "type": "array",
@@ -919,6 +924,7 @@ Feature: ListGrants role
                   "type": "object",
                   "required": ["createdDateTime","grantedToV2","id","roles","invitation"],
                   "properties": {
+                    "createdDateTime": { "format": "date-time" },
                     "id": {"pattern": "^%permissions_id_pattern%$"},
                     "roles": {
                       "type": "array",
@@ -1001,6 +1007,7 @@ Feature: ListGrants role
               "required": ["@UI.Hidden","@client.synchronize","createdBy","eTag","file",
                 "id","lastModifiedDateTime","name","parentReference","remoteItem","size"],
               "properties": {
+                "lastModifiedDateTime": { "format": "date-time" },
                 "@UI.Hidden": {"const": false},
                 "@client.synchronize": {"const": true},
                 "createdBy": {
@@ -1177,6 +1184,7 @@ Feature: ListGrants role
                 "id","lastModifiedDateTime","name","parentReference","remoteItem"
               ],
               "properties": {
+                "lastModifiedDateTime": { "format": "date-time" },
                 "@UI.Hidden":{"const": false},
                 "@client.synchronize":{"const": true},
                 "createdBy": {
@@ -1664,10 +1672,7 @@ Feature: ListGrants role
                       "type": "object",
                       "required": ["recordedTime"],
                       "properties": {
-                        "recordedTime": {
-                          "type": "string",
-                          "format": "date-time"
-                        }
+                        "recordedTime": { "format": "date-time" }
                       }
                     }
                   }

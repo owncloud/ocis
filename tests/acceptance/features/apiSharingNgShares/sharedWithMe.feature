@@ -50,6 +50,7 @@ Feature: an user gets the resources shared to them
                 "size"
               ],
               "properties": {
+                "lastModifiedDateTime": { "format": "date-time" },
                 "@UI.Hidden": {
                   "type": "boolean",
                   "enum": [false]
@@ -352,6 +353,7 @@ Feature: an user gets the resources shared to them
                 "remoteItem"
               ],
               "properties": {
+                "lastModifiedDateTime": { "format": "date-time" },
                 "@UI.Hidden": {
                   "type": "boolean",
                   "enum": [false]
@@ -648,6 +650,7 @@ Feature: an user gets the resources shared to them
                 "size"
               ],
               "properties": {
+                "lastModifiedDateTime": { "format": "date-time" },
                 "@UI.Hidden":{
                   "type": "boolean",
                   "enum": [false]

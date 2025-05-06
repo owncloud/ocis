@@ -114,10 +114,7 @@ Feature: check share activity
                       "type": "object",
                       "required": ["recordedTime"],
                       "properties": {
-                        "recordedTime": {
-                          "type": "string",
-                          "format": "date-time"
-                        }
+                        "recordedTime": { "format": "date-time" }
                       }
                     }
                   }
@@ -253,10 +250,7 @@ Feature: check share activity
                       "type": "object",
                       "required": ["recordedTime"],
                       "properties": {
-                        "recordedTime": {
-                          "type": "string",
-                          "format": "date-time"
-                        }
+                        "recordedTime": { "format": "date-time" }
                       }
                     }
                   }
@@ -358,10 +352,7 @@ Feature: check share activity
                       "type": "object",
                       "required": ["recordedTime"],
                       "properties": {
-                        "recordedTime": {
-                          "type": "string",
-                          "format": "date-time"
-                        }
+                        "recordedTime": { "format": "date-time" }
                       }
                     }
                   }
@@ -483,10 +474,7 @@ Feature: check share activity
                       "type": "object",
                       "required": ["recordedTime"],
                       "properties": {
-                        "recordedTime": {
-                          "type": "string",
-                          "format": "date-time"
-                        }
+                        "recordedTime": { "format": "date-time" }
                       }
                     }
                   }
@@ -771,10 +759,7 @@ Feature: check share activity
                       "type": "object",
                       "required": ["recordedTime"],
                       "properties": {
-                        "recordedTime": {
-                          "type": "string",
-                          "format": "date-time"
-                        }
+                        "recordedTime": { "format": "date-time" }
                       }
                     }
                   }
@@ -876,10 +861,7 @@ Feature: check share activity
                       "type": "object",
                       "required": ["recordedTime"],
                       "properties": {
-                        "recordedTime": {
-                          "type": "string",
-                          "format": "date-time"
-                        }
+                        "recordedTime": { "format": "date-time" }
                       }
                     }
                   }
@@ -1046,10 +1028,7 @@ Feature: check share activity
                       "type": "object",
                       "required": ["recordedTime"],
                       "properties": {
-                        "recordedTime": {
-                          "type": "string",
-                          "format": "date-time"
-                        }
+                        "recordedTime": { "format": "date-time" }
                       }
                     }
                   }
@@ -1332,10 +1311,7 @@ Feature: check share activity
                       "type": "object",
                       "required": ["recordedTime"],
                       "properties": {
-                        "recordedTime": {
-                          "type": "string",
-                          "format": "date-time"
-                        }
+                        "recordedTime": { "format": "date-time" }
                       }
                     }
                   }
@@ -1828,10 +1804,7 @@ Feature: check share activity
                       "type": "object",
                       "required": ["recordedTime"],
                       "properties": {
-                        "recordedTime": {
-                          "type": "string",
-                          "format": "date-time"
-                        }
+                        "recordedTime": { "format": "date-time" }
                       }
                     }
                   }
@@ -2076,10 +2049,7 @@ Feature: check share activity
                       "type": "object",
                       "required": ["recordedTime"],
                       "properties": {
-                        "recordedTime": {
-                          "type": "string",
-                          "format": "date-time"
-                        }
+                        "recordedTime": { "format": "date-time" }
                       }
                     }
                   }
@@ -2391,10 +2361,7 @@ Feature: check share activity
                       "type": "object",
                       "required": ["recordedTime"],
                       "properties": {
-                        "recordedTime": {
-                          "type": "string",
-                          "format": "date-time"
-                        }
+                        "recordedTime": { "format": "date-time" }
                       }
                     }
                   }

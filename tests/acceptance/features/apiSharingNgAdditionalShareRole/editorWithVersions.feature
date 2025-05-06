@@ -36,6 +36,7 @@ Feature: an user shares resources
               "type": "object",
               "required": ["createdDateTime", "id", "roles", "grantedToV2", "invitation"],
               "properties": {
+                "createdDateTime": { "format": "date-time" },
                 "id": { "pattern": "^%permissions_id_pattern%$" },
                 "roles": {
                   "type": "array",
@@ -117,6 +118,7 @@ Feature: an user shares resources
               "type": "object",
               "required": ["createdDateTime", "id", "roles", "grantedToV2", "invitation"],
               "properties": {
+                "createdDateTime": { "format": "date-time" },
                 "id": { "pattern": "^%permissions_id_pattern%$" },
                 "roles": {
                   "type": "array",

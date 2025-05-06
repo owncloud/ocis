@@ -50,6 +50,7 @@ Feature: an user shares resources using ScienceMesh application
                 "remoteItem"
               ],
               "properties": {
+                "lastModifiedDateTime": { "format": "date-time" },
                 "@UI.Hidden": { "const": false },
                 "@client.synchronize": { "const": false },
                 "createdBy": {
@@ -125,6 +126,7 @@ Feature: an user shares resources using ScienceMesh application
                           "roles"
                         ],
                         "properties": {
+                          "createdDateTime": { "format": "date-time" },
                           "grantedToV2": {
                             "type": "object",
                             "required": ["user"],
@@ -226,6 +228,7 @@ Feature: an user shares resources using ScienceMesh application
                 "remoteItem"
               ],
               "properties": {
+                "lastModifiedDateTime": { "format": "date-time" },
                 "@UI.Hidden": { "const": false },
                 "@client.synchronize": { "const": false },
                 "createdBy": {
@@ -313,6 +316,7 @@ Feature: an user shares resources using ScienceMesh application
                           "roles"
                         ],
                         "properties": {
+                          "createdDateTime": { "format": "date-time" },
                           "grantedToV2": {
                             "type": "object",
                             "required": ["user"],
@@ -415,6 +419,7 @@ Feature: an user shares resources using ScienceMesh application
                 "remoteItem"
               ],
               "properties": {
+                "lastModifiedDateTime": { "format": "date-time" },
                 "@UI.Hidden": { "const": false },
                 "@client.synchronize": { "const": false },
                 "createdBy": {
@@ -490,6 +495,7 @@ Feature: an user shares resources using ScienceMesh application
                           "roles"
                         ],
                         "properties": {
+                          "createdDateTime": { "format": "date-time" },
                           "grantedToV2": {
                             "type": "object",
                             "required": ["user"],
@@ -835,6 +841,7 @@ Feature: an user shares resources using ScienceMesh application
                     "remoteItem"
                   ],
                   "properties": {
+                    "lastModifiedDateTime": { "format": "date-time" },
                     "name": {
                       "const": "folderToShare"
                     }
@@ -856,6 +863,7 @@ Feature: an user shares resources using ScienceMesh application
                     "size"
                   ],
                   "properties": {
+                    "lastModifiedDateTime": { "format": "date-time" },
                     "name": {
                       "const": "testavatar.jpg"
                     },
@@ -1013,6 +1021,7 @@ Feature: an user shares resources using ScienceMesh application
                     "remoteItem"
                   ],
                   "properties": {
+                    "lastModifiedDateTime": { "format": "date-time" },
                     "name": {
                       "const": "folderToShare"
                     },
@@ -1052,6 +1061,7 @@ Feature: an user shares resources using ScienceMesh application
                     "remoteItem"
                   ],
                   "properties": {
+                    "lastModifiedDateTime": { "format": "date-time" },
                     "name": {
                       "const": "folderToShareCopy"
                     },
