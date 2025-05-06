@@ -41,23 +41,17 @@ class EmailContext implements Context {
 		// if oCIS has been setup with notification configuration
 		// event related step generates emails
 		// so deleting all email
-		$this->clearAllEmails();
 	}
 
 	/**
+	 * @BeforeScenario @email
 	 * @AfterScenario @email
 	 *
 	 * @return void
 	 * @throws GuzzleException
 	 */
 	public function clearAllEmails(): void {
-		try {
-			EmailHelper::deleteAllEmails();
-		} catch (Exception $e) {
-			echo __METHOD__ .
-				" could not delete email messages?\n" .
-				$e->getMessage();
-		}
+		EmailHelper::deleteAllEmails();
 	}
 
 	/**
