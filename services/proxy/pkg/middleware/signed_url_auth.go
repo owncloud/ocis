@@ -210,7 +210,8 @@ func (m SignedURLAuthenticator) createSignature(url string, signingKey []byte) s
 	// - sets raw output to false ->  if raw_output is FALSE length corresponds to twice the byte-length of the derived key (as every byte of the key is returned as two hexits).
 	// TODO change to length 128 in oc10?
 	// fo golangs pbkdf2.Key we need to use 32 because it will be encoded into 64 hexits later
-	hash := pbkdf2.Key([]byte(url), signingKey, 10000, 32, sha512.New)
+	// Minimum 210,000 iterations for PBKDF2-HMAC-SHA512 is recommended to resist brute-force attacks: https://rules.sonarsource.com/go/RSPEC-5344/
+	hash := pbkdf2.Key([]byte(url), signingKey, 256*1024, 32, sha512.New)
 	return hex.EncodeToString(hash)
 }
 

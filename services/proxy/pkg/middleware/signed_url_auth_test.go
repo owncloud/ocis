@@ -150,7 +150,7 @@ func TestSignedURLAuth_urlIsExpired(t *testing.T) {
 
 func TestSignedURLAuth_createSignature(t *testing.T) {
 	pua := SignedURLAuthenticator{}
-	expected := "27d2ebea381384af3179235114801dcd00f91e46f99fca72575301cf3948101d"
+	expected := "606f87d0a0fe524c5371bd8636748224c9874be2be865e8c6658fa61d2165b16"
 	s := pua.createSignature("something", []byte("somerandomkey"))
 
 	if s != expected {
@@ -185,12 +185,11 @@ func TestSignedURLAuth_validate(t *testing.T) {
 		errorMessage string
 	}{
 		{"2020-02-02T12:30:00.000Z", "http://example.com/example.jpg?OC-Date=2020-02-02T12:29:00.000Z&OC-Expires=invalid", "required OC-Signature parameter not found"},
-		{"2020-02-02T12:30:00.000Z", "http://cloud.example.net/?OC-Credential=alice&OC-Date=2019-05-14T11%3A01%3A58.135Z&OC-Expires=1200&OC-Verb=GET&OC-Signature=f9e53a1ee23caef10f72ec392c1b537317491b687bfdd224c782be197d9ca2b6", "URL is expired"},
-		{"2019-05-14T11:02:00.000Z", "http://cloud.example.net/?OC-Credential=alice&OC-Date=2019-05-14T11%3A01%3A58.135Z&OC-Expires=1200&OC-Verb=GET&OC-Signature=f9e53a1ee23caef10f72ec392c1b537317491b687bfdd224c782be197d9ca2b", "signature mismatch: expected f9e53a1ee23caef10f72ec392c1b537317491b687bfdd224c782be197d9ca2b6 != actual f9e53a1ee23caef10f72ec392c1b537317491b687bfdd224c782be197d9ca2b"},
-		{"2019-05-14T11:02:00.000Z", "http://cloud.example.net/?OC-Credential=alice&OC-Date=2019-05-14T11%3A01%3A58.135Z&OC-Expires=1200&OC-Verb=GET&OC-Signature=f9e53a1ee23caef10f72ec392c1b537317491b687bfdd224c782be197d9ca2b6", ""},
-		{"2019-05-14T11:02:00.000Z", "http://cloud.example.net/?OC-Date=2019-05-14T11%3A01%3A58.135Z&OC-Expires=1200&OC-Verb=GET&OC-Credential=alice&OC-Signature=f9e53a1ee23caef10f72ec392c1b537317491b687bfdd224c782be197d9ca2b6", ""},
-		{"2019-05-14T11:02:00.000Z", "http://cloud.example.net/?OC-Algo=PBKDF2%2F10000-SHA512&OC-Date=2019-05-14T11%3A01%3A58.135Z&OC-Expires=1200&OC-Verb=GET&OC-Credential=alice&OC-Signature=f9e53a1ee23caef10f72ec392c1b537317491b687bfdd224c782be197d9ca2b6", ""},
-		{"2024-02-07T12:03:11.966Z", "http://localhost:33001/try?id=1&id=2&OC-Credential=user&OC-Date=2024-02-07T12%3A03%3A11.966Z&OC-Expires=2&OC-Verb=GET&OC-Algo=PBKDF2%2F10000-SHA512&OC-Signature=86e21a1efbf0be989a206109cfedf70a22f338dc8995e849ce002032bc6741c5", ""},
+		{"2020-02-02T12:30:00.000Z", "http://cloud.example.net/?OC-Credential=alice&OC-Date=2019-05-14T11%3A01%3A58.135Z&OC-Expires=1200&OC-Verb=GET&OC-Signature=ce4eb6b56efbdab61318f5677df686a96b8a77d24fa731c159e5e6747c4317cc", "URL is expired"},
+		{"2019-05-14T11:02:00.000Z", "http://cloud.example.net/?OC-Credential=alice&OC-Date=2019-05-14T11%3A01%3A58.135Z&OC-Expires=1200&OC-Verb=GET&OC-Signature=ce4eb6b56efbdab61318f5677df686a96b8a77d24fa731c159e5e6747c4317cc", ""},
+		{"2019-05-14T11:02:00.000Z", "http://cloud.example.net/?OC-Date=2019-05-14T11%3A01%3A58.135Z&OC-Expires=1200&OC-Verb=GET&OC-Credential=alice&OC-Signature=ce4eb6b56efbdab61318f5677df686a96b8a77d24fa731c159e5e6747c4317cc", ""},
+		{"2019-05-14T11:02:00.000Z", "http://cloud.example.net/?OC-Algo=PBKDF2%2F10000-SHA512&OC-Date=2019-05-14T11%3A01%3A58.135Z&OC-Expires=1200&OC-Verb=GET&OC-Credential=alice&OC-Signature=ce4eb6b56efbdab61318f5677df686a96b8a77d24fa731c159e5e6747c4317cc", ""},
+		{"2024-02-07T12:03:11.966Z", "http://localhost:33001/try?id=1&id=2&OC-Credential=user&OC-Date=2024-02-07T12%3A03%3A11.966Z&OC-Expires=2&OC-Verb=GET&OC-Algo=PBKDF2%2F10000-SHA512&OC-Signature=13a15a27abd02e8f8b257363aea078ddf128f753b20bf733148476db93ebe1b1", ""},
 	}
 
 	for _, tt := range tests {
