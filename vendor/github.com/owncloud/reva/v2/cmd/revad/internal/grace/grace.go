@@ -26,6 +26,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"sync"
 	"syscall"
 	"time"
 
@@ -266,7 +267,7 @@ type Server interface {
 // TrapSignals captures the OS signal.
 func (w *Watcher) TrapSignals() {
 	signalCh := make(chan os.Signal, 1024)
-	signal.Notify(signalCh, syscall.SIGHUP, syscall.SIGINT, syscall.SIGQUIT)
+	signal.Notify(signalCh, syscall.SIGHUP, syscall.SIGINT, syscall.SIGQUIT, syscall.SIGTERM)
 	for {
 		s := <-signalCh
 		w.log.Info().Msgf("%v signal received", s)
@@ -284,14 +285,9 @@ func (w *Watcher) TrapSignals() {
 				w.log.Info().Msgf("child forked with new pid %d", p.Pid)
 				w.childPIDs = append(w.childPIDs, p.Pid)
 			}
-
-		case syscall.SIGQUIT:
+		case syscall.SIGQUIT, syscall.SIGINT, syscall.SIGTERM:
 			gracefulShutdown(w)
-		case syscall.SIGINT, syscall.SIGTERM:
-			if w.gracefulShutdownTimeout == 0 {
-				hardShutdown(w)
-			}
-			gracefulShutdown(w)
+			return
 		}
 	}
 }
@@ -301,37 +297,43 @@ func (w *Watcher) TrapSignals() {
 // reva services from some external runtime (like in the "ocis server" case
 func gracefulShutdown(w *Watcher) {
 	w.log.Info().Int("Timeout", w.gracefulShutdownTimeout).Msg("preparing for a graceful shutdown with deadline")
+	// TODO(perekhod): make this configurable. The most of services except the 'storage-users' have no shutdown timeout by default.
+	w.gracefulShutdownTimeout = 10
+	wg := sync.WaitGroup{}
+
+	for _, s := range w.ss {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			w.log.Info().Msgf("fd to %s:%s gracefully closed", s.Network(), s.Address())
+			err := s.GracefulStop()
+			if err != nil {
+				w.log.Error().Err(err).Msg("error stopping server")
+			}
+		}()
+	}
+
+	done := make(chan struct{})
 	go func() {
-		count := w.gracefulShutdownTimeout
-		ticker := time.NewTicker(time.Second)
-		for ; true; <-ticker.C {
-			w.log.Info().Msgf("shutting down in %d seconds", count-1)
-			count--
-			if count <= 0 {
-				w.log.Info().Msg("deadline reached before draining active conns, hard stopping ...")
-				for _, s := range w.ss {
-					err := s.Stop()
-					if err != nil {
-						w.log.Error().Err(err).Msg("error stopping server")
-					}
-					w.log.Info().Msgf("fd to %s:%s abruptly closed", s.Network(), s.Address())
-				}
-				w.Exit(1)
+		wg.Wait()
+		close(done)
+	}()
+
+	select {
+	case <-time.After(time.Duration(w.gracefulShutdownTimeout) * time.Second):
+		w.log.Info().Msg("graceful shutdown timeout reached. running hard shutdown")
+		for _, s := range w.ss {
+			w.log.Info().Msgf("fd to %s:%s abruptly closed", s.Network(), s.Address())
+			err := s.Stop()
+			if err != nil {
+				w.log.Error().Err(err).Msg("error stopping server")
 			}
 		}
-	}()
-	for _, s := range w.ss {
-		w.log.Info().Msgf("fd to %s:%s gracefully closed ", s.Network(), s.Address())
-		err := s.GracefulStop()
-		if err != nil {
-			w.log.Error().Err(err).Msg("error stopping server")
-			w.log.Info().Msg("exit with error code 1")
-
-			w.Exit(1)
-		}
+		return
+	case <-done:
+		w.log.Info().Msg("all servers gracefully stopped")
+		return
 	}
-	w.log.Info().Msg("exit with error code 0")
-	w.Exit(0)
 }
 
 // TODO: Ideally this would call exit() but properly return an error. The
