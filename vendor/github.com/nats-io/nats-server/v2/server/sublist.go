@@ -1747,16 +1747,6 @@ func IntersectStree[T any](st *stree.SubjectTree[T], sl *Sublist, cb func(subj [
 }
 
 func intersectStree[T any](st *stree.SubjectTree[T], r *level, subj []byte, cb func(subj []byte, entry *T)) {
-	if r.numNodes() == 0 {
-		// For wildcards we can't avoid Match, but if it's a literal subject at
-		// this point, using Find is considerably cheaper.
-		if subjectHasWildcard(bytesToString(subj)) {
-			st.Match(subj, cb)
-		} else if e, ok := st.Find(subj); ok {
-			cb(subj, e)
-		}
-		return
-	}
 	nsubj := subj
 	if len(nsubj) > 0 {
 		nsubj = append(subj, '.')
@@ -1772,15 +1762,28 @@ func intersectStree[T any](st *stree.SubjectTree[T], r *level, subj []byte, cb f
 		// check whether there's interest at this level (without triggering dupes) and
 		// match if so.
 		nsubj := append(nsubj, '*')
-		if len(r.pwc.psubs)+len(r.pwc.qsubs) > 0 && r.pwc.next != nil && r.pwc.next.numNodes() > 0 {
+		if len(r.pwc.psubs)+len(r.pwc.qsubs) > 0 {
 			st.Match(nsubj, cb)
 		}
-		intersectStree(st, r.pwc.next, nsubj, cb)
-	case r.numNodes() > 0:
+		if r.pwc.next != nil && r.pwc.next.numNodes() > 0 {
+			intersectStree(st, r.pwc.next, nsubj, cb)
+		}
+	default:
 		// Normal node with subject literals, keep iterating.
 		for t, n := range r.nodes {
 			nsubj := append(nsubj, t...)
-			intersectStree(st, n.next, nsubj, cb)
+			if len(n.psubs)+len(n.qsubs) > 0 {
+				if subjectHasWildcard(bytesToString(nsubj)) {
+					st.Match(nsubj, cb)
+				} else {
+					if e, ok := st.Find(nsubj); ok {
+						cb(nsubj, e)
+					}
+				}
+			}
+			if n.next != nil && n.next.numNodes() > 0 {
+				intersectStree(st, n.next, nsubj, cb)
+			}
 		}
 	}
 }
