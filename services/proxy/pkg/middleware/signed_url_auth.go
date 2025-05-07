@@ -144,6 +144,14 @@ func (m SignedURLAuthenticator) urlIsExpired(query url.Values) (err error) {
 }
 
 func (m SignedURLAuthenticator) signatureIsValid(req *http.Request) (err error) {
+	start := time.Now()
+	defer func() {
+		m.Logger.Debug().
+			Str("duration", time.Since(start).String()).
+			Str("path", req.URL.Path).
+			Msg("signature validation completed")
+	}()
+
 	c := revactx.ContextMustGetUser(req.Context())
 	signingKey, err := m.Store.Read(c.Id.OpaqueId)
 	if err != nil {
@@ -205,6 +213,14 @@ func (m SignedURLAuthenticator) buildUrlToSign(req *http.Request) string {
 }
 
 func (m SignedURLAuthenticator) createSignature(url string, signingKey []byte) string {
+	start := time.Now()
+	defer func() {
+		m.Logger.Debug().
+			Str("duration", time.Since(start).String()).
+			Str("url", url).
+			Msg("signature creation completed")
+	}()
+
 	// the oc10 signature check: $hash = \hash_pbkdf2("sha512", $url, $signingKey, 10000, 64, false);
 	// - sets the length of the output string to 64
 	// - sets raw output to false ->  if raw_output is FALSE length corresponds to twice the byte-length of the derived key (as every byte of the key is returned as two hexits).

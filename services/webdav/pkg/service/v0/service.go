@@ -467,6 +467,11 @@ func (g Webdav) PublicThumbnailHead(w http.ResponseWriter, r *http.Request) {
 
 func (g Webdav) sendThumbnailResponse(rsp *thumbnailssvc.GetThumbnailResponse, w http.ResponseWriter, r *http.Request) {
 	logger := g.log.SubloggerWithRequestID(r.Context())
+	logger.Debug().
+		Str("endpoint", rsp.DataEndpoint).
+		Str("transfer_token", rsp.TransferToken).
+		Msg("initiating download request")
+
 	client := &http.Client{
 		// Timeout: time.Second * 5,
 	}

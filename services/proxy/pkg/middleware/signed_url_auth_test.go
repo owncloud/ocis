@@ -158,6 +158,49 @@ func TestSignedURLAuth_createSignature(t *testing.T) {
 	}
 }
 
+func TestSignedURLAuth_createSignature_executionTime(t *testing.T) {
+	// Setup test environment
+	pua := &SignedURLAuthenticator{
+		PreSignedURLConfig: config.PreSignedURL{
+			Enabled: true,
+		},
+	}
+
+	// Create test data
+	baseURL := "https://example.com/"
+	signingKey := []byte("somerandomkey")
+
+	// Generate random string of length 128
+	generateRandomString := func(length int) string {
+		const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+		b := make([]byte, length)
+		for i := range b {
+			b[i] = charset[i%len(charset)]
+		}
+		return string(b)
+	}
+
+	N := 100
+	// Pre-generate random strings to avoid measuring string generation time
+	randomStrings := make([]string, N)
+	for i := 0; i < N; i++ {
+		randomStrings[i] = generateRandomString(128)
+	}
+	start := time.Now()
+	for i := 0; i < N; i++ {
+		// Simulate download verification
+		signature := pua.createSignature(baseURL+randomStrings[i], signingKey)
+		if signature == "" {
+			t.Fatal("signature creation failed")
+		}
+	}
+	took := time.Since(start)
+	avg := took.Milliseconds() / int64(N)
+	// Key iterations: 10000, ~2 ms local, ~5ms CI
+	// Key iterations: 256*1024, ~73 ms local, ~154ms CI
+	assert.Less(t, avg, int64(100))
+}
+
 func TestSignedURLAuth_validate(t *testing.T) {
 	nowFunc := func() time.Time {
 		t, _ := time.Parse(time.RFC3339, "2020-02-02T12:30:00.000Z")
