@@ -294,7 +294,7 @@ class TUSContext implements Context {
 		?string $user,
 		string  $source,
 		string  $destination,
-		?string  $spaceId = null,
+		?string  $spaceId,
 		array   $uploadMetadata = [],
 		int     $noOfChunks = 1,
 		int     $bytes = null,
@@ -320,10 +320,6 @@ class TUSContext implements Context {
 		}
 
 		$davPathVersion = $this->featureContext->getDavPathVersion();
-		$suffixPath = $user;
-		if ($davPathVersion === WebDavHelper::DAV_VERSION_SPACES) {
-			$suffixPath = $spaceId ?: $this->featureContext->getPersonalSpaceIdForUser($user);
-		}
 		$sourceFile = $this->featureContext->acceptanceTestsDirLocation() . $source;
 
 		$client = $this->createTusClient(
@@ -331,7 +327,7 @@ class TUSContext implements Context {
 			$headers,
 			$sourceFile,
 			$destination,
-			WebDavHelper::getDavPath($davPathVersion, $suffixPath),
+			WebDavHelper::getDavPath($davPathVersion, $spaceId),
 			$uploadMetadata
 		);
 
