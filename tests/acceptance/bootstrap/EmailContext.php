@@ -38,26 +38,17 @@ class EmailContext implements Context {
 		// Get all the contexts you need in this context
 		$this->featureContext = BehatHelper::getContext($scope, $environment, 'FeatureContext');
 		$this->spacesContext = BehatHelper::getContext($scope, $environment, 'SpacesContext');
-		// if oCIS has been setup with notification configuration
-		// event related step generates emails
-		// so deleting all email
-		$this->clearAllEmails();
 	}
 
 	/**
+	 * @BeforeScenario @email
 	 * @AfterScenario @email
 	 *
 	 * @return void
 	 * @throws GuzzleException
 	 */
 	public function clearAllEmails(): void {
-		try {
-			EmailHelper::deleteAllEmails();
-		} catch (Exception $e) {
-			echo __METHOD__ .
-				" could not delete email messages?\n" .
-				$e->getMessage();
-		}
+		EmailHelper::deleteAllEmails();
 	}
 
 	/**

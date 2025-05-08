@@ -933,7 +933,7 @@ Feature: Notification Settings
       }
       """
 
-
+  @email
   Scenario Outline: no in-app and mail notification should appear when Share Expired notification is disabled (Personal space)
     Given using SharingNG
     And user "Alice" has created folder "my_data"
@@ -967,7 +967,7 @@ Feature: Notification Settings
       | lorem.txt |
       | my_data   |
 
-
+  @email
   Scenario Outline: no in-app and mail notification should appear when Share Expired notification is disabled (Project space)
     Given using spaces DAV path
     And using SharingNG
