@@ -248,12 +248,12 @@ func (g BaseGraphService) libreGraphPermissionFromCS3PublicShare(createdLink *li
 
 	// set expiration date
 	if createdLink.GetExpiration() != nil {
-		perm.SetExpirationDateTime(cs3TimestampToTime(createdLink.GetExpiration()).UTC())
+		perm.SetExpirationDateTime(cs3TimestampToTime(createdLink.GetExpiration()))
 	}
 
 	// set cTime
 	if createdLink.GetCtime() != nil {
-		perm.SetCreatedDateTime(cs3TimestampToTime(createdLink.GetCtime()).UTC())
+		perm.SetCreatedDateTime(cs3TimestampToTime(createdLink.GetCtime()))
 	}
 
 	perm.SetHasPassword(createdLink.GetPasswordProtected())
