@@ -240,6 +240,7 @@ The following sections list the changes for unreleased.
    Allow managing spaces from oidc claims
 
    https://github.com/owncloud/ocis/pull/11280
+   https://github.com/owncloud/ocis/pull/11291
 
 * Enhancement - Bump Reva: [#11283](https://github.com/owncloud/ocis/pull/11283)
 
