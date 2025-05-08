@@ -268,7 +268,7 @@ class TUSContext implements Context {
 			$user,
 			$source,
 			$destination,
-			null,
+			$user,
 			$uploadMetadata,
 			$noOfChunks,
 			$bytes,
