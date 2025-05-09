@@ -1,0 +1,17 @@
+name: Remove stale branches
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0 * * *" # Everday at midnight
+permissions: write-all
+
+jobs:
+  remove-stale-branches:
+    name: Remove Stale Branches
+    runs-on: ubuntu-latest
+    steps:
+      - uses: fpicalausa/remove-stale-branches@v1.6.0
+        with:
+          ignore-unknown-authors: true
+          default-recipient: "kobergj"
+          dry-run: true # Check out the console output before setting this to false
