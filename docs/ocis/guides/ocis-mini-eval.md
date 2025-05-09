@@ -51,15 +51,12 @@ docker pull owncloud/ocis
 docker run --rm -it \
     --mount type=bind,source=$HOME/ocis/ocis-config,target=/etc/ocis \
     --mount type=bind,source=$HOME/ocis/ocis-data,target=/var/lib/ocis \
-    owncloud/ocis init
+    owncloud/ocis init --insecure yes
 ```
 
-You will get an output like the following, answer with `yes`:
+You will get an output like the following:
 
-```txt {hl_lines=[9]}
-Do you want to configure Infinite Scale with certificate checking disabled?
- This is not recommended for public instances! [yes | no = default] yes
-
+```txt {hl_lines=[6]}
 =========================================
  generated OCIS Config
 =========================================
