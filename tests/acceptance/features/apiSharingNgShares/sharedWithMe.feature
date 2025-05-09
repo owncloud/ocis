@@ -5397,7 +5397,7 @@ Feature: an user gets the resources shared to them
       | sharee          | grp1     |
       | shareType       | group    |
       | permissionsRole | Viewer   |
-    And user "Brian" should be able to upload file "filesForUpload/lorem.txt" to "Shares/Folder/lorem.txt"
+    Then user "Brian" should be able to upload file "filesForUpload/lorem.txt" to "Shares/Folder/lorem.txt"
     And user "Brian" should be able to create folder "Shares/Folder/testFolder"
     Examples:
       | dav-path-version |
