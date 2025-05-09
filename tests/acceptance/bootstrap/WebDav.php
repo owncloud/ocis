@@ -353,7 +353,6 @@ trait WebDav {
 		?string $password = null,
 		?string $spaceId=null
 	): ResponseInterface {
-
 		return $this->makeDavRequest(
 			$user,
 			"MKCOL",
