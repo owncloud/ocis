@@ -2,7 +2,7 @@
 ---
 title: "Migrate Data using rclone"
 date: 2020-06-12T14:35:00+01:00
-weight: 8
+weight: 10
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/ocis/guides
 geekdocFilePath: migrate-data-rclone.md

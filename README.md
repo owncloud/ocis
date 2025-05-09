@@ -73,11 +73,11 @@ Before starting to set up an instance, we **highly** recommend reading the [Prer
 
 ### Use the Official Documentation
 
-See the [Quick Guide](https://doc.owncloud.com/ocis/next/quickguide/quickguide.html) or the [Binary Setup](https://doc.owncloud.com/ocis/next/deployment/binary/binary-setup.html) for a single-node bare-metal deployment starting with a Raspberry Pi or single server, the [Container Setup](https://doc.owncloud.com/ocis/next/deployment/container/container-setup.html) for classic container environments like docker or learn how to [deploy to Kubernetes](https://doc.owncloud.com/ocis/next/deployment/container/orchestration/orchestration.html).
+See the [Install Infinite Scale on a Server](https://doc.owncloud.com/ocis/next/depl-examples/ubuntu-compose/ubuntu-compose-prod.html) for a production ready deployment starting with a Raspberry Pi, a single server or VM. Also see the [Developer Deployment Guides](https://owncloud.dev/ocis/guides/) for a brief preview.
 
 ### Use the ocis Repo as Source
 
-Use this method to run an instance with the latest code. This is only recommended for development purposes. The minimum go version required is 1.22. Note that you need, as a prerequisite, a C compile environment installed because some dependencies like reva have components that require c-go libraries/tool-chains. The command installing for debian based systems is: `sudo apt install build-essentials`. To build and run a local instance with demo users:
+Use this method to run an instance with the latest code. This is only recommended for development purposes. The minimum go version required is 1.22. Note that you need, as a prerequisite, a C compile environment installed because some dependencies like reva have components that require c-go libraries/tool-chains. The command installing for debian based systems is: `sudo apt install build-essential`. To build and run a local instance with demo users:
 
 ```console
 # get the source
