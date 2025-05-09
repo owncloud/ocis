@@ -268,7 +268,7 @@ class TUSContext implements Context {
 			$user,
 			$source,
 			$destination,
-			null,
+			$user,
 			$uploadMetadata,
 			$noOfChunks,
 			$bytes,
@@ -294,7 +294,7 @@ class TUSContext implements Context {
 		?string $user,
 		string  $source,
 		string  $destination,
-		?string  $spaceId = null,
+		?string  $spaceId,
 		array   $uploadMetadata = [],
 		int     $noOfChunks = 1,
 		int     $bytes = null,
@@ -320,10 +320,6 @@ class TUSContext implements Context {
 		}
 
 		$davPathVersion = $this->featureContext->getDavPathVersion();
-		$suffixPath = $user;
-		if ($davPathVersion === WebDavHelper::DAV_VERSION_SPACES) {
-			$suffixPath = $spaceId ?: $this->featureContext->getPersonalSpaceIdForUser($user);
-		}
 		$sourceFile = $this->featureContext->acceptanceTestsDirLocation() . $source;
 
 		$client = $this->createTusClient(
@@ -331,7 +327,7 @@ class TUSContext implements Context {
 			$headers,
 			$sourceFile,
 			$destination,
-			WebDavHelper::getDavPath($davPathVersion, $suffixPath),
+			WebDavHelper::getDavPath($davPathVersion, $spaceId),
 			$uploadMetadata
 		);
 
@@ -442,17 +438,13 @@ class TUSContext implements Context {
 		string $destination
 	): void {
 		$temporaryFileName = $this->writeDataToTempFile($content);
-		try {
-			$this->uploadFileUsingTus(
-				$user,
-				\basename($temporaryFileName),
-				$destination
-			);
-			$this->featureContext->setLastUploadDeleteTime(\time());
-		} catch (Exception $e) {
-			Assert::assertStringContainsString('TusPhp\Exception\FileException: Unable to create resource', (string)$e);
-		}
+		$response = $this->uploadFileUsingTus(
+			$user,
+			\basename($temporaryFileName),
+			$destination
+		);
 		\unlink($temporaryFileName);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -479,7 +471,7 @@ class TUSContext implements Context {
 		string  $destination
 	): void {
 		$temporaryFileName = $this->writeDataToTempFile($content);
-		$this->uploadFileUsingTus(
+		$response = $this->uploadFileUsingTus(
 			$user,
 			\basename($temporaryFileName),
 			$destination,
@@ -489,6 +481,7 @@ class TUSContext implements Context {
 		);
 		$this->featureContext->setLastUploadDeleteTime(\time());
 		\unlink($temporaryFileName);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -512,7 +505,7 @@ class TUSContext implements Context {
 		$mtime = new DateTime($mtime);
 		$mtime = $mtime->format('U');
 		$user = $this->featureContext->getActualUsername($user);
-		$this->uploadFileUsingTus(
+		$response = $this->uploadFileUsingTus(
 			$user,
 			$source,
 			$destination,
@@ -520,6 +513,11 @@ class TUSContext implements Context {
 			['mtime' => $mtime]
 		);
 		$this->featureContext->setLastUploadDeleteTime(\time());
+		$this->featureContext->theHTTPStatusCodeShouldBe(
+			["201", "204"],
+			"HTTP status code was not 201 or 204 while trying to upload file '$source' for user '$user'",
+			$response
+		);
 	}
 
 	/**
@@ -543,7 +541,7 @@ class TUSContext implements Context {
 		$mtime = new DateTime($mtime);
 		$mtime = $mtime->format('U');
 		$user = $this->featureContext->getActualUsername($user);
-		$this->uploadFileUsingTus(
+		$response = $this->uploadFileUsingTus(
 			$user,
 			$source,
 			$destination,
@@ -551,6 +549,7 @@ class TUSContext implements Context {
 			['mtime' => $mtime]
 		);
 		$this->featureContext->setLastUploadDeleteTime(\time());
+		$this->featureContext->setResponse($response);
 	}
 
 	/**
@@ -628,7 +627,7 @@ class TUSContext implements Context {
 		string $content
 	): void {
 		$temporaryFileName = $this->writeDataToTempFile($content);
-		$this->uploadFileUsingTus(
+		$response = $this->uploadFileUsingTus(
 			$user,
 			\basename($temporaryFileName),
 			$source,
@@ -639,6 +638,7 @@ class TUSContext implements Context {
 		);
 		$this->featureContext->setLastUploadDeleteTime(\time());
 		\unlink($temporaryFileName);
+		$this->featureContext->setResponse($response);
 	}
 
 	/**

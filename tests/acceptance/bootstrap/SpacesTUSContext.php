@@ -185,13 +185,19 @@ class SpacesTUSContext implements Context {
 		string $resource,
 		string $spaceName
 	): ResponseInterface {
-		$spaceId = $this->spacesContext->getSpaceIdByName($user, $spaceName);
+		$isSpacesDavPathVersion = $this->featureContext->getDavPathVersion() === WebDavHelper::DAV_VERSION_SPACES;
+		$suffixPath = $isSpacesDavPathVersion
+			? $this->spacesContext->getSpaceIdByName($user, $spaceName)
+			: $user;
+		if ($spaceName === 'Shares' && !$isSpacesDavPathVersion) {
+			$resource = 'Shares/' . $resource;
+		}
 		$tmpFile = $this->tusContext->writeDataToTempFile($content);
 		$response = $this->tusContext->uploadFileUsingTus(
 			$user,
 			\basename($tmpFile),
 			$resource,
-			$spaceId
+			$suffixPath
 		);
 		$this->featureContext->setLastUploadDeleteTime(\time());
 		\unlink($tmpFile);
