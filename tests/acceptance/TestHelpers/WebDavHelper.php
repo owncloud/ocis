@@ -645,19 +645,23 @@ class WebDavHelper {
 		}
 
 		// get space id if testing with spaces dav
-		if ($spaceId === null && $davPathVersionToUse === self::DAV_VERSION_SPACES
-			&& !\in_array($type, ["public-files", "versions"])
-		) {
+		if ($davPathVersionToUse === self::DAV_VERSION_SPACES) {
 			$path = \ltrim($path, "/");
+			$sharesSpace = false;
 			if (\str_starts_with($path, "Shares/")) {
-				$spaceId = GraphHelper::SHARES_SPACE_ID;
+				$sharesSpace = true;
 				$path = "/" . preg_replace("/^Shares\//", "", $path);
-			} else {
-				$spaceId = self::getPersonalSpaceIdForUserOrFakeIfNotFound(
-					$baseUrl,
-					$user,
-					$password,
-				);
+			}
+			if ($spaceId === null && !\in_array($type, ["public-files", "versions"])) {
+				if ($sharesSpace) {
+					$spaceId = GraphHelper::SHARES_SPACE_ID;
+				} else {
+					$spaceId = self::getPersonalSpaceIdForUserOrFakeIfNotFound(
+						$baseUrl,
+						$user,
+						$password,
+					);
+				}
 			}
 		}
 
