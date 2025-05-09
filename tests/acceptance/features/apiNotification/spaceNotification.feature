@@ -18,8 +18,9 @@ Feature: Notification
       | shareType       | user                  |
       | permissionsRole | Space Editor          |
 
-  @email
-  Scenario: user gets in-app and mail notifications of space shared
+  @issue-10937 @email
+  Scenario Outline: user gets in-app and mail notifications of space shared
+    And the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
     When user "Brian" lists all notifications
     Then the HTTP status code should be "200"
     And the JSON response should contain a notification message with the subject "Space shared" and the message-details should match
@@ -83,9 +84,14 @@ Feature: Notification
 
       Click here to view it: %base_url%/f/%space_id%
       """
+    Examples:
+      | user-role  |
+      | User       |
+      | User Light |
 
-  @email
-  Scenario: gets in-app and mail notification of space unshared
+  @issue-10937 @email
+  Scenario Outline: gets in-app and mail notification of space unshared
+    Given the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
     When user "Alice" removes the access of user "Brian" from space "notification checking" using root endpoint of the Graph API
     Then the HTTP status code should be "204"
     And user "Brian" should get a notification with subject "Removed from Space" and message:
@@ -101,10 +107,15 @@ Feature: Notification
 
       Click here to check it: %base_url%/f/%space_id%
       """
+    Examples:
+      | user-role  |
+      | User       |
+      | User Light |
 
-
-  Scenario: user gets in-app notification of space disabled (note: no mail notification)
-    Given user "Alice" has disabled a space "notification checking"
+  @issue-10937
+  Scenario Outline: user gets in-app notification of "Space disabled" event (note: no mail notification)
+    Given the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
+    And user "Alice" has disabled a space "notification checking"
     When user "Brian" lists all notifications
     Then the HTTP status code should be "200"
     And there should be "2" notifications
@@ -161,6 +172,10 @@ Feature: Notification
         }
       }
       """
+    Examples:
+      | user-role  |
+      | User       |
+      | User Light |
 
 
   Scenario Outline: get in-app notification about a space share in various languages
@@ -191,15 +206,20 @@ Feature: Notification
     Then the HTTP status code should be "200"
     And the notifications should be empty
 
-  @email
-  Scenario: user doesn't get any notification after being removed from space(note: no mail notification)
-    Given user "Alice" has removed the access of user "Brian" from space "notification checking"
+  @issue-10937 @email
+  Scenario Outline: user doesn't get any notification after being removed from space (note: no mail notification)
+    Given the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
+    And user "Alice" has removed the access of user "Brian" from space "notification checking"
     And user "Alice" has disabled a space "notification checking"
     When user "Brian" lists all notifications
     Then the HTTP status code should be "200"
     And there should be "2" notifications
     And user "Brian" should have "2" emails
     But user "Brian" should not have a notification related to space "notification checking" with subject "Space disabled"
+    Examples:
+      | user-role  |
+      | User       |
+      | User Light |
 
   @email
   Scenario: group members get in-app and email notifications when someone shares a project space with the group
@@ -275,8 +295,9 @@ Feature: Notification
       Zum Ansehen hier klicken: %base_url%/f/%space_id%
       """
 
-  @issue-10882 @email
-  Scenario: user gets in-app and email notifications when space membership expires
+  @issue-10937 @issue-10882 @email
+  Scenario Outline: user gets in-app and email notifications when space membership expires
+    Given the administrator has assigned the role "<user-role>" to user "Brian" using the Graph API
     When user "Alice" has expired the membership of user "Brian" from space "notification checking"
     Then the HTTP status code should be "200"
     And user "Brian" should get a notification with subject "Membership expired" and message:
@@ -290,3 +311,7 @@ Feature: Notification
 
       Even though this membership has expired you still might have access through other shares and/or space memberships
       """
+    Examples:
+      | user-role  |
+      | User       |
+      | User Light |
