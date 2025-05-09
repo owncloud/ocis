@@ -18,34 +18,13 @@ Feature: get users
       """
       {
         "type": "object",
-        "required": [
-          "displayName",
-          "id",
-          "onPremisesSamAccountName",
-          "accountEnabled",
-          "userType"
-        ],
+        "required": ["displayName","id","onPremisesSamAccountName","accountEnabled","userType"],
         "properties": {
-          "displayName": {
-            "type": "string",
-            "const": "Brian Murphy"
-          },
-          "id": {
-            "type": "string",
-            "pattern": "^%user_id_pattern%$"
-          },
-          "onPremisesSamAccountName": {
-            "type": "string",
-            "const": "Brian"
-          },
-          "accountEnabled": {
-            "type": "boolean",
-            "const": true
-          },
-          "userType": {
-            "type": "string",
-            "const": "Member"
-          }
+          "displayName": {"const": "Brian Murphy"},
+          "id": {"pattern": "^%user_id_pattern%$"},
+          "onPremisesSamAccountName": {"const": "Brian"},
+          "accountEnabled": {"const": true},
+          "userType": {"const": "Member"}
         }
       }
       """
@@ -60,20 +39,13 @@ Feature: get users
       """
       {
         "type": "object",
-        "required": [
-          "error"
-        ],
+        "required": ["error"],
         "properties": {
           "error": {
             "type": "object",
-            "required": [
-              "message"
-            ],
+            "required": ["message"],
             "properties": {
-              "message": {
-                "type": "string",
-                "const": "Forbidden"
-              }
+              "message": {"const": "Forbidden"}
             }
           }
         }
@@ -103,34 +75,13 @@ Feature: get users
       """
       {
         "type": "object",
-        "required": [
-          "id",
-          "mail",
-          "onPremisesSamAccountName",
-          "accountEnabled",
-          "userType"
-        ],
+        "required": ["displayName","id","onPremisesSamAccountName","accountEnabled","userType"],
         "properties": {
-          "id": {
-            "type": "string",
-            "pattern": "^%user_id_pattern%$"
-          },
-          "mail": {
-            "type": "string",
-            "const": "alice@example.org"
-          },
-          "onPremisesSamAccountName": {
-            "type": "string",
-            "const": "Alice"
-          },
-          "accountEnabled": {
-            "type": "boolean",
-            "const": true
-          },
-          "userType": {
-            "type": "string",
-            "const": "Member"
-          }
+          "id": {"pattern": "^%user_id_pattern%$"},
+          "mail": {"const": "alice@example.org"},
+          "onPremisesSamAccountName": {"const": "Alice"},
+          "accountEnabled": {"const": true},
+          "userType": {"const": "Member"}
         }
       }
       """
@@ -138,34 +89,13 @@ Feature: get users
       """
       {
         "type": "object",
-        "required": [
-          "id",
-          "mail",
-          "onPremisesSamAccountName",
-          "accountEnabled",
-          "userType"
-        ],
+        "required": ["displayName","id","onPremisesSamAccountName","accountEnabled","userType"],
         "properties": {
-          "id": {
-            "type": "string",
-            "pattern": "^%user_id_pattern%$"
-          },
-          "mail": {
-            "type": "string",
-            "const": "brian@example.org"
-          },
-          "onPremisesSamAccountName": {
-            "type": "string",
-            "const": "Brian"
-          },
-          "accountEnabled": {
-            "type": "boolean",
-            "const": true
-          },
-          "userType": {
-            "type": "string",
-            "const": "Member"
-          }
+          "id": {"pattern": "^%user_id_pattern%$"},
+          "mail": {"const": "brian@example.org"},
+          "onPremisesSamAccountName": {"const": "Brian"},
+          "accountEnabled": {"const": true},
+          "userType": {"const": "Member"}
         }
       }
       """
@@ -180,34 +110,13 @@ Feature: get users
       """
       {
         "type": "object",
-        "required": [
-          "id",
-          "mail",
-          "onPremisesSamAccountName",
-          "accountEnabled",
-          "userType"
-        ],
+        "required": ["displayName","id","onPremisesSamAccountName","accountEnabled","userType"],
         "properties": {
-          "id": {
-            "type": "string",
-            "pattern": "^%user_id_pattern%$"
-          },
-          "mail": {
-            "type": "string",
-            "const": "alice@example.org"
-          },
-          "onPremisesSamAccountName": {
-            "type": "string",
-            "const": "Alice"
-          },
-          "accountEnabled": {
-            "type": "boolean",
-            "const": true
-          },
-          "userType": {
-            "type": "string",
-            "const": "Member"
-          }
+          "id": {"pattern": "^%user_id_pattern%$"},
+          "mail": {"const": "alice@example.org"},
+          "onPremisesSamAccountName": {"const": "Alice"},
+          "accountEnabled": {"const": true},
+          "userType": {"const": "Member"}
         }
       }
       """
@@ -215,34 +124,13 @@ Feature: get users
       """
       {
         "type": "object",
-        "required": [
-          "id",
-          "mail",
-          "onPremisesSamAccountName",
-          "accountEnabled",
-          "userType"
-        ],
+        "required": ["displayName","id","onPremisesSamAccountName","accountEnabled","userType"],
         "properties": {
-          "id": {
-            "type": "string",
-            "pattern": "^%user_id_pattern%$"
-          },
-          "mail": {
-            "type": "string",
-            "const": "brian@example.org"
-          },
-          "onPremisesSamAccountName": {
-            "type": "string",
-            "const": "Brian"
-          },
-          "accountEnabled": {
-            "type": "boolean",
-            "const": false
-          },
-          "userType": {
-            "type": "string",
-            "const": "Member"
-          }
+          "id": {"pattern": "^%user_id_pattern%$"},
+          "mail": {"const": "brian@example.org"},
+          "onPremisesSamAccountName": {"const": "Brian"},
+          "accountEnabled": {"const": false},
+          "userType": {"const": "Member"}
         }
       }
       """
@@ -256,20 +144,13 @@ Feature: get users
       """
       {
         "type": "object",
-        "required": [
-          "error"
-        ],
+        "required": ["error"],
         "properties": {
           "error": {
             "type": "object",
-            "required": [
-              "message"
-            ],
+            "required": ["message"],
             "properties": {
-              "message": {
-                "type": "string",
-                "const": "search term too short"
-              }
+              "message": {"const": "search term too short"}
             }
           }
         }
@@ -290,116 +171,50 @@ Feature: get users
       """
       {
         "type": "object",
-        "required": [
-          "displayName",
-          "id",
-          "onPremisesSamAccountName",
-          "drive",
-          "accountEnabled",
-          "userType"
-        ],
+        "required": ["displayName","id","onPremisesSamAccountName","drive","accountEnabled","userType"],
         "properties": {
-          "displayName": {
-            "type": "string",
-            "const": "Brian Murphy"
-          },
-          "id": {
-            "type": "string",
-            "pattern": "^%user_id_pattern%$"
-          },
-          "onPremisesSamAccountName": {
-            "type": "string",
-            "const": "Brian"
-          },
-          "accountEnabled": {
-            "type": "boolean",
-            "const": true
-          },
-          "userType": {
-            "type": "string",
-            "const": "Member"
-          },
+          "displayName": {"const": "Brian Murphy"},
+          "id": {"pattern": "^%user_id_pattern%$"},
+          "onPremisesSamAccountName": {"const": "Brian"},
+          "accountEnabled": {"const": true},
+          "userType": {"const": "Member"},
           "drive": {
             "type": "object",
-            "required": [
-              "driveAlias",
-              "id",
-              "name",
-              "owner",
-              "quota",
-              "root",
-              "webUrl"
-            ],
+            "required": ["driveAlias","id","name","owner","quota","root","webUrl"],
             "properties": {
-              "driveType": {
-                "type": "string",
-                "const": "personal"
-              },
-              "driveAlias": {
-                "type": "string",
-                "const": "personal/brian"
-              },
-              "id": {
-                "type": "string",
-                "pattern": "^%space_id_pattern%$"
-              },
-              "name": {
-                "type": "string",
-                "const": "Brian Murphy"
-              },
+              "driveType": {"const": "personal"},
+              "driveAlias": {"const": "personal/brian"},
+              "id": {"pattern": "^%space_id_pattern%$"},
+              "name": {"const": "Brian Murphy"},
               "owner": {
                 "type": "object",
-                "required": [
-                  "user"
-                ],
+                "required": ["user"],
                 "properties": {
                   "user": {
                     "type": "object",
-                    "required": [
-                      "id"
-                    ],
+                    "required": ["id"],
                     "properties": {
-                      "id": {
-                        "type": "string",
-                        "pattern": "%user_id_pattern%"
-                      }
+                      "id": {"pattern": "%user_id_pattern%"}
                     }
                   }
                 }
               },
               "quota": {
                 "type": "object",
-                "required": [
-                  "state"
-                ],
+                "required": ["state"],
                 "properties": {
-                  "state": {
-                    "type": "string",
-                    "const": "normal"
-                  }
+                  "state": {"const": "normal"}
                 }
               },
               "root": {
                 "type": "object",
-                "required": [
-                  "id",
-                  "webDavUrl"
-                ],
+                "required": ["id","webDavUrl"],
                 "properties": {
-                  "state": {
-                    "type": "string",
-                    "const": "normal"
-                  },
-                  "webDavUrl": {
-                    "type": "string",
-                    "pattern": "^%base_url%/dav/spaces/%space_id_pattern%$"
-                  }
+                  "state": {"const": "normal"},
+                  "webDavUrl": {"pattern": "^%base_url%/dav/spaces/%space_id_pattern%$"}
                 }
               },
-              "webUrl": {
-                "type": "string",
-                "pattern": "^%base_url%/f/%space_id_pattern%$"
-              }
+              "webUrl": {"pattern": "^%base_url%/f/%space_id_pattern%$"}
             }
           }
         }
@@ -416,115 +231,51 @@ Feature: get users
       {
         "type": "object",
         "required": [
-          "displayName",
-          "id",
-          "onPremisesSamAccountName",
-          "drive",
-          "accountEnabled",
-          "userType"
+          "displayName","id","onPremisesSamAccountName","drive","accountEnabled","userType"
         ],
         "properties": {
-          "displayName": {
-            "type": "string",
-            "const": "Brian Murphy"
-          },
-          "id": {
-            "type": "string",
-            "pattern": "^%user_id_pattern%$"
-          },
-          "onPremisesSamAccountName": {
-            "type": "string",
-            "const": "Brian"
-          },
-          "accountEnabled": {
-            "type": "boolean",
-            "const": true
-          },
-          "userType": {
-            "type": "string",
-            "const": "Member"
-          },
+          "displayName": {"const": "Brian Murphy"},
+          "id": {"pattern": "^%user_id_pattern%$"},
+          "onPremisesSamAccountName": {"const": "Brian"},
+          "accountEnabled": {"const": true},
+          "userType": {"const": "Member"},
           "drive": {
             "type": "object",
-            "required": [
-              "driveAlias",
-              "id",
-              "name",
-              "owner",
-              "quota",
-              "root",
-              "webUrl"
-            ],
+            "required": ["driveAlias","id","name","owner","quota","root","webUrl"],
             "properties": {
-              "driveType": {
-                "type": "string",
-                "const": "personal"
-              },
-              "driveAlias": {
-                "type": "string",
-                "const": "personal/brian"
-              },
-              "id": {
-                "type": "string",
-                "pattern": "^%space_id_pattern%$"
-              },
-              "name": {
-                "type": "string",
-                "const": "Brian Murphy"
-              },
+              "driveType": {"const": "personal"},
+              "driveAlias": {"const": "personal/brian"},
+              "id": {"pattern": "^%space_id_pattern%$"},
+              "name": {"const": "Brian Murphy"},
               "owner": {
                 "type": "object",
-                "required": [
-                  "user"
-                ],
+                "required": ["user"],
                 "properties": {
                   "user": {
                     "type": "object",
-                    "required": [
-                      "id"
-                    ],
+                    "required": ["id"],
                     "properties": {
-                      "id": {
-                        "type": "string",
-                        "pattern": "%user_id_pattern%"
-                      }
+                      "id": {"pattern": "%user_id_pattern%"}
                     }
                   }
                 }
               },
               "quota": {
                 "type": "object",
-                "required": [
-                  "state"
-                ],
+                "required": ["state"],
                 "properties": {
-                  "state": {
-                    "type": "string",
-                    "const": "normal"
-                  }
+                  "state": {"const": "normal"}
                 }
               },
               "root": {
                 "type": "object",
-                "required": [
-                  "id",
-                  "webDavUrl"
-                ],
+                "required": ["id","webDavUrl"],
                 "properties": {
-                  "state": {
-                    "type": "string",
-                    "const": "normal"
-                  },
-                  "webDavUrl": {
-                    "type": "string",
-                    "pattern": "^%base_url%/dav/spaces/%space_id_pattern%$"
-                  }
+                  "state": {"const": "normal"},
+                  "webDavUrl": {"pattern": "^%base_url%/dav/spaces/%space_id_pattern%$"}
                 }
               },
-              "webUrl": {
-                "type": "string",
-                "pattern": "^%base_url%/f/%space_id_pattern%$"
-              }
+              "webUrl": {"pattern": "^%base_url%/f/%space_id_pattern%$"}
             }
           }
         }
@@ -550,19 +301,10 @@ Feature: get users
       """
       {
         "type": "object",
-        "required": [
-          "id",
-          "onPremisesSamAccountName"
-        ],
+        "required": ["id","onPremisesSamAccountName"],
         "properties": {
-          "id": {
-            "type": "string",
-            "pattern": "^%user_id_pattern%$"
-          },
-          "onPremisesSamAccountName": {
-            "type": "string",
-            "const": "Brian"
-          },
+          "id": {"pattern": "^%user_id_pattern%$"},
+          "onPremisesSamAccountName": {"const": "Brian"},
           "memberOf": {
             "type": "array",
             "minItems": 2,
@@ -572,26 +314,16 @@ Feature: get users
               "oneOf": [
                 {
                   "type": "object",
-                  "required": [
-                    "displayName"
-                  ],
+                  "required": ["displayName"],
                   "properties": {
-                    "displayName": {
-                      "type": "string",
-                      "const": "tea-lover"
-                    }
+                    "displayName": {"const": "tea-lover"}
                   }
                 },
                 {
                   "type": "object",
-                  "required": [
-                    "displayName"
-                  ],
+                  "required": ["displayName"],
                   "properties": {
-                    "displayName": {
-                      "type": "string",
-                      "const": "coffee-lover"
-                    }
+                    "displayName": {"const": "coffee-lover"}
                   }
                 }
               ]
@@ -613,20 +345,13 @@ Feature: get users
       """
       {
         "type": "object",
-        "required": [
-          "error"
-        ],
+        "required": ["error"],
         "properties": {
           "error": {
             "type": "object",
-            "required": [
-              "message"
-            ],
+            "required": ["message"],
             "properties": {
-              "message": {
-                "type": "string",
-                "const": "Forbidden"
-              }
+              "message": {"const": "Forbidden"}
             }
           }
         }
@@ -680,9 +405,7 @@ Feature: get users
       """
       {
         "type": "object",
-        "required": [
-          "value"
-        ],
+        "required": ["value"],
         "properties": {
           "value": {
             "type": "array",
@@ -693,65 +416,24 @@ Feature: get users
               "oneOf": [
                 {
                   "type": "object",
-                  "required": [
-                    "id",
-                    "mail",
-                    "onPremisesSamAccountName",
-                    "accountEnabled",
-                    "userType"
-                  ],
+                  "required": ["id","mail","onPremisesSamAccountName","accountEnabled","userType"],
                   "properties": {
-                    "id": {
-                      "type": "string",
-                      "pattern": "^%user_id_pattern%$"
-                    },
-                    "mail": {
-                      "type": "string",
-                      "const": "alice@example.org"
-                    },
-                    "onPremisesSamAccountName": {
-                      "type": "string",
-                      "const": "Alice"
-                    },
-                    "accountEnabled": {
-                      "type": "boolean",
-                      "const": true
-                    },
-                    "userType": {
-                      "type": "string",
-                      "const": "Member"
-                    }
+                    "id": {"pattern": "^%user_id_pattern%$"},
+                    "mail": {"const": "alice@example.org"},
+                    "onPremisesSamAccountName": {"const": "Alice"},
+                    "accountEnabled": {"const": true},
+                    "userType": {"const": "Member"}
                   }
                 },
                 {
                   "type": "object",
-                  "required": [
-                    "id",
-                    "mail",
-                    "onPremisesSamAccountName",
-                    "accountEnabled"
-                  ],
+                  "required": ["id","mail","onPremisesSamAccountName","accountEnabled"],
                   "properties": {
-                    "id": {
-                      "type": "string",
-                      "pattern": "^%user_id_pattern%$"
-                    },
-                    "mail": {
-                      "type": "string",
-                      "const": "brian@example.org"
-                    },
-                    "onPremisesSamAccountName": {
-                      "type": "string",
-                      "const": "Brian"
-                    },
-                    "accountEnabled": {
-                      "type": "boolean",
-                      "const": true
-                    },
-                    "userType": {
-                      "type": "string",
-                      "const": "Member"
-                    }
+                    "id": {"pattern": "^%user_id_pattern%$"},
+                    "mail": {"const": "brian@example.org"},
+                    "onPremisesSamAccountName": {"const": "Brian"},
+                    "accountEnabled": {"const": true},
+                    "userType": {"const": "Member"}
                   }
                 }
               ]
@@ -767,9 +449,7 @@ Feature: get users
       """
       {
         "type": "object",
-        "required": [
-          "value"
-        ],
+        "required": ["value"],
         "properties": {
           "value": {
             "type": "array",
@@ -778,33 +458,13 @@ Feature: get users
             "items": {
               "type": "object",
               "required": [
-                "id",
-                "mail",
-                "onPremisesSamAccountName",
-                "accountEnabled",
-                "userType"
-              ],
+                "id","mail","onPremisesSamAccountName","accountEnabled","userType"],
               "properties": {
-                "id": {
-                  "type": "string",
-                  "pattern": "^%user_id_pattern%$"
-                },
-                "mail": {
-                  "type": "string",
-                  "const": "brian@example.org"
-                },
-                "onPremisesSamAccountName": {
-                  "type": "string",
-                  "const": "Brian"
-                },
-                "accountEnabled": {
-                  "type": "boolean",
-                  "const": true
-                },
-                "userType": {
-                  "type": "string",
-                  "const": "Member"
-                }
+                "id": {"pattern": "^%user_id_pattern%$"},
+                "mail": {"const": "brian@example.org"},
+                "onPremisesSamAccountName": {"const": "Brian"},
+                "accountEnabled": {"const": true},
+                "userType": {"const": "Member"}
               }
             }
           }
@@ -830,34 +490,13 @@ Feature: get users
       """
       {
         "type": "object",
-        "required": [
-          "id",
-          "mail",
-          "onPremisesSamAccountName",
-          "accountEnabled",
-          "userType"
-        ],
+        "required": ["displayName","id","onPremisesSamAccountName","accountEnabled","userType"],
         "properties": {
-          "id": {
-            "type": "string",
-            "pattern": "^%user_id_pattern%$"
-          },
-          "mail": {
-            "type": "string",
-            "const": "alice@example.org"
-          },
-          "onPremisesSamAccountName": {
-            "type": "string",
-            "const": "Alice"
-          },
-          "accountEnabled": {
-            "type": "boolean",
-            "const": true
-          },
-          "userType": {
-            "type": "string",
-            "const": "Member"
-          }
+          "id": {"pattern": "^%user_id_pattern%$"},
+          "mail": {"const": "alice@example.org"},
+          "onPremisesSamAccountName": {"const": "Alice"},
+          "accountEnabled": {"const": true},
+          "userType": {"const": "Member"}
         }
       }
       """
@@ -865,34 +504,13 @@ Feature: get users
       """
       {
         "type": "object",
-        "required": [
-          "id",
-          "mail",
-          "onPremisesSamAccountName",
-          "accountEnabled",
-          "userType"
-        ],
+        "required": ["displayName","id","onPremisesSamAccountName","accountEnabled","userType"],
         "properties": {
-          "id": {
-            "type": "string",
-            "pattern": "^%user_id_pattern%$"
-          },
-          "mail": {
-            "type": "string",
-            "const": "brian@example.org"
-          },
-          "onPremisesSamAccountName": {
-            "type": "string",
-            "const": "Brian"
-          },
-          "accountEnabled": {
-            "type": "boolean",
-            "const": true
-          },
-          "userType": {
-            "type": "string",
-            "const": "Member"
-          }
+          "id": {"pattern": "^%user_id_pattern%$"},
+          "mail": {"const": "brian@example.org"},
+          "onPremisesSamAccountName": {"const": "Brian"},
+          "accountEnabled": {"const": true},
+          "userType": {"const": "Member"}
         }
       }
       """
@@ -910,20 +528,13 @@ Feature: get users
       """
       {
         "type": "object",
-        "required": [
-          "error"
-        ],
+        "required": ["error"],
         "properties": {
           "error": {
             "type": "object",
-            "required": [
-              "message"
-            ],
+            "required": ["message"],
             "properties": {
-              "message": {
-                "type": "string",
-                "const": "search term too short"
-              }
+              "message": {"const": "search term too short"}
             }
           }
         }
@@ -949,34 +560,13 @@ Feature: get users
       """
       {
         "type": "object",
-        "required": [
-          "id",
-          "mail",
-          "onPremisesSamAccountName",
-          "accountEnabled",
-          "userType"
-        ],
+        "required": ["displayName","id","onPremisesSamAccountName","accountEnabled","userType"],
         "properties": {
-          "id": {
-            "type": "string",
-            "pattern": "^%user_id_pattern%$"
-          },
-          "mail": {
-            "type": "string",
-            "const": "brian@example.org"
-          },
-          "onPremisesSamAccountName": {
-            "type": "string",
-            "const": "Brian"
-          },
-          "accountEnabled": {
-            "type": "boolean",
-            "const": true
-          },
-          "userType": {
-            "type": "string",
-            "const": "Member"
-          }
+          "id": {"pattern": "^%user_id_pattern%$"},
+          "mail": {"const": "brian@example.org"},
+          "onPremisesSamAccountName": {"const": "Brian"},
+          "accountEnabled": {"const": true},
+          "userType": {"const": "Member"}
         }
       }
       """
@@ -984,34 +574,13 @@ Feature: get users
       """
       {
         "type": "object",
-        "required": [
-          "id",
-          "mail",
-          "onPremisesSamAccountName",
-          "accountEnabled",
-          "userType"
-        ],
+        "required": ["displayName","id","onPremisesSamAccountName","accountEnabled","userType"],
         "properties": {
-          "id": {
-            "type": "string",
-            "pattern": "^%user_id_pattern%$"
-          },
-          "mail": {
-            "type": "string",
-            "const": "carol@example.org"
-          },
-          "onPremisesSamAccountName": {
-            "type": "string",
-            "const": "Carol"
-          },
-          "accountEnabled": {
-            "type": "boolean",
-            "const": true
-          },
-          "userType": {
-            "type": "string",
-            "const": "Member"
-          }
+          "id": {"pattern": "^%user_id_pattern%$"},
+          "mail": {"const": "carol@example.org"},
+          "onPremisesSamAccountName": {"const": "Carol"},
+          "accountEnabled": {"const": true},
+          "userType": {"const": "Member"}
         }
       }
       """
@@ -1022,34 +591,13 @@ Feature: get users
       """
       {
         "type": "object",
-        "required": [
-          "id",
-          "mail",
-          "onPremisesSamAccountName",
-          "accountEnabled",
-          "userType"
-        ],
+        "required": ["displayName","id","onPremisesSamAccountName","accountEnabled","userType"],
         "properties": {
-          "id": {
-            "type": "string",
-            "pattern": "^%user_id_pattern%$"
-          },
-          "mail": {
-            "type": "string",
-            "const": "brian@example.org"
-          },
-          "onPremisesSamAccountName": {
-            "type": "string",
-            "const": "Brian"
-          },
-          "accountEnabled": {
-            "type": "boolean",
-            "const": true
-          },
-          "userType": {
-            "type": "string",
-            "const": "Member"
-          }
+          "id": {"pattern": "^%user_id_pattern%$"},
+          "mail": {"const": "brian@example.org"},
+          "onPremisesSamAccountName": {"const": "Brian"},
+          "accountEnabled": {"const": true},
+          "userType": {"const": "Member"}
         }
       }
       """
@@ -1064,20 +612,13 @@ Feature: get users
       """
       {
         "type": "object",
-        "required": [
-          "error"
-        ],
+        "required": ["error"],
         "properties": {
           "error": {
             "type": "object",
-            "required": [
-              "message"
-            ],
+            "required": ["message"],
             "properties": {
-              "message": {
-                "type": "string",
-                "const": "search term too short"
-              }
+              "message": {"const": "search term too short"}
             }
           }
         }
@@ -1109,84 +650,39 @@ Feature: get users
       """
       {
         "type": "object",
-        "required": [
-          "driveAlias",
-          "driveType",
-          "id",
-          "name",
-          "webUrl",
-          "owner",
-          "quota",
-          "root"
-        ],
+        "required": ["driveAlias","driveType","id","name","webUrl","owner","quota","root"],
         "properties": {
-          "driveAlias": {
-            "type": "string",
-            "const": "personal/brian"
-          },
-          "driveType": {
-            "type": "string",
-            "const": "personal"
-          },
-          "id": {
-            "type": "string",
-            "pattern": "^%space_id_pattern%$"
-          },
-          "name": {
-            "type": "string",
-            "const": "Brian Murphy"
-          },
-          "webUrl": {
-            "type": "string",
-            "pattern": "^%base_url%/f/%space_id_pattern%$"
-          },
+          "driveAlias": {"const": "personal/brian"},
+          "driveType": {"const": "personal"},
+          "id": {"pattern": "^%space_id_pattern%$"},
+          "name": {"const": "Brian Murphy"},
+          "webUrl": {"pattern": "^%base_url%/f/%space_id_pattern%$"},
           "owner": {
             "type": "object",
-            "required": [
-              "user"
-            ],
+            "required": ["user"],
             "properties": {
               "user": {
                 "type": "object",
-                "required": [
-                  "displayName",
-                  "id"
-                ],
+                "required": ["displayName","id"],
                 "properties": {
-                  "displayName": {
-                    "type": "string",
-                    "const": ""
-                  },
-                  "id": {
-                    "type": "string",
-                    "pattern": "^%user_id_pattern%$"
-                  }
+                  "displayName": {"const": ""},
+                  "id": {"pattern": "^%user_id_pattern%$"}
                 }
               }
             }
           },
           "qouta": {
             "type": "object",
-            "required": [
-              "state"
-            ],
+            "required": ["state"],
             "properties": {
-              "state": {
-                "type": "string",
-                "const": "normal"
-              }
+              "state": {"const": "normal"}
             }
           },
           "root": {
             "type": "object",
-            "required": [
-              "webDavUrl"
-            ],
+            "required": ["webDavUrl"],
             "properties": {
-              "webDavUrl": {
-                "type": "string",
-                "pattern": "^%base_url%/dav/spaces/%space_id_pattern%$"
-              }
+              "webDavUrl": {"pattern": "^%base_url%/dav/spaces/%space_id_pattern%$"}
             }
           }
         }
@@ -1213,25 +709,14 @@ Feature: get users
       """
       {
         "type": "object",
-        "required": [
-          "error"
-        ],
+        "required": ["error"],
         "properties": {
           "error": {
             "type": "object",
-            "required": [
-              "code",
-              "message"
-            ],
+            "required": ["code","message"],
             "properties": {
-              "code": {
-                "type": "string",
-                "const": "itemNotFound"
-              },
-              "message": {
-                "type": "string",
-                "const": "no drive returned from storage"
-              }
+              "code": {"const": "itemNotFound"},
+              "message": {"const": "no drive returned from storage"}
             }
           }
         }
@@ -1257,84 +742,39 @@ Feature: get users
       """
       {
         "type": "object",
-        "required": [
-          "driveAlias",
-          "driveType",
-          "id",
-          "name",
-          "webUrl",
-          "owner",
-          "quota",
-          "root"
-        ],
+        "required": ["driveAlias","driveType","id","name","webUrl","owner","quota","root"],
         "properties": {
-          "driveAlias": {
-            "type": "string",
-            "const": "personal/alice"
-          },
-          "driveType": {
-            "type": "string",
-            "const": "personal"
-          },
-          "id": {
-            "type": "string",
-            "pattern": "^%space_id_pattern%$"
-          },
-          "name": {
-            "type": "string",
-            "const": "Alice Hansen"
-          },
-          "webUrl": {
-            "type": "string",
-            "pattern": "^%base_url%/f/%space_id_pattern%$"
-          },
+          "driveAlias": {"const": "personal/alice"},
+          "driveType": {"const": "personal"},
+          "id": {"pattern": "^%space_id_pattern%$"},
+          "name": {"const": "Alice Hansen"},
+          "webUrl": {"pattern": "^%base_url%/f/%space_id_pattern%$"},
           "owner": {
             "type": "object",
-            "required": [
-              "user"
-            ],
+            "required": ["user"],
             "properties": {
               "user": {
                 "type": "object",
-                "required": [
-                  "displayName",
-                  "id"
-                ],
+                "required": ["displayName","id"],
                 "properties": {
-                  "displayName": {
-                    "type": "string",
-                    "const": ""
-                  },
-                  "id": {
-                    "type": "string",
-                    "pattern": "^%user_id_pattern%$"
-                  }
+                  "displayName": {"const": ""},
+                  "id": {"pattern": "^%user_id_pattern%$"}
                 }
               }
             }
           },
           "qouta": {
             "type": "object",
-            "required": [
-              "state"
-            ],
+            "required": ["state"],
             "properties": {
-              "state": {
-                "type": "string",
-                "const": "normal"
-              }
+              "state": {"const": "normal"}
             }
           },
           "root": {
             "type": "object",
-            "required": [
-              "webDavUrl"
-            ],
+            "required": ["webDavUrl"],
             "properties": {
-              "webDavUrl": {
-                "type": "string",
-                "pattern": "^%base_url%/dav/spaces/%space_id_pattern%$"
-              }
+              "webDavUrl": {"pattern": "^%base_url%/dav/spaces/%space_id_pattern%$"}
             }
           }
         }
@@ -1356,9 +796,7 @@ Feature: get users
       """
       {
         "type": "object",
-        "required": [
-          "value"
-        ],
+        "required": ["value"],
         "properties": {
           "value": {
             "type": "array",
@@ -1366,24 +804,11 @@ Feature: get users
             "maxItems": 1,
             "items": {
               "type": "object",
-              "required": [
-                "displayName",
-                "id",
-                "userType"
-              ],
+              "required": ["displayName","id","userType"],
               "properties": {
-                "displayName": {
-                  "type": "string",
-                  "const": "Alice Hansen"
-                },
-                "id": {
-                  "type": "string",
-                  "pattern": "^%user_id_pattern%$"
-                },
-                "userType": {
-                  "type": "string",
-                  "const": "Member"
-                }
+                "displayName": {"const": "Alice Hansen"},
+                "id": {"pattern": "^%user_id_pattern%$"},
+                "userType": {"const": "Member"}
               }
             }
           }
@@ -1399,20 +824,13 @@ Feature: get users
       """
       {
         "type": "object",
-        "required": [
-          "error"
-        ],
+        "required": ["error"],
         "properties": {
           "error": {
             "type": "object",
-            "required": [
-              "message"
-            ],
+            "required": ["message"],
             "properties": {
-              "message": {
-                "type": "string",
-                "const": "search term too short"
-              }
+              "message": {"const": "search term too short"}
             }
           }
         }
@@ -1428,20 +846,13 @@ Feature: get users
       """
       {
         "type": "object",
-        "required": [
-          "error"
-        ],
+        "required": ["error"],
         "properties": {
           "error": {
             "type": "object",
-            "required": [
-              "message"
-            ],
+            "required": ["message"],
             "properties": {
-              "message": {
-                "type": "string",
-                "const": "Token '<error-token>' is invalid"
-              }
+              "message": {"const": "Token '<error-token>' is invalid"}
             }
           }
         }
@@ -1461,9 +872,7 @@ Feature: get users
       """
       {
         "type": "object",
-        "required": [
-          "value"
-        ],
+        "required": ["value"],
         "properties": {
           "value": {
             "type": "array",
@@ -1471,24 +880,11 @@ Feature: get users
             "maxItems": 1,
             "items": {
               "type": "object",
-              "required": [
-                "displayName",
-                "id",
-                "userType"
-              ],
+              "required": ["displayName","id","userType"],
               "properties": {
-                "displayName": {
-                  "type": "string",
-                  "const": "Alice Hansen"
-                },
-                "id": {
-                  "type": "string",
-                  "pattern": "^%user_id_pattern%$"
-                },
-                "userType": {
-                  "type": "string",
-                  "const": "Member"
-                }
+                "displayName": {"const": "Alice Hansen"},
+                "id": {"pattern": "^%user_id_pattern%$"},
+                "userType": {"const": "Member"}
               }
             }
           }
@@ -1506,9 +902,7 @@ Feature: get users
       """
       {
         "type": "object",
-        "required": [
-          "value"
-        ],
+        "required": ["value"],
         "properties": {
           "value": {
             "type": "array",
@@ -1516,24 +910,11 @@ Feature: get users
             "maxItems": 1,
             "items": {
               "type": "object",
-              "required": [
-                "displayName",
-                "id",
-                "userType"
-              ],
+              "required": ["displayName","id","userType"],
               "properties": {
-                "displayName": {
-                  "type": "string",
-                  "const": "Alice Hansen"
-                },
-                "id": {
-                  "type": "string",
-                  "pattern": "^%user_id_pattern%$"
-                },
-                "userType": {
-                  "type": "string",
-                  "const": "Member"
-                }
+                "displayName": {"const": "Alice Hansen"},
+                "id": {"pattern": "^%user_id_pattern%$"},
+                "userType": {"const": "Member"}
               }
             }
           }
@@ -1556,9 +937,7 @@ Feature: get users
       """
       {
         "type": "object",
-        "required": [
-          "value"
-        ],
+        "required": ["value"],
         "properties": {
           "value": {
             "type": "array",
@@ -1569,48 +948,20 @@ Feature: get users
               "oneOf": [
                 {
                   "type": "object",
-                  "required": [
-                    "displayName",
-                    "id",
-                    "userType"
-                  ],
+                  "required": ["displayName","id","userType"],
                   "properties": {
-                    "displayName": {
-                      "type": "string",
-                      "const": "Alice Hansen"
-                    },
-                    "id": {
-                      "type": "string",
-                      "pattern": "^%user_id_pattern%$"
-                    },
-                    "userType": {
-                      "type": "string",
-                      "const": "Member"
-                    }
+                    "displayName": {"const": "Alice Hansen"},
+                    "id": {"pattern": "^%user_id_pattern%$"},
+                    "userType": {"const": "Member"}
                   }
                 },
                 {
                   "type": "object",
-                  "required": [
-                    "displayName",
-                    "id",
-                    "userType"
-                  ],
+                  "required": ["displayName","id","userType"],
                   "properties": {
-                    "displayName": {
-                      "type": "string",
-                      "const": "Alice Hansen"
-                    },
-                    "id": {
-                      "type": "string",
-                      "pattern": "^%user_id_pattern%$"
-                    },
-                    "userType": {
-                      "type": "string",
-                      "const": [
-                        "Admin"
-                      ]
-                    }
+                    "displayName": {"const": "Alice Hansen"},
+                    "id": {"pattern": "^%user_id_pattern%$"},
+                    "userType": {"const": ["Admin"]}
                   }
                 }
               ]
@@ -1661,16 +1012,9 @@ Feature: get users
               "type": "object",
               "required": ["displayName", "id", "userType"],
               "properties": {
-                "displayName": {
-                  "const": "<displayname>"
-                },
-                "id": {
-                  "type": "string",
-                  "pattern": "^%user_id_pattern%$"
-                },
-                "userType": {
-                  "const": "Member"
-                }
+                "displayName": {"const": "<displayname>"},
+                "id": {"pattern": "^%user_id_pattern%$"},
+                "userType": {"const": "Member"}
               }
             }
           }
@@ -1683,3 +1027,107 @@ Feature: get users
       | _ocusr@          | _oc         |
       | Alice-Wonderland | -Wonderland |
       | Alice@Wonderland | @Wonderland |
+
+  @issue-7990 @issue-enterprise-6600
+  Scenario Outline: non-admin user searches for other users having special characters in username (search term with quotation)
+    Given the user "Admin" has created a new user with the following attributes:
+      | userName    | <username>              |
+      | displayName | special user            |
+      | email       | specialuser@example.org |
+    When user "Brian" searches for user '"<search-term>"' using Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": ["displayName", "id", "userType", "onPremisesSamAccountName"],
+              "properties": {
+                "displayName": {"const": "special user"},
+                "id": {"pattern": "^%user_id_pattern%$"},
+                "userType": {"const": "Member"},
+                "onPremisesSamAccountName": {"const": ""},
+                "appRoleAssignments": {"const": null},
+                "drives": {"const": null},
+                "drive": {"const": null},
+                "memberOf": {"const": null},
+                "mail": {"const": null}
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | username         | search-term |
+      | Alice-Wonderland | -Wonderland |
+      | Alice@Wonderland | @Wonderland |
+
+  @issue-enterprise-6600
+  Scenario: admin user searches for group users having special characters in username (search term with quotation)
+    Given the user "Admin" has created a new user with the following attributes:
+      | userName    | special-user            |
+      | displayName | alice wonderland        |
+      | email       | specialuser@example.org |
+    And group "tea-lover" has been created
+    And user "special-user" has been added to group "tea-lover"
+    When user "Admin" searches for user '"special-us"' of the group "tea-lover" using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": ["displayName", "id", "userType", "mail", "onPremisesSamAccountName", "surname"],
+              "properties": {
+                "displayName": {"const": "alice wonderland"},
+                "id": {"pattern": "^%user_id_pattern%$"},
+                "userType": {"const": "Member"},
+                "mail": {"const": "specialuser@example.org"}
+              }
+            }
+          }
+        }
+      }
+      """
+
+  @issue-enterprise-6600
+  Scenario: non-admin user can't search for users of a group
+    Given the user "Admin" has created a new user with the following attributes:
+      | userName    | special-user            |
+      | displayName | alice wonderland        |
+      | email       | specialuser@example.org |
+    And group "tea-lover" has been created
+    And user "special-user" has been added to group "tea-lover"
+    When user "Brian" tries to search for user '"special-us"' of the group "tea-lover" using the Graph API
+    Then the HTTP status code should be "403"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": ["message"],
+            "properties": {
+              "message": {"const": "filter has forbidden elements for regular users"}
+            }
+          }
+        }
+      }
+      """
