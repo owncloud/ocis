@@ -101,8 +101,6 @@ func ServiceAccountPermissions() *provider.ResourcePermissions {
 		Delete:               true, // for cli restore command with replace option
 		CreateContainer:      true, // for space provisioning
 		AddGrant:             true, // for initial project space member assignment
-		UpdateGrant:          true, // for automatic space membership management
-		ListGrants:           true, // for automatic space membership management
 	}
 }
 

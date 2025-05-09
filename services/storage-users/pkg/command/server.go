@@ -60,7 +60,7 @@ func Server(cfg *config.Config) *cli.Command {
 					runtime.WithRegistry(reg),
 					runtime.WithTraceProvider(traceProvider),
 				)
-
+				logger.Debug().Msg("revad-" + cfg.Service.Name + " runtime.RunWithOptions finished")
 				return nil
 			}, func(err error) {
 				if err == nil {
