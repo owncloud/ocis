@@ -76,6 +76,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix pdf form creation: [#11163](https://github.com/owncloud/ocis/pull/11163)
 * Bugfix - Fix app-auth, REST status code: [#11190](https://github.com/owncloud/ocis/pull/11190)
 * Bugfix - Fix Share roles translation: [#11241](https://github.com/owncloud/ocis/pull/11241)
+* Bugfix - Fix error on listing space members: [#11245](https://github.com/owncloud/ocis/pull/11245)
 * Enhancement - Update Mockery to 2.52.3: [#11070](https://github.com/owncloud/ocis/pull/11070)
 * Enhancement - Improve postprocessing logs: [#11108](https://github.com/owncloud/ocis/pull/11108)
 * Enhancement - Improve graph space management logs: [#11115](https://github.com/owncloud/ocis/pull/11115)
@@ -178,6 +179,14 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/11025
    https://github.com/owncloud/ocis/pull/11241
+
+* Bugfix - Fix error on listing space members: [#11245](https://github.com/owncloud/ocis/pull/11245)
+
+   Now the members list will still show grantees even with there is any invalid
+   share after the upgrade.
+
+   https://github.com/owncloud/ocis/issues/11119
+   https://github.com/owncloud/ocis/pull/11245
 
 * Enhancement - Update Mockery to 2.52.3: [#11070](https://github.com/owncloud/ocis/pull/11070)
 
