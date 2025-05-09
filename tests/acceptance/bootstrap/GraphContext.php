@@ -3210,4 +3210,26 @@ class GraphContext implements Context {
 
 		$this->featureContext->setResponse($response);
 	}
+
+    /**
+     * @When the user :user searches for user :search of the group :group using the Graph API
+     *
+     * @param string $user
+     * @param string $search
+     * @param string $group
+     *
+     * @return void
+     * @throws GuzzleException
+     */
+    public function userSearchesForUserOfTheGroupUsingTheGraphApi(string $user, string $search,string $group) {
+        $groupId = $this->featureContext->getGroupIdByGroupName($group);
+        $response = GraphHelper::searchUserWithFilterMemberOf(
+            $this->featureContext->getBaseUrl(),
+            $user,
+            $this->featureContext->getPasswordForUser($user),
+            $groupId,
+            $search
+        );
+        $this->featureContext->setResponse($response);
+    }
 }

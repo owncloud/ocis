@@ -1683,3 +1683,84 @@ Feature: get users
       | _ocusr@          | _oc         |
       | Alice-Wonderland | -Wonderland |
       | Alice@Wonderland | @Wonderland |
+
+
+  @issue-7990
+  Scenario Outline: user searches for other users having special characters in displayname (search term with quotation)
+    Given the user "Admin" has created a new user with the following attributes:
+      | userName    | special-user                 |
+      | displayName | <displayname>                |
+      | email       | specialuser@example.org      |
+    When user "Brian" searches for user '"<search-term>"' using Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": ["displayName", "id", "userType"],
+              "properties": {
+                "displayName": {
+                  "const": "<displayname>"
+                },
+                "id": {
+                  "type": "string",
+                  "pattern": "^%user_id_pattern%$"
+                },
+                "userType": {
+                  "const": "Member"
+                }
+              }
+            }
+          }
+        }
+      }
+      """
+    Examples:
+      | displayname      | search-term |
+      | -_.ocusr         | -_.         |
+      | _ocusr@          | _oc         |
+      | Alice-Wonderland | -Wonderland |
+      | Alice@Wonderland | @Wonderland |
+
+  @issue-enterprise-6600
+  Scenario: admin user searches for other users having special characters in username of certain groups(search term with quotation)
+    Given the user "Admin" has created a new user with the following attributes:
+      | userName    | special-user            |
+      | displayName | alice wonderland        |
+      | email       | specialuser@example.org |
+    And group "tea-lover" has been created
+    And user "special-user" has been added to group "tea-lover"
+    When the user "Admin" searches for user '"special-us"' of the group "tea-lover" using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": ["displayName", "id", "userType", "mail", "onPremisesSamAccountName", "surname"],
+              "properties": {
+                "displayName": {"const": "alice wonderland"},
+                "id": {"pattern": "^%user_id_pattern%$"},
+                "userType": {"const": "Member"},
+                "onPremisesSamAccountName": {"const": "special-user"}
+              }
+            }
+          }
+        }
+      }
+      """
