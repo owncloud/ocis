@@ -354,9 +354,9 @@
 - [coreApiWebdavUploadTUS/uploadFileMtimeShares.feature:93](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUploadTUS/uploadFileMtimeShares.feature#L93)
 - [coreApiWebdavUploadTUS/uploadToMoveFolder.feature:21](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUploadTUS/uploadToMoveFolder.feature#L21)
 - [coreApiWebdavUploadTUS/uploadToShare.feature:30](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUploadTUS/uploadToShare.feature#L30)
-- [coreApiWebdavUploadTUS/uploadToShare.feature:50](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUploadTUS/uploadToShare.feature#L50)
-- [coreApiWebdavUploadTUS/uploadToShare.feature:72](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUploadTUS/uploadToShare.feature#L72)
-- [coreApiWebdavUploadTUS/uploadToShare.feature:93](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUploadTUS/uploadToShare.feature#L93)
+- [coreApiWebdavUploadTUS/uploadToShare.feature:51](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUploadTUS/uploadToShare.feature#L51)
+- [coreApiWebdavUploadTUS/uploadToShare.feature:74](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUploadTUS/uploadToShare.feature#L74)
+- [coreApiWebdavUploadTUS/uploadToShare.feature:96](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUploadTUS/uploadToShare.feature#L96)
 
 #### [PROPFIND to /webdav root (old dav path) without remote.php returns html instead of xml](https://github.com/owncloud/ocis/issues/10334)
 

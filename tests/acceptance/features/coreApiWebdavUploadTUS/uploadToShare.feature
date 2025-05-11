@@ -21,7 +21,7 @@ Feature: upload file to shared folder
       | shareType       | user     |
       | permissionsRole | Editor   |
     And user "Brian" has a share "FOLDER" synced
-    When user "Brian" uploads file with content "uploaded content" to "/Shares/FOLDER/textfile.txt" using the TUS protocol on the WebDAV API
+    When user "Brian" uploads a file with content "uploaded content" to "FOLDER/textfile.txt" via TUS inside of the space "Shares" using the WebDAV API
     Then the HTTP status code should be "204"
     And as "Alice" file "/FOLDER/textfile.txt" should exist
     And the content of file "/FOLDER/textfile.txt" for user "Alice" should be "uploaded content"
@@ -29,6 +29,7 @@ Feature: upload file to shared folder
       | dav-path-version |
       | old              |
       | new              |
+      | spaces           |
 
   @issue-10346
   Scenario Outline: uploading file to a user read/write share folder works
@@ -41,7 +42,7 @@ Feature: upload file to shared folder
       | shareType       | user     |
       | permissionsRole | Uploader |
     And user "Brian" has a share "FOLDER" synced
-    When user "Brian" uploads file with content "uploaded content" to "/Shares/FOLDER/textfile.txt" using the TUS protocol on the WebDAV API
+    When user "Brian" uploads a file with content "uploaded content" to "FOLDER/textfile.txt" via TUS inside of the space "Shares" using the WebDAV API
     Then the HTTP status code should be "204"
     And as "Alice" file "/FOLDER/textfile.txt" should exist
     And the content of file "/FOLDER/textfile.txt" for user "Alice" should be "uploaded content"
@@ -49,6 +50,7 @@ Feature: upload file to shared folder
       | dav-path-version |
       | old              |
       | new              |
+      | spaces           |
 
   @issue-10346
   Scenario Outline: uploading a file into a group share as share receiver
@@ -63,7 +65,7 @@ Feature: upload file to shared folder
       | shareType       | group    |
       | permissionsRole | Uploader |
     And user "Brian" has a share "FOLDER" synced
-    When user "Brian" uploads file with content "uploaded content" to "/Shares/FOLDER/textfile.txt" using the TUS protocol on the WebDAV API
+    When user "Brian" uploads a file with content "uploaded content" to "FOLDER/textfile.txt" via TUS inside of the space "Shares" using the WebDAV API
     Then the HTTP status code should be "204"
     And as "Alice" file "/FOLDER/textfile.txt" should exist
     And the content of file "/FOLDER/textfile.txt" for user "Alice" should be "uploaded content"
@@ -71,6 +73,7 @@ Feature: upload file to shared folder
       | dav-path-version |
       | old              |
       | new              |
+      | spaces           |
 
   @issue-10346
   Scenario Outline: overwrite file to a received share folder
@@ -84,7 +87,7 @@ Feature: upload file to shared folder
       | shareType       | user     |
       | permissionsRole | Editor   |
     And user "Brian" has a share "FOLDER" synced
-    When user "Brian" uploads file with content "overwritten content" to "/Shares/FOLDER/textfile.txt" using the TUS protocol on the WebDAV API
+    When user "Brian" uploads a file with content "overwritten content" to "FOLDER/textfile.txt" via TUS inside of the space "Shares" using the WebDAV API
     Then the HTTP status code should be "204"
     And as "Alice" file "/FOLDER/textfile.txt" should exist
     And the content of file "/FOLDER/textfile.txt" for user "Alice" should be "overwritten content"
@@ -92,6 +95,7 @@ Feature: upload file to shared folder
       | dav-path-version |
       | old              |
       | new              |
+      | spaces           |
 
   @issue-10346
   Scenario Outline: attempt to upload a file into a folder within correctly received read only share
@@ -104,8 +108,8 @@ Feature: upload file to shared folder
       | shareType       | user     |
       | permissionsRole | Viewer   |
     And user "Brian" has a share "FOLDER" synced
-    When user "Brian" uploads file with content "uploaded content" to "/Shares/FOLDER/textfile.txt" using the TUS protocol on the WebDAV API
-    Then the HTTP status code should be "412"
+    When user "Brian" uploads a file with content "uploaded content" to "FOLDER/textfile.txt" via TUS inside of the space "Shares" using the WebDAV API
+    Then the HTTP status code should be "403"
     And as "Brian" file "/Shares/FOLDER/textfile.txt" should not exist
     Examples:
       | dav-path-version |
