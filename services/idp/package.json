@@ -150,7 +150,7 @@
     "mini-css-extract-plugin": "2.9.2",
     "pnp-webpack-plugin": "1.7.0",
     "postcss-flexbugs-fixes": "5.0.2",
-    "postcss-loader": "4.3.0",
+    "postcss-loader": "8.1.1",
     "postcss-normalize": "13.0.0",
     "postcss-preset-env": "10.1.6",
     "postcss-safe-parser": "7.0.0",
