@@ -151,3 +151,14 @@ Feature: List upload sessions via CLI command
     And the CLI response should not contain these entries:
       | file1.txt     |
       | virusFile.txt |
+
+  @issue-11290
+  Scenario: resume all upload sessions
+    Given the config "POSTPROCESSING_DELAY" has been set to "10s"
+    And user "Alice" has uploaded file with content "upload content" to "file.txt"
+    And the administrator has stopped the server
+    And the administrator has started the server
+    When the administrator resumes all the upload sessions using the CLI
+    Then the command should be successful
+    And the CLI response should contain these entries:
+      | file.txt |
