@@ -392,5 +392,9 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 
 - [apiSharingNgDriveLinkShare/createInternalLinkShare.feature:339](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNgDriveLinkShare/createInternalLinkShare.feature#L339)
 
+#### [[CLI] Error while resuming an upload](https://github.com/owncloud/ocis/issues/11290)
+
+- [cliCommands/uploadSessions.feature:156](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/cliCommands/uploadSessions.feature#L156)
+
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.
