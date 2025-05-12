@@ -406,5 +406,10 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 #### [Activity. no event for deleting a file using file-id](https://github.com/owncloud/ocis/issues/10328)
 - [apiActivities/activitiesByFileId.feature:2017](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiActivities/activitiesByFileId.feature#L2017)
 
+#### [[CLI]Restart and Resume stale uploads returns empty list](https://github.com/owncloud/ocis/issues/11296)
+
+- [cliCommands/staleUpload.feature:85](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/cliCommands/staleUpload.feature#L85)
+- [cliCommands/staleUpload.feature:97](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/cliCommands/staleUpload.feature#L97)
+
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.
