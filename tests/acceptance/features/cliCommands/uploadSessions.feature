@@ -151,3 +151,17 @@ Feature: List upload sessions via CLI command
     And the CLI response should not contain these entries:
       | file1.txt     |
       | virusFile.txt |
+
+  @issue-11290
+  Scenario: resume all uploads sessions
+    Given the config "POSTPROCESSING_DELAY" has been set to "10s"
+    And user "Alice" has created a new TUS resource in the space "Personal" with the following headers:
+      | Upload-Length   | 10                        |
+      #    dGV4dEZpbGUudHh0 is the base64 encode of textFile.txt
+      | Upload-Metadata | filename dGV4dEZpbGUudHh0 |
+      | Tus-Resumable   | 1.0.0                     |
+    And user "Alice" has uploaded file with checksum "SHA1 8cb2237d0679ca88db6464eac60da96345513964" to the last created TUS Location with offset "0" and content "12345" via TUS inside of the space "Personal" using the WebDAV API
+    When the administrator resumes all the upload sessions
+    Then the command should be successful
+    And the CLI response should contain these entries:
+      | textFile.txt |
