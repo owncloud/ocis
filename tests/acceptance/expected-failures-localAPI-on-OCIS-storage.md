@@ -394,5 +394,10 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiSharingNgShares/sharedWithMe.feature:5407](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNgShares/sharedWithMe.feature#L5407)
 - [apiSharingNgShares/sharedWithMe.feature:5408](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNgShares/sharedWithMe.feature#L5408)
 
+#### [[CLI]Restart and Resume stale uploads returns empty list](https://github.com/owncloud/ocis/issues/11296)
+
+- [cliCommands/staleUpload.feature:85](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/cliCommands/staleUpload.feature#L85)
+- [cliCommands/staleUpload.feature:97](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/cliCommands/staleUpload.feature#L97)
+
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.
