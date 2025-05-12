@@ -519,7 +519,7 @@ class TUSContext implements Context {
 		$this->featureContext->setLastUploadDeleteTime(\time());
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			["201", "204"],
-			"HTTP status code was not 201 or 204 while trying to upload file '$source' for user '$user'",
+			"Failed to upload file '$source' for user '$user'",
 			$response
 		);
 	}

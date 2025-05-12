@@ -185,11 +185,7 @@ class SpacesTUSContext implements Context {
 		string $resource,
 		string $spaceName
 	): ResponseInterface {
-		if ($spaceName === 'Shares') {
-			$spaceId = GraphHelper::SHARES_SPACE_ID;
-		} else {
-			$spaceId = $this->spacesContext->getSpaceIdByName($user, $spaceName);
-		}
+		$spaceId = $this->spacesContext->getSpaceIdByName($user, $spaceName);
 		$tmpFile = $this->tusContext->writeDataToTempFile($content);
 		$response = $this->tusContext->uploadFileUsingTus(
 			$user,
@@ -251,9 +247,11 @@ class SpacesTUSContext implements Context {
 		string $spaceName
 	): void {
 		$isSpacesDavPathVersion = $this->featureContext->getDavPathVersion() === WebDavHelper::DAV_VERSION_SPACES;
-		if (!$isSpacesDavPathVersion) {
-			$resource = \ltrim($resource, "/");
+		$resource = \ltrim($resource, "/");
+		if (!$isSpacesDavPathVersion && $spaceName === 'Shares' && !\str_starts_with($resource, "Shares/")) {
 			$resource = 'Shares/' . $resource;
+		} elseif ($isSpacesDavPathVersion && \str_starts_with($resource, "Shares/")) {
+			$resource = \preg_replace("/^Shares\//", "", $resource);
 		}
 		$this->featureContext->setResponse($this->uploadFileViaTus($user, $content, $resource, $spaceName));
 	}

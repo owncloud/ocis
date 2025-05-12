@@ -353,10 +353,14 @@
 - [coreApiWebdavUploadTUS/uploadFileMtimeShares.feature:72](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUploadTUS/uploadFileMtimeShares.feature#L72)
 - [coreApiWebdavUploadTUS/uploadFileMtimeShares.feature:93](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUploadTUS/uploadFileMtimeShares.feature#L93)
 - [coreApiWebdavUploadTUS/uploadToMoveFolder.feature:21](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUploadTUS/uploadToMoveFolder.feature#L21)
+- [coreApiWebdavUploadTUS/uploadToNonExistingFolder.feature:19](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUploadTUS/uploadToNonExistingFolder.feature#L19)
+- [coreApiWebdavUploadTUS/uploadToNonExistingFolder.feature:36](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUploadTUS/uploadToNonExistingFolder.feature#L36)
+- [coreApiWebdavUploadTUS/uploadToNonExistingFolder.feature:62](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUploadTUS/uploadToNonExistingFolder.feature#L62)
 - [coreApiWebdavUploadTUS/uploadToShare.feature:30](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUploadTUS/uploadToShare.feature#L30)
 - [coreApiWebdavUploadTUS/uploadToShare.feature:51](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUploadTUS/uploadToShare.feature#L51)
 - [coreApiWebdavUploadTUS/uploadToShare.feature:74](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUploadTUS/uploadToShare.feature#L74)
 - [coreApiWebdavUploadTUS/uploadToShare.feature:96](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUploadTUS/uploadToShare.feature#L96)
+- [coreApiWebdavUploadTUS/uploadToShare.feature:116](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUploadTUS/uploadToShare.feature#L116)
 
 #### [PROPFIND to /webdav root (old dav path) without remote.php returns html instead of xml](https://github.com/owncloud/ocis/issues/10334)
 
