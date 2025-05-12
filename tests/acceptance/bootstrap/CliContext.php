@@ -894,4 +894,18 @@ class CliContext implements Context {
 		];
 		$this->featureContext->setResponse(CliHelper::runCommand($body));
 	}
+
+	/**
+	 * @When the administrator resumes all the upload sessions
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function theAdministratorResumesAllTheUploadSessions(): void {
+		$command = "storage-users uploads sessions --resume --json";
+		$body = [
+			"command" => $command
+		];
+		$this->featureContext->setResponse(CliHelper::runCommand($body));
+	}
 }
