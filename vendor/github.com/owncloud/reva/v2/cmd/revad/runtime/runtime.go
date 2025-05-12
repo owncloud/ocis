@@ -27,6 +27,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/mitchellh/mapstructure"
 	"github.com/owncloud/reva/v2/cmd/revad/internal/grace"
 	"github.com/owncloud/reva/v2/pkg/logger"
 	"github.com/owncloud/reva/v2/pkg/registry"
@@ -34,7 +35,6 @@ import (
 	"github.com/owncloud/reva/v2/pkg/rhttp"
 	"github.com/owncloud/reva/v2/pkg/sharedconf"
 	rtrace "github.com/owncloud/reva/v2/pkg/trace"
-	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 	"go.opentelemetry.io/otel/trace"
