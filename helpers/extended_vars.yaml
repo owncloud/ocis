@@ -161,7 +161,7 @@ variables:
   description: ""
   do_ignore: true
 - rawname: _registryAddressEnv
-  path: ocis-pkg/natsjsregistry/registry.go:206
+  path: ocis-pkg/registry/registry.go:92
   foundincode: true
   name: _registryAddressEnv
   type: ""
@@ -169,7 +169,7 @@ variables:
   description: ""
   do_ignore: false
 - rawname: _registryAddressEnv
-  path: ocis-pkg/registry/registry.go:92
+  path: ocis-pkg/natsjsregistry/registry.go:206
   foundincode: true
   name: _registryAddressEnv
   type: ""
