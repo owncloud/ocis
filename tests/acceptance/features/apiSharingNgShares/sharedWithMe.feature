@@ -5378,3 +5378,31 @@ Feature: an user gets the resources shared to them
       | Editor           |
       | Viewer           |
       | Uploader         |
+
+  @issue-8464
+  Scenario Outline: upload to a same share received from group and user share with different permissions
+    Given using <dav-path-version> DAV path
+    And group "grp1" has been created
+    And user "Brian" has been added to group "grp1"
+    And user "Alice" has created folder "Folder"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | Folder   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Editor   |
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | Folder   |
+      | space           | Personal |
+      | sharee          | grp1     |
+      | shareType       | group    |
+      | permissionsRole | Viewer   |
+    Then user "Brian" should be able to upload file "filesForUpload/lorem.txt" to "Shares/Folder/lorem.txt"
+    And user "Brian" should be able to create folder "Shares/Folder/testFolder"
+    And as "Alice" file "Folder/lorem.txt" should exist
+    And as "Alice" folder "Folder/testFolder" should exist
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |

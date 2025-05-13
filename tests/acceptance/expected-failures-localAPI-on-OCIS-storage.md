@@ -388,5 +388,11 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiSharingNgPermissions/listPermissions.feature:1550](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNgPermissions/listPermissions.feature#L1550)
 - [apiSharingNgPermissions/listPermissions.feature:2263](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNgPermissions/listPermissions.feature#L2263)
 
+#### [Lost permission when received multiple shares on the same resource](https://github.com/owncloud/ocis/issues/8464)
+
+- [apiSharingNgShares/sharedWithMe.feature:5406](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNgShares/sharedWithMe.feature#L5406)
+- [apiSharingNgShares/sharedWithMe.feature:5407](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNgShares/sharedWithMe.feature#L5407)
+- [apiSharingNgShares/sharedWithMe.feature:5408](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNgShares/sharedWithMe.feature#L5408)
+
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.
