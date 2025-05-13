@@ -75,7 +75,7 @@ require (
 	github.com/riandyrn/otelchi v0.11.0
 	github.com/rogpeppe/go-internal v1.13.1
 	github.com/rs/cors v1.11.1
-	github.com/rs/zerolog v1.33.0
+	github.com/rs/zerolog v1.34.0
 	github.com/shamaton/msgpack/v2 v2.2.2
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/afero v1.12.0
