@@ -5391,16 +5391,20 @@ Feature: an user gets the resources shared to them
       | sharee          | Brian    |
       | shareType       | user     |
       | permissionsRole | Editor   |
-    And user "Alice" has sent the following resource share invitation:
+    Then user "Brian" should be able to upload file "filesForUpload/lorem.txt" to "Shares/Folder/lorem1.txt"
+    And user "Brian" should be able to create folder "Shares/Folder/testFolder1"
+    And as "Alice" file "Folder/lorem1.txt" should exist
+    And as "Alice" folder "Folder/testFolder1" should exist
+    Given user "Alice" has sent the following resource share invitation:
       | resource        | Folder   |
       | space           | Personal |
       | sharee          | grp1     |
       | shareType       | group    |
       | permissionsRole | Viewer   |
-    Then user "Brian" should be able to upload file "filesForUpload/lorem.txt" to "Shares/Folder/lorem.txt"
-    And user "Brian" should be able to create folder "Shares/Folder/testFolder"
-    And as "Alice" file "Folder/lorem.txt" should exist
-    And as "Alice" folder "Folder/testFolder" should exist
+    Then user "Brian" should be able to upload file "filesForUpload/lorem.txt" to "Shares/Folder/lorem2.txt"
+    And user "Brian" should be able to create folder "Shares/Folder/testFolder2"
+    And as "Alice" file "Folder/lorem2.txt" should exist
+    And as "Alice" folder "Folder/testFolder2" should exist
     Examples:
       | dav-path-version |
       | old              |
