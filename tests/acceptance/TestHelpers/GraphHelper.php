@@ -2283,4 +2283,33 @@ class GraphHelper {
 			self::getRequestHeaders()
 		);
 	}
+
+	/**
+	 * @param string $baseUrl
+	 * @param string $user
+	 * @param string $password
+	 * @param string $groupId
+	 * @param string $searchTerm
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public static function searchUserWithFilterMemberOf(
+		string $baseUrl,
+		string $user,
+		string $password,
+		string $groupId,
+		string $searchTerm
+	): ResponseInterface {
+		$url = self::getFullUrl(
+			$baseUrl,
+			'users' . '?$filter=memberOf/any(m:m/id ' . "eq '$groupId')" . '&$search=' . "$searchTerm"
+		);
+		return HttpRequestHelper::get(
+			$url,
+			$user,
+			$password,
+			self::getRequestHeaders()
+		);
+	}
 }
