@@ -12,6 +12,7 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 *   [Introduction](#introduction)
+*   [Quickstart](#quickstart)
 *   [Overview](#overview)
     * [Clients](#clients)
     * [Web Office Applications](#web-office-applications)
@@ -33,6 +34,33 @@
 ownCloud Infinite Scale (oCIS) is the new file sync & share platform that will be the foundation of your data management platform.
 
 Make sure to download the [latest released version](https://download.owncloud.com/ocis/ocis/stable/?sort=time&order=desc) today!
+
+## Quickstart
+
+For details of the commands used see the [Minimalistic Evaluation Guide for oCIS with Docker](https://owncloud.dev/ocis/guides/ocis-mini-eval/).
+
+```bash
+mkdir -p $HOME/ocis/ocis-config \
+mkdir -p $HOME/ocis/ocis-data
+sudo chown -Rfv 1000:1000 $HOME/ocis/
+docker pull owncloud/ocis
+docker run --rm -it \
+    --mount type=bind,source=$HOME/ocis/ocis-config,target=/etc/ocis \
+    --mount type=bind,source=$HOME/ocis/ocis-data,target=/var/lib/ocis \
+    owncloud/ocis init --insecure yes
+docker run \
+    --name ocis_runtime \
+    --rm \
+    -it \
+    -p 9200:9200 \
+    --mount type=bind,source=$HOME/ocis/ocis-config,target=/etc/ocis \
+    --mount type=bind,source=$HOME/ocis/ocis-data,target=/var/lib/ocis \
+    -e OCIS_INSECURE=true \
+    -e PROXY_HTTP_ADDR=0.0.0.0:9200 \
+    -e OCIS_URL=https://localhost:9200 \
+    owncloud/ocis
+```
+Use as URL `localhost:9200` and the user/password printed.
 
 ## Overview
 
@@ -73,11 +101,11 @@ Before starting to set up an instance, we **highly** recommend reading the [Prer
 
 ### Use the Official Documentation
 
-See the [Quick Guide](https://doc.owncloud.com/ocis/next/quickguide/quickguide.html) or the [Binary Setup](https://doc.owncloud.com/ocis/next/deployment/binary/binary-setup.html) for a single-node bare-metal deployment starting with a Raspberry Pi or single server, the [Container Setup](https://doc.owncloud.com/ocis/next/deployment/container/container-setup.html) for classic container environments like docker or learn how to [deploy to Kubernetes](https://doc.owncloud.com/ocis/next/deployment/container/orchestration/orchestration.html).
+See the [Install Infinite Scale on a Server](https://doc.owncloud.com/ocis/next/depl-examples/ubuntu-compose/ubuntu-compose-prod.html) for a production ready deployment starting with a Raspberry Pi, a single server or VM.
 
 ### Use the ocis Repo as Source
 
-Use this method to run an instance with the latest code. This is only recommended for development purposes. The minimum go version required is 1.22. Note that you need, as a prerequisite, a C compile environment installed because some dependencies like reva have components that require c-go libraries/tool-chains. The command installing for debian based systems is: `sudo apt install build-essentials`. To build and run a local instance with demo users:
+Use this method to run an instance with the latest code. This is only recommended for development purposes. The minimum go version required is 1.22. Note that you need, as a prerequisite, a C compile environment installed because some dependencies like reva have components that require c-go libraries/tool-chains. The command installing for debian based systems is: `sudo apt install build-essential`. To build and run a local instance with demo users:
 
 ```console
 # get the source
