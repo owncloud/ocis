@@ -46,6 +46,7 @@ default:
         - OcisConfigContext:
         - WebDavLockingContext:
         - SharingNgContext:
+        - SearchContext:
 
     apiSpacesShares:
       paths:

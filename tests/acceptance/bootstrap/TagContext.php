@@ -56,25 +56,21 @@ class TagContext implements Context {
 
 	/**
 	 * @param string $user
-	 * @param string $fileOrFolder   (file|folder)
+	 * @param string $fileOrFolder (file|folder)
 	 * @param string $resource
 	 * @param string $space
-	 * @param TableNode $table
+	 * @param array $tagNameArray
 	 *
 	 * @return ResponseInterface
-	 * @throws Exception
+	 * @throws \GuzzleHttp\Exception\GuzzleException
 	 */
 	public function createTags(
 		string $user,
 		string $fileOrFolder,
 		string $resource,
 		string $space,
-		TableNode $table
+		array $tagNameArray
 	): ResponseInterface {
-		$tagNameArray = [];
-		foreach ($table->getRows() as $value) {
-			$tagNameArray[] = $value[0];
-		}
 		if ($fileOrFolder === 'folder' || $fileOrFolder === 'folders') {
 			$resourceId = $this->spacesContext->getResourceId($user, $space, $resource);
 		} else {
@@ -109,7 +105,11 @@ class TagContext implements Context {
 		string $space,
 		TableNode $table
 	): void {
-		$response = $this->createTags($user, $fileOrFolder, $resource, $space, $table);
+		$tagNameArray = [];
+		foreach ($table->getRows() as $value) {
+			$tagNameArray[] = $value[0];
+		}
+		$response = $this->createTags($user, $fileOrFolder, $resource, $space, $tagNameArray);
 		$this->featureContext->setResponse($response);
 	}
 
@@ -132,7 +132,11 @@ class TagContext implements Context {
 		string $space,
 		TableNode $table
 	): void {
-		$response = $this->createTags($user, $fileOrFolder, $resource, $space, $table);
+		$tagNameArray = [];
+		foreach ($table->getRows() as $value) {
+			$tagNameArray[] = $value[0];
+		}
+		$response = $this->createTags($user, $fileOrFolder, $resource, $space, $tagNameArray);
 		$this->featureContext->theHttpStatusCodeShouldBe(200, "", $response);
 	}
 
@@ -156,8 +160,8 @@ class TagContext implements Context {
 		$this->featureContext->verifyTableNodeColumns($table, ["path", "tagName"]);
 		$rows = $table->getHash();
 		foreach ($rows as $row) {
-			$tags = explode(',', $row['tagName']);
-			$response = $this->createTags($user, $filesOrFolders, $row['path'], $space, new TableNode([$tags]));
+			$tagNameArray = array_map('trim', explode(',', $row['tagName']));
+			$response = $this->createTags($user, $filesOrFolders, $row['path'], $space, $tagNameArray);
 			$this->featureContext->theHttpStatusCodeShouldBe(200, "", $response);
 		}
 	}
@@ -301,5 +305,32 @@ class TagContext implements Context {
 	): void {
 		$response = $this->removeTagsFromResourceOfTheSpace($user, $fileOrFolder, $resource, $space, $table);
 		$this->featureContext->theHttpStatusCodeShouldBe(200, "", $response);
+	}
+
+	/**
+	 * @When /^user "([^"]*)" creates "([^"]*)" tags for (folder|file) "([^"]*)" of space "([^"]*)"$/
+	 *
+	 * @param string $user
+	 * @param int $numberOfTags
+	 * @param string $fileOrFolder (file|folder)
+	 * @param string $resource
+	 * @param string $space
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function userCreatesTagsForResourceOfSpace(
+		string $user,
+		int $numberOfTags,
+		string $fileOrFolder,
+		string $resource,
+		string $space
+	): void {
+		$tagNames = [];
+		foreach (range(1, $numberOfTags) as $tagNumber) {
+			$tagNames[] = "testTag$tagNumber";
+		}
+		$response = $this->createTags($user, $fileOrFolder, $resource, $space, $tagNames);
+		$this->featureContext->setResponse($response);
 	}
 }
