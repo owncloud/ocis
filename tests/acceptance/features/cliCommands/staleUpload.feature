@@ -80,3 +80,27 @@ Feature: stale upload via CLI command
       Total stale nodes: 1
       """
     And there should be "0" stale uploads of space "Personal" owned by user "Alice"
+
+  @issue-11296
+  Scenario: resume all stale uploads
+    Given the config "POSTPROCESSING_DELAY" has been set to "10s"
+    And user "Alice" has uploaded file with content "some content" to "textfile.txt"
+    And the administrator has stopped the server
+    And the administrator has created stale upload
+    And the administrator has started the server
+    When the administrator resumes all the stale uploads
+    Then the command should be successful
+    And the CLI response should contain these entries:
+      | textfile.txt |
+
+  @issue-11296
+  Scenario: restart all stale uploads
+    Given the config "POSTPROCESSING_DELAY" has been set to "10s"
+    And user "Alice" has uploaded file with content "some content" to "textfile.txt"
+    And the administrator has stopped the server
+    And the administrator has created stale upload
+    And the administrator has started the server
+    When the administrator restarts all the stale uploads
+    Then the command should be successful
+    And the CLI response should contain these entries:
+      | textfile.txt |
