@@ -3,15 +3,14 @@ package command
 import (
 	"context"
 	"fmt"
+	"os/signal"
 
-	"github.com/oklog/run"
-	"github.com/owncloud/reva/v2/pkg/events/stream"
-	"github.com/owncloud/reva/v2/pkg/store"
 	"github.com/urfave/cli/v2"
 	microstore "go-micro.dev/v4/store"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	"github.com/owncloud/ocis/v2/ocis-pkg/generators"
+	"github.com/owncloud/ocis/v2/ocis-pkg/runner"
 	ogrpc "github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
@@ -21,6 +20,8 @@ import (
 	"github.com/owncloud/ocis/v2/services/eventhistory/pkg/metrics"
 	"github.com/owncloud/ocis/v2/services/eventhistory/pkg/server/debug"
 	"github.com/owncloud/ocis/v2/services/eventhistory/pkg/server/grpc"
+	"github.com/owncloud/reva/v2/pkg/events/stream"
+	"github.com/owncloud/reva/v2/pkg/store"
 )
 
 // Server is the entrypoint for the server command.
@@ -46,15 +47,17 @@ func Server(cfg *config.Config) *cli.Command {
 				return err
 			}
 
-			var (
-				gr          = run.Group{}
-				ctx, cancel = context.WithCancel(c.Context)
-				m           = metrics.New()
-			)
+			var cancel context.CancelFunc
+			ctx := cfg.Context
+			if ctx == nil {
+				ctx, cancel = signal.NotifyContext(context.Background(), runner.StopSignals...)
+				defer cancel()
+			}
 
-			defer cancel()
-
+			m := metrics.New()
 			m.BuildInfo.WithLabelValues(version.GetString()).Set(1)
+
+			gr := runner.NewGroup()
 
 			connName := generators.GenerateConnectionName(cfg.Service.Name, generators.NTypeBus)
 			consumer, err := stream.NatsFromConfig(connName, false, stream.NatsConfig(cfg.Events))
@@ -84,21 +87,7 @@ func Server(cfg *config.Config) *cli.Command {
 				grpc.TraceProvider(traceProvider),
 			)
 
-			gr.Add(service.Run, func(err error) {
-				if err == nil {
-					logger.Info().
-						Str("transport", "grpc").
-						Str("server", cfg.Service.Name).
-						Msg("Shutting down server")
-				} else {
-					logger.Error().Err(err).
-						Str("transport", "grpc").
-						Str("server", cfg.Service.Name).
-						Msg("Shutting down server")
-				}
-
-				cancel()
-			})
+			gr.Add(runner.NewGoMicroGrpcServerRunner("eventhistory_grpc", service))
 
 			{
 				debugServer, err := debug.Server(
@@ -111,13 +100,18 @@ func Server(cfg *config.Config) *cli.Command {
 					return err
 				}
 
-				gr.Add(debugServer.ListenAndServe, func(_ error) {
-					_ = debugServer.Shutdown(ctx)
-					cancel()
-				})
+				gr.Add(runner.NewGolangHttpServerRunner("eventhistory_debug", debugServer))
 			}
 
-			return gr.Run()
+			grResults := gr.Run(ctx)
+
+			// return the first non-nil error found in the results
+			for _, grResult := range grResults {
+				if grResult.RunnerError != nil {
+					return grResult.RunnerError
+				}
+			}
+			return nil
 		},
 	}
 }
