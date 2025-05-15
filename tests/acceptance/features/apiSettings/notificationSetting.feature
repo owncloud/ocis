@@ -1059,7 +1059,7 @@ Feature: Notification Settings
       | sharee          | Brian        |
       | shareType       | user         |
       | permissionsRole | Space Viewer |
-    And user "Brian" disables notification for the following event using the settings API:
+    When user "Brian" disables notification for the following event using the settings API:
       | event             | Space Deleted |
       | notificationTypes | in-app        |
     Then the HTTP status code should be "201"
