@@ -87,6 +87,7 @@ The following sections list the changes for unreleased.
 * Enhancement - More secure Microsoft 365 collaboration: [#11276](https://github.com/owncloud/ocis/pull/11276)
 * Enhancement - Claim managed spaces: [#11280](https://github.com/owncloud/ocis/pull/11280)
 * Enhancement - Bump Reva: [#11283](https://github.com/owncloud/ocis/pull/11283)
+* Enhancement - Update ocis_full deployment example images: [#11319](https://github.com/owncloud/ocis/pull/11319)
 
 ## Details
 
@@ -256,6 +257,13 @@ The following sections list the changes for unreleased.
    Bumps reva version
 
    https://github.com/owncloud/ocis/pull/11283
+
+* Enhancement - Update ocis_full deployment example images: [#11319](https://github.com/owncloud/ocis/pull/11319)
+
+   The ocis_full deployment example got updated images. Additionally a fix has been
+   implemented for collabora.yml to be compliant with new releases.
+
+   https://github.com/owncloud/ocis/pull/11319
 
 # Changelog for [7.1.2] (2025-03-28)
 
