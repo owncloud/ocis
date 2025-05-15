@@ -388,6 +388,7 @@ DRONE_HTTP_PROXY_ENV = {
     "HTTPS_PROXY": {
         "from_secret": "drone_http_proxy",
     },
+    "GOTOOLCHAIN": "auto", # use go 1.24.2
 }
 
 def pipelineDependsOn(pipeline, dependant_pipelines):
@@ -2254,7 +2255,11 @@ def docs():
                 "name": "docs-generate",
                 "image": OC_CI_GOLANG,
                 "environment": DRONE_HTTP_PROXY_ENV,
-                "commands": ["make docs-generate"],
+                "commands": [
+                    "# bingo fail parsing `go version` when it's still downloading",
+                    "while go version 2>&1 | grep -q \"downloading\"; do sleep 5; done",
+                    "make docs-generate",
+                ],
             },
             {
                 "name": "prepare",
