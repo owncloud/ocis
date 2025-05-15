@@ -364,3 +364,17 @@ Feature: Tag
       | my tag                                                                                                    |
       | Loremipsumdolorsitametconsecteturadipiscingelitseddoeiusmodtemporincididuntutlaboreetdoloremagnaaliqua,qa |
     Then the HTTP status code should be "200"
+
+
+  Scenario: user tries to create tags above 100, only first 100 tags will be created
+    Given the config "OCIS_MAX_TAG_LENGTH" has been set to "100"
+    And user "Alice" has created a folder "folderMain" in space "Alice Hansen"
+    When user "Alice" creates "200" tags for folder "folderMain" of space "Alice Hansen"
+    Then the HTTP status code should be "200"
+    When user "Alice" searches for "Tags:testTag100" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result of user "Alice" should contain only these files:
+      | folderMain |
+    When user "Alice" searches for "Tags:testTag101" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result should contain "0" entries

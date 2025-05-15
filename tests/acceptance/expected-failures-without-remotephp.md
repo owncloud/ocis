@@ -121,6 +121,7 @@
 - [apiSearchContent/contentSearch.feature:238](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearchContent/contentSearch.feature#L238)
 - [apiSearchContent/contentSearch.feature:239](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearchContent/contentSearch.feature#L239)
 - [apiSearchContent/contentSearch.feature:268](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSearchContent/contentSearch.feature#L268)
+- [apiSpaces/tag.feature:369](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/tag.feature#L369)
 - [cliCommands/searchReIndex.feature:15](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/cliCommands/searchReIndex.feature#L15)
 - [coreApiWebdavOperations/search.feature:44](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavOperations/search.feature#L44)
 - [coreApiWebdavOperations/search.feature:62](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavOperations/search.feature#L62)
