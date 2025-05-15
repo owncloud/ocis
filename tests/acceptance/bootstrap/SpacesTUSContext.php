@@ -246,6 +246,13 @@ class SpacesTUSContext implements Context {
 		string $resource,
 		string $spaceName
 	): void {
+		$isSpacesDavPathVersion = $this->featureContext->getDavPathVersion() === WebDavHelper::DAV_VERSION_SPACES;
+		$resource = \ltrim($resource, "/");
+		if (!$isSpacesDavPathVersion && $spaceName === 'Shares' && !\str_starts_with($resource, "Shares/")) {
+			$resource = 'Shares/' . $resource;
+		} elseif ($isSpacesDavPathVersion && \str_starts_with($resource, "Shares/")) {
+			$resource = \preg_replace("/^Shares\//", "", $resource);
+		}
 		$this->featureContext->setResponse($this->uploadFileViaTus($user, $content, $resource, $spaceName));
 	}
 

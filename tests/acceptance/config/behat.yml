@@ -804,6 +804,7 @@ default:
         - FilesVersionsContext:
         - ChecksumContext:
         - SharingNgContext:
+        - SpacesTUSContext:
 
     coreApiWebdavEtagPropagation1:
       paths:
