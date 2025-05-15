@@ -49,7 +49,7 @@ func NewIndexGetterMemory(mapping mapping.IndexMapping) *IndexGetterMemory {
 
 // GetIndex creates a new in-memory index every time it is called.
 // The options are ignored in this implementation.
-func (i *IndexGetterMemory) GetIndex(opts ...GetIndexOption) (bleve.Index, func(), error) {
+func (i *IndexGetterMemory) GetIndex(_ ...GetIndexOption) (bleve.Index, func(), error) {
 	closeFn := func() {} // no-op
 	if i.index != nil {
 		return i.index, closeFn, nil
@@ -90,7 +90,7 @@ func NewIndexGetterPersistent(rootDir string, mapping mapping.IndexMapping) *Ind
 
 // GetIndex returns the cached index. The options are ignored in this
 // implementation.
-func (i *IndexGetterPersistent) GetIndex(opts ...GetIndexOption) (bleve.Index, func(), error) {
+func (i *IndexGetterPersistent) GetIndex(_ ...GetIndexOption) (bleve.Index, func(), error) {
 	closeFn := func() {} // no-op
 	if i.index != nil {
 		return i.index, closeFn, nil
@@ -103,6 +103,8 @@ func (i *IndexGetterPersistent) GetIndex(opts ...GetIndexOption) (bleve.Index, f
 		if err != nil {
 			return nil, closeFn, err
 		}
+	} else if err != nil {
+		return nil, closeFn, err
 	}
 
 	i.index = index
@@ -142,16 +144,17 @@ func (i *IndexGetterPersistentScale) GetIndex(opts ...GetIndexOption) (bleve.Ind
 	params := map[string]interface{}{
 		"read_only": options.ReadOnly,
 	}
+
+	closeFn := func() {} // no-op
 	index, err := bleve.OpenUsing(destination, params)
 	if errors.Is(bleve.ErrorIndexPathDoesNotExist, err) {
 		index, err = bleve.New(destination, i.mapping)
 		if err != nil {
-			closeFn := func() {} // no-op
 			return nil, closeFn, err
 		}
-
-		return index, func() { index.Close() }, nil
+	} else if err != nil {
+		return nil, closeFn, err
 	}
 
-	return index, func() { index.Close() }, err
+	return index, func() { index.Close() }, nil
 }
