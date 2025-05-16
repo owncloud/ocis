@@ -15,6 +15,7 @@ import (
 	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
 	"github.com/owncloud/ocis/v2/services/search/pkg/content"
 	"github.com/owncloud/ocis/v2/services/search/pkg/engine"
+	bleveEngine "github.com/owncloud/ocis/v2/services/search/pkg/engine/bleve"
 	"github.com/owncloud/ocis/v2/services/search/pkg/query/bleve"
 )
 
@@ -59,10 +60,12 @@ var _ = Describe("Bleve", func() {
 		mapping, err := engine.BuildBleveMapping()
 		Expect(err).ToNot(HaveOccurred())
 
-		idx, err = bleveSearch.NewMemOnly(mapping)
+		indexGetter := bleveEngine.NewIndexGetterMemory(mapping)
+
+		idx, _, err = indexGetter.GetIndex() // IndexGetterMemory ignores closeFn
 		Expect(err).ToNot(HaveOccurred())
 
-		eng = engine.NewBleveEngine(idx, bleve.DefaultCreator)
+		eng = engine.NewBleveEngine(indexGetter, bleve.DefaultCreator)
 		Expect(err).ToNot(HaveOccurred())
 
 		rootResource = engine.Resource{
@@ -89,13 +92,6 @@ var _ = Describe("Bleve", func() {
 			Type:     uint64(sprovider.ResourceType_RESOURCE_TYPE_FILE),
 			Document: content.Document{Name: "child.pdf"},
 		}
-	})
-
-	Describe("New", func() {
-		It("returns a new index instance", func() {
-			b := engine.NewBleveEngine(idx, bleve.DefaultCreator)
-			Expect(b).ToNot(BeNil())
-		})
 	})
 
 	Describe("Search", func() {
