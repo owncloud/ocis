@@ -31,6 +31,7 @@ import (
 	"time"
 
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	"github.com/google/uuid"
 	"github.com/owncloud/reva/v2/pkg/appctx"
 	"github.com/owncloud/reva/v2/pkg/errtypes"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/decomposedfs/lookup"
@@ -40,7 +41,6 @@ import (
 	"github.com/owncloud/reva/v2/pkg/storage/utils/decomposedfs/options"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/decomposedfs/tree/propagator"
 	"github.com/owncloud/reva/v2/pkg/utils"
-	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 	"go-micro.dev/v4/store"
@@ -391,17 +391,20 @@ func (t *Tree) ListFolder(ctx context.Context, n *node.Node) ([]*node.Node, erro
 				if nodeID == "" {
 					nodeID, err = readChildNodeFromLink(ctx, path)
 					if err != nil {
-						return err
+						appctx.GetLogger(ctx).Error().Err(err).Str("path", path).Msg("cannot read node from link")
+						continue
 					}
 					err = storeNodeIDInCache(ctx, path, nodeID, t.idCache)
 					if err != nil {
-						return err
+						appctx.GetLogger(ctx).Warn().Err(err).Str("node", nodeID).Msg("cannot store node in the cache")
+						// failing to write in the cache is fine because we can keep going
 					}
 				}
 
 				child, err := node.ReadNode(ctx, t.lookup, n.SpaceID, nodeID, false, n.SpaceRoot, true)
 				if err != nil {
-					return err
+					appctx.GetLogger(ctx).Error().Err(err).Str("node", nodeID).Msg("cannot read node")
+					continue
 				}
 
 				// prevent listing denied resources

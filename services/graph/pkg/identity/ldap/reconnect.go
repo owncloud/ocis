@@ -270,6 +270,34 @@ func (c ConnWithReconnect) reconnect(resetConn *ldap.Conn) (*ldap.Conn, error) {
 	return result.Conn, result.Error
 }
 
+// Extended implements the ldap.Client interface
+func (c ConnWithReconnect) Extended(req *ldap.ExtendedRequest) (*ldap.ExtendedResponse, error) {
+	conn, err := c.GetConnection()
+	if err != nil {
+		return nil, err
+	}
+
+	// TODO: in reva there is a good retry util function
+	var res *ldap.ExtendedResponse
+	for try := 0; try <= c.retries; try++ {
+		res, err = conn.Extended(req)
+		if !ldap.IsErrorWithCode(err, ldap.ErrorNetwork) {
+			// Non network error, return it to the client
+			return res, err
+		}
+
+		c.logger.Debug().Msgf("Network Error. attempt %d", try)
+		conn, err = c.reconnect(conn)
+		if err != nil {
+			return nil, err
+		}
+		c.logger.Debug().Msg("retrying LDAP Extended")
+	}
+	// Return error when reached the maximum retries.
+	return nil, ldap.NewError(ldap.ErrorNetwork, errMaxRetries)
+}
+
+
 // Remaining methods to fulfill ldap.Client interface
 
 func (c ConnWithReconnect) Start() {}

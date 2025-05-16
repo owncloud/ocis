@@ -51,6 +51,8 @@ const (
 	RoleSpaceEditor = "spaceeditor"
 	// RoleSpaceEditorWithoutVersions grants editor permission without list/restore versions on a space.
 	RoleSpaceEditorWithoutVersions = "spaceeditor-without-versions"
+	// RoleSpaceEditorWithoutTrashbin grants editor permission without list/restore resources in trashbin on a space.
+	RoleSpaceEditorWithoutTrashbin = "spaceeditor-without-trashbin"
 	// RoleFileEditor grants editor permission on a single file.
 	RoleFileEditor = "file-editor"
 	// RoleFileEditorListGrants grants editor permission on a single file.
@@ -179,6 +181,8 @@ func RoleFromName(name string) *Role {
 		return NewEditorListGrantsWithVersionsRole()
 	case RoleSpaceEditor:
 		return NewSpaceEditorRole()
+	case RoleSpaceEditorWithoutTrashbin:
+		return NewSpaceEditorWithoutTrashbinRole()
 	case RoleFileEditor:
 		return NewFileEditorRole()
 	case RoleFileEditorListGrants:
@@ -331,6 +335,28 @@ func NewSpaceEditorWithoutVersionsRole() *Role {
 			ListRecycle:          true,
 			Move:                 true,
 			RestoreRecycleItem:   true,
+			Stat:                 true,
+		},
+		ocsPermissions: PermissionRead | PermissionCreate | PermissionWrite | PermissionDelete,
+	}
+}
+
+// NewSpaceEditorWithoutTrashbinRole creates an editor role without list/restore resources in trashbin on a space.
+func NewSpaceEditorWithoutTrashbinRole() *Role {
+	return &Role{
+		Name: RoleSpaceEditorWithoutTrashbin,
+		cS3ResourcePermissions: &provider.ResourcePermissions{
+			CreateContainer:      true,
+			Delete:               true,
+			GetPath:              true,
+			GetQuota:             true,
+			InitiateFileDownload: true,
+			InitiateFileUpload:   true,
+			ListContainer:        true,
+			ListFileVersions:     true,
+			ListGrants:           true,
+			Move:                 true,
+			RestoreFileVersion:   true,
 			Stat:                 true,
 		},
 		ocsPermissions: PermissionRead | PermissionCreate | PermissionWrite | PermissionDelete,
