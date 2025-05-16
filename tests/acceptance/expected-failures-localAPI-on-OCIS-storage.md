@@ -392,7 +392,6 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 
 - [apiSharingNgShares/sharedWithMe.feature:5410](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNgShares/sharedWithMe.feature#L5410)
 - [apiSharingNgShares/sharedWithMe.feature:5411](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNgShares/sharedWithMe.feature#L5411)
-- [apiSharingNgShares/sharedWithMe.feature:5412](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNgShares/sharedWithMe.feature#L5412)
 
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.
