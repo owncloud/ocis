@@ -130,6 +130,7 @@ type commonLoggingResponseWriter interface {
 	http.Flusher
 	Status() int
 	Size() int
+	Unwrap() http.ResponseWriter
 }
 
 // responseLogger is wrapper of http.ResponseWriter that keeps track of its HTTP
@@ -170,6 +171,11 @@ func (l *responseLogger) Flush() {
 	}
 }
 
+// Unwrap returns the underlying wrapped http.ResponseWriter.
+func (l responseLogger) Unwrap() http.ResponseWriter {
+	return l.w
+}
+
 type hijackLogger struct {
 	responseLogger
 }
@@ -183,6 +189,11 @@ func (l *hijackLogger) Hijack() (net.Conn, *bufio.ReadWriter, error) {
 	return conn, rw, err
 }
 
+// Unwrap returns the underlying wrapped http.ResponseWriter.
+func (l hijackLogger) Unwrap() http.ResponseWriter {
+	return l.w
+}
+
 type closeNotifyWriter struct {
 	loggingResponseWriter
 	http.CloseNotifier
@@ -192,4 +203,9 @@ type hijackCloseNotifier struct {
 	loggingResponseWriter
 	http.Hijacker
 	http.CloseNotifier
+}
+
+// Unwrap returns the underlying wrapped http.ResponseWriter.
+func (l hijackCloseNotifier) Unwrap() http.ResponseWriter {
+	return l.loggingResponseWriter
 }
