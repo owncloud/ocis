@@ -35,7 +35,7 @@ PLUGINS_GIT_ACTION = "plugins/git-action:1"
 PLUGINS_MANIFEST = "plugins/manifest:1"
 PLUGINS_S3 = "plugins/s3:1"
 PLUGINS_S3_CACHE = "plugins/s3-cache:1"
-PLUGINS_SLACK = "plugins/slack:1"
+PLUGINS_MATRIX = "plugins/matrix"
 REDIS = "redis:6-alpine"
 SONARSOURCE_SONAR_SCANNER_CLI = "sonarsource/sonar-scanner-cli:11.0"
 
@@ -331,11 +331,6 @@ config = {
             ],
             "tikaNeeded": True,
         },
-    },
-    "rocketchat": {
-        "channel": "builds",
-        "channel_cron": "builds",
-        "from_secret": "rocketchat_talk_webhook",
     },
     "binaryReleases": {
         "os": ["linux", "darwin"],
@@ -2351,10 +2346,8 @@ def makeGoGenerate(module):
 
 def notify(ctx):
     status = ["failure"]
-    channel = config["rocketchat"]["channel"]
     if ctx.build.event == "cron":
         status.append("success")
-        channel = config["rocketchat"]["channel_cron"]
 
     return {
         "kind": "pipeline",
@@ -2365,13 +2358,15 @@ def notify(ctx):
         },
         "steps": [
             {
-                "name": "notify-rocketchat",
-                "image": PLUGINS_SLACK,
+                "name": "notify-matrix",
+                "image": PLUGINS_MATRIX,
                 "settings": {
-                    "webhook": {
-                        "from_secret": config["rocketchat"]["from_secret"],
+                    "homeserver": "https://matrix.org",
+                    "roomid": "!rnWsCVUmDHDJbiSPMM:matrix.org",
+                    "username": "kwbot",
+                    "accesstoken": {
+                        "from_secret": "matrix_token",
                     },
-                    "channel": channel,
                 },
             },
         ],
@@ -2381,6 +2376,7 @@ def notify(ctx):
                 "refs/heads/master",
                 "refs/heads/release*",
                 "refs/tags/**",
+                "refs/pull/**",
             ],
             "status": status,
         },
