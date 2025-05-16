@@ -35,7 +35,6 @@ PLUGINS_GIT_ACTION = "plugins/git-action:1"
 PLUGINS_MANIFEST = "plugins/manifest:1"
 PLUGINS_S3 = "plugins/s3:1"
 PLUGINS_S3_CACHE = "plugins/s3-cache:1"
-PLUGINS_SLACK = "plugins/slack:1"
 REDIS = "redis:6-alpine"
 SONARSOURCE_SONAR_SCANNER_CLI = "sonarsource/sonar-scanner-cli:11.0"
 
@@ -298,11 +297,6 @@ config = {
             ],
             "tikaNeeded": True,
         },
-    },
-    "rocketchat": {
-        "channel": "builds",
-        "channel_cron": "builds",
-        "from_secret": "rocketchat_talk_webhook",
     },
     "binaryReleases": {
         "os": ["linux", "darwin"],
@@ -2282,28 +2276,25 @@ def makeGoGenerate(module):
 
 def notify(ctx):
     status = ["failure"]
-    channel = config["rocketchat"]["channel"]
     if ctx.build.event == "cron":
         status.append("success")
-        channel = config["rocketchat"]["channel_cron"]
 
     return {
         "kind": "pipeline",
         "type": "docker",
         "name": "chat-notifications",
-        "clone": {
-            "disable": True,
-        },
         "steps": [
             {
-                "name": "notify-rocketchat",
-                "image": PLUGINS_SLACK,
-                "settings": {
-                    "webhook": {
-                        "from_secret": config["rocketchat"]["from_secret"],
+                "name": "notify-matrix",
+                "image": OC_CI_ALPINE,
+                "environment": {
+                    "MATRIX_TOKEN": {
+                        "from_secret": "matrix_token",
                     },
-                    "channel": channel,
                 },
+                "commands": [
+                    "bash %s/tests/config/drone/notification.sh" % (dirs["base"]),
+                ],
             },
         ],
         "depends_on": [],
