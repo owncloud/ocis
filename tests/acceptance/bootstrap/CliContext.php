@@ -707,6 +707,39 @@ class CliContext implements Context {
 		return CliHelper::runCommand($body);
 	}
 
+    /**
+     * @param ResponseInterface|null $response
+     *
+     * @return array
+     */
+    protected function getTrashedResourceFromCliCommandResponse(ResponseInterface $response = null): array
+    {
+        $responseArray = $this->featureContext->getJsonDecodedResponseBodyContent($response);
+        $lines = explode("\n", $responseArray->message);
+        $items = [];
+        $totalCount=0;
+        foreach ($lines as $line) {
+            if (preg_match(
+                '/^\s*\|\s*([a-f0-9\-]{36})\s*\|\s*(.*?)\s*\|\s*(file|folder)\s*\|\s*([\d\-T:Z]+)\s*\|/',
+                $line,
+                $matches
+            )
+            ) {
+                $items[] = [
+                    'itemID'    => $matches[1],
+                    'path'      => $matches[2],
+                    'type'      => $matches[3],
+                    'delete at' => $matches[4],
+                ];
+            }
+
+            if (preg_match('/total count:\s*(\d+)/', $line, $countMatch)) {
+                $totalCount = (int)$countMatch[1];
+            }
+        }
+        return [$items, $totalCount];
+    }
+
 	/**
 	 * @Then /^the command output should contain "([^"]*)" trashed resources with the following information:$/
 	 *
@@ -719,28 +752,7 @@ class CliContext implements Context {
 		int $count,
 		TableNode $table
 	): void {
-		$responseArray = $this->featureContext->getJsonDecodedResponseBodyContent();
-		$lines = explode("\n", $responseArray->message);
-		$items = [];
-		foreach ($lines as $line) {
-			if (preg_match(
-				'/^\s*\|\s*([a-f0-9\-]{36})\s*\|\s*(.*?)\s*\|\s*(file|folder)\s*\|\s*([\d\-T:Z]+)\s*\|/',
-				$line,
-				$matches
-			)
-			) {
-				$items[] = [
-					'itemID'    => $matches[1],
-					'path'      => $matches[2],
-					'type'      => $matches[3],
-					'delete at' => $matches[4],
-				];
-			}
-
-			if (preg_match('/total count:\s*(\d+)/', $line, $countMatch)) {
-				$totalCount = (int)$countMatch[1];
-			}
-		}
+        [$items, $totalCount] = $this->getTrashedResourceFromCliCommandResponse();
 
 		Assert::assertSame($totalCount, $count, "Expected total trashed resource");
 
@@ -762,4 +774,54 @@ class CliContext implements Context {
 			);
 		}
 	}
+
+    /**
+     * @When the administrator restores all the trashed resource of space :space owned by user :user
+     *
+     * @param string $spaceName
+     * @param string $user
+     *
+     * @return void
+     */
+    public function theAdministratorRestoresAllTheTrashedResourceOfSpaceOwnedByUser(
+        string $spaceName,
+        string $user
+    ): void {
+        $space = $this->spacesContext->getSpaceByName(
+            $user,
+            $spaceName
+        );
+        $spaceOwnerId = $space["owner"]["user"]["id"];
+        $body = [
+            "command" => "storage-users trash-bin restore-all -y $spaceOwnerId"
+        ];
+        $this->featureContext->setResponse(CliHelper::runCommand($body));
+    }
+
+    /**
+     * @Then there should be :number trashed resources of space :spaceName owned by user :user
+     *
+     * @param int $number
+     * @param string $spaceName
+     * @param string $user
+     *
+     * @return void
+     * @throws GuzzleException
+     */
+    public function thereShouldBeTrashedResourcesOfSpaceOwnedByUser(
+        int $number,
+        string $spaceName='',
+        string $user=''
+    ): void {
+        $space = $this->spacesContext->getSpaceByName(
+            $user,
+            $spaceName
+        );
+        $spaceOwnerId = $space["owner"]["user"]["id"];
+        $response =$this->listTrashedResource($spaceOwnerId);
+        [$items, $totalCount] = $this->getTrashedResourceFromCliCommandResponse($response);
+
+        Assert::assertSame($totalCount, $number, "Expected total trashed resource");
+
+    }
 }

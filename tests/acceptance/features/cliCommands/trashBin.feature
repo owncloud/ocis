@@ -44,3 +44,38 @@ Feature: trashbin
       | resource           | type   |
       | /folder-to-delete  | folder |
       | /folder-to-restore | folder |
+
+
+  Scenario: restore all trashed resource at once
+    Given user "Brian" has been created with default attributes
+    And user "Alice" has created the following folders
+      | path              |
+      | folder-to-delete  |
+      | folder-to-restore |
+    And user "Alice" has uploaded file with content "test file" to "testfile.txt"
+    And user "Alice" has deleted the following resources
+      | path              |
+      | folder-to-delete  |
+      | folder-to-restore |
+      | testfile.txt      |
+    And user "Brian" has created folder "BrianFolder"
+    When the administrator restores all the trashed resource of space "Personal" owned by user "Alice"
+    Then the command should be successful
+    And there should be "0" trashed resources of space "Personal" owned by user "Alice"
+
+
+  Scenario: restore specific trashed resource at once
+    Given user "Brian" has been created with default attributes
+    And user "Alice" has created the following folders
+      | path              |
+      | folder-to-delete  |
+      | folder-to-restore |
+    And user "Alice" has uploaded file with content "test file" to "testfile.txt"
+    And user "Alice" has deleted the following resources
+      | path              |
+      | folder-to-delete  |
+      | folder-to-restore |
+      | testfile.txt      |
+    When the administrator restores the trashed resource "folder-to-delete" of space "Personal" owned by user "Alice"
+    Then the command should be successful
+    And there should be "0" trashed resources of space "Personal" owned by user "Alice"
