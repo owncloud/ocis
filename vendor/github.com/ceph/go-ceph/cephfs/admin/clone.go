@@ -81,10 +81,18 @@ type CloneSource struct {
 	Snapshot  string `json:"snapshot"`
 }
 
+// CloneProgressReport contains the progress report of a subvolume clone.
+type CloneProgressReport struct {
+	PercentageCloned string `json:"percentage cloned"`
+	AmountCloned     string `json:"amount cloned"`
+	FilesCloned      string `json:"files cloned"`
+}
+
 // CloneStatus reports on the status of a subvolume clone.
 type CloneStatus struct {
-	State  CloneState  `json:"state"`
-	Source CloneSource `json:"source"`
+	State          CloneState          `json:"state"`
+	Source         CloneSource         `json:"source"`
+	ProgressReport CloneProgressReport `json:"progress_report"`
 
 	// failure can be obtained through .GetFailure()
 	failure *CloneFailure
