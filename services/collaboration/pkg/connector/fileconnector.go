@@ -40,6 +40,11 @@ const (
 	// WOPI Locks generally have a lock duration of 30 minutes and will be refreshed before expiration if needed
 	// https://docs.microsoft.com/en-us/microsoft-365/cloud-storage-partner-program/rest/concepts#lock
 	lockDuration time.Duration = 30 * time.Minute
+
+	// Expected format for LastModifiedTime is ISO 8601 round-trip format (e.g. "2009-06-15T13:45:30.0000000Z")
+	// see: https://learn.microsoft.com/en-us/microsoft-365/cloud-storage-partner-program/rest/files/checkfileinfo/checkfileinfo-other#lastmodifiedtime
+	// and: https://pkg.go.dev/time#Time.Format
+	timeFormat = "2006-01-02T15:04:05.0000000Z"
 )
 
 // FileConnectorService is the interface to implement the "Files"
@@ -1254,10 +1259,16 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (*ConnectorResponse, 
 		}
 	}
 
+	lastModifiedTime := time.Now().UTC().Format(timeFormat)
+	if statRes.GetInfo().GetMtime() != nil {
+		lastModifiedTime = time.Unix(int64(statRes.GetInfo().GetMtime().GetSeconds()), int64(statRes.GetInfo().GetMtime().GetNanos())).UTC().Format(timeFormat)
+	}
+
 	infoMap := map[string]interface{}{
 		fileinfo.KeyOwnerID:           hexEncodedOwnerId,
 		fileinfo.KeySize:              size,
 		fileinfo.KeyVersion:           getVersion(statRes.GetInfo().GetMtime()),
+		fileinfo.KeyLastModifiedTime:  lastModifiedTime,
 		fileinfo.KeyBaseFileName:      path.Base(statRes.GetInfo().GetPath()),
 		fileinfo.KeyBreadcrumbDocName: path.Base(statRes.GetInfo().GetPath()),
 		// to get the folder we actually need to do a GetPath() request
