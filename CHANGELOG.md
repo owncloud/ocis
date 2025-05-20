@@ -88,6 +88,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Claim managed spaces: [#11280](https://github.com/owncloud/ocis/pull/11280)
 * Enhancement - Bump Reva: [#11283](https://github.com/owncloud/ocis/pull/11283)
 * Enhancement - Update ocis_full deployment example images: [#11319](https://github.com/owncloud/ocis/pull/11319)
+* Enhancement - Bump Web to 11.3.2: [#11330](https://github.com/owncloud/ocis/pull/11330)
 
 ## Details
 
@@ -264,6 +265,18 @@ The following sections list the changes for unreleased.
    implemented for collabora.yml to be compliant with new releases.
 
    https://github.com/owncloud/ocis/pull/11319
+
+* Enhancement - Bump Web to 11.3.2: [#11330](https://github.com/owncloud/ocis/pull/11330)
+
+   - Bugfix [owncloud/web#12460](https://github.com/owncloud/web/pull/12460): Add
+   missing dependencies to markdown editor - Bugfix
+   [owncloud/web#12460](https://github.com/owncloud/web/pull/12460): Hide image
+   upload in markdown editor - Bugfix
+   [owncloud/web#12460](https://github.com/owncloud/web/pull/12460): Hide save in
+   markdown editor
+
+   https://github.com/owncloud/ocis/pull/11330
+   https://github.com/owncloud/web/releases/tag/v11.3.2
 
 # Changelog for [7.1.2] (2025-03-28)
 
