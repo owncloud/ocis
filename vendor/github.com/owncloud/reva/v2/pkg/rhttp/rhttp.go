@@ -27,6 +27,7 @@ import (
 	"sort"
 	"time"
 
+	"github.com/mitchellh/mapstructure"
 	"github.com/owncloud/reva/v2/internal/http/interceptors/appctx"
 	"github.com/owncloud/reva/v2/internal/http/interceptors/auth"
 	"github.com/owncloud/reva/v2/internal/http/interceptors/log"
@@ -34,7 +35,6 @@ import (
 	"github.com/owncloud/reva/v2/pkg/rhttp/global"
 	"github.com/owncloud/reva/v2/pkg/rhttp/router"
 	rtrace "github.com/owncloud/reva/v2/pkg/trace"
-	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 	"go.opentelemetry.io/otel/propagation"
@@ -132,10 +132,10 @@ func (s *Server) Start(ln net.Listener) error {
 
 // Stop stops the server.
 func (s *Server) Stop() error {
-	s.closeServices()
 	// TODO(labkode): set ctx deadline to zero
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
+	defer s.closeServices()
 	return s.httpServer.Shutdown(ctx)
 }
 
@@ -164,7 +164,7 @@ func (s *Server) Address() string {
 
 // GracefulStop gracefully stops the server.
 func (s *Server) GracefulStop() error {
-	s.closeServices()
+	defer s.closeServices()
 	return s.httpServer.Shutdown(context.Background())
 }
 

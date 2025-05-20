@@ -13,6 +13,8 @@ var (
 	// for the group runners. This global value can be adjusted if needed.
 	// TODO: To discuss the default timeout
 	DefaultGroupInterruptDuration = 25 * time.Second
+	// DefaultTimeoutDuration is the default value for the shutdownCtx
+	DefaultTimeoutDuration = 20 * time.Second
 )
 
 // Option defines a single option function.

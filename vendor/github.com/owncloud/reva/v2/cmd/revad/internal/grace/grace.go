@@ -303,8 +303,6 @@ func (w *Watcher) TrapSignals() {
 func gracefulShutdown(w *Watcher) {
 	defer w.Clean()
 	w.log.Info().Int("Timeout", w.gracefulShutdownTimeout).Msg("preparing for a graceful shutdown with deadline")
-	// TODO(perekhod): make this configurable. The most of services except the 'storage-users' have no shutdown timeout by default.
-	w.gracefulShutdownTimeout = 30
 	wg := sync.WaitGroup{}
 
 	for _, s := range w.ss {

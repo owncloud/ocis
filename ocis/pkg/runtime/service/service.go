@@ -87,8 +87,6 @@ type Service struct {
 	Log        log.Logger
 
 	serviceToken map[string][]suture.ServiceToken
-	context      context.Context
-	cancel       context.CancelFunc
 	cfg          *ociscfg.Config
 }
 
@@ -110,16 +108,12 @@ func NewService(ctx context.Context, options ...Option) (*Service, error) {
 		log.Level(opts.Config.Log.Level),
 	)
 
-	globalCtx, cancelGlobal := context.WithCancel(ctx)
-
 	s := &Service{
 		Services:   make([]serviceFuncMap, len(_waitFuncs)),
 		Additional: make(serviceFuncMap),
 		Log:        l,
 
 		serviceToken: make(map[string][]suture.ServiceToken),
-		context:      globalCtx,
-		cancel:       cancelGlobal,
 		cfg:          opts.Config,
 	}
 
@@ -364,8 +358,11 @@ func Start(ctx context.Context, o ...Option) error {
 	}
 
 	// cancel the context when a signal is received.
-	notifyCtx, cancel := signal.NotifyContext(ctx, runner.StopSignals...)
-	defer cancel()
+	var cancel context.CancelFunc
+	if ctx == nil {
+		ctx, cancel = signal.NotifyContext(ctx, runner.StopSignals...)
+		defer cancel()
+	}
 
 	// tolerance controls backoff cycles from the supervisor.
 	tolerance := 5
@@ -374,13 +371,30 @@ func Start(ctx context.Context, o ...Option) error {
 	// Start creates its own supervisor. Running services under `ocis server` will create its own supervision tree.
 	s.Supervisor = suture.New("ocis", suture.Spec{
 		EventHook: func(e suture.Event) {
+			if e.Type() == suture.EventTypeStopTimeout {
+				ev := e.(suture.EventStopTimeout)
+				s.Log.Warn().Str("supervisor_event", "EventTypeStopTimeout").Msgf("supervisor: %s; service: %s failed to terminate in a timely manner", ev.Supervisor.Name, ev.Service)
+			}
+			if e.Type() == suture.EventTypeServicePanic {
+				ev := e.(suture.EventServicePanic)
+				s.Log.Warn().Str("supervisor_event", "EventTypeServicePanic").Msgf("supervisor: %s; service: %s panicked", ev.SupervisorName, ev.ServiceName)
+			}
+			if e.Type() == suture.EventTypeServiceTerminate {
+				ev := e.(suture.EventServiceTerminate)
+				s.Log.Warn().Str("supervisor_event", "EventTypeServiceTerminate").Msgf("supervisor: %s; service: %s terminated", ev.SupervisorName, ev.ServiceName)
+			}
 			if e.Type() == suture.EventTypeBackoff {
 				totalBackoff++
 				if totalBackoff == tolerance {
 					cancel()
 				}
+				ev := e.(suture.EventBackoff)
+				s.Log.Warn().Str("supervisor_event", "EventTypeBackoff").Msgf("supervisor: %s entering the backoff state.", ev.SupervisorName)
 			}
-			s.Log.Info().Str("event", e.String()).Msg(fmt.Sprintf("supervisor: %v", e.Map()["supervisor_name"]))
+			if e.Type() == suture.EventTypeResume {
+				ev := e.(suture.EventResume)
+				s.Log.Warn().Str("supervisor_event", "EventTypeResume").Msgf("supervisor: %s resuming normal operation.", ev.SupervisorName)
+			}
 		},
 		FailureThreshold: 5,
 		FailureBackoff:   3 * time.Second,
@@ -423,7 +437,7 @@ func Start(ctx context.Context, o ...Option) error {
 	// go supervisor.Serve()
 	// because that will briefly create a race condition as it starts up, if you try to .Add() services immediately afterward.
 	// https://pkg.go.dev/github.com/thejerf/suture/v4@v4.0.0#Supervisor
-	go s.Supervisor.ServeBackground(s.context) // TODO Why does Supervisor uses s.context?
+	go s.Supervisor.ServeBackground(ctx)
 
 	for i, service := range s.Services {
 		scheduleServiceTokens(s, service)
@@ -444,7 +458,7 @@ func Start(ctx context.Context, o ...Option) error {
 	}()
 
 	// trapShutdownCtx will block on the context-done channel for interruptions.
-	trapShutdownCtx(s, srv, notifyCtx)
+	trapShutdownCtx(s, srv, ctx)
 	return nil
 }
 
