@@ -61,6 +61,8 @@ type Config struct {
 
 	ConfigurableNotifications bool `yaml:"configurable_notifications" env:"FRONTEND_CONFIGURABLE_NOTIFICATIONS" desc:"Allow configuring notifications via web client." introductionVersion:"7.1"`
 
+	ServerManagedSpaces bool `yaml:"server_managed_spaces" env:"OCIS_CLAIM_MANAGED_SPACES_ENABLED" desc:"Block adding/removing users to spaces through the webUI." introductionVersion:"%%NEXT_PRODUCTION_VERSION%%"`
+
 	Context context.Context `yaml:"-"`
 }
 
