@@ -2437,8 +2437,6 @@ def ocisServer(storage = "ocis", accounts_hash_difficulty = 4, volumes = [], dep
     }
 
     if deploy_type == "":
-        environment["FRONTEND_OCS_ENABLE_DENIALS"] = True
-
         # fonts map for txt thumbnails (including unicode support)
         environment["THUMBNAILS_TXT_FONTMAP_FILE"] = "%s/tests/config/drone/fontsMap.json" % (dirs["base"])
 
