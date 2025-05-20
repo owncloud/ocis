@@ -41,11 +41,11 @@ func Server(cfg *config.Config) *cli.Command {
 			}
 
 			var cancel context.CancelFunc
-			ctx := cfg.Context
-			if ctx == nil {
-				ctx, cancel = signal.NotifyContext(context.Background(), runner.StopSignals...)
+			if cfg.Context == nil {
+				cfg.Context, cancel = signal.NotifyContext(context.Background(), runner.StopSignals...)
 				defer cancel()
 			}
+			ctx := cfg.Context
 
 			// prepare components
 			if err := helpers.RegisterOcisService(ctx, cfg, logger); err != nil {
