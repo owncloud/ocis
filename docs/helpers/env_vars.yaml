@@ -2596,15 +2596,6 @@ CLIENTLOG_JWT_SECRET:
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
-CLIENTLOG_REVA_GATEWAY:
-  name: OCIS_REVA_GATEWAY;CLIENTLOG_REVA_GATEWAY
-  defaultValue: com.owncloud.api.gateway
-  type: string
-  description: CS3 gateway used to look up user metadata
-  introductionVersion: "5.0"
-  deprecationVersion: "6.0"
-  removalVersion: '%%NEXT_PRODUCTION_VERSION%%'
-  deprecationInfo: CLIENTLOG_REVA_GATEWAY removed for simplicity.
 CLIENTLOG_SERVICE_ACCOUNT_ID:
   name: OCIS_SERVICE_ACCOUNT_ID;CLIENTLOG_SERVICE_ACCOUNT_ID
   defaultValue: ""
