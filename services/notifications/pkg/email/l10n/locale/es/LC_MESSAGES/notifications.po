@@ -4,18 +4,18 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 # 
 # Translators:
-# Jesús Recio <jrecio@solidgear.es>, 2024
 # Martin <github@diemattels.at>, 2025
 # Juan Carlos Garrote, 2025
+# Jesús Recio <jrecio@solidgear.es>, 2025
 # 
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2025-05-06 00:04+0000\n"
+"POT-Creation-Date: 2025-05-20 00:36+0000\n"
 "PO-Revision-Date: 2023-04-19 11:11+0000\n"
-"Last-Translator: Juan Carlos Garrote, 2025\n"
+"Last-Translator: Jesús Recio <jrecio@solidgear.es>, 2025\n"
 "Language-Team: Spanish (https://app.transifex.com/owncloud-org/teams/6149/es/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -157,6 +157,9 @@ msgid ""
 "\n"
 "Even though this share has been revoked you still might have access through other shares and/or space memberships."
 msgstr ""
+"{ShareSharer} ha eliminado la compartición '{ShareFolder}' con usted.\n"
+"\n"
+"incluso habiendo eliminado esta compartición, usted podría tener acceso a través de otras comparticiones y/o membresías en spaces."
 
 #. ShareCreated email template, Subject field (resolves directly)
 #: pkg/email/templates.go:17
@@ -166,7 +169,7 @@ msgstr "{ShareSharer} compartió '{ShareFolder}' contigo"
 #. ShareRemoved email template, Subject field (resolves directly)
 #: pkg/email/templates.go:43
 msgid "{ShareSharer} unshared '{ShareFolder}' with you"
-msgstr ""
+msgstr "{ShareSharer} ha eliminado la compartición '{ShareFolder}' con usted"
 
 #. SharedSpace email template, resolves via {{ .MessageBody }}
 #: pkg/email/templates.go:61
