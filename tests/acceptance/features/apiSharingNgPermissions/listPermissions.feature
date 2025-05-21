@@ -2668,3 +2668,91 @@ Feature: List a sharing permissions
         }
       }
       """
+
+  @issue-8616
+  Scenario: sharer lists single membership permission of a project space using root endpoint
+    Given using spaces DAV path
+    And user "Brian" has been created with default attributes
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Alice" has sent the following space share invitation:
+      | space           | new-space    |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | Space Viewer |
+    When user "Alice" lists the permission of space "new-space" shared to user "Brian" using root endpoint of the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["id", "roles", "grantedToV2"],
+        "properties": {
+          "id": { "pattern": "^u:%user_id_pattern%$" },
+          "roles": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {"pattern": "^%role_id_pattern%$"}
+          },
+          "grantedToV2": {
+            "type": "object",
+            "required": ["user"],
+            "properties": {
+              "user": {
+                "type": "object",
+                "required": ["@libre.graph.userType", "displayName", "id"],
+                "properties": {
+                  "@libre.graph.userType": {"const": "Member"},
+                  "id": {"pattern": "^%user_id_pattern%$"},
+                  "displayName": {"const": "Brian Murphy"}
+                }
+              }
+            }
+          }
+        }
+      }
+      """
+
+  @issue-8616
+  Scenario: sharer lists single link permission of a project space using root endpoint
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+    And user "Alice" has created the following space link share:
+      | space           | new-space |
+      | permissionsRole | View      |
+      | password        | %public%  |
+    When user "Alice" lists the last link permission of space "Personal" using root endpoint of the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["createdDateTime", "hasPassword", "id", "link"],
+        "properties": {
+          "createdDateTime": {
+            "format": "date-time"
+          },
+          "hasPassword": { "const": true},
+          "id": {"pattern": "^[a-zA-Z]{15}$"},
+          "link": {
+            "type": "object",
+            "required": [
+              "@libre.graph.displayName",
+              "@libre.graph.quickLink",
+              "preventsDownload",
+              "type",
+              "webUrl"
+            ],
+            "properties": {
+              "@libre.graph.displayName": {"const": ""},
+              "@libre.graph.quickLink": {"const": false},
+              "preventsDownload": {"const": false},
+              "type": {"const": "view"},
+              "webUrl": {"pattern": "^%base_url%/s/[a-zA-Z]{15}$"}
+            }
+          }
+        }
+      }
+      """
