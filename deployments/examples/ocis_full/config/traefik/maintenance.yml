@@ -1,0 +1,15 @@
+---
+http:
+  services:
+    unavailable:
+      loadBalancer:
+        servers: {}
+  middlewares:
+    maintenance:
+      plugin:
+        traefik-maintenance:
+          enabled: true
+          filename: '/maintenance/content.txt'
+          triggerFilename: '/maintenance/content.txt.trigger'
+          httpResponseCode: 503
+          httpContentType: 'text/plain; charset=utf-8'
