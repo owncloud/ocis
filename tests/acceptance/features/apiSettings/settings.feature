@@ -66,6 +66,62 @@ Feature: settings api
       | permissionsRole | Viewer       |
     Then user "Brian" should have sync disabled for share "textfile.txt"
 
+  @issue-11335
+  Scenario: enable auto-sync-shares after disabling it
+    And user "Brian" has disabled the auto-sync share
+    When user "Brian" enables the auto-sync share using the settings API
+    Then the HTTP status code should be "201"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value" : {
+            "type": "object",
+            "required": ["identifier","value"],
+            "properties": {
+              "identifier": {
+                "type": "object",
+                "required": ["extension", "bundle", "setting"],
+                "properties": {
+                  "extension": { "const": "ocis-accounts" },
+                  "bundle": { "const": "profile" },
+                  "setting": { "const": "auto-accept-shares" }
+                }
+              },
+              "value": {
+                "type": "object",
+                "required": ["id", "bundleId", "settingId", "accountUuid", "resource", "boolValue"],
+                "properties": {
+                  "id": { "pattern": "^%user_id_pattern%$" },
+                  "bundleId": { "pattern": "^%user_id_pattern%$" },
+                  "settingId": { "pattern": "^%user_id_pattern%$" },
+                  "accountUuid": { "pattern": "^%user_id_pattern%$" },
+                  "resource": {
+                    "type": "object",
+                    "required": ["type"],
+                    "properties": {
+                      "type": { "const": "TYPE_USER" }
+                    }
+                  },
+                  "boolValue": { "const": true }
+                }
+              }
+            }
+          }
+        }
+      }
+      """
+    And for user "Brian" setting "auto-accept-shares" should have value "true"
+    Given user "Alice" has sent the following resource share invitation:
+      | resource        | textfile.txt |
+      | space           | Personal     |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | Viewer       |
+    Then user "Brian" should have sync enabled for share "textfile.txt"
+
 
   Scenario: assign role to user
     When user "Admin" assigns the role "Admin" to user "Alice" using the settings API
