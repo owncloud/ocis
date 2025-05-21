@@ -479,13 +479,14 @@ class SettingsContext implements Context {
 
 	/**
 	 * @param string $user
+	 * @param bool $status
 	 *
 	 * @return ResponseInterface
 	 *
 	 * @throws GuzzleException
 	 * @throws Exception
 	 */
-	public function sendRequestToDisableAutoAccepting(string $user): ResponseInterface {
+	public function toggleAutoAcceptSharesSetting(string $user, bool $status): ResponseInterface {
 		$body = json_encode(
 			[
 				"value" => [
@@ -495,7 +496,7 @@ class SettingsContext implements Context {
 					"resource" => [
 						"type" => "TYPE_USER"
 					],
-					"boolValue" => false
+					"boolValue" => $status
 				]
 			],
 			JSON_THROW_ON_ERROR
@@ -521,7 +522,7 @@ class SettingsContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function theUserHasDisabledAutoAccepting(string $user): void {
-		$response = $this->sendRequestToDisableAutoAccepting($user);
+		$response = $this->toggleAutoAcceptSharesSetting($user, false);
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			201,
 			"Expected response status code should be 201",
@@ -531,19 +532,21 @@ class SettingsContext implements Context {
 	}
 
 	/**
-	 * @When user :user disables the auto-sync share using the settings API
+	 * @When /^user "([^"]*)" (disables|enables) the auto-sync share using the settings API$/
 	 *
 	 * @param string $user
+	 * @param string $status
 	 *
 	 * @return void
 	 *
 	 * @throws Exception
 	 * @throws GuzzleException
 	 */
-	public function userDisablesAutoAcceptingUsingSettingsApi(string $user): void {
-		$response = $this->sendRequestToDisableAutoAccepting($user);
+	public function userEnablesOrDisablesTheAutoSyncShareUsingTheSettingsApi(string $user, string $status): void {
+		$enable = $status === "enables";
+		$response = $this->toggleAutoAcceptSharesSetting($user, $enable);
 		$this->featureContext->setResponse($response);
-		$this->featureContext->rememberUserAutoSyncSetting($user, false);
+		$this->featureContext->rememberUserAutoSyncSetting($user, $enable);
 	}
 
 	/**
@@ -721,5 +724,47 @@ class SettingsContext implements Context {
 	): void {
 		$response = $this->setEmailSendingInterval($user, $interval);
 		$this->featureContext->theHTTPStatusCodeShouldBe(201, "", $response);
+	}
+
+	/**
+	 * @Then for user :user setting :setting should have value :value
+	 *
+	 * @param string $user
+	 * @param string $settingName
+	 * @param string $value
+	 *
+	 * @return void
+	 * @throws Exception|GuzzleException
+	 */
+	public function forUserSettingShouldHaveValue(string $user, string $settingName, string $value): void {
+		$response = SettingsHelper::getValuesBySettingID(
+			$this->featureContext->getBaseUrl(),
+			SettingsHelper::PROFILE_SETTINGS[$settingName],
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+		);
+		$this->featureContext->theHTTPStatusCodeShouldBe(201, "", $response);
+
+		$setting = HttpRequestHelper::getJsonDecodedResponseBodyContent($response)->value->value;
+		if (\property_exists($setting, 'stringValue')) {
+			$settingValue = $setting->stringValue;
+		} elseif (\property_exists($setting, 'boolValue')) {
+			$settingValue = $setting->boolValue;
+			$value = $value === "true" ? true : false;
+		} elseif (\property_exists($setting, 'listValue')) {
+			$settingValue = $setting->listValue->values[0]->stringValue;
+		} else {
+			Assert::fail(
+				"Setting '$settingName' does not have a stringValue, boolValue or listValue."
+				. "\n"
+				. json_encode($setting)
+			);
+		}
+
+		Assert::assertSame(
+			$value,
+			$settingValue,
+			"Expected setting value '$value' but got '$settingValue'"
+		);
 	}
 }
