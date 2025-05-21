@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2025-05-21-08-45-34]
+[#deprecation-note-2025-05-21-13-29-45]
 [caption=]
 .Deprecation notes for the proxy service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -843,7 +843,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
-Enables Space management through OIDC claims.
+Enables Space management through OIDC claims. See the text description for more details.
 
 a|`OCIS_CLAIM_MANAGED_SPACES_CLAIMNAME` +
 

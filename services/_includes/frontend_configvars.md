@@ -89,3 +89,4 @@
 | OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST<br/>FRONTEND_PASSWORD_POLICY_BANNED_PASSWORDS_LIST | string |  | Path to the 'banned passwords list' file. This only impacts public link password validation. See the documentation for more details.|
 | OCIS_MAX_TAG_LENGTH | int | 100 | Define the maximum tag length. Defaults to 100 if not set. Set to 0 to not limit the tag length. Changes only impact the validation of new tags.|
 | FRONTEND_CONFIGURABLE_NOTIFICATIONS | bool | false | Allow configuring notifications via web client.|
+| OCIS_CLAIM_MANAGED_SPACES_ENABLED | bool | false | Enables Space management through OIDC claims. See the text description for more details.|

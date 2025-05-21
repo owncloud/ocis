@@ -1,6 +1,6 @@
 ---
 title: Proxy
-date: 2025-05-21T08:45:34.890686894Z
+date: 2025-05-21T13:29:47.403617246Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/proxy
@@ -22,14 +22,16 @@ The proxy service is the only service communicating to the outside and needs the
 
 * [Authentication](#authentication)
 * [Configuring Routes](#configuring-routes)
-* [Automatic User and Group Provisioning](#automatic-user-and-group-provisioning)
-  * [Prequisites](#prequisites)
-  * [Configuration](#configuration)
-  * [How it Works](#how-it-works)
-  * [Claim Updates](#claim-updates)
+* [Automatic Assignments](#automatic-assignments)
+  * [Automatic User and Group Provisioning](#automatic-user-and-group-provisioning)
+    * [Prequisites](#prequisites)
+    * [Configuration](#configuration)
+    * [How it Works](#how-it-works)
+    * [Claim Updates](#claim-updates)
     * [Impacts](#impacts)
-* [Automatic Quota Assignments](#automatic-quota-assignments)
-* [Automatic Role Assignments](#automatic-role-assignments)
+  * [Quota Assignments](#quota-assignments)
+  * [Role Assignments](#role-assignments)
+  * [Space Management Through OIDC Claims](#space-management-through-oidc-claims)
 * [Recommendations for Production Deployments](#recommendations-for-production-deployments)
   * [Content Security Policy](#content-security-policy)
 * [Caching](#caching)
@@ -88,12 +90,16 @@ unprotected: false # with false (default), calling the endpoint requires authori
                    # with true, anyone can call the endpoint without authorisation.
 ```
 
-## Automatic User and Group Provisioning
+## Automatic Assignments
+
+Some assignments can be automated using yaml files, environment variables and/or OIDC claims.
+
+### Automatic User and Group Provisioning
 
 When using an external OpenID Connect IDP, the proxy can be configured to automatically provision
 users upon their first login.
 
-### Prequisites
+#### Prequisites
 
 A number of prerequisites must be met for automatic user provisioning to work:
 
@@ -108,7 +114,7 @@ A number of prerequisites must be met for automatic user provisioning to work:
   stable per IDP. If a claim like `email` or `preferred_username` is used, you
   have to ensure that the user's email address or username never changes.
 
-### Configuration
+#### Configuration
 
 To enable automatic user provisioning, the following environment variables must
 be set for the proxy service:
@@ -138,7 +144,7 @@ This is the name of the user attribute in ocis that is used to lookup the user b
 value of the `PROXY_USER_OIDC_CLAIM`. For auto provisioning setups this usually
 needs to be set to `username`.
 
-### How it Works
+#### How it Works
 
 When a user logs into ownCloud Infinite Scale for the first time, the proxy
 checks if that user already exists. This is done by querying the `users` service for users,
@@ -166,7 +172,7 @@ somewhat costly operation, especially if the user is a member of a large number 
 groups. If the group memberships of a user are changed in the IDP after the
 first login, it can take up to 5 minutes until the changes are reflected in Infinite Scale.
 
-### Claim Updates
+#### Claim Updates
 
 OpenID Connect (OIDC) scopes are used by an application during authentication to authorize access to a user's detail, like name, email or picture information. A scope can also contain among other things groups, roles, and permissions data. Each scope returns a set of attributes, which are called claims. The scopes an application requests, depends on which  attributes the application needs. Once the user authorizes the requested scopes, the claims are returned in a token.
 
@@ -190,7 +196,7 @@ For shares or space memberships based on groups, a renamed or deleted group will
 
 To give access for rejected users on a resource, one with rights to share must update the group information.
 
-## Automatic Quota Assignments
+### Quota Assignments
 
 It is possible to automatically assign a specific quota to new users depending on their role.
 To do this, you need to configure a mapping between roles defined by their ID and the quota in bytes.
@@ -203,7 +209,7 @@ role_quotas:
     <role ID2>: <quota2>
 ```
 
-## Automatic Role Assignments
+### Role Assignments
 
 When users login, they do automatically get a role assigned. The automatic role assignment can be
 configured in different ways. The `PROXY_ROLE_ASSIGNMENT_DRIVER` environment variable (or the `driver`
@@ -264,6 +270,58 @@ The default `role_claim` (or `PROXY_ROLE_ASSIGNMENT_OIDC_CLAIM`) is `roles`. The
 - role_name: guest
   claim_value: ocisGuest
 ```
+
+### Space Management Through OIDC Claims
+
+**IMPORTANT**
+* This is an experimental/preview feature and may change.
+* This feature only works using an external IDP. The embedded IDP does not support this.
+* If you enable this feature, you can no longer use the Web UI to manually to assign or remove users to Spaces. The Web UI no longer displays related configuration options. Assigning or removing users from a Space can only be done by claims managed through the IDP.
+* If enabled and a user is not assigned a claim with defined spaces and roles, the user can only access his personal space.
+* When this functionality has been enabled via the envvar `OCIS_CLAIM_MANAGED_SPACES_ENABLED`, this envvar must also be set in the `frontend` service. This is necessary to block adding or removing users to or from spaces through the web UI.
+
+If required, users can be assigned or removed to Spaces via OIDC claims. This makes central user/Space management easy. Managed via environment variables, administrators can define the claim to use, a regex ruleset to extract the Space IDs and roles from a claim for provisioning. It is also possible to manually map OIDC roles to Infinite Scale Space roles. Note that assigning works both ways. Users can be added to Spaces as well as removed. Users must log out and log in again to activate any changes. The relevant environment variables that manage Spaces through OIDC claims follow the `OCIS_CLAIM_MANAGED_SPACES_xxx` pattern. See xref:maintenance/space-ids/space-ids.adoc[Listing Space IDs] for how to obtain the ID of a Space.
+
+**NOTE**\
+The following rules apply if enabled:
+
+* If the claim is not found, it is not considered but the incident is logged.
+* A faulty regex prevents the proxy service from starting. By this, admins can immediately identify a major configuration issue. The incident is logged.
+* Entries in a claim that do not match the regex are not considered, the incident is not logged ^(1)^.
+* Unknown Space IDs and unknown roles are not considered, the incident is not logged ^(1)^.
+* When multiple entries are created with the same Space ID but different roles, the role with the highest permission counts.
+
+(1) ... These incidents cannot be logged due to the fact that claims can have a variety of layouts and may also contain data unrelated to Infinite Scale.
+
+**Example Setup**\
+The following is a simple setup of what space management through OIDC claims can look like. The way how a claim is setup depends on the IDP used. It is important to understand, that the claim setup and the corresponding regex must match.
+
+
+A claim defined as `ocis-spaces` containing two entries:
+```JSON
+"ocis-spaces": [
+    "spaceid=b622d44a-1747-4eda-8905-89f3605d5849:role=member",
+    "spaceid=129cb9b6-c579-41b5-9316-93c6543484e5:role=spectator",
+]
+```
+
+The environment variables to extract the data from the above claim look like this:
+
+Environment variable definition:
+```plaintext
+OCIS_CLAIM_MANAGED_SPACES_ENABLED=true
+OCIS_CLAIM_MANAGED_SPACES_CLAIMNAME=ocis-spaces
+OCIS_CLAIM_MANAGED_SPACES_REGEXP="spaceid=([a-zA-Z0-9-]+):role=(.*)",
+OCIS_CLAIM_MANAGED_SPACES_MAPPING="member:editor,spectator:viewer"
+```
+
+Result:\
+This would add a user, to which this claim is assigned, to the following Spaces with defined roles:
+
+* `b622d44a-1747-4eda-8905-89f3605d5849` with the role `editor` and to
+* `129cb9b6-c579-41b5-9316-93c6543484e5` with the role `viewer`.
+
+Note that `OCIS_CLAIM_MANAGED_SPACES_MAPPING` can be omitted if roles in the claim already match roles defined by Infinite Scale.
 
 ## Recommendations for Production Deployments
 

@@ -150,3 +150,4 @@ password_policy:
 validation:
   max_tag_length: 100
 configurable_notifications: false
+server_managed_spaces: false
