@@ -110,7 +110,7 @@ require (
 	google.golang.org/grpc v1.71.1
 	google.golang.org/protobuf v1.36.6
 	gopkg.in/yaml.v2 v2.4.0
-	gotest.tools/v3 v3.5.1
+	gotest.tools/v3 v3.5.2
 	stash.kopano.io/kgol/rndm v1.1.2
 )
 
