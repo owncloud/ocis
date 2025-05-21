@@ -5,7 +5,6 @@ services:
       ocis-net:
         aliases:
           - ${COLLABORA_DOMAIN:-collabora.owncloud.test}
-          - ${WOPISERVER_DOMAIN:-wopiserver.owncloud.test}
   ocis:
     environment:
       # make collabora the secure view app
@@ -29,7 +28,7 @@ services:
       COLLABORATION_HTTP_ADDR: 0.0.0.0:9300
       MICRO_REGISTRY: "nats-js-kv"
       MICRO_REGISTRY_ADDRESS: "ocis:9233"
-      COLLABORATION_WOPI_SRC: https://${WOPISERVER_DOMAIN:-wopiserver.owncloud.test}
+      COLLABORATION_WOPI_SRC: http://collaboration:9300
       COLLABORATION_APP_NAME: "CollaboraOnline"
       COLLABORATION_APP_PRODUCT: "Collabora"
       COLLABORATION_APP_ADDR: https://${COLLABORA_DOMAIN:-collabora.owncloud.test}
@@ -44,7 +43,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.collaboration.entrypoints=https"
-      - "traefik.http.routers.collaboration.rule=Host(`${WOPISERVER_DOMAIN:-wopiserver.owncloud.test}`)"
+      - "traefik.http.routers.collaboration.rule=Host(`collaboration`)"
       - "traefik.http.routers.collaboration.tls.certresolver=http"
       - "traefik.http.routers.collaboration.service=collaboration"
       - "traefik.http.services.collaboration.loadbalancer.server.port=9300"
@@ -58,7 +57,6 @@ services:
     networks:
       ocis-net:
     environment:
-      aliasgroup1: https://${WOPISERVER_DOMAIN:-wopiserver.owncloud.test}:443
       DONT_GEN_SSL_CERT: "YES"
       extra_params: |
         --o:ssl.enable=${COLLABORA_SSL_ENABLE:-true} \

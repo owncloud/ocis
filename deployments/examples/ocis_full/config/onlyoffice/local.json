@@ -9,6 +9,21 @@
         "dbUser": "onlyoffice",
         "dbPass": "onlyoffice"
       },
+      "ipfilter": {
+        "rules": [
+          {
+            "address": "collaboration-oo",
+            "allowed": true
+          },
+          {
+            "address": "*",
+            "allowed": false
+          }
+        ],
+        "useforrequest": false,
+        "errorcode": 403
+      },
+
       "token": {
         "enable": {
           "request": {
