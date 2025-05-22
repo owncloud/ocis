@@ -1,5 +1,6 @@
 # Table of Contents
 
+* [Changelog for unreleased](#changelog-for-unreleased-unreleased)
 * [Changelog for 7.1.2](#changelog-for-712-2025-03-28)
 * [Changelog for 7.1.1](#changelog-for-711-2025-03-14)
 * [Changelog for 7.1.0](#changelog-for-710-2025-03-06)
@@ -54,6 +55,26 @@
 * [Changelog for 1.2.0](#changelog-for-120-2021-02-17)
 * [Changelog for 1.1.0](#changelog-for-110-2021-01-22)
 * [Changelog for 1.0.0](#changelog-for-100-2020-12-17)
+
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes for unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis/compare/v7.1.2...master
+
+## Summary
+
+* Bugfix - Fix Share roles translation: [#11241](https://github.com/owncloud/ocis/pull/11241)
+
+## Details
+
+* Bugfix - Fix Share roles translation: [#11241](https://github.com/owncloud/ocis/pull/11241)
+
+   We fixed the issue when the Share roles show a wrong translation after the user
+   location has changed back to English.
+
+   https://github.com/owncloud/ocis/issues/11025
+   https://github.com/owncloud/ocis/pull/11241
 
 # Changelog for [7.1.2] (2025-03-28)
 
