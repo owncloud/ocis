@@ -579,11 +579,10 @@ class CliContext implements Context {
 		string $spaceName,
 		string $user
 	): void {
-		$space = $this->spacesContext->getSpaceByName(
+		$spaceOwnerId = $this->spacesContext->getSpaceOwnerUserIdByName(
 			$user,
 			$spaceName
 		);
-		$spaceOwnerId = $space["owner"]["user"]["id"];
 		$this->featureContext->setResponse($this->listStaleUploads($spaceOwnerId));
 	}
 
@@ -627,11 +626,10 @@ class CliContext implements Context {
 		string $spaceName,
 		string $user
 	): void {
-		$space = $this->spacesContext->getSpaceByName(
+		$spaceOwnerId = $this->spacesContext->getSpaceOwnerUserIdByName(
 			$user,
 			$spaceName
 		);
-		$spaceOwnerId = $space["owner"]["user"]["id"];
 		$this->featureContext->setResponse($this->deleteStaleUploads($spaceOwnerId));
 	}
 
@@ -653,11 +651,10 @@ class CliContext implements Context {
 	): void {
 		$spaceOwnerId = null;
 		if ($spaceName !== '' && $user !== '') {
-			$space = $this->spacesContext->getSpaceByName(
+			$spaceOwnerId = $this->spacesContext->getSpaceOwnerUserIdByName(
 				$user,
 				$spaceName
 			);
-			$spaceOwnerId = $space["owner"]["user"]["id"];
 		}
 
 		$response = $this->listStaleUploads($spaceOwnerId);
@@ -686,11 +683,10 @@ class CliContext implements Context {
 		string $spaceName,
 		string $user
 	): void {
-		$space = $this->spacesContext->getSpaceByName(
+		$spaceOwnerId = $this->spacesContext->getSpaceOwnerUserIdByName(
 			$user,
 			$spaceName
 		);
-		$spaceOwnerId = $space["owner"]["user"]["id"];
 		$this->featureContext->setResponse($this->listTrashedResource($spaceOwnerId));
 	}
 
@@ -708,20 +704,17 @@ class CliContext implements Context {
 	}
 
 	/**
-	 * @Then /^the command output should contain "([^"]*)" trashed resources with the following information:$/
+	 * @param ResponseInterface|null $response
 	 *
-	 * @param int $count
-	 * @param TableNode $table
-	 *
-	 * @return void
+	 * @return array
 	 */
-	public function theCommandOutputShouldContainTheFollowingTrashResource(
-		int $count,
-		TableNode $table
-	): void {
-		$responseArray = $this->featureContext->getJsonDecodedResponseBodyContent();
+	protected function getTrashedResourceFromCliCommandResponse(
+		ResponseInterface $response = null
+	): array {
+		$responseArray = $this->featureContext->getJsonDecodedResponseBodyContent($response);
 		$lines = explode("\n", $responseArray->message);
 		$items = [];
+		$totalCount = 0;
 		foreach ($lines as $line) {
 			if (preg_match(
 				'/^\s*\|\s*([a-f0-9\-]{36})\s*\|\s*(.*?)\s*\|\s*(file|folder)\s*\|\s*([\d\-T:Z]+)\s*\|/',
@@ -741,6 +734,22 @@ class CliContext implements Context {
 				$totalCount = (int)$countMatch[1];
 			}
 		}
+		return [$items, $totalCount];
+	}
+
+	/**
+	 * @Then /^the command output should contain "([^"]*)" trashed resources with the following information:$/
+	 *
+	 * @param int $count
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 */
+	public function theCommandOutputShouldContainTheFollowingTrashResource(
+		int $count,
+		TableNode $table
+	): void {
+		[$items, $totalCount] = $this->getTrashedResourceFromCliCommandResponse();
 
 		Assert::assertSame($totalCount, $count, "Expected total trashed resource");
 
@@ -761,5 +770,128 @@ class CliContext implements Context {
 				"Could not find expected resource '{$expectedRow['resource']}' of type '{$expectedRow['type']}'"
 			);
 		}
+	}
+
+	/**
+	 * @When the administrator restores all the trashed resources of space :space owned by user :user
+	 *
+	 * @param string $spaceName
+	 * @param string $user
+	 *
+	 * @return void
+	 */
+	public function theAdministratorRestoresAllTheTrashedResourcesOfSpaceOwnedByUser(
+		string $spaceName,
+		string $user
+	): void {
+		$spaceOwnerId = $this->spacesContext->getSpaceOwnerUserIdByName(
+			$user,
+			$spaceName
+		);
+		$body = [
+			"command" => "storage-users trash-bin restore-all -y $spaceOwnerId"
+		];
+		$this->featureContext->setResponse(CliHelper::runCommand($body));
+	}
+
+	/**
+	 * @Then there should be no trashed resources of space :spaceName owned by user :user
+	 *
+	 * @param string $spaceName
+	 * @param string $user
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function thereShouldBeNoTrashedResourcesOfSpaceOwnedByUser(
+		string $spaceName,
+		string $user
+	): void {
+		$spaceOwnerId = $this->spacesContext->getSpaceOwnerUserIdByName(
+			$user,
+			$spaceName
+		);
+		$response = $this->listTrashedResource($spaceOwnerId);
+		[$items, $totalCount] = $this->getTrashedResourceFromCliCommandResponse($response);
+
+		Assert::assertSame($totalCount, 0, "Expected total trashed resource");
+	}
+
+	/**
+	 * @Then there should be :number trashed resources of space :spaceName owned by user :user:
+	 *
+	 * @param int $number
+	 * @param string $spaceName
+	 * @param string $user
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function thereShouldBeTrashedResourcesOfSpaceOwnedByUser(
+		int $number,
+		string $spaceName,
+		string $user,
+		TableNode $table
+	): void {
+		$spaceOwnerId = $this->spacesContext->getSpaceOwnerUserIdByName(
+			$user,
+			$spaceName
+		);
+		$response = $this->listTrashedResource($spaceOwnerId);
+		[$items, $totalCount] = $this->getTrashedResourceFromCliCommandResponse($response);
+
+		Assert::assertSame($totalCount, $number, "Expected total trashed resource");
+
+		foreach ($table->getHash() as $expectedRow) {
+			$matchFound = false;
+
+			foreach ($items as $item) {
+				if ($item['path'] === $expectedRow['resource']
+					&& $item['type'] === $expectedRow['type']
+				) {
+					$matchFound = true;
+					break;
+				}
+			}
+
+			Assert::assertTrue(
+				$matchFound,
+				"Could not find expected resource '{$expectedRow['resource']}' of type '{$expectedRow['type']}'"
+			);
+		}
+	}
+
+	/**
+	 * @When the administrator restores the trashed resources :resource of space :space owned by user :user
+	 *
+	 * @param string $resource
+	 * @param string $spaceName
+	 * @param string $user
+	 *
+	 * @return void
+	 */
+	public function theAdministratorRestoresTheTrashedResourcesOfSpaceOwnedByUser(
+		string $resource,
+		string $spaceName,
+		string $user
+	): void {
+		$spaceOwnerId = $this->spacesContext->getSpaceOwnerUserIdByName(
+			$user,
+			$spaceName
+		);
+		$response = $this->listTrashedResource($spaceOwnerId);
+		[$items, $totalCount] = $this->getTrashedResourceFromCliCommandResponse($response);
+		$trashItemId = null;
+		foreach ($items as $item) {
+			if ($item['path'] === $resource) {
+				$trashItemId = $item['itemID'];
+				break;
+			}
+		}
+		$body = [
+			"command" => "storage-users trash-bin restore $spaceOwnerId $trashItemId"
+		];
+		$this->featureContext->setResponse(CliHelper::runCommand($body));
 	}
 }
