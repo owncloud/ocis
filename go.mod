@@ -15,7 +15,7 @@ require (
 	github.com/beevik/etree v1.4.1
 	github.com/blevesearch/bleve/v2 v2.5.0
 	github.com/cenkalti/backoff v2.2.1+incompatible
-	github.com/coreos/go-oidc/v3 v3.11.0
+	github.com/coreos/go-oidc/v3 v3.14.1
 	github.com/cs3org/go-cs3apis v0.0.0-20241105092511-3ad35d174fc1
 	github.com/davidbyttow/govips/v2 v2.16.0
 	github.com/dhowden/tag v0.0.0-20240417053706-3d75831295e8
@@ -102,7 +102,7 @@ require (
 	golang.org/x/exp v0.0.0-20241009180824-f66d83c29e7c
 	golang.org/x/image v0.27.0
 	golang.org/x/net v0.38.0
-	golang.org/x/oauth2 v0.26.0
+	golang.org/x/oauth2 v0.28.0
 	golang.org/x/sync v0.14.0
 	golang.org/x/term v0.31.0
 	golang.org/x/text v0.25.0
