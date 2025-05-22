@@ -640,8 +640,8 @@ class CliContext implements Context {
 	 * @Then there should be :number stale uploads of space :spaceName owned by user :user
 	 *
 	 * @param int $number
-	 * @param string|null $spaceName
-	 * @param string|null $user
+	 * @param string $spaceName
+	 * @param string $user
 	 *
 	 * @return void
 	 * @throws GuzzleException
@@ -672,5 +672,94 @@ class CliContext implements Context {
 			"Expected message to contain '$expectedMessage', but got: " . ($jsonDecodedResponse->message ?? 'null')
 		);
 
+	}
+
+	/**
+	 * @When the administrator lists all the trashed resources of space :space owned by user :user
+	 *
+	 * @param string $spaceName
+	 * @param string $user
+	 *
+	 * @return void
+	 */
+	public function theAdministratorListsAllTrashedResourceOfSpaceOwnedByUser(
+		string $spaceName,
+		string $user
+	): void {
+		$space = $this->spacesContext->getSpaceByName(
+			$user,
+			$spaceName
+		);
+		$spaceOwnerId = $space["owner"]["user"]["id"];
+		$this->featureContext->setResponse($this->listTrashedResource($spaceOwnerId));
+	}
+
+	/**
+	 * @param string $spaceId
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	protected function listTrashedResource(string $spaceId): ResponseInterface {
+		$body = [
+			"command" => "storage-users trash-bin list $spaceId"
+		];
+		return CliHelper::runCommand($body);
+	}
+
+	/**
+	 * @Then /^the command output should contain "([^"]*)" trashed resources with the following information:$/
+	 *
+	 * @param int $count
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 */
+	public function theCommandOutputShouldContainTheFollowingTrashResource(
+		int $count,
+		TableNode $table
+	): void {
+		$responseArray = $this->featureContext->getJsonDecodedResponseBodyContent();
+		$lines = explode("\n", $responseArray->message);
+		$items = [];
+		foreach ($lines as $line) {
+			if (preg_match(
+				'/^\s*\|\s*([a-f0-9\-]{36})\s*\|\s*(.*?)\s*\|\s*(file|folder)\s*\|\s*([\d\-T:Z]+)\s*\|/',
+				$line,
+				$matches
+			)
+			) {
+				$items[] = [
+					'itemID'    => $matches[1],
+					'path'      => $matches[2],
+					'type'      => $matches[3],
+					'delete at' => $matches[4],
+				];
+			}
+
+			if (preg_match('/total count:\s*(\d+)/', $line, $countMatch)) {
+				$totalCount = (int)$countMatch[1];
+			}
+		}
+
+		Assert::assertSame($totalCount, $count, "Expected total trashed resource");
+
+		foreach ($table->getHash() as $expectedRow) {
+			$matchFound = false;
+
+			foreach ($items as $item) {
+				if ($item['path'] === $expectedRow['resource']
+					&& $item['type'] === $expectedRow['type']
+				) {
+					$matchFound = true;
+					break;
+				}
+			}
+
+			Assert::assertTrue(
+				$matchFound,
+				"Could not find expected resource '{$expectedRow['resource']}' of type '{$expectedRow['type']}'"
+			);
+		}
 	}
 }
