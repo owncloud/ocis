@@ -183,7 +183,6 @@
         "STORAGE_USERS_MOUNT_ID": "storage-users-1",
         "MICRO_REGISTRY": "memory",
         "SHARING_PUBLIC_DRIVER": "jsoncs3",
-        "FRONTEND_OCS_RESOURCE_INFO_CACHE_TTL": "0",
         "OCIS_LOG_LEVEL": "info",
         "OCIS_LOG_PRETTY": "true",
         "OCIS_LOG_COLOR": "true",

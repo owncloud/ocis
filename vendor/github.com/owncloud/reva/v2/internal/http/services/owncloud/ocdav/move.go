@@ -141,6 +141,46 @@ func (s *svc) handleSpacesMove(w http.ResponseWriter, r *http.Request, srcSpaceI
 }
 
 func (s *svc) handleMove(ctx context.Context, w http.ResponseWriter, r *http.Request, src, dst *provider.Reference, log zerolog.Logger) {
+	// First check if user has permission to move in the space
+	// 	so requests to move resources without permission get 403 (no permission) rather than 404 (not found)
+	client, err := s.gatewaySelector.Next()
+	if err != nil {
+		log.Error().Err(err).Msg("error selecting next client")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	spaceStatReq := &provider.StatRequest{Ref: &provider.Reference{ResourceId: src.ResourceId}}
+	spaceStatRes, err := client.Stat(ctx, spaceStatReq)
+	if err != nil {
+		log.Error().Err(err).Msg("error sending grpc stat request")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	if spaceStatRes.Status.Code != rpc.Code_CODE_OK {
+		if spaceStatRes.Status.Code == rpc.Code_CODE_PERMISSION_DENIED {
+			log.Warn().Int("code", int(spaceStatRes.Status.Code)).Msg("permission denied")
+			w.WriteHeader(http.StatusForbidden)
+			b, err := errors.Marshal(http.StatusForbidden, "permission denied", "", "")
+			errors.HandleWebdavError(&log, w, b, err)
+			return
+		}
+		log.Warn().Int("code", int(spaceStatRes.Status.Code)).Msg("error checking space permissions")
+		errors.HandleErrorStatus(&log, w, spaceStatRes.Status)
+		return
+	}
+
+	// Check if user has move permissions
+	if spaceStatRes.Info != nil &&
+		spaceStatRes.Info.PermissionSet != nil &&
+		!spaceStatRes.Info.PermissionSet.Move {
+		log.Warn().Int("code", int(spaceStatRes.Status.Code)).Msg("permission denied")
+		w.WriteHeader(http.StatusForbidden)
+		b, err := errors.Marshal(http.StatusForbidden, "permission denied: no move permission", "", "")
+		errors.HandleWebdavError(&log, w, b, err)
+		return
+	}
+
 	isChild, err := s.referenceIsChildOf(ctx, s.gatewaySelector, dst, src)
 	if err != nil {
 		switch err.(type) {
@@ -191,13 +231,6 @@ func (s *svc) handleMove(ctx context.Context, w http.ResponseWriter, r *http.Req
 	overwrite, err := net.ParseOverwrite(oh)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	client, err := s.gatewaySelector.Next()
-	if err != nil {
-		log.Error().Err(err).Msg("error selecting next client")
-		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 

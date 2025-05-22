@@ -1,8 +1,6 @@
 package defaults
 
 import (
-	"time"
-
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	"github.com/owncloud/ocis/v2/ocis-pkg/structs"
 	"github.com/owncloud/ocis/v2/services/frontend/pkg/config"
@@ -104,19 +102,6 @@ func DefaultConfig() *config.Config {
 		},
 		DataGateway: config.DataGateway{
 			Prefix: "data",
-		},
-		OCS: config.OCS{
-			Prefix:                      "ocs",
-			SharePrefix:                 "/Shares",
-			HomeNamespace:               "/users/{{.Id.OpaqueId}}",
-			AdditionalInfoAttribute:     "{{.Mail}}",
-			StatCacheType:               "memory",
-			StatCacheNodes:              []string{"127.0.0.1:9233"},
-			StatCacheDatabase:           "cache-stat",
-			StatCacheTTL:                300 * time.Second,
-			ListOCMShares:               true,
-			PublicShareMustHavePassword: true,
-			IncludeOCMSharees:           false,
 		},
 		Middleware: config.Middleware{
 			Auth: config.Auth{
