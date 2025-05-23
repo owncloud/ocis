@@ -1767,6 +1767,55 @@ class SharingNgContext implements Context {
 	}
 
 	/**
+	 * @When /^user "([^"]*)" lists the permission of space "([^"]*)" shared to user "([^"]*)" using root endpoint of the Graph API$/
+	 *
+	 * @param string $user
+	 * @param string $space
+	 * @param string $sharee
+	 *
+	 * @return void
+	 * @throws Exception
+	 * @throws GuzzleException
+	 *
+	 */
+	public function userListDrivePermissionViaRootEndpointGraphApi(string $user, string $space, string $sharee): void {
+		$spaceId = ($this->spacesContext->getSpaceByName($user, $space))["id"];
+		$permissionID = "u:" . $this->featureContext->getAttributeOfCreatedUser($sharee, 'id');
+		$response = GraphHelper::getSingleDrivePermissionList(
+			$this->featureContext->getBaseUrl(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			$spaceId,
+			$permissionID
+		);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @When /^user "([^"]*)" lists the last link permission of the space "([^"]*)" using root endpoint of the Graph API$/
+	 *
+	 * @param string $user
+	 * @param string $space
+	 *
+	 * @return void
+	 * @throws Exception
+	 * @throws GuzzleException
+	 *
+	 */
+	public function userListPermissionOfSpaceSharedViaLinkUsingRootEndpointGraphApi(string $user, string $space): void {
+		$spaceId = ($this->spacesContext->getSpaceByName($user, $space))["id"];
+		$permissionId = $this->featureContext->shareNgGetLastCreatedLinkShareID();
+		$response = GraphHelper::getSingleDrivePermission(
+			$this->featureContext->getBaseUrl(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			$spaceId,
+			$permissionId
+		);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
 	 * @When /^user "([^"]*)" (?:tries to send|sends) the following space share invitation using root endpoint of the Graph API:$/
 	 *
 	 * @param string $user
