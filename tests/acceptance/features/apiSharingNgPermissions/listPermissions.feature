@@ -1743,7 +1743,7 @@ Feature: List a sharing permissions
       }
       """
 
-  @issues-8428
+  @issues-9571
   Scenario: user lists permissions of a shared folder in personal space
     Given user "Brian" has been created with default attributes
     And user "Alice" has created folder "folder"
@@ -1848,7 +1848,7 @@ Feature: List a sharing permissions
       }
       """
 
-  @issues-8428
+  @issues-9571
   Scenario: user lists permissions of a shared file in personal space
     Given user "Brian" has been created with default attributes
     And user "Alice" has uploaded file with content "hello world" to "/textfile0.txt"
@@ -1949,7 +1949,7 @@ Feature: List a sharing permissions
       }
       """
 
-  @issues-8428
+  @issues-9571
   Scenario: user lists permissions of a shared folder in project space
     Given using spaces DAV path
     And user "Brian" has been created with default attributes
@@ -2057,7 +2057,7 @@ Feature: List a sharing permissions
       }
       """
 
-  @issues-8428
+  @issues-9571
   Scenario: user lists permissions of a shared file in project space
     Given using spaces DAV path
     And user "Brian" has been created with default attributes
@@ -2575,6 +2575,94 @@ Feature: List a sharing permissions
               "message": {
                 "pattern": "stat: error: not found: %user_id_pattern%$"
               }
+            }
+          }
+        }
+      }
+      """
+
+  @issues-8616
+  Scenario: user lists single permission of a folder shared via user invitation
+    Given user "Brian" has been created with default attributes
+    And user "Alice" has created folder "folder"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | folder   |
+      | space           | Personal |
+      | sharee          | Brian    |
+      | shareType       | user     |
+      | permissionsRole | Viewer   |
+    And user "Brian" has a share "folder" synced
+    When user "Alice" lists the permission for folder "folder" of the space "Personal" shared via invitation using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["createdDateTime", "id", "roles", "grantedToV2"],
+        "properties": {
+          "createdDateTime": {"format": "date-time"},
+          "id": {"pattern": "^%permissions_id_pattern%$"},
+          "roles": {
+            "type": "array",
+            "maxItems": 1,
+            "minItems": 1,
+            "items": {"pattern": "^%role_id_pattern%$"}
+          },
+          "grantedToV2": {
+            "type": "object",
+            "required": ["user"],
+            "properties": {
+              "user": {
+                "type": "object",
+                "required": ["@libre.graph.userType", "id", "displayName"],
+                "properties": {
+                  "@libre.graph.userType": {"const": "Member"},
+                  "id": {"pattern": "^%user_id_pattern%$"},
+                  "displayName": {"const": "Brian Murphy"}
+                }
+              }
+            }
+          }
+        }
+      }
+      """
+
+  @issues-8616
+  Scenario: user lists single permission of a folder shared via link
+    Given user "Alice" has created folder "folder"
+    And user "Alice" has created the following resource link share:
+      | resource        | folder   |
+      | space           | Personal |
+      | permissionsRole | View     |
+      | password        | %public% |
+    When user "Alice" lists the permission for folder "folder" of the space "Personal" shared via link using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["createdDateTime", "hasPassword", "id", "link"],
+        "properties": {
+          "createdDateTime": {
+            "format": "date-time"
+          },
+          "hasPassword": { "const": true},
+          "id": {"pattern": "^[a-zA-Z]{15}$"},
+          "link": {
+            "type": "object",
+            "required": [
+              "@libre.graph.displayName",
+              "@libre.graph.quickLink",
+              "preventsDownload",
+              "type",
+              "webUrl"
+            ],
+            "properties": {
+              "@libre.graph.displayName": {"const": ""},
+              "@libre.graph.quickLink": {"const": false},
+              "preventsDownload": {"const": false},
+              "type": {"const": "view"},
+              "webUrl": {"pattern": "^%base_url%/s/[a-zA-Z]{15}$"}
             }
           }
         }
