@@ -92,3 +92,47 @@ Feature: trashbin
       | resource          | type   |
       | /testfile.txt     | file   |
       | /folder-to-delete | folder |
+
+
+  Scenario: purge expired trashed resources of Personal space
+    Given the following configs have been set:
+      | config                                               | value |
+      | STORAGE_USERS_PURGE_TRASH_BIN_PERSONAL_DELETE_BEFORE | 1s    |
+    And using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created the following folders
+      | path              |
+      | folder-to-delete  |
+    And user "Alice" has deleted folder "/folder-to-delete"
+    And user "Alice" has created a space "Newspace" with the default quota using the Graph API
+    And user "Alice" has created a folder "uploadFolder" in space "Newspace"
+    And user "Alice" has uploaded a file inside space "Newspace" with content "hello world" to "text.txt"
+    And user "Alice" has removed the file "text.txt" from space "Newspace"
+    And the system waits for "1" seconds
+    When the administrator purges the expired trash resources
+    Then there should be no trashed resources of space "Personal" owned by user "Alice"
+    And there should be "1" trashed resources of space "Newspace" owned by user "Alice":
+      | resource  | type   |
+      | /text.txt | file |
+
+
+  Scenario: purge expired trashed resources of project space
+    Given the following configs have been set:
+      | config                                              | value |
+      | STORAGE_USERS_PURGE_TRASH_BIN_PROJECT_DELETE_BEFORE | 1s    |
+    And using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created the following folders
+      | path              |
+      | folder-to-delete  |
+    And user "Alice" has deleted folder "/folder-to-delete"
+    And user "Alice" has created a space "Newspace" with the default quota using the Graph API
+    And user "Alice" has created a folder "uploadFolder" in space "Newspace"
+    And user "Alice" has uploaded a file inside space "Newspace" with content "hello world" to "text.txt"
+    And user "Alice" has removed the file "text.txt" from space "Newspace"
+    And the system waits for "1" seconds
+    When the administrator purges the expired trash resources
+    Then there should be no trashed resources of space "Newspace" owned by user "Alice"
+    And there should be "1" trashed resources of space "Personal" owned by user "Alice":
+      | resource          | type   |
+      | /folder-to-delete | folder |

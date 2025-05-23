@@ -894,4 +894,17 @@ class CliContext implements Context {
 		];
 		$this->featureContext->setResponse(CliHelper::runCommand($body));
 	}
+
+	/**
+	 * @When the administrator purges the expired trash resources
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function theAdministratorPurgesTheExpiredTrashResources(): void {
+		$body = [
+			"command" => "storage-users trash-bin purge-expired"
+		];
+		$this->featureContext->setResponse(CliHelper::runCommand($body));
+	}
 }
