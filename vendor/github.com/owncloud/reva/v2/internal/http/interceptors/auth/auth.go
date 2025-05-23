@@ -31,6 +31,7 @@ import (
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
+	"github.com/mitchellh/mapstructure"
 	"github.com/owncloud/reva/v2/internal/http/interceptors/auth/credential/registry"
 	tokenregistry "github.com/owncloud/reva/v2/internal/http/interceptors/auth/token/registry"
 	tokenwriterregistry "github.com/owncloud/reva/v2/internal/http/interceptors/auth/tokenwriter/registry"
@@ -46,7 +47,6 @@ import (
 	"github.com/owncloud/reva/v2/pkg/token"
 	tokenmgr "github.com/owncloud/reva/v2/pkg/token/manager/registry"
 	"github.com/owncloud/reva/v2/pkg/utils"
-	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 	semconv "go.opentelemetry.io/otel/semconv/v1.20.0"
@@ -186,13 +186,11 @@ func New(m map[string]interface{}, unprotected []string, tp trace.TracerProvider
 				return
 			}
 
-			log := appctx.GetLogger(r.Context())
 			isUnprotectedEndpoint := false
 
 			// For unprotected URLs, we try to authenticate the request in case some service needs it,
 			// but don't return any errors if it fails.
 			if utils.Skip(r.URL.Path, unprotected) {
-				log.Info().Msg("skipping auth check for: " + r.URL.Path)
 				isUnprotectedEndpoint = true
 			}
 
@@ -245,7 +243,11 @@ func authenticateUser(w http.ResponseWriter, r *http.Request, conf *config, toke
 		}
 	}
 
-	log.Warn().Msg("core access token not set")
+	if isUnprotectedEndpoint {
+		log.Info().Msgf("skipping auth check for: %s", r.URL.Path)
+	} else {
+		log.Warn().Msgf("core access token not set for URL %s", r.URL.Path)
+	}
 
 	userAgentCredKeys := getCredsForUserAgent(r.UserAgent(), conf.CredentialsByUserAgent, conf.CredentialChain)
 
