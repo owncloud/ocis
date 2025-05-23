@@ -25,6 +25,8 @@ import (
 	"net"
 	"sort"
 
+	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
+	"github.com/mitchellh/mapstructure"
 	"github.com/owncloud/reva/v2/internal/grpc/interceptors/appctx"
 	"github.com/owncloud/reva/v2/internal/grpc/interceptors/auth"
 	"github.com/owncloud/reva/v2/internal/grpc/interceptors/log"
@@ -33,8 +35,6 @@ import (
 	"github.com/owncloud/reva/v2/internal/grpc/interceptors/useragent"
 	"github.com/owncloud/reva/v2/pkg/sharedconf"
 	rtrace "github.com/owncloud/reva/v2/pkg/trace"
-	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
-	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 	mtls "go-micro.dev/v4/util/tls"
@@ -279,15 +279,15 @@ func (s *Server) cleanupServices() {
 
 // Stop stops the server.
 func (s *Server) Stop() error {
-	s.cleanupServices()
 	s.s.Stop()
+	s.cleanupServices()
 	return nil
 }
 
 // GracefulStop gracefully stops the server.
 func (s *Server) GracefulStop() error {
-	s.cleanupServices()
 	s.s.GracefulStop()
+	s.cleanupServices()
 	return nil
 }
 
