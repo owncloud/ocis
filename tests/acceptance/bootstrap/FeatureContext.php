@@ -179,7 +179,7 @@ class FeatureContext extends BehatVariablesContext {
 		if (\array_key_exists($user, $this->autoSyncSettings)) {
 			return $this->autoSyncSettings[$user];
 		}
-		$autoSyncSetting = SettingsHelper::getAutoAcceptSharesSettingValue(
+		$autoSyncSetting = SettingsHelper::getAutoAcceptSharesDefaultValue(
 			$this->baseUrl,
 			$user,
 			$this->getPasswordForUser($user),
