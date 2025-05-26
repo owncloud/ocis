@@ -78,6 +78,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix Share roles translation: [#11241](https://github.com/owncloud/ocis/pull/11241)
 * Bugfix - Fix error on listing space members: [#11245](https://github.com/owncloud/ocis/pull/11245)
 * Bugfix - Fix collaboration service LastModifiedDate: [#11328](https://github.com/owncloud/ocis/pull/11328)
+* Bugfix - Fix the reva log interceptor: [#11348](https://github.com/owncloud/ocis/pull/11348)
 * Enhancement - Update Mockery to 2.52.3: [#11070](https://github.com/owncloud/ocis/pull/11070)
 * Enhancement - Improve postprocessing logs: [#11108](https://github.com/owncloud/ocis/pull/11108)
 * Enhancement - Improve graph space management logs: [#11115](https://github.com/owncloud/ocis/pull/11115)
@@ -197,6 +198,15 @@ The following sections list the changes for unreleased.
    Collaboration service now returns correct LastModifiedDate.
 
    https://github.com/owncloud/ocis/pull/11328
+
+* Bugfix - Fix the reva log interceptor: [#11348](https://github.com/owncloud/ocis/pull/11348)
+
+   Fix the reva log interceptor. Implemented the Unwrap interface to allow TUS
+   middleware to handle correctly SetReadDeadline and SetWriteDeadline functions
+   and to avoid the error during the upload.
+
+   https://github.com/owncloud/ocis/issues/10857
+   https://github.com/owncloud/ocis/pull/11348
 
 * Enhancement - Update Mockery to 2.52.3: [#11070](https://github.com/owncloud/ocis/pull/11070)
 
