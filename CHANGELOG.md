@@ -92,6 +92,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Update ocis_full deployment example images: [#11319](https://github.com/owncloud/ocis/pull/11319)
 * Enhancement - Bump Web to 11.3.2: [#11330](https://github.com/owncloud/ocis/pull/11330)
 * Enhancement - Add capability for server managed spaces: [#11332](https://github.com/owncloud/ocis/pull/11332)
+* Enhancement - Bump Web to 11.3.3: [#12593](https://github.com/owncloud/web/pull/12593)
 
 ## Details
 
@@ -302,6 +303,16 @@ The following sections list the changes for unreleased.
    adding/removing users to/from spaces in the web UI.
 
    https://github.com/owncloud/ocis/pull/11332
+
+* Enhancement - Bump Web to 11.3.3: [#12593](https://github.com/owncloud/web/pull/12593)
+
+   - Bugfix [owncloud/web#12326](https://github.com/owncloud/web/pull/12326): Do
+   not reveal generated password - Bugfix
+   [owncloud/web#12326](https://github.com/owncloud/web/pull/12326): Drop advanced
+   mode when creating links
+
+   https://github.com/owncloud/web/pull/12593
+   https://github.com/owncloud/web/releases/tag/v11.3.3
 
 # Changelog for [7.1.2] (2025-03-28)
 
