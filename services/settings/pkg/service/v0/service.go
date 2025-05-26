@@ -708,7 +708,8 @@ func translateBundle(bundle *settingsmsg.Bundle, t *gotext.Locale) *settingsmsg.
 			defaults.SettingUUIDProfileEventSpaceUnshared,
 			defaults.SettingUUIDProfileEventSpaceMembershipExpired,
 			defaults.SettingUUIDProfileEventSpaceDisabled,
-			defaults.SettingUUIDProfileEventSpaceDeleted:
+			defaults.SettingUUIDProfileEventSpaceDeleted,
+			defaults.SettingUUIDProfileEventPostprocessingStepFinished:
 			// translate event names ('Share Received', 'Share Removed', ...)
 			set.DisplayName = t.Get(set.GetDisplayName())
 			// translate event descriptions ('Notify me when I receive a share', ...)
