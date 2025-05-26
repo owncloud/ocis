@@ -249,8 +249,6 @@ github.com/crewjam/saml v0.4.14 h1:g9FBNx62osKusnFzs3QTN5L9CVA/Egfgm+stJShzw/c=
 github.com/crewjam/saml v0.4.14/go.mod h1:UVSZCf18jJkk6GpWNVqcyQJMD5HsRugBPf4I1nl2mME=
 github.com/cs3org/go-cs3apis v0.0.0-20241105092511-3ad35d174fc1 h1:RU6LT6mkD16xZs011+8foU7T3LrPvTTSWeTQ9OgfhkA=
 github.com/cs3org/go-cs3apis v0.0.0-20241105092511-3ad35d174fc1/go.mod h1:DedpcqXl193qF/08Y04IO0PpxyyMu8+GrkD6kWK2MEQ=
-github.com/cs3org/reva/v2 v2.27.7 h1:KjTDcEgySC4Q9nFIrpBeq+8IDAetTTanx/PbLSzNphs=
-github.com/cs3org/reva/v2 v2.27.7/go.mod h1:1H26PMXoa1rDrIoZ7lGOerq1Bg07/5srYfRaKfxBSsc=
 github.com/cyberdelia/templates v0.0.0-20141128023046-ca7fffd4298c/go.mod h1:GyV+0YP4qX0UQ7r2MoYZ+AvYDp12OF5yg4q8rGnyNh4=
 github.com/cyphar/filepath-securejoin v0.2.5 h1:6iR5tXJ/e6tJZzzdMc1km3Sa7RRIVBKAK32O2s7AYfo=
 github.com/cyphar/filepath-securejoin v0.2.5/go.mod h1:aPGpWjXOXUn2NCNjFvBE6aRxGGx79pTxQpKOJNYHHl4=
@@ -883,6 +881,8 @@ github.com/orcaman/concurrent-map v1.0.0/go.mod h1:Lu3tH6HLW3feq74c2GC+jIMS/K2CF
 github.com/ovh/go-ovh v1.1.0/go.mod h1:AxitLZ5HBRPyUd+Zl60Ajaag+rNTdVXWIkzfrVuTXWA=
 github.com/owncloud/libre-graph-api-go v1.0.5-0.20250217093259-fa3804be6c27 h1:ID8s5lGBntmrlI6TbDAjTzRyHucn3bVM2wlW+HBplv4=
 github.com/owncloud/libre-graph-api-go v1.0.5-0.20250217093259-fa3804be6c27/go.mod h1:+gT+x62AS9u2Farh9wE2uYmgdvTg0MQgsSI62D+xoRg=
+github.com/owncloud/reva/v2 v2.0.0-20250228075939-dfd964e1fe58 h1:q1FVV97Ri+uf8c/2WlCYuJ8t3FX921a/5BCGSJxhdmM=
+github.com/owncloud/reva/v2 v2.0.0-20250228075939-dfd964e1fe58/go.mod h1:1H26PMXoa1rDrIoZ7lGOerq1Bg07/5srYfRaKfxBSsc=
 github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c h1:rp5dCmg/yLR3mgFuSOe4oEnDDmGLROTvMragMUXpTQw=
 github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c/go.mod h1:X07ZCGwUbLaax7L0S3Tw4hpejzu63ZrrQiUe6W0hcy0=
 github.com/pablodz/inotifywaitgo v0.0.7 h1:1ii49dGBnRn0t1Sz7RGZS6/NberPEDQprwKHN49Bv6U=
