@@ -66,6 +66,7 @@ The following sections list the changes for unreleased.
 
 * Bugfix - Fix Share roles translation: [#11241](https://github.com/owncloud/ocis/pull/11241)
 * Bugfix - Fix collaboration service LastModifiedDate: [#11328](https://github.com/owncloud/ocis/pull/11328)
+* Bugfix - Fix translations in Settings: [#11361](https://github.com/owncloud/ocis/pull/11361)
 
 ## Details
 
@@ -82,6 +83,12 @@ The following sections list the changes for unreleased.
    Collaboration service now returns correct LastModifiedDate.
 
    https://github.com/owncloud/ocis/pull/11328
+
+* Bugfix - Fix translations in Settings: [#11361](https://github.com/owncloud/ocis/pull/11361)
+
+   Notification option translation where missing one string. This is fixed.
+
+   https://github.com/owncloud/ocis/pull/11361
 
 # Changelog for [7.1.2] (2025-03-28)
 
