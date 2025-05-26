@@ -33,7 +33,10 @@ class SettingsHelper {
 	private static string $settingsEndpoint = '/api/v0/settings/';
 
 	private const BUNDLE_ID = "2a506de7-99bd-4f0d-994e-c38e72c28fd9";
-	private const PROFILE_LANGUAGE_ID = "aa8cfbe5-95d4-4f7e-a032-c3c01f5f062f";
+	public const PROFILE_SETTINGS = [
+		'language' => 'aa8cfbe5-95d4-4f7e-a032-c3c01f5f062f',
+		'auto-accept-shares' => 'ec3ed4a3-3946-4efc-8f9f-76d38b12d3a9',
+	];
 
 	private const DEFAULT_SETTING_EVENTS = [
 		'Disable Email Notifications' => '33ffb5d6-cd07-4dc0-afb0-84f7559ae438',
@@ -259,7 +262,7 @@ class SettingsHelper {
 	 * @throws GuzzleException
 	 * @throws Exception
 	 */
-	public static function getAutoAcceptSharesSettingValue(
+	public static function getAutoAcceptSharesDefaultValue(
 		string $baseUrl,
 		string $user,
 		string $password,
@@ -299,7 +302,7 @@ class SettingsHelper {
 	): string {
 		$response = self::getValuesBySettingID(
 			$baseUrl,
-			self::PROFILE_LANGUAGE_ID,
+			self::PROFILE_SETTINGS['language'],
 			$user,
 			$password,
 		);

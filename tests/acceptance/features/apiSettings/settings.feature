@@ -12,6 +12,7 @@ Feature: settings api
 
 
   Scenario: disable auto-sync share
+    Given user "Alice" has uploaded file with content "lorem epsum" to "textfile.txt"
     When user "Brian" disables the auto-sync share using the settings API
     Then the HTTP status code should be "201"
     And the JSON data of the response should match
@@ -56,6 +57,14 @@ Feature: settings api
         }
       }
       """
+    And for user "Brian" setting "auto-accept-shares" should have value "false"
+    Given user "Alice" has sent the following resource share invitation:
+      | resource        | textfile.txt |
+      | space           | Personal     |
+      | sharee          | Brian        |
+      | shareType       | user         |
+      | permissionsRole | Viewer       |
+    Then user "Brian" should have sync disabled for share "textfile.txt"
 
 
   Scenario: assign role to user
@@ -180,6 +189,7 @@ Feature: settings api
         }
       }
       """
+    And for user "Alice" setting "language" should have value "de"
 
   @issue-5079
   Scenario Outline: user lists existing roles
