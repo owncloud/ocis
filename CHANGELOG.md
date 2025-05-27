@@ -92,7 +92,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Update ocis_full deployment example images: [#11319](https://github.com/owncloud/ocis/pull/11319)
 * Enhancement - Bump Web to 11.3.2: [#11330](https://github.com/owncloud/ocis/pull/11330)
 * Enhancement - Add capability for server managed spaces: [#11332](https://github.com/owncloud/ocis/pull/11332)
-* Enhancement - Bump Web to 11.3.3: [#12593](https://github.com/owncloud/web/pull/12593)
+* Enhancement - Bump Web to 11.3.4: [#12605](https://github.com/owncloud/web/pull/12605)
 
 ## Details
 
@@ -304,15 +304,15 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/11332
 
-* Enhancement - Bump Web to 11.3.3: [#12593](https://github.com/owncloud/web/pull/12593)
+* Enhancement - Bump Web to 11.3.4: [#12605](https://github.com/owncloud/web/pull/12605)
 
-   - Bugfix [owncloud/web#12326](https://github.com/owncloud/web/pull/12326): Do
-   not reveal generated password - Bugfix
-   [owncloud/web#12326](https://github.com/owncloud/web/pull/12326): Drop advanced
-   mode when creating links
+   - Bugfix [owncloud/web#12598](https://github.com/owncloud/web/pull/12598): Add
+   src attribute to external app iframe - Bugfix
+   [owncloud/web#12474](https://github.com/owncloud/web/pull/12474): Add tag
+   characters limit
 
-   https://github.com/owncloud/web/pull/12593
-   https://github.com/owncloud/web/releases/tag/v11.3.3
+   https://github.com/owncloud/web/pull/12605
+   https://github.com/owncloud/web/releases/tag/v11.3.4
 
 # Changelog for [7.1.2] (2025-03-28)
 
