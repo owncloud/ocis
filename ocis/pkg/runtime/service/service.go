@@ -75,6 +75,11 @@ var (
 
 	// wait funcs run after the service group has been started.
 	_waitFuncs = []func(*ociscfg.Config) error{pingNats, pingGateway, nil, wait(time.Second), nil}
+
+	// Use the runner.DefaultInterruptDuration as defaults for the individual service shutdown timeouts.
+	_defaultShutdownTimeoutDuration = runner.DefaultInterruptDuration
+	// Use the runner.DefaultGroupInterruptDuration as defaults for the server interruption timeout.
+	_defaultInterruptTimeoutDuration = runner.DefaultGroupInterruptDuration
 )
 
 type serviceFuncMap map[string]func(*ociscfg.Config) suture.Service
@@ -515,7 +520,7 @@ func trapShutdownCtx(s *Service, srv *http.Server, ctx context.Context) {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		ctx, cancel := context.WithTimeout(context.Background(), runner.DefaultInterruptDuration)
+		ctx, cancel := context.WithTimeout(context.Background(), _defaultShutdownTimeoutDuration)
 		defer cancel()
 		if err := srv.Shutdown(ctx); err != nil {
 			s.Log.Error().Err(err).Msg("could not shutdown tcp listener")
@@ -530,7 +535,7 @@ func trapShutdownCtx(s *Service, srv *http.Server, ctx context.Context) {
 			go func() {
 				s.Log.Warn().Msgf("call supervisor RemoveAndWait for %s", sName)
 				defer wg.Done()
-				if err := s.Supervisor.RemoveAndWait(s.serviceToken[sName][i], runner.DefaultInterruptDuration); err != nil && !errors.Is(err, suture.ErrSupervisorNotRunning) {
+				if err := s.Supervisor.RemoveAndWait(s.serviceToken[sName][i], _defaultShutdownTimeoutDuration); err != nil && !errors.Is(err, suture.ErrSupervisorNotRunning) {
 					s.Log.Error().Err(err).Str("service", sName).Msgf("terminating with signal: %+v", s)
 				}
 				s.Log.Warn().Msgf("done supervisor RemoveAndWait for %s", sName)
@@ -545,7 +550,7 @@ func trapShutdownCtx(s *Service, srv *http.Server, ctx context.Context) {
 	}()
 
 	select {
-	case <-time.After(runner.DefaultGroupInterruptDuration):
+	case <-time.After(_defaultInterruptTimeoutDuration):
 		s.Log.Fatal().Msg("ocis graceful shutdown timeout reached, terminating")
 	case <-done:
 		s.Log.Info().Msg("all ocis services gracefully stopped")
