@@ -67,6 +67,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix Share roles translation: [#11241](https://github.com/owncloud/ocis/pull/11241)
 * Bugfix - Fix collaboration service LastModifiedDate: [#11328](https://github.com/owncloud/ocis/pull/11328)
 * Bugfix - Fix translations in Settings: [#11361](https://github.com/owncloud/ocis/pull/11361)
+* Enhancement - Limit length of tags: [#11231](https://github.com/owncloud/ocis/pull/11231)
 * Enhancement - Bump Web to 11.3.4: [#12605](https://github.com/owncloud/web/pull/12605)
 
 ## Details
@@ -90,6 +91,12 @@ The following sections list the changes for unreleased.
    Notification option translation where missing one string. This is fixed.
 
    https://github.com/owncloud/ocis/pull/11361
+
+* Enhancement - Limit length of tags: [#11231](https://github.com/owncloud/ocis/pull/11231)
+
+   We limited the length of tags to avoid DOS attacks against the ocis server.
+
+   https://github.com/owncloud/ocis/pull/11231
 
 * Enhancement - Bump Web to 11.3.4: [#12605](https://github.com/owncloud/web/pull/12605)
 
