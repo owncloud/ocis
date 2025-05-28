@@ -80,6 +80,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix collaboration service LastModifiedDate: [#11328](https://github.com/owncloud/ocis/pull/11328)
 * Bugfix - Fix the reva log interceptor: [#11348](https://github.com/owncloud/ocis/pull/11348)
 * Bugfix - Fix translations in Settings: [#11361](https://github.com/owncloud/ocis/pull/11361)
+* Change - Remove deprecated CLIENTLOG_REVA_GATEWAY: [#11372](https://github.com/owncloud/ocis/pull/11372)
 * Enhancement - Update Mockery to 2.52.3: [#11070](https://github.com/owncloud/ocis/pull/11070)
 * Enhancement - Improve postprocessing logs: [#11108](https://github.com/owncloud/ocis/pull/11108)
 * Enhancement - Improve graph space management logs: [#11115](https://github.com/owncloud/ocis/pull/11115)
@@ -216,6 +217,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/11361
    https://github.com/owncloud/ocis/pull/11364
+
+* Change - Remove deprecated CLIENTLOG_REVA_GATEWAY: [#11372](https://github.com/owncloud/ocis/pull/11372)
+
+   Deprecated CLIENTLOG_REVA_GATEWAY environment variable was removed from config.
+
+   https://github.com/owncloud/ocis/issues/11314
+   https://github.com/owncloud/ocis/pull/11372
 
 * Enhancement - Update Mockery to 2.52.3: [#11070](https://github.com/owncloud/ocis/pull/11070)
 
