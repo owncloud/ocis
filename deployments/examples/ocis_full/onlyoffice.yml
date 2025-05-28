@@ -5,7 +5,6 @@ services:
       ocis-net:
         aliases:
           - ${ONLYOFFICE_DOMAIN:-onlyoffice.owncloud.test}
-          - ${WOPISERVER_ONLYOFFICE_DOMAIN:-wopiserver-oo.owncloud.test}
 
   collaboration-oo:
     image: ${OCIS_DOCKER_IMAGE:-owncloud/ocis}:${OCIS_DOCKER_TAG:-latest}
@@ -24,7 +23,7 @@ services:
       COLLABORATION_HTTP_ADDR: 0.0.0.0:9300
       MICRO_REGISTRY: "nats-js-kv"
       MICRO_REGISTRY_ADDRESS: "ocis:9233"
-      COLLABORATION_WOPI_SRC: https://${WOPISERVER_ONLYOFFICE_DOMAIN:-wopiserver-oo.owncloud.test}
+      COLLABORATION_WOPI_SRC: http://collaboration-oo:9300
       COLLABORATION_APP_NAME: "OnlyOffice"
       COLLABORATION_APP_PRODUCT: "OnlyOffice"
       COLLABORATION_APP_ADDR: https://${ONLYOFFICE_DOMAIN:-onlyoffice.owncloud.test}
@@ -32,7 +31,6 @@ services:
       COLLABORATION_APP_INSECURE: "${INSECURE:-true}"
       COLLABORATION_CS3API_DATAGATEWAY_INSECURE: "${INSECURE:-true}"
       COLLABORATION_LOG_LEVEL: ${LOG_LEVEL:-info}
-      COLLABORATION_APP_PROOF_DISABLE: "true"
       OCIS_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}
     volumes:
       # configure the .env file to use own paths instead of docker internal volumes
@@ -40,7 +38,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.collaboration-oo.entrypoints=https"
-      - "traefik.http.routers.collaboration-oo.rule=Host(`${WOPISERVER_ONLYOFFICE_DOMAIN:-wopiserver-oo.owncloud.test}`)"
+      - "traefik.http.routers.collaboration-oo.rule=Host(`collaboration-oo`)"
       - "traefik.http.routers.collaboration-oo.tls.certresolver=http"
       - "traefik.http.routers.collaboration-oo.service=collaboration-oo"
       - "traefik.http.services.collaboration-oo.loadbalancer.server.port=9300"
