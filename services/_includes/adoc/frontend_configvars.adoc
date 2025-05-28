@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2025-05-28-08-29-53]
+[#deprecation-note-2025-05-28-09-18-35]
 [caption=]
 .Deprecation notes for the frontend service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -36,12 +36,7 @@ ifeval::[{show-deprecation} == true]
 | next-prod
 | 
 
-| FRONTEND_OCS_STAT_CACHE_STORE, the OCS API is deprecated
-| 7.0.0
-| next-prod
-| 
-
-| FRONTEND_OCS_STAT_CACHE_STORE_NODES, the OCS API is deprecated
+| The OCS API is deprecated
 | 7.0.0
 | next-prod
 | 
@@ -51,22 +46,7 @@ ifeval::[{show-deprecation} == true]
 | next-prod
 | 
 
-| FRONTEND_OCS_STAT_CACHE_TTL, the OCS API is deprecated
-| 7.0.0
-| next-prod
-| 
-
-| FRONTEND_OCS_STAT_CACHE_DISABLE_PERSISTENCE, the OCS API is deprecated
-| 7.0.0
-| next-prod
-| 
-
-| FRONTEND_OCS_STAT_CACHE_AUTH_USERNAME, the OCS API is deprecated
-| 7.0.0
-| next-prod
-| 
-
-| FRONTEND_OCS_STAT_CACHE_AUTH_PASSWORD, the OCS API is deprecated
+| The OCS API is deprecated
 | 7.0.0
 | next-prod
 | 
@@ -76,22 +56,12 @@ ifeval::[{show-deprecation} == true]
 | next-prod
 | 
 
-| FRONTEND_OCS_LIST_OCM_SHARES, the OCS API is deprecated
+| The OCS API is deprecated
 | 7.0.0
 | next-prod
 | 
 
-| FRONTEND_OCS_INCLUDE_OCM_SHAREES, the OCS API is deprecated
-| 7.0.0
-| next-prod
-| 
-
-| FRONTEND_OCS_PUBLIC_SHARE_MUST_HAVE_PASSWORD, the OCS API is deprecated
-| 7.0.0
-| next-prod
-| 
-
-| FRONTEND_OCS_PUBLIC_WRITABLE_SHARE_MUST_HAVE_PASSWORD, the OCS API is deprecated
+| The OCS API is deprecated
 | 7.0.0
 | next-prod
 | 
@@ -629,53 +599,9 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Path prefix for the data gateway.
 
-a|`FRONTEND_OCS_PREFIX` +
-xref:deprecation-note-2025-05-28-08-29-53[Deprecation Note]
-a| [subs=-attributes]
-++pre5.0 ++
-a| [subs=-attributes]
-++string ++
-a| [subs=-attributes]
-++ocs ++
-a| [subs=-attributes]
-URL path prefix for the OCS service. Note that the string must not start with '/'.
-
-a|`FRONTEND_OCS_SHARE_PREFIX` +
-xref:deprecation-note-2025-05-28-08-29-53[Deprecation Note]
-a| [subs=-attributes]
-++pre5.0 ++
-a| [subs=-attributes]
-++string ++
-a| [subs=-attributes]
-++/Shares ++
-a| [subs=-attributes]
-Path prefix for shares as part of an ocis resource. Note that the path must start with '/'.
-
-a|`FRONTEND_OCS_PERSONAL_NAMESPACE` +
-xref:deprecation-note-2025-05-28-08-29-53[Deprecation Note]
-a| [subs=-attributes]
-++pre5.0 ++
-a| [subs=-attributes]
-++string ++
-a| [subs=-attributes]
-++/users/{{.Id.OpaqueId}} ++
-a| [subs=-attributes]
-Home namespace identifier.
-
-a|`FRONTEND_OCS_ADDITIONAL_INFO_ATTRIBUTE` +
-xref:deprecation-note-2025-05-28-08-29-53[Deprecation Note]
-a| [subs=-attributes]
-++pre5.0 ++
-a| [subs=-attributes]
-++string ++
-a| [subs=-attributes]
-++{{.Mail}} ++
-a| [subs=-attributes]
-Additional information attribute for the user like {{.Mail}}.
-
 a|`OCIS_CACHE_STORE` +
-`FRONTEND_OCS_STAT_CACHE_STORE` +
-xref:deprecation-note-2025-05-28-08-29-53[Deprecation Note]
+`` +
+xref:deprecation-note-2025-05-28-09-18-35[Deprecation Note]
 a| [subs=-attributes]
 ++pre5.0 ++
 a| [subs=-attributes]
@@ -686,8 +612,7 @@ a| [subs=-attributes]
 The type of the cache store. Supported values are: 'memory', 'redis-sentinel', 'nats-js-kv', 'noop'. See the text description for details.
 
 a|`OCIS_CACHE_STORE_NODES` +
-`FRONTEND_OCS_STAT_CACHE_STORE_NODES` +
-xref:deprecation-note-2025-05-28-08-29-53[Deprecation Note]
+xref:deprecation-note-2025-05-28-09-18-35[Deprecation Note]
 a| [subs=-attributes]
 ++pre5.0 ++
 a| [subs=-attributes]
@@ -708,20 +633,8 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 The database name the configured store should use.
 
-a|`FRONTEND_OCS_STAT_CACHE_TABLE` +
-xref:deprecation-note-2025-05-28-08-29-53[Deprecation Note]
-a| [subs=-attributes]
-++pre5.0 ++
-a| [subs=-attributes]
-++string ++
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-The database table the store should use.
-
 a|`OCIS_CACHE_TTL` +
-`FRONTEND_OCS_STAT_CACHE_TTL` +
-xref:deprecation-note-2025-05-28-08-29-53[Deprecation Note]
+xref:deprecation-note-2025-05-28-09-18-35[Deprecation Note]
 a| [subs=-attributes]
 ++pre5.0 ++
 a| [subs=-attributes]
@@ -732,8 +645,7 @@ a| [subs=-attributes]
 Default time to live for user info in the cache. Only applied when access tokens has no expiration. See the Environment Variable Types description for more details.
 
 a|`OCIS_CACHE_DISABLE_PERSISTENCE` +
-`FRONTEND_OCS_STAT_CACHE_DISABLE_PERSISTENCE` +
-xref:deprecation-note-2025-05-28-08-29-53[Deprecation Note]
+xref:deprecation-note-2025-05-28-09-18-35[Deprecation Note]
 a| [subs=-attributes]
 ++5.0 ++
 a| [subs=-attributes]
@@ -744,8 +656,7 @@ a| [subs=-attributes]
 Disable persistence of the cache. Only applies when using the 'nats-js-kv' store type. Defaults to false.
 
 a|`OCIS_CACHE_AUTH_USERNAME` +
-`FRONTEND_OCS_STAT_CACHE_AUTH_USERNAME` +
-xref:deprecation-note-2025-05-28-08-29-53[Deprecation Note]
+xref:deprecation-note-2025-05-28-09-18-35[Deprecation Note]
 a| [subs=-attributes]
 ++5.0 ++
 a| [subs=-attributes]
@@ -756,8 +667,7 @@ a| [subs=-attributes]
 The username to use for authentication. Only applies when using the 'nats-js-kv' store type.
 
 a|`OCIS_CACHE_AUTH_PASSWORD` +
-`FRONTEND_OCS_STAT_CACHE_AUTH_PASSWORD` +
-xref:deprecation-note-2025-05-28-08-29-53[Deprecation Note]
+xref:deprecation-note-2025-05-28-09-18-35[Deprecation Note]
 a| [subs=-attributes]
 ++5.0 ++
 a| [subs=-attributes]
@@ -767,20 +677,8 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 The password to use for authentication. Only applies when using the 'nats-js-kv' store type.
 
-a|`FRONTEND_OCS_ENABLE_DENIALS` +
-xref:deprecation-note-2025-05-28-08-29-53[Deprecation Note]
-a| [subs=-attributes]
-++pre5.0 ++
-a| [subs=-attributes]
-++bool ++
-a| [subs=-attributes]
-++false ++
-a| [subs=-attributes]
-EXPERIMENTAL: enable the feature to deny access on folders.
-
 a|`OCIS_ENABLE_OCM` +
-`FRONTEND_OCS_LIST_OCM_SHARES` +
-xref:deprecation-note-2025-05-28-08-29-53[Deprecation Note]
+xref:deprecation-note-2025-05-28-09-18-35[Deprecation Note]
 a| [subs=-attributes]
 ++5.0 ++
 a| [subs=-attributes]
@@ -791,8 +689,7 @@ a| [subs=-attributes]
 Include OCM shares when listing shares. See the OCM service documentation for more details.
 
 a|`OCIS_ENABLE_OCM` +
-`FRONTEND_OCS_INCLUDE_OCM_SHAREES` +
-xref:deprecation-note-2025-05-28-08-29-53[Deprecation Note]
+xref:deprecation-note-2025-05-28-09-18-35[Deprecation Note]
 a| [subs=-attributes]
 ++5.0 ++
 a| [subs=-attributes]
@@ -803,8 +700,7 @@ a| [subs=-attributes]
 Include OCM sharees when listing sharees.
 
 a|`OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD` +
-`FRONTEND_OCS_PUBLIC_SHARE_MUST_HAVE_PASSWORD` +
-xref:deprecation-note-2025-05-28-08-29-53[Deprecation Note]
+xref:deprecation-note-2025-05-28-09-18-35[Deprecation Note]
 a| [subs=-attributes]
 ++5.0 ++
 a| [subs=-attributes]
@@ -815,8 +711,7 @@ a| [subs=-attributes]
 Set this to true if you want to enforce passwords on all public shares.
 
 a|`OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD` +
-`FRONTEND_OCS_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD` +
-xref:deprecation-note-2025-05-28-08-29-53[Deprecation Note]
+xref:deprecation-note-2025-05-28-09-18-35[Deprecation Note]
 a| [subs=-attributes]
 ++5.0 ++
 a| [subs=-attributes]
