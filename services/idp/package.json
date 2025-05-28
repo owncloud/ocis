@@ -135,7 +135,7 @@
     "eslint-plugin-flowtype": "^8.0.3",
     "eslint-plugin-i18next": "^6.1.1",
     "eslint-plugin-import": "^2.30.0",
-    "eslint-plugin-jest": "^27.9.0",
+    "eslint-plugin-jest": "^28.11.1",
     "eslint-plugin-jsx-a11y": "^6.8.0",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^4.6.2",
