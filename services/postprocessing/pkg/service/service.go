@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
@@ -20,14 +21,16 @@ import (
 
 // PostprocessingService is an instance of the service handling postprocessing of files
 type PostprocessingService struct {
-	ctx    context.Context
-	log    log.Logger
-	events <-chan events.Event
-	pub    events.Publisher
-	steps  []events.Postprocessingstep
-	store  store.Store
-	c      config.Postprocessing
-	tp     trace.TracerProvider
+	ctx     context.Context
+	log     log.Logger
+	events  <-chan events.Event
+	pub     events.Publisher
+	steps   []events.Postprocessingstep
+	store   store.Store
+	c       config.Postprocessing
+	tp      trace.TracerProvider
+	stopCh  chan struct{}
+	stopped atomic.Bool
 }
 
 var (
@@ -61,6 +64,7 @@ func NewPostprocessingService(ctx context.Context, stream events.Stream, logger 
 		store:  sto,
 		c:      c,
 		tp:     tp,
+		stopCh: make(chan struct{}, 1),
 	}, nil
 }
 
@@ -68,27 +72,65 @@ func NewPostprocessingService(ctx context.Context, stream events.Stream, logger 
 func (pps *PostprocessingService) Run() error {
 	wg := sync.WaitGroup{}
 
-	for i := 0; i < pps.c.Workers; i++ {
+	for range pps.c.Workers {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			for e := range pps.events {
-				if err := pps.processEvent(e); err != nil {
-					switch {
-					case errors.Is(err, ErrFatal):
-						pps.log.Fatal().Err(err).Msg("fatal error - exiting")
-					case errors.Is(err, ErrEvent):
-						pps.log.Error().Err(err).Msg("continuing")
-					default:
-						pps.log.Fatal().Err(err).Msg("unknown error - exiting")
+
+		EventLoop:
+			for {
+				select {
+				case <-pps.stopCh:
+					// stop requested
+					// TODO: we might need a way to unsubscribe from the event channel, otherwise
+					// we'll be leaking a goroutine in reva that will be stuck waiting for
+					// someone to read from the event channel.
+					// Note: redis implementation seems to have a timeout, so the goroutine
+					// will exit if there is nobody processing the events and the timeout
+					// is reached. The behavior is unclear with natsjs
+					break EventLoop
+				case e, ok := <-pps.events:
+					if !ok {
+						// event channel is closed, so nothing more to do
+						break EventLoop
+					}
+
+					err := pps.processEvent(e)
+					if err != nil {
+						switch {
+						case errors.Is(err, ErrFatal):
+							pps.log.Fatal().Err(err).Msg("fatal error - exiting")
+						case errors.Is(err, ErrEvent):
+							pps.log.Error().Err(err).Msg("continuing")
+						default:
+							pps.log.Fatal().Err(err).Msg("unknown error - exiting")
+						}
+					}
+
+					if pps.stopped.Load() {
+						// if stopped, don't process any more events
+						break EventLoop
 					}
 				}
 			}
 		}()
 	}
+
 	wg.Wait()
 
 	return nil
+}
+
+// Close will make the postprocessing service to stop processing, so the `Run`
+// method can finish.
+// TODO: Underlying services can't be stopped. This means that some goroutines
+// will get stuck trying to push events through a channel nobody is reading
+// from, so resources won't be freed and there will be memory leaks. For now,
+// if the service is stopped, you should close the app soon after.
+func (pps *PostprocessingService) Close() {
+	if pps.stopped.CompareAndSwap(false, true) {
+		close(pps.stopCh)
+	}
 }
 
 func (pps *PostprocessingService) processEvent(e events.Event) error {

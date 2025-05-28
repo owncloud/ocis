@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/owncloud/reva/v2/pkg/bytesize"
@@ -54,7 +55,15 @@ func NewAntivirus(c *config.Config, l log.Logger, tp trace.TracerProvider) (Anti
 		return Antivirus{}, err
 	}
 
-	av := Antivirus{c: c, l: l, tp: tp, s: scanner, client: rhttp.GetHTTPClient(rhttp.Insecure(true))}
+	av := Antivirus{
+		c:       c,
+		l:       l,
+		tp:      tp,
+		s:       scanner,
+		client:  rhttp.GetHTTPClient(rhttp.Insecure(true)),
+		stopCh:  make(chan struct{}, 1),
+		stopped: new(atomic.Bool),
+	}
 
 	switch o := events.PostprocessingOutcome(c.InfectedFileHandling); o {
 	case events.PPOutcomeContinue, events.PPOutcomeAbort, events.PPOutcomeDelete:
@@ -84,7 +93,9 @@ type Antivirus struct {
 	m  uint64
 	tp trace.TracerProvider
 
-	client *http.Client
+	client  *http.Client
+	stopCh  chan struct{}
+	stopped *atomic.Bool
 }
 
 // Run runs the service
@@ -120,28 +131,50 @@ func (av Antivirus) Run() error {
 	}
 
 	wg := sync.WaitGroup{}
-	for i := 0; i < av.c.Workers; i++ {
+	for range av.c.Workers {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			for e := range ch {
-				err := av.processEvent(e, natsStream)
-				if err != nil {
-					switch {
-					case errors.Is(err, ErrFatal):
-						av.l.Fatal().Err(err).Msg("fatal error - exiting")
-					case errors.Is(err, ErrEvent):
-						av.l.Error().Err(err).Msg("continuing")
-					default:
-						av.l.Fatal().Err(err).Msg("unknown error - exiting")
+
+		EventLoop:
+			for {
+				select {
+				case e, ok := <-ch:
+					if !ok {
+						break EventLoop
 					}
+
+					err := av.processEvent(e, natsStream)
+					if err != nil {
+						switch {
+						case errors.Is(err, ErrFatal):
+							av.l.Fatal().Err(err).Msg("fatal error - exiting")
+						case errors.Is(err, ErrEvent):
+							av.l.Error().Err(err).Msg("continuing")
+						default:
+							av.l.Fatal().Err(err).Msg("unknown error - exiting")
+						}
+					}
+
+					if av.stopped.Load() {
+						break EventLoop
+					}
+				case <-av.stopCh:
+					break EventLoop
 				}
 			}
 		}()
 	}
+
 	wg.Wait()
 
 	return nil
+}
+
+func (av Antivirus) Close() {
+	if av.stopped.CompareAndSwap(false, true) {
+		close(av.stopCh)
+	}
 }
 
 func (av Antivirus) processEvent(e events.Event, s events.Publisher) error {
