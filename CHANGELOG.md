@@ -1,5 +1,6 @@
 # Table of Contents
 
+* [Changelog for unreleased](#changelog-for-unreleased-unreleased)
 * [Changelog for 7.1.3](#changelog-for-713-2025-05-27)
 * [Changelog for 7.1.2](#changelog-for-712-2025-03-28)
 * [Changelog for 7.1.1](#changelog-for-711-2025-03-14)
@@ -56,11 +57,11 @@
 * [Changelog for 1.1.0](#changelog-for-110-2021-01-22)
 * [Changelog for 1.0.0](#changelog-for-100-2020-12-17)
 
-# Changelog for [7.1.3] (2025-05-27)
+# Changelog for [unreleased] (UNRELEASED)
 
-The following sections list the changes for 7.1.3.
+The following sections list the changes for unreleased.
 
-[7.1.3]: https://github.com/owncloud/ocis/compare/v7.1.2...v7.1.3
+[unreleased]: https://github.com/owncloud/ocis/compare/v7.1.3...master
 
 ## Summary
 
@@ -75,18 +76,14 @@ The following sections list the changes for 7.1.3.
 * Bugfix - OCM Share Notifications: [#11162](https://github.com/owncloud/ocis/pull/11162)
 * Bugfix - Fix pdf form creation: [#11163](https://github.com/owncloud/ocis/pull/11163)
 * Bugfix - Fix app-auth, REST status code: [#11190](https://github.com/owncloud/ocis/pull/11190)
-* Bugfix - Fix Share roles translation: [#11241](https://github.com/owncloud/ocis/pull/11241)
 * Bugfix - Fix error on listing space members: [#11245](https://github.com/owncloud/ocis/pull/11245)
-* Bugfix - Fix collaboration service LastModifiedDate: [#11328](https://github.com/owncloud/ocis/pull/11328)
 * Bugfix - Fix the reva log interceptor: [#11348](https://github.com/owncloud/ocis/pull/11348)
-* Bugfix - Fix translations in Settings: [#11361](https://github.com/owncloud/ocis/pull/11361)
 * Change - Remove deprecated CLIENTLOG_REVA_GATEWAY: [#11372](https://github.com/owncloud/ocis/pull/11372)
 * Enhancement - Update Mockery to 2.52.3: [#11070](https://github.com/owncloud/ocis/pull/11070)
 * Enhancement - Improve postprocessing logs: [#11108](https://github.com/owncloud/ocis/pull/11108)
 * Enhancement - Improve graph space management logs: [#11115](https://github.com/owncloud/ocis/pull/11115)
 * Enhancement - Delete notification by ID: [#11203](https://github.com/owncloud/ocis/pull/11203)
 * Enhancement - CLI, storage-users uploads delete-stale-nodes: [#11216](https://github.com/owncloud/ocis/pull/11216)
-* Enhancement - Limit length of tags: [#11231](https://github.com/owncloud/ocis/pull/11231)
 * Enhancement - Allow setting driveid through graph API: [#11256](https://github.com/owncloud/ocis/pull/11256)
 * Enhancement - More secure Microsoft 365 collaboration: [#11276](https://github.com/owncloud/ocis/pull/11276)
 * Enhancement - Claim managed spaces: [#11280](https://github.com/owncloud/ocis/pull/11280)
@@ -94,7 +91,6 @@ The following sections list the changes for 7.1.3.
 * Enhancement - Update ocis_full deployment example images: [#11319](https://github.com/owncloud/ocis/pull/11319)
 * Enhancement - Bump Web to 11.3.2: [#11330](https://github.com/owncloud/ocis/pull/11330)
 * Enhancement - Add capability for server managed spaces: [#11332](https://github.com/owncloud/ocis/pull/11332)
-* Enhancement - Bump Web to 11.3.4: [#12605](https://github.com/owncloud/web/pull/12605)
 
 ## Details
 
@@ -180,14 +176,6 @@ The following sections list the changes for 7.1.3.
    https://github.com/owncloud/ocis/issues/10815
    https://github.com/owncloud/ocis/pull/11190
 
-* Bugfix - Fix Share roles translation: [#11241](https://github.com/owncloud/ocis/pull/11241)
-
-   We fixed the issue when the Share roles show a wrong translation after the user
-   location has changed back to English.
-
-   https://github.com/owncloud/ocis/issues/11025
-   https://github.com/owncloud/ocis/pull/11241
-
 * Bugfix - Fix error on listing space members: [#11245](https://github.com/owncloud/ocis/pull/11245)
 
    Now the members list will still show grantees even with there is any invalid
@@ -195,12 +183,6 @@ The following sections list the changes for 7.1.3.
 
    https://github.com/owncloud/ocis/issues/11119
    https://github.com/owncloud/ocis/pull/11245
-
-* Bugfix - Fix collaboration service LastModifiedDate: [#11328](https://github.com/owncloud/ocis/pull/11328)
-
-   Collaboration service now returns correct LastModifiedDate.
-
-   https://github.com/owncloud/ocis/pull/11328
 
 * Bugfix - Fix the reva log interceptor: [#11348](https://github.com/owncloud/ocis/pull/11348)
 
@@ -210,13 +192,6 @@ The following sections list the changes for 7.1.3.
 
    https://github.com/owncloud/ocis/issues/10857
    https://github.com/owncloud/ocis/pull/11348
-
-* Bugfix - Fix translations in Settings: [#11361](https://github.com/owncloud/ocis/pull/11361)
-
-   Notification option translation where missing one string. This is fixed.
-
-   https://github.com/owncloud/ocis/pull/11361
-   https://github.com/owncloud/ocis/pull/11364
 
 * Change - Remove deprecated CLIENTLOG_REVA_GATEWAY: [#11372](https://github.com/owncloud/ocis/pull/11372)
 
@@ -261,12 +236,6 @@ The following sections list the changes for 7.1.3.
 
    https://github.com/owncloud/enterprise/issues/7178
    https://github.com/owncloud/ocis/pull/11216
-
-* Enhancement - Limit length of tags: [#11231](https://github.com/owncloud/ocis/pull/11231)
-
-   We limited the length of tags to avoid DOS attacks against the ocis server.
-
-   https://github.com/owncloud/ocis/pull/11231
 
 * Enhancement - Allow setting driveid through graph API: [#11256](https://github.com/owncloud/ocis/pull/11256)
 
@@ -319,6 +288,49 @@ The following sections list the changes for 7.1.3.
    adding/removing users to/from spaces in the web UI.
 
    https://github.com/owncloud/ocis/pull/11332
+
+# Changelog for [7.1.3] (2025-05-27)
+
+The following sections list the changes for 7.1.3.
+
+[7.1.3]: https://github.com/owncloud/ocis/compare/v7.1.2...v7.1.3
+
+## Summary
+
+* Bugfix - Fix Share roles translation: [#11241](https://github.com/owncloud/ocis/pull/11241)
+* Bugfix - Fix collaboration service LastModifiedDate: [#11328](https://github.com/owncloud/ocis/pull/11328)
+* Bugfix - Fix translations in Settings: [#11361](https://github.com/owncloud/ocis/pull/11361)
+* Enhancement - Limit length of tags: [#11231](https://github.com/owncloud/ocis/pull/11231)
+* Enhancement - Bump Web to 11.3.4: [#12605](https://github.com/owncloud/web/pull/12605)
+
+## Details
+
+* Bugfix - Fix Share roles translation: [#11241](https://github.com/owncloud/ocis/pull/11241)
+
+   We fixed the issue when the Share roles show a wrong translation after the user
+   location has changed back to English.
+
+   https://github.com/owncloud/ocis/issues/11025
+   https://github.com/owncloud/ocis/pull/11241
+
+* Bugfix - Fix collaboration service LastModifiedDate: [#11328](https://github.com/owncloud/ocis/pull/11328)
+
+   Collaboration service now returns correct LastModifiedDate.
+
+   https://github.com/owncloud/ocis/pull/11328
+
+* Bugfix - Fix translations in Settings: [#11361](https://github.com/owncloud/ocis/pull/11361)
+
+   Notification option translation where missing one string. This is fixed.
+
+   https://github.com/owncloud/ocis/pull/11361
+   https://github.com/owncloud/ocis/pull/11364
+
+* Enhancement - Limit length of tags: [#11231](https://github.com/owncloud/ocis/pull/11231)
+
+   We limited the length of tags to avoid DOS attacks against the ocis server.
+
+   https://github.com/owncloud/ocis/pull/11231
 
 * Enhancement - Bump Web to 11.3.4: [#12605](https://github.com/owncloud/web/pull/12605)
 
