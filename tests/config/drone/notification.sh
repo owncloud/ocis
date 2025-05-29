@@ -19,11 +19,20 @@ log_success() {
   echo -e "\e[32m$1\e[0m"
 }
 
+# Determine build source: nightly, tag or branch
+if [[ "$DRONE_BUILD_EVENT" == "cron" ]]; then
+  BUILD_SOURCE="nightly-$DRONE_BRANCH"
+elif [[ "$DRONE_BUILD_EVENT" == "tag" ]]; then
+  BUILD_SOURCE="tag $DRONE_TAG"
+else
+  BUILD_SOURCE="$DRONE_BRANCH"
+fi
+
 if [[ "$DRONE_BUILD_STATUS" == "failure" ]]; then
   BUILD_STATUS="❌️ Failure"
 fi
 
-message_html='<b>'$BUILD_STATUS'</b> <a href="'${DRONE_BUILD_LINK}'">'${DRONE_REPO}'#'$COMMIT_SHA_SHORT'</a> ('${DRONE_BRANCH}') by <b>'${DRONE_COMMIT_AUTHOR}'</b>'
+message_html='<b>'$BUILD_STATUS'</b> <a href="'${DRONE_BUILD_LINK}'">'${DRONE_REPO}'#'$COMMIT_SHA_SHORT'</a> ('${BUILD_SOURCE}') by <b>'${DRONE_COMMIT_AUTHOR}'</b>'
 message_html=$(echo "$message_html" | sed 's/\\/\\\\/g' | sed 's/"/\\"/g')
 
 log_info "Sending report to the element chat...."
