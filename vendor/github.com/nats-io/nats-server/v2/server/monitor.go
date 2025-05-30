@@ -23,12 +23,14 @@ import (
 	"encoding/json"
 	"expvar"
 	"fmt"
+	"math"
 	"net"
 	"net/http"
 	"net/url"
 	"os"
 	"path/filepath"
 	"runtime"
+	"runtime/debug"
 	"runtime/pprof"
 	"slices"
 	"sort"
@@ -338,7 +340,17 @@ func (s *Server) Connz(opts *ConnzOptions) (*Connz, error) {
 
 	// Search by individual CID.
 	if cid > 0 {
-		if state == ConnClosed || state == ConnAll {
+		// Let's first check if user also selects on ConnOpen or ConnAll
+		// and look for opened connections.
+		if state == ConnOpen || state == ConnAll {
+			if client := s.clients[cid]; client != nil {
+				openClients = append(openClients, client)
+				closedClients = nil
+			}
+		}
+		// If we did not find, and the user selected for ConnClosed or ConnAll,
+		// look for closed connections.
+		if len(openClients) == 0 && (state == ConnClosed || state == ConnAll) {
 			copyClosed := closedClients
 			closedClients = nil
 			for _, cc := range copyClosed {
@@ -346,11 +358,6 @@ func (s *Server) Connz(opts *ConnzOptions) (*Connz, error) {
 					closedClients = []*closedClient{cc}
 					break
 				}
-			}
-		} else if state == ConnOpen || state == ConnAll {
-			client := s.clients[cid]
-			if client != nil {
-				openClients = append(openClients, client)
 			}
 		}
 	} else {
@@ -1215,6 +1222,7 @@ type Varz struct {
 	Mem                   int64                  `json:"mem"`
 	Cores                 int                    `json:"cores"`
 	MaxProcs              int                    `json:"gomaxprocs"`
+	MemLimit              int64                  `json:"gomemlimit,omitempty"`
 	CPU                   float64                `json:"cpu"`
 	Connections           int                    `json:"connections"`
 	TotalConnections      uint64                 `json:"total_connections"`
@@ -1604,6 +1612,9 @@ func (s *Server) createVarz(pcpu float64, rss int64) *Varz {
 		Tags:                  opts.Tags,
 		TrustedOperatorsJwt:   opts.operatorJWT,
 		TrustedOperatorsClaim: opts.TrustedOperators,
+	}
+	if mm := debug.SetMemoryLimit(-1); mm < math.MaxInt64 {
+		varz.MemLimit = mm
 	}
 	// If this is a leaf without cluster, reset the cluster name (that is otherwise
 	// set to the server name).
@@ -2727,8 +2738,10 @@ func (s *Server) accountInfo(accName string) (*AccountInfo, error) {
 		}
 		imports = append(imports, imp)
 	}
-	for _, v := range a.imports.services {
-		imports = append(imports, newExtImport(v))
+	for _, sis := range a.imports.services {
+		for _, v := range sis {
+			imports = append(imports, newExtImport(v))
+		}
 	}
 	responses := map[string]ExtImport{}
 	for k, v := range a.exports.responses {
@@ -2867,20 +2880,19 @@ type MetaClusterInfo struct {
 
 // JSInfo has detailed information on JetStream.
 type JSInfo struct {
-	ID       string          `json:"server_id"`
-	Now      time.Time       `json:"now"`
-	Disabled bool            `json:"disabled,omitempty"`
-	Config   JetStreamConfig `json:"config,omitempty"`
-	Limits   *JSLimitOpts    `json:"limits,omitempty"`
 	JetStreamStats
-	Streams   int              `json:"streams"`
-	Consumers int              `json:"consumers"`
-	Messages  uint64           `json:"messages"`
-	Bytes     uint64           `json:"bytes"`
-	Meta      *MetaClusterInfo `json:"meta_cluster,omitempty"`
-
-	// aggregate raft info
+	ID             string           `json:"server_id"`
+	Now            time.Time        `json:"now"`
+	Disabled       bool             `json:"disabled,omitempty"`
+	Config         JetStreamConfig  `json:"config,omitempty"`
+	Limits         *JSLimitOpts     `json:"limits,omitempty"`
+	Streams        int              `json:"streams"`
+	Consumers      int              `json:"consumers"`
+	Messages       uint64           `json:"messages"`
+	Bytes          uint64           `json:"bytes"`
+	Meta           *MetaClusterInfo `json:"meta_cluster,omitempty"`
 	AccountDetails []*AccountDetail `json:"account_details,omitempty"`
+	Total          int              `json:"total"`
 }
 
 func (s *Server) accountDetail(jsa *jsAccount, optStreams, optConsumers, optCfg, optRaft, optStreamLeader bool) *AccountDetail {
@@ -3015,6 +3027,9 @@ func (s *Server) Jsz(opts *JSzOptions) (*JSInfo, error) {
 	if opts == nil {
 		opts = &JSzOptions{}
 	}
+	if opts.Offset < 0 {
+		opts.Offset = 0
+	}
 	if opts.Limit == 0 {
 		opts.Limit = 1024
 	}
@@ -3059,6 +3074,8 @@ func (s *Server) Jsz(opts *JSzOptions) (*JSInfo, error) {
 	}
 	js.mu.RUnlock()
 
+	jsi.Total = len(accounts)
+
 	if mg := js.getMetaGroup(); mg != nil {
 		if ci := s.raftNodeToClusterInfo(mg); ci != nil {
 			jsi.Meta = &MetaClusterInfo{Name: ci.Name, Leader: ci.Leader, Peer: getHash(ci.Leader), Size: mg.ClusterSize()}
@@ -3073,17 +3090,22 @@ func (s *Server) Jsz(opts *JSzOptions) (*JSInfo, error) {
 
 	jsi.JetStreamStats = *js.usageStats()
 
+	// If a specific account is requested, track the index.
 	filterIdx := -1
+
+	// Calculate the stats of all accounts and streams regardless of the filtering.
 	for i, jsa := range accounts {
 		if jsa.acc().GetName() == opts.Account {
 			filterIdx = i
 		}
+
 		jsa.mu.RLock()
 		streams := make([]*stream, 0, len(jsa.streams))
 		for _, stream := range jsa.streams {
 			streams = append(streams, stream)
 		}
 		jsa.mu.RUnlock()
+
 		jsi.Streams += len(streams)
 		for _, stream := range streams {
 			streamState := stream.state()
@@ -3093,34 +3115,35 @@ func (s *Server) Jsz(opts *JSzOptions) (*JSInfo, error) {
 		}
 	}
 
-	// filter logic
-	if filterIdx != -1 {
-		accounts = []*jsAccount{accounts[filterIdx]}
+	// Targeted account takes precedence.
+	if filterIdx >= 0 {
+		accounts = accounts[filterIdx : filterIdx+1]
 	} else if opts.Accounts {
-		if opts.Offset != 0 {
+
+		if opts.Limit > 0 {
+			// Sort by name for a consistent read (barring any concurrent changes)
 			slices.SortFunc(accounts, func(i, j *jsAccount) int { return cmp.Compare(i.acc().Name, j.acc().Name) })
-			if opts.Offset > len(accounts) {
-				accounts = []*jsAccount{}
-			} else {
-				accounts = accounts[opts.Offset:]
-			}
-		}
-		if opts.Limit != 0 {
-			if opts.Limit < len(accounts) {
-				accounts = accounts[:opts.Limit]
-			}
+
+			// Offset larger than the number of accounts.
+			offset := min(opts.Offset, len(accounts))
+			accounts = accounts[offset:]
+
+			limit := min(opts.Limit, len(accounts))
+			accounts = accounts[:limit]
 		}
 	} else {
-		accounts = []*jsAccount{}
+		accounts = nil
 	}
+
 	if len(accounts) > 0 {
 		jsi.AccountDetails = make([]*AccountDetail, 0, len(accounts))
+
+		for _, jsa := range accounts {
+			detail := s.accountDetail(jsa, opts.Streams, opts.Consumer, opts.Config, opts.RaftGroups, opts.StreamLeaderOnly)
+			jsi.AccountDetails = append(jsi.AccountDetails, detail)
+		}
 	}
-	// if wanted, obtain accounts/streams/consumer
-	for _, jsa := range accounts {
-		detail := s.accountDetail(jsa, opts.Streams, opts.Consumer, opts.Config, opts.RaftGroups, opts.StreamLeaderOnly)
-		jsi.AccountDetails = append(jsi.AccountDetails, detail)
-	}
+
 	return jsi, nil
 }
 

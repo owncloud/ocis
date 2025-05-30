@@ -1,6 +1,7 @@
 # Table of Contents
 
 * [Changelog for unreleased](#changelog-for-unreleased-unreleased)
+* [Changelog for 7.1.3](#changelog-for-713-2025-05-27)
 * [Changelog for 7.1.2](#changelog-for-712-2025-03-28)
 * [Changelog for 7.1.1](#changelog-for-711-2025-03-14)
 * [Changelog for 7.1.0](#changelog-for-710-2025-03-06)
@@ -34,8 +35,8 @@
 * [Changelog for 3.0.0](#changelog-for-300-2023-06-06)
 * [Changelog for 2.0.0](#changelog-for-200-2022-11-30)
 * [Changelog for 1.20.0](#changelog-for-1200-2022-04-13)
-* [Changelog for 1.19.1](#changelog-for-1191-2022-03-29)
 * [Changelog for 1.19.0](#changelog-for-1190-2022-03-29)
+* [Changelog for 1.19.1](#changelog-for-1191-2022-03-29)
 * [Changelog for 1.18.0](#changelog-for-1180-2022-03-03)
 * [Changelog for 1.17.0](#changelog-for-1170-2022-02-16)
 * [Changelog for 1.16.0](#changelog-for-1160-2021-12-10)
@@ -60,7 +61,7 @@
 
 The following sections list the changes for unreleased.
 
-[unreleased]: https://github.com/owncloud/ocis/compare/v7.1.2...master
+[unreleased]: https://github.com/owncloud/ocis/compare/v7.1.3...master
 
 ## Summary
 
@@ -75,19 +76,23 @@ The following sections list the changes for unreleased.
 * Bugfix - OCM Share Notifications: [#11162](https://github.com/owncloud/ocis/pull/11162)
 * Bugfix - Fix pdf form creation: [#11163](https://github.com/owncloud/ocis/pull/11163)
 * Bugfix - Fix app-auth, REST status code: [#11190](https://github.com/owncloud/ocis/pull/11190)
-* Bugfix - Fix Share roles translation: [#11241](https://github.com/owncloud/ocis/pull/11241)
 * Bugfix - Fix error on listing space members: [#11245](https://github.com/owncloud/ocis/pull/11245)
+* Bugfix - Fix the graceful shutdown: [#11295](https://github.com/owncloud/ocis/pull/11295)
+* Bugfix - Fix the reva log interceptor: [#11348](https://github.com/owncloud/ocis/pull/11348)
+* Change - Remove deprecated FRONTEND_OCS_*: [#11333](https://github.com/owncloud/ocis/pull/11333)
+* Change - Remove deprecated CLIENTLOG_REVA_GATEWAY: [#11372](https://github.com/owncloud/ocis/pull/11372)
 * Enhancement - Update Mockery to 2.52.3: [#11070](https://github.com/owncloud/ocis/pull/11070)
 * Enhancement - Improve postprocessing logs: [#11108](https://github.com/owncloud/ocis/pull/11108)
 * Enhancement - Improve graph space management logs: [#11115](https://github.com/owncloud/ocis/pull/11115)
 * Enhancement - Delete notification by ID: [#11203](https://github.com/owncloud/ocis/pull/11203)
 * Enhancement - CLI, storage-users uploads delete-stale-nodes: [#11216](https://github.com/owncloud/ocis/pull/11216)
-* Enhancement - Limit length of tags: [#11231](https://github.com/owncloud/ocis/pull/11231)
 * Enhancement - Allow setting driveid through graph API: [#11256](https://github.com/owncloud/ocis/pull/11256)
 * Enhancement - More secure Microsoft 365 collaboration: [#11276](https://github.com/owncloud/ocis/pull/11276)
 * Enhancement - Claim managed spaces: [#11280](https://github.com/owncloud/ocis/pull/11280)
 * Enhancement - Bump Reva: [#11283](https://github.com/owncloud/ocis/pull/11283)
 * Enhancement - Update ocis_full deployment example images: [#11319](https://github.com/owncloud/ocis/pull/11319)
+* Enhancement - Bump Web to 11.3.2: [#11330](https://github.com/owncloud/ocis/pull/11330)
+* Enhancement - Add capability for server managed spaces: [#11332](https://github.com/owncloud/ocis/pull/11332)
 
 ## Details
 
@@ -173,14 +178,6 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/issues/10815
    https://github.com/owncloud/ocis/pull/11190
 
-* Bugfix - Fix Share roles translation: [#11241](https://github.com/owncloud/ocis/pull/11241)
-
-   We fixed the issue when the Share roles show a wrong translation after the user
-   location has changed back to English.
-
-   https://github.com/owncloud/ocis/issues/11025
-   https://github.com/owncloud/ocis/pull/11241
-
 * Bugfix - Fix error on listing space members: [#11245](https://github.com/owncloud/ocis/pull/11245)
 
    Now the members list will still show grantees even with there is any invalid
@@ -188,6 +185,36 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/11119
    https://github.com/owncloud/ocis/pull/11245
+
+* Bugfix - Fix the graceful shutdown: [#11295](https://github.com/owncloud/ocis/pull/11295)
+
+   Fix the graceful shutdown using the new ocis and reva runners.
+
+   https://github.com/owncloud/ocis/issues/11170
+   https://github.com/owncloud/ocis/pull/11295
+
+* Bugfix - Fix the reva log interceptor: [#11348](https://github.com/owncloud/ocis/pull/11348)
+
+   Fix the reva log interceptor. Implemented the Unwrap interface to allow TUS
+   middleware to handle correctly SetReadDeadline and SetWriteDeadline functions
+   and to avoid the error during the upload.
+
+   https://github.com/owncloud/ocis/issues/10857
+   https://github.com/owncloud/ocis/pull/11348
+
+* Change - Remove deprecated FRONTEND_OCS_*: [#11333](https://github.com/owncloud/ocis/pull/11333)
+
+   Deprecated FRONTEND_OCS_* environment variable was removed from config.
+
+   https://github.com/owncloud/ocis/issues/11314
+   https://github.com/owncloud/ocis/pull/11333
+
+* Change - Remove deprecated CLIENTLOG_REVA_GATEWAY: [#11372](https://github.com/owncloud/ocis/pull/11372)
+
+   Deprecated CLIENTLOG_REVA_GATEWAY environment variable was removed from config.
+
+   https://github.com/owncloud/ocis/issues/11314
+   https://github.com/owncloud/ocis/pull/11372
 
 * Enhancement - Update Mockery to 2.52.3: [#11070](https://github.com/owncloud/ocis/pull/11070)
 
@@ -226,12 +253,6 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/enterprise/issues/7178
    https://github.com/owncloud/ocis/pull/11216
 
-* Enhancement - Limit length of tags: [#11231](https://github.com/owncloud/ocis/pull/11231)
-
-   We limited the length of tags to avoid DOS attacks against the ocis server.
-
-   https://github.com/owncloud/ocis/pull/11231
-
 * Enhancement - Allow setting driveid through graph API: [#11256](https://github.com/owncloud/ocis/pull/11256)
 
    Allow setting the id through the graph API. This should always be a uuid to
@@ -264,6 +285,78 @@ The following sections list the changes for unreleased.
    implemented for collabora.yml to be compliant with new releases.
 
    https://github.com/owncloud/ocis/pull/11319
+
+* Enhancement - Bump Web to 11.3.2: [#11330](https://github.com/owncloud/ocis/pull/11330)
+
+   - Bugfix [owncloud/web#12460](https://github.com/owncloud/web/pull/12460): Add
+   missing dependencies to markdown editor - Bugfix
+   [owncloud/web#12460](https://github.com/owncloud/web/pull/12460): Hide image
+   upload in markdown editor - Bugfix
+   [owncloud/web#12460](https://github.com/owncloud/web/pull/12460): Hide save in
+   markdown editor
+
+   https://github.com/owncloud/ocis/pull/11330
+   https://github.com/owncloud/web/releases/tag/v11.3.2
+
+* Enhancement - Add capability for server managed spaces: [#11332](https://github.com/owncloud/ocis/pull/11332)
+
+   Adds the capability for server managed spaces, which will deactivate
+   adding/removing users to/from spaces in the web UI.
+
+   https://github.com/owncloud/ocis/pull/11332
+
+# Changelog for [7.1.3] (2025-05-27)
+
+The following sections list the changes for 7.1.3.
+
+[7.1.3]: https://github.com/owncloud/ocis/compare/v7.1.2...v7.1.3
+
+## Summary
+
+* Bugfix - Fix Share roles translation: [#11241](https://github.com/owncloud/ocis/pull/11241)
+* Bugfix - Fix collaboration service LastModifiedDate: [#11328](https://github.com/owncloud/ocis/pull/11328)
+* Bugfix - Fix translations in Settings: [#11361](https://github.com/owncloud/ocis/pull/11361)
+* Enhancement - Limit length of tags: [#11231](https://github.com/owncloud/ocis/pull/11231)
+* Enhancement - Bump Web to 11.3.4: [#12605](https://github.com/owncloud/web/pull/12605)
+
+## Details
+
+* Bugfix - Fix Share roles translation: [#11241](https://github.com/owncloud/ocis/pull/11241)
+
+   We fixed the issue when the Share roles show a wrong translation after the user
+   location has changed back to English.
+
+   https://github.com/owncloud/ocis/issues/11025
+   https://github.com/owncloud/ocis/pull/11241
+
+* Bugfix - Fix collaboration service LastModifiedDate: [#11328](https://github.com/owncloud/ocis/pull/11328)
+
+   Collaboration service now returns correct LastModifiedDate.
+
+   https://github.com/owncloud/ocis/pull/11328
+
+* Bugfix - Fix translations in Settings: [#11361](https://github.com/owncloud/ocis/pull/11361)
+
+   Notification option translation where missing one string. This is fixed.
+
+   https://github.com/owncloud/ocis/pull/11361
+   https://github.com/owncloud/ocis/pull/11364
+
+* Enhancement - Limit length of tags: [#11231](https://github.com/owncloud/ocis/pull/11231)
+
+   We limited the length of tags to avoid DOS attacks against the ocis server.
+
+   https://github.com/owncloud/ocis/pull/11231
+
+* Enhancement - Bump Web to 11.3.4: [#12605](https://github.com/owncloud/web/pull/12605)
+
+   - Bugfix [owncloud/web#12598](https://github.com/owncloud/web/pull/12598): Add
+   src attribute to external app iframe - Bugfix
+   [owncloud/web#12474](https://github.com/owncloud/web/pull/12474): Add tag
+   characters limit
+
+   https://github.com/owncloud/web/pull/12605
+   https://github.com/owncloud/web/releases/tag/v11.3.4
 
 # Changelog for [7.1.2] (2025-03-28)
 
@@ -11444,7 +11537,7 @@ The following sections list the changes for 2.0.0.
 
 The following sections list the changes for 1.20.0.
 
-[1.20.0]: https://github.com/owncloud/ocis/compare/v1.19.1...v1.20.0
+[1.20.0]: https://github.com/owncloud/ocis/compare/v1.19.0...v1.20.0
 
 ## Summary
 
@@ -11618,29 +11711,11 @@ The following sections list the changes for 1.20.0.
    https://github.com/owncloud/ocis/pull/3509
    https://github.com/owncloud/web/releases/tag/v5.4.0
 
-# Changelog for [1.19.1] (2022-03-29)
-
-The following sections list the changes for 1.19.1.
-
-[1.19.1]: https://github.com/owncloud/ocis/compare/v1.19.0...v1.19.1
-
-## Summary
-
-* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
-
-## Details
-
-* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
-
-   URLs for Special items (space image, readme) were broken.
-
-   https://github.com/owncloud/ocis/pull/3419
-
 # Changelog for [1.19.0] (2022-03-29)
 
 The following sections list the changes for 1.19.0.
 
-[1.19.0]: https://github.com/owncloud/ocis/compare/v1.18.0...v1.19.0
+[1.19.0]: https://github.com/owncloud/ocis/compare/v1.19.1...v1.19.0
 
 ## Summary
 
@@ -11813,6 +11888,24 @@ The following sections list the changes for 1.19.0.
    https://github.com/owncloud/ocis/pull/3291
    https://github.com/owncloud/ocis/pull/3375
    https://github.com/owncloud/web/releases/tag/v5.3.0
+
+# Changelog for [1.19.1] (2022-03-29)
+
+The following sections list the changes for 1.19.1.
+
+[1.19.1]: https://github.com/owncloud/ocis/compare/v1.18.0...v1.19.1
+
+## Summary
+
+* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
+
+## Details
+
+* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
+
+   URLs for Special items (space image, readme) were broken.
+
+   https://github.com/owncloud/ocis/pull/3419
 
 # Changelog for [1.18.0] (2022-03-03)
 

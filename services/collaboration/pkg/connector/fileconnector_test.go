@@ -1703,6 +1703,7 @@ var _ = Describe("FileConnector", func() {
 					Size: uint64(998877),
 					Mtime: &typesv1beta1.Timestamp{
 						Seconds: uint64(16273849),
+						Nanos:   uint32(123456789),
 					},
 					Path: "/path/to/test.txt",
 					Id: &providerv1beta1.ResourceId{
@@ -1721,7 +1722,8 @@ var _ = Describe("FileConnector", func() {
 			expectedFileInfo := &fileinfo.Microsoft{
 				OwnerID:                    "61616262636340637573746f6d496470", // hex of aabbcc@customIdp
 				Size:                       int64(998877),
-				Version:                    "v162738490",
+				Version:                    "v16273849123456789",
+				LastModifiedTime:           "1970-07-08T08:30:49.1234567Z",
 				BaseFileName:               "test.txt",
 				BreadcrumbDocName:          "test.txt",
 				BreadcrumbFolderName:       "/path/to",
@@ -1777,6 +1779,7 @@ var _ = Describe("FileConnector", func() {
 					// Size is intentionally nil for guest users
 					Mtime: &typesv1beta1.Timestamp{
 						Seconds: uint64(16273849),
+						Nanos:   uint32(1234567),
 					},
 					Path: "/path/to/test.txt",
 					Id: &providerv1beta1.ResourceId{
@@ -1879,6 +1882,7 @@ var _ = Describe("FileConnector", func() {
 					// Size is intentionally nil for guest users
 					Mtime: &typesv1beta1.Timestamp{
 						Seconds: uint64(16273849),
+						Nanos:   uint32(123456789),
 					},
 					Path: "/path/to/test.txt",
 					Id:   ResourceId,
@@ -1896,7 +1900,8 @@ var _ = Describe("FileConnector", func() {
 			cfg.App.Product = "OnlyOffice"
 
 			expectedFileInfo := &fileinfo.OnlyOffice{
-				Version:                 "v162738490",
+				Version:                 "v16273849123456789",
+				LastModifiedTime:        "1970-07-08T08:30:49.1234567Z",
 				BaseFileName:            "test.txt",
 				BreadcrumbDocName:       "test.txt",
 				BreadcrumbFolderName:    "/path/to",
@@ -2049,6 +2054,7 @@ var _ = Describe("FileConnector", func() {
 
 			expectedFileInfo := &fileinfo.OnlyOffice{
 				Version:                 "v162738490",
+				LastModifiedTime:        "1970-07-08T08:30:49.0000000Z",
 				BaseFileName:            "test.txt",
 				BreadcrumbDocName:       "test.txt",
 				BreadcrumbFolderName:    "/path/to",

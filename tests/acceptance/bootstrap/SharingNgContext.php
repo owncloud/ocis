@@ -205,6 +205,43 @@ class SharingNgContext implements Context {
 	}
 
 	/**
+	 * @When /^user "([^"]*)" (?:tries to list|lists) the permission for (?:folder|file) "([^"]*)" of the space "([^"]*)" shared via (link|invitation) using the Graph API$/
+	 *
+	 * @param string $user
+	 * @param string $resource
+	 * @param string $space
+	 * @param string $shareMethods
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userGetsPermissionListForResourceOfTheSpaceUsingTheGraphAPI(
+		string $user,
+		string $resource,
+		string $space,
+		string $shareMethods
+	): void {
+		if ($shareMethods === 'link') {
+			$permissionId = $this->featureContext->shareNgGetLastCreatedLinkShareID();
+		} else {
+			$permissionId = $this->featureContext->shareNgGetLastCreatedUserGroupShareID();
+		}
+		$spaceId = ($this->spacesContext->getSpaceByName($user, $space))["id"];
+		$itemId = $this->spacesContext->getResourceId($user, $space, $resource);
+
+		$response = GraphHelper::getSinglePermissionList(
+			$this->featureContext->getBaseUrl(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			$spaceId,
+			$itemId,
+			$permissionId
+		);
+
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
 	 * @When /^user "([^"]*)" lists the permissions of space "([^"]*)" using permissions endpoint of the Graph API$/
 	 *
 	 * @param string $user

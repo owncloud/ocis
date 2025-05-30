@@ -294,11 +294,12 @@ func FrontendConfigFromStruct(cfg *config.Config, logger log.Logger) (map[string
 								},
 							},
 							"spaces": map[string]interface{}{
-								"version":    "1.0.0",
-								"enabled":    true,
-								"projects":   true,
-								"share_jail": true,
-								"max_quota":  cfg.MaxQuota,
+								"version":        "1.0.0",
+								"enabled":        true,
+								"projects":       true,
+								"share_jail":     true,
+								"max_quota":      cfg.MaxQuota,
+								"server_managed": cfg.ServerManagedSpaces,
 							},
 							"theme": capabilities.Default().Theme,
 							"search": map[string]interface{}{

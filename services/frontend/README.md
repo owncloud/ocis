@@ -77,7 +77,8 @@ In Infinite Scale, the password policy is always enabled because the max-length 
 
 With the password policy, mandatory criteria for the password can be defined via the environment variables listed below.
 
-Generally, a password can contain any UTF-8 characters, however some characters are regarded as special since they are not used in ordinary texts. Which characters should be treated as special is defined by "The OWASP® Foundation" [password-special-characters](https://owasp.org/www-community/password-special-characters) (between double quotes): " !"#$%&'()*+,-./:;<=>?@[\]^_`{|}~"
+Generally, a password can contain any UTF-8 characters, however some characters are regarded as special since they are not used in ordinary texts. Which characters should be treated as special is defined by "The OWASP® Foundation" [password-special-characters](https://owasp.org/www-community/password-special-characters) (between double quotes):\
+" !"#$%&'()*+,-./:;<=>?@\[\]^_`{|}~"
 
 The validation against the banned passwords list can be configured via a text file with words separated by new lines. If a user tries to set a password listed in the banned passwords list, the password can not be used (is invalid) even if the other mandatory criteria are passed. The admin can define the path of the banned passwords list file. If the file doesn't exist in a location, Infinite Scale tries to load a file from the `OCIS_CONFIG_DIR/OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST`. An option will be enabled when the file has been loaded successfully.
 
@@ -140,3 +141,7 @@ For public accessible writable shares, a password can be enforced. To change the
 Note that changing this environment variable only makes sense if\
 `OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD`\
 is set to `false`.
+
+## Space Management Through OIDC Claims
+
+When **Space Management Through OIDC Claims** has been enabled in the `proxy` service via the envvar `OCIS_CLAIM_MANAGED_SPACES_ENABLED`, this envvar must also be set for the `frontend` service. This is necessary to block adding or removing users to or from spaces through the web UI.

@@ -21,9 +21,9 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 
 #### [Settings service user can list other peoples assignments](https://github.com/owncloud/ocis/issues/5032)
 
-- [apiSettings/settings.feature:116](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSettings/settings.feature#L116)
-- [apiSettings/settings.feature:117](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSettings/settings.feature#L117)
-- [apiSettings/settings.feature:118](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSettings/settings.feature#L118)
+- [apiSettings/settings.feature:125](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSettings/settings.feature#L125)
+- [apiSettings/settings.feature:126](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSettings/settings.feature#L126)
+- [apiSettings/settings.feature:127](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSettings/settings.feature#L127)
 
 #### [A User can get information of another user with Graph API](https://github.com/owncloud/ocis/issues/5125)
 
@@ -392,7 +392,10 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 
 - [apiSharingNgShares/sharedWithMe.feature:5410](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNgShares/sharedWithMe.feature#L5410)
 - [apiSharingNgShares/sharedWithMe.feature:5411](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNgShares/sharedWithMe.feature#L5411)
-- [apiSharingNgShares/sharedWithMe.feature:5412](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNgShares/sharedWithMe.feature#L5412)
+
+### [[Sharing NG] Implement https://owncloud.dev/libre-graph-api/#/drives.permissions/GetPermission](https://github.com/owncloud/ocis/issues/8616)
+- [apiSharingNgPermissions/listPermissions.feature:2585](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNgPermissions/listPermissions.feature#L2585)
+- [apiSharingNgPermissions/listPermissions.feature:2631](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNgPermissions/listPermissions.feature#L2631)
 
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.

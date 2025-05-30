@@ -289,6 +289,20 @@ class SpacesContext implements Context {
 	}
 
 	/**
+	 * finds available spaces to the user and returns the owner userId by spaceName
+	 *
+	 * @param string $user
+	 * @param string $spaceName
+	 *
+	 * @return string
+	 * @throws GuzzleException
+	 */
+	public function getSpaceOwnerUserIdByName(string $user, string $spaceName): string {
+		$space = $this->getSpaceByName($user, $spaceName);
+		return $space["owner"]["user"]["id"];
+	}
+
+	/**
 	 * @param string $user
 	 * @param string $share
 	 *

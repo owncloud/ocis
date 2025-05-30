@@ -1604,6 +1604,35 @@ class GraphHelper {
 	}
 
 	/**
+	 * @param string $baseUrl
+	 * @param string $user
+	 * @param string $password
+	 * @param string $spaceId
+	 * @param string $itemId
+	 * @param string $permssionId
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public static function getSinglePermissionList(
+		string $baseUrl,
+		string $user,
+		string $password,
+		string $spaceId,
+		string $itemId,
+		string $permssionId
+	): ResponseInterface {
+		$url = self::getBetaFullUrl($baseUrl, "drives/$spaceId/items/$itemId/permissions/$permssionId");
+
+		return HttpRequestHelper::get(
+			$url,
+			$user,
+			$password,
+			self::getRequestHeaders()
+		);
+	}
+
+	/**
 	 * Get the role id by name
 	 *
 	 * @param string $permissionsRole
