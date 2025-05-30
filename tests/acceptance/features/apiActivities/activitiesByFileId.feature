@@ -2012,3 +2012,106 @@ Feature: check activities
         }
       }
       """
+
+  @issue-10328
+  Scenario: check activities after deleting a file using file-id
+    Given user "Alice" has uploaded file with content "ownCloud test text file" to "textfile.txt"
+    And we save it into "FILEID"
+    And user "Alice" has deleted file "textfile.txt" from space "Personal" using file-id "<<FILEID>>"
+    When user "Alice" lists the activities of space "Personal" using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "uniqueItems": true,
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "required": ["id","template","times"],
+                  "properties": {
+                    "template": {
+                      "type": "object",
+                      "required": ["message","variables"],
+                      "properties": {
+                        "message": { "const": "{user} added {resource} to {folder}" },
+                        "variables": {
+                          "type": "object",
+                          "required": ["resource", "folder", "user"],
+                          "properties": {
+                            "resource": {
+                              "type": "object",
+                              "required": ["id", "name"],
+                              "properties": {
+                                "name": { "const": "textfile.txt" }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["id","template","times"],
+                  "properties": {
+                    "id": { "pattern": "^%user_id_pattern%$" },
+                    "template": {
+                      "type": "object",
+                      "required": ["message","variables"],
+                      "properties": {
+                        "message": { "const": "{user} deleted {resource} from {folder}" },
+                        "variables": {
+                          "type": "object",
+                          "required": ["resource","folder","user"],
+                          "properties": {
+                            "resource": {
+                              "type": "object",
+                              "required": ["id","name"],
+                              "properties": {
+                                "id": { "pattern": "%file_id_pattern%" },
+                                "name": { "const": "textfile.txt" }
+                              }
+                            },
+                            "folder": {
+                              "type": "object",
+                              "required": ["name"],
+                              "properties": {
+                                "name": { "const": "Alice Hansen" }
+                              }
+                            },
+                            "user": {
+                              "type": "object",
+                              "required": ["id","displayName"],
+                              "properties": {
+                                "id": { "pattern": "%user_id_pattern%" },
+                                "displayName": { "const": "Alice Hansen" }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "times": {
+                      "type": "object",
+                      "required": ["recordedTime"],
+                      "properties": {
+                        "recordedTime": { "format": "date-time" }
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+      """
