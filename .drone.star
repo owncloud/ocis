@@ -2345,7 +2345,7 @@ def makeGoGenerate(module):
 
 def notify(ctx):
     status = ["failure"]
-    if ctx.build.event == "cron":
+    if ctx.build.event in ["cron", "tag"]:
         status.append("success")
 
     return {
