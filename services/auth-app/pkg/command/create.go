@@ -28,6 +28,7 @@ import (
 // Create is the entrypoint for the app auth create command
 func Create(cfg *config.Config) *cli.Command {
 	return &cli.Command{
+		HideHelp: true,
 		Name:     "create",
 		Usage:    "create an app auth token for a user",
 		Category: "maintenance",

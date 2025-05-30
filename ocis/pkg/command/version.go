@@ -21,8 +21,9 @@ const (
 // VersionCommand is the entrypoint for the version command.
 func VersionCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:  "version",
-		Usage: "print the version of this binary and all running service instances",
+		HideHelp: true,
+		Name:     "version",
+		Usage:    "print the version of this binary and all running service instances",
 		Flags: []cli.Flag{
 			&cli.BoolFlag{
 				Name:  _skipServiceListingFlagName,

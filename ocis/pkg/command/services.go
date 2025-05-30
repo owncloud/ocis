@@ -268,6 +268,7 @@ var svccmds = []register.Command{
 // ServiceCommand is the entry point for the all service commands.
 func ServiceCommand(cfg *config.Config, serviceName string, subcommands []*cli.Command, f func(*config.Config)) *cli.Command {
 	return &cli.Command{
+		HideHelp: true,
 		Name:     serviceName,
 		Usage:    helper.SubcommandDescription(serviceName),
 		Category: "services",

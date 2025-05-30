@@ -13,8 +13,9 @@ import (
 
 func TrashCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:  "trash",
-		Usage: "ocis trash functionality",
+		HideHelp: true,
+		Name:     "trash",
+		Usage:    "ocis trash functionality",
 		Subcommands: []*cli.Command{
 			TrashPurgeEmptyDirsCommand(cfg),
 		},
@@ -30,8 +31,9 @@ func TrashCommand(cfg *config.Config) *cli.Command {
 
 func TrashPurgeEmptyDirsCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:  "purge-empty-dirs",
-		Usage: "purge empty directories",
+		HideHelp: true,
+		Name:     "purge-empty-dirs",
+		Usage:    "purge empty directories",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:     "basepath",

@@ -12,6 +12,7 @@ import (
 // Server is the entrypoint for the server command.
 func Server(cfg *config.Config) *cli.Command {
 	return &cli.Command{
+		HideHelp: true,
 		Name:     "server",
 		Usage:    "start a fullstack server (runtime and all services in supervised mode)",
 		Category: "fullstack",

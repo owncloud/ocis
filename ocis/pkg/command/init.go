@@ -17,8 +17,9 @@ import (
 // InitCommand is the entrypoint for the init command
 func InitCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:  "init",
-		Usage: "initialise an ocis config",
+		HideHelp: true,
+		Name:     "init",
+		Usage:    "initialise an ocis config",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:    "insecure",

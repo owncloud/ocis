@@ -26,6 +26,7 @@ import (
 // BenchmarkCommand is the entrypoint for the benchmark commands.
 func BenchmarkCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
+		HideHelp:    true,
 		Name:        "benchmark",
 		Usage:       "cli tools to test low and high level performance",
 		Category:    "benchmark",
@@ -36,7 +37,8 @@ func BenchmarkCommand(cfg *config.Config) *cli.Command {
 // BenchmarkClientCommand is the entrypoint for the benchmark client command.
 func BenchmarkClientCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name: "client",
+		HideHelp: true,
+		Name:     "client",
 
 		Usage: "Start a client that continuously makes web requests and prints stats. The options mimic curl, but URL must be at the end.",
 		Flags: []cli.Flag{
@@ -281,8 +283,9 @@ func client(o clientOptions) error {
 // BenchmarkSyscallsCommand is the entrypoint for the benchmark syscalls command.
 func BenchmarkSyscallsCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:  "syscalls",
-		Usage: "test the performance of syscalls",
+		HideHelp: true,
+		Name:     "syscalls",
+		Usage:    "test the performance of syscalls",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:  "path",

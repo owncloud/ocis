@@ -15,6 +15,7 @@ import (
 // Version prints the service versions of all running instances.
 func Version(cfg *config.Config) *cli.Command {
 	return &cli.Command{
+		HideHelp: true,
 		Name:     "version",
 		Usage:    "Print the version of this binary and the running service instances",
 		Category: "Version",

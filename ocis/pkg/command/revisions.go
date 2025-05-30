@@ -26,8 +26,9 @@ var (
 // RevisionsCommand is the entrypoint for the revisions command.
 func RevisionsCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:  "revisions",
-		Usage: "ocis revisions functionality",
+		HideHelp: true,
+		Name:     "revisions",
+		Usage:    "ocis revisions functionality",
 		Subcommands: []*cli.Command{
 			PurgeRevisionsCommand(cfg),
 		},
@@ -44,8 +45,9 @@ func RevisionsCommand(cfg *config.Config) *cli.Command {
 // PurgeRevisionsCommand allows removing all revisions from a storage provider.
 func PurgeRevisionsCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:  "purge",
-		Usage: "purge revisions",
+		HideHelp: true,
+		Name:     "purge",
+		Usage:    "purge revisions",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:     "basepath",

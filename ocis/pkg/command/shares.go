@@ -22,6 +22,7 @@ import (
 // SharesCommand is the entrypoint for the groups command.
 func SharesCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
+		HideHelp: true,
 		Name:     "shares",
 		Usage:    `cli tools to manage entries in the share manager.`,
 		Category: "maintenance",
@@ -47,8 +48,9 @@ func init() {
 
 func cleanupCmd(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:  "cleanup",
-		Usage: `clean up stale entries in the share manager.`,
+		HideHelp: true,
+		Name:     "cleanup",
+		Usage:    `clean up stale entries in the share manager.`,
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:     "service-account-id",

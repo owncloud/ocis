@@ -24,6 +24,7 @@ import (
 // ResetPassword is the entrypoint for the resetpassword command
 func ResetPassword(cfg *config.Config) *cli.Command {
 	return &cli.Command{
+		HideHelp: true,
 		Name:     "resetpassword",
 		Usage:    "Reset user password",
 		Category: "password reset",

@@ -31,6 +31,7 @@ import (
 // DecomposedfsCommand is the entrypoint for the groups command.
 func DecomposedfsCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
+		HideHelp: true,
 		Name:     "decomposedfs",
 		Usage:    `cli tools to inspect and manipulate a decomposedfs storage.`,
 		Category: "maintenance",
@@ -47,8 +48,9 @@ func init() {
 
 func checkCmd(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:  "check-treesize",
-		Usage: `cli tool to check the treesize metadata of a Space`,
+		HideHelp: true,
+		Name:     "check-treesize",
+		Usage:    `cli tool to check the treesize metadata of a Space`,
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:     "root",
@@ -186,8 +188,9 @@ func walkTree(ctx context.Context, tree *tree.Tree, lu *lookup.Lookup, root *nod
 
 func metadataCmd(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:  "metadata",
-		Usage: `cli tools to inspect and manipulate node metadata`,
+		HideHelp: true,
+		Name:     "metadata",
+		Usage:    `cli tools to inspect and manipulate node metadata`,
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:     "root",
@@ -208,8 +211,9 @@ func metadataCmd(cfg *config.Config) *cli.Command {
 
 func dumpCmd(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:  "dump",
-		Usage: `print the metadata of the given node. String attributes will be enclosed in quotes. Binary attributes will be returned encoded as base64 with their value being prefixed with '0s'.`,
+		HideHelp: true,
+		Name:     "dump",
+		Usage:    `print the metadata of the given node. String attributes will be enclosed in quotes. Binary attributes will be returned encoded as base64 with their value being prefixed with '0s'.`,
 		Action: func(c *cli.Context) error {
 			lu, backend := getBackend(c)
 			path, err := getPath(c, lu)
@@ -230,8 +234,9 @@ func dumpCmd(cfg *config.Config) *cli.Command {
 
 func getCmd(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:  "get",
-		Usage: `print a specific attribute of the given node. String attributes will be enclosed in quotes. Binary attributes will be returned encoded as base64 with their value being prefixed with '0s'.`,
+		HideHelp: true,
+		Name:     "get",
+		Usage:    `print a specific attribute of the given node. String attributes will be enclosed in quotes. Binary attributes will be returned encoded as base64 with their value being prefixed with '0s'.`,
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:    "attribute",
@@ -259,8 +264,9 @@ func getCmd(cfg *config.Config) *cli.Command {
 
 func setCmd(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:  "set",
-		Usage: `manipulate metadata of the given node. Binary attributes can be given hex encoded (prefix by '0x') or base64 encoded (prefix by '0s').`,
+		HideHelp: true,
+		Name:     "set",
+		Usage:    `manipulate metadata of the given node. Binary attributes can be given hex encoded (prefix by '0x') or base64 encoded (prefix by '0s').`,
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:     "attribute",

@@ -17,8 +17,9 @@ import (
 // BackupCommand is the entrypoint for the backup command
 func BackupCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:  "backup",
-		Usage: "ocis backup functionality",
+		HideHelp: true,
+		Name:     "backup",
+		Usage:    "ocis backup functionality",
 		Subcommands: []*cli.Command{
 			ConsistencyCommand(cfg),
 		},
@@ -35,8 +36,9 @@ func BackupCommand(cfg *config.Config) *cli.Command {
 // ConsistencyCommand is the entrypoint for the consistency Command
 func ConsistencyCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:  "consistency",
-		Usage: "check backup consistency",
+		HideHelp: true,
+		Name:     "consistency",
+		Usage:    "check backup consistency",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:     "basepath",

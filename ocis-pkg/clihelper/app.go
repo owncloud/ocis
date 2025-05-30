@@ -21,6 +21,7 @@ func DefaultApp(app *cli.App) *cli.App {
 	// disable global version flag
 	// instead we provide the version command
 	app.HideVersion = true
+	app.HideHelp = true
 
 	return app
 }

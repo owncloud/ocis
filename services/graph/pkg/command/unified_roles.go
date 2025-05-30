@@ -51,8 +51,9 @@ func UnifiedRoles(cfg *config.Config) cli.Commands {
 // unifiedRolesStatus lists available unified roles, it contains an indicator to show if the role is enabled or not
 func listUnifiedRoles(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:  "list",
-		Usage: "list available unified roles",
+		HideHelp: true,
+		Name:     "list",
+		Usage:    "list available unified roles",
 		Action: func(c *cli.Context) error {
 			tbl := tablewriter.NewWriter(os.Stdout)
 			tbl.SetRowLine(true)
