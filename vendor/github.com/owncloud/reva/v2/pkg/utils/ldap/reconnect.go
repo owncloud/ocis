@@ -344,3 +344,29 @@ func (c *ConnWithReconnect) Syncrepl(ctx context.Context, searchRequest *ldap.Se
 	// unimplemented
 	return nil
 }
+
+// Extended implements the ldap.Client interface
+func (c *ConnWithReconnect) Extended(request *ldap.ExtendedRequest) (*ldap.ExtendedResponse, error) {
+	conn, err := c.getConnection()
+	if err != nil {
+		return nil, err
+	}
+
+	var res *ldap.ExtendedResponse
+	for try := 0; try <= c.retries; try++ {
+		res, err = conn.Extended(request)
+		if !ldap.IsErrorWithCode(err, ldap.ErrorNetwork) {
+			// non network error, return it to the client
+			return res, err
+		}
+
+		c.logger.Debug().Msgf("Network Error. attempt %d", try)
+		conn, err = c.reconnect(conn)
+		if err != nil {
+			return nil, err
+		}
+		c.logger.Debug().Msg("retrying LDAP Extended")
+	}
+	// if we get here we reached the maximum retries. So return an error
+	return nil, ldap.NewError(ldap.ErrorNetwork, errMaxRetries)
+}
