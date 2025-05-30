@@ -397,5 +397,9 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiSharingNgPermissions/listPermissions.feature:2585](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNgPermissions/listPermissions.feature#L2585)
 - [apiSharingNgPermissions/listPermissions.feature:2631](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNgPermissions/listPermissions.feature#L2631)
 
+#### [Activity. No activity for copying a zero byte file](https://github.com/owncloud/ocis/issues/10417)
+- [apiActivities/activities.feature:4108](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiActivities/activities.feature#L4108)
+- [apiActivities/activitiesByFileId.feature:1842](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiActivities/activitiesByFileId.feature#L1842)
+
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.
