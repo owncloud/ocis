@@ -16,9 +16,10 @@ import (
 // RestartPostprocessing cli command to restart postprocessing
 func RestartPostprocessing(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:    "resume",
-		Aliases: []string{"restart"},
-		Usage:   "resume postprocessing for an uploadID",
+		HideHelp: true,
+		Name:     "resume",
+		Aliases:  []string{"restart"},
+		Usage:    "resume postprocessing for an uploadID",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:    "upload-id",

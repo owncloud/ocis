@@ -26,6 +26,7 @@ import (
 // Server is the entry point for the server command.
 func Server(cfg *config.Config) *cli.Command {
 	return &cli.Command{
+		HideHelp: true,
 		Name:     "server",
 		Usage:    fmt.Sprintf("start the %s service without runtime (unsupervised mode)", cfg.Service.Name),
 		Category: "server",

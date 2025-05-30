@@ -57,8 +57,9 @@ var _applyYesFlagTmpl = cli.BoolFlag{
 // TrashBin wraps trash-bin related sub-commands.
 func TrashBin(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:  "trash-bin",
-		Usage: "manage trash-bin's",
+		HideHelp: true,
+		Name:     "trash-bin",
+		Usage:    "manage trash-bin's",
 		Subcommands: []*cli.Command{
 			PurgeExpiredResources(cfg),
 			listTrashBinItems(cfg),
@@ -71,9 +72,10 @@ func TrashBin(cfg *config.Config) *cli.Command {
 // PurgeExpiredResources cli command removes old trash-bin items.
 func PurgeExpiredResources(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:  "purge-expired",
-		Usage: "Purge expired trash-bin items",
-		Flags: []cli.Flag{},
+		HideHelp: true,
+		Name:     "purge-expired",
+		Usage:    "Purge expired trash-bin items",
+		Flags:    []cli.Flag{},
 		Before: func(c *cli.Context) error {
 			return configlog.ReturnFatal(parser.ParseConfig(cfg))
 		},
@@ -105,6 +107,7 @@ func listTrashBinItems(cfg *config.Config) *cli.Command {
 	verboseFlag := _verboseFlagTmpl
 	verboseFlag.Destination = &verboseVal
 	return &cli.Command{
+		HideHelp:  true,
 		Name:      "list",
 		Usage:     "Print a list of all trash-bin items of a space.",
 		ArgsUsage: "['spaceID' required]",
@@ -166,6 +169,7 @@ func restoreAllTrashBinItems(cfg *config.Config) *cli.Command {
 	applyYesFlag := _applyYesFlagTmpl
 	applyYesFlag.Destination = &applyYesVal
 	return &cli.Command{
+		HideHelp:  true,
 		Name:      "restore-all",
 		Usage:     "Restore all trash-bin items for a space.",
 		ArgsUsage: "['spaceID' required]",
@@ -264,6 +268,7 @@ func restoreTrashBindItem(cfg *config.Config) *cli.Command {
 	verboseFlag := _verboseFlagTmpl
 	verboseFlag.Destination = &verboseVal
 	return &cli.Command{
+		HideHelp:  true,
 		Name:      "restore",
 		Usage:     "Restore a trash-bin item by ID.",
 		ArgsUsage: "['spaceID' required] ['itemID' required]",

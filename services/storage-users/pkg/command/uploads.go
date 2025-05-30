@@ -56,8 +56,9 @@ type Session struct {
 // Uploads is the entry point for the uploads command
 func Uploads(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:  "uploads",
-		Usage: "manage unfinished uploads",
+		HideHelp: true,
+		Name:     "uploads",
+		Usage:    "manage unfinished uploads",
 		Subcommands: []*cli.Command{
 			ListUploadSessions(cfg),
 			DeleteStaleProcessingNodes(cfg),
@@ -68,8 +69,9 @@ func Uploads(cfg *config.Config) *cli.Command {
 // ListUploadSessions prints a list of upload sessiens
 func ListUploadSessions(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:  "sessions",
-		Usage: "Print a list of upload sessions",
+		HideHelp: true,
+		Name:     "sessions",
+		Usage:    "Print a list of upload sessions",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:        "id",
@@ -329,8 +331,9 @@ func buildInfo(filter storage.UploadSessionFilter) string {
 // DeleteStaleProcessingNodes is the entry point for the delete-stale-nodes command
 func DeleteStaleProcessingNodes(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:  "delete-stale-nodes",
-		Usage: "Delete all nodes in processing state that are not referenced by any upload session",
+		HideHelp: true,
+		Name:     "delete-stale-nodes",
+		Usage:    "Delete all nodes in processing state that are not referenced by any upload session",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:     "spaceid",

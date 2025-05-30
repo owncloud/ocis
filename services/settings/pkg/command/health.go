@@ -14,8 +14,9 @@ import (
 // Health is the entrypoint for the health command.
 func Health(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:  "health",
-		Usage: "Check health status",
+		HideHelp: true,
+		Name:     "health",
+		Usage:    "Check health status",
 		Before: func(c *cli.Context) error {
 			return configlog.ReturnError(parser.ParseConfig(cfg))
 		},

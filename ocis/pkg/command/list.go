@@ -14,6 +14,7 @@ import (
 // ListCommand is the entrypoint for the list command.
 func ListCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
+		HideHelp: true,
 		Name:     "list",
 		Usage:    "list oCIS services running in the runtime (supervised mode)",
 		Category: "runtime",

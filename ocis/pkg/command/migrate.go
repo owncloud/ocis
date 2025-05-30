@@ -44,6 +44,7 @@ import (
 // Migrate is the entrypoint for the Migrate command.
 func Migrate(cfg *config.Config) *cli.Command {
 	return &cli.Command{
+		HideHelp: true,
 		Name:     "migrate",
 		Usage:    "migrate data from an existing to another instance",
 		Category: "migration",
@@ -63,6 +64,7 @@ func init() {
 // RebuildJSONCS3Indexes rebuilds the share indexes from the shares json
 func RebuildJSONCS3Indexes(cfg *config.Config) *cli.Command {
 	return &cli.Command{
+		HideHelp:    true,
 		Name:        "rebuild-jsoncs3-indexes",
 		Usage:       "rebuild the share indexes from the shares json",
 		Subcommands: []*cli.Command{},
@@ -203,8 +205,9 @@ func RebuildJSONCS3Indexes(cfg *config.Config) *cli.Command {
 // MigrateDecomposedfs is the entrypoint for the decomposedfs migrate command
 func MigrateDecomposedfs(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:  "decomposedfs",
-		Usage: "run a decomposedfs migration",
+		HideHelp: true,
+		Name:     "decomposedfs",
+		Usage:    "run a decomposedfs migration",
 		Subcommands: []*cli.Command{
 			ListDecomposedfsMigrations(cfg),
 		},
@@ -261,8 +264,9 @@ func MigrateDecomposedfs(cfg *config.Config) *cli.Command {
 // ListDecomposedfsMigrations is the entrypoint for the decomposedfs list migrations command
 func ListDecomposedfsMigrations(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:  "list",
-		Usage: "list decomposedfs migrations",
+		HideHelp: true,
+		Name:     "list",
+		Usage:    "list decomposedfs migrations",
 		Action: func(c *cli.Context) error {
 			rootFlag := c.String("root")
 			bod := lookup.DetectBackendOnDisk(rootFlag)
@@ -299,8 +303,9 @@ func ListDecomposedfsMigrations(cfg *config.Config) *cli.Command {
 
 func MigrateShares(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:  "shares",
-		Usage: "migrates shares from the previous to the new share manager",
+		HideHelp: true,
+		Name:     "shares",
+		Usage:    "migrates shares from the previous to the new share manager",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:  "from",
@@ -394,8 +399,9 @@ func MigrateShares(cfg *config.Config) *cli.Command {
 
 func MigratePublicShares(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:  "publicshares",
-		Usage: "migrates public shares from the previous to the new public share manager",
+		HideHelp: true,
+		Name:     "publicshares",
+		Usage:    "migrates public shares from the previous to the new public share manager",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:  "from",

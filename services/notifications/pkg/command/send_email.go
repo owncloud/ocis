@@ -14,8 +14,9 @@ import (
 // SendEmail triggers the sending of grouped email notifications for daily or weekly emails.
 func SendEmail(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:  "send-email",
-		Usage: "Send grouped email notifications with daily or weekly interval. Specify at least one of the flags '--daily' or '--weekly'.",
+		HideHelp: true,
+		Name:     "send-email",
+		Usage:    "Send grouped email notifications with daily or weekly interval. Specify at least one of the flags '--daily' or '--weekly'.",
 		Flags: []cli.Flag{
 			&cli.BoolFlag{
 				Name:    "daily",

@@ -20,6 +20,7 @@ import (
 // Index is the entrypoint for the server command.
 func Index(cfg *config.Config) *cli.Command {
 	return &cli.Command{
+		HideHelp: true,
 		Name:     "index",
 		Usage:    "index the files for one one more users",
 		Category: "index management",
