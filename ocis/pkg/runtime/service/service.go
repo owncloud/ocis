@@ -70,9 +70,6 @@ import (
 )
 
 var (
-	// runset keeps track of which services to start supervised.
-	runset map[string]struct{}
-
 	// wait funcs run after the service group has been started.
 	_waitFuncs = []func(*ociscfg.Config) error{pingNats, pingGateway, nil, wait(time.Second), nil}
 
@@ -91,6 +88,7 @@ type Service struct {
 	Additional serviceFuncMap
 	Log        log.Logger
 
+	mu           sync.Mutex
 	serviceToken map[string][]suture.ServiceToken
 	cfg          *ociscfg.Config
 }
@@ -408,7 +406,8 @@ func Start(ctx context.Context, o ...Option) error {
 	srv := new(http.Server)
 
 	// prepare the set of services to run
-	s.generateRunSet(s.cfg)
+	// runset keeps track of which services to start supervised.
+	runset := s.generateRunSet(s.cfg)
 
 	// There are reasons not to do this, but we have race conditions ourselves. Until we resolve them, mind the following disclaimer:
 	// Calling ServeBackground will CORRECTLY start the supervisor running in a new goroutine. It is risky to directly run
@@ -418,7 +417,7 @@ func Start(ctx context.Context, o ...Option) error {
 	go s.Supervisor.ServeBackground(ctx)
 
 	for i, service := range s.Services {
-		scheduleServiceTokens(s, service)
+		scheduleServiceTokens(s, runset, service)
 		if _waitFuncs[i] != nil {
 			if err := _waitFuncs[i](s.cfg); err != nil {
 				s.Log.Fatal().Err(err).Msg("wait func failed")
@@ -427,7 +426,7 @@ func Start(ctx context.Context, o ...Option) error {
 	}
 
 	// schedule services that are optional
-	scheduleServiceTokens(s, s.Additional)
+	scheduleServiceTokens(s, runset, s.Additional)
 
 	go func() {
 		if err = srv.Serve(l); err != nil && !errors.Is(err, http.ErrServerClosed) {
@@ -441,7 +440,9 @@ func Start(ctx context.Context, o ...Option) error {
 }
 
 // scheduleServiceTokens adds service tokens to the service supervisor.
-func scheduleServiceTokens(s *Service, funcSet serviceFuncMap) {
+func scheduleServiceTokens(s *Service, runset map[string]struct{}, funcSet serviceFuncMap) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	for name := range runset {
 		if _, ok := funcSet[name]; !ok {
 			continue
@@ -454,13 +455,13 @@ func scheduleServiceTokens(s *Service, funcSet serviceFuncMap) {
 
 // generateRunSet interprets the cfg.Runtime.Services config option to cherry-pick which services to start using
 // the runtime.
-func (s *Service) generateRunSet(cfg *ociscfg.Config) {
-	runset = make(map[string]struct{})
+func (s *Service) generateRunSet(cfg *ociscfg.Config) map[string]struct{} {
+	runset := make(map[string]struct{})
 	if cfg.Runtime.Services != nil {
 		for _, name := range cfg.Runtime.Services {
 			runset[name] = struct{}{}
 		}
-		return
+		return runset
 	}
 
 	for _, service := range s.Services {
@@ -478,6 +479,7 @@ func (s *Service) generateRunSet(cfg *ociscfg.Config) {
 	for _, name := range cfg.Runtime.Disabled {
 		delete(runset, name)
 	}
+	return runset
 }
 
 // List running processes for the Service Controller.
@@ -486,12 +488,14 @@ func (s *Service) List(_ struct{}, reply *string) error {
 	table := tablewriter.NewWriter(tableString)
 	table.SetHeader([]string{"Service"})
 
+	s.mu.Lock()
 	names := []string{}
 	for t := range s.serviceToken {
 		if len(s.serviceToken[t]) > 0 {
 			names = append(names, t)
 		}
 	}
+	s.mu.Unlock()
 
 	sort.Strings(names)
 
@@ -519,6 +523,7 @@ func trapShutdownCtx(s *Service, srv *http.Server, ctx context.Context) {
 		s.Log.Info().Msg("tcp listener shutdown")
 	}()
 
+	s.mu.Lock()
 	for sName := range s.serviceToken {
 		for i := range s.serviceToken[sName] {
 			wg.Add(1)
@@ -532,6 +537,7 @@ func trapShutdownCtx(s *Service, srv *http.Server, ctx context.Context) {
 			}()
 		}
 	}
+	s.mu.Unlock()
 
 	done := make(chan struct{})
 	go func() {
