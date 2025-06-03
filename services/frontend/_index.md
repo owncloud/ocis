@@ -1,6 +1,6 @@
 ---
 title: Frontend
-date: 2025-06-03T00:51:02.445868271Z
+date: 2025-06-03T04:17:05.548523663Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/frontend
