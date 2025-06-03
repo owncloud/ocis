@@ -4716,4 +4716,40 @@ trait WebDav {
 		$this->setResponse($response);
 		$this->pushToLastStatusCodesArrays();
 	}
+
+	/**
+	 * @Given user :user has deleted file :filename from space :space using file-id :fileId
+	 *
+	 * @param string $user
+	 * @param string $filename
+	 * @param string $space
+	 * @param string $fileId
+	 *
+	 * @return void
+	 * @throws JsonException
+	 * @throws GuzzleException
+	 */
+	public function userHasDeletedFileFromSpaceUsingFileId(
+		string $user,
+		string $filename,
+		string $space,
+		string $fileId
+	): void {
+		$baseUrl = $this->getBaseUrl();
+		$davPath = WebDavHelper::getDavPath($this->getDavPathVersion());
+		$user = $this->getActualUsername($user);
+		$password =  $this->getPasswordForUser($user);
+		$fullUrl = "$baseUrl/$davPath/$fileId";
+		$response = HttpRequestHelper::sendRequest(
+			$fullUrl,
+			'DELETE',
+			$user,
+			$password
+		);
+		$this->theHTTPStatusCodeShouldBe(
+			["204"],
+			"HTTP status code was not 204 while trying to delete resource '$filename' for user '$user'",
+			$response
+		);
+	}
 }
