@@ -30,6 +30,8 @@ const (
 	UnifiedRoleSpaceEditorID = "58c63c02-1d89-4572-916a-870abc5a1b7d"
 	// UnifiedRoleSpaceEditorWithoutVersionsID Unified role space editor without list/restore versions id.
 	UnifiedRoleSpaceEditorWithoutVersionsID = "3284f2d5-0070-4ad8-ac40-c247f7c1fb27"
+	// UnifiedRoleSpaceEditorWithoutTrashbinID Unified role space editor without list/restore resources in trashbin id.
+	UnifiedRoleSpaceEditorWithoutTrashbinID = "8f4701d9-c68f-4109-a482-88e22ee32805"
 	// UnifiedRoleFileEditorID Unified role file editor id.
 	UnifiedRoleFileEditorID = "2d00ce52-1fc2-4dbc-8b95-a73b73395f5a"
 	// UnifiedRoleFileEditorListGrantsID Unified role file editor id.
@@ -142,6 +144,12 @@ var (
 
 	// UnifiedRole SpaseEditorWithoutVersions, Role DisplayName (resolves directly)
 	_spaceEditorWithoutVersionsUnifiedRoleDisplayName = l10n.Template("Can edit without versions")
+
+	// UnifiedRole SpaceEditorWithoutTrashbin, Role DisplayName (resolves directly)
+	_spaceEditorWithoutTrashbinUnifiedRoleDisplayName = l10n.Template("Can edit without trashbin")
+
+	// UnifiedRole SpaceEditorWithoutTrashbin, Role Description (resolves directly)
+	_spaceEditorWithoutTrashbinUnifiedRoleDescription = l10n.Template("View, download, upload, edit, add and delete.")
 
 	// UnifiedRole FileEditor, Role Description (resolves directly)
 	_fileEditorUnifiedRoleDescription = l10n.Template("View, download and edit.")
@@ -363,6 +371,22 @@ var (
 		return &libregraph.UnifiedRoleDefinition{
 			Id:          proto.String(UnifiedRoleSpaceEditorWithoutVersionsID),
 			Description: proto.String(_spaceEditorWithoutVersionsUnifiedRoleDescription),
+			DisplayName: proto.String(cs3RoleToDisplayName(r)),
+			RolePermissions: []libregraph.UnifiedRolePermission{
+				{
+					AllowedResourceActions: CS3ResourcePermissionsToLibregraphActions(r.CS3ResourcePermissions()),
+					Condition:              proto.String(UnifiedRoleConditionDrive),
+				},
+			},
+			LibreGraphWeight: proto.Int32(0),
+		}
+	}
+
+	roleSpaceEditorWithoutTrashbin = func() *libregraph.UnifiedRoleDefinition {
+		r := conversions.NewSpaceEditorWithoutTrashbinRole()
+		return &libregraph.UnifiedRoleDefinition{
+			Id:          proto.String(UnifiedRoleSpaceEditorWithoutTrashbinID),
+			Description: proto.String(_spaceEditorWithoutTrashbinUnifiedRoleDescription),
 			DisplayName: proto.String(cs3RoleToDisplayName(r)),
 			RolePermissions: []libregraph.UnifiedRolePermission{
 				{

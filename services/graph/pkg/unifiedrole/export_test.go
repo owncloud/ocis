@@ -9,6 +9,7 @@ var (
 	RoleEditorListGrantsWithVersions     = roleEditorListGrantsWithVersions
 	RoleSpaceEditor                      = roleSpaceEditor
 	RoleSpaceEditorWithoutVersions       = roleSpaceEditorWithoutVersions
+	RoleSpaceEditorWithoutTrashbin       = roleSpaceEditorWithoutTrashbin
 	RoleFileEditor                       = roleFileEditor
 	RoleFileEditorListGrants             = roleFileEditorListGrants
 	RoleFileEditorListGrantsWithVersions = roleFileEditorListGrantsWithVersions
