@@ -190,6 +190,7 @@ func TestGetRolesByPermissions(t *testing.T) {
 				unifiedrole.RoleSpaceViewer(),
 				unifiedrole.RoleSpaceEditorWithoutVersions(),
 				unifiedrole.RoleSpaceEditor(),
+				unifiedrole.RoleSpaceEditorWithoutTrashbin(),
 				unifiedrole.RoleManager(),
 			},
 		},
