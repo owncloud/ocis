@@ -79,6 +79,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix error on listing space members: [#11245](https://github.com/owncloud/ocis/pull/11245)
 * Bugfix - Fix the graceful shutdown: [#11295](https://github.com/owncloud/ocis/pull/11295)
 * Bugfix - Fix the reva log interceptor: [#11348](https://github.com/owncloud/ocis/pull/11348)
+* Bugfix - Fix panic while traversing the service list: [#11390](https://github.com/owncloud/ocis/pull/11390)
 * Change - Remove deprecated FRONTEND_OCS_*: [#11333](https://github.com/owncloud/ocis/pull/11333)
 * Change - Remove deprecated CLIENTLOG_REVA_GATEWAY: [#11372](https://github.com/owncloud/ocis/pull/11372)
 * Enhancement - Update Mockery to 2.52.3: [#11070](https://github.com/owncloud/ocis/pull/11070)
@@ -201,6 +202,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/10857
    https://github.com/owncloud/ocis/pull/11348
+
+* Bugfix - Fix panic while traversing the service list: [#11390](https://github.com/owncloud/ocis/pull/11390)
+
+   Fix the panic while traversing the service list
+
+   https://github.com/owncloud/ocis/issues/11377
+   https://github.com/owncloud/ocis/pull/11390
 
 * Change - Remove deprecated FRONTEND_OCS_*: [#11333](https://github.com/owncloud/ocis/pull/11333)
 
