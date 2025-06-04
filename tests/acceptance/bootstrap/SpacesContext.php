@@ -614,6 +614,7 @@ class SpacesContext implements Context {
 			$this->featureContext->getPasswordForUser($user),
 			$query,
 			$this->featureContext->getStepLineRef(),
+			[],
 			$headers
 		);
 	}
