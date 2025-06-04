@@ -705,6 +705,8 @@ github.com/kobergj/icap-client v0.0.0-20250116172800-8eaa5022532b h1:NBKEgFtIukC
 github.com/kobergj/icap-client v0.0.0-20250116172800-8eaa5022532b/go.mod h1:HpntrRsQA6RKNXy2Nbr4kVj+NO3OYWpAQUVxeya+3sU=
 github.com/kobergj/plugins/v4/store/nats-js-kv v0.0.0-20240807130109-f62bb67e8c90 h1:pfI8Z5yavO6fU6vDGlWhZ4BgDlvj8c6xB7J57HfTPwA=
 github.com/kobergj/plugins/v4/store/nats-js-kv v0.0.0-20240807130109-f62bb67e8c90/go.mod h1:pjcozWijkNPbEtX5SIQaxEW/h8VAVZYTLx+70bmB3LY=
+github.com/kobergj/reva/v2 v2.26.3-0.20250605093018-1420a43ff206 h1:N0VZsT2YAgnCuQBGnzO7XQaTIRbxLLe2BFNxMFH/TUY=
+github.com/kobergj/reva/v2 v2.26.3-0.20250605093018-1420a43ff206/go.mod h1:2nemTuIJNAnpK3uhfixL+iFooUnYN3urLMyrlN8+KTM=
 github.com/kolo/xmlrpc v0.0.0-20200310150728-e0350524596b/go.mod h1:o03bZfuBwAXHetKXuInt4S7omeXUu62/A845kiycsSQ=
 github.com/konsorten/go-windows-terminal-sequences v1.0.1/go.mod h1:T0+1ngSBFLxvqU3pZ+m/2kptfBszLMUkC4ZK/EgS/cQ=
 github.com/konsorten/go-windows-terminal-sequences v1.0.2/go.mod h1:T0+1ngSBFLxvqU3pZ+m/2kptfBszLMUkC4ZK/EgS/cQ=
@@ -884,8 +886,6 @@ github.com/orcaman/concurrent-map v1.0.0/go.mod h1:Lu3tH6HLW3feq74c2GC+jIMS/K2CF
 github.com/ovh/go-ovh v1.1.0/go.mod h1:AxitLZ5HBRPyUd+Zl60Ajaag+rNTdVXWIkzfrVuTXWA=
 github.com/owncloud/libre-graph-api-go v1.0.5-0.20250217093259-fa3804be6c27 h1:ID8s5lGBntmrlI6TbDAjTzRyHucn3bVM2wlW+HBplv4=
 github.com/owncloud/libre-graph-api-go v1.0.5-0.20250217093259-fa3804be6c27/go.mod h1:+gT+x62AS9u2Farh9wE2uYmgdvTg0MQgsSI62D+xoRg=
-github.com/owncloud/reva/v2 v2.0.0-20250611073334-c84e5d845c6a h1:Afs1IurSTwvShvodID/rsxxuSbIkfimweJWmpfhewKI=
-github.com/owncloud/reva/v2 v2.0.0-20250611073334-c84e5d845c6a/go.mod h1:CDjuYyCD778IChVqLp6JswU1FSLVE7TylGDOQMhXJs8=
 github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c h1:rp5dCmg/yLR3mgFuSOe4oEnDDmGLROTvMragMUXpTQw=
 github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c/go.mod h1:X07ZCGwUbLaax7L0S3Tw4hpejzu63ZrrQiUe6W0hcy0=
 github.com/pablodz/inotifywaitgo v0.0.7 h1:1ii49dGBnRn0t1Sz7RGZS6/NberPEDQprwKHN49Bv6U=

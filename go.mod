@@ -66,7 +66,7 @@ require (
 	github.com/open-policy-agent/opa v1.4.2
 	github.com/orcaman/concurrent-map v1.0.0
 	github.com/owncloud/libre-graph-api-go v1.0.5-0.20250217093259-fa3804be6c27
-	github.com/owncloud/reva/v2 v2.0.0-20250611073334-c84e5d845c6a
+	github.com/owncloud/reva/v2 v2.0.0-20250611111443-48b5ee8e7171
 	github.com/pkg/errors v0.9.1
 	github.com/pkg/xattr v0.4.10
 	github.com/prometheus/client_golang v1.21.1
@@ -355,3 +355,5 @@ replace go-micro.dev/v4 => github.com/kobergj/go-micro/v4 v4.0.0-20250610135441-
 // exclude the v2 line of go-sqlite3 which was released accidentally and prevents pulling in newer versions of go-sqlite3
 // see https://github.com/mattn/go-sqlite3/issues/965 for more details
 exclude github.com/mattn/go-sqlite3 v2.0.3+incompatible
+
+replace github.com/owncloud/reva/v2 => github.com/kobergj/reva/v2 v2.26.3-0.20250605093018-1420a43ff206

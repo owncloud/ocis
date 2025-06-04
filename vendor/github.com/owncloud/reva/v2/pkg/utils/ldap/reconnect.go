@@ -264,18 +264,6 @@ func (c *ConnWithReconnect) IsClosing() bool {
 	return false
 }
 
-// Extended implements the ldap.Client interface
-func (c *ConnWithReconnect) Extended(request *ldap.ExtendedRequest) (*ldap.ExtendedResponse, error) {
-	var err error
-	var res *ldap.ExtendedResponse
-	
-	retryErr := c.retry(func(c ldap.Client) error {
-		res, err = c.Extended(request)
-		return err
-	})
-	return res, retryErr
-}
-
 // SetTimeout implements the ldap.Client interface
 func (c *ConnWithReconnect) SetTimeout(time.Duration) {}
 
