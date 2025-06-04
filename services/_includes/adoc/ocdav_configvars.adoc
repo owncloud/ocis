@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2025-06-04-00-53-27]
+[#deprecation-note-2025-06-04-00-55-48]
 [caption=]
 .Deprecation notes for the ocdav service
 [width="100%",cols="~,~,~,~",options="header"]
