@@ -153,7 +153,7 @@ require (
 	github.com/bluele/gcache v0.0.2 // indirect
 	github.com/bombsimon/logrusr/v3 v3.1.0 // indirect
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
-	github.com/ceph/go-ceph v0.30.0 // indirect
+	github.com/ceph/go-ceph v0.33.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/cevaris/ordered_map v0.0.0-20190319150403-3adeae072e73 // indirect
 	github.com/cilium/ebpf v0.9.1 // indirect
@@ -355,3 +355,5 @@ replace go-micro.dev/v4 => github.com/kobergj/go-micro/v4 v4.0.0-20250117084952-
 // exclude the v2 line of go-sqlite3 which was released accidentally and prevents pulling in newer versions of go-sqlite3
 // see https://github.com/mattn/go-sqlite3/issues/965 for more details
 exclude github.com/mattn/go-sqlite3 v2.0.3+incompatible
+
+replace github.com/owncloud/reva/v2 => github.com/kobergj/reva/v2 v2.26.3-0.20250605093018-1420a43ff206
