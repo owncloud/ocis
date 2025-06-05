@@ -42,6 +42,7 @@ engine:
   type: bleve
   bleve:
     data_path: /var/lib/ocis/search
+    scale: false
 extractor:
   type: basic
   cs3_allow_insecure: false

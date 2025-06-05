@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2025-06-05-08-17-16]
+[#deprecation-note-2025-06-05-08-50-42]
 [caption=]
 .Deprecation notes for the search service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -366,6 +366,17 @@ a| [subs=-attributes]
 ++/var/lib/ocis/search ++
 a| [subs=-attributes]
 The directory where the filesystem will store search data. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH/search.
+
+a|`SEARCH_ENGINE_BLEVE_SCALE` +
+
+a| [subs=-attributes]
+++next ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Enable scaling of the search index (bleve). If set to 'true', the instance of the search service will no longer have exclusive write access to the index. Note when scaling search, all instances of the search service must be set to true! For 'false', which is the default, the running search service has exclusive access to the index as long it is running. This locks out other search processes tying to access the index.
 
 a|`SEARCH_EXTRACTOR_TYPE` +
 

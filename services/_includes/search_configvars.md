@@ -31,6 +31,7 @@
 | OCIS_EVENTS_AUTH_PASSWORD<br/>SEARCH_EVENTS_AUTH_PASSWORD | string |  | The password to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.|
 | SEARCH_ENGINE_TYPE | string | bleve | Defines which search engine to use. Defaults to 'bleve'. Supported values are: 'bleve'.|
 | SEARCH_ENGINE_BLEVE_DATA_PATH | string | /var/lib/ocis/search | The directory where the filesystem will store search data. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH/search.|
+| SEARCH_ENGINE_BLEVE_SCALE | bool | false | Enable scaling of the search index (bleve). If set to 'true', the instance of the search service will no longer have exclusive write access to the index. Note when scaling search, all instances of the search service must be set to true! For 'false', which is the default, the running search service has exclusive access to the index as long it is running. This locks out other search processes tying to access the index.|
 | SEARCH_EXTRACTOR_TYPE | string | basic | Defines the content extraction engine. Defaults to 'basic'. Supported values are: 'basic' and 'tika'.|
 | OCIS_INSECURE<br/>SEARCH_EXTRACTOR_CS3SOURCE_INSECURE | bool | false | Ignore untrusted SSL certificates when connecting to the CS3 source.|
 | SEARCH_EXTRACTOR_TIKA_TIKA_URL | string | http://127.0.0.1:9998 | URL of the tika server.|
