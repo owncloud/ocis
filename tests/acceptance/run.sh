@@ -377,6 +377,8 @@ function run_behat_tests() {
 		fi
 		rm -f "${DRY_RUN_FILE}"
 	fi
+
+	# cumulate results
 }
 
 declare -x TEST_SERVER_URL
