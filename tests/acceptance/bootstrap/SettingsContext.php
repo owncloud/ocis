@@ -162,7 +162,7 @@ class SettingsContext implements Context {
 				$decodedBody = \json_decode($rawBody, true, 512, JSON_THROW_ON_ERROR);
 				$tryAgain = false;
 			} catch (Exception $e) {
-				$tryAgain = $retried < HttpRequestHelper::numRetriesOnHttpTooEarly();
+				$tryAgain = $retried < HttpRequestHelper::maxHTTPRequestRetries();
 
 				if (!$tryAgain) {
 					throw $e;

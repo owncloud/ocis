@@ -1041,7 +1041,8 @@ class GraphHelper {
 		array  $body = [],
 		array  $headers = []
 	): ResponseInterface {
-		$url = self::getFullUrl($baseUrl, 'me/drives' . $urlArguments);
+		$urlArguments = $urlArguments ? "?$urlArguments" : "";
+		$url = self::getFullUrl($baseUrl, "me/drives" . $urlArguments);
 
 		return HttpRequestHelper::get($url, $xRequestId, $user, $password, $headers, $body);
 	}
@@ -1070,7 +1071,8 @@ class GraphHelper {
 		array  $body = [],
 		array  $headers = []
 	): ResponseInterface {
-		$url = self::getFullUrl($baseUrl, 'drives/' . $urlArguments);
+		$urlArguments = $urlArguments ? "?$urlArguments" : "";
+		$url = self::getFullUrl($baseUrl, "drives" . $urlArguments);
 
 		return HttpRequestHelper::get($url, $xRequestId, $user, $password, $headers, $body);
 	}
