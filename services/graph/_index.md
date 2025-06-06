@@ -1,6 +1,6 @@
 ---
 title: Graph
-date: 2025-06-06T07:17:30.633204834Z
+date: 2025-06-06T09:26:50.008253497Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/graph
@@ -221,6 +221,7 @@ The output of this command includes the following information for each role:
 +--------------------------------------+----------+--------------------------------+--------------------------------+------------------------------------------+
 ```
 
+To add a new built-in role, see the [Graph - Unified Roles]({{< ref "services/graph/unified-roles/#add-a-new-built-in-role" >}}).
 ## Example Yaml Config
 {{< include file="services/_includes/graph-config-example.yaml"  language="yaml" >}}
 
