@@ -190,4 +190,8 @@ The output of this command includes the following information for each role:
 +--------------------------------------+----------+--------------------------------+--------------------------------+------------------------------------------+
 ```
 
-To add a new built-in role, see the [Graph - Unified Roles]({{< ref "services/graph/unified-roles/#add-a-new-built-in-role" >}}).
+### Create Unified Roles
+
+<!-- When building, the refernce is technically in the same folder and not in docs/services/graph -->
+
+To create a new built-in role, see the [Unified Roles]({{< ref "./unified-roles" >}}) documentation.
