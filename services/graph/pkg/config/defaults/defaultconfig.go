@@ -18,6 +18,7 @@ var (
 	_disabledByDefaultUnifiedRoleRoleIDs = []string{
 		unifiedrole.UnifiedRoleSecureViewerID,
 		unifiedrole.UnifiedRoleSpaceEditorWithoutVersionsID,
+		unifiedrole.UnifiedRoleSpaceEditorWithoutTrashbinID,
 		unifiedrole.UnifiedRoleViewerListGrantsID,
 		unifiedrole.UnifiedRoleEditorListGrantsID,
 		unifiedrole.UnifiedRoleEditorListGrantsWithVersionsID,

@@ -53,6 +53,7 @@ func buildInRoles() []*libregraph.UnifiedRoleDefinition {
 		roleEditorListGrantsWithVersions(),
 		roleSpaceEditor(),
 		roleSpaceEditorWithoutVersions(),
+		roleSpaceEditorWithoutTrashbin(),
 		roleFileEditor(),
 		roleFileEditorListGrants(),
 		roleFileEditorListGrantsWithVersions(),
