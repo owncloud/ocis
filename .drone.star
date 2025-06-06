@@ -87,16 +87,10 @@ config = {
         "skip": False,
     },
     "localApiTests": {
-        "basic": {
+        "contractAndLock": {
             "suites": [
-                "apiArchiver",
                 "apiContract",
-                "apiCors",
-                "apiAsyncUpload",
-                "apiDownloads",
-                "apiDepthInfinity",
                 "apiLocks",
-                "apiActivities",
             ],
             "skip": False,
         },
@@ -104,6 +98,7 @@ config = {
             "suites": [
                 "apiSettings",
                 "apiNotification",
+                "apiCors",
             ],
             "skip": False,
             "withRemotePhp": [True],
@@ -120,15 +115,6 @@ config = {
                 "NOTIFICATIONS_SMTP_SENDER": EMAIL_SMTP_SENDER,
                 "NOTIFICATIONS_DEBUG_ADDR": "0.0.0.0:9174",
             },
-        },
-        "graphBasicAndGroup": {
-            "suites": [
-                "apiGraph",
-                "apiGraphGroup",
-                "apiServiceAvailability",
-            ],
-            "skip": False,
-            "withRemotePhp": [True],
         },
         "graphUser": {
             "suites": [
@@ -149,22 +135,32 @@ config = {
             ],
             "skip": False,
         },
-        "spacesDavOperation": {
+        "davOperations": {
             "suites": [
                 "apiSpacesDavOperation",
+                "apiArchiver",
+                "apiDownloads",
+                "apiActivities",
+                "apiAsyncUpload",
+                "apiDepthInfinity",
             ],
             "skip": False,
         },
-        "search1": {
+        "groupAndSearch1": {
             "suites": [
                 "apiSearch1",
+                "apiGraph",
+                "apiGraphGroup",
+                "apiServiceAvailability",
             ],
             "skip": False,
         },
         "search2": {
             "suites": [
                 "apiSearch2",
+                "apiSearchContent",
             ],
+            "tikaNeeded": True,
             "skip": False,
         },
         "sharingNg1": {
@@ -199,13 +195,6 @@ config = {
             "skip": False,
             "withRemotePhp": [True],
         },
-        "accountsHashDifficulty": {
-            "skip": False,
-            "suites": [
-                "apiAccountsHashDifficulty",
-            ],
-            "accounts_hash_difficulty": "default",
-        },
         "antivirus": {
             "suites": [
                 "apiAntivirus",
@@ -221,16 +210,10 @@ config = {
                 "ANTIVIRUS_DEBUG_ADDR": "0.0.0.0:9297",
             },
         },
-        "searchContent": {
-            "suites": [
-                "apiSearchContent",
-            ],
-            "skip": False,
-            "tikaNeeded": True,
-        },
-        "ocm": {
+        "ocmAndAuthApp": {
             "suites": [
                 "apiOcm",
+                "apiAuthApp",
             ],
             "skip": False,
             "withRemotePhp": [True],
@@ -241,7 +224,7 @@ config = {
                 "EMAIL_PORT": EMAIL_PORT,
             },
             "extraServerEnvironment": {
-                "OCIS_ADD_RUN_SERVICES": "ocm,notifications",
+                "OCIS_ADD_RUN_SERVICES": "ocm,notifications,auth-app",
                 "OCIS_ENABLE_OCM": True,
                 "OCM_OCM_INVITE_MANAGER_INSECURE": True,
                 "OCM_OCM_SHARE_PROVIDER_INSECURE": True,
@@ -252,6 +235,8 @@ config = {
                 "NOTIFICATIONS_SMTP_PORT": EMAIL_SMTP_PORT,
                 "NOTIFICATIONS_SMTP_INSECURE": "true",
                 "NOTIFICATIONS_SMTP_SENDER": EMAIL_SMTP_SENDER,
+                # auth-app
+                "PROXY_ENABLE_APP_AUTH": True,
             },
         },
         "wopi": {
@@ -259,20 +244,10 @@ config = {
                 "apiCollaboration",
             ],
             "skip": False,
+            "withRemotePhp": [True],
             "collaborationServiceNeeded": True,
             "extraServerEnvironment": {
                 "GATEWAY_GRPC_ADDR": "0.0.0.0:9142",
-            },
-        },
-        "authApp": {
-            "suites": [
-                "apiAuthApp",
-            ],
-            "skip": False,
-            "withRemotePhp": [True],
-            "extraServerEnvironment": {
-                "OCIS_ADD_RUN_SERVICES": "auth-app",
-                "PROXY_ENABLE_APP_AUTH": True,
             },
         },
         "cliCommands": {
@@ -300,10 +275,74 @@ config = {
             },
         },
     },
-    "apiTests": {
-        "numberOfParts": 7,
-        "skip": False,
-        "skipExceptParts": [],
+    "coreApiTests": {
+        "1": {
+            "suites": [
+                "coreApiAuth",
+                "coreApiCapabilities",
+                "coreApiFavorites",
+                "coreApiMain",
+                "coreApiVersions",
+            ],
+            "skip": False,
+            "withRemotePhp": [True],
+        },
+        "2": {
+            "suites": [
+                "coreApiShareManagementBasicToShares",
+                "coreApiShareManagementToShares",
+            ],
+            "skip": False,
+            "withRemotePhp": [True],
+        },
+        "3": {
+            "suites": [
+                "coreApiSharees",
+                "coreApiSharePublicLink2",
+            ],
+            "skip": False,
+            "withRemotePhp": [True],
+        },
+        "4": {
+            "suites": [
+                "coreApiShareOperationsToShares1",
+                "coreApiShareOperationsToShares2",
+                "coreApiSharePublicLink1",
+                "coreApiShareCreateSpecialToShares1",
+                "coreApiShareCreateSpecialToShares2",
+                "coreApiShareUpdateToShares",
+            ],
+            "skip": False,
+            "withRemotePhp": [True],
+        },
+        "5": {
+            "suites": [
+                "coreApiTrashbin",
+                "coreApiTrashbinRestore",
+                "coreApiWebdavEtagPropagation1",
+                "coreApiWebdavEtagPropagation2",
+            ],
+        },
+        "6": {
+            "suites": [
+                "coreApiWebdavDelete",
+                "coreApiWebdavOperations",
+                "coreApiWebdavMove2",
+            ],
+        },
+        "7": {
+            "suites": [
+                "coreApiWebdavProperties",
+            ],
+        },
+        "8": {
+            "suites": [
+                "coreApiWebdavMove1",
+                "coreApiWebdavPreviews",
+                "coreApiWebdavUpload",
+                "coreApiWebdavUploadTUS",
+            ],
+        },
     },
     "e2eTests": {
         "part": {
@@ -532,15 +571,13 @@ def testPipelines(ctx):
         pipelines += litmus(ctx, "ocis")
 
     if "skip" not in config["cs3ApiTests"] or not config["cs3ApiTests"]["skip"]:
-        pipelines.append(cs3ApiTests(ctx, "ocis", "default"))
+        pipelines.append(cs3ApiTests(ctx, "ocis"))
     if "skip" not in config["wopiValidatorTests"] or not config["wopiValidatorTests"]["skip"]:
-        pipelines.append(wopiValidatorTests(ctx, "ocis", "builtin", "default"))
-        pipelines.append(wopiValidatorTests(ctx, "ocis", "cs3", "default"))
+        pipelines.append(wopiValidatorTests(ctx, "ocis", "builtin"))
+        pipelines.append(wopiValidatorTests(ctx, "ocis", "cs3"))
 
     pipelines += localApiTestPipeline(ctx)
-
-    if "skip" not in config["apiTests"] or not config["apiTests"]["skip"]:
-        pipelines += apiTests(ctx)
+    pipelines += coreApiTestPipeline(ctx)
 
     pipelines += e2eTestPipeline(ctx) + multiServiceE2ePipeline(ctx)
 
@@ -1000,7 +1037,6 @@ def localApiTestPipeline(ctx):
         "extraEnvironment": {},
         "extraServerEnvironment": {},
         "storages": ["ocis"],
-        "accounts_hash_difficulty": 4,
         "emailNeeded": False,
         "antivirusNeeded": False,
         "tikaNeeded": False,
@@ -1030,14 +1066,14 @@ def localApiTestPipeline(ctx):
                                      restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin") +
                                      (tikaService() if params["tikaNeeded"] else []) +
                                      (waitForServices("online-offices", ["collabora:9980", "onlyoffice:443", "fakeoffice:8080"]) if params["collaborationServiceNeeded"] else []) +
-                                     ocisServer(storage, params["accounts_hash_difficulty"], extra_server_environment = params["extraServerEnvironment"], with_wrapper = True, tika_enabled = params["tikaNeeded"], volumes = ([stepVolumeOcisStorage] if name.startswith("cli") else [])) +
+                                     ocisServer(storage, extra_server_environment = params["extraServerEnvironment"], with_wrapper = True, tika_enabled = params["tikaNeeded"], volumes = ([stepVolumeOcisStorage] if name.startswith("cli") else [])) +
                                      (waitForClamavService() if params["antivirusNeeded"] else []) +
                                      (waitForEmailService() if params["emailNeeded"] else []) +
-                                     (ocisServer(storage, params["accounts_hash_difficulty"], deploy_type = "federation", extra_server_environment = params["extraServerEnvironment"]) if params["federationServer"] else []) +
+                                     (ocisServer(storage, deploy_type = "federation", extra_server_environment = params["extraServerEnvironment"]) if params["federationServer"] else []) +
                                      ((wopiCollaborationService("fakeoffice") + wopiCollaborationService("collabora") + wopiCollaborationService("onlyoffice")) if params["collaborationServiceNeeded"] else []) +
                                      (ocisHealthCheck("wopi", ["wopi-collabora:9304", "wopi-onlyoffice:9304", "wopi-fakeoffice:9304"]) if params["collaborationServiceNeeded"] else []) +
                                      localApiTests(ctx, name, params["suites"], storage, params["extraEnvironment"], run_with_remote_php) +
-                                     logRequests() +
+                                     apiTestFailureLog() +
                                      generateCoverageFromAPITest(ctx, name),
                             "services": (emailService() if params["emailNeeded"] else []) +
                                         (clamavService() if params["antivirusNeeded"] else []) +
@@ -1127,7 +1163,7 @@ def localApiTests(ctx, name, suites, storage = "ocis", extra_environment = {}, w
         "volumes": [stepVolumeOcisStorage],
     }]
 
-def cs3ApiTests(ctx, storage, accounts_hash_difficulty = 4):
+def cs3ApiTests(ctx, storage):
     return {
         "kind": "pipeline",
         "type": "docker",
@@ -1138,7 +1174,7 @@ def cs3ApiTests(ctx, storage, accounts_hash_difficulty = 4):
         },
         "steps": skipIfUnchanged(ctx, "acceptance-tests") +
                  restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin") +
-                 ocisServer(storage, accounts_hash_difficulty, [], [], "cs3api_validator") +
+                 ocisServer(storage, [], [], "cs3api_validator") +
                  [
                      {
                          "name": "cs3ApiTests",
@@ -1158,7 +1194,7 @@ def cs3ApiTests(ctx, storage, accounts_hash_difficulty = 4):
         },
     }
 
-def wopiValidatorTests(ctx, storage, wopiServerType, accounts_hash_difficulty = 4):
+def wopiValidatorTests(ctx, storage, wopiServerType):
     testgroups = [
         "BaseWopiViewing",
         "CheckFileInfoSchema",
@@ -1243,7 +1279,7 @@ def wopiValidatorTests(ctx, storage, wopiServerType, accounts_hash_difficulty = 
                  restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin") +
                  fakeOffice() +
                  waitForServices("fake-office", ["fakeoffice:8080"]) +
-                 ocisServer(storage, accounts_hash_difficulty, deploy_type = "wopi_validator", extra_server_environment = extra_server_environment) +
+                 ocisServer(storage, deploy_type = "wopi_validator", extra_server_environment = extra_server_environment) +
                  wopiServer +
                  waitForServices("wopi-fakeoffice", ["wopi-fakeoffice:9300"]) +
                  [
@@ -1276,76 +1312,97 @@ def wopiValidatorTests(ctx, storage, wopiServerType, accounts_hash_difficulty = 
         },
     }
 
-def coreApiTests(ctx, part_number = 1, number_of_parts = 1, with_remote_php = False, storage = "ocis", accounts_hash_difficulty = 4):
-    filterTags = "~@skipOnGraph&&~@skipOnOcis-%s-Storage" % ("OC" if storage == "owncloud" else "OCIS")
-    test_dir = "%s/tests/acceptance" % dirs["base"]
-    expected_failures_file = "%s/expected-failures-API-on-%s-storage.md" % (test_dir, storage.upper())
-
-    return {
-        "kind": "pipeline",
-        "type": "docker",
-        "name": "Core-API-Tests-%s%s" % (part_number, "-withoutRemotePhp" if not with_remote_php else ""),
-        "platform": {
-            "os": "linux",
-            "arch": "amd64",
-        },
-        "steps": skipIfUnchanged(ctx, "acceptance-tests") +
-                 restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin") +
-                 ocisServer(storage, accounts_hash_difficulty, with_wrapper = True) +
-                 [
-                     {
-                         "name": "oC10ApiTests-%s" % part_number,
-                         "image": OC_CI_PHP % DEFAULT_PHP_VERSION,
-                         "environment": {
-                             "TEST_SERVER_URL": OCIS_URL,
-                             "OCIS_REVA_DATA_ROOT": "%s" % (dirs["ocisRevaDataRoot"] if storage == "owncloud" else ""),
-                             "STORAGE_DRIVER": storage,
-                             "BEHAT_FILTER_TAGS": filterTags,
-                             "DIVIDE_INTO_NUM_PARTS": number_of_parts,
-                             "RUN_PART": part_number,
-                             "ACCEPTANCE_TEST_TYPE": "core-api",
-                             "EXPECTED_FAILURES_FILE": expected_failures_file,
-                             "UPLOAD_DELETE_WAIT_TIME": "1" if storage == "owncloud" else 0,
-                             "OCIS_WRAPPER_URL": "http://%s:5200" % OCIS_SERVER_NAME,
-                             "WITH_REMOTE_PHP": with_remote_php,
-                         },
-                         "commands": [
-                             # merge the expected failures
-                             "" if with_remote_php else "cat %s/expected-failures-without-remotephp.md >> %s" % (test_dir, expected_failures_file),
-                             "make -C %s test-acceptance-api" % (dirs["base"]),
-                         ],
-                     },
-                 ] +
-                 logRequests() +
-                 generateCoverageFromAPITest(ctx, part_number),
-        "services": redisForOCStorage(storage),
-        "depends_on": getPipelineNames(buildOcisBinaryForTesting(ctx)),
-        "trigger": {
-            "ref": [
-                "refs/heads/master",
-                "refs/pull/**",
-            ],
-        },
-    }
-
-def apiTests(ctx):
+def coreApiTestPipeline(ctx):
     pipelines = []
-    debugParts = config["apiTests"]["skipExceptParts"]
-    debugPartsEnabled = (len(debugParts) != 0)
 
     with_remote_php = [True]
     if ctx.build.event == "cron" or "full-ci" in ctx.build.title.lower():
         with_remote_php.append(False)
 
     defaults = {
+        "suites": {},
+        "skip": False,
+        "extraEnvironment": {},
+        "extraServerEnvironment": {},
+        "storages": ["ocis"],
+        "emailNeeded": False,
+        "antivirusNeeded": False,
+        "tikaNeeded": False,
         "withRemotePhp": with_remote_php,
     }
+    test_dir = "%s/tests/acceptance" % dirs["base"]
 
-    for runPart in range(1, config["apiTests"]["numberOfParts"] + 1):
-        for run_with_remote_php in defaults["withRemotePhp"]:
-            if (not debugPartsEnabled or (debugPartsEnabled and runPart in debugParts)):
-                pipelines.append(coreApiTests(ctx, runPart, config["apiTests"]["numberOfParts"], run_with_remote_php))
+    if "coreApiTests" not in config:
+        return pipelines
 
+    for name, matrix in config["coreApiTests"].items():
+        if "skip" not in matrix or not matrix["skip"]:
+            params = {}
+            for item in defaults:
+                params[item] = matrix[item] if item in matrix else defaults[item]
+            for storage in params["storages"]:
+                for run_with_remote_php in params["withRemotePhp"]:
+                    filter_tags = "~@skipOnGraph&&~@skipOnOcis-%s-Storage" % ("OC" if storage == "owncloud" else "OCIS")
+                    expected_failures_file = "%s/expected-failures-API-on-%s-storage.md" % (test_dir, storage.upper())
+                    pipeline = {
+                        "kind": "pipeline",
+                        "type": "docker",
+                        "name": "Core-API-%s%s" % (name, "-withoutRemotePhp" if not run_with_remote_php else ""),
+                        "platform": {
+                            "os": "linux",
+                            "arch": "amd64",
+                        },
+                        "steps": skipIfUnchanged(ctx, "acceptance-tests") +
+                                 restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin") +
+                                 (tikaService() if params["tikaNeeded"] else []) +
+                                 (waitForClamavService() if params["antivirusNeeded"] else []) +
+                                 (waitForEmailService() if params["emailNeeded"] else []) +
+                                 ocisServer(
+                                     storage,
+                                     extra_server_environment = params["extraServerEnvironment"],
+                                     with_wrapper = True,
+                                     tika_enabled = params["tikaNeeded"],
+                                 ) +
+                                 [
+                                     {
+                                         "name": "run-api-tests",
+                                         "image": OC_CI_PHP % DEFAULT_PHP_VERSION,
+                                         "environment": {
+                                             "TEST_SERVER_URL": OCIS_URL,
+                                             "OCIS_REVA_DATA_ROOT": "%s" % (dirs["ocisRevaDataRoot"] if storage == "owncloud" else ""),
+                                             "STORAGE_DRIVER": storage,
+                                             "BEHAT_FILTER_TAGS": filter_tags,
+                                             "BEHAT_SUITES": ",".join(params["suites"]),
+                                             "ACCEPTANCE_TEST_TYPE": "core-api",
+                                             "EXPECTED_FAILURES_FILE": expected_failures_file,
+                                             "UPLOAD_DELETE_WAIT_TIME": "1" if storage == "owncloud" else 0,
+                                             "OCIS_WRAPPER_URL": "http://%s:5200" % OCIS_SERVER_NAME,
+                                             "WITH_REMOTE_PHP": run_with_remote_php,
+                                         },
+                                         "commands": [
+                                             # merge the expected failures
+                                             "" if run_with_remote_php else "cat %s/expected-failures-without-remotephp.md >> %s" % (test_dir, expected_failures_file),
+                                             "make -C %s test-acceptance-api" % (dirs["base"]),
+                                         ],
+                                     },
+                                 ] +
+                                 apiTestFailureLog() +
+                                 generateCoverageFromAPITest(ctx, name),
+                        "services": (emailService() if params["emailNeeded"] else []) +
+                                    (clamavService() if params["antivirusNeeded"] else []),
+                        "depends_on": getPipelineNames(buildOcisBinaryForTesting(ctx)),
+                        "trigger": {
+                            "ref": [
+                                "refs/heads/master",
+                                "refs/pull/**",
+                            ],
+                        },
+                        "volumes": [{
+                            "name": "storage",
+                            "temp": {},
+                        }],
+                    }
+                    pipelines.append(pipeline)
     return pipelines
 
 def e2eTestPipeline(ctx):
@@ -2377,7 +2434,7 @@ def notify(ctx):
         },
     }
 
-def ocisServer(storage = "ocis", accounts_hash_difficulty = 4, volumes = [], depends_on = [], deploy_type = "", extra_server_environment = {}, with_wrapper = False, tika_enabled = False, debug = True):
+def ocisServer(storage = "ocis", volumes = [], depends_on = [], deploy_type = "", extra_server_environment = {}, with_wrapper = False, tika_enabled = False, debug = True):
     user = "0:0"
     container_name = OCIS_SERVER_NAME
     environment = {
@@ -2464,13 +2521,6 @@ def ocisServer(storage = "ocis", accounts_hash_difficulty = 4, volumes = [], dep
         environment["SEARCH_EXTRACTOR_TYPE"] = "tika"
         environment["SEARCH_EXTRACTOR_TIKA_TIKA_URL"] = "http://tika:9998"
         environment["SEARCH_EXTRACTOR_CS3SOURCE_INSECURE"] = True
-
-    # Pass in "default" accounts_hash_difficulty to not set this environment variable.
-    # That will allow OCIS to use whatever its built-in default is.
-    # Otherwise pass in a value from 4 to about 11 or 12 (default 4, for making regular tests fast)
-    # The high values cause lots of CPU to be used when hashing passwords, and really slow down the tests.
-    if (accounts_hash_difficulty != "default"):
-        environment["ACCOUNTS_HASH_DIFFICULTY"] = accounts_hash_difficulty
 
     for item in extra_server_environment:
         environment[item] = extra_server_environment[item]
@@ -3325,7 +3375,7 @@ def tikaService():
         ],
     }]
 
-def logRequests():
+def apiTestFailureLog():
     return [{
         "name": "api-test-failure-logs",
         "image": OC_CI_PHP % DEFAULT_PHP_VERSION,

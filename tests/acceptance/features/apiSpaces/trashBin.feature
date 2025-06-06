@@ -3,9 +3,6 @@ Feature: Restore files, folder
   I want to be able to restore files, folders
   So that I can get the resources that were accidentally deleted
 
-  Note - this feature is run in CI with ACCOUNTS_HASH_DIFFICULTY set to the default for production
-  See https://github.com/owncloud/ocis/issues/1542 and https://github.com/owncloud/ocis/pull/839
-
   Background:
     Given these users have been created with default attributes:
       | username |

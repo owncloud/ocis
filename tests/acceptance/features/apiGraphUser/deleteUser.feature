@@ -3,9 +3,6 @@ Feature: delete user
   I want to be able to delete users
   So that I can remove unnecessary users
 
-  Note - this feature is run in CI with ACCOUNTS_HASH_DIFFICULTY set to the default for production
-  See https://github.com/owncloud/ocis/issues/1542 and https://github.com/owncloud/ocis/pull/839
-
   Background:
     Given user "Alice" has been created with default attributes
 

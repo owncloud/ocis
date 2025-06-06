@@ -10,9 +10,6 @@ Feature: State of the quota
   | 91 - 99% | critical |
   | 100 %    | exceeded |
 
-  Note - this feature is run in CI with ACCOUNTS_HASH_DIFFICULTY set to the default for production
-  See https://github.com/owncloud/ocis/issues/1542 and https://github.com/owncloud/ocis/pull/839
-
   Background:
     Given user "Alice" has been created with default attributes
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
