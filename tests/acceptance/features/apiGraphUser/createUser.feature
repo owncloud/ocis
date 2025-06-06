@@ -3,9 +3,6 @@ Feature: create user
   I want to create a user
   So that the user can use the application
 
-  Note - this feature is run in CI with ACCOUNTS_HASH_DIFFICULTY set to the default for production
-  See https://github.com/owncloud/ocis/issues/1542 and https://github.com/owncloud/ocis/pull/839
-
   Background:
     Given user "Alice" has been created with default attributes
 

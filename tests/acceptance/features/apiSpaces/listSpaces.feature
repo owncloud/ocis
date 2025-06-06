@@ -3,9 +3,6 @@ Feature: List and create spaces
   I want to be able to list project spaces
   So that I can retrieve the information about them
 
-  Note - this feature is run in CI with ACCOUNTS_HASH_DIFFICULTY set to the default for production
-  See https://github.com/owncloud/ocis/issues/1542 and https://github.com/owncloud/ocis/pull/839
-
   Background:
     Given user "Alice" has been created with default attributes
     And using spaces DAV path

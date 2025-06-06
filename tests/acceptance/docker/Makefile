@@ -67,12 +67,6 @@ help:
 	@echo -e "where ${YELLOW}latest${RESET} is an example for any valid Docker image tag from"
 	@echo -e "https://hub.docker.com/r/owncloud/ocis."
 	@echo
-	@echo -e "${GREEN}Run full oCIS test suites against oCIS with oCIS storage:${RESET}\n"
-	@echo -e "\tmake localApiTests-apiAccountsHashDifficulty-ocis\t\t${BLUE}run apiAccountsHashDifficulty test suite,  where available test suite are apiAccountsHashDifficulty apiArchiver apiContract apiGraph apiSpaces apiSpacesShares apiAsyncUpload apiCors${RESET}"
-	@echo
-	@echo -e "${GREEN}Run full oCIS test suites against oCIS with s3ng storage:${RESET}\n"
-	@echo -e "\tmake localApiTests-apiAccountsHashDifficulty-s3ng\t\t${BLUE}run apiAccountsHashDifficulty test suite, where available test suite are apiAccountsHashDifficulty apiArchiver apiContract apiGraph apiSpaces apiSpacesShares apiAsyncUpload apiCors${RESET}"
-	@echo
 	@echo -e "${GREEN}Run full ownCloud test suites against oCIS with oCIS storage:${RESET}\n"
 	@echo -e "\tmake Core-API-Tests-ocis-storage-${RED}X${RESET}\t\t${BLUE}run test suite number X, where ${RED}X = 1 .. 10${RESET}"
 	@echo
@@ -82,17 +76,8 @@ help:
 	@echo -e "${GREEN}Run an oCIS feature test against oCIS with oCIS storage:${RESET}\n"
 	@echo -e "\tmake test-ocis-feature-ocis-storage ${YELLOW}BEHAT_FEATURE='...'${RESET}\t${BLUE}run single feature test${RESET}"
 	@echo
-	@echo -e "\twhere ${YELLOW}BEHAT_FEATURE='...'${RESET} contains a relative path to the feature definition."
-	@echo -e "\texample: ${RED}tests/acceptance/features/apiAccountsHashDifficulty/addUser.feature${RESET}"
-	@echo
 	@echo -e "${GREEN}Run an oCIS feature test against oCIS with s3ng storage:${RESET}\n"
 	@echo -e "\tmake test-ocis-feature-s3ng-storage ${YELLOW}BEHAT_FEATURE='...'${RESET}\t${BLUE}run single feature test${RESET}"
-	@echo
-	@echo -e "\twhere ${YELLOW}BEHAT_FEATURE='...'${RESET} contains a relative path to the feature definition."
-	@echo -e "\texample: ${RED}tests/acceptance/features/apiAccountsHashDifficulty/addUser.feature${RESET}"
-	@echo
-	@echo -e "\twhere ${YELLOW}BEHAT_FEATURE='...'${RESET} contains a relative path to the feature definition."
-	@echo -e "\texample: ${RED}tests/acceptance/features/apiAccountsHashDifficulty/addUser.feature${RESET}"
 	@echo
 	@echo -e "${GREEN}Run an ownCloud feature test against oCIS with oCIS storage:${RESET}\n"
 	@echo -e "\tmake test-core-feature-ocis-storage ${YELLOW}BEHAT_FEATURE='...'${RESET}\t${BLUE}run single feature test${RESET}"
@@ -120,14 +105,14 @@ help:
 	@echo -e "\tmake clean-docker-volumes\t\t${BLUE}removes used docker volumes (used for caching)${RESET}"
 	@echo
 .PHONY: test-ocis-feature-ocis-storage
-test-ocis-feature-ocis-storage: ## test a ocis feature with oCIS storage, usage: make ... BEHAT_FEATURE='tests/acceptance/features/apiAccountsHashDifficulty/addUser.feature:10'
+test-ocis-feature-ocis-storage:
 	@TEST_SOURCE=ocis \
 	STORAGE_DRIVER=ocis \
 	BEHAT_FEATURE=$(BEHAT_FEATURE) \
 	$(MAKE) --no-print-directory testSuite
 
 .PHONY: test-ocis-feature-s3ng-storage
-test-ocis-feature-s3ng-storage: ## test a ocis feature with s3ng storage, usage: make ... BEHAT_FEATURE='tests/acceptance/features/apiAccountsHashDifficulty/addUser.feature:10'
+test-ocis-feature-s3ng-storage:
 	@TEST_SOURCE=ocis \
 	STORAGE_DRIVER=s3ng \
 	BEHAT_FEATURE=$(BEHAT_FEATURE) \

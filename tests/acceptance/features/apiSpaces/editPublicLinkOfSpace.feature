@@ -4,10 +4,6 @@ Feature: A manager of the space can edit public link
   So that I can remove or change permission, password, expireDate, and name attributes
   Users without the manager role cannot see or edit the public link
 
-
-  Note - this feature is run in CI with ACCOUNTS_HASH_DIFFICULTY set to the default for production
-  See https://github.com/owncloud/ocis/issues/1542 and https://github.com/owncloud/ocis/pull/839
-
   Background:
     Given these users have been created with default attributes:
       | username |

@@ -78,10 +78,10 @@ S3_PUBLIC_CACHE_BUCKET = "public"
 # configuration
 config = {
     "cs3ApiTests": {
-        "skip": True,
+        "skip": False,
     },
     "wopiValidatorTests": {
-        "skip": True,
+        "skip": False,
     },
     "k6LoadTests": {
         "skip": False,
@@ -163,43 +163,44 @@ config = {
         },
         "sharingNg1": {
             "suites": [
-                "apiSharingNgShares",  #13
-                "apiReshare",  #2
-                "apiSharingNgPermissions",  #4
+                "apiSharingNgShares",
+                "apiReshare",
+                "apiSharingNgPermissions",
             ],
             "skip": False,
             "withRemotePhp": [True],
         },
         "sharingNgAdditionalShareRole": {
             "suites": [
-                "apiSharingNgAdditionalShareRole",  #18
+                "apiSharingNgAdditionalShareRole",
             ],
             "skip": False,
             "withRemotePhp": [True],
         },
         "sharingNgShareInvitation": {
             "suites": [
-                "apiSharingNgDriveInvitation",  #6
-                "apiSharingNgItemInvitation",  #12
+                "apiSharingNgDriveInvitation",
+                "apiSharingNgItemInvitation",
             ],
             "skip": False,
             "withRemotePhp": [True],
         },
         "sharingNgLinkShare": {
             "suites": [
-                "apiSharingNgDriveLinkShare",  #3
-                "apiSharingNgItemLinkShare",  #18
+                "apiSharingNgDriveLinkShare",
+                "apiSharingNgItemLinkShare",
             ],
             "skip": False,
             "withRemotePhp": [True],
         },
-        "antivirusAndHashDifficulty": {
+        "antivirusAndContentSearch": {
             "suites": [
                 "apiAntivirus",
-                "apiAccountsHashDifficulty",
+                "apiSearchContent",
             ],
             "skip": False,
             "antivirusNeeded": True,
+            "tikaNeeded": True,
             "extraServerEnvironment": {
                 "ANTIVIRUS_SCANNER_TYPE": "clamav",
                 "ANTIVIRUS_CLAMAV_SOCKET": "tcp://clamav:3310",
@@ -208,20 +209,12 @@ config = {
                 "OCIS_ADD_RUN_SERVICES": "antivirus",
                 "ANTIVIRUS_DEBUG_ADDR": "0.0.0.0:9297",
             },
-            "accounts_hash_difficulty": "default",
-        },
-        "searchContent": {
-            "suites": [
-                "apiSearchContent",
-            ],
-            "skip": False,
-            "tikaNeeded": True,
         },
         "ocm": {
             "suites": [
                 "apiOcm",
             ],
-            "skip": True,
+            "skip": False,
             "withRemotePhp": [True],
             "federationServer": True,
             "emailNeeded": True,
@@ -247,7 +240,7 @@ config = {
             "suites": [
                 "apiCollaboration",
             ],
-            "skip": True,
+            "skip": False,
             "withRemotePhp": [True],
             "collaborationServiceNeeded": True,
             "extraServerEnvironment": {
@@ -258,7 +251,7 @@ config = {
             "suites": [
                 "apiAuthApp",
             ],
-            "skip": True,
+            "skip": False,
             "withRemotePhp": [True],
             "extraServerEnvironment": {
                 "OCIS_ADD_RUN_SERVICES": "auth-app",
@@ -269,7 +262,7 @@ config = {
             "suites": [
                 "cliCommands",
             ],
-            "skip": True,
+            "skip": False,
             "withRemotePhp": [True],
             "antivirusNeeded": True,
             "emailNeeded": True,
@@ -361,19 +354,19 @@ config = {
     },
     "e2eTests": {
         "part": {
-            "skip": True,
+            "skip": False,
             "totalParts": 4,  # divide and run all suites in parts (divide pipelines)
             "xsuites": ["search", "app-provider", "oidc", "ocm"],  # suites to skip
         },
         "search": {
-            "skip": True,
+            "skip": False,
             "suites": ["search"],  # suites to run
             "tikaNeeded": True,
         },
     },
     "e2eMultiService": {
         "testSuites": {
-            "skip": True,
+            "skip": False,
             "suites": [
                 "smoke",
                 "shares",
@@ -391,8 +384,8 @@ config = {
     "dockerReleases": {
         "architectures": ["arm64", "amd64"],
     },
-    "litmus": False,
-    "codestyle": False,
+    "litmus": True,
+    "codestyle": True,
 }
 
 # volume for steps to cache Go dependencies between steps of a pipeline
@@ -484,13 +477,20 @@ def main(ctx):
         licenseCheck(ctx)
 
     test_pipelines = \
+        codestyle(ctx) + \
+        checkGherkinLint(ctx) + \
+        checkTestSuitesInExpectedFailures(ctx) + \
         buildWebCache(ctx) + \
+        getGoBinForTesting(ctx) + \
         buildOcisBinaryForTesting(ctx) + \
+        checkStarlark() + \
+        build_release_helpers + \
+        testOcisAndUploadResults(ctx) + \
         testPipelines(ctx)
 
-    # build_release_pipelines = \
-    #     dockerReleases(ctx) + \
-    #     binaryReleases(ctx)
+    build_release_pipelines = \
+        dockerReleases(ctx) + \
+        binaryReleases(ctx)
 
     test_pipelines.append(
         pipelineDependsOn(
@@ -499,14 +499,14 @@ def main(ctx):
         ),
     )
 
-    # test_pipelines.append(
-    #     pipelineDependsOn(
-    #         uploadAPITestCoverageReport(ctx),
-    #         testPipelines(ctx),
-    #     ),
-    # )
+    test_pipelines.append(
+        pipelineDependsOn(
+            uploadAPITestCoverageReport(ctx),
+            testPipelines(ctx),
+        ),
+    )
 
-    pipelines = test_pipelines  #+ build_release_pipelines
+    pipelines = test_pipelines + build_release_pipelines
 
     if ctx.build.event == "cron":
         pipelines = \
@@ -1044,7 +1044,6 @@ def localApiTestPipeline(ctx):
         "extraEnvironment": {},
         "extraServerEnvironment": {},
         "storages": ["ocis"],
-        "accounts_hash_difficulty": 4,
         "emailNeeded": False,
         "antivirusNeeded": False,
         "tikaNeeded": False,
@@ -1074,10 +1073,10 @@ def localApiTestPipeline(ctx):
                                      restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin") +
                                      (tikaService() if params["tikaNeeded"] else []) +
                                      (waitForServices("online-offices", ["collabora:9980", "onlyoffice:443", "fakeoffice:8080"]) if params["collaborationServiceNeeded"] else []) +
-                                     ocisServer(storage, params["accounts_hash_difficulty"], extra_server_environment = params["extraServerEnvironment"], with_wrapper = True, tika_enabled = params["tikaNeeded"], volumes = ([stepVolumeOcisStorage] if name.startswith("cli") else [])) +
+                                     ocisServer(storage, extra_server_environment = params["extraServerEnvironment"], with_wrapper = True, tika_enabled = params["tikaNeeded"], volumes = ([stepVolumeOcisStorage] if name.startswith("cli") else [])) +
                                      (waitForClamavService() if params["antivirusNeeded"] else []) +
                                      (waitForEmailService() if params["emailNeeded"] else []) +
-                                     (ocisServer(storage, params["accounts_hash_difficulty"], deploy_type = "federation", extra_server_environment = params["extraServerEnvironment"]) if params["federationServer"] else []) +
+                                     (ocisServer(storage, deploy_type = "federation", extra_server_environment = params["extraServerEnvironment"]) if params["federationServer"] else []) +
                                      ((wopiCollaborationService("fakeoffice") + wopiCollaborationService("collabora") + wopiCollaborationService("onlyoffice")) if params["collaborationServiceNeeded"] else []) +
                                      (ocisHealthCheck("wopi", ["wopi-collabora:9304", "wopi-onlyoffice:9304", "wopi-fakeoffice:9304"]) if params["collaborationServiceNeeded"] else []) +
                                      localApiTests(ctx, name, params["suites"], storage, params["extraEnvironment"], run_with_remote_php) +
@@ -1171,7 +1170,7 @@ def localApiTests(ctx, name, suites, storage = "ocis", extra_environment = {}, w
         "volumes": [stepVolumeOcisStorage],
     }]
 
-def cs3ApiTests(ctx, storage, accounts_hash_difficulty = 4):
+def cs3ApiTests(ctx, storage):
     return {
         "kind": "pipeline",
         "type": "docker",
@@ -1182,7 +1181,7 @@ def cs3ApiTests(ctx, storage, accounts_hash_difficulty = 4):
         },
         "steps": skipIfUnchanged(ctx, "acceptance-tests") +
                  restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin") +
-                 ocisServer(storage, accounts_hash_difficulty, [], [], "cs3api_validator") +
+                 ocisServer(storage, [], [], "cs3api_validator") +
                  [
                      {
                          "name": "cs3ApiTests",
@@ -1202,7 +1201,7 @@ def cs3ApiTests(ctx, storage, accounts_hash_difficulty = 4):
         },
     }
 
-def wopiValidatorTests(ctx, storage, wopiServerType, accounts_hash_difficulty = 4):
+def wopiValidatorTests(ctx, storage, wopiServerType):
     testgroups = [
         "BaseWopiViewing",
         "CheckFileInfoSchema",
@@ -1287,7 +1286,7 @@ def wopiValidatorTests(ctx, storage, wopiServerType, accounts_hash_difficulty = 
                  restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin") +
                  fakeOffice() +
                  waitForServices("fake-office", ["fakeoffice:8080"]) +
-                 ocisServer(storage, accounts_hash_difficulty, deploy_type = "wopi_validator", extra_server_environment = extra_server_environment) +
+                 ocisServer(storage, deploy_type = "wopi_validator", extra_server_environment = extra_server_environment) +
                  wopiServer +
                  waitForServices("wopi-fakeoffice", ["wopi-fakeoffice:9300"]) +
                  [
@@ -1333,7 +1332,6 @@ def coreApiTestPipeline(ctx):
         "extraEnvironment": {},
         "extraServerEnvironment": {},
         "storages": ["ocis"],
-        "accounts_hash_difficulty": 4,
         "emailNeeded": False,
         "antivirusNeeded": False,
         "tikaNeeded": False,
@@ -1368,7 +1366,6 @@ def coreApiTestPipeline(ctx):
                                  (waitForEmailService() if params["emailNeeded"] else []) +
                                  ocisServer(
                                      storage,
-                                     params["accounts_hash_difficulty"],
                                      extra_server_environment = params["extraServerEnvironment"],
                                      with_wrapper = True,
                                      tika_enabled = params["tikaNeeded"],
@@ -2444,7 +2441,7 @@ def notify(ctx):
         },
     }
 
-def ocisServer(storage = "ocis", accounts_hash_difficulty = 4, volumes = [], depends_on = [], deploy_type = "", extra_server_environment = {}, with_wrapper = False, tika_enabled = False):
+def ocisServer(storage = "ocis", volumes = [], depends_on = [], deploy_type = "", extra_server_environment = {}, with_wrapper = False, tika_enabled = False):
     user = "0:0"
     container_name = OCIS_SERVER_NAME
     environment = {
@@ -2531,13 +2528,6 @@ def ocisServer(storage = "ocis", accounts_hash_difficulty = 4, volumes = [], dep
         environment["SEARCH_EXTRACTOR_TYPE"] = "tika"
         environment["SEARCH_EXTRACTOR_TIKA_TIKA_URL"] = "http://tika:9998"
         environment["SEARCH_EXTRACTOR_CS3SOURCE_INSECURE"] = True
-
-    # Pass in "default" accounts_hash_difficulty to not set this environment variable.
-    # That will allow OCIS to use whatever its built-in default is.
-    # Otherwise pass in a value from 4 to about 11 or 12 (default 4, for making regular tests fast)
-    # The high values cause lots of CPU to be used when hashing passwords, and really slow down the tests.
-    if (accounts_hash_difficulty != "default"):
-        environment["ACCOUNTS_HASH_DIFFICULTY"] = accounts_hash_difficulty
 
     for item in extra_server_environment:
         environment[item] = extra_server_environment[item]

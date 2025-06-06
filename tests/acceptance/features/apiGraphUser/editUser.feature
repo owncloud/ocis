@@ -3,9 +3,6 @@ Feature: edit user
   I want to be able to edit user information
   So that I can manage users
 
-  Note - this feature is run in CI with ACCOUNTS_HASH_DIFFICULTY set to the default for production
-  See https://github.com/owncloud/ocis/issues/1542 and https://github.com/owncloud/ocis/pull/839
-
   Background:
     Given user "Alice" has been created with default attributes
     And the administrator has assigned the role "Admin" to user "Alice" using the Graph API
