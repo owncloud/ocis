@@ -3,9 +3,6 @@ Feature: Share a file or folder that is inside a space
   I want to be able to share the data inside the space
   So that other users can have access to it
 
-  Note - this feature is run in CI with ACCOUNTS_HASH_DIFFICULTY set to the default for production
-  See https://github.com/owncloud/ocis/issues/1542 and https://github.com/owncloud/ocis/pull/839
-
   Background:
     Given these users have been created with default attributes:
       | username |

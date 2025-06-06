@@ -3,9 +3,6 @@ Feature: Change data of space
   I want to be able to change the meta-data of a created space (increase the quota, change name, etc.)
   So that I can manage the spaces
 
-  Note - this feature is run in CI with ACCOUNTS_HASH_DIFFICULTY set to the default for production
-  See https://github.com/owncloud/ocis/issues/1542 and https://github.com/owncloud/ocis/pull/839
-
   Background:
     Given these users have been created with default attributes:
       | username |

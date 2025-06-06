@@ -3,9 +3,6 @@ Feature: Report test
   I want to check the share REPORT response
   So that I can make sure that the response contains all the relevant details for shares
 
-  Note - this feature is run in CI with ACCOUNTS_HASH_DIFFICULTY set to the default for production
-  See https://github.com/owncloud/ocis/issues/1542 and https://github.com/owncloud/ocis/pull/839
-
   Background:
     Given these users have been created with default attributes:
       | username |
