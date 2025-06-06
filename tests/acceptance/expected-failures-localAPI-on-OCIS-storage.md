@@ -378,7 +378,7 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 
 #### [Activity. No activity for copying a zero byte file](https://github.com/owncloud/ocis/issues/10417)
 
-- [apiActivities/activities.feature:4108](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiActivities/activities.feature#L4108)
+- [apiActivities/activities.feature:3378](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiActivities/activities.feature#L3378)
 - [apiActivities/activitiesByFileId.feature:2015](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiActivities/activitiesByFileId.feature#L2015)
 
 #### [Activity. no event for deleting a file using file-id](https://github.com/owncloud/ocis/issues/10328)
