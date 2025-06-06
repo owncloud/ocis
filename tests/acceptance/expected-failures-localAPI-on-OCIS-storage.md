@@ -400,7 +400,7 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiSharingNgPermissions/listPermissions.feature:2718](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNgPermissions/listPermissions.feature#L2718)
 
 #### [Activity. No activity for copying a zero byte file](https://github.com/owncloud/ocis/issues/10417)
-- [apiActivities/activities.feature:4108](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiActivities/activities.feature#L4108)
+- [apiActivities/activities.feature:3378](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiActivities/activities.feature#L3378)
 - [apiActivities/activitiesByFileId.feature:1842](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiActivities/activitiesByFileId.feature#L1842)
 
 #### [Activity. no event for deleting a file using file-id](https://github.com/owncloud/ocis/issues/10328)
