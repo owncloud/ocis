@@ -58,9 +58,10 @@ func (m selectorCookie) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		}
 
 		cookie := http.Cookie{
-			Name:  selectorCookieName,
-			Value: selector,
-			Path:  "/",
+			Name:   selectorCookieName,
+			Value:  selector,
+			Path:   "/",
+			Secure: true,
 		}
 		http.SetCookie(w, &cookie)
 	}
