@@ -146,7 +146,7 @@ config = {
             ],
             "skip": False,
         },
-        "groupdAndSearch1": {
+        "groupAndSearch1": {
             "suites": [
                 "apiSearch1",
                 "apiGraph",
@@ -158,7 +158,9 @@ config = {
         "search2": {
             "suites": [
                 "apiSearch2",
+                "apiSearchContent",
             ],
+            "tikaNeeded": True,
             "skip": False,
         },
         "sharingNg1": {
@@ -193,14 +195,12 @@ config = {
             "skip": False,
             "withRemotePhp": [True],
         },
-        "antivirusAndContentSearch": {
+        "antivirus": {
             "suites": [
                 "apiAntivirus",
-                "apiSearchContent",
             ],
             "skip": False,
             "antivirusNeeded": True,
-            "tikaNeeded": True,
             "extraServerEnvironment": {
                 "ANTIVIRUS_SCANNER_TYPE": "clamav",
                 "ANTIVIRUS_CLAMAV_SOCKET": "tcp://clamav:3310",
@@ -210,9 +210,10 @@ config = {
                 "ANTIVIRUS_DEBUG_ADDR": "0.0.0.0:9297",
             },
         },
-        "ocm": {
+        "ocmAndAuthApp": {
             "suites": [
                 "apiOcm",
+                "apiAuthApp",
             ],
             "skip": False,
             "withRemotePhp": [True],
@@ -223,7 +224,7 @@ config = {
                 "EMAIL_PORT": EMAIL_PORT,
             },
             "extraServerEnvironment": {
-                "OCIS_ADD_RUN_SERVICES": "ocm,notifications",
+                "OCIS_ADD_RUN_SERVICES": "ocm,notifications,auth-app",
                 "OCIS_ENABLE_OCM": True,
                 "OCM_OCM_INVITE_MANAGER_INSECURE": True,
                 "OCM_OCM_SHARE_PROVIDER_INSECURE": True,
@@ -234,6 +235,8 @@ config = {
                 "NOTIFICATIONS_SMTP_PORT": EMAIL_SMTP_PORT,
                 "NOTIFICATIONS_SMTP_INSECURE": "true",
                 "NOTIFICATIONS_SMTP_SENDER": EMAIL_SMTP_SENDER,
+                # auth-app
+                "PROXY_ENABLE_APP_AUTH": True,
             },
         },
         "wopi": {
@@ -245,17 +248,6 @@ config = {
             "collaborationServiceNeeded": True,
             "extraServerEnvironment": {
                 "GATEWAY_GRPC_ADDR": "0.0.0.0:9142",
-            },
-        },
-        "authApp": {
-            "suites": [
-                "apiAuthApp",
-            ],
-            "skip": False,
-            "withRemotePhp": [True],
-            "extraServerEnvironment": {
-                "OCIS_ADD_RUN_SERVICES": "auth-app",
-                "PROXY_ENABLE_APP_AUTH": True,
             },
         },
         "cliCommands": {
@@ -579,10 +571,10 @@ def testPipelines(ctx):
         pipelines += litmus(ctx, "ocis")
 
     if "skip" not in config["cs3ApiTests"] or not config["cs3ApiTests"]["skip"]:
-        pipelines.append(cs3ApiTests(ctx, "ocis", "default"))
+        pipelines.append(cs3ApiTests(ctx, "ocis"))
     if "skip" not in config["wopiValidatorTests"] or not config["wopiValidatorTests"]["skip"]:
-        pipelines.append(wopiValidatorTests(ctx, "ocis", "builtin", "default"))
-        pipelines.append(wopiValidatorTests(ctx, "ocis", "cs3", "default"))
+        pipelines.append(wopiValidatorTests(ctx, "ocis", "builtin"))
+        pipelines.append(wopiValidatorTests(ctx, "ocis", "cs3"))
 
     pipelines += localApiTestPipeline(ctx)
     pipelines += coreApiTestPipeline(ctx)
@@ -787,6 +779,7 @@ def buildOcisBinaryForTesting(ctx):
         "steps": skipIfUnchanged(ctx, "acceptance-tests") +
                  makeNodeGenerate("") +
                  makeGoGenerate("") +
+                 build() +
                  buildDebug() +
                  rebuildBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin"),
         "trigger": {
@@ -1476,7 +1469,7 @@ def e2eTestPipeline(ctx):
             restoreWebCache() + \
             restoreWebPnpmCache() + \
             (tikaService() if params["tikaNeeded"] else []) + \
-            ocisServer(extra_server_environment = extra_server_environment, tika_enabled = params["tikaNeeded"])
+            ocisServer(extra_server_environment = extra_server_environment, tika_enabled = params["tikaNeeded"], debug = False)
 
         step_e2e = {
             "name": "e2e-tests",
@@ -1620,7 +1613,7 @@ def multiServiceE2ePipeline(ctx):
             restoreWebCache() + \
             restoreWebPnpmCache() + \
             tikaService() + \
-            ocisServer(extra_server_environment = extra_server_environment, tika_enabled = params["tikaNeeded"]) + \
+            ocisServer(extra_server_environment = extra_server_environment, tika_enabled = params["tikaNeeded"], debug = False) + \
             storage_users_services + \
             [{
                 "name": "e2e-tests",
@@ -2441,7 +2434,7 @@ def notify(ctx):
         },
     }
 
-def ocisServer(storage = "ocis", volumes = [], depends_on = [], deploy_type = "", extra_server_environment = {}, with_wrapper = False, tika_enabled = False):
+def ocisServer(storage = "ocis", volumes = [], depends_on = [], deploy_type = "", extra_server_environment = {}, with_wrapper = False, tika_enabled = False, debug = True):
     user = "0:0"
     container_name = OCIS_SERVER_NAME
     environment = {
@@ -2532,8 +2525,9 @@ def ocisServer(storage = "ocis", volumes = [], depends_on = [], deploy_type = ""
     for item in extra_server_environment:
         environment[item] = extra_server_environment[item]
 
-    # ocis_bin = "ocis/bin/ocis"
-    ocis_bin = "ocis/bin/ocis-debug"
+    ocis_bin = "ocis/bin/ocis"
+    if debug:
+        ocis_bin = "ocis/bin/ocis-debug"
 
     wrapper_commands = [
         "make -C %s build" % dirs["ocisWrapper"],

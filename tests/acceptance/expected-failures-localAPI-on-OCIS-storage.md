@@ -335,7 +335,7 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 
 #### [Delete user containing + in username returns 404 but user gets deleted](https://github.com/owncloud/ocis/issues/11027)
 
-- [apiGraphUser/deleteUser.feature:28](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUser/deleteUser.feature#L28)
+- [apiGraphUser/deleteUser.feature:25](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUser/deleteUser.feature#L25)
 
 #### [OCM. delete-accepted-user endpoint always returns 200](https://github.com/owncloud/ocis/issues/10223)
 
@@ -394,16 +394,19 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiSharingNgShares/sharedWithMe.feature:5411](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNgShares/sharedWithMe.feature#L5411)
 
 ### [[Sharing NG] Implement https://owncloud.dev/libre-graph-api/#/drives.permissions/GetPermission](https://github.com/owncloud/ocis/issues/8616)
+
 - [apiSharingNgPermissions/listPermissions.feature:2585](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNgPermissions/listPermissions.feature#L2585)
 - [apiSharingNgPermissions/listPermissions.feature:2631](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNgPermissions/listPermissions.feature#L2631)
 - [apiSharingNgPermissions/listPermissions.feature:2673](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNgPermissions/listPermissions.feature#L2673)
 - [apiSharingNgPermissions/listPermissions.feature:2718](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNgPermissions/listPermissions.feature#L2718)
 
 #### [Activity. No activity for copying a zero byte file](https://github.com/owncloud/ocis/issues/10417)
+
 - [apiActivities/activities.feature:4108](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiActivities/activities.feature#L4108)
 - [apiActivities/activitiesByFileId.feature:1842](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiActivities/activitiesByFileId.feature#L1842)
 
 #### [Activity. no event for deleting a file using file-id](https://github.com/owncloud/ocis/issues/10328)
+
 - [apiActivities/activitiesByFileId.feature:2017](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiActivities/activitiesByFileId.feature#L2017)
 
 Note: always have an empty line at the end of this file.
