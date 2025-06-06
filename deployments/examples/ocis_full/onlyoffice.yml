@@ -16,9 +16,7 @@ services:
         condition: service_started
       onlyoffice:
         condition: service_healthy
-    entrypoint:
-      - /bin/sh
-    command: [ "-c", "ocis collaboration server" ]
+    command: ["ocis", "collaboration", "server"]
     environment:
       COLLABORATION_GRPC_ADDR: 0.0.0.0:9301
       COLLABORATION_HTTP_ADDR: 0.0.0.0:9300
