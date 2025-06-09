@@ -191,6 +191,7 @@ config = {
             "suites": [
                 "apiSharingNgDriveLinkShare",
                 "apiSharingNgItemLinkShare",
+                "apiSharingNgLinkShareManagement",
             ],
             "skip": False,
             "withRemotePhp": [True],
@@ -205,7 +206,6 @@ config = {
                 "ANTIVIRUS_SCANNER_TYPE": "clamav",
                 "ANTIVIRUS_CLAMAV_SOCKET": "tcp://clamav:3310",
                 "POSTPROCESSING_STEPS": "virusscan",
-                "OCIS_ASYNC_UPLOADS": True,
                 "OCIS_ADD_RUN_SERVICES": "antivirus",
                 "ANTIVIRUS_DEBUG_ADDR": "0.0.0.0:9297",
             },
@@ -270,7 +270,6 @@ config = {
                 "NOTIFICATIONS_DEBUG_ADDR": "0.0.0.0:9174",
                 "ANTIVIRUS_SCANNER_TYPE": "clamav",
                 "ANTIVIRUS_CLAMAV_SOCKET": "tcp://clamav:3310",
-                "OCIS_ASYNC_UPLOADS": True,
                 "OCIS_ADD_RUN_SERVICES": "antivirus,notifications",
             },
         },
@@ -322,6 +321,7 @@ config = {
                 "coreApiWebdavEtagPropagation1",
                 "coreApiWebdavEtagPropagation2",
             ],
+            "skip": False,
         },
         "6": {
             "suites": [
@@ -329,11 +329,13 @@ config = {
                 "coreApiWebdavOperations",
                 "coreApiWebdavMove2",
             ],
+            "skip": False,
         },
         "7": {
             "suites": [
                 "coreApiWebdavProperties",
             ],
+            "skip": False,
         },
         "8": {
             "suites": [
@@ -342,6 +344,7 @@ config = {
                 "coreApiWebdavUpload",
                 "coreApiWebdavUploadTUS",
             ],
+            "skip": False,
         },
     },
     "e2eTests": {
