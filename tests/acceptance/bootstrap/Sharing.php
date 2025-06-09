@@ -120,6 +120,13 @@ trait Sharing {
 	}
 
 	/**
+	 * @return array
+	 */
+	public function shareNgGetCreatedLinkShares(): array {
+		return $this->shareNgCreatedLinkShares;
+	}
+
+	/**
 	 * @return array|null
 	 */
 	public function shareNgGetLastCreatedLinkShare(): ?array {

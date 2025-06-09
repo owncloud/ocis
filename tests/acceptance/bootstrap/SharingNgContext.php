@@ -2446,4 +2446,30 @@ class SharingNgContext implements Context {
 			Assert::fail(implode("\n", $errors));
 		}
 	}
+
+	/**
+	 * @Then the last :shareCount link shares should have the same id
+	 *
+	 * @param string $shareCount
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function theLastLinkSharesShouldHaveTheSameID(string $shareCount): void {
+		$shares = $this->featureContext->shareNgGetCreatedLinkShares();
+		$shares = \array_slice($shares, -(int)$shareCount);
+		$lastShareId = null;
+		foreach ($shares as $share) {
+			if ($lastShareId === null) {
+				$lastShareId = $share['id'];
+			} else {
+				Assert::assertSame(
+					$lastShareId,
+					$share['id'],
+					"Link share id is not the same. Expected '$lastShareId' but found '$share[id]'"
+				);
+			}
+		}
+	}
+
 }
