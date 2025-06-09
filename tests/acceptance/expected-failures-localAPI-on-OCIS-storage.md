@@ -410,7 +410,12 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiActivities/activitiesByFileId.feature:2017](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiActivities/activitiesByFileId.feature#L2017)
 
 #### Uploaders are not allowed to `MOVE`
+
 - [apiSpacesShares/moveSpaces.feature:377](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/moveSpaces.feature#L377)
+
+#### [Shares drive can be shared via link share with Internal role using permissions endpoint](https://github.com/owncloud/ocis/issues/11409)
+
+- [apiSharingNgItemLinkShare:580/createInternalLinkShare.feature](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNgItemLinkShare/createInternalLinkShare.feature#L580)
 
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.
