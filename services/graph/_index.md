@@ -1,6 +1,6 @@
 ---
 title: Graph
-date: 2025-06-09T06:53:04.939064231Z
+date: 2025-06-09T14:40:24.769124238Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/graph
@@ -34,6 +34,7 @@ for a detailed specification of the API implemented by the graph service.
   * [Translation Rules](#translation-rules)
 * [Default Language](#default-language)
 * [Unified Role Management](#unified-role-management)
+  * [Create Unified Roles](#create-unified-roles)
 * [Example Yaml Config](#example-yaml-config)
 
 ## Sequence Diagram
@@ -221,7 +222,11 @@ The output of this command includes the following information for each role:
 +--------------------------------------+----------+--------------------------------+--------------------------------+------------------------------------------+
 ```
 
-To add a new built-in role, see the [Graph - Unified Roles]({{< ref "services/graph/unified-roles/#add-a-new-built-in-role" >}}).
+### Create Unified Roles
+
+<!-- When building, the refernce is technically in the same folder and not in docs/services/graph -->
+
+To create a new built-in role, see the [Unified Roles]({{< ref "./unified-roles" >}}) documentation.
 ## Example Yaml Config
 {{< include file="services/_includes/graph-config-example.yaml"  language="yaml" >}}
 
