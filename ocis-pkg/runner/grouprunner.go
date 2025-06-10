@@ -2,6 +2,7 @@ package runner
 
 import (
 	"context"
+	"errors"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -81,6 +82,17 @@ func (gr *GroupRunner) Add(r *Runner) {
 	// Only increase the count if a runner is stored.
 	// Currently panicking if the runner exists and is loaded
 	gr.runnersCount++
+}
+
+// ProcessResults will process the results of the group runners and return joined errors.
+func ProcessResults(results []*Result) error {
+	err := make([]error, 0, len(results))
+	for _, result := range results {
+		if result.RunnerError != nil {
+			err = append(err, result.FormatError())
+		}
+	}
+	return errors.Join(err...)
 }
 
 // Run will execute all the tasks in the group at the same time.

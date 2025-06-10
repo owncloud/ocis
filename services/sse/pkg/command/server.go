@@ -92,14 +92,14 @@ func Server(cfg *config.Config) *cli.Command {
 				gr.Add(runner.NewGolangHttpServerRunner(cfg.Service.Name+".debug", debugServer))
 			}
 
+			logger.Warn().Msgf("starting service %s", cfg.Service.Name)
 			grResults := gr.Run(ctx)
 
-			// return the first non-nil error found in the results
-			for _, grResult := range grResults {
-				if grResult.RunnerError != nil {
-					return grResult.RunnerError
-				}
+			if err := runner.ProcessResults(grResults); err != nil {
+				logger.Error().Err(err).Msgf("service %s stopped with error", cfg.Service.Name)
+				return err
 			}
+			logger.Warn().Msgf("service %s stopped without error", cfg.Service.Name)
 			return nil
 		},
 	}
