@@ -56,7 +56,7 @@ services:
     # run ocis init to initialize a configuration file with random secrets
     # it will fail on subsequent runs, because the config file already exists
     # therefore we ignore the error and then start the ocis server
-    command: ["-c", "ocis init || true; ocis server"]
+    command: ["-c", "ocis init || true; exec ocis server"]
     environment:
       # Keycloak IDP specific configuration
       PROXY_AUTOPROVISION_ACCOUNTS: "true"
