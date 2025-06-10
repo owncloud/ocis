@@ -61,6 +61,10 @@ var themeDefaults = KV{
 				"label":    "UnifiedRoleSpaceEditorWithoutVersions",
 				"iconName": "pencil",
 			},
+			unifiedrole.UnifiedRoleSpaceEditorWithoutTrashbinID: KV{
+				"label":    "UnifiedRoleSpaceEditorWithoutTrashbin",
+				"iconName": "pencil",
+			},
 			unifiedrole.UnifiedRoleManagerID: KV{
 				"label":    "UnifiedRoleManager",
 				"iconName": "user-star",
