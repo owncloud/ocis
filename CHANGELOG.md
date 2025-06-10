@@ -94,6 +94,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Update ocis_full deployment example images: [#11319](https://github.com/owncloud/ocis/pull/11319)
 * Enhancement - Bump Web to 11.3.2: [#11330](https://github.com/owncloud/ocis/pull/11330)
 * Enhancement - Add capability for server managed spaces: [#11332](https://github.com/owncloud/ocis/pull/11332)
+* Enhancement - Add SpaceEditorWithoutTrashbin Role: [#11391](https://github.com/owncloud/ocis/pull/11391)
 
 ## Details
 
@@ -312,6 +313,15 @@ The following sections list the changes for unreleased.
    adding/removing users to/from spaces in the web UI.
 
    https://github.com/owncloud/ocis/pull/11332
+
+* Enhancement - Add SpaceEditorWithoutTrashbin Role: [#11391](https://github.com/owncloud/ocis/pull/11391)
+
+   Added a new built-in role: `SpaceEditorWithoutTrashbin`. This role is a subset
+   of the `SpaceEditor` role, but it does not have list/restore resources in
+   trashbin permissions.
+
+   https://github.com/owncloud/ocis/issues/11206
+   https://github.com/owncloud/ocis/pull/11391
 
 # Changelog for [7.1.3] (2025-05-27)
 
