@@ -402,18 +402,12 @@ func Start(ctx context.Context, o ...Option) error {
 		}
 	}
 
-	if err = rpc.Register(s); err != nil {
-		if s != nil {
-			s.Log.Fatal().Err(err).Msg("could not register rpc service")
-		}
-	}
-	rpc.HandleHTTP()
-
-	l, err := net.Listen("tcp", net.JoinHostPort(s.cfg.Runtime.Host, s.cfg.Runtime.Port))
+	// prepare RPC server
+	srv, err := newRPCServer(s)
 	if err != nil {
-		s.Log.Fatal().Err(err).Msg("could not start listener")
+		s.Log.Fatal().Err(err).Msg("could not create RPC server")
+		return err
 	}
-	srv := new(http.Server)
 
 	// prepare the set of services to run
 	// runset keeps track of which services to start supervised.
@@ -439,7 +433,7 @@ func Start(ctx context.Context, o ...Option) error {
 	scheduleServiceTokens(s, runset, s.Additional)
 
 	go func() {
-		if err = srv.Serve(l); err != nil && !errors.Is(err, http.ErrServerClosed) {
+		if err = srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			s.Log.Fatal().Err(err).Msg("could not start rpc server")
 		}
 	}()
@@ -598,4 +592,22 @@ func wait(d time.Duration) func(cfg *ociscfg.Config) error {
 		time.Sleep(d)
 		return nil
 	}
+}
+
+// newRPCServer creates an HTTP server to expose the "s" service's methods using RPC.
+// The host and port for the server are taken from the service configuration (s.cfg.Runtime)
+func newRPCServer(s *Service) (*http.Server, error) {
+	rpcSrv := rpc.NewServer()
+	if err := rpcSrv.Register(s); err != nil {
+		return nil, err
+	}
+	rpcSrv.HandleHTTP(rpc.DefaultRPCPath, rpc.DefaultDebugPath)
+	// srv.HandleHTTP will register the handlers in the http.DefaultServeMux
+
+	srv := &http.Server{
+		Addr: net.JoinHostPort(s.cfg.Runtime.Host, s.cfg.Runtime.Port), // this is always tcp
+		// Handler must be nil to use the http.DefaultServeMux
+		ReadHeaderTimeout: 5 * time.Second,
+	}
+	return srv, nil
 }
