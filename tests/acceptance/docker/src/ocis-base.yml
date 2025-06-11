@@ -16,7 +16,6 @@ services:
       SHARING_USER_JSON_FILE: /srv/app/tmp/ocis/shares.json
       PROXY_ENABLE_BASIC_AUTH: "true"
       WEB_UI_CONFIG_FILE: /drone/src/tests/config/drone/ocis-config.json
-      ACCOUNTS_HASH_DIFFICULTY: 4
       OCIS_INSECURE: "true"
       IDM_CREATE_DEMO_USERS: "true"
       IDM_ADMIN_PASSWORD: "admin"
