@@ -204,6 +204,11 @@ _ocdav: api compatibility, return correct status code_
 - [coreApiWebdavUploadTUS/uploadFileMtime.feature:80](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUploadTUS/uploadFileMtime.feature#L80)
 - [coreApiWebdavUploadTUS/uploadFileMtime.feature:81](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUploadTUS/uploadFileMtime.feature#L81)
 
+#### Uploaders are not allowed to `MOVE`
+- [coreApiWebdavMove2/moveShareOnOcis.feature:279](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove2/moveShareOnOcis.feature#L279)
+- [coreApiWebdavMove2/moveShareOnOcis.feature:281](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove2/moveShareOnOcis.feature#L281)
+- [coreApiWebdavMove2/moveShareOnOcis.feature:283](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove2/moveShareOnOcis.feature#L283)
+
 ### Won't fix
 
 Not everything needs to be implemented for ocis. While the oc10 testsuite covers these things we are not looking at them right now.
