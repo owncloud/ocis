@@ -406,7 +406,7 @@ func Start(ctx context.Context, o ...Option) error {
 	srv, err := newRPCServer(s)
 	if err != nil {
 		s.Log.Fatal().Err(err).Msg("could not create RPC server")
-		// TODO: Should abort? previous code kept going
+		return err
 	}
 
 	// prepare the set of services to run
