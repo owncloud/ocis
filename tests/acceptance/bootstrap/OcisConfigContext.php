@@ -127,12 +127,12 @@ class OcisConfigContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function theAdministratorHasEnabledTheFollowingShareRoles(TableNode $table): void {
+	public function theAdministratorHasEnabledTheFollowingSharePermissionsRoles(TableNode $table): void {
 		$defaultRoles = array_values(GraphHelper::DEFAULT_PERMISSIONS_ROLES);
 		$roles = [];
 		foreach ($table->getHash() as $row) {
-			$roles[] = $row['role'];
-			$roleId = GraphHelper::getPermissionsRoleIdByName($row['role']);
+			$roles[] = $row['permissions-role'];
+			$roleId = GraphHelper::getPermissionsRoleIdByName($row['permissions-role']);
 			if (!\in_array($roleId, $defaultRoles)) {
 				$defaultRoles[] = $roleId;
 			}
