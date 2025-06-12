@@ -10,7 +10,7 @@ Feature: ListGrants role
       | Alice    |
       | Brian    |
     And the administrator has enabled the following share permissions roles:
-      | role                        |
+      | permissions-role            |
       | Viewer With ListGrants      |
       | File Editor With ListGrants |
       | Editor With ListGrants      |
