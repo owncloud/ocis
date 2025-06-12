@@ -358,10 +358,10 @@ config = {
             "tikaNeeded": True,
         },
         "keycloak": {
-          "skip": False,
-          "suites": ["keycloak"],
-          "keycloakNeeded": True,
-        }
+            "skip": False,
+            "suites": ["keycloak"],
+            "keycloakNeeded": True,
+        },
     },
     "e2eMultiService": {
         "testSuites": {
