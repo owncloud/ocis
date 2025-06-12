@@ -95,6 +95,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Bump Web to 11.3.2: [#11330](https://github.com/owncloud/ocis/pull/11330)
 * Enhancement - Add capability for server managed spaces: [#11332](https://github.com/owncloud/ocis/pull/11332)
 * Enhancement - Add SpaceEditorWithoutTrashbin Role: [#11391](https://github.com/owncloud/ocis/pull/11391)
+* Enhancement - Improve cookies security: [#11413](https://github.com/owncloud/ocis/pull/11413)
 
 ## Details
 
@@ -322,6 +323,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/11206
    https://github.com/owncloud/ocis/pull/11391
+
+* Enhancement - Improve cookies security: [#11413](https://github.com/owncloud/ocis/pull/11413)
+
+   Cookies now have securtiy flags set that remove angle for attacks like CSRF,
+   MITM, XSS.
+
+   https://github.com/owncloud/ocis/pull/11413
 
 # Changelog for [7.1.3] (2025-05-27)
 
