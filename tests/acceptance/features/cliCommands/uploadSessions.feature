@@ -56,35 +56,24 @@ Feature: List upload sessions via CLI command
       | file1.txt |
 
 
-  Scenario: list all expired upload sessions
-    Given the config "POSTPROCESSING_DELAY" has been set to "10s"
-    And user "Alice" has uploaded file with content "uploaded content" to "/file1.txt"
-    And the config "STORAGE_USERS_UPLOAD_EXPIRATION" has been set to "0"
-    And user "Alice" has uploaded file with content "uploaded content" to "/file2.txt"
-    And user "Alice" has uploaded file with content "uploaded content" to "/file3.txt"
+  Scenario: list and cleanup the expired upload sessions
+    Given a file "large.zip" with the size of "2GB" has been created locally
+    And the config "STORAGE_USERS_UPLOAD_EXPIRATION" has been set to "1"
+    And user "Alice" has uploaded a file from "filesForUpload/textfile.txt" to "file.txt" via TUS inside of the space "Personal" using the WebDAV API
+    And user "Alice" has tried to upload file "filesForUpload/large.zip" to "large.zip" inside space "Personal" via TUS
     When the administrator lists all the upload sessions with flag "expired"
     Then the command should be successful
     And the CLI response should contain these entries:
-      | file2.txt |
-      | file3.txt |
+      | large.zip |
     And the CLI response should not contain these entries:
-      | file1.txt |
-
-
-  Scenario: clean all expired upload sessions
-    Given the config "POSTPROCESSING_DELAY" has been set to "10s"
-    And user "Alice" has uploaded file with content "upload content" to "/file1.txt"
-    And the config "STORAGE_USERS_UPLOAD_EXPIRATION" has been set to "0"
-    And user "Alice" has uploaded file with content "upload content" to "/file2.txt"
-    And user "Alice" has uploaded file with content "upload content" to "/file3.txt"
+      | file.txt |
     When the administrator cleans upload sessions with the following flags:
       | expired |
     Then the command should be successful
     And the CLI response should contain these entries:
-      | file2.txt |
-      | file3.txt |
+      | large.zip |
     And the CLI response should not contain these entries:
-      | file1.txt |
+      | file.txt |
 
 
   Scenario: restart upload sessions that are in postprocessing

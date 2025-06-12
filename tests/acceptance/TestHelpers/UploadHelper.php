@@ -151,14 +151,43 @@ class UploadHelper extends Assert {
 	}
 
 	/**
+	 * @param string $sizeString (e.g. "1GB", "500MB", "100KB", "200B", "1000")
+	 *
+	 * @return int
+	 * @throws \InvalidArgumentException
+	 */
+	public static function convertToBytes(string $sizeString): int {
+		$sizeString = \strtoupper(\trim($sizeString));
+		$sizeUnit = \preg_replace('/\d+/', '', $sizeString);
+		$size = \intval($sizeString);
+
+		switch ($sizeUnit) {
+			case 'GB':
+				return 1024 ** 3 * $size;
+			case 'MB':
+				return 1024 ** 2 * $size;
+			case 'KB':
+				return 1024 * $size;
+			case 'B':
+			case '':
+				return $size;
+			default:
+				throw new \InvalidArgumentException(
+					"Invalid size unit '$sizeUnit' in '$sizeString'. Use GB, MB, KB or no unit for bytes."
+				);
+		}
+	}
+
+	/**
 	 * creates a File with a specific size
 	 *
-	 * @param string|null $name full path of the file to create
-	 * @param int|null $size
+	 * @param string $name full path of the file to create
+	 * @param string $size
 	 *
 	 * @return void
 	 */
-	public static function createFileSpecificSize(?string $name, ?int $size): void {
+	public static function createFileSpecificSize(string $name, string $size): void {
+		$size = self::convertToBytes($size);
 		if (\file_exists($name)) {
 			\unlink($name);
 		}
@@ -204,6 +233,12 @@ class UploadHelper extends Assert {
 	 * @return string
 	 */
 	public static function getUploadFilesDir(?string $name): string {
-		return \getenv("FILES_FOR_UPLOAD") . $name;
+		$envPath = \getenv("FILES_FOR_UPLOAD");
+		$envPath = \rtrim($envPath, "/");
+		$name = \trim($name, "/");
+		if ($envPath) {
+			return "$envPath/$name";
+		}
+		return \dirname(__FILE__) . "/../filesForUpload/$name";
 	}
 }

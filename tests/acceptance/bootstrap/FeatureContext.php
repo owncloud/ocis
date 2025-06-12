@@ -1681,10 +1681,13 @@ class FeatureContext extends BehatVariablesContext {
 	/**
 	 * @Then the HTTP status code should be failure
 	 *
+	 * @param ResponseInterface|null $response
+	 *
 	 * @return void
 	 */
-	public function theHTTPStatusCodeShouldBeFailure(): void {
-		$statusCode = $this->response->getStatusCode();
+	public function theHTTPStatusCodeShouldBeFailure(?ResponseInterface $response): void {
+		$response = $response ?? $this->response;
+		$statusCode = $response->getStatusCode();
 		$message = "The HTTP status code $statusCode is not greater than or equals to 400";
 		Assert::assertGreaterThanOrEqual(
 			400,
