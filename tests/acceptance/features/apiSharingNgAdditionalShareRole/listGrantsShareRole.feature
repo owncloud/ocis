@@ -10,7 +10,7 @@ Feature: ListGrants role
       | Alice    |
       | Brian    |
     And the administrator has enabled the following share permissions roles:
-      | role                        |
+      | permissions-role            |
       | Viewer With ListGrants      |
       | File Editor With ListGrants |
       | Editor With ListGrants      |
@@ -716,11 +716,11 @@ Feature: ListGrants role
     And user "Alice" has created a group "grp1" using the Graph API
     And user "Brian" has been added to group "grp1"
     And user "Alice" has sent the following resource share invitation:
-      | resource        | folder   |
-      | space           | Personal |
-      | sharee          | Brian    |
-      | shareType       | user     |
-      | permissionsRole | Viewer   |
+      | resource        | folder                 |
+      | space           | Personal               |
+      | sharee          | Brian                  |
+      | shareType       | user                   |
+      | permissionsRole | Editor With ListGrants |
     And user "Alice" has sent the following resource share invitation:
       | resource        | textfile.txt                |
       | space           | Personal                    |

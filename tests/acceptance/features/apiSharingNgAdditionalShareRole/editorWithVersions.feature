@@ -10,7 +10,7 @@ Feature: an user shares resources
       | Alice    |
       | Brian    |
     And the administrator has enabled the following share permissions roles:
-      | role                      |
+      | permissions-role          |
       | File Editor With Versions |
       | Editor With Versions      |
 
@@ -685,7 +685,7 @@ Feature: an user shares resources
       | permissionsRole | Editor With Versions |
     When user "Brian" lists the shares shared with him using the Graph API
     Then the HTTP status code should be "200"
-    And the JSON data of the response should contain resource "textfile.txt" with the following data:
+    And the JSON data of the response should contain resource "testfile.txt" with the following data:
       """
       {
         "type": "object",
@@ -702,20 +702,6 @@ Feature: an user shares resources
             "required": ["eTag","file","id","lastModifiedDateTime",
               "name","parentReference","permissions","size"],
             "properties": {
-              "createdBy": {
-                "type": "object",
-                "required": ["user"],
-                "properties": {
-                  "user": {
-                    "type": "object",
-                    "required": ["id", "displayName"],
-                    "properties": {
-                      "id": { "pattern": "^%user_id_pattern%$" },
-                      "displayName": { "const": "Alice Hansen" }
-                    }
-                  }
-                }
-              },
               "eTag": { "pattern": "%etag_pattern%" },
               "file": {
                 "type": "object",
@@ -886,7 +872,7 @@ Feature: an user shares resources
       """
 
 
-  Scenario: sharee checks file versions after updating the permission role to FileEditorWithVersions (Personal Space)
+  Scenario: sharee checks file versions after updating the permission roles to with-versions roles (Personal Space)
     Given using spaces DAV path
     And user "Alice" has created folder "folderToShare"
     And user "Alice" has uploaded file with content "to share" to "folderToShare/lorem.txt"
@@ -896,7 +882,7 @@ Feature: an user shares resources
       | space           | Personal     |
       | sharee          | Brian        |
       | shareType       | user         |
-      | permissionsRole | Viewer       |
+      | permissionsRole | File Editor  |
     And user "Brian" has uploaded file with content "updated content" to "Shares/textfile.txt"
     And user "Alice" has sent the following resource share invitation:
       | resource        | folderToShare |
@@ -905,14 +891,16 @@ Feature: an user shares resources
       | shareType       | user          |
       | permissionsRole | Editor        |
     And user "Brian" has uploaded file with content "updated content" to "Shares/folderToShare/lorem.txt"
-    And user "Alice" has updated the last resource share with the following properties:
+    And user "Alice" has updated the following resource share:
       | permissionsRole | File Editor With Versions |
       | space           | Personal                  |
       | resource        | textfile.txt              |
-    And user "Alice" has updated the last resource share with the following properties:
+      | sharee          | Brian                     |
+    And user "Alice" has updated the following resource share:
       | permissionsRole | Editor With Versions |
       | space           | Personal             |
       | resource        | folderToShare        |
+      | sharee          | Brian                |
     When user "Brian" gets the number of versions of file "Shares/textfile.txt"
     Then the HTTP status code should be "207"
     And the number of versions should be "1"
@@ -921,7 +909,7 @@ Feature: an user shares resources
     And the number of versions should be "1"
 
 
-  Scenario: sharee tries to check file versions after updating the permission role to other role (Personal Space)
+  Scenario: sharee tries to check file versions after updating the with-versions roles to other roles (Personal Space)
     Given using spaces DAV path
     And user "Alice" has created folder "folderToShare"
     And user "Alice" has uploaded file with content "to share" to "folderToShare/lorem.txt"
@@ -940,21 +928,23 @@ Feature: an user shares resources
       | shareType       | user                 |
       | permissionsRole | Editor With Versions |
     And user "Brian" has uploaded file with content "updated content" to "Shares/folderToShare/lorem.txt"
-    And user "Alice" has updated the last resource share with the following properties:
+    And user "Alice" has updated the following resource share:
       | permissionsRole | File Editor  |
       | space           | Personal     |
       | resource        | textfile.txt |
-    And user "Alice" has updated the last resource share with the following properties:
+      | sharee          | Brian        |
+    And user "Alice" has updated the following resource share:
       | permissionsRole | Editor        |
       | space           | Personal      |
       | resource        | folderToShare |
+      | sharee          | Brian         |
     When user "Brian" tries to get versions of file "textfile.txt" from "Alice"
     Then the HTTP status code should be "403"
     When user "Brian" tries to get versions of file "folderToShare/lorem.txt" from "Alice"
     Then the HTTP status code should be "403"
 
 
-  Scenario: sharee checks file versions after updating the permission role to FileEditorWithVersions (Project Space)
+  Scenario: sharee checks file versions after updating the permission role to with-versions roles (Project Space)
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
@@ -966,7 +956,7 @@ Feature: an user shares resources
       | space           | new-space    |
       | sharee          | Brian        |
       | shareType       | user         |
-      | permissionsRole | Viewer       |
+      | permissionsRole | File Editor  |
     And user "Brian" has uploaded file with content "updated content" to "Shares/textfile.txt"
     And user "Alice" has sent the following resource share invitation:
       | resource        | folderToShare |
@@ -975,14 +965,16 @@ Feature: an user shares resources
       | shareType       | user          |
       | permissionsRole | Editor        |
     And user "Brian" has uploaded file with content "updated content" to "Shares/folderToShare/lorem.txt"
-    And user "Alice" has updated the last resource share with the following properties:
+    And user "Alice" has updated the following resource share:
       | permissionsRole | File Editor With Versions |
       | space           | new-space                 |
       | resource        | textfile.txt              |
-    And user "Alice" has updated the last resource share with the following properties:
+      | sharee          | Brian                     |
+    And user "Alice" has updated the following resource share:
       | permissionsRole | Editor With Versions |
       | space           | new-space            |
       | resource        | folderToShare        |
+      | sharee          | Brian                |
     When user "Brian" gets the number of versions of file "Shares/textfile.txt"
     Then the HTTP status code should be "207"
     And the number of versions should be "1"
@@ -991,7 +983,7 @@ Feature: an user shares resources
     And the number of versions should be "1"
 
 
-  Scenario: sharee tries to check file versions after updating the permission role to other roles (Project Space)
+  Scenario: sharee tries to check file versions after updating the with-versions roles to other roles (Project Space)
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
@@ -1013,15 +1005,17 @@ Feature: an user shares resources
       | shareType       | user                 |
       | permissionsRole | Editor With Versions |
     And user "Brian" has uploaded file with content "updated content" to "Shares/folderToShare/lorem.txt"
-    And user "Alice" has updated the last resource share with the following properties:
-      | permissionsRole | Editor       |
+    And user "Alice" has updated the following resource share:
+      | permissionsRole | File Editor  |
       | space           | new-space    |
       | resource        | textfile.txt |
-    And user "Alice" has updated the last resource share with the following properties:
+      | sharee          | Brian        |
+    And user "Alice" has updated the following resource share:
       | permissionsRole | Editor        |
       | space           | new-space     |
       | resource        | folderToShare |
-    When user "Brian" tries to get versions of file "textfile.txt" from "Alice"
+      | sharee          | Brian         |
+    When user "Brian" tries to get versions of the file "textfile.txt" from the space "Shares" using the WebDAV API
     Then the HTTP status code should be "403"
-    When user "Brian" tries to get versions of file "folderToShare/lorem.txt" from "Alice"
+    When user "Brian" tries to get versions of the file "folderToShare/lorem.txt" from the space "Shares" using the WebDAV API
     Then the HTTP status code should be "403"

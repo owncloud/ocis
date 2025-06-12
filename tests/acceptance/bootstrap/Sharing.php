@@ -135,11 +135,23 @@ trait Sharing {
 
 	/**
 	 * @param ResponseInterface $response
+	 * @param string $resource
+	 * @param string $space
 	 *
 	 * @return void
 	 */
-	public function shareNgAddToCreatedUserGroupShares(ResponseInterface $response): void {
-		$this->shareNgCreatedUserGroupShares[] = $this->getJsonDecodedResponse($response);
+	public function shareNgAddToCreatedUserGroupShares(
+		ResponseInterface $response,
+		string $resource,
+		string $space,
+	): void {
+		$share = $this->getJsonDecodedResponse($response);
+		if (\array_key_exists("value", $share)) {
+			$share = $share["value"][0];
+		}
+		$share["resource"] = $resource;
+		$share["space"] = $space;
+		$this->shareNgCreatedUserGroupShares[] = $share;
 	}
 
 	/**
@@ -147,6 +159,40 @@ trait Sharing {
 	 */
 	public function shareNgGetLastCreatedUserGroupShare(): ?array {
 		return \end($this->shareNgCreatedUserGroupShares);
+	}
+
+	/**
+	 * @param string $sharer
+	 * @param string $sharee
+	 * @param string $space
+	 * @param string $resource
+	 *
+	 * @return array
+	 */
+	public function shareNgGetCreatedUserGroupShare(
+		string $sharer,
+		string $sharee,
+		string $space,
+		string $resource = '',
+	): array {
+		foreach ($this->shareNgCreatedUserGroupShares as $share) {
+			$shareOwner = $share["invitation"]["invitedBy"]["user"]["displayName"];
+			$shareReceiver = $share["grantedToV2"]["user"]["displayName"];
+			if ($shareOwner === $this->getUserDisplayName($sharer)
+				&& $shareReceiver === $this->getUserDisplayName($sharee)
+				&& $share["resource"] === $resource
+				&& $share["space"] === $space
+			) {
+				return $share;
+			}
+		}
+		Assert::fail(
+			"Share not found:\n" .
+			"\tsharer: $sharer\n" .
+			"\tsharee: $sharee\n" .
+			"\tresource: $resource\n" .
+			"\tspace: $space",
+		);
 	}
 
 	/**
@@ -250,10 +296,10 @@ trait Sharing {
 	 */
 	public function shareNgGetLastCreatedUserGroupShareID(): string {
 		$lastResponse = $this->shareNgGetLastCreatedUserGroupShare();
-		if (!isset($lastResponse['value'][0]['id'])) {
+		if (!isset($lastResponse['id'])) {
 			throw new Error('Response did not contain share id for the last created share.');
 		}
-		return $lastResponse['value'][0]['id'];
+		return $lastResponse['id'];
 	}
 
 	/**
@@ -264,7 +310,7 @@ trait Sharing {
 	 */
 	public function shareNgUpdateCreatedUserGroupShare(string $permissionId, ResponseInterface $response): void {
 		foreach ($this->shareNgCreatedUserGroupShares as $key => $share) {
-			if ($share['value'][0]['id'] === $permissionId) {
+			if ($share['id'] === $permissionId) {
 				$decodedResponse = $this->getJsonDecodedResponse($response);
 				$this->shareNgCreatedUserGroupShares[$key]['value'] = $decodedResponse;
 				return;

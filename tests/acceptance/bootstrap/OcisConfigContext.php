@@ -127,12 +127,12 @@ class OcisConfigContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function theAdministratorHasEnabledTheFollowingShareRoles(TableNode $table): void {
+	public function theAdministratorHasEnabledTheFollowingSharePermissionsRoles(TableNode $table): void {
 		$defaultRoles = array_values(GraphHelper::DEFAULT_PERMISSIONS_ROLES);
 		$roles = [];
 		foreach ($table->getHash() as $row) {
-			$roles[] = $row['role'];
-			$roleId = GraphHelper::getPermissionsRoleIdByName($row['role']);
+			$roles[] = $row['permissions-role'];
+			$roleId = GraphHelper::getPermissionsRoleIdByName($row['permissions-role']);
 			if (!\in_array($roleId, $defaultRoles)) {
 				$defaultRoles[] = $roleId;
 			}
@@ -141,12 +141,12 @@ class OcisConfigContext implements Context {
 		$envs = [
 			"GRAPH_AVAILABLE_ROLES" => implode(',', $defaultRoles),
 		];
-		$response =  OcisConfigHelper::reConfigureOcis($envs);
+		$response = OcisConfigHelper::reConfigureOcis($envs);
 
 		Assert::assertEquals(
 			200,
 			$response->getStatusCode(),
-			"Failed to enable roles: " . implode(', ', $roles)
+			"Failed to enable roles: " . implode(', ', $roles),
 		);
 		$this->setEnabledPermissionsRoles($defaultRoles);
 	}
