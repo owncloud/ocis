@@ -24,9 +24,9 @@ use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\TableNode;
 use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Exception\ClientException;
 use TusPhp\Exception\ConnectionException;
 use TusPhp\Exception\TusException;
-use TusPhp\Tus\Client;
 use PHPUnit\Framework\Assert;
 use Psr\Http\Message\ResponseInterface;
 use TestHelpers\HttpRequestHelper;
@@ -486,6 +486,71 @@ class TUSContext implements Context {
 		$this->featureContext->setLastUploadDeleteTime(\time());
 		\unlink($temporaryFileName);
 		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @Given user :user has uploaded file :source to :destination via TUS protocol
+	 *
+	 * @param string $user
+	 * @param string $source
+	 * @param string $destination
+	 *
+	 * @return void
+	 * @throws Exception
+	 * @throws GuzzleException
+	 */
+	public function userHasUploadedFileUsingTUS(
+		string $user,
+		string $source,
+		string $destination,
+	): void {
+		$user = $this->featureContext->getActualUsername($user);
+		$response = $this->uploadFileUsingTus(
+			$user,
+			$source,
+			$destination,
+		);
+		$this->featureContext->setLastUploadDeleteTime(\time());
+		$this->featureContext->theHTTPStatusCodeShouldBe(
+			["201", "204"],
+			"Failed to upload file '$source' for user '$user'",
+			$response
+		);
+	}
+
+	/**
+	 * @Given user :user has tried to upload file :source to :destination via TUS protocol
+	 *
+	 * @param string $user
+	 * @param string $source
+	 * @param string $destination
+	 *
+	 * @return void
+	 * @throws Exception
+	 * @throws GuzzleException
+	 */
+	public function userHasTriedToUploadFileUsingTUS(
+		string $user,
+		string $source,
+		string $destination,
+	): void {
+		$user = $this->featureContext->getActualUsername($user);
+		try {
+			$response = $this->uploadFileUsingTus(
+				$user,
+				$source,
+				$destination,
+			);
+			Assert::fail(
+				__METHOD__ .
+				" - Expected an exception, but the upload was successful. Status: " .
+				$response->getStatusCode()
+			);
+		} catch (ClientException $e) {
+			if (!\str_contains($e->getMessage(), "403 Forbidden")) {
+				Assert::fail(__METHOD__ . " - " . $e->getMessage());
+			}
+		}
 	}
 
 	/**
