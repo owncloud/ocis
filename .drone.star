@@ -41,7 +41,7 @@ KEYCLOAK_IMAGE = "quay.io/keycloak/keycloak:26.2.5"
 POSTGRES_ALPINE_IMAGE = "postgres:alpine3.18"
 
 DEFAULT_PHP_VERSION = "8.2"
-DEFAULT_NODEJS_VERSION = "20"
+DEFAULT_NODEJS_VERSION = "22"
 
 dirs = {
     "base": "/drone/src",
