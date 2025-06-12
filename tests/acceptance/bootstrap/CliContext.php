@@ -907,4 +907,21 @@ class CliContext implements Context {
 		];
 		$this->featureContext->setResponse(CliHelper::runCommand($body));
 	}
+
+	/**
+	 * @When /^the administrator (resumes|restarts) all the stale uploads$/
+	 *
+	 * @param string $flag
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function theAdministratorResumesOrRestartsAllTheStaleUploads(string $flag): void {
+		$flag = rtrim($flag, "s");
+		$command = "storage-users uploads sessions --$flag --json";
+		$body = [
+			"command" => $command
+		];
+		$this->featureContext->setResponse(CliHelper::runCommand($body));
+	}
 }
