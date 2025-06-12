@@ -59,11 +59,11 @@ $(GOVULNCHECK): $(BINGO_DIR)/govulncheck.mod
 	@echo "(re)installing $(GOBIN)/govulncheck-v1.0.1"
 	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=govulncheck.mod -o=$(GOBIN)/govulncheck-v1.0.1 "golang.org/x/vuln/cmd/govulncheck"
 
-HUGO := $(GOBIN)/hugo-v0.123.7
+HUGO := $(GOBIN)/hugo-v0.129.0
 $(HUGO): $(BINGO_DIR)/hugo.mod
 	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
-	@echo "(re)installing $(GOBIN)/hugo-v0.123.7"
-	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=hugo.mod -o=$(GOBIN)/hugo-v0.123.7 "github.com/gohugoio/hugo"
+	@echo "(re)installing $(GOBIN)/hugo-v0.129.0"
+	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=hugo.mod -o=$(GOBIN)/hugo-v0.129.0 "github.com/gohugoio/hugo"
 
 MOCKERY := $(GOBIN)/mockery-v2.52.3
 $(MOCKERY): $(BINGO_DIR)/mockery.mod
