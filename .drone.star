@@ -466,7 +466,8 @@ def main(ctx):
     build_release_helpers = \
         changelog() + \
         docs() + \
-        licenseCheck(ctx)
+        licenseCheck(ctx) + \
+        deleteStaleBranches(ctx)
 
     test_pipelines = \
         codestyle(ctx) + \
@@ -3551,3 +3552,24 @@ def onlyofficeService():
             ],
         },
     ]
+
+def deleteStaleBranches(ctx):
+    return [{
+        "kind": "pipeline",
+        "type": "docker",
+        "name": "delete stale branches",
+        "steps": [
+            {
+                "name": "delete stale branches",
+                "image": OC_CI_ALPINE,
+                "commands": [
+                    "./scripts/delete-stale-branches.sh",
+                ],
+            },
+        ],
+        "trigger": {
+            "ref": [
+                "refs/heads/master",
+            ],
+        },
+    }]
