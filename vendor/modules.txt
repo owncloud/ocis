@@ -1235,7 +1235,7 @@ github.com/orcaman/concurrent-map
 # github.com/owncloud/libre-graph-api-go v1.0.5-0.20250217093259-fa3804be6c27
 ## explicit; go 1.18
 github.com/owncloud/libre-graph-api-go
-# github.com/owncloud/reva/v2 v2.0.0-20250611073334-c84e5d845c6a
+# github.com/owncloud/reva/v2 v2.0.0-20250612074708-105a834a8e19
 ## explicit; go 1.24
 github.com/owncloud/reva/v2/cmd/revad/internal/grace
 github.com/owncloud/reva/v2/cmd/revad/runtime
@@ -2023,8 +2023,8 @@ go.opencensus.io/trace/tracestate
 ## explicit; go 1.22.0
 go.opentelemetry.io/auto/sdk
 go.opentelemetry.io/auto/sdk/internal/telemetry
-# go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.60.0
-## explicit; go 1.22.0
+# go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.61.0
+## explicit; go 1.23.0
 go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc
 go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc/internal
 # go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.60.0
@@ -2050,11 +2050,11 @@ go.opentelemetry.io/otel/propagation
 go.opentelemetry.io/otel/semconv/internal
 go.opentelemetry.io/otel/semconv/internal/v4
 go.opentelemetry.io/otel/semconv/v1.10.0
-go.opentelemetry.io/otel/semconv/v1.17.0
 go.opentelemetry.io/otel/semconv/v1.20.0
 go.opentelemetry.io/otel/semconv/v1.20.0/httpconv
 go.opentelemetry.io/otel/semconv/v1.21.0
 go.opentelemetry.io/otel/semconv/v1.26.0
+go.opentelemetry.io/otel/semconv/v1.30.0
 go.opentelemetry.io/otel/semconv/v1.4.0
 # go.opentelemetry.io/otel/exporters/jaeger v1.17.0
 ## explicit; go 1.19
@@ -2079,8 +2079,8 @@ go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc/internal/retry
 go.opentelemetry.io/otel/metric
 go.opentelemetry.io/otel/metric/embedded
 go.opentelemetry.io/otel/metric/noop
-# go.opentelemetry.io/otel/sdk v1.35.0
-## explicit; go 1.22.0
+# go.opentelemetry.io/otel/sdk v1.36.0
+## explicit; go 1.23.0
 go.opentelemetry.io/otel/sdk
 go.opentelemetry.io/otel/sdk/instrumentation
 go.opentelemetry.io/otel/sdk/internal/env
@@ -2121,7 +2121,7 @@ go.uber.org/zap/internal/color
 go.uber.org/zap/internal/exit
 go.uber.org/zap/zapcore
 go.uber.org/zap/zapgrpc
-# golang.org/x/crypto v0.37.0
+# golang.org/x/crypto v0.38.0
 ## explicit; go 1.23.0
 golang.org/x/crypto/argon2
 golang.org/x/crypto/bcrypt
@@ -2175,7 +2175,7 @@ golang.org/x/image/vector
 golang.org/x/mod/internal/lazyregexp
 golang.org/x/mod/module
 golang.org/x/mod/semver
-# golang.org/x/net v0.38.0
+# golang.org/x/net v0.40.0
 ## explicit; go 1.23.0
 golang.org/x/net/bpf
 golang.org/x/net/context
@@ -2219,7 +2219,7 @@ golang.org/x/sys/windows/registry
 golang.org/x/sys/windows/svc
 golang.org/x/sys/windows/svc/eventlog
 golang.org/x/sys/windows/svc/mgr
-# golang.org/x/term v0.31.0
+# golang.org/x/term v0.32.0
 ## explicit; go 1.23.0
 golang.org/x/term
 # golang.org/x/text v0.25.0
@@ -2289,12 +2289,12 @@ google.golang.org/genproto/protobuf/field_mask
 google.golang.org/genproto/googleapis/api
 google.golang.org/genproto/googleapis/api/annotations
 google.golang.org/genproto/googleapis/api/httpbody
-# google.golang.org/genproto/googleapis/rpc v0.0.0-20250218202821-56aae31c358a
-## explicit; go 1.22
+# google.golang.org/genproto/googleapis/rpc v0.0.0-20250519155744-55703ea1f237
+## explicit; go 1.23.0
 google.golang.org/genproto/googleapis/rpc/errdetails
 google.golang.org/genproto/googleapis/rpc/status
-# google.golang.org/grpc v1.71.1
-## explicit; go 1.22.0
+# google.golang.org/grpc v1.72.1
+## explicit; go 1.23
 google.golang.org/grpc
 google.golang.org/grpc/attributes
 google.golang.org/grpc/backoff
