@@ -1446,6 +1446,9 @@ def e2eTestPipeline(ctx):
     }, {
         "name": "gopath",
         "temp": {},
+    }, {
+        "name": "certs",
+        "temp": {},
     }]
 
     pipelines = []
@@ -3587,8 +3590,9 @@ def onlyofficeService():
 def keycloakService():
     return [{
                "name": "generate-keycloak-certs",
-               "image": OC_CI_NODEJS,
+               "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
                "commands": [
+                   "pwd",
                    "mkdir -p keycloak-certs",
                    "openssl req -x509 -newkey rsa:2048 -keyout keycloak-certs/keycloakkey.pem -out keycloak-certs/keycloakcrt.pem -nodes -days 365 -subj '/CN=keycloak'",
                    "chmod -R 777 keycloak-certs",
@@ -3605,7 +3609,7 @@ def keycloakService():
                "image": KEYCLOAK_IMAGE,
                "detach": True,
                "environment": {
-                   "OCIS_DOMAIN": "ocis:9200",
+                   "OCIS_DOMAIN": OCIS_URL,
                    "KC_HOSTNAME": "keycloak",
                    "KC_PORT": 8443,
                    "KC_DB": "postgres",
@@ -3620,7 +3624,7 @@ def keycloakService():
                },
                "commands": [
                    "mkdir -p /opt/keycloak/data/import",
-                   "cp tests/drone/ocis_keycloak/ocis-ci-realm.dist.json /opt/keycloak/data/import/oCIS-realm.json",
+                   "cp tests/config/drone/ocis-ci-realm.dist.json /opt/keycloak/data/import/oCIS-realm.json",
                    "/opt/keycloak/bin/kc.sh start-dev --proxy-headers xforwarded --spi-connections-http-client-default-disable-trust-manager=true --import-realm --health-enabled=true",
                ],
                "volumes": [
@@ -3636,6 +3640,7 @@ def postgresService():
         {
             "name": "postgres",
             "image": POSTGRES_ALPINE_IMAGE,
+            "detach": True,
             "environment": {
                 "POSTGRES_DB": "keycloak",
                 "POSTGRES_USER": "keycloak",
