@@ -1,6 +1,7 @@
 package runner
 
 import (
+	"fmt"
 	"os"
 	"strings"
 	"syscall"
@@ -43,6 +44,15 @@ type Stopper func()
 type Result struct {
 	RunnerID    string
 	RunnerError error
+}
+
+// FormatError formats the error of the result.
+// If the error is nil, it returns nil
+func (r *Result) FormatError() error {
+	if r.RunnerError != nil {
+		return fmt.Errorf("runner %s failed: %w", r.RunnerID, r.RunnerError)
+	}
+	return nil
 }
 
 // TimeoutError is an error that should be used for timeouts.

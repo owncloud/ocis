@@ -57,6 +57,19 @@ func Server(cfg *config.Config) *cli.Command {
 			return configlog.ReturnFatal(parser.ParseConfig(cfg))
 		},
 		Action: func(c *cli.Context) error {
+			logger := logging.Configure(cfg.Service.Name, cfg.Log)
+			traceProvider, err := tracing.GetServiceTraceProvider(cfg.Tracing, cfg.Service.Name)
+			if err != nil {
+				return err
+			}
+
+			var cancel context.CancelFunc
+			if cfg.Context == nil {
+				cfg.Context, cancel = signal.NotifyContext(context.Background(), runner.StopSignals...)
+				defer cancel()
+			}
+			ctx := cfg.Context
+
 			userInfoCache := store.Create(
 				store.Store(cfg.OIDC.UserinfoCache.Store),
 				store.TTL(cfg.OIDC.UserinfoCache.TTL),
@@ -76,11 +89,6 @@ func Server(cfg *config.Config) *cli.Command {
 				store.Authentication(cfg.PreSignedURL.SigningKeys.AuthUsername, cfg.PreSignedURL.SigningKeys.AuthPassword),
 			)
 
-			logger := logging.Configure(cfg.Service.Name, cfg.Log)
-			traceProvider, err := tracing.GetServiceTraceProvider(cfg.Tracing, cfg.Service.Name)
-			if err != nil {
-				return err
-			}
 			cfg.GrpcClient, err = grpc.NewClient(
 				append(
 					grpc.GetClientOptions(cfg.GRPCClientTLS),
@@ -107,12 +115,6 @@ func Server(cfg *config.Config) *cli.Command {
 				oidc.WithOidcIssuer(cfg.OIDC.Issuer),
 				oidc.WithJWKSOptions(cfg.OIDC.JWKS),
 			)
-
-			var cancel context.CancelFunc
-			if cfg.Context == nil {
-				cfg.Context, cancel = signal.NotifyContext(context.Background(), runner.StopSignals...)
-				defer cancel()
-			}
 
 			m := metrics.New()
 			m.BuildInfo.WithLabelValues(version.GetString()).Set(1)
@@ -222,14 +224,14 @@ func Server(cfg *config.Config) *cli.Command {
 				gr.Add(runner.NewGolangHttpServerRunner(cfg.Service.Name+".debug", debugServer))
 			}
 
-			grResults := gr.Run(cfg.Context)
+			logger.Warn().Msgf("starting service %s", cfg.Service.Name)
+			grResults := gr.Run(ctx)
 
-			// return the first non-nil error found in the results
-			for _, grResult := range grResults {
-				if grResult.RunnerError != nil {
-					return grResult.RunnerError
-				}
+			if err := runner.ProcessResults(grResults); err != nil {
+				logger.Error().Err(err).Msgf("service %s stopped with error", cfg.Service.Name)
+				return err
 			}
+			logger.Warn().Msgf("service %s stopped without error", cfg.Service.Name)
 			return nil
 		},
 	}
