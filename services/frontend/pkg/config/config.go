@@ -61,7 +61,7 @@ type Config struct {
 
 	ConfigurableNotifications bool `yaml:"configurable_notifications" env:"FRONTEND_CONFIGURABLE_NOTIFICATIONS" desc:"Allow configuring notifications via web client." introductionVersion:"7.1"`
 
-	ServerManagedSpaces bool `yaml:"server_managed_spaces" env:"OCIS_CLAIM_MANAGED_SPACES_ENABLED" desc:"Enables Space management through OIDC claims. See the text description for more details." introductionVersion:"%%NEXT%%"`
+	ServerManagedSpaces bool `yaml:"server_managed_spaces" env:"OCIS_CLAIM_MANAGED_SPACES_ENABLED" desc:"Enables Space management through OIDC claims. See the text description for more details." introductionVersion:"7.2.0"`
 
 	Context context.Context `yaml:"-"`
 }
@@ -198,5 +198,5 @@ type PasswordPolicy struct {
 }
 
 type Validation struct {
-	MaxTagLength int `yaml:"max_tag_length" env:"OCIS_MAX_TAG_LENGTH" desc:"Define the maximum tag length. Defaults to 100 if not set. Set to 0 to not limit the tag length. Changes only impact the validation of new tags." introductionVersion:"%%NEXT%%"`
+	MaxTagLength int `yaml:"max_tag_length" env:"OCIS_MAX_TAG_LENGTH" desc:"Define the maximum tag length. Defaults to 100 if not set. Set to 0 to not limit the tag length. Changes only impact the validation of new tags." introductionVersion:"7.2.0"`
 }
