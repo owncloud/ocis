@@ -94,6 +94,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Update ocis_full deployment example images: [#11319](https://github.com/owncloud/ocis/pull/11319)
 * Enhancement - Bump Web to 11.3.2: [#11330](https://github.com/owncloud/ocis/pull/11330)
 * Enhancement - Add capability for server managed spaces: [#11332](https://github.com/owncloud/ocis/pull/11332)
+* Enhancement - Harden office deployment process: [#11339](https://github.com/owncloud/ocis/pull/11339)
 * Enhancement - Add SpaceEditorWithoutTrashbin Role: [#11391](https://github.com/owncloud/ocis/pull/11391)
 * Enhancement - Improve cookies security: [#11413](https://github.com/owncloud/ocis/pull/11413)
 * Enhancement - Remove deprecated envvars: [#11430](https://github.com/owncloud/ocis/pull/11430)
@@ -315,6 +316,16 @@ The following sections list the changes for unreleased.
    adding/removing users to/from spaces in the web UI.
 
    https://github.com/owncloud/ocis/pull/11332
+
+* Enhancement - Harden office deployment process: [#11339](https://github.com/owncloud/ocis/pull/11339)
+
+   Office deployment will use proof keys by default to ensure requests to the
+   collaboration service come from a trusted source. In addition, OnlyOffice will
+   use ip filters to ensure requests come from the collaboration service (with the
+   exception of the editor). Lastly, the collaboration service won't be exposed to
+   the outside and will remain in the docker network.
+
+   https://github.com/owncloud/ocis/pull/11339
 
 * Enhancement - Add SpaceEditorWithoutTrashbin Role: [#11391](https://github.com/owncloud/ocis/pull/11391)
 
