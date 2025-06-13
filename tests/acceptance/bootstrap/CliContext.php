@@ -54,6 +54,16 @@ class CliContext implements Context {
 	}
 
 	/**
+	 * @Given the administrator has cleaned the search service data
+	 *
+	 * @return void
+	 */
+	public function theAdministratorHasCleanedTheSearchServiceData(): void {
+		$dataPath = $this->featureContext->getOcisDataPath() . "/search";
+		\exec("rm -rf $dataPath");
+	}
+
+	/**
 	 * @Given the administrator has stopped the server
 	 *
 	 * @return void
