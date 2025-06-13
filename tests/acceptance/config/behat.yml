@@ -390,6 +390,17 @@ default:
         - PublicWebDavContext:
         - OcisConfigContext:
 
+    apiSharingNgLinkShareManagement:
+      paths:
+        - "%paths.base%/../features/apiSharingNgLinkShareManagement"
+      context: *common_ldap_suite_context
+      contexts:
+        - FeatureContext: *common_feature_context_params
+        - SpacesContext:
+        - SharingNgContext:
+        - PublicWebDavContext:
+        - OcisConfigContext:
+
     apiSharingNgDriveLinkShare:
       paths:
         - "%paths.base%/../features/apiSharingNgDriveLinkShare"
