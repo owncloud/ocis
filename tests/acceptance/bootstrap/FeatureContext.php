@@ -731,8 +731,16 @@ class FeatureContext extends BehatVariablesContext {
 	/**
 	 * @return string
 	 */
-	public function getStorageUsersRoot(): string {
+	public function getOcisDataPath(): string {
 		$ocisDataPath = getenv("OCIS_BASE_DATA_PATH") ? getenv("OCIS_BASE_DATA_PATH") : getenv("HOME") . '/.ocis';
+		return $ocisDataPath;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getStorageUsersRoot(): string {
+		$ocisDataPath = $this->getOcisDataPath();
 		return getenv("STORAGE_USERS_OCIS_ROOT") ? getenv("STORAGE_USERS_OCIS_ROOT") : $ocisDataPath . "/storage/users";
 	}
 
