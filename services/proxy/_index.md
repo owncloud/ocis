@@ -1,6 +1,6 @@
 ---
 title: Proxy
-date: 2025-06-13T08:45:28.079171767Z
+date: 2025-06-13T08:52:04.498738785Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/proxy
