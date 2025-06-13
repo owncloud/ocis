@@ -8,6 +8,179 @@ Feature: check activities
     And using spaces DAV path
 
 
+  Scenario: check activities of destination resources after uploading a file into folder using file-id
+    Given user "Alice" has created folder "NewFolder"
+    And user "Alice" has created file "textfile.txt" with content "test" into folder "NewFolder" of space "Personal" using file-id
+    When user "Alice" lists the activities of file "NewFolder/textfile.txt" from space "Personal" using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "required": ["id","template","times"],
+                  "properties": {
+                    "id": { "pattern": "^%user_id_pattern%$" },
+                    "template": {
+                      "type": "object",
+                      "required": ["message","variables"],
+                      "properties": {
+                        "message": { "const": "{user} added {resource} to {folder}" },
+                        "variables": {
+                          "type": "object",
+                          "required": ["folder", "resource", "user"],
+                          "properties": {
+                            "folder": {
+                              "type": "object",
+                              "required": ["name"],
+                              "properties": {
+                                "name": { "const": "NewFolder" }
+                              }
+                            },
+                            "resource": {
+                              "type": "object",
+                              "required": ["id","name"],
+                              "properties": {
+                                "id": { "pattern": "^%file_id_pattern%$" },
+                                "name": { "const": "textfile.txt" }
+                              }
+                            },
+                            "user": {
+                              "type": "object",
+                              "required": ["id","displayName"],
+                              "properties": {
+                                "id": { "pattern": "%user_id_pattern%" },
+                                "displayName": { "const": "Alice Hansen" }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "times": {
+                      "type": "object",
+                      "required": ["recordedTime"],
+                      "properties": {
+                        "recordedTime": { "format": "date-time" }
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+      """
+    When user "Alice" lists the activities of folder "NewFolder" from space "Personal" using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "uniqueItems": true,
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "required": ["id","template","times"],
+                  "properties": {
+                    "template": {
+                      "type": "object",
+                      "required": ["message","variables"],
+                      "properties": {
+                        "message": { "const": "{user} added {resource} to {folder}" },
+                        "variables": {
+                          "type": "object",
+                          "required": ["folder", "resource", "user"],
+                          "properties": {
+                            "resource": {
+                              "type": "object",
+                              "required": ["id","name"],
+                              "properties": {
+                                "id": { "pattern": "^%file_id_pattern%$" },
+                                "name": { "const": "NewFolder" }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["id","template","times"],
+                  "properties": {
+                    "id": { "pattern": "^%user_id_pattern%$" },
+                    "template": {
+                      "type": "object",
+                      "required": ["message","variables"],
+                      "properties": {
+                        "message": { "const": "{user} added {resource} to {folder}" },
+                        "variables": {
+                          "type": "object",
+                          "required": ["folder", "resource", "user"],
+                          "properties": {
+                            "folder": {
+                              "type": "object",
+                              "required": ["name"],
+                              "properties": {
+                                "name": { "const": "NewFolder" }
+                              }
+                            },
+                            "resource": {
+                              "type": "object",
+                              "required": ["id","name"],
+                              "properties": {
+                                "id": { "pattern": "^%file_id_pattern%$" },
+                                "name": { "const": "textfile.txt" }
+                              }
+                            },
+                            "user": {
+                              "type": "object",
+                              "required": ["id","displayName"],
+                              "properties": {
+                                "id": { "pattern": "%user_id_pattern%" },
+                                "displayName": { "const": "Alice Hansen" }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "times": {
+                      "type": "object",
+                      "required": ["recordedTime"],
+                      "properties": {
+                        "recordedTime": { "format": "date-time" }
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+      """
+
+
   Scenario: check copy activity of destination resources
     Given user "Alice" has uploaded file with content "ownCloud test text file" to "textfile.txt"
     And we save it into "FILEID"
