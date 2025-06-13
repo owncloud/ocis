@@ -3586,14 +3586,15 @@ def keycloakService():
                "name": "generate-keycloak-certs",
                "image": OC_CI_NODEJS,
                "commands": [
-                   "mkdir -p keycloak-certs",
-                   "openssl req -x509 -newkey rsa:2048 -keyout keycloak-certs/keycloakkey.pem -out keycloak-certs/keycloakcrt.pem -nodes -days 365 -subj '/CN=keycloak'",
-                   "chmod -R 777 keycloak-certs",
+                   "pwd",
+                   "mkdir -p /drone/src/keycloak-certs",
+                   "openssl req -x509 -newkey rsa:2048 -keyout /drone/src/keycloak-certs/keycloakkey.pem -out /drone/src/keycloak-certs/keycloakcrt.pem -nodes -days 365 -subj '/CN=keycloak'",
+                   "chmod -R 777 /drone/src/keycloak-certs",
                ],
                "volumes": [
                    {
-                       "name": "certs",
-                       "path": "/keycloak-certs",
+                       "name": "configs",
+                       "path": "/drone/src/keycloak-certs",
                    },
                ],
            }] + \
@@ -3612,8 +3613,8 @@ def keycloakService():
                    "KC_FEATURES": "impersonation",
                    "KEYCLOAK_ADMIN": "admin",
                    "KEYCLOAK_ADMIN_PASSWORD": "admin",
-                   "KC_HTTPS_CERTIFICATE_FILE": "./keycloak-certs/keycloakcrt.pem",
-                   "KC_HTTPS_CERTIFICATE_KEY_FILE": "./keycloak-certs/keycloakkey.pem",
+                   "KC_HTTPS_CERTIFICATE_FILE": "/drone/src/keycloak-certs/keycloakcrt.pem",
+                   "KC_HTTPS_CERTIFICATE_KEY_FILE": "/drone/src/keycloak-certs/keycloakkey.pem",
                },
                "commands": [
                    "mkdir -p /opt/keycloak/data/import",
@@ -3623,7 +3624,7 @@ def keycloakService():
                "volumes": [
                    {
                        "name": "certs",
-                       "path": "/keycloak-certs",
+                       "path": "/drone/src/keycloak-certs",
                    },
                ],
            }] + waitForServices("keycloak", ["keycloak:8443"])
@@ -3633,6 +3634,7 @@ def postgresService():
         {
             "name": "postgres",
             "image": POSTGRES_ALPINE_IMAGE,
+            "detach": True,
             "environment": {
                 "POSTGRES_DB": "keycloak",
                 "POSTGRES_USER": "keycloak",
