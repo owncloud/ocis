@@ -2,11 +2,11 @@
 // if the generated adoc file is used outside tabs, it renders correctly depending on the attribute set.
 // if inside, you need to also use the xxx_deprecation.adoc file. attributes can't be defined inside tabs.
 
-:show-deprecation: true
+:show-deprecation: false
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2025-06-13-08-25-15]
+[#deprecation-note-2025-06-13-08-45-24]
 [caption=]
 .Deprecation notes for the clientlog service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -15,11 +15,6 @@ ifeval::[{show-deprecation} == true]
 | Deprecation Version
 | Removal Version
 | Deprecation Replacement
-
-| 
-| 6.0
-| next-prod
-| 
 |===
 
 {empty} +
@@ -189,7 +184,7 @@ a| [subs=-attributes]
 The secret to mint and validate jwt tokens.
 
 a|`OCIS_REVA_GATEWAY` +
-xref:deprecation-note-2025-06-13-08-25-15[Deprecation Note]
+
 a| [subs=-attributes]
 ++5.0 ++
 a| [subs=-attributes]
