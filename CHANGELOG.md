@@ -96,6 +96,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add capability for server managed spaces: [#11332](https://github.com/owncloud/ocis/pull/11332)
 * Enhancement - Add SpaceEditorWithoutTrashbin Role: [#11391](https://github.com/owncloud/ocis/pull/11391)
 * Enhancement - Improve cookies security: [#11413](https://github.com/owncloud/ocis/pull/11413)
+* Enhancement - Remove deprecated envvars: [#11430](https://github.com/owncloud/ocis/pull/11430)
 
 ## Details
 
@@ -330,6 +331,12 @@ The following sections list the changes for unreleased.
    MITM, XSS.
 
    https://github.com/owncloud/ocis/pull/11413
+
+* Enhancement - Remove deprecated envvars: [#11430](https://github.com/owncloud/ocis/pull/11430)
+
+   Remove envvars that where deprecated on previous versions
+
+   https://github.com/owncloud/ocis/pull/11430
 
 # Changelog for [7.1.3] (2025-05-27)
 
