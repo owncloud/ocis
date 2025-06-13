@@ -47,7 +47,7 @@
 | FRONTEND_ARCHIVER_MAX_SIZE | int64 | 1073741824 | Max size in bytes of the zip archive the archiver can create.|
 | OCIS_INSECURE<br/>FRONTEND_ARCHIVER_INSECURE | bool | false | Allow insecure connections to the archiver.|
 | FRONTEND_DATA_GATEWAY_PREFIX | string | data | Path prefix for the data gateway.|
-| OCIS_CACHE_STORE<br/> | string | memory | The type of the cache store. Supported values are: 'memory', 'redis-sentinel', 'nats-js-kv', 'noop'. See the text description for details.|
+| OCIS_CACHE_STORE | string | memory | The type of the cache store. Supported values are: 'memory', 'redis-sentinel', 'nats-js-kv', 'noop'. See the text description for details.|
 | OCIS_CACHE_STORE_NODES | []string | [127.0.0.1:9233] | A list of nodes to access the configured store. This has no effect when 'memory' store is configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details.|
 | OCIS_CACHE_DATABASE | string | cache-stat | The database name the configured store should use.|
 | OCIS_CACHE_TTL | Duration | 5m0s | Default time to live for user info in the cache. Only applied when access tokens has no expiration. See the Environment Variable Types description for more details.|
