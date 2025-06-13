@@ -234,8 +234,8 @@ type Events struct {
 
 // ClaimSpaceManagement holds the configuration for claim managed spaces
 type ClaimSpaceManagement struct {
-	Enabled bool     `yaml:"enabled" env:"OCIS_CLAIM_MANAGED_SPACES_ENABLED" desc:"Enables Space management through OIDC claims. See the text description for more details." introductionVersion:"%%NEXT%%"`
-	Claim   string   `yaml:"claim" env:"OCIS_CLAIM_MANAGED_SPACES_CLAIMNAME" desc:"The name of the claim used to manage Spaces." introductionVersion:"%%NEXT%%"`
-	Regexp  string   `yaml:"regexp" env:"OCIS_CLAIM_MANAGED_SPACES_REGEXP" desc:"The regular expression that extracts Space IDs and roles from a claim." introductionVersion:"%%NEXT%%"`
-	Mapping []string `yaml:"mapping" env:"OCIS_CLAIM_MANAGED_SPACES_MAPPING" desc:"(Optional) Mapping of OIDC roles to ocis Space roles. Example: 'oidcroleA:viewer,oidcroleB:manager'" introductionVersion:"%%NEXT%%"`
+	Enabled bool     `yaml:"enabled" env:"OCIS_CLAIM_MANAGED_SPACES_ENABLED" desc:"Enables Space management through OIDC claims. See the text description for more details." introductionVersion:"7.2.0"`
+	Claim   string   `yaml:"claim" env:"OCIS_CLAIM_MANAGED_SPACES_CLAIMNAME" desc:"The name of the claim used to manage Spaces." introductionVersion:"7.2.0"`
+	Regexp  string   `yaml:"regexp" env:"OCIS_CLAIM_MANAGED_SPACES_REGEXP" desc:"The regular expression that extracts Space IDs and roles from a claim." introductionVersion:"7.2.0"`
+	Mapping []string `yaml:"mapping" env:"OCIS_CLAIM_MANAGED_SPACES_MAPPING" desc:"(Optional) Mapping of OIDC roles to ocis Space roles. Example: 'oidcroleA:viewer,oidcroleB:manager'" introductionVersion:"7.2.0"`
 }

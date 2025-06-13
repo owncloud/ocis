@@ -157,5 +157,5 @@ type ServiceAccount struct {
 }
 
 type Validation struct {
-	MaxTagLength int `yaml:"max_tag_length" env:"OCIS_MAX_TAG_LENGTH" desc:"Define the maximum tag length. Defaults to 100 if not set. Set to 0 to not limit the tag length. Changes only impact the validation of new tags." introductionVersion:"%%NEXT%%"`
+	MaxTagLength int `yaml:"max_tag_length" env:"OCIS_MAX_TAG_LENGTH" desc:"Define the maximum tag length. Defaults to 100 if not set. Set to 0 to not limit the tag length. Changes only impact the validation of new tags." introductionVersion:"7.2.0"`
 }
