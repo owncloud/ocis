@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2025-06-13-08-51-58]
+[#deprecation-note-2025-06-13-09-33-35]
 [caption=]
 .Deprecation notes for the proxy service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -837,7 +837,7 @@ The password to authenticate with the events broker. The events broker is the oc
 a|`OCIS_CLAIM_MANAGED_SPACES_ENABLED` +
 
 a| [subs=-attributes]
-++next ++
+++7.2.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -848,7 +848,7 @@ Enables Space management through OIDC claims. See the text description for more 
 a|`OCIS_CLAIM_MANAGED_SPACES_CLAIMNAME` +
 
 a| [subs=-attributes]
-++next ++
+++7.2.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -859,7 +859,7 @@ The name of the claim used to manage Spaces.
 a|`OCIS_CLAIM_MANAGED_SPACES_REGEXP` +
 
 a| [subs=-attributes]
-++next ++
+++7.2.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -870,7 +870,7 @@ The regular expression that extracts Space IDs and roles from a claim.
 a|`OCIS_CLAIM_MANAGED_SPACES_MAPPING` +
 
 a| [subs=-attributes]
-++next ++
+++7.2.0 ++
 a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]

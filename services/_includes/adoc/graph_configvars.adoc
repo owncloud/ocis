@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2025-06-13-08-51-58]
+[#deprecation-note-2025-06-13-09-33-35]
 [caption=]
 .Deprecation notes for the graph service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -1298,7 +1298,7 @@ The service account secret.
 a|`OCIS_MAX_TAG_LENGTH` +
 
 a| [subs=-attributes]
-++next ++
+++7.2.0 ++
 a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
