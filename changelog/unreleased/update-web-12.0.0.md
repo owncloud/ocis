@@ -1,0 +1,59 @@
+Enhancement: Bump Web to 12.0.0
+
+- Bugfix [owncloud/web#11960](https://github.com/owncloud/web/pull/11960): Preview app flat file lists
+- Bugfix [owncloud/web#11967](https://github.com/owncloud/web/pull/11967): Show progress bar when emptying trash bin
+- Bugfix [owncloud/web#12059](https://github.com/owncloud/web/pull/12059): Reload preloaded resource in sidebar
+- Bugfix [owncloud/web#12101](https://github.com/owncloud/web/pull/12101): Missing User Light translations
+- Bugfix [owncloud/web#12207](https://github.com/owncloud/web/pull/12207): Preserve current page when opening a file
+- Bugfix [owncloud/web#12227](https://github.com/owncloud/web/pull/12227): Make password protected folder tile clickable
+- Bugfix [owncloud/web#12228](https://github.com/owncloud/web/issues/12228): Allow email address as user name in the user creation form
+- Bugfix [owncloud/web#12236](https://github.com/owncloud/web/pull/12236): Sorting arrow misplaced
+- Bugfix [owncloud/web#12265](https://github.com/owncloud/web/pull/12265): Disable cutting and pasting into the same folder
+- Bugfix [owncloud/web#12266](https://github.com/owncloud/web/pull/12266): Generate public link password on click
+- Bugfix [owncloud/web#12328](https://github.com/owncloud/web/pull/12328): Disallow user from inviting themselves
+- Bugfix [owncloud/web#12329](https://github.com/owncloud/web/pull/12329): Delete .psec file
+- Bugfix [owncloud/web#12336](https://github.com/owncloud/web/pull/12336): Handle shares loading error
+- Bugfix [owncloud/web#12339](https://github.com/owncloud/web/pull/12339): Add domain to distinguish between external users
+- Bugfix [owncloud/web#12351](https://github.com/owncloud/web/pull/12351): Fix sorting in spaces view that may crash the application
+- Bugfix [owncloud/web#12356](https://github.com/owncloud/web/pull/12356): Show path tooltip on parent folder
+- Bugfix [owncloud/web#12357](https://github.com/owncloud/web/pull/12357): Handle changed public link password in file editors
+- Bugfix [owncloud/web#12368](https://github.com/owncloud/web/pull/12368): Space context menu is cropped with limited vertical screen space
+- Bugfix [owncloud/web#12373](https://github.com/owncloud/web/pull/12373): Add space not found message
+- Bugfix [owncloud/web#12377](https://github.com/owncloud/web/pull/12377): Mock services correctly in test file
+- Bugfix [owncloud/web#12385](https://github.com/owncloud/web/pull/12385): Use resource ID in share notifications
+- Bugfix [owncloud/web#12385](https://github.com/owncloud/web/pull/12385): Watch scroll target in shared list
+- Bugfix [owncloud/web#12406](https://github.com/owncloud/web/pull/12406): Download archives directly
+- Bugfix [owncloud/web#12406](https://github.com/owncloud/web/pull/12406): Request archive as blob
+- Bugfix [owncloud/web#12478](https://github.com/owncloud/web/pull/12478): Fix wrong HTML lang attribute
+- Bugfix [owncloud/web#12482](https://github.com/owncloud/web/pull/12482): Delete resource throws unknown error
+- Bugfix [owncloud/web#12487](https://github.com/owncloud/web/pull/12487): Application language and browser language do not match
+- Bugfix [owncloud/web#12606](https://github.com/owncloud/web/pull/12606): Access correct key when loading favorites
+- Bugfix [owncloud/web#12607](https://github.com/owncloud/web/pull/12607): Load ancestor space only when parent id is returned
+- Bugfix [owncloud/web#12608](https://github.com/owncloud/web/pull/12608): Do not crash when tus is unsupported
+- Bugfix [owncloud/web#12628](https://github.com/owncloud/web/pull/12628): Use capabilities store in preview service
+- Bugfix [owncloud/web#12646](https://github.com/owncloud/web/pull/12646): Add missing label to rename button
+- Change [owncloud/web#12567](https://github.com/owncloud/web/pull/12567): Remove CERN's collapsible table
+- Change [owncloud/web#12686](https://github.com/owncloud/web/pull/12686): Remove deprecated applicationMenu
+- Change [owncloud/web#12686](https://github.com/owncloud/web/pull/12686): Remove deprecated ApplicationQuickAction
+- Change [owncloud/web#12686](https://github.com/owncloud/web/pull/12686): Remove deprecated client init method
+- Change [owncloud/web#12686](https://github.com/owncloud/web/pull/12686): Remove deprecated isFileEditor
+- Change [owncloud/web#12686](https://github.com/owncloud/web/pull/12686): Remove deprecated ocsUserContext and ocsPublicLinkContext
+- Change [owncloud/web#12686](https://github.com/owncloud/web/pull/12686): Remove deprecated type prop
+- Enhancement [owncloud/web#5379](https://github.com/owncloud/web/issues/5379): Accessibility improvements
+- Enhancement [owncloud/web#11849](https://github.com/owncloud/web/pull/11849): Create spaces via admin settings
+- Enhancement [owncloud/web#12110](https://github.com/owncloud/web/pull/12110): Hide active editor action
+- Enhancement [owncloud/web#12239](https://github.com/owncloud/web/pull/12239): Add maintenance banner
+- Enhancement [owncloud/web#12243](https://github.com/owncloud/web/pull/12243): Add new supported language to md-editor
+- Enhancement [owncloud/web#12355](https://github.com/owncloud/web/pull/12355): Rephrase invite users to invite users to federate
+- Enhancement [owncloud/web#12424](https://github.com/owncloud/web/pull/12424): Use custom password generator
+- Enhancement [owncloud/web#12488](https://github.com/owncloud/web/pull/12488): Add OCM explanatory tooltips
+- Enhancement [owncloud/web#12508](https://github.com/owncloud/web/pull/12508): Add duplicate action
+- Enhancement [owncloud/web#12509](https://github.com/owncloud/web/pull/12509): Add flat list view
+- Enhancement [owncloud/web#12513](https://github.com/owncloud/web/pull/12513): Add loading spinner to submit button
+- Enhancement [owncloud/web#12519](https://github.com/owncloud/web/pull/12519): Improve file drop view UI
+- Enhancement [owncloud/web#12578](https://github.com/owncloud/web/pull/12578): Add Catalan to list of supported languages
+- Enhancement [owncloud/web#12584](https://github.com/owncloud/web/pull/12584): Disable space membership management when it's server-managed
+- Enhancement [owncloud/web#12648](https://github.com/owncloud/web/pull/12648): Add login error
+
+https://github.com/owncloud/ocis/pull/11420
+https://github.com/owncloud/web/releases/tag/v12.0.0
