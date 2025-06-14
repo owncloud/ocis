@@ -14,7 +14,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2025-06-10 10:02+0000\n"
+"POT-Creation-Date: 2025-06-14 00:59+0000\n"
 "PO-Revision-Date: 2024-04-04 00:17+0000\n"
 "Last-Translator: Roman Perekhod, 2025\n"
 "Language-Team: Russian (https://app.transifex.com/owncloud-org/teams/6149/ru/)\n"
@@ -37,7 +37,7 @@ msgstr "Может редактировать"
 #. directly)
 #: pkg/unifiedrole/roles.go:149
 msgid "Can edit without trashbin"
-msgstr ""
+msgstr "Может редактировать без корзины"
 
 #. UnifiedRole Editor, Role DisplayName (resolves directly)
 #. UnifiedRole EditorListGrants, Role DisplayName (resolves directly)

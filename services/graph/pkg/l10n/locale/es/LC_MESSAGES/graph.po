@@ -14,7 +14,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2025-06-10 10:02+0000\n"
+"POT-Creation-Date: 2025-06-14 00:59+0000\n"
 "PO-Revision-Date: 2024-04-04 00:17+0000\n"
 "Last-Translator: Jesús Recio <jrecio@solidgear.es>, 2025\n"
 "Language-Team: Spanish (https://app.transifex.com/owncloud-org/teams/6149/es/)\n"
@@ -37,7 +37,7 @@ msgstr "Puede editar"
 #. directly)
 #: pkg/unifiedrole/roles.go:149
 msgid "Can edit without trashbin"
-msgstr ""
+msgstr "Puede editar sin papelera de reciclaje"
 
 #. UnifiedRole Editor, Role DisplayName (resolves directly)
 #. UnifiedRole EditorListGrants, Role DisplayName (resolves directly)
@@ -49,7 +49,7 @@ msgstr ""
 #: pkg/unifiedrole/roles.go:146 pkg/unifiedrole/roles.go:158
 #: pkg/unifiedrole/roles.go:164
 msgid "Can edit without versions"
-msgstr "Se puede editar sin versiones"
+msgstr "Puede editar sin versiones"
 
 #. UnifiedRole Manager, Role DisplayName (resolves directly)
 #: pkg/unifiedrole/roles.go:182
