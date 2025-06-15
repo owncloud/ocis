@@ -37,9 +37,11 @@ PLUGINS_S3 = "plugins/s3:1"
 PLUGINS_S3_CACHE = "plugins/s3-cache:1"
 REDIS = "redis:6-alpine"
 SONARSOURCE_SONAR_SCANNER_CLI = "sonarsource/sonar-scanner-cli:11.0"
+KEYCLOAK_IMAGE = "quay.io/keycloak/keycloak:26.2.5"
+POSTGRES_ALPINE_IMAGE = "postgres:alpine3.18"
 
 DEFAULT_PHP_VERSION = "8.2"
-DEFAULT_NODEJS_VERSION = "20"
+DEFAULT_NODEJS_VERSION = "22"
 
 dirs = {
     "base": "/drone/src",
@@ -348,12 +350,17 @@ config = {
         "part": {
             "skip": False,
             "totalParts": 4,  # divide and run all suites in parts (divide pipelines)
-            "xsuites": ["search", "app-provider", "oidc", "ocm"],  # suites to skip
+            "xsuites": ["search", "app-provider", "oidc", "ocm", "keycloak"],  # suites to skip
         },
         "search": {
             "skip": False,
             "suites": ["search"],  # suites to run
             "tikaNeeded": True,
+        },
+        "keycloak": {
+            "skip": False,
+            "suites": ["keycloak"],
+            "keycloakNeeded": True,
         },
     },
     "e2eMultiService": {
@@ -1412,6 +1419,7 @@ def e2eTestPipeline(ctx):
         "xsuites": [],
         "totalParts": 0,
         "tikaNeeded": False,
+        "keycloakNeeded": False,
     }
 
     extra_server_environment = {
@@ -1463,12 +1471,31 @@ def e2eTestPipeline(ctx):
         if params["xsuites"]:
             e2e_args += " --xsuites %s" % ",".join(params["xsuites"])
 
+        # configs to setup ocis with keycloak
+        if params["keycloakNeeded"]:
+            extra_server_environment.update({
+                "PROXY_AUTOPROVISION_ACCOUNTS": "true",
+                "PROXY_ROLE_ASSIGNMENT_DRIVER": "oidc",
+                "OCIS_OIDC_ISSUER": "https://keycloak:8443/realms/oCIS",
+                "PROXY_OIDC_REWRITE_WELLKNOWN": "true",
+                "WEB_OIDC_CLIENT_ID": "web",
+                "PROXY_USER_OIDC_CLAIM": "preferred_username",
+                "PROXY_USER_CS3_CLAIM": "username",
+                "OCIS_ADMIN_USER_ID": "",
+                "OCIS_EXCLUDE_RUN_SERVICES": "idp",
+                "GRAPH_ASSIGN_DEFAULT_USER_ROLE": "false",
+                "GRAPH_USERNAME_MATCH": "none",
+                "KEYCLOAK_DOMAIN": "keycloak:8443",
+            })
+
         steps_before = \
             skipIfUnchanged(ctx, "e2e-tests") + \
             restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") + \
             restoreWebCache() + \
             restoreWebPnpmCache() + \
             (tikaService() if params["tikaNeeded"] else []) + \
+            (postgresService() if params["keycloakNeeded"] else []) + \
+            (keycloakService() if params["keycloakNeeded"] else []) + \
             ocisServer(extra_server_environment = extra_server_environment, tika_enabled = params["tikaNeeded"], debug = False)
 
         step_e2e = {
@@ -2491,6 +2518,8 @@ def ocisServer(storage = "ocis", volumes = [], depends_on = [], deploy_type = ""
         "WEBDAV_DEBUG_ADDR": "0.0.0.0:9119",
         "WEBFINGER_DEBUG_ADDR": "0.0.0.0:9279",
         "GOCOVERDIR": "reports",
+        "GRAPH_AVAILABLE_ROLES": "b1e2218d-eef8-4d4c-b82d-0f1a1b48f3b5,a8d5fe5e-96e3-418d-825b-534dbdf22b99,fb6c3e19-e378-47e5-b277-9732f9de6e21,58c63c02-1d89-4572-916a-870abc5a1b7d,2d00ce52-1fc2-4dbc-8b95-a73b73395f5a,1c996275-f1c9-4e71-abdf-a42f6495e960,312c0871-5ef7-4b3a-85b6-0e4074c64049,aa97fe03-7980-45ac-9e50-b325749fd7e6,63e64e19-8d43-42ec-a738-2b6af2610efa",
+        "FRONTEND_CONFIGURABLE_NOTIFICATIONS": "true",
     }
 
     if deploy_type == "":
@@ -3551,3 +3580,65 @@ def onlyofficeService():
             ],
         },
     ]
+
+def keycloakService():
+    return [{
+               "name": "generate-keycloak-certs",
+               "image": OC_CI_NODEJS,
+               "commands": [
+                   "pwd",
+                   "mkdir -p /drone/src/keycloak-certs",
+                   "openssl req -x509 -newkey rsa:2048 -keyout /drone/src/keycloak-certs/keycloakkey.pem -out /drone/src/keycloak-certs/keycloakcrt.pem -nodes -days 365 -subj '/CN=keycloak'",
+                   "chmod -R 777 /drone/src/keycloak-certs",
+               ],
+               "volumes": [
+                   {
+                       "name": "configs",
+                       "path": "/drone/src/keycloak-certs",
+                   },
+               ],
+           }] + \
+           [{
+               "name": "keycloak",
+               "image": KEYCLOAK_IMAGE,
+               "detach": True,
+               "environment": {
+                   "OCIS_DOMAIN": "ocis:9200",
+                   "KC_HOSTNAME": "keycloak",
+                   "KC_PORT": 8443,
+                   "KC_DB": "postgres",
+                   "KC_DB_URL": "jdbc:postgresql://postgres:5432/keycloak",
+                   "KC_DB_USERNAME": "keycloak",
+                   "KC_DB_PASSWORD": "keycloak",
+                   "KC_FEATURES": "impersonation",
+                   "KEYCLOAK_ADMIN": "admin",
+                   "KEYCLOAK_ADMIN_PASSWORD": "admin",
+                   "KC_HTTPS_CERTIFICATE_FILE": "/drone/src/keycloak-certs/keycloakcrt.pem",
+                   "KC_HTTPS_CERTIFICATE_KEY_FILE": "/drone/src/keycloak-certs/keycloakkey.pem",
+               },
+               "commands": [
+                   "mkdir -p /opt/keycloak/data/import",
+                   "cp tests/drone/ocis_keycloak/ocis-ci-realm.dist.json /opt/keycloak/data/import/oCIS-realm.json",
+                   "/opt/keycloak/bin/kc.sh start-dev --proxy-headers xforwarded --spi-connections-http-client-default-disable-trust-manager=true --import-realm --health-enabled=true",
+               ],
+               "volumes": [
+                   {
+                       "name": "certs",
+                       "path": "/drone/src/keycloak-certs",
+                   },
+               ],
+           }] + waitForServices("keycloak", ["keycloak:8443"])
+
+def postgresService():
+    return [
+        {
+            "name": "postgres",
+            "image": POSTGRES_ALPINE_IMAGE,
+            "detach": True,
+            "environment": {
+                "POSTGRES_DB": "keycloak",
+                "POSTGRES_USER": "keycloak",
+                "POSTGRES_PASSWORD": "keycloak",
+            },
+        },
+    ] + waitForServices("postgres", ["postgres:5432"])
