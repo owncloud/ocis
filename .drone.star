@@ -1504,7 +1504,7 @@ def e2eTestPipeline(ctx):
             (tikaService() if params["tikaNeeded"] else []) + \
             (postgresService() if params["keycloakNeeded"] else []) + \
             (keycloakService() if params["keycloakNeeded"] else []) + \
-            ocisServer(extra_server_environment = extra_server_environment, tika_enabled = params["tikaNeeded"], debug = False)
+            ocisServer(extra_server_environment = extra_server_environment, tika_enabled = params["tikaNeeded"], debug = False, using_idp = params["keycloakNeeded"])
 
         step_e2e = {
             "name": "e2e-tests",
@@ -2471,7 +2471,7 @@ def notify(ctx):
         },
     }
 
-def ocisServer(storage = "ocis", volumes = [], depends_on = [], deploy_type = "", extra_server_environment = {}, with_wrapper = False, tika_enabled = False, debug = True):
+def ocisServer(storage = "ocis", volumes = [], depends_on = [], deploy_type = "", extra_server_environment = {}, with_wrapper = False, tika_enabled = False, debug = True, using_idp = False):
     user = "0:0"
     container_name = OCIS_SERVER_NAME
     environment = {
@@ -2571,17 +2571,19 @@ def ocisServer(storage = "ocis", volumes = [], depends_on = [], deploy_type = ""
         "%s/bin/ociswrapper serve --bin %s --url %s --admin-username admin --admin-password admin" % (dirs["ocisWrapper"], ocis_bin, environment["OCIS_URL"]),
     ]
 
-    wait_for_ocis = {
-        "name": "wait-for-%s" % (container_name),
-        "image": OC_CI_ALPINE,
-        "commands": [
-            # wait for ocis-server to be ready (5 minutes)
-            "timeout 300 bash -c 'while [ $(curl -sk -uadmin:admin " +
-            "%s/graph/v1.0/users/admin " % environment["OCIS_URL"] +
-            "-w %{http_code} -o /dev/null) != 200 ]; do sleep 1; done'",
-        ],
-        "depends_on": depends_on,
-    }
+    wait_for_ocis = waitForServices("ocis", [OCIS_DOMAIN])
+    if not using_idp:
+        wait_for_ocis = {
+            "name": "wait-for-%s" % (container_name),
+            "image": OC_CI_ALPINE,
+            "commands": [
+                # wait for ocis-server to be ready (5 minutes)
+                "timeout 300 bash -c 'while [ $(curl -sk -uadmin:admin " +
+                "%s/graph/v1.0/users/admin " % environment["OCIS_URL"] +
+                "-w %{http_code} -o /dev/null) != 200 ]; do sleep 1; done'",
+            ],
+            "depends_on": depends_on,
+        }
 
     commands = [
         "mkdir -p $GOCOVERDIR",
