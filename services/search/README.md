@@ -19,6 +19,8 @@ When using content extraction, more resources and time are needed, because the c
 
 The search service runs out of the box with the shipped default `basic` configuration. No further configuration is needed, except when using content extraction.
 
+Consider using a dedicated hardware for this service in case more resources are needed.
+
 ## Scaling
 
 The search service can be scaled by running multiple instances. Some rules apply:
