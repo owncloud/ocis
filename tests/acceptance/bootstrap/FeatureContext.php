@@ -3006,7 +3006,8 @@ class FeatureContext extends BehatVariablesContext {
 	}
 
 	/**
-	 * @Given the system waits for :arg1 seconds
+	 * @Given the administrator has waited for :seconds seconds
+	 * @When the administrator waits for :seconds seconds
 	 *
 	 * @param string $seconds
 	 *

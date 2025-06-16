@@ -29,7 +29,7 @@ Feature: List upload sessions via CLI command
       | ANTIVIRUS_INFECTED_FILE_HANDLING | abort     |
     And user "Alice" has uploaded file "filesForUpload/filesWithVirus/eicar.com" to "/virusFile.txt"
     And the config "POSTPROCESSING_DELAY" has been set to "10s"
-    And the system waits for "5" seconds
+    And the administrator has waited for "2" seconds
     And user "Alice" has uploaded file with content "uploaded content" to "/file1.txt"
     And user "Alice" has uploaded file with content "uploaded content" to "/file2.txt"
     When the administrator lists all the upload sessions with flag "processing"
@@ -88,27 +88,44 @@ Feature: List upload sessions via CLI command
 
 
   Scenario: restart upload sessions that are in postprocessing
-    Given user "Alice" has uploaded file with content "upload content" to "/file1.txt"
-    And the config "POSTPROCESSING_DELAY" has been set to "10s"
+    Given the config "POSTPROCESSING_DELAY" has been set to "3s"
+    And user "Alice" has uploaded file with content "upload content" to "/file1.txt"
     And user "Alice" has uploaded file with content "upload content" to "/file2.txt"
+    And the administrator has waited for "1" seconds
+    And the administrator has stopped the server
+    And the administrator has started the server
+    When the administrator waits for "3" seconds
+    Then for user "Alice" file "file1.txt" of space "Personal" should be in postprocessing
+    And for user "Alice" file "file2.txt" of space "Personal" should be in postprocessing
     When the administrator restarts the upload sessions that are in postprocessing
     Then the command should be successful
     And the CLI response should contain these entries:
       | file2.txt |
-    And the CLI response should not contain these entries:
       | file1.txt |
+    When the administrator waits for "3" seconds
+    Then the content of file "file1.txt" for user "Alice" should be "upload content"
+    And the content of file "file2.txt" for user "Alice" should be "upload content"
 
 
   Scenario: restart upload sessions of a single file
-    Given the config "POSTPROCESSING_DELAY" has been set to "10s"
-    And user "Alice" has uploaded file with content "upload content" to "/file1.txt"
-    And user "Alice" has uploaded file with content "upload content" to "/file2.txt"
+    Given the config "POSTPROCESSING_DELAY" has been set to "3s"
+    And user "Alice" has uploaded file with content "uploaded content" to "file1.txt"
+    And user "Alice" has uploaded file with content "uploaded content" to "file2.txt"
+    And the administrator has waited for "1" seconds
+    And the administrator has stopped the server
+    And the administrator has started the server
+    When the administrator waits for "3" seconds
+    Then for user "Alice" file "file1.txt" of space "Personal" should be in postprocessing
+    And for user "Alice" file "file2.txt" of space "Personal" should be in postprocessing
     When the administrator restarts the upload sessions of file "file1.txt"
     Then the command should be successful
     And the CLI response should contain these entries:
       | file1.txt |
     And the CLI response should not contain these entries:
       | file2.txt |
+    When the administrator waits for "3" seconds
+    Then for user "Alice" file "file2.txt" of space "Personal" should be in postprocessing
+    And the content of file "file1.txt" for user "Alice" should be "uploaded content"
 
 
   Scenario: clean all upload sessions that are not in post-processing
@@ -154,11 +171,20 @@ Feature: List upload sessions via CLI command
 
   @issue-11290
   Scenario: resume all upload sessions
-    Given the config "POSTPROCESSING_DELAY" has been set to "10s"
+    Given the following configs have been set:
+      | config                           | value           |
+      | POSTPROCESSING_STEPS             | virusscan,delay |
+      | ANTIVIRUS_INFECTED_FILE_HANDLING | abort           |
+      | POSTPROCESSING_DELAY             | 3s              |
     And user "Alice" has uploaded file with content "upload content" to "file.txt"
+    And the administrator has waited for "1" seconds
     And the administrator has stopped the server
     And the administrator has started the server
+    When the administrator waits for "3" seconds
+    Then for user "Alice" file "file.txt" of space "Personal" should be in postprocessing
     When the administrator resumes all the upload sessions using the CLI
     Then the command should be successful
     And the CLI response should contain these entries:
       | file.txt |
+    When the administrator waits for "3" seconds
+    Then the content of file "file.txt" for user "Alice" should be "upload content"
