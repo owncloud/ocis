@@ -2567,7 +2567,7 @@ def ocisServer(storage = "ocis", volumes = [], depends_on = [], deploy_type = ""
         ocis_bin = "ocis/bin/ocis-debug"
 
     build_and_run_commands = [
-      "%s server" % ocis_bin,
+        "%s server" % ocis_bin,
     ]
     if with_wrapper:
         build_and_run_commands = [
