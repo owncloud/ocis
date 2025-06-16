@@ -1504,7 +1504,7 @@ def e2eTestPipeline(ctx):
             (tikaService() if params["tikaNeeded"] else []) + \
             (postgresService() if params["keycloakNeeded"] else []) + \
             (keycloakService() if params["keycloakNeeded"] else []) + \
-            ocisServer(extra_server_environment = extra_server_environment, tika_enabled = params["tikaNeeded"], debug = False, using_idp = params["keycloakNeeded"])
+            ocisServer(extra_server_environment = extra_server_environment, with_wrapper = not params["keycloakNeeded"], tika_enabled = params["tikaNeeded"], debug = False, using_idp = params["keycloakNeeded"])
 
         step_e2e = {
             "name": "e2e-tests",
@@ -2566,10 +2566,14 @@ def ocisServer(storage = "ocis", volumes = [], depends_on = [], deploy_type = ""
     if debug:
         ocis_bin = "ocis/bin/ocis-debug"
 
-    wrapper_commands = [
-        "make -C %s build" % dirs["ocisWrapper"],
-        "%s/bin/ociswrapper serve --bin %s --url %s --admin-username admin --admin-password admin" % (dirs["ocisWrapper"], ocis_bin, environment["OCIS_URL"]),
+    build_and_run_commands = [
+      "%s server" % ocis_bin,
     ]
+    if with_wrapper:
+        build_and_run_commands = [
+            "make -C %s build" % dirs["ocisWrapper"],
+            "%s/bin/ociswrapper serve --bin %s --url %s --admin-username admin --admin-password admin" % (dirs["ocisWrapper"], ocis_bin, environment["OCIS_URL"]),
+        ]
 
     wait_for_ocis = waitForServices("ocis", [OCIS_DOMAIN])[0]
     if not using_idp:
@@ -2590,7 +2594,7 @@ def ocisServer(storage = "ocis", volumes = [], depends_on = [], deploy_type = ""
         "%s init --insecure true" % ocis_bin,
         "cat $OCIS_CONFIG_DIR/ocis.yaml",
         "cp tests/config/drone/app-registry.yaml /root/.ocis/config/app-registry.yaml",
-    ] + (wrapper_commands)
+    ] + (build_and_run_commands)
 
     return [
         {
