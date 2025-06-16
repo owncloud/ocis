@@ -2249,6 +2249,52 @@ trait WebDav {
 	}
 
 	/**
+	 * @Given user :user has created file :fileName with content :content into folder :destination of space :space using file-id
+	 *
+	 * @param string $user
+	 * @param string $fileName
+	 * @param string $content
+	 * @param string $destination
+	 * @param string $spaceName
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws JsonException
+	 */
+	public function userHasCreatedFileWithContentIntoFolderOfSpaceUsingFileId(
+		string $user,
+		string $fileName,
+		string $content,
+		string $destination,
+		string $spaceName
+	): void {
+		$baseUrl = $this->getBaseUrl();
+		$user = $this->getActualUsername($user);
+		$password = $this->getPasswordForUser($user);
+
+		$destinationFile = trim($fileName, "/");
+		$destinationFolder = trim($destination, "/");
+		$fileId = $this->getFileIdForPath($user, $destinationFolder);
+
+		$davPath = WebDavHelper::getDavPath($this->getDavPathVersion());
+
+		$fileDestination = "$baseUrl/$davPath/$fileId/" . $this->escapePath($destinationFile);
+
+		$response = HttpRequestHelper::put(
+			$fileDestination,
+			$user,
+			$password,
+			null,
+			$content
+		);
+		$this->theHTTPStatusCodeShouldBe(
+			["201"],
+			"HTTP status code was not 201 while trying to upload file '$destination' for user '$user'",
+			$response
+		);
+	}
+
+	/**
 	 * @Given /^user "([^"]*)" has uploaded the following files with content "([^"]*)"$/
 	 *
 	 * @param string $user

@@ -379,11 +379,10 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 #### [Activity. No activity for copying a zero byte file](https://github.com/owncloud/ocis/issues/10417)
 
 - [apiActivities/activities.feature:4108](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiActivities/activities.feature#L4108)
-- [apiActivities/activitiesByFileId.feature:1842](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiActivities/activitiesByFileId.feature#L1842)
+- [apiActivities/activitiesByFileId.feature:2015](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiActivities/activitiesByFileId.feature#L2015)
 
 #### [Activity. no event for deleting a file using file-id](https://github.com/owncloud/ocis/issues/10328)
-
-- [apiActivities/activitiesByFileId.feature:2017](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiActivities/activitiesByFileId.feature#L2017)
+- [apiActivities/activitiesByFileId.feature:2190](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiActivities/activitiesByFileId.feature#L2190)
 
 #### Uploaders are not allowed to `MOVE`
 
