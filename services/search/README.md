@@ -19,18 +19,23 @@ When using content extraction, more resources and time are needed, because the c
 
 The search service runs out of the box with the shipped default `basic` configuration. No further configuration is needed, except when using content extraction.
 
-Note that as of now, the search service can not be scaled. Consider using a dedicated hardware for this service in case more resources are needed.
+## Scaling
 
-## Search engines
+The search service can be scaled by running multiple instances. Some rules apply:
+
+* With `SEARCH_ENGINE_BLEVE_SCALE=false`, which is the default , the search service has exclusive write access to the index. Once the first search process is started, any subsequent {search processes attempting to access the index are locked out.
+
+* With `SEARCH_ENGINE_BLEVE_SCALE=true`, a search service will no longer have exclusive write access to the index. This setting must be enabled for all instances of the {search service.
+
+## Search Engines
 
 By default, the search service is shipped with [bleve](https://github.com/blevesearch/bleve) as its primary search engine. The available engines can be extended by implementing the [Engine](pkg/engine/engine.go) interface and making that engine available.
 
 ## Query language
 
-By default, [KQL](https://learn.microsoft.com/en-us/sharepoint/dev/general-development/keyword-query-language-kql-syntax-reference) is used as query language,
-for an overview of how the syntax works, please read the [microsoft documentation](https://learn.microsoft.com/en-us/sharepoint/dev/general-development/keyword-query-language-kql-syntax-reference).
+By default, [KQL](https://learn.microsoft.com/en-us/sharepoint/dev/general-development/keyword-query-language-kql-syntax-reference) is used as query language, for an overview of how the syntax works, please read the [microsoft documentation](https://learn.microsoft.com/en-us/sharepoint/dev/general-development/keyword-query-language-kql-syntax-reference) for more details.
 
-Not all parts are supported, the following list gives an overview of parts that are not implemented yet:
+Not all parts are supported. The following list gives an overview of parts that are **not implemented** yet:
 
 *   Synonym operators
 *   Inclusion and exclusion operators
@@ -54,17 +59,18 @@ The search service is able to manage and retrieve many types of information. For
 
 ### Basic Extractor
 
-This extractor is the most simple one and just uses the resource information provided by Infinite Scale. It does not do any further analysis. The following fields are included in the index: `Name`, `Size`, `MimeType`, `Tags`, `Mtime`.
+This extractor is the most simple one and just uses the resource information provided by Infinite Scale. It does not do any further analysis.
 
 ### Tika Extractor
 
-This extractor is more advanced compared to the [Basic extractor](#basic-extractor). The main difference is that this extractor is able to search file contents.
-However, [Apache Tika](https://tika.apache.org/) is required for this task. Read the [Getting Started with Apache Tika](https://tika.apache.org/2.6.0/gettingstarted.html) guide on how to install and run Tika or use a ready to run [Tika container](https://hub.docker.com/r/apache/tika). See the [Tika container usage document](https://github.com/apache/tika-docker#usage) for a quickstart. Note that at the time of writing, containers are only available for the amd64 platform.
+This extractor is more advanced compared to the [Basic extractor](#basic-extractor). The main difference is that this extractor is able to search file contents. However, [Apache Tika](https://tika.apache.org/) is required for this task. Read the [Getting Started with Apache Tika](https://tika.apache.org/3.2.0/gettingstarted.html) guide on how to install and run Tika or use a ready to run [Tika container](https://hub.docker.com/r/apache/tika). See the [Tika container usage document](https://github.com/apache/tika-docker#usage) for a quickstart. Note that at the time of writing, containers are only available for the amd64 platform.
 
 As soon as Tika is installed and accessible, the search service must be configured for the use with Tika. The following settings must be set:
 
 *   `SEARCH_EXTRACTOR_TYPE=tika`
 *   `SEARCH_EXTRACTOR_TIKA_TIKA_URL=http://YOUR-TIKA.URL`
+*   `FRONTEND_FULL_TEXT_SEARCH_ENABLED=true`\
+When using the Tika extractor, make sure to also set this enironment variable in the frontend service. This will tell the web client that full-text search has been enabled.
 
 When the search service can reach Tika, it begins to read out the content on demand. Note that files must be downloaded during the process, which can lead to delays with larger documents.
 
@@ -76,8 +82,6 @@ When using the Tika container and docker-compose, consider the following:
 
 *   See the [ocis_full](https://github.com/owncloud/ocis/tree/master/deployments/examples/ocis_full) example.
 *   Containers for the linked service are reachable at a hostname identical to the alias or the service name if no alias was specified.
-
-If using the `tika` extractor, make sure to also set `FRONTEND_FULL_TEXT_SEARCH_ENABLED` in the frontend service to `true`. This will tell the webclient that full-text search has been enabled.
 
 ## Search Functionality
 
