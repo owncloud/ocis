@@ -27,12 +27,15 @@ import (
 var cmd *exec.Cmd
 var retryCount = 0
 var stopSignal = false
-var ServiceEnvConfigs = make(map[string][]string)
 var runningServices = make(map[string]int)
+
+// exported variables
+var ServiceEnvConfigs = make(map[string][]string)
+var OcisServiceName = "ocis"
 
 func Start(envMap []string) {
 	log.Println("Starting oCIS service...")
-	StartService("", envMap)
+	StartService(OcisServiceName, envMap)
 }
 
 func Stop() (bool, string) {
@@ -69,13 +72,13 @@ func Restart(envMap []string) (bool, string) {
 }
 
 func IsOcisRunning() bool {
-	if runningServices["ocis"] == 0 {
+	if runningServices[OcisServiceName] == 0 {
 		return false
 	}
 
-	_, err := os.FindProcess(runningServices["ocis"])
+	_, err := os.FindProcess(runningServices[OcisServiceName])
 	if err != nil {
-		delete(runningServices, "ocis")
+		delete(runningServices, OcisServiceName)
 		return false
 	}
 	return true
@@ -214,9 +217,16 @@ func StartService(service string, envMap []string) {
 	// Initialize command args based on service presence
 	cmdArgs := []string{"server"} // Default command args
 
-	if service != "" {
+	if envMap == nil {
+		envMap = []string{}
+	}
+
+	if service == "" {
+		service = OcisServiceName
+	} else if service != OcisServiceName {
 		cmdArgs = append([]string{service}, cmdArgs...)
 	}
+
 	// wait for the log scanner to finish
 	var wg sync.WaitGroup
 	wg.Add(2)
@@ -227,14 +237,7 @@ func StartService(service string, envMap []string) {
 	}
 
 	cmd = exec.Command(config.Get("bin"), cmdArgs...)
-
-	if len(envMap) == 0 && service == "" {
-		cmd.Env = append(os.Environ(), ServiceEnvConfigs["ocis"]...)
-	} else if len(envMap) == 0 && service != "" {
-		cmd.Env = append(os.Environ(), ServiceEnvConfigs[service]...)
-	} else {
-		cmd.Env = append(os.Environ(), envMap...)
-	}
+	cmd.Env = append(os.Environ(), append(ServiceEnvConfigs[service], envMap...)...)
 
 	logs, err := cmd.StderrPipe()
 	if err != nil {
@@ -255,11 +258,8 @@ func StartService(service string, envMap []string) {
 	outputScanner := bufio.NewScanner(output)
 	outChan := make(chan string)
 
-	if service == "" {
-		runningServices["ocis"] = cmd.Process.Pid
-	} else {
-		runningServices[service] = cmd.Process.Pid
-	}
+	// save the service process ID
+	runningServices[service] = cmd.Process.Pid
 
 	// Read the logs when the 'ocis server' command is running
 	go func() {
