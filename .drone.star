@@ -2571,7 +2571,7 @@ def ocisServer(storage = "ocis", volumes = [], depends_on = [], deploy_type = ""
         "%s/bin/ociswrapper serve --bin %s --url %s --admin-username admin --admin-password admin" % (dirs["ocisWrapper"], ocis_bin, environment["OCIS_URL"]),
     ]
 
-    wait_for_ocis = waitForServices("ocis", [OCIS_DOMAIN])
+    wait_for_ocis = waitForServices("ocis", [OCIS_DOMAIN])[0]
     if not using_idp:
         wait_for_ocis = {
             "name": "wait-for-%s" % (container_name),
