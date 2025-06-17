@@ -1504,13 +1504,14 @@ def e2eTestPipeline(ctx):
                 "KEYCLOAK_HOST": "keycloak:8443",
             })
 
+        services = postgresService() if params["keycloakNeeded"] else []
+
         steps_before = \
             skipIfUnchanged(ctx, "e2e-tests") + \
             restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") + \
             restoreWebCache() + \
             restoreWebPnpmCache() + \
             (tikaService() if params["tikaNeeded"] else []) + \
-            (postgresService() if params["keycloakNeeded"] else []) + \
             (keycloakService() if params["keycloakNeeded"] else []) + \
             ocisServer(extra_server_environment = extra_server_environment, with_wrapper = not params["keycloakNeeded"], tika_enabled = params["tikaNeeded"], debug = False, external_idp = params["keycloakNeeded"])
 
@@ -1543,6 +1544,7 @@ def e2eTestPipeline(ctx):
                     "depends_on": getPipelineNames(buildOcisBinaryForTesting(ctx) + buildWebCache(ctx)),
                     "trigger": e2e_trigger,
                     "volumes": e2e_volumes,
+                    "services": services,
                 })
         else:
             step_e2e["commands"].append("bash run-e2e.sh %s" % e2e_args)
@@ -1554,6 +1556,7 @@ def e2eTestPipeline(ctx):
                 "depends_on": getPipelineNames(buildOcisBinaryForTesting(ctx) + buildWebCache(ctx)),
                 "trigger": e2e_trigger,
                 "volumes": e2e_volumes,
+                "services": services,
             })
 
     return pipelines
@@ -3607,7 +3610,7 @@ def keycloakService():
                    "openssl req -x509 -newkey rsa:2048 -keyout keycloak-certs/keycloakkey.pem -out keycloak-certs/keycloakcrt.pem -nodes -days 365 -subj '/CN=keycloak'",
                    "chmod -R 777 keycloak-certs",
                ],
-           }] + \
+           }] + waitForServices("postgres", ["postgres:5432"]) + \
            [{
                "name": "keycloak",
                "image": KEYCLOAK_IMAGE,
@@ -3621,8 +3624,8 @@ def keycloakService():
                    "KC_DB_USERNAME": "keycloak",
                    "KC_DB_PASSWORD": "keycloak",
                    "KC_FEATURES": "impersonation",
-                   "KEYCLOAK_ADMIN": "admin",
-                   "KEYCLOAK_ADMIN_PASSWORD": "admin",
+                   "KC_BOOTSTRAP_ADMIN_USERNAME": "admin",
+                   "KC_BOOTSTRAP_ADMIN_PASSWORD": "admin",
                    "KC_HTTPS_CERTIFICATE_FILE": "%s/keycloak-certs/keycloakcrt.pem" % dirs["base"],
                    "KC_HTTPS_CERTIFICATE_KEY_FILE": "%s/keycloak-certs/keycloakkey.pem" % dirs["base"],
                },
@@ -3645,4 +3648,4 @@ def postgresService():
                 "POSTGRES_PASSWORD": "keycloak",
             },
         },
-    ] + waitForServices("postgres", ["postgres:5432"])
+    ]
