@@ -35,9 +35,8 @@ services:
       - ${OCIS_CONFIG_DIR:-ocis-config}:/etc/ocis
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.collaboration-oo.entrypoints=https"
+      - "traefik.http.routers.collaboration-oo.entrypoints=http"
       - "traefik.http.routers.collaboration-oo.rule=Host(`collaboration-oo`)"
-      - "traefik.http.routers.collaboration-oo.tls.certresolver=http"
       - "traefik.http.routers.collaboration-oo.service=collaboration-oo"
       - "traefik.http.services.collaboration-oo.loadbalancer.server.port=9300"
     logging:
