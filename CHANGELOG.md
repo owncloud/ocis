@@ -101,6 +101,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Bump Web to 12.0.1: [#11420](https://github.com/owncloud/ocis/pull/11420)
 * Enhancement - Remove deprecated envvars: [#11430](https://github.com/owncloud/ocis/pull/11430)
 * Enhancement - Update Bleve to v2.5.2: [#11441](https://github.com/owncloud/ocis/pull/11441)
+* Enhancement - Bump Web to 12.0.2: [#11444](https://github.com/owncloud/ocis/pull/11444)
 
 ## Details
 
@@ -478,6 +479,14 @@ The following sections list the changes for unreleased.
    Updated blevesearch dependency with minor improvements to the search quality.
 
    https://github.com/owncloud/ocis/pull/11441
+
+* Enhancement - Bump Web to 12.0.2: [#11444](https://github.com/owncloud/ocis/pull/11444)
+
+   - Bugfix [owncloud/web#12575](https://github.com/owncloud/web/pull/12575):
+   Ensure uniform distribution when generating password
+
+   https://github.com/owncloud/ocis/pull/11444
+   https://github.com/owncloud/web/releases/tag/v12.0.2
 
 # Changelog for [7.1.3] (2025-05-27)
 
