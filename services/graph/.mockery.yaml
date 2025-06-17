@@ -18,7 +18,7 @@ packages:
             dir: "mocks"
         interfaces:
             Publisher:
-    github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool:
+    github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool:
         config:
             dir: "mocks"
         interfaces:
