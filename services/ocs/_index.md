@@ -1,6 +1,6 @@
 ---
 title: OCS Service
-date: 2025-06-17T00:58:33.006670975Z
+date: 2025-06-17T01:02:20.212829422Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/ocs
