@@ -1499,6 +1499,7 @@ def e2eTestPipeline(ctx):
                 "GRAPH_USERNAME_MATCH": "none",
                 "KEYCLOAK_DOMAIN": "keycloak:8443",
                 "PROXY_CSP_CONFIG_FILE_LOCATION": "%s/tests/config/drone/csp.yaml" % dirs["base"],
+                "IDM_CREATE_DEMO_USERS": False,
             })
             test_environment.update({
                 "KEYCLOAK": "true",
