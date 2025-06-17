@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "homepage": ".",
+  "packageManager": "pnpm@10.12.1",
   "scripts": {
     "analyze": "source-map-explorer 'build/static/js/*.js'",
     "build": "node --openssl-legacy-provider scripts/build.js && rm -f build/service-worker.js",
@@ -176,6 +177,9 @@
     "ignoredBuiltDependencies": [
       "core-js-pure",
       "esbuild"
+    ],
+    "onlyBuiltDependencies": [
+      "core-js"
     ]
   }
 }
