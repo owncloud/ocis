@@ -362,7 +362,7 @@ config = {
         },
         "keycloak": {
             "skip": False,
-            "suites": ["keycloak"],
+            "suites": ["journeys", "keycloak"],
             "keycloakNeeded": True,
         },
     },
@@ -1479,6 +1479,12 @@ def e2eTestPipeline(ctx):
         if params["xsuites"]:
             e2e_args += " --xsuites %s" % ",".join(params["xsuites"])
 
+        test_environment = {
+            "BASE_URL_OCIS": OCIS_DOMAIN,
+            "HEADLESS": "true",
+            "RETRY": "1",
+        }
+
         # configs to setup ocis with keycloak
         if params["keycloakNeeded"]:
             extra_server_environment.update({
@@ -1495,6 +1501,10 @@ def e2eTestPipeline(ctx):
                 "GRAPH_USERNAME_MATCH": "none",
                 "KEYCLOAK_DOMAIN": "keycloak:8443",
             })
+            test_environment.update({
+                "KEYCLOAK": "true",
+                "KEYCLOAK_HOST": "keycloak:8443",
+            })
 
         steps_before = \
             skipIfUnchanged(ctx, "e2e-tests") + \
@@ -1504,18 +1514,12 @@ def e2eTestPipeline(ctx):
             (tikaService() if params["tikaNeeded"] else []) + \
             (postgresService() if params["keycloakNeeded"] else []) + \
             (keycloakService() if params["keycloakNeeded"] else []) + \
-            ocisServer(extra_server_environment = extra_server_environment, with_wrapper = not params["keycloakNeeded"], tika_enabled = params["tikaNeeded"], debug = False, using_idp = params["keycloakNeeded"])
+            ocisServer(extra_server_environment = extra_server_environment, with_wrapper = not params["keycloakNeeded"], tika_enabled = params["tikaNeeded"], debug = False, external_idp = params["keycloakNeeded"])
 
         step_e2e = {
             "name": "e2e-tests",
             "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
-            "environment": {
-                "BASE_URL_OCIS": OCIS_DOMAIN,
-                "HEADLESS": "true",
-                "RETRY": "1",
-                "WEB_UI_CONFIG_FILE": "%s/%s" % (dirs["base"], dirs["ocisConfig"]),
-                "LOCAL_UPLOAD_DIR": "/uploads",
-            },
+            "environment": test_environment,
             "commands": [
                 "cd %s/tests/e2e" % dirs["web"],
             ],
@@ -2471,7 +2475,7 @@ def notify(ctx):
         },
     }
 
-def ocisServer(storage = "ocis", volumes = [], depends_on = [], deploy_type = "", extra_server_environment = {}, with_wrapper = False, tika_enabled = False, debug = True, using_idp = False):
+def ocisServer(storage = "ocis", volumes = [], depends_on = [], deploy_type = "", extra_server_environment = {}, with_wrapper = False, tika_enabled = False, debug = True, external_idp = False):
     user = "0:0"
     container_name = OCIS_SERVER_NAME
     environment = {
@@ -2576,7 +2580,7 @@ def ocisServer(storage = "ocis", volumes = [], depends_on = [], deploy_type = ""
         ]
 
     wait_for_ocis = waitForServices("ocis", [OCIS_DOMAIN])[0]
-    if not using_idp:
+    if not external_idp:
         wait_for_ocis = {
             "name": "wait-for-%s" % (container_name),
             "image": OC_CI_ALPINE,
