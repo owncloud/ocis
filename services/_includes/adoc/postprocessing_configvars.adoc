@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2025-06-17-12-35-36]
+[#deprecation-note-2025-06-17-13-00-51]
 [caption=]
 .Deprecation notes for the postprocessing service
 [width="100%",cols="~,~,~,~",options="header"]
