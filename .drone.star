@@ -37,9 +37,11 @@ PLUGINS_S3 = "plugins/s3:1"
 PLUGINS_S3_CACHE = "plugins/s3-cache:1"
 REDIS = "redis:6-alpine"
 SONARSOURCE_SONAR_SCANNER_CLI = "sonarsource/sonar-scanner-cli:11.0"
+KEYCLOAK_IMAGE = "quay.io/keycloak/keycloak:26.2.5"
+POSTGRES_ALPINE_IMAGE = "postgres:alpine3.18"
 
 DEFAULT_PHP_VERSION = "8.2"
-DEFAULT_NODEJS_VERSION = "20"
+DEFAULT_NODEJS_VERSION = "22"
 
 dirs = {
     "base": "/drone/src",
@@ -351,12 +353,17 @@ config = {
         "part": {
             "skip": False,
             "totalParts": 4,  # divide and run all suites in parts (divide pipelines)
-            "xsuites": ["search", "app-provider", "oidc", "ocm"],  # suites to skip
+            "xsuites": ["search", "app-provider", "oidc", "ocm", "keycloak"],  # suites to skip
         },
         "search": {
             "skip": False,
             "suites": ["search"],  # suites to run
             "tikaNeeded": True,
+        },
+        "keycloak": {
+            "skip": False,
+            "suites": ["journeys", "keycloak"],
+            "keycloakNeeded": True,
         },
     },
     "e2eMultiService": {
@@ -1415,10 +1422,13 @@ def e2eTestPipeline(ctx):
         "xsuites": [],
         "totalParts": 0,
         "tikaNeeded": False,
+        "keycloakNeeded": False,
     }
 
     extra_server_environment = {
         "OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST": "%s" % dirs["bannedPasswordList"],
+        "GRAPH_AVAILABLE_ROLES": "b1e2218d-eef8-4d4c-b82d-0f1a1b48f3b5,a8d5fe5e-96e3-418d-825b-534dbdf22b99,fb6c3e19-e378-47e5-b277-9732f9de6e21,58c63c02-1d89-4572-916a-870abc5a1b7d,2d00ce52-1fc2-4dbc-8b95-a73b73395f5a,1c996275-f1c9-4e71-abdf-a42f6495e960,312c0871-5ef7-4b3a-85b6-0e4074c64049,aa97fe03-7980-45ac-9e50-b325749fd7e6,63e64e19-8d43-42ec-a738-2b6af2610efa",
+        "FRONTEND_CONFIGURABLE_NOTIFICATIONS": "true",
     }
 
     e2e_trigger = {
@@ -1466,24 +1476,51 @@ def e2eTestPipeline(ctx):
         if params["xsuites"]:
             e2e_args += " --xsuites %s" % ",".join(params["xsuites"])
 
+        test_environment = {
+            "BASE_URL_OCIS": OCIS_DOMAIN,
+            "HEADLESS": "true",
+            "RETRY": "1",
+            "REPORT_TRACING": "with-tracing" in ctx.build.title.lower(),
+        }
+
+        # configs to setup ocis with keycloak
+        if params["keycloakNeeded"]:
+            extra_server_environment.update({
+                "PROXY_AUTOPROVISION_ACCOUNTS": "true",
+                "PROXY_ROLE_ASSIGNMENT_DRIVER": "oidc",
+                "OCIS_OIDC_ISSUER": "https://keycloak:8443/realms/oCIS",
+                "PROXY_OIDC_REWRITE_WELLKNOWN": "true",
+                "WEB_OIDC_CLIENT_ID": "web",
+                "PROXY_USER_OIDC_CLAIM": "preferred_username",
+                "PROXY_USER_CS3_CLAIM": "username",
+                "OCIS_ADMIN_USER_ID": "",
+                "OCIS_EXCLUDE_RUN_SERVICES": "idp",
+                "GRAPH_ASSIGN_DEFAULT_USER_ROLE": "false",
+                "GRAPH_USERNAME_MATCH": "none",
+                "KEYCLOAK_DOMAIN": "keycloak:8443",
+                "PROXY_CSP_CONFIG_FILE_LOCATION": "%s/tests/config/drone/csp.yaml" % dirs["base"],
+                "IDM_CREATE_DEMO_USERS": False,
+            })
+            test_environment.update({
+                "KEYCLOAK": "true",
+                "KEYCLOAK_HOST": "keycloak:8443",
+            })
+
+        services = postgresService() if params["keycloakNeeded"] else []
+
         steps_before = \
             skipIfUnchanged(ctx, "e2e-tests") + \
             restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") + \
             restoreWebCache() + \
             restoreWebPnpmCache() + \
             (tikaService() if params["tikaNeeded"] else []) + \
-            ocisServer(extra_server_environment = extra_server_environment, tika_enabled = params["tikaNeeded"], debug = False)
+            (keycloakService() if params["keycloakNeeded"] else []) + \
+            ocisServer(extra_server_environment = extra_server_environment, with_wrapper = not params["keycloakNeeded"], tika_enabled = params["tikaNeeded"], debug = False, external_idp = params["keycloakNeeded"])
 
         step_e2e = {
             "name": "e2e-tests",
             "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
-            "environment": {
-                "BASE_URL_OCIS": OCIS_DOMAIN,
-                "HEADLESS": "true",
-                "RETRY": "1",
-                "WEB_UI_CONFIG_FILE": "%s/%s" % (dirs["base"], dirs["ocisConfig"]),
-                "LOCAL_UPLOAD_DIR": "/uploads",
-            },
+            "environment": test_environment,
             "commands": [
                 "cd %s/tests/e2e" % dirs["web"],
             ],
@@ -1509,6 +1546,7 @@ def e2eTestPipeline(ctx):
                     "depends_on": getPipelineNames(buildOcisBinaryForTesting(ctx) + buildWebCache(ctx)),
                     "trigger": e2e_trigger,
                     "volumes": e2e_volumes,
+                    "services": services,
                 })
         else:
             step_e2e["commands"].append("bash run-e2e.sh %s" % e2e_args)
@@ -1520,6 +1558,7 @@ def e2eTestPipeline(ctx):
                 "depends_on": getPipelineNames(buildOcisBinaryForTesting(ctx) + buildWebCache(ctx)),
                 "trigger": e2e_trigger,
                 "volumes": e2e_volumes,
+                "services": services,
             })
 
     return pipelines
@@ -1557,6 +1596,8 @@ def multiServiceE2ePipeline(ctx):
         "OCIS_GATEWAY_GRPC_ADDR": "0.0.0.0:9142",
         "SETTINGS_GRPC_ADDR": "0.0.0.0:9191",
         "GATEWAY_STORAGE_USERS_MOUNT_ID": "storage-users-id",
+        "GRAPH_AVAILABLE_ROLES": "b1e2218d-eef8-4d4c-b82d-0f1a1b48f3b5,a8d5fe5e-96e3-418d-825b-534dbdf22b99,fb6c3e19-e378-47e5-b277-9732f9de6e21,58c63c02-1d89-4572-916a-870abc5a1b7d,2d00ce52-1fc2-4dbc-8b95-a73b73395f5a,1c996275-f1c9-4e71-abdf-a42f6495e960,312c0871-5ef7-4b3a-85b6-0e4074c64049,aa97fe03-7980-45ac-9e50-b325749fd7e6,63e64e19-8d43-42ec-a738-2b6af2610efa",
+        "FRONTEND_CONFIGURABLE_NOTIFICATIONS": "true",
     }
 
     storage_users_environment = {
@@ -2437,7 +2478,7 @@ def notify(ctx):
         },
     }
 
-def ocisServer(storage = "ocis", volumes = [], depends_on = [], deploy_type = "", extra_server_environment = {}, with_wrapper = False, tika_enabled = False, debug = True):
+def ocisServer(storage = "ocis", volumes = [], depends_on = [], deploy_type = "", extra_server_environment = {}, with_wrapper = False, tika_enabled = False, debug = True, external_idp = False):
     user = "0:0"
     container_name = OCIS_SERVER_NAME
     environment = {
@@ -2532,29 +2573,35 @@ def ocisServer(storage = "ocis", volumes = [], depends_on = [], deploy_type = ""
     if debug:
         ocis_bin = "ocis/bin/ocis-debug"
 
-    wrapper_commands = [
-        "make -C %s build" % dirs["ocisWrapper"],
-        "%s/bin/ociswrapper serve --bin %s --url %s --admin-username admin --admin-password admin" % (dirs["ocisWrapper"], ocis_bin, environment["OCIS_URL"]),
+    build_and_run_commands = [
+        "%s server" % ocis_bin,
     ]
+    if with_wrapper:
+        build_and_run_commands = [
+            "make -C %s build" % dirs["ocisWrapper"],
+            "%s/bin/ociswrapper serve --bin %s --url %s --admin-username admin --admin-password admin" % (dirs["ocisWrapper"], ocis_bin, environment["OCIS_URL"]),
+        ]
 
-    wait_for_ocis = {
-        "name": "wait-for-%s" % (container_name),
-        "image": OC_CI_ALPINE,
-        "commands": [
-            # wait for ocis-server to be ready (5 minutes)
-            "timeout 300 bash -c 'while [ $(curl -sk -uadmin:admin " +
-            "%s/graph/v1.0/users/admin " % environment["OCIS_URL"] +
-            "-w %{http_code} -o /dev/null) != 200 ]; do sleep 1; done'",
-        ],
-        "depends_on": depends_on,
-    }
+    wait_for_ocis = waitForServices("ocis", [OCIS_DOMAIN])[0]
+    if not external_idp:
+        wait_for_ocis = {
+            "name": "wait-for-%s" % (container_name),
+            "image": OC_CI_ALPINE,
+            "commands": [
+                # wait for ocis-server to be ready (5 minutes)
+                "timeout 300 bash -c 'while [ $(curl -sk -uadmin:admin " +
+                "%s/graph/v1.0/users/admin " % environment["OCIS_URL"] +
+                "-w %{http_code} -o /dev/null) != 200 ]; do sleep 1; done'",
+            ],
+            "depends_on": depends_on,
+        }
 
     commands = [
         "mkdir -p $GOCOVERDIR",
         "%s init --insecure true" % ocis_bin,
         "cat $OCIS_CONFIG_DIR/ocis.yaml",
         "cp tests/config/drone/app-registry.yaml /root/.ocis/config/app-registry.yaml",
-    ] + (wrapper_commands)
+    ] + (build_and_run_commands)
 
     return [
         {
@@ -3552,5 +3599,55 @@ def onlyofficeService():
                 "chmod 400 /var/www/onlyoffice/Data/certs/onlyoffice.key",
                 "/app/ds/run-document-server.sh",
             ],
+        },
+    ]
+
+def keycloakService():
+    return [{
+               "name": "generate-keycloak-certs",
+               "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
+               "commands": [
+                   "cd %s" % dirs["base"],
+                   "mkdir -p keycloak-certs",
+                   "openssl req -x509 -newkey rsa:2048 -keyout keycloak-certs/keycloakkey.pem -out keycloak-certs/keycloakcrt.pem -nodes -days 365 -subj '/CN=keycloak'",
+                   "chmod -R 777 keycloak-certs",
+               ],
+           }] + waitForServices("postgres", ["postgres:5432"]) + \
+           [{
+               "name": "keycloak",
+               "image": KEYCLOAK_IMAGE,
+               "detach": True,
+               "environment": {
+                   "OCIS_DOMAIN": OCIS_URL,
+                   "KC_HOSTNAME": "keycloak",
+                   "KC_PORT": 8443,
+                   "KC_DB": "postgres",
+                   "KC_DB_URL": "jdbc:postgresql://postgres:5432/keycloak",
+                   "KC_DB_USERNAME": "keycloak",
+                   "KC_DB_PASSWORD": "keycloak",
+                   "KC_FEATURES": "impersonation",
+                   "KC_BOOTSTRAP_ADMIN_USERNAME": "admin",
+                   "KC_BOOTSTRAP_ADMIN_PASSWORD": "admin",
+                   "KC_HTTPS_CERTIFICATE_FILE": "%s/keycloak-certs/keycloakcrt.pem" % dirs["base"],
+                   "KC_HTTPS_CERTIFICATE_KEY_FILE": "%s/keycloak-certs/keycloakkey.pem" % dirs["base"],
+               },
+               "commands": [
+                   "mkdir -p /opt/keycloak/data/import",
+                   "cp tests/config/drone/ocis-ci-realm.dist.json /opt/keycloak/data/import/oCIS-realm.json",
+                   "/opt/keycloak/bin/kc.sh start-dev --proxy-headers xforwarded --spi-connections-http-client-default-disable-trust-manager=true --import-realm --health-enabled=true",
+               ],
+           }] + waitForServices("keycloak", ["keycloak:8443"])
+
+def postgresService():
+    return [
+        {
+            "name": "postgres",
+            "image": POSTGRES_ALPINE_IMAGE,
+            "detach": True,
+            "environment": {
+                "POSTGRES_DB": "keycloak",
+                "POSTGRES_USER": "keycloak",
+                "POSTGRES_PASSWORD": "keycloak",
+            },
         },
     ]
