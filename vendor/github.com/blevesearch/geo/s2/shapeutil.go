@@ -52,6 +52,8 @@ func newRangeIterator(index *ShapeIndex) *rangeIterator {
 
 func (r *rangeIterator) cellID() CellID             { return r.it.CellID() }
 func (r *rangeIterator) indexCell() *ShapeIndexCell { return r.it.IndexCell() }
+func (r *rangeIterator) clipped() *clippedShape     { return r.indexCell().clipped(0) }
+func (r *rangeIterator) containsCenter() bool       { return r.clipped().containsCenter }
 func (r *rangeIterator) next()                      { r.it.Next(); r.refresh() }
 func (r *rangeIterator) done() bool                 { return r.it.Done() }
 

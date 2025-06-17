@@ -14,7 +14,7 @@
 
 package s2
 
-import "github.com/golang/geo/s1"
+import "github.com/blevesearch/geo/s1"
 
 // roundAngle returns the value rounded to nearest as an int32.
 // This does not match C++ exactly for the case of x.5.

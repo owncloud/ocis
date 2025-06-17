@@ -17,7 +17,7 @@ package s2
 import (
 	"math"
 
-	"github.com/golang/geo/s1"
+	"github.com/blevesearch/geo/s1"
 )
 
 // PointArea returns the area of triangle ABC. This method combines two different
@@ -60,25 +60,26 @@ func PointArea(a, b, c Point) float64 {
 	// k3 is about 0.1. Since the best case error using Girard's formula
 	// is about 1e-15, this means that we shouldn't even consider it unless
 	// s >= 3e-4 or so.
-	sa := float64(b.Angle(c.Vector))
-	sb := float64(c.Angle(a.Vector))
-	sc := float64(a.Angle(b.Vector))
+	sa := b.stableAngle(c)
+	sb := c.stableAngle(a)
+	sc := a.stableAngle(b)
 	s := 0.5 * (sa + sb + sc)
 	if s >= 3e-4 {
 		// Consider whether Girard's formula might be more accurate.
-		dmin := s - math.Max(sa, math.Max(sb, sc))
+		dmin := s - maxAngle(sa, sb, sc)
 		if dmin < 1e-2*s*s*s*s*s {
 			// This triangle is skinny enough to use Girard's formula.
 			area := GirardArea(a, b, c)
-			if dmin < s*0.1*area {
+			if dmin < s*0.1*s1.Angle(area+5e-15) {
 				return area
 			}
 		}
 	}
 
 	// Use l'Huilier's formula.
-	return 4 * math.Atan(math.Sqrt(math.Max(0.0, math.Tan(0.5*s)*math.Tan(0.5*(s-sa))*
-		math.Tan(0.5*(s-sb))*math.Tan(0.5*(s-sc)))))
+	return 4 * math.Atan(math.Sqrt(math.Max(0.0,
+		math.Tan(float64(0.5*s))*math.Tan(0.5*float64(s-sa))*
+			math.Tan(0.5*float64(s-sb))*math.Tan(0.5*float64(s-sc)))))
 }
 
 // GirardArea returns the area of the triangle computed using Girard's formula.

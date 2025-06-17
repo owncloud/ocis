@@ -27,22 +27,24 @@ import (
 	"math"
 	"math/big"
 
-	"github.com/golang/geo/r3"
-	"github.com/golang/geo/s1"
+	"github.com/blevesearch/geo/r3"
+	"github.com/blevesearch/geo/s1"
 )
 
 const (
-	// If any other machine architectures need to be suppported, these next three
+	// If any other machine architectures need to be supported, these next
 	// values will need to be updated.
 
-	// epsilon is a small number that represents a reasonable level of noise between two
-	// values that can be considered to be equal.
-	epsilon = 1e-15
 	// dblEpsilon is a smaller number for values that require more precision.
 	// This is the C++ DBL_EPSILON equivalent.
 	dblEpsilon = 2.220446049250313e-16
 	// dblError is the C++ value for S2 rounding_epsilon().
 	dblError = 1.110223024625156e-16
+
+	// sqrt3 is used many times throughout but computed every time,
+	// so use the OEIS value like package math does for Sqrt2, etc.
+	// https://oeis.org/A002194
+	sqrt3 = 1.73205080756887729352744634150587236694280525381038062805580
 
 	// maxDeterminantError is the maximum error in computing (AxB).C where all vectors
 	// are unit length. Using standard inequalities, it can be shown that
@@ -73,6 +75,34 @@ const (
 	detErrorMultiplier = 3.2321 * dblEpsilon
 )
 
+// epsilonForDigits reports the epsilon for the given number of digits of mantissa.
+// This is essentially 2 ** (-digits).
+func epsilonForDigits(digits int) float64 {
+	// IEEE floats have either 24 (32-bit floating point) or 53
+	// (64 bit floating point) digits or mantissa.
+	if digits < 64 {
+		return 1.0 / float64(uint64(1)<<digits)
+	}
+	return epsilonForDigits(digits-63) / float64(1<<63)
+}
+
+// roundingEpsilon reports the maximum rounding error for arithmetic operations for
+// given type t.
+//
+// We could simply return 0.5 * epsilon, but that is not always the correct approach
+// on all platforms.
+func roundingEpsilon(t any) float64 {
+	switch t.(type) {
+	case float32:
+		return epsilonForDigits(24)
+	case float64:
+		return epsilonForDigits(53)
+	default:
+		// TODO(rsned): If go adds any other size floating point types, revisit this.
+		panic("unsupported type for rounding epsilon")
+	}
+}
+
 // Direction is an indication of the ordering of a set of points.
 type Direction int
 
@@ -83,8 +113,20 @@ const (
 	CounterClockwise Direction = 1
 )
 
+// These big.Float methods are copied from r3/precisevector.go
+
 // newBigFloat constructs a new big.Float with maximum precision.
 func newBigFloat() *big.Float { return new(big.Float).SetPrec(big.MaxPrec) }
+
+// precSub is a helper to wrap the boilerplate of subtracting two big.Floats.
+func precSub(a, b *big.Float) *big.Float {
+	return new(big.Float).SetPrec(big.MaxPrec).Sub(a, b)
+}
+
+// precMul is a helper to wrap the boilerplate of multiplying two big.Floats.
+func precMul(a, b *big.Float) *big.Float {
+	return new(big.Float).SetPrec(big.MaxPrec).Mul(a, b)
+}
 
 // Sign returns true if the points A, B, C are strictly counterclockwise,
 // and returns false if the points are clockwise or collinear (i.e. if they are all
@@ -120,15 +162,15 @@ func Sign(a, b, c Point) bool {
 //
 // RobustSign satisfies the following conditions:
 //
-//  (1) RobustSign(a,b,c) == Indeterminate if and only if a == b, b == c, or c == a
-//  (2) RobustSign(b,c,a) == RobustSign(a,b,c) for all a,b,c
-//  (3) RobustSign(c,b,a) == -RobustSign(a,b,c) for all a,b,c
+//	(1) RobustSign(a,b,c) == Indeterminate if and only if a == b, b == c, or c == a
+//	(2) RobustSign(b,c,a) == RobustSign(a,b,c) for all a,b,c
+//	(3) RobustSign(c,b,a) == -RobustSign(a,b,c) for all a,b,c
 //
 // In other words:
 //
-//  (1) The result is Indeterminate if and only if two points are the same.
-//  (2) Rotating the order of the arguments does not affect the result.
-//  (3) Exchanging any two arguments inverts the result.
+//	(1) The result is Indeterminate if and only if two points are the same.
+//	(2) Rotating the order of the arguments does not affect the result.
+//	(3) Exchanging any two arguments inverts the result.
 //
 // On the other hand, note that it is not true in general that
 // RobustSign(-a,b,c) == -RobustSign(a,b,c), or any similar identities
@@ -298,9 +340,9 @@ func exactSign(a, b, c Point, perturb bool) Direction {
 // And the points must be distinct, with A < B < C in lexicographic order.
 //
 // Reference:
-//   "Simulation of Simplicity" (Edelsbrunner and Muecke, ACM Transactions on
-//   Graphics, 1990).
 //
+//	"Simulation of Simplicity" (Edelsbrunner and Muecke, ACM Transactions on
+//	Graphics, 1990).
 func symbolicallyPerturbedSign(a, b, c, bCrossC r3.PreciseVector) Direction {
 	// This method requires that the points are sorted in lexicographically
 	// increasing order. This is because every possible Point has its own
@@ -484,8 +526,8 @@ func sin2Distance(x, y Point) (sin2, err float64) {
 	// distances as small as dblError.
 	n := x.Sub(y.Vector).Cross(x.Add(y.Vector))
 	sin2 = 0.25 * n.Norm2()
-	err = ((21+4*math.Sqrt(3))*dblError*sin2 +
-		32*math.Sqrt(3)*dblError*dblError*math.Sqrt(sin2) +
+	err = ((21+4*sqrt3)*dblError*sin2 +
+		32*sqrt3*dblError*dblError*math.Sqrt(sin2) +
 		768*dblError*dblError*dblError*dblError)
 	return sin2, err
 }
@@ -677,25 +719,400 @@ func exactCompareDistance(x, y r3.PreciseVector, r2 *big.Float) int {
 	return xySign * cmp.Sign()
 }
 
+// SignDotProd reports the exact sign of the dot product between A and B.
+//
+// REQUIRES: |a|^2 <= 2 and |b|^2 <= 2
+func SignDotProd(a, b Point) int {
+	sign := triageSignDotProd(a, b)
+	if sign != 0 {
+		return sign
+	}
+
+	// big.Float.Sign() returns -1/0/+1 already, so the C++
+	// ExactSignDotProd is not necessary.
+	return r3.PreciseVectorFromVector(a.Vector).Dot(r3.PreciseVectorFromVector(b.Vector)).Sign()
+}
+
+func triageSignDotProd(a, b Point) int {
+	// The dot product error can be bound as 1.01nu|a||b| assuming nu < .01,
+	// where u is the rounding unit (epsilon/2).  n=3 because we have 3
+	// components, and we require that our vectors be <= sqrt(2) in length (so
+	// that we can support the un-normalized edge normals for cells).
+	//
+	// So we have 1.01*3*ε/2*2 = 3.03ε, which we'll round up to 3.046875ε
+	// which is exactly representable.
+	//
+	// Reference:
+	//   Error Estimation Of Floating-Point Summation And Dot Product, Rump
+	//   2011
+	const maxError = 3.046875 * dblEpsilon
+
+	na := a.Dot(b.Vector)
+	if math.Abs(na) <= maxError {
+		return 0
+	}
+
+	if na > 0 {
+		return 1
+	}
+	return -1
+}
+
+// CircleEdgeIntersectionOrdering reports the relative position of two edges crossing
+// a great circle relative to a given point.
+//
+// Given two edges AB and CD that cross a great circle defined by a normal
+// vector M, orders the crossings of AB and CD relative to another great circle
+// N representing a zero point.
+//
+// This predicate can be used in any circumstance where we have an exact normal
+// vector to order edge crossings relative to some zero point.
+//
+// As an example, if we have edges AB and CD that cross boundary 2 of a cell:
+//
+//	   B     D
+//	   •  2  •
+//	  ┌─\───/─┐
+//	3 │  • •  │ 1
+//	     A C
+//
+// We could order them by using the normal of boundary 2 as M, and the normal of
+// either boundary 1 or 3 as N.  If we use boundary 1 as N, then:
+//
+//	CircleEdgeIntersectionOrdering(A, B, C, D, M, N) == +1
+//
+// Indicating that CD is closer to boundary 1 than AB is.
+//
+// But, if we use boundary 3 as N, then:
+//
+//	CircleEdgeIntersectionOrdering(A, B, C, D, M, N) == -1
+//
+// Indicating that AB is closer to boundary 3 than CD is.
+//
+// These results are consistent but one needs to bear in mind what boundary is
+// being used as the reference.
+//
+// The edges AB and CD should be specified such that A and C are on the positive
+// side of M and B and D are on the negative side, as illustrated above.  This
+// will make the sign of their cross products with M consistent.
+//
+// Because we use a dot product to check the distance from N, this predicate can
+// only unambiguously order along edges within [0,90] degrees of N (both
+// vertices must be in quadrant one of the unit circle).
+//
+// REQUIRES:
+//   - A and B are not equal or antipodal.
+//   - C and D are not equal or antipodal.
+//   - M and N are not equal or antipodal.
+//   - AB crosses M (vertices have opposite dot product signs with M)
+//   - CD crosses M (vertices have opposite dot product signs with M)
+//   - A and C are on the positive side of M
+//   - B and D are on the negative side of M
+//   - Intersection of AB and N is on the positive side of N
+//   - Intersection of CD and N is on the positive side of N
+//
+// Returns:
+//
+//	-1 if crossing AB is closer to N than crossing CD
+//	 0 if the two edges cross at exactly the same position
+//	+1 if crossing AB is further from N than crossing CD
+func CircleEdgeIntersectionOrdering(a, b, c, d, m, n Point) int {
+	ans := triageIntersectionOrdering(a, b, c, d, m, n)
+	if ans != 0 {
+		return ans
+	}
+
+	// We got zero, check for duplicate/reverse duplicate edges before falling
+	// back to more precision.
+	if (a == c && b == d) || (a == d && b == c) {
+		return 0
+	}
+
+	return exactIntersectionOrdering(
+		r3.PreciseVectorFromVector(a.Vector), r3.PreciseVectorFromVector(b.Vector),
+		r3.PreciseVectorFromVector(c.Vector), r3.PreciseVectorFromVector(d.Vector),
+		r3.PreciseVectorFromVector(m.Vector), r3.PreciseVectorFromVector(n.Vector))
+}
+
+// triageIntersectionOrdering reports the order of intersections along a great circle
+// relative to some reference point using the float64 implementation.
+func triageIntersectionOrdering(a, b, c, d, m, n Point) int {
+	// Given an edge AB, and the normal of a great circle M, the intersection of
+	// the edge with the great circle is given by the triple product (A×B)×M.
+	//
+	// Its distance relative to the reference circle N is then proportional to the
+	// dot product with N: d0 = ((A×B)×M)•N
+	//
+	// Edge CD is similar, we want to compute d1 = ((C×D)×M)•N and compare d0 to
+	// d1.  If they're further than some error from each other, we can rely on the
+	// comparison, otherwise we fall back to more exact arithmetic.
+	//
+	// ((A×B)×M)•N is a quadruple product.  We can expand this out using
+	// Lagrange's formula for a vector triple product and then distribute the dot
+	// product, which eliminates all the cross products:
+	//
+	// d0 = ((A×B)×M)•N
+	// d0 = ((M•A)B - (M•B)A)•N
+	// d0 = (M•A)(N•B) - (M•B)(N•A)
+	//
+	// Similarly:
+	//
+	// d1 = (M•C)(N•D) - (M•D)(N•C)
+	//
+	// We can compute this difference with a maximum absolute error of 32ε (see
+	// the gappa proof at end of the file).
+	//
+	// NOTE: If we want to push this error bound down as far as possible, we could
+	// use the dot product algorithm created by Ogita et al:
+	//
+	//   Accurate Sum and Dot Product, Ogita, Rump, Oishi 2005.
+	//
+	// Along with the 2x2 determinant algorithm by Kahan (which is useful for any
+	// bilinear form):
+	//
+	//   Further Analysis of Kahan's Algorithm for the Accurate Computation of
+	//   2x2 Determinants, Jeannerod, Louvet, and Muller, 2013.
+	//
+	// Both algorithms allow us to have bounded relative error, and since we're
+	// only interested in the sign of this operation, as long as the relative
+	// error is < 1 we can never get a sign flip, which would make this exact for
+	// our purposes.
+	const maxError = 32 * dblEpsilon
+
+	mdota := m.Dot(a.Vector)
+	mdotb := m.Dot(b.Vector)
+	mdotc := m.Dot(c.Vector)
+	mdotd := m.Dot(d.Vector)
+
+	ndota := n.Dot(a.Vector)
+	ndotb := n.Dot(b.Vector)
+	ndotc := n.Dot(c.Vector)
+	ndotd := n.Dot(d.Vector)
+
+	prodab := mdota*ndotb - mdotb*ndota
+	prodcd := mdotc*ndotd - mdotd*ndotc
+
+	if math.Abs(prodab-prodcd) > maxError {
+		if prodab < prodcd {
+			return -1
+		} else {
+			return +1
+		}
+	}
+	return 0
+}
+
+// exactIntersectionOrdering reports the order of intersections along a great circle
+// relative to some reference point using the precise implementation.
+func exactIntersectionOrdering(a, b, c, d, m, n r3.PreciseVector) int {
+	mdota := m.Dot(a)
+	mdotb := m.Dot(b)
+	mdotc := m.Dot(c)
+	mdotd := m.Dot(d)
+
+	ndota := n.Dot(a)
+	ndotb := n.Dot(b)
+	ndotc := n.Dot(c)
+	ndotd := n.Dot(d)
+
+	prodab := precSub(precMul(mdota, ndotb), precMul(mdotb, ndota))
+	prodcd := precSub(precMul(mdotc, ndotd), precMul(mdotd, ndotc))
+
+	return prodab.Cmp(prodcd)
+}
+
+// Gappa proof for TriageIntersectionOrdering
+//
+// # Use IEEE754 double precision, round-to-nearest by default.
+// @rnd = float<ieee_64, ne>;
+//
+// # Five vectors, two forming edges AB, CD and two normals N,M for great
+// # circles.
+// a0 = rnd(a0_ex);
+// a1 = rnd(a1_ex);
+// a2 = rnd(a2_ex);
+// b0 = rnd(b0_ex);
+// b1 = rnd(b1_ex);
+// b2 = rnd(b2_ex);
+// c0 = rnd(c0_ex);
+// c1 = rnd(c1_ex);
+// c2 = rnd(c2_ex);
+// d0 = rnd(d0_ex);
+// d1 = rnd(d1_ex);
+// d2 = rnd(d2_ex);
+// n0 = rnd(n0_ex);
+// n1 = rnd(n1_ex);
+// n2 = rnd(n2_ex);
+// m0 = rnd(m0_ex);
+// m1 = rnd(m1_ex);
+// m2 = rnd(m2_ex);
+//
+// # (AxB)xN     =  (N*A)B - (N*B)*A         -- Lagrange's formula
+// # ((AxB)xN)*M = ((N*A)B - (N*B)*A)*M
+// #             = (N*A)(M*B) - (X*B)(M*A)
+//
+// ndota_ rnd = n0*a0 + n1*a1 + n2*a2;
+// ndotb_ rnd = n0*b0 + n1*b1 + n2*b2;
+// mdota_ rnd = m0*a0 + m1*a1 + m2*a2;
+// mdotb_ rnd = m0*b0 + m1*b1 + m2*b2;
+// prod0_ rnd = ndota_*mdotb_ - ndotb_*mdota_;
+//
+// ndotc_ rnd = n0*c0 + n1*c1 + n2*c2;
+// ndotd_ rnd = n0*d0 + n1*d1 + n2*d2;
+// mdotc_ rnd = m0*c0 + m1*c1 + m2*c2;
+// mdotd_ rnd = m0*d0 + m1*d1 + m2*d2;
+// prod1_ rnd = ndotc_*mdotd_ - ndotd_*mdotc_;
+//
+// diff_ rnd = prod1_ - prod0_;
+//
+// # Compute it all again in exact arithmetic.
+// ndota = n0*a0 + n1*a1 + n2*a2;
+// ndotb = n0*b0 + n1*b1 + n2*b2;
+// mdota = m0*a0 + m1*a1 + m2*a2;
+// mdotb = m0*b0 + m1*b1 + m2*b2;
+// prod0 = ndota*mdotb - ndotb*mdota;
+//
+// ndotc = n0*c0 + n1*c1 + n2*c2;
+// ndotd = n0*d0 + n1*d1 + n2*d2;
+// mdotc = m0*c0 + m1*c1 + m2*c2;
+// mdotd = m0*d0 + m1*d1 + m2*d2;
+// prod1 = ndotc*mdotd - ndotd*mdotc;
+//
+// diff = prod1 - prod0;
+//
+// {
+//   # A,B,C, and D are meant to be normalized S2Point values, so their
+//   # magnitude will be at most 1.  M and N are allowed to be unnormalized cell
+//   # edge normals, so their magnitude can be up to sqrt(2).  In each case the
+//   # components will be at most one.
+//      a0 in [-1, 1]
+//   /\ a1 in [-1, 1]
+//   /\ a2 in [-1, 1]
+//   /\ b0 in [-1, 1]
+//   /\ b1 in [-1, 1]
+//   /\ b2 in [-1, 1]
+//   /\ c0 in [-1, 1]
+//   /\ c1 in [-1, 1]
+//   /\ c2 in [-1, 1]
+//   /\ d0 in [-1, 1]
+//   /\ d1 in [-1, 1]
+//   /\ d2 in [-1, 1]
+//
+//   /\ n0 in [-1, 1]
+//   /\ n1 in [-1, 1]
+//   /\ n2 in [-1, 1]
+//   /\ m0 in [-1, 1]
+//   /\ m1 in [-1, 1]
+//   /\ m2 in [-1, 1]
+//
+//   # We always dot an unnormalized normal against a normalized point so the
+//   # magnitude of the dot product in each case is bounded by sqrt(2).
+//   /\ |ndota_| in [0, 1.4142135623730954]
+//   /\ |ndotb_| in [0, 1.4142135623730954]
+//   /\ |ndotc_| in [0, 1.4142135623730954]
+//   /\ |ndotd_| in [0, 1.4142135623730954]
+//
+//   /\ |mdota_| in [0, 1.4142135623730954]
+//   /\ |mdotb_| in [0, 1.4142135623730954]
+//   /\ |mdotc_| in [0, 1.4142135623730954]
+//   /\ |mdotd_| in [0, 1.4142135623730954]
+//
+//   ->
+//   |diff_ - diff| in ?
+// }
+//
+// > gappa proof.gappa
+// Results:
+// |  diff_ - diff| in [0, 1145679351550454559b-107 {7.06079e-15, 2^(-47.0091)}]
+//
+// >>> 1145679351550454559*2**-107/2**-52
+// 31.79898987322334
+
+// Gappa proof for TriageCircleEdgeIntersectionSign
+//
+// # Use IEEE754 double precision, round-to-nearest by default.
+// @rnd = float<ieee_64, ne>;
+//
+// # Four vectors, two forming an edge AB and two normals (X,Y) for great
+// circles. a0 = rnd(a0_ex); a1 = rnd(a1_ex); a2 = rnd(a2_ex); b0 =
+// rnd(b0_ex); b1 = rnd(b1_ex); b2 = rnd(b2_ex); n0 = rnd(n0_ex); n1 =
+// rnd(n1_ex); n2 = rnd(n2_ex); x0 = rnd(x0_ex); x1 = rnd(x1_ex); x2 =
+// rnd(x2_ex);
+//
+// # (AxB)xX     =  (X*A)B - (X*B)*A         -- Lagrange's formula
+// # ((AxB)xX)*Y = ((X*A)B - (X*B)*A)*Y
+// #             = (X*A)(Y*B) - (X*B)(Y*A)
+//
+// ndota_ rnd = n0*a0 + n1*a1 + n2*a2;
+// ndotb_ rnd = n0*b0 + n1*b1 + n2*b2;
+// xdota_ rnd = x0*a0 + x1*a1 + x2*a2;
+// xdotb_ rnd = x0*b0 + x1*b1 + x2*b2;
+// diff_  rnd = ndota_*xdotb_ - ndotb_*xdota_;
+//
+// # Compute it all again in exact arithmetic.
+// ndota = n0*a0 + n1*a1 + n2*a2;
+// ndotb = n0*b0 + n1*b1 + n2*b2;
+// xdota = x0*a0 + x1*a1 + x2*a2;
+// xdotb = x0*b0 + x1*b1 + x2*b2;
+// diff  = ndota*xdotb - ndotb*xdota;
+//
+// {
+//   # A and B are meant to be normalized S2Point values, so their magnitude
+//   will # be at most 1.  X and Y are allowed to be unnormalized cell edge
+//   normals, so # their magnitude can be up to sqrt(2).  In each case the
+//   components will be # at most one.
+//      a0 in [-1, 1]
+//   /\ a1 in [-1, 1]
+//   /\ a2 in [-1, 1]
+//   /\ b0 in [-1, 1]
+//   /\ b1 in [-1, 1]
+//   /\ b2 in [-1, 1]
+//   /\ n0 in [-1, 1]
+//   /\ n1 in [-1, 1]
+//   /\ n2 in [-1, 1]
+//   /\ x0 in [-1, 1]
+//   /\ x1 in [-1, 1]
+//   /\ x2 in [-1, 1]
+//
+//   # We always dot an unnormalized normal against a normalized point so the
+//   # magnitude of the dot product in each case is bounded by sqrt(2).
+//   /\ |ndota_| in [0, 1.4142135623730954]
+//   /\ |ndotb_| in [0, 1.4142135623730954]
+//   /\ |xdota_| in [0, 1.4142135623730954]
+//   /\ |xdotb_| in [0, 1.4142135623730954]
+//
+//   ->
+//   |diff_ - diff| in ?
+// } 6ms
+//
+// > gappa proof.gappa
+// Results:
+//   |diff_ - diff| in [0, 1001564163474598623b-108 {3.08631e-15,
+//   2^(-48.2031)}]
+//
+// >>> 1001564163474598623*2**-108/2**-52
+// 13.89949493661167
+
 // TODO(roberts): Differences from C++
 // CompareEdgeDistance
 // CompareEdgeDirections
 // EdgeCircumcenterSign
 // GetVoronoiSiteExclusion
-// GetClosestVertex
-// TriageCompareLineSin2Distance
-// TriageCompareLineCos2Distance
-// TriageCompareLineDistance
-// TriageCompareEdgeDistance
-// ExactCompareLineDistance
-// ExactCompareEdgeDistance
-// TriageCompareEdgeDirections
-// ExactCompareEdgeDirections
-// ArePointsAntipodal
-// ArePointsLinearlyDependent
-// GetCircumcenter
-// TriageEdgeCircumcenterSign
-// ExactEdgeCircumcenterSign
-// UnperturbedSign
-// SymbolicEdgeCircumcenterSign
-// ExactVoronoiSiteExclusion
+//
+// getClosestVertex
+// triageCompareLineSin2Distance
+// triageCompareLineCos2Distance
+// triageCompareLineDistance
+// triageCompareEdgeDistance
+// exactCompareLineDistance
+// exactCompareEdgeDistance
+// triageCompareEdgeDirections
+// exactCompareEdgeDirections
+// arePointsAntipodal
+// arePointsLinearlyDependent
+// getCircumcenter
+// triageEdgeCircumcenterSign
+// exactEdgeCircumcenterSign
+// unperturbedSign
+// symbolicEdgeCircumcenterSign
+// exactVoronoiSiteExclusion

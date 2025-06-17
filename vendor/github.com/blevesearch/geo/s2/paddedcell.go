@@ -15,8 +15,8 @@
 package s2
 
 import (
-	"github.com/golang/geo/r1"
-	"github.com/golang/geo/r2"
+	"github.com/blevesearch/geo/r1"
+	"github.com/blevesearch/geo/r2"
 )
 
 // PaddedCell represents a Cell whose (u,v)-range has been expanded on
@@ -44,8 +44,8 @@ func PaddedCellFromCellID(id CellID, padding float64) *PaddedCell {
 	// Fast path for constructing a top-level face (the most common case).
 	if id.isFace() {
 		limit := padding + 1
-		p.bound = r2.Rect{r1.Interval{-limit, limit}, r1.Interval{-limit, limit}}
-		p.middle = r2.Rect{r1.Interval{-padding, padding}, r1.Interval{-padding, padding}}
+		p.bound = r2.Rect{X: r1.Interval{Lo: -limit, Hi: limit}, Y: r1.Interval{Lo: -limit, Hi: limit}}
+		p.middle = r2.Rect{X: r1.Interval{Lo: -padding, Hi: padding}, Y: r1.Interval{Lo: -padding, Hi: padding}}
 		p.orientation = id.Face() & 1
 		return p
 	}
@@ -131,8 +131,8 @@ func (p *PaddedCell) Middle() r2.Rect {
 		u := stToUV(siTiToST(uint32(2*p.iLo + ijSize)))
 		v := stToUV(siTiToST(uint32(2*p.jLo + ijSize)))
 		p.middle = r2.Rect{
-			r1.Interval{u - p.padding, u + p.padding},
-			r1.Interval{v - p.padding, v + p.padding},
+			X: r1.Interval{Lo: u - p.padding, Hi: u + p.padding},
+			Y: r1.Interval{Lo: v - p.padding, Hi: v + p.padding},
 		}
 	}
 	return p.middle
@@ -240,10 +240,10 @@ func (p *PaddedCell) ShrinkToFit(rect r2.Rect) CellID {
 
 	// Compute the highest bit position where the two i- or j-endpoints differ,
 	// and then choose the cell level that includes both of these endpoints. So
-	// if both pairs of endpoints are equal we choose maxLevel; if they differ
-	// only at bit 0, we choose (maxLevel - 1), and so on.
+	// if both pairs of endpoints are equal we choose MaxLevel; if they differ
+	// only at bit 0, we choose (MaxLevel - 1), and so on.
 	levelMSB := uint64(((iXor | jXor) << 1) + 1)
-	level := maxLevel - findMSBSetNonZero64(levelMSB)
+	level := MaxLevel - findMSBSetNonZero64(levelMSB)
 	if level <= p.level {
 		return p.id
 	}

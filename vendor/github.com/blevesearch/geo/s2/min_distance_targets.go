@@ -17,7 +17,7 @@ package s2
 import (
 	"math"
 
-	"github.com/golang/geo/s1"
+	"github.com/blevesearch/geo/s1"
 )
 
 // minDistance implements distance interface to find closest distance types.
@@ -268,10 +268,8 @@ func NewMinDistanceToShapeIndexTarget(index *ShapeIndex) *MinDistanceToShapeInde
 }
 
 func (m *MinDistanceToShapeIndexTarget) capBound() Cap {
-	// TODO(roberts): Depends on ShapeIndexRegion existing.
-	// c := makeS2ShapeIndexRegion(m.index).CapBound()
-	// return CapFromCenterRadius(Point{c.Center.Mul(-1)}, c.Radius())
-	panic("not implemented yet")
+	c := m.index.Region().CapBound()
+	return CapFromCenterAngle(Point{c.Center().Mul(-1)}, c.Radius())
 }
 
 func (m *MinDistanceToShapeIndexTarget) updateDistanceToPoint(p Point, dist distance) (distance, bool) {
@@ -358,5 +356,4 @@ func (m *MinDistanceToShapeIndexTarget) setUseBruteForce(b bool) { m.query.opts.
 
 // TODO(roberts): Remaining methods
 //
-// func (m *MinDistanceToShapeIndexTarget) capBound() Cap {
 // CellUnionTarget

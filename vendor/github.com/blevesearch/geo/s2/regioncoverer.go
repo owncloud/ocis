@@ -38,21 +38,21 @@ import (
 //
 // Note the following:
 //
-//  - MinLevel takes priority over MaxCells, i.e. cells below the given level will
-//    never be used even if this causes a large number of cells to be returned.
+//   - MinLevel takes priority over MaxCells, i.e. cells below the given level will
+//     never be used even if this causes a large number of cells to be returned.
 //
-//  - For any setting of MaxCells, up to 6 cells may be returned if that
-//    is the minimum number of cells required (e.g. if the region intersects
-//    all six face cells).  Up to 3 cells may be returned even for very tiny
-//    convex regions if they happen to be located at the intersection of
-//    three cube faces.
+//   - For any setting of MaxCells, up to 6 cells may be returned if that
+//     is the minimum number of cells required (e.g. if the region intersects
+//     all six face cells).  Up to 3 cells may be returned even for very tiny
+//     convex regions if they happen to be located at the intersection of
+//     three cube faces.
 //
-//  - For any setting of MaxCells, an arbitrary number of cells may be
-//    returned if MinLevel is too high for the region being approximated.
+//   - For any setting of MaxCells, an arbitrary number of cells may be
+//     returned if MinLevel is too high for the region being approximated.
 //
-//  - If MaxCells is less than 4, the area of the covering may be
-//    arbitrarily large compared to the area of the original region even if
-//    the region is convex (e.g. a Cap or Rect).
+//   - If MaxCells is less than 4, the area of the covering may be
+//     arbitrarily large compared to the area of the original region even if
+//     the region is convex (e.g. a Cap or Rect).
 //
 // The approximation algorithm is not optimal but does a pretty good job in
 // practice. The output does not always use the maximum number of cells
@@ -83,7 +83,7 @@ type RegionCoverer struct {
 func NewRegionCoverer() *RegionCoverer {
 	return &RegionCoverer{
 		MinLevel: 0,
-		MaxLevel: maxLevel,
+		MaxLevel: MaxLevel,
 		LevelMod: 1,
 		MaxCells: 8,
 	}
@@ -91,7 +91,7 @@ func NewRegionCoverer() *RegionCoverer {
 
 type coverer struct {
 	minLevel         int // the minimum cell level to be used.
-	maxLevel         int // the maximum cell level to be used.
+	MaxLevel         int // the maximum cell level to be used.
 	levelMod         int // the LevelMod to be used.
 	maxCells         int // the maximum desired number of cells in the approximation.
 	region           Region
@@ -123,12 +123,12 @@ func (pq priorityQueue) Swap(i, j int) {
 	pq[i], pq[j] = pq[j], pq[i]
 }
 
-func (pq *priorityQueue) Push(x interface{}) {
+func (pq *priorityQueue) Push(x any) {
 	item := x.(*candidate)
 	*pq = append(*pq, item)
 }
 
-func (pq *priorityQueue) Pop() interface{} {
+func (pq *priorityQueue) Pop() any {
 	item := (*pq)[len(*pq)-1]
 	*pq = (*pq)[:len(*pq)-1]
 	return item
@@ -150,10 +150,10 @@ func (c *coverer) newCandidate(cell Cell) *candidate {
 		if c.interiorCovering {
 			if c.region.ContainsCell(cell) {
 				cand.terminal = true
-			} else if level+c.levelMod > c.maxLevel {
+			} else if level+c.levelMod > c.MaxLevel {
 				return nil
 			}
-		} else if level+c.levelMod > c.maxLevel || c.region.ContainsCell(cell) {
+		} else if level+c.levelMod > c.MaxLevel || c.region.ContainsCell(cell) {
 			cand.terminal = true
 		}
 	}
@@ -268,7 +268,7 @@ func (c *coverer) adjustCellLevels(cells *CellUnion) {
 // initialCandidates computes a set of initial candidates that cover the given region.
 func (c *coverer) initialCandidates() {
 	// Optimization: start with a small (usually 4 cell) covering of the region's bounding cap.
-	temp := &RegionCoverer{MaxLevel: c.maxLevel, LevelMod: 1, MaxCells: minInt(4, c.maxCells)}
+	temp := &RegionCoverer{MaxLevel: c.MaxLevel, LevelMod: 1, MaxCells: minInt(4, c.maxCells)}
 
 	cells := temp.FastCovering(c.region)
 	c.adjustCellLevels(&cells)
@@ -336,8 +336,8 @@ func (c *coverer) coveringInternal(region Region) {
 // newCoverer returns an instance of coverer.
 func (rc *RegionCoverer) newCoverer() *coverer {
 	return &coverer{
-		minLevel: maxInt(0, minInt(maxLevel, rc.MinLevel)),
-		maxLevel: maxInt(0, minInt(maxLevel, rc.MaxLevel)),
+		minLevel: maxInt(0, minInt(MaxLevel, rc.MinLevel)),
+		MaxLevel: maxInt(0, minInt(MaxLevel, rc.MaxLevel)),
 		levelMod: maxInt(1, minInt(3, rc.LevelMod)),
 		maxCells: rc.MaxCells,
 	}
@@ -346,14 +346,14 @@ func (rc *RegionCoverer) newCoverer() *coverer {
 // Covering returns a CellUnion that covers the given region and satisfies the various restrictions.
 func (rc *RegionCoverer) Covering(region Region) CellUnion {
 	covering := rc.CellUnion(region)
-	covering.Denormalize(maxInt(0, minInt(maxLevel, rc.MinLevel)), maxInt(1, minInt(3, rc.LevelMod)))
+	covering.Denormalize(maxInt(0, minInt(MaxLevel, rc.MinLevel)), maxInt(1, minInt(3, rc.LevelMod)))
 	return covering
 }
 
 // InteriorCovering returns a CellUnion that is contained within the given region and satisfies the various restrictions.
 func (rc *RegionCoverer) InteriorCovering(region Region) CellUnion {
 	intCovering := rc.InteriorCellUnion(region)
-	intCovering.Denormalize(maxInt(0, minInt(maxLevel, rc.MinLevel)), maxInt(1, minInt(3, rc.LevelMod)))
+	intCovering.Denormalize(maxInt(0, minInt(MaxLevel, rc.MinLevel)), maxInt(1, minInt(3, rc.LevelMod)))
 	return intCovering
 }
 
@@ -404,23 +404,23 @@ func (rc *RegionCoverer) FastCovering(region Region) CellUnion {
 // IsCanonical reports whether the given CellUnion represents a valid covering
 // that conforms to the current covering parameters.  In particular:
 //
-//  - All CellIDs must be valid.
+//   - All CellIDs must be valid.
 //
-//  - CellIDs must be sorted and non-overlapping.
+//   - CellIDs must be sorted and non-overlapping.
 //
-//  - CellID levels must satisfy MinLevel, MaxLevel, and LevelMod.
+//   - CellID levels must satisfy MinLevel, MaxLevel, and LevelMod.
 //
-//  - If the covering has more than MaxCells, there must be no two cells with
-//    a common ancestor at MinLevel or higher.
+//   - If the covering has more than MaxCells, there must be no two cells with
+//     a common ancestor at MinLevel or higher.
 //
-//  - There must be no sequence of cells that could be replaced by an
-//    ancestor (i.e. with LevelMod == 1, the 4 child cells of a parent).
+//   - There must be no sequence of cells that could be replaced by an
+//     ancestor (i.e. with LevelMod == 1, the 4 child cells of a parent).
 func (rc *RegionCoverer) IsCanonical(covering CellUnion) bool {
 	return rc.newCoverer().isCanonical(covering)
 }
 
 // normalizeCovering normalizes the "covering" so that it conforms to the
-// current covering parameters (maxCells, minLevel, maxLevel, and levelMod).
+// current covering parameters (maxCells, minLevel, MaxLevel, and levelMod).
 // This method makes no attempt to be optimal. In particular, if
 // minLevel > 0 or levelMod > 1 then it may return more than the
 // desired number of cells even when this isn't necessary.
@@ -429,10 +429,10 @@ func (rc *RegionCoverer) IsCanonical(covering CellUnion) bool {
 // all of the code in this function is skipped.
 func (c *coverer) normalizeCovering(covering *CellUnion) {
 	// If any cells are too small, or don't satisfy levelMod, then replace them with ancestors.
-	if c.maxLevel < maxLevel || c.levelMod > 1 {
+	if c.MaxLevel < MaxLevel || c.levelMod > 1 {
 		for i, ci := range *covering {
 			level := ci.Level()
-			newLevel := c.adjustLevel(minInt(level, c.maxLevel))
+			newLevel := c.adjustLevel(minInt(level, c.MaxLevel))
 			if newLevel != level {
 				(*covering)[i] = ci.Parent(newLevel)
 			}
@@ -500,9 +500,9 @@ func (c *coverer) normalizeCovering(covering *CellUnion) {
 
 // isCanonical reports whether the covering is canonical.
 func (c *coverer) isCanonical(covering CellUnion) bool {
-	trueMax := c.maxLevel
+	trueMax := c.MaxLevel
 	if c.levelMod != 1 {
-		trueMax = c.maxLevel - (c.maxLevel-c.minLevel)%c.levelMod
+		trueMax = c.MaxLevel - (c.MaxLevel-c.minLevel)%c.levelMod
 	}
 	tooManyCells := len(covering) > c.maxCells
 	sameParentCount := 1

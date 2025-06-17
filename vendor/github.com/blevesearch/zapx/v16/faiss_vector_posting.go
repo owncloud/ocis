@@ -104,44 +104,44 @@ func (vpl *VecPostingsList) Iterator(prealloc segment.VecPostingsIterator) segme
 	return vpl.iterator(preallocPI)
 }
 
-func (p *VecPostingsList) iterator(rv *VecPostingsIterator) *VecPostingsIterator {
+func (vpl *VecPostingsList) iterator(rv *VecPostingsIterator) *VecPostingsIterator {
 	if rv == nil {
 		rv = &VecPostingsIterator{}
 	} else {
 		*rv = VecPostingsIterator{} // clear the struct
 	}
 	// think on some of the edge cases over here.
-	if p.postings == nil {
+	if vpl.postings == nil {
 		return rv
 	}
-	rv.postings = p
-	rv.all = p.postings.Iterator()
-	if p.except != nil {
-		rv.ActualBM = roaring64.AndNot(p.postings, p.except)
+	rv.postings = vpl
+	rv.all = vpl.postings.Iterator()
+	if vpl.except != nil {
+		rv.ActualBM = roaring64.AndNot(vpl.postings, vpl.except)
 		rv.Actual = rv.ActualBM.Iterator()
 	} else {
-		rv.ActualBM = p.postings
+		rv.ActualBM = vpl.postings
 		rv.Actual = rv.all // Optimize to use same iterator for all & Actual.
 	}
 	return rv
 }
 
-func (p *VecPostingsList) Size() int {
+func (vpl *VecPostingsList) Size() int {
 	sizeInBytes := reflectStaticSizeVecPostingsList + SizeOfPtr
 
-	if p.except != nil {
-		sizeInBytes += int(p.except.GetSizeInBytes())
+	if vpl.except != nil {
+		sizeInBytes += int(vpl.except.GetSizeInBytes())
 	}
 
 	return sizeInBytes
 }
 
-func (p *VecPostingsList) Count() uint64 {
-	if p.postings != nil {
-		n := p.postings.GetCardinality()
+func (vpl *VecPostingsList) Count() uint64 {
+	if vpl.postings != nil {
+		n := vpl.postings.GetCardinality()
 		var e uint64
-		if p.except != nil {
-			e = p.postings.AndCardinality(p.except)
+		if vpl.except != nil {
+			e = vpl.postings.AndCardinality(vpl.except)
 		}
 		return n - e
 	}
@@ -171,51 +171,51 @@ type VecPostingsIterator struct {
 	next VecPosting // reused across Next() calls
 }
 
-func (i *VecPostingsIterator) nextCodeAtOrAfterClean(atOrAfter uint64) (uint64, bool, error) {
-	i.Actual.AdvanceIfNeeded(atOrAfter)
+func (vpItr *VecPostingsIterator) nextCodeAtOrAfterClean(atOrAfter uint64) (uint64, bool, error) {
+	vpItr.Actual.AdvanceIfNeeded(atOrAfter)
 
-	if !i.Actual.HasNext() {
+	if !vpItr.Actual.HasNext() {
 		return 0, false, nil // couldn't find anything
 	}
 
-	return i.Actual.Next(), true, nil
+	return vpItr.Actual.Next(), true, nil
 }
 
-func (i *VecPostingsIterator) nextCodeAtOrAfter(atOrAfter uint64) (uint64, bool, error) {
-	if i.Actual == nil || !i.Actual.HasNext() {
+func (vpItr *VecPostingsIterator) nextCodeAtOrAfter(atOrAfter uint64) (uint64, bool, error) {
+	if vpItr.Actual == nil || !vpItr.Actual.HasNext() {
 		return 0, false, nil
 	}
 
-	if i.postings == nil || i.postings == emptyVecPostingsList {
+	if vpItr.postings == nil || vpItr.postings == emptyVecPostingsList {
 		// couldn't find anything
 		return 0, false, nil
 	}
 
-	if i.postings.postings == i.ActualBM {
-		return i.nextCodeAtOrAfterClean(atOrAfter)
+	if vpItr.postings.postings == vpItr.ActualBM {
+		return vpItr.nextCodeAtOrAfterClean(atOrAfter)
 	}
 
-	i.Actual.AdvanceIfNeeded(atOrAfter)
+	vpItr.Actual.AdvanceIfNeeded(atOrAfter)
 
-	if !i.Actual.HasNext() || !i.all.HasNext() {
+	if !vpItr.Actual.HasNext() || !vpItr.all.HasNext() {
 		// couldn't find anything
 		return 0, false, nil
 	}
 
-	n := i.Actual.Next()
-	allN := i.all.Next()
+	n := vpItr.Actual.Next()
+	allN := vpItr.all.Next()
 
 	// n is the next actual hit (excluding some postings), and
 	// allN is the next hit in the full postings, and
 	// if they don't match, move 'all' forwards until they do.
 	for allN != n {
-		if !i.all.HasNext() {
+		if !vpItr.all.HasNext() {
 			return 0, false, nil
 		}
-		allN = i.all.Next()
+		allN = vpItr.all.Next()
 	}
 
-	return uint64(n), true, nil
+	return n, true, nil
 }
 
 // a transformation function which stores both the score and the docNum as a single
@@ -225,49 +225,49 @@ func getVectorCode(docNum uint32, score float32) uint64 {
 }
 
 // Next returns the next posting on the vector postings list, or nil at the end
-func (i *VecPostingsIterator) nextAtOrAfter(atOrAfter uint64) (segment.VecPosting, error) {
+func (vpItr *VecPostingsIterator) nextAtOrAfter(atOrAfter uint64) (segment.VecPosting, error) {
 	// transform the docNum provided to the vector code format and use that to
 	// get the next entry. the comparison still happens docNum wise since after
 	// the transformation, the docNum occupies the upper 32 bits just an entry in
 	// the postings list
 	atOrAfter = getVectorCode(uint32(atOrAfter), 0)
-	code, exists, err := i.nextCodeAtOrAfter(atOrAfter)
+	code, exists, err := vpItr.nextCodeAtOrAfter(atOrAfter)
 	if err != nil || !exists {
 		return nil, err
 	}
 
-	i.next = VecPosting{} // clear the struct
-	rv := &i.next
+	vpItr.next = VecPosting{} // clear the struct
+	rv := &vpItr.next
 	rv.score = math.Float32frombits(uint32(code))
 	rv.docNum = code >> 32
 
 	return rv, nil
 }
 
-func (itr *VecPostingsIterator) Next() (segment.VecPosting, error) {
-	return itr.nextAtOrAfter(0)
+func (vpItr *VecPostingsIterator) Next() (segment.VecPosting, error) {
+	return vpItr.nextAtOrAfter(0)
 }
 
-func (itr *VecPostingsIterator) Advance(docNum uint64) (segment.VecPosting, error) {
-	return itr.nextAtOrAfter(docNum)
+func (vpItr *VecPostingsIterator) Advance(docNum uint64) (segment.VecPosting, error) {
+	return vpItr.nextAtOrAfter(docNum)
 }
 
-func (i *VecPostingsIterator) Size() int {
+func (vpItr *VecPostingsIterator) Size() int {
 	sizeInBytes := reflectStaticSizePostingsIterator + SizeOfPtr +
-		i.next.Size()
+		vpItr.next.Size()
 
 	return sizeInBytes
 }
 
-func (vpl *VecPostingsIterator) ResetBytesRead(val uint64) {
+func (vpItr *VecPostingsIterator) ResetBytesRead(val uint64) {
 
 }
 
-func (vpl *VecPostingsIterator) BytesRead() uint64 {
+func (vpItr *VecPostingsIterator) BytesRead() uint64 {
 	return 0
 }
 
-func (vpl *VecPostingsIterator) BytesWritten() uint64 {
+func (vpItr *VecPostingsIterator) BytesWritten() uint64 {
 	return 0
 }
 
@@ -329,7 +329,7 @@ func (sb *SegmentBase) InterpretVectorIndex(field string, requiresFiltering bool
 			// it isn't added to the final postings list.
 			if docID, ok := vecDocIDMap[vecID]; ok {
 				code := getVectorCode(docID, scores[i])
-				pl.postings.Add(uint64(code))
+				pl.postings.Add(code)
 			}
 		}
 	}
@@ -471,7 +471,7 @@ func (sb *SegmentBase) InterpretVectorIndex(field string, requiresFiltering bool
 				if err != nil {
 					return nil, err
 				}
-				// If no error occured during the creation of the selector, then
+				// If no error occurred during the creation of the selector, then
 				// it should be deleted once the search is complete.
 				defer selector.Delete()
 				// Ordering the retrieved centroid IDs by increasing order

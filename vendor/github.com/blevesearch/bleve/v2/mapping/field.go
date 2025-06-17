@@ -26,6 +26,7 @@ import (
 	"github.com/blevesearch/bleve/v2/geo"
 	"github.com/blevesearch/bleve/v2/util"
 	index "github.com/blevesearch/bleve_index_api"
+	"github.com/blevesearch/geo/geojson"
 )
 
 // control the default behavior for dynamic fields (those not explicitly mapped)
@@ -231,7 +232,9 @@ func (fm *FieldMapping) Options() index.FieldIndexingOptions {
 func (fm *FieldMapping) processString(propertyValueString string, pathString string, path []string, indexes []uint64, context *walkContext) {
 	fieldName := getFieldName(pathString, path, fm)
 	options := fm.Options()
-	if fm.Type == "text" {
+
+	switch fm.Type {
+	case "text":
 		analyzer := fm.analyzerForField(path, context)
 		field := document.NewTextFieldCustom(fieldName, indexes, []byte(propertyValueString), options, analyzer)
 		context.doc.AddField(field)
@@ -239,7 +242,7 @@ func (fm *FieldMapping) processString(propertyValueString string, pathString str
 		if !fm.IncludeInAll {
 			context.excludedFromAll = append(context.excludedFromAll, fieldName)
 		}
-	} else if fm.Type == "datetime" {
+	case "datetime":
 		dateTimeFormat := context.im.DefaultDateTimeParser
 		if fm.DateFormat != "" {
 			dateTimeFormat = fm.DateFormat
@@ -251,7 +254,7 @@ func (fm *FieldMapping) processString(propertyValueString string, pathString str
 				fm.processTime(parsedDateTime, layout, pathString, path, indexes, context)
 			}
 		}
-	} else if fm.Type == "IP" {
+	case "IP":
 		ip := net.ParseIP(propertyValueString)
 		if ip != nil {
 			fm.processIP(ip, pathString, path, indexes, context)
@@ -328,32 +331,20 @@ func (fm *FieldMapping) processIP(ip net.IP, pathString string, path []string, i
 }
 
 func (fm *FieldMapping) processGeoShape(propertyMightBeGeoShape interface{},
-	pathString string, path []string, indexes []uint64, context *walkContext) {
+	pathString string, path []string, indexes []uint64, context *walkContext,
+) {
 	coordValue, shape, err := geo.ParseGeoShapeField(propertyMightBeGeoShape)
 	if err != nil {
 		return
 	}
 
-	if shape == geo.CircleType {
-		center, radius, found := geo.ExtractCircle(propertyMightBeGeoShape)
+	if shape == geo.GeometryCollectionType {
+		geoShapes, found := geo.ExtractGeometryCollection(propertyMightBeGeoShape)
 		if found {
 			fieldName := getFieldName(pathString, path, fm)
 			options := fm.Options()
-			field := document.NewGeoCircleFieldWithIndexingOptions(fieldName,
-				indexes, center, radius, options)
-			context.doc.AddField(field)
-
-			if !fm.IncludeInAll {
-				context.excludedFromAll = append(context.excludedFromAll, fieldName)
-			}
-		}
-	} else if shape == geo.GeometryCollectionType {
-		coordinates, shapes, found := geo.ExtractGeometryCollection(propertyMightBeGeoShape)
-		if found {
-			fieldName := getFieldName(pathString, path, fm)
-			options := fm.Options()
-			field := document.NewGeometryCollectionFieldWithIndexingOptions(fieldName,
-				indexes, coordinates, shapes, options)
+			field := document.NewGeometryCollectionFieldFromShapesWithIndexingOptions(fieldName,
+				indexes, geoShapes, options)
 			context.doc.AddField(field)
 
 			if !fm.IncludeInAll {
@@ -361,12 +352,20 @@ func (fm *FieldMapping) processGeoShape(propertyMightBeGeoShape interface{},
 			}
 		}
 	} else {
-		coordinates, shape, found := geo.ExtractGeoShapeCoordinates(coordValue, shape)
+		var geoShape *geojson.GeoShape
+		var found bool
+
+		if shape == geo.CircleType {
+			geoShape, found = geo.ExtractCircle(propertyMightBeGeoShape)
+		} else {
+			geoShape, found = geo.ExtractGeoShapeCoordinates(coordValue, shape)
+		}
+
 		if found {
 			fieldName := getFieldName(pathString, path, fm)
 			options := fm.Options()
-			field := document.NewGeoShapeFieldWithIndexingOptions(fieldName,
-				indexes, coordinates, shape, options)
+			field := document.NewGeoShapeFieldFromShapeWithIndexingOptions(fieldName,
+				indexes, geoShape, options)
 			context.doc.AddField(field)
 
 			if !fm.IncludeInAll {
@@ -401,7 +400,6 @@ func getFieldName(pathString string, path []string, fieldMapping *FieldMapping) 
 
 // UnmarshalJSON offers custom unmarshaling with optional strict validation
 func (fm *FieldMapping) UnmarshalJSON(data []byte) error {
-
 	var tmp map[string]json.RawMessage
 	err := util.UnmarshalJSON(data, &tmp)
 	if err != nil {

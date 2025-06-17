@@ -17,9 +17,9 @@ package s2
 import (
 	"math"
 
-	"github.com/golang/geo/r1"
-	"github.com/golang/geo/r3"
-	"github.com/golang/geo/s1"
+	"github.com/blevesearch/geo/r1"
+	"github.com/blevesearch/geo/r3"
+	"github.com/blevesearch/geo/s1"
 )
 
 // RectBounder is used to compute a bounding rectangle that contains all edges
@@ -132,7 +132,7 @@ func (r *RectBounder) AddPoint(b Point) {
 	// and B attains its minimum and maximum latitudes). To test whether AB
 	// crosses this plane, we compute a vector M perpendicular to this
 	// plane and then project A and B onto it.
-	m := n.Cross(r3.Vector{0, 0, 1})
+	m := n.Cross(r3.Vector{X: 0, Y: 0, Z: 1})
 	mA := m.Dot(r.a.Vector)
 	mB := m.Dot(b.Vector)
 
@@ -216,8 +216,7 @@ func (r *RectBounder) RectBound() Rect {
 // More precisely, if L is a loop that does not contain either pole, and S
 // is a loop such that L.Contains(S), then
 //
-//   ExpandForSubregions(L.RectBound).Contains(S.RectBound).
-//
+//	ExpandForSubregions(L.RectBound).Contains(S.RectBound).
 func ExpandForSubregions(bound Rect) Rect {
 	// Empty bounds don't need expansion.
 	if bound.IsEmpty() {

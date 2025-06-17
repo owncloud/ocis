@@ -17,8 +17,8 @@ package s2
 import (
 	"math"
 
-	"github.com/golang/geo/r2"
-	"github.com/golang/geo/s1"
+	"github.com/blevesearch/geo/r2"
+	"github.com/blevesearch/geo/s1"
 )
 
 // Projection defines an interface for different ways of mapping between s2 and r2 Points.
@@ -134,7 +134,7 @@ func (p *PlateCarreeProjection) Interpolate(f float64, a, b r2.Point) r2.Point {
 
 // WrapDistance reports the coordinate wrapping distance along each axis.
 func (p *PlateCarreeProjection) WrapDistance() r2.Point {
-	return r2.Point{p.xWrap, 0}
+	return r2.Point{X: p.xWrap, Y: 0}
 }
 
 // WrapDestination wraps the points if needed to get the shortest edge.
@@ -191,7 +191,7 @@ func (p *MercatorProjection) FromLatLng(ll LatLng) r2.Point {
 	// Note that latitudes of +/- 90 degrees yield "y" values of +/- infinity.
 	sinPhi := math.Sin(float64(ll.Lat))
 	y := 0.5 * math.Log((1+sinPhi)/(1-sinPhi))
-	return r2.Point{p.fromRadians * float64(ll.Lng), p.fromRadians * y}
+	return r2.Point{X: p.fromRadians * float64(ll.Lng), Y: p.fromRadians * y}
 }
 
 // ToLatLng returns the LatLng projected from the given R2 Point.
@@ -216,7 +216,7 @@ func (p *MercatorProjection) Interpolate(f float64, a, b r2.Point) r2.Point {
 
 // WrapDistance reports the coordinate wrapping distance along each axis.
 func (p *MercatorProjection) WrapDistance() r2.Point {
-	return r2.Point{p.xWrap, 0}
+	return r2.Point{X: p.xWrap, Y: 0}
 }
 
 // WrapDestination wraps the points if needed to get the shortest edge.
@@ -237,5 +237,5 @@ func wrapDestination(a, b r2.Point, wrapDistance func() r2.Point) r2.Point {
 	if wrap.Y > 0 && math.Abs(y-a.Y) > 0.5*wrap.Y {
 		y = a.Y + math.Remainder(y-a.Y, wrap.Y)
 	}
-	return r2.Point{x, y}
+	return r2.Point{X: x, Y: y}
 }

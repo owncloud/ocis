@@ -93,5 +93,5 @@ func WedgeIntersects(a0, ab1, a2, b0, b2 Point) bool {
 	// Note that it's important to write these conditions as negatives
 	// (!OrderedCCW(a,b,c,o) rather than Ordered(c,b,a,o)) to get correct
 	// results when two vertices are the same.
-	return !(OrderedCCW(a0, b2, b0, ab1) && OrderedCCW(b0, a2, a0, ab1))
+	return !OrderedCCW(a0, b2, b0, ab1) || !OrderedCCW(b0, a2, a0, ab1)
 }

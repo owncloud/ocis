@@ -86,17 +86,18 @@ func bm25ScoreMetrics(ctx context.Context, field string,
 	var fieldCardinality int
 	var err error
 
-	bm25Stats, ok := ctx.Value(search.BM25PreSearchDataKey).(*search.BM25Stats)
+	bm25Stats, ok := ctx.Value(search.BM25StatsKey).(*search.BM25Stats)
 	if !ok {
 		count, err = indexReader.DocCount()
 		if err != nil {
 			return 0, 0, err
 		}
-		dict, err := indexReader.FieldDict(field)
-		if err != nil {
-			return 0, 0, err
+		if bm25Reader, ok := indexReader.(index.BM25Reader); ok {
+			fieldCardinality, err = bm25Reader.FieldCardinality(field)
+			if err != nil {
+				return 0, 0, err
+			}
 		}
-		fieldCardinality = dict.Cardinality()
 	} else {
 		count = uint64(bm25Stats.DocCount)
 		fieldCardinality, ok = bm25Stats.FieldCardinality[field]
@@ -121,9 +122,9 @@ func newTermSearcherFromReader(ctx context.Context, indexReader index.IndexReade
 
 	// as a fallback case we track certain stats for tf-idf scoring
 	if ctx != nil {
-		if similaritModelCallback, ok := ctx.Value(search.
+		if similarityModelCallback, ok := ctx.Value(search.
 			GetScoringModelCallbackKey).(search.GetScoringModelCallbackFn); ok {
-			similarityModel = similaritModelCallback()
+			similarityModel = similarityModelCallback()
 		}
 	}
 	switch similarityModel {

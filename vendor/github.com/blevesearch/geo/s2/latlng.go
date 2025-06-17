@@ -18,8 +18,8 @@ import (
 	"fmt"
 	"math"
 
-	"github.com/golang/geo/r3"
-	"github.com/golang/geo/s1"
+	"github.com/blevesearch/geo/r3"
+	"github.com/blevesearch/geo/s1"
 )
 
 const (
@@ -79,14 +79,14 @@ func longitude(p Point) s1.Angle {
 	return s1.Angle(math.Atan2(p.Y, p.X)) * s1.Radian
 }
 
-// PointFromLatLng returns an Point for the given LatLng.
+// PointFromLatLng returns a Point for the given LatLng.
 // The maximum error in the result is 1.5 * dblEpsilon. (This does not
 // include the error of converting degrees, E5, E6, or E7 into radians.)
 func PointFromLatLng(ll LatLng) Point {
 	phi := ll.Lat.Radians()
 	theta := ll.Lng.Radians()
 	cosphi := math.Cos(phi)
-	return Point{r3.Vector{math.Cos(theta) * cosphi, math.Sin(theta) * cosphi, math.Sin(phi)}}
+	return Point{r3.Vector{X: math.Cos(theta) * cosphi, Y: math.Sin(theta) * cosphi, Z: math.Sin(phi)}}
 }
 
 // LatLngFromPoint returns an LatLng for a given Point.

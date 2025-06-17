@@ -96,6 +96,11 @@ type IndexReader interface {
 	Close() error
 }
 
+type BM25Reader interface {
+	IndexReader
+	FieldCardinality(field string) (int, error)
+}
+
 // CopyReader is an extended index reader for backup or online copy operations, replacing the regular index reader.
 type CopyReader interface {
 	IndexReader

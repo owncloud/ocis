@@ -81,6 +81,9 @@ type IndexSnapshot struct {
 
 	m2        sync.Mutex                                 // Protects the fields that follow.
 	fieldTFRs map[string][]*IndexSnapshotTermFieldReader // keyed by field, recycled TFR's
+
+	m3               sync.RWMutex // bm25 metrics specific - not to interfere with TFR creation
+	fieldCardinality map[string]int
 }
 
 func (i *IndexSnapshot) Segments() []*SegmentSnapshot {
@@ -202,6 +205,33 @@ func (is *IndexSnapshot) newIndexSnapshotFieldDict(field string,
 	return rv, nil
 }
 
+func (is *IndexSnapshot) FieldCardinality(field string) (rv int, err error) {
+	is.m3.RLock()
+	rv, ok := is.fieldCardinality[field]
+	is.m3.RUnlock()
+	if ok {
+		return rv, nil
+	}
+
+	is.m3.Lock()
+	defer is.m3.Unlock()
+	if is.fieldCardinality == nil {
+		is.fieldCardinality = make(map[string]int)
+	}
+	// check again to avoid redundant fieldDict creation
+	if rv, ok := is.fieldCardinality[field]; ok {
+		return rv, nil
+	}
+
+	fd, err := is.FieldDict(field)
+	if err != nil {
+		return rv, err
+	}
+	rv = fd.Cardinality()
+	is.fieldCardinality[field] = rv
+	return rv, nil
+}
+
 func (is *IndexSnapshot) FieldDict(field string) (index.FieldDict, error) {
 	return is.newIndexSnapshotFieldDict(field, func(is segment.TermDictionary) segment.DictionaryIterator {
 		return is.AutomatonIterator(nil, nil, nil)
@@ -301,9 +331,10 @@ func (is *IndexSnapshot) fieldDictRegexp(field string,
 func (is *IndexSnapshot) getLevAutomaton(term string,
 	fuzziness uint8,
 ) (vellum.Automaton, error) {
-	if fuzziness == 1 {
+	switch fuzziness {
+	case 1:
 		return lb1.BuildDfa(term, fuzziness)
-	} else if fuzziness == 2 {
+	case 2:
 		return lb2.BuildDfa(term, fuzziness)
 	}
 	return nil, fmt.Errorf("fuzziness exceeds the max limit")
@@ -1001,32 +1032,22 @@ func (is *IndexSnapshot) CloseCopyReader() error {
 }
 
 func (is *IndexSnapshot) ThesaurusTermReader(ctx context.Context, thesaurusName string, term []byte) (index.ThesaurusTermReader, error) {
-	rv := &IndexSnapshotThesaurusTermReader{}
-	rv.name = thesaurusName
-	rv.snapshot = is
-	if rv.postings == nil {
-		rv.postings = make([]segment.SynonymsList, len(is.segment))
-	}
-	if rv.iterators == nil {
-		rv.iterators = make([]segment.SynonymsIterator, len(is.segment))
-	}
-	rv.segmentOffset = 0
-
-	if rv.thesauri == nil {
-		rv.thesauri = make([]segment.Thesaurus, len(is.segment))
-		for i, s := range is.segment {
-			if synSeg, ok := s.segment.(segment.ThesaurusSegment); ok {
-				thes, err := synSeg.Thesaurus(thesaurusName)
-				if err != nil {
-					return nil, err
-				}
-				rv.thesauri[i] = thes
-			}
-		}
+	rv := &IndexSnapshotThesaurusTermReader{
+		name:          thesaurusName,
+		snapshot:      is,
+		postings:      make([]segment.SynonymsList, len(is.segment)),
+		iterators:     make([]segment.SynonymsIterator, len(is.segment)),
+		thesauri:      make([]segment.Thesaurus, len(is.segment)),
+		segmentOffset: 0,
 	}
 
 	for i, s := range is.segment {
-		if _, ok := s.segment.(segment.ThesaurusSegment); ok {
+		if synSeg, ok := s.segment.(segment.ThesaurusSegment); ok {
+			thes, err := synSeg.Thesaurus(thesaurusName)
+			if err != nil {
+				return nil, err
+			}
+			rv.thesauri[i] = thes
 			pl, err := rv.thesauri[i].SynonymsList(term, s.deleted, rv.postings[i])
 			if err != nil {
 				return nil, err

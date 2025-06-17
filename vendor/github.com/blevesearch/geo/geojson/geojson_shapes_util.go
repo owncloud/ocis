@@ -27,9 +27,24 @@ import (
 
 var jsoniter = jsoniterator.ConfigCompatibleWithStandardLibrary
 
+type GeoShape struct {
+	// Type of the shape
+	Type string
+
+	// Coordinates of the shape
+	// Used for all shapes except Circles
+	Coordinates [][][][]float64
+
+	// Radius of the circle
+	Radius string
+
+	// Center of the circle
+	Center []float64
+}
+
 // FilterGeoShapesOnRelation extracts the shapes in the document, apply
 // the `relation` filter and confirms whether the shape in the document
-//  satisfies the given relation.
+// satisfies the given relation.
 func FilterGeoShapesOnRelation(shape index.GeoJSON, targetShapeBytes []byte,
 	relation string, reader **bytes.Reader, bufPool *s2.GeoBufferPool) (bool, error) {
 
@@ -394,26 +409,41 @@ var GlueBytes = []byte("##")
 // NewGeometryCollection instantiate a geometrycollection
 // and prefix the byte contents with certain glue bytes that
 // can be used later while filering the doc values.
-func NewGeometryCollection(coordinates [][][][][]float64,
-	typs []string) (index.GeoJSON, []byte, error) {
-	if typs == nil {
-		return nil, nil, fmt.Errorf("nil type information")
-	}
-	if len(typs) < len(coordinates) {
-		return nil, nil, fmt.Errorf("missing type information for some shapes")
-	}
-	shapes := make([]index.GeoJSON, 0, len(coordinates))
-	for i, vertices := range coordinates {
-		s, _, err := NewGeoJsonShape(vertices, typs[i])
-		if err != nil {
-			continue
+func NewGeometryCollection(shapes []*GeoShape) (
+	index.GeoJSON, []byte, error) {
+	for _, shape := range shapes {
+		if shape == nil {
+			return nil, nil, fmt.Errorf("nil shape")
 		}
-		shapes = append(shapes, s)
+		if shape.Type == CircleType && shape.Radius == "" && shape.Center == nil {
+			return nil, nil, fmt.Errorf("missing radius or center information for some circles")
+		}
+		if shape.Type != CircleType && shape.Coordinates == nil {
+			return nil, nil, fmt.Errorf("missing coordinates for some shapes")
+		}
+	}
+
+	childShapes := make([]index.GeoJSON, 0, len(shapes))
+
+	for _, shape := range shapes {
+		if shape.Type == CircleType {
+			circle, _, err := NewGeoCircleShape(shape.Center, shape.Radius)
+			if err != nil {
+				continue
+			}
+			childShapes = append(childShapes, circle)
+		} else {
+			geoShape, _, err := NewGeoJsonShape(shape.Coordinates, shape.Type)
+			if err != nil {
+				continue
+			}
+			childShapes = append(childShapes, geoShape)
+		}
 	}
 
 	var gc GeometryCollection
 	gc.Typ = GeometryCollectionType
-	gc.Shapes = shapes
+	gc.Shapes = childShapes
 	vbytes, err := gc.Marshal()
 	if err != nil {
 		return nil, nil, err

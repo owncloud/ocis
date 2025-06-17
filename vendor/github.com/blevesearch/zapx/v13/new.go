@@ -131,6 +131,11 @@ type interim struct {
 	numTermsPerPostingsList []int // key is postings list id
 	numLocsPerPostingsList  []int // key is postings list id
 
+	// store terms that are unnecessary for the term dictionaries but needed in doc values
+	// eg - encoded geoshapes
+	// docNum -> fieldID -> term
+	extraDocValues map[int]map[uint16][]byte
+
 	builder    *vellum.Builder
 	builderBuf bytes.Buffer
 
@@ -186,6 +191,7 @@ func (s *interim) reset() (err error) {
 	s.tmp1 = s.tmp1[:0]
 	s.lastNumDocs = 0
 	s.lastOutSize = 0
+	s.extraDocValues = nil
 
 	return err
 }
@@ -306,7 +312,7 @@ func (s *interim) prepareDicts() {
 	var totTFs int
 	var totLocs int
 
-	visitField := func(field index.Field) {
+	visitField := func(field index.Field, docNum int) {
 		fieldID := uint16(s.getOrDefineField(field.Name()))
 
 		dict := s.Dicts[fieldID]
@@ -337,16 +343,28 @@ func (s *interim) prepareDicts() {
 		totTFs += len(tfs)
 
 		s.DictKeys[fieldID] = dictKeys
+		if f, ok := field.(index.GeoShapeField); ok {
+			if _, exists := s.extraDocValues[docNum]; !exists {
+				s.extraDocValues[docNum] = make(map[uint16][]byte)
+			}
+			s.extraDocValues[docNum][fieldID] = f.EncodedShape()
+		}
 	}
 
-	for _, result := range s.results {
+	if s.extraDocValues == nil {
+		s.extraDocValues = map[int]map[uint16][]byte{}
+	}
+
+	for docNum, result := range s.results {
 		// walk each composite field
 		result.VisitComposite(func(field index.CompositeField) {
-			visitField(field)
+			visitField(field, docNum)
 		})
 
 		// walk each field
-		result.VisitFields(visitField)
+		result.VisitFields(func(field index.Field) {
+			visitField(field, docNum)
+		})
 	}
 
 	numPostingsLists := pidNext
@@ -760,6 +778,11 @@ func (s *interim) writeDicts() (fdvIndexOffset uint64, dictOffsets []uint64, err
 		fdvEncoder := newChunkedContentCoder(chunkSize, uint64(len(s.results)-1), s.w, false)
 		if s.IncludeDocValues[fieldID] {
 			for docNum, docTerms := range docTermMap {
+				if fieldTermMap, ok := s.extraDocValues[docNum]; ok {
+					if sTerm, ok := fieldTermMap[uint16(fieldID)]; ok {
+						docTerms = append(append(docTerms, sTerm...), termSeparator)
+					}
+				}
 				if len(docTerms) > 0 {
 					err = fdvEncoder.Add(uint64(docNum), docTerms)
 					if err != nil {

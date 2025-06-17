@@ -106,7 +106,7 @@ func (di *docValueReader) curChunkNumber() uint64 {
 	return di.curChunkNum
 }
 
-func (s *SegmentBase) loadFieldDocValueReader(field string,
+func (sb *SegmentBase) loadFieldDocValueReader(field string,
 	fieldDvLocStart, fieldDvLocEnd uint64) (*docValueReader, error) {
 	// get the docValue offset for the given fields
 	if fieldDvLocStart == fieldNotUninverted {
@@ -118,15 +118,15 @@ func (s *SegmentBase) loadFieldDocValueReader(field string,
 	var numChunks, chunkOffsetsPosition uint64
 
 	if fieldDvLocEnd-fieldDvLocStart > 16 {
-		numChunks = binary.BigEndian.Uint64(s.mem[fieldDvLocEnd-8 : fieldDvLocEnd])
+		numChunks = binary.BigEndian.Uint64(sb.mem[fieldDvLocEnd-8 : fieldDvLocEnd])
 		// read the length of chunk offsets
-		chunkOffsetsLen := binary.BigEndian.Uint64(s.mem[fieldDvLocEnd-16 : fieldDvLocEnd-8])
+		chunkOffsetsLen := binary.BigEndian.Uint64(sb.mem[fieldDvLocEnd-16 : fieldDvLocEnd-8])
 		// acquire position of chunk offsets
 		chunkOffsetsPosition = (fieldDvLocEnd - 16) - chunkOffsetsLen
 
 		// 16 bytes since it corresponds to the length
 		// of chunk offsets and the position of the offsets
-		s.incrementBytesRead(16)
+		sb.incrementBytesRead(16)
 	} else {
 		return nil, fmt.Errorf("loadFieldDocValueReader: fieldDvLoc too small: %d-%d", fieldDvLocEnd, fieldDvLocStart)
 	}
@@ -140,14 +140,14 @@ func (s *SegmentBase) loadFieldDocValueReader(field string,
 	// read the chunk offsets
 	var offset uint64
 	for i := 0; i < int(numChunks); i++ {
-		loc, read := binary.Uvarint(s.mem[chunkOffsetsPosition+offset : chunkOffsetsPosition+offset+binary.MaxVarintLen64])
+		loc, read := binary.Uvarint(sb.mem[chunkOffsetsPosition+offset : chunkOffsetsPosition+offset+binary.MaxVarintLen64])
 		if read <= 0 {
 			return nil, fmt.Errorf("corrupted chunk offset during segment load")
 		}
 		fdvIter.chunkOffsets[i] = loc
 		offset += uint64(read)
 	}
-	s.incrementBytesRead(offset)
+	sb.incrementBytesRead(offset)
 	// set the data offset
 	fdvIter.dvDataLoc = fieldDvLocStart
 	return fdvIter, nil
@@ -286,15 +286,15 @@ func (di *docValueReader) getDocValueLocs(docNum uint64) (uint64, uint64) {
 
 // VisitDocValues is an implementation of the
 // DocValueVisitable interface
-func (s *SegmentBase) VisitDocValues(localDocNum uint64, fields []string,
+func (sb *SegmentBase) VisitDocValues(localDocNum uint64, fields []string,
 	visitor index.DocValueVisitor, dvsIn segment.DocVisitState) (
 	segment.DocVisitState, error) {
 	dvs, ok := dvsIn.(*docVisitState)
 	if !ok || dvs == nil {
 		dvs = &docVisitState{}
 	} else {
-		if dvs.segment != s {
-			dvs.segment = s
+		if dvs.segment != sb {
+			dvs.segment = sb
 			dvs.dvrs = nil
 			dvs.bytesRead = 0
 		}
@@ -304,11 +304,11 @@ func (s *SegmentBase) VisitDocValues(localDocNum uint64, fields []string,
 	if dvs.dvrs == nil {
 		dvs.dvrs = make(map[uint16]*docValueReader, len(fields))
 		for _, field := range fields {
-			if fieldIDPlus1, ok = s.fieldsMap[field]; !ok {
+			if fieldIDPlus1, ok = sb.fieldsMap[field]; !ok {
 				continue
 			}
 			fieldID := fieldIDPlus1 - 1
-			if dvIter, exists := s.fieldDvReaders[SectionInvertedTextIndex][fieldID]; exists &&
+			if dvIter, exists := sb.fieldDvReaders[SectionInvertedTextIndex][fieldID]; exists &&
 				dvIter != nil {
 				dvs.dvrs[fieldID] = dvIter.cloneInto(dvs.dvrs[fieldID])
 			}
@@ -324,14 +324,14 @@ func (s *SegmentBase) VisitDocValues(localDocNum uint64, fields []string,
 	docInChunk := localDocNum / chunkFactor
 	var dvr *docValueReader
 	for _, field := range fields {
-		if fieldIDPlus1, ok = s.fieldsMap[field]; !ok {
+		if fieldIDPlus1, ok = sb.fieldsMap[field]; !ok {
 			continue
 		}
 		fieldID := fieldIDPlus1 - 1
 		if dvr, ok = dvs.dvrs[fieldID]; ok && dvr != nil {
 			// check if the chunk is already loaded
 			if docInChunk != dvr.curChunkNumber() {
-				err := dvr.loadDvChunk(docInChunk, s)
+				err := dvr.loadDvChunk(docInChunk, sb)
 				if err != nil {
 					return dvs, err
 				}
@@ -349,6 +349,6 @@ func (s *SegmentBase) VisitDocValues(localDocNum uint64, fields []string,
 // VisitableDocValueFields returns the list of fields with
 // persisted doc value terms ready to be visitable using the
 // VisitDocumentFieldTerms method.
-func (s *SegmentBase) VisitableDocValueFields() ([]string, error) {
-	return s.fieldDvNames, nil
+func (sb *SegmentBase) VisitableDocValueFields() ([]string, error) {
+	return sb.fieldDvNames, nil
 }

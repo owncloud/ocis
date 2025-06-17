@@ -20,10 +20,18 @@ import (
 )
 
 const (
-	// prec is the number of bits of precision to use for the Float values.
-	// To keep things simple, we use the maximum allowable precision on big
-	// values. This allows us to handle all values we expect in the s2 library.
-	prec = big.MaxPrec
+	// MaxPrec is the number of bits of precision to use for the Float values.
+	// To keep things simple, we match the limit used in the C++ library.
+	// This allows us to handle all values we expect in the s2 library.
+	MaxPrec = 64 << 20 // see C++'s util/math/exactfloat/exactfloat.h
+
+	// MaxExp is the maximum exponent supported.  If a value has an exponent larger than
+	// this, it is replaced by infinity (with the appropriate sign).
+	MaxExp = 200 * 1000 * 1000 // About 10**(60 million)
+
+	// MinExp is the minimum exponent supported.  If a value has an exponent less than
+	// this, it is replaced by zero (with the appropriate sign).
+	MinExp = -MaxExp // About 10**(-60 million)
 )
 
 // define some commonly referenced values.
@@ -37,28 +45,28 @@ var (
 // are integer multiples of integer powers of 2.
 func precStr(s string) *big.Float {
 	// Explicitly ignoring the bool return for this usage.
-	f, _ := new(big.Float).SetPrec(prec).SetString(s)
+	f, _ := new(big.Float).SetPrec(MaxPrec).SetString(s)
 	return f
 }
 
 func precInt(i int64) *big.Float {
-	return new(big.Float).SetPrec(prec).SetInt64(i)
+	return new(big.Float).SetPrec(MaxPrec).SetInt64(i)
 }
 
 func precFloat(f float64) *big.Float {
-	return new(big.Float).SetPrec(prec).SetFloat64(f)
+	return new(big.Float).SetPrec(MaxPrec).SetFloat64(f)
 }
 
 func precAdd(a, b *big.Float) *big.Float {
-	return new(big.Float).SetPrec(prec).Add(a, b)
+	return new(big.Float).SetPrec(MaxPrec).Add(a, b)
 }
 
 func precSub(a, b *big.Float) *big.Float {
-	return new(big.Float).SetPrec(prec).Sub(a, b)
+	return new(big.Float).SetPrec(MaxPrec).Sub(a, b)
 }
 
 func precMul(a, b *big.Float) *big.Float {
-	return new(big.Float).SetPrec(prec).Mul(a, b)
+	return new(big.Float).SetPrec(MaxPrec).Mul(a, b)
 }
 
 // PreciseVector represents a point in ℝ³ using high-precision values.
@@ -195,4 +203,9 @@ func (v PreciseVector) SmallestComponent() Axis {
 		return YAxis
 	}
 	return ZAxis
+}
+
+// IsZero reports if this vector is exactly 0 efficiently.
+func (v PreciseVector) IsZero() bool {
+	return v.X.Sign() == 0 && v.Y.Sign() == 0 && v.Z.Sign() == 0
 }

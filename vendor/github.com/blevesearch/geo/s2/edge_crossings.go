@@ -18,8 +18,8 @@ import (
 	"fmt"
 	"math"
 
-	"github.com/golang/geo/r3"
-	"github.com/golang/geo/s1"
+	"github.com/blevesearch/geo/r3"
+	"github.com/blevesearch/geo/s1"
 )
 
 const (
@@ -74,10 +74,10 @@ func (c Crossing) String() string {
 //
 // Properties of CrossingSign:
 //
-//  (1) CrossingSign(b,a,c,d) == CrossingSign(a,b,c,d)
-//  (2) CrossingSign(c,d,a,b) == CrossingSign(a,b,c,d)
-//  (3) CrossingSign(a,b,c,d) == MaybeCross if a==c, a==d, b==c, b==d
-//  (3) CrossingSign(a,b,c,d) == DoNotCross or MaybeCross if a==b or c==d
+//	(1) CrossingSign(b,a,c,d) == CrossingSign(a,b,c,d)
+//	(2) CrossingSign(c,d,a,b) == CrossingSign(a,b,c,d)
+//	(3) CrossingSign(a,b,c,d) == MaybeCross if a==c, a==d, b==c, b==d
+//	(3) CrossingSign(a,b,c,d) == DoNotCross or MaybeCross if a==b or c==d
 //
 // This method implements an exact, consistent perturbation model such
 // that no three points are ever considered to be collinear. This means
@@ -107,11 +107,11 @@ func CrossingSign(a, b, c, d Point) Crossing {
 //
 // Useful properties of VertexCrossing (VC):
 //
-//  (1) VC(a,a,c,d) == VC(a,b,c,c) == false
-//  (2) VC(a,b,a,b) == VC(a,b,b,a) == true
-//  (3) VC(a,b,c,d) == VC(a,b,d,c) == VC(b,a,c,d) == VC(b,a,d,c)
-//  (3) If exactly one of a,b equals one of c,d, then exactly one of
-//      VC(a,b,c,d) and VC(c,d,a,b) is true
+//	(1) VC(a,a,c,d) == VC(a,b,c,c) == false
+//	(2) VC(a,b,a,b) == VC(a,b,b,a) == true
+//	(3) VC(a,b,c,d) == VC(a,b,d,c) == VC(b,a,c,d) == VC(b,a,d,c)
+//	(3) If exactly one of a,b equals one of c,d, then exactly one of
+//	    VC(a,b,c,d) and VC(c,d,a,b) is true
 //
 // It is an error to call this method with 4 distinct vertices.
 func VertexCrossing(a, b, c, d Point) bool {
@@ -129,13 +129,13 @@ func VertexCrossing(a, b, c, d Point) bool {
 	// Optimization: if AB=CD or AB=DC, we can avoid most of the calculations.
 	switch {
 	case a == c:
-		return (b == d) || OrderedCCW(Point{a.Ortho()}, d, b, a)
+		return (b == d) || OrderedCCW(a.referenceDir(), d, b, a)
 	case b == d:
-		return OrderedCCW(Point{b.Ortho()}, c, a, b)
+		return OrderedCCW(b.referenceDir(), c, a, b)
 	case a == d:
-		return (b == c) || OrderedCCW(Point{a.Ortho()}, c, b, a)
+		return (b == c) || OrderedCCW(a.referenceDir(), c, b, a)
 	case b == c:
-		return OrderedCCW(Point{b.Ortho()}, d, a, b)
+		return OrderedCCW(b.referenceDir(), d, a, b)
 	}
 
 	return false
@@ -152,9 +152,10 @@ func EdgeOrVertexCrossing(a, b, c, d Point) bool {
 		return false
 	case Cross:
 		return true
-	default:
-		return VertexCrossing(a, b, c, d)
+	case MaybeCross:
+		// Fall through to the final return.
 	}
+	return VertexCrossing(a, b, c, d)
 }
 
 // Intersection returns the intersection point of two edges AB and CD that cross
@@ -162,8 +163,8 @@ func EdgeOrVertexCrossing(a, b, c, d Point) bool {
 //
 // Useful properties of Intersection:
 //
-//  (1) Intersection(b,a,c,d) == Intersection(a,b,d,c) == Intersection(a,b,c,d)
-//  (2) Intersection(c,d,a,b) == Intersection(a,b,c,d)
+//	(1) Intersection(b,a,c,d) == Intersection(a,b,d,c) == Intersection(a,b,c,d)
+//	(2) Intersection(c,d,a,b) == Intersection(a,b,c,d)
 //
 // The returned intersection point X is guaranteed to be very close to the
 // true intersection point of AB and CD, even if the edges intersect at a
@@ -185,7 +186,7 @@ func Intersection(a0, a1, b0, b1 Point) Point {
 	//    error.
 	//
 	//  - intersectionExact computes the intersection point using precision
-	//    arithmetic and converts the final result back to an Point.
+	//    arithmetic and converts the final result back to a Point.
 	pt, ok := intersectionStable(a0, a1, b0, b1)
 	if !ok {
 		pt = intersectionExact(a0, a1, b0, b1)
@@ -257,10 +258,11 @@ func projection(x, aNorm r3.Vector, aNormLen float64, a0, a1 Point) (proj, bound
 	// normalized in double precision.
 	//
 	// For reference, the bounds that went into this calculation are:
-	// ||N'-N|| <= ((1 + 2 * sqrt(3))||N|| + 32 * sqrt(3) * dblError) * epsilon
-	// |(A.B)'-(A.B)| <= (1.5 * (A.B) + 1.5 * ||A|| * ||B||) * epsilon
-	// ||(X-Y)'-(X-Y)|| <= ||X-Y|| * epsilon
-	bound = (((3.5+2*math.Sqrt(3))*aNormLen+32*math.Sqrt(3)*dblError)*dist + 1.5*math.Abs(proj)) * epsilon
+	// ||N'-N|| <= ((1 + 2 * sqrt(3))||N|| + 32 * sqrt(3) * dblError) * tErr
+	// |(A.B)'-(A.B)| <= (1.5 * (A.B) + 1.5 * ||A|| * ||B||) * tErr
+	// ||(X-Y)'-(X-Y)|| <= ||X-Y|| * tErr
+	tErr := roundingEpsilon(x.X)
+	bound = (((3.5+2*math.Sqrt(3))*aNormLen+32*math.Sqrt(3)*dblError)*dist + 1.5*math.Abs(proj)) * tErr
 	return proj, bound
 }
 
@@ -334,14 +336,25 @@ func intersectionStableSorted(a0, a1, b0, b1 Point) (Point, bool) {
 	}
 
 	x := b1.Mul(b0Dist).Sub(b0.Mul(b1Dist))
+	tErr := roundingEpsilon(x.X)
 	err := bLen*math.Abs(b0Dist*b1Error-b1Dist*b0Error)/
-		(distSum-errorSum) + 2*distSum*epsilon
+		(distSum-errorSum) + 2*distSum*tErr
 
 	// Finally we normalize the result, compute the corresponding error, and
 	// check whether the total error is acceptable.
+
+	// TODO(rsned): C++ checks Norm2 > some small amount to prevent precision loss.
+	// xLen2 := x.Norm2()
+	// if xLen2 < math.SmallestNonzeroFloat64 {
+	//         // If x.Norm2() is less than the minimum normalized value of T, xLen might
+	//         // lose precision and the result might fail to satisfy IsUnitLength().
+	//         // TODO(rsned): Implement RobustNormalize().
+	//         return pt, false
+	// }
+
 	xLen := x.Norm()
 	maxError := intersectionError
-	if err > (float64(maxError)-epsilon)*xLen {
+	if err > (float64(maxError)-tErr)*xLen {
 		return pt, false
 	}
 
@@ -354,7 +367,7 @@ func intersectionStableSorted(a0, a1, b0, b1 Point) (Point, bool) {
 // is not guaranteed to have the correct sign (i.e., the return value may need
 // to be negated).
 func intersectionExact(a0, a1, b0, b1 Point) Point {
-	// Since we are using presice arithmetic, we don't need to worry about
+	// Since we are using precise arithmetic, we don't need to worry about
 	// numerical stability.
 	a0P := r3.PreciseVectorFromVector(a0.Vector)
 	a1P := r3.PreciseVectorFromVector(a1.Vector)
@@ -374,7 +387,7 @@ func intersectionExact(a0, a1, b0, b1 Point) Point {
 		// "crossing" because of simulation of simplicity. Out of the four
 		// endpoints, exactly two lie in the interior of the other edge. Of
 		// those two we return the one that is lexicographically smallest.
-		x = r3.Vector{10, 10, 10} // Greater than any valid S2Point
+		x = r3.Vector{X: 10, Y: 10, Z: 10} // Greater than any valid S2Point
 
 		aNorm := Point{aNormP.Vector()}
 		bNorm := Point{bNormP.Vector()}
@@ -394,3 +407,47 @@ func intersectionExact(a0, a1, b0, b1 Point) Point {
 
 	return Point{x}
 }
+
+// AngleContainsVertex reports if the angle ABC contains its vertex B.
+// Containment is defined such that if several polygons tile the region around
+// a vertex, then exactly one of those polygons contains that vertex.
+// Returns false for degenerate angles of the form ABA.
+//
+// Note that this method is not sufficient to determine vertex containment in
+// polygons with duplicate vertices (such as the polygon ABCADE).  Use
+// ContainsVertexQuery for such polygons. AngleContainsVertex(a, b, c)
+// is equivalent to using ContainsVertexQuery as follows:
+//
+//	ContainsVertexQuery query(b);
+//	query.AddEdge(a, -1);  // incoming
+//	query.AddEdge(c, 1);   // outgoing
+//	return query.ContainsVertex() > 0;
+//
+// Useful properties of AngleContainsVertex:
+//
+//	(1) AngleContainsVertex(a,b,a) == false
+//	(2) AngleContainsVertex(a,b,c) == !AngleContainsVertex(c,b,a) unless a == c
+//	(3) Given vertices v_1 ... v_k ordered cyclically CCW around vertex b,
+//	    AngleContainsVertex(v_{i+1}, b, v_i) is true for exactly one value of i.
+//
+// REQUIRES: a != b && b != c
+func AngleContainsVertex(a, b, c Point) bool {
+	// A loop with consecutive vertices A, B, C contains vertex B if and only if
+	// the fixed vector R = referenceDir(B) is contained by the wedge ABC.  The
+	// wedge is closed at A and open at C, i.e. the point B is inside the loop
+	// if A = R but not if C = R.
+	//
+	// Note that the test below is written so as to get correct results when the
+	// angle ABC is degenerate. If A = C or C = R it returns false, and
+	// otherwise if A = R it returns true.
+	return !OrderedCCW(b.referenceDir(), c, a, b)
+}
+
+// TODO(roberts): Differences from C++
+// func RobustCrossProd(a, b Point) Point
+// func symbolicCrossProd(a, b Point) Point
+// func exactCrossProd(a, b Point) Point
+// func SignedVertexCrossing(a, b, c, d Point) int
+// func isNormalizable(p Point) bool
+// func ensureNormalizable(p Point) Point
+// func normalizableFromPrecise(p r3.PreciseVector) Point

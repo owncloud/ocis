@@ -269,81 +269,81 @@ func (s *Segment) incrementBytesRead(val uint64) {
 	atomic.AddUint64(&s.bytesRead, val)
 }
 
-func (s *SegmentBase) BytesWritten() uint64 {
-	return atomic.LoadUint64(&s.bytesWritten)
+func (sb *SegmentBase) BytesWritten() uint64 {
+	return atomic.LoadUint64(&sb.bytesWritten)
 }
 
-func (s *SegmentBase) setBytesWritten(val uint64) {
-	atomic.AddUint64(&s.bytesWritten, val)
+func (sb *SegmentBase) setBytesWritten(val uint64) {
+	atomic.AddUint64(&sb.bytesWritten, val)
 }
 
-func (s *SegmentBase) BytesRead() uint64 {
+func (sb *SegmentBase) BytesRead() uint64 {
 	return 0
 }
 
-func (s *SegmentBase) ResetBytesRead(val uint64) {}
+func (sb *SegmentBase) ResetBytesRead(val uint64) {}
 
-func (s *SegmentBase) incrementBytesRead(val uint64) {
-	atomic.AddUint64(&s.bytesRead, val)
+func (sb *SegmentBase) incrementBytesRead(val uint64) {
+	atomic.AddUint64(&sb.bytesRead, val)
 }
 
-func (s *SegmentBase) loadFields() error {
+func (sb *SegmentBase) loadFields() error {
 	// NOTE for now we assume the fields index immediately precedes
 	// the footer, and if this changes, need to adjust accordingly (or
 	// store explicit length), where s.mem was sliced from s.mm in Open().
-	fieldsIndexEnd := uint64(len(s.mem))
+	fieldsIndexEnd := uint64(len(sb.mem))
 
 	// iterate through fields index
 	var fieldID uint64
-	for s.fieldsIndexOffset+(8*fieldID) < fieldsIndexEnd {
-		addr := binary.BigEndian.Uint64(s.mem[s.fieldsIndexOffset+(8*fieldID) : s.fieldsIndexOffset+(8*fieldID)+8])
+	for sb.fieldsIndexOffset+(8*fieldID) < fieldsIndexEnd {
+		addr := binary.BigEndian.Uint64(sb.mem[sb.fieldsIndexOffset+(8*fieldID) : sb.fieldsIndexOffset+(8*fieldID)+8])
 
 		// accounting the address of the dictLoc being read from file
-		s.incrementBytesRead(8)
+		sb.incrementBytesRead(8)
 
-		dictLoc, read := binary.Uvarint(s.mem[addr:fieldsIndexEnd])
+		dictLoc, read := binary.Uvarint(sb.mem[addr:fieldsIndexEnd])
 		n := uint64(read)
-		s.dictLocs = append(s.dictLocs, dictLoc)
+		sb.dictLocs = append(sb.dictLocs, dictLoc)
 
 		var nameLen uint64
-		nameLen, read = binary.Uvarint(s.mem[addr+n : fieldsIndexEnd])
+		nameLen, read = binary.Uvarint(sb.mem[addr+n : fieldsIndexEnd])
 		n += uint64(read)
 
-		name := string(s.mem[addr+n : addr+n+nameLen])
+		name := string(sb.mem[addr+n : addr+n+nameLen])
 
-		s.incrementBytesRead(n + nameLen)
-		s.fieldsInv = append(s.fieldsInv, name)
-		s.fieldsMap[name] = uint16(fieldID + 1)
+		sb.incrementBytesRead(n + nameLen)
+		sb.fieldsInv = append(sb.fieldsInv, name)
+		sb.fieldsMap[name] = uint16(fieldID + 1)
 
 		fieldID++
 	}
 	return nil
 }
 
-func (s *SegmentBase) loadFieldsNew() error {
-	pos := s.sectionsIndexOffset
+func (sb *SegmentBase) loadFieldsNew() error {
+	pos := sb.sectionsIndexOffset
 
 	if pos == 0 {
 		// this is the case only for older file formats
-		return s.loadFields()
+		return sb.loadFields()
 	}
 
 	seek := pos + binary.MaxVarintLen64
-	if seek > uint64(len(s.mem)) {
+	if seek > uint64(len(sb.mem)) {
 		// handling a buffer overflow case.
 		// a rare case where the backing buffer is not large enough to be read directly via
 		// a pos+binary.MaxVarintLen64 seek. For eg, this can happen when there is only
 		// one field to be indexed in the entire batch of data and while writing out
 		// these fields metadata, you write 1 + 8 bytes whereas the MaxVarintLen64 = 10.
-		seek = uint64(len(s.mem))
+		seek = uint64(len(sb.mem))
 	}
 
 	// read the number of fields
-	numFields, sz := binary.Uvarint(s.mem[pos:seek])
+	numFields, sz := binary.Uvarint(sb.mem[pos:seek])
 	// here, the pos is incremented by the valid number bytes read from the buffer
 	// so in the edge case pointed out above the numFields = 1, the sz = 1 as well.
 	pos += uint64(sz)
-	s.incrementBytesRead(uint64(sz))
+	sb.incrementBytesRead(uint64(sz))
 
 	// the following loop will be executed only once in the edge case pointed out above
 	// since there is only field's offset store which occupies 8 bytes.
@@ -352,17 +352,17 @@ func (s *SegmentBase) loadFieldsNew() error {
 	// the specific section's parsing logic.
 	var fieldID uint64
 	for fieldID < numFields {
-		addr := binary.BigEndian.Uint64(s.mem[pos : pos+8])
-		s.incrementBytesRead(8)
+		addr := binary.BigEndian.Uint64(sb.mem[pos : pos+8])
+		sb.incrementBytesRead(8)
 
 		fieldSectionMap := make(map[uint16]uint64)
 
-		err := s.loadFieldNew(uint16(fieldID), addr, fieldSectionMap)
+		err := sb.loadFieldNew(uint16(fieldID), addr, fieldSectionMap)
 		if err != nil {
 			return err
 		}
 
-		s.fieldsSectionsMap = append(s.fieldsSectionsMap, fieldSectionMap)
+		sb.fieldsSectionsMap = append(sb.fieldsSectionsMap, fieldSectionMap)
 
 		fieldID++
 		pos += 8
@@ -371,7 +371,7 @@ func (s *SegmentBase) loadFieldsNew() error {
 	return nil
 }
 
-func (s *SegmentBase) loadFieldNew(fieldID uint16, pos uint64,
+func (sb *SegmentBase) loadFieldNew(fieldID uint16, pos uint64,
 	fieldSectionMap map[uint16]uint64) error {
 	if pos == 0 {
 		// there is no indexing structure present for this field/section
@@ -379,23 +379,23 @@ func (s *SegmentBase) loadFieldNew(fieldID uint16, pos uint64,
 	}
 
 	fieldStartPos := pos // to track the number of bytes read
-	fieldNameLen, sz := binary.Uvarint(s.mem[pos : pos+binary.MaxVarintLen64])
+	fieldNameLen, sz := binary.Uvarint(sb.mem[pos : pos+binary.MaxVarintLen64])
 	pos += uint64(sz)
 
-	fieldName := string(s.mem[pos : pos+fieldNameLen])
+	fieldName := string(sb.mem[pos : pos+fieldNameLen])
 	pos += fieldNameLen
 
-	s.fieldsInv = append(s.fieldsInv, fieldName)
-	s.fieldsMap[fieldName] = uint16(fieldID + 1)
+	sb.fieldsInv = append(sb.fieldsInv, fieldName)
+	sb.fieldsMap[fieldName] = uint16(fieldID + 1)
 
-	fieldNumSections, sz := binary.Uvarint(s.mem[pos : pos+binary.MaxVarintLen64])
+	fieldNumSections, sz := binary.Uvarint(sb.mem[pos : pos+binary.MaxVarintLen64])
 	pos += uint64(sz)
 
 	for sectionIdx := uint64(0); sectionIdx < fieldNumSections; sectionIdx++ {
 		// read section id
-		fieldSectionType := binary.BigEndian.Uint16(s.mem[pos : pos+2])
+		fieldSectionType := binary.BigEndian.Uint16(sb.mem[pos : pos+2])
 		pos += 2
-		fieldSectionAddr := binary.BigEndian.Uint64(s.mem[pos : pos+8])
+		fieldSectionAddr := binary.BigEndian.Uint64(sb.mem[pos : pos+8])
 		pos += 8
 		fieldSectionMap[fieldSectionType] = fieldSectionAddr
 		if fieldSectionType == SectionInvertedTextIndex {
@@ -403,33 +403,33 @@ func (s *SegmentBase) loadFieldNew(fieldID uint16, pos uint64,
 			// 0 and during query time, because there is no valid dictionary we
 			// will just have follow a no-op path.
 			if fieldSectionAddr == 0 {
-				s.dictLocs = append(s.dictLocs, 0)
+				sb.dictLocs = append(sb.dictLocs, 0)
 				continue
 			}
 
 			read := 0
 			// skip the doc values
-			_, n := binary.Uvarint(s.mem[fieldSectionAddr : fieldSectionAddr+binary.MaxVarintLen64])
+			_, n := binary.Uvarint(sb.mem[fieldSectionAddr : fieldSectionAddr+binary.MaxVarintLen64])
 			fieldSectionAddr += uint64(n)
 			read += n
-			_, n = binary.Uvarint(s.mem[fieldSectionAddr : fieldSectionAddr+binary.MaxVarintLen64])
+			_, n = binary.Uvarint(sb.mem[fieldSectionAddr : fieldSectionAddr+binary.MaxVarintLen64])
 			fieldSectionAddr += uint64(n)
 			read += n
-			dictLoc, n := binary.Uvarint(s.mem[fieldSectionAddr : fieldSectionAddr+binary.MaxVarintLen64])
+			dictLoc, n := binary.Uvarint(sb.mem[fieldSectionAddr : fieldSectionAddr+binary.MaxVarintLen64])
 			// account the bytes read while parsing the field's inverted index section
-			s.incrementBytesRead(uint64(read + n))
-			s.dictLocs = append(s.dictLocs, dictLoc)
+			sb.incrementBytesRead(uint64(read + n))
+			sb.dictLocs = append(sb.dictLocs, dictLoc)
 		}
 	}
 
 	// account the bytes read while parsing the sections field index.
-	s.incrementBytesRead((pos - uint64(fieldStartPos)) + fieldNameLen)
+	sb.incrementBytesRead((pos - uint64(fieldStartPos)) + fieldNameLen)
 	return nil
 }
 
 // Dictionary returns the term dictionary for the specified field
-func (s *SegmentBase) Dictionary(field string) (segment.TermDictionary, error) {
-	dict, err := s.dictionary(field)
+func (sb *SegmentBase) Dictionary(field string) (segment.TermDictionary, error) {
+	dict, err := sb.dictionary(field)
 	if err == nil && dict == nil {
 		return emptyDictionary, nil
 	}
@@ -479,8 +479,8 @@ func (sb *SegmentBase) dictionary(field string) (rv *Dictionary, err error) {
 }
 
 // Thesaurus returns the thesaurus with the specified name, or an empty thesaurus if not found.
-func (s *SegmentBase) Thesaurus(name string) (segment.Thesaurus, error) {
-	thesaurus, err := s.thesaurus(name)
+func (sb *SegmentBase) Thesaurus(name string) (segment.Thesaurus, error) {
+	thesaurus, err := sb.thesaurus(name)
 	if err == nil && thesaurus == nil {
 		return emptyThesaurus, nil
 	}
@@ -537,17 +537,17 @@ var visitDocumentCtxPool = sync.Pool{
 
 // VisitStoredFields invokes the StoredFieldValueVisitor for each stored field
 // for the specified doc number
-func (s *SegmentBase) VisitStoredFields(num uint64, visitor segment.StoredFieldValueVisitor) error {
+func (sb *SegmentBase) VisitStoredFields(num uint64, visitor segment.StoredFieldValueVisitor) error {
 	vdc := visitDocumentCtxPool.Get().(*visitDocumentCtx)
 	defer visitDocumentCtxPool.Put(vdc)
-	return s.visitStoredFields(vdc, num, visitor)
+	return sb.visitStoredFields(vdc, num, visitor)
 }
 
-func (s *SegmentBase) visitStoredFields(vdc *visitDocumentCtx, num uint64,
+func (sb *SegmentBase) visitStoredFields(vdc *visitDocumentCtx, num uint64,
 	visitor segment.StoredFieldValueVisitor) error {
 	// first make sure this is a valid number in this segment
-	if num < s.numDocs {
-		meta, compressed := s.getDocStoredMetaAndCompressed(num)
+	if num < sb.numDocs {
+		meta, compressed := sb.getDocStoredMetaAndCompressed(num)
 
 		vdc.reader.Reset(meta)
 
@@ -611,7 +611,7 @@ func (s *SegmentBase) visitStoredFields(vdc *visitDocumentCtx, num uint64,
 				}
 			}
 			value := uncompressed[offset : offset+l]
-			keepGoing = visitor(s.fieldsInv[field], byte(typ), value, arrayPos)
+			keepGoing = visitor(sb.fieldsInv[field], byte(typ), value, arrayPos)
 		}
 
 		vdc.buf = uncompressed
@@ -620,14 +620,14 @@ func (s *SegmentBase) visitStoredFields(vdc *visitDocumentCtx, num uint64,
 }
 
 // DocID returns the value of the _id field for the given docNum
-func (s *SegmentBase) DocID(num uint64) ([]byte, error) {
-	if num >= s.numDocs {
+func (sb *SegmentBase) DocID(num uint64) ([]byte, error) {
+	if num >= sb.numDocs {
 		return nil, nil
 	}
 
 	vdc := visitDocumentCtxPool.Get().(*visitDocumentCtx)
 
-	meta, compressed := s.getDocStoredMetaAndCompressed(num)
+	meta, compressed := sb.getDocStoredMetaAndCompressed(num)
 
 	vdc.reader.Reset(meta)
 
@@ -644,17 +644,17 @@ func (s *SegmentBase) DocID(num uint64) ([]byte, error) {
 }
 
 // Count returns the number of documents in this segment.
-func (s *SegmentBase) Count() uint64 {
-	return s.numDocs
+func (sb *SegmentBase) Count() uint64 {
+	return sb.numDocs
 }
 
 // DocNumbers returns a bitset corresponding to the doc numbers of all the
 // provided _id strings
-func (s *SegmentBase) DocNumbers(ids []string) (*roaring.Bitmap, error) {
+func (sb *SegmentBase) DocNumbers(ids []string) (*roaring.Bitmap, error) {
 	rv := roaring.New()
 
-	if len(s.fieldsMap) > 0 {
-		idDict, err := s.dictionary("_id")
+	if len(sb.fieldsMap) > 0 {
+		idDict, err := sb.dictionary("_id")
 		if err != nil {
 			return nil, err
 		}
@@ -681,8 +681,8 @@ func (s *SegmentBase) DocNumbers(ids []string) (*roaring.Bitmap, error) {
 }
 
 // Fields returns the field names used in this segment
-func (s *SegmentBase) Fields() []string {
-	return s.fieldsInv
+func (sb *SegmentBase) Fields() []string {
+	return sb.fieldsInv
 }
 
 // Path returns the path of this segment on disk
@@ -907,44 +907,44 @@ func (s *Segment) loadDvReaders() error {
 // since segmentBase is an in-memory segment, it can be called only
 // for v16 file formats as part of InitSegmentBase() while introducing
 // a segment into the system.
-func (s *SegmentBase) loadDvReaders() error {
+func (sb *SegmentBase) loadDvReaders() error {
 
 	// evaluate -> s.docValueOffset == fieldNotUninverted
-	if s.numDocs == 0 {
+	if sb.numDocs == 0 {
 		return nil
 	}
 
-	for fieldID, sections := range s.fieldsSectionsMap {
+	for fieldID, sections := range sb.fieldsSectionsMap {
 		for secID, secOffset := range sections {
 			if secOffset > 0 {
 				// fixed encoding as of now, need to uvarint this
 				pos := secOffset
 				var read uint64
-				fieldLocStart, n := binary.Uvarint(s.mem[pos : pos+binary.MaxVarintLen64])
+				fieldLocStart, n := binary.Uvarint(sb.mem[pos : pos+binary.MaxVarintLen64])
 				if n <= 0 {
-					return fmt.Errorf("loadDvReaders: failed to read the docvalue offset start for field %v", s.fieldsInv[fieldID])
+					return fmt.Errorf("loadDvReaders: failed to read the docvalue offset start for field %v", sb.fieldsInv[fieldID])
 				}
 				pos += uint64(n)
 				read += uint64(n)
-				fieldLocEnd, n := binary.Uvarint(s.mem[pos : pos+binary.MaxVarintLen64])
+				fieldLocEnd, n := binary.Uvarint(sb.mem[pos : pos+binary.MaxVarintLen64])
 				if read <= 0 {
-					return fmt.Errorf("loadDvReaders: failed to read the docvalue offset end for field %v", s.fieldsInv[fieldID])
+					return fmt.Errorf("loadDvReaders: failed to read the docvalue offset end for field %v", sb.fieldsInv[fieldID])
 				}
 				pos += uint64(n)
 				read += uint64(n)
 
-				s.incrementBytesRead(read)
+				sb.incrementBytesRead(read)
 
-				fieldDvReader, err := s.loadFieldDocValueReader(s.fieldsInv[fieldID], fieldLocStart, fieldLocEnd)
+				fieldDvReader, err := sb.loadFieldDocValueReader(sb.fieldsInv[fieldID], fieldLocStart, fieldLocEnd)
 				if err != nil {
 					return err
 				}
 				if fieldDvReader != nil {
-					if s.fieldDvReaders[secID] == nil {
-						s.fieldDvReaders[secID] = make(map[uint16]*docValueReader)
+					if sb.fieldDvReaders[secID] == nil {
+						sb.fieldDvReaders[secID] = make(map[uint16]*docValueReader)
 					}
-					s.fieldDvReaders[secID][uint16(fieldID)] = fieldDvReader
-					s.fieldDvNames = append(s.fieldDvNames, s.fieldsInv[fieldID])
+					sb.fieldDvReaders[secID][uint16(fieldID)] = fieldDvReader
+					sb.fieldDvNames = append(sb.fieldDvNames, sb.fieldsInv[fieldID])
 				}
 			}
 		}

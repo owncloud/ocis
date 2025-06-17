@@ -16,27 +16,27 @@ package zap
 
 import "encoding/binary"
 
-func (s *SegmentBase) getDocStoredMetaAndCompressed(docNum uint64) ([]byte, []byte) {
-	_, storedOffset, n, metaLen, dataLen := s.getDocStoredOffsets(docNum)
+func (sb *SegmentBase) getDocStoredMetaAndCompressed(docNum uint64) ([]byte, []byte) {
+	_, storedOffset, n, metaLen, dataLen := sb.getDocStoredOffsets(docNum)
 
-	meta := s.mem[storedOffset+n : storedOffset+n+metaLen]
-	data := s.mem[storedOffset+n+metaLen : storedOffset+n+metaLen+dataLen]
+	meta := sb.mem[storedOffset+n : storedOffset+n+metaLen]
+	data := sb.mem[storedOffset+n+metaLen : storedOffset+n+metaLen+dataLen]
 
 	return meta, data
 }
 
-func (s *SegmentBase) getDocStoredOffsets(docNum uint64) (
+func (sb *SegmentBase) getDocStoredOffsets(docNum uint64) (
 	uint64, uint64, uint64, uint64, uint64) {
-	indexOffset := s.storedIndexOffset + (8 * docNum)
+	indexOffset := sb.storedIndexOffset + (8 * docNum)
 
-	storedOffset := binary.BigEndian.Uint64(s.mem[indexOffset : indexOffset+8])
+	storedOffset := binary.BigEndian.Uint64(sb.mem[indexOffset : indexOffset+8])
 
 	var n uint64
 
-	metaLen, read := binary.Uvarint(s.mem[storedOffset : storedOffset+binary.MaxVarintLen64])
+	metaLen, read := binary.Uvarint(sb.mem[storedOffset : storedOffset+binary.MaxVarintLen64])
 	n += uint64(read)
 
-	dataLen, read := binary.Uvarint(s.mem[storedOffset+n : storedOffset+n+binary.MaxVarintLen64])
+	dataLen, read := binary.Uvarint(sb.mem[storedOffset+n : storedOffset+n+binary.MaxVarintLen64])
 	n += uint64(read)
 
 	return indexOffset, storedOffset, n, metaLen, dataLen

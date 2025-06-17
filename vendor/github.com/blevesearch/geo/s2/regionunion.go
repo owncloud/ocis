@@ -14,8 +14,19 @@
 
 package s2
 
-// A RegionUnion represents a union of possibly overlapping regions.
-// It is convenient for computing a covering of a set of regions.
+// A RegionUnion represents a union of possibly overlapping regions. It is
+// convenient for computing a covering of a set of regions. However, note
+// that currently, using RegionCoverer to compute coverings of RegionUnions
+// may produce coverings with considerably less than the requested number of
+// cells in cases of overlapping or tiling regions. This occurs because the
+// current RegionUnion.Contains implementation for Cells only returns
+// true if the cell is fully contained by one of the regions. So, cells along
+// internal boundaries in the region union will be subdivided by the coverer
+// even though this is unnecessary, using up the maxSize cell budget. Then,
+// when the coverer normalizes the covering, groups of 4 sibling cells along
+// these internal borders will be replaced by parents, resulting in coverings
+// that may have significantly fewer than maxSize cells, and so are less
+// accurate. This is not a concern for unions of disjoint regions.
 type RegionUnion []Region
 
 // CapBound returns a bounding cap for this RegionUnion.
@@ -31,6 +42,9 @@ func (ru RegionUnion) RectBound() Rect {
 }
 
 // ContainsCell reports whether the given Cell is contained by this RegionUnion.
+//
+// The current implementation only returns true if one of the regions in the
+// union fully contains the cell.
 func (ru RegionUnion) ContainsCell(c Cell) bool {
 	for _, reg := range ru {
 		if reg.ContainsCell(c) {

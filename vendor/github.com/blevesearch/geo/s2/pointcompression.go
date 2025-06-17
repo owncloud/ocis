@@ -18,7 +18,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/golang/geo/r3"
+	"github.com/blevesearch/geo/r3"
 )
 
 // maxEncodedVertices is the maximum number of vertices, in a row, to be encoded or decoded.
@@ -108,17 +108,27 @@ func encodeFirstPointFixedLength(e *encoder, pi, qi uint32, level int, piCoder, 
 // compresses it into a stream using the following method:
 // - decompose the points into (face, si, ti) tuples.
 // - run-length encode the faces, combining face number and count into a
-//     varint32. See the faceRun struct.
+//
+//	varint32. See the faceRun struct.
+//
 // - right shift the (si, ti) to remove the part that's constant for all cells
-//     of level-k. The result is called the (pi, qi) space.
+//
+//	of level-k. The result is called the (pi, qi) space.
+//
 // - 2nd derivative encode the pi and qi sequences (linear prediction)
 // - zig-zag encode all derivative values but the first, which cannot be
-//     negative
+//
+//	negative
+//
 // - interleave the zig-zag encoded values
 // - encode the first interleaved value in a fixed length encoding
-//     (varint would make this value larger)
+//
+//	(varint would make this value larger)
+//
 // - encode the remaining interleaved values as varint64s, as the
-//     derivative encoding should make the values small.
+//
+//	derivative encoding should make the values small.
+//
 // In addition, provides a lossless method to compress a sequence of points even
 // if some points are not the center of level-k cells. These points are stored
 // exactly, using 3 double precision values, after the above encoded string,
@@ -145,8 +155,8 @@ type faceRun struct {
 func decodeFaceRun(d *decoder) faceRun {
 	faceAndCount := d.readUvarint()
 	ret := faceRun{
-		face:  int(faceAndCount % numFaces),
-		count: int(faceAndCount / numFaces),
+		face:  int(faceAndCount % NumFaces),
+		count: int(faceAndCount / NumFaces),
 	}
 	if ret.count <= 0 && d.err == nil {
 		d.err = errors.New("non-positive count for face run")
@@ -167,12 +177,12 @@ func decodeFaces(numVertices int, d *decoder) []faceRun {
 	return frs
 }
 
-// encodeFaceRun encodes each faceRun as a varint64 with value numFaces * count + face.
+// encodeFaceRun encodes each faceRun as a varint64 with value NumFaces * count + face.
 func encodeFaceRun(e *encoder, fr faceRun) {
 	// It isn't necessary to encode the number of faces left for the last run,
 	// but since this would only help if there were more than 21 faces, it will
 	// be a small overall savings, much smaller than the bound encoding.
-	coded := numFaces*uint64(fr.count) + uint64(fr.face)
+	coded := NumFaces*uint64(fr.count) + uint64(fr.face)
 	e.writeUvarint(coded)
 }
 
@@ -290,7 +300,7 @@ func stToPiQi(s float64, level uint) uint32 {
 	return uint32(s * float64(int(1)<<level))
 }
 
-// siTiToPiQi returns the value transformed into the PiQi coordinate spade.
+// siTitoPiQi returns the value transformed into the PiQi coordinate spade.
 // encodeFirstPointFixedLength encodes the return value using level bits,
 // so we clamp si to the range [0, 2**level - 1] before trying to encode
 // it. This is okay because if si == maxSiTi, then it is not a cell center
@@ -302,7 +312,7 @@ func siTitoPiQi(siTi uint32, level int) uint32 {
 		s = max
 	}
 
-	return uint32(s >> (maxLevel + 1 - uint(level)))
+	return uint32(s >> (MaxLevel + 1 - uint(level)))
 }
 
 // piQiToST returns the value transformed to ST space.

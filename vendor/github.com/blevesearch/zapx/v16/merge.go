@@ -537,21 +537,21 @@ func mergeStoredAndRemap(segments []*SegmentBase, drops []*roaring.Bitmap,
 // copyStoredDocs writes out a segment's stored doc info, optimized by
 // using a single Write() call for the entire set of bytes.  The
 // newDocNumOffsets is filled with the new offsets for each doc.
-func (s *SegmentBase) copyStoredDocs(newDocNum uint64, newDocNumOffsets []uint64,
+func (sb *SegmentBase) copyStoredDocs(newDocNum uint64, newDocNumOffsets []uint64,
 	w *CountHashWriter) error {
-	if s.numDocs <= 0 {
+	if sb.numDocs <= 0 {
 		return nil
 	}
 
 	indexOffset0, storedOffset0, _, _, _ :=
-		s.getDocStoredOffsets(0) // the segment's first doc
+		sb.getDocStoredOffsets(0) // the segment's first doc
 
 	indexOffsetN, storedOffsetN, readN, metaLenN, dataLenN :=
-		s.getDocStoredOffsets(s.numDocs - 1) // the segment's last doc
+		sb.getDocStoredOffsets(sb.numDocs - 1) // the segment's last doc
 
 	storedOffset0New := uint64(w.Count())
 
-	storedBytes := s.mem[storedOffset0 : storedOffsetN+readN+metaLenN+dataLenN]
+	storedBytes := sb.mem[storedOffset0 : storedOffsetN+readN+metaLenN+dataLenN]
 	_, err := w.Write(storedBytes)
 	if err != nil {
 		return err
@@ -560,7 +560,7 @@ func (s *SegmentBase) copyStoredDocs(newDocNum uint64, newDocNumOffsets []uint64
 	// remap the storedOffset's for the docs into new offsets relative
 	// to storedOffset0New, filling the given docNumOffsetsOut array
 	for indexOffset := indexOffset0; indexOffset <= indexOffsetN; indexOffset += 8 {
-		storedOffset := binary.BigEndian.Uint64(s.mem[indexOffset : indexOffset+8])
+		storedOffset := binary.BigEndian.Uint64(sb.mem[indexOffset : indexOffset+8])
 		storedOffsetNew := storedOffset - storedOffset0 + storedOffset0New
 		newDocNumOffsets[newDocNum] = storedOffsetNew
 		newDocNum += 1

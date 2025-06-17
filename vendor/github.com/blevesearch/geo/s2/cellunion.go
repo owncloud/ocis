@@ -19,7 +19,7 @@ import (
 	"io"
 	"sort"
 
-	"github.com/golang/geo/s1"
+	"github.com/blevesearch/geo/s1"
 )
 
 // A CellUnion is a collection of CellIDs.
@@ -277,9 +277,9 @@ func (cu *CellUnion) Denormalize(minLevel, levelMod int) {
 			newLevel = minLevel
 		}
 		if levelMod > 1 {
-			newLevel += (maxLevel - (newLevel - minLevel)) % levelMod
-			if newLevel > maxLevel {
-				newLevel = maxLevel
+			newLevel += (MaxLevel - (newLevel - minLevel)) % levelMod
+			if newLevel > MaxLevel {
+				newLevel = MaxLevel
 			}
 		}
 		if newLevel == level {
@@ -361,7 +361,7 @@ func (cu *CellUnion) CellUnionBound() []CellID {
 func (cu *CellUnion) LeafCellsCovered() int64 {
 	var numLeaves int64
 	for _, c := range *cu {
-		numLeaves += 1 << uint64((maxLevel-int64(c.Level()))<<1)
+		numLeaves += 1 << uint64((MaxLevel-int64(c.Level()))<<1)
 	}
 	return numLeaves
 }
@@ -489,7 +489,7 @@ func (cu *CellUnion) ExpandAtLevel(level int) {
 // the number of cells in the output can be up to 4 * (1 + 2 ** maxLevelDiff) times
 // larger than the number of cells in the input.
 func (cu *CellUnion) ExpandByRadius(minRadius s1.Angle, maxLevelDiff int) {
-	minLevel := maxLevel
+	minLevel := MaxLevel
 	for _, cid := range *cu {
 		minLevel = minInt(minLevel, cid.Level())
 	}
@@ -520,7 +520,7 @@ func (cu CellUnion) Equal(o CellUnion) bool {
 // AverageArea returns the average area of this CellUnion.
 // This is accurate to within a factor of 1.7.
 func (cu *CellUnion) AverageArea() float64 {
-	return AvgAreaMetric.Value(maxLevel) * float64(cu.LeafCellsCovered())
+	return AvgAreaMetric.Value(MaxLevel) * float64(cu.LeafCellsCovered())
 }
 
 // ApproxArea returns the approximate area of this CellUnion. This method is accurate

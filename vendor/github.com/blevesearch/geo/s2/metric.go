@@ -34,6 +34,9 @@ type Metric struct {
 
 // Defined metrics.
 // Of the projection methods defined in C++, Go only supports the quadratic projection.
+// See
+// https://github.com/google/s2geometry/blob/58de4ea1e2f8a294e0c072c602c22232fd1433ad/src/s2/s2coords.h#L238
+// for more details.
 
 // Each cell is bounded by four planes passing through its four edges and
 // the center of the sphere. These metrics relate to the angle between each
@@ -108,7 +111,7 @@ func (m Metric) Value(level int) float64 {
 }
 
 // MinLevel returns the minimum level such that the metric is at most
-// the given value, or maxLevel (30) if there is no such level.
+// the given value, or MaxLevel (30) if there is no such level.
 //
 // For example, MinLevel(0.1) returns the minimum level such that all cell diagonal
 // lengths are 0.1 or smaller. The returned value is always a valid level.
@@ -116,12 +119,12 @@ func (m Metric) Value(level int) float64 {
 // In C++, this is called GetLevelForMaxValue.
 func (m Metric) MinLevel(val float64) int {
 	if val < 0 {
-		return maxLevel
+		return MaxLevel
 	}
 
 	level := -(math.Ilogb(val/m.Deriv) >> uint(m.Dim-1))
-	if level > maxLevel {
-		level = maxLevel
+	if level > MaxLevel {
+		level = MaxLevel
 	}
 	if level < 0 {
 		level = 0
@@ -138,12 +141,12 @@ func (m Metric) MinLevel(val float64) int {
 // In C++, this is called GetLevelForMinValue.
 func (m Metric) MaxLevel(val float64) int {
 	if val <= 0 {
-		return maxLevel
+		return MaxLevel
 	}
 
 	level := math.Ilogb(m.Deriv/val) >> uint(m.Dim-1)
-	if level > maxLevel {
-		level = maxLevel
+	if level > MaxLevel {
+		level = MaxLevel
 	}
 	if level < 0 {
 		level = 0
