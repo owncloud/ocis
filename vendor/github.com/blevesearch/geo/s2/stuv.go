@@ -17,8 +17,10 @@ package s2
 import (
 	"math"
 
-	"github.com/golang/geo/r3"
+	"github.com/blevesearch/geo/r3"
 )
+
+// TODO(rsned): Rename this to coords.go to match the C++
 
 //
 // This file contains documentation of the various coordinate systems used
@@ -32,7 +34,7 @@ import (
 // transformation is designed to make the cells at each level fairly uniform
 // in size.
 //
-////////////////////////// S2 Cell Decomposition /////////////////////////
+// /////////////////////// S2 Cell Decomposition /////////////////////////
 //
 // The following methods define the cube-to-sphere projection used by
 // the Cell decomposition.
@@ -41,7 +43,7 @@ import (
 // id, the following coordinate systems are used:
 //
 //  (id)
-//    An CellID is a 64-bit encoding of a face and a Hilbert curve position
+//    A CellID is a 64-bit encoding of a face and a Hilbert curve position
 //    on that face. The Hilbert curve position implicitly encodes both the
 //    position of a cell and its subdivision level (see s2cellid.go).
 //
@@ -88,7 +90,7 @@ import (
 //  (x, y, z)
 //    Direction vector (Point). Direction vectors are not necessarily unit
 //    length, and are often chosen to be points on the biunit cube
-//    [-1,+1]x[-1,+1]x[-1,+1]. They can be be normalized to obtain the
+//    [-1,+1]x[-1,+1]x[-1,+1]. They can be normalized to obtain the
 //    corresponding point on the unit sphere.
 //
 //  (lat, lng)
@@ -144,14 +146,21 @@ import (
 // implementations may offer other choices.
 
 const (
+	// The maximum absolute error in U/V coordinates when converting from XYZ.
+	//
+	// The XYZ -> UV conversion is a single division per coordinate, which is
+	// promised to be at most 0.5*dblEpsilon absolute error for values with
+	// magnitude less than two.
+	maxXYZtoUVError = 0.5 * dblEpsilon
+
 	// maxSiTi is the maximum value of an si- or ti-coordinate.
-	// It is one shift more than maxSize. The range of valid (si,ti)
+	// It is one shift more than MaxSize. The range of valid (si,ti)
 	// values is [0..maxSiTi].
-	maxSiTi = maxSize << 1
+	maxSiTi = MaxSize << 1
 )
 
 // siTiToST converts an si- or ti-value to the corresponding s- or t-value.
-// Value is capped at 1.0 because there is no DCHECK in Go.
+// Value is capped at 1.0 because there is no ABSL_DCHECK in Go.
 func siTiToST(si uint32) float64 {
 	if si > maxSiTi {
 		return 1.0
@@ -205,6 +214,19 @@ func face(r r3.Vector) int {
 	return int(f)
 }
 
+// ijToSTMin converts the i- or j-index of a leaf cell to the minimum corresponding
+// s- or t-value contained by that cell. The argument must be in the range
+// [0..2**30], i.e. up to one position beyond the normal range of valid leaf
+// cell indices.
+func ijToSTMin(i int) float64 {
+	return float64(i) / float64(MaxSize)
+}
+
+// stToIJ converts value in ST coordinates to a value in IJ coordinates.
+func stToIJ(s float64) int {
+	return clampInt(int(math.Floor(MaxSize*s)), 0, MaxSize-1)
+}
+
 // validFaceXYZToUV given a valid face for the given point r (meaning that
 // dot product of r with the face normal is positive), returns
 // the corresponding u and v values, which may lie outside the range [-1,1].
@@ -236,17 +258,17 @@ func xyzToFaceUV(r r3.Vector) (f int, u, v float64) {
 func faceUVToXYZ(face int, u, v float64) r3.Vector {
 	switch face {
 	case 0:
-		return r3.Vector{1, u, v}
+		return r3.Vector{X: 1, Y: u, Z: v}
 	case 1:
-		return r3.Vector{-u, 1, v}
+		return r3.Vector{X: -u, Y: 1, Z: v}
 	case 2:
-		return r3.Vector{-u, -v, 1}
+		return r3.Vector{X: -u, Y: -v, Z: 1}
 	case 3:
-		return r3.Vector{-1, -v, -u}
+		return r3.Vector{X: -1, Y: -v, Z: -u}
 	case 4:
-		return r3.Vector{v, -1, -u}
+		return r3.Vector{X: v, Y: -1, Z: -u}
 	default:
-		return r3.Vector{v, u, -1}
+		return r3.Vector{X: v, Y: u, Z: -1}
 	}
 }
 
@@ -291,17 +313,17 @@ func faceXYZtoUVW(face int, p Point) Point {
 	// axes for the given face (see faceUVWAxes).
 	switch face {
 	case 0:
-		return Point{r3.Vector{p.Y, p.Z, p.X}}
+		return Point{r3.Vector{X: p.Y, Y: p.Z, Z: p.X}}
 	case 1:
-		return Point{r3.Vector{-p.X, p.Z, p.Y}}
+		return Point{r3.Vector{X: -p.X, Y: p.Z, Z: p.Y}}
 	case 2:
-		return Point{r3.Vector{-p.X, -p.Y, p.Z}}
+		return Point{r3.Vector{X: -p.X, Y: -p.Y, Z: p.Z}}
 	case 3:
-		return Point{r3.Vector{-p.Z, -p.Y, -p.X}}
+		return Point{r3.Vector{X: -p.Z, Y: -p.Y, Z: -p.X}}
 	case 4:
-		return Point{r3.Vector{-p.Z, p.X, -p.Y}}
+		return Point{r3.Vector{X: -p.Z, Y: p.X, Z: -p.Y}}
 	default:
-		return Point{r3.Vector{p.Y, p.X, -p.Z}}
+		return Point{r3.Vector{X: p.Y, Y: p.X, Z: -p.Z}}
 	}
 }
 
@@ -322,8 +344,8 @@ func xyzToFaceSiTi(p Point) (face int, si, ti uint32, level int) {
 	// center. The si,ti values of 0 and maxSiTi need to be handled specially
 	// because they do not correspond to cell centers at any valid level; they
 	// are mapped to level -1 by the code at the end.
-	level = maxLevel - findLSBSetNonZero64(uint64(si|maxSiTi))
-	if level < 0 || level != maxLevel-findLSBSetNonZero64(uint64(ti|maxSiTi)) {
+	level = MaxLevel - findLSBSetNonZero64(uint64(si|maxSiTi))
+	if level < 0 || level != MaxLevel-findLSBSetNonZero64(uint64(ti|maxSiTi)) {
 		return face, si, ti, -1
 	}
 
@@ -346,17 +368,17 @@ func xyzToFaceSiTi(p Point) (face int, si, ti uint32, level int) {
 func uNorm(face int, u float64) r3.Vector {
 	switch face {
 	case 0:
-		return r3.Vector{u, -1, 0}
+		return r3.Vector{X: u, Y: -1, Z: 0}
 	case 1:
-		return r3.Vector{1, u, 0}
+		return r3.Vector{X: 1, Y: u, Z: 0}
 	case 2:
-		return r3.Vector{1, 0, u}
+		return r3.Vector{X: 1, Y: 0, Z: u}
 	case 3:
-		return r3.Vector{-u, 0, 1}
+		return r3.Vector{X: -u, Y: 0, Z: 1}
 	case 4:
-		return r3.Vector{0, -u, 1}
+		return r3.Vector{X: 0, Y: -u, Z: 1}
 	default:
-		return r3.Vector{0, -1, -u}
+		return r3.Vector{X: 0, Y: -1, Z: -u}
 	}
 }
 
@@ -366,28 +388,28 @@ func uNorm(face int, u float64) r3.Vector {
 func vNorm(face int, v float64) r3.Vector {
 	switch face {
 	case 0:
-		return r3.Vector{-v, 0, 1}
+		return r3.Vector{X: -v, Y: 0, Z: 1}
 	case 1:
-		return r3.Vector{0, -v, 1}
+		return r3.Vector{X: 0, Y: -v, Z: 1}
 	case 2:
-		return r3.Vector{0, -1, -v}
+		return r3.Vector{X: 0, Y: -1, Z: -v}
 	case 3:
-		return r3.Vector{v, -1, 0}
+		return r3.Vector{X: v, Y: -1, Z: 0}
 	case 4:
-		return r3.Vector{1, v, 0}
+		return r3.Vector{X: 1, Y: v, Z: 0}
 	default:
-		return r3.Vector{1, 0, v}
+		return r3.Vector{X: 1, Y: 0, Z: v}
 	}
 }
 
 // faceUVWAxes are the U, V, and W axes for each face.
 var faceUVWAxes = [6][3]Point{
-	{Point{r3.Vector{0, 1, 0}}, Point{r3.Vector{0, 0, 1}}, Point{r3.Vector{1, 0, 0}}},
-	{Point{r3.Vector{-1, 0, 0}}, Point{r3.Vector{0, 0, 1}}, Point{r3.Vector{0, 1, 0}}},
-	{Point{r3.Vector{-1, 0, 0}}, Point{r3.Vector{0, -1, 0}}, Point{r3.Vector{0, 0, 1}}},
-	{Point{r3.Vector{0, 0, -1}}, Point{r3.Vector{0, -1, 0}}, Point{r3.Vector{-1, 0, 0}}},
-	{Point{r3.Vector{0, 0, -1}}, Point{r3.Vector{1, 0, 0}}, Point{r3.Vector{0, -1, 0}}},
-	{Point{r3.Vector{0, 1, 0}}, Point{r3.Vector{1, 0, 0}}, Point{r3.Vector{0, 0, -1}}},
+	{Point{r3.Vector{X: 0, Y: 1, Z: 0}}, Point{r3.Vector{X: 0, Y: 0, Z: 1}}, Point{r3.Vector{X: 1, Y: 0, Z: 0}}},
+	{Point{r3.Vector{X: -1, Y: 0, Z: 0}}, Point{r3.Vector{X: 0, Y: 0, Z: 1}}, Point{r3.Vector{X: 0, Y: 1, Z: 0}}},
+	{Point{r3.Vector{X: -1, Y: 0, Z: 0}}, Point{r3.Vector{X: 0, Y: -1, Z: 0}}, Point{r3.Vector{X: 0, Y: 0, Z: 1}}},
+	{Point{r3.Vector{X: 0, Y: 0, Z: -1}}, Point{r3.Vector{X: 0, Y: -1, Z: 0}}, Point{r3.Vector{X: -1, Y: 0, Z: 0}}},
+	{Point{r3.Vector{X: 0, Y: 0, Z: -1}}, Point{r3.Vector{X: 1, Y: 0, Z: 0}}, Point{r3.Vector{X: 0, Y: -1, Z: 0}}},
+	{Point{r3.Vector{X: 0, Y: 1, Z: 0}}, Point{r3.Vector{X: 1, Y: 0, Z: 0}}, Point{r3.Vector{X: 0, Y: 0, Z: -1}}},
 }
 
 // faceUVWFaces are the precomputed neighbors of each face.
@@ -405,7 +427,7 @@ func uvwAxis(face, axis int) Point {
 	return faceUVWAxes[face][axis]
 }
 
-// uvwFaces returns the face in the (u,v,w) coordinate system on the given axis
+// uvwFace returns the face in the (u,v,w) coordinate system on the given axis
 // in the given direction.
 func uvwFace(face, axis, direction int) int {
 	return faceUVWFaces[face][axis][direction]

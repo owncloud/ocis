@@ -59,11 +59,15 @@ const storePath = "store"
 
 var mappingInternalKey = []byte("_mapping")
 
-const SearchQueryStartCallbackKey = "_search_query_start_callback_key"
-const SearchQueryEndCallbackKey = "_search_query_end_callback_key"
+const (
+	SearchQueryStartCallbackKey search.ContextKey = "_search_query_start_callback_key"
+	SearchQueryEndCallbackKey   search.ContextKey = "_search_query_end_callback_key"
+)
 
-type SearchQueryStartCallbackFn func(size uint64) error
-type SearchQueryEndCallbackFn func(size uint64) error
+type (
+	SearchQueryStartCallbackFn func(size uint64) error
+	SearchQueryEndCallbackFn   func(size uint64) error
+)
 
 func indexStorePath(path string) string {
 	return path + string(os.PathSeparator) + storePath
@@ -412,10 +416,12 @@ func (i *indexImpl) Search(req *SearchRequest) (sr *SearchResult, err error) {
 	return i.SearchInContext(context.Background(), req)
 }
 
-var documentMatchEmptySize int
-var searchContextEmptySize int
-var facetResultEmptySize int
-var documentEmptySize int
+var (
+	documentMatchEmptySize int
+	searchContextEmptySize int
+	facetResultEmptySize   int
+	documentEmptySize      int
+)
 
 func init() {
 	var dm search.DocumentMatch
@@ -435,8 +441,8 @@ func init() {
 // needed to execute a search request.
 func memNeededForSearch(req *SearchRequest,
 	searcher search.Searcher,
-	topnCollector *collector.TopNCollector) uint64 {
-
+	topnCollector *collector.TopNCollector,
+) uint64 {
 	backingSize := req.Size + req.From + 1
 	if req.Size+req.From > collector.PreAllocSizeSkipCap {
 		backingSize = collector.PreAllocSizeSkipCap + 1
@@ -509,11 +515,12 @@ func (i *indexImpl) preSearch(ctx context.Context, req *SearchRequest, reader in
 				return nil, err
 			}
 			for field := range fs {
-				dict, err := reader.FieldDict(field)
-				if err != nil {
-					return nil, err
+				if bm25Reader, ok := reader.(index.BM25Reader); ok {
+					fieldCardinality[field], err = bm25Reader.FieldCardinality(field)
+					if err != nil {
+						return nil, err
+					}
 				}
-				fieldCardinality[field] = dict.Cardinality()
 			}
 		}
 	}
@@ -560,6 +567,16 @@ func (i *indexImpl) SearchInContext(ctx context.Context, req *SearchRequest) (sr
 		if err != nil {
 			return nil, err
 		}
+		// increment the search count here itself,
+		// since the presearch may already satisfy
+		// the search request
+		atomic.AddUint64(&i.stats.searches, 1)
+		// increment the search time stat here as well,
+		// since presearch is part of the overall search
+		// operation and should be included in the search
+		// time stat
+		searchDuration := time.Since(searchStart)
+		atomic.AddUint64(&i.stats.searchTime, uint64(searchDuration))
 		return preSearchResult, nil
 	}
 
@@ -584,7 +601,7 @@ func (i *indexImpl) SearchInContext(ctx context.Context, req *SearchRequest) (sr
 	var fts search.FieldTermSynonymMap
 	var skipSynonymCollector bool
 
-	var bm25Data *search.BM25Stats
+	var bm25Stats *search.BM25Stats
 	var ok bool
 	if req.PreSearchData != nil {
 		for k, v := range req.PreSearchData {
@@ -607,9 +624,9 @@ func (i *indexImpl) SearchInContext(ctx context.Context, req *SearchRequest) (sr
 				}
 			case search.BM25PreSearchDataKey:
 				if v != nil {
-					bm25Data, ok = v.(*search.BM25Stats)
+					bm25Stats, ok = v.(*search.BM25Stats)
 					if !ok {
-						return nil, fmt.Errorf("bm25 preSearchData must be of type map[string]interface{}")
+						return nil, fmt.Errorf("bm25 preSearchData must be of type *search.BM25Stats")
 					}
 				}
 			}
@@ -651,10 +668,10 @@ func (i *indexImpl) SearchInContext(ctx context.Context, req *SearchRequest) (sr
 	ctx = context.WithValue(ctx, search.GetScoringModelCallbackKey,
 		search.GetScoringModelCallbackFn(scoringModelCallback))
 
-	// set the bm25 presearch data (stats important for consistent scoring) in
+	// set the bm25Stats (stats important for consistent scoring) in
 	// the context object
-	if bm25Data != nil {
-		ctx = context.WithValue(ctx, search.BM25PreSearchDataKey, bm25Data)
+	if bm25Stats != nil {
+		ctx = context.WithValue(ctx, search.BM25StatsKey, bm25Stats)
 	}
 
 	// This callback and variable handles the tracking of bytes read
@@ -667,8 +684,7 @@ func (i *indexImpl) SearchInContext(ctx context.Context, req *SearchRequest) (sr
 		totalSearchCost += bytesRead
 	}
 
-	ctx = context.WithValue(ctx, search.SearchIOStatsCallbackKey,
-		search.SearchIOStatsCallbackFunc(sendBytesRead))
+	ctx = context.WithValue(ctx, search.SearchIOStatsCallbackKey, search.SearchIOStatsCallbackFunc(sendBytesRead))
 
 	var bufPool *s2.GeoBufferPool
 	getBufferPool := func() *s2.GeoBufferPool {
@@ -679,8 +695,7 @@ func (i *indexImpl) SearchInContext(ctx context.Context, req *SearchRequest) (sr
 		return bufPool
 	}
 
-	ctx = context.WithValue(ctx, search.GeoBufferPoolCallbackKey,
-		search.GeoBufferPoolCallbackFunc(getBufferPool))
+	ctx = context.WithValue(ctx, search.GeoBufferPoolCallbackKey, search.GeoBufferPoolCallbackFunc(getBufferPool))
 
 	searcher, err := req.Query.Searcher(ctx, indexReader, i.m, search.SearcherOptions{
 		Explain:            req.Explain,
@@ -806,7 +821,13 @@ func (i *indexImpl) SearchInContext(ctx context.Context, req *SearchRequest) (sr
 	totalSearchCost += storedFieldsCost
 	search.RecordSearchCost(ctx, search.AddM, storedFieldsCost)
 
-	atomic.AddUint64(&i.stats.searches, 1)
+	if req.PreSearchData == nil {
+		// increment the search count only if this is not a second-phase search
+		// (e.g., for Hybrid Search), since the first-phase search already increments it
+		atomic.AddUint64(&i.stats.searches, 1)
+	}
+	// increment the search time stat, as the first-phase search is part of
+	// the overall operation; adding second-phase time later keeps it accurate
 	searchDuration := time.Since(searchStart)
 	atomic.AddUint64(&i.stats.searchTime, uint64(searchDuration))
 
@@ -847,7 +868,8 @@ func (i *indexImpl) SearchInContext(ctx context.Context, req *SearchRequest) (sr
 
 func LoadAndHighlightFields(hit *search.DocumentMatch, req *SearchRequest,
 	indexName string, r index.IndexReader,
-	highlighter highlight.Highlighter) (error, uint64) {
+	highlighter highlight.Highlighter,
+) (error, uint64) {
 	var totalStoredFieldsBytes uint64
 	if len(req.Fields) > 0 || highlighter != nil {
 		doc, err := r.Document(hit.ID)
@@ -1238,7 +1260,8 @@ func (i *indexImpl) CopyTo(d index.Directory) (err error) {
 }
 
 func (f FileSystemDirectory) GetWriter(filePath string) (io.WriteCloser,
-	error) {
+	error,
+) {
 	dir, file := filepath.Split(filePath)
 	if dir != "" {
 		err := os.MkdirAll(filepath.Join(string(f), dir), os.ModePerm)
@@ -1248,7 +1271,7 @@ func (f FileSystemDirectory) GetWriter(filePath string) (io.WriteCloser,
 	}
 
 	return os.OpenFile(filepath.Join(string(f), dir, file),
-		os.O_RDWR|os.O_CREATE, 0600)
+		os.O_RDWR|os.O_CREATE, 0o600)
 }
 
 func (i *indexImpl) FireIndexEvent() {

@@ -81,6 +81,10 @@ OUTER:
 					// Retry instead of blocking/waiting here since a long wait
 					// can result in more segments introduced i.e. s.root will
 					// be updated.
+
+					// decrement the ref count since its no longer needed in this
+					// iteration
+					_ = ourSnapshot.DecRef()
 					continue OUTER
 				}
 
@@ -488,7 +492,11 @@ func closeNewMergedSegments(segs []segment.Segment) error {
 	return nil
 }
 
-func (s *Scorch) mergeSegmentBasesParallel(snapshot *IndexSnapshot, flushableObjs []*flushable) (*IndexSnapshot, []uint64, error) {
+// mergeAndPersistInMemorySegments takes an IndexSnapshot and a list of in-memory segments,
+// which are merged and persisted to disk concurrently. These are then introduced as
+// the new root snapshot in one-shot.
+func (s *Scorch) mergeAndPersistInMemorySegments(snapshot *IndexSnapshot,
+	flushableObjs []*flushable) (*IndexSnapshot, []uint64, error) {
 	atomic.AddUint64(&s.stats.TotMemMergeBeg, 1)
 
 	memMergeZapStartTime := time.Now()
@@ -507,7 +515,8 @@ func (s *Scorch) mergeSegmentBasesParallel(snapshot *IndexSnapshot, flushableObj
 	var em sync.Mutex
 	var errs []error
 
-	// deploy the workers to merge and flush the batches of segments parallely
+	// deploy the workers to merge and flush the batches of segments concurrently
+	// and create a new file segment
 	for i := 0; i < numFlushes; i++ {
 		wg.Add(1)
 		go func(segsBatch []segment.Segment, dropsBatch []*roaring.Bitmap, id int) {
@@ -527,6 +536,11 @@ func (s *Scorch) mergeSegmentBasesParallel(snapshot *IndexSnapshot, flushableObj
 				atomic.AddUint64(&s.stats.TotMemMergeErr, 1)
 				return
 			}
+			// to prevent accidental cleanup of this newly created file, mark it
+			// as ineligible for removal. this will be flipped back when the bolt
+			// is updated - which is valid, since the snapshot updated in bolt is
+			// cleaned up only if its zero ref'd (MB-66163 for more details)
+			s.markIneligibleForRemoval(filename)
 			newMergedSegmentIDs[id] = newSegmentID
 			newDocIDsSet[id] = newDocIDs
 			newMergedSegments[id], err = s.segPlugin.Open(path)
@@ -567,6 +581,8 @@ func (s *Scorch) mergeSegmentBasesParallel(snapshot *IndexSnapshot, flushableObj
 		atomic.StoreUint64(&s.stats.MaxMemMergeZapTime, memMergeZapTime)
 	}
 
+	// update the segmentMerge task with the newly merged + flushed segments which
+	// are to be introduced atomically.
 	sm := &segmentMerge{
 		id:               newMergedSegmentIDs,
 		new:              newMergedSegments,
@@ -575,6 +591,10 @@ func (s *Scorch) mergeSegmentBasesParallel(snapshot *IndexSnapshot, flushableObj
 		newCount:         newMergedCount,
 	}
 
+	// create a history map which maps the old in-memory segments with the specific
+	// persister worker (also the specific file segment its going to be part of)
+	// which flushed it out. This map will be used on the introducer side to out-ref
+	// the in-memory segments and also track the new tombstones if present.
 	for i, flushable := range flushableObjs {
 		for j, idx := range flushable.sbIdxs {
 			ss := snapshot.segment[idx]

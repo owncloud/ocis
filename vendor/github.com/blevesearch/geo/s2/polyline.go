@@ -19,7 +19,7 @@ import (
 	"io"
 	"math"
 
-	"github.com/golang/geo/s1"
+	"github.com/blevesearch/geo/s1"
 )
 
 // Polyline represents a sequence of zero or more vertices connected by
@@ -90,7 +90,7 @@ func (p *Polyline) Equal(b *Polyline) bool {
 // ApproxEqual reports whether two polylines have the same number of vertices,
 // and corresponding vertex pairs are separated by no more the standard margin.
 func (p *Polyline) ApproxEqual(o *Polyline) bool {
-	return p.approxEqual(o, s1.Angle(epsilon))
+	return p.approxEqual(o, s1.Angle(1e-15))
 }
 
 // approxEqual reports whether two polylines are equal within the given margin.
@@ -318,19 +318,19 @@ func findEndVertex(p Polyline, tolerance s1.Angle, index int) int {
 //
 // Some useful properties of the algorithm:
 //
-//  - It runs in linear time.
+//   - It runs in linear time.
 //
-//  - The output always represents a valid polyline. In particular, adjacent
-//    output vertices are never identical or antipodal.
+//   - The output always represents a valid polyline. In particular, adjacent
+//     output vertices are never identical or antipodal.
 //
-//  - The method is not optimal, but it tends to produce 2-3% fewer
-//    vertices than the Douglas-Peucker algorithm with the same tolerance.
+//   - The method is not optimal, but it tends to produce 2-3% fewer
+//     vertices than the Douglas-Peucker algorithm with the same tolerance.
 //
-//  - The output is parametrically equivalent to the original polyline to
-//    within the given tolerance. For example, if a polyline backtracks on
-//    itself and then proceeds onwards, the backtracking will be preserved
-//    (to within the given tolerance). This is different than the
-//    Douglas-Peucker algorithm which only guarantees geometric equivalence.
+//   - The output is parametrically equivalent to the original polyline to
+//     within the given tolerance. For example, if a polyline backtracks on
+//     itself and then proceeds onwards, the backtracking will be preserved
+//     (to within the given tolerance). This is different than the
+//     Douglas-Peucker algorithm which only guarantees geometric equivalence.
 func (p *Polyline) SubsampleVertices(tolerance s1.Angle) []int {
 	var result []int
 
@@ -559,7 +559,7 @@ func (p *Polyline) Interpolate(fraction float64) (Point, int) {
 // Uninterpolate is the inverse operation of Interpolate. Given a point on the
 // polyline, it returns the ratio of the distance to the point from the
 // beginning of the polyline over the length of the polyline. The return
-// value is always betwen 0 and 1 inclusive.
+// value is always between 0 and 1 inclusive.
 //
 // The polyline should not be empty.  If it has fewer than 2 vertices, the
 // return value is zero.

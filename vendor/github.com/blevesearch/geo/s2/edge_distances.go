@@ -20,7 +20,7 @@ package s2
 import (
 	"math"
 
-	"github.com/golang/geo/s1"
+	"github.com/blevesearch/geo/s1"
 )
 
 // DistanceFromSegment returns the distance of point X from line segment AB.
@@ -96,7 +96,7 @@ func UpdateMinInteriorDistance(x, a, b Point, minDist s1.ChordAngle) (s1.ChordAn
 func Project(x, a, b Point) Point {
 	aXb := a.PointCross(b)
 	// Find the closest point to X along the great circle through AB.
-	p := x.Sub(aXb.Mul(x.Dot(aXb.Vector) / aXb.Vector.Norm2()))
+	p := x.Sub(aXb.Mul(x.Dot(aXb.Vector) / aXb.Norm2()))
 
 	// If this point is on the edge AB, then it's the closest point.
 	if Sign(aXb, a, Point{p}) && Sign(Point{p}, b, aXb) {
@@ -146,7 +146,7 @@ func InterpolateAtDistance(ax s1.Angle, a, b Point) Point {
 	// result is always perpendicular to A, even if A=B or A=-B, but it is not
 	// necessarily unit length. (We effectively normalize it below.)
 	normal := a.PointCross(b)
-	tangent := normal.Vector.Cross(a.Vector)
+	tangent := normal.Cross(a.Vector)
 
 	// Now compute the appropriate linear combination of A and "tangent". With
 	// infinite precision the result would always be unit length, but we
@@ -162,6 +162,14 @@ func InterpolateAtDistance(ax s1.Angle, a, b Point) Point {
 // input points are normalized to within the bounds guaranteed by r3.Vector's
 // Normalize. The error can be added or subtracted from an s1.ChordAngle
 // using its Expanded method.
+//
+// Note that accuracy goes down as the distance approaches 0 degrees or 180
+// degrees (for different reasons).  Near 0 degrees the error is acceptable
+// for all practical purposes (about 1.2e-15 radians ~= 8 nanometers).  For
+// exactly antipodal points the maximum error is quite high (0.5 meters), but
+// this error drops rapidly as the points move away from antipodality
+// (approximately 1 millimeter for points that are 50 meters from antipodal,
+// and 1 micrometer for points that are 50km from antipodal).
 func minUpdateDistanceMaxError(dist s1.ChordAngle) float64 {
 	// There are two cases for the maximum error in UpdateMinDistance(),
 	// depending on whether the closest point is interior to the edge.
@@ -196,9 +204,9 @@ func minUpdateInteriorDistanceMaxError(dist s1.ChordAngle) float64 {
 	// perpendicular and parallel to a plane containing the edge respectively.
 	b := math.Min(1.0, 0.5*float64(dist))
 	a := math.Sqrt(b * (2 - b))
-	return ((2.5+2*math.Sqrt(3)+8.5*a)*a +
-		(2+2*math.Sqrt(3)/3+6.5*(1-b))*b +
-		(23+16/math.Sqrt(3))*dblEpsilon) * dblEpsilon
+	return ((2.5+2*sqrt3+8.5*a)*a +
+		(2+2*sqrt3/3+6.5*(1-b))*b +
+		(23+16/sqrt3)*dblEpsilon) * dblEpsilon
 }
 
 // updateMinDistance computes the distance from a point X to a line segment AB,
@@ -328,7 +336,6 @@ func updateEdgePairMinDistance(a0, a1, b0, b1 Point, minDist s1.ChordAngle) (s1.
 		return 0, false
 	}
 	if CrossingSign(a0, a1, b0, b1) == Cross {
-		minDist = 0
 		return 0, true
 	}
 
@@ -382,7 +389,7 @@ func EdgePairClosestPoints(a0, a1, b0, b1 Point) (Point, Point) {
 	var minDist s1.ChordAngle
 	var ok bool
 
-	minDist, ok = updateMinDistance(a0, b0, b1, minDist, true)
+	minDist, _ = updateMinDistance(a0, b0, b1, minDist, true)
 	closestVertex := 0
 	if minDist, ok = UpdateMinDistance(a1, b0, b1, minDist); ok {
 		closestVertex = 1
@@ -390,7 +397,7 @@ func EdgePairClosestPoints(a0, a1, b0, b1 Point) (Point, Point) {
 	if minDist, ok = UpdateMinDistance(b0, a0, a1, minDist); ok {
 		closestVertex = 2
 	}
-	if minDist, ok = UpdateMinDistance(b1, a0, a1, minDist); ok {
+	if _, ok = UpdateMinDistance(b1, a0, a1, minDist); ok {
 		closestVertex = 3
 	}
 	switch closestVertex {
@@ -406,3 +413,68 @@ func EdgePairClosestPoints(a0, a1, b0, b1 Point) (Point, Point) {
 		panic("illegal case reached")
 	}
 }
+
+// PointOnLine Returns the point at distance "r" from A along the line AB.
+//
+// Note that the line AB has a well-defined direction even when A and B are
+// antipodal or nearly so.  If A == B then an arbitrary direction is chosen.
+func PointOnLine(a, b Point, r s1.Angle) Point {
+	// Use RobustCrossProd() to compute the tangent vector at A towards B.  This
+	// technique is robust even when A and B are antipodal or nearly so.
+	dir := Point{a.PointCross(b).Cross(a.Vector).Normalize()}
+	return PointOnRay(a, dir, r)
+}
+
+// PointToLeft returns a Point to the left of the edge from `a` to `b` which
+// is distance 'r' away from `a` orthogonal to the specified edge.
+//
+//	c (result)
+//	|
+//	|
+//	a --------> b
+func PointToLeft(a, b Point, r s1.Angle) Point {
+	return PointOnRay(a, Point{a.PointCross(b).Normalize()}, r)
+}
+
+// PointToRight returns a Point to the right of the edge from `a` to `b` which
+// is distance 'r' away from `a` orthogonal to the specified edge.
+//
+//	a --------> b
+//	|
+//	|
+//	c (result)
+func PointToRight(a, b Point, r s1.Angle) Point {
+	return PointOnRay(a, Point{b.PointCross(a).Normalize()}, r)
+}
+
+// PointOnRay returns the point at distance "r" along the ray with the given
+// origin and direction. "dir" is required to be perpendicular to "origin" (since
+// this is how directions on the sphere are represented).
+//
+// This function is similar to PointOnLine() except that (1) the first
+// two arguments are required to be perpendicular and (2) it is much faster.
+// It can be used as an alternative to repeatedly calling PointOnLine() by
+// computing "dir" as
+//
+//	dir = a.PointCross(b).Cross(a.Vector).Normalize();
+//
+// REQUIRES: "origin" and "dir" are perpendicular to within the tolerance
+//
+//	of the calculation above.
+//
+// "origin" and "dir" should also be normalized.
+func PointOnRay(origin, dir Point, r s1.Angle) Point {
+	// Mathematically the result should already be unit length, but we normalize
+	// it anyway to ensure that the error is within acceptable bounds.
+	// (Otherwise errors can build up when the result of one interpolation is
+	// fed into another interpolation.)
+	//
+	// Note that it is much cheaper to compute the sine and cosine of an
+	// s1.ChordAngle than an s1.Angle.
+	return Point{origin.Mul(math.Cos(float64(r))).Add(dir.Mul(math.Sin(float64(r)))).Normalize()}
+}
+
+// TODO(rsned): Differences from C++
+// IsEdgeBNearEdgeA
+// PointOnLineError
+// PointOnRayError

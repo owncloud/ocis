@@ -17,23 +17,23 @@ package s2
 import (
 	"sort"
 
-	"github.com/golang/geo/s1"
+	"github.com/blevesearch/geo/s1"
 )
 
 // EdgeQueryOptions holds the options for controlling how EdgeQuery operates.
 //
 // Options can be chained together builder-style:
 //
-//	opts = NewClosestEdgeQueryOptions().
-//		MaxResults(1).
-//		DistanceLimit(s1.ChordAngleFromAngle(3 * s1.Degree)).
-//		MaxError(s1.ChordAngleFromAngle(0.001 * s1.Degree))
-//	query = NewClosestEdgeQuery(index, opts)
+//		opts = NewClosestEdgeQueryOptions().
+//			MaxResults(1).
+//			DistanceLimit(s1.ChordAngleFromAngle(3 * s1.Degree)).
+//			MaxError(s1.ChordAngleFromAngle(0.001 * s1.Degree))
+//		query = NewClosestEdgeQuery(index, opts)
 //
-//  or set individually:
+//	 or set individually:
 //
-//	opts = NewClosestEdgeQueryOptions()
-//	opts.IncludeInteriors(true)
+//		opts = NewClosestEdgeQueryOptions()
+//		opts.IncludeInteriors(true)
 //
 // or just inline:
 //
@@ -102,11 +102,11 @@ func NewFurthestEdgeQueryOptions() *EdgeQueryOptions {
 // EdgeQueryResult represents an edge that meets the target criteria for the
 // query. Note the following special cases:
 //
-//  - ShapeID >= 0 && EdgeID < 0 represents the interior of a shape.
-//    Such results may be returned when the option IncludeInteriors is true.
+//   - ShapeID >= 0 && EdgeID < 0 represents the interior of a shape.
+//     Such results may be returned when the option IncludeInteriors is true.
 //
-//  - ShapeID < 0 && EdgeID < 0 is returned to indicate that no edge
-//    satisfies the requested query options.
+//   - ShapeID < 0 && EdgeID < 0 is returned to indicate that no edge
+//     satisfies the requested query options.
 type EdgeQueryResult struct {
 	distance distance
 	shapeID  int32
@@ -162,9 +162,9 @@ func (e EdgeQueryResult) Less(other EdgeQueryResult) bool {
 //
 // By using the appropriate options, this type can answer questions such as:
 //
-//  - Find the minimum distance between two geometries A and B.
-//  - Find all edges of geometry A that are within a distance D of geometry B.
-//  - Find the k edges of geometry A that are closest to a given point P.
+//   - Find the minimum distance between two geometries A and B.
+//   - Find all edges of geometry A that are within a distance D of geometry B.
+//   - Find the k edges of geometry A that are closest to a given point P.
 //
 // You can also specify whether polygons should include their interiors (i.e.,
 // if a point is contained by a polygon, should the distance be zero or should
@@ -214,7 +214,7 @@ type EdgeQuery struct {
 	// testedEdges tracks the set of shape and edges that have already been tested.
 	testedEdges map[ShapeEdgeID]uint32
 
-	// For the optimized algorihm we precompute the top-level CellIDs that
+	// For the optimized algorithm we precompute the top-level CellIDs that
 	// will be added to the priority queue. There can be at most 6 of these
 	// cells. Essentially this is just a covering of the indexed edges, except
 	// that we also store pointers to the corresponding ShapeIndexCells to
@@ -322,7 +322,6 @@ func (e *EdgeQuery) Distance(target distanceTarget) s1.ChordAngle {
 // If you wish to check if the distance is less than or equal to the limit, use:
 //
 //	query.IsDistanceLess(target, limit.Successor())
-//
 func (e *EdgeQuery) IsDistanceLess(target distanceTarget, limit s1.ChordAngle) bool {
 	opts := e.opts
 	opts = opts.MaxResults(1).
@@ -339,7 +338,6 @@ func (e *EdgeQuery) IsDistanceLess(target distanceTarget, limit s1.ChordAngle) b
 // If you wish to check if the distance is less than or equal to the limit, use:
 //
 //	query.IsDistanceGreater(target, limit.Predecessor())
-//
 func (e *EdgeQuery) IsDistanceGreater(target distanceTarget, limit s1.ChordAngle) bool {
 	return e.IsDistanceLess(target, limit)
 }
@@ -500,28 +498,28 @@ func (e *EdgeQuery) addResult(r EdgeQueryResult) {
 	// is used for the results.
 }
 
-func (e *EdgeQuery) maybeAddResult(shape Shape, edgeID int32) {
-	if _, ok := e.testedEdges[ShapeEdgeID{e.index.idForShape(shape), edgeID}]; e.avoidDuplicates && !ok {
+func (e *EdgeQuery) maybeAddResult(shape Shape, shapeID, edgeID int32) {
+	if _, ok := e.testedEdges[ShapeEdgeID{shapeID, edgeID}]; e.avoidDuplicates && !ok {
 		return
 	}
 	edge := shape.Edge(int(edgeID))
 	dist := e.distanceLimit
 
 	if dist, ok := e.target.updateDistanceToEdge(edge, dist); ok {
-		e.addResult(EdgeQueryResult{dist, e.index.idForShape(shape), edgeID})
+		e.addResult(EdgeQueryResult{dist, shapeID, edgeID})
 	}
 }
 
 func (e *EdgeQuery) findEdgesBruteForce() {
 	// Range over all shapes in the index. Does order matter here? if so
 	// switch to for i = 0 .. n?
-	for _, shape := range e.index.shapes {
+	for shapeID, shape := range e.index.shapes {
 		// TODO(roberts): can this happen if we are only ranging over current entries?
 		if shape == nil {
 			continue
 		}
 		for edgeID := int32(0); edgeID < int32(shape.NumEdges()); edgeID++ {
-			e.maybeAddResult(shape, edgeID)
+			e.maybeAddResult(shape, shapeID, edgeID)
 		}
 	}
 }
@@ -622,7 +620,7 @@ func (e *EdgeQuery) initQueue() {
 	} else {
 		// Compute a covering of the search disc and intersect it with the
 		// precomputed index covering.
-		coverer := &RegionCoverer{MaxCells: 4, LevelMod: 1, MaxLevel: maxLevel}
+		coverer := &RegionCoverer{MaxCells: 4, LevelMod: 1, MaxLevel: MaxLevel}
 
 		radius := cb.Radius() + e.distanceLimit.chordAngleBound().Angle()
 		searchCB := CapFromCenterAngle(cb.Center(), radius)
@@ -751,7 +749,7 @@ func (e *EdgeQuery) processEdges(entry *queryQueueEntry) {
 	for _, clipped := range entry.indexCell.shapes {
 		shape := e.index.Shape(clipped.shapeID)
 		for j := 0; j < clipped.numEdges(); j++ {
-			e.maybeAddResult(shape, int32(clipped.edges[j]))
+			e.maybeAddResult(shape, clipped.shapeID, int32(clipped.edges[j]))
 		}
 	}
 }

@@ -15,8 +15,8 @@
 package s2
 
 import (
-	"github.com/golang/geo/r2"
-	"github.com/golang/geo/s1"
+	"github.com/blevesearch/geo/r2"
+	"github.com/blevesearch/geo/s1"
 )
 
 // Tessellation is implemented by subdividing the edge until the estimated
@@ -180,10 +180,10 @@ const (
 // of edges in a given 2D projection such that the maximum distance between the
 // geodesic edge and the chain of projected edges is at most the requested tolerance.
 //
-//   Method      | Input                  | Output
-//   ------------|------------------------|-----------------------
-//   Projected   | S2 geodesics           | Planar projected edges
-//   Unprojected | Planar projected edges | S2 geodesics
+//	Method      | Input                  | Output
+//	------------|------------------------|-----------------------
+//	Projected   | S2 geodesics           | Planar projected edges
+//	Unprojected | Planar projected edges | S2 geodesics
 type EdgeTessellator struct {
 	projection Projection
 

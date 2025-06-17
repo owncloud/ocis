@@ -17,7 +17,7 @@ package s2
 import (
 	"math"
 
-	"github.com/golang/geo/r3"
+	"github.com/blevesearch/geo/r3"
 )
 
 // There are several notions of the "centroid" of a triangle. First, there
@@ -89,12 +89,12 @@ func TrueCentroid(a, b, c Point) Point {
 	// This code still isn't as numerically stable as it could be.
 	// The biggest potential improvement is to compute B-A and C-A more
 	// accurately so that (B-A)x(C-A) is always inside triangle ABC.
-	x := r3.Vector{a.X, b.X - a.X, c.X - a.X}
-	y := r3.Vector{a.Y, b.Y - a.Y, c.Y - a.Y}
-	z := r3.Vector{a.Z, b.Z - a.Z, c.Z - a.Z}
-	r := r3.Vector{ra, rb - ra, rc - ra}
+	x := r3.Vector{X: a.X, Y: b.X - a.X, Z: c.X - a.X}
+	y := r3.Vector{X: a.Y, Y: b.Y - a.Y, Z: c.Y - a.Y}
+	z := r3.Vector{X: a.Z, Y: b.Z - a.Z, Z: c.Z - a.Z}
+	r := r3.Vector{X: ra, Y: rb - ra, Z: rc - ra}
 
-	return Point{r3.Vector{y.Cross(z).Dot(r), z.Cross(x).Dot(r), x.Cross(y).Dot(r)}.Mul(0.5)}
+	return Point{r3.Vector{X: y.Cross(z).Dot(r), Y: z.Cross(x).Dot(r), Z: x.Cross(y).Dot(r)}.Mul(0.5)}
 }
 
 // EdgeTrueCentroid returns the true centroid of the spherical geodesic edge AB

@@ -45,16 +45,16 @@ func (q *ContainsVertexQuery) AddEdge(v Point, direction int) {
 // not contained, and 0 if the incident edges consisted of matched sibling pairs.
 func (q *ContainsVertexQuery) ContainsVertex() int {
 	// Find the unmatched edge that is immediately clockwise from Ortho(P).
-	referenceDir := Point{q.target.Ortho()}
+	refDir := q.target.referenceDir()
 
-	bestPoint := referenceDir
+	bestPoint := refDir
 	bestDir := 0
 
 	for k, v := range q.edgeMap {
 		if v == 0 {
 			continue // This is a "matched" edge.
 		}
-		if OrderedCCW(referenceDir, bestPoint, k, q.target) {
+		if OrderedCCW(refDir, bestPoint, k, q.target) {
 			bestPoint = k
 			bestDir = v
 		}

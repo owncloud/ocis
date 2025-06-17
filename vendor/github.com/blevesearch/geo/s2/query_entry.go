@@ -80,13 +80,13 @@ func (q queryPQ) Swap(i, j int) {
 }
 
 // Push adds the given entry to the queue.
-func (q *queryPQ) Push(x interface{}) {
+func (q *queryPQ) Push(x any) {
 	item := x.(*queryQueueEntry)
 	*q = append(*q, item)
 }
 
 // Pop returns the top element of the queue.
-func (q *queryPQ) Pop() interface{} {
+func (q *queryPQ) Pop() any {
 	item := (*q)[len(*q)-1]
 	*q = (*q)[:len(*q)-1]
 	return item

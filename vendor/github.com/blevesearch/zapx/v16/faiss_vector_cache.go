@@ -52,31 +52,19 @@ func (vc *vectorIndexCache) Clear() {
 	vc.m.Unlock()
 }
 
-// loadDocVecIDMap indicates if a non-nil docVecIDMap should be returned.
-// It is true when a filtered kNN query accesses the cache since it requires the
-// map. It's false otherwise.
+// loadOrCreate obtains the vector index from the cache or creates it if it's not
+// present. It also returns the batch executor for the field if it's present in the
+// cache.
 func (vc *vectorIndexCache) loadOrCreate(fieldID uint16, mem []byte,
 	loadDocVecIDMap bool, except *roaring.Bitmap) (
 	index *faiss.IndexImpl, vecDocIDMap map[int64]uint32, docVecIDMap map[uint32][]int64,
 	vecIDsToExclude []int64, err error) {
-	index, vecDocIDMap, docVecIDMap, vecIDsToExclude, err = vc.loadFromCache(
-		fieldID, loadDocVecIDMap, mem, except)
-	return index, vecDocIDMap, docVecIDMap, vecIDsToExclude, err
-}
-
-// function to load the vectorDocIDMap and if required, docVecIDMap from cache
-// If not, it will create these and add them to the cache.
-func (vc *vectorIndexCache) loadFromCache(fieldID uint16, loadDocVecIDMap bool,
-	mem []byte, except *roaring.Bitmap) (index *faiss.IndexImpl, vecDocIDMap map[int64]uint32,
-	docVecIDMap map[uint32][]int64, vecIDsToExclude []int64, err error) {
-
 	vc.m.RLock()
-
 	entry, ok := vc.cache[fieldID]
 	if ok {
 		index, vecDocIDMap, docVecIDMap = entry.load()
 		vecIDsToExclude = getVecIDsToExclude(vecDocIDMap, except)
-		if !loadDocVecIDMap || (loadDocVecIDMap && len(entry.docVecIDMap) > 0) {
+		if !loadDocVecIDMap || len(entry.docVecIDMap) > 0 {
 			vc.m.RUnlock()
 			return index, vecDocIDMap, docVecIDMap, vecIDsToExclude, nil
 		}
@@ -126,7 +114,7 @@ func (vc *vectorIndexCache) createAndCacheLOCKED(fieldID uint16, mem []byte,
 	if entry != nil {
 		index, vecDocIDMap, docVecIDMap = entry.load()
 		vecIDsToExclude = getVecIDsToExclude(vecDocIDMap, except)
-		if !loadDocVecIDMap || (loadDocVecIDMap && len(entry.docVecIDMap) > 0) {
+		if !loadDocVecIDMap || len(entry.docVecIDMap) > 0 {
 			return index, vecDocIDMap, docVecIDMap, vecIDsToExclude, nil
 		}
 		docVecIDMap = vc.addDocVecIDMapToCacheLOCKED(entry)

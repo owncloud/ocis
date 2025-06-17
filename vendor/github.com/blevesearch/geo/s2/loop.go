@@ -21,9 +21,9 @@ import (
 	"math"
 	"reflect"
 
-	"github.com/golang/geo/r1"
-	"github.com/golang/geo/r3"
-	"github.com/golang/geo/s1"
+	"github.com/blevesearch/geo/r1"
+	"github.com/blevesearch/geo/r3"
+	"github.com/blevesearch/geo/s1"
 )
 
 // Loop represents a simple spherical polygon. It consists of a sequence
@@ -139,25 +139,31 @@ func (l *Loop) initOriginAndBound() {
 		// the vertex is in the southern hemisphere or not.
 		l.originInside = l.vertices[0].Z < 0
 	} else {
-		// Point containment testing is done by counting edge crossings starting
-		// at a fixed point on the sphere (OriginPoint). We need to know whether
-		// the reference point (OriginPoint) is inside or outside the loop before
-		// we can construct the ShapeIndex. We do this by first guessing that
-		// it is outside, and then seeing whether we get the correct containment
-		// result for vertex 1. If the result is incorrect, the origin must be
-		// inside the loop.
+		// The brute force point containment algorithm works by counting edge
+		// crossings starting at a fixed reference point (chosen as OriginPoint()
+		// for historical reasons).  Loop initialization would be more efficient
+		// if we used a loop vertex such as vertex(0) as the reference point
+		// instead, however making this change would be a lot of work because
+		// originInside is currently part of the Encode() format.
 		//
-		// A loop with consecutive vertices A,B,C contains vertex B if and only if
-		// the fixed vector R = B.Ortho is contained by the wedge ABC. The
-		// wedge is closed at A and open at C, i.e. the point B is inside the loop
-		// if A = R but not if C = R. This convention is required for compatibility
-		// with VertexCrossing. (Note that we can't use OriginPoint
-		// as the fixed vector because of the possibility that B == OriginPoint.)
+		// In any case, we initialize originInside by first guessing that it is
+		// outside, and then seeing whether we get the correct containment result
+		// for vertex 1.  If the result is incorrect, the origin must be inside
+		// the loop instead.  Note that the Loop is not necessarily valid and so
+		// we need to check the requirements of AngleContainsVertex first.
+		v1Inside := l.vertices[0] != l.vertices[1] &&
+			l.vertices[2] != l.vertices[1] &&
+			AngleContainsVertex(l.vertices[0], l.vertices[1], l.vertices[2])
+
+		// initialize before calling ContainsPoint
 		l.originInside = false
-		v1Inside := OrderedCCW(Point{l.vertices[1].Ortho()}, l.vertices[0], l.vertices[2], l.vertices[1])
+
+		// Note that ContainsPoint only does a bounds check once initIndex
+		// has been called, so it doesn't matter that bound is undefined here.
 		if v1Inside != l.ContainsPoint(l.vertices[1]) {
 			l.originInside = true
 		}
+
 	}
 
 	// We *must* call initBound before initializing the index, because
@@ -199,15 +205,15 @@ func (l *Loop) initBound() {
 	}
 	b := bounder.RectBound()
 
-	if l.ContainsPoint(Point{r3.Vector{0, 0, 1}}) {
-		b = Rect{r1.Interval{b.Lat.Lo, math.Pi / 2}, s1.FullInterval()}
+	if l.ContainsPoint(Point{r3.Vector{X: 0, Y: 0, Z: 1}}) {
+		b = Rect{r1.Interval{Lo: b.Lat.Lo, Hi: math.Pi / 2}, s1.FullInterval()}
 	}
 	// If a loop contains the south pole, then either it wraps entirely
 	// around the sphere (full longitude range), or it also contains the
 	// north pole in which case b.Lng.IsFull() due to the test above.
 	// Either way, we only need to do the south pole containment test if
 	// b.Lng.IsFull().
-	if b.Lng.IsFull() && l.ContainsPoint(Point{r3.Vector{0, 0, -1}}) {
+	if b.Lng.IsFull() && l.ContainsPoint(Point{r3.Vector{X: 0, Y: 0, Z: -1}}) {
 		b.Lat.Lo = -math.Pi / 2
 	}
 	l.bound = b
@@ -418,12 +424,12 @@ func (l *Loop) BoundaryEqual(o *Loop) bool {
 // -1 if it excludes the boundary of the other, and 0 if the boundaries of the two
 // loops cross. Shared edges are handled as follows:
 //
-//   If XY is a shared edge, define Reversed(XY) to be true if XY
-//     appears in opposite directions in both loops.
-//   Then this loop contains XY if and only if Reversed(XY) == the other loop is a hole.
-//   (Intuitively, this checks whether this loop contains a vanishingly small region
-//   extending from the boundary of the other toward the interior of the polygon to
-//   which the other belongs.)
+//	If XY is a shared edge, define Reversed(XY) to be true if XY
+//	  appears in opposite directions in both loops.
+//	Then this loop contains XY if and only if Reversed(XY) == the other loop is a hole.
+//	(Intuitively, this checks whether this loop contains a vanishingly small region
+//	extending from the boundary of the other toward the interior of the polygon to
+//	which the other belongs.)
 //
 // This function is used for testing containment and intersection of
 // multi-loop polygons. Note that this method is not symmetric, since the
@@ -984,21 +990,23 @@ func (l *Loop) ContainsNested(other *Loop) bool {
 // surface integral" means:
 //
 // (1) f(A,B,C) must be the integral of f if ABC is counterclockwise,
-//     and the integral of -f if ABC is clockwise.
+//
+//	and the integral of -f if ABC is clockwise.
 //
 // (2) The result of this function is *either* the integral of f over the
-//     loop interior, or the integral of (-f) over the loop exterior.
+//
+//	loop interior, or the integral of (-f) over the loop exterior.
 //
 // Note that there are at least two common situations where it easy to work
 // around property (2) above:
 //
-//  - If the integral of f over the entire sphere is zero, then it doesn't
-//    matter which case is returned because they are always equal.
+//   - If the integral of f over the entire sphere is zero, then it doesn't
+//     matter which case is returned because they are always equal.
 //
-//  - If f is non-negative, then it is easy to detect when the integral over
-//    the loop exterior has been returned, and the integral over the loop
-//    interior can be obtained by adding the integral of f over the entire
-//    unit sphere (a constant) to the result.
+//   - If f is non-negative, then it is easy to detect when the integral over
+//     the loop exterior has been returned, and the integral over the loop
+//     interior can be obtained by adding the integral of f over the entire
+//     unit sphere (a constant) to the result.
 //
 // Any changes to this method may need corresponding changes to surfaceIntegralPoint as well.
 func (l *Loop) surfaceIntegralFloat64(f func(a, b, c Point) float64) float64 {
@@ -1585,7 +1593,7 @@ func (l *loopCrosser) cellCrossesAnySubcell(aClipped *clippedShape, bID CellID) 
 	// correct index cells more efficiently.
 	bRoot := PaddedCellFromCellID(bID, 0)
 	for _, aj := range aClipped.edges {
-		// Use an CrossingEdgeQuery starting at bRoot to find the index cells
+		// Use a CrossingEdgeQuery starting at bRoot to find the index cells
 		// of B that might contain crossing edges.
 		l.bCells = l.bQuery.getCells(l.a.Vertex(aj), l.a.Vertex(aj+1), bRoot)
 		if len(l.bCells) == 0 {
@@ -1616,11 +1624,11 @@ func (l *loopCrosser) hasCrossing(ai, bi *rangeIterator) bool {
 	l.bCells = nil
 
 	for {
-		if n := bi.it.IndexCell().shapes[0].numEdges(); n > 0 {
+		if n := bi.clipped().numEdges(); n > 0 {
 			totalEdges += n
 			if totalEdges >= edgeQueryMinEdges {
 				// There are too many edges to test them directly, so use CrossingEdgeQuery.
-				if l.cellCrossesAnySubcell(ai.it.IndexCell().shapes[0], ai.cellID()) {
+				if l.cellCrossesAnySubcell(ai.clipped(), ai.cellID()) {
 					return true
 				}
 				bi.seekBeyond(ai)
@@ -1636,7 +1644,7 @@ func (l *loopCrosser) hasCrossing(ai, bi *rangeIterator) bool {
 
 	// Test all the edge crossings directly.
 	for _, c := range l.bCells {
-		if l.cellCrossesCell(ai.it.IndexCell().shapes[0], c.shapes[0]) {
+		if l.cellCrossesCell(ai.clipped(), c.shapes[0]) {
 			return true
 		}
 	}
@@ -1644,12 +1652,12 @@ func (l *loopCrosser) hasCrossing(ai, bi *rangeIterator) bool {
 	return false
 }
 
-// containsCenterMatches reports if the clippedShapes containsCenter boolean corresponds
-// to the crossing target type given. (This is to work around C++ allowing false == 0,
-// true == 1 type implicit conversions and comparisons)
-func containsCenterMatches(a *clippedShape, target crossingTarget) bool {
-	return (!a.containsCenter && target == crossingTargetDontCross) ||
-		(a.containsCenter && target == crossingTargetCross)
+// containsCenterMatches reports if the clippedShapes containsCenter boolean
+// corresponds to the crossing target type given. (This is to work around C++
+// allowing false == 0, true == 1 type implicit conversions and comparisons)
+func containsCenterMatches(containsCenter bool, target crossingTarget) bool {
+	return (!containsCenter && target == crossingTargetDontCross) ||
+		(containsCenter && target == crossingTargetCross)
 }
 
 // hasCrossingRelation reports whether given two iterators positioned such that
@@ -1658,7 +1666,8 @@ func containsCenterMatches(a *clippedShape, target crossingTarget) bool {
 // is an edge crossing, a wedge crossing, or a point P that matches both relations
 // crossing targets. This function advances both iterators past ai.cellID.
 func (l *loopCrosser) hasCrossingRelation(ai, bi *rangeIterator) bool {
-	aClipped := ai.it.IndexCell().shapes[0]
+	// ABSL_DCHECK(ai->id().contains(bi->id()));
+	aClipped := ai.clipped()
 	if aClipped.numEdges() != 0 {
 		// The current cell of A has at least one edge, so check for crossings.
 		if l.hasCrossing(ai, bi) {
@@ -1668,8 +1677,9 @@ func (l *loopCrosser) hasCrossingRelation(ai, bi *rangeIterator) bool {
 		return false
 	}
 
-	if !containsCenterMatches(aClipped, l.aCrossingTarget) {
-		// The crossing target for A is not satisfied, so we skip over these cells of B.
+	if !containsCenterMatches(ai.containsCenter(), l.aCrossingTarget) {
+		// The crossing target for A is not satisfied, so we skip over
+		// these cells of B.
 		bi.seekBeyond(ai)
 		ai.next()
 		return false
@@ -1679,8 +1689,7 @@ func (l *loopCrosser) hasCrossingRelation(ai, bi *rangeIterator) bool {
 	// worth iterating through the cells of B to see whether any cell
 	// centers also satisfy the crossing target for B.
 	for bi.cellID() <= ai.rangeMax {
-		bClipped := bi.it.IndexCell().shapes[0]
-		if containsCenterMatches(bClipped, l.bCrossingTarget) {
+		if containsCenterMatches(bi.containsCenter(), l.bCrossingTarget) {
 			return true
 		}
 		bi.next()
@@ -1733,16 +1742,16 @@ func hasCrossingRelation(a, b *Loop, relation loopRelation) bool {
 					return true
 				}
 			} else {
-				// The A and B cells are the same. Since the two cells
-				// have the same center point P, check whether P satisfies
-				// the crossing targets.
-				aClipped := ai.it.IndexCell().shapes[0]
-				bClipped := bi.it.IndexCell().shapes[0]
-				if containsCenterMatches(aClipped, ab.aCrossingTarget) &&
-					containsCenterMatches(bClipped, ab.bCrossingTarget) {
+				// The A and B cells are the same. Since the two
+				// cells have the same center point P, check
+				// whether P satisfies the crossing targets.
+				if containsCenterMatches(ai.containsCenter(), ab.aCrossingTarget) &&
+					containsCenterMatches(bi.containsCenter(), ab.bCrossingTarget) {
 					return true
 				}
 				// Otherwise test all the edge crossings directly.
+				aClipped := ai.clipped()
+				bClipped := bi.clipped()
 				if aClipped.numEdges() > 0 && bClipped.numEdges() > 0 && ab.cellCrossesCell(aClipped, bClipped) {
 					return true
 				}
@@ -1788,10 +1797,12 @@ func (i *intersectsRelation) wedgesCross(a0, ab1, a2, b0, b2 Point) bool {
 // so we return crossingTargetDontCare for both crossing targets.
 //
 // Aside: A possible early exit condition could be based on the following.
-//   If A contains a point of both B and ~B, then A intersects Boundary(B).
-//   If ~A contains a point of both B and ~B, then ~A intersects Boundary(B).
-//   So if the intersections of {A, ~A} with {B, ~B} are all non-empty,
-//   the return value is 0, i.e., Boundary(A) intersects Boundary(B).
+//
+//	If A contains a point of both B and ~B, then A intersects Boundary(B).
+//	If ~A contains a point of both B and ~B, then ~A intersects Boundary(B).
+//	So if the intersections of {A, ~A} with {B, ~B} are all non-empty,
+//	the return value is 0, i.e., Boundary(A) intersects Boundary(B).
+//
 // Unfortunately it isn't worth detecting this situation because by the
 // time we have seen a point in all four intersection regions, we are also
 // guaranteed to have seen at least one pair of crossing edges.

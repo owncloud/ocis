@@ -27,9 +27,9 @@ package s2
 import (
 	"math"
 
-	"github.com/golang/geo/r1"
-	"github.com/golang/geo/r2"
-	"github.com/golang/geo/r3"
+	"github.com/blevesearch/geo/r1"
+	"github.com/blevesearch/geo/r2"
+	"github.com/blevesearch/geo/r3"
 )
 
 const (
@@ -76,6 +76,11 @@ const (
 // This method guarantees that the clipped vertices lie within the [-1,1]x[-1,1]
 // cube face rectangle and are within faceClipErrorUVDist of the line AB, but
 // the results may differ from those produced by FaceSegments.
+//
+// Returns false if AB does not intersect the given face.
+//
+// The test for face intersection is exact, so if this function returns false
+// then the edge definitively does not intersect the face.
 func ClipToFace(a, b Point, face int) (aUV, bUV r2.Point, intersects bool) {
 	return ClipToPaddedFace(a, b, face, 0.0)
 }
@@ -89,7 +94,7 @@ func ClipToPaddedFace(a, b Point, f int, padding float64) (aUV, bUV r2.Point, in
 	if face(a.Vector) == f && face(b.Vector) == f {
 		au, av := validFaceXYZToUV(f, a.Vector)
 		bu, bv := validFaceXYZToUV(f, b.Vector)
-		return r2.Point{au, av}, r2.Point{bu, bv}, true
+		return r2.Point{X: au, Y: av}, r2.Point{X: bu, Y: bv}, true
 	}
 
 	// Convert everything into the (u,v,w) coordinates of the given face. Note
@@ -204,7 +209,7 @@ func (p pointUVW) intersectsFace() bool {
 }
 
 // intersectsOppositeEdges reports whether a directed line L intersects two
-// opposite edges of a cube face F. This includs the case where L passes
+// opposite edges of a cube face F. This includes the case where L passes
 // exactly through a corner vertex of F. The directed line L is defined
 // by its normal N in the (u,v,w) coordinates of F.
 func (p pointUVW) intersectsOppositeEdges() bool {
@@ -283,14 +288,14 @@ func (p pointUVW) exitPoint(a axis) r2.Point {
 		if p.Y > 0 {
 			u = 1.0
 		}
-		return r2.Point{u, (-u*p.X - p.Z) / p.Y}
+		return r2.Point{X: u, Y: (-u*p.X - p.Z) / p.Y}
 	}
 
 	v := -1.0
 	if p.X < 0 {
 		v = 1.0
 	}
-	return r2.Point{(-v*p.Y - p.Z) / p.X, v}
+	return r2.Point{X: (-v*p.Y - p.Z) / p.X, Y: v}
 }
 
 // clipDestination returns a score which is used to indicate if the clipped edge AB
@@ -310,7 +315,7 @@ func clipDestination(a, b, scaledN, aTan, bTan pointUVW, scaleUV float64) (r2.Po
 	// Optimization: if B is within the safe region of the face, use it.
 	maxSafeUVCoord := 1 - faceClipErrorUVCoord
 	if b.Z > 0 {
-		uv = r2.Point{b.X / b.Z, b.Y / b.Z}
+		uv = r2.Point{X: b.X / b.Z, Y: b.Y / b.Z}
 		if math.Max(math.Abs(uv.X), math.Abs(uv.Y)) <= maxSafeUVCoord {
 			return uv, 0
 		}
@@ -319,7 +324,7 @@ func clipDestination(a, b, scaledN, aTan, bTan pointUVW, scaleUV float64) (r2.Po
 	// Otherwise find the point B' where the line AB exits the face.
 	uv = scaledN.exitPoint(scaledN.exitAxis()).Mul(scaleUV)
 
-	p := pointUVW(Point{r3.Vector{uv.X, uv.Y, 1.0}})
+	p := pointUVW(Point{r3.Vector{X: uv.X, Y: uv.Y, Z: 1.0}})
 
 	// Determine if the exit point B' is contained within the segment. We do this
 	// by computing the dot products with two inward-facing tangent vectors at A
@@ -351,7 +356,7 @@ func clipDestination(a, b, scaledN, aTan, bTan pointUVW, scaleUV float64) (r2.Po
 		if b.Z <= 0 {
 			score = 3 // B cannot be projected onto this face.
 		} else {
-			uv = r2.Point{b.X / b.Z, b.Y / b.Z}
+			uv = r2.Point{X: b.X / b.Z, Y: b.Y / b.Z}
 		}
 	}
 
@@ -475,18 +480,28 @@ func clipEdgeBound(a, b r2.Point, clip, bound r2.Rect) (r2.Rect, bool) {
 	}
 	b1y, b1x, up2 := clipBoundAxis(a.Y, b.Y, b0y, a.X, b.X, b0x, negSlope, clip.Y)
 	if !up2 {
-		return r2.Rect{b0x, b0y}, false
+		return r2.Rect{X: b0x, Y: b0y}, false
 	}
 	return r2.Rect{X: b1x, Y: b1y}, true
 }
 
 // interpolateFloat64 returns a value with the same combination of a1 and b1 as the
 // given value x is of a and b. This function makes the following guarantees:
-//  - If x == a, then x1 = a1 (exactly).
-//  - If x == b, then x1 = b1 (exactly).
-//  - If a <= x <= b, then a1 <= x1 <= b1 (even if a1 == b1).
+//   - If x == a, then x1 = a1 (exactly).
+//   - If x == b, then x1 = b1 (exactly).
+//   - If a <= x <= b and a1 <= b1, then a1 <= x1 <= b1 (even if a1 == b1).
+//   - More generally, if x is between a and b, then x1 is between a1 and b1.
+//
 // This requires a != b.
+//
+// When a <= x <= b or b <= x <= a we can prove the error bound on the resulting
+// value is 2.25*dblEpsilon. The error for extrapolating an x value outside of
+// a and b can be much worse. See the gappa proof at the end of the file.
 func interpolateFloat64(x, a, b, a1, b1 float64) float64 {
+	// If A == B == X all we can return is the single point.
+	if a == b {
+		return a1
+	}
 	// To get results that are accurate near both A and B, we interpolate
 	// starting from the closer of the two points.
 	if math.Abs(a-x) <= math.Abs(b-x) {
@@ -549,7 +564,7 @@ func FaceSegments(a, b Point) []FaceSegment {
 		// Complete the current segment by finding the point where AB
 		// exits the current face.
 		z := faceXYZtoUVW(face, ab)
-		n := pointUVW{z.Vector}
+		n := pointUVW(z)
 
 		exitAxis := n.exitAxis()
 		segment.b = n.exitPoint(exitAxis)
@@ -562,7 +577,7 @@ func FaceSegments(a, b Point) []FaceSegment {
 		face = nextFace(face, segment.b, exitAxis, n, bFace)
 		exitUvw := faceXYZtoUVW(face, Point{exitXyz})
 		segment.face = face
-		segment.a = r2.Point{exitUvw.X, exitUvw.Y}
+		segment.a = r2.Point{X: exitUvw.X, Y: exitUvw.Y}
 	}
 	// Finish the last segment.
 	segment.b = bSaved
@@ -590,7 +605,7 @@ func moveOriginToValidFace(face int, a, ab Point, aUV r2.Point) (int, r2.Point) 
 
 	// Otherwise check whether the normal AB even intersects this face.
 	z := faceXYZtoUVW(face, ab)
-	n := pointUVW{z.Vector}
+	n := pointUVW(z)
 	if n.intersectsFace() {
 		// Check whether the point where the line AB exits this face is on the
 		// wrong side of A (by more than the acceptable error tolerance).

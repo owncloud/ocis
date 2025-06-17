@@ -17,7 +17,7 @@ package s2
 import (
 	"fmt"
 
-	"github.com/golang/geo/r3"
+	"github.com/blevesearch/geo/r3"
 )
 
 // matrix3x3 represents a traditional 3x3 matrix of floating point values.
@@ -27,12 +27,12 @@ type matrix3x3 [3][3]float64
 
 // col returns the given column as a Point.
 func (m *matrix3x3) col(col int) Point {
-	return Point{r3.Vector{m[0][col], m[1][col], m[2][col]}}
+	return Point{r3.Vector{X: m[0][col], Y: m[1][col], Z: m[2][col]}}
 }
 
 // row returns the given row as a Point.
 func (m *matrix3x3) row(row int) Point {
-	return Point{r3.Vector{m[row][0], m[row][1], m[row][2]}}
+	return Point{r3.Vector{X: m[row][0], Y: m[row][1], Z: m[row][2]}}
 }
 
 // setCol sets the specified column to the value in the given Point.
@@ -66,9 +66,9 @@ func (m *matrix3x3) scale(f float64) *matrix3x3 {
 // resulting 1x3 matrix into a Point.
 func (m *matrix3x3) mul(p Point) Point {
 	return Point{r3.Vector{
-		m[0][0]*p.X + m[0][1]*p.Y + m[0][2]*p.Z,
-		m[1][0]*p.X + m[1][1]*p.Y + m[1][2]*p.Z,
-		m[2][0]*p.X + m[2][1]*p.Y + m[2][2]*p.Z,
+		X: float64(m[0][0]*p.X) + float64(m[0][1]*p.Y) + float64(m[0][2]*p.Z),
+		Y: float64(m[1][0]*p.X) + float64(m[1][1]*p.Y) + float64(m[1][2]*p.Z),
+		Z: float64(m[2][0]*p.X) + float64(m[2][1]*p.Y) + float64(m[2][2]*p.Z),
 	}}
 }
 
@@ -77,8 +77,9 @@ func (m *matrix3x3) det() float64 {
 	//      | a  b  c |
 	//  det | d  e  f | = aei + bfg + cdh - ceg - bdi - afh
 	//      | g  h  i |
-	return m[0][0]*m[1][1]*m[2][2] + m[0][1]*m[1][2]*m[2][0] + m[0][2]*m[1][0]*m[2][1] -
-		m[0][2]*m[1][1]*m[2][0] - m[0][1]*m[1][0]*m[2][2] - m[0][0]*m[1][2]*m[2][1]
+	return float64(m[0][0]*m[1][1]*m[2][2]) + float64(m[0][1]*m[1][2]*m[2][0]) +
+		float64(m[0][2]*m[1][0]*m[2][1]) - float64(m[0][2]*m[1][1]*m[2][0]) -
+		float64(m[0][1]*m[1][0]*m[2][2]) - float64(m[0][0]*m[1][2]*m[2][1])
 }
 
 // transpose reflects the matrix along its diagonal and returns the result.
@@ -107,7 +108,7 @@ func getFrame(p Point) matrix3x3 {
 	// while p itself is an orthonormal frame for the normal space at p.
 	m := matrix3x3{}
 	m.setCol(2, p)
-	m.setCol(1, Point{p.Ortho()})
+	m.setCol(1, Ortho(p))
 	m.setCol(0, Point{m.col(1).Cross(p.Vector)})
 	return m
 }

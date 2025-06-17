@@ -19,18 +19,32 @@ import (
 	"strings"
 
 	index "github.com/blevesearch/bleve_index_api"
+	"github.com/blevesearch/geo/s1"
 	"github.com/blevesearch/geo/s2"
-	"github.com/golang/geo/s1"
 )
 
 // ------------------------------------------------------------------------
 
+// creates a shape index with all of the given polygons
+// and queries it with vertex model closed which considers
+// polygon edges and vertices to be part of the polygon.
+func polygonsContainsPoint(s2pgns []*s2.Polygon,
+	point *s2.Point) bool {
+	idx := s2.NewShapeIndex()
+	for _, s2pgn := range s2pgns {
+		idx.Add(s2pgn)
+	}
+
+	return s2.NewContainsPointQuery(idx, s2.VertexModelClosed).Contains(*point)
+}
+
+// project the point to all of the linestrings and check if
+// any of the projections are equal to the point.
 func polylineIntersectsPoint(pls []*s2.Polyline,
 	point *s2.Point) bool {
-	s2cell := s2.CellFromPoint(*point)
-
 	for _, pl := range pls {
-		if pl.IntersectsCell(s2cell) {
+		closest, _ := pl.Project(*point)
+		if closest.ApproxEqual(*point) {
 			return true
 		}
 	}
@@ -38,39 +52,56 @@ func polylineIntersectsPoint(pls []*s2.Polyline,
 	return false
 }
 
+// check if any of the polyline vertices lie inside or
+// on the boundary of any of the polygons. Then check if
+// any of the polylines intersect with any of the edges of
+// the polygons
 func polylineIntersectsPolygons(pls []*s2.Polyline,
 	s2pgns []*s2.Polygon) bool {
-	// Early exit if the polygon contains any of the line's vertices.
+	idx := s2.NewShapeIndex()
+	for _, pgn := range s2pgns {
+		idx.Add(pgn)
+	}
+
+	containsQuery := s2.NewContainsPointQuery(idx, s2.VertexModelClosed)
 	for _, pl := range pls {
-		for i := 0; i < pl.NumEdges(); i++ {
-			edge := pl.Edge(i)
-			for _, s2pgn := range s2pgns {
-				if s2pgn.IntersectsCell(s2.CellFromPoint(edge.V0)) ||
-					s2pgn.IntersectsCell(s2.CellFromPoint(edge.V1)) {
-					return true
-				}
+		for _, point := range *pl {
+			if containsQuery.Contains(point) {
+				return true
 			}
 		}
 	}
 
 	for _, pl := range pls {
 		for _, s2pgn := range s2pgns {
-			for i := 0; i < pl.NumEdges(); i++ {
-				for i := 0; i < s2pgn.NumEdges(); i++ {
-					edgeB := s2pgn.Edge(i)
-					latLng1 := s2.LatLngFromPoint(edgeB.V0)
-					latLng2 := s2.LatLngFromPoint(edgeB.V1)
-					pl2 := s2.PolylineFromLatLngs([]s2.LatLng{latLng1, latLng2})
+			for i := 0; i < s2pgn.NumEdges(); i++ {
+				edgeB := s2pgn.Edge(i)
+				latLng1 := s2.LatLngFromPoint(edgeB.V0)
+				latLng2 := s2.LatLngFromPoint(edgeB.V1)
+				pl2 := s2.PolylineFromLatLngs([]s2.LatLng{latLng1, latLng2})
 
-					if pl.Intersects(pl2) {
-						return true
-					}
+				if pl.Intersects(pl2) {
+					return true
 				}
 			}
 		}
 	}
 
 	return false
+}
+
+// check if the point is contained within the polygon.
+// polygon contains point will consider vertices to be outside
+// so we create a shape index and query it instead
+// s2.VertexModelClosed will not consider points on the edges, so
+// behaviour there is arbitrary
+func polygonIntersectsPoint(s2pgns []*s2.Polygon,
+	point *s2.Point) bool {
+	idx := s2.NewShapeIndex()
+	for _, pgn := range s2pgns {
+		idx.Add(pgn)
+	}
+	return s2.NewContainsPointQuery(idx, s2.VertexModelClosed).Contains(*point)
 }
 
 func geometryCollectionIntersectsShape(gc *GeometryCollection,
@@ -140,31 +171,8 @@ func rectangleIntersectsWithPolygons(s2rect *s2.Rect,
 
 func rectangleIntersectsWithLineStrings(s2rect *s2.Rect,
 	polylines []*s2.Polyline) bool {
-	// Early exit path if the envelope contains any of the linestring's vertices.
-	for _, pl := range polylines {
-		for i := 0; i < pl.NumEdges(); i++ {
-			edge := pl.Edge(i)
-			if s2rect.IntersectsCell(s2.CellFromPoint(edge.V0)) ||
-				s2rect.IntersectsCell(s2.CellFromPoint(edge.V1)) {
-				return true
-			}
-		}
-	}
-
-	for _, pl := range polylines {
-		for i := 0; i < pl.NumEdges(); i++ {
-			for j := 0; j < 4; j++ {
-				pl2 := s2.PolylineFromLatLngs([]s2.LatLng{s2rect.Vertex(j),
-					s2rect.Vertex((j + 1) % 4)})
-
-				if pl.Intersects(pl2) {
-					return true
-				}
-			}
-		}
-	}
-
-	return false
+	s2pgnFromRect := s2PolygonFromS2Rectangle(s2rect)
+	return polylineIntersectsPolygons(polylines, []*s2.Polygon{s2pgnFromRect})
 }
 
 func s2PolygonFromCoordinates(coordinates [][][]float64) *s2.Polygon {
@@ -243,20 +251,6 @@ func s2Cap(vertices []float64, radiusInMeter float64) *s2.Cap {
 	angle := radiusInMetersToS1Angle(float64(radiusInMeter))
 	cap := s2.CapFromCenterAngle(cp, angle)
 	return &cap
-}
-
-func max(a, b float64) float64 {
-	if a >= b {
-		return a
-	}
-	return b
-}
-
-func min(a, b float64) float64 {
-	if a >= b {
-		return b
-	}
-	return a
 }
 
 func StripCoveringTerms(terms []string) []string {

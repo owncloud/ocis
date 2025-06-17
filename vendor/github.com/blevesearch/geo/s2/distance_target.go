@@ -15,7 +15,7 @@
 package s2
 
 import (
-	"github.com/golang/geo/s1"
+	"github.com/blevesearch/geo/s1"
 )
 
 // The distance interface represents a set of common methods used by algorithms

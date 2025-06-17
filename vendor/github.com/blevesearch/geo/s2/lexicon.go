@@ -55,7 +55,9 @@ func newIDSetLexicon() *idSetLexicon {
 // The primary difference between this and sequenceLexicon are:
 // 1. Empty and singleton sets are represented implicitly; they use no space.
 // 2. Sets are represented rather than sequences; the ordering of values is
-//    not important and duplicates are removed.
+//
+//	not important and duplicates are removed.
+//
 // 3. The values must be 32-bit non-negative integers only.
 func (l *idSetLexicon) add(ids ...int32) int32 {
 	// Empty sets have a special ID chosen not to conflict with other IDs.
@@ -127,9 +129,7 @@ func (l *sequenceLexicon) add(ids []int32) int32 {
 	if id, ok := l.idSet[hashSet(ids)]; ok {
 		return id
 	}
-	for _, v := range ids {
-		l.values = append(l.values, v)
-	}
+	l.values = append(l.values, ids...)
 	l.begins = append(l.begins, uint32(len(l.values)))
 
 	id := int32(len(l.begins)) - 2
@@ -149,7 +149,7 @@ func (l *sequenceLexicon) size() int {
 	return len(l.begins) - 1
 }
 
-// hash returns a hash of this sequence of int32s.
+// hashSet returns a hash of this sequence of int32s.
 func hashSet(s []int32) uint32 {
 	// TODO(roberts): We just need a way to nicely hash all the values down to
 	// a 32-bit value. To ensure no unnecessary dependencies we use the core

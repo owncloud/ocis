@@ -19,8 +19,8 @@ package s2
 // implement the methods in various other measures files.
 
 import (
-	"github.com/golang/geo/r3"
-	"github.com/golang/geo/s1"
+	"github.com/blevesearch/geo/r3"
+	"github.com/blevesearch/geo/s1"
 )
 
 // polylineLength returns the length of the given Polyline.

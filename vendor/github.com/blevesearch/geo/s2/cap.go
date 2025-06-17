@@ -19,8 +19,8 @@ import (
 	"io"
 	"math"
 
-	"github.com/golang/geo/r1"
-	"github.com/golang/geo/s1"
+	"github.com/blevesearch/geo/r1"
+	"github.com/blevesearch/geo/s1"
 )
 
 var (
@@ -52,10 +52,10 @@ var (
 // radius (r), the maximum chord length from the cap's center (d), and the
 // radius of cap's base (a).
 //
-//     h = 1 - cos(r)
-//       = 2 * sin^2(r/2)
-//   d^2 = 2 * h
-//       = a^2 + h^2
+//	  h = 1 - cos(r)
+//	    = 2 * sin^2(r/2)
+//	d^2 = 2 * h
+//	    = a^2 + h^2
 //
 // The zero value of Cap is an invalid cap. Use EmptyCap to get a valid empty cap.
 type Cap struct {
@@ -109,7 +109,7 @@ func FullCap() Cap {
 
 // IsValid reports whether the Cap is considered valid.
 func (c Cap) IsValid() bool {
-	return c.center.Vector.IsUnit() && c.radius <= s1.StraightChordAngle
+	return c.center.IsUnit() && c.radius <= s1.StraightChordAngle
 }
 
 // IsEmpty reports whether the cap is empty, i.e. it contains no points.
@@ -391,7 +391,7 @@ func (c Cap) intersects(cell Cell, vertices [4]Point) bool {
 	sin2Angle := c.radius.Sin2()
 	for k := 0; k < 4; k++ {
 		edge := cell.Edge(k).Vector
-		dot := c.center.Vector.Dot(edge)
+		dot := c.center.Dot(edge)
 		if dot > 0 {
 			// The center is in the interior half-space defined by the edge. We do not need
 			// to consider these edges, since if the cap intersects this edge then it also

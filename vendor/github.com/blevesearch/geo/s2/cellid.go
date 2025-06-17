@@ -23,10 +23,10 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/golang/geo/r1"
-	"github.com/golang/geo/r2"
-	"github.com/golang/geo/r3"
-	"github.com/golang/geo/s1"
+	"github.com/blevesearch/geo/r1"
+	"github.com/blevesearch/geo/r2"
+	"github.com/blevesearch/geo/r3"
+	"github.com/blevesearch/geo/s1"
 )
 
 // CellID uniquely identifies a cell in the S2 cell decomposition.
@@ -39,15 +39,15 @@ import (
 // Sequentially increasing cell IDs follow a continuous space-filling curve
 // over the entire sphere. They have the following properties:
 //
-//  - The ID of a cell at level k consists of a 3-bit face number followed
-//    by k bit pairs that recursively select one of the four children of
-//    each cell. The next bit is always 1, and all other bits are 0.
-//    Therefore, the level of a cell is determined by the position of its
-//    lowest-numbered bit that is turned on (for a cell at level k, this
-//    position is 2 * (maxLevel - k)).
+//   - The ID of a cell at level k consists of a 3-bit face number followed
+//     by k bit pairs that recursively select one of the four children of
+//     each cell. The next bit is always 1, and all other bits are 0.
+//     Therefore, the level of a cell is determined by the position of its
+//     lowest-numbered bit that is turned on (for a cell at level k, this
+//     position is 2 * (MaxLevel - k)).
 //
-//  - The ID of a parent cell is at the midpoint of the range of IDs spanned
-//    by its children (or by its descendants at any level).
+//   - The ID of a parent cell is at the midpoint of the range of IDs spanned
+//     by its children (or by its descendants at any level).
 //
 // Leaf cells are often used to represent points on the unit sphere, and
 // this type provides methods for converting directly between these two
@@ -73,38 +73,40 @@ func (c cellIDs) Len() int           { return len(c) }
 func (c cellIDs) Swap(i, j int)      { c[i], c[j] = c[j], c[i] }
 func (c cellIDs) Less(i, j int) bool { return c[i] < c[j] }
 
-// TODO(dsymonds): Some of these constants should probably be exported.
 const (
-	faceBits = 3
-	numFaces = 6
+	// FaceBits is the number of bits used to encode the face number.
+	FaceBits = 3
+	// NumFaces is the number of faces.
+	NumFaces = 6
 
-	// This is the number of levels needed to specify a leaf cell.
-	maxLevel = 30
+	// MaxLevel is the number of levels needed to specify a leaf cell.
+	MaxLevel = 30
 
-	// The extra position bit (61 rather than 60) lets us encode each cell as its
-	// Hilbert curve position at the cell center (which is halfway along the
-	// portion of the Hilbert curve that fills that cell).
-	posBits = 2*maxLevel + 1
+	// PosBits is the total number of position bits. The extra bit (61 rather
+	// than 60) lets us encode each cell as its Hilbert curve position at the
+	// cell center (which is halfway along the portion of the Hilbert curve that
+	// fills that cell).
+	PosBits = 2*MaxLevel + 1
 
-	// The maximum index of a valid leaf cell plus one. The range of valid leaf
-	// cell indices is [0..maxSize-1].
-	maxSize = 1 << maxLevel
+	// MaxSize is the maximum index of a valid leaf cell plus one. The range of
+	// valid leaf cell indices is [0..MaxSize-1].
+	MaxSize = 1 << MaxLevel
 
-	wrapOffset = uint64(numFaces) << posBits
+	wrapOffset = uint64(NumFaces) << PosBits
 )
 
 // CellIDFromFacePosLevel returns a cell given its face in the range
 // [0,5], the 61-bit Hilbert curve position pos within that face, and
-// the level in the range [0,maxLevel]. The position in the cell ID
+// the level in the range [0,MaxLevel]. The position in the cell ID
 // will be truncated to correspond to the Hilbert curve position at
 // the center of the returned cell.
 func CellIDFromFacePosLevel(face int, pos uint64, level int) CellID {
-	return CellID(uint64(face)<<posBits + pos | 1).Parent(level)
+	return CellID(uint64(face)<<PosBits + pos | 1).Parent(level)
 }
 
 // CellIDFromFace returns the cell corresponding to a given S2 cube face.
 func CellIDFromFace(face int) CellID {
-	return CellID((uint64(face) << posBits) + lsbForLevel(0))
+	return CellID((uint64(face) << PosBits) + lsbForLevel(0))
 }
 
 // CellIDFromLatLng returns the leaf cell containing ll.
@@ -140,18 +142,18 @@ func (ci CellID) ToToken() string {
 
 // IsValid reports whether ci represents a valid cell.
 func (ci CellID) IsValid() bool {
-	return ci.Face() < numFaces && (ci.lsb()&0x1555555555555555 != 0)
+	return ci.Face() < NumFaces && (ci.lsb()&0x1555555555555555 != 0)
 }
 
 // Face returns the cube face for this cell ID, in the range [0,5].
-func (ci CellID) Face() int { return int(uint64(ci) >> posBits) }
+func (ci CellID) Face() int { return int(uint64(ci) >> PosBits) }
 
-// Pos returns the position along the Hilbert curve of this cell ID, in the range [0,2^posBits-1].
-func (ci CellID) Pos() uint64 { return uint64(ci) & (^uint64(0) >> faceBits) }
+// Pos returns the position along the Hilbert curve of this cell ID, in the range [0,2^PosBits-1].
+func (ci CellID) Pos() uint64 { return uint64(ci) & (^uint64(0) >> FaceBits) }
 
-// Level returns the subdivision level of this cell ID, in the range [0, maxLevel].
+// Level returns the subdivision level of this cell ID, in the range [0, MaxLevel].
 func (ci CellID) Level() int {
-	return maxLevel - findLSBSetNonZero64(uint64(ci))>>1
+	return MaxLevel - findLSBSetNonZero64(uint64(ci))>>1
 }
 
 // IsLeaf returns whether this cell ID is at the deepest level;
@@ -164,11 +166,11 @@ func (ci CellID) IsLeaf() bool { return uint64(ci)&1 != 0 }
 // ChildPosition(1) returns the position of this cell's level-1
 // ancestor within its top-level face cell.
 func (ci CellID) ChildPosition(level int) int {
-	return int(uint64(ci)>>uint64(2*(maxLevel-level)+1)) & 3
+	return int(uint64(ci)>>uint64(2*(MaxLevel-level)+1)) & 3
 }
 
 // lsbForLevel returns the lowest-numbered bit that is on for cells at the given level.
-func lsbForLevel(level int) uint64 { return 1 << uint64(2*(maxLevel-level)) }
+func lsbForLevel(level int) uint64 { return 1 << uint64(2*(MaxLevel-level)) }
 
 // Parent returns the cell at the given level, which must be no greater than the current level.
 func (ci CellID) Parent(level int) CellID {
@@ -201,8 +203,9 @@ func (ci CellID) Children() [4]CellID {
 	return ch
 }
 
+// sizeIJ reports the edge length of cells at the given level in (i,j)-space.
 func sizeIJ(level int) int {
-	return 1 << uint(maxLevel-level)
+	return 1 << uint(MaxLevel-level)
 }
 
 // EdgeNeighbors returns the four cells that are adjacent across the cell's four edges.
@@ -220,9 +223,9 @@ func (ci CellID) EdgeNeighbors() [4]CellID {
 	}
 }
 
-// VertexNeighbors returns the neighboring cellIDs with vertex closest to this cell at the given level.
-// (Normally there are four neighbors, but the closest vertex may only have three neighbors if it is one of
-// the 8 cube vertices.)
+// VertexNeighbors returns the cellIDs of the neighbors of the closest vertex to
+// this cell at the given level. Normally there are four neighbors, but the closest
+// vertex may only have three neighbors if it is one of the 8 cube vertices.
 func (ci CellID) VertexNeighbors(level int) []CellID {
 	halfSize := sizeIJ(level + 1)
 	size := halfSize << 1
@@ -232,14 +235,14 @@ func (ci CellID) VertexNeighbors(level int) []CellID {
 	var ioffset, joffset int
 	if i&halfSize != 0 {
 		ioffset = size
-		isame = (i + size) < maxSize
+		isame = (i + size) < MaxSize
 	} else {
 		ioffset = -size
 		isame = (i - size) >= 0
 	}
 	if j&halfSize != 0 {
 		joffset = size
-		jsame = (j + size) < maxSize
+		jsame = (j + size) < MaxSize
 	} else {
 		joffset = -size
 		jsame = (j - size) >= 0
@@ -265,8 +268,13 @@ func (ci CellID) VertexNeighbors(level int) []CellID {
 // same neighbor may be returned more than once. There could be up to eight
 // neighbors including the diagonal ones that share the vertex.
 //
-// This requires level >= ci.Level().
+// Returns nil if level < ci.Level() (cells would not be neighboring) or
+// level > MaxLevel (no such cells exist).
 func (ci CellID) AllNeighbors(level int) []CellID {
+	if level < ci.Level() || level > MaxLevel {
+		return nil
+	}
+
 	var neighbors []CellID
 
 	face, i, j, _ := ci.faceIJOrientation()
@@ -287,21 +295,21 @@ func (ci CellID) AllNeighbors(level int) []CellID {
 		if k < 0 {
 			sameFace = (j+k >= 0)
 		} else if k >= size {
-			sameFace = (j+k < maxSize)
+			sameFace = (j+k < MaxSize)
 		} else {
 			sameFace = true
 			// Top and bottom neighbors.
 			neighbors = append(neighbors, cellIDFromFaceIJSame(face, i+k, j-nbrSize,
 				j-size >= 0).Parent(level))
 			neighbors = append(neighbors, cellIDFromFaceIJSame(face, i+k, j+size,
-				j+size < maxSize).Parent(level))
+				j+size < MaxSize).Parent(level))
 		}
 
 		// Left, right, and diagonal neighbors.
 		neighbors = append(neighbors, cellIDFromFaceIJSame(face, i-nbrSize, j+k,
 			sameFace && i-size >= 0).Parent(level))
 		neighbors = append(neighbors, cellIDFromFaceIJSame(face, i+size, j+k,
-			sameFace && i+size < maxSize).Parent(level))
+			sameFace && i+size < MaxSize).Parent(level))
 
 		if k >= size {
 			break
@@ -341,10 +349,10 @@ func (ci CellID) String() string {
 	return b.String()
 }
 
-// cellIDFromString returns a CellID from a string in the form "1/3210".
-func cellIDFromString(s string) CellID {
+// CellIDFromString returns a CellID from a string in the form "1/3210".
+func CellIDFromString(s string) CellID {
 	level := len(s) - 2
-	if level < 0 || level > maxLevel {
+	if level < 0 || level > MaxLevel {
 		return CellID(0)
 	}
 	face := int(s[0] - '0')
@@ -353,8 +361,9 @@ func cellIDFromString(s string) CellID {
 	}
 	id := CellIDFromFace(face)
 	for i := 2; i < len(s); i++ {
-		childPos := s[i] - '0'
-		if childPos < 0 || childPos > 3 {
+		var childPos = s[i] - '0'
+		// Bytes are non-negative.
+		if childPos > 3 {
 			return CellID(0)
 		}
 		id = id.Children()[childPos]
@@ -373,9 +382,9 @@ func (ci CellID) LatLng() LatLng { return LatLngFromPoint(Point{ci.rawPoint()}) 
 
 // ChildBegin returns the first child in a traversal of the children of this cell, in Hilbert curve order.
 //
-//    for ci := c.ChildBegin(); ci != c.ChildEnd(); ci = ci.Next() {
-//        ...
-//    }
+//	for ci := c.ChildBegin(); ci != c.ChildEnd(); ci = ci.Next() {
+//	    ...
+//	}
 func (ci CellID) ChildBegin() CellID {
 	ol := ci.lsb()
 	return CellID(uint64(ci) - ol + ol>>2)
@@ -445,7 +454,7 @@ func (ci CellID) AdvanceWrap(steps int64) CellID {
 
 	// We clamp the number of steps if necessary to ensure that we do not
 	// advance past the End() or before the Begin() of this level.
-	shift := uint(2*(maxLevel-ci.Level()) + 1)
+	shift := uint(2*(MaxLevel-ci.Level()) + 1)
 	if steps < 0 {
 		if min := -int64(uint64(ci) >> shift); steps < min {
 			wrap := int64(wrapOffset >> shift)
@@ -501,14 +510,14 @@ func (ci *CellID) decode(d *decoder) {
 // for this cell's level.
 // The return value is always non-negative.
 func (ci CellID) distanceFromBegin() int64 {
-	return int64(ci >> uint64(2*(maxLevel-ci.Level())+1))
+	return int64(ci >> uint64(2*(MaxLevel-ci.Level())+1))
 }
 
 // rawPoint returns an unnormalized r3 vector from the origin through the center
 // of the s2 cell on the sphere.
 func (ci CellID) rawPoint() r3.Vector {
 	face, si, ti := ci.faceSiTi()
-	return faceUVToXYZ(face, stToUV((0.5/maxSize)*float64(si)), stToUV((0.5/maxSize)*float64(ti)))
+	return faceUVToXYZ(face, stToUV((0.5/MaxSize)*float64(si)), stToUV((0.5/MaxSize)*float64(ti)))
 }
 
 // faceSiTi returns the Face/Si/Ti coordinates of the center of the cell.
@@ -529,7 +538,7 @@ func (ci CellID) faceSiTi() (face int, si, ti uint32) {
 func (ci CellID) faceIJOrientation() (f, i, j, orientation int) {
 	f = ci.Face()
 	orientation = f & swapMask
-	nbits := maxLevel - 7*lookupBits // first iteration
+	nbits := MaxLevel - 7*lookupBits // first iteration
 
 	// Each iteration maps 8 bits of the Hilbert curve position into
 	// 4 bits of "i" and "j". The lookup table transforms a key of the
@@ -550,9 +559,9 @@ func (ci CellID) faceIJOrientation() (f, i, j, orientation int) {
 
 	// The position of a non-leaf cell at level "n" consists of a prefix of
 	// 2*n bits that identifies the cell, followed by a suffix of
-	// 2*(maxLevel-n)+1 bits of the form 10*. If n==maxLevel, the suffix is
+	// 2*(MaxLevel-n)+1 bits of the form 10*. If n==MaxLevel, the suffix is
 	// just "1" and has no effect. Otherwise, it consists of "10", followed
-	// by (maxLevel-n-1) repetitions of "00", followed by "0". The "10" has
+	// by (MaxLevel-n-1) repetitions of "00", followed by "0". The "10" has
 	// no effect, while each occurrence of "00" has the effect of reversing
 	// the swapMask bit.
 	if ci.lsb()&0x1111111111111110 != 0 {
@@ -566,7 +575,7 @@ func (ci CellID) faceIJOrientation() (f, i, j, orientation int) {
 func cellIDFromFaceIJ(f, i, j int) CellID {
 	// Note that this value gets shifted one bit to the left at the end
 	// of the function.
-	n := uint64(f) << (posBits - 1)
+	n := uint64(f) << (PosBits - 1)
 	// Alternating faces have opposite Hilbert curve orientations; this
 	// is necessary in order for all faces to have a right-handed
 	// coordinate system.
@@ -591,8 +600,8 @@ func cellIDFromFaceIJWrap(f, i, j int) CellID {
 	// Convert i and j to the coordinates of a leaf cell just beyond the
 	// boundary of this face.  This prevents 32-bit overflow in the case
 	// of finding the neighbors of a face cell.
-	i = clampInt(i, -1, maxSize)
-	j = clampInt(j, -1, maxSize)
+	i = clampInt(i, -1, MaxSize)
+	j = clampInt(j, -1, MaxSize)
 
 	// We want to wrap these coordinates onto the appropriate adjacent face.
 	// The easiest way to do this is to convert the (i,j) coordinates to (x,y,z)
@@ -607,10 +616,10 @@ func cellIDFromFaceIJWrap(f, i, j int) CellID {
 	// [-1,1]x[-1,1] face rectangle, since otherwise the reprojection step
 	// (which divides by the new z coordinate) might change the other
 	// coordinates enough so that we end up in the wrong leaf cell.
-	const scale = 1.0 / maxSize
+	const scale = 1.0 / MaxSize
 	limit := math.Nextafter(1, 2)
-	u := math.Max(-limit, math.Min(limit, scale*float64((i<<1)+1-maxSize)))
-	v := math.Max(-limit, math.Min(limit, scale*float64((j<<1)+1-maxSize)))
+	u := math.Max(-limit, math.Min(limit, scale*float64((i<<1)+1-MaxSize)))
+	v := math.Max(-limit, math.Min(limit, scale*float64((j<<1)+1-MaxSize)))
 
 	// Find the leaf cell coordinates on the adjacent face, and convert
 	// them to a cell id at the appropriate level.
@@ -625,30 +634,17 @@ func cellIDFromFaceIJSame(f, i, j int, sameFace bool) CellID {
 	return cellIDFromFaceIJWrap(f, i, j)
 }
 
-// ijToSTMin converts the i- or j-index of a leaf cell to the minimum corresponding
-// s- or t-value contained by that cell. The argument must be in the range
-// [0..2**30], i.e. up to one position beyond the normal range of valid leaf
-// cell indices.
-func ijToSTMin(i int) float64 {
-	return float64(i) / float64(maxSize)
-}
-
-// stToIJ converts value in ST coordinates to a value in IJ coordinates.
-func stToIJ(s float64) int {
-	return clampInt(int(math.Floor(maxSize*s)), 0, maxSize-1)
-}
-
 // cellIDFromPoint returns a leaf cell containing point p. Usually there is
 // exactly one such cell, but for points along the edge of a cell, any
 // adjacent cell may be (deterministically) chosen. This is because
 // s2.CellIDs are considered to be closed sets. The returned cell will
 // always contain the given point, i.e.
 //
-//   CellFromPoint(p).ContainsPoint(p)
+//	CellFromPoint(p).ContainsPoint(p)
 //
 // is always true.
 func cellIDFromPoint(p Point) CellID {
-	f, u, v := xyzToFaceUV(r3.Vector{p.X, p.Y, p.Z})
+	f, u, v := xyzToFaceUV(r3.Vector{X: p.X, Y: p.Y, Z: p.Z})
 	i := stToIJ(uvToST(u))
 	j := stToIJ(uvToST(v))
 	return cellIDFromFaceIJ(f, i, j)
@@ -768,7 +764,7 @@ func (ci CellID) Advance(steps int64) CellID {
 	// We clamp the number of steps if necessary to ensure that we do not
 	// advance past the End() or before the Begin() of this level. Note that
 	// minSteps and maxSteps always fit in a signed 64-bit integer.
-	stepShift := uint(2*(maxLevel-ci.Level()) + 1)
+	stepShift := uint(2*(MaxLevel-ci.Level()) + 1)
 	if steps < 0 {
 		minSteps := -int64(uint64(ci) >> stepShift)
 		if steps < minSteps {
@@ -786,7 +782,7 @@ func (ci CellID) Advance(steps int64) CellID {
 // centerST return the center of the CellID in (s,t)-space.
 func (ci CellID) centerST() r2.Point {
 	_, si, ti := ci.faceSiTi()
-	return r2.Point{siTiToST(si), siTiToST(ti)}
+	return r2.Point{X: siTiToST(si), Y: siTiToST(ti)}
 }
 
 // sizeST returns the edge length of this CellID in (s,t)-space at the given level.
@@ -797,7 +793,7 @@ func (ci CellID) sizeST(level int) float64 {
 // boundST returns the bound of this CellID in (s,t)-space.
 func (ci CellID) boundST() r2.Rect {
 	s := ci.sizeST(ci.Level())
-	return r2.RectFromCenterSize(ci.centerST(), r2.Point{s, s})
+	return r2.RectFromCenterSize(ci.centerST(), r2.Point{X: s, Y: s})
 }
 
 // centerUV returns the center of this CellID in (u,v)-space. Note that
@@ -806,7 +802,7 @@ func (ci CellID) boundST() r2.Rect {
 // the (u,v) rectangle covered by the cell.
 func (ci CellID) centerUV() r2.Point {
 	_, si, ti := ci.faceSiTi()
-	return r2.Point{stToUV(siTiToST(si)), stToUV(siTiToST(ti))}
+	return r2.Point{X: stToUV(siTiToST(si)), Y: stToUV(siTiToST(ti))}
 }
 
 // boundUV returns the bound of this CellID in (u,v)-space.
@@ -835,23 +831,23 @@ func expandEndpoint(u, maxV, sinDist float64) float64 {
 // of the boundary.
 //
 // Distances are measured *on the sphere*, not in (u,v)-space. For example,
-// you can use this method to expand the (u,v)-bound of an CellID so that
+// you can use this method to expand the (u,v)-bound of a CellID so that
 // it contains all points within 5km of the original cell. You can then
 // test whether a point lies within the expanded bounds like this:
 //
-//   if u, v, ok := faceXYZtoUV(face, point); ok && bound.ContainsPoint(r2.Point{u,v}) { ... }
+//	if u, v, ok := faceXYZtoUV(face, point); ok && bound.ContainsPoint(r2.Point{u,v}) { ... }
 //
 // Limitations:
 //
-//  - Because the rectangle is drawn on one of the six cube-face planes
-//    (i.e., {x,y,z} = +/-1), it can cover at most one hemisphere. This
-//    limits the maximum amount that a rectangle can be expanded. For
-//    example, CellID bounds can be expanded safely by at most 45 degrees
-//    (about 5000 km on the Earth's surface).
+//   - Because the rectangle is drawn on one of the six cube-face planes
+//     (i.e., {x,y,z} = +/-1), it can cover at most one hemisphere. This
+//     limits the maximum amount that a rectangle can be expanded. For
+//     example, CellID bounds can be expanded safely by at most 45 degrees
+//     (about 5000 km on the Earth's surface).
 //
-//  - The implementation is not exact for negative distances. The resulting
-//    rectangle will exclude all points within the given distance of the
-//    boundary but may be slightly smaller than necessary.
+//   - The implementation is not exact for negative distances. The resulting
+//     rectangle will exclude all points within the given distance of the
+//     boundary but may be slightly smaller than necessary.
 func expandedByDistanceUV(uv r2.Rect, distance s1.Angle) r2.Rect {
 	// Expand each of the four sides of the rectangle just enough to include all
 	// points within the given distance of that side. (The rectangle may be
@@ -860,10 +856,10 @@ func expandedByDistanceUV(uv r2.Rect, distance s1.Angle) r2.Rect {
 	maxV := math.Max(math.Abs(uv.Y.Lo), math.Abs(uv.Y.Hi))
 	sinDist := math.Sin(float64(distance))
 	return r2.Rect{
-		X: r1.Interval{expandEndpoint(uv.X.Lo, maxV, -sinDist),
-			expandEndpoint(uv.X.Hi, maxV, sinDist)},
-		Y: r1.Interval{expandEndpoint(uv.Y.Lo, maxU, -sinDist),
-			expandEndpoint(uv.Y.Hi, maxU, sinDist)}}
+		X: r1.Interval{Lo: expandEndpoint(uv.X.Lo, maxV, -sinDist),
+			Hi: expandEndpoint(uv.X.Hi, maxV, sinDist)},
+		Y: r1.Interval{Lo: expandEndpoint(uv.Y.Lo, maxU, -sinDist),
+			Hi: expandEndpoint(uv.Y.Hi, maxU, sinDist)}}
 }
 
 // MaxTile returns the largest cell with the same RangeMin such that
@@ -872,7 +868,7 @@ func expandedByDistanceUV(uv r2.Rect, distance s1.Angle) r2.Rect {
 // a given range (a tiling). This example shows how to generate a tiling
 // for a semi-open range of leaf cells [start, limit):
 //
-//   for id := start.MaxTile(limit); id != limit; id = id.Next().MaxTile(limit)) { ... }
+//	for id := start.MaxTile(limit); id != limit; id = id.Next().MaxTile(limit)) { ... }
 //
 // Note that in general the cells in the tiling will be of different sizes;
 // they gradually get larger (near the middle of the range) and then

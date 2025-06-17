@@ -125,16 +125,14 @@ func (p *Point) Marshal() ([]byte, error) {
 
 func (p *Point) Intersects(other index.GeoJSON) (bool, error) {
 	p.init()
-	s2cell := s2.CellFromPoint(*p.s2point)
 
-	return checkCellIntersectsShape(&s2cell, p, other)
+	return checkPointIntersectsShape(p.s2point, p, other)
 }
 
 func (p *Point) Contains(other index.GeoJSON) (bool, error) {
 	p.init()
-	s2cell := s2.CellFromPoint(*p.s2point)
 
-	return checkCellContainsShape([]*s2.Cell{&s2cell}, other)
+	return checkPointContainsShape([]*s2.Point{p.s2point}, other)
 }
 
 func (p *Point) Coordinates() []float64 {
@@ -205,8 +203,7 @@ func (p *MultiPoint) Intersects(other index.GeoJSON) (bool, error) {
 	p.init()
 
 	for _, s2point := range p.s2points {
-		cell := s2.CellFromPoint(*s2point)
-		rv, err := checkCellIntersectsShape(&cell, p, other)
+		rv, err := checkPointIntersectsShape(s2point, p, other)
 		if rv && err == nil {
 			return rv, nil
 		}
@@ -217,14 +214,13 @@ func (p *MultiPoint) Intersects(other index.GeoJSON) (bool, error) {
 
 func (p *MultiPoint) Contains(other index.GeoJSON) (bool, error) {
 	p.init()
-	s2cells := make([]*s2.Cell, 0, len(p.s2points))
 
-	for _, s2point := range p.s2points {
-		cell := s2.CellFromPoint(*s2point)
-		s2cells = append(s2cells, &cell)
+	rv, err := checkPointContainsShape(p.s2points, other)
+	if rv && err == nil {
+		return rv, nil
 	}
 
-	return checkCellContainsShape(s2cells, other)
+	return false, nil
 }
 
 func (p *MultiPoint) Coordinates() [][]float64 {
@@ -302,6 +298,7 @@ func (ls *LineString) Intersects(other index.GeoJSON) (bool, error) {
 }
 
 func (ls *LineString) Contains(other index.GeoJSON) (bool, error) {
+	ls.init()
 	return checkLineStringsContainsShape([]*s2.Polyline{ls.pl}, other)
 }
 
@@ -370,6 +367,7 @@ func (p *MultiLineString) Intersects(other index.GeoJSON) (bool, error) {
 }
 
 func (p *MultiLineString) Contains(other index.GeoJSON) (bool, error) {
+	p.init()
 	return checkLineStringsContainsShape(p.pls, other)
 }
 
@@ -737,6 +735,22 @@ func (gc *GeometryCollection) UnmarshalJSON(data []byte) error {
 			}
 			pgn.init()
 			gc.Shapes = append(gc.Shapes, &pgn)
+		case CircleType:
+			var cir Circle
+			err := jsoniter.Unmarshal(shape, &cir)
+			if err != nil {
+				return err
+			}
+			cir.init()
+			gc.Shapes = append(gc.Shapes, &cir)
+		case EnvelopeType:
+			var env Envelope
+			err := jsoniter.Unmarshal(shape, &env)
+			if err != nil {
+				return err
+			}
+			env.init()
+			gc.Shapes = append(gc.Shapes, &env)
 		}
 	}
 
@@ -760,11 +774,15 @@ func NewGeoCircle(points []float64,
 	if err != nil {
 		return nil
 	}
-
-	return &Circle{Typ: CircleType,
+	rv := &Circle{
+		Typ:            CircleType,
 		Vertices:       points,
 		Radius:         radius,
-		radiusInMeters: r}
+		radiusInMeters: r,
+	}
+	rv.init()
+
+	return rv
 }
 
 func (c *Circle) Type() string {
@@ -838,7 +856,10 @@ type Envelope struct {
 }
 
 func NewGeoEnvelope(points [][]float64) index.GeoJSON {
-	return &Envelope{Vertices: points, Typ: EnvelopeType}
+	rv := &Envelope{Vertices: points, Typ: EnvelopeType}
+	rv.init()
+
+	return rv
 }
 
 func (e *Envelope) Type() string {
@@ -884,15 +905,13 @@ func (e *Envelope) Contains(other index.GeoJSON) (bool, error) {
 
 //--------------------------------------------------------
 
-// checkCellIntersectsShape checks for intersection between
-// the s2cell and the shape in the document.
-func checkCellIntersectsShape(cell *s2.Cell, shapeIn,
-	other index.GeoJSON) (bool, error) {
+// checkPointIntersectsShape checks for intersection between
+// the point and the shape in the document.
+func checkPointIntersectsShape(point *s2.Point, shapeIn, other index.GeoJSON) (bool, error) {
 	// check if the other shape is a point.
 	if p2, ok := other.(*Point); ok {
-		s2cell := s2.CellFromPoint(*p2.s2point)
-
-		if cell.IntersectsCell(s2cell) {
+		// check if the points are equal
+		if point.ApproxEqual(*p2.s2point) {
 			return true, nil
 		}
 
@@ -901,11 +920,9 @@ func checkCellIntersectsShape(cell *s2.Cell, shapeIn,
 
 	// check if the other shape is a multipoint.
 	if p2, ok := other.(*MultiPoint); ok {
-		// check the intersection for any point in the array.
-		for _, point := range p2.s2points {
-			s2cell := s2.CellFromPoint(*point)
-
-			if cell.IntersectsCell(s2cell) {
+		// check if any of the points are equal
+		for _, p := range p2.s2points {
+			if point.ApproxEqual(*p) {
 				return true, nil
 			}
 		}
@@ -915,8 +932,8 @@ func checkCellIntersectsShape(cell *s2.Cell, shapeIn,
 
 	// check if the other shape is a polygon.
 	if p2, ok := other.(*Polygon); ok {
-
-		if p2.s2pgn.IntersectsCell(*cell) {
+		// check if the point is contained within the polygon.
+		if polygonsContainsPoint([]*s2.Polygon{p2.s2pgn}, point) {
 			return true, nil
 		}
 
@@ -925,12 +942,9 @@ func checkCellIntersectsShape(cell *s2.Cell, shapeIn,
 
 	// check if the other shape is a multipolygon.
 	if p2, ok := other.(*MultiPolygon); ok {
-		// check the intersection for any polygon in the collection.
-		for _, s2pgn := range p2.s2pgns {
-
-			if s2pgn.IntersectsCell(*cell) {
-				return true, nil
-			}
+		// check if the point is contained within any of the polygons
+		if polygonsContainsPoint(p2.s2pgns, point) {
+			return true, nil
 		}
 
 		return false, nil
@@ -938,13 +952,10 @@ func checkCellIntersectsShape(cell *s2.Cell, shapeIn,
 
 	// check if the other shape is a linestring.
 	if p2, ok := other.(*LineString); ok {
-		for i := 0; i < p2.pl.NumEdges(); i++ {
-			edge := p2.pl.Edge(i)
-			start := s2.CellFromPoint(edge.V0)
-			end := s2.CellFromPoint(edge.V1)
-			if cell.IntersectsCell(start) || cell.IntersectsCell(end) {
-				return true, nil
-			}
+		// project the point to the linestring and check if
+		// the projection is equal to the point.
+		if polylineIntersectsPoint([]*s2.Polyline{p2.pl}, point) {
+			return true, nil
 		}
 
 		return false, nil
@@ -953,15 +964,8 @@ func checkCellIntersectsShape(cell *s2.Cell, shapeIn,
 	// check if the other shape is a multilinestring.
 	if p2, ok := other.(*MultiLineString); ok {
 		// check the intersection for any linestring in the array.
-		for _, pl := range p2.pls {
-			for i := 0; i < pl.NumEdges(); i++ {
-				edge := pl.Edge(i)
-				start := s2.CellFromPoint(edge.V0)
-				end := s2.CellFromPoint(edge.V1)
-				if cell.IntersectsCell(start) || cell.IntersectsCell(end) {
-					return true, nil
-				}
-			}
+		if polylineIntersectsPoint(p2.pls, point) {
+			return true, nil
 		}
 
 		return false, nil
@@ -979,8 +983,10 @@ func checkCellIntersectsShape(cell *s2.Cell, shapeIn,
 
 	// check if the other shape is a circle.
 	if c, ok := other.(*Circle); ok {
-
-		if c.s2cap.IntersectsCell(*cell) {
+		// check if the point is contained within the circle
+		// by calculating the distance between the point and the
+		// center of the circle.
+		if c.s2cap.ContainsPoint(*point) {
 			return true, nil
 		}
 
@@ -989,8 +995,9 @@ func checkCellIntersectsShape(cell *s2.Cell, shapeIn,
 
 	// check if the other shape is an envelope.
 	if e, ok := other.(*Envelope); ok {
-
-		if e.r.IntersectsCell(*cell) {
+		// check if the point is contained by the envelope
+		// by checking if the point is within its bounds
+		if e.r.ContainsPoint(*point) {
 			return true, nil
 		}
 
@@ -1001,15 +1008,14 @@ func checkCellIntersectsShape(cell *s2.Cell, shapeIn,
 		" found in document", other.Type())
 }
 
-// checkCellContainsShape checks whether the given shape in
-// in the document is contained with the s2cell.
-func checkCellContainsShape(cells []*s2.Cell,
+// checkPointContainsShape checks whether the given shape in
+// in the document is approximately contained with the point.
+func checkPointContainsShape(points []*s2.Point,
 	other index.GeoJSON) (bool, error) {
 	// check if the other shape is a point.
 	if p2, ok := other.(*Point); ok {
-		for _, cell := range cells {
-
-			if cell.ContainsPoint(*p2.s2point) {
+		for _, point := range points {
+			if point.ApproxEqual(*p2.s2point) {
 				return true, nil
 			}
 		}
@@ -1018,12 +1024,12 @@ func checkCellContainsShape(cells []*s2.Cell,
 	}
 
 	// check if the other shape is a multipoint, if so containment is
-	// checked for every point in the multipoint with every given cells.
+	// checked for every point in the multipoint with every given point.
 	if p2, ok := other.(*MultiPoint); ok {
 		// check the containment for every point in the collection.
 		lookup := make(map[int]struct{})
-		for _, cell := range cells {
-			for pos, point := range p2.s2points {
+		for _, qpoint := range points {
+			for pos, dpoint := range p2.s2points {
 				if _, done := lookup[pos]; done {
 					continue
 				}
@@ -1032,7 +1038,7 @@ func checkCellContainsShape(cells []*s2.Cell,
 					return true, nil
 				}
 
-				if cell.ContainsPoint(*point) {
+				if qpoint.ApproxEqual(*dpoint) {
 					lookup[pos] = struct{}{}
 				}
 			}
@@ -1065,7 +1071,6 @@ func checkLineStringsIntersectsShape(pls []*s2.Polyline, shapeIn,
 	if p2, ok := other.(*MultiPoint); ok {
 		// check the intersection for any point in the collection.
 		for _, point := range p2.s2points {
-
 			if polylineIntersectsPoint(pls, point) {
 				return true, nil
 			}
@@ -1134,7 +1139,9 @@ func checkLineStringsIntersectsShape(pls []*s2.Polyline, shapeIn,
 			for i := 0; i < pl.NumEdges(); i++ {
 				edge := pl.Edge(i)
 				distance := s2.DistanceFromSegment(centre, edge.V0, edge.V1)
-				return distance <= c.s2cap.Radius(), nil
+				if distance <= c.s2cap.Radius() {
+					return true, nil
+				}
 			}
 		}
 
@@ -1156,6 +1163,27 @@ func checkLineStringsIntersectsShape(pls []*s2.Polyline, shapeIn,
 // points and multipoints for the linestring vertices.
 func checkLineStringsContainsShape(pls []*s2.Polyline,
 	other index.GeoJSON) (bool, error) {
+	// check if the other shape is a point.
+	if p2, ok := other.(*Point); ok {
+		if polylineIntersectsPoint(pls, p2.s2point) {
+			return true, nil
+		}
+
+		return false, nil
+	}
+
+	// check if the other shape is a multipoint.
+	if p2, ok := other.(*MultiPoint); ok {
+		// check the containment for every point in the collection.
+		for _, point := range p2.s2points {
+			if !polylineIntersectsPoint(pls, point) {
+				return false, nil
+			}
+		}
+
+		return true, nil
+	}
+
 	return false, nil
 }
 
@@ -1167,9 +1195,7 @@ func checkPolygonIntersectsShape(s2pgn *s2.Polygon, shapeIn,
 	other index.GeoJSON) (bool, error) {
 	// check if the other shape is a point.
 	if p2, ok := other.(*Point); ok {
-
-		s2cell := s2.CellFromPoint(*p2.s2point)
-		if s2pgn.IntersectsCell(s2cell) {
+		if polygonIntersectsPoint([]*s2.Polygon{s2pgn}, p2.s2point) {
 			return true, nil
 		}
 
@@ -1178,10 +1204,8 @@ func checkPolygonIntersectsShape(s2pgn *s2.Polygon, shapeIn,
 
 	// check if the other shape is a multipoint.
 	if p2, ok := other.(*MultiPoint); ok {
-
 		for _, s2point := range p2.s2points {
-			s2cell := s2.CellFromPoint(*s2point)
-			if s2pgn.IntersectsCell(s2cell) {
+			if polygonIntersectsPoint([]*s2.Polygon{s2pgn}, s2point) {
 				return true, nil
 			}
 		}
@@ -1191,7 +1215,6 @@ func checkPolygonIntersectsShape(s2pgn *s2.Polygon, shapeIn,
 
 	// check if the other shape is a polygon.
 	if p2, ok := other.(*Polygon); ok {
-
 		if s2pgn.Intersects(p2.s2pgn) {
 			return true, nil
 		}
@@ -1203,7 +1226,6 @@ func checkPolygonIntersectsShape(s2pgn *s2.Polygon, shapeIn,
 	if p2, ok := other.(*MultiPolygon); ok {
 		// check the intersection for any polygon in the collection.
 		for _, s2pgn1 := range p2.s2pgns {
-
 			if s2pgn.Intersects(s2pgn1) {
 				return true, nil
 			}
@@ -1214,7 +1236,6 @@ func checkPolygonIntersectsShape(s2pgn *s2.Polygon, shapeIn,
 
 	// check if the other shape is a linestring.
 	if ls, ok := other.(*LineString); ok {
-
 		if polylineIntersectsPolygons([]*s2.Polyline{ls.pl},
 			[]*s2.Polygon{s2pgn}) {
 			return true, nil
@@ -1225,7 +1246,6 @@ func checkPolygonIntersectsShape(s2pgn *s2.Polygon, shapeIn,
 
 	// check if the other shape is a multilinestring.
 	if mls, ok := other.(*MultiLineString); ok {
-
 		if polylineIntersectsPolygons(mls.pls, []*s2.Polygon{s2pgn}) {
 			return true, nil
 		}
@@ -1256,7 +1276,6 @@ func checkPolygonIntersectsShape(s2pgn *s2.Polygon, shapeIn,
 
 	// check if the other shape is a envelope.
 	if e, ok := other.(*Envelope); ok {
-
 		s2pgnInDoc := s2PolygonFromS2Rectangle(e.r)
 		if s2pgn.Intersects(s2pgnInDoc) {
 			return true, nil
@@ -1274,9 +1293,8 @@ func checkMultiPolygonContainsShape(s2pgns []*s2.Polygon,
 	shapeIn, other index.GeoJSON) (bool, error) {
 	// check if the other shape is a point.
 	if p2, ok := other.(*Point); ok {
-
 		for _, s2pgn := range s2pgns {
-			if s2pgn.ContainsPoint(*p2.s2point) {
+			if polygonIntersectsPoint([]*s2.Polygon{s2pgn}, p2.s2point) {
 				return true, nil
 			}
 		}
@@ -1287,34 +1305,22 @@ func checkMultiPolygonContainsShape(s2pgns []*s2.Polygon,
 	// check if the other shape is a multipoint.
 	if p2, ok := other.(*MultiPoint); ok {
 		// check the containment for every point in the collection.
-		pointsWithIn := make(map[int]struct{})
-	nextPoint:
-		for pointIndex, point := range p2.s2points {
+		idx := s2.NewShapeIndex()
+		for _, s2pgn := range s2pgns {
+			idx.Add(s2pgn)
+		}
 
-			for _, s2pgn := range s2pgns {
-				if s2pgn.ContainsPoint(*point) {
-					pointsWithIn[pointIndex] = struct{}{}
-					continue nextPoint
-				} else {
-					// double check for containment with the vertices.
-					for _, loop := range s2pgn.Loops() {
-						for i := 0; i < loop.NumVertices(); i++ {
-							if point.ApproxEqual(loop.Vertex(i)) {
-								pointsWithIn[pointIndex] = struct{}{}
-								continue nextPoint
-							}
-						}
-					}
-				}
+		for _, point := range p2.s2points {
+			if !s2.NewContainsPointQuery(idx, s2.VertexModelClosed).Contains(*point) {
+				return false, nil
 			}
 		}
 
-		return len(p2.s2points) == len(pointsWithIn), nil
+		return true, nil
 	}
 
 	// check if the other shape is a polygon.
 	if p2, ok := other.(*Polygon); ok {
-
 		for _, s2pgn := range s2pgns {
 			if s2pgn.Contains(p2.s2pgn) {
 				return true, nil
@@ -1328,7 +1334,6 @@ func checkMultiPolygonContainsShape(s2pgns []*s2.Polygon,
 	if p2, ok := other.(*MultiPolygon); ok {
 		// check the intersection for every polygon in the collection.
 		polygonsWithIn := make(map[int]struct{})
-
 	nextPolygon:
 		for pgnIndex, pgn := range p2.s2pgns {
 			for _, s2pgn := range s2pgns {
@@ -1344,7 +1349,6 @@ func checkMultiPolygonContainsShape(s2pgns []*s2.Polygon,
 
 	// check if the other shape is a linestring.
 	if ls, ok := other.(*LineString); ok {
-
 		if polygonsContainsLineStrings(s2pgns,
 			[]*s2.Polyline{ls.pl}) {
 			return true, nil
@@ -1385,7 +1389,6 @@ func checkMultiPolygonContainsShape(s2pgns []*s2.Polygon,
 		radius := c.s2cap.Radius()
 
 		for _, s2pgn := range s2pgns {
-
 			if s2pgn.ContainsPoint(cp) {
 				projected := s2pgn.ProjectToBoundary(&cp)
 				distance := projected.Distance(cp)
@@ -1423,9 +1426,7 @@ func checkCircleIntersectsShape(s2cap *s2.Cap, shapeIn,
 	other index.GeoJSON) (bool, error) {
 	// check if the other shape is a point.
 	if p2, ok := other.(*Point); ok {
-		s2cell := s2.CellFromPoint(*p2.s2point)
-
-		if s2cap.IntersectsCell(s2cell) {
+		if s2cap.ContainsPoint(*p2.s2point) {
 			return true, nil
 		}
 
@@ -1436,9 +1437,7 @@ func checkCircleIntersectsShape(s2cap *s2.Cap, shapeIn,
 	if p2, ok := other.(*MultiPoint); ok {
 		// check the intersection for any point in the collection.
 		for _, point := range p2.s2points {
-			s2cell := s2.CellFromPoint(*point)
-
-			if s2cap.IntersectsCell(s2cell) {
+			if s2cap.ContainsPoint(*point) {
 				return true, nil
 			}
 		}
@@ -1461,7 +1460,9 @@ func checkCircleIntersectsShape(s2cap *s2.Cap, shapeIn,
 			centerPoint := s2cap.Center()
 			projected := s2pgn.Project(&centerPoint)
 			distance := projected.Distance(centerPoint)
-			return distance <= s2cap.Radius(), nil
+			if distance <= s2cap.Radius() {
+				return true, nil
+			}
 		}
 
 		return false, nil
@@ -1506,7 +1507,6 @@ func checkCircleIntersectsShape(s2cap *s2.Cap, shapeIn,
 
 	// check if the other shape is a envelope.
 	if e, ok := other.(*Envelope); ok {
-
 		if e.r.ContainsPoint(s2cap.Center()) {
 			return true, nil
 		}
@@ -1533,7 +1533,6 @@ func checkCircleContainsShape(s2cap *s2.Cap,
 	shapeIn, other index.GeoJSON) (bool, error) {
 	// check if the other shape is a point.
 	if p2, ok := other.(*Point); ok {
-
 		if s2cap.ContainsPoint(*p2.s2point) {
 			return true, nil
 		}
@@ -1620,7 +1619,6 @@ func checkCircleContainsShape(s2cap *s2.Cap,
 
 	// check if the other shape is a circle.
 	if c, ok := other.(*Circle); ok {
-
 		if s2cap.Contains(*c.s2cap) {
 			return true, nil
 		}
@@ -1630,7 +1628,6 @@ func checkCircleContainsShape(s2cap *s2.Cap,
 
 	// check if the other shape is a envelope.
 	if e, ok := other.(*Envelope); ok {
-
 		for i := 0; i < 4; i++ {
 			if !s2cap.ContainsPoint(
 				s2.PointFromLatLng(e.r.Vertex(i))) {
@@ -1653,9 +1650,7 @@ func checkEnvelopeIntersectsShape(s2rect *s2.Rect, shapeIn,
 	other index.GeoJSON) (bool, error) {
 	// check if the other shape is a point.
 	if p2, ok := other.(*Point); ok {
-		s2cell := s2.CellFromPoint(*p2.s2point)
-
-		if s2rect.IntersectsCell(s2cell) {
+		if s2rect.ContainsPoint(*p2.s2point) {
 			return true, nil
 		}
 
@@ -1666,9 +1661,7 @@ func checkEnvelopeIntersectsShape(s2rect *s2.Rect, shapeIn,
 	if p2, ok := other.(*MultiPoint); ok {
 		// check the intersection for any point in the collection.
 		for _, point := range p2.s2points {
-			s2cell := s2.CellFromPoint(*point)
-
-			if s2rect.IntersectsCell(s2cell) {
+			if s2rect.ContainsPoint(*point) {
 				return true, nil
 			}
 		}
@@ -1678,7 +1671,6 @@ func checkEnvelopeIntersectsShape(s2rect *s2.Rect, shapeIn,
 
 	// check if the other shape is a polygon.
 	if pgn, ok := other.(*Polygon); ok {
-
 		if rectangleIntersectsWithPolygons(s2rect,
 			[]*s2.Polygon{pgn.s2pgn}) {
 			return true, nil
@@ -1699,7 +1691,6 @@ func checkEnvelopeIntersectsShape(s2rect *s2.Rect, shapeIn,
 
 	// check if the other shape is a linestring.
 	if ls, ok := other.(*LineString); ok {
-
 		if rectangleIntersectsWithLineStrings(s2rect,
 			[]*s2.Polyline{ls.pl}) {
 			return true, nil
@@ -1710,7 +1701,6 @@ func checkEnvelopeIntersectsShape(s2rect *s2.Rect, shapeIn,
 
 	// check if the other shape is a multilinestring.
 	if mls, ok := other.(*MultiLineString); ok {
-
 		if rectangleIntersectsWithLineStrings(s2rect, mls.pls) {
 			return true, nil
 		}
@@ -1738,7 +1728,6 @@ func checkEnvelopeIntersectsShape(s2rect *s2.Rect, shapeIn,
 
 	// check if the other shape is a envelope.
 	if e, ok := other.(*Envelope); ok {
-
 		if s2rect.Intersects(*e.r) {
 			return true, nil
 		}
@@ -1756,9 +1745,7 @@ func checkEnvelopeContainsShape(s2rect *s2.Rect, shapeIn,
 	other index.GeoJSON) (bool, error) {
 	// check if the other shape is a point.
 	if p2, ok := other.(*Point); ok {
-		s2LatLng := s2.LatLngFromPoint(*p2.s2point)
-
-		if s2rect.ContainsLatLng(s2LatLng) {
+		if s2rect.ContainsPoint(*p2.s2point) {
 			return true, nil
 		}
 
@@ -1769,9 +1756,7 @@ func checkEnvelopeContainsShape(s2rect *s2.Rect, shapeIn,
 	if p2, ok := other.(*MultiPoint); ok {
 		// check the intersection for any point in the collection.
 		for _, point := range p2.s2points {
-			s2LatLng := s2.LatLngFromPoint(*point)
-
-			if !s2rect.ContainsLatLng(s2LatLng) {
+			if !s2rect.ContainsPoint(*point) {
 				return false, nil
 			}
 		}
@@ -1781,17 +1766,14 @@ func checkEnvelopeContainsShape(s2rect *s2.Rect, shapeIn,
 
 	// check if the other shape is a polygon.
 	if p2, ok := other.(*Polygon); ok {
-		s2pgnRect := s2PolygonFromS2Rectangle(s2rect)
-		return s2pgnRect.Contains(p2.s2pgn), nil
+		return s2rect.Contains(p2.s2pgn.RectBound()), nil
 	}
 
 	// check if the other shape is a multipolygon.
 	if p2, ok := other.(*MultiPolygon); ok {
-		s2pgnRect := s2PolygonFromS2Rectangle(s2rect)
-
 		// check the containment for every polygon in the collection.
 		for _, s2pgn := range p2.s2pgns {
-			if !s2pgnRect.Contains(s2pgn) {
+			if !s2rect.Contains(s2pgn.RectBound()) {
 				return false, nil
 			}
 		}
@@ -1801,26 +1783,14 @@ func checkEnvelopeContainsShape(s2rect *s2.Rect, shapeIn,
 
 	// check if the other shape is a linestring.
 	if p2, ok := other.(*LineString); ok {
-		for i := 0; i < p2.pl.NumEdges(); i++ {
-			edge := p2.pl.Edge(i)
-			if !s2rect.ContainsPoint(edge.V0) ||
-				!s2rect.ContainsPoint(edge.V1) {
-				return false, nil
-			}
-		}
-
-		return true, nil
+		return s2rect.Contains(p2.pl.RectBound()), nil
 	}
 
 	// check if the other shape is a multilinestring.
 	if p2, ok := other.(*MultiLineString); ok {
 		for _, pl := range p2.pls {
-			for i := 0; i < pl.NumEdges(); i++ {
-				edge := pl.Edge(i)
-				if !s2rect.ContainsPoint(edge.V0) ||
-					!s2rect.ContainsPoint(edge.V1) {
-					return false, nil
-				}
+			if !s2rect.Contains(pl.RectBound()) {
+				return false, nil
 			}
 		}
 		return true, nil
@@ -1838,7 +1808,6 @@ func checkEnvelopeContainsShape(s2rect *s2.Rect, shapeIn,
 
 	// check if the other shape is a circle.
 	if c, ok := other.(*Circle); ok {
-
 		if s2rect.Contains(c.s2cap.RectBound()) {
 			return true, nil
 		}
@@ -1848,7 +1817,6 @@ func checkEnvelopeContainsShape(s2rect *s2.Rect, shapeIn,
 
 	// check if the other shape is a envelope.
 	if e, ok := other.(*Envelope); ok {
-
 		if s2rect.Contains(*e.r) {
 			return true, nil
 		}
