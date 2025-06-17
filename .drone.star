@@ -1480,6 +1480,7 @@ def e2eTestPipeline(ctx):
             "BASE_URL_OCIS": OCIS_DOMAIN,
             "HEADLESS": "true",
             "RETRY": "1",
+            "REPORT_TRACING": "with-tracing" in ctx.build.title.lower(),
         }
 
         # configs to setup ocis with keycloak
