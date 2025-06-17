@@ -1448,9 +1448,6 @@ def e2eTestPipeline(ctx):
     }, {
         "name": "gopath",
         "temp": {},
-    }, {
-        "name": "certs",
-        "temp": {},
     }]
 
     pipelines = []
@@ -3604,16 +3601,10 @@ def keycloakService():
                "name": "generate-keycloak-certs",
                "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
                "commands": [
-                   "pwd",
+                   "cd %s" % dirs["base"],
                    "mkdir -p keycloak-certs",
                    "openssl req -x509 -newkey rsa:2048 -keyout keycloak-certs/keycloakkey.pem -out keycloak-certs/keycloakcrt.pem -nodes -days 365 -subj '/CN=keycloak'",
                    "chmod -R 777 keycloak-certs",
-               ],
-               "volumes": [
-                   {
-                       "name": "certs",
-                       "path": "/keycloak-certs",
-                   },
                ],
            }] + \
            [{
@@ -3631,19 +3622,13 @@ def keycloakService():
                    "KC_FEATURES": "impersonation",
                    "KEYCLOAK_ADMIN": "admin",
                    "KEYCLOAK_ADMIN_PASSWORD": "admin",
-                   "KC_HTTPS_CERTIFICATE_FILE": "./keycloak-certs/keycloakcrt.pem",
-                   "KC_HTTPS_CERTIFICATE_KEY_FILE": "./keycloak-certs/keycloakkey.pem",
+                   "KC_HTTPS_CERTIFICATE_FILE": "%s/keycloak-certs/keycloakcrt.pem" % dirs["base"],
+                   "KC_HTTPS_CERTIFICATE_KEY_FILE": "%s/keycloak-certs/keycloakkey.pem" % dirs["base"],
                },
                "commands": [
                    "mkdir -p /opt/keycloak/data/import",
                    "cp tests/config/drone/ocis-ci-realm.dist.json /opt/keycloak/data/import/oCIS-realm.json",
                    "/opt/keycloak/bin/kc.sh start-dev --proxy-headers xforwarded --spi-connections-http-client-default-disable-trust-manager=true --import-realm --health-enabled=true",
-               ],
-               "volumes": [
-                   {
-                       "name": "certs",
-                       "path": "/keycloak-certs",
-                   },
                ],
            }] + waitForServices("keycloak", ["keycloak:8443"])
 
