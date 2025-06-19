@@ -25,6 +25,8 @@ $config->setFinder($finder)
                 ],
                 'single_space_around_construct' => true,
                 'no_unused_imports' => true,
+                'array_indentation' => true,
+                'method_chaining_indentation' => true,
             ]
         )
     );

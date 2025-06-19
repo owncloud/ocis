@@ -71,8 +71,8 @@ class OcmHelper {
 		?string $description = null
 	): ResponseInterface {
 		$body = [
-		  "description" => $description,
-		  "recipient" => $email
+			"description" => $description,
+			"recipient" => $email
 		];
 		$url = self::getFullUrl($baseUrl, 'generate-invite');
 		return HttpRequestHelper::post(
@@ -102,8 +102,8 @@ class OcmHelper {
 		string $providerDomain
 	): ResponseInterface {
 		$body = [
-		  "token" => $token,
-		  "providerDomain" => $providerDomain
+			"token" => $token,
+			"providerDomain" => $providerDomain
 		];
 		$url = self::getFullUrl($baseUrl, 'accept-invite');
 		return HttpRequestHelper::post(

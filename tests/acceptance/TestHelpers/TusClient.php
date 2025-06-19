@@ -49,11 +49,11 @@ class TusClient extends Client {
 	public function createWithUploadRR(string $key, int $bytes = -1): ResponseInterface {
 		$bytes = $bytes < 0 ? $this->fileSize : $bytes;
 		$headers = $this->headers + [
-				'Upload-Length' => $this->fileSize,
-				'Upload-Key' => $key,
-				'Upload-Checksum' => $this->getUploadChecksumHeader(),
-				'Upload-Metadata' => $this->getUploadMetadataHeader(),
-			];
+			'Upload-Length' => $this->fileSize,
+			'Upload-Key' => $key,
+			'Upload-Checksum' => $this->getUploadChecksumHeader(),
+			'Upload-Metadata' => $this->getUploadMetadataHeader(),
+		];
 		$data = '';
 		if ($bytes > 0) {
 			$data = $this->getData(0, $bytes);
@@ -70,8 +70,8 @@ class TusClient extends Client {
 			$response = $this->getClient()->post(
 				$this->apiPath,
 				[
-				'body' => $data,
-				'headers' => $headers,
+					'body' => $data,
+					'headers' => $headers,
 				]
 			);
 		} catch (ClientException $e) {
@@ -116,10 +116,10 @@ class TusClient extends Client {
 		}
 		$data = $this->getData($offset, $bytes);
 		$headers = $this->headers + [
-				'Content-Type' => self::HEADER_CONTENT_TYPE,
-				'Content-Length' => \strlen($data),
-				'Upload-Checksum' => $this->getUploadChecksumHeader(),
-			];
+			'Content-Type' => self::HEADER_CONTENT_TYPE,
+			'Content-Length' => \strlen($data),
+			'Upload-Checksum' => $this->getUploadChecksumHeader(),
+		];
 		if ($this->isPartial()) {
 			$headers += ['Upload-Concat' => self::UPLOAD_TYPE_PARTIAL];
 		} else {
@@ -128,8 +128,8 @@ class TusClient extends Client {
 		$response = $this->getClient()->patch(
 			$this->getUrl(),
 			[
-			'body' => $data,
-			'headers' => $headers,
+				'body' => $data,
+				'headers' => $headers,
 			]
 		);
 		return $response;

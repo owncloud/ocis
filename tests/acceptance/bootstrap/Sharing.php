@@ -2500,13 +2500,13 @@ trait Sharing {
 				$field,
 				[
 					"displayname_owner",
-					 "displayname_file_owner",
-					 "owner",
-					 "uid_owner",
-					 "uid_file_owner",
-					  "additional_info_owner",
-					  "additional_info_file_owner"
-					  ]
+					"displayname_file_owner",
+					"owner",
+					"uid_owner",
+					"uid_file_owner",
+					"additional_info_owner",
+					"additional_info_file_owner"
+				]
 			)
 			) {
 				$value = $this->substituteInLineCodes($value, $sharer);

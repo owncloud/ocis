@@ -2351,8 +2351,8 @@ class FeatureContext extends BehatVariablesContext {
 				"function" => [
 					$this, "getUserIdByUserName"
 				],
-					"parameter" => [$userName]
-				],
+				"parameter" => [$userName]
+			],
 			[
 				"code" => "%group_id%",
 				"function" => [
@@ -2532,16 +2532,16 @@ class FeatureContext extends BehatVariablesContext {
 					"parameter" => [$user, true]
 				],
 				[
-				"code" => "%user_id%",
-				"function" =>
-				[$this, "getUserIdByUserName"],
-				"parameter" => [$userName]
+					"code" => "%user_id%",
+					"function" =>
+					[$this, "getUserIdByUserName"],
+					"parameter" => [$userName]
 				],
 				[
-				"code" => "%group_id%",
-				"function" =>
-				[$this, "getGroupIdByGroupName"],
-				"parameter" => [$group]
+					"code" => "%group_id%",
+					"function" =>
+					[$this, "getGroupIdByGroupName"],
+					"parameter" => [$group]
 				]
 			);
 

@@ -477,7 +477,7 @@ class SpacesContext implements Context {
 		$responseArray = json_decode(
 			json_encode(
 				HttpRequestHelper::getResponseXml($response, __METHOD__)
-				->xpath("//d:response/d:propstat/d:prop/oc:privatelink")
+					->xpath("//d:response/d:propstat/d:prop/oc:privatelink")
 			),
 			true,
 			512,

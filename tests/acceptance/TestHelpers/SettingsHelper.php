@@ -370,8 +370,8 @@ class SettingsHelper {
 		$fullUrl = self::buildFullUrl($baseUrl, "values-get-by-unique-identifiers");
 		$body = json_encode(
 			[
-			"accountUuid" => "me",
-			"settingId" => $settingId
+				"accountUuid" => "me",
+				"settingId" => $settingId
 			],
 			JSON_THROW_ON_ERROR
 		);

@@ -197,10 +197,10 @@ class TUSContext implements Context {
 		$user = $this->featureContext->getActualUsername($user);
 		$password = $this->featureContext->getUserPassword($user);
 		$headers = [
-		'Content-Type' => 'application/offset+octet-stream',
-		'Tus-Resumable' => '1.0.0',
-		'Upload-Checksum' => $checksum,
-		'Upload-Offset' => $offset
+			'Content-Type' => 'application/offset+octet-stream',
+			'Tus-Resumable' => '1.0.0',
+			'Upload-Checksum' => $checksum,
+			'Upload-Offset' => $offset
 		];
 		$headers = empty($extraHeaders) ? $headers : array_merge($headers, $extraHeaders);
 
