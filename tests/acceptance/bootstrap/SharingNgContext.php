@@ -1716,10 +1716,10 @@ class SharingNgContext implements Context {
 		$resource = $rows['resource'] ?? '';
 		$shareType = $rows['shareType'];
 		$space = $rows['space'];
-		//this details is needed for result logging purpose to determine whether the resource shared is a resource or a project space
+		// this details is needed for result logging purpose to determine whether the resource shared is a resource or a project space
 		$resourceDetail = ($resource) ? "resource '" . $resource : "space '" . $space;
 		foreach ($allowedPermissionRoles as $role) {
-			//we should be able to send share invitation for each of the role allowed for the files/folders which are listed in permissions (allowed)
+			// we should be able to send share invitation for each of the role allowed for the files/folders which are listed in permissions (allowed)
 			$roleAllowed = GraphHelper::getPermissionNameByPermissionRoleId($role->id);
 			$responseSendInvitation = $this->sendShareInvitation(
 				$user,

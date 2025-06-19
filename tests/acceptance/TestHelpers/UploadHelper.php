@@ -88,12 +88,12 @@ class UploadHelper extends Assert {
 			);
 		}
 
-		//prepare chunking
+		// prepare chunking
 		$chunks = self::chunkFile($source, $noOfChunks);
 		$chunkingId = 'chunking-' . \rand(1000, 9999);
 		$result = null;
 
-		//upload chunks
+		// upload chunks
 		foreach ($chunks as $index => $chunk) {
 			$filename = $destination . "-" . $chunkingId . "-" . \count($chunks) . '-' . $index;
 			$result = WebDavHelper::makeDavRequest(

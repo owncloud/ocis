@@ -124,7 +124,7 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 			$adminPassword,
 		);
 		// server_root is a SimpleXMLElement object that "wraps" a string.
-		/// We want the bare string.
+		// We want the bare string.
 		return (string) $sysInfo->server_root;
 	}
 

@@ -87,7 +87,7 @@ class WebDavLockingContext implements Context {
 
 		foreach ($propertiesRows as $property => $value) {
 			if ($property === "timeout") {
-				//properties that are set in the header not in the xml
+				// properties that are set in the header not in the xml
 				$headers[$property] = $value;
 			} else {
 				$body .= "<d:$property><d:$value/></d:$property>";

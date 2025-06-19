@@ -240,7 +240,7 @@ class FilesVersionsContext implements Context {
 			__METHOD__
 		);
 		$xmlPart = $responseXmlObject->xpath("//d:response/d:href");
-		//restoring the version only works with DAV path v2
+		// restoring the version only works with DAV path v2
 		$destinationUrl = $this->featureContext->getBaseUrl() . "/" .
 			WebDavHelper::getDavPath(WebDavHelper::DAV_VERSION_NEW, $user) . \trim($path, "/");
 		$fullUrl = $this->featureContext->getBaseUrlWithoutPath() .

@@ -98,7 +98,7 @@ class WebDavHelper {
 	 * @return object
 	 */
 	public static function parseNamespace(string $namespaceString): object {
-		//calculate the namespace prefix and namespace
+		// calculate the namespace prefix and namespace
 		$matches = [];
 		\preg_match("/^(.*)='(.*)'$/", $namespaceString, $matches);
 		return (object)["namespace" => $matches[2], "prefix" => $matches[1]];
@@ -169,15 +169,15 @@ class WebDavHelper {
 		$extraNamespaces = "";
 		foreach ($properties as $namespaceString => $property) {
 			if (\is_int($namespaceString)) {
-				//default namespace prefix if the property has no array key
-				//also used if no prefix is given in the property value
+				// default namespace prefix if the property has no array key
+				// also used if no prefix is given in the property value
 				$namespacePrefix = null;
 			} else {
 				$ns = self::parseNamespace($namespaceString);
 				$namespacePrefix = $ns->prefix;
 				$extraNamespaces .= " xmlns:$namespacePrefix=\"$ns->namespace\" ";
 			}
-			//if a namespace prefix is given in the property value use that
+			// if a namespace prefix is given in the property value use that
 			if (\strpos($property, ":") !== false) {
 				$propertyParts = \explode(":", $property);
 				$namespacePrefix = $propertyParts[0];
@@ -343,8 +343,8 @@ class WebDavHelper {
 		$namespace = "";
 		$namespacePrefix = "";
 		if (\is_int($namespaceString)) {
-			//default namespace prefix if the property has no array key
-			//also used if no prefix is given in the property value
+			// default namespace prefix if the property has no array key
+			// also used if no prefix is given in the property value
 			$namespacePrefix = "d";
 			$namespace = "DAV:";
 		} elseif ($namespaceString) {
@@ -352,7 +352,7 @@ class WebDavHelper {
 			$namespacePrefix = $ns->prefix;
 			$namespace = $ns->namespace;
 		}
-		//if a namespace prefix is given in the property value use that
+		// if a namespace prefix is given in the property value use that
 		if ($property && \strpos($property, ":")) {
 			$propertyParts = \explode(":", $property);
 			$namespacePrefix = $propertyParts[0];
@@ -677,7 +677,7 @@ class WebDavHelper {
 
 		$davPath = self::getDavPath($davPathVersionToUse, $suffixPath, $type);
 
-		//replace %, # and ? and in the path, Guzzle will not encode them
+		// replace %, # and ? and in the path, Guzzle will not encode them
 		$urlSpecialChar = [['%', '#', '?'], ['%25', '%23', '%3F']];
 		$path = \str_replace($urlSpecialChar[0], $urlSpecialChar[1], $path);
 
@@ -710,7 +710,7 @@ class WebDavHelper {
 
 		if ($headers !== null) {
 			foreach ($headers as $key => $value) {
-				//? and # need to be encoded in the Destination URL
+				// ? and # need to be encoded in the Destination URL
 				if ($key === "Destination") {
 					$headers[$key] = \str_replace(
 						$urlSpecialChar[0],

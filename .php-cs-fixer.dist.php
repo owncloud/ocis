@@ -29,6 +29,9 @@ $config->setFinder($finder)
                 'method_chaining_indentation' => true,
                 'trailing_comma_in_multiline' => true,
                 'no_useless_else' => true,
+                'single_line_comment_spacing' => true,
+                'no_trailing_whitespace_in_comment' => true,
+                'no_empty_comment' => true,
             ]
         )
     );

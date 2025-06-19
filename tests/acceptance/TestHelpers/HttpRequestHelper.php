@@ -175,7 +175,7 @@ class HttpRequestHelper {
 		} catch (RequestException $ex) {
 			$response = $ex->getResponse();
 
-			//if the response was null for some reason do not return it but re-throw
+			// if the response was null for some reason do not return it but re-throw
 			if ($response === null) {
 				throw $ex;
 			}

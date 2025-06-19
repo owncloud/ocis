@@ -1040,7 +1040,7 @@ trait Sharing {
 		Assert::assertIsObject($data, __METHOD__ . " data not found in response XML");
 
 		$dateFieldsArrayToConvert = ['original_date', 'new_date'];
-		//do not try to convert empty date
+		// do not try to convert empty date
 		if ((string) \in_array($field, \array_merge($dateFieldsArrayToConvert)) && !empty($contentExpected)) {
 			$timestamp = \strtotime($contentExpected, $this->getServerShareTimeFromLastResponse());
 			// strtotime returns false if it failed to parse, just leave it as it is in that condition
@@ -2755,7 +2755,7 @@ trait Sharing {
 	public function checkPublicSharesAreEmpty(string $user, string $path): void {
 		$user = $this->getActualUsername($user);
 		$response = $this->getShares($user, $path);
-		//It shouldn't have public shares
+		// It shouldn't have public shares
 		Assert::assertEquals(
 			0,
 			\count($response),
@@ -3166,8 +3166,8 @@ trait Sharing {
 		$usersShares = $this->getAllSharesSharedWithUser($user, $state);
 		foreach ($table as $row) {
 			$found = false;
-			//the API returns the path without trailing slash, but we want to
-			//be able to accept leading and/or trailing slashes in the step definition
+			// the API returns the path without trailing slash, but we want to
+			// be able to accept leading and/or trailing slashes in the step definition
 			$row['path'] = "/" . \trim($row['path'], "/");
 			foreach ($usersShares as $share) {
 				try {

@@ -164,7 +164,7 @@ trait Provisioning {
 			);
 		}
 
-		//make sure the function always returns a string
+		// make sure the function always returns a string
 		return (string) $password;
 	}
 
@@ -270,7 +270,7 @@ trait Provisioning {
 	public function importLdifData(string $ldifData): void {
 		$items = Laminas\Ldap\Ldif\Encoder::decode($ldifData);
 		if (isset($items['dn'])) {
-			//only one item in the ldif data
+			// only one item in the ldif data
 			$this->ldap->add($items['dn'], $items);
 		} else {
 			foreach ($items as $item) {
@@ -401,7 +401,7 @@ trait Provisioning {
 		$userId = \str_replace('+', '\+', $setting["userid"]);
 		$newDN = 'uid=' . $userId . ',ou=' . $ou . ',' . $this->ldapBaseDN;
 
-		//pick a high uid number to make sure there are no conflicts with existing uid numbers
+		// pick a high uid number to make sure there are no conflicts with existing uid numbers
 		$uidNumber = \count($this->ldapCreatedUsers) + 30000;
 		$entry = [];
 		$entry['cn'] = $userId;
@@ -511,12 +511,12 @@ trait Provisioning {
 			$this->rememberThatGroupIsNotExpectedToExist($group);
 		}
 		if (!$this->skipImportLdif) {
-			//delete all created ldap users
+			// delete all created ldap users
 			$this->ldap->delete(
 				"ou=" . $this->ldapUsersOU . "," . $this->ldapBaseDN,
 				true
 			);
-			//delete all created ldap groups
+			// delete all created ldap groups
 			$this->ldap->delete(
 				"ou=" . $this->ldapGroupsOU . "," . $this->ldapBaseDN,
 				true
@@ -1507,12 +1507,10 @@ trait Provisioning {
 	 * @throws Exception
 	 */
 	public function createTheGroup(string $group, ?string $method = null): void {
-		//guess yourself
 		if ($method === null) {
+			$method = "graph";
 			if ($this->isTestingWithLdap()) {
 				$method = "ldap";
-			} else {
-				$method = "graph";
 			}
 		}
 		$group = \trim($group);

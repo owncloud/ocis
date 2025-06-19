@@ -3428,7 +3428,7 @@ trait WebDav {
 		foreach ($table->getColumnsHash() as $header) {
 			$headerName = $header['header'];
 			$headerValue = $this->response->getHeader($headerName);
-			//Note: getHeader returns an empty array if the named header does not exist
+			// Note: getHeader returns an empty array if the named header does not exist
 			$headerValue0 = $headerValue[0] ?? '';
 			Assert::assertEmpty(
 				$headerValue,
@@ -3560,7 +3560,7 @@ trait WebDav {
 		);
 		$elementList = $responseXmlObject->xpath("//d:response/d:href");
 		if (\is_array($elementList) && \count($elementList)) {
-			\array_shift($elementList); //don't delete the folder itself
+			\array_shift($elementList); // don't delete the folder itself
 			$davPrefix = "/" . $this->getFullDavFilesPath($user);
 			foreach ($elementList as $element) {
 				$element = \substr((string)$element, \strlen($davPrefix));
