@@ -154,7 +154,7 @@ func StartOcisHandler(res http.ResponseWriter, req *http.Request) {
 	}
 
 	common.Wg.Add(1)
-	go ocis.Start(nil)
+	go ocis.Start(ocis.ServiceEnvConfigs[ocis.OcisServiceName])
 
 	success, message := ocis.WaitForConnection()
 	if success {
