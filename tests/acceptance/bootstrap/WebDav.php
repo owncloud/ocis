@@ -393,7 +393,7 @@ trait WebDav {
 		$urlParameter = [
 			'x' => $width,
 			'y' => $height,
-			'preview' => '1'
+			'preview' => '1',
 		];
 		return $this->makeDavRequest(
 			$user,
@@ -3623,7 +3623,7 @@ trait WebDav {
 		$urlParameter = [
 			'x' => $width,
 			'y' => $height,
-			'preview' => '0'
+			'preview' => '0',
 		];
 		$response = $this->makeDavRequest(
 			$user,
@@ -3687,7 +3687,7 @@ trait WebDav {
 			'x' => $width,
 			'y' => $height,
 			'preview' => '1',
-			'processor' => $processor
+			'processor' => $processor,
 		];
 		$response = $this->makeDavRequest(
 			$user,
@@ -3725,7 +3725,7 @@ trait WebDav {
 		$urlParameter = [
 			'x' => $width,
 			'y' => $height,
-			'preview' => '1'
+			'preview' => '1',
 		];
 		$spaceId = $this->spacesContext->getSharesRemoteItemId($user, $path);
 		$this->setResponse(
@@ -3875,7 +3875,7 @@ trait WebDav {
 				'x' => $width,
 				'y' => $height,
 				'forceIcon' => '0',
-				'preview' => '1'
+				'preview' => '1',
 			];
 			$urlParameter = \http_build_query($urlParameter, '', '&');
 		} else {

@@ -52,7 +52,7 @@ trait Sharing {
 	 */
 	private array $shareFields = [
 		'path', 'name', 'publicUpload', 'password', 'expireDate',
-		'expireDateAsString', 'permissions', 'shareWith', 'shareType'
+		'expireDateAsString', 'permissions', 'shareWith', 'shareType',
 	];
 
 	/**
@@ -69,7 +69,7 @@ trait Sharing {
 		'expiration', 'token', 'uid_file_owner', 'displayname_file_owner', 'path',
 		'item_type', 'mimetype', 'storage_id', 'storage', 'item_source',
 		'file_source', 'file_target', 'name', 'url', 'mail_send',
-		'attributes', 'permissions', 'share_with', 'share_with_displayname', 'share_with_additional_info'
+		'attributes', 'permissions', 'share_with', 'share_with_displayname', 'share_with_additional_info',
 	];
 
 	/**
@@ -2392,7 +2392,7 @@ trait Sharing {
 			"displayname_file_owner",
 			"displayname_owner",
 			"additional_info_owner",
-			"additional_info_file_owner"
+			"additional_info_file_owner",
 		];
 		foreach ($bodyRows as $field => $value) {
 			if (\in_array($field, $userRelatedFieldNames)) {
@@ -2431,7 +2431,7 @@ trait Sharing {
 			"displayname_owner",
 			"additional_info_owner",
 			"additional_info_file_owner",
-			"space_id"
+			"space_id",
 		];
 
 		$response = HttpRequestHelper::getResponseXml($this->response, __METHOD__);
@@ -2447,7 +2447,7 @@ trait Sharing {
 							"code" => "%space_id%",
 							"function" =>
 								[$this->spacesContext, "getSpaceIdByName"],
-							"parameter" => [$user, $space]
+							"parameter" => [$user, $space],
 						],
 					],
 					null,
@@ -2505,7 +2505,7 @@ trait Sharing {
 					"uid_owner",
 					"uid_file_owner",
 					"additional_info_owner",
-					"additional_info_file_owner"
+					"additional_info_file_owner",
 				]
 			)
 			) {
@@ -3508,10 +3508,10 @@ trait Sharing {
 				[
 					"scope" => "files_sharing",
 					"key" => "isQuickLink",
-					"value" => true
-				]
+					"value" => true,
+				],
 			],
-			"path" => $path
+			"path" => $path,
 		];
 	}
 

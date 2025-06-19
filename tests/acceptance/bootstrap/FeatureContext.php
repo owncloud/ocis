@@ -1326,7 +1326,7 @@ class FeatureContext extends BehatVariablesContext {
 		$token = $this->shareNgGetLastCreatedLinkShareToken();
 		$fullUrl = $this->getBaseUrl() . $url;
 		$headers = [
-			'Public-Token' => $token
+			'Public-Token' => $token,
 		];
 		$this->setResponse(
 			HttpRequestHelper::sendRequest(
@@ -1464,8 +1464,8 @@ class FeatureContext extends BehatVariablesContext {
 		if ($this->sourceIpAddress !== null) {
 			$config = [
 				'curl' => [
-					CURLOPT_INTERFACE => $this->sourceIpAddress
-				]
+					CURLOPT_INTERFACE => $this->sourceIpAddress,
+				],
 			];
 		}
 
@@ -2018,8 +2018,8 @@ class FeatureContext extends BehatVariablesContext {
 		if ($this->sourceIpAddress !== null) {
 			$config = [
 				'curl' => [
-					CURLOPT_INTERFACE => $this->sourceIpAddress
-				]
+					CURLOPT_INTERFACE => $this->sourceIpAddress,
+				],
 			];
 		}
 
@@ -2158,335 +2158,335 @@ class FeatureContext extends BehatVariablesContext {
 				"code" => "%base_url%",
 				"function" => [
 					$this,
-					"getBaseUrl"
+					"getBaseUrl",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%local_base_url%",
 				"function" => [
 					$this,
-					"getLocalBaseUrl"
+					"getLocalBaseUrl",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%remote_base_url%",
 				"function" => [
 					$this,
-					"getRemoteBaseUrl"
+					"getRemoteBaseUrl",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%base_host_port%",
 				"function" => [
 					$this,
-					"getBaseUrlWithoutScheme"
+					"getBaseUrlWithoutScheme",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%local_host_port%",
 				"function" => [
 					$this,
-					"getLocalBaseUrlWithoutScheme"
+					"getLocalBaseUrlWithoutScheme",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%remote_host_port%",
 				"function" => [
 					$this,
-					"getRemoteBaseUrlWithoutScheme"
+					"getRemoteBaseUrlWithoutScheme",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%storage_path%",
 				"function" => [
 					$this,
-					"getStorageUsersRoot"
+					"getStorageUsersRoot",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%base_url_without_scheme%",
 				"function" => [
 					$this,
-					"getBaseUrlWithoutScheme"
+					"getBaseUrlWithoutScheme",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%base_url_hostname%",
 				"function" => [
 					$this,
-					"getBaseUrlHostName"
+					"getBaseUrlHostName",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%collaboration_hostname%",
 				"function" => [
 					$this,
-					"getCollaborationHostName"
+					"getCollaborationHostName",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%remote_server%",
 				"function" => [
 					$this,
-					"getRemoteBaseUrl"
+					"getRemoteBaseUrl",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%remote_server_without_scheme%",
 				"function" => [
 					$this,
-					"getRemoteBaseUrlWithoutScheme"
+					"getRemoteBaseUrlWithoutScheme",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%local_server%",
 				"function" => [
 					$this,
-					"getLocalBaseUrl"
+					"getLocalBaseUrl",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%local_server_without_scheme%",
 				"function" => [
 					$this,
-					"getLocalBaseUrlWithoutScheme"
+					"getLocalBaseUrlWithoutScheme",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%base_path%",
 				"function" => [
 					$this,
-					"getBasePath"
+					"getBasePath",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%ocs_path_v1%",
 				"function" => [
 					$this,
-					"getOCSPath"
+					"getOCSPath",
 				],
-				"parameter" => ["1"]
+				"parameter" => ["1"],
 			],
 			[
 				"code" => "%ocs_path_v2%",
 				"function" => [
 					$this,
-					"getOCSPath"
+					"getOCSPath",
 				],
-				"parameter" => ["2"]
+				"parameter" => ["2"],
 			],
 			[
 				"code" => "%productname%",
 				"function" => [
 					$this,
-					"getProductNameFromStatus"
+					"getProductNameFromStatus",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%edition%",
 				"function" => [
 					$this,
-					"getEditionFromStatus"
+					"getEditionFromStatus",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%version%",
 				"function" => [
 					$this,
-					"getVersionFromStatus"
+					"getVersionFromStatus",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%versionstring%",
 				"function" => [
 					$this,
-					"getVersionStringFromStatus"
+					"getVersionStringFromStatus",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%a_comment_url%",
 				"function" => [
 					$this,
-					"getCommentUrlRegExp"
+					"getCommentUrlRegExp",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%last_share_id%",
 				"function" => [
 					$this,
-					"getLastCreatedUserGroupShareId"
+					"getLastCreatedUserGroupShareId",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%last_public_share_token%",
 				"function" => [
 					$this,
-					"getLastCreatedPublicShareToken"
+					"getLastCreatedPublicShareToken",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%user_id%",
 				"function" => [
-					$this, "getUserIdByUserName"
+					$this, "getUserIdByUserName",
 				],
-				"parameter" => [$userName]
+				"parameter" => [$userName],
 			],
 			[
 				"code" => "%group_id%",
 				"function" => [
-					$this, "getGroupIdByGroupName"
+					$this, "getGroupIdByGroupName",
 				],
-				"parameter" => [$group]
+				"parameter" => [$group],
 			],
 			[
 				"code" => "%user_id_pattern%",
 				"function" => [
 					__NAMESPACE__ . '\TestHelpers\GraphHelper',
-					"getUUIDv4Regex"
+					"getUUIDv4Regex",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%federated_user_id_pattern%",
 				"function" => [
 					__NAMESPACE__ . '\TestHelpers\GraphHelper',
-					"getFederatedUserRegex"
+					"getFederatedUserRegex",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%federated_file_id_pattern%",
 				"function" => [
 					__NAMESPACE__ . '\TestHelpers\GraphHelper',
-					"getFederatedFileIdRegex"
+					"getFederatedFileIdRegex",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%group_id_pattern%",
 				"function" => [
 					__NAMESPACE__ . '\TestHelpers\GraphHelper',
-					"getUUIDv4Regex"
+					"getUUIDv4Regex",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%role_id_pattern%",
 				"function" => [
 					__NAMESPACE__ . '\TestHelpers\GraphHelper',
-					"getUUIDv4Regex"
+					"getUUIDv4Regex",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%permissions_id_pattern%",
 				"function" => [
 					__NAMESPACE__ . '\TestHelpers\GraphHelper',
-					"getPermissionsIdRegex"
+					"getPermissionsIdRegex",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%file_id_pattern%",
 				"function" => [
 					__NAMESPACE__ . '\TestHelpers\GraphHelper',
-					"getFileIdRegex"
+					"getFileIdRegex",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%space_id_pattern%",
 				"function" => [
 					__NAMESPACE__ . '\TestHelpers\GraphHelper',
-					"getSpaceIdRegex"
+					"getSpaceIdRegex",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%share_id_pattern%",
 				"function" => [
 					__NAMESPACE__ . '\TestHelpers\GraphHelper',
-					"getShareIdRegex"
+					"getShareIdRegex",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%etag_pattern%",
 				"function" => [
 					__NAMESPACE__ . '\TestHelpers\GraphHelper',
-					"getEtagRegex"
+					"getEtagRegex",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%tus_upload_location%",
 				"function" => [
 					$this->tusContext,
-					"getLastTusResourceLocation"
+					"getLastTusResourceLocation",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%fed_invitation_token%",
 				"function" => [
 					$this->ocmContext,
-					"getLastFederatedInvitationToken"
+					"getLastFederatedInvitationToken",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%identities_issuer_id_pattern%",
 				"function" => [
 					__NAMESPACE__ . '\TestHelpers\GraphHelper',
-					"getFederatedUserRegex"
+					"getFederatedUserRegex",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%uuidv4_pattern%",
 				"function" => [
 					__NAMESPACE__ . '\TestHelpers\GraphHelper',
-					"getUUIDv4Regex"
+					"getUUIDv4Regex",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%request_id_pattern%",
 				"function" => [
 					__NAMESPACE__ . '\TestHelpers\HttpRequestHelper',
-					"getXRequestIdRegex"
+					"getXRequestIdRegex",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%expiry_date_in_mail%",
 				"function" => [
-					$this, "formatExpiryDateTime"
+					$this, "formatExpiryDateTime",
 				],
-				"parameter" =>  ['Y-m-d H:i:s']
-			]
+				"parameter" =>  ['Y-m-d H:i:s'],
+			],
 		];
 		if ($user !== null) {
 			array_push(
@@ -2495,33 +2495,33 @@ class FeatureContext extends BehatVariablesContext {
 					"code" => "%username%",
 					"function" => [
 						$this,
-						"getActualUsername"
+						"getActualUsername",
 					],
-					"parameter" => [$user]
+					"parameter" => [$user],
 				],
 				[
 					"code" => "%displayname%",
 					"function" => [
 						$this,
-						"getDisplayNameForUser"
+						"getDisplayNameForUser",
 					],
-					"parameter" => [$user]
+					"parameter" => [$user],
 				],
 				[
 					"code" => "%password%",
 					"function" => [
 						$this,
-						"getPasswordForUser"
+						"getPasswordForUser",
 					],
-					"parameter" => [$user]
+					"parameter" => [$user],
 				],
 				[
 					"code" => "%emailaddress%",
 					"function" => [
 						$this,
-						"getEmailAddressForUser"
+						"getEmailAddressForUser",
 					],
-					"parameter" => [$user]
+					"parameter" => [$user],
 				],
 				[
 					"code" => "%spaceid%",
@@ -2529,19 +2529,19 @@ class FeatureContext extends BehatVariablesContext {
 						$this,
 						"getPersonalSpaceIdForUser",
 					],
-					"parameter" => [$user, true]
+					"parameter" => [$user, true],
 				],
 				[
 					"code" => "%user_id%",
 					"function" =>
 					[$this, "getUserIdByUserName"],
-					"parameter" => [$userName]
+					"parameter" => [$userName],
 				],
 				[
 					"code" => "%group_id%",
 					"function" =>
 					[$this, "getGroupIdByGroupName"],
-					"parameter" => [$group]
+					"parameter" => [$group],
 				]
 			);
 
@@ -2552,9 +2552,9 @@ class FeatureContext extends BehatVariablesContext {
 						"code" => "%shares_drive_id%",
 						"function" => [
 							$this->spacesContext,
-							"getSpaceIdByName"
+							"getSpaceIdByName",
 						],
-						"parameter" => [$user, "Shares"]
+						"parameter" => [$user, "Shares"],
 					]
 				);
 			}

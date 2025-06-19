@@ -100,7 +100,7 @@ class CliContext implements Context {
 		$command = "idm resetpassword -u $user";
 		$body = [
 			"command" => $command,
-			"inputs" => [$password, $password]
+			"inputs" => [$password, $password],
 		];
 
 		$this->featureContext->setResponse(CliHelper::runCommand($body));
@@ -119,7 +119,7 @@ class CliContext implements Context {
 		$path = $this->featureContext->getStorageUsersRoot();
 		$command = "trash purge-empty-dirs -p $path --dry-run=false";
 		$body = [
-			"command" => $command
+			"command" => $command,
 		];
 		$this->featureContext->setResponse(CliHelper::runCommand($body));
 	}
@@ -133,7 +133,7 @@ class CliContext implements Context {
 		$path = $this->featureContext->getStorageUsersRoot();
 		$command = "backup consistency -p $path";
 		$body = [
-			"command" => $command
+			"command" => $command,
 		];
 		$this->featureContext->setResponse(CliHelper::runCommand($body));
 	}
@@ -154,7 +154,7 @@ class CliContext implements Context {
 		$user = $this->featureContext->getActualUserName($user);
 		$command = "auth-app create --user-name=$user --expiration=$expirationTime";
 		$body = [
-			"command" => $command
+			"command" => $command,
 		];
 		$this->featureContext->setResponse(CliHelper::runCommand($body));
 	}
@@ -174,7 +174,7 @@ class CliContext implements Context {
 		$user = $this->featureContext->getActualUserName($user);
 		$command = "auth-app create --user-name=$user --expiration=$expirationTime";
 		$body = [
-			"command" => $command
+			"command" => $command,
 		];
 		$response = CliHelper::runCommand($body);
 		$this->featureContext->theHTTPStatusCodeShouldBe(200, '', $response);
@@ -204,7 +204,7 @@ class CliContext implements Context {
 		$user = $this->featureContext->getActualUserName($user);
 		$command = "auth-app create --user-name=$user --expiration=$expirationTime";
 		$body = [
-			"command" => $command
+			"command" => $command,
 		];
 
 		$response = CliHelper::runCommand($body);
@@ -227,7 +227,7 @@ class CliContext implements Context {
 		$path = $this->featureContext->getStorageUsersRoot();
 		$command = "revisions purge -p $path --dry-run=false";
 		$body = [
-			"command" => $command
+			"command" => $command,
 		];
 		$this->featureContext->setResponse(CliHelper::runCommand($body));
 	}
@@ -246,7 +246,7 @@ class CliContext implements Context {
 		$fileId = $this->spacesContext->getFileId($user, $space, $file);
 		$command = "revisions purge -p $path -r $fileId --dry-run=false";
 		$body = [
-			"command" => $command
+			"command" => $command,
 		];
 		$this->featureContext->setResponse(CliHelper::runCommand($body));
 	}
@@ -259,7 +259,7 @@ class CliContext implements Context {
 	public function theAdministratorReindexesAllSpacesUsingTheCli(): void {
 		$command = "search index --all-spaces";
 		$body = [
-			"command" => $command
+			"command" => $command,
 		];
 		$this->featureContext->setResponse(CliHelper::runCommand($body));
 	}
@@ -275,7 +275,7 @@ class CliContext implements Context {
 		$spaceId = $this->spacesContext->getSpaceIdByName($this->featureContext->getAdminUsername(), $spaceName);
 		$command = "search index --space $spaceId";
 		$body = [
-			"command" => $command
+			"command" => $command,
 		];
 		$this->featureContext->setResponse(CliHelper::runCommand($body));
 	}
@@ -293,7 +293,7 @@ class CliContext implements Context {
 		$spaceId = $this->spacesContext->getSpaceIdByName($adminUsername, $space);
 		$command = "revisions purge -p $path -r $spaceId --dry-run=false";
 		$body = [
-			"command" => $command
+			"command" => $command,
 		];
 		$this->featureContext->setResponse(CliHelper::runCommand($body));
 	}
@@ -358,7 +358,7 @@ class CliContext implements Context {
 		}
 		$command = "storage-users uploads sessions --json $flag";
 		$body = [
-			"command" => $command
+			"command" => $command,
 		];
 		$this->featureContext->setResponse(CliHelper::runCommand($body));
 	}
@@ -378,7 +378,7 @@ class CliContext implements Context {
 		$flagString = trim($flag);
 		$command = "storage-users uploads sessions $flagString --clean --json";
 		$body = [
-			"command" => $command
+			"command" => $command,
 		];
 		$this->featureContext->setResponse(CliHelper::runCommand($body));
 	}
@@ -391,7 +391,7 @@ class CliContext implements Context {
 	public function theAdministratorRestartsTheUploadSessionsThatAreInPostprocessing(): void {
 		$command = "storage-users uploads sessions --processing --restart --json";
 		$body = [
-			"command" => $command
+			"command" => $command,
 		];
 		$this->featureContext->setResponse(CliHelper::runCommand($body));
 	}
@@ -417,7 +417,7 @@ class CliContext implements Context {
 
 		$command = "storage-users uploads sessions --id=$uploadId --restart --json";
 		$body = [
-			"command" => $command
+			"command" => $command,
 		];
 		$this->featureContext->setResponse(CliHelper::runCommand($body));
 	}
@@ -483,7 +483,7 @@ class CliContext implements Context {
 	public function cleanUploadsSessions(): void {
 		$command = "storage-users uploads sessions --clean";
 		$body = [
-			"command" => $command
+			"command" => $command,
 		];
 		$response = CliHelper::runCommand($body);
 		Assert::assertEquals("200", $response->getStatusCode(), "Failed to clean upload sessions");
@@ -510,7 +510,7 @@ class CliContext implements Context {
 	public function theAdministratorTriggersEmailNotificationsUsingTheCLI(string $interval): void {
 		$command = "notifications send-email --$interval";
 		$body = [
-			"command" => $command
+			"command" => $command,
 		];
 
 		$this->featureContext->setResponse(CliHelper::runCommand($body));
@@ -545,7 +545,7 @@ class CliContext implements Context {
 		}
 
 		$body = [
-			"command" => $command
+			"command" => $command,
 		];
 		return CliHelper::runCommand($body);
 	}
@@ -563,7 +563,7 @@ class CliContext implements Context {
 		}
 
 		$body = [
-			"command" => $command
+			"command" => $command,
 		];
 		return CliHelper::runCommand($body);
 	}
@@ -708,7 +708,7 @@ class CliContext implements Context {
 	 */
 	protected function listTrashedResource(string $spaceId): ResponseInterface {
 		$body = [
-			"command" => "storage-users trash-bin list $spaceId"
+			"command" => "storage-users trash-bin list $spaceId",
 		];
 		return CliHelper::runCommand($body);
 	}
@@ -799,7 +799,7 @@ class CliContext implements Context {
 			$spaceName
 		);
 		$body = [
-			"command" => "storage-users trash-bin restore-all -y $spaceOwnerId"
+			"command" => "storage-users trash-bin restore-all -y $spaceOwnerId",
 		];
 		$this->featureContext->setResponse(CliHelper::runCommand($body));
 	}
@@ -900,7 +900,7 @@ class CliContext implements Context {
 			}
 		}
 		$body = [
-			"command" => "storage-users trash-bin restore $spaceOwnerId $trashItemId"
+			"command" => "storage-users trash-bin restore $spaceOwnerId $trashItemId",
 		];
 		$this->featureContext->setResponse(CliHelper::runCommand($body));
 	}
@@ -913,7 +913,7 @@ class CliContext implements Context {
 	 */
 	public function theAdministratorPurgesTheExpiredTrashResources(): void {
 		$body = [
-			"command" => "storage-users trash-bin purge-expired"
+			"command" => "storage-users trash-bin purge-expired",
 		];
 		$this->featureContext->setResponse(CliHelper::runCommand($body));
 	}
@@ -927,7 +927,7 @@ class CliContext implements Context {
 	public function theAdministratorResumesAllTheUploadSessionsUsingTheCLI(): void {
 		$command = "storage-users uploads sessions --resume --json";
 		$body = [
-			"command" => $command
+			"command" => $command,
 		];
 		$this->featureContext->setResponse(CliHelper::runCommand($body));
 	}

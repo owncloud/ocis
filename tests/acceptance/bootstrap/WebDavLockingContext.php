@@ -701,7 +701,7 @@ class WebDavLockingContext implements Context {
 			);
 		}
 		$headers = [
-			"Lock-Token" => $this->tokenOfLastLock[$lockOwner][$itemToUseLockOf]
+			"Lock-Token" => $this->tokenOfLastLock[$lockOwner][$itemToUseLockOf],
 		];
 		if (isset($fullUrl)) {
 			$response = HttpRequestHelper::sendRequest(
@@ -852,7 +852,7 @@ class WebDavLockingContext implements Context {
 		$token = $this->tokenOfLastLock[$lockOwner][$itemToUseLockOf];
 		$headers = [
 			"Destination" => $destination,
-			"If" => "(<$token>)"
+			"If" => "(<$token>)",
 		];
 		return $this->featureContext->makeDavRequest(
 			$user,

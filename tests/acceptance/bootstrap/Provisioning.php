@@ -324,7 +324,7 @@ trait Provisioning {
 			'bindRequiresDn' => true,
 			'useSsl' => $useSsl,
 			'baseDn' => $this->ldapBaseDN,
-			'username' => $this->ldapAdminUser
+			'username' => $this->ldapAdminUser,
 		];
 		$this->ldap = new Ldap($options);
 		$this->ldap->bind();
@@ -985,7 +985,7 @@ trait Provisioning {
 				"shouldExist" => $shouldExist,
 				"actualUsername" => $user,
 				"id" => $userId,
-				"serverType" => $this->currentServer
+				"serverType" => $this->currentServer,
 			];
 		}
 	}
@@ -1438,7 +1438,7 @@ trait Provisioning {
 	): void {
 		$groupData = [
 			"shouldExist" => $shouldExist,
-			"possibleToDelete" => $possibleToDelete
+			"possibleToDelete" => $possibleToDelete,
 		];
 		if ($id !== null) {
 			$groupData["id"] = $id;

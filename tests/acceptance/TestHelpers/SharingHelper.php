@@ -39,7 +39,7 @@ class SharingHelper {
 		'update' => 2,
 		'create' => 4,
 		'delete' => 8,
-		'invite' => 0
+		'invite' => 0,
 	];
 
 	public const SHARE_TYPES = [

@@ -128,7 +128,7 @@ class TrashbinContext implements Context {
 					'name' => isset($name[0]) ? (string) $name[0] : null,
 					'mtime' => isset($mtime[0]) ? (string) $mtime[0] : null,
 					'collection' => $collection[0] ?? false,
-					'original-location' => isset($originalLocation[0]) ? (string) $originalLocation[0] : null
+					'original-location' => isset($originalLocation[0]) ? (string) $originalLocation[0] : null,
 				];
 			},
 			$xmlElements
@@ -171,7 +171,7 @@ class TrashbinContext implements Context {
 				'oc:trashbin-original-filename',
 				'oc:trashbin-original-location',
 				'oc:trashbin-delete-timestamp',
-				'd:getlastmodified'
+				'd:getlastmodified',
 			],
 			'trash-bin',
 			$davPathVersion
@@ -246,7 +246,7 @@ class TrashbinContext implements Context {
 				'oc:trashbin-original-location',
 				'oc:trashbin-delete-timestamp',
 				'd:resourcetype',
-				'd:getlastmodified'
+				'd:getlastmodified',
 			],
 			'trash-bin',
 			$davPathVersion
@@ -422,7 +422,7 @@ class TrashbinContext implements Context {
 				'oc:trashbin-original-filename',
 				'oc:trashbin-original-location',
 				'oc:trashbin-delete-timestamp',
-				'd:getlastmodified'
+				'd:getlastmodified',
 			],
 			'1',
 			null,

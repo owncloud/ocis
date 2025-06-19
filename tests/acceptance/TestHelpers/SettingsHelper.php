@@ -50,7 +50,7 @@ class SettingsHelper {
 		'Removed As Space Member' => '26c20e0e-98df-4483-8a77-759b3a766af0',
 		'Space Deleted' => '094ceca9-5a00-40ba-bb1a-bbc7bccd39ee',
 		'Space Disabled' => 'eb5c716e-03be-42c6-9ed1-1105d24e109f',
-		'Space Membership Expired' => '7275921e-b737-4074-ba91-3c2983be3edd'
+		'Space Membership Expired' => '7275921e-b737-4074-ba91-3c2983be3edd',
 	];
 
 	/**
@@ -371,7 +371,7 @@ class SettingsHelper {
 		$body = json_encode(
 			[
 				"accountUuid" => "me",
-				"settingId" => $settingId
+				"settingId" => $settingId,
 			],
 			JSON_THROW_ON_ERROR
 		);

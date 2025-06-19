@@ -93,7 +93,7 @@ class SharingNgContext implements Context {
 			"@libre.graph.quickLink" => filter_var($bodyRows['quickLink'], FILTER_VALIDATE_BOOLEAN),
 			'displayName' => $bodyRows['displayName'],
 			'expirationDateTime' => $bodyRows['expirationDateTime'],
-			'password' => $this->featureContext->getActualPassword($bodyRows['password'])
+			'password' => $this->featureContext->getActualPassword($bodyRows['password']),
 		];
 
 		$response = GraphHelper::createLinkShare(
@@ -138,7 +138,7 @@ class SharingNgContext implements Context {
 			"@libre.graph.quickLink" => filter_var($bodyRows['quickLink'], FILTER_VALIDATE_BOOLEAN),
 			'displayName' => $bodyRows['displayName'],
 			'expirationDateTime' => $bodyRows['expirationDateTime'],
-			'password' => $this->featureContext->getActualPassword($bodyRows['password'])
+			'password' => $this->featureContext->getActualPassword($bodyRows['password']),
 		];
 
 		return GraphHelper::createDriveShareLink(
@@ -608,7 +608,7 @@ class SharingNgContext implements Context {
 			$body = [];
 			$body['recipients'][] = [
 				"@libre.graph.recipient.type" => $shareType,
-				"objectId" => $shareeId
+				"objectId" => $shareeId,
 			];
 			$body['roles'] = [$roleId];
 

@@ -239,7 +239,7 @@ class WebDavPropertiesContext implements Context {
 	): void {
 		$user = $this->featureContext->getActualUsername($user);
 		$properties = [
-			$namespace => $propertyName
+			$namespace => $propertyName,
 		];
 		$response = WebDavHelper::propfind(
 			$this->featureContext->getBaseUrl(),
@@ -1013,7 +1013,7 @@ class WebDavPropertiesContext implements Context {
 					"code" => "%public_token%",
 					"function" =>
 					[$this->featureContext, $callback],
-					"parameter" => []
+					"parameter" => [],
 				],
 			]
 		);

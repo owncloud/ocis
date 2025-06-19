@@ -72,7 +72,7 @@ class OcmHelper {
 	): ResponseInterface {
 		$body = [
 			"description" => $description,
-			"recipient" => $email
+			"recipient" => $email,
 		];
 		$url = self::getFullUrl($baseUrl, 'generate-invite');
 		return HttpRequestHelper::post(
@@ -103,7 +103,7 @@ class OcmHelper {
 	): ResponseInterface {
 		$body = [
 			"token" => $token,
-			"providerDomain" => $providerDomain
+			"providerDomain" => $providerDomain,
 		];
 		$url = self::getFullUrl($baseUrl, 'accept-invite');
 		return HttpRequestHelper::post(
@@ -179,7 +179,7 @@ class OcmHelper {
 		$url = self::getFullUrl($baseUrl, 'delete-accepted-user');
 		$body = [
 			"idp" => $idp,
-			"user_id" => $userId
+			"user_id" => $userId,
 		];
 		return HttpRequestHelper::delete(
 			$url,

@@ -571,7 +571,7 @@ class FilesVersionsContext implements Context {
 	): ResponseInterface {
 		if (!$properties) {
 			$properties = [
-				'd:getetag'
+				'd:getetag',
 			];
 		}
 		$user = $this->featureContext->getActualUsername($user);

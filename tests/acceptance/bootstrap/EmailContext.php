@@ -86,7 +86,7 @@ class EmailContext implements Context {
 					"code" => "%space_id%",
 					"function" =>
 						[$this->spacesContext, "getSpaceIdByName"],
-					"parameter" => [$sender, $spaceName]
+					"parameter" => [$sender, $spaceName],
 				],
 			]
 		);

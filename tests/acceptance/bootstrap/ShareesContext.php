@@ -179,7 +179,7 @@ class ShareesContext implements Context {
 						$innerItem['label'],
 						$innerItem['value']['shareType'],
 						$innerItem['value']['shareWith'],
-						$innerItem['value']['shareWithAdditionalInfo']
+						$innerItem['value']['shareWithAdditionalInfo'],
 					];
 				}
 			} else {
@@ -187,7 +187,7 @@ class ShareesContext implements Context {
 					$element['label'],
 					$element['value']['shareType'],
 					$element['value']['shareWith'],
-					$element['value']['shareWithAdditionalInfo']
+					$element['value']['shareWithAdditionalInfo'],
 				];
 			}
 		}

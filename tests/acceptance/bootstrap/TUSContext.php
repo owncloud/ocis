@@ -200,7 +200,7 @@ class TUSContext implements Context {
 			'Content-Type' => 'application/offset+octet-stream',
 			'Tus-Resumable' => '1.0.0',
 			'Upload-Checksum' => $checksum,
-			'Upload-Offset' => $offset
+			'Upload-Offset' => $offset,
 		];
 		$headers = empty($extraHeaders) ? $headers : array_merge($headers, $extraHeaders);
 
@@ -301,18 +301,18 @@ class TUSContext implements Context {
 		$user = $this->featureContext->getActualUsername($user);
 		$password = $this->featureContext->getUserPassword($user);
 		$headers = [
-			'Authorization' => 'Basic ' . \base64_encode($user . ':' . $password)
+			'Authorization' => 'Basic ' . \base64_encode($user . ':' . $password),
 		];
 		if ($bytes !== null) {
 			$creationWithUploadHeader = [
 				'Content-Type' => 'application/offset+octet-stream',
-				'Tus-Resumable' => '1.0.0'
+				'Tus-Resumable' => '1.0.0',
 			];
 			$headers = \array_merge($headers, $creationWithUploadHeader);
 		}
 		if ($checksum != '') {
 			$checksumHeader = [
-				'Upload-Checksum' => $checksum
+				'Upload-Checksum' => $checksum,
 			];
 			$headers = \array_merge($headers, $checksumHeader);
 		}

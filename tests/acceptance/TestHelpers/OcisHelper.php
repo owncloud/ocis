@@ -51,7 +51,7 @@ class OcisHelper {
 		StorageDriver::EOS,
 		StorageDriver::OWNCLOUD,
 		StorageDriver::S3NG,
-		StorageDriver::POSIX
+		StorageDriver::POSIX,
 	];
 
 	/**

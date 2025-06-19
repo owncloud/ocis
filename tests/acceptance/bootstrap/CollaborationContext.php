@@ -175,7 +175,7 @@ class CollaborationContext implements Context {
 		$parentContainerId = (string) $xmlPart[0];
 
 		$headers = [
-			"Public-Token" => $token
+			"Public-Token" => $token,
 		];
 		$this->featureContext->setResponse(
 			CollaborationHelper::createFile(

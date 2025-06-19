@@ -159,7 +159,7 @@ class OcisConfigContext implements Context {
 		$path = \dirname(__FILE__) . "/../../" . $path;
 		$response =  OcisConfigHelper::reConfigureOcis(
 			[
-				$configVariable => $path
+				$configVariable => $path,
 			]
 		);
 		Assert::assertEquals(

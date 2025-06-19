@@ -293,7 +293,7 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 			"/apps/testing/api/v1/file",
 			[
 				'file' => $filePathFromServerRoot,
-				'content' => $content
+				'content' => $content,
 			]
 		);
 
@@ -331,7 +331,7 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 			"DELETE",
 			"/apps/testing/api/v1/file",
 			[
-				'file' => $filePathFromServerRoot
+				'file' => $filePathFromServerRoot,
 			]
 		);
 

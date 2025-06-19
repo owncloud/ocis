@@ -48,7 +48,7 @@ class GraphHelper {
 		'File Editor With Versions' => 'b173329d-cf2e-42f0-a595-ee410645d840',
 		'Viewer With ListGrants' => 'd5041006-ebb3-4b4a-b6a4-7c180ecfb17d',
 		'Editor With ListGrants' => 'e8ea8b21-abd4-45d2-b893-8d1546378e9e',
-		'File Editor With ListGrants' => 'c1235aea-d106-42db-8458-7d5610fb0a67'
+		'File Editor With ListGrants' => 'c1235aea-d106-42db-8458-7d5610fb0a67',
 	];
 
 	public const SHARING_LINK_TYPE_MAPPINGS = [
@@ -752,7 +752,7 @@ class GraphHelper {
 	): ResponseInterface {
 		$url = self::getFullUrl($baseUrl, 'groups/' . $groupId . '/members/$ref');
 		$body = [
-			"@odata.id" => self::getFullUrl($baseUrl, 'users/' . $userId)
+			"@odata.id" => self::getFullUrl($baseUrl, 'users/' . $userId),
 		];
 		return HttpRequestHelper::post(
 			$url,
@@ -1691,7 +1691,7 @@ class GraphHelper {
 			$shareType = $shareTypes[$index];
 			$body['recipients'][] = [
 				"@libre.graph.recipient.type" => $shareType,
-				"objectId" => $shareeId
+				"objectId" => $shareeId,
 			];
 		}
 
@@ -2022,8 +2022,8 @@ class GraphHelper {
 	): ResponseInterface {
 		$body = [
 			"remoteItem" => [
-				"id" => $itemId
-			]
+				"id" => $itemId,
+			],
 		];
 		$url = self::getBetaFullUrl($baseUrl, "drives/$shareSpaceId/root/children");
 		return HttpRequestHelper::post(

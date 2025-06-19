@@ -544,8 +544,8 @@ class SpacesContext implements Context {
 				"id" => GraphHelper::SHARES_SPACE_ID,
 				// let 'name' be empty, it is used to update the shares space later on
 				"name" => "",
-				"serverType" => $this->featureContext->getCurrentServer()
-			]
+				"serverType" => $this->featureContext->getCurrentServer(),
+			],
 		];
 	}
 
@@ -1041,26 +1041,26 @@ class SpacesContext implements Context {
 					"code" => "%space_id%",
 					"function" =>
 						[$this, "getSpaceIdByNameFromResponse"],
-					"parameter" => [$spaceName]
+					"parameter" => [$spaceName],
 				],
 				[
 					"code" => "%file_id%",
 					"function" =>
 						[$this, "getFileId"],
-					"parameter" => [$userName, $spaceName, $fileName]
+					"parameter" => [$userName, $spaceName, $fileName],
 				],
 				[
 					"code" => "%eTag%",
 					"function" =>
 						[$this, "getETag"],
-					"parameter" => [$userName, $spaceName, $fileName]
+					"parameter" => [$userName, $spaceName, $fileName],
 				],
 				[
 					"code" => "%space_etag%",
 					"function" =>
 						[$this, "getEtagOfASpace"],
-					"parameter" => [$userName, $spaceName]
-				]
+					"parameter" => [$userName, $spaceName],
+				],
 			],
 			null,
 			$userName,
@@ -2543,7 +2543,7 @@ class SpacesContext implements Context {
 			"shareType" => $rows["shareType"],
 			"shareWith" => $rows["shareWith"],
 			"role" => $rows["role"],
-			"expireDate" => $rows["expireDate"]
+			"expireDate" => $rows["expireDate"],
 		];
 
 		$fullUrl = $this->featureContext->getBaseUrl() . $this->ocsApiUrl;
@@ -2604,7 +2604,7 @@ class SpacesContext implements Context {
 			"shareWith" => $rows["shareWith"],
 			"shareType" => $rows["shareType"],
 			"expireDate" => $rows["expireDate"],
-			"role" => $rows["role"]
+			"role" => $rows["role"],
 		];
 
 		// share with custom permission
@@ -2776,7 +2776,7 @@ class SpacesContext implements Context {
 			"permissions" => $rows["permissions"],
 			"password" => $rows["password"],
 			"name" => $rows["name"],
-			"expireDate" => $rows["expireDate"]
+			"expireDate" => $rows["expireDate"],
 		];
 
 		$fullUrl = $this->featureContext->getBaseUrl() . $this->ocsApiUrl;
@@ -3472,7 +3472,7 @@ class SpacesContext implements Context {
 			'a' => '1',
 			'c' => $eTag,
 			'x' => $width,
-			'y' => $height
+			'y' => $height,
 		];
 		$urlParameters = \http_build_query($urlParameters, '', '&');
 		$space = $this->getSpaceByName($user, $spaceName);
@@ -3801,7 +3801,7 @@ class SpacesContext implements Context {
 			"permissions" => $rows["permissions"],
 			"password" => $rows["password"],
 			"name" => $rows["name"],
-			"expireDate" => $rows["expireDate"]
+			"expireDate" => $rows["expireDate"],
 		];
 
 		$fullUrl = $this->featureContext->getBaseUrl() . $this->ocsApiUrl;
@@ -4286,7 +4286,7 @@ class SpacesContext implements Context {
 			'oc:privatelink',
 			'd:getcontenttype',
 			'd:lockdiscovery',
-			'd:activelock'
+			'd:activelock',
 		];
 
 		$davPathVersion = $this->featureContext->getDavPathVersion();
@@ -4489,7 +4489,7 @@ class SpacesContext implements Context {
 						"code" => $match,
 						"function" =>
 							[$this, "getXpathSiblingValue"],
-						"parameter" => [$responseXmlObject, $siblingXpath, $siblingToFind]
+						"parameter" => [$responseXmlObject, $siblingXpath, $siblingToFind],
 					];
 				}
 			}

@@ -139,7 +139,7 @@ class PublicWebDavContext implements Context {
 			$password
 		);
 		$headers = [
-			'X-Requested-With' => 'XMLHttpRequest'
+			'X-Requested-With' => 'XMLHttpRequest',
 		];
 		return HttpRequestHelper::delete(
 			$fullUrl,
@@ -212,7 +212,7 @@ class PublicWebDavContext implements Context {
 		);
 		$headers = [
 			'X-Requested-With' => 'XMLHttpRequest',
-			'Destination' => $destination
+			'Destination' => $destination,
 		];
 		return HttpRequestHelper::sendRequest(
 			$fullUrl,
@@ -326,7 +326,7 @@ class PublicWebDavContext implements Context {
 		);
 
 		$headers = [
-			'X-Requested-With' => 'XMLHttpRequest'
+			'X-Requested-With' => 'XMLHttpRequest',
 		];
 		if ($range !== "") {
 			$headers['Range'] = $range;

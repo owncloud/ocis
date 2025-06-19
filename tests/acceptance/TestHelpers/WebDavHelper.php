@@ -455,7 +455,7 @@ class WebDavHelper {
 	): ResponseInterface {
 		if (!$properties) {
 			$properties = [
-				'd:getetag', 'd:resourcetype'
+				'd:getetag', 'd:resourcetype',
 			];
 		}
 		return self::propfind(

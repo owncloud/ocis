@@ -1493,7 +1493,7 @@ class GraphContext implements Context {
 		$credentials = $this->getAdminOrUserCredentials($adminUser);
 
 		$body = [
-			"@odata.id" => GraphHelper::getFullUrl('https://invalid/', 'users/' . $userId)
+			"@odata.id" => GraphHelper::getFullUrl('https://invalid/', 'users/' . $userId),
 		];
 
 		$this->featureContext->setResponse(
@@ -2055,7 +2055,7 @@ class GraphContext implements Context {
 
 		$payload = [
 			"members@odata.bind" => [
-				GraphHelper::getFullUrl($this->featureContext->getBaseUrl(), 'groups/' . $groupIdToAdd)]
+				GraphHelper::getFullUrl($this->featureContext->getBaseUrl(), 'groups/' . $groupIdToAdd)],
 		];
 
 		$this->featureContext->setResponse(
@@ -2091,7 +2091,7 @@ class GraphContext implements Context {
 		$credentials = $this->getAdminOrUserCredentials($user);
 
 		$payload = [
-			"@odata.id" => GraphHelper::getFullUrl($this->featureContext->getBaseUrl(), 'groups/' . $groupIdToAdd)
+			"@odata.id" => GraphHelper::getFullUrl($this->featureContext->getBaseUrl(), 'groups/' . $groupIdToAdd),
 		];
 
 		$this->featureContext->setResponse(

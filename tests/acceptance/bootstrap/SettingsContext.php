@@ -421,15 +421,15 @@ class SettingsContext implements Context {
 					"listValue" => [
 						"values" => [
 							[
-								"stringValue" => $language
-							]
-						]
+								"stringValue" => $language,
+							],
+						],
 					],
 					"resource" => [
-						"type" => "TYPE_USER"
+						"type" => "TYPE_USER",
 					],
-					"settingId" => $settingId
-				]
+					"settingId" => $settingId,
+				],
 			],
 			JSON_THROW_ON_ERROR
 		);
@@ -494,10 +494,10 @@ class SettingsContext implements Context {
 					"bundleId" => SettingsHelper::getBundleId(),
 					"settingId" => SettingsHelper::getSettingIdUsingEventName("Auto Accept Shares"),
 					"resource" => [
-						"type" => "TYPE_USER"
+						"type" => "TYPE_USER",
 					],
-					"boolValue" => $status
-				]
+					"boolValue" => $status,
+				],
 			],
 			JSON_THROW_ON_ERROR
 		);
@@ -563,10 +563,10 @@ class SettingsContext implements Context {
 				"bundleId" => SettingsHelper::getBundleId(),
 				"settingId" => SettingsHelper::getSettingIdUsingEventName("Disable Email Notifications"),
 				"resource" => [
-					"type" => "TYPE_USER"
+					"type" => "TYPE_USER",
 				],
-				"boolValue" => true
-			]
+				"boolValue" => true,
+			],
 		];
 		$response = SettingsHelper::updateSettings(
 			$this->featureContext->getBaseUrl(),
@@ -598,9 +598,9 @@ class SettingsContext implements Context {
 				"bundleId" => SettingsHelper::getBundleId(),
 				"settingId" => SettingsHelper::getSettingIdUsingEventName($event['event']),
 				"resource" => [
-					"type" => "TYPE_USER"
-				]
-			]
+					"type" => "TYPE_USER",
+				],
+			],
 		];
 		$notificationTypes = explode(',', $event['notificationTypes']);
 
@@ -608,12 +608,12 @@ class SettingsContext implements Context {
 			if ($type === "mail") {
 				$body["value"]["collectionValue"]["values"][] = [
 					"key" => "mail",
-					"boolValue" => $enableOrDisable === "enables"
+					"boolValue" => $enableOrDisable === "enables",
 				];
 			} elseif ($type === "in-app") {
 				$body["value"]["collectionValue"]["values"][] = [
 					"key" => "in-app",
-					"boolValue" => $enableOrDisable === "enables"
+					"boolValue" => $enableOrDisable === "enables",
 				];
 			}
 		}
@@ -679,10 +679,10 @@ class SettingsContext implements Context {
 				"bundleId" => SettingsHelper::getBundleId(),
 				"settingId" => SettingsHelper::getSettingIdUsingEventName("Email Sending Interval"),
 				"resource" => [
-					"type" => "TYPE_USER"
+					"type" => "TYPE_USER",
 				],
-				"stringValue" => $interval
-			]
+				"stringValue" => $interval,
+			],
 		];
 		return SettingsHelper::updateSettings(
 			$this->featureContext->getBaseUrl(),
