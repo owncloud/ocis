@@ -172,9 +172,8 @@ trait WebDav {
 		if (\preg_match("/^\"[a-f0-9:.]{1,32}\"$/", $eTag)
 		) {
 			return true;
-		} else {
-			return false;
 		}
+		return false;
 	}
 
 	/**

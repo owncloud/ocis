@@ -230,18 +230,17 @@ class SharingHelper {
 	public static function getShareType($shareType): int {
 		if (\array_key_exists($shareType, self::SHARE_TYPES)) {
 			return self::SHARE_TYPES[$shareType];
-		} else {
-			if (\ctype_digit($shareType)) {
-				$shareType = (int) $shareType;
-			}
-			$key = \array_search($shareType, self::SHARE_TYPES, true);
-			if ($key !== false) {
-				return self::SHARE_TYPES[$key];
-			}
-			throw new InvalidArgumentException(
-				"invalid share type ($shareType)"
-			);
 		}
+		if (\ctype_digit($shareType)) {
+			$shareType = (int) $shareType;
+		}
+		$key = \array_search($shareType, self::SHARE_TYPES, true);
+		if ($key !== false) {
+			return self::SHARE_TYPES[$key];
+		}
+		throw new InvalidArgumentException(
+			"invalid share type ($shareType)"
+		);
 	}
 
 	/**

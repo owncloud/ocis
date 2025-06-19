@@ -4593,9 +4593,8 @@ class SpacesContext implements Context {
 			if ($value->name === "$resource") {
 				$driveItemId = $value->id;
 				break;
-			} else {
-				throw new Error("Response didn't contain a share $resource");
 			}
+			throw new Error("Response didn't contain a share $resource");
 		}
 		Assert::assertEquals($fileId, $driveItemId, "File-id '$fileId' doesn't match driveItemId '$driveItemId'");
 	}

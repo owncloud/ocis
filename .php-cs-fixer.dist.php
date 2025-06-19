@@ -28,6 +28,7 @@ $config->setFinder($finder)
                 'array_indentation' => true,
                 'method_chaining_indentation' => true,
                 'trailing_comma_in_multiline' => true,
+                'no_useless_else' => true,
             ]
         )
     );

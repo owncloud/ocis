@@ -343,13 +343,12 @@ class TUSContext implements Context {
 			return $client->file($sourceFile, $destination)->createWithUploadRR($client->getKey(), 0);
 		} elseif ($noOfChunks === 1) {
 			return $client->file($sourceFile, $destination)->uploadRR();
-		} else {
-			$bytesPerChunk = (int)\ceil(\filesize($sourceFile) / $noOfChunks);
-			for ($i = 0; $i < $noOfChunks; $i++) {
-				$response = $client->uploadRR($bytesPerChunk);
-			}
-			return $response;
 		}
+		$bytesPerChunk = (int)\ceil(\filesize($sourceFile) / $noOfChunks);
+		for ($i = 0; $i < $noOfChunks; $i++) {
+			$response = $client->uploadRR($bytesPerChunk);
+		}
+		return $response;
 	}
 
 	/**

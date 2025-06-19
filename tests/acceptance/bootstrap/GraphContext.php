@@ -589,9 +589,8 @@ class GraphContext implements Context {
 		if ($response->getStatusCode() === 200) {
 			$jsonResponseBody = $this->featureContext->getJsonDecodedResponse($response);
 			return $jsonResponseBody["value"];
-		} else {
-			$this->throwHttpException($response, "Could not retrieve groups list.");
 		}
+		$this->throwHttpException($response, "Could not retrieve groups list.");
 	}
 
 	/**
@@ -656,9 +655,8 @@ class GraphContext implements Context {
 	public function getArrayOfUsersResponded(ResponseInterface $response): array {
 		if ($response->getStatusCode() === 200) {
 			return $this->featureContext->getJsonDecodedResponse($response);
-		} else {
-			$this->throwHttpException($response, "Could not retrieve group members list.");
 		}
+		$this->throwHttpException($response, "Could not retrieve group members list.");
 	}
 
 	/**

@@ -1936,9 +1936,8 @@ class FeatureContext extends BehatVariablesContext {
 			return 'usergrp@example.org';
 		} elseif ($username === 'sharee1') {
 			return 'sharee1@example.org';
-		} else {
-			return null;
 		}
+		return null;
 	}
 
 	/**
@@ -1993,9 +1992,8 @@ class FeatureContext extends BehatVariablesContext {
 			return $this->publicLinkSharePassword;
 		} elseif ($functionalPassword === "%remove%") {
 			return "";
-		} else {
-			return $functionalPassword;
 		}
+		return $functionalPassword;
 	}
 
 	/**
@@ -2904,9 +2902,8 @@ class FeatureContext extends BehatVariablesContext {
 		$data = \json_decode($response->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
 		if (isset($data["id"])) {
 			return $data["id"];
-		} else {
-			throw new Exception(__METHOD__ . " accounts-list is empty");
 		}
+		throw new Exception(__METHOD__ . " accounts-list is empty");
 	}
 
 	/**
@@ -2927,9 +2924,8 @@ class FeatureContext extends BehatVariablesContext {
 		$data = $this->getJsonDecodedResponse($response);
 		if (isset($data["id"])) {
 			return $data["id"];
-		} else {
-			throw new Exception(__METHOD__ . " accounts-list is empty");
 		}
+		throw new Exception(__METHOD__ . " accounts-list is empty");
 	}
 
 	/**

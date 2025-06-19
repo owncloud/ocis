@@ -80,9 +80,8 @@ class ArchiverContext implements Context {
 			return new Zip();
 		} elseif ($type === 'tar') {
 			return new Tar();
-		} else {
-			throw new Exception('Unknown archive type: ' . $type);
 		}
+		throw new Exception('Unknown archive type: ' . $type);
 	}
 
 	/**

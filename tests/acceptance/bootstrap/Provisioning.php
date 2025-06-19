@@ -117,14 +117,12 @@ trait Provisioning {
 		if (\array_key_exists($normalizedUsername, $usersList)) {
 			if (\array_key_exists($attribute, $usersList[$normalizedUsername])) {
 				return $usersList[$normalizedUsername][$attribute];
-			} else {
-				throw new Exception(
-					__METHOD__ . ": User '$user' has no attribute with name '$attribute'."
-				);
 			}
-		} else {
-			return false;
+			throw new Exception(
+				__METHOD__ . ": User '$user' has no attribute with name '$attribute'."
+			);
 		}
+		return false;
 	}
 
 	/**
@@ -139,14 +137,12 @@ trait Provisioning {
 		if (\array_key_exists($group, $groupsList)) {
 			if (\array_key_exists($attribute, $groupsList[$group])) {
 				return $groupsList[$group][$attribute];
-			} else {
-				throw new Exception(
-					__METHOD__ . ": Group '$group' has no attribute with name '$attribute'."
-				);
 			}
-		} else {
-			return false;
+			throw new Exception(
+				__METHOD__ . ": Group '$group' has no attribute with name '$attribute'."
+			);
 		}
+		return false;
 	}
 
 	/**

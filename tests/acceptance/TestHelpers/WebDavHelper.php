@@ -779,24 +779,23 @@ class WebDavHelper {
 				return self::prefixRemotePhp("dav/spaces");
 			}
 			return self::prefixRemotePhp("dav/spaces/$userOrItemIdOrSpaceIdOrToken");
-		} else {
-			if ($type === "trash-bin") {
-				// Since there is no trash bin endpoint for old dav version,
-				// new dav version's endpoint is used here.
-				return self::prefixRemotePhp("dav/trash-bin/$userOrItemIdOrSpaceIdOrToken");
-			}
-			if ($davPathVersion === self::DAV_VERSION_OLD) {
-				return self::prefixRemotePhp("webdav");
-			} elseif ($davPathVersion === self::DAV_VERSION_NEW) {
-				if ($type === "files") {
-					return self::prefixRemotePhp("dav/files/$userOrItemIdOrSpaceIdOrToken");
-				} elseif ($type === "public-files") {
-					return self::prefixRemotePhp("dav/public-files/$userOrItemIdOrSpaceIdOrToken");
-				}
-				return self::prefixRemotePhp("dav");
-			}
-			throw new InvalidArgumentException("Invalid DAV path: $davPathVersion");
 		}
+		if ($type === "trash-bin") {
+			// Since there is no trash bin endpoint for old dav version,
+			// new dav version's endpoint is used here.
+			return self::prefixRemotePhp("dav/trash-bin/$userOrItemIdOrSpaceIdOrToken");
+		}
+		if ($davPathVersion === self::DAV_VERSION_OLD) {
+			return self::prefixRemotePhp("webdav");
+		} elseif ($davPathVersion === self::DAV_VERSION_NEW) {
+			if ($type === "files") {
+				return self::prefixRemotePhp("dav/files/$userOrItemIdOrSpaceIdOrToken");
+			} elseif ($type === "public-files") {
+				return self::prefixRemotePhp("dav/public-files/$userOrItemIdOrSpaceIdOrToken");
+			}
+			return self::prefixRemotePhp("dav");
+		}
+		throw new InvalidArgumentException("Invalid DAV path: $davPathVersion");
 	}
 
 	/**

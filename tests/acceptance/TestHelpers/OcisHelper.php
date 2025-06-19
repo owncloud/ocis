@@ -196,9 +196,8 @@ class OcisHelper {
 		$useSsl = \getenv("REVA_LDAP_USESSL");
 		if ($useSsl === false) {
 			return (self::getLdapPort() === 636);
-		} else {
-			return $useSsl === "true";
 		}
+		return $useSsl === "true";
 	}
 
 	/**

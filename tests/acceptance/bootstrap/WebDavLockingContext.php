@@ -618,9 +618,8 @@ class WebDavLockingContext implements Context {
 		$xmlPart = $responseXmlObject->xpath("//d:response//d:lockdiscovery/d:activelock");
 		if (\is_array($xmlPart)) {
 			return \count($xmlPart);
-		} else {
-			throw new Exception("xmlPart for 'd:activelock' was expected to be array but found: $xmlPart");
 		}
+		throw new Exception("xmlPart for 'd:activelock' was expected to be array but found: $xmlPart");
 	}
 
 	/**
