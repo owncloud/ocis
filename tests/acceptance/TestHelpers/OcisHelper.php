@@ -115,7 +115,7 @@ class OcisHelper {
 		if (!\in_array($storageDriver, self::STORAGE_DRIVERS)) {
 			throw new Exception(
 				"Invalid storage driver. " .
-				"STORAGE_DRIVER must be '" . \join(", ", self::STORAGE_DRIVERS) . "'"
+				"STORAGE_DRIVER must be '" . \join(", ", self::STORAGE_DRIVERS) . "'",
 			);
 		}
 		return $storageDriver;
@@ -148,7 +148,7 @@ class OcisHelper {
 				$deleteCmd = \str_replace(
 					"%s",
 					$user[0] . '/' . $user,
-					$deleteCmd
+					$deleteCmd,
 				);
 			} else {
 				$deleteCmd = \sprintf($deleteCmd, $user);
@@ -308,7 +308,7 @@ class OcisHelper {
 		HttpRequestHelper::get(
 			$baseUrl . "/ocs/v2.php/apps/notifications/api/v1/notifications",
 			$user,
-			$password
+			$password,
 		);
 	}
 }

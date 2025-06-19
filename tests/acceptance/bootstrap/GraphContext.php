@@ -84,7 +84,7 @@ class GraphContext implements Context {
 	public function theUserChangesTheDisplayNameOfUserToUsingTheGraphApi(
 		string $byUser,
 		string $user,
-		string $displayName
+		string $displayName,
 	): void {
 		$response = $this->editUserUsingTheGraphApi($byUser, $user, null, null, null, $displayName);
 		$this->featureContext->setResponse($response);
@@ -105,7 +105,7 @@ class GraphContext implements Context {
 	public function theUserChangesTheUserNameOfUserToUsingTheGraphApi(
 		string $byUser,
 		string $user,
-		string $newUsername
+		string $newUsername,
 	): void {
 		$response = $this->editUserUsingTheGraphApi($byUser, $user, $newUsername);
 		$this->featureContext->setResponse($response);
@@ -115,7 +115,7 @@ class GraphContext implements Context {
 			$this->featureContext->rememberThatUserIsNotExpectedToExist($user);
 			$this->featureContext->addUserToCreatedUsersList(
 				$newUsername,
-				$this->featureContext->getUserPassword($user)
+				$this->featureContext->getUserPassword($user),
 			);
 		}
 	}
@@ -183,7 +183,7 @@ class GraphContext implements Context {
 		$responseBody = $this->featureContext->getJsonDecodedResponseBodyContent($response);
 		$this->featureContext->assertJsonDocumentMatchesSchema(
 			$responseBody,
-			$this->featureContext->getJSONSchema($schemaString)
+			$this->featureContext->getJSONSchema($schemaString),
 		);
 	}
 
@@ -210,7 +210,7 @@ class GraphContext implements Context {
 		string $email = null,
 		string $displayName = null,
 		bool $accountEnabled = true,
-		string $method = "PATCH"
+		string $method = "PATCH",
 	): ResponseInterface {
 		$user = $this->featureContext->getActualUsername($user);
 		$userId = $this->featureContext->getAttributeOfCreatedUser($user, 'id') ?: $user;
@@ -224,7 +224,7 @@ class GraphContext implements Context {
 			$password,
 			$email,
 			$displayName,
-			$accountEnabled
+			$accountEnabled,
 		);
 	}
 
@@ -243,7 +243,7 @@ class GraphContext implements Context {
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getAdminUsername(),
 			$this->featureContext->getAdminPassword(),
-			$userId
+			$userId,
 		);
 	}
 
@@ -256,7 +256,7 @@ class GraphContext implements Context {
 	 */
 	public function deleteGroupWithId(
 		string $groupId,
-		?string $user = null
+		?string $user = null,
 	): ResponseInterface {
 		$credentials = $this->getAdminOrUserCredentials($user);
 
@@ -264,7 +264,7 @@ class GraphContext implements Context {
 			$this->featureContext->getBaseUrl(),
 			$credentials["username"],
 			$credentials["password"],
-			$groupId
+			$groupId,
 		);
 	}
 
@@ -276,7 +276,7 @@ class GraphContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function deleteGroupWithName(
-		string $group
+		string $group,
 	): ResponseInterface {
 		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
 		return $this->deleteGroupWithId($groupId);
@@ -297,7 +297,7 @@ class GraphContext implements Context {
 			$this->featureContext->getBaseUrl(),
 			$credentials["username"],
 			$credentials["password"],
-			$user
+			$user,
 		);
 		if ($response->getStatusCode() === 204) {
 			$this->featureContext->rememberThatUserIsNotExpectedToExist($user);
@@ -348,7 +348,7 @@ class GraphContext implements Context {
 			$this->featureContext->getBaseUrl(),
 			$credentials["username"],
 			$credentials["password"],
-			$userId
+			$userId,
 		);
 		if ($response->getStatusCode() === 204) {
 			$this->featureContext->rememberThatUserIsNotExpectedToExist($user);
@@ -474,7 +474,7 @@ class GraphContext implements Context {
 	public function adminChangesPasswordOfUserToUsingTheGraphApi(
 		string $user,
 		string $password,
-		?string $byUser = null
+		?string $byUser = null,
 	): ResponseInterface {
 		$credentials = $this->getAdminOrUserCredentials($byUser);
 		$user = $this->featureContext->getActualUsername($user);
@@ -486,7 +486,7 @@ class GraphContext implements Context {
 			$userId,
 			"PATCH",
 			$user,
-			$password
+			$password,
 		);
 	}
 
@@ -503,7 +503,7 @@ class GraphContext implements Context {
 	public function theUserResetsThePasswordOfUserToUsingTheGraphApi(
 		string $byUser,
 		string $user,
-		string $password
+		string $password,
 	): void {
 		$response = $this->adminChangesPasswordOfUserToUsingTheGraphApi($user, $password, $byUser);
 		$this->featureContext->setResponse($response);
@@ -577,7 +577,7 @@ class GraphContext implements Context {
 		return GraphHelper::getGroups(
 			$this->featureContext->getBaseUrl(),
 			$credentials["username"],
-			$credentials["password"]
+			$credentials["password"],
 		);
 	}
 
@@ -622,7 +622,7 @@ class GraphContext implements Context {
 			$this->featureContext->getBaseUrl(),
 			$credentials["username"],
 			$credentials["password"],
-			$this->featureContext->getAttributeOfCreatedGroup($group, 'id')
+			$this->featureContext->getAttributeOfCreatedGroup($group, 'id'),
 		);
 	}
 
@@ -636,7 +636,7 @@ class GraphContext implements Context {
 	 */
 	public function listSingleOrAllGroupsAlongWithAllMemberInformation(
 		string $user,
-		?string $group = null
+		?string $group = null,
 	): ResponseInterface {
 		$credentials = $this->getAdminOrUserCredentials($user);
 
@@ -644,7 +644,7 @@ class GraphContext implements Context {
 			$this->featureContext->getBaseUrl(),
 			$credentials["username"],
 			$credentials["password"],
-			($group) ? $this->featureContext->getAttributeOfCreatedGroup($group, 'id') : null
+			($group) ? $this->featureContext->getAttributeOfCreatedGroup($group, 'id') : null,
 		);
 	}
 
@@ -694,7 +694,7 @@ class GraphContext implements Context {
 			$rows["userName"],
 			$rows["password"],
 			$rows["email"],
-			$rows["displayName"]
+			$rows["displayName"],
 		);
 		$this->featureContext->setResponse($response);
 
@@ -706,7 +706,7 @@ class GraphContext implements Context {
 				$rows["userName"],
 				$rows["password"],
 				$rows["displayName"],
-				$rows["email"]
+				$rows["email"],
 			);
 		}
 	}
@@ -739,7 +739,7 @@ class GraphContext implements Context {
 			$credentials['username'],
 			$credentials['password'],
 			$userId,
-			$groupId
+			$groupId,
 		);
 	}
 
@@ -755,7 +755,7 @@ class GraphContext implements Context {
 	 */
 	public function adminHasAddedUserToGroupUsingTheGraphApi(
 		string $user,
-		string $group
+		string $group,
 	): void {
 		$response = $this->addUserToGroup($group, $user);
 		$this->featureContext->theHTTPStatusCodeShouldBe(204, '', $response);
@@ -789,7 +789,7 @@ class GraphContext implements Context {
 	 */
 	public function theAdministratorTriesToAddNonExistentUserToGroupUsingTheGraphAPI(
 		string $group,
-		?string $byUser = null
+		?string $byUser = null,
 	): void {
 		$this->featureContext->setResponse($this->addUserToGroup($group, "nonexistent", $byUser));
 	}
@@ -807,7 +807,7 @@ class GraphContext implements Context {
 	 */
 	public function theAdministratorTriesToAddUserToNonExistentGroupUsingTheGraphAPI(
 		string $user,
-		?string $byUser = null
+		?string $byUser = null,
 	): void {
 		$this->featureContext->setResponse($this->addUserToGroup("nonexistent", $user, $byUser));
 	}
@@ -836,7 +836,7 @@ class GraphContext implements Context {
 	public function theUserTriesToAddAnotherUserToGroupUsingTheGraphAPI(
 		string $byUser,
 		string $user,
-		string $group
+		string $group,
 	): void {
 		$this->featureContext->setResponse($this->addUserToGroup($group, $user, $byUser));
 	}
@@ -920,14 +920,14 @@ class GraphContext implements Context {
 				. "\n$errorMsg"
 				. "\nHTTP status code: " . $response->getStatusCode()
 				. "\nError code: " . $jsonBody["error"]["code"]
-				. "\nMessage: " . $jsonBody["error"]["message"]
+				. "\nMessage: " . $jsonBody["error"]["message"],
 			);
 		} catch (TypeError $e) {
 			throw new Exception(
 				__METHOD__
 				. "\n$errorMsg"
 				. "\nHTTP status code: " . $response->getStatusCode()
-				. "\nResponse body: " . $response->getBody()
+				. "\nResponse body: " . $response->getBody(),
 			);
 		}
 	}
@@ -959,7 +959,7 @@ class GraphContext implements Context {
 				throw new Exception(
 					__METHOD__
 					. "\nGroup '$groupName' is expected " . ($should ? "" : "not ")
-					. "to exist, but it does" . ($should ? " not" : "") . " exist."
+					. "to exist, but it does" . ($should ? " not" : "") . " exist.",
 				);
 			}
 		}
@@ -982,7 +982,7 @@ class GraphContext implements Context {
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$currentPassword,
-			$newPassword
+			$newPassword,
 		);
 		$this->featureContext->setResponse($response);
 	}
@@ -1069,7 +1069,7 @@ class GraphContext implements Context {
 				$exists,
 				__METHOD__
 				. "\nExpected user '" . $userGroup['username'] . "' to be in group '"
-				. $userGroup['groupname'] . "'. But not found."
+				. $userGroup['groupname'] . "'. But not found.",
 			);
 		}
 	}
@@ -1092,7 +1092,7 @@ class GraphContext implements Context {
 			$credentials['username'],
 			$credentials['password'],
 			$oldGroupId,
-			$newGroup
+			$newGroup,
 		);
 	}
 
@@ -1135,14 +1135,14 @@ class GraphContext implements Context {
 	 * @return void
 	 */
 	public function theAdministratorRemovesTheFollowingUsersFromTheFollowingGroupsUsingTheGraphApi(
-		TableNode $table
+		TableNode $table,
 	): void {
 		$this->featureContext->verifyTableNodeColumns($table, ['username', 'groupname']);
 		$usersGroups = $table->getColumnsHash();
 
 		foreach ($usersGroups as $userGroup) {
 			$this->featureContext->setResponse(
-				$this->removeUserFromGroup($userGroup['groupname'], $userGroup['username'])
+				$this->removeUserFromGroup($userGroup['groupname'], $userGroup['username']),
 			);
 			$this->featureContext->pushToLastHttpStatusCodesArray();
 		}
@@ -1161,7 +1161,7 @@ class GraphContext implements Context {
 	public function theUserTriesToRemoveAnotherUserFromGroupUsingTheGraphAPI(
 		string $user,
 		string $group,
-		?string $byUser = null
+		?string $byUser = null,
 	): void {
 		$this->featureContext->setResponse($this->removeUserFromGroup($group, $user, $byUser));
 	}
@@ -1178,7 +1178,7 @@ class GraphContext implements Context {
 	 */
 	public function theUserTriesToRemoveAnotherUserFromNonExistentGroupUsingTheGraphAPI(
 		string $user,
-		?string $byUser = null
+		?string $byUser = null,
 	): void {
 		$this->featureContext->setResponse($this->removeUserFromGroup('', $user, $byUser));
 	}
@@ -1191,7 +1191,7 @@ class GraphContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function retrieveUserInformationUsingGraphApi(
-		string $user
+		string $user,
 	): ResponseInterface {
 		$credentials = $this->getAdminOrUserCredentials($user);
 		return GraphHelper::getOwnInformationAndGroupMemberships(
@@ -1210,7 +1210,7 @@ class GraphContext implements Context {
 	 * @throws JsonException
 	 */
 	public function userRetrievesHisOrHerInformationOfUserUsingGraphApi(
-		string $user
+		string $user,
 	): void {
 		$response = $this->retrieveUserInformationUsingGraphApi($user);
 		$this->featureContext->setResponse($response);
@@ -1232,7 +1232,7 @@ class GraphContext implements Context {
 			$this->featureContext->getBaseUrl(),
 			$credentials['username'],
 			$credentials['password'],
-			$user
+			$user,
 		);
 		$this->featureContext->setResponse($response);
 	}
@@ -1306,7 +1306,7 @@ class GraphContext implements Context {
 	 */
 	public function retrieveUserInformationAlongWithDriveUsingGraphApi(
 		string $byUser,
-		?string $user = null
+		?string $user = null,
 	): ResponseInterface {
 		$user = $user ?? $byUser;
 		$credentials = $this->getAdminOrUserCredentials($user);
@@ -1314,7 +1314,7 @@ class GraphContext implements Context {
 			$this->featureContext->getBaseUrl(),
 			$credentials["username"],
 			$credentials["password"],
-			$user
+			$user,
 		);
 	}
 
@@ -1328,7 +1328,7 @@ class GraphContext implements Context {
 	 */
 	public function retrieveUserInformationAlongWithGroupUsingGraphApi(
 		string $byUser,
-		?string $user = null
+		?string $user = null,
 	): ResponseInterface {
 		$user = $user ?? $byUser;
 		$credentials = $this->getAdminOrUserCredentials($user);
@@ -1336,7 +1336,7 @@ class GraphContext implements Context {
 			$this->featureContext->getBaseUrl(),
 			$credentials["username"],
 			$credentials["password"],
-			$user
+			$user,
 		);
 	}
 
@@ -1393,7 +1393,7 @@ class GraphContext implements Context {
 	public function addMultipleUsersToGroup(
 		string $user,
 		array $userIds,
-		string $groupId
+		string $groupId,
 	): ResponseInterface {
 		$credentials = $this->getAdminOrUserCredentials($user);
 
@@ -1402,7 +1402,7 @@ class GraphContext implements Context {
 			$credentials["username"],
 			$credentials["password"],
 			$groupId,
-			$userIds
+			$userIds,
 		);
 	}
 
@@ -1420,7 +1420,7 @@ class GraphContext implements Context {
 	public function theAdministratorAddsTheFollowingUsersToAGroupInASingleRequestUsingTheGraphApi(
 		string $user,
 		string $group,
-		TableNode $table
+		TableNode $table,
 	): void {
 		$userIds = [];
 		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
@@ -1446,7 +1446,7 @@ class GraphContext implements Context {
 	public function userTriesToAddTheFollowingUsersToAGroupAtOnceWithInvalidHostUsingTheGraphApi(
 		string $user,
 		string $group,
-		TableNode $table
+		TableNode $table,
 	): void {
 		$userIds = [];
 		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
@@ -1469,8 +1469,8 @@ class GraphContext implements Context {
 				$credentials["username"],
 				$credentials["password"],
 				['Content-Type' => 'application/json'],
-				\json_encode($payload)
-			)
+				\json_encode($payload),
+			),
 		);
 	}
 
@@ -1488,7 +1488,7 @@ class GraphContext implements Context {
 	public function userTriesToAddUserToGroupWithInvalidHostUsingTheGraphApi(
 		string $adminUser,
 		string $user,
-		string $group
+		string $group,
 	): void {
 		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
 		$userId = $this->featureContext->getAttributeOfCreatedUser($user, "id");
@@ -1504,8 +1504,8 @@ class GraphContext implements Context {
 				$credentials["username"],
 				$credentials["password"],
 				['Content-Type' => 'application/json'],
-				\json_encode($body)
-			)
+				\json_encode($body),
+			),
 		);
 	}
 
@@ -1521,7 +1521,7 @@ class GraphContext implements Context {
 	 */
 	public function theAdministratorTriesToAddsTheFollowingUsersToANonExistingGroupAtOnceUsingTheGraphApi(
 		string $user,
-		TableNode $table
+		TableNode $table,
 	): void {
 		$userIds = [];
 		$groupId = WebDavHelper::generateUUIDv4();
@@ -1547,7 +1547,7 @@ class GraphContext implements Context {
 	public function theAdministratorTriesToAddTheFollowingNonExistingUsersToAGroupAtOnceUsingTheGraphApi(
 		string $user,
 		string $group,
-		TableNode $table
+		TableNode $table,
 	): void {
 		$userIds = [];
 		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
@@ -1574,7 +1574,7 @@ class GraphContext implements Context {
 	public function theAdministratorTriesToAddTheFollowingUsersToAGroupAtOnceUsingTheGraphApi(
 		string $user,
 		string $group,
-		TableNode $table
+		TableNode $table,
 	): void {
 		$userIds = [];
 		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
@@ -1615,14 +1615,14 @@ class GraphContext implements Context {
 		Assert::assertIsArray(
 			$responseArray = (
 				$this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse())
-			)['value'][0]
+			)['value'][0],
 		);
 		foreach ($table->getHash() as $row) {
 			$key = $row["key"];
 			if ($key === 'id') {
 				Assert::assertTrue(
 					GraphHelper::isUUIDv4($responseArray[$key]),
-					__METHOD__ . ' Expected id to have UUIDv4 pattern but found: ' . $row["value"]
+					__METHOD__ . ' Expected id to have UUIDv4 pattern but found: ' . $row["value"],
 				);
 			} else {
 				Assert::assertEquals($responseArray[$key], $row["value"]);
@@ -1641,7 +1641,7 @@ class GraphContext implements Context {
 		Assert::assertIsArray(
 			$responseArray = (
 				$this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse())
-			)['value'][0]
+			)['value'][0],
 		);
 		foreach ($table->getRows() as $row) {
 			$foundRoleInResponse = false;
@@ -1670,7 +1670,7 @@ class GraphContext implements Context {
 			$this->featureContext->getBaseUrl(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
-			$groupId
+			$groupId,
 		);
 		$this->featureContext->setResponse($response);
 	}
@@ -1693,7 +1693,7 @@ class GraphContext implements Context {
 			$this->featureContext->getBaseUrl(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
-			$groupsIdArray
+			$groupsIdArray,
 		);
 		$this->featureContext->setResponse($response);
 	}
@@ -1711,14 +1711,14 @@ class GraphContext implements Context {
 	public function userGetsAllUsersOfFirstGroupOderSecondGroupUsingTheGraphApi(
 		string $user,
 		string $firstGroup,
-		string $secondGroup
+		string $secondGroup,
 	): void {
 		$response = GraphHelper::getUsersFromOneOrOtherGroup(
 			$this->featureContext->getBaseUrl(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$firstGroup,
-			$secondGroup
+			$secondGroup,
 		);
 		$this->featureContext->setResponse($response);
 	}
@@ -1735,7 +1735,7 @@ class GraphContext implements Context {
 		$response = GraphHelper::getApplications(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getAdminUsername(),
-			$this->featureContext->getAdminPassword()
+			$this->featureContext->getAdminPassword(),
 		);
 		$responseData = \json_decode($response->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
 		if (isset($responseData["value"][0]["appRoles"])) {
@@ -1762,7 +1762,7 @@ class GraphContext implements Context {
 			$this->featureContext->getBaseUrl(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
-			$this->getRoleIdByRoleName($role)
+			$this->getRoleIdByRoleName($role),
 		);
 		$this->featureContext->setResponse($response);
 	}
@@ -1780,14 +1780,14 @@ class GraphContext implements Context {
 	public function userGetsAllUsersWithRoleAndMemberOfGroupUsingTheGraphApi(
 		string $user,
 		string $role,
-		string $group
+		string $group,
 	): void {
 		$response = GraphHelper::getUsersWithFilterRolesAssignmentAndMemberOf(
 			$this->featureContext->getBaseUrl(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$this->getRoleIdByRoleName($role),
-			$this->featureContext->getGroupIdByGroupName($group)
+			$this->featureContext->getGroupIdByGroupName($group),
 		);
 		$this->featureContext->setResponse($response);
 	}
@@ -1816,13 +1816,13 @@ class GraphContext implements Context {
 			$this->featureContext->getAdminPassword(),
 			$this->appEntity["appRoles"][$role],
 			$this->appEntity["id"],
-			$userId
+			$userId,
 		);
 		Assert::assertEquals(
 			201,
 			$response->getStatusCode(),
 			__METHOD__
-			. "\nExpected status code '200' but got '" . $response->getStatusCode() . "'"
+			. "\nExpected status code '200' but got '" . $response->getStatusCode() . "'",
 		);
 	}
 
@@ -1842,8 +1842,8 @@ class GraphContext implements Context {
 				$this->featureContext->getBaseUrl(),
 				$admin,
 				$this->featureContext->getPasswordForUser($admin),
-				$userId
-			)
+				$userId,
+			),
 		);
 	}
 
@@ -1864,8 +1864,8 @@ class GraphContext implements Context {
 				$this->featureContext->getBaseUrl(),
 				$credentials['username'],
 				$credentials['password'],
-				$userId
-			)
+				$userId,
+			),
 		);
 	}
 
@@ -1882,7 +1882,7 @@ class GraphContext implements Context {
 					$this->featureContext->getBaseUrl(),
 					$this->featureContext->getAdminUsername(),
 					$this->featureContext->getAdminPassword(),
-				)
+				),
 			)
 		)['value'][0];
 		$this->appEntity["id"] = $applicationEntity["id"];
@@ -1910,7 +1910,7 @@ class GraphContext implements Context {
 			$response['appRoleId'],
 			__METHOD__
 			. "\nExpected rolId for role '$role'' to be '" . $this->appEntity["appRoles"][$role]
-			 . "' but got '" . $response['appRoleId'] . "'"
+			 . "' but got '" . $response['appRoleId'] . "'",
 		);
 	}
 
@@ -1924,7 +1924,7 @@ class GraphContext implements Context {
 	public function theGraphApiResponseShouldHaveNoRole(): void {
 		Assert::assertEmpty(
 			$this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse())['value'],
-			"the user has a role, but should not"
+			"the user has a role, but should not",
 		);
 	}
 
@@ -1944,8 +1944,8 @@ class GraphContext implements Context {
 				$this->featureContext->getBaseUrl(),
 				$credentials["username"],
 				$credentials["password"],
-				$groupName
-			)
+				$groupName,
+			),
 		);
 	}
 
@@ -1965,8 +1965,8 @@ class GraphContext implements Context {
 				$this->featureContext->getBaseUrl(),
 				$credentials["username"],
 				$credentials["password"],
-				$searchTerm
-			)
+				$searchTerm,
+			),
 		);
 	}
 
@@ -1984,7 +1984,7 @@ class GraphContext implements Context {
 	public function theJsonDataResponseShouldOrNotContainUserOrGroupAndMatch(
 		string $shouldOrNot,
 		string $userOrGroup,
-		?PyStringNode $schemaString = null
+		?PyStringNode $schemaString = null,
 	): void {
 		$responseBody = $this->featureContext->getJsonDecodedResponseBodyContent()->value;
 		$userOrGroupFound = false;
@@ -2001,11 +2001,11 @@ class GraphContext implements Context {
 		}
 		Assert::assertFalse(
 			!$shouldContain && $userOrGroupFound,
-			'Response contains user or group "' . $userOrGroup . '" but should not have.'
+			'Response contains user or group "' . $userOrGroup . '" but should not have.',
 		);
 		$this->featureContext->assertJsonDocumentMatchesSchema(
 			$responseBody,
-			$this->featureContext->getJSONSchema($schemaString)
+			$this->featureContext->getJSONSchema($schemaString),
 		);
 	}
 
@@ -2023,7 +2023,7 @@ class GraphContext implements Context {
 	public function theAdministratorHasAddedTheFollowingUsersToAGroupAtOnceUsingTheGraphApi(
 		string $user,
 		string $group,
-		TableNode $table
+		TableNode $table,
 	): void {
 		$userIds = [];
 		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
@@ -2049,7 +2049,7 @@ class GraphContext implements Context {
 	public function theAdministratorTriesToAddGroupToAGroupAtOnceUsingTheGraphApi(
 		string $user,
 		string $groupToAdd,
-		string $group
+		string $group,
 	): void {
 		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
 		$groupIdToAdd = $this->featureContext->getAttributeOfCreatedGroup($groupToAdd, "id");
@@ -2067,8 +2067,8 @@ class GraphContext implements Context {
 				$credentials["username"],
 				$credentials["password"],
 				['Content-Type' => 'application/json'],
-				\json_encode($payload)
-			)
+				\json_encode($payload),
+			),
 		);
 	}
 
@@ -2086,7 +2086,7 @@ class GraphContext implements Context {
 	public function theAdministratorTriesToAddAGroupToAGroupThroughPostRequestUsingTheGraphApi(
 		string $user,
 		string $groupToAdd,
-		string $group
+		string $group,
 	): void {
 		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
 		$groupIdToAdd = $this->featureContext->getAttributeOfCreatedGroup($groupToAdd, "id");
@@ -2102,8 +2102,8 @@ class GraphContext implements Context {
 				$credentials["username"],
 				$credentials["password"],
 				['Content-Type' => 'application/json'],
-				\json_encode($payload)
-			)
+				\json_encode($payload),
+			),
 		);
 	}
 
@@ -2123,7 +2123,7 @@ class GraphContext implements Context {
 		string $adminUser,
 		string $user,
 		string $group,
-		string $invalidJSON
+		string $invalidJSON,
 	): void {
 		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
 		$credentials = $this->getAdminOrUserCredentials($adminUser);
@@ -2134,7 +2134,7 @@ class GraphContext implements Context {
 			[],
 			[],
 			null,
-			$user
+			$user,
 		);
 
 		$this->featureContext->setResponse(
@@ -2143,8 +2143,8 @@ class GraphContext implements Context {
 				$credentials["username"],
 				$credentials["password"],
 				['Content-Type' => 'application/json'],
-				\json_encode($invalidJSON)
-			)
+				\json_encode($invalidJSON),
+			),
 		);
 	}
 
@@ -2164,7 +2164,7 @@ class GraphContext implements Context {
 		string $user,
 		string $group,
 		string $invalidJSON,
-		TableNode $table
+		TableNode $table,
 	): void {
 		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
 		$credentials = $this->getAdminOrUserCredentials($user);
@@ -2175,7 +2175,7 @@ class GraphContext implements Context {
 				[],
 				[],
 				null,
-				$row['username']
+				$row['username'],
 			);
 		}
 
@@ -2186,8 +2186,8 @@ class GraphContext implements Context {
 				$credentials["username"],
 				$credentials["password"],
 				['Content-Type' => 'application/json'],
-				\json_encode($invalidJSON)
-			)
+				\json_encode($invalidJSON),
+			),
 		);
 	}
 
@@ -2205,7 +2205,7 @@ class GraphContext implements Context {
 	public function theAdministratorTriesToAddTheFollowingUserIdWithInvalidCharacterToAGroup(
 		string $user,
 		string $group,
-		TableNode $table
+		TableNode $table,
 	): void {
 		$userIds = [];
 		$credentials = $this->getAdminOrUserCredentials($user);
@@ -2219,8 +2219,8 @@ class GraphContext implements Context {
 				$credentials["username"],
 				$credentials["password"],
 				$groupId,
-				$userIds
-			)
+				$userIds,
+			),
 		);
 	}
 
@@ -2238,7 +2238,7 @@ class GraphContext implements Context {
 	public function theAdministratorTriesToAddUserIdWithInvalidCharactersToAGroup(
 		string $user,
 		string $userId,
-		string $group
+		string $group,
 	): void {
 		$credentials = $this->getAdminOrUserCredentials($user);
 		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
@@ -2248,8 +2248,8 @@ class GraphContext implements Context {
 				$credentials['username'],
 				$credentials['password'],
 				$userId,
-				$groupId
-			)
+				$groupId,
+			),
 		);
 	}
 
@@ -2276,7 +2276,7 @@ class GraphContext implements Context {
 			1,
 			$count,
 			"Expected user '" . $user . "' to be added once to group '"
-			. $group . "' but the user is listed '" . $count . "' times"
+			. $group . "' but the user is listed '" . $count . "' times",
 		);
 	}
 
@@ -2298,8 +2298,8 @@ class GraphContext implements Context {
 				$this->featureContext->getBaseUrl(),
 				$credentials["username"],
 				$credentials["password"],
-				$userId
-			)
+				$userId,
+			),
 		);
 	}
 
@@ -2321,8 +2321,8 @@ class GraphContext implements Context {
 				$credentials['username'],
 				$credentials['password'],
 				$userId,
-				$path
-			)
+				$path,
+			),
 		);
 		$this->featureContext->pushToLastStatusCodesArrays();
 	}
@@ -2342,7 +2342,7 @@ class GraphContext implements Context {
 	public function downloadedJsonContentShouldContainEventTypeInItemAndShouldMatch(
 		string $eventType,
 		?string $spaceType = null,
-		PyStringNode $schemaString = null
+		PyStringNode $schemaString = null,
 	): void {
 		$actualResponseToAssert = null;
 		$events = $this->featureContext->getJsonDecodedResponseBodyContent()->events;
@@ -2361,12 +2361,12 @@ class GraphContext implements Context {
 		}
 		if ($actualResponseToAssert === null) {
 			throw new Error(
-				"Response does not contain event type '" . $eventType . "'."
+				"Response does not contain event type '" . $eventType . "'.",
 			);
 		}
 		$this->featureContext->assertJsonDocumentMatchesSchema(
 			$actualResponseToAssert,
-			$this->featureContext->getJSONSchema($schemaString)
+			$this->featureContext->getJSONSchema($schemaString),
 		);
 	}
 
@@ -2383,12 +2383,12 @@ class GraphContext implements Context {
 		$actualResponseToAssert = $this->featureContext->getJsonDecodedResponseBodyContent();
 		if (!isset($actualResponseToAssert->user)) {
 			throw new Error(
-				"Response does not contain key 'user'"
+				"Response does not contain key 'user'",
 			);
 		}
 		$this->featureContext->assertJsonDocumentMatchesSchema(
 			$actualResponseToAssert->user,
-			$this->featureContext->getJSONSchema($schemaString)
+			$this->featureContext->getJSONSchema($schemaString),
 		);
 	}
 
@@ -2405,7 +2405,7 @@ class GraphContext implements Context {
 	public function userTriesToExportGdprReportOfAnotherUserUsingGraphApi(
 		string $user,
 		string $ofUser,
-		string $path
+		string $path,
 	): void {
 		$credentials = $this->getAdminOrUserCredentials($user);
 		$this->featureContext->setResponse(
@@ -2414,8 +2414,8 @@ class GraphContext implements Context {
 				$credentials['username'],
 				$credentials['password'],
 				$this->featureContext->getAttributeOfCreatedUser($ofUser, 'id'),
-				$path
-			)
+				$path,
+			),
 		);
 	}
 
@@ -2433,7 +2433,7 @@ class GraphContext implements Context {
 				$this->featureContext->getBAseUrl(),
 				$this->featureContext->getAdminUsername(),
 				$this->featureContext->getAdminPassword(),
-				$userId
+				$userId,
 			)
 		);
 	}
@@ -2458,7 +2458,7 @@ class GraphContext implements Context {
 			$appRoleAssignmentId = $this->getRoleIdByRoleName("User");
 		} else {
 			$appRoleAssignmentId = $this->featureContext->getJsonDecodedResponse(
-				$this->getAssignedRole($ofUser)
+				$this->getAssignedRole($ofUser),
 			)["value"][0]["id"];
 		}
 
@@ -2470,8 +2470,8 @@ class GraphContext implements Context {
 				$credentials['username'],
 				$credentials['password'],
 				$appRoleAssignmentId,
-				$userId
-			)
+				$userId,
+			),
 		);
 	}
 
@@ -2495,7 +2495,7 @@ class GraphContext implements Context {
 			$jsonDecodedResponse['appRoleId'],
 			__METHOD__
 			. "\nExpected user '$user' to have role '$role' with role id '" . $this->appEntity["appRoles"][$role] .
-			"' but got the role id is '" . $jsonDecodedResponse['appRoleId'] . "'"
+			"' but got the role id is '" . $jsonDecodedResponse['appRoleId'] . "'",
 		);
 	}
 
@@ -2513,7 +2513,7 @@ class GraphContext implements Context {
 		Assert::assertEmpty(
 			$jsonDecodedResponse,
 			__METHOD__
-			. "\nExpected user '$user' to have no roles assigned but got '" . json_encode($jsonDecodedResponse) . "'"
+			. "\nExpected user '$user' to have no roles assigned but got '" . json_encode($jsonDecodedResponse) . "'",
 		);
 	}
 
@@ -2544,8 +2544,8 @@ class GraphContext implements Context {
 				$credentials['password'],
 				$this->appEntity["appRoles"][$role],
 				$this->appEntity["id"],
-				$userId
-			)
+				$userId,
+			),
 		);
 	}
 
@@ -2564,12 +2564,12 @@ class GraphContext implements Context {
 			$this->featureContext->getBaseUrl(),
 			$credentials['username'],
 			$credentials['password'],
-			$language
+			$language,
 		);
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			200,
 			"Expected response status code should be 200",
-			$response
+			$response,
 		);
 	}
 
@@ -2589,8 +2589,8 @@ class GraphContext implements Context {
 				$this->featureContext->getBaseUrl(),
 				$credentials['username'],
 				$credentials['password'],
-				$language
-			)
+				$language,
+			),
 		);
 	}
 
@@ -2607,7 +2607,7 @@ class GraphContext implements Context {
 	public function userListsTheResourcesSharedWithThemUsingGraphApi(
 		string $user,
 		string $cacheStepString,
-		string $retryOption
+		string $retryOption,
 	): void {
 		if ($cacheStepString !== '') {
 			// ENV (GRAPH_SPACES_GROUPS_CACHE_TTL | GRAPH_SPACES_USERS_CACHE_TTL) is set default to 60 sec
@@ -2628,7 +2628,7 @@ class GraphContext implements Context {
 			$response = GraphHelper::getSharesSharedWithMe(
 				$this->featureContext->getBaseUrl(),
 				$credentials['username'],
-				$credentials['password']
+				$credentials['password'],
 			);
 
 			$jsonBody = $this->featureContext->getJsonDecodedResponseBodyContent($response);
@@ -2674,7 +2674,7 @@ class GraphContext implements Context {
 		return GraphHelper::getSharesSharedByMe(
 			$this->featureContext->getBaseUrl(),
 			$credentials['username'],
-			$credentials['password']
+			$credentials['password'],
 		);
 	}
 
@@ -2717,7 +2717,7 @@ class GraphContext implements Context {
 	public function theJsonDataResponseShouldOrNotContainSharedByMeDetails(
 		string $shouldOrNot,
 		string $fileName,
-		PyStringNode $schemaString
+		PyStringNode $schemaString,
 	): void {
 		$responseBody = $this->featureContext->getJsonDecodedResponseBodyContent()->value;
 		$fileOrFolderFound = false;
@@ -2734,11 +2734,11 @@ class GraphContext implements Context {
 		}
 		Assert::assertFalse(
 			!$shouldContain && $fileOrFolderFound,
-			'Response contains file "' . $fileName . '" but should.'
+			'Response contains file "' . $fileName . '" but should.',
 		);
 		$this->featureContext->assertJsonDocumentMatchesSchema(
 			$responseBody,
-			$this->featureContext->getJSONSchema($schemaString)
+			$this->featureContext->getJSONSchema($schemaString),
 		);
 	}
 
@@ -2761,7 +2761,7 @@ class GraphContext implements Context {
 		}
 		Assert::assertFalse(
 			$mailValueExist,
-			"Response contains email '$email' but should not."
+			"Response contains email '$email' but should not.",
 		);
 	}
 
@@ -2779,20 +2779,20 @@ class GraphContext implements Context {
 	public function userUsingPasswordShouldBeAbleToCreateANewUserWithDefaultAttributes(
 		string $byUser,
 		string $password,
-		string $user
+		string $user,
 	): void {
 		$response = GraphHelper::createUser(
 			$this->featureContext->getBaseUrl(),
 			$byUser,
 			$password,
 			$user,
-			$this->featureContext->getPasswordForUser($user)
+			$this->featureContext->getPasswordForUser($user),
 		);
 		Assert::assertEquals(
 			201,
 			$response->getStatusCode(),
 			__METHOD__ . " cannot create new user '$user' by user '$byUser'.\nResponse:" .
-			json_encode($this->featureContext->getJsonDecodedResponse($response))
+			json_encode($this->featureContext->getJsonDecodedResponse($response)),
 		);
 		$this->featureContext->addUserToCreatedUsersList($user, $this->featureContext->getPasswordForUser($user));
 	}
@@ -2836,7 +2836,7 @@ class GraphContext implements Context {
 				$this->featureContext->getBaseUrl(),
 				$credentials['username'],
 				$credentials['password'],
-			)
+			),
 		);
 	}
 
@@ -2858,7 +2858,7 @@ class GraphContext implements Context {
 				$this->featureContext->getBaseUrl(),
 				$credentials['username'],
 				$credentials['password'],
-			)
+			),
 		);
 	}
 
@@ -2874,7 +2874,7 @@ class GraphContext implements Context {
 	public function getActivities(
 		string $user,
 		string $resource,
-		string $spaceName
+		string $spaceName,
 	): ResponseInterface {
 		if ($spaceName === "Shares") {
 			$resourceId = $this->spacesContext->getSharesRemoteItemId($user, $resource);
@@ -2885,7 +2885,7 @@ class GraphContext implements Context {
 			$this->featureContext->getBaseUrl(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
-			$resourceId
+			$resourceId,
 		);
 	}
 
@@ -2903,7 +2903,7 @@ class GraphContext implements Context {
 	public function userListsTheActivitiesForResourceOfSpaceUsingTheGraphAPI(
 		string $user,
 		string $resource,
-		string $spaceName
+		string $spaceName,
 	): void {
 		$this->featureContext->setResponse($this->getActivities($user, $resource, $spaceName));
 	}
@@ -2923,11 +2923,11 @@ class GraphContext implements Context {
 		string $user,
 		string $resource,
 		string $spaceName,
-		TableNode $table
+		TableNode $table,
 	): void {
 		$unmatchedActivities = [];
 		$activities = $this->featureContext->getJsonDecodedResponse(
-			$this->getActivities($user, $resource, $spaceName)
+			$this->getActivities($user, $resource, $spaceName),
 		);
 		foreach ($table->getRows() as $expectedActivity) {
 			$matched = false;
@@ -2959,7 +2959,7 @@ class GraphContext implements Context {
 	public function forUserFileOfTheSpaceShouldNotHaveAnyActivity(
 		string $user,
 		string $resource,
-		string $spaceName
+		string $spaceName,
 	): void {
 		$activities = $this->getActivities($user, $resource, $spaceName);
 		$responseBody = $activities->getBody()->getContents();
@@ -2967,7 +2967,7 @@ class GraphContext implements Context {
 			$responseBody,
 			__METHOD__
 			. "\nExpected no activity of resource '$resource' for user '$user', but some activities were found\n" .
-			print_r(json_decode($responseBody, true), true)
+			print_r(json_decode($responseBody, true), true),
 		);
 	}
 
@@ -2981,19 +2981,19 @@ class GraphContext implements Context {
 	 */
 	public function userTriesToListTheActivitiesOfFolderWithShareMountIdPointIdUsingTheGraphApi(
 		string $user,
-		string $folder
+		string $folder,
 	): void {
 		$resourceId = GraphHelper::getShareMountId(
 			$this->featureContext->getBaseUrl(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
-			$folder
+			$folder,
 		);
 		$response = GraphHelper::getActivities(
 			$this->featureContext->getBaseUrl(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
-			$resourceId
+			$resourceId,
 		);
 		$this->featureContext->setResponse($response);
 	}
@@ -3012,14 +3012,14 @@ class GraphContext implements Context {
 		string $user,
 		string $file,
 		string $owner,
-		string $spaceName
+		string $spaceName,
 	): void {
 		$resourceId = $this->spacesContext->getResourceId($owner, $spaceName, $file);
 		$response = GraphHelper::getActivities(
 			$this->featureContext->getBaseUrl(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
-			$resourceId
+			$resourceId,
 		);
 		$this->featureContext->setResponse($response);
 	}
@@ -3038,7 +3038,7 @@ class GraphContext implements Context {
 			$this->featureContext->getBaseUrl(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
-			$spaceId
+			$spaceId,
 		);
 		$this->featureContext->setResponse($response);
 	}
@@ -3055,13 +3055,13 @@ class GraphContext implements Context {
 	public function thePublicTriesToCheckTheActivitiesOfSpaceOwnedByUserWithPasswordUsingGraphApi(
 		string $spaceName,
 		string $user,
-		string $password
+		string $password,
 	): void {
 		$response = GraphHelper::getActivities(
 			$this->featureContext->getBaseUrl(),
 			"public",
 			$this->featureContext->getActualPassword($password),
-			$this->spacesContext->getSpaceIdByName($user, $spaceName)
+			$this->spacesContext->getSpaceIdByName($user, $spaceName),
 		);
 		$this->featureContext->setResponse($response);
 	}
@@ -3080,13 +3080,13 @@ class GraphContext implements Context {
 		string $resource,
 		string $space,
 		string $owner,
-		string $password
+		string $password,
 	): void {
 		$response = GraphHelper::getActivities(
 			$this->featureContext->getBaseUrl(),
 			"public",
 			$this->featureContext->getPasswordForUser($owner),
-			$this->spacesContext->getResourceId($owner, $space, $resource)
+			$this->spacesContext->getResourceId($owner, $space, $resource),
 		);
 		$this->featureContext->setResponse($response);
 	}
@@ -3107,7 +3107,7 @@ class GraphContext implements Context {
 		string $resource,
 		string $spaceName,
 		string $filterType,
-		string $filterValue
+		string $filterValue,
 	): void {
 		$resourceId = $this->spacesContext->getResourceId($user, $spaceName, $resource);
 		$response = GraphHelper::getActivities(
@@ -3115,7 +3115,7 @@ class GraphContext implements Context {
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$resourceId,
-			[$filterType => $filterValue]
+			[$filterType => $filterValue],
 		);
 		$this->featureContext->setResponse($response);
 	}
@@ -3160,7 +3160,7 @@ class GraphContext implements Context {
 		string $spaceName,
 		string $filterType,
 		string $filterValue,
-		string $sortType
+		string $sortType,
 	): void {
 		$resourceId = $this->spacesContext->getResourceId($user, $spaceName, $resource);
 		$response = GraphHelper::getActivities(
@@ -3187,7 +3187,7 @@ class GraphContext implements Context {
 		$response = GraphHelper::getFederatedUsers(
 			$this->featureContext->getBaseUrl(),
 			$credentials['username'],
-			$credentials['password']
+			$credentials['password'],
 		);
 
 		$this->featureContext->setResponse($response);
@@ -3207,7 +3207,7 @@ class GraphContext implements Context {
 		$response = GraphHelper::getAllUsers(
 			$this->featureContext->getBaseUrl(),
 			$credentials['username'],
-			$credentials['password']
+			$credentials['password'],
 		);
 
 		$this->featureContext->setResponse($response);
@@ -3227,7 +3227,7 @@ class GraphContext implements Context {
 	public function userSearchesForUserOfTheGroupUsingTheGraphApi(
 		string $user,
 		string $searchTerm,
-		string $group
+		string $group,
 	): void {
 		$groupId = $this->featureContext->getGroupIdByGroupName($group);
 		$response = GraphHelper::searchUserWithFilterMemberOf(
@@ -3235,7 +3235,7 @@ class GraphContext implements Context {
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$groupId,
-			$searchTerm
+			$searchTerm,
 		);
 		$this->featureContext->setResponse($response);
 	}

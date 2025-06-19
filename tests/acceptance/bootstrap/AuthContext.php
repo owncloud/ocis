@@ -72,7 +72,7 @@ class AuthContext implements Context {
 		string $url,
 		string $method,
 		?string $body = null,
-		?array $headers = []
+		?array $headers = [],
 	): ResponseInterface {
 		// NOTE: preserving '/' for tests with special cases
 		// E.g: coreApiAuth/webDavSpecialURLs.feature
@@ -110,12 +110,12 @@ class AuthContext implements Context {
 		string $method,
 		?string $body = null,
 		?array $headers = null,
-		?string $property = null
+		?string $property = null,
 	): ResponseInterface {
 		$user = $this->featureContext->getActualUsername($user);
 		$url = $this->featureContext->substituteInLineCodes(
 			$url,
-			$user
+			$user,
 		);
 		$authHeader = $this->createBasicAuthHeader($user, $this->featureContext->getPasswordForUser($user));
 		$headers = \array_merge($headers ?? [], $authHeader);
@@ -128,7 +128,7 @@ class AuthContext implements Context {
 			$url,
 			$method,
 			$body,
-			$headers
+			$headers,
 		);
 	}
 
@@ -159,14 +159,14 @@ class AuthContext implements Context {
 		string $method,
 		string $body,
 		string $ofUser,
-		TableNode $table
+		TableNode $table,
 	): void {
 		$ofUser = \strtolower($this->featureContext->getActualUsername($ofUser));
 		$this->featureContext->verifyTableNodeColumns($table, ['endpoint']);
 		foreach ($table->getHash() as $row) {
 			$row['endpoint'] = $this->featureContext->substituteInLineCodes(
 				$row['endpoint'],
-				$ofUser
+				$ofUser,
 			);
 			$response = $this->sendRequest($row['endpoint'], $method, $body);
 			$this->featureContext->setResponse($response);
@@ -187,14 +187,14 @@ class AuthContext implements Context {
 	public function userRequestsEndpointsWithoutBodyAndNoAuthAboutUser(
 		string $method,
 		string $ofUser,
-		TableNode $table
+		TableNode $table,
 	): void {
 		$ofUser = \strtolower($this->featureContext->getActualUsername($ofUser));
 		$this->featureContext->verifyTableNodeColumns($table, ['endpoint']);
 		foreach ($table->getHash() as $row) {
 			$row['endpoint'] = $this->featureContext->substituteInLineCodes(
 				$row['endpoint'],
-				$ofUser
+				$ofUser,
 			);
 			$response = $this->sendRequest($row['endpoint'], $method);
 			$this->featureContext->setResponse($response);
@@ -217,8 +217,8 @@ class AuthContext implements Context {
 			$this->featureContext->setResponse(
 				$this->sendRequest(
 					$this->featureContext->substituteInLineCodes($row['endpoint']),
-					$method
-				)
+					$method,
+				),
 			);
 			$this->featureContext->pushToLastStatusCodesArrays();
 		}
@@ -239,8 +239,8 @@ class AuthContext implements Context {
 			$this->featureContext->setResponse(
 				HttpRequestHelper::sendRequest(
 					$this->featureContext->substituteInLineCodes($row['endpoint']),
-					$method
-				)
+					$method,
+				),
 			);
 			$this->featureContext->pushToLastStatusCodesArrays();
 		}
@@ -282,14 +282,14 @@ class AuthContext implements Context {
 		string $method,
 		string $property,
 		string $ofUser,
-		TableNode $table
+		TableNode $table,
 	): void {
 		$this->featureContext->verifyTableNodeColumns($table, ['endpoint']);
 
 		foreach ($table->getHash() as $row) {
 			$row['endpoint'] = $this->featureContext->substituteInLineCodes(
 				$row['endpoint'],
-				$ofUser
+				$ofUser,
 			);
 			$response = $this->requestUrlWithBasicAuth($user, $row['endpoint'], $method, null, null, $property);
 			$this->featureContext->setResponse($response);
@@ -312,7 +312,7 @@ class AuthContext implements Context {
 			$response = $this->requestUrlWithBasicAuth(
 				$this->featureContext->getAdminUsername(),
 				$row['endpoint'],
-				$method
+				$method,
 			);
 			$this->featureContext->setResponse($response);
 			$this->featureContext->pushToLastStatusCodesArrays();
@@ -331,7 +331,7 @@ class AuthContext implements Context {
 	public function userRequestsURLUsingBasicAuth(
 		string $user,
 		string $url,
-		string $method
+		string $method,
 	): void {
 		$response = $this->requestUrlWithBasicAuth($user, $url, $method);
 		$this->featureContext->setResponse($response);
@@ -352,16 +352,16 @@ class AuthContext implements Context {
 		string $user,
 		string $url,
 		string $method,
-		TableNode $headersTable
+		TableNode $headersTable,
 	): void {
 		$user = $this->featureContext->getActualUsername($user);
 		$url = $this->featureContext->substituteInLineCodes(
 			$url,
-			$user
+			$user,
 		);
 		$this->featureContext->verifyTableNodeColumns(
 			$headersTable,
-			['header', 'value']
+			['header', 'value'],
 		);
 		$headers = [];
 		foreach ($headersTable as $row) {
@@ -373,8 +373,8 @@ class AuthContext implements Context {
 				$url,
 				$method,
 				null,
-				$headers
-			)
+				$headers,
+			),
 		);
 	}
 
@@ -393,7 +393,7 @@ class AuthContext implements Context {
 		string $user,
 		string $method,
 		string $password,
-		TableNode $table
+		TableNode $table,
 	): void {
 		$user = $this->featureContext->getActualUsername($user);
 		$this->featureContext->verifyTableNodeColumns($table, ['endpoint']);
@@ -424,7 +424,7 @@ class AuthContext implements Context {
 		string $method,
 		string $password,
 		string $ofUser,
-		TableNode $table
+		TableNode $table,
 	): void {
 		$user = $this->featureContext->getActualUsername($user);
 		$ofUser = $this->featureContext->getActualUsername($ofUser);
@@ -435,12 +435,12 @@ class AuthContext implements Context {
 		foreach ($table->getHash() as $row) {
 			$row['endpoint'] = $this->featureContext->substituteInLineCodes(
 				$row['endpoint'],
-				$ofUser
+				$ofUser,
 			);
 			if (isset($row['destination'])) {
 				$destination = $this->featureContext->substituteInLineCodes(
 					$row['destination'],
-					$ofUser
+					$ofUser,
 				);
 				$headers['Destination'] = $this->featureContext->getBaseUrl()
 				. "/" . WebdavHelper::prefixRemotePhp(\ltrim($destination, "/"));
@@ -449,7 +449,7 @@ class AuthContext implements Context {
 				$row['endpoint'],
 				$method,
 				null,
-				$headers
+				$headers,
 			);
 			$this->featureContext->setResponse($response);
 			$this->featureContext->pushToLastStatusCodesArrays();
@@ -475,7 +475,7 @@ class AuthContext implements Context {
 		string $body,
 		string $password,
 		string $ofUser,
-		TableNode $table
+		TableNode $table,
 	): void {
 		$user = $this->featureContext->getActualUsername($user);
 		$ofUser = $this->featureContext->getActualUsername($ofUser);
@@ -486,12 +486,12 @@ class AuthContext implements Context {
 		foreach ($table->getHash() as $row) {
 			$row['endpoint'] = $this->featureContext->substituteInLineCodes(
 				$row['endpoint'],
-				$ofUser
+				$ofUser,
 			);
 			if (isset($row['destination'])) {
 				$destination = $this->featureContext->substituteInLineCodes(
 					$row['destination'],
-					$ofUser
+					$ofUser,
 				);
 				$headers['Destination'] = $this->featureContext->getBaseUrl()
 				. "/" . WebdavHelper::prefixRemotePhp(\ltrim($destination, "/"));
@@ -500,7 +500,7 @@ class AuthContext implements Context {
 				$row['endpoint'],
 				$method,
 				$body,
-				$headers
+				$headers,
 			);
 			$this->featureContext->setResponse($response);
 			$this->featureContext->pushToLastStatusCodesArrays();
@@ -524,7 +524,7 @@ class AuthContext implements Context {
 		string $method,
 		string $body,
 		string $ofUser,
-		TableNode $table
+		TableNode $table,
 	): void {
 		$user = $this->featureContext->getActualUsername($user);
 		$ofUser = $this->featureContext->getActualUsername($ofUser);
@@ -538,14 +538,14 @@ class AuthContext implements Context {
 		foreach ($table->getHash() as $row) {
 			$row['endpoint'] = $this->featureContext->substituteInLineCodes(
 				$row['endpoint'],
-				$ofUser
+				$ofUser,
 			);
 			$response = $this->requestUrlWithBasicAuth(
 				$user,
 				$row['endpoint'],
 				$method,
 				$body,
-				$headers
+				$headers,
 			);
 			$this->featureContext->setResponse($response);
 			$this->featureContext->pushToLastStatusCodesArrays();
@@ -568,7 +568,7 @@ class AuthContext implements Context {
 		string $asUser,
 		string $method,
 		string $ofUser,
-		TableNode $table
+		TableNode $table,
 	): void {
 		$asUser = $this->featureContext->getActualUsername($asUser);
 		$ofUser = $this->featureContext->getActualUsername($ofUser);
@@ -580,13 +580,13 @@ class AuthContext implements Context {
 		foreach ($table->getHash() as $row) {
 			$row['endpoint'] = $this->featureContext->substituteInLineCodes(
 				$row['endpoint'],
-				$ofUser
+				$ofUser,
 			);
 			$response = $this->sendRequest(
 				$row['endpoint'],
 				$method,
 				null,
-				$authHeader
+				$authHeader,
 			);
 			$this->featureContext->setResponse($response);
 			$this->featureContext->pushToLastStatusCodesArrays();
@@ -610,7 +610,7 @@ class AuthContext implements Context {
 		string $method,
 		?string $body,
 		string $ofUser,
-		TableNode $table
+		TableNode $table,
 	): void {
 		$asUser = $this->featureContext->getActualUsername($asUser);
 		$ofUser = $this->featureContext->getActualUsername($ofUser);
@@ -622,13 +622,13 @@ class AuthContext implements Context {
 		foreach ($table->getHash() as $row) {
 			$row['endpoint'] = $this->featureContext->substituteInLineCodes(
 				$row['endpoint'],
-				$ofUser
+				$ofUser,
 			);
 			$response = $this->sendRequest(
 				$row['endpoint'],
 				$method,
 				$body,
-				$authHeader
+				$authHeader,
 			);
 			$this->featureContext->setResponse($response);
 			$this->featureContext->pushToLastStatusCodesArrays();
@@ -650,7 +650,7 @@ class AuthContext implements Context {
 		string $user,
 		string $method,
 		string $ofUser,
-		TableNode $table
+		TableNode $table,
 	): void {
 		$headers = [];
 		if ($method === 'MOVE' || $method === 'COPY') {
@@ -666,14 +666,14 @@ class AuthContext implements Context {
 		foreach ($table->getHash() as $row) {
 			$row['endpoint'] = $this->featureContext->substituteInLineCodes(
 				$row['endpoint'],
-				$ofUser
+				$ofUser,
 			);
 			$response = $this->requestUrlWithBasicAuth(
 				$user,
 				$row['endpoint'],
 				$method,
 				null,
-				$headers
+				$headers,
 			);
 			$this->featureContext->setResponse($response);
 			$this->featureContext->pushToLastStatusCodesArrays();
@@ -692,12 +692,12 @@ class AuthContext implements Context {
 	public function userRequestsURLWithoutRetry(
 		string $user,
 		string $endpoint,
-		string $method
+		string $method,
 	): void {
 		$username = $this->featureContext->getActualUsername($user);
 		$endpoint = $this->featureContext->substituteInLineCodes(
 			$endpoint,
-			$username
+			$username,
 		);
 		$endpoint = \ltrim($endpoint, '/');
 		if (WebdavHelper::isDAVRequest($endpoint)) {
@@ -708,7 +708,7 @@ class AuthContext implements Context {
 			$fullUrl,
 			$method,
 			$username,
-			$this->featureContext->getPasswordForUser($user)
+			$this->featureContext->getPasswordForUser($user),
 		);
 		$this->featureContext->setResponse($response);
 	}

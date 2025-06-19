@@ -72,7 +72,7 @@ class TusClient extends Client {
 				[
 					'body' => $data,
 					'headers' => $headers,
-				]
+				],
 			);
 		} catch (ClientException $e) {
 			$response = $e->getResponse();
@@ -84,9 +84,9 @@ class TusClient extends Client {
 				[
 					'location' => $uploadLocation,
 					'expires_at' => Carbon::now()->addSeconds(
-						$this->getCache()->getTtl()
+						$this->getCache()->getTtl(),
 					)->format($this->getCache()::RFC_7231),
-				]
+				],
 			);
 		}
 		return $response;
@@ -130,7 +130,7 @@ class TusClient extends Client {
 			[
 				'body' => $data,
 				'headers' => $headers,
-			]
+			],
 		);
 		return $response;
 	}

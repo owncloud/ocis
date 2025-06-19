@@ -93,7 +93,7 @@ class NotificationContext implements Context {
 			$this->featureContext->getAdminPassword(),
 			'DELETE',
 			$this->globalNotificationEndpointPath,
-			json_encode($payload)
+			json_encode($payload),
 		);
 	}
 
@@ -118,7 +118,7 @@ class NotificationContext implements Context {
 			$this->notificationEndpointPath,
 			[],
 			2,
-			$headers
+			$headers,
 		);
 	}
 
@@ -218,7 +218,7 @@ class NotificationContext implements Context {
 			'DELETE',
 			$this->notificationEndpointPath,
 			\json_encode($payload),
-			2
+			2,
 		);
 	}
 
@@ -234,7 +234,7 @@ class NotificationContext implements Context {
 			$response = $this->featureContext->getResponse()->getBody()->getContents();
 			throw new \Exception(
 				__METHOD__
-				. " Failed to get user notification list" . $response
+				. " Failed to get user notification list" . $response,
 			);
 		}
 		$notifications = $this->featureContext->getJsonDecodedResponseBodyContent()->ocs->data;
@@ -272,7 +272,7 @@ class NotificationContext implements Context {
 		Assert::assertEquals(
 			$numberOfNotification,
 			$actualNumber,
-			"Expected number of notifications was '$numberOfNotification', but got '$actualNumber'"
+			"Expected number of notifications was '$numberOfNotification', but got '$actualNumber'",
 		);
 	}
 
@@ -287,7 +287,7 @@ class NotificationContext implements Context {
 	 */
 	public function theJsonDataFromLastResponseShouldMatch(
 		string $subject,
-		PyStringNode $schemaString
+		PyStringNode $schemaString,
 	): void {
 		$responseBody = $this->filterResponseAccordingToNotificationSubject($subject);
 		// substitute the value here
@@ -302,7 +302,7 @@ class NotificationContext implements Context {
 		);
 		$this->featureContext->assertJsonDocumentMatchesSchema(
 			$responseBody,
-			$this->featureContext->getJSONSchema($schemaString)
+			$this->featureContext->getJSONSchema($schemaString),
 		);
 	}
 
@@ -316,7 +316,7 @@ class NotificationContext implements Context {
 	 */
 	public function filterResponseAccordingToNotificationSubject(
 		string $subject,
-		?ResponseInterface $response = null
+		?ResponseInterface $response = null,
 	): object {
 		$response = $response ?? $this->featureContext->getResponse();
 		if (isset($this->featureContext->getJsonDecodedResponseBodyContent($response)->ocs->data)) {
@@ -344,7 +344,7 @@ class NotificationContext implements Context {
 	public function filterNotificationsBySubjectAndResource(
 		string $subject,
 		string $resource,
-		?ResponseInterface $response = null
+		?ResponseInterface $response = null,
 	): array {
 		$filteredNotifications = [];
 		$response = $response ?? $this->featureContext->getResponse();
@@ -379,7 +379,7 @@ class NotificationContext implements Context {
 	public function filterNotificationsBySubjectAndSpace(
 		string $subject,
 		string $space,
-		?ResponseInterface $response = null
+		?ResponseInterface $response = null,
 	): array {
 		$filteredNotifications = [];
 		$response = $response ?? $this->featureContext->getResponse();
@@ -430,7 +430,7 @@ class NotificationContext implements Context {
 			$actualMessage = str_replace(
 				["\r", "\n"],
 				" ",
-				$this->filterResponseAccordingToNotificationSubject($subject, $response)->message
+				$this->filterResponseAccordingToNotificationSubject($subject, $response)->message,
 			);
 		} else {
 			throw new \Exception("Notification was not found even after retrying for 5 seconds.");
@@ -439,7 +439,7 @@ class NotificationContext implements Context {
 		Assert::assertSame(
 			$expectedMessage,
 			$actualMessage,
-			__METHOD__ . "expected message to be '$expectedMessage' but found'$actualMessage'"
+			__METHOD__ . "expected message to be '$expectedMessage' but found'$actualMessage'",
 		);
 	}
 
@@ -458,7 +458,7 @@ class NotificationContext implements Context {
 		string $user,
 		string $resource,
 		string $subject,
-		TableNode $table
+		TableNode $table,
 	): void {
 		$response = $this->listAllNotifications($user);
 		$notification = $this->filterNotificationsBySubjectAndResource($subject, $resource, $response);
@@ -469,19 +469,19 @@ class NotificationContext implements Context {
 			Assert::assertSame(
 				$expectedMessage,
 				$actualMessage,
-				__METHOD__ . "expected message to be '$expectedMessage' but found'$actualMessage'"
+				__METHOD__ . "expected message to be '$expectedMessage' but found'$actualMessage'",
 			);
 			$response = $this->userDeletesNotification($user);
 			$this->featureContext->theHTTPStatusCodeShouldBe(200, '', $response);
 		} elseif (\count($notification) === 0) {
 			throw new \Exception(
 				"Response doesn't contain any notification with resource '$resource' and subject '$subject'.\n"
-				. print_r($notification, true)
+				. print_r($notification, true),
 			);
 		} else {
 			throw new \Exception(
 				"Response contains more than one notification with resource '$resource' and subject '$subject'.\n"
-				. print_r($notification, true)
+				. print_r($notification, true),
 			);
 		}
 	}
@@ -500,7 +500,7 @@ class NotificationContext implements Context {
 		string $user,
 		string $resourceOrSpace,
 		string $resource,
-		string $subject
+		string $subject,
 	): void {
 		$response = $this->listAllNotifications($user);
 		if ($resourceOrSpace === "space") {
@@ -512,7 +512,7 @@ class NotificationContext implements Context {
 			0,
 			$filteredResponse,
 			"Response should not contain notification related to resource '$resource' with subject '$subject' but found"
-			. print_r($filteredResponse, true)
+			. print_r($filteredResponse, true),
 		);
 	}
 
@@ -531,7 +531,7 @@ class NotificationContext implements Context {
 	public function userCreatesDeprovisioningNotification(
 		?string $user = null,
 		?string $deprovision_date = "2043-07-04T11:23:12Z",
-		?string $deprovision_date_format = "2006-01-02T15:04:05Z07:00"
+		?string $deprovision_date_format = "2006-01-02T15:04:05Z07:00",
 	): ResponseInterface {
 		$payload["type"] = "deprovision";
 		$payload["data"] = [
@@ -542,7 +542,7 @@ class NotificationContext implements Context {
 			$user ? $this->featureContext->getPasswordForUser($user) : $this->featureContext->getAdminPassword(),
 			'POST',
 			$this->globalNotificationEndpointPath,
-			json_encode($payload)
+			json_encode($payload),
 		);
 	}
 
@@ -576,7 +576,7 @@ class NotificationContext implements Context {
 	 */
 	public function theAdministratorCreatesADeprovisioningNotificationUsingDateFormat(
 		$deprovision_date,
-		$deprovision_date_format
+		$deprovision_date_format,
 	): void {
 		$response = $this->userCreatesDeprovisioningNotification(null, $deprovision_date, $deprovision_date_format);
 		$this->featureContext->setResponse($response);
@@ -610,7 +610,7 @@ class NotificationContext implements Context {
 			$user ? $this->featureContext->getPasswordForUser($user) : $this->featureContext->getAdminPassword(),
 			'DELETE',
 			$this->globalNotificationEndpointPath,
-			json_encode($payload)
+			json_encode($payload),
 		);
 		$this->featureContext->setResponse($response);
 	}

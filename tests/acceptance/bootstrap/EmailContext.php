@@ -66,7 +66,7 @@ class EmailContext implements Context {
 		string $user,
 		string $sender,
 		string $spaceName,
-		PyStringNode $content
+		PyStringNode $content,
 	): void {
 		$rawExpectedEmailBodyContent = \str_replace("\r\n", "\n", $content->getRaw());
 		$this->featureContext->setResponse(
@@ -75,7 +75,7 @@ class EmailContext implements Context {
 				$user,
 				$this->featureContext->getPasswordForUser($user),
 				'',
-			)
+			),
 		);
 		$expectedEmailBodyContent = $this->featureContext->substituteInLineCodes(
 			$rawExpectedEmailBodyContent,
@@ -88,7 +88,7 @@ class EmailContext implements Context {
 						[$this->spacesContext, "getSpaceIdByName"],
 					"parameter" => [$sender, $spaceName],
 				],
-			]
+			],
 		);
 		$this->assertEmailContains($user, $expectedEmailBodyContent);
 	}
@@ -106,12 +106,12 @@ class EmailContext implements Context {
 	public function userShouldHaveReceivedTheFollowingEmailFromUser(
 		string $user,
 		string $sender,
-		PyStringNode $content
+		PyStringNode $content,
 	): void {
 		$rawExpectedEmailBodyContent = \str_replace("\r\n", "\n", $content->getRaw());
 		$expectedEmailBodyContent = $this->featureContext->substituteInLineCodes(
 			$rawExpectedEmailBodyContent,
-			$sender
+			$sender,
 		);
 		$this->assertEmailContains($user, $expectedEmailBodyContent);
 	}
@@ -142,7 +142,7 @@ class EmailContext implements Context {
 		Assert::assertSame(
 			$count,
 			$emails["messages_count"],
-			"Expected '$address' received mail total '$count' email but got " . $emails["messages_count"] . " email"
+			"Expected '$address' received mail total '$count' email but got " . $emails["messages_count"] . " email",
 		);
 	}
 
@@ -159,12 +159,12 @@ class EmailContext implements Context {
 	public function userShouldHaveReceivedTheFollowingEmailFromUserIgnoringWhitespaces(
 		string $user,
 		string $sender,
-		PyStringNode $content
+		PyStringNode $content,
 	): void {
 		$rawExpectedEmailBodyContent = \str_replace("\r\n", "\n", $content->getRaw());
 		$expectedEmailBodyContent = $this->featureContext->substituteInLineCodes(
 			$rawExpectedEmailBodyContent,
-			$sender
+			$sender,
 		);
 		$this->assertEmailContains($user, $expectedEmailBodyContent, true);
 	}
@@ -180,7 +180,7 @@ class EmailContext implements Context {
 	public function assertEmailContains(
 		string $user,
 		string $expectedEmailBodyContent,
-		$ignoreWhiteSpace = false
+		$ignoreWhiteSpace = false,
 	): void {
 		$address = $this->featureContext->getEmailAddressForUser($user);
 		$actualEmailBodyContent = $this->getBodyOfLastEmail($address);
@@ -193,7 +193,7 @@ class EmailContext implements Context {
 			$actualEmailBodyContent,
 			"The email address '$address' should have received an"
 			. "email with the body containing $expectedEmailBodyContent
-			but the received email is $actualEmailBodyContent"
+			but the received email is $actualEmailBodyContent",
 		);
 	}
 
@@ -210,23 +210,23 @@ class EmailContext implements Context {
 	 */
 	public function getBodyOfLastEmail(
 		string $emailAddress,
-		?int $waitTimeSec = EMAIL_WAIT_TIMEOUT_SEC
+		?int $waitTimeSec = EMAIL_WAIT_TIMEOUT_SEC,
 	): string {
 		$currentTime = \time();
 		$endTime = $currentTime + $waitTimeSec;
 		while ($currentTime <= $endTime) {
 			$query = 'to:' . $emailAddress;
 			$mailResponse = $this->featureContext->getJsonDecodedResponse(
-				EmailHelper::searchEmails($query)
+				EmailHelper::searchEmails($query),
 			);
 			if ($mailResponse["messages_count"] > 0) {
 				$lastEmail = $this->featureContext->getJsonDecodedResponse(
-					EmailHelper::getEmailById("latest", $query)
+					EmailHelper::getEmailById("latest", $query),
 				);
 				$body = \str_replace(
 					"\r\n",
 					"\n",
-					\quoted_printable_decode($lastEmail["Text"] . "\n" . $lastEmail["HTML"])
+					\quoted_printable_decode($lastEmail["Text"] . "\n" . $lastEmail["HTML"]),
 				);
 				return $body;
 			}
@@ -247,11 +247,11 @@ class EmailContext implements Context {
 	 */
 	public function userShouldHaveReceivedTheFollowingGroupedEmail(
 		string $user,
-		PyStringNode $content
+		PyStringNode $content,
 	): void {
 		$rawExpectedEmailBodyContent = \str_replace("\r\n", "\n", $content->getRaw());
 		$expectedEmailBodyContent = $this->featureContext->substituteInLineCodes(
-			$rawExpectedEmailBodyContent
+			$rawExpectedEmailBodyContent,
 		);
 		$this->assertEmailContains($user, $expectedEmailBodyContent);
 	}

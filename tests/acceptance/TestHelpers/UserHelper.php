@@ -53,7 +53,7 @@ class UserHelper {
 		string $value,
 		string $adminUser,
 		string $adminPassword,
-		?int $ocsApiVersion = 2
+		?int $ocsApiVersion = 2,
 	): ResponseInterface {
 		return OcsApiHelper::sendRequest(
 			$baseUrl,
@@ -62,7 +62,7 @@ class UserHelper {
 			"PUT",
 			"/cloud/users/" . $user,
 			["key" => $key, "value" => $value],
-			$ocsApiVersion
+			$ocsApiVersion,
 		);
 	}
 
@@ -84,12 +84,12 @@ class UserHelper {
 		?array $editData,
 		?string $adminUser,
 		?string $adminPassword,
-		?int $ocsApiVersion = 2
+		?int $ocsApiVersion = 2,
 	): array {
 		$requests = [];
 		$client = HttpRequestHelper::createClient(
 			$adminUser,
-			$adminPassword
+			$adminPassword,
 		);
 
 		foreach ($editData as $data) {
@@ -100,7 +100,7 @@ class UserHelper {
 				$baseUrl,
 				'PUT',
 				$path,
-				$body
+				$body,
 			);
 		}
 		// Send the array of requests at once in parallel.
@@ -111,7 +111,7 @@ class UserHelper {
 				$httpStatusCode = $e->getResponse()->getStatusCode();
 				$reasonPhrase = $e->getResponse()->getReasonPhrase();
 				throw new Exception(
-					"Unexpected failure when editing a user: HTTP status $httpStatusCode HTTP reason $reasonPhrase"
+					"Unexpected failure when editing a user: HTTP status $httpStatusCode HTTP reason $reasonPhrase",
 				);
 			}
 		}
@@ -134,7 +134,7 @@ class UserHelper {
 		?string $userName,
 		?string $adminUser,
 		?string $adminPassword,
-		?int $ocsApiVersion = 2
+		?int $ocsApiVersion = 2,
 	): ResponseInterface {
 		return OcsApiHelper::sendRequest(
 			$baseUrl,
@@ -143,7 +143,7 @@ class UserHelper {
 			"GET",
 			"/cloud/users/" . $userName,
 			[],
-			$ocsApiVersion
+			$ocsApiVersion,
 		);
 	}
 
@@ -163,7 +163,7 @@ class UserHelper {
 		?string $userName,
 		?string $adminUser,
 		?string $adminPassword,
-		?int $ocsApiVersion = 2
+		?int $ocsApiVersion = 2,
 	): ResponseInterface {
 		return OcsApiHelper::sendRequest(
 			$baseUrl,
@@ -172,7 +172,7 @@ class UserHelper {
 			"DELETE",
 			"/cloud/users/" . $userName,
 			[],
-			$ocsApiVersion
+			$ocsApiVersion,
 		);
 	}
 
@@ -194,7 +194,7 @@ class UserHelper {
 		?string $group,
 		?string $adminUser,
 		?string $adminPassword,
-		?int $ocsApiVersion = 2
+		?int $ocsApiVersion = 2,
 	): ResponseInterface {
 		return OcsApiHelper::sendRequest(
 			$baseUrl,
@@ -203,7 +203,7 @@ class UserHelper {
 			"POST",
 			"/cloud/users/" . $user . "/groups",
 			['groupid' => $group],
-			$ocsApiVersion
+			$ocsApiVersion,
 		);
 	}
 
@@ -225,7 +225,7 @@ class UserHelper {
 		?string $group,
 		?string $adminUser,
 		?string $adminPassword,
-		?int $ocsApiVersion = 2
+		?int $ocsApiVersion = 2,
 	): ResponseInterface {
 		return OcsApiHelper::sendRequest(
 			$baseUrl,
@@ -234,7 +234,7 @@ class UserHelper {
 			"DELETE",
 			"/cloud/users/" . $user . "/groups",
 			['groupid' => $group],
-			$ocsApiVersion
+			$ocsApiVersion,
 		);
 	}
 
@@ -252,7 +252,7 @@ class UserHelper {
 		?string $baseUrl,
 		?string $adminUser,
 		?string $adminPassword,
-		?string $search = ""
+		?string $search = "",
 	): ResponseInterface {
 		return OcsApiHelper::sendRequest(
 			$baseUrl,
@@ -277,13 +277,13 @@ class UserHelper {
 		?string $baseUrl,
 		?string $adminUser,
 		?string $adminPassword,
-		?string $search = ""
+		?string $search = "",
 	): array {
 		$result = self::getGroups(
 			$baseUrl,
 			$adminUser,
 			$adminPassword,
-			$search
+			$search,
 		);
 		$groups = HttpRequestHelper::getResponseXml($result, __METHOD__)->xpath(".//groups")[0];
 		$return = [];

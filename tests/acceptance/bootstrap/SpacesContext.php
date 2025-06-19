@@ -229,7 +229,7 @@ class SpacesContext implements Context {
 			$this->featureContext->theHttpStatusCodeShouldBe(
 				200,
 				"Failed to fetch me/drives for user '$user'",
-				$response
+				$response,
 			);
 			$spaces = $this->featureContext->getJsonDecodedResponseBodyContent($response)->value;
 
@@ -315,7 +315,7 @@ class SpacesContext implements Context {
 		$response = GraphHelper::getSharesSharedWithMe(
 			$this->featureContext->getBaseUrl(),
 			$credentials['username'],
-			$credentials['password']
+			$credentials['password'],
 		);
 
 		$jsonBody = $this->featureContext->getJsonDecodedResponseBodyContent($response);
@@ -378,7 +378,7 @@ class SpacesContext implements Context {
 		string $user,
 		string $spaceName,
 		string $fileName,
-		bool $federatedShare = false
+		bool $federatedShare = false,
 	): ResponseInterface {
 		$baseUrl = $this->featureContext->getBaseUrl();
 
@@ -398,7 +398,7 @@ class SpacesContext implements Context {
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			[],
-			"{}"
+			"{}",
 		);
 	}
 
@@ -472,16 +472,16 @@ class SpacesContext implements Context {
 			"0",
 			$spaceId,
 			"files",
-			WebDavHelper::DAV_VERSION_SPACES
+			WebDavHelper::DAV_VERSION_SPACES,
 		);
 		$responseArray = json_decode(
 			json_encode(
 				HttpRequestHelper::getResponseXml($response, __METHOD__)
-					->xpath("//d:response/d:propstat/d:prop/oc:privatelink")
+					->xpath("//d:response/d:propstat/d:prop/oc:privatelink"),
 			),
 			true,
 			512,
-			JSON_THROW_ON_ERROR
+			JSON_THROW_ON_ERROR,
 		);
 		Assert::assertNotEmpty($responseArray, "the PROPFIND response for $spaceName is empty");
 		return $responseArray[0][0];
@@ -610,7 +610,7 @@ class SpacesContext implements Context {
 		string $user,
 		string $password,
 		$body,
-		array $headers = []
+		array $headers = [],
 	): ResponseInterface {
 		return HttpRequestHelper::post($fullUrl, $user, $password, $headers, $body);
 	}
@@ -633,7 +633,7 @@ class SpacesContext implements Context {
 		string $method,
 		string $user,
 		string $password,
-		array $headers = []
+		array $headers = [],
 	): ResponseInterface {
 		return HttpRequestHelper::sendRequest($fullUrl, $method, $user, $password, $headers);
 	}
@@ -651,7 +651,7 @@ class SpacesContext implements Context {
 	public function listAllMySpaces(
 		string $user,
 		string $query = '',
-		array $headers = []
+		array $headers = [],
 	): ResponseInterface {
 		return GraphHelper::getMySpaces(
 			$this->featureContext->getBaseUrl(),
@@ -659,7 +659,7 @@ class SpacesContext implements Context {
 			$this->featureContext->getPasswordForUser($user),
 			$query,
 			[],
-			$headers
+			$headers,
 		);
 	}
 
@@ -692,11 +692,11 @@ class SpacesContext implements Context {
 	 */
 	public function theUserListsAllHisAvailableSpacesWithHeadersUsingTheGraphApi(
 		string $user,
-		TableNode $headersTable
+		TableNode $headersTable,
 	): void {
 		$this->featureContext->verifyTableNodeColumns(
 			$headersTable,
-			['header', 'value']
+			['header', 'value'],
 		);
 		$headers = [];
 		foreach ($headersTable as $row) {
@@ -742,7 +742,7 @@ class SpacesContext implements Context {
 	public function theUserLooksUpTheSingleSpaceUsingTheGraphApiByUsingItsId(
 		string $user,
 		string $spaceName,
-		string $ownerUser = ''
+		string $ownerUser = '',
 	): void {
 		$space = $this->getSpaceByName(($ownerUser !== "") ? $ownerUser : $user, $spaceName);
 		Assert::assertNotEmpty($space["id"]);
@@ -754,7 +754,7 @@ class SpacesContext implements Context {
 				$this->featureContext->getPasswordForUser($user),
 				$space["id"],
 				'',
-			)
+			),
 		);
 	}
 
@@ -776,7 +776,7 @@ class SpacesContext implements Context {
 		string $user,
 		string $spaceName,
 		string $spaceType,
-		?int $quota = null
+		?int $quota = null,
 	): void {
 		$space = ["name" => $spaceName, "driveType" => $spaceType, "quota" => ["total" => $quota]];
 		$body = json_encode($space);
@@ -812,7 +812,7 @@ class SpacesContext implements Context {
 			null,
 			$spaceId,
 			'files',
-			WebDavHelper::DAV_VERSION_SPACES
+			WebDavHelper::DAV_VERSION_SPACES,
 		);
 	}
 
@@ -829,7 +829,7 @@ class SpacesContext implements Context {
 	public function theUserListsTheContentOfAPersonalSpaceRootUsingTheWebDAvApi(
 		string $user,
 		string $spaceName,
-		string $foldersPath = ''
+		string $foldersPath = '',
 	): void {
 		$this->featureContext->setResponse($this->propfindSpace($user, $spaceName, $foldersPath));
 	}
@@ -849,7 +849,7 @@ class SpacesContext implements Context {
 		string $user,
 		string $spaceName,
 		string $owner,
-		string $data
+		string $data,
 	): void {
 		$space = $this->getSpaceByName($owner, $spaceName);
 		Assert::assertIsArray($space);
@@ -862,8 +862,8 @@ class SpacesContext implements Context {
 				$this->featureContext->getActualUsername($user),
 				$this->featureContext->getPasswordForUser($user),
 				null,
-				$data
-			)
+				$data,
+			),
 		);
 	}
 
@@ -879,7 +879,7 @@ class SpacesContext implements Context {
 	 */
 	public function thePropfindResultShouldContainEntries(
 		string $shouldOrNot,
-		TableNode $expectedFiles
+		TableNode $expectedFiles,
 	): void {
 		$this->featureContext->propfindResultShouldContainEntries(
 			$shouldOrNot,
@@ -903,7 +903,7 @@ class SpacesContext implements Context {
 		string $user,
 		string $spaceName,
 		string $shouldOrNot,
-		TableNode $expectedFiles
+		TableNode $expectedFiles,
 	): void {
 		$space = $this->getSpaceByName($user, $spaceName);
 		$this->featureContext->setResponse($this->propfindSpace($user, $spaceName));
@@ -913,7 +913,7 @@ class SpacesContext implements Context {
 			$user,
 			'PROPFIND',
 			'',
-			$space['id']
+			$space['id'],
 		);
 	}
 
@@ -935,7 +935,7 @@ class SpacesContext implements Context {
 		string $folderPath,
 		string $spaceName,
 		string $shouldOrNot,
-		TableNode $expectedFiles
+		TableNode $expectedFiles,
 	): void {
 		$space = $this->getSpaceByName($user, $spaceName);
 		$this->featureContext->setResponse($this->propfindSpace($user, $spaceName, $folderPath));
@@ -945,7 +945,7 @@ class SpacesContext implements Context {
 			$this->featureContext->getActualUsername($user),
 			'PROPFIND',
 			$folderPath,
-			$space['id']
+			$space['id'],
 		);
 	}
 
@@ -965,7 +965,7 @@ class SpacesContext implements Context {
 		string $user,
 		string $file,
 		string $spaceName,
-		string $fileContent
+		string $fileContent,
 	): void {
 		$actualFileContent = $this->getFileData($user, $spaceName, $file)->getBody()->getContents();
 		Assert::assertEquals($fileContent, $actualFileContent, "$file does not contain $fileContent");
@@ -987,13 +987,13 @@ class SpacesContext implements Context {
 		string $user,
 		string $file,
 		string $share,
-		string $fileContent
+		string $fileContent,
 	): void {
 		$actualFileContent = $this->getFileData(
 			$user,
 			$share,
 			$file,
-			true
+			true,
 		)->getBody()->getContents();
 		Assert::assertEquals($fileContent, $actualFileContent, "File content did not match");
 	}
@@ -1012,7 +1012,7 @@ class SpacesContext implements Context {
 		string $spaceName,
 		?string $userName = null,
 		?string $fileName = null,
-		?PyStringNode $schemaString = null
+		?PyStringNode $schemaString = null,
 	): void {
 		Assert::assertNotNull($schemaString, 'schema is not valid JSON');
 
@@ -1067,7 +1067,7 @@ class SpacesContext implements Context {
 		);
 		$this->featureContext->assertJsonDocumentMatchesSchema(
 			$responseBody,
-			$this->featureContext->getJSONSchema($schemaString)
+			$this->featureContext->getJSONSchema($schemaString),
 		);
 	}
 
@@ -1086,17 +1086,17 @@ class SpacesContext implements Context {
 		string $user,
 		string $spaceName,
 		string $grantedUser,
-		string $role
+		string $role,
 	): void {
 		$response = $this->listAllMySpaces($user);
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			200,
 			"Expected response status code should be 200",
-			$response
+			$response,
 		);
 		Assert::assertIsArray(
 			$spaceAsArray = $this->getSpaceByNameFromResponse($spaceName, $response),
-			"No space with name $spaceName found"
+			"No space with name $spaceName found",
 		);
 		$permissions = $spaceAsArray["root"]["permissions"];
 		$userId = $this->featureContext->getUserIdByUserName($grantedUser);
@@ -1121,11 +1121,11 @@ class SpacesContext implements Context {
 	 * @throws Exception
 	 */
 	public function jsonRespondedShouldNotContain(
-		string $spaceName
+		string $spaceName,
 	): void {
 		Assert::assertEmpty(
 			$this->getSpaceByNameFromResponse($spaceName),
-			"space $spaceName should not be available for a user"
+			"space $spaceName should not be available for a user",
 		);
 	}
 
@@ -1142,23 +1142,23 @@ class SpacesContext implements Context {
 	public function userShouldNotHaveSpace(
 		string $user,
 		string $shouldOrNot,
-		string $spaceName
+		string $spaceName,
 	): void {
 		$response = $this->listAllMySpaces($user);
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			200,
 			"Expected response status code should be 200",
-			$response
+			$response,
 		);
 		if (\trim($shouldOrNot) === "not") {
 			Assert::assertEmpty(
 				$this->getSpaceByNameFromResponse($spaceName, $response),
-				"space $spaceName should not be available for a user"
+				"space $spaceName should not be available for a user",
 			);
 		} else {
 			Assert::assertNotEmpty(
 				$this->getSpaceByNameFromResponse($spaceName, $response),
-				"space '$spaceName' should be available for a user '$user' but not found"
+				"space '$spaceName' should be available for a user '$user' but not found",
 			);
 		}
 	}
@@ -1174,13 +1174,13 @@ class SpacesContext implements Context {
 	 */
 	public function theUserShouldHaveASpaceInTheDisableState(
 		string $user,
-		string $spaceName
+		string $spaceName,
 	): void {
 		$response = $this->listAllMySpaces($user);
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			200,
 			"Expected response status code should be 200",
-			$response
+			$response,
 		);
 		$decodedResponse = $this->featureContext->getJsonDecodedResponse($response);
 		if (isset($decodedResponse["value"])) {
@@ -1188,7 +1188,7 @@ class SpacesContext implements Context {
 				if ($spaceCandidate['name'] === $spaceName) {
 					if ($spaceCandidate['root']['deleted']['state'] !== 'trashed') {
 						throw new \Exception(
-							"space $spaceName should be in disable state but it's not "
+							"space $spaceName should be in disable state but it's not ",
 						);
 					}
 					return;
@@ -1209,7 +1209,7 @@ class SpacesContext implements Context {
 	 */
 	public function jsonRespondedShouldNotContainSpaceType(
 		string $onlyOrNot,
-		string $type
+		string $type,
 	): void {
 		Assert::assertNotEmpty(
 			$spaces = json_decode(
@@ -1217,8 +1217,8 @@ class SpacesContext implements Context {
 					->getResponse()->getBody(),
 				true,
 				512,
-				JSON_THROW_ON_ERROR
-			)
+				JSON_THROW_ON_ERROR,
+			),
 		);
 		$matches = [];
 		foreach ($spaces["value"] as $space) {
@@ -1249,7 +1249,7 @@ class SpacesContext implements Context {
 	 */
 	public function verifyTableNodeColumnsCount(
 		TableNode $table,
-		int $count
+		int $count,
 	): void {
 		if (\count($table->getRows()) < 1) {
 			throw new Exception("Table should have at least one row.");
@@ -1288,7 +1288,7 @@ class SpacesContext implements Context {
 	public function theUserCreatesAFolderUsingTheGraphApi(
 		string $user,
 		string $folder,
-		string $spaceName
+		string $spaceName,
 	): void {
 		$folder = \trim($folder, '/');
 		$exploded = explode('/', $folder);
@@ -1314,7 +1314,7 @@ class SpacesContext implements Context {
 	public function userCreatesAFolderInsideFederatedShareUsingTheWebDavApi(
 		string $user,
 		string $folder,
-		string $federatedShare
+		string $federatedShare,
 	): void {
 		$folder = \trim($folder, '/');
 		$remoteItemId = $this->featureContext->spacesContext->getSharesRemoteItemId($user, $federatedShare);
@@ -1337,7 +1337,7 @@ class SpacesContext implements Context {
 	public function theUserTriesToCreateASubFolderUsingTheGraphApi(
 		string $user,
 		string $subfolder,
-		string $spaceName
+		string $spaceName,
 	): void {
 		$response = $this->createFolderInSpace($user, $subfolder, $spaceName);
 		$this->featureContext->setResponse($response);
@@ -1357,7 +1357,7 @@ class SpacesContext implements Context {
 	public function userHasCreatedAFolderInSpace(
 		string $user,
 		string $folder,
-		string $spaceName
+		string $spaceName,
 	): void {
 		$folder = \trim($folder, '/');
 		$paths = explode('/', $folder);
@@ -1369,7 +1369,7 @@ class SpacesContext implements Context {
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			201,
 			"Expected response status code should be 201",
-			$response
+			$response,
 		);
 	}
 
@@ -1387,7 +1387,7 @@ class SpacesContext implements Context {
 		string $user,
 		string $folder,
 		string $spaceName,
-		string $ownerUser = ''
+		string $ownerUser = '',
 	): ResponseInterface {
 		if ($ownerUser === '') {
 			$ownerUser = $user;
@@ -1412,7 +1412,7 @@ class SpacesContext implements Context {
 		string $user,
 		string $folder,
 		string $spaceName,
-		string $ownerUser = ''
+		string $ownerUser = '',
 	): void {
 		$response = $this->createFolderInSpace($user, $folder, $spaceName, $ownerUser);
 		$this->featureContext->setResponse($response);
@@ -1434,7 +1434,7 @@ class SpacesContext implements Context {
 		string $user,
 		string $spaceName,
 		string $content,
-		string $destination
+		string $destination,
 	): void {
 		$spaceId = $this->getSpaceIdByName($user, $spaceName);
 		if ($spaceName === "Shares" && !\str_starts_with($destination, "Shares/")) {
@@ -1466,8 +1466,8 @@ class SpacesContext implements Context {
 				$user,
 				$content,
 				'',
-				$spaceId
-			)
+				$spaceId,
+			),
 		);
 	}
 
@@ -1487,7 +1487,7 @@ class SpacesContext implements Context {
 		string $user,
 		string $source,
 		string $destination,
-		string $spaceName
+		string $spaceName,
 	): void {
 		$spaceId = $this->getSpaceIdByName($user, $spaceName);
 		$response = $this->featureContext->uploadFile($user, $source, $destination, $spaceId);
@@ -1510,14 +1510,14 @@ class SpacesContext implements Context {
 		string $user,
 		string $source,
 		string $destination,
-		string $spaceName
+		string $spaceName,
 	): void {
 		$spaceId = $this->getSpaceIdByName($user, $spaceName);
 		$response = $this->featureContext->uploadFile($user, $source, $destination, $spaceId);
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			201,
 			"Expected response status code should be 201",
-			$response
+			$response,
 		);
 	}
 
@@ -1539,14 +1539,14 @@ class SpacesContext implements Context {
 		string $spaceName,
 		string $ownerUser,
 		string $content,
-		string $destination
+		string $destination,
 	): void {
 		$spaceId = $this->getSpaceIdByName($ownerUser, $spaceName);
 		$response = $this->featureContext->uploadFileWithContent(
 			$user,
 			$content,
 			$destination,
-			$spaceId
+			$spaceId,
 		);
 		$this->featureContext->setResponse($response);
 	}
@@ -1565,7 +1565,7 @@ class SpacesContext implements Context {
 		string $user,
 		string $spaceName,
 		array $bodyData,
-		string $owner = ''
+		string $owner = '',
 	): ResponseInterface {
 		if ($spaceName === "non-existing") {
 			// check sending invalid data
@@ -1603,11 +1603,11 @@ class SpacesContext implements Context {
 		string $user,
 		string $spaceName,
 		string $newName,
-		string $owner = ''
+		string $owner = '',
 	): void {
 		$bodyData = ["Name" => $newName];
 		$this->featureContext->setResponse(
-			$this->updateSpace($user, $spaceName, $bodyData, $owner)
+			$this->updateSpace($user, $spaceName, $bodyData, $owner),
 		);
 	}
 
@@ -1628,11 +1628,11 @@ class SpacesContext implements Context {
 		string $user,
 		string $spaceName,
 		string $newDescription,
-		string $owner = ''
+		string $owner = '',
 	): void {
 		$bodyData = ["description" => $newDescription];
 		$this->featureContext->setResponse(
-			$this->updateSpace($user, $spaceName, $bodyData, $owner)
+			$this->updateSpace($user, $spaceName, $bodyData, $owner),
 		);
 	}
 
@@ -1650,14 +1650,14 @@ class SpacesContext implements Context {
 	public function userHasChangedDescription(
 		string $user,
 		string $spaceName,
-		string $newDescription
+		string $newDescription,
 	): void {
 		$bodyData = ["description" => $newDescription];
 		$response = $this->updateSpace($user, $spaceName, $bodyData);
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			200,
 			"Expected response status code should be 200",
-			$response
+			$response,
 		);
 	}
 
@@ -1678,11 +1678,11 @@ class SpacesContext implements Context {
 		string $user,
 		string $spaceName,
 		int $newQuota,
-		string $owner = ''
+		string $owner = '',
 	): void {
 		$bodyData = ["quota" => ["total" => $newQuota]];
 		$this->featureContext->setResponse(
-			$this->updateSpace($user, $spaceName, $bodyData, $owner)
+			$this->updateSpace($user, $spaceName, $bodyData, $owner),
 		);
 	}
 
@@ -1700,14 +1700,14 @@ class SpacesContext implements Context {
 	public function userHasChangedTheQuotaOfTheSpaceTo(
 		string $user,
 		string $spaceName,
-		int $newQuota
+		int $newQuota,
 	): void {
 		$bodyData = ["quota" => ["total" => $newQuota]];
 		$response = $this->updateSpace($user, $spaceName, $bodyData);
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			200,
 			"Expected response status code should be 200",
-			$response
+			$response,
 		);
 	}
 
@@ -1725,7 +1725,7 @@ class SpacesContext implements Context {
 		string $user,
 		string $file,
 		string $type,
-		string $spaceName
+		string $spaceName,
 	): ResponseInterface {
 		$space = $this->getSpaceByName($user, $spaceName);
 		$spaceId = $space["id"];
@@ -1764,15 +1764,15 @@ class SpacesContext implements Context {
 		string $user,
 		string $file,
 		string $type,
-		string $spaceName
+		string $spaceName,
 	): void {
 		$this->featureContext->setResponse(
 			$this->updateSpaceSpecialSection(
 				$user,
 				$file,
 				$type,
-				$spaceName
-			)
+				$spaceName,
+			),
 		);
 	}
 
@@ -1792,13 +1792,13 @@ class SpacesContext implements Context {
 		string $user,
 		string $file,
 		string $type,
-		string $spaceName
+		string $spaceName,
 	): void {
 		$response = $this->updateSpaceSpecialSection($user, $file, $type, $spaceName);
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			200,
 			"Expected response status code should be 200",
-			$response
+			$response,
 		);
 	}
 
@@ -1817,14 +1817,14 @@ class SpacesContext implements Context {
 		string $user,
 		string $spaceName,
 		string $spaceType,
-		int $quota
+		int $quota,
 	): void {
 		$space = ["name" => $spaceName, "driveType" => $spaceType, "quota" => ["total" => $quota]];
 		$response = $this->createSpace($user, $space);
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			201,
 			"Expected response status code should be 201 (Created)",
-			$response
+			$response,
 		);
 		$space = $this->featureContext->getJsonDecodedResponseBodyContent($response);
 		$this->addToCreatedSpace($user, $space);
@@ -1843,14 +1843,14 @@ class SpacesContext implements Context {
 	 */
 	public function theUserHasCreatedASpaceByDefaultUsingTheGraphApi(
 		string $user,
-		string $spaceName
+		string $spaceName,
 	): void {
 		$space = ["name" => $spaceName];
 		$response = $this->createSpace($user, $space);
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			201,
 			"Expected response status code should be 201 (Created)",
-			$response
+			$response,
 		);
 		$space = $this->featureContext->getJsonDecodedResponseBodyContent($response);
 		$this->addToCreatedSpace($user, $space);
@@ -1866,7 +1866,7 @@ class SpacesContext implements Context {
 	 */
 	public function createSpace(
 		string $user,
-		array $space
+		array $space,
 	): ResponseInterface {
 		$body = json_encode($space, JSON_THROW_ON_ERROR);
 		return GraphHelper::createSpace(
@@ -1892,13 +1892,13 @@ class SpacesContext implements Context {
 		string $user,
 		string $fileSource,
 		string $fileDestination,
-		string $spaceName
+		string $spaceName,
 	): void {
 		$space = $this->getSpaceByName($user, $spaceName);
 		$headers['Destination'] = $this->destinationHeaderValueWithSpaceName(
 			$user,
 			$fileDestination,
-			$spaceName
+			$spaceName,
 		);
 
 		$encodedName = \rawurlencode(ltrim($fileSource, "/"));
@@ -1922,13 +1922,13 @@ class SpacesContext implements Context {
 		string $user,
 		string $fileSource,
 		string $fileDestination,
-		string $spaceName
+		string $spaceName,
 	): ResponseInterface {
 		$space = $this->getSpaceByName($user, $spaceName);
 		$headers['Destination'] = $this->destinationHeaderValueWithSpaceName(
 			$user,
 			$fileDestination,
-			$spaceName
+			$spaceName,
 		);
 		$headers['Overwrite'] = 'F';
 
@@ -1955,15 +1955,15 @@ class SpacesContext implements Context {
 		string $user,
 		string $fileSource,
 		string $fileDestination,
-		string $spaceName
+		string $spaceName,
 	): void {
 		$this->featureContext->setResponse(
 			$this->moveFileWithinSpace(
 				$user,
 				$fileSource,
 				$fileDestination,
-				$spaceName
-			)
+				$spaceName,
+			),
 		);
 		$this->featureContext->pushToLastHttpStatusCodesArray();
 	}
@@ -1983,20 +1983,20 @@ class SpacesContext implements Context {
 		string $user,
 		string $fileSource,
 		string $fileDestination,
-		string $spaceName
+		string $spaceName,
 	): void {
 		$response = $this->moveFileWithinSpace(
 			$user,
 			$fileSource,
 			$fileDestination,
-			$spaceName
+			$spaceName,
 		);
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			201,
 			__METHOD__ . "Expected response status code should be 201 (Created)\n" .
 			"Actual response status code was: " . $response->getStatusCode() . "\n" .
 			"Actual response body was: " . $response->getBody(),
-			$response
+			$response,
 		);
 	}
 
@@ -2040,19 +2040,19 @@ class SpacesContext implements Context {
 		string $fromSpaceName,
 		string $fileDestination,
 		string $toSpaceName,
-		TableNode $table = null
+		TableNode $table = null,
 	): void {
 		$space = $this->getSpaceByName($user, $fromSpaceName);
 		$headers['Destination'] = $this->destinationHeaderValueWithSpaceName(
 			$user,
 			$fileDestination,
-			$toSpaceName
+			$toSpaceName,
 		);
 
 		if ($table !== null) {
 			$this->featureContext->verifyTableNodeColumns(
 				$table,
-				['header', 'value']
+				['header', 'value'],
 			);
 			foreach ($table as $row) {
 				$headers[$row['header']] = $this->featureContext->substituteInLineCodes($row['value']);
@@ -2086,13 +2086,13 @@ class SpacesContext implements Context {
 		string $fromSpaceName,
 		string $fileDestination,
 		string $toSpaceName,
-		string $action
+		string $action,
 	): void {
 		$space = $this->getSpaceByName($user, $fromSpaceName);
 		$headers['Destination'] = $this->destinationHeaderValueWithSpaceName(
 			$user,
 			$fileDestination,
-			$toSpaceName
+			$toSpaceName,
 		);
 		$headers['Overwrite'] = 'T';
 
@@ -2125,7 +2125,7 @@ class SpacesContext implements Context {
 		string $user,
 		string $shouldOrNot,
 		string $fileName,
-		string $spaceName
+		string $spaceName,
 	): void {
 		$spaceId = $this->getSpaceIdByName($user, $spaceName);
 		if ($spaceName === "Shares"
@@ -2138,27 +2138,27 @@ class SpacesContext implements Context {
 			$fileName,
 			$this->featureContext->getPasswordForUser($user),
 			null,
-			$spaceId
+			$spaceId,
 		);
 		if ($shouldOrNot === 'should') {
 			$this->featureContext->theHTTPStatusCodeShouldBe(
 				200,
 				__METHOD__ . "Expected response status code is 200 but got " . $response->getStatusCode(),
-				$response
+				$response,
 			);
 		} else {
 			Assert::assertGreaterThanOrEqual(
 				400,
 				$response->getStatusCode(),
 				__METHOD__
-				. ' download must fail'
+				. ' download must fail',
 			);
 			Assert::assertLessThanOrEqual(
 				499,
 				$response->getStatusCode(),
 				__METHOD__
 				. ' 4xx error expected but got status code "'
-				. $response->getStatusCode() . '"'
+				. $response->getStatusCode() . '"',
 			);
 		}
 	}
@@ -2180,13 +2180,13 @@ class SpacesContext implements Context {
 		string $fileSource,
 		string $fromSpaceName,
 		string $fileDestination,
-		string $toSpaceName
+		string $toSpaceName,
 	): void {
 		$space = $this->getSpaceByName($user, $fromSpaceName);
 		$headers['Destination'] = $this->destinationHeaderValueWithSpaceName(
 			$user,
 			$fileDestination,
-			$toSpaceName
+			$toSpaceName,
 		);
 
 		$encodedName = \rawurlencode(ltrim($fileSource, "/"));
@@ -2213,7 +2213,7 @@ class SpacesContext implements Context {
 		string $user,
 		string $fileDestination,
 		string $spaceName,
-		string $endPath = null
+		string $endPath = null,
 	): string {
 		$space = $this->getSpaceByName($user, $spaceName);
 		$fileDestination = $this->escapePath(\ltrim($fileDestination, "/"));
@@ -2261,7 +2261,7 @@ class SpacesContext implements Context {
 		string $fileId,
 		string $destinationFile,
 		string $destinationFolder,
-		string $toSpaceName
+		string $toSpaceName,
 	): void {
 		$destinationFile = \trim($destinationFile, "/");
 		$destinationFolder = \trim($destinationFolder, "/");
@@ -2277,17 +2277,17 @@ class SpacesContext implements Context {
 				$user,
 				$fileDestination,
 				$toSpaceName,
-				$fileId
+				$fileId,
 			);
 		}
 		$fullUrl = "$baseUrl/$sourceDavPath/$fileId";
 		if ($actionType === 'copies') {
 			$this->featureContext->setResponse(
-				$this->copyFilesAndFoldersRequest($user, $fullUrl, $headers)
+				$this->copyFilesAndFoldersRequest($user, $fullUrl, $headers),
 			);
 		} else {
 			$this->featureContext->setResponse(
-				$this->moveFilesAndFoldersRequest($user, $fullUrl, $headers)
+				$this->moveFilesAndFoldersRequest($user, $fullUrl, $headers),
 			);
 		}
 	}
@@ -2307,7 +2307,7 @@ class SpacesContext implements Context {
 		string $user,
 		string $fileId,
 		string $destinationFile,
-		string $spaceName
+		string $spaceName,
 	): void {
 		$destinationFile = \trim($destinationFile, "/");
 
@@ -2324,7 +2324,7 @@ class SpacesContext implements Context {
 				$user,
 				$fileDestination,
 				$spaceName,
-				$fileId
+				$fileId,
 			);
 		}
 		$fullUrl = "$baseUrl/$sourceDavPath/$fileId";
@@ -2368,7 +2368,7 @@ class SpacesContext implements Context {
 				$user,
 				$fileDestination,
 				$spaceName,
-				$fileId
+				$fileId,
 			);
 		}
 		$fullUrl = "$baseUrl/$sourceDavPath/$fileId";
@@ -2380,7 +2380,7 @@ class SpacesContext implements Context {
 		Assert::assertEquals(
 			201,
 			$response->getStatusCode(),
-			"Expected response status code should be 201"
+			"Expected response status code should be 201",
 		);
 	}
 
@@ -2399,7 +2399,7 @@ class SpacesContext implements Context {
 		string $user,
 		string $fileId,
 		string $destinationFile,
-		string $spaceName
+		string $spaceName,
 	): void {
 		$destinationFile = \trim($destinationFile, "/");
 
@@ -2416,7 +2416,7 @@ class SpacesContext implements Context {
 				$user,
 				$fileDestination,
 				$spaceName,
-				$fileId
+				$fileId,
 			);
 		}
 		$fullUrl = "$baseUrl/$sourceDavPath/$fileId";
@@ -2424,7 +2424,7 @@ class SpacesContext implements Context {
 		Assert::assertEquals(
 			201,
 			$response->getStatusCode(),
-			"Expected response status code should be 201"
+			"Expected response status code should be 201",
 		);
 	}
 
@@ -2446,7 +2446,7 @@ class SpacesContext implements Context {
 		string $source,
 		string $sourceSpace,
 		string $destinationType,
-		string $destinationName
+		string $destinationName,
 	): void {
 		$source = \trim($source, "/");
 		$baseUrl = $this->featureContext->getBaseUrl();
@@ -2485,7 +2485,7 @@ class SpacesContext implements Context {
 		string $user,
 		string $spaceName,
 		string $fileContent,
-		string $destination
+		string $destination,
 	): array {
 		$space = $this->getSpaceByName($user, $spaceName);
 		$response = $this->featureContext->uploadFileWithContent(
@@ -2493,7 +2493,7 @@ class SpacesContext implements Context {
 			$fileContent,
 			$destination,
 			$space["id"],
-			true
+			true,
 		);
 		$this->featureContext->theHTTPStatusCodeShouldBe(['201', '204'], "", $response);
 		return $response->getHeader('oc-fileid');
@@ -2513,7 +2513,7 @@ class SpacesContext implements Context {
 	public function sendShareSpaceRequest(
 		string $user,
 		string $spaceName,
-		TableNode $table
+		TableNode $table,
 	): void {
 		$rows = $table->getRowsHash();
 		$this->featureContext->setResponse($this->shareSpace($user, $spaceName, $rows));
@@ -2571,7 +2571,7 @@ class SpacesContext implements Context {
 		string $user,
 		string $shareType,
 		string $spaceName,
-		string $memberUser
+		string $memberUser,
 	): void {
 		$dateTime = new DateTime('yesterday');
 		$rows['expireDate'] = $dateTime->format('Y-m-d\\TH:i:sP');
@@ -2591,7 +2591,7 @@ class SpacesContext implements Context {
 	public function createShareResource(
 		string $user,
 		string $spaceName,
-		TableNode $table
+		TableNode $table,
 	): ResponseInterface {
 		$rows = $table->getRowsHash();
 		$rows["path"] = \array_key_exists("path", $rows) ? $rows["path"] : null;
@@ -2638,10 +2638,10 @@ class SpacesContext implements Context {
 	public function userCreatesShareInsideOfSpaceWithSettings(
 		string $user,
 		string $spaceName,
-		TableNode $table
+		TableNode $table,
 	): void {
 		$this->featureContext->setResponse(
-			$this->createShareResource($user, $spaceName, $table)
+			$this->createShareResource($user, $spaceName, $table),
 		);
 	}
 
@@ -2658,7 +2658,7 @@ class SpacesContext implements Context {
 	public function userHasSharedTheFollowingEntityInsideOfSpace(
 		string $user,
 		string $spaceName,
-		TableNode $table
+		TableNode $table,
 	): void {
 		$response = $this->createShareResource($user, $spaceName, $table);
 		$this->featureContext->theHTTPStatusCodeShouldBe(200, "", $response);
@@ -2675,7 +2675,7 @@ class SpacesContext implements Context {
 	 */
 	public function changeShareResourceWithSettings(
 		string $user,
-		TableNode $table
+		TableNode $table,
 	): void {
 		$rows = $table->getRowsHash();
 		$this->featureContext->setResponse($this->updateSharedResource($user, $rows));
@@ -2701,7 +2701,7 @@ class SpacesContext implements Context {
 			$this->featureContext->getActualUsername($user),
 			$this->featureContext->getPasswordForUser($user),
 			null,
-			$rows
+			$rows,
 		);
 	}
 
@@ -2718,7 +2718,7 @@ class SpacesContext implements Context {
 	public function userExpiresTheLastShareOfResourceInsideOfTheSpace(
 		string $user,
 		string $resource,
-		string $spaceName
+		string $spaceName,
 	): void {
 		$rows['expireDate'] = $this->featureContext->formatExpiryDateTime('Y-m-d\\TH:i:sP');
 		if ($this->featureContext->isUsingSharingNG()) {
@@ -2733,7 +2733,7 @@ class SpacesContext implements Context {
 				$space["id"],
 				$itemId,
 				\json_encode($body),
-				$permissionID
+				$permissionID,
 			);
 
 			if ($response->getStatusCode() === 200) {
@@ -2757,7 +2757,7 @@ class SpacesContext implements Context {
 	public function createPublicLinkToEntityInsideOfSpaceRequest(
 		string $user,
 		string $spaceName,
-		TableNode $table
+		TableNode $table,
 	): ResponseInterface {
 		$space = $this->getSpaceByName($user, $spaceName);
 		$rows = $table->getRowsHash();
@@ -2806,10 +2806,10 @@ class SpacesContext implements Context {
 	public function userCreatesPublicLinkShareInsideOfSpaceWithSettings(
 		string $user,
 		string $spaceName,
-		TableNode $table
+		TableNode $table,
 	): void {
 		$this->featureContext->setResponse(
-			$this->createPublicLinkToEntityInsideOfSpaceRequest($user, $spaceName, $table)
+			$this->createPublicLinkToEntityInsideOfSpaceRequest($user, $spaceName, $table),
 		);
 	}
 
@@ -2826,14 +2826,14 @@ class SpacesContext implements Context {
 	public function userHasCreatedPublicLinkToEntityInsideOfSpaceRequest(
 		string $user,
 		string $spaceName,
-		TableNode $table
+		TableNode $table,
 	): void {
 		$response = $this->createPublicLinkToEntityInsideOfSpaceRequest($user, $spaceName, $table);
 
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			200,
 			"Expected response status code should be 200",
-			$response
+			$response,
 		);
 	}
 
@@ -2850,7 +2850,7 @@ class SpacesContext implements Context {
 	public function userHasSharedSpace(
 		string $user,
 		string $spaceName,
-		TableNode $tableNode
+		TableNode $tableNode,
 	): void {
 		$rows = $tableNode->getRowsHash();
 		$response = $this->shareSpace($user, $spaceName, $rows);
@@ -2858,15 +2858,15 @@ class SpacesContext implements Context {
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			$expectedHTTPStatus,
 			"Expected response status code should be $expectedHTTPStatus",
-			$response
+			$response,
 		);
 		$expectedOCSStatus = "200";
 		Assert::assertEquals(
 			$expectedOCSStatus,
 			$this->ocsContext->getOCSResponseStatusCode(
-				$response
+				$response,
 			),
-			"Expected OCS response status code $expectedOCSStatus"
+			"Expected OCS response status code $expectedOCSStatus",
 		);
 	}
 
@@ -2883,13 +2883,13 @@ class SpacesContext implements Context {
 	public function userHasUnsharedASpaceSharedWith(
 		string $user,
 		string $spaceName,
-		string $recipient
+		string $recipient,
 	): void {
 		$response = $this->sendUnshareSpaceRequest($user, $spaceName, $recipient);
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			200,
 			"Expected response status code should be 200",
-			$response
+			$response,
 		);
 	}
 
@@ -2904,7 +2904,7 @@ class SpacesContext implements Context {
 	public function sendUnshareSpaceRequest(
 		string $user,
 		string $spaceName,
-		string $recipient
+		string $recipient,
 	): ResponseInterface {
 		$space = $this->getSpaceByName($user, $spaceName);
 		$fullUrl = $this->featureContext->getBaseUrl()
@@ -2913,7 +2913,7 @@ class SpacesContext implements Context {
 		return HttpRequestHelper::delete(
 			$fullUrl,
 			$user,
-			$this->featureContext->getPasswordForUser($user)
+			$this->featureContext->getPasswordForUser($user),
 		);
 	}
 
@@ -2930,10 +2930,10 @@ class SpacesContext implements Context {
 	public function userUnsharesSpace(
 		string $user,
 		string $spaceName,
-		string $recipient
+		string $recipient,
 	): void {
 		$this->featureContext->setResponse(
-			$this->sendUnshareSpaceRequest($user, $spaceName, $recipient)
+			$this->sendUnshareSpaceRequest($user, $spaceName, $recipient),
 		);
 	}
 
@@ -2948,7 +2948,7 @@ class SpacesContext implements Context {
 	public function removeObjectFromSpace(
 		string $user,
 		string $object,
-		string $spaceName
+		string $spaceName,
 	): ResponseInterface {
 		$space = $this->getSpaceByName($user, $spaceName);
 
@@ -2960,7 +2960,7 @@ class SpacesContext implements Context {
 		return HttpRequestHelper::delete(
 			$fullUrl,
 			$user,
-			$this->featureContext->getPasswordForUser($user)
+			$this->featureContext->getPasswordForUser($user),
 		);
 	}
 
@@ -2977,10 +2977,10 @@ class SpacesContext implements Context {
 	public function userRemovesFileOrFolderFromSpace(
 		string $user,
 		string $object,
-		string $spaceName
+		string $spaceName,
 	): void {
 		$this->featureContext->setResponse(
-			$this->removeObjectFromSpace($user, $object, $spaceName)
+			$this->removeObjectFromSpace($user, $object, $spaceName),
 		);
 	}
 
@@ -2995,13 +2995,13 @@ class SpacesContext implements Context {
 	 */
 	public function userHasDeletedASpaceOwnedByUser(
 		string $user,
-		string $spaceName
+		string $spaceName,
 	): void {
 		$response = $this->deleteSpace($user, $spaceName);
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			204,
 			"Expected response status code should be 200",
-			$response
+			$response,
 		);
 	}
 
@@ -3016,7 +3016,7 @@ class SpacesContext implements Context {
 	public function disableSpace(
 		string $user,
 		string $spaceName,
-		string $owner = ''
+		string $owner = '',
 	): ResponseInterface {
 		$space = $this->getSpaceByName(($owner !== "") ? $owner : $user, $spaceName);
 		return GraphHelper::disableSpace(
@@ -3041,10 +3041,10 @@ class SpacesContext implements Context {
 	public function userDisablesSpace(
 		string $user,
 		string $spaceName,
-		string $owner = ''
+		string $owner = '',
 	): void {
 		$this->featureContext->setResponse(
-			$this->disableSpace($user, $spaceName, $owner)
+			$this->disableSpace($user, $spaceName, $owner),
 		);
 	}
 
@@ -3061,14 +3061,14 @@ class SpacesContext implements Context {
 	public function userHasRemovedFileOrFolderFromSpace(
 		string $user,
 		string $object,
-		string $spaceName
+		string $spaceName,
 	): void {
 		$response = $this->removeObjectFromSpace($user, $object, $spaceName);
 		$expectedHTTPStatus = "204";
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			$expectedHTTPStatus,
 			"Expected response status code should be $expectedHTTPStatus",
-			$response
+			$response,
 		);
 	}
 
@@ -3083,14 +3083,14 @@ class SpacesContext implements Context {
 	 */
 	public function sendUserHasDisabledSpaceRequest(
 		string $user,
-		string $spaceName
+		string $spaceName,
 	): void {
 		$response = $this->disableSpace($user, $spaceName);
 		$expectedHTTPStatus = "204";
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			$expectedHTTPStatus,
 			"Expected response status code should be $expectedHTTPStatus",
-			$response
+			$response,
 		);
 	}
 
@@ -3105,7 +3105,7 @@ class SpacesContext implements Context {
 	public function deleteSpace(
 		string $user,
 		string $spaceName,
-		string $owner = ''
+		string $owner = '',
 	): ResponseInterface {
 		$space = $this->getSpaceByName(($owner !== "") ? $owner : $user, $spaceName);
 
@@ -3131,10 +3131,10 @@ class SpacesContext implements Context {
 	public function userDeletesSpace(
 		string $user,
 		string $spaceName,
-		string $owner = ''
+		string $owner = '',
 	): void {
 		$this->featureContext->setResponse(
-			$this->deleteSpace($user, $spaceName, $owner)
+			$this->deleteSpace($user, $spaceName, $owner),
 		);
 	}
 
@@ -3149,7 +3149,7 @@ class SpacesContext implements Context {
 	public function restoreSpace(
 		string $user,
 		string $spaceName,
-		string $owner = ''
+		string $owner = '',
 	): ResponseInterface {
 		$space = $this->getSpaceByName(($owner !== "") ? $owner : $user, $spaceName);
 		return GraphHelper::restoreSpace(
@@ -3174,10 +3174,10 @@ class SpacesContext implements Context {
 	public function userRestoresADisabledSpace(
 		string $user,
 		string $spaceName,
-		string $owner = ''
+		string $owner = '',
 	): void {
 		$this->featureContext->setResponse(
-			$this->restoreSpace($user, $spaceName, $owner)
+			$this->restoreSpace($user, $spaceName, $owner),
 		);
 	}
 
@@ -3192,14 +3192,14 @@ class SpacesContext implements Context {
 	 */
 	public function userHasRestoredSpaceRequest(
 		string $user,
-		string $spaceName
+		string $spaceName,
 	): void {
 		$response = $this->restoreSpace($user, $spaceName);
 		$expectedHTTPStatus = "200";
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			$expectedHTTPStatus,
 			"Expected response status code should be $expectedHTTPStatus",
-			$response
+			$response,
 		);
 	}
 
@@ -3212,21 +3212,21 @@ class SpacesContext implements Context {
 	 */
 	public function listAllDeletedFilesFromTrash(
 		string $user,
-		string $spaceName
+		string $spaceName,
 	): ResponseInterface {
 		$space = $this->getSpaceByName($user, $spaceName);
 		$baseUrl = $this->featureContext->getBaseUrl();
 		$davPath = WebDavHelper::getDavPath(
 			WebDavHelper::DAV_VERSION_SPACES,
 			$space["id"],
-			"trash-bin"
+			"trash-bin",
 		);
 		$fullUrl = "$baseUrl/$davPath";
 		return HttpRequestHelper::sendRequest(
 			$fullUrl,
 			'PROPFIND',
 			$user,
-			$this->featureContext->getPasswordForUser($user)
+			$this->featureContext->getPasswordForUser($user),
 		);
 	}
 
@@ -3241,10 +3241,10 @@ class SpacesContext implements Context {
 	 */
 	public function userListAllDeletedFilesInTrash(
 		string $user,
-		string $spaceName
+		string $spaceName,
 	): void {
 		$this->featureContext->setResponse(
-			$this->listAllDeletedFilesFromTrash($user, $spaceName)
+			$this->listAllDeletedFilesFromTrash($user, $spaceName),
 		);
 	}
 
@@ -3259,7 +3259,7 @@ class SpacesContext implements Context {
 	 */
 	public function adminListAllDeletedFilesInTrash(
 		string $user,
-		string $spaceName
+		string $spaceName,
 	): void {
 		// get space by admin user
 		$space = $this->getSpaceByName($this->featureContext->getAdminUserName(), $spaceName);
@@ -3267,7 +3267,7 @@ class SpacesContext implements Context {
 		$davPath = WebDavHelper::getDavPath(
 			WebDavHelper::DAV_VERSION_SPACES,
 			$space["id"],
-			"trash-bin"
+			"trash-bin",
 		);
 		$fullUrl = "$baseUrl/$davPath";
 		$this->featureContext->setResponse(
@@ -3275,8 +3275,8 @@ class SpacesContext implements Context {
 				$fullUrl,
 				'PROPFIND',
 				$user,
-				$this->featureContext->getPasswordForUser($user)
-			)
+				$this->featureContext->getPasswordForUser($user),
+			),
 		);
 	}
 
@@ -3301,16 +3301,16 @@ class SpacesContext implements Context {
 	 */
 	public function getObjectsInTrashbin(
 		string $user,
-		string $spaceName
+		string $spaceName,
 	): array {
 		$response = $this->listAllDeletedFilesFromTrash($user, $spaceName);
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			207,
 			"Expected response status code should be 207",
-			$response
+			$response,
 		);
 		return $this->trashbinContext->getTrashbinContentFromResponseXml(
-			HttpRequestHelper::getResponseXml($response, __METHOD__)
+			HttpRequestHelper::getResponseXml($response, __METHOD__),
 		);
 	}
 
@@ -3329,7 +3329,7 @@ class SpacesContext implements Context {
 		string $user,
 		string $object,
 		string $shouldOrNot,
-		string $spaceName
+		string $spaceName,
 	): void {
 		$objectsInTrash = $this->getObjectsInTrashbin($user, $spaceName);
 
@@ -3362,7 +3362,7 @@ class SpacesContext implements Context {
 		string $user,
 		string $object,
 		string $spaceName,
-		string $destination
+		string $destination,
 	): void {
 		$space = $this->getSpaceByName($user, $spaceName);
 
@@ -3377,7 +3377,7 @@ class SpacesContext implements Context {
 
 		if ($pathToDeletedObject === "") {
 			throw new Exception(
-				__METHOD__ . " Object '$object' was not found in the trashbin of space '$spaceName' by user '$user'"
+				__METHOD__ . " Object '$object' was not found in the trashbin of space '$spaceName' by user '$user'",
 			);
 		}
 
@@ -3394,8 +3394,8 @@ class SpacesContext implements Context {
 				$user,
 				$this->featureContext->getPasswordForUser($user),
 				$header,
-				""
-			)
+				"",
+			),
 		);
 	}
 
@@ -3414,7 +3414,7 @@ class SpacesContext implements Context {
 	public function userDeletesObjectsFromTrashRequest(
 		string $user,
 		string $object,
-		string $spaceName
+		string $spaceName,
 	): void {
 		// find object in trash
 		$objectsInTrash = $this->getObjectsInTrashbin($user, $spaceName);
@@ -3427,7 +3427,7 @@ class SpacesContext implements Context {
 
 		if ($pathToDeletedObject === "") {
 			throw new Exception(
-				__METHOD__ . " Object '$object' was not found in the trashbin of space '$spaceName' by user '$user'"
+				__METHOD__ . " Object '$object' was not found in the trashbin of space '$spaceName' by user '$user'",
 			);
 		}
 
@@ -3439,8 +3439,8 @@ class SpacesContext implements Context {
 				$user,
 				$this->featureContext->getPasswordForUser($user),
 				[],
-				""
-			)
+				"",
+			),
 		);
 	}
 
@@ -3463,7 +3463,7 @@ class SpacesContext implements Context {
 		string $fileName,
 		string $spaceName,
 		string $width,
-		string $height
+		string $height,
 	): void {
 		$eTag = str_replace("\"", "", $this->getETag($user, $spaceName, $fileName));
 		$urlParameters = [
@@ -3484,8 +3484,8 @@ class SpacesContext implements Context {
 			HttpRequestHelper::get(
 				$fullUrl,
 				$user,
-				$this->featureContext->getPasswordForUser($user)
-			)
+				$this->featureContext->getPasswordForUser($user),
+			),
 		);
 	}
 
@@ -3502,7 +3502,7 @@ class SpacesContext implements Context {
 	public function downloadFile(
 		string $user,
 		string $fileName,
-		string $spaceName
+		string $spaceName,
 	): void {
 		$spaceId = $this->getSpaceIdByName($user, $spaceName);
 		$response = $this->featureContext->downloadFileAsUserUsingPassword(
@@ -3510,7 +3510,7 @@ class SpacesContext implements Context {
 			$fileName,
 			$this->featureContext->getPasswordForUser($user),
 			[],
-			$spaceId
+			$spaceId,
 		);
 		$this->featureContext->setResponse($response);
 	}
@@ -3528,11 +3528,11 @@ class SpacesContext implements Context {
 	public function userRequestsTheChecksumViaPropfindInSpace(
 		string $user,
 		string $path,
-		string $spaceName
+		string $spaceName,
 	): void {
 		$spaceId = $this->getSpaceIdByName($user, $spaceName);
 		$this->featureContext->setResponse(
-			$this->checksumContext->propfindResourceChecksum($user, $path, $spaceId)
+			$this->checksumContext->propfindResourceChecksum($user, $path, $spaceId),
 		);
 	}
 
@@ -3553,7 +3553,7 @@ class SpacesContext implements Context {
 		string $checksum,
 		string $content,
 		string $destination,
-		string $spaceName
+		string $spaceName,
 	): void {
 		$spaceId = $this->getSpaceIdByName($user, $spaceName);
 		$this->featureContext->setResponse(
@@ -3563,8 +3563,8 @@ class SpacesContext implements Context {
 				$content,
 				$destination,
 				false,
-				$spaceId
-			)
+				$spaceId,
+			),
 		);
 	}
 
@@ -3584,11 +3584,11 @@ class SpacesContext implements Context {
 		string $user,
 		string $fileName,
 		string $index,
-		string $spaceName
+		string $spaceName,
 	): void {
 		$spaceId = $this->getSpaceIdByName($user, $spaceName);
 		$this->featureContext->setResponse(
-			$this->filesVersionsContext->downloadVersion($user, $fileName, $index, $spaceId)
+			$this->filesVersionsContext->downloadVersion($user, $fileName, $index, $spaceId),
 		);
 	}
 
@@ -3605,7 +3605,7 @@ class SpacesContext implements Context {
 	public function userTriesToDownloadFileVersions(string $user, string $file, string $spaceName): void {
 		$spaceId = $this->getSpaceIdByName($user, $spaceName);
 		$this->featureContext->setResponse(
-			$this->filesVersionsContext->getFileVersions($user, $file, null, $spaceId)
+			$this->filesVersionsContext->getFileVersions($user, $file, null, $spaceId),
 		);
 	}
 
@@ -3640,7 +3640,7 @@ class SpacesContext implements Context {
 		string $user,
 		string $space,
 		string $path,
-		?string $storePath = ""
+		?string $storePath = "",
 	): void {
 		if ($storePath === "") {
 			$storePath = $path;
@@ -3667,19 +3667,19 @@ class SpacesContext implements Context {
 			$user,
 			$this->storedEtags,
 			__METHOD__ . " No stored etags for user '$user' found"
-			. "\nFound: " . print_r($this->storedEtags, true)
+			. "\nFound: " . print_r($this->storedEtags, true),
 		);
 		Assert::assertArrayHasKey(
 			$space,
 			$this->storedEtags[$user],
 			__METHOD__ . " No stored etags for user '$user' with space '$space' found"
-			. "\nFound: " . implode(', ', array_keys($this->storedEtags[$user]))
+			. "\nFound: " . implode(', ', array_keys($this->storedEtags[$user])),
 		);
 		Assert::assertArrayHasKey(
 			$path,
 			$this->storedEtags[$user][$space],
 			__METHOD__ . " No stored etags for user '$user' with space '$space' with path '$path' found"
-			. '\nFound: ' . print_r($this->storedEtags[$user][$space], true)
+			. '\nFound: ' . print_r($this->storedEtags[$user][$space], true),
 		);
 		return $this->storedEtags[$user][$space][$path];
 	}
@@ -3756,14 +3756,14 @@ class SpacesContext implements Context {
 		string $user,
 		string $path,
 		string $storePath,
-		string $space
+		string $space,
 	): void {
 		$user = $this->featureContext->getActualUsername($user);
 		$this->storeEtagOfElementInSpaceForUser(
 			$user,
 			$space,
 			$path,
-			$storePath
+			$storePath,
 		);
 		if ($this->storedEtags[$user][$space][$storePath] === ""
 			|| $this->storedEtags[$user][$space][$storePath] === null
@@ -3783,7 +3783,7 @@ class SpacesContext implements Context {
 	public function sendShareSpaceViaLinkRequest(
 		string $user,
 		string $spaceName,
-		?TableNode $table
+		?TableNode $table,
 	): ResponseInterface {
 		$space = $this->getSpaceByName($user, $spaceName);
 		$rows = $table->getRowsHash();
@@ -3814,7 +3814,7 @@ class SpacesContext implements Context {
 		);
 
 		$this->featureContext->addToCreatedPublicShares(
-			HttpRequestHelper::getResponseXml($response, __METHOD__)->data
+			HttpRequestHelper::getResponseXml($response, __METHOD__)->data,
 		);
 		return $response;
 	}
@@ -3832,14 +3832,14 @@ class SpacesContext implements Context {
 	public function userCreatesAPublicLinkShareOfSpaceWithSettings(
 		string $user,
 		string $spaceName,
-		?TableNode $table
+		?TableNode $table,
 	): void {
 		$this->featureContext->setResponse(
 			$this->sendShareSpaceViaLinkRequest(
 				$user,
 				$spaceName,
-				$table
-			)
+				$table,
+			),
 		);
 	}
 
@@ -3856,7 +3856,7 @@ class SpacesContext implements Context {
 	public function userHasCreatedPublicLinkShareOfSpace(
 		string $user,
 		string $spaceName,
-		?TableNode $table
+		?TableNode $table,
 	): void {
 		$response = $this->sendShareSpaceViaLinkRequest($user, $spaceName, $table);
 
@@ -3864,7 +3864,7 @@ class SpacesContext implements Context {
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			$expectedHTTPStatus,
 			"Expected response status code should be $expectedHTTPStatus",
-			$response
+			$response,
 		);
 	}
 
@@ -3887,7 +3887,7 @@ class SpacesContext implements Context {
 		string $spaceName,
 		string $shouldOrNot,
 		string $shareType = 'public link',
-		string $fileName = ''
+		string $fileName = '',
 	): void {
 		if (!empty($fileName)) {
 			$body = $this->getFileId($user, $spaceName, $fileName);
@@ -3909,7 +3909,7 @@ class SpacesContext implements Context {
 			json_encode(HttpRequestHelper::getResponseXml($response, __METHOD__)->data),
 			true,
 			512,
-			JSON_THROW_ON_ERROR
+			JSON_THROW_ON_ERROR,
 		);
 
 		if ($should) {
@@ -3948,14 +3948,14 @@ class SpacesContext implements Context {
 		string $user,
 		string $resourceName,
 		string $spaceName,
-		TableNode $propertiesTable
+		TableNode $propertiesTable,
 	): void {
 		$spaceId = $this->getSpaceIdByName($user, $spaceName);
 		$response = $this->webDavPropertiesContext->getPropertiesOfFolder(
 			$user,
 			$resourceName,
 			$spaceId,
-			$propertiesTable
+			$propertiesTable,
 		);
 		$this->featureContext->setResponse($response);
 	}
@@ -3976,7 +3976,7 @@ class SpacesContext implements Context {
 		string $user,
 		string $resourceName,
 		string $spaceName,
-		TableNode $propertiesTable
+		TableNode $propertiesTable,
 	): void {
 		// NOTE: extracting properties occurs asynchronously
 		// short wait is necessary before getting those properties
@@ -3986,7 +3986,7 @@ class SpacesContext implements Context {
 			$user,
 			$resourceName,
 			$spaceId,
-			$propertiesTable
+			$propertiesTable,
 		);
 		$this->featureContext->setResponse($response);
 	}
@@ -4009,7 +4009,7 @@ class SpacesContext implements Context {
 		string $resourceName,
 		string $spaceName,
 		string $property,
-		string $value
+		string $value,
 	): void {
 		$spaceId = $this->getSpaceIdByName($user, $spaceName);
 		$this->webDavPropertiesContext->checkPropertyOfAFolder(
@@ -4018,7 +4018,7 @@ class SpacesContext implements Context {
 			$property,
 			$value,
 			null,
-			$spaceId
+			$spaceId,
 		);
 	}
 
@@ -4036,14 +4036,14 @@ class SpacesContext implements Context {
 		string $user,
 		string $path,
 		string $spaceName,
-		string $shouldOrNot
+		string $shouldOrNot,
 	): void {
 		$spaceId = $this->getSpaceIdByName($user, $spaceName);
 		$this->favoritesContext->asUserFileOrFolderShouldBeFavorited(
 			$user,
 			$path,
 			($shouldOrNot === 'should') ? 1 : 0,
-			$spaceId
+			$spaceId,
 		);
 	}
 
@@ -4095,7 +4095,7 @@ class SpacesContext implements Context {
 		string $user,
 		string $fileOrFolder,
 		string $path,
-		string $spaceName
+		string $spaceName,
 	): void {
 		$this->getSpaceIdByName($user, $spaceName);
 		$user = $this->featureContext->getActualUsername($user);
@@ -4106,7 +4106,7 @@ class SpacesContext implements Context {
 			$storedFileID,
 			__METHOD__
 			. " User '$user' $fileOrFolder '$path' does not have the previously stored id '"
-			. $storedFileID . "', but has '$currentFileID'."
+			. $storedFileID . "', but has '$currentFileID'.",
 		);
 	}
 
@@ -4123,11 +4123,11 @@ class SpacesContext implements Context {
 		// get a response after a Report request (called in the core)
 		$responseArray = json_decode(
 			json_encode(
-				HttpRequestHelper::getResponseXml($this->featureContext->getResponse())->xpath("//d:response/d:href")
+				HttpRequestHelper::getResponseXml($this->featureContext->getResponse())->xpath("//d:response/d:href"),
 			),
 			true,
 			512,
-			JSON_THROW_ON_ERROR
+			JSON_THROW_ON_ERROR,
 		);
 		Assert::assertNotEmpty($responseArray, "search result is empty");
 
@@ -4175,10 +4175,10 @@ class SpacesContext implements Context {
 	public function userSendsPropfindRequestToSpaceUsingTheWebdavApi(
 		string $user,
 		string $spaceName,
-		?string $folderDepth = "1"
+		?string $folderDepth = "1",
 	): void {
 		$this->featureContext->setResponse(
-			$this->sendPropfindRequestToSpace($user, $spaceName, "", null, $folderDepth)
+			$this->sendPropfindRequestToSpace($user, $spaceName, "", null, $folderDepth),
 		);
 	}
 
@@ -4201,7 +4201,7 @@ class SpacesContext implements Context {
 		string $user,
 		string $spaceName,
 		string $resource,
-		?string $folderDepth = "1"
+		?string $folderDepth = "1",
 	): void {
 		$response = $this->sendPropfindRequestToSpace($user, $spaceName, $resource, null, $folderDepth);
 		$this->featureContext->setResponse($response);
@@ -4223,18 +4223,18 @@ class SpacesContext implements Context {
 	public function userSendsPropfindRequestToSpaceWithHeaders(
 		string $user,
 		string $spaceName,
-		TableNode $headersTable
+		TableNode $headersTable,
 	): void {
 		$this->featureContext->verifyTableNodeColumns(
 			$headersTable,
-			['header', 'value']
+			['header', 'value'],
 		);
 		$headers = [];
 		foreach ($headersTable as $row) {
 			$headers[$row['header']] = $row ['value'];
 		}
 		$this->featureContext->setResponse(
-			$this->sendPropfindRequestToSpace($user, $spaceName, '', $headers, '0')
+			$this->sendPropfindRequestToSpace($user, $spaceName, '', $headers, '0'),
 		);
 	}
 
@@ -4257,7 +4257,7 @@ class SpacesContext implements Context {
 		?string $resource = "",
 		?array $headers = [],
 		?string $folderDepth = "1",
-		bool $federatedShare = false
+		bool $federatedShare = false,
 	): ResponseInterface {
 		// PROPFIND request to federated share via normal webdav path "remote.php/dav/spaces/{shares-space-id}/{resource}" returns 404 status code
 		// the federated share is only accessible using "remote-item-id", i.e. "remote.php/dav/spaces/{remote-item-id}"
@@ -4310,7 +4310,7 @@ class SpacesContext implements Context {
 			"files",
 			$davPathVersion,
 			null,
-			$headers
+			$headers,
 		);
 	}
 
@@ -4330,7 +4330,7 @@ class SpacesContext implements Context {
 		string $user,
 		string $type,
 		string $resource,
-		TableNode $table
+		TableNode $table,
 	): void {
 		$this->featureContext->verifyTableNodeColumns($table, ['key', 'value']);
 		if ($this->featureContext->getDavPathVersion() === WebDavHelper::DAV_VERSION_SPACES && $type === 'space') {
@@ -4356,7 +4356,7 @@ class SpacesContext implements Context {
 	public function buildXpathErrorMessage(
 		SimpleXMLElement $responseXmlObject,
 		array $xpaths,
-		string $message
+		string $message,
 	): string {
 		return "Using xpaths:\n\t- " . \join("\n\t- ", $xpaths)
 			. "\n"
@@ -4376,7 +4376,7 @@ class SpacesContext implements Context {
 	public function getXpathSiblingValue(
 		SimpleXMLElement $responseXmlObject,
 		string $siblingXpath,
-		string $siblingToFind
+		string $siblingToFind,
 	): string {
 		$xpaths[] = $siblingXpath . "/preceding-sibling::$siblingToFind";
 		$xpaths[] = $siblingXpath . "/following-sibling::$siblingToFind";
@@ -4390,7 +4390,7 @@ class SpacesContext implements Context {
 		$errorMessage = $this->buildXpathErrorMessage(
 			$responseXmlObject,
 			$xpaths,
-			"Could not find sibling '<$siblingToFind>' element in the XML response"
+			"Could not find sibling '<$siblingToFind>' element in the XML response",
 		);
 		Assert::assertNotEmpty($foundSibling, $errorMessage);
 		return \preg_quote($foundSibling[0]->__toString(), "/");
@@ -4464,16 +4464,16 @@ class SpacesContext implements Context {
 				$this->buildXpathErrorMessage(
 					$responseXmlObject,
 					$xpaths,
-					"Found multiple elements for '<$itemToFind>' in the XML response"
-				)
+					"Found multiple elements for '<$itemToFind>' in the XML response",
+				),
 			);
 			Assert::assertNotEmpty(
 				$foundXmlItem,
 				$this->buildXpathErrorMessage(
 					$responseXmlObject,
 					$xpaths,
-					"Could not find '<$itemToFind>' element in the XML response"
-				)
+					"Could not find '<$itemToFind>' element in the XML response",
+				),
 			);
 
 			$actualValue = $foundXmlItem[0]->__toString();
@@ -4506,7 +4506,7 @@ class SpacesContext implements Context {
 					Assert::assertMatchesRegularExpression(
 						$expectedValue,
 						$actualValue,
-						'wrong "fileid" in the response'
+						'wrong "fileid" in the response',
 					);
 					break;
 				case "oc:file-parent":
@@ -4514,7 +4514,7 @@ class SpacesContext implements Context {
 					Assert::assertMatchesRegularExpression(
 						$expectedValue,
 						$actualValue,
-						'wrong "file-parent" in the response'
+						'wrong "file-parent" in the response',
 					);
 					break;
 				case "oc:privatelink":
@@ -4522,7 +4522,7 @@ class SpacesContext implements Context {
 					Assert::assertMatchesRegularExpression(
 						$expectedValue,
 						$actualValue,
-						'wrong "privatelink" in the response'
+						'wrong "privatelink" in the response',
 					);
 					break;
 				case "oc:tags":
@@ -4554,7 +4554,7 @@ class SpacesContext implements Context {
 					Assert::assertMatchesRegularExpression(
 						$expectedValue,
 						$actualValue,
-						'wrong "remote-item-id" in the response'
+						'wrong "remote-item-id" in the response',
 					);
 					break;
 				default:
@@ -4577,7 +4577,7 @@ class SpacesContext implements Context {
 	public function asUserTheKeyFromPropfindResponseShouldMatchWithSharedwithmeDriveitemidOfShare(
 		string $user,
 		string $key,
-		string $resource
+		string $resource,
 	): void {
 		$responseXmlObject = HttpRequestHelper::getResponseXml($this->featureContext->getResponse(), __METHOD__);
 		$fileId = $responseXmlObject->xpath("//oc:name[text()='$resource']/preceding-sibling::$key")[0]->__toString();
@@ -4585,7 +4585,7 @@ class SpacesContext implements Context {
 		$jsonResponse = GraphHelper::getSharesSharedWithMe(
 			$this->featureContext->getBaseUrl(),
 			$user,
-			$this->featureContext->getPasswordForUser($user)
+			$this->featureContext->getPasswordForUser($user),
 		);
 		$driveItemId = '';
 		$jsonResponseBody = $this->featureContext->getJsonDecodedResponseBodyContent($jsonResponse);
@@ -4620,8 +4620,8 @@ class SpacesContext implements Context {
 				'0',
 				['oc:fileid'],
 				null,
-				"public-files"
-			)
+				"public-files",
+			),
 		);
 		$resourceId = $responseXmlObject->xpath("//d:response/d:propstat/d:prop/oc:fileid");
 		$queryString = 'public-token=' . $token . '&id=' . $resourceId[0][0];
@@ -4629,8 +4629,8 @@ class SpacesContext implements Context {
 			HttpRequestHelper::get(
 				$this->archiverContext->getArchiverUrl($queryString),
 				'',
-				''
-			)
+				'',
+			),
 		);
 	}
 
@@ -4648,7 +4648,7 @@ class SpacesContext implements Context {
 			Assert::assertEquals(
 				$data->quota->relative,
 				$quotaAmount,
-				"Expected relative quota amount to be $quotaAmount but found to be $data->quota->relative"
+				"Expected relative quota amount to be $quotaAmount but found to be $data->quota->relative",
 			);
 			return;
 		}
@@ -4676,17 +4676,17 @@ class SpacesContext implements Context {
 		string $recipientType,
 		string $recipient,
 		string $role,
-		string $expirationDate = null
+		string $expirationDate = null,
 	): void {
 		$response = $this->listAllMySpaces($user);
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			200,
 			"Expected response status code should be 200",
-			$response
+			$response,
 		);
 		Assert::assertIsArray(
 			$spaceAsArray = $this->getSpaceByNameFromResponse($spaceName, $response),
-			"No space with name $spaceName found"
+			"No space with name $spaceName found",
 		);
 		$recipientType === 'user' ?
 		$recipientId = $this->featureContext->getUserIdByUserName($recipient)
@@ -4702,7 +4702,7 @@ class SpacesContext implements Context {
 					Assert::assertEquals(
 						$expirationDate,
 						(preg_split("/[\sT]+/", $permission['expirationDateTime']))[0],
-						"$expirationDate is different in the response"
+						"$expirationDate is different in the response",
 					);
 				}
 				break;
@@ -4731,7 +4731,7 @@ class SpacesContext implements Context {
 				$url,
 				$user,
 				$this->featureContext->getPasswordForUser($user),
-			)
+			),
 		);
 	}
 
@@ -4750,7 +4750,7 @@ class SpacesContext implements Context {
 		string $sharer,
 		string $path,
 		string $space,
-		string $sharee
+		string $sharee,
 	): void {
 		$sharer = $this->featureContext->getActualUsername($sharer);
 		$resource_id = $this->getResourceId($sharer, $space, $path);
@@ -4764,18 +4764,18 @@ class SpacesContext implements Context {
 			null,
 			null,
 			null,
-			$resource_id
+			$resource_id,
 		);
 		$this->featureContext->theHTTPStatusCodeShouldBe(200, "", $response);
 		$responseStatusCode = $this->ocsContext->getOCSResponseStatusCode(
-			$response
+			$response,
 		);
 		$statusCodes = ["100", "200"];
 		Assert::assertContainsEquals(
 			$responseStatusCode,
 			$statusCodes,
 			"OCS status code is not any of the expected values "
-			. \implode(",", $statusCodes) . " got " . $responseStatusCode
+			. \implode(",", $statusCodes) . " got " . $responseStatusCode,
 		);
 	}
 
@@ -4796,7 +4796,7 @@ class SpacesContext implements Context {
 				$this->featureContext->getBaseUrl(),
 				$user,
 				$this->featureContext->getPasswordForUser($user),
-				$file
+				$file,
 			);
 		} else {
 			$itemId = $this->getFileId($user, $space, $file);
@@ -4810,7 +4810,7 @@ class SpacesContext implements Context {
 				$url,
 				$user,
 				$this->featureContext->getPasswordForUser($user),
-			)
+			),
 		);
 	}
 
@@ -4827,7 +4827,7 @@ class SpacesContext implements Context {
 	public function userHasExpiredTheMembershipOfUserFromSpace(
 		string $user,
 		string $memberUser,
-		string $spaceName
+		string $spaceName,
 	): void {
 		$rows['expireDate'] = $this->featureContext->formatExpiryDateTime('Y-m-d\\TH:i:sP');
 		$rows['shareWith'] = $memberUser;

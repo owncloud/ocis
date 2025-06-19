@@ -41,7 +41,7 @@ class BehatHelper {
 	public static function getContext(
 		ScenarioScope $scope,
 		InitializedContextEnvironment $environment,
-		string $class
+		string $class,
 	): Context {
 		try {
 			return $environment->getContext($class);

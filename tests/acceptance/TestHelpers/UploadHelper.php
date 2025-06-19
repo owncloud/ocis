@@ -84,7 +84,7 @@ class UploadHelper extends Assert {
 				null,
 				[],
 				null,
-				$isGivenStep
+				$isGivenStep,
 			);
 		}
 
@@ -114,7 +114,7 @@ class UploadHelper extends Assert {
 				null,
 				[],
 				null,
-				$isGivenStep
+				$isGivenStep,
 			);
 			if ($result->getStatusCode() >= 400) {
 				return $result;
@@ -173,7 +173,7 @@ class UploadHelper extends Assert {
 				return $size;
 			default:
 				throw new \InvalidArgumentException(
-					"Invalid size unit '$sizeUnit' in '$sizeString'. Use GB, MB, KB or no unit for bytes."
+					"Invalid size unit '$sizeUnit' in '$sizeString'. Use GB, MB, KB or no unit for bytes.",
 				);
 		}
 	}
@@ -199,11 +199,11 @@ class UploadHelper extends Assert {
 		\fclose($file);
 		self::assertEquals(
 			1,
-			\file_exists($name)
+			\file_exists($name),
 		);
 		self::assertEquals(
 			$size,
-			\filesize($name)
+			\filesize($name),
 		);
 	}
 
@@ -221,7 +221,7 @@ class UploadHelper extends Assert {
 		\fclose($file);
 		self::assertEquals(
 			1,
-			\file_exists($name)
+			\file_exists($name),
 		);
 	}
 

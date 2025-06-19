@@ -59,13 +59,13 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 	public static function init(
 		?string $adminUsername,
 		?string $adminPassword,
-		?string $baseUrl
+		?string $baseUrl,
 	): void {
 		foreach (\func_get_args() as $variableToCheck) {
 			if (!\is_string($variableToCheck)) {
 				throw new \InvalidArgumentException(
 					"mandatory argument missing or wrong type ($variableToCheck => "
-					. \gettype($variableToCheck) . ")"
+					. \gettype($variableToCheck) . ")",
 				);
 			}
 		}
@@ -98,7 +98,7 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 		);
 		if ($result->getStatusCode() !== 200) {
 			throw new \Exception(
-				"could not get sysinfo " . $result->getReasonPhrase()
+				"could not get sysinfo " . $result->getReasonPhrase(),
 			);
 		}
 		return HttpRequestHelper::getResponseXml($result, __METHOD__)->data;
@@ -140,7 +140,7 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 			&& $adminUsername === null
 		) {
 			throw new Exception(
-				"$callerName called without adminUsername - pass the username or call SetupHelper::init"
+				"$callerName called without adminUsername - pass the username or call SetupHelper::init",
 			);
 		}
 		if ($adminUsername === null) {
@@ -161,7 +161,7 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 			&& $adminPassword === null
 		) {
 			throw new Exception(
-				"$callerName called without adminPassword - pass the password or call SetupHelper::init"
+				"$callerName called without adminPassword - pass the password or call SetupHelper::init",
 			);
 		}
 		if ($adminPassword === null) {
@@ -182,7 +182,7 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 			&& $baseUrl === null
 		) {
 			throw new Exception(
-				"$callerName called without baseUrl - pass the baseUrl or call SetupHelper::init"
+				"$callerName called without baseUrl - pass the baseUrl or call SetupHelper::init",
 			);
 		}
 		if ($baseUrl === null) {
@@ -206,7 +206,7 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 		?string $dirPathFromServerRoot,
 		?string $baseUrl = null,
 		?string $adminUsername = null,
-		?string $adminPassword = null
+		?string $adminPassword = null,
 	): void {
 		$baseUrl = self::checkBaseUrl($baseUrl, "mkDirOnServer");
 		$adminUsername = self::checkAdminUsername($adminUsername, "mkDirOnServer");
@@ -217,12 +217,12 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 			$adminPassword,
 			"POST",
 			"/apps/testing/api/v1/dir",
-			['dir' => $dirPathFromServerRoot]
+			['dir' => $dirPathFromServerRoot],
 		);
 
 		if ($result->getStatusCode() !== 200) {
 			throw new \Exception(
-				"could not create directory $dirPathFromServerRoot " . $result->getReasonPhrase()
+				"could not create directory $dirPathFromServerRoot " . $result->getReasonPhrase(),
 			);
 		}
 	}
@@ -242,7 +242,7 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 		?string $dirPathFromServerRoot,
 		?string $baseUrl = null,
 		?string $adminUsername = null,
-		?string $adminPassword = null
+		?string $adminPassword = null,
 	): void {
 		$baseUrl = self::checkBaseUrl($baseUrl, "rmDirOnServer");
 		$adminUsername = self::checkAdminUsername($adminUsername, "rmDirOnServer");
@@ -253,12 +253,12 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 			$adminPassword,
 			"DELETE",
 			"/apps/testing/api/v1/dir",
-			['dir' => $dirPathFromServerRoot]
+			['dir' => $dirPathFromServerRoot],
 		);
 
 		if ($result->getStatusCode() !== 200) {
 			throw new \Exception(
-				"could not delete directory $dirPathFromServerRoot " . $result->getReasonPhrase()
+				"could not delete directory $dirPathFromServerRoot " . $result->getReasonPhrase(),
 			);
 		}
 	}
@@ -280,7 +280,7 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 		?string $content,
 		?string $baseUrl = null,
 		?string $adminUsername = null,
-		?string $adminPassword = null
+		?string $adminPassword = null,
 	): void {
 		$baseUrl = self::checkBaseUrl($baseUrl, "createFileOnServer");
 		$adminUsername = self::checkAdminUsername($adminUsername, "createFileOnServer");
@@ -294,12 +294,12 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 			[
 				'file' => $filePathFromServerRoot,
 				'content' => $content,
-			]
+			],
 		);
 
 		if ($result->getStatusCode() !== 200) {
 			throw new \Exception(
-				"could not create file $filePathFromServerRoot " . $result->getReasonPhrase()
+				"could not create file $filePathFromServerRoot " . $result->getReasonPhrase(),
 			);
 		}
 	}
@@ -319,7 +319,7 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 		?string $filePathFromServerRoot,
 		?string $baseUrl = null,
 		?string $adminUsername = null,
-		?string $adminPassword = null
+		?string $adminPassword = null,
 	): void {
 		$baseUrl = self::checkBaseUrl($baseUrl, "deleteFileOnServer");
 		$adminUsername = self::checkAdminUsername($adminUsername, "deleteFileOnServer");
@@ -332,12 +332,12 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 			"/apps/testing/api/v1/file",
 			[
 				'file' => $filePathFromServerRoot,
-			]
+			],
 		);
 
 		if ($result->getStatusCode() !== 200) {
 			throw new \Exception(
-				"could not delete file $filePathFromServerRoot " . $result->getReasonPhrase()
+				"could not delete file $filePathFromServerRoot " . $result->getReasonPhrase(),
 			);
 		}
 	}
@@ -356,16 +356,16 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 		?string $fileInCore,
 		?string $baseUrl = null,
 		?string $adminUsername = null,
-		?string $adminPassword = null
+		?string $adminPassword = null,
 	): string {
 		$baseUrl = self::checkBaseUrl($baseUrl, "readFile");
 		$adminUsername = self::checkAdminUsername(
 			$adminUsername,
-			"readFile"
+			"readFile",
 		);
 		$adminPassword = self::checkAdminPassword(
 			$adminPassword,
-			"readFile"
+			"readFile",
 		);
 
 		$response = OcsApiHelper::sendRequest(
@@ -378,7 +378,7 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 		self::assertSame(
 			200,
 			$response->getStatusCode(),
-			"Failed to read the file $fileInCore"
+			"Failed to read the file $fileInCore",
 		);
 		$localContent = HttpRequestHelper::getResponseXml($response, __METHOD__);
 		$localContent = (string)$localContent->data->element->contentUrlEncoded;

@@ -259,13 +259,13 @@ class FeatureContext extends BehatVariablesContext {
 	 */
 	public function pushToLastStatusCodesArrays(): void {
 		$this->pushToLastHttpStatusCodesArray(
-			(string)$this->getResponse()->getStatusCode()
+			(string)$this->getResponse()->getStatusCode(),
 		);
 		try {
 			$this->pushToLastOcsCodesArray(
 				$this->ocsContext->getOCSResponseStatusCode(
-					$this->getResponse()
-				)
+					$this->getResponse(),
+				),
 			);
 		} catch (Exception $exception) {
 			// if response couldn't be converted into xml then push "notset" to last ocs status codes array
@@ -402,7 +402,7 @@ class FeatureContext extends BehatVariablesContext {
 		if (($this->userReplacements === null) && $this->isTestingReplacingUsernames()) {
 			$this->userReplacements = \json_decode(
 				\file_get_contents("./tests/acceptance/usernames.json"),
-				true
+				true,
 			);
 			// Loop through the user replacements, and make entries for the lower
 			// and upper case forms. This allows for steps that specifically
@@ -413,14 +413,14 @@ class FeatureContext extends BehatVariablesContext {
 				if ($lowerKey !== $key) {
 					$this->userReplacements[$lowerKey] = $value;
 					$this->userReplacements[$lowerKey]['username'] = \strtolower(
-						$this->userReplacements[$lowerKey]['username']
+						$this->userReplacements[$lowerKey]['username'],
 					);
 				}
 				$upperKey = \strtoupper($key);
 				if ($upperKey !== $key) {
 					$this->userReplacements[$upperKey] = $value;
 					$this->userReplacements[$upperKey]['username'] = \strtoupper(
-						$this->userReplacements[$upperKey]['username']
+						$this->userReplacements[$upperKey]['username'],
 					);
 				}
 			}
@@ -882,7 +882,7 @@ class FeatureContext extends BehatVariablesContext {
 	public function addGuzzleClientHeaders(array $guzzleClientHeaders): void {
 		$this->guzzleClientHeaders = \array_merge(
 			$this->guzzleClientHeaders,
-			$guzzleClientHeaders
+			$guzzleClientHeaders,
 		);
 	}
 
@@ -979,7 +979,7 @@ class FeatureContext extends BehatVariablesContext {
 	 */
 	public function setResponse(
 		?ResponseInterface $response,
-		string $username = ""
+		string $username = "",
 	): void {
 		$this->response = $response;
 		$this->responseUser = $username;
@@ -1023,7 +1023,7 @@ class FeatureContext extends BehatVariablesContext {
 			Assert::assertContains(
 				\ltrim($validator, "$"),
 				$this->jsonSchemaValidators,
-				"Invalid schema validator: '$validator'"
+				"Invalid schema validator: '$validator'",
 			);
 		}
 	}
@@ -1108,7 +1108,7 @@ class FeatureContext extends BehatVariablesContext {
 		Assert::assertEquals(
 			$schemaObj->minItems,
 			$schemaObj->maxItems,
-			"'minItems' and 'maxItems' should be equal for strict assertion"
+			"'minItems' and 'maxItems' should be equal for strict assertion",
 		);
 
 		// check optional validators
@@ -1125,31 +1125,31 @@ class FeatureContext extends BehatVariablesContext {
 							foreach ($value as $element) {
 								Assert::assertNotNull(
 									$element->oneOf,
-									"'oneOf' is required to assert more than one elements"
+									"'oneOf' is required to assert more than one elements",
 								);
 							}
 							Assert::fail("'$validator' should be an object not an array");
 						}
 						Assert::assertFalse(
 							$value->allOf || $value->anyOf,
-							"'allOf' and 'anyOf' are not allowed in array"
+							"'allOf' and 'anyOf' are not allowed in array",
 						);
 						if ($value->oneOf) {
 							Assert::assertNotNull(
 								$value->oneOf,
-								"'oneOf' is required to assert more than one elements"
+								"'oneOf' is required to assert more than one elements",
 							);
 							Assert::assertTrue(\is_array($value->oneOf), "'oneOf' should be an array");
 							Assert::assertEquals(
 								$schemaObj->maxItems,
 								\count($value->oneOf),
-								"Expected " . $schemaObj->maxItems . " 'oneOf' items but got " . \count($value->oneOf)
+								"Expected " . $schemaObj->maxItems . " 'oneOf' items but got " . \count($value->oneOf),
 							);
 						}
 					}
 					Assert::assertTrue(
 						\is_object($value),
-						"'$validator' should be an object when expecting 1 element"
+						"'$validator' should be an object when expecting 1 element",
 					);
 					break;
 				case "uniqueItems":
@@ -1334,8 +1334,8 @@ class FeatureContext extends BehatVariablesContext {
 				$method,
 				"public",
 				$password,
-				$headers
-			)
+				$headers,
+			),
 		);
 	}
 
@@ -1355,11 +1355,11 @@ class FeatureContext extends BehatVariablesContext {
 		string $user,
 		string $verb,
 		string $url,
-		TableNode $headersTable
+		TableNode $headersTable,
 	): void {
 		$this->verifyTableNodeColumns(
 			$headersTable,
-			['header', 'value']
+			['header', 'value'],
 		);
 
 		$user = $this->getActualUsername($user);
@@ -1386,7 +1386,7 @@ class FeatureContext extends BehatVariablesContext {
 			function ($subArray) {
 				return $subArray[0];
 			},
-			$arrayOfArrays
+			$arrayOfArrays,
 		);
 		return $a;
 	}
@@ -1405,7 +1405,7 @@ class FeatureContext extends BehatVariablesContext {
 		string $user,
 		string $method,
 		string $davPath,
-		string $content
+		string $content,
 	): void {
 		$this->setResponse($this->sendingToWithDirectUrl($user, $method, $davPath, $content));
 	}
@@ -1424,7 +1424,7 @@ class FeatureContext extends BehatVariablesContext {
 		string $user,
 		string $verb,
 		string $url,
-		string $password
+		string $password,
 	): void {
 		$this->setResponse($this->sendingToWithDirectUrl($user, $verb, $url, null, $password));
 	}
@@ -1446,7 +1446,7 @@ class FeatureContext extends BehatVariablesContext {
 		string $url,
 		?string $body = null,
 		?string $password = null,
-		?array $headers = null
+		?array $headers = null,
 	): ResponseInterface {
 		$url = \ltrim($url, '/');
 		if (WebdavHelper::isDAVRequest($url)) {
@@ -1490,7 +1490,7 @@ class FeatureContext extends BehatVariablesContext {
 			$reqHeaders,
 			$body,
 			$config,
-			$cookies
+			$cookies,
 		);
 	}
 
@@ -1533,7 +1533,7 @@ class FeatureContext extends BehatVariablesContext {
 	public function theHTTPStatusCodeShouldBe(
 		$expectedStatusCode,
 		?string $message = "",
-		?ResponseInterface $response = null
+		?ResponseInterface $response = null,
 	): void {
 		$response = $response ?? $this->response;
 		$actualStatusCode = $response->getStatusCode();
@@ -1546,7 +1546,7 @@ class FeatureContext extends BehatVariablesContext {
 			Assert::assertContainsEquals(
 				$actualStatusCode,
 				$expectedStatusCode,
-				$message
+				$message,
 			);
 		} else {
 			if ($message === "") {
@@ -1556,7 +1556,7 @@ class FeatureContext extends BehatVariablesContext {
 			Assert::assertEquals(
 				$expectedStatusCode,
 				$actualStatusCode,
-				$message
+				$message,
 			);
 		}
 	}
@@ -1599,12 +1599,12 @@ class FeatureContext extends BehatVariablesContext {
 	 * @throws Exception
 	 */
 	public function theOcsDataOfTheResponseShouldMatch(
-		PyStringNode $schemaString
+		PyStringNode $schemaString,
 	): void {
 		$jsonResponse = $this->getJsonDecodedResponseBodyContent();
 		$this->assertJsonDocumentMatchesSchema(
 			$jsonResponse->ocs->data,
-			$this->getJSONSchema($schemaString)
+			$this->getJSONSchema($schemaString),
 		);
 	}
 
@@ -1620,7 +1620,7 @@ class FeatureContext extends BehatVariablesContext {
 		$responseBody = $this->getJsonDecodedResponseBodyContent();
 		$this->assertJsonDocumentMatchesSchema(
 			$responseBody,
-			$this->getJSONSchema($schemaString)
+			$this->getJSONSchema($schemaString),
 		);
 	}
 
@@ -1645,7 +1645,7 @@ class FeatureContext extends BehatVariablesContext {
 	 */
 	public function theHTTPStatusCodeShouldBeOr($statusCode1, $statusCode2): void {
 		$this->theHTTPStatusCodeShouldBe(
-			[$statusCode1, $statusCode2]
+			[$statusCode1, $statusCode2],
 		);
 	}
 
@@ -1661,7 +1661,7 @@ class FeatureContext extends BehatVariablesContext {
 	public function theHTTPStatusCodeShouldBeBetween(
 		$minStatusCode,
 		$maxStatusCode,
-		?ResponseInterface $response = null
+		?ResponseInterface $response = null,
 	): void {
 		$response = $response ?? $this->response;
 		$statusCode = $response->getStatusCode();
@@ -1669,12 +1669,12 @@ class FeatureContext extends BehatVariablesContext {
 		Assert::assertGreaterThanOrEqual(
 			$minStatusCode,
 			$statusCode,
-			$message
+			$message,
 		);
 		Assert::assertLessThanOrEqual(
 			$maxStatusCode,
 			$statusCode,
-			$message
+			$message,
 		);
 	}
 
@@ -1692,7 +1692,7 @@ class FeatureContext extends BehatVariablesContext {
 		Assert::assertGreaterThanOrEqual(
 			400,
 			$statusCode,
-			$message
+			$message,
 		);
 	}
 
@@ -1743,7 +1743,7 @@ class FeatureContext extends BehatVariablesContext {
 			$dirPathFromServerRoot,
 			$this->getBaseUrl(),
 			$this->getAdminUsername(),
-			$this->getAdminPassword()
+			$this->getAdminPassword(),
 		);
 	}
 
@@ -2027,7 +2027,7 @@ class FeatureContext extends BehatVariablesContext {
 			$this->getAdminPassword(),
 			$this->guzzleClientHeaders,
 			null,
-			$config
+			$config,
 		);
 	}
 
@@ -2042,7 +2042,7 @@ class FeatureContext extends BehatVariablesContext {
 		}
 		return \json_decode(
 			(string)$response->getBody(),
-			true
+			true,
 		);
 	}
 
@@ -2052,7 +2052,7 @@ class FeatureContext extends BehatVariablesContext {
 	 */
 	public function getJsonDecodedStatusPhp(): array {
 		return $this->getJsonDecodedResponse(
-			$this->getStatusPhp()
+			$this->getStatusPhp(),
 		);
 	}
 
@@ -2149,7 +2149,7 @@ class FeatureContext extends BehatVariablesContext {
 		?array $functions = [],
 		?array $additionalSubstitutions = [],
 		?string $group = null,
-		?string $userName = null
+		?string $userName = null,
 	): ?string {
 		$substitutions = [
 			[
@@ -2540,7 +2540,7 @@ class FeatureContext extends BehatVariablesContext {
 					"function" =>
 					[$this, "getGroupIdByGroupName"],
 					"parameter" => [$group],
-				]
+				],
 			);
 
 			if (!OcisHelper::isTestingOnReva()) {
@@ -2553,7 +2553,7 @@ class FeatureContext extends BehatVariablesContext {
 							"getSpaceIdByName",
 						],
 						"parameter" => [$user, "Shares"],
-					]
+					],
 				);
 			}
 		}
@@ -2569,7 +2569,7 @@ class FeatureContext extends BehatVariablesContext {
 
 			$replacement = \call_user_func_array(
 				$substitution["function"],
-				$substitution["parameter"]
+				$substitution["parameter"],
 			);
 
 			// do not run functions on regex patterns
@@ -2577,14 +2577,14 @@ class FeatureContext extends BehatVariablesContext {
 				foreach ($functions as $function => $parameters) {
 					$replacement = \call_user_func_array(
 						$function,
-						\array_merge([$replacement], $parameters)
+						\array_merge([$replacement], $parameters),
 					);
 				}
 			}
 			$value = \str_replace(
 				$substitution["code"],
 				$replacement,
-				$value
+				$value,
 			);
 		}
 		return $value;
@@ -2700,7 +2700,7 @@ class FeatureContext extends BehatVariablesContext {
 		if ($this->adminPassword !== $this->originalAdminPassword) {
 			$this->resetUserPasswordAsAdminUsingTheProvisioningApi(
 				$this->getAdminUsername(),
-				$this->originalAdminPassword
+				$this->originalAdminPassword,
 			);
 			$this->adminPassword = $this->originalAdminPassword;
 		}
@@ -2725,7 +2725,7 @@ class FeatureContext extends BehatVariablesContext {
 	 */
 	public function makeTemporaryStorageOnServerBefore(): void {
 		$this->mkDirOnServer(
-			TEMPORARY_STORAGE_DIR_ON_REMOTE_SERVER
+			TEMPORARY_STORAGE_DIR_ON_REMOTE_SERVER,
 		);
 	}
 
@@ -2738,7 +2738,7 @@ class FeatureContext extends BehatVariablesContext {
 	public function removeTemporaryStorageOnServerAfter(): void {
 		SetupHelper::rmDirOnServer(
 			TEMPORARY_STORAGE_DIR_ON_REMOTE_SERVER,
-			HttpRequestHelper::getCurrentScenarioRef()
+			HttpRequestHelper::getCurrentScenarioRef(),
 		);
 	}
 
@@ -2780,7 +2780,7 @@ class FeatureContext extends BehatVariablesContext {
 	public function verifyTableNodeColumns(
 		?TableNode $table,
 		?array $requiredHeader = [],
-		?array $allowedHeader = []
+		?array $allowedHeader = [],
 	): void {
 		if ($table === null || \count($table->getHash()) < 1) {
 			throw new Exception("Table should have at least one row.");
@@ -2897,7 +2897,7 @@ class FeatureContext extends BehatVariablesContext {
 			$this->getBaseUrl(),
 			$this->getAdminUsername(),
 			$this->getAdminPassword(),
-			$userName
+			$userName,
 		);
 		$data = \json_decode($response->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
 		if (isset($data["id"])) {
@@ -2919,7 +2919,7 @@ class FeatureContext extends BehatVariablesContext {
 			$this->getBaseUrl(),
 			$this->getAdminUsername(),
 			$this->getAdminPassword(),
-			$groupName
+			$groupName,
 		);
 		$data = $this->getJsonDecodedResponse($response);
 		if (isset($data["id"])) {

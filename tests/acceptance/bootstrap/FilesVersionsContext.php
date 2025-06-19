@@ -95,7 +95,7 @@ class FilesVersionsContext implements Context {
 	public function thePublicTriesToGetTheNumberOfVersionsOfFileWithPasswordUsingFileId(
 		string $file,
 		string $password,
-		string $fileId
+		string $fileId,
 	): void {
 		$password = $this->featureContext->getActualPassword($password);
 		$this->featureContext->setResponse(
@@ -109,8 +109,8 @@ class FilesVersionsContext implements Context {
 				"versions",
 				$this->featureContext->getDavPathVersion(),
 				false,
-				$password
-			)
+				$password,
+			),
 		);
 	}
 
@@ -136,7 +136,7 @@ class FilesVersionsContext implements Context {
 		Assert::assertNotNull(
 			$fileId,
 			__METHOD__
-			. " fileid of file $file user $fileOwner not found (the file may not exist)"
+			. " fileid of file $file user $fileOwner not found (the file may not exist)",
 		);
 		return $this->featureContext->makeDavRequest(
 			$user,
@@ -145,7 +145,7 @@ class FilesVersionsContext implements Context {
 			null,
 			null,
 			$spaceId,
-			"versions"
+			"versions",
 		);
 	}
 
@@ -167,8 +167,8 @@ class FilesVersionsContext implements Context {
 				null,
 				null,
 				null,
-				"versions"
-			)
+				"versions",
+			),
 		);
 	}
 
@@ -198,7 +198,7 @@ class FilesVersionsContext implements Context {
 		Assert::assertNotNull(
 			$fileId,
 			__METHOD__
-			. " fileid of file $file user $user not found (the file may not exist)"
+			. " fileid of file $file user $user not found (the file may not exist)",
 		);
 		$body = '<?xml version="1.0"?>
                 <d:propfind  xmlns:d="DAV:" xmlns:oc="http://owncloud.org/ns">
@@ -232,12 +232,12 @@ class FilesVersionsContext implements Context {
 		Assert::assertNotNull(
 			$fileId,
 			__METHOD__
-			. " fileid of file $path user $user not found (the file may not exist)"
+			. " fileid of file $path user $user not found (the file may not exist)",
 		);
 		$response = $this->listVersionFolder($user, $fileId, 1);
 		$responseXmlObject = HttpRequestHelper::getResponseXml(
 			$response,
-			__METHOD__
+			__METHOD__,
 		);
 		$xmlPart = $responseXmlObject->xpath("//d:response/d:href");
 		// restoring the version only works with DAV path v2
@@ -250,7 +250,7 @@ class FilesVersionsContext implements Context {
 			'COPY',
 			$user,
 			$this->featureContext->getPasswordForUser($user),
-			['Destination' => $destinationUrl]
+			['Destination' => $destinationUrl],
 		);
 	}
 
@@ -298,7 +298,7 @@ class FilesVersionsContext implements Context {
 		$response = $this->listVersionFolder($user, $fileId, 1);
 		$responseXmlObject = HttpRequestHelper::getResponseXml(
 			$response,
-			__METHOD__
+			__METHOD__,
 		);
 		$actualCount = \count($responseXmlObject->xpath("//d:prop/d:getetag")) - 1;
 		if ($actualCount === -1) {
@@ -307,7 +307,7 @@ class FilesVersionsContext implements Context {
 		Assert::assertEquals(
 			$expectedCount,
 			$actualCount,
-			"Expected $expectedCount versions but found $actualCount in \n" . $responseXmlObject->asXML()
+			"Expected $expectedCount versions but found $actualCount in \n" . $responseXmlObject->asXML(),
 		);
 	}
 
@@ -324,14 +324,14 @@ class FilesVersionsContext implements Context {
 	public function theVersionFolderOfFileShouldContainElements(
 		string $path,
 		string $user,
-		int $count
+		int $count,
 	): void {
 		$user = $this->featureContext->getActualUsername($user);
 		$fileId = $this->featureContext->getFileIdForPath($user, $path);
 		Assert::assertNotNull(
 			$fileId,
 			__METHOD__
-			. ". file '$path' for user '$user' not found (the file may not exist)"
+			. ". file '$path' for user '$user' not found (the file may not exist)",
 		);
 		$this->assertFileVersionsCount($user, $fileId, $count);
 	}
@@ -349,7 +349,7 @@ class FilesVersionsContext implements Context {
 	public function theVersionFolderOfFileIdShouldContainElements(
 		string $fileId,
 		string $user,
-		int $count
+		int $count,
 	): void {
 		$this->assertFileVersionsCount($user, $fileId, $count);
 	}
@@ -369,26 +369,26 @@ class FilesVersionsContext implements Context {
 		string $path,
 		int $index,
 		string $user,
-		int $length
+		int $length,
 	): void {
 		$user = $this->featureContext->getActualUsername($user);
 		$fileId = $this->featureContext->getFileIdForPath($user, $path);
 		Assert::assertNotNull(
 			$fileId,
 			__METHOD__
-			. " fileid of file $path user $user not found (the file may not exist)"
+			. " fileid of file $path user $user not found (the file may not exist)",
 		);
 		$response = $this->listVersionFolder($user, $fileId, 1, ['d:getcontentlength']);
 		$responseXmlObject = HttpRequestHelper::getResponseXml(
 			$response,
-			__METHOD__
+			__METHOD__,
 		);
 		$xmlPart = $responseXmlObject->xpath("//d:prop/d:getcontentlength");
 		Assert::assertEquals(
 			$length,
 			(int) $xmlPart[$index],
 			"The content length of file $path with version $index for user $user was
-			expected to be $length but the actual content length is $xmlPart[$index]"
+			expected to be $length but the actual content length is $xmlPart[$index]",
 		);
 	}
 
@@ -405,23 +405,23 @@ class FilesVersionsContext implements Context {
 	public function asUsersAuthorsOfVersionsOfFileShouldBe(
 		string $users,
 		string $filename,
-		TableNode $table
+		TableNode $table,
 	): void {
 		$this->featureContext->verifyTableNodeColumns(
 			$table,
-			['index', 'author']
+			['index', 'author'],
 		);
 		$requiredVersionMetadata = $table->getHash();
 		$usersArray = \explode(",", $users);
 		foreach ($usersArray as $username) {
 			$actualUsername = $this->featureContext->getActualUsername($username);
 			$this->featureContext->setResponse(
-				$this->getFileVersionMetadata($actualUsername, $filename)
+				$this->getFileVersionMetadata($actualUsername, $filename),
 			);
 			foreach ($requiredVersionMetadata as $versionMetadata) {
 				$this->featureContext->checkAuthorOfAVersionOfFile(
 					$versionMetadata['index'],
-					$versionMetadata['author']
+					$versionMetadata['author'],
 				);
 			}
 		}
@@ -440,14 +440,14 @@ class FilesVersionsContext implements Context {
 		string $user,
 		string $path,
 		string $index,
-		?string $spaceId = null
+		?string $spaceId = null,
 	): ResponseInterface {
 		$user = $this->featureContext->getActualUsername($user);
 		$fileId = $this->featureContext->getFileIdForPath($user, $path, $spaceId);
 		Assert::assertNotNull(
 			$fileId,
 			__METHOD__
-			. " fileid of file $path user $user not found (the file may not exist)"
+			. " fileid of file $path user $user not found (the file may not exist)",
 		);
 		$index = (int)$index;
 		$response = $this->listVersionFolder($user, $fileId, 1);
@@ -458,17 +458,17 @@ class FilesVersionsContext implements Context {
 		$xmlPart = $responseXmlObject->xpath("//d:response/d:href");
 		if (!isset($xmlPart[$index])) {
 			Assert::fail(
-				'could not find version of path "' . $path . '" with index "' . $index . '"'
+				'could not find version of path "' . $path . '" with index "' . $index . '"',
 			);
 		}
 		// the href already contains the path
 		$url = WebDavHelper::sanitizeUrl(
-			$this->featureContext->getBaseUrlWithoutPath() . $xmlPart[$index]
+			$this->featureContext->getBaseUrlWithoutPath() . $xmlPart[$index],
 		);
 		return HttpRequestHelper::get(
 			$url,
 			$user,
-			$this->featureContext->getPasswordForUser($user)
+			$this->featureContext->getPasswordForUser($user),
 		);
 	}
 
@@ -501,7 +501,7 @@ class FilesVersionsContext implements Context {
 		string $index,
 		string $path,
 		string $user,
-		string $content
+		string $content,
 	): void {
 		$response = $this->downloadVersion($user, $path, $index);
 		$this->featureContext->theHTTPStatusCodeShouldBe("200", '', $response);
@@ -546,7 +546,7 @@ class FilesVersionsContext implements Context {
 			null,
 			$body,
 			$this->featureContext->getDavPathVersion(),
-			null
+			null,
 		);
 		$this->featureContext->setResponse($response);
 	}
@@ -567,7 +567,7 @@ class FilesVersionsContext implements Context {
 		string $user,
 		string $fileId,
 		int $folderDepth,
-		?array $properties = null
+		?array $properties = null,
 	): ResponseInterface {
 		if (!$properties) {
 			$properties = [
@@ -584,7 +584,7 @@ class FilesVersionsContext implements Context {
 			$properties,
 			(string) $folderDepth,
 			null,
-			"versions"
+			"versions",
 		);
 		return $response;
 	}
@@ -609,8 +609,8 @@ class FilesVersionsContext implements Context {
 				null,
 				null,
 				null,
-				"versions"
-			)
+				"versions",
+			),
 		);
 	}
 }

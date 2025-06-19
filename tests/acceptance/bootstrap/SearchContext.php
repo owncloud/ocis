@@ -57,7 +57,7 @@ class SearchContext implements Context {
 		?string $scopeType = null,
 		?string $scope = null,
 		?string $spaceName = null,
-		?TableNode $properties = null
+		?TableNode $properties = null,
 	): ResponseInterface {
 		$user = $this->featureContext->getActualUsername($user);
 		$baseUrl = $this->featureContext->getBaseUrl();
@@ -87,7 +87,7 @@ class SearchContext implements Context {
 				$resourceID = $this->featureContext->spacesContext->getResourceId(
 					$user,
 					$spaceName ?? "Personal",
-					$scope
+					$scope,
 				);
 				$pattern .= " scope:$resourceID";
 			}
@@ -122,7 +122,7 @@ class SearchContext implements Context {
 			$user,
 			$password,
 			null,
-			$body
+			$body,
 		);
 	}
 
@@ -144,7 +144,7 @@ class SearchContext implements Context {
 		string $user,
 		string $pattern,
 		?string $limit = null,
-		?TableNode $properties = null
+		?TableNode $properties = null,
 	): void {
 		// NOTE: because indexing of newly uploaded files or directories with ocis is decoupled and occurs asynchronously
 		// short wait is necessary before searching
@@ -166,28 +166,28 @@ class SearchContext implements Context {
 	public function fileOrFolderInTheSearchResultShouldContainProperties(
 		string $path,
 		string $user,
-		TableNode $properties
+		TableNode $properties,
 	): void {
 		$user = $this->featureContext->getActualUsername($user);
 		$this->featureContext->verifyTableNodeColumns($properties, ['name', 'value']);
 		$properties = $properties->getHash();
 		$fileResult = $this->featureContext->findEntryFromSearchResponse(
-			$path
+			$path,
 		);
 		Assert::assertNotFalse(
 			$fileResult,
-			"could not find file/folder '$path'"
+			"could not find file/folder '$path'",
 		);
 		foreach ($properties as $property) {
 			$property['value'] = $this->featureContext->substituteInLineCodes(
 				$property['value'],
-				$user
+				$user,
 			);
 			$fileResultProperty = $fileResult->xpath("d:propstat//" . $property['name']);
 			if ($fileResultProperty) {
 				Assert::assertMatchesRegularExpression(
 					"/" . $property['value'] . "/",
-					\trim((string)$fileResultProperty[0])
+					\trim((string)$fileResultProperty[0]),
 				);
 				continue;
 			}
@@ -224,13 +224,13 @@ class SearchContext implements Context {
 	 */
 	public function theSearchResultShouldContainEntriesWithHighlight(
 		TableNode $expectedFiles,
-		string $expectedContent
+		string $expectedContent,
 	): void {
 		$this->featureContext->verifyTableNodeColumnsCount($expectedFiles, 1);
 		$elementRows = $expectedFiles->getRows();
 		$foundEntries = $this->featureContext->findEntryFromSearchResponse(
 			null,
-			true
+			true,
 		);
 		foreach ($elementRows as $expectedFile) {
 			$filename = $expectedFile[0];
@@ -244,7 +244,7 @@ class SearchContext implements Context {
 			Assert::assertEquals(
 				$expectedContent,
 				$actualContent,
-				"Expected text highlight to be '$expectedContent' but found '$actualContent'"
+				"Expected text highlight to be '$expectedContent' but found '$actualContent'",
 			);
 		}
 	}

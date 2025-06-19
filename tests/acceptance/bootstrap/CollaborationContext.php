@@ -91,7 +91,7 @@ class CollaborationContext implements Context {
 		string $file,
 		string $space,
 		string $app,
-		string $viewMode = null
+		string $viewMode = null,
 	): void {
 		$fileId = $this->spacesContext->getFileId($user, $space, $file);
 		$response = \json_decode(
@@ -101,8 +101,8 @@ class CollaborationContext implements Context {
 				$this->featureContext->getActualUsername($user),
 				$this->featureContext->getPasswordForUser($user),
 				$this->featureContext->getBaseUrl(),
-				$viewMode
-			)->getBody()->getContents()
+				$viewMode,
+			)->getBody()->getContents(),
 		);
 
 		$accessToken = $response->form_parameters->access_token;
@@ -115,7 +115,7 @@ class CollaborationContext implements Context {
 		$this->featureContext->setResponse(
 			HttpRequestHelper::get(
 				$wopiSrc . "?access_token=$accessToken",
-			)
+			),
 		);
 	}
 
@@ -135,7 +135,7 @@ class CollaborationContext implements Context {
 		string $user,
 		string $file,
 		string $folder,
-		string $space
+		string $space,
 	): void {
 		$parentContainerId = $this->spacesContext->getResourceId($user, $space, $folder);
 		$this->featureContext->setResponse(
@@ -144,8 +144,8 @@ class CollaborationContext implements Context {
 				$user,
 				$this->featureContext->getPasswordForUser($user),
 				$parentContainerId,
-				$file
-			)
+				$file,
+			),
 		);
 	}
 
@@ -168,8 +168,8 @@ class CollaborationContext implements Context {
 				"$baseUrl/$davPath/$folder",
 				"PROPFIND",
 				"public",
-				$this->featureContext->getActualPassword($password)
-			)
+				$this->featureContext->getActualPassword($password),
+			),
 		);
 		$xmlPart = $responseXmlObject->xpath("//d:prop/oc:fileid");
 		$parentContainerId = (string) $xmlPart[0];
@@ -184,8 +184,8 @@ class CollaborationContext implements Context {
 				$this->featureContext->getActualPassword($password),
 				$parentContainerId,
 				$file,
-				$headers
-			)
+				$headers,
+			),
 		);
 	}
 
@@ -201,7 +201,7 @@ class CollaborationContext implements Context {
 	 */
 	public function thePublicCreatesAFileInsideTheLastSharedPublicLinkFolderWithPasswordUsingWopiEndpoint(
 		string $file,
-		string $password
+		string $password,
 	): void {
 		$this->createFile($file, $password);
 	}
@@ -220,7 +220,7 @@ class CollaborationContext implements Context {
 	public function thePublicCreatesAFileInsideFolderInTheLastSharedPublicLinkSpaceWithPasswordUsingWopiEndpoint(
 		string $file,
 		string $folder,
-		string $password
+		string $password,
 	): void {
 		$this->createFile($file, $password, $folder);
 	}
@@ -242,7 +242,7 @@ class CollaborationContext implements Context {
 		string $user,
 		string $file,
 		string $space,
-		string $app
+		string $app,
 	): void {
 		$response = \json_decode(
 			CollaborationHelper::sendPOSTRequestToAppOpen(
@@ -251,7 +251,7 @@ class CollaborationContext implements Context {
 				$this->featureContext->getActualUsername($user),
 				$this->featureContext->getPasswordForUser($user),
 				$this->featureContext->getBaseUrl(),
-			)->getBody()->getContents()
+			)->getBody()->getContents(),
 		);
 		$accessToken = $response->form_parameters->access_token;
 
@@ -266,7 +266,7 @@ class CollaborationContext implements Context {
 		$this->featureContext->setResponse(
 			HttpRequestHelper::get(
 				$fullUrl . "?access_token=$accessToken",
-			)
+			),
 		);
 	}
 
@@ -287,8 +287,8 @@ class CollaborationContext implements Context {
 				$user,
 				$this->featureContext->getPasswordForUser($user),
 				$parentContainerId,
-				$file
-			)
+				$file,
+			),
 		);
 	}
 
@@ -335,7 +335,7 @@ class CollaborationContext implements Context {
 		$this->featureContext->setResponse(
 			HttpRequestHelper::get(
 				$wopiSrc . "?access_token=$accessToken",
-			)
+			),
 		);
 	}
 
@@ -351,7 +351,7 @@ class CollaborationContext implements Context {
 	public function theFollowingMimeTypesShouldExistForUser(string $shouldOrNot, TableNode $table): void {
 		$rows = $table->getRows();
 		$responseArray = $this->featureContext->getJsonDecodedResponse(
-			$this->featureContext->getResponse()
+			$this->featureContext->getResponse(),
 		)['mime-types'];
 		$mimeTypes = \array_column($responseArray, 'mime_type');
 		foreach ($rows as $row) {
@@ -359,13 +359,13 @@ class CollaborationContext implements Context {
 				Assert::assertFalse(
 					\in_array($row[0], $mimeTypes),
 					"the response should not contain the mimetype $row[0].\nMime Types found in response:\n"
-					. print_r($mimeTypes, true)
+					. print_r($mimeTypes, true),
 				);
 			} else {
 				Assert::assertTrue(
 					\in_array($row[0], $mimeTypes),
 					"the response does not contain the mimetype $row[0].\nMime Types found in response:\n"
-					. print_r($mimeTypes, true)
+					. print_r($mimeTypes, true),
 				);
 			}
 		}
@@ -381,14 +381,14 @@ class CollaborationContext implements Context {
 	 */
 	public function theAppListResponseShouldContainTheFollowingTemplateInformationForOffice(
 		string $app,
-		TableNode $table
+		TableNode $table,
 	): void {
 		$responseArray = $this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse());
 
 		Assert::assertArrayHasKey(
 			"mime-types",
 			$responseArray,
-			"Expected 'mime-types' in the response but not found.\n" . print_r($responseArray, true)
+			"Expected 'mime-types' in the response but not found.\n" . print_r($responseArray, true),
 		);
 
 		$mimeTypes = $responseArray['mime-types'];
@@ -403,7 +403,7 @@ class CollaborationContext implements Context {
 				$row['mime-type'],
 				$mimeTypeMap,
 				"Expected mime-type '{$row['mime-type']}' to exist in the response but it doesn't.\n"
-				. print_r($mimeTypeMap, true)
+				. print_r($mimeTypeMap, true),
 			);
 
 			$mimeType = $mimeTypeMap[$row['mime-type']];
@@ -415,7 +415,7 @@ class CollaborationContext implements Context {
 						$row['target-extension'],
 						$provider['target_ext'],
 						"Expected 'target_ext' for $app to be '{$row['target-extension']}'"
-						. " but found '{$provider['target_ext']}'"
+						. " but found '{$provider['target_ext']}'",
 					);
 					$found = true;
 					break;
@@ -427,7 +427,7 @@ class CollaborationContext implements Context {
 					"Expected response to contain app-provider '$app' with target-extension "
 					. "'{$row['target-extension']}' for mime-type '{$row['mime-type']}',"
 					. " but no matching provider was found.\n App Providers Found: "
-					. print_r($mimeType['app_providers'], true)
+					. print_r($mimeType['app_providers'], true),
 				);
 			}
 		}
@@ -449,7 +449,7 @@ class CollaborationContext implements Context {
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$parentContainerId,
-			$file
+			$file,
 		);
 		$this->featureContext->theHTTPStatusCodeShouldBe(200, "", $response);
 		$decodedResponse = $this->featureContext->getJsonDecodedResponseBodyContent($response);

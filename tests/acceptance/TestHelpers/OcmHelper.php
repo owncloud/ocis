@@ -68,7 +68,7 @@ class OcmHelper {
 		string $user,
 		string $password,
 		?string $email = null,
-		?string $description = null
+		?string $description = null,
 	): ResponseInterface {
 		$body = [
 			"description" => $description,
@@ -80,7 +80,7 @@ class OcmHelper {
 			$user,
 			$password,
 			self::getRequestHeaders(),
-			\json_encode($body)
+			\json_encode($body),
 		);
 	}
 
@@ -99,7 +99,7 @@ class OcmHelper {
 		string $user,
 		string $password,
 		string $token,
-		string $providerDomain
+		string $providerDomain,
 	): ResponseInterface {
 		$body = [
 			"token" => $token,
@@ -111,7 +111,7 @@ class OcmHelper {
 			$user,
 			$password,
 			self::getRequestHeaders(),
-			\json_encode($body)
+			\json_encode($body),
 		);
 	}
 
@@ -126,14 +126,14 @@ class OcmHelper {
 	public static function findAcceptedUsers(
 		string $baseUrl,
 		string $user,
-		string $password
+		string $password,
 	): ResponseInterface {
 		$url = self::getFullUrl($baseUrl, 'find-accepted-users');
 		return HttpRequestHelper::get(
 			$url,
 			$user,
 			$password,
-			self::getRequestHeaders()
+			self::getRequestHeaders(),
 		);
 	}
 
@@ -148,14 +148,14 @@ class OcmHelper {
 	public static function listInvite(
 		string $baseUrl,
 		string $user,
-		string $password
+		string $password,
 	): ResponseInterface {
 		$url = self::getFullUrl($baseUrl, 'list-invite');
 		return HttpRequestHelper::get(
 			$url,
 			$user,
 			$password,
-			self::getRequestHeaders()
+			self::getRequestHeaders(),
 		);
 	}
 
@@ -174,7 +174,7 @@ class OcmHelper {
 		string $user,
 		string $password,
 		string $userId,
-		string $idp
+		string $idp,
 	): ResponseInterface {
 		$url = self::getFullUrl($baseUrl, 'delete-accepted-user');
 		$body = [
@@ -186,7 +186,7 @@ class OcmHelper {
 			$user,
 			$password,
 			self::getRequestHeaders(),
-			\json_encode($body)
+			\json_encode($body),
 		);
 	}
 }

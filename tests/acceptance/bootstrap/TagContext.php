@@ -69,7 +69,7 @@ class TagContext implements Context {
 		string $fileOrFolder,
 		string $resource,
 		string $space,
-		array $tagNameArray
+		array $tagNameArray,
 	): ResponseInterface {
 		if ($fileOrFolder === 'folder' || $fileOrFolder === 'folders') {
 			$resourceId = $this->spacesContext->getResourceId($user, $space, $resource);
@@ -82,7 +82,7 @@ class TagContext implements Context {
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$resourceId,
-			$tagNameArray
+			$tagNameArray,
 		);
 	}
 
@@ -103,7 +103,7 @@ class TagContext implements Context {
 		string $fileOrFolder,
 		string $resource,
 		string $space,
-		TableNode $table
+		TableNode $table,
 	): void {
 		$tagNameArray = [];
 		foreach ($table->getRows() as $value) {
@@ -130,7 +130,7 @@ class TagContext implements Context {
 		string $fileOrFolder,
 		string $resource,
 		string $space,
-		TableNode $table
+		TableNode $table,
 	): void {
 		$tagNameArray = [];
 		foreach ($table->getRows() as $value) {
@@ -155,7 +155,7 @@ class TagContext implements Context {
 		string $user,
 		string $filesOrFolders,
 		string $space,
-		TableNode $table
+		TableNode $table,
 	): void {
 		$this->featureContext->verifyTableNodeColumns($table, ["path", "tagName"]);
 		$rows = $table->getHash();
@@ -183,7 +183,7 @@ class TagContext implements Context {
 				$this->featureContext->getBaseUrl(),
 				$user,
 				$this->featureContext->getPasswordForUser($user),
-			)
+			),
 		);
 	}
 
@@ -200,19 +200,19 @@ class TagContext implements Context {
 		$rows = $table->getRows();
 		foreach ($rows as $row) {
 			$responseArray = $this->featureContext->getJsonDecodedResponse(
-				$this->featureContext->getResponse()
+				$this->featureContext->getResponse(),
 			)['value'];
 			if ($shouldOrNot === "not") {
 				Assert::assertFalse(
 					\in_array($row[0], $responseArray),
 					"the response should not contain the tag $row[0].\nResponse\n"
-					. print_r($responseArray, true)
+					. print_r($responseArray, true),
 				);
 			} else {
 				Assert::assertTrue(
 					\in_array($row[0], $responseArray),
 					"the response does not contain the tag $row[0].\nResponse\n"
-					. print_r($responseArray, true)
+					. print_r($responseArray, true),
 				);
 			}
 		}
@@ -233,7 +233,7 @@ class TagContext implements Context {
 		string $fileOrFolder,
 		string $resource,
 		string $space,
-		TableNode $table
+		TableNode $table,
 	): ResponseInterface {
 		$tagNameArray = [];
 		foreach ($table->getRows() as $value) {
@@ -251,7 +251,7 @@ class TagContext implements Context {
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$resourceId,
-			$tagNameArray
+			$tagNameArray,
 		);
 	}
 
@@ -272,14 +272,14 @@ class TagContext implements Context {
 		string $fileOrFolder,
 		string $resource,
 		string $space,
-		TableNode $table
+		TableNode $table,
 	): void {
 		$response = $this->removeTagsFromResourceOfTheSpace(
 			$user,
 			$fileOrFolder,
 			$resource,
 			$space,
-			$table
+			$table,
 		);
 		$this->featureContext->setResponse($response);
 	}
@@ -301,7 +301,7 @@ class TagContext implements Context {
 		string $fileOrFolder,
 		string $resource,
 		string $space,
-		TableNode $table
+		TableNode $table,
 	): void {
 		$response = $this->removeTagsFromResourceOfTheSpace($user, $fileOrFolder, $resource, $space, $table);
 		$this->featureContext->theHttpStatusCodeShouldBe(200, "", $response);
@@ -324,7 +324,7 @@ class TagContext implements Context {
 		int $numberOfTags,
 		string $fileOrFolder,
 		string $resource,
-		string $space
+		string $space,
 	): void {
 		$tagNames = [];
 		foreach (range(1, $numberOfTags) as $tagNumber) {

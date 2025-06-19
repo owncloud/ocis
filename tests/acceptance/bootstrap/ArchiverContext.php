@@ -114,7 +114,7 @@ class ArchiverContext implements Context {
 	public function getArchiverQueryString(
 		string $user,
 		string $resource,
-		string $addressType
+		string $addressType,
 	): string {
 		switch ($addressType) {
 			case 'id':
@@ -128,7 +128,7 @@ class ArchiverContext implements Context {
 			default:
 				throw new Exception(
 					'"' . $addressType .
-					'" is not a legal value for $addressType, must be id|ids|remoteItemIds|path|paths'
+					'" is not a legal value for $addressType, must be id|ids|remoteItemIds|path|paths',
 				);
 		}
 	}
@@ -152,18 +152,18 @@ class ArchiverContext implements Context {
 		string $archiveType,
 		string $resource,
 		string $addressType,
-		TableNode $headersTable
+		TableNode $headersTable,
 	): void {
 		$this->featureContext->verifyTableNodeColumns(
 			$headersTable,
-			['header', 'value']
+			['header', 'value'],
 		);
 		$headers = [];
 		foreach ($headersTable as $row) {
 			$headers[$row['header']] = $row ['value'];
 		}
 		$this->featureContext->setResponse(
-			$this->downloadArchive($user, $resource, $addressType, $archiveType, null, $headers)
+			$this->downloadArchive($user, $resource, $addressType, $archiveType, null, $headers),
 		);
 	}
 
@@ -184,7 +184,7 @@ class ArchiverContext implements Context {
 		string $downloader,
 		string $resource,
 		string $owner,
-		string $addressType
+		string $addressType,
 	): void {
 		$this->featureContext->setResponse($this->downloadArchive($downloader, $resource, $addressType, null, $owner));
 	}
@@ -207,7 +207,7 @@ class ArchiverContext implements Context {
 		string $addressType,
 		?string $archiveType = null,
 		?string $owner = null,
-		?array $headers = null
+		?array $headers = null,
 	): ResponseInterface {
 		$owner = $owner ?? $downloader;
 		$downloader = $this->featureContext->getActualUsername($downloader);
@@ -219,7 +219,7 @@ class ArchiverContext implements Context {
 			$this->getArchiverUrl($queryString),
 			$downloader,
 			$this->featureContext->getPasswordForUser($downloader),
-			$headers
+			$headers,
 		);
 	}
 
@@ -238,7 +238,7 @@ class ArchiverContext implements Context {
 	public function userDownloadsTheArchiveOfTheseItems(
 		string $user,
 		string $addressType,
-		TableNode $items
+		TableNode $items,
 	): void {
 		$user = $this->featureContext->getActualUsername($user);
 		$queryString = [];
@@ -252,7 +252,7 @@ class ArchiverContext implements Context {
 				$this->getArchiverUrl($queryString),
 				$user,
 				$this->featureContext->getPasswordForUser($user),
-			)
+			),
 		);
 	}
 
@@ -302,12 +302,12 @@ class ArchiverContext implements Context {
 							Assert::assertEquals(
 								$expectedItem['content'],
 								$fileContent,
-								__METHOD__ . " content of '" . $expectedPath . "' not as expected"
+								__METHOD__ . " content of '" . $expectedPath . "' not as expected",
 							);
 						} else {
 							Assert::assertFileExists(
 								$fileFullPath,
-								__METHOD__ . " File '" . $expectedPath . "' is not in the downloaded archive."
+								__METHOD__ . " File '" . $expectedPath . "' is not in the downloaded archive.",
 							);
 						}
 					}

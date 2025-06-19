@@ -85,7 +85,7 @@ class WebDavHelper {
 	 * @throws Exception
 	 */
 	public static function removeSpaceIdReferenceForUser(
-		?string $user
+		?string $user,
 	): void {
 		if (\array_key_exists($user, self::$spacesIdRef)) {
 			unset(self::$spacesIdRef[$user]);
@@ -123,7 +123,7 @@ class WebDavHelper {
 		?string $password,
 		?string $path,
 		?string $spaceId = null,
-		?int $davPathVersionToUse = self::DAV_VERSION_NEW
+		?int $davPathVersionToUse = self::DAV_VERSION_NEW,
 	): string {
 		$body
 			= '<?xml version="1.0"?>
@@ -141,12 +141,12 @@ class WebDavHelper {
 			null,
 			$spaceId,
 			$body,
-			$davPathVersionToUse
+			$davPathVersionToUse,
 		);
 		\preg_match(
 			'/\<oc:fileid\>([^\<]*)\<\/oc:fileid\>/',
 			$response->getBody()->getContents(),
-			$matches
+			$matches,
 		);
 
 		if (!isset($matches[1])) {
@@ -239,7 +239,7 @@ class WebDavHelper {
 		?string $type = "files",
 		?int $davPathVersionToUse = self::DAV_VERSION_NEW,
 		?string $doDavRequestAsUser = null,
-		?array $headers = []
+		?array $headers = [],
 	): ResponseInterface {
 		$body = self::getBodyForPropfind($properties);
 		$folderDepth = (string) $folderDepth;
@@ -267,7 +267,7 @@ class WebDavHelper {
 			null,
 			null,
 			[],
-			$doDavRequestAsUser
+			$doDavRequestAsUser,
 		);
 	}
 
@@ -326,7 +326,7 @@ class WebDavHelper {
 			$spaceId,
 			$body,
 			$davPathVersionToUse,
-			$type
+			$type,
 		);
 	}
 
@@ -384,7 +384,7 @@ class WebDavHelper {
 		?array $propertiesArray,
 		?int $davPathVersion = null,
 		?string $namespaceString = null,
-		?string $type = "files"
+		?string $type = "files",
 	): ResponseInterface {
 		$propertyBody = "";
 		foreach ($propertiesArray as $propertyArray) {
@@ -395,7 +395,7 @@ class WebDavHelper {
 				$matches = [];
 				[$namespacePrefix, $namespace, $property] = self::getPropertyWithNamespaceInfo(
 					$namespaceString,
-					$property
+					$property,
 				);
 				$propertyBody .= "\n\t<$namespacePrefix:$property>" .
 					"$value" .
@@ -422,7 +422,7 @@ class WebDavHelper {
 			null,
 			$body,
 			$davPathVersion,
-			$type
+			$type,
 		);
 	}
 
@@ -451,7 +451,7 @@ class WebDavHelper {
 		?string $spaceId = null,
 		?array $properties = null,
 		?string $type = "files",
-		?int $davPathVersionToUse = self::DAV_VERSION_NEW
+		?int $davPathVersionToUse = self::DAV_VERSION_NEW,
 	): ResponseInterface {
 		if (!$properties) {
 			$properties = [
@@ -467,7 +467,7 @@ class WebDavHelper {
 			$folderDepth,
 			$spaceId,
 			$type,
-			$davPathVersionToUse
+			$davPathVersionToUse,
 		);
 	}
 
@@ -531,22 +531,22 @@ class WebDavHelper {
 				$fullUrl,
 				'PROPFIND',
 				$user,
-				$password
+				$password,
 			);
 			Assert::assertEquals(
 				207,
 				$response->getStatusCode(),
-				"PROPFIND for user '$user' failed so the personal space id cannot be discovered"
+				"PROPFIND for user '$user' failed so the personal space id cannot be discovered",
 			);
 
 			$responseXmlObject = HttpRequestHelper::getResponseXml(
 				$response,
-				__METHOD__
+				__METHOD__,
 			);
 			$xmlPart = $responseXmlObject->xpath("/d:multistatus/d:response[1]/d:propstat/d:prop/oc:spaceid");
 			Assert::assertNotEmpty(
 				$xmlPart,
-				"The 'oc:spaceid' for user '$user' was not found in the PROPFIND response"
+				"The 'oc:spaceid' for user '$user' was not found in the PROPFIND response",
 			);
 
 			$personalSpaceId = $xmlPart[0]->__toString();
@@ -582,7 +582,7 @@ class WebDavHelper {
 		return self::getPersonalSpaceIdForUser(
 			$baseUrl,
 			$user,
-			$password
+			$password,
 		);
 	}
 
@@ -715,7 +715,7 @@ class WebDavHelper {
 					$headers[$key] = \str_replace(
 						$urlSpecialChar[0],
 						$urlSpecialChar[1],
-						$value
+						$value,
 					);
 					break;
 				}
@@ -734,7 +734,7 @@ class WebDavHelper {
 			$stream,
 			$timeout,
 			$client,
-			$isGivenStep
+			$isGivenStep,
 		);
 	}
 
@@ -750,7 +750,7 @@ class WebDavHelper {
 	public static function getDavPath(
 		int $davPathVersion,
 		?string $userOrItemIdOrSpaceIdOrToken = null,
-		?string $type = "files"
+		?string $type = "files",
 	): string {
 		switch ($type) {
 			case 'archive':
@@ -830,7 +830,7 @@ class WebDavHelper {
 		?string $baseUrl,
 		?string $fileName,
 		?string $token,
-		?int $davVersionToUse = self::DAV_VERSION_NEW
+		?int $davVersionToUse = self::DAV_VERSION_NEW,
 	): string {
 		$response = self::propfind(
 			$baseUrl,
@@ -841,11 +841,11 @@ class WebDavHelper {
 			'1',
 			null,
 			"public-files",
-			$davVersionToUse
+			$davVersionToUse,
 		);
 		$responseXmlObject = HttpRequestHelper::getResponseXml(
 			$response,
-			__METHOD__
+			__METHOD__,
 		);
 		$xmlPart = $responseXmlObject->xpath("//d:getlastmodified");
 
@@ -883,11 +883,11 @@ class WebDavHelper {
 			"0",
 			$spaceId,
 			"files",
-			$davPathVersionToUse
+			$davPathVersionToUse,
 		);
 		$responseXmlObject = HttpRequestHelper::getResponseXml(
 			$response,
-			__METHOD__
+			__METHOD__,
 		);
 		$xmlPart = $responseXmlObject->xpath("//d:getlastmodified");
 		Assert::assertArrayHasKey(
@@ -895,7 +895,7 @@ class WebDavHelper {
 			$xmlPart,
 			__METHOD__
 			. " XML part does not have key 0. Expected a value at index 0 of 'xmlPart' but, found: "
-			. json_encode($xmlPart)
+			. json_encode($xmlPart),
 		);
 		$mtime = new DateTime($xmlPart[0]->__toString());
 		return $mtime->format('U');

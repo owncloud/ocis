@@ -94,7 +94,7 @@ class SettingsHelper {
 		string $baseUrl,
 		string $user,
 		string $password,
-		array $headers = []
+		array $headers = [],
 	): ResponseInterface {
 		$fullUrl = self::buildFullUrl($baseUrl, "bundles-list");
 		return HttpRequestHelper::post(
@@ -102,7 +102,7 @@ class SettingsHelper {
 			$user,
 			$password,
 			$headers,
-			"{}"
+			"{}",
 		);
 	}
 
@@ -150,7 +150,7 @@ class SettingsHelper {
 		string $baseUrl,
 		string $user,
 		string $password,
-		array $headers = []
+		array $headers = [],
 	): ResponseInterface {
 		$fullUrl = self::buildFullUrl($baseUrl, "roles-list");
 		return HttpRequestHelper::post(
@@ -158,7 +158,7 @@ class SettingsHelper {
 			$user,
 			$password,
 			$headers,
-			"{}"
+			"{}",
 		);
 	}
 
@@ -181,7 +181,7 @@ class SettingsHelper {
 		string $password,
 		string $assigneeId,
 		string $roleId,
-		array $headers = []
+		array $headers = [],
 	): ResponseInterface {
 		$fullUrl = self::buildFullUrl($baseUrl, "assignments-add");
 		$body = json_encode(["account_uuid" => $assigneeId, "role_id" => $roleId], JSON_THROW_ON_ERROR);
@@ -190,7 +190,7 @@ class SettingsHelper {
 			$user,
 			$password,
 			$headers,
-			$body
+			$body,
 		);
 	}
 
@@ -211,7 +211,7 @@ class SettingsHelper {
 		string $user,
 		string $password,
 		string $userId,
-		array $headers = []
+		array $headers = [],
 	): ResponseInterface {
 		$fullUrl = self::buildFullUrl($baseUrl, "assignments-list");
 		$body = json_encode(["account_uuid" => $userId], JSON_THROW_ON_ERROR);
@@ -220,7 +220,7 @@ class SettingsHelper {
 			$user,
 			$password,
 			$headers,
-			$body
+			$body,
 		);
 	}
 
@@ -239,7 +239,7 @@ class SettingsHelper {
 		string $baseUrl,
 		string $user,
 		string $password,
-		array $headers = []
+		array $headers = [],
 	): ResponseInterface {
 		$fullUrl = self::buildFullUrl($baseUrl, "values-list");
 		$body = json_encode(["account_uuid" => "me"], JSON_THROW_ON_ERROR);
@@ -248,7 +248,7 @@ class SettingsHelper {
 			$user,
 			$password,
 			$headers,
-			$body
+			$body,
 		);
 	}
 
@@ -338,7 +338,7 @@ class SettingsHelper {
 		string $user,
 		string $password,
 		string $body,
-		array $headers = []
+		array $headers = [],
 	): ResponseInterface {
 		$fullUrl = self::buildFullUrl($baseUrl, "values-save");
 		return HttpRequestHelper::post(
@@ -346,7 +346,7 @@ class SettingsHelper {
 			$user,
 			$password,
 			$headers,
-			$body
+			$body,
 		);
 	}
 
@@ -373,14 +373,14 @@ class SettingsHelper {
 				"accountUuid" => "me",
 				"settingId" => $settingId,
 			],
-			JSON_THROW_ON_ERROR
+			JSON_THROW_ON_ERROR,
 		);
 		return HttpRequestHelper::post(
 			$fullUrl,
 			$user,
 			$password,
 			[],
-			$body
+			$body,
 		);
 	}
 }

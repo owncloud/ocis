@@ -100,7 +100,7 @@ class TUSContext implements Context {
 		string $user,
 		TableNode $headersTable,
 		string $content = '',
-		?string $spaceId = null
+		?string $spaceId = null,
 	): ResponseInterface {
 		$this->featureContext->verifyTableNodeColumnsCount($headersTable, 2);
 		$user = $this->featureContext->getActualUsername($user);
@@ -117,7 +117,7 @@ class TUSContext implements Context {
 			"files",
 			null,
 			false,
-			$password
+			$password,
 		);
 		$locationHeader = $response->getHeader('Location');
 		if (\sizeof($locationHeader) > 0) {
@@ -192,7 +192,7 @@ class TUSContext implements Context {
 		string $offset,
 		string $data,
 		string $checksum = '',
-		?array $extraHeaders = null
+		?array $extraHeaders = null,
 	): ResponseInterface {
 		$user = $this->featureContext->getActualUsername($user);
 		$password = $this->featureContext->getUserPassword($user);
@@ -210,7 +210,7 @@ class TUSContext implements Context {
 			$user,
 			$password,
 			$headers,
-			$data
+			$data,
 		);
 	}
 
@@ -260,7 +260,7 @@ class TUSContext implements Context {
 		array $uploadMetadata = [],
 		int $noOfChunks = 1,
 		int $bytes = null,
-		string $checksum = ''
+		string $checksum = '',
 	): void {
 		$response = $this->uploadFileUsingTus(
 			$user,
@@ -270,7 +270,7 @@ class TUSContext implements Context {
 			$uploadMetadata,
 			$noOfChunks,
 			$bytes,
-			$checksum
+			$checksum,
 		);
 		$this->featureContext->setLastUploadDeleteTime(\time());
 		$this->featureContext->setResponse($response);
@@ -330,7 +330,7 @@ class TUSContext implements Context {
 			$sourceFile,
 			$destination,
 			WebDavHelper::getDavPath($davPathVersion, $suffixPath),
-			$uploadMetadata
+			$uploadMetadata,
 		);
 
 		$this->featureContext->pauseUploadDelete();
@@ -381,7 +381,7 @@ class TUSContext implements Context {
 			$headers,
 			$sourceFile,
 			$destination,
-			$url
+			$url,
 		);
 		$response = $client->createWithUploadRR("", 0);
 		return $response;
@@ -406,14 +406,14 @@ class TUSContext implements Context {
 		string $sourceFile,
 		string $destination,
 		string $path,
-		array $metadata = []
+		array $metadata = [],
 	): TusClient {
 		$client = new TusClient(
 			$baseUrl,
 			[
 				'verify' => false,
 				'headers' => $headers,
-			]
+			],
 		);
 		$client->setApiPath($path);
 		$client->setMetadata($metadata);
@@ -436,13 +436,13 @@ class TUSContext implements Context {
 	public function userUploadsAFileWithContentToUsingTus(
 		string $user,
 		string $content,
-		string $destination
+		string $destination,
 	): void {
 		$temporaryFileName = $this->writeDataToTempFile($content);
 		$response = $this->uploadFileUsingTus(
 			$user,
 			\basename($temporaryFileName),
-			$destination
+			$destination,
 		);
 		\unlink($temporaryFileName);
 		$this->featureContext->setResponse($response);
@@ -469,7 +469,7 @@ class TUSContext implements Context {
 		?string $user,
 		string $content,
 		?int $noOfChunks,
-		string $destination
+		string $destination,
 	): void {
 		$temporaryFileName = $this->writeDataToTempFile($content);
 		$response = $this->uploadFileUsingTus(
@@ -478,7 +478,7 @@ class TUSContext implements Context {
 			$destination,
 			null,
 			[],
-			$noOfChunks
+			$noOfChunks,
 		);
 		$this->featureContext->setLastUploadDeleteTime(\time());
 		\unlink($temporaryFileName);
@@ -501,7 +501,7 @@ class TUSContext implements Context {
 		string $user,
 		string $source,
 		string $destination,
-		string $mtime
+		string $mtime,
 	): void {
 		$mtime = new DateTime($mtime);
 		$mtime = $mtime->format('U');
@@ -511,13 +511,13 @@ class TUSContext implements Context {
 			$source,
 			$destination,
 			null,
-			['mtime' => $mtime]
+			['mtime' => $mtime],
 		);
 		$this->featureContext->setLastUploadDeleteTime(\time());
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			["201", "204"],
 			"Failed to upload file '$source' for user '$user'",
-			$response
+			$response,
 		);
 	}
 
@@ -537,7 +537,7 @@ class TUSContext implements Context {
 		string $user,
 		string $source,
 		string $destination,
-		string $mtime
+		string $mtime,
 	): void {
 		$mtime = new DateTime($mtime);
 		$mtime = $mtime->format('U');
@@ -547,7 +547,7 @@ class TUSContext implements Context {
 			$source,
 			$destination,
 			null,
-			['mtime' => $mtime]
+			['mtime' => $mtime],
 		);
 		$this->featureContext->setLastUploadDeleteTime(\time());
 		$this->featureContext->setResponse($response);
@@ -562,7 +562,7 @@ class TUSContext implements Context {
 	public function writeDataToTempFile(string $content): string {
 		$temporaryFileName = \tempnam(
 			$this->featureContext->acceptanceTestsDirLocation(),
-			"tus-upload-test-"
+			"tus-upload-test-",
 		);
 		if ($temporaryFileName === false) {
 			throw new \Exception("could not create a temporary filename");
@@ -606,7 +606,7 @@ class TUSContext implements Context {
 	public function userCreatesWithUpload(
 		string $user,
 		string $content,
-		TableNode $headers
+		TableNode $headers,
 	): void {
 		$response = $this->createNewTUSResourceWithHeaders($user, $headers, $content);
 		$this->featureContext->setResponse($response);
@@ -625,7 +625,7 @@ class TUSContext implements Context {
 	public function userUploadsWithCreatesWithUpload(
 		string $user,
 		string $source,
-		string $content
+		string $content,
 	): void {
 		$temporaryFileName = $this->writeDataToTempFile($content);
 		$response = $this->uploadFileUsingTus(
@@ -635,7 +635,7 @@ class TUSContext implements Context {
 			null,
 			[],
 			1,
-			-1
+			-1,
 		);
 		$this->featureContext->setLastUploadDeleteTime(\time());
 		\unlink($temporaryFileName);
@@ -657,7 +657,7 @@ class TUSContext implements Context {
 		string $user,
 		string $checksum,
 		string $offset,
-		string $content
+		string $content,
 	): void {
 		$resourceLocation = $this->getLastTusResourceLocation();
 		$response = $this->uploadChunkToTUSLocation($user, $resourceLocation, $offset, $content, $checksum);
@@ -684,7 +684,7 @@ class TUSContext implements Context {
 		string $checksum,
 		string $offset,
 		string $locationIndex,
-		string $filename
+		string $filename,
 	): void {
 		$filenameHash = \base64_encode($filename);
 		$resourceLocation = $this->getTusResourceLocation($filenameHash, (int)$locationIndex);
@@ -707,7 +707,7 @@ class TUSContext implements Context {
 		string $user,
 		string $checksum,
 		string $offset,
-		string $content
+		string $content,
 	): void {
 		$resourceLocation = $this->getLastTusResourceLocation();
 		$response = $this->uploadChunkToTUSLocation($user, $resourceLocation, $offset, $content, $checksum);
@@ -729,7 +729,7 @@ class TUSContext implements Context {
 		string $user,
 		string $offset,
 		string $data,
-		string $checksum
+		string $checksum,
 	): void {
 		$resourceLocation = $this->getLastTusResourceLocation();
 		$response = $this->uploadChunkToTUSLocation($user, $resourceLocation, $offset, $data, $checksum);
@@ -751,7 +751,7 @@ class TUSContext implements Context {
 		string $user,
 		string $offset,
 		string $data,
-		string $checksum
+		string $checksum,
 	): void {
 		$resourceLocation = $this->getLastTusResourceLocation();
 		$response = $this->uploadChunkToTUSLocation($user, $resourceLocation, $offset, $data, $checksum);
@@ -778,7 +778,7 @@ class TUSContext implements Context {
 		string $offset,
 		string $data,
 		string $checksum,
-		TableNode $headers
+		TableNode $headers,
 	): void {
 		$createResponse = $this->createNewTUSResource($user, $headers);
 		$this->featureContext->theHTTPStatusCodeShouldBe(201, "", $createResponse);

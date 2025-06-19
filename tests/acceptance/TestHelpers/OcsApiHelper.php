@@ -53,7 +53,7 @@ class OcsApiHelper {
 		?string $path,
 		$body = [],
 		?int $ocsApiVersion = 2,
-		?array $headers = []
+		?array $headers = [],
 	): ResponseInterface {
 		$fullUrl = $baseUrl;
 		if (\substr($fullUrl, -1) !== '/') {
@@ -81,7 +81,7 @@ class OcsApiHelper {
 		?string $path,
 		$body = [],
 		?int $ocsApiVersion = 2,
-		?array $headers = []
+		?array $headers = [],
 	): RequestInterface {
 		$fullUrl = $baseUrl;
 		if (\substr($fullUrl, -1) !== '/') {
@@ -92,7 +92,7 @@ class OcsApiHelper {
 			$fullUrl,
 			$method,
 			$headers,
-			$body
+			$body,
 		);
 	}
 }

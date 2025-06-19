@@ -119,7 +119,7 @@ trait Provisioning {
 				return $usersList[$normalizedUsername][$attribute];
 			}
 			throw new Exception(
-				__METHOD__ . ": User '$user' has no attribute with name '$attribute'."
+				__METHOD__ . ": User '$user' has no attribute with name '$attribute'.",
 			);
 		}
 		return false;
@@ -139,7 +139,7 @@ trait Provisioning {
 				return $groupsList[$group][$attribute];
 			}
 			throw new Exception(
-				__METHOD__ . ": Group '$group' has no attribute with name '$attribute'."
+				__METHOD__ . ": Group '$group' has no attribute with name '$attribute'.",
 			);
 		}
 		return false;
@@ -160,7 +160,7 @@ trait Provisioning {
 			$password = $this->createdUsers[$normalizedUsername]['password'];
 		} else {
 			throw new Exception(
-				"user '$username' was not created by this test run"
+				"user '$username' was not created by this test run",
 			);
 		}
 
@@ -177,7 +177,7 @@ trait Provisioning {
 	 * @throws Exception|GuzzleException
 	 */
 	public function userHasBeenCreatedWithDefaultAttributes(
-		string $user
+		string $user,
 	): void {
 		$this->userHasBeenCreated(["userName" => $user]);
 	}
@@ -191,7 +191,7 @@ trait Provisioning {
 	 * @throws Exception|GuzzleException
 	 */
 	public function userHasBeenCreatedWithDefaultAttributesAndNotInitialized(
-		TableNode $table
+		TableNode $table,
 	): void {
 		$this->usersHaveBeenCreated($table, true, false);
 	}
@@ -223,7 +223,7 @@ trait Provisioning {
 		$rows = $table->getRowsHash();
 		$this->userHasBeenCreated(
 			$rows,
-			$byUser
+			$byUser,
 		);
 	}
 
@@ -245,7 +245,7 @@ trait Provisioning {
 
 		throw new Exception(
 			__METHOD__
-			. " group '$groupname' was not created by this test run"
+			. " group '$groupname' was not created by this test run",
 		);
 	}
 
@@ -439,7 +439,7 @@ trait Provisioning {
 					"uid=" . ldap_escape(
 						$entry['uid'],
 						"",
-						LDAP_ESCAPE_DN
+						LDAP_ESCAPE_DN,
 					) . ",ou=" . $this->ldapUsersOU . "," . $this->ldapBaseDN,
 				);
 				OcisHelper::deleteRevaUserData([$entry['uid']]);
@@ -514,12 +514,12 @@ trait Provisioning {
 			// delete all created ldap users
 			$this->ldap->delete(
 				"ou=" . $this->ldapUsersOU . "," . $this->ldapBaseDN,
-				true
+				true,
 			);
 			// delete all created ldap groups
 			$this->ldap->delete(
 				"ou=" . $this->ldapGroupsOU . "," . $this->ldapBaseDN,
-				true
+				true,
 			);
 		}
 	}
@@ -541,7 +541,7 @@ trait Provisioning {
 	public function usersHaveBeenCreated(
 		TableNode $table,
 		bool $useDefault = true,
-		bool $initialize = true
+		bool $initialize = true,
 	): void {
 		$this->verifyTableNodeColumns($table, ['username'], ['displayname', 'email', 'password']);
 		$table = $table->getColumnsHash();
@@ -550,7 +550,7 @@ trait Provisioning {
 		$requests = [];
 		$client = HttpRequestHelper::createClient(
 			$this->getAdminUsername(),
-			$this->getAdminPassword()
+			$this->getAdminPassword(),
 		);
 
 		foreach ($users as $userAttributes) {
@@ -564,7 +564,7 @@ trait Provisioning {
 					Assert::assertArrayHasKey(
 						'userid',
 						$userAttributes,
-						__METHOD__ . " userAttributes array does not have key 'userid'"
+						__METHOD__ . " userAttributes array does not have key 'userid'",
 					);
 					$attributesToCreateUser['email'] = $userAttributes['userid'] . '@owncloud.com';
 				} else {
@@ -574,7 +574,7 @@ trait Provisioning {
 					$attributesToCreateUser['userid'],
 					$attributesToCreateUser['password'],
 					$attributesToCreateUser['email'],
-					$attributesToCreateUser['displayname']
+					$attributesToCreateUser['displayname'],
 				);
 				$request = GraphHelper::createRequest(
 					$this->getBaseUrl(),
@@ -603,7 +603,7 @@ trait Provisioning {
 						$users[$key]['userid'] . "'" .
 						"\nHTTP status $httpStatusCode " .
 						"\nGraph status $graphStatusCode " .
-						"\nError message $messageText"
+						"\nError message $messageText",
 					);
 				}
 			}
@@ -625,7 +625,7 @@ trait Provisioning {
 				$userAttributes['password'],
 				$userAttributes['displayName'],
 				$userAttributes['email'],
-				$userAttributes['id']
+				$userAttributes['id'],
 			);
 		}
 
@@ -636,7 +636,7 @@ trait Provisioning {
 		foreach ($users as $user) {
 			Assert::assertTrue(
 				$this->userExists($user["userid"]),
-				"User '" . $user["userid"] . "' should exist but does not exist"
+				"User '" . $user["userid"] . "' should exist but does not exist",
 			);
 		}
 
@@ -657,7 +657,7 @@ trait Provisioning {
 		$this->userResetUserPasswordUsingProvisioningApi(
 			$this->getAdminUsername(),
 			$username,
-			$password
+			$password,
 		);
 	}
 
@@ -671,14 +671,14 @@ trait Provisioning {
 	public function userResetUserPasswordUsingProvisioningApi(
 		?string $user,
 		?string $username,
-		?string $password
+		?string $password,
 	): void {
 		$targetUsername = $this->getActualUsername($username);
 		$password = $this->getActualPassword($password);
 		$this->userTriesToResetUserPasswordUsingTheProvisioningApi(
 			$user,
 			$targetUsername,
-			$password
+			$password,
 		);
 		$this->rememberUserPassword($targetUsername, $password);
 	}
@@ -693,7 +693,7 @@ trait Provisioning {
 	public function userTriesToResetUserPasswordUsingTheProvisioningApi(
 		?string $user,
 		?string $username,
-		?string $password
+		?string $password,
 	): void {
 		$password = $this->getActualPassword($password);
 		$bodyTable = new TableNode([['key', 'password'], ['value', $password]]);
@@ -701,7 +701,7 @@ trait Provisioning {
 			$user,
 			"PUT",
 			"/cloud/users/$username",
-			$bodyTable
+			$bodyTable,
 		);
 	}
 
@@ -730,7 +730,7 @@ trait Provisioning {
 	public function userShouldExist(string $user): void {
 		Assert::assertTrue(
 			$this->userExists($user),
-			"User '$user' should exist but does not exist"
+			"User '$user' should exist but does not exist",
 		);
 	}
 
@@ -746,7 +746,7 @@ trait Provisioning {
 		$user = $this->getActualUsername($user);
 		Assert::assertFalse(
 			$this->userExists($user),
-			"User '$user' should not exist but does exist"
+			"User '$user' should not exist but does exist",
 		);
 	}
 
@@ -762,7 +762,7 @@ trait Provisioning {
 	public function groupShouldExist(string $group): void {
 		Assert::assertTrue(
 			$this->groupExists($group),
-			"Group '$group' should exist but does not exist"
+			"Group '$group' should exist but does not exist",
 		);
 	}
 
@@ -778,7 +778,7 @@ trait Provisioning {
 	public function groupShouldNotExist(string $group): void {
 		Assert::assertFalse(
 			$this->groupExists($group),
-			"Group '$group' should not exist but does exist"
+			"Group '$group' should not exist but does exist",
 		);
 	}
 
@@ -802,7 +802,7 @@ trait Provisioning {
 					throw new Exception(
 						"group '" . $row['groupname'] .
 						"' does" . ($should ? " not" : "") .
-						" exist but should" . ($should ? "" : " not")
+						" exist but should" . ($should ? "" : " not"),
 					);
 				}
 			}
@@ -832,7 +832,7 @@ trait Provisioning {
 		}
 		Assert::assertFalse(
 			$this->userExists($user),
-			"User '$user' should not exist but does exist"
+			"User '$user' should not exist but does exist",
 		);
 	}
 
@@ -854,7 +854,7 @@ trait Provisioning {
 			}
 			$this->initializeUser(
 				$row ['username'],
-				$password
+				$password,
 			);
 		}
 	}
@@ -869,7 +869,7 @@ trait Provisioning {
 		return HttpRequestHelper::get(
 			$fullUrl,
 			$this->getAdminUsername(),
-			$this->getAdminPassword()
+			$this->getAdminPassword(),
 		);
 	}
 
@@ -887,7 +887,7 @@ trait Provisioning {
 		$this->response = HttpRequestHelper::get(
 			$fullUrl,
 			$actualUser,
-			$actualPassword
+			$actualPassword,
 		);
 	}
 
@@ -901,7 +901,7 @@ trait Provisioning {
 	 */
 	public function userGetsTheListOfAllUsersUsingTheProvisioningApi(string $user): void {
 		$this->featureContext->setResponse(
-			$this->userGetsTheListOfAllUsers($user)
+			$this->userGetsTheListOfAllUsers($user),
 		);
 	}
 
@@ -917,7 +917,7 @@ trait Provisioning {
 		return HttpRequestHelper::get(
 			$fullUrl,
 			$actualUser,
-			$actualPassword
+			$actualPassword,
 		);
 	}
 
@@ -936,7 +936,7 @@ trait Provisioning {
 			HttpRequestHelper::get(
 				$url,
 				$user,
-				$password
+				$password,
 			);
 			return;
 		}
@@ -968,7 +968,7 @@ trait Provisioning {
 		?string $displayName = null,
 		?string $email = null,
 		?string $userId = null,
-		bool $shouldExist = true
+		bool $shouldExist = true,
 	): void {
 		$user = $this->getActualUsername($user);
 		$normalizedUsername = $this->normalizeUsername($user);
@@ -997,7 +997,7 @@ trait Provisioning {
 	 */
 	public function rememberUserPassword(
 		string $user,
-		string $password
+		string $password,
 	): void {
 		$normalizedUsername = $this->normalizeUsername($user);
 		if (\array_key_exists($normalizedUsername, $this->createdUsers)) {
@@ -1055,7 +1055,7 @@ trait Provisioning {
 	 */
 	public function userHasBeenCreated(
 		array $userData,
-		string $byUser = null
+		string $byUser = null,
 	): void {
 		$userId = null;
 
@@ -1095,7 +1095,7 @@ trait Provisioning {
 				$this->createLdapUser($setting);
 			} catch (LdapException $exception) {
 				throw new Exception(
-					__METHOD__ . " cannot create a LDAP user with provided data. Error: $exception"
+					__METHOD__ . " cannot create a LDAP user with provided data. Error: $exception",
 				);
 			}
 		} else {
@@ -1113,7 +1113,7 @@ trait Provisioning {
 				201,
 				$response->getStatusCode(),
 				__METHOD__ . " cannot create user '$user' using Graph API.\nResponse:" .
-				json_encode($this->getJsonDecodedResponse($response))
+				json_encode($this->getJsonDecodedResponse($response)),
 			);
 			$userId = $this->getJsonDecodedResponse($response)['id'];
 		}
@@ -1122,7 +1122,7 @@ trait Provisioning {
 
 		Assert::assertTrue(
 			$this->userExists($user),
-			"User '$user' should exist but does not exist"
+			"User '$user' should exist but does not exist",
 		);
 
 		$this->initializeUser($user, $password);
@@ -1146,14 +1146,14 @@ trait Provisioning {
 				$group,
 				$this->getAdminUsername(),
 				$this->getAdminPassword(),
-				$this->ocsApiVersion
+				$this->ocsApiVersion,
 			);
 		} else {
 			$this->setResponse(
 				$this->graphContext->removeUserFromGroup(
 					$group,
-					$user
-				)
+					$user,
+				),
 			);
 		}
 
@@ -1179,7 +1179,7 @@ trait Provisioning {
 				$expectedGroups,
 				$respondedArray,
 				__METHOD__
-				. " Provided groups do not match the groups returned in the response."
+				. " Provided groups do not match the groups returned in the response.",
 			);
 		} else {
 			$this->graphContext->theseGroupsShouldBeInTheResponse($groupsSimplified);
@@ -1207,7 +1207,7 @@ trait Provisioning {
 		} catch (Exception $e) {
 			\error_log(
 				"INFORMATION: There was an unexpected problem trying to delete group " .
-				"'$group' message '" . $e->getMessage() . "'"
+				"'$group' message '" . $e->getMessage() . "'",
 			);
 		}
 
@@ -1217,7 +1217,7 @@ trait Provisioning {
 			\error_log(
 				"INFORMATION: tried to delete group '$group'" .
 				" at the end of the scenario but it seems to still exist. " .
-				"There might be problems with later scenarios."
+				"There might be problems with later scenarios.",
 			);
 		}
 	}
@@ -1245,7 +1245,7 @@ trait Provisioning {
 		$response = HttpRequestHelper::get(
 			$fullUrl,
 			$requestingUser,
-			$requestingPassword
+			$requestingPassword,
 		);
 		if ($response->getStatusCode() >= 400) {
 			return false;
@@ -1273,7 +1273,7 @@ trait Provisioning {
 				$respondedArray,
 				__METHOD__ . " Group '$group' does not exist in '"
 				. \implode(', ', $respondedArray)
-				. "'"
+				. "'",
 			);
 			Assert::assertEquals(
 				200,
@@ -1281,12 +1281,12 @@ trait Provisioning {
 				__METHOD__
 				. " Expected status code is '200' but got '"
 				. $this->response->getStatusCode()
-				. "'"
+				. "'",
 			);
 		} else {
 			$this->graphContext->userShouldBeMemberInGroupUsingTheGraphApi(
 				$user,
-				$group
+				$group,
 			);
 		}
 	}
@@ -1310,14 +1310,14 @@ trait Provisioning {
 				$response = HttpRequestHelper::get(
 					$fullUrl,
 					$this->getAdminUsername(),
-					$this->getAdminPassword()
+					$this->getAdminPassword(),
 				);
 				$respondedArray = $this->getArrayOfGroupsResponded($response);
 				\sort($respondedArray);
 				Assert::assertNotContains($group, $respondedArray);
 				Assert::assertEquals(
 					200,
-					$response->getStatusCode()
+					$response->getStatusCode(),
 				);
 			} else {
 				$this->graphContext->userShouldNotBeMemberInGroupUsingTheGraphApi($user, $group);
@@ -1339,7 +1339,7 @@ trait Provisioning {
 		$response = HttpRequestHelper::get(
 			$fullUrl,
 			$this->getAdminUsername(),
-			$this->getAdminPassword()
+			$this->getAdminPassword(),
 		);
 		Assert::assertNotContains($username, $this->getArrayOfUsersResponded($response));
 	}
@@ -1373,11 +1373,11 @@ trait Provisioning {
 			try {
 				$this->addUserToLdapGroup(
 					$user,
-					$group
+					$group,
 				);
 			} catch (LdapException $exception) {
 				throw new Exception(
-					"User $user cannot be added to $group Error: $exception"
+					"User $user cannot be added to $group Error: $exception",
 				);
 			}
 		} else {
@@ -1404,11 +1404,11 @@ trait Provisioning {
 				try {
 					$this->addUserToLdapGroup(
 						$user,
-						$group
+						$group,
 					);
 				} catch (LdapException $exception) {
 					throw new Exception(
-						"User $user cannot be added to $group Error: $exception"
+						"User $user cannot be added to $group Error: $exception",
 					);
 				}
 			} else {
@@ -1430,7 +1430,7 @@ trait Provisioning {
 		string $group,
 		bool $shouldExist = true,
 		bool $possibleToDelete = true,
-		?string $id = null
+		?string $id = null,
 	): void {
 		$groupData = [
 			"shouldExist" => $shouldExist,
@@ -1477,7 +1477,7 @@ trait Provisioning {
 		$this->createTheGroup($group);
 		Assert::assertTrue(
 			$this->groupExists($group),
-			"Group '$group' should exist but does not exist"
+			"Group '$group' should exist but does not exist",
 		);
 	}
 
@@ -1523,7 +1523,7 @@ trait Provisioning {
 					$this->createLdapGroup($group);
 				} catch (LdapException $e) {
 					throw new Exception(
-						"could not create group '$group'. Error: $e"
+						"could not create group '$group'. Error: $e",
 					);
 				}
 				break;
@@ -1537,7 +1537,7 @@ trait Provisioning {
 				break;
 			default:
 				throw new InvalidArgumentException(
-					"Invalid method to create group '$group'"
+					"Invalid method to create group '$group'",
 				);
 		}
 
@@ -1557,7 +1557,7 @@ trait Provisioning {
 		string $attribute,
 		string $entry,
 		string $value,
-		bool $append = false
+		bool $append = false,
 	): void {
 		$ldapEntry = $this->ldap->getEntry($entry . "," . $this->ldapBaseDN);
 		Laminas\Ldap\Attribute::setAttribute($ldapEntry, $attribute, $value, $append);
@@ -1588,7 +1588,7 @@ trait Provisioning {
 			$memberAttr,
 			"cn=$group,ou=$ou",
 			$memberValue,
-			true
+			true,
 		);
 	}
 
@@ -1602,7 +1602,7 @@ trait Provisioning {
 	public function deleteValueFromLdapAttribute(string $value, string $attribute, string $entry): void {
 		$this->ldap->deleteAttributes(
 			$entry . "," . $this->ldapBaseDN,
-			[$attribute => [$value]]
+			[$attribute => [$value]],
 		);
 	}
 
@@ -1629,7 +1629,7 @@ trait Provisioning {
 		$this->deleteValueFromLdapAttribute(
 			$memberValue,
 			$memberAttr,
-			"cn=$group,ou=$ou"
+			"cn=$group,ou=$ou",
 		);
 	}
 
@@ -1673,7 +1673,7 @@ trait Provisioning {
 	public function deleteLdapUser(?string $username, ?string $ou = null): void {
 		if (!\in_array($username, $this->ldapCreatedUsers)) {
 			throw new Error(
-				"User " . $username . " was not created using Ldap and does not exist as an Ldap User"
+				"User " . $username . " was not created using Ldap and does not exist as an Ldap User",
 			);
 		}
 		if ($ou === null) {
@@ -1708,7 +1708,7 @@ trait Provisioning {
 				null,
 				null,
 				null,
-				false
+				false,
 			);
 		}
 		Assert::assertEquals(
@@ -1734,7 +1734,7 @@ trait Provisioning {
 				$user,
 				$this->getAdminUsername(),
 				$this->getAdminPassword(),
-				$this->ocsApiVersion
+				$this->ocsApiVersion,
 			);
 		} else {
 			// users can be deleted using the username in the GraphApi too
@@ -1765,7 +1765,7 @@ trait Provisioning {
 		$this->rememberThatGroupIsNotExpectedToExist($group);
 		Assert::assertFalse(
 			$this->groupExists($group),
-			"Group '$group' should not exist but does exist"
+			"Group '$group' should not exist but does exist",
 		);
 	}
 
@@ -1790,7 +1790,7 @@ trait Provisioning {
 		$this->response = HttpRequestHelper::get(
 			$fullUrl,
 			$this->getAdminUsername(),
-			$this->getAdminPassword()
+			$this->getAdminPassword(),
 		);
 		if ($this->response->getStatusCode() >= 400) {
 			return false;
@@ -1824,14 +1824,14 @@ trait Provisioning {
 			$response = HttpRequestHelper::get(
 				$fullUrl,
 				$this->getAdminUsername(),
-				$this->getAdminPassword()
+				$this->getAdminPassword(),
 			);
 			$respondedArray = $this->getArrayOfGroupsResponded($response);
 			\sort($respondedArray);
 			Assert::assertNotContains($group, $respondedArray);
 			Assert::assertEquals(
 				200,
-				$response->getStatusCode()
+				$response->getStatusCode(),
 			);
 		} else {
 			$this->graphContext->userShouldNotBeMemberInGroupUsingTheGraphApi($user, $group);
@@ -1853,7 +1853,7 @@ trait Provisioning {
 			function ($user) {
 				return $this->getActualUsername($user);
 			},
-			$this->simplifyArray($users)
+			$this->simplifyArray($users),
 		);
 		if ($this->isTestingWithLdap()) {
 			$respondedArray = $this->getArrayOfUsersResponded($this->response);
@@ -1861,7 +1861,7 @@ trait Provisioning {
 				$usersSimplified,
 				$respondedArray,
 				__METHOD__
-				. " Provided users do not match the users returned in the response."
+				. " Provided users do not match the users returned in the response.",
 			);
 		} else {
 			$this->graphContext->theseUsersShouldBeInTheResponse($usersSimplified);
@@ -1918,7 +1918,7 @@ trait Provisioning {
 		$responseData = HttpRequestHelper::getResponseXml($this->response, __METHOD__)->data[0];
 		Assert::assertEmpty(
 			$responseData,
-			"Response data is not empty but it should be empty"
+			"Response data is not empty but it should be empty",
 		);
 	}
 
@@ -1959,7 +1959,7 @@ trait Provisioning {
 			$this->theHTTPStatusCodeShouldBe(204, "Failed to delete user '$user'", $response);
 			Assert::assertFalse(
 				$this->userExists($user),
-				"User '$user' should not exist but does exist"
+				"User '$user' should not exist but does exist",
 			);
 		}
 		$this->usingServer($previousServer);
@@ -2026,7 +2026,7 @@ trait Provisioning {
 		return HttpRequestHelper::put(
 			$fullUrl,
 			$actualUser,
-			$actualPassword
+			$actualPassword,
 		);
 	}
 }

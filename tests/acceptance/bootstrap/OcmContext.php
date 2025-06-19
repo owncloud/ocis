@@ -85,7 +85,7 @@ class OcmContext implements Context {
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$email,
-			$description
+			$description,
 		);
 		$responseData = \json_decode($response->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
 		if (isset($responseData["token"])) {
@@ -142,7 +142,7 @@ class OcmContext implements Context {
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$token ? $token : $this->getLastFederatedInvitationToken(),
-			$providerDomain
+			$providerDomain,
 		);
 	}
 
@@ -201,8 +201,8 @@ class OcmContext implements Context {
 				$user,
 				$this->featureContext->getPasswordForUser($user),
 				$token,
-				$providerDomain
-			)
+				$providerDomain,
+			),
 		);
 	}
 
@@ -217,7 +217,7 @@ class OcmContext implements Context {
 		$response = OcmHelper::findAcceptedUsers(
 			$this->featureContext->getBaseUrl(),
 			$user,
-			$this->featureContext->getPasswordForUser($user)
+			$this->featureContext->getPasswordForUser($user),
 		);
 		if ($response->getStatusCode() === 200) {
 			$users = $this->featureContext->getJsonDecodedResponse($response);
@@ -261,7 +261,7 @@ class OcmContext implements Context {
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			200,
 			"failed to list accepted users by '$user'",
-			$response
+			$response,
 		);
 		$users = ($this->featureContext->getJsonDecodedResponse($response));
 		foreach ($users as $acceptedUser) {
@@ -282,7 +282,7 @@ class OcmContext implements Context {
 		return OcmHelper::listInvite(
 			$this->featureContext->getBaseUrl(),
 			$user,
-			$this->featureContext->getPasswordForUser($user)
+			$this->featureContext->getPasswordForUser($user),
 		);
 	}
 
@@ -338,7 +338,7 @@ class OcmContext implements Context {
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			200,
 			"failed while deleting connection with user $ocmUser",
-			$response
+			$response,
 		);
 	}
 
@@ -358,7 +358,7 @@ class OcmContext implements Context {
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$ocmUser['user_id'],
-			$ocmUser['idp']
+			$ocmUser['idp'],
 		);
 	}
 
@@ -395,12 +395,12 @@ class OcmContext implements Context {
 		$response = HttpRequestHelper::get(
 			$this->archiverContext->getArchiverUrl($queryString),
 			$user,
-			$this->featureContext->getPasswordForUser($user)
+			$this->featureContext->getPasswordForUser($user),
 		);
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			200,
 			"Failed to download archive of resource $resource",
-			$response
+			$response,
 		);
 	}
 
@@ -418,7 +418,7 @@ class OcmContext implements Context {
 	public function userSendsPropfindRequestToFederatedShareWithDepthUsingTheWebdavApi(
 		string $user,
 		string $share,
-		string $folderDepth
+		string $folderDepth,
 	): void {
 		$response = $this->spacesContext->sendPropfindRequestToSpace($user, "", $share, null, $folderDepth, true);
 		$this->featureContext->setResponse($response);
@@ -462,7 +462,7 @@ class OcmContext implements Context {
 	public function userDeletesFederatedConnectionWithUserAndProviderUsingTheGraphApi(
 		string $user,
 		string $ocmUser,
-		string $idp
+		string $idp,
 	): void {
 		$this->featureContext->setResponse($this->deleteConnection($user, $ocmUser, $idp));
 	}

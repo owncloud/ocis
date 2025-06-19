@@ -68,7 +68,7 @@ class OcisConfigContext implements Context {
 		Assert::assertEquals(
 			200,
 			$response->getStatusCode(),
-			"Failed to set async upload with delayed post processing"
+			"Failed to set async upload with delayed post processing",
 		);
 	}
 
@@ -90,7 +90,7 @@ class OcisConfigContext implements Context {
 		Assert::assertEquals(
 			200,
 			$response->getStatusCode(),
-			"Failed to set config $configVariable=$configValue"
+			"Failed to set config $configVariable=$configValue",
 		);
 	}
 
@@ -115,7 +115,7 @@ class OcisConfigContext implements Context {
 		Assert::assertEquals(
 			200,
 			$response->getStatusCode(),
-			"Failed to enable role $role"
+			"Failed to enable role $role",
 		);
 		$this->setEnabledPermissionsRoles($defaultRoles);
 	}
@@ -141,7 +141,7 @@ class OcisConfigContext implements Context {
 		Assert::assertEquals(
 			200,
 			$response->getStatusCode(),
-			"Failed to disable role $role"
+			"Failed to disable role $role",
 		);
 		$this->setEnabledPermissionsRoles($availableRoles);
 	}
@@ -160,12 +160,12 @@ class OcisConfigContext implements Context {
 		$response = OcisConfigHelper::reConfigureOcis(
 			[
 				$configVariable => $path,
-			]
+			],
 		);
 		Assert::assertEquals(
 			200,
 			$response->getStatusCode(),
-			"Failed to set config $configVariable=$path"
+			"Failed to set config $configVariable=$path",
 		);
 	}
 
@@ -187,7 +187,7 @@ class OcisConfigContext implements Context {
 		Assert::assertEquals(
 			200,
 			$response->getStatusCode(),
-			"Failed to set config"
+			"Failed to set config",
 		);
 	}
 
@@ -202,7 +202,7 @@ class OcisConfigContext implements Context {
 	 */
 	public function theAdministratorHasStartedServiceSeparatelyWithTheFollowingConfig(
 		string $service,
-		TableNode $table
+		TableNode $table,
 	): void {
 		$envs = [];
 		foreach ($table->getHash() as $row) {
@@ -213,7 +213,7 @@ class OcisConfigContext implements Context {
 		Assert::assertEquals(
 			200,
 			$response->getStatusCode(),
-			"Failed to start service $service."
+			"Failed to start service $service.",
 		);
 	}
 
@@ -237,7 +237,7 @@ class OcisConfigContext implements Context {
 		Assert::assertEquals(
 			200,
 			$response->getStatusCode(),
-			"Failed to rollback ocis server. Check if oCIS is started with ociswrapper."
+			"Failed to rollback ocis server. Check if oCIS is started with ociswrapper.",
 		);
 	}
 
@@ -250,7 +250,7 @@ class OcisConfigContext implements Context {
 		Assert::assertEquals(
 			200,
 			$response->getStatusCode(),
-			"Failed to rollback services."
+			"Failed to rollback services.",
 		);
 	}
 }

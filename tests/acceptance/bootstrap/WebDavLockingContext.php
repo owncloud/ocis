@@ -67,7 +67,7 @@ class WebDavLockingContext implements Context {
 		string $fullUrl = null,
 		bool $public = false,
 		bool $expectToSucceed = true,
-		?string $spaceId = null
+		?string $spaceId = null,
 	): ResponseInterface {
 		$user = $this->featureContext->getActualUsername($user);
 		if ($public === true) {
@@ -102,7 +102,7 @@ class WebDavLockingContext implements Context {
 				$this->featureContext->getActualUsername($user),
 				$this->featureContext->getPasswordForUser($user),
 				$headers,
-				$body
+				$body,
 			);
 		} else {
 			$baseUrl = $this->featureContext->getBaseUrl();
@@ -116,7 +116,7 @@ class WebDavLockingContext implements Context {
 				$spaceId,
 				$body,
 				$this->featureContext->getDavPathVersion(),
-				$type
+				$type,
 			);
 		}
 
@@ -144,7 +144,7 @@ class WebDavLockingContext implements Context {
 	public function userLocksFileSettingPropertiesUsingWebDavAPI(
 		string $user,
 		string $file,
-		TableNode $properties
+		TableNode $properties,
 	): void {
 		$spaceId = null;
 		if (\str_starts_with($file, "Shares/")
@@ -169,7 +169,7 @@ class WebDavLockingContext implements Context {
 	public function userTriesToLockFileSettingPropertiesUsingWebDavAPI(
 		string $user,
 		string $file,
-		TableNode $properties
+		TableNode $properties,
 	): void {
 		$response = $this->lockFile($user, $file, $properties, null, false, false);
 		$this->featureContext->setResponse($response);
@@ -190,7 +190,7 @@ class WebDavLockingContext implements Context {
 		string $user,
 		string $file,
 		string $space,
-		TableNode $properties
+		TableNode $properties,
 	): void {
 		$this->featureContext->setResponse($this->userLocksFileInProjectSpace($user, $file, $space, $properties));
 	}
@@ -209,7 +209,7 @@ class WebDavLockingContext implements Context {
 		string $user,
 		string $file,
 		string $space,
-		TableNode $properties
+		TableNode $properties,
 	): ?ResponseInterface {
 		$spaceId = $this->spacesContext->getSpaceIdByName($user, $space);
 		$baseUrl = $this->featureContext->getBaseUrl();
@@ -239,7 +239,7 @@ class WebDavLockingContext implements Context {
 		string $user,
 		string $file,
 		string $space,
-		TableNode $properties
+		TableNode $properties,
 	): void {
 		$response = $this->userLocksFileInProjectSpace($user, $file, $space, $properties);
 		$this->featureContext->theHTTPStatusCodeShouldBe(200, '', $response);
@@ -259,7 +259,7 @@ class WebDavLockingContext implements Context {
 		string $user,
 		string $file,
 		string $space,
-		TableNode $properties
+		TableNode $properties,
 	): void {
 		$spaceId = $this->spacesContext->getSpaceIdByName($user, $space);
 		$davPathVersion = $this->featureContext->getDavPathVersion();
@@ -288,7 +288,7 @@ class WebDavLockingContext implements Context {
 		string $user,
 		string $file,
 		string $fileId,
-		TableNode $properties
+		TableNode $properties,
 	): void {
 		$davPath = WebdavHelper::getDavPath($this->featureContext->getDavPathVersion());
 		$davPath = \rtrim($davPath, '/');
@@ -311,7 +311,7 @@ class WebDavLockingContext implements Context {
 		string $user,
 		string $file,
 		string $fileId,
-		TableNode $properties
+		TableNode $properties,
 	): void {
 		$davPath = WebdavHelper::getDavPath($this->featureContext->getDavPathVersion());
 		$davPath = \rtrim($davPath, '/');
@@ -348,7 +348,7 @@ class WebDavLockingContext implements Context {
 		string $user,
 		string $file,
 		string $spaceName,
-		TableNode $properties
+		TableNode $properties,
 	): void {
 		$spaceId = $this->spacesContext->getSpaceIdByName($this->featureContext->getActualUsername($user), $spaceName);
 		$response = $this->lockFile($user, $file, $properties, null, false, true, $spaceId);
@@ -369,7 +369,7 @@ class WebDavLockingContext implements Context {
 		string $user,
 		string $file,
 		string $fileId,
-		TableNode $properties
+		TableNode $properties,
 	): void {
 		$davPath = WebdavHelper::getDavPath($this->featureContext->getDavPathVersion());
 		$davPath = \rtrim($davPath, '/');
@@ -391,7 +391,7 @@ class WebDavLockingContext implements Context {
 			"/",
 			$properties,
 			null,
-			true
+			true,
 		);
 		$this->featureContext->theHTTPStatusCodeShouldBe(200, '', $response);
 	}
@@ -414,7 +414,7 @@ class WebDavLockingContext implements Context {
 			$properties,
 			null,
 			true,
-			false
+			false,
 		);
 		$this->featureContext->setResponse($response);
 	}
@@ -429,7 +429,7 @@ class WebDavLockingContext implements Context {
 	 */
 	public function publicHasLockedFileLastSharedFolder(
 		string $file,
-		TableNode $properties
+		TableNode $properties,
 	): void {
 		$token = ($this->featureContext->isUsingSharingNG())
 		? $this->featureContext->shareNgGetLastCreatedLinkShareToken()
@@ -439,7 +439,7 @@ class WebDavLockingContext implements Context {
 			$file,
 			$properties,
 			null,
-			true
+			true,
 		);
 		$this->featureContext->theHTTPStatusCodeShouldBe(200, '', $response);
 	}
@@ -455,7 +455,7 @@ class WebDavLockingContext implements Context {
 	 */
 	public function publicLocksFileLastSharedFolder(
 		string $file,
-		TableNode $properties
+		TableNode $properties,
 	): void {
 		$token = ($this->featureContext->isUsingSharingNG())
 		? $this->featureContext->shareNgGetLastCreatedLinkShareToken()
@@ -466,7 +466,7 @@ class WebDavLockingContext implements Context {
 			$properties,
 			null,
 			true,
-			false
+			false,
 		);
 		$this->featureContext->setResponse($response);
 	}
@@ -484,7 +484,7 @@ class WebDavLockingContext implements Context {
 			$user,
 			$file,
 			$user,
-			$file
+			$file,
 		);
 		$this->featureContext->setResponse($response);
 	}
@@ -501,7 +501,7 @@ class WebDavLockingContext implements Context {
 	public function userUnlocksTheLastCreatedLockOfFileInsideSpaceUsingTheWebdavApi(
 		string $user,
 		string $spaceName,
-		string $file
+		string $file,
 	): void {
 		$spaceId = $this->spacesContext->getSpaceIdByName($this->featureContext->getActualUsername($user), $spaceName);
 		$response = $this->unlockItemWithLastLockOfUserAndItemUsingWebDavAPI(
@@ -511,7 +511,7 @@ class WebDavLockingContext implements Context {
 			$file,
 			false,
 			null,
-			$spaceId
+			$spaceId,
 		);
 		$this->featureContext->setResponse($response);
 	}
@@ -528,7 +528,7 @@ class WebDavLockingContext implements Context {
 	public function userUnlocksTheLastCreatedLockOfFileWithFileIdPathUsingTheWebdavApi(
 		string $user,
 		string $itemToUnlock,
-		string $fileId
+		string $fileId,
 	): void {
 		$davPath = WebdavHelper::getDavPath($this->featureContext->getDavPathVersion());
 		$davPath = \rtrim($davPath, '/');
@@ -539,7 +539,7 @@ class WebDavLockingContext implements Context {
 			$user,
 			$itemToUnlock,
 			false,
-			$fullUrl
+			$fullUrl,
 		);
 		$this->featureContext->setResponse($response);
 	}
@@ -556,13 +556,13 @@ class WebDavLockingContext implements Context {
 	public function unlockItemWithLastLockOfOtherItemUsingWebDavAPI(
 		string $user,
 		string $itemToUnlock,
-		string $itemToUseLockOf
+		string $itemToUseLockOf,
 	): void {
 		$response = $this->unlockItemWithLastLockOfUserAndItemUsingWebDavAPI(
 			$user,
 			$itemToUnlock,
 			$user,
-			$itemToUseLockOf
+			$itemToUseLockOf,
 		);
 		$this->featureContext->setResponse($response);
 	}
@@ -579,14 +579,14 @@ class WebDavLockingContext implements Context {
 	public function unlockItemWithLastPublicLockOfOtherItemUsingWebDavAPI(
 		string $user,
 		string $itemToUnlock,
-		string $itemToUseLockOf
+		string $itemToUseLockOf,
 	): void {
 		$lockOwner = $this->featureContext->getLastCreatedPublicShareToken();
 		$response = $this->unlockItemWithLastLockOfUserAndItemUsingWebDavAPI(
 			$user,
 			$itemToUnlock,
 			$lockOwner,
-			$itemToUseLockOf
+			$itemToUseLockOf,
 		);
 		$this->featureContext->setResponse($response);
 	}
@@ -602,7 +602,7 @@ class WebDavLockingContext implements Context {
 	 */
 	private function countLockOfResources(
 		string $user,
-		string $itemToUnlock
+		string $itemToUnlock,
 	): int {
 		$user = $this->featureContext->getActualUsername($user);
 		$baseUrl = $this->featureContext->getBaseUrl();
@@ -621,7 +621,7 @@ class WebDavLockingContext implements Context {
 			null,
 			null,
 			$body,
-			$this->featureContext->getDavPathVersion()
+			$this->featureContext->getDavPathVersion(),
 		);
 		$responseXmlObject = HttpRequestHelper::getResponseXml($response, __METHOD__);
 		$xmlPart = $responseXmlObject->xpath("//d:response//d:lockdiscovery/d:activelock");
@@ -648,7 +648,7 @@ class WebDavLockingContext implements Context {
 		string $itemToUnlock,
 		string $lockOwner,
 		string $itemToUseLockOf,
-		bool $public = false
+		bool $public = false,
 	): void {
 		$lockCount = $this->countLockOfResources($user, $itemToUnlock);
 
@@ -657,7 +657,7 @@ class WebDavLockingContext implements Context {
 			$itemToUnlock,
 			$lockOwner,
 			$itemToUseLockOf,
-			$public
+			$public,
 		);
 		$this->featureContext->theHTTPStatusCodeShouldBe(204, "", $response);
 
@@ -666,7 +666,7 @@ class WebDavLockingContext implements Context {
 		Assert::assertEquals(
 			$lockCount - 1,
 			$lockCountAfterUnlock,
-			"Expected $lockCount lock(s) for '$itemToUnlock' but found '$lockCount'"
+			"Expected $lockCount lock(s) for '$itemToUnlock' but found '$lockCount'",
 		);
 	}
 
@@ -705,7 +705,7 @@ class WebDavLockingContext implements Context {
 		if (!isset($this->tokenOfLastLock[$lockOwner][$itemToUseLockOf])) {
 			Assert::fail(
 				"could not find saved token of '$itemToUseLockOf' " .
-				"owned by user '$lockOwner'"
+				"owned by user '$lockOwner'",
 			);
 		}
 		$headers = [
@@ -717,7 +717,7 @@ class WebDavLockingContext implements Context {
 				"UNLOCK",
 				$this->featureContext->getActualUsername($user),
 				$this->featureContext->getPasswordForUser($user),
-				$headers
+				$headers,
 			);
 		} else {
 			$response = WebDavHelper::makeDavRequest(
@@ -730,7 +730,7 @@ class WebDavLockingContext implements Context {
 				$spaceId,
 				null,
 				$this->featureContext->getDavPathVersion(),
-				$type
+				$type,
 			);
 		}
 		return $response;
@@ -750,13 +750,13 @@ class WebDavLockingContext implements Context {
 		string $user,
 		string $itemToUnlock,
 		string $lockOwner,
-		string $itemToUseLockOf
+		string $itemToUseLockOf,
 	): void {
 		$response = $this->unlockItemWithLastLockOfUserAndItemUsingWebDavAPI(
 			$user,
 			$itemToUnlock,
 			$lockOwner,
-			$itemToUseLockOf
+			$itemToUseLockOf,
 		);
 		$this->featureContext->setResponse($response);
 	}
@@ -773,7 +773,7 @@ class WebDavLockingContext implements Context {
 	public function unlockItemAsPublicWithLastLockOfUserAndItemUsingWebDavAPI(
 		string $itemToUnlock,
 		string $lockOwner,
-		string $itemToUseLockOf
+		string $itemToUseLockOf,
 	): void {
 		$token = ($this->featureContext->isUsingSharingNG())
 		? $this->featureContext->shareNgGetLastCreatedLinkShareToken()
@@ -783,7 +783,7 @@ class WebDavLockingContext implements Context {
 			$itemToUnlock,
 			$lockOwner,
 			$itemToUseLockOf,
-			true
+			true,
 		);
 		$this->featureContext->setResponse($response);
 	}
@@ -804,7 +804,7 @@ class WebDavLockingContext implements Context {
 			$itemToUnlock,
 			$token,
 			$itemToUnlock,
-			true
+			true,
 		);
 		$this->featureContext->setResponse($response);
 	}
@@ -823,14 +823,14 @@ class WebDavLockingContext implements Context {
 		string $user,
 		string $fileSource,
 		string $fileDestination,
-		string $itemToUseLockOf
+		string $itemToUseLockOf,
 	): void {
 		$response = $this->moveItemSendingLockTokenOfUser(
 			$user,
 			$fileSource,
 			$fileDestination,
 			$itemToUseLockOf,
-			$user
+			$user,
 		);
 		$this->featureContext->setResponse($response);
 	}
@@ -849,13 +849,13 @@ class WebDavLockingContext implements Context {
 		string $fileSource,
 		string $fileDestination,
 		string $itemToUseLockOf,
-		string $lockOwner
+		string $lockOwner,
 	): ResponseInterface {
 		$user = $this->featureContext->getActualUsername($user);
 		$lockOwner = $this->featureContext->getActualUsername($lockOwner);
 		$destination = $this->featureContext->destinationHeaderValue(
 			$user,
-			$fileDestination
+			$fileDestination,
 		);
 		$token = $this->tokenOfLastLock[$lockOwner][$itemToUseLockOf];
 		$headers = [
@@ -866,7 +866,7 @@ class WebDavLockingContext implements Context {
 			$user,
 			"MOVE",
 			$fileSource,
-			$headers
+			$headers,
 		);
 	}
 
@@ -886,14 +886,14 @@ class WebDavLockingContext implements Context {
 		string $fileSource,
 		string $fileDestination,
 		string $itemToUseLockOf,
-		string $lockOwner
+		string $lockOwner,
 	): void {
 		$response = $this->moveItemSendingLockTokenOfUser(
 			$user,
 			$fileSource,
 			$fileDestination,
 			$itemToUseLockOf,
-			$lockOwner
+			$lockOwner,
 		);
 		$this->featureContext->setResponse($response);
 	}
@@ -912,7 +912,7 @@ class WebDavLockingContext implements Context {
 		string $user,
 		string $content,
 		string $destination,
-		string $itemToUseLockOf
+		string $itemToUseLockOf,
 	): void {
 		$user = $this->featureContext->getActualUsername($user);
 		$token = $this->tokenOfLastLock[$user][$itemToUseLockOf];
@@ -922,7 +922,7 @@ class WebDavLockingContext implements Context {
 			"PUT",
 			$destination,
 			["If" => "(<$token>)"],
-			$content
+			$content,
 		);
 		$this->featureContext->setResponse($response);
 		$this->featureContext->setLastUploadDeleteTime(\time());
@@ -943,7 +943,7 @@ class WebDavLockingContext implements Context {
 		Assert::assertEquals(
 			$count,
 			$lockCount,
-			"Expected $count lock(s) for '$file' but found '$lockCount'"
+			"Expected $count lock(s) for '$file' but found '$lockCount'",
 		);
 	}
 
@@ -973,7 +973,7 @@ class WebDavLockingContext implements Context {
 		int $count,
 		string $file,
 		string $spaceName,
-		string $user
+		string $user,
 	): void {
 		$response = $this->spacesContext->sendPropfindRequestToSpace($user, $spaceName, $file, null, '0');
 		$this->featureContext->theHTTPStatusCodeShouldBe(207, "", $response);
@@ -987,7 +987,7 @@ class WebDavLockingContext implements Context {
 		Assert::assertEquals(
 			$count,
 			$lockCount,
-			"Expected $count lock(s) for '$file' inside space '$spaceName' but found '$lockCount'"
+			"Expected $count lock(s) for '$file' inside space '$spaceName' but found '$lockCount'",
 		);
 	}
 
