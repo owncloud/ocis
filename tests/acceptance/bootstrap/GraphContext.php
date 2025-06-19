@@ -2730,6 +2730,11 @@ class GraphContext implements Context {
 		if (!$shouldContain && !$fileOrFolderFound) {
 			return;
 		}
+		if ($shouldContain && !$fileOrFolderFound) {
+			Assert::fail(
+				'Response does not contain file or folder "' . $fileName . '" but should.'
+			);
+		}
 		Assert::assertFalse(
 			!$shouldContain && $fileOrFolderFound,
 			'Response contains file "' . $fileName . '" but should.'
