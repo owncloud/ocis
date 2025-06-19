@@ -395,7 +395,7 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 
 #### [[CLI] Error while resuming an upload](https://github.com/owncloud/ocis/issues/11290)
 
-- [cliCommands/uploadSessions.feature:173](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/cliCommands/uploadSessions.feature#L173)
+- [cliCommands/uploadSessions.feature:162](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/cliCommands/uploadSessions.feature#L162)
 
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.

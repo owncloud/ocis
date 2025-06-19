@@ -13,12 +13,11 @@ use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\TableNode;
 use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Exception\ClientException;
 use PHPUnit\Framework\Assert;
 use Psr\Http\Message\ResponseInterface;
 use TestHelpers\WebDavHelper;
 use TestHelpers\BehatHelper;
-use TestHelpers\GraphHelper;
-use TestHelpers\HttpRequestHelper;
 
 require_once 'bootstrap.php';
 
@@ -76,6 +75,45 @@ class SpacesTUSContext implements Context {
 			"HTTP status code was not 201 or 204 while trying to upload file '$destination' for user '$user'",
 			$response
 		);
+	}
+
+	/**
+	 * @Given /^user "([^"]*)" has tried to upload file "([^"]*)" to "([^"]*)" inside space "([^"]*)" via TUS$/
+	 *
+	 * @param string $user
+	 * @param string $source
+	 * @param string $destination
+	 * @param string $spaceName
+	 *
+	 * @return void
+	 *
+	 * @throws Exception
+	 * @throws GuzzleException
+	 */
+	public function userHasTriedToUploadFileInsideSpaceViaTUS(
+		string $user,
+		string $source,
+		string $destination,
+		string $spaceName
+	): void {
+		$spaceId = $this->spacesContext->getSpaceIdByName($user, $spaceName);
+		try {
+			$response = $this->tusContext->uploadFileUsingTus(
+				$user,
+				$source,
+				$destination,
+				$spaceId,
+			);
+			Assert::fail(
+				__METHOD__ .
+				" - Expected an exception, but the upload was successful. Status: " .
+				$response->getStatusCode()
+			);
+		} catch (ClientException $e) {
+			if (!\str_contains($e->getMessage(), "403 Forbidden")) {
+				Assert::fail(__METHOD__ . " - " . $e->getMessage());
+			}
+		}
 	}
 
 	/**

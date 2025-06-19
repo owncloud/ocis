@@ -4838,4 +4838,24 @@ trait WebDav {
 			$response
 		);
 	}
+
+	/**
+	 * @Given a file :name with the size of :size has been created locally
+	 *
+	 * @param string $name
+	 * @param string $size (e.g.: 10MB, 100KB, 1GB)
+	 *
+	 * @return void
+	 * @throws InvalidArgumentException
+	 */
+	public function aFileWithSizeHasBeenCreatedLocally(string $name, string $size): void {
+		$fullPath = UploadHelper::getUploadFilesDir($name);
+		if (\file_exists($fullPath)) {
+			throw new InvalidArgumentException(
+				__METHOD__ . " could not create '$fullPath'. File already exists."
+			);
+		}
+		UploadHelper::createFileSpecificSize($fullPath, $size);
+		$this->createdFiles[] = $fullPath;
+	}
 }
