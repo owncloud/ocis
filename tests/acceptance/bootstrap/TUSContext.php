@@ -26,8 +26,6 @@ use Behat\Gherkin\Node\TableNode;
 use GuzzleHttp\Exception\GuzzleException;
 use TusPhp\Exception\ConnectionException;
 use TusPhp\Exception\TusException;
-use TusPhp\Tus\Client;
-use PHPUnit\Framework\Assert;
 use Psr\Http\Message\ResponseInterface;
 use TestHelpers\HttpRequestHelper;
 use TestHelpers\WebDavHelper;

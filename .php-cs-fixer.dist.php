@@ -23,7 +23,8 @@ $config->setFinder($finder)
                 "return_type_declaration" => [
                     "space_before" => "none",
                 ],
-                'single_space_around_construct' => true
+                'single_space_around_construct' => true,
+                'no_unused_imports' => true,
             ]
         )
     );

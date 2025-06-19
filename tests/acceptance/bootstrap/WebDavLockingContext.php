@@ -28,7 +28,6 @@ use PHPUnit\Framework\Assert;
 use Psr\Http\Message\ResponseInterface;
 use TestHelpers\HttpRequestHelper;
 use TestHelpers\WebDavHelper;
-use TestHelpers\OcisHelper;
 use TestHelpers\BehatHelper;
 
 require_once 'bootstrap.php';

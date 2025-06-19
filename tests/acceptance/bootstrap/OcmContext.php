@@ -23,14 +23,11 @@ use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use GuzzleHttp\Exception\GuzzleException;
 use Psr\Http\Message\ResponseInterface;
-use TestHelpers\OcisHelper;
 use TestHelpers\OcmHelper;
 use TestHelpers\WebDavHelper;
 use TestHelpers\BehatHelper;
 use TestHelpers\HttpRequestHelper;
 use Behat\Gherkin\Node\TableNode;
-use TestHelpers\GraphHelper;
-use PHPUnit\Framework\Assert;
 
 /**
  * Acceptance test steps related to testing federation share(ocm) features

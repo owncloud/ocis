@@ -31,7 +31,6 @@ use PHPUnit\Framework\Assert;
 use Psr\Http\Message\ResponseInterface;
 use TestHelpers\HttpRequestHelper;
 use TestHelpers\WebDavHelper;
-use TestHelpers\SetupHelper;
 use TestHelpers\GraphHelper;
 use TestHelpers\OcisHelper;
 use TestHelpers\BehatHelper;

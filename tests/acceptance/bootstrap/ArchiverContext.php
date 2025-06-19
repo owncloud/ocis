@@ -25,7 +25,6 @@ use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\TableNode;
 use GuzzleHttp\Exception\GuzzleException;
 use TestHelpers\HttpRequestHelper;
-use TestHelpers\SetupHelper;
 use TestHelpers\BehatHelper;
 use PHPUnit\Framework\Assert;
 use Psr\Http\Message\ResponseInterface;
