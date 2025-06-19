@@ -382,6 +382,7 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiActivities/activitiesByFileId.feature:2015](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiActivities/activitiesByFileId.feature#L2015)
 
 #### [Activity. no event for deleting a file using file-id](https://github.com/owncloud/ocis/issues/10328)
+
 - [apiActivities/activitiesByFileId.feature:2190](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiActivities/activitiesByFileId.feature#L2190)
 
 #### Uploaders are not allowed to `MOVE`
@@ -394,7 +395,7 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 
 #### [[CLI] Error while resuming an upload](https://github.com/owncloud/ocis/issues/11290)
 
-- [cliCommands/uploadSessions.feature:156](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/cliCommands/uploadSessions.feature#L156)
+- [cliCommands/uploadSessions.feature:173](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/cliCommands/uploadSessions.feature#L173)
 
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.

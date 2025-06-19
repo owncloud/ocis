@@ -1036,6 +1036,46 @@ trait WebDav {
 	}
 
 	/**
+	 * @When for user :user file :fileName of space :space should be in postprocessing
+	 *
+	 * @param string $user
+	 * @param string $fileName
+	 * @param string $space
+	 *
+	 * @return void
+	 */
+	public function forUserFileShouldBeInPostprocessing(
+		string $user,
+		string $fileName,
+		string $space,
+	): void {
+		$user = $this->getActualUsername($user);
+		$password = $this->getPasswordForUser($user);
+		$davPathVersion = $this->getDavPathVersion();
+		$suffixPath = $user;
+		if ($davPathVersion === WebDavHelper::DAV_VERSION_SPACES) {
+			$spaceId = $this->spacesContext->getSpaceIdByName($user, $space);
+			$suffixPath = $spaceId;
+		}
+		$davPath = WebDavHelper::getDavPath($davPathVersion, $suffixPath, "files");
+		$fullUrl = $this->getBaseUrl() . "/$davPath/$fileName";
+		$response = HttpRequestHelper::sendRequestOnce(
+			$fullUrl,
+			"GET",
+			$user,
+			$password,
+		);
+		Assert::assertEquals(
+			425,
+			$response->getStatusCode(),
+			__METHOD__
+			. " : File '$fileName' not in postprocessing."
+			. " Expected status code to be '425', but got '"
+			. $response->getStatusCode() . "'"
+		);
+	}
+
+	/**
 	 * @When user :user downloads file :fileName using the WebDAV API
 	 * @When user :user tries to download file :fileName using the WebDAV API
 	 *

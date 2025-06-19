@@ -108,7 +108,7 @@ Feature: trashbin
     And user "Alice" has created a folder "uploadFolder" in space "Newspace"
     And user "Alice" has uploaded a file inside space "Newspace" with content "hello world" to "text.txt"
     And user "Alice" has removed the file "text.txt" from space "Newspace"
-    And the system waits for "1" seconds
+    And the administrator waits for "1" seconds
     When the administrator purges the expired trash resources
     Then there should be no trashed resources of space "Personal" owned by user "Alice"
     And there should be "1" trashed resources of space "Newspace" owned by user "Alice":
@@ -130,7 +130,7 @@ Feature: trashbin
     And user "Alice" has created a folder "uploadFolder" in space "Newspace"
     And user "Alice" has uploaded a file inside space "Newspace" with content "hello world" to "text.txt"
     And user "Alice" has removed the file "text.txt" from space "Newspace"
-    And the system waits for "1" seconds
+    And the administrator waits for "1" seconds
     When the administrator purges the expired trash resources
     Then there should be no trashed resources of space "Newspace" owned by user "Alice"
     And there should be "1" trashed resources of space "Personal" owned by user "Alice":
