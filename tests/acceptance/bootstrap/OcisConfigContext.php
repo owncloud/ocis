@@ -64,7 +64,7 @@ class OcisConfigContext implements Context {
 			"POSTPROCESSING_DELAY" => $delayTime . "s",
 		];
 
-		$response =  OcisConfigHelper::reConfigureOcis($envs);
+		$response = OcisConfigHelper::reConfigureOcis($envs);
 		Assert::assertEquals(
 			200,
 			$response->getStatusCode(),
@@ -86,7 +86,7 @@ class OcisConfigContext implements Context {
 			$configVariable => $configValue,
 		];
 
-		$response =  OcisConfigHelper::reConfigureOcis($envs);
+		$response = OcisConfigHelper::reConfigureOcis($envs);
 		Assert::assertEquals(
 			200,
 			$response->getStatusCode(),
@@ -111,7 +111,7 @@ class OcisConfigContext implements Context {
 		$envs = [
 			"GRAPH_AVAILABLE_ROLES" => implode(',', $defaultRoles),
 		];
-		$response =  OcisConfigHelper::reConfigureOcis($envs);
+		$response = OcisConfigHelper::reConfigureOcis($envs);
 		Assert::assertEquals(
 			200,
 			$response->getStatusCode(),
@@ -137,7 +137,7 @@ class OcisConfigContext implements Context {
 		$envs = [
 			"GRAPH_AVAILABLE_ROLES" => implode(',', $availableRoles),
 		];
-		$response =  OcisConfigHelper::reConfigureOcis($envs);
+		$response = OcisConfigHelper::reConfigureOcis($envs);
 		Assert::assertEquals(
 			200,
 			$response->getStatusCode(),
@@ -157,7 +157,7 @@ class OcisConfigContext implements Context {
 	 */
 	public function theConfigHasBeenSetPathTo(string $configVariable, string $path): void {
 		$path = \dirname(__FILE__) . "/../../" . $path;
-		$response =  OcisConfigHelper::reConfigureOcis(
+		$response = OcisConfigHelper::reConfigureOcis(
 			[
 				$configVariable => $path,
 			]
@@ -183,7 +183,7 @@ class OcisConfigContext implements Context {
 			$envs[$row['config']] = $row['value'];
 		}
 
-		$response =  OcisConfigHelper::reConfigureOcis($envs);
+		$response = OcisConfigHelper::reConfigureOcis($envs);
 		Assert::assertEquals(
 			200,
 			$response->getStatusCode(),
@@ -209,7 +209,7 @@ class OcisConfigContext implements Context {
 			$envs[$row['config']] = $row['value'];
 		}
 
-		$response =  OcisConfigHelper::startService($service, $envs);
+		$response = OcisConfigHelper::startService($service, $envs);
 		Assert::assertEquals(
 			200,
 			$response->getStatusCode(),

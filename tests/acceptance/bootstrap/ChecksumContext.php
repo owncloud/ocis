@@ -44,9 +44,9 @@ class ChecksumContext implements Context {
 	 */
 	public function uploadFileToWithChecksumUsingTheAPI(
 		string $user,
-		string  $source,
-		string  $destination,
-		string  $checksum
+		string $source,
+		string $destination,
+		string $checksum
 	): ResponseInterface {
 		$file = \file_get_contents(
 			$this->featureContext->acceptanceTestsDirLocation() . $source
@@ -72,9 +72,9 @@ class ChecksumContext implements Context {
 	 */
 	public function userUploadsFileToWithChecksumUsingTheAPI(
 		string $user,
-		string  $source,
-		string  $destination,
-		string  $checksum
+		string $source,
+		string $destination,
+		string $checksum
 	): void {
 		$this->featureContext->setResponse(
 			$this->uploadFileToWithChecksumUsingTheAPI($user, $source, $destination, $checksum)

@@ -51,12 +51,12 @@ class SearchContext implements Context {
 	 * @throws GuzzleException|JsonException
 	 */
 	private function searchFiles(
-		string     $user,
-		string     $pattern,
-		?string    $limit = null,
-		?string    $scopeType = null,
-		?string    $scope = null,
-		?string    $spaceName = null,
+		string $user,
+		string $pattern,
+		?string $limit = null,
+		?string $scopeType = null,
+		?string $scope = null,
+		?string $spaceName = null,
 		?TableNode $properties = null
 	): ResponseInterface {
 		$user = $this->featureContext->getActualUsername($user);
@@ -141,9 +141,9 @@ class SearchContext implements Context {
 	 * @throws Exception|GuzzleException
 	 */
 	public function userSearchesUsingWebDavAPI(
-		string     $user,
-		string     $pattern,
-		?string    $limit = null,
+		string $user,
+		string $pattern,
+		?string $limit = null,
 		?TableNode $properties = null
 	): void {
 		// NOTE: because indexing of newly uploaded files or directories with ocis is decoupled and occurs asynchronously
@@ -164,8 +164,8 @@ class SearchContext implements Context {
 	 * @throws Exception
 	 */
 	public function fileOrFolderInTheSearchResultShouldContainProperties(
-		string    $path,
-		string    $user,
+		string $path,
+		string $user,
 		TableNode $properties
 	): void {
 		$user = $this->featureContext->getActualUsername($user);
@@ -224,7 +224,7 @@ class SearchContext implements Context {
 	 */
 	public function theSearchResultShouldContainEntriesWithHighlight(
 		TableNode $expectedFiles,
-		string    $expectedContent
+		string $expectedContent
 	): void {
 		$this->featureContext->verifyTableNodeColumnsCount($expectedFiles, 1);
 		$elementRows = $expectedFiles->getRows();
@@ -263,10 +263,10 @@ class SearchContext implements Context {
 	 * @throws Exception|GuzzleException
 	 */
 	public function userSearchesInsideFolderOrSpaceUsingWebDavAPI(
-		string  $user,
-		string  $pattern,
-		string  $scopeType,
-		string  $scope,
+		string $user,
+		string $pattern,
+		string $scopeType,
+		string $scope,
 		?string $spaceName = null,
 	): void {
 		// NOTE: since indexing of newly uploaded files or directories with ocis is decoupled and occurs asynchronously,

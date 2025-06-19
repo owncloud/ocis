@@ -255,12 +255,12 @@ class TUSContext implements Context {
 	 */
 	public function userUploadsUsingTusAFileTo(
 		?string $user,
-		string  $source,
-		string  $destination,
-		array   $uploadMetadata = [],
-		int     $noOfChunks = 1,
-		int     $bytes = null,
-		string  $checksum = ''
+		string $source,
+		string $destination,
+		array $uploadMetadata = [],
+		int $noOfChunks = 1,
+		int $bytes = null,
+		string $checksum = ''
 	): void {
 		$response = $this->uploadFileUsingTus(
 			$user,
@@ -290,13 +290,13 @@ class TUSContext implements Context {
 	 */
 	public function uploadFileUsingTus(
 		?string $user,
-		string  $source,
-		string  $destination,
-		?string  $spaceId = null,
-		array   $uploadMetadata = [],
-		int     $noOfChunks = 1,
-		int     $bytes = null,
-		string  $checksum = '',
+		string $source,
+		string $destination,
+		?string $spaceId = null,
+		array $uploadMetadata = [],
+		int $noOfChunks = 1,
+		int $bytes = null,
+		string $checksum = '',
 	): ResponseInterface {
 		$user = $this->featureContext->getActualUsername($user);
 		$password = $this->featureContext->getUserPassword($user);
@@ -402,7 +402,7 @@ class TUSContext implements Context {
 	 */
 	private function createTusClient(
 		string $baseUrl,
-		array  $headers,
+		array $headers,
 		string $sourceFile,
 		string $destination,
 		string $path,
@@ -467,9 +467,9 @@ class TUSContext implements Context {
 	 */
 	public function userUploadsAFileWithContentInChunksUsingTus(
 		?string $user,
-		string  $content,
-		?int    $noOfChunks,
-		string  $destination
+		string $content,
+		?int $noOfChunks,
+		string $destination
 	): void {
 		$temporaryFileName = $this->writeDataToTempFile($content);
 		$response = $this->uploadFileUsingTus(
@@ -604,8 +604,8 @@ class TUSContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function userCreatesWithUpload(
-		string    $user,
-		string    $content,
+		string $user,
+		string $content,
 		TableNode $headers
 	): void {
 		$response = $this->createNewTUSResourceWithHeaders($user, $headers, $content);

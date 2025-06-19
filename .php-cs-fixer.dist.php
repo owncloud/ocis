@@ -32,6 +32,9 @@ $config->setFinder($finder)
                 'single_line_comment_spacing' => true,
                 'no_trailing_whitespace_in_comment' => true,
                 'no_empty_comment' => true,
+                'no_singleline_whitespace_before_semicolons' => true,
+                'type_declaration_spaces' => true,
+                'binary_operator_spaces' => true,
             ]
         )
     );

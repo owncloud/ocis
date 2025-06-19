@@ -975,8 +975,8 @@ class GraphHelper {
 		string $user,
 		string $password,
 		string $urlArguments = '',
-		array  $body = [],
-		array  $headers = []
+		array $body = [],
+		array $headers = []
 	): ResponseInterface {
 		$urlArguments = $urlArguments ? "?$urlArguments" : "";
 		$url = self::getFullUrl($baseUrl, "me/drives" . $urlArguments);
@@ -1003,8 +1003,8 @@ class GraphHelper {
 		string $user,
 		string $password,
 		string $urlArguments = '',
-		array  $body = [],
-		array  $headers = []
+		array $body = [],
+		array $headers = []
 	): ResponseInterface {
 		$urlArguments = $urlArguments ? "?$urlArguments" : "";
 		$url = self::getFullUrl($baseUrl, "drives" . $urlArguments);
@@ -1033,8 +1033,8 @@ class GraphHelper {
 		string $password,
 		string $spaceId,
 		string $urlArguments = '',
-		array  $body = [],
-		array  $headers = []
+		array $body = [],
+		array $headers = []
 	): ResponseInterface {
 		$url = self::getFullUrl($baseUrl, 'drives/' . $spaceId . "/" . $urlArguments);
 
@@ -1163,8 +1163,8 @@ class GraphHelper {
 		string $baseUrl,
 		string $user,
 		string $password,
-		array  $body = [],
-		array  $headers = []
+		array $body = [],
+		array $headers = []
 	): ResponseInterface {
 		$url = self::getFullUrl($baseUrl, 'extensions/org.libregraph/tags');
 

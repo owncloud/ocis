@@ -531,7 +531,7 @@ class NotificationContext implements Context {
 	public function userCreatesDeprovisioningNotification(
 		?string $user = null,
 		?string $deprovision_date = "2043-07-04T11:23:12Z",
-		?string $deprovision_date_format= "2006-01-02T15:04:05Z07:00"
+		?string $deprovision_date_format = "2006-01-02T15:04:05Z07:00"
 	): ResponseInterface {
 		$payload["type"] = "deprovision";
 		$payload["data"] = [

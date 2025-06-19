@@ -760,7 +760,7 @@ class SharingNgContext implements Context {
 	 *
 	 * @return ResponseInterface
 	 */
-	public function updateResourceShare(string $user, TableNode  $body, string $permissionID): ResponseInterface {
+	public function updateResourceShare(string $user, TableNode $body, string $permissionID): ResponseInterface {
 		$bodyRows = $body->getRowsHash();
 		$space = $this->spacesContext->getSpaceByName($user, $bodyRows['space']);
 		$spaceId = $space["id"];
@@ -781,7 +781,7 @@ class SharingNgContext implements Context {
 			? null : $bodyRows['expirationDateTime'];
 		}
 
-		$response =  GraphHelper::updateShare(
+		$response = GraphHelper::updateShare(
 			$this->featureContext->getBaseUrl(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
@@ -829,7 +829,7 @@ class SharingNgContext implements Context {
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function userCreatesAPublicLinkShareWithSettings(string $user, TableNode  $body): void {
+	public function userCreatesAPublicLinkShareWithSettings(string $user, TableNode $body): void {
 		$response = $this->createLinkShare($user, $body);
 		$this->featureContext->setResponse($response);
 	}
@@ -876,7 +876,7 @@ class SharingNgContext implements Context {
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function userHasCreatedTheFollowingResourceLinkShare(string $user, TableNode  $body): void {
+	public function userHasCreatedTheFollowingResourceLinkShare(string $user, TableNode $body): void {
 		$rows = $body->getRowsHash();
 		Assert::assertArrayHasKey(
 			"resource",
@@ -896,7 +896,7 @@ class SharingNgContext implements Context {
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function userHasCreatedTheFollowingLinkShare(string $user, TableNode  $body): void {
+	public function userHasCreatedTheFollowingLinkShare(string $user, TableNode $body): void {
 		$rows = $body->getRowsHash();
 		Assert::assertArrayNotHasKey(
 			"resource",
@@ -917,7 +917,7 @@ class SharingNgContext implements Context {
 	 * @return void
 	 * @throws Exception|GuzzleException
 	 */
-	public function userHasUpdatedLastPublicLinkShare(string $user, TableNode  $body): void {
+	public function userHasUpdatedLastPublicLinkShare(string $user, TableNode $body): void {
 		$response = $this->updateLinkShare(
 			$user,
 			$body,
@@ -937,7 +937,7 @@ class SharingNgContext implements Context {
 	 */
 	public function userUpdatesTheLastPublicLinkShareUsingThePermissionsEndpointOfTheGraphApi(
 		string $user,
-		TableNode  $body
+		TableNode $body
 	): void {
 		$this->featureContext->setResponse(
 			$this->updateLinkShare(
@@ -956,7 +956,7 @@ class SharingNgContext implements Context {
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
-	public function updateLinkShare(string $user, TableNode  $body, string $permissionID): ResponseInterface {
+	public function updateLinkShare(string $user, TableNode $body, string $permissionID): ResponseInterface {
 		$bodyRows = $body->getRowsHash();
 		$space = $bodyRows['space'];
 		if (isset($bodyRows['resource'])) {
@@ -1005,7 +1005,7 @@ class SharingNgContext implements Context {
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
-	public function setLinkSharePassword(string $user, TableNode  $body, string $permissionID): ResponseInterface {
+	public function setLinkSharePassword(string $user, TableNode $body, string $permissionID): ResponseInterface {
 		$bodyRows = $body->getRowsHash();
 		$space = $bodyRows['space'];
 		$resource = $bodyRows['resource'];
@@ -1045,7 +1045,7 @@ class SharingNgContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userHasSetTheFollowingPasswordForTheLastLinkShare(string $user, TableNode  $body): void {
+	public function userHasSetTheFollowingPasswordForTheLastLinkShare(string $user, TableNode $body): void {
 		$response = $this->setLinkSharePassword(
 			$user,
 			$body,
@@ -1513,7 +1513,7 @@ class SharingNgContext implements Context {
 		$share = ltrim($share, '/');
 		$itemId = $this->spacesContext->getResourceId($offeredBy, $space, $share);
 		$shareSpaceId = GraphHelper::SHARES_SPACE_ID;
-		$response =  GraphHelper::enableShareSync(
+		$response = GraphHelper::enableShareSync(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getActualUsername($user),
 			$this->featureContext->getPasswordForUser($user),
@@ -1537,7 +1537,7 @@ class SharingNgContext implements Context {
 		string $share,
 	): void {
 		$remoteItemId = $this->spacesContext->getSharesRemoteItemId($user, $share);
-		$response =  GraphHelper::enableShareSync(
+		$response = GraphHelper::enableShareSync(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getActualUsername($user),
 			$this->featureContext->getPasswordForUser($user),
@@ -1563,7 +1563,7 @@ class SharingNgContext implements Context {
 		$shareSpaceId = GraphHelper::SHARES_SPACE_ID;
 		$itemId = ($resource === 'nonexistent') ? WebDavHelper::generateUUIDv4() : $resource;
 
-		$response =  GraphHelper::enableShareSync(
+		$response = GraphHelper::enableShareSync(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getActualUsername($user),
 			$this->featureContext->getPasswordForUser($user),
@@ -1586,7 +1586,7 @@ class SharingNgContext implements Context {
 		$shareSpaceId = GraphHelper::SHARES_SPACE_ID;
 		$shareID = ($resource === 'nonexistent') ? WebDavHelper::generateUUIDv4() : $resource;
 		$itemId = $shareSpaceId . '!' . $shareID;
-		$response =  GraphHelper::disableShareSync(
+		$response = GraphHelper::disableShareSync(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getActualUsername($user),
 			$this->featureContext->getPasswordForUser($user),

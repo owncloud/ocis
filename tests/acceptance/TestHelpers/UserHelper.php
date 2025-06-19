@@ -51,7 +51,7 @@ class UserHelper {
 		string $user,
 		string $key,
 		string $value,
-		string 	$adminUser,
+		string $adminUser,
 		string $adminPassword,
 		?int $ocsApiVersion = 2
 	): ResponseInterface {
@@ -104,7 +104,7 @@ class UserHelper {
 			);
 		}
 		// Send the array of requests at once in parallel.
-		$results =  HttpRequestHelper::sendBatchRequest($requests, $client);
+		$results = HttpRequestHelper::sendBatchRequest($requests, $client);
 
 		foreach ($results as $e) {
 			if ($e instanceof ClientException) {
@@ -252,7 +252,7 @@ class UserHelper {
 		?string $baseUrl,
 		?string $adminUser,
 		?string $adminPassword,
-		?string $search =""
+		?string $search = ""
 	): ResponseInterface {
 		return OcsApiHelper::sendRequest(
 			$baseUrl,

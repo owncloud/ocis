@@ -210,7 +210,7 @@ class GraphContext implements Context {
 		string $email = null,
 		string $displayName = null,
 		bool $accountEnabled = true,
-		string $method="PATCH"
+		string $method = "PATCH"
 	): ResponseInterface {
 		$user = $this->featureContext->getActualUsername($user);
 		$userId = $this->featureContext->getAttributeOfCreatedUser($user, 'id') ?: $user;
@@ -2337,8 +2337,8 @@ class GraphContext implements Context {
 	 */
 	public function downloadedJsonContentShouldContainEventTypeInItemAndShouldMatch(
 		string $eventType,
-		?string $spaceType=null,
-		PyStringNode $schemaString=null
+		?string $spaceType = null,
+		PyStringNode $schemaString = null
 	): void {
 		$actualResponseToAssert = null;
 		$events = $this->featureContext->getJsonDecodedResponseBodyContent()->events;
@@ -2556,7 +2556,7 @@ class GraphContext implements Context {
 	 */
 	public function userHasSwitchedTheSystemLanguageUsingGraphApi(string $user, string $language): void {
 		$credentials = $this->getAdminOrUserCredentials($user);
-		$response =  GraphHelper::switchSystemLanguage(
+		$response = GraphHelper::switchSystemLanguage(
 			$this->featureContext->getBaseUrl(),
 			$credentials['username'],
 			$credentials['password'],

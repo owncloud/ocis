@@ -1478,7 +1478,7 @@ trait Sharing {
 	public function createAGroupShare(
 		string $user,
 		string $filepath,
-		string$group,
+		string $group,
 		$permissions = null
 	): ResponseInterface {
 		return $this->createShare(
@@ -1859,9 +1859,9 @@ trait Sharing {
 	 * @throws Exception
 	 */
 	public function asLastShareInfoAboutUserSharingWithUserShouldInclude(
-		string    $requester,
-		string    $sharer,
-		string    $sharee,
+		string $requester,
+		string $sharer,
+		string $sharee,
 		TableNode $table
 	) {
 		$response = $this->getLastShareInfo($requester, "user");
@@ -3504,7 +3504,7 @@ trait Sharing {
 			"itemType" => $type,
 			"itemSource" => $this->getFileIdForPath($user, $path),
 			"name" => "Public quick link",
-			"attributes" =>  [
+			"attributes" => [
 				[
 					"scope" => "files_sharing",
 					"key" => "isQuickLink",

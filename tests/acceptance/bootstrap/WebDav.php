@@ -349,7 +349,7 @@ trait WebDav {
 		string $folder,
 		?bool $isGivenStep = false,
 		?string $password = null,
-		?string $spaceId=null
+		?string $spaceId = null
 	): ResponseInterface {
 		return $this->makeDavRequest(
 			$user,
@@ -1584,7 +1584,7 @@ trait WebDav {
 					);
 				};
 				if ($expectedToBeListed) {
-					$elementSanitized =  rtrim($element[0]->__toString(), '/');
+					$elementSanitized = rtrim($element[0]->__toString(), '/');
 					if (!isset($element[0]) || urldecode($elementSanitized) !== urldecode($webdavPath)) {
 						Assert::fail(
 							"$webdavPath is not in propfind answer but should be"
@@ -2584,7 +2584,7 @@ trait WebDav {
 		$baseUrl = $this->getBaseUrl();
 		$davPath = WebDavHelper::getDavPath($this->getDavPathVersion());
 		$user = $this->getActualUsername($user);
-		$password =  $this->getPasswordForUser($user);
+		$password = $this->getPasswordForUser($user);
 		$fullUrl = "$baseUrl/$davPath/$fileId";
 		$response = HttpRequestHelper::sendRequest(
 			$fullUrl,
@@ -4680,7 +4680,7 @@ trait WebDav {
 				//          "<entryName1>" => "<highlighted-content>"
 				//          "<entryName2>" => "<highlighted-content>"
 				//      ]
-				$actualHighlightString =  $item->xpath("d:propstat//oc:highlights");
+				$actualHighlightString = $item->xpath("d:propstat//oc:highlights");
 				$results[$resourcePath] = (string)$actualHighlightString[0];
 			} else {
 				// If list all the entries i.e. $entryNameToSearch=null,
@@ -4822,7 +4822,7 @@ trait WebDav {
 		$baseUrl = $this->getBaseUrl();
 		$davPath = WebDavHelper::getDavPath($this->getDavPathVersion());
 		$user = $this->getActualUsername($user);
-		$password =  $this->getPasswordForUser($user);
+		$password = $this->getPasswordForUser($user);
 		$fullUrl = "$baseUrl/$davPath/$fileId";
 		$response = HttpRequestHelper::sendRequest(
 			$fullUrl,

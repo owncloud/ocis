@@ -297,7 +297,7 @@ class WebDavHelper {
 		?string $propertyValue,
 		?string $namespaceString = null,
 		?int $davPathVersionToUse = self::DAV_VERSION_NEW,
-		?string $type="files",
+		?string $type = "files",
 		?string $spaceId = null,
 	): ResponseInterface {
 		if ($namespaceString !== null) {
@@ -377,14 +377,14 @@ class WebDavHelper {
 	 * @throws GuzzleException
 	 */
 	public static function proppatchWithMultipleProps(
-		?string  $baseUrl,
-		?string  $user,
+		?string $baseUrl,
+		?string $user,
 		?string $password,
-		string  $path,
+		string $path,
 		?array $propertiesArray,
-		?int  $davPathVersion = null,
-		?string  $namespaceString = null,
-		?string  $type="files"
+		?int $davPathVersion = null,
+		?string $namespaceString = null,
+		?string $type = "files"
 	): ResponseInterface {
 		$propertyBody = "";
 		foreach ($propertiesArray as $propertyArray) {

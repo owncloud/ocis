@@ -102,7 +102,7 @@ class TusClient extends Client {
 	 * @throws TusException | ConnectionException
 	 */
 	public function uploadRR(int $bytes = -1): ResponseInterface {
-		$bytes  = $bytes < 0 ? $this->getFileSize() : $bytes;
+		$bytes = $bytes < 0 ? $this->getFileSize() : $bytes;
 		$offset = $this->partialOffset < 0 ? 0 : $this->partialOffset;
 		try {
 			// Check if this upload exists with HEAD request.

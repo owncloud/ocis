@@ -116,7 +116,7 @@ class HttpRequestHelper {
 		?CookieJar $cookies = null,
 		bool $stream = false,
 		?int $timeout = 0,
-		?Client $client =  null
+		?Client $client = null
 	): ResponseInterface {
 		if ($client === null) {
 			$client = self::createClient(
@@ -215,7 +215,7 @@ class HttpRequestHelper {
 		?CookieJar $cookies = null,
 		bool $stream = false,
 		?int $timeout = 0,
-		?Client $client =  null,
+		?Client $client = null,
 		?bool $isGivenStep = false
 	): ResponseInterface {
 		if ((\getenv('DEBUG_ACCEPTANCE_RESPONSES') !== false) || (\getenv('DEBUG_ACCEPTANCE_API_CALLS') !== false)) {

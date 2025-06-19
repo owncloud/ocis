@@ -419,7 +419,7 @@ class WebDavLockingContext implements Context {
 	 * @return void
 	 */
 	public function publicHasLockedFileLastSharedFolder(
-		string    $file,
+		string $file,
 		TableNode $properties
 	) {
 		$token = ($this->featureContext->isUsingSharingNG())

@@ -979,7 +979,7 @@ class FeatureContext extends BehatVariablesContext {
 	 */
 	public function setResponse(
 		?ResponseInterface $response,
-		string             $username = ""
+		string $username = ""
 	): void {
 		$this->response = $response;
 		$this->responseUser = $username;
@@ -1661,7 +1661,7 @@ class FeatureContext extends BehatVariablesContext {
 	public function theHTTPStatusCodeShouldBeBetween(
 		$minStatusCode,
 		$maxStatusCode,
-		?ResponseInterface $response= null
+		?ResponseInterface $response = null
 	): void {
 		$response = $response ?? $this->response;
 		$statusCode = $response->getStatusCode();
@@ -2146,8 +2146,8 @@ class FeatureContext extends BehatVariablesContext {
 	public function substituteInLineCodes(
 		?string $value,
 		?string $user = null,
-		?array  $functions = [],
-		?array  $additionalSubstitutions = [],
+		?array $functions = [],
+		?array $additionalSubstitutions = [],
 		?string $group = null,
 		?string $userName = null
 	): ?string {
@@ -2483,7 +2483,7 @@ class FeatureContext extends BehatVariablesContext {
 				"function" => [
 					$this, "formatExpiryDateTime",
 				],
-				"parameter" =>  ['Y-m-d H:i:s'],
+				"parameter" => ['Y-m-d H:i:s'],
 			],
 		];
 		if ($user !== null) {

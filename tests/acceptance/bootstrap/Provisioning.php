@@ -394,7 +394,7 @@ trait Provisioning {
 	 * @throws Exception
 	 */
 	public function createLdapUser(array $setting): void {
-		$ou =  $this->ldapUsersOU ;
+		$ou = $this->ldapUsersOU;
 		// Some special characters need to be escaped in LDAP DN and attributes
 		// The special characters allowed in a username (UID) are +_.@-
 		// Of these, only + has to be escaped.
@@ -540,8 +540,8 @@ trait Provisioning {
 	 */
 	public function usersHaveBeenCreated(
 		TableNode $table,
-		bool $useDefault=true,
-		bool $initialize=true
+		bool $useDefault = true,
+		bool $initialize = true
 	) {
 		$this->verifyTableNodeColumns($table, ['username'], ['displayname', 'email', 'password']);
 		$table = $table->getColumnsHash();

@@ -1212,7 +1212,7 @@ class WebDavPropertiesContext implements Context {
 		string $user,
 		string $path,
 		?string $storePath = "",
-		?string  $spaceId = null
+		?string $spaceId = null
 	): SimpleXMLElement {
 		if ($storePath === "") {
 			$storePath = $path;

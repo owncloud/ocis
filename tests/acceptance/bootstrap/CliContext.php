@@ -656,8 +656,8 @@ class CliContext implements Context {
 	 */
 	public function thereShouldBeStaleUploadsOfSpaceOwnedByUser(
 		int $number,
-		string $spaceName='',
-		string $user=''
+		string $spaceName = '',
+		string $user = ''
 	): void {
 		$spaceOwnerId = null;
 		if ($spaceName !== '' && $user !== '') {
@@ -733,9 +733,9 @@ class CliContext implements Context {
 			)
 			) {
 				$items[] = [
-					'itemID'    => $matches[1],
-					'path'      => $matches[2],
-					'type'      => $matches[3],
+					'itemID' => $matches[1],
+					'path' => $matches[2],
+					'type' => $matches[3],
 					'delete at' => $matches[4],
 				];
 			}

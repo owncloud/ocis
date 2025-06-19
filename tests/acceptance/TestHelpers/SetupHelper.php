@@ -354,7 +354,7 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 	 */
 	public static function readFileFromServer(
 		?string $fileInCore,
-		?string $baseUrl  = null,
+		?string $baseUrl = null,
 		?string $adminUsername = null,
 		?string $adminPassword = null
 	): string {

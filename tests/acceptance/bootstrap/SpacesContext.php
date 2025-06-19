@@ -2781,7 +2781,7 @@ class SpacesContext implements Context {
 
 		$fullUrl = $this->featureContext->getBaseUrl() . $this->ocsApiUrl;
 
-		$response =  $this->sendPostRequestToUrl(
+		$response = $this->sendPostRequestToUrl(
 			$fullUrl,
 			$user,
 			$this->featureContext->getPasswordForUser($user),

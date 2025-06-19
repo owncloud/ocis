@@ -209,7 +209,7 @@ class ArchiverContext implements Context {
 		?string $owner = null,
 		?array $headers = null
 	): ResponseInterface {
-		$owner = $owner ??  $downloader;
+		$owner = $owner ?? $downloader;
 		$downloader = $this->featureContext->getActualUsername($downloader);
 		$queryString = $this->getArchiverQueryString($owner, $resource, $addressType);
 		if ($archiveType !== null) {
