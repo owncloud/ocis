@@ -79,7 +79,7 @@ class AuthAppContext implements Context {
 				$this->featureContext->getActualUsername($user),
 				$this->featureContext->getPasswordForUser($user),
 				["expiry" => $expiration],
-			)
+			),
 		);
 	}
 
@@ -96,12 +96,12 @@ class AuthAppContext implements Context {
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getActualUsername($user),
 			$this->featureContext->getPasswordForUser($user),
-			["expiry" => $expiration]
+			["expiry" => $expiration],
 		);
 		$this->featureContext->theHTTPStatusCodeShouldBe(200, "", $response);
 		$this->lastCreatedToken = [
 			"user" => strtolower($user),
-			"token" => json_decode($response->getBody()->getContents())->token
+			"token" => json_decode($response->getBody()->getContents())->token,
 		];
 	}
 
@@ -130,7 +130,7 @@ class AuthAppContext implements Context {
 				$this->featureContext->getBaseUrl(),
 				$this->featureContext->getActualUsername($user),
 				$this->featureContext->getPasswordForUser($user),
-			)
+			),
 		);
 	}
 
@@ -154,18 +154,18 @@ class AuthAppContext implements Context {
 			$this->featureContext->getPasswordForUser($user),
 			[
 				"expiry" => $expiration,
-				"userName" => $this->featureContext->getActualUsername($impersonatedUser)
+				"userName" => $this->featureContext->getActualUsername($impersonatedUser),
 			],
 		);
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			200,
 			"Failed creating auth-app token\n"
 			. "HTTP status code 200 is not the expected value " . $response->getStatusCode(),
-			$response
+			$response,
 		);
 		$this->lastCreatedToken = [
 			"user" => strtolower($impersonatedUser),
-			"token" => json_decode($response->getBody()->getContents())->token
+			"token" => json_decode($response->getBody()->getContents())->token,
 		];
 	}
 
@@ -190,9 +190,9 @@ class AuthAppContext implements Context {
 				$this->featureContext->getPasswordForUser($user),
 				[
 					"expiry" => $expiration,
-					"userName" => $this->featureContext->getActualUsername($impersonatedUser)
+					"userName" => $this->featureContext->getActualUsername($impersonatedUser),
 				],
-			)
+			),
 		);
 	}
 
@@ -210,7 +210,7 @@ class AuthAppContext implements Context {
 		$response = AuthAppHelper::listAllAppAuthTokensForUser(
 			$baseUrl,
 			$user,
-			$password
+			$password,
 		);
 		$authAppTokens = json_decode($response->getBody()->getContents());
 		foreach ($authAppTokens as $tokenObj) {
@@ -218,7 +218,7 @@ class AuthAppContext implements Context {
 				$baseUrl,
 				$user,
 				$password,
-				$tokenObj->token
+				$tokenObj->token,
 			);
 			$this->featureContext->setResponse($deleteResponse);
 			$this->featureContext->pushToLastHttpStatusCodesArray((string)$deleteResponse->getStatusCode());
@@ -243,7 +243,7 @@ class AuthAppContext implements Context {
 		Assert::assertCount(
 			$count,
 			$authAppTokens,
-			"Expected the count to be $count but got " . \count($authAppTokens)
+			"Expected the count to be $count but got " . \count($authAppTokens),
 		);
 	}
 
@@ -260,7 +260,7 @@ class AuthAppContext implements Context {
 	public function userCreatesAppTokenWithUserIdForUserWithExpirationTimeUsingTheAuthAppApi(
 		string $user,
 		string $impersonatedUser,
-		string $expiration
+		string $expiration,
 	): void {
 		$this->featureContext->setResponse(
 			AuthAppHelper::createAppAuthToken(
@@ -269,9 +269,9 @@ class AuthAppContext implements Context {
 				$this->featureContext->getPasswordForUser($user),
 				[
 					"expiry" => $expiration,
-					"userID" => $this->featureContext->getUserIdByUserName($impersonatedUser)
+					"userID" => $this->featureContext->getUserIdByUserName($impersonatedUser),
 				],
-			)
+			),
 		);
 	}
 	/**

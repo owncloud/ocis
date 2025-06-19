@@ -65,7 +65,7 @@ class SpacesTUSContext implements Context {
 		string $user,
 		string $source,
 		string $destination,
-		string $spaceName
+		string $spaceName,
 	): void {
 		$spaceId = $this->spacesContext->getSpaceIdByName($user, $spaceName);
 		$response = $this->tusContext->uploadFileUsingTus($user, $source, $destination, $spaceId);
@@ -73,7 +73,7 @@ class SpacesTUSContext implements Context {
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			["201", "204"],
 			"HTTP status code was not 201 or 204 while trying to upload file '$destination' for user '$user'",
-			$response
+			$response,
 		);
 	}
 
@@ -94,7 +94,7 @@ class SpacesTUSContext implements Context {
 		string $user,
 		string $source,
 		string $destination,
-		string $spaceName
+		string $spaceName,
 	): void {
 		$spaceId = $this->spacesContext->getSpaceIdByName($user, $spaceName);
 		try {
@@ -107,7 +107,7 @@ class SpacesTUSContext implements Context {
 			Assert::fail(
 				__METHOD__ .
 				" - Expected an exception, but the upload was successful. Status: " .
-				$response->getStatusCode()
+				$response->getStatusCode(),
 			);
 		} catch (ClientException $e) {
 			if (!\str_contains($e->getMessage(), "403 Forbidden")) {
@@ -132,7 +132,7 @@ class SpacesTUSContext implements Context {
 		string $user,
 		string $source,
 		string $destination,
-		string $spaceName
+		string $spaceName,
 	): void {
 		$spaceId = $this->spacesContext->getSpaceIdByName($user, $spaceName);
 		$response = $this->tusContext->uploadFileUsingTus($user, $source, $destination, $spaceId);
@@ -153,7 +153,7 @@ class SpacesTUSContext implements Context {
 	public function thePublicUploadsFileViaTusInsideLastSharedFolderWithPasswordUsingTheWebdavApi(
 		string $source,
 		string $destination,
-		string $password
+		string $password,
 	): void {
 		$response = $this->tusContext->publicUploadFileUsingTus($source, $destination, $password);
 		$this->featureContext->setLastUploadDeleteTime(\time());
@@ -175,7 +175,7 @@ class SpacesTUSContext implements Context {
 	public function userHasCreatedANewTusResourceForTheSpaceUsingTheWebdavApiWithTheseHeaders(
 		string $user,
 		string $spaceName,
-		TableNode $headers
+		TableNode $headers,
 	): void {
 		$spaceId = $this->spacesContext->getSpaceIdByName($user, $spaceName);
 		$response = $this->tusContext->createNewTUSResourceWithHeaders($user, $headers, '', $spaceId);
@@ -199,7 +199,7 @@ class SpacesTUSContext implements Context {
 		string $user,
 		string $spaceName,
 		string $content,
-		TableNode $headers
+		TableNode $headers,
 	): void {
 		$spaceId = $this->spacesContext->getSpaceIdByName($user, $spaceName);
 		$response = $this->tusContext->createNewTUSResourceWithHeaders($user, $headers, $content, $spaceId);
@@ -221,7 +221,7 @@ class SpacesTUSContext implements Context {
 		string $user,
 		string $content,
 		string $resource,
-		string $spaceName
+		string $spaceName,
 	): ResponseInterface {
 		$spaceId = $this->spacesContext->getSpaceIdByName($user, $spaceName);
 		$tmpFile = $this->tusContext->writeDataToTempFile($content);
@@ -229,7 +229,7 @@ class SpacesTUSContext implements Context {
 			$user,
 			\basename($tmpFile),
 			$resource,
-			$spaceId
+			$spaceId,
 		);
 		$this->featureContext->setLastUploadDeleteTime(\time());
 		\unlink($tmpFile);
@@ -251,7 +251,7 @@ class SpacesTUSContext implements Context {
 		string $user,
 		string $content,
 		string $file,
-		string $destination
+		string $destination,
 	): void {
 		$remoteItemId = $this->spacesContext->getSharesRemoteItemId($user, $destination);
 		$remoteItemId = \rawurlencode($remoteItemId);
@@ -260,7 +260,7 @@ class SpacesTUSContext implements Context {
 			$user,
 			\basename($tmpFile),
 			$file,
-			$remoteItemId
+			$remoteItemId,
 		);
 		$this->featureContext->setLastUploadDeleteTime(\time());
 		\unlink($tmpFile);
@@ -282,7 +282,7 @@ class SpacesTUSContext implements Context {
 		string $user,
 		string $content,
 		string $resource,
-		string $spaceName
+		string $spaceName,
 	): void {
 		$isSpacesDavPathVersion = $this->featureContext->getDavPathVersion() === WebDavHelper::DAV_VERSION_SPACES;
 		$resource = \ltrim($resource, "/");
@@ -309,13 +309,13 @@ class SpacesTUSContext implements Context {
 		string $user,
 		string $content,
 		string $resource,
-		string $spaceName
+		string $spaceName,
 	): void {
 		$response = $this->uploadFileViaTus($user, $content, $resource, $spaceName);
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			["201", "204"],
 			"HTTP status code was not 201 or 204 while trying to upload file '$resource' for user '$user'",
-			$response
+			$response,
 		);
 	}
 
@@ -338,7 +338,7 @@ class SpacesTUSContext implements Context {
 		string $source,
 		string $destination,
 		string $mtime,
-		string $spaceName
+		string $spaceName,
 	): void {
 		switch ($mtime) {
 			case "today":
@@ -354,7 +354,7 @@ class SpacesTUSContext implements Context {
 				$mtime = date('Y-m-d', strtotime('first day of previous month'));
 				break;
 			case "lastYear":
-				$mtime = date('Y-m' . '-01', strtotime('-1 year'));
+				$mtime = date('Y-m-01', strtotime('-1 year'));
 				break;
 			default:
 		}
@@ -367,7 +367,7 @@ class SpacesTUSContext implements Context {
 			$source,
 			$destination,
 			$spaceId,
-			['mtime' => $mtime]
+			['mtime' => $mtime],
 		);
 		$this->featureContext->setLastUploadDeleteTime(\time());
 		$this->featureContext->setResponse($response);
@@ -392,7 +392,7 @@ class SpacesTUSContext implements Context {
 		string $checksum,
 		string $offset,
 		string $content,
-		string $spaceName
+		string $spaceName,
 	): void {
 		$resourceLocation = $this->tusContext->getLastTusResourceLocation();
 		$response = $this->tusContext->uploadChunkToTUSLocation($user, $resourceLocation, $offset, $content, $checksum);
@@ -418,7 +418,7 @@ class SpacesTUSContext implements Context {
 		string $checksum,
 		string $offset,
 		string $content,
-		string $spaceName
+		string $spaceName,
 	): void {
 		$resourceLocation = $this->tusContext->getLastTusResourceLocation();
 		$response = $this->tusContext->uploadChunkToTUSLocation($user, $resourceLocation, $offset, $content, $checksum);
@@ -444,7 +444,7 @@ class SpacesTUSContext implements Context {
 		string $offset,
 		string $data,
 		string $checksum,
-		string $spaceName
+		string $spaceName,
 	): void {
 		$resourceLocation = $this->tusContext->getLastTusResourceLocation();
 		$response = $this->tusContext->uploadChunkToTUSLocation($user, $resourceLocation, $offset, $data, $checksum);
@@ -464,7 +464,7 @@ class SpacesTUSContext implements Context {
 	public function userSendsAChunkToTheLastCreatedTusLocationWithDataInsideOfTheSpaceWithHeaders(
 		string $user,
 		string $data,
-		TableNode $headers
+		TableNode $headers,
 	): void {
 		$rows = $headers->getRowsHash();
 		$resourceLocation = $this->tusContext->getLastTusResourceLocation();
@@ -474,7 +474,7 @@ class SpacesTUSContext implements Context {
 			$rows['Upload-Offset'],
 			$data,
 			$rows['Upload-Checksum'],
-			['Origin' => $rows['Origin']]
+			['Origin' => $rows['Origin']],
 		);
 		$this->featureContext->setResponse($response);
 	}
@@ -500,7 +500,7 @@ class SpacesTUSContext implements Context {
 		string $data,
 		string $checksum,
 		string $spaceName,
-		TableNode $headers
+		TableNode $headers,
 	): void {
 		$spaceId = $this->spacesContext->getSpaceIdByName($user, $spaceName);
 		$createResponse = $this->tusContext->createNewTUSResource($user, $headers, $spaceId);
@@ -525,7 +525,7 @@ class SpacesTUSContext implements Context {
 		string $user,
 		string $resource,
 		string $spaceName,
-		string $mtime
+		string $mtime,
 	): void {
 		$spaceId = $this->spacesContext->getSpaceIdByName($user, $spaceName);
 		$mtime = new DateTime($mtime);
@@ -538,7 +538,7 @@ class SpacesTUSContext implements Context {
 				$resource,
 				$this->featureContext->getDavPathVersion(),
 				$spaceId,
-			)
+			),
 		);
 	}
 }

@@ -56,7 +56,7 @@ class PublicWebDavContext implements Context {
 		return $this->downloadFileFromPublicFolder(
 			$path,
 			$password,
-			$range
+			$range,
 		);
 	}
 
@@ -94,7 +94,7 @@ class PublicWebDavContext implements Context {
 	 */
 	public function userTriesToDownloadFileFromPublicLinkUsingBasicAuthAndPublicWebdav(
 		string $user,
-		string $path
+		string $path,
 	): void {
 		$response = $this->downloadFromPublicLinkAsUser($path, $user);
 		$this->featureContext->setResponse($response);
@@ -108,10 +108,10 @@ class PublicWebDavContext implements Context {
 	 * @return void
 	 */
 	public function thePublicDeletesFileFolderFromTheLastPublicLinkShareUsingThePublicWebdavApi(
-		string $fileName
+		string $fileName,
 	): void {
 		$response = $this->deleteFileFromPublicShare(
-			$fileName
+			$fileName,
 		);
 		$this->featureContext->setResponse($response);
 		$this->featureContext->pushToLastStatusCodesArrays();
@@ -130,22 +130,22 @@ class PublicWebDavContext implements Context {
 		$davPath = WebDavHelper::getDavPath(
 			WebDavHelper::DAV_VERSION_NEW,
 			$token,
-			"public-files"
+			"public-files",
 		);
 		$password = $this->featureContext->getActualPassword($password);
 		$fullUrl = $this->featureContext->getBaseUrl() . "/$davPath/$fileName";
 		$userName = $this->getUsernameForPublicWebdavApi(
 			$token,
-			$password
+			$password,
 		);
 		$headers = [
-			'X-Requested-With' => 'XMLHttpRequest'
+			'X-Requested-With' => 'XMLHttpRequest',
 		];
 		return HttpRequestHelper::delete(
 			$fullUrl,
 			$userName,
 			$password,
-			$headers
+			$headers,
 		);
 	}
 
@@ -159,7 +159,7 @@ class PublicWebDavContext implements Context {
 	 */
 	public function thePublicHasDeletedFileFromTheLastLinkShareWithPasswordUsingPublicWebdavApi(
 		string $file,
-		string $password
+		string $password,
 	): void {
 		$response = $this->deleteFileFromPublicShare($file, $password);
 		$this->featureContext->theHTTPStatusCodeShouldBe([201, 204], "", $response);
@@ -175,10 +175,10 @@ class PublicWebDavContext implements Context {
 	 */
 	public function thePublicDeletesFileFromTheLastLinkShareWithPasswordUsingPublicWebdavApi(
 		string $file,
-		string $password
+		string $password,
 	): void {
 		$this->featureContext->setResponse(
-			$this->deleteFileFromPublicShare($file, $password)
+			$this->deleteFileFromPublicShare($file, $password),
 		);
 		$this->featureContext->pushToLastStatusCodesArrays();
 	}
@@ -193,7 +193,7 @@ class PublicWebDavContext implements Context {
 	public function renameFileFromPublicShare(
 		string $fileName,
 		string $toFileName,
-		?string $password = ""
+		?string $password = "",
 	): ResponseInterface {
 		$token = ($this->featureContext->isUsingSharingNG())
 		? $this->featureContext->shareNgGetLastCreatedLinkShareToken()
@@ -201,25 +201,25 @@ class PublicWebDavContext implements Context {
 		$davPath = WebDavHelper::getDavPath(
 			WebDavHelper::DAV_VERSION_NEW,
 			$token,
-			"public-files"
+			"public-files",
 		);
 		$fullUrl = $this->featureContext->getBaseUrl() . "/$davPath/$fileName";
 		$password = $this->featureContext->getActualPassword($password);
 		$destination = $this->featureContext->getBaseUrl() . "/$davPath/$toFileName";
 		$userName = $this->getUsernameForPublicWebdavApi(
 			$token,
-			$password
+			$password,
 		);
 		$headers = [
 			'X-Requested-With' => 'XMLHttpRequest',
-			'Destination' => $destination
+			'Destination' => $destination,
 		];
 		return HttpRequestHelper::sendRequest(
 			$fullUrl,
 			"MOVE",
 			$userName,
 			$password,
-			$headers
+			$headers,
 		);
 	}
 
@@ -235,10 +235,10 @@ class PublicWebDavContext implements Context {
 	public function thePublicRenamesFileFromTheLastPublicShareUsingThePasswordPasswordAndOldPublicWebdavApi(
 		string $fileName,
 		string $toName,
-		string $password
+		string $password,
 	): void {
 		$this->featureContext->setResponse(
-			$this->renameFileFromPublicShare($fileName, $toName, $password)
+			$this->renameFileFromPublicShare($fileName, $toName, $password),
 		);
 		$this->featureContext->pushToLastStatusCodesArrays();
 	}
@@ -254,13 +254,13 @@ class PublicWebDavContext implements Context {
 	 */
 	public function publicDownloadsFileFromInsideLastPublicSharedFolderWithPassword(
 		string $path,
-		string $password = ""
+		string $password = "",
 	): void {
 		$response = $this->downloadFileFromPublicFolder(
 			$path,
 			$password,
 			"",
-			$this->featureContext->isUsingSharingNG()
+			$this->featureContext->isUsingSharingNG(),
 		);
 		$this->featureContext->setResponse($response);
 	}
@@ -280,7 +280,7 @@ class PublicWebDavContext implements Context {
 		$davPath = WebDavHelper::getDavPath(
 			$this->featureContext->getDavPathVersion(),
 			$token,
-			"public-files"
+			"public-files",
 		);
 
 		$username = $this->featureContext->getActualUsername($user);
@@ -290,7 +290,7 @@ class PublicWebDavContext implements Context {
 		return HttpRequestHelper::get(
 			$fullUrl,
 			$username,
-			$password
+			$password,
 		);
 	}
 	/**
@@ -305,7 +305,7 @@ class PublicWebDavContext implements Context {
 		string $path,
 		string $password,
 		string $range,
-		bool $shareNg = false
+		bool $shareNg = false,
 	): ResponseInterface {
 		$path = \ltrim($path, "/");
 		$password = $this->featureContext->getActualPassword($password);
@@ -317,16 +317,16 @@ class PublicWebDavContext implements Context {
 		$davPath = WebDavHelper::getDavPath(
 			WebDavHelper::DAV_VERSION_NEW,
 			$token,
-			"public-files"
+			"public-files",
 		);
 		$fullUrl = $this->featureContext->getBaseUrl() . "/$davPath/$path";
 		$userName = $this->getUsernameForPublicWebdavApi(
 			$token,
-			$password
+			$password,
 		);
 
 		$headers = [
-			'X-Requested-With' => 'XMLHttpRequest'
+			'X-Requested-With' => 'XMLHttpRequest',
 		];
 		if ($range !== "") {
 			$headers['Range'] = $range;
@@ -335,7 +335,7 @@ class PublicWebDavContext implements Context {
 			$fullUrl,
 			$userName,
 			$password,
-			$headers
+			$headers,
 		);
 	}
 
@@ -348,7 +348,7 @@ class PublicWebDavContext implements Context {
 		return $this->publicUploadContent(
 			\basename($source),
 			'',
-			\file_get_contents($source)
+			\file_get_contents($source),
 		);
 	}
 
@@ -367,11 +367,11 @@ class PublicWebDavContext implements Context {
 	public function publiclyCopyingFile(
 		string $baseUrl,
 		string $source,
-		string $destination
+		string $destination,
 	): ResponseInterface {
 		$fullSourceUrl = "$baseUrl/$source";
 		$fullDestUrl = WebDavHelper::sanitizeUrl(
-			"$baseUrl/$destination"
+			"$baseUrl/$destination",
 		);
 
 		$headers["Destination"] = $fullDestUrl;
@@ -380,7 +380,7 @@ class PublicWebDavContext implements Context {
 			"COPY",
 			null,
 			null,
-			$headers
+			$headers,
 		);
 	}
 
@@ -399,14 +399,14 @@ class PublicWebDavContext implements Context {
 		$davPath = WebDavHelper::getDavPath(
 			WebDavHelper::DAV_VERSION_NEW,
 			$token,
-			"public-files"
+			"public-files",
 		);
 		$baseUrl = $this->featureContext->getLocalBaseUrl() . '/' . $davPath;
 
 		$response = $this->publiclyCopyingFile(
 			$baseUrl,
 			$source,
-			$destination
+			$destination,
 		);
 		$this->featureContext->setResponse($response);
 	}
@@ -447,7 +447,7 @@ class PublicWebDavContext implements Context {
 	 */
 	public function thePublicHasUploadedFileWithContentWithAutoRenameMode(
 		string $filename,
-		string $body = 'test'
+		string $body = 'test',
 	): void {
 		$response = $this->publiclyUploadingContentAutoRename($filename, $body);
 		$this->featureContext->theHTTPStatusCodeShouldBe([201, 204], "", $response);
@@ -486,7 +486,7 @@ class PublicWebDavContext implements Context {
 	public function thePublicHasUploadedFileWithContentAndPasswordToLastLinkShareUsingPublicWebdavApi(
 		string $filename,
 		string $content = 'test',
-		string $password = ''
+		string $password = '',
 	): void {
 		$response = $this->publiclyUploadingContentWithPassword(
 			$filename,
@@ -513,7 +513,7 @@ class PublicWebDavContext implements Context {
 		$response = $this->publiclyUploadingContentWithPassword(
 			$filename,
 			$password,
-			$body
+			$body,
 		);
 		$this->featureContext->setResponse($response);
 	}
@@ -541,7 +541,7 @@ class PublicWebDavContext implements Context {
 	 */
 	public function thePublicUploadsFileWithContentUsingThePublicWebDavApi(
 		string $filename,
-		string $body = 'test'
+		string $body = 'test',
 	): void {
 		$response = $this->publicUploadContent($filename, '', $body);
 		$this->featureContext->setResponse($response);
@@ -572,11 +572,11 @@ class PublicWebDavContext implements Context {
 	 */
 	public function checkLastPublicSharedFileWithPasswordDownload(
 		string $password,
-		string $expectedContent
+		string $expectedContent,
 	): void {
 		$response = $this->downloadPublicFileWithRange(
 			"",
-			$password
+			$password,
 		);
 
 		$this->featureContext->theHTTPStatusCodeShouldBe(200, "", $response);
@@ -584,7 +584,7 @@ class PublicWebDavContext implements Context {
 		$this->featureContext->checkDownloadedContentMatches(
 			$expectedContent,
 			"Checking the content of the last public shared file after downloading with the public WebDAV API",
-			$response
+			$response,
 		);
 	}
 
@@ -599,13 +599,13 @@ class PublicWebDavContext implements Context {
 	 */
 	public function shouldNotBeAbleToDownloadFileInsidePublicSharedFolder(
 		string $path,
-		string $expectedHttpCode = "401"
+		string $expectedHttpCode = "401",
 	): void {
 		$response = $this->downloadFileFromPublicFolder(
 			$path,
 			"",
 			"",
-			$this->featureContext->isUsingSharingNG()
+			$this->featureContext->isUsingSharingNG(),
 		);
 		$this->featureContext->theHTTPStatusCodeShouldBe($expectedHttpCode, "", $response);
 	}
@@ -620,13 +620,13 @@ class PublicWebDavContext implements Context {
 	 */
 	public function shouldBeAbleToDownloadFileInsidePublicSharedFolderWithPassword(
 		string $path,
-		string $password
+		string $password,
 	): void {
 		$response = $this->downloadFileFromPublicFolder(
 			$path,
 			$password,
 			"",
-			$this->featureContext->isUsingSharingNG()
+			$this->featureContext->isUsingSharingNG(),
 		);
 		$this->featureContext->theHTTPStatusCodeShouldBe(200, "", $response);
 	}
@@ -644,7 +644,7 @@ class PublicWebDavContext implements Context {
 	public function shouldBeAbleToDownloadFileInsidePublicSharedFolderWithPasswordAndContentShouldBe(
 		string $path,
 		string $password,
-		string $content
+		string $content,
 	): void {
 		$response = $this->downloadFileFromPublicFolder(
 			$path,
@@ -669,13 +669,13 @@ class PublicWebDavContext implements Context {
 	public function shouldBeAbleToDownloadFileInsidePublicSharedFolderWithPasswordForSharingNGAndContentShouldBe(
 		string $path,
 		string $password,
-		string $content
+		string $content,
 	): void {
 		$response = $this->downloadFileFromPublicFolder(
 			$path,
 			$password,
 			"",
-			true
+			true,
 		);
 
 		$this->featureContext->theHTTPStatusCodeShouldBe(200, "", $response);
@@ -695,13 +695,13 @@ class PublicWebDavContext implements Context {
 	public function shouldNotBeAbleToDownloadFileInsidePublicSharedFolderWithPassword(
 		string $path,
 		string $password,
-		string $expectedHttpCode = "401"
+		string $expectedHttpCode = "401",
 	): void {
 		$response = $this->downloadFileFromPublicFolder(
 			$path,
 			$password,
 			"",
-			$this->featureContext->isUsingSharingNG()
+			$this->featureContext->isUsingSharingNG(),
 		);
 		$this->featureContext->theHTTPStatusCodeShouldBe($expectedHttpCode, "", $response);
 	}
@@ -718,14 +718,14 @@ class PublicWebDavContext implements Context {
 	public function shouldNotBeAbleToDownloadFileWithPasswordForShareNg(
 		string $path,
 		string $password,
-		string $expectedHttpCode = "401"
+		string $expectedHttpCode = "401",
 	): void {
 		$this->tryingToDownloadUsingWebDAVAPI(
 			$path,
 			"new",
 			$password,
 			$expectedHttpCode,
-			true
+			true,
 		);
 	}
 
@@ -743,13 +743,13 @@ class PublicWebDavContext implements Context {
 		string $password,
 		string $range = "",
 		string $expectedHttpCode = "401",
-		bool $shareNg = false
+		bool $shareNg = false,
 	): void {
 		$response = $this->downloadFileFromPublicFolder(
 			$path,
 			$password,
 			$range,
-			$shareNg
+			$shareNg,
 		);
 		$this->featureContext->theHTTPStatusCodeShouldBe($expectedHttpCode, "", $response);
 	}
@@ -765,13 +765,13 @@ class PublicWebDavContext implements Context {
 	 */
 	public function publiclyUploadingShouldToSharedFileShouldFail(
 		string $password,
-		string $expectedHttpCode
+		string $expectedHttpCode,
 	): void {
 		$filename = (string)$this->featureContext->getLastCreatedPublicShare()->file_target;
 
 		$response = $this->publicUploadContent(
 			$filename,
-			$password
+			$password,
 		);
 
 		$this->featureContext->theHTTPStatusCodeShouldBe($expectedHttpCode, "", $response);
@@ -787,16 +787,16 @@ class PublicWebDavContext implements Context {
 	 */
 	public function publiclyUploadingWithPasswordShouldNotWork(
 		string $password,
-		string $expectedHttpCode = null
+		string $expectedHttpCode = null,
 	): void {
 		$response = $this->publicUploadContent(
 			'whateverfilefortesting.txt',
-			$password
+			$password,
 		);
 		Assert::assertGreaterThanOrEqual(
 			$expectedHttpCode,
 			$response->getStatusCode(),
-			"upload should have failed but passed with code " . $response->getStatusCode()
+			"upload should have failed but passed with code " . $response->getStatusCode(),
 		);
 	}
 
@@ -810,11 +810,11 @@ class PublicWebDavContext implements Context {
 	 */
 	public function publiclyUploadingIntoFolderWithPasswordShouldWork(
 		string $filename,
-		string $password
+		string $password,
 	): void {
 		$response = $this->publicUploadContent(
 			$filename,
-			$password
+			$password,
 		);
 
 		$this->featureContext->theHTTPStatusCodeShouldBe([201, 204], "", $response);
@@ -841,12 +841,12 @@ class PublicWebDavContext implements Context {
 		Assert::assertTrue(
 			($response->getStatusCode() === 201),
 			"upload should have passed but failed with code " .
-			$response->getStatusCode()
+			$response->getStatusCode(),
 		);
 		$response = $this->downloadFileFromPublicFolder(
 			$path,
 			$password,
-			""
+			"",
 		);
 		$this->featureContext->theHTTPStatusCodeShouldBe(200, "", $response);
 		$this->featureContext->checkDownloadedContentMatches($content, "", $response);
@@ -872,31 +872,31 @@ class PublicWebDavContext implements Context {
 		$response = $this->publicUploadContent(
 			$path,
 			$password,
-			$content
+			$content,
 		);
 		if ($should) {
 			Assert::assertTrue(
 				($response->getStatusCode() == 204),
 				"upload should have passed but failed with code " .
-				$response->getStatusCode()
+				$response->getStatusCode(),
 			);
 
 			$response = $this->downloadPublicFileWithRange(
 				"",
-				$password
+				$password,
 			);
 
 			$this->featureContext->checkDownloadedContentMatches(
 				$content,
 				"Checking the content of the last public shared file after downloading with the public WebDAV API",
-				$response
+				$response,
 			);
 		} else {
 			$expectedCode = 403;
 			Assert::assertTrue(
 				($response->getStatusCode() == $expectedCode),
 				"upload should have failed with HTTP status $expectedCode but passed with code " .
-				$response->getStatusCode()
+				$response->getStatusCode(),
 			);
 		}
 	}
@@ -914,12 +914,12 @@ class PublicWebDavContext implements Context {
 		string $destination,
 	): void {
 		$content = \file_get_contents(
-			$this->featureContext->acceptanceTestsDirLocation() . $source
+			$this->featureContext->acceptanceTestsDirLocation() . $source,
 		);
 		$response = $this->publicUploadContent(
 			$destination,
 			'',
-			$content
+			$content,
 		);
 		$this->featureContext->setResponse($response);
 	}
@@ -937,15 +937,15 @@ class PublicWebDavContext implements Context {
 	public function thePublicUploadsFileToInsideLastLinkSharedFolderWithPasswordUsingThePublicWebdavApi(
 		string $source,
 		string $destination,
-		string $password
+		string $password,
 	): void {
 		$content = \file_get_contents(
-			$this->featureContext->acceptanceTestsDirLocation() . $source
+			$this->featureContext->acceptanceTestsDirLocation() . $source,
 		);
 		$response = $this->publicUploadContent(
 			$destination,
 			$password,
-			$content
+			$content,
 		);
 		$this->featureContext->setResponse($response);
 	}
@@ -963,7 +963,7 @@ class PublicWebDavContext implements Context {
 	public function thePublicUploadsFileToLastSharedFolderWithMtimeUsingTheWebdavApi(
 		string $fileName,
 		string $password,
-		string $mtime
+		string $mtime,
 	): void {
 		$mtime = new DateTime($mtime);
 		$mtime = $mtime->format('U');
@@ -973,7 +973,7 @@ class PublicWebDavContext implements Context {
 			$password,
 			'test',
 			false,
-			["X-OC-Mtime" => $mtime]
+			["X-OC-Mtime" => $mtime],
 		);
 		$this->featureContext->setResponse($response);
 	}
@@ -986,7 +986,7 @@ class PublicWebDavContext implements Context {
 	 */
 	public function publicCreatesFolderUsingPassword(
 		string $destination,
-		string $password
+		string $password,
 	): ResponseInterface {
 		$token = ($this->featureContext->isUsingSharingNG())
 		? $this->featureContext->shareNgGetLastCreatedLinkShareToken()
@@ -994,17 +994,17 @@ class PublicWebDavContext implements Context {
 		$davPath = WebDavHelper::getDavPath(
 			$this->featureContext->getDavPathVersion(),
 			$token,
-			"public-files"
+			"public-files",
 		);
 		$url = $this->featureContext->getBaseUrl() . "/$davPath/";
 		$password = $this->featureContext->getActualPassword($password);
 		$userName = $this->getUsernameForPublicWebdavApi(
 			$token,
-			$password
+			$password,
 		);
 		$foldername = \implode(
 			'/',
-			\array_map('rawurlencode', \explode('/', $destination))
+			\array_map('rawurlencode', \explode('/', $destination)),
 		);
 		$url .= \ltrim($foldername, '/');
 
@@ -1012,7 +1012,7 @@ class PublicWebDavContext implements Context {
 			$url,
 			'MKCOL',
 			$userName,
-			$password
+			$password,
 		);
 	}
 
@@ -1037,7 +1037,7 @@ class PublicWebDavContext implements Context {
 	 */
 	public function publicShouldBeAbleToCreateFolderWithPassword(
 		string $foldername,
-		string $password
+		string $password,
 	): void {
 		$response = $this->publicCreatesFolderUsingPassword($foldername, $password);
 		$this->featureContext->theHTTPStatusCodeShouldBe(201, "", $response);
@@ -1055,14 +1055,14 @@ class PublicWebDavContext implements Context {
 	public function publicCreationOfFolderWithPasswordShouldFail(
 		string $foldername,
 		string $password,
-		string $expectedHttpCode
+		string $expectedHttpCode,
 	): void {
 		$response = $this->publicCreatesFolderUsingPassword($foldername, $password);
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			$expectedHttpCode,
 			"creation of $foldername in the last publicly shared folder should have failed with code " .
 			$expectedHttpCode,
-			$response
+			$response,
 		);
 	}
 
@@ -1077,7 +1077,7 @@ class PublicWebDavContext implements Context {
 	 */
 	public function theMtimeOfFileInTheLastSharedPublicLinkUsingTheWebdavApiShouldBe(
 		string $fileName,
-		string $mtime
+		string $mtime,
 	): void {
 		$token = ($this->featureContext->isUsingSharingNG())
 		? $this->featureContext->shareNgGetLastCreatedLinkShareToken()
@@ -1092,7 +1092,7 @@ class PublicWebDavContext implements Context {
 				$baseUrl,
 				$fileName,
 				$token,
-			)
+			),
 		);
 	}
 
@@ -1107,7 +1107,7 @@ class PublicWebDavContext implements Context {
 	 */
 	public function theMtimeOfFileInTheLastSharedPublicLinkUsingTheWebdavApiShouldNotBe(
 		string $fileName,
-		string $mtime
+		string $mtime,
 	): void {
 		$token = $this->featureContext->getLastCreatedPublicShareToken();
 		$baseUrl = $this->featureContext->getBaseUrl();
@@ -1117,7 +1117,7 @@ class PublicWebDavContext implements Context {
 				$baseUrl,
 				$fileName,
 				$token,
-			)
+			),
 		);
 	}
 
@@ -1148,16 +1148,16 @@ class PublicWebDavContext implements Context {
 		$davPath = WebDavHelper::getDavPath(
 			WebDavHelper::DAV_VERSION_NEW,
 			$token,
-			"public-files"
+			"public-files",
 		);
 		$userName = $this->getUsernameForPublicWebdavApi(
 			$token,
-			$password
+			$password,
 		);
 
 		$filename = \implode(
 			'/',
-			\array_map('rawurlencode', \explode('/', $filename))
+			\array_map('rawurlencode', \explode('/', $filename)),
 		);
 		$encodedFilePath = \ltrim($filename, '/');
 		$url = $this->featureContext->getBaseUrl() . "/$davPath/$encodedFilePath";
@@ -1176,7 +1176,7 @@ class PublicWebDavContext implements Context {
 			$userName,
 			$password,
 			$headers,
-			$body
+			$body,
 		);
 	}
 
@@ -1188,7 +1188,7 @@ class PublicWebDavContext implements Context {
 	 */
 	private function getUsernameForPublicWebdavApi(
 		string $token,
-		string $password
+		string $password,
 	): ?string {
 		if ($password !== '') {
 			$userName = 'public';
@@ -1243,12 +1243,12 @@ class PublicWebDavContext implements Context {
 		$davPath = WebDavHelper::getDavPath(
 			WebDavHelper::DAV_VERSION_NEW,
 			$token,
-			"public-files"
+			"public-files",
 		);
 		$password = $this->featureContext->getActualPassword($password);
 		$username = $this->getUsernameForPublicWebdavApi(
 			$token,
-			$password
+			$password,
 		);
 		$fullUrl = $this->featureContext->getBaseUrl() . "/$davPath";
 		$response = HttpRequestHelper::sendRequest(
@@ -1257,7 +1257,7 @@ class PublicWebDavContext implements Context {
 			$username,
 			$password,
 			null,
-			$body
+			$body,
 		);
 		$this->featureContext->setResponse($response);
 	}

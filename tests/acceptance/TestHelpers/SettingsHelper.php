@@ -50,7 +50,7 @@ class SettingsHelper {
 		'Removed As Space Member' => '26c20e0e-98df-4483-8a77-759b3a766af0',
 		'Space Deleted' => '094ceca9-5a00-40ba-bb1a-bbc7bccd39ee',
 		'Space Disabled' => 'eb5c716e-03be-42c6-9ed1-1105d24e109f',
-		'Space Membership Expired' => '7275921e-b737-4074-ba91-3c2983be3edd'
+		'Space Membership Expired' => '7275921e-b737-4074-ba91-3c2983be3edd',
 	];
 
 	/**
@@ -94,7 +94,7 @@ class SettingsHelper {
 		string $baseUrl,
 		string $user,
 		string $password,
-		array $headers = []
+		array $headers = [],
 	): ResponseInterface {
 		$fullUrl = self::buildFullUrl($baseUrl, "bundles-list");
 		return HttpRequestHelper::post(
@@ -102,7 +102,7 @@ class SettingsHelper {
 			$user,
 			$password,
 			$headers,
-			"{}"
+			"{}",
 		);
 	}
 
@@ -150,7 +150,7 @@ class SettingsHelper {
 		string $baseUrl,
 		string $user,
 		string $password,
-		array $headers = []
+		array $headers = [],
 	): ResponseInterface {
 		$fullUrl = self::buildFullUrl($baseUrl, "roles-list");
 		return HttpRequestHelper::post(
@@ -158,7 +158,7 @@ class SettingsHelper {
 			$user,
 			$password,
 			$headers,
-			"{}"
+			"{}",
 		);
 	}
 
@@ -181,7 +181,7 @@ class SettingsHelper {
 		string $password,
 		string $assigneeId,
 		string $roleId,
-		array $headers = []
+		array $headers = [],
 	): ResponseInterface {
 		$fullUrl = self::buildFullUrl($baseUrl, "assignments-add");
 		$body = json_encode(["account_uuid" => $assigneeId, "role_id" => $roleId], JSON_THROW_ON_ERROR);
@@ -190,7 +190,7 @@ class SettingsHelper {
 			$user,
 			$password,
 			$headers,
-			$body
+			$body,
 		);
 	}
 
@@ -211,7 +211,7 @@ class SettingsHelper {
 		string $user,
 		string $password,
 		string $userId,
-		array $headers = []
+		array $headers = [],
 	): ResponseInterface {
 		$fullUrl = self::buildFullUrl($baseUrl, "assignments-list");
 		$body = json_encode(["account_uuid" => $userId], JSON_THROW_ON_ERROR);
@@ -220,7 +220,7 @@ class SettingsHelper {
 			$user,
 			$password,
 			$headers,
-			$body
+			$body,
 		);
 	}
 
@@ -239,7 +239,7 @@ class SettingsHelper {
 		string $baseUrl,
 		string $user,
 		string $password,
-		array $headers = []
+		array $headers = [],
 	): ResponseInterface {
 		$fullUrl = self::buildFullUrl($baseUrl, "values-list");
 		$body = json_encode(["account_uuid" => "me"], JSON_THROW_ON_ERROR);
@@ -248,7 +248,7 @@ class SettingsHelper {
 			$user,
 			$password,
 			$headers,
-			$body
+			$body,
 		);
 	}
 
@@ -338,7 +338,7 @@ class SettingsHelper {
 		string $user,
 		string $password,
 		string $body,
-		array $headers = []
+		array $headers = [],
 	): ResponseInterface {
 		$fullUrl = self::buildFullUrl($baseUrl, "values-save");
 		return HttpRequestHelper::post(
@@ -346,7 +346,7 @@ class SettingsHelper {
 			$user,
 			$password,
 			$headers,
-			$body
+			$body,
 		);
 	}
 
@@ -370,17 +370,17 @@ class SettingsHelper {
 		$fullUrl = self::buildFullUrl($baseUrl, "values-get-by-unique-identifiers");
 		$body = json_encode(
 			[
-			"accountUuid" => "me",
-			"settingId" => $settingId
+				"accountUuid" => "me",
+				"settingId" => $settingId,
 			],
-			JSON_THROW_ON_ERROR
+			JSON_THROW_ON_ERROR,
 		);
 		return HttpRequestHelper::post(
 			$fullUrl,
 			$user,
 			$password,
 			[],
-			$body
+			$body,
 		);
 	}
 }

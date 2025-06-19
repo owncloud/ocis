@@ -26,8 +26,6 @@ use Behat\Gherkin\Node\TableNode;
 use GuzzleHttp\Exception\GuzzleException;
 use TusPhp\Exception\ConnectionException;
 use TusPhp\Exception\TusException;
-use TusPhp\Tus\Client;
-use PHPUnit\Framework\Assert;
 use Psr\Http\Message\ResponseInterface;
 use TestHelpers\HttpRequestHelper;
 use TestHelpers\WebDavHelper;
@@ -102,7 +100,7 @@ class TUSContext implements Context {
 		string $user,
 		TableNode $headersTable,
 		string $content = '',
-		?string $spaceId = null
+		?string $spaceId = null,
 	): ResponseInterface {
 		$this->featureContext->verifyTableNodeColumnsCount($headersTable, 2);
 		$user = $this->featureContext->getActualUsername($user);
@@ -119,7 +117,7 @@ class TUSContext implements Context {
 			"files",
 			null,
 			false,
-			$password
+			$password,
 		);
 		$locationHeader = $response->getHeader('Location');
 		if (\sizeof($locationHeader) > 0) {
@@ -194,15 +192,15 @@ class TUSContext implements Context {
 		string $offset,
 		string $data,
 		string $checksum = '',
-		?array $extraHeaders = null
+		?array $extraHeaders = null,
 	): ResponseInterface {
 		$user = $this->featureContext->getActualUsername($user);
 		$password = $this->featureContext->getUserPassword($user);
 		$headers = [
-		'Content-Type' => 'application/offset+octet-stream',
-		'Tus-Resumable' => '1.0.0',
-		'Upload-Checksum' => $checksum,
-		'Upload-Offset' => $offset
+			'Content-Type' => 'application/offset+octet-stream',
+			'Tus-Resumable' => '1.0.0',
+			'Upload-Checksum' => $checksum,
+			'Upload-Offset' => $offset,
 		];
 		$headers = empty($extraHeaders) ? $headers : array_merge($headers, $extraHeaders);
 
@@ -212,7 +210,7 @@ class TUSContext implements Context {
 			$user,
 			$password,
 			$headers,
-			$data
+			$data,
 		);
 	}
 
@@ -257,12 +255,12 @@ class TUSContext implements Context {
 	 */
 	public function userUploadsUsingTusAFileTo(
 		?string $user,
-		string  $source,
-		string  $destination,
-		array   $uploadMetadata = [],
-		int     $noOfChunks = 1,
-		int     $bytes = null,
-		string  $checksum = ''
+		string $source,
+		string $destination,
+		array $uploadMetadata = [],
+		int $noOfChunks = 1,
+		int $bytes = null,
+		string $checksum = '',
 	): void {
 		$response = $this->uploadFileUsingTus(
 			$user,
@@ -272,7 +270,7 @@ class TUSContext implements Context {
 			$uploadMetadata,
 			$noOfChunks,
 			$bytes,
-			$checksum
+			$checksum,
 		);
 		$this->featureContext->setLastUploadDeleteTime(\time());
 		$this->featureContext->setResponse($response);
@@ -292,29 +290,29 @@ class TUSContext implements Context {
 	 */
 	public function uploadFileUsingTus(
 		?string $user,
-		string  $source,
-		string  $destination,
-		?string  $spaceId = null,
-		array   $uploadMetadata = [],
-		int     $noOfChunks = 1,
-		int     $bytes = null,
-		string  $checksum = '',
+		string $source,
+		string $destination,
+		?string $spaceId = null,
+		array $uploadMetadata = [],
+		int $noOfChunks = 1,
+		int $bytes = null,
+		string $checksum = '',
 	): ResponseInterface {
 		$user = $this->featureContext->getActualUsername($user);
 		$password = $this->featureContext->getUserPassword($user);
 		$headers = [
-			'Authorization' => 'Basic ' . \base64_encode($user . ':' . $password)
+			'Authorization' => 'Basic ' . \base64_encode($user . ':' . $password),
 		];
 		if ($bytes !== null) {
 			$creationWithUploadHeader = [
 				'Content-Type' => 'application/offset+octet-stream',
-				'Tus-Resumable' => '1.0.0'
+				'Tus-Resumable' => '1.0.0',
 			];
 			$headers = \array_merge($headers, $creationWithUploadHeader);
 		}
 		if ($checksum != '') {
 			$checksumHeader = [
-				'Upload-Checksum' => $checksum
+				'Upload-Checksum' => $checksum,
 			];
 			$headers = \array_merge($headers, $checksumHeader);
 		}
@@ -332,7 +330,7 @@ class TUSContext implements Context {
 			$sourceFile,
 			$destination,
 			WebDavHelper::getDavPath($davPathVersion, $suffixPath),
-			$uploadMetadata
+			$uploadMetadata,
 		);
 
 		$this->featureContext->pauseUploadDelete();
@@ -345,13 +343,12 @@ class TUSContext implements Context {
 			return $client->file($sourceFile, $destination)->createWithUploadRR($client->getKey(), 0);
 		} elseif ($noOfChunks === 1) {
 			return $client->file($sourceFile, $destination)->uploadRR();
-		} else {
-			$bytesPerChunk = (int)\ceil(\filesize($sourceFile) / $noOfChunks);
-			for ($i = 0; $i < $noOfChunks; $i++) {
-				$response = $client->uploadRR($bytesPerChunk);
-			}
-			return $response;
 		}
+		$bytesPerChunk = (int)\ceil(\filesize($sourceFile) / $noOfChunks);
+		for ($i = 0; $i < $noOfChunks; $i++) {
+			$response = $client->uploadRR($bytesPerChunk);
+		}
+		return $response;
 	}
 
 	/**
@@ -384,7 +381,7 @@ class TUSContext implements Context {
 			$headers,
 			$sourceFile,
 			$destination,
-			$url
+			$url,
 		);
 		$response = $client->createWithUploadRR("", 0);
 		return $response;
@@ -405,18 +402,18 @@ class TUSContext implements Context {
 	 */
 	private function createTusClient(
 		string $baseUrl,
-		array  $headers,
+		array $headers,
 		string $sourceFile,
 		string $destination,
 		string $path,
-		array $metadata = []
+		array $metadata = [],
 	): TusClient {
 		$client = new TusClient(
 			$baseUrl,
 			[
 				'verify' => false,
 				'headers' => $headers,
-			]
+			],
 		);
 		$client->setApiPath($path);
 		$client->setMetadata($metadata);
@@ -439,13 +436,13 @@ class TUSContext implements Context {
 	public function userUploadsAFileWithContentToUsingTus(
 		string $user,
 		string $content,
-		string $destination
+		string $destination,
 	): void {
 		$temporaryFileName = $this->writeDataToTempFile($content);
 		$response = $this->uploadFileUsingTus(
 			$user,
 			\basename($temporaryFileName),
-			$destination
+			$destination,
 		);
 		\unlink($temporaryFileName);
 		$this->featureContext->setResponse($response);
@@ -470,9 +467,9 @@ class TUSContext implements Context {
 	 */
 	public function userUploadsAFileWithContentInChunksUsingTus(
 		?string $user,
-		string  $content,
-		?int    $noOfChunks,
-		string  $destination
+		string $content,
+		?int $noOfChunks,
+		string $destination,
 	): void {
 		$temporaryFileName = $this->writeDataToTempFile($content);
 		$response = $this->uploadFileUsingTus(
@@ -481,7 +478,7 @@ class TUSContext implements Context {
 			$destination,
 			null,
 			[],
-			$noOfChunks
+			$noOfChunks,
 		);
 		$this->featureContext->setLastUploadDeleteTime(\time());
 		\unlink($temporaryFileName);
@@ -504,7 +501,7 @@ class TUSContext implements Context {
 		string $user,
 		string $source,
 		string $destination,
-		string $mtime
+		string $mtime,
 	): void {
 		$mtime = new DateTime($mtime);
 		$mtime = $mtime->format('U');
@@ -514,13 +511,13 @@ class TUSContext implements Context {
 			$source,
 			$destination,
 			null,
-			['mtime' => $mtime]
+			['mtime' => $mtime],
 		);
 		$this->featureContext->setLastUploadDeleteTime(\time());
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			["201", "204"],
 			"Failed to upload file '$source' for user '$user'",
-			$response
+			$response,
 		);
 	}
 
@@ -540,7 +537,7 @@ class TUSContext implements Context {
 		string $user,
 		string $source,
 		string $destination,
-		string $mtime
+		string $mtime,
 	): void {
 		$mtime = new DateTime($mtime);
 		$mtime = $mtime->format('U');
@@ -550,7 +547,7 @@ class TUSContext implements Context {
 			$source,
 			$destination,
 			null,
-			['mtime' => $mtime]
+			['mtime' => $mtime],
 		);
 		$this->featureContext->setLastUploadDeleteTime(\time());
 		$this->featureContext->setResponse($response);
@@ -565,7 +562,7 @@ class TUSContext implements Context {
 	public function writeDataToTempFile(string $content): string {
 		$temporaryFileName = \tempnam(
 			$this->featureContext->acceptanceTestsDirLocation(),
-			"tus-upload-test-"
+			"tus-upload-test-",
 		);
 		if ($temporaryFileName === false) {
 			throw new \Exception("could not create a temporary filename");
@@ -607,9 +604,9 @@ class TUSContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function userCreatesWithUpload(
-		string    $user,
-		string    $content,
-		TableNode $headers
+		string $user,
+		string $content,
+		TableNode $headers,
 	): void {
 		$response = $this->createNewTUSResourceWithHeaders($user, $headers, $content);
 		$this->featureContext->setResponse($response);
@@ -628,7 +625,7 @@ class TUSContext implements Context {
 	public function userUploadsWithCreatesWithUpload(
 		string $user,
 		string $source,
-		string $content
+		string $content,
 	): void {
 		$temporaryFileName = $this->writeDataToTempFile($content);
 		$response = $this->uploadFileUsingTus(
@@ -638,7 +635,7 @@ class TUSContext implements Context {
 			null,
 			[],
 			1,
-			-1
+			-1,
 		);
 		$this->featureContext->setLastUploadDeleteTime(\time());
 		\unlink($temporaryFileName);
@@ -660,7 +657,7 @@ class TUSContext implements Context {
 		string $user,
 		string $checksum,
 		string $offset,
-		string $content
+		string $content,
 	): void {
 		$resourceLocation = $this->getLastTusResourceLocation();
 		$response = $this->uploadChunkToTUSLocation($user, $resourceLocation, $offset, $content, $checksum);
@@ -687,7 +684,7 @@ class TUSContext implements Context {
 		string $checksum,
 		string $offset,
 		string $locationIndex,
-		string $filename
+		string $filename,
 	): void {
 		$filenameHash = \base64_encode($filename);
 		$resourceLocation = $this->getTusResourceLocation($filenameHash, (int)$locationIndex);
@@ -710,7 +707,7 @@ class TUSContext implements Context {
 		string $user,
 		string $checksum,
 		string $offset,
-		string $content
+		string $content,
 	): void {
 		$resourceLocation = $this->getLastTusResourceLocation();
 		$response = $this->uploadChunkToTUSLocation($user, $resourceLocation, $offset, $content, $checksum);
@@ -732,7 +729,7 @@ class TUSContext implements Context {
 		string $user,
 		string $offset,
 		string $data,
-		string $checksum
+		string $checksum,
 	): void {
 		$resourceLocation = $this->getLastTusResourceLocation();
 		$response = $this->uploadChunkToTUSLocation($user, $resourceLocation, $offset, $data, $checksum);
@@ -754,7 +751,7 @@ class TUSContext implements Context {
 		string $user,
 		string $offset,
 		string $data,
-		string $checksum
+		string $checksum,
 	): void {
 		$resourceLocation = $this->getLastTusResourceLocation();
 		$response = $this->uploadChunkToTUSLocation($user, $resourceLocation, $offset, $data, $checksum);
@@ -781,7 +778,7 @@ class TUSContext implements Context {
 		string $offset,
 		string $data,
 		string $checksum,
-		TableNode $headers
+		TableNode $headers,
 	): void {
 		$createResponse = $this->createNewTUSResource($user, $headers);
 		$this->featureContext->theHTTPStatusCodeShouldBe(201, "", $createResponse);

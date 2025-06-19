@@ -85,7 +85,7 @@ class WebDavHelper {
 	 * @throws Exception
 	 */
 	public static function removeSpaceIdReferenceForUser(
-		?string $user
+		?string $user,
 	): void {
 		if (\array_key_exists($user, self::$spacesIdRef)) {
 			unset(self::$spacesIdRef[$user]);
@@ -98,7 +98,7 @@ class WebDavHelper {
 	 * @return object
 	 */
 	public static function parseNamespace(string $namespaceString): object {
-		//calculate the namespace prefix and namespace
+		// calculate the namespace prefix and namespace
 		$matches = [];
 		\preg_match("/^(.*)='(.*)'$/", $namespaceString, $matches);
 		return (object)["namespace" => $matches[2], "prefix" => $matches[1]];
@@ -123,7 +123,7 @@ class WebDavHelper {
 		?string $password,
 		?string $path,
 		?string $spaceId = null,
-		?int $davPathVersionToUse = self::DAV_VERSION_NEW
+		?int $davPathVersionToUse = self::DAV_VERSION_NEW,
 	): string {
 		$body
 			= '<?xml version="1.0"?>
@@ -141,12 +141,12 @@ class WebDavHelper {
 			null,
 			$spaceId,
 			$body,
-			$davPathVersionToUse
+			$davPathVersionToUse,
 		);
 		\preg_match(
 			'/\<oc:fileid\>([^\<]*)\<\/oc:fileid\>/',
 			$response->getBody()->getContents(),
-			$matches
+			$matches,
 		);
 
 		if (!isset($matches[1])) {
@@ -169,15 +169,15 @@ class WebDavHelper {
 		$extraNamespaces = "";
 		foreach ($properties as $namespaceString => $property) {
 			if (\is_int($namespaceString)) {
-				//default namespace prefix if the property has no array key
-				//also used if no prefix is given in the property value
+				// default namespace prefix if the property has no array key
+				// also used if no prefix is given in the property value
 				$namespacePrefix = null;
 			} else {
 				$ns = self::parseNamespace($namespaceString);
 				$namespacePrefix = $ns->prefix;
 				$extraNamespaces .= " xmlns:$namespacePrefix=\"$ns->namespace\" ";
 			}
-			//if a namespace prefix is given in the property value use that
+			// if a namespace prefix is given in the property value use that
 			if (\strpos($property, ":") !== false) {
 				$propertyParts = \explode(":", $property);
 				$namespacePrefix = $propertyParts[0];
@@ -239,7 +239,7 @@ class WebDavHelper {
 		?string $type = "files",
 		?int $davPathVersionToUse = self::DAV_VERSION_NEW,
 		?string $doDavRequestAsUser = null,
-		?array $headers = []
+		?array $headers = [],
 	): ResponseInterface {
 		$body = self::getBodyForPropfind($properties);
 		$folderDepth = (string) $folderDepth;
@@ -267,7 +267,7 @@ class WebDavHelper {
 			null,
 			null,
 			[],
-			$doDavRequestAsUser
+			$doDavRequestAsUser,
 		);
 	}
 
@@ -297,7 +297,7 @@ class WebDavHelper {
 		?string $propertyValue,
 		?string $namespaceString = null,
 		?int $davPathVersionToUse = self::DAV_VERSION_NEW,
-		?string $type="files",
+		?string $type = "files",
 		?string $spaceId = null,
 	): ResponseInterface {
 		if ($namespaceString !== null) {
@@ -326,7 +326,7 @@ class WebDavHelper {
 			$spaceId,
 			$body,
 			$davPathVersionToUse,
-			$type
+			$type,
 		);
 	}
 
@@ -343,8 +343,8 @@ class WebDavHelper {
 		$namespace = "";
 		$namespacePrefix = "";
 		if (\is_int($namespaceString)) {
-			//default namespace prefix if the property has no array key
-			//also used if no prefix is given in the property value
+			// default namespace prefix if the property has no array key
+			// also used if no prefix is given in the property value
 			$namespacePrefix = "d";
 			$namespace = "DAV:";
 		} elseif ($namespaceString) {
@@ -352,7 +352,7 @@ class WebDavHelper {
 			$namespacePrefix = $ns->prefix;
 			$namespace = $ns->namespace;
 		}
-		//if a namespace prefix is given in the property value use that
+		// if a namespace prefix is given in the property value use that
 		if ($property && \strpos($property, ":")) {
 			$propertyParts = \explode(":", $property);
 			$namespacePrefix = $propertyParts[0];
@@ -377,14 +377,14 @@ class WebDavHelper {
 	 * @throws GuzzleException
 	 */
 	public static function proppatchWithMultipleProps(
-		?string  $baseUrl,
-		?string  $user,
+		?string $baseUrl,
+		?string $user,
 		?string $password,
-		string  $path,
+		string $path,
 		?array $propertiesArray,
-		?int  $davPathVersion = null,
-		?string  $namespaceString = null,
-		?string  $type="files"
+		?int $davPathVersion = null,
+		?string $namespaceString = null,
+		?string $type = "files",
 	): ResponseInterface {
 		$propertyBody = "";
 		foreach ($propertiesArray as $propertyArray) {
@@ -395,7 +395,7 @@ class WebDavHelper {
 				$matches = [];
 				[$namespacePrefix, $namespace, $property] = self::getPropertyWithNamespaceInfo(
 					$namespaceString,
-					$property
+					$property,
 				);
 				$propertyBody .= "\n\t<$namespacePrefix:$property>" .
 					"$value" .
@@ -422,7 +422,7 @@ class WebDavHelper {
 			null,
 			$body,
 			$davPathVersion,
-			$type
+			$type,
 		);
 	}
 
@@ -451,11 +451,11 @@ class WebDavHelper {
 		?string $spaceId = null,
 		?array $properties = null,
 		?string $type = "files",
-		?int $davPathVersionToUse = self::DAV_VERSION_NEW
+		?int $davPathVersionToUse = self::DAV_VERSION_NEW,
 	): ResponseInterface {
 		if (!$properties) {
 			$properties = [
-				'd:getetag', 'd:resourcetype'
+				'd:getetag', 'd:resourcetype',
 			];
 		}
 		return self::propfind(
@@ -467,7 +467,7 @@ class WebDavHelper {
 			$folderDepth,
 			$spaceId,
 			$type,
-			$davPathVersionToUse
+			$davPathVersionToUse,
 		);
 	}
 
@@ -531,22 +531,22 @@ class WebDavHelper {
 				$fullUrl,
 				'PROPFIND',
 				$user,
-				$password
+				$password,
 			);
 			Assert::assertEquals(
 				207,
 				$response->getStatusCode(),
-				"PROPFIND for user '$user' failed so the personal space id cannot be discovered"
+				"PROPFIND for user '$user' failed so the personal space id cannot be discovered",
 			);
 
 			$responseXmlObject = HttpRequestHelper::getResponseXml(
 				$response,
-				__METHOD__
+				__METHOD__,
 			);
 			$xmlPart = $responseXmlObject->xpath("/d:multistatus/d:response[1]/d:propstat/d:prop/oc:spaceid");
 			Assert::assertNotEmpty(
 				$xmlPart,
-				"The 'oc:spaceid' for user '$user' was not found in the PROPFIND response"
+				"The 'oc:spaceid' for user '$user' was not found in the PROPFIND response",
 			);
 
 			$personalSpaceId = $xmlPart[0]->__toString();
@@ -582,7 +582,7 @@ class WebDavHelper {
 		return self::getPersonalSpaceIdForUser(
 			$baseUrl,
 			$user,
-			$password
+			$password,
 		);
 	}
 
@@ -677,7 +677,7 @@ class WebDavHelper {
 
 		$davPath = self::getDavPath($davPathVersionToUse, $suffixPath, $type);
 
-		//replace %, # and ? and in the path, Guzzle will not encode them
+		// replace %, # and ? and in the path, Guzzle will not encode them
 		$urlSpecialChar = [['%', '#', '?'], ['%25', '%23', '%3F']];
 		$path = \str_replace($urlSpecialChar[0], $urlSpecialChar[1], $path);
 
@@ -710,12 +710,12 @@ class WebDavHelper {
 
 		if ($headers !== null) {
 			foreach ($headers as $key => $value) {
-				//? and # need to be encoded in the Destination URL
+				// ? and # need to be encoded in the Destination URL
 				if ($key === "Destination") {
 					$headers[$key] = \str_replace(
 						$urlSpecialChar[0],
 						$urlSpecialChar[1],
-						$value
+						$value,
 					);
 					break;
 				}
@@ -734,7 +734,7 @@ class WebDavHelper {
 			$stream,
 			$timeout,
 			$client,
-			$isGivenStep
+			$isGivenStep,
 		);
 	}
 
@@ -750,7 +750,7 @@ class WebDavHelper {
 	public static function getDavPath(
 		int $davPathVersion,
 		?string $userOrItemIdOrSpaceIdOrToken = null,
-		?string $type = "files"
+		?string $type = "files",
 	): string {
 		switch ($type) {
 			case 'archive':
@@ -779,24 +779,23 @@ class WebDavHelper {
 				return self::prefixRemotePhp("dav/spaces");
 			}
 			return self::prefixRemotePhp("dav/spaces/$userOrItemIdOrSpaceIdOrToken");
-		} else {
-			if ($type === "trash-bin") {
-				// Since there is no trash bin endpoint for old dav version,
-				// new dav version's endpoint is used here.
-				return self::prefixRemotePhp("dav/trash-bin/$userOrItemIdOrSpaceIdOrToken");
-			}
-			if ($davPathVersion === self::DAV_VERSION_OLD) {
-				return self::prefixRemotePhp("webdav");
-			} elseif ($davPathVersion === self::DAV_VERSION_NEW) {
-				if ($type === "files") {
-					return self::prefixRemotePhp("dav/files/$userOrItemIdOrSpaceIdOrToken");
-				} elseif ($type === "public-files") {
-					return self::prefixRemotePhp("dav/public-files/$userOrItemIdOrSpaceIdOrToken");
-				}
-				return self::prefixRemotePhp("dav");
-			}
-			throw new InvalidArgumentException("Invalid DAV path: $davPathVersion");
 		}
+		if ($type === "trash-bin") {
+			// Since there is no trash bin endpoint for old dav version,
+			// new dav version's endpoint is used here.
+			return self::prefixRemotePhp("dav/trash-bin/$userOrItemIdOrSpaceIdOrToken");
+		}
+		if ($davPathVersion === self::DAV_VERSION_OLD) {
+			return self::prefixRemotePhp("webdav");
+		} elseif ($davPathVersion === self::DAV_VERSION_NEW) {
+			if ($type === "files") {
+				return self::prefixRemotePhp("dav/files/$userOrItemIdOrSpaceIdOrToken");
+			} elseif ($type === "public-files") {
+				return self::prefixRemotePhp("dav/public-files/$userOrItemIdOrSpaceIdOrToken");
+			}
+			return self::prefixRemotePhp("dav");
+		}
+		throw new InvalidArgumentException("Invalid DAV path: $davPathVersion");
 	}
 
 	/**
@@ -831,7 +830,7 @@ class WebDavHelper {
 		?string $baseUrl,
 		?string $fileName,
 		?string $token,
-		?int $davVersionToUse = self::DAV_VERSION_NEW
+		?int $davVersionToUse = self::DAV_VERSION_NEW,
 	): string {
 		$response = self::propfind(
 			$baseUrl,
@@ -842,11 +841,11 @@ class WebDavHelper {
 			'1',
 			null,
 			"public-files",
-			$davVersionToUse
+			$davVersionToUse,
 		);
 		$responseXmlObject = HttpRequestHelper::getResponseXml(
 			$response,
-			__METHOD__
+			__METHOD__,
 		);
 		$xmlPart = $responseXmlObject->xpath("//d:getlastmodified");
 
@@ -884,11 +883,11 @@ class WebDavHelper {
 			"0",
 			$spaceId,
 			"files",
-			$davPathVersionToUse
+			$davPathVersionToUse,
 		);
 		$responseXmlObject = HttpRequestHelper::getResponseXml(
 			$response,
-			__METHOD__
+			__METHOD__,
 		);
 		$xmlPart = $responseXmlObject->xpath("//d:getlastmodified");
 		Assert::assertArrayHasKey(
@@ -896,7 +895,7 @@ class WebDavHelper {
 			$xmlPart,
 			__METHOD__
 			. " XML part does not have key 0. Expected a value at index 0 of 'xmlPart' but, found: "
-			. json_encode($xmlPart)
+			. json_encode($xmlPart),
 		);
 		$mtime = new DateTime($xmlPart[0]->__toString());
 		return $mtime->format('U');

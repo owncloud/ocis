@@ -44,19 +44,19 @@ class ChecksumContext implements Context {
 	 */
 	public function uploadFileToWithChecksumUsingTheAPI(
 		string $user,
-		string  $source,
-		string  $destination,
-		string  $checksum
+		string $source,
+		string $destination,
+		string $checksum,
 	): ResponseInterface {
 		$file = \file_get_contents(
-			$this->featureContext->acceptanceTestsDirLocation() . $source
+			$this->featureContext->acceptanceTestsDirLocation() . $source,
 		);
 		return $this->featureContext->makeDavRequest(
 			$user,
 			'PUT',
 			$destination,
 			['OC-Checksum' => $checksum],
-			$file
+			$file,
 		);
 	}
 
@@ -72,12 +72,12 @@ class ChecksumContext implements Context {
 	 */
 	public function userUploadsFileToWithChecksumUsingTheAPI(
 		string $user,
-		string  $source,
-		string  $destination,
-		string  $checksum
+		string $source,
+		string $destination,
+		string $checksum,
 	): void {
 		$this->featureContext->setResponse(
-			$this->uploadFileToWithChecksumUsingTheAPI($user, $source, $destination, $checksum)
+			$this->uploadFileToWithChecksumUsingTheAPI($user, $source, $destination, $checksum),
 		);
 	}
 
@@ -95,14 +95,14 @@ class ChecksumContext implements Context {
 		string $user,
 		string $source,
 		string $destination,
-		string $checksum
+		string $checksum,
 	): void {
 		$user = $this->featureContext->getActualUsername($user);
 		$response = $this->uploadFileToWithChecksumUsingTheAPI(
 			$user,
 			$source,
 			$destination,
-			$checksum
+			$checksum,
 		);
 		$this->featureContext->theHTTPStatusCodeShouldBe([201,204], '', $response);
 	}
@@ -119,14 +119,14 @@ class ChecksumContext implements Context {
 		string $user,
 		string $content,
 		string $checksum,
-		string $destination
+		string $destination,
 	): ResponseInterface {
 		return $this->featureContext->makeDavRequest(
 			$user,
 			'PUT',
 			$destination,
 			['OC-Checksum' => $checksum],
-			$content
+			$content,
 		);
 	}
 
@@ -144,7 +144,7 @@ class ChecksumContext implements Context {
 		string $user,
 		string $content,
 		string $checksum,
-		string $destination
+		string $destination,
 	): void {
 		$user = $this->featureContext->getActualUsername($user);
 		$response = $this->uploadFileWithContentAndChecksumToUsingTheAPI($user, $content, $checksum, $destination);
@@ -188,7 +188,7 @@ class ChecksumContext implements Context {
 			null,
 			$spaceId,
 			$body,
-			$this->featureContext->getDavPathVersion()
+			$this->featureContext->getDavPathVersion(),
 		);
 	}
 
@@ -218,7 +218,7 @@ class ChecksumContext implements Context {
 	public function asUserTheWebdavChecksumOfPathViaPropfindShouldMatch(
 		string $user,
 		string $path,
-		string $expectedChecksum
+		string $expectedChecksum,
 	): void {
 		$user = $this->featureContext->getActualUsername($user);
 		$resource = $this->propfindResourceChecksum($user, $path);
@@ -249,72 +249,72 @@ class ChecksumContext implements Context {
 		Assert::assertIsArray(
 			$parsed,
 			__METHOD__
-			. " could not parse response as XML. Expected parsed XML to be an array but found " . $bodyContents
+			. " could not parse response as XML. Expected parsed XML to be an array but found " . $bodyContents,
 		);
 		Assert::assertArrayHasKey(
 			0,
 			$parsed,
-			__METHOD__ . " parsed XML does not have key 0"
+			__METHOD__ . " parsed XML does not have key 0",
 		);
 		$parsed0 = $parsed[0];
 		Assert::assertArrayHasKey(
 			'value',
 			$parsed0,
-			__METHOD__ . " parsed XML parsed0 does not have key value"
+			__METHOD__ . " parsed XML parsed0 does not have key value",
 		);
 		$parsed0Value = $parsed0['value'];
 		Assert::assertArrayHasKey(
 			1,
 			$parsed0Value,
-			__METHOD__ . " parsed XML parsed0Value does not have key 1"
+			__METHOD__ . " parsed XML parsed0Value does not have key 1",
 		);
 		$parsed0Value1 = $parsed0Value[1];
 		Assert::assertArrayHasKey(
 			'value',
 			$parsed0Value1,
-			__METHOD__ . " parsed XML parsed0Value1 does not have key value after key 1"
+			__METHOD__ . " parsed XML parsed0Value1 does not have key value after key 1",
 		);
 		$parsed0Value1Value = $parsed0Value1['value'];
 		Assert::assertArrayHasKey(
 			0,
 			$parsed0Value1Value,
-			__METHOD__ . " parsed XML parsed0Value1Value does not have key 0"
+			__METHOD__ . " parsed XML parsed0Value1Value does not have key 0",
 		);
 		$parsed0Value1Value0 = $parsed0Value1Value[0];
 		Assert::assertArrayHasKey(
 			'value',
 			$parsed0Value1Value0,
-			__METHOD__ . " parsed XML parsed0Value1Value0 does not have key value"
+			__METHOD__ . " parsed XML parsed0Value1Value0 does not have key value",
 		);
 		$parsed0Value1Value0Value = $parsed0Value1Value0['value'];
 		Assert::assertArrayHasKey(
 			0,
 			$parsed0Value1Value0Value,
-			__METHOD__ . " parsed XML parsed0Value1Value0Value does not have key 0"
+			__METHOD__ . " parsed XML parsed0Value1Value0Value does not have key 0",
 		);
 		$checksums = $parsed0Value1Value0Value[0];
 		Assert::assertArrayHasKey(
 			'value',
 			$checksums,
-			__METHOD__ . " parsed XML checksums does not have key value"
+			__METHOD__ . " parsed XML checksums does not have key value",
 		);
 		$checksumsValue = $checksums['value'];
 		Assert::assertArrayHasKey(
 			0,
 			$checksumsValue,
-			__METHOD__ . " parsed XML checksumsValue does not have key 0"
+			__METHOD__ . " parsed XML checksumsValue does not have key 0",
 		);
 		$checksumsValue0 = $checksumsValue[0];
 		Assert::assertArrayHasKey(
 			'value',
 			$checksumsValue0,
-			__METHOD__ . " parsed XML checksumsValue0 does not have key value"
+			__METHOD__ . " parsed XML checksumsValue0 does not have key value",
 		);
 		$actualChecksum = $checksumsValue0['value'];
 		Assert::assertEquals(
 			$expectedChecksum,
 			$actualChecksum,
-			"Expected: webDav checksum should be $expectedChecksum but got $actualChecksum"
+			"Expected: webDav checksum should be $expectedChecksum but got $actualChecksum",
 		);
 	}
 
@@ -332,19 +332,19 @@ class ChecksumContext implements Context {
 
 		Assert::assertIsArray(
 			$headerChecksums,
-			__METHOD__ . " getHeader('OC-Checksum') did not return an array"
+			__METHOD__ . " getHeader('OC-Checksum') did not return an array",
 		);
 
 		Assert::assertNotEmpty(
 			$headerChecksums,
-			__METHOD__ . " getHeader('OC-Checksum') returned an empty array. No checksum header was found."
+			__METHOD__ . " getHeader('OC-Checksum') returned an empty array. No checksum header was found.",
 		);
 
 		$checksumCount = \count($headerChecksums);
 
 		Assert::assertTrue(
 			$checksumCount === 1,
-			__METHOD__ . " Expected 1 checksum in the header but found $checksumCount checksums"
+			__METHOD__ . " Expected 1 checksum in the header but found $checksumCount checksums",
 		);
 
 		$headerChecksum
@@ -352,7 +352,7 @@ class ChecksumContext implements Context {
 		Assert::assertEquals(
 			$expectedChecksum,
 			$headerChecksum,
-			"Expected: header checksum should match $expectedChecksum but got $headerChecksum"
+			"Expected: header checksum should match $expectedChecksum but got $headerChecksum",
 		);
 	}
 
@@ -369,26 +369,26 @@ class ChecksumContext implements Context {
 	public function theHeaderChecksumWhenUserDownloadsFileUsingTheWebdavApiShouldMatch(
 		string $user,
 		string $fileName,
-		string $expectedChecksum
+		string $expectedChecksum,
 	): void {
 		$response = $this->featureContext->downloadFileAsUserUsingPassword($user, $fileName);
 		$headerChecksums = $response->getHeader('OC-Checksum');
 
 		Assert::assertIsArray(
 			$headerChecksums,
-			__METHOD__ . " getHeader('OC-Checksum') did not return an array"
+			__METHOD__ . " getHeader('OC-Checksum') did not return an array",
 		);
 
 		Assert::assertNotEmpty(
 			$headerChecksums,
-			__METHOD__ . " getHeader('OC-Checksum') returned an empty array. No checksum header was found."
+			__METHOD__ . " getHeader('OC-Checksum') returned an empty array. No checksum header was found.",
 		);
 
 		$checksumCount = \count($headerChecksums);
 
 		Assert::assertTrue(
 			$checksumCount === 1,
-			__METHOD__ . " Expected 1 checksum in the header but found $checksumCount checksums"
+			__METHOD__ . " Expected 1 checksum in the header but found $checksumCount checksums",
 		);
 
 		$headerChecksum
@@ -396,7 +396,7 @@ class ChecksumContext implements Context {
 		Assert::assertEquals(
 			$expectedChecksum,
 			$headerChecksum,
-			"Expected: header checksum should match $expectedChecksum but got $headerChecksum"
+			"Expected: header checksum should match $expectedChecksum but got $headerChecksum",
 		);
 	}
 
@@ -416,7 +416,7 @@ class ChecksumContext implements Context {
 		int $total,
 		string $data,
 		string $destination,
-		string $expectedChecksum
+		string $expectedChecksum,
 	): ResponseInterface {
 		$user = $this->featureContext->getActualUsername($user);
 		$num -= 1;
@@ -426,7 +426,7 @@ class ChecksumContext implements Context {
 			'PUT',
 			$file,
 			['OC-Checksum' => $expectedChecksum, 'OC-Chunked' => '1'],
-			$data
+			$data,
 		);
 	}
 
@@ -448,7 +448,7 @@ class ChecksumContext implements Context {
 		int $total,
 		string $data,
 		string $destination,
-		string $expectedChecksum
+		string $expectedChecksum,
 	): void {
 		$response = $this->uploadChunkFileOfWithToWithChecksum(
 			$user,
@@ -456,7 +456,7 @@ class ChecksumContext implements Context {
 			$total,
 			$data,
 			$destination,
-			$expectedChecksum
+			$expectedChecksum,
 		);
 		$this->featureContext->setResponse($response);
 	}
@@ -479,7 +479,7 @@ class ChecksumContext implements Context {
 		int $total,
 		string $data,
 		string $destination,
-		string $expectedChecksum
+		string $expectedChecksum,
 	): void {
 		$response = $this->uploadChunkFileOfWithToWithChecksum(
 			$user,
@@ -487,12 +487,12 @@ class ChecksumContext implements Context {
 			$total,
 			$data,
 			$destination,
-			$expectedChecksum
+			$expectedChecksum,
 		);
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			[201, 206],
 			'',
-			$response
+			$response,
 		);
 	}
 

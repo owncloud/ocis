@@ -41,7 +41,7 @@ class WebDav extends Assert {
 		?string $element,
 		?string $expectedValue,
 		?array $responseXmlArray,
-		?string $extraErrorText = ''
+		?string $extraErrorText = '',
 	): void {
 		if ($extraErrorText !== '') {
 			$extraErrorText = $extraErrorText . " ";
@@ -49,7 +49,7 @@ class WebDav extends Assert {
 		self::assertArrayHasKey(
 			'value',
 			$responseXmlArray,
-			$extraErrorText . "responseXml does not have key 'value'"
+			$extraErrorText . "responseXml does not have key 'value'",
 		);
 		if ($element === "exception") {
 			$result = $responseXmlArray['value'][0]['value'];
@@ -59,14 +59,14 @@ class WebDav extends Assert {
 			$result = $responseXmlArray['value'][3]['value'];
 		} else {
 			self::fail(
-				__METHOD__ . " element must be one of exception, response or reason. But '$element' was passed in."
+				__METHOD__ . " element must be one of exception, response or reason. But '$element' was passed in.",
 			);
 		}
 
 		self::assertEquals(
 			$expectedValue,
 			$result,
-			__METHOD__ . " " . $extraErrorText . "Expected '$expectedValue' in element $element got '$result'"
+			__METHOD__ . " " . $extraErrorText . "Expected '$expectedValue' in element $element got '$result'",
 		);
 	}
 
@@ -79,15 +79,15 @@ class WebDav extends Assert {
 	 */
 	public static function assertResponseContainsShareTypes(
 		SimpleXMLElement $responseXmlObject,
-		?array $expectedShareTypes
+		?array $expectedShareTypes,
 	): void {
 		foreach ($expectedShareTypes as $row) {
 			$xmlPart = $responseXmlObject->xpath(
-				"//d:prop/oc:share-types/oc:share-type[.=" . $row[0] . "]"
+				"//d:prop/oc:share-types/oc:share-type[.=" . $row[0] . "]",
 			);
 			self::assertNotEmpty(
 				$xmlPart,
-				"cannot find share-type '" . $row[0] . "'"
+				"cannot find share-type '" . $row[0] . "'",
 			);
 		}
 	}

@@ -50,8 +50,8 @@ class ShareesContext implements Context {
 		$this->featureContext->setResponse(
 			$this->getShareesWithParameters(
 				$this->featureContext->getCurrentUser(),
-				$body
-			)
+				$body,
+			),
 		);
 	}
 
@@ -67,8 +67,8 @@ class ShareesContext implements Context {
 		$this->featureContext->setResponse(
 			$this->getShareesWithParameters(
 				$user,
-				$body
-			)
+				$body,
+			),
 		);
 	}
 
@@ -86,12 +86,12 @@ class ShareesContext implements Context {
 		$sharees = $shareesList->getRows();
 		$respondedArray = $this->getArrayOfShareesResponded(
 			$this->featureContext->getResponse(),
-			$shareeType
+			$shareeType,
 		);
 		Assert::assertEquals(
 			$sharees,
 			$respondedArray,
-			"Returned sharees do not match the expected ones. See the differences below."
+			"Returned sharees do not match the expected ones. See the differences below.",
 		);
 	}
 
@@ -109,13 +109,13 @@ class ShareesContext implements Context {
 		$sharees = $shareesList->getRows();
 		$respondedArray = $this->getArrayOfShareesResponded(
 			$this->featureContext->getResponse(),
-			$shareeType
+			$shareeType,
 		);
 		foreach ($sharees as $sharee) {
 			Assert::assertContains(
 				$sharee,
 				$respondedArray,
-				"Returned sharees do not match the expected ones. See the differences below."
+				"Returned sharees do not match the expected ones. See the differences below.",
 			);
 		}
 	}
@@ -130,7 +130,7 @@ class ShareesContext implements Context {
 	public function theShareesReturnedShouldBeEmpty(string $shareeType): void {
 		$respondedArray = $this->getArrayOfShareesResponded(
 			$this->featureContext->getResponse(),
-			$shareeType
+			$shareeType,
 		);
 		if (isset($respondedArray[0])) {
 			// [0] is display name and [2] is user or group id
@@ -141,7 +141,7 @@ class ShareesContext implements Context {
 
 		Assert::assertEmpty(
 			$respondedArray,
-			"'$shareeType' array should be empty, but it starts with $firstEntry"
+			"'$shareeType' array should be empty, but it starts with $firstEntry",
 		);
 	}
 
@@ -154,7 +154,7 @@ class ShareesContext implements Context {
 	 */
 	public function getArrayOfShareesResponded(
 		ResponseInterface $response,
-		string $shareeType
+		string $shareeType,
 	): array {
 		$elements = HttpRequestHelper::getResponseXml($response, __METHOD__)->data;
 		$elements = \json_decode(\json_encode($elements), true);
@@ -166,7 +166,7 @@ class ShareesContext implements Context {
 		Assert::assertArrayHasKey(
 			$shareeType,
 			$elements,
-			__METHOD__ . " The sharees response does not have key '$shareeType'"
+			__METHOD__ . " The sharees response does not have key '$shareeType'",
 		);
 
 		$sharees = [];
@@ -179,7 +179,7 @@ class ShareesContext implements Context {
 						$innerItem['label'],
 						$innerItem['value']['shareType'],
 						$innerItem['value']['shareWith'],
-						$innerItem['value']['shareWithAdditionalInfo']
+						$innerItem['value']['shareWithAdditionalInfo'],
 					];
 				}
 			} else {
@@ -187,7 +187,7 @@ class ShareesContext implements Context {
 					$element['label'],
 					$element['value']['shareType'],
 					$element['value']['shareWith'],
-					$element['value']['shareWithAdditionalInfo']
+					$element['value']['shareWithAdditionalInfo'],
 				];
 			}
 		}
@@ -215,7 +215,7 @@ class ShareesContext implements Context {
 		return $this->ocsContext->sendRequestToOcsEndpoint(
 			$user,
 			'GET',
-			$url
+			$url,
 		);
 	}
 

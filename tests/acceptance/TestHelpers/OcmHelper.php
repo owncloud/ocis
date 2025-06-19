@@ -68,11 +68,11 @@ class OcmHelper {
 		string $user,
 		string $password,
 		?string $email = null,
-		?string $description = null
+		?string $description = null,
 	): ResponseInterface {
 		$body = [
-		  "description" => $description,
-		  "recipient" => $email
+			"description" => $description,
+			"recipient" => $email,
 		];
 		$url = self::getFullUrl($baseUrl, 'generate-invite');
 		return HttpRequestHelper::post(
@@ -80,7 +80,7 @@ class OcmHelper {
 			$user,
 			$password,
 			self::getRequestHeaders(),
-			\json_encode($body)
+			\json_encode($body),
 		);
 	}
 
@@ -99,11 +99,11 @@ class OcmHelper {
 		string $user,
 		string $password,
 		string $token,
-		string $providerDomain
+		string $providerDomain,
 	): ResponseInterface {
 		$body = [
-		  "token" => $token,
-		  "providerDomain" => $providerDomain
+			"token" => $token,
+			"providerDomain" => $providerDomain,
 		];
 		$url = self::getFullUrl($baseUrl, 'accept-invite');
 		return HttpRequestHelper::post(
@@ -111,7 +111,7 @@ class OcmHelper {
 			$user,
 			$password,
 			self::getRequestHeaders(),
-			\json_encode($body)
+			\json_encode($body),
 		);
 	}
 
@@ -126,14 +126,14 @@ class OcmHelper {
 	public static function findAcceptedUsers(
 		string $baseUrl,
 		string $user,
-		string $password
+		string $password,
 	): ResponseInterface {
 		$url = self::getFullUrl($baseUrl, 'find-accepted-users');
 		return HttpRequestHelper::get(
 			$url,
 			$user,
 			$password,
-			self::getRequestHeaders()
+			self::getRequestHeaders(),
 		);
 	}
 
@@ -148,14 +148,14 @@ class OcmHelper {
 	public static function listInvite(
 		string $baseUrl,
 		string $user,
-		string $password
+		string $password,
 	): ResponseInterface {
 		$url = self::getFullUrl($baseUrl, 'list-invite');
 		return HttpRequestHelper::get(
 			$url,
 			$user,
 			$password,
-			self::getRequestHeaders()
+			self::getRequestHeaders(),
 		);
 	}
 
@@ -174,19 +174,19 @@ class OcmHelper {
 		string $user,
 		string $password,
 		string $userId,
-		string $idp
+		string $idp,
 	): ResponseInterface {
 		$url = self::getFullUrl($baseUrl, 'delete-accepted-user');
 		$body = [
 			"idp" => $idp,
-			"user_id" => $userId
+			"user_id" => $userId,
 		];
 		return HttpRequestHelper::delete(
 			$url,
 			$user,
 			$password,
 			self::getRequestHeaders(),
-			\json_encode($body)
+			\json_encode($body),
 		);
 	}
 }

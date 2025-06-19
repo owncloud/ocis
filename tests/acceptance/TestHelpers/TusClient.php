@@ -49,11 +49,11 @@ class TusClient extends Client {
 	public function createWithUploadRR(string $key, int $bytes = -1): ResponseInterface {
 		$bytes = $bytes < 0 ? $this->fileSize : $bytes;
 		$headers = $this->headers + [
-				'Upload-Length' => $this->fileSize,
-				'Upload-Key' => $key,
-				'Upload-Checksum' => $this->getUploadChecksumHeader(),
-				'Upload-Metadata' => $this->getUploadMetadataHeader(),
-			];
+			'Upload-Length' => $this->fileSize,
+			'Upload-Key' => $key,
+			'Upload-Checksum' => $this->getUploadChecksumHeader(),
+			'Upload-Metadata' => $this->getUploadMetadataHeader(),
+		];
 		$data = '';
 		if ($bytes > 0) {
 			$data = $this->getData(0, $bytes);
@@ -70,9 +70,9 @@ class TusClient extends Client {
 			$response = $this->getClient()->post(
 				$this->apiPath,
 				[
-				'body' => $data,
-				'headers' => $headers,
-				]
+					'body' => $data,
+					'headers' => $headers,
+				],
 			);
 		} catch (ClientException $e) {
 			$response = $e->getResponse();
@@ -84,9 +84,9 @@ class TusClient extends Client {
 				[
 					'location' => $uploadLocation,
 					'expires_at' => Carbon::now()->addSeconds(
-						$this->getCache()->getTtl()
+						$this->getCache()->getTtl(),
 					)->format($this->getCache()::RFC_7231),
-				]
+				],
 			);
 		}
 		return $response;
@@ -102,7 +102,7 @@ class TusClient extends Client {
 	 * @throws TusException | ConnectionException
 	 */
 	public function uploadRR(int $bytes = -1): ResponseInterface {
-		$bytes  = $bytes < 0 ? $this->getFileSize() : $bytes;
+		$bytes = $bytes < 0 ? $this->getFileSize() : $bytes;
 		$offset = $this->partialOffset < 0 ? 0 : $this->partialOffset;
 		try {
 			// Check if this upload exists with HEAD request.
@@ -116,10 +116,10 @@ class TusClient extends Client {
 		}
 		$data = $this->getData($offset, $bytes);
 		$headers = $this->headers + [
-				'Content-Type' => self::HEADER_CONTENT_TYPE,
-				'Content-Length' => \strlen($data),
-				'Upload-Checksum' => $this->getUploadChecksumHeader(),
-			];
+			'Content-Type' => self::HEADER_CONTENT_TYPE,
+			'Content-Length' => \strlen($data),
+			'Upload-Checksum' => $this->getUploadChecksumHeader(),
+		];
 		if ($this->isPartial()) {
 			$headers += ['Upload-Concat' => self::UPLOAD_TYPE_PARTIAL];
 		} else {
@@ -128,9 +128,9 @@ class TusClient extends Client {
 		$response = $this->getClient()->patch(
 			$this->getUrl(),
 			[
-			'body' => $data,
-			'headers' => $headers,
-			]
+				'body' => $data,
+				'headers' => $headers,
+			],
 		);
 		return $response;
 	}

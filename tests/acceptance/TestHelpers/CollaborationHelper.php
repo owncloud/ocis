@@ -57,7 +57,7 @@ class CollaborationHelper {
 			$url,
 			$username,
 			$password,
-			['Content-Type' => 'application/json']
+			['Content-Type' => 'application/json'],
 		);
 	}
 
@@ -78,14 +78,14 @@ class CollaborationHelper {
 		string $password,
 		string $parentContainerId,
 		string $file,
-		?array $headers = null
+		?array $headers = null,
 	): ResponseInterface {
 		$url = $baseUrl . "/app/new?parent_container_id=$parentContainerId&filename=$file";
 		return HttpRequestHelper::post(
 			$url,
 			$user,
 			$password,
-			$headers
+			$headers,
 		);
 	}
 }

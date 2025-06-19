@@ -57,7 +57,7 @@ class SettingsContext implements Context {
 		return SettingsHelper::getRolesList(
 			$this->featureContext->getBaseUrl(),
 			$user,
-			$this->featureContext->getPasswordForUser($user)
+			$this->featureContext->getPasswordForUser($user),
 		);
 	}
 
@@ -132,7 +132,7 @@ class SettingsContext implements Context {
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			201,
 			"Expected response status code should be 201",
-			$response
+			$response,
 		);
 	}
 
@@ -150,12 +150,12 @@ class SettingsContext implements Context {
 	public function userAssignsTheRoleToUserUsingTheSettingsApi(
 		string $assigner,
 		string $role,
-		string $assignee
+		string $assignee,
 	): void {
 		$response = $this->assignRoleToUser(
 			$assigner,
 			$this->featureContext->getAttributeOfCreatedUser($assignee, 'id'),
-			$this->getRoleIdByRoleName($assigner, $role)
+			$this->getRoleIdByRoleName($assigner, $role),
 		);
 		$this->featureContext->setResponse($response);
 	}
@@ -175,10 +175,10 @@ class SettingsContext implements Context {
 			$this->featureContext->theHTTPStatusCodeShouldBe(
 				201,
 				"Expected response status code should be 201",
-				$response
+				$response,
 			);
 
-			$rawBody =  $response->getBody()->getContents();
+			$rawBody = $response->getBody()->getContents();
 			try {
 				$decodedBody = \json_decode($rawBody, true, 512, JSON_THROW_ON_ERROR);
 				$tryAgain = false;
@@ -201,7 +201,7 @@ class SettingsContext implements Context {
 		Assert::assertArrayHasKey(
 			'bundles',
 			$decodedBody,
-			__METHOD__ . " could not find bundles in body"
+			__METHOD__ . " could not find bundles in body",
 		);
 		$bundles = $decodedBody["bundles"];
 
@@ -287,7 +287,7 @@ class SettingsContext implements Context {
 			Assert::assertEquals(
 				$this->getRoleIdByRoleName($this->featureContext->getAdminUserName(), $role),
 				$actualRoleId,
-				"user $user has no role $role"
+				"user $user has no role $role",
 			);
 		} else {
 			Assert::fail("Response should contain user role but not found.\n" . json_encode($assignmentResponse));
@@ -305,12 +305,12 @@ class SettingsContext implements Context {
 	 */
 	public function theSettingApiResponseShouldHaveTheRole(string $role): void {
 		$assignmentRoleId = $this->featureContext->getJsonDecodedResponse(
-			$this->featureContext->getResponse()
+			$this->featureContext->getResponse(),
 		)["assignments"][0]["roleId"];
 		Assert::assertEquals(
 			$this->getRoleIdByRoleName($this->featureContext->getAdminUserName(), $role),
 			$assignmentRoleId,
-			"user has no role $role"
+			"user has no role $role",
 		);
 	}
 
@@ -362,7 +362,7 @@ class SettingsContext implements Context {
 			$this->featureContext->getBaseUrl(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
-			$headers
+			$headers,
 		);
 	}
 
@@ -380,7 +380,7 @@ class SettingsContext implements Context {
 	public function theUserListsAllValuesListWithHeadersUsingSettingsApi(string $user, TableNode $headersTable): void {
 		$this->featureContext->verifyTableNodeColumns(
 			$headersTable,
-			['header', 'value']
+			['header', 'value'],
 		);
 		$headers = [];
 		foreach ($headersTable as $row) {
@@ -421,17 +421,17 @@ class SettingsContext implements Context {
 					"listValue" => [
 						"values" => [
 							[
-								"stringValue" => $language
-							]
-						]
+								"stringValue" => $language,
+							],
+						],
 					],
 					"resource" => [
-						"type" => "TYPE_USER"
+						"type" => "TYPE_USER",
 					],
-					"settingId" => $settingId
-				]
+					"settingId" => $settingId,
+				],
 			],
-			JSON_THROW_ON_ERROR
+			JSON_THROW_ON_ERROR,
 		);
 		return SettingsHelper::updateSettings(
 			$this->featureContext->getBaseUrl(),
@@ -457,7 +457,7 @@ class SettingsContext implements Context {
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			201,
 			"Expected response status code should be 201",
-			$response
+			$response,
 		);
 	}
 
@@ -494,12 +494,12 @@ class SettingsContext implements Context {
 					"bundleId" => SettingsHelper::getBundleId(),
 					"settingId" => SettingsHelper::getSettingIdUsingEventName("Auto Accept Shares"),
 					"resource" => [
-						"type" => "TYPE_USER"
+						"type" => "TYPE_USER",
 					],
-					"boolValue" => $status
-				]
+					"boolValue" => $status,
+				],
 			],
-			JSON_THROW_ON_ERROR
+			JSON_THROW_ON_ERROR,
 		);
 
 		return SettingsHelper::updateSettings(
@@ -526,7 +526,7 @@ class SettingsContext implements Context {
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			201,
 			"Expected response status code should be 201",
-			$response
+			$response,
 		);
 		$this->featureContext->rememberUserAutoSyncSetting($user, false);
 	}
@@ -563,10 +563,10 @@ class SettingsContext implements Context {
 				"bundleId" => SettingsHelper::getBundleId(),
 				"settingId" => SettingsHelper::getSettingIdUsingEventName("Disable Email Notifications"),
 				"resource" => [
-					"type" => "TYPE_USER"
+					"type" => "TYPE_USER",
 				],
-				"boolValue" => true
-			]
+				"boolValue" => true,
+			],
 		];
 		$response = SettingsHelper::updateSettings(
 			$this->featureContext->getBaseUrl(),
@@ -590,7 +590,7 @@ class SettingsContext implements Context {
 	public function enableOrDisableNotification(
 		string $user,
 		string $enableOrDisable,
-		array $event
+		array $event,
 	): ResponseInterface {
 		$body = [
 			"value" => [
@@ -598,9 +598,9 @@ class SettingsContext implements Context {
 				"bundleId" => SettingsHelper::getBundleId(),
 				"settingId" => SettingsHelper::getSettingIdUsingEventName($event['event']),
 				"resource" => [
-					"type" => "TYPE_USER"
-				]
-			]
+					"type" => "TYPE_USER",
+				],
+			],
 		];
 		$notificationTypes = explode(',', $event['notificationTypes']);
 
@@ -608,12 +608,12 @@ class SettingsContext implements Context {
 			if ($type === "mail") {
 				$body["value"]["collectionValue"]["values"][] = [
 					"key" => "mail",
-					"boolValue" => $enableOrDisable === "enables"
+					"boolValue" => $enableOrDisable === "enables",
 				];
 			} elseif ($type === "in-app") {
 				$body["value"]["collectionValue"]["values"][] = [
 					"key" => "in-app",
-					"boolValue" => $enableOrDisable === "enables"
+					"boolValue" => $enableOrDisable === "enables",
 				];
 			}
 		}
@@ -638,7 +638,7 @@ class SettingsContext implements Context {
 	public function userHasEnabledOrDisabledNotificationForTheFollowingEventUsingTheSettingsApi(
 		string $user,
 		string $enableOrDisable,
-		TableNode $table
+		TableNode $table,
 	): void {
 		$event = $table->getRowsHash();
 		$response = $this->enableOrDisableNotification($user, $enableOrDisable, $event);
@@ -657,7 +657,7 @@ class SettingsContext implements Context {
 	public function userEnablesOrDisablesNotificationForTheFollowingEventUsingTheSettingsApi(
 		string $user,
 		string $enableOrDisable,
-		TableNode $table
+		TableNode $table,
 	): void {
 		$event = $table->getRowsHash();
 		$response = $this->enableOrDisableNotification($user, $enableOrDisable, $event);
@@ -679,10 +679,10 @@ class SettingsContext implements Context {
 				"bundleId" => SettingsHelper::getBundleId(),
 				"settingId" => SettingsHelper::getSettingIdUsingEventName("Email Sending Interval"),
 				"resource" => [
-					"type" => "TYPE_USER"
+					"type" => "TYPE_USER",
 				],
-				"stringValue" => $interval
-			]
+				"stringValue" => $interval,
+			],
 		];
 		return SettingsHelper::updateSettings(
 			$this->featureContext->getBaseUrl(),
@@ -757,14 +757,14 @@ class SettingsContext implements Context {
 			Assert::fail(
 				"Setting '$settingName' does not have a stringValue, boolValue or listValue."
 				. "\n"
-				. json_encode($setting)
+				. json_encode($setting),
 			);
 		}
 
 		Assert::assertSame(
 			$value,
 			$settingValue,
-			"Expected setting value '$value' but got '$settingValue'"
+			"Expected setting value '$value' but got '$settingValue'",
 		);
 	}
 }

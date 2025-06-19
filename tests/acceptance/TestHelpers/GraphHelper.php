@@ -48,7 +48,7 @@ class GraphHelper {
 		'File Editor With Versions' => 'b173329d-cf2e-42f0-a595-ee410645d840',
 		'Viewer With ListGrants' => 'd5041006-ebb3-4b4a-b6a4-7c180ecfb17d',
 		'Editor With ListGrants' => 'e8ea8b21-abd4-45d2-b893-8d1546378e9e',
-		'File Editor With ListGrants' => 'c1235aea-d106-42db-8458-7d5610fb0a67'
+		'File Editor With ListGrants' => 'c1235aea-d106-42db-8458-7d5610fb0a67',
 	];
 
 	public const SHARING_LINK_TYPE_MAPPINGS = [
@@ -227,14 +227,14 @@ class GraphHelper {
 		string $method,
 		string $path,
 		?string $body = null,
-		?array $headers = []
+		?array $headers = [],
 	): RequestInterface {
 		$fullUrl = self::getFullUrl($baseUrl, $path);
 		return HttpRequestHelper::createRequest(
 			$fullUrl,
 			$method,
 			$headers,
-			$body
+			$body,
 		);
 	}
 
@@ -257,13 +257,13 @@ class GraphHelper {
 		string $userName,
 		string $password,
 		?string $email = null,
-		?string $displayName = null
+		?string $displayName = null,
 	): ResponseInterface {
 		$payload = self::prepareCreateUserPayload(
 			$userName,
 			$password,
 			$email,
-			$displayName
+			$displayName,
 		);
 
 		$url = self::getFullUrl($baseUrl, 'users');
@@ -272,7 +272,7 @@ class GraphHelper {
 			$adminUser,
 			$adminPassword,
 			self::getRequestHeaders(),
-			$payload
+			$payload,
 		);
 	}
 
@@ -301,14 +301,14 @@ class GraphHelper {
 		?string $password = null,
 		?string $email = null,
 		?string $displayName = null,
-		?bool $accountEnabled = true
+		?bool $accountEnabled = true,
 	): ResponseInterface {
 		$payload = self::preparePatchUserPayload(
 			$userName,
 			$password,
 			$email,
 			$displayName,
-			$accountEnabled
+			$accountEnabled,
 		);
 		$url = self::getFullUrl($baseUrl, 'users/' . $userId);
 		return HttpRequestHelper::sendRequest(
@@ -317,7 +317,7 @@ class GraphHelper {
 			$adminUser,
 			$adminPassword,
 			self::getRequestHeaders(),
-			$payload
+			$payload,
 		);
 	}
 
@@ -334,14 +334,14 @@ class GraphHelper {
 		string $baseUrl,
 		string $adminUser,
 		string $adminPassword,
-		string $userName
+		string $userName,
 	): ResponseInterface {
 		$url = self::getFullUrl($baseUrl, 'users/' . $userName);
 		return HttpRequestHelper::get(
 			$url,
 			$adminUser,
 			$adminPassword,
-			self::getRequestHeaders()
+			self::getRequestHeaders(),
 		);
 	}
 
@@ -357,14 +357,14 @@ class GraphHelper {
 		string $baseUrl,
 		string $adminUser,
 		string $adminPassword,
-		string $searchTerm
+		string $searchTerm,
 	): ResponseInterface {
 		$url = self::getFullUrl($baseUrl, "users?\$search=$searchTerm");
 		return HttpRequestHelper::get(
 			$url,
 			$adminUser,
 			$adminPassword,
-			self::getRequestHeaders()
+			self::getRequestHeaders(),
 		);
 	}
 
@@ -380,14 +380,14 @@ class GraphHelper {
 		string $baseUrl,
 		string $adminUser,
 		string $adminPassword,
-		string $searchTerm
+		string $searchTerm,
 	): ResponseInterface {
 		$url = self::getFullUrl($baseUrl, "users?\$filter=userType eq 'Federated'&\$search=$searchTerm");
 		return HttpRequestHelper::get(
 			$url,
 			$adminUser,
 			$adminPassword,
-			self::getRequestHeaders()
+			self::getRequestHeaders(),
 		);
 	}
 
@@ -402,14 +402,14 @@ class GraphHelper {
 	public static function getOwnInformationAndGroupMemberships(
 		string $baseUrl,
 		string $user,
-		string $userPassword
+		string $userPassword,
 	): ResponseInterface {
 		$url = self::getFullUrl($baseUrl, 'me/?%24expand=memberOf');
 		return HttpRequestHelper::get(
 			$url,
 			$user,
 			$userPassword,
-			self::getRequestHeaders()
+			self::getRequestHeaders(),
 		);
 	}
 
@@ -426,7 +426,7 @@ class GraphHelper {
 		string $baseUrl,
 		string $adminUser,
 		string $adminPassword,
-		string $userName
+		string $userName,
 	): ResponseInterface {
 		$url = self::getFullUrl($baseUrl, 'users/' . $userName);
 		return HttpRequestHelper::delete(
@@ -449,7 +449,7 @@ class GraphHelper {
 		string $baseUrl,
 		string $adminUser,
 		string $adminPassword,
-		string $userId
+		string $userId,
 	): ResponseInterface {
 		$url = self::getFullUrl($baseUrl, 'users/' . $userId);
 
@@ -473,7 +473,7 @@ class GraphHelper {
 		string $baseUrl,
 		string $byUser,
 		string $userPassword,
-		?string $user = null
+		?string $user = null,
 	): ResponseInterface {
 		$url = self::getFullUrl($baseUrl, 'users/' . $user . '?%24select=&%24expand=drive');
 		return HttpRequestHelper::get(
@@ -496,13 +496,13 @@ class GraphHelper {
 		string $baseUrl,
 		string $byUser,
 		string $userPassword,
-		string $userId
+		string $userId,
 	): ResponseInterface {
 		$url = self::getFullUrl($baseUrl, 'users/' . $userId . '/drive');
 		return HttpRequestHelper::get(
 			$url,
 			$byUser,
-			$userPassword
+			$userPassword,
 		);
 	}
 
@@ -519,7 +519,7 @@ class GraphHelper {
 		string $baseUrl,
 		string $byUser,
 		string $userPassword,
-		?string $user = null
+		?string $user = null,
 	): ResponseInterface {
 		$url = self::getFullUrl($baseUrl, 'users/' . $user . '?%24expand=memberOf');
 		return HttpRequestHelper::get(
@@ -542,7 +542,7 @@ class GraphHelper {
 		string $baseUrl,
 		string $adminUser,
 		string $adminPassword,
-		string $groupName
+		string $groupName,
 	): ResponseInterface {
 		$url = self::getFullUrl($baseUrl, 'groups');
 		$payload['displayName'] = $groupName;
@@ -552,7 +552,7 @@ class GraphHelper {
 			$adminUser,
 			$adminPassword,
 			self::getRequestHeaders(),
-			\json_encode($payload)
+			\json_encode($payload),
 		);
 	}
 
@@ -571,7 +571,7 @@ class GraphHelper {
 		string $adminUser,
 		string $adminPassword,
 		string $groupId,
-		string $displayName
+		string $displayName,
 	): ResponseInterface {
 		$url = self::getFullUrl($baseUrl, 'groups/' . $groupId);
 		$payload['displayName'] = $displayName;
@@ -581,7 +581,7 @@ class GraphHelper {
 			$adminUser,
 			$adminPassword,
 			self::getRequestHeaders(),
-			\json_encode($payload)
+			\json_encode($payload),
 		);
 	}
 
@@ -596,7 +596,7 @@ class GraphHelper {
 	public static function getUsers(
 		string $baseUrl,
 		string $adminUser,
-		string $adminPassword
+		string $adminPassword,
 	): ResponseInterface {
 		$url = self::getFullUrl($baseUrl, 'users');
 		return HttpRequestHelper::get(
@@ -618,7 +618,7 @@ class GraphHelper {
 	public static function getGroups(
 		string $baseUrl,
 		string $adminUser,
-		string $adminPassword
+		string $adminPassword,
 	): ResponseInterface {
 		$url = self::getFullUrl($baseUrl, 'groups');
 		return HttpRequestHelper::get(
@@ -642,14 +642,14 @@ class GraphHelper {
 		string $baseUrl,
 		string $adminUser,
 		string $adminPassword,
-		string $groupName
+		string $groupName,
 	): ResponseInterface {
 		$url = self::getFullUrl($baseUrl, 'groups/' . $groupName);
 		return HttpRequestHelper::get(
 			$url,
 			$adminUser,
 			$adminPassword,
-			self::getRequestHeaders()
+			self::getRequestHeaders(),
 		);
 	}
 
@@ -665,14 +665,14 @@ class GraphHelper {
 		string $baseUrl,
 		string $user,
 		string $password,
-		string $searchTerm
+		string $searchTerm,
 	): ResponseInterface {
 		$url = self::getFullUrl($baseUrl, "groups?\$search=$searchTerm");
 		return HttpRequestHelper::get(
 			$url,
 			$user,
 			$password,
-			self::getRequestHeaders()
+			self::getRequestHeaders(),
 		);
 	}
 
@@ -689,7 +689,7 @@ class GraphHelper {
 		string $baseUrl,
 		string $adminUser,
 		string $adminPassword,
-		string $groupId
+		string $groupId,
 	): ResponseInterface {
 		$url = self::getFullUrl($baseUrl, 'groups/' . $groupId);
 		return HttpRequestHelper::delete(
@@ -716,7 +716,7 @@ class GraphHelper {
 		string $adminUser,
 		string $adminPassword,
 		string $groupId,
-		array $userIds
+		array $userIds,
 	): ResponseInterface {
 		$url = self::getFullUrl($baseUrl, 'groups/' . $groupId);
 		$payload = [ "members@odata.bind" => [] ];
@@ -729,7 +729,7 @@ class GraphHelper {
 			$adminUser,
 			$adminPassword,
 			self::getRequestHeaders(),
-			\json_encode($payload)
+			\json_encode($payload),
 		);
 	}
 
@@ -748,18 +748,18 @@ class GraphHelper {
 		string $adminUser,
 		string $adminPassword,
 		string $userId,
-		string $groupId
+		string $groupId,
 	): ResponseInterface {
 		$url = self::getFullUrl($baseUrl, 'groups/' . $groupId . '/members/$ref');
 		$body = [
-			"@odata.id" => self::getFullUrl($baseUrl, 'users/' . $userId)
+			"@odata.id" => self::getFullUrl($baseUrl, 'users/' . $userId),
 		];
 		return HttpRequestHelper::post(
 			$url,
 			$adminUser,
 			$adminPassword,
 			self::getRequestHeaders(),
-			\json_encode($body)
+			\json_encode($body),
 		);
 	}
 
@@ -778,7 +778,7 @@ class GraphHelper {
 		string $adminUser,
 		string $adminPassword,
 		string $userId,
-		string $groupId
+		string $groupId,
 	): ResponseInterface {
 		$url = self::getFullUrl($baseUrl, 'groups/' . $groupId . '/members/' . $userId . '/$ref');
 		return HttpRequestHelper::delete(
@@ -801,13 +801,13 @@ class GraphHelper {
 		string $baseUrl,
 		string $adminUser,
 		string $adminPassword,
-		string $groupId
+		string $groupId,
 	): ResponseInterface {
 		$url = self::getFullUrl($baseUrl, 'groups/' . $groupId . '/members');
 		return HttpRequestHelper::get(
 			$url,
 			$adminUser,
-			$adminPassword
+			$adminPassword,
 		);
 	}
 
@@ -827,7 +827,7 @@ class GraphHelper {
 		string $baseUrl,
 		string $adminUser,
 		string $adminPassword,
-		?string $groupId = null
+		?string $groupId = null,
 	): ResponseInterface {
 		// we can expand to get list of members for a single group with groupId and also expand to get all groups with all its members
 		$endPath = ($groupId) ? '/' . $groupId . '?$expand=members' : '?$expand=members';
@@ -835,7 +835,7 @@ class GraphHelper {
 		return HttpRequestHelper::get(
 			$url,
 			$adminUser,
-			$adminPassword
+			$adminPassword,
 		);
 	}
 
@@ -853,7 +853,7 @@ class GraphHelper {
 		string $userName,
 		string $password,
 		?string $email,
-		?string $displayName
+		?string $displayName,
 	): string {
 		$payload['onPremisesSamAccountName'] = $userName;
 		$payload['passwordProfile'] = ['password' => $password];
@@ -883,7 +883,7 @@ class GraphHelper {
 		?string $password,
 		?string $email,
 		?string $displayName,
-		?bool $accountEnabled
+		?bool $accountEnabled,
 	): string {
 		$payload = [];
 		if ($userName !== null) {
@@ -923,7 +923,7 @@ class GraphHelper {
 		string $user,
 		string $password,
 		string $body,
-		array $headers = []
+		array $headers = [],
 	): ResponseInterface {
 		$url = self::getFullUrl($baseUrl, 'drives');
 
@@ -949,7 +949,7 @@ class GraphHelper {
 		string $password,
 		$body,
 		string $spaceId,
-		array $headers = []
+		array $headers = [],
 	): ResponseInterface {
 		$url = self::getFullUrl($baseUrl, 'drives/' . $spaceId);
 
@@ -975,8 +975,8 @@ class GraphHelper {
 		string $user,
 		string $password,
 		string $urlArguments = '',
-		array  $body = [],
-		array  $headers = []
+		array $body = [],
+		array $headers = [],
 	): ResponseInterface {
 		$urlArguments = $urlArguments ? "?$urlArguments" : "";
 		$url = self::getFullUrl($baseUrl, "me/drives" . $urlArguments);
@@ -1003,8 +1003,8 @@ class GraphHelper {
 		string $user,
 		string $password,
 		string $urlArguments = '',
-		array  $body = [],
-		array  $headers = []
+		array $body = [],
+		array $headers = [],
 	): ResponseInterface {
 		$urlArguments = $urlArguments ? "?$urlArguments" : "";
 		$url = self::getFullUrl($baseUrl, "drives" . $urlArguments);
@@ -1033,8 +1033,8 @@ class GraphHelper {
 		string $password,
 		string $spaceId,
 		string $urlArguments = '',
-		array  $body = [],
-		array  $headers = []
+		array $body = [],
+		array $headers = [],
 	): ResponseInterface {
 		$url = self::getFullUrl($baseUrl, 'drives/' . $spaceId . "/" . $urlArguments);
 
@@ -1062,7 +1062,7 @@ class GraphHelper {
 		return HttpRequestHelper::delete(
 			$url,
 			$user,
-			$password
+			$password,
 		);
 	}
 
@@ -1090,7 +1090,7 @@ class GraphHelper {
 			$url,
 			$user,
 			$password,
-			$header
+			$header,
 		);
 	}
 
@@ -1133,7 +1133,7 @@ class GraphHelper {
 		string $user,
 		string $password,
 		string $currentPassword,
-		string $newPassword
+		string $newPassword,
 	): ResponseInterface {
 		$url = self::getFullUrl($baseUrl, 'me/changePassword');
 		$payload['currentPassword'] = $currentPassword;
@@ -1145,7 +1145,7 @@ class GraphHelper {
 			$user,
 			$password,
 			self::getRequestHeaders(),
-			\json_encode($payload)
+			\json_encode($payload),
 		);
 	}
 
@@ -1163,8 +1163,8 @@ class GraphHelper {
 		string $baseUrl,
 		string $user,
 		string $password,
-		array  $body = [],
-		array  $headers = []
+		array $body = [],
+		array $headers = [],
 	): ResponseInterface {
 		$url = self::getFullUrl($baseUrl, 'extensions/org.libregraph/tags');
 
@@ -1186,7 +1186,7 @@ class GraphHelper {
 		string $user,
 		string $password,
 		string $resourceId,
-		array $tagName
+		array $tagName,
 	): ResponseInterface {
 		$url = self::getFullUrl($baseUrl, 'extensions/org.libregraph/tags');
 		$payload['resourceId'] = $resourceId;
@@ -1198,7 +1198,7 @@ class GraphHelper {
 			$user,
 			$password,
 			self::getRequestHeaders(),
-			\json_encode($payload)
+			\json_encode($payload),
 		);
 	}
 
@@ -1217,7 +1217,7 @@ class GraphHelper {
 		string $user,
 		string $password,
 		string $resourceId,
-		array $tagName
+		array $tagName,
 	): ResponseInterface {
 		$url = self::getFullUrl($baseUrl, 'extensions/org.libregraph/tags');
 		$payload['resourceId'] = $resourceId;
@@ -1229,7 +1229,7 @@ class GraphHelper {
 			$user,
 			$password,
 			self::getRequestHeaders(),
-			\json_encode($payload)
+			\json_encode($payload),
 		);
 	}
 
@@ -1244,14 +1244,14 @@ class GraphHelper {
 	public static function getApplications(
 		string $baseUrl,
 		string $user,
-		string $password
+		string $password,
 	): ResponseInterface {
 		$url = self::getFullUrl($baseUrl, 'applications');
 		return HttpRequestHelper::get(
 			$url,
 			$user,
 			$password,
-			self::getRequestHeaders()
+			self::getRequestHeaders(),
 		);
 	}
 
@@ -1268,14 +1268,14 @@ class GraphHelper {
 		string $baseUrl,
 		string $user,
 		string $password,
-		string $groupId
+		string $groupId,
 	): ResponseInterface {
-		$url = self::getFullUrl($baseUrl, 'users' . '?$filter=memberOf/any(m:m/id ' . "eq '$groupId')");
+		$url = self::getFullUrl($baseUrl, 'users?$filter=memberOf/any(m:m/id ' . "eq '$groupId')");
 		return HttpRequestHelper::get(
 			$url,
 			$user,
 			$password,
-			self::getRequestHeaders()
+			self::getRequestHeaders(),
 		);
 	}
 
@@ -1292,18 +1292,18 @@ class GraphHelper {
 		string $baseUrl,
 		string $user,
 		string $password,
-		array $groupIdArray
+		array $groupIdArray,
 	): ResponseInterface {
 		$url = self::getFullUrl(
 			$baseUrl,
-			'users' . '?$filter=memberOf/any(m:m/id ' . "eq '$groupIdArray[0]') "
-			. "and memberOf/any(m:m/id eq '$groupIdArray[1]')"
+			'users?$filter=memberOf/any(m:m/id ' . "eq '$groupIdArray[0]') "
+			. "and memberOf/any(m:m/id eq '$groupIdArray[1]')",
 		);
 		return HttpRequestHelper::get(
 			$url,
 			$user,
 			$password,
-			self::getRequestHeaders()
+			self::getRequestHeaders(),
 		);
 	}
 
@@ -1322,18 +1322,18 @@ class GraphHelper {
 		string $user,
 		string $password,
 		string $firstGroup,
-		string $secondGroup
+		string $secondGroup,
 	): ResponseInterface {
 		$url = self::getFullUrl(
 			$baseUrl,
-			'users' . '?$filter=memberOf/any(m:m/id '
-			. "eq '$firstGroup') " . "or memberOf/any(m:m/id eq '$secondGroup')"
+			'users?$filter=memberOf/any(m:m/id '
+			. "eq '$firstGroup') or memberOf/any(m:m/id eq '$secondGroup')",
 		);
 		return HttpRequestHelper::get(
 			$url,
 			$user,
 			$password,
-			self::getRequestHeaders()
+			self::getRequestHeaders(),
 		);
 	}
 
@@ -1350,14 +1350,14 @@ class GraphHelper {
 		string $baseUrl,
 		string $user,
 		string $password,
-		string $roleId
+		string $roleId,
 	): ResponseInterface {
-		$url = self::getFullUrl($baseUrl, 'users' . '?$filter=appRoleAssignments/any(m:m/appRoleId ' . "eq '$roleId')");
+		$url = self::getFullUrl($baseUrl, 'users?$filter=appRoleAssignments/any(m:m/appRoleId ' . "eq '$roleId')");
 		return HttpRequestHelper::get(
 			$url,
 			$user,
 			$password,
-			self::getRequestHeaders()
+			self::getRequestHeaders(),
 		);
 	}
 
@@ -1376,18 +1376,18 @@ class GraphHelper {
 		string $user,
 		string $password,
 		string $roleId,
-		string $groupId
+		string $groupId,
 	): ResponseInterface {
 		$url = self::getFullUrl(
 			$baseUrl,
-			'users' . '?$filter=appRoleAssignments/any(m:m/appRoleId '
-			. "eq '$roleId') " . "and memberOf/any(m:m/id eq '$groupId')"
+			'users?$filter=appRoleAssignments/any(m:m/appRoleId '
+			. "eq '$roleId') and memberOf/any(m:m/id eq '$groupId')",
 		);
 		return HttpRequestHelper::get(
 			$url,
 			$user,
 			$password,
-			self::getRequestHeaders()
+			self::getRequestHeaders(),
 		);
 	}
 
@@ -1408,7 +1408,7 @@ class GraphHelper {
 		string $password,
 		string $appRoleId,
 		string $applicationId,
-		string $userId
+		string $userId,
 	): ResponseInterface {
 		$url = self::getFullUrl($baseUrl, 'users/' . $userId . '/appRoleAssignments');
 		$payload['principalId'] = $userId;
@@ -1420,7 +1420,7 @@ class GraphHelper {
 			$user,
 			$password,
 			self::getRequestHeaders(),
-			\json_encode($payload)
+			\json_encode($payload),
 		);
 	}
 
@@ -1437,14 +1437,14 @@ class GraphHelper {
 		string $baseUrl,
 		string $user,
 		string $password,
-		string $userId
+		string $userId,
 	): ResponseInterface {
 		$url = self::getFullUrl($baseUrl, 'users/' . $userId . '/appRoleAssignments');
 		return HttpRequestHelper::get(
 			$url,
 			$user,
 			$password,
-			self::getRequestHeaders()
+			self::getRequestHeaders(),
 		);
 	}
 
@@ -1463,7 +1463,7 @@ class GraphHelper {
 		string $user,
 		string $password,
 		string $userId,
-		string $path
+		string $path,
 	): ResponseInterface {
 		$url = self::getFullUrl($baseUrl, 'users/' . $userId . '/exportPersonalData');
 		// this payload is the storage location of the report generated
@@ -1474,7 +1474,7 @@ class GraphHelper {
 			$user,
 			$password,
 			self::getRequestHeaders(),
-			\json_encode($payload)
+			\json_encode($payload),
 		);
 	}
 
@@ -1493,7 +1493,7 @@ class GraphHelper {
 		string $user,
 		string $password,
 		string $appRoleAssignmentId,
-		string $userId
+		string $userId,
 	): ResponseInterface {
 		$url = self::getFullUrl($baseUrl, 'users/' . $userId . '/appRoleAssignments/' . $appRoleAssignmentId);
 		return HttpRequestHelper::sendRequest(
@@ -1519,13 +1519,13 @@ class GraphHelper {
 		string $baseUrl,
 		string $user,
 		string $password,
-		string $path
+		string $path,
 	): string {
 		$response = self::getMySpaces(
 			$baseUrl,
 			$user,
 			$password,
-			''
+			'',
 		);
 		$drives = json_decode($response->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
 
@@ -1540,7 +1540,7 @@ class GraphHelper {
 		}
 		throw new \Exception(
 			__METHOD__
-			. " Cannot find share mountpoint id of '$path' for user '$user'"
+			. " Cannot find share mountpoint id of '$path' for user '$user'",
 		);
 	}
 
@@ -1557,7 +1557,7 @@ class GraphHelper {
 		string $baseUrl,
 		string $user,
 		string $password,
-		string $language
+		string $language,
 	): ResponseInterface {
 		$fullUrl = self::getFullUrl($baseUrl, 'me');
 		$payload['preferredLanguage'] = $language;
@@ -1567,7 +1567,7 @@ class GraphHelper {
 			$user,
 			$password,
 			null,
-			\json_encode($payload)
+			\json_encode($payload),
 		);
 	}
 
@@ -1588,7 +1588,7 @@ class GraphHelper {
 		string $password,
 		string $spaceId,
 		string $itemId,
-		?string $query = null
+		?string $query = null,
 	): ResponseInterface {
 		$url = self::getBetaFullUrl($baseUrl, "drives/$spaceId/items/$itemId/permissions");
 		if (!empty($query)) {
@@ -1599,7 +1599,7 @@ class GraphHelper {
 			$url,
 			$user,
 			$password,
-			self::getRequestHeaders()
+			self::getRequestHeaders(),
 		);
 	}
 
@@ -1620,7 +1620,7 @@ class GraphHelper {
 		string $password,
 		string $spaceId,
 		string $itemId,
-		string $permssionId
+		string $permssionId,
 	): ResponseInterface {
 		$url = self::getBetaFullUrl($baseUrl, "drives/$spaceId/items/$itemId/permissions/$permssionId");
 
@@ -1628,7 +1628,7 @@ class GraphHelper {
 			$url,
 			$user,
 			$password,
-			self::getRequestHeaders()
+			self::getRequestHeaders(),
 		);
 	}
 
@@ -1683,7 +1683,7 @@ class GraphHelper {
 		array $shareTypes,
 		?string $permissionsRole,
 		?string $permissionsAction,
-		?string $expirationDateTime
+		?string $expirationDateTime,
 	): array {
 		$body = [];
 
@@ -1691,7 +1691,7 @@ class GraphHelper {
 			$shareType = $shareTypes[$index];
 			$body['recipients'][] = [
 				"@libre.graph.recipient.type" => $shareType,
-				"objectId" => $shareeId
+				"objectId" => $shareeId,
 			];
 		}
 
@@ -1736,7 +1736,7 @@ class GraphHelper {
 		array $shareTypes,
 		?string $permissionsRole,
 		?string $permissionsAction,
-		?string $expirationDateTime
+		?string $expirationDateTime,
 	): ResponseInterface {
 		$url = self::getBetaFullUrl($baseUrl, "drives/$spaceId/items/$itemId/invite");
 		$body = self::createShareInviteBody(
@@ -1744,14 +1744,14 @@ class GraphHelper {
 			$shareTypes,
 			$permissionsRole,
 			$permissionsAction,
-			$expirationDateTime
+			$expirationDateTime,
 		);
 		return HttpRequestHelper::post(
 			$url,
 			$user,
 			$password,
 			self::getRequestHeaders(),
-			\json_encode($body)
+			\json_encode($body),
 		);
 	}
 
@@ -1772,7 +1772,7 @@ class GraphHelper {
 		string $password,
 		string $spaceId,
 		string $itemId,
-		$body
+		$body,
 	): ResponseInterface {
 		$url = self::getBetaFullUrl($baseUrl, "drives/$spaceId/items/$itemId/createLink");
 		return HttpRequestHelper::post(
@@ -1780,7 +1780,7 @@ class GraphHelper {
 			$user,
 			$password,
 			self::getRequestHeaders(),
-			$body
+			$body,
 		);
 	}
 
@@ -1803,7 +1803,7 @@ class GraphHelper {
 		string $spaceId,
 		string $itemId,
 		$body,
-		string $permissionsId
+		string $permissionsId,
 	): ResponseInterface {
 		$url = self::getBetaFullUrl($baseUrl, "drives/$spaceId/items/$itemId/permissions/$permissionsId");
 		return HttpRequestHelper::sendRequestOnce(
@@ -1812,7 +1812,7 @@ class GraphHelper {
 			$user,
 			$password,
 			self::getRequestHeaders(),
-			$body
+			$body,
 		);
 	}
 
@@ -1835,7 +1835,7 @@ class GraphHelper {
 		string $spaceId,
 		string $itemId,
 		$body,
-		string $permissionsId
+		string $permissionsId,
 	): ResponseInterface {
 		$url = self::getBetaFullUrl($baseUrl, "drives/$spaceId/items/$itemId/permissions/$permissionsId/setPassword");
 		return HttpRequestHelper::post(
@@ -1843,7 +1843,7 @@ class GraphHelper {
 			$user,
 			$password,
 			self::getRequestHeaders(),
-			$body
+			$body,
 		);
 	}
 
@@ -1865,14 +1865,14 @@ class GraphHelper {
 		string $password,
 		string $spaceId,
 		string $itemId,
-		string $permissionId
+		string $permissionId,
 	): ResponseInterface {
 		$url = self::getBetaFullUrl($baseUrl, "drives/$spaceId/items/$itemId/permissions/$permissionId");
 		return HttpRequestHelper::delete(
 			$url,
 			$user,
 			$password,
-			self::getRequestHeaders()
+			self::getRequestHeaders(),
 		);
 	}
 
@@ -1892,14 +1892,14 @@ class GraphHelper {
 		string $user,
 		string $password,
 		string $spaceId,
-		string $permissionId
+		string $permissionId,
 	): ResponseInterface {
 		$url = self::getBetaFullUrl($baseUrl, "drives/$spaceId/root/permissions/$permissionId");
 		return HttpRequestHelper::delete(
 			$url,
 			$user,
 			$password,
-			self::getRequestHeaders()
+			self::getRequestHeaders(),
 		);
 	}
 
@@ -1914,14 +1914,14 @@ class GraphHelper {
 	public static function getSharesSharedWithMe(
 		string $baseUrl,
 		string $user,
-		string $password
+		string $password,
 	): ResponseInterface {
 		$url = self::getBetaFullUrl($baseUrl, "me/drive/sharedWithMe");
 		return HttpRequestHelper::get(
 			$url,
 			$user,
 			$password,
-			self::getRequestHeaders()
+			self::getRequestHeaders(),
 		);
 	}
 
@@ -1936,14 +1936,14 @@ class GraphHelper {
 	public static function getSharesSharedByMe(
 		string $baseUrl,
 		string $user,
-		string $password
+		string $password,
 	): ResponseInterface {
 		$url = self::getBetaFullUrl($baseUrl, "me/drive/sharedByMe");
 		return HttpRequestHelper::get(
 			$url,
 			$user,
 			$password,
-			self::getRequestHeaders()
+			self::getRequestHeaders(),
 		);
 	}
 
@@ -1962,14 +1962,14 @@ class GraphHelper {
 		string $user,
 		string $password,
 		string $itemId,
-		string $shareSpaceId
+		string $shareSpaceId,
 	): ResponseInterface {
 		$url = self::getBetaFullUrl($baseUrl, "drives/$shareSpaceId/items/$itemId");
 		return HttpRequestHelper::delete(
 			$url,
 			$user,
 			$password,
-			self::getRequestHeaders()
+			self::getRequestHeaders(),
 		);
 	}
 
@@ -1990,7 +1990,7 @@ class GraphHelper {
 		string $password,
 		string $itemId,
 		string $shareSpaceId,
-		array $body
+		array $body,
 	): ResponseInterface {
 		$url = self::getBetaFullUrl($baseUrl, "drives/$shareSpaceId/items/$itemId");
 		return HttpRequestHelper::sendRequest(
@@ -1999,7 +1999,7 @@ class GraphHelper {
 			$user,
 			$password,
 			self::getRequestHeaders(),
-			\json_encode($body)
+			\json_encode($body),
 		);
 	}
 
@@ -2018,12 +2018,12 @@ class GraphHelper {
 		string $user,
 		string $password,
 		string $itemId,
-		string $shareSpaceId
+		string $shareSpaceId,
 	): ResponseInterface {
 		$body = [
 			"remoteItem" => [
-				"id" => $itemId
-			]
+				"id" => $itemId,
+			],
 		];
 		$url = self::getBetaFullUrl($baseUrl, "drives/$shareSpaceId/root/children");
 		return HttpRequestHelper::post(
@@ -2031,7 +2031,7 @@ class GraphHelper {
 			$user,
 			$password,
 			self::getRequestHeaders(),
-			\json_encode($body)
+			\json_encode($body),
 		);
 	}
 
@@ -2048,14 +2048,14 @@ class GraphHelper {
 		string $baseUrl,
 		string $user,
 		string $password,
-		string $spaceId
+		string $spaceId,
 	): ResponseInterface {
 		$url = self::getBetaFullUrl($baseUrl, "drives/$spaceId/root/permissions");
 		return HttpRequestHelper::get(
 			$url,
 			$user,
 			$password,
-			self::getRequestHeaders()
+			self::getRequestHeaders(),
 		);
 	}
 
@@ -2074,14 +2074,14 @@ class GraphHelper {
 		string $user,
 		string $password,
 		string $spaceId,
-		string $permissionId
+		string $permissionId,
 	): ResponseInterface {
 		$url = self::getBetaFullUrl($baseUrl, "drives/$spaceId/root/permissions/$permissionId");
 		return HttpRequestHelper::get(
 			$url,
 			$user,
 			$password,
-			self::getRequestHeaders()
+			self::getRequestHeaders(),
 		);
 	}
 
@@ -2108,7 +2108,7 @@ class GraphHelper {
 		array $shareTypes,
 		?string $permissionsRole,
 		?string $permissionsAction,
-		?string $expirationDateTime
+		?string $expirationDateTime,
 	): ResponseInterface {
 		$url = self::getBetaFullUrl($baseUrl, "drives/$spaceId/root/invite");
 		$body = self::createShareInviteBody(
@@ -2116,7 +2116,7 @@ class GraphHelper {
 			$shareTypes,
 			$permissionsRole,
 			$permissionsAction,
-			$expirationDateTime
+			$expirationDateTime,
 		);
 
 		return HttpRequestHelper::post(
@@ -2124,7 +2124,7 @@ class GraphHelper {
 			$user,
 			$password,
 			self::getRequestHeaders(),
-			\json_encode($body)
+			\json_encode($body),
 		);
 	}
 
@@ -2145,7 +2145,7 @@ class GraphHelper {
 		string $password,
 		string $spaceId,
 		$body,
-		string $permissionsId
+		string $permissionsId,
 	): ResponseInterface {
 		$url = self::getBetaFullUrl($baseUrl, "drives/$spaceId/root/permissions/$permissionsId");
 
@@ -2155,7 +2155,7 @@ class GraphHelper {
 			$user,
 			$password,
 			self::getRequestHeaders(),
-			$body
+			$body,
 		);
 	}
 
@@ -2174,7 +2174,7 @@ class GraphHelper {
 		string $user,
 		string $password,
 		string $spaceId,
-		$body
+		$body,
 	): ResponseInterface {
 		$url = self::getBetaFullUrl($baseUrl, "drives/$spaceId/root/createLink");
 		return HttpRequestHelper::post(
@@ -2182,7 +2182,7 @@ class GraphHelper {
 			$user,
 			$password,
 			self::getRequestHeaders(),
-			$body
+			$body,
 		);
 	}
 
@@ -2204,7 +2204,7 @@ class GraphHelper {
 		string $password,
 		string $spaceId,
 		$body,
-		string $permissionsId
+		string $permissionsId,
 	): ResponseInterface {
 		$url = self::getBetaFullUrl($baseUrl, "drives/$spaceId/root/permissions/$permissionsId/setPassword");
 		return HttpRequestHelper::post(
@@ -2212,7 +2212,7 @@ class GraphHelper {
 			$user,
 			$password,
 			self::getRequestHeaders(),
-			$body
+			$body,
 		);
 	}
 
@@ -2234,7 +2234,7 @@ class GraphHelper {
 			$url,
 			$user,
 			$password,
-			self::getRequestHeaders()
+			self::getRequestHeaders(),
 		);
 	}
 
@@ -2259,7 +2259,7 @@ class GraphHelper {
 			$url,
 			$user,
 			$password,
-			self::getRequestHeaders()
+			self::getRequestHeaders(),
 		);
 	}
 
@@ -2278,7 +2278,7 @@ class GraphHelper {
 		string $user,
 		string $password,
 		string $resourceId,
-		?array $filterParams = []
+		?array $filterParams = [],
 	): ResponseInterface {
 		// 'kql=itemId' filter is required for the current implementation but it might change in future
 		// See: https://github.com/owncloud/ocis/issues/9194
@@ -2291,7 +2291,7 @@ class GraphHelper {
 		return HttpRequestHelper::get(
 			$fullUrl,
 			$user,
-			$password
+			$password,
 		);
 	}
 
@@ -2306,14 +2306,14 @@ class GraphHelper {
 	public static function getFederatedUsers(
 		string $baseUrl,
 		string $user,
-		string $password
+		string $password,
 	): ResponseInterface {
 		$url = self::getFullUrl($baseUrl, "users?\$filter=userType eq 'Federated'");
 		return HttpRequestHelper::get(
 			$url,
 			$user,
 			$password,
-			self::getRequestHeaders()
+			self::getRequestHeaders(),
 		);
 	}
 
@@ -2335,7 +2335,7 @@ class GraphHelper {
 			$url,
 			$adminUser,
 			$adminPassword,
-			self::getRequestHeaders()
+			self::getRequestHeaders(),
 		);
 	}
 
@@ -2354,17 +2354,17 @@ class GraphHelper {
 		string $user,
 		string $password,
 		string $groupId,
-		string $searchTerm
+		string $searchTerm,
 	): ResponseInterface {
 		$url = self::getFullUrl(
 			$baseUrl,
-			'users' . '?$filter=memberOf/any(m:m/id ' . "eq '$groupId')" . '&$search=' . "$searchTerm"
+			'users?$filter=memberOf/any(m:m/id ' . "eq '$groupId')" . '&$search=' . "$searchTerm",
 		);
 		return HttpRequestHelper::get(
 			$url,
 			$user,
 			$password,
-			self::getRequestHeaders()
+			self::getRequestHeaders(),
 		);
 	}
 }

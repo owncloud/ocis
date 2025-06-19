@@ -42,14 +42,14 @@ class OcisConfigHelper {
 	public static function sendRequest(
 		string $url,
 		string $method,
-		?string $body = ""
+		?string $body = "",
 	): ResponseInterface {
 		$client = HttpRequestHelper::createClient();
 		$request = new Request(
 			$method,
 			$url,
 			[],
-			$body
+			$body,
 		);
 
 		try {
@@ -58,7 +58,7 @@ class OcisConfigHelper {
 			throw new \Error(
 				"Cannot connect to the ociswrapper at the moment,"
 				. "make sure that ociswrapper is running before proceeding with the test run.\n"
-				. $e->getMessage()
+				. $e->getMessage(),
 			);
 		} catch (GuzzleException $ex) {
 			$response = $ex->getResponse();

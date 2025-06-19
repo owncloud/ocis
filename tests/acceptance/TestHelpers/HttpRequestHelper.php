@@ -116,7 +116,7 @@ class HttpRequestHelper {
 		?CookieJar $cookies = null,
 		bool $stream = false,
 		?int $timeout = 0,
-		?Client $client =  null
+		?Client $client = null,
 	): ResponseInterface {
 		if ($client === null) {
 			$client = self::createClient(
@@ -125,7 +125,7 @@ class HttpRequestHelper {
 				$config,
 				$cookies,
 				$stream,
-				$timeout
+				$timeout,
 			);
 		}
 
@@ -152,7 +152,7 @@ class HttpRequestHelper {
 			$url,
 			$method,
 			$headers,
-			$body
+			$body,
 		);
 
 		if ((\getenv('DEBUG_ACCEPTANCE_REQUESTS') !== false) || (\getenv('DEBUG_ACCEPTANCE_API_CALLS') !== false)) {
@@ -175,7 +175,7 @@ class HttpRequestHelper {
 		} catch (RequestException $ex) {
 			$response = $ex->getResponse();
 
-			//if the response was null for some reason do not return it but re-throw
+			// if the response was null for some reason do not return it but re-throw
 			if ($response === null) {
 				throw $ex;
 			}
@@ -215,8 +215,8 @@ class HttpRequestHelper {
 		?CookieJar $cookies = null,
 		bool $stream = false,
 		?int $timeout = 0,
-		?Client $client =  null,
-		?bool $isGivenStep = false
+		?Client $client = null,
+		?bool $isGivenStep = false,
 	): ResponseInterface {
 		if ((\getenv('DEBUG_ACCEPTANCE_RESPONSES') !== false) || (\getenv('DEBUG_ACCEPTANCE_API_CALLS') !== false)) {
 			$debugResponses = true;
@@ -239,7 +239,7 @@ class HttpRequestHelper {
 				$cookies,
 				$stream,
 				$timeout,
-				$client
+				$client,
 			);
 
 			if ($response->getStatusCode() >= 400
@@ -354,7 +354,7 @@ class HttpRequestHelper {
 	 */
 	public static function sendBatchRequest(
 		?array $requests,
-		?Client $client
+		?Client $client,
 	): array {
 		return Pool::batch($client, $requests);
 	}
@@ -379,7 +379,7 @@ class HttpRequestHelper {
 		?array $config = null,
 		?CookieJar $cookies = null,
 		?bool $stream = false,
-		?int $timeout = 0
+		?int $timeout = 0,
 	): Client {
 		$options = [];
 		if ($user !== null) {
@@ -415,7 +415,7 @@ class HttpRequestHelper {
 		?string $url,
 		?string $method = 'GET',
 		?array $headers = null,
-		$body = null
+		$body = null,
 	): RequestInterface {
 		if ($headers === null) {
 			$headers = [];
@@ -434,7 +434,7 @@ class HttpRequestHelper {
 			$method,
 			$url,
 			$headers,
-			$body
+			$body,
 		);
 		HttpLogger::logRequest($request);
 		return $request;
@@ -464,7 +464,7 @@ class HttpRequestHelper {
 		$body = null,
 		?array $config = null,
 		?CookieJar $cookies = null,
-		?bool $stream = false
+		?bool $stream = false,
 	): ResponseInterface {
 		return self::sendRequest(
 			$url,
@@ -475,7 +475,7 @@ class HttpRequestHelper {
 			$body,
 			$config,
 			$cookies,
-			$stream
+			$stream,
 		);
 	}
 
@@ -503,7 +503,7 @@ class HttpRequestHelper {
 		$body = null,
 		?array $config = null,
 		?CookieJar $cookies = null,
-		?bool $stream = false
+		?bool $stream = false,
 	): ResponseInterface {
 		return self::sendRequest(
 			$url,
@@ -514,7 +514,7 @@ class HttpRequestHelper {
 			$body,
 			$config,
 			$cookies,
-			$stream
+			$stream,
 		);
 	}
 
@@ -542,7 +542,7 @@ class HttpRequestHelper {
 		$body = null,
 		?array $config = null,
 		?CookieJar $cookies = null,
-		?bool $stream = false
+		?bool $stream = false,
 	): ResponseInterface {
 		return self::sendRequest(
 			$url,
@@ -553,7 +553,7 @@ class HttpRequestHelper {
 			$body,
 			$config,
 			$cookies,
-			$stream
+			$stream,
 		);
 	}
 
@@ -582,7 +582,7 @@ class HttpRequestHelper {
 		$body = null,
 		?array $config = null,
 		?CookieJar $cookies = null,
-		?bool $stream = false
+		?bool $stream = false,
 	): ResponseInterface {
 		return self::sendRequest(
 			$url,
@@ -593,7 +593,7 @@ class HttpRequestHelper {
 			$body,
 			$config,
 			$cookies,
-			$stream
+			$stream,
 		);
 	}
 
@@ -619,15 +619,15 @@ class HttpRequestHelper {
 			$responseXmlObject = new SimpleXMLElement($contents);
 			$responseXmlObject->registerXPathNamespace(
 				'ocs',
-				'http://open-collaboration-services.org/ns'
+				'http://open-collaboration-services.org/ns',
 			);
 			$responseXmlObject->registerXPathNamespace(
 				'oc',
-				'http://owncloud.org/ns'
+				'http://owncloud.org/ns',
 			);
 			$responseXmlObject->registerXPathNamespace(
 				'd',
-				'DAV:'
+				'DAV:',
 			);
 			return $responseXmlObject;
 		} catch (Exception $e) {

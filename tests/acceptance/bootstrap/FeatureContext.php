@@ -259,13 +259,13 @@ class FeatureContext extends BehatVariablesContext {
 	 */
 	public function pushToLastStatusCodesArrays(): void {
 		$this->pushToLastHttpStatusCodesArray(
-			(string)$this->getResponse()->getStatusCode()
+			(string)$this->getResponse()->getStatusCode(),
 		);
 		try {
 			$this->pushToLastOcsCodesArray(
 				$this->ocsContext->getOCSResponseStatusCode(
-					$this->getResponse()
-				)
+					$this->getResponse(),
+				),
 			);
 		} catch (Exception $exception) {
 			// if response couldn't be converted into xml then push "notset" to last ocs status codes array
@@ -402,7 +402,7 @@ class FeatureContext extends BehatVariablesContext {
 		if (($this->userReplacements === null) && $this->isTestingReplacingUsernames()) {
 			$this->userReplacements = \json_decode(
 				\file_get_contents("./tests/acceptance/usernames.json"),
-				true
+				true,
 			);
 			// Loop through the user replacements, and make entries for the lower
 			// and upper case forms. This allows for steps that specifically
@@ -413,14 +413,14 @@ class FeatureContext extends BehatVariablesContext {
 				if ($lowerKey !== $key) {
 					$this->userReplacements[$lowerKey] = $value;
 					$this->userReplacements[$lowerKey]['username'] = \strtolower(
-						$this->userReplacements[$lowerKey]['username']
+						$this->userReplacements[$lowerKey]['username'],
 					);
 				}
 				$upperKey = \strtoupper($key);
 				if ($upperKey !== $key) {
 					$this->userReplacements[$upperKey] = $value;
 					$this->userReplacements[$upperKey]['username'] = \strtoupper(
-						$this->userReplacements[$upperKey]['username']
+						$this->userReplacements[$upperKey]['username'],
 					);
 				}
 			}
@@ -609,7 +609,7 @@ class FeatureContext extends BehatVariablesContext {
 	 *
 	 * @return string|false
 	 */
-	private static function getAdminUsernameFromEnvironment() {
+	private static function getAdminUsernameFromEnvironment(): string|bool {
 		return \getenv('ADMIN_USERNAME');
 	}
 
@@ -618,7 +618,7 @@ class FeatureContext extends BehatVariablesContext {
 	 *
 	 * @return string|false
 	 */
-	private static function getAdminPasswordFromEnvironment() {
+	private static function getAdminPasswordFromEnvironment(): string|bool {
 		return \getenv('ADMIN_PASSWORD');
 	}
 
@@ -627,7 +627,7 @@ class FeatureContext extends BehatVariablesContext {
 	 *
 	 * @return string|false
 	 */
-	private static function getRegularUserPasswordFromEnvironment() {
+	private static function getRegularUserPasswordFromEnvironment(): string|bool {
 		return \getenv('REGULAR_USER_PASSWORD');
 	}
 
@@ -636,7 +636,7 @@ class FeatureContext extends BehatVariablesContext {
 	 *
 	 * @return string|false
 	 */
-	private static function getAlt1UserPasswordFromEnvironment() {
+	private static function getAlt1UserPasswordFromEnvironment(): string|bool {
 		return \getenv('ALT1_USER_PASSWORD');
 	}
 
@@ -645,7 +645,7 @@ class FeatureContext extends BehatVariablesContext {
 	 *
 	 * @return string|false
 	 */
-	private static function getAlt2UserPasswordFromEnvironment() {
+	private static function getAlt2UserPasswordFromEnvironment(): string|bool {
 		return \getenv('ALT2_USER_PASSWORD');
 	}
 
@@ -654,7 +654,7 @@ class FeatureContext extends BehatVariablesContext {
 	 *
 	 * @return string|false
 	 */
-	private static function getAlt3UserPasswordFromEnvironment() {
+	private static function getAlt3UserPasswordFromEnvironment(): string|bool {
 		return \getenv('ALT3_USER_PASSWORD');
 	}
 
@@ -663,7 +663,7 @@ class FeatureContext extends BehatVariablesContext {
 	 *
 	 * @return string|false
 	 */
-	private static function getAlt4UserPasswordFromEnvironment() {
+	private static function getAlt4UserPasswordFromEnvironment(): string|bool {
 		return \getenv('ALT4_USER_PASSWORD');
 	}
 
@@ -672,7 +672,7 @@ class FeatureContext extends BehatVariablesContext {
 	 *
 	 * @return string|false
 	 */
-	private static function getSubAdminPasswordFromEnvironment() {
+	private static function getSubAdminPasswordFromEnvironment(): string|bool {
 		return \getenv('SUB_ADMIN_PASSWORD');
 	}
 
@@ -681,7 +681,7 @@ class FeatureContext extends BehatVariablesContext {
 	 *
 	 * @return string|false
 	 */
-	private static function getAlternateAdminPasswordFromEnvironment() {
+	private static function getAlternateAdminPasswordFromEnvironment(): string|bool {
 		return \getenv('ALTERNATE_ADMIN_PASSWORD');
 	}
 
@@ -690,7 +690,7 @@ class FeatureContext extends BehatVariablesContext {
 	 *
 	 * @return string|false
 	 */
-	private static function getPublicLinkSharePasswordFromEnvironment() {
+	private static function getPublicLinkSharePasswordFromEnvironment(): string|bool {
 		return \getenv('PUBLIC_LINK_SHARE_PASSWORD');
 	}
 
@@ -882,7 +882,7 @@ class FeatureContext extends BehatVariablesContext {
 	public function addGuzzleClientHeaders(array $guzzleClientHeaders): void {
 		$this->guzzleClientHeaders = \array_merge(
 			$this->guzzleClientHeaders,
-			$guzzleClientHeaders
+			$guzzleClientHeaders,
 		);
 	}
 
@@ -979,7 +979,7 @@ class FeatureContext extends BehatVariablesContext {
 	 */
 	public function setResponse(
 		?ResponseInterface $response,
-		string             $username = ""
+		string $username = "",
 	): void {
 		$this->response = $response;
 		$this->responseUser = $username;
@@ -1023,7 +1023,7 @@ class FeatureContext extends BehatVariablesContext {
 			Assert::assertContains(
 				\ltrim($validator, "$"),
 				$this->jsonSchemaValidators,
-				"Invalid schema validator: '$validator'"
+				"Invalid schema validator: '$validator'",
 			);
 		}
 	}
@@ -1108,7 +1108,7 @@ class FeatureContext extends BehatVariablesContext {
 		Assert::assertEquals(
 			$schemaObj->minItems,
 			$schemaObj->maxItems,
-			"'minItems' and 'maxItems' should be equal for strict assertion"
+			"'minItems' and 'maxItems' should be equal for strict assertion",
 		);
 
 		// check optional validators
@@ -1125,31 +1125,31 @@ class FeatureContext extends BehatVariablesContext {
 							foreach ($value as $element) {
 								Assert::assertNotNull(
 									$element->oneOf,
-									"'oneOf' is required to assert more than one elements"
+									"'oneOf' is required to assert more than one elements",
 								);
 							}
 							Assert::fail("'$validator' should be an object not an array");
 						}
 						Assert::assertFalse(
 							$value->allOf || $value->anyOf,
-							"'allOf' and 'anyOf' are not allowed in array"
+							"'allOf' and 'anyOf' are not allowed in array",
 						);
 						if ($value->oneOf) {
 							Assert::assertNotNull(
 								$value->oneOf,
-								"'oneOf' is required to assert more than one elements"
+								"'oneOf' is required to assert more than one elements",
 							);
 							Assert::assertTrue(\is_array($value->oneOf), "'oneOf' should be an array");
 							Assert::assertEquals(
 								$schemaObj->maxItems,
 								\count($value->oneOf),
-								"Expected " . $schemaObj->maxItems . " 'oneOf' items but got " . \count($value->oneOf)
+								"Expected " . $schemaObj->maxItems . " 'oneOf' items but got " . \count($value->oneOf),
 							);
 						}
 					}
 					Assert::assertTrue(
 						\is_object($value),
-						"'$validator' should be an object when expecting 1 element"
+						"'$validator' should be an object when expecting 1 element",
 					);
 					break;
 				case "uniqueItems":
@@ -1326,7 +1326,7 @@ class FeatureContext extends BehatVariablesContext {
 		$token = $this->shareNgGetLastCreatedLinkShareToken();
 		$fullUrl = $this->getBaseUrl() . $url;
 		$headers = [
-			'Public-Token' => $token
+			'Public-Token' => $token,
 		];
 		$this->setResponse(
 			HttpRequestHelper::sendRequest(
@@ -1334,8 +1334,8 @@ class FeatureContext extends BehatVariablesContext {
 				$method,
 				"public",
 				$password,
-				$headers
-			)
+				$headers,
+			),
 		);
 	}
 
@@ -1355,11 +1355,11 @@ class FeatureContext extends BehatVariablesContext {
 		string $user,
 		string $verb,
 		string $url,
-		TableNode $headersTable
+		TableNode $headersTable,
 	): void {
 		$this->verifyTableNodeColumns(
 			$headersTable,
-			['header', 'value']
+			['header', 'value'],
 		);
 
 		$user = $this->getActualUsername($user);
@@ -1386,7 +1386,7 @@ class FeatureContext extends BehatVariablesContext {
 			function ($subArray) {
 				return $subArray[0];
 			},
-			$arrayOfArrays
+			$arrayOfArrays,
 		);
 		return $a;
 	}
@@ -1405,7 +1405,7 @@ class FeatureContext extends BehatVariablesContext {
 		string $user,
 		string $method,
 		string $davPath,
-		string $content
+		string $content,
 	): void {
 		$this->setResponse($this->sendingToWithDirectUrl($user, $method, $davPath, $content));
 	}
@@ -1424,7 +1424,7 @@ class FeatureContext extends BehatVariablesContext {
 		string $user,
 		string $verb,
 		string $url,
-		string $password
+		string $password,
 	): void {
 		$this->setResponse($this->sendingToWithDirectUrl($user, $verb, $url, null, $password));
 	}
@@ -1446,7 +1446,7 @@ class FeatureContext extends BehatVariablesContext {
 		string $url,
 		?string $body = null,
 		?string $password = null,
-		?array $headers = null
+		?array $headers = null,
 	): ResponseInterface {
 		$url = \ltrim($url, '/');
 		if (WebdavHelper::isDAVRequest($url)) {
@@ -1464,8 +1464,8 @@ class FeatureContext extends BehatVariablesContext {
 		if ($this->sourceIpAddress !== null) {
 			$config = [
 				'curl' => [
-					CURLOPT_INTERFACE => $this->sourceIpAddress
-				]
+					CURLOPT_INTERFACE => $this->sourceIpAddress,
+				],
 			];
 		}
 
@@ -1490,7 +1490,7 @@ class FeatureContext extends BehatVariablesContext {
 			$reqHeaders,
 			$body,
 			$config,
-			$cookies
+			$cookies,
 		);
 	}
 
@@ -1533,7 +1533,7 @@ class FeatureContext extends BehatVariablesContext {
 	public function theHTTPStatusCodeShouldBe(
 		$expectedStatusCode,
 		?string $message = "",
-		?ResponseInterface $response = null
+		?ResponseInterface $response = null,
 	): void {
 		$response = $response ?? $this->response;
 		$actualStatusCode = $response->getStatusCode();
@@ -1546,7 +1546,7 @@ class FeatureContext extends BehatVariablesContext {
 			Assert::assertContainsEquals(
 				$actualStatusCode,
 				$expectedStatusCode,
-				$message
+				$message,
 			);
 		} else {
 			if ($message === "") {
@@ -1556,7 +1556,7 @@ class FeatureContext extends BehatVariablesContext {
 			Assert::assertEquals(
 				$expectedStatusCode,
 				$actualStatusCode,
-				$message
+				$message,
 			);
 		}
 	}
@@ -1566,7 +1566,7 @@ class FeatureContext extends BehatVariablesContext {
 	 *
 	 * @return mixed
 	 */
-	public function getJSONSchema($schemaString) {
+	public function getJSONSchema($schemaString): mixed {
 		if (\gettype($schemaString) !== 'string') {
 			$schemaString = $schemaString->getRaw();
 		}
@@ -1599,12 +1599,12 @@ class FeatureContext extends BehatVariablesContext {
 	 * @throws Exception
 	 */
 	public function theOcsDataOfTheResponseShouldMatch(
-		PyStringNode $schemaString
+		PyStringNode $schemaString,
 	): void {
 		$jsonResponse = $this->getJsonDecodedResponseBodyContent();
 		$this->assertJsonDocumentMatchesSchema(
 			$jsonResponse->ocs->data,
-			$this->getJSONSchema($schemaString)
+			$this->getJSONSchema($schemaString),
 		);
 	}
 
@@ -1620,7 +1620,7 @@ class FeatureContext extends BehatVariablesContext {
 		$responseBody = $this->getJsonDecodedResponseBodyContent();
 		$this->assertJsonDocumentMatchesSchema(
 			$responseBody,
-			$this->getJSONSchema($schemaString)
+			$this->getJSONSchema($schemaString),
 		);
 	}
 
@@ -1645,7 +1645,7 @@ class FeatureContext extends BehatVariablesContext {
 	 */
 	public function theHTTPStatusCodeShouldBeOr($statusCode1, $statusCode2): void {
 		$this->theHTTPStatusCodeShouldBe(
-			[$statusCode1, $statusCode2]
+			[$statusCode1, $statusCode2],
 		);
 	}
 
@@ -1661,7 +1661,7 @@ class FeatureContext extends BehatVariablesContext {
 	public function theHTTPStatusCodeShouldBeBetween(
 		$minStatusCode,
 		$maxStatusCode,
-		?ResponseInterface $response= null
+		?ResponseInterface $response = null,
 	): void {
 		$response = $response ?? $this->response;
 		$statusCode = $response->getStatusCode();
@@ -1669,12 +1669,12 @@ class FeatureContext extends BehatVariablesContext {
 		Assert::assertGreaterThanOrEqual(
 			$minStatusCode,
 			$statusCode,
-			$message
+			$message,
 		);
 		Assert::assertLessThanOrEqual(
 			$maxStatusCode,
 			$statusCode,
-			$message
+			$message,
 		);
 	}
 
@@ -1692,7 +1692,7 @@ class FeatureContext extends BehatVariablesContext {
 		Assert::assertGreaterThanOrEqual(
 			400,
 			$statusCode,
-			$message
+			$message,
 		);
 	}
 
@@ -1743,7 +1743,7 @@ class FeatureContext extends BehatVariablesContext {
 			$dirPathFromServerRoot,
 			$this->getBaseUrl(),
 			$this->getAdminUsername(),
-			$this->getAdminPassword()
+			$this->getAdminPassword(),
 		);
 	}
 
@@ -1936,9 +1936,8 @@ class FeatureContext extends BehatVariablesContext {
 			return 'usergrp@example.org';
 		} elseif ($username === 'sharee1') {
 			return 'sharee1@example.org';
-		} else {
-			return null;
 		}
+		return null;
 	}
 
 	/**
@@ -1993,9 +1992,8 @@ class FeatureContext extends BehatVariablesContext {
 			return $this->publicLinkSharePassword;
 		} elseif ($functionalPassword === "%remove%") {
 			return "";
-		} else {
-			return $functionalPassword;
 		}
+		return $functionalPassword;
 	}
 
 	/**
@@ -2018,8 +2016,8 @@ class FeatureContext extends BehatVariablesContext {
 		if ($this->sourceIpAddress !== null) {
 			$config = [
 				'curl' => [
-					CURLOPT_INTERFACE => $this->sourceIpAddress
-				]
+					CURLOPT_INTERFACE => $this->sourceIpAddress,
+				],
 			];
 		}
 
@@ -2029,7 +2027,7 @@ class FeatureContext extends BehatVariablesContext {
 			$this->getAdminPassword(),
 			$this->guzzleClientHeaders,
 			null,
-			$config
+			$config,
 		);
 	}
 
@@ -2044,7 +2042,7 @@ class FeatureContext extends BehatVariablesContext {
 		}
 		return \json_decode(
 			(string)$response->getBody(),
-			true
+			true,
 		);
 	}
 
@@ -2054,7 +2052,7 @@ class FeatureContext extends BehatVariablesContext {
 	 */
 	public function getJsonDecodedStatusPhp(): array {
 		return $this->getJsonDecodedResponse(
-			$this->getStatusPhp()
+			$this->getStatusPhp(),
 		);
 	}
 
@@ -2148,345 +2146,345 @@ class FeatureContext extends BehatVariablesContext {
 	public function substituteInLineCodes(
 		?string $value,
 		?string $user = null,
-		?array  $functions = [],
-		?array  $additionalSubstitutions = [],
+		?array $functions = [],
+		?array $additionalSubstitutions = [],
 		?string $group = null,
-		?string $userName = null
+		?string $userName = null,
 	): ?string {
 		$substitutions = [
 			[
 				"code" => "%base_url%",
 				"function" => [
 					$this,
-					"getBaseUrl"
+					"getBaseUrl",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%local_base_url%",
 				"function" => [
 					$this,
-					"getLocalBaseUrl"
+					"getLocalBaseUrl",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%remote_base_url%",
 				"function" => [
 					$this,
-					"getRemoteBaseUrl"
+					"getRemoteBaseUrl",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%base_host_port%",
 				"function" => [
 					$this,
-					"getBaseUrlWithoutScheme"
+					"getBaseUrlWithoutScheme",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%local_host_port%",
 				"function" => [
 					$this,
-					"getLocalBaseUrlWithoutScheme"
+					"getLocalBaseUrlWithoutScheme",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%remote_host_port%",
 				"function" => [
 					$this,
-					"getRemoteBaseUrlWithoutScheme"
+					"getRemoteBaseUrlWithoutScheme",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%storage_path%",
 				"function" => [
 					$this,
-					"getStorageUsersRoot"
+					"getStorageUsersRoot",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%base_url_without_scheme%",
 				"function" => [
 					$this,
-					"getBaseUrlWithoutScheme"
+					"getBaseUrlWithoutScheme",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%base_url_hostname%",
 				"function" => [
 					$this,
-					"getBaseUrlHostName"
+					"getBaseUrlHostName",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%collaboration_hostname%",
 				"function" => [
 					$this,
-					"getCollaborationHostName"
+					"getCollaborationHostName",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%remote_server%",
 				"function" => [
 					$this,
-					"getRemoteBaseUrl"
+					"getRemoteBaseUrl",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%remote_server_without_scheme%",
 				"function" => [
 					$this,
-					"getRemoteBaseUrlWithoutScheme"
+					"getRemoteBaseUrlWithoutScheme",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%local_server%",
 				"function" => [
 					$this,
-					"getLocalBaseUrl"
+					"getLocalBaseUrl",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%local_server_without_scheme%",
 				"function" => [
 					$this,
-					"getLocalBaseUrlWithoutScheme"
+					"getLocalBaseUrlWithoutScheme",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%base_path%",
 				"function" => [
 					$this,
-					"getBasePath"
+					"getBasePath",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%ocs_path_v1%",
 				"function" => [
 					$this,
-					"getOCSPath"
+					"getOCSPath",
 				],
-				"parameter" => ["1"]
+				"parameter" => ["1"],
 			],
 			[
 				"code" => "%ocs_path_v2%",
 				"function" => [
 					$this,
-					"getOCSPath"
+					"getOCSPath",
 				],
-				"parameter" => ["2"]
+				"parameter" => ["2"],
 			],
 			[
 				"code" => "%productname%",
 				"function" => [
 					$this,
-					"getProductNameFromStatus"
+					"getProductNameFromStatus",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%edition%",
 				"function" => [
 					$this,
-					"getEditionFromStatus"
+					"getEditionFromStatus",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%version%",
 				"function" => [
 					$this,
-					"getVersionFromStatus"
+					"getVersionFromStatus",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%versionstring%",
 				"function" => [
 					$this,
-					"getVersionStringFromStatus"
+					"getVersionStringFromStatus",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%a_comment_url%",
 				"function" => [
 					$this,
-					"getCommentUrlRegExp"
+					"getCommentUrlRegExp",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%last_share_id%",
 				"function" => [
 					$this,
-					"getLastCreatedUserGroupShareId"
+					"getLastCreatedUserGroupShareId",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%last_public_share_token%",
 				"function" => [
 					$this,
-					"getLastCreatedPublicShareToken"
+					"getLastCreatedPublicShareToken",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%user_id%",
 				"function" => [
-					$this, "getUserIdByUserName"
+					$this, "getUserIdByUserName",
 				],
-					"parameter" => [$userName]
-				],
+				"parameter" => [$userName],
+			],
 			[
 				"code" => "%group_id%",
 				"function" => [
-					$this, "getGroupIdByGroupName"
+					$this, "getGroupIdByGroupName",
 				],
-				"parameter" => [$group]
+				"parameter" => [$group],
 			],
 			[
 				"code" => "%user_id_pattern%",
 				"function" => [
 					__NAMESPACE__ . '\TestHelpers\GraphHelper',
-					"getUUIDv4Regex"
+					"getUUIDv4Regex",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%federated_user_id_pattern%",
 				"function" => [
 					__NAMESPACE__ . '\TestHelpers\GraphHelper',
-					"getFederatedUserRegex"
+					"getFederatedUserRegex",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%federated_file_id_pattern%",
 				"function" => [
 					__NAMESPACE__ . '\TestHelpers\GraphHelper',
-					"getFederatedFileIdRegex"
+					"getFederatedFileIdRegex",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%group_id_pattern%",
 				"function" => [
 					__NAMESPACE__ . '\TestHelpers\GraphHelper',
-					"getUUIDv4Regex"
+					"getUUIDv4Regex",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%role_id_pattern%",
 				"function" => [
 					__NAMESPACE__ . '\TestHelpers\GraphHelper',
-					"getUUIDv4Regex"
+					"getUUIDv4Regex",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%permissions_id_pattern%",
 				"function" => [
 					__NAMESPACE__ . '\TestHelpers\GraphHelper',
-					"getPermissionsIdRegex"
+					"getPermissionsIdRegex",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%file_id_pattern%",
 				"function" => [
 					__NAMESPACE__ . '\TestHelpers\GraphHelper',
-					"getFileIdRegex"
+					"getFileIdRegex",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%space_id_pattern%",
 				"function" => [
 					__NAMESPACE__ . '\TestHelpers\GraphHelper',
-					"getSpaceIdRegex"
+					"getSpaceIdRegex",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%share_id_pattern%",
 				"function" => [
 					__NAMESPACE__ . '\TestHelpers\GraphHelper',
-					"getShareIdRegex"
+					"getShareIdRegex",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%etag_pattern%",
 				"function" => [
 					__NAMESPACE__ . '\TestHelpers\GraphHelper',
-					"getEtagRegex"
+					"getEtagRegex",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%tus_upload_location%",
 				"function" => [
 					$this->tusContext,
-					"getLastTusResourceLocation"
+					"getLastTusResourceLocation",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%fed_invitation_token%",
 				"function" => [
 					$this->ocmContext,
-					"getLastFederatedInvitationToken"
+					"getLastFederatedInvitationToken",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%identities_issuer_id_pattern%",
 				"function" => [
 					__NAMESPACE__ . '\TestHelpers\GraphHelper',
-					"getFederatedUserRegex"
+					"getFederatedUserRegex",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%uuidv4_pattern%",
 				"function" => [
 					__NAMESPACE__ . '\TestHelpers\GraphHelper',
-					"getUUIDv4Regex"
+					"getUUIDv4Regex",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%request_id_pattern%",
 				"function" => [
 					__NAMESPACE__ . '\TestHelpers\HttpRequestHelper',
-					"getXRequestIdRegex"
+					"getXRequestIdRegex",
 				],
-				"parameter" => []
+				"parameter" => [],
 			],
 			[
 				"code" => "%expiry_date_in_mail%",
 				"function" => [
-					$this, "formatExpiryDateTime"
+					$this, "formatExpiryDateTime",
 				],
-				"parameter" =>  ['Y-m-d H:i:s']
-			]
+				"parameter" => ['Y-m-d H:i:s'],
+			],
 		];
 		if ($user !== null) {
 			array_push(
@@ -2495,33 +2493,33 @@ class FeatureContext extends BehatVariablesContext {
 					"code" => "%username%",
 					"function" => [
 						$this,
-						"getActualUsername"
+						"getActualUsername",
 					],
-					"parameter" => [$user]
+					"parameter" => [$user],
 				],
 				[
 					"code" => "%displayname%",
 					"function" => [
 						$this,
-						"getDisplayNameForUser"
+						"getDisplayNameForUser",
 					],
-					"parameter" => [$user]
+					"parameter" => [$user],
 				],
 				[
 					"code" => "%password%",
 					"function" => [
 						$this,
-						"getPasswordForUser"
+						"getPasswordForUser",
 					],
-					"parameter" => [$user]
+					"parameter" => [$user],
 				],
 				[
 					"code" => "%emailaddress%",
 					"function" => [
 						$this,
-						"getEmailAddressForUser"
+						"getEmailAddressForUser",
 					],
-					"parameter" => [$user]
+					"parameter" => [$user],
 				],
 				[
 					"code" => "%spaceid%",
@@ -2529,20 +2527,20 @@ class FeatureContext extends BehatVariablesContext {
 						$this,
 						"getPersonalSpaceIdForUser",
 					],
-					"parameter" => [$user, true]
+					"parameter" => [$user, true],
 				],
 				[
-				"code" => "%user_id%",
-				"function" =>
-				[$this, "getUserIdByUserName"],
-				"parameter" => [$userName]
+					"code" => "%user_id%",
+					"function" =>
+					[$this, "getUserIdByUserName"],
+					"parameter" => [$userName],
 				],
 				[
-				"code" => "%group_id%",
-				"function" =>
-				[$this, "getGroupIdByGroupName"],
-				"parameter" => [$group]
-				]
+					"code" => "%group_id%",
+					"function" =>
+					[$this, "getGroupIdByGroupName"],
+					"parameter" => [$group],
+				],
 			);
 
 			if (!OcisHelper::isTestingOnReva()) {
@@ -2552,10 +2550,10 @@ class FeatureContext extends BehatVariablesContext {
 						"code" => "%shares_drive_id%",
 						"function" => [
 							$this->spacesContext,
-							"getSpaceIdByName"
+							"getSpaceIdByName",
 						],
-						"parameter" => [$user, "Shares"]
-					]
+						"parameter" => [$user, "Shares"],
+					],
 				);
 			}
 		}
@@ -2571,7 +2569,7 @@ class FeatureContext extends BehatVariablesContext {
 
 			$replacement = \call_user_func_array(
 				$substitution["function"],
-				$substitution["parameter"]
+				$substitution["parameter"],
 			);
 
 			// do not run functions on regex patterns
@@ -2579,14 +2577,14 @@ class FeatureContext extends BehatVariablesContext {
 				foreach ($functions as $function => $parameters) {
 					$replacement = \call_user_func_array(
 						$function,
-						\array_merge([$replacement], $parameters)
+						\array_merge([$replacement], $parameters),
 					);
 				}
 			}
 			$value = \str_replace(
 				$substitution["code"],
 				$replacement,
-				$value
+				$value,
 			);
 		}
 		return $value;
@@ -2702,7 +2700,7 @@ class FeatureContext extends BehatVariablesContext {
 		if ($this->adminPassword !== $this->originalAdminPassword) {
 			$this->resetUserPasswordAsAdminUsingTheProvisioningApi(
 				$this->getAdminUsername(),
-				$this->originalAdminPassword
+				$this->originalAdminPassword,
 			);
 			$this->adminPassword = $this->originalAdminPassword;
 		}
@@ -2727,7 +2725,7 @@ class FeatureContext extends BehatVariablesContext {
 	 */
 	public function makeTemporaryStorageOnServerBefore(): void {
 		$this->mkDirOnServer(
-			TEMPORARY_STORAGE_DIR_ON_REMOTE_SERVER
+			TEMPORARY_STORAGE_DIR_ON_REMOTE_SERVER,
 		);
 	}
 
@@ -2740,7 +2738,7 @@ class FeatureContext extends BehatVariablesContext {
 	public function removeTemporaryStorageOnServerAfter(): void {
 		SetupHelper::rmDirOnServer(
 			TEMPORARY_STORAGE_DIR_ON_REMOTE_SERVER,
-			HttpRequestHelper::getCurrentScenarioRef()
+			HttpRequestHelper::getCurrentScenarioRef(),
 		);
 	}
 
@@ -2782,7 +2780,7 @@ class FeatureContext extends BehatVariablesContext {
 	public function verifyTableNodeColumns(
 		?TableNode $table,
 		?array $requiredHeader = [],
-		?array $allowedHeader = []
+		?array $allowedHeader = [],
 	): void {
 		if ($table === null || \count($table->getHash()) < 1) {
 			throw new Exception("Table should have at least one row.");
@@ -2899,14 +2897,13 @@ class FeatureContext extends BehatVariablesContext {
 			$this->getBaseUrl(),
 			$this->getAdminUsername(),
 			$this->getAdminPassword(),
-			$userName
+			$userName,
 		);
 		$data = \json_decode($response->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
 		if (isset($data["id"])) {
 			return $data["id"];
-		} else {
-			throw new Exception(__METHOD__ . " accounts-list is empty");
 		}
+		throw new Exception(__METHOD__ . " accounts-list is empty");
 	}
 
 	/**
@@ -2922,14 +2919,13 @@ class FeatureContext extends BehatVariablesContext {
 			$this->getBaseUrl(),
 			$this->getAdminUsername(),
 			$this->getAdminPassword(),
-			$groupName
+			$groupName,
 		);
 		$data = $this->getJsonDecodedResponse($response);
 		if (isset($data["id"])) {
 			return $data["id"];
-		} else {
-			throw new Exception(__METHOD__ . " accounts-list is empty");
 		}
+		throw new Exception(__METHOD__ . " accounts-list is empty");
 	}
 
 	/**

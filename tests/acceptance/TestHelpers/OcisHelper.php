@@ -51,7 +51,7 @@ class OcisHelper {
 		StorageDriver::EOS,
 		StorageDriver::OWNCLOUD,
 		StorageDriver::S3NG,
-		StorageDriver::POSIX
+		StorageDriver::POSIX,
 	];
 
 	/**
@@ -94,7 +94,7 @@ class OcisHelper {
 	/**
 	 * @return bool|string false if no command given or the command as string
 	 */
-	public static function getDeleteUserDataCommand() {
+	public static function getDeleteUserDataCommand(): bool|string {
 		$cmd = \getenv("DELETE_USER_DATA_CMD");
 		if ($cmd === false || \trim($cmd) === "") {
 			return false;
@@ -115,7 +115,7 @@ class OcisHelper {
 		if (!\in_array($storageDriver, self::STORAGE_DRIVERS)) {
 			throw new Exception(
 				"Invalid storage driver. " .
-				"STORAGE_DRIVER must be '" . \join(", ", self::STORAGE_DRIVERS) . "'"
+				"STORAGE_DRIVER must be '" . \join(", ", self::STORAGE_DRIVERS) . "'",
 			);
 		}
 		return $storageDriver;
@@ -148,7 +148,7 @@ class OcisHelper {
 				$deleteCmd = \str_replace(
 					"%s",
 					$user[0] . '/' . $user,
-					$deleteCmd
+					$deleteCmd,
 				);
 			} else {
 				$deleteCmd = \sprintf($deleteCmd, $user);
@@ -196,9 +196,8 @@ class OcisHelper {
 		$useSsl = \getenv("REVA_LDAP_USESSL");
 		if ($useSsl === false) {
 			return (self::getLdapPort() === 636);
-		} else {
-			return $useSsl === "true";
 		}
+		return $useSsl === "true";
 	}
 
 	/**
@@ -309,7 +308,7 @@ class OcisHelper {
 		HttpRequestHelper::get(
 			$baseUrl . "/ocs/v2.php/apps/notifications/api/v1/notifications",
 			$user,
-			$password
+			$password,
 		);
 	}
 }

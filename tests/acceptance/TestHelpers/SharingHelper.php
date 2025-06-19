@@ -39,7 +39,7 @@ class SharingHelper {
 		'update' => 2,
 		'create' => 4,
 		'delete' => 8,
-		'invite' => 0
+		'invite' => 0,
 	];
 
 	public const SHARE_TYPES = [
@@ -95,25 +95,25 @@ class SharingHelper {
 		string $baseUrl,
 		string $user,
 		string $password,
-		string  $path,
+		string $path,
 		$shareType,
 		?string $shareWith = null,
-		?bool	$publicUpload = false,
+		?bool $publicUpload = false,
 		string $sharePassword = null,
 		$permissions = null,
-		?string  $linkName = null,
+		?string $linkName = null,
 		?string $expireDate = null,
 		?string $space_ref = null,
 		int $ocsApiVersion = 1,
 		int $sharingApiVersion = 1,
-		string $sharingApp = 'files_sharing'
+		string $sharingApp = 'files_sharing',
 	): ResponseInterface {
 		$fd = [];
 		foreach ([$path, $baseUrl, $user, $password] as $variableToCheck) {
 			if (!\is_string($variableToCheck)) {
 				throw new InvalidArgumentException(
 					"mandatory argument missing or wrong type ($variableToCheck => "
-					. \gettype($variableToCheck) . ")"
+					. \gettype($variableToCheck) . ")",
 				);
 			}
 		}
@@ -127,12 +127,12 @@ class SharingHelper {
 
 		if (!\in_array($ocsApiVersion, [1, 2], true)) {
 			throw new InvalidArgumentException(
-				"invalid ocsApiVersion ($ocsApiVersion)"
+				"invalid ocsApiVersion ($ocsApiVersion)",
 			);
 		}
 		if (!\in_array($sharingApiVersion, [1, 2], true)) {
 			throw new InvalidArgumentException(
-				"invalid sharingApiVersion ($sharingApiVersion)"
+				"invalid sharingApiVersion ($sharingApiVersion)",
 			);
 		}
 
@@ -169,7 +169,7 @@ class SharingHelper {
 			$user,
 			$password,
 			$headers,
-			$fd
+			$fd,
 		);
 	}
 
@@ -206,13 +206,13 @@ class SharingHelper {
 				$permissionSum += $permission;
 			} else {
 				throw new InvalidArgumentException(
-					"invalid permission type ($permission)"
+					"invalid permission type ($permission)",
 				);
 			}
 		}
 		if ($permissionSum < 0 || $permissionSum > 31) {
 			throw new InvalidArgumentException(
-				"invalid permission total ($permissionSum)"
+				"invalid permission total ($permissionSum)",
 			);
 		}
 		return $permissionSum;
@@ -230,18 +230,17 @@ class SharingHelper {
 	public static function getShareType($shareType): int {
 		if (\array_key_exists($shareType, self::SHARE_TYPES)) {
 			return self::SHARE_TYPES[$shareType];
-		} else {
-			if (\ctype_digit($shareType)) {
-				$shareType = (int) $shareType;
-			}
-			$key = \array_search($shareType, self::SHARE_TYPES, true);
-			if ($key !== false) {
-				return self::SHARE_TYPES[$key];
-			}
-			throw new InvalidArgumentException(
-				"invalid share type ($shareType)"
-			);
 		}
+		if (\ctype_digit($shareType)) {
+			$shareType = (int) $shareType;
+		}
+		$key = \array_search($shareType, self::SHARE_TYPES, true);
+		if ($key !== false) {
+			return self::SHARE_TYPES[$key];
+		}
+		throw new InvalidArgumentException(
+			"invalid share type ($shareType)",
+		);
 	}
 
 	/**
@@ -255,7 +254,7 @@ class SharingHelper {
 	 */
 	public static function getLastShareIdFromResponse(
 		SimpleXMLElement $responseXmlObject,
-		string $errorMessage = "cannot find share id in response"
+		string $errorMessage = "cannot find share id in response",
 	): string {
 		$xmlPart = $responseXmlObject->xpath("//data/element[last()]/id");
 

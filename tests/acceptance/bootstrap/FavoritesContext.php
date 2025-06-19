@@ -48,7 +48,7 @@ class FavoritesContext implements Context {
 			$user,
 			$path,
 			1,
-			$spaceId
+			$spaceId,
 		);
 	}
 
@@ -115,14 +115,14 @@ class FavoritesContext implements Context {
 	public function checkFavoritedElements(
 		string $user,
 		string $shouldOrNot,
-		TableNode $expectedElements
+		TableNode $expectedElements,
 	): void {
 		$user = $this->featureContext->getActualUsername($user);
 		$this->userListsFavorites($user);
 		$this->featureContext->propfindResultShouldContainEntries(
 			$shouldOrNot,
 			$expectedElements,
-			$user
+			$user,
 		);
 	}
 
@@ -160,7 +160,7 @@ class FavoritesContext implements Context {
 			null,
 			null,
 			$body,
-			$this->featureContext->getDavPathVersion()
+			$this->featureContext->getDavPathVersion(),
 		);
 		$this->featureContext->setResponse($response);
 	}
@@ -179,7 +179,7 @@ class FavoritesContext implements Context {
 		string $user,
 		string $path,
 		int $expectedValue = 1,
-		string $spaceId = null
+		string $spaceId = null,
 	): void {
 		$property = "oc:favorite";
 		$this->webDavPropertiesContext->checkPropertyOfAFolder(
@@ -231,7 +231,7 @@ class FavoritesContext implements Context {
 			"oc='http://owncloud.org/ns'",
 			$this->featureContext->getDavPathVersion(),
 			'files',
-			$spaceId
+			$spaceId,
 		);
 	}
 
@@ -253,7 +253,7 @@ class FavoritesContext implements Context {
 		$this->webDavPropertiesContext = BehatHelper::getContext(
 			$scope,
 			$environment,
-			'WebDavPropertiesContext'
+			'WebDavPropertiesContext',
 		);
 	}
 }

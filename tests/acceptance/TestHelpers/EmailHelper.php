@@ -72,7 +72,7 @@ class EmailHelper {
 			self::getEmailAPIUrl("messages"),
 			null,
 			null,
-			['Content-Type' => 'application/json']
+			['Content-Type' => 'application/json'],
 		);
 	}
 
@@ -91,7 +91,7 @@ class EmailHelper {
 			self::getEmailAPIUrl("message/$id") . "?query=$query",
 			null,
 			null,
-			['Content-Type' => 'application/json']
+			['Content-Type' => 'application/json'],
 		);
 	}
 
@@ -111,7 +111,7 @@ class EmailHelper {
 			$url,
 			null,
 			null,
-			['Content-Type' => 'application/json']
+			['Content-Type' => 'application/json'],
 		);
 	}
 
@@ -126,7 +126,7 @@ class EmailHelper {
 			self::getEmailAPIUrl("messages"),
 			null,
 			null,
-			['Content-Type' => 'application/json']
+			['Content-Type' => 'application/json'],
 		);
 	}
 }

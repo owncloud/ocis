@@ -95,12 +95,12 @@ class CliContext implements Context {
 	public function theAdministratorResetsThePasswordOfUserUsingTheCLI(
 		string $status,
 		string $user,
-		string $password
+		string $password,
 	): void {
 		$command = "idm resetpassword -u $user";
 		$body = [
 			"command" => $command,
-			"inputs" => [$password, $password]
+			"inputs" => [$password, $password],
 		];
 
 		$this->featureContext->setResponse(CliHelper::runCommand($body));
@@ -119,7 +119,7 @@ class CliContext implements Context {
 		$path = $this->featureContext->getStorageUsersRoot();
 		$command = "trash purge-empty-dirs -p $path --dry-run=false";
 		$body = [
-			"command" => $command
+			"command" => $command,
 		];
 		$this->featureContext->setResponse(CliHelper::runCommand($body));
 	}
@@ -133,7 +133,7 @@ class CliContext implements Context {
 		$path = $this->featureContext->getStorageUsersRoot();
 		$command = "backup consistency -p $path";
 		$body = [
-			"command" => $command
+			"command" => $command,
 		];
 		$this->featureContext->setResponse(CliHelper::runCommand($body));
 	}
@@ -149,12 +149,12 @@ class CliContext implements Context {
 	 */
 	public function theAdministratorCreatesAppTokenForUserWithExpirationTimeUsingTheAuthAppCLI(
 		string $user,
-		string $expirationTime
+		string $expirationTime,
 	): void {
 		$user = $this->featureContext->getActualUserName($user);
 		$command = "auth-app create --user-name=$user --expiration=$expirationTime";
 		$body = [
-			"command" => $command
+			"command" => $command,
 		];
 		$this->featureContext->setResponse(CliHelper::runCommand($body));
 	}
@@ -169,12 +169,12 @@ class CliContext implements Context {
 	 */
 	public function theAdministratorHasCreatedAppTokenForUserWithExpirationTimeUsingTheAuthAppCli(
 		$user,
-		$expirationTime
+		$expirationTime,
 	): void {
 		$user = $this->featureContext->getActualUserName($user);
 		$command = "auth-app create --user-name=$user --expiration=$expirationTime";
 		$body = [
-			"command" => $command
+			"command" => $command,
 		];
 		$response = CliHelper::runCommand($body);
 		$this->featureContext->theHTTPStatusCodeShouldBe(200, '', $response);
@@ -183,7 +183,7 @@ class CliContext implements Context {
 		Assert::assertSame(
 			0,
 			$jsonResponse["exitCode"],
-			"Expected exit code to be 0, but got " . $jsonResponse["exitCode"]
+			"Expected exit code to be 0, but got " . $jsonResponse["exitCode"],
 		);
 		$output = $this->featureContext->substituteInLineCodes("App token created for $user");
 		Assert::assertStringContainsString($output, $jsonResponse["message"]);
@@ -199,12 +199,12 @@ class CliContext implements Context {
 	 */
 	public function userHasCreatedAppTokenWithExpirationTimeUsingTheAuthAppCLI(
 		string $user,
-		string $expirationTime
+		string $expirationTime,
 	): void {
 		$user = $this->featureContext->getActualUserName($user);
 		$command = "auth-app create --user-name=$user --expiration=$expirationTime";
 		$body = [
-			"command" => $command
+			"command" => $command,
 		];
 
 		$response = CliHelper::runCommand($body);
@@ -214,7 +214,7 @@ class CliContext implements Context {
 		Assert::assertSame(
 			0,
 			$jsonResponse["exitCode"],
-			"Expected exit code to be 0, but got " . $jsonResponse["exitCode"]
+			"Expected exit code to be 0, but got " . $jsonResponse["exitCode"],
 		);
 	}
 
@@ -223,11 +223,11 @@ class CliContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function theAdministratorRemovesAllVersionsOfResources() {
+	public function theAdministratorRemovesAllVersionsOfResources(): void {
 		$path = $this->featureContext->getStorageUsersRoot();
 		$command = "revisions purge -p $path --dry-run=false";
 		$body = [
-			"command" => $command
+			"command" => $command,
 		];
 		$this->featureContext->setResponse(CliHelper::runCommand($body));
 	}
@@ -241,12 +241,12 @@ class CliContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function theAdministratorRemovesTheVersionsOfFileUsingFileId($file, $user, $space) {
+	public function theAdministratorRemovesTheVersionsOfFileUsingFileId($file, $user, $space): void {
 		$path = $this->featureContext->getStorageUsersRoot();
 		$fileId = $this->spacesContext->getFileId($user, $space, $file);
 		$command = "revisions purge -p $path -r $fileId --dry-run=false";
 		$body = [
-			"command" => $command
+			"command" => $command,
 		];
 		$this->featureContext->setResponse(CliHelper::runCommand($body));
 	}
@@ -259,7 +259,7 @@ class CliContext implements Context {
 	public function theAdministratorReindexesAllSpacesUsingTheCli(): void {
 		$command = "search index --all-spaces";
 		$body = [
-			"command" => $command
+			"command" => $command,
 		];
 		$this->featureContext->setResponse(CliHelper::runCommand($body));
 	}
@@ -275,7 +275,7 @@ class CliContext implements Context {
 		$spaceId = $this->spacesContext->getSpaceIdByName($this->featureContext->getAdminUsername(), $spaceName);
 		$command = "search index --space $spaceId";
 		$body = [
-			"command" => $command
+			"command" => $command,
 		];
 		$this->featureContext->setResponse(CliHelper::runCommand($body));
 	}
@@ -293,7 +293,7 @@ class CliContext implements Context {
 		$spaceId = $this->spacesContext->getSpaceIdByName($adminUsername, $space);
 		$command = "revisions purge -p $path -r $spaceId --dry-run=false";
 		$body = [
-			"command" => $command
+			"command" => $command,
 		];
 		$this->featureContext->setResponse(CliHelper::runCommand($body));
 	}
@@ -320,7 +320,7 @@ class CliContext implements Context {
 		Assert::assertSame(
 			$expectedExitCode,
 			$jsonResponse["exitCode"],
-			"Expected exit code to be 0, but got " . $jsonResponse["exitCode"]
+			"Expected exit code to be 0, but got " . $jsonResponse["exitCode"],
 		);
 	}
 
@@ -358,7 +358,7 @@ class CliContext implements Context {
 		}
 		$command = "storage-users uploads sessions --json $flag";
 		$body = [
-			"command" => $command
+			"command" => $command,
 		];
 		$this->featureContext->setResponse(CliHelper::runCommand($body));
 	}
@@ -378,7 +378,7 @@ class CliContext implements Context {
 		$flagString = trim($flag);
 		$command = "storage-users uploads sessions $flagString --clean --json";
 		$body = [
-			"command" => $command
+			"command" => $command,
 		];
 		$this->featureContext->setResponse(CliHelper::runCommand($body));
 	}
@@ -391,7 +391,7 @@ class CliContext implements Context {
 	public function theAdministratorRestartsTheUploadSessionsThatAreInPostprocessing(): void {
 		$command = "storage-users uploads sessions --processing --restart --json";
 		$body = [
-			"command" => $command
+			"command" => $command,
 		];
 		$this->featureContext->setResponse(CliHelper::runCommand($body));
 	}
@@ -417,7 +417,7 @@ class CliContext implements Context {
 
 		$command = "storage-users uploads sessions --id=$uploadId --restart --json";
 		$body = [
-			"command" => $command
+			"command" => $command,
 		];
 		$this->featureContext->setResponse(CliHelper::runCommand($body));
 	}
@@ -446,14 +446,14 @@ class CliContext implements Context {
 			foreach ($expectedFiles as $expectedFile) {
 				Assert::assertNotTrue(
 					\in_array($expectedFile, $resourceNames),
-					"The resource '$expectedFile' was found in the response."
+					"The resource '$expectedFile' was found in the response.",
 				);
 			}
 		} else {
 			foreach ($expectedFiles as $expectedFile) {
 				Assert::assertTrue(
 					\in_array($expectedFile, $resourceNames),
-					"The resource '$expectedFile' was not found in the response."
+					"The resource '$expectedFile' was not found in the response.",
 				);
 			}
 		}
@@ -483,7 +483,7 @@ class CliContext implements Context {
 	public function cleanUploadsSessions(): void {
 		$command = "storage-users uploads sessions --clean";
 		$body = [
-			"command" => $command
+			"command" => $command,
 		];
 		$response = CliHelper::runCommand($body);
 		Assert::assertEquals("200", $response->getStatusCode(), "Failed to clean upload sessions");
@@ -510,7 +510,7 @@ class CliContext implements Context {
 	public function theAdministratorTriggersEmailNotificationsUsingTheCLI(string $interval): void {
 		$command = "notifications send-email --$interval";
 		$body = [
-			"command" => $command
+			"command" => $command,
 		];
 
 		$this->featureContext->setResponse(CliHelper::runCommand($body));
@@ -545,7 +545,7 @@ class CliContext implements Context {
 		}
 
 		$body = [
-			"command" => $command
+			"command" => $command,
 		];
 		return CliHelper::runCommand($body);
 	}
@@ -563,7 +563,7 @@ class CliContext implements Context {
 		}
 
 		$body = [
-			"command" => $command
+			"command" => $command,
 		];
 		return CliHelper::runCommand($body);
 	}
@@ -587,11 +587,11 @@ class CliContext implements Context {
 	 */
 	public function theAdministratorListsTheStaleUploadsOfSpace(
 		string $spaceName,
-		string $user
+		string $user,
 	): void {
 		$spaceOwnerId = $this->spacesContext->getSpaceOwnerUserIdByName(
 			$user,
-			$spaceName
+			$spaceName,
 		);
 		$this->featureContext->setResponse($this->listStaleUploads($spaceOwnerId));
 	}
@@ -611,7 +611,7 @@ class CliContext implements Context {
 		Assert::assertSame(
 			$expectedMessage,
 			$actualMessage,
-			"Expected cli output to be $expectedMessage but found $actualMessage"
+			"Expected cli output to be $expectedMessage but found $actualMessage",
 		);
 	}
 
@@ -634,11 +634,11 @@ class CliContext implements Context {
 	 */
 	public function theAdministratorDeletesTheStaleUploadsOfSpaceOwnedByUser(
 		string $spaceName,
-		string $user
+		string $user,
 	): void {
 		$spaceOwnerId = $this->spacesContext->getSpaceOwnerUserIdByName(
 			$user,
-			$spaceName
+			$spaceName,
 		);
 		$this->featureContext->setResponse($this->deleteStaleUploads($spaceOwnerId));
 	}
@@ -656,14 +656,14 @@ class CliContext implements Context {
 	 */
 	public function thereShouldBeStaleUploadsOfSpaceOwnedByUser(
 		int $number,
-		string $spaceName='',
-		string $user=''
+		string $spaceName = '',
+		string $user = '',
 	): void {
 		$spaceOwnerId = null;
 		if ($spaceName !== '' && $user !== '') {
 			$spaceOwnerId = $this->spacesContext->getSpaceOwnerUserIdByName(
 				$user,
-				$spaceName
+				$spaceName,
 			);
 		}
 
@@ -676,7 +676,7 @@ class CliContext implements Context {
 		Assert::assertStringContainsString(
 			$expectedMessage,
 			$jsonDecodedResponse->message ?? '',
-			"Expected message to contain '$expectedMessage', but got: " . ($jsonDecodedResponse->message ?? 'null')
+			"Expected message to contain '$expectedMessage', but got: " . ($jsonDecodedResponse->message ?? 'null'),
 		);
 
 	}
@@ -691,11 +691,11 @@ class CliContext implements Context {
 	 */
 	public function theAdministratorListsAllTrashedResourceOfSpaceOwnedByUser(
 		string $spaceName,
-		string $user
+		string $user,
 	): void {
 		$spaceOwnerId = $this->spacesContext->getSpaceOwnerUserIdByName(
 			$user,
-			$spaceName
+			$spaceName,
 		);
 		$this->featureContext->setResponse($this->listTrashedResource($spaceOwnerId));
 	}
@@ -708,7 +708,7 @@ class CliContext implements Context {
 	 */
 	protected function listTrashedResource(string $spaceId): ResponseInterface {
 		$body = [
-			"command" => "storage-users trash-bin list $spaceId"
+			"command" => "storage-users trash-bin list $spaceId",
 		];
 		return CliHelper::runCommand($body);
 	}
@@ -719,7 +719,7 @@ class CliContext implements Context {
 	 * @return array
 	 */
 	protected function getTrashedResourceFromCliCommandResponse(
-		ResponseInterface $response = null
+		ResponseInterface $response = null,
 	): array {
 		$responseArray = $this->featureContext->getJsonDecodedResponseBodyContent($response);
 		$lines = explode("\n", $responseArray->message);
@@ -729,13 +729,13 @@ class CliContext implements Context {
 			if (preg_match(
 				'/^\s*\|\s*([a-f0-9\-]{36})\s*\|\s*(.*?)\s*\|\s*(file|folder)\s*\|\s*([\d\-T:Z]+)\s*\|/',
 				$line,
-				$matches
+				$matches,
 			)
 			) {
 				$items[] = [
-					'itemID'    => $matches[1],
-					'path'      => $matches[2],
-					'type'      => $matches[3],
+					'itemID' => $matches[1],
+					'path' => $matches[2],
+					'type' => $matches[3],
 					'delete at' => $matches[4],
 				];
 			}
@@ -757,7 +757,7 @@ class CliContext implements Context {
 	 */
 	public function theCommandOutputShouldContainTheFollowingTrashResource(
 		int $count,
-		TableNode $table
+		TableNode $table,
 	): void {
 		[$items, $totalCount] = $this->getTrashedResourceFromCliCommandResponse();
 
@@ -777,7 +777,7 @@ class CliContext implements Context {
 
 			Assert::assertTrue(
 				$matchFound,
-				"Could not find expected resource '{$expectedRow['resource']}' of type '{$expectedRow['type']}'"
+				"Could not find expected resource '{$expectedRow['resource']}' of type '{$expectedRow['type']}'",
 			);
 		}
 	}
@@ -792,14 +792,14 @@ class CliContext implements Context {
 	 */
 	public function theAdministratorRestoresAllTheTrashedResourcesOfSpaceOwnedByUser(
 		string $spaceName,
-		string $user
+		string $user,
 	): void {
 		$spaceOwnerId = $this->spacesContext->getSpaceOwnerUserIdByName(
 			$user,
-			$spaceName
+			$spaceName,
 		);
 		$body = [
-			"command" => "storage-users trash-bin restore-all -y $spaceOwnerId"
+			"command" => "storage-users trash-bin restore-all -y $spaceOwnerId",
 		];
 		$this->featureContext->setResponse(CliHelper::runCommand($body));
 	}
@@ -815,11 +815,11 @@ class CliContext implements Context {
 	 */
 	public function thereShouldBeNoTrashedResourcesOfSpaceOwnedByUser(
 		string $spaceName,
-		string $user
+		string $user,
 	): void {
 		$spaceOwnerId = $this->spacesContext->getSpaceOwnerUserIdByName(
 			$user,
-			$spaceName
+			$spaceName,
 		);
 		$response = $this->listTrashedResource($spaceOwnerId);
 		[$items, $totalCount] = $this->getTrashedResourceFromCliCommandResponse($response);
@@ -842,11 +842,11 @@ class CliContext implements Context {
 		int $number,
 		string $spaceName,
 		string $user,
-		TableNode $table
+		TableNode $table,
 	): void {
 		$spaceOwnerId = $this->spacesContext->getSpaceOwnerUserIdByName(
 			$user,
-			$spaceName
+			$spaceName,
 		);
 		$response = $this->listTrashedResource($spaceOwnerId);
 		[$items, $totalCount] = $this->getTrashedResourceFromCliCommandResponse($response);
@@ -867,7 +867,7 @@ class CliContext implements Context {
 
 			Assert::assertTrue(
 				$matchFound,
-				"Could not find expected resource '{$expectedRow['resource']}' of type '{$expectedRow['type']}'"
+				"Could not find expected resource '{$expectedRow['resource']}' of type '{$expectedRow['type']}'",
 			);
 		}
 	}
@@ -884,11 +884,11 @@ class CliContext implements Context {
 	public function theAdministratorRestoresTheTrashedResourcesOfSpaceOwnedByUser(
 		string $resource,
 		string $spaceName,
-		string $user
+		string $user,
 	): void {
 		$spaceOwnerId = $this->spacesContext->getSpaceOwnerUserIdByName(
 			$user,
-			$spaceName
+			$spaceName,
 		);
 		$response = $this->listTrashedResource($spaceOwnerId);
 		[$items, $totalCount] = $this->getTrashedResourceFromCliCommandResponse($response);
@@ -900,7 +900,7 @@ class CliContext implements Context {
 			}
 		}
 		$body = [
-			"command" => "storage-users trash-bin restore $spaceOwnerId $trashItemId"
+			"command" => "storage-users trash-bin restore $spaceOwnerId $trashItemId",
 		];
 		$this->featureContext->setResponse(CliHelper::runCommand($body));
 	}
@@ -913,7 +913,7 @@ class CliContext implements Context {
 	 */
 	public function theAdministratorPurgesTheExpiredTrashResources(): void {
 		$body = [
-			"command" => "storage-users trash-bin purge-expired"
+			"command" => "storage-users trash-bin purge-expired",
 		];
 		$this->featureContext->setResponse(CliHelper::runCommand($body));
 	}
@@ -927,7 +927,7 @@ class CliContext implements Context {
 	public function theAdministratorResumesAllTheUploadSessionsUsingTheCLI(): void {
 		$command = "storage-users uploads sessions --resume --json";
 		$body = [
-			"command" => $command
+			"command" => $command,
 		];
 		$this->featureContext->setResponse(CliHelper::runCommand($body));
 	}

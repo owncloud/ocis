@@ -45,7 +45,7 @@ class AuthAppHelper {
 	public static function listAllAppAuthTokensForUser(
 		string $baseUrl,
 		string $user,
-		string $password
+		string $password,
 	): ResponseInterface {
 		$url = $baseUrl . self::getAuthAppEndpoint();
 		return HttpRequestHelper::sendRequest(
@@ -92,7 +92,7 @@ class AuthAppHelper {
 		string $baseUrl,
 		string $user,
 		string $password,
-		string $token
+		string $token,
 	): ResponseInterface {
 		$url = $baseUrl . self::getAuthAppEndpoint() . "?token=$token";
 		return HttpRequestHelper::sendRequest(

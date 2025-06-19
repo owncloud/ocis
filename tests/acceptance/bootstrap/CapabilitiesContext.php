@@ -75,7 +75,7 @@ class CapabilitiesContext implements Context {
 			'GET',
 			'/cloud/capabilities' . ($formatJson ? '?format=json' : ''),
 			[],
-			$this->featureContext->getOcsApiVersion()
+			$this->featureContext->getOcsApiVersion(),
 		);
 	}
 
@@ -110,7 +110,7 @@ class CapabilitiesContext implements Context {
 	public function getParameterValueFromXml(
 		SimpleXMLElement $xml,
 		string $capabilitiesApp,
-		string $capabilitiesPath
+		string $capabilitiesPath,
 	): string {
 		$path_to_element = \explode('@@@', $capabilitiesPath);
 		$answeredValue = $xml->{$capabilitiesApp};
@@ -172,7 +172,7 @@ class CapabilitiesContext implements Context {
 		Assert::assertSame(
 			1,
 			$result,
-			__METHOD__ . " version string '$versionString' does not start with a semver version"
+			__METHOD__ . " version string '$versionString' does not start with a semver version",
 		);
 		// semVerParts should have an array with the 3 semver components of the version, e.g. "1", "9" and "2".
 		$semVerParts = \explode('.', $matches[0]);
@@ -185,17 +185,17 @@ class CapabilitiesContext implements Context {
 		Assert::assertSame(
 			$expectedMajor,
 			$actualMajor,
-			__METHOD__ . "'major' data item does not match with major version in string '$versionString'"
+			__METHOD__ . "'major' data item does not match with major version in string '$versionString'",
 		);
 		Assert::assertSame(
 			$expectedMinor,
 			$actualMinor,
-			__METHOD__ . "'minor' data item does not match with minor version in string '$versionString'"
+			__METHOD__ . "'minor' data item does not match with minor version in string '$versionString'",
 		);
 		Assert::assertSame(
 			$expectedMicro,
 			$actualMicro,
-			__METHOD__ . "'micro' data item does not match with micro (patch) version in string '$versionString'"
+			__METHOD__ . "'micro' data item does not match with micro (patch) version in string '$versionString'",
 		);
 	}
 
@@ -218,35 +218,35 @@ class CapabilitiesContext implements Context {
 		$edition = $this->getParameterValueFromXml(
 			$responseXmlObject,
 			'core',
-			'status@@@edition'
+			'status@@@edition',
 		);
 
 		if (!\strlen($edition)) {
 			Assert::fail(
-				"Cannot get edition from core capabilities"
+				"Cannot get edition from core capabilities",
 			);
 		}
 
 		$product = $this->getParameterValueFromXml(
 			$responseXmlObject,
 			'core',
-			'status@@@product'
+			'status@@@product',
 		);
 		if (!\strlen($product)) {
 			Assert::fail(
-				"Cannot get product from core capabilities"
+				"Cannot get product from core capabilities",
 			);
 		}
 
 		$productName = $this->getParameterValueFromXml(
 			$responseXmlObject,
 			'core',
-			'status@@@productname'
+			'status@@@productname',
 		);
 
 		if (!\strlen($productName)) {
 			Assert::fail(
-				"Cannot get productname from core capabilities"
+				"Cannot get productname from core capabilities",
 			);
 		}
 
@@ -259,24 +259,24 @@ class CapabilitiesContext implements Context {
 		$version = $this->getParameterValueFromXml(
 			$responseXmlObject,
 			'core',
-			'status@@@version'
+			'status@@@version',
 		);
 
 		if (!\strlen($version)) {
 			Assert::fail(
-				"Cannot get version from core capabilities"
+				"Cannot get version from core capabilities",
 			);
 		}
 
 		$versionString = $this->getParameterValueFromXml(
 			$responseXmlObject,
 			'core',
-			'status@@@versionstring'
+			'status@@@versionstring',
 		);
 
 		if (!\strlen($versionString)) {
 			Assert::fail(
-				"Cannot get versionstring from core capabilities"
+				"Cannot get versionstring from core capabilities",
 			);
 		}
 
@@ -306,7 +306,7 @@ class CapabilitiesContext implements Context {
 		Assert::assertMatchesRegularExpression(
 			"/^\d+\.\d+\.\d+\.\d+$/",
 			$version,
-			"version should be in a form like 10.9.8.1 but is $version"
+			"version should be in a form like 10.9.8.1 but is $version",
 		);
 		if (\preg_match("/^(\d+\.\d+\.\d+)\.\d+(-[0-9A-Za-z-]+)?(\+[0-9A-Za-z-]+)?$/", $version, $matches)) {
 			// We should have matched something like 10.9.8 - the first 3 numbers in the version.
@@ -314,7 +314,7 @@ class CapabilitiesContext implements Context {
 			Assert::assertArrayHasKey(
 				1,
 				$matches,
-				"version $version could not match the pattern Major.Minor.Patch"
+				"version $version could not match the pattern Major.Minor.Patch",
 			);
 			$majorMinorPatchVersion = $matches[1];
 		} else {
@@ -323,7 +323,7 @@ class CapabilitiesContext implements Context {
 		Assert::assertStringStartsWith(
 			$majorMinorPatchVersion,
 			$versionString,
-			"version string should start with $majorMinorPatchVersion but is $versionString"
+			"version string should start with $majorMinorPatchVersion but is $versionString",
 		);
 	}
 }
