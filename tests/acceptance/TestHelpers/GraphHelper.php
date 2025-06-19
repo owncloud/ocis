@@ -1270,7 +1270,7 @@ class GraphHelper {
 		string $password,
 		string $groupId
 	): ResponseInterface {
-		$url = self::getFullUrl($baseUrl, 'users' . '?$filter=memberOf/any(m:m/id ' . "eq '$groupId')");
+		$url = self::getFullUrl($baseUrl, 'users?$filter=memberOf/any(m:m/id ' . "eq '$groupId')");
 		return HttpRequestHelper::get(
 			$url,
 			$user,
@@ -1296,7 +1296,7 @@ class GraphHelper {
 	): ResponseInterface {
 		$url = self::getFullUrl(
 			$baseUrl,
-			'users' . '?$filter=memberOf/any(m:m/id ' . "eq '$groupIdArray[0]') "
+			'users?$filter=memberOf/any(m:m/id ' . "eq '$groupIdArray[0]') "
 			. "and memberOf/any(m:m/id eq '$groupIdArray[1]')"
 		);
 		return HttpRequestHelper::get(
@@ -1326,8 +1326,8 @@ class GraphHelper {
 	): ResponseInterface {
 		$url = self::getFullUrl(
 			$baseUrl,
-			'users' . '?$filter=memberOf/any(m:m/id '
-			. "eq '$firstGroup') " . "or memberOf/any(m:m/id eq '$secondGroup')"
+			'users?$filter=memberOf/any(m:m/id '
+			. "eq '$firstGroup') or memberOf/any(m:m/id eq '$secondGroup')"
 		);
 		return HttpRequestHelper::get(
 			$url,
@@ -1352,7 +1352,7 @@ class GraphHelper {
 		string $password,
 		string $roleId
 	): ResponseInterface {
-		$url = self::getFullUrl($baseUrl, 'users' . '?$filter=appRoleAssignments/any(m:m/appRoleId ' . "eq '$roleId')");
+		$url = self::getFullUrl($baseUrl, 'users?$filter=appRoleAssignments/any(m:m/appRoleId ' . "eq '$roleId')");
 		return HttpRequestHelper::get(
 			$url,
 			$user,
@@ -1380,8 +1380,8 @@ class GraphHelper {
 	): ResponseInterface {
 		$url = self::getFullUrl(
 			$baseUrl,
-			'users' . '?$filter=appRoleAssignments/any(m:m/appRoleId '
-			. "eq '$roleId') " . "and memberOf/any(m:m/id eq '$groupId')"
+			'users?$filter=appRoleAssignments/any(m:m/appRoleId '
+			. "eq '$roleId') and memberOf/any(m:m/id eq '$groupId')"
 		);
 		return HttpRequestHelper::get(
 			$url,
@@ -2358,7 +2358,7 @@ class GraphHelper {
 	): ResponseInterface {
 		$url = self::getFullUrl(
 			$baseUrl,
-			'users' . '?$filter=memberOf/any(m:m/id ' . "eq '$groupId')" . '&$search=' . "$searchTerm"
+			'users?$filter=memberOf/any(m:m/id ' . "eq '$groupId')" . '&$search=' . "$searchTerm"
 		);
 		return HttpRequestHelper::get(
 			$url,

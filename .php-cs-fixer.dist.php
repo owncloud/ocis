@@ -37,6 +37,10 @@ $config->setFinder($finder)
                 'binary_operator_spaces' => true,
                 'phpdoc_to_return_type' => true,
                 'void_return' => true,
+                'no_useless_concat_operator' => true,
+                'concat_space' => [
+                    "spacing" => "one",
+                ],
             ]
         )
     );
