@@ -508,7 +508,7 @@ trait WebDav {
 	 *
 	 * @return ResponseInterface
 	 */
-	public function moveResource(string $user, string $source, string $destination) {
+	public function moveResource(string $user, string $source, string $destination): ResponseInterface {
 		$user = $this->getActualUsername($user);
 		$headers['Destination'] = $this->destinationHeaderValue(
 			$user,
@@ -3617,7 +3617,7 @@ trait WebDav {
 		string $path,
 		string $width,
 		string $height
-	) {
+	): void {
 		$user = $this->getActualUsername($user);
 		$urlParameter = [
 			'x' => $width,
@@ -4575,7 +4575,7 @@ trait WebDav {
 		string $type = "files",
 		string $folderPath = '',
 		?string $spaceId = null
-	) {
+	): string|array|bool {
 		$trimmedEntryNameToSearch = '';
 		// trim any leading "/" passed by the caller, we can just match the "raw" name
 		if ($entryNameToSearch != null) {
@@ -4634,7 +4634,7 @@ trait WebDav {
 		?string $entryNameToSearch = null,
 		?bool $searchForHighlightString = false,
 		?string $spaceId = null
-	) {
+	): string|array|bool {
 		// trim any leading "/" passed by the caller, we can just match the "raw" name
 		if ($entryNameToSearch !== null) {
 			$entryNameToSearch = \trim($entryNameToSearch, "/");

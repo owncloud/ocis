@@ -223,7 +223,7 @@ class CliContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function theAdministratorRemovesAllVersionsOfResources() {
+	public function theAdministratorRemovesAllVersionsOfResources(): void {
 		$path = $this->featureContext->getStorageUsersRoot();
 		$command = "revisions purge -p $path --dry-run=false";
 		$body = [
@@ -241,7 +241,7 @@ class CliContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function theAdministratorRemovesTheVersionsOfFileUsingFileId($file, $user, $space) {
+	public function theAdministratorRemovesTheVersionsOfFileUsingFileId($file, $user, $space): void {
 		$path = $this->featureContext->getStorageUsersRoot();
 		$fileId = $this->spacesContext->getFileId($user, $space, $file);
 		$command = "revisions purge -p $path -r $fileId --dry-run=false";

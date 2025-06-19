@@ -148,7 +148,7 @@ class WebDavPropertiesContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function theUserGetsPropertiesOfFolder(string $path, TableNode $propertiesTable) {
+	public function theUserGetsPropertiesOfFolder(string $path, TableNode $propertiesTable): void {
 		$response = $this->getPropertiesOfFolder(
 			$this->featureContext->getCurrentUser(),
 			$path,
@@ -174,7 +174,7 @@ class WebDavPropertiesContext implements Context {
 		string $username,
 		string $path,
 		TableNode $propertiesTable
-	) {
+	): void {
 		$username = $this->featureContext->getActualUsername($username);
 		$this->featureContext->verifyTableNodeColumns($propertiesTable, ['propertyName', 'propertyValue']);
 		$properties = $propertiesTable->getColumnsHash();

@@ -710,7 +710,7 @@ class SharingNgContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function userUpdatesTheLastShareWithFollowingPropertiesUsingGraphApi($user, TableNode $table) {
+	public function userUpdatesTheLastShareWithFollowingPropertiesUsingGraphApi($user, TableNode $table): void {
 		$permissionID = $this->featureContext->shareNgGetLastCreatedUserGroupShareID();
 		$this->featureContext->setResponse(
 			$this->updateResourceShare(
@@ -736,7 +736,7 @@ class SharingNgContext implements Context {
 		string $shareType,
 		string $sharee,
 		TableNode $table
-	) {
+	): void {
 		$permissionID = "";
 		if ($shareType === "user") {
 			$permissionID = "u:" . $this->featureContext->getAttributeOfCreatedUser($sharee, 'id');

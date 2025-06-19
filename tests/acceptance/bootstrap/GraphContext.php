@@ -500,7 +500,11 @@ class GraphContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function theUserResetsThePasswordOfUserToUsingTheGraphApi(string $byUser, string $user, string $password) {
+	public function theUserResetsThePasswordOfUserToUsingTheGraphApi(
+		string $byUser,
+		string $user,
+		string $password
+	): void {
 		$response = $this->adminChangesPasswordOfUserToUsingTheGraphApi($user, $password, $byUser);
 		$this->featureContext->setResponse($response);
 	}
@@ -1370,7 +1374,7 @@ class GraphContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function userTriesToGetOwnDriveInformation(string $user) {
+	public function userTriesToGetOwnDriveInformation(string $user): void {
 		$response = $this->retrieveUserInformationAlongWithDriveUsingGraphApi($user);
 		$this->featureContext->setResponse($response);
 	}
@@ -1591,7 +1595,7 @@ class GraphContext implements Context {
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function userGetsAllApplicationsUsingTheGraphApi(string $user) {
+	public function userGetsAllApplicationsUsingTheGraphApi(string $user): void {
 		$response = GraphHelper::getApplications(
 			$this->featureContext->getBaseUrl(),
 			$user,
@@ -1660,7 +1664,7 @@ class GraphContext implements Context {
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function userGetsAllUsersOfTheGroupUsingTheGraphApi(string $user, string $group) {
+	public function userGetsAllUsersOfTheGroupUsingTheGraphApi(string $user, string $group): void {
 		$groupId = $this->featureContext->getGroupIdByGroupName($group);
 		$response = GraphHelper::getUsersWithFilterMemberOf(
 			$this->featureContext->getBaseUrl(),
@@ -1680,7 +1684,7 @@ class GraphContext implements Context {
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function userGetsAllUsersOfTwoGroupsUsingTheGraphApi(string $user, string $groups) {
+	public function userGetsAllUsersOfTwoGroupsUsingTheGraphApi(string $user, string $groups): void {
 		$groupsIdArray = [];
 		foreach (explode(',', $groups) as $group) {
 			$groupsIdArray[] = $this->featureContext->getGroupIdByGroupName($group);
@@ -1708,7 +1712,7 @@ class GraphContext implements Context {
 		string $user,
 		string $firstGroup,
 		string $secondGroup
-	) {
+	): void {
 		$response = GraphHelper::getUsersFromOneOrOtherGroup(
 			$this->featureContext->getBaseUrl(),
 			$user,
@@ -1753,7 +1757,7 @@ class GraphContext implements Context {
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function userGetsAllUsersWithRoleUsingTheGraphApi(string $user, string $role) {
+	public function userGetsAllUsersWithRoleUsingTheGraphApi(string $user, string $role): void {
 		$response = GraphHelper::getUsersWithFilterRoleAssignment(
 			$this->featureContext->getBaseUrl(),
 			$user,
@@ -1777,7 +1781,7 @@ class GraphContext implements Context {
 		string $user,
 		string $role,
 		string $group
-	) {
+	): void {
 		$response = GraphHelper::getUsersWithFilterRolesAssignmentAndMemberOf(
 			$this->featureContext->getBaseUrl(),
 			$user,
@@ -2020,7 +2024,7 @@ class GraphContext implements Context {
 		string $user,
 		string $group,
 		TableNode $table
-	) {
+	): void {
 		$userIds = [];
 		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
 		foreach ($table->getHash() as $row) {
@@ -2046,7 +2050,7 @@ class GraphContext implements Context {
 		string $user,
 		string $groupToAdd,
 		string $group
-	) {
+	): void {
 		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
 		$groupIdToAdd = $this->featureContext->getAttributeOfCreatedGroup($groupToAdd, "id");
 		$credentials = $this->getAdminOrUserCredentials($user);
@@ -2083,7 +2087,7 @@ class GraphContext implements Context {
 		string $user,
 		string $groupToAdd,
 		string $group
-	) {
+	): void {
 		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
 		$groupIdToAdd = $this->featureContext->getAttributeOfCreatedGroup($groupToAdd, "id");
 		$credentials = $this->getAdminOrUserCredentials($user);
@@ -2202,7 +2206,7 @@ class GraphContext implements Context {
 		string $user,
 		string $group,
 		TableNode $table
-	) {
+	): void {
 		$userIds = [];
 		$credentials = $this->getAdminOrUserCredentials($user);
 		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
@@ -3220,7 +3224,11 @@ class GraphContext implements Context {
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function userSearchesForUserOfTheGroupUsingTheGraphApi(string $user, string $searchTerm, string $group) {
+	public function userSearchesForUserOfTheGroupUsingTheGraphApi(
+		string $user,
+		string $searchTerm,
+		string $group
+	): void {
 		$groupId = $this->featureContext->getGroupIdByGroupName($group);
 		$response = GraphHelper::searchUserWithFilterMemberOf(
 			$this->featureContext->getBaseUrl(),

@@ -457,7 +457,7 @@ trait Sharing {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userHasCreatedAShareWithSettings(string $user, ?TableNode $body) {
+	public function userHasCreatedAShareWithSettings(string $user, ?TableNode $body): void {
 		$response = $this->createShareWithSettings(
 			$user,
 			$body
@@ -1379,7 +1379,7 @@ trait Sharing {
 		string $filepath,
 		string $user2,
 		$permissions = null
-	) {
+	): void {
 		$response = $this->createAUserShare(
 			$this->getCurrentUser(),
 			$filepath["path"],
@@ -1508,7 +1508,7 @@ trait Sharing {
 		string $filepath,
 		string $group,
 		$permissions = null
-	) {
+	): void {
 		$response = $this->createAGroupShare(
 			$user,
 			$filepath,
@@ -1536,7 +1536,7 @@ trait Sharing {
 		string $group,
 		TableNode $table,
 		$permissions = null
-	) {
+	): void {
 		$this->verifyTableNodeColumns($table, ["path"]);
 		$paths = $table->getHash();
 
@@ -1568,7 +1568,7 @@ trait Sharing {
 		string $filepath,
 		string $group,
 		$permissions = null
-	) {
+	): void {
 		$response = $this->createAGroupShare(
 			$user,
 			$filepath,
@@ -1863,7 +1863,7 @@ trait Sharing {
 		string $sharer,
 		string $sharee,
 		TableNode $table
-	) {
+	): void {
 		$response = $this->getLastShareInfo($requester, "user");
 		$this->theHTTPStatusCodeShouldBe(200, "", $response);
 		$this->ocsContext->theOCSStatusCodeShouldBe("100,200", "", $response);
@@ -2577,7 +2577,7 @@ trait Sharing {
 		// change string "true"/"false" to boolean inside array
 		\array_walk_recursive(
 			$attributes,
-			function (&$value, $key) {
+			function (&$value, $key): void {
 				if ($key !== 'enabled') {
 					return;
 				}
@@ -3100,7 +3100,7 @@ trait Sharing {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userHasAcceptedThePendingShareOfferedBy(string $user, string $share, string $offeredBy) {
+	public function userHasAcceptedThePendingShareOfferedBy(string $user, string $share, string $offeredBy): void {
 		$response = $this->reactToShareOfferedBy($user, 'accepts', $share, $offeredBy, 'pending');
 		$this->theHTTPStatusCodeShouldBe(
 			200,
@@ -3126,7 +3126,7 @@ trait Sharing {
 		string $action,
 		string $share,
 		string $offeredBy
-	) {
+	): void {
 		if ($action === 'accept') {
 			$response = $this->reactToShareOfferedBy($user, 'accepts', $share, $offeredBy, 'pending');
 			$this->theHTTPStatusCodeShouldBe(

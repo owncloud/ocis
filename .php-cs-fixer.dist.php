@@ -35,6 +35,8 @@ $config->setFinder($finder)
                 'no_singleline_whitespace_before_semicolons' => true,
                 'type_declaration_spaces' => true,
                 'binary_operator_spaces' => true,
+                'phpdoc_to_return_type' => true,
+                'void_return' => true,
             ]
         )
     );

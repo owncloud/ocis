@@ -441,7 +441,7 @@ class TrashbinContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userTriesToListTheTrashbinContentForUser(string $asUser, string $user) {
+	public function userTriesToListTheTrashbinContentForUser(string $asUser, string $user): void {
 		$user = $this->featureContext->getActualUsername($user);
 		$asUser = $this->featureContext->getActualUsername($asUser);
 		$response = $this->sendTrashbinListRequest($user, $asUser);

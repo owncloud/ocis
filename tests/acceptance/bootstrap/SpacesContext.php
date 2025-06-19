@@ -2572,7 +2572,7 @@ class SpacesContext implements Context {
 		string $shareType,
 		string $spaceName,
 		string $memberUser
-	) {
+	): void {
 		$dateTime = new DateTime('yesterday');
 		$rows['expireDate'] = $dateTime->format('Y-m-d\\TH:i:sP');
 		$rows['shareWith'] = $memberUser;
@@ -4608,7 +4608,7 @@ class SpacesContext implements Context {
 	 * @throws GuzzleException
 	 * @throws Exception
 	 */
-	public function publicDownloadsTheFolderFromTheLastCreatedPublicLink(string $resource) {
+	public function publicDownloadsTheFolderFromTheLastCreatedPublicLink(string $resource): void {
 		$token = ($this->featureContext->isUsingSharingNG())
 		? $this->featureContext->shareNgGetLastCreatedLinkShareToken()
 		: $this->featureContext->getLastCreatedPublicShareToken();

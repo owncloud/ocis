@@ -111,7 +111,7 @@ trait Provisioning {
 	 * @return mixed
 	 * @throws Exception
 	 */
-	public function getAttributeOfCreatedUser(string $user, string $attribute) {
+	public function getAttributeOfCreatedUser(string $user, string $attribute): mixed {
 		$usersList = $this->getCreatedUsers();
 		$normalizedUsername = $this->normalizeUsername($user);
 		if (\array_key_exists($normalizedUsername, $usersList)) {
@@ -132,7 +132,7 @@ trait Provisioning {
 	 * @return mixed
 	 * @throws Exception
 	 */
-	public function getAttributeOfCreatedGroup(string $group, string $attribute) {
+	public function getAttributeOfCreatedGroup(string $group, string $attribute): mixed {
 		$groupsList = $this->getCreatedGroups();
 		if (\array_key_exists($group, $groupsList)) {
 			if (\array_key_exists($attribute, $groupsList[$group])) {
@@ -542,7 +542,7 @@ trait Provisioning {
 		TableNode $table,
 		bool $useDefault = true,
 		bool $initialize = true
-	) {
+	): void {
 		$this->verifyTableNodeColumns($table, ['username'], ['displayname', 'email', 'password']);
 		$table = $table->getColumnsHash();
 		$users = $this->buildUsersAttributesArray($useDefault, $table);

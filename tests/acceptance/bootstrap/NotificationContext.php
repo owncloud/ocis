@@ -557,7 +557,7 @@ class NotificationContext implements Context {
 	 * @throws GuzzleException
 	 * @throws JsonException
 	 */
-	public function theAdministratorCreatesADeprovisioningNotification(?string $user = null) {
+	public function theAdministratorCreatesADeprovisioningNotification(?string $user = null): void {
 		$response = $this->userCreatesDeprovisioningNotification($user);
 		$this->featureContext->setResponse($response);
 		$this->featureContext->pushToLastHttpStatusCodesArray();
@@ -577,7 +577,7 @@ class NotificationContext implements Context {
 	public function theAdministratorCreatesADeprovisioningNotificationUsingDateFormat(
 		$deprovision_date,
 		$deprovision_date_format
-	) {
+	): void {
 		$response = $this->userCreatesDeprovisioningNotification(null, $deprovision_date, $deprovision_date_format);
 		$this->featureContext->setResponse($response);
 		$this->featureContext->pushToLastHttpStatusCodesArray();

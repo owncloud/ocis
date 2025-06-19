@@ -609,7 +609,7 @@ class FeatureContext extends BehatVariablesContext {
 	 *
 	 * @return string|false
 	 */
-	private static function getAdminUsernameFromEnvironment() {
+	private static function getAdminUsernameFromEnvironment(): string|bool {
 		return \getenv('ADMIN_USERNAME');
 	}
 
@@ -618,7 +618,7 @@ class FeatureContext extends BehatVariablesContext {
 	 *
 	 * @return string|false
 	 */
-	private static function getAdminPasswordFromEnvironment() {
+	private static function getAdminPasswordFromEnvironment(): string|bool {
 		return \getenv('ADMIN_PASSWORD');
 	}
 
@@ -627,7 +627,7 @@ class FeatureContext extends BehatVariablesContext {
 	 *
 	 * @return string|false
 	 */
-	private static function getRegularUserPasswordFromEnvironment() {
+	private static function getRegularUserPasswordFromEnvironment(): string|bool {
 		return \getenv('REGULAR_USER_PASSWORD');
 	}
 
@@ -636,7 +636,7 @@ class FeatureContext extends BehatVariablesContext {
 	 *
 	 * @return string|false
 	 */
-	private static function getAlt1UserPasswordFromEnvironment() {
+	private static function getAlt1UserPasswordFromEnvironment(): string|bool {
 		return \getenv('ALT1_USER_PASSWORD');
 	}
 
@@ -645,7 +645,7 @@ class FeatureContext extends BehatVariablesContext {
 	 *
 	 * @return string|false
 	 */
-	private static function getAlt2UserPasswordFromEnvironment() {
+	private static function getAlt2UserPasswordFromEnvironment(): string|bool {
 		return \getenv('ALT2_USER_PASSWORD');
 	}
 
@@ -654,7 +654,7 @@ class FeatureContext extends BehatVariablesContext {
 	 *
 	 * @return string|false
 	 */
-	private static function getAlt3UserPasswordFromEnvironment() {
+	private static function getAlt3UserPasswordFromEnvironment(): string|bool {
 		return \getenv('ALT3_USER_PASSWORD');
 	}
 
@@ -663,7 +663,7 @@ class FeatureContext extends BehatVariablesContext {
 	 *
 	 * @return string|false
 	 */
-	private static function getAlt4UserPasswordFromEnvironment() {
+	private static function getAlt4UserPasswordFromEnvironment(): string|bool {
 		return \getenv('ALT4_USER_PASSWORD');
 	}
 
@@ -672,7 +672,7 @@ class FeatureContext extends BehatVariablesContext {
 	 *
 	 * @return string|false
 	 */
-	private static function getSubAdminPasswordFromEnvironment() {
+	private static function getSubAdminPasswordFromEnvironment(): string|bool {
 		return \getenv('SUB_ADMIN_PASSWORD');
 	}
 
@@ -681,7 +681,7 @@ class FeatureContext extends BehatVariablesContext {
 	 *
 	 * @return string|false
 	 */
-	private static function getAlternateAdminPasswordFromEnvironment() {
+	private static function getAlternateAdminPasswordFromEnvironment(): string|bool {
 		return \getenv('ALTERNATE_ADMIN_PASSWORD');
 	}
 
@@ -690,7 +690,7 @@ class FeatureContext extends BehatVariablesContext {
 	 *
 	 * @return string|false
 	 */
-	private static function getPublicLinkSharePasswordFromEnvironment() {
+	private static function getPublicLinkSharePasswordFromEnvironment(): string|bool {
 		return \getenv('PUBLIC_LINK_SHARE_PASSWORD');
 	}
 
@@ -1566,7 +1566,7 @@ class FeatureContext extends BehatVariablesContext {
 	 *
 	 * @return mixed
 	 */
-	public function getJSONSchema($schemaString) {
+	public function getJSONSchema($schemaString): mixed {
 		if (\gettype($schemaString) !== 'string') {
 			$schemaString = $schemaString->getRaw();
 		}
