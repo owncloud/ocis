@@ -74,6 +74,9 @@ var _ = Describe("DriveItemPermissionsService", func() {
 		cache = identity.NewIdentityCache(identity.IdentityCacheWithGatewaySelector(gatewaySelector))
 
 		cfg = defaults.FullDefaultConfig()
+		cfg.UnifiedRoles.AvailableRoles = slices.DeleteFunc(cfg.UnifiedRoles.AvailableRoles, func(s string) bool {
+			return s == unifiedrole.UnifiedRoleSecureViewerID
+		})
 		service, err := svc.NewDriveItemPermissionsService(logger, gatewaySelector, cache, cfg, otel.GetTracerProvider())
 		Expect(err).ToNot(HaveOccurred())
 		driveItemPermissionsService = service
@@ -260,10 +263,9 @@ var _ = Describe("DriveItemPermissionsService", func() {
 		})
 
 		It("fails with unknown or disable role", func() {
-			cfg := defaults.FullDefaultConfig()
-			slices.DeleteFunc(cfg.UnifiedRoles.AvailableRoles, func(s string) bool {
-				// SecureViewer is enabled in ci, we need to remove it in the unit test
-				return s != unifiedrole.UnifiedRoleSecureViewerID
+			cfg.UnifiedRoles.AvailableRoles = slices.DeleteFunc(cfg.UnifiedRoles.AvailableRoles, func(s string) bool {
+				// remove SecureViewer from allowed roles for this unit test
+				return s == unifiedrole.UnifiedRoleSecureViewerID
 			})
 			service, err := svc.NewDriveItemPermissionsService(log.NewLogger(), gatewaySelector, cache, cfg, otel.GetTracerProvider())
 			Expect(err).ToNot(HaveOccurred())

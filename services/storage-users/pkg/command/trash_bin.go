@@ -484,5 +484,5 @@ func cliLogger(verbose bool) zlog.Logger {
 	}
 	zerolog.SetGlobalLevel(zerolog.TraceLevel)
 	output := zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: time.RFC3339, NoColor: true}
-	return zlog.Logger{zerolog.New(output).With().Timestamp().Logger().Level(logLvl)}
+	return zlog.Logger{Logger: zerolog.New(output).With().Timestamp().Logger().Level(logLvl)}
 }
