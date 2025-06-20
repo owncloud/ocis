@@ -49,6 +49,7 @@ class GraphHelper {
 		'Viewer With ListGrants' => 'd5041006-ebb3-4b4a-b6a4-7c180ecfb17d',
 		'Editor With ListGrants' => 'e8ea8b21-abd4-45d2-b893-8d1546378e9e',
 		'File Editor With ListGrants' => 'c1235aea-d106-42db-8458-7d5610fb0a67',
+		'Space Editor Without Trashbin' => '8f4701d9-c68f-4109-a482-88e22ee32805',
 	];
 
 	public const SHARING_LINK_TYPE_MAPPINGS = [
