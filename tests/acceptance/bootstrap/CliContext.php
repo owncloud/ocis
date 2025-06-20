@@ -931,4 +931,18 @@ class CliContext implements Context {
 		];
 		$this->featureContext->setResponse(CliHelper::runCommand($body));
 	}
+
+	/**
+	 * @When the administrator restarts the expired upload sessions using the CLI
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function theAdministratorRestartsTheExpiredUploadSessionsUsingTheCLI(): void {
+		$command = "storage-users uploads sessions --expired --restart --json";
+		$body = [
+			"command" => $command,
+		];
+		$this->featureContext->setResponse(CliHelper::runCommand($body));
+	}
 }

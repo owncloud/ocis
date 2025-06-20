@@ -177,3 +177,16 @@ Feature: List upload sessions via CLI command
       | file.txt |
     When the administrator waits for "3" seconds
     Then the content of file "file.txt" for user "Alice" should be "upload content"
+
+
+  Scenario: restart expired upload sessions
+    Given a file "large.zip" with the size of "2GB" has been created locally
+    And the config "STORAGE_USERS_UPLOAD_EXPIRATION" has been set to "1"
+    And user "Alice" has uploaded a file from "filesForUpload/textfile.txt" to "file.txt" via TUS inside of the space "Personal" using the WebDAV API
+    And user "Alice" has tried to upload file "filesForUpload/large.zip" to "large.zip" inside space "Personal" via TUS
+    When the administrator restarts the expired upload sessions using the CLI
+    Then the command should be successful
+    And the CLI response should contain these entries:
+      | large.zip |
+    And the CLI response should not contain these entries:
+      | file.txt |
