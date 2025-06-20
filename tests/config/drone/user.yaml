@@ -1,0 +1,16 @@
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: admin-user # default for secreRefs.adminUserSecretRef
+type: Opaque
+data:
+  # how to generate: base64 encode a UUID V4
+  # example generation command: `cat /proc/sys/kernel/random/uuid | tr -d '\n' | base64`
+  user-id: MjIxMTFlNmMtNTAxZC00ZjY3LWI5ZWYtNzJiZWExYTk1YmNj
+
+  # how to generate: base64 encode a random string (reasonable long and mixed characters)
+  # example generation command: `tr -cd '[a-zA-Z0-9],.' < /dev/urandom | fold -w 50 | head -n 1 | tr -d '\n' | base64`
+  password: YWRtaW4K
+
+---
