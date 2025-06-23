@@ -138,11 +138,14 @@ main() {
     branch_info_file=$(mktemp)
     trap 'rm -f "$branch_info_file"' EXIT
 
-    # Ensure we have all git information
-    git fetch --prune origin || true
-
     # Validate script requirements
     validate_requirements
+
+    git config --global user.email "droneci@placeholder.com"
+    git config --global user.name "Drone CI"
+
+    # Ensure we have all git information
+    git fetch --prune origin || true
 
     # Parse repository information
     parse_repo_info || exit 1
