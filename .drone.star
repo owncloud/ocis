@@ -3663,7 +3663,7 @@ def deleteStaleBranches(ctx):
                 "name": "delete stale branches",
                 "image": OC_CI_ALPINE,
                 "commands": [
-                    "./scripts/delete-stale-branches.sh",
+                    "DRY_RUN=false ./scripts/delete-stale-branches.sh",
                 ],
             },
         ],
