@@ -82,6 +82,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix panic while traversing the service list: [#11390](https://github.com/owncloud/ocis/pull/11390)
 * Change - Remove deprecated FRONTEND_OCS_*: [#11333](https://github.com/owncloud/ocis/pull/11333)
 * Change - Remove deprecated CLIENTLOG_REVA_GATEWAY: [#11372](https://github.com/owncloud/ocis/pull/11372)
+* Enhancement - Allow scaling the search service: [#11029](https://github.com/owncloud/ocis/pull/11029)
 * Enhancement - Update Mockery to 2.52.3: [#11070](https://github.com/owncloud/ocis/pull/11070)
 * Enhancement - Improve postprocessing logs: [#11108](https://github.com/owncloud/ocis/pull/11108)
 * Enhancement - Improve graph space management logs: [#11115](https://github.com/owncloud/ocis/pull/11115)
@@ -231,6 +232,15 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/11314
    https://github.com/owncloud/ocis/pull/11372
+
+* Enhancement - Allow scaling the search service: [#11029](https://github.com/owncloud/ocis/pull/11029)
+
+   Previously, the search service locked the index for its whole lifetime, so any
+   other search service wouldn't be able to access to the index. With this change,
+   the search service can be configure to lock the index per operation, so other
+   search services can access the index as long as there is no operation ongoing.
+
+   https://github.com/owncloud/ocis/pull/11029
 
 * Enhancement - Update Mockery to 2.52.3: [#11070](https://github.com/owncloud/ocis/pull/11070)
 
