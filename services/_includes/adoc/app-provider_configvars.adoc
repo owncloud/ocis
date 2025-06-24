@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2025-06-24-04-09-25]
+[#deprecation-note-2025-06-24-09-02-35]
 [caption=]
 .Deprecation notes for the app-provider service
 [width="100%",cols="~,~,~,~",options="header"]
