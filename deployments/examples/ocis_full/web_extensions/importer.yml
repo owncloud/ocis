@@ -36,7 +36,7 @@ services:
       COMPANION_ONEDRIVE_KEY: "${COMPANION_ONEDRIVE_KEY}"
       COMPANION_ONEDRIVE_SECRET: "${COMPANION_ONEDRIVE_SECRET}"
       COMPANION_TUS_DEFERRED_UPLOAD_LENGTH: 'false'
-      COMPANION_CLIENT_ORIGINS: 'true'
+      COMPANION_CLIENT_ORIGINS: "https://${OCIS_DOMAIN:-ocis.owncloud.test},https://${COMPANION_DOMAIN:-companion.owncloud.test}"
     volumes:
       - companion-data:/tmp/companion/
     labels:
