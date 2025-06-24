@@ -7,7 +7,7 @@ VERBOSE="${VERBOSE:-false}"
 
 DAYS_BEFORE_STALE="${DAYS_BEFORE_STALE:-90}"
 IGNORE_BRANCHES_REGEX="^(main$|master$|stable-|release-|docs$|docs-stable-)"
-MAX_BRANCHES_PER_RUN="${MAX_BRANCHES_PER_RUN:-10}"
+MAX_BRANCHES_PER_RUN="${MAX_BRANCHES_PER_RUN:-5}"
 
 # Global variables
 branch_info_file=""

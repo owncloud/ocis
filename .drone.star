@@ -3672,7 +3672,7 @@ def deleteStaleBranches(ctx):
                     },
                 },
                 "commands": [
-                    "DRY_RUN=false ./scripts/delete-stale-branches.sh",
+                    "./scripts/delete-stale-branches.sh",
                 ],
             },
         ],
