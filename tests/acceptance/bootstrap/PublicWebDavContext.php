@@ -787,7 +787,7 @@ class PublicWebDavContext implements Context {
 	 */
 	public function publiclyUploadingWithPasswordShouldNotWork(
 		string $password,
-		string $expectedHttpCode = null,
+		?string $expectedHttpCode = null,
 	): void {
 		$response = $this->publicUploadContent(
 			'whateverfilefortesting.txt',

@@ -91,7 +91,7 @@ class CollaborationContext implements Context {
 		string $file,
 		string $space,
 		string $app,
-		string $viewMode = null,
+		?string $viewMode = null,
 	): void {
 		$fileId = $this->spacesContext->getFileId($user, $space, $file);
 		$response = \json_decode(

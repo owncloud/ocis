@@ -1055,7 +1055,7 @@ trait Provisioning {
 	 */
 	public function userHasBeenCreated(
 		array $userData,
-		string $byUser = null,
+		?string $byUser = null,
 	): void {
 		$userId = null;
 

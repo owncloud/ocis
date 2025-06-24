@@ -259,7 +259,7 @@ class TUSContext implements Context {
 		string $destination,
 		array $uploadMetadata = [],
 		int $noOfChunks = 1,
-		int $bytes = null,
+		?int $bytes = null,
 		string $checksum = '',
 	): void {
 		$response = $this->uploadFileUsingTus(
@@ -283,7 +283,7 @@ class TUSContext implements Context {
 	 * @param string|null $spaceId
 	 * @param array $uploadMetadata
 	 * @param integer $noOfChunks
-	 * @param integer $bytes
+	 * @param integer|null $bytes
 	 * @param string $checksum
 	 *
 	 * @return ResponseInterface
@@ -295,7 +295,7 @@ class TUSContext implements Context {
 		?string $spaceId = null,
 		array $uploadMetadata = [],
 		int $noOfChunks = 1,
-		int $bytes = null,
+		?int $bytes = null,
 		string $checksum = '',
 	): ResponseInterface {
 		$user = $this->featureContext->getActualUsername($user);
