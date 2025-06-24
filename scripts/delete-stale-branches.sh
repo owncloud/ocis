@@ -121,7 +121,7 @@ validate_requirements() {
     local missing_deps=()
     
     # Check for required commands
-    for cmd in git date; do
+    for cmd in git date curl; do
         if ! command -v "$cmd" >/dev/null 2>&1; then
             missing_deps+=("$cmd")
         fi
@@ -163,6 +163,38 @@ parse_repo_info() {
         fi
     else
         log_error "Could not parse owner/repo from remote URL: $remote_url"
+        return 1
+    fi
+}
+
+# Delete branch via GitHub REST API (uses GITHUB_TOKEN)
+# Args: branch-name
+# src: https://docs.github.com/en/rest/git/refs#delete-a-reference
+# Same as gh CLI but without 40MB binary
+github_api_delete_branch() {
+    local branch="$1"
+
+    if [[ -z "${GITHUB_TOKEN:-}" ]]; then
+        log_error "GITHUB_TOKEN not set, cannot call GitHub API to delete $branch"
+        return 1
+    fi
+
+    local api_url="https://api.github.com/repos/${OWNER}/${REPO}/git/refs/heads/${branch}"
+    local curl_verbosity="-s"
+    [[ "$VERBOSE" == "true" ]] && curl_verbosity="-v"
+
+    rsp=$(curl $curl_verbosity -w '\n%{http_code}' \
+        -X DELETE \
+        -H "Authorization: token ${GITHUB_TOKEN}" \
+        -H "Accept: application/vnd.github+json" \
+        "$api_url")
+    http_code=$(printf '%s\n' "$rsp" | tail -n1)
+    [[ "$VERBOSE" == "true" ]] && echo "$rsp"
+
+    if [[ "$http_code" == "204" ]]; then
+        return 0
+    else
+        log_error "GitHub API returned HTTP $http_code while deleting $branch"
         return 1
     fi
 }
@@ -211,7 +243,10 @@ main() {
     while IFS=$'\t' read -r age_days sha date branch author; do
         echo -e "  $branch (${G}$age_days days old${R})  by $author"
         if [[ "$DRY_RUN" == "false" ]]; then
-            git push origin --delete "${branch}" >/dev/null 2>&1
+            # Attempt git deletion, fall back to REST if that fails
+            git push origin --delete "$branch" >/dev/null 2>&1 || \
+            github_api_delete_branch "$branch" || \
+            log_error "Failed to delete $branch with both git and REST"
         fi
     done <<< "$oldest_branches"
 
