@@ -20,7 +20,7 @@ services:
         condition: service_started
       collabora:
         condition: service_healthy
-    command: ["ocis", "collaboration", "server"]
+    command: ["collaboration", "server"]
     environment:
       COLLABORATION_GRPC_ADDR: 0.0.0.0:9301
       COLLABORATION_HTTP_ADDR: 0.0.0.0:9300
