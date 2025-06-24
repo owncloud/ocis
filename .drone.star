@@ -3662,6 +3662,15 @@ def deleteStaleBranches(ctx):
             {
                 "name": "delete stale branches",
                 "image": OC_CI_ALPINE,
+                "settings": {
+                    "netrc_machine": "github.com",
+                    "netrc_username": {
+                        "from_secret": "github_username",
+                    },
+                    "netrc_password": {
+                        "from_secret": "github_token",
+                    },
+                },
                 "commands": [
                     "DRY_RUN=false ./scripts/delete-stale-branches.sh",
                 ],
