@@ -8,6 +8,7 @@ import (
 
 	"github.com/felixge/httpsnoop"
 	"github.com/go-chi/chi/v5"
+	"github.com/riandyrn/otelchi/version"
 
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/codes"
@@ -35,7 +36,7 @@ func Middleware(serverName string, opts ...Option) func(next http.Handler) http.
 	}
 	tracer := cfg.tracerProvider.Tracer(
 		tracerName,
-		oteltrace.WithInstrumentationVersion(Version()),
+		oteltrace.WithInstrumentationVersion(version.Version()),
 	)
 	if cfg.propagators == nil {
 		cfg.propagators = otel.GetTextMapPropagator()
@@ -88,8 +89,10 @@ func getRRW(writer http.ResponseWriter) *recordingResponseWriter {
 				if !rrw.written {
 					rrw.written = true
 					rrw.status = statusCode
+					// only call next WriteHeader when header is not written yet
+					// this is to prevent superfluous WriteHeader call
+					next(statusCode)
 				}
-				next(statusCode)
 			}
 		},
 	})
