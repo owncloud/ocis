@@ -1,6 +1,6 @@
 # Table of Contents
 
-* [Changelog for unreleased](#changelog-for-unreleased-unreleased)
+* [Changelog for 7.2.0-rc.1](#changelog-for-720-rc1-2025-06-20)
 * [Changelog for 7.1.3](#changelog-for-713-2025-05-27)
 * [Changelog for 7.1.2](#changelog-for-712-2025-03-28)
 * [Changelog for 7.1.1](#changelog-for-711-2025-03-14)
@@ -57,11 +57,11 @@
 * [Changelog for 1.1.0](#changelog-for-110-2021-01-22)
 * [Changelog for 1.0.0](#changelog-for-100-2020-12-17)
 
-# Changelog for [unreleased] (UNRELEASED)
+# Changelog for [7.2.0-rc.1] (2025-06-20)
 
-The following sections list the changes for unreleased.
+The following sections list the changes for 7.2.0-rc.1.
 
-[unreleased]: https://github.com/owncloud/ocis/compare/v7.1.3...master
+[7.2.0-rc.1]: https://github.com/owncloud/ocis/compare/v7.1.3...v7.2.0-rc.1
 
 ## Summary
 
