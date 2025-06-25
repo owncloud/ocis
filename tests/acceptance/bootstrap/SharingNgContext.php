@@ -377,7 +377,11 @@ class SharingNgContext implements Context {
 			$expirationDateTime,
 		);
 		if ($response->getStatusCode() === 200) {
-			$this->featureContext->shareNgAddToCreatedUserGroupShares($response);
+			$this->featureContext->shareNgAddToCreatedUserGroupShares(
+				$response,
+				$shareInfo['resource'] ?? '',
+				$shareInfo['space'],
+			);
 		}
 		return $response;
 	}
@@ -696,10 +700,34 @@ class SharingNgContext implements Context {
 		$permissionID = $this->featureContext->shareNgGetLastCreatedUserGroupShareID();
 		$response = $this->updateResourceShare(
 			$user,
-			$table,
+			$table->getRowsHash(),
 			$permissionID,
 		);
 		$this->featureContext->theHTTPStatusCodeShouldBe(200, "Expected response status code should be 200", $response);
+	}
+
+	/**
+	 * @Given user :user has updated the following resource share:
+	 *
+	 * @param string $user
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 */
+	public function userHasUpdatedTheFollowingResourceShare(string $user, TableNode $table): void {
+		$updateInfo = $table->getRowsHash();
+		$share = $this->featureContext->shareNgGetCreatedUserGroupShare(
+			$user,
+			$updateInfo["sharee"],
+			$updateInfo["space"],
+			$updateInfo["resource"],
+		);
+		$response = $this->updateResourceShare(
+			$user,
+			$updateInfo,
+			$share["id"],
+		);
+		$this->featureContext->theHTTPStatusCodeShouldBe(200, "Failed to update share", $response);
 	}
 
 	/**
@@ -715,7 +743,7 @@ class SharingNgContext implements Context {
 		$this->featureContext->setResponse(
 			$this->updateResourceShare(
 				$user,
-				$table,
+				$table->getRowsHash(),
 				$permissionID,
 			),
 		);
@@ -747,7 +775,7 @@ class SharingNgContext implements Context {
 		$this->featureContext->setResponse(
 			$this->updateResourceShare(
 				$user,
-				$table,
+				$table->getRowsHash(),
 				$permissionID,
 			),
 		);
@@ -755,30 +783,29 @@ class SharingNgContext implements Context {
 
 	/**
 	 * @param string $user
-	 * @param TableNode $body
+	 * @param array $updateInfo
 	 * @param string $permissionID
 	 *
 	 * @return ResponseInterface
 	 */
-	public function updateResourceShare(string $user, TableNode $body, string $permissionID): ResponseInterface {
-		$bodyRows = $body->getRowsHash();
-		$space = $this->spacesContext->getSpaceByName($user, $bodyRows['space']);
+	public function updateResourceShare(string $user, array $updateInfo, string $permissionID): ResponseInterface {
+		$space = $this->spacesContext->getSpaceByName($user, $updateInfo['space']);
 		$spaceId = $space["id"];
 		// for updating role of project space shared, we do not need to provide resource
-		$resource = $bodyRows['resource'] ?? '';
-		if ($resource === '' && !\in_array($bodyRows['space'], ['Personal', 'Shares'])) {
+		$resource = $updateInfo['resource'] ?? '';
+		if ($resource === '' && !\in_array($updateInfo['space'], ['Personal', 'Shares'])) {
 			$itemId = $space['fileId'];
 		} else {
-			$itemId = $this->spacesContext->getResourceId($user, $bodyRows['space'], $resource);
+			$itemId = $this->spacesContext->getResourceId($user, $updateInfo['space'], $resource);
 		}
 		$body = [];
-		if (\array_key_exists('permissionsRole', $bodyRows)) {
-			$body['roles'] = [GraphHelper::getPermissionsRoleIdByName($bodyRows['permissionsRole'])];
+		if (\array_key_exists('permissionsRole', $updateInfo)) {
+			$body['roles'] = [GraphHelper::getPermissionsRoleIdByName($updateInfo['permissionsRole'])];
 		}
 
-		if (\array_key_exists('expirationDateTime', $bodyRows)) {
-			$body['expirationDateTime'] = empty($bodyRows['expirationDateTime'])
-			? null : $bodyRows['expirationDateTime'];
+		if (\array_key_exists('expirationDateTime', $updateInfo)) {
+			$body['expirationDateTime'] = empty($updateInfo['expirationDateTime'])
+			? null : $updateInfo['expirationDateTime'];
 		}
 
 		$response = GraphHelper::updateShare(

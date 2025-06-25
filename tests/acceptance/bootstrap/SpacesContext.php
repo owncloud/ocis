@@ -2737,7 +2737,7 @@ class SpacesContext implements Context {
 			);
 
 			if ($response->getStatusCode() === 200) {
-				$this->featureContext->shareNgAddToCreatedUserGroupShares($response);
+				$this->featureContext->shareNgAddToCreatedUserGroupShares($response, $resource, $spaceName);
 			}
 			$this->featureContext->setResponse($response);
 		} else {
