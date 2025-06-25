@@ -2295,7 +2295,7 @@ def changelog():
                         "push",
                     ],
                     "message": "Automated changelog update [skip ci]",
-                    "branch": "master",
+                    "branch": "stable-7.2",
                     "author_email": "devops@owncloud.com",
                     "author_name": "ownClouders",
                     "netrc_machine": "github.com",
@@ -2408,7 +2408,7 @@ def docs():
                     },
                     "pages_directory": "docs/hugo/content/",
                     "copy_contents": "true",
-                    "target_branch": "docs",
+                    "target_branch": "docs-stable-7.2",
                     "delete": "true",
                 },
                 "when": {
