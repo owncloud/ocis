@@ -31,6 +31,7 @@ import (
 	"github.com/owncloud/reva/v2/pkg/utils"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/l10n"
+	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	l10n_pkg "github.com/owncloud/ocis/v2/services/graph/pkg/l10n"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/conversions"
@@ -700,14 +701,16 @@ type DriveItemPermissionsApi struct {
 	logger                      log.Logger
 	driveItemPermissionsService DriveItemPermissionsProvider
 	config                      *config.Config
+	valueService                settingssvc.ValueService
 }
 
 // NewDriveItemPermissionsApi creates a new DriveItemPermissionsApi
-func NewDriveItemPermissionsApi(driveItemPermissionService DriveItemPermissionsProvider, logger log.Logger, c *config.Config) (DriveItemPermissionsApi, error) {
+func NewDriveItemPermissionsApi(driveItemPermissionService DriveItemPermissionsProvider, logger log.Logger, c *config.Config, valueService settingssvc.ValueService) (DriveItemPermissionsApi, error) {
 	return DriveItemPermissionsApi{
 		logger:                      log.Logger{Logger: logger.With().Str("graph api", "DrivesDriveItemApi").Logger()},
 		driveItemPermissionsService: driveItemPermissionService,
 		config:                      c,
+		valueService:                valueService,
 	}, nil
 }
 
@@ -804,7 +807,8 @@ func (api DriveItemPermissionsApi) ListPermissions(w http.ResponseWriter, r *htt
 		return
 	}
 
-	loc := r.Header.Get(l10n.HeaderAcceptLanguage)
+	userID := revactx.ContextMustGetUser(ctx).GetId().GetOpaqueId()
+	loc := l10n.MustGetUserLocale(ctx, userID, r.Header.Get(l10n.HeaderAcceptLanguage), api.valueService)
 	w.Header().Add("Content-Language", loc)
 	if loc != "" && loc != "en" {
 		err := l10n_pkg.TranslateEntity(loc, "en", permissions,
@@ -839,7 +843,8 @@ func (api DriveItemPermissionsApi) ListSpaceRootPermissions(w http.ResponseWrite
 		return
 	}
 
-	loc := r.Header.Get(l10n.HeaderAcceptLanguage)
+	userID := revactx.ContextMustGetUser(ctx).GetId().GetOpaqueId()
+	loc := l10n.MustGetUserLocale(ctx, userID, r.Header.Get(l10n.HeaderAcceptLanguage), api.valueService)
 	w.Header().Add("Content-Language", loc)
 	if loc != "" && loc != "en" {
 		err := l10n_pkg.TranslateEntity(loc, "en", permissions,
