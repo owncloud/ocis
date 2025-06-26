@@ -135,7 +135,7 @@ func (c *Converter) ConvertGlobalEvent(typ string, data json.RawMessage) (OC10No
 			return OC10Notification{}, err
 		}
 
-		return c.deprovisionMessage(PlatformDeprovision, dd.DeprovisionDate.Format(dd.DeprovisionFormat))
+		return c.deprovisionMessage(PlatformDeprovision, dd.DeprovisionDate.Format(time.RFC3339))
 	}
 
 }
