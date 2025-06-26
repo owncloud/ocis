@@ -1,0 +1,5733 @@
+---
+# Image for oCIS services
+image:
+  # @schema
+  # type: string
+  # required: true
+  # @schema
+  # -- Image repository
+  repository: owncloud/ocis
+  # @schema
+  # type: [string, null]
+  # required: false
+  # @schema
+  # -- Image tag. Defaults to the chart's appVersion.
+  tag:
+  # @schema
+  # type: [string, null]
+  # required: false
+  # @schema
+  # -- Image sha / digest (optional).
+  sha:
+  # @schema
+  # type: string
+  # required: true
+  # @schema
+  # -- Image pull policy
+  pullPolicy: IfNotPresent
+  # @schema
+  # type: array
+  # items:
+  #   type: object
+  #   required: true
+  #   additionalProperties: false
+  #   properties:
+  #     name:
+  #       type: string
+  #       required: true
+  # @schema
+  # -- Names of the secret containing the credentials to pull an image from the registry. More
+  # information how a secret can be defined at https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+  # These secrets also apply to initContainers, so you need to provide secrets for the initContainer image here as well.
+  pullSecrets: []
+  # pullSecrets:
+  #   - name: mySecret
+  #   - name: mySecret2
+
+# InitContainer image used for oCIS services.
+# Only used if `services.xxx.persistence.chownInitContainer.enabled` is set to true for at least one service.
+initContainerImage:
+  # @schema
+  # type: string
+  # required: true
+  # @schema
+  # -- Image repository
+  repository: busybox
+  # @schema
+  # type: string
+  # required: true
+  # @schema
+  # -- Image tag.
+  tag: stable
+  # @schema
+  # type: [string, null]
+  # required: false
+  # @schema
+  # -- Image sha / digest (optional).
+  sha:
+  # @schema
+  # type: [string, null]
+  # required: true
+  # @schema
+  # -- Image pull policy
+  pullPolicy: IfNotPresent
+
+# Logging settings for oCIS services
+logging:
+  # @schema
+  # enum: [panic, fatal, error, warn, info, debug, trace]
+  # required: true
+  # @schema
+  # -- Log level. Valid values: `panic`, `fatal`, `error`, `warn`, `info`, `debug`, `trace`.
+  level: info
+  # @schema
+  # type: boolean
+  # required: true
+  # @schema
+  # -- Activates pretty log output.
+  # Not recommended for production installations.
+  pretty: false
+  # @schema
+  # type: boolean
+  # required: true
+  # @schema
+  # -- Activates colorized log output.
+  # Not recommended for production installations.
+  color: false
+
+# Tracing settings for oCIS services
+tracing:
+  # @schema
+  # type: boolean
+  # required: true
+  # @schema
+  # -- Tracing enables sending traces
+  enabled: false
+  # @schema
+  # enum: [jaeger]
+  # required: true
+  # @schema
+  # -- Type of trace provider to use
+  type: jaeger
+  # @schema
+  # type: [string, null]
+  # required: false
+  # @schema
+  # -- Endpoint of the tracing system, jaeger-agent.observability.svc.cluster.local:6831 or similar.
+  endpoint:
+  # @schema
+  # type: [string, null]
+  # required: false
+  # @schema
+  # -- The HTTP endpoint for sending spans directly to a collector, i.e. http://jaeger-collector.observability.svc.cluster.local:14268/api/traces. Only used if the tracing endpoint is unset.
+  collector:
+
+# HTTP settings for oCIS services.
+http:
+  # CORS settings for oCIS services.
+  cors:
+    # @schema
+    # type: array
+    # items:
+    #   type: string
+    #   required: true
+    # @schema
+    # -- allow_origins is a list of origins a cross-domain request can be executed from.
+    # If the special "*" value is present in the list, all origins will be allowed.
+    allow_origins: []
+  # CSP settings for oCIS services.
+  csp:
+    directives:
+      # @schema
+      # type: array
+      # items:
+      #   type: string
+      #   required: true
+      # @schema
+      # -- child-src directive, see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/child-src
+      childSrc:
+        - "'self'"
+      # @schema
+      # type: array
+      # items:
+      #   type: string
+      #   required: true
+      # @schema
+      # -- connect-src directive, see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/connect-src
+      connectSrc:
+        - "'self'"
+        # If Uppy Companion is used, you need to add it with your URI:
+        # - "https://companion.kube.owncloud.test/"
+        # - "wss:///companion.kube.owncloud.test/"
+      # @schema
+      # type: array
+      # items:
+      #   type: string
+      #   required: true
+      # @schema
+      # -- default-src directive, see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/default-src
+      defaultSrc:
+        - "'none'"
+      # @schema
+      # type: array
+      # items:
+      #   type: string
+      #   required: true
+      # @schema
+      # -- front-src directive, see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/front-src
+      fontSrc:
+        - "'self'"
+      # @schema
+      # type: array
+      # items:
+      #   type: string
+      #   required: true
+      # @schema
+      # -- frame-ancestors directive, see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/frame-ancestors
+      frameAncestors:
+        - "'self'"
+      # @schema
+      # type: array
+      # items:
+      #   type: string
+      #   required: true
+      # @schema
+      # -- frame-src directive, see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/frame-src
+      frameSrc:
+        - "'self'"
+        - "blob:"
+      # @schema
+      # type: array
+      # items:
+      #   type: string
+      #   required: true
+      # @schema
+      # -- img-src directive, see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/img-src
+      imgSrc:
+        - "'self'"
+        - "data:"
+        - "blob:"
+      # @schema
+      # type: array
+      # items:
+      #   type: string
+      #   required: true
+      # @schema
+      # -- manifest-src directive, see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/manifest-src
+      manifestSrc:
+        - "'self'"
+      # @schema
+      # type: array
+      # items:
+      #   type: string
+      #   required: true
+      # @schema
+      # -- media-src directive, see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/media-src
+      mediaSrc:
+        - "'self'"
+      # @schema
+      # type: array
+      # items:
+      #   type: string
+      #   required: true
+      # @schema
+      # -- object-src directive, see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/object-src
+      objectSrc:
+        - "'self'"
+        - "blob:"
+      # @schema
+      # type: array
+      # items:
+      #   type: string
+      #   required: true
+      # @schema
+      # -- script-src directive, see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/script-src
+      scriptSrc:
+        - "'self'"
+        - "'unsafe-inline'"
+      # @schema
+      # type: array
+      # items:
+      #   type: string
+      #   required: true
+      # @schema
+      # -- style-src directive, see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/style-src
+      styleSrc:
+        - "'self'"
+        - "'unsafe-inline'"
+
+# Debug settings for the oCIS service
+debug:
+  # @schema
+  # type: boolean
+  # required: true
+  # @schema
+  # -- Profiling enables the http://<pod>:<debug-metrics>/debug/pprof endpoint to inspect various Go runtime internals.
+  # You can use the endpoint on your machine by forwarding the port, eg: `kubectl port-forward -n ocis pod/proxy-8587dc9d64-fs24l 9205:9205`
+  # and then accessing the port on https://localhost:9147/debug/pprof or using the pprof command line tool: `go tool pprof -web http://localhost:9205/debug/pprof/symbol\?seconds\=10`
+  profiling: false
+
+# Deployment strategy.
+deploymentStrategy:
+  # @schema
+  # enum: [RollingUpdate, Recreate]
+  # required: true
+  # @schema
+  # -- deployment strategy type to use. Can be "RollingUpdate" or "Recreate"
+  type: RollingUpdate
+  rollingUpdate:
+    # @schema
+    # oneOf:
+    #  - type: string
+    #  - type: integer
+    # required: true
+    # @schema
+    # -- The maximum number of pods that can be scheduled above the desired number of pods.
+    # Value can be an absolute number (ex: 5) or a percentage of desired pods (ex: 10%).
+    maxSurge: 25%
+    # @schema
+    # oneOf:
+    #  - type: string
+    #  - type: integer
+    # required: true
+    # @schema
+    # -- The maximum number of pods that can be unavailable during the update.
+    # Value can be an absolute number (ex: 5) or a percentage of desired pods (ex: 10%).
+    maxUnavailable: 25%
+
+# @schema
+# type: string
+# required: true
+# @schema
+# -- Domain where oCIS is reachable for the outside world
+externalDomain: "ocis"
+
+# Insecure options.
+# These are useful for some limited environments like CI or on a test cluster.
+insecure:
+  # @schema
+  # type: boolean
+  # required: true
+  # @schema
+  # -- Disables SSL certificate checking for connections to the openID connect identity provider.
+  # Not recommended for production installations.
+  oidcIdpInsecure: true
+  # @schema
+  # type: boolean
+  # required: true
+  # @schema
+  # -- Disables SSL certificate checking for connections to the oCIS http apis.
+  # Not recommended for production installations.
+  ocisHttpApiInsecure: true
+  # @schema
+  # type: boolean
+  # required: true
+  # @schema
+  # -- Disables SSL certificate checking for connections to all OCM instances
+  # Not recommended for production installations.
+  ocmInsecure: false
+
+cache:
+  # @schema
+  # type: string
+  # required: true
+  # @schema
+  # -- Type of the cache to use.
+  # Can be set to "nats-js-kv" or "redis-sentinel". There are also the non-recommended options "memory" and "noop".
+  # The address of NATS / Redis Sentinel node(s) needs to be set to `cache.nodes`.
+  type: nats-js-kv
+  # @schema
+  # type: array
+  # items:
+  #   type: string
+  #   required: true
+  # @schema
+  # -- Nodes of the cache to use.
+  nodes:
+    - "{{ .appNameNats }}:9233"
+
+store:
+  # @schema
+  # type: string
+  # required: true
+  # @schema
+  # -- Configure the store type.
+  # Can be set to "nats-js-kv" or "redis-sentinel". There is also the non-recommended option "memory".
+  # The address of NATS / Redis Sentinel node(s) needs to be set to `cache.nodes`.
+  type: nats-js-kv
+  # @schema
+  # type: array
+  # items:
+  #   type: string
+  #   required: true
+  # @schema
+  # -- Nodes of the store to use.
+  nodes:
+    - "{{ .appNameNats }}:9233"
+
+registry:
+  # @schema
+  # type: string
+  # required: true
+  # @schema
+  # -- Configure the service registry type.
+  # Can be set to "nats-js-kv".
+  # The address of NATS node(s) needs to be set to `cache.nodes`.
+  type: nats-js-kv
+  # @schema
+  # type: array
+  # items:
+  #   type: string
+  #   required: true
+  # @schema
+  # -- Nodes of the service registry to use.
+  nodes:
+    - "{{ .appNameNats }}:9233"
+
+messagingSystem:
+  external:
+    # @schema
+    # type: boolean
+    # required: true
+    # @schema
+    # -- Use an external NATS messaging system instead of the internal one.
+    # Recommended for all production instances.
+    # Needs to be used if HighAvailability is needed.
+    # Needs to be used if oCIS shall be used by more than a 2-digit user count.
+    enabled: false
+    # @schema
+    # type: [string, null]
+    # required: false
+    # @schema
+    # -- Endpoint of the messaging system.
+    endpoint:
+    # @schema
+    # type: [string, null]
+    # required: false
+    # @schema
+    # -- Cluster name to use with the messaging system.
+    cluster:
+    tls:
+      # @schema
+      # type: boolean
+      # required: true
+      # @schema
+      # -- Enables TLS encrypted communication with the messaging system.
+      # Recommended for production installations.
+      enabled: true
+      # @schema
+      # type: boolean
+      # required: true
+      # @schema
+      # -- Set only to false, if the certificate of your messaging system service is not trusted.
+      # If set to false, you need to put the CA cert of the messaging system server into the secret referenced by "messagingSystemCaRef"
+      certTrusted: true
+      # @schema
+      # type: boolean
+      # required: true
+      # @schema
+      # -- Disables SSL certificate checking for connections to the messaging system server.
+      # -- For self signed certificates, consider to put the CA cert of the messaging system secure server into the secret referenced by "messagingSystemCaRef"
+      # Not recommended for production installations.
+      insecure: false
+
+# @schema
+# type: array
+# required: true
+# items:
+#   type: object
+#   additionalProperties: false
+#   properties:
+#     ip:
+#       anyOf:
+#         - format: ivp4
+#           type: string
+#         - format: ivp6
+#           type: string
+#       required: true
+#     hostnames:
+#       type: array
+#       required: true
+#       items:
+#         type: string
+#         required: true
+#         format: hostname
+# @schema
+# -- provide custom hostnames to every oCIS pods
+# hostAliases:
+#   - ip: 192.168.49.2
+#     hostnames:
+#     - ocis
+
+# Feature options.
+# Enable or disable features of oCIS.
+features:
+  # @schema
+  # type: boolean
+  # required: true
+  # @schema
+  # -- Create demo users on the first startup.
+  # Not recommended for production installations.
+  demoUsers: false
+  # Language related settings
+  language:
+    # @schema
+    # type: string
+    # required: true
+    # @schema
+    # -- The default language. If not defined, English will be used as default. See the documentation for more details.
+    default: en
+  # Email related settings
+  emailNotifications:
+    # @schema
+    # type: boolean
+    # required: true
+    # @schema
+    # -- Enables email notifications.
+    enabled: false
+    smtp:
+      # @schema
+      # type: [string, null]
+      # format: hostname
+      # required: false
+      # @schema
+      # -- SMTP host to connect to.
+      host:
+      # @schema
+      # type: [integer, null]
+      # minimum: 1
+      # required: false
+      # @schema
+      # -- Port of the SMTP host to connect to.
+      port:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Sender address of emails that will be sent. Example: 'ownCloud <noreply@example.com>'
+      sender:
+      # @schema
+      # enum: [auto, login, plain, crammd5, none]
+      # required: true
+      # @schema
+      # -- Authentication method for the SMTP communication. Possible values are ‘login’, ‘plain’, ‘crammd5’, ‘none’, 'auto'
+      # If set to another value than `none`, a secret referenced by `notificationsSmtpSecretRef` needs to be present.
+      authentication: auto
+      # @schema
+      # enum: [starttls, ssl, ssltls, tls, none]
+      # required: true
+      # @schema
+      # -- Encryption method for the SMTP communication. Possible values are `starttls`, `ssl`, `ssltls`, `tls` and `none`
+      encryption: ssltls
+    summary:
+      daily:
+        # @schema
+        # type: boolean
+        # required: true
+        # @schema
+        # -- Enables a job, that sends out a summary for the day.
+        enabled: false
+        # @schema
+        # type: string
+        # required: true
+        # @schema
+        # -- Cron pattern for the job to be run.
+        schedule: "0 0 * * *"
+        # @schema
+        # type: [string, null]
+        # required: false
+        # @schema
+        # -- Timezone to be applied to the cron pattern.
+        timezone:
+        # @schema
+        # type: integer
+        # minimum: 1
+        # required: true
+        # @schema
+        # -- Defines the a deadline (in whole seconds) for starting the Job, if that Job misses its scheduled time for any reason.
+        startingDeadlineSeconds: 600
+      weekly:
+        # @schema
+        # type: boolean
+        # required: true
+        # @schema
+        # -- Enables a job, that sends out a summary for the week.
+        enabled: false
+        # @schema
+        # type: string
+        # required: true
+        # @schema
+        # -- Cron pattern for the job to be run.
+        schedule: "0 0 * * 0"
+        # @schema
+        # type: [string, null]
+        # required: false
+        # @schema
+        # -- Timezone to be applied to the cron pattern.
+        timezone:
+        # @schema
+        # type: integer
+        # minimum: 1
+        # required: true
+        # @schema
+        # -- Defines the a deadline (in whole seconds) for starting the Job, if that Job misses its scheduled time for any reason.
+        startingDeadlineSeconds: 600
+
+    branding:
+      # @schema
+      # type: boolean
+      # required: true
+      # @schema
+      # -- Enables mail branding. If enabled, you need to provide the text and html template ConfigMap.
+      # The image ConfigMap is optional.
+      enabled: false
+      # @schema
+      # type: string
+      # required: true
+      # @schema
+      # -- Reference to a ConfigMap containing the text mail template.
+      # The template file must be named "email.text.tmpl".
+      # The default template can be seen here: https://github.com/owncloud/ocis/blob/master/services/notifications/pkg/email/templates/text/email.text.tmpl
+      textMailTemplatesConfigRef: text-mail-templates
+      # @schema
+      # type: string
+      # required: true
+      # @schema
+      # -- Reference to a ConfigMap containing the html mail template.
+      # The template file must be named "email.html.tmpl".
+      # The default template can be seen here: https://github.com/owncloud/ocis/blob/master/services/notifications/pkg/email/templates/html/email.html.tmpl
+      htmlMailTemplatesConfigRef: html-mail-templates
+      # @schema
+      # type: string
+      # required: true
+      # @schema
+      # -- Reference to a ConfigMap containing images that can be referenced from the html mail template.
+      # This ConfigMap is optional and can be omitted when images are not used.
+      htmlMailImagesConfigRef: html-mail-images
+
+  # Sharing related settings
+  sharing:
+    # Sharing with users related settings
+    users:
+      # Search settings for finding users to share with.
+      search:
+        # @schema
+        # type: integer
+        # required: true
+        # minimum: 1
+        # @schema
+        # -- Minimum number of characters to enter before a client should start a search for Share receivers.
+        # This setting can be used to customize the user experience if e.g too many results are displayed.
+        minLengthLimit: 3
+        # @schema
+        # type: boolean
+        # required: true
+        # @schema
+        # -- Show user email when searching for other users to share with.
+        showUserEmail: false
+    # Sharing per public link related setings
+    publiclink:
+      # @schema
+      # type: boolean
+      # required: true
+      # @schema
+      # -- Enforce a password on all public link shares.
+      shareMustHavePassword: false
+      # @schema
+      # type: boolean
+      # required: true
+      # @schema
+      # -- Enforce a password only on writable public link shares.
+      # Is already enforced if `features.sharing.publiclink.shareMustHavePassword` option is set to `true``.
+      writeableShareMustHavePassword: false
+
+    # @schema
+    # type: boolean
+    # required: true
+    # @schema
+    # -- automatically accept incoming shares
+    autoAcceptShares: true
+    # password policies for share passwords
+    passwordPolicies:
+      # @schema
+      # type: integer
+      # required: true
+      # minimum: 0
+      # @schema
+      # -- the minimum amount of characters the password needs to have
+      minCharacters: 0
+      # @schema
+      # type: integer
+      # required: true
+      # minimum: 0
+      # @schema
+      # -- the minimum amount of lower case characters the password needs to have
+      minLowerCharacters: 0
+      # @schema
+      # type: integer
+      # required: true
+      # minimum: 0
+      # @schema
+      # -- the minimum amount of upper case characters the password needs to have
+      minUpperCharacters: 0
+      # @schema
+      # type: integer
+      # required: true
+      # minimum: 0
+      # @schema
+      # -- the minimum amount of special characters the password needs to have
+      minSpecialCharacters: 0
+      # @schema
+      # type: integer
+      # required: true
+      # minimum: 0
+      # @schema
+      # -- the minimum amount of digits the password needs to have
+      minDigits: 0
+      # @schema
+      # type: array
+      # required: true
+      # items:
+      #   type: string
+      # @schema
+      # -- list of banned passwords
+      bannedPasswords:
+        []
+        # - foo
+        # - bar
+  # Apps integration
+  appsIntegration:
+    # @schema
+    # type: boolean
+    # required: true
+    # @schema
+    # -- Enables the apps integration.
+    enabled: false
+    # WOPI (office suite integration) needs an https://github.com/cs3org/wopiserver[cs3org/wopiserver] and at least one office suite.
+    wopiIntegration:
+      # @schema
+      # type: array
+      # required: true
+      # items:
+      #   type: object
+      #   additionalProperties: false
+      #   properties:
+      #     name:
+      #       type: string
+      #       required: true
+      #     product:
+      #       enum: [Collabora, OnlyOffice, Microsoft365, MicrosoftOfficeOnline]
+      #       required: true
+      #     enabled:
+      #       type: boolean
+      #       required: true
+      #     uri:
+      #       type: string
+      #       format: uri
+      #       required: true
+      #     description:
+      #       type: string
+      #       required: false
+      #     iconURI:
+      #       type: string
+      #       format: uri
+      #       required: false
+      #     insecure:
+      #       type: boolean
+      #       required: true
+      #     disableProof:
+      #       type: boolean
+      #       required: true
+      #     secureViewEnabled:
+      #       type: boolean
+      #       required: true
+      #     disableChat:
+      #       type: boolean
+      #       required: true
+      #     ingress:
+      #       type: object
+      #       additionalProperties: false
+      #       properties:
+      #         enabled:
+      #           type: boolean
+      #           required: true
+      #         domain:
+      #           type: string
+      #           required: true
+      #         ingressClassName:
+      #           type: [string, null]
+      #           required: true
+      #         annotations:
+      #           type: object
+      #           required: true
+      #           patternProperties:
+      #            ".*":
+      #              type: string
+      #         labels:
+      #           type: object
+      #           required: true
+      #           patternProperties:
+      #            ".*":
+      #              type: string
+      #         tls:
+      #           type: array
+      #           items:
+      #             type: object
+      #             required: true
+      #             additionalProperties: false
+      #             properties:
+      #               secretName:
+      #                 type: string
+      #                 required: true
+      #               hosts:
+      #                 type: array
+      #                 items:
+      #                   type: string
+      #                   format: hostname
+      # @schema
+      # -- List of WOPI compliant office suites to be used.
+      # Example configurations can be found in https://github.com/owncloud/ocis-charts/blob/main/deployments/ocis-office/helmfile.yaml
+      # This are the available config options:
+      # - # Name of the office suite. Will be displayed to the users.
+      #   name:
+      #   # Product type of the office suite. Will be used to determine certain product specifics.
+      #   # Supports "Collabora", "OnlyOffice", "Microsoft365" or "MicrosoftOfficeOnline".
+      #   product:
+      #   # Enables the office suite.
+      #   enabled: false
+      #   # URI of the office suite.
+      #   uri:
+      #   # URI for the icon of the office suite. Will be displayed to the users.
+      #   iconURI:
+      #   # Description of the office suite
+      #   description: "Open office documents with Office X"
+      #   # Disables SSL certificate checking for connections to the office suites http api.
+      #   # Not recommended for production installations.
+      #   insecure: false
+      #   # Disables verifying requests via WOPI proof keys.
+      #   # Not recommended to be disabled for production installations.
+      #   disableProof: false
+      #   # Enable secure view for this office suite
+      #   secureViewEnabled: false
+      #   # Disables the chat in the office suite. Note: This currently only applies to OnlyOffice
+      #   disableChat: false
+      #   # Ingress for collaboration service.
+      #   ingress:
+      #     # Enables the Ingress. Only needed if the office application is not running within the same cluster.
+      #     enabled: false
+      #     # Domain of the Ingress.
+      #     domain:
+      #     # Ingress class to use.
+      #     # Uses the default ingress class if not set.
+      #     ingressClassName:
+      #     # Ingress annotations.
+      #     annotations: {}
+      #     # Labels for the ingress.
+      #     labels: {}
+      #     # Ingress TLS configuration.
+      #     tls: []
+      #     #  - secretName: chart-example-tls
+      #     #    hosts:
+      #     #      - wopi.owncloud.test
+      officeSuites: []
+    # @schema
+    # type: array
+    # required: true
+    # items:
+    #   type: object
+    #   additionalProperties: false
+    #   properties:
+    #     name:
+    #       type: string
+    #       required: false
+    #     mime_type:
+    #       type: string
+    #       required: true
+    #     extension:
+    #       type: string
+    #       required: true
+    #     description:
+    #       type: string
+    #       required: false
+    #     icon:
+    #       type: string
+    #       required: false
+    #     default_app:
+    #       type: string
+    #       required: false
+    #     allow_creation:
+    #       type: boolean
+    #       required: false
+    # @schema
+    # -- Mimetype configuration.
+    # Let's you configure a mimetypes' default application, if it is allowed to create a new file and more.
+    # @default -- default configuration of oCIS, see https://doc.owncloud.com/ocis/next/deployment/services/s-list/app-registry.html#yaml-example[doc.owncloud.com]
+    mimetypes:
+      []
+      # - mime_type: application/vnd.oasis.opendocument.text
+      # extension: odt
+      # name: OpenDocument
+      # description: OpenDocument text document
+      # icon:
+      # default_app:
+      # allow_creation: true
+  # External user management
+  externalUserManagement:
+    # @schema
+    # type: boolean
+    # required: true
+    # @schema
+    # -- Enables external user management (and disables internal user management).
+    # Needs an external OpenID Connect Identity Provider and an external LDAP server.
+    enabled: false
+    # @schema
+    # type: [string, null]
+    # required: false
+    # @schema
+    # -- UUID of the initial admin user.
+    # If the given value matches a user's value from `features.externalUserManagement.oidc.userIDClaim`, the admin role will be assigned.
+    # Consider that the UUID can be encoded in some LDAP deployment configurations like in .ldif files. These need to be decoded beforehand.
+    # Note: Enabling `roleAssignment` will disable `adminUUID`.
+    adminUUID:
+    # Autoprovisioning of user accounts via OIDC
+    autoprovisionAccounts:
+      # @schema
+      # type: boolean
+      # required: true
+      # @schema
+      # -- Enables account auto provisioning.
+      # It will create missing users on the LDAP server from OIDC information.
+      # Needs `features.externalUserManagement.ldap.writeable` to be be set to `true`.
+      enabled: false
+      # @schema
+      # type: string
+      # required: true
+      # @schema
+      # -- The name of the OIDC claim that holds the email.
+      claimEmail: email
+      # @schema
+      # type: string
+      # required: true
+      # @schema
+      # -- The name of the OIDC claim that holds the display name.
+      claimDisplayname: name
+      # @schema
+      # type: string
+      # required: true
+      # @schema
+      # -- The name of the OIDC claim that holds the groups.
+      claimGroups: groups
+      # @schema
+      # type: string
+      # required: true
+      # @schema
+      # -- The name of the OIDC claim that holds the username.
+      claimUserName: sub
+    # OpenID Connect Identity provider related settings.
+    oidc:
+      # @schema
+      # type: [string, null]
+      # format: uri
+      # required: false
+      # @schema
+      # -- Issuer URI of the OpenID Connect Identity Provider.
+      # If the IDP doesn't have valid / trusted SSL certificates, certificate validation can be disabled with the `insecure.oidcIdpInsecure` option.
+      # The issuerURI will be automatically be added to http.csp.directives.connectSrc
+      issuerURI:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Link to the OIDC provider's user accessible session management. This will be shown to the user on the personal account page.
+      # When using Keycloak with the a realm named "ocis" this could point to eg. https://keycloak.owncloud.test/realms/ocis/account/
+      sessionManagementLink:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Link to the OIDC provider's user accessible account editing page. This will be shown to the user on the personal account page.
+      # When using Keycloak with the a realm named "ocis" this could point to eg. https://keycloak.owncloud.test/realms/ocis/account/
+      editAccountLink:
+      # @schema
+      # type: string
+      # required: true
+      # @schema
+      # -- Claim to take an unique user identifier from. It will be used to look up the user on the LDAP server.
+      userIDClaim: ocis.user.uuid
+      # @schema
+      # type: string
+      # required: true
+      # @schema
+      # -- Attribute mapping of for the userIDClaim.
+      # Set to `userid` if the claim specified in `...oidc.userIDClaim` holds the value of the ldap user attribute specified in `...ldap.user.schema.id`.
+      # Set to `mail` if the claim specified in `...oidc.userIDClaim` holds the value of the ldap user attribute specified in  `...ldap.user.schema.mail`.
+      # Set to `username` if the claim specified in `...oidc.userIDClaim` holds the value of the ldap user attribute specified in `...ldap.user.schema.userName`.
+      userIDClaimAttributeMapping: userid
+
+      # @schema
+      # type: string
+      # required: true
+      # @schema
+      # -- OIDC Acces Token Verify Method
+      # Set to "jwt" or "none"
+      accessTokenVerifyMethod: jwt
+
+      # @schema
+      # type: boolean
+      # required: true
+      # @schema
+      # -- Do not look up user claims at the userinfo endpoint and directly read them from the access token.
+      # Incompatible with 'accessTokenVerifyMethod=none'
+      skipUserInfo: false
+
+      # Configure OIDC role assignment. If activated, oCIS will read the role assigment from the OIDC token, see
+      # xref:{s-path}/proxy.adoc#automatic-role-assignments[Automatic Role Assignments]
+      roleAssignment:
+        # @schema
+        # type: boolean
+        # required: true
+        # @schema
+        # -- enable OIDC role assignment.
+        enabled: false
+        # @schema
+        # type: string
+        # required: true
+        # @schema
+        # -- The name of the OIDC claim holding the role assignment
+        claim: roles
+        # @schema
+        # type: array
+        # required: true
+        # items:
+        #   type: object
+        #   additionalProperties: false
+        #   properties:
+        #     role_name:
+        #       type: string
+        #       required: true
+        #     claim_value:
+        #       type: string
+        #       required: true
+        # @schema
+        # -- Configure the mapping for the role assignment.
+        # Example configuration:
+        # - role_name: admin
+        #   claim_value: ocisAdmin
+        # - role_name: spaceadmin
+        #   claim_value: ocisSpaceAdmin
+        # - role_name: user
+        #   claim_value: ocisUser
+        # - role_name: user-light
+        #   claim_value: ocisGuest
+        mapping: []
+
+      # Configure OIDC space assignment. If activate, oCIS will read the space assignements from the oidc token
+      # @schema
+      # type: object
+      # required: false
+      # @schema
+      spaceAssignment:
+        # @schema
+        # type: boolean
+        # required: true
+        # @schema
+        # -- enable OIDC space assignment.
+        enabled: false
+        # @schema
+        # type: string
+        # required: true
+        # @schema
+        # -- The name of the OIDC claim holding the space assignment
+        claim: ""
+        # @schema
+        # type: string
+        # required: true
+        # @schema
+        # -- The regexp extracting the spaceid and the -role from the claim
+        regexp: (.*)
+        # @schema
+        # type: array
+        # required: false
+        # items:
+        #   type: string
+        # @schema
+        # -- Configure the mapping for the role assignment.
+        # Example configuration:
+        # - oidcRoleA:manager
+        # - oidcRoleB:editor
+        # - oidcRoleC:viewer
+        mapping: []
+
+    # LDAP related settings.
+    ldap:
+      # @schema
+      # type: boolean
+      # required: true
+      # @schema
+      # -- Writeable configures if oCIS is allowed to write to the LDAP server, to eg. create or edit users.
+      writeable: true
+      # @schema
+      # type: array
+      # required: true
+      # items:
+      #   type: string
+      # @schema
+      # -- If the LDAP server is set to writable in general, some user attributes can be restricted to read only in the UI.
+      # Note: This only disables editing in the UI. The readonly permissions need to be enforced in the LDAP server itself.
+      readOnlyAttributes:
+        []
+        # - user.onPremisesSamAccountName # username
+        # - user.displayName # display name
+        # - user.mail # mail
+        # - user.passwordProfile # password
+        # - user.appRoleAssignments # role
+        # - user.accountEnabled # login allowed
+        # - drive.quota # quota
+      # @schema
+      # type: [string, null]
+      # format: uri
+      # required: false
+      # @schema
+      # -- URI to connect to the LDAP secure server.
+      uri:
+      # @schema
+      # type: boolean
+      # required: true
+      # @schema
+      # -- Set only to false, if the certificate of your LDAP secure service is not trusted.
+      # If set to false, you need to put the CA cert of the LDAP secure server into the secret referenced by "ldapCaRef"
+      certTrusted: true
+      # @schema
+      # type: boolean
+      # required: true
+      # @schema
+      # -- Disables SSL certificate checking for connections to the LDAP server.
+      # -- For self signed certificates, consider to put the CA cert of the LDAP secure server into the secret referenced by "ldapCaRef"
+      # Not recommended for production installations.
+      insecure: false
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- DN of the user to use to bind to the LDAP server.
+      # The password for the user needs to be set in the secret referenced by `secretRefs.ldapSecretRef` as `reva-ldap-bind-password`.
+      # The user needs to have permission to list users and groups.
+      bindDN:
+      # @schema
+      # type: boolean
+      # required: true
+      # @schema
+      # -- Signals that the LDAP server has the refint plugin enabled, which makes some actions not needed.
+      refintEnabled: false
+      # @schema
+      # type: boolean
+      # required: true
+      # @schema
+      # -- Use the Password Modify Extended Operation for updating user passwords.
+      passwordModifyExOpEnabled: false
+      # @schema
+      # type: boolean
+      # required: true
+      # @schema
+      # -- If set to true, rely on the LDAP Server to generate a unique ID for users and groups, like when using 'entryUUID' as the user ID attribute.
+      useServerUUID: false
+      user:
+        schema:
+          # @schema
+          # type: string
+          # required: true
+          # @schema
+          # -- LDAP Attribute to use as the unique id for users. This should be a stable globally unique id like a UUID.
+          id: ownclouduuid
+          # @schema
+          # type: boolean
+          # required: true
+          # @schema
+          # -- Set this to true if the defined `id` attribute for users is of the `OCTETSTRING` syntax. This is e.g. required when using the `objectGUID` attribute of Active Directory for the user ID`s.
+          idIsOctetString: false
+          # @schema
+          # type: string
+          # required: true
+          # @schema
+          # -- LDAP Attribute to use for the email address of users.
+          mail: mail
+          # @schema
+          # type: string
+          # required: true
+          # @schema
+          # -- LDAP Attribute to use for the displayname of users.
+          displayName: displayname
+          # @schema
+          # type: string
+          # required: true
+          # @schema
+          # -- LDAP Attribute to use for username of users.
+          userName: uid
+          # @schema
+          # type: string
+          # required: true
+          # @schema
+          # -- LDAP Attribute to distinguish between 'Member' and 'Guest' users. Default is 'ownCloudUserType'.
+          userType: ownCloudUserType
+        # @schema
+        # type: string
+        # required: true
+        # @schema
+        # -- Search base DN for looking up LDAP users.
+        baseDN: ou=users,dc=owncloud,dc=com
+        # @schema
+        # enum:
+        #   - base
+        #   - sub
+        #   - one
+        # required: true
+        # @schema
+        # -- LDAP search scope to use when looking up users. Supported values are `base`, `one` and `sub`.
+        scope: sub
+        # @schema
+        # enum:
+        #   - initial
+        #   - final
+        #   - any
+        # required: true
+        # @schema
+        # -- Type of substring search filter to use for substring searches for users. Possible values: `initial` for doing prefix only searches, `final` for doing suffix only searches or `any` for doing full substring searches
+        substringFilterType: any
+        # @schema
+        # type: [string, null]
+        # required: false
+        # @schema
+        # -- LDAP filter to add to the default filters for user search like `(objectclass=ownCloud)`.
+        filter:
+        # @schema
+        # type: string
+        # required: true
+        # @schema
+        # -- The object class to use for users in the default user search filter like `inetOrgPerson`.
+        objectClass: inetOrgPerson
+        # @schema
+        # type: string
+        # required: true
+        # @schema
+        # -- Apply restrictions to usernames. Supported values are 'default' and 'none'. When set to 'default', user names must not start with a number and are restricted to ASCII characters. When set to 'none', no restrictions are applied. The default value is 'default'.
+        userNameMatch: default
+      group:
+        schema:
+          # @schema
+          # type: string
+          # required: true
+          # @schema
+          # -- LDAP Attribute to use as the unique ID for groups. This should be a stable globally unique ID like a UUID.
+          id: ownclouduuid
+          # @schema
+          # type: boolean
+          # required: true
+          # @schema
+          # -- Set this to true if the defined `id` attribute for groups is of the `OCTETSTRING` syntax. This is e.g. required when using the `objectGUID` attribute of Active Directory for the group ID`s.
+          idIsOctetString: false
+          # @schema
+          # type: string
+          # required: true
+          # @schema
+          # -- LDAP Attribute to use for the email address of groups (can be empty).
+          mail: mail
+          # @schema
+          # type: string
+          # required: true
+          # @schema
+          # -- LDAP Attribute to use for the displayname of groups (often the same as groupname attribute).
+          displayName: cn
+          # @schema
+          # type: string
+          # required: true
+          # @schema
+          # -- LDAP Attribute to use for the name of groups.
+          groupName: cn
+          # @schema
+          # type: string
+          # required: true
+          # @schema
+          # -- LDAP Attribute that is used for group members.
+          member: member
+        # @schema
+        # type: string
+        # required: true
+        # @schema
+        # -- Search base DN for looking up LDAP groups.
+        baseDN: ou=groups,dc=owncloud,dc=com
+        # @schema
+        # type: [string, null]
+        # required: false
+        # @schema
+        # -- BaseDN where new groups are created and are considered as editable.
+        # All existing groups with a DN outside the `features.externalUserManagement.ldap.group.createBaseDN` will be treated as read-only groups.
+        # Defaults to the value `features.externalUserManagement.ldap.group.baseDN`.
+        # Only applicable if `features.externalUserManagement.ldap.writeable` is set to `true`
+        createBaseDN:
+        # @schema
+        # type: string
+        # required: true
+        # @schema
+        # -- LDAP search scope to use when looking up groups. Supported values are `base`, `one` and `sub`.
+        scope: sub
+        # @schema
+        # type: [string, null]
+        # required: false
+        # @schema
+        # -- LDAP filter to add to the default filters for group searches.
+        filter:
+        # @schema
+        # type: string
+        # required: true
+        # @schema
+        # -- The object class to use for groups in the default group search filter like `groupOfNames`.
+        objectClass: groupOfNames
+      # When using external user management, users can be set as disabled by either belonging to a group or using an ldap attribute.
+      disableUsers:
+        # @schema
+        # enum: [none, attribute, group]
+        # required: true
+        # @schema
+        # -- Enables disabling users if configured as "attribute" or "group"
+        disableMechanism: none
+        # @schema
+        # type: string
+        # required: true
+        # @schema
+        # -- Attribute to use for disabling users.
+        userEnabledAttribute: ownCloudUserEnabled
+        # @schema
+        # type: string
+        # required: true
+        # @schema
+        # -- Group that a user can be added to and by that being marked as disabled.
+        disabledUsersGroupDN: cn=DisabledUsersGroup,ou=groups,o=libregraph-idm
+
+  # GDPR report related settings.
+  gdprReport:
+    # Enables the GDPR report feature
+    # Controls the separate GDPR integrations
+    integrations:
+      keycloak:
+        # @schema
+        # type: boolean
+        # required: true
+        # @schema
+        # -- Enable keycloak data export.
+        enabled: false
+        # @schema
+        # type: [string, null]
+        # required: false
+        # @schema
+        # -- Base URI of keycloak.
+        basePath:
+        # @schema
+        # type: [string, null]
+        # required: false
+        # @schema
+        # -- Client ID to authenticate against keycloak with.
+        clientID:
+        # @schema
+        # type: [string, null]
+        # required: false
+        # @schema
+        # -- Realm that the client ID is configured in, usually master.
+        clientRealm:
+        # @schema
+        # type: [string, null]
+        # required: false
+        # @schema
+        # -- Realm that the users are in.
+        userRealm:
+        # @schema
+        # type: boolean
+        # required: true
+        # @schema
+        # -- Disables SSL certificate checking for connections to the GDPR export service.
+        # Not recommended for production installations.
+        insecure: false
+  # Define custom roles here. Note that the definition will be either or. So you cannot provide a ConfigMap name and text at once.
+  roles:
+    # @schema
+    # type: [string, null]
+    # required: false
+    # @schema
+    # -- Define the roles by specifying a name of a ConfigMap which already contains the the role description (might also be defined in the `extraResources` section).
+    # The ConfigMap needs to contain a file named `custom-roles.json` which holds the role description in JSON format
+    # Please note that you have to restart the settings service manually if you change the content of you ConfigMap.
+    customRolesConfigRef:
+    # @schema
+    # type: [string, null]
+    # required: false
+    # @schema
+    # -- Define the roles by providing the JSON text here.
+    customRoles:
+    # @schema
+    # type: array
+    # required: true
+    # items:
+    #   type: string
+    # @schema
+    # -- Define a list of unified roles to make them available.
+    # The default of an empty list means all unified roles are available.
+    # You can read about unified roles in https://doc.owncloud.com/ocis/next/deployment/services/s-list/graph.html.
+    # The IDs of the roles and a description can be found by running:
+    # kubectl -n ocis exec deployments/graph -- ocis graph list-unified-roles
+    availableUnifiedRoles: []
+  # Define quota settings.
+  quotas:
+    # @schema
+    # type: [string, null]
+    # required: false
+    # @schema
+    # -- Sets the maximum quota for spaces in bytes. So 1000 sets the max quota to 1KB.
+    max:
+    # @schema
+    # type: [string, null]
+    # required: false
+    # @schema
+    # -- Sets the default quota for spaces in bytes. So 1000 sets the default quota to 1KB. 0 means unlimited.
+    default:
+    # @schema
+    # type: object
+    # required: true
+    # patternProperties:
+    #  ".*":
+    #    type: integer
+    # @schema
+    # -- Sets specific quotas for roles
+    roles: {}
+    # roles:
+    #   # User Role set to 2GB
+    #   d7beeea8-8ff4-406b-8fb6-ab2dd81e6b11: 2000000000
+    #   # Administrator Role set to 100GB
+    #   71881883-1768-46bd-a24d-a356a2afdf7f: 100000000000
+    #   # Space Administrator Role set to 100GB
+    #   2aadd357-682c-406b-8874-293091995fdd: 100000000000
+  # Define virus scanning
+  virusscan:
+    # @schema
+    # type: boolean
+    # required: true
+    # @schema
+    # -- Enables virus scanning
+    enabled: false
+    # @schema
+    # enum: [delete, continue, abort]
+    # required: true
+    # @schema
+    # -- Define what should happen with infected files. Supported options are: 'delete', 'continue' and 'abort '.
+    # Delete will delete the file.
+    # Continue will mark the file as infected but continues further processing.
+    # Abort will keep the file in the uploads folder for further admin inspection and will not move it to its final destination.
+    infectedFileHandling: delete
+    # @schema
+    # type: [string, null]
+    # required: false
+    # @schema
+    # -- Sets a maximum file size for scans. Only this many bytes of a file will be scanned. 0 means unlimited and is the default.
+    # Usable common abbreviations: [KB, KiB, MB, MiB, GB, GiB, TB, TiB, PB, PiB, EB, EiB], example: 2GB.
+    maxScanSize:
+    # Define icap parameters
+    icap:
+      # @schema
+      # type: integer
+      # required: true
+      # @schema
+      # -- Sets the timeout for icap scans
+      timeout: 300
+      # @schema
+      # type: [string, null]
+      # format: uri
+      # required: false
+      # @schema
+      # -- Sets the icap url
+      url:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Sets the service to be used in icap
+      service:
+  # Define policies
+  policies:
+    # @schema
+    # type: boolean
+    # required: true
+    # @schema
+    # -- Enables policies
+    enabled: false
+    # @schema
+    # type: string
+    # required: true
+    # @schema
+    # -- Sets the timeout the rego expression evaluation can take. The timeout can be set as number followed by a unit identifier
+    # like ms, s, etc. Rules default to deny if the timeout was reached.
+    engineTimeout: 10s
+    # @schema
+    # type: array
+    # required: true
+    # items:
+    #   type: object
+    #   additionalProperties: false
+    #   properties:
+    #     fileName:
+    #       type: string
+    #       required: true
+    #     content:
+    #       type: string
+    #       required: true
+    # @schema
+    # -- Sets the policies. Each policy file is defined by a `fileName` and a `content`. The content takes the rego script as text.
+    # For further information, please have a look at https://doc.owncloud.com/ocis/next/deployment/services/s-list/policies.html
+    # Attention: All scripts provided here will end up in a ConfigMap. The data stored in a ConfigMap cannot exceed 1 MiB. see
+    # https://kubernetes.io/docs/concepts/configuration/configmap/#:~:text=The%20data%20stored%20in%20a,separate%20database%20or%20file%20service.
+    policies: []
+    # - fileName: proxy.rego
+    #   content: |-
+    #     package proxy
+    #     default granted := true
+    #
+    # - fileName: postprocessing.rego
+    #   content: |-
+    #     package postprocessing
+    #     default granted := true
+    #
+  # @schema
+  # enum: [Community, Enterprise]
+  # required: true
+  # @schema
+  # -- Edition of ownCloud Infinite Scale.
+  edition: Community
+  # Archiver settings
+  archiver:
+    # @schema
+    # type: integer
+    # required: true
+    # minimum: 1
+    # @schema
+    # -- Max size in bytes of the zip archive the archiver can create.
+    maxSize: 1073741824
+    # @schema
+    # type: integer
+    # required: true
+    # minimum: 1
+    # @schema
+    # -- Max number of files that can be packed into an archive.
+    maxNumFiles: 10000
+  # OCM settings
+  ocm:
+    # @schema
+    # type: boolean
+    # required: true
+    # @schema
+    # -- Enables OCM service
+    enabled: false
+    # @schema
+    # type: string
+    # required: true
+    # @schema
+    # -- Expiry duration for invite tokens.
+    invitationExpiry: 24h0m0s
+    # @schema
+    # type: string
+    # required: true
+    # @schema
+    # -- Timeout specifies a time limit for requests made to OCM endpoints.
+    requestTimeout: 30s
+    # @schema
+    # type: [string, null]
+    # required: false
+    # @schema
+    # -- Required reference to an existing provider config.
+    # Will be mounted to /etc/ocis
+    # Does not get autogenerated.
+    # Documentation can be found at https://doc.owncloud.com/ocis/next/deployment/services/s-list/ocm.html#trust-between-instances
+    providersConfigRef:
+
+# Ingress for oCIS.
+ingress:
+  # @schema
+  # type: boolean
+  # required: true
+  # @schema
+  # -- Enables the Ingress.
+  enabled: true
+  # @schema
+  # type: [string, null]
+  # required: false
+  # @schema
+  # -- Ingress class to use.
+  # Uses the default ingress class if not set.
+  ingressClassName: nginx
+  # @schema
+  # $ref: schema/templates.json#/annotationsTemplate
+  # @schema
+  # -- Ingress annotations.
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: 1024m
+  # @schema
+  # $ref: schema/templates.json#/labelsTemplate
+  # @schema
+  # -- Labels for the ingress.
+  labels: {}
+  # @schema
+  # type: array
+  # items:
+  #   type: object
+  #   required: true
+  #   additionalProperties: false
+  #   properties:
+  #     secretName:
+  #       type: string
+  #       required: true
+  #     hosts:
+  #       type: array
+  #       items:
+  #         type: string
+  # @schema
+  # -- Ingress TLS configuration.
+  tls:
+    - hosts:
+        - ocis
+      secretName: chart-example-tls
+  #    hosts:
+  #      - ocis.owncloud.test
+
+# References to ConfigMaps.
+# The ConfigMaps need to be manually created.
+# Leave these empty to have them autogenerated by the Helm chart.
+# Note that ConfigMaps generated by the helm chart will be removed once the helm chart is uninstalled.
+# Furthermore, if you already had ConfigMaps at the default locations, they will be NOT be overwritten,
+# but the helm chart will claim ownership of them. If this is a problem, fill in the configRefs below
+# with the names of your existing secrets.
+# See https://doc.owncloud.com/ocis/next/deployment/container/orchestration/orchestration.html#customize-the-generic-setup[doc.owncloud.com] for how to generate them.
+configRefs:
+  # @schema
+  # type: [string, null]
+  # required: false
+  # @schema
+  # -- Reference to an existing storage-users config.
+  storageusersConfigRef:
+  # @schema
+  # type: [string, null]
+  # required: false
+  # @schema
+  # -- Reference to an existing graph config.
+  graphConfigRef:
+  # @schema
+  # type: [string, null]
+  # required: false
+  # @schema
+  # -- Optional reference to an existing web theme config.
+  # Will be mounted to /var/lib/ocis/web/assets/themes/owncloud for Web.
+  # Does not get autogenerated.
+  # Hint: if you set this, you'll no longer be able to change the instance logo via the Web UI.
+  webThemeConfigRef:
+  # @schema
+  # type: [string, null]
+  # required: false
+  # @schema
+  # -- Optional reference to an existing web theme assets config.
+  # Will be mounted to /var/lib/ocis/web/assets/themes/owncloud/assets for Web.
+  # Does not get autogenerated.
+  # Hint: if you set this, you'll no longer be able to change the instance logo via the Web UI.
+  webThemeAssetsConfigRef:
+  # @schema
+  # type: [string, null]
+  # required: false
+  # @schema
+  # -- Reference to an existing authservice config.
+  authServiceConfigRef:
+
+# References to secrets.
+# Leave these empty to have them autogenerated by the Helm chart.
+# Note that secrets generated by the helm chart will be removed once the helm chart is uninstalled.
+# Furthermore, if you already had secrets at the default locations, they will be NOT be overwritten,
+# but the helm chart will claim ownership of them. If this is a problem, fill in the secretRefs below
+# with the names of your existing secrets.
+# TODO: Update https://doc.owncloud.com/ocis/next/deployment/container/orchestration/orchestration.html#customize-the-generic-setup[doc.owncloud.com] for how to generate them.
+secretRefs:
+  # @schema
+  # type: [string, null]
+  # required: false
+  # @schema
+  # -- Reference to an existing admin user secret (see ref:Secrets#secrets). Not used if `features.externalUserManagement.enabled` equals `true`.
+  adminUserSecretRef:
+  # @schema
+  # type: [string, null]
+  # required: false
+  # @schema
+  # -- Reference to an existing collaboration service WOPI secret (see ref:Secrets#secrets). Not used if `features.appsIntegration.enabled` equals `false`.
+  collaborationWopiSecret:
+  # @schema
+  # type: [string, null]
+  # required: false
+  # @schema
+  # -- Reference to an existing IDP secret (see ref:Secrets#secrets). Not used if `features.externalUserManagement.enabled` equals `true`.
+  idpSecretRef:
+  # @schema
+  # type: [string, null]
+  # required: false
+  # @schema
+  # -- Reference to an existing JWT secret (see ref:Secrets#secrets).
+  jwtSecretRef:
+  # @schema
+  # type: [string, null]
+  # required: false
+  # @schema
+  # -- Reference to an existing keycloak client secret, used for the GDPR export. Only used if features.externalUserManagement.gdprExport.enabled equals true.
+  gdprExportClientSecretRef:
+  # @schema
+  # type: [string, null]
+  # required: false
+  # @schema
+  # -- Reference to an existing LDAP certificate authority secret (see ref:Secrets#secrets)
+  ldapCaRef:
+  # @schema
+  # type: [string, null]
+  # required: false
+  # @schema
+  # -- Reference to an existing LDAP cert secret (see ref:Secrets#secrets). Not used if `features.externalUserManagement.enabled` equals `true`.
+  ldapCertRef:
+  # @schema
+  # type: [string, null]
+  # required: false
+  # @schema
+  # -- Reference to an existing LDAP bind secret (see ref:Secrets#secrets).
+  ldapSecretRef:
+  # @schema
+  # type: [string, null]
+  # required: false
+  # @schema
+  # -- Reference to an existing machine auth api key secret (see ref:Secrets#secrets)
+  machineAuthApiKeySecretRef:
+  # @schema
+  # type: [string, null]
+  # required: false
+  # @schema
+  # -- Reference to an existing messaging system certificate authority secret (see ref:Secrets#secrets)
+  messagingSystemCaRef:
+  # @schema
+  # type: [string, null]
+  # required: false
+  # @schema
+  # -- Reference to an existing SMTP email server settings secret (see ref:Secrets#secrets).
+  # Not used if `features.emailNotifications.enabled` equals `false`.
+  # Not used if `features.emailNotifications.smtp.authentication` equals `none`.
+  notificationsSmtpSecretRef:
+  # @schema
+  # type: [string, null]
+  # required: false
+  # @schema
+  # -- Reference to an existing storage-system JWT secret (see ref:Secrets#secrets)
+  storagesystemJwtSecretRef:
+  # @schema
+  # type: [string, null]
+  # required: false
+  # @schema
+  # -- Reference to an existing storage-system secret (see ref:Secrets#secrets)
+  storagesystemSecretRef:
+  # @schema
+  # type: [string, null]
+  # required: false
+  # @schema
+  # -- Reference to an existing thumbnails transfer secret (see ref:Secrets#secrets)
+  thumbnailsSecretRef:
+  # @schema
+  # type: [string, null]
+  # required: false
+  # @schema
+  # -- Reference to an existing transfer secret (see ref:Secrets#secrets)
+  transferSecretSecretRef:
+  # @schema
+  # type: [string, null]
+  # required: false
+  # @schema
+  # -- Reference to an existing s3 secret (see ref:Secrets#secrets)
+  # If not filled in, will attempt to use values in `.storageusers.storageBackend.s3.driverConfig.s3ng` instead.
+  s3CredentialsSecretRef:
+  # @schema
+  # type: [string, null]
+  # required: false
+  # @schema
+  # -- Reference to an existing service account secret (see ref:Secrets#secrets)
+  serviceAccountSecretRef:
+  # @schema
+  # type: [string, null]
+  # required: false
+  # @schema
+  # -- The secret to secure the global notifications endpoint. Only system admins and users knowing that secret can call the global notifications POST/DELETE endpoints.
+  globalNotificationsSecretRef:
+
+# Custom CA chain
+# If a custom CA chain is needed for the communcation in between services or with external services like S3 or notification services.
+# The secret needs to be manually created.
+customCAChain:
+  # @schema
+  # type: boolean
+  # required: true
+  # @schema
+  # -- Custom CA enables SSL_CERT_DIR in pods with the additional path /etc/ssl/custom.
+  enabled: false
+  # @schema
+  # type: [string, null]
+  # required: false
+  # @schema
+  # -- If custom CA chain is enabled this attribute mounts the existing ConfigMap to /etc/ssl/custom.
+  existingConfigMap:
+
+# Security context options.
+securityContext:
+  # @schema
+  # type: integer
+  # required: true
+  # minimum: 0
+  # @schema
+  # -- File system group for all volumes.
+  fsGroup: 1000
+  # @schema
+  # enum: [Always, OnRootMismatch]
+  # required: true
+  # @schema
+  # -- File system group change policy for all volumes.
+  # Possible values "Always" and "OnRootMismatch".
+  # This will also apply to all services' chownInitContainer.
+  fsGroupChangePolicy: OnRootMismatch
+  # @schema
+  # type: integer
+  # required: true
+  # minimum: 0
+  # @schema
+  # -- User ID that all processes within any containers will run with.
+  runAsUser: 1000
+  # @schema
+  # type: integer
+  # required: true
+  # minimum: 0
+  # @schema
+  # -- Group ID that all processes within any containers will run with.
+  runAsGroup: 1000
+
+# @schema
+# type: [string, null]
+# required: false
+# @schema
+# -- TopologySpreadConstraints controls how Pods of a service are spread across the cluster among failure-domains.
+# Defaults to allow skew no more then 1 node per node.
+# Passed through tpl and therefore needs to be configured as string.
+topologySpreadConstraints: # |
+#  - maxSkew: 1
+#    topologyKey: kubernetes.io/hostname
+#    whenUnsatisfiable: DoNotSchedule
+#    labelSelector:
+#      matchLabels:
+#        app: {{ .appName }}
+
+# @schema
+# $ref: schema/templates.json#/labelsTemplate
+# @schema
+# -- Custom labels for all manifests
+extraLabels: {}
+
+# @schema
+# $ref: schema/templates.json#/annotationsTemplate
+# @schema
+# -- Custom annotations for all deployments
+extraAnnotations: {}
+
+# Backup related settings
+# Compare to https://doc.owncloud.com/ocis/next/maintenance/b-r/backup_considerations.html
+backup:
+  # @schema
+  # $ref: schema/templates.json#/labelsTemplate
+  # @schema
+  # -- Labels that are added to ConfigMaps that are manged by this Chart and must be included in a backup when backing up Kubernetes resources.
+  configMapLabels: {}
+  # @schema
+  # $ref: schema/templates.json#/labelsTemplate
+  # @schema
+  # -- Labels that are added to Secrets that are manged by this Chart and must be included in a backup when backing up Kubernetes resources.
+  secretLabels: {}
+  # @schema
+  # $ref: schema/templates.json#/labelsTemplate
+  # @schema
+  # -- Labels that are added to PVCs that are manged by this Chart and must be included in a backup when backing up Kubernetes resources.
+  pvcLabels: {}
+
+# @schema
+# type: [string, null]
+# required: false
+# @schema
+# -- Override the deployment namespace of all resources in this Helm chart.
+namespaceOverride:
+
+# @schema
+# type: integer
+# minimum: 1
+# required: true
+# @schema
+# -- Number of replicas for each scalable service. Has no effect when `autoscaling.enabled` is set to `true`.
+replicas: 1
+
+# @schema
+# $ref: schema/templates.json#/podDisruptionBudgetTemplate
+# @schema
+# -- Default PodDisruptionBudget to apply to all services, except per-service PodDisruptionBudget configuration in `services.<service-name>.podDisruptionBudget` is set.
+podDisruptionBudget:
+  {}
+  # -- Sets the maxUnavailable or the global PodDisruptionBudget.
+  # maxUnavailable: 1
+
+# @schema
+# $ref: schema/templates.json#/autoscalingTemplate
+# @schema
+# Autoscaling settings.
+autoscaling:
+  # -- Enables autoscaling. When set to `true`, `replicas` is no longer applied.
+  enabled: false
+  # -- Sets minimum replicas for autoscaling.
+  minReplicas: 3
+  # -- Sets maximum replicas for autoscaling.
+  maxReplicas: 10
+  # -- Metrics to use for autoscaling
+  metrics: []
+#   - type: Resource
+#     resource:
+#       name: cpu
+#       target:
+#         type: Utilization
+#         averageUtilization: 60
+#   - type: Resource
+#     resource:
+#       name: memory
+#       target:
+#         type: Utilization
+#         averageUtilization: 60
+
+# @schema
+# $ref: schema/templates.json#/resourcesTemplate
+# @schema
+# -- Default resources to apply to all services, except per-service resources configuration in `services.<service-name>.resources` is set.
+# Best practice is to:
+# - set memory request == memory limit (compare to https://home.robusta.dev/blog/kubernetes-memory-limit)
+# - set cpu request and omit cpu limit (compare to https://home.robusta.dev/blog/stop-using-cpu-limits)
+resources:
+  {}
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+# @schema
+# $ref: schema/templates.json#/labelsTemplate
+# @schema
+# -- Default nodeSelector to apply to all services, except per-service nodeSelector configuration in `services.<service-name>.nodeSelector` is set.
+nodeSelector:
+  {}
+  # kubernetes.io/hostname: node-01
+  # kubernetes.io/arch: amd64
+
+# @schema
+# $ref: schema/templates.json#/resourcesTemplate
+# @schema
+# -- Default resources to apply to all jobs in services, except per-service resources configuration in `services.<service-name>.jobResources` is set.
+# Best practice is to:
+# - set memory request == memory limit (compare to https://home.robusta.dev/blog/kubernetes-memory-limit)
+# - set cpu request and omit cpu limit (compare to https://home.robusta.dev/blog/stop-using-cpu-limits)
+jobResources:
+  {}
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+# @schema
+# $ref: schema/templates.json#/labelsTemplate
+# @schema
+# -- Default nodeSelector to apply to all jobs, except per-service job nodeSelector configuration in `services.<service-name>.jobNodeSelector` is set.
+jobNodeSelector:
+  {}
+  # kubernetes.io/hostname: node-01
+  # kubernetes.io/arch: amd64
+
+# @schema
+# type: [string, null]
+# required: false
+# @schema
+# -- Default priorityClassName to apply to all services, except per-service jobPriorityClassName configuration in `services.<service-name>.jobPriorityClassName` is set.
+jobPriorityClassName:
+
+  # ocis-low-priority
+  # ocis-medium-priority
+  # ocis-high-priority
+
+# @schema
+# type: [string, null]
+# required: false
+# @schema
+# -- Default priorityClassName to apply to all services, except per-service priorityClassName configuration in `services.<service-name>.priorityClassName` is set.
+priorityClassName:
+
+# @schema
+# type: array
+# required: true
+# items:
+#   type: string
+# @schema
+# Include arbitrary resources, eg. config maps or a cert-manager issuer (see example below)
+# -- Extra resources to be included.
+
+# per-service configuration.
+services:
+  # -- ACTIVITYLOG service.
+  # @default -- see detailed service configuration options below
+  activitylog:
+    # @schema
+    # $ref: schema/templates.json#/resourcesTemplate
+    # @schema
+    # -- Per-service resources configuration. Overrides the default setting from `resources` if set.
+    resources: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service nodeSelector configuration. Overrides the default setting from `nodeSelector` if set.
+    nodeSelector: {}
+    # @schema
+    # type: [string, null]
+    # required: false
+    # @schema
+    # -- Per-service priorityClassName configuration. Overrides the default setting from `priorityClassName` if set.
+    priorityClassName:
+    # @schema
+    # $ref: schema/templates.json#/podDisruptionBudgetTemplate
+    # @schema
+    # -- Per-service PodDisruptionBudget. Overrides the default setting from `podDisruptionBudget` if set.
+    podDisruptionBudget: {}
+    # @schema
+    # $ref: schema/templates.json#/autoscalingTemplate
+    # @schema
+    # -- Per-service autoscaling. Overrides the default setting from `autoscaling` if set.
+    autoscaling: {}
+    # @schema
+    # $ref: schema/templates.json#/affinityTemplate
+    # @schema
+    # -- Per-service affinity.
+    # The value of this key will be passed to the affinity setting of the pod as documented here:
+    # https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity
+    # This example will ensure that the pods will only be scheduled on nodes with the label `topology.kubernetes.io/zone`
+    # set to `eu-west-1` or `eu-east-1`.
+    # nodeAffinity:
+    #   requiredDuringSchedulingIgnoredDuringExecution:
+    #     nodeSelectorTerms:
+    #     - matchExpressions:
+    #       - key: topology.kubernetes.io/zone
+    #         operator: In
+    #         values:
+    #         - eu-east-1
+    #         - eu-west-1
+    #
+    # The following example will make sure that these pods will never be scheduled on the same node.
+    # podAntiAffinity:
+    #   requiredDuringSchedulingIgnoredDuringExecution:
+    #     - labelSelector:
+    #         matchExpressions:
+    #           - key: app
+    #             operator: In
+    #             values:
+    #               - activitylog
+    #       topologyKey: kubernetes.io/hostname
+    #
+    affinity: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service custom labels
+    extraLabels: {}
+    # Per-service image configuration. Overrides the default setting from `image` if set.
+    image:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image repository
+      repository:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image tag.
+      tag:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image sha / digest (optional).
+      sha:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image pull policy
+      pullPolicy:
+
+  # -- COLLABORATION service. Not used if `features.appsIntegration.enabled` equals `false`.
+  # @default -- see detailed service configuration options below
+  collaboration:
+    # @schema
+    # $ref: schema/templates.json#/resourcesTemplate
+    # @schema
+    # -- Per-service resources configuration. Overrides the default setting from `resources` if set.
+    resources: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service nodeSelector configuration. Overrides the default setting from `nodeSelector` if set.
+    nodeSelector: {}
+    # @schema
+    # type: [string, null]
+    # required: false
+    # @schema
+    # -- Per-service priorityClassName configuration. Overrides the default setting from `priorityClassName` if set.
+    priorityClassName:
+    # @schema
+    # $ref: schema/templates.json#/podDisruptionBudgetTemplate
+    # @schema
+    # -- Per-service PodDisruptionBudget. Overrides the default setting from `podDisruptionBudget` if set.
+    podDisruptionBudget: {}
+    # @schema
+    # $ref: schema/templates.json#/autoscalingTemplate
+    # @schema
+    # -- Per-service autoscaling. Overrides the default setting from `autoscaling` if set.
+    autoscaling: {}
+    # @schema
+    # $ref: schema/templates.json#/affinityTemplate
+    # @schema
+    # -- Per-service affinity.
+    affinity: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # Do note that the value will be different for each service.
+    # -- Per-service custom labels
+    extraLabels: {}
+    # Per-service image configuration. Overrides the default setting from `image` if set.
+    image:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image repository
+      repository:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image tag.
+      tag:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image sha / digest (optional).
+      sha:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image pull policy
+      pullPolicy:
+
+  # -- APP REGISTRY service. Not used if `features.appsIntegration.enabled` equals `false`.
+  # @default -- see detailed service configuration options below
+  appregistry:
+    # @schema
+    # $ref: schema/templates.json#/resourcesTemplate
+    # @schema
+    # -- Per-service resources configuration. Overrides the default setting from `resources` if set.
+    resources: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service nodeSelector configuration. Overrides the default setting from `nodeSelector` if set.
+    nodeSelector: {}
+    # @schema
+    # type: [string, null]
+    # required: false
+    # @schema
+    # -- Per-service priorityClassName configuration. Overrides the default setting from `priorityClassName` if set.
+    priorityClassName:
+    # @schema
+    # $ref: schema/templates.json#/affinityTemplate
+    # @schema
+    # -- Per-service affinity.
+    affinity: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service custom labels
+    extraLabels: {}
+    # Per-service image configuration. Overrides the default setting from `image` if set.
+    image:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image repository
+      repository:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image tag.
+      tag:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image sha / digest (optional).
+      sha:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image pull policy
+      pullPolicy:
+
+  # -- AUDIT service.
+  # @default -- see detailed service configuration options below
+  audit:
+    # @schema
+    # $ref: schema/templates.json#/resourcesTemplate
+    # @schema
+    # -- Per-service resources configuration. Overrides the default setting from `resources` if set.
+    resources: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service nodeSelector configuration. Overrides the default setting from `nodeSelector` if set.
+    nodeSelector: {}
+    # @schema
+    # type: [string, null]
+    # required: false
+    # @schema
+    # -- Per-service priorityClassName configuration. Overrides the default setting from `priorityClassName` if set.
+    priorityClassName:
+    # @schema
+    # $ref: schema/templates.json#/podDisruptionBudgetTemplate
+    # @schema
+    # -- Per-service PodDisruptionBudget. Overrides the default setting from `podDisruptionBudget` if set.
+    podDisruptionBudget: {}
+    # @schema
+    # $ref: schema/templates.json#/autoscalingTemplate
+    # @schema
+    # -- Per-service autoscaling. Overrides the default setting from `autoscaling` if set.
+    autoscaling: {}
+    # @schema
+    # $ref: schema/templates.json#/affinityTemplate
+    # @schema
+    # -- Per-service affinity.
+    affinity: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service custom labels
+    extraLabels: {}
+    # Per-service image configuration. Overrides the default setting from `image` if set.
+    image:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image repository
+      repository:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image tag.
+      tag:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image sha / digest (optional).
+      sha:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image pull policy
+      pullPolicy:
+
+  # -- AUTH MACHINE service.
+  # @default -- see detailed service configuration options below
+  authmachine:
+    # @schema
+    # $ref: schema/templates.json#/resourcesTemplate
+    # @schema
+    # -- Per-service resources configuration. Overrides the default setting from `resources` if set.
+    resources: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service nodeSelector configuration. Overrides the default setting from `nodeSelector` if set.
+    nodeSelector: {}
+    # @schema
+    # type: [string, null]
+    # required: false
+    # @schema
+    # -- Per-service priorityClassName configuration. Overrides the default setting from `priorityClassName` if set.
+    priorityClassName:
+    # @schema
+    # $ref: schema/templates.json#/podDisruptionBudgetTemplate
+    # @schema
+    # -- Per-service PodDisruptionBudget. Overrides the default setting from `podDisruptionBudget` if set.
+    podDisruptionBudget: {}
+    # @schema
+    # $ref: schema/templates.json#/autoscalingTemplate
+    # @schema
+    # -- Per-service autoscaling. Overrides the default setting from `autoscaling` if set.
+    autoscaling: {}
+    # @schema
+    # $ref: schema/templates.json#/affinityTemplate
+    # @schema
+    # -- Per-service affinity.
+    affinity: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service custom labels
+    extraLabels: {}
+    # Per-service image configuration. Overrides the default setting from `image` if set.
+    image:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image repository
+      repository:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image tag.
+      tag:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image sha / digest (optional).
+      sha:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image pull policy
+      pullPolicy:
+
+  # -- AUTH SERVICE service.
+  # @default -- see detailed service configuration options below
+  authservice:
+    # @schema
+    # $ref: schema/templates.json#/resourcesTemplate
+    # @schema
+    # -- Per-service resources configuration. Overrides the default setting from `resources` if set.
+    resources: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service nodeSelector configuration. Overrides the default setting from `nodeSelector` if set.
+    nodeSelector: {}
+    # @schema
+    # type: [string, null]
+    # required: false
+    # @schema
+    # -- Per-service priorityClassName configuration. Overrides the default setting from `priorityClassName` if set.
+    priorityClassName:
+    # @schema
+    # $ref: schema/templates.json#/podDisruptionBudgetTemplate
+    # @schema
+    # -- Per-service PodDisruptionBudget. Overrides the default setting from `podDisruptionBudget` if set.
+    podDisruptionBudget: {}
+    # @schema
+    # $ref: schema/templates.json#/autoscalingTemplate
+    # @schema
+    # -- Per-service autoscaling. Overrides the default setting from `autoscaling` if set.
+    autoscaling: {}
+    # @schema
+    # $ref: schema/templates.json#/affinityTemplate
+    # @schema
+    # -- Per-service affinity.
+    affinity: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service custom labels
+    extraLabels: {}
+    # Per-service image configuration. Overrides the default setting from `image` if set.
+    image:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image repository
+      repository:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image tag.
+      tag:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image sha / digest (optional).
+      sha:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image pull policy
+      pullPolicy:
+
+  # -- ANTIVIRUS service. Not used if `features.virusscan.enabled` equals `false`.
+  # @default -- see detailed service configuration options below
+  antivirus:
+    events:
+      consumer:
+        # @schema
+        # type: integer
+        # minimum: 1
+        # required: true
+        # @schema
+        # -- Number of event consumers to be started that concurrently consume events.
+        concurrency: 10
+    # @schema
+    # $ref: schema/templates.json#/resourcesTemplate
+    # @schema
+    # -- Per-service resources configuration. Overrides the default setting from `resources` if set.
+    resources: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service nodeSelector configuration. Overrides the default setting from `nodeSelector` if set.
+    nodeSelector: {}
+    # @schema
+    # type: [string, null]
+    # required: false
+    # @schema
+    # -- Per-service priorityClassName configuration. Overrides the default setting from `priorityClassName` if set.
+    priorityClassName:
+    # @schema
+    # $ref: schema/templates.json#/podDisruptionBudgetTemplate
+    # @schema
+    # -- Per-service PodDisruptionBudget. Overrides the default setting from `podDisruptionBudget` if set.
+    podDisruptionBudget: {}
+    # @schema
+    # $ref: schema/templates.json#/autoscalingTemplate
+    # @schema
+    # -- Per-service autoscaling. Overrides the default setting from `autoscaling` if set.
+    autoscaling: {}
+    # @schema
+    # $ref: schema/templates.json#/affinityTemplate
+    # @schema
+    # -- Per-service affinity.
+    affinity: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service custom labels
+    extraLabels: {}
+    # Per-service image configuration. Overrides the default setting from `image` if set.
+    image:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image repository
+      repository:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image tag.
+      tag:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image sha / digest (optional).
+      sha:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image pull policy
+      pullPolicy:
+
+  # -- CLIENTLOG service.
+  # @default -- see detailed service configuration options below
+  clientlog:
+    # @schema
+    # $ref: schema/templates.json#/resourcesTemplate
+    # @schema
+    # -- Per-service resources configuration. Overrides the default setting from `resources` if set.
+    resources: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service nodeSelector configuration. Overrides the default setting from `nodeSelector` if set.
+    nodeSelector: {}
+    # @schema
+    # type: [string, null]
+    # required: false
+    # @schema
+    # -- Per-service priorityClassName configuration. Overrides the default setting from `priorityClassName` if set.
+    priorityClassName:
+    # @schema
+    # $ref: schema/templates.json#/podDisruptionBudgetTemplate
+    # @schema
+    # -- Per-service PodDisruptionBudget. Overrides the default setting from `podDisruptionBudget` if set.
+    podDisruptionBudget: {}
+    # @schema
+    # $ref: schema/templates.json#/autoscalingTemplate
+    # @schema
+    # -- Per-service autoscaling. Overrides the default setting from `autoscaling` if set.
+    autoscaling: {}
+    # @schema
+    # $ref: schema/templates.json#/affinityTemplate
+    # @schema
+    # -- Per-service affinity.
+    affinity: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service custom labels
+    extraLabels: {}
+    # Per-service image configuration. Overrides the default setting from `image` if set.
+    image:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image repository
+      repository:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image tag.
+      tag:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image sha / digest (optional).
+      sha:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image pull policy
+      pullPolicy:
+
+  # -- EVENT HISTORY service.
+  # @default -- see detailed service configuration options below
+  eventhistory:
+    # @schema
+    # $ref: schema/templates.json#/resourcesTemplate
+    # @schema
+    # -- Per-service resources configuration. Overrides the default setting from `resources` if set.
+    resources: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service nodeSelector configuration. Overrides the default setting from `nodeSelector` if set.
+    nodeSelector: {}
+    # @schema
+    # type: [string, null]
+    # required: false
+    # @schema
+    # -- Per-service priorityClassName configuration. Overrides the default setting from `priorityClassName` if set.
+    priorityClassName:
+    # @schema
+    # $ref: schema/templates.json#/podDisruptionBudgetTemplate
+    # @schema
+    # -- Per-service PodDisruptionBudget. Overrides the default setting from `podDisruptionBudget` if set.
+    podDisruptionBudget: {}
+    # @schema
+    # $ref: schema/templates.json#/autoscalingTemplate
+    # @schema
+    # -- Per-service autoscaling. Overrides the default setting from `autoscaling` if set.
+    autoscaling: {}
+    # @schema
+    # $ref: schema/templates.json#/affinityTemplate
+    # @schema
+    # -- Per-service affinity.
+    affinity: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service custom labels
+    extraLabels: {}
+    # Per-service image configuration. Overrides the default setting from `image` if set.
+    image:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image repository
+      repository:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image tag.
+      tag:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image sha / digest (optional).
+      sha:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image pull policy
+      pullPolicy:
+
+  # -- FRONTEND service.
+  # @default -- see detailed service configuration options below
+  frontend:
+    events:
+      consumer:
+        # @schema
+        # type: integer
+        # minimum: 1
+        # required: true
+        # @schema
+        # -- Number of event consumers to be started that concurrently consume events (used for auto-accepting shares, see `features.sharing.autoAcceptShares`)
+        concurrency: 100
+    # @schema
+    # $ref: schema/templates.json#/resourcesTemplate
+    # @schema
+    # -- Per-service resources configuration. Overrides the default setting from `resources` if set.
+    resources: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service nodeSelector configuration. Overrides the default setting from `nodeSelector` if set.
+    nodeSelector: {}
+    # @schema
+    # type: [string, null]
+    # required: false
+    # @schema
+    # -- Per-service priorityClassName configuration. Overrides the default setting from `priorityClassName` if set.
+    priorityClassName:
+    # @schema
+    # $ref: schema/templates.json#/podDisruptionBudgetTemplate
+    # @schema
+    # -- Per-service PodDisruptionBudget. Overrides the default setting from `podDisruptionBudget` if set.
+    podDisruptionBudget: {}
+    # @schema
+    # $ref: schema/templates.json#/autoscalingTemplate
+    # @schema
+    # -- Per-service autoscaling. Overrides the default setting from `autoscaling` if set.
+    autoscaling: {}
+    # @schema
+    # $ref: schema/templates.json#/affinityTemplate
+    # @schema
+    # -- Per-service affinity.
+    affinity: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service custom labels
+    extraLabels: {}
+    # Per-service image configuration. Overrides the default setting from `image` if set.
+    image:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image repository
+      repository:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image tag.
+      tag:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image sha / digest (optional).
+      sha:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image pull policy
+      pullPolicy:
+
+  # -- GATEWAY service.
+  # @default -- see detailed service configuration options below
+  gateway:
+    # @schema
+    # $ref: schema/templates.json#/resourcesTemplate
+    # @schema
+    # -- Per-service resources configuration. Overrides the default setting from `resources` if set.
+    resources: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service nodeSelector configuration. Overrides the default setting from `nodeSelector` if set.
+    nodeSelector: {}
+    # @schema
+    # type: [string, null]
+    # required: false
+    # @schema
+    # -- Per-service priorityClassName configuration. Overrides the default setting from `priorityClassName` if set.
+    priorityClassName:
+    # @schema
+    # $ref: schema/templates.json#/podDisruptionBudgetTemplate
+    # @schema
+    # -- Per-service PodDisruptionBudget. Overrides the default setting from `podDisruptionBudget` if set.
+    podDisruptionBudget: {}
+    # @schema
+    # $ref: schema/templates.json#/autoscalingTemplate
+    # @schema
+    # -- Per-service autoscaling. Overrides the default setting from `autoscaling` if set.
+    autoscaling: {}
+    # @schema
+    # $ref: schema/templates.json#/affinityTemplate
+    # @schema
+    # -- Per-service affinity.
+    affinity: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service custom labels
+    extraLabels: {}
+    # Per-service image configuration. Overrides the default setting from `image` if set.
+    image:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image repository
+      repository:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image tag.
+      tag:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image sha / digest (optional).
+      sha:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image pull policy
+      pullPolicy:
+
+  # -- GRAPH service.
+  # @default -- see detailed service configuration options below
+  graph:
+    # @schema
+    # $ref: schema/templates.json#/resourcesTemplate
+    # @schema
+    # -- Per-service resources configuration. Overrides the default setting from `resources` if set.
+    resources: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service nodeSelector configuration. Overrides the default setting from `nodeSelector` if set.
+    nodeSelector: {}
+    # @schema
+    # type: [string, null]
+    # required: false
+    # @schema
+    # -- Per-service priorityClassName configuration. Overrides the default setting from `priorityClassName` if set.
+    priorityClassName:
+    # @schema
+    # $ref: schema/templates.json#/podDisruptionBudgetTemplate
+    # @schema
+    # -- Per-service PodDisruptionBudget. Overrides the default setting from `podDisruptionBudget` if set.
+    podDisruptionBudget: {}
+    # @schema
+    # $ref: schema/templates.json#/autoscalingTemplate
+    # @schema
+    # -- Per-service autoscaling. Overrides the default setting from `autoscaling` if set.
+    autoscaling: {}
+    # @schema
+    # $ref: schema/templates.json#/affinityTemplate
+    # @schema
+    # -- Per-service affinity.
+    affinity: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service custom labels
+    extraLabels: {}
+    # Per-service image configuration. Overrides the default setting from `image` if set.
+    image:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image repository
+      repository:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image tag.
+      tag:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image sha / digest (optional).
+      sha:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image pull policy
+      pullPolicy:
+
+  # -- GROUPS service.
+  # @default -- see detailed service configuration options below
+  groups:
+    # @schema
+    # $ref: schema/templates.json#/resourcesTemplate
+    # @schema
+    # -- Per-service resources configuration. Overrides the default setting from `resources` if set.
+    resources: {}
+    # -- Per-service nodeSelector configuration. Overrides the default setting from `nodeSelector` if set.
+    nodeSelector: {}
+    # @schema
+    # type: [string, null]
+    # required: false
+    # @schema
+    # -- Per-service priorityClassName configuration. Overrides the default setting from `priorityClassName` if set.
+    priorityClassName:
+    # @schema
+    # $ref: schema/templates.json#/podDisruptionBudgetTemplate
+    # @schema
+    # -- Per-service PodDisruptionBudget. Overrides the default setting from `podDisruptionBudget` if set.
+    podDisruptionBudget: {}
+    # @schema
+    # $ref: schema/templates.json#/autoscalingTemplate
+    # @schema
+    # -- Per-service autoscaling. Overrides the default setting from `autoscaling` if set.
+    autoscaling: {}
+    # @schema
+    # $ref: schema/templates.json#/affinityTemplate
+    # @schema
+    # -- Per-service affinity.
+    affinity: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service custom labels
+    extraLabels: {}
+    # Per-service image configuration. Overrides the default setting from `image` if set.
+    image:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image repository
+      repository:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image tag.
+      tag:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image sha / digest (optional).
+      sha:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image pull policy
+      pullPolicy:
+
+  # -- IDM service. Not used if `features.externalUserManagement.enabled` equals `true`.
+  # @default -- see detailed service configuration options below
+  idm:
+    # -- Persistence settings.
+    # @default -- see detailed persistence configuration options below
+    persistence:
+      # @schema
+      # type: boolean
+      # required: true
+      # @schema
+      # -- Enables persistence.
+      # Needs to be enabled on production installations, except `features.externalUserManagement.enabled` equals `true`.
+      # If not enabled, pod restarts will lead to data loss.
+      enabled: false
+      # @schema
+      # type: boolean
+      # required: true
+      # @schema
+      # -- Enables an initContainer to chown the volume.
+      # The initContainer is run as root.
+      # This is not needed if the driver applies the fsGroup from the securityContext.
+      # The image specified in `initContainerImage` will be used for this container.
+      chownInitContainer: false
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Storage class to use.
+      # Uses the default storage class if not set.
+      storageClassName:
+      # @schema
+      # type: array
+      # items:
+      #   enum:
+      #     - ReadWriteOnce
+      #     - ReadOnlyMany
+      #     - ReadWriteMany
+      #     - ReadWriteOncePod
+      #   required: true
+      # @schema
+      # -- Persistent volume access modes.
+      accessModes:
+        - ReadWriteOncePod
+      # @schema
+      # type: string
+      # required: true
+      # @schema
+      # -- Size of the persistent volume.
+      size: 10Gi
+      # @schema
+      # $ref: schema/templates.json#/annotationsTemplate
+      # @schema
+      # -- Persistent volume annotations.
+      annotations: {}
+      # @schema
+      # $ref: schema/templates.json#/finalizersTemplate
+      # @schema
+      # -- Persistent volume finalizers.
+      finalizers:
+        - kubernetes.io/pvc-protection
+      # @schema
+      # $ref: schema/templates.json#/labelsTemplate
+      # @schema
+      # -- Persistent volume selector labels.
+      selectorLabels: {}
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Use a custom name for the PVC instead of the default one.
+      claimName:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Use an existing PersistentVolumeClaim for persistence.
+      existingClaim:
+    # @schema
+    # $ref: schema/templates.json#/resourcesTemplate
+    # @schema
+    # -- Per-service resources configuration. Overrides the default setting from `resources` if set.
+    resources: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service nodeSelector configuration. Overrides the default setting from `nodeSelector` if set.
+    nodeSelector: {}
+    # @schema
+    # type: [string, null]
+    # required: false
+    # @schema
+    # -- Per-service priorityClassName configuration. Overrides the default setting from `priorityClassName` if set.
+    priorityClassName:
+    # @schema
+    # $ref: schema/templates.json#/affinityTemplate
+    # @schema
+    # -- Per-service affinity.
+    affinity: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service custom labels
+    extraLabels: {}
+    # Per-service image configuration. Overrides the default setting from `image` if set.
+    image:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image repository
+      repository:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image tag.
+      tag:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image sha / digest (optional).
+      sha:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image pull policy
+      pullPolicy:
+
+  # -- IDP service. Not used if `features.externalUserManagement.enabled` equals `true`.
+  # @default -- see detailed service configuration options below
+  idp:
+    # @schema
+    # $ref: schema/templates.json#/resourcesTemplate
+    # @schema
+    # -- Per-service resources configuration. Overrides the default setting from `resources` if set.
+    resources: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service nodeSelector configuration. Overrides the default setting from `nodeSelector` if set.
+    nodeSelector: {}
+    # @schema
+    # type: [string, null]
+    # required: false
+    # @schema
+    # -- Per-service priorityClassName configuration. Overrides the default setting from `priorityClassName` if set.
+    # @schema
+    # $ref: schema/templates.json#/affinityTemplate
+    # @schema
+    # -- Per-service affinity.
+    affinity: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service custom labels
+    extraLabels: {}
+    # Per-service image configuration. Overrides the default setting from `image` if set.
+    image:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image repository
+      repository:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image tag.
+      tag:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image sha / digest (optional).
+      sha:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image pull policy
+      pullPolicy:
+
+  # -- NATS service. Not used if `messagingSystem.external.enabled` equals `true`.
+  # @default -- see detailed service configuration options below
+  nats:
+    # -- Persistence settings.
+    # @default -- see detailed persistence configuration options below
+    persistence:
+      # @schema
+      # type: boolean
+      # required: true
+      # @schema
+      # -- Enables persistence.
+      # Needs to be enabled on production installations, except `messagingSystem.external.enabled` equals `true`.
+      # If not enabled, pod restarts will lead to data loss.
+      enabled: false
+      # @schema
+      # type: boolean
+      # required: true
+      # @schema
+      # -- Enables an initContainer to chown the volume.
+      # The initContainer is run as root.
+      # This is not needed if the driver applies the fsGroup from the securityContext.
+      # The image specified in `initContainerImage` will be used for this container.
+      chownInitContainer: false
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Storage class to use.
+      # Uses the default storage class if not set.
+      storageClassName:
+      # @schema
+      # type: array
+      # items:
+      #   enum:
+      #     - ReadWriteOnce
+      #     - ReadOnlyMany
+      #     - ReadWriteMany
+      #     - ReadWriteOncePod
+      #   required: true
+      # @schema
+      # -- Persistent volume access modes.
+      accessModes:
+        - ReadWriteOncePod
+      # @schema
+      # type: string
+      # required: true
+      # @schema
+      # -- Size of the persistent volume.
+      size: 10Gi
+      # @schema
+      # $ref: schema/templates.json#/annotationsTemplate
+      # @schema
+      # -- Persistent volume annotations.
+      annotations: {}
+      # @schema
+      # $ref: schema/templates.json#/finalizersTemplate
+      # @schema
+      # -- Persistent volume finalizers.
+      finalizers:
+        - kubernetes.io/pvc-protection
+      # @schema
+      # $ref: schema/templates.json#/labelsTemplate
+      # @schema
+      # -- Persistent volume selector labels.
+      selectorLabels: {}
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Use a custom name for the PVC instead of the default one.
+      claimName:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Use an existing PersistentVolumeClaim for persistence.
+      existingClaim:
+    # @schema
+    # $ref: schema/templates.json#/resourcesTemplate
+    # @schema
+    # -- Per-service resources configuration. Overrides the default setting from `resources` if set.
+    resources: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service nodeSelector configuration. Overrides the default setting from `nodeSelector` if set.
+    nodeSelector: {}
+    # @schema
+    # type: [string, null]
+    # required: false
+    # @schema
+    # -- Per-service priorityClassName configuration. Overrides the default setting from `priorityClassName` if set.
+    priorityClassName:
+    # @schema
+    # $ref: schema/templates.json#/affinityTemplate
+    # @schema
+    # -- Per-service affinity.
+    affinity: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service custom labels
+    extraLabels: {}
+    # Per-service image configuration. Overrides the default setting from `image` if set.
+    image:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image repository
+      repository:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image tag.
+      tag:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image sha / digest (optional).
+      sha:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image pull policy
+      pullPolicy:
+
+  # -- NOTIFICATIONS service. Not used if `features.emailNotifications.enabled` equals `true`.
+  # @default -- see detailed service configuration options below
+  notifications:
+    # @schema
+    # $ref: schema/templates.json#/resourcesTemplate
+    # @schema
+    # -- Per-service resources configuration. Overrides the default setting from `resources` if set.
+    resources: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service nodeSelector configuration. Overrides the default setting from `nodeSelector` if set.
+    nodeSelector: {}
+    # @schema
+    # type: [string, null]
+    # required: false
+    # @schema
+    # -- Per-service priorityClassName configuration. Overrides the default setting from `priorityClassName` if set.
+    priorityClassName:
+    # @schema
+    # $ref: schema/templates.json#/podDisruptionBudgetTemplate
+    # @schema
+    # -- Per-service PodDisruptionBudget. Overrides the default setting from `podDisruptionBudget` if set.
+    podDisruptionBudget: {}
+    # @schema
+    # $ref: schema/templates.json#/autoscalingTemplate
+    # @schema
+    # -- Per-service autoscaling. Overrides the default setting from `autoscaling` if set.
+    autoscaling: {}
+    # @schema
+    # $ref: schema/templates.json#/affinityTemplate
+    # @schema
+    # -- Per-service affinity.
+    affinity: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service custom labels
+    extraLabels: {}
+    # Per-service image configuration. Overrides the default setting from `image` if set.
+    image:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image repository
+      repository:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image tag.
+      tag:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image sha / digest (optional).
+      sha:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image pull policy
+      pullPolicy:
+    # @schema
+    # $ref: schema/templates.json#/resourcesTemplate
+    # @schema
+    # -- Per-service jobResources configuration. Overrides the default setting from `jobResources` if set.
+    jobResources: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service jobNodeSelector configuration. Overrides the default setting from `jobNodeSelector` if set.
+    jobNodeSelector: {}
+    # @schema
+    # type: [string, null]
+    # required: false
+    # @schema
+    # -- Per-service jobPriorityClassName configuration. Overrides the default setting from `jobPriorityClassName` if set.
+    jobPriorityClassName: ""
+
+  # -- OCDAV service.
+  # @default -- see detailed service configuration options below
+  ocdav:
+    # @schema
+    # $ref: schema/templates.json#/resourcesTemplate
+    # @schema
+    # -- Per-service resources configuration. Overrides the default setting from `resources` if set.
+    resources: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service nodeSelector configuration. Overrides the default setting from `nodeSelector` if set.
+    nodeSelector: {}
+    # @schema
+    # type: [string, null]
+    # required: false
+    # @schema
+    # -- Per-service priorityClassName configuration. Overrides the default setting from `priorityClassName` if set.
+    priorityClassName:
+    # @schema
+    # $ref: schema/templates.json#/podDisruptionBudgetTemplate
+    # @schema
+    # -- Per-service PodDisruptionBudget. Overrides the default setting from `podDisruptionBudget` if set.
+    podDisruptionBudget: {}
+    # @schema
+    # $ref: schema/templates.json#/autoscalingTemplate
+    # @schema
+    # -- Per-service autoscaling. Overrides the default setting from `autoscaling` if set.
+    autoscaling: {}
+    # @schema
+    # $ref: schema/templates.json#/affinityTemplate
+    # @schema
+    # -- Per-service affinity.
+    affinity: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service custom labels
+    extraLabels: {}
+    # Per-service image configuration. Overrides the default setting from `image` if set.
+    image:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image repository
+      repository:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image tag.
+      tag:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image sha / digest (optional).
+      sha:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image pull policy
+      pullPolicy:
+
+  # -- OCM service.
+  # @default -- see detailed service configuration options below
+  ocm:
+    # @schema
+    # $ref: schema/templates.json#/resourcesTemplate
+    # @schema
+    # -- Per-service resources configuration. Overrides the default setting from `resources` if set.
+    resources: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service nodeSelector configuration. Overrides the default setting from `nodeSelector` if set.
+    nodeSelector: {}
+    # @schema
+    # type: [string, null]
+    # required: false
+    # @schema
+    # -- Per-service priorityClassName configuration. Overrides the default setting from `priorityClassName` if set.
+    priorityClassName:
+    # @schema
+    # $ref: schema/templates.json#/affinityTemplate
+    # @schema
+    # -- Per-service affinity.
+    affinity: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service custom labels
+    extraLabels: {}
+    # Per-service image configuration. Overrides the default setting from `image` if set.
+    image:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image repository
+      repository:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image tag.
+      tag:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image sha / digest (optional).
+      sha:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image pull policy
+      pullPolicy:
+    # -- Persistence settings.
+    # @default -- see detailed persistence configuration options below
+    persistence:
+      # @schema
+      # type: boolean
+      # required: true
+      # @schema
+      # -- Enables persistence.
+      # Needs to be enabled on production installations.
+      # If not enabled, pod restarts will lead to data loss.
+      # Also scaling this service to more than one replica is not possible if the pods don't share the same volume.
+      enabled: false
+      # @schema
+      # type: boolean
+      # required: true
+      # @schema
+      # -- Enables an initContainer to chown the volume.
+      # The initContainer is run as root.
+      # This is not needed if the driver applies the fsGroup from the securityContext.
+      # The image specified in `initContainerImage` will be used for this container.
+      chownInitContainer: false
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Storage class to use.
+      # Uses the default storage class if not set.
+      storageClassName:
+      # @schema
+      # type: array
+      # items:
+      #   enum:
+      #     - ReadWriteOnce
+      #     - ReadOnlyMany
+      #     - ReadWriteMany
+      #     - ReadWriteOncePod
+      #   required: true
+      # @schema
+      # -- Persistent volume access modes.
+      accessModes:
+        - ReadWriteOncePod
+      # @schema
+      # type: string
+      # required: true
+      # @schema
+      # -- Size of the persistent volume.
+      size: 1Gi
+      # @schema
+      # $ref: schema/templates.json#/annotationsTemplate
+      # @schema
+      # -- Persistent volume annotations.
+      annotations: {}
+      # @schema
+      # $ref: schema/templates.json#/finalizersTemplate
+      # @schema
+      # -- Persistent volume finalizers.
+      finalizers:
+        - kubernetes.io/pvc-protection
+      # @schema
+      # $ref: schema/templates.json#/labelsTemplate
+      # @schema
+      # -- Persistent volume selector labels.
+      selectorLabels: {}
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Use a custom name for the PVC instead of the default one.
+      claimName:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Use an existing PersistentVolumeClaim for persistence.
+      existingClaim:
+
+  # -- OCS service.
+  # @default -- see detailed service configuration options below
+  ocs:
+    # @schema
+    # $ref: schema/templates.json#/resourcesTemplate
+    # @schema
+    # -- Per-service resources configuration. Overrides the default setting from `resources` if set.
+    resources: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service nodeSelector configuration. Overrides the default setting from `nodeSelector` if set.
+    nodeSelector: {}
+    # @schema
+    # type: [string, null]
+    # required: false
+    # @schema
+    # -- Per-service priorityClassName configuration. Overrides the default setting from `priorityClassName` if set.
+    priorityClassName:
+    # @schema
+    # $ref: schema/templates.json#/podDisruptionBudgetTemplate
+    # @schema
+    # -- Per-service PodDisruptionBudget. Overrides the default setting from `podDisruptionBudget` if set.
+    podDisruptionBudget: {}
+    # @schema
+    # $ref: schema/templates.json#/autoscalingTemplate
+    # @schema
+    # -- Per-service autoscaling. Overrides the default setting from `autoscaling` if set.
+    autoscaling: {}
+    # @schema
+    # $ref: schema/templates.json#/affinityTemplate
+    # @schema
+    # -- Per-service affinity.
+    affinity: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service custom labels
+    extraLabels: {}
+    # Per-service image configuration. Overrides the default setting from `image` if set.
+    image:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image repository
+      repository:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image tag.
+      tag:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image sha / digest (optional).
+      sha:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image pull policy
+      pullPolicy:
+
+  # -- POLICIES service.
+  # @default -- see detailed service configuration options below
+  policies:
+    # @schema
+    # $ref: schema/templates.json#/resourcesTemplate
+    # @schema
+    # -- Per-service resources configuration. Overrides the default setting from `resources` if set.
+    resources: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service nodeSelector configuration. Overrides the default setting from `nodeSelector` if set.
+    nodeSelector: {}
+    # @schema
+    # type: [string, null]
+    # required: false
+    # @schema
+    # -- Per-service priorityClassName configuration. Overrides the default setting from `priorityClassName` if set.
+    priorityClassName:
+    # @schema
+    # $ref: schema/templates.json#/podDisruptionBudgetTemplate
+    # @schema
+    # -- Per-service PodDisruptionBudget. Overrides the default setting from `podDisruptionBudget` if set.
+    podDisruptionBudget: {}
+    # @schema
+    # $ref: schema/templates.json#/autoscalingTemplate
+    # @schema
+    # -- Per-service autoscaling. Overrides the default setting from `autoscaling` if set.
+    autoscaling: {}
+    # @schema
+    # $ref: schema/templates.json#/affinityTemplate
+    # @schema
+    # -- Per-service affinity.
+    affinity: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service custom labels
+    extraLabels: {}
+    # Per-service image configuration. Overrides the default setting from `image` if set.
+    image:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image repository
+      repository:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image tag.
+      tag:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image sha / digest (optional).
+      sha:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image pull policy
+      pullPolicy:
+
+  # -- POSTPROCESSING service.
+  # @default -- see detailed service configuration options below
+  postprocessing:
+    events:
+      consumer:
+        # @schema
+        # type: integer
+        # minimum: 1
+        # required: true
+        # @schema
+        # -- Number of event consumers to be started that concurrently consume events
+        concurrency: 3
+    # @schema
+    # $ref: schema/templates.json#/resourcesTemplate
+    # @schema
+    # -- Per-service resources configuration. Overrides the default setting from `resources` if set.
+    resources: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service nodeSelector configuration. Overrides the default setting from `nodeSelector` if set.
+    nodeSelector: {}
+    # @schema
+    # type: [string, null]
+    # required: false
+    # @schema
+    # -- Per-service priorityClassName configuration. Overrides the default setting from `priorityClassName` if set.
+    priorityClassName:
+    # @schema
+    # $ref: schema/templates.json#/podDisruptionBudgetTemplate
+    # @schema
+    # -- Per-service PodDisruptionBudget. Overrides the default setting from `podDisruptionBudget` if set.
+    podDisruptionBudget: {}
+    # @schema
+    # $ref: schema/templates.json#/autoscalingTemplate
+    # @schema
+    # -- Per-service autoscaling. Overrides the default setting from `autoscaling` if set.
+    autoscaling: {}
+    # @schema
+    # $ref: schema/templates.json#/affinityTemplate
+    # @schema
+    # -- Per-service affinity.
+    affinity: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service custom labels
+    extraLabels: {}
+    # Per-service image configuration. Overrides the default setting from `image` if set.
+    image:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image repository
+      repository:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image tag.
+      tag:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image sha / digest (optional).
+      sha:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image pull policy
+      pullPolicy:
+
+  # -- PROXY service.
+  # @default -- see detailed service configuration options below
+  proxy:
+    # @schema
+    # additionalProperties: true
+    # @schema
+    # -- Specifies additional policies for the proxy service.
+    # Routes are appended to the default routes of specified policies.
+    # The policy name should always be 'ocis'.
+    additionalPolicies: []
+    #  - name: ocis
+    #    routes:
+    #      - endpoint: /some-service/endpoint
+    #        service: com.owncloud.some-namespace.some-service
+    #        unprotected: true
+    #
+    # @schema
+    # $ref: schema/templates.json#/resourcesTemplate
+    # @schema
+    # -- Per-service resources configuration. Overrides the default setting from `resources` if set.
+    resources: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service nodeSelector configuration. Overrides the default setting from `nodeSelector` if set.
+    nodeSelector: {}
+    # @schema
+    # type: [string, null]
+    # required: false
+    # @schema
+    # -- Per-service priorityClassName configuration. Overrides the default setting from `priorityClassName` if set.
+    priorityClassName:
+    # @schema
+    # $ref: schema/templates.json#/podDisruptionBudgetTemplate
+    # @schema
+    # -- Per-service PodDisruptionBudget. Overrides the default setting from `podDisruptionBudget` if set.
+    podDisruptionBudget: {}
+    # @schema
+    # $ref: schema/templates.json#/autoscalingTemplate
+    # @schema
+    # -- Per-service autoscaling. Overrides the default setting from `autoscaling` if set.
+    autoscaling: {}
+    # @schema
+    # $ref: schema/templates.json#/affinityTemplate
+    # @schema
+    # -- Per-service affinity.
+    affinity: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service custom labels
+    extraLabels: {}
+    # Per-service image configuration. Overrides the default setting from `image` if set.
+    image:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image repository
+      repository:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image tag.
+      tag:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image sha / digest (optional).
+      sha:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image pull policy
+      pullPolicy:
+
+  # -- SEARCH service.
+  # @default -- see detailed service configuration options below
+  search:
+    # -- Search Extractor settings.
+    # @default -- see detailed search extractor configuration options below
+    extractor:
+      # @schema
+      # enum: [basic, tika]
+      # required: false
+      # @schema
+      # -- Configures the search extractor type to be used. Possible extractors:
+      # - `basic`: the default search extractor.
+      # - `tika`: the Tika search extractor. If set to this value, additional settings in the `tika` section apply.
+      type: basic
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image pull policy
+      # -- Configures the maximum file size in bytes that is allowed for content extraction.
+      # For the default value see https://doc.owncloud.com/ocis/next/deployment/services/s-list/search.html
+      sizeLimit:
+      tika:
+        # @schema
+        # type: [string, null]
+        # required: false
+        # @schema
+        # -- Set the URL to Tika. Only applicable if `services.search.extractor.type` == `tika`.
+        url:
+        # @schema
+        # type: boolean
+        # required: true
+        # @schema
+        # -- Defines if stop words should be cleaned or not.
+        cleanStopWords: true
+    # -- Persistence settings.
+    # @default -- see detailed persistence configuration options below
+    persistence:
+      # @schema
+      # type: boolean
+      # required: true
+      # @schema
+      # -- Enables persistence.
+      # Needs to be enabled on production installations.
+      # If not enabled, pod restarts will lead to data loss.
+      enabled: false
+      # @schema
+      # type: boolean
+      # required: true
+      # @schema
+      # -- Enables an initContainer to chown the volume.
+      # The initContainer is run as root.
+      # This is not needed if the driver applies the fsGroup from the securityContext.
+      # The image specified in `initContainerImage` will be used for this container.
+      chownInitContainer: false
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Storage class to use.
+      # Uses the default storage class if not set.
+      storageClassName:
+      # @schema
+      # type: array
+      # items:
+      #   enum:
+      #     - ReadWriteOnce
+      #     - ReadOnlyMany
+      #     - ReadWriteMany
+      #     - ReadWriteOncePod
+      #   required: true
+      # @schema
+      # -- Persistent volume access modes.
+      accessModes:
+        - ReadWriteOncePod
+      # @schema
+      # type: string
+      # required: true
+      # @schema
+      # -- Size of the persistent volume.
+      size: 10Gi
+      # @schema
+      # $ref: schema/templates.json#/annotationsTemplate
+      # @schema
+      # -- Persistent volume annotations.
+      annotations: {}
+      # @schema
+      # $ref: schema/templates.json#/finalizersTemplate
+      # @schema
+      # -- Persistent volume finalizers.
+      finalizers:
+        - kubernetes.io/pvc-protection
+      # @schema
+      # $ref: schema/templates.json#/labelsTemplate
+      # @schema
+      # -- Persistent volume selector labels.
+      selectorLabels: {}
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Use a custom name for the PVC instead of the default one.
+      claimName:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Use an existing PersistentVolumeClaim for persistence.
+      existingClaim:
+    # @schema
+    # $ref: schema/templates.json#/resourcesTemplate
+    # @schema
+    # -- Per-service resources configuration. Overrides the default setting from `resources` if set.
+    resources: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service nodeSelector configuration. Overrides the default setting from `nodeSelector` if set.
+    nodeSelector: {}
+    # @schema
+    # type: [string, null]
+    # required: false
+    # @schema
+    # -- Per-service priorityClassName configuration. Overrides the default setting from `priorityClassName` if set.
+    priorityClassName:
+    # @schema
+    # $ref: schema/templates.json#/podDisruptionBudgetTemplate
+    # @schema
+    # -- Per-service PodDisruptionBudget. Overrides the default setting from `podDisruptionBudget` if set.
+    podDisruptionBudget: {}
+    # @schema
+    # $ref: schema/templates.json#/affinityTemplate
+    # @schema
+    # -- Per-service affinity.
+    affinity: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service custom labels
+    extraLabels: {}
+    # Per-service image configuration. Overrides the default setting from `image` if set.
+    image:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image repository
+      repository:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image tag.
+      tag:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image sha / digest (optional).
+      sha:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image pull policy
+      pullPolicy:
+
+  # -- SETTINGS service.
+  # @default -- see detailed service configuration options below
+  settings:
+    # @schema
+    # $ref: schema/templates.json#/resourcesTemplate
+    # @schema
+    # -- Per-service resources configuration. Overrides the default setting from `resources` if set.
+    resources: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service nodeSelector configuration. Overrides the default setting from `nodeSelector` if set.
+    nodeSelector: {}
+    # @schema
+    # type: [string, null]
+    # required: false
+    # @schema
+    # -- Per-service priorityClassName configuration. Overrides the default setting from `priorityClassName` if set.
+    priorityClassName:
+    # @schema
+    # $ref: schema/templates.json#/podDisruptionBudgetTemplate
+    # @schema
+    # -- Per-service PodDisruptionBudget. Overrides the default setting from `podDisruptionBudget` if set.
+    podDisruptionBudget: {}
+    # @schema
+    # $ref: schema/templates.json#/autoscalingTemplate
+    # @schema
+    # -- Per-service autoscaling. Overrides the default setting from `autoscaling` if set.
+    autoscaling: {}
+    # @schema
+    # $ref: schema/templates.json#/affinityTemplate
+    # @schema
+    # -- Per-service affinity.
+    affinity: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service custom labels
+    extraLabels: {}
+    # Per-service image configuration. Overrides the default setting from `image` if set.
+    image:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image repository
+      repository:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image tag.
+      tag:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image sha / digest (optional).
+      sha:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image pull policy
+      pullPolicy:
+
+  # -- SHARING service.
+  # @default -- see detailed service configuration options below
+  sharing:
+    # @schema
+    # $ref: schema/templates.json#/resourcesTemplate
+    # @schema
+    # -- Per-service resources configuration. Overrides the default setting from `resources` if set.
+    resources: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service nodeSelector configuration. Overrides the default setting from `nodeSelector` if set.
+    nodeSelector: {}
+    # @schema
+    # type: [string, null]
+    # required: false
+    # @schema
+    # -- Per-service priorityClassName configuration. Overrides the default setting from `priorityClassName` if set.
+    priorityClassName:
+    # @schema
+    # $ref: schema/templates.json#/podDisruptionBudgetTemplate
+    # @schema
+    # -- Per-service PodDisruptionBudget. Overrides the default setting from `podDisruptionBudget` if set.
+    podDisruptionBudget: {}
+    # @schema
+    # $ref: schema/templates.json#/autoscalingTemplate
+    # @schema
+    # -- Per-service autoscaling. Overrides the default setting from `autoscaling` if set.
+    autoscaling: {}
+    # @schema
+    # $ref: schema/templates.json#/affinityTemplate
+    # @schema
+    # -- Per-service affinity.
+    affinity: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service custom labels
+    extraLabels: {}
+    # Per-service image configuration. Overrides the default setting from `image` if set.
+    image:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image repository
+      repository:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image tag.
+      tag:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image sha / digest (optional).
+      sha:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image pull policy
+      pullPolicy:
+    # @schema
+    # type: integer
+    # minimum: 1
+    # required: true
+    # @schema
+    # -- Maximum number of concurrent go-routines. Higher values can potentially get work done faster but will also cause
+    # more load on the system. Values of 0 or below will be ignored and the default value will be used.
+    maxConcurrency: 20 # this differs from the oCIS product, see https://github.com/owncloud/ocis/issues/10647#issuecomment-2498338980
+
+  # -- SSE service
+  # @default -- see detailed service configuration options below
+  sse:
+    connections:
+      # @schema
+      # type: string
+      # required: true
+      # @schema
+      # -- To prevent intermediate proxies from closing the SSE connection, send periodic SSE comments to keep it open.
+      keepaliveInterval: 30s
+    # @schema
+    # $ref: schema/templates.json#/resourcesTemplate
+    # @schema
+    # -- Per-service resources configuration. Overrides the default setting from `resources` if set.
+    resources: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service nodeSelector configuration. Overrides the default setting from `nodeSelector` if set.
+    nodeSelector: {}
+    # @schema
+    # type: [string, null]
+    # required: false
+    # @schema
+    # -- Per-service priorityClassName configuration. Overrides the default setting from `priorityClassName` if set.
+    priorityClassName:
+    # @schema
+    # $ref: schema/templates.json#/podDisruptionBudgetTemplate
+    # @schema
+    # -- Per-service PodDisruptionBudget. Overrides the default setting from `podDisruptionBudget` if set.
+    podDisruptionBudget: {}
+    # @schema
+    # $ref: schema/templates.json#/autoscalingTemplate
+    # @schema
+    # -- Per-service autoscaling. Overrides the default setting from `autoscaling` if set.
+    autoscaling: {}
+    # @schema
+    # $ref: schema/templates.json#/affinityTemplate
+    # @schema
+    # -- Per-service affinity.
+    affinity: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service custom labels
+    extraLabels: {}
+    # Per-service image configuration. Overrides the default setting from `image` if set.
+    image:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image repository
+      repository:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image tag.
+      tag:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image sha / digest (optional).
+      sha:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image pull policy
+      pullPolicy:
+
+  # -- STORAGE-PUBLICLINK service.
+  # @default -- see detailed service configuration options below
+  storagepubliclink:
+    # @schema
+    # $ref: schema/templates.json#/resourcesTemplate
+    # @schema
+    # -- Per-service resources configuration. Overrides the default setting from `resources` if set.
+    resources: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service nodeSelector configuration. Overrides the default setting from `nodeSelector` if set.
+    nodeSelector: {}
+    # @schema
+    # type: [string, null]
+    # required: false
+    # @schema
+    # -- Per-service priorityClassName configuration. Overrides the default setting from `priorityClassName` if set.
+    priorityClassName:
+    # @schema
+    # $ref: schema/templates.json#/podDisruptionBudgetTemplate
+    # @schema
+    # -- Per-service PodDisruptionBudget. Overrides the default setting from `podDisruptionBudget` if set.
+    podDisruptionBudget: {}
+    # @schema
+    # $ref: schema/templates.json#/autoscalingTemplate
+    # @schema
+    # -- Per-service autoscaling. Overrides the default setting from `autoscaling` if set.
+    autoscaling: {}
+    # @schema
+    # $ref: schema/templates.json#/affinityTemplate
+    # @schema
+    # -- Per-service affinity.
+    affinity: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service custom labels
+    extraLabels: {}
+    # Per-service image configuration. Overrides the default setting from `image` if set.
+    image:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image repository
+      repository:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image tag.
+      tag:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image sha / digest (optional).
+      sha:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image pull policy
+      pullPolicy:
+
+  # -- STORAGE-SHARES service.
+  # @default -- see detailed service configuration options below
+  storageshares:
+    # @schema
+    # $ref: schema/templates.json#/resourcesTemplate
+    # @schema
+    # -- Per-service resources configuration. Overrides the default setting from `resources` if set.
+    resources: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service nodeSelector configuration. Overrides the default setting from `nodeSelector` if set.
+    nodeSelector: {}
+    # @schema
+    # type: [string, null]
+    # required: false
+    # @schema
+    # -- Per-service priorityClassName configuration. Overrides the default setting from `priorityClassName` if set.
+    priorityClassName:
+    # @schema
+    # $ref: schema/templates.json#/podDisruptionBudgetTemplate
+    # @schema
+    # -- Per-service PodDisruptionBudget. Overrides the default setting from `podDisruptionBudget` if set.
+    podDisruptionBudget: {}
+    # @schema
+    # $ref: schema/templates.json#/autoscalingTemplate
+    # @schema
+    # -- Per-service autoscaling. Overrides the default setting from `autoscaling` if set.
+    autoscaling: {}
+    # @schema
+    # $ref: schema/templates.json#/affinityTemplate
+    # @schema
+    # -- Per-service affinity.
+    affinity: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service custom labels
+    extraLabels: {}
+    # Per-service image configuration. Overrides the default setting from `image` if set.
+    image:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image repository
+      repository:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image tag.
+      tag:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image sha / digest (optional).
+      sha:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image pull policy
+      pullPolicy:
+
+  # -- STORAGE-SYSTEM service.
+  # @default -- see detailed service configuration options below
+  storagesystem:
+    # -- Persistence settings.
+    # @default -- see detailed persistence configuration options below
+    persistence:
+      # @schema
+      # type: boolean
+      # required: true
+      # @schema
+      # -- Enables persistence.
+      # Needs to be enabled on production installations.
+      # If not enabled, pod restarts will lead to data loss.
+      # Also scaling this service to more than one replica is not possible if the pods don't share the same volume.
+      enabled: false
+      # @schema
+      # type: boolean
+      # required: true
+      # @schema
+      # -- Enables an initContainer to chown the volume.
+      # The initContainer is run as root.
+      # This is not needed if the driver applies the fsGroup from the securityContext.
+      # The image specified in `initContainerImage` will be used for this container.
+      chownInitContainer: false
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Storage class to use.
+      # Uses the default storage class if not set.
+      storageClassName:
+      # @schema
+      # type: array
+      # items:
+      #   enum:
+      #     - ReadWriteOnce
+      #     - ReadOnlyMany
+      #     - ReadWriteMany
+      #     - ReadWriteOncePod
+      #   required: true
+      # @schema
+      # -- Persistent volume access modes. Needs to be `[ReadWriteMany]` when having more than one replica for this service.
+      accessModes:
+        - ReadWriteMany
+      # @schema
+      # type: string
+      # required: true
+      # @schema
+      # -- Size of the persistent volume.
+      size: 5Gi
+      # @schema
+      # $ref: schema/templates.json#/annotationsTemplate
+      # @schema
+      # -- Persistent volume annotations.
+      annotations: {}
+      # @schema
+      # $ref: schema/templates.json#/finalizersTemplate
+      # @schema
+      # -- Persistent volume finalizers.
+      finalizers:
+        - kubernetes.io/pvc-protection
+      # @schema
+      # $ref: schema/templates.json#/labelsTemplate
+      # @schema
+      # -- Persistent volume selector labels.
+      selectorLabels: {}
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Use a custom name for the PVC instead of the default one.
+      claimName:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Use an existing PersistentVolumeClaim for persistence.
+      existingClaim:
+    # @schema
+    # $ref: schema/templates.json#/resourcesTemplate
+    # @schema
+    # -- Per-service resources configuration. Overrides the default setting from `resources` if set.
+    resources: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service nodeSelector configuration. Overrides the default setting from `nodeSelector` if set.
+    nodeSelector: {}
+    # @schema
+    # type: [string, null]
+    # required: false
+    # @schema
+    # -- Per-service priorityClassName configuration. Overrides the default setting from `priorityClassName` if set.
+    priorityClassName:
+    # @schema
+    # $ref: schema/templates.json#/podDisruptionBudgetTemplate
+    # @schema
+    # -- Per-service PodDisruptionBudget. Overrides the default setting from `podDisruptionBudget` if set.
+    podDisruptionBudget: {}
+    # @schema
+    # $ref: schema/templates.json#/autoscalingTemplate
+    # @schema
+    # -- Per-service autoscaling. Overrides the default setting from `autoscaling` if set.
+    autoscaling: {}
+    # @schema
+    # $ref: schema/templates.json#/affinityTemplate
+    # @schema
+    # -- Per-service affinity.
+    affinity: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service custom labels
+    extraLabels: {}
+    # Per-service image configuration. Overrides the default setting from `image` if set.
+    image:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image repository
+      repository:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image tag.
+      tag:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image sha / digest (optional).
+      sha:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image pull policy
+      pullPolicy:
+
+  # -- STORAGE-USERS service.
+  # @default -- see detailed service configuration options below
+  storageusers:
+    events:
+      consumer:
+        # @schema
+        # type: integer
+        # minimum: 1
+        # required: true
+        # @schema
+        # -- Number of event consumers to be started that concurrently consume events (eg. postprocessing related events)
+        concurrency: 10
+
+    storageBackend:
+      # @schema
+      # enum: [ocis, s3ng]
+      # required: true
+      # @schema
+      # -- Configures the storage driver. Possible values are "ocis" and "s3ng".
+      # The oCIS driver stores all data in the persistent volume if persistence is enabled.
+      # The S3NG driver stores all metadata in the persistent volume and uploads blobs to s3 if persistence is enabled.
+      driver: ocis
+      driverConfig:
+        ocis:
+          # @schema
+          # type: integer
+          # minimum: 1
+          # required: true
+          # @schema
+          # -- Maximum number of concurrent go-routines. Higher values can potentially get work done faster but will also cause more load on the system.
+          maxConcurrency: 100
+        s3ng:
+          # @schema
+          # type: integer
+          # minimum: 1
+          # required: true
+          # @schema
+          # -- Maximum number of concurrent go-routines. Higher values can potentially get work done faster but will also cause more load on the system.
+          maxConcurrency: 100
+          # The S3NG driver needs an existing S3 bucket with following permissions:
+          # {
+          #     "Version": "2012-10-17",
+          #     "Statement": [
+          #         {
+          #             "Sid": "ListBucket",
+          #             "Effect": "Allow",
+          #             "Action": [
+          #                 "s3:ListBucket"
+          #             ],
+          #             "Resource": [
+          #                 "arn:aws:s3:::bucket-name"
+          #             ]
+          #         },
+          #         {
+          #             "Sid": "ActionsInBucketContext",
+          #             "Effect": "Allow",
+          #             "Action": [
+          #                 "s3:*Object",
+          #                 "s3:*MultipartUpload",
+          #                 "s3:ListMultipartUploadParts"
+          #             ],
+          #             "Resource": [
+          #                 "arn:aws:s3:::bucket-name/*"
+          #             ]
+          #         }
+          #     ]
+          # }
+          # @schema
+          # type: [string, null]
+          # required: false
+          # @schema
+          # -- S3 endpoint to use for the S3NG driver. Only used if driver is set to "s3ng".
+          endpoint:
+          # @schema
+          # type: string
+          # required: true
+          # @schema
+          # -- S3 region to use for the S3NG driver. Only used if driver is set to "s3ng".
+          region: default
+          # @schema
+          # type: [string, null]
+          # required: false
+          # @schema
+          # -- S3 bucket to use for the S3NG driver. Only used if driver is set to "s3ng".
+          bucket:
+          # @schema
+          # type: boolean
+          # required: true
+          # @schema
+          # -- Disable sending content sha256 when copying objects to S3.
+          disableContentSHA256: false
+          putObject:
+            # @schema
+            # type: boolean
+            # required: true
+            # @schema
+            # -- Disable multipart uploads when copying objects to S3
+            disableMultipart: false
+            # @schema
+            # type: boolean
+            # required: true
+            # @schema
+            # -- Send a Content-MD5 header when copying objects to S3.
+            sendContentMD5: true
+            # @schema
+            # type: boolean
+            # required: true
+            # @schema
+            # -- Always precreate parts when copying objects to S3.
+            concurrentStreamParts: true
+            # @schema
+            # type: integer
+            # minimum: 1
+            # required: true
+            # @schema
+            # -- Number of concurrent uploads to use when copying objects to S3.
+            numThreads: 4
+            # @schema
+            # type: integer
+            # minimum: 0
+            # required: true
+            # @schema
+            # -- Part size for concurrent uploads to S3.
+            partSize: 0
+
+    maintenance:
+      # Expired uploads can be cleaned up automatically by enabling the clean up job.
+      cleanUpExpiredUploads:
+        # @schema
+        # type: boolean
+        # required: true
+        # @schema
+        # -- Enables a job, that cleans up expired uploads. Requires persistence to be enabled and RWX storage.
+        enabled: false
+        # @schema
+        # type: string
+        # required: true
+        # @schema
+        # -- Cron pattern for the job to be run.
+        schedule: 0 * * * *
+        # @schema
+        # type: [string, null]
+        # required: false
+        # @schema
+        # -- Timezone to be applied to the cron pattern.
+        timezone:
+        # @schema
+        # type: integer
+        # minimum: 1
+        # required: true
+        # @schema
+        # -- Defines the a deadline (in whole seconds) for starting the Job, if that Job misses its scheduled time for any reason.
+        startingDeadlineSeconds: 600
+        # @schema
+        # type: integer
+        # minimum: 1
+        # required: true
+        # @schema
+        # -- Duration in seconds after which uploads will expire.
+        #    WARNING: Setting this to a low number will lead to uploads being cancelled before they are finished and returning a 403 to the user.
+        uploadExpiration: 86400
+      # Expired trash bin items can be cleaned up automatically by enabling the purge exired trash bin items job.
+      purgeExpiredTrashBinItems:
+        # @schema
+        # type: boolean
+        # required: true
+        # @schema
+        # -- Enables a job, that purges expired trash bin items. Requires persistence to be enabled.
+        enabled: false
+        # @schema
+        # type: string
+        # required: true
+        # @schema
+        # -- Cron pattern for the job to be run.
+        schedule: 0 * * * *
+        # @schema
+        # type: [string, null]
+        # required: false
+        # @schema
+        # -- Timezone to be applied to the cron pattern.
+        timezone:
+        # @schema
+        # type: integer
+        # minimum: 1
+        # required: true
+        # @schema
+        # -- Defines the a deadline (in whole seconds) for starting the Job, if that Job misses its scheduled time for any reason.
+        startingDeadlineSeconds: 600
+        # @schema
+        # type: string
+        # pattern: ^[0-9]*([hms]|ms)$
+        # required: true
+        # @schema
+        # -- Setting that makes the command delete all trashed personal files older than the value. The value is a number and a unit "h", "m", "s", "ms".
+        personalDeleteBefore: 720h
+        # @schema
+        # type: string
+        # pattern: ^[0-9]*([hms]|ms)$
+        # required: true
+        # @schema
+        # -- Setting that makes the command delete all trashed project files older than the value. The value is a number and a unit "h", "m", "s", "ms".
+        projectDeleteBefore: 720h
+      # Uploads that were not postprocessed can be automatically processed again by enabling the restart job.
+      restartPostprocessing:
+        # @schema
+        # type: boolean
+        # required: true
+        # @schema
+        # -- Enables a job, that restarts postprocessing for uploads that are currently in postprocessing state. Requires persistence to be enabled.
+        enabled: false
+        # @schema
+        # type: string
+        # required: true
+        # @schema
+        # -- Cron pattern for the job to be run.
+        schedule: 0 * * * *
+        # @schema
+        # type: [string, null]
+        # required: false
+        # @schema
+        # -- Timezone to be applied to the cron pattern.
+        timezone:
+        # @schema
+        # type: integer
+        # minimum: 1
+        # required: true
+        # @schema
+        # -- Defines the a deadline (in whole seconds) for starting the Job, if that Job misses its scheduled time for any reason.
+        startingDeadlineSeconds: 600
+      # Image for the storageusers service maintenance jobs
+      # Defaults to the same values as `image`
+      image:
+        # @schema
+        # type: [string, null]
+        # required: false
+        # @schema
+        # -- Image repository
+        repository:
+        # @schema
+        # type: [string, null]
+        # required: false
+        # @schema
+        # -- Image tag.
+        tag:
+        # @schema
+        # type: [string, null]
+        # required: false
+        # @schema
+        # -- Image sha / digest (optional).
+        sha:
+        # @schema
+        # type: [string, null]
+        # required: false
+        # @schema
+        # -- Image pull policy
+        pullPolicy:
+
+    # -- Persistence settings.
+    # @default -- see detailed persistence configuration options below
+    persistence:
+      # @schema
+      # type: boolean
+      # required: true
+      # @schema
+      # -- Enables persistence.
+      # Needs to be enabled on production installations.
+      # If not enabled, pod restarts will lead to data loss.
+      # Also scaling this service to more than one replica is not possible if the pods don't share the same volume.
+      enabled: false
+      # @schema
+      # type: boolean
+      # required: true
+      # @schema
+      # -- Enables an initContainer to chown the volume.
+      # The initContainer is run as root.
+      # This is not needed if the driver applies the fsGroup from the securityContext.
+      # The image specified in `initContainerImage` will be used for this container.
+      chownInitContainer: false
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Storage class to use.
+      # Uses the default storage class if not set.
+      storageClassName:
+      # @schema
+      # type: array
+      # items:
+      #   enum:
+      #     - ReadWriteOnce
+      #     - ReadOnlyMany
+      #     - ReadWriteMany
+      #     - ReadWriteOncePod
+      #   required: true
+      # @schema
+      # -- Persistent volume access modes. Needs to be `[ReadWriteMany]` when having more than one replica for this service.
+      accessModes:
+        - ReadWriteMany
+      # @schema
+      # type: string
+      # required: true
+      # @schema
+      # -- Size of the persistent volume.
+      size: 50Gi
+      # @schema
+      # $ref: schema/templates.json#/annotationsTemplate
+      # @schema
+      # -- Persistent volume annotations.
+      annotations: {}
+      # @schema
+      # $ref: schema/templates.json#/finalizersTemplate
+      # @schema
+      # -- Persistent volume finalizers.
+      finalizers:
+        - kubernetes.io/pvc-protection
+      # @schema
+      # $ref: schema/templates.json#/labelsTemplate
+      # @schema
+      # -- Persistent volume selector labels.
+      selectorLabels: {}
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Use a custom name for the PVC instead of the default one.
+      claimName:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Use an existing PersistentVolumeClaim for persistence.
+      existingClaim:
+    # @schema
+    # $ref: schema/templates.json#/resourcesTemplate
+    # @schema
+    # -- Per-service resources configuration. Overrides the default setting from `resources` if set.
+    resources: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service nodeSelector configuration. Overrides the default setting from `nodeSelector` if set.
+    nodeSelector: {}
+    # @schema
+    # type: [string, null]
+    # required: false
+    # @schema
+    # -- Per-service priorityClassName configuration. Overrides the default setting from `priorityClassName` if set.
+    priorityClassName:
+    # @schema
+    # type: [string, null]
+    # required: false
+    # @schema
+    # -- Per-service jobPriorityClassName configuration. Overrides the default setting from `jobPriorityClassName` if set.
+    jobPriorityClassName:
+    # @schema
+    # $ref: schema/templates.json#/resourcesTemplate
+    # @schema
+    # -- Per-service jobResources configuration. Overrides the default setting from `jobResources` if set.
+    jobResources: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service jobNodeSelector configuration. Overrides the default setting from `jobNodeSelector` if set.
+    jobNodeSelector: {}
+    # @schema
+    # $ref: schema/templates.json#/podDisruptionBudgetTemplate
+    # @schema
+    # -- Per-service PodDisruptionBudget. Overrides the default setting from `podDisruptionBudget` if set.
+    podDisruptionBudget: {}
+    # @schema
+    # $ref: schema/templates.json#/autoscalingTemplate
+    # @schema
+    # -- Per-service autoscaling. Overrides the default setting from `autoscaling` if set.
+    autoscaling: {}
+    # @schema
+    # $ref: schema/templates.json#/affinityTemplate
+    # @schema
+    # -- Per-service affinity.
+    affinity: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service custom labels
+    extraLabels: {}
+    # Per-service image configuration. Overrides the default setting from `image` if set.
+    image:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image repository
+      repository:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image tag.
+      tag:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image sha / digest (optional).
+      sha:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image pull policy
+      pullPolicy:
+
+  # -- THUMBNAILS service.
+  # @default -- see detailed service configuration options below
+  thumbnails:
+    quota:
+      # @schema
+      # type: integer
+      # minimum: 0
+      # required: true
+      # @schema
+      # -- Number of maximum concurrent thumbnail requests. Default is 0 which is unlimited.
+      maxConcurrencyRequests: 0
+      # @schema
+      # type: string
+      # required: true
+      # @schema
+      # -- Sets a maximum file size of an input image which is being processed. Usable common abbreviations: [KB, KiB, MB, MiB, GB, GiB, TB, TiB, PB, PiB, EB, EiB], example: 2GB.
+      maxFileSize: 50MB
+      # @schema
+      # type: integer
+      # minimum: 1
+      # required: true
+      # @schema
+      # -- Sets a maximium width of an imput image which is being processed.
+      maxInputWidth: 7680
+      # @schema
+      # type: integer
+      # minimum: 1
+      # required: true
+      # @schema
+      # -- Sets a maximium height of an imput image which is being processed.
+      maxInputHeight: 7680
+    # -- Persistence settings.
+    # @default -- see detailed persistence configuration options below
+    persistence:
+      # @schema
+      # type: boolean
+      # required: true
+      # @schema
+      # -- Enables persistence.
+      # Is recommended to be enabled on production installations.
+      # If enabled, generated thumbnails are cached on this volume and available across pod restarts and service instances.
+      # If not enabled, thumbnail generation might lead to higher CPU usage.
+      enabled: false
+      # @schema
+      # type: boolean
+      # required: true
+      # @schema
+      # -- Enables an initContainer to chown the volume.
+      # The initContainer is run as root.
+      # This is not needed if the driver applies the fsGroup from the securityContext.
+      # The image specified in `initContainerImage` will be used for this container.
+      chownInitContainer: false
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Storage class to use.
+      # Uses the default storage class if not set.
+      storageClassName:
+      # @schema
+      # type: array
+      # items:
+      #   enum:
+      #     - ReadWriteOnce
+      #     - ReadOnlyMany
+      #     - ReadWriteMany
+      #     - ReadWriteOncePod
+      #   required: true
+      # @schema
+      # -- Persistent volume access modes. Needs to be `[ReadWriteMany]` when having more than one replica for this service or persistence needs to be disabled.
+      accessModes:
+        - ReadWriteMany
+      # @schema
+      # type: string
+      # required: true
+      # @schema
+      # -- Size of the persistent volume.
+      size: 10Gi
+      # @schema
+      # $ref: schema/templates.json#/annotationsTemplate
+      # @schema
+      # -- Persistent volume annotations.
+      annotations: {}
+      # @schema
+      # $ref: schema/templates.json#/finalizersTemplate
+      # @schema
+      # -- Persistent volume finalizers.
+      finalizers: []
+      # @schema
+      # $ref: schema/templates.json#/labelsTemplate
+      # @schema
+      # -- Persistent volume selector labels.
+      selectorLabels: {}
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Use a custom name for the PVC instead of the default one.
+      claimName:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Use an existing PersistentVolumeClaim for persistence.
+      existingClaim:
+    # @schema
+    # $ref: schema/templates.json#/resourcesTemplate
+    # @schema
+    # -- Per-service resources configuration. Overrides the default setting from `resources` if set.
+    resources: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service nodeSelector configuration. Overrides the default setting from `nodeSelector` if set.
+    nodeSelector: {}
+    # @schema
+    # type: [string, null]
+    # required: false
+    # @schema
+    # -- Per-service priorityClassName configuration. Overrides the default setting from `priorityClassName` if set.
+    priorityClassName:
+    # @schema
+    # $ref: schema/templates.json#/resourcesTemplate
+    # @schema
+    # -- Per-service jobResources configuration. Overrides the default setting from `jobResources` if set.
+    jobResources: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service jobNodeSelector configuration. Overrides the default setting from `jobNodeSelector` if set.
+    jobNodeSelector: {}
+    # @schema
+    # type: [string, null]
+    # required: false
+    # @schema
+    # -- Per-service jobPriorityClassName configuration. Overrides the default setting from `jobPriorityClassName` if set.
+    jobPriorityClassName:
+    # @schema
+    # $ref: schema/templates.json#/podDisruptionBudgetTemplate
+    # @schema
+    # -- Per-service PodDisruptionBudget. Overrides the default setting from `podDisruptionBudget` if set.
+    podDisruptionBudget: {}
+    # Maintenance configuration for cleanup jobs.
+    maintenance:
+      cleanUpOldThumbnails:
+        # @schema
+        # type: boolean
+        # required: true
+        # @schema
+        # -- Enables a job, that cleans up old thumbnails. Requires persistence to be enabled.
+        enabled: false
+        # @schema
+        # type: string
+        # required: true
+        # @schema
+        # -- Cron pattern for the job to be run.
+        schedule: 0 * * * *
+        # @schema
+        # type: [string, null]
+        # required: false
+        # @schema
+        # -- Timezone to be applied to the cron pattern.
+        timezone:
+        # @schema
+        # type: integer
+        # minimum: 1
+        # required: true
+        # @schema
+        # -- Defines the a deadline (in whole seconds) for starting the Job, if that Job misses its scheduled time for any reason.
+        startingDeadlineSeconds: 600
+        # @schema
+        # type: integer
+        # minimum: 1
+        # required: true
+        # @schema
+        # -- Setting that makes the command delete all thumbnails older than the value. The value is a number in days.
+        deleteBefore: 30
+        # @schema
+        # enum: [mtime, atime, ctime]
+        # required: true
+        # @schema
+        # -- Method to use with BusyBox "find" for finding old thumbnails. Can be mtime, atime or ctime.
+        method: atime
+      # Image for thumbnails service maintenance jobs
+      image:
+        # @schema
+        # type: string
+        # required: true
+        # @schema
+        # -- Image repository
+        repository: busybox
+        # @schema
+        # type: string
+        # required: true
+        # @schema
+        # -- Image tag.
+        tag: stable
+        # @schema
+        # type: [string, null]
+        # required: false
+        # @schema
+        # -- Image sha / digest (optional).
+        sha:
+        # @schema
+        # type: [string, null]
+        # required: true
+        # @schema
+        # -- Image pull policy
+        pullPolicy: IfNotPresent
+    # @schema
+    # $ref: schema/templates.json#/autoscalingTemplate
+    # @schema
+    # -- Per-service autoscaling. Overrides the default setting from `autoscaling` if set.
+    autoscaling: {}
+    # @schema
+    # $ref: schema/templates.json#/affinityTemplate
+    # @schema
+    # -- Per-service affinity.
+    affinity: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service custom labels
+    extraLabels: {}
+    # Per-service image configuration. Overrides the default setting from `image` if set.
+    image:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image repository
+      repository:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image tag.
+      tag:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image sha / digest (optional).
+      sha:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image pull policy
+      pullPolicy:
+
+  # -- USERLOG service.
+  # @default -- see detailed service configuration options below
+  userlog:
+    # @schema
+    # $ref: schema/templates.json#/resourcesTemplate
+    # @schema
+    # -- Per-service resources configuration. Overrides the default setting from `resources` if set.
+    resources: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service nodeSelector configuration. Overrides the default setting from `nodeSelector` if set.
+    nodeSelector: {}
+    # @schema
+    # type: [string, null]
+    # required: false
+    # @schema
+    # -- Per-service priorityClassName configuration. Overrides the default setting from `priorityClassName` if set.
+    priorityClassName:
+    # @schema
+    # $ref: schema/templates.json#/podDisruptionBudgetTemplate
+    # @schema
+    # -- Per-service PodDisruptionBudget. Overrides the default setting from `podDisruptionBudget` if set.
+    podDisruptionBudget: {}
+    # @schema
+    # $ref: schema/templates.json#/autoscalingTemplate
+    # @schema
+    # -- Per-service autoscaling. Overrides the default setting from `autoscaling` if set.
+    autoscaling: {}
+    # @schema
+    # $ref: schema/templates.json#/affinityTemplate
+    # @schema
+    # -- Per-service affinity.
+    affinity: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service custom labels
+    extraLabels: {}
+    # Per-service image configuration. Overrides the default setting from `image` if set.
+    image:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image repository
+      repository:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image tag.
+      tag:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image sha / digest (optional).
+      sha:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image pull policy
+      pullPolicy:
+    # @schema
+    # type: integer
+    # minimum: 1
+    # required: true
+    # @schema
+    # -- Maximum number of concurrent go-routines. Higher values can potentially get work done faster but will also cause
+    # more load on the system. Values of 0 or below will be ignored and the default value will be used.
+    maxConcurrency: 1
+
+  # -- USERS service.
+  # @default -- see detailed service configuration options below
+  users:
+    # @schema
+    # $ref: schema/templates.json#/resourcesTemplate
+    # @schema
+    # -- Per-service resources configuration. Overrides the default setting from `resources` if set.
+    resources: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service nodeSelector configuration. Overrides the default setting from `nodeSelector` if set.
+    nodeSelector: {}
+    # @schema
+    # type: [string, null]
+    # required: false
+    # @schema
+    # -- Per-service priorityClassName configuration. Overrides the default setting from `priorityClassName` if set.
+    priorityClassName:
+    # @schema
+    # $ref: schema/templates.json#/podDisruptionBudgetTemplate
+    # @schema
+    # -- Per-service PodDisruptionBudget. Overrides the default setting from `podDisruptionBudget` if set.
+    podDisruptionBudget: {}
+    # @schema
+    # $ref: schema/templates.json#/autoscalingTemplate
+    # @schema
+    # -- Per-service autoscaling. Overrides the default setting from `autoscaling` if set.
+    autoscaling: {}
+    # @schema
+    # $ref: schema/templates.json#/affinityTemplate
+    # @schema
+    # -- Per-service affinity.
+    affinity: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service custom labels
+    extraLabels: {}
+    # Per-service image configuration. Overrides the default setting from `image` if set.
+    image:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image repository
+      repository:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image tag.
+      tag:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image sha / digest (optional).
+      sha:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image pull policy
+      pullPolicy:
+
+  # -- ownCloud WEB service.
+  # @default -- see detailed service configuration options below
+  web:
+    # Configuration for web, that ends up in the config.json file.
+    config:
+      tokenStorageLocal:
+        # @schema
+        # type: boolean
+        # required: true
+        # @schema
+        #-- Specifies whether the access token will be stored in the local storage when set to ’true’ or in the session storage when set to ‘false’.
+        # If stored in the local storage, login state will be persisted across multiple browser tabs, means no additional logins are required.
+        enabled: true
+      contextHelpersReadMore:
+        # @schema
+        # type: boolean
+        # required: true
+        # @schema
+        # -- Specifies whether the “Read more” link should be displayed or not.
+        enabled: true
+      feedbackLink:
+        # @schema
+        # type: boolean
+        # required: true
+        # @schema
+        # -- Enables the feedback link in the Web UI.
+        enabled: false
+        # @schema
+        # type: [string, null]
+        # format: uri
+        # required: false
+        # @schema
+        # -- URI where the feedback link points. Uses the ownCloud default href if empty.
+        href:
+        # @schema
+        # type: [string, null]
+        # required: false
+        # @schema
+        # -- Screen reader accessible label for the feedback link. Uses the ownCloud default label if empty.
+        ariaLabel:
+        # @schema
+        # type: [string, null]
+        # required: false
+        # @schema
+        # -- Description to be shown for the feedback link. Uses the ownCloud default description if empty.
+        description:
+      # @schema
+      # additionalProperties: true
+      # @schema
+      # -- Configure the {"styles": []} section in the Web config.json.
+      styles:
+        []
+        # - href: /theme/foo.css
+      # @schema
+      # additionalProperties: true
+      # @schema
+      # -- Configure the {"scripts": []} section in the Web config.json.
+      scripts:
+        []
+        # - src: /theme/foo.js
+        #   async: true
+      # @schema
+      # additionalProperties: true
+      # @schema
+      # -- Configure custom translations
+      customTranslations:
+        []
+        # - url: https://ocis.kube.owncloud.test/custom_translations.json
+      # @schema
+      # additionalProperties: true
+      # @schema
+      # -- Configure the {"apps": []} section in the Web config.json.
+      apps: []
+      # @schema
+      # additionalProperties: true
+      # @schema
+      # -- Configure external apps in Web's app.yaml
+      externalApps: {}
+      # Theme settings
+      theme:
+        # @schema
+        # type: [string, null]
+        # required: false
+        # @schema
+        # -- URL to load themes from. Will be prepended to the theme path. Defaults to the value of "externalDomain".
+        server:
+        # @schema
+        # type: string
+        # required: true
+        # @schema
+        # -- URL path to load themes from. The theme server will be prepended. Defaults to the ownCloud Web default theme.
+        path: /themes/owncloud/theme.json
+        # @schema
+        # type: string
+        # required: true
+        # @schema
+        # -- Name of the theme you provide via `configRefs.webThemeConfigRef` and `configRefs.webThemeAssetsConfigRef`.
+        # If you change this when providing a custom theme, you must also change `theme.path`.
+        themeNameConfigRefs: owncloud
+      oidc:
+        # @schema
+        # type: string
+        # required: true
+        # @schema
+        # -- OIDC scopes to request during authentication to authorize access to user details. Defaults to ‘openid profile email’. Values are separated by blank. More example values but not limited to are ‘address’ or ‘phone’ etc.
+        webClientScope: openid profile email
+        # @schema
+        # type: string
+        # required: true
+        # @schema
+        # -- Specify the client ID which the web frontend will use
+        webClientID: web
+        # @schema
+        # type: [string, null]
+        # format: uri
+        # required: false
+        # @schema
+        # -- URI where to redirect the user after a logout was performed. Defaults to the URI of the login page.
+        postLogoutRedirectURI:
+        # @schema
+        # type: [string, null]
+        # format: uri
+        # required: false
+        # @schema
+        # -- Specifies the target url valid for the logged out / access denied page.
+        loginURL:
+      # @schema
+      # type: boolean
+      # required: true
+      # @schema
+      # Defines whether one ore more filters must be set in order to list users in the Web admin settings.
+      userListRequiresFilter: false
+      # Embed mode settings
+      embed:
+        # @schema
+        # type: boolean
+        # required: true
+        # @schema
+        # Enables the ownCloud Web "embed"-mode.
+        enabled: false
+        # @schema
+        # type: [string, null]
+        # required: false
+        # @schema
+        # Specifies how web is being integrated when running in "embed"-mode. Currently supported values are "location" and  (default).
+        target:
+        # @schema
+        # type: [string, null]
+        # required: false
+        # @schema
+        # Specifies a URL under which web can be integrated via iFrame. This needs to be specified when web is running in "embed"-mode.
+        messagesOrigin:
+        # @schema
+        # type: boolean
+        # required: true
+        # @schema
+        # Specifies if web delegates the authentication to the embedding parent application.
+        delegateAuthentication: false
+        # @schema
+        # type: [string, null]
+        # required: false
+        # @schema
+        # Specifies the allowed message origin host when posting access tokens from the embedding parent application to web. Defaults to not being set, which is only recommended for development environments.
+        delegateAuthenticationOrigin:
+      concurrency:
+        # @schema
+        # type: [integer, null]
+        # minimum: 1
+        # required: false
+        # @schema
+        # Defines the maximum number of concurrent requests per file/folder/space batch action. If uset, the default of ownCloud Web will be used.
+        resourceBatchActionRequests:
+        # @schema
+        # type: [integer, null]
+        # minimum: 1
+        # required: false
+        # @schema
+        # Defines the maximum number of concurrent requests in SSE event handlers. If uset, the default of ownCloud Web will be used.
+        sseRequests:
+        # @schema
+        # type: [integer, null]
+        # minimum: 1
+        # required: false
+        # @schema
+        # Defines the maximum number of concurrent requests per sharing invite batch. If uset, the default of ownCloud Web will be used.
+        shareCreateRequests:
+        # @schema
+        # type: [integer, null]
+        # minimum: 1
+        # required: false
+        # @schema
+        # Defines the maximum number of concurrent requests when loading individual share information inside listings. If uset, the default of ownCloud Web will be used.
+        shareListRequests:
+
+    # -- Persistence settings.
+    # @default -- see detailed persistence configuration options below
+    persistence:
+      # @schema
+      # type: boolean
+      # required: true
+      # @schema
+      # -- Enables persistence.
+      # Only needed if you want to change the oCIS instance logo via the Web UI.
+      enabled: false
+      # @schema
+      # type: boolean
+      # required: true
+      # @schema
+      # -- Enables an initContainer to chown the volume.
+      # The initContainer is run as root.
+      # This is not needed if the driver applies the fsGroup from the securityContext.
+      # The image specified in `initContainerImage` will be used for this container.
+      chownInitContainer: false
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Storage class to use.
+      # Uses the default storage class if not set.
+      storageClassName:
+      # @schema
+      # type: array
+      # items:
+      #   enum:
+      #     - ReadWriteOnce
+      #     - ReadOnlyMany
+      #     - ReadWriteMany
+      #     - ReadWriteOncePod
+      #   required: true
+      # @schema
+      # -- Persistent volume access modes. Needs to be `[ReadWriteMany]` when having more than one replica for this service or persistence needs to be disabled.
+      accessModes:
+        - ReadWriteMany
+      # @schema
+      # type: string
+      # required: true
+      # @schema
+      # -- Size of the persistent volume.
+      size: 1Gi
+      # @schema
+      # $ref: schema/templates.json#/annotationsTemplate
+      # @schema
+      # -- Persistent volume annotations.
+      annotations: {}
+      # @schema
+      # $ref: schema/templates.json#/finalizersTemplate
+      # @schema
+      # -- Persistent volume finalizers.
+      finalizers: []
+      # @schema
+      # $ref: schema/templates.json#/labelsTemplate
+      # @schema
+      # -- Persistent volume selector labels.
+      selectorLabels: {}
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Use a custom name for the PVC instead of the default one.
+      claimName:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Use an existing PersistentVolumeClaim for persistence.
+      existingClaim:
+    # @schema
+    # $ref: schema/templates.json#/resourcesTemplate
+    # @schema
+    # -- Per-service resources configuration. Overrides the default setting from `resources` if set.
+    resources: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service nodeSelector configuration. Overrides the default setting from `nodeSelector` if set.
+    nodeSelector: {}
+    # @schema
+    # type: [string, null]
+    # required: false
+    # @schema
+    # -- Per-service priorityClassName configuration. Overrides the default setting from `priorityClassName` if set.
+    priorityClassName:
+    # @schema
+    # $ref: schema/templates.json#/podDisruptionBudgetTemplate
+    # @schema
+    # -- Per-service PodDisruptionBudget. Overrides the default setting from `podDisruptionBudget` if set.
+    podDisruptionBudget: {}
+    # @schema
+    # $ref: schema/templates.json#/autoscalingTemplate
+    # @schema
+    # -- Per-service autoscaling. Overrides the default setting from `autoscaling` if set.
+    autoscaling: {}
+    # @schema
+    # $ref: schema/templates.json#/affinityTemplate
+    # @schema
+    # -- Per-service affinity.
+    affinity: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service custom labels
+    extraLabels: {}
+    # Per-service image configuration. Overrides the default setting from `image` if set.
+    image:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image repository
+      repository:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image tag.
+      tag:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image sha / digest (optional).
+      sha:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image pull policy
+      pullPolicy:
+    # @schema
+    # additionalProperties: true
+    # @schema
+    # -- Additional init containers for the Web pods.
+    additionalInitContainers: []
+
+  # -- WEBDAV service.
+  # @default -- see detailed service configuration options below
+  webdav:
+    # @schema
+    # $ref: schema/templates.json#/resourcesTemplate
+    # @schema
+    # -- Per-service resources configuration. Overrides the default setting from `resources` if set.
+    resources: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service nodeSelector configuration. Overrides the default setting from `nodeSelector` if set.
+    nodeSelector: {}
+    # @schema
+    # type: [string, null]
+    # required: false
+    # @schema
+    # -- Per-service priorityClassName configuration. Overrides the default setting from `priorityClassName` if set.
+    priorityClassName:
+    # @schema
+    # $ref: schema/templates.json#/podDisruptionBudgetTemplate
+    # @schema
+    # -- Per-service PodDisruptionBudget. Overrides the default setting from `podDisruptionBudget` if set.
+    podDisruptionBudget: {}
+    # @schema
+    # $ref: schema/templates.json#/autoscalingTemplate
+    # @schema
+    # -- Per-service autoscaling. Overrides the default setting from `autoscaling` if set.
+    autoscaling: {}
+    # @schema
+    # $ref: schema/templates.json#/affinityTemplate
+    # @schema
+    # -- Per-service affinity.
+    affinity: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service custom labels
+    extraLabels: {}
+    # Per-service image configuration. Overrides the default setting from `image` if set.
+    image:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image repository
+      repository:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image tag.
+      tag:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image sha / digest (optional).
+      sha:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image pull policy
+      pullPolicy:
+
+  # -- WEBFINGER service.
+  # @default -- see detailed service configuration options below
+  webfinger:
+    # @schema
+    # $ref: schema/templates.json#/resourcesTemplate
+    # @schema
+    # -- Per-service resources configuration. Overrides the default setting from `resources` if set.
+    resources: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service nodeSelector configuration. Overrides the default setting from `nodeSelector` if set.
+    nodeSelector: {}
+    # @schema
+    # type: [string, null]
+    # required: false
+    # @schema
+    # -- Per-service priorityClassName configuration. Overrides the default setting from `priorityClassName` if set.
+    priorityClassName:
+    # @schema
+    # $ref: schema/templates.json#/podDisruptionBudgetTemplate
+    # @schema
+    # -- Per-service PodDisruptionBudget. Overrides the default setting from `podDisruptionBudget` if set.
+    podDisruptionBudget: {}
+    # @schema
+    # $ref: schema/templates.json#/autoscalingTemplate
+    # @schema
+    # -- Per-service autoscaling. Overrides the default setting from `autoscaling` if set.
+    autoscaling: {}
+    # @schema
+    # $ref: schema/templates.json#/affinityTemplate
+    # @schema
+    # -- Per-service affinity.
+    affinity: {}
+    # @schema
+    # $ref: schema/templates.json#/labelsTemplate
+    # @schema
+    # -- Per-service custom labels
+    extraLabels: {}
+    # Per-service image configuration. Overrides the default setting from `image` if set.
+    image:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image repository
+      repository:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image tag.
+      tag:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image sha / digest (optional).
+      sha:
+      # @schema
+      # type: [string, null]
+      # required: false
+      # @schema
+      # -- Image pull policy
+      pullPolicy:
+
+# Service monitoring configuration. Requires the monitoring.coreos.com/v1 CRDs to be installed.
+monitoring:
+  # @schema
+  # type: boolean
+  # required: true
+  # @schema
+  # -- Enable service monitoring.
+  enabled: false
+  # @schema
+  # type: string
+  # required: true
+  # @schema
+  # -- Interval at which to scrape metrics.
+  interval: 60s
+  # @schema
+  # type: string
+  # required: true
+  # @schema
+  # -- Scrape timeout.
+  scrapeTimeout: 60s
+
+# Kubernetes service related settings.
+service:
+  appProtocol:
+    # @schema
+    # type: string
+    # required: true
+    # @schema
+    # -- appProtocol to be used for service ports that use the grpc protocol.
+    grpc: grpc
+    # @schema
+    # type: string
+    # required: true
+    # @schema
+    # -- appProtocol to be used for service ports that use the http protocol.
+    http: http
+    # @schema
+    # type: string
+    # required: true
+    # @schema
+    # -- appProtocol to be used for service ports that use the ldaps protocol. Not used if `features.externalUserManagement.enabled` equals `true`.
+    ldaps: tcp
+    # @schema
+    # type: string
+    # required: true
+    # @schema
+    # -- appProtocol to be used for service ports that use the nats wire protocol. Not used if `messagingSystem.external.enabled` equals `true`.
+    nats: tcp
+
+# @schema
+# type: object
+# required: false
+# additionalProperties: true
+# @schema
+# Needs to be added to the schema, so that this chart can be used as subchart when `global` is set.
+# see https://github.com/owncloud/ocis-charts/issues/872
+global: {}

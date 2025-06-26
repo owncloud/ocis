@@ -1,0 +1,163 @@
+{{- include "ocis.basicServiceTemplates" (dict "scope" . "appName" "appNameProxy" "appNameSuffix" "") -}}
+apiVersion: apps/v1
+kind: Deployment
+{{ include "ocis.metadata" . }}
+spec:
+  {{- include "ocis.selector" . | nindent 2 }}
+  {{- if and (not .Values.autoscaling.enabled) (.Values.replicas) }}
+  replicas: {{ .Values.replicas }}
+  {{- end }}
+  {{- include "ocis.deploymentStrategy" . | nindent 2 }}
+  template:
+    {{- include "ocis.templateMetadata" (dict "scope" $ "configCheck" true) | nindent 4 }}
+    spec:
+      {{- include "ocis.affinity" $ | nindent 6 }}
+      {{- include "ocis.securityContextAndtopologySpreadConstraints" . | nindent 6 }}
+      {{- include "ocis.priorityClassName" $.priorityClassName | nindent 6 }}
+      {{- include "ocis.hostAliases" $ | nindent 6 }}
+      nodeSelector: {{ toYaml $.nodeSelector | nindent 8 }}
+      containers:
+        - name: {{ .appName }}
+          {{- include "ocis.image" $ | nindent 10 }}
+          command: ["ocis"]
+          args: ["proxy", "server"]
+          {{- include "ocis.containerSecurityContext" . | nindent 10 }}
+          env:
+            {{- include "ocis.serviceRegistry" . | nindent 12 }}
+            {{- include "ocis.cacheStore" . | nindent 12 }}
+            {{- include "ocis.events" . | nindent 12 }}
+
+
+            - name: PROXY_LOG_COLOR
+              value: {{ .Values.logging.color | quote }}
+            - name: PROXY_LOG_LEVEL
+              value: {{ .Values.logging.level | quote }}
+            - name: PROXY_LOG_PRETTY
+              value: {{ .Values.logging.pretty | quote }}
+
+            - name: PROXY_ENABLE_BASIC_AUTH
+              value: "true"
+            - name: PROXY_TRACING_ENABLED
+              value: "{{ .Values.tracing.enabled }}"
+            - name: PROXY_TRACING_TYPE
+              value: {{ .Values.tracing.type | quote }}
+            - name: PROXY_TRACING_ENDPOINT
+              value: {{ .Values.tracing.endpoint | quote }}
+            - name: PROXY_TRACING_COLLECTOR
+              value: {{ .Values.tracing.collector | quote }}
+
+            - name: PROXY_DEBUG_PPROF
+              value: {{ .Values.debug.profiling | quote }}
+
+            - name: PROXY_HTTP_ADDR
+              value: 0.0.0.0:9200
+            - name: PROXY_DEBUG_ADDR
+              value: 0.0.0.0:9205
+
+            - name: PROXY_OIDC_ISSUER
+            {{- if not .Values.features.externalUserManagement.enabled }}
+              value: "https://{{ .Values.externalDomain }}"
+            {{- else }}
+              value: {{ required "features.externalUserManagement.oidc.issuerURI must be set when features.externalUserManagement.enabled is set to true" .Values.features.externalUserManagement.oidc.issuerURI | quote }}
+            {{- end }}
+
+            {{- if .Values.features.externalUserManagement.enabled }}
+            - name: PROXY_OIDC_REWRITE_WELLKNOWN
+              value: "true"
+
+            - name: PROXY_USER_OIDC_CLAIM
+              value: {{ .Values.features.externalUserManagement.oidc.userIDClaim | quote }}
+            - name: PROXY_USER_CS3_CLAIM
+              value: {{ .Values.features.externalUserManagement.oidc.userIDClaimAttributeMapping | quote }}
+
+            - name: PROXY_OIDC_ACCESS_TOKEN_VERIFY_METHOD
+              value: {{ .Values.features.externalUserManagement.oidc.accessTokenVerifyMethod | quote }}
+
+            - name: PROXY_OIDC_SKIP_USER_INFO
+              value: {{ .Values.features.externalUserManagement.oidc.skipUserInfo | quote }}
+            {{- end }}
+
+            - name: PROXY_TLS
+              value: "false"
+
+            - name: PROXY_OIDC_INSECURE
+              value: {{ .Values.insecure.oidcIdpInsecure | quote }}
+
+            - name: PROXY_JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "secrets.jwtSecret" . }}
+                  key: jwt-secret
+
+            - name: PROXY_MACHINE_AUTH_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "secrets.machineAuthAPIKeySecret" . }}
+                  key: machine-auth-api-key
+
+            - name: PROXY_SERVICE_ACCOUNT_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "config.authService" . }}
+                  key: service-account-id
+            - name: PROXY_SERVICE_ACCOUNT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "secrets.serviceAccountSecret" . }}
+                  key: service-account-secret
+
+            - name: PROXY_CSP_CONFIG_FILE_LOCATION
+              value: /etc/ocis/csp.yaml
+
+            {{- if .Values.features.policies.enabled }}
+            - name: PROXY_POLICIES_QUERY
+              value: data.proxy.granted
+            {{- end }}
+
+            - name: PROXY_AUTOPROVISION_ACCOUNTS
+              value: {{ .Values.features.externalUserManagement.autoprovisionAccounts.enabled | default "false" | quote }}
+            {{- if .Values.features.externalUserManagement.autoprovisionAccounts.enabled }}
+            - name: PROXY_AUTOPROVISION_CLAIM_EMAIL
+              value: {{ .Values.features.externalUserManagement.autoprovisionAccounts.claimEmail | quote }}
+            - name: PROXY_AUTOPROVISION_CLAIM_DISPLAYNAME
+              value: {{ .Values.features.externalUserManagement.autoprovisionAccounts.claimDisplayname | quote }}
+            - name: PROXY_AUTOPROVISION_CLAIM_GROUPS
+              value: {{ .Values.features.externalUserManagement.autoprovisionAccounts.claimGroups | quote }}
+            - name: PROXY_AUTOPROVISION_CLAIM_USERNAME
+              value: {{ .Values.features.externalUserManagement.autoprovisionAccounts.claimUserName | quote }}
+            {{- end }}
+
+            {{- if .Values.features.externalUserManagement.oidc.spaceAssignment.enabled }}
+            - name: OCIS_CLAIM_MANAGED_SPACES_ENABLED
+              value: {{ .Values.features.externalUserManagement.oidc.spaceAssignment.enabled | quote }}
+            - name: OCIS_CLAIM_MANAGED_SPACES_CLAIMNAME
+              value: {{ .Values.features.externalUserManagement.oidc.spaceAssignment.claim | quote }}
+            - name: OCIS_CLAIM_MANAGED_SPACES_REGEXP
+              value: {{ .Values.features.externalUserManagement.oidc.spaceAssignment.regexp | quote }}
+            - name: OCIS_CLAIM_MANAGED_SPACES_MAPPING
+              value: {{ join "," .Values.features.externalUserManagement.oidc.spaceAssignment.mapping | quote }}
+            {{- end }}
+
+            {{- include "ocis.caEnv" $ | nindent 12}}
+
+          {{- include "ocis.livenessProbe" . | nindent 10 }}
+
+          resources: {{ toYaml .resources | nindent 12 }}
+
+          ports:
+            - name: http
+              containerPort: 9200
+            - name: metrics-debug
+              containerPort: 9205
+
+          volumeMounts:
+            - name: configs
+              mountPath: /etc/ocis
+            {{- include "ocis.caPath" $ | nindent 12}}
+
+      {{- include "ocis.imagePullSecrets" $ | nindent 6 }}
+      volumes:
+        - name: configs
+          configMap:
+            name: {{ .appName }}-config
+        {{- include "ocis.caVolume" $ | nindent 8}}
