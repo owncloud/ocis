@@ -80,6 +80,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix the graceful shutdown: [#11295](https://github.com/owncloud/ocis/pull/11295)
 * Bugfix - Fix the reva log interceptor: [#11348](https://github.com/owncloud/ocis/pull/11348)
 * Bugfix - Fix panic while traversing the service list: [#11390](https://github.com/owncloud/ocis/pull/11390)
+* Bugfix - Fix storage-users cli: [#11464](https://github.com/owncloud/ocis/pull/11464)
 * Change - Remove deprecated FRONTEND_OCS_*: [#11333](https://github.com/owncloud/ocis/pull/11333)
 * Change - Remove deprecated CLIENTLOG_REVA_GATEWAY: [#11372](https://github.com/owncloud/ocis/pull/11372)
 * Enhancement - Allow scaling the search service: [#11029](https://github.com/owncloud/ocis/pull/11029)
@@ -218,6 +219,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/11377
    https://github.com/owncloud/ocis/pull/11390
+
+* Bugfix - Fix storage-users cli: [#11464](https://github.com/owncloud/ocis/pull/11464)
+
+   Fix storage-users uploads --resume command.
+
+   https://github.com/owncloud/ocis/issues/11290
+   https://github.com/owncloud/ocis/pull/11464
 
 * Change - Remove deprecated FRONTEND_OCS_*: [#11333](https://github.com/owncloud/ocis/pull/11333)
 
