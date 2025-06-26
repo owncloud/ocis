@@ -2040,7 +2040,7 @@ class SpacesContext implements Context {
 		string $fromSpaceName,
 		string $fileDestination,
 		string $toSpaceName,
-		TableNode $table = null,
+		?TableNode $table = null,
 	): void {
 		$space = $this->getSpaceByName($user, $fromSpaceName);
 		$headers['Destination'] = $this->destinationHeaderValueWithSpaceName(
@@ -2213,7 +2213,7 @@ class SpacesContext implements Context {
 		string $user,
 		string $fileDestination,
 		string $spaceName,
-		string $endPath = null,
+		?string $endPath = null,
 	): string {
 		$space = $this->getSpaceByName($user, $spaceName);
 		$fileDestination = $this->escapePath(\ltrim($fileDestination, "/"));
@@ -4676,7 +4676,7 @@ class SpacesContext implements Context {
 		string $recipientType,
 		string $recipient,
 		string $role,
-		string $expirationDate = null,
+		?string $expirationDate = null,
 	): void {
 		$response = $this->listAllMySpaces($user);
 		$this->featureContext->theHTTPStatusCodeShouldBe(

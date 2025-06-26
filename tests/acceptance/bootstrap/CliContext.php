@@ -719,7 +719,7 @@ class CliContext implements Context {
 	 * @return array
 	 */
 	protected function getTrashedResourceFromCliCommandResponse(
-		ResponseInterface $response = null,
+		?ResponseInterface $response = null,
 	): array {
 		$responseArray = $this->featureContext->getJsonDecodedResponseBodyContent($response);
 		$lines = explode("\n", $responseArray->message);

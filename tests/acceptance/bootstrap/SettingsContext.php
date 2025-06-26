@@ -350,14 +350,14 @@ class SettingsContext implements Context {
 
 	/**
 	 * @param string $user
-	 * @param array $headers
+	 * @param array|null $headers
 	 *
 	 * @return ResponseInterface
 	 *
 	 * @throws GuzzleException
 	 * @throws Exception
 	 */
-	public function sendRequestGetSettingsValuesList(string $user, array $headers = null): ResponseInterface {
+	public function sendRequestGetSettingsValuesList(string $user, ?array $headers = null): ResponseInterface {
 		return SettingsHelper::getValuesList(
 			$this->featureContext->getBaseUrl(),
 			$user,

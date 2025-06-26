@@ -1600,7 +1600,7 @@ trait WebDav {
 	 * @param string $user
 	 * @param string $source
 	 * @param string $destination
-	 * @param string $spaceId
+	 * @param string|null $spaceId
 	 * @param bool|null $isGivenStep
 	 *
 	 * @return ResponseInterface
@@ -1609,7 +1609,7 @@ trait WebDav {
 		string $user,
 		string $source,
 		string $destination,
-		string $spaceId = null,
+		?string $spaceId = null,
 		?bool $isGivenStep = false,
 	): ResponseInterface {
 		$user = $this->getActualUsername($user);
@@ -4042,11 +4042,11 @@ trait WebDav {
 	/**
 	 * @param string $user
 	 * @param string $path
-	 * @param string $spaceId
+	 * @param string|null $spaceId
 	 *
 	 * @return string|null
 	 */
-	public function getFileIdForPath(string $user, string $path, string $spaceId = null): ?string {
+	public function getFileIdForPath(string $user, string $path, ?string $spaceId = null): ?string {
 		$user = $this->getActualUsername($user);
 		try {
 			return WebDavHelper::getFileIdForPath(

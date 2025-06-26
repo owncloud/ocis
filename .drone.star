@@ -40,7 +40,7 @@ SONARSOURCE_SONAR_SCANNER_CLI = "sonarsource/sonar-scanner-cli:11.0"
 KEYCLOAK_IMAGE = "quay.io/keycloak/keycloak:26.2.5"
 POSTGRES_ALPINE_IMAGE = "postgres:alpine3.18"
 
-DEFAULT_PHP_VERSION = "8.2"
+DEFAULT_PHP_VERSION = "8.4"
 DEFAULT_NODEJS_VERSION = "22"
 
 dirs = {
@@ -1010,6 +1010,9 @@ def codestyle(ctx):
                              {
                                  "name": "php-style",
                                  "image": OC_CI_PHP % phpVersion,
+                                 "environment": {
+                                     "PHP_CS_FIXER_IGNORE_ENV": "true",
+                                 },
                                  "commands": [
                                      "make test-php-style",
                                  ],

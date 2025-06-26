@@ -552,7 +552,7 @@ trait Sharing {
 		string $user,
 		string $path,
 		bool $publicUpload = false,
-		string $sharePassword = null,
+		?string $sharePassword = null,
 		$permissions = null,
 		?string $linkName = null,
 		?string $expireDate = null,
@@ -1711,7 +1711,7 @@ trait Sharing {
 	 */
 	public function deleteLastShareUsingSharingApi(
 		string $user,
-		string $sharer = null,
+		?string $sharer = null,
 		bool $deleteLastPublicLink = false,
 	): ResponseInterface {
 		$user = $this->getActualUsername($user);

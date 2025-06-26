@@ -310,7 +310,7 @@ class SharingNgContext implements Context {
 	public function sendShareInvitation(
 		string $user,
 		array $shareInfo,
-		string $fileId = null,
+		?string $fileId = null,
 		bool $federatedShare = false,
 	): ResponseInterface {
 		$space = $this->spacesContext->getSpaceByName($user, $shareInfo['space']);

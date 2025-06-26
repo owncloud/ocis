@@ -43,7 +43,7 @@ class FavoritesContext implements Context {
 	 *
 	 * @return ResponseInterface
 	 */
-	public function userFavoritesElement(string $user, string $path, string $spaceId = null): ResponseInterface {
+	public function userFavoritesElement(string $user, string $path, ?string $spaceId = null): ResponseInterface {
 		return $this->changeFavStateOfAnElement(
 			$user,
 			$path,
@@ -179,7 +179,7 @@ class FavoritesContext implements Context {
 		string $user,
 		string $path,
 		int $expectedValue = 1,
-		string $spaceId = null,
+		?string $spaceId = null,
 	): void {
 		$property = "oc:favorite";
 		$this->webDavPropertiesContext->checkPropertyOfAFolder(

@@ -73,13 +73,17 @@ class OcmContext implements Context {
 
 	/**
 	 * @param string $user
-	 * @param string $email
-	 * @param string $description
+	 * @param string|null $email
+	 * @param string|null $description
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
-	public function createInvitation(string $user, $email = null, $description = null): ResponseInterface {
+	public function createInvitation(
+		string $user,
+		?string $email = null,
+		?string $description = null,
+	): ResponseInterface {
 		$response = OcmHelper::createInvitation(
 			$this->featureContext->getBaseUrl(),
 			$user,
@@ -99,13 +103,17 @@ class OcmContext implements Context {
 	 * @When :user creates the federation share invitation with email :email and description :description
 	 *
 	 * @param string $user
-	 * @param string $email
-	 * @param string $description
+	 * @param string|null $email
+	 * @param string|null $description
 	 *
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function userCreatesTheFederationShareInvitation(string $user, $email = null, $description = null): void {
+	public function userCreatesTheFederationShareInvitation(
+		string $user,
+		?string $email = null,
+		?string $description = null,
+	): void {
 		$this->featureContext->setResponse($this->createInvitation($user, $email, $description));
 	}
 
@@ -114,25 +122,29 @@ class OcmContext implements Context {
 	 * @Given :user has created the federation share invitation with email :email and description :description
 	 *
 	 * @param string $user
-	 * @param string $email
-	 * @param string $description
+	 * @param string|null $email
+	 * @param string|null $description
 	 *
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function userHasCreatedTheFederationShareInvitation(string $user, $email = null, $description = null): void {
+	public function userHasCreatedTheFederationShareInvitation(
+		string $user,
+		?string $email = null,
+		?string $description = null,
+	): void {
 		$response = $this->createInvitation($user, $email, $description);
 		$this->featureContext->theHTTPStatusCodeShouldBe(200, '', $response);
 	}
 
 	/**
 	 * @param string $user
-	 * @param string $token
+	 * @param string|null $token
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
-	public function acceptInvitation(string $user, string $token = null): ResponseInterface {
+	public function acceptInvitation(string $user, ?string $token = null): ResponseInterface {
 		$providerDomain = $this->featureContext->getLocalBaseUrlWithoutScheme();
 		if ($this->featureContext->getCurrentServer() === "LOCAL") {
 			$providerDomain = $this->featureContext->getRemoteBaseUrlWithoutScheme();
@@ -350,7 +362,7 @@ class OcmContext implements Context {
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
-	public function deleteConnection(string $user, string $ocmUser, string $idp = null): ResponseInterface {
+	public function deleteConnection(string $user, string $ocmUser, ?string $idp = null): ResponseInterface {
 		$ocmUser = $this->getAcceptedUserByName($user, $ocmUser);
 		$ocmUser['idp'] = $idp ?? $ocmUser['idp'];
 		return OcmHelper::deleteConnection(

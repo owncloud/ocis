@@ -64,7 +64,7 @@ class WebDavLockingContext implements Context {
 		string $user,
 		string $file,
 		TableNode $properties,
-		string $fullUrl = null,
+		?string $fullUrl = null,
 		bool $public = false,
 		bool $expectToSucceed = true,
 		?string $spaceId = null,
@@ -689,7 +689,7 @@ class WebDavLockingContext implements Context {
 		string $lockOwner,
 		string $itemToUseLockOf,
 		bool $public = false,
-		string $fullUrl = null,
+		?string $fullUrl = null,
 		?string $spaceId = null,
 	): ResponseInterface {
 		$user = $this->featureContext->getActualUsername($user);
