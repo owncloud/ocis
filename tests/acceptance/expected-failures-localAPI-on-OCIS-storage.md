@@ -21,9 +21,9 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 
 #### [Settings service user can list other peoples assignments](https://github.com/owncloud/ocis/issues/5032)
 
-- [apiSettings/settings.feature:125](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSettings/settings.feature#L125)
-- [apiSettings/settings.feature:126](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSettings/settings.feature#L126)
-- [apiSettings/settings.feature:127](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSettings/settings.feature#L127)
+- [apiSettings/settings.feature:182](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSettings/settings.feature#L182)
+- [apiSettings/settings.feature:183](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSettings/settings.feature#L183)
+- [apiSettings/settings.feature:184](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSettings/settings.feature#L184)
 
 #### [A User can get information of another user with Graph API](https://github.com/owncloud/ocis/issues/5125)
 
