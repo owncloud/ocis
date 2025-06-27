@@ -371,8 +371,6 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 
 ### [[Sharing NG] Implement https://owncloud.dev/libre-graph-api/#/drives.permissions/GetPermission](https://github.com/owncloud/ocis/issues/8616)
 
-- [apiSharingNgPermissions/listPermissions.feature:2585](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNgPermissions/listPermissions.feature#L2585)
-- [apiSharingNgPermissions/listPermissions.feature:2631](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNgPermissions/listPermissions.feature#L2631)
 - [apiSharingNgPermissions/listPermissions.feature:2673](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNgPermissions/listPermissions.feature#L2673)
 - [apiSharingNgPermissions/listPermissions.feature:2718](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNgPermissions/listPermissions.feature#L2718)
 
