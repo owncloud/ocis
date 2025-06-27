@@ -186,7 +186,7 @@ func main() {
 
 func replaceEnvVarPlaceHolder(s string) string {
 	return strings.Replace(
-		strings.Replace(s, "%%NEXT%%", "next", -1),
+		s,
 		"%%NEXT_PRODUCTION_VERSION%%",
 		"next-prod",
 		-1,
