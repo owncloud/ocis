@@ -2723,7 +2723,7 @@ Feature: List a sharing permissions
       | space           | new-space |
       | permissionsRole | View      |
       | password        | %public%  |
-    When user "Alice" lists the last link permission of space "Personal" using root endpoint of the Graph API
+    When user "Alice" lists the last link permission of space "new-space" using root endpoint of the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
       """

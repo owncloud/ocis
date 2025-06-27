@@ -2089,6 +2089,32 @@ class GraphHelper {
 	 * @param string $user
 	 * @param string $password
 	 * @param string $spaceId
+	 * @param string $permissionId
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public static function getSingleDrivePermissionList(
+		string $baseUrl,
+		string $user,
+		string $password,
+		string $spaceId,
+		string $permissionId,
+	): ResponseInterface {
+		$url = self::getBetaFullUrl($baseUrl, "drives/$spaceId/root/permissions/$permissionId");
+		return HttpRequestHelper::get(
+			$url,
+			$user,
+			$password,
+			self::getRequestHeaders(),
+		);
+	}
+
+	/**
+	 * @param string $baseUrl
+	 * @param string $user
+	 * @param string $password
+	 * @param string $spaceId
 	 * @param array $shareeIds
 	 * @param array $shareTypes
 	 * @param string|null $permissionsRole

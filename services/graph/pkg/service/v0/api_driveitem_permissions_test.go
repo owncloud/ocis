@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"slices"
+	"strings"
 	"time"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
@@ -562,6 +563,179 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			Expect(len(permissions.LibreGraphPermissionsActionsAllowedValues)).ToNot(BeZero())
 		})
 
+		It("reproduces missing createdDateTime in space root permissions with user shares and public links", func() {
+			// Mock space with grants (user shares)
+			space := &provider.StorageSpace{
+				Id: &provider.StorageSpaceId{OpaqueId: "new-space"},
+				Root: &provider.ResourceId{
+					StorageId: "1",
+					SpaceId:   "new-space",
+					OpaqueId:  "new-space",
+				},
+				SpaceType: "project",
+				Opaque: &types.Opaque{
+					Map: map[string]*types.OpaqueEntry{
+						"grants": {
+							Value: []byte(`{"brian":{"stat":true,"initiate_file_download":true}}`),
+						},
+					},
+				},
+			}
+
+			// Mock gateway client responses
+			gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&provider.ListStorageSpacesResponse{
+				Status:        status.NewOK(ctx),
+				StorageSpaces: []*provider.StorageSpace{space},
+			}, nil)
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(&provider.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &provider.ResourceInfo{
+					Id: &provider.ResourceId{
+						StorageId: "1",
+						SpaceId:   "new-space",
+						OpaqueId:  "new-space",
+					},
+					Space: &provider.StorageSpace{
+						Id:   space.Id,
+						Root: space.Root,
+					},
+				},
+			}, nil)
+			gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(&userpb.GetUserResponse{
+				Status: status.NewOK(ctx),
+				User: &userpb.User{
+					Id: &userpb.UserId{
+						OpaqueId: "brian",
+						Type:     userpb.UserType_USER_TYPE_PRIMARY,
+					},
+					DisplayName: "Brian Murphy",
+				},
+			}, nil)
+
+			// Mock public shares (link shares)
+			gatewayClient.On("ListPublicShares", mock.Anything, mock.Anything).Return(&link.ListPublicSharesResponse{
+				Status: status.NewOK(ctx),
+				Share: []*link.PublicShare{
+					{
+						Id:    &link.PublicShareId{OpaqueId: "abcdefghijklmno"},
+						Token: "abcdefghijklmno",
+						ResourceId: &provider.ResourceId{
+							StorageId: "1",
+							SpaceId:   "new-space",
+							OpaqueId:  "new-space",
+						},
+						Permissions: &link.PublicSharePermissions{
+							Permissions: roleconversions.NewViewerRole().CS3ResourcePermissions(),
+						},
+						Ctime: &types.Timestamp{
+							Seconds: uint64(time.Now().Unix()),
+						},
+					},
+				},
+			}, nil)
+
+			// Call the service
+			driveID := &provider.ResourceId{
+				StorageId: "1",
+				SpaceId:   "new-space",
+				OpaqueId:  "new-space",
+			}
+
+			result, err := driveItemPermissionsService.ListSpaceRootPermissions(ctx, driveID)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(result.Value).ToNot(BeNil())
+			Expect(result.Value).To(HaveLen(2)) // 1 user share + 1 public link
+
+			// Verify that public link permissions have createdDateTime, but space permissions don't
+			for _, permission := range result.Value {
+				if strings.HasPrefix(permission.GetId(), "u:") {
+					// Space permissions (from grants) don't have createdDateTime
+					createdDateTime := permission.GetCreatedDateTime()
+					Expect(createdDateTime.IsZero()).To(BeTrue(), "Space permission %s should have zero createdDateTime", permission.GetId())
+				} else {
+					// Public link permissions should have createdDateTime
+					createdDateTime := permission.GetCreatedDateTime()
+					Expect(createdDateTime).ToNot(BeNil(), "Public link permission %s missing createdDateTime", permission.GetId())
+					Expect(createdDateTime.IsZero()).To(BeFalse(), "Public link permission %s has zero createdDateTime", permission.GetId())
+				}
+			}
+		})
+
+		It("reproduces missing GetSpaceRootPermission endpoint", func() {
+			// This test reproduces the issue where the acceptance test tries to get a single permission
+			// from a space root, but there's no endpoint for that
+
+			// Mock space with user permission
+			space := &provider.StorageSpace{
+				Id: &provider.StorageSpaceId{OpaqueId: "new-space"},
+				Root: &provider.ResourceId{
+					StorageId: "1",
+					SpaceId:   "new-space",
+					OpaqueId:  "new-space",
+				},
+				SpaceType: "project",
+				Opaque: &types.Opaque{
+					Map: map[string]*types.OpaqueEntry{
+						"grants": {
+							Value: []byte(`{"brian":{"stat":true,"initiate_file_download":true}}`),
+						},
+					},
+				},
+			}
+
+			// Mock gateway client responses
+			gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&provider.ListStorageSpacesResponse{
+				Status:        status.NewOK(ctx),
+				StorageSpaces: []*provider.StorageSpace{space},
+			}, nil)
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(&provider.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &provider.ResourceInfo{
+					Id: &provider.ResourceId{
+						StorageId: "1",
+						SpaceId:   "new-space",
+						OpaqueId:  "new-space",
+					},
+					Space: &provider.StorageSpace{
+						Id:   space.Id,
+						Root: space.Root,
+					},
+				},
+			}, nil)
+			gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(&userpb.GetUserResponse{
+				Status: status.NewOK(ctx),
+				User: &userpb.User{
+					Id: &userpb.UserId{
+						OpaqueId: "brian",
+						Type:     userpb.UserType_USER_TYPE_PRIMARY,
+					},
+					DisplayName: "Brian Murphy",
+				},
+			}, nil)
+			gatewayClient.On("ListPublicShares", mock.Anything, mock.Anything).Return(&link.ListPublicSharesResponse{
+				Status: status.NewOK(ctx),
+				Share:  []*link.PublicShare{},
+			}, nil)
+
+			// Call the service to get all permissions
+			driveID := &provider.ResourceId{
+				StorageId: "1",
+				SpaceId:   "new-space",
+				OpaqueId:  "new-space",
+			}
+
+			result, err := driveItemPermissionsService.ListSpaceRootPermissions(ctx, driveID)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(result.Value).ToNot(BeNil())
+			Expect(result.Value).To(HaveLen(1)) // 1 user share
+
+			// Verify the permission has the expected format
+			permission := result.Value[0]
+			Expect(permission.GetId()).To(Equal("u:brian"))
+			Expect(permission.GetGrantedToV2().User.GetDisplayName()).To(Equal("Brian Murphy"))
+			Expect(permission.GetGrantedToV2().User.GetId()).To(Equal("brian"))
+			Expect(permission.GetGrantedToV2().User.GetLibreGraphUserType()).To(Equal("Member"))
+		})
 	})
 	Describe("DeletePermission", func() {
 		var (
@@ -958,7 +1132,9 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(statResponse, nil)
 			getPublicShareMockResponse.Share = nil
 			getPublicShareMockResponse.Status = status.NewNotFound(ctx, "not found")
-			gatewayClient.On("GetPublicShare", mock.Anything, mock.Anything).Return(getPublicShareMockResponse, nil)
+			gatewayClient.On("GetPublicShare", mock.Anything, mock.MatchedBy(func(req *link.GetPublicShareRequest) bool {
+				return req.GetRef().GetId().GetOpaqueId() == "permissionid"
+			})).Return(getPublicShareMockResponse, nil)
 
 			gatewayClient.On("GetShare", mock.Anything, mock.MatchedBy(func(req *collaboration.GetShareRequest) bool {
 				return req.GetRef().GetId().GetOpaqueId() == "permissionid"
@@ -1310,6 +1486,73 @@ var _ = Describe("DriveItemPermissionsApi", func() {
 					context.WithValue(context.Background(), chi.RouteCtxKey, rCTX),
 				)
 			httpAPI.ListPermissions(responseRecorder, request)
+
+			Expect(responseRecorder.Code).To(Equal(http.StatusBadRequest))
+		})
+	})
+
+	Describe("GetPermission", func() {
+		It("calls the GetPermission provider with the correct arguments", func() {
+			rCTX.URLParams.Add("itemID", "1$2!3")
+			rCTX.URLParams.Add("permissionID", "perm123")
+			responseRecorder := httptest.NewRecorder()
+
+			mockProvider.On("GetPermission", mock.Anything, mock.Anything, mock.Anything).
+				Return(func(ctx context.Context, itemid *provider.ResourceId, pid string) (libregraph.Permission, error) {
+					Expect(storagespace.FormatResourceID(itemid)).To(Equal("1$2!3"))
+					Expect(pid).To(Equal("perm123"))
+					return libregraph.Permission{}, nil
+				}).Once()
+
+			ctx := context.WithValue(context.Background(), chi.RouteCtxKey, rCTX)
+			request := httptest.NewRequest(http.MethodGet, "/", nil).WithContext(ctx)
+
+			httpAPI.GetPermission(responseRecorder, request)
+
+			Expect(responseRecorder.Code).To(Equal(http.StatusOK))
+		})
+
+		It("returns correct JSON format for user permission according to API specification", func() {
+			rCTX.URLParams.Add("itemID", "1$2!3")
+			rCTX.URLParams.Add("permissionID", "81d5bad3-3eff-410a-a2ea-edad2d1444474")
+			responseRecorder := httptest.NewRecorder()
+
+			expectedPermission := libregraph.Permission{}
+			expectedPermission.SetId("81d5bad3-3eff-410a-a2ea-edad2d1444474")
+			expectedPermission.SetRoles([]string{unifiedrole.UnifiedRoleEditorID})
+			expectedPermission.SetGrantedToV2(libregraph.SharePointIdentitySet{
+				User: &libregraph.Identity{
+					Id:          libregraph.PtrString("4c510ada-c86b-4815-8820-42cdf82c3d51"),
+					DisplayName: "Albert Einstein",
+				},
+			})
+			fixedTime := time.Date(2023, 12, 25, 10, 0, 0, 0, time.UTC)
+			expectedPermission.SetCreatedDateTime(fixedTime)
+
+			mockProvider.On("GetPermission", mock.Anything, mock.Anything, mock.Anything).
+				Return(expectedPermission, nil).Once()
+
+			ctx := context.WithValue(context.Background(), chi.RouteCtxKey, rCTX)
+			request := httptest.NewRequest(http.MethodGet, "/", nil).WithContext(ctx)
+
+			httpAPI.GetPermission(responseRecorder, request)
+
+			Expect(responseRecorder.Code).To(Equal(http.StatusOK))
+
+			// Compare whole structure for readability
+			expectedJSON, _ := json.Marshal(expectedPermission)
+			Expect(responseRecorder.Body.String()).To(MatchJSON(string(expectedJSON)))
+		})
+
+		It("fails with an empty permissionID", func() {
+			rCTX.URLParams.Add("itemID", "1$2!3")
+			rCTX.URLParams.Add("permissionID", "")
+			responseRecorder := httptest.NewRecorder()
+
+			ctx := context.WithValue(context.Background(), chi.RouteCtxKey, rCTX)
+			request := httptest.NewRequest(http.MethodGet, "/", nil).WithContext(ctx)
+
+			httpAPI.GetPermission(responseRecorder, request)
 
 			Expect(responseRecorder.Code).To(Equal(http.StatusBadRequest))
 		})
