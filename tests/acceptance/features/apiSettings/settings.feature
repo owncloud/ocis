@@ -68,6 +68,7 @@ Feature: settings api
 
   @issue-11335
   Scenario: enable auto-sync-shares after disabling it
+    Given user "Alice" has uploaded file with content "lorem epsum" to "textfile.txt"
     And user "Brian" has disabled the auto-sync share
     When user "Brian" enables the auto-sync share using the settings API
     Then the HTTP status code should be "201"
