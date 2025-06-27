@@ -21,6 +21,8 @@ Feature: an user shares resources
       | shareType       | user                          |
       | permissionsRole | Space Editor Without Trashbin |
     And user "Brian" has removed the file "textfile.txt" from space "new-space"
-    When user "Brian" lists all deleted files in the trash bin of the space "new-space"
+    When user "Brian" tries to list all deleted files in the trash bin of the space "new-space"
+    Then the HTTP status code should be "403"
+    When user "Brian" tries to restore the file "textfile.txt" from the trash of the space "new-space" to "/textfile.txt"
     Then the HTTP status code should be "403"
     And as "Alice" file "textfile.txt" should exist in the trashbin of the space "new-space"

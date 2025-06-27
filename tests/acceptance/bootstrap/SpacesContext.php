@@ -3232,6 +3232,7 @@ class SpacesContext implements Context {
 
 	/**
 	 * @When /^user "([^"]*)" lists all deleted files in the trash bin of the space "([^"]*)"$/
+	 * @When /^user "([^"]*)" tries to list all deleted files in the trash bin of the space "([^"]*)"$/
 	 *
 	 * @param  string $user
 	 * @param  string $spaceName
@@ -3315,6 +3316,23 @@ class SpacesContext implements Context {
 	}
 
 	/**
+	 * @param string $user
+	 * @param string $spaceName
+	 * @param string $resource
+	 *
+	 * @return string
+	 * @throws GuzzleException
+	 */
+	public function getTrashbinItemHref(string $user, string $spaceName, string $resource): string {
+		$items = $this->getObjectsInTrashbin($user, $spaceName);
+		foreach ($items as $item) {
+			if ($item["name"] === $resource) {
+				return $item["href"];
+			}
+		}
+	}
+
+	/**
 	 * @Then /^as "([^"]*)" (?:file|folder|entry) "([^"]*)" should (not|)\s?exist in the trashbin of the space "([^"]*)"$/
 	 *
 	 * @param  string $user
@@ -3348,9 +3366,10 @@ class SpacesContext implements Context {
 
 	/**
 	 * @When /^user "([^"]*)" restores the (?:file|folder) "([^"]*)" from the trash of the space "([^"]*)" to "([^"]*)"$/
+	 * @When /^user "([^"]*)" tries to restore the (?:file|folder) "([^"]*)" from the trash of the space "([^"]*)" to "([^"]*)"$/
 	 *
 	 * @param string $user
-	 * @param string $object
+	 * @param string $trashResource
 	 * @param string $spaceName
 	 * @param string $destination
 	 *
@@ -3360,33 +3379,22 @@ class SpacesContext implements Context {
 	 */
 	public function userRestoresSpaceObjectsFromTrashRequest(
 		string $user,
-		string $object,
+		string $trashResource,
 		string $spaceName,
 		string $destination,
 	): void {
+		$destination = \ltrim($destination, "/");
 		$space = $this->getSpaceByName($user, $spaceName);
-
-		// find object in trash
-		$objectsInTrash = $this->getObjectsInTrashbin($user, $spaceName);
-		$pathToDeletedObject = "";
-		foreach ($objectsInTrash as $objectInTrash) {
-			if ($objectInTrash["name"] === $object) {
-				$pathToDeletedObject = $objectInTrash["href"];
-			}
-		}
-
-		if ($pathToDeletedObject === "") {
-			throw new Exception(
-				__METHOD__ . " Object '$object' was not found in the trashbin of space '$spaceName' by user '$user'",
-			);
-		}
+		$spaceId = $space["id"];
+		$spaceOwner = $space["spaceCreator"];
+		$itemHref = $this->getTrashbinItemHref($spaceOwner, $spaceName, $trashResource);
 
 		$baseUrl = $this->featureContext->getBaseUrl();
-		$davPath = WebDavHelper::getDavPath(WebDavHelper::DAV_VERSION_SPACES, $space["id"]);
+		$davPath = WebDavHelper::getDavPath(WebDavHelper::DAV_VERSION_SPACES, $spaceId);
 		$destination = "$baseUrl/$davPath/$destination";
 		$header = ["Destination" => $destination, "Overwrite" => "F"];
 
-		$fullUrl = $baseUrl . $pathToDeletedObject;
+		$fullUrl = $baseUrl . $itemHref;
 		$this->featureContext->setResponse(
 			HttpRequestHelper::sendRequest(
 				$fullUrl,
