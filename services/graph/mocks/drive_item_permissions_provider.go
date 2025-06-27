@@ -704,6 +704,35 @@ func (_c *DriveItemPermissionsProvider_UpdateSpaceRootPermission_Call) RunAndRet
 	return _c
 }
 
+// GetPermission provides a mock function with given fields: ctx, itemID, permissionID
+func (_m *DriveItemPermissionsProvider) GetPermission(ctx context.Context, itemID *providerv1beta1.ResourceId, permissionID string) (libregraph.Permission, error) {
+	ret := _m.Called(ctx, itemID, permissionID)
+
+	// If no expectations were set return zero values
+	if len(ret) == 0 {
+		return libregraph.Permission{}, nil
+	}
+
+	var r0 libregraph.Permission
+	var r1 error
+
+	if rf, ok := ret.Get(0).(func(context.Context, *providerv1beta1.ResourceId, string) (libregraph.Permission, error)); ok {
+		return rf(ctx, itemID, permissionID)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, *providerv1beta1.ResourceId, string) libregraph.Permission); ok {
+		r0 = rf(ctx, itemID, permissionID)
+	} else if ret.Get(0) != nil {
+		r0 = ret.Get(0).(libregraph.Permission)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, *providerv1beta1.ResourceId, string) error); ok {
+		r1 = rf(ctx, itemID, permissionID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
 // NewDriveItemPermissionsProvider creates a new instance of DriveItemPermissionsProvider. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
 // The first argument is typically a *testing.T value.
 func NewDriveItemPermissionsProvider(t interface {

@@ -259,6 +259,7 @@ func NewService(opts ...Option) (Graph, error) { //nolint:maintidx
 						r.Route("/permissions", func(r chi.Router) {
 							r.Get("/", driveItemPermissionsApi.ListPermissions)
 							r.Route("/{permissionID}", func(r chi.Router) {
+								r.Get("/", driveItemPermissionsApi.GetPermission)
 								r.Delete("/", driveItemPermissionsApi.DeletePermission)
 								r.Patch("/", driveItemPermissionsApi.UpdatePermission)
 								r.Post("/setPassword", driveItemPermissionsApi.SetLinkPassword)

@@ -518,6 +518,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			Expect(permissions.Value[0].GetLibreGraphPermissionsActions()[0]).To(Equal("none"))
 		})
 	})
+
 	Describe("ListSpaceRootPermissions", func() {
 		var (
 			driveId *provider.ResourceId
@@ -562,7 +563,311 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			Expect(len(permissions.LibreGraphPermissionsActionsAllowedValues)).ToNot(BeZero())
 		})
 
+		It("includes createdDateTime in space root permissions", func() {
+			// Mock space with grants
+			space := &provider.StorageSpace{
+				Id: &provider.StorageSpaceId{OpaqueId: "space1"},
+				Root: &provider.ResourceId{
+					StorageId: "1",
+					SpaceId:   "space1",
+					OpaqueId:  "space1",
+				},
+				SpaceType: "project",
+				Opaque: &types.Opaque{
+					Map: map[string]*types.OpaqueEntry{
+						"grants": {
+							Value: []byte(`{"user1":{"stat":true,"initiate_file_download":true}}`),
+						},
+					},
+				},
+			}
+
+			// Mock gateway client responses
+			gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&provider.ListStorageSpacesResponse{
+				Status:        status.NewOK(ctx),
+				StorageSpaces: []*provider.StorageSpace{space},
+			}, nil)
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(&provider.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &provider.ResourceInfo{
+					Id: &provider.ResourceId{
+						StorageId: "1",
+						SpaceId:   "space1",
+						OpaqueId:  "space1",
+					},
+					Space: &provider.StorageSpace{
+						Id:   space.Id,
+						Root: space.Root,
+					},
+				},
+			}, nil)
+			gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(&userpb.GetUserResponse{
+				Status: status.NewOK(ctx),
+				User: &userpb.User{
+					Id:          &userpb.UserId{OpaqueId: "user1"},
+					DisplayName: "Test User",
+				},
+			}, nil)
+			gatewayClient.On("ListPublicShares", mock.Anything, mock.Anything).Return(&link.ListPublicSharesResponse{
+				Status: status.NewOK(ctx),
+				Share:  []*link.PublicShare{},
+			}, nil)
+
+			// Call the service
+			driveID := &provider.ResourceId{
+				StorageId: "1",
+				SpaceId:   "space1",
+				OpaqueId:  "space1",
+			}
+
+			result, err := driveItemPermissionsService.ListSpaceRootPermissions(ctx, driveID)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(result.Value).ToNot(BeNil())
+			Expect(result.Value).To(HaveLen(1))
+
+			// Verify that the permission has createdDateTime
+			permission := result.Value[0]
+			createdDateTime := permission.GetCreatedDateTime()
+			Expect(createdDateTime).ToNot(BeNil())
+			Expect(createdDateTime.IsZero()).To(BeFalse())
+		})
+
+		It("reproduces missing createdDateTime in space root permissions with user shares and public links", func() {
+			// Mock space with grants (user shares)
+			space := &provider.StorageSpace{
+				Id: &provider.StorageSpaceId{OpaqueId: "new-space"},
+				Root: &provider.ResourceId{
+					StorageId: "1",
+					SpaceId:   "new-space",
+					OpaqueId:  "new-space",
+				},
+				SpaceType: "project",
+				Opaque: &types.Opaque{
+					Map: map[string]*types.OpaqueEntry{
+						"grants": {
+							Value: []byte(`{"brian":{"stat":true,"initiate_file_download":true}}`),
+						},
+					},
+				},
+			}
+
+			// Mock gateway client responses
+			gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&provider.ListStorageSpacesResponse{
+				Status:        status.NewOK(ctx),
+				StorageSpaces: []*provider.StorageSpace{space},
+			}, nil)
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(&provider.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &provider.ResourceInfo{
+					Id: &provider.ResourceId{
+						StorageId: "1",
+						SpaceId:   "new-space",
+						OpaqueId:  "new-space",
+					},
+					Space: &provider.StorageSpace{
+						Id:   space.Id,
+						Root: space.Root,
+					},
+				},
+			}, nil)
+			gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(&userpb.GetUserResponse{
+				Status: status.NewOK(ctx),
+				User: &userpb.User{
+					Id:          &userpb.UserId{OpaqueId: "brian"},
+					DisplayName: "Brian Murphy",
+				},
+			}, nil)
+
+			// Mock public shares (link shares)
+			gatewayClient.On("ListPublicShares", mock.Anything, mock.Anything).Return(&link.ListPublicSharesResponse{
+				Status: status.NewOK(ctx),
+				Share: []*link.PublicShare{
+					{
+						Id:    &link.PublicShareId{OpaqueId: "abcdefghijklmno"},
+						Token: "abcdefghijklmno",
+						ResourceId: &provider.ResourceId{
+							StorageId: "1",
+							SpaceId:   "new-space",
+							OpaqueId:  "new-space",
+						},
+						Permissions: &link.PublicSharePermissions{
+							Permissions: roleconversions.NewViewerRole().CS3ResourcePermissions(),
+						},
+						Ctime: &types.Timestamp{
+							Seconds: uint64(time.Now().Unix()),
+						},
+					},
+				},
+			}, nil)
+
+			// Call the service
+			driveID := &provider.ResourceId{
+				StorageId: "1",
+				SpaceId:   "new-space",
+				OpaqueId:  "new-space",
+			}
+
+			result, err := driveItemPermissionsService.ListSpaceRootPermissions(ctx, driveID)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(result.Value).ToNot(BeNil())
+			Expect(result.Value).To(HaveLen(2)) // 1 user share + 1 public link
+
+			// Verify that ALL permissions have createdDateTime
+			for _, permission := range result.Value {
+				createdDateTime := permission.GetCreatedDateTime()
+				Expect(createdDateTime).ToNot(BeNil(), "Permission %s missing createdDateTime", permission.GetId())
+				Expect(createdDateTime.IsZero()).To(BeFalse(), "Permission %s has zero createdDateTime", permission.GetId())
+			}
+		})
+
 	})
+
+	Describe("GetPermission", func() {
+		var itemID *provider.ResourceId
+
+		BeforeEach(func() {
+			itemID = &provider.ResourceId{
+				StorageId: "1",
+				SpaceId:   "2",
+				OpaqueId:  "3",
+			}
+			statResponse.Info = &provider.ResourceInfo{
+				Id:            itemID,
+				Type:          provider.ResourceType_RESOURCE_TYPE_FILE,
+				PermissionSet: roleconversions.NewViewerRole().CS3ResourcePermissions(),
+			}
+		})
+
+		It("returns item not found for files that are not shared", func() {
+			// mocks – no shares/public links
+			listSharesResponse := &collaboration.ListSharesResponse{Status: status.NewOK(ctx), Shares: []*collaboration.Share{}}
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(statResponse, nil)
+			gatewayClient.On("ListShares", mock.Anything, mock.Anything).Return(listSharesResponse, nil)
+			gatewayClient.On("ListPublicShares", mock.Anything, mock.Anything).Return(listPublicSharesResponse, nil)
+
+			_, err := driveItemPermissionsService.GetPermission(context.Background(), itemID, "nonexistent")
+			Expect(err).To(MatchError(errorcode.New(errorcode.ItemNotFound, "permission not found")))
+		})
+		It("returns one permission per share", func() {
+			// create a user share on the item
+			listSharesResponse := &collaboration.ListSharesResponse{
+				Status: status.NewOK(ctx),
+				Shares: []*collaboration.Share{
+					{
+						Id: &collaboration.ShareId{OpaqueId: "1"},
+						Permissions: &collaboration.SharePermissions{
+							Permissions: roleconversions.NewViewerRole().CS3ResourcePermissions(),
+						},
+						ResourceId: itemID,
+						Grantee: &provider.Grantee{
+							Type: provider.GranteeType_GRANTEE_TYPE_USER,
+							Id:   &provider.Grantee_UserId{UserId: &userpb.UserId{OpaqueId: "user-id"}},
+						},
+					},
+					{
+						Id: &collaboration.ShareId{OpaqueId: "2"},
+						Permissions: &collaboration.SharePermissions{
+							Permissions: roleconversions.NewViewerRole().CS3ResourcePermissions(),
+						},
+						ResourceId: itemID,
+						Grantee: &provider.Grantee{
+							Type: provider.GranteeType_GRANTEE_TYPE_USER,
+							Id:   &provider.Grantee_UserId{UserId: &userpb.UserId{OpaqueId: "user-id"}},
+						},
+					},
+				},
+			}
+
+			// create a public share on same item to verify isolation
+			listPublicSharesResponse.Share = []*link.PublicShare{
+				{
+					Id:          &link.PublicShareId{OpaqueId: "public-id"},
+					Token:       "token",
+					ResourceId:  itemID,
+					Permissions: &link.PublicSharePermissions{Permissions: roleconversions.NewViewerRole().CS3ResourcePermissions()},
+				},
+			}
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(statResponse, nil)
+			gatewayClient.On("ListShares", mock.Anything, mock.Anything).Return(listSharesResponse, nil)
+			gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(getUserResponse, nil)
+			gatewayClient.On("ListPublicShares", mock.Anything, mock.Anything).Return(listPublicSharesResponse, nil)
+
+			permission, err := driveItemPermissionsService.GetPermission(context.Background(), itemID, "1")
+			Expect(err).ToNot(HaveOccurred())
+			Expect(permission.GetId()).To(Equal("1"))
+		})
+		It("returns role denied", func() {
+			// Denied share setup
+			cfg.UnifiedRoles.AvailableRoles = []string{unifiedrole.UnifiedRoleViewerID, unifiedrole.UnifiedRoleDeniedID, unifiedrole.UnifiedRoleManagerID}
+
+			listSharesResponse := &collaboration.ListSharesResponse{
+				Status: status.NewOK(ctx),
+				Shares: []*collaboration.Share{
+					{
+						Id: &collaboration.ShareId{OpaqueId: "deny"},
+						Permissions: &collaboration.SharePermissions{
+							Permissions: roleconversions.NewDeniedRole().CS3ResourcePermissions(),
+						},
+						ResourceId: itemID,
+						Grantee: &provider.Grantee{
+							Type: provider.GranteeType_GRANTEE_TYPE_USER,
+							Id:   &provider.Grantee_UserId{UserId: &userpb.UserId{OpaqueId: "user-id"}},
+						},
+					},
+				},
+			}
+
+			// No public links
+			listPublicSharesResponse.Share = []*link.PublicShare{}
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(statResponse, nil)
+			gatewayClient.On("ListShares", mock.Anything, mock.Anything).Return(listSharesResponse, nil)
+			gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(getUserResponse, nil)
+			gatewayClient.On("ListPublicShares", mock.Anything, mock.Anything).Return(listPublicSharesResponse, nil)
+
+			permission, err := driveItemPermissionsService.GetPermission(context.Background(), itemID, "deny")
+			Expect(err).ToNot(HaveOccurred())
+			Expect(permission.GetRoles()).To(ContainElement(unifiedrole.UnifiedRoleDeniedID))
+		})
+		It("returns access denied when no role and no actions are set (full denial)", func() {
+			statResponse.Info.PermissionSet = roleconversions.NewManagerRole().CS3ResourcePermissions()
+			listSharesResponse := &collaboration.ListSharesResponse{
+				Status: status.NewOK(ctx),
+				Shares: []*collaboration.Share{
+					{
+						Id: &collaboration.ShareId{OpaqueId: "1"},
+						Permissions: &collaboration.SharePermissions{
+							Permissions: roleconversions.NewDeniedRole().CS3ResourcePermissions(),
+						},
+						ResourceId: itemID,
+						Grantee: &provider.Grantee{
+							Type: provider.GranteeType_GRANTEE_TYPE_USER,
+							Id: &provider.Grantee_UserId{
+								UserId: &userpb.UserId{
+									OpaqueId: "user-id",
+								},
+							},
+						},
+					},
+				},
+			}
+			listPublicSharesResponse.Share = []*link.PublicShare{}
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(statResponse, nil)
+			gatewayClient.On("ListShares", mock.Anything, mock.Anything).Return(listSharesResponse, nil)
+			gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(getUserResponse, nil)
+			gatewayClient.On("ListPublicShares", mock.Anything, mock.Anything).Return(listPublicSharesResponse, nil)
+			permissions, err := driveItemPermissionsService.ListPermissions(context.Background(), itemID, false, false)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(len(permissions.LibreGraphPermissionsActionsAllowedValues)).ToNot(BeZero())
+			Expect(len(permissions.LibreGraphPermissionsRolesAllowedValues)).ToNot(BeZero())
+			Expect(len(permissions.Value)).To(Equal(1))
+			Expect(permissions.Value[0].GetRoles()).To(HaveLen(0))
+			Expect(permissions.Value[0].GetLibreGraphPermissionsActions()).To(ContainElement("none"))
+		})
+	})
+
 	Describe("DeletePermission", func() {
 		var (
 			getShareResponse       collaboration.GetShareResponse
@@ -958,7 +1263,9 @@ var _ = Describe("DriveItemPermissionsService", func() {
 			gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(statResponse, nil)
 			getPublicShareMockResponse.Share = nil
 			getPublicShareMockResponse.Status = status.NewNotFound(ctx, "not found")
-			gatewayClient.On("GetPublicShare", mock.Anything, mock.Anything).Return(getPublicShareMockResponse, nil)
+			gatewayClient.On("GetPublicShare", mock.Anything, mock.MatchedBy(func(req *link.GetPublicShareRequest) bool {
+				return req.GetRef().GetId().GetOpaqueId() == "permissionid"
+			})).Return(getPublicShareMockResponse, nil)
 
 			gatewayClient.On("GetShare", mock.Anything, mock.MatchedBy(func(req *collaboration.GetShareRequest) bool {
 				return req.GetRef().GetId().GetOpaqueId() == "permissionid"
@@ -1310,6 +1617,73 @@ var _ = Describe("DriveItemPermissionsApi", func() {
 					context.WithValue(context.Background(), chi.RouteCtxKey, rCTX),
 				)
 			httpAPI.ListPermissions(responseRecorder, request)
+
+			Expect(responseRecorder.Code).To(Equal(http.StatusBadRequest))
+		})
+	})
+
+	Describe("GetPermission", func() {
+		It("calls the GetPermission provider with the correct arguments", func() {
+			rCTX.URLParams.Add("itemID", "1$2!3")
+			rCTX.URLParams.Add("permissionID", "perm123")
+			responseRecorder := httptest.NewRecorder()
+
+			mockProvider.On("GetPermission", mock.Anything, mock.Anything, mock.Anything).
+				Return(func(ctx context.Context, itemid *provider.ResourceId, pid string) (libregraph.Permission, error) {
+					Expect(storagespace.FormatResourceID(itemid)).To(Equal("1$2!3"))
+					Expect(pid).To(Equal("perm123"))
+					return libregraph.Permission{}, nil
+				}).Once()
+
+			ctx := context.WithValue(context.Background(), chi.RouteCtxKey, rCTX)
+			request := httptest.NewRequest(http.MethodGet, "/", nil).WithContext(ctx)
+
+			httpAPI.GetPermission(responseRecorder, request)
+
+			Expect(responseRecorder.Code).To(Equal(http.StatusOK))
+		})
+
+		It("returns correct JSON format for user permission according to API specification", func() {
+			rCTX.URLParams.Add("itemID", "1$2!3")
+			rCTX.URLParams.Add("permissionID", "81d5bad3-3eff-410a-a2ea-edad2d1444474")
+			responseRecorder := httptest.NewRecorder()
+
+			expectedPermission := libregraph.Permission{}
+			expectedPermission.SetId("81d5bad3-3eff-410a-a2ea-edad2d1444474")
+			expectedPermission.SetRoles([]string{unifiedrole.UnifiedRoleEditorID})
+			expectedPermission.SetGrantedToV2(libregraph.SharePointIdentitySet{
+				User: &libregraph.Identity{
+					Id:          libregraph.PtrString("4c510ada-c86b-4815-8820-42cdf82c3d51"),
+					DisplayName: "Albert Einstein",
+				},
+			})
+			fixedTime := time.Date(2023, 12, 25, 10, 0, 0, 0, time.UTC)
+			expectedPermission.SetCreatedDateTime(fixedTime)
+
+			mockProvider.On("GetPermission", mock.Anything, mock.Anything, mock.Anything).
+				Return(expectedPermission, nil).Once()
+
+			ctx := context.WithValue(context.Background(), chi.RouteCtxKey, rCTX)
+			request := httptest.NewRequest(http.MethodGet, "/", nil).WithContext(ctx)
+
+			httpAPI.GetPermission(responseRecorder, request)
+
+			Expect(responseRecorder.Code).To(Equal(http.StatusOK))
+
+			// Compare whole structure for readability
+			expectedJSON, _ := json.Marshal(expectedPermission)
+			Expect(responseRecorder.Body.String()).To(MatchJSON(string(expectedJSON)))
+		})
+
+		It("fails with an empty permissionID", func() {
+			rCTX.URLParams.Add("itemID", "1$2!3")
+			rCTX.URLParams.Add("permissionID", "")
+			responseRecorder := httptest.NewRecorder()
+
+			ctx := context.WithValue(context.Background(), chi.RouteCtxKey, rCTX)
+			request := httptest.NewRequest(http.MethodGet, "/", nil).WithContext(ctx)
+
+			httpAPI.GetPermission(responseRecorder, request)
 
 			Expect(responseRecorder.Code).To(Equal(http.StatusBadRequest))
 		})
