@@ -24,6 +24,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config"
 	"github.com/stretchr/testify/mock"
 	"github.com/tidwall/gjson"
+	"go-micro.dev/v4/client"
 	"go.opentelemetry.io/otel"
 	"google.golang.org/grpc"
 
@@ -35,6 +36,7 @@ import (
 	cs3mocks "github.com/owncloud/reva/v2/tests/cs3mocks/mocks"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	settings "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/graph/mocks"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config/defaults"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
@@ -1101,17 +1103,30 @@ var _ = Describe("DriveItemPermissionsService", func() {
 
 var _ = Describe("DriveItemPermissionsApi", func() {
 	var (
-		mockProvider *mocks.DriveItemPermissionsProvider
-		httpAPI      svc.DriveItemPermissionsApi
-		rCTX         *chi.Context
-		invite       libregraph.DriveItemInvite
+		mockProvider     *mocks.DriveItemPermissionsProvider
+		mockValueService *settings.MockValueService
+		httpAPI          svc.DriveItemPermissionsApi
+		rCTX             *chi.Context
+		invite           libregraph.DriveItemInvite
+		currentUser      = &userpb.User{
+			Id: &userpb.UserId{
+				OpaqueId: "testuser",
+			},
+			DisplayName: "Test User",
+		}
 	)
 
 	BeforeEach(func() {
 		logger := log.NewLogger()
 
 		mockProvider = mocks.NewDriveItemPermissionsProvider(GinkgoT())
-		api, err := svc.NewDriveItemPermissionsApi(mockProvider, logger, defaults.FullDefaultConfig())
+		mockValueService = &settings.MockValueService{
+			GetValueByUniqueIdentifiersFunc: func(ctx context.Context, req *settings.GetValueByUniqueIdentifiersRequest, opts ...client.CallOption) (*settings.GetValueResponse, error) {
+				return &settings.GetValueResponse{}, nil
+			},
+		}
+
+		api, err := svc.NewDriveItemPermissionsApi(mockProvider, logger, defaults.FullDefaultConfig(), mockValueService)
 		Expect(err).ToNot(HaveOccurred())
 
 		httpAPI = api
@@ -1274,9 +1289,12 @@ var _ = Describe("DriveItemPermissionsApi", func() {
 					return libregraph.CollectionOfPermissionsWithAllowedValues{}, nil
 				}).Once()
 
+			ctx := revactx.ContextSetUser(context.Background(), currentUser)
+			ctx = context.WithValue(ctx, chi.RouteCtxKey, rCTX)
+
 			request := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(inviteJson)).
 				WithContext(
-					context.WithValue(context.Background(), chi.RouteCtxKey, rCTX),
+					ctx,
 				)
 			httpAPI.ListPermissions(responseRecorder, request)
 
