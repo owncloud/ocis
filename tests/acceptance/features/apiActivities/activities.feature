@@ -6,7 +6,7 @@ Feature: check activities
   Background:
     Given user "Alice" has been created with default attributes
 
-  @issue-9712
+
   Scenario: check activities after uploading a file and a folder
     Given user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile.txt"
     And user "Alice" has created folder "/FOLDER"
@@ -27,16 +27,13 @@ Feature: check activities
               "required": ["id","template","times"],
               "properties": {
                 "id": {
-                  "type": "string",
                   "pattern": "^%user_id_pattern%$"
                 },
                 "template": {
                   "type": "object",
                   "required": ["message","variables"],
                   "properties": {
-                    "message": {
-                      "const": "{user} added {resource} to {folder}"
-                    },
+                    "message": { "const": "{user} added {resource} to {folder}" },
                     "variables": {
                       "type": "object",
                       "required": ["folder", "resource", "user"],
@@ -45,35 +42,23 @@ Feature: check activities
                           "type": "object",
                           "required": ["name"],
                           "properties": {
-                            "name": {
-                              "const": "Alice Hansen"
-                            }
+                            "name": { "const": "Alice Hansen" }
                           }
                         },
                         "resource": {
                           "type": "object",
                           "required": ["id","name"],
                           "properties": {
-                            "id": {
-                              "type": "string",
-                              "pattern": "%file_id_pattern%"
-                            },
-                            "name": {
-                              "const": "textfile.txt"
-                            }
+                            "id": { "pattern": "%file_id_pattern%" },
+                            "name": { "const": "textfile.txt" }
                           }
                         },
                         "user": {
                           "type": "object",
                           "required": ["id","displayName"],
                           "properties": {
-                            "id": {
-                              "type": "string",
-                              "pattern": "%user_id_pattern%"
-                            },
-                            "displayName": {
-                              "const": "Alice Hansen"
-                            }
+                            "id": { "pattern": "%user_id_pattern%" },
+                            "displayName": { "const": "Alice Hansen" }
                           }
                         }
                       }
@@ -109,17 +94,12 @@ Feature: check activities
               "type": "object",
               "required": ["id","template","times"],
               "properties": {
-                "id": {
-                  "type": "string",
-                  "pattern": "^%user_id_pattern%$"
-                },
+                "id": { "pattern": "^%user_id_pattern%$" },
                 "template": {
                   "type": "object",
                   "required": ["message","variables"],
                   "properties": {
-                    "message": {
-                      "const": "{user} added {resource} to {folder}"
-                    },
+                    "message": { "const": "{user} added {resource} to {folder}" },
                     "variables": {
                       "type": "object",
                       "required": ["folder","resource","user"],
@@ -127,36 +107,22 @@ Feature: check activities
                         "folder": {
                           "type": "object",
                           "required": ["name"],
-                          "properties": {
-                            "name": {
-                              "const": "Alice Hansen"
-                            }
-                          }
+                          "properties": { "name": { "const": "Alice Hansen" } }
                         },
                         "resource": {
                           "type": "object",
                           "required": ["id","name"],
                           "properties": {
-                            "id": {
-                              "type": "string",
-                              "pattern": "%file_id_pattern%"
-                            },
-                            "name": {
-                              "const": "FOLDER"
-                            }
+                            "id": { "pattern": "%file_id_pattern%" },
+                            "name": { "const": "FOLDER" }
                           }
                         },
                         "user": {
                           "type": "object",
                           "required": ["id","displayName"],
                           "properties": {
-                            "id": {
-                              "type": "string",
-                              "pattern": "%user_id_pattern%"
-                            },
-                            "displayName": {
-                              "const": "Alice Hansen"
-                            }
+                            "id": { "pattern": "%user_id_pattern%" },
+                            "displayName": { "const": "Alice Hansen" }
                           }
                         }
                       }
@@ -204,9 +170,7 @@ Feature: check activities
                       "type": "object",
                       "required": ["message", "variables"],
                       "properties": {
-                        "message": {
-                          "const": "{user} added {resource} to {folder}"
-                        }
+                        "message": { "const": "{user} added {resource} to {folder}" }
                       }
                     }
                   }
@@ -219,9 +183,7 @@ Feature: check activities
                       "type": "object",
                       "required": ["message", "variables"],
                       "properties": {
-                        "message": {
-                          "const": "{user} updated {resource} in {folder}"
-                        },
+                        "message": { "const": "{user} updated {resource} in {folder}" },
                         "variables": {
                           "type": "object",
                           "required": ["folder", "resource", "user"],
@@ -230,39 +192,24 @@ Feature: check activities
                               "type": "object",
                               "required": ["name"],
                               "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "%user_id_pattern%"
-                                },
-                                "name": {
-                                  "const": "Alice Hansen"
-                                }
+                                "id": { "pattern": "%user_id_pattern%" },
+                                "name": { "const": "Alice Hansen" }
                               }
                             },
                             "resource": {
                               "type": "object",
                               "required": ["id", "name"],
                               "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "%file_id_pattern%"
-                                },
-                                "name": {
-                                  "const": "textfile.txt"
-                                }
+                                "id": { "pattern": "%file_id_pattern%" },
+                                "name": { "const": "textfile.txt" }
                               }
                             },
                             "user": {
                               "type": "object",
                               "required": ["id","displayName"],
                               "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "%user_id_pattern%"
-                                },
-                                "displayName": {
-                                  "const": "Alice Hansen"
-                                }
+                                "id": { "pattern": "%user_id_pattern%" },
+                                "displayName": { "const": "Alice Hansen" }
                               }
                             }
                           }
@@ -311,9 +258,7 @@ Feature: check activities
                       "type": "object",
                       "required": ["message","variables"],
                       "properties": {
-                        "message": {
-                          "const": "{user} added {resource} to {folder}"
-                        },
+                        "message": { "const": "{user} added {resource} to {folder}" },
                         "variables": {
                           "type": "object",
                           "required": ["resource", "folder", "user"],
@@ -322,9 +267,8 @@ Feature: check activities
                               "type": "object",
                               "required": ["id", "name"],
                               "properties": {
-                                "name": {
-                                  "const": "textfile.txt"
-                                }
+                                "id": { "const": ""},
+                                "name": { "const": "textfile.txt" }
                               }
                             }
                           }
@@ -341,9 +285,7 @@ Feature: check activities
                       "type": "object",
                       "required": ["message","variables"],
                       "properties": {
-                        "message": {
-                          "const": "{user} added {resource} to {folder}"
-                        },
+                        "message": { "const": "{user} added {resource} to {folder}" },
                         "variables": {
                           "type": "object",
                           "required": ["resource", "folder", "user"],
@@ -352,9 +294,8 @@ Feature: check activities
                               "type": "object",
                               "required": ["id", "name"],
                               "properties": {
-                                "name": {
-                                  "const": "FOLDER"
-                                }
+                                "id": { "const": ""},
+                                "name": { "const": "FOLDER" }
                               }
                             }
                           }
@@ -367,17 +308,12 @@ Feature: check activities
                   "type": "object",
                   "required": ["id","template","times"],
                   "properties": {
-                    "id": {
-                      "type": "string",
-                      "pattern": "^%user_id_pattern%$"
-                    },
+                    "id": { "pattern": "^%user_id_pattern%$" },
                     "template": {
                       "type": "object",
                       "required": ["message","variables"],
                       "properties": {
-                        "message": {
-                          "const": "{user} deleted {resource} from {folder}"
-                        },
+                        "message": { "const": "{user} deleted {resource} from {folder}" },
                         "variables": {
                           "type": "object",
                           "required": ["resource","folder","user"],
@@ -386,35 +322,23 @@ Feature: check activities
                               "type": "object",
                               "required": ["id","name"],
                               "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "%file_id_pattern%"
-                                },
-                                "name": {
-                                  "const": "textfile.txt"
-                                }
+                                "id": { "pattern": "%file_id_pattern%" },
+                                "name": { "const": "textfile.txt" }
                               }
                             },
                             "folder": {
                               "type": "object",
                               "required": ["name"],
                               "properties": {
-                                "name": {
-                                  "const": "Alice Hansen"
-                                }
+                                "name": { "const": "Alice Hansen" }
                               }
                             },
                             "user": {
                               "type": "object",
                               "required": ["id","displayName"],
                               "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "%user_id_pattern%"
-                                },
-                                "displayName": {
-                                  "const": "Alice Hansen"
-                                }
+                                "id": { "pattern": "%user_id_pattern%" },
+                                "displayName": { "const": "Alice Hansen" }
                               }
                             }
                           }
@@ -434,17 +358,12 @@ Feature: check activities
                   "type": "object",
                   "required": ["id","template","times"],
                   "properties": {
-                    "id": {
-                      "type": "string",
-                      "pattern": "^%user_id_pattern%$"
-                    },
+                    "id": { "pattern": "^%user_id_pattern%$" },
                     "template": {
                       "type": "object",
                       "required": ["message","variables"],
                       "properties": {
-                        "message": {
-                          "const": "{user} deleted {resource} from {folder}"
-                        },
+                        "message": { "const": "{user} deleted {resource} from {folder}" },
                         "variables": {
                           "type": "object",
                           "required": ["resource","folder","user"],
@@ -453,35 +372,23 @@ Feature: check activities
                               "type": "object",
                               "required": ["id","name"],
                               "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "%file_id_pattern%"
-                                },
-                                "name": {
-                                  "const": "FOLDER"
-                                }
+                                "id": { "pattern": "%file_id_pattern%" },
+                                "name": { "const": "FOLDER" }
                               }
                             },
                             "folder": {
                               "type": "object",
                               "required": ["name"],
                               "properties": {
-                                "name": {
-                                  "const": "Alice Hansen"
-                                }
+                                "name": { "const": "Alice Hansen" }
                               }
                             },
                             "user": {
                               "type": "object",
                               "required": ["id","displayName"],
                               "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "%user_id_pattern%"
-                                },
-                                "displayName": {
-                                  "const": "Alice Hansen"
-                                }
+                                "id": { "pattern": "%user_id_pattern%" },
+                                "displayName": { "const": "Alice Hansen" }
                               }
                             }
                           }
@@ -532,9 +439,7 @@ Feature: check activities
                       "type": "object",
                       "required": ["message","variables"],
                       "properties": {
-                        "message": {
-                          "const": "{user} added {resource} to {folder}"
-                        },
+                        "message": { "const": "{user} added {resource} to {folder}" },
                         "variables": {
                           "type": "object",
                           "required": ["folder", "resource", "user"],
@@ -543,31 +448,23 @@ Feature: check activities
                               "type": "object",
                               "required": ["name"],
                               "properties": {
-                                "name": {
-                                  "const": "Alice Hansen"
-                                }
+                                "name": { "const": "Alice Hansen" }
                               }
                             },
                             "resource": {
                               "type": "object",
                               "required": ["id","name"],
                               "properties": {
-                                "name": {
-                                  "const": "FOLDER"
-                                }
+                                "id": { "const": ""},
+                                "name": { "const": "FOLDER" }
                               }
                             },
                             "user": {
                               "type": "object",
                               "required": ["id","displayName"],
                               "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "%user_id_pattern%"
-                                },
-                                "displayName": {
-                                  "const": "Alice Hansen"
-                                }
+                                "id": { "pattern": "%user_id_pattern%" },
+                                "displayName": { "const": "Alice Hansen" }
                               }
                             }
                           }
@@ -581,16 +478,13 @@ Feature: check activities
                   "required": ["id","template","times"],
                   "properties": {
                     "id": {
-                      "type": "string",
                       "pattern": "^%user_id_pattern%$"
                     },
                     "template": {
                       "type": "object",
                       "required": ["message","variables"],
                       "properties": {
-                        "message": {
-                          "const": "{user} moved {resource} to {folder}"
-                        },
+                        "message": { "const": "{user} moved {resource} to {folder}" },
                         "variables": {
                           "type": "object",
                           "required": ["folder", "resource", "user"],
@@ -599,9 +493,7 @@ Feature: check activities
                               "type": "object",
                               "required": ["name"],
                               "properties": {
-                                "name": {
-                                  "const": "New Folder"
-                                }
+                                "name": { "const": "New Folder" }
                               }
                             },
                             "resource": {
@@ -609,25 +501,17 @@ Feature: check activities
                               "required": ["id","name"],
                               "properties": {
                                 "id": {
-                                  "type": "string",
                                   "pattern": "^%file_id_pattern%$"
                                 },
-                                "name": {
-                                  "const": "FOLDER"
-                                }
+                                "name": { "const": "FOLDER" }
                               }
                             },
                             "user": {
                               "type": "object",
                               "required": ["id","displayName"],
                               "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "%user_id_pattern%"
-                                },
-                                "displayName": {
-                                  "const": "Alice Hansen"
-                                }
+                                "id": { "pattern": "%user_id_pattern%" },
+                                "displayName": { "const": "Alice Hansen" }
                               }
                             }
                           }
@@ -650,7 +534,7 @@ Feature: check activities
       }
       """
 
-
+  @issue-9712
   Scenario: check activities of destination file and folder after moving a file into it
     Given user "Alice" has uploaded file with content "ownCloud test text file" to "textfile.txt"
     And user "Alice" has created folder "/FOLDER"
@@ -678,9 +562,7 @@ Feature: check activities
                       "type": "object",
                       "required": ["message","variables"],
                       "properties": {
-                        "message": {
-                          "const": "{user} added {resource} to {folder}"
-                        },
+                        "message": { "const": "{user} added {resource} to {folder}" },
                         "variables": {
                           "type": "object",
                           "required": ["folder", "resource", "user"],
@@ -689,31 +571,23 @@ Feature: check activities
                               "type": "object",
                               "required": ["name"],
                               "properties": {
-                                "name": {
-                                  "const": "Alice Hansen"
-                                }
+                                "name": { "const": "Alice Hansen" }
                               }
                             },
                             "resource": {
                               "type": "object",
                               "required": ["id","name"],
                               "properties": {
-                                "name": {
-                                  "const": "textfile.txt"
-                                }
+                                "id": { "const": ""},
+                                "name": { "const": "textfile.txt" }
                               }
                             },
                             "user": {
                               "type": "object",
                               "required": ["id","displayName"],
                               "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "%user_id_pattern%"
-                                },
-                                "displayName": {
-                                  "const": "Alice Hansen"
-                                }
+                                "id": { "pattern": "%user_id_pattern%" },
+                                "displayName": { "const": "Alice Hansen" }
                               }
                             }
                           }
@@ -726,17 +600,12 @@ Feature: check activities
                   "type": "object",
                   "required": ["id","template","times"],
                   "properties": {
-                    "id": {
-                      "type": "string",
-                      "pattern": "^%user_id_pattern%$"
-                    },
+                    "id": { "pattern": "^%user_id_pattern%$" },
                     "template": {
                       "type": "object",
                       "required": ["message","variables"],
                       "properties": {
-                        "message": {
-                          "const": "{user} moved {resource} to {folder}"
-                        },
+                        "message": { "const": "{user} moved {resource} to {folder}" },
                         "variables": {
                           "type": "object",
                           "required": ["folder", "resource", "user"],
@@ -745,35 +614,23 @@ Feature: check activities
                               "type": "object",
                               "required": ["name"],
                               "properties": {
-                                "name": {
-                                  "const": "FOLDER"
-                                }
+                                "name": { "const": "FOLDER" }
                               }
                             },
                             "resource": {
                               "type": "object",
                               "required": ["id","name"],
                               "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "^%file_id_pattern%$"
-                                },
-                                "name": {
-                                  "const": "textfile.txt"
-                                }
+                                "id": { "pattern": "^%file_id_pattern%$" },
+                                "name": { "const": "textfile.txt" }
                               }
                             },
                             "user": {
                               "type": "object",
                               "required": ["id","displayName"],
                               "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "%user_id_pattern%"
-                                },
-                                "displayName": {
-                                  "const": "Alice Hansen"
-                                }
+                                "id": { "pattern": "%user_id_pattern%" },
+                                "displayName": { "const": "Alice Hansen" }
                               }
                             }
                           }
@@ -818,9 +675,7 @@ Feature: check activities
                       "type": "object",
                       "required": ["message","variables"],
                       "properties": {
-                        "message": {
-                          "const": "{user} added {resource} to {folder}"
-                        }
+                        "message": { "const": "{user} added {resource} to {folder}" }
                       }
                     }
                   }
@@ -829,17 +684,12 @@ Feature: check activities
                   "type": "object",
                   "required": ["id","template","times"],
                   "properties": {
-                    "id": {
-                      "type": "string",
-                      "pattern": "^%user_id_pattern%$"
-                    },
+                    "id": { "pattern": "^%user_id_pattern%$" },
                     "template": {
                       "type": "object",
                       "required": ["message","variables"],
                       "properties": {
-                        "message": {
-                          "const": "{user} moved {resource} to {folder}"
-                        },
+                        "message": { "const": "{user} moved {resource} to {folder}" },
                         "variables": {
                           "type": "object",
                           "required": ["folder", "resource", "user"],
@@ -848,35 +698,23 @@ Feature: check activities
                               "type": "object",
                               "required": ["name"],
                               "properties": {
-                                "name": {
-                                  "const": "FOLDER"
-                                }
+                                "name": { "const": "FOLDER" }
                               }
                             },
                             "resource": {
                               "type": "object",
                               "required": ["id","name"],
                               "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "^%file_id_pattern%$"
-                                },
-                                "name": {
-                                  "const": "textfile.txt"
-                                }
+                                "id": { "pattern": "^%file_id_pattern%$" },
+                                "name": { "const": "textfile.txt" }
                               }
                             },
                             "user": {
                               "type": "object",
                               "required": ["id","displayName"],
                               "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "%user_id_pattern%"
-                                },
-                                "displayName": {
-                                  "const": "Alice Hansen"
-                                }
+                                "id": { "pattern": "%user_id_pattern%" },
+                                "displayName": { "const": "Alice Hansen" }
                               }
                             }
                           }
@@ -927,9 +765,7 @@ Feature: check activities
                       "type": "object",
                       "required": ["message","variables"],
                       "properties": {
-                        "message": {
-                          "const": "{user} added {resource} to {folder}"
-                        }
+                        "message": { "const": "{user} added {resource} to {folder}" }
                       }
                     }
                   }
@@ -938,17 +774,12 @@ Feature: check activities
                   "type": "object",
                   "required": ["id","template","times"],
                   "properties": {
-                    "id": {
-                      "type": "string",
-                      "pattern": "^%user_id_pattern%$"
-                    },
+                    "id": { "pattern": "^%user_id_pattern%$" },
                     "template": {
                       "type": "object",
                       "required": ["message","variables"],
                       "properties": {
-                        "message": {
-                          "const": "{user} moved {resource} to {folder}"
-                        },
+                        "message": { "const": "{user} moved {resource} to {folder}" },
                         "variables": {
                           "type": "object",
                           "required": ["folder", "resource", "user"],
@@ -957,35 +788,23 @@ Feature: check activities
                               "type": "object",
                               "required": ["name"],
                               "properties": {
-                                "name": {
-                                  "const": "FOLDER"
-                                }
+                                "name": { "const": "FOLDER" }
                               }
                             },
                             "resource": {
                               "type": "object",
                               "required": ["id","name"],
                               "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "^%file_id_pattern%$"
-                                },
-                                "name": {
-                                  "const": "zerobyte.txt"
-                                }
+                                "id": { "pattern": "^%file_id_pattern%$" },
+                                "name": { "const": "zerobyte.txt" }
                               }
                             },
                             "user": {
                               "type": "object",
                               "required": ["id","displayName"],
                               "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "%user_id_pattern%"
-                                },
-                                "displayName": {
-                                  "const": "Alice Hansen"
-                                }
+                                "id": { "pattern": "%user_id_pattern%" },
+                                "displayName": { "const": "Alice Hansen" }
                               }
                             }
                           }
@@ -1030,9 +849,7 @@ Feature: check activities
                       "type": "object",
                       "required": ["message","variables"],
                       "properties": {
-                        "message": {
-                          "const": "{user} added {resource} to {folder}"
-                        }
+                        "message": { "const": "{user} added {resource} to {folder}" }
                       }
                     }
                   }
@@ -1041,17 +858,12 @@ Feature: check activities
                   "type": "object",
                   "required": ["id","template","times"],
                   "properties": {
-                    "id": {
-                      "type": "string",
-                      "pattern": "^%user_id_pattern%$"
-                    },
+                    "id": { "pattern": "^%user_id_pattern%$" },
                     "template": {
                       "type": "object",
                       "required": ["message","variables"],
                       "properties": {
-                        "message": {
-                          "const": "{user} moved {resource} to {folder}"
-                        },
+                        "message": { "const": "{user} moved {resource} to {folder}" },
                         "variables": {
                           "type": "object",
                           "required": ["folder", "resource", "user"],
@@ -1060,35 +872,23 @@ Feature: check activities
                               "type": "object",
                               "required": ["name"],
                               "properties": {
-                                "name": {
-                                  "const": "FOLDER"
-                                }
+                                "name": { "const": "FOLDER" }
                               }
                             },
                             "resource": {
                               "type": "object",
                               "required": ["id","name"],
                               "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "^%file_id_pattern%$"
-                                },
-                                "name": {
-                                  "const": "zerobyte.txt"
-                                }
+                                "id": { "pattern": "^%file_id_pattern%$" },
+                                "name": { "const": "zerobyte.txt" }
                               }
                             },
                             "user": {
                               "type": "object",
                               "required": ["id","displayName"],
                               "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "%user_id_pattern%"
-                                },
-                                "displayName": {
-                                  "const": "Alice Hansen"
-                                }
+                                "id": { "pattern": "%user_id_pattern%" },
+                                "displayName": { "const": "Alice Hansen" }
                               }
                             }
                           }
@@ -1139,9 +939,7 @@ Feature: check activities
                       "type": "object",
                       "required": ["message","variables"],
                       "properties": {
-                        "message": {
-                          "const": "{user} added {resource} to {folder}"
-                        }
+                        "message": { "const": "{user} added {resource} to {folder}" }
                       }
                     }
                   }
@@ -1150,17 +948,12 @@ Feature: check activities
                   "type": "object",
                   "required": ["id","template","times"],
                   "properties": {
-                    "id": {
-                      "type": "string",
-                      "pattern": "^%user_id_pattern%$"
-                    },
+                    "id": { "pattern": "^%user_id_pattern%$" },
                     "template": {
                       "type": "object",
                       "required": ["message","variables"],
                       "properties": {
-                        "message": {
-                          "const": "{user} renamed {oldResource} to {resource}"
-                        },
+                        "message": { "const": "{user} renamed {oldResource} to {resource}" },
                         "variables": {
                           "type": "object",
                           "required": ["folder", "oldResource", "resource", "user"],
@@ -1169,44 +962,30 @@ Feature: check activities
                               "type": "object",
                               "required": ["name"],
                               "properties": {
-                                "name": {
-                                  "const": "FOLDER"
-                                }
+                                "name": { "const": "FOLDER" }
                               }
                             },
                             "oldResource": {
                               "type": "object",
                               "required": ["name"],
                               "properties": {
-                                "name": {
-                                  "const": "textfile.txt"
-                                }
+                                "name": { "const": "textfile.txt" }
                               }
                             },
                             "resource": {
                               "type": "object",
                               "required": ["id","name"],
                               "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "^%file_id_pattern%$"
-                                },
-                                "name": {
-                                  "const": "renamed.txt"
-                                }
+                                "id": { "pattern": "^%file_id_pattern%$" },
+                                "name": { "const": "renamed.txt" }
                               }
                             },
                             "user": {
                               "type": "object",
                               "required": ["id","displayName"],
                               "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "%user_id_pattern%"
-                                },
-                                "displayName": {
-                                  "const": "Alice Hansen"
-                                }
+                                "id": { "pattern": "%user_id_pattern%" },
+                                "displayName": { "const": "Alice Hansen" }
                               }
                             }
                           }
@@ -1251,9 +1030,7 @@ Feature: check activities
                       "type": "object",
                       "required": ["message","variables"],
                       "properties": {
-                        "message": {
-                          "const": "{user} added {resource} to {folder}"
-                        }
+                        "message": { "const": "{user} added {resource} to {folder}" }
                       }
                     }
                   }
@@ -1262,17 +1039,12 @@ Feature: check activities
                   "type": "object",
                   "required": ["id","template","times"],
                   "properties": {
-                    "id": {
-                      "type": "string",
-                      "pattern": "^%user_id_pattern%$"
-                    },
+                    "id": { "pattern": "^%user_id_pattern%$" },
                     "template": {
                       "type": "object",
                       "required": ["message","variables"],
                       "properties": {
-                        "message": {
-                          "const": "{user} renamed {oldResource} to {resource}"
-                        },
+                        "message": { "const": "{user} renamed {oldResource} to {resource}" },
                         "variables": {
                           "type": "object",
                           "required": ["folder", "oldResource", "resource", "user"],
@@ -1281,44 +1053,30 @@ Feature: check activities
                               "type": "object",
                               "required": ["name"],
                               "properties": {
-                                "name": {
-                                  "const": "FOLDER"
-                                }
+                                "name": { "const": "FOLDER" }
                               }
                             },
                             "oldResource": {
                               "type": "object",
                               "required": ["name"],
                               "properties": {
-                                "name": {
-                                  "const": "textfile.txt"
-                                }
+                                "name": { "const": "textfile.txt" }
                               }
                             },
                             "resource": {
                               "type": "object",
                               "required": ["id","name"],
                               "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "^%file_id_pattern%$"
-                                },
-                                "name": {
-                                  "const": "renamed.txt"
-                                }
+                                "id": { "pattern": "^%file_id_pattern%$" },
+                                "name": { "const": "renamed.txt" }
                               }
                             },
                             "user": {
                               "type": "object",
                               "required": ["id","displayName"],
                               "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "%user_id_pattern%"
-                                },
-                                "displayName": {
-                                  "const": "Alice Hansen"
-                                }
+                                "id": { "pattern": "%user_id_pattern%" },
+                                "displayName": { "const": "Alice Hansen" }
                               }
                             }
                           }
@@ -1369,9 +1127,7 @@ Feature: check activities
                       "type": "object",
                       "required": ["message","variables"],
                       "properties": {
-                        "message": {
-                          "const": "{user} added {resource} to {folder}"
-                        }
+                        "message": { "const": "{user} added {resource} to {folder}" }
                       }
                     }
                   }
@@ -1380,17 +1136,12 @@ Feature: check activities
                   "type": "object",
                   "required": ["id","template","times"],
                   "properties": {
-                    "id": {
-                      "type": "string",
-                      "pattern": "^%user_id_pattern%$"
-                    },
+                    "id": { "pattern": "^%user_id_pattern%$" },
                     "template": {
                       "type": "object",
                       "required": ["message","variables"],
                       "properties": {
-                        "message": {
-                          "const": "{user} renamed {oldResource} to {resource}"
-                        },
+                        "message": { "const": "{user} renamed {oldResource} to {resource}" },
                         "variables": {
                           "type": "object",
                           "required": ["folder", "oldResource", "resource", "user"],
@@ -1399,44 +1150,30 @@ Feature: check activities
                               "type": "object",
                               "required": ["name"],
                               "properties": {
-                                "name": {
-                                  "const": "FOLDER"
-                                }
+                                "name": { "const": "FOLDER" }
                               }
                             },
                             "oldResource": {
                               "type": "object",
                               "required": ["name"],
                               "properties": {
-                                "name": {
-                                  "const": "zerobyte.txt"
-                                }
+                                "name": { "const": "zerobyte.txt" }
                               }
                             },
                             "resource": {
                               "type": "object",
                               "required": ["id","name"],
                               "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "^%file_id_pattern%$"
-                                },
-                                "name": {
-                                  "const": "textfile.txt"
-                                }
+                                "id": { "pattern": "^%file_id_pattern%$" },
+                                "name": { "const": "textfile.txt" }
                               }
                             },
                             "user": {
                               "type": "object",
                               "required": ["id","displayName"],
                               "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "%user_id_pattern%"
-                                },
-                                "displayName": {
-                                  "const": "Alice Hansen"
-                                }
+                                "id": { "pattern": "%user_id_pattern%" },
+                                "displayName": { "const": "Alice Hansen" }
                               }
                             }
                           }
@@ -1481,9 +1218,7 @@ Feature: check activities
                       "type": "object",
                       "required": ["message","variables"],
                       "properties": {
-                        "message": {
-                          "const": "{user} added {resource} to {folder}"
-                        }
+                        "message": { "const": "{user} added {resource} to {folder}" }
                       }
                     }
                   }
@@ -1492,17 +1227,12 @@ Feature: check activities
                   "type": "object",
                   "required": ["id","template","times"],
                   "properties": {
-                    "id": {
-                      "type": "string",
-                      "pattern": "^%user_id_pattern%$"
-                    },
+                    "id": { "pattern": "^%user_id_pattern%$" },
                     "template": {
                       "type": "object",
                       "required": ["message","variables"],
                       "properties": {
-                        "message": {
-                          "const": "{user} renamed {oldResource} to {resource}"
-                        },
+                        "message": { "const": "{user} renamed {oldResource} to {resource}" },
                         "variables": {
                           "type": "object",
                           "required": ["folder", "oldResource", "resource", "user"],
@@ -1511,44 +1241,30 @@ Feature: check activities
                               "type": "object",
                               "required": ["name"],
                               "properties": {
-                                "name": {
-                                  "const": "FOLDER"
-                                }
+                                "name": { "const": "FOLDER" }
                               }
                             },
                             "oldResource": {
                               "type": "object",
                               "required": ["name"],
                               "properties": {
-                                "name": {
-                                  "const": "zerobyte.txt"
-                                }
+                                "name": { "const": "zerobyte.txt" }
                               }
                             },
                             "resource": {
                               "type": "object",
                               "required": ["id","name"],
                               "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "^%file_id_pattern%$"
-                                },
-                                "name": {
-                                  "const": "textfile.txt"
-                                }
+                                "id": { "pattern": "^%file_id_pattern%$" },
+                                "name": { "const": "textfile.txt" }
                               }
                             },
                             "user": {
                               "type": "object",
                               "required": ["id","displayName"],
                               "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "%user_id_pattern%"
-                                },
-                                "displayName": {
-                                  "const": "Alice Hansen"
-                                }
+                                "id": { "pattern": "%user_id_pattern%" },
+                                "displayName": { "const": "Alice Hansen" }
                               }
                             }
                           }
@@ -1600,9 +1316,7 @@ Feature: check activities
                       "type": "object",
                       "required": ["message", "variables"],
                       "properties": {
-                        "message": {
-                          "const": "{user} added {resource} to {folder}"
-                        }
+                        "message": { "const": "{user} added {resource} to {folder}" }
                       }
                     }
                   }
@@ -1611,17 +1325,12 @@ Feature: check activities
                   "type": "object",
                   "required": ["id", "template", "times"],
                   "properties": {
-                    "id": {
-                      "type": "string",
-                      "pattern": "^%user_id_pattern%$"
-                    },
+                    "id": { "pattern": "^%user_id_pattern%$" },
                     "template": {
                       "type": "object",
                       "required": ["message", "variables"],
                       "properties": {
-                        "message": {
-                          "const": "{user} renamed {oldResource} to {resource}"
-                        },
+                        "message": { "const": "{user} renamed {oldResource} to {resource}" },
                         "variables": {
                           "type": "object",
                           "required": ["oldResource", "resource", "user"],
@@ -1630,38 +1339,24 @@ Feature: check activities
                               "type": "object",
                               "required": ["id", "name"],
                               "properties": {
-                                "id": {
-                                  "const": ""
-                                },
-                                "name": {
-                                  "const": "textfile.txt"
-                                }
+                                "id": { "const": "" },
+                                "name": { "const": "textfile.txt" }
                               }
                             },
                             "resource": {
                               "type": "object",
                               "required": ["id", "name"],
                               "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "^%file_id_pattern%$"
-                                },
-                                "name": {
-                                  "const": "renamed.txt"
-                                }
+                                "id": { "pattern": "^%file_id_pattern%$" },
+                                "name": { "const": "renamed.txt" }
                               }
                             },
                             "user": {
                               "type": "object",
                               "required": ["id", "displayName"],
                               "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "^%user_id_pattern%$"
-                                },
-                                "displayName": {
-                                  "const": "Alice Hansen"
-                                }
+                                "id": { "pattern": "^%user_id_pattern%$" },
+                                "displayName": { "const": "Alice Hansen" }
                               }
                             }
                           }
@@ -1706,9 +1401,7 @@ Feature: check activities
                       "type": "object",
                       "required": ["message", "variables"],
                       "properties": {
-                        "message": {
-                          "const": "{user} added {resource} to {folder}"
-                        }
+                        "message": { "const": "{user} added {resource} to {folder}" }
                       }
                     }
                   }
@@ -1717,17 +1410,12 @@ Feature: check activities
                   "type": "object",
                   "required": ["id", "template", "times"],
                   "properties": {
-                    "id": {
-                      "type": "string",
-                      "pattern": "^%user_id_pattern%$"
-                    },
+                    "id": { "pattern": "^%user_id_pattern%$" },
                     "template": {
                       "type": "object",
                       "required": ["message", "variables"],
                       "properties": {
-                        "message": {
-                          "const": "{user} renamed {oldResource} to {resource}"
-                        },
+                        "message": { "const": "{user} renamed {oldResource} to {resource}" },
                         "variables": {
                           "type": "object",
                           "required": ["oldResource", "resource", "user"],
@@ -1736,38 +1424,24 @@ Feature: check activities
                               "type": "object",
                               "required": ["id", "name"],
                               "properties": {
-                                "id": {
-                                  "const": ""
-                                },
-                                "name": {
-                                  "const": "FOLDER"
-                                }
+                                "id": { "const": "" },
+                                "name": { "const": "FOLDER" }
                               }
                             },
                             "resource": {
                               "type": "object",
                               "required": ["id", "name"],
                               "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "^%file_id_pattern%$"
-                                },
-                                "name": {
-                                  "const": "RENAMED FOLDER"
-                                }
+                                "id": { "pattern": "^%file_id_pattern%$" },
+                                "name": { "const": "RENAMED FOLDER" }
                               }
                             },
                             "user": {
                               "type": "object",
                               "required": ["id", "displayName"],
                               "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "^%user_id_pattern%$"
-                                },
-                                "displayName": {
-                                  "const": "Alice Hansen"
-                                }
+                                "id": { "pattern": "^%user_id_pattern%$" },
+                                "displayName": { "const": "Alice Hansen" }
                               }
                             }
                           }
@@ -1825,9 +1499,7 @@ Feature: check activities
                       "type": "object",
                       "required": ["message", "variables"],
                       "properties": {
-                        "message": {
-                          "const": "{user} added {resource} to {folder}"
-                        },
+                        "message": {  "const": "{user} added {resource} to {folder}" },
                         "variables": {
                           "type": "object",
                           "required": ["folder", "resource", "user"],
@@ -1836,34 +1508,23 @@ Feature: check activities
                               "type": "object",
                               "required": ["name"],
                               "properties": {
-                                "name": {
-                                  "const": "Alice Hansen"
-                                }
+                                "name": { "const": "Alice Hansen" }
                               }
                             },
                             "resource": {
                               "type": "object",
                               "required": ["id", "name"],
                               "properties": {
-                                "id": {
-                                  "type": "string"
-                                },
-                                "name": {
-                                  "const": "New Folder"
-                                }
+                                "id": { "pattern": "^%file_id_pattern%$" },
+                                "name": { "const": "New Folder" }
                               }
                             },
                             "user": {
                               "type": "object",
                               "required": ["id","displayName"],
                               "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "%user_id_pattern%"
-                                },
-                                "displayName": {
-                                  "const": "Alice Hansen"
-                                }
+                                "id": { "pattern": "%user_id_pattern%" },
+                                "displayName": { "const": "Alice Hansen" }
                               }
                             }
                           }
@@ -1880,9 +1541,7 @@ Feature: check activities
                       "type": "object",
                       "required": ["message", "variables"],
                       "properties": {
-                        "message": {
-                          "const": "{user} added {resource} to {folder}"
-                        },
+                        "message": { "const": "{user} added {resource} to {folder}" },
                         "variables": {
                           "type": "object",
                           "required": ["resource", "folder", "user"],
@@ -1891,31 +1550,23 @@ Feature: check activities
                               "type": "object",
                               "required": ["name"],
                               "properties": {
-                                "name": {
-                                  "const": "New Folder"
-                                }
+                                "name": { "const": "New Folder" }
                               }
                             },
                             "resource": {
                               "type": "object",
-                              "required": ["name"],
+                              "required": ["id", "name"],
                               "properties": {
-                                "name": {
-                                  "const": "Folder"
-                                }
+                                "id": { "const": ""},
+                                "name": { "const": "Folder" }
                               }
                             },
                             "user": {
                               "type": "object",
-                              "required": ["id","displayName"],
+                              "required": ["id", "displayName"],
                               "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "%user_id_pattern%"
-                                },
-                                "displayName": {
-                                  "const": "Alice Hansen"
-                                }
+                                "id": { "pattern": "%user_id_pattern%" },
+                                "displayName": { "const": "Alice Hansen" }
                               }
                             }
                           }
@@ -1932,9 +1583,7 @@ Feature: check activities
                       "type": "object",
                       "required": ["message", "variables"],
                       "properties": {
-                        "message": {
-                          "const": "{user} added {resource} to {folder}"
-                        },
+                        "message": { "const": "{user} added {resource} to {folder}" },
                         "variables": {
                           "type": "object",
                           "required": ["folder", "resource", "user"],
@@ -1943,31 +1592,23 @@ Feature: check activities
                               "type": "object",
                               "required": ["name"],
                               "properties": {
-                                "name": {
-                                  "const": "New Folder"
-                                }
+                                "name": { "const": "New Folder" }
                               }
                             },
                             "resource": {
                               "type": "object",
                               "required": ["id", "name"],
                               "properties": {
-                                "name": {
-                                  "const": "Sub Folder"
-                                }
+                                "id": { "pattern": "^%file_id_pattern%$" },
+                                "name": { "const": "Sub Folder" }
                               }
                             },
                             "user": {
                               "type": "object",
                               "required": ["id","displayName"],
                               "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "%user_id_pattern%"
-                                },
-                                "displayName": {
-                                  "const": "Alice Hansen"
-                                }
+                                "id": { "pattern": "%user_id_pattern%" },
+                                "displayName": { "const": "Alice Hansen" }
                               }
                             }
                           }
@@ -1984,9 +1625,7 @@ Feature: check activities
                       "type": "object",
                       "required": ["message", "variables"],
                       "properties": {
-                        "message": {
-                          "const": "{user} added {resource} to {folder}"
-                        },
+                        "message": { "const": "{user} added {resource} to {folder}" },
                         "variables": {
                           "type": "object",
                           "required": ["folder", "resource", "user"],
@@ -1995,31 +1634,23 @@ Feature: check activities
                               "type": "object",
                               "required": ["name"],
                               "properties": {
-                                "name": {
-                                  "const": "New Folder"
-                                }
+                                "name": { "const": "New Folder" }
                               }
                             },
                             "resource": {
                               "type": "object",
                               "required": ["id", "name"],
                               "properties": {
-                                "name": {
-                                  "const": "textfile.txt"
-                                }
+                                "id": { "const": ""},
+                                "name": { "const": "textfile.txt" }
                               }
                             },
                             "user": {
                               "type": "object",
                               "required": ["id","displayName"],
                               "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "%user_id_pattern%"
-                                },
-                                "displayName": {
-                                  "const": "Alice Hansen"
-                                }
+                                "id": { "pattern": "%user_id_pattern%" },
+                                "displayName": { "const": "Alice Hansen" }
                               }
                             }
                           }
@@ -2036,9 +1667,7 @@ Feature: check activities
                       "type": "object",
                       "required": ["message", "variables"],
                       "properties": {
-                        "message": {
-                          "const": "{user} moved {resource} to {folder}"
-                        },
+                        "message": { "const": "{user} moved {resource} to {folder}" },
                         "variables": {
                           "type": "object",
                           "required": ["folder", "resource", "user"],
@@ -2047,31 +1676,23 @@ Feature: check activities
                               "type": "object",
                               "required": ["name"],
                               "properties": {
-                                "name": {
-                                  "const": "Sub Folder"
-                                }
+                                "name": { "const": "Sub Folder" }
                               }
                             },
                             "resource": {
                               "type": "object",
                               "required": ["id", "name"],
                               "properties": {
-                                "name": {
-                                  "const": "textfile.txt"
-                                }
+                                "id": { "const": ""},
+                                "name": { "const": "textfile.txt" }
                               }
                             },
                             "user": {
                               "type": "object",
                               "required": ["id","displayName"],
                               "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "%user_id_pattern%"
-                                },
-                                "displayName": {
-                                  "const": "Alice Hansen"
-                                }
+                                "id": { "pattern": "%user_id_pattern%" },
+                                "displayName": { "const": "Alice Hansen" }
                               }
                             }
                           }
@@ -2088,9 +1709,7 @@ Feature: check activities
                       "type": "object",
                       "required": ["message", "variables"],
                       "properties": {
-                        "message": {
-                          "const": "{user} moved {resource} to {folder}"
-                        },
+                        "message": { "const": "{user} moved {resource} to {folder}" },
                         "variables": {
                           "type": "object",
                           "required": ["folder", "resource", "user"],
@@ -2099,31 +1718,23 @@ Feature: check activities
                               "type": "object",
                               "required": ["name"],
                               "properties": {
-                                "name": {
-                                  "const": "Sub Folder"
-                                }
+                                "name": { "const": "Sub Folder" }
                               }
                             },
                             "resource": {
                               "type": "object",
                               "required": ["id", "name"],
                               "properties": {
-                                "name": {
-                                  "const": "Folder"
-                                }
+                                "id": { "const": ""},
+                                "name": { "const": "Folder" }
                               }
                             },
                             "user": {
                               "type": "object",
                               "required": ["id","displayName"],
                               "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "%user_id_pattern%"
-                                },
-                                "displayName": {
-                                  "const": "Alice Hansen"
-                                }
+                                "id": { "pattern": "%user_id_pattern%" },
+                                "displayName": { "const": "Alice Hansen" }
                               }
                             }
                           }
@@ -2140,9 +1751,7 @@ Feature: check activities
                       "type": "object",
                       "required": ["message", "variables"],
                       "properties": {
-                        "message": {
-                          "const": "{user} renamed {oldResource} to {resource}"
-                        },
+                        "message": { "const": "{user} renamed {oldResource} to {resource}" },
                         "variables": {
                           "type": "object",
                           "required": ["oldResource", "resource", "user"],
@@ -2151,18 +1760,16 @@ Feature: check activities
                               "type": "object",
                               "required": ["id", "name"],
                               "properties": {
-                                "name": {
-                                  "const": "textfile.txt"
-                                }
+                                "id": { "const": ""},
+                                "name": { "const": "textfile.txt" }
                               }
                             },
                             "resource": {
                               "type": "object",
                               "required": ["id", "name"],
                               "properties": {
-                                "name": {
-                                  "const": "renamed.txt"
-                                }
+                                "id": { "const": ""},
+                                "name": { "const": "renamed.txt" }
                               }
                             }
                           }
@@ -2179,9 +1786,7 @@ Feature: check activities
                       "type": "object",
                       "required": ["message", "variables"],
                       "properties": {
-                        "message": {
-                          "const": "{user} renamed {oldResource} to {resource}"
-                        },
+                        "message": { "const": "{user} renamed {oldResource} to {resource}" },
                         "variables": {
                           "type": "object",
                           "required": ["oldResource", "resource", "user"],
@@ -2190,18 +1795,16 @@ Feature: check activities
                               "type": "object",
                               "required": ["id", "name"],
                               "properties": {
-                                "name": {
-                                  "const": "Folder"
-                                }
+                                "id": { "const": ""},
+                                "name": { "const": "Folder" }
                               }
                             },
                             "resource": {
                               "type": "object",
                               "required": ["id", "name"],
                               "properties": {
-                                "name": {
-                                  "const": "Renamed Folder"
-                                }
+                                "id": { "const": ""},
+                                "name": { "const": "Renamed Folder" }
                               }
                             }
                           }
@@ -2218,9 +1821,7 @@ Feature: check activities
                       "type": "object",
                       "required": ["message", "variables"],
                       "properties": {
-                        "message": {
-                          "const": "{user} deleted {resource} from {folder}"
-                        },
+                        "message": { "const": "{user} deleted {resource} from {folder}" },
                         "variables": {
                           "type": "object",
                           "required": ["folder", "resource", "user"],
@@ -2229,31 +1830,23 @@ Feature: check activities
                               "type": "object",
                               "required": ["name"],
                               "properties": {
-                                "name": {
-                                  "const": "Sub Folder"
-                                }
+                                "name": { "const": "Sub Folder" }
                               }
                             },
                             "resource": {
                               "type": "object",
                               "required": ["id", "name"],
                               "properties": {
-                                "name": {
-                                  "const": "renamed.txt"
-                                }
+                                "id": { "pattern": "^%file_id_pattern%$" },
+                                "name": { "const": "renamed.txt" }
                               }
                             },
                             "user": {
                               "type": "object",
                               "required": ["id","displayName"],
                               "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "%user_id_pattern%"
-                                },
-                                "displayName": {
-                                  "const": "Alice Hansen"
-                                }
+                                "id": { "pattern": "%user_id_pattern%" },
+                                "displayName": { "const": "Alice Hansen" }
                               }
                             }
                           }
@@ -2270,9 +1863,7 @@ Feature: check activities
                       "type": "object",
                       "required": ["message", "variables"],
                       "properties": {
-                        "message": {
-                          "const": "{user} deleted {resource} from {folder}"
-                        },
+                        "message": { "const": "{user} deleted {resource} from {folder}" },
                         "variables": {
                           "type": "object",
                           "required": ["folder", "resource", "user"],
@@ -2281,31 +1872,23 @@ Feature: check activities
                               "type": "object",
                               "required": ["name"],
                               "properties": {
-                                "name": {
-                                  "const": "Sub Folder"
-                                }
+                                "name": { "const": "Sub Folder" }
                               }
                             },
                             "resource": {
                               "type": "object",
                               "required": ["id", "name"],
                               "properties": {
-                                "name": {
-                                  "const": "Renamed Folder"
-                                }
+                                "id": { "pattern": "^%file_id_pattern%$" },
+                                "name": { "const": "Renamed Folder" }
                               }
                             },
                             "user": {
                               "type": "object",
                               "required": ["id","displayName"],
                               "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "%user_id_pattern%"
-                                },
-                                "displayName": {
-                                  "const": "Alice Hansen"
-                                }
+                                "id": { "pattern": "%user_id_pattern%" },
+                                "displayName": { "const": "Alice Hansen" }
                               }
                             }
                           }
@@ -2346,17 +1929,12 @@ Feature: check activities
                   "type": "object",
                   "required": ["id", "template", "times"],
                   "properties": {
-                    "id": {
-                      "type": "string",
-                      "pattern": "^%user_id_pattern%$"
-                    },
+                    "id": { "pattern": "^%user_id_pattern%$" },
                     "template": {
                       "type": "object",
                       "required": ["message", "variables"],
                       "properties": {
-                        "message": {
-                          "const": "{user} added {resource} to {folder}"
-                        },
+                        "message": { "const": "{user} added {resource} to {folder}" },
                         "variables": {
                           "type": "object",
                           "required": ["folder", "resource", "user"],
@@ -2365,9 +1943,7 @@ Feature: check activities
                               "type": "object",
                               "required": ["id", "name"],
                               "properties": {
-                                "name": {
-                                  "const": "FOLDER"
-                                }
+                                "name": { "const": "FOLDER" }
                               }
                             }
                           }
@@ -2380,17 +1956,12 @@ Feature: check activities
                   "type": "object",
                   "required": ["id", "template", "times"],
                   "properties": {
-                    "id": {
-                      "type": "string",
-                      "pattern": "^%user_id_pattern%$"
-                    },
+                    "id": { "pattern": "^%user_id_pattern%$" },
                     "template": {
                       "type": "object",
                       "required": ["message", "variables"],
                       "properties": {
-                        "message": {
-                          "const": "{user} added {resource} to {folder}"
-                        },
+                        "message": { "const": "{user} added {resource} to {folder}" },
                         "variables": {
                           "type": "object",
                           "required": ["folder", "resource", "user"],
@@ -2399,18 +1970,14 @@ Feature: check activities
                               "type": "object",
                               "required": ["id", "name"],
                               "properties": {
-                                "name": {
-                                  "const": "FOLDER"
-                                }
+                                "name": { "const": "FOLDER" }
                               }
                             },
                             "resource": {
                               "type": "object",
                               "required": ["id", "name"],
                               "properties": {
-                                "name": {
-                                  "const": "textfile.txt"
-                                }
+                                "name": { "const": "textfile.txt" }
                               }
                             }
                           }
@@ -2423,17 +1990,12 @@ Feature: check activities
                   "type": "object",
                   "required": ["id", "template", "times"],
                   "properties": {
-                    "id": {
-                      "type": "string",
-                      "pattern": "^%user_id_pattern%$"
-                    },
+                    "id": { "pattern": "^%user_id_pattern%$" },
                     "template": {
                       "type": "object",
                       "required": ["message", "variables"],
                       "properties": {
-                        "message": {
-                          "const": "{user} renamed {oldResource} to {resource}"
-                        },
+                        "message": { "const": "{user} renamed {oldResource} to {resource}" },
                         "variables": {
                           "type": "object",
                           "required": ["folder", "oldResource", "resource", "user"],
@@ -2442,36 +2004,28 @@ Feature: check activities
                               "type": "object",
                               "required": ["id", "name"],
                               "properties": {
-                                "name": {
-                                  "const": "Alice Hansen"
-                                }
+                                "name": { "const": "Alice Hansen" }
                               }
                             },
                             "oldResource": {
                               "type": "object",
                               "required": ["id", "name"],
                               "properties": {
-                                "name": {
-                                  "const": "FOLDER"
-                                }
+                                "name": { "const": "FOLDER" }
                               }
                             },
                             "resource": {
                               "type": "object",
                               "required": ["id", "name"],
                               "properties": {
-                                "name": {
-                                  "const": "RENAMED FOLDER"
-                                }
+                                "name": { "const": "RENAMED FOLDER" }
                               }
                             },
                             "user": {
                               "type": "object",
                               "required": ["id", "displayName"],
                               "properties": {
-                                "displayName": {
-                                  "const": "Alice Hansen"
-                                }
+                                "displayName": { "const": "Alice Hansen" }
                               }
                             }
                           }
@@ -2484,17 +2038,12 @@ Feature: check activities
                   "type": "object",
                   "required": ["id", "template", "times"],
                   "properties": {
-                    "id": {
-                      "type": "string",
-                      "pattern": "^%user_id_pattern%$"
-                    },
+                    "id": { "pattern": "^%user_id_pattern%$" },
                     "template": {
                       "type": "object",
                       "required": ["message", "variables"],
                       "properties": {
-                        "message": {
-                          "const": "{user} updated {resource} in {folder}"
-                        },
+                        "message": { "const": "{user} updated {resource} in {folder}" },
                         "variables": {
                           "type": "object",
                           "required": ["folder", "resource", "user"],
@@ -2503,27 +2052,21 @@ Feature: check activities
                               "type": "object",
                               "required": ["id", "name"],
                               "properties": {
-                                "name": {
-                                  "const": "RENAMED FOLDER"
-                                }
+                                "name": { "const": "RENAMED FOLDER" }
                               }
                             },
                             "resource": {
                               "type": "object",
                               "required": ["id", "name"],
                               "properties": {
-                                "name": {
-                                  "const": "textfile.txt"
-                                }
+                                "name": { "const": "textfile.txt" }
                               }
                             },
                             "user": {
                               "type": "object",
                               "required": ["id", "displayName"],
                               "properties": {
-                                "displayName": {
-                                  "const": "Alice Hansen"
-                                }
+                                "displayName": { "const": "Alice Hansen" }
                               }
                             }
                           }
@@ -2566,17 +2109,12 @@ Feature: check activities
               "type": "object",
               "required": ["id","template","times"],
               "properties": {
-                "id": {
-                  "type": "string",
-                  "pattern": "^%user_id_pattern%$"
-                },
+                "id": { "pattern": "^%user_id_pattern%$" },
                 "template": {
                   "type": "object",
                   "required": ["message","variables"],
                   "properties": {
-                    "message": {
-                      "const": "{user} hat {resource} zu {folder} hinzugefügt"
-                    },
+                    "message": { "const": "{user} hat {resource} zu {folder} hinzugefügt" },
                     "variables": {
                       "type": "object",
                       "required": ["resource","folder","user"],
@@ -2585,39 +2123,24 @@ Feature: check activities
                           "type": "object",
                           "required": ["id","name"],
                           "properties": {
-                            "id": {
-                              "type": "string",
-                              "pattern": "%file_id_pattern%"
-                            },
-                            "name": {
-                              "const": "textfile.txt"
-                            }
+                            "id": { "pattern": "%file_id_pattern%" },
+                            "name": { "const": "textfile.txt" }
                           }
                         },
                         "space": {
                           "type": "object",
                           "required": ["id","name"],
                           "properties": {
-                            "id": {
-                              "type": "string",
-                              "pattern": "^%user_id_pattern%!%user_id_pattern%$"
-                            },
-                            "name": {
-                              "const": "Alice Hansen"
-                            }
+                            "id": { "pattern": "^%user_id_pattern%!%user_id_pattern%$" },
+                            "name": { "const": "Alice Hansen" }
                           }
                         },
                         "user": {
                           "type": "object",
                           "required": ["id","displayName"],
                           "properties": {
-                            "id": {
-                              "type": "string",
-                              "pattern": "%user_id_pattern%"
-                            },
-                            "displayName": {
-                              "const": "Alice Hansen"
-                            }
+                            "id": { "pattern": "%user_id_pattern%" },
+                            "displayName": { "const": "Alice Hansen" }
                           }
                         }
                       }
@@ -2666,9 +2189,7 @@ Feature: check activities
                       "type": "object",
                       "required": ["message", "variables"],
                       "properties": {
-                        "message": {
-                          "const": "{user} added {resource} to {folder}"
-                        },
+                        "message": { "const": "{user} added {resource} to {folder}" },
                         "variables": {
                           "type": "object",
                           "required": ["folder", "resource", "user"],
@@ -2677,31 +2198,22 @@ Feature: check activities
                               "type": "object",
                               "required": ["name"],
                               "properties": {
-                                "name": {
-                                  "const": "Alice Hansen"
-                                }
+                                "name": { "const": "Alice Hansen" }
                               }
                             },
                             "resource": {
                               "type": "object",
                               "required": ["id", "name"],
                               "properties": {
-                                "name": {
-                                  "const": "New Folder"
-                                }
+                                "name": { "const": "New Folder" }
                               }
                             },
                             "user": {
                               "type": "object",
                               "required": ["id","displayName"],
                               "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "%user_id_pattern%"
-                                },
-                                "displayName": {
-                                  "const": "Alice Hansen"
-                                }
+                                "id": { "pattern": "%user_id_pattern%" },
+                                "displayName": { "const": "Alice Hansen" }
                               }
                             }
                           }
@@ -2722,9 +2234,7 @@ Feature: check activities
                       "type": "object",
                       "required": ["message", "variables"],
                       "properties": {
-                        "message": {
-                          "const": "{user} added {resource} to {folder}"
-                        },
+                        "message": { "const": "{user} added {resource} to {folder}" },
                         "variables": {
                           "type": "object",
                           "required": ["folder", "resource", "user"],
@@ -2733,31 +2243,22 @@ Feature: check activities
                               "type": "object",
                               "required": ["name"],
                               "properties": {
-                                "name": {
-                                  "const": "New Folder"
-                                }
+                                "name": { "const": "New Folder" }
                               }
                             },
                             "resource": {
                               "type": "object",
                               "required": ["id", "name"],
                               "properties": {
-                                "name": {
-                                  "const": "Sub Folder"
-                                }
+                                "name": { "const": "Sub Folder" }
                               }
                             },
                             "user": {
                               "type": "object",
                               "required": ["id","displayName"],
                               "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "%user_id_pattern%"
-                                },
-                                "displayName": {
-                                  "const": "Alice Hansen"
-                                }
+                                "id": { "pattern": "%user_id_pattern%" },
+                                "displayName": { "const": "Alice Hansen" }
                               }
                             }
                           }
@@ -2778,9 +2279,7 @@ Feature: check activities
                       "type": "object",
                       "required": ["message", "variables"],
                       "properties": {
-                        "message": {
-                          "const": "{user} added {resource} to {folder}"
-                        },
+                        "message": { "const": "{user} added {resource} to {folder}" },
                         "variables": {
                           "type": "object",
                           "required": ["folder", "resource", "user"],
@@ -2789,31 +2288,22 @@ Feature: check activities
                               "type": "object",
                               "required": ["name"],
                               "properties": {
-                                "name": {
-                                  "const": "Sub Folder"
-                                }
+                                "name": { "const": "Sub Folder" }
                               }
                             },
                             "resource": {
                               "type": "object",
                               "required": ["id", "name"],
                               "properties": {
-                                "name": {
-                                  "const": "textfile.txt"
-                                }
+                                "name": { "const": "textfile.txt" }
                               }
                             },
                             "user": {
                               "type": "object",
                               "required": ["id","displayName"],
                               "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "%user_id_pattern%"
-                                },
-                                "displayName": {
-                                  "const": "Alice Hansen"
-                                }
+                                "id": { "pattern": "%user_id_pattern%" },
+                                "displayName": { "const": "Alice Hansen" }
                               }
                             }
                           }
@@ -2861,9 +2351,7 @@ Feature: check activities
                       "type": "object",
                       "required": ["message", "variables"],
                       "properties": {
-                        "message": {
-                          "const": "{user} added {resource} to {folder}"
-                        },
+                        "message": { "const": "{user} added {resource} to {folder}" },
                         "variables": {
                           "type": "object",
                           "required": ["folder", "resource", "user"],
@@ -2872,31 +2360,22 @@ Feature: check activities
                               "type": "object",
                               "required": ["name"],
                               "properties": {
-                                "name": {
-                                  "const": "Alice Hansen"
-                                }
+                                "name": { "const": "Alice Hansen" }
                               }
                             },
                             "resource": {
                               "type": "object",
                               "required": ["id", "name"],
                               "properties": {
-                                "name": {
-                                  "const": "New Folder"
-                                }
+                                "name": { "const": "New Folder" }
                               }
                             },
                             "user": {
                               "type": "object",
                               "required": ["id","displayName"],
                               "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "%user_id_pattern%"
-                                },
-                                "displayName": {
-                                  "const": "Alice Hansen"
-                                }
+                                "id": { "pattern": "%user_id_pattern%" },
+                                "displayName": { "const": "Alice Hansen" }
                               }
                             }
                           }
@@ -2917,9 +2396,7 @@ Feature: check activities
                       "type": "object",
                       "required": ["message", "variables"],
                       "properties": {
-                        "message": {
-                          "const": "{user} added {resource} to {folder}"
-                        },
+                        "message": { "const": "{user} added {resource} to {folder}" },
                         "variables": {
                           "type": "object",
                           "required": ["folder", "resource", "user"],
@@ -2928,31 +2405,22 @@ Feature: check activities
                               "type": "object",
                               "required": ["name"],
                               "properties": {
-                                "name": {
-                                  "const": "New Folder"
-                                }
+                                "name": { "const": "New Folder" }
                               }
                             },
                             "resource": {
                               "type": "object",
                               "required": ["id", "name"],
                               "properties": {
-                                "name": {
-                                  "const": "Sub Folder"
-                                }
+                                "name": { "const": "Sub Folder" }
                               }
                             },
                             "user": {
                               "type": "object",
                               "required": ["id","displayName"],
                               "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "%user_id_pattern%"
-                                },
-                                "displayName": {
-                                  "const": "Alice Hansen"
-                                }
+                                "id": { "pattern": "%user_id_pattern%" },
+                                "displayName": { "const": "Alice Hansen" }
                               }
                             }
                           }
@@ -3000,9 +2468,7 @@ Feature: check activities
                       "type": "object",
                       "required": ["message", "variables"],
                       "properties": {
-                        "message": {
-                          "const": "{user} added {resource} to {folder}"
-                        },
+                        "message": { "const": "{user} added {resource} to {folder}" },
                         "variables": {
                           "type": "object",
                           "required": ["folder", "resource", "user"],
@@ -3011,31 +2477,22 @@ Feature: check activities
                               "type": "object",
                               "required": ["name"],
                               "properties": {
-                                "name": {
-                                  "const": "Alice Hansen"
-                                }
+                                "name": { "const": "Alice Hansen" }
                               }
                             },
                             "resource": {
                               "type": "object",
                               "required": ["id", "name"],
                               "properties": {
-                                "name": {
-                                  "const": "New Folder"
-                                }
+                                "name": { "const": "New Folder" }
                               }
                             },
                             "user": {
                               "type": "object",
                               "required": ["id","displayName"],
                               "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "%user_id_pattern%"
-                                },
-                                "displayName": {
-                                  "const": "Alice Hansen"
-                                }
+                                "id": { "pattern": "%user_id_pattern%" },
+                                "displayName": { "const": "Alice Hansen" }
                               }
                             }
                           }
@@ -3056,9 +2513,7 @@ Feature: check activities
                       "type": "object",
                       "required": ["message", "variables"],
                       "properties": {
-                        "message": {
-                          "const": "{user} added {resource} to {folder}"
-                        },
+                        "message": { "const": "{user} added {resource} to {folder}" },
                         "variables": {
                           "type": "object",
                           "required": ["folder", "resource", "user"],
@@ -3067,31 +2522,22 @@ Feature: check activities
                               "type": "object",
                               "required": ["name"],
                               "properties": {
-                                "name": {
-                                  "const": "New Folder"
-                                }
+                                "name": { "const": "New Folder" }
                               }
                             },
                             "resource": {
                               "type": "object",
                               "required": ["id", "name"],
                               "properties": {
-                                "name": {
-                                  "const": "Sub Folder"
-                                }
+                                "name": { "const": "Sub Folder"  }
                               }
                             },
                             "user": {
                               "type": "object",
                               "required": ["id","displayName"],
                               "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "%user_id_pattern%"
-                                },
-                                "displayName": {
-                                  "const": "Alice Hansen"
-                                }
+                                "id": { "pattern": "%user_id_pattern%" },
+                                "displayName": { "const": "Alice Hansen" }
                               }
                             }
                           }
@@ -3182,17 +2628,12 @@ Feature: check activities
                   "type": "object",
                   "required": ["id","template","times"],
                   "properties": {
-                    "id": {
-                      "type": "string",
-                      "pattern": "^%user_id_pattern%$"
-                    },
+                    "id": { "pattern": "^%user_id_pattern%$" },
                     "template": {
                       "type": "object",
                       "required": ["message","variables"],
                       "properties": {
-                        "message": {
-                          "const": "{user} added {resource} to {folder}"
-                        },
+                        "message": { "const": "{user} added {resource} to {folder}" },
                         "variables": {
                           "type": "object",
                           "required": ["folder", "resource", "user"],
@@ -3201,35 +2642,23 @@ Feature: check activities
                               "type": "object",
                               "required": ["name"],
                               "properties": {
-                                "name": {
-                                  "const": "FOLDER"
-                                }
+                                "name": { "const": "FOLDER" }
                               }
                             },
                             "resource": {
                               "type": "object",
                               "required": ["id","name"],
                               "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "^%file_id_pattern%$"
-                                },
-                                "name": {
-                                  "const": "textfile.txt"
-                                }
+                                "id": { "pattern": "^%file_id_pattern%$" },
+                                "name": { "const": "textfile.txt" }
                               }
                             },
                             "user": {
                               "type": "object",
                               "required": ["id","displayName"],
                               "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "%user_id_pattern%"
-                                },
-                                "displayName": {
-                                  "const": "Alice Hansen"
-                                }
+                                "id": { "pattern": "%user_id_pattern%" },
+                                "displayName": { "const": "Alice Hansen" }
                               }
                             }
                           }
@@ -3274,9 +2703,7 @@ Feature: check activities
                       "type": "object",
                       "required": ["message","variables"],
                       "properties": {
-                        "message": {
-                          "const": "{user} added {resource} to {folder}"
-                        },
+                        "message": { "const": "{user} added {resource} to {folder}" },
                         "variables": {
                           "type": "object",
                           "required": ["folder", "resource", "user"],
@@ -3285,13 +2712,8 @@ Feature: check activities
                               "type": "object",
                               "required": ["id","name"],
                               "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "^%file_id_pattern%$"
-                                },
-                                "name": {
-                                  "const": "FOLDER"
-                                }
+                                "id": { "pattern": "^%file_id_pattern%$" },
+                                "name": { "const": "FOLDER" }
                               }
                             }
                           }
@@ -3304,17 +2726,12 @@ Feature: check activities
                   "type": "object",
                   "required": ["id","template","times"],
                   "properties": {
-                    "id": {
-                      "type": "string",
-                      "pattern": "^%user_id_pattern%$"
-                    },
+                    "id": { "pattern": "^%user_id_pattern%$" },
                     "template": {
                       "type": "object",
                       "required": ["message","variables"],
                       "properties": {
-                        "message": {
-                          "const": "{user} added {resource} to {folder}"
-                        },
+                        "message": { "const": "{user} added {resource} to {folder}" },
                         "variables": {
                           "type": "object",
                           "required": ["folder", "resource", "user"],
@@ -3323,35 +2740,23 @@ Feature: check activities
                               "type": "object",
                               "required": ["name"],
                               "properties": {
-                                "name": {
-                                  "const": "FOLDER"
-                                }
+                                "name": { "const": "FOLDER" }
                               }
                             },
                             "resource": {
                               "type": "object",
                               "required": ["id","name"],
                               "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "^%file_id_pattern%$"
-                                },
-                                "name": {
-                                  "const": "textfile.txt"
-                                }
+                                "id": { "pattern": "^%file_id_pattern%$" },
+                                "name": { "const": "textfile.txt" }
                               }
                             },
                             "user": {
                               "type": "object",
                               "required": ["id","displayName"],
                               "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "%user_id_pattern%"
-                                },
-                                "displayName": {
-                                  "const": "Alice Hansen"
-                                }
+                                "id": { "pattern": "%user_id_pattern%" },
+                                "displayName": { "const": "Alice Hansen" }
                               }
                             }
                           }
@@ -3398,17 +2803,12 @@ Feature: check activities
                   "type": "object",
                   "required": ["id","template","times"],
                   "properties": {
-                    "id": {
-                      "type": "string",
-                      "pattern": "^%user_id_pattern%$"
-                    },
+                    "id": { "pattern": "^%user_id_pattern%$" },
                     "template": {
                       "type": "object",
                       "required": ["message","variables"],
                       "properties": {
-                        "message": {
-                          "const": "{user} added {resource} to {folder}"
-                        },
+                        "message": { "const": "{user} added {resource} to {folder}" },
                         "variables": {
                           "type": "object",
                           "required": ["folder", "resource", "user"],
@@ -3417,35 +2817,23 @@ Feature: check activities
                               "type": "object",
                               "required": ["name"],
                               "properties": {
-                                "name": {
-                                  "const": "FOLDER"
-                                }
+                                "name": { "const": "FOLDER" }
                               }
                             },
                             "resource": {
                               "type": "object",
                               "required": ["id","name"],
                               "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "^%file_id_pattern%$"
-                                },
-                                "name": {
-                                  "const": "renamed.txt"
-                                }
+                                "id": { "pattern": "^%file_id_pattern%$" },
+                                "name": { "const": "renamed.txt" }
                               }
                             },
                             "user": {
                               "type": "object",
                               "required": ["id","displayName"],
                               "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "%user_id_pattern%"
-                                },
-                                "displayName": {
-                                  "const": "Alice Hansen"
-                                }
+                                "id": { "pattern": "%user_id_pattern%" },
+                                "displayName": { "const": "Alice Hansen" }
                               }
                             }
                           }
@@ -3490,9 +2878,7 @@ Feature: check activities
                       "type": "object",
                       "required": ["message","variables"],
                       "properties": {
-                        "message": {
-                          "const": "{user} added {resource} to {folder}"
-                        },
+                        "message": { "const": "{user} added {resource} to {folder}" },
                         "variables": {
                           "type": "object",
                           "required": ["folder", "resource", "user"],
@@ -3501,13 +2887,8 @@ Feature: check activities
                               "type": "object",
                               "required": ["id","name"],
                               "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "^%file_id_pattern%$"
-                                },
-                                "name": {
-                                  "const": "FOLDER"
-                                }
+                                "id": { "pattern": "^%file_id_pattern%$" },
+                                "name": { "const": "FOLDER" }
                               }
                             }
                           }
@@ -3520,17 +2901,12 @@ Feature: check activities
                   "type": "object",
                   "required": ["id","template","times"],
                   "properties": {
-                    "id": {
-                      "type": "string",
-                      "pattern": "^%user_id_pattern%$"
-                    },
+                    "id": { "pattern": "^%user_id_pattern%$" },
                     "template": {
                       "type": "object",
                       "required": ["message","variables"],
                       "properties": {
-                        "message": {
-                          "const": "{user} added {resource} to {folder}"
-                        },
+                        "message": { "const": "{user} added {resource} to {folder}" },
                         "variables": {
                           "type": "object",
                           "required": ["folder", "resource", "user"],
@@ -3539,35 +2915,23 @@ Feature: check activities
                               "type": "object",
                               "required": ["name"],
                               "properties": {
-                                "name": {
-                                  "const": "FOLDER"
-                                }
+                                "name": { "const": "FOLDER" }
                               }
                             },
                             "resource": {
                               "type": "object",
                               "required": ["id","name"],
                               "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "^%file_id_pattern%$"
-                                },
-                                "name": {
-                                  "const": "renamed.txt"
-                                }
+                                "id": { "pattern": "^%file_id_pattern%$" },
+                                "name": { "const": "renamed.txt" }
                               }
                             },
                             "user": {
                               "type": "object",
                               "required": ["id","displayName"],
                               "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "%user_id_pattern%"
-                                },
-                                "displayName": {
-                                  "const": "Alice Hansen"
-                                }
+                                "id": { "pattern": "%user_id_pattern%" },
+                                "displayName": { "const": "Alice Hansen" }
                               }
                             }
                           }
@@ -3614,17 +2978,12 @@ Feature: check activities
                   "type": "object",
                   "required": ["id","template","times"],
                   "properties": {
-                    "id": {
-                      "type": "string",
-                      "pattern": "^%user_id_pattern%$"
-                    },
+                    "id": { "pattern": "^%user_id_pattern%$" },
                     "template": {
                       "type": "object",
                       "required": ["message","variables"],
                       "properties": {
-                        "message": {
-                          "const": "{user} added {resource} to {folder}"
-                        },
+                        "message": { "const": "{user} added {resource} to {folder}" },
                         "variables": {
                           "type": "object",
                           "required": ["folder", "resource", "user"],
@@ -3633,35 +2992,23 @@ Feature: check activities
                               "type": "object",
                               "required": ["name"],
                               "properties": {
-                                "name": {
-                                  "const": "FOLDER"
-                                }
+                                "name": { "const": "FOLDER" }
                               }
                             },
                             "resource": {
                               "type": "object",
                               "required": ["id","name"],
                               "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "^%file_id_pattern%$"
-                                },
-                                "name": {
-                                  "const": "renamed.txt"
-                                }
+                                "id": { "pattern": "^%file_id_pattern%$" },
+                                "name": { "const": "renamed.txt" }
                               }
                             },
                             "user": {
                               "type": "object",
                               "required": ["id","displayName"],
                               "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "%user_id_pattern%"
-                                },
-                                "displayName": {
-                                  "const": "Alice Hansen"
-                                }
+                                "id": { "pattern": "%user_id_pattern%" },
+                                "displayName": { "const": "Alice Hansen" }
                               }
                             }
                           }
@@ -3706,9 +3053,7 @@ Feature: check activities
                       "type": "object",
                       "required": ["message", "variables"],
                       "properties": {
-                        "message": {
-                          "const": "{user} added {resource} to {folder}"
-                        },
+                        "message": { "const": "{user} added {resource} to {folder}" },
                         "variables": {
                           "type": "object",
                           "required": ["folder", "resource", "user"],
@@ -3717,31 +3062,22 @@ Feature: check activities
                               "type": "object",
                               "required": ["name"],
                               "properties": {
-                                "name": {
-                                  "const": "Alice Hansen"
-                                }
+                                "name": { "const": "Alice Hansen" }
                               }
                             },
                             "resource": {
                               "type": "object",
                               "required": ["id", "name"],
                               "properties": {
-                                "name": {
-                                  "const": "FOLDER"
-                                }
+                                "name": { "const": "FOLDER" }
                               }
                             },
                             "user": {
                               "type": "object",
                               "required": ["id","displayName"],
                               "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "%user_id_pattern%"
-                                },
-                                "displayName": {
-                                  "const": "Alice Hansen"
-                                }
+                                "id": { "pattern": "%user_id_pattern%" },
+                                "displayName": { "const": "Alice Hansen" }
                               }
                             }
                           }
@@ -3758,9 +3094,7 @@ Feature: check activities
                       "type": "object",
                       "required": ["message", "variables"],
                       "properties": {
-                        "message": {
-                          "const": "{user} added {resource} to {folder}"
-                        },
+                        "message": { "const": "{user} added {resource} to {folder}" },
                         "variables": {
                           "type": "object",
                           "required": ["folder", "resource", "user"],
@@ -3769,31 +3103,22 @@ Feature: check activities
                               "type": "object",
                               "required": ["name"],
                               "properties": {
-                                "name": {
-                                  "const": "FOLDER"
-                                }
+                                "name": { "const": "FOLDER" }
                               }
                             },
                             "resource": {
                               "type": "object",
                               "required": ["id", "name"],
                               "properties": {
-                                "name": {
-                                  "const": "textfile.txt"
-                                }
+                                "name": { "const": "textfile.txt" }
                               }
                             },
                             "user": {
                               "type": "object",
                               "required": ["id","displayName"],
                               "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "%user_id_pattern%"
-                                },
-                                "displayName": {
-                                  "const": "Alice Hansen"
-                                }
+                                "id": { "pattern": "%user_id_pattern%" },
+                                "displayName": { "const": "Alice Hansen" }
                               }
                             }
                           }
@@ -3810,9 +3135,7 @@ Feature: check activities
                       "type": "object",
                       "required": ["message", "variables"],
                       "properties": {
-                        "message": {
-                          "const": "{user} added {resource} to {folder}"
-                        },
+                        "message": { "const": "{user} added {resource} to {folder}" },
                         "variables": {
                           "type": "object",
                           "required": ["folder", "resource", "user"],
@@ -3821,31 +3144,22 @@ Feature: check activities
                               "type": "object",
                               "required": ["name"],
                               "properties": {
-                                "name": {
-                                  "const": "FOLDER"
-                                }
+                                "name": { "const": "FOLDER" }
                               }
                             },
                             "resource": {
                               "type": "object",
                               "required": ["id", "name"],
                               "properties": {
-                                "name": {
-                                  "const": "renamed.txt"
-                                }
+                                "name": { "const": "renamed.txt" }
                               }
                             },
                             "user": {
                               "type": "object",
                               "required": ["id","displayName"],
                               "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "%user_id_pattern%"
-                                },
-                                "displayName": {
-                                  "const": "Alice Hansen"
-                                }
+                                "id": { "pattern": "%user_id_pattern%" },
+                                "displayName": { "const": "Alice Hansen" }
                               }
                             }
                           }
@@ -3897,9 +3211,7 @@ Feature: check activities
                       "type": "object",
                       "required": ["message", "variables"],
                       "properties": {
-                        "message": {
-                          "const": "{user} added {resource} to {folder}"
-                        },
+                        "message": { "const": "{user} added {resource} to {folder}" },
                         "variables": {
                           "type": "object",
                           "required": ["resource", "folder", "user"],
@@ -3908,31 +3220,22 @@ Feature: check activities
                               "type": "object",
                               "required": ["id", "name"],
                               "properties": {
-                                "name": {
-                                  "const": "parent"
-                                }
+                                "name": { "const": "parent" }
                               }
                             },
                             "folder": {
                               "type": "object",
                               "required": ["name"],
                               "properties": {
-                                "name": {
-                                  "const": "new-space"
-                                }
+                                "name": { "const": "new-space" }
                               }
                             },
                             "user": {
                               "type": "object",
                               "required": ["id", "displayName"],
                               "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "%user_id_pattern%"
-                                },
-                                "displayName": {
-                                  "const": "Alice Hansen"
-                                }
+                                "id": { "pattern": "%user_id_pattern%" },
+                                "displayName": { "const": "Alice Hansen" }
                               }
                             }
                           }
@@ -3949,9 +3252,7 @@ Feature: check activities
                       "type": "object",
                       "required": ["message", "variables"],
                       "properties": {
-                        "message": {
-                          "const": "{user} added {resource} to {folder}"
-                        },
+                        "message": { "const": "{user} added {resource} to {folder}" },
                         "variables": {
                           "type": "object",
                           "required": ["resource", "folder", "user"],
@@ -3960,31 +3261,22 @@ Feature: check activities
                               "type": "object",
                               "required": ["id", "name"],
                               "properties": {
-                                "name": {
-                                  "const": "subfolder"
-                                }
+                                "name": { "const": "subfolder" }
                               }
                             },
                             "folder": {
                               "type": "object",
                               "required": ["name"],
                               "properties": {
-                                "name": {
-                                  "const": "parent"
-                                }
+                                "name": { "const": "parent" }
                               }
                             },
                             "user": {
                               "type": "object",
                               "required": ["id", "displayName"],
                               "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "%user_id_pattern%"
-                                },
-                                "displayName": {
-                                  "const": "Alice Hansen"
-                                }
+                                "id": { "pattern": "%user_id_pattern%" },
+                                "displayName": { "const": "Alice Hansen" }
                               }
                             }
                           }
@@ -4001,9 +3293,7 @@ Feature: check activities
                       "type": "object",
                       "required": ["message", "variables"],
                       "properties": {
-                        "message": {
-                          "const": "{user} added {resource} to {folder}"
-                        },
+                        "message": { "const": "{user} added {resource} to {folder}" },
                         "variables": {
                           "type": "object",
                           "required": ["resource", "folder", "user"],
@@ -4012,31 +3302,22 @@ Feature: check activities
                               "type": "object",
                               "required": ["id", "name"],
                               "properties": {
-                                "name": {
-                                  "const": "test.md"
-                                }
+                                "name": { "const": "test.md" }
                               }
                             },
                             "folder": {
                               "type": "object",
                               "required": ["name"],
                               "properties": {
-                                "name": {
-                                  "const": "parent"
-                                }
+                                "name": { "const": "parent" }
                               }
                             },
                             "user": {
                               "type": "object",
                               "required": ["id", "displayName"],
                               "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "%user_id_pattern%"
-                                },
-                                "displayName": {
-                                  "const": "Alice Hansen"
-                                }
+                                "id": { "pattern": "%user_id_pattern%" },
+                                "displayName": { "const": "Alice Hansen" }
                               }
                             }
                           }
@@ -4053,9 +3334,7 @@ Feature: check activities
                       "type": "object",
                       "required": ["message", "variables"],
                       "properties": {
-                        "message": {
-                          "const": "{user} moved {resource} to {folder}"
-                        },
+                        "message": { "const": "{user} moved {resource} to {folder}" },
                         "variables": {
                           "type": "object",
                           "required": ["resource", "folder", "user"],
@@ -4064,31 +3343,22 @@ Feature: check activities
                               "type": "object",
                               "required": ["id", "name"],
                               "properties": {
-                                "name": {
-                                  "const": "test.md"
-                                }
+                                "name": { "const": "test.md" }
                               }
                             },
                             "folder": {
                               "type": "object",
                               "required": ["name"],
                               "properties": {
-                                "name": {
-                                  "const": "subfolder"
-                                }
+                                "name": { "const": "subfolder" }
                               }
                             },
                             "user": {
                               "type": "object",
                               "required": ["id", "displayName"],
                               "properties": {
-                                "id": {
-                                  "type": "string",
-                                  "pattern": "%user_id_pattern%"
-                                },
-                                "displayName": {
-                                  "const": "Alice Hansen"
-                                }
+                                "id": { "pattern": "%user_id_pattern%" },
+                                "displayName": { "const": "Alice Hansen" }
                               }
                             }
                           }
