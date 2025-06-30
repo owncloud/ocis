@@ -1116,7 +1116,7 @@ class FeatureContext extends BehatVariablesContext {
 			$value = $schemaObj->$validator;
 			switch ($validator) {
 				case "items":
-					if ($schemaObj->maxItems === 0) {
+					if ($schemaObj->maxItems === 0 || empty($schemaObj->items)) {
 						break;
 					}
 					Assert::assertNotNull($schemaObj->$validator, \sprintf($errMsg, $validator));

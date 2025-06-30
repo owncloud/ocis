@@ -121,6 +121,37 @@ class OcisConfigContext implements Context {
 	}
 
 	/**
+	 * @Given the administrator has enabled the following share permissions roles:
+	 *
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 */
+	public function theAdministratorHasEnabledTheFollowingSharePermissionsRoles(TableNode $table): void {
+		$defaultRoles = array_values(GraphHelper::DEFAULT_PERMISSIONS_ROLES);
+		$roles = [];
+		foreach ($table->getHash() as $row) {
+			$roles[] = $row['permissions-role'];
+			$roleId = GraphHelper::getPermissionsRoleIdByName($row['permissions-role']);
+			if (!\in_array($roleId, $defaultRoles)) {
+				$defaultRoles[] = $roleId;
+			}
+		}
+
+		$envs = [
+			"GRAPH_AVAILABLE_ROLES" => implode(',', $defaultRoles),
+		];
+		$response = OcisConfigHelper::reConfigureOcis($envs);
+
+		Assert::assertEquals(
+			200,
+			$response->getStatusCode(),
+			"Failed to enable roles: " . implode(', ', $roles),
+		);
+		$this->setEnabledPermissionsRoles($defaultRoles);
+	}
+
+	/**
 	 * @Given the administrator has disabled the permissions role :role
 	 *
 	 * @param string $role
