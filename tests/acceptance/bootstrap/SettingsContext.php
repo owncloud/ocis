@@ -26,7 +26,7 @@ require_once 'bootstrap.php';
  */
 class SettingsContext implements Context {
 	private FeatureContext $featureContext;
-	private string $settingsUrl = '/api/v0/settings/';
+	private array $autoAcceptSharesSettingIds = [];
 
 	/**
 	 * This will run before EVERY scenario.
@@ -43,6 +43,29 @@ class SettingsContext implements Context {
 		$environment = $scope->getEnvironment();
 		// Get all the contexts you need in this context from here
 		$this->featureContext = BehatHelper::getContext($scope, $environment, 'FeatureContext');
+	}
+
+	/**
+	 * @param string $user
+	 *
+	 * @return string
+	 */
+	public function getAutoAcceptShareSettingId(string $user): string {
+		if (!empty($this->autoAcceptSharesSettingIds) && \array_key_exists($user, $this->autoAcceptSharesSettingIds)) {
+			return $this->autoAcceptSharesSettingIds[$user];
+
+		}
+		return '';
+	}
+
+	/**
+	 * @param string $user
+	 * @param string $id
+	 *
+	 * @return void
+	 */
+	public function setAutoAcceptShareSettingId(string $user, string $id): void {
+		$this->autoAcceptSharesSettingIds[$user] = $id;
 	}
 
 	/**
@@ -487,27 +510,38 @@ class SettingsContext implements Context {
 	 * @throws Exception
 	 */
 	public function toggleAutoAcceptSharesSetting(string $user, bool $status): ResponseInterface {
-		$body = json_encode(
-			[
-				"value" => [
-					"account_uuid" => "me",
-					"bundleId" => SettingsHelper::getBundleId(),
-					"settingId" => SettingsHelper::getSettingIdUsingEventName("Auto Accept Shares"),
-					"resource" => [
-						"type" => "TYPE_USER",
-					],
-					"boolValue" => $status,
+		$body = [
+			"value" => [
+				"account_uuid" => "me",
+				"bundleId" => SettingsHelper::getBundleId(),
+				"settingId" => SettingsHelper::getSettingIdUsingEventName("Auto Accept Shares"),
+				"resource" => [
+					"type" => "TYPE_USER",
 				],
+				"boolValue" => $status,
 			],
-			JSON_THROW_ON_ERROR,
-		);
+		];
+		$autoAcceptSharesSettingId = $this->getAutoAcceptShareSettingId($user);
+		if ($autoAcceptSharesSettingId) {
+			// use existing id if available
+			$body["value"]["id"] = $autoAcceptSharesSettingId;
+		}
+		$body = json_encode($body, JSON_THROW_ON_ERROR);
 
-		return SettingsHelper::updateSettings(
+		$response = SettingsHelper::updateSettings(
 			$this->featureContext->getBaseUrl(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
 			$body,
 		);
+		if (!$autoAcceptSharesSettingId && $response->getStatusCode() === 201) {
+			// save id for future use
+			// updating the setting without id will create a new setting entry
+			$data = $this->featureContext->getJsonDecodedResponseBodyContent($response);
+			$this->setAutoAcceptShareSettingId($user, $data->value->value->id);
+		}
+		$response->getBody()->rewind();
+		return $response;
 	}
 
 	/**

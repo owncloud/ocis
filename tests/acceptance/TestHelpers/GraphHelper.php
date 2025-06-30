@@ -2009,7 +2009,6 @@ class GraphHelper {
 	 * @param string $user
 	 * @param string $password
 	 * @param string $itemId
-	 * @param string $shareSpaceId
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
@@ -2019,14 +2018,13 @@ class GraphHelper {
 		string $user,
 		string $password,
 		string $itemId,
-		string $shareSpaceId,
 	): ResponseInterface {
 		$body = [
 			"remoteItem" => [
 				"id" => $itemId,
 			],
 		];
-		$url = self::getBetaFullUrl($baseUrl, "drives/$shareSpaceId/root/children");
+		$url = self::getBetaFullUrl($baseUrl, "drives/" . GraphHelper::SHARES_SPACE_ID . "/root/children");
 		return HttpRequestHelper::post(
 			$url,
 			$user,

@@ -1512,13 +1512,11 @@ class SharingNgContext implements Context {
 	): void {
 		$share = ltrim($share, '/');
 		$itemId = $this->spacesContext->getResourceId($offeredBy, $space, $share);
-		$shareSpaceId = GraphHelper::SHARES_SPACE_ID;
 		$response = GraphHelper::enableShareSync(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getActualUsername($user),
 			$this->featureContext->getPasswordForUser($user),
 			$itemId,
-			$shareSpaceId,
 		);
 		$this->featureContext->setResponse($response);
 	}
@@ -1542,7 +1540,6 @@ class SharingNgContext implements Context {
 			$this->featureContext->getActualUsername($user),
 			$this->featureContext->getPasswordForUser($user),
 			$remoteItemId,
-			GraphHelper::SHARES_SPACE_ID,
 		);
 		$this->featureContext->setResponse($response);
 	}
@@ -1560,7 +1557,6 @@ class SharingNgContext implements Context {
 	 * @throws Exception|GuzzleException
 	 */
 	public function userTriesToEnableShareSyncOfResourceUsingTheGraphApi(string $user, string $resource): void {
-		$shareSpaceId = GraphHelper::SHARES_SPACE_ID;
 		$itemId = ($resource === 'nonexistent') ? WebDavHelper::generateUUIDv4() : $resource;
 
 		$response = GraphHelper::enableShareSync(
@@ -1568,7 +1564,6 @@ class SharingNgContext implements Context {
 			$this->featureContext->getActualUsername($user),
 			$this->featureContext->getPasswordForUser($user),
 			$itemId,
-			$shareSpaceId,
 		);
 		$this->featureContext->setResponse($response);
 	}
