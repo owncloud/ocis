@@ -26,8 +26,7 @@ require_once 'bootstrap.php';
  */
 class SettingsContext implements Context {
 	private FeatureContext $featureContext;
-	private string $settingsUrl = '/api/v0/settings/';
-	private string $autoAcceptSharesSettingId = '';
+	private array $autoAcceptSharesSettingIds = [];
 
 	/**
 	 * This will run before EVERY scenario.
@@ -44,6 +43,29 @@ class SettingsContext implements Context {
 		$environment = $scope->getEnvironment();
 		// Get all the contexts you need in this context from here
 		$this->featureContext = BehatHelper::getContext($scope, $environment, 'FeatureContext');
+	}
+
+	/**
+	 * @param string $user
+	 *
+	 * @return string
+	 */
+	public function getAutoAcceptShareSettingId(string $user): string {
+		if (!empty($this->autoAcceptSharesSettingIds) && \array_key_exists($user, $this->autoAcceptSharesSettingIds)) {
+			return $this->autoAcceptSharesSettingIds[$user];
+
+		}
+		return '';
+	}
+
+	/**
+	 * @param string $user
+	 * @param string $id
+	 *
+	 * @return void
+	 */
+	public function setAutoAcceptShareSettingId(string $user, string $id): void {
+		$this->autoAcceptSharesSettingIds[$user] = $id;
 	}
 
 	/**
@@ -499,9 +521,10 @@ class SettingsContext implements Context {
 				"boolValue" => $status,
 			],
 		];
-		if ($this->autoAcceptSharesSettingId) {
+		$autoAcceptSharesSettingId = $this->getAutoAcceptShareSettingId($user);
+		if ($autoAcceptSharesSettingId) {
 			// use existing id if available
-			$body["value"]["id"] = $this->autoAcceptSharesSettingId;
+			$body["value"]["id"] = $autoAcceptSharesSettingId;
 		}
 		$body = json_encode($body, JSON_THROW_ON_ERROR);
 
@@ -511,11 +534,11 @@ class SettingsContext implements Context {
 			$this->featureContext->getPasswordForUser($user),
 			$body,
 		);
-		if (empty($this->autoAcceptSharesSettingId) && $response->getStatusCode() === 201) {
+		if (!$autoAcceptSharesSettingId && $response->getStatusCode() === 201) {
 			// save id for future use
 			// updating the setting without id will create a new setting entry
 			$data = $this->featureContext->getJsonDecodedResponseBodyContent($response);
-			$this->autoAcceptSharesSettingId = $data->value->value->id;
+			$this->setAutoAcceptShareSettingId($user, $data->value->value->id);
 		}
 		$response->getBody()->rewind();
 		return $response;
