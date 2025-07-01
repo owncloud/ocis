@@ -51,11 +51,17 @@ The envvar struct tag contains at maximum the following key/value pairs to docum
 If a new envvar is introduced, only the `introductionVersion` is required.
 
 {{< hint info >}}
-During development, set `introductionVersion` to a short, **alphabetic code name** that represents the upcoming release (e.g. `releaseX`).
-This identifier stays constant until the release receives its final semantic-version number in production.
+* During development, set `introductionVersion` to a short, **alphabetic code name** that represents the upcoming release (e.g. `releaseX`).
+* This identifier stays constant until the release receives its final production semantic-version number.
 {{< /hint >}}
 
-The docs helper scripts render these alphabetic identifiers verbatim; once the release is cut, replace them with the actual semantic version (e.g. `releaseX` → `7.0.0`).
+The docs helper scripts render these alphabetic identifiers verbatim. They appear in the next (master) branch of the admin docs as rendered here.
+
+Once the release is cut, before tagging, replace them with the actual semantic version (e.g. `releaseX` → `7.2.0`). 
+
+{{< hint info >}}
+A new production version **MUST NOT** contain any alphabetic identifyers but the semantic version only.
+{{< /hint >}}
 
 ### Adding Envvars to Existing Ones
 
