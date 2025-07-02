@@ -22,15 +22,20 @@ func FileServer(fsys fs.FS) http.Handler {
 }
 
 func (f *fileServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	uPath := path.Clean(path.Join("/", r.URL.Path))
-	r.URL.Path = uPath
+	const safeBaseDir = "/safe/base/directory"
+	uPath := path.Clean(r.URL.Path)
+	absPath, err := filepath.Abs(filepath.Join(safeBaseDir, uPath))
+	if err != nil || !strings.HasPrefix(absPath, safeBaseDir) {
+		http.Error(w, "Invalid file path", http.StatusBadRequest)
+		return
+	}
 
 	tryIndex := func() {
-		r.URL.Path = "/index.html"
+		indexPath := filepath.Join(safeBaseDir, "index.html")
 
 		// not every fs contains a file named index.html,
 		// therefore, we need to check if the file exists and stop the recursion if it doesn't
-		file, err := f.fsys.Open(r.URL.Path)
+		file, err := f.fsys.Open(indexPath)
 		if err != nil {
 			http.NotFound(w, r)
 			return
@@ -40,7 +45,7 @@ func (f *fileServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		f.ServeHTTP(w, r)
 	}
 
-	asset, err := f.fsys.Open(uPath)
+	asset, err := f.fsys.Open(absPath)
 	if err != nil {
 		tryIndex()
 		return
