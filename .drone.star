@@ -3675,7 +3675,7 @@ def deleteStaleBranches(ctx):
                     },
                 },
                 "commands": [
-                    "./scripts/delete-stale-branches.sh",
+                    "./scripts/delete-stale-branches.sh || true",
                 ],
             },
         ],
