@@ -67,6 +67,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Fix storage-users cli: [#11464](https://github.com/owncloud/ocis/pull/11464)
+* Bugfix - Fix the OCM role editor: [#11484](https://github.com/owncloud/ocis/pull/11484)
 
 ## Details
 
@@ -76,6 +77,14 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/11290
    https://github.com/owncloud/ocis/pull/11464
+
+* Bugfix - Fix the OCM role editor: [#11484](https://github.com/owncloud/ocis/pull/11484)
+
+   Fix the issue when the watermark is visible to user with a viewer role in
+   Collabora
+
+   https://github.com/owncloud/ocis/issues/11474
+   https://github.com/owncloud/ocis/pull/11484
 
 # Changelog for [7.2.0-rc.1] (2025-06-20)
 
