@@ -25,7 +25,8 @@ The relevant annotations in the envvar struct tag are:
   Only if it is going to be replaced, not necessary if removed.
 
 {{< hint warning >}}
-During the development cycle, the value for the `removalVersion` must be set to `%%NEXT_PRODUCTION_VERSION%%`.  This placeholder will be replaced by the real version number during the production releasing process.
+* During the development cycle, the value for the `removalVersion` must be set to `%%NEXT_PRODUCTION_VERSION%%`. This placeholder will be replaced by the real semantic-version number during the production releasing process.
+* Compared when introducing new envvars where you can use arbitrary alphabetic identifyers, the string for deprecation is fixed and cannot be altered.
 {{< /hint >}}
 
 For the documentation to show the correct value for the `removalVersion`, our docs helper scripts will automatically generate the correct version to be printed in the documentation. If `%%NEXT_PRODUCTION_VERSION%%` is found in the query, it will be replaced with `next-prod`, else the value found is used.
@@ -45,7 +46,7 @@ There are four different annotation variables that need to be filled:
 | Annotation |Description| Format|
 |---|---|---|
 | deprecationVersion | The version the variable will be deprecated | semver (e.g. 3.0)|
-| removalVersion| The version the variable will be removed from the codebase. Note that according to semver, a removal **MUST NOT** be made in a minor or patch version change, but only in a major release | `%%NEXT_PRODUCTION_VERSION%%` |
+| removalVersion | The version the variable will be removed from the codebase. Consider semver rules when finally removing a deprecated ennvar | `%%NEXT_PRODUCTION_VERSION%%` |
 | deprecationInfo | Information why the variable is deprecated, must start with the name of the variable in order to avoid confusion, when there are multiple options in the `env:`-field | string (e.g. NATS_NATS_HOST is confusing) |
 | deprecationReplacement | The name of the variable that is going to replace the deprecated one.| string (e.g. NATS_HOST_ADDRESS) |
 
