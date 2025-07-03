@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2025-07-03-08-22-52]
+[#deprecation-note-2025-07-03-08-38-18]
 [caption=]
 .Deprecation notes for the notifications service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -451,7 +451,7 @@ a|`OCIS_PERSISTENT_STORE` +
 `NOTIFICATIONS_STORE` +
 
 a| [subs=-attributes]
-++7.1 ++
+++7.1.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -463,7 +463,7 @@ a|`OCIS_PERSISTENT_STORE_NODES` +
 `NOTIFICATIONS_STORE_NODES` +
 
 a| [subs=-attributes]
-++7.1 ++
+++7.1.0 ++
 a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
@@ -474,7 +474,7 @@ A list of nodes to access the configured store. This has no effect when 'memory'
 a|`NOTIFICATIONS_STORE_DATABASE` +
 
 a| [subs=-attributes]
-++7.1 ++
+++7.1.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -485,7 +485,7 @@ The database name the configured store should use.
 a|`NOTIFICATIONS_STORE_TABLE` +
 
 a| [subs=-attributes]
-++7.1 ++
+++7.1.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -497,7 +497,7 @@ a|`OCIS_PERSISTENT_STORE_TTL` +
 `NOTIFICATIONS_STORE_TTL` +
 
 a| [subs=-attributes]
-++7.1 ++
+++7.1.0 ++
 a| [subs=-attributes]
 ++Duration ++
 a| [subs=-attributes]
@@ -509,7 +509,7 @@ a|`OCIS_PERSISTENT_STORE_AUTH_USERNAME` +
 `NOTIFICATIONS_STORE_AUTH_USERNAME` +
 
 a| [subs=-attributes]
-++7.1 ++
+++7.1.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -521,7 +521,7 @@ a|`OCIS_PERSISTENT_STORE_AUTH_PASSWORD` +
 `NOTIFICATIONS_STORE_AUTH_PASSWORD` +
 
 a| [subs=-attributes]
-++7.1 ++
+++7.1.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]

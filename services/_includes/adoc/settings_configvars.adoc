@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2025-07-03-08-22-52]
+[#deprecation-note-2025-07-03-08-38-18]
 [caption=]
 .Deprecation notes for the settings service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -523,7 +523,7 @@ a|`OCIS_TRANSLATION_PATH` +
 `SETTINGS_TRANSLATION_PATH` +
 
 a| [subs=-attributes]
-++7.1 ++
+++7.1.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
