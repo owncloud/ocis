@@ -82,6 +82,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix panic while traversing the service list: [#11390](https://github.com/owncloud/ocis/pull/11390)
 * Bugfix - Fix storage-users cli: [#11464](https://github.com/owncloud/ocis/pull/11464)
 * Bugfix - Return translated role definitions: [#11466](https://github.com/owncloud/ocis/pull/11466)
+* Bugfix - Fix the OCM role editor: [#11484](https://github.com/owncloud/ocis/pull/11484)
 * Change - Remove deprecated FRONTEND_OCS_*: [#11333](https://github.com/owncloud/ocis/pull/11333)
 * Change - Remove deprecated CLIENTLOG_REVA_GATEWAY: [#11372](https://github.com/owncloud/ocis/pull/11372)
 * Enhancement - Allow scaling the search service: [#11029](https://github.com/owncloud/ocis/pull/11029)
@@ -234,6 +235,14 @@ The following sections list the changes for unreleased.
    role definitions in the language set in the `Accept-Language` header if present.
 
    https://github.com/owncloud/ocis/pull/11466
+
+* Bugfix - Fix the OCM role editor: [#11484](https://github.com/owncloud/ocis/pull/11484)
+
+   Fix the issue when the watermark is visible to user with a viewer role in
+   Collabora
+
+   https://github.com/owncloud/ocis/issues/11474
+   https://github.com/owncloud/ocis/pull/11484
 
 * Change - Remove deprecated FRONTEND_OCS_*: [#11333](https://github.com/owncloud/ocis/pull/11333)
 
