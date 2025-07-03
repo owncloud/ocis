@@ -1994,6 +1994,78 @@ var _ = Describe("FileConnector", func() {
 				UserID:                  hex.EncodeToString([]byte("aabbcc@example.com")),
 				UserFriendlyName:        "Pet Shaft",
 				EnableOwnerTermination:  true,
+				WatermarkText:           "",
+				SupportsLocks:           true,
+				SupportsRename:          true,
+				UserCanRename:           false,
+				BreadcrumbDocName:       "test.txt",
+				PostMessageOrigin:       "https://ocis.example.prv",
+			}
+
+			response, err := fc.CheckFileInfo(ctx)
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(response.Status).To(Equal(200))
+			Expect(response.Body.(*fileinfo.Collabora)).To(Equal(expectedFileInfo))
+		})
+		It("Stat success secure view authenticated user", func() {
+			// change view mode to view only
+			wopiCtx.ViewMode = appproviderv1beta1.ViewMode_VIEW_MODE_VIEW_ONLY
+			wopiCtx.ViewOnlyToken = "ABC123"
+
+			ctx := middleware.WopiContextToCtx(context.Background(), wopiCtx)
+			u := &userv1beta1.User{
+				Id: &userv1beta1.UserId{
+					Idp:      "example.com",
+					OpaqueId: "aabbcc",
+					Type:     userv1beta1.UserType_USER_TYPE_PRIMARY,
+				},
+				DisplayName: "Pet Shaft",
+				Mail:        "shaft@example.com",
+			}
+			ctx = ctxpkg.ContextSetUser(ctx, u)
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Times(1).Return(&providerv1beta1.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &providerv1beta1.ResourceInfo{
+					Owner: &userv1beta1.UserId{
+						Idp:      "customIdp",
+						OpaqueId: "aabbcc",
+						Type:     userv1beta1.UserType_USER_TYPE_PRIMARY,
+					},
+					Size: uint64(998877),
+					Mtime: &typesv1beta1.Timestamp{
+						Seconds: uint64(16273849),
+					},
+					Path: "/path/to/test.txt",
+					Id: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "opaqueid",
+						SpaceId:   "spaceid",
+					},
+					ParentId: &providerv1beta1.ResourceId{
+						StorageId: "storageid",
+						OpaqueId:  "parentopaqueid",
+						SpaceId:   "spaceid",
+					},
+				},
+			}, nil)
+
+			// change wopi app provider
+			cfg.App.Name = "Collabora"
+			cfg.App.Product = "Collabora"
+
+			expectedFileInfo := &fileinfo.Collabora{
+				OwnerID:                 "61616262636340637573746f6d496470", // hex of aabbcc@customIdp
+				Size:                    int64(998877),
+				BaseFileName:            "test.txt",
+				UserCanNotWriteRelative: false,
+				DisableExport:           true,
+				DisableCopy:             true,
+				DisablePrint:            true,
+				UserID:                  hex.EncodeToString([]byte("aabbcc@example.com")),
+				UserFriendlyName:        "Pet Shaft",
+				EnableOwnerTermination:  true,
 				WatermarkText:           "Pet Shaft shaft@example.com",
 				SupportsLocks:           true,
 				SupportsRename:          true,
