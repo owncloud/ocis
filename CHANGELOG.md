@@ -1,5 +1,6 @@
 # Table of Contents
 
+* [Changelog for unreleased](#changelog-for-unreleased-unreleased)
 * [Changelog for 7.2.0-rc.1](#changelog-for-720-rc1-2025-06-20)
 * [Changelog for 7.1.3](#changelog-for-713-2025-05-27)
 * [Changelog for 7.1.2](#changelog-for-712-2025-03-28)
@@ -56,6 +57,25 @@
 * [Changelog for 1.2.0](#changelog-for-120-2021-02-17)
 * [Changelog for 1.1.0](#changelog-for-110-2021-01-22)
 * [Changelog for 1.0.0](#changelog-for-100-2020-12-17)
+
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes for unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis/compare/v7.2.0-rc.1...master
+
+## Summary
+
+* Bugfix - Fix storage-users cli: [#11464](https://github.com/owncloud/ocis/pull/11464)
+
+## Details
+
+* Bugfix - Fix storage-users cli: [#11464](https://github.com/owncloud/ocis/pull/11464)
+
+   Fix storage-users uploads --resume command.
+
+   https://github.com/owncloud/ocis/issues/11290
+   https://github.com/owncloud/ocis/pull/11464
 
 # Changelog for [7.2.0-rc.1] (2025-06-20)
 
