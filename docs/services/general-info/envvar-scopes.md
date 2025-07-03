@@ -19,14 +19,14 @@ The scope of an environment variable can be derived from its name. Therefore, it
 
 -   A variable that is only used in a particular service is a **local envvar**.
 -   A variable that is used in more than one service is a **global envvar**.
--   Mandatory when used in a service, a global envvar must have a local counterpart.
--   Variables that do not belong to any service are by definition global.
+-   If applicapable, a global envvar has a local counterpart.
+-   Variables that are not limited to any service are by definition global.
 
 ## Naming Scope
 
 ### Local Envvars
 
-A local envvar always starts with the service name like `POSTPROCESSING_LOG_FILE`.
+A local envvar always starts with the service name such as `POSTPROCESSING_LOG_FILE`.
 
 ### Global Envvars
 
@@ -50,13 +50,18 @@ The envvar struct tag contains at maximum the following key/value pairs to docum
 
 If a new envvar is introduced, only the `introductionVersion` is required.
 
-{{< hint warning >}}
-During the development cycle, the value for the `introductionVersion` must be set to `%%NEXT%%`. This placeholder will be removed by the real version number during the production releasing process. 
+{{< hint info >}}
+* During development, set `introductionVersion` to a short, **alphabetic code name** that represents the upcoming release (e.g. `releaseX`).
+* This identifier stays constant until the release receives its final production semantic-version number.
 {{< /hint >}}
 
-For the documentation to show the correct value for the `IV` (introduction version), our docs helper scripts will automatically generate the correct version to be printed in the documentation. If `%%NEXT%%` is found in the query, it will be replaced with `next`, else the value found is used.
+The docs helper scripts render these alphabetic identifiers verbatim. They appear in the next (master) branch of the admin docs as rendered here.
 
-During the releasing process for a production release, the placeholder `%%NEXT%%` has to be replaced with the new production version number like `%%NEXT%%` → `7.0.0`.
+Once the release is cut, before tagging, replace them with the actual semantic version (e.g. `releaseX` → `7.2.0`). 
+
+{{< hint info >}}
+A new production version **MUST NOT** contain any alphabetic identifyers but the semantic version only.
+{{< /hint >}}
 
 ### Adding Envvars to Existing Ones
 
