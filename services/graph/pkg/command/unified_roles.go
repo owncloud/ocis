@@ -14,23 +14,6 @@ import (
 	"github.com/owncloud/ocis/v2/services/graph/pkg/unifiedrole"
 )
 
-var (
-	unifiedRolesNames = map[string]string{
-		unifiedrole.UnifiedRoleViewerID:                     "Viewer",
-		unifiedrole.UnifiedRoleViewerListGrantsID:           "ViewerListGrants",
-		unifiedrole.UnifiedRoleSpaceViewerID:                "SpaceViewer",
-		unifiedrole.UnifiedRoleEditorID:                     "Editor",
-		unifiedrole.UnifiedRoleEditorListGrantsID:           "EditorListGrants",
-		unifiedrole.UnifiedRoleSpaceEditorID:                "SpaceEditor",
-		unifiedrole.UnifiedRoleSpaceEditorWithoutVersionsID: "SpaceEditorWithoutVersions",
-		unifiedrole.UnifiedRoleFileEditorID:                 "FileEditor",
-		unifiedrole.UnifiedRoleFileEditorListGrantsID:       "FileEditorListGrants",
-		unifiedrole.UnifiedRoleEditorLiteID:                 "EditorLite",
-		unifiedrole.UnifiedRoleManagerID:                    "SpaceManager",
-		unifiedrole.UnifiedRoleSecureViewerID:               "SecureViewer",
-	}
-)
-
 // UnifiedRoles bundles available commands for unified roles
 func UnifiedRoles(cfg *config.Config) cli.Commands {
 	cmds := cli.Commands{
@@ -58,7 +41,7 @@ func listUnifiedRoles(cfg *config.Config) *cli.Command {
 			tbl.SetRowLine(true)
 			tbl.SetAutoMergeCellsByColumnIndex([]int{0}) // rowspan should only affect the first column
 
-			headers := []string{"Name", "UID", "Enabled", "Description", "Condition", "Allowed resource actions"}
+			headers := []string{"Label", "UID", "Enabled", "Description", "Condition", "Allowed resource actions"}
 			tbl.SetHeader(headers)
 
 			for _, definition := range unifiedrole.GetRoles(unifiedrole.RoleFilterAll()) {
@@ -66,7 +49,7 @@ func listUnifiedRoles(cfg *config.Config) *cli.Command {
 				const disabled = "disabled"
 
 				rows := [][]string{
-					{unifiedRolesNames[definition.GetId()], definition.GetId(), disabled, definition.GetDescription()},
+					{unifiedrole.GetUnifiedRoleLabel(definition.GetId()), definition.GetId(), disabled, definition.GetDescription()},
 				}
 				if slices.Contains(cfg.UnifiedRoles.AvailableRoles, definition.GetId()) {
 					rows[0][2] = enabled
