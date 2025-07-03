@@ -1308,7 +1308,7 @@ func (f *FileConnector) CheckFileInfo(ctx context.Context) (*ConnectorResponse, 
 		infoMap[fileinfo.KeyDisableExport] = true // only for collabora
 		infoMap[fileinfo.KeyDisableCopy] = true   // only for collabora
 		infoMap[fileinfo.KeyDisablePrint] = true
-		if !isPublicShare {
+		if !isPublicShare && wopiContext.ViewOnlyToken != "" {
 			infoMap[fileinfo.KeyWatermarkText] = f.watermarkText(user) // only for collabora
 		}
 	}
