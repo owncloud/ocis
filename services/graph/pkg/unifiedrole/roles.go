@@ -193,6 +193,26 @@ var (
 	// UnifiedRole FullDenial, Role DisplayName (resolves directly)
 	_deniedUnifiedRoleDisplayName = l10n.Template("Cannot access")
 
+	// unifiedRoleLabel contains the mapping of unified role IDs to their labels.
+	unifiedRoleLabel = map[string]string{
+		UnifiedRoleViewerID:                           "Viewer",
+		UnifiedRoleViewerListGrantsID:                 "ViewerListGrants",
+		UnifiedRoleSpaceViewerID:                      "SpaceViewer",
+		UnifiedRoleEditorID:                           "Editor",
+		UnifiedRoleEditorListGrantsID:                 "EditorListGrants",
+		UnifiedRoleEditorListGrantsWithVersionsID:     "EditorListGrantsWithVersions",
+		UnifiedRoleSpaceEditorID:                      "SpaceEditor",
+		UnifiedRoleSpaceEditorWithoutVersionsID:       "SpaceEditorWithoutVersions",
+		UnifiedRoleSpaceEditorWithoutTrashbinID:       "SpaceEditorWithoutTrashbin",
+		UnifiedRoleFileEditorID:                       "FileEditor",
+		UnifiedRoleFileEditorListGrantsID:             "FileEditorListGrants",
+		UnifiedRoleFileEditorListGrantsWithVersionsID: "FileEditorListGrantsWithVersions",
+		UnifiedRoleEditorLiteID:                       "EditorLite",
+		UnifiedRoleManagerID:                          "Manager",
+		UnifiedRoleSecureViewerID:                     "SecureViewer",
+		UnifiedRoleDeniedID:                           "Denied",
+	}
+
 	// legacyNames contains the legacy role names.
 	legacyNames = map[string]string{
 		UnifiedRoleViewerID: conversions.RoleViewer,
@@ -594,6 +614,11 @@ func GetRolesByPermissions(roleSet []*libregraph.UnifiedRoleDefinition, actions 
 	}
 
 	return weightRoles(roles, constraints, descending)
+}
+
+// GetUnifiedRoleLabel returns the label for the provided unified role ID
+func GetUnifiedRoleLabel(unifiedRoleId string) string {
+	return unifiedRoleLabel[unifiedRoleId]
 }
 
 // GetLegacyRoleName returns the legacy role name for the provided role
