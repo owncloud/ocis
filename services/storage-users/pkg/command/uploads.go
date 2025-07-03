@@ -117,7 +117,7 @@ func ListUploadSessions(cfg *config.Config) *cli.Command {
 			}
 
 			var stream events.Stream
-			if c.Bool("restart") {
+			if c.Bool("restart") || c.Bool("resume") {
 				stream, err = event.NewStream(cfg)
 				if err != nil {
 					fmt.Fprintf(os.Stderr, "Failed to create event stream: %v\n", err)
