@@ -71,11 +71,11 @@ type ServiceAccount struct {
 
 // Store configures the store to use
 type Store struct {
-	Store        string        `yaml:"store" env:"OCIS_PERSISTENT_STORE;NOTIFICATIONS_STORE" desc:"The type of the store. Supported values are: 'memory', 'nats-js-kv', 'redis-sentinel', 'noop'. See the text description for details." introductionVersion:"7.1"`
-	Nodes        []string      `yaml:"nodes" env:"OCIS_PERSISTENT_STORE_NODES;NOTIFICATIONS_STORE_NODES" desc:"A list of nodes to access the configured store. This has no effect when 'memory' store is configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details." introductionVersion:"7.1"`
-	Database     string        `yaml:"database" env:"NOTIFICATIONS_STORE_DATABASE" desc:"The database name the configured store should use." introductionVersion:"7.1"`
-	Table        string        `yaml:"table" env:"NOTIFICATIONS_STORE_TABLE" desc:"The database table the store should use." introductionVersion:"7.1"`
-	TTL          time.Duration `yaml:"ttl" env:"OCIS_PERSISTENT_STORE_TTL;NOTIFICATIONS_STORE_TTL" desc:"Time to live for notifications in the store. Defaults to '336h' (2 weeks). See the Environment Variable Types description for more details." introductionVersion:"7.1"`
-	AuthUsername string        `yaml:"username" env:"OCIS_PERSISTENT_STORE_AUTH_USERNAME;NOTIFICATIONS_STORE_AUTH_USERNAME" desc:"The username to authenticate with the store. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"7.1"`
-	AuthPassword string        `yaml:"password" env:"OCIS_PERSISTENT_STORE_AUTH_PASSWORD;NOTIFICATIONS_STORE_AUTH_PASSWORD" desc:"The password to authenticate with the store. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"7.1"`
+	Store        string        `yaml:"store" env:"OCIS_PERSISTENT_STORE;NOTIFICATIONS_STORE" desc:"The type of the store. Supported values are: 'memory', 'nats-js-kv', 'redis-sentinel', 'noop'. See the text description for details." introductionVersion:"7.1.0"`
+	Nodes        []string      `yaml:"nodes" env:"OCIS_PERSISTENT_STORE_NODES;NOTIFICATIONS_STORE_NODES" desc:"A list of nodes to access the configured store. This has no effect when 'memory' store is configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details." introductionVersion:"7.1.0"`
+	Database     string        `yaml:"database" env:"NOTIFICATIONS_STORE_DATABASE" desc:"The database name the configured store should use." introductionVersion:"7.1.0"`
+	Table        string        `yaml:"table" env:"NOTIFICATIONS_STORE_TABLE" desc:"The database table the store should use." introductionVersion:"7.1.0"`
+	TTL          time.Duration `yaml:"ttl" env:"OCIS_PERSISTENT_STORE_TTL;NOTIFICATIONS_STORE_TTL" desc:"Time to live for notifications in the store. Defaults to '336h' (2 weeks). See the Environment Variable Types description for more details." introductionVersion:"7.1.0"`
+	AuthUsername string        `yaml:"username" env:"OCIS_PERSISTENT_STORE_AUTH_USERNAME;NOTIFICATIONS_STORE_AUTH_USERNAME" desc:"The username to authenticate with the store. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"7.1.0"`
+	AuthPassword string        `yaml:"password" env:"OCIS_PERSISTENT_STORE_AUTH_PASSWORD;NOTIFICATIONS_STORE_AUTH_PASSWORD" desc:"The password to authenticate with the store. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"7.1.0"`
 }
