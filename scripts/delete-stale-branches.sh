@@ -33,7 +33,7 @@ log_header() {
 }
 
 log_info() {  
-    echo -e "$*$"
+    echo -e "$*"
 }
 
 # Helper: get ISO8601 date N days ago (cross-platform)
@@ -81,6 +81,40 @@ get_days_diff_from_now() {
     local date_epoch
     date_epoch=$(iso_to_epoch "$iso_date")
     echo $(( (now_epoch - date_epoch) / 86400 ))
+}
+
+# Get stale branches with age filtering (atomic git operation)
+get_stale_branches() {
+    local days_threshold="$1"
+    local temp_file=$(mktemp)
+    
+    # Ensure temp file cleanup on function exit/interruption
+    trap 'rm -f "$temp_file"' RETURN
+    
+    # Single atomic git command gets all branch info at once, write to file to avoid SIGPIPE
+    # Reference: TabrisJS uses git for-each-ref -> file -> process for automation across repos    
+    # https://tabris.com/iterate-over-branches-in-your-git-repository/
+    git for-each-ref --format='%(refname:short)|%(objectname)|%(committerdate:iso8601-strict)|%(authorname)' refs/remotes/origin/ > "$temp_file"
+    
+    local stale_info=""
+    while IFS='|' read -r refname sha date author; do
+        local branch=${refname#origin/}
+        [[ "$branch" == "HEAD" ]] && continue
+        
+        # Skip ignored branches
+        [[ "$branch" =~ $IGNORE_BRANCHES_REGEX ]] && continue
+        
+        # Calculate age and filter immediately
+        # Convert git date format "2025-05-20 09:48:29 +0200" to ISO8601 "2025-05-20T09:48:29+0200"
+        local iso_date="${date/ /T}"      # Replace first space with T
+        iso_date="${iso_date/ /}"         # Remove space before timezone
+        local age_days=$(get_days_diff_from_now "$iso_date")
+        if [[ "$age_days" -ge "$days_threshold" ]]; then
+            stale_info="$stale_info$age_days"$'\t'"$sha"$'\t'"$date"$'\t'"$branch"$'\t'"$author"$'\n'
+        fi
+    done < "$temp_file"
+    
+    echo "${stale_info%$'\n'}"
 }
 
 validate_requirements() {
@@ -134,10 +168,6 @@ parse_repo_info() {
 }
 
 main() {
-    # Initialize temporary file
-    branch_info_file=$(mktemp)
-    trap 'rm -f "$branch_info_file"' EXIT
-
     # Validate script requirements
     validate_requirements
 
@@ -158,47 +188,24 @@ main() {
     log_info "  Max branches per run: $MAX_BRANCHES_PER_RUN"
     log_info "  Dry run: $DRY_RUN"
 
-    # Get all branches
-    local branches_all branches_all_count branches_ignored branches_candidates
-    branches_all=$(git branch -r | grep -v '\->' | sed 's/origin\///' | xargs -I{} echo "{}")
-    branches_all_count=$(echo "$branches_all" | wc -l)
-    branches_ignored=$(echo "$branches_all" | grep -E "$IGNORE_BRANCHES_REGEX" || true)
+    local stale_branches
+    stale_branches=$(get_stale_branches "$DAYS_BEFORE_STALE")
+    
+    if [[ -z "$stale_branches" ]]; then
+        log_header "No stale branches found."
+        exit 0
+    fi
 
-    log_header "Branch Filtering:"
-    log_info "  IGNORE_BRANCHES_REGEX: ${Y}${IGNORE_BRANCHES_REGEX}${R}"
-    log_info "  Ignored branches:"
-    echo "$branches_ignored"
-
-    branches_candidates=$(echo "$branches_all" | grep -Ev "$IGNORE_BRANCHES_REGEX" || true)
-
-    # Collect branch info
-    for branch in $branches_candidates; do
-        local last_commit_date last_commit_author last_commit_sha age_days
-        last_commit_date=$(git log -1 --format=%aI "origin/$branch")
-        last_commit_author=$(git log -1 --format=%an "origin/$branch")
-        last_commit_sha=$(git log -1 --format=%H "origin/$branch")
-        age_days=$(get_days_diff_from_now "$last_commit_date")
-        
-        if [[ "$age_days" -lt "$DAYS_BEFORE_STALE" ]]; then
-            continue
-        fi
-        printf "%d\t%s\t%s\t%s\t%s\n" "$age_days" "$last_commit_sha" "$last_commit_date" "$branch" "$last_commit_author" >> "$branch_info_file"
-    done
-
-    # Sort and get oldest branches
+    # Sort and show stale branches
     if [[ "$VERBOSE" == "true" ]]; then
         log_header "Stale branches by age:"
-        sort -nr "$branch_info_file" | while IFS=$'\t' read -r age_days sha date branch author; do
-            printf "  ${G}%-4d days${R}  %s  ${G}%s${R}  by %s\n" "$age_days" "$branch" "$date" "$author"
+        echo "$stale_branches" | sort -nr | while IFS=$'\t' read -r age_days sha date branch author; do
+            printf "  ${G}%-4d days${R}  %s  ${G}%s${R}  by %s\n" "$age_days" "$branch" "${date%%T*}" "$author"
         done
     fi
 
     local oldest_branches
-    oldest_branches=$(sort -nr "$branch_info_file" | head -n "$MAX_BRANCHES_PER_RUN")
-    if [[ -z "$oldest_branches" ]]; then
-        log_header "No branches to delete."
-        exit 0
-    fi
+    oldest_branches=$(echo "$stale_branches" | sort -nr | head -n "$MAX_BRANCHES_PER_RUN")
 
     log_header "Deleting oldest branches (max $MAX_BRANCHES_PER_RUN):"
     while IFS=$'\t' read -r age_days sha date branch author; do
@@ -209,18 +216,16 @@ main() {
     done <<< "$oldest_branches"
 
     # Print summary
-    local branches_remaining branches_remaining_count deleted_count
-    branches_remaining=$(git branch -r | grep -v '\->' | sed 's/origin\///' | xargs -I{} echo "{}")
-    branches_remaining_count=$(echo "$branches_remaining" | wc -l)
-    deleted_count=$((branches_all_count - branches_remaining_count))
+    local stale_count deleted_count
+    stale_count=$(printf "%s\n" "$stale_branches" | wc -l)
+    deleted_count=$(printf "%s\n" "$oldest_branches" | wc -l)
 
     log_header "Summary:"
     if [[ "$DRY_RUN" != "false" ]]; then
         log_info "  DRY_RUN: No branches deleted"
     fi
-    log_info "  Branches before: $branches_all_count"
-    log_info "  Branches after:  $branches_remaining_count"
-    log_info "  Deleted:        $deleted_count"
+    log_info "  Stale branches found: $stale_count"
+    log_info "  Branches deleted: $deleted_count"
     echo
 }
 
