@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"math/big"
 	"net"
+	"slices"
 	"sort"
 
 	cidrMerge "github.com/open-policy-agent/opa/internal/cidr/merge"
@@ -75,7 +76,7 @@ func builtinNetCIDRIntersects(_ BuiltinContext, operands []*ast.Term, iter func(
 	// If either net contains the others starting IP they are overlapping
 	cidrsOverlap := cidrnetA.Contains(cidrnetB.IP) || cidrnetB.Contains(cidrnetA.IP)
 
-	return iter(ast.InternedBooleanTerm(cidrsOverlap))
+	return iter(ast.InternedTerm(cidrsOverlap))
 }
 
 func builtinNetCIDRContains(_ BuiltinContext, operands []*ast.Term, iter func(*ast.Term) error) error {
@@ -92,7 +93,7 @@ func builtinNetCIDRContains(_ BuiltinContext, operands []*ast.Term, iter func(*a
 
 	ip := net.ParseIP(string(bStr))
 	if ip != nil {
-		return iter(ast.InternedBooleanTerm(cidrnetA.Contains(ip)))
+		return iter(ast.InternedTerm(cidrnetA.Contains(ip)))
 	}
 
 	// It wasn't an IP, try and parse it as a CIDR
@@ -113,7 +114,7 @@ func builtinNetCIDRContains(_ BuiltinContext, operands []*ast.Term, iter func(*a
 		cidrContained = cidrnetA.Contains(lastIP)
 	}
 
-	return iter(ast.InternedBooleanTerm(cidrContained))
+	return iter(ast.InternedTerm(cidrContained))
 }
 
 var errNetCIDRContainsMatchElementType = errors.New("element must be string or non-empty array")
@@ -142,7 +143,7 @@ func evalNetCIDRContainsMatchesOperand(operand int, a *ast.Term, iter func(cidr,
 			if err != nil {
 				return fmt.Errorf("operand %v: %v", operand, err)
 			}
-			if err := iter(cidr, ast.InternedIntNumberTerm(i)); err != nil {
+			if err := iter(cidr, ast.InternedTerm(i)); err != nil {
 				return err
 			}
 		}
@@ -219,13 +220,13 @@ func builtinNetCIDRExpand(bctx BuiltinContext, operands []*ast.Term, iter func(*
 func builtinNetCIDRIsValid(_ BuiltinContext, operands []*ast.Term, iter func(*ast.Term) error) error {
 	cidr, err := builtins.StringOperand(operands[0].Value, 1)
 	if err != nil {
-		return iter(ast.InternedBooleanTerm(false))
+		return iter(ast.InternedTerm(false))
 	}
 
 	if _, _, err := net.ParseCIDR(string(cidr)); err != nil {
-		return iter(ast.InternedBooleanTerm(false))
+		return iter(ast.InternedTerm(false))
 	}
-	return iter(ast.InternedBooleanTerm(true))
+	return iter(ast.InternedTerm(true))
 }
 
 type cidrBlockRange struct {
@@ -392,7 +393,7 @@ func mergeCIDRs(ranges cidrBlockRanges) cidrBlockRanges {
 			ranges[i-1] = &cidrBlockRange{First: &firstIPRange, Last: &lastIPRange, Network: nil}
 
 			// Delete ranges[i] since merged with the previous.
-			ranges = append(ranges[:i], ranges[i+1:]...)
+			ranges = slices.Delete(ranges, i, i+1)
 		}
 	}
 	return ranges

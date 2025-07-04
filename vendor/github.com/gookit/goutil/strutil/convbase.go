@@ -4,7 +4,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/gookit/goutil/basefn"
+	"github.com/gookit/goutil/x/basefn"
 )
 
 //
@@ -20,10 +20,8 @@ const (
 	Base64Chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ+/"
 )
 
-// Base10Conv convert base 10 string to new base string.
-func Base10Conv(src string, to int) string {
-	return BaseConv(src, 10, to)
-}
+// Base10Conv convert base10 string to new base string.
+func Base10Conv(src string, to int) string { return BaseConv(src, 10, to) }
 
 // BaseConv convert base string by from and to base.
 //
@@ -55,7 +53,7 @@ func BaseConvByTpl(src string, fromBase, toBase string) string {
 	}
 
 	// convert to base 10
-	var dec uint64 = 0
+	var dec uint64
 	if fromBase == Base10Chars {
 		var err error
 		dec, err = strconv.ParseUint(src, 10, 0)

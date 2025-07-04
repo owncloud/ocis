@@ -3,16 +3,22 @@
 package sysutil
 
 import (
+	"os"
 	"syscall"
 
 	"github.com/gookit/goutil/strutil"
 )
 
+// IsAdmin Determine whether the current user is an administrator(root)
+func IsAdmin() bool {
+	return os.Getuid() == 0
+}
+
 // ChangeUserByName change work user by new username.
 func ChangeUserByName(newUname string) error {
 	u := MustFindUser(newUname)
 	// syscall.Setlogin(newUname)
-	return ChangeUserUIDGid(strutil.IntOrPanic(u.Uid), strutil.IntOrPanic(u.Gid))
+	return ChangeUserUIDGid(strutil.MustInt(u.Uid), strutil.MustInt(u.Gid))
 }
 
 // ChangeUserUidGid change work user by new username uid,gid

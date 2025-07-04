@@ -1,6 +1,9 @@
 package strutil
 
-import "strings"
+import (
+	"regexp"
+	"strings"
+)
 
 // BeforeFirst get substring before first sep.
 func BeforeFirst(s, sep string) string {
@@ -137,6 +140,14 @@ func SplitNTrimmed(s, sep string, n int) (ss []string) {
 	return
 }
 
+// 根据空白字符（空格，TAB，换行等）分隔字符串
+var whitespaceRegexp = regexp.MustCompile("\\s+")
+
+// SplitByWhitespace Separate strings by whitespace characters (space, TAB, newline, etc.)
+func SplitByWhitespace(s string) []string {
+	return whitespaceRegexp.Split(s, -1)
+}
+
 // Substr for a string.
 // if length <= 0, return pos to end.
 func Substr(s string, pos, length int) string {
@@ -158,27 +169,25 @@ func Substr(s string, pos, length int) string {
 	return string(runes[pos:stopIdx])
 }
 
-// SplitInlineComment for an inline text string.
+// SplitInlineComment for an inline text string. default is strict mode.
 func SplitInlineComment(val string, strict ...bool) (string, string) {
-	// strict check: must with space
-	if len(strict) > 0 && strict[0] {
+	// strict check: must with a space
+	if len(strict) == 0 || strict[0] {
 		if pos := strings.Index(val, " #"); pos > -1 {
 			return strings.TrimRight(val[0:pos], " "), val[pos+1:]
 		}
-
 		if pos := strings.Index(val, " //"); pos > -1 {
 			return strings.TrimRight(val[0:pos], " "), val[pos+1:]
 		}
-	} else {
-		if pos := strings.IndexByte(val, '#'); pos > -1 {
-			return strings.TrimRight(val[0:pos], " "), val[pos:]
-		}
-
-		if pos := strings.Index(val, "//"); pos > -1 {
-			return strings.TrimRight(val[0:pos], " "), val[pos:]
-		}
+		return val, ""
 	}
 
+	if pos := strings.IndexByte(val, '#'); pos > -1 {
+		return strings.TrimRight(val[0:pos], " "), val[pos:]
+	}
+	if pos := strings.Index(val, "//"); pos > -1 {
+		return strings.TrimRight(val[0:pos], " "), val[pos:]
+	}
 	return val, ""
 }
 

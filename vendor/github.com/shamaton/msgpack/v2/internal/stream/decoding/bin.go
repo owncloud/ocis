@@ -24,21 +24,24 @@ func (d *decoder) asBinWithCode(code byte, k reflect.Kind) ([]byte, error) {
 		if err != nil {
 			return emptyBytes, err
 		}
-		return d.readSizeN(int(l))
+		// avoid common buffer reference
+		return d.copySizeN(int(l))
 
 	case def.Bin16:
 		bs, err := d.readSize2()
 		if err != nil {
 			return emptyBytes, err
 		}
-		return d.readSizeN(int(binary.BigEndian.Uint16(bs)))
+		// avoid common buffer reference
+		return d.copySizeN(int(binary.BigEndian.Uint16(bs)))
 
 	case def.Bin32:
 		bs, err := d.readSize4()
 		if err != nil {
 			return emptyBytes, err
 		}
-		return d.readSizeN(int(binary.BigEndian.Uint32(bs)))
+		// avoid common buffer reference
+		return d.copySizeN(int(binary.BigEndian.Uint32(bs)))
 	}
 
 	return emptyBytes, d.errorTemplate(code, k)
@@ -47,4 +50,14 @@ func (d *decoder) asBinWithCode(code byte, k reflect.Kind) ([]byte, error) {
 func (d *decoder) asBinStringWithCode(code byte, k reflect.Kind) (string, error) {
 	bs, err := d.asBinWithCode(code, k)
 	return *(*string)(unsafe.Pointer(&bs)), err
+}
+
+func (d *decoder) copySizeN(n int) ([]byte, error) {
+	bs, err := d.readSizeN(n)
+	if err != nil {
+		return emptyBytes, err
+	}
+	v := make([]byte, n)
+	copy(v, bs)
+	return v, nil
 }

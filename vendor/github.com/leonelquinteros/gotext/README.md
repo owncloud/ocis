@@ -1,6 +1,6 @@
 [![GitHub release](https://img.shields.io/github/release/leonelquinteros/gotext.svg)](https://github.com/leonelquinteros/gotext)
 [![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-![Gotext build](https://github.com/leonelquinteros/gotext/workflows/Gotext%20build/badge.svg?branch=master)
+![Gotext build](https://github.com/leonelquinteros/gotext/workflows/Gotext%20build/badge.svg)
 [![Go Report Card](https://goreportcard.com/badge/github.com/leonelquinteros/gotext)](https://goreportcard.com/report/github.com/leonelquinteros/gotext)
 [![PkgGoDev](https://pkg.go.dev/badge/github.com/leonelquinteros/gotext)](https://pkg.go.dev/github.com/leonelquinteros/gotext)
 
@@ -35,7 +35,7 @@
 
 # Documentation
 
-Refer to the Godoc package documentation at (https://godoc.org/github.com/leonelquinteros/gotext)
+Refer to package documentation at (https://pkg.go.dev/github.com/leonelquinteros/gotext)
 
 
 # Installation
@@ -47,90 +47,6 @@ go get github.com/leonelquinteros/gotext
 - There are no requirements or dependencies to use this package.
 - No need to install GNU gettext utilities (unless specific needs of CLI tools).
 - No need for environment variables. Some naming conventions are applied but not needed.
-
-
-## Version vendoring
-
-Stable releases use [semantic versioning](http://semver.org/spec/v2.0.0.html) tagging on this repository.
-
-You can rely on this to use your preferred vendoring tool or to manually retrieve the corresponding release tag from the GitHub repository.
-
-**NOTE:** v1.5.0 contains a breaking change on how `Po` objects are initialised, see (https://github.com/leonelquinteros/gotext/issues/56)
-
-
-### Vendoring with [Go Modules](https://github.com/golang/go/wiki/Modules) (Recommended)
-
-Add `github.com/leonelquinteros/gotext` inside the  `require` section in your `go.mod` file.
-
-i.e.
-```
-require (
-    github.com/leonelquinteros/gotext v1.4.0
-)
-```
-
-
-### Vendoring with [gopkg.in](http://labix.org/gopkg.in)
-
-[http://gopkg.in/leonelquinteros/gotext.v1](http://gopkg.in/leonelquinteros/gotext.v1)
-
-To get the latest v1 package stable release, execute:
-
-```
-go get gopkg.in/leonelquinteros/gotext.v1
-```
-
-Import as
-
-```go
-import "gopkg.in/leonelquinteros/gotext.v1"
-```
-
-Refer to it as gotext.
-
-
-# Locales directories structure
-
-The package will assume a directories structure starting with a base path that will be provided to the package configuration
-or to object constructors depending on the use, but either will use the same convention to lookup inside the base path.
-
-Inside the base directory where will be the language directories named using the language and country 2-letter codes (en_US, es_AR, ...).
-All package functions can lookup after the simplified version for each language in case the full code isn't present but the more general language code exists.
-So if the language set is `en_UK`, but there is no directory named after that code and there is a directory named `en`,
-all package functions will be able to resolve this generalization and provide translations for the more general library.
-
-The language codes are assumed to be [ISO 639-1](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) codes (2-letter codes).
-That said, most functions will work with any coding standard as long the directory name matches the language code set on the configuration.
-
-Then, there can be a `LC_MESSAGES` containing all PO files or the PO files themselves.
-A library directory structure can look like:
-
-```
-/path/to/locales
-/path/to/locales/en_US
-/path/to/locales/en_US/LC_MESSAGES
-/path/to/locales/en_US/LC_MESSAGES/default.po
-/path/to/locales/en_US/LC_MESSAGES/extras.po
-/path/to/locales/en_UK
-/path/to/locales/en_UK/LC_MESSAGES
-/path/to/locales/en_UK/LC_MESSAGES/default.po
-/path/to/locales/en_UK/LC_MESSAGES/extras.po
-/path/to/locales/en_AU
-/path/to/locales/en_AU/LC_MESSAGES
-/path/to/locales/en_AU/LC_MESSAGES/default.po
-/path/to/locales/en_AU/LC_MESSAGES/extras.po
-/path/to/locales/es
-/path/to/locales/es/default.po
-/path/to/locales/es/extras.po
-/path/to/locales/es_ES
-/path/to/locales/es_ES/default.po
-/path/to/locales/es_ES/extras.po
-/path/to/locales/fr
-/path/to/locales/fr/default.po
-/path/to/locales/fr/extras.po
-```
-
-And so on...
 
 
 # Usage examples
@@ -294,6 +210,50 @@ msgstr[1] "This one is the plural: %s"
     // "This one is the plural: Variable"
 }
 ```
+
+
+# Locales directories structure
+
+The package will assume a directories structure starting with a base path that will be provided to the package configuration
+or to object constructors depending on the use, but either will use the same convention to lookup inside the base path.
+
+Inside the base directory where will be the language directories named using the language and country 2-letter codes (en_US, es_AR, ...).
+All package functions can lookup after the simplified version for each language in case the full code isn't present but the more general language code exists.
+So if the language set is `en_UK`, but there is no directory named after that code and there is a directory named `en`,
+all package functions will be able to resolve this generalization and provide translations for the more general library.
+
+The language codes are assumed to be [ISO 639-1](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) codes (2-letter codes).
+That said, most functions will work with any coding standard as long the directory name matches the language code set on the configuration.
+
+Then, there can be a `LC_MESSAGES` containing all PO files or the PO files themselves.
+A library directory structure can look like:
+
+```
+/path/to/locales
+/path/to/locales/en_US
+/path/to/locales/en_US/LC_MESSAGES
+/path/to/locales/en_US/LC_MESSAGES/default.po
+/path/to/locales/en_US/LC_MESSAGES/extras.po
+/path/to/locales/en_UK
+/path/to/locales/en_UK/LC_MESSAGES
+/path/to/locales/en_UK/LC_MESSAGES/default.po
+/path/to/locales/en_UK/LC_MESSAGES/extras.po
+/path/to/locales/en_AU
+/path/to/locales/en_AU/LC_MESSAGES
+/path/to/locales/en_AU/LC_MESSAGES/default.po
+/path/to/locales/en_AU/LC_MESSAGES/extras.po
+/path/to/locales/es
+/path/to/locales/es/default.po
+/path/to/locales/es/extras.po
+/path/to/locales/es_ES
+/path/to/locales/es_ES/default.po
+/path/to/locales/es_ES/extras.po
+/path/to/locales/fr
+/path/to/locales/fr/default.po
+/path/to/locales/fr/extras.po
+```
+
+And so on...
 
 
 # Contribute

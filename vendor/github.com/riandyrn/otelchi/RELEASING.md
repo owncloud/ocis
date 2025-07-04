@@ -14,7 +14,7 @@ This procedure is used when we want to create new release from the latest develo
 The steps for this procedure are the following:
 
 1. Create a new branch from the `master` branch with the following name format: `pre_release/v{MAJOR}.{MINOR}.{BUILD}`. For example, if we want to release for version `0.6.0`, we will first create a new branch from the `master` called `pre_release/v0.6.0`.
-2. Update method `Version()` in `version.go` to return the target version.
+2. Update method `version.Version()` to return the target version.
 3. Update the `CHANGELOG.md` to include all the notable changes.
 4. Create a new PR from this branch to `master` with the title: `Release v{MAJOR}.{MINOR}.{BUILD}` (e.g `Release v0.6.0`).
 5. At least one maintainer should approve the PR. However if the PR is created by the repo owner, it doesn't need to get approval from other maintainers.

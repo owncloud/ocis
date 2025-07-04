@@ -4,46 +4,85 @@
 
 package ast
 
-import "strconv"
+import (
+	"strconv"
+)
+
+type internable interface {
+	bool | string | int | int8 | int16 | int32 | int64 | uint | uint8 | uint16 | uint32 | uint64
+}
 
 // NOTE! Great care must be taken **not** to modify the terms returned
 // from these functions, as they are shared across all callers.
+// This package is currently considered experimental, and may change
+// at any time without notice.
 
 var (
+	InternedNullTerm = &Term{Value: Null{}}
+
+	InternedEmptyString = StringTerm("")
+	InternedEmptyObject = ObjectTerm()
+	InternedEmptyArray  = ArrayTerm()
+	InternedEmptySet    = SetTerm()
+
+	InternedEmptyArrayValue = NewArray()
+
 	booleanTrueTerm  = &Term{Value: Boolean(true)}
 	booleanFalseTerm = &Term{Value: Boolean(false)}
 
 	// since this is by far the most common negative number
 	minusOneTerm = &Term{Value: Number("-1")}
 
-	InternedNullTerm = &Term{Value: Null{}}
-
-	InternedEmptyString = StringTerm("")
-	InternedEmptyObject = ObjectTerm()
+	internedStringTerms = map[string]*Term{
+		"": InternedEmptyString,
+	}
 )
 
-// InternedBooleanTerm returns an interned term with the given boolean value.
-func InternedBooleanTerm(b bool) *Term {
-	if b {
-		return booleanTrueTerm
-	}
+// InternStringTerm interns the given strings as terms. Note that Interning is
+// considered experimental and should not be relied upon by external code.
+// WARNING: This must **only** be called at initialization time, as the
+// interned terms are shared globally, and the underlying map is not thread-safe.
+func InternStringTerm(str ...string) {
+	for _, s := range str {
+		if _, ok := internedStringTerms[s]; ok {
+			continue
+		}
 
-	return booleanFalseTerm
+		internedStringTerms[s] = StringTerm(s)
+	}
 }
 
-// InternedIntNumberTerm returns a term with the given integer value. The term is
-// cached between -1 to 512, and for values outside of that range, this function
-// is equivalent to ast.IntNumberTerm.
-func InternedIntNumberTerm(i int) *Term {
-	if i >= 0 && i < len(intNumberTerms) {
-		return intNumberTerms[i]
+// Interned returns a possibly interned term for the given scalar value.
+// If the value is not interned, a new term is created for that value.
+func InternedTerm[T internable](v T) *Term {
+	switch value := any(v).(type) {
+	case bool:
+		return internedBooleanTerm(value)
+	case string:
+		return internedStringTerm(value)
+	case int:
+		return internedIntNumberTerm(value)
+	case int8:
+		return internedIntNumberTerm(int(value))
+	case int16:
+		return internedIntNumberTerm(int(value))
+	case int32:
+		return internedIntNumberTerm(int(value))
+	case int64:
+		return internedIntNumberTerm(int(value))
+	case uint:
+		return internedIntNumberTerm(int(value))
+	case uint8:
+		return internedIntNumberTerm(int(value))
+	case uint16:
+		return internedIntNumberTerm(int(value))
+	case uint32:
+		return internedIntNumberTerm(int(value))
+	case uint64:
+		return internedIntNumberTerm(int(value))
+	default:
+		panic("unreachable")
 	}
-
-	if i == -1 {
-		return minusOneTerm
-	}
-
-	return &Term{Value: Number(strconv.Itoa(i))}
 }
 
 // InternedIntFromString returns a term with the given integer value if the string
@@ -63,7 +102,55 @@ func HasInternedIntNumberTerm(i int) bool {
 	return i >= -1 && i < len(intNumberTerms)
 }
 
-func InternedStringTerm(s string) *Term {
+// Returns an interned string term representing the integer value i, if
+// interned. If not, creates a new StringTerm for the integer value.
+func InternedIntegerString(i int) *Term {
+	// Cheapest option - we don't need to call strconv.Itoa
+	if HasInternedIntNumberTerm(i) {
+		if interned, ok := internedStringTerms[IntNumberTerm(i).String()]; ok {
+			return interned
+		}
+	}
+
+	// Next cheapest option — the string could still be interned if the store
+	// has been extended with more terms than we cucrrently intern.
+	s := strconv.Itoa(i)
+	if interned, ok := internedStringTerms[s]; ok {
+		return interned
+	}
+
+	// Nope, create a new term
+	return StringTerm(s)
+}
+
+// InternedBooleanTerm returns an interned term with the given boolean value.
+func internedBooleanTerm(b bool) *Term {
+	if b {
+		return booleanTrueTerm
+	}
+
+	return booleanFalseTerm
+}
+
+// InternedIntNumberTerm returns a term with the given integer value. The term is
+// cached between -1 to 512, and for values outside of that range, this function
+// is equivalent to IntNumberTerm.
+func internedIntNumberTerm(i int) *Term {
+	if i >= 0 && i < len(intNumberTerms) {
+		return intNumberTerms[i]
+	}
+
+	if i == -1 {
+		return minusOneTerm
+	}
+
+	return &Term{Value: Number(strconv.Itoa(i))}
+}
+
+// InternedStringTerm returns an interned term with the given string value. If the
+// provided string is not interned, a new term is created for that value. It does *not*
+// modify the global interned terms map.
+func internedStringTerm(s string) *Term {
 	if term, ok := internedStringTerms[s]; ok {
 		return term
 	}
@@ -71,19 +158,34 @@ func InternedStringTerm(s string) *Term {
 	return StringTerm(s)
 }
 
-var internedStringTerms = map[string]*Term{
-	"":   InternedEmptyString,
-	"0":  StringTerm("0"),
-	"1":  StringTerm("1"),
-	"2":  StringTerm("2"),
-	"3":  StringTerm("3"),
-	"4":  StringTerm("4"),
-	"5":  StringTerm("5"),
-	"6":  StringTerm("6"),
-	"7":  StringTerm("7"),
-	"8":  StringTerm("8"),
-	"9":  StringTerm("9"),
-	"10": StringTerm("10"),
+func init() {
+	InternStringTerm(
+		// Numbers
+		"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20",
+		"21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38",
+		"39", "40", "41", "42", "43", "44", "45", "46", "47", "48", "49", "50", "51", "52", "53", "54", "55", "56",
+		"57", "58", "59", "60", "61", "62", "63", "64", "65", "66", "67", "68", "69", "70", "71", "72", "73", "74",
+		"75", "76", "77", "78", "79", "80", "81", "82", "83", "84", "85", "86", "87", "88", "89", "90", "91", "92",
+		"93", "94", "95", "96", "97", "98", "99", "100",
+		// Types
+		"null", "boolean", "number", "string", "array", "object", "set", "var", "ref", "true", "false",
+		// Runtime
+		"config", "env", "version", "commit", "authorization_enabled", "skip_known_schema_check",
+		// Annotations
+		"annotations", "scope", "title", "entrypoint", "description", "organizations", "authors", "related_resources",
+		"schemas", "custom", "name", "email", "schema", "definition", "document", "package", "rule", "subpackages",
+		// Debug
+		"text", "value", "bindings", "expressions",
+		// Various
+		"data", "input", "result", "keywords", "path", "v1", "error", "partial",
+		// HTTP
+		"code", "message", "status_code", "method", "url", "uri",
+		// JWT
+		"enc", "cty", "iss", "exp", "nbf", "aud", "secret", "cert",
+		// Decisions
+		"revision", "labels", "decision_id", "bundles", "query", "mapped_result", "nd_builtin_cache",
+		"erased", "masked", "requested_by", "timestamp", "metrics", "req_id",
+	)
 }
 
 var stringToIntNumberTermMap = map[string]*Term{
