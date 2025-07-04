@@ -2,11 +2,13 @@ package svc
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"net/http"
 	"net/url"
 	"slices"
 	"strings"
+	"time"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	grouppb "github.com/cs3org/go-cs3apis/cs3/identity/group/v1beta1"
@@ -48,6 +50,45 @@ const (
 	parseDriveIDErrMsg = "could not parse driveID"
 )
 
+// CollectionWithExtendedRoles wraps CollectionOfPermissionsWithAllowedValues to add createdDateTime to roles
+type CollectionWithExtendedRoles struct {
+	libregraph.CollectionOfPermissionsWithAllowedValues
+}
+
+// MarshalJSON implements custom JSON marshaling that adds createdDateTime to role definitions
+func (c CollectionWithExtendedRoles) MarshalJSON() ([]byte, error) {
+	// Convert to map
+	result := make(map[string]interface{})
+
+	if c.LibreGraphPermissionsActionsAllowedValues != nil {
+		result["@libre.graph.permissions.actions.allowedValues"] = c.LibreGraphPermissionsActionsAllowedValues
+	}
+
+	if c.LibreGraphPermissionsRolesAllowedValues != nil {
+		// Add createdDateTime to each role
+		extendedRoles := make([]interface{}, len(c.LibreGraphPermissionsRolesAllowedValues))
+		now := time.Now()
+
+		for i, role := range c.LibreGraphPermissionsRolesAllowedValues {
+			// Convert role to map and add createdDateTime
+			roleMap, err := role.ToMap()
+			if err != nil {
+				return nil, err
+			}
+			roleMap["createdDateTime"] = now
+			extendedRoles[i] = roleMap
+		}
+
+		result["@libre.graph.permissions.roles.allowedValues"] = extendedRoles
+	}
+
+	if c.Value != nil {
+		result["value"] = c.Value
+	}
+
+	return json.Marshal(result)
+}
+
 // DriveItemPermissionsProvider contains the methods related to handling permissions on drive items
 type DriveItemPermissionsProvider interface {
 	Invite(ctx context.Context, resourceId *storageprovider.ResourceId, invite libregraph.DriveItemInvite) (libregraph.Permission, error)
@@ -62,6 +103,7 @@ type DriveItemPermissionsProvider interface {
 	CreateSpaceRootLink(ctx context.Context, driveID *storageprovider.ResourceId, createLink libregraph.DriveItemCreateLink) (libregraph.Permission, error)
 	SetPublicLinkPassword(ctx context.Context, driveItemID *storageprovider.ResourceId, permissionID string, password string) (libregraph.Permission, error)
 	SetPublicLinkPasswordOnSpaceRoot(ctx context.Context, driveID *storageprovider.ResourceId, permissionID string, password string) (libregraph.Permission, error)
+	GetPermission(ctx context.Context, itemID *storageprovider.ResourceId, permissionID string) (libregraph.Permission, error)
 }
 
 // DriveItemPermissionsService contains the production business logic for everything that relates to permissions on drive items.
@@ -511,6 +553,26 @@ func (s DriveItemPermissionsService) ListSpaceRootPermissions(ctx context.Contex
 	return s.ListPermissions(ctx, rootResourceID, false, false) // federated roles are not supported for spaces
 }
 
+// GetPermission returns a single permission of a drive item identified by permissionID
+func (s DriveItemPermissionsService) GetPermission(ctx context.Context, itemID *storageprovider.ResourceId, permissionID string) (libregraph.Permission, error) {
+	ctx, span := s.tp.Tracer("graph").Start(ctx, "GetPermission")
+	defer span.End()
+
+	// Reuse ListPermissions to obtain all permissions and select the requested one
+	collection, err := s.ListPermissions(ctx, itemID, false, false)
+	if err != nil {
+		return libregraph.Permission{}, err
+	}
+
+	for _, p := range collection.Value {
+		if p.GetId() == permissionID {
+			return p, nil
+		}
+	}
+
+	return libregraph.Permission{}, errorcode.New(errorcode.ItemNotFound, "permission not found")
+}
+
 // DeletePermission deletes a permission from a drive item
 func (s DriveItemPermissionsService) DeletePermission(ctx context.Context, itemID *storageprovider.ResourceId, permissionID string) error {
 
@@ -823,7 +885,7 @@ func (api DriveItemPermissionsApi) ListPermissions(w http.ResponseWriter, r *htt
 	}
 
 	render.Status(r, http.StatusOK)
-	render.JSON(w, r, permissions)
+	render.JSON(w, r, CollectionWithExtendedRoles{permissions})
 }
 
 // ListSpaceRootPermissions handles ListPermissions requests on a space root
@@ -859,7 +921,40 @@ func (api DriveItemPermissionsApi) ListSpaceRootPermissions(w http.ResponseWrite
 	}
 
 	render.Status(r, http.StatusOK)
-	render.JSON(w, r, permissions)
+	render.JSON(w, r, CollectionWithExtendedRoles{permissions})
+}
+
+// GetPermission handles requests to fetch a single permission on a drive item
+func (api DriveItemPermissionsApi) GetPermission(w http.ResponseWriter, r *http.Request) {
+	_, itemID, err := GetDriveAndItemIDParam(r, &api.logger)
+	if err != nil {
+		api.logger.Error().Err(err).Msg(invalidIdMsg)
+		errorcode.RenderError(w, r, err)
+		return
+	}
+
+	permissionID, err := url.PathUnescape(chi.URLParam(r, "permissionID"))
+	if err != nil {
+		api.logger.Error().Err(err).Msg("could not parse permissionID")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "invalid permissionID")
+		return
+	}
+
+	if permissionID == "" {
+		api.logger.Error().Msg("permissionID cannot be empty")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "invalid permissionID")
+		return
+	}
+
+	ctx := r.Context()
+	permission, err := api.driveItemPermissionsService.GetPermission(ctx, itemID, permissionID)
+	if err != nil {
+		errorcode.RenderError(w, r, err)
+		return
+	}
+
+	render.Status(r, http.StatusOK)
+	render.JSON(w, r, &permission)
 }
 
 // DeletePermission handles DeletePermission requests

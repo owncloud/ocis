@@ -196,6 +196,10 @@ func (g BaseGraphService) cs3SpacePermissionsToLibreGraph(ctx context.Context, s
 			p.SetExpirationDateTime(time.Unix(int64(exp.GetSeconds()), int64(exp.GetNanos())))
 		}
 
+		// Set createdDateTime for space permissions (using current time as fallback)
+		// Space grants don't have a ctime field like public shares, so we use current time
+		p.SetCreatedDateTime(time.Now().UTC())
+
 		availableRoles := unifiedrole.GetRoles(unifiedrole.RoleFilterIDs(g.config.UnifiedRoles.AvailableRoles...))
 		if role := unifiedrole.CS3ResourcePermissionsToRole(
 			availableRoles,
@@ -254,6 +258,10 @@ func (g BaseGraphService) libreGraphPermissionFromCS3PublicShare(createdLink *li
 	// set cTime
 	if createdLink.GetCtime() != nil {
 		perm.SetCreatedDateTime(cs3TimestampToTime(createdLink.GetCtime()).UTC())
+	} else {
+		// Fallback: if Ctime is missing, use current time
+		// This ensures createdDateTime is always populated for JSON schema validation
+		perm.SetCreatedDateTime(time.Now().UTC())
 	}
 
 	perm.SetHasPassword(createdLink.GetPasswordProtected())

@@ -356,14 +356,6 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiContract/propfindShares.feature:223](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiContract/propfindShares.feature#L223)
 - [apiContract/propfindShares.feature:224](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiContract/propfindShares.feature#L224)
 
-#### [Creation date is missing for space members](https://github.com/owncloud/ocis/issues/10077)
-
-- [apiSharingNgPermissions/listPermissions.feature:874](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNgPermissions/listPermissions.feature#L874)
-- [apiSharingNgPermissions/listPermissions.feature:1548](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNgPermissions/listPermissions.feature#L1548)
-- [apiSharingNgPermissions/listPermissions.feature:1549](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNgPermissions/listPermissions.feature#L1549)
-- [apiSharingNgPermissions/listPermissions.feature:1550](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNgPermissions/listPermissions.feature#L1550)
-- [apiSharingNgPermissions/listPermissions.feature:2263](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNgPermissions/listPermissions.feature#L2263)
-
 #### [Lost permission when received multiple shares on the same resource](https://github.com/owncloud/ocis/issues/8464)
 
 - [apiSharingNgShares/sharedWithMe.feature:5410](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNgShares/sharedWithMe.feature#L5410)
@@ -371,8 +363,6 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 
 ### [[Sharing NG] Implement https://owncloud.dev/libre-graph-api/#/drives.permissions/GetPermission](https://github.com/owncloud/ocis/issues/8616)
 
-- [apiSharingNgPermissions/listPermissions.feature:2585](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNgPermissions/listPermissions.feature#L2585)
-- [apiSharingNgPermissions/listPermissions.feature:2631](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNgPermissions/listPermissions.feature#L2631)
 - [apiSharingNgPermissions/listPermissions.feature:2673](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNgPermissions/listPermissions.feature#L2673)
 - [apiSharingNgPermissions/listPermissions.feature:2718](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNgPermissions/listPermissions.feature#L2718)
 
