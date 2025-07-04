@@ -65,10 +65,18 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Fix storage-users cli: [#11464](https://github.com/owncloud/ocis/pull/11464)
 * Bugfix - Return translated role definitions: [#11466](https://github.com/owncloud/ocis/pull/11466)
 * Enhancement - Update Web to v11.3.1: [#11471](https://github.com/owncloud/ocis/pull/11471)
 
 ## Details
+
+* Bugfix - Fix storage-users cli: [#11464](https://github.com/owncloud/ocis/pull/11464)
+
+   Fix storage-users uploads --resume command.
+
+   https://github.com/owncloud/ocis/issues/11290
+   https://github.com/owncloud/ocis/pull/11464
 
 * Bugfix - Return translated role definitions: [#11466](https://github.com/owncloud/ocis/pull/11466)
 
