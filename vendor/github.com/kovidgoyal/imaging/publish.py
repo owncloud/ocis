@@ -22,7 +22,7 @@ def main():
     os.environ['GITHUB_TOKEN'] = open(os.path.join(os.environ['PENV'], 'github-token')).read().strip()
     run('git', 'tag', '-a', 'v' + version, '-m', f'version {version}')
     run('git', 'push')
-    run('goreleaser', 'release')
+    run('goreleaser', 'release', '--clean')
 
 
 if __name__ == '__main__':

@@ -5,6 +5,17 @@ import (
 	"reflect"
 )
 
+// IsTimeType check is or alias of time.Time type
+func IsTimeType(t reflect.Type) bool {
+	return t != nil && t.Kind() == reflect.Struct && t.ConvertibleTo(timeType)
+}
+
+// IsDurationType check is or alias of time.Duration type
+func IsDurationType(t reflect.Type) bool {
+	// t == durationType - 无法判断自定义类型
+	return t != nil && t.Kind() == reflect.Int64 && t.ConvertibleTo(durationType)
+}
+
 // HasChild type check. eg: array, slice, map, struct
 func HasChild(v reflect.Value) bool {
 	switch v.Kind() {
@@ -58,6 +69,11 @@ func IsNil(v reflect.Value) bool {
 	}
 }
 
+// IsValidPtr check variable is a valid pointer.
+func IsValidPtr(v reflect.Value) bool {
+	return v.IsValid() && (v.Kind() == reflect.Ptr) && !v.IsNil()
+}
+
 // CanBeNil reports whether an untyped nil can be assigned to the type. See reflect.Zero.
 func CanBeNil(typ reflect.Type) bool {
 	switch typ.Kind() {
@@ -65,8 +81,9 @@ func CanBeNil(typ reflect.Type) bool {
 		return true
 	case reflect.Struct:
 		return typ == reflectValueType
+	default:
+		return false
 	}
-	return false
 }
 
 // IsFunc value
@@ -79,7 +96,7 @@ func IsFunc(val any) bool {
 
 // IsEqual determines if two objects are considered equal.
 //
-// TIP: cannot compare function type
+// TIP: cannot compare a function type
 func IsEqual(src, dst any) bool {
 	if src == nil || dst == nil {
 		return src == dst

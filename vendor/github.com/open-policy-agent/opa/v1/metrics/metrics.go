@@ -48,13 +48,13 @@ type Metrics interface {
 	Timer(name string) Timer
 	Histogram(name string) Histogram
 	Counter(name string) Counter
-	All() map[string]interface{}
+	All() map[string]any
 	Clear()
 	json.Marshaler
 }
 
 type TimerMetrics interface {
-	Timers() map[string]interface{}
+	Timers() map[string]any
 }
 
 type metrics struct {
@@ -66,14 +66,22 @@ type metrics struct {
 
 // New returns a new Metrics object.
 func New() Metrics {
-	m := &metrics{}
-	m.Clear()
-	return m
+	return &metrics{
+		timers:     map[string]Timer{},
+		histograms: map[string]Histogram{},
+		counters:   map[string]Counter{},
+	}
+}
+
+// NoOp returns a Metrics implementation that does nothing and costs nothing.
+// Used when metrics are expected, but not of interest.
+func NoOp() Metrics {
+	return noOpMetricsInstance
 }
 
 type metric struct {
 	Key   string
-	Value interface{}
+	Value any
 }
 
 func (*metrics) Info() Info {
@@ -83,7 +91,6 @@ func (*metrics) Info() Info {
 }
 
 func (m *metrics) String() string {
-
 	all := m.All()
 	sorted := make([]metric, 0, len(all))
 
@@ -144,10 +151,10 @@ func (m *metrics) Counter(name string) Counter {
 	return c
 }
 
-func (m *metrics) All() map[string]interface{} {
+func (m *metrics) All() map[string]any {
 	m.mtx.Lock()
 	defer m.mtx.Unlock()
-	result := map[string]interface{}{}
+	result := make(map[string]any, len(m.timers)+len(m.histograms)+len(m.counters))
 	for name, timer := range m.timers {
 		result[m.formatKey(name, timer)] = timer.Value()
 	}
@@ -160,10 +167,10 @@ func (m *metrics) All() map[string]interface{} {
 	return result
 }
 
-func (m *metrics) Timers() map[string]interface{} {
+func (m *metrics) Timers() map[string]any {
 	m.mtx.Lock()
 	defer m.mtx.Unlock()
-	ts := map[string]interface{}{}
+	ts := make(map[string]any, len(m.timers))
 	for n, t := range m.timers {
 		ts[m.formatKey(n, t)] = t.Value()
 	}
@@ -178,7 +185,7 @@ func (m *metrics) Clear() {
 	m.counters = map[string]Counter{}
 }
 
-func (*metrics) formatKey(name string, metrics interface{}) string {
+func (*metrics) formatKey(name string, metrics any) string {
 	switch metrics.(type) {
 	case Timer:
 		return "timer_" + name + "_ns"
@@ -194,9 +201,12 @@ func (*metrics) formatKey(name string, metrics interface{}) string {
 // Timer defines the interface for a restartable timer that accumulates elapsed
 // time.
 type Timer interface {
-	Value() interface{}
+	Value() any
 	Int64() int64
+	// Start or resume a timer's time tracking.
 	Start()
+	// Stop a timer, and accumulate the delta (in nanoseconds) since it was last
+	// started.
 	Stop() int64
 }
 
@@ -208,19 +218,26 @@ type timer struct {
 
 func (t *timer) Start() {
 	t.mtx.Lock()
-	defer t.mtx.Unlock()
 	t.start = time.Now()
+	t.mtx.Unlock()
 }
 
 func (t *timer) Stop() int64 {
 	t.mtx.Lock()
 	defer t.mtx.Unlock()
-	delta := time.Since(t.start).Nanoseconds()
-	t.value += delta
+
+	var delta int64
+	if !t.start.IsZero() {
+		// Add the delta to the accumulated time value so far.
+		delta = time.Since(t.start).Nanoseconds()
+		t.value += delta
+		t.start = time.Time{} // Reset the start time to zero.
+	}
+
 	return delta
 }
 
-func (t *timer) Value() interface{} {
+func (t *timer) Value() any {
 	return t.Int64()
 }
 
@@ -232,7 +249,7 @@ func (t *timer) Int64() int64 {
 
 // Histogram defines the interface for a histogram with hardcoded percentiles.
 type Histogram interface {
-	Value() interface{}
+	Value() any
 	Update(int64)
 }
 
@@ -253,8 +270,8 @@ func (h *histogram) Update(v int64) {
 	h.hist.Update(v)
 }
 
-func (h *histogram) Value() interface{} {
-	values := map[string]interface{}{}
+func (h *histogram) Value() any {
+	values := make(map[string]any, 12)
 	snap := h.hist.Snapshot()
 	percentiles := snap.Percentiles([]float64{
 		0.5,
@@ -282,7 +299,7 @@ func (h *histogram) Value() interface{} {
 
 // Counter defines the interface for a monotonic increasing counter.
 type Counter interface {
-	Value() interface{}
+	Value() any
 	Incr()
 	Add(n uint64)
 }
@@ -299,14 +316,49 @@ func (c *counter) Add(n uint64) {
 	atomic.AddUint64(&c.c, n)
 }
 
-func (c *counter) Value() interface{} {
+func (c *counter) Value() any {
 	return atomic.LoadUint64(&c.c)
 }
 
-func Statistics(num ...int64) interface{} {
+func Statistics(num ...int64) any {
 	t := newHistogram()
 	for _, n := range num {
 		t.Update(n)
 	}
 	return t.Value()
 }
+
+type noOpMetrics struct{}
+type noOpTimer struct{}
+type noOpHistogram struct{}
+type noOpCounter struct{}
+
+var (
+	noOpMetricsInstance   = &noOpMetrics{}
+	noOpTimerInstance     = &noOpTimer{}
+	noOpHistogramInstance = &noOpHistogram{}
+	noOpCounterInstance   = &noOpCounter{}
+)
+
+func (*noOpMetrics) Info() Info                      { return Info{Name: "<built-in no-op>"} }
+func (*noOpMetrics) Timer(name string) Timer         { return noOpTimerInstance }
+func (*noOpMetrics) Histogram(name string) Histogram { return noOpHistogramInstance }
+func (*noOpMetrics) Counter(name string) Counter     { return noOpCounterInstance }
+func (*noOpMetrics) All() map[string]any             { return nil }
+func (*noOpMetrics) Clear()                          {}
+func (*noOpMetrics) MarshalJSON() ([]byte, error) {
+	return []byte(`{"name": "<built-in no-op>"}`), nil
+}
+
+func (*noOpTimer) Start()       {}
+func (*noOpTimer) Stop() int64  { return 0 }
+func (*noOpTimer) Value() any   { return 0 }
+func (*noOpTimer) Int64() int64 { return 0 }
+
+func (*noOpHistogram) Update(v int64) {}
+func (*noOpHistogram) Value() any     { return nil }
+
+func (*noOpCounter) Incr()        {}
+func (*noOpCounter) Add(_ uint64) {}
+func (*noOpCounter) Value() any   { return 0 }
+func (*noOpCounter) Int64() int64 { return 0 }

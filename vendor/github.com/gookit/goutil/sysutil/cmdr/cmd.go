@@ -87,6 +87,12 @@ func (c *Cmd) PrintCmdline() *Cmd {
 	return c
 }
 
+// PrintCmdline2 on exec command
+func (c *Cmd) PrintCmdline2() *Cmd {
+	c.BeforeRun = PrintCmdline2
+	return c
+}
+
 // OnBefore exec add hook
 func (c *Cmd) OnBefore(fn func(c *Cmd)) *Cmd {
 	c.BeforeRun = fn
@@ -135,7 +141,7 @@ func (c *Cmd) WithWorkDir(dir string) *Cmd {
 
 // WorkDirOnNE set workdir on input is not empty
 func (c *Cmd) WorkDirOnNE(dir string) *Cmd {
-	if dir == "" {
+	if dir != "" {
 		c.Dir = dir
 	}
 	return c
@@ -394,12 +400,17 @@ func (c *Cmd) Output() (string, error) {
 		return "DRY-RUN: ok", nil
 	}
 
-	output, err := c.Cmd.Output()
+	bs, err := c.Cmd.Output()
 
 	if c.AfterRun != nil {
 		c.AfterRun(c, err)
 	}
-	return string(output), err
+	return string(bs), err
+}
+
+// AllOutput run and return output, will combine stderr and stdout output
+func (c *Cmd) AllOutput() (string, error) {
+	return c.CombinedOutput()
 }
 
 // CombinedOutput run and return output, will combine stderr and stdout output
@@ -412,12 +423,11 @@ func (c *Cmd) CombinedOutput() (string, error) {
 		return "DRY-RUN: ok", nil
 	}
 
-	output, err := c.Cmd.CombinedOutput()
-
+	bs, err := c.Cmd.CombinedOutput()
 	if c.AfterRun != nil {
 		c.AfterRun(c, err)
 	}
-	return string(output), err
+	return string(bs), err
 }
 
 // MustRun a command. will panic on error
@@ -444,7 +454,6 @@ func (c *Cmd) Run() error {
 
 	// do running
 	err := c.Cmd.Run()
-
 	if c.AfterRun != nil {
 		c.AfterRun(c, err)
 	}

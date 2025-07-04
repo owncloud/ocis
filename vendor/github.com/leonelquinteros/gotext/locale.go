@@ -263,7 +263,7 @@ func (l *Locale) GetD(dom, str string, vars ...interface{}) string {
 		}
 	}
 
-	return Printf(str, vars...)
+	return FormatString(str, vars...)
 }
 
 // GetND retrieves the (N)th plural form of Translation in the given domain for the given string.
@@ -283,9 +283,9 @@ func (l *Locale) GetND(dom, str, plural string, n int, vars ...interface{}) stri
 
 	// Use western default rule (plural > 1) to handle missing domain default result.
 	if n == 1 {
-		return Printf(str, vars...)
+		return FormatString(str, vars...)
 	}
-	return Printf(plural, vars...)
+	return FormatString(plural, vars...)
 }
 
 // GetC uses a domain "default" to return the corresponding Translation of the given string in the given context.
@@ -315,7 +315,7 @@ func (l *Locale) GetDC(dom, str, ctx string, vars ...interface{}) string {
 		}
 	}
 
-	return Printf(str, vars...)
+	return FormatString(str, vars...)
 }
 
 // GetNDC retrieves the (N)th plural form of Translation in the given domain for the given string in the given context.
@@ -335,9 +335,9 @@ func (l *Locale) GetNDC(dom, str, plural string, n int, ctx string, vars ...inte
 
 	// Use western default rule (plural > 1) to handle missing domain default result.
 	if n == 1 {
-		return Printf(str, vars...)
+		return FormatString(str, vars...)
 	}
-	return Printf(plural, vars...)
+	return FormatString(plural, vars...)
 }
 
 // GetTranslations returns a copy of all translations in all domains of this locale. It does not support contexts.

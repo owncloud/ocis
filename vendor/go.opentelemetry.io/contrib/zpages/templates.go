@@ -61,19 +61,19 @@ func parseTemplate(name string) *template.Template {
 }
 
 func spanRowFormatter(r spanRow) template.HTML {
-	if !r.SpanContext.IsValid() {
+	if !r.IsValid() {
 		return ""
 	}
 	col := "black"
-	if r.SpanContext.IsSampled() {
+	if r.IsSampled() {
 		col = "blue"
 	}
 
 	tpl := fmt.Sprintf(
 		`trace_id: <b style="color:%s">%s</b> span_id: %s`,
 		col,
-		r.SpanContext.TraceID(),
-		r.SpanContext.SpanID(),
+		r.TraceID(),
+		r.SpanID(),
 	)
 	if r.ParentSpanContext.IsValid() {
 		tpl += fmt.Sprintf(` parent_span_id: %s`, r.ParentSpanContext.SpanID())

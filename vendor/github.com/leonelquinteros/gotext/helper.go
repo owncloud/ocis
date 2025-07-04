@@ -28,8 +28,8 @@ func SimplifiedLocale(lang string) string {
 	return strings.TrimSpace(lang)
 }
 
-// Printf applies text formatting only when needed to parse variables.
-func Printf(str string, vars ...interface{}) string {
+// FormatString applies text formatting only when needed to parse variables.
+func FormatString(str string, vars ...interface{}) string {
 	if len(vars) > 0 {
 		return fmt.Sprintf(str, vars...)
 	}

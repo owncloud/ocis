@@ -83,6 +83,7 @@ func (d *decoder) asStringByteByLength(l int, _ reflect.Kind) ([]byte, error) {
 	if l < 1 {
 		return emptyBytes, nil
 	}
-
-	return d.readSizeN(l)
+	
+	// avoid common buffer reference
+	return d.copySizeN(l)
 }

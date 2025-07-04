@@ -11,8 +11,8 @@ import (
 type Timer struct {
 	C <-chan time.Time
 
-	i    int   // heap index.
-	when int64 // Timer wakes up at when.
+	i    int       // heap index.
+	when time.Time // Timer wakes up at when.
 
 	// f is called in a locked context on timeout. This function must not block
 	// and must behave well-defined.

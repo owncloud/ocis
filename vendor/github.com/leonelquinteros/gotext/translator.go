@@ -8,7 +8,6 @@ package gotext
 import (
 	"errors"
 	"io/fs"
-	"io/ioutil"
 	"os"
 )
 
@@ -27,6 +26,9 @@ type Translator interface {
 	UnmarshalBinary([]byte) error
 	GetDomain() *Domain
 }
+
+// AppendTranslator interface is used by Locale and Po objects.
+// It contains all methods needed to parse translation sources and to append entries to the object.
 type AppendTranslator interface {
 	Translator
 	Append(b []byte, str string, vars ...interface{}) []byte
@@ -90,5 +92,5 @@ func getFileData(f string, filesystem fs.FS) ([]byte, error) {
 		return nil, errors.New("cannot parse a directory")
 	}
 
-	return ioutil.ReadFile(f)
+	return os.ReadFile(f)
 }

@@ -69,91 +69,130 @@ func NewPoFS(filesystem fs.FS) *Po {
 	return po
 }
 
+// GetDomain returns the domain object
 func (po *Po) GetDomain() *Domain {
 	return po.domain
 }
 
 // Convenience interfaces
+// ---------------------------------------------------------------
+
+// DropStaleTranslations removes all translations that are not referenced in the current domain
 func (po *Po) DropStaleTranslations() {
 	po.domain.DropStaleTranslations()
 }
 
+// SetRefs sets the references for a given translation
 func (po *Po) SetRefs(str string, refs []string) {
 	po.domain.SetRefs(str, refs)
 }
+
+// GetRefs returns the references for a given translation
 func (po *Po) GetRefs(str string) []string {
 	return po.domain.GetRefs(str)
 }
 
+// SetPluralResolver sets the plural resolver function
 func (po *Po) SetPluralResolver(f func(int) int) {
 	po.domain.customPluralResolver = f
 }
 
+// Set translation
 func (po *Po) Set(id, str string) {
 	po.domain.Set(id, str)
 }
+
+// Get translation
 func (po *Po) Get(str string, vars ...interface{}) string {
 	return po.domain.Get(str, vars...)
 }
+
+// Append translation
 func (po *Po) Append(b []byte, str string, vars ...interface{}) []byte {
 	return po.domain.Append(b, str, vars...)
 }
 
+// SetN sets the plural translation
 func (po *Po) SetN(id, plural string, n int, str string) {
 	po.domain.SetN(id, plural, n, str)
 }
+
+// GetN gets the plural translation
 func (po *Po) GetN(str, plural string, n int, vars ...interface{}) string {
 	return po.domain.GetN(str, plural, n, vars...)
 }
+
+// AppendN appends the plural translation
 func (po *Po) AppendN(b []byte, str, plural string, n int, vars ...interface{}) []byte {
 	return po.domain.AppendN(b, str, plural, n, vars...)
 }
 
+// SetC sets the translation for a given context
 func (po *Po) SetC(id, ctx, str string) {
 	po.domain.SetC(id, ctx, str)
 }
+
+// GetC gets the translation for a given context
 func (po *Po) GetC(str, ctx string, vars ...interface{}) string {
 	return po.domain.GetC(str, ctx, vars...)
 }
+
+// AppendC appends the translation for a given context
 func (po *Po) AppendC(b []byte, str, ctx string, vars ...interface{}) []byte {
 	return po.domain.AppendC(b, str, ctx, vars...)
 }
 
+// SetNC sets the plural translation for a given context
 func (po *Po) SetNC(id, plural, ctx string, n int, str string) {
 	po.domain.SetNC(id, plural, ctx, n, str)
 }
+
+// GetNC gets the plural translation for a given context
 func (po *Po) GetNC(str, plural string, n int, ctx string, vars ...interface{}) string {
 	return po.domain.GetNC(str, plural, n, ctx, vars...)
 }
+
+// AppendNC appends the plural translation for a given context
 func (po *Po) AppendNC(b []byte, str, plural string, n int, ctx string, vars ...interface{}) []byte {
 	return po.domain.AppendNC(b, str, plural, n, ctx, vars...)
 }
 
+// IsTranslated checks if the given string is translated
 func (po *Po) IsTranslated(str string) bool {
 	return po.domain.IsTranslated(str)
 }
+
+// IsTranslatedN checks if the given string is translated with plural form
 func (po *Po) IsTranslatedN(str string, n int) bool {
 	return po.domain.IsTranslatedN(str, n)
 }
+
+// IsTranslatedC checks if the given string is translated with context
 func (po *Po) IsTranslatedC(str, ctx string) bool {
 	return po.domain.IsTranslatedC(str, ctx)
 }
+
+// IsTranslatedNC checks if the given string is translated with plural form and context
 func (po *Po) IsTranslatedNC(str string, n int, ctx string) bool {
 	return po.domain.IsTranslatedNC(str, n, ctx)
 }
 
+// MarshalText marshals the Po object to text
 func (po *Po) MarshalText() ([]byte, error) {
 	return po.domain.MarshalText()
 }
 
+// MarshalBinary marshals the Po object to binary
 func (po *Po) MarshalBinary() ([]byte, error) {
 	return po.domain.MarshalBinary()
 }
 
+// UnmarshalBinary unmarshals the Po object from binary
 func (po *Po) UnmarshalBinary(data []byte) error {
 	return po.domain.UnmarshalBinary(data)
 }
 
+// ParseFile loads the translations from a file
 func (po *Po) ParseFile(f string) {
 	data, err := getFileData(f, po.fs)
 	if err != nil {
