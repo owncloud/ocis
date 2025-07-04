@@ -378,7 +378,7 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 
 #### [Activity. No activity for copying a zero byte file](https://github.com/owncloud/ocis/issues/10417)
 
-- [apiActivities/activities.feature:3378](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiActivities/activities.feature#L3378)
+- [apiActivities/activities.feature:3598](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiActivities/activities.feature#L3598)
 - [apiActivities/activitiesByFileId.feature:2015](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiActivities/activitiesByFileId.feature#L2015)
 
 #### [Activity. no event for deleting a file using file-id](https://github.com/owncloud/ocis/issues/10328)
@@ -395,7 +395,7 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 
 #### [Activities. no event for restoring file](https://github.com/owncloud/ocis/issues/10010)
 
-- [apiActivities/activities.feature:3552](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiActivities/activities.feature#L3552)
+- [apiActivities/activities.feature:3772](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiActivities/activities.feature#L3772)
 
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.
