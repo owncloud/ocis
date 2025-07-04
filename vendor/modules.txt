@@ -18,8 +18,8 @@ github.com/BurntSushi/toml/internal
 # github.com/CiscoM31/godata v1.0.10
 ## explicit; go 1.19
 github.com/CiscoM31/godata
-# github.com/KimMachineGun/automemlimit v0.6.1
-## explicit; go 1.21
+# github.com/KimMachineGun/automemlimit v0.7.3
+## explicit; go 1.22.0
 github.com/KimMachineGun/automemlimit/memlimit
 # github.com/Masterminds/goutils v1.1.1
 ## explicit
@@ -294,15 +294,6 @@ github.com/cespare/xxhash/v2
 # github.com/cevaris/ordered_map v0.0.0-20190319150403-3adeae072e73
 ## explicit
 github.com/cevaris/ordered_map
-# github.com/cilium/ebpf v0.9.1
-## explicit; go 1.17
-github.com/cilium/ebpf
-github.com/cilium/ebpf/asm
-github.com/cilium/ebpf/btf
-github.com/cilium/ebpf/internal
-github.com/cilium/ebpf/internal/sys
-github.com/cilium/ebpf/internal/unix
-github.com/cilium/ebpf/link
 # github.com/cloudflare/circl v1.6.1
 ## explicit; go 1.22.0
 github.com/cloudflare/circl/dh/x25519
@@ -317,13 +308,6 @@ github.com/cloudflare/circl/math/mlsbset
 github.com/cloudflare/circl/sign
 github.com/cloudflare/circl/sign/ed25519
 github.com/cloudflare/circl/sign/ed448
-# github.com/containerd/cgroups/v3 v3.0.2
-## explicit; go 1.18
-github.com/containerd/cgroups/v3
-github.com/containerd/cgroups/v3/cgroup1
-github.com/containerd/cgroups/v3/cgroup1/stats
-github.com/containerd/cgroups/v3/cgroup2
-github.com/containerd/cgroups/v3/cgroup2/stats
 # github.com/coreos/go-oidc/v3 v3.14.1
 ## explicit; go 1.23.0
 github.com/coreos/go-oidc/v3/oidc
@@ -332,7 +316,6 @@ github.com/coreos/go-oidc/v3/oidc
 github.com/coreos/go-semver/semver
 # github.com/coreos/go-systemd/v22 v22.5.0
 ## explicit; go 1.12
-github.com/coreos/go-systemd/v22/dbus
 github.com/coreos/go-systemd/v22/journal
 # github.com/cornelk/hashmap v1.0.8
 ## explicit; go 1.19
@@ -404,9 +387,6 @@ github.com/dhowden/tag
 ## explicit
 github.com/dlclark/regexp2
 github.com/dlclark/regexp2/syntax
-# github.com/docker/go-units v0.5.0
-## explicit
-github.com/docker/go-units
 # github.com/dustin/go-humanize v1.0.1
 ## explicit; go 1.16
 github.com/dustin/go-humanize
@@ -439,8 +419,6 @@ github.com/fatih/color
 # github.com/felixge/httpsnoop v1.0.4
 ## explicit; go 1.13
 github.com/felixge/httpsnoop
-# github.com/frankban/quicktest v1.14.6
-## explicit; go 1.13
 # github.com/fsnotify/fsnotify v1.8.0
 ## explicit; go 1.17
 github.com/fsnotify/fsnotify
@@ -680,9 +658,6 @@ github.com/goccy/go-yaml/parser
 github.com/goccy/go-yaml/printer
 github.com/goccy/go-yaml/scanner
 github.com/goccy/go-yaml/token
-# github.com/godbus/dbus/v5 v5.1.0
-## explicit; go 1.12
-github.com/godbus/dbus/v5
 # github.com/gofrs/flock v0.12.1
 ## explicit; go 1.21.0
 github.com/gofrs/flock
@@ -1220,9 +1195,6 @@ github.com/open-policy-agent/opa/v1/types
 github.com/open-policy-agent/opa/v1/util
 github.com/open-policy-agent/opa/v1/util/decoding
 github.com/open-policy-agent/opa/v1/version
-# github.com/opencontainers/runtime-spec v1.1.0
-## explicit
-github.com/opencontainers/runtime-spec/specs-go
 # github.com/opentracing/opentracing-go v1.2.0
 ## explicit; go 1.14
 github.com/opentracing/opentracing-go
