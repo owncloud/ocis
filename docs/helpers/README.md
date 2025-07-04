@@ -12,12 +12,12 @@
       * [General Extended Envvars Info](#general-extended-envvars-info)
       * [Extract Extended Envvars](#extract-extended-envvars)
       * [Generate Extended Envvar Docs](#generate-extended-envvar-docs)
-   * [Tasks for New Releases](#tasks-for-new-releases)
+   * [Doc Tasks for New Releases](#doc-tasks-for-new-releases)
    * [Backporting](#backporting)
 
 ## Introduction
 
-`docs/helpers` contains a go program named `main.go` which creates docs by extracting information from the code using additional go programs. Individual steps (programs) can be called manually if needed. Note that not all programs are called automatically on purpose, see the [Tasks for New Releases](#tasks-for-new-releases) below. `main.go` is used by `make docs-generate` (or `make -C docs docs-generate` when running manually from the repos root) which is triggered by the CI or can be called manually. It calls the other required programs and has these main responsibilities for automatic runs:
+`docs/helpers` contains a go program named `main.go` which creates docs by extracting information from the code using additional go programs. Individual steps (programs) can be called manually if needed. Note that not all programs are called automatically on purpose, see the [Doc Tasks for New Releases](#doc-tasks-for-new-releases) below. `main.go` is used by `make docs-generate` (or `make -C docs docs-generate` when running manually from the repos root) which is triggered by the CI or can be called manually. It calls the other required programs and has these main responsibilities for automatic runs:
 
 - Generate docs for envvars in config structs including deprecations if there are any.
 - Extract and generate docs for `extended` envvars that are not mentioned in config structs (aka "rogue" envvars).
@@ -75,46 +75,6 @@ If global envvars do not appear in the list of globals, before checking if the c
 
 ## Extended Envvars
 
-### General Extended Envvars Info
-
-"Extended" envvars are variables that need to be present *before* the core or services are starting up as they depend on the info provided like path for config files etc. Therefore they are _not_ bound to services like other envvars. Extended envvars are identified via `os.Getenv`, usually defined via a subfolder of `ocis-pkg`. The real envvar name name cant be automatically assigned and needs to be manually defined via the code in the `extended_vars.yaml` file.
-
-It can happen that extended envvars are found but do not need to be published as they are for internal use only. Those envvars can be defined to be ignored for further processing.
-
-**IMPORTANT:**
-
-- **First Time Identification**\
-  Once an extended envvar has been identified, it is added to the `extended_vars.yaml` file found, but never changed or touched by the process anymore. There is one exception with respect to single/double quote usage. While you can (and will) manually define a text like: `"'/var/lib/ocis'"`, quotes are transformed by the process in the .yaml file to: `'''/var/lib/ocis'''`. There is no need to change this back, as the final step transforms this correctly for the adoc table.
-
-- **Item Naming**\
-  An extended envvar may not have the right naming. It may appear as `name: _registryEnv`. In case, this envvar needs to be named properly like `name: MICRO_REGISTRY` which can only be done in close alignment with development.
-
-- **Item Uniqueness**\
-  The identification, if an envvar is already present in the yaml file, is made via the `rawname` and the `path` identifier which includes the line number. **If there is a change in the source file shifting line numbers, new items will get added and old ones do not get touched.** Though technically ok, this can cause confusion to identify which items are correctly present or just added additionally just be cause code location has changed. If there are multiple occurrences of the same `rawname` value, check which one contains relevant data and set `do_ignore` to `false` and all others to `true`. When there are two identical blocks with different source references, mostly the one containing a proper `default_value` is the active one. Populate the false block with the envvar data to be used.
-
-- **Fixing Items**\
-  If an item has been identified as additionally added because there was a change in the code location, it is mostly sufficient to just fix the line number in the `path` key of the existing/correct one and double check by removing the newly added ones. Then, re-run `make docs-generate`. If the fix was correct, no new items of the same will re-appear.
-
-- **Remove Orphaned Items**\
-  To get rid of items with wrong line numbers, check `rawname` the `path` and correct the _existing ones_, especially the one containing the description and which is marked `do_ignore` false. Only items that have a real line number match need to be present, orphaned items can safely be removed. You can double-check valid items by creating a dummy branch, delete the `extended_vars.yaml` and run `make docs-generate` to regenerate the file having only items with valid path references. With that info, you can remove orphaned items from the live file. Note to be careful on judging only on `foundincode` set to false indicating an item not existing anymore. Fix all items first, when rerunning `make docs-generate`, this may change back to true!
-
-- **Sort Ordering**\
-  Do not change the sort order of extended envvar blocks as they are automatically reordered alphabetically.
-
-- **Mandatory Key Values**\
-  Because extended envvars do not have the same structural setup as "normal" envvars (like type, description or defaults), this info needs to be provided manually once - for each valid block. Any change of this info will be noticed during the next CI run, the corresponding adoc file generated, changes transported to the docs branch and published in the next admin docs build. See the following example with all keys listed and populated:
-    ```yaml
-    rawname: registryAddressEnv
-    path: ocis-pkg/registry/registry.go:44
-    foundincode: true
-    name: MICRO_REGISTRY_ADDRESS
-    type: string
-    default_value: ""
-    description: The bind address of the internal go micro framework. Only change on
-        supervision of ownCloud Support.
-    do_ignore: false
-    ```
-
 ### Extract Extended Envvars
 
 The grep command parses the code, looking for `os.Getenv` and passes these contents to a yaml file along with the following information:
@@ -146,9 +106,9 @@ type Variable struct {
 }
 ```
 
-This yaml file can later be manually edited to add descriptions, default values, etc.
+This yaml file can and must be manually edited to add descriptions, default values, etc.
 
-**IMPORTANT**: `RawName`, `Path` and `FoundInCode` are automatically filled by the program. DO NOT EDIT THESE VALUES MANUALLY.
+**IMPORTANT**: Some value are automatically filled by the program and mujst not be changed. See the developer documentation for more details.
 
 ### Generate Extended Envvar Docs
 
@@ -210,10 +170,9 @@ Similar to the Asciidoc files for the admin docs, Markdown files necessary for t
   This will give you an overview of available commands. 
     * Because `env_vars.yaml` has been cleaned up as part of the _before release_ tasks above, we can rely on its actuality for the branches to be compared.
     * Create delta files for added, removed and deprecated envvars. To do so type:\
-    `go run . env-var-delta-table` and use as parameter the versions you want to compare. Example: `v5.0.0 v7.0.0`.
+    `go run . env-var-delta-table` and use as parameter the versions you want to compare. Example: `v7.0.0 v7.1.0`.
     * List and check the files created in `./docs/helpers/output/env-deltas/`. The markdown files created contain a table with dev relevant data. Any other files created are not relevant and can safely be deleted.
     * Create a branch and move the markdown files from `./docs/helpers/output/env-deltas/` to `./docs/services/general-info/env-var-deltas/`. The markdown files will be consumed by dev docs from this location.
-
 
 * Commit all changes, create a PR and merge. Dev docs is now up-to-date.    
 
@@ -223,8 +182,8 @@ The ocis repo contains branches which are necessary for the documentation. The `
 
 Cases for a backport can be a typo in an envvar description you want to have fixed in a stable branch too or a file  was created after the stable branch was set up but needs to be available in that branch.
 
-When a new stable ocis release (branch) is published, like `stable-5.0`, an additional branch (including CI) is set up manually by the dev team for referencing docs content like `docs-stable-5.0` - related to envvars and yaml files only - and added to the CI.
+When a new stable ocis release (branch) is published, like `stable-7.2`, an additional branch (including CI) is set up manually by the dev team for referencing docs content like `docs-stable-7.2` - related to envvars and yaml files only - and added to the CI.
 
-In case it is necessary to transport a change from master to a stable branch like `docs-stable-5.0`, you must backport the original changes that will create that file to the `stable-5.0` branch. The CI will then take care of creating the results in the target `docs-stable-5.0`.
+In case it is necessary to transport a change from master to a stable branch like `docs-stable-7.2`, you must backport the original changes that will create that file to the `stable-7.2` branch. The CI will then take care of creating the results in the target `docs-stable-7.2`.
 
 If the change is expected to have a bigger impact on documenation, you can locally run `make -C docs docs-generate` in the respective branch containing the changes or independently in the `stable-x.y` branch after merging to see if there are additional actions necessary and changed files may need to get checked in.

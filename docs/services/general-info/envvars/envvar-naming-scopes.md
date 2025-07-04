@@ -1,10 +1,10 @@
 ---
 title: Envvar Naming Scopes
 date: 2023-03-23T00:00:00+00:00
-weight: 20
+weight: 10
 geekdocRepo: https://github.com/owncloud/ocis
-geekdocEditPath: edit/master/docs/services/general-info
-geekdocFilePath: envvar-scopes.md
+geekdocEditPath: edit/master/docs/services/general-info/envvars
+geekdocFilePath: envvar-naming-scopes.md
 geekdocCollapseSection: true
 ---
 
@@ -36,6 +36,10 @@ Note that this envvar is the global representation of the local example from abo
 
 To get a list of global envvars used in all services, see the [Global Environment Variables](https://doc.owncloud.com/ocis/next/deployment/services/env-vars-special-scope.html#global-environment-variables) table in the ocis admin documentation.
 
+### Reserved Envvar Names
+
+Services and their local envvars **MUST NOT** be named `extended` or `global`. These are reserved names for the automated documentation process.
+
 ## Lifecycle of Envvars
 
 The envvar struct tag contains at maximum the following key/value pairs to document the lifecycle of a config variable:
@@ -48,7 +52,7 @@ The envvar struct tag contains at maximum the following key/value pairs to docum
 
 ### Introduce new Envvars
 
-If a new envvar is introduced, only the `introductionVersion` is required.
+If a new envvar is introduced, the complete struct needs to be added, but only the `introductionVersion` requires data.
 
 {{< hint info >}}
 * During development, set `introductionVersion` to a short, **alphabetic code name** that represents the upcoming release (e.g. `releaseX`).
