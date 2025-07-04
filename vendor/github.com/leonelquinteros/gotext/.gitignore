@@ -1,9 +1,7 @@
-# Eclipse shit
+# Local IDE
 .project
 .settings
 .buildpath
-
-# golang jetbrains shit
 .idea
 
 # Compiled Object files, Static and Dynamic libs (Shared Objects)
@@ -14,6 +12,7 @@
 # Folders
 _obj
 _test
+cli/xgotext/fixtures/out 
 
 # Architecture specific extensions/prefixes
 *.[568vq]
@@ -30,3 +29,4 @@ _testmain.go
 *.exe
 *.test
 *.prof
+*.DS_Store

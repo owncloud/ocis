@@ -70,60 +70,82 @@ func NewMoFS(filesystem fs.FS) *Mo {
 	return mo
 }
 
+// GetDomain returns the domain object
 func (mo *Mo) GetDomain() *Domain {
 	return mo.domain
 }
 
-// all of the Get functions are for convenience and aid in backwards compatibility
+// Get returns the translation for the given string
 func (mo *Mo) Get(str string, vars ...interface{}) string {
 	return mo.domain.Get(str, vars...)
 }
+
+// Append a translation string into the domain
 func (mo *Mo) Append(b []byte, str string, vars ...interface{}) []byte {
 	return mo.domain.Append(b, str, vars...)
 }
 
+// GetN returns the translation for the given string and plural form
 func (mo *Mo) GetN(str, plural string, n int, vars ...interface{}) string {
 	return mo.domain.GetN(str, plural, n, vars...)
 }
+
+// AppendN appends a translation string for the given plural form into the domain
 func (mo *Mo) AppendN(b []byte, str, plural string, n int, vars ...interface{}) []byte {
 	return mo.domain.AppendN(b, str, plural, n, vars...)
 }
 
+// GetC returns the translation for the given string and context
 func (mo *Mo) GetC(str, ctx string, vars ...interface{}) string {
 	return mo.domain.GetC(str, ctx, vars...)
 }
+
+// AppendC appends a translation string for the given context into the domain
 func (mo *Mo) AppendC(b []byte, str, ctx string, vars ...interface{}) []byte {
 	return mo.domain.AppendC(b, str, ctx, vars...)
 }
 
+// GetNC returns the translation for the given string, plural form and context
 func (mo *Mo) GetNC(str, plural string, n int, ctx string, vars ...interface{}) string {
 	return mo.domain.GetNC(str, plural, n, ctx, vars...)
 }
+
+// AppendNC appends a translation string for the given plural form and context into the domain
 func (mo *Mo) AppendNC(b []byte, str, plural string, n int, ctx string, vars ...interface{}) []byte {
 	return mo.domain.AppendNC(b, str, plural, n, ctx, vars...)
 }
 
+// IsTranslated checks if the given string is translated
 func (mo *Mo) IsTranslated(str string) bool {
 	return mo.domain.IsTranslated(str)
 }
+
+// IsTranslatedN checks if the given string is translated with plural form
 func (mo *Mo) IsTranslatedN(str string, n int) bool {
 	return mo.domain.IsTranslatedN(str, n)
 }
+
+// IsTranslatedC checks if the given string is translated with context
 func (mo *Mo) IsTranslatedC(str, ctx string) bool {
 	return mo.domain.IsTranslatedC(str, ctx)
 }
+
+// IsTranslatedNC checks if the given string is translated with plural form and context
 func (mo *Mo) IsTranslatedNC(str string, n int, ctx string) bool {
 	return mo.domain.IsTranslatedNC(str, n, ctx)
 }
 
+// MarshalBinary marshals the Mo object into a binary format
 func (mo *Mo) MarshalBinary() ([]byte, error) {
 	return mo.domain.MarshalBinary()
 }
 
+// UnmarshalBinary unmarshals the Mo object from a binary format
 func (mo *Mo) UnmarshalBinary(data []byte) error {
 	return mo.domain.UnmarshalBinary(data)
 }
 
+// ParseFile loads the translations specified in the provided file, in the GNU gettext .mo format
 func (mo *Mo) ParseFile(f string) {
 	data, err := getFileData(f, mo.fs)
 	if err != nil {

@@ -30,9 +30,9 @@ type gt struct {
 func (e gt) test(n uint32) bool {
 	if e.flipped {
 		return e.value > n
-	} else {
-		return n > e.value
 	}
+
+	return n > e.value
 }
 
 type lt struct {

@@ -6,11 +6,10 @@ import (
 	"io"
 	"io/fs"
 	"os"
-	"path"
 	"path/filepath"
 	"strings"
 
-	"github.com/gookit/goutil/basefn"
+	"github.com/gookit/goutil/x/basefn"
 )
 
 // Mkdir alias of os.MkdirAll()
@@ -18,7 +17,7 @@ func Mkdir(dirPath string, perm os.FileMode) error {
 	return os.MkdirAll(dirPath, perm)
 }
 
-// MkDirs batch make multi dirs at once
+// MkDirs batch makes multi dirs at once
 func MkDirs(perm os.FileMode, dirPaths ...string) error {
 	for _, dirPath := range dirPaths {
 		if err := os.MkdirAll(dirPath, perm); err != nil {
@@ -28,7 +27,7 @@ func MkDirs(perm os.FileMode, dirPaths ...string) error {
 	return nil
 }
 
-// MkSubDirs batch make multi sub-dirs at once
+// MkSubDirs batch makes multi sub-dirs at once
 func MkSubDirs(perm os.FileMode, parentDir string, subDirs ...string) error {
 	for _, dirName := range subDirs {
 		dirPath := parentDir + "/" + dirName
@@ -39,7 +38,7 @@ func MkSubDirs(perm os.FileMode, parentDir string, subDirs ...string) error {
 	return nil
 }
 
-// MkParentDir quick create parent dir for given path.
+// MkParentDir quickly create parent dir for a given path.
 func MkParentDir(fpath string) error {
 	dirPath := filepath.Dir(fpath)
 	if !IsDir(dirPath) {
@@ -121,7 +120,7 @@ const (
 //
 //	file, err := OpenFile("path/to/file.txt", FsCWFlags, 0666)
 func OpenFile(filePath string, flag int, perm os.FileMode) (*os.File, error) {
-	fileDir := path.Dir(filePath)
+	fileDir := filepath.Dir(filePath)
 	if err := os.MkdirAll(fileDir, DefaultDirPerm); err != nil {
 		return nil, err
 	}
@@ -177,7 +176,7 @@ func OpenReadFile(filepath string) (*os.File, error) {
 //
 //	CreateFile("path/to/file.txt", 0664, 0666)
 func CreateFile(fpath string, filePerm, dirPerm os.FileMode, fileFlag ...int) (*os.File, error) {
-	dirPath := path.Dir(fpath)
+	dirPath := filepath.Dir(fpath)
 	if !IsDir(dirPath) {
 		err := os.MkdirAll(dirPath, dirPerm)
 		if err != nil {

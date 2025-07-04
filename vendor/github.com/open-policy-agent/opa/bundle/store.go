@@ -7,6 +7,7 @@ package bundle
 import (
 	"context"
 
+	"github.com/open-policy-agent/opa/ast"
 	"github.com/open-policy-agent/opa/storage"
 	v1 "github.com/open-policy-agent/opa/v1/bundle"
 )
@@ -70,7 +71,7 @@ func ReadBundleRevisionFromStore(ctx context.Context, store storage.Store, txn s
 // ReadBundleMetadataFromStore returns the metadata in the specified bundle.
 // If the bundle is not activated, this function will return
 // storage NotFound error.
-func ReadBundleMetadataFromStore(ctx context.Context, store storage.Store, txn storage.Transaction, name string) (map[string]interface{}, error) {
+func ReadBundleMetadataFromStore(ctx context.Context, store storage.Store, txn storage.Transaction, name string) (map[string]any, error) {
 	return v1.ReadBundleMetadataFromStore(ctx, store, txn, name)
 }
 
@@ -87,7 +88,7 @@ type ActivateOpts = v1.ActivateOpts
 // Activate the bundle(s) by loading into the given Store. This will load policies, data, and record
 // the manifest in storage. The compiler provided will have had the polices compiled on it.
 func Activate(opts *ActivateOpts) error {
-	return v1.Activate(opts)
+	return v1.Activate(setActivateDefaultRegoVersion(opts))
 }
 
 // DeactivateOpts defines options for the Deactivate API call
@@ -95,7 +96,7 @@ type DeactivateOpts = v1.DeactivateOpts
 
 // Deactivate the bundle(s). This will erase associated data, policies, and the manifest entry from the store.
 func Deactivate(opts *DeactivateOpts) error {
-	return v1.Deactivate(opts)
+	return v1.Deactivate(setDeactivateDefaultRegoVersion(opts))
 }
 
 // LegacyWriteManifestToStore will write the bundle manifest to the older single (unnamed) bundle manifest location.
@@ -120,4 +121,32 @@ func LegacyReadRevisionFromStore(ctx context.Context, store storage.Store, txn s
 // Deprecated: Use Activate with named bundles instead.
 func ActivateLegacy(opts *ActivateOpts) error {
 	return v1.ActivateLegacy(opts)
+}
+
+func setActivateDefaultRegoVersion(opts *ActivateOpts) *ActivateOpts {
+	if opts == nil {
+		return nil
+	}
+
+	if opts.ParserOptions.RegoVersion == ast.RegoUndefined {
+		cpy := *opts
+		cpy.ParserOptions.RegoVersion = ast.DefaultRegoVersion
+		return &cpy
+	}
+
+	return opts
+}
+
+func setDeactivateDefaultRegoVersion(opts *DeactivateOpts) *DeactivateOpts {
+	if opts == nil {
+		return nil
+	}
+
+	if opts.ParserOptions.RegoVersion == ast.RegoUndefined {
+		cpy := *opts
+		cpy.ParserOptions.RegoVersion = ast.DefaultRegoVersion
+		return &cpy
+	}
+
+	return opts
 }

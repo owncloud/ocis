@@ -6,18 +6,28 @@ import (
 	"strings"
 	"unicode"
 	"unicode/utf8"
+
+	"github.com/gookit/goutil/internal/checkfn"
 )
 
 // Equal check, alias of strings.EqualFold
 var Equal = strings.EqualFold
+var IsHttpURL = checkfn.IsHttpURL
 
 // IsNumChar returns true if the given character is a numeric, otherwise false.
 func IsNumChar(c byte) bool { return c >= '0' && c <= '9' }
 
-var numReg = regexp.MustCompile(`^\d+$`)
+var intReg = regexp.MustCompile(`^\d+$`)
+var floatReg = regexp.MustCompile(`^[-+]?\d*\.?\d+$`)
 
-// IsNumeric returns true if the given string is a numeric, otherwise false.
-func IsNumeric(s string) bool { return numReg.MatchString(s) }
+// IsInt check the string is an integer number
+func IsInt(s string) bool { return intReg.MatchString(s) }
+
+// IsFloat check the string is a float number
+func IsFloat(s string) bool { return floatReg.MatchString(s) }
+
+// IsNumeric returns true if the given string is a numeric(int/float), otherwise false.
+func IsNumeric(s string) bool { return checkfn.IsNumeric(s) }
 
 // IsAlphabet char
 func IsAlphabet(char uint8) bool {
@@ -97,10 +107,10 @@ func IsStartsOf(s string, prefixes []string) bool {
 	return HasOnePrefix(s, prefixes)
 }
 
-// HasOnePrefix the string start withs one of the subs
+// HasOnePrefix the string starts with one of the subs
 func HasOnePrefix(s string, prefixes []string) bool {
 	for _, prefix := range prefixes {
-		if strings.HasPrefix(s, prefix) {
+		if len(s) >= len(prefix) && s[0:len(prefix)] == prefix {
 			return true
 		}
 	}
@@ -122,7 +132,7 @@ func HasSuffix(s string, suffix string) bool { return strings.HasSuffix(s, suffi
 // IsEndOf alias of the strings.HasSuffix
 func IsEndOf(s, suffix string) bool { return strings.HasSuffix(s, suffix) }
 
-// HasOneSuffix the string end withs one of the subs
+// HasOneSuffix the string end with one of the subs
 func HasOneSuffix(s string, suffixes []string) bool {
 	for _, suffix := range suffixes {
 		if strings.HasSuffix(s, suffix) {
@@ -290,9 +300,8 @@ func LikeMatch(pattern, s string) bool {
 	if pattern[0] == '%' {
 		if ln > 2 && pattern[ln-1] == '%' {
 			return strings.Contains(s, pattern[1:ln-1])
-		} else {
-			return strings.HasSuffix(s, pattern[1:])
 		}
+		return strings.HasSuffix(s, pattern[1:])
 	}
 
 	// eg `abc%`
@@ -304,7 +313,7 @@ func LikeMatch(pattern, s string) bool {
 
 // MatchNodePath check for a string match the pattern.
 //
-// Use on pattern:
+// Use on a pattern:
 //   - `*` match any to sep
 //   - `**` match any to end. only allow at start or end on pattern.
 //

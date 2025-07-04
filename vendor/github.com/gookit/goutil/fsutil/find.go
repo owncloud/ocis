@@ -11,19 +11,19 @@ import (
 	"github.com/gookit/goutil/strutil"
 )
 
-// FilePathInDirs get full file path in dirs.
+// FilePathInDirs get full file path in dirs. return empty string if not found.
 //
 // Params:
 //   - file: can be relative path, file name, full path.
 //   - dirs: dir paths
-func FilePathInDirs(file string, dirs ...string) string {
-	file = comfunc.ExpandHome(file)
-	if FileExists(file) {
-		return file
+func FilePathInDirs(fPath string, dirs ...string) string {
+	fPath = comfunc.ExpandHome(fPath)
+	if FileExists(fPath) {
+		return fPath
 	}
 
 	for _, dirPath := range dirs {
-		fPath := JoinSubPaths(dirPath, file)
+		fPath := JoinSubPaths(dirPath, fPath)
 		if FileExists(fPath) {
 			return fPath
 		}
@@ -216,12 +216,15 @@ func FindInDir(dir string, handleFn HandleFunc, filters ...FilterFunc) (e error)
 		return // ignore I/O error
 	}
 
-	// names, _ := d.Readdirnames(-1)
-	// sort.Strings(names)
-
 	des, err := os.ReadDir(dir)
 	if err != nil {
 		return
+	}
+
+	// remove the last '/' char
+	dirLn := len(dir)
+	if dirLn > 1 && dir[dirLn-1] == '/' {
+		dir = dir[:dirLn-1]
 	}
 
 	for _, ent := range des {

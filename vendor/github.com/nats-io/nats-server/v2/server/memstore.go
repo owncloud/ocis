@@ -24,6 +24,7 @@ import (
 	"time"
 
 	"github.com/nats-io/nats-server/v2/server/avl"
+	"github.com/nats-io/nats-server/v2/server/gsl"
 	"github.com/nats-io/nats-server/v2/server/stree"
 	"github.com/nats-io/nats-server/v2/server/thw"
 )
@@ -83,6 +84,12 @@ func (ms *memStore) UpdateConfig(cfg *StreamConfig) error {
 
 	ms.mu.Lock()
 	ms.cfg = *cfg
+	// Create or delete the THW if needed.
+	if cfg.AllowMsgTTL && ms.ttls == nil {
+		ms.ttls = thw.NewHashWheel()
+	} else if !cfg.AllowMsgTTL && ms.ttls != nil {
+		ms.ttls = nil
+	}
 	// Limits checks and enforcement.
 	ms.enforceMsgLimit()
 	ms.enforceBytesLimit()
@@ -112,7 +119,7 @@ func (ms *memStore) UpdateConfig(cfg *StreamConfig) error {
 	}
 	ms.mu.Unlock()
 
-	if cfg.MaxAge != 0 {
+	if cfg.MaxAge != 0 || cfg.AllowMsgTTL {
 		ms.expireMsgs()
 	}
 	return nil
@@ -369,7 +376,7 @@ func (ms *memStore) GetSeqFromTime(t time.Time) uint64 {
 		}
 	}
 	if lmsg == nil {
-		return ms.state.FirstSeq
+		return ms.state.LastSeq + 1
 	}
 
 	last := lmsg.ts
@@ -641,7 +648,13 @@ func (ms *memStore) SubjectsState(subject string) map[string]SimpleState {
 func (ms *memStore) AllLastSeqs() ([]uint64, error) {
 	ms.mu.RLock()
 	defer ms.mu.RUnlock()
+	return ms.allLastSeqsLocked()
+}
 
+// allLastSeqsLocked will return a sorted list of last sequences for all
+// subjects, but won't take the lock to do it, to avoid the issue of compounding
+// read locks causing a deadlock with a write lock.
+func (ms *memStore) allLastSeqsLocked() ([]uint64, error) {
 	if len(ms.msgs) == 0 {
 		return nil, nil
 	}
@@ -685,7 +698,7 @@ func (ms *memStore) MultiLastSeqs(filters []string, maxSeq uint64, maxAllowed in
 
 	// See if we can short circuit if we think they are asking for all last sequences and have no maxSeq or maxAllowed set.
 	if maxSeq == 0 && maxAllowed <= 0 && ms.filterIsAll(filters) {
-		return ms.AllLastSeqs()
+		return ms.allLastSeqsLocked()
 	}
 
 	// Implied last sequence.
@@ -770,7 +783,7 @@ func (ms *memStore) NumPending(sseq uint64, filter string, lastPerSubject bool) 
 }
 
 // NumPending will return the number of pending messages matching any subject in the sublist starting at sequence.
-func (ms *memStore) NumPendingMulti(sseq uint64, sl *Sublist, lastPerSubject bool) (total, validThrough uint64) {
+func (ms *memStore) NumPendingMulti(sseq uint64, sl *gsl.SimpleSublist, lastPerSubject bool) (total, validThrough uint64) {
 	if sl == nil {
 		return ms.NumPending(sseq, fwcs, lastPerSubject)
 	}
@@ -805,7 +818,7 @@ func (ms *memStore) NumPendingMulti(sseq uint64, sl *Sublist, lastPerSubject boo
 	var havePartial bool
 	var totalSkipped uint64
 	// We will track start and end sequences as we go.
-	IntersectStree[SimpleState](ms.fss, sl, func(subj []byte, fss *SimpleState) {
+	gsl.IntersectStree[SimpleState](ms.fss, sl, func(subj []byte, fss *SimpleState) {
 		if fss.firstNeedsUpdate || fss.lastNeedsUpdate {
 			ms.recalculateForSubj(bytesToString(subj), fss)
 		}
@@ -1457,6 +1470,19 @@ func (ms *memStore) deleteFirstMsg() bool {
 	return ms.removeMsg(ms.state.FirstSeq, false)
 }
 
+// SubjectForSeq will return what the subject is for this sequence if found.
+func (ms *memStore) SubjectForSeq(seq uint64) (string, error) {
+	ms.mu.RLock()
+	defer ms.mu.RUnlock()
+	if seq < ms.state.FirstSeq {
+		return _EMPTY_, ErrStoreMsgNotFound
+	}
+	if sm, ok := ms.msgs[seq]; ok {
+		return sm.subj, nil
+	}
+	return _EMPTY_, ErrStoreMsgNotFound
+}
+
 // LoadMsg will lookup the message by sequence number and return it if found.
 func (ms *memStore) LoadMsg(seq uint64, smp *StoreMsg) (*StoreMsg, error) {
 	return ms.loadMsgLocked(seq, smp, true)
@@ -1521,7 +1547,7 @@ func (ms *memStore) LoadLastMsg(subject string, smp *StoreMsg) (*StoreMsg, error
 }
 
 // LoadNextMsgMulti will find the next message matching any entry in the sublist.
-func (ms *memStore) LoadNextMsgMulti(sl *Sublist, start uint64, smp *StoreMsg) (sm *StoreMsg, skip uint64, err error) {
+func (ms *memStore) LoadNextMsgMulti(sl *gsl.SimpleSublist, start uint64, smp *StoreMsg) (sm *StoreMsg, skip uint64, err error) {
 	// TODO(dlc) - for now simple linear walk to get started.
 	ms.mu.RLock()
 	defer ms.mu.RUnlock()

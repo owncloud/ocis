@@ -125,10 +125,10 @@ func compileMod(tokens []string) (math math, err error) {
 		return math, err
 	}
 	if len(split.Left) != 1 || split.Left[0] != "n" {
-		return math, errors.New("Modulus operation requires 'n' as left operand")
+		return math, errors.New("modulus operation requires 'n' as left operand")
 	}
 	if len(split.Right) != 1 {
-		return math, errors.New("Modulus operation requires simple integer as right operand")
+		return math, errors.New("modulus operation requires simple integer as right operand")
 	}
 	i, err := parseUint32(split.Right[0])
 	if err != nil {
@@ -329,7 +329,7 @@ func scan(s string) <-chan match {
 func split(s string) <-chan string {
 	ch := make(chan string)
 	go func() {
-		s = strings.Replace(s, " ", "", -1)
+		s = strings.ReplaceAll(s, " ", "")
 		if !strings.Contains(s, "(") {
 			ch <- s
 		} else {

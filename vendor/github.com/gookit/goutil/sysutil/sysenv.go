@@ -8,6 +8,7 @@ import (
 	"strings"
 	"syscall"
 
+	"github.com/gookit/goutil/internal/checkfn"
 	"github.com/gookit/goutil/internal/comfunc"
 	"golang.org/x/term"
 )
@@ -17,6 +18,9 @@ func IsMSys() bool {
 	// "MSYSTEM=MINGW64"
 	return len(os.Getenv("MSYSTEM")) > 0
 }
+
+// IsWSL system env
+func IsWSL() bool { return checkfn.IsWSL() }
 
 // IsConsole check out is in stderr/stdout/stdin
 //
@@ -60,8 +64,8 @@ func Hostname() string {
 //
 // eg "/bin/zsh" "/bin/bash".
 // if onlyName=true, will return "zsh", "bash"
-func CurrentShell(onlyName bool) (path string) {
-	return comfunc.CurrentShell(onlyName)
+func CurrentShell(onlyName bool, fallbackShell ...string) string {
+	return comfunc.CurrentShell(onlyName, fallbackShell...)
 }
 
 // HasShellEnv has shell env check.
@@ -144,16 +148,29 @@ func EnvPaths() []string {
 	return filepath.SplitList(os.Getenv("PATH"))
 }
 
+// SearchPathOption settings for SearchPath
+type SearchPathOption struct {
+	// 限制查找的扩展名(Windows) such as ".exe", ".bat", ".cmd"
+	LimitExt []string
+}
+
 // SearchPath search executable files in the system $PATH
 //
 // Usage:
 //
 //	sysutil.SearchPath("go")
-func SearchPath(keywords string, limit int) []string {
+func SearchPath(keywords string, limit int, opts ...SearchPathOption) []string {
 	path := os.Getenv("PATH")
 	ptn := "*" + keywords + "*"
 	list := make([]string, 0)
 
+	opt := SearchPathOption{LimitExt: []string{".exe", ".bat", ".cmd"}}
+	if len(opts) > 0 {
+		opt = opts[0]
+	}
+
+	// if windows, will limit with .exe, .bat, .cmd
+	isWindows := IsWindows()
 	checked := make(map[string]bool)
 	for _, dir := range filepath.SplitList(path) {
 		// Unix shell semantics: path element "" means "."
@@ -169,10 +186,21 @@ func SearchPath(keywords string, limit int) []string {
 		checked[dir] = true
 		matches, err := filepath.Glob(filepath.Join(dir, ptn))
 		if err == nil && len(matches) > 0 {
-			list = append(list, matches...)
-			size := len(list)
+			if isWindows {
+				// if windows, will limit with .exe, .bat, .cmd
+				for _, fPath := range matches {
+					fExt := filepath.Ext(fPath)
+					if checkfn.StringsContains(opt.LimitExt, fExt) {
+						continue
+					}
+					list = append(list, fPath)
+				}
+			} else {
+				list = append(list, matches...)
+			}
 
 			// limit result size
+			size := len(list)
 			if limit > 0 && size >= limit {
 				list = list[:limit]
 				break

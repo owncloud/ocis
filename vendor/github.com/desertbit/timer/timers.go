@@ -15,24 +15,9 @@ func init() {
 	go timerRoutine()
 }
 
-// when is a helper function for setting the 'when' field of a runtimeTimer.
-// It returns what the time will be, in nanoseconds, Duration d in the future.
-// If d is negative, it is ignored. If the returned value would be less than
-// zero because of an overflow, MaxInt64 is returned.
-func when(d time.Duration) int64 {
-	if d <= 0 {
-		return time.Now().UnixNano()
-	}
-	t := time.Now().UnixNano() + int64(d)
-	if t < 0 {
-		t = 1<<63 - 1 // math.MaxInt64
-	}
-	return t
-}
-
 // Add the timer to the heap.
 func addTimer(t *Timer, d time.Duration) {
-	t.when = when(d)
+	t.when = time.Now().Add(d)
 
 	mutex.Lock()
 	addTimerLocked(t)
@@ -91,7 +76,7 @@ func resetTimer(t *Timer, d time.Duration) (b bool) {
 	mutex.Lock()
 	b = delTimerLocked(t)
 	t.reset()
-	t.when = when(d)
+	t.when = time.Now().Add(d)
 	addTimerLocked(t)
 	mutex.Unlock()
 	return
@@ -107,7 +92,6 @@ func reschedule() {
 
 func timerRoutine() {
 	var now time.Time
-	var delta int64
 	var last int
 
 	var sleepTimerActive bool
@@ -139,12 +123,12 @@ Loop:
 		}
 
 		t := timers[0]
-		delta = t.when - now.UnixNano()
+		delta := t.when.Sub(now)
 
 		// Sleep if not expired.
 		if delta > 0 {
 			mutex.Unlock()
-			sleepTimer.Reset(time.Duration(delta))
+			sleepTimer.Reset(delta)
 			sleepTimerActive = true
 			continue Loop
 		}
@@ -182,7 +166,7 @@ func siftupTimer(i int) {
 	var p int
 	for i > 0 {
 		p = (i - 1) / 4 // parent
-		if when >= timers[p].when {
+		if !when.Before(timers[p].when) {
 			break
 		}
 		timers[i] = timers[p]
@@ -204,22 +188,22 @@ func siftdownTimer(i int) {
 			break
 		}
 		w := timers[c].when
-		if c+1 < n && timers[c+1].when < w {
+		if c+1 < n && timers[c+1].when.Before(w) {
 			w = timers[c+1].when
 			c++
 		}
 		if c3 < n {
 			w3 := timers[c3].when
-			if c3+1 < n && timers[c3+1].when < w3 {
+			if c3+1 < n && timers[c3+1].when.Before(w3) {
 				w3 = timers[c3+1].when
 				c3++
 			}
-			if w3 < w {
+			if w3.Before(w) {
 				w = w3
 				c = c3
 			}
 		}
-		if w >= when {
+		if !w.Before(when) {
 			break
 		}
 		timers[i] = timers[c]
