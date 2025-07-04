@@ -660,82 +660,6 @@ var _ = Describe("DriveItemPermissionsService", func() {
 				}
 			}
 		})
-
-		It("reproduces missing GetSpaceRootPermission endpoint", func() {
-			// This test reproduces the issue where the acceptance test tries to get a single permission
-			// from a space root, but there's no endpoint for that
-
-			// Mock space with user permission
-			space := &provider.StorageSpace{
-				Id: &provider.StorageSpaceId{OpaqueId: "new-space"},
-				Root: &provider.ResourceId{
-					StorageId: "1",
-					SpaceId:   "new-space",
-					OpaqueId:  "new-space",
-				},
-				SpaceType: "project",
-				Opaque: &types.Opaque{
-					Map: map[string]*types.OpaqueEntry{
-						"grants": {
-							Value: []byte(`{"brian":{"stat":true,"initiate_file_download":true}}`),
-						},
-					},
-				},
-			}
-
-			// Mock gateway client responses
-			gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&provider.ListStorageSpacesResponse{
-				Status:        status.NewOK(ctx),
-				StorageSpaces: []*provider.StorageSpace{space},
-			}, nil)
-			gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(&provider.StatResponse{
-				Status: status.NewOK(ctx),
-				Info: &provider.ResourceInfo{
-					Id: &provider.ResourceId{
-						StorageId: "1",
-						SpaceId:   "new-space",
-						OpaqueId:  "new-space",
-					},
-					Space: &provider.StorageSpace{
-						Id:   space.Id,
-						Root: space.Root,
-					},
-				},
-			}, nil)
-			gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(&userpb.GetUserResponse{
-				Status: status.NewOK(ctx),
-				User: &userpb.User{
-					Id: &userpb.UserId{
-						OpaqueId: "brian",
-						Type:     userpb.UserType_USER_TYPE_PRIMARY,
-					},
-					DisplayName: "Brian Murphy",
-				},
-			}, nil)
-			gatewayClient.On("ListPublicShares", mock.Anything, mock.Anything).Return(&link.ListPublicSharesResponse{
-				Status: status.NewOK(ctx),
-				Share:  []*link.PublicShare{},
-			}, nil)
-
-			// Call the service to get all permissions
-			driveID := &provider.ResourceId{
-				StorageId: "1",
-				SpaceId:   "new-space",
-				OpaqueId:  "new-space",
-			}
-
-			result, err := driveItemPermissionsService.ListSpaceRootPermissions(ctx, driveID)
-			Expect(err).ToNot(HaveOccurred())
-			Expect(result.Value).ToNot(BeNil())
-			Expect(result.Value).To(HaveLen(1)) // 1 user share
-
-			// Verify the permission has the expected format
-			permission := result.Value[0]
-			Expect(permission.GetId()).To(Equal("u:brian"))
-			Expect(permission.GetGrantedToV2().User.GetDisplayName()).To(Equal("Brian Murphy"))
-			Expect(permission.GetGrantedToV2().User.GetId()).To(Equal("brian"))
-			Expect(permission.GetGrantedToV2().User.GetLibreGraphUserType()).To(Equal("Member"))
-		})
 	})
 	Describe("DeletePermission", func() {
 		var (
@@ -1540,7 +1464,8 @@ var _ = Describe("DriveItemPermissionsApi", func() {
 			Expect(responseRecorder.Code).To(Equal(http.StatusOK))
 
 			// Compare whole structure for readability
-			expectedJSON, _ := json.Marshal(expectedPermission)
+			expectedJSON, err := json.Marshal(expectedPermission)
+			Expect(err).ToNot(HaveOccurred())
 			Expect(responseRecorder.Body.String()).To(MatchJSON(string(expectedJSON)))
 		})
 

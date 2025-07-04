@@ -2,13 +2,11 @@ package svc
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"net/http"
 	"net/url"
 	"slices"
 	"strings"
-	"time"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	grouppb "github.com/cs3org/go-cs3apis/cs3/identity/group/v1beta1"
@@ -49,45 +47,6 @@ const (
 	invalidIdMsg       = "invalid driveID or itemID"
 	parseDriveIDErrMsg = "could not parse driveID"
 )
-
-// CollectionWithExtendedRoles wraps CollectionOfPermissionsWithAllowedValues to add createdDateTime to roles
-type CollectionWithExtendedRoles struct {
-	libregraph.CollectionOfPermissionsWithAllowedValues
-}
-
-// MarshalJSON implements custom JSON marshaling that adds createdDateTime to role definitions
-func (c CollectionWithExtendedRoles) MarshalJSON() ([]byte, error) {
-	// Convert to map
-	result := make(map[string]interface{})
-
-	if c.LibreGraphPermissionsActionsAllowedValues != nil {
-		result["@libre.graph.permissions.actions.allowedValues"] = c.LibreGraphPermissionsActionsAllowedValues
-	}
-
-	if c.LibreGraphPermissionsRolesAllowedValues != nil {
-		// Add createdDateTime to each role
-		extendedRoles := make([]interface{}, len(c.LibreGraphPermissionsRolesAllowedValues))
-		now := time.Now()
-
-		for i, role := range c.LibreGraphPermissionsRolesAllowedValues {
-			// Convert role to map and add createdDateTime
-			roleMap, err := role.ToMap()
-			if err != nil {
-				return nil, err
-			}
-			roleMap["createdDateTime"] = now
-			extendedRoles[i] = roleMap
-		}
-
-		result["@libre.graph.permissions.roles.allowedValues"] = extendedRoles
-	}
-
-	if c.Value != nil {
-		result["value"] = c.Value
-	}
-
-	return json.Marshal(result)
-}
 
 // DriveItemPermissionsProvider contains the methods related to handling permissions on drive items
 type DriveItemPermissionsProvider interface {
@@ -914,7 +873,7 @@ func (api DriveItemPermissionsApi) ListPermissions(w http.ResponseWriter, r *htt
 	}
 
 	render.Status(r, http.StatusOK)
-	render.JSON(w, r, CollectionWithExtendedRoles{permissions})
+	render.JSON(w, r, permissions)
 }
 
 // ListSpaceRootPermissions handles ListPermissions requests on a space root
@@ -950,7 +909,7 @@ func (api DriveItemPermissionsApi) ListSpaceRootPermissions(w http.ResponseWrite
 	}
 
 	render.Status(r, http.StatusOK)
-	render.JSON(w, r, CollectionWithExtendedRoles{permissions})
+	render.JSON(w, r, permissions)
 }
 
 // GetSpaceRootPermission handles requests to fetch a single permission on a space root
