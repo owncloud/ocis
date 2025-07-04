@@ -7,7 +7,7 @@ toolchain go1.24.1
 require (
 	dario.cat/mergo v1.0.1
 	github.com/CiscoM31/godata v1.0.10
-	github.com/KimMachineGun/automemlimit v0.6.1
+	github.com/KimMachineGun/automemlimit v0.7.3
 	github.com/Masterminds/semver v1.5.0
 	github.com/MicahParks/keyfunc/v2 v2.1.0
 	github.com/Nerzal/gocloak/v13 v13.9.0
@@ -156,9 +156,7 @@ require (
 	github.com/ceph/go-ceph v0.33.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/cevaris/ordered_map v0.0.0-20190319150403-3adeae072e73 // indirect
-	github.com/cilium/ebpf v0.9.1 // indirect
 	github.com/cloudflare/circl v1.6.1 // indirect
-	github.com/containerd/cgroups/v3 v3.0.2 // indirect
 	github.com/coreos/go-semver v0.3.0 // indirect
 	github.com/coreos/go-systemd/v22 v22.5.0 // indirect
 	github.com/cornelk/hashmap v1.0.8 // indirect
@@ -173,7 +171,6 @@ require (
 	github.com/dgryski/go-farm v0.0.0-20240924180020-3414d57e47da // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/dlclark/regexp2 v1.4.0 // indirect
-	github.com/docker/go-units v0.5.0 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/egirna/icap v0.0.0-20181108071049-d5ee18bd70bc // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
@@ -181,7 +178,6 @@ require (
 	github.com/evanphx/json-patch/v5 v5.5.0 // indirect
 	github.com/fatih/color v1.14.1 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
-	github.com/frankban/quicktest v1.14.6 // indirect
 	github.com/fsnotify/fsnotify v1.8.0 // indirect
 	github.com/gdexlab/go-render v1.0.1 // indirect
 	github.com/go-acme/lego/v4 v4.4.0 // indirect
@@ -213,7 +209,6 @@ require (
 	github.com/gobwas/ws v1.2.1 // indirect
 	github.com/goccy/go-json v0.10.3 // indirect
 	github.com/goccy/go-yaml v1.11.2 // indirect
-	github.com/godbus/dbus/v5 v5.1.0 // indirect
 	github.com/gofrs/flock v0.12.1 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang-jwt/jwt/v4 v4.5.2 // indirect
@@ -271,7 +266,6 @@ require (
 	github.com/nats-io/nuid v1.0.1 // indirect
 	github.com/nxadm/tail v1.4.8 // indirect
 	github.com/oklog/run v1.1.0 // indirect
-	github.com/opencontainers/runtime-spec v1.1.0 // indirect
 	github.com/opentracing/opentracing-go v1.2.0 // indirect
 	github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c // indirect
 	github.com/pablodz/inotifywaitgo v0.0.7 // indirect
