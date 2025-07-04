@@ -358,21 +358,14 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 
 #### [Creation date is missing for space members](https://github.com/owncloud/ocis/issues/10077)
 
-- [apiSharingNgPermissions/listPermissions.feature:874](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNgPermissions/listPermissions.feature#L874)
 - [apiSharingNgPermissions/listPermissions.feature:1548](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNgPermissions/listPermissions.feature#L1548)
 - [apiSharingNgPermissions/listPermissions.feature:1549](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNgPermissions/listPermissions.feature#L1549)
 - [apiSharingNgPermissions/listPermissions.feature:1550](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNgPermissions/listPermissions.feature#L1550)
-- [apiSharingNgPermissions/listPermissions.feature:2263](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNgPermissions/listPermissions.feature#L2263)
 
 #### [Lost permission when received multiple shares on the same resource](https://github.com/owncloud/ocis/issues/8464)
 
 - [apiSharingNgShares/sharedWithMe.feature:5410](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNgShares/sharedWithMe.feature#L5410)
 - [apiSharingNgShares/sharedWithMe.feature:5411](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNgShares/sharedWithMe.feature#L5411)
-
-### [[Sharing NG] Implement https://owncloud.dev/libre-graph-api/#/drives.permissions/GetPermission](https://github.com/owncloud/ocis/issues/8616)
-
-- [apiSharingNgPermissions/listPermissions.feature:2673](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNgPermissions/listPermissions.feature#L2673)
-- [apiSharingNgPermissions/listPermissions.feature:2718](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNgPermissions/listPermissions.feature#L2718)
 
 #### [Activity. No activity for copying a zero byte file](https://github.com/owncloud/ocis/issues/10417)
 
