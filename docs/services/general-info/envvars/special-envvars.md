@@ -29,7 +29,7 @@ respectivle in any `docs-stable-x.y` branch.
 
 ### General Info
 
-The process behind updating the `extended_vars.yaml` is non-destructive. This means, that the process checks the code if values found match those in the file already present. If differences occur, **new** content is added. The file is recreated when  deleted - try to avoid this and maintain the changed one.
+The process behind updating the `extended_vars.yaml` is non-destructive. This means, that the process checks the code if values found match those in the file already present. If differences occur, only **new** content blocks are added, independent if it is new or moved code. The file is recreated when  deleted - try to avoid this and maintain the changed one.
 
 This also means, that if generating the docs result in a change in the `extended_vars.yaml` file, manual action **must** be taken and the final changes need to be committed/pushed/merged. If this is not done, the `extended_configvars.adoc` will contain invalid and/or corrupt data.
 
