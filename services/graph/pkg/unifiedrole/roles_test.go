@@ -270,3 +270,32 @@ func TestGetAllowedResourceActions(t *testing.T) {
 		})
 	}
 }
+
+func TestGetUnifiedRoleLabel(t *testing.T) {
+	type args struct {
+		unifiedRoleId string
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{
+			name: "Empty",
+			args: args{unifiedRoleId: ""},
+			want: "",
+		},
+		{
+			name: "Unknown",
+			args: args{unifiedRoleId: "unknown"},
+			want: "",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := unifiedrole.GetUnifiedRoleLabel(tt.args.unifiedRoleId); got != tt.want {
+				t.Errorf("GetUnifiedRoleLabel() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
