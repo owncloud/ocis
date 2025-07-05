@@ -3547,3 +3547,106 @@ Feature: check activities
         }
       }
       """
+
+  @issue-10010
+  Scenario: check activities after restoring a deleted file
+    Given user "Alice" has uploaded file with content "hello world" to "textfile0.txt"
+    And user "Alice" has deleted file "textfile0.txt"
+    And user "Alice" has restored the file with original path "/textfile0.txt"
+    When user "Alice" lists the activities of file "textfile0.txt" from space "Personal" using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 3,
+            "maxItems": 3,
+            "uniqueItems": true,
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "required": ["id","template","times"],
+                  "properties": {
+                    "template": {
+                      "type": "object",
+                      "required": ["message","variables"],
+                      "properties": {
+                        "message": { "const": "{user} added {resource} to {folder}" }
+                      }
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["id","template"],
+                  "properties": {
+                    "template": {
+                      "type": "object",
+                      "required": ["message","variables"],
+                      "properties": {
+                        "message": { "const": "{user} deleted {resource} from {folder}" }
+                      }
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["id","template","times"],
+                  "properties": {
+                    "id": { "pattern": "^%user_id_pattern%$" },
+                    "template": {
+                      "type": "object",
+                      "required": ["message","variables"],
+                      "properties": {
+                        "message": { "const": "{user} restored {resource} to {folder}" },
+                        "variables": {
+                          "type": "object",
+                          "required": ["folder", "resource", "user"],
+                          "properties": {
+                            "folder": {
+                              "type": "object",
+                              "required": ["name"],
+                              "properties": {
+                                "name": { "const": "Alice Hansen" }
+                              }
+                            },
+                            "resource": {
+                              "type": "object",
+                              "required": ["id","name"],
+                              "properties": {
+                                "id": { "const": ""},
+                                "name": { "const": "textfile0.txt" }
+                              }
+                            },
+                            "user": {
+                              "type": "object",
+                              "required": ["id","displayName"],
+                              "properties": {
+                                "id": { "pattern": "%user_id_pattern%" },
+                                "displayName": { "const": "Alice Hansen" }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "times": {
+                      "type": "object",
+                      "required": ["recordedTime"],
+                      "properties": {
+                        "recordedTime": { "format": "date-time" }
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+      """

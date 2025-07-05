@@ -393,5 +393,9 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 
 - [apiSharingNgDriveLinkShare/createInternalLinkShare.feature:339](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNgDriveLinkShare/createInternalLinkShare.feature#L339)
 
+#### [Activities. no event for restoring file](https://github.com/owncloud/ocis/issues/10010)
+
+- [apiActivities/activities.feature:3552](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiActivities/activities.feature#L3552)
+
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.
