@@ -85,6 +85,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix the OCM role editor: [#11484](https://github.com/owncloud/ocis/pull/11484)
 * Change - Remove deprecated FRONTEND_OCS_*: [#11333](https://github.com/owncloud/ocis/pull/11333)
 * Change - Remove deprecated CLIENTLOG_REVA_GATEWAY: [#11372](https://github.com/owncloud/ocis/pull/11372)
+* Enhancement - Add GetPermission API: [#8616](https://github.com/owncloud/ocis/issues/8616)
 * Enhancement - Allow scaling the search service: [#11029](https://github.com/owncloud/ocis/pull/11029)
 * Enhancement - Update Mockery to 2.52.3: [#11070](https://github.com/owncloud/ocis/pull/11070)
 * Enhancement - Improve postprocessing logs: [#11108](https://github.com/owncloud/ocis/pull/11108)
@@ -257,6 +258,16 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/11314
    https://github.com/owncloud/ocis/pull/11372
+
+* Enhancement - Add GetPermission API: [#8616](https://github.com/owncloud/ocis/issues/8616)
+
+   Graph service: added GET
+   /v1beta1/drives/{driveId}/items/{itemId}/permissions/{permissionId} (and
+   space-root equivalent) so clients can retrieve a single permission instead of
+   listing all.
+
+   https://github.com/owncloud/ocis/issues/8616
+   https://github.com/owncloud/ocis/pull/11477
 
 * Enhancement - Allow scaling the search service: [#11029](https://github.com/owncloud/ocis/pull/11029)
 
