@@ -39,6 +39,7 @@ REDIS = "redis:6-alpine"
 SONARSOURCE_SONAR_SCANNER_CLI = "sonarsource/sonar-scanner-cli:11.0"
 KEYCLOAK_IMAGE = "quay.io/keycloak/keycloak:26.2.5"
 POSTGRES_ALPINE_IMAGE = "postgres:alpine3.18"
+TRIVY_IMAGE = "aquasec/trivy:latest"
 
 DEFAULT_PHP_VERSION = "8.4"
 DEFAULT_NODEJS_VERSION = "22"
@@ -510,6 +511,9 @@ def main(ctx):
     )
 
     pipelines = test_pipelines + build_release_pipelines
+
+    # nightly Trivy security scan (non-blocking)
+    pipelines.append(trivyScan(ctx))
 
     if ctx.build.event == "cron":
         pipelines = \
@@ -3685,3 +3689,37 @@ def deleteStaleBranches(ctx):
             ],
         },
     }]
+
+def trivyScan(ctx):
+    steps = [
+        {
+            "name": "trivy-security-scan",
+            "image": TRIVY_IMAGE,
+            "commands": [
+                # Trivy filesystem scan: recursively walks /drone/src workspace
+                # - Scans entire repository including compiled artifacts and dependencies
+                # - --exit-code 0: never fails the job regardless of findings
+                # - --no-progress: reduces log noise in CI
+                "trivy fs --exit-code 0 --severity HIGH,CRITICAL --no-progress /drone/src",
+            ],
+            "failure": "ignore",
+        },
+    ]
+
+    return {
+        "kind": "pipeline",
+        "type": "docker",
+        "name": "security-scan-trivy",
+        "platform": {
+            "os": "linux",
+            "arch": "amd64",
+        },
+        "steps": steps,
+        "trigger": {
+            "ref": [
+                "refs/heads/master",
+                "refs/tags/**",
+                "refs/pull/**",
+            ],
+        },
+    }
