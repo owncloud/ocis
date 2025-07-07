@@ -34,7 +34,6 @@ const (
 var (
 	reForwardedHost  = regexp.MustCompile(`host="?([^;"]+)`)
 	reForwardedProto = regexp.MustCompile(`proto=(https?)`)
-	reMimeType       = regexp.MustCompile(`^[a-z]+\/[a-z0-9\-\+\.]+$`)
 	// We only allow certain URL-safe characters in upload IDs. URL-safe in this means
 	// that their are allowed in a URI's path component according to RFC 3986.
 	// See https://datatracker.ietf.org/doc/html/rfc3986#section-3.3
@@ -60,6 +59,7 @@ var (
 	ErrInvalidUploadDeferLength         = NewError("ERR_INVALID_UPLOAD_LENGTH_DEFER", "invalid Upload-Defer-Length header", http.StatusBadRequest)
 	ErrUploadStoppedByServer            = NewError("ERR_UPLOAD_STOPPED", "upload has been stopped by server", http.StatusBadRequest)
 	ErrUploadRejectedByServer           = NewError("ERR_UPLOAD_REJECTED", "upload creation has been rejected by server", http.StatusBadRequest)
+	ErrUploadTerminationRejected        = NewError("ERR_UPLOAD_TERMINATION_REJECTED", "upload termination has been rejected by server", http.StatusBadRequest)
 	ErrUploadInterrupted                = NewError("ERR_UPLOAD_INTERRUPTED", "upload has been interrupted by another request for this upload resource", http.StatusBadRequest)
 	ErrServerShutdown                   = NewError("ERR_SERVER_SHUTDOWN", "request has been interrupted because the server is shutting down", http.StatusServiceUnavailable)
 	ErrOriginNotAllowed                 = NewError("ERR_ORIGIN_NOT_ALLOWED", "request origin is not allowed", http.StatusForbidden)
@@ -177,10 +177,10 @@ func (handler *UnroutedHandler) Middleware(h http.Handler) http.Handler {
 		// We also update the write deadline, but makes sure that it is larger than the read deadline, so we
 		// can still write a response in the case of a read timeout.
 		if err := c.resC.SetReadDeadline(time.Now().Add(handler.config.NetworkTimeout)); err != nil {
-			c.log.Warn("NetworkControlError", "error", err)
+			c.log.WarnContext(c, "NetworkControlError", "error", err)
 		}
 		if err := c.resC.SetWriteDeadline(time.Now().Add(2 * handler.config.NetworkTimeout)); err != nil {
-			c.log.Warn("NetworkControlError", "error", err)
+			c.log.WarnContext(c, "NetworkControlError", "error", err)
 		}
 
 		// Allow overriding the HTTP method. The reason for this is
@@ -190,7 +190,7 @@ func (handler *UnroutedHandler) Middleware(h http.Handler) http.Handler {
 			r.Method = newMethod
 		}
 
-		c.log.Info("RequestIncoming")
+		c.log.InfoContext(c, "RequestIncoming")
 
 		handler.Metrics.incRequestsTotal(r.Method)
 
@@ -405,7 +405,7 @@ func (handler *UnroutedHandler) PostFile(w http.ResponseWriter, r *http.Request)
 
 	handler.Metrics.incUploadsCreated()
 	c.log = c.log.With("id", id)
-	c.log.Info("UploadCreated", "size", size, "url", url)
+	c.log.InfoContext(c, "UploadCreated", "size", size, "url", url)
 
 	if handler.config.NotifyCreatedUploads {
 		handler.CreatedUploads <- newHookEvent(c, info)
@@ -572,7 +572,7 @@ func (handler *UnroutedHandler) PostFileV2(w http.ResponseWriter, r *http.Reques
 
 	handler.Metrics.incUploadsCreated()
 	c.log = c.log.With("id", id)
-	c.log.Info("UploadCreated", "size", info.Size, "url", url)
+	c.log.InfoContext(c, "UploadCreated", "size", info.Size, "url", url)
 
 	if handler.config.NotifyCreatedUploads {
 		handler.CreatedUploads <- newHookEvent(c, info)
@@ -891,7 +891,7 @@ func (handler *UnroutedHandler) writeChunk(c *httpContext, resp HTTPResponse, up
 		maxSize = length
 	}
 
-	c.log.Info("ChunkWriteStart", "maxSize", maxSize, "offset", offset)
+	c.log.InfoContext(c, "ChunkWriteStart", "maxSize", maxSize, "offset", offset)
 
 	var bytesWritten int64
 	var err error
@@ -907,12 +907,12 @@ func (handler *UnroutedHandler) writeChunk(c *httpContext, resp HTTPResponse, up
 			// Update the read deadline for every successful read operation. This ensures that the request handler
 			// keeps going while data is transmitted but that dead connections can also time out and be cleaned up.
 			if err := c.resC.SetReadDeadline(time.Now().Add(handler.config.NetworkTimeout)); err != nil {
-				c.log.Warn("NetworkTimeoutError", "error", err)
+				c.log.WarnContext(c, "NetworkTimeoutError", "error", err)
 			}
 
 			// The write deadline is updated accordingly to ensure that we can also write responses.
 			if err := c.resC.SetWriteDeadline(time.Now().Add(2 * handler.config.NetworkTimeout)); err != nil {
-				c.log.Warn("NetworkTimeoutError", "error", err)
+				c.log.WarnContext(c, "NetworkTimeoutError", "error", err)
 			}
 		}
 
@@ -935,7 +935,7 @@ func (handler *UnroutedHandler) writeChunk(c *httpContext, resp HTTPResponse, up
 		// it in the response, if the store did not also return an error.
 		bodyErr := c.body.hasError()
 		if bodyErr != nil {
-			c.log.Error("BodyReadError", "error", bodyErr.Error())
+			c.log.ErrorContext(c, "BodyReadError", "error", bodyErr.Error())
 			if err == nil {
 				err = bodyErr
 			}
@@ -947,12 +947,12 @@ func (handler *UnroutedHandler) writeChunk(c *httpContext, resp HTTPResponse, up
 			if terminateErr := handler.terminateUpload(c, upload, info); terminateErr != nil {
 				// We only log this error and not show it to the user since this
 				// termination error is not relevant to the uploading client
-				c.log.Error("UploadStopTerminateError", "error", terminateErr.Error())
+				c.log.ErrorContext(c, "UploadStopTerminateError", "error", terminateErr.Error())
 			}
 		}
 	}
 
-	c.log.Info("ChunkWriteComplete", "bytesWritten", bytesWritten)
+	c.log.InfoContext(c, "ChunkWriteComplete", "bytesWritten", bytesWritten)
 
 	// Send new offset to client
 	newOffset := offset + bytesWritten
@@ -1003,7 +1003,7 @@ func (handler *UnroutedHandler) emitFinishEvents(c *httpContext, resp HTTPRespon
 		resp = resp.MergeWith(resp2)
 	}
 
-	c.log.Info("UploadFinished", "size", info.Size)
+	c.log.InfoContext(c, "UploadFinished", "size", info.Size)
 	handler.Metrics.incUploadsFinished()
 
 	if handler.config.NotifyCompleteUploads {
@@ -1047,6 +1047,7 @@ func (handler *UnroutedHandler) GetFile(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
+	// Fall back to the existing GetReader implementation if ContentServerDataStore is not implemented
 	contentType, contentDisposition := filterContentType(info)
 	resp := HTTPResponse{
 		StatusCode: http.StatusOK,
@@ -1058,10 +1059,40 @@ func (handler *UnroutedHandler) GetFile(w http.ResponseWriter, r *http.Request) 
 		Body: "", // Body is intentionally left empty, and we copy it manually in later.
 	}
 
+	// If the data store implements ContentServerDataStore, use delegate the handling
+	// of GET requests to the data store.
+	// Otherwise, we will use the existing GetReader implementation.
+	if handler.composer.UsesContentServer {
+		servableUpload := handler.composer.ContentServer.AsServableUpload(upload)
+
+		// Pass file type and name to the implementation, but it may override them.
+		w.Header().Set("Content-Type", resp.Header["Content-Type"])
+		w.Header().Set("Content-Disposition", resp.Header["Content-Disposition"])
+
+		// Use loggingResponseWriter to get the ResponseOutgoing log entry that
+		// normally handler.sendResp would produce.
+		loggingW := &loggingResponseWriter{ResponseWriter: w, logger: c.log}
+
+		err = servableUpload.ServeContent(c, loggingW, r)
+		if err != nil {
+			handler.sendError(c, err)
+		}
+		return
+	}
+
 	// If no data has been uploaded yet, respond with an empty "204 No Content" status.
 	if info.Offset == 0 {
 		resp.StatusCode = http.StatusNoContent
 		handler.sendResp(c, resp)
+		return
+	}
+
+	if handler.composer.UsesContentServer {
+		servableUpload := handler.composer.ContentServer.AsServableUpload(upload)
+		err = servableUpload.ServeContent(c, w, r)
+		if err != nil {
+			handler.sendError(c, err)
+		}
 		return
 	}
 
@@ -1072,7 +1103,10 @@ func (handler *UnroutedHandler) GetFile(w http.ResponseWriter, r *http.Request) 
 	}
 
 	handler.sendResp(c, resp)
-	io.Copy(w, src)
+	if _, err := io.Copy(w, src); err != nil {
+		handler.sendError(c, err)
+		return
+	}
 
 	src.Close()
 }
@@ -1080,9 +1114,9 @@ func (handler *UnroutedHandler) GetFile(w http.ResponseWriter, r *http.Request) 
 // mimeInlineBrowserWhitelist is a map containing MIME types which should be
 // allowed to be rendered by browser inline, instead of being forced to be
 // downloaded. For example, HTML or SVG files are not allowed, since they may
-// contain malicious JavaScript. In a similiar fashion PDF is not on this list
+// contain malicious JavaScript. In a similar fashion, PDF is not on this list
 // as their parsers commonly contain vulnerabilities which can be exploited.
-// The values of this map does not convey any meaning and are therefore just
+// The values of this map do not convey any meaning and are therefore just
 // empty structs.
 var mimeInlineBrowserWhitelist = map[string]struct{}{
 	"text/plain": {},
@@ -1093,14 +1127,17 @@ var mimeInlineBrowserWhitelist = map[string]struct{}{
 	"image/bmp":  {},
 	"image/webp": {},
 
-	"audio/wave":      {},
-	"audio/wav":       {},
-	"audio/x-wav":     {},
-	"audio/x-pn-wav":  {},
-	"audio/webm":      {},
-	"video/webm":      {},
-	"audio/ogg":       {},
-	"video/ogg":       {},
+	"audio/wave":     {},
+	"audio/wav":      {},
+	"audio/x-wav":    {},
+	"audio/x-pn-wav": {},
+	"audio/webm":     {},
+	"audio/ogg":      {},
+
+	"video/mp4":  {},
+	"video/webm": {},
+	"video/ogg":  {},
+
 	"application/ogg": {},
 }
 
@@ -1108,23 +1145,22 @@ var mimeInlineBrowserWhitelist = map[string]struct{}{
 // Content-Disposition headers for a given upload. These values should be used
 // in responses for GET requests to ensure that only non-malicious file types
 // are shown directly in the browser. It will extract the file name and type
-// from the "fileame" and "filetype".
+// from the "filename" and "filetype".
 // See https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Disposition
 func filterContentType(info FileInfo) (contentType string, contentDisposition string) {
 	filetype := info.MetaData["filetype"]
 
-	if reMimeType.MatchString(filetype) {
-		// If the filetype from metadata is well formed, we forward use this
-		// for the Content-Type header. However, only whitelisted mime types
-		// will be allowed to be shown inline in the browser
+	if ft, _, err := mime.ParseMediaType(filetype); err == nil {
+		// If the filetype from metadata is well-formed, we forward use this for the Content-Type header.
+		// However, only allowlisted mime types	will be allowed to be shown inline in the browser
 		contentType = filetype
-		if _, isWhitelisted := mimeInlineBrowserWhitelist[filetype]; isWhitelisted {
+		if _, isWhitelisted := mimeInlineBrowserWhitelist[ft]; isWhitelisted {
 			contentDisposition = "inline"
 		} else {
 			contentDisposition = "attachment"
 		}
 	} else {
-		// If the filetype from the metadata is not well formed, we use a
+		// If the filetype from the metadata is not well-formed, we use a
 		// default type and force the browser to download the content.
 		contentType = "application/octet-stream"
 		contentDisposition = "attachment"
@@ -1172,12 +1208,25 @@ func (handler *UnroutedHandler) DelFile(w http.ResponseWriter, r *http.Request) 
 	}
 
 	var info FileInfo
-	if handler.config.NotifyTerminatedUploads {
+	if handler.config.NotifyTerminatedUploads || handler.config.PreUploadTerminateCallback != nil {
 		info, err = upload.GetInfo(c)
 		if err != nil {
 			handler.sendError(c, err)
 			return
 		}
+	}
+
+	resp := HTTPResponse{
+		StatusCode: http.StatusNoContent,
+	}
+
+	if handler.config.PreUploadTerminateCallback != nil {
+		resp2, err := handler.config.PreUploadTerminateCallback(newHookEvent(c, info))
+		if err != nil {
+			handler.sendError(c, err)
+			return
+		}
+		resp = resp.MergeWith(resp2)
 	}
 
 	err = handler.terminateUpload(c, upload, info)
@@ -1186,9 +1235,7 @@ func (handler *UnroutedHandler) DelFile(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	handler.sendResp(c, HTTPResponse{
-		StatusCode: http.StatusNoContent,
-	})
+	handler.sendResp(c, resp)
 }
 
 // terminateUpload passes a given upload to the DataStore's Terminater,
@@ -1208,7 +1255,7 @@ func (handler *UnroutedHandler) terminateUpload(c *httpContext, upload Upload, i
 		handler.TerminatedUploads <- newHookEvent(c, info)
 	}
 
-	c.log.Info("UploadTerminated")
+	c.log.InfoContext(c, "UploadTerminated")
 	handler.Metrics.incUploadsTerminated()
 
 	return nil
@@ -1222,7 +1269,7 @@ func (handler *UnroutedHandler) sendError(c *httpContext, err error) {
 	var detailedErr Error
 
 	if !errors.As(err, &detailedErr) {
-		c.log.Error("InternalServerError", "message", err.Error())
+		c.log.ErrorContext(c, "InternalServerError", "message", err.Error())
 		detailedErr = NewError("ERR_INTERNAL_SERVER_ERROR", err.Error(), http.StatusInternalServerError)
 	}
 
@@ -1240,7 +1287,7 @@ func (handler *UnroutedHandler) sendError(c *httpContext, err error) {
 func (handler *UnroutedHandler) sendResp(c *httpContext, resp HTTPResponse) {
 	resp.writeTo(c.res)
 
-	c.log.Info("ResponseOutgoing", "status", resp.StatusCode, "body", resp.Body)
+	c.log.InfoContext(c, "ResponseOutgoing", "status", resp.StatusCode, "body", resp.Body)
 }
 
 // Make an absolute URLs to the given upload id. If the base path is absolute
@@ -1323,6 +1370,14 @@ func getHostAndProtocol(r *http.Request, allowForwarded bool) (host, proto strin
 		}
 	}
 
+	// Remove default ports
+	if proto == "http" {
+		host = strings.TrimSuffix(host, ":80")
+	}
+	if proto == "https" {
+		host = strings.TrimSuffix(host, ":443")
+	}
+
 	return
 }
 
@@ -1393,7 +1448,7 @@ func (handler *UnroutedHandler) lockUpload(c *httpContext, id string) (Lock, err
 
 	// No need to wrap this in a sync.OnceFunc because c.cancel will be a noop after the first call.
 	releaseLock := func() {
-		c.log.Info("UploadInterrupted")
+		c.log.InfoContext(c, "UploadInterrupted")
 		c.cancel(ErrUploadInterrupted)
 	}
 
@@ -1671,3 +1726,20 @@ func validateUploadId(newId string) error {
 
 	return nil
 }
+
+// loggingResponseWriter is a wrapper around http.ResponseWriter that logs the
+// final status code similar to UnroutedHandler.sendResp.
+type loggingResponseWriter struct {
+	http.ResponseWriter
+	logger *slog.Logger
+}
+
+func (w *loggingResponseWriter) WriteHeader(statusCode int) {
+	if statusCode >= 200 {
+		w.logger.Info("ResponseOutgoing", "status", statusCode)
+	}
+	w.ResponseWriter.WriteHeader(statusCode)
+}
+
+// Unwrap provides access to the underlying http.ResponseWriter.
+func (w *loggingResponseWriter) Unwrap() http.ResponseWriter { return w.ResponseWriter }

@@ -19,7 +19,7 @@ func MustToTime(s string, layouts ...string) time.Time {
 	return t
 }
 
-// auto match use some commonly layouts.
+// auto match uses some common layouts.
 // key is layout length.
 var layoutMap = map[int][]string{
 	6:  {"200601", "060102", time.Kitchen},
@@ -45,6 +45,8 @@ var layoutMap = map[int][]string{
 }
 
 // ToTime convert date string to time.Time
+//
+// NOTE: always use local timezone.
 func ToTime(s string, layouts ...string) (t time.Time, err error) {
 	// custom layout
 	if len(layouts) > 0 {

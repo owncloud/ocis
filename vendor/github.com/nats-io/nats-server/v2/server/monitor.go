@@ -23,6 +23,7 @@ import (
 	"encoding/json"
 	"expvar"
 	"fmt"
+	"maps"
 	"math"
 	"net"
 	"net/http"
@@ -282,7 +283,9 @@ func (s *Server) Connz(opts *ConnzOptions) (*Connz, error) {
 	s.mu.RLock()
 	// Default to all client unless filled in above.
 	if clist == nil {
-		clist = s.clients
+		clist = make(map[uint64]*client, len(s.clients)+len(s.leafs))
+		maps.Copy(clist, s.clients)
+		maps.Copy(clist, s.leafs)
 	}
 
 	// copy the server id for monitoring
@@ -1015,7 +1018,7 @@ func (s *Server) Subsz(opts *SubszOptions) (*Subsz, error) {
 			return true
 		})
 
-		details := make([]SubDetail, len(subs))
+		details := make([]SubDetail, 0, len(subs))
 		i := 0
 		// TODO(dlc) - may be inefficient and could just do normal match when total subs is large and filtering.
 		for _, sub := range subs {
@@ -1027,7 +1030,7 @@ func (s *Server) Subsz(opts *SubszOptions) (*Subsz, error) {
 				continue
 			}
 			sub.client.mu.Lock()
-			details[i] = newSubDetail(sub)
+			details = append(details, newSubDetail(sub))
 			sub.client.mu.Unlock()
 			i++
 		}
@@ -1044,7 +1047,7 @@ func (s *Server) Subsz(opts *SubszOptions) (*Subsz, error) {
 			maxoff = maxIndex
 		}
 		sz.Subs = details[minoff:maxoff]
-		sz.Total = len(sz.Subs)
+		sz.Total = len(details)
 	} else {
 		s.accounts.Range(func(k, v any) bool {
 			acc := v.(*Account)
@@ -4024,8 +4027,8 @@ func (s *Server) Raftz(opts *RaftzOptions) *RaftzStatus {
 				Known:               p.kp,
 				LastReplicatedIndex: p.li,
 			}
-			if p.ts > 0 {
-				peer.LastSeen = time.Since(time.Unix(0, p.ts)).String()
+			if !p.ts.IsZero() {
+				peer.LastSeen = time.Since(p.ts).String()
 			}
 			info.Peers[id] = peer
 		}

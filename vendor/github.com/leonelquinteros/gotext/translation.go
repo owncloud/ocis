@@ -22,6 +22,7 @@ func NewTranslation() *Translation {
 	}
 }
 
+// NewTranslationWithRefs returns the Translation object and initialized it with references.
 func NewTranslationWithRefs(refs []string) *Translation {
 	return &Translation{
 		Trs:  make(map[int]string),
@@ -29,15 +30,18 @@ func NewTranslationWithRefs(refs []string) *Translation {
 	}
 }
 
+// IsStale returns whether the translation is stale or not
 func (t *Translation) IsStale() bool {
-	return t.dirty == false
+	return !t.dirty
 }
 
+// SetRefs sets the references of the translation
 func (t *Translation) SetRefs(refs []string) {
 	t.Refs = refs
 	t.dirty = true
 }
 
+// Set sets the string of the translation
 func (t *Translation) Set(str string) {
 	t.Trs[0] = str
 	t.dirty = true
@@ -56,6 +60,7 @@ func (t *Translation) Get() string {
 	return t.ID
 }
 
+// SetN sets the string of the plural translation
 func (t *Translation) SetN(n int, str string) {
 	t.Trs[n] = str
 	t.dirty = true

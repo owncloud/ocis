@@ -253,7 +253,7 @@ type ruleWalker struct {
 	result *trieTraversalResult
 }
 
-func (r *ruleWalker) Do(x interface{}) trieWalker {
+func (r *ruleWalker) Do(x any) trieWalker {
 	tn := x.(*trieNode)
 	r.result.Add(tn)
 	return r
@@ -402,7 +402,7 @@ func (i *refindices) updateGlobMatch(rule *Rule, expr *Expr) {
 			if ref == nil {
 				for j, arg := range args {
 					if arg.Equal(match) {
-						ref = Ref{FunctionArgRootDocument, InternedIntNumberTerm(j)}
+						ref = Ref{FunctionArgRootDocument, InternedTerm(j)}
 					}
 				}
 			}
@@ -454,7 +454,7 @@ func (i *refindices) index(rule *Rule, ref Ref) *refindex {
 }
 
 type trieWalker interface {
-	Do(x interface{}) trieWalker
+	Do(x any) trieWalker
 }
 
 type trieTraversalResult struct {
@@ -822,7 +822,7 @@ func eqOperandsToRefAndValue(isVirtual func(Ref) bool, args []*Term, a, b *Term)
 		for i, arg := range args {
 			if arg.Value.Compare(a.Value) == 0 {
 				if bval, ok := indexValue(b); ok {
-					return &refindex{Ref: Ref{FunctionArgRootDocument, InternedIntNumberTerm(i)}, Value: bval}, true
+					return &refindex{Ref: Ref{FunctionArgRootDocument, InternedTerm(i)}, Value: bval}, true
 				}
 			}
 		}
@@ -850,7 +850,7 @@ func indexValue(b *Term) (Value, bool) {
 	case *Array:
 		stop := false
 		first := true
-		vis := NewGenericVisitor(func(x interface{}) bool {
+		vis := NewGenericVisitor(func(x any) bool {
 			if first {
 				first = false
 				return false
@@ -932,7 +932,7 @@ func globPatternToArray(pattern *Term, delim string) *Term {
 		}
 	}
 
-	return NewTerm(NewArray(arr...))
+	return ArrayTerm(arr...)
 }
 
 // splits s on characters in delim except if delim characters have been escaped

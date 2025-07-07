@@ -214,7 +214,7 @@ func (e *eval) partial() bool {
 	return e.saveSet != nil
 }
 
-func (e *eval) unknown(x interface{}, b *bindings) bool {
+func (e *eval) unknown(x any, b *bindings) bool {
 	if !e.partial() {
 		return false
 	}
@@ -227,6 +227,11 @@ func (e *eval) unknown(x interface{}, b *bindings) bool {
 	}
 
 	return saveRequired(e.compiler, e.inliningControl, true, e.saveSet, b, x, false)
+}
+
+// exactly like `unknown` above` but without the cost of `any` boxing when arg is known to be a ref
+func (e *eval) unknownRef(ref ast.Ref, b *bindings) bool {
+	return e.partial() && saveRequired(e.compiler, e.inliningControl, true, e.saveSet, b, ast.NewTerm(ref), false)
 }
 
 func (e *eval) traceEnter(x ast.Node) {
@@ -447,13 +452,18 @@ func (e *eval) evalStep(iter evalIterator) error {
 		case *ast.Term:
 			// generateVar inlined here to avoid extra allocations in hot path
 			rterm := ast.VarTerm(e.fmtVarTerm())
+
+			if e.partial() {
+				e.inliningControl.PushDisable(rterm.Value, true)
+			}
+
 			err = e.unify(terms, rterm, func() error {
 				if e.saveSet.Contains(rterm, e.bindings) {
 					return e.saveExpr(ast.NewExpr(rterm), e.bindings, func() error {
 						return iter(e)
 					})
 				}
-				if !e.bindings.Plug(rterm).Equal(ast.InternedBooleanTerm(false)) {
+				if !e.bindings.Plug(rterm).Equal(ast.InternedTerm(false)) {
 					defined = true
 					err := iter(e)
 					e.traceRedo(expr)
@@ -461,6 +471,10 @@ func (e *eval) evalStep(iter evalIterator) error {
 				}
 				return nil
 			})
+
+			if e.partial() {
+				e.inliningControl.PopDisable()
+			}
 		case *ast.Every:
 			eval := evalEvery{
 				Every: terms,
@@ -510,7 +524,7 @@ func (e *eval) evalStep(iter evalIterator) error {
 					return iter(e)
 				})
 			}
-			if !e.bindings.Plug(rterm).Equal(ast.InternedBooleanTerm(false)) {
+			if !e.bindings.Plug(rterm).Equal(ast.InternedTerm(false)) {
 				return iter(e)
 			}
 			return nil
@@ -706,16 +720,31 @@ func (e *eval) evalWithPush(input, data *ast.Term, functionMocks [][2]*ast.Term,
 		e.data = data
 	}
 
+	if e.comprehensionCache == nil {
+		e.comprehensionCache = newComprehensionCache()
+	}
+
 	e.comprehensionCache.Push()
 	e.virtualCache.Push()
+
+	if e.targetStack == nil {
+		e.targetStack = newRefStack()
+	}
+
 	e.targetStack.Push(targets)
 	e.inliningControl.PushDisable(disable, true)
+
+	if e.functionMocks == nil {
+		e.functionMocks = newFunctionMocksStack()
+	}
+
 	e.functionMocks.PutPairs(functionMocks)
 
 	return oldInput, oldData
 }
 
 func (e *eval) evalWithPop(input, data *ast.Term) {
+	// NOTE(ae) no nil checks here as we assume evalWithPush always called first
 	e.inliningControl.PopDisable()
 	e.targetStack.Pop()
 	e.virtualCache.Pop()
@@ -893,13 +922,13 @@ func (e *eval) evalCall(terms []*ast.Term, iter unifyIterator) error {
 		} else {
 			ir, err = e.getRules(ref, terms[1:])
 		}
+		defer ast.IndexResultPool.Put(ir)
 		if err != nil {
 			return err
 		}
 
 		eval := evalFunc{
 			e:     e,
-			ref:   ref,
 			terms: terms,
 			ir:    ir,
 		}
@@ -920,36 +949,41 @@ func (e *eval) evalCall(terms []*ast.Term, iter unifyIterator) error {
 		return e.saveCall(bi.Decl.Arity(), terms, iter)
 	}
 
-	var parentID uint64
-	if e.parent != nil {
-		parentID = e.parent.queryID
-	}
+	var bctx *BuiltinContext
 
-	var capabilities *ast.Capabilities
-	if e.compiler != nil {
-		capabilities = e.compiler.Capabilities()
-	}
+	// Creating a BuiltinContext is expensive, so only do it if the builtin depends on it.
+	if bi.NeedsBuiltInContext() {
+		var parentID uint64
+		if e.parent != nil {
+			parentID = e.parent.queryID
+		}
 
-	bctx := BuiltinContext{
-		Context:                     e.ctx,
-		Metrics:                     e.metrics,
-		Seed:                        e.seed,
-		Time:                        e.time,
-		Cancel:                      e.cancel,
-		Runtime:                     e.runtime,
-		Cache:                       e.builtinCache,
-		InterQueryBuiltinCache:      e.interQueryBuiltinCache,
-		InterQueryBuiltinValueCache: e.interQueryBuiltinValueCache,
-		NDBuiltinCache:              e.ndBuiltinCache,
-		Location:                    e.query[e.index].Location,
-		QueryTracers:                e.tracers,
-		TraceEnabled:                e.traceEnabled,
-		QueryID:                     e.queryID,
-		ParentID:                    parentID,
-		PrintHook:                   e.printHook,
-		DistributedTracingOpts:      e.tracingOpts,
-		Capabilities:                capabilities,
-		RoundTripper:                e.roundTripper,
+		var capabilities *ast.Capabilities
+		if e.compiler != nil {
+			capabilities = e.compiler.Capabilities()
+		}
+
+		bctx = &BuiltinContext{
+			Context:                     e.ctx,
+			Metrics:                     e.metrics,
+			Seed:                        e.seed,
+			Time:                        e.time,
+			Cancel:                      e.cancel,
+			Runtime:                     e.runtime,
+			Cache:                       e.builtinCache,
+			InterQueryBuiltinCache:      e.interQueryBuiltinCache,
+			InterQueryBuiltinValueCache: e.interQueryBuiltinValueCache,
+			NDBuiltinCache:              e.ndBuiltinCache,
+			Location:                    e.query[e.index].Location,
+			QueryTracers:                e.tracers,
+			TraceEnabled:                e.traceEnabled,
+			QueryID:                     e.queryID,
+			ParentID:                    parentID,
+			PrintHook:                   e.printHook,
+			DistributedTracingOpts:      e.tracingOpts,
+			Capabilities:                capabilities,
+			RoundTripper:                e.roundTripper,
+		}
 	}
 
 	eval := evalBuiltin{
@@ -1261,6 +1295,10 @@ func (e *eval) buildComprehensionCache(a *ast.Term) (*ast.Term, error) {
 	if index == nil {
 		e.instr.counterIncr(evalOpComprehensionCacheSkip)
 		return nil, nil
+	}
+
+	if e.comprehensionCache == nil {
+		e.comprehensionCache = newComprehensionCache()
 	}
 
 	cache, ok := e.comprehensionCache.Elem(a)
@@ -1778,9 +1816,9 @@ func (e *eval) resolveReadFromStorage(ref ast.Ref, a ast.Value) (ast.Value, erro
 
 		if len(path) == 0 {
 			switch obj := blob.(type) {
-			case map[string]interface{}:
+			case map[string]any:
 				if len(obj) > 0 {
-					cpy := make(map[string]interface{}, len(obj)-1)
+					cpy := make(map[string]any, len(obj)-1)
 					for k, v := range obj {
 						if string(ast.SystemDocumentKey) != k {
 							cpy[k] = v
@@ -1799,7 +1837,7 @@ func (e *eval) resolveReadFromStorage(ref ast.Ref, a ast.Value) (ast.Value, erro
 		case ast.Value:
 			v = blob
 		default:
-			if blob, ok := blob.(map[string]interface{}); ok && !e.strictObjects {
+			if blob, ok := blob.(map[string]any); ok && !e.strictObjects {
 				v = ast.LazyObject(blob)
 				break
 			}
@@ -1868,6 +1906,7 @@ func (e *eval) getDeclArgsLen(x *ast.Expr) (int, error) {
 	}
 
 	ir, err := e.getRules(operator, nil)
+	defer ast.IndexResultPool.Put(ir)
 	if err != nil {
 		return -1, err
 	} else if ir == nil || ir.Empty() {
@@ -1889,14 +1928,14 @@ func (e *eval) updateFromQuery(expr *ast.Expr) {
 type evalBuiltin struct {
 	e     *eval
 	bi    *ast.Builtin
-	bctx  BuiltinContext
+	bctx  *BuiltinContext
 	f     BuiltinFunc
 	terms []*ast.Term
 }
 
 // Is this builtin non-deterministic, and did the caller provide an NDBCache?
 func (e *evalBuiltin) canUseNDBCache(bi *ast.Builtin) bool {
-	return bi.Nondeterministic && e.bctx.NDBuiltinCache != nil
+	return bi.Nondeterministic && e.bctx != nil && e.bctx.NDBuiltinCache != nil
 }
 
 func (e *evalBuiltin) eval(iter unifyIterator) error {
@@ -1944,8 +1983,18 @@ func (e *evalBuiltin) eval(iter unifyIterator) error {
 		e.e.instr.startTimer(evalOpBuiltinCall)
 	}
 
+	var bctx BuiltinContext
+	if e.bctx == nil {
+		bctx = BuiltinContext{
+			// Location potentially needed for error reporting.
+			Location: e.e.query[e.e.index].Location,
+		}
+	} else {
+		bctx = *e.bctx
+	}
+
 	// Normal unification flow for builtins:
-	err := e.f(e.bctx, operands, func(output *ast.Term) error {
+	err := e.f(bctx, operands, func(output *ast.Term) error {
 
 		e.e.instr.stopTimer(evalOpBuiltinCall)
 
@@ -1996,7 +2045,6 @@ func (e *evalBuiltin) eval(iter unifyIterator) error {
 type evalFunc struct {
 	e     *eval
 	ir    *ast.IndexResult
-	ref   ast.Ref
 	terms []*ast.Term
 }
 
@@ -2027,7 +2075,7 @@ func (e evalFunc) eval(iter unifyIterator) error {
 			if len(defRule.Head.Args) == len(e.terms)-1 {
 				// The function is called without collecting the result in an output term,
 				// therefore any successful evaluation of the function is of interest, including the default value ...
-				if ret := defRule.Head.Value; ret == nil || !ret.Equal(ast.InternedBooleanTerm(false)) {
+				if ret := defRule.Head.Value; ret == nil || !ret.Equal(ast.InternedTerm(false)) {
 					// ... unless the default value is false,
 					mustGenerateSupport = true
 				}
@@ -2039,10 +2087,12 @@ func (e evalFunc) eval(iter unifyIterator) error {
 			}
 		}
 
-		if mustGenerateSupport || e.e.inliningControl.shallow || e.e.inliningControl.Disabled(e.ref, false) {
+		ref := e.terms[0].Value.(ast.Ref)
+
+		if mustGenerateSupport || e.e.inliningControl.shallow || e.e.inliningControl.Disabled(ref, false) {
 			// check if the function definitions, or any of the arguments
 			// contain something unknown
-			unknown := e.e.unknown(e.ref, e.e.bindings)
+			unknown := e.e.unknownRef(ref, e.e.bindings)
 			for i := 1; !unknown && i <= argCount; i++ {
 				unknown = e.e.unknown(e.terms[i], e.e.bindings)
 			}
@@ -2141,11 +2191,9 @@ func (e evalFunc) evalValue(iter unifyIterator, argCount int, findOne bool) erro
 }
 
 func (e evalFunc) evalCache(argCount int, iter unifyIterator) (ast.Ref, bool, error) {
-	var plen int
-	if len(e.terms) == argCount+2 { // func name + output = 2
-		plen = len(e.terms) - 1
-	} else {
-		plen = len(e.terms)
+	plen := len(e.terms)
+	if plen == argCount+2 { // func name + output = 2
+		plen -= 1
 	}
 
 	cacheKey := make([]*ast.Term, plen)
@@ -2237,8 +2285,7 @@ func (e evalFunc) evalOneRule(iter unifyIterator, rule *ast.Rule, args []*ast.Te
 }
 
 func (e evalFunc) partialEvalSupport(declArgsLen int, iter unifyIterator) error {
-
-	path := e.e.namespaceRef(e.ref)
+	path := e.e.namespaceRef(e.terms[0].Value.(ast.Ref))
 
 	if !e.e.saveSupport.Exists(path) {
 		for _, rule := range e.ir.Rules {
@@ -2381,7 +2428,7 @@ func (e evalTree) finish(iter unifyIterator) error {
 	// In some cases, it may not be possible to PE the ref. If the path refers
 	// to virtual docs that PE does not support or base documents where inlining
 	// has been disabled, then we have to save.
-	if e.e.partial() && e.e.unknown(e.plugged, e.e.bindings) {
+	if e.e.partial() && e.e.unknownRef(e.plugged, e.e.bindings) {
 		return e.e.saveUnify(ast.NewTerm(e.plugged), e.rterm, e.bindings, e.rbindings, iter)
 	}
 
@@ -2443,7 +2490,7 @@ func (e evalTree) enumerate(iter unifyIterator) error {
 		switch doc := doc.(type) {
 		case *ast.Array:
 			for i := range doc.Len() {
-				k := ast.InternedIntNumberTerm(i)
+				k := ast.InternedTerm(i)
 				err := e.e.biunify(k, e.ref[e.pos], e.bindings, e.bindings, func() error {
 					return e.next(iter, k)
 				})
@@ -2584,13 +2631,14 @@ type evalVirtual struct {
 func (e evalVirtual) eval(iter unifyIterator) error {
 
 	ir, err := e.e.getRules(e.plugged[:e.pos+1], nil)
+	defer ast.IndexResultPool.Put(ir)
 	if err != nil {
 		return err
 	}
 
 	// Partial evaluation of ordered rules is not supported currently. Save the
 	// expression and continue. This could be revisited in the future.
-	if len(ir.Else) > 0 && e.e.unknown(e.ref, e.bindings) {
+	if len(ir.Else) > 0 && e.e.unknownRef(e.ref, e.bindings) {
 		return e.e.saveUnify(ast.NewTerm(e.ref), e.rterm, e.bindings, e.rbindings, iter)
 	}
 
@@ -3400,20 +3448,24 @@ func (e evalVirtualComplete) eval(iter unifyIterator) error {
 		return nil
 	}
 
-	if !e.e.unknown(e.ref, e.bindings) {
+	if !e.e.unknownRef(e.ref, e.bindings) {
 		return e.evalValue(iter, e.ir.EarlyExit)
 	}
 
 	var generateSupport bool
 
 	if e.ir.Default != nil {
-		// If the other term is not constant OR it's equal to the default value, then
-		// a support rule must be produced as the default value _may_ be required. On
-		// the other hand, if the other term is constant (i.e., it does not require
-		// evaluation) and it differs from the default value then the default value is
-		// _not_ required, so partially evaluate the rule normally.
-		rterm := e.rbindings.Plug(e.rterm)
-		generateSupport = !ast.IsConstant(rterm.Value) || e.ir.Default.Head.Value.Equal(rterm)
+		// If inlining has been disabled for the rterm, and the default rule has a 'false' result value,
+		// the default value is inconsequential, and support does not need to be generated.
+		if !(e.ir.Default.Head.Value.Equal(ast.InternedTerm(false)) && e.e.inliningControl.Disabled(e.rterm.Value, false)) {
+			// If the other term is not constant OR it's equal to the default value, then
+			// a support rule must be produced as the default value _may_ be required. On
+			// the other hand, if the other term is constant (i.e., it does not require
+			// evaluation) and it differs from the default value then the default value is
+			// _not_ required, so partially evaluate the rule normally.
+			rterm := e.rbindings.Plug(e.rterm)
+			generateSupport = !ast.IsConstant(rterm.Value) || e.ir.Default.Head.Value.Equal(rterm)
+		}
 	}
 
 	if generateSupport || e.e.inliningControl.shallow || e.e.inliningControl.Disabled(e.plugged[:e.pos+1], false) {
@@ -3723,7 +3775,7 @@ func (e evalTerm) enumerate(iter unifyIterator) error {
 		// win across most policies. Those cases are however much more complex, as we need to deal with
 		// any type on either side, not just int/var as is the case here.
 		for i := range v.Len() {
-			a := ast.InternedIntNumberTerm(i)
+			a := ast.InternedTerm(i)
 			b := e.ref[e.pos]
 
 			if _, ok := b.Value.(ast.Var); ok {
@@ -4079,7 +4131,7 @@ func newNestedCheckVisitor() *nestedCheckVisitor {
 	return v
 }
 
-func (v *nestedCheckVisitor) visit(x interface{}) bool {
+func (v *nestedCheckVisitor) visit(x any) bool {
 	switch x.(type) {
 	case ast.Ref, ast.Call:
 		v.found = true
@@ -4170,7 +4222,7 @@ func isOtherRef(term *ast.Term) bool {
 	return !ref.HasPrefix(ast.DefaultRootRef) && !ref.HasPrefix(ast.InputRootRef)
 }
 
-func isFunction(env *ast.TypeEnv, ref interface{}) bool {
+func isFunction(env *ast.TypeEnv, ref any) bool {
 	var r ast.Ref
 	switch v := ref.(type) {
 	case ast.Ref:

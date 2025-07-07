@@ -49,15 +49,20 @@ type Domain struct {
 	customPluralResolver func(int) int
 }
 
-// Preserve MIMEHeader behaviour, without the canonicalisation
+// HeaderMap preserves MIMEHeader behaviour, without the canonicalisation
 type HeaderMap map[string][]string
 
+// Add key/value pair to HeaderMap
 func (m HeaderMap) Add(key, value string) {
 	m[key] = append(m[key], value)
 }
+
+// Del key from HeaderMap
 func (m HeaderMap) Del(key string) {
 	delete(m, key)
 }
+
+// Get value for key from HeaderMap
 func (m HeaderMap) Get(key string) string {
 	if m == nil {
 		return ""
@@ -68,9 +73,13 @@ func (m HeaderMap) Get(key string) string {
 	}
 	return v[0]
 }
+
+// Set key/value pair in HeaderMap
 func (m HeaderMap) Set(key, value string) {
 	m[key] = []string{value}
 }
+
+// Values returns all values for a given key from HeaderMap
 func (m HeaderMap) Values(key string) []string {
 	if m == nil {
 		return nil
@@ -78,6 +87,7 @@ func (m HeaderMap) Values(key string) []string {
 	return m[key]
 }
 
+// NewDomain creates a new Domain instance
 func NewDomain() *Domain {
 	domain := new(Domain)
 
@@ -90,6 +100,7 @@ func NewDomain() *Domain {
 	return domain
 }
 
+// SetPluralResolver sets a custom plural resolver function
 func (do *Domain) SetPluralResolver(f func(int) int) {
 	do.customPluralResolver = f
 }
@@ -182,8 +193,8 @@ func (do *Domain) parseHeaders() {
 	}
 }
 
-// Drops any translations stored that have not been Set*() since 'po'
-// was initialised
+// DropStaleTranslations drops any translations stored that have not been Set*()
+// since 'po' was initialised
 func (do *Domain) DropStaleTranslations() {
 	do.trMutex.Lock()
 	do.pluralMutex.Lock()
@@ -208,7 +219,7 @@ func (do *Domain) DropStaleTranslations() {
 	}
 }
 
-// Set source references for a given translation
+// SetRefs set source references for a given translation
 func (do *Domain) SetRefs(str string, refs []string) {
 	do.trMutex.Lock()
 	do.pluralMutex.Lock()
@@ -225,7 +236,7 @@ func (do *Domain) SetRefs(str string, refs []string) {
 	}
 }
 
-// Get source references for a given translation
+// GetRefs get source references for a given translation
 func (do *Domain) GetRefs(str string) []string {
 	// Sync read
 	do.trMutex.RLock()
@@ -256,6 +267,7 @@ func (do *Domain) Set(id, str string) {
 	}
 }
 
+// Get retrieves the Translation for the given string.
 func (do *Domain) Get(str string, vars ...interface{}) string {
 	// Sync read
 	do.trMutex.RLock()
@@ -263,14 +275,16 @@ func (do *Domain) Get(str string, vars ...interface{}) string {
 
 	if do.translations != nil {
 		if _, ok := do.translations[str]; ok {
-			return Printf(do.translations[str].Get(), vars...)
+			return FormatString(do.translations[str].Get(), vars...)
 		}
 	}
 
 	// Return the same we received by default
-	return Printf(str, vars...)
+	return FormatString(str, vars...)
 }
 
+// Append retrieves the Translation for the given string.
+// Supports optional parameters (vars... interface{}) to be inserted on the formatted string using the fmt.Printf syntax.
 func (do *Domain) Append(b []byte, str string, vars ...interface{}) []byte {
 	// Sync read
 	do.trMutex.RLock()
@@ -286,7 +300,7 @@ func (do *Domain) Append(b []byte, str string, vars ...interface{}) []byte {
 	return Appendf(b, str, vars...)
 }
 
-// Set the (N)th plural form for the given string
+// SetN sets the (N)th plural form for the given string
 func (do *Domain) SetN(id, plural string, n int, str string) {
 	// Get plural form _before_ lock down
 	pluralForm := do.pluralForm(n)
@@ -316,18 +330,18 @@ func (do *Domain) GetN(str, plural string, n int, vars ...interface{}) string {
 
 	if do.translations != nil {
 		if _, ok := do.translations[str]; ok {
-			return Printf(do.translations[str].GetN(do.pluralForm(n)), vars...)
+			return FormatString(do.translations[str].GetN(do.pluralForm(n)), vars...)
 		}
 	}
 
 	// Parse plural forms to distinguish between plural and singular
 	if do.pluralForm(n) == 0 {
-		return Printf(str, vars...)
+		return FormatString(str, vars...)
 	}
-	return Printf(plural, vars...)
+	return FormatString(plural, vars...)
 }
 
-// GetN retrieves the (N)th plural form of Translation for the given string.
+// AppendN adds the (N)th plural form of Translation for the given string.
 // Supports optional parameters (vars... interface{}) to be inserted on the formatted string using the fmt.Printf syntax.
 func (do *Domain) AppendN(b []byte, str, plural string, n int, vars ...interface{}) []byte {
 	// Sync read
@@ -347,7 +361,7 @@ func (do *Domain) AppendN(b []byte, str, plural string, n int, vars ...interface
 	return Appendf(b, plural, vars...)
 }
 
-// Set the translation for the given string in the given context
+// SetC sets the translation for the given string in the given context
 func (do *Domain) SetC(id, ctx, str string) {
 	do.trMutex.Lock()
 	do.pluralMutex.Lock()
@@ -383,14 +397,14 @@ func (do *Domain) GetC(str, ctx string, vars ...interface{}) string {
 		if _, ok := do.contextTranslations[ctx]; ok {
 			if do.contextTranslations[ctx] != nil {
 				if _, ok := do.contextTranslations[ctx][str]; ok {
-					return Printf(do.contextTranslations[ctx][str].Get(), vars...)
+					return FormatString(do.contextTranslations[ctx][str].Get(), vars...)
 				}
 			}
 		}
 	}
 
 	// Return the string we received by default
-	return Printf(str, vars...)
+	return FormatString(str, vars...)
 }
 
 // AppendC retrieves the corresponding Translation for a given string in the given context.
@@ -413,7 +427,7 @@ func (do *Domain) AppendC(b []byte, str, ctx string, vars ...interface{}) []byte
 	return Appendf(b, str, vars...)
 }
 
-// Set the (N)th plural form for the given string in the given context
+// SetNC sets the (N)th plural form for the given string in the given context
 func (do *Domain) SetNC(id, plural, ctx string, n int, str string) {
 	// Get plural form _before_ lock down
 	pluralForm := do.pluralForm(n)
@@ -452,16 +466,16 @@ func (do *Domain) GetNC(str, plural string, n int, ctx string, vars ...interface
 		if _, ok := do.contextTranslations[ctx]; ok {
 			if do.contextTranslations[ctx] != nil {
 				if _, ok := do.contextTranslations[ctx][str]; ok {
-					return Printf(do.contextTranslations[ctx][str].GetN(do.pluralForm(n)), vars...)
+					return FormatString(do.contextTranslations[ctx][str].GetN(do.pluralForm(n)), vars...)
 				}
 			}
 		}
 	}
 
 	if n == 1 {
-		return Printf(str, vars...)
+		return FormatString(str, vars...)
 	}
-	return Printf(plural, vars...)
+	return FormatString(plural, vars...)
 }
 
 // AppendNC retrieves the (N)th plural form of Translation for the given string in the given context.
@@ -555,6 +569,40 @@ func (do *Domain) GetTranslations() map[string]*Translation {
 	return all
 }
 
+// GetCtxTranslations returns a copy of every translation in the domain with context
+func (do *Domain) GetCtxTranslations() map[string]map[string]*Translation {
+	all := make(map[string]map[string]*Translation, len(do.contextTranslations))
+
+	do.trMutex.RLock()
+	defer do.trMutex.RUnlock()
+
+	for ctx, translations := range do.contextTranslations {
+		for msgID, trans := range translations {
+			newTrans := NewTranslation()
+			newTrans.ID = trans.ID
+			newTrans.PluralID = trans.PluralID
+			newTrans.dirty = trans.dirty
+			if len(trans.Refs) > 0 {
+				newTrans.Refs = make([]string, len(trans.Refs))
+				copy(newTrans.Refs, trans.Refs)
+			}
+			for k, v := range trans.Trs {
+				newTrans.Trs[k] = v
+			}
+
+			if all[ctx] == nil {
+				all[ctx] = make(map[string]*Translation)
+			}
+
+			all[ctx][msgID] = newTrans
+		}
+
+	}
+
+	return all
+}
+
+// SourceReference is a struct to hold source reference information
 type SourceReference struct {
 	path    string
 	line    int
@@ -603,7 +651,7 @@ func (do *Domain) MarshalText() ([]byte, error) {
 
 	headerKeys := make([]string, 0, len(do.Headers))
 
-	for k, _ := range do.Headers {
+	for k := range do.Headers {
 		headerKeys = append(headerKeys, k)
 	}
 
@@ -736,6 +784,7 @@ func (do *Domain) MarshalText() ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
+// EscapeSpecialCharacters escapes special characters in a string
 func EscapeSpecialCharacters(s string) string {
 	s = regexp.MustCompile(`([^\\])(")`).ReplaceAllString(s, "$1\\\"") // Escape non-escaped double quotation marks
 

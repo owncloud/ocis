@@ -46,6 +46,7 @@ type config struct {
 
 var globalConfig *config
 
+// FallbackLocale is the default language to be used when no language is set.
 var FallbackLocale = "en_US"
 
 func init() {
@@ -167,6 +168,7 @@ func SetLibrary(lib string) {
 	loadLocales(true)
 }
 
+// GetLocales returns the locales that have been set for the package configuration.
 func GetLocales() []*Locale {
 	globalConfig.RLock()
 	defer globalConfig.RUnlock()

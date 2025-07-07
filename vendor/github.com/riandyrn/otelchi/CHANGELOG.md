@@ -8,11 +8,25 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [0.12.1] - 2025-02-12
+
+### Fixed
+
+- Fix superfluous header writer ([#89])
+
+## [0.12.0] - 2025-01-18
+
+### Changed
+
+- Upgrade `go.opentelemetry.io/otel`, `go.opentelemetry.io/otel/sdk`, & `go.opentelemetry.io/otel/trace` to `v1.34.0`. ([#87])
+- Upgrade `go.opentelemetry.io/otel/metric` to `v1.34.0`. ([#87])
+- Set the metric version to be the same as middleware version which is `v0.12.0` to make it easy for maintainer of this repo to maintain the versioning. ([#88])
+
 ## [0.11.0] - 2024-11-27
 
 ### Added
 
-- Add metric package as middleware `go-chi/chi`, support `request_duration_millis`, `requests_inflight`, and `response_size_bytes` metric. ([#69])
+- Add metric package as middleware `go-chi/chi`, support `request_duration_millis`, `requests_inflight`, and `response_size_bytes` metric. Using `go.opentelemetry.io/otel/metric` which the version is `v1.32.0`. ([#69])
 
 ### Changed
 
@@ -214,6 +228,9 @@ It contains instrumentation for trace and depends on:
 - Example code for a basic usage.
 - Apache-2.0 license.
 
+[#89]: https://github.com/riandyrn/otelchi/pull/89
+[#88]: https://github.com/riandyrn/otelchi/pull/88
+[#87]: https://github.com/riandyrn/otelchi/pull/87
 [#74]: https://github.com/riandyrn/otelchi/pull/74
 [#70]: https://github.com/riandyrn/otelchi/pull/70
 [#69]: https://github.com/riandyrn/otelchi/pull/69
@@ -243,7 +260,9 @@ It contains instrumentation for trace and depends on:
 [#2]: https://github.com/riandyrn/otelchi/pull/2
 [#1]: https://github.com/riandyrn/otelchi/pull/1
 
-[Unreleased]: https://github.com/riandyrn/otelchi/compare/v0.11.0...HEAD
+[Unreleased]: https://github.com/riandyrn/otelchi/compare/v0.12.1...HEAD
+[0.12.1]: https://github.com/riandyrn/otelchi/releases/tag/v0.12.1
+[0.12.0]: https://github.com/riandyrn/otelchi/releases/tag/v0.12.0
 [0.11.0]: https://github.com/riandyrn/otelchi/releases/tag/v0.11.0
 [0.10.1]: https://github.com/riandyrn/otelchi/releases/tag/v0.10.1
 [0.10.0]: https://github.com/riandyrn/otelchi/releases/tag/v0.10.0

@@ -67,13 +67,11 @@ func builtinPlus(_ BuiltinContext, operands []*ast.Term, iter func(*ast.Term) er
 	y, ok2 := n2.Int()
 
 	if ok1 && ok2 && inSmallIntRange(x) && inSmallIntRange(y) {
-		return iter(ast.InternedIntNumberTerm(x + y))
+		return iter(ast.InternedTerm(x + y))
 	}
 
-	f, err := arithPlus(builtins.NumberToFloat(n1), builtins.NumberToFloat(n2))
-	if err != nil {
-		return err
-	}
+	f := new(big.Float).Add(builtins.NumberToFloat(n1), builtins.NumberToFloat(n2))
+
 	return iter(ast.NewTerm(builtins.FloatToNumber(f)))
 }
 
@@ -91,26 +89,12 @@ func builtinMultiply(_ BuiltinContext, operands []*ast.Term, iter func(*ast.Term
 	y, ok2 := n2.Int()
 
 	if ok1 && ok2 && inSmallIntRange(x) && inSmallIntRange(y) {
-		return iter(ast.InternedIntNumberTerm(x * y))
+		return iter(ast.InternedTerm(x * y))
 	}
 
-	f, err := arithMultiply(builtins.NumberToFloat(n1), builtins.NumberToFloat(n2))
-	if err != nil {
-		return err
-	}
+	f := new(big.Float).Mul(builtins.NumberToFloat(n1), builtins.NumberToFloat(n2))
+
 	return iter(ast.NewTerm(builtins.FloatToNumber(f)))
-}
-
-func arithPlus(a, b *big.Float) (*big.Float, error) {
-	return new(big.Float).Add(a, b), nil
-}
-
-func arithMinus(a, b *big.Float) (*big.Float, error) {
-	return new(big.Float).Sub(a, b), nil
-}
-
-func arithMultiply(a, b *big.Float) (*big.Float, error) {
-	return new(big.Float).Mul(a, b), nil
 }
 
 func arithDivide(a, b *big.Float) (*big.Float, error) {
@@ -171,13 +155,11 @@ func builtinMinus(_ BuiltinContext, operands []*ast.Term, iter func(*ast.Term) e
 		y, oky := n2.Int()
 
 		if okx && oky && inSmallIntRange(x) && inSmallIntRange(y) {
-			return iter(ast.InternedIntNumberTerm(x - y))
+			return iter(ast.InternedTerm(x - y))
 		}
 
-		f, err := arithMinus(builtins.NumberToFloat(n1), builtins.NumberToFloat(n2))
-		if err != nil {
-			return err
-		}
+		f := new(big.Float).Sub(builtins.NumberToFloat(n1), builtins.NumberToFloat(n2))
+
 		return iter(ast.NewTerm(builtins.FloatToNumber(f)))
 	}
 
@@ -185,7 +167,11 @@ func builtinMinus(_ BuiltinContext, operands []*ast.Term, iter func(*ast.Term) e
 	s2, ok4 := operands[1].Value.(ast.Set)
 
 	if ok3 && ok4 {
-		return iter(ast.NewTerm(s1.Diff(s2)))
+		diff := s1.Diff(s2)
+		if diff.Len() == 0 {
+			return iter(ast.InternedEmptySet)
+		}
+		return iter(ast.NewTerm(diff))
 	}
 
 	if !ok1 && !ok3 {
@@ -213,7 +199,7 @@ func builtinRem(_ BuiltinContext, operands []*ast.Term, iter func(*ast.Term) err
 				return errors.New("modulo by zero")
 			}
 
-			return iter(ast.InternedIntNumberTerm(x % y))
+			return iter(ast.InternedTerm(x % y))
 		}
 
 		op1, err1 := builtins.NumberToInt(n1)
