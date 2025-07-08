@@ -68,6 +68,7 @@ The following sections list the changes for unreleased.
 
 * Bugfix - Fix storage-users cli: [#11464](https://github.com/owncloud/ocis/pull/11464)
 * Bugfix - Fix the OCM role editor: [#11484](https://github.com/owncloud/ocis/pull/11484)
+* Bugfix - Clean up unified roles label: [#11494](https://github.com/owncloud/ocis/pull/11494)
 
 ## Details
 
@@ -85,6 +86,15 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/11474
    https://github.com/owncloud/ocis/pull/11484
+
+* Bugfix - Clean up unified roles label: [#11494](https://github.com/owncloud/ocis/pull/11494)
+
+   Clean up the unified roles label
+
+   https://github.com/owncloud/ocis/issues/11470
+   https://github.com/owncloud/ocis/issues/11254
+   https://github.com/owncloud/ocis/issues/10082
+   https://github.com/owncloud/ocis/pull/11494
 
 # Changelog for [7.2.0-rc.1] (2025-06-20)
 
