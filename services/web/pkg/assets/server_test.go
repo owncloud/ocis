@@ -119,5 +119,33 @@ func TestFileServer(t *testing.T) {
 
 		})
 	}
+}
 
+func TestFileServerPathTraversal(t *testing.T) {
+	g := gomega.NewWithT(t)
+
+	// setup in-memory filesystem that represents a "public" dir and a secret file at the root
+	fsys := fstest.MapFS{
+		"public": &fstest.MapFile{
+			Mode: fs.ModeDir,
+		},
+		"secret.txt": &fstest.MapFile{ // file outside the intended public directory
+			Data: []byte("super-secret"),
+		},
+	}
+
+	// Request targets ../ traversal to reach secret.txt
+	req := httptest.NewRequest("GET", "/public/../secret.txt", nil)
+	w := httptest.NewRecorder()
+
+	FileServer(fsys).ServeHTTP(w, req)
+	res := w.Result()
+	defer res.Body.Close()
+
+	// Expect that the request is rejected due to path traversal attempt
+	g.Expect(res.StatusCode).To(gomega.Equal(http.StatusNotFound))
+
+	body, err := io.ReadAll(res.Body)
+	g.Expect(err).ToNot(gomega.HaveOccurred())
+	g.Expect(string(body)).ToNot(gomega.ContainSubstring("super-secret"))
 }
