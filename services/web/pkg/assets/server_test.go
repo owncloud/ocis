@@ -119,5 +119,58 @@ func TestFileServer(t *testing.T) {
 
 		})
 	}
+}
 
+func TestIsSafePath(t *testing.T) {
+	cases := []struct {
+		path   string
+		permit bool
+	}{
+		// WebDAV double-slash variants that must be accepted
+		{"//dav/spaces/123/textfile0.txt", true},
+		{"//dav//spaces/123/PARENT/parent.txt", true},
+		{"/dav//spaces/123/PARENT", true},
+		{"//dav/spaces/123//FOLDER", true},
+
+		// Traversal attempts that must be rejected
+		{"/dav/spaces/123/../../passwd", false},
+		{"../secret.txt", false},
+		{"/dav/%2e%2e/secret", false},
+	}
+
+	for _, c := range cases {
+		got := isSafePath(c.path)
+		if got != c.permit {
+			t.Errorf("isSafePath(%q) = %v, want %v", c.path, got, c.permit)
+		}
+	}
+}
+
+func TestFileServerPathTraversal(t *testing.T) {
+	g := gomega.NewWithT(t)
+
+	// setup in-memory filesystem that represents a "public" dir and a secret file at the root
+	fsys := fstest.MapFS{
+		"public": &fstest.MapFile{
+			Mode: fs.ModeDir,
+		},
+		"secret.txt": &fstest.MapFile{ // file outside the intended public directory
+			Data: []byte("super-secret"),
+		},
+	}
+
+	// Request targets ../ traversal to reach secret.txt
+	req := httptest.NewRequest("GET", "/public/../secret.txt", nil)
+	w := httptest.NewRecorder()
+
+	FileServer(fsys).ServeHTTP(w, req)
+	res := w.Result()
+	defer res.Body.Close()
+
+	// Expect that the request is rejected due to path traversal attempt
+	g.Expect(res.StatusCode).To(gomega.Equal(http.StatusNotFound))
+
+	body, err := io.ReadAll(res.Body)
+	g.Expect(err).ToNot(gomega.HaveOccurred())
+	g.Expect(string(body)).ToNot(gomega.ContainSubstring("super-secret"))
 }
