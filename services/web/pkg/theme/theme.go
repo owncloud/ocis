@@ -18,67 +18,67 @@ var themeDefaults = KV{
 	"common": KV{
 		"shareRoles": KV{
 			unifiedrole.UnifiedRoleViewerID: KV{
-				"name":     "UnifiedRoleViewer",
+				"label":    unifiedrole.GetUnifiedRoleLabel(unifiedrole.UnifiedRoleViewerID),
 				"iconName": "eye",
 			},
 			unifiedrole.UnifiedRoleViewerListGrantsID: KV{
-				"name":     "UnifiedRoleViewerListGrants",
+				"label":    unifiedrole.GetUnifiedRoleLabel(unifiedrole.UnifiedRoleViewerListGrantsID),
 				"iconName": "eye",
 			},
 			unifiedrole.UnifiedRoleSpaceViewerID: KV{
-				"label":    "UnifiedRoleSpaceViewer",
+				"label":    unifiedrole.GetUnifiedRoleLabel(unifiedrole.UnifiedRoleSpaceViewerID),
 				"iconName": "eye",
 			},
 			unifiedrole.UnifiedRoleFileEditorID: KV{
-				"label":    "UnifiedRoleFileEditor",
+				"label":    unifiedrole.GetUnifiedRoleLabel(unifiedrole.UnifiedRoleFileEditorID),
 				"iconName": "pencil",
 			},
 			unifiedrole.UnifiedRoleFileEditorListGrantsID: KV{
-				"label":    "UnifiedRoleFileEditorListGrants",
+				"label":    unifiedrole.GetUnifiedRoleLabel(unifiedrole.UnifiedRoleFileEditorListGrantsID),
 				"iconName": "pencil",
 			},
 			unifiedrole.UnifiedRoleFileEditorListGrantsWithVersionsID: KV{
-				"label":    "UnifiedRoleFileEditorListGrantsWithVersions",
+				"label":    unifiedrole.GetUnifiedRoleLabel(unifiedrole.UnifiedRoleFileEditorListGrantsWithVersionsID),
 				"iconName": "pencil",
 			},
 			unifiedrole.UnifiedRoleEditorID: KV{
-				"label":    "UnifiedRoleEditor",
+				"label":    unifiedrole.GetUnifiedRoleLabel(unifiedrole.UnifiedRoleEditorID),
 				"iconName": "pencil",
 			},
 			unifiedrole.UnifiedRoleEditorListGrantsID: KV{
-				"label":    "UnifiedRoleEditorListGrants",
+				"label":    unifiedrole.GetUnifiedRoleLabel(unifiedrole.UnifiedRoleEditorListGrantsID),
 				"iconName": "pencil",
 			},
 			unifiedrole.UnifiedRoleEditorListGrantsWithVersionsID: KV{
-				"label":    "UnifiedRoleEditorListGrantsWithVersions",
+				"label":    unifiedrole.GetUnifiedRoleLabel(unifiedrole.UnifiedRoleEditorListGrantsWithVersionsID),
 				"iconName": "pencil",
 			},
 			unifiedrole.UnifiedRoleSpaceEditorID: KV{
-				"label":    "UnifiedRoleSpaceEditor",
+				"label":    unifiedrole.GetUnifiedRoleLabel(unifiedrole.UnifiedRoleSpaceEditorID),
 				"iconName": "pencil",
 			},
 			unifiedrole.UnifiedRoleSpaceEditorWithoutVersionsID: KV{
-				"label":    "UnifiedRoleSpaceEditorWithoutVersions",
+				"label":    unifiedrole.GetUnifiedRoleLabel(unifiedrole.UnifiedRoleSpaceEditorWithoutVersionsID),
 				"iconName": "pencil",
 			},
 			unifiedrole.UnifiedRoleSpaceEditorWithoutTrashbinID: KV{
-				"label":    "UnifiedRoleSpaceEditorWithoutTrashbin",
+				"label":    unifiedrole.GetUnifiedRoleLabel(unifiedrole.UnifiedRoleSpaceEditorWithoutTrashbinID),
 				"iconName": "pencil",
 			},
 			unifiedrole.UnifiedRoleManagerID: KV{
-				"label":    "UnifiedRoleManager",
+				"label":    unifiedrole.GetUnifiedRoleLabel(unifiedrole.UnifiedRoleManagerID),
 				"iconName": "user-star",
 			},
 			unifiedrole.UnifiedRoleEditorLiteID: KV{
-				"label":    "UnifiedRoleEditorLite",
+				"label":    unifiedrole.GetUnifiedRoleLabel(unifiedrole.UnifiedRoleEditorLiteID),
 				"iconName": "upload",
 			},
 			unifiedrole.UnifiedRoleSecureViewerID: KV{
-				"label":    "UnifiedRoleSecureView",
+				"label":    unifiedrole.GetUnifiedRoleLabel(unifiedrole.UnifiedRoleSecureViewerID),
 				"iconName": "shield",
 			},
 			unifiedrole.UnifiedRoleDeniedID: KV{
-				"label":    "UnifiedRoleFullDenial",
+				"label":    unifiedrole.GetUnifiedRoleLabel(unifiedrole.UnifiedRoleDeniedID),
 				"iconName": "stop-circle",
 			},
 		},
