@@ -6,10 +6,15 @@ import (
 	"io/fs"
 	"mime"
 	"net/http"
+	"net/url"
 	"path"
 	"path/filepath"
+	"regexp"
+	"strings"
+	"unicode/utf8"
 
 	"golang.org/x/net/html"
+	"golang.org/x/text/unicode/norm"
 )
 
 type fileServer struct {
@@ -21,7 +26,58 @@ func FileServer(fsys fs.FS) http.Handler {
 	return &fileServer{http.FS(fsys)}
 }
 
+// IsSafePath validates if a path is safe from path traversal attacks
+func IsSafePath(p string) bool {
+	var dangerousRunes = []rune{
+		'\uFF0F', // fullwidth slash ／
+		'\u2215', // division slash ∕
+		'\u29F8', // big solidus ⧸
+		'\u2044', // fraction slash ⁄
+		'\\',     // backslash
+		'\uFF3C', // fullwidth backslash ＼
+		'\uFE68', // small reverse solidus ﹨
+	}
+
+	// Recursive URL decode to prevent bypass via %252e%252e (double encoding)
+	path := p
+	for {
+		decoded, err := url.QueryUnescape(path)
+		if err != nil || decoded == path {
+			break
+		}
+		path = decoded
+	}
+
+	// Reject null byte injection
+	if strings.Contains(path, "\x00") {
+		return false
+	}
+
+	// Reject invalid UTF-8
+	if !utf8.ValidString(path) {
+		return false
+	}
+
+	// Reject dangerous runes
+	normalized := norm.NFC.String(path)
+	for _, r := range normalized {
+		for _, bad := range dangerousRunes {
+			if r == bad {
+				return false
+			}
+		}
+	}
+
+	// match one or more /./ and /../
+	return !regexp.MustCompile(`(?:[\/\\]\.+[\/\\])+`).MatchString(path)
+}
+
 func (f *fileServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	if !IsSafePath(r.URL.Path) {
+		http.NotFound(w, r)
+		return
+	}
+
 	uPath := path.Clean(path.Join("/", r.URL.Path))
 	r.URL.Path = uPath
 
