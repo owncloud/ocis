@@ -55,6 +55,7 @@ mkdir -p $(pwd)/ocis-config \
 mkdir -p $(pwd)/ocis-data
 ```
 
+
 Set the user for the directories to be the same as the user inside the container:
 
 ```bash
