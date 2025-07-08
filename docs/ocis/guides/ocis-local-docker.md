@@ -46,9 +46,22 @@ services:
       OCIS_LOG_LEVEL: info
 ```
 
-### Initialize
+### Prepare Paths
+Create directories if not exists:
 
-Run ocis init to create a config
+```bash
+mkdir -p $(pwd)/ocis-config \
+mkdir -p $(pwd)/ocis-data
+```
+
+Set the user for the directories to be the same as the user inside the container:
+
+```bash
+sudo chown -Rfv 1000:1000 $(pwd)/ocis-config/ \
+sudo chown -Rfv 1000:1000 $(pwd)/ocis-data
+```
+
+### Initialize
 
 ```bash
 docker run --rm -it -v $(pwd):/etc/ocis/ owncloud/ocis:latest init
