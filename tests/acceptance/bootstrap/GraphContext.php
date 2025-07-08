@@ -3244,4 +3244,35 @@ class GraphContext implements Context {
 		);
 		$this->featureContext->setResponse($response);
 	}
+
+	/**
+	 * @Then the JSON data of the response should have the following structure for resource :resourceName
+	 *
+	 * @param string $resourceName
+	 * @param PyStringNode $schemaString
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function theJsonDataOfTheResponseShouldHaveTheFollowingStructureForResource(
+		string $resourceName,
+		PyStringNode $schemaString,
+	): void {
+		$responseBody = $this->featureContext->getJsonDecodedResponseBodyContent()->value;
+		$resourceFound = false;
+		foreach ($responseBody as $item) {
+			if (isset($item->name) && $item->name === $resourceName) {
+				$resourceFound = true;
+				$this->featureContext->assertJsonDocumentMatchesSchema(
+					$item,
+					$this->featureContext->getJSONSchema($schemaString),
+				);
+				break;
+			}
+		}
+		Assert::assertTrue(
+			$resourceFound,
+			'Response does not contain resource "' . $resourceName . '".',
+		);
+	}
 }
