@@ -2,7 +2,7 @@ module github.com/owncloud/ocis/v2
 
 go 1.24
 
-toolchain go1.24.1
+toolchain go1.24.4
 
 require (
 	dario.cat/mergo v1.0.2
