@@ -123,19 +123,49 @@ func TestFileServer(t *testing.T) {
 
 func TestIsSafePath(t *testing.T) {
 	cases := []struct {
-		path   string
 		permit bool
+		path   string
 	}{
+		// simple cases
+		{true, "/"},
+		{true, "/index.html"},
+		{true, "/some-file.txt"},
+
 		// WebDAV double-slash variants that must be accepted
-		{"//dav/spaces/123/textfile0.txt", true},
-		{"//dav//spaces/123/PARENT/parent.txt", true},
-		{"/dav//spaces/123/PARENT", true},
-		{"//dav/spaces/123//FOLDER", true},
+		{true, "//dav/spaces/123/textfile0.txt"},
+		{true, "//dav//spaces/123/PARENT/parent.txt"},
+		{true, "/dav//spaces/123/PARENT"},
+		{true, "//dav/spaces/123//FOLDER"},
+
+		// WebDAV files API variants
+		{true, "//dav//files/alice/textfile1.txt"},
+		{true, "/dav//files/alice/PARENT/parent.txt"},
+		{true, "//dav/files/alice//FOLDER"},
+		{true, "/dav/files/alice//PARENT5"},
+
+		// WebDAV root variants
+		{true, "//webdav/textfile0.txt"},
+		{true, "/webdav//PARENT"},
+		{true, "//webdav//PARENT3"},
+		{true, "/webdav//textfile1.txt"},
+
+		// Spaces API with double slashes
+		{true, "//dav/spaces//SPACEID/PARENT4"},
+		{true, "/dav/spaces//SPACEID/textfile7.txt"},
+		{true, "//dav/spaces//SPACEID/PARENT//parent.txt"},
+
+		// MOVE/COPY source patterns
+		{true, "//dav/spaces/ID//PARENT1"},
+		{true, "/dav//spaces/ID/textfile1.txt"},
+		{true, "//dav/files//alice//PARENT1"},
 
 		// Traversal attempts that must be rejected
-		{"/dav/spaces/123/../../passwd", false},
-		{"../secret.txt", false},
-		{"/dav/%2e%2e/secret", false},
+		{false, "/dav/spaces/123/../../passwd"},
+		{false, "../secret.txt"},
+		{false, "/dav/%2e%2e/secret"},
+		{false, "/dav/%2e/secret"},
+		{false, "/dav/spaces/ID/../secret"},
+		{false, "/dav/files/alice/././secret"},
 	}
 
 	for _, c := range cases {
