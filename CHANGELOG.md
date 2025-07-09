@@ -87,6 +87,7 @@ The following sections list the changes for unreleased.
 * Change - Remove deprecated FRONTEND_OCS_*: [#11333](https://github.com/owncloud/ocis/pull/11333)
 * Change - Remove deprecated CLIENTLOG_REVA_GATEWAY: [#11372](https://github.com/owncloud/ocis/pull/11372)
 * Enhancement - Add GetPermission API: [#8616](https://github.com/owncloud/ocis/issues/8616)
+* Enhancement - Bump importer app: [#10880](https://github.com/owncloud/ocis/pull/10880)
 * Enhancement - Allow scaling the search service: [#11029](https://github.com/owncloud/ocis/pull/11029)
 * Enhancement - Update Mockery to 2.52.3: [#11070](https://github.com/owncloud/ocis/pull/11070)
 * Enhancement - Improve postprocessing logs: [#11108](https://github.com/owncloud/ocis/pull/11108)
@@ -278,6 +279,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/8616
    https://github.com/owncloud/ocis/pull/11477
+
+* Enhancement - Bump importer app: [#10880](https://github.com/owncloud/ocis/pull/10880)
+
+   The importer app in the ocis_full example has been updated. It's using the
+   upstream Uppy Companion Docker image now.
+
+   https://github.com/owncloud/ocis/pull/10880
 
 * Enhancement - Allow scaling the search service: [#11029](https://github.com/owncloud/ocis/pull/11029)
 
