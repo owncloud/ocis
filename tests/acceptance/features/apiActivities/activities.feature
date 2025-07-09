@@ -2444,7 +2444,7 @@ Feature: check activities
   Scenario: check activity with limit filter
     Given user "Alice" has created folder "/New Folder"
     And user "Alice" has created folder "/New Folder/Sub Folder"
-    And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/New Folder/Sub Folder/textfile.txt"
+    And user "Alice" has created folder "/New Folder/Sub Folder/test folder"
     When user "Alice" lists the activities of folder "New Folder" from space "Personal" with limit "2" using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
@@ -2486,14 +2486,6 @@ Feature: check activities
                               "properties": {
                                 "name": { "const": "New Folder" }
                               }
-                            },
-                            "user": {
-                              "type": "object",
-                              "required": ["id","displayName"],
-                              "properties": {
-                                "id": { "pattern": "%user_id_pattern%" },
-                                "displayName": { "const": "Alice Hansen" }
-                              }
                             }
                           }
                         }
@@ -2531,22 +2523,250 @@ Feature: check activities
                               "properties": {
                                 "name": { "const": "Sub Folder"  }
                               }
-                            },
-                            "user": {
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+      """
+    When user "Alice" lists the activities of folder "New Folder" from space "Personal" with limit "-1" using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 3,
+            "maxItems": 3,
+            "uniqueItems": true,
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "required": ["id", "template", "times"],
+                  "properties": {
+                    "template": {
+                      "type": "object",
+                      "required": ["message", "variables"],
+                      "properties": {
+                        "message": { "const": "{user} added {resource} to {folder}" },
+                        "variables": {
+                          "type": "object",
+                          "required": ["folder", "resource", "user"],
+                          "properties": {
+                            "folder": {
                               "type": "object",
-                              "required": ["id","displayName"],
+                              "required": ["name"],
                               "properties": {
-                                "id": { "pattern": "%user_id_pattern%" },
-                                "displayName": { "const": "Alice Hansen" }
+                                "name": { "const": "Alice Hansen" }
+                              }
+                            },
+                            "resource": {
+                              "type": "object",
+                              "required": ["id", "name"],
+                              "properties": {
+                                "name": { "const": "New Folder" }
                               }
                             }
                           }
                         }
                       }
-                    },
-                    "times": {
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["id", "template", "times"],
+                  "properties": {
+                    "template": {
                       "type": "object",
-                      "required": ["recordedTime"]
+                      "required": ["message", "variables"],
+                      "properties": {
+                        "message": { "const": "{user} added {resource} to {folder}" },
+                        "variables": {
+                          "type": "object",
+                          "required": ["folder", "resource", "user"],
+                          "properties": {
+                            "folder": {
+                              "type": "object",
+                              "required": ["name"],
+                              "properties": {
+                                "name": { "const": "New Folder" }
+                              }
+                            },
+                            "resource": {
+                              "type": "object",
+                              "required": ["id", "name"],
+                              "properties": {
+                                "name": { "const": "Sub Folder"  }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["id", "template", "times"],
+                  "properties": {
+                    "template": {
+                      "type": "object",
+                      "required": ["message", "variables"],
+                      "properties": {
+                        "message": { "const": "{user} added {resource} to {folder}" },
+                        "variables": {
+                          "type": "object",
+                          "required": ["folder", "resource", "user"],
+                          "properties": {
+                            "folder": {
+                              "type": "object",
+                              "required": ["name"],
+                              "properties": {
+                                "name": { "const": "Sub Folder" }
+                              }
+                            },
+                            "resource": {
+                              "type": "object",
+                              "required": ["id", "name"],
+                              "properties": {
+                                "name": { "const": "test folder"  }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+      """
+    When user "Alice" lists the activities of folder "New Folder" from space "Personal" with limit "0" using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 3,
+            "maxItems": 3,
+            "uniqueItems": true,
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "required": ["id", "template", "times"],
+                  "properties": {
+                    "template": {
+                      "type": "object",
+                      "required": ["message", "variables"],
+                      "properties": {
+                        "message": { "const": "{user} added {resource} to {folder}" },
+                        "variables": {
+                          "type": "object",
+                          "required": ["folder", "resource", "user"],
+                          "properties": {
+                            "folder": {
+                              "type": "object",
+                              "required": ["name"],
+                              "properties": {
+                                "name": { "const": "Alice Hansen" }
+                              }
+                            },
+                            "resource": {
+                              "type": "object",
+                              "required": ["id", "name"],
+                              "properties": {
+                                "name": { "const": "New Folder" }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["id", "template", "times"],
+                  "properties": {
+                    "template": {
+                      "type": "object",
+                      "required": ["message", "variables"],
+                      "properties": {
+                        "message": { "const": "{user} added {resource} to {folder}" },
+                        "variables": {
+                          "type": "object",
+                          "required": ["folder", "resource", "user"],
+                          "properties": {
+                            "folder": {
+                              "type": "object",
+                              "required": ["name"],
+                              "properties": {
+                                "name": { "const": "New Folder" }
+                              }
+                            },
+                            "resource": {
+                              "type": "object",
+                              "required": ["id", "name"],
+                              "properties": {
+                                "name": { "const": "Sub Folder"  }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["id", "template", "times"],
+                  "properties": {
+                    "template": {
+                      "type": "object",
+                      "required": ["message", "variables"],
+                      "properties": {
+                        "message": { "const": "{user} added {resource} to {folder}" },
+                        "variables": {
+                          "type": "object",
+                          "required": ["folder", "resource", "user"],
+                          "properties": {
+                            "folder": {
+                              "type": "object",
+                              "required": ["name"],
+                              "properties": {
+                                "name": { "const": "Sub Folder" }
+                              }
+                            },
+                            "resource": {
+                              "type": "object",
+                              "required": ["id", "name"],
+                              "properties": {
+                                "name": { "const": "test folder"  }
+                              }
+                            }
+                          }
+                        }
+                      }
                     }
                   }
                 }
