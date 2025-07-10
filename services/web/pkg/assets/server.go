@@ -24,23 +24,21 @@ func FileServer(fsys fs.FS) http.Handler {
 	return &fileServer{http.FS(fsys)}
 }
 
-var validSegment = regexp.MustCompile(`^[A-Za-z0-9_.%:-]+$`)
+var validSegment = regexp.MustCompile(`^[A-Za-z0-9_.-]+$`)
 
 func isSafePath(p string) bool {
 	if p == "" {
 		return false
 	}
-	for _, raw := range strings.Split(p, "/") {
-		if raw == "" { // allow empty for repeated slashes
+	segments := strings.Split(p, "/")
+	for _, raw := range segments {
+		if raw == "" { // allow empty segments for double slashes
 			continue
 		}
-
-		// decode %XX sequences to detect encoded traversal like %2e%2e
 		seg, err := url.PathUnescape(raw)
-		if err != nil { // malformed escape
+		if err != nil {
 			return false
 		}
-
 		if seg == "." || seg == ".." {
 			return false
 		}

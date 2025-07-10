@@ -122,6 +122,10 @@ func TestFileServer(t *testing.T) {
 }
 
 func TestIsSafePath(t *testing.T) {
+	// Replace placeholders with sample identifiers
+	spaceID := "abc123"
+	username := "alice"
+
 	cases := []struct {
 		permit bool
 		path   string
@@ -137,11 +141,11 @@ func TestIsSafePath(t *testing.T) {
 		{true, "/dav//spaces/123/PARENT"},
 		{true, "//dav/spaces/123//FOLDER"},
 
-		// WebDAV files API variants
-		{true, "//dav//files/alice/textfile1.txt"},
-		{true, "/dav//files/alice/PARENT/parent.txt"},
-		{true, "//dav/files/alice//FOLDER"},
-		{true, "/dav/files/alice//PARENT5"},
+		// files API with double slashes
+		{true, fmt.Sprintf("//dav//files/%s/textfile1.txt", username)},
+		{true, fmt.Sprintf("/dav//files/%s/PARENT/parent.txt", username)},
+		{true, fmt.Sprintf("//dav/files/%s//FOLDER", username)},
+		{true, fmt.Sprintf("/dav/files/%s//PARENT5", username)},
 
 		// WebDAV root variants
 		{true, "//webdav/textfile0.txt"},
@@ -149,15 +153,19 @@ func TestIsSafePath(t *testing.T) {
 		{true, "//webdav//PARENT3"},
 		{true, "/webdav//textfile1.txt"},
 
-		// Spaces API with double slashes
-		{true, "//dav/spaces//SPACEID/PARENT4"},
-		{true, "/dav/spaces//SPACEID/textfile7.txt"},
-		{true, "//dav/spaces//SPACEID/PARENT//parent.txt"},
+		// spaces API with double slashes
+		{true, fmt.Sprintf("//dav/spaces/%s/textfile0.txt", spaceID)},
+		{true, fmt.Sprintf("//dav//spaces/%s/PARENT/parent.txt", spaceID)},
+		{true, fmt.Sprintf("/dav//spaces/%s/PARENT", spaceID)},
+		{true, fmt.Sprintf("//dav/spaces/%s//FOLDER", spaceID)},
+		{true, fmt.Sprintf("//dav/spaces//%s/PARENT4", spaceID)},
+		{true, fmt.Sprintf("/dav/spaces//%s/textfile7.txt", spaceID)},
+		{true, fmt.Sprintf("//dav/spaces//%s/PARENT//parent.txt", spaceID)},
 
-		// MOVE/COPY source patterns
-		{true, "//dav/spaces/ID//PARENT1"},
-		{true, "/dav//spaces/ID/textfile1.txt"},
-		{true, "//dav/files//alice//PARENT1"},
+		// MOVE / COPY like sources
+		{true, fmt.Sprintf("/dav//spaces/%s/textfile1.txt", spaceID)},
+		{true, fmt.Sprintf("//dav/spaces/%s//PARENT1", spaceID)},
+		{true, fmt.Sprintf("//dav/files//%s//PARENT1", username)},
 
 		// Traversal attempts that must be rejected
 		{false, "/dav/spaces/123/../../passwd"},
