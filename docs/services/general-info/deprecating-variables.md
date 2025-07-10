@@ -1,9 +1,9 @@
 ---
 title: "Envvar Deprecation"
 date: 2024-08-22T15:41:00+01:00
-weight: 15
+weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
-geekdocEditPath: edit/master/docs/services/general-info/envvars
+geekdocEditPath: edit/master/docs/services/general-info
 geekdocFilePath: deprecating-variables.md
 ---
 

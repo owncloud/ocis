@@ -169,9 +169,7 @@ docs-generate:
     done
 
 	$(MAKE) --no-print-directory -C docs docs-generate || exit 1
-	# .adoc for admin docs, .md for dev docs
-	cp docs/services/general-info/envvars/env-var-deltas/*.adoc docs/services/_includes/adoc/env-var-deltas/
-	cp docs/services/general-info/envvars/env-var-deltas/*.md docs/services/_includes/adoc/env-var-deltas/
+	cp docs/services/general-info/env-var-deltas/*.adoc docs/services/_includes/adoc/env-var-deltas/
 
 .PHONY: check-env-var-annotations
 check-env-var-annotations:
