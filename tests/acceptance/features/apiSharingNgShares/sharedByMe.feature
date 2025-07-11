@@ -3938,3 +3938,38 @@ Feature: resources shared by user
         }
       }
       """
+
+  @issue-mixed-share-crash
+  Scenario: sharer creates user share and link share for same resource then lists sharedByMe
+    Given using spaces DAV path
+    And user "Alice" has created folder "MixedFolder"
+    And user "Alice" has uploaded file with content "hello world" to "MixedFolder/doc.txt"
+    And user "Alice" has sent the following resource share invitation:
+      | resource        | MixedFolder |
+      | space           | Personal    |
+      | sharee          | Brian       |
+      | shareType       | user        |
+      | permissionsRole | Editor      |
+    And user "Alice" has created the following resource link share:
+      | resource        | MixedFolder |
+      | space           | Personal    |
+      | permissionsRole | View        |
+      | password        | %public%    |
+    When user "Alice" lists the shares shared by her using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should have the following structure for resource "MixedFolder"
+      """
+      {
+        "type": "object",
+        "required": ["permissions"],
+        "properties": {
+          "permissions": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "uniqueItems": true,
+            "items": {}
+          }
+        }
+      }
+      """
