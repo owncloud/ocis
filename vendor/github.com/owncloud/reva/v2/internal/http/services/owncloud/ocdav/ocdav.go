@@ -20,6 +20,7 @@ package ocdav
 
 import (
 	"context"
+	"io"
 	"net/http"
 	"path"
 	"strings"
@@ -29,6 +30,8 @@ import (
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	"github.com/jellydator/ttlcache/v2"
+	"github.com/mitchellh/mapstructure"
 	"github.com/owncloud/reva/v2/internal/http/services/owncloud/ocdav/config"
 	"github.com/owncloud/reva/v2/internal/http/services/owncloud/ocdav/net"
 	"github.com/owncloud/reva/v2/pkg/appctx"
@@ -42,8 +45,6 @@ import (
 	"github.com/owncloud/reva/v2/pkg/storage/favorite/registry"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/templates"
 	"github.com/owncloud/reva/v2/pkg/utils"
-	"github.com/jellydator/ttlcache/v2"
-	"github.com/mitchellh/mapstructure"
 	"github.com/rs/zerolog"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
@@ -398,4 +399,18 @@ func (s *svc) referenceIsChildOf(ctx context.Context, selector pool.Selectable[g
 // filename returns the base filename from a path and replaces any slashes with an empty string
 func filename(p string) string {
 	return strings.Trim(path.Base(p), "/")
+}
+
+// isBodyEmpty checks if the request body is empty.
+// Tolerate the EOF error when reading the body, which is expected when the body is empty.
+// The extended mkcol https://datatracker.ietf.org/doc/rfc5689/ is not supported.
+func isBodyEmpty(r *http.Request) bool {
+	if r.Body != nil && r.Body != http.NoBody {
+		buf := make([]byte, 0)
+		_, err := r.Body.Read(buf)
+		if err != io.EOF {
+			return false
+		}
+	}
+	return true
 }
