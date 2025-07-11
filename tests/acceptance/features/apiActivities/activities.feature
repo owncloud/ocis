@@ -3870,3 +3870,119 @@ Feature: check activities
         }
       }
       """
+
+  @issue-10153
+  Scenario: check all activities
+    Given user "Alice" has uploaded file with content "ownCloud test text file" to "textfile.txt"
+    And user "Alice" has created folder "FOLDER"
+    When user "Alice" lists all the activities using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "uniqueItems": true,
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "required": ["id", "template", "times"],
+                  "properties": {
+                    "template": {
+                      "type": "object",
+                      "required": ["message", "variables"],
+                      "properties": {
+                        "message": { "const": "{user} added {resource} to {folder}" },
+                        "variables": {
+                          "type": "object",
+                          "required": ["folder", "resource", "user"],
+                          "properties": {
+                            "folder": {
+                              "type": "object",
+                              "required": ["name"],
+                              "properties": {
+                                "name": { "const": "Alice Hansen" }
+                              }
+                            },
+                            "resource": {
+                              "type": "object",
+                              "required": ["id", "name"],
+                              "properties": {
+                                "name": { "const": "textfile.txt" }
+                              }
+                            },
+                            "user": {
+                              "type": "object",
+                              "required": ["id","displayName"],
+                              "properties": {
+                                "id": { "pattern": "%user_id_pattern%" },
+                                "displayName": { "const": "Alice Hansen" }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "times": {
+                      "type": "object",
+                      "required": ["recordedTime"]
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["id", "template", "times"],
+                  "properties": {
+                    "template": {
+                      "type": "object",
+                      "required": ["message", "variables"],
+                      "properties": {
+                        "message": { "const": "{user} added {resource} to {folder}" },
+                        "variables": {
+                          "type": "object",
+                          "required": ["folder", "resource", "user"],
+                          "properties": {
+                            "folder": {
+                              "type": "object",
+                              "required": ["name"],
+                              "properties": {
+                                "name": { "const": "Alice Hansen" }
+                              }
+                            },
+                            "resource": {
+                              "type": "object",
+                              "required": ["id", "name"],
+                              "properties": {
+                                "name": { "const": "FOLDER" }
+                              }
+                            },
+                            "user": {
+                              "type": "object",
+                              "required": ["id","displayName"],
+                              "properties": {
+                                "id": { "pattern": "%user_id_pattern%" },
+                                "displayName": { "const": "Alice Hansen" }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "times": {
+                      "type": "object",
+                      "required": ["recordedTime"]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+      """
