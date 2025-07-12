@@ -6,8 +6,11 @@ import (
 	"io/fs"
 	"mime"
 	"net/http"
+	"net/url"
 	"path"
 	"path/filepath"
+	"regexp"
+	"strings"
 
 	"golang.org/x/net/html"
 )
@@ -21,7 +24,37 @@ func FileServer(fsys fs.FS) http.Handler {
 	return &fileServer{http.FS(fsys)}
 }
 
+var validSegment = regexp.MustCompile(`^[A-Za-z0-9_.-]+$`)
+
+func isSafePath(p string) bool {
+	if p == "" {
+		return false
+	}
+	segments := strings.Split(p, "/")
+	for _, raw := range segments {
+		if raw == "" { // allow empty segments for double slashes
+			continue
+		}
+		seg, err := url.PathUnescape(raw)
+		if err != nil {
+			return false
+		}
+		if seg == "." || seg == ".." {
+			return false
+		}
+		if !validSegment.MatchString(seg) {
+			return false
+		}
+	}
+	return true
+}
+
 func (f *fileServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	if !isSafePath(r.URL.Path) {
+		http.NotFound(w, r)
+		return
+	}
+
 	uPath := path.Clean(path.Join("/", r.URL.Path))
 	r.URL.Path = uPath
 
