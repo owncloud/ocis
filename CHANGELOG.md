@@ -1,7 +1,6 @@
 # Table of Contents
 
-* [Changelog for 7.2.0-rc.2](#changelog-for-720-rc2-2025-07-09)
-* [Changelog for 7.2.0-rc.1](#changelog-for-720-rc1-2025-06-20)
+* [Changelog for 7.2.0](#changelog-for-720-2025-07-14)
 * [Changelog for 7.1.3](#changelog-for-713-2025-05-27)
 * [Changelog for 7.1.2](#changelog-for-712-2025-03-28)
 * [Changelog for 7.1.1](#changelog-for-711-2025-03-14)
@@ -58,49 +57,11 @@
 * [Changelog for 1.1.0](#changelog-for-110-2021-01-22)
 * [Changelog for 1.0.0](#changelog-for-100-2020-12-17)
 
-# Changelog for [7.2.0-rc.2] (2025-07-09)
+# Changelog for [7.2.0] (2025-07-14)
 
-The following sections list the changes for 7.2.0-rc.2.
+The following sections list the changes for 7.2.0.
 
-[7.2.0-rc.2]: https://github.com/owncloud/ocis/compare/v7.2.0-rc.1...v7.2.0-rc.2
-
-## Summary
-
-* Bugfix - Fix the OCM role editor: [#11484](https://github.com/owncloud/ocis/pull/11484)
-* Bugfix - Fix storage-users cli: [#11490](https://github.com/owncloud/ocis/pull/11490)
-* Bugfix - Clean up unified roles label: [#11494](https://github.com/owncloud/ocis/pull/11494)
-
-## Details
-
-* Bugfix - Fix the OCM role editor: [#11484](https://github.com/owncloud/ocis/pull/11484)
-
-   Fix the issue when the watermark is visible to user with a viewer role in
-   Collabora
-
-   https://github.com/owncloud/ocis/issues/11474
-   https://github.com/owncloud/ocis/pull/11484
-
-* Bugfix - Fix storage-users cli: [#11490](https://github.com/owncloud/ocis/pull/11490)
-
-   Fix storage-users uploads --resume command.
-
-   https://github.com/owncloud/ocis/issues/11290
-   https://github.com/owncloud/ocis/pull/11490
-
-* Bugfix - Clean up unified roles label: [#11494](https://github.com/owncloud/ocis/pull/11494)
-
-   Clean up the unified roles label
-
-   https://github.com/owncloud/ocis/issues/11470
-   https://github.com/owncloud/ocis/issues/11254
-   https://github.com/owncloud/ocis/issues/10082
-   https://github.com/owncloud/ocis/pull/11494
-
-# Changelog for [7.2.0-rc.1] (2025-06-20)
-
-The following sections list the changes for 7.2.0-rc.1.
-
-[7.2.0-rc.1]: https://github.com/owncloud/ocis/compare/v7.1.3...v7.2.0-rc.1
+[7.2.0]: https://github.com/owncloud/ocis/compare/v7.1.3...v7.2.0
 
 ## Summary
 
@@ -273,6 +234,7 @@ The following sections list the changes for 7.2.0-rc.1.
    https://github.com/owncloud/ocis/issues/11377
    https://github.com/owncloud/ocis/pull/11390
 
+<<<<<<< HEAD
 * Bugfix - Fix storage-users cli: [#11464](https://github.com/owncloud/ocis/pull/11464)
 
    Fix storage-users uploads --resume command.
@@ -311,6 +273,22 @@ The following sections list the changes for 7.2.0-rc.1.
 
    https://github.com/owncloud/ocis/issues/10809
    https://github.com/owncloud/ocis/pull/11516
+
+* Bugfix - Fix storage-users cli: [#11490](https://github.com/owncloud/ocis/pull/11490)
+
+   Fix storage-users uploads --resume command.
+
+   https://github.com/owncloud/ocis/issues/11290
+   https://github.com/owncloud/ocis/pull/11490
+
+* Bugfix - Clean up unified roles label: [#11494](https://github.com/owncloud/ocis/pull/11494)
+
+   Clean up the unified roles label
+
+   https://github.com/owncloud/ocis/issues/11470
+   https://github.com/owncloud/ocis/issues/11254
+   https://github.com/owncloud/ocis/issues/10082
+   https://github.com/owncloud/ocis/pull/11494
 
 * Change - Remove deprecated FRONTEND_OCS_*: [#11333](https://github.com/owncloud/ocis/pull/11333)
 
