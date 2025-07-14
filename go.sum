@@ -64,8 +64,8 @@ github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03
 github.com/BurntSushi/toml v1.5.0 h1:W5quZX/G/csjUnuI8SUYlsHs9M38FC7znL0lIO+DvMg=
 github.com/BurntSushi/toml v1.5.0/go.mod h1:ukJfTF/6rtPPRCnwkur4qwRxa8vTRFBF0uk2lLoLwho=
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
-github.com/CiscoM31/godata v1.0.10 h1:DZdJ6M8QNh4HquvDDOqNLu6h77Wl86KGK7Qlbmb90sk=
-github.com/CiscoM31/godata v1.0.10/go.mod h1:ZMiT6JuD3Rm83HEtiTx4JEChsd25YCrxchKGag/sdTc=
+github.com/CiscoM31/godata v1.0.11 h1:w7y8twuW02LdH6mak3/GJ5i0GrCv2IoZUJVqa/g5Yeo=
+github.com/CiscoM31/godata v1.0.11/go.mod h1:ZMiT6JuD3Rm83HEtiTx4JEChsd25YCrxchKGag/sdTc=
 github.com/DeepDiver1975/secure v0.0.0-20240611112133-abc838fb797c h1:ocsNvQ2tNHme4v/lTs17HROamc7mFzZfzWcg4m+UXN0=
 github.com/DeepDiver1975/secure v0.0.0-20240611112133-abc838fb797c/go.mod h1:BmF5hyM6tXczk3MpQkFf1hpKSRqCyhqcbiQtiAF7+40=
 github.com/KimMachineGun/automemlimit v0.7.3 h1:oPgMp0bsWez+4fvgSa11Rd9nUDrd8RLtDjBoT3ro+/A=
