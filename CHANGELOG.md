@@ -85,6 +85,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Clean up unified roles label: [#11464](https://github.com/owncloud/ocis/pull/11464)
 * Bugfix - Return translated role definitions: [#11466](https://github.com/owncloud/ocis/pull/11466)
 * Bugfix - Fix the OCM role editor: [#11484](https://github.com/owncloud/ocis/pull/11484)
+* Bugfix - Tolerating the empty request body for WebDAV: [#11516](https://github.com/owncloud/ocis/pull/11516)
 * Change - Remove deprecated FRONTEND_OCS_*: [#11333](https://github.com/owncloud/ocis/pull/11333)
 * Change - Remove deprecated CLIENTLOG_REVA_GATEWAY: [#11372](https://github.com/owncloud/ocis/pull/11372)
 * Enhancement - Add GetPermission API: [#8616](https://github.com/owncloud/ocis/issues/8616)
@@ -263,6 +264,14 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/11474
    https://github.com/owncloud/ocis/pull/11484
+
+* Bugfix - Tolerating the empty request body for WebDAV: [#11516](https://github.com/owncloud/ocis/pull/11516)
+
+   Tolerating the empty request body for WebDAV operations like MKCOL, DELETE,
+   MOVE, COPY.
+
+   https://github.com/owncloud/ocis/issues/10809
+   https://github.com/owncloud/ocis/pull/11516
 
 * Change - Remove deprecated FRONTEND_OCS_*: [#11333](https://github.com/owncloud/ocis/pull/11333)
 
