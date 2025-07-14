@@ -93,9 +93,18 @@ The search service consists of two main parts which are file `indexing` and file
 
 Every time a resource changes its state, a corresponding event is triggered. Based on the event, the search service processes the file and adds the result to its index. There are a few more steps between accepting the file and updating the index.
 
+**IMPPORTANT**
+
+- When using the Tika Extractor, text and other data, such as EXIF data from images, are extracted from documents and written to the bleve index. Currently, this extra data cannot be searched. See the next section for more information.
+
 ### Search
 
 A query via the search service will return results based on the index created.
+
+**IMPPORTANT**
+
+- Though EXIF data can be present in the bleve index, currently, only text-related data can be extracted. Code must be written to make this type of extraction available to users.
+- Currently, there is no ocis shell command or similar mechanism to view or browse the bleve index. This capability would be highly beneficial for developers and administrators to determine the type of data contained in the index.
 
 ### State Changes which Trigger Indexing
 
