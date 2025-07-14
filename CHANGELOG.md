@@ -76,6 +76,7 @@ The following sections list the changes for unreleased.
 * Bugfix - OCM Share Notifications: [#11162](https://github.com/owncloud/ocis/pull/11162)
 * Bugfix - Fix pdf form creation: [#11163](https://github.com/owncloud/ocis/pull/11163)
 * Bugfix - Fix app-auth, REST status code: [#11190](https://github.com/owncloud/ocis/pull/11190)
+* Bugfix - Fix the expiration date response for links: [#11239](https://github.com/owncloud/ocis/pull/11239)
 * Bugfix - Fix error on listing space members: [#11245](https://github.com/owncloud/ocis/pull/11245)
 * Bugfix - Fix the graceful shutdown: [#11295](https://github.com/owncloud/ocis/pull/11295)
 * Bugfix - Fix the reva log interceptor: [#11348](https://github.com/owncloud/ocis/pull/11348)
@@ -193,6 +194,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/10815
    https://github.com/owncloud/ocis/pull/11190
+
+* Bugfix - Fix the expiration date response for links: [#11239](https://github.com/owncloud/ocis/pull/11239)
+
+   We fixed the inconsistency in the expiration date response for links
+
+   https://github.com/owncloud/ocis/issues/11232
+   https://github.com/owncloud/ocis/pull/11239
 
 * Bugfix - Fix error on listing space members: [#11245](https://github.com/owncloud/ocis/pull/11245)
 
