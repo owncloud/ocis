@@ -234,23 +234,6 @@ The following sections list the changes for 7.2.0.
    https://github.com/owncloud/ocis/issues/11377
    https://github.com/owncloud/ocis/pull/11390
 
-<<<<<<< HEAD
-* Bugfix - Fix storage-users cli: [#11464](https://github.com/owncloud/ocis/pull/11464)
-
-   Fix storage-users uploads --resume command.
-
-   https://github.com/owncloud/ocis/issues/11290
-   https://github.com/owncloud/ocis/pull/11464
-
-* Bugfix - Clean up unified roles label: [#11464](https://github.com/owncloud/ocis/pull/11464)
-
-   Clean up the unified roles label
-
-   https://github.com/owncloud/ocis/issues/11470
-   https://github.com/owncloud/ocis/issues/11254
-   https://github.com/owncloud/ocis/issues/10082
-   https://github.com/owncloud/ocis/pull/11464
-
 * Bugfix - Return translated role definitions: [#11466](https://github.com/owncloud/ocis/pull/11466)
 
    Instead of always returning the role definitions in English, we now return the
