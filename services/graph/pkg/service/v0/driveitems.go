@@ -442,9 +442,12 @@ func cs3ResourceToDriveItem(logger *log.Logger, res *storageprovider.ResourceInf
 		Size: size,
 	}
 
-	if name := path.Base(res.GetPath()); name != "" {
-		driveItem.Name = &name
+	name := res.GetName()
+	if name == "" {
+		name = path.Base(res.GetPath())
 	}
+	driveItem.Name = &name
+
 	if res.GetEtag() != "" {
 		driveItem.ETag = &res.Etag
 	}
