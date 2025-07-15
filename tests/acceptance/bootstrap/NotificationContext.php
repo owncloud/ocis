@@ -614,4 +614,53 @@ class NotificationContext implements Context {
 		);
 		$this->featureContext->setResponse($response);
 	}
+
+	/**
+	 * deletes notification using id
+	 *
+	 * @param string $user
+	 * @param string $notificationId
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 * @throws JsonException
+	 */
+	public function deleteNotificationUsingId(string $user, string $notificationId): ResponseInterface {
+		$deleteNotificationEndpoint = str_replace('?format=json', '', $this->notificationEndpointPath);
+		$deleteNotificationEndpoint .= '/' . $notificationId;
+		return OcsApiHelper::sendRequest(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getActualUsername($user),
+			$this->featureContext->getPasswordForUser($user),
+			'DELETE',
+			$deleteNotificationEndpoint,
+			[],
+			2,
+		);
+	}
+
+	/**
+	 * @When user :user deletes a notification related to resource :resource with subject :subject using id
+	 *
+	 * @param string $user
+	 * @param string $resource
+	 * @param string $subject
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws JsonException
+	 */
+	public function userDeletesNotificationOfResourceAndSubjectById(
+		string $user,
+		string $resource,
+		string $subject,
+	): void {
+		$allNotifications = $this->listAllNotifications($user);
+		$filteredNotificationId = $this->filterNotificationsBySubjectAndResource(
+			$subject,
+			$resource,
+			$allNotifications,
+		)[0]->notification_id;
+		$this->featureContext->setResponse($this->deleteNotificationUsingId($user, $filteredNotificationId));
+	}
 }
