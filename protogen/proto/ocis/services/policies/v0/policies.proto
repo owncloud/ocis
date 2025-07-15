@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+package ocis.services.policies.v0;
+
+option go_package = "github.com/owncloud/ocis/protogen/gen/ocis/service/policies/v0";
+
+import "ocis/messages/policies/v0/policies.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "google/api/annotations.proto";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    title: "ownCloud Infinite Scale policies";
+    version: "1.0.0";
+    contact: {
+      name: "ownCloud GmbH";
+      url: "https://github.com/owncloud/ocis";
+      email: "support@owncloud.com";
+    };
+    license: {
+      name: "Apache-2.0";
+      url: "https://github.com/owncloud/ocis/blob/master/LICENSE";
+    };
+  };
+  schemes: HTTP;
+  schemes: HTTPS;
+  consumes: "application/json";
+  produces: "application/json";
+  external_docs: {
+    description: "Developer Manual";
+    url: "https://owncloud.dev/services/policies/";
+  };
+};
+
+service policiesProvider {
+	rpc Evaluate(EvaluateRequest) returns (EvaluateResponse) {
+    option (google.api.http) = {
+        post: "/api/v0/policies/evaluate",
+        body: "*"
+    };
+  };
+}
+
+message EvaluateRequest {
+  string query = 1;
+  ocis.messages.policies.v0.Environment environment = 2;
+}
+
+message EvaluateResponse {
+  bool result = 1;
+}

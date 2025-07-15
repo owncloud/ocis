@@ -1,0 +1,14 @@
+sync:
+  docs:
+    mode: one-way-replica
+    alpha: .
+    beta: ./hugo/content
+    flushOnCreate: true
+    ignore:
+      paths:
+        - .gitignore
+        - mutagen.yml
+        - mutagen.yml.lock
+        - hugo
+        - README.md
+        - Makefile

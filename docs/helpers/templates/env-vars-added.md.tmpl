@@ -1,0 +1,7 @@
+Added between Version {{ .StartVersion }} and {{ .EndVersion }}.
+
+| Variable | Description |
+| --- | --- |
+{{- range $key, $value := .DeltaFields}}
+| {{$value.Name}} | {{$value.Description}} |
+{{- end}}

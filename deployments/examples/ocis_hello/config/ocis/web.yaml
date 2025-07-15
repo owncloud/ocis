@@ -1,0 +1,5 @@
+web:
+  config:
+    external_apps:
+      - id: hello
+        path: /hello.js

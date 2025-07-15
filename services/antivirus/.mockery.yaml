@@ -1,0 +1,9 @@
+with-expecter: true
+filename: "{{.InterfaceName | snakecase }}.go"
+dir: "pkg/{{.PackageName}}/mocks"
+mockname: "{{.InterfaceName}}"
+outpkg: "mocks"
+packages:
+    github.com/owncloud/ocis/v2/services/antivirus/pkg/scanners:
+        interfaces:
+            Scanner:

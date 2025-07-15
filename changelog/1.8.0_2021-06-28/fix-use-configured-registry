@@ -1,0 +1,5 @@
+Bugfix: External storage registration used wrong config
+
+The go-micro registry-singleton ignores the ocis configuration and defaults to mdns
+
+https://github.com/owncloud/ocis/pull/2120
