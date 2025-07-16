@@ -97,7 +97,7 @@ Feature: Update permission of a share
       | sharee             | grp1                 |
       | shareType          | group                |
       | permissionsRole    | <permissions-role>   |
-      | expirationDateTime | 2025-07-15T14:00:00Z |
+      | expirationDateTime | 2200-07-15T14:00:00Z |
     When user "Alice" updates the last drive share with the following using root endpoint of the Graph API:
       | permissionsRole    | <new-permissions-role> |
       | space              | NewSpace               |
@@ -177,7 +177,7 @@ Feature: Update permission of a share
       | sharee             | grp1                 |
       | shareType          | group                |
       | permissionsRole    | <permissions-role>   |
-      | expirationDateTime | 2025-07-15T14:00:00Z |
+      | expirationDateTime | 2200-07-15T14:00:00Z |
     When user "Alice" updates the last drive share with the following using root endpoint of the Graph API:
       | expirationDateTime |          |
       | space              | NewSpace |
@@ -257,7 +257,7 @@ Feature: Update permission of a share
       | sharee             | grp1                 |
       | shareType          | group                |
       | permissionsRole    | <permissions-role>   |
-      | expirationDateTime | 2025-07-15T14:00:00Z |
+      | expirationDateTime | 2200-07-14T14:00:00Z |
     When user "Alice" updates the last drive share with the following using root endpoint of the Graph API:
       | expirationDateTime | 2200-07-15T14:00:00Z |
       | space              | NewSpace             |
@@ -339,7 +339,7 @@ Feature: Update permission of a share
       | sharee             | grp1                 |
       | shareType          | group                |
       | permissionsRole    | <permissions-role>   |
-      | expirationDateTime | 2025-07-15T14:00:00Z |
+      | expirationDateTime | 2200-07-15T14:00:00Z |
     When user "Alice" updates the last drive share with the following using root endpoint of the Graph API:
       | expirationDateTime |                        |
       | permissionsRole    | <new-permissions-role> |
@@ -420,7 +420,7 @@ Feature: Update permission of a share
       | sharee             | grp1                 |
       | shareType          | group                |
       | permissionsRole    | <permissions-role>   |
-      | expirationDateTime | 2025-07-15T14:00:00Z |
+      | expirationDateTime | 2200-07-14T14:00:00Z |
     When user "Alice" updates the last drive share with the following using root endpoint of the Graph API:
       | expirationDateTime | 2200-07-15T14:00:00Z   |
       | permissionsRole    | <new-permissions-role> |
@@ -502,7 +502,7 @@ Feature: Update permission of a share
       | sharee             | Brian                |
       | shareType          | user                 |
       | permissionsRole    | <permissions-role>   |
-      | expirationDateTime | 2025-07-15T14:00:00Z |
+      | expirationDateTime | 2200-07-15T14:00:00Z |
     When user "Alice" updates the last drive share with the following using root endpoint of the Graph API:
       | permissionsRole    | <new-permissions-role> |
       | space              | NewSpace               |
@@ -578,7 +578,7 @@ Feature: Update permission of a share
       | sharee             | Brian                |
       | shareType          | user                 |
       | permissionsRole    | <permissions-role>   |
-      | expirationDateTime | 2025-07-15T14:00:00Z |
+      | expirationDateTime | 2200-07-15T14:00:00Z |
     When user "Alice" updates the last drive share with the following using root endpoint of the Graph API:
       | expirationDateTime |                        |
       | space              | NewSpace               |
@@ -654,7 +654,7 @@ Feature: Update permission of a share
       | sharee             | Brian                |
       | shareType          | user                 |
       | permissionsRole    | <permissions-role>   |
-      | expirationDateTime | 2025-07-15T14:00:00Z |
+      | expirationDateTime | 2200-07-14T14:00:00Z |
     When user "Alice" updates the last drive share with the following using root endpoint of the Graph API:
       | expirationDateTime | 2200-07-15T14:00:00Z   |
       | permissionsRole    | <new-permissions-role> |
@@ -736,7 +736,7 @@ Feature: Update permission of a share
       | sharee             | Brian                |
       | shareType          | user                 |
       | permissionsRole    | <permissions-role>   |
-      | expirationDateTime | 2025-07-15T14:00:00Z |
+      | expirationDateTime | 2200-07-15T14:00:00Z |
     When user "Alice" updates the last drive share with the following using root endpoint of the Graph API:
       | expirationDateTime |                        |
       | permissionsRole    | <new-permissions-role> |
@@ -813,7 +813,7 @@ Feature: Update permission of a share
       | sharee             | Brian                |
       | shareType          | user                 |
       | permissionsRole    | <permissions-role>   |
-      | expirationDateTime | 2025-07-15T14:00:00Z |
+      | expirationDateTime | 2200-07-14T14:00:00Z |
     When user "Alice" updates the last drive share with the following using root endpoint of the Graph API:
       | expirationDateTime | 2200-07-15T14:00:00Z   |
       | permissionsRole    | <new-permissions-role> |
