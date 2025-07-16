@@ -1,5 +1,6 @@
 # Table of Contents
 
+* [Changelog for unreleased](#changelog-for-unreleased-unreleased)
 * [Changelog for 7.2.0](#changelog-for-720-2025-07-14)
 * [Changelog for 7.1.3](#changelog-for-713-2025-05-27)
 * [Changelog for 7.1.2](#changelog-for-712-2025-03-28)
@@ -57,6 +58,71 @@
 * [Changelog for 1.1.0](#changelog-for-110-2021-01-22)
 * [Changelog for 1.0.0](#changelog-for-100-2020-12-17)
 
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes for unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis/compare/v7.2.0...master
+
+## Summary
+
+* Bugfix - Fix the expiration date response for links: [#11239](https://github.com/owncloud/ocis/pull/11239)
+* Bugfix - Return translated role definitions: [#11466](https://github.com/owncloud/ocis/pull/11466)
+* Bugfix - Tolerating the empty request body for WebDAV: [#11516](https://github.com/owncloud/ocis/pull/11516)
+* Enhancement - Add GetPermission API: [#8616](https://github.com/owncloud/ocis/issues/8616)
+* Enhancement - Bump importer app: [#10880](https://github.com/owncloud/ocis/pull/10880)
+* Enhancement - Allow scaling the search service: [#11029](https://github.com/owncloud/ocis/pull/11029)
+
+## Details
+
+* Bugfix - Fix the expiration date response for links: [#11239](https://github.com/owncloud/ocis/pull/11239)
+
+   We fixed the inconsistency in the expiration date response for links
+
+   https://github.com/owncloud/ocis/issues/11232
+   https://github.com/owncloud/ocis/pull/11239
+
+* Bugfix - Return translated role definitions: [#11466](https://github.com/owncloud/ocis/pull/11466)
+
+   Instead of always returning the role definitions in English, we now return the
+   role definitions in the language set in the `Accept-Language` header if present.
+
+   https://github.com/owncloud/ocis/pull/11466
+
+* Bugfix - Tolerating the empty request body for WebDAV: [#11516](https://github.com/owncloud/ocis/pull/11516)
+
+   Tolerating the empty request body for WebDAV operations like MKCOL, DELETE,
+   MOVE, COPY.
+
+   https://github.com/owncloud/ocis/issues/10809
+   https://github.com/owncloud/ocis/pull/11516
+
+* Enhancement - Add GetPermission API: [#8616](https://github.com/owncloud/ocis/issues/8616)
+
+   Graph service: added GET
+   /v1beta1/drives/{driveId}/items/{itemId}/permissions/{permissionId} (and
+   space-root equivalent) so clients can retrieve a single permission instead of
+   listing all.
+
+   https://github.com/owncloud/ocis/issues/8616
+   https://github.com/owncloud/ocis/pull/11477
+
+* Enhancement - Bump importer app: [#10880](https://github.com/owncloud/ocis/pull/10880)
+
+   The importer app in the ocis_full example has been updated. It's using the
+   upstream Uppy Companion Docker image now.
+
+   https://github.com/owncloud/ocis/pull/10880
+
+* Enhancement - Allow scaling the search service: [#11029](https://github.com/owncloud/ocis/pull/11029)
+
+   Previously, the search service locked the index for its whole lifetime, so any
+   other search service wouldn't be able to access to the index. With this change,
+   the search service can be configure to lock the index per operation, so other
+   search services can access the index as long as there is no operation ongoing.
+
+   https://github.com/owncloud/ocis/pull/11029
+
 # Changelog for [7.2.0] (2025-07-14)
 
 The following sections list the changes for 7.2.0.
@@ -76,21 +142,15 @@ The following sections list the changes for 7.2.0.
 * Bugfix - OCM Share Notifications: [#11162](https://github.com/owncloud/ocis/pull/11162)
 * Bugfix - Fix pdf form creation: [#11163](https://github.com/owncloud/ocis/pull/11163)
 * Bugfix - Fix app-auth, REST status code: [#11190](https://github.com/owncloud/ocis/pull/11190)
-* Bugfix - Fix the expiration date response for links: [#11239](https://github.com/owncloud/ocis/pull/11239)
 * Bugfix - Fix error on listing space members: [#11245](https://github.com/owncloud/ocis/pull/11245)
 * Bugfix - Fix the graceful shutdown: [#11295](https://github.com/owncloud/ocis/pull/11295)
 * Bugfix - Fix the reva log interceptor: [#11348](https://github.com/owncloud/ocis/pull/11348)
 * Bugfix - Fix panic while traversing the service list: [#11390](https://github.com/owncloud/ocis/pull/11390)
-* Bugfix - Fix storage-users cli: [#11464](https://github.com/owncloud/ocis/pull/11464)
 * Bugfix - Clean up unified roles label: [#11464](https://github.com/owncloud/ocis/pull/11464)
-* Bugfix - Return translated role definitions: [#11466](https://github.com/owncloud/ocis/pull/11466)
 * Bugfix - Fix the OCM role editor: [#11484](https://github.com/owncloud/ocis/pull/11484)
-* Bugfix - Tolerating the empty request body for WebDAV: [#11516](https://github.com/owncloud/ocis/pull/11516)
+* Bugfix - Fix storage-users cli: [#11490](https://github.com/owncloud/ocis/pull/11490)
 * Change - Remove deprecated FRONTEND_OCS_*: [#11333](https://github.com/owncloud/ocis/pull/11333)
 * Change - Remove deprecated CLIENTLOG_REVA_GATEWAY: [#11372](https://github.com/owncloud/ocis/pull/11372)
-* Enhancement - Add GetPermission API: [#8616](https://github.com/owncloud/ocis/issues/8616)
-* Enhancement - Bump importer app: [#10880](https://github.com/owncloud/ocis/pull/10880)
-* Enhancement - Allow scaling the search service: [#11029](https://github.com/owncloud/ocis/pull/11029)
 * Enhancement - Update Mockery to 2.52.3: [#11070](https://github.com/owncloud/ocis/pull/11070)
 * Enhancement - Improve postprocessing logs: [#11108](https://github.com/owncloud/ocis/pull/11108)
 * Enhancement - Improve graph space management logs: [#11115](https://github.com/owncloud/ocis/pull/11115)
@@ -196,13 +256,6 @@ The following sections list the changes for 7.2.0.
    https://github.com/owncloud/ocis/issues/10815
    https://github.com/owncloud/ocis/pull/11190
 
-* Bugfix - Fix the expiration date response for links: [#11239](https://github.com/owncloud/ocis/pull/11239)
-
-   We fixed the inconsistency in the expiration date response for links
-
-   https://github.com/owncloud/ocis/issues/11232
-   https://github.com/owncloud/ocis/pull/11239
-
 * Bugfix - Fix error on listing space members: [#11245](https://github.com/owncloud/ocis/pull/11245)
 
    Now the members list will still show grantees even with there is any invalid
@@ -234,12 +287,14 @@ The following sections list the changes for 7.2.0.
    https://github.com/owncloud/ocis/issues/11377
    https://github.com/owncloud/ocis/pull/11390
 
-* Bugfix - Return translated role definitions: [#11466](https://github.com/owncloud/ocis/pull/11466)
+* Bugfix - Clean up unified roles label: [#11464](https://github.com/owncloud/ocis/pull/11464)
 
-   Instead of always returning the role definitions in English, we now return the
-   role definitions in the language set in the `Accept-Language` header if present.
+   Clean up the unified roles label
 
-   https://github.com/owncloud/ocis/pull/11466
+   https://github.com/owncloud/ocis/issues/11470
+   https://github.com/owncloud/ocis/issues/11254
+   https://github.com/owncloud/ocis/issues/10082
+   https://github.com/owncloud/ocis/pull/11464
 
 * Bugfix - Fix the OCM role editor: [#11484](https://github.com/owncloud/ocis/pull/11484)
 
@@ -249,29 +304,12 @@ The following sections list the changes for 7.2.0.
    https://github.com/owncloud/ocis/issues/11474
    https://github.com/owncloud/ocis/pull/11484
 
-* Bugfix - Tolerating the empty request body for WebDAV: [#11516](https://github.com/owncloud/ocis/pull/11516)
-
-   Tolerating the empty request body for WebDAV operations like MKCOL, DELETE,
-   MOVE, COPY.
-
-   https://github.com/owncloud/ocis/issues/10809
-   https://github.com/owncloud/ocis/pull/11516
-
 * Bugfix - Fix storage-users cli: [#11490](https://github.com/owncloud/ocis/pull/11490)
 
    Fix storage-users uploads --resume command.
 
    https://github.com/owncloud/ocis/issues/11290
    https://github.com/owncloud/ocis/pull/11490
-
-* Bugfix - Clean up unified roles label: [#11494](https://github.com/owncloud/ocis/pull/11494)
-
-   Clean up the unified roles label
-
-   https://github.com/owncloud/ocis/issues/11470
-   https://github.com/owncloud/ocis/issues/11254
-   https://github.com/owncloud/ocis/issues/10082
-   https://github.com/owncloud/ocis/pull/11494
 
 * Change - Remove deprecated FRONTEND_OCS_*: [#11333](https://github.com/owncloud/ocis/pull/11333)
 
@@ -286,32 +324,6 @@ The following sections list the changes for 7.2.0.
 
    https://github.com/owncloud/ocis/issues/11314
    https://github.com/owncloud/ocis/pull/11372
-
-* Enhancement - Add GetPermission API: [#8616](https://github.com/owncloud/ocis/issues/8616)
-
-   Graph service: added GET
-   /v1beta1/drives/{driveId}/items/{itemId}/permissions/{permissionId} (and
-   space-root equivalent) so clients can retrieve a single permission instead of
-   listing all.
-
-   https://github.com/owncloud/ocis/issues/8616
-   https://github.com/owncloud/ocis/pull/11477
-
-* Enhancement - Bump importer app: [#10880](https://github.com/owncloud/ocis/pull/10880)
-
-   The importer app in the ocis_full example has been updated. It's using the
-   upstream Uppy Companion Docker image now.
-
-   https://github.com/owncloud/ocis/pull/10880
-
-* Enhancement - Allow scaling the search service: [#11029](https://github.com/owncloud/ocis/pull/11029)
-
-   Previously, the search service locked the index for its whole lifetime, so any
-   other search service wouldn't be able to access to the index. With this change,
-   the search service can be configure to lock the index per operation, so other
-   search services can access the index as long as there is no operation ongoing.
-
-   https://github.com/owncloud/ocis/pull/11029
 
 * Enhancement - Update Mockery to 2.52.3: [#11070](https://github.com/owncloud/ocis/pull/11070)
 
