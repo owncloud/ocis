@@ -34,7 +34,7 @@
 | OCIS_REVA_GATEWAY | string | com.owncloud.api.gateway | CS3 gateway used to look up user metadata.|
 | COLLABORATION_CS3API_DATAGATEWAY_INSECURE | bool | false | Connect to the CS3API data gateway insecurely.|
 | OCIS_TRACING_ENABLED<br/>COLLABORATION_TRACING_ENABLED | bool | false | Activates tracing.|
-| OCIS_TRACING_TYPE<br/>COLLABORATION_TRACING_TYPE | string |  | The type of tracing. Defaults to '', which is the same as 'jaeger'. Allowed tracing types are 'jaeger' and '' as of now.|
+| OCIS_TRACING_TYPE<br/>COLLABORATION_TRACING_TYPE | string |  | The type of tracing. Defaults to '', which is the same as 'jaeger'. Allowed tracing types are 'jaeger', 'otlp' and '' as of now.|
 | OCIS_TRACING_ENDPOINT<br/>COLLABORATION_TRACING_ENDPOINT | string |  | The endpoint of the tracing agent.|
 | OCIS_TRACING_COLLECTOR<br/>COLLABORATION_TRACING_COLLECTOR | string |  | The HTTP endpoint for sending spans directly to a collector, i.e. http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.|
 | OCIS_LOG_LEVEL<br/>COLLABORATION_LOG_LEVEL | string |  | The log level. Valid values are: 'panic', 'fatal', 'error', 'warn', 'info', 'debug', 'trace'.|

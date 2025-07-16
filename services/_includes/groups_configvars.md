@@ -3,7 +3,7 @@
 | Name | Type | Default Value | Description |
 |------|------|---------------|-------------|
 | OCIS_TRACING_ENABLED<br/>GROUPS_TRACING_ENABLED | bool | false | Activates tracing.|
-| OCIS_TRACING_TYPE<br/>GROUPS_TRACING_TYPE | string |  | The type of tracing. Defaults to '', which is the same as 'jaeger'. Allowed tracing types are 'jaeger' and '' as of now.|
+| OCIS_TRACING_TYPE<br/>GROUPS_TRACING_TYPE | string |  | The type of tracing. Defaults to '', which is the same as 'jaeger'. Allowed tracing types are 'jaeger', 'otlp' and '' as of now.|
 | OCIS_TRACING_ENDPOINT<br/>GROUPS_TRACING_ENDPOINT | string |  | The endpoint of the tracing agent.|
 | OCIS_TRACING_COLLECTOR<br/>GROUPS_TRACING_COLLECTOR | string |  | The HTTP endpoint for sending spans directly to a collector, i.e. http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.|
 | OCIS_LOG_LEVEL<br/>GROUPS_LOG_LEVEL | string |  | The log level. Valid values are: 'panic', 'fatal', 'error', 'warn', 'info', 'debug', 'trace'.|

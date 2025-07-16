@@ -11,7 +11,7 @@
 | SSE_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling.|
 | SSE_DEBUG_ZPAGES | bool | false | Enables zpages, which can be used for collecting and viewing in-memory traces.|
 | OCIS_TRACING_ENABLED<br/>SSE_TRACING_ENABLED | bool | false | Activates tracing.|
-| OCIS_TRACING_TYPE<br/>SSE_TRACING_TYPE | string |  | The type of tracing. Defaults to '', which is the same as 'jaeger'. Allowed tracing types are 'jaeger' and '' as of now.|
+| OCIS_TRACING_TYPE<br/>SSE_TRACING_TYPE | string |  | The type of tracing. Defaults to '', which is the same as 'jaeger'. Allowed tracing types are 'jaeger', 'otlp' and '' as of now.|
 | OCIS_TRACING_ENDPOINT<br/>SSE_TRACING_ENDPOINT | string |  | The endpoint of the tracing agent.|
 | OCIS_TRACING_COLLECTOR<br/>SSE_TRACING_COLLECTOR | string |  | The HTTP endpoint for sending spans directly to a collector, i.e. http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.|
 | SSE_KEEPALIVE_INTERVAL | Duration | 0s | To prevent intermediate proxies from closing the SSE connection, send periodic SSE comments to keep it open.|
