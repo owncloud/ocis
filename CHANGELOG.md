@@ -1,6 +1,6 @@
 # Table of Contents
 
-* [Changelog for unreleased](#changelog-for-unreleased-unreleased)
+* [Changelog for 7.2.0](#changelog-for-720-2025-07-14)
 * [Changelog for 7.1.3](#changelog-for-713-2025-05-27)
 * [Changelog for 7.1.2](#changelog-for-712-2025-03-28)
 * [Changelog for 7.1.1](#changelog-for-711-2025-03-14)
@@ -57,11 +57,11 @@
 * [Changelog for 1.1.0](#changelog-for-110-2021-01-22)
 * [Changelog for 1.0.0](#changelog-for-100-2020-12-17)
 
-# Changelog for [unreleased] (UNRELEASED)
+# Changelog for [7.2.0] (2025-07-14)
 
-The following sections list the changes for unreleased.
+The following sections list the changes for 7.2.0.
 
-[unreleased]: https://github.com/owncloud/ocis/compare/v7.1.3...master
+[7.2.0]: https://github.com/owncloud/ocis/compare/v7.1.3...v7.2.0
 
 ## Summary
 
@@ -234,22 +234,6 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/issues/11377
    https://github.com/owncloud/ocis/pull/11390
 
-* Bugfix - Fix storage-users cli: [#11464](https://github.com/owncloud/ocis/pull/11464)
-
-   Fix storage-users uploads --resume command.
-
-   https://github.com/owncloud/ocis/issues/11290
-   https://github.com/owncloud/ocis/pull/11464
-
-* Bugfix - Clean up unified roles label: [#11464](https://github.com/owncloud/ocis/pull/11464)
-
-   Clean up the unified roles label
-
-   https://github.com/owncloud/ocis/issues/11470
-   https://github.com/owncloud/ocis/issues/11254
-   https://github.com/owncloud/ocis/issues/10082
-   https://github.com/owncloud/ocis/pull/11464
-
 * Bugfix - Return translated role definitions: [#11466](https://github.com/owncloud/ocis/pull/11466)
 
    Instead of always returning the role definitions in English, we now return the
@@ -272,6 +256,22 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/10809
    https://github.com/owncloud/ocis/pull/11516
+
+* Bugfix - Fix storage-users cli: [#11490](https://github.com/owncloud/ocis/pull/11490)
+
+   Fix storage-users uploads --resume command.
+
+   https://github.com/owncloud/ocis/issues/11290
+   https://github.com/owncloud/ocis/pull/11490
+
+* Bugfix - Clean up unified roles label: [#11494](https://github.com/owncloud/ocis/pull/11494)
+
+   Clean up the unified roles label
+
+   https://github.com/owncloud/ocis/issues/11470
+   https://github.com/owncloud/ocis/issues/11254
+   https://github.com/owncloud/ocis/issues/10082
+   https://github.com/owncloud/ocis/pull/11494
 
 * Change - Remove deprecated FRONTEND_OCS_*: [#11333](https://github.com/owncloud/ocis/pull/11333)
 

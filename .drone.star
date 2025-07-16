@@ -550,6 +550,7 @@ def cachePipeline(name, steps):
         "trigger": {
             "ref": [
                 "refs/heads/master",
+                "refs/heads/stable-*",
                 "refs/tags/**",
                 "refs/pull/**",
             ],
@@ -743,6 +744,7 @@ def testOcis(ctx):
         "trigger": {
             "ref": [
                 "refs/heads/master",
+                "refs/heads/stable-*",
                 "refs/pull/**",
             ],
         },
@@ -775,6 +777,7 @@ def scanOcis(ctx):
         "trigger": {
             "ref": [
                 "refs/heads/master",
+                "refs/heads/stable-*",
                 "refs/pull/**",
             ],
         },
@@ -800,6 +803,7 @@ def buildOcisBinaryForTesting(ctx):
         "trigger": {
             "ref": [
                 "refs/heads/master",
+                "refs/heads/stable-*",
                 "refs/pull/**",
             ],
         },
@@ -887,6 +891,7 @@ def uploadScanResults(ctx):
         "trigger": {
             "ref": [
                 "refs/heads/master",
+                "refs/heads/stable-*",
                 "refs/pull/**",
             ],
             "status": [
@@ -1033,6 +1038,7 @@ def codestyle(ctx):
                 "trigger": {
                     "ref": [
                         "refs/heads/master",
+                        "refs/heads/stable-*",
                         "refs/pull/**",
                     ],
                 },
@@ -1100,6 +1106,7 @@ def localApiTestPipeline(ctx):
                             "trigger": {
                                 "ref": [
                                     "refs/heads/master",
+                                    "refs/heads/stable-*",
                                     "refs/pull/**",
                                 ],
                             },
@@ -1207,6 +1214,7 @@ def cs3ApiTests(ctx, storage):
         "trigger": {
             "ref": [
                 "refs/heads/master",
+                "refs/heads/stable-*",
                 "refs/pull/**",
             ],
         },
@@ -1325,6 +1333,7 @@ def wopiValidatorTests(ctx, storage, wopiServerType):
         "trigger": {
             "ref": [
                 "refs/heads/master",
+                "refs/heads/stable-*",
                 "refs/pull/**",
             ],
         },
@@ -1412,6 +1421,7 @@ def coreApiTestPipeline(ctx):
                         "trigger": {
                             "ref": [
                                 "refs/heads/master",
+                                "refs/heads/stable-*",
                                 "refs/pull/**",
                             ],
                         },
@@ -1442,6 +1452,7 @@ def e2eTestPipeline(ctx):
     e2e_trigger = {
         "ref": [
             "refs/heads/master",
+            "refs/heads/stable-*",
             "refs/tags/**",
             "refs/pull/**",
         ],
@@ -1584,6 +1595,7 @@ def multiServiceE2ePipeline(ctx):
     e2e_trigger = {
         "ref": [
             "refs/heads/master",
+            "refs/heads/stable-*",
             "refs/pull/**",
         ],
     }
@@ -1868,6 +1880,7 @@ def dockerRelease(ctx, arch, repo, build_type):
         "trigger": {
             "ref": [
                 "refs/heads/master",
+                "refs/heads/stable-*",
                 "refs/tags/v*",
                 "refs/pull/**",
             ],
@@ -1975,6 +1988,7 @@ def binaryRelease(ctx, arch, build_type, target, depends_on = []):
                 "when": {
                     "ref": [
                         "refs/heads/master",
+                        "refs/heads/stable-*",
                         "refs/tags/v*",
                     ],
                 },
@@ -1986,6 +2000,7 @@ def binaryRelease(ctx, arch, build_type, target, depends_on = []):
                 "when": {
                     "ref": [
                         "refs/heads/master",
+                        "refs/heads/stable-*",
                         "refs/tags/v*",
                     ],
                 },
@@ -2029,6 +2044,7 @@ def binaryRelease(ctx, arch, build_type, target, depends_on = []):
         "trigger": {
             "ref": [
                 "refs/heads/master",
+                "refs/heads/stable-*",
                 "refs/tags/v*",
                 "refs/pull/**",
             ],
@@ -2121,6 +2137,7 @@ def licenseCheck(ctx):
                 "when": {
                     "ref": [
                         "refs/heads/master",
+                        "refs/heads/stable-*",
                         "refs/tags/v*",
                     ],
                 },
@@ -2163,6 +2180,7 @@ def licenseCheck(ctx):
         "trigger": {
             "ref": [
                 "refs/heads/master",
+                "refs/heads/stable-*",
                 "refs/tags/v*",
                 "refs/pull/**",
             ],
@@ -2230,6 +2248,7 @@ def releaseDockerManifest(ctx, repo, build_type):
         "trigger": {
             "ref": [
                 "refs/heads/master",
+                "refs/heads/stable-*",
                 "refs/tags/v*",
             ],
         },
@@ -2299,6 +2318,7 @@ def changelog():
         "trigger": {
             "ref": [
                 "refs/heads/master",
+                "refs/heads/stable-*",
                 "refs/pull/**",
             ],
             "event": {
@@ -2338,6 +2358,7 @@ def releaseDockerReadme(ctx, repo, build_type):
         "trigger": {
             "ref": [
                 "refs/heads/master",
+                "refs/heads/stable-*",
                 "refs/tags/v*",
             ],
         },
@@ -2410,6 +2431,7 @@ def docs():
         "trigger": {
             "ref": [
                 "refs/heads/master",
+                "refs/heads/stable-*",
                 "refs/pull/**",
             ],
         },
@@ -2479,6 +2501,7 @@ def notify(ctx):
         "trigger": {
             "ref": [
                 "refs/heads/master",
+                "refs/heads/stable-*",
                 "refs/heads/release*",
                 "refs/tags/**",
             ],
@@ -2822,6 +2845,7 @@ def deploy(ctx, config, rebuild):
         "trigger": {
             "ref": [
                 "refs/heads/master",
+                "refs/heads/stable-*",
                 "refs/tags/v*",
             ],
         },
@@ -2948,6 +2972,7 @@ def uploadAPITestCoverageReport(ctx):
         "trigger": {
             "ref": [
                 "refs/heads/master",
+                "refs/heads/stable-*",
             ],
             "status": [
                 "success",
@@ -2982,6 +3007,7 @@ def genericCachePurge(flush_path):
         "trigger": {
             "ref": [
                 "refs/heads/master",
+                "refs/heads/stable-*",
                 "refs/pull/**",
             ],
             "status": [
@@ -3175,6 +3201,7 @@ def litmus(ctx, storage):
         "trigger": {
             "ref": [
                 "refs/heads/master",
+                "refs/heads/stable-*",
                 "refs/pull/**",
             ],
         },
