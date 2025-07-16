@@ -19,7 +19,7 @@ Feature: Update permission of a share
       | sharee             | Brian                |
       | shareType          | user                 |
       | permissionsRole    | Viewer               |
-      | expirationDateTime | 2025-07-15T14:00:00Z |
+      | expirationDateTime | 2200-07-14T14:00:00Z |
     When user "Alice" updates the last resource share with the following properties using the Graph API:
       | space              | Personal             |
       | resource           | testfile.txt         |
@@ -91,7 +91,7 @@ Feature: Update permission of a share
       | sharee             | Brian                |
       | shareType          | user                 |
       | permissionsRole    | Viewer               |
-      | expirationDateTime | 2025-07-15T14:00:00Z |
+      | expirationDateTime | 2200-07-15T14:00:00Z |
     When user "Alice" updates the last resource share with the following properties using the Graph API:
       | space              | Personal   |
       | resource           | <resource> |
