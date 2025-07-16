@@ -59,7 +59,7 @@ type Config struct {
 	PasswordPolicy PasswordPolicy `yaml:"password_policy"`
 	Validation     Validation     `yaml:"validation"`
 
-	ConfigurableNotifications bool `yaml:"configurable_notifications" env:"FRONTEND_CONFIGURABLE_NOTIFICATIONS" desc:"Allow configuring notifications via web client." introductionVersion:"7.1"`
+	ConfigurableNotifications bool `yaml:"configurable_notifications" env:"FRONTEND_CONFIGURABLE_NOTIFICATIONS" desc:"Allow configuring notifications via web client." introductionVersion:"7.1.0"`
 
 	ServerManagedSpaces bool `yaml:"server_managed_spaces" env:"OCIS_CLAIM_MANAGED_SPACES_ENABLED" desc:"Enables Space management through OIDC claims. See the text description for more details." introductionVersion:"7.2.0"`
 
