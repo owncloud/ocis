@@ -18,6 +18,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
+	"go.opentelemetry.io/otel/propagation"
 	"golang.org/x/oauth2"
 )
 
@@ -104,11 +105,17 @@ func (c *oidcClient) lookupWellKnownOpenidConfiguration(ctx context.Context) err
 	c.providerLock.Lock()
 	defer c.providerLock.Unlock()
 	if c.provider == nil {
+		propagator := propagation.NewCompositeTextMapPropagator(
+			propagation.Baggage{},
+			propagation.TraceContext{},
+		)
+
 		wellKnown := strings.TrimSuffix(c.issuer, "/") + wellknownPath
 		req, err := http.NewRequest("GET", wellKnown, nil)
 		if err != nil {
 			return err
 		}
+		propagator.Inject(ctx, propagation.HeaderCarrier(req.Header))
 		resp, err := c.httpClient.Do(req.WithContext(ctx))
 		if err != nil {
 			return err
@@ -214,6 +221,11 @@ func (u *UserInfo) Claims(v interface{}) error {
 
 // UserInfo retrieves the userinfo from a Token
 func (c *oidcClient) UserInfo(ctx context.Context, tokenSource oauth2.TokenSource) (*UserInfo, error) {
+	propagator := propagation.NewCompositeTextMapPropagator(
+		propagation.Baggage{},
+		propagation.TraceContext{},
+	)
+
 	if err := c.lookupWellKnownOpenidConfiguration(ctx); err != nil {
 		return nil, err
 	}
@@ -226,6 +238,7 @@ func (c *oidcClient) UserInfo(ctx context.Context, tokenSource oauth2.TokenSourc
 	if err != nil {
 		return nil, fmt.Errorf("oidc: create GET request: %v", err)
 	}
+	propagator.Inject(ctx, propagation.HeaderCarrier(req.Header))
 
 	token, err := tokenSource.Token()
 	if err != nil {
