@@ -30,8 +30,8 @@ type Config struct {
 
 // GRPCConfig defines the available grpc configuration.
 type GRPCConfig struct {
-	Addr      string                 `ocisConfig:"addr" env:"EVENTHISTORY_GRPC_ADDR" desc:"The bind address of the GRPC service." introductionVersion:"pre5.0"`
-	Namespace string                 `ocisConfig:"-" yaml:"-"`
+	Addr      string                 `yaml:"addr" env:"EVENTHISTORY_GRPC_ADDR" desc:"The bind address of the GRPC service." introductionVersion:"pre5.0"`
+	Namespace string                 `yaml:"-"`
 	TLS       *shared.GRPCServiceTLS `yaml:"tls"`
 }
 

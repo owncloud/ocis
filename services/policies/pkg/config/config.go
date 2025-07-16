@@ -29,8 +29,8 @@ type Service struct {
 
 // GRPC defines the available grpc configuration.
 type GRPC struct {
-	Addr      string                 `ocisConfig:"addr" env:"POLICIES_GRPC_ADDR" desc:"The bind address of the GRPC service." introductionVersion:"pre5.0"`
-	Namespace string                 `ocisConfig:"-" yaml:"-"`
+	Addr      string                 `yaml:"addr" env:"POLICIES_GRPC_ADDR" desc:"The bind address of the GRPC service." introductionVersion:"pre5.0"`
+	Namespace string                 `yaml:"-"`
 	TLS       *shared.GRPCServiceTLS `yaml:"tls"`
 }
 
