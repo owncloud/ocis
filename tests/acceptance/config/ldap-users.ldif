@@ -1,9 +1,0 @@
-dn: ou=TestUsers,dc=owncloud,dc=com
-objectclass: top
-objectclass: organizationalUnit
-ou: TestUsers
-
-dn: ou=TestGroups,dc=owncloud,dc=com
-objectclass: top
-objectclass: organizationalUnit
-ou: TestGroups
