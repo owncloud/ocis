@@ -2,7 +2,7 @@ package config
 
 // Reva defines all available REVA configuration.
 type Reva struct {
-	Address string `ocisConfig:"address" env:"OCIS_REVA_GATEWAY" desc:"The CS3 gateway endpoint." introductionVersion:"pre5.0"`
+	Address string `yaml:"address" env:"OCIS_REVA_GATEWAY" desc:"The CS3 gateway endpoint." introductionVersion:"pre5.0"`
 }
 
 // TokenManager is the config for using the reva token manager
