@@ -3351,7 +3351,7 @@ Feature: resources shared by user
               ],
               "properties": {
                 "name": {
-                  "const": "."
+                  "const": "NewSpace"
                 },
                 "folder": {
                   "const": {}
