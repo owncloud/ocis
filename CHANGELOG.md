@@ -67,6 +67,7 @@ The following sections list the changes for unreleased.
 
 * Bugfix - Fix storage-users cli: [#11464](https://github.com/owncloud/ocis/pull/11464)
 * Bugfix - Return translated role definitions: [#11466](https://github.com/owncloud/ocis/pull/11466)
+* Bugfix - Fix space root handling in a sharedByMe: [#11533](https://github.com/owncloud/ocis/pull/11533)
 * Enhancement - Update Web to v11.3.1: [#11471](https://github.com/owncloud/ocis/pull/11471)
 
 ## Details
@@ -84,6 +85,12 @@ The following sections list the changes for unreleased.
    role definitions in the language set in the `Accept-Language` header if present.
 
    https://github.com/owncloud/ocis/pull/11466
+
+* Bugfix - Fix space root handling in a sharedByMe: [#11533](https://github.com/owncloud/ocis/pull/11533)
+
+   Fix space root handling in a graph sharedByMe
+
+   https://github.com/owncloud/ocis/pull/11533
 
 * Enhancement - Update Web to v11.3.1: [#11471](https://github.com/owncloud/ocis/pull/11471)
 
