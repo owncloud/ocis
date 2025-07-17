@@ -382,10 +382,6 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 
 - [apiSpacesShares/moveSpaces.feature:377](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/moveSpaces.feature#L377)
 
-#### [Shares drive can be shared via link share with Internal role using permissions endpoint](https://github.com/owncloud/ocis/issues/11409)
-
-- [apiSharingNgDriveLinkShare/createInternalLinkShare.feature:339](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNgDriveLinkShare/createInternalLinkShare.feature#L339)
-
 #### [Activities. no event for restoring file](https://github.com/owncloud/ocis/issues/10010)
 
 - [apiActivities/activities.feature:3772](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiActivities/activities.feature#L3772)

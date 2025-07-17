@@ -360,16 +360,16 @@ Feature: Internal link share of project spaces
                 "type": "object",
                 "required": ["date","request-id"]
               },
-              "message": {"const": "password is redundant for the internal link"}
+              "message": {"const": "<message>"}
             }
           }
         }
       }
       """
     Examples:
-      | drive    |
-      | Personal |
-      | Shares   |
+      | drive    | message                                     |
+      | Personal | password is redundant for the internal link |
+      | Shares   | cannot create link on shares space root     |
 
 
   Scenario: create an internal quick link share of a project-space using permissions endpoint

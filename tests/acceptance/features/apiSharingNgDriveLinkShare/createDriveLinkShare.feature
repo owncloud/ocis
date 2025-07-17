@@ -232,11 +232,11 @@ Feature: Link sharing of project spaces
       """
     Examples:
       | permissions-role | drive    | message                                   |
-      | View             | Shares   | no share permission                       |
-      | Edit             | Shares   | no share permission                       |
-      | Upload           | Shares   | no share permission                       |
-      | File Drop        | Shares   | no share permission                       |
-      | Secure View      | Shares   | invalid link type                         |
+      | View             | Shares   | cannot create link on shares space root   |
+      | Edit             | Shares   | cannot create link on shares space root   |
+      | Upload           | Shares   | cannot create link on shares space root   |
+      | File Drop        | Shares   | cannot create link on shares space root   |
+      | Secure View      | Shares   | cannot create link on shares space root   |
       | View             | Personal | cannot create link on personal space root |
       | Edit             | Personal | cannot create link on personal space root |
       | Upload           | Personal | cannot create link on personal space root |
