@@ -69,6 +69,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix the expiration date response for links: [#11239](https://github.com/owncloud/ocis/pull/11239)
 * Bugfix - Return translated role definitions: [#11466](https://github.com/owncloud/ocis/pull/11466)
 * Bugfix - Tolerating the empty request body for WebDAV: [#11516](https://github.com/owncloud/ocis/pull/11516)
+* Bugfix - Fix space root handling in a sharedByMe: [#11533](https://github.com/owncloud/ocis/pull/11533)
 * Enhancement - Add GetPermission API: [#8616](https://github.com/owncloud/ocis/issues/8616)
 * Enhancement - Bump importer app: [#10880](https://github.com/owncloud/ocis/pull/10880)
 * Enhancement - Allow scaling the search service: [#11029](https://github.com/owncloud/ocis/pull/11029)
@@ -96,6 +97,12 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/10809
    https://github.com/owncloud/ocis/pull/11516
+
+* Bugfix - Fix space root handling in a sharedByMe: [#11533](https://github.com/owncloud/ocis/pull/11533)
+
+   Fix space root handling in a graph sharedByMe
+
+   https://github.com/owncloud/ocis/pull/11533
 
 * Enhancement - Add GetPermission API: [#8616](https://github.com/owncloud/ocis/issues/8616)
 
