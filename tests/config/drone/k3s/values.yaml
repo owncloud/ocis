@@ -1,0 +1,65 @@
+---
+namespaceOverride: ocis
+image:
+  repository: owncloud/ocis-rolling
+  tag: master
+ingress:
+  enabled: true
+  ingressClassName: traefik
+externalDomain: ocis-server
+extraResources: []
+
+logging:
+  level: error
+insecure:
+  oidcIdpInsecure: true
+  ocisHttpApiInsecure: true
+  ocmInsecure: true
+features:
+  virusscan:
+    enabled: false
+  policies:
+    enabled: false
+  ocm:
+    enabled: true
+services:
+  idm:
+    persistence:
+      enabled: true
+      accessModes:
+        - ReadWriteOnce
+  nats:
+    persistence:
+      enabled: true
+      accessModes:
+        - ReadWriteOnce
+  search:
+    persistence:
+      enabled: true
+      accessModes:
+        - ReadWriteOnce
+  storagesystem:
+    persistence:
+      enabled: true
+      accessModes:
+        - ReadWriteOnce
+  storageusers:
+    persistence:
+      enabled: true
+      accessModes:
+        - ReadWriteOnce
+  ocm:
+    persistence:
+      enabled: true
+      accessModes:
+        - ReadWriteOnce
+  thumbnails:
+    persistence:
+      enabled: true
+      accessModes:
+        - ReadWriteOnce
+  web:
+    persistence:
+      enabled: true
+      accessModes:
+        - ReadWriteOnce

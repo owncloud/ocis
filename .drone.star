@@ -518,6 +518,9 @@ def main(ctx):
 
     pipelines = test_pipelines + build_release_pipelines
 
+    # nightly Trivy security scan (non-blocking)
+    pipelines.append(trivyScan(ctx))
+
     if ctx.build.event == "cron":
         pipelines = \
             pipelines + \
@@ -598,7 +601,7 @@ def testPipelines(ctx):
     pipelines += localApiTestPipeline(ctx)
     pipelines += coreApiTestPipeline(ctx)
 
-    # pipelines += e2eTestPipeline(ctx) + multiServiceE2ePipeline(ctx)
+    pipelines += e2eTestPipeline(ctx) + multiServiceE2ePipeline(ctx)
 
     if ("skip" not in config["k6LoadTests"] or not config["k6LoadTests"]["skip"]) and ("k6-test" in ctx.build.title.lower() or ctx.build.event == "cron"):
         pipelines += k6LoadTests(ctx)
@@ -1082,6 +1085,11 @@ def localApiTestPipeline(ctx):
                     params[item] = matrix[item] if item in matrix else defaults[item]
                 for storage in params["storages"]:
                     for run_with_remote_php in params["withRemotePhp"]:
+                        run_on_k3d = params["k3d"] and ctx.build.event == "cron"
+                        ocis_url = OCIS_URL
+                        if run_on_k3d:
+                            ocis_url = "https://%s" % OCIS_SERVER_NAME
+
                         pipeline = {
                             "kind": "pipeline",
                             "type": "docker",
@@ -1091,41 +1099,22 @@ def localApiTestPipeline(ctx):
                                 "arch": "amd64",
                             },
                             "steps": skipIfUnchanged(ctx, "acceptance-tests") +
-                                     (restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin") if not params["k3d"] else []) +
+                                     restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin") +
                                      (tikaService() if params["tikaNeeded"] else []) +
                                      (waitForServices("online-offices", ["collabora:9980", "onlyoffice:443", "fakeoffice:8080"]) if params["collaborationServiceNeeded"] else []) +
-                                     (waitk3() + install() + showPodsAfterInstall() if params["k3d"] else ocisServer(storage, extra_server_environment = params["extraServerEnvironment"], with_wrapper = True, tika_enabled = params["tikaNeeded"], volumes = ([stepVolumeOcisStorage])) if not name.startswith("cli") else []) +
+                                     (waitK3sCluster() + deployOcis() + waitForOcis(ocis_url = ocis_url) + ocisServicePods() if run_on_k3d else ocisServer(storage, extra_server_environment = params["extraServerEnvironment"], with_wrapper = True, tika_enabled = params["tikaNeeded"], volumes = ([stepVolumeOcisStorage]))) +
                                      (waitForClamavService() if params["antivirusNeeded"] else []) +
                                      (waitForEmailService() if params["emailNeeded"] else []) +
                                      (ocisServer(storage, deploy_type = "federation", extra_server_environment = params["extraServerEnvironment"]) if params["federationServer"] else []) +
                                      ((wopiCollaborationService("fakeoffice") + wopiCollaborationService("collabora") + wopiCollaborationService("onlyoffice")) if params["collaborationServiceNeeded"] else []) +
                                      (ocisHealthCheck("wopi", ["wopi-collabora:9304", "wopi-onlyoffice:9304", "wopi-fakeoffice:9304"]) if params["collaborationServiceNeeded"] else []) +
-                                     localApiTests(ctx, name, params["suites"], storage, params["extraEnvironment"], run_with_remote_php, params["k3d"]) +
+                                     localApiTests(ctx, name, params["suites"], storage, params["extraEnvironment"], run_with_remote_php, ocis_url = ocis_url) +
                                      apiTestFailureLog() +
-                                     (generateCoverageFromAPITest(ctx, name) if not params["k3d"] else []),
+                                     (generateCoverageFromAPITest(ctx, name) if not run_on_k3d else []),
                             "services": (emailService() if params["emailNeeded"] else []) +
                                         (clamavService() if params["antivirusNeeded"] else []) +
                                         ((fakeOffice() + collaboraService() + onlyofficeService()) if params["collaborationServiceNeeded"] else []) +
-                                        ([
-                                            {
-                                                "name": "k3d",
-                                                "image": "ghcr.io/k3d-io/k3d:5-dind",
-                                                "user": "root",
-                                                "privileged": True,
-                                                "commands": [
-                                                    "git clone https://github.com/nirajacharya2/ocis-charts.git",
-                                                    "nohup dockerd-entrypoint.sh &",
-                                                    "until docker ps 2>&1 > /dev/null; do sleep 1s; done",
-                                                    "k3d cluster create --config ./ocis-charts/ci/k3d-drone.yaml --api-port k3d:443",
-                                                    "until kubectl get deployment coredns -n kube-system -o go-template='{{.status.availableReplicas}}' | grep -v -e '<no value>'; do sleep 1s; done",
-                                                    "k3d cluster list",
-                                                    "k3d kubeconfig get drone > kubeconfig-$${DRONE_BUILD_NUMBER}.yaml",
-                                                    "chmod 0600 kubeconfig-$${DRONE_BUILD_NUMBER}.yaml",
-                                                    "printf '@@@@@@@@@@@@@@@@@@@@@@@\n@@@@ k3d is ready @@@@\n@@@@@@@@@@@@@@@@@@@@@@@\n'",
-                                                    "kubectl get events -Aw",
-                                                ],
-                                            },
-                                        ] if params["k3d"] else []),
+                                        (k3sCluster() if run_on_k3d else []),
                             "depends_on": getPipelineNames(buildOcisBinaryForTesting(ctx)),
                             "trigger": {
                                 "ref": [
@@ -1179,12 +1168,12 @@ def generateCoverageFromAPITest(ctx, name):
         },
     ]
 
-def localApiTests(ctx, name, suites, storage = "ocis", extra_environment = {}, with_remote_php = False, run_with_k3 = False):
+def localApiTests(ctx, name, suites, storage = "ocis", extra_environment = {}, with_remote_php = False, ocis_url = OCIS_URL):
     test_dir = "%s/tests/acceptance" % dirs["base"]
     expected_failures_file = "%s/expected-failures-localAPI-on-%s-storage.md" % (test_dir, storage.upper())
 
     environment = {
-        "TEST_SERVER_URL": OCIS_URL if not run_with_k3 else "https://ocis:9200",
+        "TEST_SERVER_URL": ocis_url,
         "TEST_SERVER_FED_URL": OCIS_FED_URL,
         "OCIS_REVA_DATA_ROOT": "%s" % (dirs["ocisRevaDataRoot"] if storage == "owncloud" else ""),
         "STORAGE_DRIVER": storage,
@@ -2641,19 +2630,9 @@ def ocisServer(storage = "ocis", volumes = [], depends_on = [], deploy_type = ""
             "%s/bin/ociswrapper serve --bin %s --url %s --admin-username admin --admin-password admin" % (dirs["ocisWrapper"], ocis_bin, environment["OCIS_URL"]),
         ]
 
-    wait_for_ocis = waitForServices("ocis", [OCIS_DOMAIN])[0]
-    if not external_idp:
-        wait_for_ocis = {
-            "name": "wait-for-%s" % (container_name),
-            "image": OC_CI_ALPINE,
-            "commands": [
-                # wait for ocis-server to be ready (5 minutes)
-                "timeout 300 bash -c 'while [ $(curl -sk -uadmin:admin " +
-                "%s/graph/v1.0/users/admin " % environment["OCIS_URL"] +
-                "-w %{http_code} -o /dev/null) != 200 ]; do sleep 1; done'",
-            ],
-            "depends_on": depends_on,
-        }
+    wait_for_ocis = waitForOcis(container_name, environment["OCIS_URL"], depends_on)
+    if external_idp:
+        wait_for_ocis = waitForServices("ocis", [OCIS_DOMAIN])
 
     commands = [
         "mkdir -p $GOCOVERDIR",
@@ -2662,19 +2641,16 @@ def ocisServer(storage = "ocis", volumes = [], depends_on = [], deploy_type = ""
         "cp tests/config/drone/app-registry.yaml /root/.ocis/config/app-registry.yaml",
     ] + (build_and_run_commands)
 
-    return [
-        {
-            "name": container_name,
-            "image": OC_CI_GOLANG,
-            "detach": True,
-            "environment": environment,
-            "user": user,
-            "commands": commands,
-            "volumes": volumes,
-            "depends_on": depends_on,
-        },
-        wait_for_ocis,
-    ]
+    return [{
+        "name": container_name,
+        "image": OC_CI_GOLANG,
+        "detach": True,
+        "environment": environment,
+        "user": user,
+        "commands": commands,
+        "volumes": volumes,
+        "depends_on": depends_on,
+    }] + wait_for_ocis
 
 def startOcisService(service = None, name = None, environment = {}, volumes = []):
     """
@@ -3600,6 +3576,19 @@ def k6LoadTests(ctx):
         },
     }]
 
+def waitForOcis(name = "ocis", ocis_url = OCIS_URL, depends_on = []):
+    return [{
+        "name": "wait-for-%s" % name,
+        "image": OC_CI_ALPINE,
+        "commands": [
+            # wait for ocis-server to be ready (5 minutes)
+            "timeout 300 bash -c 'while [ $(curl -sk -uadmin:admin " +
+            "%s/graph/v1.0/users/admin " % ocis_url +
+            "-w %{http_code} -o /dev/null) != 200 ]; do sleep 1; done'",
+        ],
+        "depends_on": depends_on,
+    }]
+
 def waitForServices(name, services = []):
     services = ",".join(services)
     return [{
@@ -3745,7 +3734,7 @@ def deleteStaleBranches(ctx):
         },
     }]
 
-def trivyScan():
+def trivyScan(ctx):
     steps = [
         {
             "name": "trivy-security-scan",
@@ -3779,54 +3768,38 @@ def trivyScan():
         },
     }
 
-def deployments():
-    result = {
-        "kind": "pipeline",
-        "type": "docker",
-        "name": "k3d",
-        "steps": waitk3() + install() + showPodsAfterInstall() + aftr(),
-        "services": [
-            {
-                "name": "k3d",
-                "image": "ghcr.io/k3d-io/k3d:5-dind",
-                "user": "root",
-                "privileged": True,
-                "commands": [
-                    "git clone https://github.com/owncloud/ocis-charts.git",
-                    "nohup dockerd-entrypoint.sh &",
-                    "until docker ps 2>&1 > /dev/null; do sleep 1s; done",
-                    "k3d cluster create --config ./ocis-charts/ci/k3d-drone.yaml --api-port k3d:443",
-                    "until kubectl get deployment coredns -n kube-system -o go-template='{{.status.availableReplicas}}' | grep -v -e '<no value>'; do sleep 1s; done",
-                    "k3d cluster list",
-                    "k3d kubeconfig get drone > kubeconfig-$${DRONE_BUILD_NUMBER}.yaml",
-                    "chmod 0600 kubeconfig-$${DRONE_BUILD_NUMBER}.yaml",
-                    "kubectl cluster-info",
-                    "printf '@@@@@@@@@@@@@@@@@@@@@@@\n@@@@ k3d is ready @@@@\n@@@@@@@@@@@@@@@@@@@@@@@\n'",
-                    "kubectl get events -Aw",
-                ],
-            },
-        ],
-        "depends_on": [],
-        "volumes": [
-            {
-                "name": "gopath",
-                "temp": {},
-            },
-        ],
-        "trigger": {
-            "ref": [
-                "refs/heads/master",
-                "refs/tags/**",
-                "refs/pull/**",
-            ],
-        },
-    }
-
-    return [result]
-
-def waitk3():
+def k3sCluster():
     return [{
-        "name": "wait",
+        "name": OCIS_SERVER_NAME,
+        "image": "ghcr.io/k3d-io/k3d:5-dind",
+        "user": "root",
+        "privileged": True,
+        "commands": [
+            "git clone --single-branch --branch main --depth 1 https://github.com/owncloud/ocis-charts.git",
+            "nohup dockerd-entrypoint.sh &",
+            "until docker ps 2>&1 > /dev/null; do sleep 1s; done",
+            # create cluster
+            "k3d cluster create drone --api-port %s:33199 " % OCIS_SERVER_NAME +
+            "-p '80:80@loadbalancer' -p '443:443@loadbalancer' " +
+            "--k3s-arg '--tls-san=k3d@server:*' --k3s-arg '--disable=metrics-server@server:*'",
+            # wait for services to be ready
+            "until kubectl get deployment coredns -n kube-system -o go-template='{{.status.availableReplicas}}' | grep -v -e '<no value>'; do sleep 1s; done",
+            "until kubectl get deployment traefik -n kube-system -o go-template='{{.status.availableReplicas}}' | grep -v -e '<no value>'; do sleep 1s; done",
+            "k3d kubeconfig get drone > kubeconfig-$${DRONE_BUILD_NUMBER}.yaml",
+            "chmod 0600 kubeconfig-$${DRONE_BUILD_NUMBER}.yaml",
+            "printf '@@@@@@@@@@@@@@@@@@@@@@@\n@@@@ k3d is ready @@@@\n@@@@@@@@@@@@@@@@@@@@@@@\n'",
+            # add dns rewrite rule
+            "kubectl create configmap coredns-custom --namespace kube-system " +
+            "--from-literal='rewritehost.override=rewrite name exact %s host.k3d.internal'" % OCIS_SERVER_NAME,
+            "kubectl -n kube-system rollout restart deployment coredns",
+            # watch events
+            "kubectl get events -Aw",
+        ],
+    }]
+
+def waitK3sCluster():
+    return [{
+        "name": "wait-cluster",
         "image": "docker.io/bitnami/kubectl:1.31",
         "user": "root",
         "commands": [
@@ -3835,6 +3808,23 @@ def waitk3():
             "kubectl config view",
             "kubectl get pods -A",
         ],
+    }]
+
+def deployOcis():
+    return [{
+        "name": "deploy-ocis",
+        "image": "owncloudci/golang:latest",
+        "commands": [
+            "mv %s/tests/config/drone/k3s/values.yaml %s/ocis-charts/charts/ocis/ci/deployment-values.yaml" % (dirs["base"], dirs["base"]),
+            "cp -r %s/tests/config/drone/k3s/authbasic %s/ocis-charts/charts/ocis/templates/" % (dirs["base"], dirs["base"]),
+            "cd %s/ocis-charts" % dirs["base"],
+            "sed -i '/{{- define \"ocis.basicServiceTemplates\" -}}/a\\\\  {{- $_ := set .scope \"appNameAuthBasic\" \"authbasic\" -}}' ./charts/ocis/templates/_common/_tplvalues.tpl",
+            "sed -i '/- name: IDM_ADMIN_PASSWORD/{n;N;N;N;d;}' ./charts/ocis/templates/idm/deployment.yaml",
+            "sed -i '/- name: IDM_ADMIN_PASSWORD/a\\\\\\n              value: \"admin\"' ./charts/ocis/templates/idm/deployment.yaml",
+            "sed -i '/- name: PROXY_HTTP_ADDR/i\\\\            - name: PROXY_ENABLE_BASIC_AUTH\\\n              value: \"true\"' ./charts/ocis/templates/proxy/deployment.yaml",
+            "export KUBECONFIG=%s/kubeconfig-$${DRONE_BUILD_NUMBER}.yaml" % dirs["base"],
+            "make helm-install-atomic",
+        ],
         "volumes": [
             {
                 "name": "gopath",
@@ -3843,67 +3833,16 @@ def waitk3():
         ],
     }]
 
-def showPodsAfterInstall():
+def ocisServicePods():
     return [{
-        "name": "testPodsAfterInstall",
-        "image": "docker.io/bitnami/kubectl:1.31",
+        "name": "ocis-pods",
+        "image": "ghcr.io/k3d-io/k3d:5-dind",
         "user": "root",
         "commands": [
             "export KUBECONFIG=kubeconfig-$${DRONE_BUILD_NUMBER}.yaml",
             "until test -f $${KUBECONFIG}; do sleep 1s; done",
-            "kubectl get pods -n ocis",
-            "if [ \"$(kubectl get pods -n ocis --field-selector status.phase=Running | wc -l)\" -le \"33\" ]; then exit 1; fi",  # there are 32 pods + 1 header line
-            "kubectl get ingress -n ocis",
-            "if [ \"$(kubectl get ingress -n ocis | wc -l)\" -le \"1\" ]; then exit 1; fi",
-            "kubectl get services",
-            "kubectl get ingress -n ocis",
-            "kubectl get ingress -n ocis -o jsonpath='{.items[*].spec.rules[*].host}'",
-            # "kubectl port-forward -n ocis svc/proxy 9200:9200 &",
-            # "sleep 5",
-            "kubectl get svc --namespace default ocis -o jsonpath='{.status.loadBalancer.ingress[0].ip}'",
-            "kubectl get --namespace default -o jsonpath='{.spec.ports[0].port}' services ocis",
-            "kubectl describe ingress -n ocis",
-            "kubectl get all",
-            "kubectl -n ocis get secrets/admin-user --template='{{.data.password | base64decode | printf \"%s\" }}'",
-        ],
-        "volumes": [
-            {
-                "name": "gopath",
-                "path": "/go",
-            },
-        ],
-    }]
-
-def install():
-    return [{
-        "name": "ocis",
-        "image": "owncloudci/golang:latest",
-        "commands": [
-            "cd /drone/src/ocis-charts",
-            "export KUBECONFIG=/drone/src/kubeconfig-$${DRONE_BUILD_NUMBER}.yaml",
-            "make helm-install-atomic",
-            # "curl -kv https://k3d:6445/graph/v1.0/me -uadmin:admin",
-            # "curl -kv https://ocis/graph/v1.0/me -uadmin:admin",
-        ],
-        "volumes": [
-            {
-                "name": "gopath",
-                "path": "/go",
-            },
-        ],
-    }]
-
-def aftr():
-    return [{
-        "name": "aftr",
-        "image": "owncloudci/golang:latest",
-        "commands": [
-            "curl -kv https://ocis/graph/v1.0/me -uadmin:admin",
-        ],
-        "volumes": [
-            {
-                "name": "gopath",
-                "path": "/go",
-            },
+            "kubectl get pods -A",
+            "kubectl get ingress -A",
+            "kubectl get svc -A",
         ],
     }]
