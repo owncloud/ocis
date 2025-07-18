@@ -471,7 +471,7 @@ func (g Webdav) sendThumbnailResponse(rsp *thumbnailssvc.GetThumbnailResponse, w
 		// Timeout: time.Second * 5,
 	}
 
-	dlReq, err := http.NewRequest(http.MethodGet, rsp.DataEndpoint, http.NoBody)
+	dlReq, err := tracing.GetNewRequest(r.Context(), http.MethodGet, rsp.DataEndpoint, http.NoBody)
 	if err != nil {
 		renderError(w, r, errInternalError(err.Error()))
 		logger.Error().Err(err).Msg("could not create download thumbnail request")
