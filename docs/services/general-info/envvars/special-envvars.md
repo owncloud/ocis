@@ -73,6 +73,8 @@ It can happen that extended envvars are found but do not need to be published as
 
 ### Fixing Changed Items
 
+If there is a change in `extended_vars.yaml` which you can identify via git when running e.g. `make -C docs docs-generate`, read the [General Info](#general-info) section first and follow the items listed below afterwards.
+
 - **Fixing Items**\
   If an item has been identified as additionally added such as there was a change in the code location only, it is mostly sufficient to just fix the line number in the `path` key of the existing/correct one and double check by removing the newly added ones. Then, re-run `make -C docs docs-generate`. If the fix was correct, no new items of the same will re-appear.
 
