@@ -18,10 +18,11 @@ from urllib.request import urlopen
 ## create a branch to prepare the changes
 
 # CHANGE according your needs
-# old is the base version to compare from
-# new is the target version to compare to
-# tagged versions must be of format: 'tags/v6.0.0'
-# master is different, it must be:   'heads/master'
+# old is the base version to compare from which is always a tagged release
+# new is the target version to compare to and can be a branch or tagged
+# tagged versions must be of format:            'tags/v7.1.0'
+# branches are different, master or stable-x.y: 'heads/master'
+# stick with master because the follow up process is much easier and you avoid confusion
 versionOld: str = 'tags/v7.1.0'
 versionNew: str = 'heads/master'
 

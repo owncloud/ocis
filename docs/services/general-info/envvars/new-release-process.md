@@ -16,7 +16,7 @@ The following can be done at any time but it must be done *latest* when no envva
 
 ## Special Scope Envvars
 
-Ask the developers if envvars of this type have been changed (added or removed). See the [Special Envvars]({{< ref "./special-envvars.md" >}}) documentation for more details on how to manage such a change.
+Ask the developers if envvars of this type have been changed (added or removed). See the [Special Envvars]({{< ref "./special-envvars.md#special-scope-envvars" >}}) documentation for more details on how to manage such a change.
 
 ## Extended Envvars
 
@@ -28,20 +28,20 @@ If so, process [Extended Envvars - Fixing Changed Item]({{< ref "./special-envva
 
 ## Ordinary Envvars
 
-### Maintain env_vars.yaml
+### Maintain the 'env_vars.yaml' File
 
 This is **mandatory for a new release** !
 
 * Run from the ocis root `make -C docs docs-generate`\
 Any changes in `env_vars.yaml` are now considered.
-* This file will most likely show changes and merging them is essential as base for added/removed or deprecated envvars. Note that this file will get additions/updates only, but things never get deleted automatically !!\
+* This file will most likely show changes and merging them is essential as **base for added/removed or deprecated envvars**. Note that this file will get additions/updates only, but items never get deleted automatically !!\
 {{< hint info >}}
-Note that due to how the code is currently designed, things may get shifted around though no real changes have been introduced.
+Note that due to how the code is currently designed, **things may get shifted** around though no real changes have been introduced.
 {{< /hint >}}
 * First, check if any **alphabetic code names** are present in the changes. See [Introduce new Envvars]({{< ref "./envvar-naming-scopes.md/#introduce-new-envvars" >}}).
-  * If so, create a new branch and replace them **in the sourcing service** with the actual semantic version (e.g. `releaseX` → `7.2.0`) first. Note that ALL of major, minor and patch numbers must be present, including patch == `0`.
+  * If so, create a new branch and replace them in the **service containing the source** with the actual semantic version (e.g. `releaseX` → `7.2.0`) first. Note that ALL of major, minor and patch numbers must be present, including patch versions == `0`.
   * If all changes are applied, rerun `make -C docs docs-generate` and check if all changes are incorporated in the yaml file.
-  * Create a PR and merge these changes, dont forget to rebase master afterwards...
+  * Create a PR and merge these changes, dont forget to do a local pull of master afterwards...
 * With a new branch, remove all envvars from the `env_vars.yaml` file manually that have formerly been deprecated and removed from the code.
 * Commit the changes and merge it.\
 Now `env_vars.yaml` is up to date on the repo in master, next steps are based on this state!
