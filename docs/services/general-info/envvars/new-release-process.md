@@ -48,4 +48,4 @@ Now `env_vars.yaml` is up to date on the repo in master, next steps are based on
 
 ### Create Envvar Delta Files
 
-* Create [Envvar Deltas Between Versions]({{< ref "./env-var-deltas/_index.md" >}}) files according the linked description.
+* Create [Envvar Deltas Between Versions]({{< ref "./env-var-deltas/" >}}) files according the linked description.
