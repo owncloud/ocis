@@ -11,6 +11,7 @@ import (
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
 	revactx "github.com/owncloud/reva/v2/pkg/ctx"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
 )
@@ -66,7 +67,7 @@ func (s cs3) Retrieve(ctx context.Context, rID *provider.ResourceId) (io.ReadClo
 		ep, tt = res.Protocols[0].DownloadEndpoint, res.Protocols[0].Token
 	}
 
-	req, err := http.NewRequest(http.MethodGet, ep, nil)
+	req, err := tracing.GetNewRequest(ctx, http.MethodGet, ep, nil)
 	if err != nil {
 		return nil, err
 	}

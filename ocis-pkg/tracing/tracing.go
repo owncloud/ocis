@@ -3,6 +3,8 @@ package tracing
 import (
 	"context"
 	"fmt"
+	"io"
+	"net/http"
 	"net/url"
 	"reflect"
 	"strings"
@@ -171,4 +173,44 @@ func parseAgentConfig(ae string) (string, string, error) {
 		return "", "", fmt.Errorf(ERR_INVALID_AGENT_ENDPOINT, ae)
 	}
 	return p[0], p[1], nil
+}
+
+// GetNewRequest gets a new HTTP request with tracing data coming from the
+// provided context. Note that the provided context will NOT be used for the
+// request, just to get the data.
+// The request will have a new "context.Background()" context associated. This
+// means that cancelling the provided context will NOT stop the request.
+func GetNewRequest(injectCtx context.Context, method, url string, body io.Reader) (*http.Request, error) {
+	return GetNewRequestWithDifferentContext(context.Background(), injectCtx, method, url, body)
+}
+
+// GetNewRequestWithContext gets a new HTTP request with tracing data coming
+// from the provided context. The request will also have the same provided
+// context associated (in case the context is cancelled)
+func GetNewRequestWithContext(ctx context.Context, method, url string, body io.Reader) (*http.Request, error) {
+	return GetNewRequestWithDifferentContext(ctx, ctx, method, url, body)
+}
+
+// GetNewRequestWithDifferentContext gets a new HTTP request with tracing
+// data coming from the "injectCtx" context. The "reqCtx" context will be
+// associated with the request.
+//
+// This method is intended to be used if you want to associate a context
+// with a request, and at the same time use a different context to get the
+// tracing info.
+func GetNewRequestWithDifferentContext(reqCtx, injectCtx context.Context, method, url string, body io.Reader) (*http.Request, error) {
+	req, err := http.NewRequestWithContext(reqCtx, method, url, body)
+	if err != nil {
+		return req, err
+	}
+
+	InjectTracingHeaders(injectCtx, req)
+	return req, nil
+}
+
+// InjectTracingHeaders sets the tracing info from the context as HTTP headers
+// in the provided request.
+func InjectTracingHeaders(ctx context.Context, req *http.Request) {
+	propagator := GetPropagator()
+	propagator.Inject(ctx, propagation.HeaderCarrier(req.Header))
 }
