@@ -70,6 +70,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Return translated role definitions: [#11466](https://github.com/owncloud/ocis/pull/11466)
 * Bugfix - Tolerating the empty request body for WebDAV: [#11516](https://github.com/owncloud/ocis/pull/11516)
 * Bugfix - Fix space root handling in a sharedByMe: [#11533](https://github.com/owncloud/ocis/pull/11533)
+* Bugfix - Fix the create link endpoint: [#11542](https://github.com/owncloud/ocis/pull/11542)
 * Enhancement - Add GetPermission API: [#8616](https://github.com/owncloud/ocis/issues/8616)
 * Enhancement - Bump importer app: [#10880](https://github.com/owncloud/ocis/pull/10880)
 * Enhancement - Allow scaling the search service: [#11029](https://github.com/owncloud/ocis/pull/11029)
@@ -103,6 +104,14 @@ The following sections list the changes for unreleased.
    Fix space root handling in a graph sharedByMe
 
    https://github.com/owncloud/ocis/pull/11533
+
+* Bugfix - Fix the create link endpoint: [#11542](https://github.com/owncloud/ocis/pull/11542)
+
+   We fixed an issue when Shares drive can be shared via link share with Internal
+   role using permissions endpoint
+
+   https://github.com/owncloud/ocis/issues/11409
+   https://github.com/owncloud/ocis/pull/11542
 
 * Enhancement - Add GetPermission API: [#8616](https://github.com/owncloud/ocis/issues/8616)
 
