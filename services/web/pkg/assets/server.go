@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"path"
 	"path/filepath"
+	"strings"
 
 	"golang.org/x/net/html"
 )
@@ -22,8 +23,8 @@ func FileServer(fsys fs.FS) http.Handler {
 }
 
 func isSafePath(p string) bool {
-	return true // Debugging
-	// return !strings.Contains(p, "..")
+	// return true // Debugging
+	return !strings.Contains(p, "..")
 }
 
 func (f *fileServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
