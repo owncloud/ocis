@@ -1,6 +1,6 @@
 ---
 title: Auth-Basic
-date: 2025-07-18T00:41:04.212949272Z
+date: 2025-07-19T00:40:55.625292955Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/auth-basic
