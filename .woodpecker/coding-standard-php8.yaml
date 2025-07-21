@@ -1,0 +1,51 @@
+depends_on: []
+kind: pipeline
+steps:
+  - image: owncloudci/drone-skip-pipeline
+    name: skip-if-unchanged
+    settings:
+      ALLOW_SKIP_CHANGED:
+        - ^.github/.*
+        - ^.vscode/.*
+        - ^changelog/.*
+        - ^docs/.*
+        - ^deployments/.*
+        - CHANGELOG.md
+        - CONTRIBUTING.md
+        - LICENSE
+        - README.md
+        - .*_test.go$
+    when:
+      event:
+        - pull_request
+  - commands:
+      - make vendor-bin-codestyle
+    environment:
+      COMPOSER_HOME: /drone/src/.cache/composer
+    image: owncloudci/php:8.4
+    name: vendorbin-codestyle
+  - commands:
+      - make vendor-bin-codesniffer
+    environment:
+      COMPOSER_HOME: /drone/src/.cache/composer
+    image: owncloudci/php:8.4
+    name: vendorbin-codesniffer
+  - commands:
+      - make test-php-style
+    environment:
+      PHP_CS_FIXER_IGNORE_ENV: "true"
+    image: owncloudci/php:8.4
+    name: php-style
+  - commands:
+      - make check-env-var-annotations
+    image: owncloudci/php:8.4
+    name: check-env-var-annotations
+trigger:
+  ref:
+    - refs/heads/master
+    - refs/heads/stable-*
+    - refs/pull/**
+type: docker
+workspace:
+  base: /drone
+  path: src

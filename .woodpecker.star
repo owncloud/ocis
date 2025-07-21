@@ -7,6 +7,8 @@
 # - omit 'v' prefix
 PRODUCTION_RELEASE_TAGS = ["5.0", "7"]
 
+
+
 # images
 ALPINE_GIT = "alpine/git:latest"
 APACHE_TIKA = "apache/tika:2.8.0.0"

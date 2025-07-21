@@ -1,0 +1,78 @@
+kind: pipeline
+platform:
+  arch: amd64
+  os: linux
+steps:
+  - image: owncloudci/drone-skip-pipeline
+    name: skip-if-unchanged
+    settings:
+      ALLOW_SKIP_CHANGED:
+        - ^.github/.*
+        - ^.vscode/.*
+        - ^changelog/.*
+        - ^docs/.*
+        - ^deployments/.*
+        - CHANGELOG.md
+        - CONTRIBUTING.md
+        - LICENSE
+        - README.md
+        - ^tests/acceptance/.*
+    when:
+      event:
+        - pull_request
+  - commands:
+      - mc alias set s3 $MC_HOST $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY
+      - bash -x /drone/src/tests/config/drone/check_go_bin_cache.sh /drone/src go-bin.tar.gz
+    environment:
+      AWS_ACCESS_KEY_ID:
+        from_secret: cache_s3_access_key
+      AWS_SECRET_ACCESS_KEY:
+        from_secret: cache_s3_secret_key
+      CACHE_BUCKET: cache
+      MC_HOST: https://cache.owncloud.com
+    image: minio/mc:RELEASE.2021-10-07T04-19-58Z
+    name: check-go-bin-cache
+  - commands:
+      - make bingo-update
+    environment:
+      HTTP_PROXY:
+        from_secret: drone_http_proxy
+      HTTPS_PROXY:
+        from_secret: drone_http_proxy
+    image: owncloudci/golang:1.24
+    name: bingo-get
+    volumes:
+      - name: gopath
+        path: /go
+  - commands:
+      - tar -czvf /drone/src/go-bin.tar.gz /go/bin
+    image: owncloud/ubuntu:20.04
+    name: archive-go-bin
+    volumes:
+      - name: gopath
+        path: /go
+  - commands:
+      - BINGO_HASH=$(cat /drone/src/.bingo_hash)
+      - mc alias set s3 $MC_HOST $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY
+      - mc cp -r /drone/src/go-bin.tar.gz s3/$CACHE_BUCKET/ocis/go-bin/$BINGO_HASH
+    environment:
+      AWS_ACCESS_KEY_ID:
+        from_secret: cache_s3_access_key
+      AWS_SECRET_ACCESS_KEY:
+        from_secret: cache_s3_secret_key
+      CACHE_BUCKET: cache
+      MC_HOST: https://cache.owncloud.com
+    image: minio/mc:RELEASE.2021-10-07T04-19-58Z
+    name: cache-go-bin
+    volumes:
+      - name: gopath
+        path: /go
+trigger:
+  ref:
+    - refs/heads/master
+    - refs/heads/stable-*
+    - refs/pull/**
+type: docker
+volumes:
+  - name: gopath
+    temp: {}

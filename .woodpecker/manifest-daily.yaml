@@ -1,0 +1,37 @@
+depends_on:
+  - docker-arm64-daily
+  - docker-amd64-daily
+kind: pipeline
+platform:
+  arch: amd64
+  os: linux
+steps:
+  - image: plugins/manifest:1
+    name: execute
+    settings:
+      auto_tag: false
+      ignore_missing: true
+      password:
+        from_secret: docker_password
+      spec: ocis/docker/manifest.tmpl
+      username:
+        from_secret: docker_username
+  - image: plugins/manifest:1
+    name: execute-latest
+    settings:
+      auto_tag: true
+      ignore_missing: true
+      password:
+        from_secret: docker_password
+      spec: ocis/docker/manifest-latest.tmpl
+      username:
+        from_secret: docker_username
+    when:
+      ref:
+        - refs/tags/v*
+trigger:
+  ref:
+    - refs/heads/master
+    - refs/heads/stable-*
+    - refs/tags/v*
+type: docker

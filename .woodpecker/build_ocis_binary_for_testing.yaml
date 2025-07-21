@@ -1,0 +1,92 @@
+kind: pipeline
+platform:
+  arch: amd64
+  os: linux
+steps:
+  - image: owncloudci/drone-skip-pipeline
+    name: skip-if-unchanged
+    settings:
+      ALLOW_SKIP_CHANGED:
+        - ^.github/.*
+        - ^.vscode/.*
+        - ^changelog/.*
+        - ^docs/.*
+        - ^deployments/.*
+        - CHANGELOG.md
+        - CONTRIBUTING.md
+        - LICENSE
+        - README.md
+        - .*_test.go$
+    when:
+      event:
+        - pull_request
+  - commands:
+      - pnpm config set store-dir ./.pnpm-store
+      - retry -t 3 'make ci-node-generate'
+    environment:
+      CHROMEDRIVER_SKIP_DOWNLOAD: "true"
+    image: owncloudci/nodejs:22
+    name: generate nodejs
+    volumes:
+      - name: gopath
+        path: /go
+  - commands:
+      - retry -t 3 'make ci-go-generate'
+    environment:
+      HTTP_PROXY:
+        from_secret: drone_http_proxy
+      HTTPS_PROXY:
+        from_secret: drone_http_proxy
+    image: owncloudci/golang:1.24
+    name: generate go
+    volumes:
+      - name: gopath
+        path: /go
+  - commands:
+      - retry -t 3 'make -C ocis build'
+    environment:
+      HTTP_PROXY:
+        from_secret: drone_http_proxy
+      HTTPS_PROXY:
+        from_secret: drone_http_proxy
+    image: owncloudci/golang:1.24
+    name: build
+    volumes:
+      - name: gopath
+        path: /go
+  - commands:
+      - retry -t 3 'make -C ocis build-debug'
+    environment:
+      HTTP_PROXY:
+        from_secret: drone_http_proxy
+      HTTPS_PROXY:
+        from_secret: drone_http_proxy
+    image: owncloudci/golang:1.24
+    name: build debug binary
+    volumes:
+      - name: gopath
+        path: /go
+  - image: plugins/s3-cache:1
+    name: rebuild_ocis-binary-amd64_build_artifact_cache
+    settings:
+      access_key:
+        from_secret: cache_s3_access_key
+      endpoint: https://cache.owncloud.com
+      fallback_path: cache/opencloud-eu/opencloud/-${DRONE_BUILD_NUMBER}
+      filename: ocis-binary-amd64_build_artifact_cache.tar
+      mount:
+        - ocis/bin
+      path: cache/opencloud-eu/opencloud/-${DRONE_BUILD_NUMBER}
+      rebuild: "true"
+      restore: "false"
+      secret_key:
+        from_secret: cache_s3_secret_key
+trigger:
+  ref:
+    - refs/heads/master
+    - refs/heads/stable-*
+    - refs/pull/**
+type: docker
+volumes:
+  - name: gopath
+    temp: {}

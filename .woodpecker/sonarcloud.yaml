@@ -1,0 +1,83 @@
+depends_on:
+  - litmus
+  - cs3ApiTests
+  - wopiValidatorTests-builtin
+  - wopiValidatorTests-cs3
+  - API-contractAndLock
+  - API-settingsAndNotification
+  - API-graphUser
+  - API-spaces
+  - API-spacesShares
+  - API-davOperations
+  - API-groupAndSearch1
+  - API-search2
+  - API-sharingNg1
+  - API-sharingNgAdditionalShareRole
+  - API-sharingNgShareInvitation
+  - API-sharingNgLinkShare
+  - API-antivirus
+  - API-ocmAndAuthApp
+  - API-wopi
+  - CLI-cliCommands
+  - Core-API-1
+  - Core-API-2
+  - Core-API-3
+  - Core-API-4
+  - Core-API-5
+  - Core-API-6
+  - Core-API-7
+  - Core-API-8
+  - e2e-tests-part-1
+  - e2e-tests-part-2
+  - e2e-tests-part-3
+  - e2e-tests-part-4
+  - e2e-tests-search
+  - e2e-tests-keycloak
+kind: pipeline
+platform:
+  arch: amd64
+  os: linux
+steps:
+  - commands:
+      - mkdir -p results
+      - mc alias set cache $MC_HOST $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY
+      - mc mirror cache/$CACHE_BUCKET/opencloud-eu/opencloud/-${DRONE_BUILD_NUMBER}/coverage results/
+    environment:
+      AWS_ACCESS_KEY_ID:
+        from_secret: cache_s3_access_key
+      AWS_SECRET_ACCESS_KEY:
+        from_secret: cache_s3_secret_key
+      CACHE_BUCKET: cache
+      MC_HOST: https://cache.owncloud.com
+    image: minio/mc:RELEASE.2021-10-07T04-19-58Z
+    name: sync-from-cache
+  - commands:
+      - mv sonar-project.properties sonar-project.properties.skip
+      - mv tests/acceptance/sonar-project.properties sonar-project.properties
+    image: owncloud/ubuntu:20.04
+    name: sonarcloud-properties
+  - environment:
+      SONAR_TOKEN:
+        from_secret: sonarcloud_acceptance_tests
+    image: sonarsource/sonar-scanner-cli:11.0
+    name: sonarcloud
+  - commands:
+      - mc alias set cache $MC_HOST $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY
+      - mc rm --recursive --force cache/$CACHE_BUCKET/opencloud-eu/opencloud/-${DRONE_BUILD_NUMBER}
+    environment:
+      AWS_ACCESS_KEY_ID:
+        from_secret: cache_s3_access_key
+      AWS_SECRET_ACCESS_KEY:
+        from_secret: cache_s3_secret_key
+      CACHE_BUCKET: cache
+      MC_HOST: https://cache.owncloud.com
+    image: minio/mc:RELEASE.2021-10-07T04-19-58Z
+    name: purge-cache
+trigger:
+  ref:
+    - refs/heads/master
+    - refs/heads/stable-*
+  status:
+    - success
+    - failure
+type: docker

@@ -1,0 +1,171 @@
+depends_on:
+  - build_ocis_binary_for_testing
+kind: pipeline
+platform:
+  arch: amd64
+  os: linux
+services: []
+steps:
+  - image: owncloudci/drone-skip-pipeline
+    name: skip-if-unchanged
+    settings:
+      ALLOW_SKIP_CHANGED:
+        - ^.github/.*
+        - ^.vscode/.*
+        - ^changelog/.*
+        - ^docs/.*
+        - ^deployments/.*
+        - CHANGELOG.md
+        - CONTRIBUTING.md
+        - LICENSE
+        - README.md
+        - .*_test.go$
+    when:
+      event:
+        - pull_request
+  - image: plugins/s3-cache:1
+    name: restore_ocis-binary-amd64_build_artifact_cache
+    settings:
+      access_key:
+        from_secret: cache_s3_access_key
+      endpoint: https://cache.owncloud.com
+      fallback_path: cache/opencloud-eu/opencloud/-${DRONE_BUILD_NUMBER}
+      filename: ocis-binary-amd64_build_artifact_cache.tar
+      mount:
+        - ocis/bin
+      path: cache/opencloud-eu/opencloud/-${DRONE_BUILD_NUMBER}
+      rebuild: "false"
+      restore: "true"
+      secret_key:
+        from_secret: cache_s3_secret_key
+  - commands:
+      - mkdir -p $GOCOVERDIR
+      - ocis/bin/ocis-debug init --insecure true
+      - cat $OCIS_CONFIG_DIR/ocis.yaml
+      - cp tests/config/drone/app-registry.yaml /root/.ocis/config/app-registry.yaml
+      - make -C /drone/src/tests/ociswrapper build
+      - /drone/src/tests/ociswrapper/bin/ociswrapper serve --bin ocis/bin/ocis-debug --url https://ocis-server:9200 --admin-username admin --admin-password admin
+    depends_on: []
+    detach: true
+    environment:
+      ACTIVITYLOG_DEBUG_ADDR: 0.0.0.0:9197
+      APP_PROVIDER_DEBUG_ADDR: 0.0.0.0:9165
+      APP_REGISTRY_DEBUG_ADDR: 0.0.0.0:9243
+      AUTH_BASIC_DEBUG_ADDR: 0.0.0.0:9147
+      AUTH_MACHINE_DEBUG_ADDR: 0.0.0.0:9167
+      AUTH_SERVICE_DEBUG_ADDR: 0.0.0.0:9198
+      CLIENTLOG_DEBUG_ADDR: 0.0.0.0:9260
+      EVENTHISTORY_DEBUG_ADDR: 0.0.0.0:9270
+      EVENTHISTORY_STORE: memory
+      FRONTEND_DEBUG_ADDR: 0.0.0.0:9141
+      FRONTEND_SEARCH_MIN_LENGTH: "2"
+      GATEWAY_DEBUG_ADDR: 0.0.0.0:9143
+      GOCOVERDIR: reports
+      GRAPH_DEBUG_ADDR: 0.0.0.0:9124
+      GROUPS_DEBUG_ADDR: 0.0.0.0:9161
+      IDM_ADMIN_PASSWORD: admin
+      IDM_CREATE_DEMO_USERS: true
+      IDM_DEBUG_ADDR: 0.0.0.0:9239
+      IDP_DEBUG_ADDR: 0.0.0.0:9134
+      INVITATIONS_DEBUG_ADDR: 0.0.0.0:9269
+      NATS_DEBUG_ADDR: 0.0.0.0:9234
+      NATS_NATS_HOST: 0.0.0.0
+      NATS_NATS_PORT: 9233
+      OCDAV_DEBUG_ADDR: 0.0.0.0:9163
+      OCIS_ASYNC_UPLOADS: true
+      OCIS_CONFIG_DIR: /root/.ocis/config
+      OCIS_EVENTS_ENABLE_TLS: false
+      OCIS_JWT_SECRET: some-ocis-jwt-secret
+      OCIS_LOG_LEVEL: error
+      OCIS_TRANSLATION_PATH: /drone/src/tests/config/translations
+      OCIS_URL: https://ocis-server:9200
+      OCM_DEBUG_ADDR: 0.0.0.0:9281
+      OCS_DEBUG_ADDR: 0.0.0.0:9114
+      POSTPROCESSING_DEBUG_ADDR: 0.0.0.0:9255
+      PROXY_DEBUG_ADDR: 0.0.0.0:9205
+      PROXY_ENABLE_BASIC_AUTH: true
+      SEARCH_DEBUG_ADDR: 0.0.0.0:9224
+      SETTINGS_DEBUG_ADDR: 0.0.0.0:9194
+      SHARING_DEBUG_ADDR: 0.0.0.0:9151
+      SSE_DEBUG_ADDR: 0.0.0.0:9139
+      STORAGE_PUBLICLINK_DEBUG_ADDR: 0.0.0.0:9179
+      STORAGE_SHARES_DEBUG_ADDR: 0.0.0.0:9156
+      STORAGE_SYSTEM_DEBUG_ADDR: 0.0.0.0:9217
+      STORAGE_USERS_DEBUG_ADDR: 0.0.0.0:9159
+      STORAGE_USERS_DRIVER: ocis
+      THUMBNAILS_DEBUG_ADDR: 0.0.0.0:9189
+      THUMBNAILS_TXT_FONTMAP_FILE: /drone/src/tests/config/drone/fontsMap.json
+      USERLOG_DEBUG_ADDR: 0.0.0.0:9214
+      USERS_DEBUG_ADDR: 0.0.0.0:9145
+      WEB_DEBUG_ADDR: 0.0.0.0:9104
+      WEB_UI_CONFIG_FILE: /drone/src/tests/config/drone/ocis-config.json
+      WEBDAV_DEBUG_ADDR: 0.0.0.0:9119
+      WEBFINGER_DEBUG_ADDR: 0.0.0.0:9279
+    image: owncloudci/golang:1.24
+    name: ocis-server
+    user: "0:0"
+    volumes: []
+  - commands:
+      - timeout 300 bash -c 'while [ $(curl -sk -uadmin:admin https://ocis-server:9200/graph/v1.0/users/admin -w %{http_code} -o /dev/null) != 200 ]; do sleep 1; done'
+    depends_on: []
+    image: owncloudci/alpine:latest
+    name: wait-for-ocis-server
+  - commands:
+      - ""
+      - make -C /drone/src test-acceptance-api
+    environment:
+      BEHAT_FILTER_TAGS: ~@skip&&~@skipOnGraph&&~@skipOnOcis-OCIS-Storage
+      BEHAT_SUITES: apiSpaces
+      COLLABORATION_SERVICE_URL: http://wopi-fakeoffice:9300
+      EXPECTED_FAILURES_FILE: /drone/src/tests/acceptance/expected-failures-localAPI-on-OCIS-storage.md
+      OCIS_REVA_DATA_ROOT: ""
+      OCIS_WRAPPER_URL: http://ocis-server:5200
+      STORAGE_DRIVER: ocis
+      TEST_SERVER_FED_URL: https://federation-ocis-server:10200
+      TEST_SERVER_URL: https://ocis-server:9200
+      UPLOAD_DELETE_WAIT_TIME: 0
+      WITH_REMOTE_PHP: true
+    image: owncloudci/php:8.4
+    name: localApiTests-spaces
+    volumes:
+      - name: storage
+        path: /root/.ocis
+  - commands:
+      - cat /drone/src/tests/acceptance/logs/failed.log
+    image: owncloudci/php:8.4
+    name: api-test-failure-logs
+    when:
+      status:
+        - failure
+  - commands:
+      - go tool covdata percent -i=$GOCOVERDIR -o=coverage-spaces.out
+    environment:
+      GOCOVERDIR: reports
+    image: owncloudci/golang:1.24
+    name: coverageReport-spaces
+  - commands:
+      - mkdir -p cache/acceptance/coverage/
+      - mv coverage-spaces.out cache/acceptance/coverage/
+    image: owncloud/ubuntu:20.04
+    name: coverage-locate
+  - image: plugins/s3:1
+    name: coverage-cache-1
+    settings:
+      access_key:
+        from_secret: cache_s3_access_key
+      bucket: cache
+      endpoint: https://cache.owncloud.com
+      path_style: true
+      secret_key:
+        from_secret: cache_s3_secret_key
+      source: cache/acceptance/coverage/coverage-spaces.out
+      target: opencloud-eu/opencloud/-${DRONE_BUILD_NUMBER}/coverage
+trigger:
+  ref:
+    - refs/heads/master
+    - refs/heads/stable-*
+    - refs/pull/**
+type: docker
+volumes:
+  - name: storage
+    temp: {}

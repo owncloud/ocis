@@ -1,0 +1,16 @@
+kind: pipeline
+steps:
+  - commands:
+      - ./scripts/delete-stale-branches.sh || true
+    image: owncloudci/alpine:latest
+    name: delete stale branches
+    settings:
+      netrc_machine: github.com
+      netrc_password:
+        from_secret: github_token
+      netrc_username:
+        from_secret: github_username
+trigger:
+  ref:
+    - refs/heads/master
+type: docker

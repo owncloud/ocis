@@ -1,0 +1,58 @@
+kind: pipeline
+platform:
+  arch: amd64
+  os: linux
+steps:
+  - commands:
+      - make docs-generate
+    environment:
+      HTTP_PROXY:
+        from_secret: drone_http_proxy
+      HTTPS_PROXY:
+        from_secret: drone_http_proxy
+    image: owncloudci/golang:1.24
+    name: docs-generate
+  - commands:
+      - make -C docs docs-copy
+    environment:
+      HTTP_PROXY:
+        from_secret: drone_http_proxy
+      HTTPS_PROXY:
+        from_secret: drone_http_proxy
+    image: owncloudci/golang:1.24
+    name: prepare
+  - commands:
+      - make -C docs test
+    environment:
+      HTTP_PROXY:
+        from_secret: drone_http_proxy
+      HTTPS_PROXY:
+        from_secret: drone_http_proxy
+    image: owncloudci/golang:1.24
+    name: test
+  - image: plugins/gh-pages:1
+    name: publish
+    settings:
+      copy_contents: "true"
+      delete: "true"
+      pages_directory: docs/hugo/content/
+      password:
+        from_secret: github_token
+      target_branch: docs
+      username:
+        from_secret: github_username
+    when:
+      ref:
+        exclude:
+          - refs/pull/**
+  - commands:
+      - tree docs/hugo/public
+      - rm -rf docs/hugo
+    image: owncloudci/alpine:latest
+    name: list and remove temporary files
+trigger:
+  ref:
+    - refs/heads/master
+    - refs/heads/stable-*
+    - refs/pull/**
+type: docker

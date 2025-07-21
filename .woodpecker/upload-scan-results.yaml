@@ -1,0 +1,58 @@
+clone:
+  disable: true
+depends_on:
+  - linting_and_unitTests
+kind: pipeline
+platform:
+  arch: amd64
+  os: linux
+steps:
+  - commands:
+      - git clone https://github.com/opencloud-eu/opencloud.git .
+      - git checkout $DRONE_COMMIT
+    image: alpine/git:latest
+    name: clone
+  - commands:
+      - mkdir -p cache
+      - mc alias set cachebucket $MC_HOST $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY
+      - mc mirror cachebucket/$CACHE_BUCKET/opencloud-eu/opencloud/-${DRONE_BUILD_NUMBER}/cache cache/ || true
+    environment:
+      AWS_ACCESS_KEY_ID:
+        from_secret: cache_s3_access_key
+      AWS_SECRET_ACCESS_KEY:
+        from_secret: cache_s3_secret_key
+      CACHE_BUCKET: cache
+      MC_HOST: https://cache.owncloud.com
+    image: minio/mc:RELEASE.2021-10-07T04-19-58Z
+    name: sync-from-cache
+  - image: plugins/codacy:1
+    name: codacy
+    settings:
+      token:
+        from_secret: codacy_token
+  - environment:
+      SONAR_TOKEN:
+        from_secret: sonar_token
+    image: sonarsource/sonar-scanner-cli:11.0
+    name: sonarcloud
+  - commands:
+      - mc alias set cachebucket $MC_HOST $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY
+      - mc rm --recursive --force cachebucket/$CACHE_BUCKET/opencloud-eu/opencloud/-${DRONE_BUILD_NUMBER}/cache || true
+    environment:
+      AWS_ACCESS_KEY_ID:
+        from_secret: cache_s3_access_key
+      AWS_SECRET_ACCESS_KEY:
+        from_secret: cache_s3_secret_key
+      CACHE_BUCKET: cache
+      MC_HOST: https://cache.owncloud.com
+    image: minio/mc:RELEASE.2021-10-07T04-19-58Z
+    name: purge-cache
+trigger:
+  ref:
+    - refs/heads/master
+    - refs/heads/stable-*
+    - refs/pull/**
+  status:
+    - success
+    - failure
+type: docker

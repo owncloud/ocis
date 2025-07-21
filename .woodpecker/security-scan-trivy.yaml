@@ -1,0 +1,16 @@
+kind: pipeline
+platform:
+  arch: amd64
+  os: linux
+steps:
+  - commands:
+      - trivy fs --exit-code 0 --severity HIGH,CRITICAL --no-progress /drone/src
+    failure: ignore
+    image: aquasec/trivy:latest
+    name: trivy-security-scan
+trigger:
+  ref:
+    - refs/heads/master
+    - refs/tags/**
+    - refs/pull/**
+type: docker

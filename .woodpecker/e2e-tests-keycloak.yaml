@@ -1,0 +1,267 @@
+depends_on:
+  - build_ocis_binary_for_testing
+  - build-web-cache
+  - build-web-pnpm-cache
+kind: pipeline
+services:
+  - detach: true
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_PASSWORD: keycloak
+      POSTGRES_USER: keycloak
+    image: postgres:alpine3.18
+    name: postgres
+steps:
+  - image: owncloudci/drone-skip-pipeline
+    name: skip-if-unchanged
+    settings:
+      ALLOW_SKIP_CHANGED:
+        - ^.github/.*
+        - ^.vscode/.*
+        - ^changelog/.*
+        - ^docs/.*
+        - ^deployments/.*
+        - CHANGELOG.md
+        - CONTRIBUTING.md
+        - LICENSE
+        - README.md
+        - .*_test.go$
+    when:
+      event:
+        - pull_request
+  - image: plugins/s3-cache:1
+    name: restore_ocis-binary-amd64_build_artifact_cache
+    settings:
+      access_key:
+        from_secret: cache_s3_access_key
+      endpoint: https://cache.owncloud.com
+      fallback_path: cache/opencloud-eu/opencloud/-${DRONE_BUILD_NUMBER}
+      filename: ocis-binary-amd64_build_artifact_cache.tar
+      mount:
+        - ocis/bin/ocis
+      path: cache/opencloud-eu/opencloud/-${DRONE_BUILD_NUMBER}
+      rebuild: "false"
+      restore: "true"
+      secret_key:
+        from_secret: cache_s3_secret_key
+  - commands:
+      - source ./.drone.env
+      - rm -rf /drone/src/webTestRunner
+      - mkdir -p /drone/src/webTestRunner
+      - mc alias set s3 $MC_HOST $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY
+      - mc cp -r -a s3/$CACHE_BUCKET/ocis/web-test-runner/$WEB_COMMITID/web.tar.gz /drone/src/zip
+    environment:
+      AWS_ACCESS_KEY_ID:
+        from_secret: cache_s3_access_key
+      AWS_SECRET_ACCESS_KEY:
+        from_secret: cache_s3_secret_key
+      CACHE_BUCKET: cache
+      MC_HOST: https://cache.owncloud.com
+    image: minio/mc:RELEASE.2021-10-07T04-19-58Z
+    name: restore-web-cache
+  - commands:
+      - tar -xvf /drone/src/zip/web.tar.gz -C .
+    image: owncloud/ubuntu:20.04
+    name: unzip-web-cache
+  - commands:
+      - source ./.drone.env
+      - mc alias set s3 $MC_HOST $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY
+      - mc cp -r -a s3/$CACHE_BUCKET/ocis/web-test-runner/$WEB_COMMITID/pnpm-store.tar.gz /drone/src/zip
+    environment:
+      AWS_ACCESS_KEY_ID:
+        from_secret: cache_s3_access_key
+      AWS_SECRET_ACCESS_KEY:
+        from_secret: cache_s3_secret_key
+      CACHE_BUCKET: cache
+      MC_HOST: https://cache.owncloud.com
+    image: minio/mc:RELEASE.2021-10-07T04-19-58Z
+    name: restore-web-pnpm-cache
+  - commands:
+      - cd /drone/src/webTestRunner
+      - rm -rf .pnpm-store
+      - tar -xvf /drone/src/zip/pnpm-store.tar.gz
+      - npm install --silent --global --force "$(jq -r ".packageManager" < package.json)"
+      - pnpm config set store-dir ./.pnpm-store
+      - retry -t 3 'pnpm install'
+    image: owncloudci/nodejs:22
+    name: unzip-and-install-pnpm
+  - commands:
+      - cd /drone/src
+      - mkdir -p keycloak-certs
+      - openssl req -x509 -newkey rsa:2048 -keyout keycloak-certs/keycloakkey.pem -out keycloak-certs/keycloakcrt.pem -nodes -days 365 -subj '/CN=keycloak'
+      - chmod -R 777 keycloak-certs
+    image: owncloudci/nodejs:22
+    name: generate-keycloak-certs
+  - commands:
+      - wait-for -it postgres:5432 -t 300
+    image: owncloudci/wait-for:latest
+    name: wait-for-postgres
+  - commands:
+      - mkdir -p /opt/keycloak/data/import
+      - cp tests/config/drone/ocis-ci-realm.dist.json /opt/keycloak/data/import/oCIS-realm.json
+      - /opt/keycloak/bin/kc.sh start-dev --proxy-headers xforwarded --spi-connections-http-client-default-disable-trust-manager=true --import-realm --health-enabled=true
+    detach: true
+    environment:
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_DB: postgres
+      KC_DB_PASSWORD: keycloak
+      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak
+      KC_DB_USERNAME: keycloak
+      KC_FEATURES: impersonation
+      KC_HOSTNAME: keycloak
+      KC_HTTPS_CERTIFICATE_FILE: /drone/src/keycloak-certs/keycloakcrt.pem
+      KC_HTTPS_CERTIFICATE_KEY_FILE: /drone/src/keycloak-certs/keycloakkey.pem
+      KC_PORT: 8443
+      OCIS_DOMAIN: https://ocis-server:9200
+    image: quay.io/keycloak/keycloak:26.2.5
+    name: keycloak
+  - commands:
+      - wait-for -it keycloak:8443 -t 300
+    image: owncloudci/wait-for:latest
+    name: wait-for-keycloak
+  - commands:
+      - mkdir -p $GOCOVERDIR
+      - ocis/bin/ocis init --insecure true
+      - cat $OCIS_CONFIG_DIR/ocis.yaml
+      - cp tests/config/drone/app-registry.yaml /root/.ocis/config/app-registry.yaml
+      - ocis/bin/ocis server
+    depends_on: []
+    detach: true
+    environment:
+      ACTIVITYLOG_DEBUG_ADDR: 0.0.0.0:9197
+      APP_PROVIDER_DEBUG_ADDR: 0.0.0.0:9165
+      APP_REGISTRY_DEBUG_ADDR: 0.0.0.0:9243
+      AUTH_BASIC_DEBUG_ADDR: 0.0.0.0:9147
+      AUTH_MACHINE_DEBUG_ADDR: 0.0.0.0:9167
+      AUTH_SERVICE_DEBUG_ADDR: 0.0.0.0:9198
+      CLIENTLOG_DEBUG_ADDR: 0.0.0.0:9260
+      EVENTHISTORY_DEBUG_ADDR: 0.0.0.0:9270
+      EVENTHISTORY_STORE: memory
+      FRONTEND_CONFIGURABLE_NOTIFICATIONS: "true"
+      FRONTEND_DEBUG_ADDR: 0.0.0.0:9141
+      FRONTEND_SEARCH_MIN_LENGTH: "2"
+      GATEWAY_DEBUG_ADDR: 0.0.0.0:9143
+      GOCOVERDIR: reports
+      GRAPH_ASSIGN_DEFAULT_USER_ROLE: "false"
+      GRAPH_AVAILABLE_ROLES: b1e2218d-eef8-4d4c-b82d-0f1a1b48f3b5,a8d5fe5e-96e3-418d-825b-534dbdf22b99,fb6c3e19-e378-47e5-b277-9732f9de6e21,58c63c02-1d89-4572-916a-870abc5a1b7d,2d00ce52-1fc2-4dbc-8b95-a73b73395f5a,1c996275-f1c9-4e71-abdf-a42f6495e960,312c0871-5ef7-4b3a-85b6-0e4074c64049,aa97fe03-7980-45ac-9e50-b325749fd7e6,63e64e19-8d43-42ec-a738-2b6af2610efa
+      GRAPH_DEBUG_ADDR: 0.0.0.0:9124
+      GRAPH_USERNAME_MATCH: none
+      GROUPS_DEBUG_ADDR: 0.0.0.0:9161
+      IDM_ADMIN_PASSWORD: admin
+      IDM_CREATE_DEMO_USERS: false
+      IDM_DEBUG_ADDR: 0.0.0.0:9239
+      IDP_DEBUG_ADDR: 0.0.0.0:9134
+      INVITATIONS_DEBUG_ADDR: 0.0.0.0:9269
+      KEYCLOAK_DOMAIN: keycloak:8443
+      NATS_DEBUG_ADDR: 0.0.0.0:9234
+      NATS_NATS_HOST: 0.0.0.0
+      NATS_NATS_PORT: 9233
+      OCDAV_DEBUG_ADDR: 0.0.0.0:9163
+      OCIS_ADMIN_USER_ID: ""
+      OCIS_ASYNC_UPLOADS: true
+      OCIS_CONFIG_DIR: /root/.ocis/config
+      OCIS_EVENTS_ENABLE_TLS: false
+      OCIS_EXCLUDE_RUN_SERVICES: idp
+      OCIS_JWT_SECRET: some-ocis-jwt-secret
+      OCIS_LOG_LEVEL: error
+      OCIS_OIDC_ISSUER: https://keycloak:8443/realms/oCIS
+      OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST: tests/config/drone/banned-password-list.txt
+      OCIS_TRANSLATION_PATH: /drone/src/tests/config/translations
+      OCIS_URL: https://ocis-server:9200
+      OCM_DEBUG_ADDR: 0.0.0.0:9281
+      OCS_DEBUG_ADDR: 0.0.0.0:9114
+      POSTPROCESSING_DEBUG_ADDR: 0.0.0.0:9255
+      PROXY_AUTOPROVISION_ACCOUNTS: "true"
+      PROXY_CSP_CONFIG_FILE_LOCATION: /drone/src/tests/config/drone/csp.yaml
+      PROXY_DEBUG_ADDR: 0.0.0.0:9205
+      PROXY_ENABLE_BASIC_AUTH: true
+      PROXY_OIDC_REWRITE_WELLKNOWN: "true"
+      PROXY_ROLE_ASSIGNMENT_DRIVER: oidc
+      PROXY_USER_CS3_CLAIM: username
+      PROXY_USER_OIDC_CLAIM: preferred_username
+      SEARCH_DEBUG_ADDR: 0.0.0.0:9224
+      SETTINGS_DEBUG_ADDR: 0.0.0.0:9194
+      SHARING_DEBUG_ADDR: 0.0.0.0:9151
+      SSE_DEBUG_ADDR: 0.0.0.0:9139
+      STORAGE_PUBLICLINK_DEBUG_ADDR: 0.0.0.0:9179
+      STORAGE_SHARES_DEBUG_ADDR: 0.0.0.0:9156
+      STORAGE_SYSTEM_DEBUG_ADDR: 0.0.0.0:9217
+      STORAGE_USERS_DEBUG_ADDR: 0.0.0.0:9159
+      STORAGE_USERS_DRIVER: ocis
+      THUMBNAILS_DEBUG_ADDR: 0.0.0.0:9189
+      THUMBNAILS_TXT_FONTMAP_FILE: /drone/src/tests/config/drone/fontsMap.json
+      USERLOG_DEBUG_ADDR: 0.0.0.0:9214
+      USERS_DEBUG_ADDR: 0.0.0.0:9145
+      WEB_DEBUG_ADDR: 0.0.0.0:9104
+      WEB_OIDC_CLIENT_ID: web
+      WEB_UI_CONFIG_FILE: /drone/src/tests/config/drone/ocis-config.json
+      WEBDAV_DEBUG_ADDR: 0.0.0.0:9119
+      WEBFINGER_DEBUG_ADDR: 0.0.0.0:9279
+    image: owncloudci/golang:1.24
+    name: ocis-server
+    user: "0:0"
+    volumes: []
+  - commands:
+      - wait-for -it ocis-server:9200 -t 300
+    image: owncloudci/wait-for:latest
+    name: wait-for-ocis
+  - commands:
+      - cd /drone/src/webTestRunner/tests/e2e
+      - bash run-e2e.sh --suites journeys,keycloak
+    environment:
+      BASE_URL_OCIS: ocis-server:9200
+      HEADLESS: "true"
+      KEYCLOAK: "true"
+      KEYCLOAK_HOST: keycloak:8443
+      REPORT_TRACING: false
+      RETRY: "1"
+    image: owncloudci/nodejs:22
+    name: e2e-tests
+  - environment:
+      AWS_ACCESS_KEY_ID:
+        from_secret: cache_public_s3_access_key
+      AWS_SECRET_ACCESS_KEY:
+        from_secret: cache_public_s3_secret_key
+    image: plugins/s3:1
+    name: upload-tracing-result
+    pull: if-not-exists
+    settings:
+      bucket: public
+      endpoint: https://cache.owncloud.com
+      path_style: true
+      source: webTestRunner/reports/e2e/playwright/tracing/**/*
+      strip_prefix: webTestRunner/reports/e2e/playwright/tracing
+      target: /${DRONE_REPO}/${DRONE_BUILD_NUMBER}/tracing
+    when:
+      event:
+        - pull_request
+        - cron
+      status:
+        - failure
+  - commands:
+      - cd /drone/src/webTestRunner/reports/e2e/playwright/tracing/
+      - echo "To see the trace, please open the following link in the console"
+      - "for f in *.zip; do echo \"npx playwright show-trace https://cache.owncloud.com/public/${DRONE_REPO}/${DRONE_BUILD_NUMBER}/tracing/$f \n\"; done"
+    image: owncloud/ubuntu:20.04
+    name: log-tracing-result
+    when:
+      event:
+        - pull_request
+        - cron
+      status:
+        - failure
+trigger:
+  ref:
+    - refs/heads/master
+    - refs/heads/stable-*
+    - refs/tags/**
+    - refs/pull/**
+type: docker
+volumes:
+  - name: uploads
+    temp: {}
+  - name: configs
+    temp: {}
+  - name: gopath
+    temp: {}

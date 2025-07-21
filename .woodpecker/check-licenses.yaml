@@ -1,0 +1,96 @@
+kind: pipeline
+platform:
+  arch: amd64
+  os: linux
+steps:
+  - commands:
+      - make ci-node-check-licenses
+    image: owncloudci/nodejs:22
+    name: node-check-licenses
+  - commands:
+      - make ci-node-save-licenses
+    image: owncloudci/nodejs:22
+    name: node-save-licenses
+  - commands:
+      - make ci-go-check-licenses
+    environment:
+      HTTP_PROXY:
+        from_secret: drone_http_proxy
+      HTTPS_PROXY:
+        from_secret: drone_http_proxy
+    image: owncloudci/golang:1.24
+    name: go-check-licenses
+    volumes:
+      - name: gopath
+        path: /go
+  - commands:
+      - make ci-go-save-licenses
+    environment:
+      HTTP_PROXY:
+        from_secret: drone_http_proxy
+      HTTPS_PROXY:
+        from_secret: drone_http_proxy
+    image: owncloudci/golang:1.24
+    name: go-save-licenses
+    volumes:
+      - name: gopath
+        path: /go
+  - commands:
+      - cd third-party-licenses && tar -czf ../third-party-licenses.tar.gz *
+    image: owncloudci/alpine:latest
+    name: tarball
+  - image: plugins/s3:1
+    name: upload
+    settings:
+      access_key:
+        from_secret: upload_s3_access_key
+      bucket:
+        from_secret: upload_s3_bucket
+      endpoint:
+        from_secret: upload_s3_endpoint
+      path_style: true
+      secret_key:
+        from_secret: upload_s3_secret_key
+      source: third-party-licenses.tar.gz
+      target: /ocis//daily
+    when:
+      ref:
+        - refs/heads/master
+        - refs/heads/stable-*
+        - refs/tags/v*
+  - commands:
+      - make changelog CHANGELOG_VERSION=
+    environment:
+      HTTP_PROXY:
+        from_secret: drone_http_proxy
+      HTTPS_PROXY:
+        from_secret: drone_http_proxy
+    image: owncloudci/golang:1.24
+    name: changelog
+    when:
+      ref:
+        - refs/tags/v*
+  - image: plugins/github-release:1
+    name: release
+    settings:
+      api_key:
+        from_secret: github_token
+      files:
+        - third-party-licenses.tar.gz
+      note: ocis/dist/CHANGELOG.md
+      overwrite: true
+      prerelease: false
+      title: ""
+    when:
+      ref:
+        - refs/tags/v*
+trigger:
+  ref:
+    - refs/heads/master
+    - refs/heads/stable-*
+    - refs/tags/v*
+    - refs/pull/**
+type: docker
+volumes:
+  - name: gopath
+    temp: {}

@@ -1,0 +1,11 @@
+kind: pipeline
+steps:
+  - commands:
+      - npm install -g @gherlint/gherlint@1.1.0
+      - make test-gherkin-lint
+    image: owncloudci/nodejs:22
+    name: lint-feature-files
+trigger:
+  ref:
+    - refs/pull/**
+type: docker

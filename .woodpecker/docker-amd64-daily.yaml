@@ -1,0 +1,135 @@
+depends_on:
+  - linting_and_unitTests
+  - upload-scan-results
+  - litmus
+  - cs3ApiTests
+  - wopiValidatorTests-builtin
+  - wopiValidatorTests-cs3
+  - API-contractAndLock
+  - API-settingsAndNotification
+  - API-graphUser
+  - API-spaces
+  - API-spacesShares
+  - API-davOperations
+  - API-groupAndSearch1
+  - API-search2
+  - API-sharingNg1
+  - API-sharingNgAdditionalShareRole
+  - API-sharingNgShareInvitation
+  - API-sharingNgLinkShare
+  - API-antivirus
+  - API-ocmAndAuthApp
+  - API-wopi
+  - CLI-cliCommands
+  - Core-API-1
+  - Core-API-2
+  - Core-API-3
+  - Core-API-4
+  - Core-API-5
+  - Core-API-6
+  - Core-API-7
+  - Core-API-8
+  - e2e-tests-part-1
+  - e2e-tests-part-2
+  - e2e-tests-part-3
+  - e2e-tests-part-4
+  - e2e-tests-search
+  - e2e-tests-keycloak
+kind: pipeline
+platform:
+  arch: amd64
+  os: linux
+steps:
+  - image: owncloudci/drone-skip-pipeline
+    name: skip-if-unchanged
+    settings:
+      ALLOW_SKIP_CHANGED:
+        - ^.github/.*
+        - ^.vscode/.*
+        - ^changelog/.*
+        - ^docs/.*
+        - ^deployments/.*
+        - CHANGELOG.md
+        - CONTRIBUTING.md
+        - LICENSE
+        - README.md
+        - .*_test.go$
+        - ^tests/acceptance/.*
+    when:
+      event:
+        - pull_request
+  - commands:
+      - pnpm config set store-dir ./.pnpm-store
+      - retry -t 3 'make ci-node-generate'
+    environment:
+      CHROMEDRIVER_SKIP_DOWNLOAD: "true"
+    image: owncloudci/nodejs:22
+    name: generate nodejs
+    volumes:
+      - name: gopath
+        path: /go
+  - commands:
+      - retry -t 3 'make ci-go-generate'
+    environment:
+      HTTP_PROXY:
+        from_secret: drone_http_proxy
+      HTTPS_PROXY:
+        from_secret: drone_http_proxy
+    image: owncloudci/golang:1.24
+    name: generate go
+    volumes:
+      - name: gopath
+        path: /go
+  - commands:
+      - make -C ocis release-linux-docker-amd64 ENABLE_VIPS=true
+    environment:
+      HTTP_PROXY:
+        from_secret: drone_http_proxy
+      HTTPS_PROXY:
+        from_secret: drone_http_proxy
+    image: owncloudci/golang:1.24
+    name: build
+  - image: plugins/docker:latest
+    name: dryrun
+    settings:
+      build_args:
+        - REVISION=
+        - VERSION=master
+      context: ocis
+      dockerfile: ocis/docker/Dockerfile.linux.amd64
+      dry_run: true
+      repo: opencloud-eu/opencloud-rolling
+      tags: linux-amd64
+    when:
+      ref:
+        include:
+          - refs/pull/**
+  - image: plugins/docker:latest
+    name: docker
+    settings:
+      auto_tag: true
+      auto_tag_suffix: linux-amd64
+      build_args:
+        - REVISION=
+        - VERSION=master
+      context: ocis
+      dockerfile: ocis/docker/Dockerfile.linux.amd64
+      password:
+        from_secret: docker_password
+      repo: opencloud-eu/opencloud-rolling
+      username:
+        from_secret: docker_username
+    when:
+      ref:
+        exclude:
+          - refs/pull/**
+trigger:
+  ref:
+    - refs/heads/master
+    - refs/heads/stable-*
+    - refs/tags/v*
+    - refs/pull/**
+type: docker
+volumes:
+  - name: gopath
+    temp: {}

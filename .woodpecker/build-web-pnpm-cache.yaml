@@ -1,0 +1,61 @@
+clone:
+  disable: true
+kind: pipeline
+steps:
+  - commands:
+      - curl -s -o .drone.env https://raw.githubusercontent.com/owncloud/ocis//.drone.env
+      - curl -s -o check_web_cache.sh https://raw.githubusercontent.com/owncloud/ocis//tests/config/drone/check_web_cache.sh
+    image: owncloud/ubuntu:20.04
+    name: get-drone-env-and-check-script
+  - commands:
+      - mc alias set s3 $MC_HOST $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY
+      - bash -x check_web_cache.sh web.tar.gz
+    environment:
+      AWS_ACCESS_KEY_ID:
+        from_secret: cache_s3_access_key
+      AWS_SECRET_ACCESS_KEY:
+        from_secret: cache_s3_secret_key
+      CACHE_BUCKET: cache
+      MC_HOST: https://cache.owncloud.com
+    image: minio/mc:RELEASE.2021-10-07T04-19-58Z
+    name: check-for-web-pnpm-cache
+  - commands:
+      - . ./.drone.env
+      - rm -rf /drone/src/webTestRunner
+      - git clone -b $WEB_BRANCH --single-branch --no-tags https://github.com/owncloud/web.git /drone/src/webTestRunner
+      - cd /drone/src/webTestRunner && git checkout $WEB_COMMITID
+    image: owncloudci/nodejs:22
+    name: clone-web
+  - commands:
+      - cd /drone/src/webTestRunner
+      - npm install --silent --global --force "$(jq -r ".packageManager" < package.json)"
+      - pnpm config set store-dir ./.pnpm-store
+      - retry -t 3 'pnpm install'
+    image: owncloudci/nodejs:22
+    name: install-pnpm
+  - commands:
+      - if [ ! -d '/drone/src/zip' ]; then mkdir -p /drone/src/zip; fi
+      - cd /drone/src/webTestRunner
+      - tar -czvf /drone/src/zip/pnpm-store.tar.gz .pnpm-store
+    image: owncloudci/nodejs:22
+    name: zip-pnpm
+  - commands:
+      - source ./.drone.env
+      - mc alias set s3 $MC_HOST $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY
+      - mc cp -r -a /drone/src/zip/pnpm-store.tar.gz s3/$CACHE_BUCKET/ocis/web-test-runner/$WEB_COMMITID
+    environment:
+      AWS_ACCESS_KEY_ID:
+        from_secret: cache_s3_access_key
+      AWS_SECRET_ACCESS_KEY:
+        from_secret: cache_s3_secret_key
+      CACHE_BUCKET: cache
+      MC_HOST: https://cache.owncloud.com
+    image: minio/mc:RELEASE.2021-10-07T04-19-58Z
+    name: cache-pnpm
+trigger:
+  ref:
+    - refs/heads/master
+    - refs/heads/stable-*
+    - refs/tags/**
+    - refs/pull/**
+type: docker

@@ -1,0 +1,50 @@
+kind: pipeline
+platform:
+  arch: amd64
+  os: linux
+steps:
+  - commands:
+      - make -C ocis changelog
+    environment:
+      HTTP_PROXY:
+        from_secret: drone_http_proxy
+      HTTPS_PROXY:
+        from_secret: drone_http_proxy
+    image: owncloudci/golang:1.24
+    name: generate
+  - commands:
+      - git diff
+    image: owncloudci/alpine:latest
+    name: diff
+  - commands:
+      - cat CHANGELOG.md
+    image: owncloudci/alpine:latest
+    name: output
+  - image: plugins/git-action:1
+    name: publish
+    settings:
+      actions:
+        - commit
+        - push
+      author_email: devops@owncloud.com
+      author_name: ownClouders
+      branch: master
+      message: Automated changelog update [skip ci]
+      netrc_machine: github.com
+      netrc_password:
+        from_secret: github_token
+      netrc_username:
+        from_secret: github_username
+    when:
+      ref:
+        exclude:
+          - refs/pull/**
+trigger:
+  event:
+    exclude:
+      - cron
+  ref:
+    - refs/heads/master
+    - refs/heads/stable-*
+    - refs/pull/**
+type: docker

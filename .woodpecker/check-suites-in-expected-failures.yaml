@@ -1,0 +1,10 @@
+kind: pipeline
+steps:
+  - commands:
+      - /drone/src/tests/acceptance/check-deleted-suites-in-expected-failure.sh
+    image: owncloudci/alpine:latest
+    name: check-suites
+trigger:
+  ref:
+    - refs/pull/**
+type: docker

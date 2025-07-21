@@ -1,0 +1,60 @@
+depends_on:
+  - litmus
+  - cs3ApiTests
+  - wopiValidatorTests-builtin
+  - wopiValidatorTests-cs3
+  - API-contractAndLock
+  - API-settingsAndNotification
+  - API-graphUser
+  - API-spaces
+  - API-spacesShares
+  - API-davOperations
+  - API-groupAndSearch1
+  - API-search2
+  - API-sharingNg1
+  - API-sharingNgAdditionalShareRole
+  - API-sharingNgShareInvitation
+  - API-sharingNgLinkShare
+  - API-antivirus
+  - API-ocmAndAuthApp
+  - API-wopi
+  - CLI-cliCommands
+  - Core-API-1
+  - Core-API-2
+  - Core-API-3
+  - Core-API-4
+  - Core-API-5
+  - Core-API-6
+  - Core-API-7
+  - Core-API-8
+  - e2e-tests-part-1
+  - e2e-tests-part-2
+  - e2e-tests-part-3
+  - e2e-tests-part-4
+  - e2e-tests-search
+  - e2e-tests-keycloak
+kind: pipeline
+platform:
+  arch: amd64
+  os: linux
+steps:
+  - image: plugins/s3-cache:1
+    name: purge-cache
+    settings:
+      access_key:
+        from_secret: cache_s3_access_key
+      endpoint: https://cache.owncloud.com
+      flush: true
+      flush_age: 1
+      flush_path: cache/opencloud-eu/opencloud
+      secret_key:
+        from_secret: cache_s3_secret_key
+trigger:
+  ref:
+    - refs/heads/master
+    - refs/heads/stable-*
+    - refs/pull/**
+  status:
+    - success
+    - failure
+type: docker

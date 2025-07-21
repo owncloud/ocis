@@ -1,0 +1,284 @@
+depends_on:
+  - build_ocis_binary_for_testing
+kind: pipeline
+platform:
+  arch: amd64
+  os: linux
+services:
+  - commands:
+      - sh /drone/src/tests/config/drone/serve-hosting-discovery.sh
+    detach: true
+    environment: {}
+    image: owncloudci/alpine:latest
+    name: fakeoffice
+  - commands:
+      - coolconfig generate-proof-key
+      - bash /start-collabora-online.sh
+    detach: true
+    environment:
+      DONT_GEN_SSL_CERT: set
+      extra_params: --o:ssl.enable=true --o:ssl.termination=true --o:welcome.enable=false --o:net.frame_ancestors=https://ocis-server:9200
+    image: collabora/code:24.04.5.1.1
+    name: collabora
+    type: docker
+  - commands:
+      - cp /drone/src/tests/config/drone/only-office.json /etc/onlyoffice/documentserver/local.json
+      - openssl req -x509 -newkey rsa:4096 -keyout onlyoffice.key -out onlyoffice.crt -sha256 -days 365 -batch -nodes
+      - mkdir -p /var/www/onlyoffice/Data/certs
+      - cp onlyoffice.key /var/www/onlyoffice/Data/certs/
+      - cp onlyoffice.crt /var/www/onlyoffice/Data/certs/
+      - chmod 400 /var/www/onlyoffice/Data/certs/onlyoffice.key
+      - /app/ds/run-document-server.sh
+    detach: true
+    environment:
+      USE_UNAUTHORIZED_STORAGE: "true"
+      WOPI_ENABLED: "true"
+    image: onlyoffice/documentserver:9.0.0
+    name: onlyoffice
+    type: docker
+steps:
+  - image: owncloudci/drone-skip-pipeline
+    name: skip-if-unchanged
+    settings:
+      ALLOW_SKIP_CHANGED:
+        - ^.github/.*
+        - ^.vscode/.*
+        - ^changelog/.*
+        - ^docs/.*
+        - ^deployments/.*
+        - CHANGELOG.md
+        - CONTRIBUTING.md
+        - LICENSE
+        - README.md
+        - .*_test.go$
+    when:
+      event:
+        - pull_request
+  - image: plugins/s3-cache:1
+    name: restore_ocis-binary-amd64_build_artifact_cache
+    settings:
+      access_key:
+        from_secret: cache_s3_access_key
+      endpoint: https://cache.owncloud.com
+      fallback_path: cache/opencloud-eu/opencloud/-${DRONE_BUILD_NUMBER}
+      filename: ocis-binary-amd64_build_artifact_cache.tar
+      mount:
+        - ocis/bin
+      path: cache/opencloud-eu/opencloud/-${DRONE_BUILD_NUMBER}
+      rebuild: "false"
+      restore: "true"
+      secret_key:
+        from_secret: cache_s3_secret_key
+  - commands:
+      - wait-for -it collabora:9980,onlyoffice:443,fakeoffice:8080 -t 300
+    image: owncloudci/wait-for:latest
+    name: wait-for-online-offices
+  - commands:
+      - mkdir -p $GOCOVERDIR
+      - ocis/bin/ocis-debug init --insecure true
+      - cat $OCIS_CONFIG_DIR/ocis.yaml
+      - cp tests/config/drone/app-registry.yaml /root/.ocis/config/app-registry.yaml
+      - make -C /drone/src/tests/ociswrapper build
+      - /drone/src/tests/ociswrapper/bin/ociswrapper serve --bin ocis/bin/ocis-debug --url https://ocis-server:9200 --admin-username admin --admin-password admin
+    depends_on: []
+    detach: true
+    environment:
+      ACTIVITYLOG_DEBUG_ADDR: 0.0.0.0:9197
+      APP_PROVIDER_DEBUG_ADDR: 0.0.0.0:9165
+      APP_REGISTRY_DEBUG_ADDR: 0.0.0.0:9243
+      AUTH_BASIC_DEBUG_ADDR: 0.0.0.0:9147
+      AUTH_MACHINE_DEBUG_ADDR: 0.0.0.0:9167
+      AUTH_SERVICE_DEBUG_ADDR: 0.0.0.0:9198
+      CLIENTLOG_DEBUG_ADDR: 0.0.0.0:9260
+      EVENTHISTORY_DEBUG_ADDR: 0.0.0.0:9270
+      EVENTHISTORY_STORE: memory
+      FRONTEND_DEBUG_ADDR: 0.0.0.0:9141
+      FRONTEND_SEARCH_MIN_LENGTH: "2"
+      GATEWAY_DEBUG_ADDR: 0.0.0.0:9143
+      GATEWAY_GRPC_ADDR: 0.0.0.0:9142
+      GOCOVERDIR: reports
+      GRAPH_DEBUG_ADDR: 0.0.0.0:9124
+      GROUPS_DEBUG_ADDR: 0.0.0.0:9161
+      IDM_ADMIN_PASSWORD: admin
+      IDM_CREATE_DEMO_USERS: true
+      IDM_DEBUG_ADDR: 0.0.0.0:9239
+      IDP_DEBUG_ADDR: 0.0.0.0:9134
+      INVITATIONS_DEBUG_ADDR: 0.0.0.0:9269
+      NATS_DEBUG_ADDR: 0.0.0.0:9234
+      NATS_NATS_HOST: 0.0.0.0
+      NATS_NATS_PORT: 9233
+      OCDAV_DEBUG_ADDR: 0.0.0.0:9163
+      OCIS_ASYNC_UPLOADS: true
+      OCIS_CONFIG_DIR: /root/.ocis/config
+      OCIS_EVENTS_ENABLE_TLS: false
+      OCIS_JWT_SECRET: some-ocis-jwt-secret
+      OCIS_LOG_LEVEL: error
+      OCIS_TRANSLATION_PATH: /drone/src/tests/config/translations
+      OCIS_URL: https://ocis-server:9200
+      OCM_DEBUG_ADDR: 0.0.0.0:9281
+      OCS_DEBUG_ADDR: 0.0.0.0:9114
+      POSTPROCESSING_DEBUG_ADDR: 0.0.0.0:9255
+      PROXY_DEBUG_ADDR: 0.0.0.0:9205
+      PROXY_ENABLE_BASIC_AUTH: true
+      SEARCH_DEBUG_ADDR: 0.0.0.0:9224
+      SETTINGS_DEBUG_ADDR: 0.0.0.0:9194
+      SHARING_DEBUG_ADDR: 0.0.0.0:9151
+      SSE_DEBUG_ADDR: 0.0.0.0:9139
+      STORAGE_PUBLICLINK_DEBUG_ADDR: 0.0.0.0:9179
+      STORAGE_SHARES_DEBUG_ADDR: 0.0.0.0:9156
+      STORAGE_SYSTEM_DEBUG_ADDR: 0.0.0.0:9217
+      STORAGE_USERS_DEBUG_ADDR: 0.0.0.0:9159
+      STORAGE_USERS_DRIVER: ocis
+      THUMBNAILS_DEBUG_ADDR: 0.0.0.0:9189
+      THUMBNAILS_TXT_FONTMAP_FILE: /drone/src/tests/config/drone/fontsMap.json
+      USERLOG_DEBUG_ADDR: 0.0.0.0:9214
+      USERS_DEBUG_ADDR: 0.0.0.0:9145
+      WEB_DEBUG_ADDR: 0.0.0.0:9104
+      WEB_UI_CONFIG_FILE: /drone/src/tests/config/drone/ocis-config.json
+      WEBDAV_DEBUG_ADDR: 0.0.0.0:9119
+      WEBFINGER_DEBUG_ADDR: 0.0.0.0:9279
+    image: owncloudci/golang:1.24
+    name: ocis-server
+    user: "0:0"
+    volumes: []
+  - commands:
+      - timeout 300 bash -c 'while [ $(curl -sk -uadmin:admin https://ocis-server:9200/graph/v1.0/users/admin -w %{http_code} -o /dev/null) != 200 ]; do sleep 1; done'
+    depends_on: []
+    image: owncloudci/alpine:latest
+    name: wait-for-ocis-server
+  - commands:
+      - ocis/bin/ocis-debug collaboration server
+    detach: true
+    environment:
+      COLLABORATION_APP_ADDR: http://fakeoffice:8080
+      COLLABORATION_APP_INSECURE: "true"
+      COLLABORATION_APP_NAME: FakeOffice
+      COLLABORATION_APP_PRODUCT: Microsoft
+      COLLABORATION_APP_PROOF_DISABLE: "true"
+      COLLABORATION_CS3API_DATAGATEWAY_INSECURE: "true"
+      COLLABORATION_DEBUG_ADDR: 0.0.0.0:9304
+      COLLABORATION_GRPC_ADDR: 0.0.0.0:9301
+      COLLABORATION_HTTP_ADDR: 0.0.0.0:9300
+      COLLABORATION_LOG_LEVEL: debug
+      COLLABORATION_WOPI_SECRET: some-wopi-secret
+      COLLABORATION_WOPI_SRC: http://wopi-fakeoffice:9300
+      MICRO_REGISTRY: nats-js-kv
+      MICRO_REGISTRY_ADDRESS: ocis-server:9233
+      OCIS_JWT_SECRET: some-ocis-jwt-secret
+    image: owncloudci/golang:1.24
+    name: wopi-fakeoffice
+    volumes: []
+  - commands:
+      - ocis/bin/ocis-debug collaboration server
+    detach: true
+    environment:
+      COLLABORATION_APP_ADDR: https://collabora:9980
+      COLLABORATION_APP_ICON: https://collabora:9980/favicon.ico
+      COLLABORATION_APP_INSECURE: "true"
+      COLLABORATION_APP_NAME: Collabora
+      COLLABORATION_APP_PRODUCT: Collabora
+      COLLABORATION_APP_PROOF_DISABLE: "true"
+      COLLABORATION_CS3API_DATAGATEWAY_INSECURE: "true"
+      COLLABORATION_DEBUG_ADDR: 0.0.0.0:9304
+      COLLABORATION_GRPC_ADDR: 0.0.0.0:9301
+      COLLABORATION_HTTP_ADDR: 0.0.0.0:9300
+      COLLABORATION_LOG_LEVEL: debug
+      COLLABORATION_WOPI_SECRET: some-wopi-secret
+      COLLABORATION_WOPI_SRC: http://wopi-collabora:9300
+      MICRO_REGISTRY: nats-js-kv
+      MICRO_REGISTRY_ADDRESS: ocis-server:9233
+      OCIS_JWT_SECRET: some-ocis-jwt-secret
+    image: owncloudci/golang:1.24
+    name: wopi-collabora
+    volumes: []
+  - commands:
+      - ocis/bin/ocis-debug collaboration server
+    detach: true
+    environment:
+      COLLABORATION_APP_ADDR: https://onlyoffice
+      COLLABORATION_APP_ICON: https://onlyoffice/web-apps/apps/documenteditor/main/resources/img/favicon.ico
+      COLLABORATION_APP_INSECURE: "true"
+      COLLABORATION_APP_NAME: OnlyOffice
+      COLLABORATION_APP_PRODUCT: OnlyOffice
+      COLLABORATION_APP_PROOF_DISABLE: "true"
+      COLLABORATION_CS3API_DATAGATEWAY_INSECURE: "true"
+      COLLABORATION_DEBUG_ADDR: 0.0.0.0:9304
+      COLLABORATION_GRPC_ADDR: 0.0.0.0:9301
+      COLLABORATION_HTTP_ADDR: 0.0.0.0:9300
+      COLLABORATION_LOG_LEVEL: debug
+      COLLABORATION_WOPI_SECRET: some-wopi-secret
+      COLLABORATION_WOPI_SRC: http://wopi-onlyoffice:9300
+      MICRO_REGISTRY: nats-js-kv
+      MICRO_REGISTRY_ADDRESS: ocis-server:9233
+      OCIS_JWT_SECRET: some-ocis-jwt-secret
+    image: owncloudci/golang:1.24
+    name: wopi-onlyoffice
+    volumes: []
+  - commands:
+      - timeout 300 bash -c 'while [ $(curl -s wopi-collabora:9304/healthz -w %{http_code} -o /dev/null) != 200 ]; do sleep 1; done'
+      - timeout 300 bash -c 'while [ $(curl -s wopi-collabora:9304/readyz -w %{http_code} -o /dev/null) != 200 ]; do sleep 1; done'
+      - timeout 300 bash -c 'while [ $(curl -s wopi-onlyoffice:9304/healthz -w %{http_code} -o /dev/null) != 200 ]; do sleep 1; done'
+      - timeout 300 bash -c 'while [ $(curl -s wopi-onlyoffice:9304/readyz -w %{http_code} -o /dev/null) != 200 ]; do sleep 1; done'
+      - timeout 300 bash -c 'while [ $(curl -s wopi-fakeoffice:9304/healthz -w %{http_code} -o /dev/null) != 200 ]; do sleep 1; done'
+      - timeout 300 bash -c 'while [ $(curl -s wopi-fakeoffice:9304/readyz -w %{http_code} -o /dev/null) != 200 ]; do sleep 1; done'
+    image: owncloudci/alpine:latest
+    name: health-check-wopi
+  - commands:
+      - ""
+      - make -C /drone/src test-acceptance-api
+    environment:
+      BEHAT_FILTER_TAGS: ~@skip&&~@skipOnGraph&&~@skipOnOcis-OCIS-Storage
+      BEHAT_SUITES: apiCollaboration
+      COLLABORATION_SERVICE_URL: http://wopi-fakeoffice:9300
+      EXPECTED_FAILURES_FILE: /drone/src/tests/acceptance/expected-failures-localAPI-on-OCIS-storage.md
+      OCIS_REVA_DATA_ROOT: ""
+      OCIS_WRAPPER_URL: http://ocis-server:5200
+      STORAGE_DRIVER: ocis
+      TEST_SERVER_FED_URL: https://federation-ocis-server:10200
+      TEST_SERVER_URL: https://ocis-server:9200
+      UPLOAD_DELETE_WAIT_TIME: 0
+      WITH_REMOTE_PHP: true
+    image: owncloudci/php:8.4
+    name: localApiTests-wopi
+    volumes:
+      - name: storage
+        path: /root/.ocis
+  - commands:
+      - cat /drone/src/tests/acceptance/logs/failed.log
+    image: owncloudci/php:8.4
+    name: api-test-failure-logs
+    when:
+      status:
+        - failure
+  - commands:
+      - go tool covdata percent -i=$GOCOVERDIR -o=coverage-wopi.out
+    environment:
+      GOCOVERDIR: reports
+    image: owncloudci/golang:1.24
+    name: coverageReport-wopi
+  - commands:
+      - mkdir -p cache/acceptance/coverage/
+      - mv coverage-wopi.out cache/acceptance/coverage/
+    image: owncloud/ubuntu:20.04
+    name: coverage-locate
+  - image: plugins/s3:1
+    name: coverage-cache-1
+    settings:
+      access_key:
+        from_secret: cache_s3_access_key
+      bucket: cache
+      endpoint: https://cache.owncloud.com
+      path_style: true
+      secret_key:
+        from_secret: cache_s3_secret_key
+      source: cache/acceptance/coverage/coverage-wopi.out
+      target: opencloud-eu/opencloud/-${DRONE_BUILD_NUMBER}/coverage
+trigger:
+  ref:
+    - refs/heads/master
+    - refs/heads/stable-*
+    - refs/pull/**
+type: docker
+volumes:
+  - name: storage
+    temp: {}
