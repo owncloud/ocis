@@ -2314,6 +2314,9 @@ def notify(ctx):
         "kind": "pipeline",
         "type": "docker",
         "name": "chat-notifications",
+        "clone": {
+            "disable": True,
+        },
         "steps": [
             {
                 "name": "notify-matrix",
@@ -2324,7 +2327,8 @@ def notify(ctx):
                     },
                 },
                 "commands": [
-                    "bash %s/tests/config/drone/notification.sh" % (dirs["base"]),
+                    "wget https://raw.githubusercontent.com/%s/%s/tests/config/drone/notification.sh" % (ctx.repo.slug, ctx.build.commit),
+                    "bash notification.sh",
                 ],
             },
         ],
