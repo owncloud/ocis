@@ -1,6 +1,5 @@
 depends_on:
   - build_ocis_binary_for_testing
-kind: pipeline
 services: []
 steps:
   - image: owncloudci/drone-skip-pipeline
@@ -169,7 +168,6 @@ trigger:
     - refs/heads/master
     - refs/heads/stable-*
     - refs/pull/**
-type: docker
 workspace:
   base: /drone
   path: src

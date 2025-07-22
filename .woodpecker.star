@@ -1,6 +1,10 @@
 """oCIS CI definition
 """
 
+repo_slug = "opencloud-eu/opencloud"
+docker_repo_slug = "opencloudeu/opencloud"
+
+
 # Production release tags
 # NOTE: need to be updated if new production releases are determined
 # - follow semver
@@ -542,8 +546,6 @@ def main(ctx):
 
 def cachePipeline(name, steps):
     return {
-        "kind": "pipeline",
-        "type": "docker",
         "name": "build-%s-cache" % name,
         "clone": {
             "disable": True,
@@ -606,8 +608,6 @@ def testPipelines(ctx):
 
 def getGoBinForTesting(ctx):
     return [{
-        "kind": "pipeline",
-        "type": "docker",
         "name": "get-go-bin-cache",
         "platform": {
             "os": "linux",
@@ -726,7 +726,7 @@ def testOcis(ctx):
                 "endpoint": MINIO_MC_ENV["MC_HOST"],
                 "bucket": MINIO_MC_ENV["CACHE_BUCKET"],
                 "source": "cache/**/*",
-                "target": "%s/%s" % (ctx.repo.slug, ctx.build.commit + "-${DRONE_BUILD_NUMBER}"),
+                "target": "%s/%s" % (repo_slug, ctx.build.commit + "-${DRONE_BUILD_NUMBER}"),
                 "path_style": True,
                 "access_key": MINIO_MC_ENV["AWS_ACCESS_KEY_ID"],
                 "secret_key": MINIO_MC_ENV["AWS_SECRET_ACCESS_KEY"],
@@ -735,8 +735,6 @@ def testOcis(ctx):
     ]
 
     return {
-        "kind": "pipeline",
-        "type": "docker",
         "name": "linting_and_unitTests",
         "platform": {
             "os": "linux",
@@ -768,8 +766,6 @@ def scanOcis(ctx):
     ]
 
     return {
-        "kind": "pipeline",
-        "type": "docker",
         "name": "go-vulnerability-scanning",
         "platform": {
             "os": "linux",
@@ -789,8 +785,6 @@ def scanOcis(ctx):
 
 def buildOcisBinaryForTesting(ctx):
     return [{
-        "kind": "pipeline",
-        "type": "docker",
         "name": "build_ocis_binary_for_testing",
         "platform": {
             "os": "linux",
@@ -826,15 +820,13 @@ def uploadScanResults(ctx):
         })
 
     fork_handling = []
-    if ctx.build.source_repo != "" and ctx.build.source_repo != ctx.repo.slug:
-        fork_handling = [
-            "git remote add fork https://github.com/%s.git" % (ctx.build.source_repo),
-            "git fetch fork",
-        ]
+    #if ctx.build.source_repo != "" and ctx.build.source_repo != repo_slug:
+    #    fork_handling = [
+    #        "git remote add fork https://github.com/%s.git" % (ctx.build.source_repo),
+    #        "git fetch fork",
+    #    ]
 
     return {
-        "kind": "pipeline",
-        "type": "docker",
         "name": "upload-scan-results",
         "platform": {
             "os": "linux",
@@ -850,7 +842,7 @@ def uploadScanResults(ctx):
                 "commands": [
                                 # Always use the owncloud/ocis repository as base to have an up to date default branch.
                                 # This is needed for the skipIfUnchanged step, since it references a commit on master (which could be absent on a fork)
-                                "git clone https://github.com/%s.git ." % (ctx.repo.slug),
+                                "git clone https://github.com/%s.git ." % (repo_slug),
                             ] + fork_handling +
                             [
                                 "git checkout $DRONE_COMMIT",
@@ -863,7 +855,7 @@ def uploadScanResults(ctx):
                 "commands": [
                     "mkdir -p cache",
                     "mc alias set cachebucket $MC_HOST $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY",
-                    "mc mirror cachebucket/$CACHE_BUCKET/%s/%s/cache cache/ || true" % (ctx.repo.slug, ctx.build.commit + "-${DRONE_BUILD_NUMBER}"),
+                    "mc mirror cachebucket/$CACHE_BUCKET/%s/%s/cache cache/ || true" % (repo_slug, ctx.build.commit + "-${DRONE_BUILD_NUMBER}"),
                 ],
             },
             {
@@ -886,7 +878,7 @@ def uploadScanResults(ctx):
                 "environment": MINIO_MC_ENV,
                 "commands": [
                     "mc alias set cachebucket $MC_HOST $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY",
-                    "mc rm --recursive --force cachebucket/$CACHE_BUCKET/%s/%s/cache || true" % (ctx.repo.slug, ctx.build.commit + "-${DRONE_BUILD_NUMBER}"),
+                    "mc rm --recursive --force cachebucket/$CACHE_BUCKET/%s/%s/cache || true" % (repo_slug, ctx.build.commit + "-${DRONE_BUILD_NUMBER}"),
                 ],
             },
         ],
@@ -929,8 +921,6 @@ def vendorbinCodesniffer(phpVersion):
 
 def checkTestSuitesInExpectedFailures(ctx):
     return [{
-        "kind": "pipeline",
-        "type": "docker",
         "name": "check-suites-in-expected-failures",
         "steps": [
             {
@@ -950,8 +940,6 @@ def checkTestSuitesInExpectedFailures(ctx):
 
 def checkGherkinLint(ctx):
     return [{
-        "kind": "pipeline",
-        "type": "docker",
         "name": "check-gherkin-standard",
         "steps": [
             {
@@ -1007,8 +995,6 @@ def codestyle(ctx):
             name = "coding-standard-php%s" % phpVersion
 
             result = {
-                "kind": "pipeline",
-                "type": "docker",
                 "name": name,
                 "workspace": {
                     "base": "/drone",
@@ -1081,8 +1067,6 @@ def localApiTestPipeline(ctx):
                 for storage in params["storages"]:
                     for run_with_remote_php in params["withRemotePhp"]:
                         pipeline = {
-                            "kind": "pipeline",
-                            "type": "docker",
                             "name": "%s-%s%s" % ("CLI" if name.startswith("cli") else "API", name, "-withoutRemotePhp" if not run_with_remote_php else ""),
                             "platform": {
                                 "os": "linux",
@@ -1149,7 +1133,7 @@ def generateCoverageFromAPITest(ctx, name):
                 "endpoint": MINIO_MC_ENV["MC_HOST"],
                 "bucket": MINIO_MC_ENV["CACHE_BUCKET"],
                 "source": "cache/acceptance/coverage/coverage-%s.out" % name,
-                "target": "%s/%s/coverage" % (ctx.repo.slug, ctx.build.commit + "-${DRONE_BUILD_NUMBER}"),
+                "target": "%s/%s/coverage" % (repo_slug, ctx.build.commit + "-${DRONE_BUILD_NUMBER}"),
                 "path_style": True,
                 "access_key": MINIO_MC_ENV["AWS_ACCESS_KEY_ID"],
                 "secret_key": MINIO_MC_ENV["AWS_SECRET_ACCESS_KEY"],
@@ -1192,8 +1176,6 @@ def localApiTests(ctx, name, suites, storage = "ocis", extra_environment = {}, w
 
 def cs3ApiTests(ctx, storage):
     return {
-        "kind": "pipeline",
-        "type": "docker",
         "name": "cs3ApiTests",
         "platform": {
             "os": "linux",
@@ -1296,8 +1278,6 @@ def wopiValidatorTests(ctx, storage, wopiServerType):
             })
 
     return {
-        "kind": "pipeline",
-        "type": "docker",
         "name": "wopiValidatorTests-%s" % wopiServerType,
         "platform": {
             "os": "linux",
@@ -1374,8 +1354,6 @@ def coreApiTestPipeline(ctx):
                     filter_tags = "~@skipOnGraph&&~@skipOnOcis-%s-Storage" % ("OC" if storage == "owncloud" else "OCIS")
                     expected_failures_file = "%s/expected-failures-API-on-%s-storage.md" % (test_dir, storage.upper())
                     pipeline = {
-                        "kind": "pipeline",
-                        "type": "docker",
                         "name": "Core-API-%s%s" % (name, "-withoutRemotePhp" if not run_with_remote_php else ""),
                         "platform": {
                             "os": "linux",
@@ -1560,8 +1538,6 @@ def e2eTestPipeline(ctx):
                     "bash run-e2e.sh %s --run-part %d" % (e2e_args, run_part),
                 ]
                 pipelines.append({
-                    "kind": "pipeline",
-                    "type": "docker",
                     "name": "e2e-tests-%s-%s" % (name, run_part),
                     "steps": steps_before + [run_e2e] + steps_after,
                     "depends_on": getPipelineNames(buildOcisBinaryForTesting(ctx) + buildWebCache(ctx)),
@@ -1572,8 +1548,6 @@ def e2eTestPipeline(ctx):
         else:
             step_e2e["commands"].append("bash run-e2e.sh %s" % e2e_args)
             pipelines.append({
-                "kind": "pipeline",
-                "type": "docker",
                 "name": "e2e-tests-%s" % name,
                 "steps": steps_before + [step_e2e] + steps_after,
                 "depends_on": getPipelineNames(buildOcisBinaryForTesting(ctx) + buildWebCache(ctx)),
@@ -1698,8 +1672,6 @@ def multiServiceE2ePipeline(ctx):
             logTracingResults()
 
         pipelines.append({
-            "kind": "pipeline",
-            "type": "docker",
             "name": "e2e-tests-multi-service",
             "steps": steps,
             "depends_on": getPipelineNames(buildOcisBinaryForTesting(ctx) + buildWebCache(ctx)),
@@ -1773,7 +1745,7 @@ def dockerReleases(ctx):
 
     # dockerhub repo
     #  - "owncloud/ocis-rolling"
-    repo = ctx.repo.slug + "-rolling"
+    repo = repo_slug + "-rolling"
     docker_repos.append(repo)
 
     # production release repo
@@ -1781,7 +1753,7 @@ def dockerReleases(ctx):
         tag = ctx.build.ref.replace("refs/tags/v", "").lower()
         for prod_tag in PRODUCTION_RELEASE_TAGS:
             if tag.startswith(prod_tag):
-                docker_repos.append(ctx.repo.slug)
+                docker_repos.append(repo_slug)
                 break
 
     for repo in docker_repos:
@@ -1815,8 +1787,6 @@ def dockerRelease(ctx, arch, repo, build_type):
         depends_on = []
 
     return {
-        "kind": "pipeline",
-        "type": "docker",
         "name": "docker-%s-%s" % (arch, build_type),
         "platform": {
             "os": "linux",
@@ -1961,8 +1931,6 @@ def binaryRelease(ctx, arch, build_type, target, depends_on = []):
     }
 
     return {
-        "kind": "pipeline",
-        "type": "docker",
         "name": "binaries-%s-%s" % (arch, build_type),
         "platform": {
             "os": "linux",
@@ -2085,8 +2053,6 @@ def licenseCheck(ctx):
     }
 
     return [{
-        "kind": "pipeline",
-        "type": "docker",
         "name": "check-licenses",
         "platform": {
             "os": "linux",
@@ -2239,8 +2205,6 @@ def releaseDockerManifest(ctx, repo, build_type):
         )
 
     return {
-        "kind": "pipeline",
-        "type": "docker",
         "name": "manifest-%s" % build_type,
         "platform": {
             "os": "linux",
@@ -2258,8 +2222,6 @@ def releaseDockerManifest(ctx, repo, build_type):
 
 def changelog():
     return [{
-        "kind": "pipeline",
-        "type": "docker",
         "name": "changelog",
         "platform": {
             "os": "linux",
@@ -2333,8 +2295,6 @@ def changelog():
 
 def releaseDockerReadme(ctx, repo, build_type):
     return {
-        "kind": "pipeline",
-        "type": "docker",
         "name": "readme-%s" % build_type,
         "platform": {
             "os": "linux",
@@ -2368,8 +2328,6 @@ def releaseDockerReadme(ctx, repo, build_type):
 
 def docs():
     return [{
-        "kind": "pipeline",
-        "type": "docker",
         "name": "docs",
         "platform": {
             "os": "linux",
@@ -2482,8 +2440,6 @@ def notify(ctx):
         status.append("success")
 
     return {
-        "kind": "pipeline",
-        "type": "docker",
         "name": "chat-notifications",
         "clone": {
             "disable": True,
@@ -2807,8 +2763,6 @@ def example_deploys(ctx):
 
 def deploy(ctx, config, rebuild):
     return {
-        "kind": "pipeline",
-        "type": "docker",
         "name": "deploy_%s" % (config),
         "platform": {
             "os": "linux",
@@ -2859,8 +2813,6 @@ def deploy(ctx, config, rebuild):
 
 def checkStarlark():
     return [{
-        "kind": "pipeline",
-        "type": "docker",
         "name": "check-starlark",
         "steps": [
             {
@@ -2934,8 +2886,6 @@ def uploadAPITestCoverageReport(ctx):
         })
 
     return {
-        "kind": "pipeline",
-        "type": "docker",
         "name": "sonarcloud",
         "platform": {
             "os": "linux",
@@ -2949,7 +2899,7 @@ def uploadAPITestCoverageReport(ctx):
                 "commands": [
                     "mkdir -p results",
                     "mc alias set cache $MC_HOST $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY",
-                    "mc mirror cache/$CACHE_BUCKET/%s/%s/coverage results/" % (ctx.repo.slug, ctx.build.commit + "-${DRONE_BUILD_NUMBER}"),
+                    "mc mirror cache/$CACHE_BUCKET/%s/%s/coverage results/" % (repo_slug, ctx.build.commit + "-${DRONE_BUILD_NUMBER}"),
                 ],
             },
             {
@@ -2971,7 +2921,7 @@ def uploadAPITestCoverageReport(ctx):
                 "environment": MINIO_MC_ENV,
                 "commands": [
                     "mc alias set cache $MC_HOST $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY",
-                    "mc rm --recursive --force cache/$CACHE_BUCKET/%s/%s" % (ctx.repo.slug, ctx.build.commit + "-${DRONE_BUILD_NUMBER}"),
+                    "mc rm --recursive --force cache/$CACHE_BUCKET/%s/%s" % (repo_slug, ctx.build.commit + "-${DRONE_BUILD_NUMBER}"),
                 ],
             },
         ],
@@ -2989,8 +2939,6 @@ def uploadAPITestCoverageReport(ctx):
 
 def genericCachePurge(flush_path):
     return {
-        "kind": "pipeline",
-        "type": "docker",
         "name": "purge_build_artifact_cache",
         "platform": {
             "os": "linux",
@@ -3025,12 +2973,12 @@ def genericCachePurge(flush_path):
 
 def genericBuildArtifactCache(ctx, name, action, path):
     if action == "rebuild" or action == "restore":
-        cache_path = "%s/%s/%s" % (S3_CACHE_BUCKET, ctx.repo.slug, ctx.build.commit + "-${DRONE_BUILD_NUMBER}")
+        cache_path = "%s/%s/%s" % (S3_CACHE_BUCKET, repo_slug, ctx.build.commit + "-${DRONE_BUILD_NUMBER}")
         name = "%s_build_artifact_cache" % (name)
         return genericCache(name, action, [path], cache_path)
 
     if action == "purge":
-        flush_path = "%s/%s" % (S3_CACHE_BUCKET, ctx.repo.slug)
+        flush_path = "%s/%s" % (S3_CACHE_BUCKET, repo_slug)
         return genericCachePurge(flush_path)
     return []
 
@@ -3125,8 +3073,6 @@ def litmus(ctx, storage):
     litmusCommand = "/usr/local/bin/litmus-wrapper"
 
     result = {
-        "kind": "pipeline",
-        "type": "docker",
         "name": "litmus",
         "workspace": {
             "base": "/drone",
@@ -3524,8 +3470,6 @@ def k6LoadTests(ctx):
         trigger_ref.append("refs/pull/**")
 
     return [{
-        "kind": "pipeline",
-        "type": "docker",
         "name": "k6-load-test",
         "clone": {
             "disable": True,
@@ -3695,8 +3639,6 @@ def postgresService():
 
 def deleteStaleBranches(ctx):
     return [{
-        "kind": "pipeline",
-        "type": "docker",
         "name": "delete stale branches",
         "steps": [
             {
@@ -3740,8 +3682,6 @@ def trivyScan(ctx):
     ]
 
     return {
-        "kind": "pipeline",
-        "type": "docker",
         "name": "security-scan-trivy",
         "platform": {
             "os": "linux",

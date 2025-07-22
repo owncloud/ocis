@@ -2,7 +2,6 @@ depends_on:
   - build_ocis_binary_for_testing
   - build-web-cache
   - build-web-pnpm-cache
-kind: pipeline
 services:
   - detach: true
     environment:
@@ -257,7 +256,6 @@ trigger:
     - refs/heads/stable-*
     - refs/tags/**
     - refs/pull/**
-type: docker
 volumes:
   - name: uploads
     temp: {}

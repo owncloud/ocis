@@ -1,5 +1,4 @@
 depends_on: []
-kind: pipeline
 steps:
   - image: owncloudci/drone-skip-pipeline
     name: skip-if-unchanged
@@ -45,7 +44,6 @@ trigger:
     - refs/heads/master
     - refs/heads/stable-*
     - refs/pull/**
-type: docker
 workspace:
   base: /drone
   path: src

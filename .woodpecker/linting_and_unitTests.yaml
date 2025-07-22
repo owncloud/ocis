@@ -1,6 +1,5 @@
 depends_on:
   - get-go-bin-cache
-kind: pipeline
 platform:
   arch: amd64
   os: linux
@@ -102,7 +101,6 @@ trigger:
     - refs/heads/master
     - refs/heads/stable-*
     - refs/pull/**
-type: docker
 volumes:
   - name: gopath
     temp: {}

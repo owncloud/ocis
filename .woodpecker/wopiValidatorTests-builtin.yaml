@@ -1,6 +1,5 @@
 depends_on:
   - build_ocis_binary_for_testing
-kind: pipeline
 platform:
   arch: amd64
   os: linux
@@ -293,4 +292,3 @@ trigger:
     - refs/heads/master
     - refs/heads/stable-*
     - refs/pull/**
-type: docker

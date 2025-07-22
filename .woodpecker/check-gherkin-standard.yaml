@@ -1,4 +1,3 @@
-kind: pipeline
 steps:
   - commands:
       - npm install -g @gherlint/gherlint@1.1.0
@@ -8,4 +7,3 @@ steps:
 trigger:
   ref:
     - refs/pull/**
-type: docker

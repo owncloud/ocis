@@ -1,5 +1,4 @@
 depends_on: []
-kind: pipeline
 steps:
   - commands:
       - buildifier --mode=check .drone.star
@@ -16,4 +15,3 @@ steps:
 trigger:
   ref:
     - refs/pull/**
-type: docker

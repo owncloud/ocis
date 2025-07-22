@@ -35,7 +35,6 @@ depends_on:
   - e2e-tests-part-4
   - e2e-tests-search
   - e2e-tests-keycloak
-kind: pipeline
 platform:
   arch: arm64
   os: linux
@@ -129,7 +128,6 @@ trigger:
     - refs/heads/stable-*
     - refs/tags/v*
     - refs/pull/**
-type: docker
 volumes:
   - name: gopath
     temp: {}

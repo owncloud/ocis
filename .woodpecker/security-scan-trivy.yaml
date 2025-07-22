@@ -1,4 +1,3 @@
-kind: pipeline
 platform:
   arch: amd64
   os: linux
@@ -13,4 +12,3 @@ trigger:
     - refs/heads/master
     - refs/tags/**
     - refs/pull/**
-type: docker

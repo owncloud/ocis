@@ -1,7 +1,6 @@
 depends_on:
   - docker-arm64-daily
   - docker-amd64-daily
-kind: pipeline
 platform:
   arch: amd64
   os: linux
@@ -34,4 +33,3 @@ trigger:
     - refs/heads/master
     - refs/heads/stable-*
     - refs/tags/v*
-type: docker

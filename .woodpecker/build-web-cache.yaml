@@ -1,6 +1,5 @@
 clone:
   disable: true
-kind: pipeline
 steps:
   - commands:
       - curl -s -o .drone.env https://raw.githubusercontent.com/owncloud/ocis//.drone.env
@@ -50,4 +49,3 @@ trigger:
     - refs/heads/stable-*
     - refs/tags/**
     - refs/pull/**
-type: docker
