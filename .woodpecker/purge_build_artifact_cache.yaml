@@ -33,9 +33,6 @@ depends_on:
   - e2e-tests-part-4
   - e2e-tests-search
   - e2e-tests-keycloak
-platform:
-  arch: amd64
-  os: linux
 steps:
   - image: plugins/s3-cache:1
     name: purge-cache

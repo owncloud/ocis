@@ -2,9 +2,6 @@ clone:
   disable: true
 depends_on:
   - linting_and_unitTests
-platform:
-  arch: amd64
-  os: linux
 steps:
   - commands:
       - git clone https://github.com/opencloud-eu/opencloud.git .

@@ -1,8 +1,5 @@
 depends_on:
   - build_ocis_binary_for_testing
-platform:
-  arch: amd64
-  os: linux
 services:
   - image: axllent/mailpit:v1.22.3
     name: email

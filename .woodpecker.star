@@ -609,10 +609,6 @@ def testPipelines(ctx):
 def getGoBinForTesting(ctx):
     return [{
         "name": "get-go-bin-cache",
-        "platform": {
-            "os": "linux",
-            "arch": "amd64",
-        },
         "steps": skipIfUnchanged(ctx, "unit-tests") +
                  checkGoBinCache() +
                  cacheGoBin(),
@@ -736,10 +732,6 @@ def testOcis(ctx):
 
     return {
         "name": "linting_and_unitTests",
-        "platform": {
-            "os": "linux",
-            "arch": "amd64",
-        },
         "steps": steps,
         "trigger": {
             "ref": [
@@ -767,10 +759,6 @@ def scanOcis(ctx):
 
     return {
         "name": "go-vulnerability-scanning",
-        "platform": {
-            "os": "linux",
-            "arch": "amd64",
-        },
         "steps": steps,
         "trigger": {
             "ref": [
@@ -786,10 +774,6 @@ def scanOcis(ctx):
 def buildOcisBinaryForTesting(ctx):
     return [{
         "name": "build_ocis_binary_for_testing",
-        "platform": {
-            "os": "linux",
-            "arch": "amd64",
-        },
         "steps": skipIfUnchanged(ctx, "acceptance-tests") +
                  makeNodeGenerate("") +
                  makeGoGenerate("") +
@@ -828,10 +812,6 @@ def uploadScanResults(ctx):
 
     return {
         "name": "upload-scan-results",
-        "platform": {
-            "os": "linux",
-            "arch": "amd64",
-        },
         "clone": {
             "disable": True,  # Sonarcloud does not apply issues on already merged branch
         },
@@ -1068,10 +1048,6 @@ def localApiTestPipeline(ctx):
                     for run_with_remote_php in params["withRemotePhp"]:
                         pipeline = {
                             "name": "%s-%s%s" % ("CLI" if name.startswith("cli") else "API", name, "-withoutRemotePhp" if not run_with_remote_php else ""),
-                            "platform": {
-                                "os": "linux",
-                                "arch": "amd64",
-                            },
                             "steps": skipIfUnchanged(ctx, "acceptance-tests") +
                                      restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin") +
                                      (tikaService() if params["tikaNeeded"] else []) +
@@ -1177,10 +1153,6 @@ def localApiTests(ctx, name, suites, storage = "ocis", extra_environment = {}, w
 def cs3ApiTests(ctx, storage):
     return {
         "name": "cs3ApiTests",
-        "platform": {
-            "os": "linux",
-            "arch": "amd64",
-        },
         "steps": skipIfUnchanged(ctx, "acceptance-tests") +
                  restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin") +
                  ocisServer(storage, [], [], "cs3api_validator") +
@@ -1279,10 +1251,6 @@ def wopiValidatorTests(ctx, storage, wopiServerType):
 
     return {
         "name": "wopiValidatorTests-%s" % wopiServerType,
-        "platform": {
-            "os": "linux",
-            "arch": "amd64",
-        },
         "steps": skipIfUnchanged(ctx, "acceptance-tests") +
                  restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin") +
                  fakeOffice() +
@@ -1355,10 +1323,6 @@ def coreApiTestPipeline(ctx):
                     expected_failures_file = "%s/expected-failures-API-on-%s-storage.md" % (test_dir, storage.upper())
                     pipeline = {
                         "name": "Core-API-%s%s" % (name, "-withoutRemotePhp" if not run_with_remote_php else ""),
-                        "platform": {
-                            "os": "linux",
-                            "arch": "amd64",
-                        },
                         "steps": skipIfUnchanged(ctx, "acceptance-tests") +
                                  restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin") +
                                  (tikaService() if params["tikaNeeded"] else []) +
@@ -1777,6 +1741,7 @@ def dockerReleases(ctx):
     return pipelines
 
 def dockerRelease(ctx, arch, repo, build_type):
+    # TODO:  handle arch
     build_args = [
         "REVISION=%s" % (ctx.build.commit),
         "VERSION=%s" % (ctx.build.ref.replace("refs/tags/", "") if ctx.build.event == "tag" else "master"),
@@ -1788,10 +1753,6 @@ def dockerRelease(ctx, arch, repo, build_type):
 
     return {
         "name": "docker-%s-%s" % (arch, build_type),
-        "platform": {
-            "os": "linux",
-            "arch": arch,
-        },
         "steps": skipIfUnchanged(ctx, "build-docker") +
                  makeNodeGenerate("") +
                  makeGoGenerate("") + [
@@ -1932,10 +1893,6 @@ def binaryRelease(ctx, arch, build_type, target, depends_on = []):
 
     return {
         "name": "binaries-%s-%s" % (arch, build_type),
-        "platform": {
-            "os": "linux",
-            "arch": "amd64",
-        },
         "steps": skipIfUnchanged(ctx, "build-binary") +
                  makeNodeGenerate("") +
                  makeGoGenerate("") + [
@@ -2054,10 +2011,6 @@ def licenseCheck(ctx):
 
     return [{
         "name": "check-licenses",
-        "platform": {
-            "os": "linux",
-            "arch": "amd64",
-        },
         "steps": [
             {
                 "name": "node-check-licenses",
@@ -2206,10 +2159,6 @@ def releaseDockerManifest(ctx, repo, build_type):
 
     return {
         "name": "manifest-%s" % build_type,
-        "platform": {
-            "os": "linux",
-            "arch": "amd64",
-        },
         "steps": steps,
         "trigger": {
             "ref": [
@@ -2223,10 +2172,6 @@ def releaseDockerManifest(ctx, repo, build_type):
 def changelog():
     return [{
         "name": "changelog",
-        "platform": {
-            "os": "linux",
-            "arch": "amd64",
-        },
         "steps": [
             {
                 "name": "generate",
@@ -2296,10 +2241,6 @@ def changelog():
 def releaseDockerReadme(ctx, repo, build_type):
     return {
         "name": "readme-%s" % build_type,
-        "platform": {
-            "os": "linux",
-            "arch": "amd64",
-        },
         "steps": [
             {
                 "name": "execute",
@@ -2329,10 +2270,6 @@ def releaseDockerReadme(ctx, repo, build_type):
 def docs():
     return [{
         "name": "docs",
-        "platform": {
-            "os": "linux",
-            "arch": "amd64",
-        },
         "steps": [
             {
                 "name": "docs-generate",
@@ -2764,10 +2701,6 @@ def example_deploys(ctx):
 def deploy(ctx, config, rebuild):
     return {
         "name": "deploy_%s" % (config),
-        "platform": {
-            "os": "linux",
-            "arch": "amd64",
-        },
         "steps": [
             {
                 "name": "clone continuous deployment playbook",
@@ -2887,10 +2820,6 @@ def uploadAPITestCoverageReport(ctx):
 
     return {
         "name": "sonarcloud",
-        "platform": {
-            "os": "linux",
-            "arch": "amd64",
-        },
         "steps": [
             {
                 "name": "sync-from-cache",
@@ -2940,10 +2869,6 @@ def uploadAPITestCoverageReport(ctx):
 def genericCachePurge(flush_path):
     return {
         "name": "purge_build_artifact_cache",
-        "platform": {
-            "os": "linux",
-            "arch": "amd64",
-        },
         "steps": [
             {
                 "name": "purge-cache",
@@ -3683,10 +3608,6 @@ def trivyScan(ctx):
 
     return {
         "name": "security-scan-trivy",
-        "platform": {
-            "os": "linux",
-            "arch": "amd64",
-        },
         "steps": steps,
         "trigger": {
             "ref": [

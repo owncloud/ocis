@@ -1,6 +1,3 @@
-platform:
-  arch: amd64
-  os: linux
 steps:
   - commands:
       - make ci-node-check-licenses

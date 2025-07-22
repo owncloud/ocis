@@ -1,6 +1,3 @@
-platform:
-  arch: amd64
-  os: linux
 steps:
   - image: owncloudci/drone-skip-pipeline
     name: skip-if-unchanged

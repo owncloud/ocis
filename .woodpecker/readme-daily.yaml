@@ -2,9 +2,6 @@ depends_on:
   - docker-arm64-daily
   - docker-amd64-daily
   - manifest-daily
-platform:
-  arch: amd64
-  os: linux
 steps:
   - environment:
       DOCKER_PASS:
