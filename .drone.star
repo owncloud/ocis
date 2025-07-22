@@ -2496,7 +2496,7 @@ def notify(ctx):
                     },
                 },
                 "commands": [
-                    "wget https://raw.githubusercontent.com/owncloud/ocis/%s/tests/config/drone/notification.sh" % ctx.build.commit,
+                    "wget https://raw.githubusercontent.com/%s/%s/tests/config/drone/notification.sh" % (ctx.repo.slug, ctx.build.commit),
                     "bash notification.sh",
                 ],
             },
