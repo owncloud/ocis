@@ -38,3 +38,12 @@ Feature: Delete notification
     When user "Brian" deletes all notifications
     Then the HTTP status code should be "200"
     And user "Brian" should not have any notification
+
+
+  Scenario: delete a notification using id
+    When user "Brian" deletes a notification related to resource "my_data" with subject "Resource shared" using id
+    Then the HTTP status code should be "200"
+    And user "Brian" should have a notification with subject "Resource shared" and message:
+      | message                                    |
+      | Alice Hansen shared textfile1.txt with you |
+    But user "Brian" should not have a notification related to resource "my_data" with subject "Resource shared"

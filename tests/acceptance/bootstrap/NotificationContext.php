@@ -24,7 +24,7 @@ require_once 'bootstrap.php';
  */
 class NotificationContext implements Context {
 	private FeatureContext $featureContext;
-	private string $notificationEndpointPath = '/apps/notifications/api/v1/notifications?format=json';
+	private string $notificationEndpointPath = '/apps/notifications/api/v1/notifications';
 	private string $globalNotificationEndpointPath = '/apps/notifications/api/v1/notifications/global';
 
 	private array $notificationIds;
@@ -115,7 +115,7 @@ class NotificationContext implements Context {
 			$this->featureContext->getActualUsername($user),
 			$this->featureContext->getPasswordForUser($user),
 			'GET',
-			$this->notificationEndpointPath,
+			$this->notificationEndpointPath . '?format=json',
 			[],
 			2,
 			$headers,
@@ -216,7 +216,7 @@ class NotificationContext implements Context {
 			$this->featureContext->getActualUsername($user),
 			$this->featureContext->getPasswordForUser($user),
 			'DELETE',
-			$this->notificationEndpointPath,
+			$this->notificationEndpointPath . '?format=json',
 			\json_encode($payload),
 			2,
 		);
@@ -613,5 +613,51 @@ class NotificationContext implements Context {
 			json_encode($payload),
 		);
 		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * deletes notification using id
+	 *
+	 * @param string $user
+	 * @param string $notificationId
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 * @throws JsonException
+	 */
+	public function deleteNotificationUsingId(string $user, string $notificationId): ResponseInterface {
+		$deleteNotificationEndpoint = $this->notificationEndpointPath . '/' . $notificationId;
+		return OcsApiHelper::sendRequest(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getActualUsername($user),
+			$this->featureContext->getPasswordForUser($user),
+			'DELETE',
+			$deleteNotificationEndpoint,
+		);
+	}
+
+	/**
+	 * @When user :user deletes a notification related to resource :resource with subject :subject using id
+	 *
+	 * @param string $user
+	 * @param string $resource
+	 * @param string $subject
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws JsonException
+	 */
+	public function userDeletesNotificationOfResourceAndSubjectById(
+		string $user,
+		string $resource,
+		string $subject,
+	): void {
+		$allNotifications = $this->listAllNotifications($user);
+		$filteredNotificationId = $this->filterNotificationsBySubjectAndResource(
+			$subject,
+			$resource,
+			$allNotifications,
+		)[0]->notification_id;
+		$this->featureContext->setResponse($this->deleteNotificationUsingId($user, $filteredNotificationId));
 	}
 }
