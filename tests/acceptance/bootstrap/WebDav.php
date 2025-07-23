@@ -339,6 +339,7 @@ trait WebDav {
 	 * @param bool|null $isGivenStep
 	 * @param string|null $password
 	 * @param string|null $spaceId
+	 * @param array|null $headers
 	 *
 	 * @return ResponseInterface
 	 * @throws JsonException | GuzzleException
@@ -350,12 +351,13 @@ trait WebDav {
 		?bool $isGivenStep = false,
 		?string $password = null,
 		?string $spaceId = null,
+		?array $headers = [],
 	): ResponseInterface {
 		return $this->makeDavRequest(
 			$user,
 			"MKCOL",
 			$folder,
-			[],
+			$headers,
 			null,
 			$spaceId,
 			"files",
@@ -2726,6 +2728,32 @@ trait WebDav {
 	 */
 	public function userCreatesFolder(string $user, string $destination): void {
 		$response = $this->createFolder($user, $destination);
+		$this->setResponse($response);
+	}
+
+	/**
+	 * @When user :user creates folder :destination with the following headers using the WebDAV API
+	 *
+	 * @param string $user
+	 * @param string $destination
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws JsonException
+	 * @throws GuzzleException
+	 */
+	public function userCreatesFolderWithTheFollowingHeadersUsingTheWebDavApi(
+		string $user,
+		string $destination,
+		TableNode $table,
+	): void {
+		$headers = [];
+		foreach ($table->getColumnsHash() as $header) {
+			$headerName = $header['header'];
+			$headerValue = $header['value'];
+			$headers[$headerName] = $headerValue;
+		}
+		$response = $this->createFolder(user: $user, folder: $destination, headers: $headers);
 		$this->setResponse($response);
 	}
 
