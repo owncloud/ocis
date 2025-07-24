@@ -6,6 +6,7 @@ import (
 	"io/fs"
 	"mime"
 	"net/http"
+	"net/url"
 	"path"
 	"path/filepath"
 	"strings"
@@ -23,8 +24,16 @@ func FileServer(fsys fs.FS) http.Handler {
 }
 
 func isSafePath(p string) bool {
-	// return true // Debugging
-	return !strings.Contains(p, "..")
+	// Recursive URL decode to prevent bypass via %252e%252e (double encoding)
+	decoded := p
+	for {
+		prev := decoded
+		decoded, err := url.QueryUnescape(decoded)
+		if err != nil || decoded == prev {
+			break // stop on error or no more decoding possible
+		}
+	}
+	return !strings.Contains(decoded, "..")
 }
 
 func (f *fileServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
