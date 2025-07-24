@@ -1,0 +1,22 @@
+{{- include "ocis.basicServiceTemplates" (dict "scope" . "appName" "appNameAuthBasic" "appNameSuffix" "") -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .appName }}
+  namespace: {{ template "ocis.namespace" . }}
+  labels:
+    app: {{ .appName }}
+    ocis-metrics: enabled
+    {{- include "ocis.labels" . | nindent 4 }}
+spec:
+  selector:
+    app: {{ .appName }}
+  ports:
+    - name: grpc
+      port: 9146
+      protocol: TCP
+      appProtocol: {{ .Values.service.appProtocol.grpc | quote}}
+    - name: metrics-debug
+      port: 9147
+      protocol: TCP
+      appProtocol: {{ .Values.service.appProtocol.http | quote}}
