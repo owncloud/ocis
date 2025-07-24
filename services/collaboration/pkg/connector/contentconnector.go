@@ -21,7 +21,6 @@ import (
 	revactx "github.com/owncloud/reva/v2/pkg/ctx"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/rs/zerolog"
-	"go.opentelemetry.io/otel/propagation"
 )
 
 // ContentConnectorService is the interface to implement the "File contents"
@@ -57,7 +56,7 @@ func NewContentConnector(gws pool.Selectable[gatewayv1beta1.GatewayAPIClient], c
 }
 
 func newHttpRequest(ctx context.Context, wopiContext middleware.WopiContext, method, url, transferToken string, body io.Reader) (*http.Request, error) {
-	httpReq, err := http.NewRequestWithContext(ctx, method, url, body)
+	httpReq, err := tracing.GetNewRequestWithContext(ctx, method, url, body)
 	if err != nil {
 		return nil, err
 	}
@@ -72,8 +71,6 @@ func newHttpRequest(ctx context.Context, wopiContext middleware.WopiContext, met
 	} else {
 		httpReq.Header.Add("X-Access-Token", wopiContext.AccessToken)
 	}
-	tracingProp := tracing.GetPropagator()
-	tracingProp.Inject(ctx, propagation.HeaderCarrier(httpReq.Header))
 	return httpReq, nil
 }
 

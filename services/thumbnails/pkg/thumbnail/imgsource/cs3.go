@@ -10,6 +10,7 @@ import (
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
 	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/config"
 	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/errors"
 	"github.com/owncloud/reva/v2/pkg/bytesize"
@@ -58,7 +59,7 @@ func (s CS3) Get(ctx context.Context, path string) (io.ReadCloser, error) {
 		}
 	}
 
-	ctx = metadata.AppendToOutgoingContext(context.Background(), revactx.TokenHeader, auth)
+	ctx = metadata.AppendToOutgoingContext(ctx, revactx.TokenHeader, auth)
 	err = s.checkImageFileSize(ctx, ref)
 	if err != nil {
 		return nil, err
@@ -89,6 +90,7 @@ func (s CS3) Get(ctx context.Context, path string) (io.ReadCloser, error) {
 	}
 
 	httpReq, err := rhttp.NewRequest(ctx, "GET", ep, nil)
+	tracing.InjectTracingHeaders(ctx, httpReq)
 	if err != nil {
 		return nil, err
 	}
