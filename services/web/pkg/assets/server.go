@@ -25,15 +25,16 @@ func FileServer(fsys fs.FS) http.Handler {
 
 func isSafePath(p string) bool {
 	// Recursive URL decode to prevent bypass via %252e%252e (double encoding)
-	decoded := p
+	prev := p
 	for {
-		prev := decoded
-		decoded, err := url.QueryUnescape(decoded)
+		decoded, err := url.QueryUnescape(prev)
 		if err != nil || decoded == prev {
-			break // stop on error or no more decoding possible
+			break
 		}
+		prev = decoded
 	}
-	return !strings.Contains(decoded, "..")
+
+	return !strings.Contains(prev, "..")
 }
 
 func (f *fileServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
