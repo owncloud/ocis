@@ -96,7 +96,7 @@ func (a *AuthAppService) HandleCreate(w http.ResponseWriter, r *http.Request) {
 
 	q := r.URL.Query()
 	expiry, err := time.ParseDuration(q.Get("expiry"))
-	if err != nil { 
+	if err != nil {
 		sublog.Info().Err(err).Str("duration", q.Get("expiry")).Msg("error parsing expiry")
 		http.Error(w, "error parsing expiry. Use e.g. 30m or 72h", http.StatusBadRequest)
 		return
