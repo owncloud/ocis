@@ -321,13 +321,13 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 
 #### [server returns status code 500 when creating token for non-existent user (Impersonation)](https://github.com/owncloud/ocis/issues/10815)
 
-- [apiAuthApp/token.feature:170](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiAuthApp/token.feature#L170)
-- [apiAuthApp/token.feature:176](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiAuthApp/token.feature#L176)
+- [apiAuthApp/token.feature:195](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiAuthApp/token.feature#L195)
+- [apiAuthApp/token.feature:201](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiAuthApp/token.feature#L201)
 
 #### [Server returns status code 500 when deleting auth-app token of a different user](https://github.com/owncloud/ocis/issues/10921)
 
-- [apiAuthApp/token.feature:183](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiAuthApp/token.feature#L183)
-- [apiAuthApp/token.feature:189](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiAuthApp/token.feature#L189)
+- [apiAuthApp/token.feature:208](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiAuthApp/token.feature#L208)
+- [apiAuthApp/token.feature:214](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiAuthApp/token.feature#L214)
 
 #### [Missing shareid on response of a PROPFIND on the sharejail root](https://github.com/owncloud/ocis/issues/8510)
 
