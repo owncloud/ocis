@@ -1,0 +1,17 @@
+depends_on: []
+steps:
+  - commands:
+      - buildifier --mode=check .drone.star
+    image: owncloudci/bazel-buildifier:latest
+    name: format-check-starlark
+  - commands:
+      - buildifier --mode=fix .drone.star
+      - git diff
+    image: owncloudci/bazel-buildifier:latest
+    name: show-diff
+    when:
+      status:
+        - failure
+trigger:
+  ref:
+    - refs/pull/**

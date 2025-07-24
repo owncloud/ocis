@@ -1,0 +1,20 @@
+depends_on:
+  - docker-arm64-daily
+  - docker-amd64-daily
+  - manifest-daily
+steps:
+  - environment:
+      DOCKER_PASS:
+        from_secret: docker_password
+      DOCKER_USER:
+        from_secret: docker_username
+      PUSHRM_FILE: README.md
+      PUSHRM_SHORT: 'Docker images for '
+      PUSHRM_TARGET: opencloud-eu/opencloud-rolling
+    image: chko/docker-pushrm:1
+    name: execute
+trigger:
+  ref:
+    - refs/heads/master
+    - refs/heads/stable-*
+    - refs/tags/v*

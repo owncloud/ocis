@@ -1,0 +1,79 @@
+clone:
+  disable: true
+depends_on:
+  - coding-standard-php8.4
+  - check-gherkin-standard
+  - check-suites-in-expected-failures
+  - build-web-cache
+  - build-web-pnpm-cache
+  - get-go-bin-cache
+  - build_ocis_binary_for_testing
+  - check-starlark
+  - changelog
+  - docs
+  - check-licenses
+  - delete stale branches
+  - linting_and_unitTests
+  - upload-scan-results
+  - litmus
+  - cs3ApiTests
+  - wopiValidatorTests-builtin
+  - wopiValidatorTests-cs3
+  - API-contractAndLock
+  - API-settingsAndNotification
+  - API-graphUser
+  - API-spaces
+  - API-spacesShares
+  - API-davOperations
+  - API-groupAndSearch1
+  - API-search2
+  - API-sharingNg1
+  - API-sharingNgAdditionalShareRole
+  - API-sharingNgShareInvitation
+  - API-sharingNgLinkShare
+  - API-antivirus
+  - API-ocmAndAuthApp
+  - API-wopi
+  - CLI-cliCommands
+  - Core-API-1
+  - Core-API-2
+  - Core-API-3
+  - Core-API-4
+  - Core-API-5
+  - Core-API-6
+  - Core-API-7
+  - Core-API-8
+  - e2e-tests-part-1
+  - e2e-tests-part-2
+  - e2e-tests-part-3
+  - e2e-tests-part-4
+  - e2e-tests-search
+  - e2e-tests-keycloak
+  - purge_build_artifact_cache
+  - sonarcloud
+  - docker-arm64-daily
+  - docker-amd64-daily
+  - manifest-daily
+  - readme-daily
+  - binaries-linux-daily
+  - binaries-darwin-daily
+  - security-scan-trivy
+  - deploy_ocis_full/master.yml
+  - deploy_ocis_full/onlyoffice-master.yml
+steps:
+  - commands:
+      - wget https://raw.githubusercontent.com/owncloud/ocis//tests/config/drone/notification.sh
+      - bash notification.sh
+    environment:
+      MATRIX_TOKEN:
+        from_secret: matrix_token
+    image: owncloudci/alpine:latest
+    name: notify-matrix
+trigger:
+  ref:
+    - refs/heads/master
+    - refs/heads/stable-*
+    - refs/heads/release*
+    - refs/tags/**
+  status:
+    - failure
