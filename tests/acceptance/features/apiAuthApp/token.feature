@@ -31,6 +31,7 @@ Feature: create auth-app token
       }
       """
 
+
   Scenario: user creates auth-app token with custom label
     When user "Alice" creates auth-app token with expiration time "72h" and label "Custom label" using the auth-app API
     Then the HTTP status code should be "200"

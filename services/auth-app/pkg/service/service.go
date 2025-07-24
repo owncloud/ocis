@@ -142,9 +142,9 @@ func (a *AuthAppService) HandleCreate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Custom label, overrides "Generated via ..." default
-	custom_label := q.Get("label")
-	if len(custom_label) > 0 {
-		label = custom_label
+	customLabel := q.Get("label")
+	if len(customLabel) > 0 {
+		label = customLabel
 	}
 
 	scopes, err := scope.AddOwnerScope(map[string]*authpb.Scope{})
