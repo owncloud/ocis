@@ -26,7 +26,12 @@ func FileServer(fsys fs.FS) http.Handler {
 	return &fileServer{http.FS(fsys)}
 }
 
-func isSafePath(p string) bool {
+// IsSafePath validates if a path is safe from path traversal attacks
+func IsSafePath(p string) bool {
+	if p == "" {
+		return false
+	}
+
 	var dangerousRunes = []rune{
 		'\uFF0F', // fullwidth slash ／
 		'\u2215', // division slash ∕
@@ -52,7 +57,7 @@ func isSafePath(p string) bool {
 		return false
 	}
 
-	// // Reject invalid UTF-8
+	// Reject invalid UTF-8
 	if !utf8.ValidString(path) {
 		return false
 	}
@@ -68,27 +73,11 @@ func isSafePath(p string) bool {
 	}
 
 	// match one or more /./ and /../
-	if regexp.MustCompile(`(?:[\/\\]\.+[\/\\])+`).MatchString(path) {
-		return false
-	}
-
-	return true // Debug acceptance tests
-
-	// Clean to resolve all .. and . and compare the root
-	// clean := path.Clean(prev)
-
-	//if clean == "/" {
-	//	return true
-	//}
-
-	// check same root path after resolve
-	// parts := strings.Split(strings.TrimPrefix(prev, "/"), "/")
-	// partsClean := strings.Split(path.Clean(strings.TrimPrefix(prev, "/")), "/")
-	// return strings.EqualFold(parts[0], partsClean[0])
+	return !regexp.MustCompile(`(?:[\/\\]\.+[\/\\])+`).MatchString(path)
 }
 
 func (f *fileServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if !isSafePath(r.URL.Path) {
+	if !IsSafePath(r.URL.Path) {
 		http.NotFound(w, r)
 		return
 	}
