@@ -354,4 +354,4 @@ replace go-micro.dev/v4 => github.com/kobergj/go-micro/v4 v4.0.0-20250117084952-
 // see https://github.com/mattn/go-sqlite3/issues/965 for more details
 exclude github.com/mattn/go-sqlite3 v2.0.3+incompatible
 
-replace github.com/cs3org/reva/v2 => github.com/owncloud/reva/v2 v2.0.0-20250526202834-eda90d6d516a
+replace github.com/cs3org/reva/v2 => github.com/owncloud/reva/v2 v2.0.0-20250724132414-1d9f38a30619
