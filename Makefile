@@ -162,16 +162,30 @@ clean:
 .PHONY: docs-generate
 docs-generate:
 	# empty the folders first to only have files that are generated without remnants
-	find docs/services/_includes/ -type f \( -name "*" ! -name ".git*" ! -name "_*" \) -delete || exit 1
+	find docs/services/_includes/ -type f \( -name "*" ! -name ".git*" \) -delete || exit 1
 
+	# generate the services md files for dev docs
 	@for mod in $(OCIS_MODULES); do \
-        $(MAKE) --no-print-directory -C $$mod docs-generate || exit 1; \
-    done
+		$(MAKE) --no-print-directory -C $$mod docs-generate || exit 1; \
+	done
 
-	$(MAKE) --no-print-directory -C docs docs-generate || exit 1
-	# .adoc for admin docs, .md for dev docs
-	cp docs/services/general-info/envvars/env-var-deltas/*.adoc docs/services/_includes/adoc/env-var-deltas/
-	cp docs/services/general-info/envvars/env-var-deltas/*.md docs/services/_includes/adoc/env-var-deltas/
+	# generate envvar adoc and md tables for dev and admin docs
+	$(MAKE) --no-print-directory -C docs docs-generate || exit 1 
+
+	# only copy all added/removed/deprecated files that have been created for a release + .gitkeep
+	# note that files are locally ignored via _include/.gitignore for pushing, but required by the drone process
+	# for markdown, if e.g. an `_index.md` file would be present containing links, hugo thinks it must render and fails
+	# the -I flag followed by % cp % means that all passed arguments will concatenated to the last %
+	find docs/services/general-info/envvars/env-var-deltas/ -type f \( -name ".gitkeep" -o -name "*-added.*" -o -name "*-removed.*" -o -name "*-deprecated.*" \) | xargs -I % cp % docs/services/_includes/adoc/env-var-deltas/
+
+.PHONY: docs-drone-test
+	# imitate a full drone run to build docs without pushing to the web.
+	# this can help identify uncaught issues when running `make -C docs docs-serve` only.
+docs-drone-test:
+	$(MAKE) --no-print-directory docs-generate
+	$(MAKE) --no-print-directory -C docs docs-copy
+	$(MAKE) --no-print-directory -C docs test 
+
 
 .PHONY: check-env-var-annotations
 check-env-var-annotations:
