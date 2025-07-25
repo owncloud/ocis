@@ -1,6 +1,6 @@
 ---
 title: Settings
-date: 2025-07-24T00:05:55.813174082Z
+date: 2025-07-25T00:03:42.285359621Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/settings
