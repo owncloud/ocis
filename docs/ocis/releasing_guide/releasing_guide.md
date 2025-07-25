@@ -9,7 +9,7 @@ geekdocFilePath: releasing_guide.md
 
 {{< toc >}}
 
-To prepare an ocis production release, you must follow a specific sequence of steps in the correct order.
+To prepare an oCIS production release, you must follow a specific sequence of steps in the correct order.
 
 ## New ocis Version
 
@@ -29,8 +29,8 @@ Use this detailed copy/paste checklists for Jira when starting a new release.
 * A new production release is being prepared and the implementation of new features has finished in master.
 * `web`, `reva` and `dependencies` have already been bumped.
 * Translations
-  * For ocis, all required translations changes are included.
-  * For web, all translation changes have been applied and are part of the web version provided.
+  * For oCIS, all required translations changes are included.
+  * For Web, all translation changes have been applied and are part of the web version provided.
 * **Only** bug fixes to release candidates are allowed.
 {{< /hint >}}
 
@@ -57,8 +57,8 @@ https://owncloud.dev/ocis/releasing_guide/
 * [ ] Start the Release Candidates Phase
   * [ ] Create a new feature branch based on `stable-7.2`
   * [ ] Move all changelog items from `unreleased` to `7.2.0-rc.1_2025-06-12`
-  * [ ] Bump ocis version in `ocis-pkg/version/version.go`
-  * [ ] Bump ocis version in `sonar-project.properties`
+  * [ ] Bump oCIS version in `ocis-pkg/version/version.go`
+  * [ ] Bump oCIS version in `sonar-project.properties`
   * [ ] Create PR with `[full-ci][k6-test]` against `stable-7.2`
   * [ ] Get PR approved. **DO NOT MERGE YET**
   * [ ] Wait for pipeline to be green
@@ -68,14 +68,14 @@ https://owncloud.dev/ocis/releasing_guide/
   * [ ] Merge PR
   * [ ] Sync with DevOps and Product\
   Repeat process with `rc.2`,`rc.3`, ...
-  * [ ] All required translations from ocis are included
+  * [ ] All required translations from oCIS are included
   * [ ] All issues are fixed, RC phase has finished
 
 * [ ] Prepare Release
   * [ ] Create a new feature branch based on `stable-7.2`
   * [ ] Move all changelog items from `7.2.0-rc.*` to `7.2.0_2025-04-01`
-  * [ ] Bump ocis version in `ocis-pkg/version/version.go`
-  * [ ] Bump ocis version in `sonar-project.properties`
+  * [ ] Bump oCIS version in `ocis-pkg/version/version.go`
+  * [ ] Bump oCIS version in `sonar-project.properties`
   * [ ] Create PR with `[full-ci][k6-test]` against `stable-7.2`
   * [ ] Mark PR as **Draft** to avoid accidentially merging
   * [ ] Get PR approved. **DO NOT MERGE YET**\
@@ -92,11 +92,11 @@ https://owncloud.dev/ocis/releasing_guide/
   * [ ] Push tag: `git push origin v7.2.0`
   * [ ] Watch the PR to see pipeline succeed (can be restarted)
   * [ ] Smoke test docker image `owncloud/ocis@v7.2.0`
-    * [ ] Choose any docker-compose example from ocis repository
+    * [ ] Choose any docker-compose example from oCIS repository
     * [ ] Export `OCIS_DOCKER_IMAGE=owncloud/ocis`
     * [ ] Export `OCIS_DOCKER_TAG=7.2.0`
     * [ ] `docker compose up -d`
-    * [ ] Confirm ocis version in browser and start the `upload-download-awesome` test
+    * [ ] Confirm oCIS version in browser and start the `upload-download-awesome` test
   * [ ] Remove the **Draft** state and Merge PR\
   This is the PR from step *Prepare Release*
     * [ ] Delete the feature branch
@@ -119,8 +119,8 @@ https://owncloud.dev/ocis/releasing_guide/
 {{< hint warning >}}
 * A patch branch is prepared, based off the appropriate stable branch, and contains all the changes including `web`, `reva` and `dependencies` bumps.
 * Translations
-  * For ocis, all required translations changes are included.
-  * For web, all translation changes have been applied and are part of the web version provided.
+  * For oCIS, all required translations changes are included.
+  * For Web, all translation changes have been applied and are part of the web version provided.
 * **Only** bug fixes to the patch branch are allowed.
 {{< /hint >}}
 
@@ -149,8 +149,8 @@ https://owncloud.dev/ocis/releasing_guide/
 * [ ] Prepare Release
   * [ ] Create a new feature branch based on `stable-7.2`
   * [ ] Move all changelog items from `unreleased` to `7.2.1_2025-04-01`
-  * [ ] Bump ocis version in `ocis-pkg/version/version.go`
-  * [ ] Bump ocis version in `sonar-project.properties`
+  * [ ] Bump oCIS version in `ocis-pkg/version/version.go`
+  * [ ] Bump oCIS version in `sonar-project.properties`
   * [ ] Create PR with `[full-ci][k6-test]` against `stable-7.2`
   * [ ] Mark PR as **Draft** to avoid accidentially merging
   * [ ] Get PR approved **requires 2 approvals**, **DO NOT MERGE YET**\
@@ -171,7 +171,7 @@ https://owncloud.dev/ocis/releasing_guide/
     * [ ] Export `OCIS_DOCKER_IMAGE=owncloud/ocis`
     * [ ] Export `OCIS_DOCKER_TAG=7.2.1`
     * [ ] `docker compose up -d`
-    * [ ] Confirm ocis version in browser and start the `upload-download-awesome` test
+    * [ ] Confirm oCIS version in browser and start the `upload-download-awesome` test
   * [ ] Remove the **Draft** state and Merge PR\
   This is the PR from step *Prepare Release*
     * [ ] Delete the feature branch
@@ -194,14 +194,14 @@ The admin docs processes access the data via the branch name, not the tag set. T
 
 The admin documentation must be prepared for the new release.
 
-Note that this section is only **informational** for ocis developers and is done by the documentation team. This is why they need to be informed in a timely manner.
+Note that this section is only **informational** for oCIS developers and is done by the documentation team. This is why they need to be informed in a timely manner.
 
 * [ ] Create **overview release notes** in the `docs-main` repo based on the changelog\
 The source is most likely the unreleased folder during the development cycle
 * [ ] For Major and Minor versions:
   * [ ] Add all **documentation changes** including the upgrade guide in the `docs-ocis` repo in master
   * [ ] Create a new release branch in the `docs-ocis` repo based off master
-  * [ ] **Update ocis branches and versions** in the `docs` repo
+  * [ ] **Update oCIS branches and versions** in the `docs` repo
 * [ ] For Patch releases:
-  * [ ] **Update ocis versions** in the `docs` repo
+  * [ ] **Update oCIS versions** in the `docs` repo
   
