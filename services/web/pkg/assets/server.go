@@ -10,8 +10,11 @@ import (
 	"path"
 	"path/filepath"
 	"regexp"
+	"strings"
+	"unicode/utf8"
 
 	"golang.org/x/net/html"
+	"golang.org/x/text/unicode/norm"
 )
 
 type fileServer struct {
@@ -24,15 +27,15 @@ func FileServer(fsys fs.FS) http.Handler {
 }
 
 func isSafePath(p string) bool {
-	// var dangerousRunes = []rune{
-	// 	'\uFF0F', // fullwidth slash ／
-	// 	'\u2215', // division slash ∕
-	// 	'\u29F8', // big solidus ⧸
-	// 	'\u2044', // fraction slash ⁄
-	// 	'\\',     // backslash
-	// 	'\uFF3C', // fullwidth backslash ＼
-	// 	'\uFE68', // small reverse solidus ﹨
-	// }
+	var dangerousRunes = []rune{
+		'\uFF0F', // fullwidth slash ／
+		'\u2215', // division slash ∕
+		'\u29F8', // big solidus ⧸
+		'\u2044', // fraction slash ⁄
+		'\\',     // backslash
+		'\uFF3C', // fullwidth backslash ＼
+		'\uFE68', // small reverse solidus ﹨
+	}
 
 	// Recursive URL decode to prevent bypass via %252e%252e (double encoding)
 	path := p
@@ -44,26 +47,25 @@ func isSafePath(p string) bool {
 		path = decoded
 	}
 
-	// // Reject null byte injection
-	// var nullByte = "\x00"
-	// if strings.Contains(prev, nullByte) {
-	// 	return false
-	// }
+	// Reject null byte injection
+	if strings.Contains(path, "\x00") {
+		return false
+	}
 
 	// // Reject invalid UTF-8
-	// if !utf8.ValidString(prev) {
-	// 	return false
-	// }
+	if !utf8.ValidString(path) {
+		return false
+	}
 
-	// // Reject dangerous runes
-	// normalized := norm.NFC.String(prev)
-	// for _, r := range normalized {
-	// 	for _, bad := range dangerousRunes {
-	// 		if r == bad {
-	// 			return false
-	// 		}
-	// 	}
-	// }
+	// Reject dangerous runes
+	normalized := norm.NFC.String(path)
+	for _, r := range normalized {
+		for _, bad := range dangerousRunes {
+			if r == bad {
+				return false
+			}
+		}
+	}
 
 	// match one or more /./ and /../
 	if regexp.MustCompile(`(?:[\/\\]\.+[\/\\])+`).MatchString(path) {
