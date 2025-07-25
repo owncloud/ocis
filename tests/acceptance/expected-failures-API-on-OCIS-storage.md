@@ -209,6 +209,10 @@ _ocdav: api compatibility, return correct status code_
 - [coreApiWebdavMove2/moveShareOnOcis.feature:281](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove2/moveShareOnOcis.feature#L281)
 - [coreApiWebdavMove2/moveShareOnOcis.feature:283](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove2/moveShareOnOcis.feature#L283)
 
+#### [A proxy adding Transfer-Encoding: chunked to MKCOL requests returns status code 415](https://github.com/owncloud/ocis/issues/10809)
+￼
+￼- [coreApiWebdavProperties/createFileFolder.feature:269](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties/createFileFolder.feature#L269)
+
 ### Won't fix
 
 Not everything needs to be implemented for ocis. While the oc10 testsuite covers these things we are not looking at them right now.

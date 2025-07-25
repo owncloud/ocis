@@ -264,3 +264,12 @@ Feature: create files and folder
       | spaces           | /..fo       |
       | spaces           | /fo.xyz     |
       | spaces           | /fo.exe     |
+
+  @issue-10809
+  Scenario: create a folder with Transfer-Encoding: chunked header
+    Given using spaces DAV path
+    When user "Alice" creates folder "myFolder" using the WebDAV API with headers
+      | header            | value   |
+      | Transfer-Encoding | chunked |
+    Then the HTTP status code should be "201"
+    And as "Alice" folder "myFolder" should exist
