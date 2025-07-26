@@ -84,6 +84,30 @@ class AuthAppContext implements Context {
 	}
 
 	/**
+	 * @When /^user "([^"]*)" (?:creates|tries to create) auth-app token with expiration time "([^"]*)" and label "(.*)" using the auth-app API$/
+	 *
+	 * @param string $user
+	 * @param string $expiration
+	 * @param string $label
+	 *
+	 * @return void
+	 */
+	public function userCreatesAuthAppTokenWithExpirationTimeAndLabelUsingTheAuthAppApi(
+		string $user,
+		string $expiration,
+		string $label,
+	): void {
+		$this->featureContext->setResponse(
+			AuthAppHelper::createAppAuthToken(
+				$this->featureContext->getBaseUrl(),
+				$this->featureContext->getActualUsername($user),
+				$this->featureContext->getPasswordForUser($user),
+				["expiry" => $expiration, "label" => $label],
+			),
+		);
+	}
+
+	/**
 	 * @Given user :user has created auth-app token with expiration time :expiration using the auth-app API
 	 *
 	 * @param string $user

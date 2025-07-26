@@ -141,6 +141,12 @@ func (a *AuthAppService) HandleCreate(w http.ResponseWriter, r *http.Request) {
 		label = "Generated via Impersonation API"
 	}
 
+	// Custom label, overrides "Generated via ..." default
+	customLabel := q.Get("label")
+	if len(customLabel) > 0 {
+		label = customLabel
+	}
+
 	scopes, err := scope.AddOwnerScope(map[string]*authpb.Scope{})
 	if err != nil {
 		sublog.Error().Err(err).Msg("error adding owner scope")
