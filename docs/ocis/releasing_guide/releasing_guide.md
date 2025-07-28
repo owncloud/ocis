@@ -82,7 +82,7 @@ https://owncloud.dev/ocis/releasing_guide/
   Info: merging will be done in step *Release the new Version*
   * [ ] Wait for pipeline to be green
 
-* [ ] Get new Release Sign-off (confluence)
+* [ ] Get new Release Sign-off (jira)
   * [ ] **EITHER (preferred):** Find someone who wants the release more than you do, and have them sign-off
   * [ ] **OR (not recommended):** Have the appropriate people sign the *release sign-off* document
 
