@@ -332,5 +332,8 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiOcm/share.feature:1158](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L1158)
 - [apiOcm/share.feature:1178](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiOcm/share.feature#L1178)
 
+#### Uploaders are not allowed to `MOVE`
+- [apiSpacesShares/moveSpaces.feature:377](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/moveSpaces.feature#L377)
+
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.
