@@ -68,6 +68,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix storage-users cli: [#11464](https://github.com/owncloud/ocis/pull/11464)
 * Bugfix - Return translated role definitions: [#11466](https://github.com/owncloud/ocis/pull/11466)
 * Bugfix - Fix space root handling in a sharedByMe: [#11533](https://github.com/owncloud/ocis/pull/11533)
+* Bugfix - Bump Reva: [#11560](https://github.com/owncloud/ocis/pull/11560)
 * Enhancement - Update Web to v11.3.1: [#11471](https://github.com/owncloud/ocis/pull/11471)
 
 ## Details
@@ -91,6 +92,13 @@ The following sections list the changes for unreleased.
    Fix space root handling in a graph sharedByMe
 
    https://github.com/owncloud/ocis/pull/11533
+
+* Bugfix - Bump Reva: [#11560](https://github.com/owncloud/ocis/pull/11560)
+
+   Bump reva to fix the uploader issue (Uploader being able to move files)
+   https://kiteworks.atlassian.net/browse/OCISDEV-171
+
+   https://github.com/owncloud/ocis/pull/11560
 
 * Enhancement - Update Web to v11.3.1: [#11471](https://github.com/owncloud/ocis/pull/11471)
 
