@@ -13,7 +13,7 @@ Before you start reading, if you are interested in:
 - deployment examples,
 - detailed settings and more
 
-we would recommend to continue with the [ownCloud Admin Documentation for Infinite Scale](https://doc.owncloud.com/ocis/next/).
+we would recommend to continue with the [ownCloud Admin Documentation for Infinite Scale](https://doc.owncloud.com/ocis/latest/).
 
 ## Developer Documentation
 
