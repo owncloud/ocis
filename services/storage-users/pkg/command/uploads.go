@@ -154,8 +154,7 @@ func ListUploadSessions(cfg *config.Config) *cli.Command {
 				fmt.Println(buildInfo(filter))
 
 				table = tw.NewWriter(os.Stdout)
-				table.SetHeader([]string{"Space", "Upload Id", "Name", "Offset", "Size", "Executant", "Owner", "Expires", "Processing", "Scan Date", "Scan Result"})
-				table.SetAutoFormatHeaders(false)
+				table.Header("Space", "Upload Id", "Name", "Offset", "Size", "Executant", "Owner", "Expires", "Processing", "Scan Date", "Scan Result")
 			}
 
 			for _, u := range uploads {

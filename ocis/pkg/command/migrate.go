@@ -285,8 +285,7 @@ func ListDecomposedfsMigrations(cfg *config.Config) *cli.Command {
 			sort.Strings(migrations)
 
 			table := tw.NewWriter(os.Stdout)
-			table.SetHeader([]string{"Migration", "State", "Message"})
-			table.SetAutoFormatHeaders(false)
+			table.Header("Migration", "State", "Message")
 			for _, migration := range migrations {
 				table.Append([]string{migration, migrationStates[migration].State, migrationStates[migration].Message})
 			}

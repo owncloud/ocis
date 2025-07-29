@@ -404,10 +404,7 @@ func benchmark(iterations int, path string) error {
 	fmt.Println("")
 
 	table := tw.NewWriter(os.Stdout)
-	table.SetHeader([]string{"Test", "Iterations", "dur/it", "total"})
-	table.SetAutoFormatHeaders(false)
-	table.SetColumnAlignment([]int{tw.ALIGN_LEFT, tw.ALIGN_RIGHT, tw.ALIGN_RIGHT, tw.ALIGN_RIGHT})
-	table.SetAutoMergeCellsByColumnIndex([]int{2, 3})
+	table.Header("Test", "Iterations", "dur/it", "total")
 	for _, t := range []string{"lockedfile open(wo,c,t) close", "stat", "fopen(wo,t) write close", "fopen(ro) close", "fopen(ro) read close", "xattr-set", "xattr-get"} {
 		start := time.Now()
 		err := tests[t]()

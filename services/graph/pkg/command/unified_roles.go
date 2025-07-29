@@ -38,12 +38,10 @@ func listUnifiedRoles(cfg *config.Config) *cli.Command {
 		Usage: "list available unified roles",
 		Action: func(c *cli.Context) error {
 			tbl := tablewriter.NewWriter(os.Stdout)
-			tbl.SetRowLine(true)
-			tbl.SetAutoMergeCellsByColumnIndex([]int{0}) // rowspan should only affect the first column
+			tbl.Header("Label", "UID", "Enabled", "Description", "Condition", "Allowed resource actions")
 
 			headers := []string{"Label", "UID", "Enabled", "Description", "Condition", "Allowed resource actions"}
-			tbl.SetHeader(headers)
-
+			
 			for _, definition := range unifiedrole.GetRoles(unifiedrole.RoleFilterAll()) {
 				const enabled = "enabled"
 				const disabled = "disabled"
