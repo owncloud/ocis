@@ -1,6 +1,6 @@
 ---
 title: Auth-App
-date: 2025-07-29T09:58:41.327596004Z
+date: 2025-07-29T19:36:29.737176911Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/auth-app
@@ -68,6 +68,12 @@ When using curl for the respective command, you need to authenticate with a head
   * A `expiry` key/value pair in the form of `expiry=<number><h|m|s>`\
     Example: `expiry=72h`
   * An active bearer token
+
+  The POST request also accepts:
+  * An optional label, which will default to "Generated via API" or \
+    "Generated via Impersonation API" if excluded\
+    Example: `label=WebDav Token`
+
   ```bash
   curl --request POST 'https://<your host:9200>/auth-app/tokens?expiry={value}' \
        --header 'accept: application/json' \
