@@ -74,6 +74,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add GetPermission API: [#8616](https://github.com/owncloud/ocis/issues/8616)
 * Enhancement - Bump importer app: [#10880](https://github.com/owncloud/ocis/pull/10880)
 * Enhancement - Allow scaling the search service: [#11029](https://github.com/owncloud/ocis/pull/11029)
+* Enhancement - Add custom labels for app tokens: [#11555](https://github.com/owncloud/ocis/pull/11555)
 
 ## Details
 
@@ -138,6 +139,12 @@ The following sections list the changes for unreleased.
    search services can access the index as long as there is no operation ongoing.
 
    https://github.com/owncloud/ocis/pull/11029
+
+* Enhancement - Add custom labels for app tokens: [#11555](https://github.com/owncloud/ocis/pull/11555)
+
+   The ability to set a custom label when creating an app token has been added.
+
+   https://github.com/owncloud/ocis/pull/11555
 
 # Changelog for [7.2.0] (2025-07-14)
 
