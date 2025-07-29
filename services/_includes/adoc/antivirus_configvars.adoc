@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2025-07-29-00-02-51]
+[#deprecation-note-2025-07-29-00-06-06]
 [caption=]
 .Deprecation notes for the antivirus service
 [width="100%",cols="~,~,~,~",options="header"]
