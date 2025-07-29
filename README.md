@@ -105,7 +105,12 @@ See the [Install Infinite Scale on a Server](https://doc.owncloud.com/ocis/next/
 
 ### Use the ocis Repo as Source
 
-Use this method to run an instance with the latest code. This is only recommended for development purposes. The minimum go version required is 1.22. Note that you need, as a prerequisite, a C compile environment installed because some dependencies like reva have components that require c-go libraries/tool-chains. The command installing for debian based systems is: `sudo apt install build-essential`. To build and run a local instance with demo users:
+Use this method to build and run an instance with the latest code. This is only recommended for development purposes.
+
+The minimum go version required is `1.24`.\
+Note that you need a C compile environment installed as a prerequisite because some dependencies, like reva, have components that require C-Go libraries and toolchains. The command installing for debian based systems is: `sudo apt install build-essential`.
+
+To build and run a local instance with demo users:
 
 ```console
 # get the source
