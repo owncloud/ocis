@@ -65,7 +65,7 @@ func Server(opts ...Option) (http.Service, error) {
 	}
 
 	middlewares := []func(stdhttp.Handler) stdhttp.Handler{
-		middleware.TraceContext,
+		middleware.GetOtelhttpMiddleware("graph", options.TraceProvider),
 		chimiddleware.RequestID,
 		middleware.Version(
 			options.Config.Service.Name,

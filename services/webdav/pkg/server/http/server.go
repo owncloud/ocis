@@ -38,6 +38,7 @@ func Server(opts ...Option) (http.Service, error) {
 		svc.Logger(options.Logger),
 		svc.Config(options.Config),
 		svc.Middleware(
+			middleware.GetOtelhttpMiddleware("webdav", options.TraceProvider),
 			chimiddleware.RealIP,
 			chimiddleware.RequestID,
 			middleware.NoCache,

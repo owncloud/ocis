@@ -8,10 +8,8 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/riandyrn/otelchi"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
 	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/config"
 	tjwt "github.com/owncloud/ocis/v2/services/thumbnails/pkg/service/jwt"
 	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/thumbnail"
@@ -35,15 +33,6 @@ func NewService(opts ...Option) Service {
 
 	m := chi.NewMux()
 	m.Use(options.Middleware...)
-
-	m.Use(
-		otelchi.Middleware(
-			"thumbnails",
-			otelchi.WithChiRoutes(m),
-			otelchi.WithTracerProvider(options.TraceProvider),
-			otelchi.WithPropagators(tracing.GetPropagator()),
-		),
-	)
 
 	logger := options.Logger
 	resolutions, err := thumbnail.ParseResolutions(options.Config.Thumbnail.Resolutions)

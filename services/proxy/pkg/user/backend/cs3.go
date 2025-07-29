@@ -13,6 +13,7 @@ import (
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
@@ -20,6 +21,7 @@ import (
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
 	utils "github.com/owncloud/reva/v2/pkg/utils"
 	"go-micro.dev/v4/selector"
+	"go.opentelemetry.io/otel/trace"
 )
 
 type cs3backend struct {
@@ -425,7 +427,7 @@ func (c cs3backend) updateLibregraphUser(userid string, user libregraph.UserUpda
 	return nil
 }
 
-func (c cs3backend) setupLibregraphClient(_ context.Context, cs3token string) (*libregraph.APIClient, error) {
+func (c cs3backend) setupLibregraphClient(ctx context.Context, cs3token string) (*libregraph.APIClient, error) {
 	// Use micro registry to resolve next graph service endpoint
 	next, err := c.graphSelector.Select("com.owncloud.web.graph")
 	if err != nil {
@@ -445,6 +447,10 @@ func (c cs3backend) setupLibregraphClient(_ context.Context, cs3token string) (*
 	}
 
 	lgconf.DefaultHeader = map[string]string{revactx.TokenHeader: cs3token}
+
+	// TODO: Need to improve the setup of the HTTP client for libregraph
+	span := trace.SpanFromContext(ctx)
+	lgconf.HTTPClient = middleware.GetOtelhttpClient(span.TracerProvider())
 	return libregraph.NewAPIClient(lgconf), nil
 }
 

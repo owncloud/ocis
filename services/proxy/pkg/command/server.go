@@ -43,7 +43,6 @@ import (
 	"github.com/urfave/cli/v2"
 	"go-micro.dev/v4/selector"
 	microstore "go-micro.dev/v4/store"
-	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -122,6 +121,7 @@ func Server(cfg *config.Config) *cli.Command {
 			rp, err := proxy.NewMultiHostReverseProxy(
 				proxy.Logger(logger),
 				proxy.Config(cfg),
+				proxy.TraceProvider(traceProvider),
 			)
 			if err != nil {
 				return fmt.Errorf("failed to initialize reverse proxy: %w", err)
@@ -327,14 +327,7 @@ func loadMiddlewares(logger log.Logger, cfg *config.Config,
 
 	return alice.New(
 		// first make sure we log all requests and redirect to https if necessary
-		otelhttp.NewMiddleware("proxy",
-			otelhttp.WithTracerProvider(traceProvider),
-			otelhttp.WithSpanNameFormatter(func(name string, r *http.Request) string {
-				return fmt.Sprintf("%s %s", r.Method, r.URL.Path)
-			}),
-		),
-		middleware.Tracer(traceProvider),
-		pkgmiddleware.TraceContext,
+		pkgmiddleware.GetOtelhttpMiddleware("proxy", traceProvider),
 		middleware.Instrumenter(metrics),
 		chimiddleware.RealIP,
 		chimiddleware.RequestID,
