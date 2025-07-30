@@ -507,10 +507,16 @@ trait WebDav {
 	 * @param string $user
 	 * @param string $source
 	 * @param string $destination
+	 * @param array|null $headers
 	 *
 	 * @return ResponseInterface
 	 */
-	public function moveResource(string $user, string $source, string $destination): ResponseInterface {
+	public function moveResource(
+		string $user,
+		string $source,
+		string $destination,
+		?array $headers = [],
+	): ResponseInterface {
 		$user = $this->getActualUsername($user);
 		$headers['Destination'] = $this->destinationHeaderValue(
 			$user,
@@ -542,6 +548,33 @@ trait WebDav {
 		string $destination,
 	): void {
 		$response = $this->moveResource($user, $source, $destination);
+		$this->setResponse($response);
+		$this->pushToLastHttpStatusCodesArray();
+	}
+
+	/**
+	 * @When user :user moves file/folder :source to :destination with the following headers using the WebDAV API
+	 *
+	 * @param string $user
+	 * @param string $source
+	 * @param string $destination
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws JsonException
+	 * @throws GuzzleException
+	 */
+	public function userMovesResourceWithTheFollowingHeadersUsingTheWebDavAPI(
+		string $user,
+		string $source,
+		string $destination,
+		TableNode $table,
+	): void {
+		$headers = [];
+		foreach ($table->getColumnsHash() as $header) {
+		    $headers[$header["header"]] = $header["value"];
+		}
+		$response = $this->moveResource($user, $source, $destination, $headers);
 		$this->setResponse($response);
 		$this->pushToLastHttpStatusCodesArray();
 	}
