@@ -86,6 +86,7 @@ func NewService(opts ...Option) (Service, error) {
 	// register method with chi before any routing is set up
 	chi.RegisterMethod("REPORT")
 
+	m.Use(options.Middleware...)
 	m.Route(options.Config.HTTP.Root, func(r chi.Router) {
 
 		if !svc.config.DisablePreviews {
