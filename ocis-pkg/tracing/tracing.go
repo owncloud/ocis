@@ -8,9 +8,11 @@ import (
 	"net/url"
 	"reflect"
 	"strings"
+	"sync"
 	"time"
 
 	rtrace "github.com/owncloud/reva/v2/pkg/trace"
+	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/jaeger"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
@@ -58,6 +60,20 @@ func GetPropagator() propagation.TextMapPropagator {
 		propagation.Baggage{},
 		propagation.TraceContext{},
 	)
+}
+
+// propagatorOnceFn is needed to ensure we set the global propagator only once
+var propagatorOnceFn sync.Once
+
+// setGlobalPropagatorOnce set the global propagator only once. This is needed
+// because go-micro uses the global propagator to extract and inject data and
+// we want to use the same.
+// Note: in case of services running in different hosts, this needs to be run
+// in all of them.
+func setGlobalPropagatorOnce() {
+	propagatorOnceFn.Do(func() {
+		otel.SetTextMapPropagator(GetPropagator())
+	})
 }
 
 // GetTraceProvider returns a configured open-telemetry trace provider.
@@ -141,6 +157,7 @@ func GetTraceProvider(endpoint, collector, serviceName, traceType string) (*sdkt
 			sdktrace.WithResource(resources),
 		)
 		rtrace.SetDefaultTracerProvider(tp)
+		setGlobalPropagatorOnce()
 		return tp, nil
 	case "agent":
 		fallthrough
