@@ -117,7 +117,7 @@ https://owncloud.dev/ocis/releasing_guide/
 ### Steps for Patch Releases Only
 
 {{< hint warning >}}
-* A patch branch is prepared, based off the appropriate stable branch, and contains all the changes including `web`, `reva` and `dependencies` bumps.
+* A patch branch is prepared, based off the appropriate stable branch, and contains all the changes including `web`, `reva` and `dependencies` bumps. The patch branch is merged into the corresponding stable branch. No release candidates are used because the changes are known.
 * Translations
   * For oCIS, all required translations changes are included.
   * For Web, all translation changes have been applied and are part of the web version provided.
@@ -126,8 +126,6 @@ https://owncloud.dev/ocis/releasing_guide/
 
 #### Overview
 
-1. Apply Prepared Patches\
-No release candidates are used because the changes are known
 1. Prepare Release\
 Integrate all patches and set the final version
 1. Sign-off the Releasing Process
@@ -138,13 +136,6 @@ Integrate all patches and set the final version
 
 ```
 https://owncloud.dev/ocis/releasing_guide/
-
-* [ ] Apply Prepared Patches
-  * [ ] The patch branch is ready to be applied
-  * [ ] Create PR against `stable-7.2`\
-    Use the `[full-ci]` prefix in the PR Name
-  * [ ] Get PR approved and merged, **requires 2 approvals**
-  * [ ] Patching phase has finished
 
 * [ ] Prepare Release
   * [ ] Create a new feature branch based on `stable-7.2`
