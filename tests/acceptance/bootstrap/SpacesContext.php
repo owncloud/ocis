@@ -1374,6 +1374,27 @@ class SpacesContext implements Context {
 	}
 
 	/**
+	 * @Given /^user "([^"]*)" has created the following folders in space "([^"]*)"$/
+	 *
+	 * @param string $user
+	 * @param string $spaceName
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userHasCreatedTheFollowingFoldersInSpace(string $user, string $spaceName, TableNode $table): void {
+		foreach ($table->getColumn(0) as $folder) {
+			$response = $this->createFolderInSpace($user, $folder, $spaceName);
+		}
+		$this->featureContext->theHTTPStatusCodeShouldBe(
+			201,
+			"Expected response status code should be 201",
+			$response,
+		);
+	}
+
+	/**
 	 * @param string $user
 	 * @param string $folder
 	 * @param string $spaceName

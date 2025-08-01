@@ -507,10 +507,16 @@ trait WebDav {
 	 * @param string $user
 	 * @param string $source
 	 * @param string $destination
+	 * @param array|null $headers
 	 *
 	 * @return ResponseInterface
 	 */
-	public function moveResource(string $user, string $source, string $destination): ResponseInterface {
+	public function moveResource(
+		string $user,
+		string $source,
+		string $destination,
+		?array $headers = [],
+	): ResponseInterface {
 		$user = $this->getActualUsername($user);
 		$headers['Destination'] = $this->destinationHeaderValue(
 			$user,
@@ -542,6 +548,33 @@ trait WebDav {
 		string $destination,
 	): void {
 		$response = $this->moveResource($user, $source, $destination);
+		$this->setResponse($response);
+		$this->pushToLastHttpStatusCodesArray();
+	}
+
+	/**
+	 * @When user :user moves file/folder :source to :destination with the following headers using the WebDAV API
+	 *
+	 * @param string $user
+	 * @param string $source
+	 * @param string $destination
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws JsonException
+	 * @throws GuzzleException
+	 */
+	public function userMovesResourceWithTheFollowingHeadersUsingTheWebDavAPI(
+		string $user,
+		string $source,
+		string $destination,
+		TableNode $table,
+	): void {
+		$headers = [];
+		foreach ($table->getColumnsHash() as $header) {
+			$headers[$header["header"]] = $header["value"];
+		}
+		$response = $this->moveResource($user, $source, $destination, $headers);
 		$this->setResponse($response);
 		$this->pushToLastHttpStatusCodesArray();
 	}
@@ -2543,13 +2576,14 @@ trait WebDav {
 	/**
 	 * @param string $user
 	 * @param string $resource
+	 * @param array|null $headers
 	 *
 	 * @return void
 	 */
-	public function deleteFile(string $user, string $resource): ResponseInterface {
+	public function deleteFile(string $user, string $resource, ?array $headers = []): ResponseInterface {
 		$user = $this->getActualUsername($user);
 		$this->pauseUploadDelete();
-		$response = $this->makeDavRequest($user, 'DELETE', $resource, []);
+		$response = $this->makeDavRequest($user, 'DELETE', $resource, $headers);
 		$this->lastUploadDeleteTime = \time();
 		return $response;
 	}
@@ -2564,6 +2598,29 @@ trait WebDav {
 	 */
 	public function userDeletesFile(string $user, string $resource): void {
 		$response = $this->deleteFile($user, $resource);
+		$this->setResponse($response);
+		$this->pushToLastStatusCodesArrays();
+	}
+
+	/**
+	 * @When user :user deletes file/folder :resource with the following headers using the WebDAV API
+	 *
+	 * @param string $user
+	 * @param string $resource
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 */
+	public function userDeletesFileOrFolderWithTheFollowingHeadersUsingTheWebDAVAPI(
+		string $user,
+		string $resource,
+		TableNode $table,
+	): void {
+		$headers = [];
+		foreach ($table->getColumnsHash() as $header) {
+			$headers[$header["header"]] = $header["value"];
+		}
+		$response = $this->deleteFile($user, $resource, $headers);
 		$this->setResponse($response);
 		$this->pushToLastStatusCodesArrays();
 	}

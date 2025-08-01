@@ -25,3 +25,15 @@ Feature: Copy test
       | Access-Control-Allow-Origin | /^%base_url%$/         |
       | X-Request-Id                | %request_id_pattern%   |
 
+  @issue-10809
+  Scenario: copy a folder with Transfer-Encoding: chunked header
+    Given user "Alice" has created the following folders in space "new-space"
+      | folder1 |
+      | folder2 |
+    When user "Alice" copies folder "folder2" from space "new-space" to "folder1/folder2" inside space "new-space" with following headers using the WebDAV API
+      | header            | value   |
+      # NOTE: requires system curl version >= 8.12.0
+      | Transfer-Encoding | chunked |
+    Then the HTTP status code should be "201"
+    And for user "Alice" folder "folder1" of the space "new-space" should contain these entries:
+      | folder2 |
