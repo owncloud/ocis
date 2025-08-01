@@ -138,6 +138,19 @@ class CliContext implements Context {
 		$this->featureContext->setResponse(CliHelper::runCommand($body));
 	}
 
+    /**
+     * @When the administrator lists unified roles using the CLI
+     *
+     * @return void
+     */
+    public function theAdministratorListsUnifiedRolesUsingTheCli(): void {
+        $command = "graph list-unified-roles";
+        $body = [
+            "command" => $command,
+        ];
+        $this->featureContext->setResponse(CliHelper::runCommand($body));
+    }
+
 	/**
 	 * @When the administrator creates auth-app token for user :user with expiration time :expirationTime using the auth-app CLI
 	 * @When the administrator tries to create auth-app token for user :user with expiration time :expirationTime using the auth-app CLI
@@ -343,6 +356,35 @@ class CliContext implements Context {
 			Assert::assertStringNotContainsString($output, $jsonResponse["message"]);
 		}
 	}
+
+    /**
+     * @Then the command output should include the following fields for each role:
+     *
+     * @param TableNode $table
+     *
+     * @return void
+     * @throws Exception
+     */
+    public function theFollowingHeadersShouldNotBeSet(TableNode $table): void {
+        $this->verifyTableNodeColumns(
+            $table,
+            ['header'],
+        );
+        foreach ($table->getColumnsHash() as $header) {
+
+        }
+//        foreach ($table->getColumnsHash() as $header) {
+//            $headerName = $header['header'];
+//            $headerValue = $this->response->getHeader($headerName);
+//            // Note: getHeader returns an empty array if the named header does not exist
+//            $headerValue0 = $headerValue[0] ?? '';
+//            Assert::assertEmpty(
+//                $headerValue,
+//                "header $headerName should not exist " .
+//                "but does and is set to $headerValue0",
+//            );
+//        }
+    }
 
 	/**
 	 * @When the administrator lists all the upload sessions
