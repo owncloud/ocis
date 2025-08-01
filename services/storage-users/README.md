@@ -137,7 +137,7 @@ Note: It is recommended to run to command first without the `--clean` (`--proces
 ocis storage-users uploads sessions --expired=true --clean
 
 # resumes all uploads that are processing and are not virus infected
-ocis storage-users uploads sessions --processing=false --has-virus=false --resume
+ocis storage-users uploads sessions --processing=true --has-virus=false --resume
 ```
 
 ### Manage Trash-Bin Items
