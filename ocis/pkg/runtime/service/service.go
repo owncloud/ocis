@@ -490,7 +490,7 @@ func (s *Service) generateRunSet(cfg *ociscfg.Config) map[string]struct{} {
 func (s *Service) List(_ struct{}, reply *string) error {
 	tableString := &strings.Builder{}
 	table := tablewriter.NewWriter(tableString)
-	table.SetHeader([]string{"Service"})
+	table.Header("Service")
 
 	s.mu.Lock()
 	names := []string{}

@@ -63,8 +63,7 @@ func VersionCommand(cfg *config.Config) *cli.Command {
 			}
 
 			table := tw.NewWriter(os.Stdout)
-			table.SetHeader([]string{"Version", "Address", "Id"})
-			table.SetAutoFormatHeaders(false)
+			table.Header("Version", "Address", "Id")
 			for _, s := range services {
 				for _, n := range s.Nodes {
 					table.Append([]string{s.Version, n.Address, n.Id})
