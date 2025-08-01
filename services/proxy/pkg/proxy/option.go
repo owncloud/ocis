@@ -3,6 +3,7 @@ package proxy
 import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
+	"go.opentelemetry.io/otel/trace"
 )
 
 // Option defines a single option function.
@@ -10,8 +11,9 @@ type Option func(o *Options)
 
 // Options defines the available options for this package.
 type Options struct {
-	Logger log.Logger
-	Config *config.Config
+	Logger        log.Logger
+	Config        *config.Config
+	TraceProvider trace.TracerProvider
 }
 
 // newOptions initializes the available default options.
@@ -36,5 +38,12 @@ func Logger(val log.Logger) Option {
 func Config(val *config.Config) Option {
 	return func(o *Options) {
 		o.Config = val
+	}
+}
+
+// TraceProvider provides a function to set the trace provider
+func TraceProvider(tp trace.TracerProvider) Option {
+	return func(o *Options) {
+		o.TraceProvider = tp
 	}
 }

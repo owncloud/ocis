@@ -10,10 +10,8 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/cors"
 	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	ohttp "github.com/owncloud/ocis/v2/ocis-pkg/service/http"
-	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
-	"github.com/riandyrn/otelchi"
 	"go-micro.dev/v4"
 )
 
@@ -42,6 +40,7 @@ func Server(opts ...Option) (ohttp.Service, error) {
 
 	mux := chi.NewMux()
 
+	mux.Use(middleware.GetOtelhttpMiddleware(options.Name, options.TraceProvider))
 	mux.Use(chimiddleware.RealIP)
 	mux.Use(chimiddleware.RequestID)
 	mux.Use(middleware.NoCache)
@@ -65,15 +64,6 @@ func Server(opts ...Option) (ohttp.Service, error) {
 	mux.Use(middleware.Logger(
 		options.Logger,
 	))
-
-	mux.Use(
-		otelchi.Middleware(
-			options.Name,
-			otelchi.WithChiRoutes(mux),
-			otelchi.WithTracerProvider(options.TraceProvider),
-			otelchi.WithPropagators(tracing.GetPropagator()),
-		),
-	)
 
 	mux.Route(options.Config.HTTP.Root, func(r chi.Router) {
 		settingssvc.RegisterBundleServiceWeb(r, handle)

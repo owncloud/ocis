@@ -20,7 +20,6 @@ import (
 	revactx "github.com/owncloud/reva/v2/pkg/ctx"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/templates"
-	"github.com/riandyrn/otelchi"
 	merrors "go-micro.dev/v4/errors"
 	grpcmetadata "google.golang.org/grpc/metadata"
 
@@ -56,14 +55,6 @@ func NewService(opts ...Option) (Service, error) {
 	conf := options.Config
 
 	m := chi.NewMux()
-	m.Use(
-		otelchi.Middleware(
-			conf.Service.Name,
-			otelchi.WithChiRoutes(m),
-			otelchi.WithTracerProvider(options.TraceProvider),
-			otelchi.WithPropagators(tracing.GetPropagator()),
-		),
-	)
 
 	tm, err := pool.StringToTLSMode(conf.GRPCClientTLS.Mode)
 	if err != nil {
@@ -95,6 +86,7 @@ func NewService(opts ...Option) (Service, error) {
 	// register method with chi before any routing is set up
 	chi.RegisterMethod("REPORT")
 
+	m.Use(options.Middleware...)
 	m.Route(options.Config.HTTP.Root, func(r chi.Router) {
 
 		if !svc.config.DisablePreviews {

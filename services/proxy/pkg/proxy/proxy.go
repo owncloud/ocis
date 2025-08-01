@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/proxy/policy"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/router"
@@ -72,7 +73,7 @@ func NewMultiHostReverseProxy(opts ...Option) (*MultiHostReverseProxy, error) {
 		tlsConf.RootCAs = certs
 	}
 	// equals http.DefaultTransport except TLSClientConfig
-	rp.Transport = &http.Transport{
+	transport := &http.Transport{
 		Proxy: http.ProxyFromEnvironment,
 		DialContext: (&net.Dialer{
 			Timeout:   30 * time.Second,
@@ -86,6 +87,7 @@ func NewMultiHostReverseProxy(opts ...Option) (*MultiHostReverseProxy, error) {
 		ExpectContinueTimeout: 1 * time.Second,
 		TLSClientConfig:       tlsConf,
 	}
+	rp.Transport = middleware.GetOtelhttpClientTransport(transport, options.TraceProvider)
 	return rp, nil
 }
 

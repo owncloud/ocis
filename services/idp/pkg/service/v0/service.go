@@ -20,12 +20,10 @@ import (
 	"github.com/libregraph/lico/server"
 	"github.com/owncloud/ocis/v2/ocis-pkg/ldap"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
 	"github.com/owncloud/ocis/v2/services/idp/pkg/assets"
 	cs3BackendSupport "github.com/owncloud/ocis/v2/services/idp/pkg/backends/cs3/bootstrap"
 	"github.com/owncloud/ocis/v2/services/idp/pkg/config"
 	"github.com/owncloud/ocis/v2/services/idp/pkg/middleware"
-	"github.com/riandyrn/otelchi"
 	"go.opentelemetry.io/otel/trace"
 	"gopkg.in/yaml.v2"
 	"stash.kopano.io/kgol/rndm"
@@ -281,15 +279,6 @@ func (idp *IDP) initMux(ctx context.Context, r []server.WithRoutes, h http.Handl
 		),
 		idp.tp,
 	))
-
-	idp.mux.Use(
-		otelchi.Middleware(
-			"idp",
-			otelchi.WithChiRoutes(idp.mux),
-			otelchi.WithTracerProvider(idp.tp),
-			otelchi.WithPropagators(tracing.GetPropagator()),
-		),
-	)
 
 	// handle / | index.html with a template that needs to have the BASE_PREFIX replaced
 	idp.mux.Get("/signin/v1/identifier", idp.Index())

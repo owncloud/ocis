@@ -13,12 +13,10 @@ import (
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	"github.com/go-chi/chi/v5"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
-	"github.com/riandyrn/otelchi"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/account"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
-	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
 	"github.com/owncloud/ocis/v2/ocis-pkg/x/io/fsx"
 	"github.com/owncloud/ocis/v2/services/web/pkg/assets"
 	"github.com/owncloud/ocis/v2/services/web/pkg/config"
@@ -40,15 +38,6 @@ func NewService(opts ...Option) (Service, error) {
 
 	m := chi.NewMux()
 	m.Use(options.Middleware...)
-
-	m.Use(
-		otelchi.Middleware(
-			"web",
-			otelchi.WithChiRoutes(m),
-			otelchi.WithTracerProvider(options.TraceProvider),
-			otelchi.WithPropagators(tracing.GetPropagator()),
-		),
-	)
 
 	svc := Web{
 		logger:          options.Logger,

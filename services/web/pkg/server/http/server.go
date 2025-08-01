@@ -96,6 +96,7 @@ func Server(opts ...Option) (http.Service, error) {
 		svc.Config(options.Config),
 		svc.GatewaySelector(gatewaySelector),
 		svc.Middleware(
+			middleware.GetOtelhttpMiddleware("web", options.TraceProvider),
 			chimiddleware.RealIP,
 			chimiddleware.RequestID,
 			chimiddleware.Compress(5),

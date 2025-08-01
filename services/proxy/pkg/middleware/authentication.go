@@ -9,7 +9,6 @@ import (
 
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/router"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/webdav"
-	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 )
@@ -52,17 +51,10 @@ type Authenticator interface {
 func Authentication(auths []Authenticator, opts ...Option) func(next http.Handler) http.Handler {
 	options := newOptions(opts...)
 	configureSupportedChallenges(options)
-	tracer := getTraceProvider(options).Tracer("proxy")
-
-	spanOpts := []trace.SpanStartOption{
-		trace.WithSpanKind(trace.SpanKindServer),
-	}
 
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			ctx, span := tracer.Start(r.Context(), fmt.Sprintf("%s %v", r.Method, r.URL.Path), spanOpts...)
-			defer span.End()
-			r = r.WithContext(ctx)
+			ctx := r.Context()
 
 			ri := router.ContextRoutingInfo(ctx)
 			if isOIDCTokenAuth(r) || ri.IsRouteUnprotected() || r.Method == http.MethodOptions {
@@ -201,11 +193,4 @@ func evalRequestURI(l userAgentLocker, r regexp.Regexp) {
 			return
 		}
 	}
-}
-
-func getTraceProvider(o Options) trace.TracerProvider {
-	if o.TraceProvider != nil {
-		return o.TraceProvider
-	}
-	return trace.NewNoopTracerProvider()
 }
