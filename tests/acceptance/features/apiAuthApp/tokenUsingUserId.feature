@@ -8,7 +8,7 @@ Feature: create auth-app token using user-id
 
   @env-config @issue-11063
   Scenario: admin creates auth-app token for another user using user-id
-    Given the config "AUTH_APP_ENABLE_IMPERSONATION" has been set to "true"
+    Given the config "AUTH_APP_ENABLE_IMPERSONATION" has been set to "true" for "auth-app" service
     When user "Admin" creates app token with user-id for user "Alice" with expiration time "72h" using the auth-app API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
@@ -56,13 +56,13 @@ Feature: create auth-app token using user-id
 
 
   Scenario: non-admin user tries to create own auth-app token using user-id with impersonation enabled
-    Given the config "AUTH_APP_ENABLE_IMPERSONATION" has been set to "true"
+    Given the config "AUTH_APP_ENABLE_IMPERSONATION" has been set to "true" for "auth-app" service
     When user "Alice" tries to create app token with user-id for user "Alice" with expiration time "72h" using the auth-app API
     Then the HTTP status code should be "403"
 
   @env-config @issue-11063
   Scenario: non-admin user tries to creates auth-app token for another user using user-id
-    Given the config "AUTH_APP_ENABLE_IMPERSONATION" has been set to "true"
+    Given the config "AUTH_APP_ENABLE_IMPERSONATION" has been set to "true" for "auth-app" service
     And user "Brian" has been created with default attributes
     When user "Brian" tries to create app token with user-id for user "Alice" with expiration time "72h" using the auth-app API
     Then the HTTP status code should be "403"
@@ -88,7 +88,7 @@ Feature: create auth-app token using user-id
 
   @env-config
   Scenario: admin tries to create auth-app token for another user with user-id and without expiry
-    Given the config "AUTH_APP_ENABLE_IMPERSONATION" has been set to "true"
+    Given the config "AUTH_APP_ENABLE_IMPERSONATION" has been set to "true" for "auth-app" service
     When user "Admin" tries to create app token with user-id for user "Alice" with expiration time "" using the auth-app API
     Then the HTTP status code should be "400"
     And the content in the response should include the following content:
@@ -98,7 +98,7 @@ Feature: create auth-app token using user-id
 
 
   Scenario: non-admin user tries to create auth-app token for another user using user-id and without expiry
-    Given the config "AUTH_APP_ENABLE_IMPERSONATION" has been set to "true"
+    Given the config "AUTH_APP_ENABLE_IMPERSONATION" has been set to "true" for "auth-app" service
     And user "Brian" has been created with default attributes
     When user "Brian" tries to create app token with user-id for user "Alice" with expiration time "" using the auth-app API
     Then the HTTP status code should be "400"

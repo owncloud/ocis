@@ -7,9 +7,11 @@ Feature: enforce password on writable shares
 
   Background:
     Given the following configs have been set:
-      | config                                                 | value |
-      | OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD           | false |
-      | OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD | true  |
+      | service | config                                                 | value |
+      | sharing | OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD           | false |
+      | sharing | OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD | true  |
+      | frontend | OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD           | false |
+      | frontend | OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD | true  |
     And user "Alice" has been created with default attributes
     And using spaces DAV path
 

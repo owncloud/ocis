@@ -10,7 +10,7 @@ Feature: stale upload via CLI command
 
 
   Scenario: list and delete all stale uploads
-    Given the config "POSTPROCESSING_DELAY" has been set to "10s"
+    Given the config "POSTPROCESSING_DELAY" has been set to "10s" for "postprocessing" service
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "staleuploads" with the default quota using the Graph API
     And user "Alice" has uploaded a file "filesForUpload/testavatar.jpg" to "/testavatar.jpg" in space "staleuploads"
@@ -41,7 +41,7 @@ Feature: stale upload via CLI command
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "staleuploads" with the default quota using the Graph API
     And using SharingNG
-    And the config "POSTPROCESSING_DELAY" has been set to "10s"
+    And the config "POSTPROCESSING_DELAY" has been set to "10s" for "postprocessing" service
     And user "Alice" has sent the following resource share invitation:
       | resource        | FolderToShare |
       | space           | Personal      |

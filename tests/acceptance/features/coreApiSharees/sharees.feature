@@ -210,7 +210,7 @@ Feature: search sharees
   @env-config
   Scenario Outline: search other users when OCIS_SHOW_USER_EMAIL_IN_RESULTS config is enabled
     Given user "Brian" has been created with default attributes
-    And the config "OCIS_SHOW_USER_EMAIL_IN_RESULTS" has been set to "true"
+    And the config "OCIS_SHOW_USER_EMAIL_IN_RESULTS" has been set to "true" for "frontend" service
     And using OCS API version "<ocs-api-version>"
     When user "Alice" gets the sharees using the sharing API with parameters
       | search   | Brian |
@@ -227,7 +227,7 @@ Feature: search sharees
   @env-config
   Scenario Outline: search other users when OCIS_SHOW_USER_EMAIL_IN_RESULTS config is disabled
     Given user "Brian" has been created with default attributes
-    And the config "OCIS_SHOW_USER_EMAIL_IN_RESULTS" has been set to "false"
+    And the config "OCIS_SHOW_USER_EMAIL_IN_RESULTS" has been set to "false" for "graph" service
     And using OCS API version "<ocs-api-version>"
     When user "Alice" gets the sharees using the sharing API with parameters
       | search   | Brian |
