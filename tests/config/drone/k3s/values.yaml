@@ -22,6 +22,15 @@ features:
     enabled: false
   ocm:
     enabled: true
+  sharing:
+    passwordPolicies:
+      bannedPasswords:
+        - "password"
+        - "123"
+        - "12345678"
+        - "ownCloud"
+        - "owncloud-1"
+
 services:
   idm:
     persistence:

@@ -127,6 +127,7 @@ config = {
                 "apiGraphUser",
             ],
             "skip": False,
+            "k3d": True,
             "withRemotePhp": [True],
         },
         "spaces": {
@@ -134,12 +135,14 @@ config = {
                 "apiSpaces",
             ],
             "skip": False,
+            "k3d": True,
         },
         "spacesShares": {
             "suites": [
                 "apiSpacesShares",
             ],
             "skip": False,
+            "k3d": True,
         },
         "davOperations1": {
             "suites": [
@@ -147,11 +150,6 @@ config = {
                 "apiDownloads",
                 "apiAsyncUpload",
                 "apiDepthInfinity",
-            ],
-            "skip": False,
-        },
-        "davOperations2": {
-            "suites": [
                 "apiArchiver",
                 "apiActivities",
             ],
@@ -166,6 +164,7 @@ config = {
                 "apiServiceAvailability",
             ],
             "skip": False,
+            "k3d": False,
         },
         "search2": {
             "suites": [
@@ -174,6 +173,7 @@ config = {
             ],
             "tikaNeeded": True,
             "skip": False,
+            "k3d": True,
         },
         "sharingNg1": {
             "suites": [
@@ -189,6 +189,7 @@ config = {
                 "apiSharingNgAdditionalShareRole",
             ],
             "skip": False,
+            "k3d": True,
             "withRemotePhp": [True],
         },
         "sharingNgShareInvitation": {
@@ -1077,6 +1078,7 @@ def localApiTestPipeline(ctx):
         "extraCollaborationEnvironment": {},
         "withRemotePhp": with_remote_php,
         "k3d": False,
+        "wrapper": False,
     }
 
     if "localApiTests" in config:
@@ -1087,7 +1089,7 @@ def localApiTestPipeline(ctx):
                     params[item] = matrix[item] if item in matrix else defaults[item]
                 for storage in params["storages"]:
                     for run_with_remote_php in params["withRemotePhp"]:
-                        run_on_k3d = params["k3d"] and ctx.build.event == "cron"
+                        run_on_k3d = params["k3d"]  #and ctx.build.event == "cron"
                         ocis_url = OCIS_URL
                         if run_on_k3d:
                             ocis_url = "https://%s" % OCIS_SERVER_NAME
@@ -1110,7 +1112,7 @@ def localApiTestPipeline(ctx):
                                      (ocisServer(storage, deploy_type = "federation", extra_server_environment = params["extraServerEnvironment"]) if params["federationServer"] else []) +
                                      ((wopiCollaborationService("fakeoffice") + wopiCollaborationService("collabora") + wopiCollaborationService("onlyoffice")) if params["collaborationServiceNeeded"] else []) +
                                      (ocisHealthCheck("wopi", ["wopi-collabora:9304", "wopi-onlyoffice:9304", "wopi-fakeoffice:9304"]) if params["collaborationServiceNeeded"] else []) +
-                                     localApiTests(ctx, name, params["suites"], storage, params["extraEnvironment"], run_with_remote_php, ocis_url = ocis_url) +
+                                     localApiTests(ctx, name, params["suites"], storage, params["extraEnvironment"], run_with_remote_php, ocis_url = ocis_url, k3d = run_on_k3d) +
                                      apiTestFailureLog() +
                                      (generateCoverageFromAPITest(ctx, name) if not run_on_k3d else []),
                             "services": (emailService() if params["emailNeeded"] else []) +
@@ -1170,7 +1172,7 @@ def generateCoverageFromAPITest(ctx, name):
         },
     ]
 
-def localApiTests(ctx, name, suites, storage = "ocis", extra_environment = {}, with_remote_php = False, ocis_url = OCIS_URL):
+def localApiTests(ctx, name, suites, storage = "ocis", extra_environment = {}, with_remote_php = False, ocis_url = OCIS_URL, k3d = False):
     test_dir = "%s/tests/acceptance" % dirs["base"]
     expected_failures_file = "%s/expected-failures-localAPI-on-%s-storage.md" % (test_dir, storage.upper())
 
@@ -1186,6 +1188,7 @@ def localApiTests(ctx, name, suites, storage = "ocis", extra_environment = {}, w
         "OCIS_WRAPPER_URL": "http://%s:5200" % OCIS_SERVER_NAME,
         "WITH_REMOTE_PHP": with_remote_php,
         "COLLABORATION_SERVICE_URL": "http://wopi-fakeoffice:9300",
+        "K3D": "true" if k3d else "false",
     }
 
     for item in extra_environment:
@@ -1198,6 +1201,8 @@ def localApiTests(ctx, name, suites, storage = "ocis", extra_environment = {}, w
         "commands": [
             # merge the expected failures
             "" if with_remote_php else "cat %s/expected-failures-without-remotephp.md >> %s" % (test_dir, expected_failures_file),
+            "mkdir -p /etc/ocis/",
+            "cp %s /etc/ocis/sharing-banned-passwords.txt" % dirs["bannedPasswordList"],
             "make -C %s test-acceptance-api" % (dirs["base"]),
         ],
         "volumes": [stepVolumeOcisStorage],
@@ -3794,6 +3799,7 @@ def deployOcis():
         "name": "deploy-ocis",
         "image": "owncloudci/golang:latest",
         "commands": [
+            "make -C %s build" % dirs["ocisWrapper"],
             "mv %s/tests/config/drone/k3s/values.yaml %s/ocis-charts/charts/ocis/ci/deployment-values.yaml" % (dirs["base"], dirs["base"]),
             "cp -r %s/tests/config/drone/k3s/authbasic %s/ocis-charts/charts/ocis/templates/" % (dirs["base"], dirs["base"]),
             "cd %s/ocis-charts" % dirs["base"],
@@ -3801,6 +3807,7 @@ def deployOcis():
             "sed -i '/- name: IDM_ADMIN_PASSWORD/{n;N;N;N;d;}' ./charts/ocis/templates/idm/deployment.yaml",
             "sed -i '/- name: IDM_ADMIN_PASSWORD/a\\\\\\n              value: \"admin\"' ./charts/ocis/templates/idm/deployment.yaml",
             "sed -i '/- name: PROXY_HTTP_ADDR/i\\\\            - name: PROXY_ENABLE_BASIC_AUTH\\\n              value: \"true\"' ./charts/ocis/templates/proxy/deployment.yaml",
+            "sed -i '/- name: FRONTEND_PASSWORD_POLICY_BANNED_PASSWORDS_LIST/{N;d;}' %s/ocis-charts/charts/ocis/templates/frontend/deployment.yaml" % dirs["base"],
             "export KUBECONFIG=%s/kubeconfig-$${DRONE_BUILD_NUMBER}.yaml" % dirs["base"],
             "make helm-install-atomic",
         ],
@@ -3814,7 +3821,7 @@ def deployOcis():
 
 def ocisServicePods():
     return [{
-        "name": "ocis-pods",
+        "name": "ocis-server",
         "image": "ghcr.io/k3d-io/k3d:5-dind",
         "user": "root",
         "commands": [
@@ -3822,6 +3829,7 @@ def ocisServicePods():
             "until test -f $${KUBECONFIG}; do sleep 1s; done",
             "kubectl get pods -A",
             "kubectl get ingress -A",
-            "kubectl get svc -A",
+            "%s/bin/ociswrapper serve --url https://ocis-server --admin-username admin --admin-password admin" % dirs["ocisWrapper"],
         ],
+        "detach": True,
     }]
