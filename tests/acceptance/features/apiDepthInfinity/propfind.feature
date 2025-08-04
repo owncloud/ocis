@@ -5,7 +5,7 @@ Feature: PROPFIND with depth:infinity
   So that I can get the information about a resource
 
   Background:
-    Given the config "OCDAV_ALLOW_PROPFIND_DEPTH_INFINITY" has been set to "true"
+    Given the config "OCDAV_ALLOW_PROPFIND_DEPTH_INFINITY" has been set to "true" for "ocdav" service
     And user "Alice" has been created with default attributes
     And user "Alice" has created the following folders
       | path                                        |

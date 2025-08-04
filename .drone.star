@@ -96,6 +96,7 @@ config = {
                 "apiLocks",
             ],
             "skip": False,
+            "k3d": True,
         },
         "settingsAndNotification": {
             "suites": [
@@ -104,6 +105,7 @@ config = {
                 "apiCors",
             ],
             "skip": False,
+            "k3d": True,
             "withRemotePhp": [True],
             "emailNeeded": True,
             "extraEnvironment": {
@@ -125,18 +127,21 @@ config = {
             ],
             "skip": False,
             "withRemotePhp": [True],
+            "k3d": True,
         },
         "spaces": {
             "suites": [
                 "apiSpaces",
             ],
             "skip": False,
+            "k3d": True,
         },
         "spacesShares": {
             "suites": [
                 "apiSpacesShares",
             ],
             "skip": False,
+            "k3d": True,
         },
         "davOperations1": {
             "suites": [
@@ -146,6 +151,7 @@ config = {
                 "apiDepthInfinity",
             ],
             "skip": False,
+            "k3d": True,
         },
         "davOperations2": {
             "suites": [
@@ -163,6 +169,7 @@ config = {
                 "apiServiceAvailability",
             ],
             "skip": False,
+            "k3d": True,
         },
         "search2": {
             "suites": [
@@ -171,6 +178,7 @@ config = {
             ],
             "tikaNeeded": True,
             "skip": False,
+            "k3d": True,
         },
         "sharingNg1": {
             "suites": [
@@ -180,12 +188,14 @@ config = {
             ],
             "skip": False,
             "withRemotePhp": [True],
+            "k3d": True,
         },
         "sharingNgAdditionalShareRole": {
             "suites": [
                 "apiSharingNgAdditionalShareRole",
             ],
             "skip": False,
+            "k3d": True,
             "withRemotePhp": [True],
         },
         "sharingNgShareInvitation": {
@@ -194,6 +204,7 @@ config = {
                 "apiSharingNgItemInvitation",
             ],
             "skip": False,
+            "k3d": True,
             "withRemotePhp": [True],
         },
         "sharingNgLinkShare": {
@@ -203,6 +214,7 @@ config = {
                 "apiSharingNgLinkShareManagement",
             ],
             "skip": False,
+            "k3d": True,
             "withRemotePhp": [True],
         },
         "antivirus": {
@@ -210,6 +222,7 @@ config = {
                 "apiAntivirus",
             ],
             "skip": False,
+            "k3d": True,
             "antivirusNeeded": True,
             "extraServerEnvironment": {
                 "ANTIVIRUS_SCANNER_TYPE": "clamav",
@@ -225,6 +238,7 @@ config = {
                 "apiAuthApp",
             ],
             "skip": False,
+            "k3d": True,
             "withRemotePhp": [True],
             "federationServer": True,
             "emailNeeded": True,
@@ -253,6 +267,7 @@ config = {
                 "apiCollaboration",
             ],
             "skip": False,
+            "k3d": True,
             "withRemotePhp": [True],
             "collaborationServiceNeeded": True,
             "extraServerEnvironment": {
@@ -293,6 +308,7 @@ config = {
                 "coreApiVersions",
             ],
             "skip": False,
+            "k3d": True,
             "withRemotePhp": [True],
         },
         "2": {
@@ -301,6 +317,7 @@ config = {
                 "coreApiShareManagementToShares",
             ],
             "skip": False,
+            "k3d": True,
             "withRemotePhp": [True],
         },
         "3": {
@@ -309,6 +326,7 @@ config = {
                 "coreApiSharePublicLink2",
             ],
             "skip": False,
+            "k3d": True,
             "withRemotePhp": [True],
         },
         "4": {
@@ -321,6 +339,7 @@ config = {
                 "coreApiShareUpdateToShares",
             ],
             "skip": False,
+            "k3d": True,
             "withRemotePhp": [True],
         },
         "5": {
@@ -330,6 +349,7 @@ config = {
                 "coreApiWebdavEtagPropagation1",
                 "coreApiWebdavEtagPropagation2",
             ],
+            "k3d": True,
             "skip": False,
         },
         "6": {
@@ -339,12 +359,14 @@ config = {
                 "coreApiWebdavMove2",
             ],
             "skip": False,
+            "k3d": True,
         },
         "7": {
             "suites": [
                 "coreApiWebdavProperties",
             ],
             "skip": False,
+            "k3d": True,
         },
         "8": {
             "suites": [
@@ -354,6 +376,7 @@ config = {
                 "coreApiWebdavUploadTUS",
             ],
             "skip": False,
+            "k3d": True,
         },
     },
     "e2eTests": {
@@ -1085,7 +1108,7 @@ def localApiTestPipeline(ctx):
                     params[item] = matrix[item] if item in matrix else defaults[item]
                 for storage in params["storages"]:
                     for run_with_remote_php in params["withRemotePhp"]:
-                        run_on_k3d = params["k3d"] and ctx.build.event == "cron"
+                        run_on_k3d = params["k3d"]  #and ctx.build.event == "cron"
                         ocis_url = OCIS_URL
                         if run_on_k3d:
                             ocis_url = "https://%s" % OCIS_SERVER_NAME
@@ -3817,6 +3840,7 @@ def deployOcis():
         "commands": [
             "mv %s/tests/config/drone/k3s/values.yaml %s/ocis-charts/charts/ocis/ci/deployment-values.yaml" % (dirs["base"], dirs["base"]),
             "cp -r %s/tests/config/drone/k3s/authbasic %s/ocis-charts/charts/ocis/templates/" % (dirs["base"], dirs["base"]),
+            "make -C %s build" % dirs["ocisWrapper"],
             "cd %s/ocis-charts" % dirs["base"],
             "sed -i '/{{- define \"ocis.basicServiceTemplates\" -}}/a\\\\  {{- $_ := set .scope \"appNameAuthBasic\" \"authbasic\" -}}' ./charts/ocis/templates/_common/_tplvalues.tpl",
             "sed -i '/- name: IDM_ADMIN_PASSWORD/{n;N;N;N;d;}' ./charts/ocis/templates/idm/deployment.yaml",
@@ -3824,6 +3848,7 @@ def deployOcis():
             "sed -i '/- name: PROXY_HTTP_ADDR/i\\\\            - name: PROXY_ENABLE_BASIC_AUTH\\\n              value: \"true\"' ./charts/ocis/templates/proxy/deployment.yaml",
             "export KUBECONFIG=%s/kubeconfig-$${DRONE_BUILD_NUMBER}.yaml" % dirs["base"],
             "make helm-install-atomic",
+            "%s/bin/ociswrapper serve" % dirs["ocisWrapper"],
         ],
         "volumes": [
             {
@@ -3831,6 +3856,7 @@ def deployOcis():
                 "path": "/go",
             },
         ],
+        "detach": True,
     }]
 
 def ocisServicePods():

@@ -31,11 +31,12 @@ var runningServices = make(map[string]int)
 
 // exported variables
 var ServiceEnvConfigs = make(map[string][]string)
+var K3dServiceEnvConfigs = make(map[string][]string)
 var OcisServiceName = "ocis"
 
 func Start(envMap []string) {
-	log.Println("Starting oCIS service...")
-	StartService(OcisServiceName, envMap)
+	// log.Println("Starting oCIS service...")
+	// StartService(OcisServiceName, envMap)
 }
 
 func Stop() (bool, string) {
@@ -69,6 +70,101 @@ func Restart(envMap []string) (bool, string) {
 	go Start(envMap)
 
 	return WaitForConnection()
+}
+
+func UpdateEnv(service string, envMap []string) (bool, string) {
+	// restart pod
+	// - grep pod
+	// set env blabla
+	// cmdArgs := []string{"set env", "-n" ,"ocis deployment", service} // Default command args
+
+	if envMap == nil {
+		envMap = []string{}
+	}
+	// fmt.Println("env", envMap)
+
+	cmdArgs := new(bytes.Buffer)
+	for _, value := range envMap {
+		fmt.Fprintf(cmdArgs, "%s ", value)
+
+	}
+	// cmdArgsString := cmdArgs.String()
+	envMap = append([]string{"set", "env", "-n", "ocis", "deployment", service}, envMap...)
+
+	// fmt.Println(service,cmdArgs,cmdArgsString)
+	// K3dServiceEnvConfigs[service] //
+
+	// if service == "" {
+	// 	service = OcisServiceName
+	// } else if service != OcisServiceName {
+	// 	cmdArgs = append([]string{service}, cmdArgs...)
+	// }
+
+	// wait for the log scanner to finish
+	// var wg sync.WaitGroup
+	// wg.Add(2)
+
+	// // stopSignal = false
+	// if retryCount == 0 {
+	// 	defer common.Wg.Done()
+	// }
+
+	// cmd = exec.Command("kubectl","set", "env", "-n", "ocis", "deployment", "proxy", "PROXY_LOG_LEVEL=error")
+	cmd = exec.Command("kubectl", envMap...)
+	// cmd = exec.Command("kubectl","get pods -n ocis -A")
+	// cmd = exec.Command("echo","$USER")
+	// cmd.Env = append(os.Environ(), append(K3dServiceEnvConfigs[service], envMap...)...)
+	// fmt.Println(cmd)
+	stdout, err := cmd.Output()
+	fmt.Println(string(stdout))
+
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+
+	// Print the output
+	// return WaitForConnection()
+	return true, fmt.Sprintf("%s service restarted", service)
+}
+
+func Rollback() (bool, string) {
+
+	fmt.Println("fffffff",K3dServiceEnvConfigs)
+
+	cmdArgs := []string{"set", "env", "-n", "ocis"}
+	// cmdArgs := new(bytes.Buffer)
+	// var service string
+
+	for service, envs := range K3dServiceEnvConfigs {
+		cmdArgs = append(cmdArgs, "deployment/"+service)
+		for _, env := range envs {
+			// cmdArgs=new(bytes.Buffer)
+			// fmt.Fprintf(cmdArgs, " %s-", strings.SplitN(env, "=", 2)[0])
+			cmdArgs = append(cmdArgs, strings.SplitN(env, "=", 2)[0]+"-")
+		}
+		fmt.Println("cmd arga-----------",cmdArgs)
+		// envMap = append([]string{"set", "env", "-n", "ocis", "deployment", service}, envMap...)
+		cmd = exec.Command("kubectl", cmdArgs...)
+
+		fmt.Println(cmd)
+		stdout, err := cmd.Output()
+		fmt.Println(stdout)
+		if err != nil {
+			return false, "service didnt start"
+		}
+
+		delete(K3dServiceEnvConfigs, service)
+	}
+
+	// cmd = exec.Command("kubectl", "set", "env", "-n", "ocis", "deployment/"+service, cmdArgs.String())
+
+	// fmt.Println(cmd)
+	// _, err := cmd.Output()
+	// if err != nil {
+	// 	return false, "service didnt start"
+	// }
+	// delete(K3dServiceEnvConfigs, service)
+	return true, "services restarted"
 }
 
 func IsOcisRunning() bool {
