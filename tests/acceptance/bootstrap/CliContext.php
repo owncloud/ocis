@@ -139,6 +139,19 @@ class CliContext implements Context {
 	}
 
 	/**
+	 * @When the administrator lists all the unified roles using the CLI
+	 *
+	 * @return void
+	 */
+	public function theAdministratorListsAllTheUnifiedRolesUsingTheCli(): void {
+		$command = "graph list-unified-roles";
+		$body = [
+			"command" => $command,
+		];
+		$this->featureContext->setResponse(CliHelper::runCommand($body));
+	}
+
+	/**
 	 * @When the administrator creates auth-app token for user :user with expiration time :expirationTime using the auth-app CLI
 	 * @When the administrator tries to create auth-app token for user :user with expiration time :expirationTime using the auth-app CLI
 	 *
@@ -341,6 +354,47 @@ class CliContext implements Context {
 			Assert::assertStringContainsString($output, $jsonResponse["message"]);
 		} else {
 			Assert::assertStringNotContainsString($output, $jsonResponse["message"]);
+		}
+	}
+
+	/**
+	 * @Then the command output should include the following roles:
+	 *
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function theCommandOutputShouldIncludeTheFollowingRoles(TableNode $table): void {
+		$this->featureContext->verifyTableNodeColumns(
+			$table,
+			['LABEL', 'ENABLED', 'DESCRIPTION'],
+		);
+		$actualRoles = $table->getColumnsHash();
+		$response = $this->featureContext->getResponse();
+		$decodedResponse = $this->featureContext->getJsonDecodedResponse($response);
+
+		// Regex pattern to extract LABEL, ENABLED, and DESCRIPTION
+		$pattern = '/│\s*\d+\s*│\s*([^\|]+?)\s*│\s*([a-f0-9\-]{36})\s*│\s*(enabled|disabled)\s*│\s*(.*?)\s*│/i';
+		preg_match_all($pattern, $decodedResponse['message'], $matches, PREG_SET_ORDER);
+		$expectedRoles = [];
+
+		foreach ($matches as $match) {
+			$expectedRoles[] = [
+				'LABEL' => trim($match[1]),
+				'ENABLED' => trim($match[3]),
+				'DESCRIPTION' => trim($match[4]),
+			];
+		}
+
+		for ($i = 0; $i < \count($actualRoles); $i++) {
+			Assert::assertEquals(
+				$expectedRoles[$i],
+				$actualRoles[$i],
+				"Mismatch at row " . ($i + 1) .
+				":\nExpected: " . json_encode($expectedRoles[$i]) .
+				"\nActual: " . json_encode($actualRoles[$i]),
+			);
 		}
 	}
 
