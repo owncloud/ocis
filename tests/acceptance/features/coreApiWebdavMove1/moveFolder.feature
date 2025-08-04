@@ -264,3 +264,23 @@ Feature: move (rename) folder
       | old              |
       | new              |
       | spaces           |
+
+  @issue-10809
+  Scenario Outline: move a folder with Transfer-Encoding: chunked header
+    Given using <dav-path-version> DAV path
+    And user "Alice" has created folder "folder1"
+    And user "Alice" has created folder "folder2"
+    When user "Alice" moves folder "folder2" to "folder1/folder2" with the following headers using the WebDAV API
+      | header            | value   |
+      # NOTE: requires system curl version >= 8.12.0
+      | Transfer-Encoding | chunked |
+    Then the HTTP status code should be "201"
+    And user "Alice" should not see the following elements
+      | folder2 |
+    And user "Alice" should see the following elements
+      | folder1/folder2 |
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
