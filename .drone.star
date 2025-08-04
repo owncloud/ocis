@@ -483,8 +483,7 @@ def main(ctx):
     build_release_helpers = \
         changelog() + \
         docs() + \
-        licenseCheck(ctx) + \
-        deleteStaleBranches(ctx)
+        licenseCheck(ctx)
 
     test_pipelines = \
         codestyle(ctx) + \
@@ -3703,36 +3702,6 @@ def postgresService():
             },
         },
     ]
-
-def deleteStaleBranches(ctx):
-    return [{
-        "kind": "pipeline",
-        "type": "docker",
-        "name": "delete stale branches",
-        "steps": [
-            {
-                "name": "delete stale branches",
-                "image": OC_CI_ALPINE,
-                "settings": {
-                    "netrc_machine": "github.com",
-                    "netrc_username": {
-                        "from_secret": "github_username",
-                    },
-                    "netrc_password": {
-                        "from_secret": "github_token",
-                    },
-                },
-                "commands": [
-                    "./scripts/delete-stale-branches.sh || true",
-                ],
-            },
-        ],
-        "trigger": {
-            "ref": [
-                "refs/heads/master",
-            ],
-        },
-    }]
 
 def trivyScan(ctx):
     steps = [
