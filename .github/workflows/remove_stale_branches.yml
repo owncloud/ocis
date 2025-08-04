@@ -20,4 +20,4 @@ jobs:
         with:
           ignore-unknown-authors: true
           default-recipient: "kobergj"
-          dry-run: ${{ inputs.dry-run || 'true' }} # fallback to dry-run
+          dry-run: ${{ inputs.dry-run || 'false' }} # fallback to dry-run
