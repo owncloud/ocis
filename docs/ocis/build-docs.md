@@ -32,7 +32,7 @@ Beside building docs, some additional files/folders will be copied required for 
 The rendered build stays in the branch that is currently active and is NOT part of a git change, though additional changed files show up and may need to be committed. The build can be viewed normally, for details see below.
 
 * **Merge**\
-When a docs PR gets merged, the source is copied. For master the target is the `docs` branch or a respective `docs-stable-` branch otherwise. The latter must be configured on new stable versions. The docs branch is further the base, it is what is pushed to the web.
+When a docs PR gets merged, the content of the `docs/` folder gets "copied". For master the target is the `docs` branch or a respective `docs-stable-` branch otherwise. The latter must be configured on new stable versions. The docs branch is further the base, it is what is pushed to the web.
 
 ## Building the Documentation
 
