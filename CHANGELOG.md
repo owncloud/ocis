@@ -75,6 +75,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Bump importer app: [#10880](https://github.com/owncloud/ocis/pull/10880)
 * Enhancement - Allow scaling the search service: [#11029](https://github.com/owncloud/ocis/pull/11029)
 * Enhancement - Add custom labels for app tokens: [#11555](https://github.com/owncloud/ocis/pull/11555)
+* Enhancement - HTTP Strict Transport Security: [#11568](https://github.com/owncloud/ocis/pull/11568)
 
 ## Details
 
@@ -145,6 +146,13 @@ The following sections list the changes for unreleased.
    The ability to set a custom label when creating an app token has been added.
 
    https://github.com/owncloud/ocis/pull/11555
+
+* Enhancement - HTTP Strict Transport Security: [#11568](https://github.com/owncloud/ocis/pull/11568)
+
+   Added Support for HTTP Strict Transport Security. It reduces surface for
+   Man-in-the-Middle attacks or leakage of sensitive information.
+
+   https://github.com/owncloud/ocis/pull/11568
 
 # Changelog for [7.2.0] (2025-07-14)
 
