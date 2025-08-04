@@ -123,7 +123,7 @@ func NewService(opts ...Option) Service {
 	routes := []server.WithRoutes{managers.Must("identity").(server.WithRoutes)}
 	handlers := managers.Must("handler").(http.Handler)
 
-	svc := IDP{
+	svc := &IDP{
 		logger: options.Logger,
 		config: options.Config,
 		assets: assetVFS,
@@ -294,12 +294,12 @@ func (idp *IDP) initMux(ctx context.Context, r []server.WithRoutes, h http.Handl
 }
 
 // ServeHTTP implements the Service interface.
-func (idp IDP) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (idp *IDP) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	idp.mux.ServeHTTP(w, r)
 }
 
 // Index renders the static html with templated variables.
-func (idp IDP) Index() http.HandlerFunc {
+func (idp *IDP) Index() http.HandlerFunc {
 	f, err := idp.assets.Open("/identifier/index.html")
 	if err != nil {
 		idp.logger.Fatal().Err(err).Msg("Could not open index template")

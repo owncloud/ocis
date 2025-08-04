@@ -125,14 +125,14 @@ func (c *cs3backend) GetUserByClaims(ctx context.Context, claim, value string) (
 	switch {
 	case err != nil:
 		return nil, "", fmt.Errorf("could not get user by claim %v with value %v: %w", claim, value, err)
-	case res.Status.Code != rpcv1beta1.Code_CODE_OK:
-		if res.Status.Code == rpcv1beta1.Code_CODE_NOT_FOUND {
+	case res.GetStatus().GetCode() != rpcv1beta1.Code_CODE_OK:
+		if res.GetStatus().GetCode() == rpcv1beta1.Code_CODE_NOT_FOUND {
 			return nil, "", ErrAccountNotFound
 		}
 		return nil, "", fmt.Errorf("could not get user by claim %v with value %v : %s ", claim, value, res.GetStatus().GetMessage())
 	}
 
-	user := res.User
+	user := res.GetUser()
 
 	return user, res.GetToken(), nil
 }
@@ -152,11 +152,11 @@ func (c *cs3backend) Authenticate(ctx context.Context, username string, password
 	switch {
 	case err != nil:
 		return nil, "", fmt.Errorf("could not authenticate with username and password user: %s, %w", username, err)
-	case res.Status.Code != rpcv1beta1.Code_CODE_OK:
+	case res.GetStatus().GetCode() != rpcv1beta1.Code_CODE_OK:
 		return nil, "", fmt.Errorf("could not authenticate with username and password user: %s, got code: %d", username, res.GetStatus().GetCode())
 	}
 
-	return res.User, res.Token, nil
+	return res.GetUser(), res.GetToken(), nil
 }
 
 // CreateUserFromClaims creates a new user via libregraph users API, taking the
@@ -235,7 +235,7 @@ func (c *cs3backend) CreateUserFromClaims(ctx context.Context, claims map[string
 	return &cs3UserCreated, nil
 }
 
-func (c cs3backend) UpdateUserIfNeeded(ctx context.Context, user *cs3.User, claims map[string]interface{}) error {
+func (c *cs3backend) UpdateUserIfNeeded(ctx context.Context, user *cs3.User, claims map[string]interface{}) error {
 	newUser, err := c.libregraphUserFromClaims(claims)
 	if err != nil {
 		c.logger.Error().Err(err).Interface("claims", claims).Msg("Error converting claims to user")
@@ -260,7 +260,7 @@ func (c cs3backend) UpdateUserIfNeeded(ctx context.Context, user *cs3.User, clai
 }
 
 // SyncGroupMemberships maintains a users group memberships based on an OIDC claim
-func (c cs3backend) SyncGroupMemberships(ctx context.Context, user *cs3.User, claims map[string]interface{}) error {
+func (c *cs3backend) SyncGroupMemberships(ctx context.Context, user *cs3.User, claims map[string]interface{}) error {
 	gatewayClient, err := c.gatewaySelector.Next()
 	if err != nil {
 		c.logger.Error().Err(err).Msg("could not select next gateway client")
@@ -378,7 +378,7 @@ func (c cs3backend) SyncGroupMemberships(ctx context.Context, user *cs3.User, cl
 	return nil
 }
 
-func (c cs3backend) getLibregraphGroup(ctx context.Context, client *libregraph.APIClient, group string) (*libregraph.Group, error) {
+func (c *cs3backend) getLibregraphGroup(ctx context.Context, client *libregraph.APIClient, group string) (*libregraph.Group, error) {
 	lgGroup, resp, err := client.GroupApi.GetGroup(ctx, group).Execute()
 	if resp != nil {
 		defer resp.Body.Close()
@@ -396,7 +396,7 @@ func (c cs3backend) getLibregraphGroup(ctx context.Context, client *libregraph.A
 	return lgGroup, nil
 }
 
-func (c cs3backend) updateLibregraphUser(userid string, user libregraph.UserUpdate) error {
+func (c *cs3backend) updateLibregraphUser(userid string, user libregraph.UserUpdate) error {
 	gatewayClient, err := c.gatewaySelector.Next()
 	if err != nil {
 		c.logger.Error().Err(err).Msg("could not select next gateway client")
@@ -427,7 +427,7 @@ func (c cs3backend) updateLibregraphUser(userid string, user libregraph.UserUpda
 	return nil
 }
 
-func (c cs3backend) setupLibregraphClient(ctx context.Context, cs3token string) (*libregraph.APIClient, error) {
+func (c *cs3backend) setupLibregraphClient(ctx context.Context, cs3token string) (*libregraph.APIClient, error) {
 	// Use micro registry to resolve next graph service endpoint
 	next, err := c.graphSelector.Select("com.owncloud.web.graph")
 	if err != nil {
@@ -454,7 +454,7 @@ func (c cs3backend) setupLibregraphClient(ctx context.Context, cs3token string) 
 	return libregraph.NewAPIClient(lgconf), nil
 }
 
-func (c cs3backend) isAlreadyExists(resp *http.Response) (bool, error) {
+func (c *cs3backend) isAlreadyExists(resp *http.Response) (bool, error) {
 	oDataErr := libregraph.NewOdataErrorWithDefaults()
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
@@ -475,7 +475,7 @@ func (c cs3backend) isAlreadyExists(resp *http.Response) (bool, error) {
 	return false, nil
 }
 
-func (c cs3backend) libregraphUserFromClaims(claims map[string]interface{}) (libregraph.User, error) {
+func (c *cs3backend) libregraphUserFromClaims(claims map[string]interface{}) (libregraph.User, error) {
 	user := libregraph.User{}
 	if dn, ok := claims[c.autoProvisionClaims.DisplayName].(string); ok {
 		user.SetDisplayName(dn)
@@ -505,7 +505,7 @@ func (c cs3backend) libregraphUserFromClaims(claims map[string]interface{}) (lib
 	return user, nil
 }
 
-func (c cs3backend) cs3UserFromLibregraph(_ context.Context, lu *libregraph.User) cs3.User {
+func (c *cs3backend) cs3UserFromLibregraph(_ context.Context, lu *libregraph.User) cs3.User {
 	cs3id := cs3.UserId{
 		Type: cs3.UserType_USER_TYPE_PRIMARY,
 		Idp:  c.oidcISS,

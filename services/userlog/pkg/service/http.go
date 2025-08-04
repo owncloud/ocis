@@ -255,7 +255,7 @@ func RequireAdminOrSecret(rm *roles.Manager, secret string) func(http.HandlerFun
 	return func(next http.HandlerFunc) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
 			// allow bypassing admin requirement by sending the correct secret
-			if secret != "" && r.Header.Get("secret") == secret {
+			if secret != "" && r.Header.Get("Secret") == secret {
 				next.ServeHTTP(w, r)
 				return
 			}
