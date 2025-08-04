@@ -3,6 +3,7 @@ package command
 import (
 	"os"
 	"slices"
+	"strconv"
 	"strings"
 
 	"github.com/olekukonko/tablewriter"
@@ -36,21 +37,34 @@ func listUnifiedRoles(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "list",
 		Usage: "list available unified roles",
+		Flags: []cli.Flag{
+			&cli.BoolFlag{
+				Name:  "md",
+				Usage: "Render the table output as Markdown format",
+				Value: false,
+			},
+		},
 		Action: func(c *cli.Context) error {
+			headers := []string{"#", "Label", "UID", "Enabled", "Description", "Condition", "Allowed resource actions"}
+
 			tbl := tablewriter.NewTable(os.Stdout)
-			tbl.Header("Label", "UID", "Enabled", "Description", "Condition", "Allowed resource actions")
+			tbl.Header(headers...)
 
-			headers := []string{"Label", "UID", "Enabled", "Description", "Condition", "Allowed resource actions"}
+			// Markdown format
+			if c.Bool("md") {
+				tbl.SetBorders(tablewriter.Border{Left: true, Top: false, Right: true, Bottom: false})
+				tbl.SetCenterSeparator("|")
+			}
 
-			for _, definition := range unifiedrole.GetRoles(unifiedrole.RoleFilterAll()) {
+			for i, definition := range unifiedrole.GetRoles(unifiedrole.RoleFilterAll()) {
 				const enabled = "enabled"
 				const disabled = "disabled"
 
 				rows := [][]string{
-					{unifiedrole.GetUnifiedRoleLabel(definition.GetId()), definition.GetId(), disabled, definition.GetDescription()},
+					{strconv.Itoa(i + 1), unifiedrole.GetUnifiedRoleLabel(definition.GetId()), definition.GetId(), disabled, definition.GetDescription()},
 				}
 				if slices.Contains(cfg.UnifiedRoles.AvailableRoles, definition.GetId()) {
-					rows[0][2] = enabled
+					rows[0][3] = enabled
 				}
 
 				for i, rolePermission := range definition.GetRolePermissions() {
@@ -60,7 +74,7 @@ func listUnifiedRoles(cfg *config.Config) *cli.Command {
 					case 0:
 						rows[0] = append(rows[0], row...)
 					default:
-						rows[0][4] = rows[0][4] + "\n" + rolePermission.GetCondition()
+						rows[0][5] = rows[0][5] + "\n" + rolePermission.GetCondition()
 					}
 				}
 
