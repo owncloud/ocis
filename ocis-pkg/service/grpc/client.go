@@ -74,10 +74,7 @@ func NewClient(opts ...ClientOption) (client.Client, error) {
 	}
 	switch options.tlsMode {
 	case "insecure":
-		tlsConfig = &tls.Config{
-			InsecureSkipVerify: true,
-		}
-		cOpts = append(cOpts, mgrpcc.AuthTLS(tlsConfig))
+		return nil, errors.New("insecure TLS mode is not allowed: certificate verification must not be disabled")
 	case "on":
 		tlsConfig = &tls.Config{
 			MinVersion: tls.VersionTLS12,
