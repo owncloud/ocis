@@ -10,7 +10,7 @@ Feature: List upload sessions via CLI command
 
   Scenario: list all upload sessions
     Given user "Alice" has uploaded file with content "uploaded content" to "/file0.txt"
-    And the config "POSTPROCESSING_DELAY" has been set to "10s"
+    And the config "POSTPROCESSING_DELAY" has been set to "10s" for "postprocessing" service
     And user "Alice" has uploaded file with content "uploaded content" to "/file1.txt"
     And user "Alice" has uploaded file with content "uploaded content" to "/file2.txt"
     When the administrator lists all the upload sessions
@@ -24,11 +24,11 @@ Feature: List upload sessions via CLI command
 
   Scenario: list all upload sessions that are currently in postprocessing
     Given the following configs have been set:
-      | config                           | value     |
-      | POSTPROCESSING_STEPS             | virusscan |
-      | ANTIVIRUS_INFECTED_FILE_HANDLING | abort     |
+      | service        | config                           | value     |
+      | postprocessing | POSTPROCESSING_STEPS             | virusscan |
+      | antivirus      | ANTIVIRUS_INFECTED_FILE_HANDLING | abort     |
     And user "Alice" has uploaded file "filesForUpload/filesWithVirus/eicar.com" to "/virusFile.txt"
-    And the config "POSTPROCESSING_DELAY" has been set to "10s"
+    And the config "POSTPROCESSING_DELAY" has been set to "10s" for "postprocessing" service
     And the administrator has waited for "2" seconds
     And user "Alice" has uploaded file with content "uploaded content" to "/file1.txt"
     And user "Alice" has uploaded file with content "uploaded content" to "/file2.txt"
@@ -43,9 +43,9 @@ Feature: List upload sessions via CLI command
 
   Scenario: list all upload sessions that are infected by virus
     Given the following configs have been set:
-      | config                           | value     |
-      | POSTPROCESSING_STEPS             | virusscan |
-      | ANTIVIRUS_INFECTED_FILE_HANDLING | abort     |
+      | service        | config                           | value     |
+      | postprocessing | POSTPROCESSING_STEPS             | virusscan |
+      | antivirus      | ANTIVIRUS_INFECTED_FILE_HANDLING | abort     |
     And user "Alice" has uploaded file "filesForUpload/filesWithVirus/eicar.com" to "/virusFile.txt"
     And user "Alice" has uploaded file with content "uploaded content" to "/file1.txt"
     When the administrator lists all the upload sessions with flag "has-virus"
@@ -58,7 +58,7 @@ Feature: List upload sessions via CLI command
 
   Scenario: list and cleanup the expired upload sessions
     Given a file "large.zip" with the size of "2GB" has been created locally
-    And the config "STORAGE_USERS_UPLOAD_EXPIRATION" has been set to "1"
+    And the config "STORAGE_USERS_UPLOAD_EXPIRATION" has been set to "1" for "storageuser" service
     And user "Alice" has uploaded a file from "filesForUpload/textfile.txt" to "file.txt" via TUS inside of the space "Personal" using the WebDAV API
     And user "Alice" has tried to upload file "filesForUpload/large.zip" to "large.zip" inside space "Personal" via TUS
     When the administrator lists all the upload sessions with flag "expired"
@@ -77,7 +77,7 @@ Feature: List upload sessions via CLI command
 
 
   Scenario: restart upload sessions that are in postprocessing
-    Given the config "POSTPROCESSING_DELAY" has been set to "3s"
+    Given the config "POSTPROCESSING_DELAY" has been set to "3s" for "postprocessing" service
     And user "Alice" has uploaded file with content "upload content" to "/file1.txt"
     And user "Alice" has uploaded file with content "upload content" to "/file2.txt"
     And the administrator has waited for "1" seconds
@@ -97,7 +97,7 @@ Feature: List upload sessions via CLI command
 
 
   Scenario: restart upload sessions of a single file
-    Given the config "POSTPROCESSING_DELAY" has been set to "3s"
+    Given the config "POSTPROCESSING_DELAY" has been set to "3s" for "postprocessing" service
     And user "Alice" has uploaded file with content "uploaded content" to "file1.txt"
     And user "Alice" has uploaded file with content "uploaded content" to "file2.txt"
     And the administrator has waited for "1" seconds
@@ -119,11 +119,11 @@ Feature: List upload sessions via CLI command
 
   Scenario: clean all upload sessions that are not in post-processing
     Given the following configs have been set:
-      | config                           | value     |
-      | POSTPROCESSING_STEPS             | virusscan |
-      | ANTIVIRUS_INFECTED_FILE_HANDLING | abort     |
+      | service        | config                           | value     |
+      | postprocessing | POSTPROCESSING_STEPS             | virusscan |
+      | antivirus      | ANTIVIRUS_INFECTED_FILE_HANDLING | abort     |
     And user "Alice" has uploaded file "filesForUpload/filesWithVirus/eicar.com" to "/virusFile.txt"
-    And the config "POSTPROCESSING_DELAY" has been set to "10s"
+    And the config "POSTPROCESSING_DELAY" has been set to "10s" for "postprocessing" service
     And user "Alice" has uploaded file with content "upload content" to "/file1.txt"
     When the administrator cleans upload sessions with the following flags:
       | processing=false |
@@ -136,10 +136,10 @@ Feature: List upload sessions via CLI command
 
   Scenario: clean upload sessions that are not in post-processing and is not virus infected
     Given the following configs have been set:
-      | config                           | value     |
-      | POSTPROCESSING_STEPS             | virusscan |
-      | ANTIVIRUS_INFECTED_FILE_HANDLING | abort     |
-      | POSTPROCESSING_DELAY             | 10s       |
+      | service        | config                           | value     |
+      | postprocessing | POSTPROCESSING_STEPS             | virusscan |
+      | antivirus      | ANTIVIRUS_INFECTED_FILE_HANDLING | abort     |
+      | postprocessing | POSTPROCESSING_DELAY             | 10s       |
     And user "Alice" has uploaded file "filesForUpload/filesWithVirus/eicar.com" to "/virusFile.txt"
     And user "Alice" has uploaded file with content "upload content" to "/file1.txt"
     And user "Alice" has created a new TUS resource in the space "Personal" with the following headers:
@@ -161,10 +161,10 @@ Feature: List upload sessions via CLI command
   @issue-11290
   Scenario: resume all upload sessions
     Given the following configs have been set:
-      | config                           | value           |
-      | POSTPROCESSING_STEPS             | virusscan,delay |
-      | ANTIVIRUS_INFECTED_FILE_HANDLING | abort           |
-      | POSTPROCESSING_DELAY             | 3s              |
+      | service        | config                           | value           |
+      | postprocessing | POSTPROCESSING_STEPS             | virusscan,delay |
+      | antivirus      | ANTIVIRUS_INFECTED_FILE_HANDLING | abort           |
+      | postprocessing | POSTPROCESSING_DELAY             | 3s              |
     And user "Alice" has uploaded file with content "upload content" to "file.txt"
     And the administrator has waited for "1" seconds
     And the administrator has stopped the server
@@ -202,7 +202,7 @@ Feature: List upload sessions via CLI command
 
   Scenario: restart expired upload sessions
     Given a file "large.zip" with the size of "2GB" has been created locally
-    And the config "STORAGE_USERS_UPLOAD_EXPIRATION" has been set to "1"
+    And the config "STORAGE_USERS_UPLOAD_EXPIRATION" has been set to "1" for "storageuser" service
     And user "Alice" has uploaded a file from "filesForUpload/textfile.txt" to "file.txt" via TUS inside of the space "Personal" using the WebDAV API
     And user "Alice" has tried to upload file "filesForUpload/large.zip" to "large.zip" inside space "Personal" via TUS
     When the administrator restarts the expired upload sessions using the CLI

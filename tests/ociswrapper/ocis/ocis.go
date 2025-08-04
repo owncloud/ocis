@@ -31,6 +31,7 @@ var runningServices = make(map[string]int)
 
 // exported variables
 var ServiceEnvConfigs = make(map[string][]string)
+var K3dServiceEnvConfigs = make(map[string][]string)
 var OcisServiceName = "ocis"
 
 func Start(envMap []string) {
@@ -69,6 +70,81 @@ func Restart(envMap []string) (bool, string) {
 	go Start(envMap)
 
 	return WaitForConnection()
+}
+
+func UpdateEnv(service string, envMap []string) (bool, string) {
+	if envMap == nil {
+		envMap = []string{}
+	}
+
+	cmdArgs := new(bytes.Buffer)
+	for _, value := range envMap {
+		fmt.Fprintf(cmdArgs, "%s ", value)
+	}
+	envMap = append([]string{"set", "env", "-n", "ocis", "deployment", service}, envMap...)
+	cmd = exec.Command("kubectl", envMap...)
+	_, err := cmd.Output()
+	if err != nil {
+		fmt.Println(err.Error())
+		return false, "error"
+	}
+	if(isServiceReady(service)){
+		time.Sleep(1000 * time.Microsecond)
+		return true, "ok"
+	}
+	return false, "error"
+}
+
+func Rollback() (bool, string) {
+	for service, envs := range K3dServiceEnvConfigs {
+		cmdArgs := []string{"set", "env", "-n", "ocis"}
+		cmdArgs = append(cmdArgs, "deployment/"+service)
+		for _, env := range envs {
+			cmdArgs = append(cmdArgs, strings.SplitN(env, "=", 2)[0]+"-")
+		}
+		cmd = exec.Command("kubectl", cmdArgs...)
+		_, err := cmd.Output()
+		if err != nil {
+			return false, "service didnt restart"
+		}
+		if(isServiceReady(service)){
+			delete(K3dServiceEnvConfigs, service)
+		}
+	}
+	time.Sleep(1000 * time.Microsecond)
+	return true, "ok"
+}
+
+func isServiceReady(service string) bool {
+	startTime := time.Now()
+	timeout := 10 * time.Second
+	sleepInterval := 500 * time.Millisecond
+
+	for time.Since(startTime) < timeout {
+		time.Sleep(sleepInterval)
+		cmd := exec.Command("sh", "-c", fmt.Sprintf("kubectl get pods -n ocis -A | grep %q | wc -l", service))
+		stdout, err := cmd.Output()
+		if err != nil {
+			fmt.Println("Error:", err)
+			return false
+		}
+		if strings.TrimSpace(string(stdout)) == "1" {
+			for time.Since(startTime) < timeout {
+				time.Sleep(sleepInterval)
+				cmd := exec.Command("sh", "-c", fmt.Sprintf("kubectl get pods -n ocis -A | grep %q | grep Running | wc -l", service))
+				stdout, err := cmd.Output()
+				if err != nil {
+					fmt.Println("Error:", err)
+					return false
+				}
+				if strings.TrimSpace(string(stdout)) == "1" {
+					return true
+				}
+			}
+			return false
+		}
+	}
+	return false
 }
 
 func IsOcisRunning() bool {

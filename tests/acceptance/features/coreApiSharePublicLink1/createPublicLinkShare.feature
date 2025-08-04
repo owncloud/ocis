@@ -147,7 +147,7 @@ Feature: create a public link share
 
   @env-config
   Scenario Outline: getting the share information of password less public-links hides credential placeholders
-    Given the config "OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false"
+    Given the config "OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false" for "frontend" service
     And using OCS API version "<ocs-api-version>"
     And user "Alice" has uploaded file with content "Random data" to "/randomfile.txt"
     When user "Alice" creates a public link share using the sharing API with settings
@@ -302,7 +302,7 @@ Feature: create a public link share
 
   @env-config @skipOnReva @issue-10331 @issue-10071
   Scenario: get the size of a file shared by public link
-    Given the config "OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false"
+    Given the config "OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false" for "sharing" service
     And user "Alice" has uploaded file with content "This is a test file" to "test-file.txt"
     And using SharingNG
     And user "Alice" has created the following resource link share:
@@ -315,7 +315,7 @@ Feature: create a public link share
 
   @env-config @issue-10331 @issue-10071
   Scenario Outline: get the mtime of a file shared by public link
-    Given the config "OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false"
+    Given the config "OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false" for "frontend" service
     And using <dav-path-version> DAV path
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "file.txt" with mtime "Thu, 08 Aug 2019 04:18:13 GMT"
     When user "Alice" creates a public link share using the sharing API with settings
@@ -330,7 +330,7 @@ Feature: create a public link share
 
   @env-config @issue-10331 @issue-10071
   Scenario Outline: get the mtime of a file inside a folder shared by public link
-    Given the config "OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false"
+    Given the config "OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false" for "frontend" service
     And using <dav-path-version> DAV path
     And user "Alice" has created folder "testFolder"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "testFolder/file.txt" with mtime "Thu, 08 Aug 2019 04:18:13 GMT"
@@ -346,7 +346,7 @@ Feature: create a public link share
 
   @env-config @skipOnReva @issue-10331 @issue-10071
   Scenario: get the mtime of a file inside a folder shared by public link using new webDAV version
-    Given the config "OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false"
+    Given the config "OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false" for "frontend" service
     And user "Alice" has created folder "testFolder"
     And using SharingNG
     And user "Alice" has created the following resource link share:
@@ -361,7 +361,7 @@ Feature: create a public link share
 
   @env-config @issue-10331 @issue-10071
   Scenario: overwriting a file changes its mtime (public webDAV API)
-    Given the config "OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false"
+    Given the config "OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false" for "frontend" service
     And user "Alice" has created folder "testFolder"
     When user "Alice" uploads file with content "uploaded content for file name ending with a dot" to "testFolder/file.txt" using the WebDAV API
     And user "Alice" creates a public link share using the sharing API with settings
@@ -375,7 +375,7 @@ Feature: create a public link share
 
   @env-config @skipOnReva @issue-10331 @issue-10071
   Scenario: check the href of a public link file
-    Given the config "OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false"
+    Given the config "OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false" for "sharing" service
     And using new DAV path
     And user "Alice" has uploaded file with content "Random data" to "/file.txt"
     And using SharingNG

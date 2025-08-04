@@ -9,7 +9,7 @@ Feature: edit/search user including email
       | displayName | Brian Murphy      |
       | email       | brian@example.com |
       | password    | 1234              |
-    And the config "OCIS_SHOW_USER_EMAIL_IN_RESULTS" has been set to "true"
+    And the config "OCIS_SHOW_USER_EMAIL_IN_RESULTS" has been set to "true" for "graph" service
 
 
   Scenario Outline: admin user can edit another user's email
@@ -469,7 +469,7 @@ Feature: edit/search user including email
 
 
   Scenario Outline: search other users when OCIS_SHOW_USER_EMAIL_IN_RESULTS config is disabled
-    Given the config "OCIS_SHOW_USER_EMAIL_IN_RESULTS" has been set to "false"
+    Given the config "OCIS_SHOW_USER_EMAIL_IN_RESULTS" has been set to "false" for "graph" service
     And the administrator has assigned the role "<user-role>" to user "Alice" using the Graph API
     When user "Alice" searches for user "Brian" using Graph API
     Then the HTTP status code should be "200"

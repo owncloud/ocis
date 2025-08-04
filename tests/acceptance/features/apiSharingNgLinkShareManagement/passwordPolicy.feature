@@ -2,21 +2,22 @@
 Feature: Password policy for public links password
 
   Password requirements. set by default:
-  | OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD  | true |
-  | OCIS_PASSWORD_POLICY_MIN_CHARACTERS           | 8    |
-  | OCIS_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS | 1    |
-  | OCIS_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS | 1    |
-  | OCIS_PASSWORD_POLICY_MIN_DIGITS               | 1    |
-  | OCIS_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS   | 1    |
+  | SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD / OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD           | true |
+  | SHARING_PASSWORD_POLICY_MIN_CHARACTERS / OCIS_PASSWORD_POLICY_MIN_CHARACTERS                     | 8    |
+  | SHARING_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS / OCIS_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS | 1    |
+  | SHARING_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS / OCIS_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS | 1    |
+  | SHARING_PASSWORD_POLICY_MIN_DIGITS / OCIS_PASSWORD_POLICY_MIN_DIGITS                             | 1    |
+  | SHARING_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS / OCIS_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS     | 1    |
 
   Background:
     Given the following configs have been set:
-      | config                                        | value |
-      | OCIS_PASSWORD_POLICY_MIN_CHARACTERS           | 13    |
-      | OCIS_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS | 3     |
-      | OCIS_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS | 2     |
-      | OCIS_PASSWORD_POLICY_MIN_DIGITS               | 2     |
-      | OCIS_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS   | 2     |
+      | service | config                                           | value |
+      | sharing | SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD          | 13    |
+      | sharing | SHARING_PASSWORD_POLICY_MIN_CHARACTERS           | 13    |
+      | sharing | SHARING_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS | 3     |
+      | sharing | SHARING_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS | 2     |
+      | sharing | SHARING_PASSWORD_POLICY_MIN_DIGITS               | 2     |
+      | sharing | SHARING_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS   | 2     |
     And user "Alice" has been created with default attributes
     And using SharingNG
 
