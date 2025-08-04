@@ -237,7 +237,7 @@ Feature: Update a link share for a resource
 
 
   Scenario Outline: update a file's link share with a password that is listed in the Banned-Password-List using permissions endpoint
-    Given the config "OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/drone/banned-password-list.txt"
+    Given the config "SHARING_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/drone/banned-password-list.txt" for "sharing" service
     And user "Alice" has uploaded file with content "other data" to "text.txt"
     And user "Alice" has created the following resource link share:
       | resource        | text.txt |
@@ -286,8 +286,8 @@ Feature: Update a link share for a resource
   @env-config @issue-9724 @issue-10331
   Scenario: set password on a existing link share of a folder inside project-space using permissions endpoint
     Given the following configs have been set:
-      | config                                       | value |
-      | OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD | false |
+      | service | config                                       | value |
+      | sharing | OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD | false |
     And using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "projectSpace" with the default quota using the Graph API

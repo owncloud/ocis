@@ -23,6 +23,8 @@ func Start(port string) {
 	var mux = http.NewServeMux()
 	mux.HandleFunc("/", http.NotFound)
 	mux.HandleFunc("/config", handlers.SetEnvHandler)
+	mux.HandleFunc("/k8s/config", handlers.K8sSetEnvHandler)
+	mux.HandleFunc("/k8s/rollback", handlers.K8sRollbackHandler)
 	mux.HandleFunc("/rollback", handlers.RollbackHandler)
 	mux.HandleFunc("/command", handlers.CommandHandler)
 	mux.HandleFunc("/stop", handlers.StopOcisHandler)

@@ -599,6 +599,9 @@ class FeatureContext extends BehatVariablesContext {
 	 * @return void
 	 */
 	public function startOcisServer(): void {
+		if (\getenv('K8S') === "true") {
+			return;
+		}
 		$response = OcisConfigHelper::startOcis();
 		// 409 is returned if the server is already running
 		$this->theHTTPStatusCodeShouldBe([200, 409], 'Starting oCIS server', $response);

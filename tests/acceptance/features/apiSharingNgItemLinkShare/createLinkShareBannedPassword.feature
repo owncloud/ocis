@@ -6,7 +6,7 @@ Feature: Link share with banned password
     Given these users have been created with default attributes:
       | username |
       | Alice    |
-    And the config "OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/drone/banned-password-list.txt"
+    And the config "SHARING_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/drone/banned-password-list.txt" for "sharing" service
 
 
   Scenario: try to create a folder link share with a password that is listed in the Banned-Password-List

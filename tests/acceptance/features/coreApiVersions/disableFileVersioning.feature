@@ -13,7 +13,7 @@ Feature: checking file versions
 
 
   Scenario: check version number of a file when versioning is disabled
-    Given the config "OCIS_DISABLE_VERSIONING" has been set to "true"
+    Given the config "OCIS_DISABLE_VERSIONING" has been set to "true" for "storageusers" service
     And user "Alice" has uploaded file with content "test file version 1" to "/testfile.txt"
     And user "Alice" has uploaded file with content "test file version 2" to "/testfile.txt"
     When user "Alice" gets the number of versions of file "/testfile.txt"
@@ -24,7 +24,7 @@ Feature: checking file versions
   Scenario: file version number should not be added after disabling versioning
     Given user "Alice" has uploaded file with content "test file version 1" to "/testfile.txt"
     And user "Alice" has uploaded file with content "test file version 2" to "/testfile.txt"
-    And the config "OCIS_DISABLE_VERSIONING" has been set to "true"
+    And the config "OCIS_DISABLE_VERSIONING" has been set to "true" for "storageusers" service
     And user "Alice" has uploaded file with content "test file version 3" to "/testfile.txt"
     And user "Alice" has uploaded file with content "test file version 4" to "/testfile.txt"
     When user "Alice" gets the number of versions of file "/testfile.txt"
@@ -33,7 +33,7 @@ Feature: checking file versions
 
 
   Scenario Outline: sharee tries to check version number of a file shared from project space when versioning is disabled
-    Given the config "OCIS_DISABLE_VERSIONING" has been set to "true"
+    Given the config "OCIS_DISABLE_VERSIONING" has been set to "true" for "storageusers" service
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "Project1" with the default quota using the Graph API
     And user "Alice" has uploaded a file inside space "Project1" with content "hello world version 1" to "text.txt"
@@ -54,7 +54,7 @@ Feature: checking file versions
 
 
   Scenario Outline: sharee tries to check version number of a file shared from personal space when versioning is disabled
-    Given the config "OCIS_DISABLE_VERSIONING" has been set to "true"
+    Given the config "OCIS_DISABLE_VERSIONING" has been set to "true" for "storageusers" service
     And user "Alice" has uploaded file with content "test file version 2" to "/text.txt"
     And user "Alice" has sent the following resource share invitation:
       | resource        | text.txt          |
@@ -72,10 +72,10 @@ Feature: checking file versions
 
 
   Scenario: check file version number after disabling versioning, creating versions and then enabling versioning
-    Given the config "OCIS_DISABLE_VERSIONING" has been set to "true"
+    Given the config "OCIS_DISABLE_VERSIONING" has been set to "true" for "storageusers" service
     And user "Alice" has uploaded file with content "test file version 1" to "/testfile.txt"
     And user "Alice" has uploaded file with content "test file version 2" to "/testfile.txt"
-    And the config "OCIS_DISABLE_VERSIONING" has been set to "false"
+    And the config "OCIS_DISABLE_VERSIONING" has been set to "false" for "storageusers" service
     And user "Alice" has uploaded file with content "test file version 3" to "/testfile.txt"
     And user "Alice" has uploaded file with content "test file version 4" to "/testfile.txt"
     When user "Alice" gets the number of versions of file "/testfile.txt"

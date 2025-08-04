@@ -108,6 +108,37 @@ func SetEnvHandler(res http.ResponseWriter, req *http.Request) {
 	sendResponse(res, http.StatusInternalServerError, message)
 }
 
+func K8sSetEnvHandler(res http.ResponseWriter, req *http.Request) {
+	if req.Method != http.MethodPut {
+		sendResponse(res, http.StatusMethodNotAllowed, "")
+		return
+	}
+	envBody, err := parseJsonBody(req.Body)
+	if err != nil {
+		sendResponse(res, http.StatusMethodNotAllowed, "Invalid json body")
+		return
+	}
+
+	var message string
+	var envMap []string
+
+	for service, envs := range envBody {
+		for env, value := range envs.(map[string]any) {
+			envMap = append(envMap, fmt.Sprintf("%s=%v", env, value))
+		}
+		ocis.K3dServiceEnvConfigs[service] = append(ocis.K3dServiceEnvConfigs[service], envMap...)
+		success, _ := ocis.UpdateEnv(service, envMap)
+		if !success {
+			message = "Failed to restart oCIS with new configuration"
+			sendResponse(res, http.StatusInternalServerError, message)
+			return
+		}
+		envMap = []string{}
+	}
+	message = "oCIS configured successfully"
+	sendResponse(res, http.StatusOK, message)
+}
+
 func RollbackHandler(res http.ResponseWriter, req *http.Request) {
 	if req.Method != http.MethodDelete {
 		sendResponse(res, http.StatusMethodNotAllowed, "")
@@ -124,6 +155,23 @@ func RollbackHandler(res http.ResponseWriter, req *http.Request) {
 	}
 
 	message = "Failed to restart oCIS with initial configuration"
+	sendResponse(res, http.StatusInternalServerError, message)
+}
+
+func K8sRollbackHandler(res http.ResponseWriter, req *http.Request) {
+	if req.Method != http.MethodDelete {
+		sendResponse(res, http.StatusMethodNotAllowed, "")
+		return
+	}
+	var message string
+	success, _ := ocis.Rollback()
+
+	if success {
+		message = "oCIS configured successfully"
+		sendResponse(res, http.StatusOK, message)
+		return
+	}
+	message = "Failed to restart oCIS with new configuration"
 	sendResponse(res, http.StatusInternalServerError, message)
 }
 

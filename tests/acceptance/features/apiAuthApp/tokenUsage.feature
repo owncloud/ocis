@@ -112,7 +112,7 @@ Feature: create auth-app token
 
   @env-config
   Scenario: admin tries to access resource of another user using impersonation token
-    Given the config "AUTH_APP_ENABLE_IMPERSONATION" has been set to "true"
+    Given the config "AUTH_APP_ENABLE_IMPERSONATION" has been set to "true" for "auth-app" service
     And user "Admin" has created auth-app token for user "Alice" with expiration time "72h" using the auth-app API
     And user "Alice" has uploaded file with content "ownCloud test text file" to "textfile.txt"
     When user "Admin" requests these endpoints with "PROPFIND" using the auth-app token of user "Alice"
@@ -124,7 +124,7 @@ Feature: create auth-app token
 
   @env-config
   Scenario: non-admin user tries to access resource of another user using impersonation token
-    Given the config "AUTH_APP_ENABLE_IMPERSONATION" has been set to "true"
+    Given the config "AUTH_APP_ENABLE_IMPERSONATION" has been set to "true" for "auth-app" service
     And user "Admin" has created auth-app token for user "Alice" with expiration time "72h" using the auth-app API
     And user "Alice" has uploaded file with content "ownCloud test text file" to "textfile.txt"
     And user "Brian" has been created with default attributes
@@ -144,7 +144,7 @@ Feature: create auth-app token
 
   @env-config
   Scenario: user tries to use expired impersonation token created via impersonation token
-    Given the config "AUTH_APP_ENABLE_IMPERSONATION" has been set to "true"
+    Given the config "AUTH_APP_ENABLE_IMPERSONATION" has been set to "true" for "auth-app" service
     And user "Admin" has created auth-app token for user "Alice" with expiration time "1s" using the auth-app API
     And user "Alice" has waited "2" second for auth-app token to expire
     When user "Alice" lists all available spaces via the Graph API
@@ -152,7 +152,7 @@ Feature: create auth-app token
 
   @env-config
   Scenario: user lists their drives using impersonation token
-    Given the config "AUTH_APP_ENABLE_IMPERSONATION" has been set to "true"
+    Given the config "AUTH_APP_ENABLE_IMPERSONATION" has been set to "true" for "auth-app" service
     And user "Admin" has created auth-app token for user "Alice" with expiration time "72h" using the auth-app API
     When user "Alice" lists all available spaces via the Graph API
     Then the HTTP status code should be "200"

@@ -94,6 +94,18 @@ class OcisConfigHelper {
 	}
 
 	/**
+	 * @param array $envs
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public static function reConfigureOcisK8s(array $envs): ResponseInterface {
+		$url = self::getWrapperUrl() . "/k8s/config";
+		$response = self::sendRequest($url, "PUT", \json_encode($envs));
+		return $response;
+	}
+
+	/**
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
