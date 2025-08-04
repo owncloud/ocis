@@ -139,6 +139,19 @@ class CliContext implements Context {
 	}
 
 	/**
+	 * @When the administrator lists all the unified roles using the CLI
+	 *
+	 * @return void
+	 */
+	public function theAdministratorListsAllTheUnifiedRolesUsingTheCli(): void {
+		$command = "graph list-unified-roles";
+		$body = [
+			"command" => $command,
+		];
+		$this->featureContext->setResponse(CliHelper::runCommand($body));
+	}
+
+	/**
 	 * @When the administrator creates auth-app token for user :user with expiration time :expirationTime using the auth-app CLI
 	 * @When the administrator tries to create auth-app token for user :user with expiration time :expirationTime using the auth-app CLI
 	 *
@@ -341,6 +354,32 @@ class CliContext implements Context {
 			Assert::assertStringContainsString($output, $jsonResponse["message"]);
 		} else {
 			Assert::assertStringNotContainsString($output, $jsonResponse["message"]);
+		}
+	}
+
+	/**
+	 * @Then the command output should include the following fields for each role:
+	 *
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function theCommandOutputShouldIncludeTheFollowingFieldsForEachRole(TableNode $table): void {
+		$this->featureContext->verifyTableNodeColumns(
+			$table,
+			['field'],
+		);
+		$response = $this->featureContext->getResponse();
+		$decodedResponse = $this->featureContext->getJsonDecodedResponse($response);
+		foreach ($table->getColumnsHash() as $expectedFieldRow) {
+			$expectedField = $expectedFieldRow['field'];
+			$pattern = '/\b' . $expectedField . '\b/';
+			$isPatternMatched = \boolval(preg_match($pattern, $decodedResponse["message"]));
+			Assert::assertTrue(
+				$isPatternMatched,
+				"Expected field '$expectedField' was not found in the command output.",
+			);
 		}
 	}
 
