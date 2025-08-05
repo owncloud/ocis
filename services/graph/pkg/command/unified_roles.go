@@ -37,11 +37,11 @@ func listUnifiedRoles(cfg *config.Config) *cli.Command {
 		Name:  "list",
 		Usage: "list available unified roles",
 		Action: func(c *cli.Context) error {
-			tbl := tablewriter.NewWriter(os.Stdout)
+			tbl := tablewriter.NewTable(os.Stdout)
 			tbl.Header("Label", "UID", "Enabled", "Description", "Condition", "Allowed resource actions")
 
 			headers := []string{"Label", "UID", "Enabled", "Description", "Condition", "Allowed resource actions"}
-			
+
 			for _, definition := range unifiedrole.GetRoles(unifiedrole.RoleFilterAll()) {
 				const enabled = "enabled"
 				const disabled = "disabled"

@@ -13,6 +13,7 @@ import (
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/mohae/deepcopy"
+	"github.com/olekukonko/tablewriter"
 	tw "github.com/olekukonko/tablewriter"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	zlog "github.com/owncloud/ocis/v2/ocis-pkg/log"
@@ -469,7 +470,7 @@ func itemType(it provider.ResourceType) string {
 }
 
 func itemsTable(total int) *tw.Table {
-	table := tw.NewWriter(os.Stdout)
+	table := tablewriter.NewTable(os.Stdout)
 	table.Header("itemID", "path", "type", "delete at")
 	return table
 }

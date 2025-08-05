@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	tw "github.com/olekukonko/tablewriter"
+	"github.com/olekukonko/tablewriter"
 	"github.com/urfave/cli/v2"
 	mreg "go-micro.dev/v4/registry"
 
@@ -62,7 +62,7 @@ func VersionCommand(cfg *config.Config) *cli.Command {
 				return nil
 			}
 
-			table := tw.NewWriter(os.Stdout)
+			table := tablewriter.NewTable(os.Stdout)
 			table.Header("Version", "Address", "Id")
 			for _, s := range services {
 				for _, n := range s.Nodes {
