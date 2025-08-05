@@ -38,7 +38,7 @@ func Server(opts ...Option) (http.Service, error) {
 		svc.Logger(options.Logger),
 		svc.Config(options.Config),
 		svc.Middleware(
-			ocismiddleware.GetOtelhttpMiddleware("thumbnails", options.TraceProvider),
+			ocismiddleware.GetOtelhttpMiddleware(options.Config.Service.Name, options.TraceProvider),
 			middleware.RealIP,
 			middleware.RequestID,
 			ocismiddleware.Cors(

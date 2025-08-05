@@ -42,7 +42,7 @@ func Server(opts ...Option) (http.Service, error) {
 	}
 
 	middlewares := []func(stdhttp.Handler) stdhttp.Handler{
-		middleware.GetOtelhttpMiddleware("auth-app", options.TracerProvider),
+		middleware.GetOtelhttpMiddleware(options.Config.Service.Name, options.TracerProvider),
 		chimiddleware.RequestID,
 		middleware.Version(
 			options.Config.Service.Name,

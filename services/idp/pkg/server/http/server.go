@@ -57,7 +57,7 @@ func Server(opts ...Option) (http.Service, error) {
 		svc.Logger(options.Logger),
 		svc.Config(options.Config),
 		svc.Middleware(
-			middleware.GetOtelhttpMiddleware("idp", options.TraceProvider),
+			middleware.GetOtelhttpMiddleware(options.Config.Service.Name, options.TraceProvider),
 			chimiddleware.RealIP,
 			chimiddleware.RequestID,
 			middleware.NoCache,

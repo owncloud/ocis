@@ -327,7 +327,7 @@ func loadMiddlewares(logger log.Logger, cfg *config.Config,
 
 	return alice.New(
 		// first make sure we log all requests and redirect to https if necessary
-		pkgmiddleware.GetOtelhttpMiddleware("proxy", traceProvider),
+		pkgmiddleware.GetOtelhttpMiddleware(cfg.Service.Name, traceProvider),
 		middleware.Instrumenter(metrics),
 		chimiddleware.RealIP,
 		chimiddleware.RequestID,
