@@ -15,11 +15,13 @@ import (
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/owncloud/reva/v2/pkg/utils"
 	"go-micro.dev/v4/store"
+	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/trace"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/l10n"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/roles"
+	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
 	ehmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/eventhistory/v0"
 	ehsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/eventhistory/v0"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
@@ -117,13 +119,16 @@ func (ul *UserlogService) processEvent(event events.Event) {
 		err       error
 	)
 
+	startCtx, span := tracing.TraceEventConsumer(context.Background(), ul.tp, event)
+	defer span.End()
+
 	gwc, err := ul.gatewaySelector.Next()
 	if err != nil {
 		ul.log.Error().Err(err).Msg("cannot get gateway client")
 		return
 	}
 
-	ctx, err := utils.GetServiceUserContext(ul.cfg.ServiceAccount.ServiceAccountID, gwc, ul.cfg.ServiceAccount.ServiceAccountSecret)
+	ctx, err := utils.GetServiceUserContextWithContext(startCtx, gwc, ul.cfg.ServiceAccount.ServiceAccountID, ul.cfg.ServiceAccount.ServiceAccountSecret)
 	if err != nil {
 		ul.log.Error().Err(err).Msg("cannot get service account")
 		return
@@ -387,12 +392,24 @@ func (ul *UserlogService) sendSSE(ctx context.Context, userIDs []string, event e
 	}
 
 	for _, ev := range m {
-		if err := events.Publish(ctx, ul.publisher, ev); err != nil {
+		if err := ul.publishEvent(ctx, ev); err != nil {
 			return err
 		}
 	}
 
 	return nil
+}
+
+func (ul *UserlogService) publishEvent(ctx context.Context, ev interface{}) error {
+	pubCtx, span := tracing.TraceEventProducer(ctx, ul.tp, ev)
+	defer span.End()
+
+	err := events.Publish(pubCtx, ul.publisher, ev)
+	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+	}
+	return err
 }
 
 func (ul *UserlogService) removeExpiredEvents(userid string, all []string, received []*ehmsg.Event) error {

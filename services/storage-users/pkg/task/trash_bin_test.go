@@ -115,7 +115,7 @@ var _ = Describe("trash", func() {
 			gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(getUserResponse, nil)
 			gatewayClient.On("Authenticate", mock.Anything, mock.Anything).Return(nil, genericError)
 
-			err := task.PurgeTrashBin("service-user-id", now, task.Project, gatewaySelector, "")
+			err := task.PurgeTrashBin(context.Backgroun(), "service-user-id", now, task.Project, gatewaySelector, "")
 			Expect(err).To(HaveOccurred())
 		})
 		It("throws an error if space listing fails", func() {
@@ -123,7 +123,7 @@ var _ = Describe("trash", func() {
 			gatewayClient.On("Authenticate", mock.Anything, mock.Anything).Return(authenticateResponse, nil)
 			gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(nil, genericError)
 
-			err := task.PurgeTrashBin("service-user-id", now, task.Project, gatewaySelector, "")
+			err := task.PurgeTrashBin(context.Background(), "service-user-id", now, task.Project, gatewaySelector, "")
 			Expect(err).To(HaveOccurred())
 		})
 		It("only deletes items older than the specified period", func() {
@@ -195,7 +195,7 @@ var _ = Describe("trash", func() {
 				}, nil,
 			)
 
-			err := task.PurgeTrashBin("service-user-id", now, task.Project, gatewaySelector, "")
+			err := task.PurgeTrashBin(context.Background(), "service-user-id", now, task.Project, gatewaySelector, "")
 			Expect(err).To(BeNil())
 			Expect(recycleItems["personal"]).To(HaveLen(2))
 			Expect(recycleItems["project"]).To(HaveLen(2))

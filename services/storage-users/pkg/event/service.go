@@ -6,10 +6,12 @@ import (
 
 	apiGateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
 	"github.com/owncloud/ocis/v2/services/storage-users/pkg/config"
 	"github.com/owncloud/ocis/v2/services/storage-users/pkg/task"
 	"github.com/owncloud/reva/v2/pkg/events"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
+	"go.opentelemetry.io/otel/trace"
 )
 
 const (
@@ -21,16 +23,18 @@ type Service struct {
 	gatewaySelector pool.Selectable[apiGateway.GatewayAPIClient]
 	eventStream     events.Stream
 	logger          log.Logger
+	traceProvider   trace.TracerProvider
 	config          config.Config
 	ctx             context.Context
 }
 
 // NewService prepares and returns a Service implementation.
-func NewService(ctx context.Context, gatewaySelector pool.Selectable[apiGateway.GatewayAPIClient], eventStream events.Stream, logger log.Logger, conf config.Config) (Service, error) {
+func NewService(ctx context.Context, gatewaySelector pool.Selectable[apiGateway.GatewayAPIClient], eventStream events.Stream, logger log.Logger, tp trace.TracerProvider, conf config.Config) (Service, error) {
 	svc := Service{
 		gatewaySelector: gatewaySelector,
 		eventStream:     eventStream,
 		logger:          logger,
+		traceProvider:   tp,
 		config:          conf,
 		ctx:             ctx,
 	}
@@ -64,6 +68,9 @@ func (s Service) Run() error {
 func (s Service) handleEvent(e events.Event) {
 	var errs []error
 
+	ctx, span := tracing.TraceEventConsumer(context.Background(), s.traceProvider, e)
+	defer span.End()
+
 	switch ev := e.Event.(type) {
 	case PurgeTrashBin:
 		executionTime := ev.ExecutionTime
@@ -83,7 +90,7 @@ func (s Service) handleEvent(e events.Event) {
 				continue
 			}
 
-			if err := task.PurgeTrashBin(s.config.ServiceAccount.ServiceAccountID, deleteBefore, spaceType, s.gatewaySelector, s.config.ServiceAccount.ServiceAccountSecret); err != nil {
+			if err := task.PurgeTrashBin(ctx, s.config.ServiceAccount.ServiceAccountID, deleteBefore, spaceType, s.gatewaySelector, s.config.ServiceAccount.ServiceAccountSecret); err != nil {
 				errs = append(errs, err)
 			}
 		}

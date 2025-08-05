@@ -10,12 +10,14 @@ import (
 	"time"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
 	"github.com/owncloud/ocis/v2/services/postprocessing/pkg/config"
 	"github.com/owncloud/ocis/v2/services/postprocessing/pkg/postprocessing"
 	ctxpkg "github.com/owncloud/reva/v2/pkg/ctx"
 	"github.com/owncloud/reva/v2/pkg/events"
 	"github.com/owncloud/reva/v2/pkg/utils"
 	"go-micro.dev/v4/store"
+	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -142,8 +144,7 @@ func (pps *PostprocessingService) processEvent(e events.Event) error {
 		err  error
 	)
 
-	ctx := e.GetTraceContext(pps.ctx)
-	ctx, span := pps.tp.Tracer("postprocessing").Start(ctx, "processEvent")
+	ctx, span := tracing.TraceEventConsumer(context.Background(), pps.tp, e)
 	defer span.End()
 
 	switch ev := e.Event.(type) {
@@ -195,7 +196,8 @@ func (pps *PostprocessingService) processEvent(e events.Event) error {
 					StepToStart:       pp.Status.CurrentStep,
 					ImpersonatingUser: pp.ImpersonatingUser,
 				}
-				err := events.Publish(ctx, pps.pub, retryEvent)
+
+				err := pps.publishEvent(ctx, retryEvent)
 				if err != nil {
 					pps.log.Error().Str("uploadID", ev.UploadID).Err(err).Msg("cannot publish RestartPostprocessing event")
 				}
@@ -217,7 +219,7 @@ func (pps *PostprocessingService) processEvent(e events.Event) error {
 			return fmt.Errorf("%w: cannot get upload", ErrEvent)
 		}
 		pp.Delay(func(next interface{}) {
-			if err := events.Publish(ctx, pps.pub, next); err != nil {
+			if err := pps.publishEvent(ctx, next); err != nil {
 				pps.log.Error().Err(err).Msg("cannot publish event")
 			}
 		})
@@ -254,7 +256,7 @@ func (pps *PostprocessingService) processEvent(e events.Event) error {
 	}
 
 	if next != nil {
-		if err := events.Publish(ctx, pps.pub, next); err != nil {
+		if err := pps.publishEvent(ctx, next); err != nil {
 			pps.log.Error().Err(err).Msg("unable to publish event")
 			return fmt.Errorf("%w: unable to publish event", ErrFatal) // we can't publish -> we are screwed
 		}
@@ -291,6 +293,18 @@ func (pps *PostprocessingService) getPP(sto store.Store, uploadID string) (*post
 	}
 
 	return pp, nil
+}
+
+func (pps *PostprocessingService) publishEvent(ctx context.Context, ev interface{}) error {
+	pubCtx, span := tracing.TraceEventProducer(ctx, pps.tp, ev)
+	defer span.End()
+
+	err := events.Publish(pubCtx, pps.pub, ev)
+	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+	}
+	return err
 }
 
 func getSteps(c config.Postprocessing) []events.Postprocessingstep {
@@ -335,10 +349,11 @@ func (pps *PostprocessingService) resumePP(ctx context.Context, uploadID string)
 	pp, err := pps.getPP(pps.store, uploadID)
 	if err != nil {
 		if err == ErrNotFound {
-			if err := events.Publish(ctx, pps.pub, events.RestartPostprocessing{
+			ev := events.RestartPostprocessing{
 				UploadID:  uploadID,
 				Timestamp: utils.TSNow(),
-			}); err != nil {
+			}
+			if err := pps.publishEvent(ctx, ev); err != nil {
 				return err
 			}
 			return nil
@@ -351,7 +366,7 @@ func (pps *PostprocessingService) resumePP(ctx context.Context, uploadID string)
 		return nil
 	}
 
-	return events.Publish(ctx, pps.pub, pp.CurrentStep())
+	return pps.publishEvent(ctx, pp.CurrentStep())
 }
 
 func (pps *PostprocessingService) findUploadsByStep(step events.Postprocessingstep) []string {

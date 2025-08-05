@@ -1,6 +1,7 @@
 package task
 
 import (
+	"context"
 	"time"
 
 	apiGateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
@@ -15,13 +16,13 @@ import (
 // the provided executantID must have space access.
 // removeBefore specifies how long an item must be in the trash-bin to be deleted,
 // items that stay there for a shorter time are ignored and kept in place.
-func PurgeTrashBin(serviceAccountID string, deleteBefore time.Time, spaceType SpaceType, gatewaySelector pool.Selectable[apiGateway.GatewayAPIClient], serviceAccountSecret string) error {
+func PurgeTrashBin(extCtx context.Context, serviceAccountID string, deleteBefore time.Time, spaceType SpaceType, gatewaySelector pool.Selectable[apiGateway.GatewayAPIClient], serviceAccountSecret string) error {
 	gatewayClient, err := gatewaySelector.Next()
 	if err != nil {
 		return err
 	}
 
-	ctx, err := utils.GetServiceUserContext(serviceAccountID, gatewayClient, serviceAccountSecret)
+	ctx, err := utils.GetServiceUserContextWithContext(extCtx, gatewayClient, serviceAccountID, serviceAccountSecret)
 	if err != nil {
 		return err
 	}

@@ -95,7 +95,7 @@ func Server(cfg *config.Config) *cli.Command {
 					return err
 				}
 
-				eventSVC, err := event.NewService(ctx, selector, stream, logger, *cfg)
+				eventSVC, err := event.NewService(ctx, selector, stream, logger, traceProvider, *cfg)
 				if err != nil {
 					logger.Fatal().Err(err).Msg("can't create event handler")
 				}

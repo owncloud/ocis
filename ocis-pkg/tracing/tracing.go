@@ -11,6 +11,8 @@ import (
 	"sync"
 	"time"
 
+	ctxpkg "github.com/owncloud/reva/v2/pkg/ctx"
+	"github.com/owncloud/reva/v2/pkg/events"
 	rtrace "github.com/owncloud/reva/v2/pkg/trace"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
@@ -230,4 +232,41 @@ func GetNewRequestWithDifferentContext(reqCtx, injectCtx context.Context, method
 func InjectTracingHeaders(ctx context.Context, req *http.Request) {
 	propagator := GetPropagator()
 	propagator.Inject(ctx, propagation.HeaderCarrier(req.Header))
+}
+
+func TraceEventProducer(ctx context.Context, tp trace.TracerProvider, evPayload interface{}) (context.Context, trace.Span) {
+	tracer := tp.Tracer("github.com/owncloud/ocis/v2/ocis-pkg/tracing")
+	evType := reflect.TypeOf(evPayload).String()
+	iid, _ := ctxpkg.ContextGetInitiator(ctx)
+
+	newCtx, span := tracer.Start(
+		ctx,
+		"Event "+evType,
+		trace.WithSpanKind(trace.SpanKindProducer),
+		trace.WithAttributes(
+			attribute.String("ocis.event.type", evType),
+			attribute.String("ocis.event.initiator", iid),
+		),
+	)
+	return newCtx, span
+}
+
+func TraceEventConsumer(ctx context.Context, tp trace.TracerProvider, ev events.Event) (context.Context, trace.Span) {
+	tracer := tp.Tracer("github.com/owncloud/ocis/v2/ocis-pkg/tracing")
+	evCtx := ev.GetTraceContext(ctx)
+
+	newCtx, span := tracer.Start(
+		ctx,
+		"Event "+ev.Type,
+		trace.WithSpanKind(trace.SpanKindConsumer),
+		trace.WithAttributes(
+			attribute.String("ocis.event.type", ev.Type),
+			attribute.String("ocis.event.id", ev.ID),
+			attribute.String("ocis.event.initiator", ev.InitiatorID),
+		),
+		trace.WithLinks(
+			trace.LinkFromContext(evCtx),
+		),
+	)
+	return newCtx, span
 }
