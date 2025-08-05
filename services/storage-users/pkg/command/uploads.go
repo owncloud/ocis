@@ -12,7 +12,6 @@ import (
 	"time"
 
 	"github.com/olekukonko/tablewriter"
-	tw "github.com/olekukonko/tablewriter"
 	"github.com/shamaton/msgpack/v2"
 	"github.com/urfave/cli/v2"
 
@@ -147,7 +146,7 @@ func ListUploadSessions(cfg *config.Config) *cli.Command {
 			}
 
 			var (
-				table *tw.Table
+				table *tablewriter.Table
 				raw   []Session
 			)
 

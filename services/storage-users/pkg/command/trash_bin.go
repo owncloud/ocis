@@ -15,7 +15,6 @@ import (
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/mohae/deepcopy"
 	"github.com/olekukonko/tablewriter"
-	tw "github.com/olekukonko/tablewriter"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	zlog "github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/storage-users/pkg/config"
@@ -470,7 +469,7 @@ func itemType(it provider.ResourceType) string {
 	return itemType
 }
 
-func itemsTable(total int) *tw.Table {
+func itemsTable(total int) *tablewriter.Table {
 	table := tablewriter.NewTable(os.Stdout)
 	table.Header("itemID", "path", "type", "delete at")
 	table.Footer("", "", "", "total count: "+strconv.Itoa(total))
