@@ -6,6 +6,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 
@@ -472,6 +473,7 @@ func itemType(it provider.ResourceType) string {
 func itemsTable(total int) *tw.Table {
 	table := tablewriter.NewTable(os.Stdout)
 	table.Header("itemID", "path", "type", "delete at")
+	table.Footer("", "", "", "total count: "+strconv.Itoa(total))
 	return table
 }
 
