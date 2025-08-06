@@ -1,7 +1,7 @@
 Feature: check activities
-  As a user
+  As a user random change
   I want to check who made which changes to files
-  So that I can track modifications
+  So that I can track modifications hcange
 
   Background:
     Given user "Alice" has been created with default attributes
