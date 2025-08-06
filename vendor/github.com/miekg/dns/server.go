@@ -44,6 +44,8 @@ type ResponseWriter interface {
 	LocalAddr() net.Addr
 	// RemoteAddr returns the net.Addr of the client that sent the current request.
 	RemoteAddr() net.Addr
+	// Network returns the value of the Net field of the Server (e.g., "tcp", "tcp-tls").
+	Network() string
 	// WriteMsg writes a reply back to the client.
 	WriteMsg(*Msg) error
 	// Write writes a raw buffer back to the client.
@@ -77,6 +79,7 @@ type response struct {
 	udpSession     *SessionUDP    // oob data to get egress interface right
 	pcSession      net.Addr       // address to use when writing to a generic net.PacketConn
 	writer         Writer         // writer to output the raw DNS bits
+	network        string         // corresponding Server.Net value
 }
 
 // handleRefused returns a HandlerFunc that returns REFUSED for every request it gets.
@@ -188,6 +191,14 @@ type DecorateReader func(Reader) Reader
 // Implementations should never return a nil Writer.
 type DecorateWriter func(Writer) Writer
 
+// MsgInvalidFunc is a listener hook for observing incoming messages that were discarded
+// because they could not be parsed.
+// Every message that is read by a Reader will eventually be provided to the Handler,
+// rejected (or ignored) by the MsgAcceptFunc, or passed to this function.
+type MsgInvalidFunc func(m []byte, err error)
+
+func DefaultMsgInvalidFunc(m []byte, err error) {}
+
 // A Server defines parameters for running an DNS server.
 type Server struct {
 	// Address to listen on, ":dns" if empty.
@@ -218,6 +229,7 @@ type Server struct {
 	// If NotifyStartedFunc is set it is called once the server has started listening.
 	NotifyStartedFunc func()
 	// DecorateReader is optional, allows customization of the process that reads raw DNS messages.
+	// The decorated reader must not mutate the data read from the conn.
 	DecorateReader DecorateReader
 	// DecorateWriter is optional, allows customization of the process that writes raw DNS messages.
 	DecorateWriter DecorateWriter
@@ -233,6 +245,8 @@ type Server struct {
 	// AcceptMsgFunc will check the incoming message and will reject it early in the process.
 	// By default DefaultMsgAcceptFunc will be used.
 	MsgAcceptFunc MsgAcceptFunc
+	// MsgInvalidFunc is optional, will be called if a message is received but cannot be parsed.
+	MsgInvalidFunc MsgInvalidFunc
 
 	// Shutdown handling
 	lock     sync.RWMutex
@@ -277,6 +291,9 @@ func (srv *Server) init() {
 	if srv.MsgAcceptFunc == nil {
 		srv.MsgAcceptFunc = DefaultMsgAcceptFunc
 	}
+	if srv.MsgInvalidFunc == nil {
+		srv.MsgInvalidFunc = DefaultMsgInvalidFunc
+	}
 	if srv.Handler == nil {
 		srv.Handler = DefaultServeMux
 	}
@@ -318,7 +335,7 @@ func (srv *Server) ListenAndServe() error {
 		return srv.serveTCP(l)
 	case "tcp-tls", "tcp4-tls", "tcp6-tls":
 		if srv.TLSConfig == nil || (len(srv.TLSConfig.Certificates) == 0 && srv.TLSConfig.GetCertificate == nil) {
-			return errors.New("dns: neither Certificates nor GetCertificate set in Config")
+			return errors.New("neither Certificates nor GetCertificate set in config")
 		}
 		network := strings.TrimSuffix(srv.Net, "-tls")
 		l, err := listenTCP(network, addr, srv.ReusePort, srv.ReuseAddr)
@@ -531,6 +548,7 @@ func (srv *Server) serveUDP(l net.PacketConn) error {
 			if cap(m) == srv.UDPSize {
 				srv.udpPool.Put(m[:srv.UDPSize])
 			}
+			srv.MsgInvalidFunc(m, ErrShortRead)
 			continue
 		}
 		wg.Add(1)
@@ -542,7 +560,7 @@ func (srv *Server) serveUDP(l net.PacketConn) error {
 
 // Serve a new TCP connection.
 func (srv *Server) serveTCPConn(wg *sync.WaitGroup, rw net.Conn) {
-	w := &response{tsigProvider: srv.tsigProvider(), tcp: rw}
+	w := &response{tsigProvider: srv.tsigProvider(), tcp: rw, network: srv.Net}
 	if srv.DecorateWriter != nil {
 		w.writer = srv.DecorateWriter(w)
 	} else {
@@ -597,7 +615,7 @@ func (srv *Server) serveTCPConn(wg *sync.WaitGroup, rw net.Conn) {
 
 // Serve a new UDP request.
 func (srv *Server) serveUDPPacket(wg *sync.WaitGroup, m []byte, u net.PacketConn, udpSession *SessionUDP, pcSession net.Addr) {
-	w := &response{tsigProvider: srv.tsigProvider(), udp: u, udpSession: udpSession, pcSession: pcSession}
+	w := &response{tsigProvider: srv.tsigProvider(), udp: u, udpSession: udpSession, pcSession: pcSession, network: srv.Net}
 	if srv.DecorateWriter != nil {
 		w.writer = srv.DecorateWriter(w)
 	} else {
@@ -611,6 +629,7 @@ func (srv *Server) serveUDPPacket(wg *sync.WaitGroup, m []byte, u net.PacketConn
 func (srv *Server) serveDNS(m []byte, w *response) {
 	dh, off, err := unpackMsgHdr(m, 0)
 	if err != nil {
+		srv.MsgInvalidFunc(m, err)
 		// Let client hang, they are sending crap; any reply can be used to amplify.
 		return
 	}
@@ -620,10 +639,12 @@ func (srv *Server) serveDNS(m []byte, w *response) {
 
 	switch action := srv.MsgAcceptFunc(dh); action {
 	case MsgAccept:
-		if req.unpack(dh, m, off) == nil {
+		err := req.unpack(dh, m, off)
+		if err == nil {
 			break
 		}
 
+		srv.MsgInvalidFunc(m, err)
 		fallthrough
 	case MsgReject, MsgRejectNotImplemented:
 		opcode := req.Opcode
@@ -799,6 +820,9 @@ func (w *response) RemoteAddr() net.Addr {
 		panic("dns: internal error: udpSession, pcSession and tcp are all nil")
 	}
 }
+
+// Network implements the ResponseWriter.Network method.
+func (w *response) Network() string { return w.network }
 
 // TsigStatus implements the ResponseWriter.TsigStatus method.
 func (w *response) TsigStatus() error { return w.tsigStatus }

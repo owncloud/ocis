@@ -1,4 +1,4 @@
-// Copyright (c) 2020-2023 Uber Technologies, Inc.
+// Copyright (c) 2023 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -18,37 +18,37 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-package atomic
+package zapcore
 
-//go:generate bin/gen-atomicwrapper -name=String -type=string -wrapped Value -pack packString -unpack unpackString -compareandswap -swap -file=string.go
+import "sync"
 
-func packString(s string) interface{} {
-	return s
+type lazyWithCore struct {
+	Core
+	sync.Once
+	fields []Field
 }
 
-func unpackString(v interface{}) string {
-	if s, ok := v.(string); ok {
-		return s
+// NewLazyWith wraps a Core with a "lazy" Core that will only encode fields if
+// the logger is written to (or is further chained in a lon-lazy manner).
+func NewLazyWith(core Core, fields []Field) Core {
+	return &lazyWithCore{
+		Core:   core,
+		fields: fields,
 	}
-	return ""
 }
 
-// String returns the wrapped value.
-func (s *String) String() string {
-	return s.Load()
+func (d *lazyWithCore) initOnce() {
+	d.Once.Do(func() {
+		d.Core = d.Core.With(d.fields)
+	})
 }
 
-// MarshalText encodes the wrapped string into a textual form.
-//
-// This makes it encodable as JSON, YAML, XML, and more.
-func (s *String) MarshalText() ([]byte, error) {
-	return []byte(s.Load()), nil
+func (d *lazyWithCore) With(fields []Field) Core {
+	d.initOnce()
+	return d.Core.With(fields)
 }
 
-// UnmarshalText decodes text and replaces the wrapped string with it.
-//
-// This makes it decodable from JSON, YAML, XML, and more.
-func (s *String) UnmarshalText(b []byte) error {
-	s.Store(string(b))
-	return nil
+func (d *lazyWithCore) Check(e Entry, ce *CheckedEntry) *CheckedEntry {
+	d.initOnce()
+	return d.Core.Check(e, ce)
 }
