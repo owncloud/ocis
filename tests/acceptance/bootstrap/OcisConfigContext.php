@@ -74,19 +74,31 @@ class OcisConfigContext implements Context {
 
 	/**
 	 * @Given the config :configVariable has been set to :configValue
+	 * @Given the config :configVariable has been set to :configValue for :serviceName service
 	 *
 	 * @param string $configVariable
 	 * @param string $configValue
+	 * @param string|null $serviceName
 	 *
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function theConfigHasBeenSetTo(string $configVariable, string $configValue): void {
-		$envs = [
-			$configVariable => $configValue,
-		];
+	public function theConfigHasBeenSetTo(string $configVariable, string $configValue, string $serviceName): void {
+		if ($serviceName !== null) {
+			$envs = [
+				$serviceName => [[$configVariable => $configValue]],
+			];
+			var_dump($envs);
 
-		$response = OcisConfigHelper::reConfigureOcis($envs);
+			$response = OcisConfigHelper::reConfigureK8sOcis($envs);
+
+		} else {
+			$envs = [
+				$configVariable => $configValue,
+			];
+			$response = OcisConfigHelper::reConfigureOcis($envs);
+		}
+
 		Assert::assertEquals(
 			200,
 			$response->getStatusCode(),
@@ -209,12 +221,20 @@ class OcisConfigContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function theConfigHasBeenSetToValue(TableNode $table): void {
+		// $envs = [];
+		// foreach ($table->getHash() as $row) {
+		// 	$envs[$row['config']] = $row['value'];
+		// }
+		// var_dump($envs);
+
 		$envs = [];
 		foreach ($table->getHash() as $row) {
-			$envs[$row['config']] = $row['value'];
+			$envs[$row['service']][] = [$row['config'] => $row['value']];
 		}
+		var_dump($envs);
 
-		$response = OcisConfigHelper::reConfigureOcis($envs);
+		$response = OcisConfigHelper::reConfigureK8sOcis($envs);
+		// $response = OcisConfigHelper::reConfigureOcis($envs);
 		Assert::assertEquals(
 			200,
 			$response->getStatusCode(),
@@ -255,6 +275,12 @@ class OcisConfigContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function rollback(): void {
+		if (\getenv('K3D') === "true") {
+			// sleep(60);
+			// echo("skip rollbackww");
+			$this->rollbackK3dServices();
+			return;
+		}
 		$this->rollbackServices();
 		$this->rollbackOcis();
 	}
@@ -278,6 +304,21 @@ class OcisConfigContext implements Context {
 	 */
 	public function rollbackServices(): void {
 		$response = OcisConfigHelper::rollbackServices();
+		Assert::assertEquals(
+			200,
+			$response->getStatusCode(),
+			"Failed to rollback services.",
+		);
+	}
+
+	/**
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function rollbackK3dServices(): void {
+		$url = OcisConfigHelper::getWrapperUrl() . "/k3d/rollback";
+		$response = OcisConfigHelper::sendRequest($url, "DELETE", '{"service"=>"thumbnails"}');
+		// var_dump($response);
 		Assert::assertEquals(
 			200,
 			$response->getStatusCode(),
