@@ -14,7 +14,7 @@ import (
 	"strings"
 	"time"
 
-	tw "github.com/olekukonko/tablewriter"
+	"github.com/olekukonko/tablewriter"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	"github.com/owncloud/ocis/v2/ocis/pkg/register"
@@ -403,11 +403,8 @@ func benchmark(iterations int, path string) error {
 	fmt.Printf("Iterations: %d\n", iterations)
 	fmt.Println("")
 
-	table := tw.NewWriter(os.Stdout)
-	table.SetHeader([]string{"Test", "Iterations", "dur/it", "total"})
-	table.SetAutoFormatHeaders(false)
-	table.SetColumnAlignment([]int{tw.ALIGN_LEFT, tw.ALIGN_RIGHT, tw.ALIGN_RIGHT, tw.ALIGN_RIGHT})
-	table.SetAutoMergeCellsByColumnIndex([]int{2, 3})
+	table := tablewriter.NewTable(os.Stdout)
+	table.Header("Test", "Iterations", "dur/it", "total")
 	for _, t := range []string{"lockedfile open(wo,c,t) close", "stat", "fopen(wo,t) write close", "fopen(ro) close", "fopen(ro) read close", "xattr-set", "xattr-get"} {
 		start := time.Now()
 		err := tests[t]()

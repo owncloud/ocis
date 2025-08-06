@@ -13,7 +13,7 @@ import (
 	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/mitchellh/mapstructure"
-	tw "github.com/olekukonko/tablewriter"
+	"github.com/olekukonko/tablewriter"
 	"github.com/owncloud/reva/v2/pkg/publicshare"
 	publicregistry "github.com/owncloud/reva/v2/pkg/publicshare/manager/registry"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
@@ -284,9 +284,8 @@ func ListDecomposedfsMigrations(cfg *config.Config) *cli.Command {
 			}
 			sort.Strings(migrations)
 
-			table := tw.NewWriter(os.Stdout)
-			table.SetHeader([]string{"Migration", "State", "Message"})
-			table.SetAutoFormatHeaders(false)
+			table := tablewriter.NewTable(os.Stdout)
+			table.Header("Migration", "State", "Message")
 			for _, migration := range migrations {
 				table.Append([]string{migration, migrationStates[migration].State, migrationStates[migration].Message})
 			}

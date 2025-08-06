@@ -727,7 +727,7 @@ class CliContext implements Context {
 		$totalCount = 0;
 		foreach ($lines as $line) {
 			if (preg_match(
-				'/^\s*\|\s*([a-f0-9\-]{36})\s*\|\s*(.*?)\s*\|\s*(file|folder)\s*\|\s*([\d\-T:Z]+)\s*\|/',
+				'/^\s*\│\s*([a-f0-9\-]{36})\s*\│\s*(.*?)\s*\│\s*(file|folder)\s*\│\s*([\d\-T:Z]+)\s*\│/',
 				$line,
 				$matches,
 			)

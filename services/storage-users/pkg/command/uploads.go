@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	tw "github.com/olekukonko/tablewriter"
+	"github.com/olekukonko/tablewriter"
 	"github.com/shamaton/msgpack/v2"
 	"github.com/urfave/cli/v2"
 
@@ -146,16 +146,15 @@ func ListUploadSessions(cfg *config.Config) *cli.Command {
 			}
 
 			var (
-				table *tw.Table
+				table *tablewriter.Table
 				raw   []Session
 			)
 
 			if !c.Bool("json") {
 				fmt.Println(buildInfo(filter))
 
-				table = tw.NewWriter(os.Stdout)
-				table.SetHeader([]string{"Space", "Upload Id", "Name", "Offset", "Size", "Executant", "Owner", "Expires", "Processing", "Scan Date", "Scan Result"})
-				table.SetAutoFormatHeaders(false)
+				table = tablewriter.NewTable(os.Stdout)
+				table.Header("Space", "Upload Id", "Name", "Offset", "Size", "Executant", "Owner", "Expires", "Processing", "Scan Date", "Scan Result")
 			}
 
 			for _, u := range uploads {
