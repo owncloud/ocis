@@ -74,6 +74,9 @@ func NewClient(opts ...ClientOption) (client.Client, error) {
 	}
 	switch options.tlsMode {
 	case "insecure":
+		if os.Getenv("OCIS_INSECURE") != "true" {
+			return nil, errors.New("insecure TLS mode is only allowed in development environments with OCIS_INSECURE=true")
+		}
 		tlsConfig = &tls.Config{
 			InsecureSkipVerify: true,
 		}
