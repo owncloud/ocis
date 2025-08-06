@@ -10,15 +10,16 @@
 # Joas Schilling, 2025
 # David Walter, 2025
 # Martin <github@diemattels.at>, 2025
+# kobergj, 2025
 # 
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2025-07-16 00:38+0000\n"
+"POT-Creation-Date: 2025-08-06 00:01+0000\n"
 "PO-Revision-Date: 2025-01-08 11:08+0000\n"
-"Last-Translator: Martin <github@diemattels.at>, 2025\n"
+"Last-Translator: kobergj, 2025\n"
 "Language-Team: German (https://app.transifex.com/owncloud-org/teams/6149/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -96,13 +97,14 @@ msgstr "Benachrichtigung, wenn eine empfangene Dateifreigabe abgelaufen ist"
 #: pkg/store/defaults/templates.go:38
 msgid "Notify when a space I am member of has been deleted"
 msgstr ""
-"Benachrichtigung, wenn ein Space, wo Sie Mitglied sind, gelöscht wurde"
+"Benachrichtigung, wenn ein Space, in dem Sie Mitglied sind, gelöscht wurde"
 
 #. description of the notification option 'Space Disabled'
 #: pkg/store/defaults/templates.go:34
 msgid "Notify when a space I am member of has been disabled"
 msgstr ""
-"Benachrichtigung, wenn ein Space, wo Sie Mitglied sind, deaktiviert wurde"
+"Benachrichtigung, wenn ein Space, in dem Sie Mitglied sind, deaktiviert "
+"wurde"
 
 #. description of the notification option 'Space Membership Expired'
 #: pkg/store/defaults/templates.go:30
