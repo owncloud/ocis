@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/olekukonko/tablewriter"
+	"github.com/olekukonko/tablewriter/renderer"
 	"github.com/urfave/cli/v2"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
@@ -38,23 +39,27 @@ func listUnifiedRoles(cfg *config.Config) *cli.Command {
 		Name:  "list",
 		Usage: "list available unified roles",
 		Flags: []cli.Flag{
-			&cli.BoolFlag{
-				Name:  "md",
-				Usage: "Render the table output as Markdown format",
-				Value: false,
+			&cli.StringFlag{
+				Name:    "output-format",
+				Usage:   "Adjust the basic table output. Available Options: md, colorized",
+				Aliases: []string{"o"},
+				Value:   "",
 			},
 		},
 		Action: func(c *cli.Context) error {
 			headers := []string{"#", "Label", "UID", "Enabled", "Description", "Condition", "Allowed resource actions"}
 
-			tbl := tablewriter.NewTable(os.Stdout)
-			tbl.Header(headers...)
-
-			// Markdown format
-			if c.Bool("md") {
-				tbl.SetBorders(tablewriter.Border{Left: true, Top: false, Right: true, Bottom: false})
-				tbl.SetCenterSeparator("|")
+			opts := []tablewriter.Option{}
+			switch c.String("output-format") {
+			case "md":
+				// Markdown format
+				opts = append(opts, tablewriter.WithRenderer(renderer.NewMarkdown()))
+			case "colorized":
+				opts = append(opts, tablewriter.WithRenderer(renderer.NewColorized()))
 			}
+
+			tbl := tablewriter.NewTable(os.Stdout, opts...)
+			tbl.Header(headers)
 
 			for i, definition := range unifiedrole.GetRoles(unifiedrole.RoleFilterAll()) {
 				const enabled = "enabled"
