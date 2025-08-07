@@ -4,800 +4,667 @@
 package v0
 
 import (
-	"bytes"
 	"encoding/json"
 
-	"github.com/golang/protobuf/jsonpb"
+	"google.golang.org/protobuf/encoding/protojson"
 )
 
-// ValueWithIdentifierJSONMarshaler describes the default jsonpb.Marshaler used by all
+// ValueWithIdentifierJSONMarshaler describes the default protojson.Marshaler used by all
 // instances of ValueWithIdentifier. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var ValueWithIdentifierJSONMarshaler = new(jsonpb.Marshaler)
+var ValueWithIdentifierJSONMarshaler = protojson.MarshalOptions{}
 
 // MarshalJSON satisfies the encoding/json Marshaler interface. This method
-// uses the more correct jsonpb package to correctly marshal the message.
+// uses the more correct protojson package to correctly marshal the message.
 func (m *ValueWithIdentifier) MarshalJSON() ([]byte, error) {
 	if m == nil {
 		return json.Marshal(nil)
 	}
 
-	buf := &bytes.Buffer{}
-
-	if err := ValueWithIdentifierJSONMarshaler.Marshal(buf, m); err != nil {
-		return nil, err
-	}
-
-	return buf.Bytes(), nil
+	return ValueWithIdentifierJSONMarshaler.Marshal(m)
 }
 
 var _ json.Marshaler = (*ValueWithIdentifier)(nil)
 
-// ValueWithIdentifierJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
+// ValueWithIdentifierJSONUnmarshaler describes the default protojson.Unmarshaler used by all
 // instances of ValueWithIdentifier. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var ValueWithIdentifierJSONUnmarshaler = new(jsonpb.Unmarshaler)
+var ValueWithIdentifierJSONUnmarshaler = protojson.UnmarshalOptions{}
 
 // UnmarshalJSON satisfies the encoding/json Unmarshaler interface. This method
-// uses the more correct jsonpb package to correctly unmarshal the message.
+// uses the more correct protojson package to correctly unmarshal the message.
 func (m *ValueWithIdentifier) UnmarshalJSON(b []byte) error {
-	return ValueWithIdentifierJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
+	return ValueWithIdentifierJSONUnmarshaler.Unmarshal(b, m)
 }
 
 var _ json.Unmarshaler = (*ValueWithIdentifier)(nil)
 
-// IdentifierJSONMarshaler describes the default jsonpb.Marshaler used by all
+// IdentifierJSONMarshaler describes the default protojson.Marshaler used by all
 // instances of Identifier. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var IdentifierJSONMarshaler = new(jsonpb.Marshaler)
+var IdentifierJSONMarshaler = protojson.MarshalOptions{}
 
 // MarshalJSON satisfies the encoding/json Marshaler interface. This method
-// uses the more correct jsonpb package to correctly marshal the message.
+// uses the more correct protojson package to correctly marshal the message.
 func (m *Identifier) MarshalJSON() ([]byte, error) {
 	if m == nil {
 		return json.Marshal(nil)
 	}
 
-	buf := &bytes.Buffer{}
-
-	if err := IdentifierJSONMarshaler.Marshal(buf, m); err != nil {
-		return nil, err
-	}
-
-	return buf.Bytes(), nil
+	return IdentifierJSONMarshaler.Marshal(m)
 }
 
 var _ json.Marshaler = (*Identifier)(nil)
 
-// IdentifierJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
+// IdentifierJSONUnmarshaler describes the default protojson.Unmarshaler used by all
 // instances of Identifier. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var IdentifierJSONUnmarshaler = new(jsonpb.Unmarshaler)
+var IdentifierJSONUnmarshaler = protojson.UnmarshalOptions{}
 
 // UnmarshalJSON satisfies the encoding/json Unmarshaler interface. This method
-// uses the more correct jsonpb package to correctly unmarshal the message.
+// uses the more correct protojson package to correctly unmarshal the message.
 func (m *Identifier) UnmarshalJSON(b []byte) error {
-	return IdentifierJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
+	return IdentifierJSONUnmarshaler.Unmarshal(b, m)
 }
 
 var _ json.Unmarshaler = (*Identifier)(nil)
 
-// UserRoleAssignmentJSONMarshaler describes the default jsonpb.Marshaler used by all
+// UserRoleAssignmentJSONMarshaler describes the default protojson.Marshaler used by all
 // instances of UserRoleAssignment. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var UserRoleAssignmentJSONMarshaler = new(jsonpb.Marshaler)
+var UserRoleAssignmentJSONMarshaler = protojson.MarshalOptions{}
 
 // MarshalJSON satisfies the encoding/json Marshaler interface. This method
-// uses the more correct jsonpb package to correctly marshal the message.
+// uses the more correct protojson package to correctly marshal the message.
 func (m *UserRoleAssignment) MarshalJSON() ([]byte, error) {
 	if m == nil {
 		return json.Marshal(nil)
 	}
 
-	buf := &bytes.Buffer{}
-
-	if err := UserRoleAssignmentJSONMarshaler.Marshal(buf, m); err != nil {
-		return nil, err
-	}
-
-	return buf.Bytes(), nil
+	return UserRoleAssignmentJSONMarshaler.Marshal(m)
 }
 
 var _ json.Marshaler = (*UserRoleAssignment)(nil)
 
-// UserRoleAssignmentJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
+// UserRoleAssignmentJSONUnmarshaler describes the default protojson.Unmarshaler used by all
 // instances of UserRoleAssignment. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var UserRoleAssignmentJSONUnmarshaler = new(jsonpb.Unmarshaler)
+var UserRoleAssignmentJSONUnmarshaler = protojson.UnmarshalOptions{}
 
 // UnmarshalJSON satisfies the encoding/json Unmarshaler interface. This method
-// uses the more correct jsonpb package to correctly unmarshal the message.
+// uses the more correct protojson package to correctly unmarshal the message.
 func (m *UserRoleAssignment) UnmarshalJSON(b []byte) error {
-	return UserRoleAssignmentJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
+	return UserRoleAssignmentJSONUnmarshaler.Unmarshal(b, m)
 }
 
 var _ json.Unmarshaler = (*UserRoleAssignment)(nil)
 
-// UserRoleAssignmentFilterJSONMarshaler describes the default jsonpb.Marshaler used by all
+// UserRoleAssignmentFilterJSONMarshaler describes the default protojson.Marshaler used by all
 // instances of UserRoleAssignmentFilter. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var UserRoleAssignmentFilterJSONMarshaler = new(jsonpb.Marshaler)
+var UserRoleAssignmentFilterJSONMarshaler = protojson.MarshalOptions{}
 
 // MarshalJSON satisfies the encoding/json Marshaler interface. This method
-// uses the more correct jsonpb package to correctly marshal the message.
+// uses the more correct protojson package to correctly marshal the message.
 func (m *UserRoleAssignmentFilter) MarshalJSON() ([]byte, error) {
 	if m == nil {
 		return json.Marshal(nil)
 	}
 
-	buf := &bytes.Buffer{}
-
-	if err := UserRoleAssignmentFilterJSONMarshaler.Marshal(buf, m); err != nil {
-		return nil, err
-	}
-
-	return buf.Bytes(), nil
+	return UserRoleAssignmentFilterJSONMarshaler.Marshal(m)
 }
 
 var _ json.Marshaler = (*UserRoleAssignmentFilter)(nil)
 
-// UserRoleAssignmentFilterJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
+// UserRoleAssignmentFilterJSONUnmarshaler describes the default protojson.Unmarshaler used by all
 // instances of UserRoleAssignmentFilter. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var UserRoleAssignmentFilterJSONUnmarshaler = new(jsonpb.Unmarshaler)
+var UserRoleAssignmentFilterJSONUnmarshaler = protojson.UnmarshalOptions{}
 
 // UnmarshalJSON satisfies the encoding/json Unmarshaler interface. This method
-// uses the more correct jsonpb package to correctly unmarshal the message.
+// uses the more correct protojson package to correctly unmarshal the message.
 func (m *UserRoleAssignmentFilter) UnmarshalJSON(b []byte) error {
-	return UserRoleAssignmentFilterJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
+	return UserRoleAssignmentFilterJSONUnmarshaler.Unmarshal(b, m)
 }
 
 var _ json.Unmarshaler = (*UserRoleAssignmentFilter)(nil)
 
-// ResourceJSONMarshaler describes the default jsonpb.Marshaler used by all
+// ResourceJSONMarshaler describes the default protojson.Marshaler used by all
 // instances of Resource. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var ResourceJSONMarshaler = new(jsonpb.Marshaler)
+var ResourceJSONMarshaler = protojson.MarshalOptions{}
 
 // MarshalJSON satisfies the encoding/json Marshaler interface. This method
-// uses the more correct jsonpb package to correctly marshal the message.
+// uses the more correct protojson package to correctly marshal the message.
 func (m *Resource) MarshalJSON() ([]byte, error) {
 	if m == nil {
 		return json.Marshal(nil)
 	}
 
-	buf := &bytes.Buffer{}
-
-	if err := ResourceJSONMarshaler.Marshal(buf, m); err != nil {
-		return nil, err
-	}
-
-	return buf.Bytes(), nil
+	return ResourceJSONMarshaler.Marshal(m)
 }
 
 var _ json.Marshaler = (*Resource)(nil)
 
-// ResourceJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
+// ResourceJSONUnmarshaler describes the default protojson.Unmarshaler used by all
 // instances of Resource. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var ResourceJSONUnmarshaler = new(jsonpb.Unmarshaler)
+var ResourceJSONUnmarshaler = protojson.UnmarshalOptions{}
 
 // UnmarshalJSON satisfies the encoding/json Unmarshaler interface. This method
-// uses the more correct jsonpb package to correctly unmarshal the message.
+// uses the more correct protojson package to correctly unmarshal the message.
 func (m *Resource) UnmarshalJSON(b []byte) error {
-	return ResourceJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
+	return ResourceJSONUnmarshaler.Unmarshal(b, m)
 }
 
 var _ json.Unmarshaler = (*Resource)(nil)
 
-// BundleJSONMarshaler describes the default jsonpb.Marshaler used by all
+// BundleJSONMarshaler describes the default protojson.Marshaler used by all
 // instances of Bundle. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var BundleJSONMarshaler = new(jsonpb.Marshaler)
+var BundleJSONMarshaler = protojson.MarshalOptions{}
 
 // MarshalJSON satisfies the encoding/json Marshaler interface. This method
-// uses the more correct jsonpb package to correctly marshal the message.
+// uses the more correct protojson package to correctly marshal the message.
 func (m *Bundle) MarshalJSON() ([]byte, error) {
 	if m == nil {
 		return json.Marshal(nil)
 	}
 
-	buf := &bytes.Buffer{}
-
-	if err := BundleJSONMarshaler.Marshal(buf, m); err != nil {
-		return nil, err
-	}
-
-	return buf.Bytes(), nil
+	return BundleJSONMarshaler.Marshal(m)
 }
 
 var _ json.Marshaler = (*Bundle)(nil)
 
-// BundleJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
+// BundleJSONUnmarshaler describes the default protojson.Unmarshaler used by all
 // instances of Bundle. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var BundleJSONUnmarshaler = new(jsonpb.Unmarshaler)
+var BundleJSONUnmarshaler = protojson.UnmarshalOptions{}
 
 // UnmarshalJSON satisfies the encoding/json Unmarshaler interface. This method
-// uses the more correct jsonpb package to correctly unmarshal the message.
+// uses the more correct protojson package to correctly unmarshal the message.
 func (m *Bundle) UnmarshalJSON(b []byte) error {
-	return BundleJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
+	return BundleJSONUnmarshaler.Unmarshal(b, m)
 }
 
 var _ json.Unmarshaler = (*Bundle)(nil)
 
-// SettingJSONMarshaler describes the default jsonpb.Marshaler used by all
+// SettingJSONMarshaler describes the default protojson.Marshaler used by all
 // instances of Setting. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var SettingJSONMarshaler = new(jsonpb.Marshaler)
+var SettingJSONMarshaler = protojson.MarshalOptions{}
 
 // MarshalJSON satisfies the encoding/json Marshaler interface. This method
-// uses the more correct jsonpb package to correctly marshal the message.
+// uses the more correct protojson package to correctly marshal the message.
 func (m *Setting) MarshalJSON() ([]byte, error) {
 	if m == nil {
 		return json.Marshal(nil)
 	}
 
-	buf := &bytes.Buffer{}
-
-	if err := SettingJSONMarshaler.Marshal(buf, m); err != nil {
-		return nil, err
-	}
-
-	return buf.Bytes(), nil
+	return SettingJSONMarshaler.Marshal(m)
 }
 
 var _ json.Marshaler = (*Setting)(nil)
 
-// SettingJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
+// SettingJSONUnmarshaler describes the default protojson.Unmarshaler used by all
 // instances of Setting. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var SettingJSONUnmarshaler = new(jsonpb.Unmarshaler)
+var SettingJSONUnmarshaler = protojson.UnmarshalOptions{}
 
 // UnmarshalJSON satisfies the encoding/json Unmarshaler interface. This method
-// uses the more correct jsonpb package to correctly unmarshal the message.
+// uses the more correct protojson package to correctly unmarshal the message.
 func (m *Setting) UnmarshalJSON(b []byte) error {
-	return SettingJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
+	return SettingJSONUnmarshaler.Unmarshal(b, m)
 }
 
 var _ json.Unmarshaler = (*Setting)(nil)
 
-// IntJSONMarshaler describes the default jsonpb.Marshaler used by all
+// IntJSONMarshaler describes the default protojson.Marshaler used by all
 // instances of Int. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var IntJSONMarshaler = new(jsonpb.Marshaler)
+var IntJSONMarshaler = protojson.MarshalOptions{}
 
 // MarshalJSON satisfies the encoding/json Marshaler interface. This method
-// uses the more correct jsonpb package to correctly marshal the message.
+// uses the more correct protojson package to correctly marshal the message.
 func (m *Int) MarshalJSON() ([]byte, error) {
 	if m == nil {
 		return json.Marshal(nil)
 	}
 
-	buf := &bytes.Buffer{}
-
-	if err := IntJSONMarshaler.Marshal(buf, m); err != nil {
-		return nil, err
-	}
-
-	return buf.Bytes(), nil
+	return IntJSONMarshaler.Marshal(m)
 }
 
 var _ json.Marshaler = (*Int)(nil)
 
-// IntJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
+// IntJSONUnmarshaler describes the default protojson.Unmarshaler used by all
 // instances of Int. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var IntJSONUnmarshaler = new(jsonpb.Unmarshaler)
+var IntJSONUnmarshaler = protojson.UnmarshalOptions{}
 
 // UnmarshalJSON satisfies the encoding/json Unmarshaler interface. This method
-// uses the more correct jsonpb package to correctly unmarshal the message.
+// uses the more correct protojson package to correctly unmarshal the message.
 func (m *Int) UnmarshalJSON(b []byte) error {
-	return IntJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
+	return IntJSONUnmarshaler.Unmarshal(b, m)
 }
 
 var _ json.Unmarshaler = (*Int)(nil)
 
-// StringJSONMarshaler describes the default jsonpb.Marshaler used by all
+// StringJSONMarshaler describes the default protojson.Marshaler used by all
 // instances of String. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var StringJSONMarshaler = new(jsonpb.Marshaler)
+var StringJSONMarshaler = protojson.MarshalOptions{}
 
 // MarshalJSON satisfies the encoding/json Marshaler interface. This method
-// uses the more correct jsonpb package to correctly marshal the message.
+// uses the more correct protojson package to correctly marshal the message.
 func (m *String) MarshalJSON() ([]byte, error) {
 	if m == nil {
 		return json.Marshal(nil)
 	}
 
-	buf := &bytes.Buffer{}
-
-	if err := StringJSONMarshaler.Marshal(buf, m); err != nil {
-		return nil, err
-	}
-
-	return buf.Bytes(), nil
+	return StringJSONMarshaler.Marshal(m)
 }
 
 var _ json.Marshaler = (*String)(nil)
 
-// StringJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
+// StringJSONUnmarshaler describes the default protojson.Unmarshaler used by all
 // instances of String. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var StringJSONUnmarshaler = new(jsonpb.Unmarshaler)
+var StringJSONUnmarshaler = protojson.UnmarshalOptions{}
 
 // UnmarshalJSON satisfies the encoding/json Unmarshaler interface. This method
-// uses the more correct jsonpb package to correctly unmarshal the message.
+// uses the more correct protojson package to correctly unmarshal the message.
 func (m *String) UnmarshalJSON(b []byte) error {
-	return StringJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
+	return StringJSONUnmarshaler.Unmarshal(b, m)
 }
 
 var _ json.Unmarshaler = (*String)(nil)
 
-// BoolJSONMarshaler describes the default jsonpb.Marshaler used by all
+// BoolJSONMarshaler describes the default protojson.Marshaler used by all
 // instances of Bool. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var BoolJSONMarshaler = new(jsonpb.Marshaler)
+var BoolJSONMarshaler = protojson.MarshalOptions{}
 
 // MarshalJSON satisfies the encoding/json Marshaler interface. This method
-// uses the more correct jsonpb package to correctly marshal the message.
+// uses the more correct protojson package to correctly marshal the message.
 func (m *Bool) MarshalJSON() ([]byte, error) {
 	if m == nil {
 		return json.Marshal(nil)
 	}
 
-	buf := &bytes.Buffer{}
-
-	if err := BoolJSONMarshaler.Marshal(buf, m); err != nil {
-		return nil, err
-	}
-
-	return buf.Bytes(), nil
+	return BoolJSONMarshaler.Marshal(m)
 }
 
 var _ json.Marshaler = (*Bool)(nil)
 
-// BoolJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
+// BoolJSONUnmarshaler describes the default protojson.Unmarshaler used by all
 // instances of Bool. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var BoolJSONUnmarshaler = new(jsonpb.Unmarshaler)
+var BoolJSONUnmarshaler = protojson.UnmarshalOptions{}
 
 // UnmarshalJSON satisfies the encoding/json Unmarshaler interface. This method
-// uses the more correct jsonpb package to correctly unmarshal the message.
+// uses the more correct protojson package to correctly unmarshal the message.
 func (m *Bool) UnmarshalJSON(b []byte) error {
-	return BoolJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
+	return BoolJSONUnmarshaler.Unmarshal(b, m)
 }
 
 var _ json.Unmarshaler = (*Bool)(nil)
 
-// SingleChoiceListJSONMarshaler describes the default jsonpb.Marshaler used by all
+// SingleChoiceListJSONMarshaler describes the default protojson.Marshaler used by all
 // instances of SingleChoiceList. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var SingleChoiceListJSONMarshaler = new(jsonpb.Marshaler)
+var SingleChoiceListJSONMarshaler = protojson.MarshalOptions{}
 
 // MarshalJSON satisfies the encoding/json Marshaler interface. This method
-// uses the more correct jsonpb package to correctly marshal the message.
+// uses the more correct protojson package to correctly marshal the message.
 func (m *SingleChoiceList) MarshalJSON() ([]byte, error) {
 	if m == nil {
 		return json.Marshal(nil)
 	}
 
-	buf := &bytes.Buffer{}
-
-	if err := SingleChoiceListJSONMarshaler.Marshal(buf, m); err != nil {
-		return nil, err
-	}
-
-	return buf.Bytes(), nil
+	return SingleChoiceListJSONMarshaler.Marshal(m)
 }
 
 var _ json.Marshaler = (*SingleChoiceList)(nil)
 
-// SingleChoiceListJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
+// SingleChoiceListJSONUnmarshaler describes the default protojson.Unmarshaler used by all
 // instances of SingleChoiceList. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var SingleChoiceListJSONUnmarshaler = new(jsonpb.Unmarshaler)
+var SingleChoiceListJSONUnmarshaler = protojson.UnmarshalOptions{}
 
 // UnmarshalJSON satisfies the encoding/json Unmarshaler interface. This method
-// uses the more correct jsonpb package to correctly unmarshal the message.
+// uses the more correct protojson package to correctly unmarshal the message.
 func (m *SingleChoiceList) UnmarshalJSON(b []byte) error {
-	return SingleChoiceListJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
+	return SingleChoiceListJSONUnmarshaler.Unmarshal(b, m)
 }
 
 var _ json.Unmarshaler = (*SingleChoiceList)(nil)
 
-// MultiChoiceListJSONMarshaler describes the default jsonpb.Marshaler used by all
+// MultiChoiceListJSONMarshaler describes the default protojson.Marshaler used by all
 // instances of MultiChoiceList. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var MultiChoiceListJSONMarshaler = new(jsonpb.Marshaler)
+var MultiChoiceListJSONMarshaler = protojson.MarshalOptions{}
 
 // MarshalJSON satisfies the encoding/json Marshaler interface. This method
-// uses the more correct jsonpb package to correctly marshal the message.
+// uses the more correct protojson package to correctly marshal the message.
 func (m *MultiChoiceList) MarshalJSON() ([]byte, error) {
 	if m == nil {
 		return json.Marshal(nil)
 	}
 
-	buf := &bytes.Buffer{}
-
-	if err := MultiChoiceListJSONMarshaler.Marshal(buf, m); err != nil {
-		return nil, err
-	}
-
-	return buf.Bytes(), nil
+	return MultiChoiceListJSONMarshaler.Marshal(m)
 }
 
 var _ json.Marshaler = (*MultiChoiceList)(nil)
 
-// MultiChoiceListJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
+// MultiChoiceListJSONUnmarshaler describes the default protojson.Unmarshaler used by all
 // instances of MultiChoiceList. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var MultiChoiceListJSONUnmarshaler = new(jsonpb.Unmarshaler)
+var MultiChoiceListJSONUnmarshaler = protojson.UnmarshalOptions{}
 
 // UnmarshalJSON satisfies the encoding/json Unmarshaler interface. This method
-// uses the more correct jsonpb package to correctly unmarshal the message.
+// uses the more correct protojson package to correctly unmarshal the message.
 func (m *MultiChoiceList) UnmarshalJSON(b []byte) error {
-	return MultiChoiceListJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
+	return MultiChoiceListJSONUnmarshaler.Unmarshal(b, m)
 }
 
 var _ json.Unmarshaler = (*MultiChoiceList)(nil)
 
-// ListOptionJSONMarshaler describes the default jsonpb.Marshaler used by all
+// ListOptionJSONMarshaler describes the default protojson.Marshaler used by all
 // instances of ListOption. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var ListOptionJSONMarshaler = new(jsonpb.Marshaler)
+var ListOptionJSONMarshaler = protojson.MarshalOptions{}
 
 // MarshalJSON satisfies the encoding/json Marshaler interface. This method
-// uses the more correct jsonpb package to correctly marshal the message.
+// uses the more correct protojson package to correctly marshal the message.
 func (m *ListOption) MarshalJSON() ([]byte, error) {
 	if m == nil {
 		return json.Marshal(nil)
 	}
 
-	buf := &bytes.Buffer{}
-
-	if err := ListOptionJSONMarshaler.Marshal(buf, m); err != nil {
-		return nil, err
-	}
-
-	return buf.Bytes(), nil
+	return ListOptionJSONMarshaler.Marshal(m)
 }
 
 var _ json.Marshaler = (*ListOption)(nil)
 
-// ListOptionJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
+// ListOptionJSONUnmarshaler describes the default protojson.Unmarshaler used by all
 // instances of ListOption. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var ListOptionJSONUnmarshaler = new(jsonpb.Unmarshaler)
+var ListOptionJSONUnmarshaler = protojson.UnmarshalOptions{}
 
 // UnmarshalJSON satisfies the encoding/json Unmarshaler interface. This method
-// uses the more correct jsonpb package to correctly unmarshal the message.
+// uses the more correct protojson package to correctly unmarshal the message.
 func (m *ListOption) UnmarshalJSON(b []byte) error {
-	return ListOptionJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
+	return ListOptionJSONUnmarshaler.Unmarshal(b, m)
 }
 
 var _ json.Unmarshaler = (*ListOption)(nil)
 
-// MultiChoiceCollectionJSONMarshaler describes the default jsonpb.Marshaler used by all
+// MultiChoiceCollectionJSONMarshaler describes the default protojson.Marshaler used by all
 // instances of MultiChoiceCollection. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var MultiChoiceCollectionJSONMarshaler = new(jsonpb.Marshaler)
+var MultiChoiceCollectionJSONMarshaler = protojson.MarshalOptions{}
 
 // MarshalJSON satisfies the encoding/json Marshaler interface. This method
-// uses the more correct jsonpb package to correctly marshal the message.
+// uses the more correct protojson package to correctly marshal the message.
 func (m *MultiChoiceCollection) MarshalJSON() ([]byte, error) {
 	if m == nil {
 		return json.Marshal(nil)
 	}
 
-	buf := &bytes.Buffer{}
-
-	if err := MultiChoiceCollectionJSONMarshaler.Marshal(buf, m); err != nil {
-		return nil, err
-	}
-
-	return buf.Bytes(), nil
+	return MultiChoiceCollectionJSONMarshaler.Marshal(m)
 }
 
 var _ json.Marshaler = (*MultiChoiceCollection)(nil)
 
-// MultiChoiceCollectionJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
+// MultiChoiceCollectionJSONUnmarshaler describes the default protojson.Unmarshaler used by all
 // instances of MultiChoiceCollection. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var MultiChoiceCollectionJSONUnmarshaler = new(jsonpb.Unmarshaler)
+var MultiChoiceCollectionJSONUnmarshaler = protojson.UnmarshalOptions{}
 
 // UnmarshalJSON satisfies the encoding/json Unmarshaler interface. This method
-// uses the more correct jsonpb package to correctly unmarshal the message.
+// uses the more correct protojson package to correctly unmarshal the message.
 func (m *MultiChoiceCollection) UnmarshalJSON(b []byte) error {
-	return MultiChoiceCollectionJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
+	return MultiChoiceCollectionJSONUnmarshaler.Unmarshal(b, m)
 }
 
 var _ json.Unmarshaler = (*MultiChoiceCollection)(nil)
 
-// MultiChoiceCollectionOptionJSONMarshaler describes the default jsonpb.Marshaler used by all
+// MultiChoiceCollectionOptionJSONMarshaler describes the default protojson.Marshaler used by all
 // instances of MultiChoiceCollectionOption. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var MultiChoiceCollectionOptionJSONMarshaler = new(jsonpb.Marshaler)
+var MultiChoiceCollectionOptionJSONMarshaler = protojson.MarshalOptions{}
 
 // MarshalJSON satisfies the encoding/json Marshaler interface. This method
-// uses the more correct jsonpb package to correctly marshal the message.
+// uses the more correct protojson package to correctly marshal the message.
 func (m *MultiChoiceCollectionOption) MarshalJSON() ([]byte, error) {
 	if m == nil {
 		return json.Marshal(nil)
 	}
 
-	buf := &bytes.Buffer{}
-
-	if err := MultiChoiceCollectionOptionJSONMarshaler.Marshal(buf, m); err != nil {
-		return nil, err
-	}
-
-	return buf.Bytes(), nil
+	return MultiChoiceCollectionOptionJSONMarshaler.Marshal(m)
 }
 
 var _ json.Marshaler = (*MultiChoiceCollectionOption)(nil)
 
-// MultiChoiceCollectionOptionJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
+// MultiChoiceCollectionOptionJSONUnmarshaler describes the default protojson.Unmarshaler used by all
 // instances of MultiChoiceCollectionOption. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var MultiChoiceCollectionOptionJSONUnmarshaler = new(jsonpb.Unmarshaler)
+var MultiChoiceCollectionOptionJSONUnmarshaler = protojson.UnmarshalOptions{}
 
 // UnmarshalJSON satisfies the encoding/json Unmarshaler interface. This method
-// uses the more correct jsonpb package to correctly unmarshal the message.
+// uses the more correct protojson package to correctly unmarshal the message.
 func (m *MultiChoiceCollectionOption) UnmarshalJSON(b []byte) error {
-	return MultiChoiceCollectionOptionJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
+	return MultiChoiceCollectionOptionJSONUnmarshaler.Unmarshal(b, m)
 }
 
 var _ json.Unmarshaler = (*MultiChoiceCollectionOption)(nil)
 
-// MultiChoiceCollectionOptionValueJSONMarshaler describes the default jsonpb.Marshaler used by all
+// MultiChoiceCollectionOptionValueJSONMarshaler describes the default protojson.Marshaler used by all
 // instances of MultiChoiceCollectionOptionValue. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var MultiChoiceCollectionOptionValueJSONMarshaler = new(jsonpb.Marshaler)
+var MultiChoiceCollectionOptionValueJSONMarshaler = protojson.MarshalOptions{}
 
 // MarshalJSON satisfies the encoding/json Marshaler interface. This method
-// uses the more correct jsonpb package to correctly marshal the message.
+// uses the more correct protojson package to correctly marshal the message.
 func (m *MultiChoiceCollectionOptionValue) MarshalJSON() ([]byte, error) {
 	if m == nil {
 		return json.Marshal(nil)
 	}
 
-	buf := &bytes.Buffer{}
-
-	if err := MultiChoiceCollectionOptionValueJSONMarshaler.Marshal(buf, m); err != nil {
-		return nil, err
-	}
-
-	return buf.Bytes(), nil
+	return MultiChoiceCollectionOptionValueJSONMarshaler.Marshal(m)
 }
 
 var _ json.Marshaler = (*MultiChoiceCollectionOptionValue)(nil)
 
-// MultiChoiceCollectionOptionValueJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
+// MultiChoiceCollectionOptionValueJSONUnmarshaler describes the default protojson.Unmarshaler used by all
 // instances of MultiChoiceCollectionOptionValue. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var MultiChoiceCollectionOptionValueJSONUnmarshaler = new(jsonpb.Unmarshaler)
+var MultiChoiceCollectionOptionValueJSONUnmarshaler = protojson.UnmarshalOptions{}
 
 // UnmarshalJSON satisfies the encoding/json Unmarshaler interface. This method
-// uses the more correct jsonpb package to correctly unmarshal the message.
+// uses the more correct protojson package to correctly unmarshal the message.
 func (m *MultiChoiceCollectionOptionValue) UnmarshalJSON(b []byte) error {
-	return MultiChoiceCollectionOptionValueJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
+	return MultiChoiceCollectionOptionValueJSONUnmarshaler.Unmarshal(b, m)
 }
 
 var _ json.Unmarshaler = (*MultiChoiceCollectionOptionValue)(nil)
 
-// PermissionJSONMarshaler describes the default jsonpb.Marshaler used by all
+// PermissionJSONMarshaler describes the default protojson.Marshaler used by all
 // instances of Permission. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var PermissionJSONMarshaler = new(jsonpb.Marshaler)
+var PermissionJSONMarshaler = protojson.MarshalOptions{}
 
 // MarshalJSON satisfies the encoding/json Marshaler interface. This method
-// uses the more correct jsonpb package to correctly marshal the message.
+// uses the more correct protojson package to correctly marshal the message.
 func (m *Permission) MarshalJSON() ([]byte, error) {
 	if m == nil {
 		return json.Marshal(nil)
 	}
 
-	buf := &bytes.Buffer{}
-
-	if err := PermissionJSONMarshaler.Marshal(buf, m); err != nil {
-		return nil, err
-	}
-
-	return buf.Bytes(), nil
+	return PermissionJSONMarshaler.Marshal(m)
 }
 
 var _ json.Marshaler = (*Permission)(nil)
 
-// PermissionJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
+// PermissionJSONUnmarshaler describes the default protojson.Unmarshaler used by all
 // instances of Permission. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var PermissionJSONUnmarshaler = new(jsonpb.Unmarshaler)
+var PermissionJSONUnmarshaler = protojson.UnmarshalOptions{}
 
 // UnmarshalJSON satisfies the encoding/json Unmarshaler interface. This method
-// uses the more correct jsonpb package to correctly unmarshal the message.
+// uses the more correct protojson package to correctly unmarshal the message.
 func (m *Permission) UnmarshalJSON(b []byte) error {
-	return PermissionJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
+	return PermissionJSONUnmarshaler.Unmarshal(b, m)
 }
 
 var _ json.Unmarshaler = (*Permission)(nil)
 
-// ValueJSONMarshaler describes the default jsonpb.Marshaler used by all
+// ValueJSONMarshaler describes the default protojson.Marshaler used by all
 // instances of Value. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var ValueJSONMarshaler = new(jsonpb.Marshaler)
+var ValueJSONMarshaler = protojson.MarshalOptions{}
 
 // MarshalJSON satisfies the encoding/json Marshaler interface. This method
-// uses the more correct jsonpb package to correctly marshal the message.
+// uses the more correct protojson package to correctly marshal the message.
 func (m *Value) MarshalJSON() ([]byte, error) {
 	if m == nil {
 		return json.Marshal(nil)
 	}
 
-	buf := &bytes.Buffer{}
-
-	if err := ValueJSONMarshaler.Marshal(buf, m); err != nil {
-		return nil, err
-	}
-
-	return buf.Bytes(), nil
+	return ValueJSONMarshaler.Marshal(m)
 }
 
 var _ json.Marshaler = (*Value)(nil)
 
-// ValueJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
+// ValueJSONUnmarshaler describes the default protojson.Unmarshaler used by all
 // instances of Value. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var ValueJSONUnmarshaler = new(jsonpb.Unmarshaler)
+var ValueJSONUnmarshaler = protojson.UnmarshalOptions{}
 
 // UnmarshalJSON satisfies the encoding/json Unmarshaler interface. This method
-// uses the more correct jsonpb package to correctly unmarshal the message.
+// uses the more correct protojson package to correctly unmarshal the message.
 func (m *Value) UnmarshalJSON(b []byte) error {
-	return ValueJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
+	return ValueJSONUnmarshaler.Unmarshal(b, m)
 }
 
 var _ json.Unmarshaler = (*Value)(nil)
 
-// ListValueJSONMarshaler describes the default jsonpb.Marshaler used by all
+// ListValueJSONMarshaler describes the default protojson.Marshaler used by all
 // instances of ListValue. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var ListValueJSONMarshaler = new(jsonpb.Marshaler)
+var ListValueJSONMarshaler = protojson.MarshalOptions{}
 
 // MarshalJSON satisfies the encoding/json Marshaler interface. This method
-// uses the more correct jsonpb package to correctly marshal the message.
+// uses the more correct protojson package to correctly marshal the message.
 func (m *ListValue) MarshalJSON() ([]byte, error) {
 	if m == nil {
 		return json.Marshal(nil)
 	}
 
-	buf := &bytes.Buffer{}
-
-	if err := ListValueJSONMarshaler.Marshal(buf, m); err != nil {
-		return nil, err
-	}
-
-	return buf.Bytes(), nil
+	return ListValueJSONMarshaler.Marshal(m)
 }
 
 var _ json.Marshaler = (*ListValue)(nil)
 
-// ListValueJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
+// ListValueJSONUnmarshaler describes the default protojson.Unmarshaler used by all
 // instances of ListValue. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var ListValueJSONUnmarshaler = new(jsonpb.Unmarshaler)
+var ListValueJSONUnmarshaler = protojson.UnmarshalOptions{}
 
 // UnmarshalJSON satisfies the encoding/json Unmarshaler interface. This method
-// uses the more correct jsonpb package to correctly unmarshal the message.
+// uses the more correct protojson package to correctly unmarshal the message.
 func (m *ListValue) UnmarshalJSON(b []byte) error {
-	return ListValueJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
+	return ListValueJSONUnmarshaler.Unmarshal(b, m)
 }
 
 var _ json.Unmarshaler = (*ListValue)(nil)
 
-// ListOptionValueJSONMarshaler describes the default jsonpb.Marshaler used by all
+// ListOptionValueJSONMarshaler describes the default protojson.Marshaler used by all
 // instances of ListOptionValue. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var ListOptionValueJSONMarshaler = new(jsonpb.Marshaler)
+var ListOptionValueJSONMarshaler = protojson.MarshalOptions{}
 
 // MarshalJSON satisfies the encoding/json Marshaler interface. This method
-// uses the more correct jsonpb package to correctly marshal the message.
+// uses the more correct protojson package to correctly marshal the message.
 func (m *ListOptionValue) MarshalJSON() ([]byte, error) {
 	if m == nil {
 		return json.Marshal(nil)
 	}
 
-	buf := &bytes.Buffer{}
-
-	if err := ListOptionValueJSONMarshaler.Marshal(buf, m); err != nil {
-		return nil, err
-	}
-
-	return buf.Bytes(), nil
+	return ListOptionValueJSONMarshaler.Marshal(m)
 }
 
 var _ json.Marshaler = (*ListOptionValue)(nil)
 
-// ListOptionValueJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
+// ListOptionValueJSONUnmarshaler describes the default protojson.Unmarshaler used by all
 // instances of ListOptionValue. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var ListOptionValueJSONUnmarshaler = new(jsonpb.Unmarshaler)
+var ListOptionValueJSONUnmarshaler = protojson.UnmarshalOptions{}
 
 // UnmarshalJSON satisfies the encoding/json Unmarshaler interface. This method
-// uses the more correct jsonpb package to correctly unmarshal the message.
+// uses the more correct protojson package to correctly unmarshal the message.
 func (m *ListOptionValue) UnmarshalJSON(b []byte) error {
-	return ListOptionValueJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
+	return ListOptionValueJSONUnmarshaler.Unmarshal(b, m)
 }
 
 var _ json.Unmarshaler = (*ListOptionValue)(nil)
 
-// CollectionValueJSONMarshaler describes the default jsonpb.Marshaler used by all
+// CollectionValueJSONMarshaler describes the default protojson.Marshaler used by all
 // instances of CollectionValue. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var CollectionValueJSONMarshaler = new(jsonpb.Marshaler)
+var CollectionValueJSONMarshaler = protojson.MarshalOptions{}
 
 // MarshalJSON satisfies the encoding/json Marshaler interface. This method
-// uses the more correct jsonpb package to correctly marshal the message.
+// uses the more correct protojson package to correctly marshal the message.
 func (m *CollectionValue) MarshalJSON() ([]byte, error) {
 	if m == nil {
 		return json.Marshal(nil)
 	}
 
-	buf := &bytes.Buffer{}
-
-	if err := CollectionValueJSONMarshaler.Marshal(buf, m); err != nil {
-		return nil, err
-	}
-
-	return buf.Bytes(), nil
+	return CollectionValueJSONMarshaler.Marshal(m)
 }
 
 var _ json.Marshaler = (*CollectionValue)(nil)
 
-// CollectionValueJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
+// CollectionValueJSONUnmarshaler describes the default protojson.Unmarshaler used by all
 // instances of CollectionValue. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var CollectionValueJSONUnmarshaler = new(jsonpb.Unmarshaler)
+var CollectionValueJSONUnmarshaler = protojson.UnmarshalOptions{}
 
 // UnmarshalJSON satisfies the encoding/json Unmarshaler interface. This method
-// uses the more correct jsonpb package to correctly unmarshal the message.
+// uses the more correct protojson package to correctly unmarshal the message.
 func (m *CollectionValue) UnmarshalJSON(b []byte) error {
-	return CollectionValueJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
+	return CollectionValueJSONUnmarshaler.Unmarshal(b, m)
 }
 
 var _ json.Unmarshaler = (*CollectionValue)(nil)
 
-// CollectionOptionJSONMarshaler describes the default jsonpb.Marshaler used by all
+// CollectionOptionJSONMarshaler describes the default protojson.Marshaler used by all
 // instances of CollectionOption. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var CollectionOptionJSONMarshaler = new(jsonpb.Marshaler)
+var CollectionOptionJSONMarshaler = protojson.MarshalOptions{}
 
 // MarshalJSON satisfies the encoding/json Marshaler interface. This method
-// uses the more correct jsonpb package to correctly marshal the message.
+// uses the more correct protojson package to correctly marshal the message.
 func (m *CollectionOption) MarshalJSON() ([]byte, error) {
 	if m == nil {
 		return json.Marshal(nil)
 	}
 
-	buf := &bytes.Buffer{}
-
-	if err := CollectionOptionJSONMarshaler.Marshal(buf, m); err != nil {
-		return nil, err
-	}
-
-	return buf.Bytes(), nil
+	return CollectionOptionJSONMarshaler.Marshal(m)
 }
 
 var _ json.Marshaler = (*CollectionOption)(nil)
 
-// CollectionOptionJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
+// CollectionOptionJSONUnmarshaler describes the default protojson.Unmarshaler used by all
 // instances of CollectionOption. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var CollectionOptionJSONUnmarshaler = new(jsonpb.Unmarshaler)
+var CollectionOptionJSONUnmarshaler = protojson.UnmarshalOptions{}
 
 // UnmarshalJSON satisfies the encoding/json Unmarshaler interface. This method
-// uses the more correct jsonpb package to correctly unmarshal the message.
+// uses the more correct protojson package to correctly unmarshal the message.
 func (m *CollectionOption) UnmarshalJSON(b []byte) error {
-	return CollectionOptionJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
+	return CollectionOptionJSONUnmarshaler.Unmarshal(b, m)
 }
 
 var _ json.Unmarshaler = (*CollectionOption)(nil)
