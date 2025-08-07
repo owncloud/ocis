@@ -94,47 +94,44 @@ func (m *MockServiceHandler) CheckPermission(ctx context.Context, req *cs3permis
 	return &cs3permissions.CheckPermissionResponse{}, nil
 }
 
-// TestCurrentProtocGenMicrowebImplementation captures the current protoc-gen-microweb implementation
-// for future reference after it gets replaced with manual handlers
-func TestCurrentProtocGenMicrowebImplementation(t *testing.T) {
+// TestManualHTTPHandlersImplementation tests the new manual HTTP handlers implementation
+// that replaces the protoc-gen-microweb generated handlers
+func TestManualHTTPHandlersImplementation(t *testing.T) {
 	mockHandler := &MockServiceHandler{}
 	r := chi.NewRouter()
 
-	// Test that current protoc-gen-microweb handlers are registered without panicking
+	// Test that manual handlers are registered without panicking
 	assert.NotPanics(t, func() {
-		settingssvc.RegisterBundleServiceWeb(r, mockHandler)
-		settingssvc.RegisterValueServiceWeb(r, mockHandler)
-		settingssvc.RegisterRoleServiceWeb(r, mockHandler)
-		settingssvc.RegisterPermissionServiceWeb(r, mockHandler)
+		registerHandlers(r, mockHandler)
 	})
 
-	// Test all endpoints with minimal JSON - these are the current protoc-gen-microweb routes
+	// Test all endpoints with minimal JSON - these are the manual HTTP handler routes
 	testCases := []struct {
 		name           string
 		path           string
 		expectedStatus int
 	}{
-		// Bundle endpoints (current protoc-gen-microweb routes)
+		// Bundle endpoints (manual HTTP handler routes)
 		{name: "bundle-save", path: "/api/v0/settings/bundle-save", expectedStatus: http.StatusCreated},
 		{name: "bundle-get", path: "/api/v0/settings/bundle-get", expectedStatus: http.StatusCreated},
 		{name: "bundles-list", path: "/api/v0/settings/bundles-list", expectedStatus: http.StatusCreated},
 		{name: "bundles-add-setting", path: "/api/v0/settings/bundles-add-setting", expectedStatus: http.StatusCreated},
 		{name: "bundles-remove-setting", path: "/api/v0/settings/bundles-remove-setting", expectedStatus: http.StatusNoContent},
 
-		// Value endpoints (current protoc-gen-microweb routes)
+		// Value endpoints (manual HTTP handler routes)
 		{name: "values-save", path: "/api/v0/settings/values-save", expectedStatus: http.StatusCreated},
 		{name: "values-get", path: "/api/v0/settings/values-get", expectedStatus: http.StatusCreated},
 		{name: "values-list", path: "/api/v0/settings/values-list", expectedStatus: http.StatusCreated},
 		{name: "values-get-by-unique-identifiers", path: "/api/v0/settings/values-get-by-unique-identifiers", expectedStatus: http.StatusCreated},
 
-		// Role endpoints (current protoc-gen-microweb routes)
+		// Role endpoints (manual HTTP handler routes)
 		{name: "roles-list", path: "/api/v0/settings/roles-list", expectedStatus: http.StatusCreated},
 		{name: "assignments-list", path: "/api/v0/settings/assignments-list", expectedStatus: http.StatusCreated},
 		{name: "assignments-list-filtered", path: "/api/v0/settings/assignments-list-filtered", expectedStatus: http.StatusCreated},
 		{name: "assignments-add", path: "/api/v0/settings/assignments-add", expectedStatus: http.StatusCreated},
 		{name: "assignments-remove", path: "/api/v0/settings/assignments-remove", expectedStatus: http.StatusNoContent},
 
-		// Permission endpoints (current protoc-gen-microweb routes)
+		// Permission endpoints (manual HTTP handler routes)
 		{name: "permissions-list", path: "/api/v0/settings/permissions-list", expectedStatus: http.StatusCreated},
 		{name: "permissions-list-by-resource", path: "/api/v0/settings/permissions-list-by-resource", expectedStatus: http.StatusCreated},
 		{name: "permissions-get-by-id", path: "/api/v0/settings/permissions-get-by-id", expectedStatus: http.StatusCreated},
@@ -162,11 +159,8 @@ func TestEdgeCaseRequestPayloads(t *testing.T) {
 	mockHandler := &MockServiceHandler{}
 	r := chi.NewRouter()
 
-	// Register current protoc-gen-microweb handlers
-	settingssvc.RegisterBundleServiceWeb(r, mockHandler)
-	settingssvc.RegisterValueServiceWeb(r, mockHandler)
-	settingssvc.RegisterRoleServiceWeb(r, mockHandler)
-	settingssvc.RegisterPermissionServiceWeb(r, mockHandler)
+	// Register manual HTTP handlers
+	registerHandlers(r, mockHandler)
 
 	testCases := []struct {
 		name           string
