@@ -94,44 +94,44 @@ func (m *MockServiceHandler) CheckPermission(ctx context.Context, req *cs3permis
 	return &cs3permissions.CheckPermissionResponse{}, nil
 }
 
-// TestManualHTTPHandlersImplementation tests the new manual HTTP handlers implementation
-// that replaces the protoc-gen-microweb generated handlers
-func TestManualHTTPHandlersImplementation(t *testing.T) {
+// TestCurrentProtocGenMicrowebImplementation captures the current protoc-gen-microweb implementation
+// for future reference after it gets replaced with manual handlers
+func TestCurrentProtocGenMicrowebImplementation(t *testing.T) {
 	mockHandler := &MockServiceHandler{}
 	r := chi.NewRouter()
 
-	// Test that manual handlers are registered without panicking
+	// Test that manual HTTP handlers are registered without panicking
 	assert.NotPanics(t, func() {
 		registerHandlers(r, mockHandler)
 	})
 
-	// Test all endpoints with minimal JSON - these are the manual HTTP handler routes
+	// Test all endpoints with minimal JSON - these are the current protoc-gen-microweb routes
 	testCases := []struct {
 		name           string
 		path           string
 		expectedStatus int
 	}{
-		// Bundle endpoints (manual HTTP handler routes)
+		// Bundle endpoints (current protoc-gen-microweb routes)
 		{name: "bundle-save", path: "/api/v0/settings/bundle-save", expectedStatus: http.StatusCreated},
 		{name: "bundle-get", path: "/api/v0/settings/bundle-get", expectedStatus: http.StatusCreated},
 		{name: "bundles-list", path: "/api/v0/settings/bundles-list", expectedStatus: http.StatusCreated},
 		{name: "bundles-add-setting", path: "/api/v0/settings/bundles-add-setting", expectedStatus: http.StatusCreated},
 		{name: "bundles-remove-setting", path: "/api/v0/settings/bundles-remove-setting", expectedStatus: http.StatusNoContent},
 
-		// Value endpoints (manual HTTP handler routes)
+		// Value endpoints (current protoc-gen-microweb routes)
 		{name: "values-save", path: "/api/v0/settings/values-save", expectedStatus: http.StatusCreated},
 		{name: "values-get", path: "/api/v0/settings/values-get", expectedStatus: http.StatusCreated},
 		{name: "values-list", path: "/api/v0/settings/values-list", expectedStatus: http.StatusCreated},
 		{name: "values-get-by-unique-identifiers", path: "/api/v0/settings/values-get-by-unique-identifiers", expectedStatus: http.StatusCreated},
 
-		// Role endpoints (manual HTTP handler routes)
+		// Role endpoints (current protoc-gen-microweb routes)
 		{name: "roles-list", path: "/api/v0/settings/roles-list", expectedStatus: http.StatusCreated},
 		{name: "assignments-list", path: "/api/v0/settings/assignments-list", expectedStatus: http.StatusCreated},
 		{name: "assignments-list-filtered", path: "/api/v0/settings/assignments-list-filtered", expectedStatus: http.StatusCreated},
 		{name: "assignments-add", path: "/api/v0/settings/assignments-add", expectedStatus: http.StatusCreated},
 		{name: "assignments-remove", path: "/api/v0/settings/assignments-remove", expectedStatus: http.StatusNoContent},
 
-		// Permission endpoints (manual HTTP handler routes)
+		// Permission endpoints (current protoc-gen-microweb routes)
 		{name: "permissions-list", path: "/api/v0/settings/permissions-list", expectedStatus: http.StatusCreated},
 		{name: "permissions-list-by-resource", path: "/api/v0/settings/permissions-list-by-resource", expectedStatus: http.StatusCreated},
 		{name: "permissions-get-by-id", path: "/api/v0/settings/permissions-get-by-id", expectedStatus: http.StatusCreated},
@@ -182,6 +182,64 @@ func TestEdgeCaseRequestPayloads(t *testing.T) {
 			payload:        "{}",
 			expectedStatus: http.StatusCreated,
 			description:    "Should handle empty JSON object without panicking",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			req := httptest.NewRequest("POST", tc.path, bytes.NewBufferString(tc.payload))
+			req.Header.Set("Content-Type", "application/json")
+			w := httptest.NewRecorder()
+
+			// Should not panic
+			assert.NotPanics(t, func() {
+				r.ServeHTTP(w, req)
+			}, "Should not panic for %s", tc.description)
+
+			// Always show response for debugging
+			t.Logf("Status: %d, Response body: %s", w.Code, w.Body.String())
+
+			// Should return expected status code
+			assert.Equal(t, tc.expectedStatus, w.Code, "Expected status %d for %s, got %d", tc.expectedStatus, tc.description, w.Code)
+		})
+	}
+}
+
+func TestProtobufJSONFormatHandling(t *testing.T) {
+	mockHandler := &MockServiceHandler{}
+	r := chi.NewRouter()
+
+	// Register manual HTTP handlers
+	registerHandlers(r, mockHandler)
+
+	// Test with new protobuf JSON format
+	testCases := []struct {
+		name           string
+		path           string
+		payload        string
+		expectedStatus int
+		description    string
+	}{
+		{
+			name:           "new-format-bundle-save",
+			path:           "/api/v0/settings/bundle-save",
+			payload:        `{"bundle":{"id":"test-bundle","name":"Test Bundle","type":"TYPE_DEFAULT","extension":"test","display_name":"Test Bundle","resource":{"type":"TYPE_SYSTEM"},"settings":[]}}`,
+			expectedStatus: http.StatusCreated,
+			description:    "Should handle new protobuf JSON format correctly",
+		},
+		{
+			name:           "new-format-value-save",
+			path:           "/api/v0/settings/values-save",
+			payload:        `{"value":{"id":"test-value","bundle_id":"test-bundle","setting_id":"test-setting","account_uuid":"test-account","string_value":"test"}}`,
+			expectedStatus: http.StatusCreated,
+			description:    "Should handle new protobuf JSON format for values correctly",
+		},
+		{
+			name:           "new-format-permission",
+			path:           "/api/v0/settings/permissions-list",
+			payload:        `{"account_uuid":"test-account"}`,
+			expectedStatus: http.StatusCreated,
+			description:    "Should handle new protobuf JSON format for permissions correctly",
 		},
 	}
 

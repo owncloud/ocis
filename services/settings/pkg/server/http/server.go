@@ -2,8 +2,8 @@ package http
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 
 	"reflect"
@@ -20,6 +20,8 @@ import (
 	"github.com/owncloud/ocis/v2/services/settings/pkg/settings"
 	"go-micro.dev/v4"
 	"go-micro.dev/v4/errors"
+	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -94,7 +96,13 @@ func registerPostHandler(r chi.Router, path string, reqProto interface{}, respPr
 		req := reflect.New(reflect.TypeOf(reqProto).Elem()).Interface()
 		resp := reflect.New(reflect.TypeOf(respProto).Elem()).Interface()
 
-		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
+		body, err := io.ReadAll(r.Body)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusPreconditionFailed)
+			return
+		}
+
+		if err := protojson.Unmarshal(body, req.(proto.Message)); err != nil {
 			http.Error(w, err.Error(), http.StatusPreconditionFailed)
 			return
 		}
