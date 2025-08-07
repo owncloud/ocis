@@ -32,7 +32,7 @@ func Server(opts ...Option) (http.Service, error) {
 		http.TLSConfig(options.Config.HTTP.TLS),
 		http.Logger(options.Logger),
 		http.Namespace(options.Namespace),
-		http.Name("web"),
+		http.Name(options.Config.Service.Name),
 		http.Version(version.GetString()),
 		http.Address(options.Config.HTTP.Addr),
 		http.Context(options.Context),
@@ -96,6 +96,7 @@ func Server(opts ...Option) (http.Service, error) {
 		svc.Config(options.Config),
 		svc.GatewaySelector(gatewaySelector),
 		svc.Middleware(
+			middleware.GetOtelhttpMiddleware(options.Config.Service.Name, options.TraceProvider),
 			chimiddleware.RealIP,
 			chimiddleware.RequestID,
 			chimiddleware.Compress(5),

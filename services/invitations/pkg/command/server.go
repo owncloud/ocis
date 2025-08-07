@@ -66,6 +66,7 @@ func Server(cfg *config.Config) *cli.Command {
 					http.Context(ctx),
 					http.Config(cfg),
 					http.Service(svc),
+					http.TraceProvider(traceProvider),
 				)
 				if err != nil {
 					logger.Info().

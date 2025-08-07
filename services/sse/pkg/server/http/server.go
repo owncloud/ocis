@@ -12,11 +12,9 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/cors"
 	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/http"
-	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	svc "github.com/owncloud/ocis/v2/services/sse/pkg/service"
 	"github.com/owncloud/reva/v2/pkg/events"
-	"github.com/riandyrn/otelchi"
 	"go-micro.dev/v4"
 )
 
@@ -45,6 +43,7 @@ func Server(opts ...Option) (http.Service, error) {
 	}
 
 	middlewares := []func(stdhttp.Handler) stdhttp.Handler{
+		middleware.GetOtelhttpMiddleware(options.Config.Service.Name, options.TracerProvider),
 		chimiddleware.RequestID,
 		middleware.Version(
 			options.Config.Service.Name,
@@ -68,15 +67,6 @@ func Server(opts ...Option) (http.Service, error) {
 
 	mux := chi.NewMux()
 	mux.Use(middlewares...)
-
-	mux.Use(
-		otelchi.Middleware(
-			"sse",
-			otelchi.WithChiRoutes(mux),
-			otelchi.WithTracerProvider(options.TracerProvider),
-			otelchi.WithPropagators(tracing.GetPropagator()),
-		),
-	)
 
 	ch, err := events.Consume(options.Consumer, "sse-"+uuid.New().String(), options.RegisteredEvents...)
 	if err != nil {

@@ -12,7 +12,6 @@ import (
 	"github.com/owncloud/reva/v2/pkg/store"
 	"go-micro.dev/v4"
 	microstore "go-micro.dev/v4/store"
-	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 )
 
 // Server initializes the http service and server.
@@ -50,6 +49,7 @@ func Server(opts ...Option) (http.Service, error) {
 		svc.Logger(options.Logger),
 		svc.Config(options.Config),
 		svc.Middleware(
+			middleware.GetOtelhttpMiddleware(options.Config.Service.Name, options.TraceProvider),
 			chimiddleware.RealIP,
 			chimiddleware.RequestID,
 			middleware.NoCache,
@@ -65,8 +65,6 @@ func Server(opts ...Option) (http.Service, error) {
 				version.GetString(),
 			),
 			middleware.Logger(options.Logger),
-			middleware.TraceContext,
-			otelhttp.NewMiddleware(options.Config.Service.Name, otelhttp.WithTracerProvider(options.TraceProvider)),
 		),
 		svc.Store(signingKeyStore),
 	)

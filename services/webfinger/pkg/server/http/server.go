@@ -12,12 +12,10 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/cors"
 	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	ohttp "github.com/owncloud/ocis/v2/ocis-pkg/service/http"
-	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	serviceErrors "github.com/owncloud/ocis/v2/services/webfinger/pkg/service/v0"
 	svc "github.com/owncloud/ocis/v2/services/webfinger/pkg/service/v0"
 	"github.com/pkg/errors"
-	"github.com/riandyrn/otelchi"
 	"go-micro.dev/v4"
 )
 
@@ -45,9 +43,9 @@ func Server(opts ...Option) (ohttp.Service, error) {
 
 	mux := chi.NewMux()
 
+	mux.Use(middleware.GetOtelhttpMiddleware(options.Config.Service.Name, options.TraceProvider))
 	mux.Use(chimiddleware.RealIP)
 	mux.Use(chimiddleware.RequestID)
-	mux.Use(middleware.TraceContext)
 	mux.Use(middleware.NoCache)
 	mux.Use(
 		middleware.Cors(
@@ -62,15 +60,6 @@ func Server(opts ...Option) (ohttp.Service, error) {
 		options.Name,
 		version.String,
 	))
-
-	mux.Use(
-		otelchi.Middleware(
-			options.Name,
-			otelchi.WithChiRoutes(mux),
-			otelchi.WithTracerProvider(options.TraceProvider),
-			otelchi.WithPropagators(tracing.GetPropagator()),
-		),
-	)
 
 	var oidcHTTPClient = &http.Client{
 		Transport: &http.Transport{

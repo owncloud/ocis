@@ -20,12 +20,10 @@ import (
 	"github.com/libregraph/lico/server"
 	"github.com/owncloud/ocis/v2/ocis-pkg/ldap"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
 	"github.com/owncloud/ocis/v2/services/idp/pkg/assets"
 	cs3BackendSupport "github.com/owncloud/ocis/v2/services/idp/pkg/backends/cs3/bootstrap"
 	"github.com/owncloud/ocis/v2/services/idp/pkg/config"
 	"github.com/owncloud/ocis/v2/services/idp/pkg/middleware"
-	"github.com/riandyrn/otelchi"
 	"go.opentelemetry.io/otel/trace"
 	"gopkg.in/yaml.v2"
 	"stash.kopano.io/kgol/rndm"
@@ -125,7 +123,7 @@ func NewService(opts ...Option) Service {
 	routes := []server.WithRoutes{managers.Must("identity").(server.WithRoutes)}
 	handlers := managers.Must("handler").(http.Handler)
 
-	svc := IDP{
+	svc := &IDP{
 		logger: options.Logger,
 		config: options.Config,
 		assets: assetVFS,
@@ -282,15 +280,6 @@ func (idp *IDP) initMux(ctx context.Context, r []server.WithRoutes, h http.Handl
 		idp.tp,
 	))
 
-	idp.mux.Use(
-		otelchi.Middleware(
-			"idp",
-			otelchi.WithChiRoutes(idp.mux),
-			otelchi.WithTracerProvider(idp.tp),
-			otelchi.WithPropagators(tracing.GetPropagator()),
-		),
-	)
-
 	// handle / | index.html with a template that needs to have the BASE_PREFIX replaced
 	idp.mux.Get("/signin/v1/identifier", idp.Index())
 	idp.mux.Get("/signin/v1/identifier/", idp.Index())
@@ -305,12 +294,12 @@ func (idp *IDP) initMux(ctx context.Context, r []server.WithRoutes, h http.Handl
 }
 
 // ServeHTTP implements the Service interface.
-func (idp IDP) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (idp *IDP) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	idp.mux.ServeHTTP(w, r)
 }
 
 // Index renders the static html with templated variables.
-func (idp IDP) Index() http.HandlerFunc {
+func (idp *IDP) Index() http.HandlerFunc {
 	f, err := idp.assets.Open("/identifier/index.html")
 	if err != nil {
 		idp.logger.Fatal().Err(err).Msg("Could not open index template")

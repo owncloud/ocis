@@ -57,14 +57,15 @@ func (ul *UserlogService) HandleGetEvents(w http.ResponseWriter, r *http.Request
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	ctx, err = utils.GetServiceUserContext(ul.cfg.ServiceAccount.ServiceAccountID, gwc, ul.cfg.ServiceAccount.ServiceAccountSecret)
+	// convCtx is a new context for the NewConverter
+	convCtx, err := utils.GetServiceUserContext(ul.cfg.ServiceAccount.ServiceAccountID, gwc, ul.cfg.ServiceAccount.ServiceAccountSecret)
 	if err != nil {
 		ul.log.Error().Err(err).Msg("cant get service account")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	conv := NewConverter(ctx, r.Header.Get(HeaderAcceptLanguage), ul.gatewaySelector, ul.cfg.Service.Name, ul.cfg.TranslationPath, ul.cfg.DefaultLanguage)
+	conv := NewConverter(convCtx, r.Header.Get(HeaderAcceptLanguage), ul.gatewaySelector, ul.cfg.Service.Name, ul.cfg.TranslationPath, ul.cfg.DefaultLanguage)
 
 	var outdatedEvents []string
 	resp := GetEventResponseOC10{}
@@ -254,7 +255,7 @@ func RequireAdminOrSecret(rm *roles.Manager, secret string) func(http.HandlerFun
 	return func(next http.HandlerFunc) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
 			// allow bypassing admin requirement by sending the correct secret
-			if secret != "" && r.Header.Get("secret") == secret {
+			if secret != "" && r.Header.Get("Secret") == secret {
 				next.ServeHTTP(w, r)
 				return
 			}
