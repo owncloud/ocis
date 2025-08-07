@@ -4,14 +4,13 @@
 package v0
 
 import (
-	"bytes"
 	"encoding/json"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
-	"github.com/golang/protobuf/jsonpb"
 	merrors "go-micro.dev/v4/errors"
+	"google.golang.org/protobuf/encoding/protojson"
 )
 
 type webSearchProviderHandler struct {
@@ -129,218 +128,182 @@ func RegisterIndexProviderWeb(r chi.Router, i IndexProviderHandler, middlewares 
 	r.MethodFunc("POST", "/api/v0/search/index/search", handler.Search)
 }
 
-// SearchRequestJSONMarshaler describes the default jsonpb.Marshaler used by all
+// SearchRequestJSONMarshaler describes the default protojson.Marshaler used by all
 // instances of SearchRequest. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var SearchRequestJSONMarshaler = new(jsonpb.Marshaler)
+var SearchRequestJSONMarshaler = protojson.MarshalOptions{}
 
 // MarshalJSON satisfies the encoding/json Marshaler interface. This method
-// uses the more correct jsonpb package to correctly marshal the message.
+// uses the more correct protojson package to correctly marshal the message.
 func (m *SearchRequest) MarshalJSON() ([]byte, error) {
 	if m == nil {
 		return json.Marshal(nil)
 	}
 
-	buf := &bytes.Buffer{}
-
-	if err := SearchRequestJSONMarshaler.Marshal(buf, m); err != nil {
-		return nil, err
-	}
-
-	return buf.Bytes(), nil
+	return SearchRequestJSONMarshaler.Marshal(m)
 }
 
 var _ json.Marshaler = (*SearchRequest)(nil)
 
-// SearchRequestJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
+// SearchRequestJSONUnmarshaler describes the default protojson.Unmarshaler used by all
 // instances of SearchRequest. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var SearchRequestJSONUnmarshaler = new(jsonpb.Unmarshaler)
+var SearchRequestJSONUnmarshaler = protojson.UnmarshalOptions{}
 
 // UnmarshalJSON satisfies the encoding/json Unmarshaler interface. This method
-// uses the more correct jsonpb package to correctly unmarshal the message.
+// uses the more correct protojson package to correctly unmarshal the message.
 func (m *SearchRequest) UnmarshalJSON(b []byte) error {
-	return SearchRequestJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
+	return SearchRequestJSONUnmarshaler.Unmarshal(b, m)
 }
 
 var _ json.Unmarshaler = (*SearchRequest)(nil)
 
-// SearchResponseJSONMarshaler describes the default jsonpb.Marshaler used by all
+// SearchResponseJSONMarshaler describes the default protojson.Marshaler used by all
 // instances of SearchResponse. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var SearchResponseJSONMarshaler = new(jsonpb.Marshaler)
+var SearchResponseJSONMarshaler = protojson.MarshalOptions{}
 
 // MarshalJSON satisfies the encoding/json Marshaler interface. This method
-// uses the more correct jsonpb package to correctly marshal the message.
+// uses the more correct protojson package to correctly marshal the message.
 func (m *SearchResponse) MarshalJSON() ([]byte, error) {
 	if m == nil {
 		return json.Marshal(nil)
 	}
 
-	buf := &bytes.Buffer{}
-
-	if err := SearchResponseJSONMarshaler.Marshal(buf, m); err != nil {
-		return nil, err
-	}
-
-	return buf.Bytes(), nil
+	return SearchResponseJSONMarshaler.Marshal(m)
 }
 
 var _ json.Marshaler = (*SearchResponse)(nil)
 
-// SearchResponseJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
+// SearchResponseJSONUnmarshaler describes the default protojson.Unmarshaler used by all
 // instances of SearchResponse. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var SearchResponseJSONUnmarshaler = new(jsonpb.Unmarshaler)
+var SearchResponseJSONUnmarshaler = protojson.UnmarshalOptions{}
 
 // UnmarshalJSON satisfies the encoding/json Unmarshaler interface. This method
-// uses the more correct jsonpb package to correctly unmarshal the message.
+// uses the more correct protojson package to correctly unmarshal the message.
 func (m *SearchResponse) UnmarshalJSON(b []byte) error {
-	return SearchResponseJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
+	return SearchResponseJSONUnmarshaler.Unmarshal(b, m)
 }
 
 var _ json.Unmarshaler = (*SearchResponse)(nil)
 
-// SearchIndexRequestJSONMarshaler describes the default jsonpb.Marshaler used by all
+// SearchIndexRequestJSONMarshaler describes the default protojson.Marshaler used by all
 // instances of SearchIndexRequest. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var SearchIndexRequestJSONMarshaler = new(jsonpb.Marshaler)
+var SearchIndexRequestJSONMarshaler = protojson.MarshalOptions{}
 
 // MarshalJSON satisfies the encoding/json Marshaler interface. This method
-// uses the more correct jsonpb package to correctly marshal the message.
+// uses the more correct protojson package to correctly marshal the message.
 func (m *SearchIndexRequest) MarshalJSON() ([]byte, error) {
 	if m == nil {
 		return json.Marshal(nil)
 	}
 
-	buf := &bytes.Buffer{}
-
-	if err := SearchIndexRequestJSONMarshaler.Marshal(buf, m); err != nil {
-		return nil, err
-	}
-
-	return buf.Bytes(), nil
+	return SearchIndexRequestJSONMarshaler.Marshal(m)
 }
 
 var _ json.Marshaler = (*SearchIndexRequest)(nil)
 
-// SearchIndexRequestJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
+// SearchIndexRequestJSONUnmarshaler describes the default protojson.Unmarshaler used by all
 // instances of SearchIndexRequest. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var SearchIndexRequestJSONUnmarshaler = new(jsonpb.Unmarshaler)
+var SearchIndexRequestJSONUnmarshaler = protojson.UnmarshalOptions{}
 
 // UnmarshalJSON satisfies the encoding/json Unmarshaler interface. This method
-// uses the more correct jsonpb package to correctly unmarshal the message.
+// uses the more correct protojson package to correctly unmarshal the message.
 func (m *SearchIndexRequest) UnmarshalJSON(b []byte) error {
-	return SearchIndexRequestJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
+	return SearchIndexRequestJSONUnmarshaler.Unmarshal(b, m)
 }
 
 var _ json.Unmarshaler = (*SearchIndexRequest)(nil)
 
-// SearchIndexResponseJSONMarshaler describes the default jsonpb.Marshaler used by all
+// SearchIndexResponseJSONMarshaler describes the default protojson.Marshaler used by all
 // instances of SearchIndexResponse. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var SearchIndexResponseJSONMarshaler = new(jsonpb.Marshaler)
+var SearchIndexResponseJSONMarshaler = protojson.MarshalOptions{}
 
 // MarshalJSON satisfies the encoding/json Marshaler interface. This method
-// uses the more correct jsonpb package to correctly marshal the message.
+// uses the more correct protojson package to correctly marshal the message.
 func (m *SearchIndexResponse) MarshalJSON() ([]byte, error) {
 	if m == nil {
 		return json.Marshal(nil)
 	}
 
-	buf := &bytes.Buffer{}
-
-	if err := SearchIndexResponseJSONMarshaler.Marshal(buf, m); err != nil {
-		return nil, err
-	}
-
-	return buf.Bytes(), nil
+	return SearchIndexResponseJSONMarshaler.Marshal(m)
 }
 
 var _ json.Marshaler = (*SearchIndexResponse)(nil)
 
-// SearchIndexResponseJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
+// SearchIndexResponseJSONUnmarshaler describes the default protojson.Unmarshaler used by all
 // instances of SearchIndexResponse. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var SearchIndexResponseJSONUnmarshaler = new(jsonpb.Unmarshaler)
+var SearchIndexResponseJSONUnmarshaler = protojson.UnmarshalOptions{}
 
 // UnmarshalJSON satisfies the encoding/json Unmarshaler interface. This method
-// uses the more correct jsonpb package to correctly unmarshal the message.
+// uses the more correct protojson package to correctly unmarshal the message.
 func (m *SearchIndexResponse) UnmarshalJSON(b []byte) error {
-	return SearchIndexResponseJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
+	return SearchIndexResponseJSONUnmarshaler.Unmarshal(b, m)
 }
 
 var _ json.Unmarshaler = (*SearchIndexResponse)(nil)
 
-// IndexSpaceRequestJSONMarshaler describes the default jsonpb.Marshaler used by all
+// IndexSpaceRequestJSONMarshaler describes the default protojson.Marshaler used by all
 // instances of IndexSpaceRequest. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var IndexSpaceRequestJSONMarshaler = new(jsonpb.Marshaler)
+var IndexSpaceRequestJSONMarshaler = protojson.MarshalOptions{}
 
 // MarshalJSON satisfies the encoding/json Marshaler interface. This method
-// uses the more correct jsonpb package to correctly marshal the message.
+// uses the more correct protojson package to correctly marshal the message.
 func (m *IndexSpaceRequest) MarshalJSON() ([]byte, error) {
 	if m == nil {
 		return json.Marshal(nil)
 	}
 
-	buf := &bytes.Buffer{}
-
-	if err := IndexSpaceRequestJSONMarshaler.Marshal(buf, m); err != nil {
-		return nil, err
-	}
-
-	return buf.Bytes(), nil
+	return IndexSpaceRequestJSONMarshaler.Marshal(m)
 }
 
 var _ json.Marshaler = (*IndexSpaceRequest)(nil)
 
-// IndexSpaceRequestJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
+// IndexSpaceRequestJSONUnmarshaler describes the default protojson.Unmarshaler used by all
 // instances of IndexSpaceRequest. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var IndexSpaceRequestJSONUnmarshaler = new(jsonpb.Unmarshaler)
+var IndexSpaceRequestJSONUnmarshaler = protojson.UnmarshalOptions{}
 
 // UnmarshalJSON satisfies the encoding/json Unmarshaler interface. This method
-// uses the more correct jsonpb package to correctly unmarshal the message.
+// uses the more correct protojson package to correctly unmarshal the message.
 func (m *IndexSpaceRequest) UnmarshalJSON(b []byte) error {
-	return IndexSpaceRequestJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
+	return IndexSpaceRequestJSONUnmarshaler.Unmarshal(b, m)
 }
 
 var _ json.Unmarshaler = (*IndexSpaceRequest)(nil)
 
-// IndexSpaceResponseJSONMarshaler describes the default jsonpb.Marshaler used by all
+// IndexSpaceResponseJSONMarshaler describes the default protojson.Marshaler used by all
 // instances of IndexSpaceResponse. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var IndexSpaceResponseJSONMarshaler = new(jsonpb.Marshaler)
+var IndexSpaceResponseJSONMarshaler = protojson.MarshalOptions{}
 
 // MarshalJSON satisfies the encoding/json Marshaler interface. This method
-// uses the more correct jsonpb package to correctly marshal the message.
+// uses the more correct protojson package to correctly marshal the message.
 func (m *IndexSpaceResponse) MarshalJSON() ([]byte, error) {
 	if m == nil {
 		return json.Marshal(nil)
 	}
 
-	buf := &bytes.Buffer{}
-
-	if err := IndexSpaceResponseJSONMarshaler.Marshal(buf, m); err != nil {
-		return nil, err
-	}
-
-	return buf.Bytes(), nil
+	return IndexSpaceResponseJSONMarshaler.Marshal(m)
 }
 
 var _ json.Marshaler = (*IndexSpaceResponse)(nil)
 
-// IndexSpaceResponseJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
+// IndexSpaceResponseJSONUnmarshaler describes the default protojson.Unmarshaler used by all
 // instances of IndexSpaceResponse. This struct is safe to replace or modify but
 // should not be done so concurrently.
-var IndexSpaceResponseJSONUnmarshaler = new(jsonpb.Unmarshaler)
+var IndexSpaceResponseJSONUnmarshaler = protojson.UnmarshalOptions{}
 
 // UnmarshalJSON satisfies the encoding/json Unmarshaler interface. This method
-// uses the more correct jsonpb package to correctly unmarshal the message.
+// uses the more correct protojson package to correctly unmarshal the message.
 func (m *IndexSpaceResponse) UnmarshalJSON(b []byte) error {
-	return IndexSpaceResponseJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
+	return IndexSpaceResponseJSONUnmarshaler.Unmarshal(b, m)
 }
 
 var _ json.Unmarshaler = (*IndexSpaceResponse)(nil)
