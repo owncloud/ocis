@@ -8,6 +8,7 @@
 | Type
 | Default Value
 | Description
+    
 
 a| `CS3_GATEWAY` +
 a| [subs=-attributes]
@@ -16,7 +17,6 @@ a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 ++ ++
-    
     
 
 a| `CS3_MACHINE_AUTH_API_KEY` +
@@ -45,16 +45,6 @@ a| [subs=-attributes]
 ++9223372036854775807 ++
 a| [subs=-attributes]
 ++Timeout for GRPC connections. After timeout, a new connection will be established automatically. The default value is in ns and is about 2.5 mio h. ++
-    
-    
-
-a| `MICRO_LOG_LEVEL` +
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-++ ++
 
 a| `MICRO_LOG_LEVEL` +
 a| [subs=-attributes]
@@ -63,6 +53,16 @@ a| [subs=-attributes]
 ++Error ++
 a| [subs=-attributes]
 ++Set the log level for the internal go micro framework. Only change on supervision of ownCloud Support. ++
+    
+    
+
+a| `MICRO_LOG_LEVEL` +
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+++ ++
 
 a| `MICRO_LOG_LEVEL` +
 a| [subs=-attributes]
@@ -132,19 +132,20 @@ a| [subs=-attributes]
 
 a| `OCIS_CONFIG_DIR` +
 a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-++ ++
-
-a| `OCIS_CONFIG_DIR` +
-a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 ++The default directory location for config files. See the General Info section in the documentation for more details on defaults. ++
+
+a| `OCIS_CONFIG_DIR` +
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+++ ++
+    
 
 a| `RUN_CMD_TEST` +
 a| [subs=-attributes]
@@ -153,7 +154,6 @@ a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 ++ ++
-    
     
 
 a| `YEAR` +
