@@ -144,6 +144,14 @@ variables:
   description: The default directory location for config files. See the General Info
     section in the documentation for more details on defaults.
   do_ignore: false
+- rawname: OCIS_INSECURE
+  path: ocis-pkg/service/grpc/client.go:77
+  foundincode: true
+  name: OCIS_INSECURE
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
 - rawname: RUN_CMD_TEST
   path: internal/testenv/test.go:32
   foundincode: true
