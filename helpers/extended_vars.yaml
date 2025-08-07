@@ -74,6 +74,30 @@ variables:
     h.
   do_ignore: false
 - rawname: MICRO_LOG_LEVEL
+  path: ocis-pkg/log/log.go:34
+  foundincode: false
+  name: MICRO_LOG_LEVEL
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: true
+- rawname: MICRO_LOG_LEVEL
+  path: ./ocis-pkg/log/log.go:30
+  foundincode: true
+  name: MICRO_LOG_LEVEL
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: MICRO_LOG_LEVEL
+  path: ./ocis-pkg/log/log.go:34
+  foundincode: true
+  name: MICRO_LOG_LEVEL
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: MICRO_LOG_LEVEL
   path: ocis-pkg/log/log.go:31
   foundincode: false
   name: MICRO_LOG_LEVEL
@@ -90,30 +114,6 @@ variables:
   default_value: ""
   description: ""
   do_ignore: true
-- rawname: MICRO_LOG_LEVEL
-  path: ocis-pkg/log/log.go:34
-  foundincode: false
-  name: MICRO_LOG_LEVEL
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: true
-- rawname: MICRO_LOG_LEVEL
-  path: ./ocis-pkg/log/log.go:34
-  foundincode: true
-  name: MICRO_LOG_LEVEL
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: MICRO_LOG_LEVEL
-  path: ./ocis-pkg/log/log.go:30
-  foundincode: true
-  name: MICRO_LOG_LEVEL
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
 - rawname: _registryEnv
   path: ocis-pkg/registry/registry.go:88
   foundincode: false
@@ -124,14 +124,6 @@ variables:
     and ''nats-js-kv'' (default). Only change on supervision of ownCloud Support.'
   do_ignore: false
 - rawname: _registryAddressEnv
-  path: ocis-pkg/registry/registry.go:92
-  foundincode: false
-  name: MICRO_REGISTRY_ADDRESS
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: true
-- rawname: _registryAddressEnv
   path: ocis-pkg/natsjsregistry/registry.go:206
   foundincode: false
   name: MICRO_REGISTRY_ADDRESS
@@ -140,6 +132,14 @@ variables:
   description: The bind address of the internal go micro framework. Only change on
     supervision of ownCloud Support.
   do_ignore: false
+- rawname: _registryAddressEnv
+  path: ocis-pkg/registry/registry.go:92
+  foundincode: false
+  name: MICRO_REGISTRY_ADDRESS
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: true
 - rawname: _registryPasswordEnv
   path: ocis-pkg/natsjsregistry/registry.go:234
   foundincode: false
@@ -241,7 +241,7 @@ variables:
   description: ""
   do_ignore: false
 - rawname: _registryAddressEnv
-  path: ./ocis-pkg/natsjsregistry/registry.go:206
+  path: ./ocis-pkg/registry/registry.go:92
   foundincode: true
   name: _registryAddressEnv
   type: ""
@@ -249,7 +249,7 @@ variables:
   description: ""
   do_ignore: false
 - rawname: _registryAddressEnv
-  path: ./ocis-pkg/registry/registry.go:92
+  path: ./ocis-pkg/natsjsregistry/registry.go:206
   foundincode: true
   name: _registryAddressEnv
   type: ""
