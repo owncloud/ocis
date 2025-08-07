@@ -92,22 +92,35 @@ func GetRogueEnvs() {
 
 	// find current vars
 	currentVars := make(map[string]Variable)
+	totalLines := len(lines)
+	fmt.Printf("Processing %d lines...\n", totalLines)
+
 	for _, l := range lines {
-		fmt.Printf("Parsing %s\n", l)
-		r := strings.SplitN(l, ":\t", 2)
-		if len(r) != 2 || r[0] == "" || r[1] == "" {
+
+		if l == "" {
 			continue
 		}
 
-		res := re.FindAllSubmatch([]byte(r[1]), -1)
+		fmt.Printf("Parsing %s\n", l)
+		r := strings.SplitN(l, ":", 3)
+		if len(r) != 3 || r[0] == "" || r[2] == "" {
+			continue
+		}
+
+		// Remove ./ prefix from path if it exists
+		path := strings.TrimPrefix(r[0], "./")
+		path = path + ":" + r[1] // Reconstruct path:line
+		content := r[2]
+
+		res := re.FindAllSubmatch([]byte(content), -1)
 		if len(res) < 1 {
-			fmt.Printf("Error envvar not matching pattern: %s", r[1])
+			fmt.Printf("  No envvar found in content: %s\n", content)
 			continue
 		}
 
 		for _, m := range res {
-			path := r[0]
 			name := strings.Trim(string(m[1]), "\"")
+			fmt.Printf("  Found envvar: %s at %s\n", name, path)
 			currentVars[path+name] = Variable{
 				RawName:     name,
 				Path:        path,
@@ -117,6 +130,7 @@ func GetRogueEnvs() {
 		}
 	}
 
+	fmt.Printf("Found %d current variables\n", len(currentVars))
 	// adjust existing vars
 	for i, v := range vars.Variables {
 		_, ok := currentVars[v.Path+v.RawName]
