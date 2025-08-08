@@ -7,6 +7,7 @@ import (
 	"os/exec"
 	"path"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"text/template"
 )
@@ -71,6 +72,12 @@ func runIntermediateCode(intermediateCodePath string) {
 	defaultDataPath := "/var/lib/ocis"
 	os.Setenv("OCIS_BASE_DATA_PATH", defaultDataPath)
 	os.Setenv("OCIS_CONFIG_DIR", defaultConfigPath)
+
+	// Set AUTOMEMLIMIT_EXPERIMENT=system on non-Linux systems to avoid cgroups errors
+	if runtime.GOOS != "linux" {
+		os.Setenv("AUTOMEMLIMIT_EXPERIMENT", "system")
+	}
+
 	out, err := exec.Command("go", "run", intermediateCodePath).CombinedOutput()
 	if err != nil {
 		log.Fatal(string(out), err)

@@ -1,4 +1,12 @@
 variables:
+- rawname: AUTOMEMLIMIT
+  path: ocis-pkg/shared/memlimit.go:15
+  foundincode: true
+  name: AUTOMEMLIMIT
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
 - rawname: CS3_GATEWAY
   path: services/idp/pkg/backends/cs3/bootstrap/cs3.go:77
   foundincode: true
