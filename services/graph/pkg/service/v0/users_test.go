@@ -496,7 +496,7 @@ var _ = Describe("Users", func() {
 			},
 			Entry("with invalid filter", "invalid", http.StatusBadRequest),
 			Entry("with unsupported filter for user property", "mail eq 'unsupported'", http.StatusNotImplemented),
-			Entry("with unsupported filter operation", "mail add 10", http.StatusNotImplemented),
+			Entry("with unsupported filter operation", "mail add 10", http.StatusBadRequest),
 			Entry("with unsupported logical operation", "memberOf/any(n:n/id eq 1) or memberOf/any(n:n/id eq 2)", http.StatusNotImplemented),
 			Entry("with unsupported lambda query ", `drives/any(n:n/id eq '1')`, http.StatusNotImplemented),
 			Entry("with unsupported lambda token ", "memberOf/all(n:n/id eq 1)", http.StatusNotImplemented),
