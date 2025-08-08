@@ -20,11 +20,13 @@ Ask the developers if envvars of this type have been changed (added or removed).
 
 ## Extended Envvars
 
-* Run from the ocis root `make -C docs docs-generate`\
+* From the ocis root run:\
+`sudo make docs-clean`\
+`make docs-generate`\
 Drop any changes in `env_vars.yaml`!
 * Check if there is a change in the `extended-envars.yaml` output.\
 If so, process [Extended Envvars - Fixing Changed Item]({{< ref "./special-envvars.md#fixing-changed-items" >}}).
-* When done, re-run the make command and check if the output of `./docs/services/_includes/adoc/extended_configvars.adoc` matches the expectations.
+* When done, re-run `make docs-generate` and check if the output matches the expectations in `./docs/services/_includes/adoc/extended_configvars.adoc`.
 
 ## Ordinary Envvars
 
@@ -32,15 +34,17 @@ If so, process [Extended Envvars - Fixing Changed Item]({{< ref "./special-envva
 
 This is **mandatory for a new release** !
 
-* Run from the ocis root `make -C docs docs-generate`\
+* From the ocis root run:\
+`sudo make docs-clean`\
+`make docs-generate`\
 Any changes in `env_vars.yaml` are now considered.
-* This file will most likely show changes and merging them is essential as **base for added/removed or deprecated envvars**. Note that this file will get additions/updates only, but items never get deleted automatically !!\
+* This file will most likely show changes and merging them is **essential** as base for **added/removed or deprecated envvars**. Note that this file will get additions/updates only, but items never get deleted automatically !!\
 {{< hint info >}}
 Note that due to how the code is currently designed, **things may get shifted** around though no real changes have been introduced.
 {{< /hint >}}
 * First, check if any **alphabetic code names** are present in the changes. See [Introduce new Envvars]({{< ref "./envvar-naming-scopes.md/#introduce-new-envvars" >}}).
   * If so, create a new branch and replace them in the **service containing the source** with the actual semantic version (e.g. `releaseX` → `7.2.0`) first. Note that ALL of major, minor and patch numbers must be present, including patch versions == `0`.
-  * If all changes are applied, rerun `make -C docs docs-generate` and check if all changes are incorporated in the yaml file.
+  * If all changes are applied, rerun `make docs-generate` and check if all changes are incorporated in the yaml file.
   * Create a PR and merge these changes, dont forget to do a local pull of master afterwards...
 * With a new branch, remove all envvars from the `env_vars.yaml` file manually that have formerly been deprecated and removed from the code.
 * Commit the changes and merge it.\

@@ -81,9 +81,13 @@ endif
 include .make/recursion.mk
 
 .PHONY: help
+DEFAULT_GOAL := help
 help:
 	@echo "Please use 'make <target>' where <target> is one of the following:"
 	@echo
+	@echo -e "${GREEN}List all available .PHONY targets:${RESET}\n"
+	@echo -e "\tmake list\t\t${BLUE}sorted alphabetically${RESET}"
+	@echo -e "${BLACK}---------------------------------------------------------${RESET}"
 	@echo -e "${GREEN}Testing with test suite natively installed:${RESET}\n"
 	@echo -e "${PURPLE}\tdocs: https://owncloud.dev/ocis/development/testing/#testing-with-test-suite-natively-installed${RESET}\n"
 	@echo -e "\tmake test-acceptance-api\t\t${BLUE}run API acceptance tests${RESET}"
@@ -94,14 +98,13 @@ help:
 	@echo -e "${RED}You also should have a look at other available Makefiles:${RESET}"
 	@echo
 	@echo -e "${GREEN}oCIS:${RESET}\n"
-	@echo -e "${PURPLE}\tdocs: https://owncloud.dev/ocis/development/build/${RESET}\n"
+	@echo -e "${PURPLE}\tdocs: https://owncloud.dev/ocis/ocis/build-docs/${RESET}\n"
 	@echo -e "\tsee ./ocis/Makefile"
 	@echo -e "\tor run ${YELLOW}make -C ocis help${RESET}"
 	@echo
 	@echo -e "${GREEN}Documentation:${RESET}\n"
-	@echo -e "${PURPLE}\tdocs: https://owncloud.dev/ocis/development/build-docs/${RESET}\n"
-	@echo -e "\tsee ./docs/Makefile"
-	@echo -e "\tor run ${YELLOW}make -C docs help${RESET}"
+	@echo -e "${PURPLE}\tdocs: https://owncloud.dev/ocis/build-docs/${RESET}\n"
+	@echo -e "\trun ${YELLOW}make list | grep docs-\t\t${BLUE}note: run all docs command via this makefile${RESET}"
 	@echo
 	@echo -e "${GREEN}Testing with test suite in docker:${RESET}\n"
 	@echo -e "${PURPLE}\tdocs: https://owncloud.dev/ocis/development/testing/#testing-with-test-suite-in-docker${RESET}\n"
@@ -115,6 +118,12 @@ help:
 	@echo -e "${GREEN}Tools for linting gherkin feature files:\n${RESET}"
 	@echo -e "\tmake test-gherkin-lint\t\t${BLUE}run lint checks on Gherkin feature files${RESET}"
 	@echo -e "\tmake test-gherkin-lint-fix\t${BLUE}apply lint fixes to gherkin feature files${RESET}"
+	@echo
+
+.PHONY: list
+list:
+	@echo -e 'Available .PHONY targets: \n'
+	@grep -P -o '(?<=^\.PHONY: )(.*)' Makefile | sort -u
 	@echo
 
 .PHONY: clean-tests
@@ -159,33 +168,57 @@ clean:
         $(MAKE) --no-print-directory -C $$mod clean || exit 1; \
     done
 
-.PHONY: docs-generate
+# generate the docs
+# intents and comments are intentional...
+.PHONY: docs-generate          # 1. prepare docs
 docs-generate:
-	# empty the folders first to only have files that are generated without remnants
+	@echo 'Empty folders first to only have those files that are generated without remnants.'
 	find docs/services/_includes/ -type f \( -name "*" ! -name ".git*" \) -delete || exit 1
 
-	# generate the services md files for dev docs
+	@echo 'Generate content from services.'
 	@for mod in $(OCIS_MODULES); do \
 		$(MAKE) --no-print-directory -C $$mod docs-generate || exit 1; \
 	done
 
-	# generate envvar adoc and md tables for dev and admin docs
-	$(MAKE) --no-print-directory -C docs docs-generate || exit 1 
+	@$(MAKE) --no-print-directory -C docs docs-run-helpers || exit 1 
 
-	# only copy all added/removed/deprecated files that have been created for a release + .gitkeep
-	# note that files are locally ignored via _include/.gitignore for pushing, but required by the drone process
-	# for markdown, if e.g. an `_index.md` file would be present containing links, hugo thinks it must render and fails
-	# the -I flag followed by % cp % means that all passed arguments will concatenated to the last %
-	find docs/services/general-info/envvars/env-var-deltas/ -type f \( -name ".gitkeep" -o -name "*-added.*" -o -name "*-removed.*" -o -name "*-deprecated.*" \) | xargs -I % cp % docs/services/_includes/adoc/env-var-deltas/
+# initialize the docs build environment
+	@$(MAKE) --no-print-directory -C docs docs-init
 
-.PHONY: docs-drone-test
-	# imitate a full drone run to build docs without pushing to the web.
-	# this can help identify uncaught issues when running `make -C docs docs-serve` only.
-docs-drone-test:
-	$(MAKE) --no-print-directory docs-generate
-	$(MAKE) --no-print-directory -C docs docs-copy
-	$(MAKE) --no-print-directory -C docs test 
+# copy required resources into hugo/content
+.PHONY: docs-copy              # 2. copy required doc resources
+docs-copy:
+	@$(MAKE) --no-print-directory -C docs docs-copy
 
+# the docs-build|serve commands requires that docs-init was run first for the required data to exists
+# create a docs build
+.PHONY: docs-build             # 3. build prepared docs
+docs-build:
+	@$(MAKE) --no-print-directory -C docs docs-build
+
+# serve built docs with hugo
+.PHONY: docs-serve             # serve the docs build
+docs-serve:
+	@$(MAKE) --no-print-directory -C docs docs-serve
+
+# clean up doc build artifacts 
+.PHONY: docs-clean             # clean all docs artifacts, must be run as sudo
+docs-clean:
+	@$(MAKE) --no-print-directory -C docs docs-clean
+
+# imitate a full drone run locally to build docs without pushing to the web.
+# this can help identify uncaught issues when running `make docs-serve` only.
+.PHONY: docs-local             # run all steps as drone would do it (1, 2, 3)
+docs-local:
+	@$(MAKE) --no-print-directory docs-generate
+	@$(MAKE) --no-print-directory docs-copy
+	@$(MAKE) --no-print-directory docs-build 
+
+# prepare a link from the root to the hugo folder because the image requires it
+# note that on local building, the referenced container of inside the hugo/makefile is used
+.PHONY: docs-hugo-drone-prep   # only used for drone !
+docs-hugo-drone-prep:
+	@$(MAKE) --no-print-directory -C docs docs-hugo-drone-prep
 
 .PHONY: check-env-var-annotations
 check-env-var-annotations:

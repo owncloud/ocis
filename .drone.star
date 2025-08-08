@@ -41,6 +41,9 @@ KEYCLOAK_IMAGE = "quay.io/keycloak/keycloak:26.2.5"
 POSTGRES_ALPINE_IMAGE = "postgres:alpine3.18"
 TRIVY_IMAGE = "aquasec/trivy:latest"
 
+# the hugo version needs to be the same as in owncloud.github.io
+OC_CI_HUGO_STATIC_IMAGE = "hugomods/hugo:base-0.129.0"
+
 DEFAULT_PHP_VERSION = "8.4"
 DEFAULT_NODEJS_VERSION = "22"
 
@@ -482,7 +485,7 @@ def main(ctx):
 
     build_release_helpers = \
         changelog() + \
-        docs() + \
+        documentation() + \
         licenseCheck(ctx)
 
     test_pipelines = \
@@ -2376,11 +2379,11 @@ def releaseDockerReadme(ctx, repo, build_type):
         },
     }
 
-def docs():
+def documentation():
     return [{
         "kind": "pipeline",
         "type": "docker",
-        "name": "docs",
+        "name": "documentation",
         "platform": {
             "os": "linux",
             "arch": "amd64",
@@ -2389,23 +2392,29 @@ def docs():
             {
                 "name": "docs-generate",
                 "image": OC_CI_GOLANG,
+                # "pull": "always",
                 "environment": DRONE_HTTP_PROXY_ENV,
                 "commands": ["make docs-generate"],
             },
             {
-                "name": "prepare",
+                "name": "docs-copy",
                 "image": OC_CI_GOLANG,
                 "environment": DRONE_HTTP_PROXY_ENV,
-                "commands": [
-                    "make -C docs docs-copy",
-                ],
+                "commands": ["make docs-copy"],
             },
             {
-                "name": "test",
+                "name": "docs-hugo-drone-prep",
                 "image": OC_CI_GOLANG,
                 "environment": DRONE_HTTP_PROXY_ENV,
+                "commands": ["make docs-hugo-drone-prep"],
+            },
+            {
+                "name": "docs-build",
+                "image": OC_CI_HUGO_STATIC_IMAGE,
+                "environment": DRONE_HTTP_PROXY_ENV,
                 "commands": [
-                    "make -C docs test",
+                    "cd hugo",
+                    "hugo",
                 ],
             },
             {
@@ -2437,6 +2446,7 @@ def docs():
                 "commands": [
                     "tree docs/hugo/public",
                     "rm -rf docs/hugo",
+                    "rm -rf hugo",
                 ],
             },
         ],
