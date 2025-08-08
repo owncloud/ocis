@@ -1,6 +1,6 @@
 ---
 title: Graph
-date: 2025-08-08T09:01:40.214430801Z
+date: 2025-08-08T14:14:52.983335564Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/graph
@@ -198,6 +198,8 @@ ocis graph list-unified-roles
 
 The output of this command includes the following information for each role:
 
+* `LABEL`\
+  The Label of the role.
 * `UID`\
   The unique identifier of the role.
 * `Enabled`\
@@ -210,17 +212,40 @@ The output of this command includes the following information for each role:
 **Example output (shortned)**
 
 ```bash
-+--------------------------------------+----------+--------------------------------+--------------------------------+------------------------------------------+
-|                 UID                  | ENABLED  |          DESCRIPTION           |           CONDITION            |         ALLOWED RESOURCE ACTIONS         |
-+--------------------------------------+----------+--------------------------------+--------------------------------+------------------------------------------+
-| a8d5fe5e-96e3-418d-825b-534dbdf22b99 | enabled  | View and download.             | exists @Resource.Root          | libre.graph/driveItem/path/read          |
-|                                      |          |                                |                                | libre.graph/driveItem/quota/read         |
-|                                      |          |                                |                                | libre.graph/driveItem/content/read       |
-|                                      |          |                                |                                | libre.graph/driveItem/permissions/read   |
-|                                      |          |                                |                                | libre.graph/driveItem/children/read      |
-|                                      |          |                                |                                | libre.graph/driveItem/deleted/read       |
-|                                      |          |                                |                                | libre.graph/driveItem/basic/read         |
-+--------------------------------------+----------+--------------------------------+--------------------------------+------------------------------------------+
++----+--------------------------------+--------------------------------------+----------+--------------------------------+--------------------------------+------------------------------------------+
+|  # |            LABEL               |                UID                   | ENABLED  |          DESCRIPTION           |           CONDITION            |         ALLOWED RESOURCE ACTIONS         |
++----+--------------------------------+--------------------------------------+----------+--------------------------------+--------------------------------+------------------------------------------+
+|  1 | View                           | a8d5fe5e-96e3-418d-825b-534dbdf22b99 | enabled  | View and download.             | exists @Resource.Root          | libre.graph/driveItem/path/read          |
+|    |                                |                                      |          |                                |                                | libre.graph/driveItem/quota/read         |
+|    |                                |                                      |          |                                |                                | libre.graph/driveItem/content/read       |
+|    |                                |                                      |          |                                |                                | libre.graph/driveItem/permissions/read   |
+|    |                                |                                      |          |                                |                                | libre.graph/driveItem/children/read      |
+|    |                                |                                      |          |                                |                                | libre.graph/driveItem/deleted/read       |
+|    |                                |                                      |          |                                |                                | libre.graph/driveItem/basic/read         |
++----+--------------------------------+--------------------------------------+----------+--------------------------------+--------------------------------+------------------------------------------+
+```
+
+Render the table as Markdown:
+
+```bash
+ocis graph list-unified-roles -o md
+```
+
+**Example output (shortned)**
+
+```bash
+| #  |              LABEL               |                 UID                  | ENABLED  |                                     DESCRIPTION                                      |                         CONDITION                         |         ALLOWED RESOURCE ACTIONS         |
+|:--:|:--------------------------------:|:------------------------------------:|:--------:|:------------------------------------------------------------------------------------:|:---------------------------------------------------------:|:----------------------------------------:|
+| 1  |              Viewer              | b1e2218d-eef8-4d4c-b82d-0f1a1b48f3b5 | enabled  |                                  View and download.                                  |                   exists @Resource.File                   |     libre.graph/driveItem/path/read      |
+|    |                                  |                                      |          |                                                                                      |                  exists @Resource.Folder                  |     libre.graph/driveItem/quota/read     |
+|    |                                  |                                      |          |                                                                                      |  exists @Resource.File && @Subject.UserType=="Federated"  |    libre.graph/driveItem/content/read    |
+|    |                                  |                                      |          |                                                                                      | exists @Resource.Folder && @Subject.UserType=="Federated" |   libre.graph/driveItem/children/read    |
+|    |                                  |                                      |          |                                                                                      |                                                           |    libre.graph/driveItem/deleted/read    |
+|    |                                  |                                      |          |                                                                                      |                                                           |     libre.graph/driveItem/basic/read     |
+| 2  |         ViewerListGrants         | d5041006-ebb3-4b4a-b6a4-7c180ecfb17d | disabled |                     View, download and show all invited people.                      |                   exists @Resource.File                   |     libre.graph/driveItem/path/read      |
+|    |                                  |                                      |          |                                                                                      |                  exists @Resource.Folder                  |     libre.graph/driveItem/quota/read     |
+|    |                                  |                                      |          |                                                                                      |  exists @Resource.File && @Subject.UserType=="Federated"  |    libre.graph/driveItem/content/read    |
+|    |                                  |                                      |          |                                                                                      | exists @Resource.Folder && @Subject.UserType=="Federated" |  libre.graph/driveItem/permissions/read  |
 ```
 
 ### Create Unified Roles
