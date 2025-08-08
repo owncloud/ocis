@@ -3,7 +3,6 @@ package store
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 
@@ -12,6 +11,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/settings/pkg/settings"
 	"github.com/owncloud/ocis/v2/services/settings/pkg/store/defaults"
 	"github.com/owncloud/reva/v2/pkg/errtypes"
+	"google.golang.org/protobuf/encoding/protojson"
 )
 
 // ListBundles returns all bundles in the dataPath folder that match the given type.
@@ -49,7 +49,7 @@ func (s *Store) ListBundles(bundleType settingsmsg.Bundle_Type, bundleIDs []stri
 		}
 
 		bundle := &settingsmsg.Bundle{}
-		err = json.Unmarshal(b, bundle)
+		err = protojson.Unmarshal(b, bundle)
 		if err != nil {
 			return nil, err
 		}
@@ -82,7 +82,7 @@ func (s *Store) ReadBundle(bundleID string) (*settingsmsg.Bundle, error) {
 	}
 
 	bundle := &settingsmsg.Bundle{}
-	return bundle, json.Unmarshal(b, bundle)
+	return bundle, protojson.Unmarshal(b, bundle)
 }
 
 // ReadSetting tries to find a setting by the given id from the metadata service
@@ -125,7 +125,7 @@ func (s *Store) WriteBundle(record *settingsmsg.Bundle) (*settingsmsg.Bundle, er
 	s.Init()
 	ctx := context.TODO()
 
-	b, err := json.Marshal(record)
+	b, err := protojson.Marshal(record)
 	if err != nil {
 		return nil, err
 	}

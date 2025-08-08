@@ -3,13 +3,13 @@ package store
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 
 	"github.com/gofrs/uuid"
 	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 	"github.com/owncloud/ocis/v2/services/settings/pkg/settings"
 	"github.com/owncloud/reva/v2/pkg/errtypes"
+	"google.golang.org/protobuf/encoding/protojson"
 )
 
 // ListValues reads all values that match the given bundleId and accountUUID.
@@ -44,7 +44,7 @@ func (s *Store) ListValues(bundleID, accountUUID string) ([]*settingsmsg.Value, 
 		}
 
 		v := &settingsmsg.Value{}
-		err = json.Unmarshal(b, v)
+		err = protojson.Unmarshal(b, v)
 		if err != nil {
 			return nil, err
 		}
@@ -81,7 +81,7 @@ func (s *Store) ReadValue(valueID string) (*settingsmsg.Value, error) {
 		return nil, err
 	}
 	val := &settingsmsg.Value{}
-	return val, json.Unmarshal(b, val)
+	return val, protojson.Unmarshal(b, val)
 }
 
 // ReadValueByUniqueIdentifiers tries to find a value given a set of unique identifiers
@@ -109,7 +109,7 @@ func (s *Store) ReadValueByUniqueIdentifiers(accountUUID, settingID string) (*se
 		}
 
 		v := &settingsmsg.Value{}
-		err = json.Unmarshal(b, v)
+		err = protojson.Unmarshal(b, v)
 		if err != nil {
 			return nil, err
 		}
@@ -129,7 +129,7 @@ func (s *Store) WriteValue(value *settingsmsg.Value) (*settingsmsg.Value, error)
 	if value.Id == "" {
 		value.Id = uuid.Must(uuid.NewV4()).String()
 	}
-	b, err := json.Marshal(value)
+	b, err := protojson.Marshal(value)
 	if err != nil {
 		return nil, err
 	}
