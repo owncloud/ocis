@@ -13,7 +13,7 @@ plugins:
       - paths=source_relative
 
   - name: microweb
-    path: ../../.bingo/protoc-gen-microweb
+    path: ../../bin/protoc-gen-microweb
     out: ../gen/
     opt:
       - paths=source_relative

@@ -67,6 +67,10 @@ OCIS_MODULES = \
 	ocis \
 	ocis-pkg
 
+# tools that can be built
+TOOLS_MODULES = \
+	tools/protoc-gen-microweb
+
 # bin file definitions
 PHP_CS_FIXER=php -d zend.enable_gc=0 vendor-bin/owncloud-codestyle/vendor/bin/php-cs-fixer
 PHP_CODESNIFFER=vendor-bin/php_codesniffer/vendor/bin/phpcs
@@ -116,6 +120,10 @@ help:
 	@echo -e "\tmake test-gherkin-lint\t\t${BLUE}run lint checks on Gherkin feature files${RESET}"
 	@echo -e "\tmake test-gherkin-lint-fix\t${BLUE}apply lint fixes to gherkin feature files${RESET}"
 	@echo
+	@echo -e "${GREEN}Protobuf tools:\n${RESET}"
+	@echo -e "\tmake tools\t\t\t${BLUE}build all tools i.e. protoc-gen-microweb - protobuf generator plugin${RESET}"	
+	@echo -e "\tmake protobuf\t\t\t${BLUE}generate protobuf code for services${RESET}"
+	@echo
 
 .PHONY: clean-tests
 clean-tests:
@@ -154,10 +162,11 @@ vet:
     done
 
 .PHONY: clean
-clean:
+clean:	
 	@for mod in $(OCIS_MODULES); do \
         $(MAKE) --no-print-directory -C $$mod clean || exit 1; \
     done
+	@rm -rf bin/* # default place for tools binaries
 
 .PHONY: docs-generate
 docs-generate:
@@ -222,10 +231,20 @@ go-coverage:
     done
 
 .PHONY: protobuf
-protobuf:
+protobuf: tools
 	@for mod in ./services/thumbnails ./services/settings; do \
         echo -n "% protobuf $$mod: "; $(MAKE) --no-print-directory -C $$mod protobuf || exit 1; \
     done
+
+.PHONY: tools
+tools:
+	@echo "Building tools..."
+	@mkdir -p bin
+	@for tool in $(TOOLS_MODULES); do \
+		echo "Building $$tool..."; \
+		cd $$tool && go build -o ../../bin/$$(basename $$tool) . && cd ../..; \
+		echo "$$tool built successfully at bin/$$(basename $$tool)"; \
+	done
 
 .PHONY: golangci-lint
 golangci-lint:

@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+option go_package = "github.com/owncloud/ocis/v2/tools/protoc-gen-microweb/examples/greeter/proto";
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+service Greeter {
+	rpc Say(SayRequest) returns (SayResponse) {
+		option (google.api.http) = {
+			post: "/api/say"
+			body: "*"
+		};
+	}
+	rpc SayAnything(google.protobuf.Empty) returns (SayResponse) {
+		option (google.api.http) = {
+			post: "/api/anything"
+			body: "*"
+		};
+	}
+}
+
+message SayRequest {
+	string name = 1;
+}
+
+message SayResponse {
+	string message = 1;
+	string err = 2;
+}

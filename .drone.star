@@ -605,6 +605,9 @@ def testPipelines(ctx):
     if ("skip" not in config["k6LoadTests"] or not config["k6LoadTests"]["skip"]) and ("k6-test" in ctx.build.title.lower() or ctx.build.event == "cron"):
         pipelines += k6LoadTests(ctx)
 
+    # Add protoc-gen-microweb test
+    pipelines.append(protocGenMicrowebTest())
+
     return pipelines
 
 def getGoBinForTesting(ctx):
@@ -3815,3 +3818,45 @@ def ocisServicePods():
             "kubectl get svc -A",
         ],
     }]
+
+def protocGenMicrowebTest():
+    steps = [
+        {
+            "name": "protoc-gen-microweb-test",
+            "image": OC_CI_GOLANG,
+            "commands": [
+                "cd %s" % dirs["base"],
+                "go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.36.6",
+                "go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest",
+                "go install github.com/go-micro/generator/cmd/protoc-gen-micro@latest",
+                "go build -o bin/protoc-gen-microweb tools/protoc-gen-microweb/",
+                "cd tools/protoc-gen-microweb",
+                "chmod +x test.sh",
+                "./test.sh",
+            ],
+            "volumes": [
+                {
+                    "name": "gopath",
+                    "path": "/go",
+                },
+            ],
+        },
+    ]
+
+    return {
+        "kind": "pipeline",
+        "type": "docker",
+        "name": "protoc-gen-microweb-test",
+        "platform": {
+            "os": "linux",
+            "arch": "amd64",
+        },
+        "steps": steps,
+        "trigger": {
+            "ref": [
+                "refs/heads/master",
+                "refs/tags/**",
+                "refs/pull/**",
+            ],
+        },
+    }
