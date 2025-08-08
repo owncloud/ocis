@@ -1076,6 +1076,7 @@
         "email"
       ],
       "optionalClientScopes": [
+        "acr",
         "address",
         "phone",
         "offline_access",
@@ -1136,6 +1137,7 @@
         "email"
       ],
       "optionalClientScopes": [
+        "acr",
         "address",
         "phone",
         "offline_access",
@@ -1288,6 +1290,7 @@
         "email"
       ],
       "optionalClientScopes": [
+        "acr",
         "address",
         "phone",
         "offline_access",
@@ -2158,6 +2161,128 @@
   "supportedLocales": [],
   "authenticationFlows": [
     {
+      "id" : "5392b282-096e-4994-a3ad-780eb4023d27",
+      "alias" : "step up flow",
+      "description" : "browser login flow with step-up mechanism",
+      "providerId" : "basic-flow",
+      "topLevel" : true,
+      "builtIn" : false,
+      "authenticationExecutions" : [
+        {
+          "authenticator" : "auth-cookie",
+          "authenticatorFlow" : false,
+          "requirement" : "ALTERNATIVE",
+          "priority" : 20,
+          "autheticatorFlow" : false,
+          "userSetupAllowed" : false
+        },
+        {
+          "authenticator" : "auth-spnego",
+          "authenticatorFlow" : false,
+          "requirement" : "DISABLED",
+          "priority" : 25,
+          "autheticatorFlow" : false,
+          "userSetupAllowed" : false
+        },
+        {
+          "authenticator" : "identity-provider-redirector",
+          "authenticatorFlow" : false,
+          "requirement" : "ALTERNATIVE",
+          "priority" : 30,
+          "autheticatorFlow" : false,
+          "userSetupAllowed" : false
+        },
+        {
+          "authenticatorFlow" : true,
+          "requirement" : "ALTERNATIVE",
+          "priority" : 31,
+          "autheticatorFlow" : true,
+          "flowAlias" : "base step up",
+          "userSetupAllowed" : false
+        }
+      ]
+    },
+    {
+      "id" : "00e79c8a-93b3-4c0d-857f-7bf5be19d0cb",
+      "alias" : "base step up",
+      "description" : "base step up flow",
+      "providerId" : "basic-flow",
+      "topLevel" : false,
+      "builtIn" : false,
+      "authenticationExecutions" : [
+        {
+          "authenticatorFlow" : true,
+          "requirement" : "CONDITIONAL",
+          "priority" : 2,
+          "autheticatorFlow" : true,
+          "flowAlias" : "step up level 1",
+          "userSetupAllowed" : false
+        },
+        {
+          "authenticatorFlow" : true,
+          "requirement" : "CONDITIONAL",
+          "priority" : 3,
+          "autheticatorFlow" : true,
+          "flowAlias" : "step up level 2",
+          "userSetupAllowed" : false
+        }
+      ]
+    },
+    {
+      "id" : "32ec29d9-dd12-45ce-bdbc-3e597aca4b51",
+      "alias" : "step up level 1",
+      "description" : "loa 1 with username and password",
+      "providerId" : "basic-flow",
+      "topLevel" : false,
+      "builtIn" : false,
+      "authenticationExecutions" : [
+        {
+          "authenticatorConfig" : "loa level 1",
+          "authenticator" : "conditional-level-of-authentication",
+          "authenticatorFlow" : false,
+          "requirement" : "REQUIRED",
+          "priority" : 0,
+          "autheticatorFlow" : false,
+          "userSetupAllowed" : false
+        },
+        {
+          "authenticator" : "auth-username-password-form",
+          "authenticatorFlow" : false,
+          "requirement" : "REQUIRED",
+          "priority" : 1,
+          "autheticatorFlow" : false,
+          "userSetupAllowed" : false
+        }
+      ]
+    },
+    {
+      "id" : "b8c46bfb-cf9e-414a-a773-b17e0fdaa475",
+      "alias" : "step up level 2",
+      "description" : "loa 2 with totp",
+      "providerId" : "basic-flow",
+      "topLevel" : false,
+      "builtIn" : false,
+      "authenticationExecutions" : [
+        {
+          "authenticatorConfig" : "loa level 2",
+          "authenticator" : "conditional-level-of-authentication",
+          "authenticatorFlow" : false,
+          "requirement" : "REQUIRED",
+          "priority" : 0,
+          "autheticatorFlow" : false,
+          "userSetupAllowed" : false
+        },
+        {
+          "authenticator" : "auth-otp-form",
+          "authenticatorFlow" : false,
+          "requirement" : "REQUIRED",
+          "priority" : 1,
+          "autheticatorFlow" : false,
+          "userSetupAllowed" : false
+        }
+      ]
+    },
+    {
       "id": "8964f931-b866-4a05-ab1c-89331a566887",
       "alias": "Account verification options",
       "description": "Method with which to verity the existing account",
@@ -2683,6 +2808,22 @@
       "config": {
         "update.profile.on.first.login": "missing"
       }
+    },
+    {
+      "id" : "5b7b9811-6a2d-47ba-8722-7a4a5cb67cc3",
+      "alias" : "loa level 2",
+      "config" : {
+        "loa-condition-level" : "2",
+        "loa-max-age" : "36000"
+      }
+    },
+    {
+      "id" : "fc6ac583-5601-4c97-a57b-3b044dc4007f",
+      "alias" : "loa level 1",
+      "config" : {
+        "loa-condition-level" : "1",
+        "loa-max-age" : "36000"
+      }
     }
   ],
   "requiredActions": [
@@ -2779,7 +2920,8 @@
     "oauth2DeviceCodeLifespan": "600",
     "parRequestUriLifespan": "60",
     "clientSessionMaxLifespan": "0",
-    "organizationsEnabled": "false"
+    "organizationsEnabled": "false",
+    "acr.loa.map" : "{\"regular\":\"1\",\"advanced\":\"2\"}"
   },
   "keycloakVersion": "25.0.0",
   "userManagedAccessAllowed": false,
