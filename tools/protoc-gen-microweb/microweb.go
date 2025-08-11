@@ -51,6 +51,10 @@ func (p *MicroWebModule) InitContext(ctx pgs.BuildContext) {
 	p.eimp = make(map[pgs.FilePath]string)
 	p.pconv = map[pgs.FilePath]pgs.FilePath{
 		"google.golang.org/protobuf/types/known/emptypb": "github.com/golang/protobuf/ptypes/empty",
+		"go-micro.dev/v4/api":                            "github.com/micro/go-micro/v4/api",
+		"go-micro.dev/v4/client":                         "github.com/micro/go-micro/v4/client",
+		"go-micro.dev/v4/server":                         "github.com/micro/go-micro/v4/server",
+		"go-micro.dev/v4/errors":                         "github.com/micro/go-micro/v4/errors",
 	}
 	p.tpl = template.Must(tpl.Parse(microwebTpl))
 }

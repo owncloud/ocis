@@ -132,7 +132,7 @@ const file_greeter_proto_rawDesc = "" +
 	"\x03err\x18\x02 \x01(\tR\x03err2\x8f\x01\n" +
 	"\aGreeter\x125\n" +
 	"\x03Say\x12\v.SayRequest\x1a\f.SayResponse\"\x13\x82\xd3\xe4\x93\x02\r:\x01*\"\b/api/say\x12M\n" +
-	"\vSayAnything\x12\x16.google.protobuf.Empty\x1a\f.SayResponse\"\x18\x82\xd3\xe4\x93\x02\x12:\x01*\"\r/api/anythingBNZLgithub.com/owncloud/ocis/v2/tools/protoc-gen-microweb/examples/greeter/protob\x06proto3"
+	"\vSayAnything\x12\x16.google.protobuf.Empty\x1a\f.SayResponse\"\x18\x82\xd3\xe4\x93\x02\x12:\x01*\"\r/api/anythingB@Z>github.com/owncloud/protoc-gen-microweb/examples/greeter/protob\x06proto3"
 
 var (
 	file_greeter_proto_rawDescOnce sync.Once

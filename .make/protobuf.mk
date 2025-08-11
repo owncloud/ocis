@@ -13,6 +13,9 @@ protoc-deps: $(BINGO)
 	@cd ../.. && GOPATH="" GOBIN=".bingo" $(BINGO) get -l github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc
 	@cd ../.. && GOPATH="" GOBIN=".bingo" $(BINGO) get -l github.com/favadi/protoc-go-inject-tag
 
+	# Ensure local protoc-gen-microweb binary exists for buf to use
+	@cd ../.. && [ -x bin/protoc-gen-microweb ] || (echo "Building protoc-gen-microweb tool..." && mkdir -p bin && cd tools/protoc-gen-microweb && GOWORK=off go build -o ../../bin/protoc-gen-microweb .)
+
 .PHONY: buf-generate
 buf-generate: $(BUF) protoc-deps $(SHA1_LOCK_FILE)
 	@find $(abspath $(CURDIR)/../../protogen/proto/) -type f -print0 | sort -z | xargs -0 sha1sum > buf.sha1.lock.tmp

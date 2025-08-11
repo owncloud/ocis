@@ -7,9 +7,35 @@ set -e
 
 assert_file_exists() {
     if [ ! -f "$1" ]; then
-        echo "❌ File $1 does not exist"
+        echo "File $1 does not exist"
         exit 1
     fi
+}
+
+setup_prerequisites() {
+  echo "0. Checking and installing protoc tools..."
+  which protoc || (echo "protoc not found" && exit 1)
+
+  # Install compatible protoc toolchain (pinned)
+  echo "Installing compatible protoc-gen-go version..."
+  go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.36.6
+  which protoc-gen-go-grpc || (echo "Installing protoc-gen-go-grpc..." && go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.5.1)
+  which protoc-gen-micro || (echo "Installing protoc-gen-micro..." && go install github.com/go-micro/generator/cmd/protoc-gen-micro@v1.0.0)
+  which protoc-gen-go || (echo "Installing protoc-gen-go..." && go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.36.6)
+  export PATH="$PATH:$(go env GOPATH)/bin"
+
+  # Build the protoc-gen-microweb tool
+  echo "Building protoc-gen-microweb tool..."
+  GOWORK=off go build -o protoc-gen-microweb .
+
+  # Clone googleapis (unpinned HEAD). For full determinism, pin a commit.
+  echo "    Setting up googleapis..."
+  if [ ! -d "/tmp/googleapis" ]; then
+    echo "Cloning googleapis to /tmp/googleapis..."
+    git clone https://github.com/googleapis/googleapis.git /tmp/googleapis
+  else
+    echo "googleapis already exists at /tmp/googleapis"
+  fi
 }
 
 main() {
@@ -19,31 +45,8 @@ main() {
   cd "$(dirname "$0")"
   echo "Working directory: $(pwd)"
   
-  # Ensure protoc tools are available and use compatible versions
-  echo "0. Checking and installing protoc tools..."
-  which protoc || (echo "❌ protoc not found" && exit 1)
-  
-  # Install compatible protoc-gen-go version
-  echo "Installing compatible protoc-gen-go version..."
-  go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.36.6
-  
-  # Install other required tools
-  which protoc-gen-go-grpc || (echo "Installing protoc-gen-go-grpc..." && go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest)
-  which protoc-gen-micro || (echo "Installing protoc-gen-micro..." && go install github.com/go-micro/generator/cmd/protoc-gen-micro@latest)
-  
-  # Build the protoc-gen-microweb tool
-  echo "Building protoc-gen-microweb tool..."
-  # Use GOWORK=off to build in standalone mode
-  GOWORK=off go build -o protoc-gen-microweb .
-  
-  # Clone googleapis if not exists
-  echo "    Setting up googleapis..."
-  if [ ! -d "/tmp/googleapis" ]; then
-    echo "Cloning googleapis to /tmp/googleapis..."
-    git clone https://github.com/googleapis/googleapis.git /tmp/googleapis
-  else
-    echo "googleapis already exists at /tmp/googleapis"
-  fi
+  # Prerequisites and environment
+  setup_prerequisites
   
   echo "2. Assert initial example state"
   # Use greeter example
@@ -59,10 +62,8 @@ main() {
   assert_file_exists go.mod
   assert_file_exists go.sum
 
-  # Ensure we're using the correct protobuf version
-  echo "3. Ensuring correct protobuf versions..."
-  GOWORK=off go mod tidy
-  GOWORK=off go mod download
+  # Ensure we're using the correct protobuf version (no tidy/download for determinism)
+  echo "3. Ensuring correct protobuf versions... (no go mod tidy/download)"
 
   # Generate code - microweb creates flat structure regardless of module parameter
   echo "4. Generate code..."
@@ -70,15 +71,17 @@ main() {
     --proto_path=/tmp/googleapis \
     --proto_path=proto/ \
     --go_out=proto/ \
-    --go_opt=module=github.com/owncloud/ocis/v2/tools/protoc-gen-microweb/examples/greeter/proto \
+    --go_opt=module=github.com/owncloud/protoc-gen-microweb/examples/greeter/proto \
     --go-grpc_out=proto/ \
-    --go-grpc_opt=module=github.com/owncloud/ocis/v2/tools/protoc-gen-microweb/examples/greeter/proto \
+    --go-grpc_opt=module=github.com/owncloud/protoc-gen-microweb/examples/greeter/proto \
     --micro_out=proto/ \
-    --micro_opt=module=github.com/owncloud/ocis/v2/tools/protoc-gen-microweb/examples/greeter/proto \
+    --micro_opt=module=github.com/owncloud/protoc-gen-microweb/examples/greeter/proto \
     --microweb_out=proto/ \
-    --microweb_opt=module=github.com/owncloud/ocis/v2/tools/protoc-gen-microweb/examples/greeter/proto \
+    --microweb_opt=module=github.com/owncloud/protoc-gen-microweb/examples/greeter/proto \
     --plugin=protoc-gen-microweb=../../protoc-gen-microweb \
     proto/greeter.proto
+
+  # 4.5. Skipping post-generation tidy/download; rely on pinned go.mod/go.sum
 
   # Assert generated files are in the correct location
   assert_file_exists proto/greeter.proto
@@ -87,8 +90,9 @@ main() {
   assert_file_exists proto/greeter.pb.micro.go
 
   echo "5. Run and test server..."
-  # Use GOWORK=off to run in standalone mode and -mod=mod to handle vendoring
-  GOWORK=off go run -mod=mod main.go &
+  # Use GOWORK=off to run in standalone mode; -mod=readonly forbids go.mod edits
+  GOWORK=off go build -mod=readonly -o greeter .
+  GOWORK=off ./greeter &
   SERVER_PID=$!
 
   # Wait for server to start

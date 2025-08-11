@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option go_package = "github.com/owncloud/ocis/v2/tools/protoc-gen-microweb/examples/greeter/proto";
+option go_package = "github.com/owncloud/protoc-gen-microweb/examples/greeter/proto";
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 

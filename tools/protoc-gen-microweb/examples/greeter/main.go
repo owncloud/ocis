@@ -9,7 +9,7 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/owncloud/ocis/v2/tools/protoc-gen-microweb/examples/greeter/proto"
+	"github.com/owncloud/protoc-gen-microweb/examples/greeter/proto"
 )
 
 func main() {
