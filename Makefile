@@ -201,7 +201,7 @@ check-env-var-annotations:
 	.make/check-env-var-annotations.sh
 
 .PHONY: ci-go-generate
-ci-go-generate:
+ci-go-generate: tools
 	@for mod in $(OCIS_MODULES); do \
         $(MAKE) --no-print-directory -C $$mod ci-go-generate || exit 1; \
     done
