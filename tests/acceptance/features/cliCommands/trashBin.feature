@@ -1,6 +1,6 @@
 @env-config
 Feature: trashbin
-  As a administrator
+  As an administrator
   I want to manage trash-bin
   So that I can manage handle trashed resources efficiently
 

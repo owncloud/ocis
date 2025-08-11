@@ -397,14 +397,16 @@ class CliContext implements Context {
 	}
 
 	/**
-	 * @When the administrator restarts the upload sessions of file :file
+	 * @When /^the administrator (restarts|resumes) the upload session of file "([^"]*)" using the CLI$/
 	 *
+	 * @param string $flag
 	 * @param string $file
 	 *
 	 * @return void
 	 * @throws JsonException
 	 */
-	public function theAdministratorRestartsUploadSessionsOfFile(string $file): void {
+	public function theAdministratorResumesOrRestartsUploadSessionOfFileUsingTheCLI(string $flag, string $file): void {
+		$flag = rtrim($flag, "s");
 		$response = CliHelper::runCommand(["command" => "storage-users uploads sessions --json"]);
 		$this->featureContext->theHTTPStatusCodeShouldBe(200, '', $response);
 		$responseArray = $this->getJSONDecodedCliMessage($response);
@@ -415,7 +417,7 @@ class CliContext implements Context {
 			}
 		}
 
-		$command = "storage-users uploads sessions --id=$uploadId --restart --json";
+		$command = "storage-users uploads sessions --id=$uploadId --$flag --json";
 		$body = [
 			"command" => $command,
 		];

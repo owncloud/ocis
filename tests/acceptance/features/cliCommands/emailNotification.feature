@@ -1,6 +1,6 @@
 @env-config @email
 Feature: get grouped email notification
-  As a user
+  As an administrator
   I want to get email notification of grouped events related to me either daily or weekly
   So that I can stay updated about the events either once a day or once a week
 

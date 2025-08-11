@@ -1,6 +1,6 @@
 @env-config
 Feature: reindex space via CLI command
-    As an admin
+    As an administrator
     I want to reindex space
     So that I can improve search performance by ensuring that the index is up-to-date
 

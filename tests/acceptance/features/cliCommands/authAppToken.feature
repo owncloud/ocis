@@ -1,6 +1,6 @@
 @env-config
 Feature: create auth-app token
-  As an admin
+  As an administrator
   I want to create auth-app Tokens
   So that I can use 3rd party apps
 
