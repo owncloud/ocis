@@ -86,9 +86,9 @@ a| `OCIS_INSECURE` +
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
-++ ++
+++false ++
 a| [subs=-attributes]
-++ ++
+++Insecure TLS mode is only allowed in development environments with OCIS_INSECURE=true ++
     
     
     

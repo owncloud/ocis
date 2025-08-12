@@ -149,8 +149,9 @@ variables:
   foundincode: true
   name: OCIS_INSECURE
   type: ""
-  default_value: ""
-  description: ""
+  default_value: "false"
+  description: Insecure TLS mode is only allowed in development environments with
+    OCIS_INSECURE=true
   do_ignore: false
 - rawname: RUN_CMD_TEST
   path: internal/testenv/test.go:32
