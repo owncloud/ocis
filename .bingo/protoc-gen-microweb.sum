@@ -13,6 +13,8 @@ github.com/owncloud/protoc-gen-microweb v0.0.0-20250808105641-c77b256d76b3 h1:a/
 github.com/owncloud/protoc-gen-microweb v0.0.0-20250808105641-c77b256d76b3/go.mod h1:yGWNA7ytSBiIg5cbGClW54ai8dqBnreYYqcFYt8XN/s=
 github.com/owncloud/protoc-gen-microweb v0.0.0-20250811124423-992ffebf226e h1:ddv5qAK5pn3lIEzzqRF+NkIpQyIGLxAgEvS0rypbvFs=
 github.com/owncloud/protoc-gen-microweb v0.0.0-20250811124423-992ffebf226e/go.mod h1:jTXCFbvYT4PYJaaxXlmagalixGDdpFQdp4hyZt9jAnU=
+github.com/owncloud/protoc-gen-microweb v0.0.0-20250812083720-c9765347567d h1:3Z9QM6i1PFaCLY9DZnNoWfqF8/A5hGoV9tUMXq5UNWQ=
+github.com/owncloud/protoc-gen-microweb v0.0.0-20250812083720-c9765347567d/go.mod h1:yGWNA7ytSBiIg5cbGClW54ai8dqBnreYYqcFYt8XN/s=
 github.com/pkg/errors v0.8.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 github.com/pkg/sftp v1.10.1/go.mod h1:lYOWFsE0bwd1+KfKJaKeuokY15vzFx25BLbzYYoAxZI=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
