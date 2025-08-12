@@ -49,7 +49,7 @@ services:
     restart: always
 
   collabora:
-    image: collabora/code:25.04.2.2.1
+    image: collabora/code:25.04.4.2.1
     # release notes: https://www.collaboraonline.com/release-notes/
     networks:
       ocis-net:
