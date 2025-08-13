@@ -128,8 +128,8 @@ type JWKS struct {
 }
 
 type ClaimsChecker struct {
-	Name   string `yaml:"name" env:"PROXY_OIDC_CLAIMSCHECKER_NAME" desc:"Name of the claims checker to be used. It can be 'Bool'" introductionVersion:"%%NEXT%%"`
-	Params string `yaml:"params" env:"PROXY_OIDC_CLAIMSCHECKER_PARAMS" desc:"Parameters to be used by the chosen claims checker. Formatting depends on the specific checker, but it usually like 'param1=value1;param2=value2'" introductionVersion:"%%NEXT%%"`
+	Name   string `yaml:"name" env:"PROXY_OIDC_CLAIMSCHECKER_NAME" desc:"Name of the claims checker to be used. It can be 'Bool'" introductionVersion:"releaseX"`
+	Params string `yaml:"params" env:"PROXY_OIDC_CLAIMSCHECKER_PARAMS" desc:"Parameters to be used by the chosen claims checker. Formatting depends on the specific checker, but it usually like 'param1=value1;param2=value2'" introductionVersion:"releaseX"`
 }
 
 // Cache is a TTL cache configuration.
