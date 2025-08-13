@@ -74,3 +74,21 @@ func ReadStringClaim(path string, claims map[string]interface{}) (string, error)
 
 	return value, fmt.Errorf("claim path '%s' not set or empty", path)
 }
+
+func ReadBoolClaim(path string, claims map[string]interface{}) (bool, error) {
+	// check the simple case first
+	if value, ok := claims[path].(bool); ok {
+		return value, nil
+	}
+
+	claim, err := WalkSegments(SplitWithEscaping(path, ".", "\\"), claims)
+	if err != nil {
+		return false, err
+	}
+
+	if value, ok := claim.(bool); ok {
+		return value, nil
+	}
+
+	return false, fmt.Errorf("claim path '%s' not set or not have a boolean value", path)
+}
