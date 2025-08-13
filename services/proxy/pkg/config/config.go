@@ -110,13 +110,14 @@ const (
 // OIDC is the config for the OpenID-Connect middleware. If set the proxy will try to authenticate every request
 // with the configured oidc-provider
 type OIDC struct {
-	Issuer                  string `yaml:"issuer" env:"OCIS_URL;OCIS_OIDC_ISSUER;PROXY_OIDC_ISSUER" desc:"URL of the OIDC issuer. It defaults to URL of the builtin IDP." introductionVersion:"pre5.0"`
-	Insecure                bool   `yaml:"insecure" env:"OCIS_INSECURE;PROXY_OIDC_INSECURE" desc:"Disable TLS certificate validation for connections to the IDP. Note that this is not recommended for production environments." introductionVersion:"pre5.0"`
-	AccessTokenVerifyMethod string `yaml:"access_token_verify_method" env:"PROXY_OIDC_ACCESS_TOKEN_VERIFY_METHOD" desc:"Sets how OIDC access tokens should be verified. Possible values are 'none' and 'jwt'. When using 'none', no special validation apart from using it for accessing the IPD's userinfo endpoint will be done. When using 'jwt', it tries to parse the access token as a jwt token and verifies the signature using the keys published on the IDP's 'jwks_uri'." introductionVersion:"pre5.0"`
-	SkipUserInfo            bool   `yaml:"skip_user_info" env:"PROXY_OIDC_SKIP_USER_INFO" desc:"Do not look up user claims at the userinfo endpoint and directly read them from the access token. Incompatible with 'PROXY_OIDC_ACCESS_TOKEN_VERIFY_METHOD=none'." introductionVersion:"pre5.0"`
-	UserinfoCache           *Cache `yaml:"user_info_cache"`
-	JWKS                    JWKS   `yaml:"jwks"`
-	RewriteWellKnown        bool   `yaml:"rewrite_well_known" env:"PROXY_OIDC_REWRITE_WELLKNOWN" desc:"Enables rewriting the /.well-known/openid-configuration to the configured OIDC issuer. Needed by the Desktop Client, Android Client and iOS Client to discover the OIDC provider." introductionVersion:"pre5.0"`
+	Issuer                  string        `yaml:"issuer" env:"OCIS_URL;OCIS_OIDC_ISSUER;PROXY_OIDC_ISSUER" desc:"URL of the OIDC issuer. It defaults to URL of the builtin IDP." introductionVersion:"pre5.0"`
+	Insecure                bool          `yaml:"insecure" env:"OCIS_INSECURE;PROXY_OIDC_INSECURE" desc:"Disable TLS certificate validation for connections to the IDP. Note that this is not recommended for production environments." introductionVersion:"pre5.0"`
+	AccessTokenVerifyMethod string        `yaml:"access_token_verify_method" env:"PROXY_OIDC_ACCESS_TOKEN_VERIFY_METHOD" desc:"Sets how OIDC access tokens should be verified. Possible values are 'none' and 'jwt'. When using 'none', no special validation apart from using it for accessing the IPD's userinfo endpoint will be done. When using 'jwt', it tries to parse the access token as a jwt token and verifies the signature using the keys published on the IDP's 'jwks_uri'." introductionVersion:"pre5.0"`
+	SkipUserInfo            bool          `yaml:"skip_user_info" env:"PROXY_OIDC_SKIP_USER_INFO" desc:"Do not look up user claims at the userinfo endpoint and directly read them from the access token. Incompatible with 'PROXY_OIDC_ACCESS_TOKEN_VERIFY_METHOD=none'." introductionVersion:"pre5.0"`
+	UserinfoCache           *Cache        `yaml:"user_info_cache"`
+	JWKS                    JWKS          `yaml:"jwks"`
+	RewriteWellKnown        bool          `yaml:"rewrite_well_known" env:"PROXY_OIDC_REWRITE_WELLKNOWN" desc:"Enables rewriting the /.well-known/openid-configuration to the configured OIDC issuer. Needed by the Desktop Client, Android Client and iOS Client to discover the OIDC provider." introductionVersion:"pre5.0"`
+	ClaimsChecker           ClaimsChecker `yaml:"claims_checker"`
 }
 
 type JWKS struct {
@@ -124,6 +125,11 @@ type JWKS struct {
 	RefreshTimeout    uint64 `yaml:"refresh_timeout" env:"PROXY_OIDC_JWKS_REFRESH_TIMEOUT" desc:"The timeout in seconds for an outgoing JWKS request." introductionVersion:"pre5.0"`
 	RefreshRateLimit  uint64 `yaml:"refresh_limit" env:"PROXY_OIDC_JWKS_REFRESH_RATE_LIMIT" desc:"Limits the rate in seconds at which refresh requests are performed for unknown keys. This is used to prevent malicious clients from imposing high network load on the IDP via ocis." introductionVersion:"pre5.0"`
 	RefreshUnknownKID bool   `yaml:"refresh_unknown_kid" env:"PROXY_OIDC_JWKS_REFRESH_UNKNOWN_KID" desc:"If set to 'true', the JWKS refresh request will occur every time an unknown KEY ID (KID) is seen. Always set a 'refresh_limit' when enabling this." introductionVersion:"pre5.0"`
+}
+
+type ClaimsChecker struct {
+	Name   string `yaml:"name" env:"PROXY_OIDC_CLAIMSCHECKER_NAME" desc:"Name of the claims checker to be used. It can be 'Bool'" introductionVersion:"%%NEXT%%"`
+	Params string `yaml:"params" env:"PROXY_OIDC_CLAIMSCHECKER_PARAMS" desc:"Parameters to be used by the chosen claims checker. Formatting depends on the specific checker, but it usually like 'param1=value1;param2=value2'" introductionVersion:"%%NEXT%%"`
 }
 
 // Cache is a TTL cache configuration.
