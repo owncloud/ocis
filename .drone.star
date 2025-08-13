@@ -1027,9 +1027,6 @@ def codestyle(ctx):
                              {
                                  "name": "php-style",
                                  "image": OC_CI_PHP % phpVersion,
-                                 "environment": {
-                                     "PHP_CS_FIXER_IGNORE_ENV": "true",
-                                 },
                                  "commands": [
                                      "make test-php-style",
                                  ],
