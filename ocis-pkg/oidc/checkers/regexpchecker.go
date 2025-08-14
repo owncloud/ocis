@@ -35,3 +35,10 @@ func (rc *RegexpChecker) CheckClaims(claims map[string]interface{}) error {
 	}
 	return nil
 }
+
+func (rc *RegexpChecker) RequireMap() map[string]string {
+	return map[string]string{
+		"Type": "Regexp",
+		"Data": rc.key + "=" + rc.exp.String(),
+	}
+}

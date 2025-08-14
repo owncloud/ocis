@@ -32,3 +32,10 @@ func (ac *AcrChecker) CheckClaims(claims map[string]interface{}) error {
 	}
 	return nil
 }
+
+func (ac *AcrChecker) RequireMap() map[string]string {
+	return map[string]string{
+		"Type": "Acr",
+		"Data": "acr=" + ac.value,
+	}
+}

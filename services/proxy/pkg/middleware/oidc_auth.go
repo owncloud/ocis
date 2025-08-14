@@ -196,17 +196,17 @@ func (m *OIDCAuthenticator) shouldCheckClaims(r *http.Request) bool {
 }
 
 // Authenticate implements the authenticator interface to authenticate requests via oidc auth.
-func (m *OIDCAuthenticator) Authenticate(r *http.Request) (*http.Request, bool) {
+func (m *OIDCAuthenticator) Authenticate(r *http.Request) (*http.Request, map[string]string, bool) {
 	// there is no bearer token on the request,
 	if !m.shouldServe(r) {
 		// The authentication of public path requests is handled by another authenticator.
 		// Since we can't guarantee the order of execution of the authenticators, we better
 		// implement an early return here for paths we can't authenticate in this authenticator.
-		return nil, false
+		return nil, nil, false
 	}
 	token := strings.TrimPrefix(r.Header.Get(_headerAuthorization), _bearerPrefix)
 	if token == "" {
-		return nil, false
+		return nil, nil, false
 	}
 
 	claims, newSession, err := m.getClaims(token, r)
@@ -216,7 +216,7 @@ func (m *OIDCAuthenticator) Authenticate(r *http.Request) (*http.Request, bool) 
 				Err(err).
 				Str("path", r.URL.Path).
 				Msg("can't access protected path without valid claims")
-			return nil, false
+			return nil, m.claimsChecker.RequireMap(), false
 		}
 	}
 
@@ -231,7 +231,7 @@ func (m *OIDCAuthenticator) Authenticate(r *http.Request) (*http.Request, bool) 
 			Str("network.peer.address", host).
 			Str("network.peer.port", port).
 			Msg("failed to authenticate the request")
-		return nil, false
+		return nil, nil, false
 	}
 	m.Logger.Debug().
 		Str("authenticator", "oidc").
@@ -243,5 +243,5 @@ func (m *OIDCAuthenticator) Authenticate(r *http.Request) (*http.Request, bool) 
 		ctx = oidc.NewContextSessionFlag(ctx, true)
 	}
 
-	return r.WithContext(oidc.NewContext(ctx, claims)), true
+	return r.WithContext(oidc.NewContext(ctx, claims)), nil, true
 }
