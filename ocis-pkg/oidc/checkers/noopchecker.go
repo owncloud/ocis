@@ -13,3 +13,7 @@ func NewNoopChecker() *NoopChecker {
 func (nc *NoopChecker) CheckClaims(_ map[string]interface{}) error {
 	return nil
 }
+
+func (nc *NoopChecker) RequireMap() map[string]string {
+	return nil
+}
