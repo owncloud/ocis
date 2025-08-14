@@ -370,30 +370,45 @@ class CliContext implements Context {
 			$table,
 			['LABEL', 'ENABLED', 'DESCRIPTION'],
 		);
-		$actualRoles = $table->getColumnsHash();
+
+		$expectedRoles = $table->getColumnsHash();
 		$response = $this->featureContext->getResponse();
 		$decodedResponse = $this->featureContext->getJsonDecodedResponse($response);
 
 		// Regex pattern to extract LABEL, ENABLED, and DESCRIPTION
 		$pattern = '/│\s*\d+\s*│\s*([^\|]+?)\s*│\s*([a-f0-9\-]{36})\s*│\s*(enabled|disabled)\s*│\s*(.*?)\s*│/i';
 		preg_match_all($pattern, $decodedResponse['message'], $matches, PREG_SET_ORDER);
-		$expectedRoles = [];
 
+		$actualRoles = [];
 		foreach ($matches as $match) {
-			$expectedRoles[] = [
+			$actualRoles[] = [
 				'LABEL' => trim($match[1]),
 				'ENABLED' => trim($match[3]),
 				'DESCRIPTION' => trim($match[4]),
 			];
 		}
 
-		for ($i = 0; $i < \count($actualRoles); $i++) {
+		// Compare expected roles with actual roles by LABEL and assert equality
+		foreach ($expectedRoles as $expected) {
+			$label = $expected['LABEL'];
+			$actual = null;
+			foreach ($actualRoles as $role) {
+				if ($role['LABEL'] === $label) {
+					$actual = $role;
+					break;
+				}
+			}
+
+			Assert::assertNotNull(
+				$actual,
+				"Role with LABEL '$label' not found in command output.",
+			);
+
 			Assert::assertEquals(
-				$expectedRoles[$i],
-				$actualRoles[$i],
-				"Mismatch at row " . ($i + 1) .
-				":\nExpected: " . json_encode($expectedRoles[$i]) .
-				"\nActual: " . json_encode($actualRoles[$i]),
+				$expected,
+				$actual,
+				"Mismatch for LABEL '$label':\nExpected: " . json_encode($expected) .
+				"\nActual: " . json_encode($actual),
 			);
 		}
 	}
