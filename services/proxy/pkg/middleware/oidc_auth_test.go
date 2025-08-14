@@ -58,7 +58,7 @@ var _ = Describe("Authenticating requests", Label("OIDCAuthenticator"), func() {
 			req := httptest.NewRequest(http.MethodGet, "http://example.com/example/path", http.NoBody)
 			req.Header.Set(_headerAuthorization, "Bearer jwt.token.sig")
 
-			req2, valid := authenticator.Authenticate(req)
+			req2, _, valid := authenticator.Authenticate(req)
 
 			Expect(valid).To(Equal(true))
 			Expect(req2).ToNot(BeNil())
@@ -67,7 +67,7 @@ var _ = Describe("Authenticating requests", Label("OIDCAuthenticator"), func() {
 			req := httptest.NewRequest(http.MethodGet, "http://example.com/dav/public-files", http.NoBody)
 			req.Header.Set(_headerAuthorization, "Bearer jwt.token.sig")
 
-			req2, valid := authenticator.Authenticate(req)
+			req2, _, valid := authenticator.Authenticate(req)
 
 			Expect(valid).To(Equal(true))
 			Expect(req2).ToNot(BeNil())
@@ -77,7 +77,7 @@ var _ = Describe("Authenticating requests", Label("OIDCAuthenticator"), func() {
 			req.Header.Set(_headerAuthorization, "Bearer jwt.token.sig")
 			req.Header.Set(headerShareToken, "sharetoken")
 
-			req2, valid := authenticator.Authenticate(req)
+			req2, _, valid := authenticator.Authenticate(req)
 
 			// TODO Should the authentication of public path requests is handled by another authenticator?
 			//Expect(valid).To(Equal(false))
@@ -89,7 +89,7 @@ var _ = Describe("Authenticating requests", Label("OIDCAuthenticator"), func() {
 			req := httptest.NewRequest(http.MethodGet, "http://example.com/dav/public-files/?public-token=sharetoken", http.NoBody)
 			req.Header.Set(_headerAuthorization, "Bearer jwt.token.sig")
 
-			req2, valid := authenticator.Authenticate(req)
+			req2, _, valid := authenticator.Authenticate(req)
 
 			// TODO Should the authentication of public path requests is handled by another authenticator?
 			//Expect(valid).To(Equal(false))
