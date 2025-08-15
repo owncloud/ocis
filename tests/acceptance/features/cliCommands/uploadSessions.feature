@@ -245,3 +245,58 @@ Feature: List upload sessions via CLI command
     When the administrator waits for "3" seconds
     Then for user "Alice" file "file2.txt" of space "Personal" should be in postprocessing
     And the content of file "file1.txt" for user "Alice" should be "uploaded content"
+
+
+  Scenario: resume all failed upload using postprocessing command
+    Given the config "POSTPROCESSING_DELAY" has been set to "3s"
+    And user "Alice" has uploaded file with content "uploaded content" to "file1.txt"
+    And user "Alice" has uploaded file with content "uploaded content" to "file2.txt"
+    And the administrator has waited for "1" seconds
+    And the administrator has stopped the server
+    And the administrator has started the server
+    When the administrator waits for "3" seconds
+    Then for user "Alice" file "file1.txt" of space "Personal" should be in postprocessing
+    And for user "Alice" file "file2.txt" of space "Personal" should be in postprocessing
+    When the administrator resumes all uploads session using post processing command
+    Then the command should be successful
+    When the administrator waits for "3" seconds
+    And the content of file "file1.txt" for user "Alice" should be "uploaded content"
+    And the content of file "file2.txt" for user "Alice" should be "uploaded content"
+
+
+  Scenario: resume all failed upload on finished step using postprocessing command
+    Given the config "POSTPROCESSING_DELAY" has been set to "3s"
+    And user "Alice" has uploaded file with content "uploaded content" to "file1.txt"
+    And user "Alice" has uploaded file with content "uploaded content" to "file2.txt"
+    And the administrator has waited for "1" seconds
+    And the administrator has stopped the server
+    And the administrator has started the server
+    When the administrator waits for "3" seconds
+    Then for user "Alice" file "file1.txt" of space "Personal" should be in postprocessing
+    And for user "Alice" file "file2.txt" of space "Personal" should be in postprocessing
+    When the administrator resumes all uploads session in finished step using post processing command
+    Then the command should be successful
+    When the administrator waits for "3" seconds
+    And the content of file "file1.txt" for user "Alice" should be "uploaded content"
+    And the content of file "file2.txt" for user "Alice" should be "uploaded content"
+
+
+#  Scenario: resume all failed upload on virus scan step using postprocessing command
+#    Given the following configs have been set:
+#      | config                           | value     |
+#      | POSTPROCESSING_STEPS             | virusscan |
+#      | ANTIVIRUS_INFECTED_FILE_HANDLING | abort     |
+#      | POSTPROCESSING_DELAY             | 10s       |
+#    And user "Alice" has uploaded file with content "uploaded content" to "file1.txt"
+#    And user "Alice" has uploaded file with content "uploaded content" to "file2.txt"
+#    And the administrator has waited for "1" seconds
+#    And the administrator has stopped the server
+#    And the administrator has started the server
+#    When the administrator waits for "3" seconds
+#    Then for user "Alice" file "file1.txt" of space "Personal" should be in postprocessing
+#    And for user "Alice" file "file2.txt" of space "Personal" should be in postprocessing
+#    When the administrator resumes all uploads session in virusscan step using post processing command
+#    Then the command should be successful
+#    When the administrator waits for "3" seconds
+#    And the content of file "file1.txt" for user "Alice" should be "uploaded content"
+#    And the content of file "file2.txt" for user "Alice" should be "uploaded content"
