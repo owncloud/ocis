@@ -526,6 +526,40 @@ class CliContext implements Context {
 	}
 
 	/**
+	 * @When /^the administrator resumes all uploads session using post processing command$/
+	 *
+	 * @return void
+	 * @throws JsonException
+	 */
+	public function theAdministratorResumesAllUploadsSessionUsingPostprocessingCommand(): void {
+		$command = "postprocessing resume";
+		var_dump($command);
+		$body = [
+			"command" => $command,
+		];
+		$this->featureContext->setResponse(CliHelper::runCommand($body));
+	}
+
+	/**
+	 * @When /^the administrator resumes all uploads session in (finished|virusscan) step using post processing command$/
+	 *
+	 * @param string $step
+	 *
+	 * @return void
+	 * @throws JsonException
+	 */
+	public function theAdministratorResumesAllUploadsSessionInFinishedOrVirusScanStepUsingPostprocessingCommand(
+		string $step,
+	): void {
+		$command = "postprocessing resume -s $step";
+		var_dump($command);
+		$body = [
+			"command" => $command,
+		];
+		$this->featureContext->setResponse(CliHelper::runCommand($body));
+	}
+
+	/**
 	 * @Then /^the CLI response (should|should not) contain these entries:$/
 	 *
 	 * @param string $shouldOrNot
