@@ -1,6 +1,6 @@
 @env-config
 Feature: backup consistency
-  As a user
+  As an administrator
   I want to check my data for inconsistencies
   So that I can backup my data
 

@@ -1,6 +1,6 @@
 @env-config @cli-stale-uploads
 Feature: stale upload via CLI command
-  As a user
+  As an administrator
   I want to manage stale uploads
   So that I clean up stale uploads from storage
 
