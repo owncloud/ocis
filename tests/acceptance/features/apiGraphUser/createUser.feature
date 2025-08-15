@@ -90,7 +90,7 @@ Feature: create user
 
   @env-config
   Scenario Outline: create user with setting OCIS no restriction on the user name
-    Given the config "GRAPH_USERNAME_MATCH" has been set to "none"
+    Given the config "GRAPH_USERNAME_MATCH" has been set to "none" for "graph" service
     And the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     When the user "Alice" creates a new user with the following attributes using the Graph API:
       | userName       | <user>          |
@@ -107,7 +107,7 @@ Feature: create user
 
   @env-config
   Scenario: create user with setting OCIS not to assign the default user role
-    Given the config "GRAPH_ASSIGN_DEFAULT_USER_ROLE" has been set to "false"
+    Given the config "GRAPH_ASSIGN_DEFAULT_USER_ROLE" has been set to "false" for "graph" service
     When the user "admin" creates a new user with the following attributes using the Graph API:
       | userName       | sam             |
       | displayName    | test user       |
@@ -122,7 +122,7 @@ Feature: create user
 
   @env-config
   Scenario: create user with setting OCIS assign the default user role
-    Given the config "GRAPH_ASSIGN_DEFAULT_USER_ROLE" has been set to "true"
+    Given the config "GRAPH_ASSIGN_DEFAULT_USER_ROLE" has been set to "true" for "graph" service
     When the user "admin" creates a new user with the following attributes using the Graph API:
       | userName       | sam             |
       | displayName    | test user       |

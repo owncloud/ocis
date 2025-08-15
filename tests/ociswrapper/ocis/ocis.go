@@ -31,11 +31,12 @@ var runningServices = make(map[string]int)
 
 // exported variables
 var ServiceEnvConfigs = make(map[string][]string)
+var K3dServiceEnvConfigs = make(map[string][]string)
 var OcisServiceName = "ocis"
 
 func Start(envMap []string) {
-	log.Println("Starting oCIS service...")
-	StartService(OcisServiceName, envMap)
+	// log.Println("Starting oCIS service...")
+	// StartService(OcisServiceName, envMap)
 }
 
 func Stop() (bool, string) {
@@ -68,6 +69,72 @@ func Restart(envMap []string) (bool, string) {
 	common.Wg.Add(1)
 	go Start(envMap)
 
+	return WaitForConnection()
+}
+
+func UpdateEnv(service string, envMap []string) (bool, string) {
+	if envMap == nil {
+		envMap = []string{}
+	}
+
+	cmdArgs := new(bytes.Buffer)
+	for _, value := range envMap {
+		fmt.Fprintf(cmdArgs, "%s ", value)
+
+	}
+	envMap = append([]string{"set", "env", "-n", "ocis", "deployment", service}, envMap...)
+	cmd = exec.Command("kubectl", envMap...)
+	stdout, err := cmd.Output()
+	fmt.Println(string(stdout))
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	return WaitForConnection()
+}
+
+func Rollback() (bool, string) {
+	for service, envs := range K3dServiceEnvConfigs {
+		cmdArgs := []string{"set", "env", "-n", "ocis"}
+		cmdArgs = append(cmdArgs, "deployment/"+service)
+		for _, env := range envs {
+			cmdArgs = append(cmdArgs, strings.SplitN(env, "=", 2)[0]+"-")
+			cmd = exec.Command("kubectl", cmdArgs...)
+
+			fmt.Println(cmd)
+			stdout, err := cmd.Output()
+			fmt.Println(string(stdout))
+			if err != nil {
+				return false, "service didnt restart"
+			}
+			flag := true
+			for flag {
+				cmd := exec.Command("sh", "-c", "kubectl get pods -n ocis -A|grep "+service+"|wc -l")
+				fmt.Println(cmd)
+				stdout, err := cmd.Output()
+				fmt.Println(string(stdout))
+				if err != nil {
+					fmt.Println(err.Error())
+				}
+				if strings.TrimSpace(string(stdout)) == "1" {
+					for flag {
+						cmd := exec.Command("sh", "-c", "kubectl get pods -n ocis -A|grep "+service+"|grep Running|wc -l")
+						fmt.Println(cmd)
+						stdout, err := cmd.Output()
+						fmt.Println(string(stdout))
+						if err != nil {
+							fmt.Println(err.Error())
+						}
+						if strings.TrimSpace(string(stdout)) == "1" {
+							flag = false
+						}
+
+					}
+				}
+
+			}
+			delete(K3dServiceEnvConfigs, service)
+		}
+	}
 	return WaitForConnection()
 }
 
