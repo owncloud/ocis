@@ -211,3 +211,37 @@ Feature: List upload sessions via CLI command
       | large.zip |
     And the CLI response should not contain these entries:
       | file.txt |
+
+
+  Scenario: resume a specific upload session using postprocessing command
+    Given the config "POSTPROCESSING_DELAY" has been set to "3s"
+    And user "Alice" has uploaded file with content "uploaded content" to "file1.txt"
+    And user "Alice" has uploaded file with content "uploaded content" to "file2.txt"
+    And the administrator has waited for "1" seconds
+    And the administrator has stopped the server
+    And the administrator has started the server
+    When the administrator waits for "3" seconds
+    Then for user "Alice" file "file1.txt" of space "Personal" should be in postprocessing
+    And for user "Alice" file "file2.txt" of space "Personal" should be in postprocessing
+    When the administrator resumes the upload session of file "file1.txt" using postprocessing command
+    Then the command should be successful
+    When the administrator waits for "3" seconds
+    Then for user "Alice" file "file2.txt" of space "Personal" should be in postprocessing
+    And the content of file "file1.txt" for user "Alice" should be "uploaded content"
+
+
+  Scenario: restart a specific upload session using postprocessing command
+    Given the config "POSTPROCESSING_DELAY" has been set to "3s"
+    And user "Alice" has uploaded file with content "uploaded content" to "file1.txt"
+    And user "Alice" has uploaded file with content "uploaded content" to "file2.txt"
+    And the administrator has waited for "1" seconds
+    And the administrator has stopped the server
+    And the administrator has started the server
+    When the administrator waits for "3" seconds
+    Then for user "Alice" file "file1.txt" of space "Personal" should be in postprocessing
+    And for user "Alice" file "file2.txt" of space "Personal" should be in postprocessing
+    When the administrator restarts the upload session of file "file1.txt" using postprocessing command
+    Then the command should be successful
+    When the administrator waits for "3" seconds
+    Then for user "Alice" file "file2.txt" of space "Personal" should be in postprocessing
+    And the content of file "file1.txt" for user "Alice" should be "uploaded content"

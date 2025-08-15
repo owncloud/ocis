@@ -414,10 +414,42 @@ class CliContext implements Context {
 		foreach ($responseArray as $item) {
 			if ($item->filename === $file) {
 				$uploadId = $item->id;
+				break;
 			}
 		}
 
 		$command = "storage-users uploads sessions --id=$uploadId --$flag --json";
+		$body = [
+			"command" => $command,
+		];
+		$this->featureContext->setResponse(CliHelper::runCommand($body));
+	}
+
+	/**
+	 * @When /^the administrator (resumes|restarts) the upload session of file "([^"]*)" using postprocessing command$/
+	 *
+	 * @param string $flag
+	 * @param string $file
+	 *
+	 * @return void
+	 * @throws JsonException
+	 */
+	public function theAdministratorResumesOrRestartsUploadSessionOfFileUsingPostprocessingCommand(
+		string $flag,
+		string $file,
+	): void {
+		$uploadSessions = CliHelper::runCommand(["command" => "storage-users uploads sessions --json"]);
+		$this->featureContext->theHTTPStatusCodeShouldBe(200, '', $uploadSessions);
+		$responseArray = $this->getJSONDecodedCliMessage($uploadSessions);
+
+		foreach ($responseArray as $item) {
+			if ($item->filename === $file) {
+				$uploadId = $item->id;
+				break;
+			}
+		}
+
+		$command = "postprocessing resume" . ($flag === "restarts" ? " -r" : "") . " -u $uploadId";
 		$body = [
 			"command" => $command,
 		];
