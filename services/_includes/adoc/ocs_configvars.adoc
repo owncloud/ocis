@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2025-08-15-03-45-47]
+[#deprecation-note-2025-08-16-00-48-23]
 [caption=]
 .Deprecation notes for the ocs service
 [width="100%",cols="~,~,~,~",options="header"]
