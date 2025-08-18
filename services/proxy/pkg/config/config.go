@@ -128,7 +128,7 @@ type JWKS struct {
 }
 
 type ClaimsChecker struct {
-	Name   string `yaml:"name" env:"PROXY_OIDC_CLAIMSCHECKER_NAME" desc:"Name of the claims checker to be used. It can be 'Bool'" introductionVersion:"releaseX"`
+	Name   string `yaml:"name" env:"PROXY_OIDC_CLAIMSCHECKER_NAME" desc:"Name of the claims checker to be used. It can be 'Bool', 'Regexp' or 'Acr'" introductionVersion:"releaseX"`
 	Params string `yaml:"params" env:"PROXY_OIDC_CLAIMSCHECKER_PARAMS" desc:"Parameters to be used by the chosen claims checker. Formatting depends on the specific checker, but it usually like 'param1=value1;param2=value2'" introductionVersion:"releaseX"`
 }
 
