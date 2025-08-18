@@ -247,56 +247,105 @@ Feature: List upload sessions via CLI command
     And the content of file "file1.txt" for user "Alice" should be "uploaded content"
 
 
-  Scenario: resume all failed upload using postprocessing command
+  Scenario: resume all failed upload but not for unfinished upload using postprocessing command
     Given the config "POSTPROCESSING_DELAY" has been set to "3s"
-    And user "Alice" has uploaded file with content "uploaded content" to "file1.txt"
-    And user "Alice" has uploaded file with content "uploaded content" to "file2.txt"
+    And user "Alice" has created a new TUS resource in the space "Personal" with the following headers:
+      | Upload-Length   | 10                        |
+      #    dGV4dEZpbGUudHh0 is the base64 encode of textFile.txt
+      | Upload-Metadata | filename dGV4dEZpbGUudHh0 |
+      | Tus-Resumable   | 1.0.0                     |
+    And user "Alice" has uploaded file with checksum "SHA1 8cb2237d0679ca88db6464eac60da96345513964" to the last created TUS Location with offset "0" and content "12345" via TUS inside of the space "Personal" using the WebDAV API
+    And user "Alice" has uploaded file with content "uploaded content" to "file.txt"
     And the administrator has waited for "1" seconds
     And the administrator has stopped the server
     And the administrator has started the server
-    When the administrator waits for "3" seconds
-    Then for user "Alice" file "file1.txt" of space "Personal" should be in postprocessing
-    And for user "Alice" file "file2.txt" of space "Personal" should be in postprocessing
-    When the administrator resumes all uploads session using post processing command
+    When the administrator resumes all the uploads session using the post processing command
     Then the command should be successful
     When the administrator waits for "3" seconds
-    And the content of file "file1.txt" for user "Alice" should be "uploaded content"
-    And the content of file "file2.txt" for user "Alice" should be "uploaded content"
+    Then the content of file "file.txt" for user "Alice" should be "uploaded content"
+    When the administrator lists all the upload sessions
+    Then the command should be successful
+    And the CLI response should contain these entries:
+      | textFile.txt |
+    And the CLI response should not contain these entries:
+      | file.txt |
 
 
-  Scenario: resume all failed upload on finished step using postprocessing command
+  Scenario: resume all failed upload on finished step but not for unfinished upload using postprocessing command
     Given the config "POSTPROCESSING_DELAY" has been set to "3s"
-    And user "Alice" has uploaded file with content "uploaded content" to "file1.txt"
-    And user "Alice" has uploaded file with content "uploaded content" to "file2.txt"
+    And user "Alice" has created a new TUS resource in the space "Personal" with the following headers:
+      | Upload-Length   | 10                        |
+      #    dGV4dEZpbGUudHh0 is the base64 encode of textFile.txt
+      | Upload-Metadata | filename dGV4dEZpbGUudHh0 |
+      | Tus-Resumable   | 1.0.0                     |
+    And user "Alice" has uploaded file with checksum "SHA1 8cb2237d0679ca88db6464eac60da96345513964" to the last created TUS Location with offset "0" and content "12345" via TUS inside of the space "Personal" using the WebDAV API
+    And user "Alice" has uploaded file with content "uploaded content" to "file.txt"
     And the administrator has waited for "1" seconds
     And the administrator has stopped the server
     And the administrator has started the server
-    When the administrator waits for "3" seconds
-    Then for user "Alice" file "file1.txt" of space "Personal" should be in postprocessing
-    And for user "Alice" file "file2.txt" of space "Personal" should be in postprocessing
     When the administrator resumes all uploads session in finished step using post processing command
     Then the command should be successful
     When the administrator waits for "3" seconds
-    And the content of file "file1.txt" for user "Alice" should be "uploaded content"
-    And the content of file "file2.txt" for user "Alice" should be "uploaded content"
+    Then the content of file "file.txt" for user "Alice" should be "uploaded content"
+    When the administrator lists all the upload sessions
+    Then the command should be successful
+    And the CLI response should contain these entries:
+      | textFile.txt |
+    And the CLI response should not contain these entries:
+      | file.txt |
 
 
-#  Scenario: resume all failed upload on virus scan step using postprocessing command
-#    Given the following configs have been set:
-#      | config                           | value     |
-#      | POSTPROCESSING_STEPS             | virusscan |
-#      | ANTIVIRUS_INFECTED_FILE_HANDLING | abort     |
-#      | POSTPROCESSING_DELAY             | 10s       |
-#    And user "Alice" has uploaded file with content "uploaded content" to "file1.txt"
-#    And user "Alice" has uploaded file with content "uploaded content" to "file2.txt"
-#    And the administrator has waited for "1" seconds
-#    And the administrator has stopped the server
-#    And the administrator has started the server
-#    When the administrator waits for "3" seconds
-#    Then for user "Alice" file "file1.txt" of space "Personal" should be in postprocessing
-#    And for user "Alice" file "file2.txt" of space "Personal" should be in postprocessing
-#    When the administrator resumes all uploads session in virusscan step using post processing command
-#    Then the command should be successful
-#    When the administrator waits for "3" seconds
-#    And the content of file "file1.txt" for user "Alice" should be "uploaded content"
-#    And the content of file "file2.txt" for user "Alice" should be "uploaded content"
+  Scenario: resume all failed upload on virus scan steps but not for unfinished upload step using postprocessing command
+    Given the following configs have been set:
+      | config                           | value           |
+      | POSTPROCESSING_STEPS             | delay,virusscan |
+      | ANTIVIRUS_INFECTED_FILE_HANDLING | abort           |
+      | POSTPROCESSING_DELAY             | 10s             |
+    And user "Alice" has created a new TUS resource in the space "Personal" with the following headers:
+      | Upload-Length   | 10                        |
+      #    dGV4dEZpbGUudHh0 is the base64 encode of textFile.txt
+      | Upload-Metadata | filename dGV4dEZpbGUudHh0 |
+      | Tus-Resumable   | 1.0.0                     |
+    And user "Alice" has uploaded file with checksum "SHA1 8cb2237d0679ca88db6464eac60da96345513964" to the last created TUS Location with offset "0" and content "12345" via TUS inside of the space "Personal" using the WebDAV API
+    And user "Alice" has uploaded file "filesForUpload/filesWithVirus/eicar.com" to "/virusFile.txt"
+    And user "Alice" has uploaded file with content "uploaded content" to "file.txt"
+    And the administrator has waited for "1" seconds
+    And the administrator has stopped the server
+    And the administrator has started the server
+    When the administrator resumes all uploads session in virusscan step using post processing command
+    Then the command should be successful
+    When the administrator waits for "3" seconds
+    Then the content of file "file.txt" for user "Alice" should be "uploaded content"
+    When the administrator lists all the upload sessions
+    Then the command should be successful
+    And the CLI response should contain these entries:
+      | textFile.txt |
+      | virusFile.txt |
+    And the CLI response should not contain these entries:
+      | file.txt |
+
+
+  Scenario: resume virus file upload failed on virus scan step using postprocessing command
+    Given the following configs have been set:
+      | config                           | value           |
+      | POSTPROCESSING_STEPS             | delay,virusscan |
+      | ANTIVIRUS_INFECTED_FILE_HANDLING | continue         |
+      | POSTPROCESSING_DELAY             | 10s             |
+    And user "Alice" has uploaded file "filesForUpload/filesWithVirus/eicar.com" to "/virusFile.txt"
+    And the administrator has waited for "1" seconds
+    And the administrator has stopped the server
+    And the administrator has started the server
+    When the administrator waits for "3" seconds
+    Then for user "Alice" file "virusFile.txt" of space "Personal" should be in postprocessing
+    When the administrator lists all the upload sessions
+    Then the command should be successful
+    And the CLI response should contain these entries:
+      | virusFile.txt |
+    When the administrator resumes all uploads session in virusscan step using post processing command
+    Then the command should be successful
+    When the administrator waits for "3" seconds
+    Then as "Alice" file "/virusFile.txt" should exist
+    When the administrator lists all the upload sessions
+    Then the command should be successful
+    And the CLI response should not contain these entries:
+      | virusFile.txt |
