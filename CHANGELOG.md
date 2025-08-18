@@ -70,6 +70,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix space root handling in a sharedByMe: [#11533](https://github.com/owncloud/ocis/pull/11533)
 * Bugfix - Bump Reva: [#11560](https://github.com/owncloud/ocis/pull/11560)
 * Enhancement - Update Web to v11.3.1: [#11471](https://github.com/owncloud/ocis/pull/11471)
+* Enhancement - Update Web to v11.3.6: [#12914](https://github.com/owncloud/web/pull/12914)
 
 ## Details
 
@@ -107,6 +108,18 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/11471
    https://github.com/owncloud/web/releases/tag/v11.3.5
+
+* Enhancement - Update Web to v11.3.6: [#12914](https://github.com/owncloud/web/pull/12914)
+
+   - Bugfix: [owncloud/web#12890](https://github.com/owncloud/web/pull/12890)
+   Deactivated Space button clips German translated word - Bugfix:
+   [owncloud/web#12889](https://github.com/owncloud/web/pull/12889) Incorrect
+   translation when using switches language - Bugfix:
+   [owncloud/web#12893](https://github.com/owncloud/web/pull/12893) user info
+   getting translated
+
+   https://github.com/owncloud/web/pull/12914
+   https://github.com/owncloud/web/releases/tag/v11.3.6
 
 # Changelog for [7.1.3] (2025-05-27)
 
