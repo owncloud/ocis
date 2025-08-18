@@ -39,6 +39,7 @@
   "bruteForceProtected": true,
   "permanentLockout": false,
   "maxTemporaryLockouts": 0,
+  "bruteForceStrategy": "MULTIPLE",
   "maxFailureWaitSeconds": 900,
   "minimumQuickLoginWaitSeconds": 60,
   "waitIncrementSeconds": 60,
@@ -845,6 +846,7 @@
       "frontchannelLogout": false,
       "protocol": "openid-connect",
       "attributes": {
+        "realm_client": "false",
         "client.secret.creation.time": "1718778122",
         "post.logout.redirect.uris": "+"
       },
@@ -891,6 +893,7 @@
       "frontchannelLogout": false,
       "protocol": "openid-connect",
       "attributes": {
+        "realm_client": "false",
         "client.secret.creation.time": "1718778122",
         "post.logout.redirect.uris": "+"
       },
@@ -927,6 +930,7 @@
       "frontchannelLogout": false,
       "protocol": "openid-connect",
       "attributes": {
+        "realm_client": "false",
         "post.logout.redirect.uris": "+",
         "pkce.code.challenge.method": "S256"
       },
@@ -979,10 +983,12 @@
       "frontchannelLogout": false,
       "protocol": "openid-connect",
       "attributes": {
+        "realm_client": "false",
+        "client.use.lightweight.access.token.enabled": "true",
         "post.logout.redirect.uris": "+"
       },
       "authenticationFlowBindingOverrides": {},
-      "fullScopeAllowed": false,
+      "fullScopeAllowed": true,
       "nodeReRegistrationTimeout": 0,
       "defaultClientScopes": [
         "basic"
@@ -1011,6 +1017,7 @@
       "frontchannelLogout": false,
       "protocol": "openid-connect",
       "attributes": {
+        "realm_client": "true",
         "client.secret.creation.time": "1718778122",
         "post.logout.redirect.uris": "+"
       },
@@ -1055,6 +1062,7 @@
         "saml.server.signature": "false",
         "saml.server.signature.keyinfo.ext": "false",
         "exclude.session.state.from.auth.response": "false",
+        "realm_client": "false",
         "backchannel.logout.session.required": "true",
         "client_credentials.use_refresh_token": "false",
         "saml_force_name_id_format": "false",
@@ -1116,6 +1124,7 @@
         "saml.server.signature": "false",
         "saml.server.signature.keyinfo.ext": "false",
         "exclude.session.state.from.auth.response": "false",
+        "realm_client": "false",
         "backchannel.logout.session.required": "true",
         "client_credentials.use_refresh_token": "false",
         "saml_force_name_id_format": "false",
@@ -1165,6 +1174,7 @@
       "frontchannelLogout": false,
       "protocol": "openid-connect",
       "attributes": {
+        "realm_client": "true",
         "post.logout.redirect.uris": "+"
       },
       "authenticationFlowBindingOverrides": {},
@@ -1200,6 +1210,8 @@
       "frontchannelLogout": false,
       "protocol": "openid-connect",
       "attributes": {
+        "realm_client": "false",
+        "client.use.lightweight.access.token.enabled": "true",
         "post.logout.redirect.uris": "+",
         "pkce.code.challenge.method": "S256"
       },
@@ -1257,25 +1269,40 @@
       "frontchannelLogout": false,
       "protocol": "openid-connect",
       "attributes": {
-        "saml.assertion.signature": "false",
+        "request.object.signature.alg": "any",
         "saml.force.post.binding": "false",
         "saml.multivalued.roles": "false",
-        "saml.encrypt": "false",
         "post.logout.redirect.uris": "+",
         "oauth2.device.authorization.grant.enabled": "false",
         "backchannel.logout.revoke.offline.tokens": "false",
-        "saml.server.signature": "false",
         "saml.server.signature.keyinfo.ext": "false",
-        "exclude.session.state.from.auth.response": "false",
+        "use.refresh.tokens": "true",
+        "realm_client": "false",
         "oidc.ciba.grant.enabled": "false",
         "backchannel.logout.url": "https://ocis.owncloud.test/backchannel_logout",
         "backchannel.logout.session.required": "true",
+        "minimum.acr.value": "1",
         "client_credentials.use_refresh_token": "false",
-        "saml_force_name_id_format": "false",
         "saml.client.signature": "false",
+        "require.pushed.authorization.requests": "false",
+        "request.object.encryption.enc": "any",
+        "default.acr.values": "1",
+        "saml.assertion.signature": "false",
+        "request.object.encryption.alg": "any",
+        "client.introspection.response.allow.jwt.claim.enabled": "false",
+        "saml.encrypt": "false",
+        "standard.token.exchange.enabled": "false",
+        "saml.server.signature": "false",
+        "exclude.session.state.from.auth.response": "false",
+        "client.use.lightweight.access.token.enabled": "false",
+        "request.object.required": "not required",
+        "saml_force_name_id_format": "false",
+        "access.token.header.type.rfc9068": "false",
         "tls.client.certificate.bound.access.tokens": "false",
+        "acr.loa.map": "{\"regular\":\"1\",\"advanced\":\"2\"}",
         "saml.authnstatement": "false",
         "display.on.consent.screen": "false",
+        "token.response.type.bearer.lower-case": "false",
         "saml.onetimeuse.condition": "false"
       },
       "authenticationFlowBindingOverrides": {},
@@ -1283,6 +1310,7 @@
       "nodeReRegistrationTimeout": -1,
       "defaultClientScopes": [
         "web-origins",
+        "acr",
         "profile",
         "roles",
         "groups",
@@ -1331,6 +1359,7 @@
         "saml.server.signature": "false",
         "saml.server.signature.keyinfo.ext": "false",
         "exclude.session.state.from.auth.response": "false",
+        "realm_client": "false",
         "backchannel.logout.session.required": "true",
         "client_credentials.use_refresh_token": "false",
         "saml_force_name_id_format": "false",
@@ -1842,6 +1871,7 @@
             "full.path": "false",
             "introspection.token.claim": "true",
             "userinfo.token.claim": "true",
+            "multivalued": "true",
             "id.token.claim": "true",
             "lightweight.claim": "false",
             "access.token.claim": "true",
@@ -2309,6 +2339,32 @@
       ]
     },
     {
+      "id": "986387b4-fe3a-45be-a375-4e1333db58d8",
+      "alias": "Auth Flow",
+      "description": "",
+      "providerId": "basic-flow",
+      "topLevel": false,
+      "builtIn": false,
+      "authenticationExecutions": [
+        {
+          "authenticatorFlow": true,
+          "requirement": "CONDITIONAL",
+          "priority": 0,
+          "autheticatorFlow": true,
+          "flowAlias": "regular",
+          "userSetupAllowed": false
+        },
+        {
+          "authenticatorFlow": true,
+          "requirement": "CONDITIONAL",
+          "priority": 1,
+          "autheticatorFlow": true,
+          "flowAlias": "advanced",
+          "userSetupAllowed": false
+        }
+      ]
+    },
+    {
       "id": "123e5711-1ee5-4f7e-ac9c-64c644daaea9",
       "alias": "Browser - Conditional OTP",
       "description": "Flow to determine if the OTP is required for the authentication",
@@ -2330,6 +2386,32 @@
           "requirement": "REQUIRED",
           "priority": 20,
           "autheticatorFlow": false,
+          "userSetupAllowed": false
+        }
+      ]
+    },
+    {
+      "id": "1bc2c1d8-5aae-4e44-a454-3e52b8a4ed9e",
+      "alias": "Browser Step up",
+      "description": "",
+      "providerId": "basic-flow",
+      "topLevel": true,
+      "builtIn": false,
+      "authenticationExecutions": [
+        {
+          "authenticator": "auth-cookie",
+          "authenticatorFlow": false,
+          "requirement": "ALTERNATIVE",
+          "priority": 0,
+          "autheticatorFlow": false,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticatorFlow": true,
+          "requirement": "ALTERNATIVE",
+          "priority": 1,
+          "autheticatorFlow": true,
+          "flowAlias": "Auth Flow",
           "userSetupAllowed": false
         }
       ]
@@ -2487,6 +2569,33 @@
           "priority": 20,
           "autheticatorFlow": true,
           "flowAlias": "First broker login - Conditional OTP",
+          "userSetupAllowed": false
+        }
+      ]
+    },
+    {
+      "id": "11a0eaa9-556d-46b0-bf54-ce708d28cffa",
+      "alias": "advanced",
+      "description": "",
+      "providerId": "basic-flow",
+      "topLevel": false,
+      "builtIn": false,
+      "authenticationExecutions": [
+        {
+          "authenticatorConfig": "advanced",
+          "authenticator": "conditional-level-of-authentication",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 0,
+          "autheticatorFlow": false,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticator": "auth-otp-form",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 1,
+          "autheticatorFlow": false,
           "userSetupAllowed": false
         }
       ]
@@ -2734,6 +2843,33 @@
       ]
     },
     {
+      "id": "a3d7bddd-56ff-44ea-844c-b61a36d9a225",
+      "alias": "regular",
+      "description": "",
+      "providerId": "basic-flow",
+      "topLevel": false,
+      "builtIn": false,
+      "authenticationExecutions": [
+        {
+          "authenticatorConfig": "regular",
+          "authenticator": "conditional-level-of-authentication",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 0,
+          "autheticatorFlow": false,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticator": "auth-username-password-form",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 1,
+          "autheticatorFlow": false,
+          "userSetupAllowed": false
+        }
+      ]
+    },
+    {
       "id": "5520aa89-cd76-438a-abae-7ccd3a2d7615",
       "alias": "reset credentials",
       "description": "Reset credentials for a user if they forgot their password or something",
@@ -2796,10 +2932,26 @@
   ],
   "authenticatorConfig": [
     {
+      "id": "54174825-25af-4e1f-9abd-61d354f32d20",
+      "alias": "advanced",
+      "config": {
+        "loa-condition-level": "2",
+        "loa-max-age": "0"
+      }
+    },
+    {
       "id": "0848606c-7510-4b09-ba0e-4dc2ef3d63f8",
       "alias": "create unique user config",
       "config": {
         "require.password.update.after.registration": "false"
+      }
+    },
+    {
+      "id": "b435a10b-bcac-4035-be7c-6d55fe84a80f",
+      "alias": "regular",
+      "config": {
+        "loa-condition-level": "1",
+        "loa-max-age": "36000"
       }
     },
     {
@@ -2900,7 +3052,7 @@
       "config": {}
     }
   ],
-  "browserFlow": "browser",
+  "browserFlow": "Browser Step up",
   "registrationFlow": "registration",
   "directGrantFlow": "direct grant",
   "resetCredentialsFlow": "reset credentials",
@@ -2923,9 +3075,11 @@
     "organizationsEnabled": "false",
     "acr.loa.map" : "{\"regular\":\"1\",\"advanced\":\"2\"}"
   },
-  "keycloakVersion": "25.0.0",
+  "keycloakVersion": "26.2.5",
   "userManagedAccessAllowed": false,
   "organizationsEnabled": false,
+  "verifiableCredentialsEnabled": false,
+  "adminPermissionsEnabled": false,
   "clientProfiles": {
     "profiles": []
   },
