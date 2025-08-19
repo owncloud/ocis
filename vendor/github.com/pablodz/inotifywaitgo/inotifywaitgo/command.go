@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-func GenerateBashCommands(s *Settings) ([]string, error) {
+func GenerateShellCommands(s *Settings) ([]string, error) {
 	if s.Options == nil {
 		return nil, errors.New(OPT_NIL)
 	}
@@ -34,27 +34,27 @@ func GenerateBashCommands(s *Settings) ([]string, error) {
 			if !Contains(VALID_EVENTS, int(event)) {
 				return nil, errors.New(INVALID_EVENT)
 			}
-			baseCmd = append(baseCmd, "-e ", EVENT_MAP[int(event)])
+			baseCmd = append(baseCmd, "-e", EVENT_MAP[int(event)])
 		}
 	}
 
 	baseCmd = append(baseCmd, s.Dir)
 
-	// remove spaces on all elements
+	// Trim spaces on all elements
 	var outCmd []string
 	for _, v := range baseCmd {
 		outCmd = append(outCmd, strings.TrimSpace(v))
 	}
 
 	if s.Verbose {
-		fmt.Println("baseCmd:", outCmd)
+		fmt.Println("Generated command:", strings.Join(outCmd, " "))
 	}
 
 	return outCmd, nil
 }
 
 // Contains checks if a slice contains an item
-func Contains[T string | int](slice []T, item T) bool {
+func Contains[T comparable](slice []T, item T) bool {
 	for _, v := range slice {
 		if v == item {
 			return true
