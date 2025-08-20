@@ -6,7 +6,10 @@
     "urls": {
       "accessDeniedHelp": "",
       "imprint": "",
-      "privacy": ""
+      "privacy": "",
+      "accessibilityStatement": "",
+      "universalAccessEasyLanguage": "",
+      "universalAccessSignLanguage": ""
     }
   },
   "clients": {
@@ -23,6 +26,11 @@
         },
         "loginPage": {
           "backgroundImg": "themes/owncloud/assets/loginBackground.jpg"
+        },
+        "icons": {
+          "universalAccess": "",
+          "universalAccessEasyLanguage": "",
+          "universalAccessSignLanguage": ""
         },
         "designTokens": {
           "breakpoints": {
