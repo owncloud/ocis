@@ -3,6 +3,6 @@ package inotifywaitgo
 import "os/exec"
 
 func killOthers() error {
-	cmd := exec.Command("bash", "-c", "pkill inotifywait").Run()
-	return cmd
+	cmd := exec.Command("pkill", "inotifywait")
+	return cmd.Run()
 }
