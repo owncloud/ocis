@@ -177,17 +177,18 @@ func (m OIDCAuthenticator) shouldServe(req *http.Request) bool {
 // provided request.
 func (m *OIDCAuthenticator) shouldCheckClaims(r *http.Request) bool {
 	// the list is currently hardcoded
-	protectedPaths := []string{
+	protectedPrefixes := []string{
 		"/graph/v1.0/users",
 		"/graph/v1.0/groups",
+		"/graph/v1.0/drives",
 		"/graph/v1beta1/drives",
 	}
 
-	for _, path := range protectedPaths {
-		if r.URL.Path == path {
+	for _, pfx := range protectedPrefixes {
+		if strings.HasPrefix(r.URL.Path, pfx) {
 			q := r.URL.Query()
-			// we need to check claims if the $search query is NOT present (or empty)
-			if q.Get("$search") == "" { // if $query isn't present, it will return the empty string
+			// For list endpoints, allow $search exemption; otherwise enforce ACR
+			if q.Get("$search") == "" {
 				return true
 			}
 		}

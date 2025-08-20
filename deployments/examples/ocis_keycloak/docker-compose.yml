@@ -63,6 +63,9 @@ services:
       PROXY_ROLE_ASSIGNMENT_DRIVER: "oidc"
       OCIS_OIDC_ISSUER: https://${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}/realms/${KEYCLOAK_REALM:-oCIS}
       PROXY_OIDC_REWRITE_WELLKNOWN: "true"
+      # Backend step-up: require advanced ACR on protected admin paths (per PR #11603)
+      PROXY_OIDC_CLAIMSCHECKER_NAME: "Acr"
+      PROXY_OIDC_CLAIMSCHECKER_PARAMS: "value=advanced"
       WEB_OIDC_CLIENT_ID: ${OCIS_OIDC_CLIENT_ID:-web}
       # general config
       OCIS_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}
@@ -81,6 +84,10 @@ services:
       OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST: "banned-password-list.txt"
       PROXY_CSP_CONFIG_FILE_LOCATION: /etc/ocis/csp.yaml
       KEYCLOAK_DOMAIN: ${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}
+      # serve local web build
+      WEB_ASSET_CORE_PATH: "/web-dist"
+      WEB_ASSET_APPS_PATH: "/web-dist/js"
+      WEB_ASSET_THEMES_PATH: "/web-dist/assets/themes"
     volumes:
       - ./config/ocis/banned-password-list.txt:/etc/ocis/banned-password-list.txt
       - ./config/ocis/csp.yaml:/etc/ocis/csp.yaml
@@ -123,6 +130,8 @@ services:
     environment:
       OCIS_DOMAIN: ${OCIS_DOMAIN:-ocis.owncloud.test}
       KC_HOSTNAME: ${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}
+      KC_HOSTNAME_STRICT: "false"
+      KC_HOSTNAME_STRICT_HTTPS: "false"
       KC_DB: postgres
       KC_DB_URL: "jdbc:postgresql://postgres:5432/keycloak"
       KC_DB_USERNAME: keycloak
@@ -133,6 +142,7 @@ services:
       # as replacement of --proxy=edge
       KC_PROXY_HEADERS: xforwarded
       KC_HTTP_ENABLED: true
+      KC_PROXY: edge
       # tracing
       KC_TRACING_ENABLED: ${KEYCLOAK_TRACING:-false}
       KC_TRACING_ENDPOINT: http://jaeger:4317
