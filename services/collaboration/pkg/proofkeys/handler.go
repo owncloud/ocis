@@ -111,11 +111,15 @@ func (vh *VerifyHandler) Verify(accessToken, url, timestamp, sig64, oldSig64 str
 	expectedProof := vh.generateProof(accessToken, url, timestamp)
 	hashedProof := sha256.Sum256(expectedProof)
 
-	// verify
-	if err := rsa.VerifyPKCS1v15(pubkeys.Key, crypto.SHA256, hashedProof[:], signature); err != nil {
-		if err := rsa.VerifyPKCS1v15(pubkeys.Key, crypto.SHA256, hashedProof[:], oldSignature); err != nil {
+	// verify using PSS padding for better security
+	pssOpts := &rsa.PSSOptions{
+		SaltLength: rsa.PSSSaltLengthEqualsHash,
+		Hash:       crypto.SHA256,
+	}
+	if err := rsa.VerifyPSS(pubkeys.Key, crypto.SHA256, hashedProof[:], signature, pssOpts); err != nil {
+		if err := rsa.VerifyPSS(pubkeys.Key, crypto.SHA256, hashedProof[:], oldSignature, pssOpts); err != nil {
 			if pubkeys.OldKey != nil {
-				return rsa.VerifyPKCS1v15(pubkeys.OldKey, crypto.SHA256, hashedProof[:], signature)
+				return rsa.VerifyPSS(pubkeys.OldKey, crypto.SHA256, hashedProof[:], signature, pssOpts)
 			} else {
 				return err
 			}
