@@ -1,6 +1,6 @@
 ---
 title: Clientlog Service
-date: 2025-08-20T00:47:43.648995024Z
+date: 2025-08-20T00:51:11.559539999Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/clientlog
