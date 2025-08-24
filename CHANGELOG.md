@@ -1,5 +1,6 @@
 # Table of Contents
 
+* [Changelog for unreleased](#changelog-for-unreleased-unreleased)
 * [Changelog for 7.2.0](#changelog-for-720-2025-07-14)
 * [Changelog for 7.1.3](#changelog-for-713-2025-05-27)
 * [Changelog for 7.1.2](#changelog-for-712-2025-03-28)
@@ -56,6 +57,24 @@
 * [Changelog for 1.2.0](#changelog-for-120-2021-02-17)
 * [Changelog for 1.1.0](#changelog-for-110-2021-01-22)
 * [Changelog for 1.0.0](#changelog-for-100-2020-12-17)
+
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes for unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis/compare/v7.2.0...master
+
+## Summary
+
+* Bugfix - Fix space root handling in a sharedByMe: [#11558](https://github.com/owncloud/ocis/pull/11558)
+
+## Details
+
+* Bugfix - Fix space root handling in a sharedByMe: [#11558](https://github.com/owncloud/ocis/pull/11558)
+
+   Fix space root handling in a graph sharedByMe
+
+   https://github.com/owncloud/ocis/pull/11558
 
 # Changelog for [7.2.0] (2025-07-14)
 
