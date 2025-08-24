@@ -329,11 +329,6 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiAuthApp/token.feature:183](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiAuthApp/token.feature#L183)
 - [apiAuthApp/token.feature:189](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiAuthApp/token.feature#L189)
 
-#### [[Sharing NG] sharedByMe endpoint is missing data for drives shared via link](https://github.com/owncloud/ocis/issues/8355)
-
-- [apiSharingNgShares/sharedByMe.feature:3324](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNgShares/sharedByMe.feature#L3324)
-- [apiSharingNgShares/sharedByMe.feature:3873](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSharingNgShares/sharedByMe.feature#L3873)
-
 #### [Missing shareid on response of a PROPFIND on the sharejail root](https://github.com/owncloud/ocis/issues/8510)
 
 - [apiContract/propfindShares.feature:170](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiContract/propfindShares.feature#L170)
