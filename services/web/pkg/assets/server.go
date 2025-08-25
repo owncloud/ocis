@@ -81,6 +81,13 @@ func (f *fileServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	uPath := path.Clean(path.Join("/", r.URL.Path))
 	r.URL.Path = uPath
 
+	// Additional path containment check to prevent traversal
+	rel := strings.TrimPrefix(uPath, "/")
+	if rel == "" || strings.HasPrefix(rel, "/") || strings.Contains(rel, "..") || strings.Contains(rel, "\\") {
+		http.NotFound(w, r)
+		return
+	}
+
 	tryIndex := func() {
 		r.URL.Path = "/index.html"
 
