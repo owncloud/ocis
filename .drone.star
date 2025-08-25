@@ -1970,6 +1970,26 @@ def binaryRelease(ctx, arch, build_type, target, depends_on = []):
         "target": target,
     }
 
+    # [OCISDEV-266] Avoid cross-pipeline races on GitHub Release assets by:
+    # - Uploading only OS-scoped files from each pipeline
+    # - Copying and uploading the shared EULA only from the linux pipeline
+    artifacts = []
+    if arch == "linux":
+        artifacts = [
+            "ocis/dist/release/*-linux-*",
+            "ocis/dist/release/End-User-License-Agreement-for-ownCloud-Infinite-Scale.pdf",
+        ]
+    elif arch == "darwin":
+        artifacts = [
+            "ocis/dist/release/*-darwin-*",
+        ]
+
+    finish_commands = [
+        "make -C ocis release-finish",
+    ]
+    if arch == "linux":
+        finish_commands.append("cp assets/End-User-License-Agreement-for-ownCloud-Infinite-Scale.pdf ocis/dist/release/")
+
     return {
         "kind": "pipeline",
         "type": "docker",
@@ -1993,10 +2013,7 @@ def binaryRelease(ctx, arch, build_type, target, depends_on = []):
                 "name": "finish",
                 "image": OC_CI_GOLANG,
                 "environment": DRONE_HTTP_PROXY_ENV,
-                "commands": [
-                    "make -C ocis release-finish",
-                    "cp assets/End-User-License-Agreement-for-ownCloud-Infinite-Scale.pdf ocis/dist/release/",
-                ],
+                "commands": finish_commands,
                 "when": {
                     "ref": [
                         "refs/heads/master",
@@ -2037,9 +2054,7 @@ def binaryRelease(ctx, arch, build_type, target, depends_on = []):
                     "api_key": {
                         "from_secret": "github_token",
                     },
-                    "files": [
-                        "ocis/dist/release/*",
-                    ],
+                    "files": artifacts,
                     "title": ctx.build.ref.replace("refs/tags/v", ""),
                     "note": "ocis/dist/CHANGELOG.md",
                     "overwrite": True,
