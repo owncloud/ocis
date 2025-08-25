@@ -95,7 +95,7 @@ Feature: antivirus
   @issue-10331
   Scenario Outline: public uploads a file with the virus to a public share
     Given using <dav-path-version> DAV path
-    And the config "OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false"
+    And the config "OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false" for "sharing" service
     And using SharingNG
     And user "Alice" has created folder "/uploadFolder"
     And user "Alice" has created the following resource link share:
@@ -254,7 +254,7 @@ Feature: antivirus
 
   @env-config  @issue-6494
   Scenario Outline: upload a file with virus by setting antivirus infected file handling config to continue
-    Given the config "ANTIVIRUS_INFECTED_FILE_HANDLING" has been set to "continue"
+    Given the config "ANTIVIRUS_INFECTED_FILE_HANDLING" has been set to "continue" for "antivirus" service
     And using <dav-path-version> DAV path
     When user "Alice" uploads file "filesForUpload/filesWithVirus/eicar.com" to "/aFileWithVirus.txt" using the WebDAV API
     Then the HTTP status code should be "201"
@@ -267,7 +267,7 @@ Feature: antivirus
 
   @env-config
   Scenario Outline: upload a file with virus smaller than the upload threshold
-    Given the config "ANTIVIRUS_MAX_SCAN_SIZE" has been set to "100"
+    Given the config "ANTIVIRUS_MAX_SCAN_SIZE" has been set to "100" for "antivirus" service
     And using <dav-path-version> DAV path
     When user "Alice" uploads file "filesForUpload/filesWithVirus/eicar.com" to "/aFileWithVirus.txt" using the WebDAV API
     Then the HTTP status code should be "201"
@@ -283,7 +283,7 @@ Feature: antivirus
 
   @env-config
   Scenario Outline: upload a file with virus larger than the upload threshold
-    Given the config "ANTIVIRUS_MAX_SCAN_SIZE" has been set to "100"
+    Given the config "ANTIVIRUS_MAX_SCAN_SIZE" has been set to "100" for "antivirus" service
     And using <dav-path-version> DAV path
     When user "Alice" uploads file "filesForUpload/filesWithVirus/eicar_com.zip" to "/aFileWithVirus.txt" using the WebDAV API
     Then the HTTP status code should be "201"
@@ -337,7 +337,7 @@ Feature: antivirus
 
   @env-config @issue-10331
   Scenario Outline: try to overwrite a file with the virus content in a public link share
-    Given the config "OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false"
+    Given the config "OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false" for "sharing" service
     And using <dav-path-version> DAV path
     And using SharingNG
     And user "Alice" has uploaded file with content "hello" to "test.txt"

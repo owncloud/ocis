@@ -4253,7 +4253,7 @@ Feature: an user gets the resources shared to them
 
   @env-config @issue-8314
   Scenario: sharee lists the folder share after sharer is deleted (Project space)
-    Given the config "GRAPH_SPACES_USERS_CACHE_TTL" has been set to "1"
+    Given the config "GRAPH_SPACES_USERS_CACHE_TTL" has been set to "1" for "graph" service
     And using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
@@ -4464,7 +4464,7 @@ Feature: an user gets the resources shared to them
 
   @env-config @issue-8314
   Scenario: sharee lists the file share with after sharer is deleted (Project space)
-    Given the config "GRAPH_SPACES_USERS_CACHE_TTL" has been set to "1"
+    Given the config "GRAPH_SPACES_USERS_CACHE_TTL" has been set to "1" for "graph" service
     And using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the Graph API

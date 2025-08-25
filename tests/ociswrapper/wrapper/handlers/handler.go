@@ -108,6 +108,84 @@ func SetEnvHandler(res http.ResponseWriter, req *http.Request) {
 	sendResponse(res, http.StatusInternalServerError, message)
 }
 
+// func K3dSetEnvHandler(res http.ResponseWriter, req *http.Request) {
+// 	if req.Method != http.MethodPut {
+// 		sendResponse(res, http.StatusMethodNotAllowed, "")
+// 		return
+// 	}
+// 	envBody, err := parseJsonBody(req.Body)
+// 	if err != nil {
+// 		sendResponse(res, http.StatusMethodNotAllowed, "Invalid json body")
+// 		return
+// 	}
+
+// 	var message string
+// 	var envMap []string
+
+// 	for service, envs := range envBody {
+// 		for _, value := range envs.([]any) {
+// 			for env, value := range value.(map[string]any) {
+// 				envMap = append(envMap, fmt.Sprintf("%s=%v", env, value))
+// 			}
+// 		}
+// 		ocis.K3dServiceEnvConfigs[service] = append(ocis.K3dServiceEnvConfigs[service], envMap...)
+// 		success, _ := ocis.UpdateEnv(service, envMap)
+// 		if !success {
+// 			message = "Failed to restart oCIS with new configuration"
+// 			sendResponse(res, http.StatusInternalServerError, message)
+// 			return
+// 		}
+// 		envMap = []string{}
+// 	}
+// 	message = "oCIS configured successfully"
+// 	sendResponse(res, http.StatusOK, message)
+// }
+
+func K3dSetEnvHandler(res http.ResponseWriter, req *http.Request) {
+	if req.Method != http.MethodPut {
+		sendResponse(res, http.StatusMethodNotAllowed, "Method not allowed")
+		return
+	}
+
+	envBody, err := parseJsonBody(req.Body)
+	if err != nil {
+		sendResponse(res, http.StatusBadRequest, "Invalid JSON body")
+		return
+	}
+
+	for service, rawEnvs := range envBody {
+		rawEnvList, ok := rawEnvs.([]interface{})
+		if !ok {
+			sendResponse(res, http.StatusBadRequest, fmt.Sprintf("Invalid env list for service: %s", service))
+			return
+		}
+
+		var envMap []string
+		for _, rawEnv := range rawEnvList {
+			envEntry, ok := rawEnv.(map[string]interface{})
+			if !ok {
+				sendResponse(res, http.StatusBadRequest, "Invalid env entry format")
+				return
+			}
+			for envKey, envVal := range envEntry {
+				envMap = append(envMap, fmt.Sprintf("%s=%v", envKey, envVal))
+			}
+		}
+
+		// Overwrite instead of append to avoid growing indefinitely
+		ocis.K3dServiceEnvConfigs[service] = envMap
+
+		success, message := ocis.UpdateEnv(service, envMap)
+		if !success || message != "ok" {
+			msg := fmt.Sprintf("Failed to restart oCIS for service '%s'", service)
+			sendResponse(res, http.StatusInternalServerError, msg)
+			return
+		}
+	}
+
+	sendResponse(res, http.StatusOK, "oCIS configured successfully")
+}
+
 func RollbackHandler(res http.ResponseWriter, req *http.Request) {
 	if req.Method != http.MethodDelete {
 		sendResponse(res, http.StatusMethodNotAllowed, "")
@@ -124,6 +202,23 @@ func RollbackHandler(res http.ResponseWriter, req *http.Request) {
 	}
 
 	message = "Failed to restart oCIS with initial configuration"
+	sendResponse(res, http.StatusInternalServerError, message)
+}
+
+func K3dRollbackHandler(res http.ResponseWriter, req *http.Request) {
+	if req.Method != http.MethodDelete {
+		sendResponse(res, http.StatusMethodNotAllowed, "")
+		return
+	}
+	var message string
+	success, _ := ocis.Rollback()
+
+	if success {
+		message = "oCIS configured successfully"
+		sendResponse(res, http.StatusOK, message)
+		return
+	}
+	message = "Failed to restart oCIS with new configuration"
 	sendResponse(res, http.StatusInternalServerError, message)
 }
 

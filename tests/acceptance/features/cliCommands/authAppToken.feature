@@ -7,9 +7,9 @@ Feature: create auth-app token
   Background:
     Given user "Alice" has been created with default attributes
     And the following configs have been set:
-      | config                | value    |
-      | OCIS_ADD_RUN_SERVICES | auth-app |
-      | PROXY_ENABLE_APP_AUTH | true     |
+      | service | config                | value    |
+      | authapp | OCIS_ADD_RUN_SERVICES | auth-app |
+      | authapp | PROXY_ENABLE_APP_AUTH | true     |
 
 
   Scenario: creates auth-app token via CLI
@@ -19,7 +19,7 @@ Feature: create auth-app token
 
 
   Scenario: user deletes the created auth-app token
-    Given the config "AUTH_APP_ENABLE_IMPERSONATION" has been set to "true"
+    Given the config "AUTH_APP_ENABLE_IMPERSONATION" has been set to "true" for "auth-app" service
     And the administrator has created app token for user "Alice" with expiration time "72h" using the auth-app CLI
     When user "Alice" deletes all the created auth-app tokens using the auth-app API
     Then the HTTP status code should be "200"

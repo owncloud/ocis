@@ -536,6 +536,7 @@ default:
       contexts:
         - FeatureContext: *common_feature_context_params
         - CapabilitiesContext:
+        - OcisConfigContext:
 
     coreApiFavorites:
       paths:

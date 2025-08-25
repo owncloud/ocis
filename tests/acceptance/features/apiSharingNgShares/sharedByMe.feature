@@ -1660,7 +1660,7 @@ Feature: resources shared by user
 
   @env-config
   Scenario: sharer lists the file share after sharee (user) is deleted (Personal space)
-    Given the config "GRAPH_SPACES_USERS_CACHE_TTL" has been set to "1"
+    Given the config "GRAPH_SPACES_USERS_CACHE_TTL" has been set to "1" for "graph" service
     And the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     And user "Alice" has uploaded file with content "hello world" to "textfile.txt"
     And user "Alice" has sent the following resource share invitation:
@@ -1691,7 +1691,7 @@ Feature: resources shared by user
 
   @env-config
   Scenario: sharer lists the file share after sharee (group) is deleted (Personal space)
-    Given the config "GRAPH_SPACES_GROUPS_CACHE_TTL" has been set to "1"
+    Given the config "GRAPH_SPACES_GROUPS_CACHE_TTL" has been set to "1" for "graph" service
     And group "grp1" has been created
     And the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     And user "Alice" has uploaded file with content "hello world" to "textfile.txt"
@@ -1723,7 +1723,7 @@ Feature: resources shared by user
 
   @env-config
   Scenario: sharer lists the file share after sharee is disabled (Personal space)
-    Given the config "GRAPH_SPACES_USERS_CACHE_TTL" has been set to "1"
+    Given the config "GRAPH_SPACES_USERS_CACHE_TTL" has been set to "1" for "graph" service
     And the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     And user "Alice" has uploaded file with content "hello world" to "textfile.txt"
     And user "Alice" has sent the following resource share invitation:
@@ -1812,7 +1812,7 @@ Feature: resources shared by user
 
   @env-config
   Scenario: sharer lists the file share after sharee (user) is deleted (Project space)
-    Given the config "GRAPH_SPACES_USERS_CACHE_TTL" has been set to "1"
+    Given the config "GRAPH_SPACES_USERS_CACHE_TTL" has been set to "1" for "graph" service
     And using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
@@ -1845,7 +1845,7 @@ Feature: resources shared by user
 
   @env-config
   Scenario: sharer lists the file share after sharee (group) is deleted (Project space)
-    Given the config "GRAPH_SPACES_GROUPS_CACHE_TTL" has been set to "1"
+    Given the config "GRAPH_SPACES_GROUPS_CACHE_TTL" has been set to "1" for "graph" service
     And using spaces DAV path
     And group "grp1" has been created
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
@@ -1879,7 +1879,7 @@ Feature: resources shared by user
 
   @env-config
   Scenario: sharer lists the file share after sharee is disabled (Project space)
-    Given the config "GRAPH_SPACES_USERS_CACHE_TTL" has been set to "1"
+    Given the config "GRAPH_SPACES_USERS_CACHE_TTL" has been set to "1" for "graph" service
     And using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the Graph API
