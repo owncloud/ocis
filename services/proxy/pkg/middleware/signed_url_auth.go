@@ -215,9 +215,9 @@ func (m SignedURLAuthenticator) createSignature(url string, signingKey []byte) s
 }
 
 // Authenticate implements the authenticator interface to authenticate requests via signed URL auth.
-func (m SignedURLAuthenticator) Authenticate(r *http.Request) (*http.Request, bool) {
+func (m SignedURLAuthenticator) Authenticate(r *http.Request) (*http.Request, map[string]string, bool) {
 	if !m.shouldServe(r) {
-		return nil, false
+		return nil, nil, false
 	}
 
 	user, _, err := m.UserProvider.GetUserByClaims(r.Context(), "username", r.URL.Query().Get(_paramOCCredential))
@@ -227,7 +227,7 @@ func (m SignedURLAuthenticator) Authenticate(r *http.Request) (*http.Request, bo
 			Str("authenticator", "signed_url").
 			Str("path", r.URL.Path).
 			Msg("Could not get user by claim")
-		return nil, false
+		return nil, nil, false
 	}
 
 	user, err = m.UserRoleAssigner.ApplyUserRole(r.Context(), user)
@@ -237,7 +237,7 @@ func (m SignedURLAuthenticator) Authenticate(r *http.Request) (*http.Request, bo
 			Str("authenticator", "signed_url").
 			Str("path", r.URL.Path).
 			Msg("Could not get user by claim")
-		return nil, false
+		return nil, nil, false
 	}
 
 	ctx := revactx.ContextSetUser(r.Context(), user)
@@ -251,7 +251,7 @@ func (m SignedURLAuthenticator) Authenticate(r *http.Request) (*http.Request, bo
 			Str("path", r.URL.Path).
 			Str("url", r.URL.String()).
 			Msg("Could not get user by claim")
-		return nil, false
+		return nil, nil, false
 	}
 
 	// TODO: set user in context
@@ -259,5 +259,5 @@ func (m SignedURLAuthenticator) Authenticate(r *http.Request) (*http.Request, bo
 		Str("authenticator", "signed_url").
 		Str("path", r.URL.Path).
 		Msg("successfully authenticated request")
-	return r, true
+	return r, nil, true
 }

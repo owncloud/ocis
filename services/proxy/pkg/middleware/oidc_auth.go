@@ -11,6 +11,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
+	"github.com/owncloud/ocis/v2/ocis-pkg/oidc/checkers"
 	"github.com/pkg/errors"
 	"github.com/shamaton/msgpack/v2"
 	store "go-micro.dev/v4/store"
@@ -34,6 +35,7 @@ func NewOIDCAuthenticator(opts ...Option) *OIDCAuthenticator {
 		HTTPClient:              options.HTTPClient,
 		OIDCIss:                 options.OIDCIss,
 		oidcClient:              options.OIDCClient,
+		claimsChecker:           options.ClaimsChecker,
 		AccessTokenVerifyMethod: options.AccessTokenVerifyMethod,
 		skipUserInfo:            options.SkipUserInfo,
 		TimeFunc:                time.Now,
@@ -48,6 +50,7 @@ type OIDCAuthenticator struct {
 	userInfoCache           store.Store
 	DefaultTokenCacheTTL    time.Duration
 	oidcClient              oidc.OIDCClient
+	claimsChecker           checkers.Checker
 	AccessTokenVerifyMethod string
 	skipUserInfo            bool
 	TimeFunc                func() time.Time
@@ -170,21 +173,53 @@ func (m OIDCAuthenticator) shouldServe(req *http.Request) bool {
 	return strings.HasPrefix(header, _bearerPrefix)
 }
 
+// shouldCheckClaims returns true if we should check the claims for the
+// provided request.
+func (m *OIDCAuthenticator) shouldCheckClaims(r *http.Request) bool {
+	// the list is currently hardcoded
+	protectedPaths := []string{
+		"/graph/v1.0/users",
+		"/graph/v1.0/groups",
+		"/graph/v1beta1/drives",
+	}
+
+	for _, path := range protectedPaths {
+		if r.URL.Path == path {
+			q := r.URL.Query()
+			// we need to check claims if the $search query is NOT present (or empty)
+			if q.Get("$search") == "" { // if $query isn't present, it will return the empty string
+				return true
+			}
+		}
+	}
+	return false
+}
+
 // Authenticate implements the authenticator interface to authenticate requests via oidc auth.
-func (m *OIDCAuthenticator) Authenticate(r *http.Request) (*http.Request, bool) {
+func (m *OIDCAuthenticator) Authenticate(r *http.Request) (*http.Request, map[string]string, bool) {
 	// there is no bearer token on the request,
 	if !m.shouldServe(r) {
 		// The authentication of public path requests is handled by another authenticator.
 		// Since we can't guarantee the order of execution of the authenticators, we better
 		// implement an early return here for paths we can't authenticate in this authenticator.
-		return nil, false
+		return nil, nil, false
 	}
 	token := strings.TrimPrefix(r.Header.Get(_headerAuthorization), _bearerPrefix)
 	if token == "" {
-		return nil, false
+		return nil, nil, false
 	}
 
 	claims, newSession, err := m.getClaims(token, r)
+	if m.shouldCheckClaims(r) {
+		if err := m.claimsChecker.CheckClaims(claims); err != nil {
+			m.Logger.Error().
+				Err(err).
+				Str("path", r.URL.Path).
+				Msg("can't access protected path without valid claims")
+			return nil, m.claimsChecker.RequireMap(), false
+		}
+	}
+
 	if err != nil {
 		host, port, _ := net.SplitHostPort(r.RemoteAddr)
 		m.Logger.Error().
@@ -196,7 +231,7 @@ func (m *OIDCAuthenticator) Authenticate(r *http.Request) (*http.Request, bool) 
 			Str("network.peer.address", host).
 			Str("network.peer.port", port).
 			Msg("failed to authenticate the request")
-		return nil, false
+		return nil, nil, false
 	}
 	m.Logger.Debug().
 		Str("authenticator", "oidc").
@@ -208,5 +243,5 @@ func (m *OIDCAuthenticator) Authenticate(r *http.Request) (*http.Request, bool) 
 		ctx = oidc.NewContextSessionFlag(ctx, true)
 	}
 
-	return r.WithContext(oidc.NewContext(ctx, claims)), true
+	return r.WithContext(oidc.NewContext(ctx, claims)), nil, true
 }
