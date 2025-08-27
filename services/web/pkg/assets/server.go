@@ -79,21 +79,35 @@ func (f *fileServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	uPath := path.Clean(path.Join("/", r.URL.Path))
-	r.URL.Path = uPath
+
+	// Ensure the cleaned path is within the virtual root, and not attempting traversal.
+	if strings.HasPrefix(uPath, "/..") || strings.Contains(uPath, "../") {
+		http.NotFound(w, r)
+		return
+	}
 
 	tryIndex := func() {
-		r.URL.Path = "/index.html"
+		// Always explicitly set to known safe path
+		safeIndex := "/index.html"
+		// Check index.html is not trying to escape root (should not be, but defense-in-depth)
+		if strings.HasPrefix(safeIndex, "/..") || strings.Contains(safeIndex, "../") {
+			http.NotFound(w, r)
+			return
+		}
 
-		// not every fs contains a file named index.html,
-		// therefore, we need to check if the file exists and stop the recursion if it doesn't
-		file, err := f.fsys.Open(r.URL.Path)
+		file, err := f.fsys.Open(safeIndex)
 		if err != nil {
 			http.NotFound(w, r)
 			return
 		}
 		defer file.Close()
 
-		f.ServeHTTP(w, r)
+		// Serve the fixed "index.html" with a copied request
+		newReq := *r
+		newReq.URL = new(url.URL)
+		*newReq.URL = *r.URL
+		newReq.URL.Path = safeIndex
+		f.ServeHTTP(w, &newReq)
 	}
 
 	asset, err := f.fsys.Open(uPath)
