@@ -532,7 +532,7 @@ WEB_UI_CONFIG_FILE="tests/config/local/ocis-web.json" \
 ocis/bin/ocis server
 ```
 
-The first oCIS instance should be available at: https://localhost:9200/
+The first oCIS instance should be available at: <https://localhost:9200/>
 
 ### Setup Second oCIS Instance
 
@@ -552,7 +552,7 @@ source tests/config/local/.env-federation && ocis/bin/ocis init
 ocis/bin/ocis server
 ```
 
-The second oCIS instance should be available at: https://localhost:10200/
+The second oCIS instance should be available at: <https://localhost:10200/>
 
 {{< hint info >}}
 To enable ocm in the web interface, you need to set the following envs:
@@ -587,6 +587,43 @@ The sample `fontsMap.json` file is located in `tests/config/drone/fontsMap.json`
 {
   "defaultFont": "/path/to/ocis/tests/config/drone/NotoSans.ttf"
 }
+```
+
+## Running Test on helm setup
+
+Clone the [`ocis-charts`](https://github.com/owncloud/ocis-charts/) repository.
+
+Install [k3d](https://k3d.io/stable/#install-script)
+Install [kubectl](https://kubernetes.io/docs/tasks/tools/#kubectl)
+
+1. Setup Basicauth
+
+```bash
+cd ocis-charts
+# Enable basic auth in proxy deployment
+sed -i '/- name: PROXY_HTTP_ADDR/i\
+            - name: PROXY_ENABLE_BASIC_AUTH\n\
+value: "true"' ./charts/ocis/templates/proxy/deployment.yaml
+# copy authbasic service
+cp -r <path-to-ocis-repo>/tests/config/drone/k3s/authbasic ./charts/ocis/templates/
+sed -i '/{{- $_ := set .scope "appNameAuthMachine" "authmachine" -}}/a\  {{- $_ := set .scope "appNameAuthBasic" "authbasic" -}}' ./charts/ocis/templates/_common/_tplvalues.tpl
+```
+
+2. Install charts using k3d
+
+```bash
+k3d cluster create drone --api-port ocis.owncloud.test:33199 -p '80:80@loadbalancer' -p '443:443@loadbalancer' --k3s-arg '--tls-san=k3d@server:*' --k3s-arg '--disable=metrics-server@server:*'
+k3d kubeconfig get drone > kubeconfig.yaml
+chmod 0600 kubeconfig.yaml
+kubectl create configmap coredns-custom --namespace kube-system --from-literal='rewritehost.override=rewrite name exact ocis.owncloud.test host.k3d.internal'
+kubectl -n kube-system rollout restart deployment coredns
+make helm-install-atomic
+```
+
+3. Run test
+```bash
+cd ocis
+K3D=true TEST_SERVER_URL="ocis.owncloud.test" make test-acceptance-api BEHAT_FEATURE=tests/acceptance/features/apiArchiver/downloadById.feature
 ```
 
 ## Generating Code Coverage Report by Running Acceptance Tests
