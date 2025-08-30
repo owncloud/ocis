@@ -23,6 +23,8 @@ func Start(port string) {
 	var mux = http.NewServeMux()
 	mux.HandleFunc("/", http.NotFound)
 	mux.HandleFunc("/config", handlers.SetEnvHandler)
+	mux.HandleFunc("/k3d/config", handlers.K3dSetEnvHandler)
+	mux.HandleFunc("/k3d/rollback", handlers.K3dRollbackHandler)
 	mux.HandleFunc("/rollback", handlers.RollbackHandler)
 	mux.HandleFunc("/command", handlers.CommandHandler)
 	mux.HandleFunc("/stop", handlers.StopOcisHandler)

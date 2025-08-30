@@ -5,7 +5,7 @@ Feature: PROPFIND with depth:infinity
   So that I can get the information about a resource
 
   Background:
-    Given the config "OCDAV_ALLOW_PROPFIND_DEPTH_INFINITY" has been set to "true"
+    Given the config "OCDAV_ALLOW_PROPFIND_DEPTH_INFINITY" has been set to "true" for "ocdav" service
     And user "Alice" has been created with default attributes
     And user "Alice" has created the following folders
       | path                                        |
@@ -74,9 +74,9 @@ Feature: PROPFIND with depth:infinity
   Scenario: get the list of resources in a folder shared through public link with depth infinity
     Given using SharingNG
     And the following configs have been set:
-      | config                                       | value |
-      | OCDAV_ALLOW_PROPFIND_DEPTH_INFINITY          | true  |
-      | OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD | false |
+      | service |config                                       | value |
+      | ocdav   |OCDAV_ALLOW_PROPFIND_DEPTH_INFINITY          | true  |
+      | ocdav   |OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD | false |
     And user "Alice" has created the following resource link share:
       | resource        | simple-folder |
       | space           | Personal      |
@@ -123,9 +123,9 @@ Feature: PROPFIND with depth:infinity
   @issue-10331
   Scenario: get the list of resources in a folder shared through public link with depth infinity when depth infinity is not allowed
     Given the following configs have been set:
-      | config                                       | value |
-      | OCDAV_ALLOW_PROPFIND_DEPTH_INFINITY          | false |
-      | OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD | false |
+      | service | config                                       | value |
+      | ocdav   | OCDAV_ALLOW_PROPFIND_DEPTH_INFINITY          | false |
+      | sharing | OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD | false |
     And using SharingNG
     And user "Alice" has created the following resource link share:
       | resource        | simple-folder |
@@ -136,7 +136,7 @@ Feature: PROPFIND with depth:infinity
 
 
   Scenario Outline: get the list of files in the trashbin with depth infinity when depth infinity is not allowed
-    Given the config "OCDAV_ALLOW_PROPFIND_DEPTH_INFINITY" has been set to "false"
+    Given the config "OCDAV_ALLOW_PROPFIND_DEPTH_INFINITY" has been set to "false" for "ocdav" service
     And using <dav-path-version> DAV path
     And user "Alice" has deleted the following resources
       | path          |

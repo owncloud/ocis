@@ -21,7 +21,52 @@ features:
   policies:
     enabled: false
   ocm:
-    enabled: true
+    enabled: false
+  sharing:
+    passwordPolicies:
+      bannedPasswords:
+        - "password"
+        - "123"
+        - "12345678"
+        - "ownCloud"
+        - "owncloud-1"
+
+http:
+  cors:
+    allow_origins: []
+  csp:
+    directives:
+      childSrc:
+        - "'self'"
+      connectSrc:
+        - "'self'"
+        - "blob: https://raw.githubusercontent.com/owncloud/awesome-ocis/"
+      defaultSrc:
+        - "'none'"
+      fontSrc:
+        - "'self'"
+      frameAncestors:
+        - "'self'"
+      frameSrc:
+        - "'self'"
+        - "data: blob: https://embed.diagrams.net/"
+      imgSrc:
+        - "'self'"
+        - "blob: https://raw.githubusercontent.com/owncloud/awesome-ocis/"
+      manifestSrc:
+        - "'self'"
+      mediaSrc:
+        - "'self'"
+      objectSrc:
+        - "'self'"
+        - "blob:"
+      scriptSrc:
+        - "'self'"
+        - "'unsafe-inline'"
+      styleSrc:
+        - "'self'"
+        - "'unsafe-inline'"
+
 services:
   idm:
     persistence:

@@ -95,7 +95,7 @@ Feature: accepting invitation
   @env-config
   Scenario: user cannot accept expired invitation tokens
     Given using server "LOCAL"
-    And the config "OCM_OCM_INVITE_MANAGER_TOKEN_EXPIRATION" has been set to "1s"
+    And the config "OCM_OCM_INVITE_MANAGER_TOKEN_EXPIRATION" has been set to "1s" for "ocm" service
     And "Alice" has created the federation share invitation
     When using server "REMOTE"
     And the user waits "2" seconds for the invitation token to expire
