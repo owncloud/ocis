@@ -46,7 +46,7 @@ services:
   onlyoffice:
     # if you want to use oo enterprise edition, use: onlyoffice/documentserver-ee:<version>
     # note, you also need to add a volume, see below
-    image: onlyoffice/documentserver:9.0.4
+    image: ${ONLYOFFICE_IMAGE:-onlyoffice/documentserver}:${ONLYOFFICE_DOCKER_TAG:-latest}
     # changelog https://github.com/ONLYOFFICE/DocumentServer/releases
     networks:
       ocis-net:
@@ -56,14 +56,19 @@ services:
     environment:
       WOPI_ENABLED: "true"
       # self-signed certificates
-      USE_UNAUTHORIZED_STORAGE: "${INSECURE:-false}"
+      USE_UNAUTHORIZED_STORAGE: ${INSECURE:-false}
+      JWT_ENABLED: ${ONLYOFFICE_JWT_ENABLED:-false}
+      REDIS_SERVER_HOST: ${ONLYOFFICE_REDIS_HOST:-localhost}
+      REDIS_SERVER_PORT: ${ONLYOFFICE_REDIS_PORT:-6379}
     volumes:
       # paths are relative to the main compose file
       - ./config/onlyoffice/entrypoint-override.sh:/entrypoint-override.sh
       - ./config/onlyoffice/local.json:/etc/onlyoffice/documentserver/local.dist.json
-      # if you want to use oo enterprise edition, you need to add a volume for the license file
-      # for details see: Registering your Enterprise Edition version -->
+      # Mount the license file only if using enterprise edition.
+      # For details see: Registering your Enterprise Edition version:
       # https://helpcenter.onlyoffice.com/installation/docs-enterprise-install-docker.aspx
+      # Uncomment and set ONLYOFFICE_LICENSE_LOCAL to the license file path.
+      #- ${ONLYOFFICE_LICENSE_LOCAL:-/dev/null}:/var/www/onlyoffice/Data/license.lic:ro
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.onlyoffice.entrypoints=https"
