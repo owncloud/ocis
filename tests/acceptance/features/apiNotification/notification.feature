@@ -134,7 +134,7 @@ Feature: Notification
 
   @env-config
   Scenario: get a notification about a file share in default languages
-    Given the config "OCIS_DEFAULT_LANGUAGE" has been set to "de" for "notifications" service
+    Given the config "OCIS_DEFAULT_LANGUAGE" has been set to "de" for "settings" service
     And user "Alice" has sent the following resource share invitation:
       | resource        | textfile1.txt |
       | space           | Personal      |

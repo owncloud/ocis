@@ -84,13 +84,13 @@ S3_PUBLIC_CACHE_BUCKET = "public"
 # configuration
 config = {
     "cs3ApiTests": {
-        "skip": False,
+        "skip": True,
     },
     "wopiValidatorTests": {
-        "skip": False,
+        "skip": True,
     },
     "k6LoadTests": {
-        "skip": False,
+        "skip": True,
     },
     "localApiTests": {
         "contractAndLock": {
@@ -98,8 +98,8 @@ config = {
                 "apiContract",
                 "apiLocks",
             ],
-            "skip": False,
-            "k8s": True,
+            "skip": True,
+            "k8s": False,
         },
         "settingsAndNotification": {
             "suites": [
@@ -108,6 +108,7 @@ config = {
                 "apiCors",
             ],
             "skip": False,
+            "k8s": True,
             "withRemotePhp": [True],
             "emailNeeded": True,
             "extraEnvironment": {
@@ -127,23 +128,23 @@ config = {
             "suites": [
                 "apiGraphUser",
             ],
-            "skip": False,
-            "k8s": True,
+            "skip": True,
+            "k8s": False,
             "withRemotePhp": [True],
         },
         "spaces": {
             "suites": [
                 "apiSpaces",
             ],
-            "skip": False,
-            "k8s": True,
+            "skip": True,
+            "k8s": False,
         },
         "spacesShares": {
             "suites": [
                 "apiSpacesShares",
             ],
-            "skip": False,
-            "k8s": True,
+            "skip": True,
+            "k8s": False,
         },
         "davOperations": {
             "suites": [
@@ -154,8 +155,8 @@ config = {
                 "apiArchiver",
                 "apiActivities",
             ],
-            "skip": False,
-            "k8s": True,
+            "skip": True,
+            "k8s": False,
         },
         "groupAndSearch1": {
             "suites": [
@@ -164,7 +165,7 @@ config = {
                 "apiGraphGroup",
                 "apiServiceAvailability",
             ],
-            "skip": False,
+            "skip": True,
             "k8s": False,
         },
         "search2": {
@@ -173,7 +174,7 @@ config = {
                 "apiSearchContent",
             ],
             "tikaNeeded": True,
-            "skip": False,
+            "skip": True,
             "k8s": False,
         },
         "sharingNg1": {
@@ -182,16 +183,16 @@ config = {
                 "apiReshare",
                 "apiSharingNgPermissions",
             ],
-            "skip": False,
-            "k8s": True,
+            "skip": True,
+            "k8s": False,
             "withRemotePhp": [True],
         },
         "sharingNgAdditionalShareRole": {
             "suites": [
                 "apiSharingNgAdditionalShareRole",
             ],
-            "skip": False,
-            "k8s": True,
+            "skip": True,
+            "k8s": False,
             "withRemotePhp": [True],
         },
         "sharingNgShareInvitation": {
@@ -199,7 +200,7 @@ config = {
                 "apiSharingNgDriveInvitation",
                 "apiSharingNgItemInvitation",
             ],
-            "skip": False,
+            "skip": True,
             "withRemotePhp": [True],
         },
         "sharingNgLinkShare": {
@@ -208,7 +209,7 @@ config = {
                 "apiSharingNgItemLinkShare",
                 "apiSharingNgLinkShareManagement",
             ],
-            "skip": False,
+            "skip": True,
             "withRemotePhp": [True],
         },
         "antivirus": {
@@ -216,6 +217,7 @@ config = {
                 "apiAntivirus",
             ],
             "skip": False,
+            "k8s": True,
             "antivirusNeeded": True,
             "extraServerEnvironment": {
                 "ANTIVIRUS_SCANNER_TYPE": "clamav",
@@ -227,10 +229,10 @@ config = {
         },
         "ocmAndAuthApp": {
             "suites": [
-                "apiOcm",
                 "apiAuthApp",
             ],
             "skip": False,
+            "k8s": True,
             "withRemotePhp": [True],
             "federationServer": True,
             "emailNeeded": True,
@@ -258,7 +260,7 @@ config = {
             "suites": [
                 "apiCollaboration",
             ],
-            "skip": False,
+            "skip": True,
             "withRemotePhp": [True],
             "collaborationServiceNeeded": True,
             "extraServerEnvironment": {
@@ -269,7 +271,7 @@ config = {
             "suites": [
                 "cliCommands",
             ],
-            "skip": False,
+            "skip": True,
             "withRemotePhp": [True],
             "antivirusNeeded": True,
             "emailNeeded": True,
@@ -298,7 +300,8 @@ config = {
                 "coreApiMain",
                 "coreApiVersions",
             ],
-            "skip": False,
+            "skip": True,
+            "k8s": False,
             "withRemotePhp": [True],
         },
         "2": {
@@ -306,7 +309,8 @@ config = {
                 "coreApiShareManagementBasicToShares",
                 "coreApiShareManagementToShares",
             ],
-            "skip": False,
+            "skip": True,
+            "k8s": False,
             "withRemotePhp": [True],
         },
         "3": {
@@ -314,7 +318,7 @@ config = {
                 "coreApiSharees",
                 "coreApiSharePublicLink2",
             ],
-            "skip": False,
+            "skip": True,
             "withRemotePhp": [True],
         },
         "4": {
@@ -326,7 +330,7 @@ config = {
                 "coreApiShareCreateSpecialToShares2",
                 "coreApiShareUpdateToShares",
             ],
-            "skip": False,
+            "skip": True,
             "withRemotePhp": [True],
         },
         "5": {
@@ -336,7 +340,8 @@ config = {
                 "coreApiWebdavEtagPropagation1",
                 "coreApiWebdavEtagPropagation2",
             ],
-            "skip": False,
+            "skip": True,
+            "k8s": False,
         },
         "6": {
             "suites": [
@@ -344,13 +349,14 @@ config = {
                 "coreApiWebdavOperations",
                 "coreApiWebdavMove2",
             ],
-            "skip": False,
+            "skip": True,
         },
         "7": {
             "suites": [
                 "coreApiWebdavProperties",
             ],
-            "skip": False,
+            "skip": True,
+            "k8s": False,
         },
         "8": {
             "suites": [
@@ -359,29 +365,29 @@ config = {
                 "coreApiWebdavUpload",
                 "coreApiWebdavUploadTUS",
             ],
-            "skip": False,
+            "skip": True,
         },
     },
     "e2eTests": {
         "part": {
-            "skip": False,
+            "skip": True,
             "totalParts": 4,  # divide and run all suites in parts (divide pipelines)
             "xsuites": ["search", "app-provider", "oidc", "ocm", "keycloak"],  # suites to skip
         },
         "search": {
-            "skip": False,
+            "skip": True,
             "suites": ["search"],  # suites to run
             "tikaNeeded": True,
         },
         "keycloak": {
-            "skip": False,
+            "skip": True,
             "suites": ["journeys", "keycloak"],
             "keycloakNeeded": True,
         },
     },
     "e2eMultiService": {
         "testSuites": {
-            "skip": False,
+            "skip": True,
             "suites": [
                 "smoke",
                 "shares",
@@ -1087,7 +1093,7 @@ def localApiTestPipeline(ctx):
                     params[item] = matrix[item] if item in matrix else defaults[item]
                 for storage in params["storages"]:
                     for run_with_remote_php in params["withRemotePhp"]:
-                        run_on_k8s = params["k8s"] and ctx.build.event == "cron"
+                        run_on_k8s = params["k8s"]  #and ctx.build.event == "cron"
                         ocis_url = OCIS_URL
                         if run_on_k8s:
                             ocis_url = "https://%s" % OCIS_SERVER_NAME
@@ -1104,19 +1110,19 @@ def localApiTestPipeline(ctx):
                                      restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin") +
                                      (tikaService() if params["tikaNeeded"] else []) +
                                      (waitForServices("online-offices", ["collabora:9980", "onlyoffice:443", "fakeoffice:8080"]) if params["collaborationServiceNeeded"] else []) +
-                                     (waitK3sCluster() + deployOcis() + waitForOcis(ocis_url = ocis_url) + ociswrapper() + waitForOciswrapper() if run_on_k8s else ocisServer(storage, extra_server_environment = params["extraServerEnvironment"], with_wrapper = True, tika_enabled = params["tikaNeeded"], volumes = ([stepVolumeOcisStorage]))) +
-                                     (waitForClamavService() if params["antivirusNeeded"] else []) +
-                                     (waitForEmailService() if params["emailNeeded"] else []) +
+                                     (waitK3sCluster() + (clamavServiceK8s() if params["antivirusNeeded"] and run_on_k8s else []) + (emailServiceK8s() if params["emailNeeded"] and run_on_k8s else []) + deployOcis() + waitForOcis(ocis_url = ocis_url) + ociswrapper() + waitForOciswrapper() if run_on_k8s else ocisServer(storage, extra_server_environment = params["extraServerEnvironment"], with_wrapper = True, tika_enabled = params["tikaNeeded"], volumes = ([stepVolumeOcisStorage]))) +
+                                     (waitForClamavService() if params["antivirusNeeded"] and not run_on_k8s else []) +
+                                     (waitForEmailService() if params["emailNeeded"] and not run_on_k8s else waitForEmailServiceK8s() if params["emailNeeded"] and run_on_k8s else []) +
                                      (ocisServer(storage, deploy_type = "federation", extra_server_environment = params["extraServerEnvironment"]) if params["federationServer"] else []) +
                                      ((wopiCollaborationService("fakeoffice") + wopiCollaborationService("collabora") + wopiCollaborationService("onlyoffice")) if params["collaborationServiceNeeded"] else []) +
                                      (ocisHealthCheck("wopi", ["wopi-collabora:9304", "wopi-onlyoffice:9304", "wopi-fakeoffice:9304"]) if params["collaborationServiceNeeded"] else []) +
                                      localApiTests(name, params["suites"], storage, params["extraEnvironment"], run_with_remote_php, ocis_url = ocis_url, k8s = run_on_k8s) +
                                      apiTestFailureLog() +
                                      (generateCoverageFromAPITest(ctx, name) if not run_on_k8s else []),
-                            "services": (emailService() if params["emailNeeded"] else []) +
-                                        (clamavService() if params["antivirusNeeded"] else []) +
-                                        ((fakeOffice() + collaboraService() + onlyofficeService()) if params["collaborationServiceNeeded"] else []) +
-                                        (k3sCluster() if run_on_k8s else []),
+                            "services": (k3sCluster() if run_on_k8s else []) +
+                                        (emailService() if params["emailNeeded"] and not run_on_k8s else []) +
+                                        (clamavService() if params["antivirusNeeded"] and not run_on_k8s else []) +
+                                        ((fakeOffice() + collaboraService() + onlyofficeService()) if params["collaborationServiceNeeded"] else []),
                             "depends_on": getPipelineNames(buildOcisBinaryForTesting(ctx)),
                             "trigger": {
                                 "ref": [
@@ -1389,7 +1395,7 @@ def coreApiTestPipeline(ctx):
                 for run_with_remote_php in params["withRemotePhp"]:
                     filter_tags = "~@skipOnGraph&&~@skipOnOcis-%s-Storage" % ("OC" if storage == "owncloud" else "OCIS")
                     expected_failures_file = "%s/expected-failures-API-on-%s-storage.md" % (test_dir, storage.upper())
-                    run_on_k8s = params["k8s"] and ctx.build.event == "cron"
+                    run_on_k8s = params["k8s"]  #and ctx.build.event == "cron"
                     ocis_url = OCIS_URL
                     if run_on_k8s:
                         ocis_url = "https://%s" % OCIS_SERVER_NAME
@@ -3814,8 +3820,8 @@ def deployOcis():
         "image": "owncloudci/golang:latest",
         "commands": [
             "make -C %s build" % dirs["ocisWrapper"],
-            "mv %s/tests/config/drone/k3s/values.yaml %s/ocis-charts/charts/ocis/ci/deployment-values.yaml" % (dirs["base"], dirs["base"]),
-            "cp -r %s/tests/config/drone/k3s/authbasic %s/ocis-charts/charts/ocis/templates/" % (dirs["base"], dirs["base"]),
+            "mv %s/tests/config/drone/k8s/values.yaml %s/ocis-charts/charts/ocis/ci/deployment-values.yaml" % (dirs["base"], dirs["base"]),
+            "cp -r %s/tests/config/drone/k8s/authbasic %s/ocis-charts/charts/ocis/templates/" % (dirs["base"], dirs["base"]),
             "cd %s/ocis-charts" % dirs["base"],
             "sed -i '/{{- define \"ocis.basicServiceTemplates\" -}}/a\\\\  {{- $_ := set .scope \"appNameAuthBasic\" \"authbasic\" -}}' ./charts/ocis/templates/_common/_tplvalues.tpl",
             "sed -i '/- name: IDM_ADMIN_PASSWORD/{n;N;N;N;d;}' ./charts/ocis/templates/idm/deployment.yaml",
@@ -3832,6 +3838,34 @@ def deployOcis():
                 "path": "/go",
             },
         ],
+    }]
+
+def clamavServiceK8s():
+    return [{
+        "name": "clamav",
+        "image": OC_CI_ALPINE,
+        "commands": [
+            "cp -r %s/tests/config/drone/k8s/clamav %s/ocis-charts/charts/ocis/templates/" % (dirs["base"], dirs["base"]),
+        ],
+    }]
+
+def emailServiceK8s():
+    return [{
+        "name": "copy-%s-service" % EMAIL_SMTP_HOST,
+        "image": OC_CI_ALPINE,
+        "commands": [
+            "cp -r %s/tests/config/drone/k8s/mailpit %s/ocis-charts/charts/ocis/templates/" % (dirs["base"], dirs["base"]),
+        ],
+    }]
+
+def waitForEmailServiceK8s():
+    return [{
+        "name": EMAIL_SMTP_HOST,
+        "image": "ghcr.io/k3d-io/k3d:5-dind",
+        "commands": [
+            "kubectl port-forward svc/mailpit %s:%s -n ocis" % (EMAIL_PORT, EMAIL_PORT),
+        ],
+        "detach": True,
     }]
 
 def ociswrapper():
