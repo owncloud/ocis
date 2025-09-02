@@ -55,7 +55,6 @@ func Security(cspConfig *config.CSP) func(h http.Handler) http.Handler {
 	}
 
 	secureMiddleware := secure.New(secure.Options{
-		BrowserXssFilter:             true,
 		ContentSecurityPolicy:        cspBuilder.MustBuild(),
 		ContentTypeNosniff:           true,
 		CustomFrameOptionsValue:      "SAMEORIGIN",

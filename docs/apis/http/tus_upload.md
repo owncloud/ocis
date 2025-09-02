@@ -86,7 +86,6 @@ curl -ks -XPOST https://ocis.test/remote.php/dav/spaces/8d72036d-14a5-490f-889e-
 < X-Permitted-Cross-Domain-Policies: none
 < X-Request-Id: xxxxxxxxxxxxxxxxxxxxxx
 < X-Robots-Tag: none
-< X-Xss-Protection: 1; mode=block
 <
 * Connection #0 to host localhost left intact
 ```
@@ -211,7 +210,6 @@ curl -ks -XPOST https://ocis.test/remote.php/dav/spaces/{space-id} \
 < X-Permitted-Cross-Domain-Policies: none
 < X-Request-Id: xxxxxxxxxxxxxxxxxxxxxx
 < X-Robots-Tag: none
-< X-Xss-Protection: 1; mode=block
 <
 * Connection #0 to host localhost left intact
 ```
