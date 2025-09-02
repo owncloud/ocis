@@ -318,6 +318,7 @@ class OcisConfigContext implements Context {
 	 */
 	public function rollback(): void {
 		if (\getenv('K8S') === "true") {
+			$this->rollbackK8sServices();
 			return;
 		}
 		$this->rollbackServices();
@@ -343,6 +344,20 @@ class OcisConfigContext implements Context {
 	 */
 	public function rollbackServices(): void {
 		$response = OcisConfigHelper::rollbackServices();
+		Assert::assertEquals(
+			200,
+			$response->getStatusCode(),
+			"Failed to rollback services.",
+		);
+	}
+
+	/**
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function rollbackK8sServices(): void {
+		$url = OcisConfigHelper::getWrapperUrl() . "/k8s/rollback";
+		$response = OcisConfigHelper::sendRequest($url, "DELETE");
 		Assert::assertEquals(
 			200,
 			$response->getStatusCode(),
