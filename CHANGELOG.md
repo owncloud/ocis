@@ -77,6 +77,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add custom labels for app tokens: [#11555](https://github.com/owncloud/ocis/pull/11555)
 * Enhancement - HTTP Strict Transport Security: [#11568](https://github.com/owncloud/ocis/pull/11568)
 * Enhancement - Allow markdown output for unified-roles-table: [#11581](https://github.com/owncloud/ocis/pull/11581)
+* Enhancement - Bump Web to 12.0.4: [#11625](https://github.com/owncloud/ocis/pull/11625)
 
 ## Details
 
@@ -161,6 +162,14 @@ The following sections list the changes for unreleased.
    colorized)
 
    https://github.com/owncloud/ocis/pull/11581
+
+* Enhancement - Bump Web to 12.0.4: [#11625](https://github.com/owncloud/ocis/pull/11625)
+
+   - Bugfix [owncloud/web#12943](https://github.com/owncloud/web/pull/12943): Sign
+   public link archiver download URL
+
+   https://github.com/owncloud/ocis/pull/11625
+   https://github.com/owncloud/web/releases/tag/v12.0.4
 
 # Changelog for [7.2.0] (2025-07-14)
 
