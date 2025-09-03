@@ -6,14 +6,11 @@
 [![codecov](https://codecov.io/gh/shamaton/msgpack/branch/master/graph/badge.svg?token=9PD2JUK5V3)](https://codecov.io/gh/shamaton/msgpack)
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fshamaton%2Fmsgpack.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fshamaton%2Fmsgpack?ref=badge_shield)
 
-## 📣 Notice
-If your application serializes only primitive types, array, map and struct, code generation is also recommended.
-You can get the fastest performance with [msgpackgen](https://github.com/shamaton/msgpackgen).
-
 ## Features
 * Supported types : primitive / array / slice / struct / map / interface{} and time.Time
 * Renaming fields via `msgpack:"field_name"`
 * Omitting fields via `msgpack:"-"`
+* Omitting empty fields via msgpack:"field_name,omitempty"
 * Supports extend encoder / decoder
 * Can also Encoding / Decoding struct as array
 
