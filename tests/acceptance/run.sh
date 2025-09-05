@@ -270,6 +270,10 @@ function run_behat_tests() {
 	# then the awk, grep, sed command sequence above ends up with an empty string.
 	# Unset FAILED_SCENARIO_PATHS to avoid later code thinking that there might be
 	# one failed scenario.
+
+	FAILED_HOOK_PATHS_COLORED=`awk '/Failed hooks:/',0 ${TEST_LOG_FILE} | grep -o 'tests/acceptance/features/[^"]*\.feature:[0-9]\+'`
+	FAILED_HOOK_PATHS=$(echo "${FAILED_HOOK_PATHS_COLORED}" | sed 's/"//g' | sed "s/\x1b[^m]*m//g")
+
 	if [ -z "${FAILED_SCENARIO_PATHS}" ]
 	then
 		unset FAILED_SCENARIO_PATHS
@@ -285,17 +289,24 @@ function run_behat_tests() {
 		fi
 
 		# Check that every failed scenario is in the list of expected failures
-		for FAILED_SCENARIO_PATH in ${FAILED_SCENARIO_PATHS}
+		for FAILED_SCENARIO_PATH in ${FAILED_SCENARIO_PATHS} ${FAILED_HOOK_PATHS}
 			do
 				SUITE_PATH=`dirname ${FAILED_SCENARIO_PATH}`
 				SUITE=`basename ${SUITE_PATH}`
 				SCENARIO=`basename ${FAILED_SCENARIO_PATH}`
 				SUITE_SCENARIO="${SUITE}/${SCENARIO}"
-				grep "\[${SUITE_SCENARIO}\]" "${EXPECTED_FAILURES_FILE}" > /dev/null
-				if [ $? -ne 0 ]
-				then
-					echo "Error: Scenario ${SUITE_SCENARIO} failed but was not expected to fail."
-					UNEXPECTED_FAILED_SCENARIOS+=("${SUITE_SCENARIO}")
+				if echo "${FAILED_SCENARIO_PATH}" | grep -q "AfterScenario"; then
+					grep "\[HOOK ${SUITE_SCENARIO}\]" "${EXPECTED_FAILURES_FILE}" > /dev/null
+					if [ $? -ne 0 ]; then
+						echo "Error: Hook ${SUITE_SCENARIO} failed but was not expected to fail."
+						UNEXPECTED_FAILED_SCENARIOS+=("${SUITE_SCENARIO}")
+					fi
+				else
+					grep "\[${SUITE_SCENARIO}\]" "${EXPECTED_FAILURES_FILE}" > /dev/null
+					if [ $? -ne 0 ]; then
+						echo "Error: Scenario ${SUITE_SCENARIO} failed but was not expected to fail."
+						UNEXPECTED_FAILED_SCENARIOS+=("${SUITE_SCENARIO}")
+					fi
 				fi
 			done
 
@@ -340,7 +351,7 @@ function run_behat_tests() {
 				fi
 			done < ${EXPECTED_FAILURES_FILE}
 	else
-		for FAILED_SCENARIO_PATH in ${FAILED_SCENARIO_PATHS}
+		for FAILED_SCENARIO_PATH in ${FAILED_SCENARIO_PATHS} ${FAILED_HOOK_PATHS}
 		do
 			SUITE_PATH=$(dirname "${FAILED_SCENARIO_PATH}")
 			SUITE=$(basename "${SUITE_PATH}")
@@ -579,6 +590,8 @@ then
 else
 	UNEXPECTED_FAILURE=false
 fi
+echo "UNEXPECTED_FAILURE = ${UNEXPECTED_FAILURE}"
+echo "UNEXPECTED_FAILED_SCENARIOS = ${UNEXPECTED_FAILED_SCENARIOS[@]}"
 
 if [ ${#UNEXPECTED_PASSED_SCENARIOS[@]} -gt 0 ]
 then

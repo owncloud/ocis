@@ -1540,6 +1540,9 @@ class FeatureContext extends BehatVariablesContext {
 	): void {
 		$response = $response ?? $this->response;
 		$actualStatusCode = $response->getStatusCode();
+		echo "Expected:";
+		var_dump($expectedStatusCode);
+		echo "Actual: $actualStatusCode\n";
 		if (\is_array($expectedStatusCode)) {
 			if ($message === "") {
 				$message = "HTTP status code $actualStatusCode is not one of the expected values "
