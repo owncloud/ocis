@@ -58,13 +58,21 @@ class OcisConfigContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function asyncUploadHasBeenEnabledWithDelayedPostProcessing(string $delayTime): void {
-		$envs = [
-			"OCIS_ASYNC_UPLOADS" => true,
-			"OCIS_EVENTS_ENABLE_TLS" => false,
-			"POSTPROCESSING_DELAY" => $delayTime . "s",
-		];
+		if (\getenv('K8S') === "true") {
+			$envs = [
+				"storageusers" => ["OCIS_ASYNC_UPLOADS" => true, "OCIS_EVENTS_ENABLE_TLS" => false],
+				"postprocessing" => ["POSTPROCESSING_DELAY" => $delayTime . "s"],
+			];
+			$response = OcisConfigHelper::reConfigureOcisK8s($envs);
+		} else {
+			$envs = [
+				"OCIS_ASYNC_UPLOADS" => true,
+				"OCIS_EVENTS_ENABLE_TLS" => false,
+				"POSTPROCESSING_DELAY" => $delayTime . "s",
+			];
+			$response = OcisConfigHelper::reConfigureOcis($envs);
+		}
 
-		$response = OcisConfigHelper::reConfigureOcis($envs);
 		Assert::assertEquals(
 			200,
 			$response->getStatusCode(),
@@ -74,19 +82,33 @@ class OcisConfigContext implements Context {
 
 	/**
 	 * @Given the config :configVariable has been set to :configValue
+	 * @Given the config :configVariable has been set to :configValue for :serviceName service
 	 *
 	 * @param string $configVariable
 	 * @param string $configValue
+	 * @param string|null $serviceName
 	 *
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function theConfigHasBeenSetTo(string $configVariable, string $configValue): void {
-		$envs = [
-			$configVariable => $configValue,
-		];
+	public function theConfigHasBeenSetTo(
+		string $configVariable,
+		string $configValue,
+		?string $serviceName = null,
+	): void {
+		if (getenv("K8S") === "true") {
+			$envs = [
+				$serviceName => [$configVariable => $configValue],
+			];
+			$response = OcisConfigHelper::reConfigureOcisK8s($envs);
 
-		$response = OcisConfigHelper::reConfigureOcis($envs);
+		} else {
+			$envs = [
+				$configVariable => $configValue,
+			];
+			$response = OcisConfigHelper::reConfigureOcis($envs);
+		}
+
 		Assert::assertEquals(
 			200,
 			$response->getStatusCode(),
@@ -104,14 +126,23 @@ class OcisConfigContext implements Context {
 	public function theAdministratorHasEnabledTheRole(string $role): void {
 		$roleId = GraphHelper::getPermissionsRoleIdByName($role);
 		$defaultRoles = array_values(GraphHelper::DEFAULT_PERMISSIONS_ROLES);
-
 		if (!\in_array($roleId, $defaultRoles)) {
 			$defaultRoles[] = $roleId;
 		}
-		$envs = [
-			"GRAPH_AVAILABLE_ROLES" => implode(',', $defaultRoles),
-		];
-		$response = OcisConfigHelper::reConfigureOcis($envs);
+
+		if (getenv("K8S") === "true") {
+			$envs = [
+				'graph' => [ "GRAPH_AVAILABLE_ROLES" => implode(',', $defaultRoles)],
+			];
+			$response = OcisConfigHelper::reConfigureOcisK8s($envs);
+
+		} else {
+			$envs = [
+				"GRAPH_AVAILABLE_ROLES" => implode(',', $defaultRoles),
+			];
+			$response = OcisConfigHelper::reConfigureOcis($envs);
+		}
+
 		Assert::assertEquals(
 			200,
 			$response->getStatusCode(),
@@ -138,10 +169,18 @@ class OcisConfigContext implements Context {
 			}
 		}
 
-		$envs = [
-			"GRAPH_AVAILABLE_ROLES" => implode(',', $defaultRoles),
-		];
-		$response = OcisConfigHelper::reConfigureOcis($envs);
+		if (getenv("K8S") === "true") {
+			$envs = [
+				'graph' => ["GRAPH_AVAILABLE_ROLES" => implode(',', $defaultRoles)],
+			];
+			$response = OcisConfigHelper::reConfigureOcisK8s($envs);
+
+		} else {
+			$envs = [
+				"GRAPH_AVAILABLE_ROLES" => implode(',', $defaultRoles),
+			];
+			$response = OcisConfigHelper::reConfigureOcis($envs);
+		}
 
 		Assert::assertEquals(
 			200,
@@ -165,10 +204,18 @@ class OcisConfigContext implements Context {
 		if ($key = array_search($roleId, $availableRoles)) {
 			unset($availableRoles[$key]);
 		}
-		$envs = [
-			"GRAPH_AVAILABLE_ROLES" => implode(',', $availableRoles),
-		];
-		$response = OcisConfigHelper::reConfigureOcis($envs);
+		if (getenv("K8S") === "true") {
+			$envs = [
+				'graph' => [ "GRAPH_AVAILABLE_ROLES" => implode(',', $availableRoles)],
+			];
+			$response = OcisConfigHelper::reConfigureOcisK8s($envs);
+
+		} else {
+			$envs = [
+				"GRAPH_AVAILABLE_ROLES" => implode(',', $availableRoles),
+			];
+			$response = OcisConfigHelper::reConfigureOcis($envs);
+		}
 		Assert::assertEquals(
 			200,
 			$response->getStatusCode(),
@@ -178,21 +225,29 @@ class OcisConfigContext implements Context {
 	}
 
 	/**
-	 * @Given the config :configVariable has been set to path :path
+	 * @Given the config :configVariable has been set to path :path for :serviceName service
 	 *
 	 * @param string $configVariable
 	 * @param string $path
+	 * @param string|null $serviceName
 	 *
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function theConfigHasBeenSetPathTo(string $configVariable, string $path): void {
+	public function theConfigHasBeenSetToPath(string $configVariable, string $path, ?string $serviceName = null): void {
 		$path = \dirname(__FILE__) . "/../../" . $path;
-		$response = OcisConfigHelper::reConfigureOcis(
-			[
+		if (getenv("K8S") === "true") {
+			$envs = [
+				$serviceName => [$configVariable => $path],
+			];
+			$response = OcisConfigHelper::reConfigureOcisK8s($envs);
+
+		} else {
+			$envs = [
 				$configVariable => $path,
-			],
-		);
+			];
+			$response = OcisConfigHelper::reConfigureOcis($envs);
+		}
 		Assert::assertEquals(
 			200,
 			$response->getStatusCode(),
@@ -210,11 +265,18 @@ class OcisConfigContext implements Context {
 	 */
 	public function theConfigHasBeenSetToValue(TableNode $table): void {
 		$envs = [];
-		foreach ($table->getHash() as $row) {
-			$envs[$row['config']] = $row['value'];
+		if (getenv("K8S") === "true") {
+			foreach ($table->getHash() as $row) {
+				$envs[$row['service']] = [$row['config'] => $row['value']];
+			}
+			$response = OcisConfigHelper::reConfigureOcisK8s($envs);
+		} else {
+			foreach ($table->getHash() as $row) {
+				$envs[$row['config']] = $row['value'];
+			}
+			$response = OcisConfigHelper::reConfigureOcis($envs);
 		}
 
-		$response = OcisConfigHelper::reConfigureOcis($envs);
 		Assert::assertEquals(
 			200,
 			$response->getStatusCode(),
@@ -255,6 +317,9 @@ class OcisConfigContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function rollback(): void {
+		if (\getenv('K8S') === "true") {
+			return;
+		}
 		$this->rollbackServices();
 		$this->rollbackOcis();
 	}

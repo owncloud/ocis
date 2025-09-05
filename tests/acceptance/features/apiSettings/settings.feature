@@ -352,7 +352,7 @@ Feature: settings api
 
 
   Scenario: CORS headers should be returned when setting CORS domain sending origin header in the settings api
-    Given the config "OCIS_CORS_ALLOW_ORIGINS" has been set to "https://aphno.badal"
+    Given the config "OCIS_CORS_ALLOW_ORIGINS" has been set to "https://aphno.badal" for "settings" service
     When user "Alice" lists values-list with headers using the Settings API
       | header | value               |
       | Origin | https://aphno.badal |

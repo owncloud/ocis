@@ -334,7 +334,7 @@ Feature: Tag
 
   @env-config
   Scenario: user creates a tag that exceeds the set max tag length
-    Given the config "OCIS_MAX_TAG_LENGTH" has been set to "2"
+    Given the config "OCIS_MAX_TAG_LENGTH" has been set to "2" for "graph" service
     And user "Alice" has created a folder "folderMain" in space "Alice Hansen"
     And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "file.txt"
     When user "Alice" creates the following tags for folder "folderMain" of space "Alice Hansen":
@@ -344,7 +344,7 @@ Feature: Tag
 
   @env-config
   Scenario: user creates a tag that is under the set max tag length
-    Given the config "OCIS_MAX_TAG_LENGTH" has been set to "10"
+    Given the config "OCIS_MAX_TAG_LENGTH" has been set to "10" for "graph" service
     And user "Alice" has created a folder "folderMain" in space "Alice Hansen"
     And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "file.txt"
     When user "Alice" creates the following tags for folder "folderMain" of space "Alice Hansen":
@@ -354,7 +354,7 @@ Feature: Tag
 
   @env-config
   Scenario: user creates a tag that exceeds the default max tag length when tag length is set to unlimited
-    Given the config "OCIS_MAX_TAG_LENGTH" has been set to "0"
+    Given the config "OCIS_MAX_TAG_LENGTH" has been set to "0" for "graph" service
     And user "Alice" has created a folder "folderMain" in space "Alice Hansen"
     And user "Alice" has uploaded a file inside space "Personal" with content "some content" to "file.txt"
     When user "Alice" creates the following tags for folder "folderMain" of space "Alice Hansen":
@@ -364,7 +364,7 @@ Feature: Tag
 
 
   Scenario: user tries to create tags above 100, only first 100 tags will be created
-    Given the config "OCIS_MAX_TAG_LENGTH" has been set to "100"
+    Given the config "OCIS_MAX_TAG_LENGTH" has been set to "100" for "graph" service
     And user "Alice" has created a folder "folderMain" in space "Alice Hansen"
     When user "Alice" creates "200" tags for folder "folderMain" of space "Alice Hansen"
     Then the HTTP status code should be "200"
