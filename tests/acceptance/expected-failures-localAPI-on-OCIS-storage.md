@@ -312,6 +312,7 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 #### [Delete user containing + in username returns 404 but user gets deleted](https://github.com/owncloud/ocis/issues/11027)
 
 - [apiGraphUser/deleteUser.feature:25](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUser/deleteUser.feature#L25)
+- [apiGraphUser/createUser.feature:106](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUser/createUser.feature#L106)
 
 #### [OCM. delete-accepted-user endpoint always returns 200](https://github.com/owncloud/ocis/issues/10223)
 
