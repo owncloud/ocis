@@ -271,6 +271,14 @@ function run_behat_tests() {
 	# then the awk, grep, sed command sequence above ends up with an empty string.
 	# Unset FAILED_SCENARIO_PATHS to avoid later code thinking that there might be
 	# one failed scenario.
+
+	FAILED_HOOK_PATHS_COLORED=`awk '/Failed hooks:/',0 ${TEST_LOG_FILE} | grep -o 'AfterScenario[^"]*tests/acceptance/features/[^"]*\.feature:[0-9]\+'`
+	FAILED_HOOK_PATHS=$(echo "${FAILED_HOOK_PATHS_COLORED}" \
+    | sed 's/.*tests/HOOK tests/' \
+    | sed 's/"//g' \
+    | sed "s/\x1b[^m]*m//g")
+
+
 	if [ -z "${FAILED_SCENARIO_PATHS}" ]
 	then
 		unset FAILED_SCENARIO_PATHS
@@ -285,20 +293,36 @@ function run_behat_tests() {
 			echo "Checking expected failures"
 		fi
 
-		# Check that every failed scenario is in the list of expected failures
-		for FAILED_SCENARIO_PATH in ${FAILED_SCENARIO_PATHS}
-			do
-				SUITE_PATH=`dirname ${FAILED_SCENARIO_PATH}`
-				SUITE=`basename ${SUITE_PATH}`
-				SCENARIO=`basename ${FAILED_SCENARIO_PATH}`
+		# Check that every failed scenario or hook is in the list of expected failures
+		for FAILED_SCENARIO_PATH in ${FAILED_SCENARIO_PATHS} ${FAILED_HOOK_PATHS}
+		do
+			if echo "${FAILED_SCENARIO_PATH}" | grep -q "^HOOK"; then
+				# This is a failed hook
+				CLEAN_PATH=$(echo "${FAILED_SCENARIO_PATH}" | sed 's/^HOOK //')
+				SUITE_PATH=$(dirname "${CLEAN_PATH}")
+				SUITE=$(basename "${SUITE_PATH}")
+				SCENARIO=$(basename "${CLEAN_PATH}")
 				SUITE_SCENARIO="${SUITE}/${SCENARIO}"
+
+				grep "\[HOOK ${SUITE_SCENARIO}\]" "${EXPECTED_FAILURES_FILE}" > /dev/null
+				if [ $? -ne 0 ]; then
+					echo "Error: Hook ${SUITE_SCENARIO} failed but was not expected to fail."
+					UNEXPECTED_FAILED_SCENARIOS+=("${SUITE_SCENARIO}")
+				fi
+			else
+				# This is a failed scenario
+				SUITE_PATH=$(dirname "${FAILED_SCENARIO_PATH}")
+				SUITE=$(basename "${SUITE_PATH}")
+				SCENARIO=$(basename "${FAILED_SCENARIO_PATH}")
+				SUITE_SCENARIO="${SUITE}/${SCENARIO}"
+
 				grep "\[${SUITE_SCENARIO}\]" "${EXPECTED_FAILURES_FILE}" > /dev/null
-				if [ $? -ne 0 ]
-				then
+				if [ $? -ne 0 ]; then
 					echo "Error: Scenario ${SUITE_SCENARIO} failed but was not expected to fail."
 					UNEXPECTED_FAILED_SCENARIOS+=("${SUITE_SCENARIO}")
 				fi
-			done
+			fi
+		done
 
 		# Check that every scenario in the list of expected failures did fail
 		while read SUITE_SCENARIO
@@ -341,7 +365,7 @@ function run_behat_tests() {
 				fi
 			done < ${EXPECTED_FAILURES_FILE}
 	else
-		for FAILED_SCENARIO_PATH in ${FAILED_SCENARIO_PATHS}
+		for FAILED_SCENARIO_PATH in ${FAILED_SCENARIO_PATHS} ${FAILED_HOOK_PATHS}
 		do
 			SUITE_PATH=$(dirname "${FAILED_SCENARIO_PATH}")
 			SUITE=$(basename "${SUITE_PATH}")

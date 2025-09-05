@@ -309,6 +309,10 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 
 #### Commented out when backport the release-7.1.1 to master
 
+#### [[QA] Fail test if afterhook fails ](https://github.com/owncloud/ocis/issues/11611)
+
+- [HOOK apiGraphUser/createUser.feature:106](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUser/createUser.feature#L106)
+
 #### [Delete user containing + in username returns 404 but user gets deleted](https://github.com/owncloud/ocis/issues/11027)
 
 - [apiGraphUser/deleteUser.feature:25](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUser/deleteUser.feature#L25)
