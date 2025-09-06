@@ -17,6 +17,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	pkgmiddleware "github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
+	"github.com/owncloud/ocis/v2/ocis-pkg/oidc/checkers"
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	"github.com/owncloud/ocis/v2/ocis-pkg/runner"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
@@ -292,6 +293,8 @@ func loadMiddlewares(logger log.Logger, cfg *config.Config,
 			RevaGatewaySelector: gatewaySelector,
 		})
 	}
+
+	checkerFactory := checkers.NewFactory()
 	authenticators = append(authenticators, middleware.NewOIDCAuthenticator(
 		middleware.Logger(logger),
 		middleware.UserInfoCache(userInfoCache),
@@ -306,6 +309,7 @@ func loadMiddlewares(logger log.Logger, cfg *config.Config,
 			oidc.WithJWKSOptions(cfg.OIDC.JWKS),
 		)),
 		middleware.SkipUserInfo(cfg.OIDC.SkipUserInfo),
+		middleware.ClaimsChecker(checkerFactory.GetChecker(cfg.OIDC.ClaimsChecker.Name, cfg.OIDC.ClaimsChecker.Params)),
 	))
 	authenticators = append(authenticators, middleware.PublicShareAuthenticator{
 		Logger:              logger,
