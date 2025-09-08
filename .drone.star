@@ -128,7 +128,6 @@ config = {
                 "apiGraphUser",
             ],
             "skip": False,
-            "k8s": True,
             "withRemotePhp": [True],
         },
         "spaces": {
@@ -136,7 +135,6 @@ config = {
                 "apiSpaces",
             ],
             "skip": False,
-            "k8s": True,
         },
         "spacesShares": {
             "suites": [
@@ -155,7 +153,6 @@ config = {
                 "apiActivities",
             ],
             "skip": False,
-            "k8s": True,
         },
         "groupAndSearch1": {
             "suites": [
@@ -183,7 +180,6 @@ config = {
                 "apiSharingNgPermissions",
             ],
             "skip": False,
-            "k8s": True,
             "withRemotePhp": [True],
         },
         "sharingNgAdditionalShareRole": {
@@ -307,6 +303,7 @@ config = {
                 "coreApiShareManagementToShares",
             ],
             "skip": False,
+            "k8s": True,
             "withRemotePhp": [True],
         },
         "3": {
@@ -327,6 +324,7 @@ config = {
                 "coreApiShareUpdateToShares",
             ],
             "skip": False,
+            "k8s": True,
             "withRemotePhp": [True],
         },
         "5": {
@@ -337,6 +335,7 @@ config = {
                 "coreApiWebdavEtagPropagation2",
             ],
             "skip": False,
+            "k8s": True,
         },
         "6": {
             "suites": [
@@ -351,6 +350,7 @@ config = {
                 "coreApiWebdavProperties",
             ],
             "skip": False,
+            "k8s": True,
         },
         "8": {
             "suites": [
@@ -1422,7 +1422,7 @@ def coreApiTestPipeline(ctx):
                                              "UPLOAD_DELETE_WAIT_TIME": "1" if storage == "owncloud" else 0,
                                              "OCIS_WRAPPER_URL": "http://ociswrapper:5200" if run_on_k8s else "http://%s:5200" % OCIS_SERVER_NAME,
                                              "WITH_REMOTE_PHP": run_with_remote_php,
-                                             "k8s": "true" if run_on_k8s else "false",
+                                             "K8S": run_on_k8s,
                                          },
                                          "commands": [
                                              # merge the expected failures
