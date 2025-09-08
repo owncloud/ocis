@@ -6,15 +6,11 @@ import (
 	"io/fs"
 	"mime"
 	"net/http"
-	"net/url"
+	"os"
 	"path"
 	"path/filepath"
-	"regexp"
-	"strings"
-	"unicode/utf8"
 
 	"golang.org/x/net/html"
-	"golang.org/x/text/unicode/norm"
 )
 
 type fileServer struct {
@@ -26,90 +22,66 @@ func FileServer(fsys fs.FS) http.Handler {
 	return &fileServer{http.FS(fsys)}
 }
 
-// IsSafePath validates if a path is safe from path traversal attacks
-func IsSafePath(p string) bool {
-	var dangerousRunes = []rune{
-		'\uFF0F', // fullwidth slash ／
-		'\u2215', // division slash ∕
-		'\u29F8', // big solidus ⧸
-		'\u2044', // fraction slash ⁄
-		'\\',     // backslash
-		'\uFF3C', // fullwidth backslash ＼
-		'\uFE68', // small reverse solidus ﹨
-	}
-
-	// Recursive URL decode to prevent bypass via %252e%252e (double encoding)
-	path := p
-	for {
-		decoded, err := url.QueryUnescape(path)
-		if err != nil || decoded == path {
-			break
-		}
-		path = decoded
-	}
-
-	// Reject null byte injection
-	if strings.Contains(path, "\x00") {
-		return false
-	}
-
-	// Reject invalid UTF-8
-	if !utf8.ValidString(path) {
-		return false
-	}
-
-	// Reject dangerous runes
-	normalized := norm.NFC.String(path)
-	for _, r := range normalized {
-		for _, bad := range dangerousRunes {
-			if r == bad {
-				return false
-			}
-		}
-	}
-
-	// match one or more /./ and /../
-	return !regexp.MustCompile(`(?:[\/\\]\.+[\/\\])+`).MatchString(path)
-}
-
 func (f *fileServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if !IsSafePath(r.URL.Path) {
-		http.NotFound(w, r)
-		return
-	}
+	path := path.Clean(path.Join("/", r.URL.Path))
 
-	uPath := path.Clean(path.Join("/", r.URL.Path))
-	r.URL.Path = uPath
-
-	tryIndex := func() {
-		r.URL.Path = "/index.html"
-
+	serveIndex := func() {
 		// not every fs contains a file named index.html,
-		// therefore, we need to check if the file exists and stop the recursion if it doesn't
-		file, err := f.fsys.Open(r.URL.Path)
+		// therefore, we need to check if the file exists
+		indexPath := "/index.html"
+		file, err := f.fsys.Open(indexPath)
 		if err != nil {
 			http.NotFound(w, r)
 			return
 		}
 		defer file.Close()
 
-		f.ServeHTTP(w, r)
+		s, err := file.Stat()
+		if err != nil || s.IsDir() {
+			http.NotFound(w, r)
+			return
+		}
+
+		w.Header().Set("Content-Type", mime.TypeByExtension(filepath.Ext(s.Name())))
+		w.Header().Add("Vary", "Accept-Encoding")
+
+		buf := new(bytes.Buffer)
+		w.Header().Del("Expires")
+		w.Header().Set("Cache-Control", "no-cache")
+		if err := withBase(buf, file, "/"); err != nil {
+			http.NotFound(w, r)
+			return
+		}
+		if _, err := w.Write(buf.Bytes()); err != nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
 	}
 
-	asset, err := f.fsys.Open(uPath)
+	if !isValid(f, path) {
+		serveIndex()
+		return
+	}
+
+	asset, err := f.fsys.Open(path)
 	if err != nil {
-		tryIndex()
+		serveIndex()
 		return
 	}
 	defer asset.Close()
 
-	s, _ := asset.Stat()
+	s, err := asset.Stat()
+	if err != nil {
+		serveIndex()
+		return
+	}
 	if s.IsDir() {
-		tryIndex()
+		serveIndex()
 		return
 	}
 
 	w.Header().Set("Content-Type", mime.TypeByExtension(filepath.Ext(s.Name())))
+	w.Header().Add("Vary", "Accept-Encoding")
 
 	buf := new(bytes.Buffer)
 
@@ -117,12 +89,46 @@ func (f *fileServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case "index.html", "oidc-callback.html", "oidc-silent-redirect.html":
 		w.Header().Del("Expires")
 		w.Header().Set("Cache-Control", "no-cache")
-		_ = withBase(buf, asset, "/")
+		err = withBase(buf, asset, "/")
+		if err != nil {
+			http.NotFound(w, r)
+			return
+		}
 	default:
-		_, _ = buf.ReadFrom(asset)
+		_, err := buf.ReadFrom(asset)
+		if err != nil {
+			http.NotFound(w, r)
+			return
+		}
 	}
 
-	_, _ = w.Write(buf.Bytes())
+	_, err = w.Write(buf.Bytes())
+	if err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+}
+
+func isValid(f *fileServer, path string) bool {
+	if dir, ok := f.fsys.(http.Dir); ok {
+		rootAbs, err := filepath.Abs(string(dir))
+		if err != nil {
+			return false
+		}
+		rel := path
+		if len(rel) > 0 && rel[0] == '/' {
+			rel = rel[1:]
+		}
+		candidate := filepath.Join(rootAbs, filepath.FromSlash(rel))
+		fi, err := os.Lstat(candidate)
+		if err != nil {
+			return false
+		}
+		if fi.Mode()&os.ModeSymlink != 0 {
+			return false
+		}
+	}
+	return true
 }
 
 func withBase(w io.Writer, r io.Reader, base string) error {
