@@ -6,6 +6,7 @@ import (
 	"io/fs"
 	"mime"
 	"net/http"
+	"os"
 	"path"
 	"path/filepath"
 
@@ -22,38 +23,65 @@ func FileServer(fsys fs.FS) http.Handler {
 }
 
 func (f *fileServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	uPath := path.Clean(path.Join("/", r.URL.Path))
-	r.URL.Path = uPath
+	path := path.Clean(path.Join("/", r.URL.Path))
 
-	tryIndex := func() {
-		r.URL.Path = "/index.html"
-
+	serveIndex := func() {
 		// not every fs contains a file named index.html,
-		// therefore, we need to check if the file exists and stop the recursion if it doesn't
-		file, err := f.fsys.Open(r.URL.Path)
+		// therefore, we need to check if the file exists
+		indexPath := "/index.html"
+		file, err := f.fsys.Open(indexPath)
 		if err != nil {
 			http.NotFound(w, r)
 			return
 		}
 		defer file.Close()
 
-		f.ServeHTTP(w, r)
+		s, err := file.Stat()
+		if err != nil || s.IsDir() {
+			http.NotFound(w, r)
+			return
+		}
+
+		w.Header().Set("Content-Type", mime.TypeByExtension(filepath.Ext(s.Name())))
+		w.Header().Add("Vary", "Accept-Encoding")
+
+		buf := new(bytes.Buffer)
+		w.Header().Del("Expires")
+		w.Header().Set("Cache-Control", "no-cache")
+		if err := withBase(buf, file, "/"); err != nil {
+			http.NotFound(w, r)
+			return
+		}
+		if _, err := w.Write(buf.Bytes()); err != nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
 	}
 
-	asset, err := f.fsys.Open(uPath)
+	if !isValid(f, path) {
+		serveIndex()
+		return
+	}
+
+	asset, err := f.fsys.Open(path)
 	if err != nil {
-		tryIndex()
+		serveIndex()
 		return
 	}
 	defer asset.Close()
 
-	s, _ := asset.Stat()
+	s, err := asset.Stat()
+	if err != nil {
+		serveIndex()
+		return
+	}
 	if s.IsDir() {
-		tryIndex()
+		serveIndex()
 		return
 	}
 
 	w.Header().Set("Content-Type", mime.TypeByExtension(filepath.Ext(s.Name())))
+	w.Header().Add("Vary", "Accept-Encoding")
 
 	buf := new(bytes.Buffer)
 
@@ -61,12 +89,46 @@ func (f *fileServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case "index.html", "oidc-callback.html", "oidc-silent-redirect.html":
 		w.Header().Del("Expires")
 		w.Header().Set("Cache-Control", "no-cache")
-		_ = withBase(buf, asset, "/")
+		err = withBase(buf, asset, "/")
+		if err != nil {
+			http.NotFound(w, r)
+			return
+		}
 	default:
-		_, _ = buf.ReadFrom(asset)
+		_, err := buf.ReadFrom(asset)
+		if err != nil {
+			http.NotFound(w, r)
+			return
+		}
 	}
 
-	_, _ = w.Write(buf.Bytes())
+	_, err = w.Write(buf.Bytes())
+	if err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+}
+
+func isValid(f *fileServer, path string) bool {
+	if dir, ok := f.fsys.(http.Dir); ok {
+		rootAbs, err := filepath.Abs(string(dir))
+		if err != nil {
+			return false
+		}
+		rel := path
+		if len(rel) > 0 && rel[0] == '/' {
+			rel = rel[1:]
+		}
+		candidate := filepath.Join(rootAbs, filepath.FromSlash(rel))
+		fi, err := os.Lstat(candidate)
+		if err != nil {
+			return false
+		}
+		if fi.Mode()&os.ModeSymlink != 0 {
+			return false
+		}
+	}
+	return true
 }
 
 func withBase(w io.Writer, r io.Reader, base string) error {
