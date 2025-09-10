@@ -184,6 +184,23 @@ class SharingNgContext implements Context {
 	}
 
 	/**
+	 * @Given /^user "([^"]*)" has triggered the share expiration notification for (?:folder|file) "([^"]*)"$/
+	 *
+	 * @param string $user
+	 * @param string $resource
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userHasTriggeredTheShareExpirationNotificationForResource(
+		string $user,
+		string $resource,
+	): void {
+		$response = $this->getPermissionsList($user, "Personal", $resource);
+		$this->featureContext->theHTTPStatusCodeShouldBe(200, "", $response);
+	}
+
+	/**
 	 * @When /^user "([^"]*)" gets permissions list for (?:folder|file) "([^"]*)" of the space "([^"]*)" using the Graph API$/
 	 *
 	 * @param string $user
