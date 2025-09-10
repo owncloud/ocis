@@ -385,5 +385,10 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 
 - [apiActivities/activities.feature:3875](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiActivities/activities.feature#L3875)
 
+#### [Flaky Inclusion of Share Expiration Notification in Grouped Emails](https://github.com/owncloud/ocis/issues/11001)
+
+- [cliCommands/emailNotification.feature:20](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/cliCommands/emailNotification.feature#L20)
+- [cliCommands/emailNotification.feature:90](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/cliCommands/emailNotification.feature#L90)
+
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.
