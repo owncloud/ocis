@@ -62,6 +62,9 @@ Feature: get grouped email notification
       Even though this share has been revoked you still might have access through other shares and/or space memberships.
 
 
+      Alice Hansen has shared "lorem.txt" with you.
+
+
       Your share to "lorem.txt" has expired at %expiry_date_in_mail%
 
       Even though this share has been revoked you still might have access through other shares and/or space memberships.
