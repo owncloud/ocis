@@ -52,7 +52,7 @@ var _ = Describe("Authenticating requests", Label("PublicShareAuthenticator"), f
 				req := httptest.NewRequest(http.MethodGet, "http://example.com/dav/public-files/?public-token=sharetoken", http.NoBody)
 				req.SetBasicAuth("public", "examples3cr3t")
 
-				req2, _, valid := authenticator.Authenticate(req)
+				req2, valid := authenticator.Authenticate(req)
 
 				Expect(valid).To(Equal(true))
 				Expect(req2).ToNot(BeNil())
@@ -65,7 +65,7 @@ var _ = Describe("Authenticating requests", Label("PublicShareAuthenticator"), f
 			It("should successfully authenticate", func() {
 				req := httptest.NewRequest(http.MethodGet, "http://example.com/dav/public-files/?public-token=sharetoken&signature=examplesignature&expiration=exampleexpiration", http.NoBody)
 
-				req2, _, valid := authenticator.Authenticate(req)
+				req2, valid := authenticator.Authenticate(req)
 
 				Expect(valid).To(Equal(true))
 				Expect(req2).ToNot(BeNil())
@@ -79,7 +79,7 @@ var _ = Describe("Authenticating requests", Label("PublicShareAuthenticator"), f
 		Context("using a public-token", func() {
 			It("should successfully authenticate", func() {
 				req := httptest.NewRequest(http.MethodGet, "http://example.com/archiver?public-token=sharetoken", http.NoBody)
-				req2, _, valid := authenticator.Authenticate(req)
+				req2, valid := authenticator.Authenticate(req)
 
 				Expect(valid).To(Equal(true))
 				Expect(req2).ToNot(BeNil())
@@ -91,7 +91,7 @@ var _ = Describe("Authenticating requests", Label("PublicShareAuthenticator"), f
 		Context("not using a public-token", func() {
 			It("should fail to authenticate", func() {
 				req := httptest.NewRequest(http.MethodGet, "http://example.com/archiver", http.NoBody)
-				req2, _, valid := authenticator.Authenticate(req)
+				req2, valid := authenticator.Authenticate(req)
 
 				Expect(valid).To(Equal(false))
 				Expect(req2).To(BeNil())

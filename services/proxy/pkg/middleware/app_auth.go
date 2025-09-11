@@ -17,21 +17,21 @@ type AppAuthAuthenticator struct {
 }
 
 // Authenticate implements the authenticator interface to authenticate requests via app auth.
-func (m AppAuthAuthenticator) Authenticate(r *http.Request) (*http.Request, map[string]string, bool) {
+func (m AppAuthAuthenticator) Authenticate(r *http.Request) (*http.Request, bool) {
 	if isPublicPath(r.URL.Path) {
 		// The authentication of public path requests is handled by another authenticator.
 		// Since we can't guarantee the order of execution of the authenticators, we better
 		// implement an early return here for paths we can't authenticate in this authenticator.
-		return nil, nil, false
+		return nil, false
 	}
 
 	username, password, ok := r.BasicAuth()
 	if !ok {
-		return nil, nil, false
+		return nil, false
 	}
 	next, err := m.RevaGatewaySelector.Next()
 	if err != nil {
-		return nil, nil, false
+		return nil, false
 	}
 
 	authenticateResponse, err := next.Authenticate(r.Context(), &gateway.AuthenticateRequest{
@@ -40,14 +40,14 @@ func (m AppAuthAuthenticator) Authenticate(r *http.Request) (*http.Request, map[
 		ClientSecret: password,
 	})
 	if err != nil {
-		return nil, nil, false
+		return nil, false
 	}
 	if authenticateResponse.GetStatus().GetCode() != cs3rpc.Code_CODE_OK {
 		// TODO: log???
-		return nil, nil, false
+		return nil, false
 	}
 
 	r.Header.Set(revactx.TokenHeader, authenticateResponse.GetToken())
 
-	return r, nil, true
+	return r, true
 }

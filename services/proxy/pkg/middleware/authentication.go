@@ -47,7 +47,7 @@ type Authenticator interface {
 	// Authenticate is used to authenticate incoming HTTP requests.
 	// The Authenticator may augment the request with user info or anything related to the
 	// authentication and return the augmented request.
-	Authenticate(*http.Request) (*http.Request, map[string]string, bool)
+	Authenticate(*http.Request) (*http.Request, bool)
 }
 
 // Authentication is a higher order authentication middleware.
@@ -68,11 +68,9 @@ func Authentication(auths []Authenticator, opts ...Option) func(next http.Handle
 			}
 
 			for _, a := range auths {
-				if req, authRespHeaders, ok := a.Authenticate(r); ok {
+				if req, ok := a.Authenticate(r); ok {
 					next.ServeHTTP(w, req)
 					return
-				} else {
-					applyAuthResponseHeaders(w, a, authRespHeaders)
 				}
 			}
 			if !isPublicPath(r.URL.Path) {
@@ -135,18 +133,6 @@ func isPublicPath(p string) bool {
 		}
 	}
 	return false
-}
-
-func applyAuthResponseHeaders(w http.ResponseWriter, a Authenticator, m map[string]string) {
-	baseHeader := ""
-	switch a.(type) {
-	case *OIDCAuthenticator:
-		baseHeader = "X-OCIS-OIDC-Requires-"
-	}
-
-	for key, value := range m {
-		w.Header().Add(baseHeader+key, value)
-	}
 }
 
 // configureSupportedChallenges adds known authentication challenges to the current session.

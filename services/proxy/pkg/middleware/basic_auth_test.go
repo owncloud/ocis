@@ -44,7 +44,7 @@ var _ = Describe("Authenticating requests", Label("BasicAuthenticator"), func() 
 			req := httptest.NewRequest(http.MethodGet, "http://example.com/example/path", http.NoBody)
 			req.SetBasicAuth("testuser", "testpassword")
 
-			req2, _, valid := authenticator.Authenticate(req)
+			req2, valid := authenticator.Authenticate(req)
 
 			Expect(valid).To(Equal(true))
 			Expect(req2).ToNot(BeNil())
@@ -53,7 +53,7 @@ var _ = Describe("Authenticating requests", Label("BasicAuthenticator"), func() 
 			req := httptest.NewRequest(http.MethodGet, "http://example.com/example/path", http.NoBody)
 			req.SetBasicAuth("testuser", "testpassword")
 
-			req2, _, valid := authenticator.Authenticate(req)
+			req2, valid := authenticator.Authenticate(req)
 			Expect(valid).To(Equal(true))
 
 			claims := oidc.FromContext(req2.Context())
