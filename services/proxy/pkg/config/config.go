@@ -24,28 +24,29 @@ type Config struct {
 	GRPCClientTLS *shared.GRPCClientTLS `yaml:"grpc_client_tls"`
 	GrpcClient    client.Client         `yaml:"-"`
 
-	RoleQuotas            map[string]uint64    `yaml:"role_quotas"`
-	Policies              []Policy             `yaml:"policies"`
-	AdditionalPolicies    []Policy             `yaml:"additional_policies"`
-	OIDC                  OIDC                 `yaml:"oidc"`
-	ServiceAccount        ServiceAccount       `yaml:"service_account"`
-	RoleAssignment        RoleAssignment       `yaml:"role_assignment"`
-	PolicySelector        *PolicySelector      `yaml:"policy_selector"`
-	PreSignedURL          PreSignedURL         `yaml:"pre_signed_url"`
-	AccountBackend        string               `yaml:"account_backend" env:"PROXY_ACCOUNT_BACKEND_TYPE" desc:"Account backend the PROXY service should use. Currently only 'cs3' is possible here." introductionVersion:"pre5.0"`
-	UserOIDCClaim         string               `yaml:"user_oidc_claim" env:"PROXY_USER_OIDC_CLAIM" desc:"The name of an OpenID Connect claim that is used for resolving users with the account backend. The value of the claim must hold a per user unique, stable and non re-assignable identifier. The availability of claims depends on your Identity Provider. There are common claims available for most Identity providers like 'email' or 'preferred_username' but you can also add your own claim." introductionVersion:"pre5.0"`
-	UserCS3Claim          string               `yaml:"user_cs3_claim" env:"PROXY_USER_CS3_CLAIM" desc:"The name of a CS3 user attribute (claim) that should be mapped to the 'user_oidc_claim'. Supported values are 'username', 'mail' and 'userid'." introductionVersion:"pre5.0"`
-	MachineAuthAPIKey     string               `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;PROXY_MACHINE_AUTH_API_KEY" desc:"Machine auth API key used to validate internal requests necessary to access resources from other services." introductionVersion:"pre5.0" mask:"password"`
-	AutoprovisionAccounts bool                 `yaml:"auto_provision_accounts" env:"PROXY_AUTOPROVISION_ACCOUNTS" desc:"Set this to 'true' to automatically provision users that do not yet exist in the users service on-demand upon first sign-in. To use this a write-enabled libregraph user backend needs to be setup an running." introductionVersion:"pre5.0"`
-	AutoProvisionClaims   AutoProvisionClaims  `yaml:"auto_provision_claims"`
-	EnableBasicAuth       bool                 `yaml:"enable_basic_auth" env:"PROXY_ENABLE_BASIC_AUTH" desc:"Set this to true to enable 'basic authentication' (username/password)." introductionVersion:"pre5.0"`
-	InsecureBackends      bool                 `yaml:"insecure_backends" env:"PROXY_INSECURE_BACKENDS" desc:"Disable TLS certificate validation for all HTTP backend connections." introductionVersion:"pre5.0"`
-	BackendHTTPSCACert    string               `yaml:"backend_https_cacert" env:"PROXY_HTTPS_CACERT" desc:"Path/File for the root CA certificate used to validate the server’s TLS certificate for https enabled backend services." introductionVersion:"pre5.0"`
-	AuthMiddleware        AuthMiddleware       `yaml:"auth_middleware"`
-	PoliciesMiddleware    PoliciesMiddleware   `yaml:"policies_middleware"`
-	CSPConfigFileLocation string               `yaml:"csp_config_file_location" env:"PROXY_CSP_CONFIG_FILE_LOCATION" desc:"The location of the CSP configuration file." introductionVersion:"6.0.0"`
-	Events                Events               `yaml:"events"`
-	ClaimSpaceManagement  ClaimSpaceManagement `yaml:"claim_space_management"`
+	RoleQuotas                map[string]uint64    `yaml:"role_quotas"`
+	Policies                  []Policy             `yaml:"policies"`
+	AdditionalPolicies        []Policy             `yaml:"additional_policies"`
+	OIDC                      OIDC                 `yaml:"oidc"`
+	ServiceAccount            ServiceAccount       `yaml:"service_account"`
+	RoleAssignment            RoleAssignment       `yaml:"role_assignment"`
+	PolicySelector            *PolicySelector      `yaml:"policy_selector"`
+	PreSignedURL              PreSignedURL         `yaml:"pre_signed_url"`
+	AccountBackend            string               `yaml:"account_backend" env:"PROXY_ACCOUNT_BACKEND_TYPE" desc:"Account backend the PROXY service should use. Currently only 'cs3' is possible here." introductionVersion:"pre5.0"`
+	UserOIDCClaim             string               `yaml:"user_oidc_claim" env:"PROXY_USER_OIDC_CLAIM" desc:"The name of an OpenID Connect claim that is used for resolving users with the account backend. The value of the claim must hold a per user unique, stable and non re-assignable identifier. The availability of claims depends on your Identity Provider. There are common claims available for most Identity providers like 'email' or 'preferred_username' but you can also add your own claim." introductionVersion:"pre5.0"`
+	UserCS3Claim              string               `yaml:"user_cs3_claim" env:"PROXY_USER_CS3_CLAIM" desc:"The name of a CS3 user attribute (claim) that should be mapped to the 'user_oidc_claim'. Supported values are 'username', 'mail' and 'userid'." introductionVersion:"pre5.0"`
+	MachineAuthAPIKey         string               `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;PROXY_MACHINE_AUTH_API_KEY" desc:"Machine auth API key used to validate internal requests necessary to access resources from other services." introductionVersion:"pre5.0" mask:"password"`
+	AutoprovisionAccounts     bool                 `yaml:"auto_provision_accounts" env:"PROXY_AUTOPROVISION_ACCOUNTS" desc:"Set this to 'true' to automatically provision users that do not yet exist in the users service on-demand upon first sign-in. To use this a write-enabled libregraph user backend needs to be setup an running." introductionVersion:"pre5.0"`
+	AutoProvisionClaims       AutoProvisionClaims  `yaml:"auto_provision_claims"`
+	EnableBasicAuth           bool                 `yaml:"enable_basic_auth" env:"PROXY_ENABLE_BASIC_AUTH" desc:"Set this to true to enable 'basic authentication' (username/password)." introductionVersion:"pre5.0"`
+	InsecureBackends          bool                 `yaml:"insecure_backends" env:"PROXY_INSECURE_BACKENDS" desc:"Disable TLS certificate validation for all HTTP backend connections." introductionVersion:"pre5.0"`
+	BackendHTTPSCACert        string               `yaml:"backend_https_cacert" env:"PROXY_HTTPS_CACERT" desc:"Path/File for the root CA certificate used to validate the server’s TLS certificate for https enabled backend services." introductionVersion:"pre5.0"`
+	AuthMiddleware            AuthMiddleware       `yaml:"auth_middleware"`
+	PoliciesMiddleware        PoliciesMiddleware   `yaml:"policies_middleware"`
+	CSPConfigFileLocation     string               `yaml:"csp_config_file_location" env:"PROXY_CSP_CONFIG_FILE_LOCATION" desc:"The location of the CSP configuration file." introductionVersion:"6.0.0"`
+	Events                    Events               `yaml:"events"`
+	ClaimSpaceManagement      ClaimSpaceManagement `yaml:"claim_space_management"`
+	MultiFactorAuthentication MFAConfig            `yaml:"mfa"`
 
 	Context context.Context `json:"-" yaml:"-"`
 }
@@ -110,14 +111,13 @@ const (
 // OIDC is the config for the OpenID-Connect middleware. If set the proxy will try to authenticate every request
 // with the configured oidc-provider
 type OIDC struct {
-	Issuer                  string        `yaml:"issuer" env:"OCIS_URL;OCIS_OIDC_ISSUER;PROXY_OIDC_ISSUER" desc:"URL of the OIDC issuer. It defaults to URL of the builtin IDP." introductionVersion:"pre5.0"`
-	Insecure                bool          `yaml:"insecure" env:"OCIS_INSECURE;PROXY_OIDC_INSECURE" desc:"Disable TLS certificate validation for connections to the IDP. Note that this is not recommended for production environments." introductionVersion:"pre5.0"`
-	AccessTokenVerifyMethod string        `yaml:"access_token_verify_method" env:"PROXY_OIDC_ACCESS_TOKEN_VERIFY_METHOD" desc:"Sets how OIDC access tokens should be verified. Possible values are 'none' and 'jwt'. When using 'none', no special validation apart from using it for accessing the IPD's userinfo endpoint will be done. When using 'jwt', it tries to parse the access token as a jwt token and verifies the signature using the keys published on the IDP's 'jwks_uri'." introductionVersion:"pre5.0"`
-	SkipUserInfo            bool          `yaml:"skip_user_info" env:"PROXY_OIDC_SKIP_USER_INFO" desc:"Do not look up user claims at the userinfo endpoint and directly read them from the access token. Incompatible with 'PROXY_OIDC_ACCESS_TOKEN_VERIFY_METHOD=none'." introductionVersion:"pre5.0"`
-	UserinfoCache           *Cache        `yaml:"user_info_cache"`
-	JWKS                    JWKS          `yaml:"jwks"`
-	RewriteWellKnown        bool          `yaml:"rewrite_well_known" env:"PROXY_OIDC_REWRITE_WELLKNOWN" desc:"Enables rewriting the /.well-known/openid-configuration to the configured OIDC issuer. Needed by the Desktop Client, Android Client and iOS Client to discover the OIDC provider." introductionVersion:"pre5.0"`
-	ClaimsChecker           ClaimsChecker `yaml:"claims_checker"`
+	Issuer                  string `yaml:"issuer" env:"OCIS_URL;OCIS_OIDC_ISSUER;PROXY_OIDC_ISSUER" desc:"URL of the OIDC issuer. It defaults to URL of the builtin IDP." introductionVersion:"pre5.0"`
+	Insecure                bool   `yaml:"insecure" env:"OCIS_INSECURE;PROXY_OIDC_INSECURE" desc:"Disable TLS certificate validation for connections to the IDP. Note that this is not recommended for production environments." introductionVersion:"pre5.0"`
+	AccessTokenVerifyMethod string `yaml:"access_token_verify_method" env:"PROXY_OIDC_ACCESS_TOKEN_VERIFY_METHOD" desc:"Sets how OIDC access tokens should be verified. Possible values are 'none' and 'jwt'. When using 'none', no special validation apart from using it for accessing the IPD's userinfo endpoint will be done. When using 'jwt', it tries to parse the access token as a jwt token and verifies the signature using the keys published on the IDP's 'jwks_uri'." introductionVersion:"pre5.0"`
+	SkipUserInfo            bool   `yaml:"skip_user_info" env:"PROXY_OIDC_SKIP_USER_INFO" desc:"Do not look up user claims at the userinfo endpoint and directly read them from the access token. Incompatible with 'PROXY_OIDC_ACCESS_TOKEN_VERIFY_METHOD=none'." introductionVersion:"pre5.0"`
+	UserinfoCache           *Cache `yaml:"user_info_cache"`
+	JWKS                    JWKS   `yaml:"jwks"`
+	RewriteWellKnown        bool   `yaml:"rewrite_well_known" env:"PROXY_OIDC_REWRITE_WELLKNOWN" desc:"Enables rewriting the /.well-known/openid-configuration to the configured OIDC issuer. Needed by the Desktop Client, Android Client and iOS Client to discover the OIDC provider." introductionVersion:"pre5.0"`
 }
 
 type JWKS struct {
@@ -127,9 +127,9 @@ type JWKS struct {
 	RefreshUnknownKID bool   `yaml:"refresh_unknown_kid" env:"PROXY_OIDC_JWKS_REFRESH_UNKNOWN_KID" desc:"If set to 'true', the JWKS refresh request will occur every time an unknown KEY ID (KID) is seen. Always set a 'refresh_limit' when enabling this." introductionVersion:"pre5.0"`
 }
 
-type ClaimsChecker struct {
-	Name   string `yaml:"name" env:"PROXY_OIDC_CLAIMSCHECKER_NAME" desc:"Name of the claims checker to be used. It can be 'Bool', 'Regexp' or 'Acr'" introductionVersion:"releaseX"`
-	Params string `yaml:"params" env:"PROXY_OIDC_CLAIMSCHECKER_PARAMS" desc:"Parameters to be used by the chosen claims checker. Formatting depends on the specific checker, but it usually like 'param1=value1;param2=value2'" introductionVersion:"releaseX"`
+type MFAConfig struct {
+	Enabled       bool   `yaml:"enabled" env:"PROXY_MFA_ENABLED" desc:"Enable MFA enforcement. If enabled users need to complete MFA before they can access specific paths" introductionVersion:"Balch"`
+	AuthLevelName string `yaml:"auth_level_name" env:"PROXY_MFA_AUTH_LEVEL_NAME" desc:"The name of the auth level that is used to enforce MFA. This needs to match the value in the 'acr' claim of the access token." introductionVersion:"Balch"`
 }
 
 // Cache is a TTL cache configuration.

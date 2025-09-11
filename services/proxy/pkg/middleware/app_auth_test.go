@@ -47,7 +47,7 @@ var _ = Describe("Authenticating requests", Label("AppAuthAuthenticator"), func(
 			req := httptest.NewRequest(http.MethodGet, "http://example.com/example/path", http.NoBody)
 			req.SetBasicAuth("test-user", "AppPassword")
 
-			req2, _, valid := authenticator.Authenticate(req)
+			req2, valid := authenticator.Authenticate(req)
 
 			Expect(valid).To(Equal(true))
 			Expect(req2).ToNot(BeNil())
@@ -60,7 +60,7 @@ var _ = Describe("Authenticating requests", Label("AppAuthAuthenticator"), func(
 			req := httptest.NewRequest(http.MethodGet, "http://example.com/example/path", http.NoBody)
 			req.SetBasicAuth("test-user", "WrongAppPassword")
 
-			req2, _, valid := authenticator.Authenticate(req)
+			req2, valid := authenticator.Authenticate(req)
 
 			Expect(valid).To(Equal(false))
 			Expect(req2).To(BeNil())

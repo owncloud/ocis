@@ -56,9 +56,9 @@ func isPublicWithShareToken(r *http.Request) bool {
 }
 
 // Authenticate implements the authenticator interface to authenticate requests via public share auth.
-func (a PublicShareAuthenticator) Authenticate(r *http.Request) (*http.Request, map[string]string, bool) {
+func (a PublicShareAuthenticator) Authenticate(r *http.Request) (*http.Request, bool) {
 	if !isPublicPath(r.URL.Path) && !isPublicShareArchive(r) && !isPublicShareAppOpen(r) {
-		return nil, nil, false
+		return nil, false
 	}
 
 	query := r.URL.Query()
@@ -70,7 +70,7 @@ func (a PublicShareAuthenticator) Authenticate(r *http.Request) (*http.Request, 
 	if shareToken == "" {
 		// If the share token is not set then we don't need to inject the user to
 		// the request context so we can just continue with the request.
-		return r, nil, true
+		return r, true
 	}
 
 	var sharePassword string
@@ -78,7 +78,7 @@ func (a PublicShareAuthenticator) Authenticate(r *http.Request) (*http.Request, 
 		expiration := query.Get(_paramExpiration)
 		if expiration == "" {
 			a.Logger.Warn().Str("signature", signature).Msg("cannot do signature auth without the expiration")
-			return nil, nil, false
+			return nil, false
 		}
 		sharePassword = strings.Join([]string{"signature", signature, expiration}, "|")
 	} else {
@@ -99,7 +99,7 @@ func (a PublicShareAuthenticator) Authenticate(r *http.Request) (*http.Request, 
 			Str("public_share_token", shareToken).
 			Str("path", r.URL.Path).
 			Msg("could not select next gateway client")
-		return nil, nil, false
+		return nil, false
 	}
 
 	authResp, err := client.Authenticate(r.Context(), &gateway.AuthenticateRequest{
@@ -115,7 +115,7 @@ func (a PublicShareAuthenticator) Authenticate(r *http.Request) (*http.Request, 
 			Str("public_share_token", shareToken).
 			Str("path", r.URL.Path).
 			Msg("failed to authenticate request")
-		return nil, nil, false
+		return nil, false
 	}
 
 	r.Header.Add(_headerRevaAccessToken, authResp.Token)
@@ -124,5 +124,5 @@ func (a PublicShareAuthenticator) Authenticate(r *http.Request) (*http.Request, 
 		Str("authenticator", "public_share").
 		Str("path", r.URL.Path).
 		Msg("successfully authenticated request")
-	return r, nil, true
+	return r, true
 }
