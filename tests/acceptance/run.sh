@@ -264,7 +264,7 @@ function run_behat_tests() {
 	# Thanks to https://en.wikipedia.org/wiki/Tee_(command) and
 	# https://stackoverflow.com/questions/23416278/how-to-strip-ansi-escape-sequences-from-a-variable
 	# for ideas.
-	FAILED_SCENARIO_PATHS=$(echo "${FAILED_SCENARIO_PATHS_COLORED}" | sed "s/\x1b[^m]*m//g")
+	FAILED_SCENARIO_PATHS=$(echo "${FAILED_SCENARIO_PATHS_COLORED}" | sed "s/\x1b\[[0-9;]*m//g" | sed 's/\(\.feature:[0-9]\+\).*/\1/')
 
 	# If something else went wrong, and there were no failed scenarios,
 	# then the awk, grep, sed command sequence above ends up with an empty string.
