@@ -146,6 +146,22 @@ These issued JWT tokens are immutable and integrity-protected. Which means, any 
 
 * Infinite Scale does not get aware when a group is being deleted in the IDP, a new claim will not hold any information from the deleted group. Infinite Scale does not track a claim history to compare. 
 
+#### Claim checks and step up authentication
+
+On fixed routes, Infinite Scale can provide different checks over the OIDC claims that could block requests to those routes if the check fails. These checks are intended to provide a step up authentication mechanism on those paths, which would require a higher authentication level.
+
+This feature is disabled by default, and is intended to work with Keycloak as IDP (it heavily relies on IDP features and requires client support, so it might not work with all the providers).
+
+For the step up authentication, you will need to setup a check on the claims (as env variables):
+```
+PROXY_OIDC_CLAIMSCHECKER_NAME: Acr
+PROXY_OIDC_CLAIMSCHECKER_PARAMS: value=advanced
+```
+where the "advanced" value will depend on the specific acr and authentication level configured in the IDP (Keycloak in this case)
+
+For the (fixed) affected routes, if the check fails, a 401 error code will be returned with a couple of extra custom headers: `X-OCIS-OIDC-Requires-Type: Acr` and `X-OCIS-OIDC-Requires-Data: acr=advanced`. Clients can request another token with the proper authentication level and repeat the request in this particular scenario.
+Note that it isn't the only check that can be setup, and some checks might not be solvable from the client side.
+
 #### Impacts
 
 For shares or space memberships based on groups, a renamed or deleted group will impact accessing the resource:
