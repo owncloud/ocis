@@ -1,6 +1,8 @@
 ---
 services:
   ocis:
+    volumes:
+      - ./config/ocis/apps.yaml:/etc/ocis/apps.yaml
     depends_on:
       externalsites-init:
         condition: service_completed_successfully
