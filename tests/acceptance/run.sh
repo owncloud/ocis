@@ -261,6 +261,7 @@ function run_behat_tests() {
 	FAILED_SCENARIO_PATHS_COLORED=`awk '/Failed scenarios:/',0 ${TEST_LOG_FILE} | grep -a feature`
 	# There will be some ANSI escape codes for color in the FEATURE_COLORED var.
 	# Strip them out so we can pass just the ordinary feature details to Behat.
+	# Also strip everything after ".feature:XX", including text such as "(on line xx)" added by Behat indicating the failing step's line number.
 	# Thanks to https://en.wikipedia.org/wiki/Tee_(command) and
 	# https://stackoverflow.com/questions/23416278/how-to-strip-ansi-escape-sequences-from-a-variable
 	# for ideas.
