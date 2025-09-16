@@ -167,7 +167,6 @@ The request will fail with `507 Insufficient Storage`:
 < X-Frame-Options: SAMEORIGIN
 < X-Permitted-Cross-Domain-Policies: none
 < X-Robots-Tag: none
-< X-Xss-Protection: 1; mode=block
 <
 * Connection #0 to host localhost left intact
 * Closing connection 0
