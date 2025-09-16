@@ -33,6 +33,10 @@ There are a few variables that you need to set:
   The product name of the connected WebOffice app, which can be one of the following:\
   `Collabora`, `OnlyOffice`, `Microsoft365` or `MicrosoftOfficeOnline`. This is used to internally control the behavior according to the different features of the used products.
 
+* `COLLABORATION_APP_PRODUCT_EDITION`:\
+  The product edition of the connected WebOffice app define the capabilities specific to the product.
+  Supported OnlyOffice `ce` (community edition), `de` (developer edition), `ee` (enterprise edition) or `default:empty` equal to `ce`. This is used to internally control the behavior according to the different features of the used products.
+
 * `COLLABORATION_APP_ADDR`:\
   The URL of the collaborative editing app (onlyoffice, collabora, etc).\
   For example: `https://office.example.com`.
@@ -46,6 +50,9 @@ There are a few variables that you need to set:
 
 * `COLLABORATION_WOPI_SHORTTOKENS`:\
   Needs to be set if the office application like `Microsoft Office Online` complains about the URL is too long  (which contains the access token) and refuses to work. If enabled, a store must be configured.
+
+* `COLLABORATION_WOPI_ENABLE_MOBILE`:\
+  The option enables the mobile view for office web app. This feature applies to OnlyOffice. The OnlyOffice `ce` only supports mobile view mode. The `ee` and `de` support mobile view in both view and edit modes. The product edition must be set accordingly via `COLLABORATION_APP_PRODUCT_EDITION`.
 
 The application can be customized further by changing the `COLLABORATION_APP_*` options to better describe the application.
 
