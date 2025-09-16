@@ -144,30 +144,27 @@ These issued JWT tokens are immutable and integrity-protected. Which means, any 
 
 * Infinite Scale can't differentiate between a group being renamed in the IDP and users being reassigned to a different group.
 
-* Infinite Scale does not get aware when a group is being deleted in the IDP, a new claim will not hold any information from the deleted group. Infinite Scale does not track a claim history to compare. 
+* Infinite Scale does not get aware when a group is being deleted in the IDP, a new claim will not hold any information from the deleted group. Infinite Scale does not track a claim history to compare.
 
 #### Claim checks and step up authentication
 
-On fixed routes, Infinite Scale can provide different checks over the OIDC claims that could block requests to those routes if the check fails. These checks are intended to provide a step up authentication mechanism on those paths, which would require a higher authentication level.
-
-This feature is disabled by default, and is intended to work with Keycloak as IDP (it heavily relies on IDP features and requires client support, so it might not work with all the providers).
-
-For the step up authentication, you will need to setup a check on the claims (as env variables):
+Infinite Scale can provide access control via the OIDC "acr" claim ("Authentication Class Reference"). This can be used to enforce step up authentication on specific routes. For example, a user might have logged in with a basic authentication level, but to access a sensitive route, a higher authentication level is required. If the user has not authenticated with the required level, access to the route will be denied.
+Configurable via env variables:
 ```
-PROXY_OIDC_CLAIMSCHECKER_NAME: Acr
-PROXY_OIDC_CLAIMSCHECKER_PARAMS: value=advanced
+OCIS_MFA_ENABLED: true
+OCIS_MFA_AUTH_LEVEL_NAME: advanced
 ```
-where the "advanced" value will depend on the specific acr and authentication level configured in the IDP (Keycloak in this case)
 
-For the (fixed) affected routes, if the check fails, a 401 error code will be returned with a couple of extra custom headers: `X-OCIS-OIDC-Requires-Type: Acr` and `X-OCIS-OIDC-Requires-Data: acr=advanced`. Clients can request another token with the proper authentication level and repeat the request in this particular scenario.
-Note that it isn't the only check that can be setup, and some checks might not be solvable from the client side.
+This feature is disabled by default, and requires an external IDP that supports step up authentication and the acr claim (e.g. Keycloak).
+
+When an authenticated user tries to access a protected route without 2FA, the server will respond with `403 Forbidden` and a `X-OCIS-MFA-Required` header.
 
 #### Impacts
 
 For shares or space memberships based on groups, a renamed or deleted group will impact accessing the resource:
 
 * There is no user notification about the inability accessing the resource.
-* The user will only experience rejected access. 
+* The user will only experience rejected access.
 * This also applies for connected apps like the Desktop, iOS or Android app!
 
 To give access for rejected users on a resource, one with rights to share must update the group information.

@@ -10,6 +10,7 @@ import (
 
 	"github.com/CiscoM31/godata"
 	libregraph "github.com/owncloud/libre-graph-api-go"
+	"github.com/owncloud/ocis/v2/ocis-pkg/mfa"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
 
 	"github.com/go-chi/chi/v5"
@@ -42,11 +43,17 @@ func (g Graph) GetGroups(w http.ResponseWriter, r *http.Request) {
 		}
 		searchHasAcceptableLength = len(odataReq.Query.Search.RawValue) >= minSearchLength
 	}
-	if !ctxHasFullPerms && !searchHasAcceptableLength {
-		// for regular user the search term must have a minimum length
-		logger.Debug().Interface("query", r.URL.Query()).Msgf("search with less than %d chars for a regular user", g.config.API.IdentitySearchMinLength)
-		errorcode.AccessDenied.Render(w, r, http.StatusForbidden, "search term too short")
-		return
+	if !searchHasAcceptableLength {
+		if !ctxHasFullPerms {
+			// for regular user the search term must have a minimum length
+			logger.Debug().Interface("query", r.URL.Query()).Msgf("search with less than %d chars for a regular user", g.config.API.IdentitySearchMinLength)
+			errorcode.AccessDenied.Render(w, r, http.StatusForbidden, "search term too short")
+			return
+		}
+
+		if !mfa.Accepted(r.Context(), w) {
+			return
+		}
 	}
 
 	if !ctxHasFullPerms && (odataReq.Query.Filter != nil || odataReq.Query.Apply != nil || odataReq.Query.Expand != nil || odataReq.Query.Compute != nil) {
