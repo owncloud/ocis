@@ -78,6 +78,7 @@ The following sections list the changes for unreleased.
 * Enhancement - HTTP Strict Transport Security: [#11568](https://github.com/owncloud/ocis/pull/11568)
 * Enhancement - Allow markdown output for unified-roles-table: [#11581](https://github.com/owncloud/ocis/pull/11581)
 * Enhancement - The sse support added for the public links: [#11623](https://github.com/owncloud/ocis/pull/11623)
+* Enhancement - Added the OnlyOffice license support: [#11624](https://github.com/owncloud/ocis/pull/11624)
 * Enhancement - Bump Web to 12.0.4: [#11625](https://github.com/owncloud/ocis/pull/11625)
 
 ## Details
@@ -169,6 +170,12 @@ The following sections list the changes for unreleased.
    The sse support added for the public links
 
    https://github.com/owncloud/ocis/pull/11623
+
+* Enhancement - Added the OnlyOffice license support: [#11624](https://github.com/owncloud/ocis/pull/11624)
+
+   Added the OnlyOffice ee license support to the ocis_full deployment.
+
+   https://github.com/owncloud/ocis/pull/11624
 
 * Enhancement - Bump Web to 12.0.4: [#11625](https://github.com/owncloud/ocis/pull/11625)
 
