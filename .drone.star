@@ -100,7 +100,7 @@ config = {
                 "apiLocks",
             ],
             "skip": False,
-            "k8s": False,
+            "k8s": True,
         },
         "settingsAndNotification": {
             "suites": [
@@ -109,6 +109,7 @@ config = {
                 "apiCors",
             ],
             "skip": False,
+            "k8s": True,
             "withRemotePhp": [False],
             "emailNeeded": True,
             "extraEnvironment": {
@@ -130,21 +131,21 @@ config = {
             ],
             "skip": False,
             "withRemotePhp": [False],
-            "k8s": False,
+            "k8s": True,
         },
         "spaces": {
             "suites": [
                 "apiSpaces",
             ],
             "skip": False,
-            "k8s": False,
+            "k8s": True,
         },
         "spacesShares": {
             "suites": [
                 "apiSpacesShares",
             ],
             "skip": False,
-            "k8s": False,
+            "k8s": True,
         },
         "davOperations": {
             "suites": [
@@ -156,6 +157,7 @@ config = {
                 "apiActivities",
             ],
             "skip": False,
+            "k8s": True,
         },
         "groupAndSearch1": {
             "suites": [
@@ -165,7 +167,7 @@ config = {
                 "apiServiceAvailability",
             ],
             "skip": False,
-            "k8s": False,
+            "k8s": True,
         },
         "search2": {
             "suites": [
@@ -174,7 +176,7 @@ config = {
             ],
             "tikaNeeded": True,
             "skip": False,
-            "k8s": False,
+            "k8s": True,
         },
         "sharingNg1": {
             "suites": [
@@ -183,15 +185,15 @@ config = {
                 "apiSharingNgPermissions",
             ],
             "skip": False,
+            "k8s": True,
             "withRemotePhp": [False],
-            "k8s": False,
         },
         "sharingNgAdditionalShareRole": {
             "suites": [
                 "apiSharingNgAdditionalShareRole",
             ],
             "skip": False,
-            "k8s": False,
+            "k8s": True,
             "withRemotePhp": [False],
         },
         "sharingNgShareInvitation": {
@@ -200,6 +202,7 @@ config = {
                 "apiSharingNgItemInvitation",
             ],
             "skip": False,
+            "k8s": True,
             "withRemotePhp": [False],
         },
         "sharingNgLinkShare": {
@@ -209,13 +212,15 @@ config = {
                 "apiSharingNgLinkShareManagement",
             ],
             "skip": False,
-            "withRemotePhp": [False],
+            "k8s": True,
+            "withRemotePhp": [True],
         },
         "antivirus": {
             "suites": [
                 "apiAntivirus",
             ],
             "skip": False,
+            "k8s": True,
             "antivirusNeeded": True,
             "extraServerEnvironment": {
                 "ANTIVIRUS_SCANNER_TYPE": "clamav",
@@ -231,6 +236,7 @@ config = {
                 "apiAuthApp",
             ],
             "skip": False,
+            "k8s": True,
             "withRemotePhp": [False],
             "federationServer": True,
             "emailNeeded": True,
@@ -259,6 +265,7 @@ config = {
                 "apiCollaboration",
             ],
             "skip": False,
+            "k8s": True,
             "withRemotePhp": [False],
             "collaborationServiceNeeded": True,
             "extraServerEnvironment": {
@@ -270,6 +277,7 @@ config = {
                 "cliCommands",
             ],
             "skip": False,
+            "k8s": True,
             "withRemotePhp": [False],
             "antivirusNeeded": True,
             "emailNeeded": True,
@@ -299,6 +307,7 @@ config = {
                 "coreApiVersions",
             ],
             "skip": False,
+            "k8s": True,
             "withRemotePhp": [False],
         },
         "2": {
@@ -307,7 +316,7 @@ config = {
                 "coreApiShareManagementToShares",
             ],
             "skip": False,
-            "k8s": False,
+            "k8s": True,
             "withRemotePhp": [False],
         },
         "3": {
@@ -316,6 +325,7 @@ config = {
                 "coreApiSharePublicLink2",
             ],
             "skip": False,
+            "k8s": True,
             "withRemotePhp": [False],
         },
         "4": {
@@ -328,7 +338,7 @@ config = {
                 "coreApiShareUpdateToShares",
             ],
             "skip": False,
-            "k8s": False,
+            "k8s": True,
             "withRemotePhp": [False],
         },
         "5": {
@@ -339,7 +349,7 @@ config = {
                 "coreApiWebdavEtagPropagation2",
             ],
             "skip": False,
-            "k8s": False,
+            "k8s": True,
         },
         "6": {
             "suites": [
@@ -354,7 +364,7 @@ config = {
                 "coreApiWebdavProperties",
             ],
             "skip": False,
-            "k8s": False,
+            "k8s": True,
         },
         "8": {
             "suites": [
@@ -363,22 +373,26 @@ config = {
                 "coreApiWebdavUpload",
                 "coreApiWebdavUploadTUS",
             ],
+            "k8s": True,
             "skip": False,
         },
     },
     "e2eTests": {
         "part": {
             "skip": False,
+            "k8s": True,
             "totalParts": 4,  # divide and run all suites in parts (divide pipelines)
             "xsuites": ["search", "app-provider", "oidc", "ocm", "keycloak"],  # suites to skip
         },
         "search": {
             "skip": False,
+            "k8s": True,
             "suites": ["search"],  # suites to run
             "tikaNeeded": True,
         },
         "keycloak": {
             "skip": False,
+            "k8s": True,
             "suites": ["journeys", "keycloak"],
             "keycloakNeeded": True,
         },
@@ -1063,7 +1077,7 @@ def codestyle(ctx):
 def localApiTestPipeline(ctx):
     pipelines = []
 
-    with_remote_php = [False]
+    with_remote_php = [True]
     if ctx.build.event == "cron" or "full-ci" in ctx.build.title.lower():
         with_remote_php.append(True)
 
@@ -1091,7 +1105,7 @@ def localApiTestPipeline(ctx):
                     params[item] = matrix[item] if item in matrix else defaults[item]
                 for storage in params["storages"]:
                     for run_with_remote_php in params["withRemotePhp"]:
-                        run_on_k8s = params["k8s"] and ctx.build.event == "cron"
+                        run_on_k8s = params["k8s"]
                         ocis_url = OCIS_URL
                         if run_on_k8s:
                             ocis_url = "https://%s" % OCIS_SERVER_NAME
@@ -1363,7 +1377,7 @@ def wopiValidatorTests(ctx, storage, wopiServerType):
 def coreApiTestPipeline(ctx):
     pipelines = []
 
-    with_remote_php = [False]
+    with_remote_php = [True]
     if ctx.build.event == "cron" or "full-ci" in ctx.build.title.lower():
         with_remote_php.append(True)
 
@@ -1393,7 +1407,7 @@ def coreApiTestPipeline(ctx):
                 for run_with_remote_php in params["withRemotePhp"]:
                     filter_tags = "~@skipOnGraph&&~@skipOnOcis-%s-Storage" % ("OC" if storage == "owncloud" else "OCIS")
                     expected_failures_file = "%s/expected-failures-API-on-%s-storage.md" % (test_dir, storage.upper())
-                    run_on_k8s = params["k8s"] and ctx.build.event == "cron"
+                    run_on_k8s = params["k8s"]
                     ocis_url = OCIS_URL
                     if run_on_k8s:
                         ocis_url = "https://%s" % OCIS_SERVER_NAME
