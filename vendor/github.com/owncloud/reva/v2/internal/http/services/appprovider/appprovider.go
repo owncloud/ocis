@@ -31,6 +31,10 @@ import (
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	iso6391 "github.com/emvi/iso-639-1"
+	"github.com/go-chi/chi/v5"
+	ua "github.com/mileusna/useragent"
+	"github.com/mitchellh/mapstructure"
 	ctxpkg "github.com/owncloud/reva/v2/pkg/ctx"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/status"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
@@ -38,10 +42,6 @@ import (
 	"github.com/owncloud/reva/v2/pkg/sharedconf"
 	"github.com/owncloud/reva/v2/pkg/storagespace"
 	"github.com/owncloud/reva/v2/pkg/utils"
-	iso6391 "github.com/emvi/iso-639-1"
-	"github.com/go-chi/chi/v5"
-	ua "github.com/mileusna/useragent"
-	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 	"google.golang.org/protobuf/proto"
@@ -412,6 +412,12 @@ func (s *svc) handleOpen(openMode int) http.HandlerFunc {
 		if templateID != "" {
 			openReq.Opaque = utils.AppendPlainToOpaque(openReq.Opaque, "template", templateID)
 		}
+
+		mobile := r.Form.Get("mobile")
+		if mobile == "true" || mobile == "1" {
+			openReq.Opaque = utils.AppendPlainToOpaque(openReq.Opaque, "mobile", "1")
+		}
+
 		openRes, err := client.OpenInApp(ctx, &openReq)
 		if err != nil {
 			writeError(w, r, appErrorServerError,

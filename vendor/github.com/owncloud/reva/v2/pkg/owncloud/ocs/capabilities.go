@@ -61,6 +61,7 @@ type Capabilities struct {
 	Search         *CapabilitiesSearch         `json:"search,omitempty" xml:"search,omitempty" mapstructure:"search"`
 	Theme          *CapabilitiesTheme          `json:"theme,omitempty" xml:"theme,omitempty" mapstructure:"theme"`
 	Notifications  *CapabilitiesNotifications  `json:"notifications,omitempty" xml:"notifications,omitempty"`
+	Auth           *CapabilitiesAuth           `json:"auth,omitempty" xml:"auth,omitempty"`
 }
 
 // CapabilitiesSearch holds the search capabilities
@@ -90,6 +91,17 @@ type CapabilitiesSearchProperty struct {
 type CapabilitiesSearchPropertyExtended struct {
 	CapabilitiesSearchProperty `mapstructure:",squash"`
 	Keywords                   []string `json:"keywords,omitempty" xml:"keywords,omitempty" mapstructure:"keywords"`
+}
+
+// CapabilitiesAuth holds auth capabilities
+type CapabilitiesAuth struct {
+	MFA CapabilitiesMFA `json:"mfa" xml:"mfa" mapstructure:"mfa"`
+}
+
+// CapabilitiesMFA holds mfa capabilities
+type CapabilitiesMFA struct {
+	Enabled   bool   `json:"enabled,omitempty" xml:"enabled,omitempty" mapstructure:"enabled"`
+	LevelName string `json:"levelname,omitempty" xml:"levelname,omitempty" mapstructure:"levelname"`
 }
 
 // Spaces lets a service configure its advertised options related to Storage Spaces.
