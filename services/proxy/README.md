@@ -231,8 +231,8 @@ role_assignment:
 ```
 
 Note: Regex patterns are treated as full matches. Typically you don't need `^` or `$`.
-If a `claim_value` is an invalid regex, it only matches exactly equal claim values; otherwise it's ignored.
-Ordering still applies; the first matching mapping wins.
+If a `claim_value` is an invalid regex, it only matches claim values that are exactly equal; otherwise it's ignored.
+Ordering still applies, and the first matching mapping wins.
 
 Claim values that are not mapped to a specific ownCloud Infinite Scale role will be ignored.
 
