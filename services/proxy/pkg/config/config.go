@@ -128,8 +128,8 @@ type JWKS struct {
 }
 
 type MFAConfig struct {
-	Enabled       bool   `yaml:"enabled" env:"OCIS_MFA_ENABLED" desc:"Enable MFA enforcement. If enabled users need to complete MFA before they can access specific paths" introductionVersion:"Balch"`
-	AuthLevelName string `yaml:"auth_level_name" env:"OCIS_MFA_AUTH_LEVEL_NAME" desc:"The name of the auth level that is used to enforce MFA. This needs to match the value in the 'acr' claim of the access token." introductionVersion:"Balch"`
+	Enabled        bool     `yaml:"enabled" env:"OCIS_MFA_ENABLED" desc:"Enable MFA enforcement. If enabled users need to complete MFA before they can access specific paths" introductionVersion:"Balch"`
+	AuthLevelNames []string `yaml:"auth_level_name" env:"OCIS_MFA_AUTH_LEVEL_NAMES" desc:"The names of the auth levels that contain MFA. One of these needs to match the value in the 'acr' claim of the access token." introductionVersion:"Balch"`
 }
 
 // Cache is a TTL cache configuration.

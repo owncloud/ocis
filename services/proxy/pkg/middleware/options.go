@@ -7,7 +7,6 @@ import (
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
-	"github.com/owncloud/ocis/v2/ocis-pkg/oidc/checkers"
 	policiessvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/policies/v0"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
@@ -42,8 +41,6 @@ type Options struct {
 	OIDCClient oidc.OIDCClient
 	// OIDCIss is the oidcAuth-issuer
 	OIDCIss string
-	// ClaimsChecker makes checks over the OIDC claims
-	ClaimsChecker checkers.Checker
 	// RevaGatewaySelector to send requests to the reva gateway
 	RevaGatewaySelector pool.Selectable[gateway.GatewayAPIClient]
 	// PreSignedURLConfig to configure the middleware
@@ -139,13 +136,6 @@ func OIDCClient(val oidc.OIDCClient) Option {
 func OIDCIss(iss string) Option {
 	return func(o *Options) {
 		o.OIDCIss = iss
-	}
-}
-
-// OIDCIss sets the oidcAuth issuer url
-func ClaimsChecker(cc checkers.Checker) Option {
-	return func(o *Options) {
-		o.ClaimsChecker = cc
 	}
 }
 

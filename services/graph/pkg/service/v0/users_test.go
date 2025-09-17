@@ -26,6 +26,7 @@ import (
 	"go-micro.dev/v4/client"
 	"google.golang.org/grpc"
 
+	"github.com/owncloud/ocis/v2/ocis-pkg/mfa"
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 	settings "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
@@ -242,7 +243,7 @@ var _ = Describe("Users", func() {
 				Expect(rr.Code).To(Equal(http.StatusBadRequest))
 			})
 
-			It("lists the users", func() {
+			It("lists the users with 2fa", func() {
 				permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settings.GetPermissionByIDResponse{
 					Permission: &settingsmsg.Permission{
 						Operation:  settingsmsg.Permission_OPERATION_UNKNOWN,
@@ -257,6 +258,7 @@ var _ = Describe("Users", func() {
 				identityBackend.On("GetUsers", mock.Anything, mock.Anything, mock.Anything).Return(users, nil)
 
 				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users", nil)
+				r = r.WithContext(mfa.Set(r.Context(), true))
 				svc.GetUsers(rr, r)
 
 				Expect(rr.Code).To(Equal(http.StatusOK))
@@ -269,6 +271,18 @@ var _ = Describe("Users", func() {
 
 				Expect(len(res.Value)).To(Equal(1))
 				Expect(res.Value[0].GetId()).To(Equal("user1"))
+			})
+			It("denies listing without 2fa", func() {
+				permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settings.GetPermissionByIDResponse{
+					Permission: &settingsmsg.Permission{
+						Operation:  settingsmsg.Permission_OPERATION_UNKNOWN,
+						Constraint: settingsmsg.Permission_CONSTRAINT_ALL,
+					},
+				}, nil)
+				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users", nil)
+				svc.GetUsers(rr, r)
+
+				Expect(rr.Code).To(Equal(http.StatusForbidden))
 			})
 			It("denies listing for unprivileged users", func() {
 				permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settings.GetPermissionByIDResponse{}, nil)
@@ -353,6 +367,7 @@ var _ = Describe("Users", func() {
 
 				getUsers := func(path string) []*libregraph.User {
 					r := httptest.NewRequest(http.MethodGet, path, nil)
+					r = r.WithContext(mfa.Set(r.Context(), true))
 					rec := httptest.NewRecorder()
 					svc.GetUsers(rec, r)
 
@@ -412,6 +427,7 @@ var _ = Describe("Users", func() {
 
 				// Handles invalid sort field
 				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users?$orderby=invalid", nil)
+				r = r.WithContext(mfa.Set(r.Context(), true))
 				svc.GetUsers(rr, r)
 
 				Expect(rr.Code).To(Equal(http.StatusBadRequest))
@@ -450,6 +466,7 @@ var _ = Describe("Users", func() {
 
 				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users?$expand=appRoleAssignments", nil)
 				r = r.WithContext(revactx.ContextSetUser(ctx, currentUser))
+				r = r.WithContext(mfa.Set(r.Context(), true))
 				svc.GetUsers(rr, r)
 
 				Expect(rr.Code).To(Equal(http.StatusOK))
@@ -490,6 +507,7 @@ var _ = Describe("Users", func() {
 				}, nil)
 
 				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users?$filter="+url.QueryEscape(filter), nil)
+				r = r.WithContext(mfa.Set(r.Context(), true))
 				svc.GetUsers(rr, r)
 
 				Expect(rr.Code).To(Equal(status))
@@ -550,6 +568,7 @@ var _ = Describe("Users", func() {
 						}}
 					}, nil)
 				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users?$filter="+url.QueryEscape(filter), nil)
+				r = r.WithContext(mfa.Set(r.Context(), true))
 				svc.GetUsers(rr, r)
 
 				Expect(rr.Code).To(Equal(status))

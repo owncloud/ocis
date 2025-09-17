@@ -1877,7 +1877,7 @@
       "description": "OpenID Connect scope for add acr (authentication context class reference) to the token",
       "protocol": "openid-connect",
       "attributes": {
-        "include.in.token.scope": "false",
+        "include.in.token.scope": "true",
         "display.on.consent.screen": "false"
       },
       "protocolMappers": [
@@ -2899,7 +2899,7 @@
       "config": {}
     }
   ],
-  "browserFlow": "browser",
+  "browserFlow": "step up flow",
   "registrationFlow": "registration",
   "directGrantFlow": "direct grant",
   "resetCredentialsFlow": "reset credentials",

@@ -9,19 +9,6 @@ import (
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
 )
 
-var (
-// ResponseHeaderBase is the prefix for all auth related response headers.
-// ResponseHeaderBase = "X-OCIS-AUTH-"
-
-// The list of paths that require mfa if no $search query is present
-// we use a map here for easier lookups
-// _protectedPaths = map[string]struct{}{
-// "/graph/v1.0/users":     struct{}{},
-// "/graph/v1.0/groups":    struct{}{},
-// "/graph/v1beta1/drives": struct{}{},
-// }
-)
-
 // MultiFactor returns a middleware that checks requests for mfa
 func MultiFactor(cfg config.MFAConfig, opts ...Option) func(next http.Handler) http.Handler {
 	options := newOptions(opts...)
@@ -29,95 +16,23 @@ func MultiFactor(cfg config.MFAConfig, opts ...Option) func(next http.Handler) h
 
 	return func(next http.Handler) http.Handler {
 		return &MultiFactorAuthentication{
-			next:          next,
-			logger:        logger,
-			enabled:       cfg.Enabled,
-			authLevelName: cfg.AuthLevelName,
-			// claimsChecker: checkers.NewAcrChecker(cfg.AuthLevelName), // ?
+			next:           next,
+			logger:         logger,
+			enabled:        cfg.Enabled,
+			authLevelNames: cfg.AuthLevelNames,
 		}
 	}
 }
 
 // MultiFactorAuthentication is a authenticator that checks for mfa on specific paths
 type MultiFactorAuthentication struct {
-	next          http.Handler
-	logger        log.Logger
-	enabled       bool
-	authLevelName string
-	// claimsChecker checkers.Checker // ?
+	next           http.Handler
+	logger         log.Logger
+	enabled        bool
+	authLevelNames []string
 }
 
-// Authenticate implenents the authenticator interface and checks the access token for the correct acr claim
-// func (mfa MultiFactorAuthentication) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-// if !mfa.shouldCheckClaims(req) {
-// mfa.next.ServeHTTP(w, req)
-// return
-// }
-
-// log := mfa.logger.Error().Str("path", req.URL.Path).Str("required", mfa.authLevelName)
-// claims := oidc.FromContext(req.Context())
-
-// // either we use the claims checker here:
-// if false {
-
-// err := mfa.claimsChecker.CheckClaims(claims)
-// if err == nil {
-// // acr claim is correct
-// mfa.next.ServeHTTP(w, req)
-// return
-// }
-
-// log.Err(err).Interface("checker", mfa.claimsChecker.RequireMap()).Msg("can't access protected path without valid claims")
-// }
-
-// // or we read the acr claim directly here:
-// if true {
-
-// // acr is a standard OIDC claim.
-// value, err := oidc.ReadStringClaim("acr", claims)
-// if err != nil {
-// log.Err(err).Interface("claims", claims).Msg("no acr claim found in access token")
-// w.Header().Add(ResponseHeaderBase+"Requires-Claim", "acr")
-// w.WriteHeader(http.StatusUnauthorized)
-// return
-// }
-
-// if value == mfa.authLevelName {
-// // acr claim is corrct
-// mfa.next.ServeHTTP(w, req)
-// return
-// }
-
-// log.Err(err).Str("acr", value).Msg("can't access protected path without valid claims")
-// }
-
-// w.Header().Add(ResponseHeaderBase+"Requires-AuthLevel", mfa.authLevelName)
-// w.WriteHeader(http.StatusUnauthorized)
-// return
-// }
-
-// // shouldCheckClaims returns true if we should check the claims for the provided request.
-// func (mfa MultiFactorAuthentication) shouldCheckClaims(r *http.Request) bool {
-// if !mfa.enabled {
-// return false
-// }
-
-// if _, protected := _protectedPaths[r.URL.Path]; !protected {
-// return false
-// }
-
-// q := r.URL.Query()
-
-// // We need to be careful here. We don't want to block access if this is a search query as this can be done without mfa.
-// // But we don't want to allow bypassing mfa by just adding an empty (or ignored) $search parameter.
-// // We should only check for the presence of the $search parameter if the endpoint is actually using it.
-// if q.Get("$search") != "" { // if $query isn't present, it will return the empty string
-// return false
-// }
-
-// return true
-// }
-
+// ServeHTTP adds the mfa header if the request contains a valid mfa token
 func (m MultiFactorAuthentication) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	defer m.next.ServeHTTP(w, req)
 
@@ -129,21 +44,30 @@ func (m MultiFactorAuthentication) ServeHTTP(w http.ResponseWriter, req *http.Re
 	// overwrite the mfa header to avoid passing on wrong information
 	mfa.SetHeader(req, false)
 
-	log := m.logger.Error().Str("path", req.URL.Path).Str("required", m.authLevelName)
 	claims := oidc.FromContext(req.Context())
 
 	// acr is a standard OIDC claim.
 	value, err := oidc.ReadStringClaim("acr", claims)
 	if err != nil {
-		log.Err(err).Interface("claims", claims).Msg("no acr claim found in access token")
+		m.logger.Error().Str("path", req.URL.Path).Interface("required", m.authLevelNames).Err(err).Interface("claims", claims).Msg("no acr claim found in access token")
 		return
 	}
 
-	if value != m.authLevelName {
+	if !m.containsMFA(value) {
 		m.logger.Debug().Str("acr", value).Str("url", req.URL.Path).Msg("accessing path without mfa")
 		return
 	}
 
 	mfa.SetHeader(req, true)
 	m.logger.Debug().Str("acr", value).Str("url", req.URL.Path).Msg("mfa authenticated")
+}
+
+// containsMFA checks if the given value is in the list of authentication level names
+func (m MultiFactorAuthentication) containsMFA(value string) bool {
+	for _, v := range m.authLevelNames {
+		if v == value {
+			return true
+		}
+	}
+	return false
 }

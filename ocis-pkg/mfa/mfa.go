@@ -1,4 +1,4 @@
-// package mfa provides functionality for multi-factor authentication (MFA).
+// Package mfa provides functionality for multi-factor authentication (MFA).
 package mfa
 
 import (
@@ -8,10 +8,10 @@ import (
 
 // MFAHeader is the header to be used across grpc and http services
 // to forward the access token.
-const MFAHeader = "x-multi-factor-authentication"
+const MFAHeader = "X-Multi-Factor-Authentication"
 
 // MFARequiredHeader is the header returned by the server if step-up authentication is required.
-const MFARequiredHeader = "X-OCIS-MFA-Required"
+const MFARequiredHeader = "X-Ocis-Mfa-Required"
 
 type mfaKeyType struct{}
 

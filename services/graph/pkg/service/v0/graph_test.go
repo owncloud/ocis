@@ -29,6 +29,7 @@ import (
 	"github.com/tidwall/gjson"
 	"google.golang.org/grpc"
 
+	"github.com/owncloud/ocis/v2/ocis-pkg/mfa"
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	v0 "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
@@ -116,17 +117,29 @@ var _ = Describe("Graph", func() {
 				Expect(rr.Code).To(Equal(http.StatusOK))
 			})
 
-			It("can list an empty list of all spaces", func() {
+			It("can list an empty list of all spaces when having 2fa", func() {
 				gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Times(1).Return(&provider.ListStorageSpacesResponse{
 					Status:        status.NewOK(ctx),
 					StorageSpaces: []*provider.StorageSpace{},
 				}, nil)
 
 				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/drives", nil)
-				r = r.WithContext(ctx)
+				r = r.WithContext(mfa.Set(ctx, true))
 				rr := httptest.NewRecorder()
 				svc.GetAllDrivesV1(rr, r)
 				Expect(rr.Code).To(Equal(http.StatusOK))
+			})
+
+			It("denies getting all spaces when not having 2fa", func() {
+				gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Times(1).Return(&provider.ListStorageSpacesResponse{
+					Status:        status.NewOK(ctx),
+					StorageSpaces: []*provider.StorageSpace{},
+				}, nil)
+
+				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/drives", nil)
+				rr := httptest.NewRecorder()
+				svc.GetAllDrivesV1(rr, r)
+				Expect(rr.Code).To(Equal(http.StatusForbidden))
 			})
 
 			It("can list a space without owner", func() {
