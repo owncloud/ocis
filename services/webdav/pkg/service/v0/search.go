@@ -56,23 +56,6 @@ func (g Webdav) Search(w http.ResponseWriter, r *http.Request) {
 		PageSize: int32(rep.SearchFiles.Search.Limit),
 	}
 
-	// Limit search to the according space when searching /dav/spaces/
-	if strings.HasPrefix(r.URL.Path, "/dav/spaces") {
-		space := strings.TrimPrefix(r.URL.Path, "/dav/spaces/")
-		rid, err := storagespace.ParseID(space)
-		if err != nil {
-			logger.Debug().Err(err).Msg("error parsing the space id for filtering")
-		} else {
-			req.Ref = &searchmsg.Reference{
-				ResourceId: &searchmsg.ResourceID{
-					StorageId: rid.StorageId,
-					SpaceId:   rid.SpaceId,
-					OpaqueId:  rid.SpaceId,
-				},
-			}
-		}
-	}
-
 	rsp, err := g.searchClient.Search(ctx, req)
 	if err != nil {
 		e := merrors.Parse(err.Error())
@@ -91,7 +74,13 @@ func (g Webdav) Search(w http.ResponseWriter, r *http.Request) {
 
 func (g Webdav) sendSearchResponse(rsp *searchsvc.SearchResponse, w http.ResponseWriter, r *http.Request) {
 	logger := g.log.SubloggerWithRequestID(r.Context())
-	responsesXML, err := multistatusResponse(r.Context(), rsp.Matches)
+
+	hrefPrefix := "/dav/spaces"
+	if strings.HasPrefix(r.URL.Path, "/remote.php/dav/spaces") {
+		hrefPrefix = "/remote.php/dav/spaces"
+	}
+
+	responsesXML, err := multistatusResponse(r.Context(), rsp.Matches, hrefPrefix)
 	if err != nil {
 		logger.Error().Err(err).Msg("error formatting propfind")
 		w.WriteHeader(http.StatusInternalServerError)
@@ -109,10 +98,10 @@ func (g Webdav) sendSearchResponse(rsp *searchsvc.SearchResponse, w http.Respons
 }
 
 // multistatusResponse converts a list of matches into a multistatus response string
-func multistatusResponse(ctx context.Context, matches []*searchmsg.Match) ([]byte, error) {
+func multistatusResponse(ctx context.Context, matches []*searchmsg.Match, hrefPrefix string) ([]byte, error) {
 	responses := make([]*propfind.ResponseXML, 0, len(matches))
 	for i := range matches {
-		res, err := matchToPropResponse(ctx, matches[i])
+		res, err := matchToPropResponse(ctx, matches[i], hrefPrefix)
 		if err != nil {
 			return nil, err
 		}
@@ -128,7 +117,7 @@ func multistatusResponse(ctx context.Context, matches []*searchmsg.Match) ([]byt
 	return msg, nil
 }
 
-func matchToPropResponse(ctx context.Context, match *searchmsg.Match) (*propfind.ResponseXML, error) {
+func matchToPropResponse(ctx context.Context, match *searchmsg.Match, hrefPrefix string) (*propfind.ResponseXML, error) {
 	// unfortunately search uses own versions of ResourceId and Ref. So we need to assert them here
 	var (
 		ref string
@@ -161,7 +150,7 @@ func matchToPropResponse(ctx context.Context, match *searchmsg.Match) (*propfind
 		return nil, err
 	}
 	response := propfind.ResponseXML{
-		Href:     net.EncodePath(path.Join("/remote.php/dav/spaces/", ref)),
+		Href:     net.EncodePath(path.Join(hrefPrefix, ref)),
 		Propstat: []propfind.PropstatXML{},
 	}
 
