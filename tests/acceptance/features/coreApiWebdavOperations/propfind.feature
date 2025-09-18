@@ -48,7 +48,7 @@ Feature: PROPFIND
       | password        | %public% |
     When the public sends "PROPFIND" request to the last public link share using the public WebDAV API with password "%public%"
     Then the HTTP status code should be "207"
-    And the value of the item "//d:href" in the response should match "/\/dav\/public-files\/%public_token%\/$/"
+    And the value of the item "//d:href" in the response should match "/\*/dav\/public-files\/%public_token%\/$/"
     And the value of the item "//oc:public-link-share-owner" in the response should be "Alice"
 
   @skipOnReva @issue-10071 @issue-10331
