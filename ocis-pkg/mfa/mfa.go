@@ -1,4 +1,5 @@
 // Package mfa provides functionality for multi-factor authentication (MFA).
+// mfa_test.go contains usage examples and tests.
 package mfa
 
 import (
@@ -17,22 +18,33 @@ type mfaKeyType struct{}
 
 var mfaKey = mfaKeyType{}
 
-// FromRequest extracts the mfa status from the request headers
-func FromRequest(ctx context.Context, req *http.Request) context.Context {
-	return Set(ctx, req.Header.Get(MFAHeader) == "true")
-}
-
-// Accepted checks if the context has MFA authentication. If not, it sets the required header and status code.
-func Accepted(ctx context.Context, w http.ResponseWriter) bool {
-	hasMFA := Has(ctx)
-	if !hasMFA {
-		SetRequiredHeader(w)
+// EnhanceRequest enhances the request context with the MFA status from the header.
+// This operation does not overwrite existing context values.
+func EnhanceRequest(req *http.Request) *http.Request {
+	ctx := req.Context()
+	if Get(ctx) {
+		return req
 	}
-	return hasMFA
+	return req.WithContext(Set(ctx, req.Header.Get(MFAHeader) == "true"))
 }
 
-// Has returns true if the user is MFA authenticated.
-func Has(ctx context.Context) bool {
+// EnsureOrReject sets the MFA required header and status code 403 if not multi factor authenticated.
+func EnsureOrReject(ctx context.Context, w http.ResponseWriter) (hasMFA bool) {
+	hasMFA = Get(ctx)
+	if !hasMFA {
+		SetRequiredStatus(w)
+	}
+	return
+}
+
+// SetRequiredStatus sets the MFA required header and the statuscode to 403
+func SetRequiredStatus(w http.ResponseWriter) {
+	w.Header().Set(MFARequiredHeader, "true")
+	w.WriteHeader(http.StatusForbidden)
+}
+
+// Get gets the mfa status from the context.
+func Get(ctx context.Context) bool {
 	mfa, ok := ctx.Value(mfaKey).(bool)
 	if !ok {
 		return false
@@ -53,10 +65,4 @@ func SetHeader(r *http.Request, mfa bool) {
 	}
 
 	r.Header.Set(MFAHeader, "false")
-}
-
-// SetRequiredHeader sets the MFA required header and the statuscode to 403
-func SetRequiredHeader(w http.ResponseWriter) {
-	w.Header().Set(MFARequiredHeader, "true")
-	w.WriteHeader(http.StatusForbidden)
 }

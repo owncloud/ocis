@@ -140,6 +140,7 @@ var _ = Describe("Graph", func() {
 				rr := httptest.NewRecorder()
 				svc.GetAllDrivesV1(rr, r)
 				Expect(rr.Code).To(Equal(http.StatusForbidden))
+				Expect(rr.Header().Get("X-Ocis-Mfa-Required")).To(Equal("true"))
 			})
 
 			It("can list a space without owner", func() {

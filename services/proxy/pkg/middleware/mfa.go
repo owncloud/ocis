@@ -37,6 +37,9 @@ func (m MultiFactorAuthentication) ServeHTTP(w http.ResponseWriter, req *http.Re
 	defer m.next.ServeHTTP(w, req)
 
 	if !m.enabled {
+		// if mfa is disabled we always set the header to true.
+		// this allows all other services to assume mfa is always active.
+		// this should reduce code and configuration complexity in other services.
 		mfa.SetHeader(req, true)
 		return
 	}

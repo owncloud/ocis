@@ -51,7 +51,8 @@ func (g Graph) GetGroups(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		if !mfa.Accepted(r.Context(), w) {
+		if !mfa.EnsureOrReject(r.Context(), w) {
+			logger.Error().Str("path", r.URL.Path).Msg("MFA required but not satisfied")
 			return
 		}
 	}

@@ -43,6 +43,8 @@ func Auth(opts ...account.Option) func(http.Handler) http.Handler {
 	}
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			r = mfa.EnhanceRequest(r)
+
 			ctx := r.Context()
 			t := r.Header.Get("x-access-token")
 			if t == "" {
@@ -90,8 +92,6 @@ func Auth(opts ...account.Option) func(http.Handler) http.Handler {
 				ctx = ctxpkg.ContextSetInitiator(ctx, initiatorID)
 				ctx = metadata.AppendToOutgoingContext(ctx, ctxpkg.InitiatorHeader, initiatorID)
 			}
-
-			ctx = mfa.FromRequest(ctx, r)
 
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})

@@ -133,7 +133,9 @@ func (g Graph) GetAllDrives(version APIVersion) http.HandlerFunc {
 // GetAllDrivesV1 attempts to retrieve the current users drives;
 // it includes another user's drives, if the current user has the permission.
 func (g Graph) GetAllDrivesV1(w http.ResponseWriter, r *http.Request) {
-	if !mfa.Accepted(r.Context(), w) {
+	if !mfa.EnsureOrReject(r.Context(), w) {
+		logger := g.logger.SubloggerWithRequestID(r.Context())
+		logger.Error().Str("path", r.URL.Path).Msg("MFA required but not satisfied")
 		return
 	}
 
@@ -157,7 +159,9 @@ func (g Graph) GetAllDrivesV1(w http.ResponseWriter, r *http.Request) {
 // it includes the grantedtoV2 property
 // it uses unified roles instead of the cs3 representations
 func (g Graph) GetAllDrivesV1Beta1(w http.ResponseWriter, r *http.Request) {
-	if !mfa.Accepted(r.Context(), w) {
+	if !mfa.EnsureOrReject(r.Context(), w) {
+		logger := g.logger.SubloggerWithRequestID(r.Context())
+		logger.Error().Str("path", r.URL.Path).Msg("MFA required but not satisfied")
 		return
 	}
 

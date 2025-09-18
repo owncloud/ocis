@@ -206,5 +206,5 @@ type Validation struct {
 // MFAConfig configures multi factor multifactor authentication
 type MFAConfig struct {
 	Enabled        bool     `yaml:"enabled" env:"OCIS_MFA_ENABLED" desc:"Set to true to enable multi factor authentication. See the documentation for more details." introductionVersion:"Balch"`
-	AuthLevelNames []string `yaml:"auth_level_names" env:"OCIS_MFA_AUTH_LEVEL_NAMES" desc:"A list of authentication level names that indicate that multi factor authentication has been performed. The names must match the acr claim in the access token. Web will use the first one in the list when requesting mfa." introductionVersion:"Balch"`
+	AuthLevelNames []string `yaml:"auth_level_names" env:"OCIS_MFA_AUTH_LEVEL_NAMES" desc:"This authentication level name indicates that multi-factor authentication was performed. The name must match the ACR claim in the access token received. Note: If multiple names are required, use a comma-separated list. The front-end service will use the first name in the list when requesting multi-factor authentication (MFA)." introductionVersion:"Balch"`
 }

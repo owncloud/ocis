@@ -239,7 +239,8 @@ func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 			errorcode.AccessDenied.Render(w, r, http.StatusForbidden, "search term too short")
 			return
 		}
-		if !mfa.Accepted(r.Context(), w) {
+		if !mfa.EnsureOrReject(r.Context(), w) {
+			logger.Error().Str("path", r.URL.Path).Msg("MFA required but not satisfied")
 			return
 		}
 	}

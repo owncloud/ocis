@@ -283,6 +283,7 @@ var _ = Describe("Users", func() {
 				svc.GetUsers(rr, r)
 
 				Expect(rr.Code).To(Equal(http.StatusForbidden))
+				Expect(rr.Header().Get("X-Ocis-Mfa-Required")).To(Equal("true"))
 			})
 			It("denies listing for unprivileged users", func() {
 				permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settings.GetPermissionByIDResponse{}, nil)

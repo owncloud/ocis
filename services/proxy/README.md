@@ -146,18 +146,19 @@ These issued JWT tokens are immutable and integrity-protected. Which means, any 
 
 * Infinite Scale does not get aware when a group is being deleted in the IDP, a new claim will not hold any information from the deleted group. Infinite Scale does not track a claim history to compare.
 
-#### Claim checks and step up authentication
+#### Claim Checks and Step-up Authentication
 
-Infinite Scale can provide access control via the OIDC "acr" claim ("Authentication Class Reference"). This can be used to enforce step up authentication on specific routes. For example, a user might have logged in with a basic authentication level, but to access a sensitive route, a higher authentication level is required. If the user has not authenticated with the required level, access to the route will be denied.
-Configurable via env variables:
+Infinite Scale provides access control via the OpenID Connect (OIDC) "Authentication Class Reference" (ACR) claim. This can be used to enforce step-up authentication on specific routes. For instance, if a user logs in with basic authentication, they may need a higher level to access a sensitive route. If the user has not authenticated at the required level, access to the route will be denied.
+This is configurable via environment variables, such as:
+
 ```
 OCIS_MFA_ENABLED: true
 OCIS_MFA_AUTH_LEVEL_NAME: advanced
 ```
 
-This feature is disabled by default, and requires an external IDP that supports step up authentication and the acr claim (e.g. Keycloak).
+This feature is disabled by default and requires an external Identity Provider (IDP) that supports step-up authentication and the ACR claim. Examples of such IDPs include Keycloak.
 
-When an authenticated user tries to access a protected route without 2FA, the server will respond with `403 Forbidden` and a `X-OCIS-MFA-Required` header.
+If an authenticated user attempts to access a protected route without two-factor authentication (2FA), the server will respond with a 403 Forbidden error and an `X-OCIS-MFA-Required` header.
 
 #### Impacts
 
