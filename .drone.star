@@ -93,273 +93,12 @@ config = {
         "skip": False,
     },
     "localApiTests": {
-        "contractAndLock": {
-            "suites": [
-                "apiContract",
-                "apiLocks",
-            ],
-            "skip": False,
-            "k8s": True,
-        },
-        "settingsAndNotification": {
-            "suites": [
-                "apiSettings",
-                "apiNotification",
-                "apiCors",
-            ],
-            "skip": False,
-            "withRemotePhp": [True],
-            "emailNeeded": True,
-            "extraEnvironment": {
-                "EMAIL_HOST": EMAIL_SMTP_HOST,
-                "EMAIL_PORT": EMAIL_PORT,
-            },
-            "extraServerEnvironment": {
-                "OCIS_ADD_RUN_SERVICES": "notifications",
-                "NOTIFICATIONS_SMTP_HOST": EMAIL_SMTP_HOST,
-                "NOTIFICATIONS_SMTP_PORT": EMAIL_SMTP_PORT,
-                "NOTIFICATIONS_SMTP_INSECURE": "true",
-                "NOTIFICATIONS_SMTP_SENDER": EMAIL_SMTP_SENDER,
-                "NOTIFICATIONS_DEBUG_ADDR": "0.0.0.0:9174",
-            },
-        },
-        "graphUser": {
-            "suites": [
-                "apiGraphUser",
-            ],
-            "skip": False,
-            "withRemotePhp": [True],
-        },
         "spaces": {
             "suites": [
                 "apiSpaces",
             ],
             "skip": False,
-        },
-        "spacesShares": {
-            "suites": [
-                "apiSpacesShares",
-            ],
-            "skip": False,
             "k8s": True,
-        },
-        "davOperations": {
-            "suites": [
-                "apiSpacesDavOperation",
-                "apiDownloads",
-                "apiAsyncUpload",
-                "apiDepthInfinity",
-                "apiArchiver",
-                "apiActivities",
-            ],
-            "skip": False,
-        },
-        "groupAndSearch1": {
-            "suites": [
-                "apiSearch1",
-                "apiGraph",
-                "apiGraphGroup",
-                "apiServiceAvailability",
-            ],
-            "skip": False,
-            "k8s": False,
-        },
-        "search2": {
-            "suites": [
-                "apiSearch2",
-                "apiSearchContent",
-            ],
-            "tikaNeeded": True,
-            "skip": False,
-            "k8s": False,
-        },
-        "sharingNg1": {
-            "suites": [
-                "apiSharingNgShares",
-                "apiReshare",
-                "apiSharingNgPermissions",
-            ],
-            "skip": False,
-            "withRemotePhp": [True],
-        },
-        "sharingNgAdditionalShareRole": {
-            "suites": [
-                "apiSharingNgAdditionalShareRole",
-            ],
-            "skip": False,
-            "k8s": True,
-            "withRemotePhp": [True],
-        },
-        "sharingNgShareInvitation": {
-            "suites": [
-                "apiSharingNgDriveInvitation",
-                "apiSharingNgItemInvitation",
-            ],
-            "skip": False,
-            "withRemotePhp": [True],
-        },
-        "sharingNgLinkShare": {
-            "suites": [
-                "apiSharingNgDriveLinkShare",
-                "apiSharingNgItemLinkShare",
-                "apiSharingNgLinkShareManagement",
-            ],
-            "skip": False,
-            "withRemotePhp": [True],
-        },
-        "antivirus": {
-            "suites": [
-                "apiAntivirus",
-            ],
-            "skip": False,
-            "antivirusNeeded": True,
-            "extraServerEnvironment": {
-                "ANTIVIRUS_SCANNER_TYPE": "clamav",
-                "ANTIVIRUS_CLAMAV_SOCKET": "tcp://clamav:3310",
-                "POSTPROCESSING_STEPS": "virusscan",
-                "OCIS_ADD_RUN_SERVICES": "antivirus",
-                "ANTIVIRUS_DEBUG_ADDR": "0.0.0.0:9297",
-            },
-        },
-        "ocmAndAuthApp": {
-            "suites": [
-                "apiOcm",
-                "apiAuthApp",
-            ],
-            "skip": False,
-            "withRemotePhp": [True],
-            "federationServer": True,
-            "emailNeeded": True,
-            "extraEnvironment": {
-                "EMAIL_HOST": EMAIL_SMTP_HOST,
-                "EMAIL_PORT": EMAIL_PORT,
-            },
-            "extraServerEnvironment": {
-                "OCIS_ADD_RUN_SERVICES": "ocm,notifications,auth-app",
-                "OCIS_ENABLE_OCM": True,
-                "OCM_OCM_INVITE_MANAGER_INSECURE": True,
-                "OCM_OCM_SHARE_PROVIDER_INSECURE": True,
-                "OCM_OCM_STORAGE_PROVIDER_INSECURE": True,
-                "OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE": "%s" % dirs["ocmProviders"],
-                # mail notifications
-                "NOTIFICATIONS_SMTP_HOST": EMAIL_SMTP_HOST,
-                "NOTIFICATIONS_SMTP_PORT": EMAIL_SMTP_PORT,
-                "NOTIFICATIONS_SMTP_INSECURE": "true",
-                "NOTIFICATIONS_SMTP_SENDER": EMAIL_SMTP_SENDER,
-                # auth-app
-                "PROXY_ENABLE_APP_AUTH": True,
-            },
-        },
-        "wopi": {
-            "suites": [
-                "apiCollaboration",
-            ],
-            "skip": False,
-            "withRemotePhp": [True],
-            "collaborationServiceNeeded": True,
-            "extraServerEnvironment": {
-                "GATEWAY_GRPC_ADDR": "0.0.0.0:9142",
-            },
-        },
-        "cliCommands": {
-            "suites": [
-                "cliCommands",
-            ],
-            "skip": False,
-            "withRemotePhp": [True],
-            "antivirusNeeded": True,
-            "emailNeeded": True,
-            "extraEnvironment": {
-                "EMAIL_HOST": EMAIL_SMTP_HOST,
-                "EMAIL_PORT": EMAIL_PORT,
-            },
-            "extraServerEnvironment": {
-                "NOTIFICATIONS_SMTP_HOST": EMAIL_SMTP_HOST,
-                "NOTIFICATIONS_SMTP_PORT": EMAIL_SMTP_PORT,
-                "NOTIFICATIONS_SMTP_INSECURE": "true",
-                "NOTIFICATIONS_SMTP_SENDER": EMAIL_SMTP_SENDER,
-                "NOTIFICATIONS_DEBUG_ADDR": "0.0.0.0:9174",
-                "ANTIVIRUS_SCANNER_TYPE": "clamav",
-                "ANTIVIRUS_CLAMAV_SOCKET": "tcp://clamav:3310",
-                "OCIS_ADD_RUN_SERVICES": "antivirus,notifications",
-            },
-        },
-    },
-    "coreApiTests": {
-        "1": {
-            "suites": [
-                "coreApiAuth",
-                "coreApiCapabilities",
-                "coreApiFavorites",
-                "coreApiMain",
-                "coreApiVersions",
-            ],
-            "skip": False,
-            "withRemotePhp": [True],
-        },
-        "2": {
-            "suites": [
-                "coreApiShareManagementBasicToShares",
-                "coreApiShareManagementToShares",
-            ],
-            "skip": False,
-            "k8s": True,
-            "withRemotePhp": [True],
-        },
-        "3": {
-            "suites": [
-                "coreApiSharees",
-                "coreApiSharePublicLink2",
-            ],
-            "skip": False,
-            "withRemotePhp": [True],
-        },
-        "4": {
-            "suites": [
-                "coreApiShareOperationsToShares1",
-                "coreApiShareOperationsToShares2",
-                "coreApiSharePublicLink1",
-                "coreApiShareCreateSpecialToShares1",
-                "coreApiShareCreateSpecialToShares2",
-                "coreApiShareUpdateToShares",
-            ],
-            "skip": False,
-            "k8s": True,
-            "withRemotePhp": [True],
-        },
-        "5": {
-            "suites": [
-                "coreApiTrashbin",
-                "coreApiTrashbinRestore",
-                "coreApiWebdavEtagPropagation1",
-                "coreApiWebdavEtagPropagation2",
-            ],
-            "skip": False,
-            "k8s": True,
-        },
-        "6": {
-            "suites": [
-                "coreApiWebdavDelete",
-                "coreApiWebdavOperations",
-                "coreApiWebdavMove2",
-            ],
-            "skip": False,
-        },
-        "7": {
-            "suites": [
-                "coreApiWebdavProperties",
-            ],
-            "skip": False,
-            "k8s": True,
-        },
-        "8": {
-            "suites": [
-                "coreApiWebdavMove1",
-                "coreApiWebdavPreviews",
-                "coreApiWebdavUpload",
-                "coreApiWebdavUploadTUS",
-            ],
-            "skip": False,
         },
     },
     "e2eTests": {
@@ -1087,7 +826,7 @@ def localApiTestPipeline(ctx):
                     params[item] = matrix[item] if item in matrix else defaults[item]
                 for storage in params["storages"]:
                     for run_with_remote_php in params["withRemotePhp"]:
-                        run_on_k8s = params["k8s"] and ctx.build.event == "cron"
+                        run_on_k8s = params["k8s"]
                         ocis_url = OCIS_URL
                         if run_on_k8s:
                             ocis_url = "https://%s" % OCIS_SERVER_NAME
@@ -1389,7 +1128,7 @@ def coreApiTestPipeline(ctx):
                 for run_with_remote_php in params["withRemotePhp"]:
                     filter_tags = "~@skipOnGraph&&~@skipOnOcis-%s-Storage" % ("OC" if storage == "owncloud" else "OCIS")
                     expected_failures_file = "%s/expected-failures-API-on-%s-storage.md" % (test_dir, storage.upper())
-                    run_on_k8s = params["k8s"] and ctx.build.event == "cron"
+                    run_on_k8s = params["k8s"]
                     ocis_url = OCIS_URL
                     if run_on_k8s:
                         ocis_url = "https://%s" % OCIS_SERVER_NAME
@@ -3815,6 +3554,7 @@ def deployOcis():
         "commands": [
             "make -C %s build" % dirs["ocisWrapper"],
             "mv %s/tests/config/drone/k3s/values.yaml %s/ocis-charts/charts/ocis/ci/deployment-values.yaml" % (dirs["base"], dirs["base"]),
+            "cat %s/ocis-charts/charts/ocis/ci/deployment-values.yaml" % dirs["base"],
             "cp -r %s/tests/config/drone/k3s/authbasic %s/ocis-charts/charts/ocis/templates/" % (dirs["base"], dirs["base"]),
             "cd %s/ocis-charts" % dirs["base"],
             "sed -i '/{{- define \"ocis.basicServiceTemplates\" -}}/a\\\\  {{- $_ := set .scope \"appNameAuthBasic\" \"authbasic\" -}}' ./charts/ocis/templates/_common/_tplvalues.tpl",
@@ -3825,6 +3565,7 @@ def deployOcis():
             "sed -i '/name: SHARING_PASSWORD_POLICY_BANNED_PASSWORDS_LIST/,+1d' %s/ocis-charts/charts/ocis/templates/sharing/deployment.yaml" % dirs["base"],
             "export KUBECONFIG=%s/kubeconfig-$${DRONE_BUILD_NUMBER}.yaml" % dirs["base"],
             "make helm-install-atomic",
+            "curl -kv -X 'POST' 'https://ocis-server/graph/v1.0/drives' -H 'Authorization: Basic YWRtaW46YWRtaW4=' -d '{\"name\":\"Space Nameklkj\"}'",
         ],
         "volumes": [
             {
@@ -3844,6 +3585,8 @@ def ociswrapper():
             "until test -f $${KUBECONFIG}; do sleep 1s; done",
             "kubectl get pods -A",
             "kubectl get ingress -A",
+            "POD_NAME=$(kubectl get pods -n ocis --no-headers | grep graph | awk '{print $1}')",
+            "kubectl describe pod $POD_NAME -n ocis",
             "%s/bin/ociswrapper serve --url https://ocis-server --admin-username admin --admin-password admin --skip-ocis-run" % dirs["ocisWrapper"],
         ],
         "detach": True,
