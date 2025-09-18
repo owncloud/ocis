@@ -10,6 +10,7 @@ import (
 	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
+	settingsService "github.com/owncloud/ocis/v2/services/settings/pkg/service/v0"
 	revactx "github.com/owncloud/reva/v2/pkg/ctx"
 	"github.com/owncloud/reva/v2/pkg/events"
 	"github.com/owncloud/reva/v2/pkg/utils"
@@ -73,7 +74,7 @@ func (g Graph) CreateAppRoleAssignment(w http.ResponseWriter, r *http.Request) {
 
 	artur, err := g.roleService.AssignRoleToUser(r.Context(), &settingssvc.AssignRoleToUserRequest{
 		AccountUuid: userID,
-		RoleId:      appRoleAssignment.AppRoleId,
+		RoleId:      appRoleAssignment.GetAppRoleId(),
 	})
 	if err != nil {
 		if merr, ok := merrors.As(err); ok && merr.Code == http.StatusForbidden {
@@ -84,10 +85,26 @@ func (g Graph) CreateAppRoleAssignment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var role string
+	var oldRole string
 	roles := oldRoles.GetAssignments()
 	if len(roles) > 0 {
-		role = roles[0].GetRoleId()
+		oldRole = roles[0].GetRoleId()
+	}
+
+	if appRoleAssignment.GetAppRoleId() == settingsService.BundleUUIDRoleUserLight && oldRole != settingsService.BundleUUIDRoleUserLight {
+		err := g.disablePersonalSpace(r.Context(), userID)
+		if err != nil {
+			logger.Error().Any("userID", userID).Err(err).Msg("can't disable the personal space")
+			errorcode.RenderError(w, r, err)
+			return
+		}
+	} else if appRoleAssignment.GetAppRoleId() != settingsService.BundleUUIDRoleUserLight && oldRole == settingsService.BundleUUIDRoleUserLight {
+		err := g.ensurePersonalSpace(r.Context(), userID)
+		if err != nil {
+			logger.Error().Any("userID", userID).Err(err).Msg("can't ensure the personal space")
+			errorcode.RenderError(w, r, err)
+			return
+		}
 	}
 
 	e := events.UserFeatureChanged{
@@ -96,7 +113,7 @@ func (g Graph) CreateAppRoleAssignment(w http.ResponseWriter, r *http.Request) {
 			{
 				Name:     "roleChanged",
 				Value:    appRoleAssignment.AppRoleId,
-				OldValue: &role,
+				OldValue: &oldRole,
 			},
 		},
 		Timestamp: utils.TSNow(),
