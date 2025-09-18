@@ -80,6 +80,7 @@ The following sections list the changes for unreleased.
 * Enhancement - The sse support added for the public links: [#11623](https://github.com/owncloud/ocis/pull/11623)
 * Enhancement - Added the OnlyOffice license support: [#11624](https://github.com/owncloud/ocis/pull/11624)
 * Enhancement - Bump Web to 12.0.4: [#11625](https://github.com/owncloud/ocis/pull/11625)
+* Enhancement - Update the ocis_full deployment example: [#11666](https://github.com/owncloud/ocis/pull/11666)
 
 ## Details
 
@@ -184,6 +185,12 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/11625
    https://github.com/owncloud/web/releases/tag/v12.0.4
+
+* Enhancement - Update the ocis_full deployment example: [#11666](https://github.com/owncloud/ocis/pull/11666)
+
+   Fix description texts, move image versions from yaml to .env where applicapable
+
+   https://github.com/owncloud/ocis/pull/11666
 
 # Changelog for [7.2.0] (2025-07-14)
 
