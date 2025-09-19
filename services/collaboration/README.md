@@ -52,7 +52,7 @@ There are a few variables that you need to set:
   Needs to be set if the office application like `Microsoft Office Online` complains about the URL is too long  (which contains the access token) and refuses to work. If enabled, a store must be configured.
 
 * `COLLABORATION_WOPI_ENABLE_MOBILE`:\
-  The option enables the mobile view for office web app. This feature applies to OnlyOffice. The OnlyOffice `ce` only supports mobile view mode. The `ee` and `de` support mobile view in both view and edit modes. The product edition must be set accordingly via `COLLABORATION_APP_PRODUCT_EDITION`.
+  This option enables the mobile view for the Office Web App and only applies to OnlyOffice. While OnlyOffice `ce` supports mobile view mode only, the `ee` and `de` versions support mobile view in both view and edit modes. Set the product edition accordingly via `COLLABORATION_APP_PRODUCT_EDITION`.
 
 The application can be customized further by changing the `COLLABORATION_APP_*` options to better describe the application.
 
