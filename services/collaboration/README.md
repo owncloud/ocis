@@ -34,8 +34,8 @@ There are a few variables that you need to set:
   `Collabora`, `OnlyOffice`, `Microsoft365` or `MicrosoftOfficeOnline`. This is used to internally control the behavior according to the different features of the used products.
 
 * `COLLABORATION_APP_PRODUCT_EDITION`:\
-  The product edition of the connected WebOffice app define the capabilities specific to the product.
-  Supported OnlyOffice `ce` (community edition), `de` (developer edition), `ee` (enterprise edition) or `default:empty` equal to `ce`. This is used to internally control the behavior according to the different features of the used products.
+  The product edition of the WebOffice app defines the app's specific capabilities.
+  The supported editions of OnlyOffice are: `ce` (community edition), `de` (developer edition), `ee` (enterprise edition) or `default:empty` which equals to `ce`. These are used to control internal behavior according to the features of the products used.
 
 * `COLLABORATION_APP_ADDR`:\
   The URL of the collaborative editing app (onlyoffice, collabora, etc).\
