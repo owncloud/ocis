@@ -1002,7 +1002,12 @@ class WebDavPropertiesContext implements Context {
 			$pattern = \preg_replace("/^\^/", "", $pattern);
 			$pattern = \ltrim($pattern, "\/");
 			$prefixRemotePhp = \rtrim(WebdavHelper::prefixRemotePhp(""), "/");
-			$pattern = "/^\/{$prefixRemotePhp}\/{$pattern}";
+
+			if ($prefixRemotePhp === '') {
+				$pattern = "/^\/{$pattern}";
+			} else {
+				$pattern = "/^\/{$prefixRemotePhp}\/{$pattern}";
+			}
 		}
 		$pattern = $this->featureContext->substituteInLineCodes(
 			$pattern,

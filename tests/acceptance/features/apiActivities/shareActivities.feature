@@ -1925,7 +1925,7 @@ Feature: check share activity
     When user "Brian" tries to list the activities of file "anotherTextfile.txt" from space "Personal" owned by user "Alice" using the Graph API
     Then the HTTP status code should be "403"
 
-  @issue-9676 @issue-10331
+  @issue-9676
   Scenario: user checks public activities of a link shared file
     Given using SharingNG
     And user "Alice" has created the following resource link share:
@@ -2061,7 +2061,7 @@ Feature: check share activity
       }
       """
 
-  @issue-9676 @issue-10331
+  @issue-9676
   Scenario: user checks public activities of a link shared folder
     Given using SharingNG
     And user "Alice" has created folder "/FOLDER"

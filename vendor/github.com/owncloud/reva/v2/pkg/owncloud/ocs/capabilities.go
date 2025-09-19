@@ -100,8 +100,8 @@ type CapabilitiesAuth struct {
 
 // CapabilitiesMFA holds mfa capabilities
 type CapabilitiesMFA struct {
-	Enabled   bool   `json:"enabled,omitempty" xml:"enabled,omitempty" mapstructure:"enabled"`
-	LevelName string `json:"levelname,omitempty" xml:"levelname,omitempty" mapstructure:"levelname"`
+	Enabled    bool     `json:"enabled,omitempty" xml:"enabled,omitempty" mapstructure:"enabled"`
+	LevelNames []string `json:"levelnames,omitempty" xml:"levelnames,omitempty" mapstructure:"levelnames"`
 }
 
 // Spaces lets a service configure its advertised options related to Storage Spaces.

@@ -84,7 +84,7 @@ Feature: Link share without enforcing password
       | Edit             | edit                   |
       | Secure View      | blocksDownload         |
 
-  @issue-9724 @issue-10331
+
   Scenario: set password on existing file link share
     Given user "Alice" has uploaded file with content "other data" to "textfile1.txt"
     And user "Alice" has created the following resource link share:
@@ -187,7 +187,7 @@ Feature: Link share without enforcing password
       | Edit             | edit                   |
       | Secure View      | blocksDownload         |
 
-  @issue-9724 @issue-10331
+
   Scenario: set password on a existing file link share inside project-space
     Given using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
