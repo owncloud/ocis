@@ -92,6 +92,7 @@ Feature: antivirus
       | new              |
       | spaces           |
 
+
   Scenario Outline: public uploads a file with the virus to a public share
     Given using <dav-path-version> DAV path
     And the config "OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false" for "sharing" service
@@ -116,6 +117,7 @@ Feature: antivirus
       | new              | eicar_com.zip | virusFile2.zip |
       | spaces           | eicar.com     | virusFile1.txt |
       | spaces           | eicar_com.zip | virusFile2.zip |
+
 
   Scenario Outline: public uploads a file with the virus to a password-protected public share
     Given using <dav-path-version> DAV path

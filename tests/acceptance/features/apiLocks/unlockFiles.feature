@@ -298,6 +298,7 @@ Feature: unlock locked items
     And using new DAV path
     And user "Brian" should be able to upload file "filesForUpload/lorem.txt" to "Shares/textfile.txt"
 
+
   Scenario Outline: unlock a file as an anonymous user
     Given using <dav-path-version> DAV path
     And using SharingNG

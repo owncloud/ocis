@@ -84,6 +84,7 @@ Feature: Link share without enforcing password
       | Edit             | edit                   |
       | Secure View      | blocksDownload         |
 
+
   Scenario: set password on existing file link share
     Given user "Alice" has uploaded file with content "other data" to "textfile1.txt"
     And user "Alice" has created the following resource link share:
@@ -185,6 +186,7 @@ Feature: Link share without enforcing password
       | View             | view                   |
       | Edit             | edit                   |
       | Secure View      | blocksDownload         |
+
 
   Scenario: set password on a existing file link share inside project-space
     Given using spaces DAV path

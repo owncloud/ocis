@@ -205,6 +205,7 @@ Feature: Update a link share for a resource
       }
       """
 
+
   Scenario: update password of a file's link share using permissions endpoint
     Given user "Alice" has uploaded file with content "other data" to "textfile1.txt"
     And user "Alice" has created the following resource link share:

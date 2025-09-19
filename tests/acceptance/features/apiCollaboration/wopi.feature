@@ -925,6 +925,7 @@ Feature: collaboration (wopi)
     And as "Alice" file "testFolder/simple.odt" should not exist
     And as "Brian" file "Shares/testFolder/simple.odt" should not exist
 
+
   Scenario Outline: public user with permission edit/upload/createOnly creates odt file inside public folder using wopi endpoint
     Given user "Alice" has created folder "publicFolder"
     And user "Alice" has created the following resource link share:

@@ -38,6 +38,7 @@ Feature: Update a link share for a resource
       """
     And the public should be able to download file "textfile.txt" from the last link share with password "%public%" and the content should be "to share"
 
+
   Scenario: update password on a existing link share of a project-space drive using root endpoint
     And using spaces DAV path
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API

@@ -59,6 +59,7 @@ Feature: create a public link share
       | 1               | 100             |
       | 2               | 200             |
 
+
   Scenario Outline: create a new public link share of a file with edit permissions
     Given using OCS API version "<ocs-api-version>"
     And user "Alice" has uploaded file with content "Random data" to "/randomfile.txt"
@@ -86,6 +87,7 @@ Feature: create a public link share
       | ocs-api-version | ocs-status-code |
       | 1               | 100             |
       | 2               | 200             |
+
 
   Scenario Outline: creating a new public link share of a folder, with a password and accessing using the public WebDAV API
     Given using OCS API version "<ocs-api-version>"
@@ -167,6 +169,7 @@ Feature: create a public link share
       | 1               | 100             |
       | 2               | 200             |
 
+
   Scenario Outline: creating a link share with no specified permissions defaults to read permissions when public upload is disabled globally and accessing using the public WebDAV API
     Given using OCS API version "<ocs-api-version>"
     And user "Alice" has created folder "/afolder"
@@ -186,6 +189,7 @@ Feature: create a public link share
       | 1               | 100             |
       | 2               | 200             |
 
+
   Scenario Outline: creating a link share with edit permissions keeps it using the public WebDAV API
     Given using OCS API version "<ocs-api-version>"
     And user "Alice" has created folder "/afolder"
@@ -204,6 +208,7 @@ Feature: create a public link share
       | ocs-api-version | ocs-status-code |
       | 1               | 100             |
       | 2               | 200             |
+
 
   Scenario Outline: creating a link share with upload permissions keeps it using the public WebDAV API
     Given using OCS API version "<ocs-api-version>"
@@ -237,6 +242,7 @@ Feature: create a public link share
       | 1               | 200              |
       | 2               | 400              |
 
+
   Scenario Outline: user creates a public link share of a file with file name longer than 64 chars using the public WebDAV API
     Given using OCS API version "<ocs-api-version>"
     And user "Alice" has uploaded file with content "long file" to "/aquickbrownfoxjumpsoveraverylazydogaquickbrownfoxjumpsoveralazydog.txt"
@@ -250,6 +256,7 @@ Feature: create a public link share
       | ocs-api-version | ocs-status-code |
       | 1               | 100             |
       | 2               | 200             |
+
 
   Scenario Outline: user creates a public link share of a folder with folder name longer than 64 chars and access using the public WebDAV API
     Given using OCS API version "<ocs-api-version>"

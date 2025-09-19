@@ -91,6 +91,7 @@ Feature: update a public link share
       | 1               | 100             |
       | 2               | 200             |
 
+
   Scenario Outline: creating a new public link share with password and adding an expiration date using public API
     Given using OCS API version "<ocs-api-version>"
     And user "Alice" has uploaded file with content "Random data" to "/randomfile.txt"
@@ -247,6 +248,7 @@ Feature: update a public link share
       | ocs-api-version |
       | 1               |
       | 2               |
+
 
   Scenario Outline: updating share permissions from read to change allows public to delete files using the public API
     Given using OCS API version "<ocs-api-version>"

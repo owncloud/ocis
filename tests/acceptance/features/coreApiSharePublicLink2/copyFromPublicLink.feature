@@ -9,6 +9,7 @@ Feature: copying from public link share
     And user "Alice" has created folder "/PARENT"
     And the config "OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false" for "sharing" service
 
+
   Scenario: copy file within a public link folder
     Given user "Alice" has uploaded file with content "some data" to "/PARENT/testfile.txt"
     And using SharingNG
@@ -22,6 +23,7 @@ Feature: copying from public link share
     And as "Alice" file "/PARENT/copy1.txt" should exist
     And the content of file "/PARENT/testfile.txt" for user "Alice" should be "some data"
     And the content of file "/PARENT/copy1.txt" for user "Alice" should be "some data"
+
 
   Scenario: copy folder within a public link folder
     Given user "Alice" has created folder "/PARENT/testFolder"
@@ -38,6 +40,7 @@ Feature: copying from public link share
     And the content of file "/PARENT/testFolder/testfile.txt" for user "Alice" should be "some data"
     And the content of file "/PARENT/testFolder-copy/testfile.txt" for user "Alice" should be "some data"
 
+
   Scenario: copy file within a public link folder to a new folder
     Given user "Alice" has uploaded file with content "some data" to "/PARENT/testfile.txt"
     And user "Alice" has created folder "/PARENT/testFolder"
@@ -52,6 +55,7 @@ Feature: copying from public link share
     And as "Alice" file "/PARENT/testFolder/copy1.txt" should exist
     And the content of file "/PARENT/testfile.txt" for user "Alice" should be "some data"
     And the content of file "/PARENT/testFolder/copy1.txt" for user "Alice" should be "some data"
+
 
   Scenario: copy file within a public link folder to existing file
     Given user "Alice" has uploaded file with content "some data 0" to "/PARENT/testfile.txt"
@@ -84,6 +88,7 @@ Feature: copying from public link share
     But as "Alice" file "/PARENT/copy1.txt" should not exist
     And as "Alice" file "/copy1.txt" should exist in the trashbin
 
+
   Scenario: copy file within a public link folder and delete file
     Given user "Alice" has uploaded file with content "some data" to "/PARENT/testfile.txt"
     And using SharingNG
@@ -113,6 +118,7 @@ Feature: copying from public link share
     And as "Alice" folder "/PARENT/new-folder" should not exist
     And as "Alice" folder "new-folder" should exist in the trashbin
 
+
   Scenario Outline: copy file with special characters in it's name within a public link folder
     Given user "Alice" has uploaded file with content "some data" to "/PARENT/<file-name>"
     And using SharingNG
@@ -133,6 +139,7 @@ Feature: copying from public link share
       | C++ file.cpp     |
       | sample,1.txt     |
 
+
   Scenario Outline: copy file within a public link folder to a file with special characters in it's name
     Given user "Alice" has uploaded file with content "some data" to "/PARENT/testfile.txt"
     And using SharingNG
@@ -152,6 +159,7 @@ Feature: copying from public link share
       | strängé file.txt      |
       | C++ file.cpp          |
       | sample,1.txt          |
+
 
   Scenario Outline: copy file within a public link folder into a folder with special characters
     Given user "Alice" has uploaded file with content "some data" to "/PARENT/testfile.txt"

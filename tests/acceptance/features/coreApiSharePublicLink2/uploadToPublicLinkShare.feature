@@ -9,6 +9,7 @@ Feature: upload to a public link share
     Given user "Alice" has been created with default attributes
     And user "Alice" has created folder "FOLDER"
 
+
   Scenario Outline: uploading file to a public upload-only share using public API that was deleted does not work
     Given using <dav-path-version> DAV path
     And using SharingNG
@@ -39,6 +40,7 @@ Feature: upload to a public link share
     When the public uploads file "test.txt" with password "%public%" and content "test-file" using the public WebDAV API
     And the HTTP status code should be "403"
 
+
   Scenario: uploading to a public upload-only share with public API
     Given using SharingNG
     And user "Alice" has created the following resource link share:
@@ -52,6 +54,7 @@ Feature: upload to a public link share
     And the following headers should match these regular expressions
       | ETag | /^"[a-f0-9:\.]{1,32}"$/ |
 
+
   Scenario: uploading to a public upload-only share with password with public API
     Given using SharingNG
     And user "Alice" has created the following resource link share:
@@ -62,6 +65,7 @@ Feature: upload to a public link share
     When the public uploads file "test.txt" with password "%public%" and content "test-file" using the public WebDAV API
     Then the HTTP status code should be "201"
     And the content of file "/FOLDER/test.txt" for user "Alice" should be "test-file"
+
 
   Scenario: uploading to a public read/write share with password with public API
     Given using SharingNG

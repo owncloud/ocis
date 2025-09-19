@@ -466,6 +466,7 @@ Feature: lock files
       | spaces           | shared     |
       | spaces           | exclusive  |
 
+
   Scenario Outline: lock a file inside a folder shared by a link as anonymous user with edit permission
     Given using <dav-path-version> DAV path
     And using SharingNG
@@ -488,6 +489,7 @@ Feature: lock files
       | spaces           | shared     |
       | spaces           | exclusive  |
 
+
   Scenario Outline: try to lock a file inside a folder shared by a link as anonymous user with read permission
     Given using <dav-path-version> DAV path
     And using SharingNG
@@ -509,6 +511,7 @@ Feature: lock files
       | new              | exclusive  |
       | spaces           | shared     |
       | spaces           | exclusive  |
+
 
   Scenario Outline: lock a file shared by a link as anonymous user with edit permission
     Given using <dav-path-version> DAV path

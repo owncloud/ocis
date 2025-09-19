@@ -11,6 +11,7 @@ Feature: changing a public link share
     And user "Alice" has created folder "PARENT"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "PARENT/parent.txt"
 
+
   Scenario Outline: public can or cannot delete file through publicly shared link depending on having delete permissions using the public WebDAV API
     Given using SharingNG
     And user "Alice" has created the following resource link share:
@@ -28,6 +29,7 @@ Feature: changing a public link share
       | File Drop        | 403              | should        |
       | Edit             | 204              | should not    |
 
+
   Scenario: public link share permissions work correctly for renaming and share permissions edit using the public WebDAV API
     Given using SharingNG
     And user "Alice" has created the following resource link share:
@@ -39,6 +41,7 @@ Feature: changing a public link share
     Then the HTTP status code should be "201"
     And as "Alice" file "/PARENT/parent.txt" should not exist
     And as "Alice" file "/PARENT/newparent.txt" should exist
+
 
   Scenario: public link share permissions work correctly for upload with share permissions edit with the public WebDAV API
     Given using SharingNG
@@ -62,6 +65,7 @@ Feature: changing a public link share
     When the public deletes file "parent.txt" from the last link share with password "invalid" using the public WebDAV API
     Then the HTTP status code should be "401"
     And as "Alice" file "PARENT/parent.txt" should exist
+
 
   Scenario: public can delete file through publicly shared link with password using the valid password with the public WebDAV API
     Given using SharingNG
@@ -87,6 +91,7 @@ Feature: changing a public link share
     And as "Alice" file "/PARENT/newparent.txt" should not exist
     And as "Alice" file "/PARENT/parent.txt" should exist
 
+
   Scenario: public tries to rename a file in a password protected share using the valid password with the public WebDAV API
     Given using SharingNG
     And user "Alice" has created the following resource link share:
@@ -111,6 +116,7 @@ Feature: changing a public link share
     Then the HTTP status code should be "401"
     And as "Alice" file "/PARENT/lorem.txt" should not exist
 
+
   Scenario: public tries to upload to a password protected public share using the valid password with the public WebDAV API
     Given using SharingNG
     And user "Alice" has created the following resource link share:
@@ -121,6 +127,7 @@ Feature: changing a public link share
     When the public uploads file "lorem.txt" with password "%public%" and content "test" using the public WebDAV API
     Then the HTTP status code should be "201"
     And as "Alice" file "/PARENT/lorem.txt" should exist
+
 
   Scenario: public cannot rename a file in upload-write-only public link share with the public WebDAV API
     Given using SharingNG
@@ -133,6 +140,7 @@ Feature: changing a public link share
     Then the HTTP status code should be "403"
     And as "Alice" file "/PARENT/parent.txt" should exist
     And as "Alice" file "/PARENT/newparent.txt" should not exist
+
 
   Scenario: public cannot delete a file in upload-write-only public link share with the public WebDAV API
     Given using SharingNG
@@ -187,6 +195,7 @@ Feature: changing a public link share
       | ocs-api-version | http-status-code |
       | 1               | 200              |
       | 2               | 403              |
+
 
   Scenario Outline: administrator removes password of a read-only public link
     Given using OCS API version "<ocs-api-version>"

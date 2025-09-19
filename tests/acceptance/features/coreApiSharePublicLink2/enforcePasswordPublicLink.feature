@@ -51,6 +51,7 @@ Feature: enforce password on public link
       | 1               | 100             |
       | 2               | 200             |
 
+
   Scenario Outline: updates a public link to edit permission with a password
     Given the following configs have been set:
       | service  | config                                                 | value |
@@ -77,6 +78,7 @@ Feature: enforce password on public link
       | ocs-api-version | ocs-status-code |
       | 1               | 100             |
       | 2               | 200             |
+
 
   Scenario Outline: create a public link with a password in accordance with the password policy
     Given the following configs have been set:
@@ -140,6 +142,7 @@ Feature: enforce password on public link
       | ocs-api-version | http-status-code |
       | 1               | 200              |
       | 2               | 400              |
+
 
   Scenario Outline: update a public link with a password in accordance with the password policy
     Given the following configs have been set:
@@ -209,6 +212,7 @@ Feature: enforce password on public link
       | ocs-api-version | http-status-code |
       | 1               | 200              |
       | 2               | 400              |
+
 
   Scenario Outline: create a public link with a password in accordance with the password policy (valid cases)
     Given the config "<config>" has been set to "<config-value>" for "<service>" service
