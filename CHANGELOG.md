@@ -81,6 +81,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Bump Web to 12.0.4: [#11625](https://github.com/owncloud/ocis/pull/11625)
 * Enhancement - The sse support added for the public links: [#11627](https://github.com/owncloud/ocis/pull/11627)
 * Enhancement - Update the ocis_full deployment example: [#11666](https://github.com/owncloud/ocis/pull/11666)
+* Enhancement - Bump Reva version: [#11669](https://github.com/owncloud/ocis/pull/11669)
 
 ## Details
 
@@ -191,6 +192,12 @@ The following sections list the changes for unreleased.
    Fix description texts, move image versions from yaml to .env where applicapable
 
    https://github.com/owncloud/ocis/pull/11666
+
+* Enhancement - Bump Reva version: [#11669](https://github.com/owncloud/ocis/pull/11669)
+
+   Bumped reva version
+
+   https://github.com/owncloud/ocis/pull/11669
 
 # Changelog for [7.2.0] (2025-07-14)
 
