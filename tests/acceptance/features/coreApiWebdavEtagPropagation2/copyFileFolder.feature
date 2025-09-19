@@ -104,7 +104,7 @@ Feature: propagation of etags when copying files or folders
       | new              |
       | spaces           |
 
-  @env-config @issue-4251 @issue-10331
+  @env-config @issue-4251
   Scenario Outline: copying a file inside a publicly shared folder by public changes etag for the sharer
     Given the config "SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false" for "sharing" service
     And using <dav-path-version> DAV path

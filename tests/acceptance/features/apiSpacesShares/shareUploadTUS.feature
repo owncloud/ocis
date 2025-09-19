@@ -417,7 +417,7 @@ Feature: upload resources on share using TUS protocol
     Then the HTTP status code should be "460"
     And for user "Alice" the content of the file "/textFile.txt" of the space "Personal" should be "original content"
 
-  @issue-10331 @issue-10469
+  @issue-10469
   Scenario: public uploads a zero byte file to a public share folder
     Given using SharingNG
     And user "Alice" has created folder "/uploadFolder"
@@ -437,7 +437,7 @@ Feature: upload resources on share using TUS protocol
       | textfile (1).txt |
       | textfile (2).txt |
 
-  @issue-10331 @issue-10469
+  @issue-10469
   Scenario: public uploads a zero-byte file to a shared folder inside project space
     Given using SharingNG
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
@@ -459,7 +459,7 @@ Feature: upload resources on share using TUS protocol
       | textfile (1).txt |
       | textfile (2).txt |
 
-  @issue-10331 @issue-10469
+  @issue-10469
   Scenario: public uploads a zero-byte file to a public share project space
     Given using SharingNG
     And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API

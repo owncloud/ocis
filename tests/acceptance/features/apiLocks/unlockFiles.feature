@@ -21,7 +21,7 @@ Feature: unlock locked items
       | new              |
       | spaces           |
 
-  @issue-7761 @issue-10331
+  @issue-7761
   Scenario Outline: public tries to unlock a file in a share that was locked by the file owner
     Given using <dav-path-version> DAV path
     And using SharingNG
@@ -298,7 +298,6 @@ Feature: unlock locked items
     And using new DAV path
     And user "Brian" should be able to upload file "filesForUpload/lorem.txt" to "Shares/textfile.txt"
 
-  @issue-10331
   Scenario Outline: unlock a file as an anonymous user
     Given using <dav-path-version> DAV path
     And using SharingNG
