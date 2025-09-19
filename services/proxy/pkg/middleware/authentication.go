@@ -23,14 +23,15 @@ var (
 	ProxyWwwAuthenticate = []regexp.Regexp{*regexp.MustCompile("/ocs/v[12].php/cloud/")}
 
 	_publicPaths = [...]string{
-		"/dav/public-files/",
 		"/remote.php/dav/ocm/",
 		"/dav/ocm/",
 		"/ocm/",
 		"/remote.php/dav/public-files/",
+		"/dav/public-files/",
 		"/ocs/v1.php/apps/files_sharing/api/v1/tokeninfo/unprotected",
 		"/ocs/v2.php/apps/files_sharing/api/v1/tokeninfo/unprotected",
 		"/ocs/v1.php/cloud/capabilities",
+		"/ocs/v2.php/cloud/capabilities",
 		"/ocs/v1.php/cloud/user/signing-key",
 		"/ocs/v2.php/cloud/user/signing-key",
 		"/ocs/v2.php/apps/notifications/api/v1/notifications/sse",
