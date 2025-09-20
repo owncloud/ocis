@@ -14,7 +14,7 @@ Feature: Search
     And user "Alice" has created a folder "folderMain/SubFolder1/subFOLDER2" in space "project101"
     And user "Alice" has uploaded a file inside space "project101" with content "some content" to "folderMain/SubFolder1/subFOLDER2/insideTheFolder.txt"
 
-  @issue-10329
+
   Scenario Outline: user can search items inside project space
     Given using <dav-path-version> DAV path
     And user "Alice" has created a folder "AlicePersonal" in space "Personal"
@@ -42,7 +42,7 @@ Feature: Search
       | new              |
       | spaces           |
 
-  @issue-10329
+
   Scenario Outline: user can search items inside personal space
     Given using <dav-path-version> DAV path
     And user "Alice" has created a folder "AlicePersonal" in space "Personal"
@@ -97,7 +97,7 @@ Feature: Search
       | new              |
       | spaces           |
 
-  @issue-10329 @issue-11028
+  @issue-11028
   Scenario Outline: user can't search hidden files
     Given using <dav-path-version> DAV path
     And user "Alice" has created a folder ".space" in space "project101"
@@ -172,14 +172,14 @@ Feature: Search
       | new              |
       | spaces           |
 
-  @issue-10329 @issue-11028
+  @issue-11028
   Scenario: user can't search project space by name
     Given using spaces DAV path
     When user "Alice" searches for '*project101*' using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result should contain "0" entries
 
-  @issue-10329
+
   Scenario Outline: user can search inside folder in space
     Given using <dav-path-version> DAV path
     When user "Alice" searches for "*folder*" inside folder "/folderMain" in space "project101" using the WebDAV API
@@ -197,7 +197,7 @@ Feature: Search
       | new              |
       | spaces           |
 
-  @issue-10329
+
   Scenario Outline: search inside folder in shares
     Given using <dav-path-version> DAV path
     And user "Alice" has sent the following resource share invitation:
@@ -221,7 +221,7 @@ Feature: Search
       | new              |
       | spaces           |
 
-  @issue-10329
+
   Scenario Outline: search files inside the folder
     Given using <dav-path-version> DAV path
     And user "Alice" has uploaded file with content "hello world inside root" to "file1.txt"
@@ -242,7 +242,7 @@ Feature: Search
       | new              |
       | spaces           |
 
-  @issue-7114 @issue-10329
+  @issue-7114
   Scenario Outline: search files inside the folder with white space character in its name
     Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/New Folder"
@@ -260,7 +260,7 @@ Feature: Search
       | new              |
       | spaces           |
 
-  @issue-7114 @issue-10329
+  @issue-7114
   Scenario Outline: search files with white space character in its name
     Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/New Folder"
@@ -278,7 +278,7 @@ Feature: Search
       | new              |
       | spaces           |
 
-  @issue-enterprise-6000 @issue-7028 @issue-7092 @issue-10329
+  @issue-enterprise-6000 @issue-7028 @issue-7092
   Scenario Outline: sharee cannot find resources that are not shared
     Given using <dav-path-version> DAV path
     And user "Alice" has created a folder "foo/sharedToBrian" in space "Alice Hansen"
@@ -302,7 +302,7 @@ Feature: Search
       | new              |
       | spaces           |
 
-  @issue-10329
+
   Scenario Outline: search resources using different search patterns (KQL feature)
     Given using spaces DAV path
     And user "Alice" has created a folder "subfolder" in space "project101"
@@ -319,7 +319,7 @@ Feature: Search
       | name:*der2   | /folderMain/SubFolder1/subFOLDER2 | patern 'name:''                 |
       | name:"*der2" | /folderMain/SubFolder1/subFOLDER2 | pattern 'name:""' (with quotes) |
 
-  @issue-7812 @issue-8442 @issue-10329
+  @issue-7812 @issue-8442
   Scenario: try to search with invalid patterns
     Given using spaces DAV path
     And user "Alice" has uploaded file with content "test file" to "testFile.txt"
@@ -327,7 +327,7 @@ Feature: Search
     Then the HTTP status code should be "400"
     And the value of the item "/d:error/s:message" in the response should be "error: bad request: the expression can't begin from a binary operator: 'AND'"
 
-  @issue-10329
+
   Scenario Outline: search a file globally (in all spaces)
     Given using <dav-path-version> DAV path
     And user "Alice" has created a folder "AlicePersonal" in space "Personal"
