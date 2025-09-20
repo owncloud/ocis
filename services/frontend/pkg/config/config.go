@@ -63,6 +63,8 @@ type Config struct {
 
 	ServerManagedSpaces bool `yaml:"server_managed_spaces" env:"OCIS_CLAIM_MANAGED_SPACES_ENABLED" desc:"Enables Space management through OIDC claims. See the text description for more details." introductionVersion:"7.2.0"`
 
+	MultiFactorAuthentication MFAConfig `yaml:"mfa"`
+
 	Context context.Context `yaml:"-"`
 }
 
@@ -199,4 +201,10 @@ type PasswordPolicy struct {
 
 type Validation struct {
 	MaxTagLength int `yaml:"max_tag_length" env:"OCIS_MAX_TAG_LENGTH" desc:"Define the maximum tag length. Defaults to 100 if not set. Set to 0 to not limit the tag length. Changes only impact the validation of new tags." introductionVersion:"7.2.0"`
+}
+
+// MFAConfig configures multi factor multifactor authentication
+type MFAConfig struct {
+	Enabled        bool     `yaml:"enabled" env:"OCIS_MFA_ENABLED" desc:"Set to true to enable multi factor authentication. See the documentation for more details." introductionVersion:"Balch"`
+	AuthLevelNames []string `yaml:"auth_level_names" env:"OCIS_MFA_AUTH_LEVEL_NAMES" desc:"This authentication level name indicates that multi-factor authentication was performed. The name must match the ACR claim in the access token received. Note: If multiple names are required, use a comma-separated list. The front-end service will use the first name in the list when requesting multi-factor authentication (MFA)." introductionVersion:"Balch"`
 }

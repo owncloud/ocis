@@ -340,6 +340,12 @@ func FrontendConfigFromStruct(cfg *config.Config, logger log.Logger) (map[string
 								"endpoints":    []string{"list", "get", "delete"},
 								"configurable": cfg.ConfigurableNotifications,
 							},
+							"auth": map[string]interface{}{
+								"mfa": map[string]interface{}{
+									"enabled":    cfg.MultiFactorAuthentication.Enabled,
+									"levelnames": cfg.MultiFactorAuthentication.AuthLevelNames,
+								},
+							},
 						},
 						"version": map[string]interface{}{
 							"product":        "Infinite Scale",
