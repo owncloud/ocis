@@ -118,3 +118,41 @@ func TestNoRoles(t *testing.T) {
 		t.Fatal("length of roles mut be 0")
 	}
 }
+
+func TestMatchesClaimMappingExact(t *testing.T) {
+	claimRoles := map[string]struct{}{
+		"ocis-user": {},
+	}
+	if !matchesClaimMapping("ocis-user", claimRoles) {
+		t.Fatal("expected exact match to succeed")
+	}
+	if matchesClaimMapping("admin", claimRoles) {
+		t.Fatal("expected non-matching literal to fail")
+	}
+}
+
+func TestMatchesClaimMappingRegex(t *testing.T) {
+	claimRoles := map[string]struct{}{
+		"ocis-user-1":   {},
+		"ocis-user-42":  {},
+		"ocis-user-lth": {},
+		"admin":         {},
+	}
+	if !matchesClaimMapping("ocis-user-.*", claimRoles) {
+		t.Fatal("expected regex match to succeed")
+	}
+	if !matchesClaimMapping("ocis-user-[a-zA-Z0-9]", claimRoles) {
+		t.Fatal("expected regex match to succeed")
+	}
+	if matchesClaimMapping("admin-.*", claimRoles) {
+		t.Fatal("expected regex match to fail for admin-.*")
+	}
+}
+
+func TestMatchesClaimMappingInvalidRegexFallsBackToExact(t *testing.T) {
+	claimRoles := map[string]struct{}{"ocis-user": {}}
+	// invalid regex pattern
+	if matchesClaimMapping("ocis-user[", claimRoles) {
+		t.Fatal("invalid regex should fall back to exact and not match")
+	}
+}

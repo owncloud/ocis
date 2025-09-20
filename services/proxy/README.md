@@ -205,6 +205,35 @@ role_assignment:
 This would assign the role `admin` to users with the value `myAdminRole` in the claim `ocisRoles`.
 The role `user` to users with the values `myUserRole` in the claims `ocisRoles` and so on.
 
+#### Wildcard/Regex Claim Matching
+
+The `claim_value` supports exact strings and regular expressions to map multiple claim values to a single role. Regexes are matched against the entire claim value (implicit start/end anchors).
+
+Examples:
+
+```yaml
+role_assignment:
+  driver: oidc
+  oidc_role_mapper:
+    role_claim: ocisRoles
+    role_mapping:
+      # exact match
+      - role_name: user
+        claim_value: ocisUser
+
+      # regex: match any value starting with "ocis-user-"
+      - role_name: user-light
+        claim_value: ocis-user-.*
+
+      # regex: single alphanumeric suffix
+      - role_name: guest
+        claim_value: ocis-guest-[a-zA-Z0-9]
+```
+
+Note: Regex patterns are treated as full matches. Typically you don't need `^` or `$`.
+If a `claim_value` is an invalid regex, it only matches claim values that are exactly equal; otherwise it's ignored.
+Ordering still applies, and the first matching mapping wins.
+
 Claim values that are not mapped to a specific ownCloud Infinite Scale role will be ignored.
 
 Note: An ownCloud Infinite Scale user can only have a single role assigned. If the configured

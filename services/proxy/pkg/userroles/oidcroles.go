@@ -3,6 +3,7 @@ package userroles
 import (
 	"context"
 	"errors"
+	"regexp"
 	"sync"
 	"time"
 
@@ -69,6 +70,28 @@ func extractRoles(rolesClaim string, claims map[string]interface{}) (map[string]
 	return claimRoles, nil
 }
 
+// matchesClaimMapping returns true if the provided mapping pattern matches at least
+// one of the values present in claimRoles. It supports:
+// - exact match when ClaimValue is a literal equal to a claim value
+// - regex match when ClaimValue is a regex pattern (e.g. "ocis-user-.*")
+// The regex is matched against the entire claim value, not a substring.
+func matchesClaimMapping(mappingValue string, claimRoles map[string]struct{}) bool {
+	if _, ok := claimRoles[mappingValue]; ok {
+		return true
+	}
+
+	rx, err := regexp.Compile("^(?:" + mappingValue + ")$")
+	if err != nil {
+		return false
+	}
+	for cr := range claimRoles {
+		if rx.MatchString(cr) {
+			return true
+		}
+	}
+	return false
+}
+
 // UpdateUserRoleAssignment assigns the role "User" to the supplied user. Unless the user
 // already has a different role assigned.
 func (ra oidcRoleAssigner) UpdateUserRoleAssignment(ctx context.Context, user *cs3.User, claims map[string]interface{}) (*cs3.User, error) {
@@ -96,7 +119,7 @@ func (ra oidcRoleAssigner) UpdateUserRoleAssignment(ctx context.Context, user *c
 	// pick the highest privileged role that matches a value from the claims
 	roleIDFromClaim := ""
 	for _, mapping := range ra.Options.roleMapping {
-		if _, ok := claimRoles[mapping.ClaimValue]; ok {
+		if matchesClaimMapping(mapping.ClaimValue, claimRoles) {
 			logger.Debug().Str("ocisRole", mapping.RoleName).Str("role id", roleNamesToRoleIDs[mapping.RoleName]).Msg("first matching role")
 			roleIDFromClaim = roleNamesToRoleIDs[mapping.RoleName]
 			break
