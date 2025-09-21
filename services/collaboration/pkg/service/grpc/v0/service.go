@@ -247,6 +247,16 @@ func (s *Service) addQueryToURL(baseURL string, req *appproviderv1beta1.OpenInAp
 		q.Add("dchat", "1")
 	}
 
+	// The option enables the mobile web view for OnlyOffice.
+	if strings.ToLower(s.config.App.Product) == "onlyoffice" && s.config.Wopi.EnableMobile {
+		mobile := utils.ReadPlainFromOpaque(req.GetOpaque(), "mobile")
+		if s.config.App.ProductEdition == "ee" || s.config.App.ProductEdition == "de" {
+			q.Add("mobile", mobile)
+		} else if req.GetViewMode() != appproviderv1beta1.ViewMode_VIEW_MODE_READ_WRITE {
+			q.Add("mobile", mobile)
+		}
+	}
+
 	lang := utils.ReadPlainFromOpaque(req.GetOpaque(), "lang")
 
 	// @TODO: this is a temporary solution until we figure out how to send these from oc web
