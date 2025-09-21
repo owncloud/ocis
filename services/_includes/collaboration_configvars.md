@@ -4,6 +4,7 @@
 |------|------|---------------|-------------|
 | COLLABORATION_APP_NAME | string | Collabora | The name of the app which is shown to the user. You can chose freely but you are limited to a single word without special characters or whitespaces. We recommend to use pascalCase like 'CollaboraOnline'.|
 | COLLABORATION_APP_PRODUCT | string | Collabora | The WebOffice app, either Collabora, OnlyOffice, Microsoft365 or MicrosoftOfficeOnline.|
+| COLLABORATION_APP_PRODUCT_EDITION | string |  | The WebOffice app edition defines the capabilities specific to the product such as CE - Community Edition, EE - Enterprise Edition DE - Developer Edition, etc. Currently supported values are limited to OnlyOffice and are: 'ce', 'ee' or 'de' and  default to empty which is equal to ce). See the documentation for more details.|
 | COLLABORATION_APP_DESCRIPTION | string | Open office documents with Collabora | App description|
 | COLLABORATION_APP_ICON | string | image-edit | Icon for the app|
 | COLLABORATION_APP_ADDR | string | https://127.0.0.1:9980 | The URL where the WOPI app is located, such as https://127.0.0.1:8080.|
@@ -28,6 +29,7 @@
 | COLLABORATION_WOPI_SRC | string | https://localhost:9300 | The WOPI source base URL containing schema, host and port. Set this to the schema and domain where the collaboration service is reachable for the wopi app, such as https://office.owncloud.test.|
 | COLLABORATION_WOPI_SECRET | string |  | Used to mint and verify WOPI JWT tokens and encrypt and decrypt the REVA JWT token embedded in the WOPI JWT token.|
 | COLLABORATION_WOPI_DISABLE_CHAT<br/>OCIS_WOPI_DISABLE_CHAT | bool | false | Disable chat in the office web frontend. This feature applies to OnlyOffice and Microsoft.|
+| COLLABORATION_WOPI_ENABLE_MOBILE | bool | false | Enable the mobile web view for office app. This feature applies to OnlyOffice.  See the documentation for more details.|
 | COLLABORATION_WOPI_PROXY_URL | string |  | The URL to the ownCloud Office365 WOPI proxy. Optional. To use this feature, you need an office365 proxy subscription. If you become part of the Microsoft CSP program (https://learn.microsoft.com/en-us/partner-center/enroll/csp-overview), you can use WebOffice without a proxy.|
 | COLLABORATION_WOPI_PROXY_SECRET | string |  | Optional, the secret to authenticate against the ownCloud Office365 WOPI proxy. This secret can be obtained from ownCloud via the office365 proxy subscription.|
 | COLLABORATION_WOPI_SHORTTOKENS | bool | false | Use short access tokens for WOPI access. This is useful for office packages, like Microsoft Office Online, which have URL length restrictions. If enabled, a persistent store must be configured.|

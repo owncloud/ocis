@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2025-09-21-00-07-21]
+[#deprecation-note-2025-09-21-18-18-03]
 [caption=]
 .Deprecation notes for the collaboration service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -52,6 +52,17 @@ a| [subs=-attributes]
 ++Collabora ++
 a| [subs=-attributes]
 The WebOffice app, either Collabora, OnlyOffice, Microsoft365 or MicrosoftOfficeOnline.
+
+a|`COLLABORATION_APP_PRODUCT_EDITION` +
+
+a| [subs=-attributes]
+++Balch ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The WebOffice app edition defines the capabilities specific to the product such as CE - Community Edition, EE - Enterprise Edition DE - Developer Edition, etc. Currently supported values are limited to OnlyOffice and are: 'ce', 'ee' or 'de' and  default to empty which is equal to ce). See the documentation for more details.
 
 a|`COLLABORATION_APP_DESCRIPTION` +
 
@@ -324,6 +335,17 @@ a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
 Disable chat in the office web frontend. This feature applies to OnlyOffice and Microsoft.
+
+a|`COLLABORATION_WOPI_ENABLE_MOBILE` +
+
+a| [subs=-attributes]
+++Balch ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Enable the mobile web view for office app. This feature applies to OnlyOffice.  See the documentation for more details.
 
 a|`COLLABORATION_WOPI_PROXY_URL` +
 

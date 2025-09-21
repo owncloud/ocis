@@ -4,6 +4,7 @@
 app:
   name: Collabora
   product: Collabora
+  productedition: ""
   description: Open office documents with Collabora
   icon: image-edit
   addr: https://127.0.0.1:9980
@@ -36,6 +37,7 @@ wopi:
   wopisrc: https://localhost:9300
   secret: ""
   disable_chat: false
+  enable_mobile: false
   proxy_url: ""
   proxy_secret: ""
   short_tokens: false
