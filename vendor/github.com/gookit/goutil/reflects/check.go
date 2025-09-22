@@ -7,13 +7,20 @@ import (
 
 // IsTimeType check is or alias of time.Time type
 func IsTimeType(t reflect.Type) bool {
-	return t != nil && t.Kind() == reflect.Struct && t.ConvertibleTo(timeType)
+	if t == nil || t.Kind() != reflect.Struct {
+		return false
+	}
+	// t == timeType - 无法判断自定义类型
+	return t == timeType || t.ConvertibleTo(timeType)
 }
 
 // IsDurationType check is or alias of time.Duration type
 func IsDurationType(t reflect.Type) bool {
+	if t == nil || t.Kind() != reflect.Int64 {
+		return false
+	}
 	// t == durationType - 无法判断自定义类型
-	return t != nil && t.Kind() == reflect.Int64 && t.ConvertibleTo(durationType)
+	return t == durationType || t.ConvertibleTo(durationType)
 }
 
 // HasChild type check. eg: array, slice, map, struct
@@ -26,7 +33,7 @@ func HasChild(v reflect.Value) bool {
 	}
 }
 
-// IsArrayOrSlice check. eg: array, slice
+// IsArrayOrSlice type check. eg: array, slice
 func IsArrayOrSlice(k reflect.Kind) bool {
 	return k == reflect.Slice || k == reflect.Array
 }
@@ -121,7 +128,7 @@ func IsEqual(src, dst any) bool {
 // IsZero reflect value check, alias of the IsEmpty()
 var IsZero = IsEmpty
 
-// IsEmpty reflect value check
+// IsEmpty reflect value check. if is ptr, check if is nil
 func IsEmpty(v reflect.Value) bool {
 	switch v.Kind() {
 	case reflect.Invalid:
@@ -152,7 +159,7 @@ var IsEmptyValue = IsEmptyReal
 //
 // Note:
 //
-//	Difference the IsEmpty(), if value is ptr or interface, will check real elem.
+// Difference the IsEmpty(), if value is ptr or interface, will check real elem.
 //
 // From src/pkg/encoding/json/encode.go.
 func IsEmptyReal(v reflect.Value) bool {

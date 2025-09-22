@@ -42,7 +42,7 @@ require (
 	github.com/google/go-cmp v0.7.0
 	github.com/google/go-tika v0.3.1
 	github.com/google/uuid v1.6.0
-	github.com/gookit/config/v2 v2.2.6
+	github.com/gookit/config/v2 v2.2.7
 	github.com/gorilla/mux v1.8.1
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.27.1
 	github.com/invopop/validation v0.8.0
@@ -203,6 +203,7 @@ require (
 	github.com/go-task/slim-sprig v0.0.0-20230315185526-52ccab3ef572 // indirect
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
 	github.com/go-test/deep v1.1.0 // indirect
+	github.com/go-viper/mapstructure/v2 v2.4.0 // indirect
 	github.com/gobwas/glob v0.2.3 // indirect
 	github.com/gobwas/httphead v0.1.0 // indirect
 	github.com/gobwas/pool v0.2.1 // indirect
@@ -219,7 +220,7 @@ require (
 	github.com/google/go-tpm v0.9.5 // indirect
 	github.com/google/pprof v0.0.0-20250403155104-27863c87afa6 // indirect
 	github.com/google/renameio/v2 v2.0.0 // indirect
-	github.com/gookit/goutil v0.7.0 // indirect
+	github.com/gookit/goutil v0.7.1 // indirect
 	github.com/gorilla/handlers v1.5.1 // indirect
 	github.com/gorilla/schema v1.4.1 // indirect
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0 // indirect

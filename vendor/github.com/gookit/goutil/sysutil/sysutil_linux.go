@@ -1,11 +1,12 @@
-//go:build !windows && !darwin
-
 package sysutil
 
 import (
 	"os/exec"
 	"strings"
 )
+
+// OsName system name. like runtime.GOOS. allow: linux, windows, darwin
+const OsName = Linux
 
 // IsWin system. linux windows darwin
 func IsWin() bool { return false }
@@ -20,9 +21,7 @@ func IsMac() bool { return false }
 func IsDarwin() bool { return false }
 
 // IsLinux system
-func IsLinux() bool {
-	return true
-}
+func IsLinux() bool { return true }
 
 // There are multiple possible providers to open a browser on linux
 // One of them is xdg-open, another is x-www-browser, then there's www-browser, etc.
