@@ -71,6 +71,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Tolerating the empty request body for WebDAV: [#11516](https://github.com/owncloud/ocis/pull/11516)
 * Bugfix - Fix space root handling in a sharedByMe: [#11533](https://github.com/owncloud/ocis/pull/11533)
 * Bugfix - Fix the create link endpoint: [#11542](https://github.com/owncloud/ocis/pull/11542)
+* Bugfix - Add OCS v2 capabilities endpoint to public paths: [#11665](https://github.com/owncloud/ocis/pull/11665)
 * Enhancement - Add GetPermission API: [#8616](https://github.com/owncloud/ocis/issues/8616)
 * Enhancement - Bump importer app: [#10880](https://github.com/owncloud/ocis/pull/10880)
 * Enhancement - Allow scaling the search service: [#11029](https://github.com/owncloud/ocis/pull/11029)
@@ -120,6 +121,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/11409
    https://github.com/owncloud/ocis/pull/11542
+
+* Bugfix - Add OCS v2 capabilities endpoint to public paths: [#11665](https://github.com/owncloud/ocis/pull/11665)
+
+   Following the same behavior as OCS v1, we added the OCS v2 capabilities endpoint
+   to the public paths.
+
+   https://github.com/owncloud/ocis/pull/11665
 
 * Enhancement - Add GetPermission API: [#8616](https://github.com/owncloud/ocis/issues/8616)
 
