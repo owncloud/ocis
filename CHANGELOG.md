@@ -72,6 +72,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix space root handling in a sharedByMe: [#11533](https://github.com/owncloud/ocis/pull/11533)
 * Bugfix - Fix the create link endpoint: [#11542](https://github.com/owncloud/ocis/pull/11542)
 * Bugfix - Add OCS v2 capabilities endpoint to public paths: [#11665](https://github.com/owncloud/ocis/pull/11665)
+* Bugfix - Add webdav without trailing slash into proxy default config: [#11677](https://github.com/owncloud/ocis/pull/11677)
 * Enhancement - Add GetPermission API: [#8616](https://github.com/owncloud/ocis/issues/8616)
 * Enhancement - Bump importer app: [#10880](https://github.com/owncloud/ocis/pull/10880)
 * Enhancement - Allow scaling the search service: [#11029](https://github.com/owncloud/ocis/pull/11029)
@@ -128,6 +129,15 @@ The following sections list the changes for unreleased.
    to the public paths.
 
    https://github.com/owncloud/ocis/pull/11665
+
+* Bugfix - Add webdav without trailing slash into proxy default config: [#11677](https://github.com/owncloud/ocis/pull/11677)
+
+   We've added the `/webdav` endpoint without a trailing slash into the proxy
+   default config.
+
+   https://github.com/owncloud/ocis/issues/10346
+   https://github.com/owncloud/ocis/issues/10334
+   https://github.com/owncloud/ocis/pull/11677
 
 * Enhancement - Add GetPermission API: [#8616](https://github.com/owncloud/ocis/issues/8616)
 
