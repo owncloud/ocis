@@ -41,7 +41,7 @@ excludePattern: list[str] = ['pre5.0', '5.0', '6.0', '6.0.0', '6.0.1', '6.1.0', 
 
 # DO NOT CHANGE
 # this is the path the added/removed result is written to
-adocWritePath: str = 'docs/services/general-info/env-var-deltas'
+adocWritePath: str = 'docs/services/general-info/envvars/env-var-deltas'
 
 # define root sources from github
 git_left_dir: str = 'https://raw.githubusercontent.com/owncloud/ocis/refs/'
