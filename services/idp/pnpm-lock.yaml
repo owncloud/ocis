@@ -188,8 +188,8 @@ importers:
         specifier: ^7.0.2
         version: 7.0.2(webpack@5.96.1)
       dotenv:
-        specifier: 16.4.5
-        version: 16.4.5
+        specifier: 17.2.2
+        version: 17.2.2
       dotenv-expand:
         specifier: 10.0.0
         version: 10.0.0
@@ -3132,8 +3132,8 @@ packages:
     resolution: {integrity: sha512-GopVGCpVS1UKH75VKHGuQFqS1Gusej0z4FyQkPdwjil2gNIv+LNsqBlboOzpJFZKVT95GkCyWJbBSdFEFUWI2A==}
     engines: {node: '>=12'}
 
-  dotenv@16.4.5:
-    resolution: {integrity: sha512-ZmdL2rui+eB2YwhsWzjInR8LldtZHGDoQ1ugH85ppHKwpUHL7j7rN0Ti9NCnGiQbhaZ11FpR+7ao1dNsmduNUg==}
+  dotenv@17.2.2:
+    resolution: {integrity: sha512-Sf2LSQP+bOlhKWWyhFsn0UsfdK/kCWRv1iuA2gXAwt3dyNabr6QSj00I2V10pidqz69soatm9ZwZvpQMTIOd5Q==}
     engines: {node: '>=12'}
 
   dunder-proto@1.0.1:
@@ -9849,7 +9849,7 @@ snapshots:
 
   dotenv-expand@10.0.0: {}
 
-  dotenv@16.4.5: {}
+  dotenv@17.2.2: {}
 
   dunder-proto@1.0.1:
     dependencies:
