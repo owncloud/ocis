@@ -90,6 +90,8 @@ policies:
     service: com.owncloud.web.ocdav
   - endpoint: /webdav/
     service: com.owncloud.web.ocdav
+  - endpoint: /webdav
+    service: com.owncloud.web.ocdav
   - endpoint: /status
     service: com.owncloud.web.ocdav
     unprotected: true
