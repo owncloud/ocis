@@ -9,7 +9,7 @@ Feature: sharing
       | Brian    |
       | Carol    |
 
-  @issue-8242 @issue-10334
+  @issue-8242
   Scenario Outline: sharer renames the shared item (old/new webdav)
     Given user "Alice" has uploaded file with content "foo" to "sharefile.txt"
     And using <dav-path-version> DAV path
@@ -88,7 +88,7 @@ Feature: sharing
       | dav-path                                 | dav-path-personal     |
       | /dav/spaces/%shares_drive_id%            | /dav/spaces/%spaceid% |
 
-  @issue-8242 @issue-10334 @env-config
+  @issue-8242 @env-config
   Scenario Outline: share receiver renames the shared item (old/new webdav)
     Given user "Alice" has uploaded file with content "foo" to "/sharefile.txt"
     And the administrator has enabled the permissions role "Secure Viewer"

@@ -218,6 +218,10 @@ func DefaultPolicies() []config.Policy {
 					Service:  "com.owncloud.web.ocdav",
 				},
 				{
+					Endpoint: "/webdav",
+					Service:  "com.owncloud.web.ocdav",
+				},
+				{
 					Endpoint:    "/status",
 					Service:     "com.owncloud.web.ocdav",
 					Unprotected: true,

@@ -10,7 +10,7 @@ Feature: upload file to shared folder
       | Alice    |
       | Brian    |
 
-  @issue-10346
+
   Scenario Outline: uploading file to a received share folder
     Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/FOLDER"
@@ -31,7 +31,7 @@ Feature: upload file to shared folder
       | new              |
       | spaces           |
 
-  @issue-10346
+
   Scenario Outline: uploading file to a user read/write share folder works
     Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/FOLDER"
@@ -52,7 +52,7 @@ Feature: upload file to shared folder
       | new              |
       | spaces           |
 
-  @issue-10346
+
   Scenario Outline: uploading a file into a group share as share receiver
     Given using <dav-path-version> DAV path
     And group "grp1" has been created
@@ -75,7 +75,7 @@ Feature: upload file to shared folder
       | new              |
       | spaces           |
 
-  @issue-10346
+
   Scenario Outline: overwrite file to a received share folder
     Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/FOLDER"
@@ -97,7 +97,7 @@ Feature: upload file to shared folder
       | new              |
       | spaces           |
 
-  @issue-10346
+
   Scenario Outline: attempt to upload a file into a folder within correctly received read only share
     Given using <dav-path-version> DAV path
     And user "Alice" has created folder "/FOLDER"
