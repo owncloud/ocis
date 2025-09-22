@@ -13,6 +13,14 @@ import (
 	"golang.org/x/term"
 )
 
+// os names
+const (
+	Windows = "windows"
+	Linux   = "linux"
+	Darwin  = "darwin"
+	FreeBSD = "freebsd"
+)
+
 // IsMSys msys(MINGW64) env，不一定支持颜色
 func IsMSys() bool {
 	// "MSYSTEM=MINGW64"
@@ -146,6 +154,11 @@ func EnvMapWith(newEnv map[string]string) map[string]string {
 // EnvPaths get and split $PATH to []string
 func EnvPaths() []string {
 	return filepath.SplitList(os.Getenv("PATH"))
+}
+
+// ToEnvPATH convert []string to $PATH string.
+func ToEnvPATH(paths []string) string {
+	return strings.Join(paths, string(filepath.ListSeparator))
 }
 
 // SearchPathOption settings for SearchPath
