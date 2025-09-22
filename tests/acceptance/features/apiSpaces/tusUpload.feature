@@ -42,7 +42,7 @@ Feature: upload resources using TUS protocol
       | test.txt   |
       | upload.txt |
 
-  @issue-10346
+
   Scenario Outline: upload a zero-byte file inside a shared folder
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes
@@ -98,7 +98,7 @@ Feature: upload resources using TUS protocol
       | Access-Control-Expose-Headers | Tus-Resumable, Upload-Offset, Location |
     And for user "Alice" the content of the file "textfile.txt" of the space "new-space" should be ""
 
-  @issue-8003 @issue-10346
+  @issue-8003
   Scenario Outline: replace a shared file with zero-byte file
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes

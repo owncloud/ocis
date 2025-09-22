@@ -13,7 +13,7 @@ Feature: PROPFIND
       | /dav/files  |
       | /dav/spaces |
 
-  @issue-10334
+
   Scenario Outline: send PROPFIND request to "/dav/(files|spaces)" with depth header
     Given user "Alice" has been created with default attributes
     When user "Alice" requests "<dav-path>" with "PROPFIND" using basic auth and with headers

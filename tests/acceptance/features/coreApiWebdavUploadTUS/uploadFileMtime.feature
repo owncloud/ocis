@@ -6,7 +6,7 @@ Feature: upload file
   Background:
     Given user "Alice" has been created with default attributes
 
-  @issue-10346
+
   Scenario Outline: upload file with mtime
     Given using <dav-path-version> DAV path
     When user "Alice" uploads file "filesForUpload/textfile.txt" to "file.txt" with mtime "Thu, 08 Aug 2019 04:18:13 GMT" using the TUS protocol on the WebDAV API
@@ -18,7 +18,7 @@ Feature: upload file
       | new              |
       | spaces           |
 
-  @issue-10346
+
   Scenario Outline: upload file with future mtime
     Given using <dav-path-version> DAV path
     When user "Alice" uploads file "filesForUpload/textfile.txt" to "file.txt" with mtime "Thu, 08 Aug 2129 04:18:13 GMT" using the TUS protocol on the WebDAV API
@@ -30,7 +30,7 @@ Feature: upload file
       | new              |
       | spaces           |
 
-  @issue-10346
+
   Scenario Outline: upload a file with mtime in a folder
     Given using <dav-path-version> DAV path
     And user "Alice" has created folder "testFolder"
@@ -43,7 +43,7 @@ Feature: upload file
       | new              |
       | spaces           |
 
-  @issue-10346
+
   Scenario Outline: overwriting a file changes its mtime
     Given using <dav-path-version> DAV path
     And user "Alice" has uploaded file with content "first time upload content" to "file.txt"
@@ -56,7 +56,7 @@ Feature: upload file
       | new              |
       | spaces           |
 
-  @issue-10346
+
   Scenario Outline: upload a file with the same mtime and same content multiple times (atleast 3 times)
     Given using <dav-path-version> DAV path
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "file.txt" with mtime "Thu, 08 Aug 2019 04:18:13 GMT" using the TUS protocol
@@ -71,7 +71,7 @@ Feature: upload file
       | new              |
       | spaces           |
 
-  @issue-10346 @issue-10496
+  @issue-10496
   Scenario Outline: upload a file with the same mtime and different content multiple times (atleast 3 times)
     Given using <dav-path-version> DAV path
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "file.txt" with mtime "Thu, 08 Aug 2019 04:18:13 GMT" using the TUS protocol
