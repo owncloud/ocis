@@ -22,19 +22,10 @@ var mfaKey = mfaKeyType{}
 // This operation does not overwrite existing context values.
 func EnhanceRequest(req *http.Request) *http.Request {
 	ctx := req.Context()
-	if Get(ctx) {
+	if Has(ctx) {
 		return req
 	}
 	return req.WithContext(Set(ctx, req.Header.Get(MFAHeader) == "true"))
-}
-
-// EnsureOrReject sets the MFA required header and status code 403 if not multi factor authenticated.
-func EnsureOrReject(ctx context.Context, w http.ResponseWriter) (hasMFA bool) {
-	hasMFA = Get(ctx)
-	if !hasMFA {
-		SetRequiredStatus(w)
-	}
-	return
 }
 
 // SetRequiredStatus sets the MFA required header and the statuscode to 403
@@ -43,8 +34,8 @@ func SetRequiredStatus(w http.ResponseWriter) {
 	w.WriteHeader(http.StatusForbidden)
 }
 
-// Get gets the mfa status from the context.
-func Get(ctx context.Context) bool {
+// Has returns the mfa status from the context.
+func Has(ctx context.Context) bool {
 	mfa, ok := ctx.Value(mfaKey).(bool)
 	if !ok {
 		return false

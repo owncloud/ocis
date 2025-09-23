@@ -19,13 +19,10 @@ func exampleUsage() http.HandlerFunc {
 		ctx := r.Context()
 
 		// now you can check if the user has MFA enabled
-		hasMFA := mfa.Get(ctx)
-		_ = hasMFA // use it as needed
-
-		// use convenience method to automatically set headers and response codes
-		if !mfa.EnsureOrReject(ctx, w) {
+		if !mfa.Has(ctx) {
 			// use this line to log access denied information
 			// mfa package will not log anything by itself
+			mfa.SetRequiredStatus(w)
 			return
 		}
 		// user has MFA enabled, you can now proceed with sensitive operation

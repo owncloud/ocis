@@ -8,6 +8,7 @@ import (
 	"path"
 	"strings"
 
+	"github.com/CiscoM31/godata"
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/go-chi/chi/v5"
@@ -151,4 +152,40 @@ func parseIDParam(r *http.Request, param string) (storageprovider.ResourceId, er
 		return storageprovider.ResourceId{}, errorcode.New(errorcode.InvalidRequest, err.Error())
 	}
 	return id, nil
+}
+
+// regular users can only search for terms with a minimum length
+func hasAcceptableSearch(query *godata.GoDataQuery, minSearchLength int) bool {
+	if query == nil || query.Search == nil {
+		return false
+	}
+
+	if strings.HasPrefix(query.Search.RawValue, "\"") {
+		// if search starts with double quotes then it must finish with double quotes
+		// add +2 to the minimum search length in this case
+		minSearchLength += 2
+	}
+
+	return len(query.Search.RawValue) >= minSearchLength
+}
+
+// regular users can only filter by userType
+func hasAcceptableFilter(query *godata.GoDataQuery) bool {
+	switch {
+	case query == nil || query.Filter == nil:
+		return true
+	case query.Filter.Tree.Token.Type != godata.ExpressionTokenLogical:
+		return false
+	case query.Filter.Tree.Token.Value != "eq":
+		return false
+	case query.Filter.Tree.Children[0].Token.Value != "userType":
+		return false
+	}
+
+	return true
+}
+
+// regular users can only use basic queries without any expansions, computes or applies
+func hasAcceptableQuery(query *godata.GoDataQuery) bool {
+	return query != nil && query.Apply == nil && query.Expand == nil && query.Compute == nil
 }
