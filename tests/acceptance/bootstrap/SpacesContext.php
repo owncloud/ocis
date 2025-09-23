@@ -2059,7 +2059,11 @@ class SpacesContext implements Context {
 			}
 		}
 
-		$encodedName = \rawurlencode(ltrim($fileSource, "/"));
+		$sourcePath = explode('/', ltrim($fileSource, "/"));
+		foreach ($sourcePath as $key => $part) {
+			$sourcePath[$key] = \rawurlencode($part);
+		}
+		$encodedName = implode('/', $sourcePath);
 		$baseUrl = $this->featureContext->getBaseUrl();
 		$davPath = WebdavHelper::getDavPath(WebDavHelper::DAV_VERSION_SPACES, $space["id"]);
 		$fullUrl = "$baseUrl/$davPath/$encodedName";

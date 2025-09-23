@@ -273,6 +273,7 @@ class SettingsHelper {
 		$valuesList = HttpRequestHelper::getJsonDecodedResponseBodyContent($response);
 
 		if (empty($valuesList)) {
+			// default is true
 			return true;
 		}
 

@@ -390,7 +390,7 @@ class SharingNgContext implements Context {
 	 * share the drive (space) using the drives.root endpoint
 	 *
 	 * @param string $user
-	 * @param TableNode $table
+	 * @param array $rows
 	 * @param bool $federatedShare
 	 *
 	 * @return ResponseInterface
@@ -401,11 +401,10 @@ class SharingNgContext implements Context {
 	 */
 	public function sendDriveShareInvitation(
 		string $user,
-		TableNode $table,
+		array $rows,
 		bool $federatedShare = false,
 	): ResponseInterface {
 		$shareeIds = [];
-		$rows = $table->getRowsHash();
 		$space = $this->spacesContext->getSpaceByName($user, $rows['space']);
 		$spaceId = $space['id'];
 
@@ -468,6 +467,13 @@ class SharingNgContext implements Context {
 		);
 		$response = $this->sendShareInvitation($user, $rows);
 		$this->featureContext->theHTTPStatusCodeShouldBe(200, "", $response);
+		// wait till the share is available to the sharee
+		if ($rows['shareType'] === 'user' && $rows['permissionsRole'] !== 'Denied') {
+			$status = $this->featureContext->getUserAutoSyncSetting($rows['sharee']) ? "enabled" : "disabled";
+			$resourcePaths = explode('/', $rows['resource']);
+			$resource = array_pop($resourcePaths);
+			$this->waitAndCheckShareSyncStatus($rows['sharee'], $resource, $status);
+		}
 	}
 
 	/**
@@ -511,7 +517,7 @@ class SharingNgContext implements Context {
 			$rows,
 			"'resource' should not be provided in the data-table while sharing a space",
 		);
-		$response = $this->sendDriveShareInvitation($user, $table);
+		$response = $this->sendDriveShareInvitation($user, $table->getRowsHash());
 		$this->featureContext->theHTTPStatusCodeShouldBe(200, "", $response);
 	}
 
@@ -1852,7 +1858,7 @@ class SharingNgContext implements Context {
 		string $user,
 		TableNode $table,
 	): void {
-		$response = $this->sendDriveShareInvitation($user, $table);
+		$response = $this->sendDriveShareInvitation($user, $table->getRowsHash());
 		$this->featureContext->setResponse($response);
 	}
 
@@ -1869,7 +1875,7 @@ class SharingNgContext implements Context {
 		string $user,
 		TableNode $table,
 	): void {
-		$response = $this->sendDriveShareInvitation($user, $table, true);
+		$response = $this->sendDriveShareInvitation($user, $table->getRowsHash(), true);
 		$this->featureContext->setResponse($response);
 	}
 
@@ -2091,7 +2097,7 @@ class SharingNgContext implements Context {
 			$roleAllowed = GraphHelper::getPermissionNameByPermissionRoleId($role->id);
 			$responseSendInvitation = $this->sendDriveShareInvitation(
 				$user,
-				new TableNode(array_merge($table->getTable(), [['permissionsRole', $roleAllowed]])),
+				array_merge($rows, ['permissionsRole' => $roleAllowed]),
 			);
 			$jsonResponseSendInvitation = $this->featureContext->getJsonDecodedResponseBodyContent(
 				$responseSendInvitation,
