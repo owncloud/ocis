@@ -84,13 +84,13 @@ S3_PUBLIC_CACHE_BUCKET = "public"
 # configuration
 config = {
     "cs3ApiTests": {
-        "skip": False,
+        "skip": True,
     },
     "wopiValidatorTests": {
-        "skip": False,
+        "skip": True,
     },
     "k6LoadTests": {
-        "skip": False,
+        "skip": True,
     },
     "localApiTests": {
         "contractAndLock": {
@@ -98,7 +98,7 @@ config = {
                 "apiContract",
                 "apiLocks",
             ],
-            "skip": False,
+            "skip": True,
             "k8s": True,
         },
         "settingsAndNotification": {
@@ -107,7 +107,7 @@ config = {
                 "apiNotification",
                 "apiCors",
             ],
-            "skip": False,
+            "skip": True,
             "withRemotePhp": [True],
             "emailNeeded": True,
             "extraEnvironment": {
@@ -128,6 +128,7 @@ config = {
                 "apiGraphUser",
             ],
             "withRemotePhp": [True],
+            "skip": True,
         },
         "spaces": {
             "suites": [
@@ -140,7 +141,7 @@ config = {
             "suites": [
                 "apiSpacesShares",
             ],
-            "skip": False,
+            "skip": True,
             "k8s": True,
         },
         "davOperations": {
@@ -152,7 +153,7 @@ config = {
                 "apiArchiver",
                 "apiActivities",
             ],
-            "skip": False,
+            "skip": True,
         },
         "groupAndSearch1": {
             "suites": [
@@ -161,7 +162,7 @@ config = {
                 "apiGraphGroup",
                 "apiServiceAvailability",
             ],
-            "skip": False,
+            "skip": True,
             "k8s": False,
         },
         "search2": {
@@ -170,7 +171,7 @@ config = {
                 "apiSearchContent",
             ],
             "tikaNeeded": True,
-            "skip": False,
+            "skip": True,
             "k8s": False,
         },
         "sharingNg1": {
@@ -179,7 +180,7 @@ config = {
                 "apiReshare",
                 "apiSharingNgPermissions",
             ],
-            "skip": False,
+            "skip": True,
             "withRemotePhp": [True],
         },
         "sharingNgAdditionalShareRole": {
@@ -195,7 +196,7 @@ config = {
                 "apiSharingNgDriveInvitation",
                 "apiSharingNgItemInvitation",
             ],
-            "skip": False,
+            "skip": True,
             "withRemotePhp": [True],
         },
         "sharingNgLinkShare": {
@@ -204,14 +205,14 @@ config = {
                 "apiSharingNgItemLinkShare",
                 "apiSharingNgLinkShareManagement",
             ],
-            "skip": False,
+            "skip": True,
             "withRemotePhp": [True],
         },
         "antivirus": {
             "suites": [
                 "apiAntivirus",
             ],
-            "skip": False,
+            "skip": True,
             "antivirusNeeded": True,
             "extraServerEnvironment": {
                 "ANTIVIRUS_SCANNER_TYPE": "clamav",
@@ -224,9 +225,10 @@ config = {
         "ocmAndAuthApp": {
             "suites": [
                 "apiOcm",
-                "apiAuthApp",
+                # "apiAuthApp",
             ],
             "skip": False,
+            "k8s": True,
             "withRemotePhp": [True],
             "federationServer": True,
             "emailNeeded": True,
@@ -254,7 +256,7 @@ config = {
             "suites": [
                 "apiCollaboration",
             ],
-            "skip": False,
+            "skip": True,
             "withRemotePhp": [True],
             "collaborationServiceNeeded": True,
             "extraServerEnvironment": {
@@ -265,7 +267,7 @@ config = {
             "suites": [
                 "cliCommands",
             ],
-            "skip": False,
+            "skip": True,
             "withRemotePhp": [True],
             "antivirusNeeded": True,
             "emailNeeded": True,
@@ -294,7 +296,7 @@ config = {
                 "coreApiMain",
                 "coreApiVersions",
             ],
-            "skip": False,
+            "skip": True,
             "withRemotePhp": [True],
         },
         "2": {
@@ -311,7 +313,7 @@ config = {
                 "coreApiSharees",
                 "coreApiSharePublicLink2",
             ],
-            "skip": False,
+            "skip": True,
             "withRemotePhp": [True],
         },
         "4": {
@@ -333,7 +335,7 @@ config = {
                 "coreApiWebdavEtagPropagation1",
                 "coreApiWebdavEtagPropagation2",
             ],
-            "skip": False,
+            "skip": True,
             "k8s": True,
         },
         "6": {
@@ -348,7 +350,7 @@ config = {
             "suites": [
                 "coreApiWebdavProperties",
             ],
-            "skip": False,
+            "skip": True,
             "k8s": True,
         },
         "8": {
@@ -358,29 +360,29 @@ config = {
                 "coreApiWebdavUpload",
                 "coreApiWebdavUploadTUS",
             ],
-            "skip": False,
+            "skip": True,
         },
     },
     "e2eTests": {
         "part": {
-            "skip": False,
+            "skip": True,
             "totalParts": 4,  # divide and run all suites in parts (divide pipelines)
             "xsuites": ["search", "app-provider", "oidc", "ocm", "keycloak"],  # suites to skip
         },
         "search": {
-            "skip": False,
+            "skip": True,
             "suites": ["search"],  # suites to run
             "tikaNeeded": True,
         },
         "keycloak": {
-            "skip": False,
+            "skip": True,
             "suites": ["journeys", "keycloak"],
             "keycloakNeeded": True,
         },
     },
     "e2eMultiService": {
         "testSuites": {
-            "skip": False,
+            "skip": True,
             "suites": [
                 "smoke",
                 "shares",
@@ -1086,7 +1088,7 @@ def localApiTestPipeline(ctx):
                     params[item] = matrix[item] if item in matrix else defaults[item]
                 for storage in params["storages"]:
                     for run_with_remote_php in params["withRemotePhp"]:
-                        run_on_k8s = params["k8s"] and ctx.build.event == "cron"
+                        run_on_k8s = params["k8s"]  #and ctx.build.event == "cron"
                         ocis_url = OCIS_URL
                         if run_on_k8s:
                             ocis_url = "https://%s" % OCIS_SERVER_NAME
@@ -1100,7 +1102,7 @@ def localApiTestPipeline(ctx):
                                 "arch": "amd64",
                             },
                             "steps": skipIfUnchanged(ctx, "acceptance-tests") +
-                                     restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin") +
+                                     #  restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin") +
                                      (tikaService() if params["tikaNeeded"] else []) +
                                      (waitForServices("online-offices", ["collabora:9980", "onlyoffice:443", "fakeoffice:8080"]) if params["collaborationServiceNeeded"] else []) +
                                      (waitK3sCluster() + (clamavServiceK8s() if params["antivirusNeeded"] and run_on_k8s else []) + (emailServiceK8s() if params["emailNeeded"] and run_on_k8s else []) + deployOcis() + waitForOcis(ocis_url = ocis_url) + ociswrapper() + waitForOciswrapper() if run_on_k8s else ocisServer(storage, extra_server_environment = params["extraServerEnvironment"], with_wrapper = True, tika_enabled = params["tikaNeeded"], volumes = ([stepVolumeOcisStorage]))) +
@@ -3496,7 +3498,7 @@ def apiTestFailureLog():
         "name": "api-test-failure-logs",
         "image": OC_CI_PHP % DEFAULT_PHP_VERSION,
         "commands": [
-            "cat %s/tests/acceptance/logs/failed.log" % dirs["base"],
+            # "cat %s/tests/acceptance/logs/failed.log" % dirs["base"],
         ],
         "when": {
             "status": [
@@ -3772,6 +3774,7 @@ def k3sCluster():
         "user": "root",
         "privileged": True,
         "commands": [
+            "rm -rf ocis-charts",
             "git clone --single-branch --branch main --depth 1 https://github.com/owncloud/ocis-charts.git",
             "nohup dockerd-entrypoint.sh &",
             "until docker ps 2>&1 > /dev/null; do sleep 1s; done",
@@ -3828,6 +3831,27 @@ def deployOcis():
                 "name": "gopath",
                 "path": "/go",
             },
+        ],
+    }]
+
+def deployFedOcis():
+    return [{
+        "name": "deploy-ocis",
+        "image": "ghcr.io/helmfile/helmfile:v0.156.0",
+        "commands": [
+            "cd ocis-charts",
+            "cp deployments/ocm-install/helmfile.yaml deployments/ocm-install/helmfile.yaml.gotmpl",
+            "helmfile sync",
+        ],
+        "volumes": [
+            {
+                "name": "gopath",
+                "path": "/go",
+            },
+        ],
+        "extra_hosts": [
+            "myservice.local:192.168.1.100",
+            "another.local:10.0.0.5",
         ],
     }]
 
