@@ -71,6 +71,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Tolerating the empty request body for WebDAV: [#11516](https://github.com/owncloud/ocis/pull/11516)
 * Bugfix - Fix space root handling in a sharedByMe: [#11533](https://github.com/owncloud/ocis/pull/11533)
 * Bugfix - Fix the create link endpoint: [#11542](https://github.com/owncloud/ocis/pull/11542)
+* Bugfix - Limit search only when scope is passed: [#11664](https://github.com/owncloud/ocis/pull/11664)
 * Bugfix - Add OCS v2 capabilities endpoint to public paths: [#11665](https://github.com/owncloud/ocis/pull/11665)
 * Bugfix - Add webdav without trailing slash into proxy default config: [#11677](https://github.com/owncloud/ocis/pull/11677)
 * Enhancement - Add GetPermission API: [#8616](https://github.com/owncloud/ocis/issues/8616)
@@ -122,6 +123,15 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/11409
    https://github.com/owncloud/ocis/pull/11542
+
+* Bugfix - Limit search only when scope is passed: [#11664](https://github.com/owncloud/ocis/pull/11664)
+
+   Previously, the search service would limit the search to the according space
+   when searching `/dav/spaces/`. This was not correct, as the search should be
+   limited to the according space when a `scope` is passed in the search pattern
+   instead.
+
+   https://github.com/owncloud/ocis/pull/11664
 
 * Bugfix - Add OCS v2 capabilities endpoint to public paths: [#11665](https://github.com/owncloud/ocis/pull/11665)
 
