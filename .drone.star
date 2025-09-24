@@ -135,6 +135,7 @@ config = {
                 "apiSpaces",
             ],
             "skip": False,
+            "k8s": True,
         },
         "spacesShares": {
             "suites": [
