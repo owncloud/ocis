@@ -312,7 +312,6 @@ class GraphHelper {
 			$accountEnabled,
 		);
 		$url = self::getFullUrl($baseUrl, 'users/' . $userId);
-		var_dump($url, $payload);
 		return HttpRequestHelper::sendRequest(
 			$url,
 			$method,
@@ -982,8 +981,6 @@ class GraphHelper {
 	): ResponseInterface {
 		$urlArguments = $urlArguments ? "?$urlArguments" : "";
 		$url = self::getFullUrl($baseUrl, "me/drives" . $urlArguments);
-
-		var_dump("urllllll", $url);
 
 		return HttpRequestHelper::get($url, $user, $password, $headers, $body);
 	}

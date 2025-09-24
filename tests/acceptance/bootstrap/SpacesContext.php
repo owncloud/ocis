@@ -1847,8 +1847,6 @@ class SpacesContext implements Context {
 		string $spaceName,
 	): void {
 		$space = ["name" => $spaceName];
-		$spaces = $this->listAllMySpaces($user);
-		var_dump($spaces->getBody()->getContents());
 		$response = $this->createSpace($user, $space);
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			201,
