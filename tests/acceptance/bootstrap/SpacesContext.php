@@ -653,7 +653,7 @@ class SpacesContext implements Context {
 		string $query = '',
 		array $headers = [],
 	): ResponseInterface {
-		$response = GraphHelper::getMySpaces(
+		return GraphHelper::getMySpaces(
 			$this->featureContext->getBaseUrl(),
 			$user,
 			$this->featureContext->getPasswordForUser($user),
@@ -661,7 +661,6 @@ class SpacesContext implements Context {
 			[],
 			$headers,
 		);
-		return $response;
 	}
 
 	/**
