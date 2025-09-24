@@ -30,6 +30,8 @@ features:
         - "12345678"
         - "ownCloud"
         - "owncloud-1"
+  quotas:
+    default: "1000000000"
 
 http:
   cors:
