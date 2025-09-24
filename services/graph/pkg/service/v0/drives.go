@@ -29,6 +29,7 @@ import (
 	"google.golang.org/protobuf/proto"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/l10n"
+	"github.com/owncloud/ocis/v2/ocis-pkg/mfa"
 	v0 "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
@@ -132,6 +133,13 @@ func (g Graph) GetAllDrives(version APIVersion) http.HandlerFunc {
 // GetAllDrivesV1 attempts to retrieve the current users drives;
 // it includes another user's drives, if the current user has the permission.
 func (g Graph) GetAllDrivesV1(w http.ResponseWriter, r *http.Request) {
+	if !mfa.Has(r.Context()) {
+		logger := g.logger.SubloggerWithRequestID(r.Context())
+		logger.Error().Str("path", r.URL.Path).Msg("MFA required but not satisfied")
+		mfa.SetRequiredStatus(w)
+		return
+	}
+
 	spaces, errCode := g.getDrives(r, true, APIVersion_1)
 	if errCode != nil {
 		errorcode.RenderError(w, r, errCode)
@@ -152,6 +160,13 @@ func (g Graph) GetAllDrivesV1(w http.ResponseWriter, r *http.Request) {
 // it includes the grantedtoV2 property
 // it uses unified roles instead of the cs3 representations
 func (g Graph) GetAllDrivesV1Beta1(w http.ResponseWriter, r *http.Request) {
+	if !mfa.Has(r.Context()) {
+		logger := g.logger.SubloggerWithRequestID(r.Context())
+		logger.Error().Str("path", r.URL.Path).Msg("MFA required but not satisfied")
+		mfa.SetRequiredStatus(w)
+		return
+	}
+
 	drives, errCode := g.getDrives(r, true, APIVersion_1_Beta_1)
 	if errCode != nil {
 		errorcode.RenderError(w, r, errCode)

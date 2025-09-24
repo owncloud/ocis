@@ -10,6 +10,7 @@ import (
 
 	"github.com/CiscoM31/godata"
 	libregraph "github.com/owncloud/libre-graph-api-go"
+	"github.com/owncloud/ocis/v2/ocis-pkg/mfa"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
 
 	"github.com/go-chi/chi/v5"
@@ -32,28 +33,34 @@ func (g Graph) GetGroups(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	ctxHasFullPerms := g.contextUserHasFullAccountPerms(r.Context())
-	searchHasAcceptableLength := false
-	if odataReq.Query != nil && odataReq.Query.Search != nil {
-		minSearchLength := g.config.API.IdentitySearchMinLength
-		if strings.HasPrefix(odataReq.Query.Search.RawValue, "\"") {
-			// if search starts with double quotes then it must finish with double quotes
-			// add +2 to the minimum search length in this case
-			minSearchLength += 2
+	hasMFA := mfa.Has(r.Context())
+	if !hasAcceptableSearch(odataReq.Query, g.config.API.IdentitySearchMinLength) {
+		if !ctxHasFullPerms {
+			// for regular user the search term must have a minimum length
+			logger.Debug().Interface("query", r.URL.Query()).Msgf("search with less than %d chars for a regular user", g.config.API.IdentitySearchMinLength)
+			errorcode.AccessDenied.Render(w, r, http.StatusForbidden, "search term too short")
+			return
 		}
-		searchHasAcceptableLength = len(odataReq.Query.Search.RawValue) >= minSearchLength
-	}
-	if !ctxHasFullPerms && !searchHasAcceptableLength {
-		// for regular user the search term must have a minimum length
-		logger.Debug().Interface("query", r.URL.Query()).Msgf("search with less than %d chars for a regular user", g.config.API.IdentitySearchMinLength)
-		errorcode.AccessDenied.Render(w, r, http.StatusForbidden, "search term too short")
-		return
+		if !hasMFA {
+			logger.Error().Str("path", r.URL.Path).Msg("MFA required but not satisfied")
+			mfa.SetRequiredStatus(w)
+			return
+		}
 	}
 
-	if !ctxHasFullPerms && (odataReq.Query.Filter != nil || odataReq.Query.Apply != nil || odataReq.Query.Expand != nil || odataReq.Query.Compute != nil) {
-		// regular users can't use filter, apply, expand and compute
-		logger.Debug().Interface("query", r.URL.Query()).Msg("forbidden query elements for a regular user")
-		errorcode.AccessDenied.Render(w, r, http.StatusForbidden, "query has forbidden elements for regular users")
-		return
+	if !hasAcceptableQuery(odataReq.Query) {
+		if !ctxHasFullPerms {
+			// regular users can't use filter, apply, expand and compute
+			logger.Debug().Interface("query", r.URL.Query()).Msg("forbidden query elements for a regular user")
+			errorcode.AccessDenied.Render(w, r, http.StatusForbidden, "query has forbidden elements for regular users")
+			return
+		}
+
+		if !hasMFA {
+			logger.Error().Str("path", r.URL.Path).Msg("MFA required but not satisfied")
+			mfa.SetRequiredStatus(w)
+			return
+		}
 	}
 
 	groups, err := g.identityBackend.GetGroups(r.Context(), odataReq)

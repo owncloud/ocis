@@ -292,6 +292,7 @@ func loadMiddlewares(logger log.Logger, cfg *config.Config,
 			RevaGatewaySelector: gatewaySelector,
 		})
 	}
+
 	authenticators = append(authenticators, middleware.NewOIDCAuthenticator(
 		middleware.Logger(logger),
 		middleware.UserInfoCache(userInfoCache),
@@ -355,6 +356,7 @@ func loadMiddlewares(logger log.Logger, cfg *config.Config,
 			middleware.AutoprovisionAccounts(cfg.AutoprovisionAccounts),
 			middleware.EventsPublisher(publisher),
 		),
+		middleware.MultiFactor(cfg.MultiFactorAuthentication, middleware.Logger(logger)),
 		middleware.SelectorCookie(
 			middleware.Logger(logger),
 			middleware.PolicySelectorConfig(*cfg.PolicySelector),

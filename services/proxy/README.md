@@ -144,14 +144,28 @@ These issued JWT tokens are immutable and integrity-protected. Which means, any 
 
 * Infinite Scale can't differentiate between a group being renamed in the IDP and users being reassigned to a different group.
 
-* Infinite Scale does not get aware when a group is being deleted in the IDP, a new claim will not hold any information from the deleted group. Infinite Scale does not track a claim history to compare. 
+* Infinite Scale does not get aware when a group is being deleted in the IDP, a new claim will not hold any information from the deleted group. Infinite Scale does not track a claim history to compare.
+
+#### Claim Checks and Step-up Authentication
+
+Infinite Scale provides access control via the OpenID Connect (OIDC) "Authentication Class Reference" (ACR) claim. This can be used to enforce step-up authentication on specific routes. For instance, if a user logs in with basic authentication, they may need a higher level to access a sensitive route. If the user has not authenticated at the required level, access to the route will be denied.
+This is configurable via environment variables, such as:
+
+```
+OCIS_MFA_ENABLED: true
+OCIS_MFA_AUTH_LEVEL_NAME: advanced
+```
+
+This feature is disabled by default and requires an external Identity Provider (IDP) that supports step-up authentication and the ACR claim. Examples of such IDPs include Keycloak.
+
+If an authenticated user attempts to access a protected route without two-factor authentication (2FA), the server will respond with a 403 Forbidden error and an `X-OCIS-MFA-Required` header.
 
 #### Impacts
 
 For shares or space memberships based on groups, a renamed or deleted group will impact accessing the resource:
 
 * There is no user notification about the inability accessing the resource.
-* The user will only experience rejected access. 
+* The user will only experience rejected access.
 * This also applies for connected apps like the Desktop, iOS or Android app!
 
 To give access for rejected users on a resource, one with rights to share must update the group information.

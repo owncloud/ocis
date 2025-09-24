@@ -100,6 +100,9 @@ func DefaultConfig() *config.Config {
 			Cluster:   "ocis-cluster",
 			EnableTLS: false,
 		},
+		MultiFactorAuthentication: config.MFAConfig{
+			AuthLevelNames: []string{"advanced"},
+		},
 	}
 }
 

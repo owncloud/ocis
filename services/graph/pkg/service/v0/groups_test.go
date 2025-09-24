@@ -15,6 +15,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	libregraph "github.com/owncloud/libre-graph-api-go"
+	"github.com/owncloud/ocis/v2/ocis-pkg/mfa"
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 	settings "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
@@ -108,9 +109,10 @@ var _ = Describe("Groups", func() {
 					Constraint: settingsmsg.Permission_CONSTRAINT_ALL,
 				},
 			}, nil)
-			identityBackend.On("GetGroups", ctx, mock.Anything).Return([]*libregraph.Group{newGroup}, nil)
+			identityBackend.On("GetGroups", mock.Anything, mock.Anything).Return([]*libregraph.Group{newGroup}, nil)
 
 			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/groups?$orderby=invalid", nil)
+			r = r.WithContext(mfa.Set(r.Context(), true))
 			svc.GetGroups(rr, r)
 
 			Expect(rr.Code).To(Equal(http.StatusBadRequest))
@@ -130,9 +132,10 @@ var _ = Describe("Groups", func() {
 					Constraint: settingsmsg.Permission_CONSTRAINT_ALL,
 				},
 			}, nil)
-			identityBackend.On("GetGroups", ctx, mock.Anything).Return(nil, errors.New("failed"))
+			identityBackend.On("GetGroups", mock.Anything, mock.Anything).Return(nil, errors.New("failed"))
 
 			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/groups", nil)
+			r = r.WithContext(mfa.Set(r.Context(), true))
 			svc.GetGroups(rr, r)
 			Expect(rr.Code).To(Equal(http.StatusInternalServerError))
 			data, err := io.ReadAll(rr.Body)
@@ -151,9 +154,10 @@ var _ = Describe("Groups", func() {
 					Constraint: settingsmsg.Permission_CONSTRAINT_ALL,
 				},
 			}, nil)
-			identityBackend.On("GetGroups", ctx, mock.Anything).Return(nil, errorcode.New(errorcode.AccessDenied, "access denied"))
+			identityBackend.On("GetGroups", mock.Anything, mock.Anything).Return(nil, errorcode.New(errorcode.AccessDenied, "access denied"))
 
 			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/groups", nil)
+			r = r.WithContext(mfa.Set(r.Context(), true))
 			svc.GetGroups(rr, r)
 
 			Expect(rr.Code).To(Equal(http.StatusForbidden))
@@ -166,16 +170,17 @@ var _ = Describe("Groups", func() {
 			Expect(odataerr.Error.Code).To(Equal("accessDenied"))
 		})
 
-		It("renders an empty list of groups", func() {
+		It("renders an empty list of groups with 2fa", func() {
 			permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settings.GetPermissionByIDResponse{
 				Permission: &settingsmsg.Permission{
 					Operation:  settingsmsg.Permission_OPERATION_UNKNOWN,
 					Constraint: settingsmsg.Permission_CONSTRAINT_ALL,
 				},
 			}, nil)
-			identityBackend.On("GetGroups", ctx, mock.Anything).Return([]*libregraph.Group{}, nil)
+			identityBackend.On("GetGroups", mock.Anything, mock.Anything).Return([]*libregraph.Group{}, nil)
 
 			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/groups", nil)
+			r = r.WithContext(mfa.Set(r.Context(), true))
 			svc.GetGroups(rr, r)
 
 			Expect(rr.Code).To(Equal(http.StatusOK))
@@ -188,16 +193,17 @@ var _ = Describe("Groups", func() {
 			Expect(res.Value).To(Equal([]interface{}{}))
 		})
 
-		It("renders a list of groups", func() {
+		It("renders a list of groups with 2fa", func() {
 			permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settings.GetPermissionByIDResponse{
 				Permission: &settingsmsg.Permission{
 					Operation:  settingsmsg.Permission_OPERATION_UNKNOWN,
 					Constraint: settingsmsg.Permission_CONSTRAINT_ALL,
 				},
 			}, nil)
-			identityBackend.On("GetGroups", ctx, mock.Anything).Return([]*libregraph.Group{newGroup}, nil)
+			identityBackend.On("GetGroups", mock.Anything, mock.Anything).Return([]*libregraph.Group{newGroup}, nil)
 
 			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/groups", nil)
+			r = r.WithContext(mfa.Set(r.Context(), true))
 			svc.GetGroups(rr, r)
 
 			Expect(rr.Code).To(Equal(http.StatusOK))
@@ -210,6 +216,21 @@ var _ = Describe("Groups", func() {
 
 			Expect(len(res.Value)).To(Equal(1))
 			Expect(res.Value[0].GetId()).To(Equal("group1"))
+		})
+		It("denies accessing a list of groups without 2fa", func() {
+			permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settings.GetPermissionByIDResponse{
+				Permission: &settingsmsg.Permission{
+					Operation:  settingsmsg.Permission_OPERATION_UNKNOWN,
+					Constraint: settingsmsg.Permission_CONSTRAINT_ALL,
+				},
+			}, nil)
+			identityBackend.On("GetGroups", ctx, mock.Anything).Return([]*libregraph.Group{newGroup}, nil)
+
+			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/groups", nil)
+			svc.GetGroups(rr, r)
+
+			Expect(rr.Code).To(Equal(http.StatusForbidden))
+			Expect(rr.Header().Get("X-Ocis-Mfa-Required")).To(Equal("true"))
 		})
 		It("denies listing for unprivileged users", func() {
 			permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settings.GetPermissionByIDResponse{}, nil)

@@ -141,6 +141,9 @@ func DefaultConfig() *config.Config {
 		Validation: config.Validation{
 			MaxTagLength: 100,
 		},
+		MultiFactorAuthentication: config.MFAConfig{
+			AuthLevelNames: []string{"advanced"},
+		},
 	}
 }
 
