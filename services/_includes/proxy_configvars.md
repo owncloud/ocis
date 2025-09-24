@@ -76,3 +76,5 @@
 | OCIS_CLAIM_MANAGED_SPACES_CLAIMNAME | string |  | The name of the claim used to manage Spaces.|
 | OCIS_CLAIM_MANAGED_SPACES_REGEXP | string |  | The regular expression that extracts Space IDs and roles from a claim.|
 | OCIS_CLAIM_MANAGED_SPACES_MAPPING | []string | [] | (Optional) Mapping of OIDC roles to ocis Space roles. Example: 'oidcroleA:viewer,oidcroleB:manager'|
+| OCIS_MFA_ENABLED | bool | false | Enable MFA enforcement. If enabled users need to complete MFA before they can access specific paths|
+| OCIS_MFA_AUTH_LEVEL_NAMES | []string | [advanced] | This authentication level name indicates that multi-factor authentication was performed. The name must match the ACR claim in the access token received. Note: If multiple names are required, use a comma-separated list. The front-end service will use the first name in the list when requesting multi-factor authentication (MFA).|

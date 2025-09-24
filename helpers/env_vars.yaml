@@ -7980,46 +7980,49 @@ OCIS_CLAIM_MANAGED_SPACES_REGEXP:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_CORS_ALLOW_CREDENTIALS:
-  name: OCIS_CORS_ALLOW_CREDENTIALS;THUMBNAILS_CORS_ALLOW_CREDENTIALS
-  defaultValue: "true"
+  name: OCIS_CORS_ALLOW_CREDENTIALS;FRONTEND_CORS_ALLOW_CREDENTIALS
+  defaultValue: "false"
   type: bool
   description: 'Allow credentials for CORS.See following chapter for more details:
     *Access-Control-Allow-Credentials* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials.'
-  introductionVersion: "6.0"
+  introductionVersion: pre5.0
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
 OCIS_CORS_ALLOW_HEADERS:
-  name: OCIS_CORS_ALLOW_HEADERS;THUMBNAILS_CORS_ALLOW_HEADERS
-  defaultValue: '[Authorization Origin Content-Type Accept X-Requested-With X-Request-Id
-    Cache-Control]'
+  name: OCIS_CORS_ALLOW_HEADERS;FRONTEND_CORS_ALLOW_HEADERS
+  defaultValue: '[Origin Accept Content-Type Depth Authorization Ocs-Apirequest If-None-Match
+    If-Match Destination Overwrite X-Request-Id X-Requested-With Tus-Resumable Tus-Checksum-Algorithm
+    Upload-Concat Upload-Length Upload-Metadata Upload-Defer-Length Upload-Expires
+    Upload-Checksum Upload-Offset X-HTTP-Method-Override Cache-Control]'
   type: '[]string'
   description: 'A list of allowed CORS headers. See following chapter for more details:
     *Access-Control-Request-Headers* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers.
     See the Environment Variable Types description for more details.'
-  introductionVersion: "6.0"
+  introductionVersion: pre5.0
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
 OCIS_CORS_ALLOW_METHODS:
-  name: OCIS_CORS_ALLOW_METHODS;THUMBNAILS_CORS_ALLOW_METHODS
-  defaultValue: '[GET POST PUT PATCH DELETE OPTIONS]'
+  name: OCIS_CORS_ALLOW_METHODS;FRONTEND_CORS_ALLOW_METHODS
+  defaultValue: '[OPTIONS HEAD GET PUT POST PATCH DELETE MKCOL PROPFIND PROPPATCH
+    MOVE COPY REPORT SEARCH]'
   type: '[]string'
   description: 'A list of allowed CORS methods. See following chapter for more details:
     *Access-Control-Request-Method* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method.
     See the Environment Variable Types description for more details.'
-  introductionVersion: "6.0"
+  introductionVersion: pre5.0
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
 OCIS_CORS_ALLOW_ORIGINS:
-  name: OCIS_CORS_ALLOW_ORIGINS;THUMBNAILS_CORS_ALLOW_ORIGINS
-  defaultValue: '[*]'
+  name: OCIS_CORS_ALLOW_ORIGINS;FRONTEND_CORS_ALLOW_ORIGINS
+  defaultValue: '[https://localhost:9200]'
   type: '[]string'
   description: 'A list of allowed CORS origins. See following chapter for more details:
     *Access-Control-Allow-Origin* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin.
     See the Environment Variable Types description for more details.'
-  introductionVersion: "6.0"
+  introductionVersion: pre5.0
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
@@ -8063,7 +8066,7 @@ OCIS_DEFAULT_LANGUAGE:
   type: string
   description: The default language used by services and the WebUI. If not defined,
     English will be used as default. See the documentation for more details.
-  introductionVersion: 7.0.0
+  introductionVersion: "5.0"
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
@@ -8187,12 +8190,12 @@ OCIS_EVENTS_ENDPOINT:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE:
-  name: OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE
+  name: OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE;ANTIVIRUS_EVENTS_TLS_ROOT_CA_CERTIFICATE
   defaultValue: ""
   type: string
   description: The root CA certificate used to validate the server's TLS certificate.
-    If provided NOTIFICATIONS_EVENTS_TLS_INSECURE will be seen as false.
-  introductionVersion: "5.0"
+    If provided ANTIVIRUS_EVENTS_TLS_INSECURE will be seen as false.
+  introductionVersion: pre5.0
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
@@ -8229,10 +8232,10 @@ OCIS_GRPC_CLIENT_TLS_MODE:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_GRPC_PROTOCOL:
-  name: OCIS_GRPC_PROTOCOL;USERS_GRPC_PROTOCOL
+  name: OCIS_GRPC_PROTOCOL;STORAGE_PUBLICLINK_GRPC_PROTOCOL
   defaultValue: ""
   type: string
-  description: The transport protocol of the GPRC service.
+  description: The transport protocol of the GRPC service.
   introductionVersion: pre5.0
   deprecationVersion: ""
   removalVersion: ""
@@ -8269,16 +8272,16 @@ OCIS_HTTP_TLS_KEY:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_INSECURE:
-  name: OCIS_INSECURE;THUMBNAILS_CS3SOURCE_INSECURE
+  name: OCIS_INSECURE;FRONTEND_EVENTS_TLS_INSECURE
   defaultValue: "false"
   type: bool
-  description: Ignore untrusted SSL certificates when connecting to the CS3 source.
-  introductionVersion: pre5.0
+  description: Whether to verify the server TLS certificates.
+  introductionVersion: "5.0"
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
 OCIS_JWT_SECRET:
-  name: OCIS_JWT_SECRET;INVITATIONS_JWT_SECRET
+  name: OCIS_JWT_SECRET;STORAGE_PUBLICLINK_JWT_SECRET
   defaultValue: ""
   type: string
   description: The secret to mint and validate jwt tokens.
@@ -8628,7 +8631,7 @@ OCIS_LDAP_USER_SCOPE:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_LOG_COLOR:
-  name: OCIS_LOG_COLOR;THUMBNAILS_LOG_COLOR
+  name: OCIS_LOG_COLOR;STORAGE_PUBLICLINK_LOG_COLOR
   defaultValue: "false"
   type: bool
   description: Activates colorized log output.
@@ -8637,7 +8640,7 @@ OCIS_LOG_COLOR:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_LOG_FILE:
-  name: OCIS_LOG_FILE;THUMBNAILS_LOG_FILE
+  name: OCIS_LOG_FILE;STORAGE_PUBLICLINK_LOG_FILE
   defaultValue: ""
   type: string
   description: The path to the log file. Activates logging to this file if set.
@@ -8646,7 +8649,7 @@ OCIS_LOG_FILE:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_LOG_LEVEL:
-  name: OCIS_LOG_LEVEL;THUMBNAILS_LOG_LEVEL
+  name: OCIS_LOG_LEVEL;STORAGE_PUBLICLINK_LOG_LEVEL
   defaultValue: ""
   type: string
   description: 'The log level. Valid values are: ''panic'', ''fatal'', ''error'',
@@ -8656,7 +8659,7 @@ OCIS_LOG_LEVEL:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_LOG_PRETTY:
-  name: OCIS_LOG_PRETTY;THUMBNAILS_LOG_PRETTY
+  name: OCIS_LOG_PRETTY;STORAGE_PUBLICLINK_LOG_PRETTY
   defaultValue: "false"
   type: bool
   description: Activates pretty log output.
@@ -8695,6 +8698,29 @@ OCIS_MAX_TAG_LENGTH:
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
+OCIS_MFA_AUTH_LEVEL_NAMES:
+  name: OCIS_MFA_AUTH_LEVEL_NAMES
+  defaultValue: '[advanced]'
+  type: '[]string'
+  description: 'This authentication level name indicates that multi-factor authentication
+    was performed. The name must match the ACR claim in the access token received.
+    Note: If multiple names are required, use a comma-separated list. The front-end
+    service will use the first name in the list when requesting multi-factor authentication
+    (MFA).'
+  introductionVersion: Balch
+  deprecationVersion: ""
+  removalVersion: ""
+  deprecationInfo: ""
+OCIS_MFA_ENABLED:
+  name: OCIS_MFA_ENABLED
+  defaultValue: "false"
+  type: bool
+  description: Set to true to enable multi factor authentication. See the documentation
+    for more details.
+  introductionVersion: Balch
+  deprecationVersion: ""
+  removalVersion: ""
+  deprecationInfo: ""
 OCIS_OIDC_CLIENT_ID:
   name: OCIS_OIDC_CLIENT_ID;WEB_OIDC_CLIENT_ID
   defaultValue: web
@@ -8707,10 +8733,10 @@ OCIS_OIDC_CLIENT_ID:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_OIDC_ISSUER:
-  name: OCIS_URL;OCIS_OIDC_ISSUER;WEB_OIDC_AUTHORITY
+  name: OCIS_URL;OCIS_OIDC_ISSUER;WEBFINGER_OIDC_ISSUER
   defaultValue: https://localhost:9200
   type: string
-  description: URL of the OIDC issuer. It defaults to URL of the builtin IDP.
+  description: The identity provider href for the openid-discovery relation.
   introductionVersion: pre5.0
   deprecationVersion: ""
   removalVersion: ""
@@ -8783,17 +8809,17 @@ OCIS_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_PERSISTENT_STORE:
-  name: OCIS_PERSISTENT_STORE;ACTIVITYLOG_STORE
+  name: OCIS_PERSISTENT_STORE;POSTPROCESSING_STORE
   defaultValue: nats-js-kv
   type: string
-  description: 'The type of the store. Supported values are: ''memory'', ''nats-js-kv'',
-    ''redis-sentinel'', ''noop''. See the text description for details.'
+  description: 'The type of the store. Supported values are: ''memory'', ''redis-sentinel'',
+    ''nats-js-kv'', ''noop''. See the text description for details.'
   introductionVersion: pre5.0
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
 OCIS_PERSISTENT_STORE_AUTH_PASSWORD:
-  name: OCIS_PERSISTENT_STORE_AUTH_PASSWORD;ACTIVITYLOG_STORE_AUTH_PASSWORD
+  name: OCIS_PERSISTENT_STORE_AUTH_PASSWORD;POSTPROCESSING_STORE_AUTH_PASSWORD
   defaultValue: ""
   type: string
   description: The password to authenticate with the store. Only applies when store
@@ -8803,7 +8829,7 @@ OCIS_PERSISTENT_STORE_AUTH_PASSWORD:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_PERSISTENT_STORE_AUTH_USERNAME:
-  name: OCIS_PERSISTENT_STORE_AUTH_USERNAME;ACTIVITYLOG_STORE_AUTH_USERNAME
+  name: OCIS_PERSISTENT_STORE_AUTH_USERNAME;POSTPROCESSING_STORE_AUTH_USERNAME
   defaultValue: ""
   type: string
   description: The username to authenticate with the store. Only applies when store
@@ -8813,7 +8839,7 @@ OCIS_PERSISTENT_STORE_AUTH_USERNAME:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_PERSISTENT_STORE_NODES:
-  name: OCIS_PERSISTENT_STORE_NODES;ACTIVITYLOG_STORE_NODES
+  name: OCIS_PERSISTENT_STORE_NODES;POSTPROCESSING_STORE_NODES
   defaultValue: '[127.0.0.1:9233]'
   type: '[]string'
   description: A list of nodes to access the configured store. This has no effect
@@ -8825,7 +8851,7 @@ OCIS_PERSISTENT_STORE_NODES:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_PERSISTENT_STORE_TTL:
-  name: OCIS_PERSISTENT_STORE_TTL;ACTIVITYLOG_STORE_TTL
+  name: OCIS_PERSISTENT_STORE_TTL;POSTPROCESSING_STORE_TTL
   defaultValue: 0s
   type: Duration
   description: Time to live for events in the store. See the Environment Variable
@@ -8847,7 +8873,7 @@ OCIS_REVA_GATEWAY:
   name: OCIS_REVA_GATEWAY
   defaultValue: com.owncloud.api.gateway
   type: string
-  description: CS3 gateway used to look up user metadata
+  description: The CS3 gateway endpoint.
   introductionVersion: pre5.0
   deprecationVersion: ""
   removalVersion: ""
@@ -8934,7 +8960,7 @@ OCIS_SPACES_MAX_QUOTA:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_SYSTEM_USER_API_KEY:
-  name: OCIS_SYSTEM_USER_API_KEY;SHARING_PUBLIC_CS3_SYSTEM_USER_API_KEY
+  name: OCIS_SYSTEM_USER_API_KEY
   defaultValue: ""
   type: string
   description: API key for the STORAGE-SYSTEM system user.
@@ -8943,7 +8969,7 @@ OCIS_SYSTEM_USER_API_KEY:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_SYSTEM_USER_ID:
-  name: OCIS_SYSTEM_USER_ID;SHARING_PUBLIC_CS3_SYSTEM_USER_ID
+  name: OCIS_SYSTEM_USER_ID;SETTINGS_SYSTEM_USER_ID
   defaultValue: ""
   type: string
   description: ID of the oCIS STORAGE-SYSTEM system user. Admins need to set the ID
@@ -8955,7 +8981,7 @@ OCIS_SYSTEM_USER_ID:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_SYSTEM_USER_IDP:
-  name: OCIS_SYSTEM_USER_IDP;SHARING_PUBLIC_CS3_SYSTEM_USER_IDP
+  name: OCIS_SYSTEM_USER_IDP;SETTINGS_SYSTEM_USER_IDP
   defaultValue: internal
   type: string
   description: IDP of the oCIS STORAGE-SYSTEM system user.
@@ -8964,7 +8990,7 @@ OCIS_SYSTEM_USER_IDP:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_TRACING_COLLECTOR:
-  name: OCIS_TRACING_COLLECTOR;THUMBNAILS_TRACING_COLLECTOR
+  name: OCIS_TRACING_COLLECTOR;STORAGE_PUBLICLINK_TRACING_COLLECTOR
   defaultValue: ""
   type: string
   description: The HTTP endpoint for sending spans directly to a collector, i.e. http://jaeger-collector:14268/api/traces.
@@ -8974,7 +9000,7 @@ OCIS_TRACING_COLLECTOR:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_TRACING_ENABLED:
-  name: OCIS_TRACING_ENABLED;THUMBNAILS_TRACING_ENABLED
+  name: OCIS_TRACING_ENABLED;STORAGE_PUBLICLINK_TRACING_ENABLED
   defaultValue: "false"
   type: bool
   description: Activates tracing.
@@ -8983,7 +9009,7 @@ OCIS_TRACING_ENABLED:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_TRACING_ENDPOINT:
-  name: OCIS_TRACING_ENDPOINT;THUMBNAILS_TRACING_ENDPOINT
+  name: OCIS_TRACING_ENDPOINT;STORAGE_PUBLICLINK_TRACING_ENDPOINT
   defaultValue: ""
   type: string
   description: The endpoint of the tracing agent.
@@ -8992,7 +9018,7 @@ OCIS_TRACING_ENDPOINT:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_TRACING_TYPE:
-  name: OCIS_TRACING_TYPE;THUMBNAILS_TRACING_TYPE
+  name: OCIS_TRACING_TYPE;STORAGE_PUBLICLINK_TRACING_TYPE
   defaultValue: ""
   type: string
   description: The type of tracing. Defaults to '', which is the same as 'jaeger'.
@@ -9011,13 +9037,13 @@ OCIS_TRANSFER_SECRET:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_TRANSLATION_PATH:
-  name: OCIS_TRANSLATION_PATH;ACTIVITYLOG_TRANSLATION_PATH
+  name: OCIS_TRANSLATION_PATH;SETTINGS_TRANSLATION_PATH
   defaultValue: ""
   type: string
   description: (optional) Set this to a path with custom translations to overwrite
     the builtin translations. Note that file and folder naming rules apply, see the
     documentation for more details.
-  introductionVersion: 7.0.0
+  introductionVersion: 7.1.0
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""

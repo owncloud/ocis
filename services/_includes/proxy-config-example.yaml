@@ -207,3 +207,7 @@ claim_space_management:
   claim: ""
   regexp: ""
   mapping: []
+mfa:
+  enabled: false
+  auth_level_name:
+  - advanced

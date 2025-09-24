@@ -151,3 +151,7 @@ validation:
   max_tag_length: 100
 configurable_notifications: false
 server_managed_spaces: false
+mfa:
+  enabled: false
+  auth_level_names:
+  - advanced

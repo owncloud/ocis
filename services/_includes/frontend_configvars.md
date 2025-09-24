@@ -84,3 +84,5 @@
 | OCIS_MAX_TAG_LENGTH | int | 100 | Define the maximum tag length. Defaults to 100 if not set. Set to 0 to not limit the tag length. Changes only impact the validation of new tags.|
 | FRONTEND_CONFIGURABLE_NOTIFICATIONS | bool | false | Allow configuring notifications via web client.|
 | OCIS_CLAIM_MANAGED_SPACES_ENABLED | bool | false | Enables Space management through OIDC claims. See the text description for more details.|
+| OCIS_MFA_ENABLED | bool | false | Set to true to enable multi factor authentication. See the documentation for more details.|
+| OCIS_MFA_AUTH_LEVEL_NAMES | []string | [advanced] | This authentication level name indicates that multi-factor authentication was performed. The name must match the ACR claim in the access token received. Note: If multiple names are required, use a comma-separated list. The front-end service will use the first name in the list when requesting multi-factor authentication (MFA).|
