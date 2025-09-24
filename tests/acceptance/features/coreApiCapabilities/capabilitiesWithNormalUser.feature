@@ -40,7 +40,7 @@ Feature: default capabilities for normal user
                     "const": 60
                   },
                   "webdav-root": {
-                    "const": "remote.php/webdav"
+                    "const": "webdav"
                   },
                   "status": {
                     "type": "object",
