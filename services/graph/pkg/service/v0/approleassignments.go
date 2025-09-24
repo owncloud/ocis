@@ -7,6 +7,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
+	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
@@ -91,15 +92,27 @@ func (g Graph) CreateAppRoleAssignment(w http.ResponseWriter, r *http.Request) {
 		oldRole = roles[0].GetRoleId()
 	}
 
-	if appRoleAssignment.GetAppRoleId() == settingsService.BundleUUIDRoleUserLight && oldRole != settingsService.BundleUUIDRoleUserLight {
-		err := g.disablePersonalSpace(r.Context(), userID)
+	client, err := g.gatewaySelector.Next()
+	if err != nil {
+		errorcode.NotAllowed.Render(w, r, http.StatusForbidden, err.Error())
+		return
+	}
+
+	if appRoleAssignment.GetAppRoleId() == settingsService.BundleUUIDRoleUserLight {
+		err := shared.DisablePersonalSpace(r.Context(), client, userID)
 		if err != nil {
 			logger.Error().Any("userID", userID).Err(err).Msg("can't disable the personal space")
 			errorcode.RenderError(w, r, err)
 			return
 		}
-	} else if appRoleAssignment.GetAppRoleId() != settingsService.BundleUUIDRoleUserLight && oldRole == settingsService.BundleUUIDRoleUserLight {
-		err := g.ensurePersonalSpace(r.Context(), userID)
+	}
+	if appRoleAssignment.GetAppRoleId() != settingsService.BundleUUIDRoleUserLight {
+		user, err := g.identityCache.GetUser(r.Context(), userID)
+		if err != nil {
+			errorcode.RenderError(w, r, fmt.Errorf("failed to get user: %w", err))
+			return
+		}
+		err = shared.EnsurePersonalSpace(r.Context(), client, user)
 		if err != nil {
 			logger.Error().Any("userID", userID).Err(err).Msg("can't ensure the personal space")
 			errorcode.RenderError(w, r, err)

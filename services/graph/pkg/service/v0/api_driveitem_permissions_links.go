@@ -41,7 +41,7 @@ func (s DriveItemPermissionsService) CreateLink(ctx context.Context, driveItemID
 	}
 	if code := statResp.GetStatus().GetCode(); code != rpc.Code_CODE_OK {
 		s.logger.Debug().Interface("itemID", driveItemID).Msg(statResp.GetStatus().GetMessage())
-		return libregraph.Permission{}, errorcode.New(cs3StatusToErrCode(code), statResp.GetStatus().GetMessage())
+		return libregraph.Permission{}, errorcode.NewFromStatusCode(code, statResp.GetStatus().GetMessage())
 	}
 	permissions, err := linktype.CS3ResourcePermissionsFromSharingLink(createLink, statResp.GetInfo().GetType())
 	if err != nil {
@@ -83,7 +83,7 @@ func (s DriveItemPermissionsService) CreateLink(ctx context.Context, driveItemID
 		return libregraph.Permission{}, errorcode.New(errorcode.GeneralException, err.Error())
 	}
 	if statusCode := createResp.GetStatus().GetCode(); statusCode != rpc.Code_CODE_OK {
-		return libregraph.Permission{}, errorcode.New(cs3StatusToErrCode(statusCode), createResp.Status.Message)
+		return libregraph.Permission{}, errorcode.NewFromStatusCode(statusCode, createResp.Status.Message)
 	}
 	link := createResp.GetShare()
 	perm, err := s.libreGraphPermissionFromCS3PublicShare(link)

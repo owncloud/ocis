@@ -10,6 +10,8 @@ import (
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
+	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/go-chi/chi/v5"
 	"github.com/golang/protobuf/ptypes/empty"
 	. "github.com/onsi/ginkgo/v2"
@@ -69,6 +71,18 @@ var _ = Describe("AppRoleAssignments", func() {
 				return gatewayClient
 			},
 		)
+
+		gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(&userv1beta1.GetUserResponse{
+			Status: &rpc.Status{Code: rpc.Code_CODE_OK},
+			User:   currentUser,
+		}, nil)
+
+		gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&storageprovider.ListStorageSpacesResponse{
+			Status: &rpc.Status{Code: rpc.Code_CODE_OK},
+			StorageSpaces: []*storageprovider.StorageSpace{
+				{Id: &storageprovider.StorageSpaceId{OpaqueId: "ps1"}},
+			},
+		}, nil)
 
 		rr = httptest.NewRecorder()
 		ctx = context.Background()

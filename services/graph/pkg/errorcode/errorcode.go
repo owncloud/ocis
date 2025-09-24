@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"time"
 
+	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
@@ -104,6 +105,11 @@ func New(e ErrorCode, msg string) Error {
 		errorCode: e,
 		msg:       msg,
 	}
+}
+
+// New errorcode.Error from cs3rpc Status Code
+func NewFromStatusCode(code rpc.Code, msg string) Error {
+	return New(cs3StatusToErrCode(code), msg)
 }
 
 // Render writes a Graph ErrorCode object to the response writer
@@ -205,4 +211,24 @@ func ToError(err error) (Error, bool) {
 	}
 
 	return Error{}, false
+}
+
+func cs3StatusToErrCode(code rpc.Code) (errcode ErrorCode) {
+	switch code {
+	case rpc.Code_CODE_UNAUTHENTICATED:
+		errcode = Unauthenticated
+	case rpc.Code_CODE_PERMISSION_DENIED:
+		errcode = AccessDenied
+	case rpc.Code_CODE_NOT_FOUND:
+		errcode = ItemNotFound
+	case rpc.Code_CODE_LOCKED:
+		errcode = ItemIsLocked
+	case rpc.Code_CODE_INVALID_ARGUMENT:
+		errcode = InvalidRequest
+	case rpc.Code_CODE_FAILED_PRECONDITION:
+		errcode = InvalidRequest
+	default:
+		errcode = GeneralException
+	}
+	return errcode
 }
