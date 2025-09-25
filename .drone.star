@@ -182,6 +182,7 @@ config = {
             ],
             "skip": False,
             "withRemotePhp": [True],
+            "k8s": True,
         },
         "sharingNgAdditionalShareRole": {
             "suites": [
