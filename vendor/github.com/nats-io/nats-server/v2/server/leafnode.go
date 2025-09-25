@@ -82,6 +82,8 @@ type leaf struct {
 	remoteDomain string
 	// account name of remote server
 	remoteAccName string
+	// Whether or not we want to propagate east-west interest from other LNs.
+	isolated bool
 	// Used to suppress sub and unsub interest. Same as routes but our audience
 	// here is tied to this leaf node. This will hold all subscriptions except this
 	// leaf nodes. This represents all the interest we want to send to the other side.
@@ -128,6 +130,14 @@ func (c *client) isSpokeLeafNode() bool {
 
 func (c *client) isHubLeafNode() bool {
 	return c.kind == LEAF && !c.leaf.isSpoke
+}
+
+func (c *client) isIsolatedLeafNode() bool {
+	// TODO(nat): In future we may want to pass in and consider an isolation
+	// group name here, which the hub and/or leaf could provide, so that we
+	// can isolate away certain LNs but not others on an opt-in basis. For
+	// now we will just isolate all LN interest until then.
+	return c.kind == LEAF && c.leaf.isolated
 }
 
 // This will spin up go routines to solicit the remote leaf node connections.
@@ -177,12 +187,20 @@ func (s *Server) solicitLeafNodeRemotes(remotes []*RemoteLeafOpts) {
 		return remote
 	}
 	for _, r := range remotes {
+		// We need to call this, even if the leaf is disabled. This is so that
+		// the number of internal configuration matches the options' remote leaf
+		// configuration required for configuration reload.
 		remote := addRemote(r, r.LocalAccount == sysAccName)
-		s.startGoRoutine(func() { s.connectToRemoteLeafNode(remote, true) })
+		if !r.Disabled {
+			s.startGoRoutine(func() { s.connectToRemoteLeafNode(remote, true) })
+		}
 	}
 }
 
 func (s *Server) remoteLeafNodeStillValid(remote *leafNodeCfg) bool {
+	if remote.Disabled {
+		return false
+	}
 	for _, ri := range s.getOpts().LeafNode.Remotes {
 		// FIXME(dlc) - What about auth changes?
 		if reflect.DeepEqual(ri.URLs, remote.URLs) {
@@ -748,6 +766,7 @@ func (s *Server) startLeafNodeAcceptLoop() {
 		Domain:        opts.JetStreamDomain,
 		Proto:         s.getServerProto(),
 		InfoOnConnect: true,
+		JSApiLevel:    JSApiLevel,
 	}
 	// If we have selected a random port...
 	if port == 0 {
@@ -811,6 +830,7 @@ func (c *client) sendLeafConnect(clusterName string, headers bool) error {
 		Compression:   c.leaf.compression,
 		RemoteAccount: c.acc.GetName(),
 		Proto:         c.srv.getServerProto(),
+		Isolate:       c.leaf.remote.RequestIsolation,
 	}
 
 	// If a signature callback is specified, this takes precedence over anything else.
@@ -977,6 +997,13 @@ func (s *Server) createLeafNode(conn net.Conn, rURL *url.URL, remote *leafNodeCf
 	// Do not update the smap here, we need to do it in initLeafNodeSmapAndSendSubs
 	c.leaf = &leaf{}
 
+	// If the leafnode subject interest should be isolated, flag it here.
+	s.optsMu.RLock()
+	if c.leaf.isolated = s.opts.LeafNode.IsolateLeafnodeInterest; !c.leaf.isolated && remote != nil {
+		c.leaf.isolated = remote.LocalIsolation
+	}
+	s.optsMu.RUnlock()
+
 	// For accepted LN connections, ws will be != nil if it was accepted
 	// through the Websocket port.
 	c.ws = ws
@@ -1057,6 +1084,8 @@ func (s *Server) createLeafNode(conn net.Conn, rURL *url.URL, remote *leafNodeCf
 		if cm := opts.LeafNode.Compression.Mode; cm != CompressionNotSupported {
 			info.Compression = cm
 		}
+		// We always send a nonce for LEAF connections. Do not change that without
+		// taking into account presence of proxy trusted keys.
 		s.generateNonce(nonce[:])
 		s.mu.Unlock()
 	}
@@ -1418,7 +1447,7 @@ func (c *client) processLeafnodeInfo(info *Info) {
 		c.setPermissions(perms)
 	}
 
-	var resumeConnect, checkSyncConsumers bool
+	var resumeConnect bool
 
 	// If this is a remote connection and this is the first INFO protocol,
 	// then we need to finish the connect process by sending CONNECT, etc..
@@ -1428,7 +1457,6 @@ func (c *client) processLeafnodeInfo(info *Info) {
 		resumeConnect = true
 	} else if !firstINFO && didSolicit {
 		c.leaf.remoteAccName = info.RemoteAccount
-		checkSyncConsumers = info.JetStream
 	}
 
 	// Check if we have the remote account information and if so make sure it's stored.
@@ -1448,11 +1476,10 @@ func (c *client) processLeafnodeInfo(info *Info) {
 		s.leafNodeFinishConnectProcess(c)
 	}
 
-	// If we have JS enabled and so does the other side, we will
-	// check to see if we need to kick any internal source or mirror consumers.
-	if checkSyncConsumers {
-		s.checkInternalSyncConsumers(c.acc, info.Domain)
-	}
+	// Check to see if we need to kick any internal source or mirror consumers.
+	// This will be a no-op if JetStream not enabled for this server or if the bound account
+	// does not have jetstream.
+	s.checkInternalSyncConsumers(c.acc)
 }
 
 func (s *Server) negotiateLeafCompression(c *client, didSolicit bool, infoCompression string, co *CompressionOpts) (bool, error) {
@@ -1796,9 +1823,13 @@ func (s *Server) removeLeafNodeConnection(c *client) {
 			c.leaf.gwSub = nil
 		}
 	}
+	proxyKey := c.proxyKey
 	c.mu.Unlock()
 	s.mu.Lock()
 	delete(s.leafs, cid)
+	if proxyKey != _EMPTY_ {
+		s.removeProxiedConn(proxyKey, cid)
+	}
 	s.mu.Unlock()
 	s.removeFromTempClients(cid)
 }
@@ -1820,6 +1851,7 @@ type leafConnectInfo struct {
 	Headers   bool     `json:"headers,omitempty"`
 	JetStream bool     `json:"jetstream,omitempty"`
 	DenyPub   []string `json:"deny_pub,omitempty"`
+	Isolate   bool     `json:"isolate,omitempty"`
 
 	// There was an existing field called:
 	// >> Comp bool `json:"compression,omitempty"`
@@ -1930,6 +1962,8 @@ func (c *client) processLeafNodeConnect(s *Server, arg []byte, lang string) erro
 	c.leaf.remoteServer = proto.Name
 	// Remember the remote account name
 	c.leaf.remoteAccName = proto.RemoteAccount
+	// Remember if the leafnode requested isolation.
+	c.leaf.isolated = c.leaf.isolated || proto.Isolate
 
 	// If the other side has declared itself a hub, so we will take on the spoke role.
 	if proto.Hub {
@@ -1984,16 +2018,16 @@ func (c *client) processLeafNodeConnect(s *Server, arg []byte, lang string) erro
 	// This will be a no-op as needed.
 	s.sendLeafNodeConnect(c.acc)
 
-	// If we have JS enabled and so does the other side, we will
-	// check to see if we need to kick any internal source or mirror consumers.
-	if proto.JetStream {
-		s.checkInternalSyncConsumers(acc, proto.Domain)
-	}
+	// Check to see if we need to kick any internal source or mirror consumers.
+	// This will be a no-op if JetStream not enabled for this server or if the bound account
+	// does not have jetstream.
+	s.checkInternalSyncConsumers(acc)
+
 	return nil
 }
 
 // checkInternalSyncConsumers
-func (s *Server) checkInternalSyncConsumers(acc *Account, remoteDomain string) {
+func (s *Server) checkInternalSyncConsumers(acc *Account) {
 	// Grab our js
 	js := s.getJetStream()
 
@@ -2012,6 +2046,7 @@ func (s *Server) checkInternalSyncConsumers(acc *Account, remoteDomain string) {
 	if jsa == nil {
 		return
 	}
+
 	var streams []*stream
 	jsa.mu.RLock()
 	for _, mset := range jsa.streams {
@@ -2029,7 +2064,7 @@ func (s *Server) checkInternalSyncConsumers(acc *Account, remoteDomain string) {
 	// Now loop through all candidates and check if we are the leader and have NOT
 	// created the sync up consumer.
 	for _, mset := range streams {
-		mset.retryDisconnectedSyncConsumers(remoteDomain)
+		mset.retryDisconnectedSyncConsumers()
 	}
 }
 
@@ -2045,12 +2080,16 @@ func (c *client) remoteCluster() string {
 // its permission settings for local enforcement.
 func (s *Server) sendPermsAndAccountInfo(c *client) {
 	// Copy
+	s.mu.Lock()
 	info := s.copyLeafNodeInfo()
+	s.mu.Unlock()
 	c.mu.Lock()
 	info.CID = c.cid
 	info.Import = c.opts.Import
 	info.Export = c.opts.Export
 	info.RemoteAccount = c.acc.Name
+	// s.SystemAccount() uses an atomic operation and does not get the server lock, so this is safe.
+	info.IsSystemAccount = c.acc == s.SystemAccount()
 	info.ConnectInfo = true
 	c.enqueueProto(generateInfoJSON(info))
 	c.mu.Unlock()
@@ -2160,6 +2199,10 @@ func (s *Server) initLeafNodeSmapAndSendSubs(c *client) {
 			c.Debugf("Not permitted to subscribe to %q on behalf of %s%s", sub.subject, accName, accNTag)
 			continue
 		}
+		// Don't advertise interest from leafnodes to other isolated leafnodes.
+		if sub.client.kind == LEAF && c.isIsolatedLeafNode() {
+			continue
+		}
 		// We ignore ourselves here.
 		// Also don't add the subscription if it has a origin cluster and the
 		// cluster name matches the one of the client we are sending to.
@@ -2228,9 +2271,11 @@ func (s *Server) updateInterestForAccountOnGateway(accName string, sub *subscrip
 	acc.updateLeafNodes(sub, delta)
 }
 
-// updateLeafNodes will make sure to update the account smap for the subscription.
+// updateLeafNodesEx will make sure to update the account smap for the subscription.
 // Will also forward to all leaf nodes as needed.
-func (acc *Account) updateLeafNodes(sub *subscription, delta int32) {
+// If `hubOnly` is true, then will update only leaf nodes that connect to this server
+// (that is, for which this server acts as a hub to them).
+func (acc *Account) updateLeafNodesEx(sub *subscription, delta int32, hubOnly bool) {
 	if acc == nil || sub == nil {
 		return
 	}
@@ -2278,8 +2323,19 @@ func (acc *Account) updateLeafNodes(sub *subscription, delta int32) {
 		if ln == sub.client {
 			continue
 		}
-		// Check to make sure this sub does not have an origin cluster that matches the leafnode.
 		ln.mu.Lock()
+		// Don't advertise interest from leafnodes to other isolated leafnodes.
+		if sub.client.kind == LEAF && ln.isIsolatedLeafNode() {
+			ln.mu.Unlock()
+			continue
+		}
+		// If `hubOnly` is true, it means that we want to update only leafnodes
+		// that connect to this server (so isHubLeafNode() would return `true`).
+		if hubOnly && !ln.isHubLeafNode() {
+			ln.mu.Unlock()
+			continue
+		}
+		// Check to make sure this sub does not have an origin cluster that matches the leafnode.
 		// If skipped, make sure that we still let go the "$LDS." subscription that allows
 		// the detection of loops as long as different cluster.
 		clusterDifferent := cluster != ln.remoteCluster()
@@ -2288,6 +2344,12 @@ func (acc *Account) updateLeafNodes(sub *subscription, delta int32) {
 		}
 		ln.mu.Unlock()
 	}
+}
+
+// updateLeafNodes will make sure to update the account smap for the subscription.
+// Will also forward to all leaf nodes as needed.
+func (acc *Account) updateLeafNodes(sub *subscription, delta int32) {
+	acc.updateLeafNodesEx(sub, delta, false)
 }
 
 // This will make an update to our internal smap and determine if we should send out

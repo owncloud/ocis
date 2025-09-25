@@ -167,7 +167,7 @@ func (session *OcisSession) FinishUploadDecomposed(ctx context.Context) error {
 			err = errtypes.BadRequest("unsupported checksum algorithm: " + parts[0])
 		}
 		if err != nil {
-			session.store.Cleanup(ctx, session, true, false, false)
+			session.Cleanup(false, true, true, false)
 			return err
 		}
 	}
@@ -238,7 +238,7 @@ func (session *OcisSession) FinishUploadDecomposed(ctx context.Context) error {
 	if !session.store.async || session.info.Size == 0 {
 		// handle postprocessing synchronously
 		err = session.Finalize(ctx)
-		session.store.Cleanup(ctx, session, err != nil, false, err == nil)
+		session.Cleanup(err != nil, true, true, true)
 		if err != nil {
 			log.Error().Err(err).Msg("failed to upload")
 			return err
@@ -251,7 +251,7 @@ func (session *OcisSession) FinishUploadDecomposed(ctx context.Context) error {
 
 // Terminate terminates the upload
 func (session *OcisSession) Terminate(_ context.Context) error {
-	session.Cleanup(true, true, true)
+	session.Cleanup(true, true, true, true)
 	return nil
 }
 
@@ -328,7 +328,7 @@ func (session *OcisSession) removeNode(ctx context.Context) {
 }
 
 // cleanup cleans up after the upload is finished
-func (session *OcisSession) Cleanup(revertNodeMetadata, cleanBin, cleanInfo bool) {
+func (session *OcisSession) Cleanup(revertNodeMetadata, cleanBin, cleanInfo, unmarkPostprocessing bool) {
 	ctx := session.Context(context.Background())
 
 	if revertNodeMetadata {
@@ -374,8 +374,23 @@ func (session *OcisSession) Cleanup(revertNodeMetadata, cleanBin, cleanInfo bool
 	}
 
 	if cleanInfo {
-		if err := session.Purge(ctx); err != nil && !errors.Is(err, fs.ErrNotExist) {
+		if err := os.Remove(session.infoPath()); err != nil {
 			appctx.GetLogger(ctx).Error().Err(err).Str("session", session.ID()).Msg("removing upload info failed")
+			return
+		}
+	}
+
+	if unmarkPostprocessing {
+		n, err := session.Node(ctx)
+		if err != nil {
+			appctx.GetLogger(ctx).Info().Str("session", session.ID()).Err(err).Msg("could not read node")
+			return
+		}
+		// FIXME: after cleanup the node might already be deleted ...
+		if n != nil { // node can be nil when there was an error before it was created (eg. checksum-mismatch)
+			if err := n.UnmarkProcessing(ctx, session.ID()); err != nil {
+				appctx.GetLogger(ctx).Info().Str("path", n.InternalPath()).Err(err).Msg("unmarking processing failed")
+			}
 		}
 	}
 }

@@ -32,6 +32,7 @@ import (
 	"time"
 
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	"github.com/google/uuid"
 	"github.com/owncloud/reva/v2/pkg/appctx"
 	"github.com/owncloud/reva/v2/pkg/errtypes"
 	"github.com/owncloud/reva/v2/pkg/events"
@@ -42,7 +43,6 @@ import (
 	"github.com/owncloud/reva/v2/pkg/storage/utils/decomposedfs/node"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/decomposedfs/options"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/decomposedfs/usermapper"
-	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	"github.com/rogpeppe/go-internal/lockedfile"
 	"github.com/rs/zerolog"
@@ -171,28 +171,6 @@ type Session interface {
 	Node(ctx context.Context) (*node.Node, error)
 	Context(ctx context.Context) context.Context
 	Cleanup(revertNodeMetadata, cleanBin, cleanInfo bool)
-}
-
-// Cleanup cleans upload metadata, binary data and processing status as necessary
-func (store OcisStore) Cleanup(ctx context.Context, session Session, revertNodeMetadata, keepUpload, unmarkPostprocessing bool) {
-	ctx, span := tracer.Start(session.Context(ctx), "Cleanup")
-	defer span.End()
-	session.Cleanup(revertNodeMetadata, !keepUpload, !keepUpload)
-
-	// unset processing status
-	if unmarkPostprocessing {
-		n, err := session.Node(ctx)
-		if err != nil {
-			appctx.GetLogger(ctx).Info().Str("session", session.ID()).Err(err).Msg("could not read node")
-			return
-		}
-		// FIXME: after cleanup the node might already be deleted ...
-		if n != nil { // node can be nil when there was an error before it was created (eg. checksum-mismatch)
-			if err := n.UnmarkProcessing(ctx, session.ID()); err != nil {
-				appctx.GetLogger(ctx).Info().Str("path", n.InternalPath()).Err(err).Msg("unmarking processing failed")
-			}
-		}
-	}
 }
 
 // CreateNodeForUpload will create the target node for the Upload
