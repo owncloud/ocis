@@ -85,6 +85,7 @@ The following sections list the changes for unreleased.
 * Enhancement - The sse support added for the public links: [#11627](https://github.com/owncloud/ocis/pull/11627)
 * Enhancement - Update the ocis_full deployment example: [#11666](https://github.com/owncloud/ocis/pull/11666)
 * Enhancement - Bump Reva version: [#11669](https://github.com/owncloud/ocis/pull/11669)
+* Enhancement - Drop remote.php prefix: [#11687](https://github.com/owncloud/ocis/pull/11687)
 
 ## Details
 
@@ -226,6 +227,13 @@ The following sections list the changes for unreleased.
    Bumped reva version
 
    https://github.com/owncloud/ocis/pull/11669
+
+* Enhancement - Drop remote.php prefix: [#11687](https://github.com/owncloud/ocis/pull/11687)
+
+   The `remote.php` prefix is now fully optional in WebDAV endpoints and is never
+   returned in responses.
+
+   https://github.com/owncloud/ocis/pull/11687
 
 # Changelog for [7.2.0] (2025-07-14)
 
