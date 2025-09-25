@@ -79,7 +79,7 @@ func Policies(qs string, opts ...Option) func(next http.Handler) http.Handler {
 			// this should only be used as last bastion, every request goes through the proxy and doing stats is expensive!
 			// needed for:
 			// - if a single resource is shared -> the url only contains the resourceID (spaceRef)
-			if resource.Name == "" && filepath.Ext(r.URL.Path) == "" && r.Method == http.MethodPut && strings.HasPrefix(r.URL.Path, "/remote.php/dav/spaces") {
+			if resource.Name == "" && filepath.Ext(r.URL.Path) == "" && r.Method == http.MethodPut && (strings.HasPrefix(r.URL.Path, "/remote.php/dav/spaces") || strings.HasPrefix(r.URL.Path, "/dav/spaces")) {
 				client, err := gatewaySelector.Next()
 				if err != nil {
 					logger.Err(err).Msg("error selecting next gateway client")
@@ -87,7 +87,8 @@ func Policies(qs string, opts ...Option) func(next http.Handler) http.Handler {
 					return
 				}
 
-				resourceID, err := storagespace.ParseID(strings.TrimPrefix(r.URL.Path, "/remote.php/dav/spaces/"))
+				path := strings.TrimPrefix(r.URL.Path, "/remote.php")
+				resourceID, err := storagespace.ParseID(strings.TrimPrefix(path, "/dav/spaces/"))
 				if err != nil {
 					logger.Debug().Err(err).Msg("error parsing the resourceId")
 					RenderError(w, r, req, http.StatusForbidden, DeniedMessage)

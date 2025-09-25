@@ -201,7 +201,7 @@ func FrontendConfigFromStruct(cfg *config.Config, logger log.Logger) (map[string
 						"capabilities": map[string]interface{}{
 							"core": map[string]interface{}{
 								"poll_interval": 60,
-								"webdav_root":   "remote.php/webdav",
+								"webdav_root":   "webdav",
 								"status": map[string]interface{}{
 									"installed":      true,
 									"maintenance":    false,
