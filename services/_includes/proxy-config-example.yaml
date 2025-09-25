@@ -74,6 +74,9 @@ policies:
   - type: query
     endpoint: /remote.php/?preview=1
     service: com.owncloud.web.webdav
+  - type: query
+    endpoint: /?preview=1
+    service: com.owncloud.web.webdav
   - type: regex
     method: REPORT
     endpoint: (/remote.php)?/(web)?dav
