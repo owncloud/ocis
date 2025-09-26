@@ -1050,6 +1050,7 @@ Feature: get users
               "type": "object",
               "required": ["displayName", "id", "userType", "onPremisesSamAccountName"],
               "properties": {
+                "attributes": {"const": []},
                 "displayName": {"const": "special user"},
                 "id": {"pattern": "^%user_id_pattern%$"},
                 "userType": {"const": "Member"},

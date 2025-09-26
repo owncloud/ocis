@@ -39,7 +39,7 @@ import (
 )
 
 type userList struct {
-	Value []*libregraph.User
+	Value []*service.UserWithAttributes
 }
 
 var _ = Describe("Users", func() {
@@ -344,6 +344,91 @@ var _ = Describe("Users", func() {
 				}
 			})
 
+			Describe("user attributes", func() {
+				var (
+					user  *libregraph.User
+					users []*libregraph.User
+				)
+
+				BeforeEach(func() {
+					cfg.API.UserSearchDisplayedAttributes = []string{"displayName", "onPremisesSamAccountName"}
+					cfg.API.ShowUserEmailInResults = true
+
+					user = libregraph.NewUser("Albert Einstein", "einstein")
+					user.SetId("user1")
+					user.SetMail("albert.einstein@example.com")
+					user.SetUserType("Member")
+					user.SetPasswordProfile(libregraph.PasswordProfile{Password: libregraph.PtrString("secret")})
+					users = []*libregraph.User{user}
+
+					identityBackend.On("GetUsers", mock.Anything, mock.Anything, mock.Anything).Return(users, nil)
+				})
+
+				It("returns full user objects and configured attributes for privileged users", func() {
+					permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settings.GetPermissionByIDResponse{
+						Permission: &settingsmsg.Permission{
+							Constraint: settingsmsg.Permission_CONSTRAINT_ALL,
+						},
+					}, nil)
+
+					r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users?$search=einstein", nil)
+					r = r.WithContext(mfa.Set(r.Context(), true))
+					svc.GetUsers(rr, r)
+
+					Expect(rr.Code).To(Equal(http.StatusOK))
+					data, err := io.ReadAll(rr.Body)
+					Expect(err).ToNot(HaveOccurred())
+
+					var res userList
+					err = json.Unmarshal(data, &res)
+					Expect(err).ToNot(HaveOccurred())
+
+					Expect(res.Value).To(HaveLen(1))
+
+					Expect(res.Value[0].User.GetId()).To(Equal("user1"))
+					Expect(res.Value[0].User.GetDisplayName()).To(Equal("Albert Einstein"))
+					Expect(res.Value[0].User.GetOnPremisesSamAccountName()).To(Equal("einstein"))
+					Expect(res.Value[0].User.GetMail()).To(Equal("albert.einstein@example.com"))
+					Expect(res.Value[0].User.HasPasswordProfile()).To(BeTrue())
+
+					Expect(res.Value[0].Attributes).To(ConsistOf(
+						"Albert Einstein",
+						"einstein",
+						"albert.einstein@example.com",
+					))
+				})
+
+				It("returns restricted user objects and configured attributes for unprivileged users", func() {
+					permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settings.GetPermissionByIDResponse{}, nil)
+
+					r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users?$search=einstein", nil)
+					svc.GetUsers(rr, r)
+
+					Expect(rr.Code).To(Equal(http.StatusOK))
+					data, err := io.ReadAll(rr.Body)
+					Expect(err).ToNot(HaveOccurred())
+
+					var res userList
+					err = json.Unmarshal(data, &res)
+					Expect(err).ToNot(HaveOccurred())
+
+					Expect(res.Value).To(HaveLen(1))
+
+					Expect(res.Value[0].User.GetId()).To(Equal("user1"))
+					Expect(res.Value[0].User.GetDisplayName()).To(Equal("Albert Einstein"))
+					Expect(res.Value[0].User.GetUserType()).To(Equal("Member"))
+					Expect(res.Value[0].User.GetOnPremisesSamAccountName()).To(Equal(""))
+					Expect(res.Value[0].User.HasMail()).To(BeTrue())
+					Expect(res.Value[0].User.HasPasswordProfile()).To(BeFalse())
+
+					Expect(res.Value[0].Attributes).To(ConsistOf(
+						"Albert Einstein",
+						"einstein",
+						"albert.einstein@example.com",
+					))
+				})
+			})
+
 			It("sorts", func() {
 				user := &libregraph.User{}
 				user.SetId("user1")
@@ -366,7 +451,7 @@ var _ = Describe("Users", func() {
 					},
 				}, nil)
 
-				getUsers := func(path string) []*libregraph.User {
+				getUsers := func(path string) []*service.UserWithAttributes {
 					r := httptest.NewRequest(http.MethodGet, path, nil)
 					r = r.WithContext(mfa.Set(r.Context(), true))
 					rec := httptest.NewRecorder()

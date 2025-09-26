@@ -272,21 +272,23 @@ Feature: edit/search user including email
             "items": {
               "type": "object",
               "required": [
+                "attributes",
                 "displayName",
                 "id",
-                "mail",
                 "userType"
               ],
               "properties": {
+                "attributes": {
+                  "type": "array",
+                  "maxItems": 1,
+                  "minItems": 1
+                },
                 "displayName": {
                   "const": "Alice Hansen"
                 },
                 "id": {
                   "type": "string",
                   "pattern": "^%user_id_pattern%$"
-                },
-                "mail": {
-                  "const": "alice@example.org"
                 },
                 "userType": {
                   "const": "Member"
@@ -320,12 +322,17 @@ Feature: edit/search user including email
             "items": {
               "type": "object",
               "required": [
+                "attributes",
                 "displayName",
                 "id",
-                "mail",
                 "userType"
               ],
               "properties": {
+                "attributes": {
+                  "type": "array",
+                  "maxItems": 1,
+                  "minItems": 1
+                },
                 "displayName": {
                   "const": "Alice Hansen"
                 },
@@ -364,12 +371,17 @@ Feature: edit/search user including email
             "items": {
               "type": "object",
               "required": [
+                "attributes",
                 "displayName",
                 "id",
-                "mail",
                 "userType"
               ],
               "properties": {
+                "attributes": {
+                  "type": "array",
+                  "maxItems": 1,
+                  "minItems": 1
+                },
                 "displayName": {
                   "const": "Alice Hansen"
                 },
@@ -415,12 +427,17 @@ Feature: edit/search user including email
                 {
                   "type": "object",
                   "required": [
+                    "attributes",
                     "displayName",
                     "id",
-                    "mail",
                     "userType"
                   ],
                   "properties": {
+                    "attributes": {
+                      "type": "array",
+                      "maxItems": 1,
+                      "minItems": 1
+                    },
                     "displayName": {
                       "const": "Alice Hansen"
                     },
@@ -439,12 +456,17 @@ Feature: edit/search user including email
                 {
                   "type": "object",
                   "required": [
+                    "attributes",
                     "displayName",
                     "id",
-                    "mail",
                     "userType"
                   ],
                   "properties": {
+                    "attributes": {
+                      "type": "array",
+                      "maxItems": 1,
+                      "minItems": 1
+                    },
                     "displayName": {
                       "const": "Alice Murphy"
                     },

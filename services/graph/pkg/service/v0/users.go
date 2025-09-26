@@ -2,6 +2,7 @@ package svc
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -209,6 +210,92 @@ func (g Graph) contextUserHasFullAccountPerms(reqctx context.Context) bool {
 	return true
 }
 
+// UserWithAttributes is a wrapper for the User type that includes attributes.
+// Attributes are a list of attributes that are displayed in the user search results.
+type UserWithAttributes struct {
+	*libregraph.User
+	Attributes []string `json:"attributes"`
+}
+
+// MarshalJSON is a custom marshaler for the UserWithAttributes type.
+// It marshals the User type and the Attributes type.
+func (u UserWithAttributes) MarshalJSON() ([]byte, error) {
+	if u.User == nil {
+		return []byte("null"), nil
+	}
+
+	userMap, err := u.User.ToMap()
+	if err != nil {
+		return nil, err
+	}
+
+	if u.Attributes != nil {
+		userMap["attributes"] = u.Attributes
+	} else {
+		userMap["attributes"] = []string{}
+	}
+
+	return json.Marshal(userMap)
+}
+
+// UnmarshalJSON is a custom unmarshaler for the UserWithAttributes type.
+// It unmarshals the User type and the Attributes type.
+func (u *UserWithAttributes) UnmarshalJSON(data []byte) error {
+	raw := make(map[string]json.RawMessage)
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+
+	if attrData, exists := raw["attributes"]; exists {
+		if err := json.Unmarshal(attrData, &u.Attributes); err != nil {
+			return err
+		}
+		delete(raw, "attributes")
+	}
+
+	if userJSON, err := json.Marshal(raw); err != nil {
+		return err
+	} else if err := json.Unmarshal(userJSON, &u.User); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// getUsersAttributes returns the attributes of the user that are in the allowed list.
+func getUsersAttributes(displayedAttributes []string, user *libregraph.User) ([]string, error) {
+	userMap, err := user.ToMap()
+	if err != nil {
+		return []string{}, err
+	}
+
+	attributes := []string{}
+
+	for attrStr, val := range userMap {
+		if !slices.Contains(displayedAttributes, attrStr) {
+			continue
+		}
+
+		switch v := val.(type) {
+		case string:
+			attributes = append(attributes, v)
+		case *string:
+			if v != nil {
+				attributes = append(attributes, *v)
+			}
+		case []libregraph.Group:
+			groups := userMap[attrStr].([]libregraph.Group)
+			for _, group := range groups {
+				attributes = append(attributes, *group.DisplayName)
+			}
+		default:
+			// skip unsupported types
+		}
+	}
+
+	return attributes, nil
+}
+
 // GetUsers implements the Service interface.
 func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
@@ -292,24 +379,6 @@ func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// If the user isn't admin, we'll show just the minimum user attibutes
-	if !ctxHasFullPerms {
-		finalUsers := make([]*libregraph.User, len(users))
-		for i, u := range users {
-			finalUsers[i] = &libregraph.User{
-				Id:          u.Id,
-				DisplayName: u.DisplayName,
-				UserType:    u.UserType,
-				Identities:  u.Identities,
-			}
-
-			if g.config.API.ShowUserEmailInResults {
-				finalUsers[i].Mail = u.Mail
-			}
-		}
-		users = finalUsers
-	}
-
 	exp, err := identity.GetExpandValues(odataReq.Query)
 	if err != nil {
 		logger.Debug().Err(err).Interface("query", r.URL.Query()).Msg("could not get users: $expand error")
@@ -340,8 +409,42 @@ func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
 		return
 	}
+
+	usersWithAttributes := make([]*UserWithAttributes, 0, len(users))
+	displayedAttributes := g.config.API.UserSearchDisplayedAttributes
+	if g.config.API.ShowUserEmailInResults && !slices.Contains(displayedAttributes, "mail") {
+		displayedAttributes = append([]string{"mail"}, displayedAttributes...)
+	}
+
+	for _, user := range users {
+		attributes, err := getUsersAttributes(displayedAttributes, user)
+		if err != nil {
+			logger.Debug().Err(err).Str("user", user.GetId()).Msg("could not get user attributes")
+		}
+
+		// If the user isn't admin, we'll show just the minimum user attributes
+		finalUser := &libregraph.User{
+			Id:          user.Id,
+			DisplayName: user.DisplayName,
+			UserType:    user.UserType,
+			Identities:  user.Identities,
+		}
+
+		if ctxHasFullPerms {
+			finalUser = user
+		} else if g.config.API.ShowUserEmailInResults || slices.Contains(displayedAttributes, "mail") {
+			// Remove this once `ShowUserEmailInResults` is removed
+			finalUser.Mail = user.Mail
+		}
+
+		usersWithAttributes = append(usersWithAttributes, &UserWithAttributes{
+			User:       finalUser,
+			Attributes: attributes,
+		})
+	}
+
 	render.Status(r, http.StatusOK)
-	render.JSON(w, r, &ListResponse{Value: users})
+	render.JSON(w, r, &ListResponse{Value: usersWithAttributes})
 }
 
 // PostUser implements the Service interface.
@@ -567,7 +670,7 @@ func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	if !g.config.API.ShowUserEmailInResults {
+	if !g.config.API.ShowUserEmailInResults && !slices.Contains(g.config.API.UserSearchDisplayedAttributes, "mail") {
 		user.Mail = nil
 	}
 
