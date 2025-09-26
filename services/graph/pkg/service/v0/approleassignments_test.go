@@ -4,12 +4,15 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
+	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/go-chi/chi/v5"
 	"github.com/golang/protobuf/ptypes/empty"
 	. "github.com/onsi/ginkgo/v2"
@@ -23,10 +26,12 @@ import (
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config/defaults"
 	identitymocks "github.com/owncloud/ocis/v2/services/graph/pkg/identity/mocks"
 	service "github.com/owncloud/ocis/v2/services/graph/pkg/service/v0"
+	settingsService "github.com/owncloud/ocis/v2/services/settings/pkg/service/v0"
 	revactx "github.com/owncloud/reva/v2/pkg/ctx"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
 	cs3mocks "github.com/owncloud/reva/v2/tests/cs3mocks/mocks"
 	"github.com/stretchr/testify/mock"
+	merrors "go-micro.dev/v4/errors"
 	"google.golang.org/grpc"
 )
 
@@ -69,6 +74,18 @@ var _ = Describe("AppRoleAssignments", func() {
 				return gatewayClient
 			},
 		)
+
+		gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(&userv1beta1.GetUserResponse{
+			Status: &rpc.Status{Code: rpc.Code_CODE_OK},
+			User:   currentUser,
+		}, nil)
+
+		gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&storageprovider.ListStorageSpacesResponse{
+			Status: &rpc.Status{Code: rpc.Code_CODE_OK},
+			StorageSpaces: []*storageprovider.StorageSpace{
+				{Id: &storageprovider.StorageSpaceId{OpaqueId: "ps1"}},
+			},
+		}, nil)
 
 		rr = httptest.NewRecorder()
 		ctx = context.Background()
@@ -171,6 +188,316 @@ var _ = Describe("AppRoleAssignments", func() {
 			Expect(assignment.GetAppRoleId()).To(Equal("some-appRole-ID"))
 			Expect(assignment.GetPrincipalId()).To(Equal("user1"))
 			Expect(assignment.GetResourceId()).To(Equal(cfg.Application.ID))
+		})
+
+		It("returns bad request for invalid JSON", func() {
+			invalidJson := `{"invalid": json}`
+			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/users/user1/appRoleAssignments", bytes.NewBufferString(invalidJson))
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("userID", "user1")
+			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+			svc.CreateAppRoleAssignment(rr, r)
+
+			Expect(rr.Code).To(Equal(http.StatusBadRequest))
+		})
+
+		It("returns bad request when principal ID does not match user ID", func() {
+			roleService.On("ListRoleAssignments", mock.Anything, mock.Anything, mock.Anything).Return(&settings.ListRoleAssignmentsResponse{Assignments: []*settingsmsg.UserRoleAssignment{}}, nil)
+
+			ara := libregraph.NewAppRoleAssignmentWithDefaults()
+			ara.SetAppRoleId("some-appRole-ID")
+			ara.SetPrincipalId("different-user-id")
+			ara.SetResourceId(cfg.Application.ID)
+
+			araJson, err := json.Marshal(ara)
+			Expect(err).ToNot(HaveOccurred())
+
+			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/users/user1/appRoleAssignments", bytes.NewBuffer(araJson))
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("userID", "user1")
+			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+			svc.CreateAppRoleAssignment(rr, r)
+
+			Expect(rr.Code).To(Equal(http.StatusBadRequest))
+		})
+
+		It("returns bad request when resource ID does not match application ID", func() {
+			roleService.On("ListRoleAssignments", mock.Anything, mock.Anything, mock.Anything).Return(&settings.ListRoleAssignmentsResponse{Assignments: []*settingsmsg.UserRoleAssignment{}}, nil)
+
+			ara := libregraph.NewAppRoleAssignmentWithDefaults()
+			ara.SetAppRoleId("some-appRole-ID")
+			ara.SetPrincipalId("user1")
+			ara.SetResourceId("different-application-id")
+
+			araJson, err := json.Marshal(ara)
+			Expect(err).ToNot(HaveOccurred())
+
+			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/users/user1/appRoleAssignments", bytes.NewBuffer(araJson))
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("userID", "user1")
+			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+			svc.CreateAppRoleAssignment(rr, r)
+
+			Expect(rr.Code).To(Equal(http.StatusBadRequest))
+		})
+
+		It("returns forbidden when AssignRoleToUser returns forbidden error", func() {
+			roleService.On("ListRoleAssignments", mock.Anything, mock.Anything, mock.Anything).Return(&settings.ListRoleAssignmentsResponse{Assignments: []*settingsmsg.UserRoleAssignment{}}, nil)
+			roleService.On("AssignRoleToUser", mock.Anything, mock.Anything, mock.Anything).Return(nil, merrors.Forbidden("test", "forbidden"))
+
+			ara := libregraph.NewAppRoleAssignmentWithDefaults()
+			ara.SetAppRoleId("some-appRole-ID")
+			ara.SetPrincipalId("user1")
+			ara.SetResourceId(cfg.Application.ID)
+
+			araJson, err := json.Marshal(ara)
+			Expect(err).ToNot(HaveOccurred())
+
+			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/users/user1/appRoleAssignments", bytes.NewBuffer(araJson))
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("userID", "user1")
+			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+			svc.CreateAppRoleAssignment(rr, r)
+
+			Expect(rr.Code).To(Equal(http.StatusForbidden))
+		})
+
+		It("returns internal server error when AssignRoleToUser returns general error", func() {
+			roleService.On("ListRoleAssignments", mock.Anything, mock.Anything, mock.Anything).Return(&settings.ListRoleAssignmentsResponse{Assignments: []*settingsmsg.UserRoleAssignment{}}, nil)
+			roleService.On("AssignRoleToUser", mock.Anything, mock.Anything, mock.Anything).Return(nil, fmt.Errorf("general error"))
+
+			ara := libregraph.NewAppRoleAssignmentWithDefaults()
+			ara.SetAppRoleId("some-appRole-ID")
+			ara.SetPrincipalId("user1")
+			ara.SetResourceId(cfg.Application.ID)
+
+			araJson, err := json.Marshal(ara)
+			Expect(err).ToNot(HaveOccurred())
+
+			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/users/user1/appRoleAssignments", bytes.NewBuffer(araJson))
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("userID", "user1")
+			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+			svc.CreateAppRoleAssignment(rr, r)
+
+			Expect(rr.Code).To(Equal(http.StatusInternalServerError))
+		})
+
+		It("disables personal space for UserLight role", func() {
+			userRoleAssignment := &settingsmsg.UserRoleAssignment{
+				Id:          "some-appRoleAssignment-ID",
+				AccountUuid: "user1",
+				RoleId:      settingsService.BundleUUIDRoleUserLight,
+			}
+			roleService.On("ListRoleAssignments", mock.Anything, mock.Anything, mock.Anything).Return(&settings.ListRoleAssignmentsResponse{Assignments: []*settingsmsg.UserRoleAssignment{}}, nil)
+			roleService.On("AssignRoleToUser", mock.Anything, mock.Anything, mock.Anything).Return(&settings.AssignRoleToUserResponse{Assignment: userRoleAssignment}, nil)
+
+			gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&storageprovider.ListStorageSpacesResponse{
+				Status: &rpc.Status{Code: rpc.Code_CODE_OK},
+				StorageSpaces: []*storageprovider.StorageSpace{
+					{Id: &storageprovider.StorageSpaceId{OpaqueId: "ps1"}},
+				},
+			}, nil)
+			gatewayClient.On("DeleteStorageSpace", mock.Anything, mock.Anything).Return(&storageprovider.DeleteStorageSpaceResponse{
+				Status: &rpc.Status{Code: rpc.Code_CODE_OK},
+			}, nil)
+
+			ara := libregraph.NewAppRoleAssignmentWithDefaults()
+			ara.SetAppRoleId(settingsService.BundleUUIDRoleUserLight)
+			ara.SetPrincipalId("user1")
+			ara.SetResourceId(cfg.Application.ID)
+
+			araJson, err := json.Marshal(ara)
+			Expect(err).ToNot(HaveOccurred())
+
+			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/users/user1/appRoleAssignments", bytes.NewBuffer(araJson))
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("userID", "user1")
+			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+			svc.CreateAppRoleAssignment(rr, r)
+
+			Expect(rr.Code).To(Equal(http.StatusCreated))
+		})
+
+		It("ensures personal space for non-UserLight role", func() {
+			userRoleAssignment := &settingsmsg.UserRoleAssignment{
+				Id:          "some-appRoleAssignment-ID",
+				AccountUuid: "user1",
+				RoleId:      "some-appRole-ID",
+			}
+			roleService.On("ListRoleAssignments", mock.Anything, mock.Anything, mock.Anything).Return(&settings.ListRoleAssignmentsResponse{Assignments: []*settingsmsg.UserRoleAssignment{}}, nil)
+			roleService.On("AssignRoleToUser", mock.Anything, mock.Anything, mock.Anything).Return(&settings.AssignRoleToUserResponse{Assignment: userRoleAssignment}, nil)
+
+			gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&storageprovider.ListStorageSpacesResponse{
+				Status:        &rpc.Status{Code: rpc.Code_CODE_OK},
+				StorageSpaces: []*storageprovider.StorageSpace{},
+			}, nil)
+			gatewayClient.On("CreateStorageSpace", mock.Anything, mock.Anything).Return(&storageprovider.CreateStorageSpaceResponse{
+				Status: &rpc.Status{Code: rpc.Code_CODE_OK},
+			}, nil)
+
+			ara := libregraph.NewAppRoleAssignmentWithDefaults()
+			ara.SetAppRoleId("some-appRole-ID")
+			ara.SetPrincipalId("user1")
+			ara.SetResourceId(cfg.Application.ID)
+
+			araJson, err := json.Marshal(ara)
+			Expect(err).ToNot(HaveOccurred())
+
+			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/users/user1/appRoleAssignments", bytes.NewBuffer(araJson))
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("userID", "user1")
+			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+			svc.CreateAppRoleAssignment(rr, r)
+
+			Expect(rr.Code).To(Equal(http.StatusCreated))
+		})
+
+		It("handles old role assignment correctly", func() {
+			oldRoleAssignment := &settingsmsg.UserRoleAssignment{
+				Id:          "old-assignment-ID",
+				AccountUuid: "user1",
+				RoleId:      "old-role-ID",
+			}
+			userRoleAssignment := &settingsmsg.UserRoleAssignment{
+				Id:          "some-appRoleAssignment-ID",
+				AccountUuid: "user1",
+				RoleId:      "some-appRole-ID",
+			}
+			roleService.On("ListRoleAssignments", mock.Anything, mock.Anything, mock.Anything).Return(&settings.ListRoleAssignmentsResponse{
+				Assignments: []*settingsmsg.UserRoleAssignment{oldRoleAssignment},
+			}, nil)
+			roleService.On("AssignRoleToUser", mock.Anything, mock.Anything, mock.Anything).Return(&settings.AssignRoleToUserResponse{Assignment: userRoleAssignment}, nil)
+
+			gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&storageprovider.ListStorageSpacesResponse{
+				Status:        &rpc.Status{Code: rpc.Code_CODE_OK},
+				StorageSpaces: []*storageprovider.StorageSpace{},
+			}, nil)
+			gatewayClient.On("CreateStorageSpace", mock.Anything, mock.Anything).Return(&storageprovider.CreateStorageSpaceResponse{
+				Status: &rpc.Status{Code: rpc.Code_CODE_OK},
+			}, nil)
+
+			ara := libregraph.NewAppRoleAssignmentWithDefaults()
+			ara.SetAppRoleId("some-appRole-ID")
+			ara.SetPrincipalId("user1")
+			ara.SetResourceId(cfg.Application.ID)
+
+			araJson, err := json.Marshal(ara)
+			Expect(err).ToNot(HaveOccurred())
+
+			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/users/user1/appRoleAssignments", bytes.NewBuffer(araJson))
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("userID", "user1")
+			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+			svc.CreateAppRoleAssignment(rr, r)
+
+			Expect(rr.Code).To(Equal(http.StatusCreated))
+		})
+
+		It("returns error when DisablePersonalSpace fails for UserLight role", func() {
+			userRoleAssignment := &settingsmsg.UserRoleAssignment{
+				Id:          "some-appRoleAssignment-ID",
+				AccountUuid: "user1",
+				RoleId:      settingsService.BundleUUIDRoleUserLight,
+			}
+			roleService.On("ListRoleAssignments", mock.Anything, mock.Anything, mock.Anything).Return(&settings.ListRoleAssignmentsResponse{Assignments: []*settingsmsg.UserRoleAssignment{}}, nil)
+			roleService.On("AssignRoleToUser", mock.Anything, mock.Anything, mock.Anything).Return(&settings.AssignRoleToUserResponse{Assignment: userRoleAssignment}, nil)
+
+			gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&storageprovider.ListStorageSpacesResponse{
+				Status: &rpc.Status{Code: rpc.Code_CODE_OK},
+				StorageSpaces: []*storageprovider.StorageSpace{
+					{Id: &storageprovider.StorageSpaceId{OpaqueId: "ps1"}},
+				},
+			}, nil)
+			gatewayClient.On("DeleteStorageSpace", mock.Anything, mock.Anything).Return(&storageprovider.DeleteStorageSpaceResponse{
+				Status: &rpc.Status{Code: rpc.Code_CODE_INTERNAL, Message: "internal error"},
+			}, nil)
+
+			ara := libregraph.NewAppRoleAssignmentWithDefaults()
+			ara.SetAppRoleId(settingsService.BundleUUIDRoleUserLight)
+			ara.SetPrincipalId("user1")
+			ara.SetResourceId(cfg.Application.ID)
+
+			araJson, err := json.Marshal(ara)
+			Expect(err).ToNot(HaveOccurred())
+
+			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/users/user1/appRoleAssignments", bytes.NewBuffer(araJson))
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("userID", "user1")
+			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+			svc.CreateAppRoleAssignment(rr, r)
+
+			Expect(rr.Code).To(Equal(http.StatusInternalServerError))
+		})
+
+		It("returns error when GetUser fails for non-UserLight role", func() {
+			userRoleAssignment := &settingsmsg.UserRoleAssignment{
+				Id:          "some-appRoleAssignment-ID",
+				AccountUuid: "user1",
+				RoleId:      "some-appRole-ID",
+			}
+			roleService.On("ListRoleAssignments", mock.Anything, mock.Anything, mock.Anything).Return(&settings.ListRoleAssignmentsResponse{Assignments: []*settingsmsg.UserRoleAssignment{}}, nil)
+			roleService.On("AssignRoleToUser", mock.Anything, mock.Anything, mock.Anything).Return(&settings.AssignRoleToUserResponse{Assignment: userRoleAssignment}, nil)
+
+			// Reset the mock and make GetUser fail
+			gatewayClient.ExpectedCalls = nil
+			gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(nil, fmt.Errorf("user not found"))
+
+			ara := libregraph.NewAppRoleAssignmentWithDefaults()
+			ara.SetAppRoleId("some-appRole-ID")
+			ara.SetPrincipalId("user1")
+			ara.SetResourceId(cfg.Application.ID)
+
+			araJson, err := json.Marshal(ara)
+			Expect(err).ToNot(HaveOccurred())
+
+			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/users/user1/appRoleAssignments", bytes.NewBuffer(araJson))
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("userID", "user1")
+			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+			svc.CreateAppRoleAssignment(rr, r)
+
+			Expect(rr.Code).To(Equal(http.StatusInternalServerError))
+		})
+
+		It("returns error when EnsurePersonalSpace fails for non-UserLight role", func() {
+			userRoleAssignment := &settingsmsg.UserRoleAssignment{
+				Id:          "some-appRoleAssignment-ID",
+				AccountUuid: "user1",
+				RoleId:      "some-appRole-ID",
+			}
+			roleService.On("ListRoleAssignments", mock.Anything, mock.Anything, mock.Anything).Return(&settings.ListRoleAssignmentsResponse{Assignments: []*settingsmsg.UserRoleAssignment{}}, nil)
+			roleService.On("AssignRoleToUser", mock.Anything, mock.Anything, mock.Anything).Return(&settings.AssignRoleToUserResponse{Assignment: userRoleAssignment}, nil)
+
+			// Reset the mock and set up the failing scenario
+			gatewayClient.ExpectedCalls = nil
+			gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(&userv1beta1.GetUserResponse{
+				Status: &rpc.Status{Code: rpc.Code_CODE_OK},
+				User:   currentUser,
+			}, nil)
+			gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&storageprovider.ListStorageSpacesResponse{
+				Status:        &rpc.Status{Code: rpc.Code_CODE_OK},
+				StorageSpaces: []*storageprovider.StorageSpace{},
+			}, nil)
+			gatewayClient.On("CreateStorageSpace", mock.Anything, mock.Anything).Return(&storageprovider.CreateStorageSpaceResponse{
+				Status: &rpc.Status{Code: rpc.Code_CODE_INTERNAL, Message: "internal error"},
+			}, nil)
+
+			ara := libregraph.NewAppRoleAssignmentWithDefaults()
+			ara.SetAppRoleId("some-appRole-ID")
+			ara.SetPrincipalId("user1")
+			ara.SetResourceId(cfg.Application.ID)
+
+			araJson, err := json.Marshal(ara)
+			Expect(err).ToNot(HaveOccurred())
+
+			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/users/user1/appRoleAssignments", bytes.NewBuffer(araJson))
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("userID", "user1")
+			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+			svc.CreateAppRoleAssignment(rr, r)
+
+			Expect(rr.Code).To(Equal(http.StatusInternalServerError))
 		})
 
 	})

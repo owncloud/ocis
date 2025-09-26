@@ -283,7 +283,7 @@ func (g BaseGraphService) listUserShares(ctx context.Context, filters []*collabo
 		return driveItems, errorcode.New(errorcode.GeneralException, err.Error())
 	}
 	if statusCode := lsUserSharesResponse.GetStatus().GetCode(); statusCode != rpc.Code_CODE_OK {
-		return driveItems, errorcode.New(cs3StatusToErrCode(statusCode), lsUserSharesResponse.Status.Message)
+		return driveItems, errorcode.NewFromStatusCode(statusCode, lsUserSharesResponse.Status.Message)
 	}
 	driveItems, err = g.cs3UserSharesToDriveItems(ctx, lsUserSharesResponse.Shares, driveItems)
 	if err != nil {
@@ -311,7 +311,7 @@ func (g BaseGraphService) listOCMShares(ctx context.Context, filters []*ocm.List
 		return driveItems, errorcode.New(errorcode.GeneralException, err.Error())
 	}
 	if statusCode := lsOCMSharesResponse.GetStatus().GetCode(); statusCode != rpc.Code_CODE_OK {
-		return driveItems, errorcode.New(cs3StatusToErrCode(statusCode), lsOCMSharesResponse.Status.Message)
+		return driveItems, errorcode.NewFromStatusCode(statusCode, lsOCMSharesResponse.Status.Message)
 	}
 	driveItems, err = g.cs3OCMSharesToDriveItems(ctx, lsOCMSharesResponse.Shares, driveItems)
 	if err != nil {
@@ -340,7 +340,7 @@ func (g BaseGraphService) listPublicShares(ctx context.Context, filters []*link.
 		return driveItems, errorcode.New(errorcode.GeneralException, err.Error())
 	}
 	if statusCode := lsPublicSharesResponse.GetStatus().GetCode(); statusCode != rpc.Code_CODE_OK {
-		return driveItems, errorcode.New(cs3StatusToErrCode(statusCode), lsPublicSharesResponse.Status.Message)
+		return driveItems, errorcode.NewFromStatusCode(statusCode, lsPublicSharesResponse.Status.Message)
 	}
 	driveItems, err = g.cs3PublicSharesToDriveItems(ctx, lsPublicSharesResponse.Share, driveItems)
 	if err != nil {
