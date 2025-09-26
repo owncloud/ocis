@@ -53,7 +53,7 @@ func (h *Handler) Init(c *config.Config) {
 		h.c.Capabilities.Core.PollInterval = 60
 	}
 	if h.c.Capabilities.Core.WebdavRoot == "" {
-		h.c.Capabilities.Core.WebdavRoot = "remote.php/webdav"
+		h.c.Capabilities.Core.WebdavRoot = "webdav"
 	}
 	// h.c.Capabilities.Core.SupportURLSigning is boolean
 

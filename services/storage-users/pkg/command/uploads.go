@@ -131,7 +131,7 @@ func ListUploadSessions(cfg *config.Config) *cli.Command {
 			}
 
 			var stream events.Stream
-			if c.Bool("restart") || c.Bool("resume") {
+			if c.Bool("restart") || c.Bool("resume") || c.Bool("clean") {
 				stream, err = event.NewStream(cfg)
 				if err != nil {
 					fmt.Fprintf(os.Stderr, "Failed to create event stream: %v\n", err)
@@ -147,7 +147,7 @@ func ListUploadSessions(cfg *config.Config) *cli.Command {
 
 			var (
 				table *tablewriter.Table
-				raw   []Session
+				raw   []*Session
 			)
 
 			if !c.Bool("json") {
@@ -176,7 +176,7 @@ func ListUploadSessions(cfg *config.Config) *cli.Command {
 				}
 
 				if c.Bool("json") {
-					raw = append(raw, session)
+					raw = append(raw, &session)
 				} else {
 					table.Append([]string{
 						session.Space,
@@ -215,8 +215,13 @@ func ListUploadSessions(cfg *config.Config) *cli.Command {
 					}
 
 				case c.Bool("clean"):
-					if err := u.Purge(c.Context); err != nil {
-						fmt.Fprintf(os.Stderr, "Failed to clean upload session '%s'\n", u.ID())
+					if err := events.Publish(context.Background(), stream, events.CleanUpload{
+						UploadID:  u.ID(),
+						Timestamp: utils.TSNow(),
+					}); err != nil {
+						fmt.Fprintf(os.Stderr, "Failed to send clean upload event for upload session '%s'\n", u.ID())
+						// if publishing fails there is no need to try publishing other events - they will fail too.
+						os.Exit(1)
 					}
 				}
 

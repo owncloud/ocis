@@ -33,7 +33,7 @@ type OcmProviderConfig struct {
 	OCMPrefix    string `docs:"ocm;The prefix URL where the OCM API is served."                                   mapstructure:"ocm_prefix"`
 	Endpoint     string `docs:"This host's full URL. If it's not configured, it is assumed OCM is not available." mapstructure:"endpoint"`
 	Provider     string `docs:"reva;A friendly name that defines this service."                                   mapstructure:"provider"`
-	WebdavRoot   string `docs:"/remote.php/dav/ocm;The root URL of the WebDAV endpoint to serve OCM shares."      mapstructure:"webdav_root"`
+	WebdavRoot   string `docs:"/dav/ocm;The root URL of the WebDAV endpoint to serve OCM shares."                 mapstructure:"webdav_root"`
 	WebappRoot   string `docs:"/external/sciencemesh;The root URL to serve Web apps via OCM."                     mapstructure:"webapp_root"`
 	EnableWebapp bool   `docs:"false;Whether web apps are enabled in OCM shares."                                 mapstructure:"enable_webapp"`
 	EnableDatatx bool   `docs:"false;Whether data transfers are enabled in OCM shares."                           mapstructure:"enable_datatx"`
@@ -66,7 +66,7 @@ func (c *OcmProviderConfig) ApplyDefaults() {
 		c.Provider = "reva"
 	}
 	if c.WebdavRoot == "" {
-		c.WebdavRoot = "/remote.php/dav/ocm/"
+		c.WebdavRoot = "/dav/ocm/"
 	}
 	if c.WebdavRoot[len(c.WebdavRoot)-1:] != "/" {
 		c.WebdavRoot += "/"
