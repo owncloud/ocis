@@ -48,6 +48,18 @@ const (
 	SettingUUIDProfileEventPostprocessingStepFinished = "fe0a3011-d886-49c8-b797-33d02fa426ef"
 )
 
+// IsValidUserRole checks if the provided role is one of the predefined valid roles.
+func IsValidUserRole(role string) bool {
+	switch role {
+	case BundleUUIDRoleAdmin,
+		BundleUUIDRoleSpaceAdmin,
+		BundleUUIDRoleUser,
+		BundleUUIDRoleUserLight:
+		return true
+	}
+	return false
+}
+
 // GenerateBundlesDefaultRoles bootstraps the default roles.
 func GenerateBundlesDefaultRoles() []*settingsmsg.Bundle {
 	return []*settingsmsg.Bundle{

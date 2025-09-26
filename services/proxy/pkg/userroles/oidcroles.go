@@ -10,7 +10,11 @@ import (
 	cs3 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
+	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
+	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
+	settingsService "github.com/owncloud/ocis/v2/services/settings/pkg/service/v0"
+	defaultsSettings "github.com/owncloud/ocis/v2/services/settings/pkg/store/defaults"
 	"github.com/owncloud/reva/v2/pkg/utils"
 	"go-micro.dev/v4/metadata"
 )
@@ -95,7 +99,8 @@ func matchesClaimMapping(mappingValue string, claimRoles map[string]struct{}) bo
 // UpdateUserRoleAssignment assigns the role "User" to the supplied user. Unless the user
 // already has a different role assigned.
 func (ra oidcRoleAssigner) UpdateUserRoleAssignment(ctx context.Context, user *cs3.User, claims map[string]interface{}) (*cs3.User, error) {
-	logger := ra.logger.SubloggerWithRequestID(ctx).With().Str("userid", user.GetId().GetOpaqueId()).Logger()
+	userID := user.GetId().GetOpaqueId()
+	logger := ra.logger.SubloggerWithRequestID(ctx).With().Str("userid", userID).Logger()
 	roleNamesToRoleIDs, err := ra.roleNamesToRoleIDs()
 	if err != nil {
 		logger.Error().Err(err).Msg("Error mapping role names to role ids")
@@ -132,13 +137,13 @@ func (ra oidcRoleAssigner) UpdateUserRoleAssignment(ctx context.Context, user *c
 		return nil, err
 	}
 
-	assignedRoles, err := loadRolesIDs(ctx, user.GetId().GetOpaqueId(), ra.roleService)
+	assignedRoles, err := loadRolesIDs(ctx, userID, ra.roleService)
 	if err != nil {
 		logger.Error().Err(err).Msg("Could not load roles")
 		return nil, err
 	}
 	if len(assignedRoles) > 1 {
-		logger.Error().Str("userID", user.GetId().GetOpaqueId()).Int("numRoles", len(assignedRoles)).Msg("The user has too many roles assigned")
+		logger.Error().Str("userID", userID).Int("numRoles", len(assignedRoles)).Msg("The user has too many roles assigned")
 	}
 	logger.Debug().Interface("assignedRoleIds", assignedRoles).Msg("Currently assigned roles")
 
@@ -150,11 +155,33 @@ func (ra oidcRoleAssigner) UpdateUserRoleAssignment(ctx context.Context, user *c
 			return nil, err
 		}
 		if _, err = ra.roleService.AssignRoleToUser(newctx, &settingssvc.AssignRoleToUserRequest{
-			AccountUuid: user.GetId().GetOpaqueId(),
+			AccountUuid: userID,
 			RoleId:      roleIDFromClaim,
 		}); err != nil {
 			logger.Error().Err(err).Msg("Role assignment failed")
 			return nil, err
+		}
+
+		userID := user.GetId().GetOpaqueId()
+		client, err := ra.gatewaySelector.Next()
+		if err != nil {
+			return nil, err
+		}
+
+		if roleIDFromClaim == settingsService.BundleUUIDRoleUserLight {
+			err := shared.DisablePersonalSpace(ctx, client, userID)
+			if err != nil {
+				logger.Error().Any("userID", userID).Err(err).Msg("can't disable the personal space")
+				return nil, err
+			}
+		}
+		if defaultsSettings.IsValidUserRole(roleIDFromClaim) && roleIDFromClaim != settingsService.BundleUUIDRoleUserLight {
+			libreUser := identity.CreateUserModelFromCS3(user)
+			err = shared.EnsurePersonalSpace(ctx, client, libreUser)
+			if err != nil {
+				logger.Error().Any("userID", userID).Err(err).Msg("can't ensure the personal space")
+				return nil, err
+			}
 		}
 	}
 

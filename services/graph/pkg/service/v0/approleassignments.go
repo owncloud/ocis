@@ -12,6 +12,7 @@ import (
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
 	settingsService "github.com/owncloud/ocis/v2/services/settings/pkg/service/v0"
+	defaultsSettings "github.com/owncloud/ocis/v2/services/settings/pkg/store/defaults"
 	revactx "github.com/owncloud/reva/v2/pkg/ctx"
 	"github.com/owncloud/reva/v2/pkg/events"
 	"github.com/owncloud/reva/v2/pkg/utils"
@@ -106,13 +107,13 @@ func (g Graph) CreateAppRoleAssignment(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	if appRoleAssignment.GetAppRoleId() != settingsService.BundleUUIDRoleUserLight {
+	if defaultsSettings.IsValidUserRole(appRoleAssignment.GetAppRoleId()) && appRoleAssignment.GetAppRoleId() != settingsService.BundleUUIDRoleUserLight {
 		user, err := g.identityCache.GetUser(r.Context(), userID)
 		if err != nil {
 			errorcode.RenderError(w, r, fmt.Errorf("failed to get user: %w", err))
 			return
 		}
-		err = shared.EnsurePersonalSpace(r.Context(), client, user)
+		err = shared.EnsurePersonalSpace(r.Context(), client, &user)
 		if err != nil {
 			logger.Error().Any("userID", userID).Err(err).Msg("can't ensure the personal space")
 			errorcode.RenderError(w, r, err)
