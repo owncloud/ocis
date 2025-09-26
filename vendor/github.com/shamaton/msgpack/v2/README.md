@@ -10,8 +10,8 @@
 * Supported types : primitive / array / slice / struct / map / interface{} and time.Time
 * Renaming fields via `msgpack:"field_name"`
 * Omitting fields via `msgpack:"-"`
-* Omitting empty fields via msgpack:"field_name,omitempty"
-* Supports extend encoder / decoder
+* Omitting empty fields via `msgpack:"field_name,omitempty"`
+* Supports extend encoder / decoder [(example)](./msgpack_example_test.go)
 * Can also Encoding / Decoding struct as array
 
 ## Installation
@@ -63,7 +63,7 @@ func handle(w http.ResponseWriter, r *http.Request) {
 ## Benchmark
 This result made from [shamaton/msgpack_bench](https://github.com/shamaton/msgpack_bench)
 
-![msgpack_bench](https://user-images.githubusercontent.com/4637556/128299009-4823e79b-d70b-4d11-8f35-10a4758dfeca.png)
+![msgpack_bench](https://github.com/user-attachments/assets/ed5bc4c5-a149-4083-98b8-ee6820c00eae)
 
 ## License
 

@@ -1,7 +1,6 @@
 package encoding
 
 import (
-	"fmt"
 	"math"
 	"reflect"
 	"sync"
@@ -99,17 +98,11 @@ func (e *encoder) calcStructArray(rv reflect.Value) (int, error) {
 	}
 
 	// format size
-	l := len(c.indexes)
-	if l <= 0x0f {
-		// format code only
-	} else if l <= math.MaxUint16 {
-		ret += def.Byte2
-	} else if uint(l) <= math.MaxUint32 {
-		ret += def.Byte4
-	} else {
-		// not supported error
-		return 0, fmt.Errorf("array length %d is %w", l, def.ErrUnsupportedLength)
+	size, err := e.calcLength(len(c.indexes))
+	if err != nil {
+		return 0, err
 	}
+	ret += size
 	return ret, nil
 }
 
@@ -162,16 +155,11 @@ func (e *encoder) calcStructMap(rv reflect.Value) (int, error) {
 	}
 
 	// format size
-	if l <= 0x0f {
-		// format code only
-	} else if l <= math.MaxUint16 {
-		ret += def.Byte2
-	} else if uint(l) <= math.MaxUint32 {
-		ret += def.Byte4
-	} else {
-		// not supported error
-		return 0, fmt.Errorf("map length %d is %w", l, def.ErrUnsupportedLength)
+	size, err := e.calcLength(len(c.indexes))
+	if err != nil {
+		return 0, err
 	}
+	ret += size
 	return ret, nil
 }
 
@@ -179,7 +167,7 @@ func (e *encoder) calcSizeWithOmitEmpty(rv reflect.Value, name string, omit bool
 	keySize := 0
 	valueSize := 0
 	if !omit || !rv.IsZero() {
-		keySize = def.Byte1 + e.calcString(name)
+		keySize = e.calcString(name)
 		vSize, err := e.calcSize(rv)
 		if err != nil {
 			return 0, err
