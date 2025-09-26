@@ -1104,8 +1104,8 @@ def localApiTestPipeline(ctx):
                                 "arch": "amd64",
                             },
                             "steps": skipIfUnchanged(ctx, "acceptance-tests") +
-                                     restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin") +
-                                     (tikaService() if params["tikaNeeded"] else []) +
+                                     ([] if run_on_k8s else restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin")) +
+                                     (tikaService() if params["tikaNeeded"] and not run_on_k8s else tikaServiceK8s() if params["tikaNeeded"] and run_on_k8s else []) +
                                      (waitForServices("online-offices", ["collabora:9980", "onlyoffice:443", "fakeoffice:8080"]) if params["collaborationServiceNeeded"] else []) +
                                      (waitK3sCluster() + deployOcis() + waitForOcis(ocis_url = ocis_url) + ociswrapper() + waitForOciswrapper() if run_on_k8s else ocisServer(storage, extra_server_environment = params["extraServerEnvironment"], with_wrapper = True, tika_enabled = params["tikaNeeded"], volumes = ([stepVolumeOcisStorage]))) +
                                      (waitForClamavService() if params["antivirusNeeded"] else []) +
@@ -3817,15 +3817,13 @@ def deployOcis():
         "image": "owncloudci/golang:latest",
         "commands": [
             "make -C %s build" % dirs["ocisWrapper"],
-            "mv %s/tests/config/drone/k3s/values.yaml %s/ocis-charts/charts/ocis/ci/deployment-values.yaml" % (dirs["base"], dirs["base"]),
-            "cp -r %s/tests/config/drone/k3s/authbasic %s/ocis-charts/charts/ocis/templates/" % (dirs["base"], dirs["base"]),
+            "mv %s/tests/config/drone/k8s/values.yaml %s/ocis-charts/charts/ocis/ci/deployment-values.yaml" % (dirs["base"], dirs["base"]),
+            "cp -r %s/tests/config/drone/k8s/authbasic %s/ocis-charts/charts/ocis/templates/" % (dirs["base"], dirs["base"]),
             "cd %s/ocis-charts" % dirs["base"],
             "sed -i '/{{- define \"ocis.basicServiceTemplates\" -}}/a\\\\  {{- $_ := set .scope \"appNameAuthBasic\" \"authbasic\" -}}' ./charts/ocis/templates/_common/_tplvalues.tpl",
             "sed -i '/- name: IDM_ADMIN_PASSWORD/{n;N;N;N;d;}' ./charts/ocis/templates/idm/deployment.yaml",
             "sed -i '/- name: IDM_ADMIN_PASSWORD/a\\\\\\n              value: \"admin\"' ./charts/ocis/templates/idm/deployment.yaml",
             "sed -i '/- name: PROXY_HTTP_ADDR/i\\\\            - name: PROXY_ENABLE_BASIC_AUTH\\\n              value: \"true\"' ./charts/ocis/templates/proxy/deployment.yaml",
-            "sed -i '/- name: FRONTEND_PASSWORD_POLICY_BANNED_PASSWORDS_LIST/{N;d;}' %s/ocis-charts/charts/ocis/templates/frontend/deployment.yaml" % dirs["base"],
-            "sed -i '/name: SHARING_PASSWORD_POLICY_BANNED_PASSWORDS_LIST/,+1d' %s/ocis-charts/charts/ocis/templates/sharing/deployment.yaml" % dirs["base"],
             "export KUBECONFIG=%s/kubeconfig-$${DRONE_BUILD_NUMBER}.yaml" % dirs["base"],
             "make helm-install-atomic",
         ],
@@ -3862,4 +3860,14 @@ def waitForOciswrapper(url = "http://ociswrapper:5200", depends_on = []):
             "-w %{http_code} -o /dev/null) != 404 ]; do sleep 1; done'",
         ],
         "depends_on": depends_on,
+    }]
+
+def tikaServiceK8s():
+    return [{
+        "name": "tika",
+        "type": "docker",
+        "image": OC_CI_ALPINE,
+        "commands": [
+            "cp -r %s/tests/config/drone/k8s/tika %s/ocis-charts/charts/ocis/templates/" % (dirs["base"], dirs["base"]),
+        ],
     }]

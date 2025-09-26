@@ -82,6 +82,10 @@ services:
       accessModes:
         - ReadWriteOnce
   search:
+    extractor:
+      type: "tika"
+      tika:
+        url: "http://tika:9998"
     persistence:
       enabled: true
       accessModes:
