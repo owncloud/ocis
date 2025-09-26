@@ -385,5 +385,20 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 
 - [apiActivities/activities.feature:3875](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiActivities/activities.feature#L3875)
 
+#### [The user role downgrading to Use Light disables the Personal space](https://github.com/owncloud/ocis/issues/11696)
+
+- [apiSettings/notificationSetting.feature:160](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSettings/notificationSetting.feature#L160)
+- [apiSettings/notificationSetting.feature:613](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSettings/notificationSetting.feature#L613)
+- [apiNotification/deprovisioningNotification.feature:100](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiNotification/deprovisioningNotification.feature#L100)
+- [apiNotification/deprovisioningNotification.feature:171](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiNotification/deprovisioningNotification.feature#L171)
+- [apiNotification/spaceNotification.feature:178](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiNotification/spaceNotification.feature#L178)
+- [apiNotification/spaceNotification.feature:222](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiNotification/spaceNotification.feature#L222)
+- [apiSpaces/changeSpaces.feature:529](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/changeSpaces.feature#L529)
+- [apiGraphUser/editUser.feature:227](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUser/editUser.feature#L227)
+- [apiGraphUser/editUser.feature:231](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUser/editUser.feature#L231)
+- [apiGraphUser/editUser.feature:235](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUser/editUser.feature#L235)
+- [apiGraphUser/getUser.feature:696](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUser/getUser.feature#L696)
+- [apiGraphUser/getUser.feature:700](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUser/getUser.feature#L700)
+
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.
