@@ -16,8 +16,21 @@ insecure:
   ocisHttpApiInsecure: true
   ocmInsecure: true
 features:
+  authapp:
+    enabled: true
+  emailNotifications:
+    enabled: true
+    smtp:
+      host: mailpit
+      port: 1025
+      sender: 'oCIS <noreply@local.test>'
+      authentication: none
+      encryption: none
+    branding:
+      enabled: false
   virusscan:
-    enabled: false
+    enabled: true
+    infectedFileHandling: delete
   policies:
     enabled: false
   ocm:
@@ -115,3 +128,9 @@ services:
       enabled: true
       accessModes:
         - ReadWriteOnce
+  antivirus:
+    events:
+      consumer:
+        concurrency: 10
+secretRefs:
+  notificationsSmtpSecretRef: notifications-smtp-secret
