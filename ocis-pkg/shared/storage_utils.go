@@ -55,7 +55,7 @@ func DisablePersonalSpace(ctx context.Context, client gateway.GatewayAPIClient, 
 // If the personal space is found and is trashed, it restores it.
 // If the personal space does not exist, it creates a new one.
 // Returns an error if the operation fails.
-func EnsurePersonalSpace(ctx context.Context, client gateway.GatewayAPIClient, user libregraph.User) error {
+func EnsurePersonalSpace(ctx context.Context, client gateway.GatewayAPIClient, user *libregraph.User) error {
 	sp, err := getPersonalSpace(ctx, client, user.GetId())
 	if err != nil && !errors.Is(err, ErrNotFound) {
 		return err

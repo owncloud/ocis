@@ -48,7 +48,7 @@ func TestEnsurePersonalSpace(t *testing.T) {
 		user := libregraph.NewUser("User One", "user1")
 		user.SetId("user1")
 
-		err := EnsurePersonalSpace(context.Background(), gw, *user)
+		err := EnsurePersonalSpace(context.Background(), gw, user)
 		require.NoError(t, err)
 	})
 
@@ -68,7 +68,7 @@ func TestEnsurePersonalSpace(t *testing.T) {
 		user := libregraph.NewUser("User Two", "user2")
 		user.SetId("user2")
 
-		err := EnsurePersonalSpace(context.Background(), gw, *user)
+		err := EnsurePersonalSpace(context.Background(), gw, user)
 		require.NoError(t, err)
 	})
 
@@ -86,7 +86,7 @@ func TestEnsurePersonalSpace(t *testing.T) {
 		user := libregraph.NewUser("User Three", "user3")
 		user.SetId("user3")
 
-		err := EnsurePersonalSpace(context.Background(), gw, *user)
+		err := EnsurePersonalSpace(context.Background(), gw, user)
 		require.NoError(t, err)
 	})
 
@@ -104,7 +104,7 @@ func TestEnsurePersonalSpace(t *testing.T) {
 		user := libregraph.NewUser("User Four", "user4")
 		user.SetId("user4")
 
-		err := EnsurePersonalSpace(context.Background(), gw, *user)
+		err := EnsurePersonalSpace(context.Background(), gw, user)
 		require.NoError(t, err)
 	})
 
@@ -115,7 +115,7 @@ func TestEnsurePersonalSpace(t *testing.T) {
 		user := libregraph.NewUser("User Five", "user5")
 		user.SetId("user5")
 
-		err := EnsurePersonalSpace(context.Background(), gw, *user)
+		err := EnsurePersonalSpace(context.Background(), gw, user)
 		require.Error(t, err)
 	})
 
@@ -135,7 +135,7 @@ func TestEnsurePersonalSpace(t *testing.T) {
 		user := libregraph.NewUser("User Six", "user6")
 		user.SetId("user6")
 
-		err := EnsurePersonalSpace(context.Background(), gw, *user)
+		err := EnsurePersonalSpace(context.Background(), gw, user)
 		require.Error(t, err)
 	})
 }
