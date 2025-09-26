@@ -74,6 +74,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Limit search only when scope is passed: [#11664](https://github.com/owncloud/ocis/pull/11664)
 * Bugfix - Add OCS v2 capabilities endpoint to public paths: [#11665](https://github.com/owncloud/ocis/pull/11665)
 * Bugfix - Add webdav without trailing slash into proxy default config: [#11677](https://github.com/owncloud/ocis/pull/11677)
+* Bugfix - Fix clean uploads command: [#11693](https://github.com/owncloud/ocis/pull/11693)
 * Enhancement - Add GetPermission API: [#8616](https://github.com/owncloud/ocis/issues/8616)
 * Enhancement - Bump importer app: [#10880](https://github.com/owncloud/ocis/pull/10880)
 * Enhancement - Allow scaling the search service: [#11029](https://github.com/owncloud/ocis/pull/11029)
@@ -149,6 +150,13 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/issues/10346
    https://github.com/owncloud/ocis/issues/10334
    https://github.com/owncloud/ocis/pull/11677
+
+* Bugfix - Fix clean uploads command: [#11693](https://github.com/owncloud/ocis/pull/11693)
+
+   When using --clean ongoing uploads would be purged but the nodes would not be
+   reverted. This is now fixed.
+
+   https://github.com/owncloud/ocis/pull/11693
 
 * Enhancement - Add GetPermission API: [#8616](https://github.com/owncloud/ocis/issues/8616)
 
@@ -227,6 +235,7 @@ The following sections list the changes for unreleased.
    Bumped reva version
 
    https://github.com/owncloud/ocis/pull/11669
+   https://github.com/owncloud/ocis/pull/11693
 
 * Enhancement - Drop remote.php prefix: [#11687](https://github.com/owncloud/ocis/pull/11687)
 
