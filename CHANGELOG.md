@@ -86,6 +86,7 @@ The following sections list the changes for unreleased.
 * Enhancement - The sse support added for the public links: [#11627](https://github.com/owncloud/ocis/pull/11627)
 * Enhancement - Update the ocis_full deployment example: [#11666](https://github.com/owncloud/ocis/pull/11666)
 * Enhancement - Bump Reva version: [#11669](https://github.com/owncloud/ocis/pull/11669)
+* Enhancement - Added user type upgrade/downgrade: [#11678](https://github.com/owncloud/ocis/pull/11678)
 * Enhancement - Drop remote.php prefix: [#11687](https://github.com/owncloud/ocis/pull/11687)
 
 ## Details
@@ -236,6 +237,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/11669
    https://github.com/owncloud/ocis/pull/11693
+
+* Enhancement - Added user type upgrade/downgrade: [#11678](https://github.com/owncloud/ocis/pull/11678)
+
+   Added the mechanism to disable/enable personal spaces on user type
+   upgrade/downgrade
+
+   https://github.com/owncloud/ocis/pull/11678
 
 * Enhancement - Drop remote.php prefix: [#11687](https://github.com/owncloud/ocis/pull/11687)
 
