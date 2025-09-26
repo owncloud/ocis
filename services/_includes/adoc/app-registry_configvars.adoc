@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2025-09-26-00-02-44]
+[#deprecation-note-2025-09-26-00-05-24]
 [caption=]
 .Deprecation notes for the app-registry service
 [width="100%",cols="~,~,~,~",options="header"]
