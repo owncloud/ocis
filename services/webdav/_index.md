@@ -1,6 +1,6 @@
 ---
 title: Webdav
-date: 2025-09-27T00:02:56.325063796Z
+date: 2025-09-28T00:02:54.845757819Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/webdav
