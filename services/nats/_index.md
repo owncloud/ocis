@@ -1,6 +1,6 @@
 ---
 title: Nats
-date: 2025-09-27T00:05:49.28422701Z
+date: 2025-09-28T00:05:21.700842575Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/nats
