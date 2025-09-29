@@ -79,8 +79,8 @@ importers:
         specifier: ^1.0.10
         version: 1.0.10(@material-ui/core@4.12.4(@types/react@17.0.87)(react-dom@17.0.2(react@17.0.2))(react@17.0.2))(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
       query-string:
-        specifier: ^9.2.2
-        version: 9.2.2
+        specifier: ^9.3.1
+        version: 9.3.1
       react:
         specifier: ^17.0.2
         version: 17.0.2
@@ -5343,8 +5343,8 @@ packages:
   pure-rand@6.1.0:
     resolution: {integrity: sha512-bVWawvoZoBYpp6yIoQtQXHZjmz35RSVHnUOTefl8Vcjr8snTPY1wnpSPMWekcFwbxI6gtmT7rSYPFvz71ldiOA==}
 
-  query-string@9.2.2:
-    resolution: {integrity: sha512-pDSIZJ9sFuOp6VnD+5IkakSVf+rICAuuU88Hcsr6AKL0QtxSIfVuKiVP2oahFI7tk3CRSexwV+Ya6MOoTxzg9g==}
+  query-string@9.3.1:
+    resolution: {integrity: sha512-5fBfMOcDi5SA9qj5jZhWAcTtDfKF5WFdd2uD9nVNlbxVv1baq65aALy6qofpNEGELHvisjjasxQp7BlM9gvMzw==}
     engines: {node: '>=18'}
 
   queue-microtask@1.2.3:
@@ -12600,7 +12600,7 @@ snapshots:
 
   pure-rand@6.1.0: {}
 
-  query-string@9.2.2:
+  query-string@9.3.1:
     dependencies:
       decode-uri-component: 0.4.1
       filter-obj: 5.1.0
