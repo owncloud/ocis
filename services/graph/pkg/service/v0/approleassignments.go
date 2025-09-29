@@ -1,9 +1,12 @@
 package svc
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 
+	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
+	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
@@ -11,8 +14,6 @@ import (
 	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
-	settingsService "github.com/owncloud/ocis/v2/services/settings/pkg/service/v0"
-	defaultsSettings "github.com/owncloud/ocis/v2/services/settings/pkg/store/defaults"
 	revactx "github.com/owncloud/reva/v2/pkg/ctx"
 	"github.com/owncloud/reva/v2/pkg/events"
 	"github.com/owncloud/reva/v2/pkg/utils"
@@ -99,23 +100,18 @@ func (g Graph) CreateAppRoleAssignment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if appRoleAssignment.GetAppRoleId() == settingsService.BundleUUIDRoleUserLight {
-		err := shared.DisablePersonalSpace(r.Context(), client, userID)
+	canCreateDrives := g.checkPermission(r.Context(), "Drives.Create", userID, client)
+	if canCreateDrives {
+		err = shared.RestorePersonalSpace(r.Context(), client, userID)
 		if err != nil {
-			logger.Error().Any("userID", userID).Err(err).Msg("can't disable the personal space")
+			logger.Error().Any("userID", userID).Err(err).Msg("can't ensure the personal space")
 			errorcode.RenderError(w, r, err)
 			return
 		}
-	}
-	if defaultsSettings.IsValidUserRole(appRoleAssignment.GetAppRoleId()) && appRoleAssignment.GetAppRoleId() != settingsService.BundleUUIDRoleUserLight {
-		user, err := g.identityCache.GetUser(r.Context(), userID)
+	} else {
+		err := shared.DisablePersonalSpace(r.Context(), client, userID)
 		if err != nil {
-			errorcode.RenderError(w, r, fmt.Errorf("failed to get user: %w", err))
-			return
-		}
-		err = shared.EnsurePersonalSpace(r.Context(), client, &user)
-		if err != nil {
-			logger.Error().Any("userID", userID).Err(err).Msg("can't ensure the personal space")
+			logger.Error().Any("userID", userID).Err(err).Msg("can't disable the personal space")
 			errorcode.RenderError(w, r, err)
 			return
 		}
@@ -194,4 +190,19 @@ func (g Graph) assignmentToAppRoleAssignment(assignment *settingsmsg.UserRoleAss
 	appRoleAssignment.SetPrincipalId(assignment.AccountUuid)
 	// appRoleAssignment.SetPrincipalDisplayName() // TODO fetch and cache
 	return *appRoleAssignment
+}
+
+func (g Graph) checkPermission(ctx context.Context, perm string, userID string, gwc gateway.GatewayAPIClient) bool {
+	u, err := utils.GetUserWithContext(ctx, &userv1beta1.UserId{OpaqueId: userID}, gwc)
+	if err != nil {
+		g.logger.Error().Err(err).Msg("could not get user")
+		return false
+	}
+
+	if ok, err := utils.CheckPermission(revactx.ContextSetUser(context.Background(), u), perm, gwc); ok {
+		return true
+	} else if err != nil {
+		g.logger.Error().Err(err).Msg("error checking permission")
+	}
+	return false
 }

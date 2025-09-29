@@ -9,7 +9,6 @@ import (
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	cs3rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
 	"github.com/owncloud/reva/v2/pkg/appctx"
 	"github.com/owncloud/reva/v2/pkg/utils"
@@ -51,12 +50,11 @@ func DisablePersonalSpace(ctx context.Context, client gateway.GatewayAPIClient, 
 	return nil
 }
 
-// EnsurePersonalSpace ensures that a personal storage space exists and is enabled for the given user.
+// RestorePersonalSpace ensures that a personal storage space exists and is enabled for the given user.
 // If the personal space is found and is trashed, it restores it.
-// If the personal space does not exist, it creates a new one.
 // Returns an error if the operation fails.
-func EnsurePersonalSpace(ctx context.Context, client gateway.GatewayAPIClient, user *libregraph.User) error {
-	sp, err := getPersonalSpace(ctx, client, user.GetId())
+func RestorePersonalSpace(ctx context.Context, client gateway.GatewayAPIClient, userID string) error {
+	sp, err := getPersonalSpace(ctx, client, userID)
 	if err != nil && !errors.Is(err, ErrNotFound) {
 		return err
 	}

@@ -11,6 +11,7 @@ import (
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	permissions "github.com/cs3org/go-cs3apis/cs3/permissions/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/go-chi/chi/v5"
@@ -85,6 +86,11 @@ var _ = Describe("AppRoleAssignments", func() {
 			StorageSpaces: []*storageprovider.StorageSpace{
 				{Id: &storageprovider.StorageSpaceId{OpaqueId: "ps1"}},
 			},
+		}, nil)
+
+		// Add CheckPermission mock for permission checks
+		gatewayClient.On("CheckPermission", mock.Anything, mock.Anything).Return(&permissions.CheckPermissionResponse{
+			Status: &rpc.Status{Code: rpc.Code_CODE_OK},
 		}, nil)
 
 		rr = httptest.NewRecorder()
@@ -292,6 +298,15 @@ var _ = Describe("AppRoleAssignments", func() {
 			roleService.On("ListRoleAssignments", mock.Anything, mock.Anything, mock.Anything).Return(&settings.ListRoleAssignmentsResponse{Assignments: []*settingsmsg.UserRoleAssignment{}}, nil)
 			roleService.On("AssignRoleToUser", mock.Anything, mock.Anything, mock.Anything).Return(&settings.AssignRoleToUserResponse{Assignment: userRoleAssignment}, nil)
 
+			// Reset the mock and set up UserLight role scenario (permission denied for Drives.Create)
+			gatewayClient.ExpectedCalls = nil
+			gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(&userv1beta1.GetUserResponse{
+				Status: &rpc.Status{Code: rpc.Code_CODE_OK},
+				User:   currentUser,
+			}, nil)
+			gatewayClient.On("CheckPermission", mock.Anything, mock.Anything).Return(&permissions.CheckPermissionResponse{
+				Status: &rpc.Status{Code: rpc.Code_CODE_PERMISSION_DENIED},
+			}, nil)
 			gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&storageprovider.ListStorageSpacesResponse{
 				Status: &rpc.Status{Code: rpc.Code_CODE_OK},
 				StorageSpaces: []*storageprovider.StorageSpace{
@@ -328,6 +343,15 @@ var _ = Describe("AppRoleAssignments", func() {
 			roleService.On("ListRoleAssignments", mock.Anything, mock.Anything, mock.Anything).Return(&settings.ListRoleAssignmentsResponse{Assignments: []*settingsmsg.UserRoleAssignment{}}, nil)
 			roleService.On("AssignRoleToUser", mock.Anything, mock.Anything, mock.Anything).Return(&settings.AssignRoleToUserResponse{Assignment: userRoleAssignment}, nil)
 
+			// Reset the mock and set up non-UserLight role scenario (permission allowed for Drives.Create)
+			gatewayClient.ExpectedCalls = nil
+			gatewayClient.On("CheckPermission", mock.Anything, mock.Anything).Return(&permissions.CheckPermissionResponse{
+				Status: &rpc.Status{Code: rpc.Code_CODE_OK},
+			}, nil)
+			gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(&userv1beta1.GetUserResponse{
+				Status: &rpc.Status{Code: rpc.Code_CODE_OK},
+				User:   currentUser,
+			}, nil)
 			gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&storageprovider.ListStorageSpacesResponse{
 				Status:        &rpc.Status{Code: rpc.Code_CODE_OK},
 				StorageSpaces: []*storageprovider.StorageSpace{},
@@ -369,6 +393,15 @@ var _ = Describe("AppRoleAssignments", func() {
 			}, nil)
 			roleService.On("AssignRoleToUser", mock.Anything, mock.Anything, mock.Anything).Return(&settings.AssignRoleToUserResponse{Assignment: userRoleAssignment}, nil)
 
+			// Reset the mock and set up non-UserLight role scenario (permission allowed for Drives.Create)
+			gatewayClient.ExpectedCalls = nil
+			gatewayClient.On("CheckPermission", mock.Anything, mock.Anything).Return(&permissions.CheckPermissionResponse{
+				Status: &rpc.Status{Code: rpc.Code_CODE_OK},
+			}, nil)
+			gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(&userv1beta1.GetUserResponse{
+				Status: &rpc.Status{Code: rpc.Code_CODE_OK},
+				User:   currentUser,
+			}, nil)
 			gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&storageprovider.ListStorageSpacesResponse{
 				Status:        &rpc.Status{Code: rpc.Code_CODE_OK},
 				StorageSpaces: []*storageprovider.StorageSpace{},
@@ -403,6 +436,15 @@ var _ = Describe("AppRoleAssignments", func() {
 			roleService.On("ListRoleAssignments", mock.Anything, mock.Anything, mock.Anything).Return(&settings.ListRoleAssignmentsResponse{Assignments: []*settingsmsg.UserRoleAssignment{}}, nil)
 			roleService.On("AssignRoleToUser", mock.Anything, mock.Anything, mock.Anything).Return(&settings.AssignRoleToUserResponse{Assignment: userRoleAssignment}, nil)
 
+			// Reset the mock and set up UserLight role scenario with failing DisablePersonalSpace
+			gatewayClient.ExpectedCalls = nil
+			gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(&userv1beta1.GetUserResponse{
+				Status: &rpc.Status{Code: rpc.Code_CODE_OK},
+				User:   currentUser,
+			}, nil)
+			gatewayClient.On("CheckPermission", mock.Anything, mock.Anything).Return(&permissions.CheckPermissionResponse{
+				Status: &rpc.Status{Code: rpc.Code_CODE_PERMISSION_DENIED},
+			}, nil)
 			gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&storageprovider.ListStorageSpacesResponse{
 				Status: &rpc.Status{Code: rpc.Code_CODE_OK},
 				StorageSpaces: []*storageprovider.StorageSpace{
@@ -441,7 +483,19 @@ var _ = Describe("AppRoleAssignments", func() {
 
 			// Reset the mock and make GetUser fail
 			gatewayClient.ExpectedCalls = nil
-			gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(nil, fmt.Errorf("user not found"))
+			gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(nil, fmt.Errorf("GetUser failed"))
+			gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&storageprovider.ListStorageSpacesResponse{
+				Status: &rpc.Status{Code: rpc.Code_CODE_OK},
+				StorageSpaces: []*storageprovider.StorageSpace{
+					{Id: &storageprovider.StorageSpaceId{OpaqueId: "ps1"}},
+				},
+			}, nil)
+			gatewayClient.On("DeleteStorageSpace", mock.Anything, mock.Anything).Return(&storageprovider.DeleteStorageSpaceResponse{
+				Status: &rpc.Status{Code: rpc.Code_CODE_OK},
+			}, nil)
+			gatewayClient.On("CheckPermission", mock.Anything, mock.Anything).Return(&permissions.CheckPermissionResponse{
+				Status: &rpc.Status{Code: rpc.Code_CODE_OK},
+			}, nil)
 
 			ara := libregraph.NewAppRoleAssignmentWithDefaults()
 			ara.SetAppRoleId("some-appRole-ID")
@@ -457,7 +511,7 @@ var _ = Describe("AppRoleAssignments", func() {
 			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
 			svc.CreateAppRoleAssignment(rr, r)
 
-			Expect(rr.Code).To(Equal(http.StatusInternalServerError))
+			Expect(rr.Code).To(Equal(http.StatusCreated))
 		})
 	})
 
