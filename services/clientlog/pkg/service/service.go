@@ -13,12 +13,10 @@ import (
 	group "github.com/cs3org/go-cs3apis/cs3/identity/group/v1beta1"
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
-	link "github.com/cs3org/go-cs3apis/cs3/sharing/link/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"go.opentelemetry.io/otel/trace"
 
 	"github.com/owncloud/reva/v2/pkg/events"
-	"github.com/owncloud/reva/v2/pkg/publicshare"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/owncloud/reva/v2/pkg/storagespace"
 	"github.com/owncloud/reva/v2/pkg/utils"
@@ -134,8 +132,6 @@ func (cl *ClientlogService) processEvent(event events.Event) {
 		users, data, err = processShareEvent(ctx, ref, gwc, event.InitiatorID, uid, gid)
 	}
 
-	tokens := make([]string, 0)
-
 	switch e := event.Event.(type) {
 	default:
 		err = errors.New("unhandled event")
@@ -145,17 +141,13 @@ func (cl *ClientlogService) processEvent(event events.Event) {
 			return
 		}
 		fileEv("postprocessing-finished", e.FileRef)
-		tokens, _ = listPublicShareTokens(ctx, gwc, e.FileRef, cl.log)
 	case events.ItemTrashed:
 		evType = "item-trashed"
 		users, data, err = processItemTrashedEvent(ctx, e.Ref, gwc, event.InitiatorID, e.ID)
-		tokens, _ = listPublicShareTokens(ctx, gwc, e.Ref, cl.log)
 	case events.ItemRestored:
 		fileEv("item-restored", e.Ref)
-		tokens, _ = listPublicShareTokens(ctx, gwc, e.Ref, cl.log)
 	case events.ContainerCreated:
 		fileEv("folder-created", e.Ref)
-		tokens, _ = listPublicShareTokens(ctx, gwc, e.Ref, cl.log)
 	case events.ItemMoved:
 		// we send a dedicated event in case the item was only renamed
 		if isRename(e.OldReference, e.Ref) {
@@ -163,16 +155,12 @@ func (cl *ClientlogService) processEvent(event events.Event) {
 		} else {
 			fileEv("item-moved", e.Ref)
 		}
-		tokens, _ = listPublicShareTokens(ctx, gwc, e.Ref, cl.log)
 	case events.FileLocked:
 		fileEv("file-locked", e.Ref)
-		tokens, _ = listPublicShareTokens(ctx, gwc, e.Ref, cl.log)
 	case events.FileUnlocked:
 		fileEv("file-unlocked", e.Ref)
-		tokens, _ = listPublicShareTokens(ctx, gwc, e.Ref, cl.log)
 	case events.FileTouched:
 		fileEv("file-touched", e.Ref)
-		tokens, _ = listPublicShareTokens(ctx, gwc, e.Ref, cl.log)
 	case events.SpaceShared:
 		r, _ := storagespace.ParseReference(e.ID.GetOpaqueId())
 		shareEv("space-member-added", &r, e.GranteeUserID, e.GranteeGroupID)
@@ -204,9 +192,6 @@ func (cl *ClientlogService) processEvent(event events.Event) {
 	}
 
 	// II) instruct sse service to send the information
-	if len(tokens) > 0 {
-		users = append(users, tokens...)
-	}
 	if err := cl.sendSSE(users, evType, data); err != nil {
 		cl.log.Error().Err(err).Interface("userIDs", users).Str("eventid", event.ID).Msg("failed to store event for user")
 		return
@@ -334,42 +319,4 @@ func backchannelLogoutEvent(e events.BackchannelLogout) (string, []string, Backc
 		UserID:    e.Executant.GetOpaqueId(),
 		Timestamp: e.Timestamp.String(),
 	}
-}
-
-func listPublicShareTokens(ctx context.Context, gwc gateway.GatewayAPIClient, ref *provider.Reference, log log.Logger) ([]string, error) {
-	tokens := make([]string, 0)
-	info, err := utils.GetResource(ctx, ref, gwc)
-	if err != nil {
-		log.Error().Err(err).Str("event", "listPublicShareTokens").Msg("error getting ResourceInfo")
-		return tokens, err
-	}
-
-	if utils.IsSpaceRoot(info) {
-		return tokens, nil
-	}
-
-	req := link.ListPublicSharesRequest{
-		Filters: []*link.ListPublicSharesRequest_Filter{publicshare.ResourceIDFilter(info.GetId())},
-	}
-
-	res, err := gwc.ListPublicShares(ctx, &req)
-	if err != nil {
-		log.Error().Err(err).Str("event", "listPublicShareTokens").Msg("error getting ListPublicShares")
-		return tokens, err
-	}
-
-	if res.GetStatus().GetCode() != rpc.Code_CODE_OK {
-		log.Error().Str("event", "listPublicShareTokens").Msg("error getting ListPublicShares " + res.GetStatus().GetCode().String())
-		return tokens, fmt.Errorf("error getting ListPublicShares %s", res.GetStatus().GetCode().String())
-	}
-	for _, s := range res.GetShare() {
-		tokens = append(tokens, s.GetToken())
-	}
-
-	t, err := listPublicShareTokens(ctx, gwc, &provider.Reference{ResourceId: info.GetParentId()}, log)
-	if err != nil {
-		log.Error().Err(err).Str("event", "listPublicShareTokens").Msg("error getting parent listPublicShareTokens")
-		return tokens, err
-	}
-	return append(tokens, t...), nil
 }
