@@ -34,7 +34,6 @@ var (
 		"/ocs/v2.php/cloud/capabilities",
 		"/ocs/v1.php/cloud/user/signing-key",
 		"/ocs/v2.php/cloud/user/signing-key",
-		"/ocs/v2.php/apps/notifications/api/v1/notifications/sse",
 	}
 )
 
