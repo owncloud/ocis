@@ -1025,7 +1025,7 @@ github.com/nats-io/nats-server/v2/server/stree
 github.com/nats-io/nats-server/v2/server/sysmem
 github.com/nats-io/nats-server/v2/server/thw
 github.com/nats-io/nats-server/v2/server/tpm
-# github.com/nats-io/nats.go v1.45.0
+# github.com/nats-io/nats.go v1.46.0
 ## explicit; go 1.23.0
 github.com/nats-io/nats.go
 github.com/nats-io/nats.go/encoders/builtin
@@ -1230,7 +1230,7 @@ github.com/orcaman/concurrent-map
 # github.com/owncloud/libre-graph-api-go v1.0.5-0.20250217093259-fa3804be6c27
 ## explicit; go 1.18
 github.com/owncloud/libre-graph-api-go
-# github.com/owncloud/reva/v2 v2.0.0-20250925134851-02c7681fe2b3
+# github.com/owncloud/reva/v2 v2.0.0-20251001134122-cb98fe521deb
 ## explicit; go 1.24.0
 github.com/owncloud/reva/v2/cmd/revad/internal/grace
 github.com/owncloud/reva/v2/cmd/revad/runtime
