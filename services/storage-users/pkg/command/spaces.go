@@ -3,11 +3,13 @@ package command
 import (
 	"context"
 	"fmt"
+	"os"
 	"time"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	"github.com/olekukonko/tablewriter"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	zlog "github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/storage-users/pkg/config"
@@ -19,6 +21,8 @@ import (
 
 const (
 	_spaceTypePersonal = "personal"
+	_spaceTypeProject  = "project"
+
 	_spaceStateTrashed = "trashed"
 )
 
@@ -33,21 +37,28 @@ func Spaces(cfg *config.Config) *cli.Command {
 	}
 }
 
-// PurgeDisabledSpaces cli command purges disabled personal spaces.
+// PurgeDisabledSpaces cli command purges disabled spaces 'personal' or 'project'.
 //
 // Note: The current implementation uses space modification time as a heuristic
 // to determine if a space should be purged.
 // The default value of the dry-run flag is true to avoid accidental purging.
 func PurgeDisabledSpaces(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:  "purge-disabled",
-		Usage: "Purge disabled personal spaces that exceed the retention period",
+		Name:  "purge",
+		Usage: "Purge disabled spaces 'personal' or 'project' that exceed the retention period",
 		Flags: []cli.Flag{
 			&cli.BoolFlag{
 				Name:    "dry-run",
 				Usage:   "Only show what would be purged without actually purging",
 				Value:   true, // default must be true to avoid accidental purging!
 				Aliases: []string{"d"},
+			},
+			&cli.StringFlag{
+				Name:     "type",
+				Usage:    "Type of spaces to purge (e.g., 'personal', 'project')",
+				Value:    _spaceTypePersonal,
+				Required: true,
+				Aliases:  []string{"t"},
 			},
 			&cli.StringFlag{
 				Name:     "space-id",
@@ -75,9 +86,12 @@ func PurgeDisabledSpaces(cfg *config.Config) *cli.Command {
 		Action: func(c *cli.Context) error {
 			log := cliLogger(c.Bool("verbose"))
 			dryRun := c.Bool("dry-run")
+			spaceType := c.String("type")
 			spaceID := c.String("space-id")
 			retentionPeriod := c.String("retention-period")
-			verbose := c.Bool("verbose")
+			if spaceType != _spaceTypePersonal && spaceType != _spaceTypeProject {
+				return fmt.Errorf("invalid space type: %s", spaceType)
+			}
 
 			// Parse retention period
 			duration, err := time.ParseDuration(retentionPeriod)
@@ -100,44 +114,51 @@ func PurgeDisabledSpaces(cfg *config.Config) *cli.Command {
 			var spacesToProcess []*provider.StorageSpace
 			if spaceID != "" {
 				// Get specific space
-				space, err := getSpaceByID(ctx, client, spaceID)
+				space, err := getSpaceByID(ctx, client, spaceID, spaceType)
 				if err != nil {
-					return fmt.Errorf("failed to get space %s: %w", spaceID, err)
+					return fmt.Errorf("failed to get space: %w", err)
 				}
-				spacesToProcess = []*provider.StorageSpace{space}
+				if shouldPurgeSpace(space, duration, log, spaceType) {
+					spacesToProcess = []*provider.StorageSpace{space}
+				}
 			} else {
-				// Get all personal spaces
-				spaces, err := getAllPersonalSpaces(ctx, client)
+				// Get all spaces
+				spaces, err := getAllSpaces(ctx, client, spaceType)
 				if err != nil {
 					return fmt.Errorf("failed to list spaces: %w", err)
 				}
-				spacesToProcess = spaces
-			}
-
-			if verbose {
-				log.Info().Msgf("Found %d spaces to process", len(spacesToProcess))
-			}
-
-			purgedCount := 0
-			for _, space := range spacesToProcess {
-				shouldPurge := shouldPurgeSpace(space, duration, log)
-				if !shouldPurge {
-					continue
-				}
-
-				mtime := utils.TSToTime(space.GetMtime()).Truncate(time.Second)
-				if dryRun {
-					log.Info().Msgf("Would purge space: %s (disabled at: %v)", space.Id.OpaqueId, mtime)
-					purgedCount++
-				} else {
-					err := purgeSpace(ctx, client, space)
-					if err != nil {
-						log.Error().Err(err).Msgf("Failed to purge space %s (disabled at: %v)", space.Id.OpaqueId, mtime)
-						continue
+				for _, space := range spaces {
+					if shouldPurgeSpace(space, duration, log, spaceType) {
+						spacesToProcess = append(spacesToProcess, space)
 					}
-					log.Info().Msgf("Purged space: %s (disabled at: %v)", space.Id.OpaqueId, mtime)
-					purgedCount++
 				}
+			}
+
+			log.Info().Msgf("Found %d spaces to process", len(spacesToProcess))
+			purgedCount := 0
+			if len(spacesToProcess) > 0 {
+				table := tablewriter.NewTable(os.Stdout)
+				table.Header("id", "space type", "space name", "disabled at")
+				for _, space := range spacesToProcess {
+
+					mtime := utils.TSToTime(space.GetMtime()).Truncate(time.Second).UTC().Format(time.RFC3339)
+					spaceId := space.GetId().GetOpaqueId()
+					table.Append([]string{spaceId, space.GetSpaceType(), space.GetName(), mtime})
+
+					if dryRun {
+						log.Info().Msgf("Would purge space: %s (disabled at: %v)", spaceId, mtime)
+						purgedCount++
+					} else {
+						err := purgeSpace(ctx, client, space)
+						if err != nil {
+							log.Error().Err(err).Msgf("Failed to purge space %s (disabled at: %v)", spaceId, mtime)
+							continue
+						}
+						log.Info().Msgf("Purged space: %s (disabled at: %v)", spaceId, mtime)
+						purgedCount++
+					}
+				}
+				table.Render()
 			}
 
 			if dryRun {
@@ -152,9 +173,8 @@ func PurgeDisabledSpaces(cfg *config.Config) *cli.Command {
 }
 
 // getSpaceByID retrieves a specific space by ID
-func getSpaceByID(ctx context.Context, client gateway.GatewayAPIClient, spaceID string) (*provider.StorageSpace, error) {
+func getSpaceByID(ctx context.Context, client gateway.GatewayAPIClient, spaceID string, spaceType string) (*provider.StorageSpace, error) {
 	req := &provider.ListStorageSpacesRequest{
-		Opaque: utils.AppendPlainToOpaque(nil, _spaceStateTrashed, _spaceStateTrashed),
 		Filters: []*provider.ListStorageSpacesRequest_Filter{
 			{
 				Type: provider.ListStorageSpacesRequest_Filter_TYPE_ID,
@@ -167,7 +187,7 @@ func getSpaceByID(ctx context.Context, client gateway.GatewayAPIClient, spaceID 
 			{
 				Type: provider.ListStorageSpacesRequest_Filter_TYPE_SPACE_TYPE,
 				Term: &provider.ListStorageSpacesRequest_Filter_SpaceType{
-					SpaceType: _spaceTypePersonal,
+					SpaceType: spaceType,
 				},
 			},
 		},
@@ -178,26 +198,25 @@ func getSpaceByID(ctx context.Context, client gateway.GatewayAPIClient, spaceID 
 		return nil, err
 	}
 
-	if resp.Status.Code != rpc.Code_CODE_OK {
-		return nil, fmt.Errorf("failed to list spaces: %s", resp.Status.Code)
+	if resp.GetStatus().GetCode() != rpc.Code_CODE_OK {
+		return nil, fmt.Errorf("failed to list spaces: %s", resp.GetStatus().GetCode())
 	}
 
-	if len(resp.StorageSpaces) == 0 {
+	if len(resp.GetStorageSpaces()) == 0 {
 		return nil, fmt.Errorf("space not found: %s", spaceID)
 	}
 
-	return resp.StorageSpaces[0], nil
+	return resp.GetStorageSpaces()[0], nil
 }
 
-// getAllPersonalSpaces retrieves all personal spaces
-func getAllPersonalSpaces(ctx context.Context, client gateway.GatewayAPIClient) ([]*provider.StorageSpace, error) {
+// getAllSpaces retrieves all spaces of a given type
+func getAllSpaces(ctx context.Context, client gateway.GatewayAPIClient, spaceType string) ([]*provider.StorageSpace, error) {
 	req := &provider.ListStorageSpacesRequest{
-		Opaque: utils.AppendPlainToOpaque(nil, _spaceStateTrashed, _spaceStateTrashed),
 		Filters: []*provider.ListStorageSpacesRequest_Filter{
 			{
 				Type: provider.ListStorageSpacesRequest_Filter_TYPE_SPACE_TYPE,
 				Term: &provider.ListStorageSpacesRequest_Filter_SpaceType{
-					SpaceType: _spaceTypePersonal,
+					SpaceType: spaceType,
 				},
 			},
 		},
@@ -208,17 +227,17 @@ func getAllPersonalSpaces(ctx context.Context, client gateway.GatewayAPIClient) 
 		return nil, err
 	}
 
-	if resp.Status.Code != rpc.Code_CODE_OK {
-		return nil, fmt.Errorf("failed to list spaces: %s", resp.Status.Code)
+	if resp.GetStatus().GetCode() != rpc.Code_CODE_OK {
+		return nil, fmt.Errorf("failed to list spaces: %s", resp.GetStatus().GetCode())
 	}
 
-	return resp.StorageSpaces, nil
+	return resp.GetStorageSpaces(), nil
 }
 
 // shouldPurgeSpace determines if a space should be purged based on retention period.
-func shouldPurgeSpace(space *provider.StorageSpace, retentionPeriod time.Duration, log zlog.Logger) bool {
-	// Only process personal spaces
-	if space.SpaceType != _spaceTypePersonal {
+func shouldPurgeSpace(space *provider.StorageSpace, retentionPeriod time.Duration, log zlog.Logger, spaceType string) bool {
+	// Only process spaces of the given type
+	if space.GetSpaceType() != spaceType {
 		return false
 	}
 	// Only process trashed spaces
@@ -248,16 +267,14 @@ func purgeSpace(ctx context.Context, client gateway.GatewayAPIClient, space *pro
 	resp, err := client.DeleteStorageSpace(ctx, &provider.DeleteStorageSpaceRequest{
 		Opaque: purgeFlag,
 		Id: &provider.StorageSpaceId{
-			OpaqueId: space.Id.OpaqueId,
+			OpaqueId: space.GetId().GetOpaqueId(),
 		},
 	})
-
 	if err != nil {
 		return fmt.Errorf("failed to delete storage space: %w", err)
 	}
-
-	if resp.Status.Code != rpc.Code_CODE_OK {
-		return fmt.Errorf("delete storage space failed: %s", resp.Status.Code)
+	if resp.GetStatus().GetCode() != rpc.Code_CODE_OK {
+		return fmt.Errorf("delete storage space failed: %s", resp.GetStatus().GetCode())
 	}
 
 	return nil
