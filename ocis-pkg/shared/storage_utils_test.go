@@ -72,15 +72,11 @@ func TestEnsurePersonalSpace(t *testing.T) {
 		require.NoError(t, err)
 	})
 
-	t.Run("creates when not found", func(t *testing.T) {
+	t.Run("no-op when not found", func(t *testing.T) {
 		gw := cs3mocks.NewGatewayAPIClient(t)
 		gw.EXPECT().ListStorageSpaces(mock.Anything, mock.Anything, mock.Anything).Return(&storageprovider.ListStorageSpacesResponse{
 			Status:        okStatus(),
 			StorageSpaces: []*storageprovider.StorageSpace{},
-		}, nil).Once()
-
-		gw.EXPECT().CreateStorageSpace(mock.Anything, mock.Anything, mock.Anything).Return(&storageprovider.CreateStorageSpaceResponse{
-			Status: okStatus(),
 		}, nil).Once()
 
 		user := libregraph.NewUser("User Three", "user3")
@@ -90,15 +86,11 @@ func TestEnsurePersonalSpace(t *testing.T) {
 		require.NoError(t, err)
 	})
 
-	t.Run("create returns already exists treated as success", func(t *testing.T) {
+	t.Run("no-op when not found (empty spaces)", func(t *testing.T) {
 		gw := cs3mocks.NewGatewayAPIClient(t)
 		gw.EXPECT().ListStorageSpaces(mock.Anything, mock.Anything, mock.Anything).Return(&storageprovider.ListStorageSpacesResponse{
 			Status:        okStatus(),
 			StorageSpaces: []*storageprovider.StorageSpace{},
-		}, nil).Once()
-
-		gw.EXPECT().CreateStorageSpace(mock.Anything, mock.Anything, mock.Anything).Return(&storageprovider.CreateStorageSpaceResponse{
-			Status: status(cs3rpc.Code_CODE_ALREADY_EXISTS, "exists"),
 		}, nil).Once()
 
 		user := libregraph.NewUser("User Four", "user4")
