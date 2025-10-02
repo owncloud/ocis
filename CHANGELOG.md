@@ -85,7 +85,6 @@ The following sections list the changes for unreleased.
 * Enhancement - Allow markdown output for unified-roles-table: [#11581](https://github.com/owncloud/ocis/pull/11581)
 * Enhancement - Added the OnlyOffice license support: [#11624](https://github.com/owncloud/ocis/pull/11624)
 * Enhancement - Bump Web to 12.0.4: [#11625](https://github.com/owncloud/ocis/pull/11625)
-* Enhancement - The sse support added for the public links: [#11627](https://github.com/owncloud/ocis/pull/11627)
 * Enhancement - Update the ocis_full deployment example: [#11666](https://github.com/owncloud/ocis/pull/11666)
 * Enhancement - Bump Reva version: [#11669](https://github.com/owncloud/ocis/pull/11669)
 * Enhancement - Added user type upgrade/downgrade: [#11678](https://github.com/owncloud/ocis/pull/11678)
@@ -232,12 +231,6 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/11625
    https://github.com/owncloud/web/releases/tag/v12.0.4
-
-* Enhancement - The sse support added for the public links: [#11627](https://github.com/owncloud/ocis/pull/11627)
-
-   The sse support added for the public links
-
-   https://github.com/owncloud/ocis/pull/11627
 
 * Enhancement - Update the ocis_full deployment example: [#11666](https://github.com/owncloud/ocis/pull/11666)
 
