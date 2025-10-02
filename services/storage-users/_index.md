@@ -1,6 +1,6 @@
 ---
 title: Storage-Users
-date: 2025-10-02T09:04:36.229629383Z
+date: 2025-10-02T12:09:53.104626102Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/storage-users
@@ -22,6 +22,8 @@ Purpose and description to be added
 * [CLI Commands](#cli-commands)
   * [Manage Unfinished Uploads](#manage-unfinished-uploads)
     * [Sessions command](#sessions-command)
+    * [Command Examples](#command-examples)
+    * [Delete Stale Nodes command](#delete-stale-nodes-command)
     * [Command Examples](#command-examples)
   * [Manage Spaces](#manage-spaces)
     * [Purge (delete permanently) Disabled Spaces](#purge-(delete-permanently)-disabled-spaces)
@@ -168,6 +170,50 @@ ocis storage-users uploads sessions --expired=true --clean
 # resumes all uploads that are processing and are not virus infected
 ocis storage-users uploads sessions --processing=true --has-virus=false --resume
 ```
+
+
+#### Delete Stale Nodes command
+
+This command allows to remove (or revert) nodes that are stale, meaning they are in postprocessing but their upload session is gone.
+It will check all nodes that are in postprocessing and find those without an upload session. Then it will delete the node if there are no other versions. If there are other versions, it will instead revert the node to the previous version.
+
+```bash
+    ~/ocis storage-users uploads delete-stale-nodes <commandoptions>
+```
+```
+NAME:
+   ocis storage-users uploads delete-stale-nodes - Delete (or revert) all nodes in processing state that are not referenced by any upload session
+
+USAGE:
+   ocis storage-users uploads delete-stale-nodes [command options]
+
+OPTIONS:
+   --spaceid value  Space ID to check for processing nodes (omit to check all spaces)
+   --dry-run        Only show what would be deleted without actually deleting (default: true)
+   --verbose        Enable verbose logging (default: false)
+   --help, -h       show help
+```
+
+#### Command Examples
+
+Dry run to see what would be deleted (recommended first step)
+
+```bash
+ocis storage-users uploads delete-stale-nodes
+```
+
+Set `--dry-run=false` to actually delete the stale nodes
+
+```bash
+ocis storage-users uploads delete-stale-nodes --dry-run=false
+```
+
+Use `--verbose` to get more information about what is happening
+
+```bash
+ocis storage-users uploads delete-stale-nodes --dry-run=false --verbose
+```
+
 
 ### Manage Spaces
 
