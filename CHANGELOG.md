@@ -79,6 +79,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add GetPermission API: [#8616](https://github.com/owncloud/ocis/issues/8616)
 * Enhancement - Bump importer app: [#10880](https://github.com/owncloud/ocis/pull/10880)
 * Enhancement - Allow scaling the search service: [#11029](https://github.com/owncloud/ocis/pull/11029)
+* Enhancement - Add Cli to delete personal spaces: [#11555](https://github.com/owncloud/ocis/pull/11555)
 * Enhancement - Add custom labels for app tokens: [#11555](https://github.com/owncloud/ocis/pull/11555)
 * Enhancement - HTTP Strict Transport Security: [#11568](https://github.com/owncloud/ocis/pull/11568)
 * Enhancement - Allow markdown output for unified-roles-table: [#11581](https://github.com/owncloud/ocis/pull/11581)
@@ -191,6 +192,12 @@ The following sections list the changes for unreleased.
    search services can access the index as long as there is no operation ongoing.
 
    https://github.com/owncloud/ocis/pull/11029
+
+* Enhancement - Add Cli to delete personal spaces: [#11555](https://github.com/owncloud/ocis/pull/11555)
+
+   Add Cli to delete the trashed personal spaces.
+
+   https://github.com/owncloud/ocis/pull/11555
 
 * Enhancement - Add custom labels for app tokens: [#11555](https://github.com/owncloud/ocis/pull/11555)
 
