@@ -459,47 +459,6 @@ var _ = Describe("AppRoleAssignments", func() {
 
 			Expect(rr.Code).To(Equal(http.StatusInternalServerError))
 		})
-
-		It("returns error when EnsurePersonalSpace fails for non-UserLight role", func() {
-			userRoleAssignment := &settingsmsg.UserRoleAssignment{
-				Id:          "some-appRoleAssignment-ID",
-				AccountUuid: "user1",
-				RoleId:      "some-appRole-ID",
-			}
-			roleService.On("ListRoleAssignments", mock.Anything, mock.Anything, mock.Anything).Return(&settings.ListRoleAssignmentsResponse{Assignments: []*settingsmsg.UserRoleAssignment{}}, nil)
-			roleService.On("AssignRoleToUser", mock.Anything, mock.Anything, mock.Anything).Return(&settings.AssignRoleToUserResponse{Assignment: userRoleAssignment}, nil)
-
-			// Reset the mock and set up the failing scenario
-			gatewayClient.ExpectedCalls = nil
-			gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(&userv1beta1.GetUserResponse{
-				Status: &rpc.Status{Code: rpc.Code_CODE_OK},
-				User:   currentUser,
-			}, nil)
-			gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&storageprovider.ListStorageSpacesResponse{
-				Status:        &rpc.Status{Code: rpc.Code_CODE_OK},
-				StorageSpaces: []*storageprovider.StorageSpace{},
-			}, nil)
-			gatewayClient.On("CreateStorageSpace", mock.Anything, mock.Anything).Return(&storageprovider.CreateStorageSpaceResponse{
-				Status: &rpc.Status{Code: rpc.Code_CODE_INTERNAL, Message: "internal error"},
-			}, nil)
-
-			ara := libregraph.NewAppRoleAssignmentWithDefaults()
-			ara.SetAppRoleId("some-appRole-ID")
-			ara.SetPrincipalId("user1")
-			ara.SetResourceId(cfg.Application.ID)
-
-			araJson, err := json.Marshal(ara)
-			Expect(err).ToNot(HaveOccurred())
-
-			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/users/user1/appRoleAssignments", bytes.NewBuffer(araJson))
-			rctx := chi.NewRouteContext()
-			rctx.URLParams.Add("userID", "user1")
-			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
-			svc.CreateAppRoleAssignment(rr, r)
-
-			Expect(rr.Code).To(Equal(http.StatusInternalServerError))
-		})
-
 	})
 
 	Describe("DeleteAppRoleAssignment", func() {

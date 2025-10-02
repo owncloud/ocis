@@ -78,23 +78,6 @@ func EnsurePersonalSpace(ctx context.Context, client gateway.GatewayAPIClient, u
 		}
 		return nil
 	}
-	if errors.Is(err, ErrNotFound) {
-		req := &storageprovider.CreateStorageSpaceRequest{
-			Type:  _spaceTypePersonal,
-			Owner: &userv1beta1.User{Id: &userv1beta1.UserId{OpaqueId: user.GetId()}},
-			Name:  user.GetDisplayName(),
-		}
-		cRes, cerr := client.CreateStorageSpace(ctx, req)
-		if cerr != nil {
-			return fmt.Errorf("failed to create personal space: %w", cerr)
-		}
-		if cRes.GetStatus().GetCode() == cs3rpc.Code_CODE_ALREADY_EXISTS {
-			return nil
-		}
-		if cRes.GetStatus().GetCode() != cs3rpc.Code_CODE_OK {
-			return errorcode.NewFromStatusCode(cRes.GetStatus().GetCode(), cRes.GetStatus().GetMessage())
-		}
-	}
 	return nil
 }
 
