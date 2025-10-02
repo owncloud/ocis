@@ -88,6 +88,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Update the ocis_full deployment example: [#11666](https://github.com/owncloud/ocis/pull/11666)
 * Enhancement - Bump Reva version: [#11669](https://github.com/owncloud/ocis/pull/11669)
 * Enhancement - Added user type upgrade/downgrade: [#11678](https://github.com/owncloud/ocis/pull/11678)
+* Enhancement - Respect changed user type in OIDC claim: [#11684](https://github.com/owncloud/ocis/pull/11684)
 * Enhancement - Drop remote.php prefix: [#11687](https://github.com/owncloud/ocis/pull/11687)
 * Enhancement - Add configurable display attributes: [#11695](https://github.com/owncloud/ocis/pull/11695)
 
@@ -253,6 +254,13 @@ The following sections list the changes for unreleased.
    upgrade/downgrade
 
    https://github.com/owncloud/ocis/pull/11678
+
+* Enhancement - Respect changed user type in OIDC claim: [#11684](https://github.com/owncloud/ocis/pull/11684)
+
+   Ensure that OIDC login correctly interprets user type changes to disable/enable
+   personal spaces on user type upgrade/downgrade
+
+   https://github.com/owncloud/ocis/pull/11684
 
 * Enhancement - Drop remote.php prefix: [#11687](https://github.com/owncloud/ocis/pull/11687)
 
