@@ -89,6 +89,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Bump Reva version: [#11669](https://github.com/owncloud/ocis/pull/11669)
 * Enhancement - Added user type upgrade/downgrade: [#11678](https://github.com/owncloud/ocis/pull/11678)
 * Enhancement - Drop remote.php prefix: [#11687](https://github.com/owncloud/ocis/pull/11687)
+* Enhancement - Add configurable display attributes: [#11695](https://github.com/owncloud/ocis/pull/11695)
 
 ## Details
 
@@ -259,6 +260,14 @@ The following sections list the changes for unreleased.
    returned in responses.
 
    https://github.com/owncloud/ocis/pull/11687
+
+* Enhancement - Add configurable display attributes: [#11695](https://github.com/owncloud/ocis/pull/11695)
+
+   We added new configuration options `UserSearchDisplayedAttributes` which allows
+   to configure the attributes that are displayed in the user search results. We
+   are also deprecating the `ShowUserEmailInResults` configuration option.
+
+   https://github.com/owncloud/ocis/pull/11695
 
 # Changelog for [7.2.0] (2025-07-14)
 
