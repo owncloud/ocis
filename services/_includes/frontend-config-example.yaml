@@ -81,6 +81,7 @@ default_upload_protocol: tus
 enable_federated_sharing_incoming: false
 enable_federated_sharing_outgoing: false
 search_min_length: 3
+user_search_displayed_attributes: []
 edition: Community
 disable_sse: false
 default_link_permissions: 1

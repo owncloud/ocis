@@ -60,6 +60,7 @@ api:
   graph_assign_default_user_role: true
   graph_identity_search_min_length: 3
   show_email_in_results: false
+  user_search_displayed_attributes: []
 reva:
   address: com.owncloud.api.gateway
   tls:
