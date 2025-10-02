@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/fs"
+	"log"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -16,6 +17,7 @@ import (
 	"github.com/urfave/cli/v2"
 
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	"github.com/owncloud/ocis/v2/services/storage-users/pkg/config"
 	"github.com/owncloud/ocis/v2/services/storage-users/pkg/config/parser"
@@ -376,9 +378,18 @@ func DeleteStaleProcessingNodes(cfg *config.Config) *cli.Command {
 				}
 			}
 
+			var stream events.Stream
+			if !dryRun {
+				s, err := event.NewStream(cfg)
+				if err != nil {
+					log.Fatalf("Failed to create event stream: %v", err)
+				}
+				stream = s
+			}
+
 			staleCount := 0
 			for _, spaceID := range spaceIDs {
-				staleCount += deleteStaleUploads(cfg, spaceID, dryRun, verbose)
+				staleCount += deleteStaleUploads(cfg, spaceID, dryRun, verbose, stream)
 			}
 
 			if verbose {
@@ -410,7 +421,7 @@ func globSpaceIDs(cfg *config.Config) []string {
 }
 
 // delete stale processing nodes for a given spaceID
-func deleteStaleUploads(cfg *config.Config, spaceID string, dryRun bool, verbose bool) int {
+func deleteStaleUploads(cfg *config.Config, spaceID string, dryRun bool, verbose bool, stream events.Stream) int {
 	if verbose {
 		fmt.Printf("\nDeleting stale processing nodes for space: %s\n", spaceID)
 	}
@@ -440,7 +451,7 @@ func deleteStaleUploads(cfg *config.Config, spaceID string, dryRun bool, verbose
 
 	staleCount := 0
 	for _, path := range mpkFiles {
-		staleCount += deleteStaleNode(cfg, path, dryRun, verbose)
+		staleCount += deleteStaleNode(cfg, path, dryRun, verbose, stream)
 	}
 
 	if verbose {
@@ -452,7 +463,7 @@ func deleteStaleUploads(cfg *config.Config, spaceID string, dryRun bool, verbose
 
 // deleteStaleNode deletes a stale node: if it is not referenced by any upload session
 // returns 1 if the node stale node was detected for deletion, 0 otherwise, for counting purposes
-func deleteStaleNode(cfg *config.Config, path string, dryRun bool, verbose bool) int {
+func deleteStaleNode(cfg *config.Config, path string, dryRun bool, verbose bool, stream events.Stream) int {
 	nodeDir := filepath.Dir(path)
 
 	// Read .mpk file to get processing info
@@ -495,9 +506,18 @@ func deleteStaleNode(cfg *config.Config, path string, dryRun bool, verbose bool)
 		return 1
 	}
 
-	if err := os.RemoveAll(nodeDir); err != nil {
-		fmt.Fprintf(os.Stderr, "%sError deleting stale node %s: %v\n", LOG_INDENT_L2, nodeDir, err)
+	rid := extractResourceID(strings.TrimSuffix(path, ".mpk"))
+	if rid == nil {
+		fmt.Fprintf(os.Stderr, "Failed to extract resource ID from path %s\n", path)
 		return 0
+	}
+
+	if err := events.Publish(context.Background(), stream, events.RevertRevision{
+		ResourceID: rid,
+		Timestamp:  utils.TSNow(),
+	}); err != nil {
+		// if publishing fails there is no need to try publishing other events - they will fail too.
+		log.Fatalf("Failed to send revert revision event for node '%s'\n", path)
 	}
 
 	if verbose {
@@ -517,4 +537,22 @@ func extractProcessingID(mpkData map[string]interface{}) string {
 		}
 	}
 	return processingID
+}
+
+func extractResourceID(path string) *provider.ResourceId {
+	// path looks like /.../storage/users/spaces/f2/06bccf-0f10-4070-9e63-40943f060667/nodes/5b/ba/1e/a7/-f185-4f31-8342-ed4b5743f096
+	parts := strings.Split(path, "spaces")
+	if len(parts) < 2 {
+		return nil
+	}
+
+	spaceParts := strings.Split(parts[1], "nodes")
+	if len(spaceParts) < 2 {
+		return nil
+	}
+
+	return &provider.ResourceId{
+		SpaceId:  strings.ReplaceAll(spaceParts[0], "/", ""),
+		OpaqueId: strings.ReplaceAll(spaceParts[1], "/", ""),
+	}
 }
