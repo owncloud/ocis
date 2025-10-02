@@ -4,14 +4,11 @@ import (
 	"net/http"
 	"time"
 
-	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
-
 	"github.com/go-chi/chi/v5"
 	"github.com/r3labs/sse/v2"
 
 	revactx "github.com/owncloud/reva/v2/pkg/ctx"
 	"github.com/owncloud/reva/v2/pkg/events"
-	"github.com/owncloud/reva/v2/pkg/utils"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/sse/pkg/config"
@@ -76,17 +73,6 @@ func (s SSE) HandleSSE(w http.ResponseWriter, r *http.Request) {
 	}
 
 	uid := u.GetId().GetOpaqueId()
-
-	if len(utils.ReadPlainFromOpaque(u.Opaque, "public-share-role")) > 0 {
-		var impersonator userpb.User
-		if err := utils.ReadJSONFromOpaque(u.Opaque, "impersonating-user", &impersonator); err != nil {
-			s.l.Error().Msg("sse: public share token not found")
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-		uid = impersonator.GetId().GetOpaqueId()
-	}
-
 	if uid == "" {
 		s.l.Error().Msg("sse: user in context is broken")
 		w.WriteHeader(http.StatusInternalServerError)
