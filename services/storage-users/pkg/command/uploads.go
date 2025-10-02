@@ -336,7 +336,7 @@ func buildInfo(filter storage.UploadSessionFilter) string {
 func DeleteStaleProcessingNodes(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "delete-stale-nodes",
-		Usage: "Delete all nodes in processing state that are not referenced by any upload session",
+		Usage: "Delete (or revert) all nodes in processing state that are not referenced by any upload session",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:     "spaceid",
