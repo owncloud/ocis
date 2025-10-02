@@ -1,6 +1,6 @@
 ---
 title: Storage-Users
-date: 2025-10-02T07:17:17.258910921Z
+date: 2025-10-02T07:29:01.705684893Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/storage-users
@@ -23,6 +23,8 @@ Purpose and description to be added
   * [Manage Unfinished Uploads](#manage-unfinished-uploads)
     * [Sessions command](#sessions-command)
     * [Command Examples](#command-examples)
+  * [Manage Spaces](#manage-spaces)
+    * [Purge (delete permanently) Disabled Spaces](#purge-(delete-permanently)-disabled-spaces)
   * [Manage Trash-Bin Items](#manage-trash-bin-items)
     * [Purge Expired](#purge-expired)
     * [List and Restore Trash-Bins Items](#list-and-restore-trash-bins-items)
@@ -166,6 +168,55 @@ ocis storage-users uploads sessions --expired=true --clean
 # resumes all uploads that are processing and are not virus infected
 ocis storage-users uploads sessions --processing=true --has-virus=false --resume
 ```
+
+### Manage Spaces
+
+This command set provides commands to manage spaces, including purging disabled spaces that exceed the retention period.
+
+```bash
+ocis storage-users spaces <command>
+```
+
+```plaintext
+COMMANDS:
+   purge  Purge disabled spaces that exceed the retention period
+```
+
+#### Purge (delete permanently) Disabled Spaces
+
+Purge disabled spaces of a specific type that have exceeded the retention period. This command helps delete permanently the spaces that have been disabled and are no longer needed.
+
+```bash
+ocis storage-users spaces purge [command options]
+```
+
+**Options:**
+- `--dry-run, -d` - Only show what would be purged without actually purging (default: true)
+- `--type, -t` - Type of spaces to purge: 'personal' or 'project' (required)
+- `--space-id, -s` - Specific space ID to purge (optional, omit to process all spaces)
+- `--retention-period, -r` - Retention period for disabled spaces (default: '336h', e.g., '14d', '720h')
+- `--verbose, -v` - Enable verbose logging (default: false)
+
+**Examples:**
+
+```bash
+# Dry run to see what would be purged (recommended first step)
+ocis storage-users spaces purge --type=personal
+
+# Purge all disabled personal spaces older than 14 days
+ocis storage-users spaces purge --type=personal --retention-period=14d --dry-run=false
+
+# Purge a specific project space
+ocis storage-users spaces purge --type=project --space-id='f46bae39-b2e4-48c7-a1bc-26169b1ffc2e$2d274464-0d11-4334-9f66-391cbe38c8a5!2d274464-0d11-4334-9f66-391cbe38c8a5' --dry-run=false
+
+# Purge with verbose logging
+ocis storage-users spaces purge --type=personal --verbose --dry-run=false
+```
+
+**Important Notes:**
+- Only processes spaces that are in 'trashed' state
+- The `--dry-run` flag defaults to `true` to prevent accidental purging
+- Retention period supports human-readable formats (e.g., '336h', '14d', '720h')
 
 ### Manage Trash-Bin Items
 
