@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2025-10-04-00-04-51]
+[#deprecation-note-2025-10-05-00-05-43]
 [caption=]
 .Deprecation notes for the collaboration service
 [width="100%",cols="~,~,~,~",options="header"]
