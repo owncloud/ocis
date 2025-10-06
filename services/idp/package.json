@@ -121,7 +121,7 @@
     "@babel/preset-typescript": "^7.27.1",
     "@babel/runtime": "^7.28.2",
     "@babel/runtime-corejs3": "^7.28.2",
-    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^6.21.0",
     "babel-loader": "9.2.1",
     "babel-plugin-named-asset-import": "^0.3.8",
