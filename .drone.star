@@ -40,6 +40,7 @@ SONARSOURCE_SONAR_SCANNER_CLI = "sonarsource/sonar-scanner-cli:11.0"
 KEYCLOAK_IMAGE = "quay.io/keycloak/keycloak:26.2.5"
 POSTGRES_ALPINE_IMAGE = "postgres:alpine3.18"
 TRIVY_IMAGE = "aquasec/trivy:latest"
+K3D_IMAGE = "ghcr.io/k3d-io/k3d:5-dind"
 
 # the hugo version needs to be the same as in owncloud.github.io
 OC_CI_HUGO_STATIC_IMAGE = "hugomods/hugo:base-0.129.0"
@@ -3772,7 +3773,7 @@ def trivyScan(ctx):
 def k3sCluster():
     return [{
         "name": OCIS_SERVER_NAME,
-        "image": "ghcr.io/k3d-io/k3d:5-dind",
+        "image": K3D_IMAGE,
         "user": "root",
         "privileged": True,
         "commands": [
@@ -3801,7 +3802,7 @@ def k3sCluster():
 def waitK3sCluster():
     return [{
         "name": "wait-cluster",
-        "image": "docker.io/bitnami/kubectl:1.31",
+        "image": K3D_IMAGE,
         "user": "root",
         "commands": [
             "export KUBECONFIG=kubeconfig-$${DRONE_BUILD_NUMBER}.yaml",
@@ -3838,7 +3839,7 @@ def deployOcis():
 def ociswrapper():
     return [{
         "name": "ociswrapper",
-        "image": "ghcr.io/k3d-io/k3d:5-dind",
+        "image": K3D_IMAGE,
         "user": "root",
         "commands": [
             "export KUBECONFIG=kubeconfig-$${DRONE_BUILD_NUMBER}.yaml",
