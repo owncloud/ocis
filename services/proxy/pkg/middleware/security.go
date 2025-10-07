@@ -59,7 +59,7 @@ func Security(cspConfig *config.CSP) func(h http.Handler) http.Handler {
 		ContentTypeNosniff:           true,
 		CustomFrameOptionsValue:      "SAMEORIGIN",
 		FrameDeny:                    true,
-		ReferrerPolicy:               "strict-origin-when-cross-origin",
+		ReferrerPolicy:               "no-referrer",
 		STSSeconds:                   315360000,
 		STSIncludeSubdomains:         true,
 		STSPreload:                   true,
