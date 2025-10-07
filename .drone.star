@@ -1108,19 +1108,19 @@ def localApiTestPipeline(ctx):
                                      ([] if run_on_k8s else restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin")) +
                                      (tikaService() if params["tikaNeeded"] and not run_on_k8s else tikaServiceK8s() if params["tikaNeeded"] and run_on_k8s else []) +
                                      (waitForServices("online-offices", ["collabora:9980", "onlyoffice:443", "fakeoffice:8080"]) if params["collaborationServiceNeeded"] else []) +
-                                     (waitK3sCluster() + deployOcis() + waitForOcis(ocis_url = ocis_url) + ociswrapper() + waitForOciswrapper() if run_on_k8s else ocisServer(storage, extra_server_environment = params["extraServerEnvironment"], with_wrapper = True, tika_enabled = params["tikaNeeded"], volumes = ([stepVolumeOcisStorage]))) +
-                                     (waitForClamavService() if params["antivirusNeeded"] else []) +
-                                     (waitForEmailService() if params["emailNeeded"] else []) +
+                                     (waitK3sCluster() + (clamavServiceK8s() if params["antivirusNeeded"] and run_on_k8s else []) + (emailServiceK8s() if params["emailNeeded"] and run_on_k8s else []) + deployOcis() + waitForOcis(ocis_url = ocis_url) + ociswrapper() + waitForOciswrapper() if run_on_k8s else ocisServer(storage, extra_server_environment = params["extraServerEnvironment"], with_wrapper = True, tika_enabled = params["tikaNeeded"], volumes = ([stepVolumeOcisStorage]))) +
+                                     (waitForClamavService() if params["antivirusNeeded"] and not run_on_k8s else exposeAntivirusServiceK8s() if params["antivirusNeeded"] and run_on_k8s else []) +
+                                     (waitForEmailService() if params["emailNeeded"] and not run_on_k8s else exposeEmailServiceK8s() if params["emailNeeded"] and run_on_k8s else []) +
                                      (ocisServer(storage, deploy_type = "federation", extra_server_environment = params["extraServerEnvironment"]) if params["federationServer"] else []) +
                                      ((wopiCollaborationService("fakeoffice") + wopiCollaborationService("collabora") + wopiCollaborationService("onlyoffice")) if params["collaborationServiceNeeded"] else []) +
                                      (ocisHealthCheck("wopi", ["wopi-collabora:9304", "wopi-onlyoffice:9304", "wopi-fakeoffice:9304"]) if params["collaborationServiceNeeded"] else []) +
                                      localApiTests(name, params["suites"], storage, params["extraEnvironment"], run_with_remote_php, ocis_url = ocis_url, k8s = run_on_k8s) +
                                      apiTestFailureLog() +
                                      (generateCoverageFromAPITest(ctx, name) if not run_on_k8s else []),
-                            "services": (emailService() if params["emailNeeded"] else []) +
-                                        (clamavService() if params["antivirusNeeded"] else []) +
-                                        ((fakeOffice() + collaboraService() + onlyofficeService()) if params["collaborationServiceNeeded"] else []) +
-                                        (k3sCluster() if run_on_k8s else []),
+                            "services": (k3sCluster() if run_on_k8s else []) +
+                                        (emailService() if params["emailNeeded"] and not run_on_k8s else []) +
+                                        (clamavService() if params["antivirusNeeded"] and not run_on_k8s else []) +
+                                        ((fakeOffice() + collaboraService() + onlyofficeService()) if params["collaborationServiceNeeded"] else []),
                             "depends_on": getPipelineNames(buildOcisBinaryForTesting(ctx)),
                             "trigger": {
                                 "ref": [
@@ -3836,6 +3836,49 @@ def deployOcis():
         ],
     }]
 
+def clamavServiceK8s():
+    return [{
+        "name": "clamav",
+        "image": OC_CI_ALPINE,
+        "commands": [
+            "cp -r %s/tests/config/drone/k8s/clamav %s/ocis-charts/charts/ocis/templates/" % (dirs["base"], dirs["base"]),
+            "sed -i 's/{{ *\\\\.Values\\\\.features\\\\.virusscan\\\\.infectedFileHandling *| *quote *}}/\"delete\"/' %s/ocis-charts/charts/ocis/templates/antivirus/deployment.yaml" % dirs["base"],
+            "sed -i 's/{{ *\\\\.Values\\\\.features\\\\.virusscan\\\\.infectedFileHandling *| *quote *}}/\"delete\"/' %s/ocis-charts/charts/ocis/templates/antivirus/deployment.yaml" % dirs["base"],
+            "sed -i '/name: ANTIVIRUS_SCANNER_TYPE/{n;s/value: *\"icap\"/value: \"clamav\"/}' %s/ocis-charts/charts/ocis/templates/antivirus/deployment.yaml" % dirs["base"],
+            "sed -i '/- name: ANTIVIRUS_SCANNER_TYPE/i\\\\            - name: ANTIVIRUS_CLAMAV_SOCKET\\\n              value: \"tcp://clamav:3310\"' %s/ocis-charts/charts/ocis/templates/antivirus/deployment.yaml" % dirs["base"],
+        ],
+    }]
+
+def emailServiceK8s():
+    return [{
+        "name": "copy-%s-service" % EMAIL_SMTP_HOST,
+        "image": OC_CI_ALPINE,
+        "commands": [
+            "cp -r %s/tests/config/drone/k8s/mailpit %s/ocis-charts/charts/ocis/templates/" % (dirs["base"], dirs["base"]),
+        ],
+    }]
+
+def exposeEmailServiceK8s():
+    return [{
+        "name": EMAIL_SMTP_HOST,
+        "image": "ghcr.io/k3d-io/k3d:5-dind",
+        "commands": [
+            "kubectl port-forward svc/mailpit %s:%s -n ocis" % (EMAIL_PORT, EMAIL_PORT),
+            "kubectl port-forward svc/mailpit 9174:9174 -n ocis",
+        ],
+        "detach": True,
+    }]
+
+def exposeAntivirusServiceK8s():
+    return [{
+        "name": EMAIL_SMTP_HOST,
+        "image": "ghcr.io/k3d-io/k3d:5-dind",
+        "commands": [
+            "kubectl port-forward svc/antivirus 9297:9277 -n ocis",
+        ],
+        "detach": True,
+    }]
+
 def ociswrapper():
     return [{
         "name": "ociswrapper",
@@ -3846,6 +3889,8 @@ def ociswrapper():
             "until test -f $${KUBECONFIG}; do sleep 1s; done",
             "kubectl get pods -A",
             "kubectl get ingress -A",
+            "kubectl describe pods $(kubectl get pods -n ocis -l app=antivirus -o jsonpath=\"{.items[0].metadata.name}\") -n ocis",
+            "kubectl describe pods $(kubectl get pods -n ocis -l app=postprocessing -o jsonpath=\"{.items[0].metadata.name}\") -n ocis",
             "%s/bin/ociswrapper serve --url https://ocis-server --admin-username admin --admin-password admin --skip-ocis-run" % dirs["ocisWrapper"],
         ],
         "detach": True,
