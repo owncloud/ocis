@@ -100,7 +100,7 @@ config = {
                 "apiLocks",
             ],
             "skip": False,
-            "k8s": True,
+            "k8s": False,
         },
         "settingsAndNotification": {
             "suites": [
@@ -109,6 +109,7 @@ config = {
                 "apiCors",
             ],
             "skip": False,
+            "k8s": False,
             "withRemotePhp": [True],
             "emailNeeded": True,
             "extraEnvironment": {
@@ -130,21 +131,21 @@ config = {
             ],
             "skip": False,
             "withRemotePhp": [True],
-            "k8s": True,
+            "k8s": False,
         },
         "spaces": {
             "suites": [
                 "apiSpaces",
             ],
             "skip": False,
-            "k8s": True,
+            "k8s": False,
         },
         "spacesShares": {
             "suites": [
                 "apiSpacesShares",
             ],
             "skip": False,
-            "k8s": True,
+            "k8s": False,
         },
         "davOperations": {
             "suites": [
@@ -184,14 +185,14 @@ config = {
             ],
             "skip": False,
             "withRemotePhp": [True],
-            "k8s": True,
+            "k8s": False,
         },
         "sharingNgAdditionalShareRole": {
             "suites": [
                 "apiSharingNgAdditionalShareRole",
             ],
             "skip": False,
-            "k8s": True,
+            "k8s": False,
             "withRemotePhp": [True],
         },
         "sharingNgShareInvitation": {
@@ -216,6 +217,7 @@ config = {
                 "apiAntivirus",
             ],
             "skip": False,
+            "k8s": False,
             "antivirusNeeded": True,
             "extraServerEnvironment": {
                 "ANTIVIRUS_SCANNER_TYPE": "clamav",
@@ -231,6 +233,7 @@ config = {
                 "apiAuthApp",
             ],
             "skip": False,
+            "k8s": False,
             "withRemotePhp": [True],
             "federationServer": True,
             "emailNeeded": True,
@@ -307,7 +310,7 @@ config = {
                 "coreApiShareManagementToShares",
             ],
             "skip": False,
-            "k8s": True,
+            "k8s": False,
             "withRemotePhp": [True],
         },
         "3": {
@@ -328,7 +331,7 @@ config = {
                 "coreApiShareUpdateToShares",
             ],
             "skip": False,
-            "k8s": True,
+            "k8s": False,
             "withRemotePhp": [True],
         },
         "5": {
@@ -339,7 +342,7 @@ config = {
                 "coreApiWebdavEtagPropagation2",
             ],
             "skip": False,
-            "k8s": True,
+            "k8s": False,
         },
         "6": {
             "suites": [
@@ -354,7 +357,7 @@ config = {
                 "coreApiWebdavProperties",
             ],
             "skip": False,
-            "k8s": True,
+            "k8s": False,
         },
         "8": {
             "suites": [
