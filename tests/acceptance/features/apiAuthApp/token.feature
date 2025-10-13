@@ -113,7 +113,7 @@ Feature: create auth-app token
 
   @env-config
   Scenario: admin creates auth-app token for other user
-    Given the config "AUTH_APP_ENABLE_IMPERSONATION" has been set to "true" for "auth-app" service
+    Given the config "AUTH_APP_ENABLE_IMPERSONATION" has been set to "true" for "authapp" service
     When user "Admin" creates auth-app token for user "Alice" with expiration time "72h" using the auth-app API
     Then the HTTP status code should be "200"
     And the JSON data of the response should match
@@ -139,7 +139,7 @@ Feature: create auth-app token
 
   @env-config
   Scenario: user deletes the created auth-app token
-    Given the config "AUTH_APP_ENABLE_IMPERSONATION" has been set to "true" for "auth-app" service
+    Given the config "AUTH_APP_ENABLE_IMPERSONATION" has been set to "true" for "authapp" service
     And user "Alice" has created auth-app token with expiration time "72h" using the auth-app API
     And user "Admin" has created auth-app token for user "Alice" with expiration time "72h" using the auth-app API
     When user "Alice" deletes all the created auth-app tokens using the auth-app API
@@ -176,7 +176,7 @@ Feature: create auth-app token
 
   @env-config
   Scenario: admin tries to create auth-app token for other users without expiry
-    Given the config "AUTH_APP_ENABLE_IMPERSONATION" has been set to "true" for "auth-app" service
+    Given the config "AUTH_APP_ENABLE_IMPERSONATION" has been set to "true" for "authapp" service
     When user "Admin" tries to create auth-app token for user "Alice" with expiration time "" using the auth-app API
     Then the HTTP status code should be "400"
     And the content in the response should include the following content:
@@ -187,19 +187,19 @@ Feature: create auth-app token
   @env-config
   Scenario: non-admin user tries to create an auth-app token for another user
     Given user "Brian" has been created with default attributes
-    And the config "AUTH_APP_ENABLE_IMPERSONATION" has been set to "true" for "auth-app" service
+    And the config "AUTH_APP_ENABLE_IMPERSONATION" has been set to "true" for "authapp" service
     When user "Alice" tries to create auth-app token for user "Brian" with expiration time "72h" using the auth-app API
     Then the HTTP status code should be "403"
 
   @env-config @issue-10815
   Scenario: admin tries to create auth-app token for non-existing user
-    Given the config "AUTH_APP_ENABLE_IMPERSONATION" has been set to "true" for "auth-app" service
+    Given the config "AUTH_APP_ENABLE_IMPERSONATION" has been set to "true" for "authapp" service
     When user "Admin" creates auth-app token for user "Brian" with expiration time "72h" using the auth-app API
     Then the HTTP status code should be "403"
 
   @env-config @issue-10815
   Scenario: admin user tries to delete auth-app token of another user with impersonation enabled
-    Given the config "AUTH_APP_ENABLE_IMPERSONATION" has been set to "true" for "auth-app" service
+    Given the config "AUTH_APP_ENABLE_IMPERSONATION" has been set to "true" for "authapp" service
     And user "Admin" has created auth-app token for user "Alice" with expiration time "72h" using the auth-app API
     When user "Admin" tries to delete the last created auth-app token using the auth-app API
     Then the HTTP status code should be "403"
