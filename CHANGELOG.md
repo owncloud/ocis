@@ -1,6 +1,6 @@
 # Table of Contents
 
-* [Changelog for unreleased](#changelog-for-unreleased-unreleased)
+* [Changelog for 7.3.0](#changelog-for-730-2025-10-13)
 * [Changelog for 7.2.0](#changelog-for-720-2025-07-14)
 * [Changelog for 7.1.3](#changelog-for-713-2025-05-27)
 * [Changelog for 7.1.2](#changelog-for-712-2025-03-28)
@@ -36,8 +36,8 @@
 * [Changelog for 3.0.0](#changelog-for-300-2023-06-06)
 * [Changelog for 2.0.0](#changelog-for-200-2022-11-30)
 * [Changelog for 1.20.0](#changelog-for-1200-2022-04-13)
-* [Changelog for 1.19.1](#changelog-for-1191-2022-03-29)
 * [Changelog for 1.19.0](#changelog-for-1190-2022-03-29)
+* [Changelog for 1.19.1](#changelog-for-1191-2022-03-29)
 * [Changelog for 1.18.0](#changelog-for-1180-2022-03-03)
 * [Changelog for 1.17.0](#changelog-for-1170-2022-02-16)
 * [Changelog for 1.16.0](#changelog-for-1160-2021-12-10)
@@ -58,11 +58,11 @@
 * [Changelog for 1.1.0](#changelog-for-110-2021-01-22)
 * [Changelog for 1.0.0](#changelog-for-100-2020-12-17)
 
-# Changelog for [unreleased] (UNRELEASED)
+# Changelog for [7.3.0] (2025-10-13)
 
-The following sections list the changes for unreleased.
+The following sections list the changes for 7.3.0.
 
-[unreleased]: https://github.com/owncloud/ocis/compare/v7.2.0...master
+[7.3.0]: https://github.com/owncloud/ocis/compare/v7.2.0...v7.3.0
 
 ## Summary
 
@@ -92,6 +92,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Drop remote.php prefix: [#11687](https://github.com/owncloud/ocis/pull/11687)
 * Enhancement - Add configurable display attributes: [#11695](https://github.com/owncloud/ocis/pull/11695)
 * Enhancement - Bump Web to 12.1.0: [#11710](https://github.com/owncloud/ocis/pull/11710)
+* Enhancement - Bump Web to 12.1.1: [#11726](https://github.com/owncloud/ocis/pull/11726)
 
 ## Details
 
@@ -322,6 +323,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/11710
    https://github.com/owncloud/web/releases/tag/v12.1.0
+
+* Enhancement - Bump Web to 12.1.1: [#11726](https://github.com/owncloud/ocis/pull/11726)
+
+   This version contains only updated translations.
+
+   https://github.com/owncloud/ocis/pull/11726
+   https://github.com/owncloud/web/releases/tag/v12.1.1
 
 # Changelog for [7.2.0] (2025-07-14)
 
@@ -12013,7 +12021,7 @@ The following sections list the changes for 2.0.0.
 
 The following sections list the changes for 1.20.0.
 
-[1.20.0]: https://github.com/owncloud/ocis/compare/v1.19.1...v1.20.0
+[1.20.0]: https://github.com/owncloud/ocis/compare/v1.19.0...v1.20.0
 
 ## Summary
 
@@ -12187,29 +12195,11 @@ The following sections list the changes for 1.20.0.
    https://github.com/owncloud/ocis/pull/3509
    https://github.com/owncloud/web/releases/tag/v5.4.0
 
-# Changelog for [1.19.1] (2022-03-29)
-
-The following sections list the changes for 1.19.1.
-
-[1.19.1]: https://github.com/owncloud/ocis/compare/v1.19.0...v1.19.1
-
-## Summary
-
-* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
-
-## Details
-
-* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
-
-   URLs for Special items (space image, readme) were broken.
-
-   https://github.com/owncloud/ocis/pull/3419
-
 # Changelog for [1.19.0] (2022-03-29)
 
 The following sections list the changes for 1.19.0.
 
-[1.19.0]: https://github.com/owncloud/ocis/compare/v1.18.0...v1.19.0
+[1.19.0]: https://github.com/owncloud/ocis/compare/v1.19.1...v1.19.0
 
 ## Summary
 
@@ -12382,6 +12372,24 @@ The following sections list the changes for 1.19.0.
    https://github.com/owncloud/ocis/pull/3291
    https://github.com/owncloud/ocis/pull/3375
    https://github.com/owncloud/web/releases/tag/v5.3.0
+
+# Changelog for [1.19.1] (2022-03-29)
+
+The following sections list the changes for 1.19.1.
+
+[1.19.1]: https://github.com/owncloud/ocis/compare/v1.18.0...v1.19.1
+
+## Summary
+
+* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
+
+## Details
+
+* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
+
+   URLs for Special items (space image, readme) were broken.
+
+   https://github.com/owncloud/ocis/pull/3419
 
 # Changelog for [1.18.0] (2022-03-03)
 
