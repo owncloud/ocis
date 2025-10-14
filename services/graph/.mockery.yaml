@@ -1,0 +1,40 @@
+with-expecter: true
+filename: "{{.InterfaceName | snakecase }}.go"
+mockname: "{{.InterfaceName}}"
+outpkg: "mocks"
+packages:
+    github.com/owncloud/ocis/v2/services/graph/pkg/service/v0:
+        config:
+            dir: "mocks"
+        interfaces:
+            BaseGraphProvider:
+            DrivesDriveItemProvider:
+            DriveItemPermissionsProvider:
+            HTTPClient:
+            Permissions:
+            RoleService:
+    github.com/cs3org/reva/v2/pkg/events:
+        config:
+            dir: "mocks"
+        interfaces:
+            Publisher:
+    github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool:
+        config:
+            dir: "mocks"
+        interfaces:
+            Selectable:
+              config:
+                filename: "gateway_selector.go"
+    github.com/owncloud/ocis/v2/services/graph/pkg/identity:
+        config:
+            dir: "pkg/identity/mocks"
+        interfaces:
+            Backend:
+            EducationBackend:
+    github.com/go-ldap/ldap/v3:
+        config:
+            dir: "pkg/identity/mocks"
+        interfaces:
+            Client:
+                config:
+                    filename: "ldapclient.go"

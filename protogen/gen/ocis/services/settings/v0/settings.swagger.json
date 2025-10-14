@@ -1,0 +1,1381 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "ownCloud Infinite Scale settings",
+    "version": "1.0.0",
+    "contact": {
+      "name": "ownCloud GmbH",
+      "url": "https://github.com/owncloud/ocis",
+      "email": "support@owncloud.com"
+    },
+    "license": {
+      "name": "Apache-2.0",
+      "url": "https://github.com/owncloud/ocis/blob/master/LICENSE"
+    }
+  },
+  "tags": [
+    {
+      "name": "BundleService"
+    },
+    {
+      "name": "ValueService"
+    },
+    {
+      "name": "RoleService"
+    },
+    {
+      "name": "PermissionService"
+    }
+  ],
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/api/v0/settings/assignments-add": {
+      "post": {
+        "operationId": "RoleService_AssignRoleToUser",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v0AssignRoleToUserResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v0AssignRoleToUserRequest"
+            }
+          }
+        ],
+        "tags": [
+          "RoleService"
+        ]
+      }
+    },
+    "/api/v0/settings/assignments-list": {
+      "post": {
+        "operationId": "RoleService_ListRoleAssignments",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v0ListRoleAssignmentsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v0ListRoleAssignmentsRequest"
+            }
+          }
+        ],
+        "tags": [
+          "RoleService"
+        ]
+      }
+    },
+    "/api/v0/settings/assignments-list-filtered": {
+      "post": {
+        "operationId": "RoleService_ListRoleAssignmentsFiltered",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v0ListRoleAssignmentsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v0ListRoleAssignmentsFilteredRequest"
+            }
+          }
+        ],
+        "tags": [
+          "RoleService"
+        ]
+      }
+    },
+    "/api/v0/settings/assignments-remove": {
+      "post": {
+        "operationId": "RoleService_RemoveRoleFromUser",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v0RemoveRoleFromUserRequest"
+            }
+          }
+        ],
+        "tags": [
+          "RoleService"
+        ]
+      }
+    },
+    "/api/v0/settings/bundle-get": {
+      "post": {
+        "operationId": "BundleService_GetBundle",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v0GetBundleResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v0GetBundleRequest"
+            }
+          }
+        ],
+        "tags": [
+          "BundleService"
+        ]
+      }
+    },
+    "/api/v0/settings/bundle-save": {
+      "post": {
+        "operationId": "BundleService_SaveBundle",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v0SaveBundleResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v0SaveBundleRequest"
+            }
+          }
+        ],
+        "tags": [
+          "BundleService"
+        ]
+      }
+    },
+    "/api/v0/settings/bundles-add-setting": {
+      "post": {
+        "operationId": "BundleService_AddSettingToBundle",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v0AddSettingToBundleResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v0AddSettingToBundleRequest"
+            }
+          }
+        ],
+        "tags": [
+          "BundleService"
+        ]
+      }
+    },
+    "/api/v0/settings/bundles-list": {
+      "post": {
+        "operationId": "BundleService_ListBundles",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v0ListBundlesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v0ListBundlesRequest"
+            }
+          }
+        ],
+        "tags": [
+          "BundleService"
+        ]
+      }
+    },
+    "/api/v0/settings/bundles-remove-setting": {
+      "post": {
+        "operationId": "BundleService_RemoveSettingFromBundle",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v0RemoveSettingFromBundleRequest"
+            }
+          }
+        ],
+        "tags": [
+          "BundleService"
+        ]
+      }
+    },
+    "/api/v0/settings/permissions-get-by-id": {
+      "post": {
+        "operationId": "PermissionService_GetPermissionByID",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v0GetPermissionByIDResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v0GetPermissionByIDRequest"
+            }
+          }
+        ],
+        "tags": [
+          "PermissionService"
+        ]
+      }
+    },
+    "/api/v0/settings/permissions-list": {
+      "post": {
+        "operationId": "PermissionService_ListPermissions",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v0ListPermissionsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v0ListPermissionsRequest"
+            }
+          }
+        ],
+        "tags": [
+          "PermissionService"
+        ]
+      }
+    },
+    "/api/v0/settings/permissions-list-by-resource": {
+      "post": {
+        "operationId": "PermissionService_ListPermissionsByResource",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v0ListPermissionsByResourceResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v0ListPermissionsByResourceRequest"
+            }
+          }
+        ],
+        "tags": [
+          "PermissionService"
+        ]
+      }
+    },
+    "/api/v0/settings/roles-list": {
+      "post": {
+        "operationId": "RoleService_ListRoles",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v0ListBundlesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v0ListBundlesRequest"
+            }
+          }
+        ],
+        "tags": [
+          "RoleService"
+        ]
+      }
+    },
+    "/api/v0/settings/values-get": {
+      "post": {
+        "operationId": "ValueService_GetValue",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v0GetValueResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v0GetValueRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ValueService"
+        ]
+      }
+    },
+    "/api/v0/settings/values-get-by-unique-identifiers": {
+      "post": {
+        "operationId": "ValueService_GetValueByUniqueIdentifiers",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v0GetValueResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v0GetValueByUniqueIdentifiersRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ValueService"
+        ]
+      }
+    },
+    "/api/v0/settings/values-list": {
+      "post": {
+        "operationId": "ValueService_ListValues",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v0ListValuesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v0ListValuesRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ValueService"
+        ]
+      }
+    },
+    "/api/v0/settings/values-save": {
+      "post": {
+        "operationId": "ValueService_SaveValue",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v0SaveValueResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v0SaveValueRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ValueService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "PermissionConstraint": {
+      "type": "string",
+      "enum": [
+        "CONSTRAINT_UNKNOWN",
+        "CONSTRAINT_OWN",
+        "CONSTRAINT_SHARED",
+        "CONSTRAINT_ALL"
+      ],
+      "default": "CONSTRAINT_UNKNOWN"
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "settingsv0ListValue": {
+      "type": "object",
+      "properties": {
+        "values": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v0ListOptionValue"
+          },
+          "title": "@gotags: yaml:\"values\""
+        }
+      }
+    },
+    "settingsv0Value": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "id is the id of the Value. It is generated on saving it.\n\n@gotags: yaml:\"id\""
+        },
+        "bundleId": {
+          "type": "string",
+          "title": "@gotags: yaml:\"bundle_id\""
+        },
+        "settingId": {
+          "type": "string",
+          "description": "setting_id is the id of the setting from within its bundle.\n\n@gotags: yaml:\"setting_id\""
+        },
+        "accountUuid": {
+          "type": "string",
+          "title": "@gotags: yaml:\"account_uuid\""
+        },
+        "resource": {
+          "$ref": "#/definitions/v0Resource",
+          "title": "@gotags: yaml:\"resource\""
+        },
+        "boolValue": {
+          "type": "boolean",
+          "title": "@gotags: yaml:\"bool_value\""
+        },
+        "intValue": {
+          "type": "string",
+          "format": "int64",
+          "title": "@gotags: yaml:\"int_value\""
+        },
+        "stringValue": {
+          "type": "string",
+          "title": "@gotags: yaml:\"string_value\""
+        },
+        "listValue": {
+          "$ref": "#/definitions/settingsv0ListValue",
+          "title": "@gotags: yaml:\"list_value\""
+        },
+        "collectionValue": {
+          "$ref": "#/definitions/v0CollectionValue",
+          "title": "@gotags: yaml:\"collection_value\""
+        }
+      }
+    },
+    "v0AddSettingToBundleRequest": {
+      "type": "object",
+      "properties": {
+        "bundleId": {
+          "type": "string"
+        },
+        "setting": {
+          "$ref": "#/definitions/v0Setting"
+        }
+      }
+    },
+    "v0AddSettingToBundleResponse": {
+      "type": "object",
+      "properties": {
+        "setting": {
+          "$ref": "#/definitions/v0Setting"
+        }
+      }
+    },
+    "v0AssignRoleToUserRequest": {
+      "type": "object",
+      "properties": {
+        "accountUuid": {
+          "type": "string"
+        },
+        "roleId": {
+          "type": "string",
+          "title": "the role_id is a bundle_id internally"
+        }
+      }
+    },
+    "v0AssignRoleToUserResponse": {
+      "type": "object",
+      "properties": {
+        "assignment": {
+          "$ref": "#/definitions/v0UserRoleAssignment"
+        }
+      }
+    },
+    "v0Bool": {
+      "type": "object",
+      "properties": {
+        "default": {
+          "type": "boolean",
+          "title": "@gotags: yaml:\"default\""
+        },
+        "label": {
+          "type": "string",
+          "title": "@gotags: yaml:\"label\""
+        }
+      }
+    },
+    "v0Bundle": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "@gotags: yaml:\"id\""
+        },
+        "name": {
+          "type": "string",
+          "title": "@gotags: yaml:\"name\""
+        },
+        "type": {
+          "$ref": "#/definitions/v0BundleType",
+          "title": "@gotags: yaml:\"type\""
+        },
+        "extension": {
+          "type": "string",
+          "title": "@gotags: yaml:\"extension\""
+        },
+        "displayName": {
+          "type": "string",
+          "title": "@gotags: yaml:\"display_name\""
+        },
+        "settings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v0Setting"
+          },
+          "title": "@gotags: yaml:\"settings\""
+        },
+        "resource": {
+          "$ref": "#/definitions/v0Resource",
+          "title": "@gotags: yaml:\"resource\""
+        }
+      }
+    },
+    "v0BundleType": {
+      "type": "string",
+      "enum": [
+        "TYPE_UNKNOWN",
+        "TYPE_DEFAULT",
+        "TYPE_ROLE"
+      ],
+      "default": "TYPE_UNKNOWN"
+    },
+    "v0CollectionOption": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "@gotags: yaml:\"key\"",
+          "title": "required"
+        },
+        "intValue": {
+          "type": "string",
+          "format": "int64",
+          "title": "@gotags: yaml:\"int_value\""
+        },
+        "stringValue": {
+          "type": "string",
+          "title": "@gotags: yaml:\"string_value\""
+        },
+        "boolValue": {
+          "type": "boolean",
+          "title": "@gotags: yaml:\"bool_value\""
+        }
+      }
+    },
+    "v0CollectionValue": {
+      "type": "object",
+      "properties": {
+        "values": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v0CollectionOption"
+          },
+          "title": "@gotags: yaml:\"values\""
+        }
+      }
+    },
+    "v0GetBundleRequest": {
+      "type": "object",
+      "properties": {
+        "bundleId": {
+          "type": "string"
+        }
+      }
+    },
+    "v0GetBundleResponse": {
+      "type": "object",
+      "properties": {
+        "bundle": {
+          "$ref": "#/definitions/v0Bundle"
+        }
+      }
+    },
+    "v0GetPermissionByIDRequest": {
+      "type": "object",
+      "properties": {
+        "permissionId": {
+          "type": "string"
+        }
+      }
+    },
+    "v0GetPermissionByIDResponse": {
+      "type": "object",
+      "properties": {
+        "permission": {
+          "$ref": "#/definitions/v0Permission"
+        }
+      }
+    },
+    "v0GetValueByUniqueIdentifiersRequest": {
+      "type": "object",
+      "properties": {
+        "accountUuid": {
+          "type": "string"
+        },
+        "settingId": {
+          "type": "string"
+        }
+      }
+    },
+    "v0GetValueRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      }
+    },
+    "v0GetValueResponse": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "$ref": "#/definitions/v0ValueWithIdentifier"
+        }
+      }
+    },
+    "v0Identifier": {
+      "type": "object",
+      "properties": {
+        "extension": {
+          "type": "string"
+        },
+        "bundle": {
+          "type": "string"
+        },
+        "setting": {
+          "type": "string"
+        }
+      }
+    },
+    "v0Int": {
+      "type": "object",
+      "properties": {
+        "default": {
+          "type": "string",
+          "format": "int64",
+          "title": "@gotags: yaml:\"default\""
+        },
+        "min": {
+          "type": "string",
+          "format": "int64",
+          "title": "@gotags: yaml:\"min\""
+        },
+        "max": {
+          "type": "string",
+          "format": "int64",
+          "title": "@gotags: yaml:\"max\""
+        },
+        "step": {
+          "type": "string",
+          "format": "int64",
+          "title": "@gotags: yaml:\"step\""
+        },
+        "placeholder": {
+          "type": "string",
+          "title": "@gotags: yaml:\"placeholder\""
+        }
+      }
+    },
+    "v0ListBundlesRequest": {
+      "type": "object",
+      "properties": {
+        "bundleIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "locale": {
+          "type": "string"
+        }
+      }
+    },
+    "v0ListBundlesResponse": {
+      "type": "object",
+      "properties": {
+        "bundles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v0Bundle"
+          }
+        }
+      }
+    },
+    "v0ListOption": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "$ref": "#/definitions/v0ListOptionValue",
+          "title": "@gotags: yaml:\"value\""
+        },
+        "default": {
+          "type": "boolean",
+          "title": "@gotags: yaml:\"default\""
+        },
+        "displayValue": {
+          "type": "string",
+          "title": "@gotags: yaml:\"display_value\""
+        }
+      }
+    },
+    "v0ListOptionValue": {
+      "type": "object",
+      "properties": {
+        "stringValue": {
+          "type": "string",
+          "title": "@gotags: yaml:\"string_value\""
+        },
+        "intValue": {
+          "type": "string",
+          "format": "int64",
+          "title": "@gotags: yaml:\"int_value\""
+        },
+        "boolValue": {
+          "type": "boolean",
+          "title": "@gotags: yaml:\"bool_value\""
+        }
+      }
+    },
+    "v0ListPermissionsByResourceRequest": {
+      "type": "object",
+      "properties": {
+        "resource": {
+          "$ref": "#/definitions/v0Resource"
+        }
+      }
+    },
+    "v0ListPermissionsByResourceResponse": {
+      "type": "object",
+      "properties": {
+        "permissions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v0Permission"
+          }
+        }
+      }
+    },
+    "v0ListPermissionsRequest": {
+      "type": "object",
+      "properties": {
+        "accountUuid": {
+          "type": "string"
+        }
+      }
+    },
+    "v0ListPermissionsResponse": {
+      "type": "object",
+      "properties": {
+        "permissions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v0ListRoleAssignmentsFilteredRequest": {
+      "type": "object",
+      "properties": {
+        "filters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v0UserRoleAssignmentFilter"
+          }
+        }
+      }
+    },
+    "v0ListRoleAssignmentsRequest": {
+      "type": "object",
+      "properties": {
+        "accountUuid": {
+          "type": "string"
+        }
+      }
+    },
+    "v0ListRoleAssignmentsResponse": {
+      "type": "object",
+      "properties": {
+        "assignments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v0UserRoleAssignment"
+          }
+        }
+      }
+    },
+    "v0ListValuesRequest": {
+      "type": "object",
+      "properties": {
+        "bundleId": {
+          "type": "string"
+        },
+        "accountUuid": {
+          "type": "string"
+        }
+      }
+    },
+    "v0ListValuesResponse": {
+      "type": "object",
+      "properties": {
+        "values": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v0ValueWithIdentifier"
+          }
+        }
+      }
+    },
+    "v0MultiChoiceCollection": {
+      "type": "object",
+      "properties": {
+        "options": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v0MultiChoiceCollectionOption"
+          },
+          "title": "@gotags: yaml:\"options\""
+        }
+      }
+    },
+    "v0MultiChoiceCollectionOption": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "$ref": "#/definitions/v0MultiChoiceCollectionOptionValue",
+          "title": "@gotags: yaml:\"value\""
+        },
+        "key": {
+          "type": "string",
+          "title": "@gotags: yaml:\"key\""
+        },
+        "attribute": {
+          "type": "string",
+          "title": "@gotags: yaml:\"attribute\""
+        },
+        "displayValue": {
+          "type": "string",
+          "title": "@gotags: yaml:\"display_value\""
+        }
+      }
+    },
+    "v0MultiChoiceCollectionOptionValue": {
+      "type": "object",
+      "properties": {
+        "intValue": {
+          "$ref": "#/definitions/v0Int",
+          "title": "@gotags: yaml:\"int_value\""
+        },
+        "stringValue": {
+          "$ref": "#/definitions/v0String",
+          "title": "@gotags: yaml:\"string_value\""
+        },
+        "boolValue": {
+          "$ref": "#/definitions/v0Bool",
+          "title": "@gotags: yaml:\"bool_value\""
+        }
+      }
+    },
+    "v0MultiChoiceList": {
+      "type": "object",
+      "properties": {
+        "options": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v0ListOption"
+          },
+          "title": "@gotags: yaml:\"options\""
+        }
+      }
+    },
+    "v0Permission": {
+      "type": "object",
+      "properties": {
+        "operation": {
+          "$ref": "#/definitions/v0PermissionOperation",
+          "title": "@gotags: yaml:\"operation\""
+        },
+        "constraint": {
+          "$ref": "#/definitions/PermissionConstraint",
+          "title": "@gotags: yaml:\"constraint\""
+        }
+      }
+    },
+    "v0PermissionOperation": {
+      "type": "string",
+      "enum": [
+        "OPERATION_UNKNOWN",
+        "OPERATION_CREATE",
+        "OPERATION_READ",
+        "OPERATION_UPDATE",
+        "OPERATION_DELETE",
+        "OPERATION_WRITE",
+        "OPERATION_READWRITE"
+      ],
+      "default": "OPERATION_UNKNOWN",
+      "title": "- OPERATION_WRITE: WRITE is a combination of CREATE and UPDATE\n - OPERATION_READWRITE: READWRITE is a combination of READ and WRITE"
+    },
+    "v0RemoveRoleFromUserRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      }
+    },
+    "v0RemoveSettingFromBundleRequest": {
+      "type": "object",
+      "properties": {
+        "bundleId": {
+          "type": "string"
+        },
+        "settingId": {
+          "type": "string"
+        }
+      }
+    },
+    "v0Resource": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/v0ResourceType"
+        },
+        "id": {
+          "type": "string"
+        }
+      }
+    },
+    "v0ResourceType": {
+      "type": "string",
+      "enum": [
+        "TYPE_UNKNOWN",
+        "TYPE_SYSTEM",
+        "TYPE_FILE",
+        "TYPE_SHARE",
+        "TYPE_SETTING",
+        "TYPE_BUNDLE",
+        "TYPE_USER",
+        "TYPE_GROUP"
+      ],
+      "default": "TYPE_UNKNOWN"
+    },
+    "v0SaveBundleRequest": {
+      "type": "object",
+      "properties": {
+        "bundle": {
+          "$ref": "#/definitions/v0Bundle"
+        }
+      },
+      "title": "---\nrequests and responses for settings bundles\n---"
+    },
+    "v0SaveBundleResponse": {
+      "type": "object",
+      "properties": {
+        "bundle": {
+          "$ref": "#/definitions/v0Bundle"
+        }
+      }
+    },
+    "v0SaveValueRequest": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "$ref": "#/definitions/settingsv0Value"
+        }
+      }
+    },
+    "v0SaveValueResponse": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "$ref": "#/definitions/v0ValueWithIdentifier"
+        }
+      }
+    },
+    "v0Setting": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "@gotags: yaml:\"id\""
+        },
+        "name": {
+          "type": "string",
+          "title": "@gotags: yaml:\"name\""
+        },
+        "displayName": {
+          "type": "string",
+          "title": "@gotags: yaml:\"display_name\""
+        },
+        "description": {
+          "type": "string",
+          "title": "@gotags: yaml:\"description\""
+        },
+        "intValue": {
+          "$ref": "#/definitions/v0Int",
+          "title": "@gotags: yaml:\"int_value\""
+        },
+        "stringValue": {
+          "$ref": "#/definitions/v0String",
+          "title": "@gotags: yaml:\"string_value\""
+        },
+        "boolValue": {
+          "$ref": "#/definitions/v0Bool",
+          "title": "@gotags: yaml:\"bool_value\""
+        },
+        "singleChoiceValue": {
+          "$ref": "#/definitions/v0SingleChoiceList",
+          "title": "@gotags: yaml:\"single_choice_value\""
+        },
+        "multiChoiceValue": {
+          "$ref": "#/definitions/v0MultiChoiceList",
+          "title": "@gotags: yaml:\"multi_choice_value\""
+        },
+        "permissionValue": {
+          "$ref": "#/definitions/v0Permission",
+          "title": "@gotags: yaml:\"permission_value\""
+        },
+        "multiChoiceCollectionValue": {
+          "$ref": "#/definitions/v0MultiChoiceCollection",
+          "title": "@gotags: yaml:\"multi_choice_collection_value\""
+        },
+        "resource": {
+          "$ref": "#/definitions/v0Resource",
+          "title": "@gotags: yaml:\"resource\""
+        }
+      }
+    },
+    "v0SingleChoiceList": {
+      "type": "object",
+      "properties": {
+        "options": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v0ListOption"
+          },
+          "title": "@gotags: yaml:\"options\""
+        }
+      }
+    },
+    "v0String": {
+      "type": "object",
+      "properties": {
+        "default": {
+          "type": "string",
+          "title": "@gotags: yaml:\"default\""
+        },
+        "required": {
+          "type": "boolean",
+          "title": "@gotags: yaml:\"required\""
+        },
+        "minLength": {
+          "type": "integer",
+          "format": "int32",
+          "title": "@gotags: yaml:\"min_length\""
+        },
+        "maxLength": {
+          "type": "integer",
+          "format": "int32",
+          "title": "@gotags: yaml:\"max_length\""
+        },
+        "placeholder": {
+          "type": "string",
+          "title": "@gotags: yaml:\"placeholder\""
+        }
+      }
+    },
+    "v0UserRoleAssignment": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "id is generated upon saving the assignment"
+        },
+        "accountUuid": {
+          "type": "string"
+        },
+        "roleId": {
+          "type": "string",
+          "title": "the role_id is a bundle_id internally"
+        }
+      }
+    },
+    "v0UserRoleAssignmentFilter": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/v0UserRoleAssignmentFilterType"
+        },
+        "accountUuid": {
+          "type": "string"
+        },
+        "roleId": {
+          "type": "string"
+        }
+      }
+    },
+    "v0UserRoleAssignmentFilterType": {
+      "type": "string",
+      "enum": [
+        "TYPE_UNKNOWN",
+        "TYPE_ACCOUNT",
+        "TYPE_ROLE"
+      ],
+      "default": "TYPE_UNKNOWN"
+    },
+    "v0ValueWithIdentifier": {
+      "type": "object",
+      "properties": {
+        "identifier": {
+          "$ref": "#/definitions/v0Identifier"
+        },
+        "value": {
+          "$ref": "#/definitions/settingsv0Value"
+        }
+      }
+    }
+  },
+  "externalDocs": {
+    "description": "Developer Manual",
+    "url": "https://owncloud.dev/services/settings/"
+  }
+}

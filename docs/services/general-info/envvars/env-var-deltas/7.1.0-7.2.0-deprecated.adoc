@@ -1,0 +1,12 @@
+// # Deprecated Variables between oCIS 7.1.0 and oCIS 7.2.0
+// commenting the headline to make it better includable
+
+// table created per 2025.06.13
+// the table should be recreated/updated on source () changes
+
+[width="100%",cols="~,~,~,~,~",options="header"]
+|===
+| Service | Variable | Description | Removal Version | Deprecation Info
+
+|===
+

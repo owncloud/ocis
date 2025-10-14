@@ -1,0 +1,25 @@
+# Antivirus
+msgid "Virus found"
+msgstr "Virus encontrado"
+
+msgid "Virus found in {resource}. Upload not possible. Virus: {virus}"
+msgstr "Virus encontrado en {resource}. La subida no ha sido posible. Virus: {virus}"
+
+# User Log
+msgid "Space shared"
+msgstr "Space compartido"
+
+msgid "{user} added you to Space {space}"
+msgstr "{user} te añadió al Space {space}"
+
+msgid "Instance will be shut down and deprovisioned"
+msgstr "La instancia se cerrará y se desaprovisionará"
+
+msgid "Attention! The instance will be shut down and deprovisioned on {date}. Download all your data before that date as no access past that date is possible."
+msgstr "¡Atención! La instancia se cerrará y se desaprovisionará el {date}. Descarga todos tus datos antes de esa fecha, puesto que el acceso pasada la fecha no será posible."
+
+msgid "Resource shared"
+msgstr "Recurso compartido"
+
+msgid "{user} shared {resource} with you"
+msgstr "{user} compartió {resource} contigo"

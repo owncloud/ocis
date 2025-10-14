@@ -1,0 +1,91 @@
+{
+    "konnect": {
+        "consent": {
+            "message": "<0><0><0></0></0></0> souhaite",
+            "allowButton": {
+                "label": "Autoriser"
+            },
+            "question": "Autoriser <1><0></0></1> à faire cela?",
+            "consequence": "En cliquant, vous autoriser l'app à accéder à vos informations.",
+            "cancelButton": {
+                "label": "Annuler"
+            },
+            "tooltip": {
+                "client": "En cliquant \"Autoriser\" vous serez redirigé vers: {{redirectURI}}"
+            },
+            "headline": "Bonjour {{displayName}}"
+        },
+        "chooseaccount": {
+            "useOther": {
+                "persona": {
+                    "label": "?"
+                },
+                "label": "Utiliser un autre compte"
+            },
+            "headline": "Choisir un compte",
+            "subHeader": "identification"
+        },
+        "scopeDescription": {
+            "aliasBasic": "Consulter les informations de base de votre compte",
+            "offlineAccess": "Conserver les autorisations d'accès à l'avenir",
+            "scope": "Portée : {{scope}}"
+        },
+        "login": {
+            "usernameField": {
+                "placeholder": {
+                    "username": "Utilisateur"
+                }
+            },
+            "nextButton": {
+                "label": "Suivant"
+            },
+            "passwordField": {
+                "label": "Mot de passe"
+            },
+            "retryButton": {
+                "label": "Réessayer"
+            },
+            "headline": "Identification"
+        },
+        "error": {
+            "login": {
+                "validate": {
+                    "missingPassword": "Saisir un mot de passe."
+                },
+                "failed": "Echec de connexion. Vérifier vos identifiants et essayer à nouveau."
+            },
+            "http": {
+                "networkError": "Erreur réseau. Vérifier votre connexion, et réessayer.",
+                "unexpectedResponseStatus": "Erreur HTTP inattendue : {{status}}. Vérifier votre connexion et réessayer.",
+                "unexpectedResponseState": "Erreur d'état inattendue : {{state}}"
+            }
+        },
+        "loading": {
+            "error": {
+                "headline": "La connexion au serveur a échoué"
+            }
+        },
+        "goodbye": {
+            "headline": "Au revoir",
+            "confirm": {
+                "headline": "Bonjour {{displayName}}",
+                "subHeader": "confirmer votre déconnexion"
+            },
+            "message": {
+                "confirm": "Cliquer le bouton ci-dessous, pour quitter.",
+                "close": "Vous pouvez fermer cette fenêtre à présent."
+            },
+            "signoutButton": {
+                "label": "Quitter"
+            },
+            "subHeader": "vous avez été déconnecté"
+        },
+        "welcome": {
+            "signoutButton": {
+                "label": "Quitter"
+            },
+            "headline": "Bienvenue {{displayName}}",
+            "message": "Magnifique - Vous êtes connecté!"
+        }
+    }
+}

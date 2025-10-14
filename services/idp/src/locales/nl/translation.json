@@ -1,0 +1,91 @@
+{
+    "konnect": {
+        "consent": {
+            "message": "<0><0><0></0></0></0> wil",
+            "allowButton": {
+                "label": "Toestaan"
+            },
+            "question": "<1><0></0></1> toestaan dit te doen?",
+            "consequence": "Door op Toestaan te klikken, krijgt deze app toestemming je informatie te gebruiken.",
+            "cancelButton": {
+                "label": "Annuleren"
+            },
+            "tooltip": {
+                "client": "Door op \"Toestaan\" te klikken word je doorverwezen naar: {{redirectURI}}"
+            },
+            "headline": "Hoi {{displayName}}"
+        },
+        "chooseaccount": {
+            "useOther": {
+                "persona": {
+                    "label": "?"
+                },
+                "label": "Gebruik een ander account"
+            },
+            "headline": "Account kiezen",
+            "subHeader": "aanmelden"
+        },
+        "scopeDescription": {
+            "aliasBasic": "Basis accountgegevens weergeven",
+            "offlineAccess": "De toestemming voor altijd onthouden",
+            "scope": "Scope: {{scope}}"
+        },
+        "login": {
+            "usernameField": {
+                "placeholder": {
+                    "username": "Gebruikersnaam"
+                }
+            },
+            "nextButton": {
+                "label": "Volgende"
+            },
+            "passwordField": {
+                "label": "Wachtwoord"
+            },
+            "retryButton": {
+                "label": "Opnieuw"
+            },
+            "headline": "Aanmelden"
+        },
+        "error": {
+            "login": {
+                "validate": {
+                    "missingPassword": "Voer een wachtwoord in."
+                },
+                "failed": "Inloggen mislukt. Controleer logingegevens en probeer opnieuw."
+            },
+            "http": {
+                "networkError": "Netwerk probleem. Controleer je verbinding en probeer opnieuw.",
+                "unexpectedResponseStatus": "Onverwachte HTTP respons: {{status}}. Controleer je verbinding en probeer opnieuw.",
+                "unexpectedResponseState": "Onverwachte respons status: {{state}}"
+            }
+        },
+        "loading": {
+            "error": {
+                "headline": "Kon niet met server verbinden"
+            }
+        },
+        "goodbye": {
+            "headline": "Tot ziens",
+            "confirm": {
+                "headline": "Hallo {{displayName}}",
+                "subHeader": "bevestig afmelden"
+            },
+            "message": {
+                "confirm": "Klik op onderstaande knop om af te melden van je account.",
+                "close": "Dit venster kan nu worden gesloten."
+            },
+            "signoutButton": {
+                "label": "Afmelden"
+            },
+            "subHeader": "je bent afgemeld van je account"
+        },
+        "welcome": {
+            "signoutButton": {
+                "label": "Afmelden"
+            },
+            "headline": "Welkom {{displayName}}",
+            "message": "Je bent aangemeld - fantastisch!"
+        }
+    }
+}

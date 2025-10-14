@@ -1,0 +1,44 @@
+run:
+  skip-dirs:
+    - (^|/)testdata($|/)
+  skip-dirs-use-default: false
+
+linters:
+  enable:
+    - goimports
+    - gofmt
+    - misspell
+    - gosec
+    - unconvert
+    - revive
+    - gocognit
+    - gocyclo
+  fast: true
+
+linters-settings:
+  misspell:
+    locale: US
+  golint:
+    min-confidence: 0
+  govet:
+    check-shadowing: false
+  goimports:
+    local-prefixes: github.com/Nerzal/gocloak
+  gocognit:
+    min-complexity: 15
+  gocyclo:
+    min-complexity: 15
+  gofmt:
+    simplify: true
+
+issues:
+  exclude-use-default: false
+  exclude-rules:
+    - path: _test\.go
+      linters:
+        - gocyclo
+        - dupl
+        - gosec
+        - gocognit
+  exclude:
+    - should have a package comment

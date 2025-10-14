@@ -1,0 +1,224 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: 2022-03-09T19:33:04.641Z\n"
+"PO-Revision-Date: 2022-03-10 09:40+0100\n"
+"Last-Translator: Simon Eisenmann <simon@longsleep.org>\n"
+"Language-Team: German <http://translate.kopano.io/projects/kopano/konnect/de/>\n"
+"Language: de\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Poedit 2.3\n"
+
+#. From: konnect##consent##message
+#: konnect##consent##message
+msgid "<0><0><0></0></0></0> wants to"
+msgstr "<0><0><0></0></0></0> möchte"
+
+#. From: konnect##chooseaccount##useOther##persona##label
+#: konnect##chooseaccount##useOther##persona##label
+msgid "?"
+msgstr "?"
+
+#. From: konnect##scopeDescription##aliasBasic
+#: konnect##scopeDescription##aliasBasic
+msgid "Access your basic account information"
+msgstr "Zugriff auf Ihre grundlegenden Benutzerinformationen"
+
+#. From: konnect##consent##allowButton##label
+#: konnect##consent##allowButton##label
+msgid "Allow"
+msgstr "Einverstanden"
+
+#. From: konnect##consent##question
+#: konnect##consent##question
+msgid "Allow <1><0></0></1> to do this?"
+msgstr "<1><0></0></1> den Zugriff gestatten?"
+
+#. From: konnect##consent##consequence
+#: konnect##consent##consequence
+msgid "By clicking Allow, you allow this app to use your information."
+msgstr "Wenn Sie Einverstanden klicken, erhält die App Zugriff auf Ihre Informationen."
+
+#. From: konnect##consent##cancelButton##label
+#: konnect##consent##cancelButton##label
+msgid "Cancel"
+msgstr "Abbrechen"
+
+#. From: konnect##chooseaccount##headline
+#: konnect##chooseaccount##headline
+msgid "Choose an account"
+msgstr "Konto auswählen"
+
+#. From: konnect##consent##tooltip##client
+#: konnect##consent##tooltip##client
+msgid "Clicking \"Allow\" will redirect you to: {{redirectURI}}"
+msgstr "Wenn Sie \"Einverstanden\" klicken werden Sie zu {{redirectURI}} weitergeleitet"
+
+#. From: konnect##login##usernameField##placeholder##email
+#: konnect##login##usernameField##placeholder##email
+msgid "Email"
+msgstr "E-Mail"
+
+#. From: konnect##error##login##validate##missingUsername
+#: konnect##error##login##validate##missingUsername
+msgid "Enter a valid value."
+msgstr "Geben Sie einen gültigen Wert ein."
+
+#. From: konnect##error##login##validate##missingPassword
+#: konnect##error##login##validate##missingPassword
+msgid "Enter your password."
+msgstr "Geben Sie ein Passwort ein."
+
+#. From: konnect##loading##error##headline
+#: konnect##loading##error##headline
+msgid "Failed to connect to server"
+msgstr "Verbindung zum Server fehlgeschlagen"
+
+#. From: konnect##goodbye##headline
+#: konnect##goodbye##headline
+msgid "Goodbye"
+msgstr "Bis bald"
+
+#. From: konnect##goodbye##confirm##headline
+#: konnect##goodbye##confirm##headline
+msgid "Hello {{displayName}}"
+msgstr "Hallo {{displayName}}"
+
+#. From: konnect##consent##headline
+#: konnect##consent##headline
+msgid "Hi {{displayName}}"
+msgstr "Hallo {{displayName}}"
+
+#. From: konnect##login##usernameField##placeholder##identity
+#: konnect##login##usernameField##placeholder##identity
+msgid "Identity"
+msgstr "Identität"
+
+#. From: konnect##scopeDescription##offlineAccess
+#: konnect##scopeDescription##offlineAccess
+msgid "Keep the allowed access persistently and forever"
+msgstr "Dauerhaften Zugriff (läuft nicht ab)"
+
+#. From: konnect##error##login##failed
+#: konnect##error##login##failed
+msgid "Logon failed. Please verify your credentials and try again."
+msgstr "Anmeldung fehlgeschlagen. Bitte überprüfen Sie Ihre Eingabe und versuchen Sie es noch einmal."
+
+#. From: konnect##error##http##networkError
+#: konnect##error##http##networkError
+msgid "Network error. Please check your connection and try again."
+msgstr "Netzwerkfehler. Bitte prüfen Sie Ihre Verbindung und versuchen Sie es noch einmal."
+
+#. From: konnect##login##nextButton##label
+#: konnect##login##nextButton##label
+msgid "Next"
+msgstr "Weiter"
+
+#. From: konnect##login##passwordField##label
+#: konnect##login##passwordField##label
+msgid "Password"
+msgstr "Passwort"
+
+#. From: konnect##goodbye##message##confirm
+#: konnect##goodbye##message##confirm
+msgid "Press the button below, to sign out from your account now."
+msgstr "Klicken Sie auf die Schaltfläche unten um sich aus Ihrem Konto abzumelden."
+
+#. From: konnect##login##retryButton##label
+#: konnect##login##retryButton##label
+msgid "Retry"
+msgstr "Wiederholen"
+
+#. From: konnect##scopeDescription##scope
+#: konnect##scopeDescription##scope
+msgid "Scope: {{scope}}"
+msgstr "Geltungsbereich: {{scope}}"
+
+#. From: konnect##login##headline
+#: konnect##login##headline
+msgid "Sign in"
+msgstr "Anmelden"
+
+#. From: konnect##goodbye##signoutButton##label
+#. konnect##welcome##signoutButton##label
+#: konnect##goodbye##signoutButton##label
+#: konnect##welcome##signoutButton##label
+msgid "Sign out"
+msgstr "Abmelden"
+
+#. From: konnect##error##http##unexpectedResponseStatus
+#: konnect##error##http##unexpectedResponseStatus
+msgid "Unexpected HTTP response: {{status}}. Please check your connection and try again."
+msgstr "Unerwartete HTTP-Antwort: {{status}}. Bitte prüfen Sie Ihre Verbindung und versuchen Sie es noch einmal."
+
+#. From: konnect##error##http##unexpectedResponseState
+#: konnect##error##http##unexpectedResponseState
+msgid "Unexpected response state: {{state}}"
+msgstr "Unerwarteter Antwort-Status: {{state}}"
+
+#. From: konnect##chooseaccount##useOther##label
+#: konnect##chooseaccount##useOther##label
+msgid "Use another account"
+msgstr "Anderes Konto"
+
+#. From: konnect##login##usernameField##placeholder##username
+#: konnect##login##usernameField##placeholder##username
+msgid "Username"
+msgstr "Benutzername"
+
+#. From: konnect##welcome##headline
+#: konnect##welcome##headline
+msgid "Welcome {{displayName}}"
+msgstr "Willkommen {{displayName}}"
+
+#. From: konnect##welcome##message
+#: konnect##welcome##message
+msgid "You are signed in - awesome!"
+msgstr "Sie sind angemeldet - super!"
+
+#. From: konnect##goodbye##message##close
+#: konnect##goodbye##message##close
+msgid "You can close this window now."
+msgstr "Sie können dieses Fenster jetzt schließen."
+
+#. From: konnect##goodbye##confirm##subHeader
+#: konnect##goodbye##confirm##subHeader
+msgid "please confirm sign out"
+msgstr "Bitte bestätigen Sie, dass Sie sich abmelden möchten"
+
+#. From: konnect##chooseaccount##subHeader
+#: konnect##chooseaccount##subHeader
+msgid "to sign in"
+msgstr "das angemeldet werden soll"
+
+#. From: konnect##goodbye##subHeader
+#: konnect##goodbye##subHeader
+msgid "you have been signed out from your account"
+msgstr "sie sind jetzt abgemeldet"
+
+#~ msgctxt "konnect.consent.question"
+#~ msgid "Allow {clientDisplayName} to do this?"
+#~ msgstr "{clientDisplayName} den Zugriff gestatten?"
+
+#~ msgctxt "konnect.error.login.validate.missingUsername"
+#~ msgid "Enter an username"
+#~ msgstr "Geben Sie einen Benutzername ein"
+
+#~ msgctxt "konnect.welcome.signoutButton.label"
+#~ msgid "Sign out"
+#~ msgstr "Abmelden"
+
+#~ msgctxt "konnect.chooseaccount.subHeader"
+#~ msgid "to sign in to Kopano"
+#~ msgstr "um sich bei Kopano anzumelden"
+
+#~ msgctxt "konnect.login.subHeader"
+#~ msgid "with your Kopano account"
+#~ msgstr "mit Ihrem Kopano Konto"
+
+#~ msgctxt "konnect.consent.message"
+#~ msgid "{clientDisplayName} wants to"
+#~ msgstr "{clientDisplayName} möchte"

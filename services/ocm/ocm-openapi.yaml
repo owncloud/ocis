@@ -1,0 +1,807 @@
+openapi: 3.1.0
+info:
+  title: oCIS OCM API
+  description: |
+    The Open Cloud Mesh (OCM) API provides federated sharing functionality based on the ScienceMesh and OCM HTTP APIs. 
+    This API enables secure sharing of resources between different oCIS instances and other compatible cloud storage providers.
+    
+    The OCM service consists of multiple HTTP APIs:
+    - **ScienceMesh API**: Handles the invitation workflow for establishing trust between instances
+    - **OCMD API**: Manages federated shares between trusted instances
+  version: 1.0.0
+  contact:
+    name: ownCloud
+    url: https://github.com/owncloud/ocis
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+
+servers:
+  - url: https://your-ocis-instance.com
+    description: oCIS instance
+
+security:
+  - BearerAuth: []
+  - OCMShareToken: []
+
+paths:
+  /.well-known/ocm:
+    get:
+      summary: OCM Provider Discovery
+      description: |
+        Discovers OCM capabilities and configuration of this oCIS instance. This endpoint is used by remote instances
+        to understand what OCM features are supported, available resource types, sharing protocols, and service endpoints.
+        
+        This is a public endpoint that doesn't require authentication and is essential for establishing federated
+        connections between different cloud storage providers. Remote instances query this endpoint before attempting
+        to create federated shares or send invitations.
+        
+        The response includes information about supported resource types (files, folders, calendars), available
+        sharing protocols (WebDAV, CalDAV), and the OCM API version implemented by this instance.
+      operationId: getOCMProviderInfo
+      security: []
+      responses:
+        '200':
+          description: OCM provider information retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OCMProviderInfo'
+
+  /sciencemesh/generate-invite:
+    post:
+      summary: Generate Invitation Token
+      description: |
+        Creates a secure invitation token that can be shared with users on remote oCIS instances to establish
+        a trusted relationship for federated sharing. This is the first step in the OCM invitation workflow.
+        
+        The generated token contains encrypted information about the inviting user and instance, and has a
+        configurable expiration time for security. The token should be transmitted to the recipient through
+        a secure channel (email, messaging app, etc.).
+        
+        Once the recipient accepts the invitation using the token, both instances will add each other to their
+        list of trusted remote users, enabling future federated sharing between these users.
+        
+        **Prerequisites:**
+        - The recipient's instance domain must be listed in the trusted providers configuration
+        - The authenticated user must have permission to create federated invitations
+        
+        **Security Note:** Invitation tokens are single-use and expire after a configured time period.
+      operationId: generateInviteToken
+      tags:
+        - ScienceMesh
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenerateInviteRequest'
+      responses:
+        '200':
+          description: Invitation token generated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvitationToken'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /sciencemesh/accept-invite:
+    post:
+      summary: Accept Invitation
+      description: |
+        Accepts an invitation token received from a remote oCIS instance, completing the trust establishment
+        process for federated sharing. This endpoint validates the invitation token and creates a trusted
+        relationship between the local user and the remote user who sent the invitation.
+        
+        Upon successful acceptance:
+        - The remote user is added to the local instance's trusted users list
+        - The local user is added to the remote instance's trusted users list
+        - Both users can now create federated shares with each other
+        - The invitation token is marked as used and becomes invalid
+        
+        **Prerequisites:**
+        - The invitation token must be valid and not expired
+        - The token's issuing instance must be in the trusted providers list
+        - The authenticated user must have permission to accept federated invitations
+        
+        **Error Conditions:**
+        - Invalid or expired tokens return 400 Bad Request
+        - Already accepted invitations return 409 Conflict
+        - Untrusted provider domains return 403 Forbidden
+      operationId: acceptInvitation
+      tags:
+        - ScienceMesh
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AcceptInviteRequest'
+      responses:
+        '200':
+          description: Invitation accepted successfully, remote user relationship established
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RemoteUser'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  /ocm/shares:
+    post:
+      summary: Create Federated Share
+      description: |
+        Creates a new federated share, allowing a local resource (file, folder, calendar) to be shared with
+        a user on a remote oCIS instance. This endpoint initiates the federated sharing process by sending
+        a share notification to the remote instance.
+        
+        The sharing process involves:
+        1. Validating that the recipient exists and is trusted (invitation must have been accepted previously)
+        2. Creating a local share record with the specified permissions
+        3. Sending a share notification to the remote instance via the OCM protocol
+        4. The remote instance creates a "received share" that the recipient can accept or reject
+        
+        **Supported Resource Types:**
+        - Files: Individual documents, images, or other file types
+        - Folders: Directory structures with all contained files
+        - Calendars: Calendar collections (if CalDAV is enabled)
+        
+        **Permission Levels:**
+        - `read`: View and download the shared resource
+        - `write`: Modify the shared resource content
+        - `share`: Re-share the resource with other users
+        - `delete`: Remove the shared resource
+        
+        **Prerequisites:**
+        - A trusted relationship must exist with the recipient (via invitation workflow)
+        - The authenticated user must own or have sharing permissions on the resource
+        - The recipient's instance must be reachable and support the required protocols
+      operationId: createFederatedShare
+      tags:
+        - OCMD
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateShareRequest'
+      responses:
+        '201':
+          description: Federated share created successfully and notification sent to remote instance
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Share'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    get:
+      summary: List Federated Shares
+      description: |
+        Retrieves a paginated list of federated shares created by the authenticated user. This includes both
+        outgoing shares (resources shared with remote users) and incoming shares (resources received from
+        remote users that have been accepted).
+        
+        The response includes comprehensive information about each share including current state, permissions,
+        recipient details, and access protocols. This endpoint is useful for building user interfaces that
+        display sharing status and allow share management.
+        
+        **Filtering Options:**
+        - `state`: Filter by share state (pending, accepted, rejected, expired)
+        - `limit`: Control the number of results per page (1-1000, default 100)
+        - `offset`: Skip a number of results for pagination
+        
+        **Share States:**
+        - `pending`: Share created but not yet accepted by recipient
+        - `accepted`: Share accepted and accessible by recipient
+        - `rejected`: Share explicitly rejected by recipient
+        - `expired`: Share invitation expired before acceptance
+        
+        **Use Cases:**
+        - Dashboard views showing all user's federated shares
+        - Monitoring share status and recipient responses
+        - Bulk operations on multiple shares
+        - Audit trails for compliance and security
+      operationId: listFederatedShares
+      tags:
+        - OCMD
+      parameters:
+        - name: state
+          in: query
+          description: Filter shares by their current state
+          schema:
+            type: string
+            enum: [pending, accepted, rejected, expired]
+        - name: limit
+          in: query
+          description: Maximum number of shares to return (pagination)
+          schema:
+            type: integer
+            default: 100
+            minimum: 1
+            maximum: 1000
+        - name: offset
+          in: query
+          description: Number of shares to skip for pagination
+          schema:
+            type: integer
+            default: 0
+            minimum: 0
+      responses:
+        '200':
+          description: List of federated shares retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShareList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /ocm/shares/{shareId}:
+    get:
+      summary: Get Federated Share Details
+      description: |
+        Retrieves comprehensive details about a specific federated share, including its current state,
+        permissions, recipient information, access protocols, and metadata. This endpoint provides
+        complete information needed for share management and troubleshooting.
+        
+        The response includes:
+        - Share metadata (name, description, creation/update timestamps)
+        - Current state and any state change history
+        - Detailed permission settings and access levels
+        - Recipient information and contact details
+        - Protocol-specific access information (WebDAV URLs, tokens)
+        - Resource information (type, size, location)
+        
+        **Access Control:**
+        - Share creators can always access their share details
+        - Share recipients can access details of accepted shares
+        - Administrators can access all share details for their instance
+        
+        **Use Cases:**
+        - Debugging share access issues
+        - Displaying detailed share information in user interfaces
+        - Auditing share configurations and permissions
+        - Generating share access instructions for recipients
+      operationId: getFederatedShare
+      tags:
+        - OCMD
+      parameters:
+        - $ref: '#/components/parameters/ShareId'
+      responses:
+        '200':
+          description: Federated share details retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Share'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      summary: Update Federated Share
+      description: |
+        Updates the configuration of an existing federated share, such as changing permissions, updating
+        the description, or modifying access settings. Changes are propagated to the remote instance
+        and take effect immediately.
+        
+        **Updatable Properties:**
+        - Permissions: Add or remove access levels (read, write, share, delete)
+        - Description: Update the human-readable share description
+        - Expiration: Set or modify share expiration date
+        - Notification settings: Configure recipient notifications
+        
+        **Permission Changes:**
+        - Expanding permissions (e.g., read-only to read-write) takes effect immediately
+        - Restricting permissions may require recipient confirmation for security
+        - Removing all permissions effectively disables the share
+        
+        **Limitations:**
+        - Cannot change the shared resource or recipient after creation
+        - Some permission changes may be restricted by instance policies
+        - Updates to accepted shares notify the recipient of changes
+        
+        **Access Control:**
+        - Only the share creator can update share settings
+        - Administrators can update any share on their instance
+        - Recipients cannot modify share settings (but can accept/reject)
+      operationId: updateFederatedShare
+      tags:
+        - OCMD
+      parameters:
+        - $ref: '#/components/parameters/ShareId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateShareRequest'
+      responses:
+        '200':
+          description: Federated share updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Share'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      summary: Delete Federated Share
+      description: |
+        Permanently removes a federated share, revoking all access for the recipient and cleaning up
+        associated resources on both local and remote instances. This action cannot be undone.
+        
+        **Deletion Process:**
+        1. Local share record is marked for deletion
+        2. Revocation notification is sent to the remote instance
+        3. Remote instance removes the received share and notifies the recipient
+        4. All access tokens and protocols are invalidated
+        5. Local share record is permanently deleted
+        
+        **Effects of Deletion:**
+        - Recipient immediately loses access to the shared resource
+        - Any active connections or downloads are terminated
+        - Share no longer appears in either user's share lists
+        - Associated WebDAV endpoints become inaccessible
+        - Audit logs retain deletion record for compliance
+        
+        **Access Control:**
+        - Only the share creator can delete their shares
+        - Administrators can delete any share on their instance
+        - Recipients cannot delete shares (but can reject them)
+        
+        **Best Practices:**
+        - Consider updating permissions instead of deletion for temporary access removal
+        - Notify recipients before deleting important shares
+        - Use rejection instead of deletion for unwanted received shares
+      operationId: deleteFederatedShare
+      tags:
+        - OCMD
+      parameters:
+        - $ref: '#/components/parameters/ShareId'
+      responses:
+        '204':
+          description: Federated share deleted successfully
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /ocm/shares/{shareId}/accept:
+    post:
+      summary: Accept Received Share
+      description: |
+        Accepts a federated share that was received from a remote instance, making the shared resource
+        accessible to the authenticated user. This endpoint is used by recipients to confirm they want
+        to access a shared resource.
+        
+        **Acceptance Process:**
+        1. Validates the share exists and is in pending state
+        2. Checks user permissions and instance policies
+        3. Creates local access structures (mount points, WebDAV endpoints)
+        4. Updates share state to "accepted"
+        5. Notifies the sharing instance of acceptance
+        6. Makes the resource accessible through configured protocols
+        
+        **Post-Acceptance Access:**
+        - Resource becomes available in the user's file system or application
+        - WebDAV endpoints are activated for file access
+        - Permissions are enforced according to the share configuration
+        - User can interact with the resource based on granted permissions
+        
+        **Access Protocols:**
+        - WebDAV: For file and folder access through standard clients
+        - CalDAV: For calendar sharing (if supported)
+        - Web Interface: Browser-based access through oCIS web UI
+        
+        **Prerequisites:**
+        - Share must be in "pending" state
+        - User must have permission to accept federated shares
+        - Instance must support the required access protocols
+        - Sufficient storage quota (if applicable)
+      operationId: acceptReceivedShare
+      tags:
+        - OCMD
+      parameters:
+        - $ref: '#/components/parameters/ShareId'
+      responses:
+        '200':
+          description: Share accepted successfully, resource is now accessible
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Share'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /ocm/shares/{shareId}/reject:
+    post:
+      summary: Reject Received Share
+      description: |
+        Rejects a federated share that was received from a remote instance, declining access to the
+        shared resource. This is a polite way to decline unwanted shares and helps keep share lists clean.
+        
+        **Rejection Process:**
+        1. Validates the share exists and can be rejected
+        2. Updates share state to "rejected"
+        3. Sends rejection notification to the sharing instance
+        4. Removes the share from the recipient's pending shares list
+        5. Optionally provides feedback to the share creator
+        
+        **Effects of Rejection:**
+        - Share is removed from recipient's interface
+        - Share creator is notified of the rejection
+        - No access is granted to the shared resource
+        - Share state is permanently set to "rejected"
+        - Future sharing attempts may reference this rejection
+        
+        **Difference from Deletion:**
+        - Rejection is performed by the recipient, deletion by the creator
+        - Rejected shares maintain audit trail and notification history
+        - Rejection can include optional feedback message
+        - Share creator retains the share record with "rejected" status
+        
+        **Use Cases:**
+        - Declining unwanted or inappropriate shares
+        - Managing share inbox and reducing clutter
+        - Providing feedback about sharing policies or preferences
+        - Maintaining professional boundaries in collaborative environments
+        
+        **Note:** Rejected shares can potentially be re-shared by the creator, but recipients
+        may receive notifications about repeated sharing attempts.
+      operationId: rejectReceivedShare
+      tags:
+        - OCMD
+      parameters:
+        - $ref: '#/components/parameters/ShareId'
+      responses:
+        '200':
+          description: Share rejected successfully, creator has been notified
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Share'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    OCMShareToken:
+      type: http
+      scheme: bearer
+      description: OCM share token for accessing shared resources
+
+  parameters:
+    ShareId:
+      name: shareId
+      in: path
+      required: true
+      description: Unique identifier of the federated share
+      schema:
+        type: string
+
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Conflict:
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+  schemas:
+    OCMProviderInfo:
+      type: object
+      properties:
+        enabled:
+          type: boolean
+          description: Whether OCM is enabled on this instance
+        apiVersion:
+          type: string
+          description: OCM API version
+          example: "1.0.0"
+        endPoint:
+          type: string
+          format: uri
+          description: OCM endpoint URL
+          example: "https://your-instance.com/ocm/"
+        provider:
+          type: string
+          description: Provider name
+          example: "oCIS"
+        resourceTypes:
+          type: array
+          items:
+            $ref: '#/components/schemas/ResourceType'
+        capabilities:
+          type: array
+          items:
+            type: string
+          example: ["core", "file-sharing", "notifications"]
+
+    ResourceType:
+      type: object
+      properties:
+        name:
+          type: string
+          enum: [file, folder, calendar, contact]
+        shareTypes:
+          type: array
+          items:
+            type: string
+            enum: [user, group]
+        protocols:
+          type: object
+          additionalProperties:
+            type: string
+
+    GenerateInviteRequest:
+      type: object
+      required:
+        - recipient
+      properties:
+        description:
+          type: string
+          description: Description of the invitation
+          example: "Invitation for collaboration"
+        recipient:
+          type: string
+          format: email
+          description: Email of the recipient
+          example: "user@remote-instance.com"
+
+    AcceptInviteRequest:
+      type: object
+      required:
+        - token
+        - provider_domain
+      properties:
+        token:
+          type: string
+          description: Invitation token
+        provider_domain:
+          type: string
+          description: Domain of the provider that issued the token
+          example: "remote-instance.com"
+
+    InvitationToken:
+      type: object
+      properties:
+        token:
+          type: string
+          description: JWT invitation token
+        expiration:
+          type: string
+          format: date-time
+          description: Token expiration time
+        provider_domain:
+          type: string
+          description: Domain of the issuing provider
+
+    RemoteUser:
+      type: object
+      properties:
+        user_id:
+          type: string
+          description: Remote user identifier
+        display_name:
+          type: string
+          description: Display name of the remote user
+        email:
+          type: string
+          format: email
+          description: Email of the remote user
+        provider_domain:
+          type: string
+          description: Domain of the remote provider
+
+    CreateShareRequest:
+      type: object
+      required:
+        - shareWith
+        - name
+        - resourceType
+        - permissions
+      properties:
+        shareWith:
+          type: string
+          description: Remote user to share with
+          example: "user@remote-instance.com"
+        name:
+          type: string
+          description: Name of the shared resource
+          example: "Shared Document.pdf"
+        description:
+          type: string
+          description: Description of the share
+        providerId:
+          type: string
+          description: Provider identifier
+        owner:
+          type: string
+          description: Owner of the resource
+        ownerDisplayName:
+          type: string
+          description: Display name of the owner
+        sharedBy:
+          type: string
+          description: User who created the share
+        sharedByDisplayName:
+          type: string
+          description: Display name of the user who created the share
+        resourceType:
+          type: string
+          enum: [file, folder, calendar, contact]
+        permissions:
+          type: array
+          items:
+            type: string
+            enum: [read, write, share, delete]
+        protocols:
+          $ref: '#/components/schemas/ShareProtocols'
+
+    UpdateShareRequest:
+      type: object
+      properties:
+        permissions:
+          type: array
+          items:
+            type: string
+            enum: [read, write, share, delete]
+        description:
+          type: string
+
+    Share:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique share identifier
+        shareWith:
+          type: string
+          description: Remote user the resource is shared with
+        name:
+          type: string
+          description: Name of the shared resource
+        description:
+          type: string
+          description: Description of the share
+        providerId:
+          type: string
+          description: Provider identifier
+        owner:
+          type: string
+          description: Owner of the resource
+        ownerDisplayName:
+          type: string
+          description: Display name of the owner
+        sharedBy:
+          type: string
+          description: User who created the share
+        sharedByDisplayName:
+          type: string
+          description: Display name of the user who created the share
+        resourceType:
+          type: string
+          enum: [file, folder, calendar, contact]
+        permissions:
+          type: array
+          items:
+            type: string
+            enum: [read, write, share, delete]
+        protocols:
+          $ref: '#/components/schemas/ShareProtocols'
+        createdAt:
+          type: string
+          format: date-time
+          description: Share creation timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          description: Share last update timestamp
+        state:
+          type: string
+          enum: [pending, accepted, rejected, expired]
+          description: Current state of the share
+
+    ShareProtocols:
+      type: object
+      properties:
+        webdav:
+          type: object
+          properties:
+            uri:
+              type: string
+              description: WebDAV URI for accessing the shared resource
+            permissions:
+              type: array
+              items:
+                type: string
+                enum: [read, write]
+
+    ShareList:
+      type: object
+      properties:
+        shares:
+          type: array
+          items:
+            $ref: '#/components/schemas/Share'
+        total:
+          type: integer
+          description: Total number of shares
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              description: Error code
+            message:
+              type: string
+              description: Human readable error message
+            details:
+              type: object
+              description: Additional error details
+              additionalProperties: true
+
+tags:
+  - name: ScienceMesh
+    description: ScienceMesh API for invitation workflow
+  - name: OCMD
+    description: Open Cloud Mesh Discovery API for federated shares

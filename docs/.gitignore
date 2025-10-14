@@ -1,0 +1,4 @@
+hugo/
+grpc_apis/
+helpers/output/*
+services/**/_index.md

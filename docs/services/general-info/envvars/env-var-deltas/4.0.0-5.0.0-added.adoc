@@ -1,0 +1,1021 @@
+// # Added Variables between oCIS 4.0.0 and oCIS 5.0.0
+// commenting the headline to make it better includable
+
+// table created based on the .md file per 2024.02.12
+// the table should be recreated/updated based on the final .md file
+
+[width="100%",cols="~,~,~,~",options="header"]
+|===
+| Service| Variable| Description| Default
+
+| xref:deployment/services/env-vars-special-scope.adoc[Special Scope Envvars]
+| `OCIS_CACHE_DISABLE_PERSISTENCE`
+| Disables persistence of the cache. Only applies when store type 'nats-js-kv' is configured.| `false`
+|
+| `MICRO_REGISTRY` +
+(important change)
+| The Go micro registry type to use. Supported types are: 'memory', 'nats-js-kv' (default) and 'kubernetes'. Note that 'nats', 'etcd', 'consul' and 'mdns' are deprecated and will be removed in a later version. Only change on supervision of ownCloud Support.| nats-js-kv
+|
+| `MICRO_REGISTRY_AUTH_PASSWORD`
+| Optional when using nats to authenticate with the nats cluster.|
+|
+| `MICRO_REGISTRY_AUTH_USERNAME`
+| Optional when using nats to authenticate with the nats cluster.|
+
+| xref:{s-path}/antivirus.adoc[antivirus]
+| `OCIS_EVENTS_AUTH_USERNAME`
+| The username to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.|
+|
+| `OCIS_EVENTS_AUTH_PASSWORD`
+| The password to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.|
+|
+| `ANTIVIRUS_ICAP_SCAN_TIMEOUT`
+| Scan timeout for the ICAP client. Defaults to '5m' (5 minutes). See the Environment Variable Types description for more details.| 5m0s
+
+| xref:{s-path}/audit.adoc[audit]
+| `OCIS_EVENTS_AUTH_USERNAME`
+| The username to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.|
+|
+| `OCIS_EVENTS_AUTH_PASSWORD`
+| The password to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.|
+
+| xref:{s-path}/auth-service.adoc[auth-service]
+| `OCIS_TRACING_ENABLED` +
+`AUTH_SERVICE_TRACING_ENABLED`
+| Activates tracing.|
+|
+| `OCIS_TRACING_TYPE` +
+`AUTH_SERVICE_TRACING_TYPE`
+| The type of tracing. Defaults to '', which is the same as 'jaeger'. Allowed tracing types are 'jaeger' and '' as of now."|
+|
+| `OCIS_TRACING_ENDPOINT` +
+`AUTH_SERVICE_TRACING_ENDPOINT`
+| The endpoint of the tracing agent.|
+|
+| `OCIS_TRACING_COLLECTOR` +
+`AUTH_SERVICE_TRACING_COLLECTOR`
+| The HTTP endpoint for sending spans directly to a collector, i.e. http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.|
+|
+| `OCIS_LOG_LEVEL` +
+`AUTH_SERVICE_LOG_LEVEL`
+| The log level. Valid values are: 'panic', 'fatal', 'error', 'warn', 'info', 'debug', 'trace'."|
+|
+| `OCIS_LOG_PRETTY` +
+`AUTH_SERVICE_LOG_PRETTY`
+| Activates pretty log output.|
+|
+| `OCIS_LOG_COLOR` +
+`AUTH_SERVICE_LOG_COLOR`
+| Activates colorized log output.|
+|
+| `OCIS_LOG_FILE` +
+`AUTH_SERVICE_LOG_FILE`
+| The path to the log file. Activates logging to this file if set.|
+|
+| `AUTH_SERVICE_DEBUG_ADDR`
+| Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.|
+|
+| `AUTH_SERVICE_DEBUG_PPROF`
+| Enables pprof, which can be used for profiling.|
+|
+| `AUTH_SERVICE_DEBUG_TOKEN`
+| Enables pprof, which can be used for profiling.|
+|
+| `AUTH_SERVICE_DEBUG_ZPAGES`
+| Enables zpages, which can be used for collecting and viewing in-memory traces.|
+|
+| `AUTH_SERVICE_GRPC_ADDR`
+| The bind address of the GRPC service.|
+|
+| `AUTH_SERVICE_GRPC_PROTOCOL`
+| The transport protocol of the GRPC service.|
+|
+| `OCIS_SERVICE_ACCOUNT_ID` +
+`AUTH_SERVICE_SERVICE_ACCOUNT_ID`
+| The ID of the service account the service should use. See the 'auth-service' service description for more details.|
+|
+| `OCIS_SERVICE_ACCOUNT_SECRET` +
+`AUTH_SERVICE_SERVICE_ACCOUNT_SECRET`
+| The service account secret.|
+
+|
+| `OCIS_JWT_SECRET` +
+`AUTH_SERVICE_JWT_SECRET`
+| The secret to mint and validate jwt tokens.|
+
+| xref:{s-path}/clientlog.adoc[clientlog]
+| `OCIS_REVA_GATEWAY` +
+`CLIENTLOG_REVA_GATEWAY`
+| CS3 gateway used to look up user metadata|
+|
+| `OCIS_EVENTS_ENDPOINT` +
+`CLIENTLOG_EVENTS_ENDPOINT`
+| The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.|
+|
+| `OCIS_EVENTS_CLUSTER` +
+`CLIENTLOG_EVENTS_CLUSTER`
+| The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system.|
+|
+| `OCIS_INSECURE` +
+`CLIENTLOG_EVENTS_TLS_INSECURE`
+| Whether to verify the server TLS certificates.|
+|
+| `OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
+`CLIENTLOG_EVENTS_TLS_ROOT_CA_CERTIFICATE`
+| The root CA certificate used to validate the server's TLS certificate. If provided NOTIFICATIONS_EVENTS_TLS_INSECURE will be seen as false.|
+|
+| `OCIS_EVENTS_ENABLE_TLS` +
+`CLIENTLOG_EVENTS_ENABLE_TLS`
+| Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services.|
+|
+| `OCIS_EVENTS_AUTH_USERNAME` +
+`CLIENTLOG_EVENTS_AUTH_USERNAME`
+| The username to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.|
+|
+| `OCIS_EVENTS_AUTH_PASSWORD` +
+`CLIENTLOG_EVENTS_AUTH_PASSWORD`
+| The password to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.|
+|
+| `OCIS_JWT_SECRET` +
+`CLIENTLOG_JWT_SECRET`
+| The secret to mint and validate jwt tokens.|
+|
+| `OCIS_SERVICE_ACCOUNT_ID` +
+`CLIENTLOG_SERVICE_ACCOUNT_ID`
+| The ID of the service account the service should use. See the 'auth-service' service description for more details.|
+|
+| `OCIS_SERVICE_ACCOUNT_SECRET` +
+`CLIENTLOG_SERVICE_ACCOUNT_SECRET`
+| The service account secret.|
+
+|
+| `CLIENTLOG_DEBUG_ADDR`
+| Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.|
+|
+| `CLIENTLOG_DEBUG_TOKEN`
+| Token to secure the metrics endpoint.|
+|
+| `CLIENTLOG_DEBUG_PPROF`
+| Enables pprof, which can be used for profiling.|
+|
+| `CLIENTLOG_DEBUG_ZPAGES`
+| Enables zpages, which can be used for collecting and viewing in-memory traces.|
+
+|
+| `OCIS_LOG_LEVEL` +
+`CLIENTLOG_USERLOG_LOG_LEVEL`
+| The log level. Valid values are: 'panic', 'fatal', 'error', 'warn', 'info', 'debug', 'trace'."|
+|
+| `OCIS_LOG_PRETTY` +
+`CLIENTLOG_USERLOG_LOG_PRETTY`
+| Activates pretty log output.|
+|
+| `OCIS_LOG_COLOR` +
+`CLIENTLOG_USERLOG_LOG_COLOR`
+| Activates colorized log output.|
+|
+| `OCIS_LOG_FILE` +
+`CLIENTLOG_USERLOG_LOG_FILE`
+| The path to the log file. Activates logging to this file if set.|
+
+|
+| `OCIS_TRACING_ENABLED` +
+`CLIENTLOG_TRACING_ENABLED`
+| Activates tracing.|
+|
+| `OCIS_TRACING_TYPE` +
+`CLIENTLOG_TRACING_TYPE`
+| The type of tracing. Defaults to '', which is the same as 'jaeger'. Allowed tracing types are 'jaeger' and '' as of now."`
+|
+|
+| `OCIS_TRACING_ENDPOINT` +
+`CLIENTLOG_TRACING_ENDPOINT`
+| The endpoint of the tracing agent.|
+|
+| `OCIS_TRACING_COLLECTOR` +
+`CLIENTLOG_TRACING_COLLECTOR`
+| The HTTP endpoint for sending spans directly to a collector, i.e. http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.|
+
+| xref:{s-path}/eventhistory.adoc[eventhistory]
+| `OCIS_PERSISTENT_STORE_AUTH_USERNAME` +
+`EVENTHISTORY_STORE_AUTH_USERNAME`
+| The username to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.|
+|
+| `OCIS_PERSISTENT_STORE_AUTH_PASSWORD` +
+`EVENTHISTORY_STORE_AUTH_PASSWORD`
+| The password to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.|
+|
+| `OCIS_EVENTS_AUTH_USERNAME` +
+`EVENTHISTORY_EVENTS_AUTH_USERNAME`
+| The username to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.|
+|
+| `OCIS_EVENTS_AUTH_PASSWORD` +
+`EVENTHISTORY_EVENTS_AUTH_PASSWORD`
+| The password to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.|
+
+| xref:{s-path}/frontend.adoc[frontend]
+| `FRONTEND_DEFAULT_LINK_PERMISSIONS`
+| Defines the default permissions a link is being created with. Possible values are 0 (= internal link, for instance members only) and 1 (= public link with viewer permissions). Defaults to 1.|
+|
+| `FRONTEND_AUTO_ACCEPT_SHARES`
+| Defines if shares should be auto accepted by default. Users can change this setting individually in their profile.| true
+|
+| `OCIS_CACHE_DISABLE_PERSISTENCE` +
+`FRONTEND_OCS_STAT_CACHE_DISABLE_PERSISTENCE`
+| Disable persistence of the cache. Only applies when using the 'nats-js-kv' store type. Defaults to false.| false
+|
+| `OCIS_CACHE_AUTH_USERNAME` +
+`FRONTEND_OCS_STAT_CACHE_AUTH_USERNAME`
+| The username to use for authentication. Only applies when using the 'nats-js-kv' store type.|
+|
+| `OCIS_CACHE_AUTH_PASSWORD` +
+`FRONTEND_OCS_STAT_CACHE_AUTH_PASSWORD`
+| The password to use for authentication. Only applies when using the 'nats-js-kv' store type.|
+|
+| `FRONTEND_OCS_LIST_OCM_SHARES`
+| Include OCM shares when listing shares. See the OCM service documentation for more details.|
+|
+| `OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD` +
+`FRONTEND_OCS_PUBLIC_SHARE_MUST_HAVE_PASSWORD`
+| Set this to true if you want to enforce passwords on all public shares.|
+|
+| `OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD` +
+`FRONTEND_OCS_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD`
+| Set this to true if you want to enforce passwords on Uploader, Editor or Contributor shares.|
+|
+| `FRONTEND_OCS_INCLUDE_OCM_SHAREES`
+| Include OCM sharees when listing sharees.|
+|
+| `OCIS_EVENTS_ENDPOINT` +
+`FRONTEND_EVENTS_ENDPOINT`
+| The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.|
+|
+| `OCIS_EVENTS_CLUSTER` +
+`FRONTEND_EVENTS_CLUSTER`
+| The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system.|
+|
+| `OCIS_INSECURE` +
+`FRONTEND_EVENTS_TLS_INSECURE`
+| Whether to verify the server TLS certificates.|
+|
+| `FRONTEND_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
+`OCS_EVENTS_TLS_ROOT_CA_CERTIFICATE`
+| The root CA certificate used to validate the server's TLS certificate. If provided NOTIFICATIONS_EVENTS_TLS_INSECURE will be seen as false.|
+|
+| `OCIS_EVENTS_ENABLE_TLS` +
+`FRONTEND_EVENTS_ENABLE_TLS`
+| Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services.|
+|
+| `OCIS_EVENTS_AUTH_USERNAME` +
+`FRONTEND_EVENTS_AUTH_USERNAME`
+| The username to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.|
+|
+| `OCIS_EVENTS_AUTH_PASSWORD` +
+`FRONTEND_EVENTS_AUTH_PASSWORD`
+| The password to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.|
+|
+| `OCIS_SERVICE_ACCOUNT_ID` +
+`FRONTEND_SERVICE_ACCOUNT_ID`
+| The ID of the service account the service should use. See the 'auth-service' service description for more details.|
+|
+| `OCIS_SERVICE_ACCOUNT_SECRET` +
+`FRONTEND_SERVICE_ACCOUNT_SECRET`
+| The service account secret.|
+|
+| `OCIS_PASSWORD_POLICY_DISABLED` +
+`FRONTEND_PASSWORD_POLICY_DISABLED`
+| Define the minimum password length. Defaults to 0 if not set.| 0
+|
+| `OCIS_PASSWORD_POLICY_MIN_CHARACTERS` +
+`FRONTEND_PASSWORD_POLICY_MIN_CHARACTERS`
+| Disable the password policy. Defaults to false if not set.|
+|
+| `OCIS_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS` +
+`FRONTEND_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS`
+| Define the minimum number of lowercase characters. Defaults to 0 if not set.| 0
+|
+| `OCIS_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS` +
+`FRONTEND_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS`
+| Define the minimum number of uppercase characters. Defaults to 0 if not set.| 0
+|
+| `OCIS_PASSWORD_POLICY_MIN_DIGITS` +
+`FRONTEND_PASSWORD_POLICY_MIN_DIGITS`
+| Define the minimum number of digits. Defaults to 0 if not set.| 0
+|
+| `OCIS_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS` +
+`FRONTEND_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS`
+| Define the minimum number of special characters. Defaults to 0 if not set.| 0
+|
+| `OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST` +
+`FRONTEND_PASSWORD_POLICY_BANNED_PASSWORDS_LIST`
+| Path to the 'banned passwords list' file. See the documentation for more details.|
+
+| xref:{s-path}/gateway.adoc[gateway]
+| `OCIS_CACHE_DISABLE_PERSISTENCE` +
+`GATEWAY_STAT_CACHE_DISABLE_PERSISTENCE`
+| Disables persistence of the stat cache. Only applies when store type 'nats-js-kv' is configured. Defaults to false.| false
+|
+| `OCIS_CACHE_DISABLE_PERSISTENCE` +
+`GATEWAY_PROVIDER_CACHE_DISABLE_PERSISTENCE`
+| Disables persistence of the provider cache. Only applies when store type 'nats-js-kv' is configured. Defaults to false.| false
+|
+| `OCIS_CACHE_AUTH_USERNAME` +
+`GATEWAY_PROVIDER_CACHE_AUTH_USERNAME`
+| The username to use for authentication. Only applies when store type 'nats-js-kv' is configured.|
+|
+| `OCIS_CACHE_AUTH_PASSWORD` +
+`GATEWAY_PROVIDER_CACHE_AUTH_PASSWORD`
+| The password to use for authentication. Only applies when store type 'nats-js-kv' is configured.|
+|
+| `OCIS_CACHE_DISABLE_PERSISTENCE` +
+`GATEWAY_CREATE_HOME_CACHE_DISABLE_PERSISTENCE`
+| Disables persistence of the create home cache. Only applies when store type 'nats-js-kv' is configured. Defaults to false.| false
+|
+| `OCIS_CACHE_AUTH_USERNAME` +
+`GATEWAY_CREATE_HOME_CACHE_AUTH_USERNAME`
+| The username to use for authentication. Only applies when store type 'nats-js-kv' is configured.|
+|
+| `OCIS_CACHE_AUTH_PASSWORD` +
+`GATEWAY_CREATE_HOME_CACHE_AUTH_PASSWORDv`
+| The password to use for authentication. Only applies when store type 'nats-js-kv' is configured.|
+
+| xref:{s-path}/graph.adoc[graph]
+| `OCIS_CACHE_DISABLE_PERSISTENCE` +
+`GRAPH_CACHE_DISABLE_PERSISTENCE`
+| Disables persistence of the cache. Only applies when store type 'nats-js-kv' is configured. Defaults to false.| false
+|
+| `OCIS_CACHE_AUTH_USERNAME` +
+`GRAPH_CACHE_AUTH_USERNAME`
+| The username to authenticate with the cache. Only applies when store type 'nats-js-kv' is configured.|
+|
+| `OCIS_CACHE_AUTH_PASSWORD` +
+`GRAPH_CACHE_AUTH_PASSWORD`
+| The password to authenticate with the cache. Only applies when store type 'nats-js-kv' is configured.|
+
+|
+| `GRAPH_IDENTITY_SEARCH_MIN_LENGTH`
+| The minimum length the search term needs to have for unprivileged users when searching for users or groups.|
+|
+| `OCIS_EVENTS_AUTH_USERNAME` +
+`GRAPH_EVENTS_AUTH_USERNAME`
+| The username to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.|
+|
+| `OCIS_EVENTS_AUTH_PASSWORD` +
+`GRAPH_EVENTS_AUTH_PASSWORD`
+| The password to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.|
+|
+| `OCIS_SERVICE_ACCOUNT_ID` +
+`GRAPH_SERVICE_ACCOUNT_ID`
+| The ID of the service account the service should use. See the 'auth-service' service description for more details.|
+|
+| `OCIS_SERVICE_ACCOUNT_SECRET` +
+`GRAPH_SERVICE_ACCOUNT_SECRET`
+| The service account secret.|
+|
+| `OCIS_ENABLE_RESHARING` +
+`GRAPH_ENABLE_RESHARING`
+| Changing this value is NOT supported. Enables the support for resharing in the clients.|
+
+| xref:{s-path}/idp.adoc[idp]
+| `IDP_LOGIN_BACKGROUND_URL`
+| Configure an alternative URL to the background image for the login page.|
+
+| xref:{s-path}/notifications.adoc[notifications]
+| `OCIS_DEFAULT_LANGUAGE`
+| The default language used by services and the WebUI. If not defined, English will be used as default. See the documentation for more details.|
+|
+| `OCIS_EVENTS_AUTH_USERNAME` +
+`NOTIFICATIONS_EVENTS_AUTH_USERNAME`
+| The username to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.|
+|
+| `OCIS_EVENTS_AUTH_PASSWORD` +
+`NOTIFICATIONS_EVENTS_AUTH_PASSWORD`
+| The password to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.|
+|
+| `OCIS_SERVICE_ACCOUNT_ID` +
+`NOTIFICATIONS_SERVICE_ACCOUNT_ID`
+| The ID of the service account the service should use. See the 'auth-service' service description for more details.|
+|
+| `OCIS_SERVICE_ACCOUNT_SECRET` +
+`NOTIFICATIONS_SERVICE_ACCOUNT_SECRET`
+| The service account secret.|
+
+| xref:{s-path}/ocdav.adoc[ocdav]
+| `OCDAV_OCM_NAMESPACE`
+| The human readable path prefix for the ocm shares.|
+
+| xref:{s-path}/ocm.adoc[ocm]
+| `SHARING_OCM_PROVIDER_AUTHORIZER_DRIVER`
+| Driver to be used to persist ocm invites. Supported value is only 'json'.| `json`
+|
+| `OCM_HTTP_ADDR`
+| The bind address of the HTTP service.|
+|
+| `OCM_HTTP_PROTOCOL`
+| The transport protocol of the HTTP service.|
+|
+| `OCM_HTTP_PREFIX`
+| The path prefix where OCM can be accessed (defaults to /).|
+|
+| `OCIS_SERVICE_ACCOUNT_ID` +
+`OCM_SERVICE_ACCOUNT_ID`
+| The ID of the service account the service should use. See the 'auth-service' service description for more details.|
+|
+| `OCIS_SERVICE_ACCOUNT_SECRET` +
+`OCM_SERVICE_ACCOUNT_SECRET`
+| The service account secret.|
+|
+| `OCIS_CORS_ALLOW_ORIGINS` +
+`OCM_CORS_ALLOW_ORIGINS`
+| A list of allowed CORS origins. See following chapter for more details: *Access-Control-Allow-Origin* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin. See the Environment Variable Types description for more details.|
+|
+| `OCIS_CORS_ALLOW_METHODS` +
+`OCM_CORS_ALLOW_METHODS`
+| A list of allowed CORS methods. See following chapter for more details: *Access-Control-Allow-Methods* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Methods. See the Environment Variable Types description for more details.|
+|
+| `OCIS_CORS_ALLOW_HEADERS` +
+`OCM_CORS_ALLOW_HEADERS`
+| A list of allowed CORS headers. See following chapter for more details: *Access-Control-Allow-Headers* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Headers. See the Environment Variable Types description for more details.|
+|
+| `OCIS_CORS_ALLOW_CREDENTIALS` +
+`OCM_CORS_ALLOW_CREDENTIALS`
+| Allow credentials for CORS.See following chapter for more details: *Access-Control-Allow-Credentials* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials.|
+|
+| `OCM_GRPC_ADDR`
+| The bind address of the GRPC service.|
+|
+| `OCM_GRPC_PROTOCOL`
+| The transport protocol of the GRPC service.|
+|
+| `OCM_SCIENCEMESH_PREFIX`
+| URL path prefix for the ScienceMesh service. Note that the string must not start with '/'.|
+|
+| `OCM_MESH_DIRECTORY_URL`
+| URL of the mesh directory service.|
+|
+| `OCM_OCMD_PREFIX`
+| URL path prefix for the OCMd service. Note that the string must not start with '/'.|
+|
+| `OCM_OCMD_EXPOSE_RECIPIENT_DISPLAY_NAME`
+| Expose the display name of OCM share recipients.|
+|
+| `OCM_OCM_INVITE_MANAGER_DRIVER`
+| Driver to be used to persist ocm invites. Supported value is only 'json'.| `json`
+|
+| `OCM_OCM_INVITE_MANAGER_INSECURE`
+| Disable TLS certificate validation for the OCM connections. Do not set this in production environments.|
+|
+| `OCM_OCM_INVITE_MANAGER_JSON_FILE`
+| Path to the JSON file where OCM invite data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage.|
+|
+| `OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE`
+| Path to the JSON file where ocm invite data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage.|
+|
+| `OCM_OCM_PROVIDER_AUTHORIZER_VERIFY_REQUEST_HOSTNAME`
+| Verify the hostname of the request against the hostname of the OCM provider.|
+|
+| `OCM_OCM_CORE_DRIVER`
+| Driver to be used to persist ocm shares. Supported value is only 'json'.| `json`
+|
+| `OCM_OCM_STORAGE_PROVIDER_INSECURE`
+| Disable TLS certificate validation for the OCM connections. Do not set this in production environments.|
+|
+| `OCM_OCM_STORAGE_PROVIDER_STORAGE_ROOT`
+| Directory where the ocm storage provider persists its data like tus upload info files.|
+|
+| `OCM_OCM_CORE_JSON_FILE`
+| Path to the JSON file where OCM share data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage.|
+|
+| `OCM_OCM_SHARE_PROVIDER_DRIVER`
+| Driver to be used to persist ocm shares. Supported value is only 'json'.| `json`
+|
+| `OCM_OCM_SHARE_PROVIDER_INSECURE`
+| Disable TLS certificate validation for the OCM connections. Do not set this in production environments.|
+|
+| `OCM_WEBAPP_TEMPLATE`
+| Template for the webapp url.|
+|
+| `OCM_OCM_SHAREPROVIDER_JSON_FILE`
+| Path to the JSON file where OCM share data will be stored. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage.|
+
+|
+| `OCM_DEBUG_ADDR`
+| Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.|
+|
+| `OCM_DEBUG_TOKEN`
+| Token to secure the metrics endpoint.|
+|
+| `OCM_DEBUG_PPROF`
+| Enables pprof, which can be used for profiling.|
+|
+| `OCM_DEBUG_ZPAGES`
+| Enables zpages, which can be used for collecting and viewing in-memory traces.|
+
+|
+| `OCIS_LOG_LEVEL` +
+`OCM_LOG_LEVEL`
+| The log level. Valid values are: 'panic', 'fatal', 'error', 'warn', 'info', 'debug', 'trace'."|
+|
+| `OCIS_LOG_PRETTY` +
+`OCM_LOG_PRETTY`
+| Activates pretty log output.|
+|
+| `OCIS_LOG_COLOR` +
+`OCM_LOG_COLOR`
+| Activates colorized log output.|
+|
+| `OCIS_LOG_FILE` +
+`OCM_LOG_FILE`
+| The path to the log file. Activates logging to this file if set.|
+
+|
+| `OCIS_TRACING_ENABLED` +
+`OCM_TRACING_ENABLED`
+| Activates tracing.|
+|
+| `OCIS_TRACING_TYPE` +
+`OCM_TRACING_TYPE`
+| The type of tracing. Defaults to '', which is the same as 'jaeger'. Allowed tracing types are 'jaeger' and '' as of now."`
+|
+|
+| `OCIS_TRACING_ENDPOINT` +
+`OCM_TRACING_ENDPOINT`
+| The endpoint of the tracing agent.|
+|
+| `OCIS_TRACING_COLLECTOR` +
+`OCM_TRACING_COLLECTOR`
+| The HTTP endpoint for sending spans directly to a collector, i.e. http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.|
+
+| xref:{s-path}/ocs.adoc[ocs]
+| `OCIS_CACHE_STORE` +
+`OCS_PRESIGNEDURL_SIGNING_KEYS_STORE`
+| The type of the signing key store. Supported values are: 'redis-sentinel' and 'nats-js-kv'. See the text description for details.|
+|
+| `OCIS_CACHE_STORE_NODES` +
+`OCS_PRESIGNEDURL_SIGNING_KEYS_STORE_NODES`
+| A list of nodes to access the configured store. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details.|
+
+|
+| `OCIS_CACHE_TTL` +
+`OCS_PRESIGNEDURL_SIGNING_KEYS_STORE_TTL`
+| Default time to live for signing keys. See the Environment Variable Types description for more details.|
+
+|
+| `OCIS_CACHE_AUTH_USERNAME` +
+`OCS_PRESIGNEDURL_SIGNING_KEYS_STORE_AUTH_USERNAME`
+| The username to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.|
+
+|
+| `OCIS_CACHE_AUTH_PASSWORD` +
+`OCS_PRESIGNEDURL_SIGNING_KEYS_STORE_AUTH_PASSWORD`
+| The password to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.|
+
+| xref:{s-path}/policies.adoc[policies]
+| `OCIS_EVENTS_AUTH_USERNAME` +
+`POLICIES_EVENTS_AUTH_USERNAME`
+| The username to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.|
+|
+| `OCIS_EVENTS_AUTH_PASSWORD` +
+`POLICIES_EVENTS_AUTH_PASSWORD`
+| The password to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.|
+
+|
+| `OCIS_TRACING_ENABLED` +
+`POLICIES_TRACING_ENABLED`
+| Activates tracing.|
+|
+| `OCIS_TRACING_TYPE` +
+`POLICIES_TRACING_TYPE`
+| The type of tracing. Defaults to '', which is the same as 'jaeger'. Allowed tracing types are 'jaeger' and '' as of now."`
+|
+|
+| `OCIS_TRACING_ENDPOINT` +
+`POLICIES_TRACING_ENDPOINT`
+| The endpoint of the tracing agent.|
+|
+| `OCIS_TRACING_COLLECTOR` +
+`POLICIES_TRACING_COLLECTOR`
+| The HTTP endpoint for sending spans directly to a collector, i.e. http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.|
+
+| xref:{s-path}/postprocessing.adoc[postprocessing]
+| `POSTPROCESSING_RETRY_BACKOFF_DURATION`
+| The base for the exponential backoff duration before retrying a failed postprocessing step. See the Environment Variable Types description for more details.|
+|
+| `POSTPROCESSING_MAX_RETRIES`
+| The maximum number of retries for a failed postprocessing step.|
+|
+| `OCIS_EVENTS_AUTH_USERNAME` +
+`POSTPROCESSING_EVENTS_AUTH_USERNAME`
+| The username to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.|
+|
+| `OCIS_EVENTS_AUTH_PASSWORD` +
+`POSTPROCESSING_EVENTS_AUTH_PASSWORD`
+| The password to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.|
+|
+| `OCIS_PERSISTENT_STORE_AUTH_USERNAME` +
+`POSTPROCESSING_STORE_AUTH_USERNAME`
+| The username to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.|
+|
+| `OCIS_PERSISTENT_STORE_AUTH_PASSWORD` +
+`POSTPROCESSING_STORE_AUTH_PASSWORD`
+| The password to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.|
+
+|
+| `OCIS_TRACING_ENABLED` +
+`POSTPROCESSING_TRACING_ENABLED`
+| Activates tracing.|
+|
+| `OCIS_TRACING_TYPE` +
+`POSTPROCESSING_TRACING_TYPE`
+| The type of tracing. Defaults to '', which is the same as 'jaeger'. Allowed tracing types are 'jaeger' and '' as of now."`
+|
+|
+| `OCIS_TRACING_ENDPOINT` +
+`POSTPROCESSING_TRACING_ENDPOINT`
+| The endpoint of the tracing agent.|
+|
+| `OCIS_TRACING_COLLECTOR` +
+`POSTPROCESSING_TRACING_COLLECTOR`
+| The HTTP endpoint for sending spans directly to a collector, i.e. http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.|
+
+| xref:{s-path}/proxy.adoc[proxy]
+| `OCIS_CACHE_AUTH_USERNAME` +
+`PROXY_OIDC_USERINFO_CACHE_AUTH_USERNAME`
+| The username to authenticate with the cache. Only applies when store type 'nats-js-kv' is configured.|
+|
+| `OCIS_CACHE_AUTH_PASSWORD` +
+`PROXY_OIDC_USERINFO_CACHE_AUTH_PASSWORD`
+| The password to authenticate with the cache. Only applies when store type 'nats-js-kv' is configured.|
+
+|
+| `OCIS_CACHE_STORE` +
+`PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE`
+| The type of the signing key store. Supported values are: 'redis-sentinel' and 'nats-js-kv'. See the text description for details.|
+|
+| `OCIS_CACHE_STORE_NODES` +
+`PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE_NODES`
+| A list of nodes to access the configured store. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details.|
+
+|
+| `OCIS_CACHE_TTL` +
+`PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE_TTL`
+| Default time to live for signing keys. See the Environment Variable Types description for more details.|
+
+|
+| `OCIS_CACHE_DISABLE_PERSISTENCE` +
+`PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE_DISABLE_PERSISTENCE`
+| Disables persistence of the store. Only applies when store type 'nats-js-kv' is configured. Defaults to true.|
+
+|
+| `OCIS_CACHE_AUTH_USERNAME` +
+`PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE_AUTH_USERNAME`
+| The username to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.|
+
+|
+| `OCIS_CACHE_AUTH_PASSWORD` +
+`PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE_AUTH_PASSWORD`
+| The password to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.|
+
+|
+| `OCIS_SERVICE_ACCOUNT_ID` +
+`PROXY_SERVICE_ACCOUNT_ID`
+| The ID of the service account the service should use. See the 'auth-service' service description for more details.|
+|
+| `OCIS_SERVICE_ACCOUNT_SECRET` +
+`PROXY_SERVICE_ACCOUNT_SECRET`
+| The service account secret.|
+
+| xref:{s-path}/search.adoc[search]
+| `OCIS_SERVICE_ACCOUNT_ID` +
+`SEARCH_SERVICE_ACCOUNT_ID`
+| The ID of the service account the service should use. See the 'auth-service' service description for more details.|
+|
+| `OCIS_SERVICE_ACCOUNT_SECRET` +
+`SEARCH_SERVICE_ACCOUNT_SECRET`
+| The service account secret.|
+
+|
+| `SEARCH_EXTRACTOR_TIKA_CLEAN_STOP_WORDS`
+| Defines if stop words should be cleaned or not. See the documentation for more details.|
+
+|
+| `OCIS_EVENTS_AUTH_USERNAME` +
+`SEARCH_EVENTS_AUTH_USERNAME`
+| The username to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.|
+|
+| `OCIS_EVENTS_AUTH_PASSWORD` +
+`SEARCH_EVENTS_AUTH_PASSWORD`
+| The password to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.|
+
+| xref:{s-path}/settings.adoc[settings]
+| `SETTINGS_SERVICE_ACCOUNT_IDS` +
+`OCIS_SERVICE_ACCOUNT_ID`
+| The list of all service account IDs. These will be assigned the hidden 'service-account' role. Note: When using 'OCIS_SERVICE_ACCOUNT_ID' this will contain only one value while 'SETTINGS_SERVICE_ACCOUNT_IDS' can have multiple. See the 'auth-service' service description for more details about service accounts.|
+|
+| `OCIS_DEFAULT_LANGUAGE`
+| The default language used by services and the WebUI. If not defined, English will be used as default. See the documentation for more details.|
+|
+| `OCIS_CACHE_DISABLE_PERSISTENCE` +
+`SETTINGS_CACHE_DISABLE_PERSISTENCE`
+| Disables persistence of the cache. Only applies when store type 'nats-js-kv' is configured. Defaults to false.|
+|
+| `OCIS_CACHE_AUTH_USERNAME` +
+`SETTINGS_CACHE_AUTH_USERNAME`
+| The username to authenticate with the cache. Only applies when store type 'nats-js-kv' is configured.|
+|
+| `OCIS_CACHE_AUTH_PASSWORD` +
+`SETTINGS_CACHE_AUTH_PASSWORD`
+| The password to authenticate with the cache. Only applies when store type 'nats-js-kv' is configured.|
+|
+| `OCIS_EVENTS_AUTH_USERNAME` +
+`SETTINGS_EVENTS_AUTH_USERNAME`
+| The username to authenticate with the cache. Only applies when store type 'nats-js-kv' is configured.|
+|
+| `OCIS_EVENTS_AUTH_PASSWORD` +
+`SETTINGS_EVENTS_AUTH_PASSWORD`
+| The password to authenticate with the cache. Only applies when store type 'nats-js-kv' is configured.|
+
+| xref:{s-path}/sharing.adoc[sharing]
+| `OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD` +
+`SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD`
+| Set this to true if you want to enforce passwords on Uploader, Editor or Contributor shares. If not using the global OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD, you must define the FRONTEND_OCS_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD in the frontend service.|
+|
+| `OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD` +
+`SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD`
+| Set this to true if you want to enforce passwords on all public shares.|
+|
+| `OCIS_EVENTS_AUTH_USERNAME` +
+`SHARING_EVENTS_AUTH_USERNAME`
+| Username for the events broker.|
+|
+| `OCIS_EVENTS_AUTH_PASSWORD` +
+`SHARING_EVENTS_AUTH_PASSWORD`
+| Password for the events broker.|
+|
+| `OCIS_PASSWORD_POLICY_DISABLED` +
+`SHARING_PASSWORD_POLICY_DISABLED`
+| Disable the password policy. Defaults to false if not set.|
+|
+| `OCIS_PASSWORD_POLICY_MIN_CHARACTERS` +
+`SHARING_PASSWORD_POLICY_MIN_CHARACTERS`
+| Define the minimum password length. Defaults to 0 if not set.| 0
+|
+| `OCIS_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS` +
+`SHARING_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS`
+| Define the minimum number of lowercase characters. Defaults to 0 if not set.| 0
+|
+| `OCIS_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS` +
+`SHARING_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS`
+| Define the minimum number of uppercase characters. Defaults to 0 if not set.| 0
+|
+| `OCIS_PASSWORD_POLICY_MIN_DIGITS` +
+`SHARING_PASSWORD_POLICY_MIN_DIGITS`
+| Define the minimum number of digits. Defaults to 0 if not set.| 0
+|
+| `OCIS_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS` +
+`SHARING_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS`
+| Define the minimum number of special characters. Defaults to 0 if not set.| 0
+|
+| `OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST` +
+`SHARING_PASSWORD_POLICY_BANNED_PASSWORDS_LIST`
+| Path to the 'banned passwords list' file. See the documentation for more details.|
+
+| xref:{s-path}/sse.adoc[sse]
+| `OCIS_LOG_LEVEL` +
+`SSE_LOG_LEVEL`
+| The log level. Valid values are: 'panic', 'fatal', 'error', 'warn', 'info', 'debug', 'trace'."|
+|
+| `OCIS_LOG_PRETTY` +
+`SSE_LOG_PRETTY`
+| Activates pretty log output.|
+|
+| `OCIS_LOG_COLOR` +
+`SSE_LOG_COLOR`
+| Activates colorized log output.|
+|
+| `OCIS_LOG_FILE` +
+`SSE_LOG_FILE`
+| The path to the log file. Activates logging to this file if set.|
+|
+| `SSE_DEBUG_ADDR`
+| Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.|
+|
+| `SSE_DEBUG_TOKEN`
+| Token to secure the metrics endpoint.|
+|
+| `SSE_DEBUG_PPROF`
+| Enables pprof, which can be used for profiling.|
+|
+| `SSE_DEBUG_ZPAGES`
+| Enables zpages, which can be used for collecting and viewing in-memory traces.|
+|
+| `OCIS_EVENTS_ENDPOINT` +
+`SSE_EVENTS_ENDPOINT`
+| The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.|
+|
+| `OCIS_EVENTS_CLUSTER` +
+`SSE_EVENTS_CLUSTER`
+| The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system.|
+|
+| `OCIS_INSECURE` +
+`SSE_EVENTS_TLS_INSECURE`
+| Whether to verify the server TLS certificates.|
+|
+| `OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
+`SSE_EVENTS_TLS_ROOT_CA_CERTIFICATE`
+| The root CA certificate used to validate the server's TLS certificate. If provided NOTIFICATIONS_EVENTS_TLS_INSECURE will be seen as false.|
+|
+| `OCIS_EVENTS_ENABLE_TLS` +
+`SSE_EVENTS_ENABLE_TLS`
+| Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services.|
+|
+| `OCIS_EVENTS_AUTH_USERNAME` +
+`SSE_EVENTS_AUTH_USERNAME`
+| The username to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.|
+|
+| `OCIS_EVENTS_AUTH_PASSWORD` +
+`SSE_EVENTS_AUTH_PASSWORD`
+| The password to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.|
+|
+| `OCIS_CORS_ALLOW_ORIGINS` +
+`SSE_CORS_ALLOW_ORIGINS`
+| A list of allowed CORS origins. See following chapter for more details: *Access-Control-Allow-Origin* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin. See the Environment Variable Types description for more details.|
+|
+| `OCIS_CORS_ALLOW_METHODS` +
+`SSE_CORS_ALLOW_METHODS`
+| A list of allowed CORS methods. See following chapter for more details: *Access-Control-Allow-Methods* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Methods. See the Environment Variable Types description for more details.|
+|
+| `OCIS_CORS_ALLOW_HEADERS` +
+`SSE_CORS_ALLOW_HEADERS`
+| A list of allowed CORS headers. See following chapter for more details: *Access-Control-Allow-Headers* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Headers. See the Environment Variable Types description for more details.|
+|
+| `OCIS_CORS_ALLOW_CREDENTIALS` +
+`SSE_CORS_ALLOW_CREDENTIALS`
+| Allow credentials for CORS.See following chapter for more details: *Access-Control-Allow-Credentials* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials.|
+|
+| `SSE_HTTP_ADDR`
+| The bind address of the HTTP service. |
+|
+| `SSE_HTTP_ROOT`
+| The root path of the HTTP service.|
+|
+| `OCIS_JWT_SECRET` +
+`SSE_JWT_SECRET`
+| The secret to mint and validate jwt tokens.|
+
+|
+| `OCIS_TRACING_ENABLED` +
+`SSE_TRACING_ENABLED`
+| Activates tracing.|
+|
+| `OCIS_TRACING_TYPE` +
+`SSE_TRACING_TYPE`
+| The type of tracing. Defaults to '', which is the same as 'jaeger'. Allowed tracing types are 'jaeger' and '' as of now."`
+|
+|
+| `OCIS_TRACING_ENDPOINT` +
+`SSE_TRACING_ENDPOINT`
+| The endpoint of the tracing agent.|
+|
+| `OCIS_TRACING_COLLECTOR` +
+`SSE_TRACING_COLLECTOR`
+| The HTTP endpoint for sending spans directly to a collector, i.e. http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.|
+
+| xref:{s-path}/storage-system.adoc[storage-system]
+| `OCIS_CACHE_DISABLE_PERSISTENCE` +
+`STORAGE_SYSTEM_CACHE_DISABLE_PERSISTENCE`
+| Disables persistence of the cache. Only applies when store type 'nats-js-kv' is configured. Defaults to false.| false
+|
+| `OCIS_CACHE_AUTH_USERNAME` +
+`STORAGE_SYSTEM_CACHE_AUTH_USERNAME`
+| Username for the configured store. Only applies when store type 'nats-js-kv' is configured.|
+|
+| `OCIS_CACHE_AUTH_PASSWORD` +
+`STORAGE_SYSTEM_CACHE_AUTH_PASSWORD`
+| Password for the configured store. Only applies when store type 'nats-js-kv' is configured.|
+|
+| `OCIS_MACHINE_AUTH_API_KEY` +
+`STORAGE_USERS_MACHINE_AUTH_API_KEY`
+| Machine auth API key used to validate internal requests necessary for the access to resources from other services.|
+
+| xref:{s-path}/storage-users.adoc[storage-users]
+| `OCIS_GATEWAY_GRPC_ADDR` +
+`STORAGE_USERS_GATEWAY_GRPC_ADDR`
+| The bind address of the gateway GRPC address.|
+|
+| `OCIS_MACHINE_AUTH_API_KEY` +
+`STORAGE_USERS_MACHINE_AUTH_API_KEY`
+| Machine auth API key used to validate internal requests necessary for the access to resources from other services.|
+|
+| `STORAGE_USERS_CLI_MAX_ATTEMPTS_RENAME_FILE`
+| The maximum number of attempts to rename a file when a user restores a file to an existing destination with the same name. The minimum value is 100.|
+|
+| `OCIS_EVENTS_AUTH_USERNAME` +
+`STORAGE_USERS_EVENTS_AUTH_USERNAME`
+| The username to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.|
+|
+| `OCIS_EVENTS_AUTH_PASSWORD` +
+`STORAGE_USERS_EVENTS_AUTH_PASSWORD`
+| The password to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.|
+|
+| `OCIS_CACHE_DISABLE_PERSISTENCE` +
+`STORAGE_USERS_STAT_CACHE_DISABLE_PERSISTENCE`
+| Disables persistence of the stat cache. Only applies when store type 'nats-js-kv' is configured. Defaults to false.| false
+|
+| `OCIS_CACHE_DISABLE_PERSISTENCE` +
+`STORAGE_USERS_FILEMETADATA_CACHE_DISABLE_PERSISTENCE`
+| Disables persistence of the file metadata cache. Only applies when store type 'nats-js-kv' is configured. Defaults to false.| false
+|
+| `OCIS_CACHE_AUTH_USERNAME` +
+`STORAGE_USERS_FILEMETADATA_CACHE_AUTH_USERNAME`
+| The username to authenticate with the cache store. Only applies when store type 'nats-js-kv' is configured.|
+|
+| `OCIS_CACHE_AUTH_PASSWORD` +
+`STORAGE_USERS_FILEMETADATA_CACHE_AUTH_PASSWORD`
+| The password to authenticate with the cache store. Only applies when store type 'nats-js-kv' is configured.|
+|
+| `OCIS_CACHE_DISABLE_PERSISTENCE` +
+`STORAGE_USERS_ID_CACHE_DISABLE_PERSISTENCE`
+| Disables persistence of the id cache. Only applies when store type 'nats-js-kv' is configured. Defaults to false.| false
+|
+| `OCIS_CACHE_AUTH_USERNAME` +
+`STORAGE_USERS_ID_CACHE_AUTH_USERNAME`
+| The username to authenticate with the cache store. Only applies when store type 'nats-js-kv' is configured.|
+|
+| `OCIS_CACHE_AUTH_PASSWORD` +
+`STORAGE_USERS_ID_CACHE_AUTH_PASSWORD`
+| The password to authenticate with the cache store. Only applies when store type 'nats-js-kv' is configured.|
+|
+| `OCIS_SERVICE_ACCOUNT_ID` +
+`STORAGE_USERS_SERVICE_ACCOUNT_ID`
+| The ID of the service account the service should use. See the 'auth-service' service description for more details.|
+|
+| `OCIS_SERVICE_ACCOUNT_SECRET` +
+`STORAGE_USERS_SERVICE_ACCOUNT_SECRET`
+| The service account secret.|
+
+| xref:{s-path}/userlog.adoc[userlog]
+| `OCIS_DEFAULT_LANGUAGE`
+| The default language used by services and the WebUI. If not defined, English will be used as default. See the documentation for more details.|
+|
+| `OCIS_PERSISTENT_STORE_AUTH_USERNAME` +
+`USERLOG_STORE_AUTH_USERNAME`
+| The username to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.|
+|
+| `OCIS_PERSISTENT_STORE_AUTH_PASSWORD` +
+`USERLOG_STORE_AUTH_PASSWORD`
+| The password to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.|
+|
+| `OCIS_EVENTS_AUTH_USERNAME` +
+`USERLOG_EVENTS_AUTH_USERNAME`
+| The username to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.|
+|
+| `OCIS_EVENTS_AUTH_PASSWORD` +
+`USERLOG_EVENTS_AUTH_PASSWORD`
+| The password to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.|
+|
+| `OCIS_SERVICE_ACCOUNT_ID` +
+`USERLOG_SERVICE_ACCOUNT_ID`
+| The ID of the service account the service should use. See the 'auth-service' service description for more details.|
+|
+| `OCIS_SERVICE_ACCOUNT_SECRET` +
+`USERLOG_SERVICE_ACCOUNT_SECRET`
+| The service account secret.|
+
+| xref:{s-path}/web.adoc[web]
+| `WEB_OPTION_LOGIN_URL`
+| Specifies the target URL to the login page. This is helpful when an external IdP is used. This option is disabled by default. Example URL like: https://www.myidp.com/login.|
+|
+| `WEB_OPTION_DISABLED_EXTENSIONS`
+| A list to disable specific Web extensions identified by their ID. The ID can e.g. be taken from the 'index.ts' file of the web extension. Example: 'com.github.owncloud.web.files.search,com.github.owncloud.web.files.print'. See the Environment Variable Types description for more details.|
+|
+| `WEB_OPTION_USER_LIST_REQUIRES_FILTER`
+| Defines whether one or more filters must be set in order to list users in the Web admin settings. Set this option to 'true' if running in an environment with a lot of users and listing all users could slow down performance. Defaults to 'false'.| false
+|
+| `WEB_OPTION_EMBED_ENABLED`
+| Defines whether Web should be running in 'embed' mode. Setting this to 'true' will enable a stripped down version of Web with reduced functionality used to integrate Web into other applications like via iFrame. Setting it to 'false' or not setting it (default) will run Web as usual with all functionality enabled. See the text description for more details.|
+|
+| `WEB_OPTION_EMBED_TARGET`
+| Defines how Web is being integrated when running in 'embed' mode. Currently, the only supported options are '' (empty) and 'location'. With '' which is the default, Web will run regular as defined via the 'embed.enabled' config option. With 'location', Web will run embedded as location picker. Resource selection will be disabled and the selected resources array always includes the current folder as the only item. See the text description for more details. |
+|
+| `WEB_OPTION_EMBED_MESSAGES_ORIGIN`
+| Defines a URL under which Web can be integrated via iFrame in 'embed' mode. Note that setting this is mandatory when running Web in 'embed' mode. Use '*' as value to allow running the iFrame under any URL, although this is not recommended for security reasons. See the text description for more details.|
+|
+| `WEB_OPTION_EMBED_DELEGATE_AUTHENTICATION`
+| Defines whether Web should require authentication to be done by the parent application when running in 'embed' mode. If set to 'true' Web will not try to authenticate the user on its own but will require an access token coming from the parent application. Defaults to being unset.|
+|
+| `WEB_OPTION_EMBED_DELEGATE_AUTHENTICATION_ORIGIN`
+| Defines the host to validate the message event origin against when running Web in 'embed' mode with delegated authentication. Defaults to event message origin validation being omitted, which is only recommended for development setups.|
+|
+| `WEB_OPTION_CONCURRENT_REQUESTS_RESOURCE_BATCH_ACTIONS`
+| Defines the maximum number of concurrent requests per file/folder/space batch action. Defaults to 4.|
+|
+| `WEB_OPTION_CONCURRENT_REQUESTS_SSE`
+| Defines the maximum number of concurrent requests in SSE event handlers. Defaults to 4.|
+|
+| `WEB_OPTION_CONCURRENT_REQUESTS_SHARES_CREATE`
+| Defines the maximum number of concurrent requests per sharing invite batch. Defaults to 4.|
+|
+| `WEB_OPTION_CONCURRENT_REQUESTS_SHARES_LIST`
+| Defines the maximum number of concurrent requests when loading individual share information inside listings. Defaults to 2.|
+|===

@@ -1,0 +1,15 @@
+# Email Notification
+msgid "Hello {ShareGrantee}"
+msgstr "Hallo {ShareGrantee}"
+
+msgid "Hello {SpaceGrantee},"
+msgstr "Hallo {SpaceGrantee},"
+
+msgid "{ShareSharer} has shared \"{ShareFolder}\" with you."
+msgstr "{ShareSharer} hat \"{ShareFolder}\" mit Ihnen geteilt."
+
+msgid "Click here to view it: {ShareLink}"
+msgstr "Zum Ansehen hier klicken: {ShareLink}"
+
+msgid "{SpaceSharer} has invited you to join \"{SpaceName}\"."
+msgstr "{SpaceSharer} hat Sie eingeladen, dem Space \"{SpaceName}\" beizutreten."
