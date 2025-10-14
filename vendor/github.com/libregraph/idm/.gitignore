@@ -1,8 +1,0 @@
-/vendor
-/bin
-/golint.txt
-/govet.txt
-/dist
-/test/tests.*
-/3rdparty-LICENSES.md
-/.vscode

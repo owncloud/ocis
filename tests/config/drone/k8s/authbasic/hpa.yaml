@@ -1,3 +1,0 @@
-{{- include "ocis.basicServiceTemplates" (dict "scope" . "appName" "appNameAuthBasic" "appNameSuffix" "") -}}
-{{- $_ := set . "autoscaling" (default (default (dict) .Values.autoscaling) .Values.services.authservice.autoscaling) -}}
-{{ include "ocis.hpa" . }}
