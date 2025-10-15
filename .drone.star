@@ -99,7 +99,7 @@ config = {
                 "apiLocks",
             ],
             "skip": False,
-            "k8s": True,
+            "k8s": False,
         },
         "settingsAndNotification": {
             "suites": [
@@ -129,21 +129,21 @@ config = {
             ],
             "skip": False,
             "withRemotePhp": [True],
-            "k8s": True,
+            "k8s": False,
         },
         "spaces": {
             "suites": [
                 "apiSpaces",
             ],
             "skip": False,
-            "k8s": True,
+            "k8s": False,
         },
         "spacesShares": {
             "suites": [
                 "apiSpacesShares",
             ],
             "skip": False,
-            "k8s": True,
+            "k8s": False,
         },
         "davOperations": {
             "suites": [
@@ -183,14 +183,14 @@ config = {
             ],
             "skip": False,
             "withRemotePhp": [True],
-            "k8s": True,
+            "k8s": False,
         },
         "sharingNgAdditionalShareRole": {
             "suites": [
                 "apiSharingNgAdditionalShareRole",
             ],
             "skip": False,
-            "k8s": True,
+            "k8s": False,
             "withRemotePhp": [True],
         },
         "sharingNgShareInvitation": {
@@ -306,7 +306,7 @@ config = {
                 "coreApiShareManagementToShares",
             ],
             "skip": False,
-            "k8s": True,
+            "k8s": False,
             "withRemotePhp": [True],
         },
         "3": {
@@ -327,7 +327,7 @@ config = {
                 "coreApiShareUpdateToShares",
             ],
             "skip": False,
-            "k8s": True,
+            "k8s": False,
             "withRemotePhp": [True],
         },
         "5": {
@@ -338,7 +338,7 @@ config = {
                 "coreApiWebdavEtagPropagation2",
             ],
             "skip": False,
-            "k8s": True,
+            "k8s": False,
         },
         "6": {
             "suites": [
@@ -353,7 +353,7 @@ config = {
                 "coreApiWebdavProperties",
             ],
             "skip": False,
-            "k8s": True,
+            "k8s": False,
         },
         "8": {
             "suites": [
@@ -1098,7 +1098,7 @@ def localApiTestPipeline(ctx):
                         pipeline = {
                             "kind": "pipeline",
                             "type": "docker",
-                            "name": "%s-%s%s" % ("CLI" if name.startswith("cli") else "API", name, "-withoutRemotePhp" if not run_with_remote_php else ""),
+                            "name": "%s-%s%s%s" % ("CLI" if name.startswith("cli") else "API", name, "-withoutRemotePhp" if not run_with_remote_php else "", "-k8s" if run_on_k8s else ""),
                             "platform": {
                                 "os": "linux",
                                 "arch": "amd64",
@@ -1399,7 +1399,7 @@ def coreApiTestPipeline(ctx):
                     pipeline = {
                         "kind": "pipeline",
                         "type": "docker",
-                        "name": "Core-API-%s%s" % (name, "-withoutRemotePhp" if not run_with_remote_php else ""),
+                        "name": "Core-API-%s%s%s" % (name, "-withoutRemotePhp" if not run_with_remote_php else "", "-k8s" if run_on_k8s else ""),
                         "platform": {
                             "os": "linux",
                             "arch": "amd64",
