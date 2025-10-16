@@ -109,7 +109,7 @@ config = {
                 "apiCors",
             ],
             "skip": False,
-            "withRemotePhp": [True],
+            "withRemotePhp": [False],
             "emailNeeded": True,
             "extraEnvironment": {
                 "EMAIL_HOST": EMAIL_SMTP_HOST,
@@ -129,7 +129,7 @@ config = {
                 "apiGraphUser",
             ],
             "skip": False,
-            "withRemotePhp": [True],
+            "withRemotePhp": [False],
             "k8s": False,
         },
         "spaces": {
@@ -183,7 +183,7 @@ config = {
                 "apiSharingNgPermissions",
             ],
             "skip": False,
-            "withRemotePhp": [True],
+            "withRemotePhp": [False],
             "k8s": False,
         },
         "sharingNgAdditionalShareRole": {
@@ -192,7 +192,7 @@ config = {
             ],
             "skip": False,
             "k8s": False,
-            "withRemotePhp": [True],
+            "withRemotePhp": [False],
         },
         "sharingNgShareInvitation": {
             "suites": [
@@ -200,7 +200,7 @@ config = {
                 "apiSharingNgItemInvitation",
             ],
             "skip": False,
-            "withRemotePhp": [True],
+            "withRemotePhp": [False],
         },
         "sharingNgLinkShare": {
             "suites": [
@@ -209,7 +209,7 @@ config = {
                 "apiSharingNgLinkShareManagement",
             ],
             "skip": False,
-            "withRemotePhp": [True],
+            "withRemotePhp": [False],
         },
         "antivirus": {
             "suites": [
@@ -231,7 +231,7 @@ config = {
                 "apiAuthApp",
             ],
             "skip": False,
-            "withRemotePhp": [True],
+            "withRemotePhp": [False],
             "federationServer": True,
             "emailNeeded": True,
             "extraEnvironment": {
@@ -259,7 +259,7 @@ config = {
                 "apiCollaboration",
             ],
             "skip": False,
-            "withRemotePhp": [True],
+            "withRemotePhp": [False],
             "collaborationServiceNeeded": True,
             "extraServerEnvironment": {
                 "GATEWAY_GRPC_ADDR": "0.0.0.0:9142",
@@ -270,7 +270,7 @@ config = {
                 "cliCommands",
             ],
             "skip": False,
-            "withRemotePhp": [True],
+            "withRemotePhp": [False],
             "antivirusNeeded": True,
             "emailNeeded": True,
             "extraEnvironment": {
@@ -299,7 +299,7 @@ config = {
                 "coreApiVersions",
             ],
             "skip": False,
-            "withRemotePhp": [True],
+            "withRemotePhp": [False],
         },
         "2": {
             "suites": [
@@ -308,7 +308,7 @@ config = {
             ],
             "skip": False,
             "k8s": False,
-            "withRemotePhp": [True],
+            "withRemotePhp": [False],
         },
         "3": {
             "suites": [
@@ -316,7 +316,7 @@ config = {
                 "coreApiSharePublicLink2",
             ],
             "skip": False,
-            "withRemotePhp": [True],
+            "withRemotePhp": [False],
         },
         "4": {
             "suites": [
@@ -329,7 +329,7 @@ config = {
             ],
             "skip": False,
             "k8s": False,
-            "withRemotePhp": [True],
+            "withRemotePhp": [False],
         },
         "5": {
             "suites": [
@@ -1063,9 +1063,7 @@ def codestyle(ctx):
 def localApiTestPipeline(ctx):
     pipelines = []
 
-    with_remote_php = [True]
-    if ctx.build.event == "cron" or "full-ci" in ctx.build.title.lower():
-        with_remote_php.append(False)
+    with_remote_php = [False]
 
     defaults = {
         "suites": {},
@@ -1099,7 +1097,7 @@ def localApiTestPipeline(ctx):
                         pipeline = {
                             "kind": "pipeline",
                             "type": "docker",
-                            "name": "%s-%s%s%s" % ("CLI" if name.startswith("cli") else "API", name, "-withoutRemotePhp" if not run_with_remote_php else "", "-k8s" if run_on_k8s else ""),
+                            "name": "%s-%s%s%s" % ("CLI" if name.startswith("cli") else "API", name, "-withRemotePhp" if run_with_remote_php else "", "-k8s" if run_on_k8s else ""),
                             "platform": {
                                 "os": "linux",
                                 "arch": "amd64",
@@ -1363,9 +1361,7 @@ def wopiValidatorTests(ctx, storage, wopiServerType):
 def coreApiTestPipeline(ctx):
     pipelines = []
 
-    with_remote_php = [True]
-    if ctx.build.event == "cron" or "full-ci" in ctx.build.title.lower():
-        with_remote_php.append(False)
+    with_remote_php = [False]
 
     defaults = {
         "suites": {},
@@ -1400,7 +1396,7 @@ def coreApiTestPipeline(ctx):
                     pipeline = {
                         "kind": "pipeline",
                         "type": "docker",
-                        "name": "Core-API-%s%s%s" % (name, "-withoutRemotePhp" if not run_with_remote_php else "", "-k8s" if run_on_k8s else ""),
+                        "name": "Core-API-%s%s%s" % (name, "-withRemotePhp" if run_with_remote_php else "", "-k8s" if run_on_k8s else ""),
                         "platform": {
                             "os": "linux",
                             "arch": "amd64",
