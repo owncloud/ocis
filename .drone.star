@@ -40,6 +40,7 @@ SONARSOURCE_SONAR_SCANNER_CLI = "sonarsource/sonar-scanner-cli:11.0"
 KEYCLOAK_IMAGE = "quay.io/keycloak/keycloak:26.2.5"
 POSTGRES_ALPINE_IMAGE = "postgres:alpine3.18"
 TRIVY_IMAGE = "aquasec/trivy:latest"
+K3D_IMAGE = "ghcr.io/k3d-io/k3d:5-dind"
 
 # the hugo version needs to be the same as in owncloud.github.io
 OC_CI_HUGO_STATIC_IMAGE = "hugomods/hugo:base-0.129.0"
@@ -99,7 +100,7 @@ config = {
                 "apiLocks",
             ],
             "skip": False,
-            "k8s": True,
+            "k8s": False,
         },
         "settingsAndNotification": {
             "suites": [
@@ -129,21 +130,21 @@ config = {
             ],
             "skip": False,
             "withRemotePhp": [True],
-            "k8s": True,
+            "k8s": False,
         },
         "spaces": {
             "suites": [
                 "apiSpaces",
             ],
             "skip": False,
-            "k8s": True,
+            "k8s": False,
         },
         "spacesShares": {
             "suites": [
                 "apiSpacesShares",
             ],
             "skip": False,
-            "k8s": True,
+            "k8s": False,
         },
         "davOperations": {
             "suites": [
@@ -183,14 +184,14 @@ config = {
             ],
             "skip": False,
             "withRemotePhp": [True],
-            "k8s": True,
+            "k8s": False,
         },
         "sharingNgAdditionalShareRole": {
             "suites": [
                 "apiSharingNgAdditionalShareRole",
             ],
             "skip": False,
-            "k8s": True,
+            "k8s": False,
             "withRemotePhp": [True],
         },
         "sharingNgShareInvitation": {
@@ -306,7 +307,7 @@ config = {
                 "coreApiShareManagementToShares",
             ],
             "skip": False,
-            "k8s": True,
+            "k8s": False,
             "withRemotePhp": [True],
         },
         "3": {
@@ -327,7 +328,7 @@ config = {
                 "coreApiShareUpdateToShares",
             ],
             "skip": False,
-            "k8s": True,
+            "k8s": False,
             "withRemotePhp": [True],
         },
         "5": {
@@ -338,7 +339,7 @@ config = {
                 "coreApiWebdavEtagPropagation2",
             ],
             "skip": False,
-            "k8s": True,
+            "k8s": False,
         },
         "6": {
             "suites": [
@@ -353,7 +354,7 @@ config = {
                 "coreApiWebdavProperties",
             ],
             "skip": False,
-            "k8s": True,
+            "k8s": False,
         },
         "8": {
             "suites": [
@@ -1098,7 +1099,7 @@ def localApiTestPipeline(ctx):
                         pipeline = {
                             "kind": "pipeline",
                             "type": "docker",
-                            "name": "%s-%s%s" % ("CLI" if name.startswith("cli") else "API", name, "-withoutRemotePhp" if not run_with_remote_php else ""),
+                            "name": "%s-%s%s%s" % ("CLI" if name.startswith("cli") else "API", name, "-withoutRemotePhp" if not run_with_remote_php else "", "-k8s" if run_on_k8s else ""),
                             "platform": {
                                 "os": "linux",
                                 "arch": "amd64",
@@ -1399,7 +1400,7 @@ def coreApiTestPipeline(ctx):
                     pipeline = {
                         "kind": "pipeline",
                         "type": "docker",
-                        "name": "Core-API-%s%s" % (name, "-withoutRemotePhp" if not run_with_remote_php else ""),
+                        "name": "Core-API-%s%s%s" % (name, "-withoutRemotePhp" if not run_with_remote_php else "", "-k8s" if run_on_k8s else ""),
                         "platform": {
                             "os": "linux",
                             "arch": "amd64",
@@ -3772,7 +3773,7 @@ def trivyScan(ctx):
 def k3sCluster():
     return [{
         "name": OCIS_SERVER_NAME,
-        "image": "ghcr.io/k3d-io/k3d:5-dind",
+        "image": K3D_IMAGE,
         "user": "root",
         "privileged": True,
         "commands": [
@@ -3801,7 +3802,7 @@ def k3sCluster():
 def waitK3sCluster():
     return [{
         "name": "wait-cluster",
-        "image": "docker.io/bitnami/kubectl:1.31",
+        "image": K3D_IMAGE,
         "user": "root",
         "commands": [
             "export KUBECONFIG=kubeconfig-$${DRONE_BUILD_NUMBER}.yaml",
@@ -3838,7 +3839,7 @@ def deployOcis():
 def ociswrapper():
     return [{
         "name": "ociswrapper",
-        "image": "ghcr.io/k3d-io/k3d:5-dind",
+        "image": K3D_IMAGE,
         "user": "root",
         "commands": [
             "export KUBECONFIG=kubeconfig-$${DRONE_BUILD_NUMBER}.yaml",
