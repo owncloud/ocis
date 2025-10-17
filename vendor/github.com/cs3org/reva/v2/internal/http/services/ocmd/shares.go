@@ -19,6 +19,7 @@
 package ocmd
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -212,6 +213,10 @@ func getIDAndMeshProvider(user string) (string, string, error) {
 	split := strings.Split(user, "@")
 	if len(split) < 2 {
 		return "", "", errors.New("not in the form <id>@<provider>")
+	}
+	candidate := split[0]
+	if b, err := base64.StdEncoding.DecodeString(candidate); err == nil {
+		split = strings.Split(string(b), "@")
 	}
 	return strings.Join(split[:len(split)-1], "@"), split[len(split)-1], nil
 }
