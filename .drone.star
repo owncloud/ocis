@@ -1064,6 +1064,8 @@ def localApiTestPipeline(ctx):
     pipelines = []
 
     with_remote_php = [False]
+    if ctx.build.event == "cron" or "full-ci" in ctx.build.title.lower():
+        with_remote_php.append(True)
 
     defaults = {
         "suites": {},
@@ -1362,6 +1364,8 @@ def coreApiTestPipeline(ctx):
     pipelines = []
 
     with_remote_php = [False]
+    if ctx.build.event == "cron" or "full-ci" in ctx.build.title.lower():
+        with_remote_php.append(True)
 
     defaults = {
         "suites": {},
