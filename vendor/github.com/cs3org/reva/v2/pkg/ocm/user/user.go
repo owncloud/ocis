@@ -12,7 +12,7 @@ import (
 // 1. stripping the protocol from the domain and
 // 2. base64 encoding the opaque id with the domain to get a unique identifier that cannot collide with other users
 func FederatedID(id *userpb.UserId, domain string) *userpb.UserId {
-	opaqueId := base64.URLEncoding.EncodeToString([]byte(id.OpaqueId + "@" + id.Idp))
+	opaqueId := base64.StdEncoding.EncodeToString([]byte(id.OpaqueId + "@" + id.Idp))
 	return &userpb.UserId{
 		Type:     userpb.UserType_USER_TYPE_FEDERATED,
 		Idp:      domain,
@@ -29,7 +29,7 @@ func RemoteID(id *userpb.UserId) *userpb.UserId {
 		Idp:      id.Idp,
 		OpaqueId: id.OpaqueId,
 	}
-	bytes, err := base64.URLEncoding.DecodeString(id.GetOpaqueId())
+	bytes, err := base64.StdEncoding.DecodeString(id.GetOpaqueId())
 	if err != nil {
 		return remoteId
 	}

@@ -215,7 +215,7 @@ func getIDAndMeshProvider(user string) (string, string, error) {
 		return "", "", errors.New("not in the form <id>@<provider>")
 	}
 	candidate := split[0]
-	if b, err := base64.URLEncoding.DecodeString(candidate); err == nil {
+	if b, err := base64.StdEncoding.DecodeString(candidate); err == nil {
 		split = strings.Split(string(b), "@")
 	}
 	return strings.Join(split[:len(split)-1], "@"), split[len(split)-1], nil
