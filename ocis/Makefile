@@ -33,7 +33,7 @@ docs-generate: config-docs-generate
 .PHONY: dev-docker
 dev-docker:
 	$(MAKE) --no-print-directory release-linux-docker-$(GOARCH)
-	docker build -f docker/Dockerfile.linux.$(GOARCH) -t owncloud/ocis:dev .
+	docker build --platform linux/$(GOARCH) -f docker/Dockerfile.linux.$(GOARCH) -t owncloud/ocis:dev .
 
 ############ debug-docker ############
 .PHONY: debug-docker
