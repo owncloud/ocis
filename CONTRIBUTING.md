@@ -38,7 +38,7 @@ For simplicity reasons, this document mostly refers to the ownCloud [Infinite Sc
 
 For general questions, please refer to [ownCloud's FAQs](https://owncloud.com/faq/) or ask on the [ownCloud Central Server](https://central.owncloud.org/).
 
-We also have a [Rocket Chat Server](https://talk.owncloud.com/channel/ocis) to answer your questions specifically about ownCloud Infinite Scale.
+We also have a [Matrix channel](https://matrix.to/#/#ocis:matrix.org) to answer your questions specifically about ownCloud Infinite Scale.
 
 ## What should I know before I get started
 
