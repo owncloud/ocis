@@ -1,5 +1,6 @@
 # Table of Contents
 
+* [Changelog for unreleased](#changelog-for-unreleased-unreleased)
 * [Changelog for 7.3.0](#changelog-for-730-2025-10-13)
 * [Changelog for 7.2.0](#changelog-for-720-2025-07-14)
 * [Changelog for 7.1.3](#changelog-for-713-2025-05-27)
@@ -57,6 +58,26 @@
 * [Changelog for 1.2.0](#changelog-for-120-2021-02-17)
 * [Changelog for 1.1.0](#changelog-for-110-2021-01-22)
 * [Changelog for 1.0.0](#changelog-for-100-2020-12-17)
+
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes for unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis/compare/v7.3.0...master
+
+## Summary
+
+* Enhancement - Bump Reva: [#11748](https://github.com/owncloud/ocis/pull/11748)
+
+## Details
+
+* Enhancement - Bump Reva: [#11748](https://github.com/owncloud/ocis/pull/11748)
+
+   This updates the ownCloud Reva dependency to commit
+   `82c22e954c1cdabb62a14fbe5c1a4ec3e1dabd45`. Changelog:
+   https://github.com/owncloud/reva/compare/cb98fe521deb55ae339d6ddc4a4b60d6d4da9e14...82c22e954c1cdabb62a14fbe5c1a4ec3e1dabd45
+
+   https://github.com/owncloud/ocis/pull/11748
 
 # Changelog for [7.3.0] (2025-10-13)
 
