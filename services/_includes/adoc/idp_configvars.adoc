@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2025-10-19-00-32-18]
+[#deprecation-note-2025-10-20-00-31-13]
 [caption=]
 .Deprecation notes for the idp service
 [width="100%",cols="~,~,~,~",options="header"]
