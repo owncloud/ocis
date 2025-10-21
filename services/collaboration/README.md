@@ -54,6 +54,10 @@ There are a few variables that you need to set:
 * `COLLABORATION_WOPI_ENABLE_MOBILE`:\
   This option enables the mobile view for the Office Web App and only applies to OnlyOffice. While OnlyOffice `ce` supports mobile view mode only, the `ee` and `de` versions support mobile view in both view and edit modes. Set the product edition accordingly via `COLLABORATION_APP_PRODUCT_EDITION`.
 
+* `COLLABORATION_WOPI_DISABLED_EXTENSIONS`:\
+  List of extensions to disable. If an extension is disabled, it will not be available to the office web frontend.
+  For example: `COLLABORATION_WOPI_DISABLED_EXTENSIONS=docx,xlsx,pptx`.
+
 The application can be customized further by changing the `COLLABORATION_APP_*` options to better describe the application.
 
 ## Storing

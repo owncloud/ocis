@@ -3,6 +3,7 @@ package helpers
 import (
 	"context"
 	"errors"
+	"slices"
 
 	registryv1beta1 "github.com/cs3org/go-cs3apis/cs3/app/registry/v1beta1"
 	gatewayv1beta1 "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
@@ -40,6 +41,11 @@ func RegisterAppProvider(
 	mimeTypesMap := make(map[string]bool)
 	for _, extensions := range appUrls {
 		for ext := range extensions {
+			if slices.Contains(cfg.Wopi.DisabledExtensions, ext) {
+				logger.Debug().Str("AppName", cfg.App.Name).Str("Extension", ext).Msg("Skipping disabled extension")
+				continue
+			}
+
 			m := mime.Detect(false, ext)
 			// skip the default
 			if m == "application/octet-stream" {
