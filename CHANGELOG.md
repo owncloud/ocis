@@ -68,6 +68,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Enhancement - Bump Reva: [#11748](https://github.com/owncloud/ocis/pull/11748)
+* Enhancement - Support disabling editors by extensions: [#11750](https://github.com/owncloud/ocis/pull/11750)
 
 ## Details
 
@@ -78,6 +79,13 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/reva/compare/cb98fe521deb55ae339d6ddc4a4b60d6d4da9e14...82c22e954c1cdabb62a14fbe5c1a4ec3e1dabd45
 
    https://github.com/owncloud/ocis/pull/11748
+
+* Enhancement - Support disabling editors by extensions: [#11750](https://github.com/owncloud/ocis/pull/11750)
+
+   We have extended the configuration of collaboration service to support disabling
+   editors for specific file extensions.
+
+   https://github.com/owncloud/ocis/pull/11750
 
 # Changelog for [7.3.0] (2025-10-13)
 
