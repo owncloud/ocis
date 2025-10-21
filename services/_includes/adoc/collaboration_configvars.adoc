@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2025-10-21-09-03-13]
+[#deprecation-note-2025-10-21-11-27-23]
 [caption=]
 .Deprecation notes for the collaboration service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -379,6 +379,17 @@ a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
 Use short access tokens for WOPI access. This is useful for office packages, like Microsoft Office Online, which have URL length restrictions. If enabled, a persistent store must be configured.
+
+a|`COLLABORATION_WOPI_DISABLED_EXTENSIONS` +
+
+a| [subs=-attributes]
+++curie ++
+a| [subs=-attributes]
+++[]string ++
+a| [subs=-attributes]
+++[] ++
+a| [subs=-attributes]
+List of extensions to disable: Disabling an extension will make it unavailable to the Office web front end. The list is comma-separated with no spaces between the items, such as 'docx,xlsx,pptx'.
 
 a|`OCIS_REVA_GATEWAY` +
 

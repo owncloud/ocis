@@ -41,6 +41,7 @@ wopi:
   proxy_url: ""
   proxy_secret: ""
   short_tokens: false
+  disabled_extensions: []
 cs3api:
   gateway:
     name: com.owncloud.api.gateway

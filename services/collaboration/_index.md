@@ -1,6 +1,6 @@
 ---
 title: Collaboration
-date: 2025-10-21T09:03:18.439407793Z
+date: 2025-10-21T11:27:25.273685026Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/collaboration
@@ -74,6 +74,10 @@ There are a few variables that you need to set:
 
 * `COLLABORATION_WOPI_ENABLE_MOBILE`:\
   This option enables the mobile view for the Office Web App and only applies to OnlyOffice. While OnlyOffice `ce` supports mobile view mode only, the `ee` and `de` versions support mobile view in both view and edit modes. Set the product edition accordingly via `COLLABORATION_APP_PRODUCT_EDITION`.
+
+* `COLLABORATION_WOPI_DISABLED_EXTENSIONS`:\
+  List of extensions to disable: Disabling an extension will make it unavailable to the Office web front end.
+  For example: `COLLABORATION_WOPI_DISABLED_EXTENSIONS=docx,xlsx,pptx`.
 
 The application can be customized further by changing the `COLLABORATION_APP_*` options to better describe the application.
 

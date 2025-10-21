@@ -33,6 +33,7 @@
 | COLLABORATION_WOPI_PROXY_URL | string |  | The URL to the ownCloud Office365 WOPI proxy. Optional. To use this feature, you need an office365 proxy subscription. If you become part of the Microsoft CSP program (https://learn.microsoft.com/en-us/partner-center/enroll/csp-overview), you can use WebOffice without a proxy.|
 | COLLABORATION_WOPI_PROXY_SECRET | string |  | Optional, the secret to authenticate against the ownCloud Office365 WOPI proxy. This secret can be obtained from ownCloud via the office365 proxy subscription.|
 | COLLABORATION_WOPI_SHORTTOKENS | bool | false | Use short access tokens for WOPI access. This is useful for office packages, like Microsoft Office Online, which have URL length restrictions. If enabled, a persistent store must be configured.|
+| COLLABORATION_WOPI_DISABLED_EXTENSIONS | []string | [] | List of extensions to disable: Disabling an extension will make it unavailable to the Office web front end. The list is comma-separated with no spaces between the items, such as 'docx,xlsx,pptx'.|
 | OCIS_REVA_GATEWAY | string | com.owncloud.api.gateway | CS3 gateway used to look up user metadata.|
 | COLLABORATION_CS3API_DATAGATEWAY_INSECURE | bool | false | Connect to the CS3API data gateway insecurely.|
 | OCIS_TRACING_ENABLED<br/>COLLABORATION_TRACING_ENABLED | bool | false | Activates tracing.|
