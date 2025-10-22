@@ -1,6 +1,6 @@
 ---
 title: Storage-System
-date: 2025-10-21T00:31:32.411387746Z
+date: 2025-10-22T00:33:28.342800192Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/storage-system
