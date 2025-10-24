@@ -126,7 +126,7 @@ variables:
   do_ignore: true
 - rawname: OCIS_BASE_DATA_PATH
   path: ocis-pkg/config/defaults/paths.go:23
-  foundincode: true
+  foundincode: false
   name: OCIS_BASE_DATA_PATH
   type: string
   default_value: ""
