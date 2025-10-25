@@ -1,7 +1,7 @@
 ---
 title: "ocis.services.settings.v0"
 url: /apis/grpc_apis/ocis_services_settings_v0
-date: 2025-10-24T00:32:50Z
+date: 2025-10-25T00:19:37Z
 weight: 50
 geekdocRepo: https://github.com/owncloud/ocis
 ---
