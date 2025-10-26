@@ -83,8 +83,10 @@ type GRPCConfig struct {
 }
 
 type ScienceMesh struct {
-	Prefix           string `yaml:"prefix" env:"OCM_SCIENCEMESH_PREFIX" desc:"URL path prefix for the ScienceMesh service. Note that the string must not start with '/'." introductionVersion:"5.0"`
-	MeshDirectoryURL string `yaml:"science_mesh_directory_url" env:"OCM_MESH_DIRECTORY_URL" desc:"URL of the mesh directory service." introductionVersion:"5.0"`
+	Prefix             string `yaml:"prefix" env:"OCM_SCIENCEMESH_PREFIX" desc:"URL path prefix for the ScienceMesh service. Note that the string must not start with '/'." introductionVersion:"5.0"`
+	MeshDirectoryURL   string `yaml:"science_mesh_directory_url" env:"OCM_MESH_DIRECTORY_URL" desc:"URL of the mesh directory service." introductionVersion:"5.0"`
+	Federations        string `yaml:"federations_file" env:"OCM_FEDERATIONS_FILE" desc:"Path to the JSON file where OCM federations data will be stored." introductionVersion:"7.1"`
+	InviteAcceptDialog string `yaml:"invite_accept_dialog" env:"OCM_INVITE_ACCEPT_DIALOG" desc:"/open-cloud-mesh/accept-invite;The frontend URL where to land when receiving an invitation" introductionVersion:"7.1"`
 }
 
 type OCMD struct {
