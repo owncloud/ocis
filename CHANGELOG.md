@@ -67,10 +67,23 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Enhancement - Set Referrer-Policy to no-referrer: [#11722](https://github.com/owncloud/ocis/pull/11722)
 * Enhancement - Bump Reva: [#11748](https://github.com/owncloud/ocis/pull/11748)
 * Enhancement - Support disabling editors by extensions: [#11750](https://github.com/owncloud/ocis/pull/11750)
 
 ## Details
+
+* Enhancement - Set Referrer-Policy to no-referrer: [#11722](https://github.com/owncloud/ocis/pull/11722)
+
+   Change the Referrer-Policy from 'strict-origin-when-cross-origin' to
+   'no-referrer' to enhance user privacy and security.
+
+   Previously, the origin was sent on cross-origin requests. This change completely
+   removes the Referrer header from all outgoing requests, preventing any potential
+   leakage of browsing information to third parties. This is a more robust approach
+   to protecting user privacy.
+
+   https://github.com/owncloud/ocis/pull/11722
 
 * Enhancement - Bump Reva: [#11748](https://github.com/owncloud/ocis/pull/11748)
 
