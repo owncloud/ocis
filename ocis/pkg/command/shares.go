@@ -51,7 +51,7 @@ func SharesCommand(cfg *config.Config) *cli.Command {
 		Subcommands: []*cli.Command{
 			cleanupCmd(cfg),
 			moveStuckUploadBlobsCmd(cfg),
-			missingShareBlobsCmd(cfg),
+			recreateMissingSharesBlobsCmd(cfg),
 		},
 	}
 }
@@ -142,51 +142,51 @@ func cleanup(c *cli.Context, cfg *config.Config) error {
 	return nil
 }
 
-	// oCIS directory structure for share-manager metadata and user spaces:
-	//
-	// ocisHome/storage/
-	// ...
-	// ├── metadata/
-	// │   ├── spaces/js/oncs3-share-manager-metadata/    (rootMetadata - Phase 1,3,4)
-	// │   │   ├── blobs/
-	// │   │   │   ├── 9c/a3/b2/f5/-42a1-4b8e-9123-456789abcdef   (Phase 4: MISSING received.json blob - reconstructed here)
-	// │   │   │   │   {"Spaces": {"215fee7a-...:480049db-...": {"States": {"...:...:84652da9-...": {State: 2, MountPoint: {path: "file.txt"}}}}}}
-	// │   │   │   └── d7/02/d7/e1/-37b0-4d41-b8dc-4b90c1d1f907   (Phase 1: read <spaceID>.json blob for Shares data)
-	// │   │   │       {"Shares": {"215fee7a-...:480049db-...:84652da9-...": {resource_id: {...}, grantee: {...}, creator: {...}}}}
-	// │   │   └── nodes/
-	// │   │       ├── 99/98/b8/bf/-6871-49cc-aca9-dab4984dc1e4.mpk  (Phase 1: <spaceID>.json MPK → points to Shares blob)
-	// │   │       │   {"user.ocis.name": "480049db-...-...-....json", "user.ocis.blobid": "d702d7e1-37b0-4d41-b8dc-4b90c1d1f907"}
-	// │   │       ├── 3a/5f/c2/d8/-1234-5678-abcd-ef0123456789.mpk  (Phase 4: received.json MPK → points to MISSING blob)
-	// │   │       │   {"user.ocis.name": "received.json", "user.ocis.blobid": "9ca3b2f5-42a1-4b8e-9123-456789abcdef", "user.ocis.parentid": "a9a54ce7-..."}
-	// │   │       └── a9/a5/4c/e7/-de30-4d27-94f8-10e4612c66c2.mpk  (Phase 3: parent node for ancestry lookup)
-	// │   │           {"user.ocis.name": "einstein", "user.ocis.id": "a9a54ce7-...", "user.ocis.parentid": "...users-node-id..."}
-	// │   └── uploads/
-	// │       └── d702d7e1-37b0-4d41-b8dc-4b90c1d1f907   (Phase 1: read <spaceID>.json blob for Shares data)
-	// │               {"Shares": {"215fee7a-...:480049db-...:84652da9-...": {resource_id: {...}, grantee: {...}, creator: {...}}}}
-	// ...
-	// │
-	// └── users/spaces/ (local mode only)                     (rootUsersSpaces - Phase 2a)
-	// │     └── 48/0049db-2ca5-4363-a4b3-aec71b9dab4b/nodes/
-	// │         └── 49/d1/39/af/-75f2-41bd-b105-0749f59dc98c.mpk  (Phase 2a: user's file MPK with grant info)
-	// │             {"user.ocis.name": "file.txt", "user.ocis.id": "49d139af-...", "user.ocis.parentid": "480049db-...",
-	// │              "user.ocis.grant.u:4c510ada-...": "t^5^1:c=c39e2f6a-...:..."}
-	// ...   OR
-	// │
-	// └──── Gateway -> Users Storage Service  (--local=false, rootUsersSpaces is in different pod - Phase 2a)
-	//         For each unique MountKey{spaceID, opaqueID} from Phase 1 sharesByGrantee:
-	//           gateway.Stat(ctx, &provider.StatRequest{
-	//             Ref: &provider.Reference{
-	//               ResourceId: &provider.ResourceId{
-	//                 StorageId: "480049db-...",  // from MountKey.SpaceID
-	//                 OpaqueId:  "49d139af-...",  // from MountKey.OpaqueID
-	//                 SpaceId:   "480049db-...",
-	//               }
-	//             }
-	//           })
-	//           → rspStat.Info.Path = "/einstein/file.txt" → filename = filepath.Base("file.txt")
-	//           → OR rspStat.Info.ArbitraryMetadata.Metadata["name"] = "file.txt"
-	//           → Store: map[MountKey{spaceID, opaqueID, granteeID, creatorID}] = "file.txt"
-	//         Note: Gateway routes request to storage provider pod where user space 480049db-... is mounted
+// oCIS directory structure for share-manager metadata and user spaces:
+//
+// ocisHome/storage/
+// ...
+// ├── metadata/
+// │   ├── spaces/js/oncs3-share-manager-metadata/    (rootMetadata - Phase 1,3,4)
+// │   │   ├── blobs/
+// │   │   │   ├── 9c/a3/b2/f5/-42a1-4b8e-9123-456789abcdef   (Phase 4: MISSING received.json blob - reconstructed here)
+// │   │   │   │   {"Spaces": {"215fee7a-...:480049db-...": {"States": {"...:...:84652da9-...": {State: 2, MountPoint: {path: "file.txt"}}}}}}
+// │   │   │   └── d7/02/d7/e1/-37b0-4d41-b8dc-4b90c1d1f907   (Phase 1: read <spaceID>.json blob for Shares data)
+// │   │   │       {"Shares": {"215fee7a-...:480049db-...:84652da9-...": {resource_id: {...}, grantee: {...}, creator: {...}}}}
+// │   │   └── nodes/
+// │   │       ├── 99/98/b8/bf/-6871-49cc-aca9-dab4984dc1e4.mpk  (Phase 1: <spaceID>.json MPK → points to Shares blob)
+// │   │       │   {"user.ocis.name": "480049db-...-...-....json", "user.ocis.blobid": "d702d7e1-37b0-4d41-b8dc-4b90c1d1f907"}
+// │   │       ├── 3a/5f/c2/d8/-1234-5678-abcd-ef0123456789.mpk  (Phase 4: received.json MPK → points to MISSING blob)
+// │   │       │   {"user.ocis.name": "received.json", "user.ocis.blobid": "9ca3b2f5-42a1-4b8e-9123-456789abcdef", "user.ocis.parentid": "a9a54ce7-..."}
+// │   │       └── a9/a5/4c/e7/-de30-4d27-94f8-10e4612c66c2.mpk  (Phase 3: parent node for ancestry lookup)
+// │   │           {"user.ocis.name": "einstein", "user.ocis.id": "a9a54ce7-...", "user.ocis.parentid": "...users-node-id..."}
+// │   └── uploads/
+// │       └── d702d7e1-37b0-4d41-b8dc-4b90c1d1f907   (Phase 1: read <spaceID>.json blob for Shares data)
+// │               {"Shares": {"215fee7a-...:480049db-...:84652da9-...": {resource_id: {...}, grantee: {...}, creator: {...}}}}
+// ...
+// │
+// └── users/spaces/ (local mode only)                     (rootUsersSpaces - Phase 2a)
+//     └── 48/0049db-2ca5-4363-a4b3-aec71b9dab4b/nodes/
+//         └── 49/d1/39/af/-75f2-41bd-b105-0749f59dc98c.mpk  (Phase 2a: user's file MPK with grant info)
+//             {"user.ocis.name": "file.txt", "user.ocis.id": "49d139af-...", "user.ocis.parentid": "480049db-...",
+//             "user.ocis.grant.u:4c510ada-...": "t^5^1:c=c39e2f6a-...:..."}
+//     OR
+// 
+//     Gateway -> Users Storage Service  (--local=false, rootUsersSpaces is in different pod - Phase 2a)
+//         For each unique MountKey{spaceID, opaqueID} from Phase 1 sharesByGrantee:
+//           gateway.Stat(ctx, &provider.StatRequest{
+//             Ref: &provider.Reference{
+//               ResourceId: &provider.ResourceId{
+//                 StorageId: "480049db-...",  // from MountKey.SpaceID
+//                 OpaqueId:  "49d139af-...",  // from MountKey.OpaqueID
+//                 SpaceId:   "480049db-...",
+//               }
+//             }
+//           })
+//           → rspStat.Info.Path = "/einstein/file.txt" → filename = filepath.Base("file.txt")
+//           → OR rspStat.Info.ArbitraryMetadata.Metadata["name"] = "file.txt"
+//           → Store: map[MountKey{spaceID, opaqueID, granteeID, creatorID}] = "file.txt"
+//         Note: Gateway routes request to storage provider pod where user space 480049db-... is mounted
 
 func moveStuckUploadBlobsCmd(cfg *config.Config) *cli.Command {
 	return &cli.Command{
@@ -242,7 +242,7 @@ func moveStuckUploadBlobsCmd(cfg *config.Config) *cli.Command {
 
 			rootMetadata := filepath.Join(ocisHome, "storage", "metadata")
 			rootMetadataBlobs := filepath.Join(rootMetadata, "spaces", "js", "oncs3-share-manager-metadata")
-		
+
 			// Phase 0: Prescan for missing blobs and try fast path restoration from uploads/
 			fmt.Println("Scanning for missing blobs in:", rootMetadataBlobs)
 			missingBlobs, err := scanMissingBlobs(rootMetadataBlobs)
@@ -266,12 +266,12 @@ func moveStuckUploadBlobsCmd(cfg *config.Config) *cli.Command {
 				printJSON(remainingBlobIDs, "remainingBlobIDs")
 			}
 
-			return nil		
+			return nil
 		},
 	}
 }
 
-func missingShareBlobsCmd(cfg *config.Config) *cli.Command {
+func recreateMissingSharesBlobsCmd(cfg *config.Config) *cli.Command {
 	// Missing share blob reconstruction algorithm:
 	//
 	// Data structures:
@@ -279,56 +279,42 @@ func missingShareBlobsCmd(cfg *config.Config) *cli.Command {
 	//   spaceKey = storageID:spaceID (e.g., "215fee7a-...:480049db-...")
 	//   shareKey = storageID:spaceID:shareID (e.g., "215fee7a-...:480049db-...:84652da9-...")
 	//
-	// Phase 1: collectSharesByUser(rootMetadata) → SharesByGranteeSpaceSharekey = map[granteeID]map[spaceKey]map[shareKey]MountKey
+	// Phase 0: scanMissingBlobs(rootMetadata) → map[blobID]MissingBlobInfo
+	//   Scans: rootMetadata/nodes/**/*.mpk where user.ocis.name = "received.json"
+	//   Computes blob path from user.ocis.blobid; records MPK path and user.ocis.parentid
+	//
+	// Phase 1: collectSharesByUser(rootMetadata, affectedUsers) → SharesByGranteeSpaceSharekey
 	//   Location: rootMetadata = ocisHome/storage/metadata/spaces/js/oncs3-share-manager-metadata/
 	//   Scans: rootMetadata/nodes/**/*.mpk where user.ocis.name = "<spaceID>.json"
 	//   Reads blob: rootMetadata/blobs/d1/d2/d3/d4/-<suffix> (path computed from user.ocis.blobid)
 	//   Blob JSON: {"Shares": {shareID: {resource_id: {storage_id, space_id, opaque_id}, grantee: {Id: {UserId: {opaque_id}}}, creator: {opaque_id}}}}
-	//   Extracts:
-	//     - resource_id.storage_id → storageID
-	//     - resource_id.space_id → spaceID (space where shared resource lives)
-	//     - resource_id.opaque_id → resourceOpaqueID (file/folder being shared)
-	//     - grantee.Id.UserId.opaque_id → granteeID (user receiving share)
-	//     - creator.opaque_id → creatorID (user who created share)
+	//   Extracts storageID, spaceID, resourceOpaqueID, granteeID, creatorID and FILTERS to granteeID ∈ affectedUsers
 	//   Output: map[granteeID][spaceKey][shareKey] = MountKey{SpaceID, OpaqueID, GranteeID, CreatorID}
 	//
-	// Phase 2a: collectResourceNamesLocal(rootUsersSpaces) → map[MountKey]filename (local mode, --local=true)
+	// Phase 2a: collectResourceNamesLocal(rootUsersSpaces, sharesByGrantee) → map[MountKey]filename (local)
 	//   Location: rootUsersSpaces = ocisHome/storage/users/spaces/
-	//   Scans: rootUsersSpaces/**/nodes/**/*.mpk (all user space node MPKs)
-	//   Extracts from MPK msgpack:
+	//   Scans: rootUsersSpaces/**/nodes/**/*.mpk but PREFILTERS to resources referenced by sharesByGrantee
+	//   Extracts from MPK msgpack only for relevant MountKeys:
 	//     - user.ocis.parentid → spaceID
-	//     - user.ocis.id → opaqueID (matches resource_id.opaque_id from Phase 1)
-	//     - user.ocis.name → filename (e.g., "missing-blobs.txt")
-	//     - Keys "user.ocis.grant.u:<granteeID>" → granteeID
-	//     - Value ":c=<creatorID>:" → creatorID
+	//     - user.ocis.id → opaqueID
+	//     - user.ocis.name → filename
+	//     - Keys "user.ocis.grant.u:<granteeID>" → granteeID; value ":c=<creatorID>:" → creatorID
 	//   Output: map[MountKey{spaceID, opaqueID, granteeID, creatorID}] = filename
 	//
-	// Phase 2b: collectResourceNamesViaGateway(ctx, gatewayAddr, sharesByGrantee) → map[MountKey]filename (remote mode, --local=false)
+	// Phase 2b: collectResourceNamesViaGateway(ctx, gatewayAddr, sharesByGrantee) → map[MountKey]filename (remote)
 	//   Gateway: gatewayAddr from --gateway-addr flag or cfg.Gateway.GRPC.Addr (default: 127.0.0.1:9142)
-	//   For each unique (spaceID, opaqueID) in sharesByGrantee:
-	//     - Call gateway.Stat(ctx, &provider.StatRequest{Ref: &provider.Reference{ResourceId: {StorageId: spaceID, OpaqueId: opaqueID, SpaceId: spaceID}}})
-	//     - Extract filename from rspStat.Info.Path (filepath.Base) or rspStat.Info.ArbitraryMetadata.Metadata["name"]
-	//     - Store: map[MountKey{spaceID, opaqueID, granteeID, creatorID}] = filename
-	//   Used in production where user storage pod != share-manager metadata pod
+	//   For each unique (spaceID, opaqueID) in sharesByGrantee, Stat and extract filename; stored per MountKey
 	//
-	// Phase 3: collectIdToParentId(rootMetadata) → map[nodeID]nodeMeta{ID, Name, ParentID}
-	//   Location: rootMetadata/nodes/**/*.mpk
-	//   Extracts: user.ocis.id → nodeID, user.ocis.name → Name, user.ocis.parentid → ParentID
-	//   Ancestry chain: received.json (parentID=a9a54ce7-...) → parent node (name="einstein") → grandparent (name="users")
-	//   Purpose: Fast userID resolution without re-scanning filesystem
+	// Phase 3: collectIdToParentId(rootMetadata, missingBlobs) → map[nodeID]nodeMeta{ID, Name, ParentID}
+	//   Builds MINIMAL ancestry only for parents of missing received.json MPKs; walks up to the "users" node
 	//
-	// Phase 4: scanBlobs(idxIdToParentId, rootMetadata) → []BlobInfo
-	//   Location: rootMetadata/nodes/**/*.mpk where user.ocis.name = "received.json"
-	//   For each received.json MPK:
-	//     - Extract user.ocis.blobid, compute blob path: rootMetadata/blobs/d1/d2/d3/d4/-<suffix>
-	//     - Check blob existence via os.Stat(), skip if exists
-	//     - Resolve userID: resolveUserIDForReceivedMPKFromIndex() using user.ocis.parentid → idxIdToParentId[parentID].Name
-	//     - Return BlobInfo{UserID, MPKPath, BlobID, BlobRel, BlobAbs} (Payload filled in next step)
+	// Phase 4: scanBlobsFiltered(idxIdToParentId, rootMetadata, missingBlobs) → []BlobInfo
+	//   Scans rootMetadata/nodes/**/*.mpk where user.ocis.name = "received.json" but ONLY for blobIDs in missingBlobs
+	//   Resolves userID via ancestry (parentID → idxIdToParentId[parentID].Name)
+	//   Returns BlobInfo{UserID, MPKPath, BlobID, BlobRel, BlobAbs}
 	//
 	// Phase 5: buildBlobJSONForUser(userID, sharesByGrantee[userID], resourceNames) → JSON payload
-	//   For each shareKey in sharesByGrantee[userID]:
-	//     - Look up MountKey in resourceNames to get filename
-	//     - Build: {"Spaces": {spaceKey: {"States": {shareKey: {"State": 2, "MountPoint": {"path": filename}, "Hidden": false}}}}}
+	//   For each shareKey in sharesByGrantee[userID], look up MountKey in resourceNames to get filename
 	//   Write missing blobs to rootMetadata/blobs/d1/d2/d3/d4/-<suffix>
 	//
 	// ID associations:
@@ -336,8 +322,8 @@ func missingShareBlobsCmd(cfg *config.Config) *cli.Command {
 	//   MountKey{spaceID, opaqueID, granteeID, creatorID} → filename → mount point path in received.json blob
 
 	return &cli.Command{
-		Name:  "fix-missing-share-blobs",
-		Usage: `fix missing share blobs in the jsoncs3 share-manager metadata`,
+		Name:  "recreate-missing-shares-blobs",
+		Usage: `recreate missing share blobs in the jsoncs3 share-manager metadata`,
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:  "ocis-home",
@@ -411,99 +397,105 @@ func missingShareBlobsCmd(cfg *config.Config) *cli.Command {
 				local = c.Bool("local")
 			}
 
-		rootMetadata := filepath.Join(ocisHome, "storage", "metadata", "spaces", "js", "oncs3-share-manager-metadata")
-		rootUsersSpaces := filepath.Join(ocisHome, "storage", "users", "spaces")
+			rootMetadata := filepath.Join(ocisHome, "storage", "metadata", "spaces", "js", "oncs3-share-manager-metadata")
+			rootUsersSpaces := filepath.Join(ocisHome, "storage", "users", "spaces")
 
-		// Phase 0: Prescan for missing blobs and try fast path restoration from uploads/
-		// fmt.Println("Phase 0: Scanning for missing blobs...")
-		// missingBlobs, err := scanMissingBlobs(rootMetadata)
-		// if err != nil {
-		// 	return err
-		// }
-
-		fmt.Printf("Phase 1-4: Rebuilding %d remaining blobs...\n")
-
-		sharesByGrantee, err := collectSharesByUser(rootMetadata)
-		if err != nil {
-			return err
-		}
-
-		var resourceNames map[MountKey]string
-		var uerr error
-		if local {
-			resourceNames = collectResourceNamesLocal(rootUsersSpaces)
-		} else {
-			// Get gateway address from config (cfg.Sharing.Reva.Address would require parsing sharing config)
-			// For now, use environment variable or default
-			gatewayAddr := cfg.Gateway.GRPC.Addr
-			if gatewayAddr == "" {
-				gatewayAddr = "127.0.0.1:9142" // default oCIS gateway address
+            fmt.Println("Scanning for missing blobs in:", rootMetadata)
+            missingBlobs, err := scanMissingBlobs(rootMetadata)
+			if debugDump {
+				printJSON(missingBlobs, "missingBlobs")
 			}
 
-			// TODO: add utils.getServiceUserContext() to auth
-			gatewaySelector, err := pool.GatewaySelector(cfg.Sharing.Reva.Address)
+			// Build ancestry index once for fast userID resolution without blobs
+            idxIdToParentId, err := collectIdToParentId(rootMetadata, missingBlobs)
 			if err != nil {
 				return err
 			}
 
-			client, err := gatewaySelector.Next()
+            // Resolve affected userIDs from missing MPKs
+            affectedUsers := map[string]bool{}
+            for _, mb := range missingBlobs {
+                uid, uerr := resolveUserIDForReceivedMPKFromIndex(rootMetadata, mb.MPKPath, idxIdToParentId)
+                if uerr == nil && uid != "" {
+                    affectedUsers[uid] = true
+                }
+            }
+
+            sharesByGrantee, err := collectSharesByUser(rootMetadata, affectedUsers)
 			if err != nil {
 				return err
 			}
 
-			// ./rebuild_and_cli.sh shares fix-missing-share-blobs --local=false --service-account-id=97370784-3ea2-4d3a-bbe2-8a8963e473e6 --service_account_secret=gkRjpvf4VZM6u$bH-8E4BEfiTV$edhLe
-			ctx, err := utils.GetServiceUserContext(c.String("service-account-id"), client, c.String("service-account-secret"))
-			if err != nil {
-				return configlog.ReturnError(err)
+            var resourceNames map[MountKey]string
+			var uerr error
+			if local {
+                resourceNames = collectResourceNamesLocal(rootUsersSpaces, sharesByGrantee)
+			} else {
+				// Get gateway address from config (cfg.Sharing.Reva.Address would require parsing sharing config)
+				// For now, use environment variable or default
+				gatewayAddr := cfg.Gateway.GRPC.Addr
+				if gatewayAddr == "" {
+					gatewayAddr = "127.0.0.1:9142" // default oCIS gateway address
+				}
+
+				// TODO: add utils.getServiceUserContext() to auth
+				gatewaySelector, err := pool.GatewaySelector(cfg.Sharing.Reva.Address)
+				if err != nil {
+					return err
+				}
+
+				client, err := gatewaySelector.Next()
+				if err != nil {
+					return err
+				}
+
+				// ./rebuild_and_cli.sh shares fix-missing-share-blobs --local=false --service-account-id=97370784-3ea2-4d3a-bbe2-8a8963e473e6 --service_account_secret=gkRjpvf4VZM6u$bH-8E4BEfiTV$edhLe
+				ctx, err := utils.GetServiceUserContext(c.String("service-account-id"), client, c.String("service-account-secret"))
+				if err != nil {
+					return configlog.ReturnError(err)
+				}
+
+				fmt.Println("Collecting resource names with StatRequest via gateway:", gatewayAddr)
+                resourceNames, uerr = collectResourceNamesViaGateway(ctx, client, gatewayAddr, sharesByGrantee)
+				if uerr != nil {
+					return uerr
+				}
 			}
-
-			fmt.Println("Collecting resource names with StatRequest via gateway:", gatewayAddr)
-			resourceNames, uerr = collectResourceNamesViaGateway(ctx, client, gatewayAddr, sharesByGrantee)
-			if uerr != nil {
-				return uerr
-			}
-		}
-
-		// Build ancestry index once for fast userID resolution without blobs
-		idxIdToParentId, err := collectIdToParentId(rootMetadata)
-		if err != nil {
-			return err
-		}
-
-		if debugDump {
-			printJSON(sharesByGrantee, "sharesByGrantee")
-			printJSON(resourceNames, "resourceNames")
-			printJSON(idxIdToParentId, "idxIdToParentId")
-		}
-
-		blobs, err := scanBlobsFiltered(idxIdToParentId, rootMetadata)
-		if err != nil {
-			return err
-		}
-
-		for i := 0; i < len(blobs); i++ {
-			blobInfo := &blobs[i]
-
-			payload, _ := buildBlobJSONForUser(blobInfo.UserID, sharesByGrantee[blobInfo.UserID], resourceNames)
-			blobInfo.Payload = payload
 
 			if debugDump {
-				printJSON(blobInfo, "BlobInfo #"+strconv.Itoa(i+1))
+				printJSON(sharesByGrantee, "sharesByGrantee")
+				printJSON(resourceNames, "resourceNames")
+				printJSON(idxIdToParentId, "idxIdToParentId")
 			}
 
-			fmt.Println("    Writing blob at:", blobInfo.BlobAbs)
-			fmt.Println("    Payload:", blobInfo.Payload)
-			if dryRun {
-				continue
-			}
-			if err := os.MkdirAll(filepath.Dir(blobInfo.BlobAbs), 0755); err != nil {
-				return configlog.ReturnError(err)
-			}
-			err := os.WriteFile(blobInfo.BlobAbs, []byte(blobInfo.Payload), 0644)
+            blobs, err := scanBlobsFiltered(idxIdToParentId, rootMetadata, missingBlobs)
 			if err != nil {
-				return configlog.ReturnError(err)
+				return err
 			}
-		}
+
+			for i := 0; i < len(blobs); i++ {
+				blobInfo := &blobs[i]
+
+				payload, _ := buildBlobJSONForUser(blobInfo.UserID, sharesByGrantee[blobInfo.UserID], resourceNames)
+				blobInfo.Payload = payload
+
+				if debugDump {
+					printJSON(blobInfo, "BlobInfo #"+strconv.Itoa(i+1))
+				}
+
+				fmt.Println("    Writing blob at:", blobInfo.BlobAbs)
+				fmt.Println("    Payload:", blobInfo.Payload)
+				if dryRun {
+					continue
+				}
+				if err := os.MkdirAll(filepath.Dir(blobInfo.BlobAbs), 0755); err != nil {
+					return configlog.ReturnError(err)
+				}
+				err := os.WriteFile(blobInfo.BlobAbs, []byte(blobInfo.Payload), 0644)
+				if err != nil {
+					return configlog.ReturnError(err)
+				}
+			}
 
 			return nil
 		},
@@ -522,6 +514,15 @@ type BlobInfo struct {
 	Payload string
 	BlobRel string
 	BlobAbs string
+}
+
+// MissingBlobInfo holds minimal details about a missing received.json blob and its node context
+type MissingBlobInfo struct {
+    BlobID   string
+    BlobRel  string
+    BlobAbs  string
+    MPKPath  string
+    ParentID string
 }
 
 // MountKey uniquely identifies a target: (space_id, resource_id.opaque_id, grantee_id (user), creator_id)
@@ -580,10 +581,10 @@ func scanBlobs(idxIdToParentId map[string]nodeMeta, rootMetadata string) ([]Blob
 }
 
 // Scan for missing received.json blobs
-func scanMissingBlobs(rootMetadata string) (map[string]string, error) {
-	missingBlobs := make(map[string]string) // blobID -> blobPathAbs
+func scanMissingBlobs(rootMetadata string) (map[string]MissingBlobInfo, error) {
+    missingBlobs := make(map[string]MissingBlobInfo) // blobID -> info
 	nodesRoot := filepath.Join(rootMetadata, "nodes")
-	
+
 	_ = filepath.WalkDir(nodesRoot, func(path string, dir os.DirEntry, err error) error {
 		if err != nil || dir.IsDir() || filepath.Ext(path) != ".mpk" {
 			return nil
@@ -593,7 +594,7 @@ func scanMissingBlobs(rootMetadata string) (map[string]string, error) {
 		if rerr != nil {
 			return nil
 		}
-		mpk := unmarshalMPK(mpkBin)
+        mpk := unmarshalMPK(mpkBin)
 		if mpk["user.ocis.name"] != "received.json" {
 			return nil
 		}
@@ -602,24 +603,30 @@ func scanMissingBlobs(rootMetadata string) (map[string]string, error) {
 		if !ok {
 			return nil
 		}
-		blobPathAbs := filepath.Join(rootMetadata, blobPathRel)
+        blobPathAbs := filepath.Join(rootMetadata, blobPathRel)
 		// fmt.Println("blobPathAbs ", blobPathAbs)
 		if _, statErr := os.Stat(blobPathAbs); statErr == nil {
 			return nil
 		}
-		missingBlobs[blobID] = blobPathAbs
+        missingBlobs[blobID] = MissingBlobInfo{
+            BlobID:   blobID,
+            BlobRel:  blobPathRel,
+            BlobAbs:  blobPathAbs,
+            MPKPath:  path,
+            ParentID: mpk["user.ocis.parentid"],
+        }
 		return nil
 	})
-	
+
 	return missingBlobs, nil
 }
 
 // Attempt fast path restoration from uploads/ folder
-func restoreFromUploads(rootMetadataUploads string, missingBlobs map[string]string, dryRun bool) map[string]bool {
+func restoreFromUploads(rootMetadataUploads string, missing map[string]MissingBlobInfo, dryRun bool) map[string]bool {
 	remainingBlobIDs := make(map[string]bool)
-	
-	for blobID, blobPathAbs := range missingBlobs {
-		blobUploadsPath := filepath.Join(rootMetadataUploads, blobID)
+
+    for blobID, info := range missing {
+        blobUploadsPath := filepath.Join(rootMetadataUploads, blobID)
 		if _, err := os.Stat(blobUploadsPath); err != nil {
 			fmt.Printf("    Blob %s: not found in %s\n", blobID, blobUploadsPath)
 			remainingBlobIDs[blobID] = true
@@ -627,30 +634,30 @@ func restoreFromUploads(rootMetadataUploads string, missingBlobs map[string]stri
 		}
 
 		if dryRun {
-			fmt.Printf("    DRY RUN: move %s to %s\n", blobUploadsPath, blobPathAbs)
+			fmt.Printf("    DRY RUN: move %s to %s\n", blobUploadsPath, info.BlobAbs)
 			continue
 		}
-		
-		fmt.Printf("    Move %s to %s\n", blobUploadsPath, blobPathAbs)
-		if err := os.MkdirAll(filepath.Dir(blobPathAbs), 0755); err != nil {
+
+        fmt.Printf("    Move %s to %s\n", blobUploadsPath, info.BlobAbs)
+        if err := os.MkdirAll(filepath.Dir(info.BlobAbs), 0755); err != nil {
 			fmt.Printf("    Warning: Failed to create dir: %v\n", err)
 			remainingBlobIDs[blobID] = true
 			continue
 		}
-		if err := os.Rename(blobUploadsPath, blobPathAbs); err != nil {
+        if err := os.Rename(blobUploadsPath, info.BlobAbs); err != nil {
 			fmt.Printf("    Warning: Failed to move blob: %v\n", err)
 			remainingBlobIDs[blobID] = true
 		}
 	}
-	
+
 	return remainingBlobIDs
 }
 
 // Filtered blob scan that only processes blobs in the missingBlobIDs set
-func scanBlobsFiltered(idxIdToParentId map[string]nodeMeta, rootMetadata string) ([]BlobInfo, error) {
+func scanBlobsFiltered(idxIdToParentId map[string]nodeMeta, rootMetadata string, missing map[string]MissingBlobInfo) ([]BlobInfo, error) {
 	var blobs []BlobInfo
 	nodesRoot := filepath.Join(rootMetadata, "nodes")
-	
+
 	_ = filepath.WalkDir(nodesRoot, func(path string, dir os.DirEntry, err error) error {
 		if err != nil || dir.IsDir() || filepath.Ext(path) != ".mpk" {
 			return nil
@@ -663,18 +670,16 @@ func scanBlobsFiltered(idxIdToParentId map[string]nodeMeta, rootMetadata string)
 		if mpk["user.ocis.name"] != "received.json" {
 			return nil
 		}
-		blobID := mpk["user.ocis.blobid"]
-		
-		// // Only process blobs in the filtered set
-		// if !missingBlobIDs[blobID] {
-		// 	return nil
-		// }
-		
+        blobID := mpk["user.ocis.blobid"]
+        if _, ok := missing[blobID]; !ok {
+            return nil
+        }
+
 		blobPathRel, ok := computeBlobPathRelative(blobID)
 		if !ok {
 			return nil
 		}
-		blobPathAbs := filepath.Join(rootMetadata, blobPathRel)
+        blobPathAbs := filepath.Join(rootMetadata, blobPathRel)
 
 		userID, uerr := resolveUserIDForReceivedMPKFromIndex(rootMetadata, path, idxIdToParentId)
 		if uerr != nil {
@@ -694,7 +699,7 @@ func scanBlobsFiltered(idxIdToParentId map[string]nodeMeta, rootMetadata string)
 }
 
 // 1) From storages blobs: build shareKey → MountKey, grouped by user (grantee)
-func collectSharesByUser(rootMetadata string) (SharesByGranteeSpaceSharekey, error) {
+func collectSharesByUser(rootMetadata string, affectedUsers map[string]bool) (SharesByGranteeSpaceSharekey, error) {
 	// granteeID -> spaceKey -> shareKey -> MountKey
 	idxShare := SharesByGranteeSpaceSharekey{}
 	nodesRoot := filepath.Join(rootMetadata, "nodes")
@@ -744,7 +749,7 @@ func collectSharesByUser(rootMetadata string) (SharesByGranteeSpaceSharekey, err
 		if json.Unmarshal(blobBin, &blobSharesModel) != nil {
 			return nil
 		}
-		for shareID, v := range blobSharesModel.Shares {
+        for shareID, v := range blobSharesModel.Shares {
 			storageID := v.ResourceID.StorageID
 			spaceID := v.ResourceID.SpaceID
 			resourceOpaque := v.ResourceID.OpaqueID
@@ -753,6 +758,10 @@ func collectSharesByUser(rootMetadata string) (SharesByGranteeSpaceSharekey, err
 			if storageID == "" || spaceID == "" || resourceOpaque == "" || granteeID == "" || creatorID == "" {
 				continue
 			}
+            // Filter to only affected users (receivers with missing blobs)
+            if len(affectedUsers) > 0 && !affectedUsers[granteeID] {
+                continue
+            }
 			spaceKey := storageID + ":" + spaceID
 			shareKey := shareID
 			if !strings.HasPrefix(shareKey, spaceKey+":") {
@@ -773,9 +782,20 @@ func collectSharesByUser(rootMetadata string) (SharesByGranteeSpaceSharekey, err
 }
 
 // 2) From users' MPKs: MountKey → filename (used for MountPoint.path)
-func collectResourceNamesLocal(rootUsersSpaces string) map[MountKey]string {
+func collectResourceNamesLocal(rootUsersSpaces string, sharesByGrantee SharesByGranteeSpaceSharekey) map[MountKey]string {
 	idxMounts := map[MountKey]string{}
-	_ = filepath.WalkDir(rootUsersSpaces, func(path string, dir os.DirEntry, err error) error {
+    // Build a quick filter set for relevant (spaceID, opaqueID, granteeID, creatorID)
+    relevant := map[MountKey]bool{}
+    for _, spaceShares := range sharesByGrantee {
+        for _, shares := range spaceShares {
+            for _, mk := range shares {
+                relevant[mk] = true
+                // also allow matching without creator for extraction stage (will fill later)
+            }
+        }
+    }
+
+    _ = filepath.WalkDir(rootUsersSpaces, func(path string, dir os.DirEntry, err error) error {
 		if err != nil || dir.IsDir() || filepath.Ext(path) != ".mpk" {
 			return nil
 		}
@@ -790,6 +810,18 @@ func collectResourceNamesLocal(rootUsersSpaces string) map[MountKey]string {
 		if spaceID == "" || opaqueID == "" || name == "" {
 			return nil
 		}
+        // Quick pre-filter: if no share references this resource at all, skip processing grants
+        pre := MountKey{SpaceID: spaceID, OpaqueID: opaqueID}
+        hasAny := false
+        for mk := range relevant {
+            if mk.SpaceID == pre.SpaceID && mk.OpaqueID == pre.OpaqueID {
+                hasAny = true
+                break
+            }
+        }
+        if !hasAny {
+            return nil
+        }
 		for key, val := range mpk {
 			if !strings.HasPrefix(key, "user.ocis.grant.u:") {
 				continue
@@ -812,7 +844,10 @@ func collectResourceNamesLocal(rootUsersSpaces string) map[MountKey]string {
 			if creatorID == "" {
 				continue
 			}
-			idxMounts[MountKey{SpaceID: spaceID, OpaqueID: opaqueID, GranteeID: granteeID, CreatorID: creatorID}] = name
+            mk := MountKey{SpaceID: spaceID, OpaqueID: opaqueID, GranteeID: granteeID, CreatorID: creatorID}
+            if relevant[mk] {
+                idxMounts[mk] = name
+            }
 		}
 		return nil
 	})
@@ -948,25 +983,52 @@ type nodeMeta struct {
 	ParentID string
 }
 
-func collectIdToParentId(rootMetadata string) (map[string]nodeMeta, error) {
-	idxIdToParentId := map[string]nodeMeta{}
-	nodesRoot := filepath.Join(rootMetadata, "nodes")
-	err := filepath.WalkDir(nodesRoot, func(path string, dir os.DirEntry, err error) error {
-		if err != nil || dir.IsDir() || filepath.Ext(path) != ".mpk" {
-			return nil
-		}
-		mpkBin, rerr := os.ReadFile(path)
-		if rerr != nil {
-			return nil
-		}
-		mpk := unmarshalMPK(mpkBin)
-		if mpk["user.ocis.id"] == "" {
-			return nil
-		}
-		idxIdToParentId[mpk["user.ocis.id"]] = nodeMeta{ID: mpk["user.ocis.id"], Name: mpk["user.ocis.name"], ParentID: mpk["user.ocis.parentid"]}
-		return nil
-	})
-	return idxIdToParentId, err
+func collectIdToParentId(rootMetadata string, missingBlobs map[string]MissingBlobInfo) (map[string]nodeMeta, error) {
+    idxIdToParentId := map[string]nodeMeta{}
+    // Build minimal ancestry only for the parents of missing received.json MPKs
+    for _, mb := range missingBlobs {
+        parentID := mb.ParentID
+        if parentID == "" {
+            // try to load parentID from mpk on demand (safety)
+            mpkBin, err := os.ReadFile(mb.MPKPath)
+            if err == nil {
+                mpk := unmarshalMPK(mpkBin)
+                parentID = mpk["user.ocis.parentid"]
+            }
+        }
+        if parentID == "" {
+            continue
+        }
+
+        // Walk up ancestors up to "users" node, loading only required nodes
+        curr := parentID
+        for i := 0; i < 1024 && curr != ""; i++ {
+            if _, ok := idxIdToParentId[curr]; ok {
+                // already loaded, continue climbing
+            } else {
+                if rel, ok := computeNodeMPKPathRelative(curr); ok {
+                    abs := filepath.Join(rootMetadata, rel)
+                    if mpkBin, err := os.ReadFile(abs); err == nil {
+                        mpk := unmarshalMPK(mpkBin)
+                        idxIdToParentId[mpk["user.ocis.id"]] = nodeMeta{ID: mpk["user.ocis.id"], Name: mpk["user.ocis.name"], ParentID: mpk["user.ocis.parentid"]}
+                        if mpk["user.ocis.name"] == "users" {
+                            break
+                        }
+                        curr = mpk["user.ocis.parentid"]
+                        continue
+                    }
+                }
+                break
+            }
+            // move to parent if present in index
+            next := idxIdToParentId[curr].ParentID
+            if idxIdToParentId[curr].Name == "users" {
+                break
+            }
+            curr = next
+        }
+    }
+    return idxIdToParentId, nil
 }
 
 // Resolve userID for a received.json mpk using ancestry: the node whose parent is "users" has Name == userID
