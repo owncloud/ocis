@@ -164,7 +164,7 @@
     "typescript": "^4.9.5",
     "url-loader": "4.1.1",
     "webpack": "5.96.1",
-    "webpack-manifest-plugin": "5.0.0",
+    "webpack-manifest-plugin": "5.0.1",
     "workbox-webpack-plugin": "7.1.0"
   },
   "pnpm": {
