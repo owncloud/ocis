@@ -30,6 +30,10 @@ var (
 func DisablePersonalSpace(ctx context.Context, client gateway.GatewayAPIClient, userID string) error {
 	logger := appctx.GetLogger(ctx)
 	sp, err := getPersonalSpace(ctx, client, userID)
+	if err == ErrNotFound {
+		logger.Debug().Str("userID", userID).Msg("no personal space found to delete")
+		return nil
+	}
 	if err != nil {
 		return fmt.Errorf("failed to retrieve personal space: %w", err)
 	}
