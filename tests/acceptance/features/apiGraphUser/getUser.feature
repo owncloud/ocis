@@ -1132,3 +1132,54 @@ Feature: get users
         }
       }
       """
+
+  @env-config
+  Scenario: non-admin user searches for other users with attributes
+    Given the config "OCIS_USER_SEARCH_DISPLAYED_ATTRIBUTES" has been set to "onPremisesSamAccountName,userType,mail" for "graph" service
+    And the user "Admin" has created a new user with the following attributes:
+      | userName    | Carol             |
+      | displayName | carol             |
+      | email       | carol@example.org |
+    When user "Brian" searches for user '"carol"' using Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": ["value"],
+        "properties": {
+          "value": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": ["displayName", "id", "userType", "onPremisesSamAccountName"],
+              "properties": {
+                "attributes": {
+                  "type": "array",
+                  "minItems": 3,
+                  "maxItems": 3,
+                  "uniqueItems": true,
+                  "items": { "type": "string" },
+                  "allOf": [
+                    { "contains": { "const": "carol@example.org" } },
+                    { "contains": { "const": "Carol" } },
+                    { "contains": { "const": "Member" } }
+                  ]
+                },
+                "displayName": {"const": "carol"},
+                "id": {"pattern": "^%user_id_pattern%$"},
+                "userType": {"const": "Member"},
+                "onPremisesSamAccountName": {"const": ""},
+                "appRoleAssignments": {"const": null},
+                "drives": {"const": null},
+                "drive": {"const": null},
+                "memberOf": {"const": null},
+                "email": {"const": "carol@example.org"}
+              }
+            }
+          }
+        }
+      }
+      """
