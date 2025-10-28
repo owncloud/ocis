@@ -271,6 +271,19 @@ function run_behat_tests() {
 	# then the awk, grep, sed command sequence above ends up with an empty string.
 	# Unset FAILED_SCENARIO_PATHS to avoid later code thinking that there might be
 	# one failed scenario.
+
+	# get the failed hooks
+	FAILED_HOOK_PATHS=`awk '/Failed hooks:/',0 ${TEST_LOG_FILE} | grep --color=never -oP '(?<=").*\.feature:[0-9]+(?=")'`
+	# check if any of the failed hooks are not already in the failed scenarios
+	for HOOK_PATH in ${FAILED_HOOK_PATHS}
+	do
+		echo "${FAILED_SCENARIO_PATHS}" | grep -q "${HOOK_PATH}"
+		if [ $? -ne 0 ]
+		then
+			FAILED_SCENARIO_PATHS=`echo -e "${FAILED_SCENARIO_PATHS}\n    ${HOOK_PATH}"`
+		fi
+	done
+
 	if [ -z "${FAILED_SCENARIO_PATHS}" ]
 	then
 		unset FAILED_SCENARIO_PATHS
