@@ -3099,6 +3099,34 @@ class SpacesContext implements Context {
 	}
 
 	/**
+	 * @Given /^user "([^"]*)" has disabled personal space of user "([^"]*)"$/
+	 *
+	 * @param  string $user
+	 * @param  string $spaceOwnerName
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userHasDisabledPersonalSpaceOfUser(
+		string $user,
+		string $spaceOwnerName,
+	): void {
+		$space = $this->getSpaceByName($spaceOwnerName, "Personal");
+		$response = GraphHelper::disableSpace(
+			$this->featureContext->getBaseUrl(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			$space["id"],
+		);
+		$expectedHTTPStatus = "204";
+		$this->featureContext->theHTTPStatusCodeShouldBe(
+			$expectedHTTPStatus,
+			"Expected response status code should be $expectedHTTPStatus",
+			$response,
+		);
+	}
+
+	/**
 	 * @param  string $user
 	 * @param  string $spaceName
 	 * @param string $owner
