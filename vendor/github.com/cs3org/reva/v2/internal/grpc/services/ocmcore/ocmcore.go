@@ -158,7 +158,7 @@ func (s *service) UpdateOCMCoreShare(ctx context.Context, req *ocmcore.UpdateOCM
 	}
 	fileMask := &fieldmaskpb.FieldMask{Paths: []string{"protocols"}}
 
-	user := &userpb.User{Id: ocmuser.RemoteID(&userpb.UserId{OpaqueId: grantee})}
+	user := &userpb.User{Id: ocmuser.DecodeRemoteUserFederatedID(&userpb.UserId{OpaqueId: grantee})}
 	_, err := s.repo.UpdateReceivedShare(ctx, user, &ocm.ReceivedShare{
 		Id: &ocm.ShareId{
 			OpaqueId: req.GetOcmShareId(),
@@ -185,7 +185,7 @@ func (s *service) DeleteOCMCoreShare(ctx context.Context, req *ocmcore.DeleteOCM
 		return nil, errtypes.UserRequired("missing remote user id in a metadata")
 	}
 
-	user := &userpb.User{Id: ocmuser.RemoteID(&userpb.UserId{OpaqueId: grantee})}
+	user := &userpb.User{Id: ocmuser.DecodeRemoteUserFederatedID(&userpb.UserId{OpaqueId: grantee})}
 
 	err := s.repo.DeleteReceivedShare(ctx, user, &ocm.ShareReference{
 		Spec: &ocm.ShareReference_Id{
