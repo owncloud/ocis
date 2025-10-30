@@ -9,7 +9,7 @@ Feature: edit/search user including email
       | displayName | Brian Murphy      |
       | email       | brian@example.com |
       | password    | 1234              |
-    And the config "OCIS_SHOW_USER_EMAIL_IN_RESULTS" has been set to "true" for "graph" service
+    And the config "OCIS_USER_SEARCH_DISPLAYED_ATTRIBUTES" has been set to "mail" for "graph" service
 
 
   Scenario Outline: admin user can edit another user's email
@@ -281,7 +281,8 @@ Feature: edit/search user including email
                 "attributes": {
                   "type": "array",
                   "maxItems": 1,
-                  "minItems": 1
+                  "minItems": 1,
+                  "const": ["alice@example.org"]
                 },
                 "displayName": {
                   "const": "Alice Hansen"
@@ -331,7 +332,8 @@ Feature: edit/search user including email
                 "attributes": {
                   "type": "array",
                   "maxItems": 1,
-                  "minItems": 1
+                  "minItems": 1,
+                  "const": ["alice@example.org"]
                 },
                 "displayName": {
                   "const": "Alice Hansen"
@@ -380,7 +382,8 @@ Feature: edit/search user including email
                 "attributes": {
                   "type": "array",
                   "maxItems": 1,
-                  "minItems": 1
+                  "minItems": 1,
+                  "const": ["alice@example.org"]
                 },
                 "displayName": {
                   "const": "Alice Hansen"
@@ -490,8 +493,8 @@ Feature: edit/search user including email
       """
 
 
-  Scenario Outline: search other users when OCIS_SHOW_USER_EMAIL_IN_RESULTS config is disabled
-    Given the config "OCIS_SHOW_USER_EMAIL_IN_RESULTS" has been set to "false" for "graph" service
+  Scenario Outline: search other users when OCIS_USER_SEARCH_DISPLAYED_ATTRIBUTES config is disabled
+    Given the config "OCIS_USER_SEARCH_DISPLAYED_ATTRIBUTES" has been set to "" for "graph" service
     And the administrator has assigned the role "<user-role>" to user "Alice" using the Graph API
     When user "Alice" searches for user "Brian" using Graph API
     Then the HTTP status code should be "200"
@@ -501,3 +504,48 @@ Feature: edit/search user including email
       | Space Admin |
       | User        |
       | User Light  |
+
+
+  Scenario: non-admin user searches other users by e-mail
+    Given the following configs have been set:
+      | config                                | value |
+      | OCIS_USER_SEARCH_DISPLAYED_ATTRIBUTES |       |
+      | OCIS_SHOW_USER_EMAIL_IN_RESULTS       | true  |
+    And the administrator has assigned the role "Admin" to user "Alice" using the Graph API
+    When user "Alice" gets information of user "Brian" using Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "displayName",
+          "id",
+          "mail",
+          "onPremisesSamAccountName",
+          "accountEnabled",
+          "userType"
+        ],
+        "properties": {
+          "displayName": {
+            "const": "Brian Murphy"
+          },
+          "id" : {
+            "type": "string",
+            "pattern": "^%user_id_pattern%$"
+          },
+          "mail": {
+            "const": "brian@example.com"
+          },
+          "onPremisesSamAccountName": {
+            "const": "Brian"
+          },
+          "accountEnabled": {
+            "const": true
+          },
+          "userType": {
+            "const": "Member"
+          }
+        }
+      }
+      """
