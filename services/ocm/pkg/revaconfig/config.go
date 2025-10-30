@@ -59,13 +59,14 @@ func OCMConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]inter
 				"wellknown": map[string]interface{}{
 					"prefix": ".well-known",
 					"ocmprovider": map[string]interface{}{
-						"ocm_prefix":    cfg.OCMD.Prefix,
-						"endpoint":      cfg.Commons.OcisURL,
-						"provider":      "oCIS",
-						"webdav_root":   "/dav/ocm",
-						"webapp_root":   cfg.ScienceMesh.Prefix,
-						"enable_webapp": false,
-						"enable_datatx": false,
+						"ocm_prefix":           cfg.OCMD.Prefix,
+						"endpoint":             cfg.Commons.OcisURL,
+						"provider":             "oCIS",
+						"webdav_root":          "/dav/ocm",
+						"webapp_root":          cfg.ScienceMesh.Prefix,
+						"invite_accept_dialog": cfg.ScienceMesh.InviteAcceptDialog,
+						"enable_webapp":        false,
+						"enable_datatx":        false,
 					},
 				},
 				"sciencemesh": map[string]interface{}{
@@ -73,6 +74,7 @@ func OCMConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]inter
 					"smtp_credentials":   map[string]string{},
 					"gatewaysvc":         cfg.Reva.Address,
 					"mesh_directory_url": cfg.ScienceMesh.MeshDirectoryURL,
+					"federations_file":   cfg.ScienceMesh.Federations,
 					"provider_domain":    providerDomain,
 					"events": map[string]interface{}{
 						"natsaddress":          cfg.Events.Endpoint,
