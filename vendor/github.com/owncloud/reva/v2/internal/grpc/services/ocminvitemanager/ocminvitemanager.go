@@ -180,8 +180,8 @@ func (s *service) ForwardInvite(ctx context.Context, req *invitepb.ForwardInvite
 	remoteUser, err := s.ocmClient.InviteAccepted(ctx, ocmEndpoint, &client.InviteAcceptedRequest{
 		Token:             req.InviteToken.GetToken(),
 		RecipientProvider: s.conf.ProviderDomain,
-		// The UserID is only a string here. To not loose the IDP information we use the FederatedID encoding
-		// i.e. base64(UserID@IDP)
+		// The UserID is only a string here. To not lose the IDP information we use the FederatedID encoding
+		// i.e. UserID@IDP
 		UserID: ocmuser.FederatedID(user.GetId(), "").GetOpaqueId(),
 		Email:  user.GetMail(),
 		Name:   user.GetDisplayName(),
@@ -222,6 +222,9 @@ func (s *service) ForwardInvite(ctx context.Context, req *invitepb.ForwardInvite
 		Idp:      req.GetOriginSystemProvider().Domain,
 		OpaqueId: remoteUser.UserID,
 	}
+
+	// we need to use a unique identifier for federated users
+	// remoteUserID = ocmuser.FederatedID(remoteUserID, "")
 
 	if err := s.repo.AddRemoteUser(ctx, user.Id, &userpb.User{
 		Id:          remoteUserID,
@@ -282,6 +285,8 @@ func (s *service) AcceptInvite(ctx context.Context, req *invitepb.AcceptInviteRe
 	}
 
 	remoteUser := req.GetRemoteUser()
+	// we need to use a unique identifier for federated users
+	//remoteUser.Id = ocmuser.FederatedID(remoteUser.Id, "")
 
 	if err := s.repo.AddRemoteUser(ctx, token.GetUserId(), remoteUser); err != nil {
 		if !errors.Is(err, invite.ErrUserAlreadyAccepted) {

@@ -173,10 +173,12 @@ func (a *authorizer) IsProviderAllowed(ctx context.Context, pi *ocmprovider.Prov
 	}
 
 	switch {
-	case !providerAuthorized:
-		return errtypes.NotFound(pi.GetDomain())
 	case !a.conf.VerifyRequestHostname:
+		log.Info().Msg("VerifyRequestHostname is disabled. any provider is allowed")
 		return nil
+	case !providerAuthorized:
+		log.Info().Msg("providerAuthorized is false")
+		return errtypes.NotFound(pi.GetDomain())
 	case len(pi.Services) == 0:
 		return ErrNoIP
 	}
