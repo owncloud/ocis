@@ -578,8 +578,8 @@ github.com/klauspost/cpuid/v2 v2.2.11 h1:0OwqZRYI2rFrjS4kvkDnqJkKHdHaRnCm68/DY4O
 github.com/klauspost/cpuid/v2 v2.2.11/go.mod h1:hqwkgyIinND0mEev00jJYCxPNVRVXFQeu1XKlok6oO0=
 github.com/kobergj/go-micro/v4 v4.0.0-20250610135441-d0b187215699 h1:3TOdtI6WPyvBB+uCykapjRtQX8vTHMlyhINzR+58B4k=
 github.com/kobergj/go-micro/v4 v4.0.0-20250610135441-d0b187215699/go.mod h1:eE/tD53n3KbVrzrWxKLxdkGw45Fg1qaNLWjpJMvIUF4=
-github.com/kobergj/gowebdav v0.0.0-20250102091030-aa65266db202 h1:A1xJ2NKgiYFiaHiLl9B5yw/gUBACSs9crDykTS3GuQI=
-github.com/kobergj/gowebdav v0.0.0-20250102091030-aa65266db202/go.mod h1:bHA7t77X/QFExdeAnDzK6vKM34kEZAcE1OX4MfiwjkE=
+github.com/kobergj/gowebdav v0.0.0-20251030165916-532350997dde h1:HYcp4J4xYe2m9KSUVbTccJb14TpSs+ldCfDFgqsXedI=
+github.com/kobergj/gowebdav v0.0.0-20251030165916-532350997dde/go.mod h1:bHA7t77X/QFExdeAnDzK6vKM34kEZAcE1OX4MfiwjkE=
 github.com/kobergj/icap-client v0.0.0-20250116172800-8eaa5022532b h1:NBKEgFtIukCreWOEvtrgNQusqosGyhlxzyiHbba1zEI=
 github.com/kobergj/icap-client v0.0.0-20250116172800-8eaa5022532b/go.mod h1:HpntrRsQA6RKNXy2Nbr4kVj+NO3OYWpAQUVxeya+3sU=
 github.com/kobergj/plugins/v4/store/nats-js-kv v0.0.0-20240807130109-f62bb67e8c90 h1:pfI8Z5yavO6fU6vDGlWhZ4BgDlvj8c6xB7J57HfTPwA=
@@ -717,8 +717,8 @@ github.com/orcaman/concurrent-map v1.0.0 h1:I/2A2XPCb4IuQWcQhBhSwGfiuybl/J0ev9HD
 github.com/orcaman/concurrent-map v1.0.0/go.mod h1:Lu3tH6HLW3feq74c2GC+jIMS/K2CFcDWnWD9XkenwhI=
 github.com/owncloud/libre-graph-api-go v1.0.5-0.20250217093259-fa3804be6c27 h1:ID8s5lGBntmrlI6TbDAjTzRyHucn3bVM2wlW+HBplv4=
 github.com/owncloud/libre-graph-api-go v1.0.5-0.20250217093259-fa3804be6c27/go.mod h1:+gT+x62AS9u2Farh9wE2uYmgdvTg0MQgsSI62D+xoRg=
-github.com/owncloud/reva/v2 v2.0.0-20251017104024-82c22e954c1c h1:8xgW1qAuKNdXgH9P8F4hDI5vU6/VM1PibZhIFj7JSU0=
-github.com/owncloud/reva/v2 v2.0.0-20251017104024-82c22e954c1c/go.mod h1:EgvdLWO1ezgdVqewaAP2GIZJfRRggwZItJnnTBxNNrY=
+github.com/owncloud/reva/v2 v2.0.0-20251031091821-e32f19d8b321 h1:0280gHTdvrDrts+7zx/PfuK0pu112pNHUKtAlpGj0/Q=
+github.com/owncloud/reva/v2 v2.0.0-20251031091821-e32f19d8b321/go.mod h1:9c5qJbKff+lDgtgjOPFi4/b5Cyx5niauCJGSm1b1zqM=
 github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c h1:rp5dCmg/yLR3mgFuSOe4oEnDDmGLROTvMragMUXpTQw=
 github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c/go.mod h1:X07ZCGwUbLaax7L0S3Tw4hpejzu63ZrrQiUe6W0hcy0=
 github.com/pablodz/inotifywaitgo v0.0.9 h1:njquRbBU7fuwIe5rEvtaniVBjwWzcpdUVptSgzFqZsw=

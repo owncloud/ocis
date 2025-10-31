@@ -124,7 +124,7 @@ func (h *sharesHandler) CreateShare(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	shareWith, _, err := getIDAndMeshProvider(req.ShareWith)
+	shareWith, _, err := getLocalUserID(req.ShareWith)
 	if err != nil {
 		reqres.WriteError(w, r, reqres.APIErrorInvalidParameter, err.Error(), nil)
 		return
@@ -197,11 +197,28 @@ func (h *sharesHandler) CreateShare(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 }
 
+func getLocalUserID(user string) (id, provider string, err error) {
+	idPart, provider, err := getIDAndMeshProvider(user)
+	if err != nil {
+		return "", "", err
+	}
+
+	// Handle nested @ in idPart (e.g. "user@idp@provider")
+	if inner := strings.LastIndex(idPart, "@"); inner != -1 {
+		id = idPart[:inner]
+	} else {
+		id = idPart
+	}
+
+	return id, provider, nil
+}
+
 func getUserIDFromOCMUser(user string) (*userpb.UserId, error) {
 	id, idp, err := getIDAndMeshProvider(user)
 	if err != nil {
 		return nil, err
 	}
+	idp = strings.TrimPrefix(idp, "https://") // strip off leading scheme if present (despite being not OCM compliant). This is the case in Nextcloud and oCIS
 	return &userpb.UserId{
 		OpaqueId: id,
 		Idp:      idp,
@@ -210,13 +227,21 @@ func getUserIDFromOCMUser(user string) (*userpb.UserId, error) {
 	}, nil
 }
 
-func getIDAndMeshProvider(user string) (string, string, error) {
-	// the user is in the form of dimitri@apiwise.nl
-	split := strings.Split(user, "@")
-	if len(split) < 2 {
-		return "", "", errors.New("not in the form <id>@<provider>")
+func getIDAndMeshProvider(user string) (id, provider string, err error) {
+	last := strings.LastIndex(user, "@")
+	if last == -1 {
+		return "", "", fmt.Errorf("%s not in the form <id>@<provider>", user)
 	}
-	return strings.Join(split[:len(split)-1], "@"), split[len(split)-1], nil
+
+	id, provider = user[:last], user[last+1:]
+	if id == "" {
+		return "", "", errors.New("id cannot be empty")
+	}
+	if provider == "" {
+		return "", "", errors.New("provider cannot be empty")
+	}
+
+	return id, provider, nil
 }
 
 func getCreateShareRequest(r *http.Request) (*createShareRequest, error) {
