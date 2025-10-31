@@ -46,7 +46,7 @@ K3D_IMAGE = "ghcr.io/k3d-io/k3d:5-dind"
 OC_CI_HUGO_STATIC_IMAGE = "hugomods/hugo:base-0.129.0"
 
 DEFAULT_PHP_VERSION = "8.4"
-DEFAULT_NODEJS_VERSION = "22"
+DEFAULT_NODEJS_VERSION = "24"
 
 dirs = {
     "base": "/drone/src",
