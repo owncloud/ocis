@@ -1048,4 +1048,65 @@ class CliContext implements Context {
 		];
 		$this->featureContext->setResponse(CliHelper::runCommand($body));
 	}
+
+	/**
+	 * @When administrator deletes :space space using the CLI
+	 *
+	 * @param string $space
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function theAdministratorDeletesSpaceUsingTheCLI(string $space): void {
+		$command = "storage-users spaces purge -t=" . strtolower($space) . " -r=0s -v -d=false";
+		$body = [
+			"command" => $command,
+		];
+		$this->featureContext->setResponse(CliHelper::runCommand($body));
+	}
+
+	/**
+	 * @When administrator deletes :space space of user :user with space-id using the CLI
+	 *
+	 * @param string $spaceName
+	 * @param string $user
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function administratorDeletesSpaceWithSpaceIdUsingTheCli(string $spaceName, string $user): void {
+		$space = $this->featureContext->spacesContext->getSpaceByName($user, $spaceName);
+
+		if ($spaceName === "Personal") {
+			$spaceType = "personal";
+		} else {
+			$spaceType = 'project';
+		}
+
+		$command = "storage-users spaces purge -t=$spaceType -s=" . $space['id'] . " -r=0s -v -d=false";
+		$body = [
+			"command" => $command,
+		];
+		$this->featureContext->setResponse(CliHelper::runCommand($body));
+	}
+
+	/**
+	 * @When administrator deletes :space space with :retentionPeriod retention period using the CLI
+	 *
+	 * @param string $space
+	 * @param string $retentionPeriod
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function administratorDeletesSpaceWithRetentionPeriodOfUsingTheCli(
+		string $space,
+		string $retentionPeriod,
+	): void {
+		$command = "storage-users spaces purge -t=" . strtolower($space) . " -r=$retentionPeriod -v -d=false";
+		$body = [
+			"command" => $command,
+		];
+		$this->featureContext->setResponse(CliHelper::runCommand($body));
+	}
 }
