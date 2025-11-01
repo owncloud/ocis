@@ -207,7 +207,7 @@ func (s *service) UpdateOCMCoreShare(ctx context.Context, req *ocmcore.UpdateOCM
 	}
 	fileMask := &fieldmaskpb.FieldMask{Paths: []string{"protocols"}}
 
-	user := &userpb.User{Id: ocmuser.RemoteID(&userpb.UserId{OpaqueId: grantee})}
+	user := &userpb.User{Id: ocmuser.DecodeRemoteUserFederatedID(&userpb.UserId{OpaqueId: grantee})}
 	_, err := s.repo.UpdateReceivedShare(ctx, user, &ocm.ReceivedShare{
 		Id: &ocm.ShareId{
 			OpaqueId: req.GetOcmShareId(),
@@ -234,7 +234,7 @@ func (s *service) DeleteOCMCoreShare(ctx context.Context, req *ocmcore.DeleteOCM
 		return nil, errtypes.UserRequired("missing remote user id in a metadata")
 	}
 
-	share, err := s.repo.GetReceivedShare(ctx, &userpb.User{Id: ocmuser.RemoteID(&userpb.UserId{OpaqueId: grantee})}, &ocm.ShareReference{
+	share, err := s.repo.GetReceivedShare(ctx, &userpb.User{Id: ocmuser.DecodeRemoteUserFederatedID(&userpb.UserId{OpaqueId: grantee})}, &ocm.ShareReference{
 		Spec: &ocm.ShareReference_Id{
 			Id: &ocm.ShareId{
 				OpaqueId: req.GetId(),
@@ -245,7 +245,7 @@ func (s *service) DeleteOCMCoreShare(ctx context.Context, req *ocmcore.DeleteOCM
 		return nil, errtypes.InternalError("unable to get share details")
 	}
 
-	granteeUser := &userpb.User{Id: ocmuser.RemoteID(&userpb.UserId{OpaqueId: grantee})}
+	granteeUser := &userpb.User{Id: ocmuser.DecodeRemoteUserFederatedID(&userpb.UserId{OpaqueId: grantee})}
 	err = s.repo.DeleteReceivedShare(ctx, granteeUser, &ocm.ShareReference{
 		Spec: &ocm.ShareReference_Id{
 			Id: &ocm.ShareId{
@@ -262,7 +262,7 @@ func (s *service) DeleteOCMCoreShare(ctx context.Context, req *ocmcore.DeleteOCM
 			if err := events.Publish(ctx, s.eventStream, events.OCMCoreShareDelete{
 				ShareID:      share.Id.OpaqueId,
 				Sharer:       share.GetOwner(),
-				Grantee:      ocmuser.RemoteID(&userpb.UserId{OpaqueId: grantee}),
+				Grantee:      ocmuser.DecodeRemoteUserFederatedID(&userpb.UserId{OpaqueId: grantee}),
 				ResourceName: share.Name,
 				CTime:        &typespb.Timestamp{Seconds: uint64(time.Now().Unix())},
 			}); err != nil {

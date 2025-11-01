@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"path"
 	"reflect"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
@@ -544,7 +545,7 @@ func cs3ReceivedOCMSharesToDriveItems(ctx context.Context,
 			// file shares
 			resOpaqueID := "/"
 			if receivedShares[0].GetResourceType() == storageprovider.ResourceType_RESOURCE_TYPE_FILE {
-				resOpaqueID += receivedShares[0].GetName()
+				resOpaqueID = path.Join(resOpaqueID, receivedShares[0].GetName())
 			}
 
 			shareStat, err := gatewayClient.Stat(ctx, &storageprovider.StatRequest{
