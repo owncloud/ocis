@@ -436,7 +436,7 @@ func (i *LDAP) getGroupCreateLDAPDN(group libregraph.Group) string {
 func (i *LDAP) groupToLDAPAttrValues(group libregraph.Group) (map[string][]string, error) {
 	attrs := map[string][]string{
 		i.groupAttributeMap.name: {group.GetDisplayName()},
-		"objectClass":            {"groupOfNames", "top"},
+		"objectClass":            {i.groupObjectClass, "top"},
 		// This is a crutch to allow groups without members for LDAP servers
 		// that apply strict Schema checking. The RFCs define "member/uniqueMember"
 		// as required attribute for groupOfNames/groupOfUniqueNames. So we
