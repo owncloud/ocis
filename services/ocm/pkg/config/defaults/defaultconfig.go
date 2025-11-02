@@ -91,7 +91,6 @@ func DefaultConfig() *config.Config {
 		},
 		ScienceMesh: config.ScienceMesh{
 			Prefix:             "sciencemesh",
-			Federations:        filepath.Join(defaults.BaseConfigPath(), "federations.json"),
 			InviteAcceptDialog: "/open-cloud-mesh/accept-invite",
 		},
 		OCMD: config.OCMD{

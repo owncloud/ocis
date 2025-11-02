@@ -70,12 +70,12 @@ func OCMConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]inter
 					},
 				},
 				"sciencemesh": map[string]interface{}{
-					"prefix":             cfg.ScienceMesh.Prefix,
-					"smtp_credentials":   map[string]string{},
-					"gatewaysvc":         cfg.Reva.Address,
-					"mesh_directory_url": cfg.ScienceMesh.MeshDirectoryURL,
-					"federations_file":   cfg.ScienceMesh.Federations,
-					"provider_domain":    providerDomain,
+					"prefix":                 cfg.ScienceMesh.Prefix,
+					"smtp_credentials":       map[string]string{},
+					"gatewaysvc":             cfg.Reva.Address,
+					"mesh_directory_url":     cfg.ScienceMesh.MeshDirectoryURL,
+					"directory_service_urls": cfg.ScienceMesh.DirectoryServiceURLs,
+					"provider_domain":        providerDomain,
 					"events": map[string]interface{}{
 						"natsaddress":          cfg.Events.Endpoint,
 						"natsclusterid":        cfg.Events.Cluster,
