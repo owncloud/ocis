@@ -168,6 +168,18 @@ func DefaultPolicies() []config.Policy {
 					Service:     "com.owncloud.web.frontend",
 					Unprotected: true,
 				},
+				// OCM WAYF public endpoints
+				{
+					Endpoint:    "/sciencemesh/federations",
+					Service:     "com.owncloud.web.ocm",
+					Unprotected: true,
+				},
+				{
+					Endpoint:    "/sciencemesh/discover",
+					Service:     "com.owncloud.web.ocm",
+					Unprotected: true,
+				},
+				// General sciencemesh endpoints
 				{
 					Endpoint: "/sciencemesh/",
 					Service:  "com.owncloud.web.ocm",

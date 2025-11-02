@@ -90,7 +90,8 @@ func DefaultConfig() *config.Config {
 			Cluster:  "ocis-cluster",
 		},
 		ScienceMesh: config.ScienceMesh{
-			Prefix: "sciencemesh",
+			Prefix:             "sciencemesh",
+			InviteAcceptDialog: "/open-cloud-mesh/accept-invite",
 		},
 		OCMD: config.OCMD{
 			Prefix: "ocm",
