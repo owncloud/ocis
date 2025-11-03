@@ -105,7 +105,7 @@
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.4.2",
     "render-if": "^0.1.1",
-    "web-vitals": "^3.5.2"
+    "web-vitals": "^5.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.28.0",
