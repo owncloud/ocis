@@ -2,7 +2,6 @@
 services:
   traefik:
     image: traefik:${TRAEFIK_DOCKER_TAG:-latest}
-    # release notes: https://github.com/traefik/traefik/releases
     networks:
       ocis-net:
     command:
