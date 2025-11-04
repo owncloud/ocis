@@ -50,7 +50,6 @@ services:
 
   collabora:
     image: collabora/code:${COLLABORA_DOCKER_TAG:-latest}
-    # release notes: https://www.collaboraonline.com/release-notes/
     networks:
       ocis-net:
     environment:
