@@ -111,7 +111,7 @@ func (h *invitesHandler) AcceptInvite(w http.ResponseWriter, r *http.Request) {
 	userObj := &userpb.User{
 		Id: &userpb.UserId{
 			OpaqueId: req.UserID,
-			Idp:      req.RecipientProvider,
+			Idp:      ocmuser.NormolizeOCMUserIPD(req.RecipientProvider),
 			Type:     userpb.UserType_USER_TYPE_FEDERATED,
 		},
 		Mail:        req.Email,

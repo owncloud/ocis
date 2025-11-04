@@ -143,7 +143,7 @@ class GraphHelper {
 	 * @return string
 	 */
 	public static function getFederatedUserRegex(): string {
-		return '([0-9a-fA-F-]+)@([A-Za-z0-9.-]+(?::\d+)?$)';
+		return '^[a-zA-Z_][a-zA-Z0-9.!#$%&\'*+\/=?^_`{|}~-]*(?:@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*(?::\d{1,5})?)?$';
 	}
 
 	/**

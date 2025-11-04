@@ -34,11 +34,12 @@ import (
 	ocm "github.com/cs3org/go-cs3apis/cs3/sharing/ocm/v1beta1"
 	providerpb "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	"github.com/go-playground/validator/v10"
 	"github.com/owncloud/reva/v2/internal/http/services/reqres"
 	"github.com/owncloud/reva/v2/pkg/appctx"
+	ocmuser "github.com/owncloud/reva/v2/pkg/ocm/user"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/owncloud/reva/v2/pkg/utils"
-	"github.com/go-playground/validator/v10"
 )
 
 var validate = validator.New()
@@ -218,7 +219,8 @@ func getUserIDFromOCMUser(user string) (*userpb.UserId, error) {
 	if err != nil {
 		return nil, err
 	}
-	idp = strings.TrimPrefix(idp, "https://") // strip off leading scheme if present (despite being not OCM compliant). This is the case in Nextcloud and oCIS
+	// idp = strings.TrimPrefix(idp, "https://") // strip off leading scheme if present (despite being not OCM compliant). This is the case in Nextcloud and oCIS
+	idp = ocmuser.NormolizeOCMUserIPD(idp)
 	return &userpb.UserId{
 		OpaqueId: id,
 		Idp:      idp,

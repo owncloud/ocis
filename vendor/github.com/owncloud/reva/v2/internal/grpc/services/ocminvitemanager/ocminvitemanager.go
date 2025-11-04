@@ -219,7 +219,7 @@ func (s *service) ForwardInvite(ctx context.Context, req *invitepb.ForwardInvite
 	// we're using the provider domain as the IDP part of the ID
 	remoteUserID := &userpb.UserId{
 		Type:     userpb.UserType_USER_TYPE_FEDERATED,
-		Idp:      req.GetOriginSystemProvider().Domain,
+		Idp:      ocmuser.NormolizeOCMUserIPD(req.GetOriginSystemProvider().Domain),
 		OpaqueId: remoteUser.UserID,
 	}
 

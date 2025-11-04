@@ -12,6 +12,9 @@ import (
 // 1. stripping the protocol from the domain and
 // 2. concatenating the opaque id with the domain to get a unique identifier that cannot collide with other users
 func FederatedID(id *userpb.UserId, domain string) *userpb.UserId {
+	if domain == "" {
+		domain = id.Idp
+	}
 	// strip protocol from the domain
 	idp := id.Idp
 	if u, err := url.Parse(id.Idp); err == nil && u.Host != "" {
@@ -24,7 +27,7 @@ func FederatedID(id *userpb.UserId, domain string) *userpb.UserId {
 
 	u := &userpb.UserId{
 		Type:     userpb.UserType_USER_TYPE_FEDERATED,
-		Idp:      domain,
+		Idp:      NormolizeOCMUserIPD(domain),
 		OpaqueId: opaqueId,
 	}
 
@@ -45,7 +48,7 @@ func DecodeRemoteUserFederatedID(id *userpb.UserId) *userpb.UserId {
 		return remoteId
 	}
 	remoteId.OpaqueId = remote[:last]
-	remoteId.Idp = remote[last+1:]
+	remoteId.Idp = NormolizeOCMUserIPD(remote[last+1:])
 
 	return remoteId
 }
@@ -61,4 +64,13 @@ func FormatOCMUser(u *userpb.UserId) string {
 		idp = u.Host
 	}
 	return fmt.Sprintf("%s@%s", u.OpaqueId, idp)
+}
+
+// NormolizeOCMUserIPD ensures that the idp has a scheme (https://) prefix if prefix is missing
+// to keep the idp consistent across shares and received shares in the OCM share store.
+func NormolizeOCMUserIPD(idp string) string {
+	if strings.Contains(idp, "://") {
+		return idp
+	}
+	return "https://" + idp
 }
