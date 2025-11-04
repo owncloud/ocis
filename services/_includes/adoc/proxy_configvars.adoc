@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2025-11-04-00-08-35]
+[#deprecation-note-2025-11-04-08-41-27]
 [caption=]
 .Deprecation notes for the proxy service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -892,7 +892,7 @@ Enable MFA enforcement. If enabled users need to complete MFA before they can ac
 a|`OCIS_MFA_AUTH_LEVEL_NAMES` +
 
 a| [subs=-attributes]
-++Balch ++
+++7.3.0 ++
 a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
