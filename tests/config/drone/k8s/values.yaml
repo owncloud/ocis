@@ -45,7 +45,6 @@ features:
         - "owncloud-1"
   quotas:
     default: "1000000000"
-    max: "0"
 
 http:
   cors:
