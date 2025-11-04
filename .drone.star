@@ -185,8 +185,8 @@ config = {
                 "apiSharingNgPermissions",
             ],
             "skip": False,
-            "k8s": True,
             "withRemotePhp": [False],
+            "k8s": True,
         },
         "sharingNgAdditionalShareRole": {
             "suites": [
@@ -213,7 +213,7 @@ config = {
             ],
             "skip": False,
             "k8s": True,
-            "withRemotePhp": [True],
+            "withRemotePhp": [False],
         },
         "antivirus": {
             "suites": [
@@ -358,6 +358,7 @@ config = {
                 "coreApiWebdavMove2",
             ],
             "skip": False,
+            "k8s": True,
         },
         "7": {
             "suites": [
@@ -373,8 +374,8 @@ config = {
                 "coreApiWebdavUpload",
                 "coreApiWebdavUploadTUS",
             ],
-            "k8s": True,
             "skip": False,
+            "k8s": True,
         },
     },
     "e2eTests": {
@@ -386,9 +387,9 @@ config = {
         },
         "search": {
             "skip": False,
-            "k8s": True,
             "suites": ["search"],  # suites to run
             "tikaNeeded": True,
+            "k8s": True,
         },
         "keycloak": {
             "skip": False,
@@ -409,6 +410,7 @@ config = {
                 "spaces",
             ],
             "tikaNeeded": True,
+            "k8s": True,
         },
     },
     "binaryReleases": {
@@ -1077,7 +1079,7 @@ def codestyle(ctx):
 def localApiTestPipeline(ctx):
     pipelines = []
 
-    with_remote_php = [True]
+    with_remote_php = [False]
     if ctx.build.event == "cron" or "full-ci" in ctx.build.title.lower():
         with_remote_php.append(True)
 
@@ -1377,7 +1379,7 @@ def wopiValidatorTests(ctx, storage, wopiServerType):
 def coreApiTestPipeline(ctx):
     pipelines = []
 
-    with_remote_php = [True]
+    with_remote_php = [False]
     if ctx.build.event == "cron" or "full-ci" in ctx.build.title.lower():
         with_remote_php.append(True)
 
@@ -3885,7 +3887,7 @@ def exposeEmailServiceK8s():
 
 def exposeAntivirusServiceK8s():
     return [{
-        "name": EMAIL_SMTP_HOST,
+        "name": "expose-antivirus",
         "image": "ghcr.io/k3d-io/k3d:5-dind",
         "commands": [
             "kubectl port-forward svc/antivirus 9297:9277 -n ocis",
