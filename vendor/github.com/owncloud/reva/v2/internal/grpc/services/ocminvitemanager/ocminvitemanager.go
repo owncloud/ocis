@@ -219,12 +219,9 @@ func (s *service) ForwardInvite(ctx context.Context, req *invitepb.ForwardInvite
 	// we're using the provider domain as the IDP part of the ID
 	remoteUserID := &userpb.UserId{
 		Type:     userpb.UserType_USER_TYPE_FEDERATED,
-		Idp:      ocmuser.NormolizeOCMUserIPD(req.GetOriginSystemProvider().Domain),
+		Idp:      ocmuser.NormalizeOCMUserIPD(req.GetOriginSystemProvider().Domain),
 		OpaqueId: remoteUser.UserID,
 	}
-
-	// we need to use a unique identifier for federated users
-	// remoteUserID = ocmuser.FederatedID(remoteUserID, "")
 
 	if err := s.repo.AddRemoteUser(ctx, user.Id, &userpb.User{
 		Id:          remoteUserID,
@@ -285,8 +282,6 @@ func (s *service) AcceptInvite(ctx context.Context, req *invitepb.AcceptInviteRe
 	}
 
 	remoteUser := req.GetRemoteUser()
-	// we need to use a unique identifier for federated users
-	//remoteUser.Id = ocmuser.FederatedID(remoteUser.Id, "")
 
 	if err := s.repo.AddRemoteUser(ctx, token.GetUserId(), remoteUser); err != nil {
 		if !errors.Is(err, invite.ErrUserAlreadyAccepted) {

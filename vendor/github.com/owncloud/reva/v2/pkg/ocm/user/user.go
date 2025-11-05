@@ -27,7 +27,7 @@ func FederatedID(id *userpb.UserId, domain string) *userpb.UserId {
 
 	u := &userpb.UserId{
 		Type:     userpb.UserType_USER_TYPE_FEDERATED,
-		Idp:      NormolizeOCMUserIPD(domain),
+		Idp:      NormalizeOCMUserIPD(domain),
 		OpaqueId: opaqueId,
 	}
 
@@ -48,7 +48,7 @@ func DecodeRemoteUserFederatedID(id *userpb.UserId) *userpb.UserId {
 		return remoteId
 	}
 	remoteId.OpaqueId = remote[:last]
-	remoteId.Idp = NormolizeOCMUserIPD(remote[last+1:])
+	remoteId.Idp = NormalizeOCMUserIPD(remote[last+1:])
 
 	return remoteId
 }
@@ -66,9 +66,9 @@ func FormatOCMUser(u *userpb.UserId) string {
 	return fmt.Sprintf("%s@%s", u.OpaqueId, idp)
 }
 
-// NormolizeOCMUserIPD ensures that the idp has a scheme (https://) prefix if prefix is missing
+// NormalizeOCMUserIPD ensures that the idp has a scheme (https://) prefix if prefix is missing
 // to keep the idp consistent across shares and received shares in the OCM share store.
-func NormolizeOCMUserIPD(idp string) string {
+func NormalizeOCMUserIPD(idp string) string {
 	if strings.Contains(idp, "://") {
 		return idp
 	}
