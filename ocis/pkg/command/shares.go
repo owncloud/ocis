@@ -159,9 +159,10 @@ func moveStuckUploadBlobsCmd(cfg *config.Config) *cli.Command {
 				Usage: "Dry run mode enabled",
 			},
 			&cli.StringFlag{
-				Name:  "ocis-home",
-				Value: "~/.ocis",
-				Usage: "oCIS home directory",
+				Name:     "basepath",
+				Aliases:  []string{"p"},
+				Usage:    "the basepath of the decomposedfs (e.g. /var/tmp/ocis/storage/users)",
+				Required: true,
 			},
 			&cli.StringFlag{
 				Name:  "filename",
@@ -169,9 +170,10 @@ func moveStuckUploadBlobsCmd(cfg *config.Config) *cli.Command {
 				Usage: "File to move from uploads/ to share manager metadata blobs/",
 			},
 			&cli.BoolFlag{
-				Name:  "verbose",
-				Value: false,
-				Usage: "Verbose logging enabled",
+				Name:    "verbose",
+				Aliases: []string{"v"},
+				Value:   false,
+				Usage:   "Verbose logging enabled",
 			},
 		},
 		Before: func(c *cli.Context) error {
@@ -199,8 +201,8 @@ func moveStuckUploadBlobsCmd(cfg *config.Config) *cli.Command {
 			}
 
 			ocisHome := filepath.Join(home, ".ocis")
-			if c.IsSet("ocis-home") {
-				ocisHome = c.String("ocis-home")
+			if c.IsSet("basepath") {
+				ocisHome = c.String("basepath")
 			}
 
 			rootMetadata := filepath.Join(ocisHome, "storage", "metadata")
