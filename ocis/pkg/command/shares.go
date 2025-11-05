@@ -151,7 +151,7 @@ func cleanup(c *cli.Context, cfg *config.Config) error {
 func moveStuckUploadBlobsCmd(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "move-stuck-upload-blobs",
-		Usage: `move stuck upload blobs to the jsoncs3 share-manager metadata`,
+		Usage: `Move stuck upload blobs to the jsoncs3 share-manager metadata`,
 		Flags: []cli.Flag{
 			&cli.BoolFlag{
 				Name:  "dry-run",
@@ -166,7 +166,7 @@ func moveStuckUploadBlobsCmd(cfg *config.Config) *cli.Command {
 			&cli.StringFlag{
 				Name:  "filename",
 				Value: "received.json",
-				Usage: "file to move from uploads/ to share manager metadata blobs/",
+				Usage: "File to move from uploads/ to share manager metadata blobs/",
 			},
 			&cli.BoolFlag{
 				Name:  "verbose",
