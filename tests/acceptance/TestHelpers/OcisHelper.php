@@ -77,17 +77,6 @@ class OcisHelper {
 	/**
 	 * @return string
 	 */
-	public static function getFederatedServerHost(): string {
-		$serverUrl = self::getFederatedServerUrl();
-		$parts = parse_url($serverUrl);
-		$host = $parts['host'];
-		$port = $parts['port'] ? ':' . $parts['port'] : '';
-		return $host . $port;
-	}
-
-	/**
-	 * @return string
-	 */
 	public static function getCollaborationServiceUrl(): string {
 		if (\getenv("COLLABORATION_SERVICE_URL")) {
 			return \getenv("COLLABORATION_SERVICE_URL");
