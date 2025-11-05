@@ -110,6 +110,7 @@ type ExternalAppConfig struct {
 type Web struct {
 	ThemeServer string    `yaml:"theme_server" env:"OCIS_URL;WEB_UI_THEME_SERVER" desc:"Base URL to load themes from. Will be prepended to the theme path." introductionVersion:"pre5.0"` // used to build Theme in WebConfig
 	ThemePath   string    `yaml:"theme_path" env:"WEB_UI_THEME_PATH" desc:"Path to the theme json file. Will be appended to the URL of the theme server." introductionVersion:"pre5.0"`   // used to build Theme in WebConfig
+	StaticOnly  bool      `yaml:"static_only" env:"WEB_STATIC_ONLY" desc:"Serve only static assets without exposing dynamic web endpoints. Requires a config.json file in the asset root or provided via WEB_UI_CONFIG_FILE."`
 	Config      WebConfig `yaml:"config"`
 }
 

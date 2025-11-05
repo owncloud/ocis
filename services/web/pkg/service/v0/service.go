@@ -47,39 +47,46 @@ func NewService(opts ...Option) (Service, error) {
 		themeFS:         options.ThemeFS,
 		gatewaySelector: options.GatewaySelector,
 	}
-
-	themeService, err := theme.NewService(
-		theme.ServiceOptions{}.
-			WithThemeFS(options.ThemeFS).
-			WithGatewaySelector(options.GatewaySelector),
+	var (
+		err          error
+		themeService theme.Service
 	)
-	if err != nil {
-		return svc, err
+	if !options.Config.Web.StaticOnly {
+		themeService, err = theme.NewService(
+			theme.ServiceOptions{}.
+				WithThemeFS(options.ThemeFS).
+				WithGatewaySelector(options.GatewaySelector),
+		)
+		if err != nil {
+			return svc, err
+		}
 	}
 
 	m.Route(options.Config.HTTP.Root, func(r chi.Router) {
-		r.Get("/config.json", svc.Config)
-		r.Route("/branding/logo", func(r chi.Router) {
-			r.Use(middleware.ExtractAccountUUID(
-				account.Logger(options.Logger),
-				account.JWTSecret(options.Config.TokenManager.JWTSecret),
-			))
-			r.Post("/", themeService.LogoUpload)
-			r.Delete("/", themeService.LogoReset)
-		})
-		r.Route("/themes", func(r chi.Router) {
-			r.Get("/{id}/theme.json", themeService.Get)
-			r.Mount("/", svc.Static(
-				options.ThemeFS.IOFS(),
-				path.Join(svc.config.HTTP.Root, "/themes"),
+		if !options.Config.Web.StaticOnly {
+			r.Get("/config.json", svc.Config)
+			r.Route("/branding/logo", func(r chi.Router) {
+				r.Use(middleware.ExtractAccountUUID(
+					account.Logger(options.Logger),
+					account.JWTSecret(options.Config.TokenManager.JWTSecret),
+				))
+				r.Post("/", themeService.LogoUpload)
+				r.Delete("/", themeService.LogoReset)
+			})
+			r.Route("/themes", func(r chi.Router) {
+				r.Get("/{id}/theme.json", themeService.Get)
+				r.Mount("/", svc.Static(
+					options.ThemeFS.IOFS(),
+					path.Join(svc.config.HTTP.Root, "/themes"),
+					options.Config.HTTP.CacheTTL,
+				))
+			})
+			r.Mount(options.AppsHTTPEndpoint, svc.Static(
+				options.AppFS,
+				path.Join(svc.config.HTTP.Root, options.AppsHTTPEndpoint),
 				options.Config.HTTP.CacheTTL,
 			))
-		})
-		r.Mount(options.AppsHTTPEndpoint, svc.Static(
-			options.AppFS,
-			path.Join(svc.config.HTTP.Root, options.AppsHTTPEndpoint),
-			options.Config.HTTP.CacheTTL,
-		))
+		}
 		r.Mount("/", svc.Static(
 			svc.coreFS,
 			svc.config.HTTP.Root,

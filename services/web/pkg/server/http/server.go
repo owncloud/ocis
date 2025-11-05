@@ -2,8 +2,10 @@ package http
 
 import (
 	"fmt"
+	"os"
 	"path"
 
+	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
 	"go-micro.dev/v4"
@@ -17,6 +19,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/web"
 	"github.com/owncloud/ocis/v2/services/web/pkg/apps"
 	svc "github.com/owncloud/ocis/v2/services/web/pkg/service/v0"
+	"github.com/spf13/afero"
 )
 
 var (
@@ -46,13 +49,17 @@ func Server(opts ...Option) (http.Service, error) {
 		return http.Service{}, fmt.Errorf("could not initialize http service: %w", err)
 	}
 
-	gatewaySelector, err := pool.GatewaySelector(
-		options.Config.GatewayAddress,
-		pool.WithRegistry(registry.GetRegistry()),
-		pool.WithTracerProvider(options.TraceProvider),
-	)
-	if err != nil {
-		return http.Service{}, err
+	var gatewaySelector pool.Selectable[gateway.GatewayAPIClient]
+	if !options.Config.Web.StaticOnly {
+		var err error
+		gatewaySelector, err = pool.GatewaySelector(
+			options.Config.GatewayAddress,
+			pool.WithRegistry(registry.GetRegistry()),
+			pool.WithTracerProvider(options.TraceProvider),
+		)
+		if err != nil {
+			return http.Service{}, err
+		}
 	}
 
 	appsFS := fsx.NewFallbackFS(
@@ -60,17 +67,30 @@ func Server(opts ...Option) (http.Service, error) {
 		fsx.NewBasePathFs(fsx.FromIOFS(web.Assets), "assets/apps"),
 	)
 	// build and inject the list of applications into the config
-	for _, application := range apps.List(options.Logger, options.Config.Apps, appsFS.Secondary().IOFS(), appsFS.Primary().IOFS()) {
-		options.Config.Web.Config.ExternalApps = append(
-			options.Config.Web.Config.ExternalApps,
-			application.ToExternal(path.Join(options.Config.HTTP.Root, _customAppsEndpoint)),
-		)
+	if !options.Config.Web.StaticOnly {
+		for _, application := range apps.List(options.Logger, options.Config.Apps, appsFS.Secondary().IOFS(), appsFS.Primary().IOFS()) {
+			options.Config.Web.Config.ExternalApps = append(
+				options.Config.Web.Config.ExternalApps,
+				application.ToExternal(path.Join(options.Config.HTTP.Root, _customAppsEndpoint)),
+			)
+		}
 	}
 
 	coreFS := fsx.NewFallbackFS(
 		fsx.NewBasePathFs(fsx.NewOsFs(), options.Config.Asset.CorePath),
 		fsx.NewBasePathFs(fsx.FromIOFS(web.Assets), "assets/core"),
 	)
+	if options.Config.Web.StaticOnly && options.Config.File != "" {
+		data, err := os.ReadFile(options.Config.File)
+		if err != nil {
+			return http.Service{}, fmt.Errorf("load static config: %w", err)
+		}
+		mem := fsx.NewMemMapFs()
+		if err := afero.WriteFile(mem, "config.json", data, 0o644); err != nil {
+			return http.Service{}, fmt.Errorf("write static config: %w", err)
+		}
+		coreFS = fsx.NewFallbackFS(mem, coreFS)
+	}
 	themeFS := fsx.NewFallbackFS(
 		fsx.NewBasePathFs(fsx.NewOsFs(), options.Config.Asset.ThemesPath),
 		fsx.NewBasePathFs(fsx.FromIOFS(web.Assets), "assets/themes"),
@@ -87,14 +107,13 @@ func Server(opts ...Option) (http.Service, error) {
 		fsx.NewBasePathFs(coreFS.Secondary(), "themes"),
 	)
 
-	handle, err := svc.NewService(
+	svcOptions := []svc.Option{
 		svc.Logger(options.Logger),
 		svc.CoreFS(coreFS.IOFS()),
 		svc.AppFS(appsFS.IOFS()),
 		svc.ThemeFS(themeFS),
 		svc.AppsHTTPEndpoint(_customAppsEndpoint),
 		svc.Config(options.Config),
-		svc.GatewaySelector(gatewaySelector),
 		svc.Middleware(
 			middleware.GetOtelhttpMiddleware(options.Config.Service.Name, options.TraceProvider),
 			chimiddleware.RealIP,
@@ -117,7 +136,12 @@ func Server(opts ...Option) (http.Service, error) {
 			),
 		),
 		svc.TraceProvider(options.TraceProvider),
-	)
+	}
+	if !options.Config.Web.StaticOnly {
+		svcOptions = append(svcOptions, svc.GatewaySelector(gatewaySelector))
+	}
+
+	handle, err := svc.NewService(svcOptions...)
 
 	if err != nil {
 		return http.Service{}, err
