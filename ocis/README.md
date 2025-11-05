@@ -1,6 +1,22 @@
 # ocis
 
-The ocis package contains the Infinite Scale runtime and the commands for the Infinite Scale CLI.
+The ocis package includes the Infinite Scale runtime and commands for the Infinite Scale command-line interface (CLI), which are not bound to a service.
+
+Table of Contents
+=================
+
+   * [Service Registry](#service-registry)
+   * [Memory limits](#memory-limits)
+   * [CLI Commands](#cli-commands)
+      * [Backup CLI](#backup-cli)
+      * [Cleanup Orphaned Shares](#cleanup-orphaned-shares)
+      * [List Unified Roles](#list-unified-roles)
+      * [Move Stuck Uploads](#move-stuck-uploads)
+      * [Revisions CLI](#revisions-cli)
+      * [Service Health](#service-health)
+      * [Trash CLI](#trash-cli)
+
+<!-- Created by https://github.com/ekalinin/github-markdown-toc -->
 
 ## Service Registry
 
@@ -28,6 +44,8 @@ The ocis package offers a variety of cli commands to monitor or repair ocis inst
 ```
 
 These paths can vary depending on your ocis installation.
+
+All commands provide a `-h` / `--help` option. Use to print all available options.
 
 ### Backup CLI
 
@@ -67,6 +85,56 @@ When a shared space or directory got deleted, use the `shares cleanup` command t
 ocis shares cleanup
 ```
 
+### List Unified Roles
+
+This command simplifies the process of finding out which UID belongs to which role. The command using markdown as output format is:
+
+```bash
+ocis graph list-unified-roles --output-format md
+```
+
+The output of this command includes the following information for each role:
+
+* `Name`\
+  The human readable name of the role.
+* `UID`\
+  The unique identifier of the role.
+* `Enabled`\
+  Whether the role is enabled or not.
+* `Description`\
+  A short description of the role.
+* `Condition`
+* `Allowed Resource Actions`
+
+**Example output (shortned)**
+
+| #  |              LABEL               |                 UID                  | ENABLED  |                                     DESCRIPTION                                      |                         CONDITION                         |         ALLOWED RESOURCE ACTIONS         |
+|:--:|:--------------------------------:|:------------------------------------:|:--------:|:------------------------------------------------------------------------------------:|:---------------------------------------------------------:|:----------------------------------------:|
+| 1  |              Viewer              | b1e2218d-eef8-4d4c-b82d-0f1a1b48f3b5 | enabled  |                                  View and download.                                  |                   exists @Resource.File                   |     libre.graph/driveItem/path/read      |
+|    |                                  |                                      |          |                                                                                      |                  exists @Resource.Folder                  |     libre.graph/driveItem/quota/read     |
+|    |                                  |                                      |          |                                                                                      |  exists @Resource.File && @Subject.UserType=="Federated"  |    libre.graph/driveItem/content/read    |
+|    |                                  |                                      |          |                                                                                      | exists @Resource.Folder && @Subject.UserType=="Federated" |   libre.graph/driveItem/children/read    |
+|    |                                  |                                      |          |                                                                                      |                                                           |    libre.graph/driveItem/deleted/read    |
+|    |                                  |                                      |          |                                                                                      |                                                           |     libre.graph/driveItem/basic/read     |
+| 2  |         ViewerListGrants         | d5041006-ebb3-4b4a-b6a4-7c180ecfb17d | disabled |                     View, download and show all invite
+
+### Move Stuck Uploads
+
+In some cases of saturated disk usage, Infinite Scale metadata may become stuck. This can occur when file metadata is being moved to its final destination after file operations. This issue was primarily seen with shares, where uploaded files could not be accessed. The required filename parameter aligns with Infinite Scale's internal processes and is used to complete the formerly stuck move action.
+
+```bash
+ocis shares move-stuck-upload-blobs [--dry-run=false] -p /base/path/storage/users
+```
+
+This command provides additional options:
+
+* `--dry-run` (default: `true`)\
+Only print found files stuck in transition.\
+Note: This is a safety measure. You must specify `--dry-run=false` for the command to be effective.
+
+* `--filename` value (default: "received.json")\
+File to move from `uploads/` to share manager metadata `blobs/`
+
 ### Revisions CLI
 
 The revisions command allows removing the revisions of files in the storage.
@@ -92,6 +160,30 @@ Prints additional information about the revisions that are removed.
 * `--glob-mechanism` (default: `glob`\
 (advanced) Allows specifying the mechanism to use for globbing. Can be `glob`, `list` or `workers`. In most cases the default `glob` does not need to be changed. If large spaces need to be purged, `list` or `workers` can be used to improve performance at the cost of higher cpu and ram usage. `list` will spawn 10 threads that list folder contents in parallel. `workers` will use a special globbing mechanism and multiple threads to achieve the best performance for the highest cost.
 
+### Service Health
+
+The service health CLI command allows checking the health status of a service. If there are no issues found, nothing health related will get printed.
+
+```bash
+ocis <service-name> health
+```
+
+**Examples**
+
+* The `collaboration` service has been started but not configured and is therefore not in a healthy state:
+  ```bash
+  ocis collaboration health
+  
+  The WOPI secret has not been set properly in your config for collaboration. Make sure your /root/.ocis/config config contains the proper values (e.g. by using 'ocis init --diff' and applying the patch or setting a value manually in the config/corresponding environment variable).
+  ```
+
+* The `antivirus` service has not been started, the health check responds accordingly:
+  ```bash
+  ocis antivirus health
+  
+  {"level":"fatal","service":"antivirus","error":"Get \"http://127.0.0.1:9277/healthz\": dial tcp 127.0.0.1:9277: connect: connection refused","time":"2024-10-28T17:47:54+01:00","message":"Failed to request health check"}
+  ```
+
 ### Trash CLI
 
 The trash cli allows removing empty folders from the trashbin. This should be used to speed up trash bin operations.
@@ -104,39 +196,3 @@ This command provides additional options:
 
 * `--dry-run` (default: `true`)\
 Do not remove any empty folders but print the empty folders that would be removed.
-
-### List Unified Roles
-
-This command simplifies the process of finding out which UID belongs to which role. The command is:
-
-```bash
-ocis graph list-unified-roles
-```
-
-The output of this command includes the following information for each role:
-
-* `Name`\
-  The human readable name of the role.
-* `UID`\
-  The unique identifier of the role.
-* `Enabled`\
-  Whether the role is enabled or not.
-* `Description`\
-  A short description of the role.
-* `Condition`
-* `Allowed Resource Action`
-
-**Example output (shortned)**
-
-```bash
-+----------------------------+--------------------------------------+----------+--------------------------------+--------------------------------+------------------------------------------+
-|            NAME            |                 UID                  | ENABLED  |          DESCRIPTION           |           CONDITION            |         ALLOWED RESOURCE ACTIONS         |
-+----------------------------+--------------------------------------+----------+--------------------------------+--------------------------------+------------------------------------------+
-| Viewer                     | b1e2218d-eef8-4d4c-b82d-0f1a1b48f3b5 | enabled  | View and download.             | exists @Resource.File          | libre.graph/driveItem/path/read          |
-|                            |                                      |          |                                | exists @Resource.Folder        | libre.graph/driveItem/quota/read         |
-|                            |                                      |          |                                | exists @Resource.File &&       | libre.graph/driveItem/content/read       |
-|                            |                                      |          |                                | @Subject.UserType=="Federated" | libre.graph/driveItem/children/read      |
-|                            |                                      |          |                                | exists @Resource.Folder &&     | libre.graph/driveItem/deleted/read       |
-|                            |                                      |          |                                | @Subject.UserType=="Federated" | libre.graph/driveItem/basic/read         |
-+----------------------------+--------------------------------------+----------+--------------------------------+--------------------------------+------------------------------------------+
-```
