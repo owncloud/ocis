@@ -143,7 +143,7 @@ class GraphHelper {
 	 * @return string
 	 */
 	public static function getFederatedUserRegex(): string {
-		return '[^\s]+';
+		return self::getUUIDv4Regex() . '@' . OcisHelper::getFederatedServerHost();
 	}
 
 	/**
