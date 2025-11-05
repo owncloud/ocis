@@ -45,7 +45,7 @@ func init() {
 func cleanupCmd(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "cleanup",
-		Usage: `clean up stale entries in the share manager.`,
+		Usage: `Clean up stale entries in the share manager.`,
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:     "service-account-id",
