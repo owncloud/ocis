@@ -34,11 +34,12 @@ import (
 	ocm "github.com/cs3org/go-cs3apis/cs3/sharing/ocm/v1beta1"
 	providerpb "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	"github.com/go-playground/validator/v10"
 	"github.com/owncloud/reva/v2/internal/http/services/reqres"
 	"github.com/owncloud/reva/v2/pkg/appctx"
+	ocmuser "github.com/owncloud/reva/v2/pkg/ocm/user"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/owncloud/reva/v2/pkg/utils"
-	"github.com/go-playground/validator/v10"
 )
 
 var validate = validator.New()
@@ -124,7 +125,7 @@ func (h *sharesHandler) CreateShare(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	shareWith, _, err := getIDAndMeshProvider(req.ShareWith)
+	shareWith, _, err := getLocalUserID(req.ShareWith)
 	if err != nil {
 		reqres.WriteError(w, r, reqres.APIErrorInvalidParameter, err.Error(), nil)
 		return
@@ -197,11 +198,28 @@ func (h *sharesHandler) CreateShare(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 }
 
+func getLocalUserID(user string) (id, provider string, err error) {
+	idPart, provider, err := getIDAndMeshProvider(user)
+	if err != nil {
+		return "", "", err
+	}
+
+	// Handle nested @ in idPart (e.g. "user@idp@provider")
+	if inner := strings.LastIndex(idPart, "@"); inner != -1 {
+		id = idPart[:inner]
+	} else {
+		id = idPart
+	}
+
+	return id, provider, nil
+}
+
 func getUserIDFromOCMUser(user string) (*userpb.UserId, error) {
 	id, idp, err := getIDAndMeshProvider(user)
 	if err != nil {
 		return nil, err
 	}
+	idp = ocmuser.NormalizeOCMUserIPD(idp)
 	return &userpb.UserId{
 		OpaqueId: id,
 		Idp:      idp,
@@ -210,13 +228,21 @@ func getUserIDFromOCMUser(user string) (*userpb.UserId, error) {
 	}, nil
 }
 
-func getIDAndMeshProvider(user string) (string, string, error) {
-	// the user is in the form of dimitri@apiwise.nl
-	split := strings.Split(user, "@")
-	if len(split) < 2 {
-		return "", "", errors.New("not in the form <id>@<provider>")
+func getIDAndMeshProvider(user string) (id, provider string, err error) {
+	last := strings.LastIndex(user, "@")
+	if last == -1 {
+		return "", "", fmt.Errorf("%s not in the form <id>@<provider>", user)
 	}
-	return strings.Join(split[:len(split)-1], "@"), split[len(split)-1], nil
+
+	id, provider = user[:last], user[last+1:]
+	if id == "" {
+		return "", "", errors.New("id cannot be empty")
+	}
+	if provider == "" {
+		return "", "", errors.New("provider cannot be empty")
+	}
+
+	return id, provider, nil
 }
 
 func getCreateShareRequest(r *http.Request) (*createShareRequest, error) {

@@ -66,7 +66,7 @@ require (
 	github.com/open-policy-agent/opa v1.6.0
 	github.com/orcaman/concurrent-map v1.0.0
 	github.com/owncloud/libre-graph-api-go v1.0.5-0.20250217093259-fa3804be6c27
-	github.com/owncloud/reva/v2 v2.0.0-20251017104024-82c22e954c1c
+	github.com/owncloud/reva/v2 v2.0.0-20251106102926-751223b32d48
 	github.com/pkg/errors v0.9.1
 	github.com/pkg/xattr v0.4.12
 	github.com/prometheus/client_golang v1.23.2
@@ -334,7 +334,6 @@ require (
 	golang.org/x/sys v0.37.0 // indirect
 	golang.org/x/time v0.14.0 // indirect
 	golang.org/x/tools v0.37.0 // indirect
-	golang.org/x/tools/godoc v0.1.0-deprecated // indirect
 	google.golang.org/genproto v0.0.0-20250303144028-a0af3efb3deb // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250825161204-c5933d9347a5 // indirect
 	gopkg.in/cenkalti/backoff.v1 v1.1.0 // indirect
@@ -344,7 +343,7 @@ require (
 	sigs.k8s.io/yaml v1.5.0 // indirect
 )
 
-replace github.com/studio-b12/gowebdav => github.com/kobergj/gowebdav v0.0.0-20250102091030-aa65266db202
+replace github.com/studio-b12/gowebdav => github.com/kobergj/gowebdav v0.0.0-20251030165916-532350997dde
 
 replace github.com/egirna/icap-client => github.com/kobergj/icap-client v0.0.0-20250116172800-8eaa5022532b
 

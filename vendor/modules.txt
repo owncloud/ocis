@@ -1247,7 +1247,7 @@ github.com/orcaman/concurrent-map
 # github.com/owncloud/libre-graph-api-go v1.0.5-0.20250217093259-fa3804be6c27
 ## explicit; go 1.18
 github.com/owncloud/libre-graph-api-go
-# github.com/owncloud/reva/v2 v2.0.0-20251017104024-82c22e954c1c
+# github.com/owncloud/reva/v2 v2.0.0-20251106102926-751223b32d48
 ## explicit; go 1.24.0
 github.com/owncloud/reva/v2/cmd/revad/internal/grace
 github.com/owncloud/reva/v2/cmd/revad/runtime
@@ -1852,7 +1852,7 @@ github.com/stretchr/testify/assert
 github.com/stretchr/testify/assert/yaml
 github.com/stretchr/testify/mock
 github.com/stretchr/testify/require
-# github.com/studio-b12/gowebdav v0.9.0 => github.com/kobergj/gowebdav v0.0.0-20250102091030-aa65266db202
+# github.com/studio-b12/gowebdav v0.9.0 => github.com/kobergj/gowebdav v0.0.0-20251030165916-532350997dde
 ## explicit; go 1.17
 github.com/studio-b12/gowebdav
 # github.com/tchap/go-patricia/v2 v2.3.3
@@ -2470,7 +2470,7 @@ sigs.k8s.io/yaml
 # stash.kopano.io/kgol/rndm v1.1.2
 ## explicit; go 1.13
 stash.kopano.io/kgol/rndm
-# github.com/studio-b12/gowebdav => github.com/kobergj/gowebdav v0.0.0-20250102091030-aa65266db202
+# github.com/studio-b12/gowebdav => github.com/kobergj/gowebdav v0.0.0-20251030165916-532350997dde
 # github.com/egirna/icap-client => github.com/kobergj/icap-client v0.0.0-20250116172800-8eaa5022532b
 # github.com/unrolled/secure => github.com/DeepDiver1975/secure v0.0.0-20240611112133-abc838fb797c
 # github.com/go-micro/plugins/v4/store/nats-js-kv => github.com/kobergj/plugins/v4/store/nats-js-kv v0.0.0-20240807130109-f62bb67e8c90
