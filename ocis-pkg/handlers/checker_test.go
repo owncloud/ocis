@@ -125,3 +125,21 @@ func TestCheckHandler(t *testing.T) {
 		require.Equal(t, 2, len(slices.DeleteFunc(errs, func(err error) bool { return err != nil })))
 	})
 }
+
+func TestSplitHostPort(t *testing.T) {
+	address, port := handlers.SplitHostPort("10.10.10.10")
+	require.Equal(t, address, "10.10.10.10")
+	require.Equal(t, port, "")
+
+	address, port = handlers.SplitHostPort("10.10.10.10:20")
+	require.Equal(t, address, "10.10.10.10")
+	require.Equal(t, port, "20")
+
+	address, port = handlers.SplitHostPort("2a01::1")
+	require.Equal(t, address, "2a01::1")
+	require.Equal(t, port, "")
+
+	address, port = handlers.SplitHostPort("[2a01::1]:10")
+	require.Equal(t, address, "2a01::1")
+	require.Equal(t, port, "10")
+}
