@@ -100,7 +100,7 @@ config = {
                 "apiLocks",
             ],
             "skip": False,
-            "k8s": False,
+            "k8s": True,
         },
         "settingsAndNotification": {
             "suites": [
@@ -109,6 +109,7 @@ config = {
                 "apiCors",
             ],
             "skip": False,
+            "k8s": True,
             "withRemotePhp": [False],
             "emailNeeded": True,
             "extraEnvironment": {
@@ -130,21 +131,21 @@ config = {
             ],
             "skip": False,
             "withRemotePhp": [False],
-            "k8s": False,
+            "k8s": True,
         },
         "spaces": {
             "suites": [
                 "apiSpaces",
             ],
             "skip": False,
-            "k8s": False,
+            "k8s": True,
         },
         "spacesShares": {
             "suites": [
                 "apiSpacesShares",
             ],
             "skip": False,
-            "k8s": False,
+            "k8s": True,
         },
         "davOperations": {
             "suites": [
@@ -156,6 +157,7 @@ config = {
                 "apiActivities",
             ],
             "skip": False,
+            "k8s": True,
         },
         "groupAndSearch1": {
             "suites": [
@@ -165,7 +167,7 @@ config = {
                 "apiServiceAvailability",
             ],
             "skip": False,
-            "k8s": False,
+            "k8s": True,
         },
         "search2": {
             "suites": [
@@ -174,7 +176,7 @@ config = {
             ],
             "tikaNeeded": True,
             "skip": False,
-            "k8s": False,
+            "k8s": True,
         },
         "sharingNg1": {
             "suites": [
@@ -184,14 +186,14 @@ config = {
             ],
             "skip": False,
             "withRemotePhp": [False],
-            "k8s": False,
+            "k8s": True,
         },
         "sharingNgAdditionalShareRole": {
             "suites": [
                 "apiSharingNgAdditionalShareRole",
             ],
             "skip": False,
-            "k8s": False,
+            "k8s": True,
             "withRemotePhp": [False],
         },
         "sharingNgShareInvitation": {
@@ -200,6 +202,7 @@ config = {
                 "apiSharingNgItemInvitation",
             ],
             "skip": False,
+            "k8s": True,
             "withRemotePhp": [False],
         },
         "sharingNgLinkShare": {
@@ -209,6 +212,7 @@ config = {
                 "apiSharingNgLinkShareManagement",
             ],
             "skip": False,
+            "k8s": True,
             "withRemotePhp": [False],
         },
         "antivirus": {
@@ -216,6 +220,7 @@ config = {
                 "apiAntivirus",
             ],
             "skip": False,
+            "k8s": True,
             "antivirusNeeded": True,
             "extraServerEnvironment": {
                 "ANTIVIRUS_SCANNER_TYPE": "clamav",
@@ -231,6 +236,7 @@ config = {
                 "apiAuthApp",
             ],
             "skip": False,
+            "k8s": True,
             "withRemotePhp": [False],
             "federationServer": True,
             "emailNeeded": True,
@@ -259,6 +265,7 @@ config = {
                 "apiCollaboration",
             ],
             "skip": False,
+            "k8s": True,
             "withRemotePhp": [False],
             "collaborationServiceNeeded": True,
             "extraServerEnvironment": {
@@ -270,6 +277,7 @@ config = {
                 "cliCommands",
             ],
             "skip": False,
+            "k8s": True,
             "withRemotePhp": [False],
             "antivirusNeeded": True,
             "emailNeeded": True,
@@ -299,6 +307,7 @@ config = {
                 "coreApiVersions",
             ],
             "skip": False,
+            "k8s": True,
             "withRemotePhp": [False],
         },
         "2": {
@@ -307,7 +316,7 @@ config = {
                 "coreApiShareManagementToShares",
             ],
             "skip": False,
-            "k8s": False,
+            "k8s": True,
             "withRemotePhp": [False],
         },
         "3": {
@@ -316,6 +325,7 @@ config = {
                 "coreApiSharePublicLink2",
             ],
             "skip": False,
+            "k8s": True,
             "withRemotePhp": [False],
         },
         "4": {
@@ -328,7 +338,7 @@ config = {
                 "coreApiShareUpdateToShares",
             ],
             "skip": False,
-            "k8s": False,
+            "k8s": True,
             "withRemotePhp": [False],
         },
         "5": {
@@ -339,7 +349,7 @@ config = {
                 "coreApiWebdavEtagPropagation2",
             ],
             "skip": False,
-            "k8s": False,
+            "k8s": True,
         },
         "6": {
             "suites": [
@@ -348,13 +358,14 @@ config = {
                 "coreApiWebdavMove2",
             ],
             "skip": False,
+            "k8s": True,
         },
         "7": {
             "suites": [
                 "coreApiWebdavProperties",
             ],
             "skip": False,
-            "k8s": False,
+            "k8s": True,
         },
         "8": {
             "suites": [
@@ -364,11 +375,13 @@ config = {
                 "coreApiWebdavUploadTUS",
             ],
             "skip": False,
+            "k8s": True,
         },
     },
     "e2eTests": {
         "part": {
             "skip": False,
+            "k8s": True,
             "totalParts": 4,  # divide and run all suites in parts (divide pipelines)
             "xsuites": ["search", "app-provider", "oidc", "ocm", "keycloak"],  # suites to skip
         },
@@ -376,9 +389,11 @@ config = {
             "skip": False,
             "suites": ["search"],  # suites to run
             "tikaNeeded": True,
+            "k8s": True,
         },
         "keycloak": {
             "skip": False,
+            "k8s": True,
             "suites": ["journeys", "keycloak"],
             "keycloakNeeded": True,
         },
@@ -395,6 +410,7 @@ config = {
                 "spaces",
             ],
             "tikaNeeded": True,
+            "k8s": True,
         },
     },
     "binaryReleases": {
@@ -1091,7 +1107,7 @@ def localApiTestPipeline(ctx):
                     params[item] = matrix[item] if item in matrix else defaults[item]
                 for storage in params["storages"]:
                     for run_with_remote_php in params["withRemotePhp"]:
-                        run_on_k8s = params["k8s"] and ctx.build.event == "cron"
+                        run_on_k8s = params["k8s"]
                         ocis_url = OCIS_URL
                         if run_on_k8s:
                             ocis_url = "https://%s" % OCIS_SERVER_NAME
@@ -1393,7 +1409,7 @@ def coreApiTestPipeline(ctx):
                 for run_with_remote_php in params["withRemotePhp"]:
                     filter_tags = "~@skipOnGraph&&~@skipOnOcis-%s-Storage" % ("OC" if storage == "owncloud" else "OCIS")
                     expected_failures_file = "%s/expected-failures-API-on-%s-storage.md" % (test_dir, storage.upper())
-                    run_on_k8s = params["k8s"] and ctx.build.event == "cron"
+                    run_on_k8s = params["k8s"]
                     ocis_url = OCIS_URL
                     if run_on_k8s:
                         ocis_url = "https://%s" % OCIS_SERVER_NAME
@@ -3871,7 +3887,7 @@ def exposeEmailServiceK8s():
 
 def exposeAntivirusServiceK8s():
     return [{
-        "name": EMAIL_SMTP_HOST,
+        "name": "expose-antivirus",
         "image": "ghcr.io/k3d-io/k3d:5-dind",
         "commands": [
             "kubectl port-forward svc/antivirus 9297:9277 -n ocis",
