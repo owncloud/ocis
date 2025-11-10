@@ -68,6 +68,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Fix user light creation: [#11765](https://github.com/owncloud/ocis/pull/11765)
+* Bugfix - OCM Specification Compliance: [#11773](https://github.com/owncloud/ocis/pull/11773)
 * Enhancement - Set Referrer-Policy to no-referrer: [#11722](https://github.com/owncloud/ocis/pull/11722)
 * Enhancement - Bump Reva: [#11748](https://github.com/owncloud/ocis/pull/11748)
 * Enhancement - Support disabling editors by extensions: [#11750](https://github.com/owncloud/ocis/pull/11750)
@@ -82,6 +83,12 @@ The following sections list the changes for unreleased.
    allows switching to user light even before the first login.
 
    https://github.com/owncloud/ocis/pull/11765
+
+* Bugfix - OCM Specification Compliance: [#11773](https://github.com/owncloud/ocis/pull/11773)
+
+   OCM Specification Compliance
+
+   https://github.com/owncloud/ocis/pull/11773
 
 * Enhancement - Set Referrer-Policy to no-referrer: [#11722](https://github.com/owncloud/ocis/pull/11722)
 
