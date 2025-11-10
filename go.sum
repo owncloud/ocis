@@ -170,8 +170,8 @@ github.com/cenkalti/backoff v2.2.1+incompatible/go.mod h1:90ReRw6GdpyfrHakVjL/QH
 github.com/cenkalti/backoff/v5 v5.0.3 h1:ZN+IMa753KfX5hd8vVaMixjnqRZ3y8CuJKRKj1xcsSM=
 github.com/cenkalti/backoff/v5 v5.0.3/go.mod h1:rkhZdG3JZukswDf7f0cwqPNk4K0sa+F97BxZthm/crw=
 github.com/census-instrumentation/opencensus-proto v0.2.1/go.mod h1:f6KPmirojxKA12rnyqOA5BBL4O983OfeGPqjHWSTneU=
-github.com/ceph/go-ceph v0.35.0 h1:wcDUbsjeNJ7OfbWCE7I5prqUL794uXchopw3IvrGQkk=
-github.com/ceph/go-ceph v0.35.0/go.mod h1:ILF8WKhQQ2p2YuX1oWigkmsfT39U8T/HS2NrqxExq2s=
+github.com/ceph/go-ceph v0.36.0 h1:IDE4vEF+4fmjve+CPjD1WStgfQ+Lh6vD+9PMUI712KI=
+github.com/ceph/go-ceph v0.36.0/go.mod h1:fGCbndVDLuHW7q2954d6y+tgPFOBnRLqJRe2YXyngw4=
 github.com/cespare/xxhash/v2 v2.1.1/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XLFGgcrjCOs=
 github.com/cespare/xxhash/v2 v2.1.2/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XLFGgcrjCOs=
 github.com/cespare/xxhash/v2 v2.3.0 h1:UL815xU9SqsFlibzuggzjXhog7bL6oX9BbNZnL2UFvs=
@@ -717,8 +717,8 @@ github.com/orcaman/concurrent-map v1.0.0 h1:I/2A2XPCb4IuQWcQhBhSwGfiuybl/J0ev9HD
 github.com/orcaman/concurrent-map v1.0.0/go.mod h1:Lu3tH6HLW3feq74c2GC+jIMS/K2CFcDWnWD9XkenwhI=
 github.com/owncloud/libre-graph-api-go v1.0.5-0.20251107084958-31937a4ea3f1 h1:uW3BUPdaAhti2aP8x3Vb79vzmqAgDaWZ0yrW+4ujjU8=
 github.com/owncloud/libre-graph-api-go v1.0.5-0.20251107084958-31937a4ea3f1/go.mod h1:z61VMGAJRtR1nbgXWiNoCkxUXP1B3Je9rMuJbnGd+Og=
-github.com/owncloud/reva/v2 v2.0.0-20251106102926-751223b32d48 h1:RGnvbZNOE1ss3b0BOM8J+bPrk6prfXB0paKnWaDA/Xg=
-github.com/owncloud/reva/v2 v2.0.0-20251106102926-751223b32d48/go.mod h1:XenQR69s8JQ5Q4/+/vQbSg6B4+0iM6inYjNxB7SJAhI=
+github.com/owncloud/reva/v2 v2.0.0-20251107154850-a122a9538794 h1:j5IbfxSCcnMaIi8yei//NsXyHTEsJRz5tJSPnNcCERA=
+github.com/owncloud/reva/v2 v2.0.0-20251107154850-a122a9538794/go.mod h1:3PTzYZopTiFJ6DWdZ19HP3iHh2I3Gav0cDNFQ1gMT6g=
 github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c h1:rp5dCmg/yLR3mgFuSOe4oEnDDmGLROTvMragMUXpTQw=
 github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c/go.mod h1:X07ZCGwUbLaax7L0S3Tw4hpejzu63ZrrQiUe6W0hcy0=
 github.com/pablodz/inotifywaitgo v0.0.9 h1:njquRbBU7fuwIe5rEvtaniVBjwWzcpdUVptSgzFqZsw=
