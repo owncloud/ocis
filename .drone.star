@@ -100,7 +100,7 @@ config = {
                 "apiLocks",
             ],
             "skip": False,
-            "k8s": False,
+            "k8s": True,
         },
         "settingsAndNotification": {
             "suites": [
@@ -130,21 +130,21 @@ config = {
             ],
             "skip": False,
             "withRemotePhp": [False],
-            "k8s": False,
+            "k8s": True,
         },
         "spaces": {
             "suites": [
                 "apiSpaces",
             ],
             "skip": False,
-            "k8s": False,
+            "k8s": True,
         },
         "spacesShares": {
             "suites": [
                 "apiSpacesShares",
             ],
             "skip": False,
-            "k8s": False,
+            "k8s": True,
         },
         "davOperations": {
             "suites": [
@@ -184,14 +184,14 @@ config = {
             ],
             "skip": False,
             "withRemotePhp": [False],
-            "k8s": False,
+            "k8s": True,
         },
         "sharingNgAdditionalShareRole": {
             "suites": [
                 "apiSharingNgAdditionalShareRole",
             ],
             "skip": False,
-            "k8s": False,
+            "k8s": True,
             "withRemotePhp": [False],
         },
         "sharingNgShareInvitation": {
@@ -307,7 +307,7 @@ config = {
                 "coreApiShareManagementToShares",
             ],
             "skip": False,
-            "k8s": False,
+            "k8s": True,
             "withRemotePhp": [False],
         },
         "3": {
@@ -328,7 +328,7 @@ config = {
                 "coreApiShareUpdateToShares",
             ],
             "skip": False,
-            "k8s": False,
+            "k8s": True,
             "withRemotePhp": [False],
         },
         "5": {
@@ -339,7 +339,7 @@ config = {
                 "coreApiWebdavEtagPropagation2",
             ],
             "skip": False,
-            "k8s": False,
+            "k8s": True,
         },
         "6": {
             "suites": [
@@ -354,7 +354,7 @@ config = {
                 "coreApiWebdavProperties",
             ],
             "skip": False,
-            "k8s": False,
+            "k8s": True,
         },
         "8": {
             "suites": [

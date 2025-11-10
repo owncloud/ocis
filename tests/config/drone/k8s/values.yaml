@@ -94,15 +94,6 @@ services:
       enabled: true
       accessModes:
         - ReadWriteOnce
-  search:
-    extractor:
-      type: "tika"
-      tika:
-        url: "http://tika:9998"
-    persistence:
-      enabled: true
-      accessModes:
-        - ReadWriteOnce
   storagesystem:
     persistence:
       enabled: true
