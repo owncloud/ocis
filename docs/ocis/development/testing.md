@@ -617,7 +617,7 @@ Also, clone the [ocis-charts](https://github.com/owncloud/ocis-charts/) reposito
    sed -i '/- name: IDM_ADMIN_PASSWORD/a\\n value: "admin"' ./charts/ocis/templates/idm/deployment.yaml
 
    # Update values.yaml
-   cp <path-to-ocis-repo>/tests/config/drone/k8s/values.yaml charts/charts/ocis/ci/deployment-values.yaml
+   cp <path-to-ocis-repo>/tests/config/drone/k8s/values.yaml ./charts/ocis/ci/deployment-values.yaml
 
    # Update template values
    sed -i '/{{- $_ := set .scope "appNameAuthMachine" "authmachine" -}}/a \
