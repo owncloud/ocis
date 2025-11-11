@@ -29,7 +29,7 @@ features:
     branding:
       enabled: false
   virusscan:
-    enabled: true
+    enabled: false
     infectedFileHandling: delete
   policies:
     enabled: false
