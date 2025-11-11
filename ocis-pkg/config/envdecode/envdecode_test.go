@@ -258,8 +258,11 @@ func TestDecode(t *testing.T) {
 		t.Fatal("Expected empty field")
 	}
 
-	if tc.IgnoredPtr != nil {
-		t.Fatal("Expected nil pointer")
+	if tc.IgnoredPtr == nil {
+		t.Fatal("Expected non-nil pointer for IgnoredPtr")
+	}
+	if *tc.IgnoredPtr != true {
+		t.Fatalf("IgnoredPtr value: have %v, expected true", *tc.IgnoredPtr)
 	}
 
 	if tc.Nested.String != "foo" {
@@ -786,5 +789,66 @@ func TestExport(t *testing.T) {
 		if *ci != *v {
 			t.Fatalf("have %+v, expected %+v", v, ci)
 		}
+	}
+}
+
+func TestDecodePointerPrimitives(t *testing.T) {
+	type testConfigPointerPrimitives struct {
+		BoolPtr    *bool   `env:"TEST_BOOL_PTR"`
+		IntPtr     *int    `env:"TEST_INT_PTR"`
+		StringPtr  *string `env:"TEST_STRING_PTR"`
+		Float64Ptr *float64 `env:"TEST_FLOAT64_PTR"`
+		
+		UnsetBoolPtr *bool `env:"TEST_UNSET_BOOL_PTR"`
+	}
+
+	os.Setenv("TEST_BOOL_PTR", "true")
+	os.Setenv("TEST_INT_PTR", "42")
+	os.Setenv("TEST_STRING_PTR", "hello")
+	os.Setenv("TEST_FLOAT64_PTR", "3.14")
+	defer func() {
+		os.Unsetenv("TEST_BOOL_PTR")
+		os.Unsetenv("TEST_INT_PTR")
+		os.Unsetenv("TEST_STRING_PTR")
+		os.Unsetenv("TEST_FLOAT64_PTR")
+	}()
+
+	var tc testConfigPointerPrimitives
+	if err := Decode(&tc); err != nil {
+		t.Fatal(err)
+	}
+
+	// Check that pointer values are set
+	if tc.BoolPtr == nil {
+		t.Fatal("BoolPtr should not be nil")
+	}
+	if *tc.BoolPtr != true {
+		t.Fatalf("BoolPtr value: have %v, expected true", *tc.BoolPtr)
+	}
+
+	if tc.IntPtr == nil {
+		t.Fatal("IntPtr should not be nil")
+	}
+	if *tc.IntPtr != 42 {
+		t.Fatalf("IntPtr value: have %v, expected 42", *tc.IntPtr)
+	}
+
+	if tc.StringPtr == nil {
+		t.Fatal("StringPtr should not be nil")
+	}
+	if *tc.StringPtr != "hello" {
+		t.Fatalf("StringPtr value: have %v, expected 'hello'", *tc.StringPtr)
+	}
+
+	if tc.Float64Ptr == nil {
+		t.Fatal("Float64Ptr should not be nil")
+	}
+	if *tc.Float64Ptr != 3.14 {
+		t.Fatalf("Float64Ptr value: have %v, expected 3.14", *tc.Float64Ptr)
+	}
+
+	// Check that unset pointer is nil
+	if tc.UnsetBoolPtr != nil {
+		t.Fatalf("UnsetBoolPtr should be nil, got %v", *tc.UnsetBoolPtr)
 	}
 }
