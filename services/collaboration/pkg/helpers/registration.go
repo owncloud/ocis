@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"slices"
+	"strings"
 
 	registryv1beta1 "github.com/cs3org/go-cs3apis/cs3/app/registry/v1beta1"
 	gatewayv1beta1 "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
@@ -41,7 +42,7 @@ func RegisterAppProvider(
 	mimeTypesMap := make(map[string]bool)
 	for _, extensions := range appUrls {
 		for ext := range extensions {
-			if slices.Contains(cfg.Wopi.DisabledExtensions, ext) {
+			if slices.Contains(cfg.Wopi.DisabledExtensions, strings.TrimPrefix(ext, ".")) {
 				logger.Debug().Str("AppName", cfg.App.Name).Str("Extension", ext).Msg("Skipping disabled extension")
 				continue
 			}
