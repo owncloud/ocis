@@ -508,9 +508,9 @@ Feature: edit/search user including email
 
   Scenario: non-admin user searches other users by e-mail
     Given the following configs have been set:
-      | config                                | value |
-      | OCIS_USER_SEARCH_DISPLAYED_ATTRIBUTES |       |
-      | OCIS_SHOW_USER_EMAIL_IN_RESULTS       | true  |
+      | service | config                                | value |
+      | graph   | OCIS_USER_SEARCH_DISPLAYED_ATTRIBUTES |       |
+      | graph   | OCIS_SHOW_USER_EMAIL_IN_RESULTS       | true  |
     And the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     When user "Alice" gets information of user "Brian" using Graph API
     Then the HTTP status code should be "200"
