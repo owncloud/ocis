@@ -300,6 +300,7 @@ config = {
             ],
             "skip": False,
             "withRemotePhp": [False],
+            "k8s": True,
         },
         "2": {
             "suites": [
