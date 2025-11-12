@@ -73,6 +73,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Bump Reva: [#11748](https://github.com/owncloud/ocis/pull/11748)
 * Enhancement - Support disabling editors by extensions: [#11750](https://github.com/owncloud/ocis/pull/11750)
 * Enhancement - Add Cli to move stuck uploads: [#11762](https://github.com/owncloud/ocis/pull/11762)
+* Enhancement - Use externalID in Provisioning API: [#11799](https://github.com/owncloud/ocis/pull/11799)
 
 ## Details
 
@@ -123,6 +124,14 @@ The following sections list the changes for unreleased.
    relieves this case.
 
    https://github.com/owncloud/ocis/pull/11762
+
+* Enhancement - Use externalID in Provisioning API: [#11799](https://github.com/owncloud/ocis/pull/11799)
+
+   This PR adds the externalID as optional parameter to the Provisioning API that
+   can be used as the primary identifier. It also contains a switch to enable this
+   setting.
+
+   https://github.com/owncloud/ocis/pull/11799
 
 # Changelog for [7.3.0] (2025-10-13)
 
