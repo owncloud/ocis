@@ -84,7 +84,7 @@ a| [subs=-attributes]
 
 a| `OCIS_INSECURE` +
 a| [subs=-attributes]
-++ ++
+++bool ++
 a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
