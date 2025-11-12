@@ -148,7 +148,7 @@ variables:
   path: ocis-pkg/service/grpc/client.go:77
   foundincode: true
   name: OCIS_INSECURE
-  type: ""
+  type: bool
   default_value: "false"
   description: Insecure TLS mode is only allowed in development environments with
     OCIS_INSECURE=true
