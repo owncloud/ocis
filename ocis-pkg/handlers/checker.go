@@ -115,34 +115,75 @@ func (h *CheckHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// FailSaveAddress replaces wildcard addresses with the outbound IP.
+// FailSaveAddress replaces unspecified addresses with the outbound IP.
 func FailSaveAddress(address string) (string, error) {
-	if strings.Contains(address, "0.0.0.0") || strings.Contains(address, "::") {
-		outboundIp, err := getOutBoundIP()
+	host, port := SplitHostPort(address)
+
+	hostIP := net.ParseIP(host)
+
+	if host == "" || (hostIP != nil && hostIP.IsUnspecified()) {
+		outboundIP, err := getOutBoundIP()
 		if err != nil {
 			return "", err
 		}
-		address = strings.Replace(address, "0.0.0.0", outboundIp, 1)
-		address = strings.Replace(address, "::", "["+outboundIp+"]", 1)
-		address = strings.Replace(address, "[::]", "["+outboundIp+"]", 1)
+
+		host = outboundIP.String()
 	}
-	return address, nil
+
+	if port != "" {
+		if strings.Contains(host, ":") {
+			host = "[" + host + "]"
+		}
+		return host + ":" + port, nil
+	}
+
+	return host, nil
+}
+
+// SplitHostPort returns host and port of the address.
+// Contrary to the net.SplitHostPort the port is not mandatory.
+func SplitHostPort(address string) (string, string) {
+	columns := strings.Split(address, ":")
+	brackets := strings.Split(address, "]")
+
+	switch {
+	case len(columns) == 1 && len(brackets) == 1: // 10.10.10.10
+		return address, ""
+	case len(columns) == 2 && len(brackets) == 1: // 10.10.10.10:80
+		return columns[0], columns[1]
+	case len(columns) > 2 && len(brackets) == 1: // 2a01::a
+		return address, ""
+	case len(brackets) == 2 && brackets[1] == "": // [2a01::a]
+		return brackets[0][1:], ""
+	case len(brackets) == 2: // [2a01::a]:10
+		return brackets[0][1:], columns[len(columns)-1]
+	}
+
+	return address, ""
 }
 
 // getOutBoundIP returns the outbound IP address.
-func getOutBoundIP() (string, error) {
+func getOutBoundIP() (net.IP, error) {
 	interfacesAddresses, err := net.InterfaceAddrs()
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
+	var fallbackIpv6 net.IP
 	for _, address := range interfacesAddresses {
 		if ipNet, ok := address.(*net.IPNet); ok && !ipNet.IP.IsLoopback() {
 			if ipNet.IP.To4() != nil {
-				return ipNet.IP.String(), nil
+				return ipNet.IP, nil
+			}
+			if ipNet.IP.To16() != nil && !ipNet.IP.IsLinkLocalUnicast() {
+				fallbackIpv6 = ipNet.IP.To16()
 			}
 		}
 	}
 
-	return "", fmt.Errorf("no IP found")
+	if fallbackIpv6 != nil {
+		return fallbackIpv6, nil
+	}
+
+	return nil, fmt.Errorf("no IP found")
 }
