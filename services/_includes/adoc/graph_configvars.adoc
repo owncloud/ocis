@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2025-11-12-11-32-17]
+[#deprecation-note-2025-11-12-13-47-14]
 [caption=]
 .Deprecation notes for the graph service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -429,7 +429,7 @@ a| [subs=-attributes]
 The minimum length the search term needs to have for unprivileged users when searching for users or groups.
 
 a|`OCIS_SHOW_USER_EMAIL_IN_RESULTS` +
-xref:deprecation-note-2025-11-12-11-32-17[Deprecation Note]
+xref:deprecation-note-2025-11-12-13-47-14[Deprecation Note]
 a| [subs=-attributes]
 ++6.0.0 ++
 a| [subs=-attributes]
@@ -866,6 +866,18 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 LDAP Attribute to use as a flag telling if the user is enabled or disabled.
 
+a|`OCIS_LDAP_USER_SCHEMA_EXTERNAL_ID` +
+`GRAPH_LDAP_EXTERNAL_ID_ATTRIBUTE` +
+
+a| [subs=-attributes]
+++Curie ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++owncloudExternalID ++
+a| [subs=-attributes]
+LDAP attribute that references the external ID of users during the provisioning process. The final ID is provided by an external identity provider. If it is not set, a default attribute will be used instead.
+
 a|`OCIS_LDAP_DISABLE_USER_MECHANISM` +
 `GRAPH_DISABLE_USER_MECHANISM` +
 
@@ -1095,6 +1107,17 @@ a| [subs=-attributes]
 ++0 ++
 a| [subs=-attributes]
 When setting a 'terminationDate' for a school, require the date to be at least this number of days in the future.
+
+a|`GRAPH_LDAP_REQUIRE_EXTERNAL_ID` +
+
+a| [subs=-attributes]
+++Curie ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+If enabled, the 'OCIS_LDAP_USER_SCHEMA_EXTERNAL_ID' is used as primary identifier for the provisioning API.
 
 a|`OCIS_ENABLE_OCM` +
 `GRAPH_INCLUDE_OCM_SHAREES` +

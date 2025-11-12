@@ -74,6 +74,7 @@
 | OCIS_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING<br/>GRAPH_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING | bool | false | Set this to true if the defined 'ID' attribute for users is of the 'OCTETSTRING' syntax. This is required when using the 'objectGUID' attribute of Active Directory for the user ID's.|
 | OCIS_LDAP_USER_SCHEMA_USER_TYPE<br/>GRAPH_LDAP_USER_TYPE_ATTRIBUTE | string | ownCloudUserType | LDAP Attribute to distinguish between 'Member' and 'Guest' users. Default is 'ownCloudUserType'.|
 | OCIS_LDAP_USER_ENABLED_ATTRIBUTE<br/>GRAPH_USER_ENABLED_ATTRIBUTE | string | ownCloudUserEnabled | LDAP Attribute to use as a flag telling if the user is enabled or disabled.|
+| OCIS_LDAP_USER_SCHEMA_EXTERNAL_ID<br/>GRAPH_LDAP_EXTERNAL_ID_ATTRIBUTE | string | owncloudExternalID | LDAP attribute that references the external ID of users during the provisioning process. The final ID is provided by an external identity provider. If it is not set, a default attribute will be used instead.|
 | OCIS_LDAP_DISABLE_USER_MECHANISM<br/>GRAPH_DISABLE_USER_MECHANISM | string | attribute | An option to control the behavior for disabling users. Supported options are 'none', 'attribute' and 'group'. If set to 'group', disabling a user via API will add the user to the configured group for disabled users, if set to 'attribute' this will be done in the ldap user entry, if set to 'none' the disable request is not processed. Default is 'attribute'.|
 | OCIS_LDAP_DISABLED_USERS_GROUP_DN<br/>GRAPH_DISABLED_USERS_GROUP_DN | string | cn=DisabledUsersGroup,ou=groups,o=libregraph-idm | The distinguished name of the group to which added users will be classified as disabled when 'disable_user_mechanism' is set to 'group'.|
 | OCIS_LDAP_GROUP_BASE_DN<br/>GRAPH_LDAP_GROUP_BASE_DN | string | ou=groups,o=libregraph-idm | Search base DN for looking up LDAP groups.|
@@ -94,6 +95,7 @@
 | GRAPH_LDAP_SCHOOL_NUMBER_ATTRIBUTE | string |  | LDAP Attribute to use for the number of a school.|
 | GRAPH_LDAP_SCHOOL_ID_ATTRIBUTE | string |  | LDAP Attribute to use as the unique id for schools. This should be a stable globally unique ID like a UUID.|
 | GRAPH_LDAP_SCHOOL_TERMINATION_MIN_GRACE_DAYS | int | 0 | When setting a 'terminationDate' for a school, require the date to be at least this number of days in the future.|
+| GRAPH_LDAP_REQUIRE_EXTERNAL_ID | bool | false | If enabled, the 'OCIS_LDAP_USER_SCHEMA_EXTERNAL_ID' is used as primary identifier for the provisioning API.|
 | OCIS_ENABLE_OCM<br/>GRAPH_INCLUDE_OCM_SHAREES | bool | false | Include OCM sharees when listing users.|
 | OCIS_EVENTS_ENDPOINT<br/>GRAPH_EVENTS_ENDPOINT | string | 127.0.0.1:9233 | The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Set to a empty string to disable emitting events.|
 | OCIS_EVENTS_CLUSTER<br/>GRAPH_EVENTS_CLUSTER | string | ocis-cluster | The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.|
