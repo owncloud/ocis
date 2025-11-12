@@ -428,7 +428,7 @@ func (i *LDAP) AddUsersToEducationSchool(ctx context.Context, schoolNumberOrID s
 
 	userEntries := make([]*ldap.Entry, 0, len(memberIDs))
 	for _, memberID := range memberIDs {
-		user, err := i.getEducationUserByNameOrID(memberID)
+		user, err := i.getEducationUser(memberID)
 		if err != nil {
 			i.logger.Warn().Str("userid", memberID).Msg("User does not exist")
 			return errorcode.New(errorcode.ItemNotFound, fmt.Sprintf("user '%s' not found", memberID))
@@ -472,7 +472,7 @@ func (i *LDAP) RemoveUserFromEducationSchool(ctx context.Context, schoolNumberOr
 	}
 
 	schoolID := schoolEntry.GetEqualFoldAttributeValue(i.educationConfig.schoolAttributeMap.id)
-	user, err := i.getEducationUserByNameOrID(memberID)
+	user, err := i.getEducationUser(memberID)
 	if err != nil {
 		i.logger.Warn().Str("userid", memberID).Msg("User does not exist")
 		return err
