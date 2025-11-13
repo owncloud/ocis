@@ -1,6 +1,6 @@
 ---
 title: Auth-Machine
-date: 2025-11-13T00:34:00.633954237Z
+date: 2025-11-13T00:37:45.116161694Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/auth-machine
