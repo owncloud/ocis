@@ -74,6 +74,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Support disabling editors by extensions: [#11750](https://github.com/owncloud/ocis/pull/11750)
 * Enhancement - Add Cli to move stuck uploads: [#11762](https://github.com/owncloud/ocis/pull/11762)
 * Enhancement - Use externalID in Provisioning API: [#11799](https://github.com/owncloud/ocis/pull/11799)
+* Enhancement - Bump Reva: [#11808](https://github.com/owncloud/ocis/pull/11808)
 
 ## Details
 
@@ -132,6 +133,14 @@ The following sections list the changes for unreleased.
    setting.
 
    https://github.com/owncloud/ocis/pull/11799
+
+* Enhancement - Bump Reva: [#11808](https://github.com/owncloud/ocis/pull/11808)
+
+   This updates the ownCloud Reva dependency to commit
+   `a122a9538794530267743edfd5dc67b48aa90325`. Changelog:
+   https://github.com/owncloud/reva/compare/751223b32d4852c73a43388f6f55308c2065afeb...a122a9538794530267743edfd5dc67b48aa90325
+
+   https://github.com/owncloud/ocis/pull/11808
 
 # Changelog for [7.3.0] (2025-10-13)
 
