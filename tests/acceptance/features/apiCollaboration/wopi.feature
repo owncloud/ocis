@@ -97,26 +97,43 @@ Feature: collaboration (wopi)
       }
       """
 
-  @issue-9928
+
   Scenario: user tries to open text file without app name in url query (MIME type not registered in app-registry)
     Given user "Alice" has uploaded file "filesForUpload/lorem.txt" to "lorem.txt"
     And we save it into "FILEID"
     When user "Alice" tries to send HTTP method "POST" to URL "/app/open?file_id=<<FILEID>>"
-    Then the HTTP status code should be "500"
+    Then the HTTP status code should be "200"
     And the JSON data of the response should match
       """
       {
         "type": "object",
         "required": [
-          "code",
-          "message"
+          "app_url",
+          "method",
+          "form_parameters"
         ],
         "properties": {
-          "code": {
-            "const": "SERVER_ERROR"
+          "app_url": {
+            "type": "string",
+            "pattern": "^.*\\?WOPISrc=.*wopi%2Ffiles%2F[a-fA-F0-9]{64}$"
           },
-          "message": {
-            "const": "Error contacting the requested application, please use a different one or try again later"
+          "method": {
+            "const": "POST"
+          },
+          "form_parameters": {
+            "type": "object",
+            "required": [
+              "access_token",
+              "access_token_ttl"
+            ],
+            "properties": {
+              "access_token": {
+                "type": "string"
+              },
+              "access_token_ttl": {
+                "type": "string"
+              }
+            }
           }
         }
       }
@@ -229,7 +246,7 @@ Feature: collaboration (wopi)
   Scenario Outline: user tries to open unsupported file format
     Given user "Alice" has uploaded file "filesForUpload/simple.pdf" to "simple.pdf"
     And we save it into "FILEID"
-    When user "Alice" tries to send HTTP method "POST" to URL "<app-endpoint>"
+    When user "Alice" tries to send HTTP method "POST" to URL "/app/open?file_id=<<FILEID>>&app_name=FakeOffice"
     Then the HTTP status code should be "500"
     And the JSON data of the response should match
       """
@@ -249,10 +266,6 @@ Feature: collaboration (wopi)
         }
       }
       """
-    Examples:
-      | app-endpoint                                     |
-      | /app/open?file_id=<<FILEID>>&app_name=FakeOffice |
-      | /app/open?file_id=<<FILEID>>                     |
 
 
   Scenario Outline: user tries to open deleted file
@@ -355,7 +368,7 @@ Feature: collaboration (wopi)
     Examples:
       | app-endpoint                                              | url-query       |
       | /app/open-with-web?file_id=<<FILEID>>&app_name=FakeOffice | app=FakeOffice& |
-      | /app/open-with-web?file_id=<<FILEID>>                     |                 |
+      | /app/open-with-web?file_id=<<FILEID>>                     | app=FakeOffice& |
 
 
   Scenario: open text file using open-with-web with app name in url query (MIME type not registered in app-registry)
@@ -379,26 +392,23 @@ Feature: collaboration (wopi)
       }
       """
 
-  @issue-9928
+
   Scenario: user tries to open text file using open-with-web without app name in url query (MIME type not registered in app-registry)
     Given user "Alice" has uploaded file "filesForUpload/lorem.txt" to "lorem.txt"
     And we save it into "FILEID"
     When user "Alice" tries to send HTTP method "POST" to URL "/app/open-with-web?file_id=<<FILEID>>"
-    Then the HTTP status code should be "500"
+    Then the HTTP status code should be "200"
     And the JSON data of the response should match
       """
       {
         "type": "object",
         "required": [
-          "code",
-          "message"
+          "uri"
         ],
         "properties": {
-          "code": {
-            "const": "SERVER_ERROR"
-          },
-          "message": {
-            "const": "Error contacting the requested application, please use a different one or try again later"
+          "uri": {
+            "type": "string",
+             "pattern": "%base_url%/external\\?app=FakeOffice&contextRouteName=files-spaces-personal&fileId=%uuidv4_pattern%%24%uuidv4_pattern%%21%uuidv4_pattern%$"
           }
         }
       }
@@ -433,7 +443,7 @@ Feature: collaboration (wopi)
     Examples:
       | app-endpoint                                              | url-query       |
       | /app/open-with-web?file_id=<<FILEID>>&app_name=FakeOffice | app=FakeOffice& |
-      | /app/open-with-web?file_id=<<FILEID>>                     |                 |
+      | /app/open-with-web?file_id=<<FILEID>>                     | app=FakeOffice& |
 
 
   Scenario Outline: sharee open file with .odt extension (open-with-web)
@@ -465,7 +475,7 @@ Feature: collaboration (wopi)
     Examples:
       | app-endpoint                                              | url-query       |
       | /app/open-with-web?file_id=<<FILEID>>&app_name=FakeOffice | app=FakeOffice& |
-      | /app/open-with-web?file_id=<<FILEID>>                     |                 |
+      | /app/open-with-web?file_id=<<FILEID>>                     | app=FakeOffice& |
 
 
   Scenario Outline: open file with .odt extension with different view mode (open-with-web)
@@ -498,7 +508,7 @@ Feature: collaboration (wopi)
   Scenario Outline: user tries to open unsupported file format (open-with-web)
     Given user "Alice" has uploaded file "filesForUpload/simple.pdf" to "simple.pdf"
     And we save it into "FILEID"
-    When user "Alice" tries to send HTTP method "POST" to URL "<app-endpoint>"
+    When user "Alice" tries to send HTTP method "POST" to URL "/app/open-with-web?file_id=<<FILEID>>&app_name=FakeOffice"
     Then the HTTP status code should be "500"
     And the JSON data of the response should match
       """
@@ -518,10 +528,6 @@ Feature: collaboration (wopi)
         }
       }
       """
-    Examples:
-      | app-endpoint                                              |
-      | /app/open-with-web?file_id=<<FILEID>>&app_name=FakeOffice |
-      | /app/open-with-web?file_id=<<FILEID>>                     |
 
 
   Scenario Outline: user tries to open deleted file (open-with-web)
