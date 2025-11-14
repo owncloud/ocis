@@ -1,11 +1,11 @@
 ---
 title: Services
 date: 2023-12-06T13:00:00+01:00
-weight: 10
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/services/
 geekdocFilePath: _index.md
 geekdocCollapseSection: true
+weight: 10
 ---
 
 The documentation of services is intended for developers and only reflects the state of the master branch of the ocis repo.
