@@ -5,6 +5,52 @@ Note that clients will respond with a connection error if the web service is not
 
 The web service also provides a minimal API for branding functionality like changing the logo shown.
 
+## Static-only Mode
+
+Set the environment variable `WEB_STATIC_ONLY=true` to disable the dynamic web API surface (branding endpoints, theme handlers, external app discovery) and serve the embedded/static assets only. Ensure that a `config.json` file exists in the asset root (`services/web/assets/core/config.json`) or provide one via `WEB_UI_CONFIG_FILE`; this file is exposed through `/config.json` by the static file server.
+
+### Development (local binary)
+
+```bash
+go build -o bin/web ./services/web/cmd/web
+
+# Option A: point to a config file without modifying the assets tree
+WEB_STATIC_ONLY=true \
+WEB_HTTP_ADDR=127.0.0.1:9100 \
+WEB_UI_CONFIG_FILE=$(pwd)/services/web/assets/core/config.json \
+./bin/web
+
+# Option B: place config.json inside services/web/assets/core and rely on the assets only
+WEB_STATIC_ONLY=true \
+WEB_HTTP_ADDR=127.0.0.1:9100 \
+./bin/web
+
+# Verification
+curl -sS http://127.0.0.1:9100/config.json | jq . >/dev/null
+curl -I http://127.0.0.1:9100/
+```
+
+### Production (existing Docker image)
+
+```bash
+make -C ocis dev-docker
+docker run --rm -p 9100:9100 \
+  -e WEB_STATIC_ONLY=true \
+  -e WEB_HTTP_ADDR=0.0.0.0:9100 \
+  -e WEB_ASSET_CORE_PATH=/data/assets/core \
+  -v $(pwd)/services/web/assets/core:/data/assets/core:ro \
+  --entrypoint web \
+  owncloud/ocis:dev
+
+# Optional: mount a standalone config.json file instead of updating the assets directory
+#   -v $(pwd)/services/web/assets/core/config.json:/data/config.json:ro \
+#   -e WEB_UI_CONFIG_FILE=/data/config.json \
+
+# Verification
+curl -sS http://localhost:9100/config.json | jq . >/dev/null
+curl -I http://localhost:9100/
+```
+
 ## Custom Compiled Web Assets
 
 If you want to use your custom compiled web client assets instead of the embedded ones,
