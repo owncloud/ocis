@@ -16,7 +16,7 @@ Feature: enforce password on public link
   Scenario Outline: create a public link with edit permission without a password when enforce-password is enabled
     Given the following configs have been set:
       | service  | config                                                 | value |
-      | sharing  | SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD                | false |
+      | frontend | SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD                | false |
       | sharing  | SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD      | true  |
     And user "Alice" has been created with default attributes
     And user "Alice" has uploaded file with content "test file" to "/testfile.txt"
@@ -36,7 +36,7 @@ Feature: enforce password on public link
   Scenario Outline: create a public link with viewer permission without a password when enforce-password is enabled
     Given the following configs have been set:
       | service  | config                                                 | value |
-      | sharing  | OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD           | false |
+      | frontend | OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD           | false |
       | sharing  | OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD | true  |
     And user "Alice" has been created with default attributes
     And user "Alice" has uploaded file with content "test file" to "/testfile.txt"
