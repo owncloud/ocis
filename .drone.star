@@ -365,7 +365,7 @@ config = {
                 "coreApiWebdavUploadTUS",
             ],
             "skip": False,
-            "k8s": True,
+            # "k8s": True,
         },
     },
     "e2eTests": {
@@ -3798,9 +3798,9 @@ def k3sCluster():
             "kubectl -n kube-system rollout restart deployment coredns",
             # Setup Unicode font support for thumbnails - create ConfigMaps
             "kubectl create namespace ocis || true",
-            "echo '{\"defaultFont\": \"/etc/ocis/fonts/NotoSans.ttf\"}' > %s/fontsMap-k8s.json" % dirs["base"],
+            "echo '{\"defaultFont\": \"/etc/ocis/fonts/NotoSans.ttf\"}' > %s/fontsMap.json" % dirs["base"],
             "kubectl create configmap -n ocis ocis-fonts-ttf --from-file=%s/tests/config/drone/NotoSans.ttf" % dirs["base"],
-            "kubectl create configmap -n ocis ocis-fonts-map --from-file=%s/fontsMap-k8s.json" % dirs["base"],
+            "kubectl create configmap -n ocis ocis-fonts-map --from-file=%s/fontsMap.json" % dirs["base"],
             # watch events
             "kubectl get events -Aw",
         ],
@@ -3827,14 +3827,14 @@ def deployOcis():
             "make -C %s build" % dirs["ocisWrapper"],
             "mv %s/tests/config/drone/k8s/values.yaml %s/ocis-charts/charts/ocis/ci/deployment-values.yaml" % (dirs["base"], dirs["base"]),
             "cp -r %s/tests/config/drone/k8s/authbasic %s/ocis-charts/charts/ocis/templates/" % (dirs["base"], dirs["base"]),
+            # Fix thumbnails deployment to use correct environment variable and mount fonts (ConfigMaps created in k3sCluster)
+            "cp %s/tests/config/drone/k8s/thumbnails/deployment.yaml %s/ocis-charts/charts/ocis/templates/thumbnails/deployment.yaml" % (dirs["base"], dirs["base"]),
             "cd %s/ocis-charts" % dirs["base"],
             "sed -i '/{{- define \"ocis.basicServiceTemplates\" -}}/a\\\\  {{- $_ := set .scope \"appNameAuthBasic\" \"authbasic\" -}}' ./charts/ocis/templates/_common/_tplvalues.tpl",
             "sed -i '/- name: IDM_ADMIN_PASSWORD/{n;N;N;N;d;}' ./charts/ocis/templates/idm/deployment.yaml",
             "sed -i '/- name: IDM_ADMIN_PASSWORD/a\\\\\\n              value: \"admin\"' ./charts/ocis/templates/idm/deployment.yaml",
             "sed -i '/- name: PROXY_HTTP_ADDR/i\\\\            - name: PROXY_ENABLE_BASIC_AUTH\\\n              value: \"true\"' ./charts/ocis/templates/proxy/deployment.yaml",
-            # Fix thumbnails deployment to use correct environment variable and mount fonts (ConfigMaps created in k3sCluster)
             "export KUBECONFIG=%s/kubeconfig-$${DRONE_BUILD_NUMBER}.yaml" % dirs["base"],
-            "cp %s/tests/config/drone/k8s/thumbnails/deployment.yaml %s/ocis-charts/charts/ocis/templates/thumbnails/deployment.yaml" % (dirs["base"], dirs["base"]),
             "make helm-install-atomic",
         ],
         "volumes": [
