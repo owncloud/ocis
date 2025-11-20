@@ -60,7 +60,7 @@ services:
     command: [ "-c", "ocis init || true; exec ocis server" ]
     environment:
       # users/groups from ldap
-      OCIS_LDAP_URI: ldaps://ldap-server:1636
+      OCIS_LDAP_URI: ldaps://ldap-server:636
       OCIS_LDAP_INSECURE: "true"
       OCIS_LDAP_BIND_DN: "cn=admin,dc=owncloud,dc=com"
       OCIS_LDAP_BIND_PASSWORD: ${LDAP_ADMIN_PASSWORD:-admin}
@@ -106,28 +106,27 @@ services:
     restart: always
 
   ldap-server:
-    image: bitnami/openldap:2.6
+    image: osixia/openldap:1.5.0
     networks:
       ocis-net:
-    entrypoint: ["/bin/sh", "/opt/bitnami/scripts/openldap/docker-entrypoint-override.sh", "/opt/bitnami/scripts/openldap/run.sh" ]
     environment:
-      BITNAMI_DEBUG: true
       LDAP_TLS_VERIFY_CLIENT: never
-      LDAP_ENABLE_TLS: "yes"
-      LDAP_TLS_CA_FILE: /opt/bitnami/openldap/share/openldap.crt
-      LDAP_TLS_CERT_FILE: /opt/bitnami/openldap/share/openldap.crt
-      LDAP_TLS_KEY_FILE: /opt/bitnami/openldap/share/openldap.key
+      LDAP_TLS: true
+      LDAP_ORGANISATION: owncloud
+      LDAP_DOMAIN: owncloud.com
       LDAP_ROOT: "dc=owncloud,dc=com"
       LDAP_ADMIN_PASSWORD: ${LDAP_ADMIN_PASSWORD:-admin}
+      LDAP_SEED_INTERNAL_LDIF_PATH: /ldifs
+      LDAP_SEED_INTERNAL_SCHEMA_PATH: /schemas
     ports:
-      - "127.0.0.1:389:1389"
-      - "127.0.0.1:636:1636"
+      - "127.0.0.1:389:389"
+      - "127.0.0.1:636:636"
     volumes:
       - ./config/ldap/ldif:/ldifs
       - ./config/ldap/schemas:/schemas
-      - ./config/ldap/docker-entrypoint-override.sh:/opt/bitnami/scripts/openldap/docker-entrypoint-override.sh
-      - ldap-certs:/opt/bitnami/openldap/share
-      - ldap-data:/bitnami/openldap
+      - ldap-certs:/container/service/slapd/assets/certs
+      - ldap-data:/var/lib/ldap
+      - ldap-config:/etc/ldap/slapd.d
     logging:
       driver: ${LOG_DRIVER:-local}
     restart: always
@@ -137,7 +136,7 @@ services:
     networks:
       ocis-net:
     environment:
-      PHPLDAPADMIN_LDAP_HOSTS: "#PYTHON2BASH:[{'ldap-server': [{'server': [{'port': 1389}]}]}]"
+      PHPLDAPADMIN_LDAP_HOSTS: "#PYTHON2BASH:[{'ldap-server': [{'server': [{'port': 389}]}]}]"
       PHPLDAPADMIN_HTTPS: "false"
     labels:
       - "traefik.enable=true"
@@ -156,6 +155,7 @@ volumes:
   ocis-config:
   ocis-data:
   ldap-data:
+  ldap-config:
 
 
 networks:
