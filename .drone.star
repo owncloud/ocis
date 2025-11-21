@@ -365,6 +365,7 @@ config = {
                 "coreApiWebdavUploadTUS",
             ],
             "skip": False,
+            "k8s": True,
         },
     },
     "e2eTests": {
@@ -1092,7 +1093,7 @@ def localApiTestPipeline(ctx):
                     params[item] = matrix[item] if item in matrix else defaults[item]
                 for storage in params["storages"]:
                     for run_with_remote_php in params["withRemotePhp"]:
-                        run_on_k8s = params["k8s"] and ctx.build.event == "cron"
+                        run_on_k8s = params["k8s"]
                         ocis_url = OCIS_URL
                         if run_on_k8s:
                             ocis_url = "https://%s" % OCIS_SERVER_NAME
@@ -1394,7 +1395,7 @@ def coreApiTestPipeline(ctx):
                 for run_with_remote_php in params["withRemotePhp"]:
                     filter_tags = "~@skipOnGraph&&~@skipOnOcis-%s-Storage" % ("OC" if storage == "owncloud" else "OCIS")
                     expected_failures_file = "%s/expected-failures-API-on-%s-storage.md" % (test_dir, storage.upper())
-                    run_on_k8s = params["k8s"] and ctx.build.event == "cron"
+                    run_on_k8s = params["k8s"]
                     ocis_url = OCIS_URL
                     if run_on_k8s:
                         ocis_url = "https://%s" % OCIS_SERVER_NAME
@@ -2737,7 +2738,7 @@ def build():
             "name": "build",
             "image": OC_CI_GOLANG,
             "commands": [
-                "retry -t 3 'make -C ocis build'",
+                "retry -t 3 'make -C ocis build ENABLE_VIPS=true'",
             ],
             "environment": DRONE_HTTP_PROXY_ENV,
             "volumes": [stepVolumeGo],
@@ -2750,7 +2751,7 @@ def buildDebug():
             "name": "build debug binary",
             "image": OC_CI_GOLANG,
             "commands": [
-                "retry -t 3 'make -C ocis build-debug'",
+                "retry -t 3 'make -C ocis build-debug ENABLE_VIPS=true'",
             ],
             "environment": DRONE_HTTP_PROXY_ENV,
             "volumes": [stepVolumeGo],
@@ -3795,6 +3796,11 @@ def k3sCluster():
             "kubectl create configmap coredns-custom --namespace kube-system " +
             "--from-literal='rewritehost.override=rewrite name exact %s host.k3d.internal'" % OCIS_SERVER_NAME,
             "kubectl -n kube-system rollout restart deployment coredns",
+            # Setup Unicode font support for thumbnails - create ConfigMaps
+            "kubectl create namespace ocis || true",
+            "echo '{\"defaultFont\": \"/etc/ocis/fonts/NotoSans.ttf\"}' > %s/fontsMap.json" % dirs["base"],
+            "kubectl create configmap -n ocis ocis-fonts-ttf --from-file=%s/tests/config/drone/NotoSans.ttf" % dirs["base"],
+            "kubectl create configmap -n ocis ocis-fonts-map --from-file=%s/fontsMap.json" % dirs["base"],
             # watch events
             "kubectl get events -Aw",
         ],
@@ -3821,6 +3827,8 @@ def deployOcis():
             "make -C %s build" % dirs["ocisWrapper"],
             "mv %s/tests/config/drone/k8s/values.yaml %s/ocis-charts/charts/ocis/ci/deployment-values.yaml" % (dirs["base"], dirs["base"]),
             "cp -r %s/tests/config/drone/k8s/authbasic %s/ocis-charts/charts/ocis/templates/" % (dirs["base"], dirs["base"]),
+            # Fix thumbnails deployment to use correct environment variable and mount fonts (ConfigMaps created in k3sCluster)
+            "cp %s/tests/config/drone/k8s/thumbnails/deployment.yaml %s/ocis-charts/charts/ocis/templates/thumbnails/deployment.yaml" % (dirs["base"], dirs["base"]),
             "cd %s/ocis-charts" % dirs["base"],
             "sed -i '/{{- define \"ocis.basicServiceTemplates\" -}}/a\\\\  {{- $_ := set .scope \"appNameAuthBasic\" \"authbasic\" -}}' ./charts/ocis/templates/_common/_tplvalues.tpl",
             "sed -i '/- name: IDM_ADMIN_PASSWORD/{n;N;N;N;d;}' ./charts/ocis/templates/idm/deployment.yaml",
