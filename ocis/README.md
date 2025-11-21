@@ -5,16 +5,17 @@ The ocis package includes the Infinite Scale runtime and commands for the Infini
 Table of Contents
 =================
 
-   * [Service Registry](#service-registry)
-   * [Memory limits](#memory-limits)
-   * [CLI Commands](#cli-commands)
-      * [Backup CLI](#backup-cli)
-      * [Cleanup Orphaned Shares](#cleanup-orphaned-shares)
-      * [List Unified Roles](#list-unified-roles)
-      * [Move Stuck Uploads](#move-stuck-uploads)
-      * [Revisions CLI](#revisions-cli)
-      * [Service Health](#service-health)
-      * [Trash CLI](#trash-cli)
+      * [Service Registry](README.md#service-registry)
+   * [Memory limits](README.md#memory-limits)
+   * [CLI Commands](README.md#cli-commands)
+      * [Backup CLI](README.md#backup-cli)
+      * [Cleanup Orphaned Shares](README.md#cleanup-orphaned-shares)
+      * [Cleanup Orphaned Grants](README.md#cleanup-orphaned-grants)
+      * [List Unified Roles](README.md#list-unified-roles)
+      * [Move Stuck Uploads](README.md#move-stuck-uploads)
+      * [Revisions CLI](README.md#revisions-cli)
+      * [Service Health](README.md#service-health)
+      * [Trash CLI](README.md#trash-cli)
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
 
@@ -84,6 +85,24 @@ When a shared space or directory got deleted, use the `shares cleanup` command t
 ```bash
 ocis shares cleanup
 ```
+
+### Cleanup Orphaned Grants
+
+Detect and optionally delete storage grants that have no corresponding share-manager entry.
+
+Usage:
+```bash
+ocis shares clean-orphaned-grants \
+  --service-account-id "<id>" \
+  --service-account-secret "<secret>" \
+  [--space-id "<space-opaque-id>"] \
+  [--dry-run=false]
+```
+
+Notes:
+- `--dry-run` defaults to `true` (no deletions). Set to `false` to remove orphaned grants.
+- `--space-id` limits the scan; omit to scan all spaces.
+- Public links are not touched.
 
 ### List Unified Roles
 
