@@ -526,6 +526,38 @@ class CliContext implements Context {
 	}
 
 	/**
+	 * @When /^the administrator resumes all the uploads session using the post processing command$/
+	 *
+	 * @return void
+	 * @throws JsonException
+	 */
+	public function theAdministratorResumesAllUploadsSessionUsingPostprocessingCommand(): void {
+		$command = "postprocessing resume";
+		$body = [
+			"command" => $command,
+		];
+		$this->featureContext->setResponse(CliHelper::runCommand($body));
+	}
+
+	/**
+	 * @When /^the administrator resumes all uploads session in (finished|virusscan) step using post processing command$/
+	 *
+	 * @param string $step
+	 *
+	 * @return void
+	 * @throws JsonException
+	 */
+	public function theAdministratorResumesAllUploadsSessionInFinishedOrVirusScanStepUsingPostprocessingCommand(
+		string $step,
+	): void {
+		$command = "postprocessing resume -s $step";
+		$body = [
+			"command" => $command,
+		];
+		$this->featureContext->setResponse(CliHelper::runCommand($body));
+	}
+
+	/**
 	 * @Then /^the CLI response (should|should not) contain these entries:$/
 	 *
 	 * @param string $shouldOrNot
@@ -570,11 +602,13 @@ class CliContext implements Context {
 	 */
 	public function getJSONDecodedCliMessage(ResponseInterface $response): array {
 		$responseBody = $this->featureContext->getJsonDecodedResponse($response);
-
 		// $responseBody["message"] contains a message info with the array of output json of the upload sessions command
 		// Example Output: "INFO memory is not limited, skipping package=github.com/KimMachineGun/automemlimit/memlimit [{<output-json>}]"
 		// So, only extracting the array of output json from the message
-		\preg_match('/(\[.*\])/', $responseBody["message"], $matches);
+		\preg_match('/(\[.*?\])/', $responseBody["message"], $matches);
+		if (!isset($matches[1])) {
+			return [];
+		}
 		return \json_decode($matches[1], null, 512, JSON_THROW_ON_ERROR);
 	}
 
