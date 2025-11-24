@@ -169,6 +169,7 @@
   },
   "pnpm": {
     "overrides": {
+      "glob": "10.5.0",
       "kpop>cldr": "",
       "kpop>notistack": "^1.0.5",
       "kpop>react-intl": "^5.25.0",
