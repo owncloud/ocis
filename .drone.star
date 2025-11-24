@@ -2453,7 +2453,7 @@ def documentation():
                     },
                     "pages_directory": "docs/hugo/content/",
                     "copy_contents": "true",
-                    "target_branch": "docs-stable-7.3",
+                    "target_branch": "docs",
                     "delete": "true",
                 },
                 "when": {
