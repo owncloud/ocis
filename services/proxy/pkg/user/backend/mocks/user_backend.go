@@ -89,9 +89,9 @@ func (_c *UserBackend_Authenticate_Call) RunAndReturn(run func(context.Context, 
 	return _c
 }
 
-// CreateUserFromClaims provides a mock function with given fields: ctx, claims
-func (_m *UserBackend) CreateUserFromClaims(ctx context.Context, claims map[string]interface{}) (*userv1beta1.User, error) {
-	ret := _m.Called(ctx, claims)
+// CreateUserFromClaims provides a mock function with given fields: ctx, claims, guest
+func (_m *UserBackend) CreateUserFromClaims(ctx context.Context, claims map[string]interface{}, guest bool) (*userv1beta1.User, error) {
+	ret := _m.Called(ctx, claims, guest)
 
 	if len(ret) == 0 {
 		panic("no return value specified for CreateUserFromClaims")
@@ -99,19 +99,19 @@ func (_m *UserBackend) CreateUserFromClaims(ctx context.Context, claims map[stri
 
 	var r0 *userv1beta1.User
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, map[string]interface{}) (*userv1beta1.User, error)); ok {
-		return rf(ctx, claims)
+	if rf, ok := ret.Get(0).(func(context.Context, map[string]interface{}, bool) (*userv1beta1.User, error)); ok {
+		return rf(ctx, claims, guest)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, map[string]interface{}) *userv1beta1.User); ok {
-		r0 = rf(ctx, claims)
+	if rf, ok := ret.Get(0).(func(context.Context, map[string]interface{}, bool) *userv1beta1.User); ok {
+		r0 = rf(ctx, claims, guest)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*userv1beta1.User)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, map[string]interface{}) error); ok {
-		r1 = rf(ctx, claims)
+	if rf, ok := ret.Get(1).(func(context.Context, map[string]interface{}, bool) error); ok {
+		r1 = rf(ctx, claims, guest)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -127,13 +127,14 @@ type UserBackend_CreateUserFromClaims_Call struct {
 // CreateUserFromClaims is a helper method to define mock.On call
 //   - ctx context.Context
 //   - claims map[string]interface{}
-func (_e *UserBackend_Expecter) CreateUserFromClaims(ctx interface{}, claims interface{}) *UserBackend_CreateUserFromClaims_Call {
-	return &UserBackend_CreateUserFromClaims_Call{Call: _e.mock.On("CreateUserFromClaims", ctx, claims)}
+//   - guest bool
+func (_e *UserBackend_Expecter) CreateUserFromClaims(ctx interface{}, claims interface{}, guest interface{}) *UserBackend_CreateUserFromClaims_Call {
+	return &UserBackend_CreateUserFromClaims_Call{Call: _e.mock.On("CreateUserFromClaims", ctx, claims, guest)}
 }
 
-func (_c *UserBackend_CreateUserFromClaims_Call) Run(run func(ctx context.Context, claims map[string]interface{})) *UserBackend_CreateUserFromClaims_Call {
+func (_c *UserBackend_CreateUserFromClaims_Call) Run(run func(ctx context.Context, claims map[string]interface{}, guest bool)) *UserBackend_CreateUserFromClaims_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(map[string]interface{}))
+		run(args[0].(context.Context), args[1].(map[string]interface{}), args[2].(bool))
 	})
 	return _c
 }
@@ -143,7 +144,7 @@ func (_c *UserBackend_CreateUserFromClaims_Call) Return(_a0 *userv1beta1.User, _
 	return _c
 }
 
-func (_c *UserBackend_CreateUserFromClaims_Call) RunAndReturn(run func(context.Context, map[string]interface{}) (*userv1beta1.User, error)) *UserBackend_CreateUserFromClaims_Call {
+func (_c *UserBackend_CreateUserFromClaims_Call) RunAndReturn(run func(context.Context, map[string]interface{}, bool) (*userv1beta1.User, error)) *UserBackend_CreateUserFromClaims_Call {
 	_c.Call.Return(run)
 	return _c
 }

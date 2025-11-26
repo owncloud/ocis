@@ -77,6 +77,12 @@ type Options struct {
 	// Service Accounts
 	ServiceAccountID     string
 	ServiceAccountSecret string
+	// Multi-Instance Options
+	MultiInstanceEnabled bool
+	InstanceID           string
+	MemberClaim          string
+	GuestClaim           string
+	GuestRoleName        string
 }
 
 // newOptions initializes the available default options.
@@ -263,5 +269,16 @@ func ServiceAccount(id string, secret string) Option {
 	return func(o *Options) {
 		o.ServiceAccountID = id
 		o.ServiceAccountSecret = secret
+	}
+}
+
+// MultiInstance sets muli-instance options
+func MultiInstance(enabled bool, iid string, memberClaim, guestClaim string, guestRole string) Option {
+	return func(o *Options) {
+		o.MultiInstanceEnabled = enabled
+		o.InstanceID = iid
+		o.MemberClaim = memberClaim
+		o.GuestClaim = guestClaim
+		o.GuestRoleName = guestRole
 	}
 }
