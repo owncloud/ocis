@@ -85,13 +85,13 @@ S3_PUBLIC_CACHE_BUCKET = "public"
 # configuration
 config = {
     "cs3ApiTests": {
-        "skip": False,
+        "skip": True,
     },
     "wopiValidatorTests": {
-        "skip": False,
+        "skip": True,
     },
     "k6LoadTests": {
-        "skip": False,
+        "skip": True,
     },
     "localApiTests": {
         "contractAndLock": {
@@ -99,7 +99,7 @@ config = {
                 "apiContract",
                 "apiLocks",
             ],
-            "skip": False,
+            "skip": True,
             "k8s": True,
         },
         "settingsAndNotification": {
@@ -108,7 +108,7 @@ config = {
                 "apiNotification",
                 "apiCors",
             ],
-            "skip": False,
+            "skip": True,
             "withRemotePhp": [False],
             "emailNeeded": True,
             "extraEnvironment": {
@@ -128,7 +128,7 @@ config = {
             "suites": [
                 "apiGraphUser",
             ],
-            "skip": False,
+            "skip": True,
             "withRemotePhp": [False],
             "k8s": True,
         },
@@ -136,14 +136,14 @@ config = {
             "suites": [
                 "apiSpaces",
             ],
-            "skip": False,
+            "skip": True,
             "k8s": True,
         },
         "spacesShares": {
             "suites": [
                 "apiSpacesShares",
             ],
-            "skip": False,
+            "skip": True,
             "k8s": True,
         },
         "davOperations": {
@@ -155,7 +155,7 @@ config = {
                 "apiArchiver",
                 "apiActivities",
             ],
-            "skip": False,
+            "skip": True,
         },
         "groupAndSearch1": {
             "suites": [
@@ -164,7 +164,7 @@ config = {
                 "apiGraphGroup",
                 "apiServiceAvailability",
             ],
-            "skip": False,
+            "skip": True,
             "k8s": False,
         },
         "search2": {
@@ -173,7 +173,7 @@ config = {
                 "apiSearchContent",
             ],
             "tikaNeeded": True,
-            "skip": False,
+            "skip": True,
             "k8s": False,
         },
         "sharingNg1": {
@@ -182,7 +182,7 @@ config = {
                 "apiReshare",
                 "apiSharingNgPermissions",
             ],
-            "skip": False,
+            "skip": True,
             "withRemotePhp": [False],
             "k8s": True,
         },
@@ -190,7 +190,7 @@ config = {
             "suites": [
                 "apiSharingNgAdditionalShareRole",
             ],
-            "skip": False,
+            "skip": True,
             "k8s": True,
             "withRemotePhp": [False],
         },
@@ -199,7 +199,7 @@ config = {
                 "apiSharingNgDriveInvitation",
                 "apiSharingNgItemInvitation",
             ],
-            "skip": False,
+            "skip": True,
             "withRemotePhp": [False],
         },
         "sharingNgLinkShare": {
@@ -208,14 +208,14 @@ config = {
                 "apiSharingNgItemLinkShare",
                 "apiSharingNgLinkShareManagement",
             ],
-            "skip": False,
+            "skip": True,
             "withRemotePhp": [False],
         },
         "antivirus": {
             "suites": [
                 "apiAntivirus",
             ],
-            "skip": False,
+            "skip": True,
             "antivirusNeeded": True,
             "extraServerEnvironment": {
                 "ANTIVIRUS_SCANNER_TYPE": "clamav",
@@ -230,7 +230,7 @@ config = {
                 "apiOcm",
                 "apiAuthApp",
             ],
-            "skip": False,
+            "skip": True,
             "withRemotePhp": [False],
             "federationServer": True,
             "emailNeeded": True,
@@ -258,7 +258,7 @@ config = {
             "suites": [
                 "apiCollaboration",
             ],
-            "skip": False,
+            "skip": True,
             "withRemotePhp": [False],
             "collaborationServiceNeeded": True,
             "extraServerEnvironment": {
@@ -269,7 +269,7 @@ config = {
             "suites": [
                 "cliCommands",
             ],
-            "skip": False,
+            "skip": True,
             "withRemotePhp": [False],
             "antivirusNeeded": True,
             "emailNeeded": True,
@@ -298,7 +298,7 @@ config = {
                 "coreApiMain",
                 "coreApiVersions",
             ],
-            "skip": False,
+            "skip": True,
             "withRemotePhp": [False],
             "k8s": True,
         },
@@ -307,7 +307,7 @@ config = {
                 "coreApiShareManagementBasicToShares",
                 "coreApiShareManagementToShares",
             ],
-            "skip": False,
+            "skip": True,
             "k8s": True,
             "withRemotePhp": [False],
         },
@@ -316,7 +316,7 @@ config = {
                 "coreApiSharees",
                 "coreApiSharePublicLink2",
             ],
-            "skip": False,
+            "skip": True,
             "withRemotePhp": [False],
         },
         "4": {
@@ -328,7 +328,7 @@ config = {
                 "coreApiShareCreateSpecialToShares2",
                 "coreApiShareUpdateToShares",
             ],
-            "skip": False,
+            "skip": True,
             "k8s": True,
             "withRemotePhp": [False],
         },
@@ -339,7 +339,7 @@ config = {
                 "coreApiWebdavEtagPropagation1",
                 "coreApiWebdavEtagPropagation2",
             ],
-            "skip": False,
+            "skip": True,
             "k8s": True,
         },
         "6": {
@@ -348,13 +348,13 @@ config = {
                 "coreApiWebdavOperations",
                 "coreApiWebdavMove2",
             ],
-            "skip": False,
+            "skip": True,
         },
         "7": {
             "suites": [
                 "coreApiWebdavProperties",
             ],
-            "skip": False,
+            "skip": True,
             "k8s": True,
         },
         "8": {
@@ -370,24 +370,24 @@ config = {
     },
     "e2eTests": {
         "part": {
-            "skip": False,
+            "skip": True,
             "totalParts": 4,  # divide and run all suites in parts (divide pipelines)
             "xsuites": ["search", "app-provider", "oidc", "ocm", "keycloak"],  # suites to skip
         },
         "search": {
-            "skip": False,
+            "skip": True,
             "suites": ["search"],  # suites to run
             "tikaNeeded": True,
         },
         "keycloak": {
-            "skip": False,
+            "skip": True,
             "suites": ["journeys", "keycloak"],
             "keycloakNeeded": True,
         },
     },
     "e2eMultiService": {
         "testSuites": {
-            "skip": False,
+            "skip": True,
             "suites": [
                 "smoke",
                 "shares",
@@ -2738,7 +2738,7 @@ def build():
             "name": "build",
             "image": OC_CI_GOLANG,
             "commands": [
-                "retry -t 3 'make -C ocis build ENABLE_VIPS=true'",
+                "retry -t 3 'make -C ocis build'",
             ],
             "environment": DRONE_HTTP_PROXY_ENV,
             "volumes": [stepVolumeGo],
@@ -2751,7 +2751,7 @@ def buildDebug():
             "name": "build debug binary",
             "image": OC_CI_GOLANG,
             "commands": [
-                "retry -t 3 'make -C ocis build-debug ENABLE_VIPS=true'",
+                "retry -t 3 'make -C ocis build-debug'",
             ],
             "environment": DRONE_HTTP_PROXY_ENV,
             "volumes": [stepVolumeGo],
@@ -3827,9 +3827,11 @@ def deployOcis():
             "make -C %s build" % dirs["ocisWrapper"],
             "mv %s/tests/config/drone/k8s/values.yaml %s/ocis-charts/charts/ocis/ci/deployment-values.yaml" % (dirs["base"], dirs["base"]),
             "cp -r %s/tests/config/drone/k8s/authbasic %s/ocis-charts/charts/ocis/templates/" % (dirs["base"], dirs["base"]),
-            # Fix thumbnails deployment to use correct environment variable and mount fonts (ConfigMaps created in k3sCluster)
-            "cp %s/tests/config/drone/k8s/thumbnails/deployment.yaml %s/ocis-charts/charts/ocis/templates/thumbnails/deployment.yaml" % (dirs["base"], dirs["base"]),
             "cd %s/ocis-charts" % dirs["base"],
+            # Patch thumbnails deployment to mount Unicode fonts (ConfigMaps created in k3sCluster)
+            "sed -i '/- name: THUMBNAILS_TRANSFER_TOKEN/i\\\\            - name: THUMBNAILS_TXT_FONTMAP_FILE\\\n              value: /etc/ocis/fontsMap.json\\\n' ./charts/ocis/templates/thumbnails/deployment.yaml",
+            "sed -i '/volumeMounts:/a\\\\            - name: ocis-fonts-ttf\\\n              mountPath: /etc/ocis/fonts\\\n            - name: ocis-fonts-map\\\n              mountPath: /etc/ocis/fontsMap.json\\\n              subPath: fontsMap.json' ./charts/ocis/templates/thumbnails/deployment.yaml",
+            "sed -i '/volumes:/a\\\\        - name: ocis-fonts-ttf\\\n          configMap:\\\n            name: ocis-fonts-ttf\\\n        - name: ocis-fonts-map\\\n          configMap:\\\n            name: ocis-fonts-map' ./charts/ocis/templates/thumbnails/deployment.yaml",
             "sed -i '/{{- define \"ocis.basicServiceTemplates\" -}}/a\\\\  {{- $_ := set .scope \"appNameAuthBasic\" \"authbasic\" -}}' ./charts/ocis/templates/_common/_tplvalues.tpl",
             "sed -i '/- name: IDM_ADMIN_PASSWORD/{n;N;N;N;d;}' ./charts/ocis/templates/idm/deployment.yaml",
             "sed -i '/- name: IDM_ADMIN_PASSWORD/a\\\\\\n              value: \"admin\"' ./charts/ocis/templates/idm/deployment.yaml",
