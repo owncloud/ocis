@@ -1,6 +1,6 @@
 ---
 title: Collaboration
-date: 2025-11-25T04:28:46.234172283Z
+date: 2025-11-26T00:07:30.428454194Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/collaboration
