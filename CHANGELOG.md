@@ -37,8 +37,8 @@
 * [Changelog for 3.0.0](#changelog-for-300-2023-06-06)
 * [Changelog for 2.0.0](#changelog-for-200-2022-11-30)
 * [Changelog for 1.20.0](#changelog-for-1200-2022-04-13)
-* [Changelog for 1.19.0](#changelog-for-1190-2022-03-29)
 * [Changelog for 1.19.1](#changelog-for-1191-2022-03-29)
+* [Changelog for 1.19.0](#changelog-for-1190-2022-03-29)
 * [Changelog for 1.18.0](#changelog-for-1180-2022-03-03)
 * [Changelog for 1.17.0](#changelog-for-1170-2022-02-16)
 * [Changelog for 1.16.0](#changelog-for-1160-2021-12-10)
@@ -75,6 +75,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add Cli to move stuck uploads: [#11762](https://github.com/owncloud/ocis/pull/11762)
 * Enhancement - Use externalID in Provisioning API: [#11799](https://github.com/owncloud/ocis/pull/11799)
 * Enhancement - Bump Reva: [#11808](https://github.com/owncloud/ocis/pull/11808)
+* Enhancement - Bump Web to v12.2.0: [#11834](https://github.com/owncloud/ocis/pull/11834)
 
 ## Details
 
@@ -141,6 +142,43 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/reva/compare/751223b32d4852c73a43388f6f55308c2065afeb...a122a9538794530267743edfd5dc67b48aa90325
 
    https://github.com/owncloud/ocis/pull/11808
+
+* Enhancement - Bump Web to v12.2.0: [#11834](https://github.com/owncloud/ocis/pull/11834)
+
+   - Bugfix [owncloud/web#13177](https://github.com/owncloud/web/pull/13177): Fix
+   copying public link and password on Safari - Bugfix
+   [owncloud/web#13198](https://github.com/owncloud/web/pull/13198): Fix incorrect
+   translations - Bugfix
+   [owncloud/web#13203](https://github.com/owncloud/web/pull/13203): Remove
+   duplicate resource links - Bugfix
+   [owncloud/web#13213](https://github.com/owncloud/web/pull/13213): Do not disable
+   sharing of resources when managing spaces via claims - Bugfix
+   [owncloud/web#13223](https://github.com/owncloud/web/pull/13223): Fix spinner
+   loading continuously when resource is deleted - Bugfix
+   [owncloud/web#13233](https://github.com/owncloud/web/pull/13233): Include Ubuntu
+   font - Bugfix [owncloud/web#13253](https://github.com/owncloud/web/pull/13253):
+   External share ID fallback - Bugfix
+   [owncloud/web#13274](https://github.com/owncloud/web/pull/13274): Handle file
+   loading error - Bugfix
+   [owncloud/web#13329](https://github.com/owncloud/web/pull/13329): Use sticky
+   header composable in deleted files - Enhancement
+   [owncloud/web#13168](https://github.com/owncloud/web/pull/13168): Hide trashed
+   spaces - Enhancement
+   [owncloud/web#13169](https://github.com/owncloud/web/pull/13169): Drop beta
+   badge from GeoGebra pinboards - Enhancement
+   [owncloud/web#13172](https://github.com/owncloud/web/pull/13172): Add Excalidraw
+   file icon - Enhancement
+   [owncloud/web#13197](https://github.com/owncloud/web/pull/13197): Add Visio file
+   icons - Enhancement
+   [owncloud/web#13224](https://github.com/owncloud/web/pull/13224): Add table
+   caption - Enhancement
+   [owncloud/web#13235](https://github.com/owncloud/web/pull/13235): Use API groups
+   search in admin settings - Enhancement
+   [owncloud/web#13296](https://github.com/owncloud/web/pull/13296): Embed mode
+   share links with password
+
+   https://github.com/owncloud/ocis/pull/11834
+   https://github.com/owncloud/web/releases/tag/v12.2.0
 
 # Changelog for [7.3.0] (2025-10-13)
 
@@ -12105,7 +12143,7 @@ The following sections list the changes for 2.0.0.
 
 The following sections list the changes for 1.20.0.
 
-[1.20.0]: https://github.com/owncloud/ocis/compare/v1.19.0...v1.20.0
+[1.20.0]: https://github.com/owncloud/ocis/compare/v1.19.1...v1.20.0
 
 ## Summary
 
@@ -12279,11 +12317,29 @@ The following sections list the changes for 1.20.0.
    https://github.com/owncloud/ocis/pull/3509
    https://github.com/owncloud/web/releases/tag/v5.4.0
 
+# Changelog for [1.19.1] (2022-03-29)
+
+The following sections list the changes for 1.19.1.
+
+[1.19.1]: https://github.com/owncloud/ocis/compare/v1.19.0...v1.19.1
+
+## Summary
+
+* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
+
+## Details
+
+* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
+
+   URLs for Special items (space image, readme) were broken.
+
+   https://github.com/owncloud/ocis/pull/3419
+
 # Changelog for [1.19.0] (2022-03-29)
 
 The following sections list the changes for 1.19.0.
 
-[1.19.0]: https://github.com/owncloud/ocis/compare/v1.19.1...v1.19.0
+[1.19.0]: https://github.com/owncloud/ocis/compare/v1.18.0...v1.19.0
 
 ## Summary
 
@@ -12456,24 +12512,6 @@ The following sections list the changes for 1.19.0.
    https://github.com/owncloud/ocis/pull/3291
    https://github.com/owncloud/ocis/pull/3375
    https://github.com/owncloud/web/releases/tag/v5.3.0
-
-# Changelog for [1.19.1] (2022-03-29)
-
-The following sections list the changes for 1.19.1.
-
-[1.19.1]: https://github.com/owncloud/ocis/compare/v1.18.0...v1.19.1
-
-## Summary
-
-* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
-
-## Details
-
-* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
-
-   URLs for Special items (space image, readme) were broken.
-
-   https://github.com/owncloud/ocis/pull/3419
 
 # Changelog for [1.18.0] (2022-03-03)
 
