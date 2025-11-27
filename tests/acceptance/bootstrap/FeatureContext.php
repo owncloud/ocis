@@ -855,6 +855,17 @@ class FeatureContext extends BehatVariablesContext {
 	}
 
 	/**
+	 * Get antivirus service host
+	 *
+	 * @return string
+	 */
+	public function getAntivirusServiceUrl(): string {
+		return getenv("ANTIVIRUS_SERVICE_URL") ?
+		getenv("ANTIVIRUS_SERVICE_URL") :
+		$this->removeSchemeAndPortFromUrl($this->getBaseUrl());
+	}
+
+	/**
 	 * @return int
 	 */
 	public function getOcsApiVersion(): int {
@@ -2487,6 +2498,14 @@ class FeatureContext extends BehatVariablesContext {
 					$this, "formatExpiryDateTime",
 				],
 				"parameter" => ['Y-m-d H:i:s'],
+			],
+			[
+				"code" => "%antivirus_service_host%",
+				"function" => [
+					$this,
+					"getAntivirusServiceUrl",
+				],
+				"parameter" => [],
 			],
 		];
 		if ($user !== null) {
