@@ -249,7 +249,7 @@ type ClaimSpaceManagement struct {
 
 // MultiInstanceConfig holds configuration for multi-instance-ocis
 type MultiInstanceConfig struct {
-	Enabled     bool   `yaml:"enabled" env:"OCIS_MULTI_INSTANCE_ENABLED" desc:"Enables Multi-Instance ocis." introductionVersion:"Curie"`
+	Enabled     bool   `yaml:"enabled" env:"OCIS_MULTI_INSTANCE_ENABLED" desc:"Enable multiple instances of Infinite Scale." introductionVersion:"Curie"`
 	InstanceID  string `yaml:"instanceid" env:"OCIS_MULTI_INSTANCE_INSTANCEID" desc:"The unique id of this instance" introductionVersion:"Curie"`
 	MemberClaim string `yaml:"member_claim" env:"OCIS_MULTI_INSTANCE_MEMBER_CLAIM" desc:"The claim name for the 'memberOf' property" introductionVersion:"Curie"`
 	GuestClaim  string `yaml:"guest_claim" env:"OCIS_MULTI_INSTANCE_GUEST_CLAIM" desc:"The claim name for the 'guestOf' property" introductionVersion:"Curie"`

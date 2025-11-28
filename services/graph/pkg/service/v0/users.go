@@ -493,13 +493,12 @@ func (g Graph) PostUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Println("XXX GRAPH Creating user with type", u.GetUserType())
-	if !u.HasUserType() {
-		// logger.Info().Interface("user", u).Msg("could not create user: userType is a read-only attribute")
-		// errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "userType is a read-only attribute")
-		// return
-		u.SetUserType("Member")
+	if u.HasUserType() {
+		logger.Info().Interface("user", u).Msg("could not create user: userType is a read-only attribute")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "userType is a read-only attribute")
+		return
 	}
+	u.SetUserType("Member")
 
 	logger.Debug().Interface("user", u).Msg("calling create user on backend")
 	if u, err = g.identityBackend.CreateUser(r.Context(), *u); err != nil {

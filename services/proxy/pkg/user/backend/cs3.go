@@ -163,7 +163,7 @@ func (c *cs3backend) Authenticate(ctx context.Context, username string, password
 // attributes from the provided `claims` map. On success it returns the new
 // user. If the user already exist this is not considered an error and the
 // function will just return the existing user.
-func (c *cs3backend) CreateUserFromClaims(ctx context.Context, claims map[string]interface{}, guest bool) (*cs3.User, error) {
+func (c *cs3backend) CreateUserFromClaims(ctx context.Context, claims map[string]interface{}) (*cs3.User, error) {
 	gatewayClient, err := c.gatewaySelector.Next()
 	if err != nil {
 		c.logger.Error().Err(err).Msg("could not select next gateway client")
@@ -188,13 +188,12 @@ func (c *cs3backend) CreateUserFromClaims(ctx context.Context, claims map[string
 		return nil, err
 	}
 
-	newUser, err := c.libregraphUserFromClaims(claims, guest)
+	newUser, err := c.libregraphUserFromClaims(claims)
 	if err != nil {
 		c.logger.Error().Err(err).Interface("claims", claims).Msg("Error creating user from claims")
 		return nil, fmt.Errorf("error creating user from claims: %w", err)
 	}
 
-	fmt.Println("XXX PROXY Creating user with", newUser.GetUserType())
 	req := lgClient.UsersApi.CreateUser(newctx).User(newUser)
 
 	created, resp, err := req.Execute()
@@ -237,7 +236,7 @@ func (c *cs3backend) CreateUserFromClaims(ctx context.Context, claims map[string
 }
 
 func (c *cs3backend) UpdateUserIfNeeded(ctx context.Context, user *cs3.User, claims map[string]interface{}) error {
-	newUser, err := c.libregraphUserFromClaims(claims, false)
+	newUser, err := c.libregraphUserFromClaims(claims)
 	if err != nil {
 		c.logger.Error().Err(err).Interface("claims", claims).Msg("Error converting claims to user")
 		return fmt.Errorf("error converting claims to updated user: %w", err)
@@ -476,7 +475,7 @@ func (c *cs3backend) isAlreadyExists(resp *http.Response) (bool, error) {
 	return false, nil
 }
 
-func (c *cs3backend) libregraphUserFromClaims(claims map[string]interface{}, guest bool) (libregraph.User, error) {
+func (c *cs3backend) libregraphUserFromClaims(claims map[string]interface{}) (libregraph.User, error) {
 	user := libregraph.User{}
 	if dn, ok := claims[c.autoProvisionClaims.DisplayName].(string); ok {
 		user.SetDisplayName(dn)
@@ -492,10 +491,6 @@ func (c *cs3backend) libregraphUserFromClaims(claims map[string]interface{}, gue
 	if mail, ok := claims[c.autoProvisionClaims.Email].(string); ok {
 		user.SetMail(mail)
 	}
-	if guest {
-		user.SetUserType("guest")
-	}
-
 	sub, subExists := claims[oidc.Sub].(string)
 	iss, issExists := claims[oidc.Iss].(string)
 
