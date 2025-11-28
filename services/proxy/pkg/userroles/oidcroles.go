@@ -3,7 +3,6 @@ package userroles
 import (
 	"context"
 	"errors"
-	"fmt"
 	"regexp"
 	"sync"
 	"time"
@@ -108,7 +107,6 @@ func (ra oidcRoleAssigner) UpdateUserRoleAssignment(ctx context.Context, user *c
 		return nil, err
 	}
 
-	fmt.Println("XXX Assigning", overwriteRole, "to user")
 	roleIDFromClaim := roleNamesToRoleIDs[overwriteRole]
 	if overwriteRole == "" {
 		claimRoles, err := extractRoles(ra.rolesClaim, claims)
