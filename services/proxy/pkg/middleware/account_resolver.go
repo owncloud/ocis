@@ -234,12 +234,20 @@ func (m accountResolver) resolveUserType(claims map[string]interface{}) (isMembe
 	return false, false
 }
 
-func readClaim(key string, claims map[string]interface{}) []string {
+func readClaim(key string, claims map[string]any) []string {
 	switch v := claims[key].(type) {
 	case string:
 		return []string{v}
 	case []string:
 		return v
+	case []any:
+		var s []string
+		for _, vv := range v {
+			if ss, ok := vv.(string); ok {
+				s = append(s, ss)
+			}
+		}
+		return s
 	}
 	return nil
 }
