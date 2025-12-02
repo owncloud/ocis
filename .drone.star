@@ -68,7 +68,7 @@ dirs = {
 OCIS_SERVER_NAME = "ocis-server"
 OCIS_URL = "https://%s:9200" % OCIS_SERVER_NAME
 OCIS_DOMAIN = "%s:9200" % OCIS_SERVER_NAME
-FED_OCIS_SERVER_NAME = "federation-ocis-server"
+FED_OCIS_SERVER_NAME = "federation-%s" % OCIS_SERVER_NAME
 OCIS_FED_URL = "https://%s:10200" % FED_OCIS_SERVER_NAME
 OCIS_FED_DOMAIN = "%s:10200" % FED_OCIS_SERVER_NAME
 
@@ -218,16 +218,6 @@ config = {
             "skip": False,
             "k8s": True,
             "antivirusNeeded": True,
-            "extraServerEnvironment": {
-                "ANTIVIRUS_SCANNER_TYPE": "clamav",
-                "ANTIVIRUS_CLAMAV_SOCKET": "tcp://clamav:3310",
-                "POSTPROCESSING_STEPS": "virusscan",
-                "OCIS_ADD_RUN_SERVICES": "antivirus",
-                "ANTIVIRUS_DEBUG_ADDR": "0.0.0.0:9297",
-            },
-            "extraEnvironment":{
-                "ANTIVIRUS_SERVICE_URL": "expose-clam-service",
-            }
         },
         # "ocmAndAuthApp": {
         #     "suites": [
@@ -3787,7 +3777,7 @@ def k3sCluster():
             "until docker ps 2>&1 > /dev/null; do sleep 1s; done",
             # create cluster
             "k3d cluster create drone --api-port %s:33199 " % OCIS_SERVER_NAME +
-            "-p '80:80@loadbalancer' -p '443:443@loadbalancer' " +
+            "-p '80:80@loadbalancer' -p '443:443@loadbalancer' -p '9100-9399:30100-30399@loadbalancer' " +
             "--k3s-arg '--tls-san=k3d@server:*' --k3s-arg '--disable=metrics-server@server:*'",
             # wait for services to be ready
             "until kubectl get deployment coredns -n kube-system -o go-template='{{.status.availableReplicas}}' | grep -v -e '<no value>'; do sleep 1s; done",
@@ -3848,14 +3838,12 @@ def clamavServiceK8s():
         "commands": [
             "cp -r %s/tests/config/drone/k8s/clamav %s/ocis-charts/charts/ocis/templates/" % (dirs["base"], dirs["base"]),
             "sed -i '/^  virusscan:/,/^ *[^ ]/ s/enabled: .*/enabled: true/' %s/tests/config/drone/k8s/values.yaml" % dirs["base"],
-            "sed -i 's/{{ *\\\\.Values\\\\.features\\\\.virusscan\\\\.infectedFileHandling *| *quote *}}/\"delete\"/' %s/ocis-charts/charts/ocis/templates/antivirus/deployment.yaml" % dirs["base"],
+            # "sed -i 's/{{ *\\\\.Values\\\\.features\\\\.virusscan\\\\.infectedFileHandling *| *quote *}}/\"delete\"/' %s/ocis-charts/charts/ocis/templates/antivirus/deployment.yaml" % dirs["base"],
             "sed -i '/name: ANTIVIRUS_SCANNER_TYPE/{n;s/value: *\"icap\"/value: \"clamav\"/}' %s/ocis-charts/charts/ocis/templates/antivirus/deployment.yaml" % dirs["base"],
             "sed -i '/- name: ANTIVIRUS_SCANNER_TYPE/i\\\\            - name: ANTIVIRUS_CLAMAV_SOCKET\\\n              value: \"tcp://clamav:3310\"' %s/ocis-charts/charts/ocis/templates/antivirus/deployment.yaml" % dirs["base"],
             "cat  %s/tests/config/drone/k8s/values.yaml" % dirs["base"],
         ],
     }]
-    # sed -i '/^  virusscan:/,/^ *[^ ]/ s/enabled: \.*/enabled: true/'
-    # sed -i '/^  virusscan:/,/^ *[^ ]/ s/enabled: \.*/enabled: true/'
 
 def emailServiceK8s():
     return [{
@@ -3879,12 +3867,14 @@ def exposeEmailServiceK8s():
 
 def exposeAntivirusServiceK8s():
     return [{
-        "name": "expose-clam-service",
+        "name": "expose-antivirus-service",
         "image": K3D_IMAGE,
         "commands": [
-            "kubectl port-forward svc/antivirus 9297:http://ocis-server:9277 -n ocis",
+            "export KUBECONFIG=kubeconfig-$${DRONE_BUILD_NUMBER}.yaml",
+            "until test -f $${KUBECONFIG}; do sleep 1s; done",
+            "kubectl -n ocis expose deployment antivirus --type=NodePort --port=9277 --name=antivirus-np",
+            "kubectl -n ocis patch svc antivirus-np -p '{\"spec\":{\"ports\":[{\"port\":9277,\"nodePort\":30277}]}}'",
         ],
-        "detach": True,
     }]
 
 def ociswrapper():
@@ -3899,7 +3889,7 @@ def ociswrapper():
             "kubectl get ingress -A",
             "kubectl describe pods $(kubectl get pods -n ocis -l app=antivirus -o jsonpath=\"{.items[0].metadata.name}\") -n ocis",
             "kubectl describe pods $(kubectl get pods -n ocis -l app=postprocessing -o jsonpath=\"{.items[0].metadata.name}\") -n ocis",
-            "%s/bin/ociswrapper serve --url https://ocis-server --admin-username admin --admin-password admin --skip-ocis-run" % dirs["ocisWrapper"],
+            "%s/bin/ociswrapper serve --url https://%s --admin-username admin --admin-password admin --skip-ocis-run" % (dirs["ocisWrapper"], OCIS_SERVER_NAME),
         ],
         "detach": True,
     }]
