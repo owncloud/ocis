@@ -85,132 +85,132 @@ S3_PUBLIC_CACHE_BUCKET = "public"
 # configuration
 config = {
     "cs3ApiTests": {
-        "skip": True,
+        "skip": False,
     },
     "wopiValidatorTests": {
-        "skip": True,
+        "skip": False,
     },
     "k6LoadTests": {
-        "skip": True,
+        "skip": False,
     },
     "localApiTests": {
-        # "contractAndLock": {
-        #     "suites": [
-        #         "apiContract",
-        #         "apiLocks",
-        #     ],
-        #     "skip": False,
-        #     "k8s": True,
-        # },
-        # "settingsAndNotification": {
-        #     "suites": [
-        #         "apiSettings",
-        #         "apiNotification",
-        #         "apiCors",
-        #     ],
-        #     "skip": False,
-        #     "withRemotePhp": [False],
-        #     "emailNeeded": True,
-        #     "extraEnvironment": {
-        #         "EMAIL_HOST": EMAIL_SMTP_HOST,
-        #         "EMAIL_PORT": EMAIL_PORT,
-        #     },
-        #     "extraServerEnvironment": {
-        #         "OCIS_ADD_RUN_SERVICES": "notifications",
-        #         "NOTIFICATIONS_SMTP_HOST": EMAIL_SMTP_HOST,
-        #         "NOTIFICATIONS_SMTP_PORT": EMAIL_SMTP_PORT,
-        #         "NOTIFICATIONS_SMTP_INSECURE": "true",
-        #         "NOTIFICATIONS_SMTP_SENDER": EMAIL_SMTP_SENDER,
-        #         "NOTIFICATIONS_DEBUG_ADDR": "0.0.0.0:9174",
-        #     },
-        # },
-        # "graphUser": {
-        #     "suites": [
-        #         "apiGraphUser",
-        #     ],
-        #     "skip": False,
-        #     "withRemotePhp": [False],
-        #     "k8s": True,
-        # },
-        # "spaces": {
-        #     "suites": [
-        #         "apiSpaces",
-        #     ],
-        #     "skip": False,
-        #     "k8s": True,
-        # },
-        # "spacesShares": {
-        #     "suites": [
-        #         "apiSpacesShares",
-        #     ],
-        #     "skip": False,
-        #     "k8s": True,
-        # },
-        # "davOperations": {
-        #     "suites": [
-        #         "apiSpacesDavOperation",
-        #         "apiDownloads",
-        #         "apiAsyncUpload",
-        #         "apiDepthInfinity",
-        #         "apiArchiver",
-        #         "apiActivities",
-        #     ],
-        #     "skip": False,
-        # },
-        # "groupAndSearch1": {
-        #     "suites": [
-        #         "apiSearch1",
-        #         "apiGraph",
-        #         "apiGraphGroup",
-        #         "apiServiceAvailability",
-        #     ],
-        #     "skip": False,
-        #     "k8s": False,
-        # },
-        # "search2": {
-        #     "suites": [
-        #         "apiSearch2",
-        #         "apiSearchContent",
-        #     ],
-        #     "tikaNeeded": True,
-        #     "skip": False,
-        #     "k8s": False,
-        # },
-        # "sharingNg1": {
-        #     "suites": [
-        #         "apiSharingNgShares",
-        #         "apiReshare",
-        #         "apiSharingNgPermissions",
-        #     ],
-        #     "skip": False,
-        #     "withRemotePhp": [False],
-        #     "k8s": True,
-        # },
-        # "sharingNgAdditionalShareRole": {
-        #     "suites": [
-        #         "apiSharingNgAdditionalShareRole",
-        #     ],
-        #     "skip": False,
-        #     "k8s": True,
-        #     "withRemotePhp": [False],
-        # },
-        # "sharingNgShareInvitation": {
-        #     "suites": [
-        #         "apiSharingNgDriveInvitation",
-        #         "apiSharingNgItemInvitation",
-        #     ],
-        #     "skip": False,
-        #     "withRemotePhp": [False],
-        # },
-        # "sharingNgLinkShare": {
-        #     "suites": [
-        #         "apiSharingNgDriveLinkShare",
-        #         "apiSharingNgItemLinkShare",
-        #         "apiSharingNgLinkShareManagement",
-        #     ],
-        #     "skip": False,
-        #     "withRemotePhp": [False],
-        # },
+        "contractAndLock": {
+            "suites": [
+                "apiContract",
+                "apiLocks",
+            ],
+            "skip": False,
+            "k8s": True,
+        },
+        "settingsAndNotification": {
+            "suites": [
+                "apiSettings",
+                "apiNotification",
+                "apiCors",
+            ],
+            "skip": False,
+            "withRemotePhp": [False],
+            "emailNeeded": True,
+            "extraEnvironment": {
+                "EMAIL_HOST": EMAIL_SMTP_HOST,
+                "EMAIL_PORT": EMAIL_PORT,
+            },
+            "extraServerEnvironment": {
+                "OCIS_ADD_RUN_SERVICES": "notifications",
+                "NOTIFICATIONS_SMTP_HOST": EMAIL_SMTP_HOST,
+                "NOTIFICATIONS_SMTP_PORT": EMAIL_SMTP_PORT,
+                "NOTIFICATIONS_SMTP_INSECURE": "true",
+                "NOTIFICATIONS_SMTP_SENDER": EMAIL_SMTP_SENDER,
+                "NOTIFICATIONS_DEBUG_ADDR": "0.0.0.0:9174",
+            },
+        },
+        "graphUser": {
+            "suites": [
+                "apiGraphUser",
+            ],
+            "skip": False,
+            "withRemotePhp": [False],
+            "k8s": True,
+        },
+        "spaces": {
+            "suites": [
+                "apiSpaces",
+            ],
+            "skip": False,
+            "k8s": True,
+        },
+        "spacesShares": {
+            "suites": [
+                "apiSpacesShares",
+            ],
+            "skip": False,
+            "k8s": True,
+        },
+        "davOperations": {
+            "suites": [
+                "apiSpacesDavOperation",
+                "apiDownloads",
+                "apiAsyncUpload",
+                "apiDepthInfinity",
+                "apiArchiver",
+                "apiActivities",
+            ],
+            "skip": False,
+        },
+        "groupAndSearch1": {
+            "suites": [
+                "apiSearch1",
+                "apiGraph",
+                "apiGraphGroup",
+                "apiServiceAvailability",
+            ],
+            "skip": False,
+            "k8s": False,
+        },
+        "search2": {
+            "suites": [
+                "apiSearch2",
+                "apiSearchContent",
+            ],
+            "tikaNeeded": True,
+            "skip": False,
+            "k8s": False,
+        },
+        "sharingNg1": {
+            "suites": [
+                "apiSharingNgShares",
+                "apiReshare",
+                "apiSharingNgPermissions",
+            ],
+            "skip": False,
+            "withRemotePhp": [False],
+            "k8s": True,
+        },
+        "sharingNgAdditionalShareRole": {
+            "suites": [
+                "apiSharingNgAdditionalShareRole",
+            ],
+            "skip": False,
+            "k8s": True,
+            "withRemotePhp": [False],
+        },
+        "sharingNgShareInvitation": {
+            "suites": [
+                "apiSharingNgDriveInvitation",
+                "apiSharingNgItemInvitation",
+            ],
+            "skip": False,
+            "withRemotePhp": [False],
+        },
+        "sharingNgLinkShare": {
+            "suites": [
+                "apiSharingNgDriveLinkShare",
+                "apiSharingNgItemLinkShare",
+                "apiSharingNgLinkShareManagement",
+            ],
+            "skip": False,
+            "withRemotePhp": [False],
+        },
         "antivirus": {
             "suites": [
                 "apiAntivirus",
@@ -218,148 +218,155 @@ config = {
             "skip": False,
             "k8s": True,
             "antivirusNeeded": True,
+            "extraServerEnvironment": {
+                "ANTIVIRUS_SCANNER_TYPE": "clamav",
+                "ANTIVIRUS_CLAMAV_SOCKET": "tcp://clamav:3310",
+                "POSTPROCESSING_STEPS": "virusscan",
+                "OCIS_ADD_RUN_SERVICES": "antivirus",
+                "ANTIVIRUS_DEBUG_ADDR": "0.0.0.0:9297",
+            },
         },
-        # "ocmAndAuthApp": {
-        #     "suites": [
-        #         "apiOcm",
-        #         "apiAuthApp",
-        #     ],
-        #     "skip": False,
-        #     "withRemotePhp": [False],
-        #     "federationServer": True,
-        #     "emailNeeded": True,
-        #     "extraEnvironment": {
-        #         "EMAIL_HOST": EMAIL_SMTP_HOST,
-        #         "EMAIL_PORT": EMAIL_PORT,
-        #     },
-        #     "extraServerEnvironment": {
-        #         "OCIS_ADD_RUN_SERVICES": "ocm,notifications,auth-app",
-        #         "OCIS_ENABLE_OCM": True,
-        #         "OCM_OCM_INVITE_MANAGER_INSECURE": True,
-        #         "OCM_OCM_SHARE_PROVIDER_INSECURE": True,
-        #         "OCM_OCM_STORAGE_PROVIDER_INSECURE": True,
-        #         "OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE": "%s" % dirs["ocmProviders"],
-        #         # mail notifications
-        #         "NOTIFICATIONS_SMTP_HOST": EMAIL_SMTP_HOST,
-        #         "NOTIFICATIONS_SMTP_PORT": EMAIL_SMTP_PORT,
-        #         "NOTIFICATIONS_SMTP_INSECURE": "true",
-        #         "NOTIFICATIONS_SMTP_SENDER": EMAIL_SMTP_SENDER,
-        #         # auth-app
-        #         "PROXY_ENABLE_APP_AUTH": True,
-        #     },
-        # },
-        # "wopi": {
-        #     "suites": [
-        #         "apiCollaboration",
-        #     ],
-        #     "skip": False,
-        #     "withRemotePhp": [False],
-        #     "collaborationServiceNeeded": True,
-        #     "extraServerEnvironment": {
-        #         "GATEWAY_GRPC_ADDR": "0.0.0.0:9142",
-        #     },
-        # },
-        # "cliCommands": {
-        #     "suites": [
-        #         "cliCommands",
-        #     ],
-        #     "skip": False,
-        #     "withRemotePhp": [False],
-        #     "antivirusNeeded": True,
-        #     "emailNeeded": True,
-        #     "extraEnvironment": {
-        #         "EMAIL_HOST": EMAIL_SMTP_HOST,
-        #         "EMAIL_PORT": EMAIL_PORT,
-        #     },
-        #     "extraServerEnvironment": {
-        #         "NOTIFICATIONS_SMTP_HOST": EMAIL_SMTP_HOST,
-        #         "NOTIFICATIONS_SMTP_PORT": EMAIL_SMTP_PORT,
-        #         "NOTIFICATIONS_SMTP_INSECURE": "true",
-        #         "NOTIFICATIONS_SMTP_SENDER": EMAIL_SMTP_SENDER,
-        #         "NOTIFICATIONS_DEBUG_ADDR": "0.0.0.0:9174",
-        #         "ANTIVIRUS_SCANNER_TYPE": "clamav",
-        #         "ANTIVIRUS_CLAMAV_SOCKET": "tcp://clamav:3310",
-        #         "OCIS_ADD_RUN_SERVICES": "antivirus,notifications",
-        #     },
-        # },
+        "ocmAndAuthApp": {
+            "suites": [
+                "apiOcm",
+                "apiAuthApp",
+            ],
+            "skip": False,
+            "withRemotePhp": [False],
+            "federationServer": True,
+            "emailNeeded": True,
+            "extraEnvironment": {
+                "EMAIL_HOST": EMAIL_SMTP_HOST,
+                "EMAIL_PORT": EMAIL_PORT,
+            },
+            "extraServerEnvironment": {
+                "OCIS_ADD_RUN_SERVICES": "ocm,notifications,auth-app",
+                "OCIS_ENABLE_OCM": True,
+                "OCM_OCM_INVITE_MANAGER_INSECURE": True,
+                "OCM_OCM_SHARE_PROVIDER_INSECURE": True,
+                "OCM_OCM_STORAGE_PROVIDER_INSECURE": True,
+                "OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE": "%s" % dirs["ocmProviders"],
+                # mail notifications
+                "NOTIFICATIONS_SMTP_HOST": EMAIL_SMTP_HOST,
+                "NOTIFICATIONS_SMTP_PORT": EMAIL_SMTP_PORT,
+                "NOTIFICATIONS_SMTP_INSECURE": "true",
+                "NOTIFICATIONS_SMTP_SENDER": EMAIL_SMTP_SENDER,
+                # auth-app
+                "PROXY_ENABLE_APP_AUTH": True,
+            },
+        },
+        "wopi": {
+            "suites": [
+                "apiCollaboration",
+            ],
+            "skip": False,
+            "withRemotePhp": [False],
+            "collaborationServiceNeeded": True,
+            "extraServerEnvironment": {
+                "GATEWAY_GRPC_ADDR": "0.0.0.0:9142",
+            },
+        },
+        "cliCommands": {
+            "suites": [
+                "cliCommands",
+            ],
+            "skip": False,
+            "withRemotePhp": [False],
+            "antivirusNeeded": True,
+            "emailNeeded": True,
+            "extraEnvironment": {
+                "EMAIL_HOST": EMAIL_SMTP_HOST,
+                "EMAIL_PORT": EMAIL_PORT,
+            },
+            "extraServerEnvironment": {
+                "NOTIFICATIONS_SMTP_HOST": EMAIL_SMTP_HOST,
+                "NOTIFICATIONS_SMTP_PORT": EMAIL_SMTP_PORT,
+                "NOTIFICATIONS_SMTP_INSECURE": "true",
+                "NOTIFICATIONS_SMTP_SENDER": EMAIL_SMTP_SENDER,
+                "NOTIFICATIONS_DEBUG_ADDR": "0.0.0.0:9174",
+                "ANTIVIRUS_SCANNER_TYPE": "clamav",
+                "ANTIVIRUS_CLAMAV_SOCKET": "tcp://clamav:3310",
+                "OCIS_ADD_RUN_SERVICES": "antivirus,notifications",
+            },
+        },
     },
     "coreApiTests": {
-        # "1": {
-        #     "suites": [
-        #         "coreApiAuth",
-        #         "coreApiCapabilities",
-        #         "coreApiFavorites",
-        #         "coreApiMain",
-        #         "coreApiVersions",
-        #     ],
-        #     "skip": False,
-        #     "withRemotePhp": [False],
-        #     "k8s": True,
-        # },
-        # "2": {
-        #     "suites": [
-        #         "coreApiShareManagementBasicToShares",
-        #         "coreApiShareManagementToShares",
-        #     ],
-        #     "skip": False,
-        #     "k8s": True,
-        #     "withRemotePhp": [False],
-        # },
-        # "3": {
-        #     "suites": [
-        #         "coreApiSharees",
-        #         "coreApiSharePublicLink2",
-        #     ],
-        #     "skip": False,
-        #     "withRemotePhp": [False],
-        # },
-        # "4": {
-        #     "suites": [
-        #         "coreApiShareOperationsToShares1",
-        #         "coreApiShareOperationsToShares2",
-        #         "coreApiSharePublicLink1",
-        #         "coreApiShareCreateSpecialToShares1",
-        #         "coreApiShareCreateSpecialToShares2",
-        #         "coreApiShareUpdateToShares",
-        #     ],
-        #     "skip": False,
-        #     "k8s": True,
-        #     "withRemotePhp": [False],
-        # },
-        # "5": {
-        #     "suites": [
-        #         "coreApiTrashbin",
-        #         "coreApiTrashbinRestore",
-        #         "coreApiWebdavEtagPropagation1",
-        #         "coreApiWebdavEtagPropagation2",
-        #     ],
-        #     "skip": False,
-        #     "k8s": True,
-        # },
-        # "6": {
-        #     "suites": [
-        #         "coreApiWebdavDelete",
-        #         "coreApiWebdavOperations",
-        #         "coreApiWebdavMove2",
-        #     ],
-        #     "skip": False,
-        # },
-        # "7": {
-        #     "suites": [
-        #         "coreApiWebdavProperties",
-        #     ],
-        #     "skip": False,
-        #     "k8s": True,
-        # },
-        # "8": {
-        #     "suites": [
-        #         "coreApiWebdavMove1",
-        #         "coreApiWebdavPreviews",
-        #         "coreApiWebdavUpload",
-        #         "coreApiWebdavUploadTUS",
-        #     ],
-        #     "skip": False,
-        # },
+        "1": {
+            "suites": [
+                "coreApiAuth",
+                "coreApiCapabilities",
+                "coreApiFavorites",
+                "coreApiMain",
+                "coreApiVersions",
+            ],
+            "skip": False,
+            "withRemotePhp": [False],
+            "k8s": True,
+        },
+        "2": {
+            "suites": [
+                "coreApiShareManagementBasicToShares",
+                "coreApiShareManagementToShares",
+            ],
+            "skip": False,
+            "k8s": True,
+            "withRemotePhp": [False],
+        },
+        "3": {
+            "suites": [
+                "coreApiSharees",
+                "coreApiSharePublicLink2",
+            ],
+            "skip": False,
+            "withRemotePhp": [False],
+        },
+        "4": {
+            "suites": [
+                "coreApiShareOperationsToShares1",
+                "coreApiShareOperationsToShares2",
+                "coreApiSharePublicLink1",
+                "coreApiShareCreateSpecialToShares1",
+                "coreApiShareCreateSpecialToShares2",
+                "coreApiShareUpdateToShares",
+            ],
+            "skip": False,
+            "k8s": True,
+            "withRemotePhp": [False],
+        },
+        "5": {
+            "suites": [
+                "coreApiTrashbin",
+                "coreApiTrashbinRestore",
+                "coreApiWebdavEtagPropagation1",
+                "coreApiWebdavEtagPropagation2",
+            ],
+            "skip": False,
+            "k8s": True,
+        },
+        "6": {
+            "suites": [
+                "coreApiWebdavDelete",
+                "coreApiWebdavOperations",
+                "coreApiWebdavMove2",
+            ],
+            "skip": False,
+        },
+        "7": {
+            "suites": [
+                "coreApiWebdavProperties",
+            ],
+            "skip": False,
+            "k8s": True,
+        },
+        "8": {
+            "suites": [
+                "coreApiWebdavMove1",
+                "coreApiWebdavPreviews",
+                "coreApiWebdavUpload",
+                "coreApiWebdavUploadTUS",
+            ],
+            "skip": False,
+        },
     },
     "e2eTests": {
         "part": {
@@ -485,68 +492,68 @@ def main(ctx):
 
     pipelines = []
 
-    # build_release_helpers = \
-    #     changelog() + \
-    #     documentation() + \
-    #     licenseCheck(ctx)
+    build_release_helpers = \
+        changelog() + \
+        documentation() + \
+        licenseCheck(ctx)
 
-    # test_pipelines = \
-    # codestyle(ctx) + \
-    # checkGherkinLint(ctx) + \
-    # checkTestSuitesInExpectedFailures(ctx) + \
-    # buildWebCache(ctx) + \
-    # getGoBinForTesting(ctx) + \
-    # buildOcisBinaryForTesting(ctx) + \
-    # checkStarlark() + \
-    # build_release_helpers + \
-    # testOcisAndUploadResults(ctx) + \
-    # testPipelines(ctx)
+    test_pipelines = \
+        codestyle(ctx) + \
+        checkGherkinLint(ctx) + \
+        checkTestSuitesInExpectedFailures(ctx) + \
+        buildWebCache(ctx) + \
+        getGoBinForTesting(ctx) + \
+        buildOcisBinaryForTesting(ctx) + \
+        checkStarlark() + \
+        build_release_helpers + \
+        testOcisAndUploadResults(ctx) + \
+        testPipelines(ctx)
 
-    # build_release_pipelines = \
-    #     dockerReleases(ctx) + \
-    #     binaryReleases(ctx)
+    build_release_pipelines = \
+        dockerReleases(ctx) + \
+        binaryReleases(ctx)
 
-    # test_pipelines.append(
-    #     pipelineDependsOn(
-    #         purgeBuildArtifactCache(ctx),
-    #         testPipelines(ctx),
-    #     ),
-    # )
+    test_pipelines.append(
+        pipelineDependsOn(
+            purgeBuildArtifactCache(ctx),
+            testPipelines(ctx),
+        ),
+    )
 
-    # test_pipelines.append(
-    #     pipelineDependsOn(
-    #         uploadAPITestCoverageReport(ctx),
-    #         testPipelines(ctx),
-    #     ),
-    # )
+    test_pipelines.append(
+        pipelineDependsOn(
+            uploadAPITestCoverageReport(ctx),
+            testPipelines(ctx),
+        ),
+    )
 
-    # pipelines = test_pipelines + build_release_pipelines
+    pipelines = test_pipelines + build_release_pipelines
 
     # nightly Trivy security scan (non-blocking)
-    # pipelines.append(trivyScan(ctx))
+    pipelines.append(trivyScan(ctx))
 
-    # if ctx.build.event == "cron":
-    #     pipelines = \
-    #         pipelines + \
-    #         example_deploys(ctx)
-    # else:
-    #     pipelines = \
-    #         pipelines + \
-    #         pipelinesDependsOn(
-    #             example_deploys(ctx),
-    #             pipelines,
-    #         )
+    if ctx.build.event == "cron":
+        pipelines = \
+            pipelines + \
+            example_deploys(ctx)
+    else:
+        pipelines = \
+            pipelines + \
+            pipelinesDependsOn(
+                example_deploys(ctx),
+                pipelines,
+            )
 
-    # # always append notification step
-    # pipelines.append(
-    #     pipelineDependsOn(
-    #         notify(ctx),
-    #         pipelines,
-    #     ),
-    # )
+    # always append notification step
+    pipelines.append(
+        pipelineDependsOn(
+            notify(ctx),
+            pipelines,
+        ),
+    )
 
-    # pipelineSanityChecks(ctx, pipelines)
-    return testPipelines(ctx)
+    pipelineSanityChecks(ctx, pipelines)
+    return pipelines
 
 def cachePipeline(name, steps):
     return {
@@ -593,22 +600,22 @@ def testOcisAndUploadResults(ctx):
 def testPipelines(ctx):
     pipelines = []
 
-    # if config["litmus"]:
-    #     pipelines += litmus(ctx, "ocis")
+    if config["litmus"]:
+        pipelines += litmus(ctx, "ocis")
 
-    # if "skip" not in config["cs3ApiTests"] or not config["cs3ApiTests"]["skip"]:
-    #     pipelines.append(cs3ApiTests(ctx, "ocis"))
-    # if "skip" not in config["wopiValidatorTests"] or not config["wopiValidatorTests"]["skip"]:
-    #     pipelines.append(wopiValidatorTests(ctx, "ocis", "builtin"))
-    #     pipelines.append(wopiValidatorTests(ctx, "ocis", "cs3"))
+    if "skip" not in config["cs3ApiTests"] or not config["cs3ApiTests"]["skip"]:
+        pipelines.append(cs3ApiTests(ctx, "ocis"))
+    if "skip" not in config["wopiValidatorTests"] or not config["wopiValidatorTests"]["skip"]:
+        pipelines.append(wopiValidatorTests(ctx, "ocis", "builtin"))
+        pipelines.append(wopiValidatorTests(ctx, "ocis", "cs3"))
 
     pipelines += localApiTestPipeline(ctx)
-    # pipelines += coreApiTestPipeline(ctx)
+    pipelines += coreApiTestPipeline(ctx)
 
-    # pipelines += e2eTestPipeline(ctx) + multiServiceE2ePipeline(ctx)
+    pipelines += e2eTestPipeline(ctx) + multiServiceE2ePipeline(ctx)
 
-    # if ("skip" not in config["k6LoadTests"] or not config["k6LoadTests"]["skip"]) and ("k6-test" in ctx.build.title.lower() or ctx.build.event == "cron"):
-    #     pipelines += k6LoadTests(ctx)
+    if ("skip" not in config["k6LoadTests"] or not config["k6LoadTests"]["skip"]) and ("k6-test" in ctx.build.title.lower() or ctx.build.event == "cron"):
+        pipelines += k6LoadTests(ctx)
 
     return pipelines
 
@@ -1086,7 +1093,7 @@ def localApiTestPipeline(ctx):
                     params[item] = matrix[item] if item in matrix else defaults[item]
                 for storage in params["storages"]:
                     for run_with_remote_php in params["withRemotePhp"]:
-                        run_on_k8s = params["k8s"]  # and ctx.build.event == "cron"
+                        run_on_k8s = params["k8s"] and ctx.build.event == "cron"
                         ocis_url = OCIS_URL
                         if run_on_k8s:
                             ocis_url = "https://%s" % OCIS_SERVER_NAME
@@ -1103,7 +1110,7 @@ def localApiTestPipeline(ctx):
                                      ([] if run_on_k8s else restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin")) +
                                      (tikaService() if params["tikaNeeded"] and not run_on_k8s else tikaServiceK8s() if params["tikaNeeded"] and run_on_k8s else []) +
                                      (waitForServices("online-offices", ["collabora:9980", "onlyoffice:443", "fakeoffice:8080"]) if params["collaborationServiceNeeded"] else []) +
-                                     (waitK3sCluster() + (clamavServiceK8s() if params["antivirusNeeded"] and run_on_k8s else []) + (emailServiceK8s() if params["emailNeeded"] and run_on_k8s else []) + deployOcis() + waitForOcis(ocis_url = ocis_url) + ociswrapper() + waitForOciswrapper() if run_on_k8s else ocisServer(storage, extra_server_environment = params["extraServerEnvironment"], with_wrapper = True, tika_enabled = params["tikaNeeded"], volumes = ([stepVolumeOcisStorage]))) +
+                                     (waitK3sCluster() + (enableAntivirusServiceK8s() if params["antivirusNeeded"] and run_on_k8s else []) + (emailServiceK8s() if params["emailNeeded"] and run_on_k8s else []) + deployOcis() + waitForOcis(ocis_url = ocis_url) + ociswrapper() + waitForOciswrapper() if run_on_k8s else ocisServer(storage, extra_server_environment = params["extraServerEnvironment"], with_wrapper = True, tika_enabled = params["tikaNeeded"], volumes = ([stepVolumeOcisStorage]))) +
                                      (waitForClamavService() if params["antivirusNeeded"] and not run_on_k8s else exposeAntivirusServiceK8s() if params["antivirusNeeded"] and run_on_k8s else []) +
                                      (waitForEmailService() if params["emailNeeded"] and not run_on_k8s else exposeEmailServiceK8s() if params["emailNeeded"] and run_on_k8s else []) +
                                      (ocisServer(storage, deploy_type = "federation", extra_server_environment = params["extraServerEnvironment"]) if params["federationServer"] else []) +
@@ -1114,9 +1121,9 @@ def localApiTestPipeline(ctx):
                                      (generateCoverageFromAPITest(ctx, name) if not run_on_k8s else []),
                             "services": (k3sCluster() if run_on_k8s else []) +
                                         (emailService() if params["emailNeeded"] and not run_on_k8s else []) +
-                                        (clamavService() if params["antivirusNeeded"] and not run_on_k8s else []) +
+                                        (clamavService() if params["antivirusNeeded"] else []) +
                                         ((fakeOffice() + collaboraService() + onlyofficeService()) if params["collaborationServiceNeeded"] else []),
-                            # "depends_on": getPipelineNames(buildOcisBinaryForTesting(ctx)),
+                            "depends_on": getPipelineNames(buildOcisBinaryForTesting(ctx)) if not run_on_k8s else [],
                             "trigger": {
                                 "ref": [
                                     "refs/heads/master",
@@ -3786,7 +3793,7 @@ def k3sCluster():
             "chmod 0600 kubeconfig-$${DRONE_BUILD_NUMBER}.yaml",
             "printf '@@@@@@@@@@@@@@@@@@@@@@@\n@@@@ k3d is ready @@@@\n@@@@@@@@@@@@@@@@@@@@@@@\n'",
             # add dns rewrite rule
-            "kubectl create configmap coredns-custom --namespace kube-system " +
+            "kubectl create configmap coredns-custom -n kube-system " +
             "--from-literal='rewritehost.override=rewrite name exact %s host.k3d.internal'" % OCIS_SERVER_NAME,
             "kubectl -n kube-system rollout restart deployment coredns",
             # watch events
@@ -3831,17 +3838,14 @@ def deployOcis():
         ],
     }]
 
-def clamavServiceK8s():
+def enableAntivirusServiceK8s():
     return [{
-        "name": "clamav",
+        "name": "enable-antivirus-service",
         "image": OC_CI_ALPINE,
         "commands": [
-            "cp -r %s/tests/config/drone/k8s/clamav %s/ocis-charts/charts/ocis/templates/" % (dirs["base"], dirs["base"]),
             "sed -i '/^  virusscan:/,/^ *[^ ]/ s/enabled: .*/enabled: true/' %s/tests/config/drone/k8s/values.yaml" % dirs["base"],
-            # "sed -i 's/{{ *\\\\.Values\\\\.features\\\\.virusscan\\\\.infectedFileHandling *| *quote *}}/\"delete\"/' %s/ocis-charts/charts/ocis/templates/antivirus/deployment.yaml" % dirs["base"],
             "sed -i '/name: ANTIVIRUS_SCANNER_TYPE/{n;s/value: *\"icap\"/value: \"clamav\"/}' %s/ocis-charts/charts/ocis/templates/antivirus/deployment.yaml" % dirs["base"],
             "sed -i '/- name: ANTIVIRUS_SCANNER_TYPE/i\\\\            - name: ANTIVIRUS_CLAMAV_SOCKET\\\n              value: \"tcp://clamav:3310\"' %s/ocis-charts/charts/ocis/templates/antivirus/deployment.yaml" % dirs["base"],
-            "cat  %s/tests/config/drone/k8s/values.yaml" % dirs["base"],
         ],
     }]
 
@@ -3872,8 +3876,15 @@ def exposeAntivirusServiceK8s():
         "commands": [
             "export KUBECONFIG=kubeconfig-$${DRONE_BUILD_NUMBER}.yaml",
             "until test -f $${KUBECONFIG}; do sleep 1s; done",
+            # expose antivirus service via NodePort
             "kubectl -n ocis expose deployment antivirus --type=NodePort --port=9277 --name=antivirus-np",
             "kubectl -n ocis patch svc antivirus-np -p '{\"spec\":{\"ports\":[{\"port\":9277,\"nodePort\":30277}]}}'",
+            # add external clamav endpoint and service
+            "CLAMAV_IP=$(getent hosts clamav | awk '{print $1}')",
+            "echo -e \"apiVersion: v1\nkind: Endpoints\nmetadata:\n  name: clamav\n  namespace: ocis\n" +
+            "subsets:\n- addresses:\n  - ip: $CLAMAV_IP\n  ports:\n  - port: 3310\" | kubectl apply -f -",
+            "echo -e \"apiVersion: v1\nkind: Service\nmetadata:\n  name: clamav\n  namespace: ocis\n" +
+            "spec:\n  ports:\n  - port: 3310\n    targetPort: 3310\" | kubectl apply -f -",
         ],
     }]
 
