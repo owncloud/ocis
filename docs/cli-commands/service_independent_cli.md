@@ -91,13 +91,18 @@ Usage:
 ocis shares clean-orphaned-grants \
   --service-account-id "<id>" \
   --service-account-secret "<secret>" \
+  [--force] \
   [--space-id "<space-opaque-id>"] \
   [--dry-run=false]
 ```
 
 Notes:
-- `--dry-run` defaults to `true` (no deletions). Set to `false` to remove orphaned grants.
-- `--space-id` limits the scan; omit to scan all spaces.
+- `--dry-run`\
+Defaults to `true` (no deletions). Set to `false` to remove orphaned grants.
+- `--space-id`\
+Limit the scan to a specific storage space (opaque ID).
+- `--force`\
+Force removal of suspected orphans even when listing shares fails.
 - Public links are not touched.
 
 ### Cleanup Orphaned Shares
