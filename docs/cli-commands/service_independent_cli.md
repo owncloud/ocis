@@ -76,7 +76,7 @@ Detect and optionally delete storage grants that have no corresponding share-man
 
 Sharing in ocis relies on two truths. The share manager and the grants. When a share is created, ocis will 
 
-1) Create a grant for the specific file or folder.\
+1. Create a grant for the specific file or folder.\
 This grant is _checked when access to the file is requested_.
 
 2. Create an entry in the `created.json`/`received.json` files of the specific user.\
