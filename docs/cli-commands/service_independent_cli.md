@@ -82,7 +82,7 @@ This grant is _checked when access to the file is requested_.
 2. Create an entry in the `created.json`/`received.json` files of the specific user.\
 These files are _checked whenever shares are listed_.
 
-The process for creating a share is as follows: first, ocis creates the grant, and then adds the share entry. The reverse order is followed when deleting a share. This means that if the second step fails, the grant will still be present. This can be visually confirmed in the webUI. Although there is no "shared" symbol on the file, an entry will appear when you click on it. Note: This entry can be manually deleted, but an error will occur if you try to do so.
+The process for creating a share is as follows: first, ocis creates the grant, and then adds the share entry. The reverse order is followed when deleting a share. This means that if the second step fails, the grant will still be present. This can be visually confirmed in the webUI. The webUI details of the "share" section will show an error fetching information for orphan grants.
 
 The following command fixes the problem of orhaned grants.
 
