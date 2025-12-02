@@ -70,6 +70,36 @@ Allows specifying the blobstore to use. Defaults to `ocis`. Empty blobs will not
 * `--fail`\
 Exits with non-zero exit code if inconsistencies are found. Useful for automation.
 
+### Cleanup Orphaned Grants
+
+Detect and optionally delete storage grants that have no corresponding share-manager entry.
+
+Sharing in ocis relies on two truths. The share manager and the grants. When a share is created, ocis will 
+
+1) Create a grant for the specific file or folder.\
+This grant is _checked when access to the file is requested_.
+
+2. Create an entry in the `created.json`/`received.json` files of the specific user.\
+These files are _checked whenever shares are listed_.
+
+The process for creating a share is as follows: first, ocis creates the grant, and then adds the share entry. The reverse order is followed when deleting a share. This means that if the second step fails, the grant will still be present. This can be visually confirmed in the webUI. Although there is no "shared" symbol on the file, an entry will appear when you click on it. Note: This entry can be manually deleted, but an error will occur if you try to do so.
+
+The following command fixes the problem of orhaned grants.
+
+Usage:
+```bash
+ocis shares clean-orphaned-grants \
+  --service-account-id "<id>" \
+  --service-account-secret "<secret>" \
+  [--space-id "<space-opaque-id>"] \
+  [--dry-run=false]
+```
+
+Notes:
+- `--dry-run` defaults to `true` (no deletions). Set to `false` to remove orphaned grants.
+- `--space-id` limits the scan; omit to scan all spaces.
+- Public links are not touched.
+
 ### Cleanup Orphaned Shares
 
 When a shared space or directory got deleted, use the `shares cleanup` command to remove those share orphans. This can't be done automatically at the moment.
@@ -111,7 +141,6 @@ The output of this command includes the following information for each role:
 |    |                                  |                                      |          |                                                                                      |                                                           |     libre.graph/driveItem/basic/read     |
 | 2  |         ViewerListGrants         | d5041006-ebb3-4b4a-b6a4-7c180ecfb17d | disabled |                     View, download and show all invite
 
-<!--
 ### Move Stuck Uploads
 
 In some cases of saturated disk usage, Infinite Scale metadata may become stuck. This can occur when file metadata is being moved to its final destination after file operations. This issue was primarily seen with shares, where uploaded files could not be accessed. The required filename parameter aligns with Infinite Scale's internal processes and is used to complete the formerly stuck move action.
@@ -128,7 +157,6 @@ Note: This is a safety measure. You must specify `--dry-run=false` for the comma
 
 * `--filename` value (default: "received.json")\
 File to move from `uploads/` to share manager metadata `blobs/`
--->
 
 ### Revisions CLI
 
