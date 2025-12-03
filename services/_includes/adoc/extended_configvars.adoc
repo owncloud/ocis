@@ -82,30 +82,6 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++ ++
 
-a| `OCIS_BASE_DATA_PATH` +
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-++ ++
-
-a| `OCIS_BASE_DATA_PATH` +
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-++ ++
-
-a| `OCIS_BASE_DATA_PATH` +
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-++ ++
-
 a| `OCIS_CONFIG_DIR` +
 a| [subs=-attributes]
 ++string ++
