@@ -139,7 +139,7 @@ func (m accountResolver) resolveUserFromClaims(w http.ResponseWriter, req *http.
 			return
 		}
 		m.logger.Debug().Interface("claims", claims).Msg("Autoprovisioning user")
-		user, err = m.userProvider.CreateUserFromClaims(req.Context(), claims, isGuest)
+		user, err = m.userProvider.CreateUserFromClaims(req.Context(), claims)
 		if err != nil {
 			m.logger.Error().Err(err).Msg("Autoprovisioning user failed")
 			w.WriteHeader(http.StatusInternalServerError)
