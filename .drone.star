@@ -223,7 +223,7 @@ config = {
                 "ANTIVIRUS_CLAMAV_SOCKET": "tcp://clamav:3310",
                 "POSTPROCESSING_STEPS": "virusscan",
                 "OCIS_ADD_RUN_SERVICES": "antivirus",
-                "ANTIVIRUS_DEBUG_ADDR": "0.0.0.0:9297",
+                "ANTIVIRUS_DEBUG_ADDR": "0.0.0.0:9277",
             },
         },
         "ocmAndAuthApp": {
@@ -1123,7 +1123,7 @@ def localApiTestPipeline(ctx):
                                         (emailService() if params["emailNeeded"] and not run_on_k8s else []) +
                                         (clamavService() if params["antivirusNeeded"] else []) +
                                         ((fakeOffice() + collaboraService() + onlyofficeService()) if params["collaborationServiceNeeded"] else []),
-                            "depends_on": getPipelineNames(buildOcisBinaryForTesting(ctx)) if not run_on_k8s else [],
+                            "depends_on": getPipelineNames(buildOcisBinaryForTesting(ctx)),
                             "trigger": {
                                 "ref": [
                                     "refs/heads/master",
@@ -3860,7 +3860,7 @@ def emailServiceK8s():
 
 def exposeEmailServiceK8s():
     return [{
-        "name": "expose-email-service",
+        "name": EMAIL_SMTP_HOST,
         "image": K3D_IMAGE,
         "commands": [
             "kubectl port-forward svc/mailpit %s:%s -n ocis" % (EMAIL_PORT, EMAIL_PORT),
