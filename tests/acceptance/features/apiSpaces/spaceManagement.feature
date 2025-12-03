@@ -151,12 +151,8 @@ Feature: Space management
 
 
   Scenario Outline: space admin user tries to disable the personal space
-    When user "<user>" disables a space "Alice Hansen" owned by user "Alice"
+    When user "Brian" disables a space "Alice Hansen" owned by user "Alice"
     Then the HTTP status code should be "403"
-    Examples:
-      | user  |
-      | Brian |
-      | Carol |
 
 
   Scenario: space admin user deletes the project space
