@@ -73,14 +73,7 @@ a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 ++The base directory location used by several services and for user data. See the General Info section in the documentation for more details on defaults. Services can have, if available, an individual setting with an own environment variable. ++
-
-a| `OCIS_BASE_DATA_PATH` +
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-++ ++
+    
 
 a| `OCIS_CONFIG_DIR` +
 a| [subs=-attributes]
