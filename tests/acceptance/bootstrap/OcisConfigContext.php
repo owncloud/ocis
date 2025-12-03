@@ -237,7 +237,7 @@ class OcisConfigContext implements Context {
 	public function theConfigHasBeenSetToPath(string $configVariable, string $path, ?string $serviceName = null): void {
 		if (getenv("K8S") === "true") {
 			// In K8s, use the path where the ConfigMap is mounted
-			// The banned-password-list.txt is mounted at /etc/ocis/config/drone/
+			// For example: The banned-password-list.txt is mounted at /etc/ocis/config/drone/
 			$k8sPath = "/etc/ocis/" . $path;
 			$envs = [
 				$serviceName => [$configVariable => $k8sPath],
