@@ -47,12 +47,13 @@ const (
 	oncs3MetadataSpace       = "oncs3-share-manager-metadata"
 )
 
+var cachedOCISBaseDataPath = os.Getenv("OCIS_BASE_DATA_PATH")
+
 func ocisBaseDataPath() string {
-	basepath := os.Getenv("OCIS_BASE_DATA_PATH")
-	if basepath == "" {
-		return defaultOCISBaseDir
+	if cachedOCISBaseDataPath != "" {
+		return cachedOCISBaseDataPath
 	}
-	return basepath
+	return defaultOCISBaseDir
 }
 
 // SharesCommand is the entrypoint for the groups command.
@@ -346,10 +347,7 @@ func preprocessReconcileJsoncs3(ctx context.Context, cfg *config.Config, dryRun,
 	if cfg.Sharing.UserSharingDriver != jsoncs3Driver {
 		return
 	}
-	basepath := os.Getenv("OCIS_BASE_DATA_PATH")
-	if basepath == "" {
-		basepath = defaultOCISBaseDir
-	}
+	basepath := ocisBaseDataPath()
 	if verbose {
 		printStoragesRootsSummary(basepath)
 	}
@@ -376,10 +374,7 @@ func preprocessPrepareProviderCache(ctx context.Context, cfg *config.Config, spa
 	if cfg.Sharing.UserSharingDriver != jsoncs3Driver {
 		return
 	}
-	basepath := os.Getenv("OCIS_BASE_DATA_PATH")
-	if basepath == "" {
-		basepath = defaultOCISBaseDir
-	}
+	basepath := ocisBaseDataPath()
 	pcFixed, pcInvalid, pcZero, pcCreated := healJsoncs3ProviderCacheDocs(basepath, spaces, dryRun, verbose)
 	if verbose {
 		fmt.Printf("ProviderCacheHealer(pre): fixed=%d invalid=%d zero=%d created=%d\n", pcFixed, pcInvalid, pcZero, pcCreated)
@@ -659,10 +654,7 @@ func postprocessReconcileJsoncs3AfterRemovals(
 			mgr.(*jsoncs3.Manager).CleanupStaleShares(cleanCtx)
 		}
 	}
-	basepath := os.Getenv("OCIS_BASE_DATA_PATH")
-	if basepath == "" {
-		basepath = defaultOCISBaseDir
-	}
+	basepath := ocisBaseDataPath()
 	if args.Verbose {
 		printStoragesRootsSummary(basepath)
 	}
