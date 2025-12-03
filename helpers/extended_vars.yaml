@@ -136,22 +136,6 @@ variables:
     variable.
   do_ignore: false
 - rawname: OCIS_BASE_DATA_PATH
-  path: ocis/pkg/command/shares.go:379
-  foundincode: true
-  name: OCIS_BASE_DATA_PATH
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: OCIS_BASE_DATA_PATH
-  path: ocis/pkg/command/shares.go:662
-  foundincode: true
-  name: OCIS_BASE_DATA_PATH
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: OCIS_BASE_DATA_PATH
   path: ocis/pkg/command/shares.go:51
   foundincode: true
   name: OCIS_BASE_DATA_PATH
@@ -160,7 +144,23 @@ variables:
   description: ""
   do_ignore: false
 - rawname: OCIS_BASE_DATA_PATH
+  path: ocis/pkg/command/shares.go:379
+  foundincode: true
+  name: OCIS_BASE_DATA_PATH
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: OCIS_BASE_DATA_PATH
   path: ocis/pkg/command/shares.go:349
+  foundincode: true
+  name: OCIS_BASE_DATA_PATH
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: OCIS_BASE_DATA_PATH
+  path: ocis/pkg/command/shares.go:662
   foundincode: true
   name: OCIS_BASE_DATA_PATH
   type: ""
