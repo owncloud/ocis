@@ -60,7 +60,7 @@ func ocisBaseDataPath() string {
 func SharesCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:     "shares",
-		Usage:    `cli tools to manage entries in the share manager.`,
+		Usage:    `CLI tools to manage entries in the share manager.`,
 		Category: "maintenance",
 		Subcommands: []*cli.Command{
 			cleanupCmd(cfg),
