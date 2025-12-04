@@ -1121,7 +1121,7 @@ def localApiTestPipeline(ctx):
                                      (generateCoverageFromAPITest(ctx, name) if not run_on_k8s else []),
                             "services": (k3sCluster() if run_on_k8s else []) +
                                         (emailService() if params["emailNeeded"] and not run_on_k8s else []) +
-                                        (clamavService() if params["antivirusNeeded"] else []) +
+                                        (clamavService() if params["antivirusNeeded"] and not run_on_k8s else []) +
                                         ((fakeOffice() + collaboraService() + onlyofficeService()) if params["collaborationServiceNeeded"] else []),
                             "depends_on": getPipelineNames(buildOcisBinaryForTesting(ctx)),
                             "trigger": {
@@ -3843,6 +3843,7 @@ def enableAntivirusServiceK8s():
         "name": "enable-antivirus-service",
         "image": OC_CI_ALPINE,
         "commands": [
+            "cp -r %s/tests/config/drone/k8s/clamav %s/ocis-charts/charts/ocis/templates/" % (dirs["base"], dirs["base"]),
             "sed -i '/^  virusscan:/,/^ *[^ ]/ s/enabled: .*/enabled: true/' %s/tests/config/drone/k8s/values.yaml" % dirs["base"],
             "sed -i '/name: ANTIVIRUS_SCANNER_TYPE/{n;s/value: *\"icap\"/value: \"clamav\"/}' %s/ocis-charts/charts/ocis/templates/antivirus/deployment.yaml" % dirs["base"],
             "sed -i '/- name: ANTIVIRUS_SCANNER_TYPE/i\\\\            - name: ANTIVIRUS_CLAMAV_SOCKET\\\n              value: \"tcp://clamav:3310\"' %s/ocis-charts/charts/ocis/templates/antivirus/deployment.yaml" % dirs["base"],
@@ -3879,12 +3880,6 @@ def exposeAntivirusServiceK8s():
             # expose antivirus service via NodePort
             "kubectl -n ocis expose deployment antivirus --type=NodePort --port=9277 --name=antivirus-np",
             "kubectl -n ocis patch svc antivirus-np -p '{\"spec\":{\"ports\":[{\"port\":9277,\"nodePort\":30277}]}}'",
-            # add external clamav endpoint and service
-            "CLAMAV_IP=$(getent hosts clamav | awk '{print $1}')",
-            "echo -e \"apiVersion: v1\nkind: Endpoints\nmetadata:\n  name: clamav\n  namespace: ocis\n" +
-            "subsets:\n- addresses:\n  - ip: $CLAMAV_IP\n  ports:\n  - port: 3310\" | kubectl apply -f -",
-            "echo -e \"apiVersion: v1\nkind: Service\nmetadata:\n  name: clamav\n  namespace: ocis\n" +
-            "spec:\n  ports:\n  - port: 3310\n    targetPort: 3310\" | kubectl apply -f -",
         ],
     }]
 
