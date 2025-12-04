@@ -79,6 +79,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add CLI to clean orphned grants: [#11804](https://github.com/owncloud/ocis/pull/11804)
 * Enhancement - Bump Reva: [#11808](https://github.com/owncloud/ocis/pull/11808)
 * Enhancement - Bump Web to v12.2.0: [#11834](https://github.com/owncloud/ocis/pull/11834)
+* Enhancement - Update the ocis_full deployment example images: [#11860](https://github.com/owncloud/ocis/pull/11860)
 
 ## Details
 
@@ -200,6 +201,15 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/11834
    https://github.com/owncloud/web/releases/tag/v12.2.0
+
+* Enhancement - Update the ocis_full deployment example images: [#11860](https://github.com/owncloud/ocis/pull/11860)
+
+  * Traefik    3.6.2
+  * Collabora  27.4.7.3
+  * OnlyOffice 9.2.0
+  * Mailpit    1.28.0
+
+   https://github.com/owncloud/ocis/pull/11860
 
 # Changelog for [7.3.1] (2025-11-24)
 
