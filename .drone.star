@@ -162,10 +162,9 @@ config = {
                 "apiSearch1",
                 "apiGraph",
                 "apiGraphGroup",
-                "apiServiceAvailability",
             ],
             "skip": False,
-            "k8s": False,
+            "k8s": True,
         },
         "search2": {
             "suites": [
@@ -229,6 +228,7 @@ config = {
             "suites": [
                 "apiOcm",
                 "apiAuthApp",
+                "apiServiceAvailability",
             ],
             "skip": False,
             "withRemotePhp": [False],
