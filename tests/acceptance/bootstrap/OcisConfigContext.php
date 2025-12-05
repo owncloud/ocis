@@ -267,7 +267,7 @@ class OcisConfigContext implements Context {
 		$envs = [];
 		if (getenv("K8S") === "true") {
 			foreach ($table->getHash() as $row) {
-				$envs[$row['service']] = [$row['config'] => $row['value']];
+				$envs[$row['service']][$row['config']] = $row['value'];
 			}
 			$response = OcisConfigHelper::reConfigureOcisK8s($envs);
 		} else {
