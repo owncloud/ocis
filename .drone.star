@@ -225,10 +225,9 @@ config = {
                 "ANTIVIRUS_DEBUG_ADDR": "0.0.0.0:9277",
             },
         },
-        "ocmAndAuthApp": {
+        "ocm": {
             "suites": [
                 "apiOcm",
-                "apiAuthApp",
                 "apiServiceAvailability",
             ],
             "skip": False,
@@ -240,7 +239,7 @@ config = {
                 "EMAIL_PORT": EMAIL_PORT,
             },
             "extraServerEnvironment": {
-                "OCIS_ADD_RUN_SERVICES": "ocm,notifications,auth-app",
+                "OCIS_ADD_RUN_SERVICES": "ocm,notifications",
                 "OCIS_ENABLE_OCM": True,
                 "OCM_OCM_INVITE_MANAGER_INSECURE": True,
                 "OCM_OCM_SHARE_PROVIDER_INSECURE": True,
@@ -251,7 +250,17 @@ config = {
                 "NOTIFICATIONS_SMTP_PORT": EMAIL_SMTP_PORT,
                 "NOTIFICATIONS_SMTP_INSECURE": "true",
                 "NOTIFICATIONS_SMTP_SENDER": EMAIL_SMTP_SENDER,
-                # auth-app
+            },
+        },
+        "authApp": {
+            "suites": [
+                "apiAuthApp",
+            ],
+            "skip": False,
+            "k8s": True,
+            "withRemotePhp": [False],
+            "extraServerEnvironment": {
+                "OCIS_ADD_RUN_SERVICES": "auth-app",
                 "PROXY_ENABLE_APP_AUTH": True,
             },
         },
