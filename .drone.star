@@ -68,7 +68,7 @@ dirs = {
 OCIS_SERVER_NAME = "ocis-server"
 OCIS_URL = "https://%s:9200" % OCIS_SERVER_NAME
 OCIS_DOMAIN = "%s:9200" % OCIS_SERVER_NAME
-FED_OCIS_SERVER_NAME = "federation-ocis-server"
+FED_OCIS_SERVER_NAME = "federation-%s" % OCIS_SERVER_NAME
 OCIS_FED_URL = "https://%s:10200" % FED_OCIS_SERVER_NAME
 OCIS_FED_DOMAIN = "%s:10200" % FED_OCIS_SERVER_NAME
 
@@ -216,13 +216,14 @@ config = {
                 "apiAntivirus",
             ],
             "skip": False,
+            "k8s": True,
             "antivirusNeeded": True,
             "extraServerEnvironment": {
                 "ANTIVIRUS_SCANNER_TYPE": "clamav",
                 "ANTIVIRUS_CLAMAV_SOCKET": "tcp://clamav:3310",
                 "POSTPROCESSING_STEPS": "virusscan",
                 "OCIS_ADD_RUN_SERVICES": "antivirus",
-                "ANTIVIRUS_DEBUG_ADDR": "0.0.0.0:9297",
+                "ANTIVIRUS_DEBUG_ADDR": "0.0.0.0:9277",
             },
         },
         "ocmAndAuthApp": {
@@ -1109,7 +1110,7 @@ def localApiTestPipeline(ctx):
                                      ([] if run_on_k8s else restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin")) +
                                      (tikaService() if params["tikaNeeded"] and not run_on_k8s else tikaServiceK8s() if params["tikaNeeded"] and run_on_k8s else []) +
                                      (waitForServices("online-offices", ["collabora:9980", "onlyoffice:443", "fakeoffice:8080"]) if params["collaborationServiceNeeded"] else []) +
-                                     (waitK3sCluster() + (clamavServiceK8s() if params["antivirusNeeded"] and run_on_k8s else []) + (emailServiceK8s() if params["emailNeeded"] and run_on_k8s else []) + deployOcis() + waitForOcis(ocis_url = ocis_url) + ociswrapper() + waitForOciswrapper() if run_on_k8s else ocisServer(storage, extra_server_environment = params["extraServerEnvironment"], with_wrapper = True, tika_enabled = params["tikaNeeded"], volumes = ([stepVolumeOcisStorage]))) +
+                                     (waitK3sCluster() + (enableAntivirusServiceK8s() if params["antivirusNeeded"] and run_on_k8s else []) + (emailServiceK8s() if params["emailNeeded"] and run_on_k8s else []) + deployOcis() + waitForOcis(ocis_url = ocis_url) + ociswrapper() + waitForOciswrapper() if run_on_k8s else ocisServer(storage, extra_server_environment = params["extraServerEnvironment"], with_wrapper = True, tika_enabled = params["tikaNeeded"], volumes = ([stepVolumeOcisStorage]))) +
                                      (waitForClamavService() if params["antivirusNeeded"] and not run_on_k8s else exposeAntivirusServiceK8s() if params["antivirusNeeded"] and run_on_k8s else []) +
                                      (waitForEmailService() if params["emailNeeded"] and not run_on_k8s else exposeEmailServiceK8s() if params["emailNeeded"] and run_on_k8s else []) +
                                      (ocisServer(storage, deploy_type = "federation", extra_server_environment = params["extraServerEnvironment"]) if params["federationServer"] else []) +
@@ -3783,7 +3784,7 @@ def k3sCluster():
             "until docker ps 2>&1 > /dev/null; do sleep 1s; done",
             # create cluster
             "k3d cluster create drone --api-port %s:33199 " % OCIS_SERVER_NAME +
-            "-p '80:80@loadbalancer' -p '443:443@loadbalancer' " +
+            "-p '80:80@loadbalancer' -p '443:443@loadbalancer' -p '9100-9399:30100-30399@loadbalancer' " +
             "--k3s-arg '--tls-san=k3d@server:*' --k3s-arg '--disable=metrics-server@server:*'",
             # wait for services to be ready
             "until kubectl get deployment coredns -n kube-system -o go-template='{{.status.availableReplicas}}' | grep -v -e '<no value>'; do sleep 1s; done",
@@ -3792,7 +3793,7 @@ def k3sCluster():
             "chmod 0600 kubeconfig-$${DRONE_BUILD_NUMBER}.yaml",
             "printf '@@@@@@@@@@@@@@@@@@@@@@@\n@@@@ k3d is ready @@@@\n@@@@@@@@@@@@@@@@@@@@@@@\n'",
             # add dns rewrite rule
-            "kubectl create configmap coredns-custom --namespace kube-system " +
+            "kubectl create configmap coredns-custom -n kube-system " +
             "--from-literal='rewritehost.override=rewrite name exact %s host.k3d.internal'" % OCIS_SERVER_NAME,
             "kubectl -n kube-system rollout restart deployment coredns",
             # watch events
@@ -3837,14 +3838,13 @@ def deployOcis():
         ],
     }]
 
-def clamavServiceK8s():
+def enableAntivirusServiceK8s():
     return [{
-        "name": "clamav",
+        "name": "enable-antivirus-service",
         "image": OC_CI_ALPINE,
         "commands": [
             "cp -r %s/tests/config/drone/k8s/clamav %s/ocis-charts/charts/ocis/templates/" % (dirs["base"], dirs["base"]),
-            "sed -i 's/{{ *\\\\.Values\\\\.features\\\\.virusscan\\\\.infectedFileHandling *| *quote *}}/\"delete\"/' %s/ocis-charts/charts/ocis/templates/antivirus/deployment.yaml" % dirs["base"],
-            "sed -i 's/{{ *\\\\.Values\\\\.features\\\\.virusscan\\\\.infectedFileHandling *| *quote *}}/\"delete\"/' %s/ocis-charts/charts/ocis/templates/antivirus/deployment.yaml" % dirs["base"],
+            "sed -i '/^  virusscan:/,/^ *[^ ]/ s/enabled: .*/enabled: true/' %s/tests/config/drone/k8s/values.yaml" % dirs["base"],
             "sed -i '/name: ANTIVIRUS_SCANNER_TYPE/{n;s/value: *\"icap\"/value: \"clamav\"/}' %s/ocis-charts/charts/ocis/templates/antivirus/deployment.yaml" % dirs["base"],
             "sed -i '/- name: ANTIVIRUS_SCANNER_TYPE/i\\\\            - name: ANTIVIRUS_CLAMAV_SOCKET\\\n              value: \"tcp://clamav:3310\"' %s/ocis-charts/charts/ocis/templates/antivirus/deployment.yaml" % dirs["base"],
         ],
@@ -3862,7 +3862,7 @@ def emailServiceK8s():
 def exposeEmailServiceK8s():
     return [{
         "name": EMAIL_SMTP_HOST,
-        "image": "ghcr.io/k3d-io/k3d:5-dind",
+        "image": K3D_IMAGE,
         "commands": [
             "kubectl port-forward svc/mailpit %s:%s -n ocis" % (EMAIL_PORT, EMAIL_PORT),
             "kubectl port-forward svc/mailpit 9174:9174 -n ocis",
@@ -3872,12 +3872,15 @@ def exposeEmailServiceK8s():
 
 def exposeAntivirusServiceK8s():
     return [{
-        "name": EMAIL_SMTP_HOST,
-        "image": "ghcr.io/k3d-io/k3d:5-dind",
+        "name": "expose-antivirus-service",
+        "image": K3D_IMAGE,
         "commands": [
-            "kubectl port-forward svc/antivirus 9297:9277 -n ocis",
+            "export KUBECONFIG=kubeconfig-$${DRONE_BUILD_NUMBER}.yaml",
+            "until test -f $${KUBECONFIG}; do sleep 1s; done",
+            # expose antivirus service via NodePort
+            "kubectl -n ocis expose deployment antivirus --type=NodePort --port=9277 --name=antivirus-np",
+            "kubectl -n ocis patch svc antivirus-np -p '{\"spec\":{\"ports\":[{\"port\":9277,\"nodePort\":30277}]}}'",
         ],
-        "detach": True,
     }]
 
 def ociswrapper():
@@ -3892,7 +3895,7 @@ def ociswrapper():
             "kubectl get ingress -A",
             "kubectl describe pods $(kubectl get pods -n ocis -l app=antivirus -o jsonpath=\"{.items[0].metadata.name}\") -n ocis",
             "kubectl describe pods $(kubectl get pods -n ocis -l app=postprocessing -o jsonpath=\"{.items[0].metadata.name}\") -n ocis",
-            "%s/bin/ociswrapper serve --url https://ocis-server --admin-username admin --admin-password admin --skip-ocis-run" % dirs["ocisWrapper"],
+            "%s/bin/ociswrapper serve --url https://%s --admin-username admin --admin-password admin --skip-ocis-run" % (dirs["ocisWrapper"], OCIS_SERVER_NAME),
         ],
         "detach": True,
     }]
