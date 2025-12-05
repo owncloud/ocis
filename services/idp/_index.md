@@ -1,6 +1,6 @@
 ---
 title: IDP
-date: 2025-12-04T04:11:43.007542341Z
+date: 2025-12-05T00:06:50.213841245Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/idp
