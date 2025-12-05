@@ -174,7 +174,7 @@ config = {
             ],
             "tikaNeeded": True,
             "skip": False,
-            "k8s": False,
+            "k8s": True,
         },
         "sharingNg1": {
             "suites": [
@@ -3918,6 +3918,8 @@ def tikaServiceK8s():
         "type": "docker",
         "image": OC_CI_ALPINE,
         "commands": [
+            "until test -f %s/ocis-charts/charts/ocis/templates/search/deployment.yaml; do sleep 1s; done" % dirs["base"],
             "cp -r %s/tests/config/drone/k8s/tika %s/ocis-charts/charts/ocis/templates/" % (dirs["base"], dirs["base"]),
+            "sed -i '/^[[:space:]]*storagesystem:/i\\\\  search:\\\n    extractor:\\\n      type: \"tika\"\\\n      tika:\\\n        url: \"http://tika:9998\"\\\n    persistence:\\\n      enabled: true\\\n      accessModes:\\\n        - ReadWriteOnce' %s/tests/config/drone/k8s/values.yaml" % dirs["base"],
         ],
     }]
