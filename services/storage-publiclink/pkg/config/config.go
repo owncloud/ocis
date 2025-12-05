@@ -2,6 +2,7 @@ package config
 
 import (
 	"context"
+	"time"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 )
@@ -17,6 +18,7 @@ type Config struct {
 
 	TokenManager *TokenManager `yaml:"token_manager"`
 	Reva         *shared.Reva  `yaml:"reva"`
+	BruteForce   BruteForce    `yaml:"brute_force"`
 
 	SkipUserGroupsInToken bool `yaml:"skip_user_groups_in_token" env:"STORAGE_PUBLICLINK_SKIP_USER_GROUPS_IN_TOKEN" desc:"Disables the loading of user's group memberships from the reva access token." introductionVersion:"pre5.0"`
 
@@ -52,4 +54,9 @@ type GRPCConfig struct {
 
 type StorageProvider struct {
 	MountID string `yaml:"mount_id" env:"STORAGE_PUBLICLINK_STORAGE_PROVIDER_MOUNT_ID" desc:"Mount ID of this storage. Admins can set the ID for the storage in this config option manually which is then used to reference the storage. Any reasonable long string is possible, preferably this would be an UUIDv4 format." introductionVersion:"pre5.0"`
+}
+
+type BruteForce struct {
+	TimeGap     time.Duration `yaml:"time_gap" env:"STORAGE_PUBLICLINK_BRUTEFORCE_TIMEGAP" desc:"The duration of the time gap computed for the brute force protection." introductionVersion:"%%NEXT%%"`
+	MaxAttempts int           `yaml:"max_attempts" env:"STORAGE_PUBLICLINK_BRUTEFORCE_MAXATTEMPTS" desc:"The maximum number of failed attempts allowed in the time gap above." introductionVersion:"%%NEXT%%"`
 }
