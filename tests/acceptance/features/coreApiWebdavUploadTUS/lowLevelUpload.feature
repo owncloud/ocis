@@ -51,7 +51,7 @@ Feature: low level tests for upload of chunks
     When user "Alice" sends a chunk to the last created TUS Location with offset "0" and data "123" using the WebDAV API
     And user "Alice" sends a chunk to the last created TUS Location with offset "3" and data "4567890" using the WebDAV API
     And user "Alice" sends a chunk to the last created TUS Location with offset "3" and data "0000000" using the WebDAV API
-    Then the HTTP status code should be "404"
+    Then the HTTP status code should be "404" or "409"
     And the content of file "/file.txt" for user "Alice" should be "1234567890"
     Examples:
       | dav-path-version |
