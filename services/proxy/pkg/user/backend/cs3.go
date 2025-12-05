@@ -194,6 +194,7 @@ func (c *cs3backend) CreateUserFromClaims(ctx context.Context, claims map[string
 		return nil, fmt.Errorf("error creating user from claims: %w", err)
 	}
 
+	fmt.Println("XXX PROXY Creating user with", newUser.GetUserType())
 	req := lgClient.UsersApi.CreateUser(newctx).User(newUser)
 
 	created, resp, err := req.Execute()
@@ -491,7 +492,6 @@ func (c *cs3backend) libregraphUserFromClaims(claims map[string]interface{}) (li
 	if mail, ok := claims[c.autoProvisionClaims.Email].(string); ok {
 		user.SetMail(mail)
 	}
-
 	sub, subExists := claims[oidc.Sub].(string)
 	iss, issExists := claims[oidc.Iss].(string)
 
