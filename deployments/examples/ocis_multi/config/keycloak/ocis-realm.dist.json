@@ -675,6 +675,10 @@
           "credentialData": "{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\",\"additionalParameters\":{}}"
         }
       ],
+      "attributes": {
+	  "memberOf": ["base"],
+	  "guestOf": []
+      },
       "disableableCredentialTypes": [],
       "requiredActions": [],
       "realmRoles": [
@@ -703,6 +707,10 @@
           "credentialData": "{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\",\"additionalParameters\":{}}"
         }
       ],
+      "attributes": {
+	  "memberOf": ["ocm"],
+	  "guestOf": ["base"]
+      },
       "disableableCredentialTypes": [],
       "requiredActions": [],
       "realmRoles": [
@@ -735,8 +743,8 @@
       "enabled": true,
       "totp": false,
       "attributes": {
-	  "memberOf": "ocm",
-	  "guestOf": "base"
+	  "memberOf": ["ocm"],
+	  "guestOf": []
       },
       "credentials": [
         {
@@ -784,6 +792,10 @@
           "credentialData": "{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\",\"additionalParameters\":{}}"
         }
       ],
+      "attributes": {
+	  "memberOf": ["base"],
+	  "guestOf": ["ocm"]
+      },
       "disableableCredentialTypes": [],
       "requiredActions": [],
       "realmRoles": [
