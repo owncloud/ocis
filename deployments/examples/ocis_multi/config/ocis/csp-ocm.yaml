@@ -16,8 +16,6 @@ directives:
     - '''self'''
     - 'blob:'
     - 'https://embed.diagrams.net/'
-    # In contrary to bash and docker the default is given after the | character
-    - 'https://${COLLABORA_DOMAIN|collabora.ocm.next.owncloud.test}/'
     # This is needed for the external-sites web extension when embedding sites
     - 'https://owncloud.dev'
   img-src:
@@ -25,8 +23,6 @@ directives:
     - 'data:'
     - 'blob:'
     - 'https://raw.githubusercontent.com/owncloud/awesome-ocis/'
-    # In contrary to bash and docker the default is given after the | character
-    - 'https://${COLLABORA_DOMAIN|collabora.ocm.next.owncloud.test}/'
   manifest-src:
     - '''self'''
   media-src:
