@@ -57,6 +57,6 @@ type StorageProvider struct {
 }
 
 type BruteForce struct {
-	TimeGap     time.Duration `yaml:"time_gap" env:"STORAGE_PUBLICLINK_BRUTEFORCE_TIMEGAP" desc:"The duration of the time gap computed for the brute force protection." introductionVersion:"%%NEXT%%"`
-	MaxAttempts int           `yaml:"max_attempts" env:"STORAGE_PUBLICLINK_BRUTEFORCE_MAXATTEMPTS" desc:"The maximum number of failed attempts allowed in the time gap above." introductionVersion:"%%NEXT%%"`
+	TimeGap     time.Duration `yaml:"time_gap" env:"STORAGE_PUBLICLINK_BRUTEFORCE_TIMEGAP" desc:"The duration of the time gap computed for the brute force protection." introductionVersion:"Curie"`
+	MaxAttempts int           `yaml:"max_attempts" env:"STORAGE_PUBLICLINK_BRUTEFORCE_MAXATTEMPTS" desc:"The maximum number of failed attempts allowed in the time gap defined in STORAGE_PUBLICLINK_BRUTEFORCE_TIMEGAP." introductionVersion:"Curie"`
 }
