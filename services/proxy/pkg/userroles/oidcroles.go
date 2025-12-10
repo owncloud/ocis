@@ -98,7 +98,7 @@ func matchesClaimMapping(mappingValue string, claimRoles map[string]struct{}) bo
 
 // UpdateUserRoleAssignment assigns the role "User" to the supplied user. Unless the user
 // already has a different role assigned.
-func (ra oidcRoleAssigner) UpdateUserRoleAssignment(ctx context.Context, user *cs3user.User, claims map[string]interface{}) (*cs3user.User, error) {
+func (ra oidcRoleAssigner) UpdateUserRoleAssignment(ctx context.Context, user *cs3user.User, claims map[string]interface{}, overwriteRole string) (*cs3user.User, error) {
 	userID := user.GetId().GetOpaqueId()
 	logger := ra.logger.SubloggerWithRequestID(ctx).With().Str("userid", userID).Logger()
 	roleNamesToRoleIDs, err := ra.roleNamesToRoleIDs()
@@ -107,34 +107,36 @@ func (ra oidcRoleAssigner) UpdateUserRoleAssignment(ctx context.Context, user *c
 		return nil, err
 	}
 
-	claimRoles, err := extractRoles(ra.rolesClaim, claims)
-	if err != nil {
-		logger.Error().Err(err).Msg("Error mapping role names to role ids")
-		return nil, err
-	}
-
-	if len(claimRoles) == 0 {
-		err := errors.New("no roles set in claim")
-		logger.Error().Err(err).Msg("")
-		return nil, err
-	}
-
-	// the roleMapping config is supposed to have the role mappings ordered from the highest privileged role
-	// down to the lowest privileged role. Since ocis currently only can handle a single role assignment we
-	// pick the highest privileged role that matches a value from the claims
-	roleIDFromClaim := ""
-	for _, mapping := range ra.Options.roleMapping {
-		if matchesClaimMapping(mapping.ClaimValue, claimRoles) {
-			logger.Debug().Str("ocisRole", mapping.RoleName).Str("role id", roleNamesToRoleIDs[mapping.RoleName]).Msg("first matching role")
-			roleIDFromClaim = roleNamesToRoleIDs[mapping.RoleName]
-			break
+	roleIDFromClaim := roleNamesToRoleIDs[overwriteRole]
+	if overwriteRole == "" {
+		claimRoles, err := extractRoles(ra.rolesClaim, claims)
+		if err != nil {
+			logger.Error().Err(err).Msg("Error mapping role names to role ids")
+			return nil, err
 		}
-	}
 
-	if roleIDFromClaim == "" {
-		err := errors.New("no role in claim maps to an ocis role")
-		logger.Error().Err(err).Msg("")
-		return nil, err
+		if len(claimRoles) == 0 {
+			err := errors.New("no roles set in claim")
+			logger.Error().Err(err).Msg("")
+			return nil, err
+		}
+
+		// the roleMapping config is supposed to have the role mappings ordered from the highest privileged role
+		// down to the lowest privileged role. Since ocis currently only can handle a single role assignment we
+		// pick the highest privileged role that matches a value from the claims
+		for _, mapping := range ra.Options.roleMapping {
+			if matchesClaimMapping(mapping.ClaimValue, claimRoles) {
+				logger.Debug().Str("ocisRole", mapping.RoleName).Str("role id", roleNamesToRoleIDs[mapping.RoleName]).Msg("first matching role")
+				roleIDFromClaim = roleNamesToRoleIDs[mapping.RoleName]
+				break
+			}
+		}
+
+		if roleIDFromClaim == "" {
+			err := errors.New("no role in claim maps to an ocis role")
+			logger.Error().Err(err).Msg("")
+			return nil, err
+		}
 	}
 
 	assignedRoles, err := loadRolesIDs(ctx, userID, ra.roleService)

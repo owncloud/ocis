@@ -493,7 +493,6 @@ func (g Graph) PostUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// treat userType as a read-only attribute.
 	if u.HasUserType() {
 		logger.Info().Interface("user", u).Msg("could not create user: userType is a read-only attribute")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "userType is a read-only attribute")

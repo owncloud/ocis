@@ -491,7 +491,6 @@ func (c *cs3backend) libregraphUserFromClaims(claims map[string]interface{}) (li
 	if mail, ok := claims[c.autoProvisionClaims.Email].(string); ok {
 		user.SetMail(mail)
 	}
-
 	sub, subExists := claims[oidc.Sub].(string)
 	iss, issExists := claims[oidc.Iss].(string)
 
