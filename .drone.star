@@ -329,6 +329,7 @@ config = {
             ],
             "skip": False,
             "withRemotePhp": [False],
+            "k8s": True,
         },
         "4": {
             "suites": [
@@ -1422,7 +1423,7 @@ def coreApiTestPipeline(ctx):
                                  (tikaService() if params["tikaNeeded"] else []) +
                                  (waitForClamavService() if params["antivirusNeeded"] else []) +
                                  (waitForEmailService() if params["emailNeeded"] else []) +
-                                 (waitK3sCluster() + prepareOcisDeployment(name) + setupOcisConfigMaps(name) + deployOcis() + waitForOcis(ocis_url = ocis_url) + ociswrapper() + waitForOciswrapper() if run_on_k8s else ocisServer(storage, extra_server_environment = params["extraServerEnvironment"], with_wrapper = True, tika_enabled = params["tikaNeeded"], volumes = ([stepVolumeOcisStorage]))) +
+                                 (waitK3sCluster() + prepareOcisDeployment(name, params["suites"]) + setupOcisConfigMaps(name, params["suites"]) + deployOcis() + waitForOcis(ocis_url = ocis_url) + ociswrapper() + waitForOciswrapper() if run_on_k8s else ocisServer(storage, extra_server_environment = params["extraServerEnvironment"], with_wrapper = True, tika_enabled = params["tikaNeeded"], volumes = ([stepVolumeOcisStorage]))) +
                                  [
                                      {
                                          "name": "run-api-tests",
@@ -3824,7 +3825,7 @@ def waitK3sCluster():
         ],
     }]
 
-def prepareOcisDeployment(suite_name = ""):
+def prepareOcisDeployment(suite_name = "", suites = []):
     commands = [
         "make -C %s build" % dirs["ocisWrapper"],
         "mv %s/tests/config/drone/k8s/values.yaml %s/ocis-charts/charts/ocis/ci/deployment-values.yaml" % (dirs["base"], dirs["base"]),
@@ -3836,14 +3837,18 @@ def prepareOcisDeployment(suite_name = ""):
         "sed -i '/- name: PROXY_HTTP_ADDR/i\\\\            - name: PROXY_ENABLE_BASIC_AUTH\\\n              value: \"true\"' ./charts/ocis/templates/proxy/deployment.yaml",
     ]
 
-    # Only add banned password patches for sharingNgLinkShare suite
-    if suite_name == "sharingNgLinkShare":
+    # Only add banned password patches for sharingNgLinkShare suite and coreApiSharePublicLink2 suite
+    if suite_name == "sharingNgLinkShare" or "coreApiSharePublicLink2" in suites:
         commands.extend([
-            # Patch sharing deployment for banned password list
-            "sed -i 's|/etc/ocis/sharing-banned-passwords.txt|/etc/ocis/config/drone/banned-password-list.txt|' ./charts/ocis/templates/sharing/deployment.yaml",
+            # Patch sharing deployment and frontend deployment for banned password list
+            "sed -i 's|/etc/ocis/sharing-banned-passwords.txt|config/drone/banned-password-list.txt|' ./charts/ocis/templates/sharing/deployment.yaml",
             "sed -i 's|- name: configs|- name: banned-passwords|' ./charts/ocis/templates/sharing/deployment.yaml",
             "sed -i 's|mountPath: /etc/ocis$|mountPath: /etc/ocis/config/drone|' ./charts/ocis/templates/sharing/deployment.yaml",
             "sed -i 's|name: sharing-banned-passwords-{{ .appName }}|name: sharing-banned-passwords|' ./charts/ocis/templates/sharing/deployment.yaml",
+            "sed -i 's|/etc/ocis/sharing-banned-passwords.txt|config/drone/banned-password-list.txt|' ./charts/ocis/templates/frontend/deployment.yaml",
+            "sed -i 's|- name: configs|- name: banned-passwords|' ./charts/ocis/templates/frontend/deployment.yaml",
+            "sed -i 's|mountPath: /etc/ocis$|mountPath: /etc/ocis/config/drone|' ./charts/ocis/templates/frontend/deployment.yaml",
+            "sed -i 's|name: sharing-banned-passwords-{{ .appName }}|name: sharing-banned-passwords|' ./charts/ocis/templates/frontend/deployment.yaml",
         ])
 
     return [{
@@ -3858,15 +3863,15 @@ def prepareOcisDeployment(suite_name = ""):
         ],
     }]
 
-def setupOcisConfigMaps(suite_name = ""):
+def setupOcisConfigMaps(suite_name = "", suites = []):
     commands = [
         "export KUBECONFIG=%s/kubeconfig-$${DRONE_BUILD_NUMBER}.yaml" % dirs["base"],
         # Create namespace for oCIS deployment
         "kubectl create namespace ocis || true",
     ]
 
-    # Only create banned password ConfigMap for sharingNgLinkShare suite
-    if suite_name == "sharingNgLinkShare":
+    # Only create banned password ConfigMap for sharingNgLinkShare suite and coreApiSharePublicLink2 suite
+    if suite_name == "sharingNgLinkShare" or "coreApiSharePublicLink2" in suites:
         commands.append(
             "kubectl create configmap -n ocis sharing-banned-passwords --from-file=banned-password-list.txt=%s/tests/config/drone/banned-password-list.txt" % dirs["base"],
         )
