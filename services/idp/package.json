@@ -116,7 +116,7 @@
     "@babel/plugin-transform-optional-chaining": "^7.27.1",
     "@babel/plugin-transform-private-methods": "^7.27.1",
     "@babel/plugin-transform-private-property-in-object": "^7.27.1",
-    "@babel/preset-env": "^7.28.0",
+    "@babel/preset-env": "^7.28.5",
     "@babel/preset-react": "^7.27.1",
     "@babel/preset-typescript": "^7.27.1",
     "@babel/runtime": "^7.28.2",
