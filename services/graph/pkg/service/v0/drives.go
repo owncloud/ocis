@@ -425,7 +425,7 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 	if resp.GetStatus().GetCode() != cs3rpc.Code_CODE_OK {
 		if resp.GetStatus().GetCode() == cs3rpc.Code_CODE_PERMISSION_DENIED {
 			logger.Debug().Str("grpcmessage", resp.GetStatus().GetMessage()).Msg("could not create drive: permission denied")
-			errorcode.NotAllowed.Render(w, r, http.StatusForbidden, "permission denied")
+			errorcode.AccessDenied.Render(w, r, http.StatusForbidden, "permission denied")
 			return
 		}
 		if resp.GetStatus().GetCode() == cs3rpc.Code_CODE_INVALID_ARGUMENT {
@@ -603,7 +603,7 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 			return
 		case cs3rpc.Code_CODE_PERMISSION_DENIED:
 			logger.Debug().Interface("id", rid).Msg("could not update drive, permission denied")
-			errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, "drive not found")
+			errorcode.AccessDenied.Render(w, r, http.StatusForbidden, "permission denied")
 			return
 		case cs3rpc.Code_CODE_INVALID_ARGUMENT:
 			logger.Debug().Interface("id", rid).Msg("could not update drive, invalid argument")
@@ -1090,7 +1090,7 @@ func (g Graph) DeleteDrive(w http.ResponseWriter, r *http.Request) {
 		return
 	case cs3rpc.Code_CODE_PERMISSION_DENIED:
 		logger.Debug().Interface("id", rid).Msg("could not delete drive: permission denied")
-		errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, "drive not found")
+		errorcode.AccessDenied.Render(w, r, http.StatusForbidden, "permission denied")
 		return
 	case cs3rpc.Code_CODE_NOT_FOUND:
 		logger.Debug().Interface("id", rid).Msg("could not delete drive: drive not found")
