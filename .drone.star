@@ -71,6 +71,7 @@ OCIS_DOMAIN = "%s:9200" % OCIS_SERVER_NAME
 FED_OCIS_SERVER_NAME = "federation-%s" % OCIS_SERVER_NAME
 OCIS_FED_URL = "https://%s:10200" % FED_OCIS_SERVER_NAME
 OCIS_FED_DOMAIN = "%s:10200" % FED_OCIS_SERVER_NAME
+OCIS_FED_URL_K8 = "https://%s:444" % FED_OCIS_SERVER_NAME
 
 # emails
 EMAIL_PORT = "8025"
@@ -229,9 +230,9 @@ config = {
         "ocm": {
             "suites": [
                 "apiOcm",
-                "apiServiceAvailability",
             ],
             "skip": False,
+            "k8s": True,
             "withRemotePhp": [False],
             "federationServer": True,
             "emailNeeded": True,
@@ -279,6 +280,7 @@ config = {
         "cliCommands": {
             "suites": [
                 "cliCommands",
+                "apiServiceAvailability",
             ],
             "skip": False,
             "withRemotePhp": [False],
@@ -1109,7 +1111,7 @@ def localApiTestPipeline(ctx):
                         ocis_url = OCIS_URL
                         if run_on_k8s:
                             ocis_url = "https://%s" % OCIS_SERVER_NAME
-
+                            OCIS_FED_URL = OCIS_FED_URL_K8
                         pipeline = {
                             "kind": "pipeline",
                             "type": "docker",
@@ -1122,16 +1124,18 @@ def localApiTestPipeline(ctx):
                                      ([] if run_on_k8s else restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin")) +
                                      (tikaService() if params["tikaNeeded"] and not run_on_k8s else tikaServiceK8s() if params["tikaNeeded"] and run_on_k8s else []) +
                                      (waitForServices("online-offices", ["collabora:9980", "onlyoffice:443", "fakeoffice:8080"]) if params["collaborationServiceNeeded"] else []) +
-                                     (waitK3sCluster() + (enableAntivirusServiceK8s() if params["antivirusNeeded"] and run_on_k8s else []) + (emailServiceK8s() if params["emailNeeded"] and run_on_k8s else []) + prepareOcisDeployment() + setupOcisConfigMaps() + deployOcis() + waitForOcis(ocis_url = ocis_url) + ociswrapper() + waitForOciswrapper() if run_on_k8s else ocisServer(storage, extra_server_environment = params["extraServerEnvironment"], with_wrapper = True, tika_enabled = params["tikaNeeded"], volumes = ([stepVolumeOcisStorage]))) +
+                                     (waitK3sCluster() + (waitK3sCluster("2") if params["federationServer"] else []) + (enableAntivirusServiceK8s() if params["antivirusNeeded"] and run_on_k8s else []) + (emailServiceK8s() if params["emailNeeded"] and run_on_k8s else []) + prepareOcisDeployment() + setupOcisConfigMaps() + deployOcis() + waitForOcis(ocis_url = ocis_url) + (setupOcisConfigMaps("2") if params["federationServer"] else []) + (deployFederationOcisServer() if params["federationServer"] else []) + (waitForOcis(name = "federation-ocis", ocis_url = OCIS_FED_URL) if params["federationServer"] else []) + ociswrapper() + waitForOciswrapper() if run_on_k8s else ocisServer(storage, extra_server_environment = params["extraServerEnvironment"], with_wrapper = True, tika_enabled = params["tikaNeeded"], volumes = ([stepVolumeOcisStorage]))) +
                                      (waitForClamavService() if params["antivirusNeeded"] and not run_on_k8s else exposeAntivirusServiceK8s() if params["antivirusNeeded"] and run_on_k8s else []) +
                                      (waitForEmailService() if params["emailNeeded"] and not run_on_k8s else exposeEmailServiceK8s() if params["emailNeeded"] and run_on_k8s else []) +
-                                     (ocisServer(storage, deploy_type = "federation", extra_server_environment = params["extraServerEnvironment"]) if params["federationServer"] else []) +
+                                     (ocisServer(storage, deploy_type = "federation", extra_server_environment = params["extraServerEnvironment"]) if params["federationServer"] and not run_on_k8s else []) +
                                      ((wopiCollaborationService("fakeoffice") + wopiCollaborationService("collabora") + wopiCollaborationService("onlyoffice")) if params["collaborationServiceNeeded"] else []) +
                                      (ocisHealthCheck("wopi", ["wopi-collabora:9304", "wopi-onlyoffice:9304", "wopi-fakeoffice:9304"]) if params["collaborationServiceNeeded"] else []) +
                                      localApiTests(name, params["suites"], storage, params["extraEnvironment"], run_with_remote_php, ocis_url = ocis_url, k8s = run_on_k8s) +
+                                     (getOcmLogs() if params["federationServer"] and run_on_k8s else []) + (getOcmLogs("2") if params["federationServer"] and run_on_k8s else []) +
                                      apiTestFailureLog() +
                                      (generateCoverageFromAPITest(ctx, name) if not run_on_k8s else []),
-                            "services": (k3sCluster() if run_on_k8s else []) +
+                            "services": (k3sCluster(suite_name = name) if run_on_k8s else []) +
+                                        (k3sCluster2(suite_name = name) if run_on_k8s and params["federationServer"] else []) +
                                         (emailService() if params["emailNeeded"] and not run_on_k8s else []) +
                                         (clamavService() if params["antivirusNeeded"] and not run_on_k8s else []) +
                                         ((fakeOffice() + collaboraService() + onlyofficeService()) if params["collaborationServiceNeeded"] else []),
@@ -1191,10 +1195,9 @@ def generateCoverageFromAPITest(ctx, name):
 def localApiTests(name, suites, storage = "ocis", extra_environment = {}, with_remote_php = False, ocis_url = OCIS_URL, k8s = False):
     test_dir = "%s/tests/acceptance" % dirs["base"]
     expected_failures_file = "%s/expected-failures-localAPI-on-%s-storage.md" % (test_dir, storage.upper())
-
     environment = {
         "TEST_SERVER_URL": ocis_url,
-        "TEST_SERVER_FED_URL": OCIS_FED_URL,
+        "TEST_SERVER_FED_URL": OCIS_FED_URL_K8 if k8s else OCIS_FED_URL,
         "OCIS_REVA_DATA_ROOT": "%s" % (dirs["ocisRevaDataRoot"] if storage == "owncloud" else ""),
         "STORAGE_DRIVER": storage,
         "BEHAT_SUITES": ",".join(suites),
@@ -1209,7 +1212,8 @@ def localApiTests(name, suites, storage = "ocis", extra_environment = {}, with_r
 
     for item in extra_environment:
         environment[item] = extra_environment[item]
-
+    if k8s:
+        environment["EMAIL_HOST"] = OCIS_SERVER_NAME
     return [{
         "name": "localApiTests-%s" % name,
         "image": OC_CI_PHP % DEFAULT_PHP_VERSION,
@@ -3786,42 +3790,101 @@ def trivyScan(ctx):
         },
     }
 
-def k3sCluster():
+def k3sCluster(
+        name = OCIS_SERVER_NAME,
+        api_port = 33199,
+        http_port = 80,
+        https_port = 443,
+        email_port = 8025,
+        range_start = 9100,
+        range_end = 9399,
+        peer_name = FED_OCIS_SERVER_NAME,
+        peer_port = 444,
+        drone_cluster = "drone",
+        kubeconfig_suffix = "",
+        include_git_clone = True,
+        suite_name = ""):
+    commands = []
+
+    if include_git_clone:
+        commands.append("git clone --single-branch --branch main --depth 1 https://github.com/owncloud/ocis-charts.git")
+
+    commands.extend([
+        "nohup dockerd-entrypoint.sh &",
+        "until docker ps 2>&1 > /dev/null; do sleep 1s; done",
+        # create cluster
+        "k3d cluster create %s --api-port %s:%s " % (drone_cluster, name, api_port) +
+        "-p '%s:80@loadbalancer' -p '%s:443@loadbalancer' -p '%s:30325@loadbalancer' -p '%s-%s:30100-30399@loadbalancer' " % (http_port, https_port, email_port, range_start, range_end) +
+        "--k3s-arg '--tls-san=k3d@server:*' --k3s-arg '--disable=metrics-server@server:*'",
+        # wait for services to be ready
+        "until kubectl get deployment coredns -n kube-system -o go-template='{{.status.availableReplicas}}' | grep -v -e '<no value>'; do sleep 1s; done",
+        "until kubectl get deployment traefik -n kube-system -o go-template='{{.status.availableReplicas}}' | grep -v -e '<no value>'; do sleep 1s; done",
+        "k3d kubeconfig get %s > kubeconfig-$${DRONE_BUILD_NUMBER}%s.yaml" % (drone_cluster, kubeconfig_suffix),
+        "chmod 0600 kubeconfig-$${DRONE_BUILD_NUMBER}%s.yaml" % kubeconfig_suffix,
+        "printf '@@@@@@@@@@@@@@@@@@@@@@@\\n@@@@ k3d is ready @@@@\\n@@@@@@@@@@@@@@@@@@@@@@@\\n'",
+        # add dns rewrite rule
+        "kubectl create configmap coredns-custom -n kube-system " +
+        "--from-literal='rewritehost.override=rewrite name exact %s host.k3d.internal'" % name,
+        "kubectl -n kube-system rollout restart deployment coredns",
+    ])
+
+    if suite_name == "ocm":
+        commands.extend([
+            # wait for peer
+            "echo 'Waiting for %s to be available...'" % peer_name,
+            "for i in {1..60}; do if getent hosts %s > /dev/null 2>&1; then break; fi; echo 'Waiting for %s... attempt '$i; sleep 2; done" % (peer_name, peer_name),
+            # get the IP of peer
+            "PEER_IP=$(getent hosts %s | awk '{ print $1 }')" % peer_name,
+            "echo \"%s IP: $PEER_IP\"" % peer_name,
+            # create namespace for ocis
+            "kubectl create namespace ocis --dry-run=client -o yaml | kubectl apply -f -",
+            # create service in the 'ocis' namespace
+            "cat <<EOF | kubectl apply -f -\napiVersion: v1\nkind: Service\nmetadata:\n  name: %s\n  namespace: ocis\nspec:\n  type: ClusterIP\n  clusterIP: None\n  ports:\n  - port: %s\n    protocol: TCP\n---\napiVersion: v1\nkind: Endpoints\nmetadata:\n  name: %s\n  namespace: ocis\nsubsets:\n- addresses:\n  - ip: $PEER_IP\n  ports:\n  - port: %s\n    protocol: TCP\nEOF" % (peer_name, peer_port, peer_name, peer_port),
+            # verify
+            "kubectl get svc %s -n ocis" % peer_name,
+            "kubectl get endpoints %s -n ocis" % peer_name,
+        ])
+
+    commands.extend([
+        "printf '@@@@@@@@@@@@@@@@@@@@@@@\\n@@@@ k3d is ready @@@@\\n@@@@@@@@@@@@@@@@@@@@@@@\\n'",
+        # watch events
+        "kubectl get events -Aw",
+    ])
+
     return [{
-        "name": OCIS_SERVER_NAME,
+        "name": name,
         "image": K3D_IMAGE,
         "user": "root",
         "privileged": True,
-        "commands": [
-            "git clone --single-branch --branch main --depth 1 https://github.com/owncloud/ocis-charts.git",
-            "nohup dockerd-entrypoint.sh &",
-            "until docker ps 2>&1 > /dev/null; do sleep 1s; done",
-            # create cluster
-            "k3d cluster create drone --api-port %s:33199 " % OCIS_SERVER_NAME +
-            "-p '80:80@loadbalancer' -p '443:443@loadbalancer' -p '9100-9399:30100-30399@loadbalancer' " +
-            "--k3s-arg '--tls-san=k3d@server:*' --k3s-arg '--disable=metrics-server@server:*'",
-            # wait for services to be ready
-            "until kubectl get deployment coredns -n kube-system -o go-template='{{.status.availableReplicas}}' | grep -v -e '<no value>'; do sleep 1s; done",
-            "until kubectl get deployment traefik -n kube-system -o go-template='{{.status.availableReplicas}}' | grep -v -e '<no value>'; do sleep 1s; done",
-            "k3d kubeconfig get drone > kubeconfig-$${DRONE_BUILD_NUMBER}.yaml",
-            "chmod 0600 kubeconfig-$${DRONE_BUILD_NUMBER}.yaml",
-            "printf '@@@@@@@@@@@@@@@@@@@@@@@\n@@@@ k3d is ready @@@@\n@@@@@@@@@@@@@@@@@@@@@@@\n'",
-            # add dns rewrite rule
-            "kubectl create configmap coredns-custom -n kube-system " +
-            "--from-literal='rewritehost.override=rewrite name exact %s host.k3d.internal'" % OCIS_SERVER_NAME,
-            "kubectl -n kube-system rollout restart deployment coredns",
-            # watch events
-            "kubectl get events -Aw",
-        ],
+        "commands": commands,
     }]
 
-def waitK3sCluster():
+def k3sCluster2(suite_name = ""):
+    return k3sCluster(
+        name = FED_OCIS_SERVER_NAME,
+        api_port = 33299,
+        http_port = 81,
+        https_port = 444,
+        range_start = 9400,
+        range_end = 9699,
+        peer_name = OCIS_SERVER_NAME,
+        peer_port = 443,
+        drone_cluster = "drone2",
+        kubeconfig_suffix = "2",
+        include_git_clone = False,
+        suite_name = suite_name,
+    )
+
+def waitK3sCluster(suffix = ""):
+    kubeconfig_suffix = suffix if suffix else ""
+    step_name = "wait-cluster" + suffix
+
     return [{
-        "name": "wait-cluster",
+        "name": step_name,
         "image": K3D_IMAGE,
         "user": "root",
         "commands": [
-            "export KUBECONFIG=kubeconfig-$${DRONE_BUILD_NUMBER}.yaml",
+            "export KUBECONFIG=kubeconfig-$${DRONE_BUILD_NUMBER}" + kubeconfig_suffix + ".yaml",
             "timeout 300 bash -c 'until test -f $${KUBECONFIG}; do sleep 1; done'",
             "kubectl config view",
             "kubectl get pods -A",
@@ -3855,7 +3918,7 @@ def prepareOcisDeployment():
 
     return [{
         "name": "prepare-ocis-deployment",
-        "image": "owncloudci/golang:1.25",
+        "image": "owncloudci/golang:latest",
         "commands": commands,
         "volumes": [
             {
@@ -3865,9 +3928,12 @@ def prepareOcisDeployment():
         ],
     }]
 
-def setupOcisConfigMaps():
+def setupOcisConfigMaps(suffix = ""):
+    kubeconfig_suffix = suffix if suffix else ""
+    step_name = "setup-configmaps" + kubeconfig_suffix
+
     commands = [
-        "export KUBECONFIG=%s/kubeconfig-$${DRONE_BUILD_NUMBER}.yaml" % dirs["base"],
+        "export KUBECONFIG=%s/kubeconfig-$${DRONE_BUILD_NUMBER}%s.yaml" % (dirs["base"], kubeconfig_suffix),
         # Create namespace for oCIS deployment
         "kubectl create namespace ocis || true",
         "kubectl create configmap -n ocis sharing-banned-passwords --from-file=banned-password-list.txt=%s/tests/config/drone/banned-password-list.txt" % dirs["base"],
@@ -3878,7 +3944,7 @@ def setupOcisConfigMaps():
     ]
 
     return [{
-        "name": "setup-configmaps",
+        "name": step_name,
         "image": K3D_IMAGE,
         "user": "root",
         "commands": commands,
@@ -3887,12 +3953,69 @@ def setupOcisConfigMaps():
 def deployOcis():
     return [{
         "name": "deploy-ocis",
-        "image": "owncloudci/golang:1.25",
+        "image": "owncloudci/golang:latest",
         "commands": [
             "export KUBECONFIG=%s/kubeconfig-$${DRONE_BUILD_NUMBER}.yaml" % dirs["base"],
             "cd %s/ocis-charts" % dirs["base"],
             "make helm-install-atomic",
         ],
+        "volumes": [
+            {
+                "name": "gopath",
+                "path": "/go",
+            },
+        ],
+    }]
+
+def getOcmLogs(suffix = ""):
+    kubeconfig_suffix = suffix if suffix else ""
+    step_name = "ocm-logs" + kubeconfig_suffix
+
+    commands = [
+        "export KUBECONFIG=%s/kubeconfig-$${DRONE_BUILD_NUMBER}%s.yaml" % (dirs["base"], kubeconfig_suffix),
+        "kubectl logs -n ocis deploy/ocm",
+    ]
+
+    return [{
+        "name": step_name,
+        "image": K3D_IMAGE,
+        "user": "root",
+        "commands": commands,
+        "when": {
+            "status": [
+                "failure",
+            ],
+        },
+    }]
+
+def deployFederationOcisServer():
+    commands = [
+        "export KUBECONFIG=%s/kubeconfig-$${DRONE_BUILD_NUMBER}2.yaml" % dirs["base"],
+        "cd %s/ocis-charts" % dirs["base"],
+        "sed -i 's|externalDomain: ocis-server|externalDomain: %s|' ./charts/ocis/ci/deployment-values.yaml" % FED_OCIS_SERVER_NAME,
+        "sed -i 's|https://{{ .Values.externalDomain }}|https://{{ .Values.externalDomain }}:444|' ./charts/ocis/templates/authbasic/deployment.yaml",
+        "sed -i 's|https://{{ .Values.externalDomain }}|https://{{ .Values.externalDomain }}:444|' ./charts/ocis/templates/frontend/deployment.yaml",
+        "sed -i 's|https://{{ .Values.externalDomain }}|https://{{ .Values.externalDomain }}:444|' ./charts/ocis/templates/gateway/deployment.yaml",
+        "sed -i 's|https://{{ .Values.externalDomain }}|https://{{ .Values.externalDomain }}:444|' ./charts/ocis/templates/graph/deployment.yaml",
+        "sed -i 's|https://{{ .Values.externalDomain }}|https://{{ .Values.externalDomain }}:444|' ./charts/ocis/templates/groups/deployment.yaml",
+        "sed -i 's|https://{{ .Values.externalDomain }}|https://{{ .Values.externalDomain }}:444|' ./charts/ocis/templates/idm/deployment.yaml",
+        "sed -i 's|https://{{ .Values.externalDomain }}|https://{{ .Values.externalDomain }}:444|' ./charts/ocis/templates/idp/deployment.yaml",
+        "sed -i 's|https://{{ .Values.externalDomain }}|https://{{ .Values.externalDomain }}:444|' ./charts/ocis/templates/notifications/deployment.yaml",
+        "sed -i 's|https://{{ .Values.externalDomain }}|https://{{ .Values.externalDomain }}:444|' ./charts/ocis/templates/ocdav/deployment.yaml",
+        "sed -i 's|https://{{ .Values.externalDomain }}|https://{{ .Values.externalDomain }}:444|' ./charts/ocis/templates/ocm/deployment.yaml",
+        "sed -i 's|https://{{ .Values.externalDomain }}|https://{{ .Values.externalDomain }}:444|' ./charts/ocis/templates/ocs/deployment.yaml",
+        "sed -i 's|https://{{ .Values.externalDomain }}|https://{{ .Values.externalDomain }}:444|' ./charts/ocis/templates/proxy/deployment.yaml",
+        "sed -i 's|https://{{ .Values.externalDomain }}|https://{{ .Values.externalDomain }}:444|' ./charts/ocis/templates/users/deployment.yaml",
+        "sed -i 's|https://{{ .Values.externalDomain }}|https://{{ .Values.externalDomain }}:444|' ./charts/ocis/templates/web/deployment.yaml",
+        "sed -i 's|https://{{ .Values.externalDomain }}|https://{{ .Values.externalDomain }}:444|' ./charts/ocis/templates/webdav/deployment.yaml",
+        "sed -i 's|https://{{ .Values.externalDomain }}|https://{{ .Values.externalDomain }}:444|' ./charts/ocis/templates/webfinger/deployment.yaml",
+        "make helm-install-atomic",
+    ]
+
+    return [{
+        "name": "deploy-federation-ocis-server",
+        "image": "owncloudci/golang:latest",
+        "commands": commands,
         "volumes": [
             {
                 "name": "gopath",
@@ -3927,8 +4050,10 @@ def exposeEmailServiceK8s():
         "name": EMAIL_SMTP_HOST,
         "image": K3D_IMAGE,
         "commands": [
-            "kubectl port-forward svc/mailpit %s:%s -n ocis" % (EMAIL_PORT, EMAIL_PORT),
-            "kubectl port-forward svc/mailpit 9174:9174 -n ocis",
+            "export KUBECONFIG=%s/kubeconfig-$${DRONE_BUILD_NUMBER}.yaml" % dirs["base"],
+            "until test -f $${KUBECONFIG}; do sleep 1s; done",
+            "kubectl -n ocis expose deployment mailpit --type=NodePort --port=8025 --name=mailpit-np",
+            "kubectl -n ocis patch svc mailpit-np -p '{\"spec\":{\"ports\":[{\"port\":8025,\"nodePort\":30325,\"targetPort\":8025}]}}'",
         ],
         "detach": True,
     }]
