@@ -257,8 +257,19 @@ func (g Graph) getDrives(r *http.Request, unrestricted bool, apiVersion APIVersi
 	return spaces, nil
 }
 
-// GetSingleDrive does a lookup of a single space by spaceId
+// GetSingleDrive V1 does a lookup of a single space by spaceId
 func (g Graph) GetSingleDrive(w http.ResponseWriter, r *http.Request) {
+	g.getSingleDrive(w, r, APIVersion_1)
+}
+
+// GetSingleDriveV1Beta1 does a lookup of a single space by spaceId
+// it uses unified roles instead of the cs3 representations
+func (g Graph) GetSingleDriveV1Beta1(w http.ResponseWriter, r *http.Request) {
+	g.getSingleDrive(w, r, APIVersion_1_Beta_1)
+}
+
+// GetSingleDrive does a lookup of a single space by spaceId
+func (g Graph) getSingleDrive(w http.ResponseWriter, r *http.Request, apiVersion APIVersion) {
 	ctx := r.Context()
 	logger := g.logger.SubloggerWithRequestID(ctx)
 	logger.Info().Interface("query", r.URL.Query()).Msg("calling get drive")
@@ -302,7 +313,7 @@ func (g Graph) GetSingleDrive(w http.ResponseWriter, r *http.Request) {
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		return
 	}
-	spaces, err := g.formatDrives(ctx, webDavBaseURL, res.StorageSpaces, APIVersion_1)
+	spaces, err := g.formatDrives(ctx, webDavBaseURL, res.StorageSpaces, apiVersion)
 	if err != nil {
 		log.Debug().Err(err).Msg("could not get drive: error parsing grpc response")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
@@ -339,6 +350,17 @@ func (g Graph) canCreateSpace(ctx context.Context, ownPersonalHome bool) bool {
 
 // CreateDrive creates a storage drive (space).
 func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
+	g.createDrive(w, r, APIVersion_1)
+}
+
+// CreateDriveV1Beta1 creates a storage drive (space).
+// it uses unified roles instead of the cs3 representations
+func (g Graph) CreateDriveV1Beta1(w http.ResponseWriter, r *http.Request) {
+	g.createDrive(w, r, APIVersion_1_Beta_1)
+}
+
+// CreateDrive creates a storage drive (space).
+func (g Graph) createDrive(w http.ResponseWriter, r *http.Request, apiVersion APIVersion) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 	logger.Info().Msg("calling create drive")
 
@@ -462,8 +484,7 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-
-	spaces, err := g.formatDrives(ctx, webDavBaseURL, []*storageprovider.StorageSpace{space}, APIVersion_1)
+	spaces, err := g.formatDrives(ctx, webDavBaseURL, []*storageprovider.StorageSpace{space}, apiVersion)
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not get drive: error parsing grpc response")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
@@ -481,6 +502,17 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 
 // UpdateDrive updates the properties of a storage drive (space).
 func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
+	g.updateDrive(w, r, APIVersion_1)
+}
+
+// UpdateDrive updates the properties of a storage drive (space).
+// it uses unified roles instead of the cs3 representations
+func (g Graph) UpdateDriveV1Beta1(w http.ResponseWriter, r *http.Request) {
+	g.updateDrive(w, r, APIVersion_1_Beta_1)
+}
+
+// UpdateDrive updates the properties of a storage drive (space).
+func (g Graph) updateDrive(w http.ResponseWriter, r *http.Request, apiVersion APIVersion) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 	logger.Info().Msg("calling update drive")
 
@@ -627,7 +659,7 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	spaces, err := g.formatDrives(r.Context(), webDavBaseURL, []*storageprovider.StorageSpace{resp.StorageSpace}, APIVersion_1)
+	spaces, err := g.formatDrives(r.Context(), webDavBaseURL, []*storageprovider.StorageSpace{resp.StorageSpace}, apiVersion)
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not update drive: error parsing grpc response")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
