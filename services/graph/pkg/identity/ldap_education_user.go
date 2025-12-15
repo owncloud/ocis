@@ -53,14 +53,13 @@ func (i *LDAP) CreateEducationUser(ctx context.Context, user libregraph.Educatio
 }
 
 // DeleteEducationUser deletes a given education user, identified by username or id, from the backend
-func (i *LDAP) DeleteEducationUser(ctx context.Context, nameOrID string) error {
+func (i *LDAP) DeleteEducationUser(ctx context.Context, id string) error {
 	logger := i.logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "ldap").Msg("DeleteEducationUser")
 	if !i.writeEnabled {
 		return ErrReadOnly
 	}
-	// TODO, implement a proper lookup for education Users here
-	e, err := i.getEducationUserByNameOrID(nameOrID)
+	e, err := i.getEducationUser(id)
 	if err != nil {
 		return err
 	}
@@ -73,13 +72,13 @@ func (i *LDAP) DeleteEducationUser(ctx context.Context, nameOrID string) error {
 }
 
 // UpdateEducationUser applies changes to given education user, identified by username or id
-func (i *LDAP) UpdateEducationUser(ctx context.Context, nameOrID string, user libregraph.EducationUser) (*libregraph.EducationUser, error) {
+func (i *LDAP) UpdateEducationUser(ctx context.Context, id string, user libregraph.EducationUser) (*libregraph.EducationUser, error) {
 	logger := i.logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "ldap").Msg("UpdateEducationUser")
 	if !i.writeEnabled {
 		return nil, ErrReadOnly
 	}
-	e, err := i.getEducationUserByNameOrID(nameOrID)
+	e, err := i.getEducationUser(id)
 	if err != nil {
 		return nil, err
 	}
@@ -189,10 +188,10 @@ func (i *LDAP) UpdateEducationUser(ctx context.Context, nameOrID string, user li
 }
 
 // GetEducationUser implements the EducationBackend interface for the LDAP backend.
-func (i *LDAP) GetEducationUser(ctx context.Context, nameOrID string) (*libregraph.EducationUser, error) {
+func (i *LDAP) GetEducationUser(ctx context.Context, id string) (*libregraph.EducationUser, error) {
 	logger := i.logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "ldap").Msg("GetEducationUser")
-	e, err := i.getEducationUserByNameOrID(nameOrID)
+	e, err := i.getEducationUser(id)
 	if err != nil {
 		return nil, err
 	}
@@ -257,6 +256,7 @@ func (i *LDAP) educationUserToUser(eduUser libregraph.EducationUser) *libregraph
 	user.Mail = eduUser.Mail
 	user.UserType = eduUser.UserType
 	user.Identities = eduUser.Identities
+	user.ExternalID = eduUser.ExternalID
 
 	return user
 }
@@ -272,6 +272,7 @@ func (i *LDAP) userToEducationUser(user libregraph.User, e *ldap.Entry) *libregr
 	eduUser.Mail = user.Mail
 	eduUser.UserType = user.UserType
 	eduUser.Identities = user.Identities
+	eduUser.ExternalID = user.ExternalID
 
 	if e != nil {
 		// Set the education User specific Attributes from the supplied LDAP Entry
@@ -326,6 +327,7 @@ func (i *LDAP) getEducationUserAttrTypes() []string {
 		i.userAttributeMap.accountEnabled,
 		i.userAttributeMap.userType,
 		i.userAttributeMap.identities,
+		i.userAttributeMap.externalID,
 		i.educationConfig.userAttributeMap.primaryRole,
 		i.educationConfig.memberOfSchoolAttribute,
 	}
@@ -341,6 +343,13 @@ func (i *LDAP) getEducationUserByDN(dn string) (*ldap.Entry, error) {
 	return i.getEntryByDN(dn, i.getEducationUserAttrTypes(), filter)
 }
 
+func (i *LDAP) getEducationUser(nameOrID string) (*ldap.Entry, error) {
+	if i.useExternalID {
+		return i.getEducationUserByExternalID(nameOrID)
+	}
+	return i.getEducationUserByNameOrID(nameOrID)
+}
+
 func (i *LDAP) getEducationUserByNameOrID(nameOrID string) (*ldap.Entry, error) {
 	return i.getEducationObjectByNameOrID(
 		nameOrID,
@@ -353,9 +362,25 @@ func (i *LDAP) getEducationUserByNameOrID(nameOrID string) (*ldap.Entry, error) 
 	)
 }
 
+func (i *LDAP) getEducationUserByExternalID(id string) (*ldap.Entry, error) {
+	return i.getEducationObjectByID(
+		id,
+		i.userAttributeMap.externalID,
+		i.userFilter,
+		i.educationConfig.userObjectClass,
+		i.userBaseDN,
+		i.getEducationUserAttrTypes(),
+	)
+}
+
 func (i *LDAP) getEducationObjectByNameOrID(nameOrID, nameAttribute, idAttribute, objectFilter, objectClass, baseDN string, attributes []string) (*ldap.Entry, error) {
 	nameOrID = ldap.EscapeFilter(nameOrID)
 	filter := fmt.Sprintf("(|(%s=%s)(%s=%s))", nameAttribute, nameOrID, idAttribute, nameOrID)
+	return i.getEducationObjectByFilter(filter, baseDN, objectFilter, objectClass, attributes)
+}
+
+func (i *LDAP) getEducationObjectByID(id, idAttribute, objectFilter, objectClass, baseDN string, attributes []string) (*ldap.Entry, error) {
+	filter := fmt.Sprintf("(%s=%s)", idAttribute, id)
 	return i.getEducationObjectByFilter(filter, baseDN, objectFilter, objectClass, attributes)
 }
 

@@ -104,7 +104,7 @@
               "swatch-passive-muted": "#283e5d",
               "swatch-passive-contrast": "#ffffff",
               "swatch-primary-default": "#456FB3",
-              "swatch-primary-hover": "#80a7d7",
+              "swatch-primary-hover": "oklch(0.5698 0.1232 258.67)",
               "swatch-primary-muted": "#2c588e",
               "swatch-primary-muted-hover": "rgb(36, 75, 119)",
               "swatch-primary-gradient": "#4e85c8",

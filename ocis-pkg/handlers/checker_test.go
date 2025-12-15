@@ -125,3 +125,93 @@ func TestCheckHandler(t *testing.T) {
 		require.Equal(t, 2, len(slices.DeleteFunc(errs, func(err error) bool { return err != nil })))
 	})
 }
+
+var splitHostPortScenarios = []struct {
+	name    string
+	input   string
+	address string
+	port    string
+}{
+	{
+		"ipv4 host",
+		"10.10.10.10",
+		"10.10.10.10",
+		"",
+	},
+	{
+		"ipv4 host with port",
+		"10.10.10.10:123",
+		"10.10.10.10",
+		"123",
+	},
+	{
+		"port only",
+		":123",
+		"",
+		"123",
+	},
+	{
+		"ipv6 host",
+		"2a01::1",
+		"2a01::1",
+		"",
+	},
+	{
+		"ipv6 localhost",
+		"::1",
+		"::1",
+		"",
+	},
+	{
+		"ipv6 host in brackets",
+		"[2a01::1]",
+		"2a01::1",
+		"",
+	},
+	{
+		"ipv6 host with port",
+		"[2a01::1]:123",
+		"2a01::1",
+		"123",
+	},
+	{
+		"localhost",
+		"localhost",
+		"localhost",
+		"",
+	},
+	{
+		"localhost with port",
+		"localhost:123",
+		"localhost",
+		"123",
+	},
+	{
+		"localhost with port",
+		"localhost:123",
+		"localhost",
+		"123",
+	},
+	{
+		"number only",
+		"123",
+		"123",
+		"",
+	},
+	{
+		"double bracket",
+		"[aa::aa]]:123",
+		"[aa::aa]]:123",
+		"",
+	},
+}
+
+func TestSplitHostPort(t *testing.T) {
+	for _, scenario := range splitHostPortScenarios {
+		t.Run(scenario.name, func(t *testing.T) {
+			address, port := handlers.SplitHostPort(scenario.input)
+			require.Equal(t, scenario.address, address)
+			require.Equal(t, scenario.port, port)
+		})
+	}
+}

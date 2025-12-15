@@ -72,6 +72,8 @@ type LDAP struct {
 
 	educationConfig educationConfig
 
+	useExternalID bool
+
 	logger *log.Logger
 	conn   ldap.Client
 }
@@ -87,6 +89,7 @@ type userAttributeMap struct {
 	userType       string
 	identities     string
 	lastSignIn     string
+	externalID     string
 }
 
 type ldapAttributeValues map[string][]string
@@ -122,6 +125,7 @@ func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger) (*LD
 		userType:       config.UserTypeAttribute,
 		identities:     identitiesAttribute,
 		lastSignIn:     lastSignAttribute,
+		externalID:     config.ExternalIDAttribute,
 	}
 
 	if config.GroupNameAttribute == "" || config.GroupIDAttribute == "" {
@@ -176,6 +180,7 @@ func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger) (*LD
 		conn:                    lc,
 		writeEnabled:            config.WriteEnabled,
 		refintEnabled:           config.RefintEnabled,
+		useExternalID:           config.RequireExternalID,
 	}, nil
 }
 
@@ -844,6 +849,7 @@ func (i *LDAP) createUserModelFromLDAP(e *ldap.Entry) *libregraph.User {
 			GivenName:                pointerOrNil(e.GetEqualFoldAttributeValue(i.userAttributeMap.givenName)),
 			Surname:                  &surname,
 			AccountEnabled:           booleanOrNil(e.GetEqualFoldAttributeValue(i.userAttributeMap.accountEnabled)),
+			ExternalID:               pointerOrNil(e.GetEqualFoldAttributeValue(i.userAttributeMap.externalID)),
 		}
 
 		userType := e.GetEqualFoldAttributeValue(i.userAttributeMap.userType)
@@ -887,6 +893,7 @@ func (i *LDAP) userToLDAPAttrValues(user libregraph.User) (map[string][]string, 
 		"objectClass":                  {"inetOrgPerson", "organizationalPerson", "person", "top", "ownCloudUser"},
 		"cn":                           {user.GetOnPremisesSamAccountName()},
 		i.userAttributeMap.userType:    {user.GetUserType()},
+		i.userAttributeMap.externalID:  {user.GetExternalID()},
 	}
 
 	if identities, ok := user.GetIdentitiesOk(); ok {
@@ -957,6 +964,7 @@ func (i *LDAP) getUserAttrTypesForSearch() []string {
 		i.userAttributeMap.userType,
 		i.userAttributeMap.identities,
 		i.userAttributeMap.lastSignIn,
+		i.userAttributeMap.externalID,
 	}
 }
 

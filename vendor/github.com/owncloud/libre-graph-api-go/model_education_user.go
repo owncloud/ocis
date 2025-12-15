@@ -45,6 +45,8 @@ type EducationUser struct {
 	PrimaryRole *string `json:"primaryRole,omitempty"`
 	// The user`s type. This can be either \"Member\" for regular user, \"Guest\" for guest users or \"Federated\" for users imported from a federated instance.
 	UserType *string `json:"userType,omitempty"`
+	// A unique identifier for the user assigned by the school or institution.
+	ExternalID *string `json:"externalID,omitempty"`
 }
 
 // NewEducationUser instantiates a new EducationUser object
@@ -512,6 +514,38 @@ func (o *EducationUser) SetUserType(v string) {
 	o.UserType = &v
 }
 
+// GetExternalID returns the ExternalID field value if set, zero value otherwise.
+func (o *EducationUser) GetExternalID() string {
+	if o == nil || IsNil(o.ExternalID) {
+		var ret string
+		return ret
+	}
+	return *o.ExternalID
+}
+
+// GetExternalIDOk returns a tuple with the ExternalID field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *EducationUser) GetExternalIDOk() (*string, bool) {
+	if o == nil || IsNil(o.ExternalID) {
+		return nil, false
+	}
+	return o.ExternalID, true
+}
+
+// HasExternalID returns a boolean if a field has been set.
+func (o *EducationUser) HasExternalID() bool {
+	if o != nil && !IsNil(o.ExternalID) {
+		return true
+	}
+
+	return false
+}
+
+// SetExternalID gets a reference to the given string and assigns it to the ExternalID field.
+func (o *EducationUser) SetExternalID(v string) {
+	o.ExternalID = &v
+}
+
 func (o EducationUser) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -563,6 +597,9 @@ func (o EducationUser) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.UserType) {
 		toSerialize["userType"] = o.UserType
+	}
+	if !IsNil(o.ExternalID) {
+		toSerialize["externalID"] = o.ExternalID
 	}
 	return toSerialize, nil
 }

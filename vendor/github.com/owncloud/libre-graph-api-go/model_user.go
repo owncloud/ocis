@@ -50,6 +50,8 @@ type User struct {
 	// Represents the users language setting, ISO-639-1 Code
 	PreferredLanguage *string         `json:"preferredLanguage,omitempty"`
 	SignInActivity    *SignInActivity `json:"signInActivity,omitempty"`
+	// A unique identifier assigned to the user by the organization.
+	ExternalID *string `json:"externalID,omitempty"`
 }
 
 type _User User
@@ -569,6 +571,38 @@ func (o *User) SetSignInActivity(v SignInActivity) {
 	o.SignInActivity = &v
 }
 
+// GetExternalID returns the ExternalID field value if set, zero value otherwise.
+func (o *User) GetExternalID() string {
+	if o == nil || IsNil(o.ExternalID) {
+		var ret string
+		return ret
+	}
+	return *o.ExternalID
+}
+
+// GetExternalIDOk returns a tuple with the ExternalID field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *User) GetExternalIDOk() (*string, bool) {
+	if o == nil || IsNil(o.ExternalID) {
+		return nil, false
+	}
+	return o.ExternalID, true
+}
+
+// HasExternalID returns a boolean if a field has been set.
+func (o *User) HasExternalID() bool {
+	if o != nil && !IsNil(o.ExternalID) {
+		return true
+	}
+
+	return false
+}
+
+// SetExternalID gets a reference to the given string and assigns it to the ExternalID field.
+func (o *User) SetExternalID(v string) {
+	o.ExternalID = &v
+}
+
 func (o User) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -622,6 +656,9 @@ func (o User) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.SignInActivity) {
 		toSerialize["signInActivity"] = o.SignInActivity
+	}
+	if !IsNil(o.ExternalID) {
+		toSerialize["externalID"] = o.ExternalID
 	}
 	return toSerialize, nil
 }

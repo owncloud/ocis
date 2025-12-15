@@ -135,6 +135,14 @@ variables:
     Services can have, if available, an individual setting with an own environment
     variable.
   do_ignore: false
+- rawname: OCIS_BASE_DATA_PATH
+  path: ocis/pkg/command/shares.go:50
+  foundincode: true
+  name: OCIS_BASE_DATA_PATH
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: true
 - rawname: OCIS_CONFIG_DIR
   path: ocis-pkg/config/defaults/paths.go:56
   foundincode: true
@@ -148,7 +156,7 @@ variables:
   path: ocis-pkg/service/grpc/client.go:77
   foundincode: true
   name: OCIS_INSECURE
-  type: ""
+  type: bool
   default_value: "false"
   description: Insecure TLS mode is only allowed in development environments with
     OCIS_INSECURE=true

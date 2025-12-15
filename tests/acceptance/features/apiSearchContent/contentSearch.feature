@@ -67,7 +67,7 @@ Feature: content search
   @env-config
   Scenario Outline: search files by stop words when clean_stop_words is disabled
     Given using <dav-path-version> DAV path
-    And the config "SEARCH_EXTRACTOR_TIKA_CLEAN_STOP_WORDS" has been set to "false"
+    And the config "SEARCH_EXTRACTOR_TIKA_CLEAN_STOP_WORDS" has been set to "false" for "search" service
     And user "Alice" has uploaded file with content "He has expirience, we must to have, I have to find ...." to "fileWithStopWords.txt"
     When user "Alice" searches for 'Content:"he has"' using the WebDAV API
     Then the HTTP status code should be "207"

@@ -235,14 +235,17 @@ class OcisConfigContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function theConfigHasBeenSetToPath(string $configVariable, string $path, ?string $serviceName = null): void {
-		$path = \dirname(__FILE__) . "/../../" . $path;
 		if (getenv("K8S") === "true") {
+			// In K8s, use the path where the ConfigMap is mounted
+			// For example: The banned-password-list.txt is mounted at /etc/ocis/config/drone/
+			$k8sPath = "/etc/ocis/" . $path;
 			$envs = [
-				$serviceName => [$configVariable => $path],
+				$serviceName => [$configVariable => $k8sPath],
 			];
 			$response = OcisConfigHelper::reConfigureOcisK8s($envs);
 
 		} else {
+			$path = \dirname(__FILE__) . "/../../" . $path;
 			$envs = [
 				$configVariable => $path,
 			];
@@ -267,7 +270,7 @@ class OcisConfigContext implements Context {
 		$envs = [];
 		if (getenv("K8S") === "true") {
 			foreach ($table->getHash() as $row) {
-				$envs[$row['service']] = [$row['config'] => $row['value']];
+				$envs[$row['service']][$row['config']] = $row['value'];
 			}
 			$response = OcisConfigHelper::reConfigureOcisK8s($envs);
 		} else {

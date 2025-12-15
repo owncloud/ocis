@@ -258,6 +258,7 @@ var _ = Describe("EducationUsers", func() {
 			user.SetAccountEnabled(true)
 			user.SetIdentities([]libregraph.ObjectIdentity{identity})
 			user.SetPrimaryRole("student")
+			user.SetExternalID("external-id-12345")
 		})
 
 		It("handles invalid bodies", func() {

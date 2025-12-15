@@ -37,6 +37,7 @@ var lconfig = config.LDAP{
 	UserNameAttribute:        "uid",
 	UserEnabledAttribute:     "userEnabledAttribute",
 	UserTypeAttribute:        "userTypeAttribute",
+	ExternalIDAttribute:      "externalID",
 	LdapDisabledUsersGroupDN: disableUsersGroup,
 	DisableUserMechanism:     "attribute",
 
@@ -72,7 +73,7 @@ var invalidUserEntry = ldap.NewEntry("uid=user",
 
 var logger = log.NewLogger(log.Level("debug"))
 
-var ldapUserAttributes = []string{"displayname", "entryUUID", "mail", "uid", "sn", "givenname", "userEnabledAttribute", "userTypeAttribute", "oCExternalIdentity", "oCLastSignInTimestamp"}
+var ldapUserAttributes = []string{"displayname", "entryUUID", "mail", "uid", "sn", "givenname", "userEnabledAttribute", "userTypeAttribute", "oCExternalIdentity", "oCLastSignInTimestamp", "externalID"}
 
 func TestNewLDAPBackend(t *testing.T) {
 	l := &mocks.Client{}
@@ -122,6 +123,7 @@ func TestCreateUser(t *testing.T) {
 	ar.Attribute("givenname", []string{givenName})
 	ar.Attribute(lconfig.UserEnabledAttribute, []string{"TRUE"})
 	ar.Attribute(lconfig.UserTypeAttribute, []string{"Member"})
+	ar.Attribute(lconfig.ExternalIDAttribute, []string{"abcd-efgh-ijkl-mnop"})
 	ar.Attribute("cn", []string{userName})
 	ar.Attribute("objectClass", []string{"inetOrgPerson", "organizationalPerson", "person", "top", "ownCloudUser"})
 
@@ -141,6 +143,7 @@ func TestCreateUser(t *testing.T) {
 	user.SetGivenName(givenName)
 	user.SetAccountEnabled(true)
 	user.SetUserType(userType)
+	user.SetExternalID("abcd-efgh-ijkl-mnop")
 
 	c := lconfig
 	c.UseServerUUID = true
