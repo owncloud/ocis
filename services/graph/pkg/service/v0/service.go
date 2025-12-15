@@ -237,6 +237,7 @@ func NewService(opts ...Option) (Graph, error) { //nolint:maintidx
 			r.Route("/drives", func(r chi.Router) {
 				r.Get("/", svc.GetAllDrives(APIVersion_1_Beta_1))
 				r.Route("/{driveID}", func(r chi.Router) {
+					r.Get("/", svc.GetSingleDriveV1Beta1)
 					r.Route("/root", func(r chi.Router) {
 						r.Post("/children", drivesDriveItemApi.CreateDriveItem)
 						r.Post("/invite", driveItemPermissionsApi.SpaceRootInvite)
