@@ -11,17 +11,12 @@ Feature: Password policy for public links password
 
   Background:
     Given the following configs have been set:
-      | service | config                                        | value |
-      | sharing | OCIS_PASSWORD_POLICY_MIN_CHARACTERS           | 13    |
-      | sharing | OCIS_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS | 3     |
-      | sharing | OCIS_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS | 2     |
-      | sharing | OCIS_PASSWORD_POLICY_MIN_DIGITS               | 2     |
-      | sharing | OCIS_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS   | 2     |
-      | frontend | OCIS_PASSWORD_POLICY_MIN_CHARACTERS           | 13    |
-      | frontend | OCIS_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS | 3     |
-      | frontend | OCIS_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS | 2     |
-      | frontend | OCIS_PASSWORD_POLICY_MIN_DIGITS               | 2     |
-      | frontend | OCIS_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS   | 2     |
+      | service | config                                           | value |
+      | sharing | SHARING_PASSWORD_POLICY_MIN_CHARACTERS           | 13    |
+      | sharing | SHARING_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS | 3     |
+      | sharing | SHARING_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS | 2     |
+      | sharing | SHARING_PASSWORD_POLICY_MIN_DIGITS               | 2     |
+      | sharing | SHARING_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS   | 2     |
     And user "Alice" has been created with default attributes
     And using SharingNG
 
