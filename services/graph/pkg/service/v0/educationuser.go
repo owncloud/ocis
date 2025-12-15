@@ -70,6 +70,12 @@ func (g Graph) PostEducationUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if _, ok := u.GetExternalIDOk(); !ok && g.config.Identity.LDAP.RequireExternalID {
+		logger.Debug().Err(err).Interface("user", u).Msg("could not create education user: missing required Attribute: 'externalID'")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing required Attribute: 'externalID'")
+		return
+	}
+
 	if _, ok := u.GetDisplayNameOk(); !ok {
 		logger.Debug().Err(err).Interface("user", u).Msg("could not create education user: missing required Attribute: 'displayName'")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing required Attribute: 'displayName'")
@@ -279,8 +285,8 @@ func (g Graph) DeleteEducationUser(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	logger.Debug().Str("id", user.GetId()).Msg("calling delete education user on backend")
-	err = g.identityEducationBackend.DeleteEducationUser(r.Context(), user.GetId())
+	logger.Debug().Str("id", user.GetExternalID()).Msg("calling delete education user on backend")
+	err = g.identityEducationBackend.DeleteEducationUser(r.Context(), user.GetExternalID())
 
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not delete education user: backend error")

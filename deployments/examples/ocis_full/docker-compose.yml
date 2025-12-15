@@ -2,7 +2,6 @@
 services:
   traefik:
     image: traefik:${TRAEFIK_DOCKER_TAG:-latest}
-    # release notes: https://github.com/traefik/traefik/releases
     networks:
       ocis-net:
     command:
@@ -24,6 +23,10 @@ services:
       - "--entryPoints.https.transport.respondingTimeouts.readTimeout=12h"
       - "--entryPoints.https.transport.respondingTimeouts.writeTimeout=12h"
       - "--entryPoints.https.transport.respondingTimeouts.idleTimeout=3m"
+      # allow encoded characters which is required for collaboration/Collabora
+      - "--entryPoints.https.http.encodedCharacters.allowEncodedSlash=true"
+      - "--entryPoints.https.http.encodedCharacters.allowEncodedQuestionMark=true"
+      - "--entryPoints.https.http.encodedCharacters.allowEncodedPercent=true"
       # docker provider (get configuration from container labels)
       - "--providers.docker.endpoint=unix:///var/run/docker.sock"
       - "--providers.docker.exposedByDefault=false"

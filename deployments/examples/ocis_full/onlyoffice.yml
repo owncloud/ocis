@@ -46,7 +46,6 @@ services:
   onlyoffice:
     # note, you also need to add a volume when using the enterprise version, see below
     image: ${ONLYOFFICE_IMAGE:-onlyoffice/documentserver}:${ONLYOFFICE_DOCKER_TAG:-latest}
-    # changelog https://github.com/ONLYOFFICE/DocumentServer/releases
     networks:
       ocis-net:
     entrypoint:

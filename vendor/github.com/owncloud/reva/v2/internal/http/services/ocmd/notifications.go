@@ -29,10 +29,10 @@ import (
 	ocmcore "github.com/cs3org/go-cs3apis/cs3/ocm/core/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	"github.com/go-chi/render"
 	"github.com/owncloud/reva/v2/pkg/appctx"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/owncloud/reva/v2/pkg/utils"
-	"github.com/go-chi/render"
 )
 
 const (
@@ -99,7 +99,6 @@ func (h *notifHandler) Notifications(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO(lopresti) this is all to be implemented. For now we just log what we got
 	log.Debug().Msgf("Received OCM notification: %+v", req)
 
 	var status *rpc.Status

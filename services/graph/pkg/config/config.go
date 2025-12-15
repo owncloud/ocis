@@ -75,6 +75,7 @@ type LDAP struct {
 	UserIDIsOctetString      bool   `yaml:"user_id_is_octet_string" env:"OCIS_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING;GRAPH_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING" desc:"Set this to true if the defined 'ID' attribute for users is of the 'OCTETSTRING' syntax. This is required when using the 'objectGUID' attribute of Active Directory for the user ID's." introductionVersion:"pre5.0"`
 	UserTypeAttribute        string `yaml:"user_type_attribute" env:"OCIS_LDAP_USER_SCHEMA_USER_TYPE;GRAPH_LDAP_USER_TYPE_ATTRIBUTE" desc:"LDAP Attribute to distinguish between 'Member' and 'Guest' users. Default is 'ownCloudUserType'." introductionVersion:"pre5.0"`
 	UserEnabledAttribute     string `yaml:"user_enabled_attribute" env:"OCIS_LDAP_USER_ENABLED_ATTRIBUTE;GRAPH_USER_ENABLED_ATTRIBUTE" desc:"LDAP Attribute to use as a flag telling if the user is enabled or disabled." introductionVersion:"pre5.0"`
+	ExternalIDAttribute      string `yaml:"external_id_attribute" env:"OCIS_LDAP_USER_SCHEMA_EXTERNAL_ID;GRAPH_LDAP_EXTERNAL_ID_ATTRIBUTE" desc:"LDAP attribute that references the external ID of users during the provisioning process. The final ID is provided by an external identity provider. If it is not set, a default attribute will be used instead." introductionVersion:"Curie"`
 	DisableUserMechanism     string `yaml:"disable_user_mechanism" env:"OCIS_LDAP_DISABLE_USER_MECHANISM;GRAPH_DISABLE_USER_MECHANISM" desc:"An option to control the behavior for disabling users. Supported options are 'none', 'attribute' and 'group'. If set to 'group', disabling a user via API will add the user to the configured group for disabled users, if set to 'attribute' this will be done in the ldap user entry, if set to 'none' the disable request is not processed. Default is 'attribute'." introductionVersion:"pre5.0"`
 	LdapDisabledUsersGroupDN string `yaml:"ldap_disabled_users_group_dn" env:"OCIS_LDAP_DISABLED_USERS_GROUP_DN;GRAPH_DISABLED_USERS_GROUP_DN" desc:"The distinguished name of the group to which added users will be classified as disabled when 'disable_user_mechanism' is set to 'group'." introductionVersion:"pre5.0"`
 
@@ -90,6 +91,7 @@ type LDAP struct {
 
 	EducationResourcesEnabled bool `yaml:"education_resources_enabled" env:"GRAPH_LDAP_EDUCATION_RESOURCES_ENABLED" desc:"Enable LDAP support for managing education related resources." introductionVersion:"pre5.0"`
 	EducationConfig           LDAPEducationConfig
+	RequireExternalID         bool `yaml:"require_external_id" env:"GRAPH_LDAP_REQUIRE_EXTERNAL_ID" desc:"If enabled, the 'OCIS_LDAP_USER_SCHEMA_EXTERNAL_ID' is used as primary identifier for the provisioning API." introductionVersion:"Curie"`
 }
 
 // LDAPEducationConfig represents the LDAP configuration for education related resources
@@ -119,7 +121,7 @@ type API struct {
 	AssignDefaultUserRole         bool     `yaml:"graph_assign_default_user_role" env:"GRAPH_ASSIGN_DEFAULT_USER_ROLE" desc:"Whether to assign newly created users the default role 'User'. Set this to 'false' if you want to assign roles manually, or if the role assignment should happen at first login. Set this to 'true' (the default) to assign the role 'User' when creating a new user." introductionVersion:"pre5.0"`
 	IdentitySearchMinLength       int      `yaml:"graph_identity_search_min_length" env:"GRAPH_IDENTITY_SEARCH_MIN_LENGTH" desc:"The minimum length the search term needs to have for unprivileged users when searching for users or groups." introductionVersion:"5.0"`
 	ShowUserEmailInResults        bool     `yaml:"show_email_in_results" env:"OCIS_SHOW_USER_EMAIL_IN_RESULTS" desc:"Include user email addresses in responses. If absent or set to false emails will be omitted from results. Please note that admin users can always see all email addresses." introductionVersion:"6.0.0" deprecationVersion:"Balch" removalVersion:"%%NEXT_PRODUCTION_VERSION%%" deprecationInfo:"Deprecating in favor of a unified array with arbitrary attributes" deprecationReplacement:"UserSearchDisplayedAttributes"`
-	UserSearchDisplayedAttributes []string `yaml:"user_search_displayed_attributes" env:"OCIS_USER_SEARCH_DISPLAYED_ATTRIBUTES" desc:"The attributes to display in the user search results." introductionVersion:"Balch"`
+	UserSearchDisplayedAttributes []string `yaml:"user_search_displayed_attributes" env:"OCIS_USER_SEARCH_DISPLAYED_ATTRIBUTES" desc:"The attributes to display in the user search results." introductionVersion:"7.3.0"`
 }
 
 // Events combines the configuration options for the event bus.

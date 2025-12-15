@@ -8,7 +8,7 @@ services:
       NOTIFICATIONS_SMTP_INSECURE: "true"
 
   mailserver:
-    image: axllent/mailpit:v1.26
+    image: axllent/mailpit:${MAIL_SERVER_DOCKER_TAG:-latest}
     networks:
       - ocis-net
     ports:

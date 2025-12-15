@@ -64,7 +64,7 @@ Feature: search federation users
                     ],
                     "properties": {
                       "issuer": {
-                        "const": "%local_host_port%"
+                        "const": "%local_base_url%"
                       },
                       "issuerAssignedId": {
                         "type": "string",
@@ -126,7 +126,7 @@ Feature: search federation users
                     ],
                     "properties": {
                       "issuer": {
-                        "const": "%remote_host_port%"
+                        "const": "%remote_base_url%"
                       },
                       "issuerAssignedId": {
                         "type": "string",
@@ -194,7 +194,7 @@ Feature: search federation users
                     ],
                     "properties": {
                       "issuer": {
-                        "const": "%local_host_port%"
+                        "const": "%local_base_url%"
                       },
                       "issuerAssignedId": {
                         "type": "string",
@@ -256,7 +256,7 @@ Feature: search federation users
                     ],
                     "properties": {
                       "issuer": {
-                        "const": "%remote_host_port%"
+                        "const": "%remote_base_url%"
                       },
                       "issuerAssignedId": {
                         "type": "string",
@@ -346,7 +346,7 @@ Feature: search federation users
             },
             "idp": {
               "type": "string",
-              "const": "%remote_host_port%"
+              "const": "%remote_base_url%"
             },
             "mail": {
               "type": "string",
@@ -385,7 +385,7 @@ Feature: search federation users
                   "const": "Alice Hansen"
                 },
                 "idp": {
-                  "const": "%local_host_port%"
+                  "const": "%local_base_url%"
                 },
                 "mail": {
                   "pattern": "alice@example.org"
@@ -409,7 +409,7 @@ Feature: search federation users
                   "const": "Carol King"
                 },
                 "idp": {
-                  "const": "%local_host_port%"
+                  "const": "%local_base_url%"
                 },
                 "mail": {
                   "pattern": "carol@example.org"
@@ -480,7 +480,7 @@ Feature: search federation users
                     ],
                     "properties": {
                       "issuer": {
-                        "const": "%local_host_port%"
+                        "const": "%local_base_url%"
                       },
                       "issuerAssignedId": {
                         "type": "string",
@@ -545,7 +545,7 @@ Feature: search federation users
                     ],
                     "properties": {
                       "issuer": {
-                        "const": "%remote_host_port%"
+                        "const": "%remote_base_url%"
                       },
                       "issuerAssignedId": {
                         "type": "string",
@@ -692,7 +692,7 @@ Feature: search federation users
                         ],
                         "properties": {
                           "issuer": {
-                            "const": "%remote_host_port%"
+                            "const": "%remote_base_url%"
                           },
                           "issuerAssignedId": {
                             "type": "string",

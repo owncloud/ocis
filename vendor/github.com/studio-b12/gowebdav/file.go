@@ -32,7 +32,7 @@ func newFile(path, name string, p *propstat) *File {
 	path = FixSlashes(path)
 
 	f.name = filepath.Base(name)
-	f.path = filepath.Clean(filepath.Join(path, f.name))
+	f.path = filepath.Clean(filepath.Join(path, name))
 	f.modified = p.Modified()
 	f.etag = p.ETag()
 	f.contentType = p.ContentType()

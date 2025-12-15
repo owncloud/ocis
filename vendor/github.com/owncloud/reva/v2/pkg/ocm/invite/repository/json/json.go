@@ -226,12 +226,14 @@ func (m *manager) GetRemoteUser(ctx context.Context, initiator *userpb.UserId, r
 	log := appctx.GetLogger(ctx)
 	for _, acceptedUser := range m.model.AcceptedUsers[initiator.GetOpaqueId()] {
 		log.Info().Msgf("looking for '%s' at '%s' - considering '%s' at '%s'",
-			remoteUserID.OpaqueId,
-			remoteUserID.Idp,
-			acceptedUser.Id.GetOpaqueId(),
-			acceptedUser.Id.GetIdp(),
-		)
+			remoteUserID.OpaqueId, remoteUserID.Idp,
+			acceptedUser.Id.GetOpaqueId(), acceptedUser.Id.GetIdp())
+
 		if (acceptedUser.Id.GetOpaqueId() == remoteUserID.OpaqueId) && (remoteUserID.Idp == "" || idpsEqual(acceptedUser.Id.GetIdp(), remoteUserID.Idp)) {
+			log.Info().Msgf("remote user OpaqueId:'%s' Idp:'%s' matches OpaqueId:'%s'  Idp:'%s'",
+				remoteUserID.OpaqueId, remoteUserID.Idp,
+				acceptedUser.Id.GetOpaqueId(), acceptedUser.Id.GetIdp())
+
 			return acceptedUser, nil
 		}
 	}

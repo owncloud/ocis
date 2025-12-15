@@ -29,7 +29,7 @@ features:
     branding:
       enabled: false
   virusscan:
-    enabled: true
+    enabled: false
     infectedFileHandling: delete
   policies:
     enabled: false
@@ -90,15 +90,6 @@ services:
       accessModes:
         - ReadWriteOnce
   nats:
-    persistence:
-      enabled: true
-      accessModes:
-        - ReadWriteOnce
-  search:
-    extractor:
-      type: "tika"
-      tika:
-        url: "http://tika:9998"
     persistence:
       enabled: true
       accessModes:

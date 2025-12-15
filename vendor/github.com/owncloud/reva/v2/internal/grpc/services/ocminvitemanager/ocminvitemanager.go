@@ -180,8 +180,8 @@ func (s *service) ForwardInvite(ctx context.Context, req *invitepb.ForwardInvite
 	remoteUser, err := s.ocmClient.InviteAccepted(ctx, ocmEndpoint, &client.InviteAcceptedRequest{
 		Token:             req.InviteToken.GetToken(),
 		RecipientProvider: s.conf.ProviderDomain,
-		// The UserID is only a string here. To not loose the IDP information we use the FederatedID encoding
-		// i.e. base64(UserID@IDP)
+		// The UserID is only a string here. To not lose the IDP information we use the FederatedID encoding
+		// i.e. UserID@IDP
 		UserID: ocmuser.FederatedID(user.GetId(), "").GetOpaqueId(),
 		Email:  user.GetMail(),
 		Name:   user.GetDisplayName(),
@@ -219,7 +219,7 @@ func (s *service) ForwardInvite(ctx context.Context, req *invitepb.ForwardInvite
 	// we're using the provider domain as the IDP part of the ID
 	remoteUserID := &userpb.UserId{
 		Type:     userpb.UserType_USER_TYPE_FEDERATED,
-		Idp:      req.GetOriginSystemProvider().Domain,
+		Idp:      ocmuser.NormalizeOCMUserIPD(req.GetOriginSystemProvider().Domain),
 		OpaqueId: remoteUser.UserID,
 	}
 

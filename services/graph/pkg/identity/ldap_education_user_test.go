@@ -21,6 +21,7 @@ var eduUserAttrs = []string{
 	"userEnabledAttribute",
 	"userTypeAttribute",
 	"oCExternalIdentity",
+	"externalID",
 	"userClass",
 	"ocMemberOfSchool",
 }
@@ -38,6 +39,7 @@ var eduUserEntry = ldap.NewEntry("uid=user,ou=people,dc=test",
 		},
 		"userTypeAttribute":    {"Member"},
 		"userEnabledAttribute": {"FALSE"},
+		"externalID":           {"ext-ernal-id"},
 	})
 var renamedEduUserEntry = ldap.NewEntry("uid=newtestuser,ou=people,dc=test",
 	map[string][]string{
@@ -52,6 +54,7 @@ var renamedEduUserEntry = ldap.NewEntry("uid=newtestuser,ou=people,dc=test",
 		},
 		"userTypeAttribute":    {"Guest"},
 		"userEnabledAttribute": {"TRUE"},
+		"externalID":           {"ext-ernal-id"},
 	})
 var eduUserEntryWithSchool = ldap.NewEntry("uid=user,ou=people,dc=test",
 	map[string][]string{
@@ -83,6 +86,14 @@ var sr2 *ldap.SearchRequest = &ldap.SearchRequest{
 	Attributes: eduUserAttrs,
 	Controls:   []ldap.Control(nil),
 }
+var sr3 *ldap.SearchRequest = &ldap.SearchRequest{
+	BaseDN:     "ou=people,dc=test",
+	Scope:      2,
+	SizeLimit:  1,
+	Filter:     "(&(objectClass=ocEducationUser)(externalID=ext-ernal-id))",
+	Attributes: eduUserAttrs,
+	Controls:   []ldap.Control(nil),
+}
 
 func TestCreateEducationUser(t *testing.T) {
 	lm := &mocks.Client{}
@@ -106,6 +117,8 @@ func TestCreateEducationUser(t *testing.T) {
 	user.SetPrimaryRole("student")
 	user.SetUserType(("Member"))
 	user.SetAccountEnabled(false)
+	user.SetExternalID("ext-ernal-id")
+
 	eduUser, err := b.CreateEducationUser(context.Background(), *user)
 	lm.AssertNumberOfCalls(t, "Add", 1)
 	lm.AssertNumberOfCalls(t, "Search", 1)
@@ -117,6 +130,7 @@ func TestCreateEducationUser(t *testing.T) {
 	assert.Equal(t, eduUser.GetPrimaryRole(), user.GetPrimaryRole())
 	assert.Equal(t, eduUser.GetUserType(), user.GetUserType())
 	assert.Equal(t, eduUser.GetAccountEnabled(), false)
+	assert.Equal(t, eduUser.GetExternalID(), user.GetExternalID())
 }
 
 func TestDeleteEducationUser(t *testing.T) {
@@ -124,12 +138,14 @@ func TestDeleteEducationUser(t *testing.T) {
 
 	lm.On("Search", sr1).Return(&ldap.SearchResult{Entries: []*ldap.Entry{eduUserEntry}}, nil)
 	lm.On("Search", sr2).Return(&ldap.SearchResult{Entries: []*ldap.Entry{}}, nil)
+	lm.On("Search", sr3).Return(&ldap.SearchResult{Entries: []*ldap.Entry{eduUserEntry}}, nil)
 	dr1 := &ldap.DelRequest{
 		DN: "uid=user,ou=people,dc=test",
 	}
 	lm.On("Del", dr1).Return(nil)
 	b, err := getMockedBackend(lm, eduConfig, &logger)
 	assert.Nil(t, err)
+
 	err = b.DeleteEducationUser(context.Background(), "abcd-defg")
 	lm.AssertNumberOfCalls(t, "Search", 1)
 	lm.AssertNumberOfCalls(t, "Del", 1)
@@ -140,14 +156,23 @@ func TestDeleteEducationUser(t *testing.T) {
 	lm.AssertNumberOfCalls(t, "Del", 1)
 	assert.NotNil(t, err)
 	assert.Equal(t, "itemNotFound: not found", err.Error())
+
+	b.useExternalID = true
+	err = b.DeleteEducationUser(context.Background(), "ext-ernal-id")
+	lm.AssertNumberOfCalls(t, "Search", 3)
+	lm.AssertNumberOfCalls(t, "Del", 2)
+	assert.Nil(t, err)
 }
 
 func TestGetEducationUser(t *testing.T) {
 	lm := &mocks.Client{}
 	lm.On("Search", sr1).Return(&ldap.SearchResult{Entries: []*ldap.Entry{eduUserEntry}}, nil)
 	lm.On("Search", sr2).Return(&ldap.SearchResult{Entries: []*ldap.Entry{}}, nil)
+	lm.On("Search", sr3).Return(&ldap.SearchResult{Entries: []*ldap.Entry{eduUserEntry}}, nil)
+
 	b, err := getMockedBackend(lm, eduConfig, &logger)
 	assert.Nil(t, err)
+
 	user, err := b.GetEducationUser(context.Background(), "abcd-defg")
 	lm.AssertNumberOfCalls(t, "Search", 1)
 	assert.Nil(t, err)
@@ -158,6 +183,13 @@ func TestGetEducationUser(t *testing.T) {
 	lm.AssertNumberOfCalls(t, "Search", 2)
 	assert.NotNil(t, err)
 	assert.Equal(t, "itemNotFound: not found", err.Error())
+
+	b.useExternalID = true
+	user, err = b.GetEducationUser(context.Background(), "ext-ernal-id")
+	lm.AssertNumberOfCalls(t, "Search", 3)
+	assert.Nil(t, err)
+	assert.Equal(t, "Test User", user.GetDisplayName())
+	assert.Equal(t, "ext-ernal-id", user.GetExternalID())
 }
 
 func TestGetEducationUsers(t *testing.T) {
@@ -179,14 +211,25 @@ func TestGetEducationUsers(t *testing.T) {
 }
 
 func TestUpdateEducationUser(t *testing.T) {
+	testUpdateEducationUser(t, "(&(objectClass=ocEducationUser)(|(uid=testuser)(entryUUID=testuser)))", false, "testuser")
+}
+
+func TestUpdateEducationUserExternalID(t *testing.T) {
+	testUpdateEducationUser(t, "(&(objectClass=ocEducationUser)(externalID=ext-ernal-id))", true, "ext-ernal-id")
+}
+
+func testUpdateEducationUser(t *testing.T, userSearchFilter string, useExternalID bool, id string) {
 	lm := &mocks.Client{}
 	b, err := getMockedBackend(lm, eduConfig, &logger)
 	assert.Nil(t, err)
+
+	b.useExternalID = useExternalID
+
 	userSearchReq := &ldap.SearchRequest{
 		BaseDN:     "ou=people,dc=test",
 		Scope:      2,
 		SizeLimit:  1,
-		Filter:     "(&(objectClass=ocEducationUser)(|(uid=testuser)(entryUUID=testuser)))",
+		Filter:     userSearchFilter,
 		Attributes: eduUserAttrs,
 	}
 	userLookupReq := &ldap.SearchRequest{
@@ -268,15 +311,19 @@ func TestUpdateEducationUser(t *testing.T) {
 	}
 	lm.On("ModifyDN", &modDNReq).Return(nil)
 	lm.On("Modify", &modReq).Return(nil)
+
 	user := libregraph.NewEducationUser()
 	user.SetOnPremisesSamAccountName("newtestuser")
 	user.SetMail("new@mail.org")
 	user.SetAccountEnabled(true)
-	eduUser, err := b.UpdateEducationUser(context.Background(), "testuser", *user)
+	user.SetExternalID("ext-ernal-id")
+
+	eduUser, err := b.UpdateEducationUser(context.Background(), id, *user)
 	assert.NotNil(t, eduUser)
 	assert.Nil(t, err)
 	assert.Equal(t, eduUser.GetOnPremisesSamAccountName(), "newtestuser")
 	assert.Equal(t, "abcd-defg", eduUser.GetId())
 	assert.Equal(t, "Guest", eduUser.GetUserType())
 	assert.Equal(t, eduUser.GetAccountEnabled(), true)
+	assert.Equal(t, "ext-ernal-id", eduUser.GetExternalID())
 }

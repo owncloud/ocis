@@ -401,10 +401,31 @@ func (s *svc) handleOpen(openMode int) http.HandlerFunc {
 			}
 		}
 
+		appName := r.Form.Get("app_name")
+		if appName == "" {
+			apps, err := client.GetAppProviders(ctx, &appregistry.GetAppProvidersRequest{
+				ResourceInfo: statRes.Info,
+			})
+			if err != nil {
+				writeError(w, r, appErrorServerError, "error getting app providers", err)
+				return
+			}
+			if apps.Status.Code != rpc.Code_CODE_OK {
+				writeError(w, r, appErrorServerError, "error getting app providers", nil)
+				return
+			}
+			if len(apps.Providers) == 0 {
+				writeError(w, r, appErrorProviderNotFound, "no app providers found", nil)
+				return
+			}
+
+			appName = apps.Providers[0].Name
+		}
+
 		openReq := gateway.OpenInAppRequest{
 			Ref:      fileRef,
 			ViewMode: viewMode,
-			App:      r.Form.Get("app_name"),
+			App:      appName,
 			Opaque:   utils.AppendPlainToOpaque(nil, "lang", lang),
 		}
 
@@ -441,7 +462,7 @@ func (s *svc) handleOpen(openMode int) http.HandlerFunc {
 			payload = openRes.AppUrl
 
 		case openModeWeb:
-			payload, err = newOpenInWebResponse(s.conf.WebBaseURI, s.conf.Web.URLParamsMapping, s.conf.Web.StaticURLParams, fileID, r.Form.Get("app_name"), r.Form.Get("view_mode"))
+			payload, err = newOpenInWebResponse(s.conf.WebBaseURI, s.conf.Web.URLParamsMapping, s.conf.Web.StaticURLParams, fileID, appName, r.Form.Get("view_mode"))
 			if err != nil {
 				writeError(w, r, appErrorServerError, "Internal error",
 					errors.Wrap(err, "error building OpenInWeb response"))
@@ -455,18 +476,14 @@ func (s *svc) handleOpen(openMode int) http.HandlerFunc {
 
 		}
 
-		js, err := json.Marshal(payload)
-		if err != nil {
-			writeError(w, r, appErrorServerError, "Internal error with JSON payload",
-				errors.Wrap(err, "error marshalling JSON response"))
-			return
-		}
-
 		w.Header().Set("Content-Type", "application/json")
-		if _, err = w.Write(js); err != nil {
+
+		encoder := json.NewEncoder(w)
+		encoder.SetEscapeHTML(false)
+
+		if err := encoder.Encode(payload); err != nil {
 			writeError(w, r, appErrorServerError, "Internal error with JSON payload",
-				errors.Wrap(err, "error writing JSON response"))
-			return
+				errors.Wrap(err, "error encoding JSON response"))
 		}
 	}
 }
