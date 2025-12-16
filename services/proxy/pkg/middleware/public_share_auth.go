@@ -6,6 +6,7 @@ import (
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/reva/v2/pkg/auth/manager/publicshares"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
 )
 
@@ -90,6 +91,38 @@ func (a PublicShareAuthenticator) Authenticate(r *http.Request) (*http.Request, 
 			sharePassword += password
 		}
 	}
+
+	client, err := a.RevaGatewaySelector.Next()
+	if err != nil {
+		a.Logger.Error().
+			Err(err).
+			Str("authenticator", "public_share").
+			Str("public_share_token", shareToken).
+			Str("path", r.URL.Path).
+			Msg("could not select next gateway client")
+		return nil, false
+	}
+
+	// we just need the reva access token, so we want to skip the brute force
+	// protection in this case
+	ctx := publicshares.MarkSkipAttemptContext(r.Context(), shareToken)
+	authResp, err := client.Authenticate(ctx, &gateway.AuthenticateRequest{
+		Type:         authenticationType,
+		ClientId:     shareToken,
+		ClientSecret: sharePassword,
+	})
+
+	if err != nil {
+		a.Logger.Error().
+			Err(err).
+			Str("authenticator", "public_share").
+			Str("public_share_token", shareToken).
+			Str("path", r.URL.Path).
+			Msg("failed to authenticate request")
+		return nil, false
+	}
+
+	r.Header.Add(_headerRevaAccessToken, authResp.Token)
 
 	a.Logger.Debug().
 		Str("authenticator", "public_share").
