@@ -1,6 +1,7 @@
 # Table of Contents
 
 * [Changelog for unreleased](#changelog-for-unreleased-unreleased)
+* [Changelog for 7.3.1](#changelog-for-731-2025-11-24)
 * [Changelog for 7.3.0](#changelog-for-730-2025-10-13)
 * [Changelog for 7.2.0](#changelog-for-720-2025-07-14)
 * [Changelog for 7.1.3](#changelog-for-713-2025-05-27)
@@ -63,18 +64,24 @@
 
 The following sections list the changes for unreleased.
 
-[unreleased]: https://github.com/owncloud/ocis/compare/v7.3.0...master
+[unreleased]: https://github.com/owncloud/ocis/compare/v7.3.1...master
 
 ## Summary
 
 * Bugfix - Fix user light creation: [#11765](https://github.com/owncloud/ocis/pull/11765)
 * Bugfix - OCM Specification Compliance: [#11773](https://github.com/owncloud/ocis/pull/11773)
+* Bugfix - Remove leading dot before checking disabled extension: [#11814](https://github.com/owncloud/ocis/pull/11814)
+* Bugfix - Replace obsolete docker image in the deployment example: [#11828](https://github.com/owncloud/ocis/pull/11828)
 * Enhancement - Set Referrer-Policy to no-referrer: [#11722](https://github.com/owncloud/ocis/pull/11722)
 * Enhancement - Bump Reva: [#11748](https://github.com/owncloud/ocis/pull/11748)
 * Enhancement - Support disabling editors by extensions: [#11750](https://github.com/owncloud/ocis/pull/11750)
-* Enhancement - Add Cli to move stuck uploads: [#11762](https://github.com/owncloud/ocis/pull/11762)
+* Enhancement - Add CLI to move stuck uploads: [#11762](https://github.com/owncloud/ocis/pull/11762)
 * Enhancement - Use externalID in Provisioning API: [#11799](https://github.com/owncloud/ocis/pull/11799)
+* Enhancement - Add CLI to clean orphned grants: [#11804](https://github.com/owncloud/ocis/pull/11804)
 * Enhancement - Bump Reva: [#11808](https://github.com/owncloud/ocis/pull/11808)
+* Enhancement - Bump Web to v12.2.0: [#11834](https://github.com/owncloud/ocis/pull/11834)
+* Enhancement - Update the ocis_full deployment example images: [#11860](https://github.com/owncloud/ocis/pull/11860)
+* Enhancement - Update the ocis_full deployment example traefik image: [#11867](https://github.com/owncloud/ocis/pull/11867)
 
 ## Details
 
@@ -91,6 +98,25 @@ The following sections list the changes for unreleased.
    OCM Specification Compliance
 
    https://github.com/owncloud/ocis/pull/11773
+
+* Bugfix - Remove leading dot before checking disabled extension: [#11814](https://github.com/owncloud/ocis/pull/11814)
+
+   We have fixed a bug where the leading dot was not removed before checking if an
+   extension is disabled. The original behavior would have caused the
+   `COLLABORATION_WOPI_DISABLED_EXTENSIONS` config to be ignored.
+
+   https://github.com/owncloud/ocis/pull/11814
+
+* Bugfix - Replace obsolete docker image in the deployment example: [#11828](https://github.com/owncloud/ocis/pull/11828)
+
+   In the ocis_ldap deployment example, we were using the bitnami/openldap docker
+   image. This image isn't available any longer, so the example couldn't be
+   deployed as intended.
+
+   We've replaced the docker image with the osixia/openldap image and we've
+   adjusted some of the configuration of the openldap image.
+
+   https://github.com/owncloud/ocis/pull/11828
 
 * Enhancement - Set Referrer-Policy to no-referrer: [#11722](https://github.com/owncloud/ocis/pull/11722)
 
@@ -119,7 +145,7 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/11750
 
-* Enhancement - Add Cli to move stuck uploads: [#11762](https://github.com/owncloud/ocis/pull/11762)
+* Enhancement - Add CLI to move stuck uploads: [#11762](https://github.com/owncloud/ocis/pull/11762)
 
    In some cases of saturated disk usage ocis metadata may get stuck. This command
    relieves this case.
@@ -134,6 +160,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/11799
 
+* Enhancement - Add CLI to clean orphned grants: [#11804](https://github.com/owncloud/ocis/pull/11804)
+
+   Add CLI `ocis shares clean-orphaned-grants` to find and optionally remove
+   storage grants without corresponding share-manager entries.
+
+   https://github.com/owncloud/ocis/pull/11804
+
 * Enhancement - Bump Reva: [#11808](https://github.com/owncloud/ocis/pull/11808)
 
    This updates the ownCloud Reva dependency to commit
@@ -141,6 +174,87 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/reva/compare/751223b32d4852c73a43388f6f55308c2065afeb...a122a9538794530267743edfd5dc67b48aa90325
 
    https://github.com/owncloud/ocis/pull/11808
+
+* Enhancement - Bump Web to v12.2.0: [#11834](https://github.com/owncloud/ocis/pull/11834)
+
+   - Bugfix [owncloud/web#13177](https://github.com/owncloud/web/pull/13177): Fix
+   copying public link and password on Safari - Bugfix
+   [owncloud/web#13198](https://github.com/owncloud/web/pull/13198): Fix incorrect
+   translations - Bugfix
+   [owncloud/web#13203](https://github.com/owncloud/web/pull/13203): Remove
+   duplicate resource links - Bugfix
+   [owncloud/web#13213](https://github.com/owncloud/web/pull/13213): Do not disable
+   sharing of resources when managing spaces via claims - Bugfix
+   [owncloud/web#13223](https://github.com/owncloud/web/pull/13223): Fix spinner
+   loading continuously when resource is deleted - Bugfix
+   [owncloud/web#13233](https://github.com/owncloud/web/pull/13233): Include Ubuntu
+   font - Bugfix [owncloud/web#13253](https://github.com/owncloud/web/pull/13253):
+   External share ID fallback - Bugfix
+   [owncloud/web#13274](https://github.com/owncloud/web/pull/13274): Handle file
+   loading error - Bugfix
+   [owncloud/web#13329](https://github.com/owncloud/web/pull/13329): Use sticky
+   header composable in deleted files - Enhancement
+   [owncloud/web#13168](https://github.com/owncloud/web/pull/13168): Hide trashed
+   spaces - Enhancement
+   [owncloud/web#13169](https://github.com/owncloud/web/pull/13169): Drop beta
+   badge from GeoGebra pinboards - Enhancement
+   [owncloud/web#13172](https://github.com/owncloud/web/pull/13172): Add Excalidraw
+   file icon - Enhancement
+   [owncloud/web#13197](https://github.com/owncloud/web/pull/13197): Add Visio file
+   icons - Enhancement
+   [owncloud/web#13224](https://github.com/owncloud/web/pull/13224): Add table
+   caption - Enhancement
+   [owncloud/web#13235](https://github.com/owncloud/web/pull/13235): Use API groups
+   search in admin settings - Enhancement
+   [owncloud/web#13296](https://github.com/owncloud/web/pull/13296): Embed mode
+   share links with password
+
+   https://github.com/owncloud/ocis/pull/11834
+   https://github.com/owncloud/web/releases/tag/v12.2.0
+
+* Enhancement - Update the ocis_full deployment example images: [#11860](https://github.com/owncloud/ocis/pull/11860)
+
+  * Traefik    3.6.2
+  * Collabora  27.4.7.3
+  * OnlyOffice 9.2.0
+  * Mailpit    1.28.0
+
+   https://github.com/owncloud/ocis/pull/11860
+
+* Enhancement - Update the ocis_full deployment example traefik image: [#11867](https://github.com/owncloud/ocis/pull/11867)
+
+  * Traefik: 3.6.4
+  * Traefik fix for Collabora
+
+   https://github.com/owncloud/ocis/pull/11867
+
+# Changelog for [7.3.1] (2025-11-24)
+
+The following sections list the changes for 7.3.1.
+
+[7.3.1]: https://github.com/owncloud/ocis/compare/v7.3.0...v7.3.1
+
+## Summary
+
+* Enhancement - Bump Web to 12.1.1: [#11726](https://github.com/owncloud/ocis/pull/11726)
+* Enhancement - Bump Web to v12.1.2: [#11836](https://github.com/owncloud/ocis/pull/11836)
+
+## Details
+
+* Enhancement - Bump Web to 12.1.1: [#11726](https://github.com/owncloud/ocis/pull/11726)
+
+   This version contains only updated translations.
+
+   https://github.com/owncloud/ocis/pull/11726
+   https://github.com/owncloud/web/releases/tag/v12.1.1
+
+* Enhancement - Bump Web to v12.1.2: [#11836](https://github.com/owncloud/ocis/pull/11836)
+
+   - Bugfix [owncloud/web#13213](https://github.com/owncloud/web/pull/13213): Do
+   not disable sharing of resources when managing spaces via claims
+
+   https://github.com/owncloud/ocis/pull/11836
+   https://github.com/owncloud/web/releases/tag/v12.1.2
 
 # Changelog for [7.3.0] (2025-10-13)
 
