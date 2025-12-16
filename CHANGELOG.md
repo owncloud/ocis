@@ -80,6 +80,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add CLI to clean orphned grants: [#11804](https://github.com/owncloud/ocis/pull/11804)
 * Enhancement - Bump Reva: [#11808](https://github.com/owncloud/ocis/pull/11808)
 * Enhancement - Bump Web to v12.2.0: [#11834](https://github.com/owncloud/ocis/pull/11834)
+* Enhancement - Introduce claims for multi-instance-ocis: [#11848](https://github.com/owncloud/ocis/pull/11848)
 * Enhancement - Update the ocis_full deployment example images: [#11860](https://github.com/owncloud/ocis/pull/11860)
 * Enhancement - Update the ocis_full deployment example traefik image: [#11867](https://github.com/owncloud/ocis/pull/11867)
 
@@ -211,6 +212,12 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/11834
    https://github.com/owncloud/web/releases/tag/v12.2.0
+
+* Enhancement - Introduce claims for multi-instance-ocis: [#11848](https://github.com/owncloud/ocis/pull/11848)
+
+   Reads claims from the oidc token to add users to ocis with specific roles.
+
+   https://github.com/owncloud/ocis/pull/11848
 
 * Enhancement - Update the ocis_full deployment example images: [#11860](https://github.com/owncloud/ocis/pull/11860)
 
