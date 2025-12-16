@@ -187,7 +187,7 @@ func newMockAccountResolver(userBackendResult *userv1beta1.User, userBackendErr 
 	ub.On("GetUserRoles", mock.Anything, mock.Anything).Return(userBackendResult, nil)
 
 	ra := userRoleMocks.UserRoleAssigner{}
-	ra.On("UpdateUserRoleAssignment", mock.Anything, mock.Anything, mock.Anything).Return(userBackendResult, nil)
+	ra.On("UpdateUserRoleAssignment", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(userBackendResult, nil)
 
 	return AccountResolver(
 		Logger(log.NewLogger()),
@@ -198,6 +198,86 @@ func newMockAccountResolver(userBackendResult *userv1beta1.User, userBackendErr 
 		UserCS3Claim(cs3claim),
 		AutoprovisionAccounts(false),
 	)(mockHandler{})
+}
+
+func TestReadClaim(t *testing.T) {
+	var testCases = []struct {
+		Alias    string
+		Key      string
+		Claims   map[string]any
+		Expected []string
+	}{
+		{
+			Alias: "single value",
+			Key:   "testkey",
+			Claims: map[string]any{
+				"testkey": "testvalue",
+			},
+			Expected: []string{"testvalue"},
+		},
+		{
+			Alias: "multivalue",
+			Key:   "testkey",
+			Claims: map[string]any{
+				"testkey": []string{"testvalue1", "testvalue2"},
+			},
+			Expected: []string{"testvalue1", "testvalue2"},
+		},
+		{
+			Alias: "empty value 1",
+			Key:   "testkey",
+			Claims: map[string]any{
+				"testkey": "",
+			},
+			Expected: []string{""},
+		},
+		{
+			Alias: "empty value 2",
+			Key:   "testkey",
+			Claims: map[string]any{
+				"testkey": []string{},
+			},
+			Expected: []string{},
+		},
+		{
+			Alias: "no value",
+			Key:   "testkey",
+			Claims: map[string]any{
+				"testkey": nil,
+			},
+			Expected: nil,
+		},
+		{
+			Alias: "no key",
+			Key:   "testkey",
+			Claims: map[string]any{
+				"anotherkey": "withvalue",
+			},
+			Expected: nil,
+		},
+		{
+			Alias: "wrong type 1",
+			Key:   "testkey",
+			Claims: map[string]any{
+				"anotherkey": true,
+			},
+			Expected: nil,
+		},
+		{
+			Alias: "wrong type 2",
+			Key:   "testkey",
+			Claims: map[string]any{
+				"anotherkey": 123,
+			},
+			Expected: nil,
+		},
+	}
+
+	for _, tc := range testCases {
+		s := readClaim(tc.Key, tc.Claims)
+		assert.Equal(t, tc.Expected, s)
+	}
+
 }
 
 func mockRequest(claims map[string]interface{}) (*http.Request, *httptest.ResponseRecorder) {

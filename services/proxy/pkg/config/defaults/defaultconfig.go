@@ -103,6 +103,12 @@ func DefaultConfig() *config.Config {
 		MultiFactorAuthentication: config.MFAConfig{
 			AuthLevelNames: []string{"advanced"},
 		},
+		MultiInstance: config.MultiInstanceConfig{
+			InstanceID:  "c1f28cf2-d363-4671-a8fe-8d7a80b36b87",
+			MemberClaim: "memberOf",
+			GuestClaim:  "guestOf",
+			GuestRole:   "user-light",
+		},
 	}
 }
 

@@ -1,0 +1,26 @@
+{
+  "server": "https://ocis.ocm.owncloud.test",
+  "theme": "https://ocis.ocm.owncloud.test/themes/owncloud/theme.json",
+  "openIdConnect": {
+    "metadata_url": "https://ocis.ocm.owncloud.test/.well-known/openid-configuration",
+    "authority": "https://ocis.ocm.owncloud.test",
+    "client_id": "web-ocm",
+    "response_type": "code"
+  },
+  "options": {
+    "contextHelpersReadMore": true
+  },
+  "apps": [
+    "files",
+    "text-editor",
+    "pdf-viewer",
+    "search",
+    "external",
+    "admin-settings",
+    "webfinger",
+    "epub-reader",
+    "app-store",
+    "activities",
+    "preview"
+  ]
+}
