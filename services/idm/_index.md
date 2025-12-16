@@ -1,6 +1,6 @@
 ---
 title: IDM
-date: 2025-12-15T04:01:55.474365127Z
+date: 2025-12-16T00:07:50.693824291Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/idm
