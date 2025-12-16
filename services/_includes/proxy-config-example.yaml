@@ -214,3 +214,9 @@ mfa:
   enabled: false
   auth_level_name:
   - advanced
+multi_instance:
+  enabled: false
+  instanceid: c1f28cf2-d363-4671-a8fe-8d7a80b36b87
+  member_claim: memberOf
+  guest_claim: guestOf
+  guest_role: user-light

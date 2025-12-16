@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2025-12-16-03-28-06]
+[#deprecation-note-2025-12-16-13-36-23]
 [caption=]
 .Deprecation notes for the proxy service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -899,5 +899,60 @@ a| [subs=-attributes]
 ++[advanced] ++
 a| [subs=-attributes]
 This authentication level name indicates that multi-factor authentication was performed. The name must match the ACR claim in the access token received. Note: If multiple names are required, use a comma-separated list. The front-end service will use the first name in the list when requesting multi-factor authentication (MFA).
+
+a|`OCIS_MULTI_INSTANCE_ENABLED` +
+
+a| [subs=-attributes]
+++Curie ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Enable multiple instances of Infinite Scale.
+
+a|`OCIS_MULTI_INSTANCE_INSTANCEID` +
+
+a| [subs=-attributes]
+++Curie ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++c1f28cf2-d363-4671-a8fe-8d7a80b36b87 ++
+a| [subs=-attributes]
+The unique id of this instance
+
+a|`OCIS_MULTI_INSTANCE_MEMBER_CLAIM` +
+
+a| [subs=-attributes]
+++Curie ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++memberOf ++
+a| [subs=-attributes]
+The claim name for the 'memberOf' property
+
+a|`OCIS_MULTI_INSTANCE_GUEST_CLAIM` +
+
+a| [subs=-attributes]
+++Curie ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++guestOf ++
+a| [subs=-attributes]
+The claim name for the 'guestOf' property
+
+a|`OCIS_MULTI_INSTANCE_GUEST_ROLE` +
+
+a| [subs=-attributes]
+++Curie ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++user-light ++
+a| [subs=-attributes]
+The role that should be assigned to a guest user
 |===
 
