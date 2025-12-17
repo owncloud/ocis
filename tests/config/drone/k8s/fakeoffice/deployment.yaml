@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fakeoffice
+  namespace: ocis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fakeoffice
+  template:
+    metadata:
+      labels:
+        app: fakeoffice
+    spec:
+      containers:
+        - name: fakeoffice
+          image: alpine:latest
+          command: ["/bin/sh", "/config/serve-discovery.sh"]
+          ports:
+            - containerPort: 8080
+              name: http
+          volumeMounts:
+            - name: config
+              mountPath: /config
+      volumes:
+        - name: config
+          configMap:
+            name: fakeoffice-discovery
+            defaultMode: 0755
