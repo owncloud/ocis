@@ -45,6 +45,8 @@ CODACY_COVERAGE_REPORTER = "codacy/codacy-coverage-reporter:latest"
 CS3ORG_WOPISERVER = "cs3org/wopiserver:v10.4.0"
 OC_CI_WOPI_VALIDATOR = "owncloudci/wopi-validator"
 
+KUBECTL_VERSION = "v1.27.3"
+
 # the hugo version needs to be the same as in owncloud.github.io
 OC_CI_HUGO_STATIC_IMAGE = "hugomods/hugo:base-0.129.0"
 
@@ -273,6 +275,7 @@ config = {
                 "apiCollaboration",
             ],
             "skip": False,
+            "k8s": True,
             "withRemotePhp": [False],
             "collaborationServiceNeeded": True,
             "extraServerEnvironment": {
@@ -1150,12 +1153,13 @@ def localApiTestPipeline(ctx):
                                      (tikaService() if params["tikaNeeded"] and not run_on_k8s else tikaServiceK8s() if params["tikaNeeded"] and run_on_k8s else []) +
                                      (waitForServices("online-offices", ["collabora:9980", "onlyoffice:443", "fakeoffice:8080"]) if params["collaborationServiceNeeded"] else []) +
                                      deployment_steps +
+                                     (waitK3sCluster() + (enableAntivirusServiceK8s() if params["antivirusNeeded"] and run_on_k8s else []) + (emailServiceK8s() if params["emailNeeded"] and run_on_k8s else []) + prepareOcisDeployment(enable_wopi = params["collaborationServiceNeeded"] if run_on_k8s else False) + setupOcisConfigMaps() + (deployFakeofficeK8s() if params["collaborationServiceNeeded"] and run_on_k8s else []) + deployOcis() + (exposeCollaborationServicesK8s() if params["collaborationServiceNeeded"] and run_on_k8s else []) + waitForOcis(ocis_url = ocis_url) + ociswrapper() + waitForOciswrapper() if run_on_k8s else ocisServer(storage, extra_server_environment = params["extraServerEnvironment"], with_wrapper = True, tika_enabled = params["tikaNeeded"], volumes = ([stepVolumeOcisStorage]))) +
                                      (waitForClamavService() if params["antivirusNeeded"] and not run_on_k8s else exposeAntivirusServiceK8s() if params["antivirusNeeded"] and run_on_k8s else []) +
                                      (waitForEmailService() if params["emailNeeded"] and not run_on_k8s else exposeEmailServiceK8s() if params["emailNeeded"] and run_on_k8s else []) +
-                                     (ocisServer(storage, deploy_type = "federation", extra_server_environment = params["extraServerEnvironment"]) if params["federationServer"] and not run_on_k8s else []) +
-                                     ((wopiCollaborationService("fakeoffice") + wopiCollaborationService("collabora") + wopiCollaborationService("onlyoffice")) if params["collaborationServiceNeeded"] else []) +
-                                     (ocisHealthCheck("wopi", ["wopi-collabora:9304", "wopi-onlyoffice:9304", "wopi-fakeoffice:9304"]) if params["collaborationServiceNeeded"] else []) +
-                                     localApiTests(name, params["suites"], storage, params["extraEnvironment"], run_with_remote_php, ocis_url = ocis_url, ocis_fed_url = ocis_fed_url, k8s = run_on_k8s) +
+                                     (ocisServer(storage, deploy_type = "federation", extra_server_environment = params["extraServerEnvironment"]) if params["federationServer"] else []) +
+                                     ((wopiCollaborationService("fakeoffice") + wopiCollaborationService("collabora") + wopiCollaborationService("onlyoffice")) if params["collaborationServiceNeeded"] and not run_on_k8s else []) +
+                                     (ocisHealthCheck("wopi", ["wopi-collabora:9304", "wopi-onlyoffice:9304", "wopi-fakeoffice:9304"]) if params["collaborationServiceNeeded"] and not run_on_k8s else []) +
+                                     localApiTests(name, params["suites"], storage, params["extraEnvironment"], run_with_remote_php, ocis_url = ocis_url, k8s = run_on_k8s) +
                                      apiTestFailureLog() +
                                      (generateCoverageFromAPITest(ctx, name) if not run_on_k8s else []),
                             "services": (k3sCluster() if run_on_k8s and not params["federationServer"] else []) +
@@ -1230,26 +1234,34 @@ def localApiTests(name, suites, storage = "ocis", extra_environment = {}, with_r
         "UPLOAD_DELETE_WAIT_TIME": "1" if storage == "owncloud" else 0,
         "OCIS_WRAPPER_URL": "http://ociswrapper:5200" if k8s else "http://%s:5200" % OCIS_SERVER_NAME,
         "WITH_REMOTE_PHP": with_remote_php,
-        "COLLABORATION_SERVICE_URL": "http://wopi-fakeoffice:9300",
+        "COLLABORATION_SERVICE_URL": "http://localhost:9305" if k8s else "http://wopi-fakeoffice:9300",
         "K8S": k8s,
     }
 
     for item in extra_environment:
         environment[item] = extra_environment[item]
-    if k8s:
-        environment["EMAIL_HOST"] = OCIS_SERVER_NAME
-    return [{
-        "name": "localApiTests-%s" % name,
-        "image": OC_CI_PHP % DEFAULT_PHP_VERSION,
-        "environment": environment,
-        "commands": [
-            # merge the expected failures
-            "" if with_remote_php else "cat %s/expected-failures-without-remotephp.md >> %s" % (test_dir, expected_failures_file),
-            "mkdir -p /etc/ocis/",
-            "make -C %s test-acceptance-api" % (dirs["base"]),
-        ],
-        "volumes": [stepVolumeOcisStorage],
-    }]
+    commands = []
+
+    if not with_remote_php:
+        commands.append(
+            "cat %s/expected-failures-without-remotephp.md >> %s" %
+            (test_dir, expected_failures_file),
+        )
+
+    commands = commands + (getWopiPortForwardCommands() + ["sleep 5"] if k8s else []) + [
+        "mkdir -p /etc/ocis/",
+        "make -C %s test-acceptance-api" % dirs["base"],
+    ]
+
+    return [
+        {
+            "name": "localApiTests-%s" % name,
+            "image": OC_CI_PHP % DEFAULT_PHP_VERSION,
+            "environment": environment,
+            "commands": commands,
+            "volumes": [stepVolumeOcisStorage],
+        },
+    ]
 
 def cs3ApiTests(ctx, storage):
     return {
@@ -2674,6 +2686,8 @@ def ocisServer(storage = "ocis", volumes = [], depends_on = [], deploy_type = ""
         environment["APP_PROVIDER_EXTERNAL_ADDR"] = "com.owncloud.api.app-provider"
         environment["APP_PROVIDER_DRIVER"] = "wopi"
         environment["APP_PROVIDER_WOPI_APP_NAME"] = "FakeOffice"
+        environment["COLLABORATION_APP_NAME"] = "FakeOffice"
+        environment["COLLABORATION_APP_PRODUCT"] = "MicrosoftOfficeOnline"
         environment["APP_PROVIDER_WOPI_APP_URL"] = "http://fakeoffice:8080"
         environment["APP_PROVIDER_WOPI_INSECURE"] = "true"
         environment["APP_PROVIDER_WOPI_WOPI_SERVER_EXTERNAL_URL"] = "http://wopi-fakeoffice:9300"
@@ -3518,7 +3532,7 @@ def wopiCollaborationService(name):
         environment["COLLABORATION_APP_ICON"] = "https://onlyoffice/web-apps/apps/documenteditor/main/resources/img/favicon.ico"
     elif name == "fakeoffice":
         environment["COLLABORATION_APP_NAME"] = "FakeOffice"
-        environment["COLLABORATION_APP_PRODUCT"] = "Microsoft"
+        environment["COLLABORATION_APP_PRODUCT"] = "MicrosoftOfficeOnline"
         environment["COLLABORATION_APP_ADDR"] = "http://fakeoffice:8080"
 
     environment["COLLABORATION_WOPI_SRC"] = "http://%s:9300" % service_name
@@ -3886,7 +3900,49 @@ def waitK3sCluster(name = OCIS_SERVER_NAME):
         ],
     }]
 
-def prepareOcisDeployment():
+def patchWopiSchema():
+    """Patch values.schema.json to add postMessageOrigin and wopiSrc properties"""
+    return """python3 << 'PYEOF'
+import json
+
+path = './charts/ocis/values.schema.json'
+with open(path) as f:
+    data = json.load(f)
+
+props = data['properties']['features']['properties']['appsIntegration']['properties']['wopiIntegration']['properties']['officeSuites']['items']['properties']
+props.setdefault('postMessageOrigin', {"type": "string"})
+props.setdefault('wopiSrc', {"type": "string"})
+
+with open(path, 'w') as f:
+    json.dump(data, f, indent=2)
+PYEOF"""
+
+def injectWopiConfig():
+    """Inject WOPI configuration into deployment-values.yaml"""
+    return """sed -i '/^  ocm:/,/^services:/ { /^    enabled:/ r %s/tests/config/drone/wopi-integration.yaml
+}' ./charts/ocis/ci/deployment-values.yaml""" % dirs["base"]
+
+def patchCollaborationWopiSrc():
+    """Force COLLABORATION_WOPI_SRC to use wopiSrc from values"""
+    return [
+        "awk '/^[[:space:]]*- name: COLLABORATION_WOPI_SRC/ { print; print \"              value: {{ $officeSuite.wopiSrc | quote }}\"; while ( (getline line) > 0 ) { if (line ~ /^[[:space:]]*- name:/) { print line; break; } } next; } { print }' ./charts/ocis/templates/collaboration/deployment.yaml > /tmp/deployment.yaml && mv /tmp/deployment.yaml ./charts/ocis/templates/collaboration/deployment.yaml",
+    ]
+
+def getWopiPortForwardCommands():
+    """Get port forwarding commands for WOPI collaboration services"""
+    return [
+        # Ensure kubeconfig is present before attempting port-forwards
+        "export KUBECONFIG=%s/kubeconfig-$${DRONE_BUILD_NUMBER}.yaml" % dirs["base"],
+        "until test -f $${KUBECONFIG}; do sleep 1; done",
+        "bash -lc 'command -v kubectl >/dev/null || (curl -fsSL -o /usr/local/bin/kubectl https://dl.k8s.io/release/%s/bin/linux/amd64/kubectl && chmod +x /usr/local/bin/kubectl) || true'" % KUBECTL_VERSION,
+        "kubectl -n ocis port-forward svc/collaboration-fakeoffice 9300:9300 --address=127.0.0.1 >/dev/null 2>&1 &",
+        "kubectl -n ocis port-forward svc/collaboration-collabora 9302:9300 --address=127.0.0.1 >/dev/null 2>&1 &",
+        "kubectl -n ocis port-forward svc/collaboration-onlyoffice 9305:9300 --address=127.0.0.1 >/dev/null 2>&1 &",
+        "COLLAB_POD=$(kubectl -n ocis get pod -l app=collaboration-onlyoffice -o jsonpath='{.items[0].metadata.name}')",
+        "kubectl -n ocis port-forward pod/$COLLAB_POD 9304:9304 --address=127.0.0.1 >/dev/null 2>&1 &",
+    ]
+
+def prepareOcisDeployment(enable_wopi = False):
     commands = [
         "make -C %s build" % dirs["ocisWrapper"],
         "mv %s/tests/config/drone/k8s/values.yaml %s/ocis-charts/charts/ocis/ci/deployment-values.yaml" % (dirs["base"], dirs["base"]),
@@ -3916,8 +3972,14 @@ def prepareOcisDeployment():
         "sed -i '/- name: THUMBNAILS_TRANSFER_TOKEN/i\\\\            - name: THUMBNAILS_TXT_FONTMAP_FILE\\\n              value: /etc/ocis/fontsMap.json\\\n' ./charts/ocis/templates/thumbnails/deployment.yaml",
         "sed -i '/volumeMounts:/a\\\\            - name: ocis-fonts-ttf\\\n              mountPath: /etc/ocis/fonts\\\n            - name: ocis-fonts-map\\\n              mountPath: /etc/ocis/fontsMap.json\\\n              subPath: fontsMap.json' ./charts/ocis/templates/thumbnails/deployment.yaml",
         "sed -i '/volumes:/a\\\\        - name: ocis-fonts-ttf\\\n          configMap:\\\n            name: ocis-fonts-ttf\\\n        - name: ocis-fonts-map\\\n          configMap:\\\n            name: ocis-fonts-map' ./charts/ocis/templates/thumbnails/deployment.yaml",
+        # Add OCIS_CONFIG_DIR env var to appregistry deployment
+        "sed -i '/{{- include \"ocis.serviceRegistry\" . | nindent 12 }}/a\\\\            - name: OCIS_CONFIG_DIR\\\n              value: /etc/ocis' ./charts/ocis/templates/appregistry/deployment.yaml",
     ]
 
+    if enable_wopi:
+        commands.append(patchWopiSchema())
+        commands.append(injectWopiConfig())
+        commands.extend(patchCollaborationWopiSrc())
     return [{
         "name": "prepare-ocis-deployment",
         "image": OC_CI_GOLANG,
@@ -4037,7 +4099,48 @@ def exposeAntivirusServiceK8s(name = OCIS_SERVER_NAME):
         ],
     }]
 
-def ociswrapper(name = OCIS_SERVER_NAME):
+def deployFakeofficeK8s():
+    return [{
+        "name": "deploy-fakeoffice",
+        "image": K3D_IMAGE,
+        "commands": [
+            "export KUBECONFIG=kubeconfig-$${DRONE_BUILD_NUMBER}.yaml",
+            "until test -f $${KUBECONFIG}; do sleep 1s; done",
+            "kubectl create configmap fakeoffice-discovery --from-file=hosting-discovery.xml=%s/tests/config/drone/hosting-discovery.xml -n ocis" % dirs["base"],
+            "kubectl apply -f %s/tests/config/drone/k8s/fakeoffice/" % dirs["base"],
+            "kubectl -n ocis rollout status deployment/fakeoffice --timeout=120s",
+        ],
+    }]
+
+def exposeCollaborationServicesK8s():
+    """
+    Expose collaboration services (FakeOffice, Collabora, OnlyOffice) as NodePort
+    so tests running on host can reach them via localhost:<port>.
+    Maps to ports matching wopiSrc overrides in deployment-values.yaml.
+    """
+    return [{
+        "name": "expose-collaboration-services",
+        "image": K3D_IMAGE,
+        "commands": [
+            "export KUBECONFIG=kubeconfig-$${DRONE_BUILD_NUMBER}.yaml",
+            "until test -f $${KUBECONFIG}; do sleep 1s; done",
+            # Expose collaboration-fakeoffice on NodePort 30100 (accessible via localhost:9300 from loadbalancer mapping)
+            # Ensure base service exists with the expected name used by tests
+            "kubectl -n ocis get svc collaboration-fakeoffice || kubectl -n ocis expose deployment collaboration-fakeoffice --type=NodePort --port=9300 --name=collaboration-fakeoffice",
+            # Patch the base service to be NodePort for in-cluster + host access
+            "kubectl -n ocis patch svc collaboration-fakeoffice -p '{\"spec\":{\"type\":\"NodePort\",\"ports\":[{\"port\":9300,\"nodePort\":30100}]}}' || true",
+            # Ensure collabora service exists and set NodePort 30102 (localhost:9302)
+            "kubectl -n ocis get svc collaboration-collabora || kubectl -n ocis expose deployment collaboration-collabora --type=NodePort --port=9300 --name=collaboration-collabora",
+            "kubectl -n ocis patch svc collaboration-collabora -p '{\"spec\":{\"type\":\"NodePort\",\"ports\":[{\"port\":9300,\"nodePort\":30102}]}}' || true",
+            # Ensure onlyoffice service exists and set NodePort 30105 (localhost:9305)
+            "kubectl -n ocis get svc collaboration-onlyoffice || kubectl -n ocis expose deployment collaboration-onlyoffice --type=NodePort --port=9300 --name=collaboration-onlyoffice",
+            "kubectl -n ocis patch svc collaboration-onlyoffice -p '{\"spec\":{\"type\":\"NodePort\",\"ports\":[{\"port\":9300,\"nodePort\":30105}]}}' || true",
+            # Verify services are exposed
+            "kubectl -n ocis get svc | grep collaboration",
+        ],
+    }]
+
+def ociswrapper():
     return [{
         "name": "ociswrapper",
         "image": K3D_IMAGE,

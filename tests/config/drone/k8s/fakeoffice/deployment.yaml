@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fakeoffice
+  namespace: ocis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fakeoffice
+  template:
+    metadata:
+      labels:
+        app: fakeoffice
+    spec:
+      containers:
+        - name: fakeoffice
+          image: alpine:latest
+          command:
+            [
+              "/bin/sh",
+              "-c",
+              "while true; do echo -e \"HTTP/1.1 200 OK\\nContent-Type: text/xml\\n\\n$(cat /var/www/hosting-discovery.xml)\" | nc -l -k -p 8080; done",
+            ]
+          ports:
+            - containerPort: 8080
+              name: http
+          volumeMounts:
+            - name: hosting-discovery-volume
+              mountPath: /var/www/
+              readOnly: true
+      volumes:
+        - name: hosting-discovery-volume
+          configMap:
+            name: fakeoffice-discovery
+            items:
+              - key: hosting-discovery.xml
+                path: hosting-discovery.xml
+            defaultMode: 0755
