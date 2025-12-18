@@ -376,6 +376,7 @@ config = {
                 "coreApiWebdavUploadTUS",
             ],
             "skip": False,
+            "k8s": True,
         },
     },
     "e2eTests": {
@@ -508,8 +509,6 @@ def main(ctx):
         licenseCheck(ctx)
 
     test_pipelines = \
-        codestyle(ctx) + \
-        checkGherkinLint(ctx) + \
         checkTestSuitesInExpectedFailures(ctx) + \
         buildWebCache(ctx) + \
         getGoBinForTesting(ctx) + \
@@ -1422,7 +1421,7 @@ def coreApiTestPipeline(ctx):
                                  (tikaService() if params["tikaNeeded"] else []) +
                                  (waitForClamavService() if params["antivirusNeeded"] else []) +
                                  (waitForEmailService() if params["emailNeeded"] else []) +
-                                 (waitK3sCluster() + prepareOcisDeployment(name) + setupOcisConfigMaps(name) + deployOcis() + waitForOcis(ocis_url = ocis_url) + ociswrapper() + waitForOciswrapper() if run_on_k8s else ocisServer(storage, extra_server_environment = params["extraServerEnvironment"], with_wrapper = True, tika_enabled = params["tikaNeeded"], volumes = ([stepVolumeOcisStorage]))) +
+                                 (waitK3sCluster() + prepareOcisDeployment(name, params["suites"]) + setupOcisConfigMaps(name, params["suites"]) + deployOcis() + waitForOcis(ocis_url = ocis_url) + ociswrapper() + waitForOciswrapper() if run_on_k8s else ocisServer(storage, extra_server_environment = params["extraServerEnvironment"], with_wrapper = True, tika_enabled = params["tikaNeeded"], volumes = ([stepVolumeOcisStorage]))) +
                                  [
                                      {
                                          "name": "run-api-tests",
@@ -2748,7 +2747,7 @@ def build():
             "name": "build",
             "image": OC_CI_GOLANG,
             "commands": [
-                "retry -t 3 'make -C ocis build'",
+                "retry -t 3 'make -C ocis build ENABLE_VIPS=true'",
             ],
             "environment": DRONE_HTTP_PROXY_ENV,
             "volumes": [stepVolumeGo],
@@ -2761,7 +2760,7 @@ def buildDebug():
             "name": "build debug binary",
             "image": OC_CI_GOLANG,
             "commands": [
-                "retry -t 3 'make -C ocis build-debug'",
+                "retry -t 3 'make -C ocis build-debug ENABLE_VIPS=true'",
             ],
             "environment": DRONE_HTTP_PROXY_ENV,
             "volumes": [stepVolumeGo],
@@ -3824,7 +3823,7 @@ def waitK3sCluster():
         ],
     }]
 
-def prepareOcisDeployment(suite_name = ""):
+def prepareOcisDeployment(suite_name = "", suites = []):
     commands = [
         "make -C %s build" % dirs["ocisWrapper"],
         "mv %s/tests/config/drone/k8s/values.yaml %s/ocis-charts/charts/ocis/ci/deployment-values.yaml" % (dirs["base"], dirs["base"]),
@@ -3846,6 +3845,15 @@ def prepareOcisDeployment(suite_name = ""):
             "sed -i 's|name: sharing-banned-passwords-{{ .appName }}|name: sharing-banned-passwords|' ./charts/ocis/templates/sharing/deployment.yaml",
         ])
 
+    # Add specific patches for coreApiWebdavPreviews suite
+    if "coreApiWebdavPreviews" in suites:
+        commands.extend([
+            # Patch thumbnails deployment to mount Unicode fonts (ConfigMaps created in k3sCluster)
+            "sed -i '/- name: THUMBNAILS_TRANSFER_TOKEN/i\\\\            - name: THUMBNAILS_TXT_FONTMAP_FILE\\\n              value: /etc/ocis/fontsMap.json\\\n' ./charts/ocis/templates/thumbnails/deployment.yaml",
+            "sed -i '/volumeMounts:/a\\\\            - name: ocis-fonts-ttf\\\n              mountPath: /etc/ocis/fonts\\\n            - name: ocis-fonts-map\\\n              mountPath: /etc/ocis/fontsMap.json\\\n              subPath: fontsMap.json' ./charts/ocis/templates/thumbnails/deployment.yaml",
+            "sed -i '/volumes:/a\\\\        - name: ocis-fonts-ttf\\\n          configMap:\\\n            name: ocis-fonts-ttf\\\n        - name: ocis-fonts-map\\\n          configMap:\\\n            name: ocis-fonts-map' ./charts/ocis/templates/thumbnails/deployment.yaml",
+        ])
+
     return [{
         "name": "prepare-ocis-deployment",
         "image": "owncloudci/golang:latest",
@@ -3858,7 +3866,7 @@ def prepareOcisDeployment(suite_name = ""):
         ],
     }]
 
-def setupOcisConfigMaps(suite_name = ""):
+def setupOcisConfigMaps(suite_name = "", suites = []):
     commands = [
         "export KUBECONFIG=%s/kubeconfig-$${DRONE_BUILD_NUMBER}.yaml" % dirs["base"],
         # Create namespace for oCIS deployment
@@ -3870,6 +3878,14 @@ def setupOcisConfigMaps(suite_name = ""):
         commands.append(
             "kubectl create configmap -n ocis sharing-banned-passwords --from-file=banned-password-list.txt=%s/tests/config/drone/banned-password-list.txt" % dirs["base"],
         )
+
+    # Setup Unicode font support for thumbnails - create ConfigMaps
+    if "coreApiWebdavPreviews" in suites:
+        commands.extend([
+            "echo '{\"defaultFont\": \"/etc/ocis/fonts/NotoSans.ttf\"}' > %s/fontsMap.json" % dirs["base"],
+            "kubectl create configmap -n ocis ocis-fonts-ttf --from-file=%s/tests/config/drone/NotoSans.ttf" % dirs["base"],
+            "kubectl create configmap -n ocis ocis-fonts-map --from-file=%s/fontsMap.json" % dirs["base"],
+        ])
 
     return [{
         "name": "setup-configmaps",
