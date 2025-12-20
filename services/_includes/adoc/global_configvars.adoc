@@ -28,7 +28,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-The default role assignments the demo users should be setup.
+Flag to enable or disable the creation of the demo users.
 a| `OCIS_ADMIN_USER_ID`
 
 a| [subs=-attributes]
@@ -90,7 +90,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The password to use for authentication. Only applies when store type 'nats-js-kv' is configured.
+The password to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.
 a| `OCIS_CACHE_AUTH_USERNAME`
 
 a| [subs=-attributes]
@@ -116,7 +116,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The username to use for authentication. Only applies when store type 'nats-js-kv' is configured.
+The username to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.
 a| `OCIS_CACHE_DATABASE`
 
 a| [subs=-attributes]
@@ -136,7 +136,7 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++cache-providers ++
+++cache-stat ++
 
 a| [subs=-attributes]
 The database name the configured store should use.
@@ -164,11 +164,11 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Disables persistence of the provider cache. Only applies when store type 'nats-js-kv' is configured. Defaults to false.
+Disable persistence of the cache. Only applies when using the 'nats-js-kv' store type. Defaults to false.
 a| `OCIS_CACHE_STORE`
 
 a| [subs=-attributes]
-++pre5.0 ++
+++5.0 ++
 
 a| [subs=attributes+]
 * xref:{s-path}/frontend.adoc[frontend] +
@@ -187,14 +187,14 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++noop ++
+++nats-js-kv ++
 
 a| [subs=-attributes]
-The type of the cache store. Supported values are: 'memory', 'redis-sentinel', 'nats-js-kv', 'noop'. See the text description for details.
+The type of the signing key store. Supported values are: 'redis-sentinel' and 'nats-js-kv'. See the text description for details.
 a| `OCIS_CACHE_STORE_NODES`
 
 a| [subs=-attributes]
-++pre5.0 ++
+++5.0 ++
 
 a| [subs=attributes+]
 * xref:{s-path}/frontend.adoc[frontend] +
@@ -216,11 +216,11 @@ a| [subs=-attributes]
 ++[127.0.0.1:9233] ++
 
 a| [subs=-attributes]
-A list of nodes to access the configured store. This has no effect when 'memory' store is configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details.
+A list of nodes to access the configured store. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details.
 a| `OCIS_CACHE_TTL`
 
 a| [subs=-attributes]
-++pre5.0 ++
+++5.0 ++
 
 a| [subs=attributes+]
 * xref:{s-path}/frontend.adoc[frontend] +
@@ -239,10 +239,10 @@ a| [subs=-attributes]
 ++Duration ++
 
 a| [subs=-attributes]
-++5m0s ++
+++12h0m0s ++
 
 a| [subs=-attributes]
-Default time to live for user info in the cache. Only applied when access tokens has no expiration. See the Environment Variable Types description for more details.
+Default time to live for signing keys. See the Environment Variable Types description for more details.
 a| `OCIS_CLAIM_MANAGED_SPACES_ENABLED`
 
 a| [subs=-attributes]
@@ -318,7 +318,7 @@ a| [subs=-attributes]
 ++[]string ++
 
 a| [subs=-attributes]
-++[Authorization Origin Content-Type Accept X-Requested-With X-Request-Id Purge Restore] ++
+++[Authorization Origin Content-Type Accept X-Requested-With X-Request-Id Ocs-Apirequest] ++
 
 a| [subs=-attributes]
 A list of allowed CORS headers. See following chapter for more details: *Access-Control-Request-Headers* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers. See the Environment Variable Types description for more details.
@@ -349,7 +349,7 @@ a| [subs=-attributes]
 ++[]string ++
 
 a| [subs=-attributes]
-++[GET POST PUT PATCH DELETE OPTIONS] ++
+++[GET POST DELETE] ++
 
 a| [subs=-attributes]
 A list of allowed CORS methods. See following chapter for more details: *Access-Control-Request-Method* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method. See the Environment Variable Types description for more details.
@@ -458,7 +458,7 @@ Edition of oCIS. Used for branding purposes.
 a| `OCIS_ENABLE_OCM`
 
 a| [subs=-attributes]
-++5.0 ++
+++pre5.0 ++
 
 a| [subs=attributes+]
 * xref:{s-path}/frontend.adoc[frontend] +
@@ -474,7 +474,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Include OCM sharees when listing users.
+Changing this value is NOT supported. Enables support for incoming federated sharing for clients. The backend behaviour is not changed.
 a| `OCIS_EVENTS_AUTH_PASSWORD`
 
 a| [subs=-attributes]
@@ -570,7 +570,7 @@ a| [subs=-attributes]
 ++ocis-cluster ++
 
 a| [subs=-attributes]
-The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.
+The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system.
 a| `OCIS_EVENTS_ENABLE_TLS`
 
 a| [subs=-attributes]
@@ -635,7 +635,7 @@ a| [subs=-attributes]
 ++127.0.0.1:9233 ++
 
 a| [subs=-attributes]
-The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Set to a empty string to disable emitting events.
+The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.
 a| `OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE`
 
 a| [subs=-attributes]
@@ -666,7 +666,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The root CA certificate used to validate the server's TLS certificate. If provided GRAPH_EVENTS_TLS_INSECURE will be seen as false.
+The root CA certificate used to validate the server's TLS certificate. If provided AUDIT_EVENTS_TLS_INSECURE will be seen as false.
 a| `OCIS_GATEWAY_GRPC_ADDR`
 
 a| [subs=-attributes]
@@ -763,7 +763,7 @@ TLS mode for grpc connection to the go-micro based grpc services. Possible value
 a| `OCIS_GRPC_PROTOCOL`
 
 a| [subs=-attributes]
-++pre5.0 ++
+++7.0.0 ++
 
 a| [subs=attributes+]
 * xref:{s-path}/app-provider.adoc[app-provider] +
@@ -917,11 +917,11 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Allow insecure connections to the OIDC issuer.
+Whether to verify the server TLS certificates.
 a| `OCIS_JWT_SECRET`
 
 a| [subs=-attributes]
-++pre5.0 ++
+++7.0.0 ++
 
 a| [subs=attributes+]
 * xref:{s-path}/activitylog.adoc[activitylog] +
@@ -995,7 +995,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The client id to authenticate with keycloak.
+The client ID to authenticate with keycloak.
 a| `OCIS_KEYCLOAK_CLIENT_REALM`
 
 a| [subs=-attributes]
@@ -1850,7 +1850,7 @@ Activates pretty log output.
 a| `OCIS_MACHINE_AUTH_API_KEY`
 
 a| [subs=-attributes]
-++pre5.0 ++
+++7.0.0 ++
 
 a| [subs=attributes+]
 * xref:{s-path}/auth-app.adoc[auth-app] +
@@ -1868,7 +1868,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-Machine auth API key used to validate internal requests necessary to access resources from other services.
+The machine auth API key used to validate internal requests necessary to access resources from other services.
 a| `OCIS_MAX_CONCURRENCY`
 
 a| [subs=-attributes]
@@ -1886,10 +1886,10 @@ a| [subs=-attributes]
 ++int ++
 
 a| [subs=-attributes]
-++20 ++
+++1 ++
 
 a| [subs=-attributes]
-The maximum number of concurrent requests the service will handle.
+Maximum number of concurrent go-routines. Higher values can potentially get work done faster but will also cause more load on the system. Values of 0 or below will be ignored and the default value will be used.
 a| `OCIS_MAX_TAG_LENGTH`
 
 a| [subs=-attributes]
@@ -1927,7 +1927,7 @@ This authentication level name indicates that multi-factor authentication was pe
 a| `OCIS_MFA_ENABLED`
 
 a| [subs=-attributes]
-++Balch ++
+++7.3.0 ++
 
 a| [subs=attributes+]
 * xref:{s-path}/frontend.adoc[frontend] +
@@ -1940,7 +1940,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Enable MFA enforcement. If enabled users need to complete MFA before they can access specific paths
+Set to true to enable multi factor authentication. See the documentation for more details.
 a| `OCIS_OIDC_ISSUER`
 
 a| [subs=-attributes]
@@ -2104,7 +2104,7 @@ a| [subs=-attributes]
 ++nats-js-kv ++
 
 a| [subs=-attributes]
-The type of the store. Supported values are: 'memory', 'nats-js-kv', 'redis-sentinel', 'noop'. See the text description for details.
+The type of the store. Supported values are: 'memory', 'redis-sentinel', 'nats-js-kv', 'noop'. See the text description for details.
 a| `OCIS_PERSISTENT_STORE_AUTH_PASSWORD`
 
 a| [subs=-attributes]
@@ -2185,10 +2185,10 @@ a| [subs=-attributes]
 ++Duration ++
 
 a| [subs=-attributes]
-++336h0m0s ++
+++0s ++
 
 a| [subs=-attributes]
-Time to live for events in the store. Defaults to '336h' (2 weeks). See the Environment Variable Types description for more details.
+Time to live for events in the store. See the Environment Variable Types description for more details.
 a| `OCIS_REVA_GATEWAY`
 
 a| [subs=-attributes]
@@ -2353,7 +2353,7 @@ a| [subs=-attributes]
 ++0 ++
 
 a| [subs=-attributes]
-Set a global max quota for spaces in bytes. A value of 0 equals unlimited. If not using the global OCIS_SPACES_MAX_QUOTA, you must define the FRONTEND_MAX_QUOTA in the frontend service.
+Set the global max quota value in bytes. A value of 0 equals unlimited. The value is provided via capabilities.
 a| `OCIS_SYSTEM_USER_API_KEY`
 
 a| [subs=-attributes]
@@ -2660,11 +2660,11 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The storage transfer secret.
+Transfer secret for signing file up- and download requests.
 a| `OCIS_TRANSLATION_PATH`
 
 a| [subs=-attributes]
-++7.0.0 ++
+++pre5.0 ++
 
 a| [subs=attributes+]
 * xref:{s-path}/activitylog.adoc[activitylog] +
@@ -2731,11 +2731,11 @@ a| [subs=-attributes]
 ++[] ++
 
 a| [subs=-attributes]
-The attributes to display in the user search results.
+A list of user attributes to display in the user search results.
 a| `OCIS_WOPI_DISABLE_CHAT`
 
 a| [subs=-attributes]
-++pre5.0 ++
+++7.0.0 ++
 
 a| [subs=attributes+]
 * xref:{s-path}/app-provider.adoc[app-provider] +
@@ -2748,7 +2748,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Disable the chat functionality of the office app.
+Disable chat in the office web frontend. This feature applies to OnlyOffice and Microsoft.
 a| `STORAGE_USERS_ASYNC_PROPAGATOR_PROPAGATION_DELAY`
 
 a| [subs=-attributes]
