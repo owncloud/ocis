@@ -7912,28 +7912,28 @@ OCIS_ASYNC_UPLOADS:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_CACHE_AUTH_PASSWORD:
-  name: OCIS_CACHE_AUTH_PASSWORD;OCS_PRESIGNEDURL_SIGNING_KEYS_STORE_AUTH_PASSWORD
+  name: OCIS_CACHE_AUTH_PASSWORD
   defaultValue: ""
   type: string
-  description: The password to authenticate with the store. Only applies when store
-    type 'nats-js-kv' is configured.
+  description: The password to use for authentication. Only applies when using the
+    'nats-js-kv' store type.
   introductionVersion: "5.0"
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
 OCIS_CACHE_AUTH_USERNAME:
-  name: OCIS_CACHE_AUTH_USERNAME;OCS_PRESIGNEDURL_SIGNING_KEYS_STORE_AUTH_USERNAME
+  name: OCIS_CACHE_AUTH_USERNAME
   defaultValue: ""
   type: string
-  description: The username to authenticate with the store. Only applies when store
-    type 'nats-js-kv' is configured.
+  description: The username to use for authentication. Only applies when using the
+    'nats-js-kv' store type.
   introductionVersion: "5.0"
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
 OCIS_CACHE_DATABASE:
   name: OCIS_CACHE_DATABASE
-  defaultValue: cache-createhome
+  defaultValue: cache-stat
   type: string
   description: The database name the configured store should use.
   introductionVersion: pre5.0
@@ -7941,43 +7941,45 @@ OCIS_CACHE_DATABASE:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_CACHE_DISABLE_PERSISTENCE:
-  name: OCIS_CACHE_DISABLE_PERSISTENCE;GATEWAY_CREATE_HOME_CACHE_DISABLE_PERSISTENCE
+  name: OCIS_CACHE_DISABLE_PERSISTENCE
   defaultValue: "false"
   type: bool
-  description: Disables persistence of the create home cache. Only applies when store
-    type 'nats-js-kv' is configured. Defaults to false.
+  description: Disable persistence of the cache. Only applies when using the 'nats-js-kv'
+    store type. Defaults to false.
   introductionVersion: "5.0"
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
 OCIS_CACHE_STORE:
-  name: OCIS_CACHE_STORE;OCS_PRESIGNEDURL_SIGNING_KEYS_STORE
-  defaultValue: nats-js-kv
+  name: OCIS_CACHE_STORE
+  defaultValue: memory
   type: string
-  description: 'The type of the signing key store. Supported values are: ''redis-sentinel''
-    and ''nats-js-kv''. See the text description for details.'
-  introductionVersion: "5.0"
+  description: 'The type of the cache store. Supported values are: ''memory'', ''redis-sentinel'',
+    ''nats-js-kv'', ''noop''. See the text description for details.'
+  introductionVersion: pre5.0
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
 OCIS_CACHE_STORE_NODES:
-  name: OCIS_CACHE_STORE_NODES;OCS_PRESIGNEDURL_SIGNING_KEYS_STORE_NODES
+  name: OCIS_CACHE_STORE_NODES
   defaultValue: '[127.0.0.1:9233]'
   type: '[]string'
-  description: A list of nodes to access the configured store. Note that the behaviour
-    how nodes are used is dependent on the library of the configured store. See the
-    Environment Variable Types description for more details.
-  introductionVersion: "5.0"
+  description: A list of nodes to access the configured store. This has no effect
+    when 'memory' store is configured. Note that the behaviour how nodes are used
+    is dependent on the library of the configured store. See the Environment Variable
+    Types description for more details.
+  introductionVersion: pre5.0
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
 OCIS_CACHE_TTL:
-  name: OCIS_CACHE_TTL;OCS_PRESIGNEDURL_SIGNING_KEYS_STORE_TTL
-  defaultValue: 12h0m0s
+  name: OCIS_CACHE_TTL
+  defaultValue: 5m0s
   type: Duration
-  description: Default time to live for signing keys. See the Environment Variable
-    Types description for more details.
-  introductionVersion: "5.0"
+  description: Default time to live for user info in the cache. Only applied when
+    access tokens has no expiration. See the Environment Variable Types description
+    for more details.
+  introductionVersion: pre5.0
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
@@ -8019,19 +8021,21 @@ OCIS_CLAIM_MANAGED_SPACES_REGEXP:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_CORS_ALLOW_CREDENTIALS:
-  name: OCIS_CORS_ALLOW_CREDENTIALS;OCS_CORS_ALLOW_CREDENTIALS
-  defaultValue: "true"
+  name: OCIS_CORS_ALLOW_CREDENTIALS;WEB_CORS_ALLOW_CREDENTIALS
+  defaultValue: "false"
   type: bool
-  description: 'Allow credentials for CORS.See following chapter for more details:
+  description: 'Allow credentials for CORS. See following chapter for more details:
     *Access-Control-Allow-Credentials* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials.'
   introductionVersion: pre5.0
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
 OCIS_CORS_ALLOW_HEADERS:
-  name: OCIS_CORS_ALLOW_HEADERS;OCS_CORS_ALLOW_HEADERS
-  defaultValue: '[Authorization Origin Content-Type Accept X-Requested-With X-Request-Id
-    Cache-Control]'
+  name: OCIS_CORS_ALLOW_HEADERS;WEB_CORS_ALLOW_HEADERS
+  defaultValue: '[Origin Accept Content-Type Depth Authorization Ocs-Apirequest If-None-Match
+    If-Match Destination Overwrite X-Request-Id X-Requested-With Tus-Resumable Tus-Checksum-Algorithm
+    Upload-Concat Upload-Length Upload-Metadata Upload-Defer-Length Upload-Expires
+    Upload-Checksum Upload-Offset X-HTTP-Method-Override]'
   type: '[]string'
   description: 'A list of allowed CORS headers. See following chapter for more details:
     *Access-Control-Request-Headers* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers.
@@ -8041,8 +8045,9 @@ OCIS_CORS_ALLOW_HEADERS:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_CORS_ALLOW_METHODS:
-  name: OCIS_CORS_ALLOW_METHODS;OCS_CORS_ALLOW_METHODS
-  defaultValue: '[GET POST PUT PATCH DELETE OPTIONS]'
+  name: OCIS_CORS_ALLOW_METHODS;WEB_CORS_ALLOW_METHODS
+  defaultValue: '[OPTIONS HEAD GET PUT PATCH POST DELETE MKCOL PROPFIND PROPPATCH
+    MOVE COPY REPORT SEARCH]'
   type: '[]string'
   description: 'A list of allowed CORS methods. See following chapter for more details:
     *Access-Control-Request-Method* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method.
@@ -8052,8 +8057,8 @@ OCIS_CORS_ALLOW_METHODS:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_CORS_ALLOW_ORIGINS:
-  name: OCIS_CORS_ALLOW_ORIGINS;OCS_CORS_ALLOW_ORIGINS
-  defaultValue: '[*]'
+  name: OCIS_CORS_ALLOW_ORIGINS;WEB_CORS_ALLOW_ORIGINS
+  defaultValue: '[https://localhost:9200]'
   type: '[]string'
   description: 'A list of allowed CORS origins. See following chapter for more details:
     *Access-Control-Allow-Origin* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin.
@@ -8148,7 +8153,7 @@ OCIS_DISABLE_VERSIONING:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_EDITION:
-  name: OCIS_EDITION;OCDAV_EDITION
+  name: OCIS_EDITION;FRONTEND_EDITION
   defaultValue: Community
   type: string
   description: Edition of oCIS. Used for branding purposes.
@@ -8175,7 +8180,7 @@ OCIS_ENABLE_OCM:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_EVENTS_AUTH_PASSWORD:
-  name: OCIS_EVENTS_AUTH_PASSWORD;SEARCH_EVENTS_AUTH_PASSWORD
+  name: OCIS_EVENTS_AUTH_PASSWORD;CLIENTLOG_EVENTS_AUTH_PASSWORD
   defaultValue: ""
   type: string
   description: The password to authenticate with the events broker. The events broker
@@ -8185,7 +8190,7 @@ OCIS_EVENTS_AUTH_PASSWORD:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_EVENTS_AUTH_USERNAME:
-  name: OCIS_EVENTS_AUTH_USERNAME;SEARCH_EVENTS_AUTH_USERNAME
+  name: OCIS_EVENTS_AUTH_USERNAME;CLIENTLOG_EVENTS_AUTH_USERNAME
   defaultValue: ""
   type: string
   description: The username to authenticate with the events broker. The events broker
@@ -8195,43 +8200,43 @@ OCIS_EVENTS_AUTH_USERNAME:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_EVENTS_CLUSTER:
-  name: OCIS_EVENTS_CLUSTER;SEARCH_EVENTS_CLUSTER
+  name: OCIS_EVENTS_CLUSTER;CLIENTLOG_EVENTS_CLUSTER
   defaultValue: ocis-cluster
   type: string
   description: The clusterID of the event system. The event system is the message
     queuing service. It is used as message broker for the microservice architecture.
     Mandatory when using NATS as event system.
-  introductionVersion: pre5.0
+  introductionVersion: "5.0"
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
 OCIS_EVENTS_ENABLE_TLS:
-  name: OCIS_EVENTS_ENABLE_TLS;SEARCH_EVENTS_ENABLE_TLS
+  name: OCIS_EVENTS_ENABLE_TLS;CLIENTLOG_EVENTS_ENABLE_TLS
   defaultValue: "false"
   type: bool
   description: Enable TLS for the connection to the events broker. The events broker
     is the ocis service which receives and delivers events between the services.
-  introductionVersion: pre5.0
+  introductionVersion: "5.0"
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
 OCIS_EVENTS_ENDPOINT:
-  name: OCIS_EVENTS_ENDPOINT;SEARCH_EVENTS_ENDPOINT
+  name: OCIS_EVENTS_ENDPOINT;CLIENTLOG_EVENTS_ENDPOINT
   defaultValue: 127.0.0.1:9233
   type: string
   description: The address of the event system. The event system is the message queuing
     service. It is used as message broker for the microservice architecture.
-  introductionVersion: pre5.0
+  introductionVersion: "5.0"
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
 OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE:
-  name: OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE;SEARCH_EVENTS_TLS_ROOT_CA_CERTIFICATE
+  name: OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE;CLIENTLOG_EVENTS_TLS_ROOT_CA_CERTIFICATE
   defaultValue: ""
   type: string
   description: The root CA certificate used to validate the server's TLS certificate.
-    If provided SEARCH_EVENTS_TLS_INSECURE will be seen as false.
-  introductionVersion: pre5.0
+    If provided NOTIFICATIONS_EVENTS_TLS_INSECURE will be seen as false.
+  introductionVersion: "5.0"
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
@@ -8268,11 +8273,11 @@ OCIS_GRPC_CLIENT_TLS_MODE:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_GRPC_PROTOCOL:
-  name: OCIS_GRPC_PROTOCOL;AUTH_APP_GRPC_PROTOCOL
+  name: OCIS_GRPC_PROTOCOL;AUTH_BEARER_GRPC_PROTOCOL
   defaultValue: ""
   type: string
   description: The transport protocol of the GRPC service.
-  introductionVersion: 7.0.0
+  introductionVersion: pre5.0
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
@@ -8308,20 +8313,20 @@ OCIS_HTTP_TLS_KEY:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_INSECURE:
-  name: OCIS_INSECURE;SEARCH_EXTRACTOR_CS3SOURCE_INSECURE
+  name: OCIS_INSECURE;CLIENTLOG_EVENTS_TLS_INSECURE
   defaultValue: "false"
   type: bool
-  description: Ignore untrusted SSL certificates when connecting to the CS3 source.
-  introductionVersion: pre5.0
+  description: Whether to verify the server TLS certificates.
+  introductionVersion: "5.0"
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
 OCIS_JWT_SECRET:
-  name: OCIS_JWT_SECRET;SEARCH_JWT_SECRET
+  name: OCIS_JWT_SECRET;CLIENTLOG_JWT_SECRET
   defaultValue: ""
   type: string
   description: The secret to mint and validate jwt tokens.
-  introductionVersion: pre5.0
+  introductionVersion: "5.0"
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
@@ -8678,54 +8683,54 @@ OCIS_LDAP_USER_SCOPE:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_LOG_COLOR:
-  name: OCIS_LOG_COLOR;SEARCH_LOG_COLOR
+  name: OCIS_LOG_COLOR;CLIENTLOG_USERLOG_LOG_COLOR
   defaultValue: "false"
   type: bool
   description: Activates colorized log output.
-  introductionVersion: pre5.0
+  introductionVersion: "5.0"
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
 OCIS_LOG_FILE:
-  name: OCIS_LOG_FILE;SEARCH_LOG_FILE
+  name: OCIS_LOG_FILE;CLIENTLOG_USERLOG_LOG_FILE
   defaultValue: ""
   type: string
   description: The path to the log file. Activates logging to this file if set.
-  introductionVersion: pre5.0
+  introductionVersion: "5.0"
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
 OCIS_LOG_LEVEL:
-  name: OCIS_LOG_LEVEL;SEARCH_LOG_LEVEL
+  name: OCIS_LOG_LEVEL;CLIENTLOG_USERLOG_LOG_LEVEL
   defaultValue: ""
   type: string
   description: 'The log level. Valid values are: ''panic'', ''fatal'', ''error'',
     ''warn'', ''info'', ''debug'', ''trace''.'
-  introductionVersion: pre5.0
+  introductionVersion: "5.0"
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
 OCIS_LOG_PRETTY:
-  name: OCIS_LOG_PRETTY;SEARCH_LOG_PRETTY
+  name: OCIS_LOG_PRETTY;CLIENTLOG_USERLOG_LOG_PRETTY
   defaultValue: "false"
   type: bool
   description: Activates pretty log output.
-  introductionVersion: pre5.0
+  introductionVersion: "5.0"
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
 OCIS_MACHINE_AUTH_API_KEY:
-  name: OCIS_MACHINE_AUTH_API_KEY;AUTH_APP_MACHINE_AUTH_API_KEY
+  name: OCIS_MACHINE_AUTH_API_KEY;FRONTEND_MACHINE_AUTH_API_KEY
   defaultValue: ""
   type: string
   description: The machine auth API key used to validate internal requests necessary
     to access resources from other services.
-  introductionVersion: 7.0.0
+  introductionVersion: pre5.0
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
 OCIS_MAX_CONCURRENCY:
-  name: OCIS_MAX_CONCURRENCY;USERLOG_MAX_CONCURRENCY
+  name: OCIS_MAX_CONCURRENCY;SHARING_USER_JSONCS3_MAX_CONCURRENCY
   defaultValue: "1"
   type: int
   description: Maximum number of concurrent go-routines. Higher values can potentially
@@ -8825,7 +8830,7 @@ OCIS_OIDC_CLIENT_ID:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_OIDC_ISSUER:
-  name: OCIS_URL;OCIS_OIDC_ISSUER;WEB_OIDC_AUTHORITY
+  name: OCIS_URL;OCIS_OIDC_ISSUER;AUTH_BEARER_OIDC_ISSUER
   defaultValue: https://localhost:9200
   type: string
   description: URL of the OIDC issuer. It defaults to URL of the builtin IDP.
@@ -8834,7 +8839,7 @@ OCIS_OIDC_ISSUER:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST:
-  name: OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST;FRONTEND_PASSWORD_POLICY_BANNED_PASSWORDS_LIST
+  name: OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST;SHARING_PASSWORD_POLICY_BANNED_PASSWORDS_LIST
   defaultValue: ""
   type: string
   description: Path to the 'banned passwords list' file. This only impacts public
@@ -8844,7 +8849,7 @@ OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_PASSWORD_POLICY_DISABLED:
-  name: OCIS_PASSWORD_POLICY_DISABLED;FRONTEND_PASSWORD_POLICY_DISABLED
+  name: OCIS_PASSWORD_POLICY_DISABLED;SHARING_PASSWORD_POLICY_DISABLED
   defaultValue: "false"
   type: bool
   description: Disable the password policy. Defaults to false if not set.
@@ -8853,7 +8858,7 @@ OCIS_PASSWORD_POLICY_DISABLED:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_PASSWORD_POLICY_MIN_CHARACTERS:
-  name: OCIS_PASSWORD_POLICY_MIN_CHARACTERS;FRONTEND_PASSWORD_POLICY_MIN_CHARACTERS
+  name: OCIS_PASSWORD_POLICY_MIN_CHARACTERS;SHARING_PASSWORD_POLICY_MIN_CHARACTERS
   defaultValue: "8"
   type: int
   description: Define the minimum password length. Defaults to 8 if not set.
@@ -8862,7 +8867,7 @@ OCIS_PASSWORD_POLICY_MIN_CHARACTERS:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_PASSWORD_POLICY_MIN_DIGITS:
-  name: OCIS_PASSWORD_POLICY_MIN_DIGITS;FRONTEND_PASSWORD_POLICY_MIN_DIGITS
+  name: OCIS_PASSWORD_POLICY_MIN_DIGITS;SHARING_PASSWORD_POLICY_MIN_DIGITS
   defaultValue: "1"
   type: int
   description: Define the minimum number of digits. Defaults to 1 if not set.
@@ -8871,7 +8876,7 @@ OCIS_PASSWORD_POLICY_MIN_DIGITS:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS:
-  name: OCIS_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS;FRONTEND_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS
+  name: OCIS_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS;SHARING_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS
   defaultValue: "1"
   type: int
   description: Define the minimum number of uppercase letters. Defaults to 1 if not
@@ -8881,7 +8886,7 @@ OCIS_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS:
-  name: OCIS_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS;FRONTEND_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS
+  name: OCIS_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS;SHARING_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS
   defaultValue: "1"
   type: int
   description: Define the minimum number of characters from the special characters
@@ -8891,7 +8896,7 @@ OCIS_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS:
-  name: OCIS_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS;FRONTEND_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS
+  name: OCIS_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS;SHARING_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS
   defaultValue: "1"
   type: int
   description: Define the minimum number of lowercase letters. Defaults to 1 if not
@@ -8901,54 +8906,54 @@ OCIS_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_PERSISTENT_STORE:
-  name: OCIS_PERSISTENT_STORE;POSTPROCESSING_STORE
+  name: OCIS_PERSISTENT_STORE;NOTIFICATIONS_STORE
   defaultValue: nats-js-kv
   type: string
-  description: 'The type of the store. Supported values are: ''memory'', ''redis-sentinel'',
-    ''nats-js-kv'', ''noop''. See the text description for details.'
-  introductionVersion: pre5.0
+  description: 'The type of the store. Supported values are: ''memory'', ''nats-js-kv'',
+    ''redis-sentinel'', ''noop''. See the text description for details.'
+  introductionVersion: 7.1.0
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
 OCIS_PERSISTENT_STORE_AUTH_PASSWORD:
-  name: OCIS_PERSISTENT_STORE_AUTH_PASSWORD;POSTPROCESSING_STORE_AUTH_PASSWORD
+  name: OCIS_PERSISTENT_STORE_AUTH_PASSWORD;NOTIFICATIONS_STORE_AUTH_PASSWORD
   defaultValue: ""
   type: string
   description: The password to authenticate with the store. Only applies when store
     type 'nats-js-kv' is configured.
-  introductionVersion: "5.0"
+  introductionVersion: 7.1.0
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
 OCIS_PERSISTENT_STORE_AUTH_USERNAME:
-  name: OCIS_PERSISTENT_STORE_AUTH_USERNAME;POSTPROCESSING_STORE_AUTH_USERNAME
+  name: OCIS_PERSISTENT_STORE_AUTH_USERNAME;NOTIFICATIONS_STORE_AUTH_USERNAME
   defaultValue: ""
   type: string
   description: The username to authenticate with the store. Only applies when store
     type 'nats-js-kv' is configured.
-  introductionVersion: "5.0"
+  introductionVersion: 7.1.0
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
 OCIS_PERSISTENT_STORE_NODES:
-  name: OCIS_PERSISTENT_STORE_NODES;POSTPROCESSING_STORE_NODES
+  name: OCIS_PERSISTENT_STORE_NODES;NOTIFICATIONS_STORE_NODES
   defaultValue: '[127.0.0.1:9233]'
   type: '[]string'
   description: A list of nodes to access the configured store. This has no effect
     when 'memory' store is configured. Note that the behaviour how nodes are used
     is dependent on the library of the configured store. See the Environment Variable
     Types description for more details.
-  introductionVersion: pre5.0
+  introductionVersion: 7.1.0
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
 OCIS_PERSISTENT_STORE_TTL:
-  name: OCIS_PERSISTENT_STORE_TTL;POSTPROCESSING_STORE_TTL
-  defaultValue: 0s
+  name: OCIS_PERSISTENT_STORE_TTL;NOTIFICATIONS_STORE_TTL
+  defaultValue: 336h0m0s
   type: Duration
-  description: Time to live for events in the store. See the Environment Variable
-    Types description for more details.
-  introductionVersion: pre5.0
+  description: Time to live for notifications in the store. Defaults to '336h' (2
+    weeks). See the Environment Variable Types description for more details.
+  introductionVersion: 7.1.0
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
@@ -8965,8 +8970,8 @@ OCIS_REVA_GATEWAY:
   name: OCIS_REVA_GATEWAY
   defaultValue: com.owncloud.api.gateway
   type: string
-  description: The CS3 gateway endpoint.
-  introductionVersion: pre5.0
+  description: CS3 gateway used to look up user metadata
+  introductionVersion: "5.0"
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
@@ -8993,7 +8998,7 @@ OCIS_REVA_GATEWAY_TLS_MODE:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_SERVICE_ACCOUNT_ID:
-  name: OCIS_SERVICE_ACCOUNT_ID;SEARCH_SERVICE_ACCOUNT_ID
+  name: OCIS_SERVICE_ACCOUNT_ID;CLIENTLOG_SERVICE_ACCOUNT_ID
   defaultValue: ""
   type: string
   description: The ID of the service account the service should use. See the 'auth-service'
@@ -9003,7 +9008,7 @@ OCIS_SERVICE_ACCOUNT_ID:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_SERVICE_ACCOUNT_SECRET:
-  name: OCIS_SERVICE_ACCOUNT_SECRET;SEARCH_SERVICE_ACCOUNT_SECRET
+  name: OCIS_SERVICE_ACCOUNT_SECRET;CLIENTLOG_SERVICE_ACCOUNT_SECRET
   defaultValue: ""
   type: string
   description: The service account secret.
@@ -9012,7 +9017,7 @@ OCIS_SERVICE_ACCOUNT_SECRET:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD:
-  name: OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD
+  name: OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD;SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD
   defaultValue: "true"
   type: bool
   description: Set this to true if you want to enforce passwords on all public shares.
@@ -9021,11 +9026,11 @@ OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD:
-  name: OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD
+  name: OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD;SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD
   defaultValue: "false"
   type: bool
-  description: Set this to true if you want to enforce passwords for writable shares.
-    Only effective if the setting for 'passwords on all public shares' is set to false.
+  description: Set this to true if you want to enforce passwords on Uploader, Editor
+    or Contributor shares.
   introductionVersion: "5.0"
   deprecationVersion: ""
   removalVersion: ""
@@ -9052,7 +9057,7 @@ OCIS_SPACES_MAX_QUOTA:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_SYSTEM_USER_API_KEY:
-  name: OCIS_SYSTEM_USER_API_KEY
+  name: OCIS_SYSTEM_USER_API_KEY;SHARING_PUBLIC_CS3_SYSTEM_USER_API_KEY
   defaultValue: ""
   type: string
   description: API key for the STORAGE-SYSTEM system user.
@@ -9061,10 +9066,10 @@ OCIS_SYSTEM_USER_API_KEY:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_SYSTEM_USER_ID:
-  name: OCIS_SYSTEM_USER_ID
+  name: OCIS_SYSTEM_USER_ID;SHARING_PUBLIC_CS3_SYSTEM_USER_ID
   defaultValue: ""
   type: string
-  description: ID of the oCIS storage-system system user. Admins need to set the ID
+  description: ID of the oCIS STORAGE-SYSTEM system user. Admins need to set the ID
     for the STORAGE-SYSTEM system user in this config option which is then used to
     reference the user. Any reasonable long string is possible, preferably this would
     be an UUIDv4 format.
@@ -9082,40 +9087,40 @@ OCIS_SYSTEM_USER_IDP:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_TRACING_COLLECTOR:
-  name: OCIS_TRACING_COLLECTOR;SEARCH_TRACING_COLLECTOR
+  name: OCIS_TRACING_COLLECTOR;CLIENTLOG_TRACING_COLLECTOR
   defaultValue: ""
   type: string
   description: The HTTP endpoint for sending spans directly to a collector, i.e. http://jaeger-collector:14268/api/traces.
     Only used if the tracing endpoint is unset.
-  introductionVersion: pre5.0
+  introductionVersion: "5.0"
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
 OCIS_TRACING_ENABLED:
-  name: OCIS_TRACING_ENABLED;SEARCH_TRACING_ENABLED
+  name: OCIS_TRACING_ENABLED;CLIENTLOG_TRACING_ENABLED
   defaultValue: "false"
   type: bool
   description: Activates tracing.
-  introductionVersion: pre5.0
+  introductionVersion: "5.0"
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
 OCIS_TRACING_ENDPOINT:
-  name: OCIS_TRACING_ENDPOINT;SEARCH_TRACING_ENDPOINT
+  name: OCIS_TRACING_ENDPOINT;CLIENTLOG_TRACING_ENDPOINT
   defaultValue: ""
   type: string
   description: The endpoint of the tracing agent.
-  introductionVersion: pre5.0
+  introductionVersion: "5.0"
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
 OCIS_TRACING_TYPE:
-  name: OCIS_TRACING_TYPE;SEARCH_TRACING_TYPE
+  name: OCIS_TRACING_TYPE;CLIENTLOG_TRACING_TYPE
   defaultValue: ""
   type: string
   description: The type of tracing. Defaults to '', which is the same as 'jaeger'.
     Allowed tracing types are 'jaeger', 'otlp' and '' as of now.
-  introductionVersion: pre5.0
+  introductionVersion: "5.0"
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
@@ -9123,7 +9128,7 @@ OCIS_TRANSFER_SECRET:
   name: OCIS_TRANSFER_SECRET
   defaultValue: ""
   type: string
-  description: The storage transfer secret.
+  description: Transfer secret for signing file up- and download requests.
   introductionVersion: pre5.0
   deprecationVersion: ""
   removalVersion: ""
@@ -9140,10 +9145,10 @@ OCIS_TRANSLATION_PATH:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_URL:
-  name: OCIS_URL;OCIS_PUBLIC_URL
-  defaultValue: https://127.0.0.1:9200
+  name: OCIS_URL;OCIS_OIDC_ISSUER;AUTH_BEARER_OIDC_ISSUER
+  defaultValue: https://localhost:9200
   type: string
-  description: URL, where oCIS is reachable for users.
+  description: URL of the OIDC issuer. It defaults to URL of the builtin IDP.
   introductionVersion: pre5.0
   deprecationVersion: ""
   removalVersion: ""
@@ -9158,12 +9163,11 @@ OCIS_USER_SEARCH_DISPLAYED_ATTRIBUTES:
   removalVersion: ""
   deprecationInfo: ""
 OCIS_WOPI_DISABLE_CHAT:
-  name: COLLABORATION_WOPI_DISABLE_CHAT;OCIS_WOPI_DISABLE_CHAT
+  name: APP_PROVIDER_WOPI_DISABLE_CHAT;OCIS_WOPI_DISABLE_CHAT
   defaultValue: "false"
   type: bool
-  description: Disable chat in the office web frontend. This feature applies to OnlyOffice
-    and Microsoft.
-  introductionVersion: 7.0.0
+  description: Disable the chat functionality of the office app.
+  introductionVersion: pre5.0
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
