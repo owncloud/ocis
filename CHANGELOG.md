@@ -83,6 +83,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Introduce claims for multi-instance-ocis: [#11848](https://github.com/owncloud/ocis/pull/11848)
 * Enhancement - Update the ocis_full deployment example images: [#11860](https://github.com/owncloud/ocis/pull/11860)
 * Enhancement - Update the ocis_full deployment example traefik image: [#11867](https://github.com/owncloud/ocis/pull/11867)
+* Enhancement - Added a graph endpoint alias: [#11871](https://github.com/owncloud/ocis/pull/11871)
 
 ## Details
 
@@ -234,6 +235,12 @@ The following sections list the changes for unreleased.
   * Traefik fix for Collabora
 
    https://github.com/owncloud/ocis/pull/11867
+
+* Enhancement - Added a graph endpoint alias: [#11871](https://github.com/owncloud/ocis/pull/11871)
+
+   We added a graph endpoint alias that uses the unified roles instead of cs3 roles
+
+   https://github.com/owncloud/ocis/pull/11871
 
 # Changelog for [7.3.1] (2025-11-24)
 
