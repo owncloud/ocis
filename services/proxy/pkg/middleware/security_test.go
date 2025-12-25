@@ -60,3 +60,27 @@ func TestStrictTransportSecurity(t *testing.T) {
 	expected := "max-age=315360000; includeSubDomains; preload"
 	assert.Equal(t, hstsHeader, expected, "HSTS header missing includeSubDomains directive - subdomains not protected")
 }
+
+func TestStrictTransportSecurity_ForceOnHTTP(t *testing.T) {
+	t.Setenv("PROXY_FORCE_STRICT_TRANSPORT_SECURITY", "true")
+
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	})
+	cspConfig := &config.CSP{
+		Directives: map[string][]string{
+			"default-src": {"'none'"},
+		},
+	}
+	securityMiddleware := Security(cspConfig)
+
+	// Plain HTTP request (no TLS); should still emit Strict-Transport-Security when forced.
+	req := httptest.NewRequest("GET", "http://example.com/", nil)
+
+	rr := httptest.NewRecorder()
+	securityMiddleware(handler).ServeHTTP(rr, req)
+
+	stsHeader := rr.Header().Get("Strict-Transport-Security")
+	expected := "max-age=315360000; includeSubDomains; preload"
+	assert.Equal(t, stsHeader, expected)
+}
