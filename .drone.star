@@ -3951,71 +3951,21 @@ def patchCollaborationWopiSrc():
     ]
 
 def patchFakeofficeDiscovery():
-    """Patch FakeOffice WOPI discovery XML to include template conversion actions with target extensions"""
+    """Inject canonical hosting-discovery.xml into the FakeOffice ConfigMap for k8s tests"""
     return [
-        "cat > /tmp/patch_fakeoffice_discovery.py << 'EOFPYTHON'\n" +
-        "# Patch tests/config/drone/k8s/fakeoffice/configmap.yaml to add template conversion actions\n" +
-        ("with open('%s/tests/config/drone/k8s/fakeoffice/configmap.yaml', 'r') as f:\n" % dirs["base"]) +
-        "    content = f.read()\n\n" +
-        "template_conversions = \"\"\"                <!-- OnlyOffice template conversions - convert templates to Office formats -->\n" +
-        "                <action name=\"convert\" ext=\"dotm\" targetext=\"docx\" urlsrc=\"https://fakeoffice.owncloud.test/not/relevant?\"/>\n" +
-        "                <action name=\"convert\" ext=\"ott\" targetext=\"docx\" urlsrc=\"https://fakeoffice.owncloud.test/not/relevant?\"/>\n" +
-        "                <action name=\"convert\" ext=\"dotx\" targetext=\"docx\" urlsrc=\"https://fakeoffice.owncloud.test/not/relevant?\"/>\n" +
-        "                <action name=\"convert\" ext=\"ots\" targetext=\"xlsx\" urlsrc=\"https://fakeoffice.owncloud.test/not/relevant?\"/>\n" +
-        "                <action name=\"convert\" ext=\"xltm\" targetext=\"xlsx\" urlsrc=\"https://fakeoffice.owncloud.test/not/relevant?\"/>\n" +
-        "                <action name=\"convert\" ext=\"xltx\" targetext=\"xlsx\" urlsrc=\"https://fakeoffice.owncloud.test/not/relevant?\"/>\n" +
-        "                <action name=\"convert\" ext=\"otp\" targetext=\"pptx\" urlsrc=\"https://fakeoffice.owncloud.test/not/relevant?\"/>\n" +
-        "                <action name=\"convert\" ext=\"potm\" targetext=\"pptx\" urlsrc=\"https://fakeoffice.owncloud.test/not/relevant?\"/>\n" +
-        "                <action name=\"convert\" ext=\"potx\" targetext=\"pptx\" urlsrc=\"https://fakeoffice.owncloud.test/not/relevant?\"/>\n\"\"\"\n\n" +
-        "template_viewedits = \"\"\"                <!-- Template view/edit actions so templates appear in /hosting discovery -->\n" +
-        "                <action default=\"true\" ext=\"dotm\" name=\"view\" urlsrc=\"https://fakeoffice.owncloud.test/not/relevant?\"/>\n" +
-        "                <action default=\"true\" ext=\"dotm\" name=\"edit\" urlsrc=\"https://fakeoffice.owncloud.test/not/relevant?\"/>\n" +
-        "                <action default=\"true\" ext=\"ott\" name=\"view\" urlsrc=\"https://fakeoffice.owncloud.test/not/relevant?\"/>\n" +
-        "                <action default=\"true\" ext=\"ott\" name=\"edit\" urlsrc=\"https://fakeoffice.owncloud.test/not/relevant?\"/>\n" +
-        "                <action default=\"true\" ext=\"dotx\" name=\"view\" urlsrc=\"https://fakeoffice.owncloud.test/not/relevant?\"/>\n" +
-        "                <action default=\"true\" ext=\"dotx\" name=\"edit\" urlsrc=\"https://fakeoffice.owncloud.test/not/relevant?\"/>\n" +
-        "                <action default=\"true\" ext=\"ots\" name=\"view\" urlsrc=\"https://fakeoffice.owncloud.test/not/relevant?\"/>\n" +
-        "                <action default=\"true\" ext=\"ots\" name=\"edit\" urlsrc=\"https://fakeoffice.owncloud.test/not/relevant?\"/>\n" +
-        "                <action default=\"true\" ext=\"xltm\" name=\"view\" urlsrc=\"https://fakeoffice.owncloud.test/not/relevant?\"/>\n" +
-        "                <action default=\"true\" ext=\"xltm\" name=\"edit\" urlsrc=\"https://fakeoffice.owncloud.test/not/relevant?\"/>\n" +
-        "                <action default=\"true\" ext=\"xltx\" name=\"view\" urlsrc=\"https://fakeoffice.owncloud.test/not/relevant?\"/>\n" +
-        "                <action default=\"true\" ext=\"xltx\" name=\"edit\" urlsrc=\"https://fakeoffice.owncloud.test/not/relevant?\"/>\n" +
-        "                <action default=\"true\" ext=\"otp\" name=\"view\" urlsrc=\"https://fakeoffice.owncloud.test/not/relevant?\"/>\n" +
-        "                <action default=\"true\" ext=\"otp\" name=\"edit\" urlsrc=\"https://fakeoffice.owncloud.test/not/relevant?\"/>\n" +
-        "                <action default=\"true\" ext=\"potm\" name=\"view\" urlsrc=\"https://fakeoffice.owncloud.test/not/relevant?\"/>\n" +
-        "                <action default=\"true\" ext=\"potm\" name=\"edit\" urlsrc=\"https://fakeoffice.owncloud.test/not/relevant?\"/>\n" +
-        "                <action default=\"true\" ext=\"potx\" name=\"view\" urlsrc=\"https://fakeoffice.owncloud.test/not/relevant?\"/>\n" +
-        "                <action default=\"true\" ext=\"potx\" name=\"edit\" urlsrc=\"https://fakeoffice.owncloud.test/not/relevant?\"/>\n\"\"\"\n\n" +
-        "collabora_app = \"\"\"            <!-- Collabora app - converts templates to OpenDocument formats -->\n" +
-        "            <app favIconUrl=\"https://fakeoffice.owncloud.test/favicon.ico\" name=\"collabora\">\n" +
-        "                <!-- Collabora template view/edit actions to surface template mime types -->\n" +
-        "                <action default=\"true\" ext=\"ott\" name=\"view\" urlsrc=\"https://fakeoffice.owncloud.test/not/relevant?\"/>\n" +
-        "                <action default=\"true\" ext=\"ott\" name=\"edit\" urlsrc=\"https://fakeoffice.owncloud.test/not/relevant?\"/>\n" +
-        "                <action default=\"true\" ext=\"ots\" name=\"view\" urlsrc=\"https://fakeoffice.owncloud.test/not/relevant?\"/>\n" +
-        "                <action default=\"true\" ext=\"ots\" name=\"edit\" urlsrc=\"https://fakeoffice.owncloud.test/not/relevant?\"/>\n" +
-        "                <action default=\"true\" ext=\"otp\" name=\"view\" urlsrc=\"https://fakeoffice.owncloud.test/not/relevant?\"/>\n" +
-        "                <action default=\"true\" ext=\"otp\" name=\"edit\" urlsrc=\"https://fakeoffice.owncloud.test/not/relevant?\"/>\n" +
-        "                <action name=\"convert\" ext=\"ott\" targetext=\"odt\" urlsrc=\"https://fakeoffice.owncloud.test/not/relevant?\"/>\n" +
-        "                <action name=\"convert\" ext=\"ots\" targetext=\"ods\" urlsrc=\"https://fakeoffice.owncloud.test/not/relevant?\"/>\n" +
-        "                <action name=\"convert\" ext=\"otp\" targetext=\"odp\" urlsrc=\"https://fakeoffice.owncloud.test/not/relevant?\"/>\n" +
-        "            </app>\n\"\"\"\n\n" +
-        "# Insert template conversions before first </app>\n" +
-        "if '            </app>' in content:\n" +
-        "    content = content.replace('            </app>', template_viewedits + template_conversions + '            </app>', 1)\n" +
-        "else:\n" +
-        "    raise SystemExit('Marker </app> not found in fakeoffice configmap')\n\n" +
-        "# Insert Collabora app before </net-zone>\n" +
-        "if '        </net-zone>' in content:\n" +
-        "    content = content.replace('        </net-zone>', collabora_app + '        </net-zone>', 1)\n" +
-        "else:\n" +
-        "    raise SystemExit('Marker </net-zone> not found in fakeoffice configmap')\n\n" +
-        ("with open('%s/tests/config/drone/k8s/fakeoffice/configmap.yaml', 'w') as f:\n" % dirs["base"]) +
-        "    f.write(content)\n\n" +
-        "print('Patched fakeoffice configmap.yaml with template conversions')\n" +
-        "EOFPYTHON",
-        "python3 /tmp/patch_fakeoffice_discovery.py",
-        "echo '=== Verifying FakeOffice discovery XML includes template conversions ==='",
-        ("grep -c 'targetext=' %s/tests/config/drone/k8s/fakeoffice/configmap.yaml || echo 'Warning: No targetext attributes found!'" % dirs["base"]),
+        "awk -v hostfile=\"%s/tests/config/drone/hosting-discovery.xml\" ' $0==\"  hosting-discovery.xml: |\" { print $0; while ((getline h < hostfile) > 0) { print \"    \" h } while ((getline l) > 0) { if (l == \"  serve-discovery.sh: |\") { print l; break } } next } { print }' %s/tests/config/drone/k8s/fakeoffice/configmap.yaml > /tmp/fake.tmp && mv /tmp/fake.tmp %s/tests/config/drone/k8s/fakeoffice/configmap.yaml" % (dirs["base"], dirs["base"], dirs["base"]),
+        "echo 'Injected canonical hosting-discovery.xml into fakeoffice configmap'",
+        "echo '=== Canonical hosting-discovery.xml (first 120 lines) ==='",
+        "sed -n '1,120p' %s/tests/config/drone/hosting-discovery.xml" % dirs["base"],
+        "echo '=== FakeOffice configmap after injection (first 200 lines) ==='",
+        "sed -n '1,200p' %s/tests/config/drone/k8s/fakeoffice/configmap.yaml" % dirs["base"],
+        "echo '=== Checking presence of name=\"FakeOffice\" in injected configmap ==='",
+        "bash -c 'grep -q FakeOffice %s/tests/config/drone/k8s/fakeoffice/configmap.yaml || (echo \"ERROR: FakeOffice not present in fakeoffice configmap\" && exit 1)'" % dirs["base"],
+        "echo '=== Checking for targetext entries ==='",
+        "bash -lc 'if grep -q targetext= %s/tests/config/drone/k8s/fakeoffice/configmap.yaml; then echo Found targetext entries; else echo ERROR: No targetext entries; exit 1; fi'" % dirs["base"],
+        "echo '=== Checking deployment-values for ODT mimetype default app ==='",
+        "bash -lc 'grep -n application/vnd.oasis.opendocument.text %s/ocis-charts/charts/ocis/ci/deployment-values.yaml || echo Mimetype missing from deployment-values.yaml'" % dirs["base"],
+        "bash -lc 'grep -n -E \"default_app:.*FakeOffice\" %s/ocis-charts/charts/ocis/ci/deployment-values.yaml || echo default_app for ODT is not FakeOffice'" % dirs["base"],
     ]
 
 def getWopiCommands():
