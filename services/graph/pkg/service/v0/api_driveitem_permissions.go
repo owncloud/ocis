@@ -69,7 +69,8 @@ type DriveItemPermissionsProvider interface {
 // DriveItemPermissionsService contains the production business logic for everything that relates to permissions on drive items.
 type DriveItemPermissionsService struct {
 	BaseGraphService
-	tp trace.TracerProvider
+	tp              trace.TracerProvider
+	identityBackend identity.Backend
 }
 
 type permissionType int
@@ -83,7 +84,7 @@ const (
 )
 
 // NewDriveItemPermissionsService creates a new DriveItemPermissionsService
-func NewDriveItemPermissionsService(logger log.Logger, gatewaySelector pool.Selectable[gateway.GatewayAPIClient], identityCache identity.IdentityCache, config *config.Config, tp trace.TracerProvider) (DriveItemPermissionsService, error) {
+func NewDriveItemPermissionsService(logger log.Logger, gatewaySelector pool.Selectable[gateway.GatewayAPIClient], identityCache identity.IdentityCache, config *config.Config, tp trace.TracerProvider, be identity.Backend) (DriveItemPermissionsService, error) {
 	return DriveItemPermissionsService{
 		BaseGraphService: BaseGraphService{
 			logger:          &log.Logger{Logger: logger.With().Str("graph api", "DrivesDriveItemService").Logger()},
@@ -91,7 +92,8 @@ func NewDriveItemPermissionsService(logger log.Logger, gatewaySelector pool.Sele
 			identityCache:   identityCache,
 			config:          config,
 		},
-		tp: tp,
+		tp:              tp,
+		identityBackend: be,
 	}, nil
 }
 
@@ -190,12 +192,17 @@ func (s DriveItemPermissionsService) Invite(ctx context.Context, resourceId *sto
 		expiration = createShareResponse.GetShare().GetExpiration()
 	default:
 		user, err := s.identityCache.GetUser(ctx, objectID)
-		if errors.Is(err, identity.ErrNotFound) && s.config.IncludeOCMSharees {
-			user, err = s.identityCache.GetAcceptedUser(ctx, objectID)
-			if err == nil && IsSpaceRoot(statResponse.GetInfo().GetId()) {
-				err = errorcode.New(errorcode.InvalidRequest, "federated user can not become a space member")
-				s.logger.Error().Err(err).Str("resourceId", resourceId.GetStorageId()).Interface("userId", objectID).Msg(err.Error())
-				return libregraph.Permission{}, err
+		if errors.Is(err, identity.ErrNotFound) {
+			if s.config.MultiInstance.Enabled {
+				user, err = s.identityBackend.AddUser(ctx, objectID, s.config.MultiInstance.InstanceID)
+			}
+			if s.config.IncludeOCMSharees && err != nil {
+				user, err = s.identityCache.GetAcceptedUser(ctx, objectID)
+				if err == nil && IsSpaceRoot(statResponse.GetInfo().GetId()) {
+					err = errorcode.New(errorcode.InvalidRequest, "federated user can not become a space member")
+					s.logger.Error().Err(err).Str("resourceId", resourceId.GetStorageId()).Interface("userId", objectID).Msg(err.Error())
+					return libregraph.Permission{}, err
+				}
 			}
 		}
 		if err != nil {

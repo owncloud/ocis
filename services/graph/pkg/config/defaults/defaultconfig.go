@@ -101,6 +101,7 @@ func DefaultConfig() *config.Config {
 				UserIDAttribute:           "owncloudUUID",
 				UserTypeAttribute:         "ownCloudUserType",
 				UserEnabledAttribute:      "ownCloudUserEnabled",
+				UserGuestAttribute:        "ownCloudGuestOf",
 				ExternalIDAttribute:       "owncloudExternalID",
 				DisableUserMechanism:      "attribute",
 				LdapDisabledUsersGroupDN:  "cn=DisabledUsersGroup,ou=groups,o=libregraph-idm",

@@ -61,6 +61,7 @@ type LDAP struct {
 
 	disableUserMechanism    DisableUserMechanismType
 	localUserDisableGroupDN string
+	userGuestClaim          string
 
 	groupBaseDN          string
 	groupCreateBaseDN    string
@@ -166,6 +167,7 @@ func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger) (*LD
 		userIDisOctetString:     config.UserIDIsOctetString,
 		userScope:               userScope,
 		userAttributeMap:        uam,
+		userGuestClaim:          config.UserGuestAttribute,
 		groupBaseDN:             config.GroupBaseDN,
 		groupCreateBaseDN:       config.GroupCreateBaseDN,
 		groupFilter:             config.GroupFilter,
@@ -411,6 +413,25 @@ func (i *LDAP) UpdateUser(ctx context.Context, nameOrID string, user libregraph.
 	return returnUser, nil
 }
 
+// AddUser adds a user to the instance by setting the corresponding guest attribute.
+func (i *LDAP) AddUser(ctx context.Context, id string, instanceID string) (libregraph.User, error) {
+	e, err := i.getPreciseLDAPUser(id)
+	if err != nil {
+		return libregraph.User{}, err
+	}
+	mr := ldap.ModifyRequest{DN: e.DN}
+	mr.Add(i.userGuestClaim, []string{instanceID})
+	if err := i.conn.Modify(&mr); err != nil {
+		i.logger.Error().Err(err).Msg("error adding user")
+		return libregraph.User{}, err
+	}
+	u, err := i.refineUser(e, nil)
+	if err != nil {
+		return libregraph.User{}, err
+	}
+	return *u, nil
+}
+
 func (i *LDAP) getUserByDN(dn, searchTerm string) (*ldap.Entry, error) {
 	baseFilter := fmt.Sprintf("(objectClass=%s)", i.userObjectClass)
 
@@ -524,7 +545,7 @@ func (i *LDAP) getLDAPUserByID(id string) (*ldap.Entry, error) {
 		return nil, fmt.Errorf("invalid User id: %w", err)
 	}
 	filter := fmt.Sprintf("(%s=%s)", i.userAttributeMap.id, idString)
-	return i.getLDAPUserByFilter(filter)
+	return i.getLDAPUserByFilter(filter, i.userFilter)
 }
 
 func (i *LDAP) getLDAPUserByNameOrID(nameOrID string) (*ldap.Entry, error) {
@@ -538,11 +559,16 @@ func (i *LDAP) getLDAPUserByNameOrID(nameOrID string) (*ldap.Entry, error) {
 		filter = fmt.Sprintf("(%s=%s)", i.userAttributeMap.userName, ldap.EscapeFilter(nameOrID))
 	}
 
-	return i.getLDAPUserByFilter(filter)
+	return i.getLDAPUserByFilter(filter, i.userFilter)
 }
 
-func (i *LDAP) getLDAPUserByFilter(filter string) (*ldap.Entry, error) {
-	filter = fmt.Sprintf("(&%s(objectClass=%s)%s)", i.userFilter, i.userObjectClass, filter)
+func (i *LDAP) getPreciseLDAPUser(uniqueID string) (*ldap.Entry, error) {
+	filter := fmt.Sprintf("(|(%s=%s)(%s=%s))", i.userAttributeMap.mail, ldap.EscapeFilter(uniqueID), i.userAttributeMap.id, ldap.EscapeFilter(uniqueID))
+	return i.getLDAPUserByFilter(filter, "") // no user filter for precise search
+}
+
+func (i *LDAP) getLDAPUserByFilter(filter string, userFilter string) (*ldap.Entry, error) {
+	filter = fmt.Sprintf("(&%s(objectClass=%s)%s)", userFilter, i.userObjectClass, filter)
 	return i.searchLDAPEntryByFilter(i.userBaseDN, i.getUserAttrTypesForSearch(), filter)
 }
 
@@ -556,6 +582,31 @@ func (i *LDAP) GetUser(ctx context.Context, nameOrID string, oreq *godata.GoData
 		return nil, err
 	}
 
+	var q *godata.GoDataQuery
+	if oreq != nil {
+		q = oreq.Query
+	}
+	return i.refineUser(e, q)
+}
+
+// GetPreciseUser gets a user using its exact email address or id. The overall user filter will be ignored.
+func (i *LDAP) GetPreciseUser(ctx context.Context, name string, oreq *godata.GoDataRequest) (*libregraph.User, error) {
+	logger := i.logger.SubloggerWithRequestID(ctx)
+	logger.Debug().Str("backend", "ldap").Msg("GetPreciseUser")
+
+	e, err := i.getPreciseLDAPUser(name)
+	if err != nil {
+		return nil, err
+	}
+
+	var q *godata.GoDataQuery
+	if oreq != nil {
+		q = oreq.Query
+	}
+	return i.refineUser(e, q)
+}
+
+func (i *LDAP) refineUser(e *ldap.Entry, query *godata.GoDataQuery) (*libregraph.User, error) {
 	u := i.createUserModelFromLDAP(e)
 	if u == nil {
 		return nil, ErrNotFound
@@ -568,7 +619,7 @@ func (i *LDAP) GetUser(ctx context.Context, nameOrID string, oreq *godata.GoData
 		}
 	}
 
-	exp, err := GetExpandValues(oreq.Query)
+	exp, err := GetExpandValues(query)
 	if err != nil {
 		return nil, err
 	}

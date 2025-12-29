@@ -33,8 +33,9 @@ type Config struct {
 	UnifiedRoles      UnifiedRoles `yaml:"unified_roles"`
 	MaxConcurrency    int          `yaml:"max_concurrency" env:"OCIS_MAX_CONCURRENCY;GRAPH_MAX_CONCURRENCY" desc:"The maximum number of concurrent requests the service will handle." introductionVersion:"7.0.0"`
 
-	Keycloak       Keycloak       `yaml:"keycloak"`
-	ServiceAccount ServiceAccount `yaml:"service_account"`
+	Keycloak       Keycloak            `yaml:"keycloak"`
+	ServiceAccount ServiceAccount      `yaml:"service_account"`
+	MultiInstance  MultiInstanceConfig `yaml:"multi_instance"`
 
 	Validation Validation `yaml:"validation"`
 
@@ -76,6 +77,7 @@ type LDAP struct {
 	UserTypeAttribute        string `yaml:"user_type_attribute" env:"OCIS_LDAP_USER_SCHEMA_USER_TYPE;GRAPH_LDAP_USER_TYPE_ATTRIBUTE" desc:"LDAP Attribute to distinguish between 'Member' and 'Guest' users. Default is 'ownCloudUserType'." introductionVersion:"pre5.0"`
 	UserEnabledAttribute     string `yaml:"user_enabled_attribute" env:"OCIS_LDAP_USER_ENABLED_ATTRIBUTE;GRAPH_USER_ENABLED_ATTRIBUTE" desc:"LDAP Attribute to use as a flag telling if the user is enabled or disabled." introductionVersion:"pre5.0"`
 	ExternalIDAttribute      string `yaml:"external_id_attribute" env:"OCIS_LDAP_USER_SCHEMA_EXTERNAL_ID;GRAPH_LDAP_EXTERNAL_ID_ATTRIBUTE" desc:"LDAP attribute that references the external ID of users during the provisioning process. The final ID is provided by an external identity provider. If it is not set, a default attribute will be used instead." introductionVersion:"8.0.0"`
+	UserGuestAttribute       string `yaml:"user_guest_attribute" env:"OCIS_LDAP_USER_GUEST_ATTRIBUTE" desc:"LDAP Attribute to signal the user is guest of the instance. Requires OCIS_MULTI_INSTANCE_ENABLED." introductionVersion:"Curie"`
 	DisableUserMechanism     string `yaml:"disable_user_mechanism" env:"OCIS_LDAP_DISABLE_USER_MECHANISM;GRAPH_DISABLE_USER_MECHANISM" desc:"An option to control the behavior for disabling users. Supported options are 'none', 'attribute' and 'group'. If set to 'group', disabling a user via API will add the user to the configured group for disabled users, if set to 'attribute' this will be done in the ldap user entry, if set to 'none' the disable request is not processed. Default is 'attribute'." introductionVersion:"pre5.0"`
 	LdapDisabledUsersGroupDN string `yaml:"ldap_disabled_users_group_dn" env:"OCIS_LDAP_DISABLED_USERS_GROUP_DN;GRAPH_DISABLED_USERS_GROUP_DN" desc:"The distinguished name of the group to which added users will be classified as disabled when 'disable_user_mechanism' is set to 'group'." introductionVersion:"pre5.0"`
 
@@ -161,4 +163,10 @@ type ServiceAccount struct {
 
 type Validation struct {
 	MaxTagLength int `yaml:"max_tag_length" env:"OCIS_MAX_TAG_LENGTH" desc:"Define the maximum tag length. Defaults to 100 if not set. Set to 0 to not limit the tag length. Changes only impact the validation of new tags." introductionVersion:"7.2.0"`
+}
+
+// MultiInstanceConfig holds configuration for multi-instance-ocis
+type MultiInstanceConfig struct {
+	Enabled    bool   `yaml:"enabled" env:"OCIS_MULTI_INSTANCE_ENABLED" desc:"Enable multiple instances of Infinite Scale." introductionVersion:"Curie"`
+	InstanceID string `yaml:"instanceid" env:"OCIS_MULTI_INSTANCE_INSTANCEID" desc:"The unique id of this instance" introductionVersion:"Curie"`
 }

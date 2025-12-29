@@ -55,7 +55,7 @@ var _ = Describe("createLinkTests", func() {
 		cache := identity.NewIdentityCache(identity.IdentityCacheWithGatewaySelector(gatewaySelector))
 
 		cfg := defaults.FullDefaultConfig()
-		svc, err = service.NewDriveItemPermissionsService(logger, gatewaySelector, cache, cfg, otel.GetTracerProvider())
+		svc, err = service.NewDriveItemPermissionsService(logger, gatewaySelector, cache, cfg, otel.GetTracerProvider(), nil)
 		Expect(err).ToNot(HaveOccurred())
 		driveItemId = &provider.ResourceId{
 			StorageId: "1",
