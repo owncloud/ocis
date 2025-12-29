@@ -1,0 +1,8 @@
+# groupOfNames requires at least one member to be present
+# The refint will use this dn if the last member of the group
+# has been removed
+dn: cn=nobody,dc=owncloud,dc=com
+objectClass: top
+objectClass: organizationalRole
+description: to be used for refint in empty groups
+cn: nobody
