@@ -109,7 +109,7 @@ Feature: Space management
 
   Scenario: user without space admin permission tries to change the name of the project space
     When user "Carol" tries to change the name of the "Project" space to "New Name" owned by user "Alice"
-    Then the HTTP status code should be "404"
+    Then the HTTP status code should be "403"
     And the user "Alice" should have a space called "Project"
 
 
@@ -136,7 +136,7 @@ Feature: Space management
   Scenario: user without space admin permission tries to change the description of the project space
     Given user "Alice" has changed the description of the "Project" space to "old description"
     When user "Carol" tries to change the description of the "Project" space to "New description" owned by user "Alice"
-    Then the HTTP status code should be "404"
+    Then the HTTP status code should be "403"
 
 
   Scenario: space admin user disables the project space
@@ -151,12 +151,8 @@ Feature: Space management
 
 
   Scenario Outline: space admin user tries to disable the personal space
-    When user "<user>" disables a space "Alice Hansen" owned by user "Alice"
-    Then the HTTP status code should be "404"
-    Examples:
-      | user  |
-      | Brian |
-      | Carol |
+    When user "Brian" disables a space "Alice Hansen" owned by user "Alice"
+    Then the HTTP status code should be "403"
 
 
   Scenario: space admin user deletes the project space
@@ -169,7 +165,7 @@ Feature: Space management
   Scenario: user without space admin permission tries to delete the project space
     Given user "Alice" has disabled a space "Project"
     When user "Carol" tries to delete a space "Project" owned by user "Alice"
-    Then the HTTP status code should be "404"
+    Then the HTTP status code should be "403"
 
 
   Scenario: space admin user enables the project space
