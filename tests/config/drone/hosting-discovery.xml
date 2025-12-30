@@ -1,12 +1,64 @@
 <wopi-discovery>
     <net-zone name="external-http">
-        <app favIconUrl="https://fakeoffice.owncloud.test/favicon.ico" name="wopitest">
+        <app favIconUrl="https://fakeoffice.owncloud.test/favicon.ico" name="FakeOffice">
             <action default="true" ext="wopitest" name="view" urlsrc="https://fakeoffice.owncloud.test/not/relevant?"/>
             <action default="true" ext="wopitest" name="edit" urlsrc="https://fakeoffice.owncloud.test/not/relevant?"/>
             <action default="true" ext="odt" name="view" urlsrc="https://fakeoffice.owncloud.test/not/relevant?"/>
             <action default="true" ext="odt" name="edit" urlsrc="https://fakeoffice.owncloud.test/not/relevant?"/>
+            <action default="true" ext="ods" name="view" urlsrc="https://fakeoffice.owncloud.test/not/relevant?"/>
+            <action default="true" ext="ods" name="edit" urlsrc="https://fakeoffice.owncloud.test/not/relevant?"/>
+            <action default="true" ext="odp" name="view" urlsrc="https://fakeoffice.owncloud.test/not/relevant?"/>
+            <action default="true" ext="odp" name="edit" urlsrc="https://fakeoffice.owncloud.test/not/relevant?"/>
             <action default="true" ext="txt" name="view" urlsrc="https://fakeoffice.owncloud.test/not/relevant?"/>
             <action default="true" ext="txt" name="edit" urlsrc="https://fakeoffice.owncloud.test/not/relevant?"/>
+            <action default="true" ext="docx" name="view" urlsrc="https://fakeoffice.owncloud.test/not/relevant?"/>
+            <action default="true" ext="docx" name="edit" urlsrc="https://fakeoffice.owncloud.test/not/relevant?"/>
+            <action default="true" ext="xlsx" name="view" urlsrc="https://fakeoffice.owncloud.test/not/relevant?"/>
+            <action default="true" ext="xlsx" name="edit" urlsrc="https://fakeoffice.owncloud.test/not/relevant?"/>
+            <action default="true" ext="pptx" name="view" urlsrc="https://fakeoffice.owncloud.test/not/relevant?"/>
+            <action default="true" ext="pptx" name="edit" urlsrc="https://fakeoffice.owncloud.test/not/relevant?"/>
+            <!-- Template view/edit actions so templates appear in /hosting discovery -->
+            <action default="true" ext="dotm" name="view" urlsrc="https://fakeoffice.owncloud.test/not/relevant?"/>
+            <action default="true" ext="dotm" name="edit" urlsrc="https://fakeoffice.owncloud.test/not/relevant?"/>
+            <action default="true" ext="ott" name="view" urlsrc="https://fakeoffice.owncloud.test/not/relevant?"/>
+            <action default="true" ext="ott" name="edit" urlsrc="https://fakeoffice.owncloud.test/not/relevant?"/>
+            <action default="true" ext="dotx" name="view" urlsrc="https://fakeoffice.owncloud.test/not/relevant?"/>
+            <action default="true" ext="dotx" name="edit" urlsrc="https://fakeoffice.owncloud.test/not/relevant?"/>
+            <action default="true" ext="ots" name="view" urlsrc="https://fakeoffice.owncloud.test/not/relevant?"/>
+            <action default="true" ext="ots" name="edit" urlsrc="https://fakeoffice.owncloud.test/not/relevant?"/>
+            <action default="true" ext="xltm" name="view" urlsrc="https://fakeoffice.owncloud.test/not/relevant?"/>
+            <action default="true" ext="xltm" name="edit" urlsrc="https://fakeoffice.owncloud.test/not/relevant?"/>
+            <action default="true" ext="xltx" name="view" urlsrc="https://fakeoffice.owncloud.test/not/relevant?"/>
+            <action default="true" ext="xltx" name="edit" urlsrc="https://fakeoffice.owncloud.test/not/relevant?"/>
+            <action default="true" ext="otp" name="view" urlsrc="https://fakeoffice.owncloud.test/not/relevant?"/>
+            <action default="true" ext="otp" name="edit" urlsrc="https://fakeoffice.owncloud.test/not/relevant?"/>
+            <action default="true" ext="potm" name="view" urlsrc="https://fakeoffice.owncloud.test/not/relevant?"/>
+            <action default="true" ext="potm" name="edit" urlsrc="https://fakeoffice.owncloud.test/not/relevant?"/>
+            <action default="true" ext="potx" name="view" urlsrc="https://fakeoffice.owncloud.test/not/relevant?"/>
+            <action default="true" ext="potx" name="edit" urlsrc="https://fakeoffice.owncloud.test/not/relevant?"/>
+            <!-- OnlyOffice template conversions - convert templates to Office formats -->
+            <action name="convert" ext="dotm" targetext="docx" urlsrc="https://fakeoffice.owncloud.test/not/relevant?"/>
+            <action name="convert" ext="ott" targetext="docx" urlsrc="https://fakeoffice.owncloud.test/not/relevant?"/>
+            <action name="convert" ext="dotx" targetext="docx" urlsrc="https://fakeoffice.owncloud.test/not/relevant?"/>
+            <action name="convert" ext="ots" targetext="xlsx" urlsrc="https://fakeoffice.owncloud.test/not/relevant?"/>
+            <action name="convert" ext="xltm" targetext="xlsx" urlsrc="https://fakeoffice.owncloud.test/not/relevant?"/>
+            <action name="convert" ext="xltx" targetext="xlsx" urlsrc="https://fakeoffice.owncloud.test/not/relevant?"/>
+            <action name="convert" ext="otp" targetext="pptx" urlsrc="https://fakeoffice.owncloud.test/not/relevant?"/>
+            <action name="convert" ext="potm" targetext="pptx" urlsrc="https://fakeoffice.owncloud.test/not/relevant?"/>
+            <action name="convert" ext="potx" targetext="pptx" urlsrc="https://fakeoffice.owncloud.test/not/relevant?"/>
+        </app>
+        <!-- Collabora app - converts templates to OpenDocument formats -->
+        <app favIconUrl="https://fakeoffice.owncloud.test/favicon.ico" name="collabora">
+            <!-- Collabora template view/edit actions to surface template mime types -->
+            <action default="true" ext="ott" name="view" urlsrc="https://fakeoffice.owncloud.test/not/relevant?"/>
+            <action default="true" ext="ott" name="edit" urlsrc="https://fakeoffice.owncloud.test/not/relevant?"/>
+            <action default="true" ext="ots" name="view" urlsrc="https://fakeoffice.owncloud.test/not/relevant?"/>
+            <action default="true" ext="ots" name="edit" urlsrc="https://fakeoffice.owncloud.test/not/relevant?"/>
+            <action default="true" ext="otp" name="view" urlsrc="https://fakeoffice.owncloud.test/not/relevant?"/>
+            <action default="true" ext="otp" name="edit" urlsrc="https://fakeoffice.owncloud.test/not/relevant?"/>
+            <action name="convert" ext="ott" targetext="odt" urlsrc="https://fakeoffice.owncloud.test/not/relevant?"/>
+            <action name="convert" ext="ots" targetext="ods" urlsrc="https://fakeoffice.owncloud.test/not/relevant?"/>
+            <action name="convert" ext="otp" targetext="odp" urlsrc="https://fakeoffice.owncloud.test/not/relevant?"/>
         </app>
     </net-zone>
 </wopi-discovery>
