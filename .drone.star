@@ -1241,12 +1241,8 @@ def localApiTests(
         "K8S": k8s,
     }
 
-    for k in extra_environment:
-        environment[k] = extra_environment[k]
-
-    # ------------------------------------------------------------
-    # BUILD COMMANDS LIST SAFELY (NO EMPTY STRINGS)
-    # ------------------------------------------------------------
+    for item in extra_environment:
+        environment[item] = extra_environment[item]
     commands = []
 
     if not with_remote_php:
@@ -1269,15 +1265,6 @@ def localApiTests(
         # Install kubectl if missing
         "bash -lc 'command -v kubectl >/dev/null || (curl -fsSL -o /usr/local/bin/kubectl https://dl.k8s.io/release/v1.27.3/bin/linux/amd64/kubectl && chmod +x /usr/local/bin/kubectl)'",
 
-        # Check pod ports
-        "bash -lc 'kubectl -n ocis get pods -l app=collaboration-onlyoffice -o jsonpath='\"'\"'{.items[0].spec.containers[0].ports}'\"'\"''",
-
-        # Check pod logs
-        "bash -lc 'kubectl -n ocis logs -l app=collaboration-onlyoffice --tail=50'",
-
-        # Check service definition
-        "bash -lc 'kubectl -n ocis get svc -l app=collaboration-onlyoffice -o yaml'",
-
         # Port-forwards
         "bash -lc 'kubectl -n ocis port-forward svc/collaboration-fakeoffice 9300:9300 --address=127.0.0.1 >/dev/null 2>&1 & true'",
         "bash -lc 'kubectl -n ocis port-forward svc/collaboration-collabora 9302:9300 --address=127.0.0.1 >/dev/null 2>&1 & true'",
@@ -1287,11 +1274,6 @@ def localApiTests(
 
         # Add a small delay to ensure port-forward is established
         "sleep 5",
-        # Check fakeoffice health
-        "bash -lc 'curl -sS --max-time 5 http://localhost:9300/ || echo fakeoffice_unreachable'",
-        "bash -lc 'curl -sS --max-time 5 http://localhost:9302/ || echo collabora_unreachable'",
-        "bash -lc 'curl -sS --max-time 5 http://localhost:9305/ || echo onlyoffice_wopi_unreachable'",
-        "bash -lc 'curl -sS --max-time 5 http://localhost:9304/healthz || echo onlyoffice_health_unreachable'",
         "mkdir -p /etc/ocis/",
         "make -C %s test-acceptance-api" % dirs["base"],
     ])
