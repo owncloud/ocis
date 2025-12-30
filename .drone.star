@@ -737,22 +737,10 @@ def testOcis(ctx):
             "commands": [
                 "export KUBECONFIG=%s/kubeconfig-$${DRONE_BUILD_NUMBER}.yaml" % dirs["base"],
                 "until test -f $${KUBECONFIG}; do sleep 1; done",
-                "bash -lc 'command -v kubectl >/dev/null || (curl -fsSL -o /usr/local/bin/kubectl https://dl.k8s.io/release/v1.27.3/bin/linux/amd64/kubectl && chmod +x /usr/local/bin/kubectl) || true'",
-                "echo '=== Starting kubectl port-forwards for collaboration services ==='",
             ] + getWopiPortForwardCommands() + [
                 "sleep 5",
-                "echo '=== Checking localhost WOPI/health ports (test stage) ==='",
-                "bash -lc 'for p in 9300 9302 9304 9305; do echo -n \"localhost:$p -> \"; if (echo > /dev/tcp/127.0.0.1/$p) >/dev/null 2>&1; then echo open; else echo closed; fi; done' || echo 'bash tcp check unavailable'",
-                "echo '=== Ensuring curl is available (test stage) ==='",
-                "bash -lc 'command -v curl >/dev/null || (apt-get update -y && apt-get install -y curl) || (apk add --no-cache curl) || (yum install -y curl) || true'",
-                "echo '=== Probing FakeOffice health endpoint (test stage) ==='",
-                "bash -lc 'curl -sS --max-time 5 http://localhost:9300/health || echo \"fakeoffice health unreachable\"'",
-                "echo '=== Probing OnlyOffice health endpoint (test stage) ==='",
-                "bash -lc 'curl -sS --max-time 5 http://localhost:9304/healthz || echo \"onlyoffice health unreachable\"'",
-                "echo '=== Checking NodePort WOPI ports (test stage) ==='",
-                "bash -lc 'for p in 30100 30102 30105; do echo -n \"localhost:$p -> \"; if (echo > /dev/tcp/127.0.0.1/$p) >/dev/null 2>&1; then echo open; else echo closed; fi; done' || echo 'bash tcp check unavailable'",
-                "echo '=== Probing FakeOffice NodePort health endpoint (test stage) ==='",
-                "bash -lc 'curl -sS --max-time 5 http://localhost:30100/health || echo \"fakeoffice nodeport health unreachable\"'",
+                "kubectl -n ocis wait --for=condition=ready pod -l app=appregistry --timeout=60s",
+                "kubectl -n ocis exec $(kubectl -n ocis get pod -l app=appregistry -o jsonpath='{.items[0].metadata.name}') -- test -f /etc/ocis/app-registry.yaml && echo 'Config file exists' || (echo 'Config file missing'; exit 1)",
                 "mkdir -p cache/coverage",
                 "make test",
                 "mv coverage.out cache/coverage/",
@@ -3937,6 +3925,7 @@ def getWopiCommands():
 def getWopiPortForwardCommands():
     """Get port forwarding commands for WOPI collaboration services"""
     return [
+        "bash -lc 'command -v kubectl >/dev/null || (curl -fsSL -o /usr/local/bin/kubectl https://dl.k8s.io/release/v1.27.3/bin/linux/amd64/kubectl && chmod +x /usr/local/bin/kubectl) || true'",
         "kubectl -n ocis port-forward svc/collaboration-fakeoffice 9300:9300 --address=127.0.0.1 >/dev/null 2>&1 &",
         "kubectl -n ocis port-forward svc/collaboration-collabora 9302:9300 --address=127.0.0.1 >/dev/null 2>&1 &",
         "kubectl -n ocis port-forward svc/collaboration-onlyoffice 9305:9300 --address=127.0.0.1 >/dev/null 2>&1 &",
@@ -4020,25 +4009,7 @@ def deployOcis():
         "commands": [
             "export KUBECONFIG=%s/kubeconfig-$${DRONE_BUILD_NUMBER}.yaml" % dirs["base"],
             "cd %s/ocis-charts" % dirs["base"],
-            "echo '=== Verifying WOPI configuration in deployment-values.yaml ==='",
-            "grep -n wopiSrc charts/ocis/ci/deployment-values.yaml",
-            "echo '=== Verifying schema has postMessageOrigin/wopiSrc ==='",
-            "grep -n -E 'postMessageOrigin|wopiSrc' charts/ocis/values.schema.json || echo 'Keys not found in schema'",
-            "echo \'=== Verifying collaboration template ===\'",
-            "grep -A2 \'COLLABORATION_WOPI_SRC\' charts/ocis/templates/collaboration/deployment.yaml | head -n 3",
-            "echo '=== Starting Helm deployment ==='",
             "make helm-install-atomic",
-            "echo '=== Ensuring kubectl is available ==='",
-            "bash -lc 'command -v kubectl >/dev/null || (curl -fsSL -o /usr/local/bin/kubectl https://dl.k8s.io/release/v1.27.3/bin/linux/amd64/kubectl && chmod +x /usr/local/bin/kubectl) || true'",
-            "echo '=== Verifying appregistry ConfigMap contains mimetypes ==='",
-            "kubectl -n ocis get configmap appregistry-config -o yaml | grep -A 50 'mimetypes:' | head -60 || echo 'ERROR: mimetypes not found in ConfigMap'",
-            "echo '=== Verifying appregistry pod environment ==='",
-            "kubectl -n ocis get pod -l app=appregistry -o jsonpath='{.items[0].spec.containers[0].env}' | grep -E 'OCIS_CONFIG_DIR|APP_REGISTRY' || echo 'No OCIS_CONFIG_DIR env var found'",
-            "echo '=== Verifying ConfigMap is mounted in pod ==='",
-            "kubectl -n ocis exec $(kubectl -n ocis get pod -l app=appregistry -o jsonpath='{.items[0].metadata.name}') -- ls -la /etc/ocis/ || echo 'Cannot list /etc/ocis'",
-            "kubectl -n ocis exec $(kubectl -n ocis get pod -l app=appregistry -o jsonpath='{.items[0].metadata.name}') -- cat /etc/ocis/app-registry.yaml || echo 'Cannot read app-registry.yaml'",
-            "echo '=== Checking if app-registry is using the config ==='",
-            "kubectl -n ocis logs -l app=appregistry --tail=20 || echo 'No logs available'",
         ],
         "volumes": [
             {
