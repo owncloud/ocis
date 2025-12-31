@@ -149,6 +149,7 @@ class OcmContext implements Context {
 		if ($this->featureContext->getCurrentServer() === "LOCAL") {
 			$providerDomain = $this->featureContext->getRemoteBaseUrlWithoutScheme();
 		}
+
 		return OcmHelper::acceptInvitation(
 			$this->featureContext->getBaseUrl(),
 			$user,

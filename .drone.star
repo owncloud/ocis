@@ -1122,7 +1122,7 @@ def localApiTestPipeline(ctx):
                                      ([] if run_on_k8s else restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin")) +
                                      (tikaService() if params["tikaNeeded"] and not run_on_k8s else tikaServiceK8s() if params["tikaNeeded"] and run_on_k8s else []) +
                                      (waitForServices("online-offices", ["collabora:9980", "onlyoffice:443", "fakeoffice:8080"]) if params["collaborationServiceNeeded"] else []) +
-                                     (waitK3sCluster() + (enableAntivirusServiceK8s() if params["antivirusNeeded"] and run_on_k8s else []) + (emailServiceK8s() if params["emailNeeded"] and run_on_k8s else []) + prepareOcisDeployment() + setupOcisConfigMaps() + deployOcis() + waitForOcis(ocis_url = ocis_url) + ociswrapper() + waitForOciswrapper() if run_on_k8s else ocisServer(storage, extra_server_environment = params["extraServerEnvironment"], with_wrapper = True, tika_enabled = params["tikaNeeded"], volumes = ([stepVolumeOcisStorage]))) +
+                                     (waitK3sCluster() + (enableAntivirusServiceK8s() if params["antivirusNeeded"] and run_on_k8s else []) + (emailServiceK8s() if params["emailNeeded"] and run_on_k8s else []) + prepareOcisDeployment() + setupOcisConfigMaps() + deployOcis() + waitForOcis(ocis_url = ocis_url) + prepareOcis2Deployment() + deployOcis2() + ociswrapper() + waitForOciswrapper() if run_on_k8s else ocisServer(storage, extra_server_environment = params["extraServerEnvironment"], with_wrapper = True, tika_enabled = params["tikaNeeded"], volumes = ([stepVolumeOcisStorage]))) +
                                      (waitForClamavService() if params["antivirusNeeded"] and not run_on_k8s else exposeAntivirusServiceK8s() if params["antivirusNeeded"] and run_on_k8s else []) +
                                      (waitForEmailService() if params["emailNeeded"] and not run_on_k8s else exposeEmailServiceK8s() if params["emailNeeded"] and run_on_k8s else []) +
                                      (ocisServer(storage, deploy_type = "federation", extra_server_environment = params["extraServerEnvironment"]) if params["federationServer"] else []) +
@@ -3882,6 +3882,44 @@ def deployOcis():
             "cd %s/ocis-charts" % dirs["base"],
             "make helm-install-atomic",
         ],
+        "volumes": [
+            {
+                "name": "gopath",
+                "path": "/go",
+            },
+        ],
+    }]
+
+def prepareOcis2Deployment():
+    commands = [
+        "kubectl create namespace ocis2",
+        "kubectl create configmap coredns-custom -n kube-system" +
+        "--from-literal=rewritehost.override=$'rewrite name exact ocis-server host.k3d.internal\nrewrite name exact ocis2-server host.k3d.internal" +
+        "--dry-run=client -o yaml | kubectl apply -f -",
+        "kubectl -n kube-system rollout restart deployment coredns",
+    ]
+
+    return [{
+        "name": "prepareOcis2Deployment",
+        "image": K3D_IMAGE,
+        "user": "root",
+        "commands": commands,
+    }]
+
+def deployOcis2():
+    commands = [
+        "mv %s/tests/config/drone/k8s/deployment-values-ocis2.yaml %s/ocis-charts/charts/ocis/ci/deployment-values-ocis2.yaml" % (dirs["base"], dirs["base"]),
+        "cd %s/ocis-charts" % dirs["base"],
+        "helm upgrade --install ocis2 ./charts/ocis/" +
+        " -n ocis2 --create-namespace" +
+        " --values ./charts/ocis/ci/deployment-values-ocis2.yaml" +
+        " --rollback-on-failure --timeout 5m0s",
+    ]
+
+    return [{
+        "name": "deployOcis2",
+        "image": "owncloudci/golang:latest",
+        "commands": commands,
         "volumes": [
             {
                 "name": "gopath",
