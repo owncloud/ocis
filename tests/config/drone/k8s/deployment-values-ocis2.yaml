@@ -1,12 +1,14 @@
----
-namespaceOverride: ocis
+namespaceOverride: ocis2
 image:
   repository: owncloud/ocis-rolling
   tag: master
+
+externalDomain: ocis2-server
+
 ingress:
   enabled: true
   ingressClassName: traefik
-externalDomain: ocis-server
+
 extraResources:
   - |
     apiVersion: v1
@@ -95,10 +97,12 @@ extraResources:
 
 logging:
   level: error
+
 insecure:
   oidcIdpInsecure: true
   ocisHttpApiInsecure: true
   ocmInsecure: true
+
 features:
   authapp:
     enabled: true
