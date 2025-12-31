@@ -3881,6 +3881,12 @@ def deployOcis():
             "export KUBECONFIG=%s/kubeconfig-$${DRONE_BUILD_NUMBER}.yaml" % dirs["base"],
             "cd %s/ocis-charts" % dirs["base"],
             "make helm-install-atomic",
+            "mv %s/tests/config/drone/k8s/deployment-values-ocis2.yaml %s/ocis-charts/charts/ocis/ci/deployment-values-ocis2.yaml" % (dirs["base"], dirs["base"]),
+            "kubectl create namespace ocis2",
+            "kubectl create configmap coredns-custom -n kube-system" +
+            "--from-literal=rewritehost.override=$'rewrite name exact ocis-server host.k3d.internal\nrewrite name exact ocis2-server host.k3d.internal" +
+            "--dry-run=client -o yaml | kubectl apply -f -",
+            "make helm-install-ocm-atomic",
         ],
         "volumes": [
             {
