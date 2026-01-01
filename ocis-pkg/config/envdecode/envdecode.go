@@ -283,13 +283,27 @@ func decodePrimitiveType(f *reflect.Value, env string) error {
 		f.SetString(env)
 
 	case reflect.Ptr:
+		// Handle special case for *url.URL
 		if t := f.Type().Elem(); t.Kind() == reflect.Struct && t.PkgPath() == "net/url" && t.Name() == "URL" {
 			v, err := url.Parse(env)
 			if err != nil {
 				return err
 			}
 			f.Set(reflect.ValueOf(v))
+			return nil
 		}
+
+		// Handle pointers to primitive types (*bool, *int, *string, etc.)
+		elemType := f.Type().Elem()
+		newVal := reflect.New(elemType)
+		elem := newVal.Elem()
+
+		// Recursively decode the dereferenced value
+		if err := decodePrimitiveType(&elem, env); err != nil {
+			return err
+		}
+
+		f.Set(newVal)
 	}
 	return nil
 }
