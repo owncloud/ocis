@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2026-01-01-00-34-41]
+[#deprecation-note-2026-01-01-00-36-53]
 [caption=]
 .Deprecation notes for the graph service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -429,7 +429,7 @@ a| [subs=-attributes]
 The minimum length the search term needs to have for unprivileged users when searching for users or groups.
 
 a|`OCIS_SHOW_USER_EMAIL_IN_RESULTS` +
-xref:deprecation-note-2026-01-01-00-34-41[Deprecation Note]
+xref:deprecation-note-2026-01-01-00-36-53[Deprecation Note]
 a| [subs=-attributes]
 ++6.0.0 ++
 a| [subs=-attributes]
