@@ -4,20 +4,16 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 # 
 # Translators:
-# dudanogueira <dudanogueira@gmail.com>, 2025
-# Flávio Veras <flaviove@gmail.com>, 2025
-# Van Der Fran <transifex@vanderland.com>, 2025
-# Tulio Simoes Martins Padilha <appsdotulio@gmx.com>, 2025
-# F Bausch, 2025
+# Martin <github@diemattels.at>, 2026
 # 
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2026-01-02 00:31+0000\n"
-"PO-Revision-Date: 2025-01-08 11:08+0000\n"
-"Last-Translator: F Bausch, 2025\n"
+"POT-Creation-Date: 2026-01-02 12:55+0000\n"
+"PO-Revision-Date: 2026-01-02 10:10+0000\n"
+"Last-Translator: Martin <github@diemattels.at>, 2026\n"
 "Language-Team: Portuguese (Brazil) (https://app.transifex.com/owncloud-org/teams/6149/pt_BR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
