@@ -84,6 +84,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Update the ocis_full deployment example images: [#11860](https://github.com/owncloud/ocis/pull/11860)
 * Enhancement - Update the ocis_full deployment example traefik image: [#11867](https://github.com/owncloud/ocis/pull/11867)
 * Enhancement - Added a graph endpoint alias: [#11871](https://github.com/owncloud/ocis/pull/11871)
+* Enhancement - Relocate Transifex resources: [#11889](https://github.com/owncloud/ocis/pull/11889)
 
 ## Details
 
@@ -241,6 +242,13 @@ The following sections list the changes for unreleased.
    We added a graph endpoint alias that uses the unified roles instead of cs3 roles
 
    https://github.com/owncloud/ocis/pull/11871
+
+* Enhancement - Relocate Transifex resources: [#11889](https://github.com/owncloud/ocis/pull/11889)
+
+   The resources for services with translations are relocated in Transifex from
+   owncloud to owncloud-web. Now all ocis related resources are in one project.
+
+   https://github.com/owncloud/ocis/pull/11889
 
 # Changelog for [7.3.1] (2025-11-24)
 
