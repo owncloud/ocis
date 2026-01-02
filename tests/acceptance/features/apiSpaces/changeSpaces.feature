@@ -598,3 +598,8 @@ Feature: Change data of space
       | role                          |
       | Space Editor Without Versions |
       | Space Editor                  |
+
+  @issue-11887
+  Scenario: user with space manager role tries to change the name of a space to an empty string via the Graph API
+    When user "Alice" changes the name of the "Project Jupiter" space to ""
+    Then the HTTP status code should be "400"
