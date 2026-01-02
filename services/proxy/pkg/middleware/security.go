@@ -3,6 +3,7 @@ package middleware
 import (
 	"net/http"
 	"os"
+	"strconv"
 
 	gofig "github.com/gookit/config/v2"
 	"github.com/gookit/config/v2/yaml"
@@ -54,6 +55,13 @@ func Security(cspConfig *config.CSP) func(h http.Handler) http.Handler {
 		Directives: cspConfig.Directives,
 	}
 
+	forceSTSHeader := false
+	if v := os.Getenv("PROXY_FORCE_STRICT_TRANSPORT_SECURITY"); v != "" {
+		if b, err := strconv.ParseBool(v); err == nil {
+			forceSTSHeader = b
+		}
+	}
+
 	secureMiddleware := secure.New(secure.Options{
 		ContentSecurityPolicy:        cspBuilder.MustBuild(),
 		ContentTypeNosniff:           true,
@@ -61,6 +69,7 @@ func Security(cspConfig *config.CSP) func(h http.Handler) http.Handler {
 		FrameDeny:                    true,
 		ReferrerPolicy:               "no-referrer",
 		STSSeconds:                   315360000,
+		ForceSTSHeader:               forceSTSHeader,
 		STSIncludeSubdomains:         true,
 		STSPreload:                   true,
 		PermittedCrossDomainPolicies: "none",
