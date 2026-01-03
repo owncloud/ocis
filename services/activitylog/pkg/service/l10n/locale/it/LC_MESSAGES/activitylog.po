@@ -5,7 +5,7 @@
 # 
 # Translators:
 # Martin <github@diemattels.at>, 2026
-# Victor Vinuela <vinuela.victor@dissectio.com>, 2026
+# Cesare Capoferri, 2026
 # 
 #, fuzzy
 msgid ""
@@ -14,94 +14,95 @@ msgstr ""
 "Report-Msgid-Bugs-To: EMAIL\n"
 "POT-Creation-Date: 2026-01-03 00:30+0000\n"
 "PO-Revision-Date: 2026-01-02 10:10+0000\n"
-"Last-Translator: Victor Vinuela <vinuela.victor@dissectio.com>, 2026\n"
-"Language-Team: Spanish (https://app.transifex.com/owncloud-org/teams/6149/es/)\n"
+"Last-Translator: Cesare Capoferri, 2026\n"
+"Language-Team: Italian (https://app.transifex.com/owncloud-org/teams/6149/it/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: es\n"
+"Language: it\n"
 "Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
 
 #: pkg/service/response.go:44
 msgid "description"
-msgstr "descripción"
+msgstr "descrizione"
 
 #: pkg/service/response.go:43
 msgid "display name"
-msgstr "nombre para mostar"
+msgstr "nome visualizzato"
 
 #: pkg/service/response.go:42
 msgid "expiration date"
-msgstr "fecha de caducidad"
+msgstr "Data di scadenza"
 
 #: pkg/service/response.go:41
 msgid "password"
-msgstr "contraseña"
+msgstr "password"
 
 #: pkg/service/response.go:40
 msgid "permission"
-msgstr "permiso"
+msgstr "Autorizzazione"
 
 #: pkg/service/response.go:45
 msgid "shared-with-me"
-msgstr "compartido-conmigo"
+msgstr "Condiviso-con-me"
 
 #: pkg/service/response.go:39
 msgid "some field"
-msgstr "algun campo"
+msgstr "Qualche campo"
 
 #: pkg/service/response.go:26
 msgid "{resource} was downloaded via public link {token}"
-msgstr "{resource} se descargó via enlace publico {token}"
+msgstr "{resource} è stato scaricato tramite collegamento pubblico {token}"
 
 #: pkg/service/response.go:24
 msgid "{user} added {resource} to {folder}"
-msgstr "{user} añadió {resource} a {folder}"
+msgstr "{user} ha aggiunto {resource} a {folder}"
 
 #: pkg/service/response.go:36
 msgid "{user} added {sharee} as member of {space}"
-msgstr "{user} añadió {sharee} como miembro de {space}"
+msgstr "{user} ha aggiunto {sharee} come membro di {space}"
 
 #: pkg/service/response.go:27
 msgid "{user} deleted {resource} from {folder}"
-msgstr "{user} eliminó {resource} de {folder}"
+msgstr "{user} ha cancellato {resource} da {folder}"
 
 #: pkg/service/response.go:28
 msgid "{user} moved {resource} to {folder}"
-msgstr "{user} movió {resource} a {folder}"
+msgstr "{user} ha spostato {resource} in {folder}"
 
 #: pkg/service/response.go:35
 msgid "{user} removed link to {resource}"
-msgstr "{user} eliminó enlace a {resource}"
+msgstr "{user} ha cancellato il collegamento a {resource}"
 
 #: pkg/service/response.go:32
 msgid "{user} removed {sharee} from {resource}"
-msgstr "{user} eliminó {sharee} de {resource}"
+msgstr "{user} ha rimosso {sharee} da {resource}"
 
 #: pkg/service/response.go:37
 msgid "{user} removed {sharee} from {space}"
-msgstr "{user} eliminó {sharee} de {space}"
+msgstr "{user} ha rimosso {sharee} da {space}"
 
 #: pkg/service/response.go:29
 msgid "{user} renamed {oldResource} to {resource}"
-msgstr "{user} renombró {oldResource} a {resource}"
+msgstr "{user} ha rinominato {oldResource} in {resource}"
 
 #: pkg/service/response.go:33
 msgid "{user} shared {resource} via link"
-msgstr "{user} compartió {resource} por enlace"
+msgstr "{user} ha condiviso {resource} tramite collegamento"
 
 #: pkg/service/response.go:30
 msgid "{user} shared {resource} with {sharee}"
-msgstr "{user} compartió {resource} con {sharee}"
+msgstr "{user} ha condiviso {resource} con {sharee}"
 
 #: pkg/service/response.go:34
 msgid "{user} updated {field} for a link {token} on {resource}"
-msgstr "{user} actualizó {field} para el enlace {token} en {resource}"
+msgstr ""
+"{user} ha aggiornato {field} per un collegamento {token} su {resource}"
 
 #: pkg/service/response.go:31
 msgid "{user} updated {field} for the {resource}"
-msgstr "{user} actualizó {field} para el {resource}"
+msgstr "{user} ha aggiornato {field} per il {resource}"
 
 #: pkg/service/response.go:25
 msgid "{user} updated {resource} in {folder}"
-msgstr "{user} actualizó {resource} en {folder}"
+msgstr "{user} ha aggiornato {resource} in {folder}"
