@@ -22,6 +22,7 @@ http:
   tls_cert: /var/lib/ocis/proxy/server.crt
   tls_key: /var/lib/ocis/proxy/server.key
   tls: true
+  force_strict_transport_security: false
 reva:
   address: com.owncloud.api.gateway
   tls:

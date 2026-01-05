@@ -1,6 +1,6 @@
 ---
 title: Proxy
-date: 2026-01-05T12:48:00.200898719Z
+date: 2026-01-05T14:17:54.691692682Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/proxy
@@ -427,6 +427,7 @@ When using the ocis IDP service instead of an external IDP:
 -   Use the environment variable `OCIS_URL` to define how ocis can be accessed, mandatory use `https` as protocol for the URL.
 -   If no reverse proxy is set up, the `PROXY_TLS` environment variable **must** be set to `true` because the embedded `libreConnect` shipped with the IDP service has a hard check if the connection is on TLS and uses the HTTPS protocol. If this mismatches, an error will be logged and no connection from the client can be established.
 -   `PROXY_TLS` **can** be set to `false` if a reverse proxy is used and the https connection is terminated at the reverse proxy. When setting to `false`, the communication between the reverse proxy and ocis is not secured. If set to `true`, you must provide certificates.
+-   `PROXY_FORCE_STRICT_TRANSPORT_SECURITY`: Set to `true` to force emission of the `Strict-Transport-Security` header on all responses, including plain HTTP requests. Required when `PROXY_TLS=false` (TLS terminated upstream) to ensure the header is emitted despite oCIS receiving plain HTTP from the reverse proxy.
 
 ## Metrics
 
