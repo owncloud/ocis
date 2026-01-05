@@ -85,6 +85,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Update the ocis_full deployment example traefik image: [#11867](https://github.com/owncloud/ocis/pull/11867)
 * Enhancement - Added a graph endpoint alias: [#11871](https://github.com/owncloud/ocis/pull/11871)
 * Enhancement - Relocate Transifex resources: [#11889](https://github.com/owncloud/ocis/pull/11889)
+* Enhancement - Update the ocis_full deployment example images: [#11890](https://github.com/owncloud/ocis/pull/11890)
 
 ## Details
 
@@ -249,6 +250,14 @@ The following sections list the changes for unreleased.
    owncloud to owncloud-web. Now all ocis related resources are in one project.
 
    https://github.com/owncloud/ocis/pull/11889
+
+* Enhancement - Update the ocis_full deployment example images: [#11890](https://github.com/owncloud/ocis/pull/11890)
+
+  * Traefic:   v3.6.6
+  * Collabora: 25.04.8.1.1
+  * Onlyoffice: 9.2.1.1
+
+   https://github.com/owncloud/ocis/pull/11890
 
 # Changelog for [7.3.1] (2025-11-24)
 

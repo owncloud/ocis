@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "homepage": ".",
-  "packageManager": "pnpm@10.24.0",
+  "packageManager": "pnpm@10.27.0",
   "scripts": {
     "analyze": "source-map-explorer 'build/static/js/*.js'",
     "build": "node --openssl-legacy-provider scripts/build.js && rm -f build/service-worker.js",
