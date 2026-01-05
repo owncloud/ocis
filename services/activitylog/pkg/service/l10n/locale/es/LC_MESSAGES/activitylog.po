@@ -4,16 +4,17 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 # 
 # Translators:
-# Jesús Recio <jrecio@solidgear.es>, 2025
+# Martin <github@diemattels.at>, 2026
+# Victor Vinuela <vinuela.victor@dissectio.com>, 2026
 # 
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2025-12-10 00:06+0000\n"
-"PO-Revision-Date: 2024-08-20 10:13+0000\n"
-"Last-Translator: Jesús Recio <jrecio@solidgear.es>, 2025\n"
+"POT-Creation-Date: 2026-01-03 00:30+0000\n"
+"PO-Revision-Date: 2026-01-02 10:10+0000\n"
+"Last-Translator: Victor Vinuela <vinuela.victor@dissectio.com>, 2026\n"
 "Language-Team: Spanish (https://app.transifex.com/owncloud-org/teams/6149/es/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -23,7 +24,7 @@ msgstr ""
 
 #: pkg/service/response.go:44
 msgid "description"
-msgstr "descripcion"
+msgstr "descripción"
 
 #: pkg/service/response.go:43
 msgid "display name"
@@ -31,7 +32,7 @@ msgstr "nombre para mostar"
 
 #: pkg/service/response.go:42
 msgid "expiration date"
-msgstr "fecha de expiracion"
+msgstr "fecha de caducidad"
 
 #: pkg/service/response.go:41
 msgid "password"

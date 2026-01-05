@@ -355,6 +355,7 @@ func loadMiddlewares(logger log.Logger, cfg *config.Config,
 			middleware.UserCS3Claim(cfg.UserCS3Claim),
 			middleware.AutoprovisionAccounts(cfg.AutoprovisionAccounts),
 			middleware.EventsPublisher(publisher),
+			middleware.MultiInstance(cfg.MultiInstance.Enabled, cfg.MultiInstance.InstanceID, cfg.MultiInstance.MemberClaim, cfg.MultiInstance.GuestClaim, cfg.MultiInstance.GuestRole),
 		),
 		middleware.MultiFactor(cfg.MultiFactorAuthentication, middleware.Logger(logger)),
 		middleware.SelectorCookie(

@@ -70,6 +70,7 @@ The following sections list the changes for unreleased.
 
 * Bugfix - Fix user light creation: [#11765](https://github.com/owncloud/ocis/pull/11765)
 * Bugfix - OCM Specification Compliance: [#11773](https://github.com/owncloud/ocis/pull/11773)
+* Bugfix - Remove leading dot before checking disabled extension: [#11814](https://github.com/owncloud/ocis/pull/11814)
 * Bugfix - Replace obsolete docker image in the deployment example: [#11828](https://github.com/owncloud/ocis/pull/11828)
 * Enhancement - Set Referrer-Policy to no-referrer: [#11722](https://github.com/owncloud/ocis/pull/11722)
 * Enhancement - Bump Reva: [#11748](https://github.com/owncloud/ocis/pull/11748)
@@ -79,8 +80,12 @@ The following sections list the changes for unreleased.
 * Enhancement - Add CLI to clean orphned grants: [#11804](https://github.com/owncloud/ocis/pull/11804)
 * Enhancement - Bump Reva: [#11808](https://github.com/owncloud/ocis/pull/11808)
 * Enhancement - Bump Web to v12.2.0: [#11834](https://github.com/owncloud/ocis/pull/11834)
+* Enhancement - Introduce claims for multi-instance-ocis: [#11848](https://github.com/owncloud/ocis/pull/11848)
 * Enhancement - Update the ocis_full deployment example images: [#11860](https://github.com/owncloud/ocis/pull/11860)
 * Enhancement - Update the ocis_full deployment example traefik image: [#11867](https://github.com/owncloud/ocis/pull/11867)
+* Enhancement - Added a graph endpoint alias: [#11871](https://github.com/owncloud/ocis/pull/11871)
+* Enhancement - Relocate Transifex resources: [#11889](https://github.com/owncloud/ocis/pull/11889)
+* Enhancement - Update the ocis_full deployment example images: [#11890](https://github.com/owncloud/ocis/pull/11890)
 
 ## Details
 
@@ -97,6 +102,14 @@ The following sections list the changes for unreleased.
    OCM Specification Compliance
 
    https://github.com/owncloud/ocis/pull/11773
+
+* Bugfix - Remove leading dot before checking disabled extension: [#11814](https://github.com/owncloud/ocis/pull/11814)
+
+   We have fixed a bug where the leading dot was not removed before checking if an
+   extension is disabled. The original behavior would have caused the
+   `COLLABORATION_WOPI_DISABLED_EXTENSIONS` config to be ignored.
+
+   https://github.com/owncloud/ocis/pull/11814
 
 * Bugfix - Replace obsolete docker image in the deployment example: [#11828](https://github.com/owncloud/ocis/pull/11828)
 
@@ -203,6 +216,12 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/11834
    https://github.com/owncloud/web/releases/tag/v12.2.0
 
+* Enhancement - Introduce claims for multi-instance-ocis: [#11848](https://github.com/owncloud/ocis/pull/11848)
+
+   Reads claims from the oidc token to add users to ocis with specific roles.
+
+   https://github.com/owncloud/ocis/pull/11848
+
 * Enhancement - Update the ocis_full deployment example images: [#11860](https://github.com/owncloud/ocis/pull/11860)
 
   * Traefik    3.6.2
@@ -218,6 +237,27 @@ The following sections list the changes for unreleased.
   * Traefik fix for Collabora
 
    https://github.com/owncloud/ocis/pull/11867
+
+* Enhancement - Added a graph endpoint alias: [#11871](https://github.com/owncloud/ocis/pull/11871)
+
+   We added a graph endpoint alias that uses the unified roles instead of cs3 roles
+
+   https://github.com/owncloud/ocis/pull/11871
+
+* Enhancement - Relocate Transifex resources: [#11889](https://github.com/owncloud/ocis/pull/11889)
+
+   The resources for services with translations are relocated in Transifex from
+   owncloud to owncloud-web. Now all ocis related resources are in one project.
+
+   https://github.com/owncloud/ocis/pull/11889
+
+* Enhancement - Update the ocis_full deployment example images: [#11890](https://github.com/owncloud/ocis/pull/11890)
+
+  * Traefic:   v3.6.6
+  * Collabora: 25.04.8.1.1
+  * Onlyoffice: 9.2.1.1
+
+   https://github.com/owncloud/ocis/pull/11890
 
 # Changelog for [7.3.1] (2025-11-24)
 
