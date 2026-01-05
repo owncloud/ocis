@@ -9,7 +9,8 @@ on:
         type: boolean
   schedule:
     - cron: "0 0 * * *" # Everday at midnight
-permissions: write-all
+permissions:
+  contents: write
 
 jobs:
   remove-stale-branches:
