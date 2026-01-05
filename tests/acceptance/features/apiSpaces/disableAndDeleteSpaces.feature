@@ -125,7 +125,7 @@ Feature: Disabling and deleting space
     Given the administrator has assigned the role "<user-role>" to user "Carol" using the Graph API
     And user "Alice" has disabled a space "Project Moon"
     When user "Carol" tries to delete a space "Project Moon" owned by user "Alice"
-    Then the HTTP status code should be "404"
+    Then the HTTP status code should be "403"
     Examples:
       | user-role  |
       | User       |
@@ -134,7 +134,7 @@ Feature: Disabling and deleting space
 
   Scenario Outline: viewer and space editor cannot disable space
     When user "<user>" tries to disable a space "Project Moon" owned by user "Alice"
-    Then the HTTP status code should be "404"
+    Then the HTTP status code should be "403"
     And the user "<user>" should have a space called "Project Moon"
     Examples:
       | user  |
@@ -145,7 +145,7 @@ Feature: Disabling and deleting space
   Scenario Outline: viewer and space editor cannot delete disabled space
     Given user "Alice" has disabled a space "Project Moon"
     When user "<user>" tries to delete a space "Project Moon" owned by user "Alice"
-    Then the HTTP status code should be "404"
+    Then the HTTP status code should be "403"
     Examples:
       | user  |
       | Brian |
