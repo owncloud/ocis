@@ -84,6 +84,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Update the ocis_full deployment example images: [#11860](https://github.com/owncloud/ocis/pull/11860)
 * Enhancement - Update the ocis_full deployment example traefik image: [#11867](https://github.com/owncloud/ocis/pull/11867)
 * Enhancement - Added a graph endpoint alias: [#11871](https://github.com/owncloud/ocis/pull/11871)
+* Enhancement - Force Strict-Transport-Security: [#11880](https://github.com/owncloud/ocis/pull/11880)
 * Enhancement - Relocate Transifex resources: [#11889](https://github.com/owncloud/ocis/pull/11889)
 * Enhancement - Update the ocis_full deployment example images: [#11890](https://github.com/owncloud/ocis/pull/11890)
 
@@ -243,6 +244,15 @@ The following sections list the changes for unreleased.
    We added a graph endpoint alias that uses the unified roles instead of cs3 roles
 
    https://github.com/owncloud/ocis/pull/11871
+
+* Enhancement - Force Strict-Transport-Security: [#11880](https://github.com/owncloud/ocis/pull/11880)
+
+   Added `PROXY_FORCE_STRICT_TRANSPORT_SECURITY` environment variable to force
+   emission of `Strict-Transport-Security` header on all responses, including plain
+   HTTP requests when TLS is terminated upstream. Useful when oCIS is deployed
+   behind a proxy.
+
+   https://github.com/owncloud/ocis/pull/11880
 
 * Enhancement - Relocate Transifex resources: [#11889](https://github.com/owncloud/ocis/pull/11889)
 
