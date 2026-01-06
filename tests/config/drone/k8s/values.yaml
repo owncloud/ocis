@@ -70,11 +70,11 @@ extraResources:
                     "description": "Remote oCIS2 Open Cloud Mesh API"
                   },
                   "name": "ocis2-server - OCM API",
-                  "path": "https://ocis2-server/ocm/",
+                  "path": "https://ocis2-server:444/ocm/",
                   "is_monitored": true
                 },
                 "api_version": "0.0.1",
-                "host": "https://ocis2-server"
+                "host": "https://ocis2-server:444"
               },
               {
                 "endpoint": {
@@ -83,11 +83,11 @@ extraResources:
                     "description": "Remote oCIS2 Webdav API"
                   },
                   "name": "ocis2-server - Webdav API",
-                  "path": "https://ocis2-server/dav/",
+                  "path": "https://ocis2-server:444/dav/",
                   "is_monitored": true
                 },
                 "api_version": "0.0.1",
-                "host": "https://ocis2-server/"
+                "host": "https://ocis2-server:444"
               }
             ]
           }

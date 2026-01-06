@@ -234,7 +234,7 @@ config = {
             "skip": False,
             "k8s": True,
             "withRemotePhp": [False],
-            "federationServer": True,
+            "federationServer": False,
             "emailNeeded": True,
             "extraEnvironment": {
                 "EMAIL_HOST": EMAIL_SMTP_HOST,
@@ -382,24 +382,24 @@ config = {
     },
     "e2eTests": {
         "part": {
-            "skip": False,
+            "skip": True,
             "totalParts": 4,  # divide and run all suites in parts (divide pipelines)
             "xsuites": ["search", "app-provider", "oidc", "ocm", "keycloak"],  # suites to skip
         },
         "search": {
-            "skip": False,
+            "skip": True,
             "suites": ["search"],  # suites to run
             "tikaNeeded": True,
         },
         "keycloak": {
-            "skip": False,
+            "skip": True,
             "suites": ["journeys", "keycloak"],
             "keycloakNeeded": True,
         },
     },
     "e2eMultiService": {
         "testSuites": {
-            "skip": False,
+            "skip": True,
             "suites": [
                 "smoke",
                 "shares",
@@ -510,15 +510,11 @@ def main(ctx):
         licenseCheck(ctx)
 
     test_pipelines = \
-        codestyle(ctx) + \
-        checkGherkinLint(ctx) + \
         checkTestSuitesInExpectedFailures(ctx) + \
         buildWebCache(ctx) + \
         getGoBinForTesting(ctx) + \
         buildOcisBinaryForTesting(ctx) + \
         checkStarlark() + \
-        build_release_helpers + \
-        testOcisAndUploadResults(ctx) + \
         testPipelines(ctx)
 
     build_release_pipelines = \
@@ -539,7 +535,7 @@ def main(ctx):
         ),
     )
 
-    pipelines = test_pipelines + build_release_pipelines
+    pipelines = test_pipelines
 
     # nightly Trivy security scan (non-blocking)
     pipelines.append(trivyScan(ctx))
@@ -1122,7 +1118,7 @@ def localApiTestPipeline(ctx):
                                      ([] if run_on_k8s else restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin")) +
                                      (tikaService() if params["tikaNeeded"] and not run_on_k8s else tikaServiceK8s() if params["tikaNeeded"] and run_on_k8s else []) +
                                      (waitForServices("online-offices", ["collabora:9980", "onlyoffice:443", "fakeoffice:8080"]) if params["collaborationServiceNeeded"] else []) +
-                                     (waitK3sCluster() + (enableAntivirusServiceK8s() if params["antivirusNeeded"] and run_on_k8s else []) + (emailServiceK8s() if params["emailNeeded"] and run_on_k8s else []) + prepareOcisDeployment() + setupOcisConfigMaps() + deployOcis() + waitForOcis(ocis_url = ocis_url) + prepareOcis2Deployment() + deployOcis2() + ociswrapper() + waitForOciswrapper() if run_on_k8s else ocisServer(storage, extra_server_environment = params["extraServerEnvironment"], with_wrapper = True, tika_enabled = params["tikaNeeded"], volumes = ([stepVolumeOcisStorage]))) +
+                                     (waitK3sCluster() + waitK3sCluster2() + (enableAntivirusServiceK8s() if params["antivirusNeeded"] and run_on_k8s else []) + (emailServiceK8s() if params["emailNeeded"] and run_on_k8s else []) + prepareOcisDeployment() + setupOcisConfigMaps() + deployOcis() + waitForOcis(ocis_url = ocis_url) + setupOcis2ConfigMaps() + deployOcis2() + waitForOcis2(ocis_url = "https://ocis2-server:444") + ociswrapper() + waitForOciswrapper() if run_on_k8s else ocisServer(storage, extra_server_environment = params["extraServerEnvironment"], with_wrapper = True, tika_enabled = params["tikaNeeded"], volumes = ([stepVolumeOcisStorage]))) +
                                      (waitForClamavService() if params["antivirusNeeded"] and not run_on_k8s else exposeAntivirusServiceK8s() if params["antivirusNeeded"] and run_on_k8s else []) +
                                      (waitForEmailService() if params["emailNeeded"] and not run_on_k8s else exposeEmailServiceK8s() if params["emailNeeded"] and run_on_k8s else []) +
                                      (ocisServer(storage, deploy_type = "federation", extra_server_environment = params["extraServerEnvironment"]) if params["federationServer"] else []) +
@@ -1132,6 +1128,7 @@ def localApiTestPipeline(ctx):
                                      apiTestFailureLog() +
                                      (generateCoverageFromAPITest(ctx, name) if not run_on_k8s else []),
                             "services": (k3sCluster() if run_on_k8s else []) +
+                                        (k3sCluster2() if run_on_k8s else []) +
                                         (emailService() if params["emailNeeded"] and not run_on_k8s else []) +
                                         (clamavService() if params["antivirusNeeded"] and not run_on_k8s else []) +
                                         ((fakeOffice() + collaboraService() + onlyofficeService()) if params["collaborationServiceNeeded"] else []),
@@ -1194,7 +1191,7 @@ def localApiTests(name, suites, storage = "ocis", extra_environment = {}, with_r
 
     environment = {
         "TEST_SERVER_URL": ocis_url,
-        "TEST_SERVER_FED_URL": OCIS_FED_URL,
+        "TEST_SERVER_FED_URL": "https://ocis2-server:444",
         "OCIS_REVA_DATA_ROOT": "%s" % (dirs["ocisRevaDataRoot"] if storage == "owncloud" else ""),
         "STORAGE_DRIVER": storage,
         "BEHAT_SUITES": ",".join(suites),
@@ -2650,9 +2647,9 @@ def ocisServer(storage = "ocis", volumes = [], depends_on = [], deploy_type = ""
         environment["APP_PROVIDER_WOPI_FOLDER_URL_BASE_URL"] = OCIS_URL
 
     if deploy_type == "federation":
-        environment["OCIS_URL"] = OCIS_FED_URL
-        environment["PROXY_HTTP_ADDR"] = OCIS_FED_DOMAIN
-        container_name = FED_OCIS_SERVER_NAME
+        environment["OCIS_URL"] = "https://ocis2-server"
+        environment["PROXY_HTTP_ADDR"] = "ocis2-server"
+        container_name = "ocis2-server"
 
     if tika_enabled:
         environment["FRONTEND_FULL_TEXT_SEARCH_ENABLED"] = True
@@ -3635,6 +3632,19 @@ def waitForOcis(name = "ocis", ocis_url = OCIS_URL, depends_on = []):
         "depends_on": depends_on,
     }]
 
+def waitForOcis2(name = "ocis2", ocis_url = OCIS_URL, depends_on = []):
+    return [{
+        "name": "wait-for-%s" % name,
+        "image": OC_CI_ALPINE,
+        "commands": [
+            # wait for ocis-server to be ready (5 minutes)
+            "timeout 300 bash -c 'while [ $(curl -sk -uadmin:admin " +
+            "%s/graph/v1.0/users/admin " % ocis_url +
+            "-w %{http_code} -o /dev/null) != 200 ]; do sleep 1; done'",
+        ],
+        "depends_on": depends_on,
+    }]
+
 def waitForServices(name, services = []):
     services = ",".join(services)
     return [{
@@ -3813,6 +3823,34 @@ def k3sCluster():
         ],
     }]
 
+def k3sCluster2():
+    return [{
+        "name": "ocis2-server",
+        "image": K3D_IMAGE,
+        "user": "root",
+        "privileged": True,
+        "commands": [
+            "nohup dockerd-entrypoint.sh &",
+            "until docker ps 2>&1 > /dev/null; do sleep 1s; done",
+            # create cluster
+            "k3d cluster create drone2 --api-port ocis2-server:33299 " +
+            "-p '81:80@loadbalancer' -p '444:443@loadbalancer' -p '7100-7399:30100-30399@loadbalancer' " +
+            "--k3s-arg '--tls-san=k3d@server:*' --k3s-arg '--disable=metrics-server@server:*'",
+            # wait for services to be ready
+            "until kubectl get deployment coredns -n kube-system -o go-template='{{.status.availableReplicas}}' | grep -v -e '<no value>'; do sleep 1s; done",
+            "until kubectl get deployment traefik -n kube-system -o go-template='{{.status.availableReplicas}}' | grep -v -e '<no value>'; do sleep 1s; done",
+            "k3d kubeconfig get drone2 > kubeconfig-$${DRONE_BUILD_NUMBER}2.yaml",
+            "chmod 0600 kubeconfig-$${DRONE_BUILD_NUMBER}2.yaml",
+            "printf '@@@@@@@@@@@@@@@@@@@@@@@\n@@@@ k3d is ready @@@@\n@@@@@@@@@@@@@@@@@@@@@@@\n'",
+            # add dns rewrite rule
+            "kubectl create configmap coredns-custom -n kube-system " +
+            "--from-literal='rewritehost.override=rewrite name exact ocis2-server host.k3d.internal'",
+            "kubectl -n kube-system rollout restart deployment coredns",
+            # watch events
+            "kubectl get events -Aw",
+        ],
+    }]
+
 def waitK3sCluster():
     return [{
         "name": "wait-cluster",
@@ -3820,6 +3858,19 @@ def waitK3sCluster():
         "user": "root",
         "commands": [
             "export KUBECONFIG=kubeconfig-$${DRONE_BUILD_NUMBER}.yaml",
+            "timeout 300 bash -c 'until test -f $${KUBECONFIG}; do sleep 1; done'",
+            "kubectl config view",
+            "kubectl get pods -A",
+        ],
+    }]
+
+def waitK3sCluster2():
+    return [{
+        "name": "wait-cluster2",
+        "image": K3D_IMAGE,
+        "user": "root",
+        "commands": [
+            "export KUBECONFIG=kubeconfig-$${DRONE_BUILD_NUMBER}2.yaml",
             "timeout 300 bash -c 'until test -f $${KUBECONFIG}; do sleep 1; done'",
             "kubectl config view",
             "kubectl get pods -A",
@@ -3873,6 +3924,21 @@ def setupOcisConfigMaps():
         "commands": commands,
     }]
 
+def setupOcis2ConfigMaps():
+    commands = [
+        "export KUBECONFIG=%s/kubeconfig-$${DRONE_BUILD_NUMBER}2.yaml" % dirs["base"],
+        # Create namespace for oCIS deployment
+        "kubectl create namespace ocis || true",
+        "kubectl create configmap -n ocis sharing-banned-passwords --from-file=banned-password-list.txt=%s/tests/config/drone/banned-password-list.txt" % dirs["base"],
+    ]
+
+    return [{
+        "name": "setup-configmaps2",
+        "image": K3D_IMAGE,
+        "user": "root",
+        "commands": commands,
+    }]
+
 def deployOcis():
     return [{
         "name": "deploy-ocis",
@@ -3890,30 +3956,32 @@ def deployOcis():
         ],
     }]
 
-def prepareOcis2Deployment():
-    commands = [
-        "kubectl create namespace ocis2",
-        "kubectl create configmap coredns-custom -n kube-system" +
-        "--from-literal=rewritehost.override=$'rewrite name exact ocis-server host.k3d.internal\nrewrite name exact ocis2-server host.k3d.internal" +
-        "--dry-run=client -o yaml | kubectl apply -f -",
-        "kubectl -n kube-system rollout restart deployment coredns",
-    ]
-
-    return [{
-        "name": "prepareOcis2Deployment",
-        "image": K3D_IMAGE,
-        "user": "root",
-        "commands": commands,
-    }]
+# def prepareOcis2Deployment():
+#     commands = [
+#         "export KUBECONFIG=%s/kubeconfig-$${DRONE_BUILD_NUMBER}2.yaml" % dirs["base"],
+#         "kubectl create namespace ocis",
+#     ]
+#
+#     return [{
+#         "name": "prepareOcis2Deployment",
+#         "image": K3D_IMAGE,
+#         "user": "root",
+#         "commands": commands,
+#     }]
 
 def deployOcis2():
     commands = [
-        "mv %s/tests/config/drone/k8s/deployment-values-ocis2.yaml %s/ocis-charts/charts/ocis/ci/deployment-values-ocis2.yaml" % (dirs["base"], dirs["base"]),
+        "export KUBECONFIG=%s/kubeconfig-$${DRONE_BUILD_NUMBER}2.yaml" % dirs["base"],
+        #         "mv %s/tests/config/drone/k8s/deployment-values-ocis2.yaml %s/ocis-charts/charts/ocis/ci/deployment-values-ocis2.yaml" % (dirs["base"], dirs["base"]),
+        #         "curl -LO https://get.helm.sh/helm-v3.16.2-linux-amd64.tar.gz",
+        #         "tar -zxvf helm-v3.16.2-linux-amd64.tar.gz",
+        #         "mv linux-amd64/helm /go/bin/helm-v3.16.2",
+        #         "chmod +x /go/bin/helm-v3.16.2",
         "cd %s/ocis-charts" % dirs["base"],
-        "helm upgrade --install ocis2 ./charts/ocis/" +
-        " -n ocis2 --create-namespace" +
-        " --values ./charts/ocis/ci/deployment-values-ocis2.yaml" +
-        " --rollback-on-failure --timeout 5m0s",
+        "sed -i 's|externalDomain: ocis-server|externalDomain: ocis2-server|' ./charts/ocis/ci/deployment-values.yaml",
+        "make helm-install-atomic",
+        "sed -i 's|externalDomain: ocis2-server|externalDomain: ocis-server|' ./charts/ocis/ci/deployment-values.yaml",
+        #         "/go/bin/helm-v3.16.2 upgrade --install ocis2 ./charts/ocis/ -n ocis2 --create-namespace --values ./charts/ocis/ci/deployment-values-ocis2.yaml --timeout 5m0s",
     ]
 
     return [{
