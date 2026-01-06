@@ -1,7 +1,7 @@
 ---
 title: "ocis.services.store.v0"
 url: /apis/grpc_apis/ocis_services_store_v0
-date: 2026-01-06T00:32:21Z
+date: 2026-01-06T03:29:37Z
 weight: 50
 geekdocRepo: https://github.com/owncloud/ocis
 ---
