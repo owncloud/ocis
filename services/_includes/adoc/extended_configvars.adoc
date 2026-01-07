@@ -93,4 +93,12 @@ a| [subs=-attributes]
     
     
     
+
+a| `parts[0]` +
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+++ ++
 |===
