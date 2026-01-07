@@ -335,7 +335,7 @@ func loadMiddlewares(logger log.Logger, cfg *config.Config,
 		middleware.AccessLog(logger),
 		middleware.ContextLogger(logger),
 		middleware.HTTPSRedirect(cfg.Commons.OcisURL),
-		middleware.Security(cspConfig),
+		middleware.Security(cfg, cspConfig),
 		router.Middleware(serviceSelector, cfg.PolicySelector, cfg.Policies, logger),
 		middleware.Authentication(
 			authenticators,
