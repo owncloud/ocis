@@ -1,6 +1,6 @@
 ---
 title: ocDAV
-date: 2026-01-06T03:32:06.270118598Z
+date: 2026-01-07T00:35:41.452257231Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/ocdav
