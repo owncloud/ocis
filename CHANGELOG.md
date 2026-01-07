@@ -71,6 +71,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix user light creation: [#11765](https://github.com/owncloud/ocis/pull/11765)
 * Bugfix - OCM Specification Compliance: [#11773](https://github.com/owncloud/ocis/pull/11773)
 * Bugfix - Remove leading dot before checking disabled extension: [#11814](https://github.com/owncloud/ocis/pull/11814)
+* Bugfix - Support pointer types in config environment variable decoding: [#11815](https://github.com/owncloud/ocis/pull/11815)
 * Bugfix - Replace obsolete docker image in the deployment example: [#11828](https://github.com/owncloud/ocis/pull/11828)
 * Enhancement - Set Referrer-Policy to no-referrer: [#11722](https://github.com/owncloud/ocis/pull/11722)
 * Enhancement - Bump Reva: [#11748](https://github.com/owncloud/ocis/pull/11748)
@@ -111,6 +112,15 @@ The following sections list the changes for unreleased.
    `COLLABORATION_WOPI_DISABLED_EXTENSIONS` config to be ignored.
 
    https://github.com/owncloud/ocis/pull/11814
+
+* Bugfix - Support pointer types in config environment variable decoding: [#11815](https://github.com/owncloud/ocis/pull/11815)
+
+   Added support for decoding pointer types (*bool, *int, *string, etc.) in the
+   envdecode package, allowing configuration fields to distinguish between unset
+   (nil) and explicitly set values. Changed `WEB_OPTION_EMBED_ENABLED` from string
+   to *bool type to enable explicit false values.
+
+   https://github.com/owncloud/ocis/pull/11815
 
 * Bugfix - Replace obsolete docker image in the deployment example: [#11828](https://github.com/owncloud/ocis/pull/11828)
 
