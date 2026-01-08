@@ -389,10 +389,10 @@ Feature: previews of files downloaded through the webdav API
   @issue-10589 @env-config
   Scenario Outline: try to download a file preview when the maximum thumbnail input value in the environment is set to a small value
     Given the following configs have been set:
-      | config                               | value |
-      | THUMBNAILS_MAX_INPUT_IMAGE_FILE_SIZE | 1KB   |
-      | THUMBNAILS_MAX_INPUT_WIDTH           | 200   |
-      | THUMBNAILS_MAX_INPUT_HEIGHT          | 200   |
+      | service    | config                               | value |
+      | thumbnails | THUMBNAILS_MAX_INPUT_IMAGE_FILE_SIZE | 1KB   |
+      | thumbnails | THUMBNAILS_MAX_INPUT_WIDTH           | 200   |
+      | thumbnails | THUMBNAILS_MAX_INPUT_HEIGHT          | 200   |
     And using <dav-path-version> DAV path
     And user "Alice" has uploaded file "filesForUpload/lorem-big.txt" to "/lorem-big.txt"
     When user "Alice" downloads the preview of "/lorem-big.txt" with width "32" and height "32" and processor thumbnail using the WebDAV API
@@ -407,10 +407,10 @@ Feature: previews of files downloaded through the webdav API
   @issue-10589 @env-config
   Scenario Outline: download a file preview when the maximum thumbnail input value in the environment is set to a valid value
     Given the following configs have been set:
-      | config                               | value |
-      | THUMBNAILS_MAX_INPUT_IMAGE_FILE_SIZE | 1KB   |
-      | THUMBNAILS_MAX_INPUT_WIDTH           | 700   |
-      | THUMBNAILS_MAX_INPUT_HEIGHT          | 700   |
+      | service    | config                               | value |
+      | thumbnails | THUMBNAILS_MAX_INPUT_IMAGE_FILE_SIZE | 1KB   |
+      | thumbnails | THUMBNAILS_MAX_INPUT_WIDTH           | 700   |
+      | thumbnails | THUMBNAILS_MAX_INPUT_HEIGHT          | 700   |
     And using <dav-path-version> DAV path
     And user "Alice" has uploaded file with content "hello world" to "test.txt"
     When user "Alice" downloads the preview of "/test.txt" with width "32" and height "32" and processor thumbnail using the WebDAV API
@@ -424,10 +424,10 @@ Feature: previews of files downloaded through the webdav API
   @issue-10589 @env-config
   Scenario Outline: download an image preview when the maximum thumbnail input value in the environment is set to a valid value
     Given the following configs have been set:
-      | config                               | value |
-      | THUMBNAILS_MAX_INPUT_IMAGE_FILE_SIZE | 36KB  |
-      | THUMBNAILS_MAX_INPUT_WIDTH           | 1250  |
-      | THUMBNAILS_MAX_INPUT_HEIGHT          | 650   |
+      | service    | config                               | value |
+      | thumbnails | THUMBNAILS_MAX_INPUT_IMAGE_FILE_SIZE | 36KB  |
+      | thumbnails | THUMBNAILS_MAX_INPUT_WIDTH           | 1250  |
+      | thumbnails | THUMBNAILS_MAX_INPUT_HEIGHT          | 650   |
     And using <dav-path-version> DAV path
     And user "Alice" has uploaded file "filesForUpload/testavatar.png" to "/testimage.png"
     When user "Alice" downloads the preview of "/testimage.png" with width "32" and height "32" and processor thumbnail using the WebDAV API

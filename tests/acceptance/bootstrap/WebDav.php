@@ -4039,8 +4039,19 @@ trait WebDav {
 		$responseBodyContent = $response->getBody()->getContents();
 		$size = \getimagesizefromstring($responseBodyContent);
 		Assert::assertNotFalse($size, "could not get size of image");
-		Assert::assertEquals($width, $size[0], "width not as expected");
-		Assert::assertEquals($height, $size[1], "height not as expected");
+		// allow multiple acceptable expected dimensions, comma-separated
+		$checkDimension = static function (string $expected, int $actual, string $message): void {
+			$expectedParts = array_map('trim', explode(',', $expected));
+			$expectedInts = array_map('intval', $expectedParts);
+			if (\count($expectedInts) > 1) {
+				Assert::assertContainsEquals($actual, $expectedInts, $message);
+			} else {
+				Assert::assertEquals($expectedInts[0], $actual, $message);
+			}
+		};
+
+		$checkDimension($width, $size[0], "width not as expected");
+		$checkDimension($height, $size[1], "height not as expected");
 	}
 
 	/**

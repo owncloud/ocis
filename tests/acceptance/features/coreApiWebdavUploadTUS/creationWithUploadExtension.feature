@@ -18,9 +18,9 @@ Feature: tests of the creation extension see https://tus.io/protocols/resumable-
       | Tus-Extension   | creation-with-upload            |
     Then the HTTP status code should be "201"
     And the following headers should match these regular expressions
-      | Tus-Resumable | /1\.0\.0/                       |
-      | Location      | /http[s]?:\/\/.*:\d+\/data\/.*/ |
-      | Upload-Offset | /\d+/                           |
+      | Tus-Resumable | /1\.0\.0/                            |
+      | Location      | /http[s]?:\/\/.*(?::\d+)?\/data\/.*/ |
+      | Upload-Offset | /\d+/                                |
     And the content of file "/test.txt" for user "Alice" should be "uploaded content"
     Examples:
       | dav-path-version |
