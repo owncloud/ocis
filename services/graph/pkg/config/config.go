@@ -33,8 +33,9 @@ type Config struct {
 	UnifiedRoles      UnifiedRoles `yaml:"unified_roles"`
 	MaxConcurrency    int          `yaml:"max_concurrency" env:"OCIS_MAX_CONCURRENCY;GRAPH_MAX_CONCURRENCY" desc:"The maximum number of concurrent requests the service will handle." introductionVersion:"7.0.0"`
 
-	Keycloak       Keycloak       `yaml:"keycloak"`
-	ServiceAccount ServiceAccount `yaml:"service_account"`
+	Keycloak       Keycloak            `yaml:"keycloak"`
+	ServiceAccount ServiceAccount      `yaml:"service_account"`
+	MultiInstance  MultiInstanceConfig `yaml:"multi_instance"`
 
 	Validation Validation `yaml:"validation"`
 
@@ -161,4 +162,13 @@ type ServiceAccount struct {
 
 type Validation struct {
 	MaxTagLength int `yaml:"max_tag_length" env:"OCIS_MAX_TAG_LENGTH" desc:"Define the maximum tag length. Defaults to 100 if not set. Set to 0 to not limit the tag length. Changes only impact the validation of new tags." introductionVersion:"7.2.0"`
+}
+
+// MultiInstanceConfig holds configuration for multi-instance-ocis
+type MultiInstanceConfig struct {
+	Enabled    bool   `yaml:"enabled" env:"OCIS_MULTI_INSTANCE_ENABLED" desc:"Enable multiple instances of Infinite Scale." introductionVersion:"Curie"`
+	InstanceID string `yaml:"instanceid" env:"OCIS_MULTI_INSTANCE_INSTANCEID" desc:"The unique id of this instance" introductionVersion:"Curie"`
+	// MemberClaim string `yaml:"member_claim" env:"OCIS_MULTI_INSTANCE_MEMBER_CLAIM" desc:"The claim name for the 'memberOf' property" introductionVersion:"Curie"`
+	// GuestClaim  string `yaml:"guest_claim" env:"OCIS_MULTI_INSTANCE_GUEST_CLAIM" desc:"The claim name for the 'guestOf' property" introductionVersion:"Curie"`
+	// GuestRole   string `yaml:"guest_role" env:"OCIS_MULTI_INSTANCE_GUEST_ROLE" desc:"The role that should be assigned to a guest user" introductionVersion:"Curie"`
 }

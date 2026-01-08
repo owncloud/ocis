@@ -1,0 +1,14 @@
+# the owncloud organization is already setup by osixia configuration
+#dn: dc=owncloud,dc=com
+#objectClass: organization
+#objectClass: dcObject
+#dc: owncloud
+#o: ownCloud
+
+dn: ou=users,dc=owncloud,dc=com
+objectClass: organizationalUnit
+ou: users
+
+dn: ou=groups,dc=owncloud,dc=com
+objectClass: organizationalUnit
+ou: groups
