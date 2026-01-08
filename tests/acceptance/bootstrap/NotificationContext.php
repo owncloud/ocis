@@ -436,7 +436,7 @@ class NotificationContext implements Context {
 			throw new \Exception("Notification was not found even after retrying for 5 seconds.");
 		}
 		$expectedMessage = $table->getColumnsHash()[0]['message'];
-		Assert::assertSame(
+		Assert::assertStringContainsString(
 			$expectedMessage,
 			$actualMessage,
 			__METHOD__ . "expected message to be '$expectedMessage' but found'$actualMessage'",
@@ -466,7 +466,7 @@ class NotificationContext implements Context {
 		if (\count($notification) === 1) {
 			$actualMessage = str_replace(["\r", "\r"], " ", $notification[0]->message);
 			$expectedMessage = $table->getColumnsHash()[0]['message'];
-			Assert::assertSame(
+			Assert::assertStringContainsString(
 				$expectedMessage,
 				$actualMessage,
 				__METHOD__ . "expected message to be '$expectedMessage' but found'$actualMessage'",

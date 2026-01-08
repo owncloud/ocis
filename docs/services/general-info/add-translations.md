@@ -8,10 +8,9 @@ geekdocFilePath: add-translations.md
 geekdocCollapseSection: true
 ---
 
-Services can have texts that need to be translated. These translations will be shown in the ownCloud Web UI. Compared to web, these translations are:
+Services can have texts that need to be translated. These translations will be shown in the ownCloud Web UI. Compared to web, these translations:
 
-* Independent of [ownCloud Web](https://app.transifex.com/owncloud-org/owncloud-web/translate/) on Transifex.
-* Are located in the [ownCloud](https://app.transifex.com/owncloud-org/owncloud/translate) Transifex Project.
+* Are located in the same Transifex project as the web, which is named [ownCloud Web](https://app.transifex.com/owncloud-org/owncloud-web/translate/).
 * Have a name starting with `ocis-` for ease of identification.
 
 The process for _synchronisation_ with Transifex is already setup and nothing needs to be done here. For any translation, it is necessary to set it up in the respective service and tell to sync it.
@@ -48,7 +47,7 @@ Translations have a `context` and a `translatable string`. The context is shown 
   [main]
   host = https://www.transifex.com
 
-  [o:owncloud-org:p:owncloud:r:ocis-<service-name>]
+  [o:owncloud-org:p:owncloud-web:r:ocis-<service-name>]
   file_filter = locale/<lang>/LC_MESSAGES/<service-name>.po
   minimum_perc = 75
   resource_name = ocis-<service-name>

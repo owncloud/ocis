@@ -71,6 +71,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix user light creation: [#11765](https://github.com/owncloud/ocis/pull/11765)
 * Bugfix - OCM Specification Compliance: [#11773](https://github.com/owncloud/ocis/pull/11773)
 * Bugfix - Remove leading dot before checking disabled extension: [#11814](https://github.com/owncloud/ocis/pull/11814)
+* Bugfix - Support pointer types in config environment variable decoding: [#11815](https://github.com/owncloud/ocis/pull/11815)
 * Bugfix - Replace obsolete docker image in the deployment example: [#11828](https://github.com/owncloud/ocis/pull/11828)
 * Enhancement - Set Referrer-Policy to no-referrer: [#11722](https://github.com/owncloud/ocis/pull/11722)
 * Enhancement - Bump Reva: [#11748](https://github.com/owncloud/ocis/pull/11748)
@@ -83,6 +84,10 @@ The following sections list the changes for unreleased.
 * Enhancement - Introduce claims for multi-instance-ocis: [#11848](https://github.com/owncloud/ocis/pull/11848)
 * Enhancement - Update the ocis_full deployment example images: [#11860](https://github.com/owncloud/ocis/pull/11860)
 * Enhancement - Update the ocis_full deployment example traefik image: [#11867](https://github.com/owncloud/ocis/pull/11867)
+* Enhancement - Added a graph endpoint alias: [#11871](https://github.com/owncloud/ocis/pull/11871)
+* Enhancement - Force Strict-Transport-Security: [#11880](https://github.com/owncloud/ocis/pull/11880)
+* Enhancement - Relocate Transifex resources: [#11889](https://github.com/owncloud/ocis/pull/11889)
+* Enhancement - Update the ocis_full deployment example images: [#11890](https://github.com/owncloud/ocis/pull/11890)
 
 ## Details
 
@@ -107,6 +112,15 @@ The following sections list the changes for unreleased.
    `COLLABORATION_WOPI_DISABLED_EXTENSIONS` config to be ignored.
 
    https://github.com/owncloud/ocis/pull/11814
+
+* Bugfix - Support pointer types in config environment variable decoding: [#11815](https://github.com/owncloud/ocis/pull/11815)
+
+   Added support for decoding pointer types (*bool, *int, *string, etc.) in the
+   envdecode package, allowing configuration fields to distinguish between unset
+   (nil) and explicitly set values. Changed `WEB_OPTION_EMBED_ENABLED` from string
+   to *bool type to enable explicit false values.
+
+   https://github.com/owncloud/ocis/pull/11815
 
 * Bugfix - Replace obsolete docker image in the deployment example: [#11828](https://github.com/owncloud/ocis/pull/11828)
 
@@ -234,6 +248,36 @@ The following sections list the changes for unreleased.
   * Traefik fix for Collabora
 
    https://github.com/owncloud/ocis/pull/11867
+
+* Enhancement - Added a graph endpoint alias: [#11871](https://github.com/owncloud/ocis/pull/11871)
+
+   We added a graph endpoint alias that uses the unified roles instead of cs3 roles
+
+   https://github.com/owncloud/ocis/pull/11871
+
+* Enhancement - Force Strict-Transport-Security: [#11880](https://github.com/owncloud/ocis/pull/11880)
+
+   Added `PROXY_FORCE_STRICT_TRANSPORT_SECURITY` environment variable to force
+   emission of `Strict-Transport-Security` header on all responses, including plain
+   HTTP requests when TLS is terminated upstream. Useful when oCIS is deployed
+   behind a proxy.
+
+   https://github.com/owncloud/ocis/pull/11880
+
+* Enhancement - Relocate Transifex resources: [#11889](https://github.com/owncloud/ocis/pull/11889)
+
+   The resources for services with translations are relocated in Transifex from
+   owncloud to owncloud-web. Now all ocis related resources are in one project.
+
+   https://github.com/owncloud/ocis/pull/11889
+
+* Enhancement - Update the ocis_full deployment example images: [#11890](https://github.com/owncloud/ocis/pull/11890)
+
+  * Traefic:   v3.6.6
+  * Collabora: 25.04.8.1.1
+  * Onlyoffice: 9.2.1.1
+
+   https://github.com/owncloud/ocis/pull/11890
 
 # Changelog for [7.3.1] (2025-11-24)
 

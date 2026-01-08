@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "homepage": ".",
-  "packageManager": "pnpm@10.24.0",
+  "packageManager": "pnpm@10.27.0",
   "scripts": {
     "analyze": "source-map-explorer 'build/static/js/*.js'",
     "build": "node --openssl-legacy-provider scripts/build.js && rm -f build/service-worker.js",
@@ -170,6 +170,7 @@
   "pnpm": {
     "overrides": {
       "glob": "10.5.0",
+      "js-yaml": ">=4.1.1",
       "kpop>cldr": "",
       "kpop>notistack": "^1.0.5",
       "kpop>react-intl": "^5.25.0",

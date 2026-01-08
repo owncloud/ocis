@@ -6,6 +6,7 @@ settings:
 
 overrides:
   glob: 10.5.0
+  js-yaml: '>=4.1.1'
   kpop>cldr: ''
   kpop>notistack: ^1.0.5
   kpop>react-intl: ^5.25.0
@@ -259,7 +260,7 @@ importers:
         version: 8.1.1(postcss@8.5.3)(typescript@4.9.5)(webpack@5.96.1)
       postcss-normalize:
         specifier: 13.0.0
-        version: 13.0.0(browserslist@4.24.2)(postcss@8.5.3)
+        version: 13.0.0(browserslist@4.25.1)(postcss@8.5.3)
       postcss-preset-env:
         specifier: 10.1.6
         version: 10.1.6(postcss@8.5.3)
@@ -2571,9 +2572,6 @@ packages:
     resolution: {integrity: sha512-KMReFUr0B4t+D+OBkjR3KYqvocp2XaSzO55UcB6mgQMd3KbcE+mWTyvVV7D/zsdEbNnV6acZUutkiHQXvTr1Rw==}
     engines: {node: '>= 8'}
 
-  argparse@1.0.10:
-    resolution: {integrity: sha512-o5Roy6tNG4SL/FOkCAN6RzjiakZS25RLYFrcMttJqbdd8BWrnA+fGz57iN5Pb06pvBGvl5gQ0B48dJlslXvoTg==}
-
   argparse@2.0.1:
     resolution: {integrity: sha512-8+9WqebbFzpX9OR+Wa6O29asIogeRMzcGtAINdpMHHyAg10f05aSFVBbcEqGf/PXw1EjAZ+q2/bEBg3DvurK3Q==}
 
@@ -4542,12 +4540,8 @@ packages:
   js-tokens@4.0.0:
     resolution: {integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==}
 
-  js-yaml@3.14.1:
-    resolution: {integrity: sha512-okMH7OXXJ7YrN9Ok3/SXrnu4iX9yOk+25nqX4imS2npuvTYDmo/QEZoqwZkYaIDk3jVvBOTOIEgEhaLOynBS9g==}
-    hasBin: true
-
-  js-yaml@4.1.0:
-    resolution: {integrity: sha512-wpxZs9NoxZaJESJGIZTyDEaYpl0FKSA+FB9aJiyemKhMwkxQg63h4T1KJgUGHpTqPDNRcmmYLugrRjJlBtWvRA==}
+  js-yaml@4.1.1:
+    resolution: {integrity: sha512-qQKT4zQxXl8lLwBtHMWwaTcGfFOZviOJet3Oy/xmGk2gZH677CJM9EvtfdSkgWcATZhj/55JZ0rmy3myCT5lsA==}
     hasBin: true
 
   jsesc@3.0.2:
@@ -6139,9 +6133,6 @@ packages:
   split-on-first@3.0.0:
     resolution: {integrity: sha512-qxQJTx2ryR0Dw0ITYyekNQWpz6f8dGd7vffGNflQQ3Iqj9NJ6qiZ7ELpZsJ/QBhIVAiDfXdag3+Gp8RvWa62AA==}
     engines: {node: '>=12'}
-
-  sprintf-js@1.0.3:
-    resolution: {integrity: sha512-D9cPgkvLlV3t3IzL0D0YLvGA9Ahk4PcvVwUbN0dSGr1aP0Nrt4AEnTUbuGvquEC0mA64Gqt1fzirlRs5ibXx8g==}
 
   sprintf-js@1.1.3:
     resolution: {integrity: sha512-Oo+0REFV59/rz3gfJNKQiBlwfHaSESl1pcGyABQsnnIfWOFt6JNj5gCog2U6MLZ//IGYD+nA8nI+mTShREReaA==}
@@ -8196,7 +8187,7 @@ snapshots:
       globals: 13.24.0
       ignore: 5.3.2
       import-fresh: 3.3.0
-      js-yaml: 4.1.0
+      js-yaml: 4.1.1
       minimatch: 3.1.2
       strip-json-comments: 3.1.1
     transitivePeerDependencies:
@@ -8286,7 +8277,7 @@ snapshots:
       camelcase: 5.3.1
       find-up: 4.1.0
       get-package-type: 0.1.0
-      js-yaml: 3.14.1
+      js-yaml: 4.1.1
       resolve-from: 5.0.0
 
   '@istanbuljs/schema@0.1.3': {}
@@ -9453,10 +9444,6 @@ snapshots:
       normalize-path: 3.0.0
       picomatch: 2.3.1
 
-  argparse@1.0.10:
-    dependencies:
-      sprintf-js: 1.0.3
-
   argparse@2.0.1: {}
 
   aria-query@5.1.3:
@@ -10060,7 +10047,7 @@ snapshots:
     dependencies:
       env-paths: 2.2.1
       import-fresh: 3.3.1
-      js-yaml: 4.1.0
+      js-yaml: 4.1.1
       parse-json: 5.2.0
     optionalDependencies:
       typescript: 4.9.5
@@ -10953,7 +10940,7 @@ snapshots:
       imurmurhash: 0.1.4
       is-glob: 4.0.3
       is-path-inside: 3.0.3
-      js-yaml: 4.1.0
+      js-yaml: 4.1.1
       json-stable-stringify-without-jsonify: 1.0.1
       levn: 0.4.1
       lodash.merge: 4.6.2
@@ -11465,7 +11452,7 @@ snapshots:
       fs-extra: 11.2.0
       gulp-sort: 2.0.0
       i18next: 23.16.8
-      js-yaml: 4.1.0
+      js-yaml: 4.1.1
       lilconfig: 3.1.3
       rsvp: 4.8.5
       sort-keys: 5.0.0
@@ -12089,12 +12076,7 @@ snapshots:
 
   js-tokens@4.0.0: {}
 
-  js-yaml@3.14.1:
-    dependencies:
-      argparse: 1.0.10
-      esprima: 4.0.1
-
-  js-yaml@4.1.0:
+  js-yaml@4.1.1:
     dependencies:
       argparse: 2.0.1
 
@@ -12696,9 +12678,9 @@ snapshots:
       postcss: 8.5.3
       postcss-selector-parser: 7.1.0
 
-  postcss-browser-comments@4.0.0(browserslist@4.24.2)(postcss@8.5.3):
+  postcss-browser-comments@4.0.0(browserslist@4.25.1)(postcss@8.5.3):
     dependencies:
-      browserslist: 4.24.2
+      browserslist: 4.25.1
       postcss: 8.5.3
 
   postcss-calc@10.0.0(postcss@8.5.3):
@@ -12966,12 +12948,12 @@ snapshots:
       postcss: 8.5.3
       postcss-value-parser: 4.2.0
 
-  postcss-normalize@13.0.0(browserslist@4.24.2)(postcss@8.5.3):
+  postcss-normalize@13.0.0(browserslist@4.25.1)(postcss@8.5.3):
     dependencies:
       '@csstools/normalize.css': 12.1.1
-      browserslist: 4.24.2
+      browserslist: 4.25.1
       postcss: 8.5.3
-      postcss-browser-comments: 4.0.0(browserslist@4.24.2)(postcss@8.5.3)
+      postcss-browser-comments: 4.0.0(browserslist@4.25.1)(postcss@8.5.3)
       sanitize.css: 13.0.0
 
   postcss-opacity-percentage@3.0.0(postcss@8.5.3):
@@ -13781,8 +13763,6 @@ snapshots:
       spdx-ranges: 2.1.1
 
   split-on-first@3.0.0: {}
-
-  sprintf-js@1.0.3: {}
 
   sprintf-js@1.1.3: {}
 
