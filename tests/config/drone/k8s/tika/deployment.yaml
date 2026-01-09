@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
         - name: tika
-          image: apache/tika:latest
+          image: apache/tika:3.2.2.0-full
           ports:
             - containerPort: 9998
