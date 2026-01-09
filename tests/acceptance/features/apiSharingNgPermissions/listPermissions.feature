@@ -86,10 +86,10 @@ Feature: List a sharing permissions
                       "const": 2
                     },
                     "description": {
-                      "const": "View, download and upload."
+                      "const": "View, download, upload, edit and add."
                     },
                     "displayName": {
-                      "const": "Can upload"
+                      "const": "Can edit"
                     },
                     "id": {
                       "const": "1c996275-f1c9-4e71-abdf-a42f6495e960"
@@ -112,7 +112,7 @@ Feature: List a sharing permissions
                       "const": "View, download, upload, edit, add and delete."
                     },
                     "displayName": {
-                      "const": "Can edit without versions"
+                      "const": "Can edit with trashbin"
                     },
                     "id": {
                       "const": "fb6c3e19-e378-47e5-b277-9732f9de6e21"
@@ -209,10 +209,10 @@ Feature: List a sharing permissions
                       "const": 2
                     },
                     "description": {
-                      "const": "View, download, upload, edit, add, delete including the history."
+                      "const": "View, download, upload, edit, add, show all versions and delete."
                     },
                     "displayName": {
-                      "const": "Can edit"
+                      "const": "Can edit with versions and trashbin"
                     },
                     "id": {
                       "const": "58c63c02-1d89-4572-916a-870abc5a1b7d"
@@ -232,7 +232,7 @@ Feature: List a sharing permissions
                       "const": 3
                     },
                     "description": {
-                      "const": "View, download, upload, edit, add, delete and manage members."
+                      "const": "View, download, upload, edit, add, show all versions, delete and manage members."
                     },
                     "displayName": {
                       "const": "Can manage"
@@ -342,10 +342,10 @@ Feature: List a sharing permissions
                       "const": 2
                     },
                     "description": {
-                      "const": "View, download, upload, edit, add, delete including the history."
+                      "const": "View, download, upload, edit, add, show all versions and delete."
                     },
                     "displayName": {
-                      "const": "Can edit"
+                      "const": "Can edit with versions and trashbin"
                     },
                     "id": {
                       "const": "58c63c02-1d89-4572-916a-870abc5a1b7d"
@@ -365,7 +365,7 @@ Feature: List a sharing permissions
                       "const": 3
                     },
                     "description": {
-                      "const": "View, download, upload, edit, add, delete and manage members."
+                      "const": "View, download, upload, edit, add, show all versions, delete and manage members."
                     },
                     "displayName": {
                       "const": "Can manage"
@@ -606,10 +606,10 @@ Feature: List a sharing permissions
                       "const": 2
                     },
                     "description": {
-                      "const": "View, download and edit."
+                      "const": "View, download, upload and edit."
                     },
                     "displayName": {
-                      "const": "Can edit without versions"
+                      "const": "Can edit"
                     },
                     "id": {
                       "const": "2d00ce52-1fc2-4dbc-8b95-a73b73395f5a"
@@ -706,10 +706,10 @@ Feature: List a sharing permissions
                       "const": 2
                     },
                     "description": {
-                      "const": "View, download and upload."
+                      "const": "View, download, upload, edit and add."
                     },
                     "displayName": {
-                      "const": "Can upload"
+                      "const": "Can edit"
                     },
                     "id": {
                       "const": "1c996275-f1c9-4e71-abdf-a42f6495e960"
@@ -732,7 +732,7 @@ Feature: List a sharing permissions
                       "const": "View, download, upload, edit, add and delete."
                     },
                     "displayName": {
-                      "const": "Can edit without versions"
+                      "const": "Can edit with trashbin"
                     },
                     "id": {
                       "const": "fb6c3e19-e378-47e5-b277-9732f9de6e21"
@@ -829,10 +829,10 @@ Feature: List a sharing permissions
                       "const": 2
                     },
                     "description": {
-                      "const": "View, download and edit."
+                      "const": "View, download, upload and edit."
                     },
                     "displayName": {
-                      "const": "Can edit without versions"
+                      "const": "Can edit"
                     },
                     "id": {
                       "const": "2d00ce52-1fc2-4dbc-8b95-a73b73395f5a"
@@ -954,10 +954,10 @@ Feature: List a sharing permissions
                       "const": 2
                     },
                     "description": {
-                      "const": "View, download, upload, edit, add, delete including the history."
+                      "const": "View, download, upload, edit, add, show all versions and delete."
                     },
                     "displayName": {
-                      "const": "Can edit"
+                      "const": "Can edit with versions and trashbin"
                     },
                     "id": {
                       "const": "58c63c02-1d89-4572-916a-870abc5a1b7d"
@@ -978,7 +978,7 @@ Feature: List a sharing permissions
                       "const": 3
                     },
                     "description": {
-                      "const": "View, download, upload, edit, add, delete and manage members."
+                      "const": "View, download, upload, edit, add, show all versions, delete and manage members."
                     },
                     "displayName": {
                       "const": "Can manage"
@@ -1077,10 +1077,10 @@ Feature: List a sharing permissions
                       "const": 2
                     },
                     "description": {
-                      "const": "View, download, upload, edit, add, delete including the history."
+                      "const": "View, download, upload, edit, add, show all versions and delete."
                     },
                     "displayName": {
-                      "const": "Can edit"
+                      "const": "Can edit with versions and trashbin"
                     },
                     "id": {
                       "const": "58c63c02-1d89-4572-916a-870abc5a1b7d"
@@ -1100,7 +1100,7 @@ Feature: List a sharing permissions
                       "const": 3
                     },
                     "description": {
-                      "const": "View, download, upload, edit, add, delete and manage members."
+                      "const": "View, download, upload, edit, add, show all versions, delete and manage members."
                     },
                     "displayName": {
                       "const": "Can manage"
@@ -1361,10 +1361,10 @@ Feature: List a sharing permissions
                       "const": 2
                     },
                     "description": {
-                      "const": "View, download, upload, edit, add, delete including the history."
+                      "const": "View, download, upload, edit, add, show all versions and delete."
                     },
                     "displayName": {
-                      "const": "Can edit"
+                      "const": "Can edit with versions and trashbin"
                     },
                     "id": {
                       "const": "58c63c02-1d89-4572-916a-870abc5a1b7d"
@@ -1385,7 +1385,7 @@ Feature: List a sharing permissions
                       "const": 3
                     },
                     "description": {
-                      "const": "View, download, upload, edit, add, delete and manage members."
+                      "const": "View, download, upload, edit, add, show all versions, delete and manage members."
                     },
                     "displayName": {
                       "const": "Can manage"
@@ -1703,10 +1703,10 @@ Feature: List a sharing permissions
                       "const": 2
                     },
                     "description": {
-                      "const": "View, download, upload, edit, add, delete including the history."
+                      "const": "View, download, upload, edit, add, show all versions and delete."
                     },
                     "displayName": {
-                      "const": "Can edit"
+                      "const": "Can edit with versions and trashbin"
                     },
                     "id": {
                       "const": "58c63c02-1d89-4572-916a-870abc5a1b7d"
@@ -1726,7 +1726,7 @@ Feature: List a sharing permissions
                       "const": 3
                     },
                     "description": {
-                      "const": "View, download, upload, edit, add, delete and manage members."
+                      "const": "View, download, upload, edit, add, show all versions, delete and manage members."
                     },
                     "displayName": {
                       "const": "Can manage"
@@ -2234,7 +2234,7 @@ Feature: List a sharing permissions
                   ],
                   "properties": {
                     "displayName": {
-                      "const": "Can upload"
+                      "const": "Can edit"
                     }
                   }
                 },
@@ -2248,7 +2248,7 @@ Feature: List a sharing permissions
                   ],
                   "properties": {
                     "displayName": {
-                      "const": "Can edit without versions"
+                      "const": "Can edit with trashbin"
                     }
                   }
                 }
@@ -2314,7 +2314,7 @@ Feature: List a sharing permissions
                       "const": "View, download, upload, edit, add and delete."
                     },
                     "displayName": {
-                      "const": "Can edit without versions"
+                      "const": "Can edit with trashbin"
                     },
                     "id": {
                       "const": "3284f2d5-0070-4ad8-ac40-c247f7c1fb27"
@@ -2332,7 +2332,7 @@ Feature: List a sharing permissions
                   ],
                   "properties": {
                     "displayName": {
-                      "const": "Can edit"
+                      "const": "Can edit with versions and trashbin"
                     }
                   }
                 },
@@ -2427,7 +2427,7 @@ Feature: List a sharing permissions
                   ],
                   "properties": {
                     "displayName": {
-                      "const": "Can upload"
+                      "const": "Can edit"
                     }
                   }
                 },
@@ -2441,7 +2441,7 @@ Feature: List a sharing permissions
                   ],
                   "properties": {
                     "displayName": {
-                      "const": "Can edit without versions"
+                      "const": "Can edit with trashbin"
                     }
                   }
                 }
@@ -2524,7 +2524,7 @@ Feature: List a sharing permissions
                   ],
                   "properties": {
                     "displayName": {
-                      "const": "Can upload"
+                      "const": "Can edit"
                     }
                   }
                 },
@@ -2538,7 +2538,7 @@ Feature: List a sharing permissions
                   ],
                   "properties": {
                     "displayName": {
-                      "const": "Can edit without versions"
+                      "const": "Can edit with trashbin"
                     }
                   }
                 }

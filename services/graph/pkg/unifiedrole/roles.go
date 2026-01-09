@@ -135,7 +135,7 @@ var (
 
 	// EditorLite
 	// UnifiedRole EditorLite, Role DisplayName (resolves directly)
-	_editorLiteUnifiedRoleDisplayName = l10n.Template("Can upload")
+	_editorLiteUnifiedRoleDisplayName = l10n.Template("Can edit")
 	// UnifiedRole EditorLite, Role Description (resolves directly)
 	_editorLiteUnifiedRoleDescription = l10n.Template("View, download, upload, edit and add.")
 	// UnifiedRole EditorLite, Permissions
@@ -143,7 +143,7 @@ var (
 
 	// Editor
 	// UnifiedRole Editor, Role DisplayName (resolves directly)
-	_editorUnifiedRoleDisplayName = l10n.Template("Can upload with trashbin")
+	_editorUnifiedRoleDisplayName = l10n.Template("Can edit with trashbin")
 	// UnifiedRole Editor, Role Description (resolves directly)
 	_editorUnifiedRoleDescription = l10n.Template("View, download, upload, edit, add and delete.")
 	// UnifiedRole Editor, Permissions
@@ -151,7 +151,7 @@ var (
 
 	// Editor + ListGrants
 	// UnifiedRole EditorListGrants, Role DisplayName (resolves directly)
-	_editorListGrantsUnifiedRoleDisplayName = l10n.Template("Can edit")
+	_editorListGrantsUnifiedRoleDisplayName = l10n.Template("Can edit with trashbin and show invitees")
 	// UnifiedRole EditorListGrants Editor, Role Description (resolves directly)
 	_editorListGrantsUnifiedRoleDescription = l10n.Template("View, download, upload, edit, add, delete and show all invited people.")
 	// UnifiedRole EditorListGrants Editor, Permissions
@@ -159,9 +159,9 @@ var (
 
 	// Editor + ListGrants + Version
 	// UnifiedRole EditorListGrantsWithVersions, Role DisplayName (resolves directly)
-	_editorListGrantsWithVersionsUnifiedRoleDisplayName = l10n.Template("Can edit with versions")
+	_editorListGrantsWithVersionsUnifiedRoleDisplayName = l10n.Template("Can edit with trashbin, versions and show invitees")
 	// UnifiedRole EditorListGrantsWithVersions, Role Description (resolves directly)
-	_editorListGrantsWithVersionsUnifiedRoleDescription = l10n.Template("View, download, upload, edit, delete, show all invited people and show all versions.")
+	_editorListGrantsWithVersionsUnifiedRoleDescription = l10n.Template("View, download, upload, edit, delete, show all versions and all invited people.")
 	// UnifiedRole EditorListGrantsWithVersions, Permissions
 	_editorListGrantsWithVersionsRole = conversions.NewEditorListGrantsWithVersionsRole()
 
@@ -169,25 +169,25 @@ var (
 
 	// FileEditor
 	// UnifiedRole FileEditor, Role DisplayName (resolves directly)
-	_fileEditorUnifiedRoleDisplayName = l10n.Template("Can upload")
+	_fileEditorUnifiedRoleDisplayName = l10n.Template("Can edit")
 	// UnifiedRole FileEditor, Role Description (resolves directly)
-	_fileEditorUnifiedRoleDescription = l10n.Template("View, download and edit.")
+	_fileEditorUnifiedRoleDescription = l10n.Template("View, download, upload and edit.")
 	// UnifiedRole FileEditor, Permissions
 	_fileEditorRole = conversions.NewFileEditorRole()
 
 	// FileEditor + ListGrants
 	// UnifiedRole FileEditorListGrants, Role DisplayName (resolves directly)
-	_fileEditorListGrantsUnifiedRoleDisplayName = l10n.Template("Can edit")
+	_fileEditorListGrantsUnifiedRoleDisplayName = l10n.Template("Can edit and show invitees")
 	// UnifiedRole FileEditorListGrants, Role Description (resolves directly)
-	_fileEditorListGrantsUnifiedRoleDescription = l10n.Template("View, download, edit and show all invited people.")
+	_fileEditorListGrantsUnifiedRoleDescription = l10n.Template("View, download, upload, edit and show all invited people.")
 	// UnifiedRole FileEditorListGrants, Permissions
 	_fileEditorListGrantsRole = conversions.NewFileEditorListGrantsRole()
 
 	// FileEditor + ListGrants + Versions
 	// UnifiedRole FileEditorListGrantsWithVersions, Role DisplayName (resolves directly)
-	_fileEditorListGrantsWithVersionsUnifiedRoleDisplayName = l10n.Template("Can edit with versions")
+	_fileEditorListGrantsWithVersionsUnifiedRoleDisplayName = l10n.Template("Can edit with versions and show invitees")
 	// UnifiedRole FileEditorListGrantsWithVersions, Role Description (resolves directly)
-	_fileEditorListGrantsWithVersionsUnifiedRoleDescription = l10n.Template("View, download, edit, show all invited people and show all versions.")
+	_fileEditorListGrantsWithVersionsUnifiedRoleDescription = l10n.Template("View, download, upload, edit, show all versions and all invited people.")
 	// UnifiedRole FileEditorListGrantsWithVersion, Role Permissions
 	_fileEditorListGrantsWithVersionsRole = conversions.NewFileEditorListGrantsWithVersionsRole()
 
@@ -201,27 +201,27 @@ var (
 	// UnifiedRole SpaceViewer, Permissions
 	_spaceViewerRole = conversions.NewSpaceViewerRole()
 
-	// Editor without Trashbin
-	// UnifiedRole SpaceEditorWithoutTrashbin, Role DisplayName (resolves directly)
-	_spaceEditorWithoutTrashbinUnifiedRoleDisplayName = l10n.Template("Can edit")
-	// UnifiedRole SpaceEditorWithoutTrashbin, Role Description (resolves directly)
-	_spaceEditorWithoutTrashbinUnifiedRoleDescription = l10n.Template("View, download, upload, edit and add.")
-	// UnifiedRole SpaceEditorWithoutTrashbin, Permissions
-	_spaceEditorWithoutTrashbinRole = conversions.NewSpaceEditorWithoutTrashbinRole()
-
 	// Editor without Versions
 	// UnifiedRole SpaceEditorWithoutVersions, Role DisplayName (resolves directly)
-	_spaceEditorWithoutVersionsUnifiedRoleDisplayName = l10n.Template("Can edit with trashbin")
+	_spaceEditorWithoutVersionsUnifiedRoleDisplayName = l10n.Template("Can edit")
 	// UnifiedRole SpaceEditorWithoutVersions, Role Description (resolves directly)
-	_spaceEditorWithoutVersionsUnifiedRoleDescription = l10n.Template("View, download, upload, edit, add and delete.")
+	_spaceEditorWithoutVersionsUnifiedRoleDescription = l10n.Template("View, download, upload, edit and add.")
 	// UnifiedRole SpaceEditorWithoutVersions, Permissions
 	_spaceEditorWithoutVersionsRole = conversions.NewSpaceEditorWithoutVersionsRole()
 
+	// Editor without Trashbin
+	// UnifiedRole SpaceEditorWithoutTrashbin, Role DisplayName (resolves directly)
+	_spaceEditorWithoutTrashbinUnifiedRoleDisplayName = l10n.Template("Can edit with versions")
+	// UnifiedRole SpaceEditorWithoutTrashbin, Role Description (resolves directly)
+	_spaceEditorWithoutTrashbinUnifiedRoleDescription = l10n.Template("View, download, upload, edit, add and show all versions.")
+	// UnifiedRole SpaceEditorWithoutTrashbin, Permissions
+	_spaceEditorWithoutTrashbinRole = conversions.NewSpaceEditorWithoutTrashbinRole()
+
 	// Editor
 	// UnifiedRole SpaceEditor, Role DisplayName (resolves directly)
-	_spaceEditorUnifiedRoleDisplayName = l10n.Template("Can edit with trashbin and versions")
+	_spaceEditorUnifiedRoleDisplayName = l10n.Template("Can edit with versions and trashbin")
 	// UnifiedRole SpaceEditor, Role Description (resolves directly)
-	_spaceEditorUnifiedRoleDescription = l10n.Template("View, download, upload, edit, add, delete and show all versions.")
+	_spaceEditorUnifiedRoleDescription = l10n.Template("View, download, upload, edit, add, show all versions and delete.")
 	// UnifiedRole SpaceEditor, Permissions
 	_spaceEditorRole = conversions.NewSpaceEditorRole()
 
@@ -229,7 +229,7 @@ var (
 	// UnifiedRole Manager, Role DisplayName (resolves directly)
 	_managerUnifiedRoleDisplayName = l10n.Template("Can manage")
 	// UnifiedRole Manager, Role Description (resolves directly)
-	_managerUnifiedRoleDescription = l10n.Template("View, download, upload, edit, add, delete, show all versions and manage members.")
+	_managerUnifiedRoleDescription = l10n.Template("View, download, upload, edit, add, show all versions, delete and manage members.")
 	// UnifiedRole Manager, Permissions
 	_managerRole = conversions.NewManagerRole()
 
