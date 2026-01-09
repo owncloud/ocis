@@ -27,7 +27,7 @@ Feature: collaboration (wopi)
         "properties": {
           "app_url": {
             "type": "string",
-            "pattern": "^.*\\?WOPISrc=.*wopi%2Ffiles%2F[a-fA-F0-9]{64}$"
+            "pattern": "^.*\\?WOPISrc=.*wopi%2Ffiles%2F[a-fA-F0-9]{64}($|&)"
           },
           "method": {
             "const": "POST"
@@ -73,7 +73,7 @@ Feature: collaboration (wopi)
         "properties": {
           "app_url": {
             "type": "string",
-            "pattern": "^.*\\?WOPISrc=.*wopi%2Ffiles%2F[a-fA-F0-9]{64}$"
+            "pattern": "^.*\\?WOPISrc=.*wopi%2Ffiles%2F[a-fA-F0-9]{64}($|&)"
           },
           "method": {
             "const": "POST"
@@ -115,7 +115,7 @@ Feature: collaboration (wopi)
         "properties": {
           "app_url": {
             "type": "string",
-            "pattern": "^.*\\?WOPISrc=.*wopi%2Ffiles%2F[a-fA-F0-9]{64}$"
+            "pattern": "^.*\\?WOPISrc=.*wopi%2Ffiles%2F[a-fA-F0-9]{64}($|&)"
           },
           "method": {
             "const": "POST"
@@ -163,7 +163,7 @@ Feature: collaboration (wopi)
         "properties": {
           "app_url": {
             "type": "string",
-            "pattern": "^.*\\?WOPISrc=.*wopi%2Ffiles%2F[a-fA-F0-9]{64}$"
+            "pattern": "^.*\\?WOPISrc=.*wopi%2Ffiles%2F[a-fA-F0-9]{64}($|&)"
           },
           "method": {
             "const": "POST"
@@ -214,7 +214,7 @@ Feature: collaboration (wopi)
         "properties": {
           "app_url": {
             "type": "string",
-            "pattern": "^.*\\?WOPISrc=.*wopi%2Ffiles%2F[a-fA-F0-9]{64}$"
+            "pattern": "^.*\\?WOPISrc=.*wopi%2Ffiles%2F[a-fA-F0-9]{64}($|&)"
           },
           "method": {
             "const": "POST"
@@ -315,7 +315,7 @@ Feature: collaboration (wopi)
         "properties": {
           "app_url": {
             "type": "string",
-            "pattern": "^.*\\?WOPISrc=.*wopi%2Ffiles%2F[a-fA-F0-9]{64}$"
+            "pattern": "^.*\\?WOPISrc=.*wopi%2Ffiles%2F[a-fA-F0-9]{64}($|&)"
           },
           "method": {
             "const": "POST"
@@ -1108,7 +1108,7 @@ Feature: collaboration (wopi)
         "properties": {
           "app_url": {
             "type": "string",
-            "pattern": "^.*\\?WOPISrc=.*wopi%2Ffiles%2F[a-fA-F0-9]{64}$"
+            "pattern": "^.*\\?WOPISrc=.*wopi%2Ffiles%2F[a-fA-F0-9]{64}($|&)"
           },
           "method": {
             "const": "POST"
