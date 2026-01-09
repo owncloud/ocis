@@ -211,7 +211,7 @@ Feature: permissions role definitions
                   "const": "View, download, upload, edit, add and delete."
                 },
                 "displayName": {
-                  "const": "Can edit without versions"
+                  "const": "Can upload with trashbin"
                 },
                 "id": {
                   "const": "fb6c3e19-e378-47e5-b277-9732f9de6e21"
@@ -296,10 +296,10 @@ Feature: permissions role definitions
                   "const": 0
                 },
                 "description": {
-                  "const": "View, download, upload, edit, add, delete including the history."
+                  "const": "View, download, upload, edit, add, delete and show all versions."
                 },
                 "displayName": {
-                  "const": "Can edit"
+                  "const": "Can edit with trashbin and versions"
                 },
                 "id": {
                   "const": "58c63c02-1d89-4572-916a-870abc5a1b7d"
@@ -359,7 +359,7 @@ Feature: permissions role definitions
                   "const": "View, download and edit."
                 },
                 "displayName": {
-                  "const": "Can edit without versions"
+                  "const": "Can upload"
                 },
                 "id": {
                   "const": "2d00ce52-1fc2-4dbc-8b95-a73b73395f5a"
@@ -438,7 +438,7 @@ Feature: permissions role definitions
                   "const": 0
                 },
                 "description": {
-                  "const": "View, download and upload."
+                  "const": "View, download, upload, edit and add."
                 },
                 "displayName": {
                   "const": "Can upload"
@@ -491,7 +491,7 @@ Feature: permissions role definitions
                   "const": 0
                 },
                 "description": {
-                  "const": "View, download, upload, edit, add, delete and manage members."
+                  "const": "View, download, upload, edit, add, delete, show all versions and manage members."
                 },
                 "displayName": {
                   "const": "Can manage"
