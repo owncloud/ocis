@@ -1,12 +1,14 @@
----
-namespaceOverride: ocis
+namespaceOverride: ocis2
 image:
   repository: owncloud/ocis-rolling
   tag: master
+
+externalDomain: ocis2-server
+
 ingress:
   enabled: true
   ingressClassName: traefik
-externalDomain: ocis-server
+
 extraResources:
   - |
     apiVersion: v1
@@ -20,46 +22,74 @@ extraResources:
       ocmproviders.json: |
         [
           {
-            "name": "ocis-server",
-            "full_name": "first-ocis-instance",
-            "organization": "Owncloud",
+            "name": "Local oCIS",
+            "full_name": "Local oCIS provider",
+            "organization": "oCIS",
             "domain": "ocis-server",
             "homepage": "https://ocis-server",
+            "description": "Local oCIS instance",
             "services": [
               {
                 "endpoint": {
                   "type": {
                     "name": "OCM",
-                    "description": "CERNBox Open Cloud Mesh API"
+                    "description": "Local oCIS Open Cloud Mesh API"
                   },
-                  "name": "CERNBox - OCM API",
+                  "name": "ocis-server - OCM API",
                   "path": "https://ocis-server/ocm/",
                   "is_monitored": true
                 },
                 "api_version": "0.0.1",
-                "host": "ocis-server"
+                "host": "https://ocis-server"
+              },
+              {
+                "endpoint": {
+                  "type": {
+                    "name": "Webdav",
+                    "description": "Local oCIS Webdav API"
+                  },
+                  "name": "ocis-server - Webdav API",
+                  "path": "https://ocis-server/dav/",
+                  "is_monitored": true
+                },
+                "api_version": "0.0.1",
+                "host": "https://ocis-server/"
               }
             ]
           },
           {
-            "name": "ocis2-server",
-            "full_name": "Federation ocis",
-            "organization": "Owncloud",
-            "domain": "ocis2-server:444",
-            "homepage": "https://ocis2-server:444",
+            "name": "Remote oCIS2",
+            "full_name": "Remote oCIS provider",
+            "organization": "oCIS",
+            "domain": "ocis2-server",
+            "homepage": "https://ocis2-server",
+            "description": "Remote oCIS instance for ScienceMesh",
             "services": [
               {
                 "endpoint": {
                   "type": {
                     "name": "OCM",
-                    "description": "CERNBox Open Cloud Mesh API"
+                    "description": "Remote oCIS2 Open Cloud Mesh API"
                   },
-                  "name": "CERNBox - OCM API",
-                  "path": "https://ocis2-server:444/ocm/",
+                  "name": "ocis2-server - OCM API",
+                  "path": "https://ocis2-server/ocm/",
                   "is_monitored": true
                 },
                 "api_version": "0.0.1",
-                "host": "ocis2-server:444"
+                "host": "https://ocis2-server"
+              },
+              {
+                "endpoint": {
+                  "type": {
+                    "name": "Webdav",
+                    "description": "Remote oCIS2 Webdav API"
+                  },
+                  "name": "ocis2-server - Webdav API",
+                  "path": "https://ocis2-server/dav/",
+                  "is_monitored": true
+                },
+                "api_version": "0.0.1",
+                "host": "https://ocis2-server/"
               }
             ]
           }
@@ -67,10 +97,12 @@ extraResources:
 
 logging:
   level: error
+
 insecure:
   oidcIdpInsecure: true
   ocisHttpApiInsecure: true
   ocmInsecure: true
+
 features:
   authapp:
     enabled: true
