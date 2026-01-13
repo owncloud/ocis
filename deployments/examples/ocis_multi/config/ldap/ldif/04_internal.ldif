@@ -6,3 +6,15 @@ objectClass: top
 objectClass: organizationalRole
 description: to be used for refint in empty groups
 cn: nobody
+
+dn: cn=ec730a6c-1b63-4b45-b83b-9e2311afdf85,dc=owncloud,dc=com
+objectClass: top
+objectClass: organizationalRole
+description: base
+cn: ec730a6c-1b63-4b45-b83b-9e2311afdf85
+
+dn: cn=8d24cb5f-6ee6-4b98-86df-c4c268dddb46,dc=owncloud,dc=com
+objectClass: top
+objectClass: organizationalRole
+description: ocm
+cn: 8d24cb5f-6ee6-4b98-86df-c4c268dddb46

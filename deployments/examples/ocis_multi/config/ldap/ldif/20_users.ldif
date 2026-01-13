@@ -17,7 +17,7 @@ uidNumber: 20000
 gidNumber: 30000
 homeDirectory: /home/einstein
 ownCloudUUID: 4c510ada-c86b-4815-8820-42cdf82c3d51
-owncloudMemberOf: base
+owncloudMemberOf: ec730a6c-1b63-4b45-b83b-9e2311afdf85
 ownCloudRole: ocisUser
 userPassword:: e1NTSEF9TXJEcXpFNGdKbXZxbVRVTGhvWEZ1VzJBbkV3NWFLK3J3WTIvbHc9PQ==
 
@@ -39,7 +39,7 @@ uidNumber: 20001
 gidNumber: 30000
 homeDirectory: /home/marie
 ownCloudUUID: f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c
-owncloudMemberOf: ocm
+owncloudMemberOf: 8d24cb5f-6ee6-4b98-86df-c4c268dddb46
 ownCloudRole: ocisUser
 userPassword:: e1NTSEF9UmFvQWs3TU9jRHBIUWY3bXN3MGhHNnVraFZQWnRIRlhOSUNNZEE9PQ==
 
@@ -82,7 +82,7 @@ uidNumber: 20002
 gidNumber: 30000
 homeDirectory: /home/katherine
 ownCloudUUID: 534bb038-6f9d-4093-946f-133be61fa4e7
-owncloudMemberOf: base
+owncloudMemberOf: ec730a6c-1b63-4b45-b83b-9e2311afdf85
 ownCloudRole: ocisSpaceAdmin
 userPassword:: e1NTSEF9Z05LZTRreHdmOGRUREY5eHlhSmpySTZ3MGxSVUM1d1RGcWROTVE9PQ==
 
@@ -104,7 +104,7 @@ uidNumber: 20003
 gidNumber: 30000
 homeDirectory: /home/moss
 ownCloudUUID: 058bff95-6708-4fe5-91e4-9ea3d377588b
-owncloudMemberOf: ocm
+owncloudMemberOf: 8d24cb5f-6ee6-4b98-86df-c4c268dddb46
 ownCloudRole: ocisAdmin
 userPassword:: e1NTSEF9N0hEdTRoMkFDVExFWWt4U0RtSDZVQjhmUlpKRExDZDc=
 
@@ -126,7 +126,7 @@ uidNumber: 20004
 gidNumber: 30000
 homeDirectory: /home/admin
 ownCloudUUID: ddc2004c-0977-11eb-9d3f-a793888cd0f8
-owncloudMemberOf: base
-owncloudMemberOf: ocm
+owncloudMemberOf: ec730a6c-1b63-4b45-b83b-9e2311afdf85
+owncloudMemberOf: 8d24cb5f-6ee6-4b98-86df-c4c268dddb46
 ownCloudRole: ocisAdmin
 userPassword:: e1NTSEF9UWhmaFB3dERydTUydURoWFFObDRMbzVIckI3TkI5Nmo=

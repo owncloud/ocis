@@ -40,7 +40,7 @@ type Backend interface {
 	AddUser(ctx context.Context, id string, instanceID string) (libregraph.User, error) // FIXME
 
 	GetUser(ctx context.Context, nameOrID string, oreq *godata.GoDataRequest) (*libregraph.User, error)
-	GetPreciseUser(ctx context.Context, name string, oreq *godata.GoDataRequest) (*libregraph.User, error)
+	GetPreciseUser(ctx context.Context, name string, instancename string, oreq *godata.GoDataRequest) (*libregraph.User, error)
 	GetUsers(ctx context.Context, oreq *godata.GoDataRequest) ([]*libregraph.User, error)
 	// FilterUsers returns a list of users that match the filter
 	FilterUsers(ctx context.Context, oreq *godata.GoDataRequest, filter *godata.ParseNode) ([]*libregraph.User, error)

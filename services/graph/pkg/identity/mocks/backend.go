@@ -586,9 +586,9 @@ func (_c *Backend_GetGroups_Call) RunAndReturn(run func(context.Context, *godata
 	return _c
 }
 
-// GetPreciseUser provides a mock function with given fields: ctx, name, oreq
-func (_m *Backend) GetPreciseUser(ctx context.Context, name string, oreq *godata.GoDataRequest) (*libregraph.User, error) {
-	ret := _m.Called(ctx, name, oreq)
+// GetPreciseUser provides a mock function with given fields: ctx, name, instancename, oreq
+func (_m *Backend) GetPreciseUser(ctx context.Context, name string, instancename string, oreq *godata.GoDataRequest) (*libregraph.User, error) {
+	ret := _m.Called(ctx, name, instancename, oreq)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetPreciseUser")
@@ -596,19 +596,19 @@ func (_m *Backend) GetPreciseUser(ctx context.Context, name string, oreq *godata
 
 	var r0 *libregraph.User
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, string, *godata.GoDataRequest) (*libregraph.User, error)); ok {
-		return rf(ctx, name, oreq)
+	if rf, ok := ret.Get(0).(func(context.Context, string, string, *godata.GoDataRequest) (*libregraph.User, error)); ok {
+		return rf(ctx, name, instancename, oreq)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, string, *godata.GoDataRequest) *libregraph.User); ok {
-		r0 = rf(ctx, name, oreq)
+	if rf, ok := ret.Get(0).(func(context.Context, string, string, *godata.GoDataRequest) *libregraph.User); ok {
+		r0 = rf(ctx, name, instancename, oreq)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*libregraph.User)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, string, *godata.GoDataRequest) error); ok {
-		r1 = rf(ctx, name, oreq)
+	if rf, ok := ret.Get(1).(func(context.Context, string, string, *godata.GoDataRequest) error); ok {
+		r1 = rf(ctx, name, instancename, oreq)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -624,14 +624,15 @@ type Backend_GetPreciseUser_Call struct {
 // GetPreciseUser is a helper method to define mock.On call
 //   - ctx context.Context
 //   - name string
+//   - instancename string
 //   - oreq *godata.GoDataRequest
-func (_e *Backend_Expecter) GetPreciseUser(ctx interface{}, name interface{}, oreq interface{}) *Backend_GetPreciseUser_Call {
-	return &Backend_GetPreciseUser_Call{Call: _e.mock.On("GetPreciseUser", ctx, name, oreq)}
+func (_e *Backend_Expecter) GetPreciseUser(ctx interface{}, name interface{}, instancename interface{}, oreq interface{}) *Backend_GetPreciseUser_Call {
+	return &Backend_GetPreciseUser_Call{Call: _e.mock.On("GetPreciseUser", ctx, name, instancename, oreq)}
 }
 
-func (_c *Backend_GetPreciseUser_Call) Run(run func(ctx context.Context, name string, oreq *godata.GoDataRequest)) *Backend_GetPreciseUser_Call {
+func (_c *Backend_GetPreciseUser_Call) Run(run func(ctx context.Context, name string, instancename string, oreq *godata.GoDataRequest)) *Backend_GetPreciseUser_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(string), args[2].(*godata.GoDataRequest))
+		run(args[0].(context.Context), args[1].(string), args[2].(string), args[3].(*godata.GoDataRequest))
 	})
 	return _c
 }
@@ -641,7 +642,7 @@ func (_c *Backend_GetPreciseUser_Call) Return(_a0 *libregraph.User, _a1 error) *
 	return _c
 }
 
-func (_c *Backend_GetPreciseUser_Call) RunAndReturn(run func(context.Context, string, *godata.GoDataRequest) (*libregraph.User, error)) *Backend_GetPreciseUser_Call {
+func (_c *Backend_GetPreciseUser_Call) RunAndReturn(run func(context.Context, string, string, *godata.GoDataRequest) (*libregraph.User, error)) *Backend_GetPreciseUser_Call {
 	_c.Call.Return(run)
 	return _c
 }

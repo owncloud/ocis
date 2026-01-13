@@ -358,12 +358,12 @@ func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 	logger.Debug().Interface("query", r.URL.Query()).Msg("calling get users on backend")
 
 	var users []*libregraph.User
-	username := g.parseExternalSearch(odataReq)
+	username, instancename := g.parseExternalSearch(odataReq)
 
 	switch {
-	case username != "":
+	case username != "" && instancename != "":
 		users = make([]*libregraph.User, 1)
-		users[0], err = g.identityBackend.GetPreciseUser(r.Context(), username, odataReq)
+		users[0], err = g.identityBackend.GetPreciseUser(r.Context(), username, instancename, odataReq)
 	case odataReq.Query.Filter != nil:
 		users, err = g.applyUserFilter(r.Context(), odataReq, nil)
 	default:
@@ -1177,15 +1177,20 @@ func (g Graph) searchOCMAcceptedUsers(ctx context.Context, odataReq *godata.GoDa
 	return users, nil
 }
 
-func (g Graph) parseExternalSearch(req *godata.GoDataRequest) string {
+// with multi-instance enabled, one can share to another instance by entering `username@instancename`
+func (g Graph) parseExternalSearch(req *godata.GoDataRequest) (string, string) {
 	if !g.config.MultiInstance.Enabled {
-		return ""
+		return "", ""
 	}
 	if req == nil || req.Query == nil || req.Query.Search == nil {
-		return ""
+		return "", ""
 	}
-	if !strings.Contains(req.Query.Search.RawValue, "@") {
-		return ""
+	unquoted := strings.Trim(req.Query.Search.RawValue, "\"")
+	parts := regexp.MustCompile(g.config.MultiInstance.QueryRegexp).FindStringSubmatch(unquoted)
+	// parts[0] contains complete expression
+	if len(parts) != 3 {
+		return "", ""
 	}
-	return strings.Trim(req.Query.Search.RawValue, "\"") // remove quotes too
+
+	return parts[1], parts[2]
 }

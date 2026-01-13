@@ -473,7 +473,11 @@ func setIdentityBackends(options Options, svc *Graph) error {
 					TLSConfig:    tlsConf,
 				},
 			)
-			lb, err := identity.NewLDAPBackend(conn, options.Config.Identity.LDAP, &options.Logger)
+			var iid string
+			if options.Config.MultiInstance.Enabled {
+				iid = options.Config.MultiInstance.InstanceID
+			}
+			lb, err := identity.NewLDAPBackend(conn, options.Config.Identity.LDAP, &options.Logger, iid)
 			if err != nil {
 				options.Logger.Error().Err(err).Msg("Error initializing LDAP Backend")
 				return err

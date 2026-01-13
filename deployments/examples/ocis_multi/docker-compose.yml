@@ -88,11 +88,13 @@ services:
       OCIS_LDAP_INSECURE: "true"
       OCIS_LDAP_BIND_DN: "cn=admin,dc=owncloud,dc=com"
       OCIS_LDAP_BIND_PASSWORD: ${LDAP_ADMIN_PASSWORD:-admin}
+      OCIS_LDAP_USER_FILTER: "(objectclass=owncloud)"
       OCIS_LDAP_GROUP_BASE_DN: "ou=groups,dc=owncloud,dc=com"
       OCIS_LDAP_GROUP_FILTER: "(objectclass=owncloud)"
       OCIS_LDAP_GROUP_OBJECTCLASS: "groupOfNames"
       OCIS_LDAP_USER_BASE_DN: "ou=users,dc=owncloud,dc=com"
       OCIS_LDAP_USER_OBJECTCLASS: "inetOrgPerson"
+      OCIS_LDAP_PRECISE_SEARCH_ATTRIBUTE: "cn"
       LDAP_LOGIN_ATTRIBUTES: "uid"
       OCIS_ADMIN_USER_ID: "ddc2004c-0977-11eb-9d3f-a793888cd0f8"
       IDP_LDAP_LOGIN_ATTRIBUTE: "uid"
@@ -102,9 +104,8 @@ services:
       GRAPH_LDAP_REFINT_ENABLED: "true" # osixia has refint enabled.
       # Multi-Instance Configuration
       OCIS_MULTI_INSTANCE_ENABLED: true
-      OCIS_MULTI_INSTANCE_INSTANCEID: "base"
+      OCIS_MULTI_INSTANCE_INSTANCEID: "ec730a6c-1b63-4b45-b83b-9e2311afdf85"
       # user filter required for multi-instance ocis
-      OCIS_LDAP_USER_FILTER: "(&(objectclass=owncloud)(|(ownCloudMemberOf=base)(ownCloudGuestOf=base)))"
       # Workaround needed to show external users - can be removed once fixed
       OCIS_SHOW_USER_EMAIL_IN_RESULTS: true
       PROXY_ROLE_ASSIGNMENT_OIDC_CLAIM: ownCloudRole
@@ -186,7 +187,7 @@ services:
       GRAPH_LDAP_REFINT_ENABLED: "true" # osixia has refint enabled.
       # Multi-Instance
       OCIS_MULTI_INSTANCE_ENABLED: true
-      OCIS_MULTI_INSTANCE_INSTANCEID: "ocm"
+      OCIS_MULTI_INSTANCE_INSTANCEID: "8d24cb5f-6ee6-4b98-86df-c4c268dddb46"
       # user filter required for multi-instance ocis
       OCIS_LDAP_USER_FILTER: "(&(objectclass=owncloud)(|(ownCloudMemberOf=ocm)(ownCloudGuestOf=ocm)))"
       # Workaround needed to show external users - can be removed once fixed
