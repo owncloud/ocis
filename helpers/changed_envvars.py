@@ -148,6 +148,8 @@ def create_table(type_text: str, source_dict: set[str], from_version: str, to_ve
 		for key, value in source_dict.items():
 			if key.startswith('OCIS_'):
 				a += add_adoc_line_1(
+						# note that any envvar starting with ocis cant be assigned to a service automatically
+						# the xref must be corrected in the output file manually
 						'xref:deployment/services/env-vars-special-scope.adoc[Special Scope Envvars]',
 						key,
 						value['description'],
