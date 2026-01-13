@@ -23,21 +23,21 @@ from urllib.request import urlopen
 # tagged versions must be of format:            'tags/v7.1.0'
 # branches are different, master or stable-x.y: 'heads/master'
 # stick with master because the follow up process is much easier and you avoid confusion
-versionOld: str = 'tags/v7.2.0'
+versionOld: str = 'tags/v7.3.0'
 versionNew: str = 'heads/master'
 
 # CHANGE according your needs
-from_version: str = '7.2.0'
-to_version: str = '7.3.0'
+from_version: str = '7.3.0'
+to_version: str = '8.0.0'
 
 # CHANGE according your needs
 # this will create files like 5.0.0-7.0.0-added and 5.0.0-7.0.0-removed
 # this should match which versions you compare. master is ok if that is the base for a named release
-nameComponent: str = '7.2.0-7.3.0'
+nameComponent: str = '7.3.0-8.0.0'
 
 # ADD new elements when a new version has been published so that it gets excluded
 # array of version patterns to be excluded for added items. we dont need patch versions
-excludePattern: list[str] = ['pre5.0', '5.0', '6.0', '6.0.0', '6.0.1', '6.1.0', '6.7', '7.0', '7.0.0', '7.1.0', '7.2.0']
+excludePattern: list[str] = ['pre5.0', '5.0', '6.0', '6.0.0', '6.0.1', '6.1.0', '6.7', '7.0', '7.0.0', '7.1.0', '7.2.0', '7.3.0']
 
 # DO NOT CHANGE
 # this is the path the added/removed result is written to
