@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2026-01-13-08-17-55]
+[#deprecation-note-2026-01-13-09-50-58]
 [caption=]
 .Deprecation notes for the proxy service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -229,7 +229,7 @@ Enable/Disable HTTPS for external HTTP services. Must be set to 'true' if the bu
 a|`PROXY_FORCE_STRICT_TRANSPORT_SECURITY` +
 
 a| [subs=-attributes]
-++Curie ++
+++8.0.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -914,7 +914,7 @@ This authentication level name indicates that multi-factor authentication was pe
 a|`OCIS_MULTI_INSTANCE_ENABLED` +
 
 a| [subs=-attributes]
-++Curie ++
+++8.0.0 ++
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -925,7 +925,7 @@ Enable multiple instances of Infinite Scale.
 a|`OCIS_MULTI_INSTANCE_INSTANCEID` +
 
 a| [subs=-attributes]
-++Curie ++
+++8.0.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -936,7 +936,7 @@ The unique id of this instance
 a|`OCIS_MULTI_INSTANCE_MEMBER_CLAIM` +
 
 a| [subs=-attributes]
-++Curie ++
+++8.0.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -947,7 +947,7 @@ The claim name for the 'memberOf' property
 a|`OCIS_MULTI_INSTANCE_GUEST_CLAIM` +
 
 a| [subs=-attributes]
-++Curie ++
+++8.0.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -958,7 +958,7 @@ The claim name for the 'guestOf' property
 a|`OCIS_MULTI_INSTANCE_GUEST_ROLE` +
 
 a| [subs=-attributes]
-++Curie ++
+++8.0.0 ++
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]

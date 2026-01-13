@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2026-01-13-08-17-55]
+[#deprecation-note-2026-01-13-09-50-58]
 [caption=]
 .Deprecation notes for the collaboration service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -383,7 +383,7 @@ Use short access tokens for WOPI access. This is useful for office packages, lik
 a|`COLLABORATION_WOPI_DISABLED_EXTENSIONS` +
 
 a| [subs=-attributes]
-++curie ++
+++8.0.0 ++
 a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
