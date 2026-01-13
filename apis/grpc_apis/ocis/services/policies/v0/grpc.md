@@ -1,7 +1,7 @@
 ---
 title: "ocis.services.policies.v0"
 url: /apis/grpc_apis/ocis_services_policies_v0
-date: 2026-01-13T06:22:10Z
+date: 2026-01-13T08:17:36Z
 weight: 50
 geekdocRepo: https://github.com/owncloud/ocis
 ---
