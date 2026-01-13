@@ -22,8 +22,8 @@ To create the changed envvar tables, you must proceed the following steps in ord
 1. Install, if not already done, the converter for adoc to markdown tables: `npm install -g downdoc`\
 This is only required when converting adoc to markdown tables but it is highly recommended to show them in the dev docs too!
 
-1. Run `make -C docs docs-generate` from the ocis root.\
-A file named `env_vars.yaml` is generated. Check for validity. If issues are found, fix them in the service sources first which need to be merged before you rerun make. For details how to do so, see [Maintain the 'env_vars.yaml' File]({{< ref "../new-release-process.md#maintain-the-env_varsyaml-file" >}}). Any delta information is based on an actual `env_vars.yaml` file which is pulled **from master** by the python script described below!
+1. Run `make docs-generate` from the ocis root.\
+Usually, a file named `env_vars.yaml` gets changed. Check for validity. If issues are found, fix them in the service sources first which need to be merged before you rerun make. For details how to do so, see [Maintain the 'env_vars.yaml' File]({{< ref "../new-release-process.md#maintain-the-env_varsyaml-file" >}}). Any delta information is based on an actual `env_vars.yaml` file which is pulled **from master** by the python script described below!
 
 1. Configure the Python script `docs/helpers/changed_envvars.py` variables for the new version.\
 Note that you **must** use semver and not code names!
