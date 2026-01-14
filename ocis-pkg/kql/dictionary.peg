@@ -215,7 +215,7 @@ NaturalLanguageDateTime  <-
 ////////////////////////////////////////////////////////
 
 Char <-
-    [A-Za-z] {
+    [A-Za-z.] {
         return c.text, nil
     }
 

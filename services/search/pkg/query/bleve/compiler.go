@@ -25,6 +25,18 @@ var _fields = map[string]string{
 	"hidden":    "Hidden",
 }
 
+var _photoFields = map[string]string{
+	"cameramake":          "photo.cameraMake",
+	"cameramodel":         "photo.cameraModel",
+	"takendatetime":       "photo.takenDateTime",
+	"fnumber":             "photo.fNumber",
+	"focallength":         "photo.focalLength",
+	"iso":                 "photo.iso",
+	"orientation":         "photo.orientation",
+	"exposurenumerator":   "photo.exposureNumerator",
+	"exposuredenominator": "photo.exposureDenominator",
+}
+
 // The following quoted string enumerates the characters which may be escaped: "+-=&|><!(){}[]^\"~*?:\\/ "
 // based on bleve docs https://blevesearch.com/docs/Query-String-Query/
 // Wildcards * and ? are excluded
@@ -269,8 +281,22 @@ func getField(name string) string {
 	if name == "" {
 		return "Name"
 	}
-	if _, ok := _fields[strings.ToLower(name)]; ok {
-		return _fields[strings.ToLower(name)]
+	lower := strings.ToLower(name)
+
+	// Handle nested field prefixes (e.g., "photo.takenDateTime")
+	if parts := strings.SplitN(lower, ".", 2); len(parts) == 2 {
+		switch parts[0] {
+		case "photo":
+			if field, ok := _photoFields[parts[1]]; ok {
+				return field
+			}
+		// Future: case "audio", "image", "location"
+		}
+	}
+
+	// Check regular fields
+	if field, ok := _fields[lower]; ok {
+		return field
 	}
 	return name
 }
