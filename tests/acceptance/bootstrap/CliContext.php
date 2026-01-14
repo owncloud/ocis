@@ -571,10 +571,27 @@ class CliContext implements Context {
 	public function getJSONDecodedCliMessage(ResponseInterface $response): array {
 		$responseBody = $this->featureContext->getJsonDecodedResponse($response);
 
+		if (!isset($responseBody["message"])) {
+			throw new \RuntimeException(
+				"Missing 'message' key in CLI response. Response: " . \json_encode($responseBody),
+			);
+		}
+
 		// $responseBody["message"] contains a message info with the array of output json of the upload sessions command
 		// Example Output: "INFO memory is not limited, skipping package=github.com/KimMachineGun/automemlimit/memlimit [{<output-json>}]"
 		// So, only extracting the array of output json from the message
-		\preg_match('/(\[.*\])/', $responseBody["message"], $matches);
+		$matchResult = \preg_match('/(\[.*\])/', $responseBody["message"], $matches);
+		if ($matchResult === false || !isset($matches[1])) {
+			// If regex match fails, try to decode the entire message as JSON array
+			// or return empty array if message format is unexpected
+			$trimmedMessage = \trim($responseBody["message"]);
+			if (\substr($trimmedMessage, 0, 1) === '[') {
+				return \json_decode($trimmedMessage, null, 512, JSON_THROW_ON_ERROR);
+			}
+			throw new \RuntimeException(
+				"Failed to extract JSON array from CLI message. Message: " . $responseBody["message"],
+			);
+		}
 		return \json_decode($matches[1], null, 512, JSON_THROW_ON_ERROR);
 	}
 
