@@ -3,6 +3,9 @@ IMPORT := ($OCIS_REPO)/$(NAME)
 BIN := bin
 DIST := dist
 
+# Enable automatic toolchain downloads to match go.mod requirements
+export GOTOOLCHAIN := auto
+
 ifeq ($(OS), Windows_NT)
 	EXECUTABLE := $(NAME).exe
 	UNAME := Windows
