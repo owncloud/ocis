@@ -2,10 +2,17 @@ package imaging
 
 import (
 	"bytes"
+	"fmt"
 	"image"
 	"image/color"
+	"image/draw"
 	"math"
+	"slices"
+
+	"github.com/kovidgoyal/imaging/nrgb"
 )
+
+var _ = fmt.Println
 
 // New creates a new image with the specified width and height, and fills it with the specified color.
 func New(width, height int, fillColor color.Color) *image.NRGBA {
@@ -39,6 +46,203 @@ func Clone(img image.Image) *image.NRGBA {
 		panic(err)
 	}
 	return dst
+}
+
+func ClonePreservingOrigin(img image.Image) *image.NRGBA {
+	src := newScanner(img)
+	dst := image.NewNRGBA(img.Bounds())
+	size := src.w * 4
+	if err := run_in_parallel_over_range(0, func(start, limit int) {
+		for y := start; y < limit; y++ {
+			i := y * dst.Stride
+			src.Scan(0, y, src.w, y+1, dst.Pix[i:i+size])
+		}
+	}, 0, src.h); err != nil {
+		panic(err)
+	}
+	return dst
+}
+
+func AsNRGBA(src image.Image) *image.NRGBA {
+	if nrgba, ok := src.(*image.NRGBA); ok {
+		return nrgba
+	}
+	return ClonePreservingOrigin(src)
+}
+
+func AsNRGB(src image.Image) *NRGB {
+	if nrgb, ok := src.(*NRGB); ok {
+		return nrgb
+	}
+	sc := nrgb.NewNRGBScanner(src, nrgb.Color{})
+	dst := sc.NewImage(src.Bounds()).(*nrgb.Image)
+	w, h := src.Bounds().Dx(), src.Bounds().Dy()
+	if err := run_in_parallel_over_range(0, func(start, limit int) {
+		for y := start; y < limit; y++ {
+			sc.ScanRow(0, y, w, y+1, dst, y)
+		}
+	}, 0, h); err != nil {
+		panic(err)
+	}
+	return dst
+}
+
+// Clone an image preserving it's type for all known image types or returning an NRGBA64 image otherwise
+func ClonePreservingType(src image.Image) image.Image {
+	switch src := src.(type) {
+	case *image.RGBA:
+		dst := *src
+		dst.Pix = slices.Clone(src.Pix)
+		return &dst
+	case *image.RGBA64:
+		dst := *src
+		dst.Pix = slices.Clone(src.Pix)
+		return &dst
+	case *image.NRGBA:
+		dst := *src
+		dst.Pix = slices.Clone(src.Pix)
+		return &dst
+	case *NRGB:
+		dst := *src
+		dst.Pix = slices.Clone(src.Pix)
+		return &dst
+	case *image.NRGBA64:
+		dst := *src
+		dst.Pix = slices.Clone(src.Pix)
+		return &dst
+	case *image.Gray:
+		dst := *src
+		dst.Pix = slices.Clone(src.Pix)
+		return &dst
+	case *image.Gray16:
+		dst := *src
+		dst.Pix = slices.Clone(src.Pix)
+		return &dst
+	case *image.Alpha:
+		dst := *src
+		dst.Pix = slices.Clone(src.Pix)
+		return &dst
+	case *image.Alpha16:
+		dst := *src
+		dst.Pix = slices.Clone(src.Pix)
+		return &dst
+	case *image.CMYK:
+		dst := *src
+		dst.Pix = slices.Clone(src.Pix)
+		return &dst
+	case *image.Paletted:
+		dst := *src
+		dst.Pix = slices.Clone(src.Pix)
+		dst.Palette = slices.Clone(src.Palette)
+		return &dst
+	case *image.YCbCr:
+		dst := *src
+		dst.Y = slices.Clone(src.Y)
+		dst.Cb = slices.Clone(src.Cb)
+		dst.Cr = slices.Clone(src.Cr)
+		return &dst
+	case *image.NYCbCrA:
+		dst := *src
+		dst.Y = slices.Clone(src.Y)
+		dst.Cb = slices.Clone(src.Cb)
+		dst.Cr = slices.Clone(src.Cr)
+		dst.A = slices.Clone(src.A)
+		return &dst
+	// For any other image type, fall back to a generic copy.
+	// This creates an NRGBA image, which may not be the original type,
+	// but ensures the image data is preserved.
+	default:
+		b := src.Bounds()
+		dst := image.NewNRGBA64(b)
+		draw.Draw(dst, b, src, b.Min, draw.Src)
+		return dst
+	}
+}
+
+// Ensure image has origin at (0, 0). Note that this destroys the original
+// image and returns a new image with the same data, but origin shifted.
+func NormalizeOrigin(src image.Image) image.Image {
+	r := src.Bounds()
+	if r.Min.X == 0 && r.Min.Y == 0 {
+		return src
+	}
+	r = image.Rect(0, 0, r.Dx(), r.Dy())
+	switch src := src.(type) {
+	case *image.RGBA:
+		dst := *src
+		*src = image.RGBA{}
+		dst.Rect = r
+		return &dst
+	case *image.RGBA64:
+		dst := *src
+		*src = image.RGBA64{}
+		dst.Rect = r
+		return &dst
+	case *image.NRGBA:
+		dst := *src
+		*src = image.NRGBA{}
+		dst.Rect = r
+		return &dst
+	case *NRGB:
+		dst := *src
+		*src = NRGB{}
+		dst.Rect = r
+		return &dst
+	case *image.NRGBA64:
+		dst := *src
+		*src = image.NRGBA64{}
+		dst.Rect = r
+		return &dst
+	case *image.Gray:
+		dst := *src
+		*src = image.Gray{}
+		dst.Rect = r
+		return &dst
+	case *image.Gray16:
+		dst := *src
+		*src = image.Gray16{}
+		dst.Rect = r
+		return &dst
+	case *image.Alpha:
+		dst := *src
+		*src = image.Alpha{}
+		dst.Rect = r
+		return &dst
+	case *image.Alpha16:
+		dst := *src
+		*src = image.Alpha16{}
+		dst.Rect = r
+		return &dst
+	case *image.CMYK:
+		dst := *src
+		*src = image.CMYK{}
+		dst.Rect = r
+		return &dst
+	case *image.Paletted:
+		dst := *src
+		*src = image.Paletted{}
+		dst.Rect = r
+		return &dst
+	case *image.YCbCr:
+		dst := *src
+		*src = image.YCbCr{}
+		dst.Rect = r
+		return &dst
+	case *image.NYCbCrA:
+		dst := *src
+		*src = image.NYCbCrA{}
+		dst.Rect = r
+		return &dst
+	// For any other image type, fall back to a generic copy.
+	// This creates an NRGBA image, which may not be the original type,
+	// but ensures the image data is preserved.
+	default:
+		b := src.Bounds()
+		dst := image.NewNRGBA64(b)
+		draw.Draw(dst, b, src, b.Min, draw.Src)
+		dst.Rect = r
+		return dst
+	}
 }
 
 // Anchor is the anchor point for image alignment.
@@ -261,4 +465,27 @@ func OverlayCenter(background, img image.Image, opacity float64) *image.NRGBA {
 	y0 := centerY - img.Bounds().Dy()/2
 
 	return Overlay(background, img, image.Point{x0, y0}, opacity)
+}
+
+// Paste the image onto the specified background color.
+func PasteOntoBackground(img image.Image, bg color.Color) image.Image {
+	if IsOpaque(img) {
+		return img
+	}
+	_, _, _, a := bg.RGBA()
+	bg_is_opaque := a == 0xffff
+	var base draw.Image
+	if bg_is_opaque {
+		// use premult as its faster and will be converted to NRGB anyway
+		base = image.NewRGBA(img.Bounds())
+	} else {
+		base = image.NewNRGBA(img.Bounds())
+	}
+	bgi := image.NewUniform(bg)
+	draw.Draw(base, base.Bounds(), bgi, image.Point{}, draw.Src)
+	draw.Draw(base, base.Bounds(), img, img.Bounds().Min, draw.Over)
+	if bg_is_opaque {
+		return AsNRGB(base)
+	}
+	return base
 }

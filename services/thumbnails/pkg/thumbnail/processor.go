@@ -29,23 +29,39 @@ func (p DefinableProcessor) Process(img image.Image, width, height int, filter i
 
 // ProcessorFor returns a matching Processor
 func ProcessorFor(id, fileType string) (DefinableProcessor, error) {
+	convertToNRGBA := func(img image.Image) *image.NRGBA {
+		if nrgba, ok := img.(*image.NRGBA); ok {
+			return nrgba
+		}
+		return imaging.Clone(img)
+	}
 	switch strings.ToLower(id) {
 	case "fit":
-		return DefinableProcessor{Slug: strings.ToLower(id), Converter: imaging.Fit}, nil
+		return DefinableProcessor{Slug: strings.ToLower(id), Converter: func(img image.Image, width, height int, filter imaging.ResampleFilter) *image.NRGBA {
+			return convertToNRGBA(imaging.Fit(img, width, height, filter))
+		}}, nil
 	case "resize":
-		return DefinableProcessor{Slug: strings.ToLower(id), Converter: imaging.Resize}, nil
+		return DefinableProcessor{Slug: strings.ToLower(id), Converter: func(img image.Image, width, height int, filter imaging.ResampleFilter) *image.NRGBA {
+			return convertToNRGBA(imaging.Resize(img, width, height, filter))
+		}}, nil
 	case "fill":
 		return DefinableProcessor{Slug: strings.ToLower(id), Converter: func(img image.Image, width, height int, filter imaging.ResampleFilter) *image.NRGBA {
-			return imaging.Fill(img, width, height, imaging.Center, filter)
+			return convertToNRGBA(imaging.Fill(img, width, height, imaging.Center, filter))
 		}}, nil
 	case "thumbnail":
-		return DefinableProcessor{Slug: strings.ToLower(id), Converter: imaging.Thumbnail}, nil
+		return DefinableProcessor{Slug: strings.ToLower(id), Converter: func(img image.Image, width, height int, filter imaging.ResampleFilter) *image.NRGBA {
+			return convertToNRGBA(imaging.Thumbnail(img, width, height, filter))
+		}}, nil
 	default:
 		switch strings.ToLower(fileType) {
 		case typeGif:
-			return DefinableProcessor{Converter: imaging.Resize}, nil
+			return DefinableProcessor{Converter: func(img image.Image, width, height int, filter imaging.ResampleFilter) *image.NRGBA {
+				return convertToNRGBA(imaging.Resize(img, width, height, filter))
+			}}, nil
 		default:
-			return DefinableProcessor{Converter: imaging.Thumbnail}, nil
+			return DefinableProcessor{Converter: func(img image.Image, width, height int, filter imaging.ResampleFilter) *image.NRGBA {
+				return convertToNRGBA(imaging.Thumbnail(img, width, height, filter))
+			}}, nil
 		}
 	}
 }
