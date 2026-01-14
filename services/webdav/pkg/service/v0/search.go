@@ -205,6 +205,41 @@ func matchToPropResponse(ctx context.Context, match *searchmsg.Match, hrefPrefix
 	score := strconv.FormatFloat(float64(match.Score), 'f', -1, 64)
 	propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:score", score))
 
+	// Add photo metadata if available (from Tika EXIF extraction)
+	if match.Entity.Photo != nil {
+		if match.Entity.Photo.TakenDateTime != nil {
+			propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:photo-taken-date-time", match.Entity.Photo.TakenDateTime.AsTime().Format("2006-01-02T15:04:05Z07:00")))
+		}
+		if match.Entity.Photo.CameraMake != nil && *match.Entity.Photo.CameraMake != "" {
+			propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:photo-camera-make", *match.Entity.Photo.CameraMake))
+		}
+		if match.Entity.Photo.CameraModel != nil && *match.Entity.Photo.CameraModel != "" {
+			propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:photo-camera-model", *match.Entity.Photo.CameraModel))
+		}
+		if match.Entity.Photo.FNumber != nil && *match.Entity.Photo.FNumber != 0 {
+			propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:photo-fnumber", strconv.FormatFloat(float64(*match.Entity.Photo.FNumber), 'f', 2, 64)))
+		}
+		if match.Entity.Photo.FocalLength != nil && *match.Entity.Photo.FocalLength != 0 {
+			propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:photo-focal-length", strconv.FormatFloat(float64(*match.Entity.Photo.FocalLength), 'f', 2, 64)))
+		}
+		if match.Entity.Photo.Iso != nil && *match.Entity.Photo.Iso != 0 {
+			propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:photo-iso", strconv.FormatInt(int64(*match.Entity.Photo.Iso), 10)))
+		}
+		if match.Entity.Photo.Orientation != nil && *match.Entity.Photo.Orientation != 0 {
+			propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:photo-orientation", strconv.FormatInt(int64(*match.Entity.Photo.Orientation), 10)))
+		}
+	}
+
+	// Add location metadata if available
+	if match.Entity.Location != nil {
+		if match.Entity.Location.Latitude != nil {
+			propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:location-latitude", strconv.FormatFloat(*match.Entity.Location.Latitude, 'f', 6, 64)))
+		}
+		if match.Entity.Location.Longitude != nil {
+			propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:location-longitude", strconv.FormatFloat(*match.Entity.Location.Longitude, 'f', 6, 64)))
+		}
+	}
+
 	if len(propstatOK.Prop) > 0 {
 		response.Propstat = append(response.Propstat, propstatOK)
 	}
