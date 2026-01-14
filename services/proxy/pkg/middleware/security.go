@@ -49,7 +49,7 @@ func loadCSPYaml(proxyCfg *config.Config) ([]byte, error) {
 }
 
 // Security is a middleware to apply security relevant http headers like CSP.
-func Security(cspConfig *config.CSP) func(h http.Handler) http.Handler {
+func Security(cfg *config.Config, cspConfig *config.CSP) func(h http.Handler) http.Handler {
 	cspBuilder := cspbuilder.Builder{
 		Directives: cspConfig.Directives,
 	}
@@ -61,6 +61,7 @@ func Security(cspConfig *config.CSP) func(h http.Handler) http.Handler {
 		FrameDeny:                    true,
 		ReferrerPolicy:               "no-referrer",
 		STSSeconds:                   315360000,
+		ForceSTSHeader:               cfg.HTTP.ForceStrictTransportSecurity,
 		STSIncludeSubdomains:         true,
 		STSPreload:                   true,
 		PermittedCrossDomainPolicies: "none",

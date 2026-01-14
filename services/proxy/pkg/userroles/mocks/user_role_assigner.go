@@ -82,9 +82,9 @@ func (_c *UserRoleAssigner_ApplyUserRole_Call) RunAndReturn(run func(context.Con
 	return _c
 }
 
-// UpdateUserRoleAssignment provides a mock function with given fields: ctx, user, claims
-func (_m *UserRoleAssigner) UpdateUserRoleAssignment(ctx context.Context, user *userv1beta1.User, claims map[string]interface{}) (*userv1beta1.User, error) {
-	ret := _m.Called(ctx, user, claims)
+// UpdateUserRoleAssignment provides a mock function with given fields: ctx, user, claims, forceRole
+func (_m *UserRoleAssigner) UpdateUserRoleAssignment(ctx context.Context, user *userv1beta1.User, claims map[string]interface{}, forceRole string) (*userv1beta1.User, error) {
+	ret := _m.Called(ctx, user, claims, forceRole)
 
 	if len(ret) == 0 {
 		panic("no return value specified for UpdateUserRoleAssignment")
@@ -92,19 +92,19 @@ func (_m *UserRoleAssigner) UpdateUserRoleAssignment(ctx context.Context, user *
 
 	var r0 *userv1beta1.User
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, *userv1beta1.User, map[string]interface{}) (*userv1beta1.User, error)); ok {
-		return rf(ctx, user, claims)
+	if rf, ok := ret.Get(0).(func(context.Context, *userv1beta1.User, map[string]interface{}, string) (*userv1beta1.User, error)); ok {
+		return rf(ctx, user, claims, forceRole)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, *userv1beta1.User, map[string]interface{}) *userv1beta1.User); ok {
-		r0 = rf(ctx, user, claims)
+	if rf, ok := ret.Get(0).(func(context.Context, *userv1beta1.User, map[string]interface{}, string) *userv1beta1.User); ok {
+		r0 = rf(ctx, user, claims, forceRole)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*userv1beta1.User)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, *userv1beta1.User, map[string]interface{}) error); ok {
-		r1 = rf(ctx, user, claims)
+	if rf, ok := ret.Get(1).(func(context.Context, *userv1beta1.User, map[string]interface{}, string) error); ok {
+		r1 = rf(ctx, user, claims, forceRole)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -121,13 +121,14 @@ type UserRoleAssigner_UpdateUserRoleAssignment_Call struct {
 //   - ctx context.Context
 //   - user *userv1beta1.User
 //   - claims map[string]interface{}
-func (_e *UserRoleAssigner_Expecter) UpdateUserRoleAssignment(ctx interface{}, user interface{}, claims interface{}) *UserRoleAssigner_UpdateUserRoleAssignment_Call {
-	return &UserRoleAssigner_UpdateUserRoleAssignment_Call{Call: _e.mock.On("UpdateUserRoleAssignment", ctx, user, claims)}
+//   - forceRole string
+func (_e *UserRoleAssigner_Expecter) UpdateUserRoleAssignment(ctx interface{}, user interface{}, claims interface{}, forceRole interface{}) *UserRoleAssigner_UpdateUserRoleAssignment_Call {
+	return &UserRoleAssigner_UpdateUserRoleAssignment_Call{Call: _e.mock.On("UpdateUserRoleAssignment", ctx, user, claims, forceRole)}
 }
 
-func (_c *UserRoleAssigner_UpdateUserRoleAssignment_Call) Run(run func(ctx context.Context, user *userv1beta1.User, claims map[string]interface{})) *UserRoleAssigner_UpdateUserRoleAssignment_Call {
+func (_c *UserRoleAssigner_UpdateUserRoleAssignment_Call) Run(run func(ctx context.Context, user *userv1beta1.User, claims map[string]interface{}, forceRole string)) *UserRoleAssigner_UpdateUserRoleAssignment_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(*userv1beta1.User), args[2].(map[string]interface{}))
+		run(args[0].(context.Context), args[1].(*userv1beta1.User), args[2].(map[string]interface{}), args[3].(string))
 	})
 	return _c
 }
@@ -137,7 +138,7 @@ func (_c *UserRoleAssigner_UpdateUserRoleAssignment_Call) Return(_a0 *userv1beta
 	return _c
 }
 
-func (_c *UserRoleAssigner_UpdateUserRoleAssignment_Call) RunAndReturn(run func(context.Context, *userv1beta1.User, map[string]interface{}) (*userv1beta1.User, error)) *UserRoleAssigner_UpdateUserRoleAssignment_Call {
+func (_c *UserRoleAssigner_UpdateUserRoleAssignment_Call) RunAndReturn(run func(context.Context, *userv1beta1.User, map[string]interface{}, string) (*userv1beta1.User, error)) *UserRoleAssigner_UpdateUserRoleAssignment_Call {
 	_c.Call.Return(run)
 	return _c
 }
