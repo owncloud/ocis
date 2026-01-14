@@ -657,7 +657,7 @@ var _ = Describe("Graph", func() {
 				err := json.Unmarshal(body, &libreError)
 				Expect(err).To(Not(HaveOccurred()))
 				Expect(libreError.Error.Message).To(Equal("permission denied"))
-				Expect(libreError.Error.Code).To(Equal(errorcode.NotAllowed.String()))
+				Expect(libreError.Error.Code).To(Equal(errorcode.AccessDenied.String()))
 			})
 			It("grpc general error", func() {
 				permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settingssvc.GetPermissionByIDResponse{

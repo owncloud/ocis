@@ -51,7 +51,7 @@ Feature: Change data of space
 
   Scenario Outline: user other than space manager role can't change the name of a Space via the Graph API
     When user "<user>" changes the name of the "Project Jupiter" space to "Project Jupiter"
-    Then the HTTP status code should be "404"
+    Then the HTTP status code should be "403"
     Examples:
       | user  |
       | Brian |
@@ -90,7 +90,7 @@ Feature: Change data of space
 
   Scenario Outline: viewer and editor cannot change the description(subtitle) of a space via the Graph API
     When user "<user>" changes the description of the "Project Jupiter" space to "The Death Star is a fictional mobile space station"
-    Then the HTTP status code should be "404"
+    Then the HTTP status code should be "403"
     Examples:
       | user  |
       | Brian |
@@ -335,7 +335,7 @@ Feature: Change data of space
     Given user "Alice" has created a folder ".space" in space "Project Jupiter"
     And user "Alice" has uploaded a file inside space "Project Jupiter" with content "" to ".space/someImageFile.jpg"
     When user "Bob" sets the file ".space/someImageFile.jpg" as a space image in a special section of the "Project Jupiter" space
-    Then the HTTP status code should be "404"
+    Then the HTTP status code should be "403"
 
 
   Scenario Outline: user set new readme file as description of the space via the graph API
