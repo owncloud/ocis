@@ -3,7 +3,6 @@ package thumbnail_test
 import (
 	"testing"
 
-	"github.com/kovidgoyal/imaging"
 	tAssert "github.com/stretchr/testify/assert"
 
 	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/thumbnail"
@@ -19,7 +18,7 @@ func TestProcessorFor(t *testing.T) {
 		{
 			id:       "fit",
 			fileType: "",
-			wantP:    thumbnail.DefinableProcessor{Slug: "fit", Converter: imaging.Fit},
+			wantP:    thumbnail.DefinableProcessor{Slug: "fit"},
 			wantE:    nil,
 		},
 		{

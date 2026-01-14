@@ -49,7 +49,7 @@ func clamp(x float64) uint8 {
 	return 0
 }
 
-func reverse(pix []uint8) {
+func reverse4(pix []uint8) {
 	if len(pix) <= 4 {
 		return
 	}
