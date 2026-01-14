@@ -166,16 +166,11 @@ func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger, inst
 		return nil, fmt.Errorf("error configuring disable user mechanism: %w", err)
 	}
 
-	userFilter := config.UserFilter
-	if iid := ldap.EscapeFilter(instanceID); iid != "" { // passing an instanceID will implictly activate multi-instance
-		instanceFilter := fmt.Sprintf("(|(%s=%s)(%s=%s))", config.UserMemberAttribute, iid, config.UserGuestAttribute, iid)
-		userFilter = fmt.Sprintf("(&%s%s)", instanceFilter, userFilter)
-	}
 	return &LDAP{
 		useServerUUID:               config.UseServerUUID,
 		usePwModifyExOp:             config.UsePasswordModExOp,
 		userBaseDN:                  config.UserBaseDN,
-		userFilter:                  userFilter,
+		userFilter:                  config.UserFilter,
 		userObjectClass:             config.UserObjectClass,
 		userIDisOctetString:         config.UserIDIsOctetString,
 		userScope:                   userScope,
@@ -620,14 +615,14 @@ func (i *LDAP) GetPreciseUser(ctx context.Context, name string, instancename str
 
 	iid, err := i.getInstanceID(instancename)
 	if err != nil {
-		i.logger.Error().Err(err).Str("username", name).Str("instancename", instancename).Msg("error getting instanceid")
-		return nil, err
+		// error logged in getInstanceID
+		return nil, ErrNotFound
 	}
 
 	e, err := i.getPreciseLDAPUser(name, iid)
 	if err != nil {
 		i.logger.Error().Err(err).Str("username", name).Str("instancename", instancename).Str("instanceid", iid).Msg("error getting precise user")
-		return nil, err
+		return nil, ErrNotFound
 	}
 
 	var q *godata.GoDataQuery
@@ -1453,7 +1448,16 @@ func (i *LDAP) getInstanceID(instancename string) (string, error) {
 		i.logger.Error().Err(err).Str("backend", "ldap").Str("dn", i.instanceMapperBaseDN).Str("instancename", instancename).Str("attribute", i.instanceMapperIDAttribute).Msg("Search instance by name failed")
 		return "", errorcode.New(errorcode.ItemNotFound, "instanceid search failed")
 	}
-	if len(res.Entries) == 0 || len(res.Entries[0].Attributes) == 0 || len(res.Entries[0].Attributes[0].Values) == 0 {
+	if len(res.Entries) == 0 {
+		// expected behaviour - we log debug in case something is fishy. This log can be removed when the feature proves stable
+		i.logger.Debug().Str("backend", "ldap").Str("dn", i.instanceMapperBaseDN).Str("instancename", instancename).Interface("result", res).Msg("Search instance by name empty")
+		return "", ErrNotFound
+	}
+	if len(res.Entries) > 1 {
+		i.logger.Error().Str("backend", "ldap").Str("dn", i.instanceMapperBaseDN).Str("instancename", instancename).Interface("result", res).Msg("Search instance by name returned multiple responses.")
+		return "", errorcode.New(errorcode.ItemNotFound, "instanceid search returned multiple responses")
+	}
+	if len(res.Entries[0].Attributes) == 0 || len(res.Entries[0].Attributes[0].Values) == 0 {
 		i.logger.Error().Str("backend", "ldap").Str("dn", i.instanceMapperBaseDN).Str("instancename", instancename).Interface("result", res).Msg("Search instance by name returned malformed response")
 		return "", errorcode.New(errorcode.ItemNotFound, "instanceid search response malformed")
 	}

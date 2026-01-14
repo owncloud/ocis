@@ -88,13 +88,10 @@ services:
       OCIS_LDAP_INSECURE: "true"
       OCIS_LDAP_BIND_DN: "cn=admin,dc=owncloud,dc=com"
       OCIS_LDAP_BIND_PASSWORD: ${LDAP_ADMIN_PASSWORD:-admin}
-      OCIS_LDAP_USER_FILTER: "(objectclass=owncloud)"
       OCIS_LDAP_GROUP_BASE_DN: "ou=groups,dc=owncloud,dc=com"
-      OCIS_LDAP_GROUP_FILTER: "(objectclass=owncloud)"
       OCIS_LDAP_GROUP_OBJECTCLASS: "groupOfNames"
       OCIS_LDAP_USER_BASE_DN: "ou=users,dc=owncloud,dc=com"
       OCIS_LDAP_USER_OBJECTCLASS: "inetOrgPerson"
-      OCIS_LDAP_PRECISE_SEARCH_ATTRIBUTE: "cn"
       LDAP_LOGIN_ATTRIBUTES: "uid"
       OCIS_ADMIN_USER_ID: "ddc2004c-0977-11eb-9d3f-a793888cd0f8"
       IDP_LDAP_LOGIN_ATTRIBUTE: "uid"
@@ -105,7 +102,19 @@ services:
       # Multi-Instance Configuration
       OCIS_MULTI_INSTANCE_ENABLED: true
       OCIS_MULTI_INSTANCE_INSTANCEID: "ec730a6c-1b63-4b45-b83b-9e2311afdf85"
-      # user filter required for multi-instance ocis
+      OCIS_LDAP_USER_FILTER: "(&(objectclass=owncloud)(|(ownCloudMemberOf=ec730a6c-1b63-4b45-b83b-9e2311afdf85)(ownCloudGuestOf=ec730a6c-1b63-4b45-b83b-9e2311afdf85)))"
+      OCIS_LDAP_GROUP_FILTER: "(&(objectclass=owncloud)(ownCloudMemberOf=ec730a6c-1b63-4b45-b83b-9e2311afdf85))"
+      OCIS_LDAP_USER_MEMBER_ATTRIBUTE: "owncloudMemberOf"
+      OCIS_LDAP_USER_GUEST_ATTRIBUTE: "ownCloudGuestOf"
+      OCIS_LDAP_PRECISE_SEARCH_ATTRIBUTE: "cn"
+      OCIS_LDAP_INSTANCE_MAPPER_ENABLED: true
+      OCIS_LDAP_INSTANCE_MAPPER_BASE_DN: "dc=owncloud,dc=com"
+      OCIS_LDAP_INSTANCE_MAPPER_NAME_ATTRIBUTE: "description"
+      OCIS_LDAP_INSTANCE_MAPPER_ID_ATTRIBUTE: "cn"
+      OCIS_MULTI_INSTANCE_QUERY_TEMPLATE: "([^@]+)@(.+).owncloud.test"
+      OCIS_MULTI_INSTANCE_MEMBER_CLAIM: "memberOf"
+      OCIS_MULTI_INSTANCE_GUEST_CLAIM: "guestOf"
+      OCIS_MULTI_INSTANCE_GUEST_ROLE: "user-light"
       # Workaround needed to show external users - can be removed once fixed
       OCIS_SHOW_USER_EMAIL_IN_RESULTS: true
       PROXY_ROLE_ASSIGNMENT_OIDC_CLAIM: ownCloudRole
@@ -174,7 +183,6 @@ services:
       OCIS_LDAP_BIND_DN: "cn=admin,dc=owncloud,dc=com"
       OCIS_LDAP_BIND_PASSWORD: ${LDAP_ADMIN_PASSWORD:-admin}
       OCIS_LDAP_GROUP_BASE_DN: "ou=groups,dc=owncloud,dc=com"
-      OCIS_LDAP_GROUP_FILTER: "(objectclass=owncloud)"
       OCIS_LDAP_GROUP_OBJECTCLASS: "groupOfNames"
       OCIS_LDAP_USER_BASE_DN: "ou=users,dc=owncloud,dc=com"
       OCIS_LDAP_USER_OBJECTCLASS: "inetOrgPerson"
@@ -188,8 +196,20 @@ services:
       # Multi-Instance
       OCIS_MULTI_INSTANCE_ENABLED: true
       OCIS_MULTI_INSTANCE_INSTANCEID: "8d24cb5f-6ee6-4b98-86df-c4c268dddb46"
+      OCIS_LDAP_USER_FILTER: "(&(objectclass=owncloud)(|(ownCloudMemberOf=8d24cb5f-6ee6-4b98-86df-c4c268dddb46)(ownCloudGuestOf=8d24cb5f-6ee6-4b98-86df-c4c268dddb46)))"
+      OCIS_LDAP_GROUP_FILTER: "(&(objectclass=owncloud)(ownCloudMemberOf=8d24cb5f-6ee6-4b98-86df-c4c268dddb46))"
+      OCIS_LDAP_USER_MEMBER_ATTRIBUTE: "owncloudMemberOf"
+      OCIS_LDAP_USER_GUEST_ATTRIBUTE: "ownCloudGuestOf"
+      OCIS_LDAP_PRECISE_SEARCH_ATTRIBUTE: "cn"
+      OCIS_LDAP_INSTANCE_MAPPER_ENABLED: true
+      OCIS_LDAP_INSTANCE_MAPPER_BASE_DN: "dc=owncloud,dc=com"
+      OCIS_LDAP_INSTANCE_MAPPER_NAME_ATTRIBUTE: "description"
+      OCIS_LDAP_INSTANCE_MAPPER_ID_ATTRIBUTE: "cn"
+      OCIS_MULTI_INSTANCE_QUERY_TEMPLATE: "([^@]+)@(.+).owncloud.test"
+      OCIS_MULTI_INSTANCE_MEMBER_CLAIM: "memberOf"
+      OCIS_MULTI_INSTANCE_GUEST_CLAIM: "guestOf"
+      OCIS_MULTI_INSTANCE_GUEST_ROLE: "user-light"
       # user filter required for multi-instance ocis
-      OCIS_LDAP_USER_FILTER: "(&(objectclass=owncloud)(|(ownCloudMemberOf=ocm)(ownCloudGuestOf=ocm)))"
       # Workaround needed to show external users - can be removed once fixed
       OCIS_SHOW_USER_EMAIL_IN_RESULTS: true
       PROXY_ROLE_ASSIGNMENT_OIDC_CLAIM: ownCloudRole

@@ -97,11 +97,11 @@ type LDAP struct {
 	// Multi-Instance Only
 	UserMemberAttribute         string `yaml:"user_member_attribute" env:"OCIS_LDAP_USER_MEMBER_ATTRIBUTE" desc:"LDAP Attribute to signal the user is member of an instance. Requires OCIS_MULTI_INSTANCE_ENABLED." introductionVersion:"Curie"`
 	UserGuestAttribute          string `yaml:"user_guest_attribute" env:"OCIS_LDAP_USER_GUEST_ATTRIBUTE" desc:"LDAP Attribute to signal the user is guest of an instance. Requires OCIS_MULTI_INSTANCE_ENABLED." introductionVersion:"Curie"`
-	PreciseSearchAttribute      string `yaml:"precise_search_attribute" env:"OCIS_LDAP_PRECISE_SEARCH_ATTRIBUTE" desc:"LDAP Attribute to be used for searching user on other instances. Requires OCIS_MULTI_INSTANCE_ENABLED." introductionVersion:"Curie"`
-	InstanceMapperEnabled       bool   `yaml:"instance_mapper_enabled" env:"OCIS_LDAP_INSTANCE_MAPPER_ENABLED" desc:"The InstanceMapper allows mapping instance names (user readable) to instance ids (machine readable) based on an LDAP query. See other _INSTANCE_MAPPER_ env vars. Requires OCIS_MULTI_INSTANCE_ENABLED." introductionVersion:"Curie"`
+	PreciseSearchAttribute      string `yaml:"precise_search_attribute" env:"OCIS_LDAP_PRECISE_SEARCH_ATTRIBUTE" desc:"LDAP Attribute to be used for searching users on other instances. Requires OCIS_MULTI_INSTANCE_ENABLED." introductionVersion:"Curie"`
+	InstanceMapperEnabled       bool   `yaml:"instance_mapper_enabled" env:"OCIS_LDAP_INSTANCE_MAPPER_ENABLED" desc:"The InstanceMapper allows mapping instance names (user readable) to instance IDs (machine readable) based on an LDAP query. See other _INSTANCE_MAPPER_ env vars. Requires OCIS_MULTI_INSTANCE_ENABLED." introductionVersion:"Curie"`
 	InstanceMapperBaseDN        string `yaml:"instance_mapper_base_dn" env:"OCIS_LDAP_INSTANCE_MAPPER_BASE_DN" desc:"BaseDN of the 'instancename to instanceid' mapper in LDAP. Requires OCIS_MULTI_INSTANCE_ENABLED." introductionVersion:"Curie"`
 	InstanceMapperNameAttribute string `yaml:"instance_mapper_name_attribute" env:"OCIS_LDAP_INSTANCE_MAPPER_NAME_ATTRIBUTE" desc:"LDAP Attribute of the instance name. Requires OCIS_MULTI_INSTANCE_ENABLED." introductionVersion:"Curie"`
-	InstanceMapperIDAttribute   string `yaml:"instance_mapper_id_attribute" env:"OCIS_LDAP_INSTANCE_MAPPER_ID_ATTRIBUTE" desc:"LDAP Attribute of the instance id. Requires OCIS_MULTI_INSTANCE_ENABLED." introductionVersion:"Curie"`
+	InstanceMapperIDAttribute   string `yaml:"instance_mapper_id_attribute" env:"OCIS_LDAP_INSTANCE_MAPPER_ID_ATTRIBUTE" desc:"LDAP Attribute of the instance ID. Requires OCIS_MULTI_INSTANCE_ENABLED." introductionVersion:"Curie"`
 }
 
 // LDAPEducationConfig represents the LDAP configuration for education related resources
@@ -176,6 +176,6 @@ type Validation struct {
 // MultiInstanceConfig holds configuration for multi-instance-ocis
 type MultiInstanceConfig struct {
 	Enabled     bool   `yaml:"enabled" env:"OCIS_MULTI_INSTANCE_ENABLED" desc:"Enable multiple instances of Infinite Scale." introductionVersion:"Curie"`
-	InstanceID  string `yaml:"instanceid" env:"OCIS_MULTI_INSTANCE_INSTANCEID" desc:"The unique id of this instance" introductionVersion:"Curie"`
+	InstanceID  string `yaml:"instanceid" env:"OCIS_MULTI_INSTANCE_INSTANCEID" desc:"The unique ID of this instance." introductionVersion:"Curie"`
 	QueryRegexp string `yaml:"query_regexp" env:"OCIS_MULTI_INSTANCE_QUERY_TEMPLATE" desc:"The regular expression extracting username and instancename from a user provided search." introductionVersion:"Curie"`
 }

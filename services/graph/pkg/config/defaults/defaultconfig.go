@@ -112,14 +112,6 @@ func DefaultConfig() *config.Config {
 				GroupMemberAttribute:      "member",
 				GroupIDAttribute:          "owncloudUUID",
 				EducationResourcesEnabled: false,
-				// Multi-Instance example config. Note: Multi-Instance is disabled by default
-				UserMemberAttribute:         "owncloudMemberOf",
-				UserGuestAttribute:          "ownCloudGuestOf",
-				PreciseSearchAttribute:      "cn",
-				InstanceMapperEnabled:       true,
-				InstanceMapperBaseDN:        "dc=owncloud,dc=com",
-				InstanceMapperNameAttribute: "description",
-				InstanceMapperIDAttribute:   "cn",
 			},
 		},
 		Cache: &config.Cache{
@@ -139,9 +131,6 @@ func DefaultConfig() *config.Config {
 		},
 		Validation: config.Validation{
 			MaxTagLength: 100,
-		},
-		MultiInstance: config.MultiInstanceConfig{
-			QueryRegexp: "([^@]+)@(.+)",
 		},
 	}
 }
