@@ -27,4 +27,4 @@ These fields are returned in WebDAV search results using the `oc:photo-*`
 property namespace, allowing web extensions to build photo timeline views,
 filter by camera, or show photos on a map.
 
-https://github.com/owncloud/ocis/pull/XXXXX
+https://github.com/owncloud/ocis/pull/11912
