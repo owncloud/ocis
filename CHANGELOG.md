@@ -89,6 +89,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Force Strict-Transport-Security: [#11880](https://github.com/owncloud/ocis/pull/11880)
 * Enhancement - Relocate Transifex resources: [#11889](https://github.com/owncloud/ocis/pull/11889)
 * Enhancement - Update the ocis_full deployment example images: [#11890](https://github.com/owncloud/ocis/pull/11890)
+* Enhancement - Update the traefik image for some deployment examples: [#11915](https://github.com/owncloud/ocis/pull/11915)
 
 ## Details
 
@@ -287,6 +288,12 @@ The following sections list the changes for unreleased.
   * Onlyoffice: 9.2.1.1
 
    https://github.com/owncloud/ocis/pull/11890
+
+* Enhancement - Update the traefik image for some deployment examples: [#11915](https://github.com/owncloud/ocis/pull/11915)
+
+  * Traefik: 3.6.6 --> 3.6.7
+
+   https://github.com/owncloud/ocis/pull/11915
 
 # Changelog for [7.3.1] (2025-11-24)
 
