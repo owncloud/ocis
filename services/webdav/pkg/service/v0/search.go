@@ -233,10 +233,13 @@ func matchToPropResponse(ctx context.Context, match *searchmsg.Match, hrefPrefix
 	// Add location metadata if available
 	if match.Entity.Location != nil {
 		if match.Entity.Location.Latitude != nil {
-			propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:location-latitude", strconv.FormatFloat(*match.Entity.Location.Latitude, 'f', 6, 64)))
+			propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:photo-location-latitude", strconv.FormatFloat(*match.Entity.Location.Latitude, 'f', 6, 64)))
 		}
 		if match.Entity.Location.Longitude != nil {
-			propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:location-longitude", strconv.FormatFloat(*match.Entity.Location.Longitude, 'f', 6, 64)))
+			propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:photo-location-longitude", strconv.FormatFloat(*match.Entity.Location.Longitude, 'f', 6, 64)))
+		}
+		if match.Entity.Location.Altitude != nil {
+			propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:photo-location-altitude", strconv.FormatFloat(*match.Entity.Location.Altitude, 'f', 1, 64)))
 		}
 	}
 

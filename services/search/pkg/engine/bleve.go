@@ -110,6 +110,16 @@ func BuildBleveMapping() (mapping.IndexMapping, error) {
 	photoMapping.AddFieldMappingsAt("takenDateTime", photoDateMapping)
 	docMapping.AddSubDocumentMapping("photo", photoMapping)
 
+	// Add explicit Location field mappings to ensure fields are stored
+	locationMapping := bleve.NewDocumentMapping()
+	locationNumericMapping := bleve.NewNumericFieldMapping()
+	locationNumericMapping.Store = true
+	locationNumericMapping.Index = true
+	locationMapping.AddFieldMappingsAt("latitude", locationNumericMapping)
+	locationMapping.AddFieldMappingsAt("longitude", locationNumericMapping)
+	locationMapping.AddFieldMappingsAt("altitude", locationNumericMapping)
+	docMapping.AddSubDocumentMapping("location", locationMapping)
+
 	indexMapping := bleve.NewIndexMapping()
 	indexMapping.DefaultAnalyzer = keyword.Name
 	indexMapping.DefaultMapping = docMapping
