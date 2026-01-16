@@ -284,13 +284,13 @@ func getField(name string) string {
 	lower := strings.ToLower(name)
 
 	// Handle nested field prefixes (e.g., "photo.takenDateTime")
+	// Future: add cases for "audio", "image", "location"
 	if parts := strings.SplitN(lower, ".", 2); len(parts) == 2 {
 		switch parts[0] {
 		case "photo":
 			if field, ok := _photoFields[parts[1]]; ok {
 				return field
 			}
-		// Future: case "audio", "image", "location"
 		}
 	}
 
