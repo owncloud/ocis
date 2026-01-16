@@ -42,7 +42,8 @@ func TestStrictTransportSecurity(t *testing.T) {
 			"default-src": {"'none'"},
 		},
 	}
-	securityMiddleware := Security(cspConfig)
+	cfg := &config.Config{HTTP: config.HTTP{ForceStrictTransportSecurity: false}}
+	securityMiddleware := Security(cfg, cspConfig)
 
 	// Test HTTPS request, url not important, only headers will be checked
 	req, err := http.NewRequest("GET", "https://example.com", nil)
@@ -59,4 +60,27 @@ func TestStrictTransportSecurity(t *testing.T) {
 	// HSTS header should contain includeSubDomains
 	expected := "max-age=315360000; includeSubDomains; preload"
 	assert.Equal(t, hstsHeader, expected, "HSTS header missing includeSubDomains directive - subdomains not protected")
+}
+
+func TestStrictTransportSecurity_ForceOnHTTP(t *testing.T) {
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	})
+	cspConfig := &config.CSP{
+		Directives: map[string][]string{
+			"default-src": {"'none'"},
+		},
+	}
+	cfg := &config.Config{HTTP: config.HTTP{ForceStrictTransportSecurity: true}}
+	securityMiddleware := Security(cfg, cspConfig)
+
+	// Plain HTTP request (no TLS); should still emit Strict-Transport-Security when forced.
+	req := httptest.NewRequest("GET", "http://example.com/", nil)
+
+	rr := httptest.NewRecorder()
+	securityMiddleware(handler).ServeHTTP(rr, req)
+
+	stsHeader := rr.Header().Get("Strict-Transport-Security")
+	expected := "max-age=315360000; includeSubDomains; preload"
+	assert.Equal(t, stsHeader, expected)
 }
