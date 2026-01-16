@@ -128,6 +128,13 @@ identity:
       school_id_attribute: ""
       school_termination_min_grace_days: 0
     require_external_id: false
+    user_member_attribute: ""
+    user_guest_attribute: ""
+    precise_search_attribute: ""
+    instance_mapper_enabled: false
+    instance_mapper_base_dn: ""
+    instance_mapper_name_attribute: ""
+    instance_mapper_id_attribute: ""
 include_ocm_sharees: false
 events:
   endpoint: 127.0.0.1:9233
@@ -157,5 +164,9 @@ keycloak:
 service_account:
   service_account_id: ""
   service_account_secret: ""
+multi_instance:
+  enabled: false
+  instanceid: ""
+  query_regexp: ""
 validation:
   max_tag_length: 100

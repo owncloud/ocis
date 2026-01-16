@@ -96,6 +96,13 @@
 | GRAPH_LDAP_SCHOOL_ID_ATTRIBUTE | string |  | LDAP Attribute to use as the unique id for schools. This should be a stable globally unique ID like a UUID.|
 | GRAPH_LDAP_SCHOOL_TERMINATION_MIN_GRACE_DAYS | int | 0 | When setting a 'terminationDate' for a school, require the date to be at least this number of days in the future.|
 | GRAPH_LDAP_REQUIRE_EXTERNAL_ID | bool | false | If enabled, the 'OCIS_LDAP_USER_SCHEMA_EXTERNAL_ID' is used as primary identifier for the provisioning API.|
+| OCIS_LDAP_USER_MEMBER_ATTRIBUTE | string |  | LDAP Attribute to signal the user is member of an instance. Requires OCIS_MULTI_INSTANCE_ENABLED.|
+| OCIS_LDAP_USER_GUEST_ATTRIBUTE | string |  | LDAP Attribute to signal the user is guest of an instance. Requires OCIS_MULTI_INSTANCE_ENABLED.|
+| OCIS_LDAP_PRECISE_SEARCH_ATTRIBUTE | string |  | LDAP Attribute to be used for searching users on other instances. Requires OCIS_MULTI_INSTANCE_ENABLED.|
+| OCIS_LDAP_INSTANCE_MAPPER_ENABLED | bool | false | The InstanceMapper allows mapping instance names (user readable) to instance IDs (machine readable) based on an LDAP query. See other _INSTANCE_MAPPER_ env vars. Requires OCIS_MULTI_INSTANCE_ENABLED.|
+| OCIS_LDAP_INSTANCE_MAPPER_BASE_DN | string |  | BaseDN of the 'instancename to instanceid' mapper in LDAP. Requires OCIS_MULTI_INSTANCE_ENABLED.|
+| OCIS_LDAP_INSTANCE_MAPPER_NAME_ATTRIBUTE | string |  | LDAP Attribute of the instance name. Requires OCIS_MULTI_INSTANCE_ENABLED.|
+| OCIS_LDAP_INSTANCE_MAPPER_ID_ATTRIBUTE | string |  | LDAP Attribute of the instance ID. Requires OCIS_MULTI_INSTANCE_ENABLED.|
 | OCIS_ENABLE_OCM<br/>GRAPH_INCLUDE_OCM_SHAREES | bool | false | Include OCM sharees when listing users.|
 | OCIS_EVENTS_ENDPOINT<br/>GRAPH_EVENTS_ENDPOINT | string | 127.0.0.1:9233 | The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Set to a empty string to disable emitting events.|
 | OCIS_EVENTS_CLUSTER<br/>GRAPH_EVENTS_CLUSTER | string | ocis-cluster | The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.|
@@ -114,4 +121,7 @@
 | OCIS_KEYCLOAK_INSECURE_SKIP_VERIFY<br/>GRAPH_KEYCLOAK_INSECURE_SKIP_VERIFY | bool | false | Disable TLS certificate validation for Keycloak connections. Do not set this in production environments.|
 | OCIS_SERVICE_ACCOUNT_ID<br/>GRAPH_SERVICE_ACCOUNT_ID | string |  | The ID of the service account the service should use. See the 'auth-service' service description for more details.|
 | OCIS_SERVICE_ACCOUNT_SECRET<br/>GRAPH_SERVICE_ACCOUNT_SECRET | string |  | The service account secret.|
+| OCIS_MULTI_INSTANCE_ENABLED | bool | false | Enable multiple instances of Infinite Scale.|
+| OCIS_MULTI_INSTANCE_INSTANCEID | string |  | The unique ID of this instance.|
+| OCIS_MULTI_INSTANCE_QUERY_TEMPLATE | string |  | The regular expression extracting username and instancename from a user provided search.|
 | OCIS_MAX_TAG_LENGTH | int | 100 | Define the maximum tag length. Defaults to 100 if not set. Set to 0 to not limit the tag length. Changes only impact the validation of new tags.|

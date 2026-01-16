@@ -80,7 +80,7 @@
 | OCIS_MFA_ENABLED | bool | false | Enable MFA enforcement. If enabled users need to complete MFA before they can access specific paths|
 | OCIS_MFA_AUTH_LEVEL_NAMES | []string | [advanced] | This authentication level name indicates that multi-factor authentication was performed. The name must match the ACR claim in the access token received. Note: If multiple names are required, use a comma-separated list. The front-end service will use the first name in the list when requesting multi-factor authentication (MFA).|
 | OCIS_MULTI_INSTANCE_ENABLED | bool | false | Enable multiple instances of Infinite Scale.|
-| OCIS_MULTI_INSTANCE_INSTANCEID | string | c1f28cf2-d363-4671-a8fe-8d7a80b36b87 | The unique id of this instance|
-| OCIS_MULTI_INSTANCE_MEMBER_CLAIM | string | memberOf | The claim name for the 'memberOf' property|
-| OCIS_MULTI_INSTANCE_GUEST_CLAIM | string | guestOf | The claim name for the 'guestOf' property|
-| OCIS_MULTI_INSTANCE_GUEST_ROLE | string | user-light | The role that should be assigned to a guest user|
+| OCIS_MULTI_INSTANCE_INSTANCEID | string |  | The unique id of this instance|
+| OCIS_MULTI_INSTANCE_MEMBER_CLAIM | string |  | The claim name for the 'memberOf' property|
+| OCIS_MULTI_INSTANCE_GUEST_CLAIM | string |  | The claim name for the 'guestOf' property|
+| OCIS_MULTI_INSTANCE_GUEST_ROLE | string |  | The role that should be assigned to a guest user|

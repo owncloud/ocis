@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2026-01-16-11-44-09]
+[#deprecation-note-2026-01-16-12-29-35]
 [caption=]
 .Deprecation notes for the graph service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -429,7 +429,7 @@ a| [subs=-attributes]
 The minimum length the search term needs to have for unprivileged users when searching for users or groups.
 
 a|`OCIS_SHOW_USER_EMAIL_IN_RESULTS` +
-xref:deprecation-note-2026-01-16-11-44-09[Deprecation Note]
+xref:deprecation-note-2026-01-16-12-29-35[Deprecation Note]
 a| [subs=-attributes]
 ++6.0.0 ++
 a| [subs=-attributes]
@@ -1119,6 +1119,83 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 If enabled, the 'OCIS_LDAP_USER_SCHEMA_EXTERNAL_ID' is used as primary identifier for the provisioning API.
 
+a|`OCIS_LDAP_USER_MEMBER_ATTRIBUTE` +
+
+a| [subs=-attributes]
+++Curie ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+LDAP Attribute to signal the user is member of an instance. Requires OCIS_MULTI_INSTANCE_ENABLED.
+
+a|`OCIS_LDAP_USER_GUEST_ATTRIBUTE` +
+
+a| [subs=-attributes]
+++Curie ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+LDAP Attribute to signal the user is guest of an instance. Requires OCIS_MULTI_INSTANCE_ENABLED.
+
+a|`OCIS_LDAP_PRECISE_SEARCH_ATTRIBUTE` +
+
+a| [subs=-attributes]
+++Curie ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+LDAP Attribute to be used for searching users on other instances. Requires OCIS_MULTI_INSTANCE_ENABLED.
+
+a|`OCIS_LDAP_INSTANCE_MAPPER_ENABLED` +
+
+a| [subs=-attributes]
+++Curie ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+The InstanceMapper allows mapping instance names (user readable) to instance IDs (machine readable) based on an LDAP query. See other _INSTANCE_MAPPER_ env vars. Requires OCIS_MULTI_INSTANCE_ENABLED.
+
+a|`OCIS_LDAP_INSTANCE_MAPPER_BASE_DN` +
+
+a| [subs=-attributes]
+++Curie ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+BaseDN of the 'instancename to instanceid' mapper in LDAP. Requires OCIS_MULTI_INSTANCE_ENABLED.
+
+a|`OCIS_LDAP_INSTANCE_MAPPER_NAME_ATTRIBUTE` +
+
+a| [subs=-attributes]
+++Curie ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+LDAP Attribute of the instance name. Requires OCIS_MULTI_INSTANCE_ENABLED.
+
+a|`OCIS_LDAP_INSTANCE_MAPPER_ID_ATTRIBUTE` +
+
+a| [subs=-attributes]
+++Curie ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+LDAP Attribute of the instance ID. Requires OCIS_MULTI_INSTANCE_ENABLED.
+
 a|`OCIS_ENABLE_OCM` +
 `GRAPH_INCLUDE_OCM_SHAREES` +
 
@@ -1333,6 +1410,39 @@ a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 The service account secret.
+
+a|`OCIS_MULTI_INSTANCE_ENABLED` +
+
+a| [subs=-attributes]
+++Curie ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Enable multiple instances of Infinite Scale.
+
+a|`OCIS_MULTI_INSTANCE_INSTANCEID` +
+
+a| [subs=-attributes]
+++Curie ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The unique ID of this instance.
+
+a|`OCIS_MULTI_INSTANCE_QUERY_TEMPLATE` +
+
+a| [subs=-attributes]
+++Curie ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The regular expression extracting username and instancename from a user provided search.
 
 a|`OCIS_MAX_TAG_LENGTH` +
 

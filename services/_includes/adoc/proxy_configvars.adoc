@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2026-01-16-11-44-10]
+[#deprecation-note-2026-01-16-12-29-35]
 [caption=]
 .Deprecation notes for the proxy service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -929,7 +929,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++c1f28cf2-d363-4671-a8fe-8d7a80b36b87 ++
+++ ++
 a| [subs=-attributes]
 The unique id of this instance
 
@@ -940,7 +940,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++memberOf ++
+++ ++
 a| [subs=-attributes]
 The claim name for the 'memberOf' property
 
@@ -951,7 +951,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++guestOf ++
+++ ++
 a| [subs=-attributes]
 The claim name for the 'guestOf' property
 
@@ -962,7 +962,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++user-light ++
+++ ++
 a| [subs=-attributes]
 The role that should be assigned to a guest user
 |===
