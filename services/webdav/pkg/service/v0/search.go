@@ -228,6 +228,12 @@ func matchToPropResponse(ctx context.Context, match *searchmsg.Match, hrefPrefix
 		if match.Entity.Photo.Orientation != nil && *match.Entity.Photo.Orientation != 0 {
 			propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:photo-orientation", strconv.FormatInt(int64(*match.Entity.Photo.Orientation), 10)))
 		}
+		if match.Entity.Photo.ExposureNumerator != nil && *match.Entity.Photo.ExposureNumerator != 0 {
+			propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:photo-exposure-numerator", strconv.FormatFloat(float64(*match.Entity.Photo.ExposureNumerator), 'f', 0, 64)))
+		}
+		if match.Entity.Photo.ExposureDenominator != nil && *match.Entity.Photo.ExposureDenominator != 0 {
+			propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:photo-exposure-denominator", strconv.FormatFloat(float64(*match.Entity.Photo.ExposureDenominator), 'f', 0, 64)))
+		}
 	}
 
 	// Add location metadata if available
