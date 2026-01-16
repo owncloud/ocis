@@ -310,6 +310,7 @@ func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 
 	ctxHasFullPerms := g.contextUserHasFullAccountPerms(r.Context())
 	hasMFA := mfa.Has(r.Context())
+
 	if !hasAcceptableSearch(odataReq.Query, g.config.API.IdentitySearchMinLength) {
 		if !ctxHasFullPerms {
 			// for regular user the search term must have a minimum length
@@ -357,10 +358,15 @@ func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 	logger.Debug().Interface("query", r.URL.Query()).Msg("calling get users on backend")
 
 	var users []*libregraph.User
+	username, instancename := g.parseExternalSearch(odataReq)
 
-	if odataReq.Query.Filter != nil {
+	switch {
+	case username != "" && instancename != "":
+		users = make([]*libregraph.User, 1)
+		users[0], err = g.identityBackend.GetPreciseUser(r.Context(), username, instancename, odataReq)
+	case odataReq.Query.Filter != nil:
 		users, err = g.applyUserFilter(r.Context(), odataReq, nil)
-	} else {
+	default:
 		users, err = g.identityBackend.GetUsers(r.Context(), odataReq)
 	}
 
@@ -1169,4 +1175,22 @@ func (g Graph) searchOCMAcceptedUsers(ctx context.Context, odataReq *godata.GoDa
 		users = append(users, identity.CreateUserModelFromCS3(user))
 	}
 	return users, nil
+}
+
+// with multi-instance enabled, one can share to another instance by entering `username@instancename`
+func (g Graph) parseExternalSearch(req *godata.GoDataRequest) (string, string) {
+	if !g.config.MultiInstance.Enabled {
+		return "", ""
+	}
+	if req == nil || req.Query == nil || req.Query.Search == nil {
+		return "", ""
+	}
+	unquoted := strings.Trim(req.Query.Search.RawValue, "\"")
+	parts := regexp.MustCompile(g.config.MultiInstance.QueryRegexp).FindStringSubmatch(unquoted)
+	// parts[0] contains complete expression
+	if len(parts) != 3 {
+		return "", ""
+	}
+
+	return parts[1], parts[2]
 }

@@ -75,8 +75,7 @@ services:
       PROXY_USER_CS3_CLAIM: "username"
       # INSECURE: needed if oCIS / Traefik is using self generated certificates
       OCIS_INSECURE: "${INSECURE:-true}"
-      OCIS_ADMIN_USER_ID: ""
-      OCIS_EXCLUDE_RUN_SERVICES: "idp"
+      OCIS_EXCLUDE_RUN_SERVICES: "idp,idm"
       GRAPH_ASSIGN_DEFAULT_USER_ROLE: "false"
       GRAPH_USERNAME_MATCH: "none"
       # password policies
@@ -84,8 +83,41 @@ services:
       PROXY_CSP_CONFIG_FILE_LOCATION: /etc/ocis/csp.yaml
       OCIS_MFA_ENABLED: ${OCIS_MFA_ENABLED:-false}
       WEB_OIDC_SCOPE: "openid profile email acr"
+      # LDAP
+      OCIS_LDAP_URI: ldap://ldap-server:389
+      OCIS_LDAP_INSECURE: "true"
+      OCIS_LDAP_BIND_DN: "cn=admin,dc=owncloud,dc=com"
+      OCIS_LDAP_BIND_PASSWORD: ${LDAP_ADMIN_PASSWORD:-admin}
+      OCIS_LDAP_GROUP_BASE_DN: "ou=groups,dc=owncloud,dc=com"
+      OCIS_LDAP_GROUP_OBJECTCLASS: "groupOfNames"
+      OCIS_LDAP_USER_BASE_DN: "ou=users,dc=owncloud,dc=com"
+      OCIS_LDAP_USER_OBJECTCLASS: "inetOrgPerson"
+      LDAP_LOGIN_ATTRIBUTES: "uid"
+      OCIS_ADMIN_USER_ID: "ddc2004c-0977-11eb-9d3f-a793888cd0f8"
+      IDP_LDAP_LOGIN_ATTRIBUTE: "uid"
+      IDP_LDAP_UUID_ATTRIBUTE: "ownclouduuid"
+      IDP_LDAP_UUID_ATTRIBUTE_TYPE: binary
+      GRAPH_LDAP_SERVER_WRITE_ENABLED: "true" # assuming the external ldap is writable
+      GRAPH_LDAP_REFINT_ENABLED: "true" # osixia has refint enabled.
+      # Multi-Instance Configuration
       OCIS_MULTI_INSTANCE_ENABLED: true
-      OCIS_MULTI_INSTANCE_INSTANCEID: "base"
+      OCIS_MULTI_INSTANCE_INSTANCEID: "ec730a6c-1b63-4b45-b83b-9e2311afdf85"
+      OCIS_LDAP_USER_FILTER: "(&(objectclass=owncloud)(|(ownCloudMemberOf=ec730a6c-1b63-4b45-b83b-9e2311afdf85)(ownCloudGuestOf=ec730a6c-1b63-4b45-b83b-9e2311afdf85)))"
+      OCIS_LDAP_GROUP_FILTER: "(&(objectclass=owncloud)(ownCloudMemberOf=ec730a6c-1b63-4b45-b83b-9e2311afdf85))"
+      OCIS_LDAP_USER_MEMBER_ATTRIBUTE: "owncloudMemberOf"
+      OCIS_LDAP_USER_GUEST_ATTRIBUTE: "ownCloudGuestOf"
+      OCIS_LDAP_PRECISE_SEARCH_ATTRIBUTE: "cn"
+      OCIS_LDAP_INSTANCE_MAPPER_ENABLED: true
+      OCIS_LDAP_INSTANCE_MAPPER_BASE_DN: "dc=owncloud,dc=com"
+      OCIS_LDAP_INSTANCE_MAPPER_NAME_ATTRIBUTE: "description"
+      OCIS_LDAP_INSTANCE_MAPPER_ID_ATTRIBUTE: "cn"
+      OCIS_MULTI_INSTANCE_QUERY_TEMPLATE: "([^@]+)@(.+).owncloud.test"
+      OCIS_MULTI_INSTANCE_MEMBER_CLAIM: "memberOf"
+      OCIS_MULTI_INSTANCE_GUEST_CLAIM: "guestOf"
+      OCIS_MULTI_INSTANCE_GUEST_ROLE: "user-light"
+      # Workaround needed to show external users - can be removed once fixed
+      OCIS_SHOW_USER_EMAIL_IN_RESULTS: true
+      PROXY_ROLE_ASSIGNMENT_OIDC_CLAIM: ownCloudRole
     volumes:
       - ./config/ocis/banned-password-list.txt:/etc/ocis/banned-password-list.txt
       - ./config/ocis/csp.yaml:/etc/ocis/csp.yaml
@@ -130,17 +162,13 @@ services:
       PROXY_USER_CS3_CLAIM: "username"
       # ??
       OCIS_INSECURE: "${INSECURE:-true}"
-      OCIS_ADMIN_USER_ID: ""
-      OCIS_EXCLUDE_RUN_SERVICES: "idp"
+      OCIS_EXCLUDE_RUN_SERVICES: "idp,idm"
       GRAPH_ASSIGN_DEFAULT_USER_ROLE: "false"
       GRAPH_USERNAME_MATCH: "none"
       # CSP
       PROXY_CSP_CONFIG_FILE_LOCATION: /etc/ocis/csp-ocm.yaml
       OCIS_MFA_ENABLED: ${OCIS_MFA_ENABLED:-false}
       WEB_OIDC_SCOPE: "openid profile email acr"
-      # Multi-Instance
-      OCIS_MULTI_INSTANCE_ENABLED: true
-      OCIS_MULTI_INSTANCE_INSTANCEID: "ocm"
       # make the REVA gateway accessible to the app drivers
       GATEWAY_GRPC_ADDR: 0.0.0.0:9142
       # make the registry available to the app provider containers
@@ -149,6 +177,42 @@ services:
       NATS_NATS_PORT: 9233
       #keycloak
       WEB_UI_CONFIG_FILE: /etc/ocis/ocis.ocm.web.config.json
+      # LDAP
+      OCIS_LDAP_URI: ldap://ldap-server:389
+      OCIS_LDAP_INSECURE: "true"
+      OCIS_LDAP_BIND_DN: "cn=admin,dc=owncloud,dc=com"
+      OCIS_LDAP_BIND_PASSWORD: ${LDAP_ADMIN_PASSWORD:-admin}
+      OCIS_LDAP_GROUP_BASE_DN: "ou=groups,dc=owncloud,dc=com"
+      OCIS_LDAP_GROUP_OBJECTCLASS: "groupOfNames"
+      OCIS_LDAP_USER_BASE_DN: "ou=users,dc=owncloud,dc=com"
+      OCIS_LDAP_USER_OBJECTCLASS: "inetOrgPerson"
+      LDAP_LOGIN_ATTRIBUTES: "uid"
+      OCIS_ADMIN_USER_ID: "ddc2004c-0977-11eb-9d3f-a793888cd0f8"
+      IDP_LDAP_LOGIN_ATTRIBUTE: "uid"
+      IDP_LDAP_UUID_ATTRIBUTE: "ownclouduuid"
+      IDP_LDAP_UUID_ATTRIBUTE_TYPE: binary
+      GRAPH_LDAP_SERVER_WRITE_ENABLED: "true" # assuming the external ldap is writable
+      GRAPH_LDAP_REFINT_ENABLED: "true" # osixia has refint enabled.
+      # Multi-Instance
+      OCIS_MULTI_INSTANCE_ENABLED: true
+      OCIS_MULTI_INSTANCE_INSTANCEID: "8d24cb5f-6ee6-4b98-86df-c4c268dddb46"
+      OCIS_LDAP_USER_FILTER: "(&(objectclass=owncloud)(|(ownCloudMemberOf=8d24cb5f-6ee6-4b98-86df-c4c268dddb46)(ownCloudGuestOf=8d24cb5f-6ee6-4b98-86df-c4c268dddb46)))"
+      OCIS_LDAP_GROUP_FILTER: "(&(objectclass=owncloud)(ownCloudMemberOf=8d24cb5f-6ee6-4b98-86df-c4c268dddb46))"
+      OCIS_LDAP_USER_MEMBER_ATTRIBUTE: "owncloudMemberOf"
+      OCIS_LDAP_USER_GUEST_ATTRIBUTE: "ownCloudGuestOf"
+      OCIS_LDAP_PRECISE_SEARCH_ATTRIBUTE: "cn"
+      OCIS_LDAP_INSTANCE_MAPPER_ENABLED: true
+      OCIS_LDAP_INSTANCE_MAPPER_BASE_DN: "dc=owncloud,dc=com"
+      OCIS_LDAP_INSTANCE_MAPPER_NAME_ATTRIBUTE: "description"
+      OCIS_LDAP_INSTANCE_MAPPER_ID_ATTRIBUTE: "cn"
+      OCIS_MULTI_INSTANCE_QUERY_TEMPLATE: "([^@]+)@(.+).owncloud.test"
+      OCIS_MULTI_INSTANCE_MEMBER_CLAIM: "memberOf"
+      OCIS_MULTI_INSTANCE_GUEST_CLAIM: "guestOf"
+      OCIS_MULTI_INSTANCE_GUEST_ROLE: "user-light"
+      # user filter required for multi-instance ocis
+      # Workaround needed to show external users - can be removed once fixed
+      OCIS_SHOW_USER_EMAIL_IN_RESULTS: true
+      PROXY_ROLE_ASSIGNMENT_OIDC_CLAIM: ownCloudRole
     volumes:
       - ./config/ocis/csp-ocm.yaml:/etc/ocis/csp-ocm.yaml
       - ./config/ocis/ocis.ocm.web.config.json:/etc/ocis/ocis.ocm.web.config.json:ro
@@ -205,6 +269,7 @@ services:
       # tracing
       KC_TRACING_ENABLED: ${KEYCLOAK_TRACING:-false}
       KC_TRACING_ENDPOINT: http://jaeger:4317
+      JAVA_OPTS: "-Dcom.sun.jndi.ldap.object.disableEndpointIdentification=true"
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.keycloak.entrypoints=https"
@@ -218,6 +283,50 @@ services:
       driver: ${LOG_DRIVER:-local}
     restart: always
 
+  ldap-server:
+    image: osixia/openldap:1.5.0
+    networks:
+      ocis-net:
+    environment:
+      LDAP_TLS_VERIFY_CLIENT: never
+      LDAP_TLS: false
+      LDAP_ORGANISATION: owncloud
+      LDAP_DOMAIN: owncloud.com
+      LDAP_ROOT: "dc=owncloud,dc=com"
+      LDAP_ADMIN_PASSWORD: ${LDAP_ADMIN_PASSWORD:-admin}
+      LDAP_SEED_INTERNAL_LDIF_PATH: /ldifs
+      LDAP_SEED_INTERNAL_SCHEMA_PATH: /schemas
+    ports:
+      - "127.0.0.1:389:389"
+      - "127.0.0.1:636:636"
+    volumes:
+      - ./config/ldap/ldif:/ldifs
+      - ./config/ldap/schemas:/schemas
+      - ldap-certs:/container/service/slapd/assets/certs
+      - ldap-data:/var/lib/ldap
+      - ldap-config:/etc/ldap/slapd.d
+    logging:
+      driver: ${LOG_DRIVER:-local}
+    restart: always
+
+  ldap-manager:
+    image: osixia/phpldapadmin:latest
+    networks:
+      ocis-net:
+    environment:
+      PHPLDAPADMIN_LDAP_HOSTS: "#PYTHON2BASH:[{'ldap-server': [{'server': [{'port': 389}]}]}]"
+      PHPLDAPADMIN_HTTPS: "false"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.ldap-manager.entrypoints=https"
+      - "traefik.http.routers.ldap-manager.rule=Host(`${LDAP_MANAGER_DOMAIN:-ldap.owncloud.test}`)"
+      - "traefik.http.routers.ldap-manager.tls.certresolver=http"
+      - "traefik.http.routers.ldap-manager.service=ldap-manager"
+      - "traefik.http.services.ldap-manager.loadbalancer.server.port=80"
+    logging:
+      driver: ${LOG_DRIVER:-local}
+    restart: always
+
 volumes:
   certs:
   ocis-config:
@@ -225,6 +334,9 @@ volumes:
   keycloak_postgres_data:
   ocis-ocm-config:
   ocis-ocm-data:
+  ldap-data:
+  ldap-config:
+  ldap-certs:
 
 networks:
   ocis-net:

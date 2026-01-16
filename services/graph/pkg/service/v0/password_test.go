@@ -75,7 +75,7 @@ var _ = Describe("Users changing their own password", func() {
 			GroupSearchScope:         "sub",
 		}
 		loggger := log.NewLogger()
-		identityBackend, err = identity.NewLDAPBackend(ldapClient, ldapConfig, &loggger)
+		identityBackend, err = identity.NewLDAPBackend(ldapClient, ldapConfig, &loggger, "")
 		Expect(err).To(BeNil())
 
 		eventsPublisher = mocks.Publisher{}

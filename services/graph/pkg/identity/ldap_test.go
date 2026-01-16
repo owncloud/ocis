@@ -18,7 +18,7 @@ import (
 )
 
 func getMockedBackend(l ldap.Client, lc config.LDAP, logger *log.Logger) (*LDAP, error) {
-	return NewLDAPBackend(l, lc, logger)
+	return NewLDAPBackend(l, lc, logger, "")
 }
 
 const (
@@ -80,29 +80,29 @@ func TestNewLDAPBackend(t *testing.T) {
 
 	tc := lconfig
 	tc.UserDisplayNameAttribute = ""
-	if _, err := NewLDAPBackend(l, tc, &logger); err == nil {
+	if _, err := NewLDAPBackend(l, tc, &logger, ""); err == nil {
 		t.Error("Should fail with incomplete user attr config")
 	}
 
 	tc = lconfig
 	tc.GroupIDAttribute = ""
-	if _, err := NewLDAPBackend(l, tc, &logger); err == nil {
+	if _, err := NewLDAPBackend(l, tc, &logger, ""); err == nil {
 		t.Errorf("Should fail with incomplete group	config")
 	}
 
 	tc = lconfig
 	tc.UserSearchScope = ""
-	if _, err := NewLDAPBackend(l, tc, &logger); err == nil {
+	if _, err := NewLDAPBackend(l, tc, &logger, ""); err == nil {
 		t.Errorf("Should fail with invalid user search scope")
 	}
 
 	tc = lconfig
 	tc.GroupSearchScope = ""
-	if _, err := NewLDAPBackend(l, tc, &logger); err == nil {
+	if _, err := NewLDAPBackend(l, tc, &logger, ""); err == nil {
 		t.Errorf("Should fail with invalid group search scope")
 	}
 
-	if _, err := NewLDAPBackend(l, lconfig, &logger); err != nil {
+	if _, err := NewLDAPBackend(l, lconfig, &logger, ""); err != nil {
 		t.Errorf("Should fail with invalid group search scope")
 	}
 }
@@ -147,7 +147,7 @@ func TestCreateUser(t *testing.T) {
 
 	c := lconfig
 	c.UseServerUUID = true
-	b, _ := NewLDAPBackend(l, c, &logger)
+	b, _ := NewLDAPBackend(l, c, &logger, "")
 
 	newUser, err := b.CreateUser(context.Background(), *user)
 	assert.Nil(t, err)
@@ -164,7 +164,7 @@ func TestCreateUserModelFromLDAP(t *testing.T) {
 	l := &mocks.Client{}
 	logger := log.NewLogger(log.Level("debug"))
 
-	b, _ := NewLDAPBackend(l, lconfig, &logger)
+	b, _ := NewLDAPBackend(l, lconfig, &logger, "")
 	if user := b.createUserModelFromLDAP(nil); user != nil {
 		t.Errorf("createUserModelFromLDAP should return on nil Entry")
 	}

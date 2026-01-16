@@ -33,8 +33,9 @@ type Config struct {
 	UnifiedRoles      UnifiedRoles `yaml:"unified_roles"`
 	MaxConcurrency    int          `yaml:"max_concurrency" env:"OCIS_MAX_CONCURRENCY;GRAPH_MAX_CONCURRENCY" desc:"The maximum number of concurrent requests the service will handle." introductionVersion:"7.0.0"`
 
-	Keycloak       Keycloak       `yaml:"keycloak"`
-	ServiceAccount ServiceAccount `yaml:"service_account"`
+	Keycloak       Keycloak            `yaml:"keycloak"`
+	ServiceAccount ServiceAccount      `yaml:"service_account"`
+	MultiInstance  MultiInstanceConfig `yaml:"multi_instance"`
 
 	Validation Validation `yaml:"validation"`
 
@@ -92,6 +93,15 @@ type LDAP struct {
 	EducationResourcesEnabled bool `yaml:"education_resources_enabled" env:"GRAPH_LDAP_EDUCATION_RESOURCES_ENABLED" desc:"Enable LDAP support for managing education related resources." introductionVersion:"pre5.0"`
 	EducationConfig           LDAPEducationConfig
 	RequireExternalID         bool `yaml:"require_external_id" env:"GRAPH_LDAP_REQUIRE_EXTERNAL_ID" desc:"If enabled, the 'OCIS_LDAP_USER_SCHEMA_EXTERNAL_ID' is used as primary identifier for the provisioning API." introductionVersion:"8.0.0"`
+
+	// Multi-Instance Only
+	UserMemberAttribute         string `yaml:"user_member_attribute" env:"OCIS_LDAP_USER_MEMBER_ATTRIBUTE" desc:"LDAP Attribute to signal the user is member of an instance. Requires OCIS_MULTI_INSTANCE_ENABLED." introductionVersion:"Curie"`
+	UserGuestAttribute          string `yaml:"user_guest_attribute" env:"OCIS_LDAP_USER_GUEST_ATTRIBUTE" desc:"LDAP Attribute to signal the user is guest of an instance. Requires OCIS_MULTI_INSTANCE_ENABLED." introductionVersion:"Curie"`
+	PreciseSearchAttribute      string `yaml:"precise_search_attribute" env:"OCIS_LDAP_PRECISE_SEARCH_ATTRIBUTE" desc:"LDAP Attribute to be used for searching users on other instances. Requires OCIS_MULTI_INSTANCE_ENABLED." introductionVersion:"Curie"`
+	InstanceMapperEnabled       bool   `yaml:"instance_mapper_enabled" env:"OCIS_LDAP_INSTANCE_MAPPER_ENABLED" desc:"The InstanceMapper allows mapping instance names (user readable) to instance IDs (machine readable) based on an LDAP query. See other _INSTANCE_MAPPER_ env vars. Requires OCIS_MULTI_INSTANCE_ENABLED." introductionVersion:"Curie"`
+	InstanceMapperBaseDN        string `yaml:"instance_mapper_base_dn" env:"OCIS_LDAP_INSTANCE_MAPPER_BASE_DN" desc:"BaseDN of the 'instancename to instanceid' mapper in LDAP. Requires OCIS_MULTI_INSTANCE_ENABLED." introductionVersion:"Curie"`
+	InstanceMapperNameAttribute string `yaml:"instance_mapper_name_attribute" env:"OCIS_LDAP_INSTANCE_MAPPER_NAME_ATTRIBUTE" desc:"LDAP Attribute of the instance name. Requires OCIS_MULTI_INSTANCE_ENABLED." introductionVersion:"Curie"`
+	InstanceMapperIDAttribute   string `yaml:"instance_mapper_id_attribute" env:"OCIS_LDAP_INSTANCE_MAPPER_ID_ATTRIBUTE" desc:"LDAP Attribute of the instance ID. Requires OCIS_MULTI_INSTANCE_ENABLED." introductionVersion:"Curie"`
 }
 
 // LDAPEducationConfig represents the LDAP configuration for education related resources
@@ -161,4 +171,11 @@ type ServiceAccount struct {
 
 type Validation struct {
 	MaxTagLength int `yaml:"max_tag_length" env:"OCIS_MAX_TAG_LENGTH" desc:"Define the maximum tag length. Defaults to 100 if not set. Set to 0 to not limit the tag length. Changes only impact the validation of new tags." introductionVersion:"7.2.0"`
+}
+
+// MultiInstanceConfig holds configuration for multi-instance-ocis
+type MultiInstanceConfig struct {
+	Enabled     bool   `yaml:"enabled" env:"OCIS_MULTI_INSTANCE_ENABLED" desc:"Enable multiple instances of Infinite Scale." introductionVersion:"Curie"`
+	InstanceID  string `yaml:"instanceid" env:"OCIS_MULTI_INSTANCE_INSTANCEID" desc:"The unique ID of this instance." introductionVersion:"Curie"`
+	QueryRegexp string `yaml:"query_regexp" env:"OCIS_MULTI_INSTANCE_QUERY_TEMPLATE" desc:"The regular expression extracting username and instancename from a user provided search." introductionVersion:"Curie"`
 }

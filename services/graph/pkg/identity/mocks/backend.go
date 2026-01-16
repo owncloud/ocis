@@ -77,6 +77,64 @@ func (_c *Backend_AddMembersToGroup_Call) RunAndReturn(run func(context.Context,
 	return _c
 }
 
+// AddUser provides a mock function with given fields: ctx, id, instanceID
+func (_m *Backend) AddUser(ctx context.Context, id string, instanceID string) (libregraph.User, error) {
+	ret := _m.Called(ctx, id, instanceID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for AddUser")
+	}
+
+	var r0 libregraph.User
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, string, string) (libregraph.User, error)); ok {
+		return rf(ctx, id, instanceID)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, string, string) libregraph.User); ok {
+		r0 = rf(ctx, id, instanceID)
+	} else {
+		r0 = ret.Get(0).(libregraph.User)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, string, string) error); ok {
+		r1 = rf(ctx, id, instanceID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Backend_AddUser_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'AddUser'
+type Backend_AddUser_Call struct {
+	*mock.Call
+}
+
+// AddUser is a helper method to define mock.On call
+//   - ctx context.Context
+//   - id string
+//   - instanceID string
+func (_e *Backend_Expecter) AddUser(ctx interface{}, id interface{}, instanceID interface{}) *Backend_AddUser_Call {
+	return &Backend_AddUser_Call{Call: _e.mock.On("AddUser", ctx, id, instanceID)}
+}
+
+func (_c *Backend_AddUser_Call) Run(run func(ctx context.Context, id string, instanceID string)) *Backend_AddUser_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(string), args[2].(string))
+	})
+	return _c
+}
+
+func (_c *Backend_AddUser_Call) Return(_a0 libregraph.User, _a1 error) *Backend_AddUser_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Backend_AddUser_Call) RunAndReturn(run func(context.Context, string, string) (libregraph.User, error)) *Backend_AddUser_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // CreateGroup provides a mock function with given fields: ctx, group
 func (_m *Backend) CreateGroup(ctx context.Context, group libregraph.Group) (*libregraph.Group, error) {
 	ret := _m.Called(ctx, group)
@@ -524,6 +582,67 @@ func (_c *Backend_GetGroups_Call) Return(_a0 []*libregraph.Group, _a1 error) *Ba
 }
 
 func (_c *Backend_GetGroups_Call) RunAndReturn(run func(context.Context, *godata.GoDataRequest) ([]*libregraph.Group, error)) *Backend_GetGroups_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetPreciseUser provides a mock function with given fields: ctx, name, instancename, oreq
+func (_m *Backend) GetPreciseUser(ctx context.Context, name string, instancename string, oreq *godata.GoDataRequest) (*libregraph.User, error) {
+	ret := _m.Called(ctx, name, instancename, oreq)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetPreciseUser")
+	}
+
+	var r0 *libregraph.User
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, string, string, *godata.GoDataRequest) (*libregraph.User, error)); ok {
+		return rf(ctx, name, instancename, oreq)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, string, string, *godata.GoDataRequest) *libregraph.User); ok {
+		r0 = rf(ctx, name, instancename, oreq)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*libregraph.User)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, string, string, *godata.GoDataRequest) error); ok {
+		r1 = rf(ctx, name, instancename, oreq)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Backend_GetPreciseUser_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetPreciseUser'
+type Backend_GetPreciseUser_Call struct {
+	*mock.Call
+}
+
+// GetPreciseUser is a helper method to define mock.On call
+//   - ctx context.Context
+//   - name string
+//   - instancename string
+//   - oreq *godata.GoDataRequest
+func (_e *Backend_Expecter) GetPreciseUser(ctx interface{}, name interface{}, instancename interface{}, oreq interface{}) *Backend_GetPreciseUser_Call {
+	return &Backend_GetPreciseUser_Call{Call: _e.mock.On("GetPreciseUser", ctx, name, instancename, oreq)}
+}
+
+func (_c *Backend_GetPreciseUser_Call) Run(run func(ctx context.Context, name string, instancename string, oreq *godata.GoDataRequest)) *Backend_GetPreciseUser_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(string), args[2].(string), args[3].(*godata.GoDataRequest))
+	})
+	return _c
+}
+
+func (_c *Backend_GetPreciseUser_Call) Return(_a0 *libregraph.User, _a1 error) *Backend_GetPreciseUser_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Backend_GetPreciseUser_Call) RunAndReturn(run func(context.Context, string, string, *godata.GoDataRequest) (*libregraph.User, error)) *Backend_GetPreciseUser_Call {
 	_c.Call.Return(run)
 	return _c
 }

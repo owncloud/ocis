@@ -36,7 +36,11 @@ type Backend interface {
 	DeleteUser(ctx context.Context, nameOrID string) error
 	// UpdateUser applies changes to given user, identified by username or id
 	UpdateUser(ctx context.Context, nameOrID string, user libregraph.UserUpdate) (*libregraph.User, error)
+	// AddUser adds a user to the instance (multi-instance only)
+	AddUser(ctx context.Context, id string, instanceID string) (libregraph.User, error) // FIXME
+
 	GetUser(ctx context.Context, nameOrID string, oreq *godata.GoDataRequest) (*libregraph.User, error)
+	GetPreciseUser(ctx context.Context, name string, instancename string, oreq *godata.GoDataRequest) (*libregraph.User, error)
 	GetUsers(ctx context.Context, oreq *godata.GoDataRequest) ([]*libregraph.User, error)
 	// FilterUsers returns a list of users that match the filter
 	FilterUsers(ctx context.Context, oreq *godata.GoDataRequest, filter *godata.ParseNode) ([]*libregraph.User, error)

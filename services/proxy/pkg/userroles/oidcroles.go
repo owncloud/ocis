@@ -111,7 +111,7 @@ func (ra oidcRoleAssigner) UpdateUserRoleAssignment(ctx context.Context, user *c
 	if overwriteRole == "" {
 		claimRoles, err := extractRoles(ra.rolesClaim, claims)
 		if err != nil {
-			logger.Error().Err(err).Msg("Error mapping role names to role ids")
+			logger.Error().Err(err).Str("Claim", ra.rolesClaim).Interface("claims", claims).Msg("Error mapping role names to role ids")
 			return nil, err
 		}
 

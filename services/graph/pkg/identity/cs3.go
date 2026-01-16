@@ -42,6 +42,11 @@ func (i *CS3) UpdateUser(ctx context.Context, nameOrID string, user libregraph.U
 	return nil, errNotImplemented
 }
 
+// AddUser is not implemented
+func (i *CS3) AddUser(ctx context.Context, id string, instanceID string) (libregraph.User, error) {
+	return libregraph.User{}, errNotImplemented
+}
+
 // GetUser implements the Backend Interface.
 func (i *CS3) GetUser(ctx context.Context, userID string, _ *godata.GoDataRequest) (*libregraph.User, error) {
 	logger := i.Logger.SubloggerWithRequestID(ctx)
@@ -69,6 +74,11 @@ func (i *CS3) GetUser(ctx context.Context, userID string, _ *godata.GoDataReques
 		return nil, errorcode.New(errorcode.GeneralException, res.GetStatus().GetMessage())
 	}
 	return CreateUserModelFromCS3(res.GetUser()), nil
+}
+
+// GetPreciseUser is not implemented
+func (i *CS3) GetPreciseUser(ctx context.Context, name string, instancename string, oreq *godata.GoDataRequest) (*libregraph.User, error) {
+	return nil, errNotImplemented
 }
 
 // GetUsers implements the Backend Interface.

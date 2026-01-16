@@ -213,7 +213,7 @@ func NewService(opts ...Option) (Graph, error) { //nolint:maintidx
 		return svc, err
 	}
 
-	driveItemPermissionsService, err := NewDriveItemPermissionsService(options.Logger, options.GatewaySelector, identityCache, options.Config, options.TraceProvider)
+	driveItemPermissionsService, err := NewDriveItemPermissionsService(options.Logger, options.GatewaySelector, identityCache, options.Config, options.TraceProvider, svc.identityBackend)
 	if err != nil {
 		return svc, err
 	}
@@ -473,7 +473,11 @@ func setIdentityBackends(options Options, svc *Graph) error {
 					TLSConfig:    tlsConf,
 				},
 			)
-			lb, err := identity.NewLDAPBackend(conn, options.Config.Identity.LDAP, &options.Logger)
+			var iid string
+			if options.Config.MultiInstance.Enabled {
+				iid = options.Config.MultiInstance.InstanceID
+			}
+			lb, err := identity.NewLDAPBackend(conn, options.Config.Identity.LDAP, &options.Logger, iid)
 			if err != nil {
 				options.Logger.Error().Err(err).Msg("Error initializing LDAP Backend")
 				return err
