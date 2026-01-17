@@ -1,6 +1,6 @@
 ---
 title: App Registry
-date: 2026-01-16T03:28:36.448900664Z
+date: 2026-01-17T00:07:33.064155343Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/app-registry
