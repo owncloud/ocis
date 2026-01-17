@@ -140,9 +140,16 @@ func (t Tika) getLocation(meta map[string][]string) *libregraph.GeoCoordinates {
 		}
 	}
 
-	// TODO: location.Altitute: transform the following data to … feet above sea level.
-	// "GPS:GPS Altitude":                          []string{"227.4 metres"},
-	// "GPS:GPS Altitude Ref":                      []string{"Sea level"},
+	// GPS Altitude is returned as "227.4 metres" - extract the numeric portion
+	if v, err := getFirstValue(meta, "GPS:GPS Altitude"); err == nil {
+		// Parse altitude value - remove " metres" suffix if present
+		altStr := strings.TrimSuffix(v, " metres")
+		altStr = strings.TrimSuffix(altStr, " m")
+		if alt, err := strconv.ParseFloat(strings.TrimSpace(altStr), 64); err == nil {
+			initLocation()
+			location.SetAltitude(alt)
+		}
+	}
 
 	if v, err := getFirstValue(meta, "geo:lat"); err == nil {
 		if i, err := strconv.ParseFloat(v, 64); err == nil {
