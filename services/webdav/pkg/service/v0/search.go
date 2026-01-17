@@ -1,7 +1,6 @@
 package svc
 
 import (
-	"context"
 	"encoding/xml"
 	"fmt"
 	"io"
@@ -80,7 +79,7 @@ func (g Webdav) sendSearchResponse(rsp *searchsvc.SearchResponse, w http.Respons
 		hrefPrefix = "/remote.php/dav/spaces"
 	}
 
-	responsesXML, err := multistatusResponse(r.Context(), rsp.Matches, hrefPrefix)
+	responsesXML, err := multistatusResponse(rsp.Matches, hrefPrefix)
 	if err != nil {
 		logger.Error().Err(err).Msg("error formatting propfind")
 		w.WriteHeader(http.StatusInternalServerError)
@@ -98,10 +97,10 @@ func (g Webdav) sendSearchResponse(rsp *searchsvc.SearchResponse, w http.Respons
 }
 
 // multistatusResponse converts a list of matches into a multistatus response string
-func multistatusResponse(ctx context.Context, matches []*searchmsg.Match, hrefPrefix string) ([]byte, error) {
+func multistatusResponse(matches []*searchmsg.Match, hrefPrefix string) ([]byte, error) {
 	responses := make([]*propfind.ResponseXML, 0, len(matches))
 	for i := range matches {
-		res, err := matchToPropResponse(ctx, matches[i], hrefPrefix)
+		res, err := matchToPropResponse(matches[i], hrefPrefix)
 		if err != nil {
 			return nil, err
 		}
@@ -183,7 +182,7 @@ func appendLocationProps(props []prop.PropertyXML, location *searchmsg.GeoCoordi
 	return props
 }
 
-func matchToPropResponse(ctx context.Context, match *searchmsg.Match, hrefPrefix string) (*propfind.ResponseXML, error) {
+func matchToPropResponse(match *searchmsg.Match, hrefPrefix string) (*propfind.ResponseXML, error) {
 	// unfortunately search uses own versions of ResourceId and Ref. So we need to assert them here
 	var (
 		ref string
