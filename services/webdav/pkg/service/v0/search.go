@@ -117,6 +117,38 @@ func multistatusResponse(ctx context.Context, matches []*searchmsg.Match, hrefPr
 	return msg, nil
 }
 
+// appendStringProp appends a string property if the value is non-nil and non-empty
+func appendStringProp(props []prop.PropertyXML, name string, value *string) []prop.PropertyXML {
+	if value != nil && *value != "" {
+		return append(props, prop.Escaped(name, *value))
+	}
+	return props
+}
+
+// appendFloat32Prop appends a float32 property if the value is non-nil and non-zero
+func appendFloat32Prop(props []prop.PropertyXML, name string, value *float32, precision int) []prop.PropertyXML {
+	if value != nil && *value != 0 {
+		return append(props, prop.Escaped(name, strconv.FormatFloat(float64(*value), 'f', precision, 64)))
+	}
+	return props
+}
+
+// appendInt32Prop appends an int32 property if the value is non-nil and non-zero
+func appendInt32Prop(props []prop.PropertyXML, name string, value *int32) []prop.PropertyXML {
+	if value != nil && *value != 0 {
+		return append(props, prop.Escaped(name, strconv.FormatInt(int64(*value), 10)))
+	}
+	return props
+}
+
+// appendFloat64Prop appends a float64 property if the value is non-nil
+func appendFloat64Prop(props []prop.PropertyXML, name string, value *float64, precision int) []prop.PropertyXML {
+	if value != nil {
+		return append(props, prop.Escaped(name, strconv.FormatFloat(*value, 'f', precision, 64)))
+	}
+	return props
+}
+
 // appendPhotoProps appends photo metadata properties to the property list
 func appendPhotoProps(props []prop.PropertyXML, photo *searchmsg.Photo) []prop.PropertyXML {
 	if photo == nil {
@@ -126,30 +158,14 @@ func appendPhotoProps(props []prop.PropertyXML, photo *searchmsg.Photo) []prop.P
 	if photo.TakenDateTime != nil {
 		props = append(props, prop.Escaped("oc:photo-taken-date-time", photo.TakenDateTime.AsTime().Format("2006-01-02T15:04:05Z07:00")))
 	}
-	if photo.CameraMake != nil && *photo.CameraMake != "" {
-		props = append(props, prop.Escaped("oc:photo-camera-make", *photo.CameraMake))
-	}
-	if photo.CameraModel != nil && *photo.CameraModel != "" {
-		props = append(props, prop.Escaped("oc:photo-camera-model", *photo.CameraModel))
-	}
-	if photo.FNumber != nil && *photo.FNumber != 0 {
-		props = append(props, prop.Escaped("oc:photo-fnumber", strconv.FormatFloat(float64(*photo.FNumber), 'f', 2, 64)))
-	}
-	if photo.FocalLength != nil && *photo.FocalLength != 0 {
-		props = append(props, prop.Escaped("oc:photo-focal-length", strconv.FormatFloat(float64(*photo.FocalLength), 'f', 2, 64)))
-	}
-	if photo.Iso != nil && *photo.Iso != 0 {
-		props = append(props, prop.Escaped("oc:photo-iso", strconv.FormatInt(int64(*photo.Iso), 10)))
-	}
-	if photo.Orientation != nil && *photo.Orientation != 0 {
-		props = append(props, prop.Escaped("oc:photo-orientation", strconv.FormatInt(int64(*photo.Orientation), 10)))
-	}
-	if photo.ExposureNumerator != nil && *photo.ExposureNumerator != 0 {
-		props = append(props, prop.Escaped("oc:photo-exposure-numerator", strconv.FormatFloat(float64(*photo.ExposureNumerator), 'f', 0, 64)))
-	}
-	if photo.ExposureDenominator != nil && *photo.ExposureDenominator != 0 {
-		props = append(props, prop.Escaped("oc:photo-exposure-denominator", strconv.FormatFloat(float64(*photo.ExposureDenominator), 'f', 0, 64)))
-	}
+	props = appendStringProp(props, "oc:photo-camera-make", photo.CameraMake)
+	props = appendStringProp(props, "oc:photo-camera-model", photo.CameraModel)
+	props = appendFloat32Prop(props, "oc:photo-fnumber", photo.FNumber, 2)
+	props = appendFloat32Prop(props, "oc:photo-focal-length", photo.FocalLength, 2)
+	props = appendInt32Prop(props, "oc:photo-iso", photo.Iso)
+	props = appendInt32Prop(props, "oc:photo-orientation", photo.Orientation)
+	props = appendFloat32Prop(props, "oc:photo-exposure-numerator", photo.ExposureNumerator, 0)
+	props = appendFloat32Prop(props, "oc:photo-exposure-denominator", photo.ExposureDenominator, 0)
 
 	return props
 }
@@ -160,15 +176,9 @@ func appendLocationProps(props []prop.PropertyXML, location *searchmsg.GeoCoordi
 		return props
 	}
 
-	if location.Latitude != nil {
-		props = append(props, prop.Escaped("oc:photo-location-latitude", strconv.FormatFloat(*location.Latitude, 'f', 6, 64)))
-	}
-	if location.Longitude != nil {
-		props = append(props, prop.Escaped("oc:photo-location-longitude", strconv.FormatFloat(*location.Longitude, 'f', 6, 64)))
-	}
-	if location.Altitude != nil {
-		props = append(props, prop.Escaped("oc:photo-location-altitude", strconv.FormatFloat(*location.Altitude, 'f', 1, 64)))
-	}
+	props = appendFloat64Prop(props, "oc:photo-location-latitude", location.Latitude, 6)
+	props = appendFloat64Prop(props, "oc:photo-location-longitude", location.Longitude, 6)
+	props = appendFloat64Prop(props, "oc:photo-location-altitude", location.Altitude, 1)
 
 	return props
 }
