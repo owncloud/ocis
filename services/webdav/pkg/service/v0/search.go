@@ -117,6 +117,62 @@ func multistatusResponse(ctx context.Context, matches []*searchmsg.Match, hrefPr
 	return msg, nil
 }
 
+// appendPhotoProps appends photo metadata properties to the property list
+func appendPhotoProps(props []prop.PropertyXML, photo *searchmsg.Photo) []prop.PropertyXML {
+	if photo == nil {
+		return props
+	}
+
+	if photo.TakenDateTime != nil {
+		props = append(props, prop.Escaped("oc:photo-taken-date-time", photo.TakenDateTime.AsTime().Format("2006-01-02T15:04:05Z07:00")))
+	}
+	if photo.CameraMake != nil && *photo.CameraMake != "" {
+		props = append(props, prop.Escaped("oc:photo-camera-make", *photo.CameraMake))
+	}
+	if photo.CameraModel != nil && *photo.CameraModel != "" {
+		props = append(props, prop.Escaped("oc:photo-camera-model", *photo.CameraModel))
+	}
+	if photo.FNumber != nil && *photo.FNumber != 0 {
+		props = append(props, prop.Escaped("oc:photo-fnumber", strconv.FormatFloat(float64(*photo.FNumber), 'f', 2, 64)))
+	}
+	if photo.FocalLength != nil && *photo.FocalLength != 0 {
+		props = append(props, prop.Escaped("oc:photo-focal-length", strconv.FormatFloat(float64(*photo.FocalLength), 'f', 2, 64)))
+	}
+	if photo.Iso != nil && *photo.Iso != 0 {
+		props = append(props, prop.Escaped("oc:photo-iso", strconv.FormatInt(int64(*photo.Iso), 10)))
+	}
+	if photo.Orientation != nil && *photo.Orientation != 0 {
+		props = append(props, prop.Escaped("oc:photo-orientation", strconv.FormatInt(int64(*photo.Orientation), 10)))
+	}
+	if photo.ExposureNumerator != nil && *photo.ExposureNumerator != 0 {
+		props = append(props, prop.Escaped("oc:photo-exposure-numerator", strconv.FormatFloat(float64(*photo.ExposureNumerator), 'f', 0, 64)))
+	}
+	if photo.ExposureDenominator != nil && *photo.ExposureDenominator != 0 {
+		props = append(props, prop.Escaped("oc:photo-exposure-denominator", strconv.FormatFloat(float64(*photo.ExposureDenominator), 'f', 0, 64)))
+	}
+
+	return props
+}
+
+// appendLocationProps appends location metadata properties to the property list
+func appendLocationProps(props []prop.PropertyXML, location *searchmsg.GeoCoordinates) []prop.PropertyXML {
+	if location == nil {
+		return props
+	}
+
+	if location.Latitude != nil {
+		props = append(props, prop.Escaped("oc:photo-location-latitude", strconv.FormatFloat(*location.Latitude, 'f', 6, 64)))
+	}
+	if location.Longitude != nil {
+		props = append(props, prop.Escaped("oc:photo-location-longitude", strconv.FormatFloat(*location.Longitude, 'f', 6, 64)))
+	}
+	if location.Altitude != nil {
+		props = append(props, prop.Escaped("oc:photo-location-altitude", strconv.FormatFloat(*location.Altitude, 'f', 1, 64)))
+	}
+
+	return props
+}
+
 func matchToPropResponse(ctx context.Context, match *searchmsg.Match, hrefPrefix string) (*propfind.ResponseXML, error) {
 	// unfortunately search uses own versions of ResourceId and Ref. So we need to assert them here
 	var (
@@ -128,6 +184,14 @@ func matchToPropResponse(ctx context.Context, match *searchmsg.Match, hrefPrefix
 	// for shares it needs to be sharestorageproviderid!shareid
 	// for other spaces it needs to be storageproviderid$spaceid
 	switch match.Entity.Ref.ResourceId.StorageId {
+	case utils.ShareStorageProviderID:
+		ref, err = storagespace.FormatReference(&provider.Reference{
+			ResourceId: &provider.ResourceId{
+				SpaceId:  match.Entity.Ref.ResourceId.SpaceId,
+				OpaqueId: match.Entity.Ref.ResourceId.OpaqueId,
+			},
+			Path: match.Entity.Ref.Path,
+		})
 	default:
 		ref, err = storagespace.FormatReference(&provider.Reference{
 			ResourceId: &provider.ResourceId{
@@ -136,19 +200,11 @@ func matchToPropResponse(ctx context.Context, match *searchmsg.Match, hrefPrefix
 			},
 			Path: match.Entity.Ref.Path,
 		})
-	case utils.ShareStorageProviderID:
-		ref, err = storagespace.FormatReference(&provider.Reference{
-			ResourceId: &provider.ResourceId{
-				//StorageId: match.Entity.Ref.ResourceId.StorageId,
-				SpaceId:  match.Entity.Ref.ResourceId.SpaceId,
-				OpaqueId: match.Entity.Ref.ResourceId.OpaqueId,
-			},
-			Path: match.Entity.Ref.Path,
-		})
 	}
 	if err != nil {
 		return nil, err
 	}
+
 	response := propfind.ResponseXML{
 		Href:     net.EncodePath(path.Join(hrefPrefix, ref)),
 		Propstat: []propfind.PropstatXML{},
@@ -164,6 +220,7 @@ func matchToPropResponse(ctx context.Context, match *searchmsg.Match, hrefPrefix
 		SpaceId:   match.Entity.Id.SpaceId,
 		OpaqueId:  match.Entity.Id.OpaqueId,
 	})))
+
 	if match.Entity.ParentId != nil {
 		propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:file-parent", storagespace.FormatResourceID(&provider.ResourceId{
 			StorageId: match.Entity.ParentId.StorageId,
@@ -171,6 +228,7 @@ func matchToPropResponse(ctx context.Context, match *searchmsg.Match, hrefPrefix
 			OpaqueId:  match.Entity.ParentId.OpaqueId,
 		})))
 	}
+
 	if match.Entity.Ref.ResourceId.StorageId == utils.ShareStorageProviderID {
 		propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:shareid", match.Entity.Ref.ResourceId.OpaqueId))
 		propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:shareroot", match.Entity.ShareRootName))
@@ -180,6 +238,7 @@ func matchToPropResponse(ctx context.Context, match *searchmsg.Match, hrefPrefix
 			OpaqueId:  match.Entity.GetRemoteItemId().GetOpaqueId(),
 		})))
 	}
+
 	propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:name", match.Entity.Name))
 	propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("d:getlastmodified", match.Entity.LastModifiedTime.AsTime().Format(constants.RFC1123)))
 	propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("d:getcontenttype", match.Entity.MimeType))
@@ -202,52 +261,13 @@ func matchToPropResponse(ctx context.Context, match *searchmsg.Match, hrefPrefix
 			prop.Escaped("d:getcontentlength", size),
 		)
 	}
+
 	score := strconv.FormatFloat(float64(match.Score), 'f', -1, 64)
 	propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:score", score))
 
-	// Add photo metadata if available (from Tika EXIF extraction)
-	if match.Entity.Photo != nil {
-		if match.Entity.Photo.TakenDateTime != nil {
-			propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:photo-taken-date-time", match.Entity.Photo.TakenDateTime.AsTime().Format("2006-01-02T15:04:05Z07:00")))
-		}
-		if match.Entity.Photo.CameraMake != nil && *match.Entity.Photo.CameraMake != "" {
-			propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:photo-camera-make", *match.Entity.Photo.CameraMake))
-		}
-		if match.Entity.Photo.CameraModel != nil && *match.Entity.Photo.CameraModel != "" {
-			propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:photo-camera-model", *match.Entity.Photo.CameraModel))
-		}
-		if match.Entity.Photo.FNumber != nil && *match.Entity.Photo.FNumber != 0 {
-			propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:photo-fnumber", strconv.FormatFloat(float64(*match.Entity.Photo.FNumber), 'f', 2, 64)))
-		}
-		if match.Entity.Photo.FocalLength != nil && *match.Entity.Photo.FocalLength != 0 {
-			propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:photo-focal-length", strconv.FormatFloat(float64(*match.Entity.Photo.FocalLength), 'f', 2, 64)))
-		}
-		if match.Entity.Photo.Iso != nil && *match.Entity.Photo.Iso != 0 {
-			propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:photo-iso", strconv.FormatInt(int64(*match.Entity.Photo.Iso), 10)))
-		}
-		if match.Entity.Photo.Orientation != nil && *match.Entity.Photo.Orientation != 0 {
-			propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:photo-orientation", strconv.FormatInt(int64(*match.Entity.Photo.Orientation), 10)))
-		}
-		if match.Entity.Photo.ExposureNumerator != nil && *match.Entity.Photo.ExposureNumerator != 0 {
-			propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:photo-exposure-numerator", strconv.FormatFloat(float64(*match.Entity.Photo.ExposureNumerator), 'f', 0, 64)))
-		}
-		if match.Entity.Photo.ExposureDenominator != nil && *match.Entity.Photo.ExposureDenominator != 0 {
-			propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:photo-exposure-denominator", strconv.FormatFloat(float64(*match.Entity.Photo.ExposureDenominator), 'f', 0, 64)))
-		}
-	}
-
-	// Add location metadata if available
-	if match.Entity.Location != nil {
-		if match.Entity.Location.Latitude != nil {
-			propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:photo-location-latitude", strconv.FormatFloat(*match.Entity.Location.Latitude, 'f', 6, 64)))
-		}
-		if match.Entity.Location.Longitude != nil {
-			propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:photo-location-longitude", strconv.FormatFloat(*match.Entity.Location.Longitude, 'f', 6, 64)))
-		}
-		if match.Entity.Location.Altitude != nil {
-			propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:photo-location-altitude", strconv.FormatFloat(*match.Entity.Location.Altitude, 'f', 1, 64)))
-		}
-	}
+	// Add photo and location metadata using helper functions
+	propstatOK.Prop = appendPhotoProps(propstatOK.Prop, match.Entity.Photo)
+	propstatOK.Prop = appendLocationProps(propstatOK.Prop, match.Entity.Location)
 
 	if len(propstatOK.Prop) > 0 {
 		response.Propstat = append(response.Propstat, propstatOK)
