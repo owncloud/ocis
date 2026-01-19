@@ -8,6 +8,7 @@ import (
 	"slices"
 	"strconv"
 	"strings"
+	"text/template"
 	"time"
 
 	"github.com/CiscoM31/godata"
@@ -78,27 +79,29 @@ type LDAP struct {
 	conn   ldap.Client
 
 	// multi instance only
-	userMemberAttribute         string
-	userGuestAttribute          string
-	preciseSearchAttribute      string
-	instanceMapperEnabled       bool
-	instanceMapperBaseDN        string
-	instanceMapperNameAttribute string
-	instanceMapperIDAttribute   string
+	preciseSearchAttribute         string
+	instanceMapperEnabled          bool
+	instanceMapperBaseDN           string
+	instanceMapperNameAttribute    string
+	instanceMapperIDAttribute      string
+	crossInstanceReferenceTemplate *template.Template
+	instanceURLTemplate            *template.Template
 }
 
 type userAttributeMap struct {
-	displayName    string
-	id             string
-	mail           string
-	userName       string
-	givenName      string
-	surname        string
-	accountEnabled string
-	userType       string
-	identities     string
-	lastSignIn     string
-	externalID     string
+	displayName         string
+	id                  string
+	mail                string
+	userName            string
+	givenName           string
+	surname             string
+	accountEnabled      string
+	userType            string
+	identities          string
+	lastSignIn          string
+	externalID          string
+	userMemberAttribute string
+	userGuestAttribute  string
 }
 
 type ldapAttributeValues map[string][]string
@@ -124,17 +127,19 @@ func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger, inst
 		return nil, errors.New("invalid user attribute mappings")
 	}
 	uam := userAttributeMap{
-		displayName:    config.UserDisplayNameAttribute,
-		id:             config.UserIDAttribute,
-		mail:           config.UserEmailAttribute,
-		userName:       config.UserNameAttribute,
-		accountEnabled: config.UserEnabledAttribute,
-		givenName:      givenNameAttribute,
-		surname:        surNameAttribute,
-		userType:       config.UserTypeAttribute,
-		identities:     identitiesAttribute,
-		lastSignIn:     lastSignAttribute,
-		externalID:     config.ExternalIDAttribute,
+		displayName:         config.UserDisplayNameAttribute,
+		id:                  config.UserIDAttribute,
+		mail:                config.UserEmailAttribute,
+		userName:            config.UserNameAttribute,
+		accountEnabled:      config.UserEnabledAttribute,
+		givenName:           givenNameAttribute,
+		surname:             surNameAttribute,
+		userType:            config.UserTypeAttribute,
+		identities:          identitiesAttribute,
+		lastSignIn:          lastSignAttribute,
+		externalID:          config.ExternalIDAttribute,
+		userMemberAttribute: config.UserMemberAttribute,
+		userGuestAttribute:  config.UserGuestAttribute,
 	}
 
 	if config.GroupNameAttribute == "" || config.GroupIDAttribute == "" {
@@ -166,37 +171,53 @@ func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger, inst
 		return nil, fmt.Errorf("error configuring disable user mechanism: %w", err)
 	}
 
+	var crossInstanceReferenceTemplate *template.Template
+	if instanceID != "" {
+		crossInstanceReferenceTemplate, err = template.New("crossInstanceReferenceTemplate").Parse(config.CrossInstanceReferenceTemplate)
+		if err != nil {
+			return nil, fmt.Errorf("error parsing cross instance reference template: %w", err)
+		}
+	}
+
+	var instanceURLTemplate *template.Template
+	if instanceID != "" {
+		instanceURLTemplate, err = template.New("instanceURLTemplate").Parse(config.InstanceURLTemplate)
+		if err != nil {
+			return nil, fmt.Errorf("error parsing cross instance reference template: %w", err)
+		}
+	}
+
 	return &LDAP{
-		useServerUUID:               config.UseServerUUID,
-		usePwModifyExOp:             config.UsePasswordModExOp,
-		userBaseDN:                  config.UserBaseDN,
-		userFilter:                  config.UserFilter,
-		userObjectClass:             config.UserObjectClass,
-		userIDisOctetString:         config.UserIDIsOctetString,
-		userScope:                   userScope,
-		userAttributeMap:            uam,
-		groupBaseDN:                 config.GroupBaseDN,
-		groupCreateBaseDN:           config.GroupCreateBaseDN,
-		groupFilter:                 config.GroupFilter,
-		groupObjectClass:            config.GroupObjectClass,
-		groupIDisOctetString:        config.GroupIDIsOctetString,
-		groupScope:                  groupScope,
-		groupAttributeMap:           gam,
-		educationConfig:             educationConfig,
-		disableUserMechanism:        disableMechanismType,
-		localUserDisableGroupDN:     config.LdapDisabledUsersGroupDN,
-		logger:                      logger,
-		conn:                        lc,
-		writeEnabled:                config.WriteEnabled,
-		refintEnabled:               config.RefintEnabled,
-		useExternalID:               config.RequireExternalID,
-		userMemberAttribute:         config.UserMemberAttribute,
-		userGuestAttribute:          config.UserGuestAttribute,
-		preciseSearchAttribute:      config.PreciseSearchAttribute,
-		instanceMapperEnabled:       config.InstanceMapperEnabled,
-		instanceMapperBaseDN:        config.InstanceMapperBaseDN,
-		instanceMapperNameAttribute: config.InstanceMapperNameAttribute,
-		instanceMapperIDAttribute:   config.InstanceMapperIDAttribute,
+		useServerUUID:                  config.UseServerUUID,
+		usePwModifyExOp:                config.UsePasswordModExOp,
+		userBaseDN:                     config.UserBaseDN,
+		userFilter:                     config.UserFilter,
+		userObjectClass:                config.UserObjectClass,
+		userIDisOctetString:            config.UserIDIsOctetString,
+		userScope:                      userScope,
+		userAttributeMap:               uam,
+		groupBaseDN:                    config.GroupBaseDN,
+		groupCreateBaseDN:              config.GroupCreateBaseDN,
+		groupFilter:                    config.GroupFilter,
+		groupObjectClass:               config.GroupObjectClass,
+		groupIDisOctetString:           config.GroupIDIsOctetString,
+		groupScope:                     groupScope,
+		groupAttributeMap:              gam,
+		educationConfig:                educationConfig,
+		disableUserMechanism:           disableMechanismType,
+		localUserDisableGroupDN:        config.LdapDisabledUsersGroupDN,
+		logger:                         logger,
+		conn:                           lc,
+		writeEnabled:                   config.WriteEnabled,
+		refintEnabled:                  config.RefintEnabled,
+		useExternalID:                  config.RequireExternalID,
+		preciseSearchAttribute:         config.PreciseSearchAttribute,
+		instanceMapperEnabled:          config.InstanceMapperEnabled,
+		instanceMapperBaseDN:           config.InstanceMapperBaseDN,
+		instanceMapperNameAttribute:    config.InstanceMapperNameAttribute,
+		instanceMapperIDAttribute:      config.InstanceMapperIDAttribute,
+		crossInstanceReferenceTemplate: crossInstanceReferenceTemplate,
+		instanceURLTemplate:            instanceURLTemplate,
 	}, nil
 }
 
@@ -434,7 +455,7 @@ func (i *LDAP) AddUser(ctx context.Context, id string, instanceID string) (libre
 		return libregraph.User{}, err
 	}
 	mr := ldap.ModifyRequest{DN: e.DN}
-	mr.Add(i.userGuestAttribute, []string{instanceID})
+	mr.Add(i.userAttributeMap.userGuestAttribute, []string{instanceID})
 	if err := i.conn.Modify(&mr); err != nil {
 		i.logger.Error().Err(err).Str("userid", id).Str("instanceid", instanceID).Msg("error adding user")
 		return libregraph.User{}, err
@@ -581,7 +602,7 @@ func (i *LDAP) getPreciseLDAPUser(uniqueID string, instanceID string) (*ldap.Ent
 	uid := ldap.EscapeFilter(uniqueID)
 	filter := fmt.Sprintf("(%s=%s)", i.userAttributeMap.id, uid)
 	if iid := ldap.EscapeFilter(instanceID); iid != "" {
-		filter = fmt.Sprintf("(&(%s=%s)(|(%s=%s)(%s=%s)))", i.preciseSearchAttribute, uid, i.userMemberAttribute, iid, i.userGuestAttribute, iid)
+		filter = fmt.Sprintf("(&(%s=%s)(|(%s=%s)(%s=%s)))", i.preciseSearchAttribute, uid, i.userAttributeMap.userMemberAttribute, iid, i.userAttributeMap.userGuestAttribute, iid)
 	}
 	return i.getLDAPUserByFilter(filter, "") // no user filter for precise search
 }
@@ -917,49 +938,114 @@ func (i *LDAP) createUserModelFromLDAP(e *ldap.Entry) *libregraph.User {
 	}
 	surname := e.GetEqualFoldAttributeValue(i.userAttributeMap.surname)
 
-	if id != "" && opsan != "" {
-		user := &libregraph.User{
-			DisplayName:              e.GetEqualFoldAttributeValue(i.userAttributeMap.displayName),
-			Mail:                     pointerOrNil(e.GetEqualFoldAttributeValue(i.userAttributeMap.mail)),
-			OnPremisesSamAccountName: opsan,
-			Id:                       &id,
-			GivenName:                pointerOrNil(e.GetEqualFoldAttributeValue(i.userAttributeMap.givenName)),
-			Surname:                  &surname,
-			AccountEnabled:           booleanOrNil(e.GetEqualFoldAttributeValue(i.userAttributeMap.accountEnabled)),
-			ExternalID:               pointerOrNil(e.GetEqualFoldAttributeValue(i.userAttributeMap.externalID)),
-		}
+	if id == "" || opsan == "" {
+		i.logger.Warn().Str("dn", e.DN).Msg("Invalid User. Missing username or id attribute")
+		return nil
+	}
 
-		userType := e.GetEqualFoldAttributeValue(i.userAttributeMap.userType)
-		if userType == "" {
-			userType = UserTypeMember
-		}
-		user.SetUserType(userType)
-		var identities []libregraph.ObjectIdentity
-		for _, identityStr := range e.GetEqualFoldAttributeValues(i.userAttributeMap.identities) {
-			parts := strings.SplitN(identityStr, "$", 3)
-			identity := libregraph.NewObjectIdentity()
-			identity.SetIssuer(strings.TrimSpace(parts[1]))
-			identity.SetIssuerAssignedId(strings.TrimSpace(parts[2]))
-			identities = append(identities, *identity)
-		}
-		if len(identities) > 0 {
-			user.SetIdentities(identities)
-		}
+	user := &libregraph.User{
+		DisplayName:              e.GetEqualFoldAttributeValue(i.userAttributeMap.displayName),
+		Mail:                     pointerOrNil(e.GetEqualFoldAttributeValue(i.userAttributeMap.mail)),
+		OnPremisesSamAccountName: opsan,
+		Id:                       &id,
+		GivenName:                pointerOrNil(e.GetEqualFoldAttributeValue(i.userAttributeMap.givenName)),
+		Surname:                  &surname,
+		AccountEnabled:           booleanOrNil(e.GetEqualFoldAttributeValue(i.userAttributeMap.accountEnabled)),
+		ExternalID:               pointerOrNil(e.GetEqualFoldAttributeValue(i.userAttributeMap.externalID)),
+	}
 
-		lastSignIn, err := i.getLastSignTime(e)
-		switch {
-		case err == nil:
-			signinActivity := libregraph.SignInActivity{
-				LastSuccessfulSignInDateTime: lastSignIn,
-			}
-			user.SetSignInActivity(signinActivity)
-		case !errors.Is(err, errNotSet):
-			i.logger.Warn().Err(err).Str("dn", e.DN).Msg("Error getting last signin timestamp")
+	userType := e.GetEqualFoldAttributeValue(i.userAttributeMap.userType)
+	if userType == "" {
+		userType = UserTypeMember
+	}
+	user.SetUserType(userType)
+	var identities []libregraph.ObjectIdentity
+	for _, identityStr := range e.GetEqualFoldAttributeValues(i.userAttributeMap.identities) {
+		parts := strings.SplitN(identityStr, "$", 3)
+		identity := libregraph.NewObjectIdentity()
+		identity.SetIssuer(strings.TrimSpace(parts[1]))
+		identity.SetIssuerAssignedId(strings.TrimSpace(parts[2]))
+		identities = append(identities, *identity)
+	}
+	if len(identities) > 0 {
+		user.SetIdentities(identities)
+	}
+
+	lastSignIn, err := i.getLastSignTime(e)
+	switch {
+	case err == nil:
+		signinActivity := libregraph.SignInActivity{
+			LastSuccessfulSignInDateTime: lastSignIn,
 		}
+		user.SetSignInActivity(signinActivity)
+	case !errors.Is(err, errNotSet):
+		i.logger.Warn().Err(err).Str("dn", e.DN).Msg("Error getting last signin timestamp")
+	}
+
+	if i.instanceURLTemplate == nil || i.crossInstanceReferenceTemplate == nil {
 		return user
 	}
-	i.logger.Warn().Str("dn", e.DN).Msg("Invalid User. Missing username or id attribute")
-	return nil
+
+	for _, instance := range e.GetEqualFoldAttributeValues(i.userAttributeMap.userMemberAttribute) {
+		instanceName, err := i.getInstanceName(instance)
+		if err != nil {
+			i.logger.Warn().Err(err).Str("dn", e.DN).Msg("Error getting instance name")
+			continue
+		}
+
+		instanceURL := &strings.Builder{}
+		if err := i.instanceURLTemplate.Execute(instanceURL, map[string]string{
+			"Instancename": instanceName,
+		}); err != nil {
+			i.logger.Warn().Err(err).Str("dn", e.DN).Msg("Error executing instance URL template")
+			continue
+		}
+
+		isPrimary := true
+		user.Instances = append(user.Instances, libregraph.Instance{
+			Url:     pointerOrNil(instanceURL.String()),
+			Primary: &isPrimary,
+		})
+
+		if user.CrossInstanceReference != nil {
+			continue
+		}
+
+		crossInstanceReference := &strings.Builder{}
+		if err := i.crossInstanceReferenceTemplate.Execute(crossInstanceReference, map[string]string{
+			"Username":     user.GetOnPremisesSamAccountName(),
+			"Instancename": instanceName,
+		}); err != nil {
+			i.logger.Warn().Err(err).Str("dn", e.DN).Msg("Error executing cross instance reference template")
+			return user
+		}
+
+		user.CrossInstanceReference = pointerOrNil(crossInstanceReference.String())
+	}
+
+	for _, instance := range e.GetEqualFoldAttributeValues(i.userAttributeMap.userGuestAttribute) {
+		instanceName, err := i.getInstanceName(instance)
+		if err != nil {
+			i.logger.Warn().Err(err).Str("dn", e.DN).Msg("Error getting instance name")
+			continue
+		}
+
+		instanceURL := &strings.Builder{}
+		if err := i.instanceURLTemplate.Execute(instanceURL, map[string]string{
+			"Instancename": instanceName,
+		}); err != nil {
+			i.logger.Warn().Err(err).Str("dn", e.DN).Msg("Error executing instance URL template")
+			continue
+		}
+
+		isPrimary := false
+		user.Instances = append(user.Instances, libregraph.Instance{
+			Url:     pointerOrNil(instanceURL.String()),
+			Primary: &isPrimary,
+		})
+	}
+
+	return user
 }
 
 func (i *LDAP) userToLDAPAttrValues(user libregraph.User) (map[string][]string, error) {
@@ -1042,6 +1128,8 @@ func (i *LDAP) getUserAttrTypesForSearch() []string {
 		i.userAttributeMap.identities,
 		i.userAttributeMap.lastSignIn,
 		i.userAttributeMap.externalID,
+		i.userAttributeMap.userMemberAttribute,
+		i.userAttributeMap.userGuestAttribute,
 	}
 }
 
@@ -1429,39 +1517,47 @@ func (i *LDAP) oDataFilterToLDAPFilter(filter *godata.ParseNode) (string, error)
 	return fmt.Sprintf("(%s<=%s)", i.userAttributeMap.lastSignIn, ldap.EscapeFilter(ldapDateTime)), nil
 }
 
-func (i *LDAP) getInstanceID(instancename string) (string, error) {
-	if instancename == "" || !i.instanceMapperEnabled {
-		return instancename, nil
+func (i *LDAP) getInstance(searchValue, searchAttribute, resultAttribute string) (string, error) {
+	if searchValue == "" || !i.instanceMapperEnabled {
+		return searchValue, nil
 	}
 
 	searchRequest := ldap.NewSearchRequest(
 		i.instanceMapperBaseDN,
 		ldap.ScopeWholeSubtree,
 		ldap.NeverDerefAliases, 1, 0, false,
-		fmt.Sprintf("(%s=%s)", i.instanceMapperNameAttribute, instancename),
-		[]string{i.instanceMapperIDAttribute},
+		fmt.Sprintf("(%s=%s)", searchAttribute, searchValue),
+		[]string{resultAttribute},
 		nil,
 	)
 
 	res, err := i.conn.Search(searchRequest)
 	if err != nil {
-		i.logger.Error().Err(err).Str("backend", "ldap").Str("dn", i.instanceMapperBaseDN).Str("instancename", instancename).Str("attribute", i.instanceMapperIDAttribute).Msg("Search instance by name failed")
+		i.logger.Error().Err(err).Str("backend", "ldap").Str("dn", i.instanceMapperBaseDN).Str("searchValue", searchValue).Str("searchAttribute", searchAttribute).Str("resultAttribute", resultAttribute).Msg("Search instance failed")
 		return "", errorcode.New(errorcode.ItemNotFound, "instanceid search failed")
 	}
 	if len(res.Entries) == 0 {
 		// expected behaviour - we log debug in case something is fishy. This log can be removed when the feature proves stable
-		i.logger.Debug().Str("backend", "ldap").Str("dn", i.instanceMapperBaseDN).Str("instancename", instancename).Interface("result", res).Msg("Search instance by name empty")
+		i.logger.Debug().Str("backend", "ldap").Str("dn", i.instanceMapperBaseDN).Str("searchValue", searchValue).Interface("result", res).Msg("Search instance empty")
 		return "", ErrNotFound
 	}
 	if len(res.Entries) > 1 {
-		i.logger.Error().Str("backend", "ldap").Str("dn", i.instanceMapperBaseDN).Str("instancename", instancename).Interface("result", res).Msg("Search instance by name returned multiple responses.")
+		i.logger.Error().Str("backend", "ldap").Str("dn", i.instanceMapperBaseDN).Str("searchValue", searchValue).Interface("result", res).Msg("Search instance returned multiple responses.")
 		return "", errorcode.New(errorcode.ItemNotFound, "instanceid search returned multiple responses")
 	}
 	if len(res.Entries[0].Attributes) == 0 || len(res.Entries[0].Attributes[0].Values) == 0 {
-		i.logger.Error().Str("backend", "ldap").Str("dn", i.instanceMapperBaseDN).Str("instancename", instancename).Interface("result", res).Msg("Search instance by name returned malformed response")
+		i.logger.Error().Str("backend", "ldap").Str("dn", i.instanceMapperBaseDN).Str("searchValue", searchValue).Interface("result", res).Msg("Search instance returned malformed response")
 		return "", errorcode.New(errorcode.ItemNotFound, "instanceid search response malformed")
 	}
 	return res.Entries[0].Attributes[0].Values[0], nil
+}
+
+func (i *LDAP) getInstanceID(instancename string) (string, error) {
+	return i.getInstance(instancename, i.instanceMapperNameAttribute, i.instanceMapperIDAttribute)
+}
+
+func (i *LDAP) getInstanceName(instanceID string) (string, error) {
+	return i.getInstance(instanceID, i.instanceMapperIDAttribute, i.instanceMapperNameAttribute)
 }
 
 func isLastSuccessFullSignInDateTimeFilter(node *godata.ParseNode) bool {

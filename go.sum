@@ -738,8 +738,8 @@ github.com/opentracing/opentracing-go v1.2.0 h1:uEJPy/1a5RIPAJ0Ov+OIO8OxWu77jEv+
 github.com/opentracing/opentracing-go v1.2.0/go.mod h1:GxEUsuufX4nBwe+T+Wl9TAgYrxe9dPLANfrWvHYVTgc=
 github.com/orcaman/concurrent-map v1.0.0 h1:I/2A2XPCb4IuQWcQhBhSwGfiuybl/J0ev9HDbW65HOY=
 github.com/orcaman/concurrent-map v1.0.0/go.mod h1:Lu3tH6HLW3feq74c2GC+jIMS/K2CFcDWnWD9XkenwhI=
-github.com/owncloud/libre-graph-api-go v1.0.5-0.20251107084958-31937a4ea3f1 h1:uW3BUPdaAhti2aP8x3Vb79vzmqAgDaWZ0yrW+4ujjU8=
-github.com/owncloud/libre-graph-api-go v1.0.5-0.20251107084958-31937a4ea3f1/go.mod h1:z61VMGAJRtR1nbgXWiNoCkxUXP1B3Je9rMuJbnGd+Og=
+github.com/owncloud/libre-graph-api-go v1.0.5-0.20260116104114-10074a92be64 h1:z9djjzd+leAy6QZpi8dLy3OVjc/um+1XAGk1SJEvwE8=
+github.com/owncloud/libre-graph-api-go v1.0.5-0.20260116104114-10074a92be64/go.mod h1:z61VMGAJRtR1nbgXWiNoCkxUXP1B3Je9rMuJbnGd+Og=
 github.com/owncloud/reva/v2 v2.0.0-20260116122933-81e6e21256eb h1:G4YhVvtdJDEE0fhV0sWMUDpcpV5WqQNdfLw9xNMfkFI=
 github.com/owncloud/reva/v2 v2.0.0-20260116122933-81e6e21256eb/go.mod h1:nDBXQivlwd4Vf5UD/oDT0RakSXy0GJPI1LsyHMm5IpI=
 github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c h1:rp5dCmg/yLR3mgFuSOe4oEnDDmGLROTvMragMUXpTQw=

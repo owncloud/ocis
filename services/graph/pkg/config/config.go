@@ -95,13 +95,15 @@ type LDAP struct {
 	RequireExternalID         bool `yaml:"require_external_id" env:"GRAPH_LDAP_REQUIRE_EXTERNAL_ID" desc:"If enabled, the 'OCIS_LDAP_USER_SCHEMA_EXTERNAL_ID' is used as primary identifier for the provisioning API." introductionVersion:"8.0.0"`
 
 	// Multi-Instance Only
-	UserMemberAttribute         string `yaml:"user_member_attribute" env:"OCIS_LDAP_USER_MEMBER_ATTRIBUTE" desc:"LDAP Attribute to signal the user is member of an instance. Requires OCIS_MULTI_INSTANCE_ENABLED." introductionVersion:"8.0.0"`
-	UserGuestAttribute          string `yaml:"user_guest_attribute" env:"OCIS_LDAP_USER_GUEST_ATTRIBUTE" desc:"LDAP Attribute to signal the user is guest of an instance. Requires OCIS_MULTI_INSTANCE_ENABLED." introductionVersion:"8.0.0"`
-	PreciseSearchAttribute      string `yaml:"precise_search_attribute" env:"OCIS_LDAP_PRECISE_SEARCH_ATTRIBUTE" desc:"LDAP Attribute to be used for searching users on other instances. Requires OCIS_MULTI_INSTANCE_ENABLED." introductionVersion:"8.0.0"`
-	InstanceMapperEnabled       bool   `yaml:"instance_mapper_enabled" env:"OCIS_LDAP_INSTANCE_MAPPER_ENABLED" desc:"The InstanceMapper allows mapping instance names (user readable) to instance IDs (machine readable) based on an LDAP query. See other _INSTANCE_MAPPER_ env vars. Requires OCIS_MULTI_INSTANCE_ENABLED." introductionVersion:"8.0.0"`
-	InstanceMapperBaseDN        string `yaml:"instance_mapper_base_dn" env:"OCIS_LDAP_INSTANCE_MAPPER_BASE_DN" desc:"BaseDN of the 'instancename to instanceid' mapper in LDAP. Requires OCIS_MULTI_INSTANCE_ENABLED." introductionVersion:"8.0.0"`
-	InstanceMapperNameAttribute string `yaml:"instance_mapper_name_attribute" env:"OCIS_LDAP_INSTANCE_MAPPER_NAME_ATTRIBUTE" desc:"LDAP Attribute of the instance name. Requires OCIS_MULTI_INSTANCE_ENABLED." introductionVersion:"8.0.0"`
-	InstanceMapperIDAttribute   string `yaml:"instance_mapper_id_attribute" env:"OCIS_LDAP_INSTANCE_MAPPER_ID_ATTRIBUTE" desc:"LDAP Attribute of the instance ID. Requires OCIS_MULTI_INSTANCE_ENABLED." introductionVersion:"8.0.0"`
+	UserMemberAttribute            string `yaml:"user_member_attribute" env:"OCIS_LDAP_USER_MEMBER_ATTRIBUTE" desc:"LDAP Attribute to signal the user is member of an instance. Requires OCIS_MULTI_INSTANCE_ENABLED." introductionVersion:"8.0.0"`
+	UserGuestAttribute             string `yaml:"user_guest_attribute" env:"OCIS_LDAP_USER_GUEST_ATTRIBUTE" desc:"LDAP Attribute to signal the user is guest of an instance. Requires OCIS_MULTI_INSTANCE_ENABLED." introductionVersion:"8.0.0"`
+	PreciseSearchAttribute         string `yaml:"precise_search_attribute" env:"OCIS_LDAP_PRECISE_SEARCH_ATTRIBUTE" desc:"LDAP Attribute to be used for searching users on other instances. Requires OCIS_MULTI_INSTANCE_ENABLED." introductionVersion:"8.0.0"`
+	InstanceMapperEnabled          bool   `yaml:"instance_mapper_enabled" env:"OCIS_LDAP_INSTANCE_MAPPER_ENABLED" desc:"The InstanceMapper allows mapping instance names (user readable) to instance IDs (machine readable) based on an LDAP query. See other _INSTANCE_MAPPER_ env vars. Requires OCIS_MULTI_INSTANCE_ENABLED." introductionVersion:"8.0.0"`
+	InstanceMapperBaseDN           string `yaml:"instance_mapper_base_dn" env:"OCIS_LDAP_INSTANCE_MAPPER_BASE_DN" desc:"BaseDN of the 'instancename to instanceid' mapper in LDAP. Requires OCIS_MULTI_INSTANCE_ENABLED." introductionVersion:"8.0.0"`
+	InstanceMapperNameAttribute    string `yaml:"instance_mapper_name_attribute" env:"OCIS_LDAP_INSTANCE_MAPPER_NAME_ATTRIBUTE" desc:"LDAP Attribute of the instance name. Requires OCIS_MULTI_INSTANCE_ENABLED." introductionVersion:"8.0.0"`
+	InstanceMapperIDAttribute      string `yaml:"instance_mapper_id_attribute" env:"OCIS_LDAP_INSTANCE_MAPPER_ID_ATTRIBUTE" desc:"LDAP Attribute of the instance ID. Requires OCIS_MULTI_INSTANCE_ENABLED." introductionVersion:"8.0.0"`
+	CrossInstanceReferenceTemplate string `yaml:"cross_instance_reference_template" env:"OCIS_LDAP_CROSS_INSTANCE_REFERENCE_TEMPLATE" desc:"Template for the users unique reference across oCIS instances. Requires OCIS_MULTI_INSTANCE_ENABLED." introductionVersion:"8.0.0"`
+	InstanceURLTemplate            string `yaml:"instance_url_template" env:"OCIS_LDAP_INSTANCE_URL_TEMPLATE" desc:"Template for the instance URL. Requires OCIS_MULTI_INSTANCE_ENABLED." introductionVersion:"8.0.0"`
 }
 
 // LDAPEducationConfig represents the LDAP configuration for education related resources
