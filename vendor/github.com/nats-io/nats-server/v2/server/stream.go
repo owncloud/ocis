@@ -827,11 +827,19 @@ func (a *Account) addStreamWithAssignment(config *StreamConfig, fsConfig *FileSt
 			ipqLimitByLen[*inMsg](mlen),
 			ipqLimitBySize[*inMsg](msz),
 		),
-		gets: newIPQueue[*directGetReq](s, qpfx+"direct gets"),
-		qch:  make(chan struct{}),
-		mqch: make(chan struct{}),
-		uch:  make(chan struct{}, 4),
-		sch:  make(chan struct{}, 1),
+		gets:    newIPQueue[*directGetReq](s, qpfx+"direct gets"),
+		qch:     make(chan struct{}),
+		mqch:    make(chan struct{}),
+		uch:     make(chan struct{}, 4),
+		sch:     make(chan struct{}, 1),
+		created: time.Now().UTC(),
+	}
+
+	// Add created timestamp used for the store, must match that of the stream assignment if it exists.
+	if sa != nil {
+		js.mu.RLock()
+		mset.created = sa.Created
+		js.mu.RUnlock()
 	}
 
 	// Start our signaling routine to process consumers.
@@ -895,7 +903,6 @@ func (a *Account) addStreamWithAssignment(config *StreamConfig, fsConfig *FileSt
 		fsCfg.SyncAlways = false
 		fsCfg.AsyncFlush = true
 	}
-
 	if err := mset.setupStore(fsCfg); err != nil {
 		mset.stop(true, false)
 		return nil, NewJSStreamStoreFailedError(err)
@@ -2012,6 +2019,18 @@ func (s *Server) checkStreamCfg(config *StreamConfig, acc *Account, pedantic boo
 		}
 	}
 
+	// Check the subject transform if any
+	if cfg.SubjectTransform != nil {
+		if cfg.SubjectTransform.Source != _EMPTY_ && !IsValidSubject(cfg.SubjectTransform.Source) {
+			return StreamConfig{}, NewJSStreamTransformInvalidSourceError(fmt.Errorf("%w %s", ErrBadSubject, cfg.SubjectTransform.Source))
+		}
+
+		err := ValidateMapping(cfg.SubjectTransform.Source, cfg.SubjectTransform.Destination)
+		if err != nil {
+			return StreamConfig{}, NewJSStreamTransformInvalidDestinationError(err)
+		}
+	}
+
 	// If we have a republish directive check if we can create a transform here.
 	if cfg.RePublish != nil {
 		// Check to make sure source is a valid subset of the subjects we have.
@@ -2022,6 +2041,18 @@ func (s *Server) checkStreamCfg(config *StreamConfig, acc *Account, pedantic boo
 				return StreamConfig{}, NewJSPedanticError(fmt.Errorf("republish source can not be empty"))
 			}
 			cfg.RePublish.Source = fwcs
+		}
+		// A RePublish from '>' to '>' could be used, normally this would form a cycle with the stream subjects.
+		// But if this aligns to a different subject based on the transform, we allow it still.
+		// The RePublish will be implicit based on the transform, but only if the transform's source
+		// is the only stream subject.
+		if cfg.RePublish.Destination == fwcs && cfg.RePublish.Source == fwcs && cfg.SubjectTransform != nil &&
+			len(cfg.Subjects) == 1 && cfg.SubjectTransform.Source == cfg.Subjects[0] {
+			if pedantic {
+				return StreamConfig{}, NewJSPedanticError(fmt.Errorf("implicit republish based on subject transform"))
+			}
+			// RePublish all messages with the transformed subject.
+			cfg.RePublish.Source, cfg.RePublish.Destination = cfg.SubjectTransform.Destination, cfg.SubjectTransform.Destination
 		}
 		var formsCycle bool
 		for _, subj := range cfg.Subjects {
@@ -2035,18 +2066,6 @@ func (s *Server) checkStreamCfg(config *StreamConfig, acc *Account, pedantic boo
 		}
 		if _, err := NewSubjectTransform(cfg.RePublish.Source, cfg.RePublish.Destination); err != nil {
 			return StreamConfig{}, NewJSStreamInvalidConfigError(fmt.Errorf("stream configuration for republish with transform from '%s' to '%s' not valid", cfg.RePublish.Source, cfg.RePublish.Destination))
-		}
-	}
-
-	// Check the subject transform if any
-	if cfg.SubjectTransform != nil {
-		if cfg.SubjectTransform.Source != _EMPTY_ && !IsValidSubject(cfg.SubjectTransform.Source) {
-			return StreamConfig{}, NewJSStreamTransformInvalidSourceError(fmt.Errorf("%w %s", ErrBadSubject, cfg.SubjectTransform.Source))
-		}
-
-		err := ValidateMapping(cfg.SubjectTransform.Source, cfg.SubjectTransform.Destination)
-		if err != nil {
-			return StreamConfig{}, NewJSStreamTransformInvalidDestinationError(err)
 		}
 	}
 
@@ -4074,28 +4093,61 @@ func (mset *stream) setStartingSequenceForSources(iNames map[string]struct{}) {
 		return
 	}
 
+	// From the provided list of sources, we build a sublist that contains
+	// the interested filters (including transforms). As we figure out the
+	// starting sequence for each source, we will eliminate the source from
+	// the map and then refresh the sublist, which in turn makes the sublist
+	// ideally more specific. This allows LoadPrevMsgsMulti to work most
+	// effectively.
+	// Because this is a SimpleSublist we can't just remove the entries per
+	// source so we have no other option but to rebuild it from scratch, but
+	// this is cheap enough to do so not the end of the world.
+	var sl *gsl.SimpleSublist
+	refreshSublist := func() {
+		sl = gsl.NewSimpleSublist()
+		for iName := range iNames {
+			si := mset.sources[iName]
+			if si == nil {
+				continue
+			}
+			if si.sf == _EMPTY_ {
+				sl.Insert(fwcs, struct{}{})
+			} else {
+				sl.Insert(si.sf, struct{}{})
+			}
+			for _, sf := range si.sfs {
+				if sf == _EMPTY_ {
+					sl.Insert(fwcs, struct{}{})
+				} else {
+					sl.Insert(sf, struct{}{})
+				}
+			}
+		}
+	}
+	refreshSublist()
+
 	var smv StoreMsg
-	for seq := state.LastSeq; seq >= state.FirstSeq; {
-		sm, err := mset.store.LoadPrevMsg(seq, &smv)
+	for last := state.LastSeq; ; {
+		sm, seq, err := mset.store.LoadPrevMsgMulti(sl, last, &smv)
 		if err == ErrStoreEOF || err != nil {
 			break
 		}
-		seq = sm.seq - 1
+		last = seq - 1
 		if len(sm.hdr) == 0 {
 			continue
 		}
-
-		ss := getHeader(JSStreamSource, sm.hdr)
+		ss := sliceHeader(JSStreamSource, sm.hdr)
 		if len(ss) == 0 {
 			continue
 		}
-		streamName, indexName, sseq := streamAndSeq(bytesToString(ss))
 
+		streamName, indexName, sseq := streamAndSeq(bytesToString(ss))
 		if _, ok := iNames[indexName]; ok {
 			si := mset.sources[indexName]
 			si.sseq = sseq
 			si.dseq = 0
 			delete(iNames, indexName)
+			refreshSublist()
 		} else if indexName == _EMPTY_ && streamName != _EMPTY_ {
 			for iName := range iNames {
 				// TODO streamSource is a linear walk, to optimize later
@@ -4104,6 +4156,7 @@ func (mset *stream) setStartingSequenceForSources(iNames map[string]struct{}) {
 					si.sseq = sseq
 					si.dseq = 0
 					delete(iNames, iName)
+					refreshSublist()
 					break
 				}
 			}
@@ -4185,26 +4238,61 @@ func (mset *stream) startingSequenceForSources() {
 		}
 	}()
 
+	// Generate a list of sources and, from that, a sublist that contains
+	// the interested filters (including transforms). As we figure out the
+	// starting sequence for each source, we will eliminate the source from
+	// the map and then refresh the sublist, which in turn makes the sublist
+	// ideally more specific. This allows LoadPrevMsgsMulti to work most
+	// effectively.
+	// Because this is a SimpleSublist we can't just remove the entries per
+	// source so we have no other option but to rebuild it from scratch, but
+	// this is cheap enough to do so not the end of the world.
+	sources := map[string]*StreamSource{}
+	for _, src := range mset.cfg.Sources {
+		sources[src.composeIName()] = src
+	}
+	var sl *gsl.SimpleSublist
+	refreshSublist := func() {
+		sl = gsl.NewSimpleSublist()
+		for _, src := range sources {
+			if src.FilterSubject == _EMPTY_ {
+				sl.Insert(fwcs, struct{}{})
+			} else {
+				sl.Insert(src.FilterSubject, struct{}{})
+			}
+			for _, tr := range src.SubjectTransforms {
+				if tr.Destination == _EMPTY_ {
+					sl.Insert(fwcs, struct{}{})
+				} else {
+					sl.Insert(tr.Destination, struct{}{})
+				}
+			}
+		}
+	}
+	refreshSublist()
+
 	update := func(iName string, seq uint64) {
 		// Only update active in case we have older ones in here that got configured out.
 		if si := mset.sources[iName]; si != nil {
 			if _, ok := seqs[iName]; !ok {
 				seqs[iName] = seq
+				delete(sources, iName)
+				refreshSublist()
 			}
 		}
 	}
 
 	var smv StoreMsg
-	for seq := state.LastSeq; ; {
-		sm, err := mset.store.LoadPrevMsg(seq, &smv)
+	for last := state.LastSeq; ; {
+		sm, seq, err := mset.store.LoadPrevMsgMulti(sl, last, &smv)
 		if err == ErrStoreEOF || err != nil {
 			break
 		}
-		seq = sm.seq - 1
+		last = seq - 1
 		if len(sm.hdr) == 0 {
 			continue
 		}
-		ss := getHeader(JSStreamSource, sm.hdr)
+		ss := sliceHeader(JSStreamSource, sm.hdr)
 		if len(ss) == 0 {
 			continue
 		}
@@ -4534,8 +4622,6 @@ func (mset *stream) unsubscribe(sub *subscription) {
 
 func (mset *stream) setupStore(fsCfg *FileStoreConfig) error {
 	mset.mu.Lock()
-	mset.created = time.Now().UTC()
-
 	switch mset.cfg.Storage {
 	case MemoryStorage:
 		ms, err := newMemStore(&mset.cfg)
@@ -5196,7 +5282,10 @@ func (mset *stream) getDirectRequest(req *JSApiMsgGetRequest, reply string) {
 	} else {
 		// This is a batch request, capture initial numPending.
 		isBatchRequest = true
-		np, validThrough = store.NumPending(seq, req.NextFor, false)
+		var err error
+		if np, validThrough, err = store.NumPending(seq, req.NextFor, false); err != nil {
+			return
+		}
 	}
 
 	// Grab MaxBytes
@@ -5287,9 +5376,12 @@ func (mset *stream) getDirectRequest(req *JSApiMsgGetRequest, reply string) {
 
 	// If batch was requested send EOB.
 	if isBatchRequest {
-		// Update if the stream's lasts sequence has moved past our validThrough.
-		if mset.lastSeq() > validThrough {
-			np, _ = store.NumPending(seq, req.NextFor, false)
+		// Update if the stream's last sequence has moved past our validThrough.
+		if mset.lseq > validThrough {
+			var err error
+			if np, _, err = store.NumPending(seq, req.NextFor, false); err != nil {
+				return
+			}
 		}
 		hdr := fmt.Appendf(nil, eob, np, lseq)
 		mset.outq.send(newJSPubMsg(reply, _EMPTY_, _EMPTY_, hdr, nil, nil, 0))
@@ -6507,7 +6599,7 @@ func (mset *stream) processJetStreamBatchMsg(batchId, subject, reply string, hdr
 		}
 
 		// Reject unsupported headers.
-		if getExpectedLastMsgId(hdr) != _EMPTY_ {
+		if getExpectedLastMsgId(bhdr) != _EMPTY_ {
 			return errorOnUnsupported(seq, JSExpectedLastMsgId)
 		}
 
@@ -7172,6 +7264,20 @@ func (mset *stream) getPublicConsumers() []*consumer {
 	return obs
 }
 
+// This returns all consumers that are DIRECT.
+func (mset *stream) getDirectConsumers() []*consumer {
+	mset.clsMu.RLock()
+	defer mset.clsMu.RUnlock()
+
+	var obs []*consumer
+	for _, o := range mset.cList {
+		if o.cfg.Direct {
+			obs = append(obs, o)
+		}
+	}
+	return obs
+}
+
 // 2 minutes plus up to 30s jitter.
 const (
 	defaultCheckInterestStateT = 2 * time.Minute
@@ -7593,7 +7699,19 @@ func (mset *stream) ackMsg(o *consumer, seq uint64) bool {
 	// Only propose message deletion to the stream if we're consumer leader, otherwise all followers would also propose.
 	// We must be the consumer leader, since we know for sure we've stored the message and don't register as pre-ack.
 	if o != nil && !o.IsLeader() {
+		// Currently, interest-based streams can race on "no interest" because consumer creates/updates go over
+		// the meta layer and published messages go over the stream layer. Some servers could then either store
+		// or not store some initial set of messages that gained new interest. To get the stream back in sync,
+		// we allow moving the first sequence up.
+		// TODO(mvv): later on only the stream leader should determine "no interest"
+		interestRaiseFirst := mset.cfg.Retention == InterestPolicy && seq == state.FirstSeq
 		mset.mu.Unlock()
+		if interestRaiseFirst {
+			if _, err := store.RemoveMsg(seq); err == ErrStoreEOF {
+				// This should not happen, but being pedantic.
+				mset.registerPreAckLock(o, seq)
+			}
+		}
 		// Must still mark as removal if follower. If we become leader later, we must be able to retry the proposal.
 		return true
 	}
