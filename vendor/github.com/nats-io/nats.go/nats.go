@@ -48,7 +48,7 @@ import (
 
 // Default Constants
 const (
-	Version                   = "1.46.1"
+	Version                   = "1.48.0"
 	DefaultURL                = "nats://127.0.0.1:4222"
 	DefaultPort               = 4222
 	DefaultMaxReconnect       = 60
@@ -151,6 +151,7 @@ var (
 	ErrMaxAccountConnectionsExceeded = errors.New("nats: maximum account active connections exceeded")
 	ErrConnectionNotTLS              = errors.New("nats: connection is not tls")
 	ErrMaxSubscriptionsExceeded      = errors.New("nats: server maximum subscriptions exceeded")
+	ErrWebSocketHeadersAlreadySet    = errors.New("nats: websocket connection headers already set")
 )
 
 // GetDefaultOptions returns default configuration options for the client.
@@ -249,6 +250,9 @@ type UserInfoCB func() (string, string)
 // again. Note that this is invoked after the library tried the
 // whole list of URLs and failed to reconnect.
 type ReconnectDelayHandler func(attempts int) time.Duration
+
+// WebSocketHeadersHandler is an optional callback handler for generating token used for WebSocket connections.
+type WebSocketHeadersHandler func() (http.Header, error)
 
 // asyncCB is used to preserve order for async callbacks.
 type asyncCB struct {
@@ -524,6 +528,17 @@ type Options struct {
 	// from SubscribeSync if the server returns a permissions error for a subscription.
 	// Defaults to false.
 	PermissionErrOnSubscribe bool
+
+	// WebSocketConnectionHeaders is an optional http request headers to be sent with the WebSocket request.
+	WebSocketConnectionHeaders http.Header
+
+	// WebSocketConnectionHeadersHandler is an optional callback handler for generating token  used for WebSocket connections.
+	WebSocketConnectionHeadersHandler WebSocketHeadersHandler
+
+	// SkipSubjectValidation will disable publish subject validation.
+	// NOTE: This is not recommended in general, as the performance gain is minimal
+	// and may lead to breaking protocol.
+	SkipSubjectValidation bool
 }
 
 const (
@@ -1472,6 +1487,50 @@ func TLSHandshakeFirst() Option {
 	}
 }
 
+// WebSocketConnectionHeaders sets a fixed set of HTTP headers that will be
+// sent during the WebSocket connection handshake.
+// This option is mutually exclusive with WebSocketConnectionHeadersHandler;
+// if a headers handler has already been configured, it returns
+// ErrWebSocketHeadersAlreadySet.
+func WebSocketConnectionHeaders(headers http.Header) Option {
+	return func(o *Options) error {
+		if o.WebSocketConnectionHeadersHandler != nil {
+			return ErrWebSocketHeadersAlreadySet
+		}
+		o.WebSocketConnectionHeaders = headers
+		return nil
+	}
+}
+
+// WebSocketConnectionHeadersHandler registers a callback used to supply HTTP
+// headers for the WebSocket connection handshake.
+// This option is mutually exclusive with WebSocketConnectionHeaders; if
+// non-empty static headers have already been configured, it returns
+// ErrWebSocketHeadersAlreadySet.
+func WebSocketConnectionHeadersHandler(cb WebSocketHeadersHandler) Option {
+	return func(o *Options) error {
+		if len(o.WebSocketConnectionHeaders) != 0 {
+			return ErrWebSocketHeadersAlreadySet
+		}
+		o.WebSocketConnectionHeadersHandler = cb
+		return nil
+	}
+}
+
+// SkipSubjectValidation is an Option to skip subject validation when
+// publishing messages.
+// By default, subject validation is performed to ensure that subjects
+// are valid according to NATS subject syntax (no spaces newlines and tabs).
+// NOTE: It is not recommended to use this option as the performance gain
+// is minimal and disabling subject validation can lead breaking protocol
+// rules.
+func SkipSubjectValidation() Option {
+	return func(o *Options) error {
+		o.SkipSubjectValidation = true
+		return nil
+	}
+}
+
 // Handler processing
 
 // SetDisconnectHandler will set the disconnect event handler.
@@ -1671,8 +1730,10 @@ func (o Options) Connect() (*Conn, error) {
 		return nil, err
 	}
 
-	if connectionEstablished && nc.Opts.ConnectedCB != nil {
-		nc.ach.push(func() { nc.Opts.ConnectedCB(nc) })
+	if connectionEstablished {
+		if connectedCB := nc.Opts.ConnectedCB; connectedCB != nil {
+			nc.ach.push(func() { connectedCB(nc) })
+		}
 	}
 
 	return nc, nil
@@ -2747,8 +2808,10 @@ func (nc *Conn) sendConnect() error {
 	// Construct the CONNECT protocol string
 	cProto, err := nc.connectProto()
 	if err != nil {
-		if !nc.initc && nc.Opts.AsyncErrorCB != nil {
-			nc.ach.push(func() { nc.Opts.AsyncErrorCB(nc, nil, err) })
+		if !nc.initc {
+			if asyncErrorCB := nc.Opts.AsyncErrorCB; asyncErrorCB != nil {
+				nc.ach.push(func() { asyncErrorCB(nc, nil, err) })
+			}
 		}
 		return err
 	}
@@ -2764,8 +2827,10 @@ func (nc *Conn) sendConnect() error {
 	// reading byte-by-byte here is ok.
 	proto, err := nc.readProto()
 	if err != nil {
-		if !nc.initc && nc.Opts.AsyncErrorCB != nil {
-			nc.ach.push(func() { nc.Opts.AsyncErrorCB(nc, nil, err) })
+		if !nc.initc {
+			if asyncErrorCB := nc.Opts.AsyncErrorCB; asyncErrorCB != nil {
+				nc.ach.push(func() { asyncErrorCB(nc, nil, err) })
+			}
 		}
 		return err
 	}
@@ -2775,8 +2840,10 @@ func (nc *Conn) sendConnect() error {
 		// Read the rest now...
 		proto, err = nc.readProto()
 		if err != nil {
-			if !nc.initc && nc.Opts.AsyncErrorCB != nil {
-				nc.ach.push(func() { nc.Opts.AsyncErrorCB(nc, nil, err) })
+			if !nc.initc {
+				if asyncErrorCB := nc.Opts.AsyncErrorCB; asyncErrorCB != nil {
+					nc.ach.push(func() { asyncErrorCB(nc, nil, err) })
+				}
 			}
 			return err
 		}
@@ -2884,10 +2951,10 @@ func (nc *Conn) doReconnect(err error, forceReconnect bool) {
 	// Perform appropriate callback if needed for a disconnect.
 	// DisconnectedErrCB has priority over deprecated DisconnectedCB
 	if !nc.initc {
-		if nc.Opts.DisconnectedErrCB != nil {
-			nc.ach.push(func() { nc.Opts.DisconnectedErrCB(nc, err) })
-		} else if nc.Opts.DisconnectedCB != nil {
-			nc.ach.push(func() { nc.Opts.DisconnectedCB(nc) })
+		if disconnectedErrCB := nc.Opts.DisconnectedErrCB; disconnectedErrCB != nil {
+			nc.ach.push(func() { disconnectedErrCB(nc, err) })
+		} else if disconnectedCB := nc.Opts.DisconnectedCB; disconnectedCB != nil {
+			nc.ach.push(func() { disconnectedCB(nc) })
 		}
 	} else if nc.Opts.RetryOnFailedConnect && nc.initc && err != nil {
 		// For initial connection failure with RetryOnFailedConnect,
@@ -2996,8 +3063,8 @@ func (nc *Conn) doReconnect(err error, forceReconnect bool) {
 		// Continue to hold the lock
 		if err != nil {
 			// Perform appropriate callback for a failed connection attempt.
-			if nc.Opts.ReconnectErrCB != nil {
-				nc.ach.push(func() { nc.Opts.ReconnectErrCB(nc, err) })
+			if reconnectErrCB := nc.Opts.ReconnectErrCB; reconnectErrCB != nil {
+				nc.ach.push(func() { reconnectErrCB(nc, err) })
 			}
 			nc.err = nil
 			continue
@@ -3047,10 +3114,10 @@ func (nc *Conn) doReconnect(err error, forceReconnect bool) {
 		// Queue up the correct callback. If we are in initial connect state
 		// (using retry on failed connect), we will call the ConnectedCB,
 		// otherwise the ReconnectedCB.
-		if nc.Opts.ReconnectedCB != nil && !nc.initc {
-			nc.ach.push(func() { nc.Opts.ReconnectedCB(nc) })
-		} else if nc.Opts.ConnectedCB != nil && nc.initc {
-			nc.ach.push(func() { nc.Opts.ConnectedCB(nc) })
+		if reconnectedCB := nc.Opts.ReconnectedCB; reconnectedCB != nil && !nc.initc {
+			nc.ach.push(func() { reconnectedCB(nc) })
+		} else if connectedCB := nc.Opts.ConnectedCB; connectedCB != nil && nc.initc {
+			nc.ach.push(func() { connectedCB(nc) })
 		}
 
 		// If we are here with a retry on failed connect, indicate that the
@@ -3364,8 +3431,8 @@ func (nc *Conn) processMsg(data []byte) {
 			// We will pass the message through but send async error.
 			nc.mu.Lock()
 			nc.err = ErrBadHeaderMsg
-			if nc.Opts.AsyncErrorCB != nil {
-				nc.ach.push(func() { nc.Opts.AsyncErrorCB(nc, sub, ErrBadHeaderMsg) })
+			if asyncErrorCB := nc.Opts.AsyncErrorCB; asyncErrorCB != nil {
+				nc.ach.push(func() { asyncErrorCB(nc, sub, ErrBadHeaderMsg) })
 			}
 			nc.mu.Unlock()
 		}
@@ -3542,8 +3609,8 @@ slowConsumer:
 		// is already experiencing client-side slow consumer situation.
 		nc.mu.Lock()
 		nc.err = ErrSlowConsumer
-		if nc.Opts.AsyncErrorCB != nil {
-			nc.ach.push(func() { nc.Opts.AsyncErrorCB(nc, sub, ErrSlowConsumer) })
+		if asyncErrorCB := nc.Opts.AsyncErrorCB; asyncErrorCB != nil {
+			nc.ach.push(func() { asyncErrorCB(nc, sub, ErrSlowConsumer) })
 		}
 		nc.mu.Unlock()
 	} else {
@@ -3586,8 +3653,8 @@ func (nc *Conn) processTransientError(err error) {
 			}
 		}
 	}
-	if nc.Opts.AsyncErrorCB != nil {
-		nc.ach.push(func() { nc.Opts.AsyncErrorCB(nc, nil, err) })
+	if asyncErrorCB := nc.Opts.AsyncErrorCB; asyncErrorCB != nil {
+		nc.ach.push(func() { asyncErrorCB(nc, nil, err) })
 	}
 	nc.mu.Unlock()
 }
@@ -3599,8 +3666,10 @@ func (nc *Conn) processTransientError(err error) {
 // Connection lock is held on entry
 func (nc *Conn) processAuthError(err error) bool {
 	nc.err = err
-	if !nc.initc && nc.Opts.AsyncErrorCB != nil {
-		nc.ach.push(func() { nc.Opts.AsyncErrorCB(nc, nil, err) })
+	if !nc.initc {
+		if asyncErrorCB := nc.Opts.AsyncErrorCB; asyncErrorCB != nil {
+			nc.ach.push(func() { asyncErrorCB(nc, nil, err) })
+		}
 	}
 	// We should give up if we tried twice on this server and got the
 	// same error. This behavior can be modified using IgnoreAuthErrorAbort.
@@ -3645,8 +3714,8 @@ func (nc *Conn) flusher() {
 				if nc.err == nil {
 					nc.err = err
 				}
-				if nc.Opts.AsyncErrorCB != nil {
-					nc.ach.push(func() { nc.Opts.AsyncErrorCB(nc, nil, err) })
+				if asyncErrorCB := nc.Opts.AsyncErrorCB; asyncErrorCB != nil {
+					nc.ach.push(func() { asyncErrorCB(nc, nil, err) })
 				}
 			}
 		}
@@ -3760,12 +3829,16 @@ func (nc *Conn) processInfo(info string) error {
 		if !nc.Opts.NoRandomize {
 			nc.shufflePool(1)
 		}
-		if !nc.initc && nc.Opts.DiscoveredServersCB != nil {
-			nc.ach.push(func() { nc.Opts.DiscoveredServersCB(nc) })
+		if !nc.initc {
+			if discoveredServersCB := nc.Opts.DiscoveredServersCB; discoveredServersCB != nil {
+				nc.ach.push(func() { discoveredServersCB(nc) })
+			}
 		}
 	}
-	if !nc.initc && ncInfo.LameDuckMode && nc.Opts.LameDuckModeHandler != nil {
-		nc.ach.push(func() { nc.Opts.LameDuckModeHandler(nc) })
+	if !nc.initc && ncInfo.LameDuckMode {
+		if lameDuckModeHandler := nc.Opts.LameDuckModeHandler; lameDuckModeHandler != nil {
+			nc.ach.push(func() { lameDuckModeHandler(nc) })
+		}
 	}
 	return nil
 }
@@ -3862,7 +3935,7 @@ func (nc *Conn) kickFlusher() {
 // argument is left untouched and needs to be correctly interpreted on
 // the receiver.
 func (nc *Conn) Publish(subj string, data []byte) error {
-	return nc.publish(subj, _EMPTY_, nil, data)
+	return nc.publish(subj, _EMPTY_, false, nil, data)
 }
 
 // Header represents the optional Header for a NATS message,
@@ -4005,27 +4078,71 @@ func (nc *Conn) PublishMsg(m *Msg) error {
 	if err != nil {
 		return err
 	}
-	return nc.publish(m.Subject, m.Reply, hdr, m.Data)
+	validateReply := m.Reply != _EMPTY_
+	return nc.publish(m.Subject, m.Reply, validateReply, hdr, m.Data)
 }
 
 // PublishRequest will perform a Publish() expecting a response on the
 // reply subject. Use Request() for automatically waiting for a response
 // inline.
 func (nc *Conn) PublishRequest(subj, reply string, data []byte) error {
-	return nc.publish(subj, reply, nil, data)
+	return nc.publish(subj, reply, true, nil, data)
 }
 
 // Used for handrolled Itoa
 const digits = "0123456789"
 
+// validateSubject checks if the subject contains characters that break the NATS protocol.
+// Uses an adaptive algorithm: manual loop for short subjects (< 16 chars) and
+// SIMD-optimized strings.IndexByte for longer subjects.
+func validateSubject(subj string) error {
+	if subj == "" {
+		return ErrBadSubject
+	}
+
+	// Adaptive threshold based on benchmark data showing crossover at ~15-20 characters.
+	const lengthThreshold = 16
+
+	if len(subj) < lengthThreshold {
+		// Fast path for short subjects (< 16 chars)
+		// Short-circuit on non-control characters.
+		for i := range len(subj) {
+			c := subj[i]
+			if c <= ' ' && (c == ' ' || c == '\t' || c == '\r' || c == '\n') {
+				return ErrBadSubject
+			}
+		}
+		return nil
+	}
+
+	// Optimized path for long subjects (>= 16 chars)
+	// Uses SIMD-optimized strings.IndexByte (processes 16+ bytes per instruction)
+	if strings.IndexByte(subj, ' ') >= 0 ||
+		strings.IndexByte(subj, '\t') >= 0 ||
+		strings.IndexByte(subj, '\r') >= 0 ||
+		strings.IndexByte(subj, '\n') >= 0 {
+		return ErrBadSubject
+	}
+	return nil
+}
+
 // publish is the internal function to publish messages to a nats-server.
 // Sends a protocol data message by queuing into the bufio writer
 // and kicking the flush go routine. These writes should be protected.
-func (nc *Conn) publish(subj, reply string, hdr, data []byte) error {
+func (nc *Conn) publish(subj, reply string, validateReply bool, hdr, data []byte) error {
 	if nc == nil {
 		return ErrInvalidConnection
 	}
-	if subj == "" {
+	if !nc.Opts.SkipSubjectValidation {
+		if err := validateSubject(subj); err != nil {
+			return err
+		}
+		if validateReply {
+			if err := validateSubject(reply); err != nil {
+				return ErrBadSubject
+			}
+		}
+	} else if subj == _EMPTY_ {
 		return ErrBadSubject
 	}
 	nc.mu.Lock()
@@ -4191,7 +4308,7 @@ func (nc *Conn) createNewRequestAndSend(subj string, hdr, data []byte) (chan *Ms
 	}
 	nc.mu.Unlock()
 
-	if err := nc.publish(subj, respInbox, hdr, data); err != nil {
+	if err := nc.publish(subj, respInbox, false, hdr, data); err != nil {
 		return nil, token, err
 	}
 
@@ -4287,7 +4404,7 @@ func (nc *Conn) oldRequest(subj string, hdr, data []byte, timeout time.Duration)
 	s.AutoUnsubscribe(1)
 	defer s.Unsubscribe()
 
-	err = nc.publish(subj, inbox, hdr, data)
+	err = nc.publish(subj, inbox, false, hdr, data)
 	if err != nil {
 		return nil, err
 	}
@@ -5607,8 +5724,8 @@ func (nc *Conn) close(status Status, doCBs bool, err error) {
 				nc.ach.push(func() { disconnectedCB(nc) })
 			}
 		}
-		if nc.Opts.ClosedCB != nil {
-			nc.ach.push(func() { nc.Opts.ClosedCB(nc) })
+		if closedCB := nc.Opts.ClosedCB; closedCB != nil {
+			nc.ach.push(func() { closedCB(nc) })
 		}
 	}
 	// If this is terminal, then we have to notify the asyncCB handler that

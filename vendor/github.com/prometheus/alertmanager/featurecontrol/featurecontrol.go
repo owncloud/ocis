@@ -113,7 +113,7 @@ func NewFlags(logger *slog.Logger, features string) (Flagger, error) {
 		return NoopFlags{}, nil
 	}
 
-	for _, feature := range strings.Split(features, ",") {
+	for feature := range strings.SplitSeq(features, ",") {
 		switch feature {
 		case FeatureReceiverNameInMetrics:
 			opts = append(opts, enableReceiverNameInMetrics())
@@ -131,7 +131,7 @@ func NewFlags(logger *slog.Logger, features string) (Flagger, error) {
 			opts = append(opts, enableAutoGOMAXPROCS())
 			logger.Warn("Automatically set GOMAXPROCS to match Linux container CPU quota")
 		default:
-			return nil, fmt.Errorf("Unknown option '%s' for --enable-feature", feature)
+			return nil, fmt.Errorf("unknown option '%s' for --enable-feature", feature)
 		}
 	}
 

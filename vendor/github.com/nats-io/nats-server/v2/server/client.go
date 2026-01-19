@@ -237,6 +237,26 @@ const (
 	pmrMsgImportedFromService
 )
 
+type WriteTimeoutPolicy uint8
+
+const (
+	WriteTimeoutPolicyDefault = iota
+	WriteTimeoutPolicyClose
+	WriteTimeoutPolicyRetry
+)
+
+// String returns a human-friendly value. Only used in varz.
+func (p WriteTimeoutPolicy) String() string {
+	switch p {
+	case WriteTimeoutPolicyClose:
+		return "close"
+	case WriteTimeoutPolicyRetry:
+		return "retry"
+	default:
+		return _EMPTY_
+	}
+}
+
 type client struct {
 	// Here first because of use of atomics, and memory alignment.
 	stats
@@ -328,15 +348,16 @@ type pinfo struct {
 
 // outbound holds pending data for a socket.
 type outbound struct {
-	nb  net.Buffers   // Pending buffers for send, each has fixed capacity as per nbPool below.
-	wnb net.Buffers   // Working copy of "nb", reused on each flushOutbound call, partial writes may leave entries here for next iteration.
-	pb  int64         // Total pending/queued bytes.
-	fsp int32         // Flush signals that are pending per producer from readLoop's pcd.
-	sg  *sync.Cond    // To signal writeLoop that there is data to flush.
-	wdl time.Duration // Snapshot of write deadline.
-	mp  int64         // Snapshot of max pending for client.
-	lft time.Duration // Last flush time for Write.
-	stc chan struct{} // Stall chan we create to slow down producers on overrun, e.g. fan-in.
+	nb  net.Buffers        // Pending buffers for send, each has fixed capacity as per nbPool below.
+	wnb net.Buffers        // Working copy of "nb", reused on each flushOutbound call, partial writes may leave entries here for next iteration.
+	pb  int64              // Total pending/queued bytes.
+	fsp int32              // Flush signals that are pending per producer from readLoop's pcd.
+	wtp WriteTimeoutPolicy // What do we do on a write timeout?
+	sg  *sync.Cond         // To signal writeLoop that there is data to flush.
+	wdl time.Duration      // Snapshot of write deadline.
+	mp  int64              // Snapshot of max pending for client.
+	lft time.Duration      // Last flush time for Write.
+	stc chan struct{}      // Stall chan we create to slow down producers on overrun, e.g. fan-in.
 	cw  *s2.Writer
 }
 
@@ -697,6 +718,24 @@ func (c *client) initClient() {
 		c.out.wdl = opts.Gateway.WriteDeadline
 	case c.kind == LEAF && opts.LeafNode.WriteDeadline > 0:
 		c.out.wdl = opts.LeafNode.WriteDeadline
+	}
+	switch c.kind {
+	case ROUTER:
+		if c.out.wtp = opts.Cluster.WriteTimeout; c.out.wtp == WriteTimeoutPolicyDefault {
+			c.out.wtp = WriteTimeoutPolicyRetry
+		}
+	case LEAF:
+		if c.out.wtp = opts.LeafNode.WriteTimeout; c.out.wtp == WriteTimeoutPolicyDefault {
+			c.out.wtp = WriteTimeoutPolicyRetry
+		}
+	case GATEWAY:
+		if c.out.wtp = opts.Gateway.WriteTimeout; c.out.wtp == WriteTimeoutPolicyDefault {
+			c.out.wtp = WriteTimeoutPolicyRetry
+		}
+	default:
+		if c.out.wtp = opts.WriteTimeout; c.out.wtp == WriteTimeoutPolicyDefault {
+			c.out.wtp = WriteTimeoutPolicyClose
+		}
 	}
 	c.out.mp = opts.MaxPending
 	// Snapshot max control line since currently can not be changed on reload and we
@@ -1849,7 +1888,7 @@ func (c *client) handleWriteTimeout(written, attempted int64, numChunks int) boo
 		scState, c.out.wdl, numChunks, attempted)
 
 	// We always close CLIENT connections, or when nothing was written at all...
-	if c.kind == CLIENT || written == 0 {
+	if c.out.wtp == WriteTimeoutPolicyClose || written == 0 {
 		c.markConnAsClosed(SlowConsumerWriteDeadline)
 		return true
 	} else {
@@ -2548,9 +2587,11 @@ func (c *client) sendPing() {
 // Generates the INFO to be sent to the client with the client ID included.
 // info arg will be copied since passed by value.
 // Assume lock is held.
-func (c *client) generateClientInfoJSON(info Info) []byte {
+func (c *client) generateClientInfoJSON(info Info, includeClientIP bool) []byte {
 	info.CID = c.cid
-	info.ClientIP = c.host
+	if includeClientIP {
+		info.ClientIP = c.host
+	}
 	info.MaxPayload = c.mpay
 	if c.isWebsocket() {
 		info.ClientConnectURLs = info.WSConnectURLs
@@ -2631,7 +2672,7 @@ func (c *client) processPing() {
 		info.RemoteAccount = c.acc.Name
 		info.IsSystemAccount = c.acc == srv.SystemAccount()
 		info.ConnectInfo = true
-		c.enqueueProto(c.generateClientInfoJSON(info))
+		c.enqueueProto(c.generateClientInfoJSON(info, true))
 		c.mu.Unlock()
 		srv.mu.Unlock()
 	}
@@ -2981,7 +3022,7 @@ func (c *client) processSubEx(subject, queue, bsid []byte, cb msgHandler, noForw
 		return sub, nil
 	}
 
-	if err := c.addShadowSubscriptions(acc, sub, true); err != nil {
+	if err := c.addShadowSubscriptions(acc, sub); err != nil {
 		c.Errorf(err.Error())
 	}
 
@@ -3011,10 +3052,7 @@ type ime struct {
 // If the client's account has stream imports and there are matches for this
 // subscription's subject, then add shadow subscriptions in the other accounts
 // that export this subject.
-//
-// enact=false allows MQTT clients to get the list of shadow subscriptions
-// without enacting them, in order to first obtain matching "retained" messages.
-func (c *client) addShadowSubscriptions(acc *Account, sub *subscription, enact bool) error {
+func (c *client) addShadowSubscriptions(acc *Account, sub *subscription) error {
 	if acc == nil {
 		return ErrMissingAccount
 	}
@@ -3117,7 +3155,7 @@ func (c *client) addShadowSubscriptions(acc *Account, sub *subscription, enact b
 	for i := 0; i < len(ims); i++ {
 		ime := &ims[i]
 		// We will create a shadow subscription.
-		nsub, err := c.addShadowSub(sub, ime, enact)
+		nsub, err := c.addShadowSub(sub, ime)
 		if err != nil {
 			return err
 		}
@@ -3134,7 +3172,7 @@ func (c *client) addShadowSubscriptions(acc *Account, sub *subscription, enact b
 }
 
 // Add in the shadow subscription.
-func (c *client) addShadowSub(sub *subscription, ime *ime, enact bool) (*subscription, error) {
+func (c *client) addShadowSub(sub *subscription, ime *ime) (*subscription, error) {
 	c.mu.Lock()
 	nsub := *sub // copy
 	c.mu.Unlock()
@@ -3161,10 +3199,6 @@ func (c *client) addShadowSub(sub *subscription, ime *ime, enact bool) (*subscri
 		}
 	}
 	// Else use original subject
-
-	if !enact {
-		return &nsub, nil
-	}
 
 	c.Debugf("Creating import subscription on %q from account %q", nsub.subject, im.acc.Name)
 
@@ -3196,7 +3230,7 @@ func (c *client) canSubscribe(subject string, optQueue ...string) bool {
 		return true
 	}
 
-	allowed := true
+	allowed, checkAllow := true, true
 
 	// Optional queue group.
 	var queue string
@@ -3204,8 +3238,14 @@ func (c *client) canSubscribe(subject string, optQueue ...string) bool {
 		queue = optQueue[0]
 	}
 
+	// For CLIENT connections that are MQTT, or other types of connections, we will
+	// implicitly allow anything that starts with the "$MQTT." prefix. However,
+	// we don't just return here, we skip the check for "allow" but will check "deny".
+	if (c.isMqtt() || (c.kind != CLIENT)) && strings.HasPrefix(subject, mqttPrefix) {
+		checkAllow = false
+	}
 	// Check allow list. If no allow list that means all are allowed. Deny can overrule.
-	if c.perms.sub.allow != nil {
+	if checkAllow && c.perms.sub.allow != nil {
 		r := c.perms.sub.allow.Match(subject)
 		allowed = len(r.psubs) > 0
 		if queue != _EMPTY_ && len(r.qsubs) > 0 {
@@ -4022,9 +4062,15 @@ func (c *client) pubAllowedFullCheck(subject string, fullCheck, hasLock bool) bo
 	if ok {
 		return v.(bool)
 	}
-	allowed := true
+	allowed, checkAllow := true, true
+	// For CLIENT connections that are MQTT, or other types of connections, we will
+	// implicitly allow anything that starts with the "$MQTT." prefix. However,
+	// we don't just return here, we skip the check for "allow" but will check "deny".
+	if (c.isMqtt() || c.kind != CLIENT) && strings.HasPrefix(subject, mqttPrefix) {
+		checkAllow = false
+	}
 	// Cache miss, check allow then deny as needed.
-	if c.perms.pub.allow != nil {
+	if checkAllow && c.perms.pub.allow != nil {
 		np, _ := c.perms.pub.allow.NumInterest(subject)
 		allowed = np != 0
 	}
@@ -4345,7 +4391,7 @@ func (c *client) setupResponseServiceImport(acc *Account, si *serviceImport, tra
 
 // Will remove a header if present.
 func removeHeaderIfPresent(hdr []byte, key string) []byte {
-	start := bytes.Index(hdr, []byte(key+":"))
+	start := getHeaderKeyIndex(key, hdr)
 	// key can't be first and we want to check that it is preceded by a '\n'
 	if start < 1 || hdr[start-1] != '\n' {
 		return hdr
@@ -4463,22 +4509,13 @@ func sliceHeader(key string, hdr []byte) []byte {
 	if len(hdr) == 0 {
 		return nil
 	}
-	index := bytes.Index(hdr, stringToBytes(key+":"))
-	hdrLen := len(hdr)
-	// Check that we have enough characters, this will handle the -1 case of the key not
-	// being found and will also handle not having enough characters for trailing CRLF.
-	if index < 2 {
+	index := getHeaderKeyIndex(key, hdr)
+	if index == -1 {
 		return nil
 	}
-	// There should be a terminating CRLF.
-	if index >= hdrLen-1 || hdr[index-1] != '\n' || hdr[index-2] != '\r' {
-		return nil
-	}
-	// The key should be immediately followed by a : separator.
+	// Skip over the key and the : separator.
 	index += len(key) + 1
-	if index >= hdrLen || hdr[index-1] != ':' {
-		return nil
-	}
+	hdrLen := len(hdr)
 	// Skip over whitespace before the value.
 	for index < hdrLen && hdr[index] == ' ' {
 		index++
@@ -4494,11 +4531,49 @@ func sliceHeader(key string, hdr []byte) []byte {
 	return hdr[start:index:index]
 }
 
+// getHeaderKeyIndex returns an index into the header slice for the given key.
+// Returns -1 if not found.
+func getHeaderKeyIndex(key string, hdr []byte) int {
+	if len(hdr) == 0 {
+		return -1
+	}
+	bkey := stringToBytes(key)
+	keyLen, hdrLen := len(key), len(hdr)
+	var offset int
+	for {
+		index := bytes.Index(hdr[offset:], bkey)
+		// Check that we have enough characters, this will handle the -1 case of the key not
+		// being found and will also handle not having enough characters for trailing CRLF.
+		if index < 2 {
+			return -1
+		}
+		index += offset
+		// There should be a terminating CRLF.
+		if index >= hdrLen-1 || hdr[index-1] != '\n' || hdr[index-2] != '\r' {
+			offset = index + keyLen
+			continue
+		}
+		// The key should be immediately followed by a : separator.
+		if index+keyLen >= hdrLen {
+			return -1
+		}
+		if hdr[index+keyLen] != ':' {
+			offset = index + keyLen
+			continue
+		}
+		return index
+	}
+}
+
 func setHeader(key, val string, hdr []byte) []byte {
-	prefix := []byte(key + ": ")
-	start := bytes.Index(hdr, prefix)
+	start := getHeaderKeyIndex(key, hdr)
 	if start >= 0 {
-		valStart := start + len(prefix)
+		valStart := start + len(key) + 1
+		// Preserve single whitespace if used.
+		hdrLen := len(hdr)
+		if valStart < hdrLen && hdr[valStart] == ' ' {
+			valStart++
+		}
 		valEnd := bytes.Index(hdr[valStart:], []byte("\r"))
 		if valEnd < 0 {
 			return hdr // malformed headers
@@ -5271,8 +5346,10 @@ sendToRoutesOrLeafs:
 	// If we do have a deliver subject we need to do something with it.
 	// Again this is when JetStream (but possibly others) wants the system
 	// to rewrite the delivered subject. The way we will do that is place it
-	// at the end of the reply subject if it exists.
-	if len(deliver) > 0 && len(reply) > 0 {
+	// at the end of the reply subject if it exists. But only if this wasn't
+	// already performed, otherwise we'd end up with a duplicate '@' suffix
+	// resulting in a protocol error.
+	if len(deliver) > 0 && len(reply) > 0 && !remapped {
 		reply = append(reply, '@')
 		reply = append(reply, deliver...)
 	}
@@ -5431,6 +5508,9 @@ func (c *client) processPingTimer() {
 	if c.kind == ROUTER && opts.Cluster.PingInterval > 0 {
 		pingInterval = opts.Cluster.PingInterval
 	}
+	if c.isWebsocket() && opts.Websocket.PingInterval > 0 {
+		pingInterval = opts.Websocket.PingInterval
+	}
 	pingInterval = adjustPingInterval(c.kind, pingInterval)
 	now := time.Now()
 	needRTT := c.rtt == 0 || now.Sub(c.rttStart) > DEFAULT_RTT_MEASUREMENT_INTERVAL
@@ -5512,6 +5592,9 @@ func (c *client) setPingTimer() {
 	d := opts.PingInterval
 	if c.kind == ROUTER && opts.Cluster.PingInterval > 0 {
 		d = opts.Cluster.PingInterval
+	}
+	if c.isWebsocket() && opts.Websocket.PingInterval > 0 {
+		d = opts.Websocket.PingInterval
 	}
 	d = adjustPingInterval(c.kind, d)
 	c.ping.tmr = time.AfterFunc(d, c.processPingTimer)
@@ -5718,7 +5801,7 @@ func (c *client) processSubsOnConfigReload(awcsti map[string]struct{}) {
 		oldShadows := sub.shadow
 		sub.shadow = nil
 		c.mu.Unlock()
-		c.addShadowSubscriptions(acc, sub, true)
+		c.addShadowSubscriptions(acc, sub)
 		for _, nsub := range oldShadows {
 			nsub.im.acc.sl.Remove(nsub)
 		}
@@ -5766,7 +5849,8 @@ func (c *client) closeConnection(reason ClosedState) {
 	}
 
 	// If we are shutting down, no need to do all the accounting on subs, etc.
-	if reason == ServerShutdown {
+	// During LDM we'll still do the accounting, otherwise account limits could close others after this reconnects.
+	if reason == ServerShutdown && c.srv.isShuttingDown() {
 		s := c.srv
 		c.mu.Unlock()
 		if s != nil {
@@ -6545,6 +6629,9 @@ func (c *client) setFirstPingTimer() {
 
 	if c.kind == ROUTER && opts.Cluster.PingInterval > 0 {
 		d = opts.Cluster.PingInterval
+	}
+	if c.isWebsocket() && opts.Websocket.PingInterval > 0 {
+		d = opts.Websocket.PingInterval
 	}
 	if !opts.DisableShortFirstPing {
 		if c.kind != CLIENT {
