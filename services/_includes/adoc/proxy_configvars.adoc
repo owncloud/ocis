@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2026-01-19-03-27-14]
+[#deprecation-note-2026-01-19-09-17-05]
 [caption=]
 .Deprecation notes for the proxy service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -225,6 +225,17 @@ a| [subs=-attributes]
 ++true ++
 a| [subs=-attributes]
 Enable/Disable HTTPS for external HTTP services. Must be set to 'true' if the built-in IDP service an no reverse proxy is used. See the text description for details.
+
+a|`PROXY_FORCE_STRICT_TRANSPORT_SECURITY` +
+
+a| [subs=-attributes]
+++Curie ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Force emission of the Strict-Transport-Security header on all responses, including plain HTTP requests. See also: PROXY_TLS
 
 a|`OCIS_REVA_GATEWAY` +
 
