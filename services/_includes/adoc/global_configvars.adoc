@@ -46,7 +46,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-ID of the user that should receive admin privileges. Consider that the UUID can be encoded in some LDAP deployment configurations like in .ldif files. These need to be decoded beforehand.
+ID of the user who collects all necessary information for deletion. Consider that the UUID can be encoded in some LDAP deployment configurations like in .ldif files. These need to be decoded beforehand.
 a| `OCIS_ASYNC_UPLOADS`
 
 a| [subs=-attributes]
@@ -639,7 +639,7 @@ The address of the event system. The event system is the message queuing service
 a| `OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE`
 
 a| [subs=-attributes]
-++pre5.0 ++
+++5.0 ++
 
 a| [subs=attributes+]
 * xref:{s-path}/activitylog.adoc[activitylog] +
@@ -666,11 +666,11 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The root CA certificate used to validate the server's TLS certificate. If provided GRAPH_EVENTS_TLS_INSECURE will be seen as false.
+The root CA certificate used to validate the server's TLS certificate. If provided NOTIFICATIONS_EVENTS_TLS_INSECURE will be seen as false.
 a| `OCIS_GATEWAY_GRPC_ADDR`
 
 a| [subs=-attributes]
-++pre5.0 ++
+++5.0 ++
 
 a| [subs=attributes+]
 * xref:{s-path}/gateway.adoc[gateway] +
@@ -683,7 +683,7 @@ a| [subs=-attributes]
 ++127.0.0.1:9142 ++
 
 a| [subs=-attributes]
-The bind address of the GRPC service.
+The bind address of the gateway GRPC address.
 a| `OCIS_GRPC_CLIENT_TLS_CACERT`
 
 a| [subs=-attributes]
@@ -791,7 +791,7 @@ a| [subs=-attributes]
 ++tcp ++
 
 a| [subs=-attributes]
-The transport protocol of the GRPC service.
+The transport protocol of the GPRC service.
 a| `OCIS_HTTP_TLS_CERTIFICATE`
 
 a| [subs=-attributes]
@@ -879,7 +879,7 @@ Path/File name for the TLS certificate key (in PEM format) for the server certif
 a| `OCIS_INSECURE`
 
 a| [subs=-attributes]
-++pre5.0 ++
+++5.0 ++
 
 a| [subs=attributes+]
 * xref:{s-path}/activitylog.adoc[activitylog] +
@@ -917,7 +917,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Allow insecure connections to the frontend.
+Whether to verify the server TLS certificates.
 a| `OCIS_JWT_SECRET`
 
 a| [subs=-attributes]
@@ -1080,7 +1080,7 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++uid=libregraph,ou=sysusers,o=libregraph-idm ++
+++uid=reva,ou=sysusers,o=libregraph-idm ++
 
 a| [subs=-attributes]
 LDAP DN to use for simple bind authentication with the target LDAP server.
@@ -1159,7 +1159,7 @@ a| [subs=-attributes]
 ++attribute ++
 
 a| [subs=-attributes]
-An option to control the behavior for disabling users. Supported options are 'none', 'attribute' and 'group'. If set to 'group', disabling a user via API will add the user to the configured group for disabled users, if set to 'attribute' this will be done in the ldap user entry, if set to 'none' the disable request is not processed. Default is 'attribute'.
+An option to control the behavior for disabling users. Valid options are 'none', 'attribute' and 'group'. If set to 'group', disabling a user via API will add the user to the configured group for disabled users, if set to 'attribute' this will be done in the ldap user entry, if set to 'none' the disable request is not processed.
 a| `OCIS_LDAP_GROUP_BASE_DN`
 
 a| [subs=-attributes]
@@ -1269,10 +1269,10 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++owncloudUUID ++
+++ownclouduuid ++
 
 a| [subs=-attributes]
-LDAP Attribute to use as the unique id for groups. This should be a stable globally unique ID like a UUID.
+LDAP Attribute to use as the unique id for groups. This should be a stable globally unique id (e.g. a UUID).
 a| `OCIS_LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING`
 
 a| [subs=-attributes]
@@ -1291,7 +1291,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Set this to true if the defined 'ID' attribute for groups is of the 'OCTETSTRING' syntax. This is required when using the 'objectGUID' attribute of Active Directory for the group ID's.
+Set this to true if the defined 'id' attribute for groups is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the group IDs.
 a| `OCIS_LDAP_GROUP_SCHEMA_MAIL`
 
 a| [subs=-attributes]
@@ -1347,7 +1347,7 @@ a| [subs=-attributes]
 ++sub ++
 
 a| [subs=-attributes]
-LDAP search scope to use when looking up groups. Supported scopes are 'base', 'one' and 'sub'.
+LDAP search scope to use when looking up groups. Supported values are 'base', 'one' and 'sub'.
 a| `OCIS_LDAP_INSECURE`
 
 a| [subs=-attributes]
@@ -1443,7 +1443,7 @@ a| [subs=-attributes]
 ++ownCloudUserEnabled ++
 
 a| [subs=-attributes]
-LDAP Attribute to use as a flag telling if the user is enabled or disabled.
+LDAP attribute to use as a flag telling if the user is enabled or disabled.
 a| `OCIS_LDAP_USER_FILTER`
 
 a| [subs=-attributes]
@@ -1499,10 +1499,10 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++displayName ++
+++displayname ++
 
 a| [subs=-attributes]
-LDAP Attribute to use for the display name of users.
+LDAP Attribute to use for the displayname of users.
 a| `OCIS_LDAP_USER_SCHEMA_ID`
 
 a| [subs=-attributes]
@@ -1519,7 +1519,7 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++owncloudUUID ++
+++ownclouduuid ++
 
 a| [subs=-attributes]
 LDAP Attribute to use as the unique ID for users. This should be a stable globally unique ID like a UUID.
@@ -1541,7 +1541,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Set this to true if the defined 'ID' attribute for users is of the 'OCTETSTRING' syntax. This is required when using the 'objectGUID' attribute of Active Directory for the user ID's.
+Set this to true if the defined 'ID' attribute for users is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the user IDs.
 a| `OCIS_LDAP_USER_SCHEMA_MAIL`
 
 a| [subs=-attributes]
@@ -1618,7 +1618,7 @@ a| [subs=-attributes]
 ++sub ++
 
 a| [subs=-attributes]
-LDAP search scope to use when looking up users. Supported scopes are 'base', 'one' and 'sub'.
+LDAP search scope to use when looking up users. Supported values are 'base', 'one' and 'sub'.
 a| `OCIS_LOG_COLOR`
 
 a| [subs=-attributes]
@@ -1944,7 +1944,7 @@ Set to true to enable multi factor authentication. See the documentation for mor
 a| `OCIS_MULTI_INSTANCE_ENABLED`
 
 a| [subs=-attributes]
-++Curie ++
+++8.0.0 ++
 
 a| [subs=attributes+]
 * xref:{s-path}/graph.adoc[graph] +
@@ -1961,7 +1961,7 @@ Enable multiple instances of Infinite Scale.
 a| `OCIS_MULTI_INSTANCE_INSTANCEID`
 
 a| [subs=-attributes]
-++Curie ++
+++8.0.0 ++
 
 a| [subs=attributes+]
 * xref:{s-path}/graph.adoc[graph] +
@@ -1974,7 +1974,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The unique ID of this instance.
+The unique id of this instance
 a| `OCIS_OIDC_ISSUER`
 
 a| [subs=-attributes]
@@ -1998,7 +1998,7 @@ a| [subs=-attributes]
 ++https://localhost:9200 ++
 
 a| [subs=-attributes]
-The identity provider value to set in the group IDs of the CS3 group objects for groups returned by this group provider.
+The identity provider value to set in the userids of the CS3 user objects for users returned by this user provider.
 a| `OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST`
 
 a| [subs=-attributes]
@@ -2135,7 +2135,7 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++memory ++
+++nats-js-kv ++
 
 a| [subs=-attributes]
 The type of the store. Supported values are: 'memory', 'nats-js-kv', 'redis-sentinel', 'noop'. See the text description for details.
@@ -2198,7 +2198,7 @@ a| [subs=-attributes]
 ++[]string ++
 
 a| [subs=-attributes]
-++[] ++
+++[127.0.0.1:9233] ++
 
 a| [subs=-attributes]
 A list of nodes to access the configured store. This has no effect when 'memory' store is configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details.
@@ -2745,10 +2745,10 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++https://localhost:9200 ++
+++https://localhost:9200/ ++
 
 a| [subs=-attributes]
-The public facing URL of the oCIS frontend.
+Base url to navigate back from the app to the containing folder in the file list.
 a| `OCIS_USER_SEARCH_DISPLAYED_ATTRIBUTES`
 
 a| [subs=-attributes]
