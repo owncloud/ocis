@@ -12,11 +12,8 @@ The following photo metadata fields are now indexed and searchable:
 - `photo.focalLength` - Focal length in millimeters
 - `photo.iso` - ISO sensitivity
 - `photo.orientation` - Image orientation
-- `photo.exposureTime` - Shutter speed
-- `photo.exposureBias` - Exposure compensation
-- `photo.flash` - Flash mode used
-- `photo.meteringMode` - Metering mode
-- `photo.whiteBalance` - White balance setting
+- `photo.exposureNumerator` - Exposure time numerator (for shutter speed calculation)
+- `photo.exposureDenominator` - Exposure time denominator (for shutter speed calculation)
 
 GPS location data is also included when available:
 - `photo.location.latitude` - GPS latitude

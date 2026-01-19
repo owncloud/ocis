@@ -140,7 +140,9 @@ func appendInt32Prop(props []prop.PropertyXML, name string, value *int32) []prop
 	return props
 }
 
-// appendFloat64Prop appends a float64 property if the value is non-nil
+// appendFloat64Prop appends a float64 property if the value is non-nil.
+// Note: Unlike other numeric helpers, this does NOT check for zero values because
+// GPS coordinates of 0.0 are valid (equator at latitude 0, prime meridian at longitude 0).
 func appendFloat64Prop(props []prop.PropertyXML, name string, value *float64, precision int) []prop.PropertyXML {
 	if value != nil {
 		return append(props, prop.Escaped(name, strconv.FormatFloat(*value, 'f', precision, 64)))
