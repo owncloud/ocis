@@ -8,14 +8,6 @@
 | Type
 | Default Value
 | Description
-
-a| `CS3_GATEWAY` +
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-++ ++
     
     
     
