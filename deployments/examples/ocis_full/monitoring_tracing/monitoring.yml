@@ -15,9 +15,10 @@ services:
   collaboration:
     environment:
       # tracing
-      OCIS_TRACING_ENABLED: "true"
-      OCIS_TRACING_TYPE: "otlp"
-      OCIS_TRACING_ENDPOINT: jaeger:4317
+      OCIS_TRACING_ENABLED: ${OCIS_TRACING_ENABLED:-true}
+      OCIS_TRACING_TYPE: ${OCIS_TRACING_TYPE:-otlp}
+      OCIS_TRACING_ENDPOINT: ${OCIS_TRACING_ENDPOINT:-jaeger:4317}
+
       # metrics
       COLLABORATION_DEBUG_ADDR: 0.0.0.0:9304
 
