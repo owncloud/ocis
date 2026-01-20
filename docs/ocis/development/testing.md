@@ -682,9 +682,6 @@ Also, clone the [ocis-charts](https://github.com/owncloud/ocis-charts/) reposito
    sed -i 's/{{ *\.Values\.features\.virusscan\.infectedFileHandling *| *quote *}}/"delete"/' \
            ocis/templates/antivirus/deployment.yaml
 
-   sed -i 's/{{ *\.Values\.features\.virusscan\.infectedFileHandling *| *quote *}}/"delete"/' \
-           ocis/templates/antivirus/deployment.yaml
-
    sed -i '/name: ANTIVIRUS_SCANNER_TYPE/{n;s/value: *"icap"/value: "clamav"/}' \
            charts/ocis/templates/antivirus/deployment.yaml
 
