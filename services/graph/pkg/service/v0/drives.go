@@ -574,7 +574,7 @@ func (g Graph) updateDrive(w http.ResponseWriter, r *http.Request, apiVersion AP
 		}
 	}
 
-	if drive.GetName() != "" {
+	if _, ok := drive.GetNameOk(); ok {
 		spacename := strings.TrimSpace(drive.GetName())
 		if err := validateSpaceName(spacename); err != nil {
 			logger.Info().Err(err).Msg("could not update drive: spacename invalid")
