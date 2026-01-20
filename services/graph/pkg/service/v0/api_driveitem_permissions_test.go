@@ -80,7 +80,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 		cfg.UnifiedRoles.AvailableRoles = slices.DeleteFunc(cfg.UnifiedRoles.AvailableRoles, func(s string) bool {
 			return s == unifiedrole.UnifiedRoleSecureViewerID
 		})
-		service, err := svc.NewDriveItemPermissionsService(logger, gatewaySelector, cache, cfg, otel.GetTracerProvider(), nil)
+		service, err := svc.NewDriveItemPermissionsService(logger, gatewaySelector, cache, cfg, otel.GetTracerProvider(), nil, nil)
 		Expect(err).ToNot(HaveOccurred())
 		driveItemPermissionsService = service
 		ctx = revactx.ContextSetUser(context.Background(), currentUser)
@@ -270,7 +270,7 @@ var _ = Describe("DriveItemPermissionsService", func() {
 				// remove SecureViewer from allowed roles for this unit test
 				return s == unifiedrole.UnifiedRoleSecureViewerID
 			})
-			service, err := svc.NewDriveItemPermissionsService(log.NewLogger(), gatewaySelector, cache, cfg, otel.GetTracerProvider(), nil)
+			service, err := svc.NewDriveItemPermissionsService(log.NewLogger(), gatewaySelector, cache, cfg, otel.GetTracerProvider(), nil, nil)
 			Expect(err).ToNot(HaveOccurred())
 
 			driveItemInvite.Roles = []string{unifiedrole.UnifiedRoleViewerID, unifiedrole.UnifiedRoleSecureViewerID}

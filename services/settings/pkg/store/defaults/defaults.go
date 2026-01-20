@@ -114,6 +114,7 @@ func generateBundleAdminRole() *settingsmsg.Bundle {
 			AccountManagementPermission(All),
 			AutoAcceptSharesPermission(Own),
 			ChangeLogoPermission(All),
+			CreateExternalSharePermission(All),
 			CreatePublicLinkPermission(All),
 			CreateSharePermission(All),
 			CreateSpacesPermission(All),
@@ -158,6 +159,7 @@ func generateBundleSpaceAdminRole() *settingsmsg.Bundle {
 		},
 		Settings: []*settingsmsg.Setting{
 			AutoAcceptSharesPermission(Own),
+			CreateExternalSharePermission(All),
 			CreatePublicLinkPermission(All),
 			CreateSharePermission(All),
 			CreateSpacesPermission(All),
