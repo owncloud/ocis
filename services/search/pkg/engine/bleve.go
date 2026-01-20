@@ -86,6 +86,40 @@ func BuildBleveMapping() (mapping.IndexMapping, error) {
 	docMapping.AddFieldMappingsAt("Tags", lowercaseMapping)
 	docMapping.AddFieldMappingsAt("Content", fulltextFieldMapping)
 
+	// Add explicit Photo field mappings to ensure fields are stored
+	photoMapping := bleve.NewDocumentMapping()
+	photoStringMapping := bleve.NewTextFieldMapping()
+	photoStringMapping.Store = true
+	photoStringMapping.Index = true
+	photoStringMapping.Analyzer = keyword.Name
+	photoNumericMapping := bleve.NewNumericFieldMapping()
+	photoNumericMapping.Store = true
+	photoNumericMapping.Index = true
+	photoDateMapping := bleve.NewDateTimeFieldMapping()
+	photoDateMapping.Store = true
+	photoDateMapping.Index = true
+
+	photoMapping.AddFieldMappingsAt("cameraMake", photoStringMapping)
+	photoMapping.AddFieldMappingsAt("cameraModel", photoStringMapping)
+	photoMapping.AddFieldMappingsAt("exposureDenominator", photoNumericMapping)
+	photoMapping.AddFieldMappingsAt("exposureNumerator", photoNumericMapping)
+	photoMapping.AddFieldMappingsAt("fNumber", photoNumericMapping)
+	photoMapping.AddFieldMappingsAt("focalLength", photoNumericMapping)
+	photoMapping.AddFieldMappingsAt("iso", photoNumericMapping)
+	photoMapping.AddFieldMappingsAt("orientation", photoNumericMapping)
+	photoMapping.AddFieldMappingsAt("takenDateTime", photoDateMapping)
+	docMapping.AddSubDocumentMapping("photo", photoMapping)
+
+	// Add explicit Location field mappings to ensure fields are stored
+	locationMapping := bleve.NewDocumentMapping()
+	locationNumericMapping := bleve.NewNumericFieldMapping()
+	locationNumericMapping.Store = true
+	locationNumericMapping.Index = true
+	locationMapping.AddFieldMappingsAt("latitude", locationNumericMapping)
+	locationMapping.AddFieldMappingsAt("longitude", locationNumericMapping)
+	locationMapping.AddFieldMappingsAt("altitude", locationNumericMapping)
+	docMapping.AddSubDocumentMapping("location", locationMapping)
+
 	indexMapping := bleve.NewIndexMapping()
 	indexMapping.DefaultAnalyzer = keyword.Name
 	indexMapping.DefaultMapping = docMapping
@@ -146,17 +180,18 @@ func (b *Bleve) Search(ctx context.Context, sir *searchService.SearchIndexReques
 	)
 
 	if sir.Ref != nil {
+		rootIDValue := storagespace.FormatResourceID(
+			&storageProvider.ResourceId{
+				StorageId: sir.Ref.GetResourceId().GetStorageId(),
+				SpaceId:   sir.Ref.GetResourceId().GetSpaceId(),
+				OpaqueId:  sir.Ref.GetResourceId().GetOpaqueId(),
+			},
+		)
 		q.Conjuncts = append(
 			q.Conjuncts,
 			&query.TermQuery{
 				FieldVal: "RootID",
-				Term: storagespace.FormatResourceID(
-					&storageProvider.ResourceId{
-						StorageId: sir.Ref.GetResourceId().GetStorageId(),
-						SpaceId:   sir.Ref.GetResourceId().GetSpaceId(),
-						OpaqueId:  sir.Ref.GetResourceId().GetOpaqueId(),
-					},
-				),
+				Term:     rootIDValue,
 			},
 		)
 	}
@@ -480,6 +515,7 @@ func getLocationValue[T any](fields map[string]interface{}) *T {
 
 func getPhotoValue[T any](fields map[string]interface{}) *T {
 	var photo = newPointerOfType[T]()
+
 	if ok := unmarshalInterfaceMap(photo, fields, "photo."); ok {
 		return photo
 	}

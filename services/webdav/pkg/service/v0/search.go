@@ -1,7 +1,6 @@
 package svc
 
 import (
-	"context"
 	"encoding/xml"
 	"fmt"
 	"io"
@@ -80,7 +79,7 @@ func (g Webdav) sendSearchResponse(rsp *searchsvc.SearchResponse, w http.Respons
 		hrefPrefix = "/remote.php/dav/spaces"
 	}
 
-	responsesXML, err := multistatusResponse(r.Context(), rsp.Matches, hrefPrefix)
+	responsesXML, err := multistatusResponse(rsp.Matches, hrefPrefix)
 	if err != nil {
 		logger.Error().Err(err).Msg("error formatting propfind")
 		w.WriteHeader(http.StatusInternalServerError)
@@ -98,10 +97,10 @@ func (g Webdav) sendSearchResponse(rsp *searchsvc.SearchResponse, w http.Respons
 }
 
 // multistatusResponse converts a list of matches into a multistatus response string
-func multistatusResponse(ctx context.Context, matches []*searchmsg.Match, hrefPrefix string) ([]byte, error) {
+func multistatusResponse(matches []*searchmsg.Match, hrefPrefix string) ([]byte, error) {
 	responses := make([]*propfind.ResponseXML, 0, len(matches))
 	for i := range matches {
-		res, err := matchToPropResponse(ctx, matches[i], hrefPrefix)
+		res, err := matchToPropResponse(matches[i], hrefPrefix)
 		if err != nil {
 			return nil, err
 		}
@@ -117,7 +116,75 @@ func multistatusResponse(ctx context.Context, matches []*searchmsg.Match, hrefPr
 	return msg, nil
 }
 
-func matchToPropResponse(ctx context.Context, match *searchmsg.Match, hrefPrefix string) (*propfind.ResponseXML, error) {
+// appendStringProp appends a string property if the value is non-nil and non-empty
+func appendStringProp(props []prop.PropertyXML, name string, value *string) []prop.PropertyXML {
+	if value != nil && *value != "" {
+		return append(props, prop.Escaped(name, *value))
+	}
+	return props
+}
+
+// appendFloat32Prop appends a float32 property if the value is non-nil and non-zero
+func appendFloat32Prop(props []prop.PropertyXML, name string, value *float32, precision int) []prop.PropertyXML {
+	if value != nil && *value != 0 {
+		return append(props, prop.Escaped(name, strconv.FormatFloat(float64(*value), 'f', precision, 64)))
+	}
+	return props
+}
+
+// appendInt32Prop appends an int32 property if the value is non-nil and non-zero
+func appendInt32Prop(props []prop.PropertyXML, name string, value *int32) []prop.PropertyXML {
+	if value != nil && *value != 0 {
+		return append(props, prop.Escaped(name, strconv.FormatInt(int64(*value), 10)))
+	}
+	return props
+}
+
+// appendFloat64Prop appends a float64 property if the value is non-nil.
+// Note: Unlike other numeric helpers, this does NOT check for zero values because
+// GPS coordinates of 0.0 are valid (equator at latitude 0, prime meridian at longitude 0).
+func appendFloat64Prop(props []prop.PropertyXML, name string, value *float64, precision int) []prop.PropertyXML {
+	if value != nil {
+		return append(props, prop.Escaped(name, strconv.FormatFloat(*value, 'f', precision, 64)))
+	}
+	return props
+}
+
+// appendPhotoProps appends photo metadata properties to the property list
+func appendPhotoProps(props []prop.PropertyXML, photo *searchmsg.Photo) []prop.PropertyXML {
+	if photo == nil {
+		return props
+	}
+
+	if photo.TakenDateTime != nil {
+		props = append(props, prop.Escaped("oc:photo-taken-date-time", photo.TakenDateTime.AsTime().Format("2006-01-02T15:04:05Z07:00")))
+	}
+	props = appendStringProp(props, "oc:photo-camera-make", photo.CameraMake)
+	props = appendStringProp(props, "oc:photo-camera-model", photo.CameraModel)
+	props = appendFloat32Prop(props, "oc:photo-fnumber", photo.FNumber, 2)
+	props = appendFloat32Prop(props, "oc:photo-focal-length", photo.FocalLength, 2)
+	props = appendInt32Prop(props, "oc:photo-iso", photo.Iso)
+	props = appendInt32Prop(props, "oc:photo-orientation", photo.Orientation)
+	props = appendFloat32Prop(props, "oc:photo-exposure-numerator", photo.ExposureNumerator, 0)
+	props = appendFloat32Prop(props, "oc:photo-exposure-denominator", photo.ExposureDenominator, 0)
+
+	return props
+}
+
+// appendLocationProps appends location metadata properties to the property list
+func appendLocationProps(props []prop.PropertyXML, location *searchmsg.GeoCoordinates) []prop.PropertyXML {
+	if location == nil {
+		return props
+	}
+
+	props = appendFloat64Prop(props, "oc:photo-location-latitude", location.Latitude, 6)
+	props = appendFloat64Prop(props, "oc:photo-location-longitude", location.Longitude, 6)
+	props = appendFloat64Prop(props, "oc:photo-location-altitude", location.Altitude, 1)
+
+	return props
+}
+
+func matchToPropResponse(match *searchmsg.Match, hrefPrefix string) (*propfind.ResponseXML, error) {
 	// unfortunately search uses own versions of ResourceId and Ref. So we need to assert them here
 	var (
 		ref string
@@ -128,6 +195,14 @@ func matchToPropResponse(ctx context.Context, match *searchmsg.Match, hrefPrefix
 	// for shares it needs to be sharestorageproviderid!shareid
 	// for other spaces it needs to be storageproviderid$spaceid
 	switch match.Entity.Ref.ResourceId.StorageId {
+	case utils.ShareStorageProviderID:
+		ref, err = storagespace.FormatReference(&provider.Reference{
+			ResourceId: &provider.ResourceId{
+				SpaceId:  match.Entity.Ref.ResourceId.SpaceId,
+				OpaqueId: match.Entity.Ref.ResourceId.OpaqueId,
+			},
+			Path: match.Entity.Ref.Path,
+		})
 	default:
 		ref, err = storagespace.FormatReference(&provider.Reference{
 			ResourceId: &provider.ResourceId{
@@ -136,19 +211,11 @@ func matchToPropResponse(ctx context.Context, match *searchmsg.Match, hrefPrefix
 			},
 			Path: match.Entity.Ref.Path,
 		})
-	case utils.ShareStorageProviderID:
-		ref, err = storagespace.FormatReference(&provider.Reference{
-			ResourceId: &provider.ResourceId{
-				//StorageId: match.Entity.Ref.ResourceId.StorageId,
-				SpaceId:  match.Entity.Ref.ResourceId.SpaceId,
-				OpaqueId: match.Entity.Ref.ResourceId.OpaqueId,
-			},
-			Path: match.Entity.Ref.Path,
-		})
 	}
 	if err != nil {
 		return nil, err
 	}
+
 	response := propfind.ResponseXML{
 		Href:     net.EncodePath(path.Join(hrefPrefix, ref)),
 		Propstat: []propfind.PropstatXML{},
@@ -164,6 +231,7 @@ func matchToPropResponse(ctx context.Context, match *searchmsg.Match, hrefPrefix
 		SpaceId:   match.Entity.Id.SpaceId,
 		OpaqueId:  match.Entity.Id.OpaqueId,
 	})))
+
 	if match.Entity.ParentId != nil {
 		propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:file-parent", storagespace.FormatResourceID(&provider.ResourceId{
 			StorageId: match.Entity.ParentId.StorageId,
@@ -171,6 +239,7 @@ func matchToPropResponse(ctx context.Context, match *searchmsg.Match, hrefPrefix
 			OpaqueId:  match.Entity.ParentId.OpaqueId,
 		})))
 	}
+
 	if match.Entity.Ref.ResourceId.StorageId == utils.ShareStorageProviderID {
 		propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:shareid", match.Entity.Ref.ResourceId.OpaqueId))
 		propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:shareroot", match.Entity.ShareRootName))
@@ -180,6 +249,7 @@ func matchToPropResponse(ctx context.Context, match *searchmsg.Match, hrefPrefix
 			OpaqueId:  match.Entity.GetRemoteItemId().GetOpaqueId(),
 		})))
 	}
+
 	propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:name", match.Entity.Name))
 	propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("d:getlastmodified", match.Entity.LastModifiedTime.AsTime().Format(constants.RFC1123)))
 	propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("d:getcontenttype", match.Entity.MimeType))
@@ -202,8 +272,13 @@ func matchToPropResponse(ctx context.Context, match *searchmsg.Match, hrefPrefix
 			prop.Escaped("d:getcontentlength", size),
 		)
 	}
+
 	score := strconv.FormatFloat(float64(match.Score), 'f', -1, 64)
 	propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:score", score))
+
+	// Add photo and location metadata using helper functions
+	propstatOK.Prop = appendPhotoProps(propstatOK.Prop, match.Entity.Photo)
+	propstatOK.Prop = appendLocationProps(propstatOK.Prop, match.Entity.Location)
 
 	if len(propstatOK.Prop) > 0 {
 		response.Propstat = append(response.Propstat, propstatOK)
