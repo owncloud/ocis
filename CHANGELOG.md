@@ -38,8 +38,8 @@
 * [Changelog for 3.0.0](#changelog-for-300-2023-06-06)
 * [Changelog for 2.0.0](#changelog-for-200-2022-11-30)
 * [Changelog for 1.20.0](#changelog-for-1200-2022-04-13)
-* [Changelog for 1.19.0](#changelog-for-1190-2022-03-29)
 * [Changelog for 1.19.1](#changelog-for-1191-2022-03-29)
+* [Changelog for 1.19.0](#changelog-for-1190-2022-03-29)
 * [Changelog for 1.18.0](#changelog-for-1180-2022-03-03)
 * [Changelog for 1.17.0](#changelog-for-1170-2022-02-16)
 * [Changelog for 1.16.0](#changelog-for-1160-2021-12-10)
@@ -90,6 +90,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Relocate Transifex resources: [#11889](https://github.com/owncloud/ocis/pull/11889)
 * Enhancement - Update the ocis_full deployment example images: [#11890](https://github.com/owncloud/ocis/pull/11890)
 * Enhancement - Allow sharing between instances: [#11893](https://github.com/owncloud/ocis/pull/11893)
+* Enhancement - Add photo EXIF metadata to search index and WebDAV results: [#11912](https://github.com/owncloud/ocis/pull/11912)
 * Enhancement - Update the traefik image for some deployment examples: [#11915](https://github.com/owncloud/ocis/pull/11915)
 
 ## Details
@@ -295,6 +296,32 @@ The following sections list the changes for unreleased.
    In Multi-Instance ocis it is now possible to share between instances.
 
    https://github.com/owncloud/ocis/pull/11893
+
+* Enhancement - Add photo EXIF metadata to search index and WebDAV results: [#11912](https://github.com/owncloud/ocis/pull/11912)
+
+   We've added support for photo metadata fields in the Bleve search index and
+   WebDAV REPORT responses. This enables photo gallery applications to efficiently
+   query photos by their EXIF metadata and display camera information.
+
+   The following photo metadata fields are now indexed and searchable: -
+   `photo.takenDateTime` - When the photo was taken (supports date range queries) -
+   `photo.cameraMake` - Camera manufacturer (e.g., Canon, Nikon, Samsung) -
+   `photo.cameraModel` - Camera model name - `photo.fNumber` - Aperture f-stop
+   value - `photo.focalLength` - Focal length in millimeters - `photo.iso` - ISO
+   sensitivity - `photo.orientation` - Image orientation -
+   `photo.exposureNumerator` - Exposure time numerator (for shutter speed
+   calculation) - `photo.exposureDenominator` - Exposure time denominator (for
+   shutter speed calculation)
+
+   GPS location data is also included when available: - `photo.location.latitude` -
+   GPS latitude - `photo.location.longitude` - GPS longitude -
+   `photo.location.altitude` - GPS altitude
+
+   These fields are returned in WebDAV search results using the `oc:photo-*`
+   property namespace, allowing web extensions to build photo timeline views,
+   filter by camera, or show photos on a map.
+
+   https://github.com/owncloud/ocis/pull/11912
 
 * Enhancement - Update the traefik image for some deployment examples: [#11915](https://github.com/owncloud/ocis/pull/11915)
 
@@ -12293,7 +12320,7 @@ The following sections list the changes for 2.0.0.
 
 The following sections list the changes for 1.20.0.
 
-[1.20.0]: https://github.com/owncloud/ocis/compare/v1.19.0...v1.20.0
+[1.20.0]: https://github.com/owncloud/ocis/compare/v1.19.1...v1.20.0
 
 ## Summary
 
@@ -12467,11 +12494,29 @@ The following sections list the changes for 1.20.0.
    https://github.com/owncloud/ocis/pull/3509
    https://github.com/owncloud/web/releases/tag/v5.4.0
 
+# Changelog for [1.19.1] (2022-03-29)
+
+The following sections list the changes for 1.19.1.
+
+[1.19.1]: https://github.com/owncloud/ocis/compare/v1.19.0...v1.19.1
+
+## Summary
+
+* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
+
+## Details
+
+* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
+
+   URLs for Special items (space image, readme) were broken.
+
+   https://github.com/owncloud/ocis/pull/3419
+
 # Changelog for [1.19.0] (2022-03-29)
 
 The following sections list the changes for 1.19.0.
 
-[1.19.0]: https://github.com/owncloud/ocis/compare/v1.19.1...v1.19.0
+[1.19.0]: https://github.com/owncloud/ocis/compare/v1.18.0...v1.19.0
 
 ## Summary
 
@@ -12644,24 +12689,6 @@ The following sections list the changes for 1.19.0.
    https://github.com/owncloud/ocis/pull/3291
    https://github.com/owncloud/ocis/pull/3375
    https://github.com/owncloud/web/releases/tag/v5.3.0
-
-# Changelog for [1.19.1] (2022-03-29)
-
-The following sections list the changes for 1.19.1.
-
-[1.19.1]: https://github.com/owncloud/ocis/compare/v1.18.0...v1.19.1
-
-## Summary
-
-* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
-
-## Details
-
-* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
-
-   URLs for Special items (space image, readme) were broken.
-
-   https://github.com/owncloud/ocis/pull/3419
 
 # Changelog for [1.18.0] (2022-03-03)
 
