@@ -19,6 +19,7 @@ type Config struct {
 	TokenManager *TokenManager `yaml:"token_manager"`
 	Reva         *shared.Reva  `yaml:"reva"`
 	BruteForce   BruteForce    `yaml:"brute_force"`
+	Store        Store         `yaml:"store"`
 
 	SkipUserGroupsInToken bool `yaml:"skip_user_groups_in_token" env:"STORAGE_PUBLICLINK_SKIP_USER_GROUPS_IN_TOKEN" desc:"Disables the loading of user's group memberships from the reva access token." introductionVersion:"pre5.0"`
 
@@ -59,4 +60,14 @@ type StorageProvider struct {
 type BruteForce struct {
 	TimeGap     time.Duration `yaml:"time_gap" env:"STORAGE_PUBLICLINK_BRUTEFORCE_TIMEGAP" desc:"The duration of the time gap computed for the brute force protection." introductionVersion:"Curie"`
 	MaxAttempts int           `yaml:"max_attempts" env:"STORAGE_PUBLICLINK_BRUTEFORCE_MAXATTEMPTS" desc:"The maximum number of failed attempts allowed in the time gap defined in STORAGE_PUBLICLINK_BRUTEFORCE_TIMEGAP." introductionVersion:"Curie"`
+}
+
+// Store configures the store to use
+type Store struct {
+	Store        string   `yaml:"store" env:"OCIS_PERSISTENT_STORE;STORAGE_PUBLICLINK_STORE_STORE" desc:"The type of the store. Supported values are: 'memory', 'nats-js-kv', 'redis-sentinel', 'noop'. See the text description for details." introductionVersion:"curie"`
+	Nodes        []string `yaml:"nodes" env:"OCIS_PERSISTENT_STORE_NODES;STORAGE_PUBLICLINK_STORE_NODES" desc:"A list of nodes to access the configured store. This has no effect when 'memory' store is configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details." introductionVersion:"curie"`
+	Database     string   `yaml:"database" env:"STORAGE_PUBLICLINK_STORE_DATABASE" desc:"The database name the configured store should use." introductionVersion:"curie"`
+	Table        string   `yaml:"table" env:"STORAGE_PUBLICLINK_STORE_TABLE" desc:"The database table the store should use." introductionVersion:"curie"`
+	AuthUsername string   `yaml:"username" env:"OCIS_PERSISTENT_STORE_AUTH_USERNAME;STORAGE_PUBLICLINK_STORE_AUTH_USERNAME" desc:"The username to authenticate with the store. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"curie"`
+	AuthPassword string   `yaml:"password" env:"OCIS_PERSISTENT_STORE_AUTH_PASSWORD;STORAGE_PUBLICLINK_STORE_AUTH_PASSWORD" desc:"The password to authenticate with the store. Only applies when store type 'nats-js-kv' is configured." introductionVersion:"curie"`
 }

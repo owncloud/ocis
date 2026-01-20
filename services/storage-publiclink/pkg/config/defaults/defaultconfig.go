@@ -41,6 +41,12 @@ func DefaultConfig() *config.Config {
 			TimeGap:     1 * time.Hour,
 			MaxAttempts: 5,
 		},
+		Store: config.Store{
+			Store:    "nats-js-kv",
+			Nodes:    []string{"127.0.0.1:9233"},
+			Database: "storage-publiclink",
+			Table:    "brute-force-protection",
+		},
 	}
 }
 
