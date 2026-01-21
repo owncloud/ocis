@@ -93,6 +93,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Allow sharing between instances: [#11893](https://github.com/owncloud/ocis/pull/11893)
 * Enhancement - Add photo EXIF metadata to search index and WebDAV results: [#11912](https://github.com/owncloud/ocis/pull/11912)
 * Enhancement - Update the traefik image for some deployment examples: [#11915](https://github.com/owncloud/ocis/pull/11915)
+* Enhancement - Add users instances: [#11925](https://github.com/owncloud/ocis/pull/11925)
 
 ## Details
 
@@ -336,6 +337,13 @@ The following sections list the changes for unreleased.
   * Traefik: 3.6.6 --> 3.6.7
 
    https://github.com/owncloud/ocis/pull/11915
+
+* Enhancement - Add users instances: [#11925](https://github.com/owncloud/ocis/pull/11925)
+
+   The user endpoint now returns the instances that the user is either a member or
+   a guest of and the cross instance reference.
+
+   https://github.com/owncloud/ocis/pull/11925
 
 # Changelog for [7.3.1] (2025-11-24)
 
