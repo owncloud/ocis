@@ -74,6 +74,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Support pointer types in config environment variable decoding: [#11815](https://github.com/owncloud/ocis/pull/11815)
 * Bugfix - Replace obsolete docker image in the deployment example: [#11828](https://github.com/owncloud/ocis/pull/11828)
 * Bugfix - Fix error code when a user can't disable a space: [#11845](https://github.com/owncloud/ocis/pull/11845)
+* Bugfix - Fix the error handling for empty name on space update: [#11933](https://github.com/owncloud/ocis/pull/11933)
 * Enhancement - Set Referrer-Policy to no-referrer: [#11722](https://github.com/owncloud/ocis/pull/11722)
 * Enhancement - Bump Reva: [#11748](https://github.com/owncloud/ocis/pull/11748)
 * Enhancement - Support disabling editors by extensions: [#11750](https://github.com/owncloud/ocis/pull/11750)
@@ -90,6 +91,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Relocate Transifex resources: [#11889](https://github.com/owncloud/ocis/pull/11889)
 * Enhancement - Update the ocis_full deployment example images: [#11890](https://github.com/owncloud/ocis/pull/11890)
 * Enhancement - Allow sharing between instances: [#11893](https://github.com/owncloud/ocis/pull/11893)
+* Enhancement - Add photo EXIF metadata to search index and WebDAV results: [#11912](https://github.com/owncloud/ocis/pull/11912)
 * Enhancement - Update the traefik image for some deployment examples: [#11915](https://github.com/owncloud/ocis/pull/11915)
 
 ## Details
@@ -143,6 +145,13 @@ The following sections list the changes for unreleased.
    space was visible. Now it will return the expected 403 error code.
 
    https://github.com/owncloud/ocis/pull/11845
+
+* Bugfix - Fix the error handling for empty name on space update: [#11933](https://github.com/owncloud/ocis/pull/11933)
+
+   Fix the error handling for empty name on space update.
+
+   https://github.com/owncloud/ocis/issues/11887
+   https://github.com/owncloud/ocis/pull/11933
 
 * Enhancement - Set Referrer-Policy to no-referrer: [#11722](https://github.com/owncloud/ocis/pull/11722)
 
@@ -295,6 +304,32 @@ The following sections list the changes for unreleased.
    In Multi-Instance ocis it is now possible to share between instances.
 
    https://github.com/owncloud/ocis/pull/11893
+
+* Enhancement - Add photo EXIF metadata to search index and WebDAV results: [#11912](https://github.com/owncloud/ocis/pull/11912)
+
+   We've added support for photo metadata fields in the Bleve search index and
+   WebDAV REPORT responses. This enables photo gallery applications to efficiently
+   query photos by their EXIF metadata and display camera information.
+
+   The following photo metadata fields are now indexed and searchable: -
+   `photo.takenDateTime` - When the photo was taken (supports date range queries) -
+   `photo.cameraMake` - Camera manufacturer (e.g., Canon, Nikon, Samsung) -
+   `photo.cameraModel` - Camera model name - `photo.fNumber` - Aperture f-stop
+   value - `photo.focalLength` - Focal length in millimeters - `photo.iso` - ISO
+   sensitivity - `photo.orientation` - Image orientation -
+   `photo.exposureNumerator` - Exposure time numerator (for shutter speed
+   calculation) - `photo.exposureDenominator` - Exposure time denominator (for
+   shutter speed calculation)
+
+   GPS location data is also included when available: - `photo.location.latitude` -
+   GPS latitude - `photo.location.longitude` - GPS longitude -
+   `photo.location.altitude` - GPS altitude
+
+   These fields are returned in WebDAV search results using the `oc:photo-*`
+   property namespace, allowing web extensions to build photo timeline views,
+   filter by camera, or show photos on a map.
+
+   https://github.com/owncloud/ocis/pull/11912
 
 * Enhancement - Update the traefik image for some deployment examples: [#11915](https://github.com/owncloud/ocis/pull/11915)
 
