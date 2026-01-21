@@ -103,6 +103,8 @@
 | OCIS_LDAP_INSTANCE_MAPPER_BASE_DN | string |  | BaseDN of the 'instancename to instanceid' mapper in LDAP. Requires OCIS_MULTI_INSTANCE_ENABLED.|
 | OCIS_LDAP_INSTANCE_MAPPER_NAME_ATTRIBUTE | string |  | LDAP Attribute of the instance name. Requires OCIS_MULTI_INSTANCE_ENABLED.|
 | OCIS_LDAP_INSTANCE_MAPPER_ID_ATTRIBUTE | string |  | LDAP Attribute of the instance ID. Requires OCIS_MULTI_INSTANCE_ENABLED.|
+| OCIS_LDAP_CROSS_INSTANCE_REFERENCE_TEMPLATE | string |  | Template for the users unique reference across oCIS instances. Requires OCIS_MULTI_INSTANCE_ENABLED.|
+| OCIS_LDAP_INSTANCE_URL_TEMPLATE | string |  | Template for the instance URL. Requires OCIS_MULTI_INSTANCE_ENABLED.|
 | OCIS_ENABLE_OCM<br/>GRAPH_INCLUDE_OCM_SHAREES | bool | false | Include OCM sharees when listing users.|
 | OCIS_EVENTS_ENDPOINT<br/>GRAPH_EVENTS_ENDPOINT | string | 127.0.0.1:9233 | The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Set to a empty string to disable emitting events.|
 | OCIS_EVENTS_CLUSTER<br/>GRAPH_EVENTS_CLUSTER | string | ocis-cluster | The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.|

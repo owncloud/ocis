@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2026-01-21-10-09-46]
+[#deprecation-note-2026-01-21-10-47-38]
 [caption=]
 .Deprecation notes for the graph service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -429,7 +429,7 @@ a| [subs=-attributes]
 The minimum length the search term needs to have for unprivileged users when searching for users or groups.
 
 a|`OCIS_SHOW_USER_EMAIL_IN_RESULTS` +
-xref:deprecation-note-2026-01-21-10-09-46[Deprecation Note]
+xref:deprecation-note-2026-01-21-10-47-38[Deprecation Note]
 a| [subs=-attributes]
 ++6.0.0 ++
 a| [subs=-attributes]
@@ -1195,6 +1195,28 @@ a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 LDAP Attribute of the instance ID. Requires OCIS_MULTI_INSTANCE_ENABLED.
+
+a|`OCIS_LDAP_CROSS_INSTANCE_REFERENCE_TEMPLATE` +
+
+a| [subs=-attributes]
+++8.0.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Template for the users unique reference across oCIS instances. Requires OCIS_MULTI_INSTANCE_ENABLED.
+
+a|`OCIS_LDAP_INSTANCE_URL_TEMPLATE` +
+
+a| [subs=-attributes]
+++8.0.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Template for the instance URL. Requires OCIS_MULTI_INSTANCE_ENABLED.
 
 a|`OCIS_ENABLE_OCM` +
 `GRAPH_INCLUDE_OCM_SHAREES` +

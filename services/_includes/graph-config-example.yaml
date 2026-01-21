@@ -135,6 +135,8 @@ identity:
     instance_mapper_base_dn: ""
     instance_mapper_name_attribute: ""
     instance_mapper_id_attribute: ""
+    cross_instance_reference_template: ""
+    instance_url_template: ""
 include_ocm_sharees: false
 events:
   endpoint: 127.0.0.1:9233
