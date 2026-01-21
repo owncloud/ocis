@@ -297,7 +297,6 @@ func (c ConnWithReconnect) Extended(req *ldap.ExtendedRequest) (*ldap.ExtendedRe
 	return nil, ldap.NewError(ldap.ErrorNetwork, errMaxRetries)
 }
 
-
 // Remaining methods to fulfill ldap.Client interface
 
 func (c ConnWithReconnect) Start() {}
@@ -326,10 +325,12 @@ func (c ConnWithReconnect) GetLastError() error {
 	return conn.GetLastError()
 }
 
+// IsClosing implements the ldap.Client interface
 func (c ConnWithReconnect) IsClosing() bool {
 	return false
 }
 
+// SetTimeout implements the ldap.Client interface
 func (c ConnWithReconnect) SetTimeout(time.Duration) {}
 
 func (c ConnWithReconnect) Bind(username, password string) error {
