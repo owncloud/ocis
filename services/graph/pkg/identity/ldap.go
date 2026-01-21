@@ -183,7 +183,7 @@ func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger, inst
 	if instanceID != "" {
 		instanceURLTemplate, err = template.New("instanceURLTemplate").Parse(config.InstanceURLTemplate)
 		if err != nil {
-			return nil, fmt.Errorf("error parsing cross instance reference template: %w", err)
+			return nil, fmt.Errorf("error parsing instance URL template: %w", err)
 		}
 	}
 
