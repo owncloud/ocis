@@ -1,7 +1,7 @@
 // # Added Variables between oCIS 7.3.0 and oCIS 8.0.0
 // commenting the headline to make it better includable
 
-// table created per 2026.01.19
+// table created per 2026.01.21
 // the table should be recreated/updated on source () changes
 
 [width="100%",cols="~,~,~,~",options="header"]
@@ -46,6 +46,16 @@
 |
 | OCIS_LDAP_INSTANCE_MAPPER_NAME_ATTRIBUTE
 | LDAP Attribute of the instance name. Requires OCIS_MULTI_INSTANCE_ENABLED.
+| 
+
+|
+| OCIS_LDAP_CROSS_INSTANCE_REFERENCE_TEMPLATE
+| Template for the users unique reference across oCIS instances. Requires OCIS_MULTI_INSTANCE_ENABLED.
+| 
+
+|
+| OCIS_LDAP_INSTANCE_URL_TEMPLATE
+| Template for the instance URL. Requires OCIS_MULTI_INSTANCE_ENABLED.
 | 
 
 |
