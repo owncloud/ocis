@@ -725,7 +725,8 @@ For running specific core API suites (`coreApiWebdavMove1`, `coreApiWebdavPrevie
    sed -i 's|mountPath: /etc/ocis$|mountPath: /etc/ocis/config/drone|' ./charts/ocis/templates/sharing/deployment.yaml
    sed -i 's|name: sharing-banned-passwords-{{ .appName }}|name: sharing-banned-passwords|' ./charts/ocis/templates/sharing/deployment.yaml
 
-   kubectl create configmap -n ocis sharing-banned-passwords --from-file=banned-password-list.txt=<path-to-ocis-repo>/tests/config/drone/banned-password-list.txt
+   kubectl create configmap -n ocis sharing-banned-passwords \
+     --from-file=banned-password-list.txt=<path-to-ocis-repo>/tests/config/drone/banned-password-list.txt
    ```
 
 2. **Install and Setup** (after step 2 above):
