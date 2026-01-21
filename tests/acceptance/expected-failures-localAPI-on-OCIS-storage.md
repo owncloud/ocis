@@ -401,9 +401,6 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiGraphUser/getUser.feature:696](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUser/getUser.feature#L696)
 - [apiGraphUser/getUser.feature:700](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUser/getUser.feature#L700)
 
-#### [PATCH /v1.0/drives/{drive-id} accepts empty name](https://github.com/owncloud/ocis/issues/11887)
-
-- [apiSpaces/changeSpaces.feature:603](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/changeSpaces.feature#L603)
 
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.
