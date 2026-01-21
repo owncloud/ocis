@@ -715,7 +715,8 @@ For running specific core API suites (`coreApiWebdavMove1`, `coreApiWebdavPrevie
    ```bash
    # Create fonts configmaps
    echo '{"defaultFont": "/etc/ocis/fonts/NotoSans.ttf"}' > fontsMap.json
-   kubectl create configmap -n ocis ocis-fonts-ttf --from-file=<path-to-ocis-repo>/tests/config/drone/NotoSans.ttf
+   kubectl create configmap -n ocis sharing-banned-passwords \
+     --from-file=banned-password-list.txt=<path-to-ocis-repo>/tests/config/drone/banned-password-list.txt
    kubectl create configmap -n ocis ocis-fonts-map --from-file=./fontsMap.json
 
    # Patch sharing for banned passwords
@@ -725,29 +726,23 @@ For running specific core API suites (`coreApiWebdavMove1`, `coreApiWebdavPrevie
    sed -i 's|name: sharing-banned-passwords-{{ .appName }}|name: sharing-banned-passwords|' ./charts/ocis/templates/sharing/deployment.yaml
 
    kubectl create configmap -n ocis sharing-banned-passwords --from-file=banned-password-list.txt=<path-to-ocis-repo>/tests/config/drone/banned-password-list.txt
-
-   # Deploy FakeOffice
-   kubectl apply -f fakeoffice-deployment.yaml
-   kubectl -n ocis rollout restart deployment/fakeoffice
    ```
 
-2. **Install and Setup** (after step 2):
+2. **Install and Setup** (after step 2 above):
    ```bash
    make helm-install-atomic
-   kubectl -n ocis wait --for=condition=ready pod -l app=collaboration-onlyoffice --timeout=300s
-
-   # Port forwards
-   kubectl -n ocis port-forward deploy/collaboration-fakeoffice 9300:9300 --address=127.0.0.1 &
-   kubectl -n ocis port-forward deploy/collaboration-collabora 9302:9300 --address=127.0.0.1 &
-   kubectl -n ocis port-forward deploy/collaboration-onlyoffice 9305:9300 --address=127.0.0.1 &
-   COLLAB_POD=$(kubectl -n ocis get pod -l app=collaboration-onlyoffice -o jsonpath='{.items[0].metadata.name}')
-   kubectl -n ocis port-forward pod/$COLLAB_POD 9304:9304 --address=127.0.0.1 &
    ```
 
 3. **Run Tests**:
    ```bash
    cd <path-to-ocis-repo>
-   K8S=true TEST_SERVER_URL="https://ocis-server" STORAGE_DRIVER="ocis" BEHAT_FILTER_TAGS="~@skipOnGraph&&~@skipOnOcis-OCIS-Storage" BEHAT_SUITES="coreApiWebdavMove1,coreApiWebdavPreviews,coreApiWebdavUpload,coreApiWebdavUploadTUS" ACCEPTANCE_TEST_TYPE="core-api" EXPECTED_FAILURES_FILE="tests/acceptance/expected-failures-API-on-OCIS-storage.md" UPLOAD_DELETE_WAIT_TIME="0" OCIS_WRAPPER_URL="http://ociswrapper:5200" WITH_REMOTE_PHP="false" make test-acceptance-api
+   K8S=true \
+   TEST_OCIS=true \
+   TEST_WITH_GRAPH_API=true \
+   TEST_SERVER_URL="https://ocis-server" \
+   OCIS_WRAPPER_URL="http://localhost:5200" \
+     make test-acceptance-api \
+     BEHAT_FEATURE=tests/acceptance/features/coreApiWebdavMove1/moveFolder.feature
    ```
 
 ## Generating Code Coverage Report by Running Acceptance Tests
