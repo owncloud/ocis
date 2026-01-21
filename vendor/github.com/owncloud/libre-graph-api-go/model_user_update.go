@@ -50,6 +50,10 @@ type UserUpdate struct {
 	SignInActivity    *SignInActivity `json:"signInActivity,omitempty"`
 	// A unique identifier assigned to the user by the organization.
 	ExternalID *string `json:"externalID,omitempty"`
+	// A unique reference to the user. This is used to query the user from a different oCIS instance connected to the same identity provider.
+	CrossInstanceReference *string `json:"crossInstanceReference,omitempty"`
+	// oCIS instances that the user is either a member or a guest of.
+	Instances []Instance `json:"instances,omitempty"`
 }
 
 // NewUserUpdate instantiates a new UserUpdate object
@@ -613,6 +617,70 @@ func (o *UserUpdate) SetExternalID(v string) {
 	o.ExternalID = &v
 }
 
+// GetCrossInstanceReference returns the CrossInstanceReference field value if set, zero value otherwise.
+func (o *UserUpdate) GetCrossInstanceReference() string {
+	if o == nil || IsNil(o.CrossInstanceReference) {
+		var ret string
+		return ret
+	}
+	return *o.CrossInstanceReference
+}
+
+// GetCrossInstanceReferenceOk returns a tuple with the CrossInstanceReference field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *UserUpdate) GetCrossInstanceReferenceOk() (*string, bool) {
+	if o == nil || IsNil(o.CrossInstanceReference) {
+		return nil, false
+	}
+	return o.CrossInstanceReference, true
+}
+
+// HasCrossInstanceReference returns a boolean if a field has been set.
+func (o *UserUpdate) HasCrossInstanceReference() bool {
+	if o != nil && !IsNil(o.CrossInstanceReference) {
+		return true
+	}
+
+	return false
+}
+
+// SetCrossInstanceReference gets a reference to the given string and assigns it to the CrossInstanceReference field.
+func (o *UserUpdate) SetCrossInstanceReference(v string) {
+	o.CrossInstanceReference = &v
+}
+
+// GetInstances returns the Instances field value if set, zero value otherwise.
+func (o *UserUpdate) GetInstances() []Instance {
+	if o == nil || IsNil(o.Instances) {
+		var ret []Instance
+		return ret
+	}
+	return o.Instances
+}
+
+// GetInstancesOk returns a tuple with the Instances field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *UserUpdate) GetInstancesOk() ([]Instance, bool) {
+	if o == nil || IsNil(o.Instances) {
+		return nil, false
+	}
+	return o.Instances, true
+}
+
+// HasInstances returns a boolean if a field has been set.
+func (o *UserUpdate) HasInstances() bool {
+	if o != nil && !IsNil(o.Instances) {
+		return true
+	}
+
+	return false
+}
+
+// SetInstances gets a reference to the given []Instance and assigns it to the Instances field.
+func (o *UserUpdate) SetInstances(v []Instance) {
+	o.Instances = v
+}
+
 func (o UserUpdate) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -673,6 +741,12 @@ func (o UserUpdate) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.ExternalID) {
 		toSerialize["externalID"] = o.ExternalID
+	}
+	if !IsNil(o.CrossInstanceReference) {
+		toSerialize["crossInstanceReference"] = o.CrossInstanceReference
+	}
+	if !IsNil(o.Instances) {
+		toSerialize["instances"] = o.Instances
 	}
 	return toSerialize, nil
 }
