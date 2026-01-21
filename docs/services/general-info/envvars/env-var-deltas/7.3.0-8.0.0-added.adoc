@@ -53,7 +53,6 @@
 | Template for the users unique reference across oCIS instances. Requires OCIS_MULTI_INSTANCE_ENABLED.
 | 
 
-
 |
 | OCIS_LDAP_INSTANCE_URL_TEMPLATE
 | Template for the instance URL. Requires OCIS_MULTI_INSTANCE_ENABLED.
