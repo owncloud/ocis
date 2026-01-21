@@ -74,6 +74,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Support pointer types in config environment variable decoding: [#11815](https://github.com/owncloud/ocis/pull/11815)
 * Bugfix - Replace obsolete docker image in the deployment example: [#11828](https://github.com/owncloud/ocis/pull/11828)
 * Bugfix - Fix error code when a user can't disable a space: [#11845](https://github.com/owncloud/ocis/pull/11845)
+* Bugfix - Fix the error handling for empty name on space update: [#11933](https://github.com/owncloud/ocis/pull/11933)
 * Enhancement - Set Referrer-Policy to no-referrer: [#11722](https://github.com/owncloud/ocis/pull/11722)
 * Enhancement - Bump Reva: [#11748](https://github.com/owncloud/ocis/pull/11748)
 * Enhancement - Support disabling editors by extensions: [#11750](https://github.com/owncloud/ocis/pull/11750)
@@ -144,6 +145,13 @@ The following sections list the changes for unreleased.
    space was visible. Now it will return the expected 403 error code.
 
    https://github.com/owncloud/ocis/pull/11845
+
+* Bugfix - Fix the error handling for empty name on space update: [#11933](https://github.com/owncloud/ocis/pull/11933)
+
+   Fix the error handling for empty name on space update.
+
+   https://github.com/owncloud/ocis/issues/11887
+   https://github.com/owncloud/ocis/pull/11933
 
 * Enhancement - Set Referrer-Policy to no-referrer: [#11722](https://github.com/owncloud/ocis/pull/11722)
 
