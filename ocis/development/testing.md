@@ -682,9 +682,6 @@ Also, clone the [ocis-charts](https://github.com/owncloud/ocis-charts/) reposito
    sed -i 's/{{ *\.Values\.features\.virusscan\.infectedFileHandling *| *quote *}}/"delete"/' \
            ocis/templates/antivirus/deployment.yaml
 
-   sed -i 's/{{ *\.Values\.features\.virusscan\.infectedFileHandling *| *quote *}}/"delete"/' \
-           ocis/templates/antivirus/deployment.yaml
-
    sed -i '/name: ANTIVIRUS_SCANNER_TYPE/{n;s/value: *"icap"/value: "clamav"/}' \
            charts/ocis/templates/antivirus/deployment.yaml
 
@@ -708,6 +705,45 @@ Also, clone the [ocis-charts](https://github.com/owncloud/ocis-charts/) reposito
    To run the tika service, run these commands deploying the helm chart:
    ```bash
    cp -r <path-to-ocis-repo>/tests/config/drone/k8s/tika charts/ocis/templates/
+   ```
+
+### Running Core API Test Suites from Pipeline "8"
+
+For running specific core API suites (`coreApiWebdavMove1`, `coreApiWebdavPreviews`, `coreApiWebdavUpload`, `coreApiWebdavUploadTUS`) on k8s:
+
+1. **Additional Configs** (after step 1 above):
+   ```bash
+   # Create fonts configmaps
+   echo '{"defaultFont": "/etc/ocis/fonts/NotoSans.ttf"}' > fontsMap.json
+   kubectl create configmap -n ocis sharing-banned-passwords \
+     --from-file=banned-password-list.txt=<path-to-ocis-repo>/tests/config/drone/banned-password-list.txt
+   kubectl create configmap -n ocis ocis-fonts-map --from-file=./fontsMap.json
+
+   # Patch sharing for banned passwords
+   sed -i 's|/etc/ocis/sharing-banned-passwords.txt|/etc/ocis/config/drone/banned-password-list.txt|' ./charts/ocis/templates/sharing/deployment.yaml
+   sed -i 's|- name: configs|- name: banned-passwords|' ./charts/ocis/templates/sharing/deployment.yaml
+   sed -i 's|mountPath: /etc/ocis$|mountPath: /etc/ocis/config/drone|' ./charts/ocis/templates/sharing/deployment.yaml
+   sed -i 's|name: sharing-banned-passwords-{{ .appName }}|name: sharing-banned-passwords|' ./charts/ocis/templates/sharing/deployment.yaml
+
+   kubectl create configmap -n ocis sharing-banned-passwords \
+     --from-file=banned-password-list.txt=<path-to-ocis-repo>/tests/config/drone/banned-password-list.txt
+   ```
+
+2. **Install and Setup** (after step 2 above):
+   ```bash
+   make helm-install-atomic
+   ```
+
+3. **Run Tests**:
+   ```bash
+   cd <path-to-ocis-repo>
+   K8S=true \
+   TEST_OCIS=true \
+   TEST_WITH_GRAPH_API=true \
+   TEST_SERVER_URL="https://ocis-server" \
+   OCIS_WRAPPER_URL="http://localhost:5200" \
+     make test-acceptance-api \
+     BEHAT_FEATURE=tests/acceptance/features/coreApiWebdavMove1/moveFolder.feature
    ```
 
 ## Generating Code Coverage Report by Running Acceptance Tests
