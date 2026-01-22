@@ -52,4 +52,9 @@ There are four different annotation variables that need to be filled:
 
 ### What Happens Next?
 
-Once a variable has been finally been removed, the annotations must be removed again from the code, since they don't serve any purpose.
+To remove an environment variable, which needs to be done before the planned release has codefreeze:
+
+* Check if the envvar is also present in the REVA code and adapt if so.
+* The envvar needs to be removed from any occurrences in the ocis code.
+* The envvar must also be removed from the `docs/helpers/env_vars.yaml` file. This should be done in the same PR that removes the envvar from the code.
+* Notify docs. The added/deprecated/removed envvar tables need to be created/updated. The release notes will get a note about this change.
