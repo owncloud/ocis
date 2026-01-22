@@ -86,7 +86,11 @@ var ReservedVars = NewVarSet(
 )
 
 // Wildcard represents the wildcard variable as defined in the language.
-var Wildcard = &Term{Value: Var("_")}
+var (
+	WildcardString       = "_"
+	WildcardValue  Value = Var(WildcardString)
+	Wildcard             = &Term{Value: WildcardValue}
+)
 
 // WildcardPrefix is the special character that all wildcard variables are
 // prefixed with when the statement they are contained in is parsed.
@@ -375,8 +379,10 @@ func (mod *Module) String() string {
 	appendAnnotationStrings := func(buf []string, node Node) []string {
 		if as, ok := byNode[node]; ok {
 			for i := range as {
-				buf = append(buf, "# METADATA")
-				buf = append(buf, "# "+as[i].String())
+				buf = append(buf,
+					"# METADATA",
+					"# "+as[i].String(),
+				)
 			}
 		}
 		return buf
@@ -615,7 +621,7 @@ func (imp *Import) SetLoc(loc *Location) {
 // document. This is the alias if defined otherwise the last element in the
 // path.
 func (imp *Import) Name() Var {
-	if len(imp.Alias) != 0 {
+	if imp.Alias != "" {
 		return imp.Alias
 	}
 	switch v := imp.Path.Value.(type) {
@@ -726,6 +732,7 @@ func (rule *Rule) SetLoc(loc *Location) {
 
 // Path returns a ref referring to the document produced by this rule. If rule
 // is not contained in a module, this function panics.
+//
 // Deprecated: Poor handling of ref rules. Use `(*Rule).Ref()` instead.
 func (rule *Rule) Path() Ref {
 	if rule.Module == nil {
@@ -981,6 +988,7 @@ func (head *Head) Copy() *Head {
 	cpy.Key = head.Key.Copy()
 	cpy.Value = head.Value.Copy()
 	cpy.keywords = nil
+	cpy.Assign = head.Assign
 	return &cpy
 }
 
