@@ -2,11 +2,11 @@
 // if the generated adoc file is used outside tabs, it renders correctly depending on the attribute set.
 // if inside, you need to also use the xxx_deprecation.adoc file. attributes can't be defined inside tabs.
 
-:show-deprecation: true
+:show-deprecation: false
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2026-01-22-16-32-45]
+[#deprecation-note-2026-01-22-17-00-30]
 [caption=]
 .Deprecation notes for the graph service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -15,11 +15,6 @@ ifeval::[{show-deprecation} == true]
 | Deprecation Version
 | Removal Version
 | Deprecation Replacement
-
-| Deprecating in favor of a unified array with arbitrary attributes
-| Balch
-| next-prod
-| UserSearchDisplayedAttributes
 |===
 
 {empty} +
@@ -427,17 +422,6 @@ a| [subs=-attributes]
 ++3 ++
 a| [subs=-attributes]
 The minimum length the search term needs to have for unprivileged users when searching for users or groups.
-
-a|`OCIS_SHOW_USER_EMAIL_IN_RESULTS` +
-xref:deprecation-note-2026-01-22-16-32-45[Deprecation Note]
-a| [subs=-attributes]
-++6.0.0 ++
-a| [subs=-attributes]
-++bool ++
-a| [subs=-attributes]
-++false ++
-a| [subs=-attributes]
-Include user email addresses in responses. If absent or set to false emails will be omitted from results. Please note that admin users can always see all email addresses.
 
 a|`OCIS_USER_SEARCH_DISPLAYED_ATTRIBUTES` +
 

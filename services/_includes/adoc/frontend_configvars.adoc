@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2026-01-22-16-32-45]
+[#deprecation-note-2026-01-22-17-00-30]
 [caption=]
 .Deprecation notes for the frontend service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -70,11 +70,6 @@ ifeval::[{show-deprecation} == true]
 | 7.0.0
 | next-prod
 | 
-
-| Deprecating in favor of a unified array with arbitrary attributes
-| 7.3.0
-| next-prod
-| UserSearchDisplayedAttributes
 |===
 
 {empty} +
@@ -622,7 +617,7 @@ a| [subs=-attributes]
 Path prefix for the data gateway.
 
 a|`OCIS_CACHE_STORE` +
-xref:deprecation-note-2026-01-22-16-32-45[Deprecation Note]
+xref:deprecation-note-2026-01-22-17-00-30[Deprecation Note]
 a| [subs=-attributes]
 ++pre5.0 ++
 a| [subs=-attributes]
@@ -633,7 +628,7 @@ a| [subs=-attributes]
 The type of the cache store. Supported values are: 'memory', 'redis-sentinel', 'nats-js-kv', 'noop'. See the text description for details.
 
 a|`OCIS_CACHE_STORE_NODES` +
-xref:deprecation-note-2026-01-22-16-32-45[Deprecation Note]
+xref:deprecation-note-2026-01-22-17-00-30[Deprecation Note]
 a| [subs=-attributes]
 ++pre5.0 ++
 a| [subs=-attributes]
@@ -644,7 +639,7 @@ a| [subs=-attributes]
 A list of nodes to access the configured store. This has no effect when 'memory' store is configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details.
 
 a|`OCIS_CACHE_DATABASE` +
-xref:deprecation-note-2026-01-22-16-32-45[Deprecation Note]
+xref:deprecation-note-2026-01-22-17-00-30[Deprecation Note]
 a| [subs=-attributes]
 ++pre5.0 ++
 a| [subs=-attributes]
@@ -655,7 +650,7 @@ a| [subs=-attributes]
 The database name the configured store should use.
 
 a|`OCIS_CACHE_TTL` +
-xref:deprecation-note-2026-01-22-16-32-45[Deprecation Note]
+xref:deprecation-note-2026-01-22-17-00-30[Deprecation Note]
 a| [subs=-attributes]
 ++pre5.0 ++
 a| [subs=-attributes]
@@ -666,7 +661,7 @@ a| [subs=-attributes]
 Default time to live for user info in the cache. Only applied when access tokens has no expiration. See the Environment Variable Types description for more details.
 
 a|`OCIS_CACHE_DISABLE_PERSISTENCE` +
-xref:deprecation-note-2026-01-22-16-32-45[Deprecation Note]
+xref:deprecation-note-2026-01-22-17-00-30[Deprecation Note]
 a| [subs=-attributes]
 ++5.0 ++
 a| [subs=-attributes]
@@ -677,7 +672,7 @@ a| [subs=-attributes]
 Disable persistence of the cache. Only applies when using the 'nats-js-kv' store type. Defaults to false.
 
 a|`OCIS_CACHE_AUTH_USERNAME` +
-xref:deprecation-note-2026-01-22-16-32-45[Deprecation Note]
+xref:deprecation-note-2026-01-22-17-00-30[Deprecation Note]
 a| [subs=-attributes]
 ++5.0 ++
 a| [subs=-attributes]
@@ -688,7 +683,7 @@ a| [subs=-attributes]
 The username to use for authentication. Only applies when using the 'nats-js-kv' store type.
 
 a|`OCIS_CACHE_AUTH_PASSWORD` +
-xref:deprecation-note-2026-01-22-16-32-45[Deprecation Note]
+xref:deprecation-note-2026-01-22-17-00-30[Deprecation Note]
 a| [subs=-attributes]
 ++5.0 ++
 a| [subs=-attributes]
@@ -699,7 +694,7 @@ a| [subs=-attributes]
 The password to use for authentication. Only applies when using the 'nats-js-kv' store type.
 
 a|`OCIS_ENABLE_OCM` +
-xref:deprecation-note-2026-01-22-16-32-45[Deprecation Note]
+xref:deprecation-note-2026-01-22-17-00-30[Deprecation Note]
 a| [subs=-attributes]
 ++5.0 ++
 a| [subs=-attributes]
@@ -710,7 +705,7 @@ a| [subs=-attributes]
 Include OCM shares when listing shares. See the OCM service documentation for more details.
 
 a|`OCIS_ENABLE_OCM` +
-xref:deprecation-note-2026-01-22-16-32-45[Deprecation Note]
+xref:deprecation-note-2026-01-22-17-00-30[Deprecation Note]
 a| [subs=-attributes]
 ++5.0 ++
 a| [subs=-attributes]
@@ -721,7 +716,7 @@ a| [subs=-attributes]
 Include OCM sharees when listing sharees.
 
 a|`OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD` +
-xref:deprecation-note-2026-01-22-16-32-45[Deprecation Note]
+xref:deprecation-note-2026-01-22-17-00-30[Deprecation Note]
 a| [subs=-attributes]
 ++5.0 ++
 a| [subs=-attributes]
@@ -732,7 +727,7 @@ a| [subs=-attributes]
 Set this to true if you want to enforce passwords on all public shares.
 
 a|`OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD` +
-xref:deprecation-note-2026-01-22-16-32-45[Deprecation Note]
+xref:deprecation-note-2026-01-22-17-00-30[Deprecation Note]
 a| [subs=-attributes]
 ++5.0 ++
 a| [subs=-attributes]
@@ -741,17 +736,6 @@ a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
 Set this to true if you want to enforce passwords for writable shares. Only effective if the setting for 'passwords on all public shares' is set to false.
-
-a|`OCIS_SHOW_USER_EMAIL_IN_RESULTS` +
-xref:deprecation-note-2026-01-22-16-32-45[Deprecation Note]
-a| [subs=-attributes]
-++6.0.0 ++
-a| [subs=-attributes]
-++bool ++
-a| [subs=-attributes]
-++false ++
-a| [subs=-attributes]
-Include user email addresses in responses. If absent or set to false emails will be omitted from results. Please note that admin users can always see all email addresses.
 
 a|`FRONTEND_CHECKSUMS_SUPPORTED_TYPES` +
 
