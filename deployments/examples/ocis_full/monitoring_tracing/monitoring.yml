@@ -6,7 +6,7 @@ services:
       # tracing
       OCIS_TRACING_ENABLED: "true"
       OCIS_TRACING_TYPE: "otlp"
-      OCIS_TRACING_ENDPOINT: jaeger:4317
+      OCIS_TRACING_ENDPOINT: signoz-otel-collector:4317
       # metrics
       # if oCIS runs as a single process, all  <debug>/metrics endpoints
       # will expose the same metrics, so it's sufficient to query one endpoint
@@ -15,12 +15,12 @@ services:
   collaboration:
     environment:
       # tracing
-      OCIS_TRACING_ENABLED: ${OCIS_TRACING_ENABLED:-true}
-      OCIS_TRACING_TYPE: ${OCIS_TRACING_TYPE:-otlp}
-      OCIS_TRACING_ENDPOINT: ${OCIS_TRACING_ENDPOINT:-jaeger:4317}
-
+      OCIS_TRACING_ENABLED: "true"
+      OCIS_TRACING_TYPE: "otlp"
+      OCIS_TRACING_ENDPOINT: signoz-otel-collector:4317
       # metrics
       COLLABORATION_DEBUG_ADDR: 0.0.0.0:9304
 
 networks:
   ocis-net:
+    external: true
