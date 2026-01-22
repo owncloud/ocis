@@ -200,10 +200,11 @@ func TestGetRolesByPermissions(t *testing.T) {
 			unifiedRoleDefinition: []*libregraph.UnifiedRoleDefinition{},
 		},
 		"RoleEditorLite and custom | folder": {
-			givenActions: append(getRoleActions(unifiedrole.RoleEditorLite()), unifiedrole.DriveItemQuotaRead),
+			givenActions: getRoleActions(unifiedrole.RoleEditorLite()),
 			constraints:  unifiedrole.UnifiedRoleConditionFolder,
 			unifiedRoleDefinition: []*libregraph.UnifiedRoleDefinition{
 				unifiedrole.RoleSecureViewer(),
+				unifiedrole.RoleViewer(),
 				unifiedrole.RoleEditorLite(),
 			},
 		},

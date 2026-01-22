@@ -1313,7 +1313,7 @@ github.com/orcaman/concurrent-map
 # github.com/owncloud/libre-graph-api-go v1.0.5-0.20260116104114-10074a92be64
 ## explicit; go 1.18
 github.com/owncloud/libre-graph-api-go
-# github.com/owncloud/reva/v2 v2.0.0-20260116122933-81e6e21256eb
+# github.com/owncloud/reva/v2 v2.0.0-20260116122933-81e6e21256eb => github.com/kobergj/reva/v2 v2.26.3-0.20260122145036-d6e50a1a1b8c
 ## explicit; go 1.24.0
 github.com/owncloud/reva/v2/cmd/revad/internal/grace
 github.com/owncloud/reva/v2/cmd/revad/runtime
@@ -2557,3 +2557,4 @@ stash.kopano.io/kgol/rndm
 # github.com/unrolled/secure => github.com/DeepDiver1975/secure v0.0.0-20240611112133-abc838fb797c
 # github.com/go-micro/plugins/v4/store/nats-js-kv => github.com/kobergj/plugins/v4/store/nats-js-kv v0.0.0-20240807130109-f62bb67e8c90
 # go-micro.dev/v4 => github.com/kobergj/go-micro/v4 v4.0.0-20250610135441-d0b187215699
+# github.com/owncloud/reva/v2 => github.com/kobergj/reva/v2 v2.26.3-0.20260122145036-d6e50a1a1b8c
