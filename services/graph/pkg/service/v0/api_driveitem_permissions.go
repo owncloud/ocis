@@ -69,8 +69,9 @@ type DriveItemPermissionsProvider interface {
 // DriveItemPermissionsService contains the production business logic for everything that relates to permissions on drive items.
 type DriveItemPermissionsService struct {
 	BaseGraphService
-	tp              trace.TracerProvider
-	identityBackend identity.Backend
+	tp                         trace.TracerProvider
+	identityBackend            identity.Backend
+	hasExternalSharePermission externalSharePermissionChecker
 }
 
 type permissionType int
@@ -83,8 +84,16 @@ const (
 	OCM
 )
 
+// supposed to return true if the user can share to users from other instances (multi-instance only)
+type externalSharePermissionChecker func(context.Context) bool
+
 // NewDriveItemPermissionsService creates a new DriveItemPermissionsService
-func NewDriveItemPermissionsService(logger log.Logger, gatewaySelector pool.Selectable[gateway.GatewayAPIClient], identityCache identity.IdentityCache, config *config.Config, tp trace.TracerProvider, be identity.Backend) (DriveItemPermissionsService, error) {
+func NewDriveItemPermissionsService(logger log.Logger, gatewaySelector pool.Selectable[gateway.GatewayAPIClient], identityCache identity.IdentityCache, config *config.Config, tp trace.TracerProvider, be identity.Backend, espc externalSharePermissionChecker) (DriveItemPermissionsService, error) {
+	f := func(context.Context) bool { return false }
+	if espc != nil {
+		f = espc
+	}
+
 	return DriveItemPermissionsService{
 		BaseGraphService: BaseGraphService{
 			logger:          &log.Logger{Logger: logger.With().Str("graph api", "DrivesDriveItemService").Logger()},
@@ -92,8 +101,9 @@ func NewDriveItemPermissionsService(logger log.Logger, gatewaySelector pool.Sele
 			identityCache:   identityCache,
 			config:          config,
 		},
-		tp:              tp,
-		identityBackend: be,
+		tp:                         tp,
+		identityBackend:            be,
+		hasExternalSharePermission: f,
 	}, nil
 }
 
@@ -193,7 +203,7 @@ func (s DriveItemPermissionsService) Invite(ctx context.Context, resourceId *sto
 	default:
 		user, err := s.identityCache.GetUser(ctx, objectID)
 		if errors.Is(err, identity.ErrNotFound) {
-			if s.config.MultiInstance.Enabled {
+			if s.config.MultiInstance.Enabled && s.hasExternalSharePermission(ctx) {
 				user, err = s.identityBackend.AddUser(ctx, objectID, s.config.MultiInstance.InstanceID)
 			}
 			if s.config.IncludeOCMSharees && err != nil {

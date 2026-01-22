@@ -210,6 +210,22 @@ func (g Graph) contextUserHasFullAccountPerms(reqctx context.Context) bool {
 	return true
 }
 
+func (g Graph) contextUserHasExternalSharePermission(reqctx context.Context) bool {
+	// mostly copied from the canCreateSpace method
+	pr, err := g.permissionsService.GetPermissionByID(reqctx, &settingssvc.GetPermissionByIDRequest{
+		PermissionId: defaults.CreateExternalSharePermission(0).Id,
+	})
+	if err != nil || pr.Permission == nil {
+		return false
+	}
+
+	if pr.Permission.Constraint != defaults.All {
+		return false
+	}
+
+	return true
+}
+
 // UserWithAttributes is a wrapper for the User type that includes attributes.
 // Attributes are a list of attributes that are displayed in the user search results.
 type UserWithAttributes struct {
@@ -361,7 +377,7 @@ func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 	username, instancename := g.parseExternalSearch(odataReq)
 
 	switch {
-	case username != "" && instancename != "":
+	case username != "" && instancename != "" && g.contextUserHasExternalSharePermission(r.Context()):
 		users = make([]*libregraph.User, 1)
 		users[0], err = g.identityBackend.GetPreciseUser(r.Context(), username, instancename, odataReq)
 	case odataReq.Query.Filter != nil:

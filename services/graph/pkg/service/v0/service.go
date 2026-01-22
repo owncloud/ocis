@@ -213,7 +213,7 @@ func NewService(opts ...Option) (Graph, error) { //nolint:maintidx
 		return svc, err
 	}
 
-	driveItemPermissionsService, err := NewDriveItemPermissionsService(options.Logger, options.GatewaySelector, identityCache, options.Config, options.TraceProvider, svc.identityBackend)
+	driveItemPermissionsService, err := NewDriveItemPermissionsService(options.Logger, options.GatewaySelector, identityCache, options.Config, options.TraceProvider, svc.identityBackend, svc.contextUserHasExternalSharePermission)
 	if err != nil {
 		return svc, err
 	}
