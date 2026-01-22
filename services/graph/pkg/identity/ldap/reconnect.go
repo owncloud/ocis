@@ -50,9 +50,9 @@ func NewLDAPWithReconnect(logger *log.Logger, config Config) ConnWithReconnect {
 	return conn
 }
 
+// Search implements the ldap.Client interface
 func (c ConnWithReconnect) Search(sr *ldap.SearchRequest) (*ldap.SearchResult, error) {
 	conn, err := c.GetConnection()
-
 	if err != nil {
 		return nil, err
 	}
@@ -76,6 +76,7 @@ func (c ConnWithReconnect) Search(sr *ldap.SearchRequest) (*ldap.SearchResult, e
 	return nil, ldap.NewError(ldap.ErrorNetwork, errMaxRetries)
 }
 
+// Add implements the ldap.Client interface
 func (c ConnWithReconnect) Add(a *ldap.AddRequest) error {
 	conn, err := c.GetConnection()
 	if err != nil {
@@ -99,12 +100,12 @@ func (c ConnWithReconnect) Add(a *ldap.AddRequest) error {
 	return ldap.NewError(ldap.ErrorNetwork, errMaxRetries)
 }
 
+// Del implements the ldap.Client interface
 func (c ConnWithReconnect) Del(d *ldap.DelRequest) error {
 	conn, err := c.GetConnection()
 	if err != nil {
 		return err
 	}
-
 	for try := 0; try <= c.retries; try++ {
 		err = conn.Del(d)
 		if !ldap.IsErrorWithCode(err, ldap.ErrorNetwork) {
@@ -123,12 +124,12 @@ func (c ConnWithReconnect) Del(d *ldap.DelRequest) error {
 	return ldap.NewError(ldap.ErrorNetwork, errMaxRetries)
 }
 
+// Modify implements the ldap.Client interface
 func (c ConnWithReconnect) Modify(m *ldap.ModifyRequest) error {
 	conn, err := c.GetConnection()
 	if err != nil {
 		return err
 	}
-
 	for try := 0; try <= c.retries; try++ {
 		err = conn.Modify(m)
 		if !ldap.IsErrorWithCode(err, ldap.ErrorNetwork) {
@@ -147,12 +148,12 @@ func (c ConnWithReconnect) Modify(m *ldap.ModifyRequest) error {
 	return ldap.NewError(ldap.ErrorNetwork, errMaxRetries)
 }
 
+// PasswordModify implements the ldap.Client interface
 func (c ConnWithReconnect) PasswordModify(m *ldap.PasswordModifyRequest) (*ldap.PasswordModifyResult, error) {
 	conn, err := c.GetConnection()
 	if err != nil {
 		return nil, err
 	}
-
 	var res *ldap.PasswordModifyResult
 	for try := 0; try <= c.retries; try++ {
 		res, err = conn.PasswordModify(m)
@@ -172,12 +173,12 @@ func (c ConnWithReconnect) PasswordModify(m *ldap.PasswordModifyRequest) (*ldap.
 	return nil, ldap.NewError(ldap.ErrorNetwork, errMaxRetries)
 }
 
+// ModifyDN implements the ldap.Client interface
 func (c ConnWithReconnect) ModifyDN(m *ldap.ModifyDNRequest) error {
 	conn, err := c.GetConnection()
 	if err != nil {
 		return err
 	}
-
 	for try := 0; try <= c.retries; try++ {
 		err = conn.ModifyDN(m)
 		if !ldap.IsErrorWithCode(err, ldap.ErrorNetwork) {
@@ -196,6 +197,7 @@ func (c ConnWithReconnect) ModifyDN(m *ldap.ModifyDNRequest) error {
 	return ldap.NewError(ldap.ErrorNetwork, errMaxRetries)
 }
 
+// GetConnection implements the ldap.Client interface
 func (c ConnWithReconnect) GetConnection() (*ldap.Conn, error) {
 	conn := <-c.conn
 	if conn.Conn != nil && !ldap.IsErrorWithCode(conn.Error, ldap.ErrorNetwork) {
@@ -205,12 +207,12 @@ func (c ConnWithReconnect) GetConnection() (*ldap.Conn, error) {
 	return c.reconnect(conn.Conn)
 }
 
+// ldapAutoConnect implements the ldap.Client interface
 func (c ConnWithReconnect) ldapAutoConnect(config Config) {
 	var (
 		l   *ldap.Conn
 		err error
 	)
-
 	for {
 		select {
 		case resConn := <-c.reset:
@@ -232,6 +234,7 @@ func (c ConnWithReconnect) ldapAutoConnect(config Config) {
 	}
 }
 
+// ldapConnect implements the ldap.Client interface
 func (c ConnWithReconnect) ldapConnect(config Config) (*ldap.Conn, error) {
 	c.logger.Debug().Msgf("Connecting to %s", config.URI)
 
@@ -262,6 +265,7 @@ func (c ConnWithReconnect) ldapConnect(config Config) (*ldap.Conn, error) {
 	return l, err
 }
 
+// reconnect implements the ldap.Client interface
 func (c ConnWithReconnect) reconnect(resetConn *ldap.Conn) (*ldap.Conn, error) {
 	c.logger.Debug().Msg("LDAP connection reset")
 	c.reset <- resetConn
@@ -297,11 +301,11 @@ func (c ConnWithReconnect) Extended(req *ldap.ExtendedRequest) (*ldap.ExtendedRe
 	return nil, ldap.NewError(ldap.ErrorNetwork, errMaxRetries)
 }
 
-
 // Remaining methods to fulfill ldap.Client interface
 
 func (c ConnWithReconnect) Start() {}
 
+// StartTLS implements the ldap.Client interface
 func (c ConnWithReconnect) StartTLS(*tls.Config) error {
 	return ldap.NewError(ldap.LDAPResultNotSupported, fmt.Errorf("not implemented"))
 }
@@ -309,7 +313,6 @@ func (c ConnWithReconnect) StartTLS(*tls.Config) error {
 // Close implements the ldap.Client interface
 func (c ConnWithReconnect) Close() (err error) {
 	conn, err := c.GetConnection()
-
 	if err != nil {
 		return err
 	}
@@ -319,48 +322,55 @@ func (c ConnWithReconnect) Close() (err error) {
 // GetLastError implements the ldap.Client interface
 func (c ConnWithReconnect) GetLastError() error {
 	conn, err := c.GetConnection()
-
 	if err != nil {
 		return err
 	}
 	return conn.GetLastError()
 }
 
+// IsClosing implements the ldap.Client interface
 func (c ConnWithReconnect) IsClosing() bool {
 	return false
 }
 
+// SetTimeout implements the ldap.Client interface
 func (c ConnWithReconnect) SetTimeout(time.Duration) {}
 
+// Bind implements the ldap.Client interface
 func (c ConnWithReconnect) Bind(username, password string) error {
 	return ldap.NewError(ldap.LDAPResultNotSupported, fmt.Errorf("not implemented"))
 }
 
+// UnauthenticatedBind implements the ldap.Client interface
 func (c ConnWithReconnect) UnauthenticatedBind(username string) error {
 	return ldap.NewError(ldap.LDAPResultNotSupported, fmt.Errorf("not implemented"))
 }
 
+// SimpleBind implements the ldap.Client interface
 func (c ConnWithReconnect) SimpleBind(*ldap.SimpleBindRequest) (*ldap.SimpleBindResult, error) {
 	return nil, ldap.NewError(ldap.LDAPResultNotSupported, fmt.Errorf("not implemented"))
 }
 
+// ExternalBind implements the ldap.Client interface
 func (c ConnWithReconnect) ExternalBind() error {
 	return ldap.NewError(ldap.LDAPResultNotSupported, fmt.Errorf("not implemented"))
 }
 
+// ModifyWithResult implements the ldap.Client interface
 func (c ConnWithReconnect) ModifyWithResult(m *ldap.ModifyRequest) (*ldap.ModifyResult, error) {
 	conn, err := c.GetConnection()
 	if err != nil {
 		return nil, err
 	}
-
 	return conn.ModifyWithResult(m)
 }
 
+// Compare implements the ldap.Client interface
 func (c ConnWithReconnect) Compare(dn, attribute, value string) (bool, error) {
 	return false, ldap.NewError(ldap.LDAPResultNotSupported, fmt.Errorf("not implemented"))
 }
 
+// Compare implements the ldap.Client interface
 func (c ConnWithReconnect) SearchWithPaging(searchRequest *ldap.SearchRequest, pagingSize uint32) (*ldap.SearchResult, error) {
 	return nil, ldap.NewError(ldap.LDAPResultNotSupported, fmt.Errorf("not implemented"))
 }

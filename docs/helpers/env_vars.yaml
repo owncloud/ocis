@@ -9126,17 +9126,6 @@ OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD:
   deprecationVersion: ""
   removalVersion: ""
   deprecationInfo: ""
-OCIS_SHOW_USER_EMAIL_IN_RESULTS:
-  name: OCIS_SHOW_USER_EMAIL_IN_RESULTS
-  defaultValue: "false"
-  type: bool
-  description: Include user email addresses in responses. If absent or set to false
-    emails will be omitted from results. Please note that admin users can always see
-    all email addresses.
-  introductionVersion: 6.0.0
-  deprecationVersion: ""
-  removalVersion: ""
-  deprecationInfo: ""
 OCIS_SPACES_MAX_QUOTA:
   name: OCIS_SPACES_MAX_QUOTA;FRONTEND_MAX_QUOTA
   defaultValue: "0"
