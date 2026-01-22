@@ -108,7 +108,7 @@
     "web-vitals": "^5.1.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.28.0",
+    "@babel/core": "^7.28.6",
     "@babel/eslint-parser": "^7.28.0",
     "@babel/plugin-transform-class-properties": "^7.27.1",
     "@babel/plugin-transform-nullish-coalescing-operator": "^7.27.1",
