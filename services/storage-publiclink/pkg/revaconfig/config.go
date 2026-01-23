@@ -37,7 +37,15 @@ func StoragePublicLinkConfigFromStruct(cfg *config.Config) map[string]interface{
 					"auth_manager": "publicshares",
 					"auth_managers": map[string]interface{}{
 						"publicshares": map[string]interface{}{
-							"gateway_addr": cfg.Reva.Address,
+							"gateway_addr":             cfg.Reva.Address,
+							"brute_force_time_gap":     cfg.BruteForce.TimeGap,
+							"brute_force_max_attempts": cfg.BruteForce.MaxAttempts,
+							"store_type":               cfg.Store.Store,
+							"store_nodes":              cfg.Store.Nodes,
+							"store_database":           cfg.Store.Database,
+							"store_table":              cfg.Store.Table,
+							"store_username":           cfg.Store.AuthUsername,
+							"store_password":           cfg.Store.AuthPassword,
 						},
 					},
 				},

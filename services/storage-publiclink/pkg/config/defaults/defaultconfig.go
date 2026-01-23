@@ -1,6 +1,8 @@
 package defaults
 
 import (
+	"time"
+
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	"github.com/owncloud/ocis/v2/ocis-pkg/structs"
 	"github.com/owncloud/ocis/v2/services/storage-publiclink/pkg/config"
@@ -34,6 +36,16 @@ func DefaultConfig() *config.Config {
 		Reva: shared.DefaultRevaConfig(),
 		StorageProvider: config.StorageProvider{
 			MountID: "7993447f-687f-490d-875c-ac95e89a62a4",
+		},
+		BruteForce: config.BruteForce{
+			TimeGap:     1 * time.Hour,
+			MaxAttempts: 5,
+		},
+		Store: config.Store{
+			Store:    "nats-js-kv",
+			Nodes:    []string{"127.0.0.1:9233"},
+			Database: "storage-publiclink",
+			Table:    "brute-force-protection",
 		},
 	}
 }
