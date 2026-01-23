@@ -1,6 +1,6 @@
 ---
 title: storage-publiclink
-date: 2026-01-23T14:43:28.061970022Z
+date: 2026-01-23T17:56:36.720734874Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/storage-publiclink
