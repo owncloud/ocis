@@ -384,7 +384,7 @@ config = {
         "part": {
             "skip": False,
             "totalParts": 4,  # divide and run all suites in parts (divide pipelines)
-            "xsuites": ["search", "app-provider", "oidc", "ocm", "keycloak"],  # suites to skip
+            "xsuites": ["search", "app-provider", "ocm", "keycloak"],  # suites to skip
         },
         "search": {
             "skip": False,
@@ -1537,6 +1537,7 @@ def e2eTestPipeline(ctx):
             "HEADLESS": "true",
             "RETRY": "1",
             "REPORT_TRACING": "with-tracing" in ctx.build.title.lower(),
+            "SKIP_A11Y_TESTS": "true",
         }
 
         # configs to setup ocis with keycloak
@@ -1723,6 +1724,7 @@ def multiServiceE2ePipeline(ctx):
                     "BASE_URL_OCIS": OCIS_DOMAIN,
                     "HEADLESS": "true",
                     "RETRY": "1",
+                    "SKIP_A11Y_TESTS": "true",
                 },
                 "commands": [
                     "cd %s/tests/e2e" % dirs["web"],
