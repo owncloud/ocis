@@ -27,10 +27,10 @@ import (
 	link "github.com/cs3org/go-cs3apis/cs3/sharing/link/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	typespb "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	"github.com/jellydator/ttlcache/v2"
 	"github.com/owncloud/reva/v2/pkg/conversions"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/status"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
-	"github.com/jellydator/ttlcache/v2"
 )
 
 // DBShare stores information about user and public shares.
@@ -157,6 +157,9 @@ func sharePermToInt(p *provider.ResourcePermissions) int {
 func intTosharePerm(p int) (*provider.ResourcePermissions, error) {
 	perms, err := conversions.NewPermissions(p)
 	if err != nil {
+		if err == conversions.ErrZeroPermission {
+			return nil, nil
+		}
 		return nil, err
 	}
 

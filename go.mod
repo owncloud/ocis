@@ -368,3 +368,5 @@ replace go-micro.dev/v4 => github.com/kobergj/go-micro/v4 v4.0.0-20250610135441-
 // exclude the v2 line of go-sqlite3 which was released accidentally and prevents pulling in newer versions of go-sqlite3
 // see https://github.com/mattn/go-sqlite3/issues/965 for more details
 exclude github.com/mattn/go-sqlite3 v2.0.3+incompatible
+
+replace github.com/owncloud/reva/v2 => github.com/kobergj/reva/v2 v2.26.3-0.20260122145036-d6e50a1a1b8c

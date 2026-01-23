@@ -209,6 +209,40 @@ func NewUnknownRole() *Role {
 	}
 }
 
+// Sharing Viewer (Files + Folders)
+
+// NewSecureViewerRole creates a secure viewer role
+func NewSecureViewerRole() *Role {
+	return &Role{
+		Name: RoleSecureViewer,
+		cS3ResourcePermissions: &provider.ResourcePermissions{
+			GetPath:       true,
+			ListContainer: true,
+			Stat:          true,
+		},
+	}
+}
+
+// NewViewerRole creates a viewer role.
+func NewViewerRole() *Role {
+	r := NewSecureViewerRole()
+	r.Name = RoleViewer
+	r.ocsPermissions = PermissionRead
+	r.cS3ResourcePermissions.GetQuota = true
+	r.cS3ResourcePermissions.InitiateFileDownload = true
+	return r
+}
+
+// NewViewerListGrantsRole creates a viewer role.
+func NewViewerListGrantsRole() *Role {
+	r := NewViewerRole()
+	r.Name = RoleViewerListGrants
+	r.cS3ResourcePermissions.ListGrants = true
+	return r
+}
+
+// Sharing Folder
+
 // NewDeniedRole creates a fully denied role
 func NewDeniedRole() *Role {
 	return &Role{
@@ -218,185 +252,126 @@ func NewDeniedRole() *Role {
 	}
 }
 
-// NewViewerRole creates a viewer role. `sharing` indicates if sharing permission should be added
-func NewViewerRole() *Role {
-	p := PermissionRead
-	return &Role{
-		Name: RoleViewer,
-		cS3ResourcePermissions: &provider.ResourcePermissions{
-			GetPath:              true,
-			GetQuota:             true,
-			InitiateFileDownload: true,
-			ListContainer:        true,
-			ListRecycle:          true,
-			Stat:                 true,
-		},
-		ocsPermissions: p,
-	}
+// NewEditorLiteRole creates an editor-lite role
+func NewEditorLiteRole() *Role {
+	r := NewViewerRole()
+	r.Name = RoleEditorLite
+	r.ocsPermissions = PermissionCreate
+	r.cS3ResourcePermissions.CreateContainer = true
+	r.cS3ResourcePermissions.InitiateFileUpload = true
+	r.cS3ResourcePermissions.Move = true
+	return r
 }
 
-// NewViewerListGrantsRole creates a viewer role. `sharing` indicates if sharing permission should be added
-func NewViewerListGrantsRole() *Role {
-	role := NewViewerRole()
-	role.cS3ResourcePermissions.ListGrants = true
-	return role
-}
-
-// NewSpaceViewerRole creates a spaceviewer role
-func NewSpaceViewerRole() *Role {
-	return &Role{
-		Name: RoleSpaceViewer,
-		cS3ResourcePermissions: &provider.ResourcePermissions{
-			GetPath:              true,
-			GetQuota:             true,
-			InitiateFileDownload: true,
-			ListContainer:        true,
-			ListGrants:           true,
-			ListRecycle:          true,
-			Stat:                 true,
-		},
-		ocsPermissions: PermissionRead,
-	}
-}
-
-// NewEditorRole creates an editor role. `sharing` indicates if sharing permission should be added
+// NewEditorRole creates an editor role.
 func NewEditorRole() *Role {
-	p := PermissionRead | PermissionCreate | PermissionWrite | PermissionDelete
-	return &Role{
-		Name: RoleEditor,
-		cS3ResourcePermissions: &provider.ResourcePermissions{
-			CreateContainer:      true,
-			Delete:               true,
-			GetPath:              true,
-			GetQuota:             true,
-			InitiateFileDownload: true,
-			InitiateFileUpload:   true,
-			ListContainer:        true,
-			ListRecycle:          true,
-			Move:                 true,
-			RestoreRecycleItem:   true,
-			Stat:                 true,
-		},
-		ocsPermissions: p,
-	}
+	r := NewEditorLiteRole()
+	r.Name = RoleEditor
+	r.ocsPermissions = PermissionRead | PermissionCreate | PermissionWrite | PermissionDelete
+	r.cS3ResourcePermissions.Delete = true
+	r.cS3ResourcePermissions.RestoreRecycleItem = true
+	return r
 }
 
-// NewEditorListGrantsRole creates an editor role. `sharing` indicates if sharing permission should be added
+// NewEditorListGrantsRole creates an editor role.
 func NewEditorListGrantsRole() *Role {
-	role := NewEditorRole()
-	role.cS3ResourcePermissions.ListGrants = true
-	return role
+	r := NewEditorRole()
+	r.Name = RoleEditorListGrants
+	r.cS3ResourcePermissions.ListGrants = true
+	return r
 }
 
-// NewEditorListGrantsWithVersionsRole creates an editor role. `sharing` indicates if sharing permission should be added
+// NewEditorListGrantsWithVersionsRole creates an editor role.
 func NewEditorListGrantsWithVersionsRole() *Role {
-	role := NewEditorListGrantsRole()
-	role.cS3ResourcePermissions.ListFileVersions = true
-	return role
+	r := NewEditorListGrantsRole()
+	r.Name = RoleEditorListGrantsWithVersions
+	r.cS3ResourcePermissions.ListFileVersions = true
+	r.cS3ResourcePermissions.RestoreFileVersion = true
+	return r
 }
 
-// NewSpaceEditorRole creates an editor role
-func NewSpaceEditorRole() *Role {
-	return &Role{
-		Name: RoleSpaceEditor,
-		cS3ResourcePermissions: &provider.ResourcePermissions{
-			CreateContainer:      true,
-			Delete:               true,
-			GetPath:              true,
-			GetQuota:             true,
-			InitiateFileDownload: true,
-			InitiateFileUpload:   true,
-			ListContainer:        true,
-			ListFileVersions:     true,
-			ListGrants:           true,
-			ListRecycle:          true,
-			Move:                 true,
-			RestoreFileVersion:   true,
-			RestoreRecycleItem:   true,
-			Stat:                 true,
-		},
-		ocsPermissions: PermissionRead | PermissionCreate | PermissionWrite | PermissionDelete,
-	}
-}
-
-// NewSpaceEditorWithoutVersionsRole creates an editor without list/restore versions role
-func NewSpaceEditorWithoutVersionsRole() *Role {
-	return &Role{
-		Name: RoleSpaceEditorWithoutVersions,
-		cS3ResourcePermissions: &provider.ResourcePermissions{
-			CreateContainer:      true,
-			Delete:               true,
-			GetPath:              true,
-			GetQuota:             true,
-			InitiateFileDownload: true,
-			InitiateFileUpload:   true,
-			ListContainer:        true,
-			ListGrants:           true,
-			ListRecycle:          true,
-			Move:                 true,
-			RestoreRecycleItem:   true,
-			Stat:                 true,
-		},
-		ocsPermissions: PermissionRead | PermissionCreate | PermissionWrite | PermissionDelete,
-	}
-}
-
-// NewSpaceEditorWithoutTrashbinRole creates an editor role without list/restore resources in trashbin on a space.
-func NewSpaceEditorWithoutTrashbinRole() *Role {
-	return &Role{
-		Name: RoleSpaceEditorWithoutTrashbin,
-		cS3ResourcePermissions: &provider.ResourcePermissions{
-			CreateContainer:      true,
-			Delete:               true,
-			GetPath:              true,
-			GetQuota:             true,
-			InitiateFileDownload: true,
-			InitiateFileUpload:   true,
-			ListContainer:        true,
-			ListFileVersions:     true,
-			ListGrants:           true,
-			Move:                 true,
-			RestoreFileVersion:   true,
-			Stat:                 true,
-		},
-		ocsPermissions: PermissionRead | PermissionCreate | PermissionWrite | PermissionDelete,
-	}
-}
+// Sharing File
 
 // NewFileEditorRole creates a file-editor role
 func NewFileEditorRole() *Role {
-	p := PermissionRead | PermissionWrite
-	return &Role{
-		Name: RoleEditor,
-		cS3ResourcePermissions: &provider.ResourcePermissions{
-			GetPath:              true,
-			GetQuota:             true,
-			InitiateFileDownload: true,
-			ListContainer:        true,
-			ListRecycle:          true,
-			Stat:                 true,
-			InitiateFileUpload:   true,
-			RestoreRecycleItem:   true,
-		},
-		ocsPermissions: p,
-	}
+	r := NewViewerRole()
+	r.Name = RoleFileEditor
+	r.ocsPermissions = PermissionRead | PermissionWrite
+	r.cS3ResourcePermissions.InitiateFileUpload = true
+	return r
 }
 
 // NewFileEditorListGrantsRole creates a file-editor role
 func NewFileEditorListGrantsRole() *Role {
-	role := NewFileEditorRole()
-	role.cS3ResourcePermissions.ListGrants = true
-	return role
+	r := NewFileEditorRole()
+	r.Name = RoleFileEditorListGrants
+	r.cS3ResourcePermissions.ListGrants = true
+	return r
 }
 
 // NewFileEditorListGrantsWithVersionsRole creates a file-editor role
 func NewFileEditorListGrantsWithVersionsRole() *Role {
 	role := NewFileEditorListGrantsRole()
 	role.cS3ResourcePermissions.ListFileVersions = true
+	role.cS3ResourcePermissions.RestoreFileVersion = true
 	return role
 }
 
-// NewCoownerRole creates a coowner role.
+// Space Membership
+
+// NewSpaceViewerRole creates a spaceviewer role
+// FIXME: Same as ViewerListGrants
+func NewSpaceViewerRole() *Role {
+	r := NewViewerRole()
+	r.Name = RoleSpaceViewer
+	r.cS3ResourcePermissions.ListGrants = true
+	return r
+}
+
+// NewSpaceEditorWithoutVersionsRole creates an editor without list/restore versions role
+func NewSpaceEditorWithoutVersionsRole() *Role {
+	r := NewSpaceViewerRole()
+	r.Name = RoleSpaceEditorWithoutVersions
+	r.cS3ResourcePermissions.CreateContainer = true
+	r.cS3ResourcePermissions.InitiateFileUpload = true
+	r.cS3ResourcePermissions.Move = true
+	return r
+}
+
+// NewSpaceEditorWithoutTrashbinRole creates an editor role without list/restore resources in trashbin on a space.
+func NewSpaceEditorWithoutTrashbinRole() *Role {
+	r := NewSpaceEditorWithoutVersionsRole()
+	r.Name = RoleSpaceEditorWithoutTrashbin
+	r.ocsPermissions = PermissionRead | PermissionCreate | PermissionWrite | PermissionDelete
+	r.cS3ResourcePermissions.ListFileVersions = true
+	r.cS3ResourcePermissions.RestoreFileVersion = true
+	return r
+}
+
+// NewSpaceEditorRole creates an editor role
+func NewSpaceEditorRole() *Role {
+	r := NewSpaceEditorWithoutTrashbinRole()
+	r.Name = RoleSpaceEditor
+	r.cS3ResourcePermissions.ListRecycle = true
+	r.cS3ResourcePermissions.Delete = true
+	r.cS3ResourcePermissions.RestoreRecycleItem = true
+	return r
+}
+
+// NewManagerRole creates an manager role
+func NewManagerRole() *Role {
+	r := NewSpaceEditorRole()
+	r.Name = RoleManager
+	r.ocsPermissions = PermissionAll
+	r.cS3ResourcePermissions.PurgeRecycle = true
+	r.cS3ResourcePermissions.AddGrant = true    // managers can add users to the space
+	r.cS3ResourcePermissions.RemoveGrant = true // managers can remove users from the space
+	r.cS3ResourcePermissions.UpdateGrant = true // managers can update user roles
+	r.cS3ResourcePermissions.DenyGrant = true   // managers can deny access to sub folders
+	return r
+}
+
+// NewCoownerRole creates a coowner role. NOT USED BY OCIS
 func NewCoownerRole() *Role {
 	return &Role{
 		Name: RoleCoowner,
@@ -424,24 +399,7 @@ func NewCoownerRole() *Role {
 	}
 }
 
-// NewEditorLiteRole creates an editor-lite role
-func NewEditorLiteRole() *Role {
-	return &Role{
-		Name: RoleEditorLite,
-		cS3ResourcePermissions: &provider.ResourcePermissions{
-			Stat:                 true,
-			GetPath:              true,
-			CreateContainer:      true,
-			InitiateFileUpload:   true,
-			InitiateFileDownload: true,
-			ListContainer:        true,
-			Move:                 true,
-		},
-		ocsPermissions: PermissionCreate,
-	}
-}
-
-// NewUploaderRole creates an uploader role with no download permissions
+// NewUploaderRole creates an uploader role with no download permissions. NOT USED BY OCIS
 func NewUploaderRole() *Role {
 	return &Role{
 		Name: RoleUploader,
@@ -455,55 +413,12 @@ func NewUploaderRole() *Role {
 	}
 }
 
-// NewNoneRole creates a role with no permissions
+// NewNoneRole creates a role with no permissions NOT USED BY OCIS
 func NewNoneRole() *Role {
 	return &Role{
 		Name:                   "none",
 		cS3ResourcePermissions: &provider.ResourcePermissions{},
 		ocsPermissions:         PermissionInvalid,
-	}
-}
-
-// NewManagerRole creates an manager role
-func NewManagerRole() *Role {
-	return &Role{
-		Name: RoleManager,
-		cS3ResourcePermissions: &provider.ResourcePermissions{
-			GetPath:              true,
-			GetQuota:             true,
-			InitiateFileDownload: true,
-			ListGrants:           true,
-			ListContainer:        true,
-			ListFileVersions:     true,
-			ListRecycle:          true,
-			Stat:                 true,
-			InitiateFileUpload:   true,
-			RestoreFileVersion:   true,
-			RestoreRecycleItem:   true,
-			Move:                 true,
-			CreateContainer:      true,
-			Delete:               true,
-			PurgeRecycle:         true,
-
-			// these permissions only make sense to enforce them in the root of the storage space.
-			AddGrant:    true, // managers can add users to the space
-			RemoveGrant: true, // managers can remove users from the space
-			UpdateGrant: true,
-			DenyGrant:   true, // managers can deny access to sub folders
-		},
-		ocsPermissions: PermissionAll,
-	}
-}
-
-// NewSecureViewerRole creates a secure viewer role
-func NewSecureViewerRole() *Role {
-	return &Role{
-		Name: RoleSecureViewer,
-		cS3ResourcePermissions: &provider.ResourcePermissions{
-			GetPath:       true,
-			ListContainer: true,
-			Stat:          true,
-		},
 	}
 }
 

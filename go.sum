@@ -592,6 +592,8 @@ github.com/kobergj/icap-client v0.0.0-20250116172800-8eaa5022532b h1:NBKEgFtIukC
 github.com/kobergj/icap-client v0.0.0-20250116172800-8eaa5022532b/go.mod h1:HpntrRsQA6RKNXy2Nbr4kVj+NO3OYWpAQUVxeya+3sU=
 github.com/kobergj/plugins/v4/store/nats-js-kv v0.0.0-20240807130109-f62bb67e8c90 h1:pfI8Z5yavO6fU6vDGlWhZ4BgDlvj8c6xB7J57HfTPwA=
 github.com/kobergj/plugins/v4/store/nats-js-kv v0.0.0-20240807130109-f62bb67e8c90/go.mod h1:pjcozWijkNPbEtX5SIQaxEW/h8VAVZYTLx+70bmB3LY=
+github.com/kobergj/reva/v2 v2.26.3-0.20260122145036-d6e50a1a1b8c h1:fY6NPkp7mrLXBOGZ4WgWg/bQfCurX70hgv58QrZ/ptQ=
+github.com/kobergj/reva/v2 v2.26.3-0.20260122145036-d6e50a1a1b8c/go.mod h1:Itza4SSsgKrDfoXXFIjdZaz8dVSkC0orJl+w5tW23PY=
 github.com/konsorten/go-windows-terminal-sequences v1.0.1/go.mod h1:T0+1ngSBFLxvqU3pZ+m/2kptfBszLMUkC4ZK/EgS/cQ=
 github.com/konsorten/go-windows-terminal-sequences v1.0.3/go.mod h1:T0+1ngSBFLxvqU3pZ+m/2kptfBszLMUkC4ZK/EgS/cQ=
 github.com/kovidgoyal/go-parallel v1.1.1 h1:1OzpNjtrUkBPq3UaqrnvOoB2F9RttSt811uiUXyI7ok=
@@ -742,8 +744,6 @@ github.com/orcaman/concurrent-map v1.0.0 h1:I/2A2XPCb4IuQWcQhBhSwGfiuybl/J0ev9HD
 github.com/orcaman/concurrent-map v1.0.0/go.mod h1:Lu3tH6HLW3feq74c2GC+jIMS/K2CFcDWnWD9XkenwhI=
 github.com/owncloud/libre-graph-api-go v1.0.5-0.20260116104114-10074a92be64 h1:z9djjzd+leAy6QZpi8dLy3OVjc/um+1XAGk1SJEvwE8=
 github.com/owncloud/libre-graph-api-go v1.0.5-0.20260116104114-10074a92be64/go.mod h1:z61VMGAJRtR1nbgXWiNoCkxUXP1B3Je9rMuJbnGd+Og=
-github.com/owncloud/reva/v2 v2.0.0-20260116122933-81e6e21256eb h1:G4YhVvtdJDEE0fhV0sWMUDpcpV5WqQNdfLw9xNMfkFI=
-github.com/owncloud/reva/v2 v2.0.0-20260116122933-81e6e21256eb/go.mod h1:nDBXQivlwd4Vf5UD/oDT0RakSXy0GJPI1LsyHMm5IpI=
 github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c h1:rp5dCmg/yLR3mgFuSOe4oEnDDmGLROTvMragMUXpTQw=
 github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c/go.mod h1:X07ZCGwUbLaax7L0S3Tw4hpejzu63ZrrQiUe6W0hcy0=
 github.com/pablodz/inotifywaitgo v0.0.9 h1:njquRbBU7fuwIe5rEvtaniVBjwWzcpdUVptSgzFqZsw=
