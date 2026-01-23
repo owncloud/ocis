@@ -59,6 +59,11 @@
 | 
 
 |
+| OCIS_LDAP_GROUP_AFFILIATION_ATTRIBUTE
+| LDAP Attribute to signal which instance the group is belonging to. Requires OCIS_MULTI_INSTANCE_ENABLED.
+| 
+
+|
 | OCIS_LDAP_PRECISE_SEARCH_ATTRIBUTE
 | LDAP Attribute to be used for searching users on other instances. Requires OCIS_MULTI_INSTANCE_ENABLED.
 | 

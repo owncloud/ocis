@@ -79,6 +79,7 @@ type LDAP struct {
 	conn   ldap.Client
 
 	// multi instance only
+	instanceID                     string
 	preciseSearchAttribute         string
 	instanceMapperEnabled          bool
 	instanceMapperBaseDN           string
@@ -146,9 +147,10 @@ func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger, inst
 		return nil, errors.New("invalid group attribute mappings")
 	}
 	gam := groupAttributeMap{
-		name:   config.GroupNameAttribute,
-		id:     config.GroupIDAttribute,
-		member: config.GroupMemberAttribute,
+		name:        config.GroupNameAttribute,
+		id:          config.GroupIDAttribute,
+		member:      config.GroupMemberAttribute,
+		affiliation: config.GroupAffiliationAttribute,
 	}
 
 	var userScope, groupScope int
@@ -211,6 +213,7 @@ func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger, inst
 		writeEnabled:                   config.WriteEnabled,
 		refintEnabled:                  config.RefintEnabled,
 		useExternalID:                  config.RequireExternalID,
+		instanceID:                     instanceID,
 		preciseSearchAttribute:         config.PreciseSearchAttribute,
 		instanceMapperEnabled:          config.InstanceMapperEnabled,
 		instanceMapperBaseDN:           config.InstanceMapperBaseDN,
