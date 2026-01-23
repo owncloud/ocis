@@ -113,5 +113,35 @@
 | The claim name for the 'memberOf' property
 | memberOf
 
+| xref:{s-path}/storage-publiclink.adoc[Storage-Publiclink]
+| STORAGE_PUBLICLINK_STORE_STORE
+| The type of the store. Supported values are: 'memory', 'nats-js-kv', 'redis-sentinel', 'noop'. See the text description for details.
+| nats-js-kv
+
+|
+| STORAGE_PUBLICLINK_STORE_NODES
+| A list of nodes to access the configured store. This has no effect when 'memory' store is configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details.
+| [127.0.0.1:9233]
+
+|
+| STORAGE_PUBLICLINK_STORE_DATABASE
+| The database name the configured store should use.
+|
+
+|
+| STORAGE_PUBLICLINK_STORE_TABLE
+| The database table the store should use.
+|
+
+|
+| STORAGE_PUBLICLINK_STORE_AUTH_USERNAME
+| The username to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.
+|
+
+|
+| STORAGE_PUBLICLINK_STORE_AUTH_PASSWORD
+| The password to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.
+|
+
 |===
 

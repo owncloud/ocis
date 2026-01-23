@@ -88,6 +88,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Bump Web to v12.2.0: [#11834](https://github.com/owncloud/ocis/pull/11834)
 * Enhancement - Introduce claims for multi-instance-ocis: [#11848](https://github.com/owncloud/ocis/pull/11848)
 * Enhancement - Update the ocis_full deployment example images: [#11860](https://github.com/owncloud/ocis/pull/11860)
+* Enhancement - Implement brute force protection for public links: [#11864](https://github.com/owncloud/ocis/pull/11864)
 * Enhancement - Update the ocis_full deployment example traefik image: [#11867](https://github.com/owncloud/ocis/pull/11867)
 * Enhancement - Added a graph endpoint alias: [#11871](https://github.com/owncloud/ocis/pull/11871)
 * Enhancement - Force Strict-Transport-Security: [#11880](https://github.com/owncloud/ocis/pull/11880)
@@ -289,6 +290,19 @@ The following sections list the changes for unreleased.
   * Mailpit    1.28.0
 
    https://github.com/owncloud/ocis/pull/11860
+
+* Enhancement - Implement brute force protection for public links: [#11864](https://github.com/owncloud/ocis/pull/11864)
+
+   Public links will be protected by default, allowing up to 5 wrong password
+   attempts per hour. If such rate is exceeded, the link will be blocked for all
+   the users until the failure rate goes below the configured threshold (5 failures
+   per hour by default, as said).
+
+   The failure rate is configurable, so it can be 10 failures each 2 hours or 3
+   failures per minute.
+
+   https://github.com/owncloud/ocis/pull/11864
+   https://github.com/owncloud/reva/pull/460
 
 * Enhancement - Update the ocis_full deployment example traefik image: [#11867](https://github.com/owncloud/ocis/pull/11867)
 
