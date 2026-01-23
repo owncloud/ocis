@@ -261,6 +261,11 @@ func (c *cs3backend) UpdateUserIfNeeded(ctx context.Context, user *cs3.User, cla
 
 // SyncGroupMemberships maintains a users group memberships based on an OIDC claim
 func (c *cs3backend) SyncGroupMemberships(ctx context.Context, user *cs3.User, claims map[string]interface{}) error {
+	if c.autoProvisionClaims.Groups == "" {
+		// do not sync groups when claim is not set
+		return nil
+	}
+
 	gatewayClient, err := c.gatewaySelector.Next()
 	if err != nil {
 		c.logger.Error().Err(err).Msg("could not select next gateway client")

@@ -89,7 +89,8 @@ services:
       OCIS_LDAP_BIND_DN: "cn=admin,dc=owncloud,dc=com"
       OCIS_LDAP_BIND_PASSWORD: ${LDAP_ADMIN_PASSWORD:-admin}
       OCIS_LDAP_GROUP_BASE_DN: "ou=groups,dc=owncloud,dc=com"
-      OCIS_LDAP_GROUP_OBJECTCLASS: "groupOfNames"
+      GRAPH_LDAP_GROUP_CREATE_BASE_DN: "ou=groups-ec730a6c-1b63-4b45-b83b-9e2311afdf85,ou=groups,dc=owncloud,dc=com"
+      OCIS_LDAP_GROUP_OBJECTCLASS: "owncloudGroup"
       OCIS_LDAP_USER_BASE_DN: "ou=users,dc=owncloud,dc=com"
       OCIS_LDAP_USER_OBJECTCLASS: "inetOrgPerson"
       LDAP_LOGIN_ATTRIBUTES: "uid"
@@ -106,6 +107,7 @@ services:
       OCIS_LDAP_GROUP_FILTER: "(&(objectclass=owncloud)(ownCloudMemberOf=ec730a6c-1b63-4b45-b83b-9e2311afdf85))"
       OCIS_LDAP_USER_MEMBER_ATTRIBUTE: "owncloudMemberOf"
       OCIS_LDAP_USER_GUEST_ATTRIBUTE: "ownCloudGuestOf"
+      OCIS_LDAP_GROUP_AFFILIATION_ATTRIBUTE: "owncloudMemberOf"
       OCIS_LDAP_PRECISE_SEARCH_ATTRIBUTE: "cn"
       OCIS_LDAP_INSTANCE_MAPPER_ENABLED: true
       OCIS_LDAP_INSTANCE_MAPPER_BASE_DN: "dc=owncloud,dc=com"
@@ -117,8 +119,9 @@ services:
       OCIS_MULTI_INSTANCE_GUEST_ROLE: "user-light"
       OCIS_LDAP_CROSS_INSTANCE_REFERENCE_TEMPLATE: "{{.Username}}@{{.Instancename}}.owncloud.test"
       OCIS_LDAP_INSTANCE_URL_TEMPLATE: "https://{{.Instancename}}.owncloud.test"
-      # Workaround needed to show external users - can be removed once fixed
-      OCIS_USER_SEARCH_DISPLAYED_ATTRIBUTES: mail
+      # FIXME: sync groups properly to keycloak and remove the next line
+      PROXY_AUTOPROVISION_CLAIM_GROUPS: ""
+      # specific for deployment example
       PROXY_ROLE_ASSIGNMENT_OIDC_CLAIM: ownCloudRole
     volumes:
       - ./config/ocis/banned-password-list.txt:/etc/ocis/banned-password-list.txt
