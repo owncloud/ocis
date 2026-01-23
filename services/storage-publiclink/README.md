@@ -6,7 +6,7 @@ The brute force protection will prevent access to public links if wrong password
 
 By default, you're allowed a maximum of 5 failed attempts in 1 hour:
 
-* `STORAGE_PUBLICLINK_BRUTEFORCE_MAXATTEMPTS=5` 
+* `STORAGE_PUBLICLINK_BRUTEFORCE_MAXATTEMPTS=5`
 * `STORAGE_PUBLICLINK_BRUTEFORCE_TIMEGAP=1h`
 
 You can adjust those values to your liking in order to define the failure rate threshold (5 failures per hour, by default).
