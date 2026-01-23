@@ -77,6 +77,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix Sharingroles: [#11898](https://github.com/owncloud/ocis/pull/11898)
 * Bugfix - Fix the error handling for empty name on space update: [#11933](https://github.com/owncloud/ocis/pull/11933)
 * Change - Remove deprecated OCIS_SHOW_USER_EMAIL_IN_RESULTS: [#11942](https://github.com/owncloud/ocis/pull/11942)
+* Enhancement - Bump Reva: [#460](https://github.com/owncloud/reva/pull/460)
 * Enhancement - Set Referrer-Policy to no-referrer: [#11722](https://github.com/owncloud/ocis/pull/11722)
 * Enhancement - Bump Reva: [#11748](https://github.com/owncloud/ocis/pull/11748)
 * Enhancement - Support disabling editors by extensions: [#11750](https://github.com/owncloud/ocis/pull/11750)
@@ -170,6 +171,15 @@ The following sections list the changes for unreleased.
    control which user attributes are displayed in search results.
 
    https://github.com/owncloud/ocis/pull/11942
+
+* Enhancement - Bump Reva: [#460](https://github.com/owncloud/reva/pull/460)
+
+   This updates the ownCloud Reva dependency to include brute force protection for
+   public links. The feature implements rate-limiting that blocks access to
+   password-protected public shares after exceeding a configurable maximum number
+   of failed authentication attempts within a time window.
+
+   https://github.com/owncloud/reva/pull/460
 
 * Enhancement - Set Referrer-Policy to no-referrer: [#11722](https://github.com/owncloud/ocis/pull/11722)
 

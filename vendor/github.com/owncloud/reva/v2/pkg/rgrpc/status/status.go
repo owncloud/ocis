@@ -161,6 +161,15 @@ func NewLocked(ctx context.Context, msg string) *rpc.Status {
 	}
 }
 
+// NewTooManyRequests return a status Code_CODE_RESOURCE_EXHAUSTED
+func NewTooManyRequests(ctx context.Context, msg string) *rpc.Status {
+	return &rpc.Status{
+		Code:    rpc.Code_CODE_RESOURCE_EXHAUSTED,
+		Message: msg,
+		Trace:   getTrace(ctx),
+	}
+}
+
 // NewStatusFromErrType returns a status that corresponds to the given errtype
 func NewStatusFromErrType(ctx context.Context, msg string, err error) *rpc.Status {
 	switch e := err.(type) {
@@ -191,6 +200,8 @@ func NewStatusFromErrType(ctx context.Context, msg string, err error) *rpc.Statu
 		return NewUnimplemented(ctx, err, msg+":"+err.Error())
 	case errtypes.BadRequest:
 		return NewInvalid(ctx, msg+":"+err.Error())
+	case errtypes.TooManyRequests:
+		return NewTooManyRequests(ctx, msg+": "+err.Error())
 	}
 
 	// map GRPC status codes coming from the auth middleware

@@ -205,6 +205,14 @@ func (e TooEarly) Error() string { return "error: too early: " + string(e) }
 // IsTooEarly implements the IsTooEarly interface.
 func (e TooEarly) IsTooEarly() {}
 
+// TooManyRequests is the error to use when too many requests have been received in a given period of time
+type TooManyRequests string
+
+func (e TooManyRequests) Error() string { return "error: too many requests: " + string(e) }
+
+// IsTooManyRequests implements the IsTooManyRequests interface
+func (e TooManyRequests) IsTooManyRequests() {}
+
 // IsNotFound is the interface to implement
 // to specify that a resource is not found.
 type IsNotFound interface {
@@ -295,6 +303,12 @@ type IsTooEarly interface {
 	IsTooEarly()
 }
 
+// IsTooManyRequests is the interface to implement
+// to specify that too many requests have been received in a period of time
+type IsTooManyRequests interface {
+	IsTooManyRequests()
+}
+
 // NewErrtypeFromStatus maps a rpc status to an errtype
 func NewErrtypeFromStatus(status *rpc.Status) error {
 	switch status.Code {
@@ -365,6 +379,8 @@ func NewErrtypeFromHTTPStatusCode(code int, message string) error {
 		return PartialContent(message)
 	case http.StatusTooEarly:
 		return TooEarly(message)
+	case http.StatusTooManyRequests:
+		return TooManyRequests(message)
 	case StatusChecksumMismatch:
 		return ChecksumMismatch(message)
 	default:
@@ -401,6 +417,8 @@ func NewHTTPStatusCodeFromErrtype(err error) int {
 		return http.StatusPartialContent
 	case TooEarly:
 		return http.StatusTooEarly
+	case TooManyRequests:
+		return http.StatusTooManyRequests
 	case ChecksumMismatch:
 		return StatusChecksumMismatch
 	default:
