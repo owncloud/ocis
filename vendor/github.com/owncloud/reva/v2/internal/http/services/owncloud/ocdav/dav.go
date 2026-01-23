@@ -330,6 +330,9 @@ func (h *DavHandler) Handler(s *svc) http.Handler {
 			case res.Status.Code == rpc.Code_CODE_NOT_FOUND:
 				w.WriteHeader(http.StatusNotFound)
 				return
+			case res.Status.Code == rpc.Code_CODE_RESOURCE_EXHAUSTED:
+				w.WriteHeader(http.StatusTooManyRequests)
+				return
 			case res.Status.Code != rpc.Code_CODE_OK:
 				w.WriteHeader(http.StatusInternalServerError)
 				return
