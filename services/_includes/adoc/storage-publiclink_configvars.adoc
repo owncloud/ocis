@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2026-01-23-13-05-51]
+[#deprecation-note-2026-01-23-14-43-25]
 [caption=]
 .Deprecation notes for the storage-publiclink service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -238,6 +238,98 @@ a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the go-micro based grpc services.
+
+a|`STORAGE_PUBLICLINK_BRUTEFORCE_TIMEGAP` +
+
+a| [subs=-attributes]
+++8.0.0 ++
+a| [subs=-attributes]
+++Duration ++
+a| [subs=-attributes]
+++1h0m0s ++
+a| [subs=-attributes]
+The duration of the time gap computed for the brute force protection.
+
+a|`STORAGE_PUBLICLINK_BRUTEFORCE_MAXATTEMPTS` +
+
+a| [subs=-attributes]
+++8.0.0 ++
+a| [subs=-attributes]
+++int ++
+a| [subs=-attributes]
+++5 ++
+a| [subs=-attributes]
+The maximum number of failed attempts allowed in the time gap defined in STORAGE_PUBLICLINK_BRUTEFORCE_TIMEGAP.
+
+a|`OCIS_PERSISTENT_STORE` +
+`STORAGE_PUBLICLINK_STORE_STORE` +
+
+a| [subs=-attributes]
+++8.0.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++nats-js-kv ++
+a| [subs=-attributes]
+The type of the store. Supported values are: 'memory', 'nats-js-kv', 'redis-sentinel', 'noop'. See the text description for details.
+
+a|`OCIS_PERSISTENT_STORE_NODES` +
+`STORAGE_PUBLICLINK_STORE_NODES` +
+
+a| [subs=-attributes]
+++8.0.0 ++
+a| [subs=-attributes]
+++[]string ++
+a| [subs=-attributes]
+++[127.0.0.1:9233] ++
+a| [subs=-attributes]
+A list of nodes to access the configured store. This has no effect when 'memory' store is configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details.
+
+a|`STORAGE_PUBLICLINK_STORE_DATABASE` +
+
+a| [subs=-attributes]
+++8.0.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++storage-publiclink ++
+a| [subs=-attributes]
+The database name the configured store should use.
+
+a|`STORAGE_PUBLICLINK_STORE_TABLE` +
+
+a| [subs=-attributes]
+++8.0.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++brute-force-protection ++
+a| [subs=-attributes]
+The database table the store should use.
+
+a|`OCIS_PERSISTENT_STORE_AUTH_USERNAME` +
+`STORAGE_PUBLICLINK_STORE_AUTH_USERNAME` +
+
+a| [subs=-attributes]
+++8.0.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The username to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.
+
+a|`OCIS_PERSISTENT_STORE_AUTH_PASSWORD` +
+`STORAGE_PUBLICLINK_STORE_AUTH_PASSWORD` +
+
+a| [subs=-attributes]
+++8.0.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The password to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.
 
 a|`STORAGE_PUBLICLINK_SKIP_USER_GROUPS_IN_TOKEN` +
 
