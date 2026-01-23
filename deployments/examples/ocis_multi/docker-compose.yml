@@ -118,7 +118,7 @@ services:
       OCIS_LDAP_CROSS_INSTANCE_REFERENCE_TEMPLATE: "{{.Username}}@{{.Instancename}}.owncloud.test"
       OCIS_LDAP_INSTANCE_URL_TEMPLATE: "https://{{.Instancename}}.owncloud.test"
       # Workaround needed to show external users - can be removed once fixed
-      OCIS_SHOW_USER_EMAIL_IN_RESULTS: true
+      OCIS_USER_SEARCH_DISPLAYED_ATTRIBUTES: mail
       PROXY_ROLE_ASSIGNMENT_OIDC_CLAIM: ownCloudRole
     volumes:
       - ./config/ocis/banned-password-list.txt:/etc/ocis/banned-password-list.txt
@@ -215,7 +215,7 @@ services:
       OCIS_LDAP_INSTANCE_URL_TEMPLATE: "https://{{.Instancename}}.owncloud.test"
       # user filter required for multi-instance ocis
       # Workaround needed to show external users - can be removed once fixed
-      OCIS_SHOW_USER_EMAIL_IN_RESULTS: true
+      OCIS_USER_SEARCH_DISPLAYED_ATTRIBUTES: mail
       PROXY_ROLE_ASSIGNMENT_OIDC_CLAIM: ownCloudRole
     volumes:
       - ./config/ocis/csp-ocm.yaml:/etc/ocis/csp-ocm.yaml
