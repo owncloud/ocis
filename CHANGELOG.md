@@ -76,6 +76,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix error code when a user can't disable a space: [#11845](https://github.com/owncloud/ocis/pull/11845)
 * Bugfix - Fix Sharingroles: [#11898](https://github.com/owncloud/ocis/pull/11898)
 * Bugfix - Fix the error handling for empty name on space update: [#11933](https://github.com/owncloud/ocis/pull/11933)
+* Change - Remove deprecated OCIS_SHOW_USER_EMAIL_IN_RESULTS: [#11942](https://github.com/owncloud/ocis/pull/11942)
 * Enhancement - Set Referrer-Policy to no-referrer: [#11722](https://github.com/owncloud/ocis/pull/11722)
 * Enhancement - Bump Reva: [#11748](https://github.com/owncloud/ocis/pull/11748)
 * Enhancement - Support disabling editors by extensions: [#11750](https://github.com/owncloud/ocis/pull/11750)
@@ -161,6 +162,14 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/11887
    https://github.com/owncloud/ocis/pull/11933
+
+* Change - Remove deprecated OCIS_SHOW_USER_EMAIL_IN_RESULTS: [#11942](https://github.com/owncloud/ocis/pull/11942)
+
+   Deprecated OCIS_SHOW_USER_EMAIL_IN_RESULTS environment variable was removed from
+   frontend service config. Use OCIS_USER_SEARCH_DISPLAYED_ATTRIBUTES instead to
+   control which user attributes are displayed in search results.
+
+   https://github.com/owncloud/ocis/pull/11942
 
 * Enhancement - Set Referrer-Policy to no-referrer: [#11722](https://github.com/owncloud/ocis/pull/11722)
 

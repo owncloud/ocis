@@ -434,9 +434,6 @@ func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 
 	usersWithAttributes := make([]*UserWithAttributes, 0, len(users))
 	displayedAttributes := g.config.API.UserSearchDisplayedAttributes
-	if g.config.API.ShowUserEmailInResults && !slices.Contains(displayedAttributes, "mail") {
-		displayedAttributes = append([]string{"mail"}, displayedAttributes...)
-	}
 
 	for _, user := range users {
 		attributes, err := getUsersAttributes(displayedAttributes, user)
@@ -454,8 +451,7 @@ func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 
 		if ctxHasFullPerms {
 			finalUser = user
-		} else if g.config.API.ShowUserEmailInResults || slices.Contains(displayedAttributes, "mail") {
-			// Remove this once `ShowUserEmailInResults` is removed
+		} else if slices.Contains(displayedAttributes, "mail") {
 			finalUser.Mail = user.Mail
 		}
 
@@ -691,7 +687,7 @@ func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	if !g.config.API.ShowUserEmailInResults && !slices.Contains(g.config.API.UserSearchDisplayedAttributes, "mail") {
+	if !slices.Contains(g.config.API.UserSearchDisplayedAttributes, "mail") {
 		user.Mail = nil
 	}
 

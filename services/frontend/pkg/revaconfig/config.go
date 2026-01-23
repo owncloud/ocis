@@ -172,12 +172,17 @@ func FrontendConfigFromStruct(cfg *config.Config, logger log.Logger) (map[string
 						"cache_auth_username":       cfg.OCS.StatCacheAuthUsername,
 						"cache_auth_password":       cfg.OCS.StatCacheAuthPassword,
 					},
-					"prefix":                    cfg.OCS.Prefix,
-					"additional_info_attribute": cfg.OCS.AdditionalInfoAttribute,
-					"machine_auth_apikey":       cfg.MachineAuthAPIKey,
-					"enable_denials":            cfg.OCS.EnableDenials,
-					"list_ocm_shares":           cfg.OCS.ListOCMShares,
-					"cache_warmup_driver":       cfg.OCS.CacheWarmupDriver,
+					"prefix": cfg.OCS.Prefix,
+					"additional_info_attribute": func() string {
+						if slices.Contains(cfg.UserSearchDisplayedAttributes, "mail") {
+							return "{{.Mail}}"
+						}
+						return cfg.OCS.AdditionalInfoAttribute
+					}(),
+					"machine_auth_apikey": cfg.MachineAuthAPIKey,
+					"enable_denials":      cfg.OCS.EnableDenials,
+					"list_ocm_shares":     cfg.OCS.ListOCMShares,
+					"cache_warmup_driver": cfg.OCS.CacheWarmupDriver,
 					"cache_warmup_drivers": map[string]interface{}{
 						"cbox": map[string]interface{}{
 							"db_username": cfg.OCS.CacheWarmupDrivers.CBOX.DBUsername,
@@ -358,7 +363,7 @@ func FrontendConfigFromStruct(cfg *config.Config, logger log.Logger) (map[string
 						},
 					},
 					"include_ocm_sharees":              cfg.OCS.IncludeOCMSharees,
-					"show_email_in_results":            cfg.OCS.ShowUserEmailInResults,
+					"show_email_in_results":            slices.Contains(cfg.UserSearchDisplayedAttributes, "mail"),
 					"user_search_displayed_attributes": cfg.UserSearchDisplayedAttributes,
 				},
 			},
