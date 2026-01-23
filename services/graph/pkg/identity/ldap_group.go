@@ -18,9 +18,10 @@ import (
 )
 
 type groupAttributeMap struct {
-	name   string
-	id     string
-	member string
+	name        string
+	id          string
+	member      string
+	affiliation string
 }
 
 // GetGroup implements the Backend Interface for the LDAP Backend
@@ -199,13 +200,24 @@ func (i *LDAP) CreateGroup(ctx context.Context, group libregraph.Group) (*libreg
 
 	if err := i.conn.Add(ar); err != nil {
 		var lerr *ldap.Error
-		logger.Debug().Str("backend", "ldap").Str("dn", group.GetDisplayName()).Err(err).Msg("Failed to create group")
+		logger.Error().Str("backend", "ldap").Str("dn", group.GetDisplayName()).Err(err).Msg("Failed to create group")
 		if errors.As(err, &lerr) {
 			if lerr.ResultCode == ldap.LDAPResultEntryAlreadyExists {
 				err = errorcode.New(errorcode.NameAlreadyExists, "group already exists")
 			}
+
+			if lerr.ResultCode == ldap.LDAPResultNoSuchObject {
+				r := ldap.NewAddRequest(i.groupCreateBaseDN, nil)
+				r.Attribute("objectClass", []string{"organizationalUnit"})
+				e := i.conn.Add(r)
+				if e == nil {
+					err = i.conn.Add(ar)
+				}
+			}
 		}
-		return nil, err
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	// Read	back group from LDAP to get the generated UUID
@@ -436,7 +448,7 @@ func (i *LDAP) getGroupCreateLDAPDN(group libregraph.Group) string {
 func (i *LDAP) groupToLDAPAttrValues(group libregraph.Group) (map[string][]string, error) {
 	attrs := map[string][]string{
 		i.groupAttributeMap.name: {group.GetDisplayName()},
-		"objectClass":            {"groupOfNames", "top"},
+		"objectClass":            {"groupOfNames", "top", i.groupObjectClass},
 		// This is a crutch to allow groups without members for LDAP servers
 		// that apply strict Schema checking. The RFCs define "member/uniqueMember"
 		// as required attribute for groupOfNames/groupOfUniqueNames. So we
@@ -451,6 +463,11 @@ func (i *LDAP) groupToLDAPAttrValues(group libregraph.Group) (map[string][]strin
 		attrs["owncloudUUID"] = []string{uuid.Must(uuid.NewV4()).String()}
 		attrs["objectClass"] = append(attrs["objectClass"], "owncloud")
 	}
+
+	if i.instanceID != "" {
+		attrs[i.groupAttributeMap.affiliation] = []string{i.instanceID}
+	}
+
 	return attrs, nil
 }
 

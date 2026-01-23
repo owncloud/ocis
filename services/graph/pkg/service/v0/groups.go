@@ -126,7 +126,7 @@ func (g Graph) PostGroup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if grp, err = g.identityBackend.CreateGroup(r.Context(), *grp); err != nil {
-		logger.Debug().Err(err).Interface("group", grp).Msg("could not create group: backend error")
+		logger.Error().Err(err).Interface("group", grp).Msg("could not create group: backend error")
 		errorcode.RenderError(w, r, err)
 		return
 	}
