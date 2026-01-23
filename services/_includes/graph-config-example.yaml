@@ -129,6 +129,7 @@ identity:
     require_external_id: false
     user_member_attribute: ""
     user_guest_attribute: ""
+    group_affiliation_attribute: ""
     precise_search_attribute: ""
     instance_mapper_enabled: false
     instance_mapper_base_dn: ""

@@ -97,6 +97,7 @@
 | GRAPH_LDAP_REQUIRE_EXTERNAL_ID | bool | false | If enabled, the 'OCIS_LDAP_USER_SCHEMA_EXTERNAL_ID' is used as primary identifier for the provisioning API.|
 | OCIS_LDAP_USER_MEMBER_ATTRIBUTE | string |  | LDAP Attribute to signal the user is member of an instance. Requires OCIS_MULTI_INSTANCE_ENABLED.|
 | OCIS_LDAP_USER_GUEST_ATTRIBUTE | string |  | LDAP Attribute to signal the user is guest of an instance. Requires OCIS_MULTI_INSTANCE_ENABLED.|
+| OCIS_LDAP_GROUP_AFFILIATION_ATTRIBUTE | string |  | LDAP Attribute to signal which instance the group is belonging to. Requires OCIS_MULTI_INSTANCE_ENABLED.|
 | OCIS_LDAP_PRECISE_SEARCH_ATTRIBUTE | string |  | LDAP Attribute to be used for searching users on other instances. Requires OCIS_MULTI_INSTANCE_ENABLED.|
 | OCIS_LDAP_INSTANCE_MAPPER_ENABLED | bool | false | The InstanceMapper allows mapping instance names (user readable) to instance IDs (machine readable) based on an LDAP query. See other _INSTANCE_MAPPER_ env vars. Requires OCIS_MULTI_INSTANCE_ENABLED.|
 | OCIS_LDAP_INSTANCE_MAPPER_BASE_DN | string |  | BaseDN of the 'instancename to instanceid' mapper in LDAP. Requires OCIS_MULTI_INSTANCE_ENABLED.|
