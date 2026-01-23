@@ -22,10 +22,5 @@ to `STORAGE_PUBLICLINK_BRUTEFORCE_TIME` in the worst case.
 If the public link is blocked by the brute force protection, it will be blocked
 for all the users.
 
-In case of multiple service replicas, the brute force protection won't share
-any data among the replicas and the failure rate will apply per replica. This
-means that a replica might be blocked due to high failure rate while the rest
-work fine.
-
 As said, this feature is enabled by default, with a 5 failures per hour rate.
 If you want to disable this feature, set the related configuration values to 0.

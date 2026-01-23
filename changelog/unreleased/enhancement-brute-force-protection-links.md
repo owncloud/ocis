@@ -8,8 +8,5 @@ all the users until the failure rate goes below the configured threshold
 The failure rate is configurable, so it can be 10 failures each 2 hours
 or 3 failures per minute.
 
-Note that the protection will apply per service replica, so one replica
-might be blocked while another replica is fully functional.
-
 https://github.com/owncloud/ocis/pull/11864
 https://github.com/owncloud/reva/pull/460
