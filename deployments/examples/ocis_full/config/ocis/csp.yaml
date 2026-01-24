@@ -7,6 +7,8 @@ directives:
     - 'https://${COMPANION_DOMAIN|companion.owncloud.test}/'
     - 'wss://${COMPANION_DOMAIN|companion.owncloud.test}/'
     - 'https://raw.githubusercontent.com/owncloud/awesome-ocis/'
+    # Photo-addon: OpenStreetMap tile requests
+    - 'https://*.tile.openstreetmap.org'
   default-src:
     - '''none'''
   font-src:
@@ -30,6 +32,8 @@ directives:
     # In contrary to bash and docker the default is given after the | character
     - 'https://${ONLYOFFICE_DOMAIN|onlyoffice.owncloud.test}/'
     - 'https://${COLLABORA_DOMAIN|collabora.owncloud.test}/'
+    # Photo-addon: OpenStreetMap tiles for map view
+    - 'https://*.tile.openstreetmap.org'
   manifest-src:
     - '''self'''
   media-src:
