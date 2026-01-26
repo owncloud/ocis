@@ -42,7 +42,7 @@ func decodeAnimated(r io.Reader) (*AnimatedWEBP, error) {
 	}
 
 	for {
-		frame, err := parseFrame(riffReader, vp8xHeader)
+		frame, err := parseFrame(riffReader)
 		if err != nil {
 			if err == io.EOF {
 				break
@@ -93,7 +93,7 @@ func validateANIMHeader(r *riff.Reader) (ANIMHeader, error) {
 	return h, nil
 }
 
-func parseFrame(r *riff.Reader, h VP8XHeader) (*Frame, error) {
+func parseFrame(r *riff.Reader) (*Frame, error) {
 	fourCC, chunkLen, chunkData, err := r.Next()
 	if err != nil {
 		return nil, err
@@ -131,28 +131,29 @@ func parseFrame(r *riff.Reader, h VP8XHeader) (*Frame, error) {
 			return nil, err
 		}
 	}
-	if subFourCC != fccVP8 && subFourCC != fccVP8L {
-		return nil, errInvalidFormat
-	}
-
 	var out image.Image
-	if subFourCC == fccVP8 {
+	switch subFourCC {
+	case fccVP8:
 		i, err = decodeVp8Bitstream(subChunkData, int(subChunkLen))
 		if err != nil {
 			return nil, err
 		}
-		if alpha != nil && len(alpha) > 0 {
+		if len(alpha) > 0 {
 			out = &image.NYCbCrA{
 				YCbCr:   *i,
 				A:       alpha,
 				AStride: stride,
 			}
+		} else {
+			out = i
 		}
-	} else if subFourCC == fccVP8L {
+	case fccVP8L:
 		out, err = vp8l.Decode(subChunkData)
 		if err != nil {
 			return nil, err
 		}
+	default:
+		return nil, errInvalidFormat
 	}
 
 	return &Frame{
