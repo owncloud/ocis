@@ -20,6 +20,8 @@ import (
 	"image"
 	"image/color"
 	"io"
+
+	"github.com/kovidgoyal/imaging/nrgb"
 )
 
 // Color type, as per the PNG spec.
@@ -249,7 +251,7 @@ func (d *decoder) parsePLTE(length uint32) error {
 	switch d.cb {
 	case cbP1, cbP2, cbP4, cbP8:
 		d.palette = make(color.Palette, 256)
-		for i := 0; i < np; i++ {
+		for i := range np {
 			d.palette[i] = color.RGBA{d.tmp[3*i+0], d.tmp[3*i+1], d.tmp[3*i+2], 0xff}
 		}
 		for i := np; i < 256; i++ {
@@ -319,7 +321,7 @@ func (d *decoder) parsetRNS(length uint32) error {
 		if len(d.palette) < n {
 			d.palette = d.palette[:n]
 		}
-		for i := 0; i < n; i++ {
+		for i := range n {
 			rgba := d.palette[i].(color.RGBA)
 			d.palette[i] = color.NRGBA{rgba.R, rgba.G, rgba.B, d.tmp[i]}
 		}
@@ -332,7 +334,9 @@ func (d *decoder) parsetRNS(length uint32) error {
 
 // Read presents one or more IDAT chunks as one continuous stream (minus the
 // intermediate chunk headers and footers). If the PNG data looked like:
-//   ... len0 IDAT xxx crc0 len1 IDAT yy crc1 len2 IEND crc2
+//
+//	... len0 IDAT xxx crc0 len1 IDAT yy crc1 len2 IEND crc2
+//
 // then this reader presents xxxyy. For well-formed PNG data, the decoder state
 // immediately before the first Read call is that d.r is positioned between the
 // first IDAT and xxx, and the decoder state immediately after the last Read
@@ -400,7 +404,7 @@ func (d *decoder) decode() (image.Image, error) {
 		if err != nil {
 			return nil, err
 		}
-		for pass := 0; pass < 7; pass++ {
+		for pass := range 7 {
 			imagePass, err := d.readImagePass(r, pass, false)
 			if err != nil {
 				return nil, err
@@ -435,7 +439,7 @@ func (d *decoder) readImagePass(r io.Reader, pass int, allocateOnly bool) (image
 	pixOffset := 0
 	var (
 		gray     *image.Gray
-		rgba     *image.RGBA
+		rgb      *nrgb.Image
 		paletted *image.Paletted
 		nrgba    *image.NRGBA
 		gray16   *image.Gray16
@@ -479,8 +483,8 @@ func (d *decoder) readImagePass(r io.Reader, pass int, allocateOnly bool) (image
 			nrgba = image.NewNRGBA(image.Rect(0, 0, width, height))
 			img = nrgba
 		} else {
-			rgba = image.NewRGBA(image.Rect(0, 0, width, height))
-			img = rgba
+			rgb = nrgb.NewNRGB(image.Rect(0, 0, width, height))
+			img = rgb
 		}
 	case cbP1, cbP2, cbP4, cbP8:
 		bitsPerPixel = d.depth
@@ -559,7 +563,7 @@ func (d *decoder) readImagePass(r io.Reader, pass int, allocateOnly bool) (image
 			// The first column has no column to the left of it, so it is a
 			// special case. We know that the first column exists because we
 			// check above that width != 0, and so len(cdat) != 0.
-			for i := 0; i < bytesPerPixel; i++ {
+			for i := range bytesPerPixel {
 				cdat[i] += pdat[i] / 2
 			}
 			for i := bytesPerPixel; i < len(cdat); i++ {
@@ -686,16 +690,15 @@ func (d *decoder) readImagePass(r io.Reader, pass int, allocateOnly bool) (image
 				}
 				pixOffset += nrgba.Stride
 			} else {
-				pix, i, j := rgba.Pix, pixOffset, 0
+				pix, i, j := rgb.Pix, pixOffset, 0
 				for x := 0; x < width; x++ {
 					pix[i+0] = cdat[j+0]
 					pix[i+1] = cdat[j+1]
 					pix[i+2] = cdat[j+2]
-					pix[i+3] = 0xff
-					i += 4
+					i += 3
 					j += 3
 				}
-				pixOffset += rgba.Stride
+				pixOffset += rgb.Stride
 			}
 		case cbP1:
 			for x := 0; x < width; x += 8 {
@@ -1145,8 +1148,4 @@ func DecodeConfig(r io.Reader) (image.Config, error) {
 		Width:      d.a.Frames[0].width,
 		Height:     d.a.Frames[0].height,
 	}, nil
-}
-
-func init() {
-	image.RegisterFormat("apng", pngHeader, Decode, DecodeConfig)
 }

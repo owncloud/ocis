@@ -13,7 +13,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/kettek/apng"
+	"github.com/kovidgoyal/imaging/apng"
 	"github.com/kovidgoyal/imaging/prism/meta"
 	"github.com/kovidgoyal/imaging/prism/meta/gifmeta"
 	"github.com/kovidgoyal/imaging/webp"
@@ -163,15 +163,20 @@ func (self *Image) populate_from_gif(g *gif.GIF) {
 			Delay: gifmeta.CalculateFrameDelay(g.Delay[i], min_gap),
 		}
 		switch prev_disposal {
-		case gif.DisposalNone:
+		case gif.DisposalNone, 0: // 1
 			frame.ComposeOnto = frame.Number - 1
-		case gif.DisposalPrevious:
+		case gif.DisposalPrevious: // 3
 			frame.ComposeOnto = prev_compose_onto
-		case gif.DisposalBackground:
-			// this is in contravention of the GIF spec but browsers and
-			// gif2apng both do this, so follow them. Test image for this
-			// is apple.gif
-			frame.ComposeOnto = frame.Number - 1
+		case gif.DisposalBackground: // 2
+			if i > 0 && g.Delay[i-1] == 0 {
+				// this is in contravention of the GIF spec but browsers and
+				// gif2apng both do this, so follow them. Test images for this
+				// are apple.gif and disposal-background-with-delay.gif
+				frame.ComposeOnto = frame.Number - 1
+			} else {
+				// delay present, frame visible, so clear to background as the spec requires
+				frame.ComposeOnto = 0
+			}
 		}
 		prev_disposal, prev_compose_onto = g.Disposal[i], frame.ComposeOnto
 		self.Frames = append(self.Frames, &frame)
@@ -460,12 +465,12 @@ func (self *Image) Resize(width, height int, filter ResampleFilter) {
 	sx := float64(width) / float64(old_width)
 	sy := float64(height) / float64(old_height)
 	scaledx := func(x int) int { return int(float64(x) * sx) }
-	scaledy := func(x int) int { return int(float64(x) * sy) }
+	scaledy := func(y int) int { return int(float64(y) * sy) }
 	for i, f := range self.Frames {
 		if i == 0 {
-			f.Image = Resize(f.Image, width, height, filter)
+			f.Image = ResizeWithOpacity(f.Image, width, height, filter, IsOpaque(f.Image))
 		} else {
-			f.Image = Resize(f.Image, scaledx(f.Image.Bounds().Dx()), scaledy(f.Image.Bounds().Dy()), filter)
+			f.Image = ResizeWithOpacity(f.Image, scaledx(f.Image.Bounds().Dx()), scaledy(f.Image.Bounds().Dy()), filter, IsOpaque(f.Image))
 			f.TopLeft = image.Pt(scaledx(f.TopLeft.X), scaledy(f.TopLeft.Y))
 		}
 	}
