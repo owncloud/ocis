@@ -16,6 +16,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/kovidgoyal/imaging/apng"
+	myjpeg "github.com/kovidgoyal/imaging/jpeg"
 	"github.com/kovidgoyal/imaging/magick"
 	_ "github.com/kovidgoyal/imaging/netpbm"
 	"github.com/kovidgoyal/imaging/prism/meta"
@@ -26,7 +28,6 @@ import (
 	"github.com/kovidgoyal/imaging/types"
 	"github.com/kovidgoyal/imaging/webp"
 
-	"github.com/kettek/apng"
 	"github.com/rwcarlsen/goexif/exif"
 	exif_tiff "github.com/rwcarlsen/goexif/tiff"
 
@@ -178,7 +179,10 @@ func NewDecodeConfig(opts ...DecodeOption) (cfg *decodeConfig) {
 func (cfg *decodeConfig) magick_callback(w, h int) (ro magick.RenderOptions) {
 	ro.AutoOrient = cfg.autoOrientation
 	if cfg.resize != nil {
-		ro.ResizeTo.X, ro.ResizeTo.Y = cfg.resize(w, h)
+		nw, nh := cfg.resize(w, h)
+		if nw != w || nh != h {
+			ro.ResizeTo.X, ro.ResizeTo.Y = nw, nh
+		}
 	}
 	ro.Background = cfg.background
 	ro.ToSRGB = cfg.outputColorspace == SRGB_COLORSPACE
@@ -382,7 +386,15 @@ func decode_all_go(r io.Reader, md *meta.Data, cfg *decodeConfig) (ans *Image, e
 		ans.Metadata.NumFrames = len(ans.Frames)
 		ans.Metadata.NumPlays = int(ans.LoopCount)
 	} else {
-		img, _, err := image.Decode(r)
+		var img image.Image
+		switch md.Format {
+		case JPEG:
+			img, err = myjpeg.Decode(r)
+		case PNG:
+			img, err = apng.Decode(r)
+		default:
+			img, _, err = image.Decode(r)
+		}
 		if err != nil {
 			return nil, err
 		}
@@ -622,7 +634,7 @@ func Encode(w io.Writer, img image.Image, format Format, opts ...EncodeOption) e
 
 	switch format {
 	case JPEG:
-		if nrgba, ok := img.(*image.NRGBA); ok && nrgba.Opaque() {
+		if nrgba, ok := img.(*image.NRGBA); ok && IsOpaque(nrgba) {
 			rgba := &image.RGBA{
 				Pix:    nrgba.Pix,
 				Stride: nrgba.Stride,
