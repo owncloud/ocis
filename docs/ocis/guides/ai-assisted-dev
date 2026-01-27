@@ -12,26 +12,18 @@ geekdocCollapseSection: true
 
 ## Introduction
 
-This guide demonstrates how to build oCIS web extensions using AI-assisted development (sometimes called "vibe coding") with Claude AI. By following this approach, you can create production-ready extensions without writing code manually—the AI handles syntax, boilerplate, and implementation while you focus on architecture and user experience.
+This guide demonstrates how to build oCIS web extensions using AI-assisted development (sometimes called "vibe coding") with Claude AI. By following this approach, production-ready extensions can be created without writing code manually—the AI handles syntax, boilerplate, and implementation while the developer focuses on architecture and user experience.
 
 **What you'll learn:**
 - Setting up MCP connectors so Claude can access your server
 - Using Claude to install development tools and manage your environment
 - The five-phase workflow for AI-assisted extension development
 - Practical tips for supervising AI-generated code
-- How to contribute your extensions back to the oCIS community
+- How to contribute extensions back to the oCIS community
 
 **Time investment:** ~10-14 hours per extension (concept to production-ready)
 
 **Cost:** ~$70 CAD for two extensions (using Claude Max Pro subscription)
-
-## Background
-
-When Google started pushing notifications telling my family we were at or close to our storage limits—with helpful suggestions to upgrade to a paid plan—I decided to solve the problem by enhancing our self-hosted oCIS instance with better photo browsing capabilities.
-
-The existing oCIS file browser shows thumbnails, which is functional, but I wanted what Google Photos gave us: timeline views organised by capture date, camera metadata at a glance, and a map showing where photos were taken.
-
-Using AI-assisted development, I built two fully functional web extensions and contributed backend changes to oCIS core—all without writing a single line of code by hand.
 
 ## Prerequisites
 
@@ -42,19 +34,19 @@ Before starting, ensure you have the following:
 - SSH access to your server (for MCP connectivity)
 - Full root access to the server unless Claude Code, Claude MCP connector, oCIS and other tools all run as another user
 
-That's it. Claude will help you install everything else.
+That's it. Claude will help install everything else.
 
 ## Step 1: Configure MCP Connector
 
 {{< hint type=important title="This Is the Hardest Part" >}}
-Setting up the MCP connector is the most challenging step. Once this is done, Claude handles everything else—including installing development tools, managing git, and building your extension.
+Setting up the MCP connector is the most challenging step. Once this is done, Claude handles everything else—including installing development tools, managing git, and building extensions.
 {{< /hint >}}
 
-MCP (Model Context Protocol) allows Claude to connect directly to your server, enabling both the Claude web interface and Claude Code to access files, run commands, and debug your oCIS deployment.
+MCP (Model Context Protocol) allows Claude to connect directly to a server, enabling both the Claude web interface and Claude Code to access files, run commands, and debug oCIS deployments.
 
 ### Installation
 
-Follow the official MCP documentation to set up your connector:
+Follow the official MCP documentation to set up a connector:
 
 - **MCP Quickstart Guide**: https://modelcontextprotocol.io/quickstart
 - **Connect to Local Servers**: https://modelcontextprotocol.io/docs/develop/connect-local-servers
@@ -62,17 +54,17 @@ Follow the official MCP documentation to set up your connector:
 
 ### Verify Connection
 
-Once configured, verify Claude can access your server by asking:
+Once configured, verify Claude can access the server by asking:
 
 ```
 Can you list the contents of /home on my server?
 ```
 
-If Claude successfully lists your directories, you're ready to proceed.
+If Claude successfully lists directories, proceed to the next step.
 
 ## Step 2: Let Claude Set Up Your Environment
 
-With MCP connected, Claude can install the development tools you need. Simply ask:
+With MCP connected, Claude can install the development tools needed. Simply ask:
 
 ```
 Please install Claude Code and Git on my server. I'll need these for 
@@ -80,7 +72,7 @@ developing an oCIS web extension.
 ```
 
 Claude will:
-- Detect your operating system
+- Detect the operating system
 - Install Claude Code using the appropriate method
 - Install Git if not already present
 - Configure any necessary paths or permissions
@@ -91,7 +83,7 @@ This workflow has been refined over several projects and consistently produces p
 
 ### Phase 1: Architecture (~15-30 minutes)
 
-Start in the Claude web interface (not Claude Code). Describe your project and have a conversation:
+Start in the Claude web interface (not Claude Code). Describe the project and have a conversation:
 
 ```
 I want to build an oCIS web extension that displays photos in a timeline 
@@ -124,7 +116,7 @@ Claude reads documentation, examines code patterns, and produces an architectura
 
 ### Phase 3: Scaffolding (~15 minutes)
 
-Now ask Claude to create the project structure on your server:
+Ask Claude to create the project structure on the server:
 
 ```
 Please create the project structure for my photo-addon extension:
@@ -136,13 +128,13 @@ Please create the project structure for my photo-addon extension:
 - A starter CLAUDE.md file documenting the project for future sessions
 ```
 
-By the end of this phase, you have a working (empty) extension.
+By the end of this phase, a working (empty) extension exists.
 
 ### Phase 4: Implementation (~5-6 hours)
 
-Login to your server and changes the folder where the new project was created, and run: 
+Login to the server and change to the folder where the new project was created, then run: 
 ```
-claude "Please review the claude.md project file, build the web exention, and deploy it to our server. Install and configure any dependencies required. Use 'sudo' where needed to modify or configure the oCIS environment."
+claude "Please review the claude.md project file, build the web extension, and deploy it to our server. Install and configure any dependencies required. Use 'sudo' where needed to modify or configure the oCIS environment."
 ```
 Once complete, work through features incrementally. Example prompts:
 
@@ -169,7 +161,7 @@ Can you investigate and fix it?
 
 ### Phase 5: Polish (~3 hours)
 
-Once core features work, request comprehensive cleanup. Here are the prompts I used:
+Once core features work, request comprehensive cleanup:
 
 **Performance optimisation:**
 ```
@@ -215,20 +207,20 @@ code with the right comments.
 ## Active Supervision
 
 {{< hint type=warning title="This is NOT 'Set It and Forget It'" >}}
-While no coding is required, this approach demands active supervision. You cannot just give Claude a prompt and walk away.
+While no coding is required, this approach demands active supervision. Developers cannot simply give Claude a prompt and walk away.
 {{< /hint >}}
 
 ### When to Intervene
 
-There were times when Claude Code would:
+There are times when Claude Code may:
 - Deviate from requirements (with good intentions)
 - Undo something it had just done
-- Go down a path that didn't match the architecture
+- Go down a path that doesn't match the architecture
 
-The decisions were always logical, but sometimes the harder path is required. I estimate intervening to redirect maybe 3-5% of the time.
+The decisions are always logical, but sometimes the harder path is required. Expect to intervene and redirect approximately 3-5% of the time.
 
 **Watch for:**
-- Changes that don't match your architectural decisions
+- Changes that don't match architectural decisions
 - Unnecessary complexity being added
 - Repeated undo/redo cycles
 - Deviation from oCIS extension patterns
@@ -243,7 +235,7 @@ AI-generated code works, but it can accumulate:
 
 Explicitly asking for refactoring and optimisation catches these issues.
 
-### UI Testing Is On You
+### UI Testing Is Manual
 
 The AI can write unit tests, but exploratory testing requires human judgment:
 - Click around the interface
@@ -290,12 +282,12 @@ but stays within the viewport?
 ```
 
 {{< hint type=tip title="Chrome Extension Limitations" >}}
-Claude has a Chrome extension, but I found it primitive for this use case. Manually copying console output and HTML/CSS snippets into Claude was more effective.
+Claude has a Chrome extension, but it may be limited for this use case. Manually copying console output and HTML/CSS snippets into Claude is often more effective.
 {{< /hint >}}
 
-## What I Built
+## Example Extensions Built with This Approach
 
-### Photo Gallery Extension (web-app-photos)
+### Photo Gallery Extension (web-app-photo-addon)
 
 Features:
 - **Timeline View**: Photos grouped by EXIF capture date with infinite scroll
@@ -317,7 +309,7 @@ Features:
 
 ### Backend Changes (PR #11912)
 
-To enable photo metadata search, I contributed changes to oCIS core:
+To enable photo metadata search, changes were contributed to oCIS core:
 - Photo field mappings in the KQL parser
 - `Store=true` configuration in Bleve for field retrieval
 - WebDAV properties for photo metadata
@@ -328,7 +320,7 @@ This was the trickiest part—understanding why searches returned empty results.
 
 ### 1. Start with Conversation, Then Architecture
 
-Don't jump straight into implementation. Spend ~30-60 minutes in regular chat, discussing the problem space and having Claude research the codebase. I still don't fully understand all of the oCIS source code—Claude figured that out. But those early conversations shaped the architecture that made implementation smooth.
+Don't jump straight into implementation. Spend ~30-60 minutes in regular chat, discussing the problem space and having Claude research the codebase. Those early conversations shape the architecture that makes implementation smooth.
 
 ### 2. Work Incrementally
 
@@ -336,7 +328,7 @@ Ask for one feature at a time. Get it working, then move to the next. This creat
 
 ### 3. Use Browser DevTools Liberally
 
-Console errors, network requests, and performance profiles are incredibly valuable context. Copy and paste them into your AI conversation.
+Console errors, network requests, and performance profiles are incredibly valuable context. Copy and paste them into AI conversations.
 
 ### 4. Understand oCIS Extension Requirements
 
@@ -349,15 +341,15 @@ Claude learns these constraints during the research phase and applies them consi
 
 ### 5. Test with Multiple Accounts
 
-Search in oCIS is space-scoped. What works for your admin account might not work for regular users. I spent more time on this than I'd like to admit.
+Search in oCIS is space-scoped. What works for an admin account might not work for regular users.
 
 ### 6. Read Maintainer Feedback Carefully
 
-PR reviews teach you things no documentation mentions. The oCIS team's suggestions improved my code significantly.
+PR reviews teach things no documentation mentions. The oCIS team's suggestions can significantly improve code quality.
 
 ## Contributing to oCIS
 
-Once your extension is ready, Claude can handle the entire contribution workflow. I used Claude to:
+Once an extension is ready, Claude can handle the entire contribution workflow:
 
 - Install and configure Git
 - Create forks of the oCIS repositories
@@ -384,24 +376,22 @@ screenshots from the /screenshots directory and a clear description
 of what the extension does.
 ```
 
-**My contributions:**
-- **PR #11912** (oCIS core): Photo metadata search backend — **Merged**
-- **PR #305** (web-extensions): Photo gallery extension — Under review
-- **PR #306** (web-extensions): Advanced search extension — Under review
+**Contributions made by this approach:**
+- **PR #11912** (oCIS core): Photo metadata search backend
+- **PR #312** (web-extensions): Photo gallery extension
+- **PR #313** (web-extensions): Advanced search extension
 
 {{< hint type=note title="CLA Requirement" >}}
-You'll need to sign the ownCloud Contributor License Agreement (CLA) for your PRs to be accepted. Claude can help you find the CLA link and remind you of the process.
+Contributors need to sign the ownCloud Contributor License Agreement (CLA) for PRs to be accepted. Claude can help find the CLA link and explain the process.
 {{< /hint >}}
 
 ## Summary
 
-**Not a single line of code was written by hand. Not a single git command was typed manually. Nor a single pnpm command.**
+Using this approach, complete extensions can be built without writing code manually. No git commands need to be typed manually. No pnpm commands either.
 
-Every commit, every push, every PR—all generated through AI assistance. The backend changes to oCIS core were approved and merged. The web extensions are currently under review.
+Every commit, every push, every PR—all generated through AI assistance. The backend changes to oCIS core were approved and merged. The web extensions demonstrate the viability of this development approach.
 
-The barrier to entry for meaningful open source contribution just got a lot lower. If you're interested in contributing to oCIS but feel intimidated by the codebase, consider trying AI-assisted development. It will surprise you.
-
-And if you're sceptical? Good. Try it yourself and see.
+The barrier to entry for meaningful open source contribution is significantly lower with AI-assisted development. For those interested in contributing to oCIS but feeling intimidated by the codebase, this approach is worth considering.
 
 ---
 
@@ -409,7 +399,6 @@ And if you're sceptical? Good. Try it yourself and see.
 
 | Resource | URL |
 |----------|-----|
-| My Extensions | https://github.com/paul43210/web-extensions |
 | MCP Quickstart | https://modelcontextprotocol.io/quickstart |
 | MCP Local Servers | https://modelcontextprotocol.io/docs/develop/connect-local-servers |
 | Claude Desktop MCP | https://support.claude.com/en/articles/10949351-getting-started-with-local-mcp-servers-on-claude-desktop |
@@ -418,6 +407,4 @@ And if you're sceptical? Good. Try it yourself and see.
 
 ---
 
-*Paul Faure is a computer engineer based in Ottawa, Canada. He runs a family oCIS instance that he now enjoys using for photos.*
-
-*Full disclosure: this guide was also written with AI assistance. But a human reviewed it for accuracy—I promise.*
+*This guide was written with AI assistance and reviewed for accuracy.*
