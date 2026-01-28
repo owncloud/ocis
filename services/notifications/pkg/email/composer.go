@@ -3,9 +3,10 @@ package email
 import (
 	"bytes"
 	"embed"
-	"github.com/pkg/errors"
 	"strings"
 	"text/template"
+
+	"github.com/pkg/errors"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/l10n"
 )
@@ -32,9 +33,14 @@ func NewTextTemplate(mt MessageTemplate, locale, defaultLocale string, translati
 	if err != nil {
 		return mt, err
 	}
-	mt.CallToAction, err = composeMessage(t.Get(mt.CallToAction), vars)
-	if err != nil {
-		return mt, err
+
+	if mt.CallToAction != "" {
+		// Some templates have an empty call-to-action. We don't want to translate
+		// an empty key and get an unexpected message.
+		mt.CallToAction, err = composeMessage(t.Get(mt.CallToAction), vars)
+		if err != nil {
+			return mt, err
+		}
 	}
 	return mt, nil
 }
@@ -55,9 +61,13 @@ func NewHTMLTemplate(mt MessageTemplate, locale, defaultLocale string, translati
 	if err != nil {
 		return mt, err
 	}
-	mt.CallToAction, err = composeMessage(callToActionToHTML(t.Get(mt.CallToAction)), vars)
-	if err != nil {
-		return mt, err
+	if mt.CallToAction != "" {
+		// Some templates have an empty call-to-action. We don't want to translate
+		// an empty key and get an unexpected message.
+		mt.CallToAction, err = composeMessage(callToActionToHTML(t.Get(mt.CallToAction)), vars)
+		if err != nil {
+			return mt, err
+		}
 	}
 	return mt, nil
 }
