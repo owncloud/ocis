@@ -38,8 +38,8 @@
 * [Changelog for 3.0.0](#changelog-for-300-2023-06-06)
 * [Changelog for 2.0.0](#changelog-for-200-2022-11-30)
 * [Changelog for 1.20.0](#changelog-for-1200-2022-04-13)
-* [Changelog for 1.19.1](#changelog-for-1191-2022-03-29)
 * [Changelog for 1.19.0](#changelog-for-1190-2022-03-29)
+* [Changelog for 1.19.1](#changelog-for-1191-2022-03-29)
 * [Changelog for 1.18.0](#changelog-for-1180-2022-03-03)
 * [Changelog for 1.17.0](#changelog-for-1170-2022-02-16)
 * [Changelog for 1.16.0](#changelog-for-1160-2021-12-10)
@@ -74,6 +74,10 @@ The following sections list the changes for unreleased.
 * Bugfix - Support pointer types in config environment variable decoding: [#11815](https://github.com/owncloud/ocis/pull/11815)
 * Bugfix - Replace obsolete docker image in the deployment example: [#11828](https://github.com/owncloud/ocis/pull/11828)
 * Bugfix - Fix error code when a user can't disable a space: [#11845](https://github.com/owncloud/ocis/pull/11845)
+* Bugfix - Fix Sharingroles: [#11898](https://github.com/owncloud/ocis/pull/11898)
+* Bugfix - Fix the error handling for empty name on space update: [#11933](https://github.com/owncloud/ocis/pull/11933)
+* Change - Remove deprecated OCIS_SHOW_USER_EMAIL_IN_RESULTS: [#11942](https://github.com/owncloud/ocis/pull/11942)
+* Enhancement - Bump Reva: [#460](https://github.com/owncloud/reva/pull/460)
 * Enhancement - Set Referrer-Policy to no-referrer: [#11722](https://github.com/owncloud/ocis/pull/11722)
 * Enhancement - Bump Reva: [#11748](https://github.com/owncloud/ocis/pull/11748)
 * Enhancement - Support disabling editors by extensions: [#11750](https://github.com/owncloud/ocis/pull/11750)
@@ -84,13 +88,18 @@ The following sections list the changes for unreleased.
 * Enhancement - Bump Web to v12.2.0: [#11834](https://github.com/owncloud/ocis/pull/11834)
 * Enhancement - Introduce claims for multi-instance-ocis: [#11848](https://github.com/owncloud/ocis/pull/11848)
 * Enhancement - Update the ocis_full deployment example images: [#11860](https://github.com/owncloud/ocis/pull/11860)
+* Enhancement - Implement brute force protection for public links: [#11864](https://github.com/owncloud/ocis/pull/11864)
 * Enhancement - Update the ocis_full deployment example traefik image: [#11867](https://github.com/owncloud/ocis/pull/11867)
 * Enhancement - Added a graph endpoint alias: [#11871](https://github.com/owncloud/ocis/pull/11871)
 * Enhancement - Force Strict-Transport-Security: [#11880](https://github.com/owncloud/ocis/pull/11880)
 * Enhancement - Relocate Transifex resources: [#11889](https://github.com/owncloud/ocis/pull/11889)
 * Enhancement - Update the ocis_full deployment example images: [#11890](https://github.com/owncloud/ocis/pull/11890)
 * Enhancement - Allow sharing between instances: [#11893](https://github.com/owncloud/ocis/pull/11893)
+* Enhancement - Add photo EXIF metadata to search index and WebDAV results: [#11912](https://github.com/owncloud/ocis/pull/11912)
 * Enhancement - Update the traefik image for some deployment examples: [#11915](https://github.com/owncloud/ocis/pull/11915)
+* Enhancement - Add users instances: [#11925](https://github.com/owncloud/ocis/pull/11925)
+* Enhancement - Introduce external shares permission: [#11931](https://github.com/owncloud/ocis/pull/11931)
+* Enhancement - Bump Web to 12.3.0: [#13519](https://github.com/owncloud/web/pull/13519)
 
 ## Details
 
@@ -143,6 +152,36 @@ The following sections list the changes for unreleased.
    space was visible. Now it will return the expected 403 error code.
 
    https://github.com/owncloud/ocis/pull/11845
+
+* Bugfix - Fix Sharingroles: [#11898](https://github.com/owncloud/ocis/pull/11898)
+
+   Sharing roles were inconsistent, now they are fixed.
+
+   https://github.com/owncloud/ocis/pull/11898
+
+* Bugfix - Fix the error handling for empty name on space update: [#11933](https://github.com/owncloud/ocis/pull/11933)
+
+   Fix the error handling for empty name on space update.
+
+   https://github.com/owncloud/ocis/issues/11887
+   https://github.com/owncloud/ocis/pull/11933
+
+* Change - Remove deprecated OCIS_SHOW_USER_EMAIL_IN_RESULTS: [#11942](https://github.com/owncloud/ocis/pull/11942)
+
+   Deprecated OCIS_SHOW_USER_EMAIL_IN_RESULTS environment variable was removed from
+   frontend service config. Use OCIS_USER_SEARCH_DISPLAYED_ATTRIBUTES instead to
+   control which user attributes are displayed in search results.
+
+   https://github.com/owncloud/ocis/pull/11942
+
+* Enhancement - Bump Reva: [#460](https://github.com/owncloud/reva/pull/460)
+
+   This updates the ownCloud Reva dependency to include brute force protection for
+   public links. The feature implements rate-limiting that blocks access to
+   password-protected public shares after exceeding a configurable maximum number
+   of failed authentication attempts within a time window.
+
+   https://github.com/owncloud/reva/pull/460
 
 * Enhancement - Set Referrer-Policy to no-referrer: [#11722](https://github.com/owncloud/ocis/pull/11722)
 
@@ -253,6 +292,19 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/11860
 
+* Enhancement - Implement brute force protection for public links: [#11864](https://github.com/owncloud/ocis/pull/11864)
+
+   Public links will be protected by default, allowing up to 5 wrong password
+   attempts per hour. If such rate is exceeded, the link will be blocked for all
+   the users until the failure rate goes below the configured threshold (5 failures
+   per hour by default, as said).
+
+   The failure rate is configurable, so it can be 10 failures each 2 hours or 3
+   failures per minute.
+
+   https://github.com/owncloud/ocis/pull/11864
+   https://github.com/owncloud/reva/pull/460
+
 * Enhancement - Update the ocis_full deployment example traefik image: [#11867](https://github.com/owncloud/ocis/pull/11867)
 
   * Traefik: 3.6.4
@@ -296,11 +348,75 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/11893
 
+* Enhancement - Add photo EXIF metadata to search index and WebDAV results: [#11912](https://github.com/owncloud/ocis/pull/11912)
+
+   We've added support for photo metadata fields in the Bleve search index and
+   WebDAV REPORT responses. This enables photo gallery applications to efficiently
+   query photos by their EXIF metadata and display camera information.
+
+   The following photo metadata fields are now indexed and searchable: -
+   `photo.takenDateTime` - When the photo was taken (supports date range queries) -
+   `photo.cameraMake` - Camera manufacturer (e.g., Canon, Nikon, Samsung) -
+   `photo.cameraModel` - Camera model name - `photo.fNumber` - Aperture f-stop
+   value - `photo.focalLength` - Focal length in millimeters - `photo.iso` - ISO
+   sensitivity - `photo.orientation` - Image orientation -
+   `photo.exposureNumerator` - Exposure time numerator (for shutter speed
+   calculation) - `photo.exposureDenominator` - Exposure time denominator (for
+   shutter speed calculation)
+
+   GPS location data is also included when available: - `photo.location.latitude` -
+   GPS latitude - `photo.location.longitude` - GPS longitude -
+   `photo.location.altitude` - GPS altitude
+
+   These fields are returned in WebDAV search results using the `oc:photo-*`
+   property namespace, allowing web extensions to build photo timeline views,
+   filter by camera, or show photos on a map.
+
+   https://github.com/owncloud/ocis/pull/11912
+
 * Enhancement - Update the traefik image for some deployment examples: [#11915](https://github.com/owncloud/ocis/pull/11915)
 
   * Traefik: 3.6.6 --> 3.6.7
 
    https://github.com/owncloud/ocis/pull/11915
+
+* Enhancement - Add users instances: [#11925](https://github.com/owncloud/ocis/pull/11925)
+
+   The user endpoint now returns the instances that the user is either a member or
+   a guest of and the cross instance reference.
+
+   https://github.com/owncloud/ocis/pull/11925
+
+* Enhancement - Introduce external shares permission: [#11931](https://github.com/owncloud/ocis/pull/11931)
+
+   Introduces a permission allowing to share between instances in multi-instance
+   ocis. This permission is by default added to the admin and space-admin role.
+
+   https://github.com/owncloud/ocis/pull/11931
+
+* Enhancement - Bump Web to 12.3.0: [#13519](https://github.com/owncloud/web/pull/13519)
+
+   Bugfix [owncloud/web#13406](https://github.com/owncloud/web/pull/13406): Prevent
+   overlapping search content Bugfix
+   [owncloud/web#13415](https://github.com/owncloud/web/pull/13415) Filter only
+   personal trashed spaces Enhancement
+   [owncloud/web#5847](https://github.com/owncloud/web/pull/5847) Dynamic
+   theme-color meta tag based on loaded theme Enhancement
+   [owncloud/web#13412](https://github.com/owncloud/web/pull/13412) Use beta
+   endpoint for single drive operations Enhancement
+   [owncloud/web#13426](https://github.com/owncloud/web/pull/13426) Add crash page
+   Enhancement
+   [owncloud/web#13426](https://github.com/owncloud/web/pull/13426)Catch spaces
+   loading error Enhancement
+   [owncloud/web#13485](https://github.com/owncloud/web/pull/13485)Drop custom
+   share filters Enhancement
+   [owncloud/web#13499](https://github.com/owncloud/web/pull/13499)Add
+   cross-instance reference Enhancement
+   [owncloud/web#13500](https://github.com/owncloud/web/pull/13500)Add instance
+   switcher
+
+   https://github.com/owncloud/web/pull/13519
+   https://github.com/owncloud/web/releases/tag/v12.3.0
 
 # Changelog for [7.3.1] (2025-11-24)
 
@@ -12293,7 +12409,7 @@ The following sections list the changes for 2.0.0.
 
 The following sections list the changes for 1.20.0.
 
-[1.20.0]: https://github.com/owncloud/ocis/compare/v1.19.1...v1.20.0
+[1.20.0]: https://github.com/owncloud/ocis/compare/v1.19.0...v1.20.0
 
 ## Summary
 
@@ -12467,29 +12583,11 @@ The following sections list the changes for 1.20.0.
    https://github.com/owncloud/ocis/pull/3509
    https://github.com/owncloud/web/releases/tag/v5.4.0
 
-# Changelog for [1.19.1] (2022-03-29)
-
-The following sections list the changes for 1.19.1.
-
-[1.19.1]: https://github.com/owncloud/ocis/compare/v1.19.0...v1.19.1
-
-## Summary
-
-* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
-
-## Details
-
-* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
-
-   URLs for Special items (space image, readme) were broken.
-
-   https://github.com/owncloud/ocis/pull/3419
-
 # Changelog for [1.19.0] (2022-03-29)
 
 The following sections list the changes for 1.19.0.
 
-[1.19.0]: https://github.com/owncloud/ocis/compare/v1.18.0...v1.19.0
+[1.19.0]: https://github.com/owncloud/ocis/compare/v1.19.1...v1.19.0
 
 ## Summary
 
@@ -12662,6 +12760,24 @@ The following sections list the changes for 1.19.0.
    https://github.com/owncloud/ocis/pull/3291
    https://github.com/owncloud/ocis/pull/3375
    https://github.com/owncloud/web/releases/tag/v5.3.0
+
+# Changelog for [1.19.1] (2022-03-29)
+
+The following sections list the changes for 1.19.1.
+
+[1.19.1]: https://github.com/owncloud/ocis/compare/v1.18.0...v1.19.1
+
+## Summary
+
+* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
+
+## Details
+
+* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
+
+   URLs for Special items (space image, readme) were broken.
+
+   https://github.com/owncloud/ocis/pull/3419
 
 # Changelog for [1.18.0] (2022-03-03)
 

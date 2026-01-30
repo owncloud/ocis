@@ -525,6 +525,70 @@ func Test_compile(t *testing.T) {
 			}),
 			wantErr: false,
 		},
+		{
+			name: `photo.takenDateTime>=2024-01-01`,
+			args: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.DateTimeNode{
+						Key:      "photo.takenDateTime",
+						Operator: &ast.OperatorNode{Value: ">="},
+						Value:    timeMustParse(t, "2024-01-01T00:00:00Z"),
+					},
+				},
+			},
+			want: query.NewConjunctionQuery([]query.Query{
+				func() query.Query {
+					q := query.NewDateRangeInclusiveQuery(timeMustParse(t, "2024-01-01T00:00:00Z"), time.Time{}, &[]bool{true}[0], nil)
+					q.FieldVal = "photo.takenDateTime"
+					return q
+				}(),
+			}),
+			wantErr: false,
+		},
+		{
+			name: `photo.takenDateTime<2024-12-31`,
+			args: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.DateTimeNode{
+						Key:      "photo.takenDateTime",
+						Operator: &ast.OperatorNode{Value: "<"},
+						Value:    timeMustParse(t, "2024-12-31T00:00:00Z"),
+					},
+				},
+			},
+			want: query.NewConjunctionQuery([]query.Query{
+				func() query.Query {
+					q := query.NewDateRangeInclusiveQuery(time.Time{}, timeMustParse(t, "2024-12-31T00:00:00Z"), nil, &[]bool{false}[0])
+					q.FieldVal = "photo.takenDateTime"
+					return q
+				}(),
+			}),
+			wantErr: false,
+		},
+		{
+			name: `photo.cameraMake:canon`,
+			args: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.StringNode{Key: "photo.cameraMake", Value: "canon"},
+				},
+			},
+			want: query.NewConjunctionQuery([]query.Query{
+				query.NewQueryStringQuery(`photo.cameraMake:canon`),
+			}),
+			wantErr: false,
+		},
+		{
+			name: `photo.iso query`,
+			args: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.StringNode{Key: "photo.iso", Value: "100"},
+				},
+			},
+			want: query.NewConjunctionQuery([]query.Query{
+				query.NewQueryStringQuery(`photo.iso:100`),
+			}),
+			wantErr: false,
+		},
 	}
 
 	assert := tAssert.New(t)
@@ -569,6 +633,33 @@ func Test_escape(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tAssert.Equalf(t, tt.want, bleveEscaper.Replace(tt.args.str), "bleveEscaper(%v)", tt.args.str)
+		})
+	}
+}
+
+func Test_getField(t *testing.T) {
+	tests := []struct {
+		name  string
+		input string
+		want  string
+	}{
+		{"empty defaults to Name", "", "Name"},
+		{"regular field mtime", "mtime", "Mtime"},
+		{"regular field name", "name", "Name"},
+		{"photo.takenDateTime", "photo.takendatetime", "photo.takenDateTime"},
+		{"photo.cameraMake", "photo.cameramake", "photo.cameraMake"},
+		{"photo.cameraModel", "photo.cameramodel", "photo.cameraModel"},
+		{"photo.iso", "photo.iso", "photo.iso"},
+		{"case insensitive Photo.TakenDateTime", "Photo.TakenDateTime", "photo.takenDateTime"},
+		{"case insensitive PHOTO.CAMERAMAKE", "PHOTO.CAMERAMAKE", "photo.cameraMake"},
+		{"unknown photo field passthrough", "photo.unknown", "photo.unknown"},
+		{"unknown prefix passthrough", "unknown.field", "unknown.field"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := getField(tt.input); got != tt.want {
+				t.Errorf("getField(%q) = %q, want %q", tt.input, got, tt.want)
+			}
 		})
 	}
 }

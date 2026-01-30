@@ -90,7 +90,7 @@ Feature: filter sharing permissions
                       "const": "View, download, upload, edit, add and delete."
                     },
                     "displayName": {
-                      "const": "Can edit without versions"
+                      "const": "Can edit with trashbin"
                     },
                     "id": {
                       "const": "fb6c3e19-e378-47e5-b277-9732f9de6e21"
@@ -186,10 +186,10 @@ Feature: filter sharing permissions
                       "const": 2
                     },
                     "description": {
-                      "const": "View, download and edit."
+                      "const": "View, download, upload and edit."
                     },
                     "displayName": {
-                      "const": "Can edit without versions"
+                      "const": "Can edit"
                     },
                     "id": {
                       "const": "2d00ce52-1fc2-4dbc-8b95-a73b73395f5a"
@@ -308,10 +308,10 @@ Feature: filter sharing permissions
                       "const": 3
                     },
                     "description": {
-                      "const": "View, download and upload."
+                      "const": "View, download, upload, edit and add."
                     },
                     "displayName": {
-                      "const": "Can upload"
+                      "const": "Can edit"
                     },
                     "id": {
                       "const": "1c996275-f1c9-4e71-abdf-a42f6495e960"
@@ -334,7 +334,7 @@ Feature: filter sharing permissions
                       "const": "View, download, upload, edit, add and delete."
                     },
                     "displayName": {
-                      "const": "Can edit without versions"
+                      "const": "Can edit with trashbin"
                     },
                     "id": {
                       "const": "fb6c3e19-e378-47e5-b277-9732f9de6e21"
@@ -453,10 +453,10 @@ Feature: filter sharing permissions
                       "const": 3
                     },
                     "description": {
-                      "const": "View, download and edit."
+                      "const": "View, download, upload and edit."
                     },
                     "displayName": {
-                      "const": "Can edit without versions"
+                      "const": "Can edit"
                     },
                     "id": {
                       "const": "2d00ce52-1fc2-4dbc-8b95-a73b73395f5a"
@@ -528,10 +528,10 @@ Feature: filter sharing permissions
                       "const": 2
                     },
                     "description": {
-                      "const": "View, download and upload."
+                      "const": "View, download, upload, edit and add."
                     },
                     "displayName": {
-                      "const": "Can upload"
+                      "const": "Can edit"
                     },
                     "id": {
                       "const": "1c996275-f1c9-4e71-abdf-a42f6495e960"
@@ -554,7 +554,7 @@ Feature: filter sharing permissions
                       "const": "View, download, upload, edit, add and delete."
                     },
                     "displayName": {
-                      "const": "Can edit without versions"
+                      "const": "Can edit with trashbin"
                     },
                     "id": {
                       "const": "fb6c3e19-e378-47e5-b277-9732f9de6e21"
@@ -650,10 +650,10 @@ Feature: filter sharing permissions
                       "const": 3
                     },
                     "description": {
-                      "const": "View, download and edit."
+                      "const": "View, download, upload and edit."
                     },
                     "displayName": {
-                      "const": "Can edit without versions"
+                      "const": "Can edit"
                     },
                     "id": {
                       "const": "2d00ce52-1fc2-4dbc-8b95-a73b73395f5a"
@@ -775,10 +775,10 @@ Feature: filter sharing permissions
                       "const": 3
                     },
                     "description": {
-                      "const": "View, download and edit."
+                      "const": "View, download, upload and edit."
                     },
                     "displayName": {
-                      "const": "Can edit without versions"
+                      "const": "Can edit"
                     },
                     "id": {
                       "const": "2d00ce52-1fc2-4dbc-8b95-a73b73395f5a"
@@ -900,10 +900,10 @@ Feature: filter sharing permissions
                       "const": 3
                     },
                     "description": {
-                      "const": "View, download and upload."
+                      "const": "View, download, upload, edit and add."
                     },
                     "displayName": {
-                      "const": "Can upload"
+                      "const": "Can edit"
                     },
                     "id": {
                       "const": "1c996275-f1c9-4e71-abdf-a42f6495e960"
@@ -926,7 +926,7 @@ Feature: filter sharing permissions
                       "const": "View, download, upload, edit, add and delete."
                     },
                     "displayName": {
-                      "const": "Can edit without versions"
+                      "const": "Can edit with trashbin"
                     },
                     "id": {
                       "const": "fb6c3e19-e378-47e5-b277-9732f9de6e21"
@@ -1025,10 +1025,10 @@ Feature: filter sharing permissions
                       "const": 3
                     },
                     "description": {
-                      "const": "View, download and upload."
+                      "const": "View, download, upload, edit and add."
                     },
                     "displayName": {
-                      "const": "Can upload"
+                      "const": "Can edit"
                     },
                     "id": {
                       "const": "1c996275-f1c9-4e71-abdf-a42f6495e960"
@@ -1051,7 +1051,7 @@ Feature: filter sharing permissions
                       "const": "View, download, upload, edit, add and delete."
                     },
                     "displayName": {
-                      "const": "Can edit without versions"
+                      "const": "Can edit with trashbin"
                     },
                     "id": {
                       "const": "fb6c3e19-e378-47e5-b277-9732f9de6e21"
@@ -1150,10 +1150,10 @@ Feature: filter sharing permissions
                       "const": 3
                     },
                     "description": {
-                      "const": "View, download and edit."
+                      "const": "View, download, upload and edit."
                     },
                     "displayName": {
-                      "const": "Can edit without versions"
+                      "const": "Can edit"
                     },
                     "id": {
                       "const": "2d00ce52-1fc2-4dbc-8b95-a73b73395f5a"
@@ -1205,8 +1205,8 @@ Feature: filter sharing permissions
                   "required": ["@libre.graph.weight","description","displayName","id"],
                   "properties": {
                     "@libre.graph.weight": {"const": 2},
-                    "description": {"const": "View, download and edit."},
-                    "displayName": {"const": "Can edit without versions"},
+                    "description": {"const": "View, download, upload and edit."},
+                    "displayName": {"const": "Can edit"},
                     "id": {"const": "2d00ce52-1fc2-4dbc-8b95-a73b73395f5a" }
                   }
                 }
@@ -1256,7 +1256,7 @@ Feature: filter sharing permissions
                   "properties": {
                     "@libre.graph.weight": {"const": 2},
                     "description": {"const": "View, download, upload, edit, add and delete."},
-                    "displayName": {"const": "Can edit without versions"},
+                    "displayName": {"const": "Can edit with trashbin"},
                     "id": {"const": "fb6c3e19-e378-47e5-b277-9732f9de6e21"}
                   }
                 }
@@ -1308,8 +1308,8 @@ Feature: filter sharing permissions
                   "required": ["@libre.graph.weight","description","displayName","id"],
                   "properties": {
                     "@libre.graph.weight": {"const": 2},
-                    "description": {"const": "View, download and edit."},
-                    "displayName": {"const": "Can edit without versions"},
+                    "description": {"const": "View, download, upload and edit."},
+                    "displayName": {"const": "Can edit"},
                     "id": {"const": "2d00ce52-1fc2-4dbc-8b95-a73b73395f5a"}
                   }
                 }
@@ -1362,7 +1362,7 @@ Feature: filter sharing permissions
                   "properties": {
                     "@libre.graph.weight": {"const": 2},
                     "description": {"const": "View, download, upload, edit, add and delete."},
-                    "displayName": {"const": "Can edit without versions"},
+                    "displayName": {"const": "Can edit with trashbin"},
                     "id": {"const": "fb6c3e19-e378-47e5-b277-9732f9de6e21"}
                   }
                 }

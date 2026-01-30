@@ -6,6 +6,7 @@ import (
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/reva/v2/pkg/auth/manager/publicshares"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
 )
 
@@ -102,7 +103,10 @@ func (a PublicShareAuthenticator) Authenticate(r *http.Request) (*http.Request, 
 		return nil, false
 	}
 
-	authResp, err := client.Authenticate(r.Context(), &gateway.AuthenticateRequest{
+	// we just need the reva access token, so we want to skip the brute force
+	// protection in this case
+	ctx := publicshares.MarkSkipAttemptContext(r.Context(), shareToken)
+	authResp, err := client.Authenticate(ctx, &gateway.AuthenticateRequest{
 		Type:         authenticationType,
 		ClientId:     shareToken,
 		ClientSecret: sharePassword,

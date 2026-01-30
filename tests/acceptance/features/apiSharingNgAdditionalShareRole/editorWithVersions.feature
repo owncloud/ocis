@@ -214,8 +214,8 @@ Feature: an user shares resources
                   "required": ["@libre.graph.weight", "description", "displayName", "id" ],
                   "properties": {
                     "@libre.graph.weight": { "const": 2 },
-                    "description": { "const": "View, download and edit." },
-                    "displayName": { "const": "Can edit without versions" },
+                    "description": { "const": "View, download, upload and edit." },
+                    "displayName": { "const": "Can edit" },
                     "id": { "const": "2d00ce52-1fc2-4dbc-8b95-a73b73395f5a" }
                   }
                 },
@@ -223,7 +223,7 @@ Feature: an user shares resources
                   "type": "object",
                   "required": ["@libre.graph.weight", "description", "displayName", "id"],
                   "properties": {
-                    "displayName": { "const": "Can edit" }
+                    "displayName": { "const": "Can edit with versions and show invitees" }
                   }
                 }
               ]
@@ -275,8 +275,8 @@ Feature: an user shares resources
                   "required": ["@libre.graph.weight", "description", "displayName", "id"],
                   "properties": {
                     "@libre.graph.weight": { "const": 2 },
-                    "description": { "const": "View, download and edit." },
-                    "displayName": { "const": "Can edit without versions" },
+                    "description": { "const": "View, download, upload and edit." },
+                    "displayName": { "const": "Can edit" },
                     "id": { "const": "2d00ce52-1fc2-4dbc-8b95-a73b73395f5a" }
                   }
                 },
@@ -284,7 +284,7 @@ Feature: an user shares resources
                   "type": "object",
                   "required": ["@libre.graph.weight", "description", "displayName", "id"],
                   "properties": {
-                    "displayName": { "const": "Can edit" }
+                    "displayName": { "const": "Can edit with versions and show invitees" }
                   }
                 }
               ]
@@ -332,7 +332,7 @@ Feature: an user shares resources
                   "type": "object",
                   "required": ["@libre.graph.weight", "description", "displayName", "id"],
                   "properties": {
-                    "displayName": { "const": "Can upload" }
+                    "displayName": { "const": "Can edit" }
                   }
                 },
                 {
@@ -341,7 +341,7 @@ Feature: an user shares resources
                   "properties": {
                     "@libre.graph.weight": { "const": 3 },
                     "description": { "const": "View, download, upload, edit, add and delete." },
-                    "displayName": { "const": "Can edit without versions" },
+                    "displayName": { "const": "Can edit with trashbin" },
                     "id": { "const": "fb6c3e19-e378-47e5-b277-9732f9de6e21" }
                   }
                 },
@@ -349,7 +349,7 @@ Feature: an user shares resources
                   "type": "object",
                   "required": ["@libre.graph.weight", "description", "displayName", "id"],
                   "properties": {
-                    "displayName": { "const": "Can edit" }
+                    "displayName": { "const": "Can edit with trashbin, versions and show invitees" }
                   }
                 }
               ]
@@ -400,7 +400,7 @@ Feature: an user shares resources
                   "type": "object",
                   "required": ["@libre.graph.weight", "description", "displayName", "id"],
                   "properties": {
-                    "displayName": { "const": "Can upload" }
+                    "displayName": { "const": "Can edit" }
                   }
                 },
                 {
@@ -409,7 +409,7 @@ Feature: an user shares resources
                   "properties": {
                     "@libre.graph.weight": { "const": 3 },
                     "description": { "const": "View, download, upload, edit, add and delete." },
-                    "displayName": { "const": "Can edit without versions" },
+                    "displayName": { "const": "Can edit with trashbin" },
                     "id": { "const": "fb6c3e19-e378-47e5-b277-9732f9de6e21" }
                   }
                 },
@@ -417,7 +417,7 @@ Feature: an user shares resources
                   "type": "object",
                   "required": ["@libre.graph.weight", "description", "displayName", "id"],
                   "properties": {
-                    "displayName": { "const": "Can edit" }
+                    "displayName": { "const": "Can edit with trashbin, versions and show invitees" }
                   }
                 }
               ]

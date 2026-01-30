@@ -73,7 +73,21 @@ var invalidUserEntry = ldap.NewEntry("uid=user",
 
 var logger = log.NewLogger(log.Level("debug"))
 
-var ldapUserAttributes = []string{"displayname", "entryUUID", "mail", "uid", "sn", "givenname", "userEnabledAttribute", "userTypeAttribute", "oCExternalIdentity", "oCLastSignInTimestamp", "externalID"}
+var ldapUserAttributes = []string{
+	"displayname",
+	"entryUUID",
+	"mail",
+	"uid",
+	"sn",
+	"givenname",
+	"userEnabledAttribute",
+	"userTypeAttribute",
+	"oCExternalIdentity",
+	"oCLastSignInTimestamp",
+	"externalID",
+	"", // UserMemberAttribute
+	"", // UserGuestAttribute
+}
 
 func TestNewLDAPBackend(t *testing.T) {
 	l := &mocks.Client{}

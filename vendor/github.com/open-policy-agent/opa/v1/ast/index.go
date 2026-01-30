@@ -412,7 +412,7 @@ func (i *refindices) updateGlobMatch(rule *Rule, expr *Expr) {
 		if _, ok := match.Value.(Var); ok {
 			var ref Ref
 			for _, other := range i.rules[rule] {
-				if _, ok := other.Value.(Var); ok && other.Value.Compare(match.Value) == 0 {
+				if ov, ok := other.Value.(Var); ok && ov.Equal(match.Value) {
 					ref = other.Ref
 				}
 			}
@@ -884,7 +884,6 @@ func indexValue(b Value) (Value, bool) {
 }
 
 func globDelimiterToString(delim *Term) (string, bool) {
-
 	arr, ok := delim.Value.(*Array)
 	if !ok {
 		return "", false
@@ -895,14 +894,16 @@ func globDelimiterToString(delim *Term) (string, bool) {
 	if arr.Len() == 0 {
 		result = "."
 	} else {
+		sb := strings.Builder{}
 		for i := range arr.Len() {
 			term := arr.Elem(i)
 			s, ok := term.Value.(String)
 			if !ok {
 				return "", false
 			}
-			result += string(s)
+			sb.WriteString(string(s))
 		}
+		result = sb.String()
 	}
 
 	return result, true

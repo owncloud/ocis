@@ -351,8 +351,7 @@ var _ = Describe("Users", func() {
 				)
 
 				BeforeEach(func() {
-					cfg.API.UserSearchDisplayedAttributes = []string{"displayName", "onPremisesSamAccountName"}
-					cfg.API.ShowUserEmailInResults = true
+					cfg.API.UserSearchDisplayedAttributes = []string{"displayName", "onPremisesSamAccountName", "mail"}
 
 					user = libregraph.NewUser("Albert Einstein", "einstein")
 					user.SetId("user1")

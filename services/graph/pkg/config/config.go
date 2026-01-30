@@ -95,13 +95,16 @@ type LDAP struct {
 	RequireExternalID         bool `yaml:"require_external_id" env:"GRAPH_LDAP_REQUIRE_EXTERNAL_ID" desc:"If enabled, the 'OCIS_LDAP_USER_SCHEMA_EXTERNAL_ID' is used as primary identifier for the provisioning API." introductionVersion:"8.0.0"`
 
 	// Multi-Instance Only
-	UserMemberAttribute         string `yaml:"user_member_attribute" env:"OCIS_LDAP_USER_MEMBER_ATTRIBUTE" desc:"LDAP Attribute to signal the user is member of an instance. Requires OCIS_MULTI_INSTANCE_ENABLED." introductionVersion:"Curie"`
-	UserGuestAttribute          string `yaml:"user_guest_attribute" env:"OCIS_LDAP_USER_GUEST_ATTRIBUTE" desc:"LDAP Attribute to signal the user is guest of an instance. Requires OCIS_MULTI_INSTANCE_ENABLED." introductionVersion:"Curie"`
-	PreciseSearchAttribute      string `yaml:"precise_search_attribute" env:"OCIS_LDAP_PRECISE_SEARCH_ATTRIBUTE" desc:"LDAP Attribute to be used for searching users on other instances. Requires OCIS_MULTI_INSTANCE_ENABLED." introductionVersion:"Curie"`
-	InstanceMapperEnabled       bool   `yaml:"instance_mapper_enabled" env:"OCIS_LDAP_INSTANCE_MAPPER_ENABLED" desc:"The InstanceMapper allows mapping instance names (user readable) to instance IDs (machine readable) based on an LDAP query. See other _INSTANCE_MAPPER_ env vars. Requires OCIS_MULTI_INSTANCE_ENABLED." introductionVersion:"Curie"`
-	InstanceMapperBaseDN        string `yaml:"instance_mapper_base_dn" env:"OCIS_LDAP_INSTANCE_MAPPER_BASE_DN" desc:"BaseDN of the 'instancename to instanceid' mapper in LDAP. Requires OCIS_MULTI_INSTANCE_ENABLED." introductionVersion:"Curie"`
-	InstanceMapperNameAttribute string `yaml:"instance_mapper_name_attribute" env:"OCIS_LDAP_INSTANCE_MAPPER_NAME_ATTRIBUTE" desc:"LDAP Attribute of the instance name. Requires OCIS_MULTI_INSTANCE_ENABLED." introductionVersion:"Curie"`
-	InstanceMapperIDAttribute   string `yaml:"instance_mapper_id_attribute" env:"OCIS_LDAP_INSTANCE_MAPPER_ID_ATTRIBUTE" desc:"LDAP Attribute of the instance ID. Requires OCIS_MULTI_INSTANCE_ENABLED." introductionVersion:"Curie"`
+	UserMemberAttribute            string `yaml:"user_member_attribute" env:"OCIS_LDAP_USER_MEMBER_ATTRIBUTE" desc:"LDAP Attribute to signal the user is member of an instance. Requires OCIS_MULTI_INSTANCE_ENABLED." introductionVersion:"8.0.0"`
+	UserGuestAttribute             string `yaml:"user_guest_attribute" env:"OCIS_LDAP_USER_GUEST_ATTRIBUTE" desc:"LDAP Attribute to signal the user is guest of an instance. Requires OCIS_MULTI_INSTANCE_ENABLED." introductionVersion:"8.0.0"`
+	GroupAffiliationAttribute      string `yaml:"group_affiliation_attribute" env:"OCIS_LDAP_GROUP_AFFILIATION_ATTRIBUTE" desc:"LDAP Attribute to signal which instance the group is belonging to. Requires OCIS_MULTI_INSTANCE_ENABLED." introductionVersion:"8.0.0"`
+	PreciseSearchAttribute         string `yaml:"precise_search_attribute" env:"OCIS_LDAP_PRECISE_SEARCH_ATTRIBUTE" desc:"LDAP Attribute to be used for searching users on other instances. Requires OCIS_MULTI_INSTANCE_ENABLED." introductionVersion:"8.0.0"`
+	InstanceMapperEnabled          bool   `yaml:"instance_mapper_enabled" env:"OCIS_LDAP_INSTANCE_MAPPER_ENABLED" desc:"The InstanceMapper allows mapping instance names (user readable) to instance IDs (machine readable) based on an LDAP query. See other _INSTANCE_MAPPER_ env vars. Requires OCIS_MULTI_INSTANCE_ENABLED." introductionVersion:"8.0.0"`
+	InstanceMapperBaseDN           string `yaml:"instance_mapper_base_dn" env:"OCIS_LDAP_INSTANCE_MAPPER_BASE_DN" desc:"BaseDN of the 'instancename to instanceid' mapper in LDAP. Requires OCIS_MULTI_INSTANCE_ENABLED." introductionVersion:"8.0.0"`
+	InstanceMapperNameAttribute    string `yaml:"instance_mapper_name_attribute" env:"OCIS_LDAP_INSTANCE_MAPPER_NAME_ATTRIBUTE" desc:"LDAP Attribute of the instance name. Requires OCIS_MULTI_INSTANCE_ENABLED." introductionVersion:"8.0.0"`
+	InstanceMapperIDAttribute      string `yaml:"instance_mapper_id_attribute" env:"OCIS_LDAP_INSTANCE_MAPPER_ID_ATTRIBUTE" desc:"LDAP Attribute of the instance ID. Requires OCIS_MULTI_INSTANCE_ENABLED." introductionVersion:"8.0.0"`
+	CrossInstanceReferenceTemplate string `yaml:"cross_instance_reference_template" env:"OCIS_LDAP_CROSS_INSTANCE_REFERENCE_TEMPLATE" desc:"Template for the users unique reference across oCIS instances. Requires OCIS_MULTI_INSTANCE_ENABLED." introductionVersion:"8.0.0"`
+	InstanceURLTemplate            string `yaml:"instance_url_template" env:"OCIS_LDAP_INSTANCE_URL_TEMPLATE" desc:"Template for the instance URL. Requires OCIS_MULTI_INSTANCE_ENABLED." introductionVersion:"8.0.0"`
 }
 
 // LDAPEducationConfig represents the LDAP configuration for education related resources
@@ -130,7 +133,6 @@ type API struct {
 	UsernameMatch                 string   `yaml:"graph_username_match" env:"GRAPH_USERNAME_MATCH" desc:"Apply restrictions to usernames. Supported values are 'default' and 'none'. When set to 'default', user names must not start with a number and are restricted to ASCII characters. When set to 'none', no restrictions are applied. The default value is 'default'." introductionVersion:"pre5.0"`
 	AssignDefaultUserRole         bool     `yaml:"graph_assign_default_user_role" env:"GRAPH_ASSIGN_DEFAULT_USER_ROLE" desc:"Whether to assign newly created users the default role 'User'. Set this to 'false' if you want to assign roles manually, or if the role assignment should happen at first login. Set this to 'true' (the default) to assign the role 'User' when creating a new user." introductionVersion:"pre5.0"`
 	IdentitySearchMinLength       int      `yaml:"graph_identity_search_min_length" env:"GRAPH_IDENTITY_SEARCH_MIN_LENGTH" desc:"The minimum length the search term needs to have for unprivileged users when searching for users or groups." introductionVersion:"5.0"`
-	ShowUserEmailInResults        bool     `yaml:"show_email_in_results" env:"OCIS_SHOW_USER_EMAIL_IN_RESULTS" desc:"Include user email addresses in responses. If absent or set to false emails will be omitted from results. Please note that admin users can always see all email addresses." introductionVersion:"6.0.0" deprecationVersion:"Balch" removalVersion:"%%NEXT_PRODUCTION_VERSION%%" deprecationInfo:"Deprecating in favor of a unified array with arbitrary attributes" deprecationReplacement:"UserSearchDisplayedAttributes"`
 	UserSearchDisplayedAttributes []string `yaml:"user_search_displayed_attributes" env:"OCIS_USER_SEARCH_DISPLAYED_ATTRIBUTES" desc:"The attributes to display in the user search results." introductionVersion:"7.3.0"`
 }
 
@@ -175,7 +177,7 @@ type Validation struct {
 
 // MultiInstanceConfig holds configuration for multi-instance-ocis
 type MultiInstanceConfig struct {
-	Enabled     bool   `yaml:"enabled" env:"OCIS_MULTI_INSTANCE_ENABLED" desc:"Enable multiple instances of Infinite Scale." introductionVersion:"Curie"`
-	InstanceID  string `yaml:"instanceid" env:"OCIS_MULTI_INSTANCE_INSTANCEID" desc:"The unique ID of this instance." introductionVersion:"Curie"`
-	QueryRegexp string `yaml:"query_regexp" env:"OCIS_MULTI_INSTANCE_QUERY_TEMPLATE" desc:"The regular expression extracting username and instancename from a user provided search." introductionVersion:"Curie"`
+	Enabled     bool   `yaml:"enabled" env:"OCIS_MULTI_INSTANCE_ENABLED" desc:"Enable multiple instances of Infinite Scale." introductionVersion:"8.0.0"`
+	InstanceID  string `yaml:"instanceid" env:"OCIS_MULTI_INSTANCE_INSTANCEID" desc:"The unique ID of this instance." introductionVersion:"8.0.0"`
+	QueryRegexp string `yaml:"query_regexp" env:"OCIS_MULTI_INSTANCE_QUERY_TEMPLATE" desc:"The regular expression extracting username and instancename from a user provided search." introductionVersion:"8.0.0"`
 }

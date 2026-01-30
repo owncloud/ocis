@@ -1179,7 +1179,7 @@ Feature: ListGrants role
                   "properties": {
                     "@libre.graph.weight": {"const": 2},
                     "description": {"const": "View, download and show all invited people."},
-                    "displayName": {"const": "Can view"},
+                    "displayName": {"const": "Can view and show invitees"},
                     "id": {"const": "d5041006-ebb3-4b4a-b6a4-7c180ecfb17d"}
                   }
                 },
@@ -1187,14 +1187,14 @@ Feature: ListGrants role
                   "type": "object",
                   "required": ["@libre.graph.weight","description","displayName","id"],
                   "properties": {
-                    "displayName": {"const": "Can upload"}
+                    "displayName": {"const": "Can edit with trashbin"}
                   }
                 },
                 {
                   "type": "object",
                   "required": ["@libre.graph.weight","description","displayName","id"],
                   "properties": {
-                    "displayName": {"const": "Can edit without versions"}
+                    "displayName": {"const": "Can edit"}
                   }
                 }
               ]
@@ -1242,7 +1242,7 @@ Feature: ListGrants role
                   "required": ["@libre.graph.weight","description","displayName","id"],
                   "properties": {
                     "@libre.graph.weight": {"const": 2},
-                    "displayName": {"const": "Can edit without versions"},
+                    "displayName": {"const": "Can edit"},
                     "id": {"const": "2d00ce52-1fc2-4dbc-8b95-a73b73395f5a"}
                   }
                 },
@@ -1251,8 +1251,8 @@ Feature: ListGrants role
                   "required": ["@libre.graph.weight","description","displayName","id"],
                   "properties": {
                     "@libre.graph.weight": {"const": 3},
-                    "description": {"const": "View, download, edit and show all invited people."},
-                    "displayName": {"const": "Can edit without versions"},
+                    "description": {"const": "View, download, upload, edit and show all invited people."},
+                    "displayName": {"const": "Can edit and show invitees"},
                     "id": {"const": "c1235aea-d106-42db-8458-7d5610fb0a67"}
                   }
                 }

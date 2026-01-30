@@ -12,3 +12,11 @@ updates:
       interval: "weekly"
     open-pull-requests-limit: 2
 
+  - package-ecosystem: "docker"
+    directories:
+      - "/"
+      - "/ocis/docker"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 2
+

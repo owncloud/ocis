@@ -15,14 +15,14 @@ Feature: List unified roles
       | SpaceViewer                      | enabled  | View and download.                                                                   |
       | Editor                           | enabled  | View, download, upload, edit, add and delete.                                        |
       | EditorListGrants                 | disabled | View, download, upload, edit, add, delete and show all invited people.               |
-      | EditorListGrantsWithVersions     | disabled | View, download, upload, edit, delete and show all invited people, show all versions. |
-      | SpaceEditor                      | enabled  | View, download, upload, edit, add, delete including the history.                     |
-      | SpaceEditorWithoutVersions       | disabled | View, download, upload, edit, add and delete.                                        |
-      | SpaceEditorWithoutTrashbin       | disabled | View, download, upload, edit, add and delete.                                        |
-      | FileEditor                       | enabled  | View, download and edit.                                                             |
-      | FileEditorListGrants             | disabled | View, download, edit and show all invited people.                                    |
-      | FileEditorListGrantsWithVersions | disabled | View, download, edit and show all invited people, show all versions.                 |
-      | EditorLite                       | enabled  | View, download and upload.                                                           |
-      | Manager                          | enabled  | View, download, upload, edit, add, delete and manage members.                        |
+      | EditorListGrantsWithVersions     | disabled | View, download, upload, edit, delete, show all versions and all invited people.      |
+      | SpaceEditor                      | enabled  | View, download, upload, edit, add, show all versions and delete.                     |
+      | SpaceEditorWithoutVersions       | disabled | View, download, upload, edit and add.                                                |
+      | SpaceEditorWithoutTrashbin       | disabled | View, download, upload, edit, add and show all versions.                             |
+      | FileEditor                       | enabled  | View, download, upload and edit.                                                     |
+      | FileEditorListGrants             | disabled | View, download, upload, edit and show all invited people.                            |
+      | FileEditorListGrantsWithVersions | disabled | View, download, upload, edit, show all versions and all invited people.              |
+      | EditorLite                       | enabled  | View, download, upload, edit and add.                                                |
+      | Manager                          | enabled  | View, download, upload, edit, add, show all versions, delete and manage members.     |
       | SecureViewer                     | disabled | View only documents, images and PDFs. Watermarks will be applied.                    |
       | Denied                           | disabled | Deny all access.                                                                     |
