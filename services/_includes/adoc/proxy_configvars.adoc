@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2026-02-01-01-06-34]
+[#deprecation-note-2026-02-02-01-05-44]
 [caption=]
 .Deprecation notes for the proxy service
 [width="100%",cols="~,~,~,~",options="header"]
