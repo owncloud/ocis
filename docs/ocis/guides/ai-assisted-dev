@@ -2,9 +2,9 @@
 title: "Building oCIS Web Extensions with AI-Assisted Development"
 date: 2026-01-21T16:00:00+02:00
 weight: 9
-geekdocRepo: https://github.com/owncloud/web-extensions
-geekdocEditPath: edit/master/docs/guides
-geekdocFilePath: ai-assisted-development.md
+geekdocRepo: https://github.com/owncloud/ocis
+geekdocEditPath: edit/master/docs/ocis/guides
+geekdocFilePath: ai-assisted-dev.md
 geekdocCollapseSection: true
 ---
 
@@ -134,7 +134,7 @@ By the end of this phase, a working (empty) extension exists.
 
 Login to the server and change to the folder where the new project was created, then run: 
 ```
-claude "Please review the claude.md project file, build the web extension, and deploy it to our server. Install and configure any dependencies required. Use 'sudo' where needed to modify or configure the oCIS environment."
+claude "Please review the CLAUDE.md project file, build the web extension, and deploy it to our server. Install and configure any dependencies required. Use 'sudo' where needed to modify or configure the oCIS environment."
 ```
 Once complete, work through features incrementally. Example prompts:
 
