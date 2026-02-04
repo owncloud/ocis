@@ -2,7 +2,7 @@
 Feature: public link for a space
 
   Background:
-    Given the config "OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false" for "sharing" service
+    Given the config "SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false" for "sharing" service
     And these users have been created with default attributes:
       | username |
       | Alice    |

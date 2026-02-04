@@ -14,7 +14,7 @@ Feature: Public can download folders from project space public link
 
   @env-config
   Scenario: download a folder from public link of a space
-    Given the config "OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false" for "sharing" service
+    Given the config "SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false" for "sharing" service
     And using SharingNG
     And user "Alice" has created a folder "NewFolder" in space "new-space"
     And user "Alice" has uploaded a file inside space "new-space" with content "some content" to "NewFolder/test.txt"
@@ -30,7 +30,7 @@ Feature: Public can download folders from project space public link
 
   @env-config @issue-5229
   Scenario: download a folder from public link of a folder inside a space
-    Given the config "OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false" for "sharing" service
+    Given the config "SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false" for "sharing" service
     And using SharingNG
     And user "Alice" has created a folder "NewFolder" in space "new-space"
     And user "Alice" has created a folder "NewFolder/folder" in space "new-space"
