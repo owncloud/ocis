@@ -74,9 +74,9 @@ Feature: PROPFIND with depth:infinity
   Scenario: get the list of resources in a folder shared through public link with depth infinity
     Given using SharingNG
     And the following configs have been set:
-      | service |config                                       | value |
-      | ocdav   |OCDAV_ALLOW_PROPFIND_DEPTH_INFINITY          | true  |
-      | ocdav   |OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD | false |
+      | service | config                                  | value |
+      | ocdav   | OCDAV_ALLOW_PROPFIND_DEPTH_INFINITY     | true  |
+      | sharing | SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD | false |
     And user "Alice" has created the following resource link share:
       | resource        | simple-folder |
       | space           | Personal      |
@@ -123,9 +123,9 @@ Feature: PROPFIND with depth:infinity
 
   Scenario: get the list of resources in a folder shared through public link with depth infinity when depth infinity is not allowed
     Given the following configs have been set:
-      | service | config                                       | value |
-      | ocdav   | OCDAV_ALLOW_PROPFIND_DEPTH_INFINITY          | false |
-      | sharing | OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD | false |
+      | service | config                                  | value |
+      | ocdav   | OCDAV_ALLOW_PROPFIND_DEPTH_INFINITY     | false |
+      | sharing | SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD | false |
     And using SharingNG
     And user "Alice" has created the following resource link share:
       | resource        | simple-folder |

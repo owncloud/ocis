@@ -7,8 +7,8 @@ Feature: Link share without enforcing password
       | username |
       | Alice    |
     And the following configs have been set:
-      | service | config                                       | value |
-      | sharing | OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD | false |
+      | service | config                                  | value |
+      | sharing | SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD | false |
 
   @issue-7879
   Scenario Outline: create a link share of a folder
