@@ -1,0 +1,13 @@
+# define the collaboration monitoring for onlyoffice
+# the filename must match the value in the .env file
+services:
+  collaboration-oo:
+    extends:
+      # add common tracing envvars for collaboration-oo (onlyoffice)
+      # note that the path is relative because the file is included
+      file: tracing_env.yml
+      service: common_monitoring_environment
+    environment:
+      # as onlyoffice runs as a single process, all <debug>/metrics endpoints
+      # will expose the same metrics, so it's sufficient to query one endpoint
+      COLLABORATION_DEBUG_ADDR: 0.0.0.0:9304

@@ -1,25 +1,25 @@
 ---
-
+# monitoring and tracing if enabled
 services:
   ocis:
+    # add common tracing envvars for ocis
+    extends:
+      file: monitoring_tracing/tracing_env.yml
+      service: common_monitoring_environment
     environment:
-      # tracing
-      OCIS_TRACING_ENABLED: "true"
-      OCIS_TRACING_TYPE: "otlp"
-      OCIS_TRACING_ENDPOINT: jaeger:4317
-      # metrics
-      # if oCIS runs as a single process, all  <debug>/metrics endpoints
+      # as oCIS runs as a single process, all <debug>/metrics endpoints
       # will expose the same metrics, so it's sufficient to query one endpoint
       PROXY_DEBUG_ADDR: 0.0.0.0:9205
 
-  collaboration:
-    environment:
-      # tracing
-      OCIS_TRACING_ENABLED: "true"
-      OCIS_TRACING_TYPE: "otlp"
-      OCIS_TRACING_ENDPOINT: jaeger:4317
-      # metrics
-      COLLABORATION_DEBUG_ADDR: 0.0.0.0:9304
+# include additional monitoring definitions for collabora and onlyoffice via the .env file
+# if the envvars are not uncommented in the .env file, use a dummy file with no content instead
+# compose is not able to conditionally include, this mimics the behavior
+include:
+  # collaboration
+  - monitoring_tracing/${MONITORING_COLLABORATION:-empty_dummy.yml}
+
+  # collaboration-oo
+  - monitoring_tracing/${MONITORING_COLLABORATION_OO:-empty_dummy.yml}
 
 networks:
   ocis-net:

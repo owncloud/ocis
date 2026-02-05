@@ -1,0 +1,4 @@
+# this file has ho compose configuration on purpose
+# it is required to be present and used in the monitoring.yml file
+# with this, we can mimic missing conditional rendering 
+# DO NOT DELETE OR ADD CONTENT !
