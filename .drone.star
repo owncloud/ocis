@@ -419,7 +419,7 @@ config = {
     "dockerReleases": {
         "architectures": ["arm64", "amd64"],
     },
-    "litmus": False,
+    "litmus": True,
     "codestyle": True,
 }
 
@@ -512,10 +512,15 @@ def main(ctx):
         licenseCheck(ctx)
 
     test_pipelines = \
+        codestyle(ctx) + \
+        checkGherkinLint(ctx) + \
         checkTestSuitesInExpectedFailures(ctx) + \
         buildWebCache(ctx) + \
         getGoBinForTesting(ctx) + \
+        buildOcisBinaryForTesting(ctx) + \
         checkStarlark() + \
+        build_release_helpers + \
+        testOcisAndUploadResults(ctx) + \
         testPipelines(ctx)
 
     build_release_pipelines = \
@@ -536,7 +541,7 @@ def main(ctx):
         ),
     )
 
-    pipelines = test_pipelines
+    pipelines = test_pipelines + build_release_pipelines
 
     # nightly Trivy security scan (non-blocking)
     pipelines.append(trivyScan(ctx))
@@ -1102,7 +1107,7 @@ def localApiTestPipeline(ctx):
                     params[item] = matrix[item] if item in matrix else defaults[item]
                 for storage in params["storages"]:
                     for run_with_remote_php in params["withRemotePhp"]:
-                        run_on_k8s = params["k8s"]
+                        run_on_k8s = params["k8s"] and ctx.build.event == "cron"
                         ocis_url = OCIS_URL
                         if run_on_k8s:
                             ocis_url = "https://%s" % OCIS_SERVER_NAME
@@ -1134,6 +1139,7 @@ def localApiTestPipeline(ctx):
                                         (emailService() if params["emailNeeded"] and not run_on_k8s else []) +
                                         (clamavService() if params["antivirusNeeded"] and not run_on_k8s else []) +
                                         ((fakeOffice() + collaboraService() + onlyofficeService()) if params["collaborationServiceNeeded"] else []),
+                            "depends_on": getPipelineNames(buildOcisBinaryForTesting(ctx)),
                             "trigger": {
                                 "ref": [
                                     "refs/heads/master",
@@ -1405,7 +1411,7 @@ def coreApiTestPipeline(ctx):
                 for run_with_remote_php in params["withRemotePhp"]:
                     filter_tags = "~@skipOnGraph&&~@skipOnOcis-%s-Storage" % ("OC" if storage == "owncloud" else "OCIS")
                     expected_failures_file = "%s/expected-failures-API-on-%s-storage.md" % (test_dir, storage.upper())
-                    run_on_k8s = params["k8s"]
+                    run_on_k8s = params["k8s"] and ctx.build.event == "cron"
                     ocis_url = OCIS_URL
                     if run_on_k8s:
                         ocis_url = "https://%s" % OCIS_SERVER_NAME
