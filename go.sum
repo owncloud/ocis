@@ -705,6 +705,12 @@ github.com/owncloud/libre-graph-api-go v1.0.5-0.20250217093259-fa3804be6c27 h1:I
 github.com/owncloud/libre-graph-api-go v1.0.5-0.20250217093259-fa3804be6c27/go.mod h1:+gT+x62AS9u2Farh9wE2uYmgdvTg0MQgsSI62D+xoRg=
 github.com/owncloud/reva/v2 v2.0.0-20251001134122-cb98fe521deb h1:wIu3AM0Khs+cw3BJjXnPz7tjJyZ3DbMsX2pwWafvyRI=
 github.com/owncloud/reva/v2 v2.0.0-20251001134122-cb98fe521deb/go.mod h1:JwGg9zW2BmgMdcjKRwzqyoWtSVhFTMlVa4z6UToQgAA=
+github.com/owncloud/reva/v2 v2.0.0-20260205083921-918ad0e00bd6 h1:CtlBFR3XZznDaEMAbBcnh0eFFoKpTghJ1nAqiwJHa2k=
+github.com/owncloud/reva/v2 v2.0.0-20260205083921-918ad0e00bd6/go.mod h1:JwGg9zW2BmgMdcjKRwzqyoWtSVhFTMlVa4z6UToQgAA=
+github.com/owncloud/reva/v2 v2.0.0-20260205113732-688f40fb9d36 h1:8UdzfpW2BRIuaovghSxw6nALQG+9nVxe+F9IHal1sqs=
+github.com/owncloud/reva/v2 v2.0.0-20260205113732-688f40fb9d36/go.mod h1:JwGg9zW2BmgMdcjKRwzqyoWtSVhFTMlVa4z6UToQgAA=
+github.com/owncloud/reva/v2 v2.0.0-20260205130344-0430868db993 h1:MSwrYYZT31v0c64LBu1QyXZIBVwAPyrAxi2eBaJ5B1M=
+github.com/owncloud/reva/v2 v2.0.0-20260205130344-0430868db993/go.mod h1:JwGg9zW2BmgMdcjKRwzqyoWtSVhFTMlVa4z6UToQgAA=
 github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c h1:rp5dCmg/yLR3mgFuSOe4oEnDDmGLROTvMragMUXpTQw=
 github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c/go.mod h1:X07ZCGwUbLaax7L0S3Tw4hpejzu63ZrrQiUe6W0hcy0=
 github.com/pablodz/inotifywaitgo v0.0.9 h1:njquRbBU7fuwIe5rEvtaniVBjwWzcpdUVptSgzFqZsw=
