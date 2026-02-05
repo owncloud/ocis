@@ -4,7 +4,7 @@ date: 2026-01-21T16:00:00+02:00
 weight: 9
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/ocis/guides
-geekdocFilePath: ai-assisted-dev.md
+geekdocFilePath: ai_assisted_dev.md
 geekdocCollapseSection: true
 ---
 
@@ -12,7 +12,7 @@ geekdocCollapseSection: true
 
 ## Introduction
 
-This guide demonstrates how to build oCIS web extensions using AI-assisted development (sometimes called "vibe coding") with Claude AI. By following this approach, production-ready extensions can be created without writing code manually—the AI handles syntax, boilerplate, and implementation while the developer focuses on architecture and user experience.
+This guide demonstrates how to build Infinite Scale (oCIS) web extensions using AI-assisted development (sometimes called "vibe coding") with Claude AI. By following this approach, review-ready extensions can be created without writing code manually—the AI handles syntax, boilerplate, and implementation while the developer focuses on architecture and user experience.
 
 **What you'll learn:**
 - Setting up MCP connectors so Claude can access your server
@@ -21,16 +21,16 @@ This guide demonstrates how to build oCIS web extensions using AI-assisted devel
 - Practical tips for supervising AI-generated code
 - How to contribute extensions back to the oCIS community
 
-**Time investment:** ~10-14 hours per extension (concept to production-ready)
+**Time investment:** ~10-14 hours per extension (concept to review-ready)
 
-**Cost:** ~$70 CAD for two extensions (using Claude Max Pro subscription)
+**Cost:** ~$100 USD for two extensions (using the Claude Max subscription)
 
 ## Prerequisites
 
 Before starting, ensure you have the following:
 
-- A running oCIS instance
-- Claude Max Pro subscription (~$140 CAD/month)
+- A running oCIS instance, see the [Admin Docs](https://doc.owncloud.com/ocis/latest/depl-examples/ubuntu-compose/ubuntu-compose-prod.html) for a deployment example
+- [Claude Max subscription](https://claude.com/pricing/max) (starts with $100 US/month at the time of writing, other plans availabe)
 - SSH access to your server (for MCP connectivity)
 - Full root access to the server unless Claude Code, Claude MCP connector, oCIS and other tools all run as another user
 
@@ -48,15 +48,15 @@ MCP (Model Context Protocol) allows Claude to connect directly to a server, enab
 
 Follow the official MCP documentation to set up a connector:
 
-- **MCP Quickstart Guide**: https://modelcontextprotocol.io/quickstart
-- **Connect to Local Servers**: https://modelcontextprotocol.io/docs/develop/connect-local-servers
-- **Claude Desktop MCP Setup**: https://support.claude.com/en/articles/10949351-getting-started-with-local-mcp-servers-on-claude-desktop
+- **[MCP Quickstart Guide](https://modelcontextprotocol.io/quickstart)**
+- **[Connect to Local Servers](https://modelcontextprotocol.io/docs/develop/connect-local-servers)**
+- **[Claude Desktop MCP Setup](https://support.claude.com/en/articles/10949351-getting-started-with-local-mcp-servers-on-claude-desktop)**
 
 ### Verify Connection
 
 Once configured, verify Claude can access the server by asking:
 
-```
+```text
 Can you list the contents of /home on my server?
 ```
 
@@ -66,7 +66,7 @@ If Claude successfully lists directories, proceed to the next step.
 
 With MCP connected, Claude can install the development tools needed. Simply ask:
 
-```
+```text
 Please install Claude Code and Git on my server. I'll need these for 
 developing an oCIS web extension.
 ```
@@ -79,13 +79,13 @@ Claude will:
 
 ## The Five-Phase Workflow
 
-This workflow has been refined over several projects and consistently produces production-ready code.
+This workflow has been refined over several projects and consistently produces review-ready code.
 
 ### Phase 1: Architecture (~15-30 minutes)
 
 Start in the Claude web interface (not Claude Code). Describe the project and have a conversation:
 
-```
+```text
 I want to build an oCIS web extension that displays photos in a timeline 
 grouped by their EXIF capture date. It should have infinite scroll starting 
 from today and going backwards, show camera metadata when you click on a photo, 
@@ -100,7 +100,7 @@ Claude will ask clarifying questions about scope, user experience, and technical
 
 Ask Claude to research the existing oCIS architecture:
 
-```
+```text
 Please research how oCIS web extensions work. I need to understand:
 - The extension manifest format
 - How extensions integrate with the oCIS web UI
@@ -118,7 +118,7 @@ Claude reads documentation, examines code patterns, and produces an architectura
 
 Ask Claude to create the project structure on the server:
 
-```
+```text
 Please create the project structure for my photo-addon extension:
 - Git repository initialised
 - Build configuration (Vite with AMD output)
@@ -132,27 +132,32 @@ By the end of this phase, a working (empty) extension exists.
 
 ### Phase 4: Implementation (~5-6 hours)
 
-Login to the server and change to the folder where the new project was created, then run: 
-```
-claude "Please review the CLAUDE.md project file, build the web extension, and deploy it to our server. Install and configure any dependencies required. Use 'sudo' where needed to modify or configure the oCIS environment."
+Login to the server and change to the folder where the new project was created, then run:
+
+```text
+claude "Please review the CLAUDE.md project file, build the web extension,
+and deploy it to our server. Install and configure any dependencies required.
+Use 'sudo' where needed to modify or configure the oCIS environment."
 ```
 Once complete, work through features incrementally. Example prompts:
 
 **Feature requests:**
-```
+
+```text
 Please adjust the logic to start by searching for today's date (unless 
 overwritten by the dropdowns at the top), then display them on the screen. 
 If the images don't fill the screen, load up another day, until the screen 
 is filled plus some buffer. Then when I scroll, bring in more images.
 ```
 
-```
+```text
 In the map view, when I hover over a dot, the thumbnail shows up above 
 off the screen. Can you fix the positioning?
 ```
 
 **Bug fixes:**
-```
+
+```text
 I'm seeing this error in the console:
 [paste error here]
 
@@ -164,41 +169,48 @@ Can you investigate and fix it?
 Once core features work, request comprehensive cleanup:
 
 **Performance optimisation:**
-```
+
+```text
 Are there any performance improvements that we can make?
 ```
 
 **Bug hunting:**
-```
+
+```text
 Are there any memory leaks or bugs that can be found?
 ```
 
 **Code quality:**
-```
+
+```text
 Are there any inefficiencies we can improve on? Unused variables? 
 Duplicate functions? Excessive if statements? Overwriting CSS styles? 
 Overly complex logic?
 ```
 
 **Error handling:**
-```
+
+```text
 Are there any error handling gaps or functions that may fall through 
 without handling all scenarios?
 ```
 
 **Documentation:**
-```
+
+```text
 Are there any missing comments? Or complex code that could use 
 clear documentation?
 ```
 
 **Internationalisation:**
-```
+
+```text
 Are there any visible text strings that are not yet set up for translation?
 ```
 
 **Comprehensive cleanup:**
-```
+
+```text
 Pulling from the backlog list, can you do a good code refactor to simplify, 
 add all required unit tests, and add i18n support, then commit and push the 
 code with the right comments.
@@ -217,7 +229,7 @@ There are times when Claude Code may:
 - Undo something it had just done
 - Go down a path that doesn't match the architecture
 
-The decisions are always logical, but sometimes the harder path is required. Expect to intervene and redirect approximately 3-5% of the time.
+The decisions are always logical, but sometimes the harder path is required. Expect to intervene and redirect approximately ~5% of the time.
 
 **Watch for:**
 - Changes that don't match architectural decisions
@@ -232,8 +244,10 @@ AI-generated code works, but it can accumulate:
 - Unused variables
 - Overly complex conditionals
 - Duplicate CSS styles
+- Missing good practice for the orders of directives
+- Missing the definition of required interactive handlers
 
-Explicitly asking for refactoring and optimisation catches these issues.
+When submitting a pull request (PR), issues highlighted during CI steps, such as linting, can be resolved by explicitly asking for code refactoring and optimisation.
 
 ### UI Testing Is Manual
 
@@ -252,7 +266,7 @@ When issues arise, these techniques help Claude understand and fix problems:
 
 Open Chrome DevTools, copy console errors, and paste into Claude:
 
-```
+```text
 I'm seeing this error in the console:
 [paste error here]
 
@@ -272,7 +286,7 @@ For performance issues, export HAR files (network traffic captures):
 
 Copy specific HTML/CSS snippets from DevTools:
 
-```
+```text
 The thumbnail hover popup is positioned incorrectly. Here's the current 
 CSS and HTML structure:
 [paste code here]
@@ -285,7 +299,7 @@ but stays within the viewport?
 Claude has a Chrome extension, but it may be limited for this use case. Manually copying console output and HTML/CSS snippets into Claude is often more effective.
 {{< /hint >}}
 
-## Example Extensions Built with This Approach
+## Example Web Extensions Built with This Approach
 
 ### Photo Gallery Extension (web-app-photo-addon)
 
@@ -307,7 +321,7 @@ Features:
 - **KQL Search**: Direct advanced query editing
 - **Index Statistics**: View indexing status and configuration
 
-### Backend Changes (PR #11912)
+### Backend Changes in oCIS
 
 To enable photo metadata search, changes were contributed to oCIS core:
 - Photo field mappings in the KQL parser
@@ -333,7 +347,7 @@ Console errors, network requests, and performance profiles are incredibly valuab
 ### 4. Understand oCIS Extension Requirements
 
 Extensions must:
-- Use AMD module format (not ES modules)
+- Use CJS module format (not ES modules)
 - Have a proper `manifest.json`
 - Use the oCIS web SDK for API access
 
@@ -347,9 +361,9 @@ Search in oCIS is space-scoped. What works for an admin account might not work f
 
 PR reviews teach things no documentation mentions. The oCIS team's suggestions can significantly improve code quality.
 
-## Contributing to oCIS
+## Contributing to oCIS or web-extensions
 
-Once an extension is ready, Claude can handle the entire contribution workflow:
+Once a web-extension is ready, Claude can handle the entire contribution workflow:
 
 - Install and configure Git
 - Create forks of the oCIS repositories
@@ -360,38 +374,47 @@ Once an extension is ready, Claude can handle the entire contribution workflow:
 
 Example prompts:
 
-```
+```text
 Please fork the owncloud/web-extensions repository to my GitHub account 
 and clone it to my server.
 ```
 
-```
+```text
 Create a new branch called feat/web-app-photo-addon and commit our 
 extension with an appropriate commit message.
 ```
 
-```
+```text
 Please create a pull request for our photo-addon extension. Include 
 screenshots from the /screenshots directory and a clear description 
 of what the extension does.
 ```
 
 **Contributions made by this approach:**
-- **PR #11912** (oCIS core): Photo metadata search backend
-- **PR #312** (web-extensions): Photo gallery extension
-- **PR #313** (web-extensions): Advanced search extension
+- **oCIS core**: Photo metadata search backend
+- **web-extensions**: Photo gallery extension
+- **web-extensions**: Advanced search extension
 
 {{< hint type=note title="CLA Requirement" >}}
 Contributors need to sign the ownCloud Contributor License Agreement (CLA) for PRs to be accepted. Claude can help find the CLA link and explain the process.
 {{< /hint >}}
 
+## Notes
+
+Additional steps can be required in the oCIS repository for changes in the web-extensions repository, in particular:
+
+- If the web extension requires it, add proposals to the back-end code in the oCIS codebase.
+- In order to make the new web extension more easily accessible to the public, the `ocis_full` deployment example in the oCIS repository should be updated. The new oCIS version will then reference it automatically and the documentation team will update the release notes and documentation accordingly.
+
 ## Summary
 
-Using this approach, complete extensions can be built without writing code manually. No git commands need to be typed manually. No pnpm commands either.
+Using this approach, complete web-extensions can be built without writing code manually. No git commands need to be typed manually. No pnpm commands either.
 
-Every commit, every push, every PR—all generated through AI assistance. The backend changes to oCIS core were approved and merged. The web extensions demonstrate the viability of this development approach.
+Every commit, every push, every PR—all generated through AI assistance. The backend changes to oCIS core were approved and merged. The web-extensions demonstrate the viability of this development approach.
 
 The barrier to entry for meaningful open source contribution is significantly lower with AI-assisted development. For those interested in contributing to oCIS but feeling intimidated by the codebase, this approach is worth considering.
+
+Please note that, as with all contributions, this approach requires a full review process from the code maintainers, with iterations required to finalise all steps. To ensure stability and maintainability, all feedback must be incorporated into the proposed changes.
 
 ---
 
@@ -403,8 +426,9 @@ The barrier to entry for meaningful open source contribution is significantly lo
 | MCP Local Servers | https://modelcontextprotocol.io/docs/develop/connect-local-servers |
 | Claude Desktop MCP | https://support.claude.com/en/articles/10949351-getting-started-with-local-mcp-servers-on-claude-desktop |
 | oCIS Web Extensions | https://github.com/owncloud/web-extensions |
-| oCIS Documentation | https://doc.owncloud.com/ocis/ |
-
+| oCIS Admin Documentation | https://doc.owncloud.com/ocis/ |
+| oCIS Developer Documentation | https://owncloud.dev |
 ---
 
-*This guide was written with AI assistance and reviewed for accuracy.*
+*This guide was written with AI assistance and reviewed by the ownCloud documentation team for accuracy.*
+
