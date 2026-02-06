@@ -1444,6 +1444,7 @@ def coreApiTestPipeline(ctx):
                                          ],
                                      },
                                  ] +
+                                 getSharingLogs() + getFrontendLogs() +
                                  apiTestFailureLog() +
                                  ([] if run_on_k8s else generateCoverageFromAPITest(ctx, name)),
                         "services": (emailService() if params["emailNeeded"] else []) +
@@ -3831,6 +3832,7 @@ def prepareOcisDeployment():
         "sed -i '/{{- define \"ocis.basicServiceTemplates\" -}}/a\\\\  {{- $_ := set .scope \"appNameAuthBasic\" \"authbasic\" -}}' ./charts/ocis/templates/_common/_tplvalues.tpl",
         "sed -i '/- name: IDM_ADMIN_PASSWORD/{n;N;N;N;d;}' ./charts/ocis/templates/idm/deployment.yaml",
         "sed -i '/- name: IDM_ADMIN_PASSWORD/a\\\\\\n              value: \"admin\"' ./charts/ocis/templates/idm/deployment.yaml",
+        "sed -i '/- name: STORAGE_PUBLICLINK_DEBUG_ADDR/i\\\\            {{- include \"ocis.persistentStore\" . | nindent 12 }}\\\n' ./charts/ocis/templates/storagepubliclink/deployment.yaml",
         "sed -i '/- name: PROXY_HTTP_ADDR/i\\\\            - name: PROXY_ENABLE_BASIC_AUTH\\\n              value: \"true\"' ./charts/ocis/templates/proxy/deployment.yaml",
         "sed -i 's|/etc/ocis/sharing-banned-passwords.txt|config/drone/banned-password-list.txt|' ./charts/ocis/templates/sharing/deployment.yaml",
         "sed -i 's|- name: configs|- name: banned-passwords|' ./charts/ocis/templates/sharing/deployment.yaml",
@@ -3892,6 +3894,48 @@ def deployOcis():
                 "path": "/go",
             },
         ],
+    }]
+
+def getSharingLogs(suffix = ""):
+    kubeconfig_suffix = suffix if suffix else ""
+    step_name = "sharing-logs" + kubeconfig_suffix
+
+    commands = [
+        "export KUBECONFIG=%s/kubeconfig-$${DRONE_BUILD_NUMBER}%s.yaml" % (dirs["base"], kubeconfig_suffix),
+        "kubectl logs -n ocis deploy/sharing --all-containers ",
+    ]
+
+    return [{
+        "name": step_name,
+        "image": K3D_IMAGE,
+        "user": "root",
+        "commands": commands,
+        "when": {
+            "status": [
+                "failure",
+            ],
+        },
+    }]
+
+def getFrontendLogs(suffix = ""):
+    kubeconfig_suffix = suffix if suffix else ""
+    step_name = "frontend-logs" + kubeconfig_suffix
+
+    commands = [
+        "export KUBECONFIG=%s/kubeconfig-$${DRONE_BUILD_NUMBER}%s.yaml" % (dirs["base"], kubeconfig_suffix),
+        "kubectl logs -n ocis deploy/frontend --all-containers ",
+    ]
+
+    return [{
+        "name": step_name,
+        "image": K3D_IMAGE,
+        "user": "root",
+        "commands": commands,
+        "when": {
+            "status": [
+                "failure",
+            ],
+        },
     }]
 
 def enableAntivirusServiceK8s():
