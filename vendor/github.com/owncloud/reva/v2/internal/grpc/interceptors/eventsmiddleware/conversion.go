@@ -309,10 +309,16 @@ func ItemRestored(r *provider.RestoreRecycleItemResponse, req *provider.RestoreR
 	if req.RestoreRef != nil {
 		ref = req.RestoreRef
 	}
+	opaqueID := utils.ReadPlainFromOpaque(r.Opaque, "opaque_id")
 	return events.ItemRestored{
-		SpaceOwner:        spaceOwner,
-		Executant:         executant.GetId(),
-		Ref:               ref,
+		SpaceOwner: spaceOwner,
+		Executant:  executant.GetId(),
+		Ref:        ref,
+		ID: &provider.ResourceId{
+			StorageId: ref.GetResourceId().GetStorageId(),
+			SpaceId:   ref.GetResourceId().GetSpaceId(),
+			OpaqueId:  opaqueID,
+		},
 		OldReference:      req.Ref,
 		Key:               req.Key,
 		Timestamp:         utils.TSNow(),

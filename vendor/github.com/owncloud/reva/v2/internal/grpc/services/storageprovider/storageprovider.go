@@ -977,6 +977,18 @@ func (s *Service) RestoreRecycleItem(ctx context.Context, req *provider.RestoreR
 	res := &provider.RestoreRecycleItemResponse{
 		Status: status.NewStatusFromErrType(ctx, "restore recycle item", err),
 	}
+
+	// The key from the restore request IS the file's opaque_id.
+	// Include it in the response so the events middleware can populate
+	// the ItemRestored event's ID field (mirroring how Delete works).
+	if err == nil && key != "" {
+		res.Opaque = &typesv1beta1.Opaque{
+			Map: map[string]*typesv1beta1.OpaqueEntry{
+				"opaque_id": {Decoder: "plain", Value: []byte(key)},
+			},
+		}
+	}
+
 	return res, nil
 }
 
