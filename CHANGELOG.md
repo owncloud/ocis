@@ -76,6 +76,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix error code when a user can't disable a space: [#11845](https://github.com/owncloud/ocis/pull/11845)
 * Bugfix - Fix Sharingroles: [#11898](https://github.com/owncloud/ocis/pull/11898)
 * Bugfix - Fix the error handling for empty name on space update: [#11933](https://github.com/owncloud/ocis/pull/11933)
+* Bugfix - Rework monitoring in the ocis_full deployment example: [#11995](https://github.com/owncloud/ocis/pull/11995)
 * Change - Remove deprecated OCIS_SHOW_USER_EMAIL_IN_RESULTS: [#11942](https://github.com/owncloud/ocis/pull/11942)
 * Enhancement - Bump Reva: [#460](https://github.com/owncloud/reva/pull/460)
 * Enhancement - Set Referrer-Policy to no-referrer: [#11722](https://github.com/owncloud/ocis/pull/11722)
@@ -166,6 +167,20 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/11887
    https://github.com/owncloud/ocis/pull/11933
+
+* Bugfix - Rework monitoring in the ocis_full deployment example: [#11995](https://github.com/owncloud/ocis/pull/11995)
+
+   The ocis_full deployment example has been basically reworked for how to provide
+   monitoring.
+
+   We now have: - a singe place for the definition of the tracing envvars for all
+   ocis related container services - an easy and modular setup defining which
+   sources should be inlcuded in monitoring via .env - comments describing the
+   setup for the ease extending it - the monitoring definition in .env has been
+   moved to the bottom and the compose_file assembly has monitoring as last entry
+   now to guarantee nothing gets overwritten by accident
+
+   https://github.com/owncloud/ocis/pull/11995
 
 * Change - Remove deprecated OCIS_SHOW_USER_EMAIL_IN_RESULTS: [#11942](https://github.com/owncloud/ocis/pull/11942)
 
