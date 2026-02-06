@@ -11,7 +11,7 @@ services:
       # will expose the same metrics, so it's sufficient to query one endpoint
       PROXY_DEBUG_ADDR: 0.0.0.0:9205
 
-# include additional monitoring definitions for collabora and onlyoffice via the .env file
+# include additional monitoring definitions such as collabora and onlyoffice via the .env file
 # if the envvars are not uncommented in the .env file, use a dummy file with no content instead
 # compose is not able to conditionally include, this mimics the behavior
 include:
@@ -23,3 +23,7 @@ include:
 
 networks:
   ocis-net:
+
+# additional includes to define monitoring products to be used in this setup
+#include:
+#  ...
