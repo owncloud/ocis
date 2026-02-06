@@ -1,0 +1,11 @@
+# this is the commonly used ocis envvar definition for tracing when included
+# this makes this a single point of maintenance
+
+services:
+  # this is a dummy environment required for the compose extend attribute 
+  common_monitoring_environment:
+    environment:
+      # tracing envvars
+      OCIS_TRACING_ENABLED: "true"
+      OCIS_TRACING_TYPE: "otlp"
+      OCIS_TRACING_ENDPOINT: jaeger:4317
