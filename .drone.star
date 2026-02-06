@@ -2756,7 +2756,7 @@ def build():
             "name": "build",
             "image": OC_CI_GOLANG,
             "commands": [
-                "retry -t 3 'make -C ocis build ENABLE_VIPS=true'",
+                "retry -t 3 'make -C ocis build'",
             ],
             "environment": DRONE_HTTP_PROXY_ENV,
             "volumes": [stepVolumeGo],
@@ -2769,7 +2769,7 @@ def buildDebug():
             "name": "build debug binary",
             "image": OC_CI_GOLANG,
             "commands": [
-                "retry -t 3 'make -C ocis build-debug ENABLE_VIPS=true'",
+                "retry -t 3 'make -C ocis build-debug'",
             ],
             "environment": DRONE_HTTP_PROXY_ENV,
             "volumes": [stepVolumeGo],
