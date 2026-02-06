@@ -35,19 +35,7 @@ var MagickExe = sync.OnceValue(func() string {
 })
 var HasMagick = sync.OnceValue(func() bool { return MagickExe() != "magick" })
 
-var TempDirInRAMIfPossible = sync.OnceValue(func() string {
-	const shm = "/dev/shm"
-	if s, err := os.Stat(shm); err == nil && s.IsDir() {
-		tempFile, err := os.CreateTemp(shm, "write_check_*")
-		if err != nil {
-			return os.TempDir()
-		}
-		tempFile.Close()
-		os.Remove(tempFile.Name())
-		return shm
-	}
-	return os.TempDir()
-})
+var TempDirInRAMIfPossible = sync.OnceValue(func() string { return get_temp_dir() })
 
 type ImageFrame struct {
 	Width, Height, Left, Top int

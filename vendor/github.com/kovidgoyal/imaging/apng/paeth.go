@@ -46,7 +46,7 @@ func paeth(a, b, c uint8) uint8 {
 // cdat is the current row's data, pdat is the previous row's data.
 func filterPaeth(cdat, pdat []byte, bytesPerPixel int) {
 	var a, b, c, pa, pb, pc int
-	for i := 0; i < bytesPerPixel; i++ {
+	for i := range bytesPerPixel {
 		a, c = 0, 0
 		for j := i; j < len(cdat); j += bytesPerPixel {
 			b = int(pdat[j])
