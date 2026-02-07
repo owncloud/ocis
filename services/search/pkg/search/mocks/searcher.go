@@ -228,6 +228,39 @@ func (_c *Searcher_TrashItem_Call) RunAndReturn(run func(*providerv1beta1.Resour
 	return _c
 }
 
+// UpdateTags provides a mock function with given fields: ref
+func (_m *Searcher) UpdateTags(ref *providerv1beta1.Reference) {
+	_m.Called(ref)
+}
+
+// Searcher_UpdateTags_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpdateTags'
+type Searcher_UpdateTags_Call struct {
+	*mock.Call
+}
+
+// UpdateTags is a helper method to define mock.On call
+//   - ref *providerv1beta1.Reference
+func (_e *Searcher_Expecter) UpdateTags(ref interface{}) *Searcher_UpdateTags_Call {
+	return &Searcher_UpdateTags_Call{Call: _e.mock.On("UpdateTags", ref)}
+}
+
+func (_c *Searcher_UpdateTags_Call) Run(run func(ref *providerv1beta1.Reference)) *Searcher_UpdateTags_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(*providerv1beta1.Reference))
+	})
+	return _c
+}
+
+func (_c *Searcher_UpdateTags_Call) Return() *Searcher_UpdateTags_Call {
+	_c.Call.Return()
+	return _c
+}
+
+func (_c *Searcher_UpdateTags_Call) RunAndReturn(run func(*providerv1beta1.Reference)) *Searcher_UpdateTags_Call {
+	_c.Run(run)
+	return _c
+}
+
 // UpsertItem provides a mock function with given fields: ref
 func (_m *Searcher) UpsertItem(ref *providerv1beta1.Reference) {
 	_m.Called(ref)
