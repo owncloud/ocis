@@ -173,6 +173,64 @@ func (_c *Engine_Move_Call) RunAndReturn(run func(string, string, string) error)
 	return _c
 }
 
+// Retrieve provides a mock function with given fields: id
+func (_m *Engine) Retrieve(id string) (*engine.Resource, error) {
+	ret := _m.Called(id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Retrieve")
+	}
+
+	var r0 *engine.Resource
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string) (*engine.Resource, error)); ok {
+		return rf(id)
+	}
+	if rf, ok := ret.Get(0).(func(string) *engine.Resource); ok {
+		r0 = rf(id)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*engine.Resource)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(id)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Engine_Retrieve_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Retrieve'
+type Engine_Retrieve_Call struct {
+	*mock.Call
+}
+
+// Retrieve is a helper method to define mock.On call
+//   - id string
+func (_e *Engine_Expecter) Retrieve(id interface{}) *Engine_Retrieve_Call {
+	return &Engine_Retrieve_Call{Call: _e.mock.On("Retrieve", id)}
+}
+
+func (_c *Engine_Retrieve_Call) Run(run func(id string)) *Engine_Retrieve_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Engine_Retrieve_Call) Return(_a0 *engine.Resource, _a1 error) *Engine_Retrieve_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Engine_Retrieve_Call) RunAndReturn(run func(string) (*engine.Resource, error)) *Engine_Retrieve_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // Purge provides a mock function with given fields: id
 func (_m *Engine) Purge(id string) error {
 	ret := _m.Called(id)

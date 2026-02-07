@@ -28,6 +28,10 @@ func (b Basic) Extract(_ context.Context, ri *storageProvider.ResourceInfo) (Doc
 		MimeType: ri.MimeType,
 	}
 
+	if ri.GetChecksum() != nil {
+		doc.Checksum = ri.GetChecksum().GetSum()
+	}
+
 	if m := ri.ArbitraryMetadata.GetMetadata(); m != nil {
 		if t, ok := m["tags"]; ok {
 			doc.Tags = tags.New(t).AsSlice()
