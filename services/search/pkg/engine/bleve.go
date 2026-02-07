@@ -286,6 +286,17 @@ func (b *Bleve) Upsert(id string, r Resource) error {
 	return bleveIndex.Index(id, r)
 }
 
+// Retrieve loads an existing resource from the index by its ID.
+func (b *Bleve) Retrieve(id string) (*Resource, error) {
+	bleveIndex, closeFn, err := b.indexGetter.GetIndex(bleveEngine.ReadOnly(true))
+	if err != nil {
+		return nil, err
+	}
+	defer closeFn()
+
+	return b.getResource(bleveIndex, id)
+}
+
 // Move updates the resource location and all of its necessary fields.
 func (b *Bleve) Move(id string, parentid string, target string) error {
 	bleveIndex, closeFn, err := b.indexGetter.GetIndex()
@@ -410,6 +421,7 @@ func (b *Bleve) getResource(bleveIndex bleve.Index, id string) (*Resource, error
 			Size:     uint64(getFieldValue[float64](fields, "Size")),
 			Mtime:    getFieldValue[string](fields, "Mtime"),
 			MimeType: getFieldValue[string](fields, "MimeType"),
+			Checksum: getFieldValue[string](fields, "Checksum"),
 			Content:  getFieldValue[string](fields, "Content"),
 			Tags:     getFieldSliceValue[string](fields, "Tags"),
 			Audio:    getAudioValue[libregraph.Audio](fields),

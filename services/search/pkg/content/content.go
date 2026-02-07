@@ -20,6 +20,7 @@ type Document struct {
 	Size     uint64
 	Mtime    string
 	MimeType string
+	Checksum string
 	Tags     []string
 	Audio    *libregraph.Audio          `json:"audio,omitempty"`
 	Image    *libregraph.Image          `json:"image,omitempty"`
