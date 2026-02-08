@@ -216,25 +216,25 @@ func (g Graph) UnassignTags(w http.ResponseWriter, r *http.Request) {
 	}
 
 	allTags := tags.New(currentTags)
-	if !allTags.Remove(unassignment.Tags...) {
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "no new tags in createtagsrequest or maximum reached")
-		return
-	}
-
-	resp, err := client.SetArbitraryMetadata(ctx, &provider.SetArbitraryMetadataRequest{
-		Ref: &provider.Reference{ResourceId: &rid},
-		ArbitraryMetadata: &provider.ArbitraryMetadata{
-			Metadata: map[string]string{
-				"tags": allTags.AsList(),
+	if allTags.Remove(unassignment.Tags...) {
+		// Tags were present in metadata — update the file.
+		resp, err := client.SetArbitraryMetadata(ctx, &provider.SetArbitraryMetadataRequest{
+			Ref: &provider.Reference{ResourceId: &rid},
+			ArbitraryMetadata: &provider.ArbitraryMetadata{
+				Metadata: map[string]string{
+					"tags": allTags.AsList(),
+				},
 			},
-		},
-	})
-	if err != nil || resp.GetStatus().GetCode() != rpc.Code_CODE_OK {
-		g.logger.Error().Err(err).Msg("error setting tags")
-		w.WriteHeader(http.StatusInternalServerError)
-		return
+		})
+		if err != nil || resp.GetStatus().GetCode() != rpc.Code_CODE_OK {
+			g.logger.Error().Err(err).Msg("error setting tags")
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
 	}
 
+	// Always publish the event so the search index gets updated,
+	// even if the tag was already absent from file metadata.
 	if g.eventsPublisher != nil {
 		ev := events.TagsRemoved{
 			Tags: strings.Join(unassignment.Tags, ","),
