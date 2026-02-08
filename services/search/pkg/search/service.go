@@ -21,6 +21,7 @@ import (
 	sdk "github.com/owncloud/reva/v2/pkg/sdk/common"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/walker"
 	"github.com/owncloud/reva/v2/pkg/storagespace"
+	"github.com/owncloud/reva/v2/pkg/tags"
 	"github.com/owncloud/reva/v2/pkg/utils"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
@@ -58,6 +59,7 @@ type Searcher interface {
 	IndexSpace(rID *provider.StorageSpaceId) error
 	TrashItem(rID *provider.ResourceId)
 	UpsertItem(ref *provider.Reference)
+	UpdateTags(ref *provider.Reference)
 	RestoreItem(ref *provider.Reference)
 	MoveItem(ref *provider.Reference)
 }
@@ -513,6 +515,26 @@ func (s *Service) UpsertItem(ref *provider.Reference) {
 		}
 	}
 
+	resourceID := storagespace.FormatResourceID(stat.Info.Id)
+
+	// If the file is already indexed with the same content checksum, the blob
+	// has not been written to — only metadata (mtime, tags, etc.) was updated.
+	// Skip the expensive Tika content extraction and the SetArbitraryMetadata
+	// writeback (which itself bumps the mtime and would otherwise cause a
+	// second cycle).
+	currentChecksum := stat.Info.GetChecksum().GetSum()
+	if existing, err := s.engine.Retrieve(resourceID); err == nil &&
+		currentChecksum != "" && existing.Checksum == currentChecksum {
+		s.logger.Debug().Str("id", resourceID).Msg("checksum unchanged, skipping content extraction")
+		s.refreshMetadata(existing, stat, path)
+		if err = s.engine.Upsert(existing.ID, *existing); err != nil {
+			s.logger.Error().Err(err).Msg("error updating the resource in the index")
+		} else {
+			logDocCount(s.engine, s.logger)
+		}
+		return
+	}
+
 	doc, err := s.extractor.Extract(ctx, stat.Info)
 	if err != nil {
 		s.logger.Error().Err(err).Msg("failed to extract resource content")
@@ -520,7 +542,7 @@ func (s *Service) UpsertItem(ref *provider.Reference) {
 	}
 
 	r := engine.Resource{
-		ID: storagespace.FormatResourceID(stat.Info.Id),
+		ID: resourceID,
 		RootID: storagespace.FormatResourceID(&provider.ResourceId{
 			StorageId: stat.Info.Id.StorageId,
 			OpaqueId:  stat.Info.Id.SpaceId,
@@ -569,6 +591,65 @@ func (s *Service) UpsertItem(ref *provider.Reference) {
 	if err != nil || resp.GetStatus().GetCode() != rpc.Code_CODE_OK {
 		s.logger.Error().Err(err).Int32("status", int32(resp.GetStatus().GetCode())).Msg("error storing metadata")
 		return
+	}
+}
+
+// UpdateTags updates only the tags (and basic metadata) of an already-indexed
+// resource without triggering a full content re-extraction via Tika.  If the
+// resource is not yet in the index it falls back to a full UpsertItem.
+func (s *Service) UpdateTags(ref *provider.Reference) {
+	_, stat, path := s.resInfo(ref)
+	if stat == nil || path == "" {
+		return
+	}
+
+	resourceID := storagespace.FormatResourceID(stat.Info.Id)
+
+	// Try to load the existing indexed resource so we can preserve
+	// Tika-extracted fields (Content, Title, Audio, Image, Location, Photo).
+	existing, err := s.engine.Retrieve(resourceID)
+	if err != nil {
+		// Resource is not yet indexed — fall back to the full extraction path.
+		s.logger.Debug().Err(err).Str("id", resourceID).Msg("resource not in index, falling back to full upsert for tag update")
+		s.UpsertItem(ref)
+		return
+	}
+
+	s.refreshMetadata(existing, stat, path)
+
+	if err = s.engine.Upsert(existing.ID, *existing); err != nil {
+		s.logger.Error().Err(err).Msg("error updating tags in the index")
+	} else {
+		logDocCount(s.engine, s.logger)
+	}
+}
+
+// refreshMetadata updates the basic metadata fields on an already-indexed
+// resource from the current stat response, preserving any previously
+// extracted content (Title, Content, Audio, Image, Location, Photo).
+func (s *Service) refreshMetadata(r *engine.Resource, stat *provider.StatResponse, path string) {
+	r.Name = stat.Info.Name
+	r.Size = stat.Info.Size
+	r.MimeType = stat.Info.MimeType
+	if checksum := stat.Info.GetChecksum().GetSum(); checksum != "" {
+		r.Checksum = checksum
+	}
+	r.Path = utils.MakeRelativePath(path)
+	r.Hidden = strings.HasPrefix(r.Path, ".")
+
+	if stat.Info.Mtime != nil {
+		r.Mtime = utils.TSToTime(stat.Info.Mtime).UTC().Format(time.RFC3339Nano)
+	}
+	if parentID := stat.GetInfo().GetParentId(); parentID != nil {
+		r.ParentID = storagespace.FormatResourceID(parentID)
+	}
+
+	// Refresh tags from current ArbitraryMetadata.
+	r.Tags = nil
+	if m := stat.Info.ArbitraryMetadata.GetMetadata(); m != nil {
+		if t, ok := m["tags"]; ok {
+			r.Tags = tags.New(t).AsSlice()
+		}
 	}
 }
 

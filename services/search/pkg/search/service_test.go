@@ -2,6 +2,7 @@ package search_test
 
 import (
 	"context"
+	"errors"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
@@ -143,6 +144,7 @@ var _ = Describe("Searchprovider", func() {
 			Status: status.NewOK(ctx),
 		}, nil)
 		indexClient.On("DocCount").Return(uint64(1), nil)
+		indexClient.On("Retrieve", mock.Anything).Return(nil, errors.New("not found"))
 	})
 
 	Describe("New", func() {
