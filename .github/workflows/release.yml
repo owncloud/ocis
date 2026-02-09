@@ -1,0 +1,665 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+env:
+  # Production release tags (semver patterns)
+  PRODUCTION_RELEASE_TAGS: '5.0,7'
+
+  # Docker configuration
+  DOCKER_REPO_ROLLING: kwlschwarz/ocis
+  DOCKER_REPO_PRODUCTION: kwlschwarz/ocis
+
+  # Build configuration
+  GO_VERSION: '1.24'
+  NODE_VERSION: '24'
+  PHP_VERSION: '8.4'
+
+  # S3 configuration
+  #S3_BUCKET: ${{ secrets.UPLOAD_S3_BUCKET }}
+  #S3_ENDPOINT: ${{ secrets.UPLOAD_S3_ENDPOINT }}
+
+jobs:
+  # ============================================================================
+  # PREPARATION JOBS
+  # ============================================================================
+
+  determine-release-type:
+    name: Determine Release Type
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      is_production: ${{ steps.check.outputs.is_production }}
+      is_prerelease: ${{ steps.check.outputs.is_prerelease }}
+      release_folder: ${{ steps.check.outputs.release_folder }}
+      docker_repos: ${{ steps.check.outputs.docker_repos }}
+    steps:
+      - name: Extract version
+        id: version
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Version: $VERSION"
+
+      - name: Check release type
+        id: check
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+
+          # Check if production release
+          IS_PRODUCTION=false
+          for TAG in ${PRODUCTION_RELEASE_TAGS//,/ }; do
+            if [[ "$VERSION" == "$TAG"* ]]; then
+              IS_PRODUCTION=true
+              break
+            fi
+          done
+          echo "is_production=$IS_PRODUCTION" >> $GITHUB_OUTPUT
+
+          # Check if prerelease (contains -, like alpha/beta/rc)
+          IS_PRERELEASE=false
+          if [[ "$VERSION" == *"-"* ]]; then
+            IS_PRERELEASE=true
+          fi
+          echo "is_prerelease=$IS_PRERELEASE" >> $GITHUB_OUTPUT
+
+          # Determine release folder
+          if [[ "$IS_PRERELEASE" == "true" ]]; then
+            FOLDER="testing"
+          else
+            FOLDER="stable"
+          fi
+          echo "release_folder=$FOLDER" >> $GITHUB_OUTPUT
+
+          # Determine Docker repos
+          if [[ "$IS_PRODUCTION" == "true" ]]; then
+            REPOS="$DOCKER_REPO_ROLLING,$DOCKER_REPO_PRODUCTION"
+          else
+            REPOS="$DOCKER_REPO_ROLLING"
+          fi
+          echo "docker_repos=$REPOS" >> $GITHUB_OUTPUT
+
+          echo "Release Type Summary:"
+          echo "  Version: $VERSION"
+          echo "  Production: $IS_PRODUCTION"
+          echo "  Prerelease: $IS_PRERELEASE"
+          echo "  Folder: $FOLDER"
+          echo "  Docker Repos: $REPOS"
+
+  # ============================================================================
+  # CODE GENERATION
+  # ============================================================================
+
+  generate-code:
+    name: Generate Code
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 8
+
+      - name: Generate Node.js code
+        run: |
+          pnpm config set store-dir ./.pnpm-store
+          make ci-node-generate
+        env:
+          CHROMEDRIVER_SKIP_DOWNLOAD: 'true'
+
+      - name: Generate Go code
+        run: make ci-go-generate
+
+      - name: Upload generated code
+        uses: actions/upload-artifact@v4
+        with:
+          name: generated-code
+          path: |
+            .
+            !.git
+          retention-days: 1
+
+  # ============================================================================
+  # DOCKER BUILDS
+  # ============================================================================
+
+  docker-build:
+    name: Build Docker Image (${{ matrix.arch }})
+    runs-on: ubuntu-latest
+    needs: [determine-release-type, generate-code]
+    strategy:
+      matrix:
+        arch: [amd64, arm64]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download generated code
+        uses: actions/download-artifact@v4
+        with:
+          name: generated-code
+          path: .
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Build binary
+        run: make -C ocis release-linux-docker-${{ matrix.arch }} ENABLE_VIPS=true
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ needs.determine-release-type.outputs.docker_repos }}
+          tags: |
+            type=semver,pattern={{version}},suffix=-linux-${{ matrix.arch }}
+            type=semver,pattern={{major}}.{{minor}},suffix=-linux-${{ matrix.arch }}
+            type=semver,pattern={{major}},suffix=-linux-${{ matrix.arch }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ocis
+          file: ocis/docker/Dockerfile.linux.${{ matrix.arch }}
+          platforms: linux/${{ matrix.arch }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            REVISION=${{ github.sha }}
+            VERSION=${{ needs.determine-release-type.outputs.version }}
+
+  docker-manifest:
+    name: Create Docker Manifest
+    runs-on: ubuntu-latest
+    needs: [determine-release-type, docker-build]
+    strategy:
+      matrix:
+        repo: ${{ fromJson(format('["{0}"]', needs.determine-release-type.outputs.docker_repos)) }}
+    steps:
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Create and push manifest
+        run: |
+          VERSION="${{ needs.determine-release-type.outputs.version }}"
+          REPO="${{ matrix.repo }}"
+
+          # Create versioned manifest
+          docker manifest create ${REPO}:${VERSION} \
+            ${REPO}:${VERSION}-linux-amd64 \
+            ${REPO}:${VERSION}-linux-arm64
+          docker manifest push ${REPO}:${VERSION}
+
+          # Create major.minor manifest
+          if [[ "$VERSION" != *"-"* ]]; then
+            MAJOR_MINOR=$(echo $VERSION | cut -d. -f1-2)
+            docker manifest create ${REPO}:${MAJOR_MINOR} \
+              ${REPO}:${VERSION}-linux-amd64 \
+              ${REPO}:${VERSION}-linux-arm64
+            docker manifest push ${REPO}:${MAJOR_MINOR}
+
+            # Create major manifest
+            MAJOR=$(echo $VERSION | cut -d. -f1)
+            docker manifest create ${REPO}:${MAJOR} \
+              ${REPO}:${VERSION}-linux-amd64 \
+              ${REPO}:${VERSION}-linux-arm64
+            docker manifest push ${REPO}:${MAJOR}
+
+            # Create latest manifest for production releases
+            if [[ "${{ needs.determine-release-type.outputs.is_production }}" == "true" ]]; then
+              docker manifest create ${REPO}:latest \
+                ${REPO}:${VERSION}-linux-amd64 \
+                ${REPO}:${VERSION}-linux-arm64
+              docker manifest push ${REPO}:latest
+            fi
+          fi
+
+  docker-readme:
+    name: Update Docker README
+    runs-on: ubuntu-latest
+    needs: [determine-release-type, docker-manifest]
+    strategy:
+      matrix:
+        repo: ${{ fromJson(format('["{0}"]', needs.determine-release-type.outputs.docker_repos)) }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Update DockerHub README
+        uses: peter-evans/dockerhub-description@v4
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          repository: ${{ matrix.repo }}
+          short-description: Docker images for ownCloud Infinite Scale
+          readme-filepath: ./README.md
+
+  # ============================================================================
+  # BINARY BUILDS
+  # ============================================================================
+
+  build-binaries:
+    name: Build Binaries (${{ matrix.os }})
+    runs-on: ubuntu-latest
+    needs: [determine-release-type, generate-code]
+    strategy:
+      matrix:
+        os: [linux, darwin]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download generated code
+        uses: actions/download-artifact@v4
+        with:
+          name: generated-code
+          path: .
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Build binaries
+        run: make -C ocis release-${{ matrix.os }}
+
+      - name: Finish build
+        run: |
+          make -C ocis release-finish
+          if [ "${{ matrix.os }}" == "linux" ]; then
+            cp assets/End-User-License-Agreement-for-ownCloud-Infinite-Scale.pdf ocis/dist/release/
+          fi
+
+      - name: Upload binaries
+        uses: actions/upload-artifact@v4
+        with:
+          name: binaries-${{ matrix.os }}
+          path: ocis/dist/release/*
+          retention-days: 1
+
+            #upload-binaries-to-s3:
+            #  name: Upload Binaries to S3 (${{ matrix.os }})
+            #  runs-on: ubuntu-latest
+            #  needs: [determine-release-type, build-binaries]
+            #  strategy:
+            #    matrix:
+            #      os: [linux, darwin]
+            #  steps:
+            #    - name: Download binaries
+            #      uses: actions/download-artifact@v4
+            #      with:
+            #        name: binaries-${{ matrix.os }}
+            #        path: binaries
+
+            #    - name: Configure AWS credentials
+            #      uses: aws-actions/configure-aws-credentials@v4
+            #      with:
+            #        aws-access-key-id: ${{ secrets.UPLOAD_S3_ACCESS_KEY }}
+            #        aws-secret-access-key: ${{ secrets.UPLOAD_S3_SECRET_KEY }}
+            #        aws-region: us-east-1
+
+            #    - name: Upload to S3
+            #      run: |
+            #        VERSION="${{ needs.determine-release-type.outputs.version }}"
+            #        FOLDER="${{ needs.determine-release-type.outputs.release_folder }}"
+
+            #        # Upload to stable/testing folder
+            #        aws s3 cp binaries/ \
+            #          s3://${{ env.S3_BUCKET }}/ocis/ocis/${FOLDER}/${VERSION}/ \
+            #          --recursive \
+            #          --endpoint-url ${{ env.S3_ENDPOINT }}
+
+            #        # Also upload to rolling folder
+            #        aws s3 cp binaries/ \
+            #          s3://${{ env.S3_BUCKET }}/ocis/ocis/rolling/${VERSION}/ \
+            #          --recursive \
+            #          --endpoint-url ${{ env.S3_ENDPOINT }}
+
+  # ============================================================================
+  # LICENSE CHECK
+  # ============================================================================
+
+  license-check:
+    name: Check and Upload Licenses
+    runs-on: ubuntu-latest
+    needs: [determine-release-type, generate-code]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download generated code
+        uses: actions/download-artifact@v4
+        with:
+          name: generated-code
+          path: .
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Check Node.js licenses
+        run: make ci-node-check-licenses
+
+      - name: Save Node.js licenses
+        run: make ci-node-save-licenses
+
+      - name: Check Go licenses
+        run: make ci-go-check-licenses
+
+      - name: Save Go licenses
+        run: make ci-go-save-licenses
+
+      - name: Create tarball
+        run: |
+          cd third-party-licenses
+          tar -czf ../third-party-licenses.tar.gz *
+
+          #- name: Configure AWS credentials
+          #  uses: aws-actions/configure-aws-credentials@v4
+          #  with:
+          #    aws-access-key-id: ${{ secrets.UPLOAD_S3_ACCESS_KEY }}
+          #    aws-secret-access-key: ${{ secrets.UPLOAD_S3_SECRET_KEY }}
+          #    aws-region: us-east-1
+
+            #- name: Upload to S3
+            #  run: |
+            #    VERSION="${{ needs.determine-release-type.outputs.version }}"
+            #    FOLDER="${{ needs.determine-release-type.outputs.release_folder }}"
+
+            #    aws s3 cp third-party-licenses.tar.gz \
+            #      s3://${{ env.S3_BUCKET }}/ocis/ocis/${FOLDER}/${VERSION}/third-party-licenses.tar.gz \
+            #      --endpoint-url ${{ env.S3_ENDPOINT }}
+
+            #    aws s3 cp third-party-licenses.tar.gz \
+            #      s3://${{ env.S3_BUCKET }}/ocis/ocis/rolling/${VERSION}/third-party-licenses.tar.gz \
+            #      --endpoint-url ${{ env.S3_ENDPOINT }}
+
+      - name: Upload licenses artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: third-party-licenses
+          path: third-party-licenses.tar.gz
+          retention-days: 1
+
+  # ============================================================================
+  # CHANGELOG GENERATION
+  # ============================================================================
+
+  generate-changelog:
+    name: Generate Changelog
+    runs-on: ubuntu-latest
+    needs: [determine-release-type]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Generate changelog
+        run: |
+          VERSION="${{ needs.determine-release-type.outputs.version }}"
+          # Remove pre-release suffix for changelog
+          CHANGELOG_VERSION=$(echo $VERSION | cut -d'-' -f1)
+          make changelog CHANGELOG_VERSION=$CHANGELOG_VERSION
+
+      - name: Upload changelog
+        uses: actions/upload-artifact@v4
+        with:
+          name: changelog
+          path: ocis/dist/CHANGELOG.md
+          retention-days: 1
+
+  # ============================================================================
+  # GITHUB RELEASE
+  # ============================================================================
+
+  create-github-release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    needs:
+      - determine-release-type
+      - build-binaries
+      - license-check
+      - generate-changelog
+    steps:
+      - name: Download Linux binaries
+        uses: actions/download-artifact@v4
+        with:
+          name: binaries-linux
+          path: release-assets
+
+      - name: Download Darwin binaries
+        uses: actions/download-artifact@v4
+        with:
+          name: binaries-darwin
+          path: release-assets
+
+      - name: Download licenses
+        uses: actions/download-artifact@v4
+        with:
+          name: third-party-licenses
+          path: release-assets
+
+      - name: Download changelog
+        uses: actions/download-artifact@v4
+        with:
+          name: changelog
+          path: .
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: ${{ needs.determine-release-type.outputs.version }}
+          body_path: CHANGELOG.md
+          files: release-assets/*
+          prerelease: ${{ needs.determine-release-type.outputs.is_prerelease == 'true' }}
+          draft: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # ============================================================================
+  # DOCUMENTATION
+  # ============================================================================
+
+  publish-documentation:
+    name: Publish Documentation
+    runs-on: ubuntu-latest
+    needs: [determine-release-type]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Generate documentation
+        run: make docs-generate
+
+      - name: Copy documentation
+        run: make docs-copy
+
+      - name: Prepare Hugo
+        run: make docs-hugo-drone-prep
+
+      - name: Setup Hugo
+        uses: peaceiris/actions-hugo@v2
+        with:
+          hugo-version: '0.129.0'
+          extended: true
+
+      - name: Build documentation
+        run: |
+          cd hugo
+          hugo
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs/hugo/content
+          publish_branch: docs
+          force_orphan: true
+
+  # ============================================================================
+  # DEPLOYMENT
+  # ============================================================================
+
+  deploy-examples:
+    name: Deploy Example (${{ matrix.config }})
+    runs-on: ubuntu-latest
+    needs:
+      - determine-release-type
+      - docker-manifest
+      - create-github-release
+    strategy:
+      matrix:
+        config:
+          - ocis_ldap/rolling.yml
+          - ocis_keycloak/rolling.yml
+          - ocis_full/production.yml
+          - ocis_full/rolling.yml
+          - ocis_full/onlyoffice-rolling.yml
+          - ocis_full/s3-rolling.yml
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Clone deployment playbook
+        run: |
+          cd deployments/continuous-deployment-config
+          git clone --single-branch --branch main --depth 1 \
+            https://github.com/owncloud-devops/continuous-deployment.git
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install Ansible
+        run: |
+          pip install ansible
+          ansible-galaxy install -r deployments/continuous-deployment-config/continuous-deployment/requirements.yml
+          pip install -r deployments/continuous-deployment-config/continuous-deployment/py-requirements.txt
+
+          #- name: Setup SSH key
+          #  run: |
+          #    mkdir -p ~/.ssh
+          #    echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          #    chmod 600 ~/.ssh/id_rsa
+
+          #- name: Run deployment
+          #  run: |
+          #    cd deployments/continuous-deployment-config/continuous-deployment
+          #    ansible-playbook playbook-all.yml \
+          #      -i localhost \
+          #      -e "CONTINUOUS_DEPLOY_SERVERS_CONFIG=../${{ matrix.config }}" \
+          #      -e "REBUILD=false"
+          #  env:
+          #    HCLOUD_API_TOKEN: ${{ secrets.HCLOUD_API_TOKEN }}
+          #    CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          #  continue-on-error: true
+
+  # ============================================================================
+  # NOTIFICATION
+  # ============================================================================
+
+  notify:
+    - uses: lkiesow/matrix-notification@v1
+    with:
+      # The Matrix home server to send the message to
+      # Default: matrix.org
+      server: matrix.org
+
+      # Secret token used for authentication.
+      token: ${{ secrets.MATRIX_TOKEN }}
+
+      # Identifier of the room to send the message to
+      room: '!bdzlCtTAyDFgIdlknw:lkas.cc'
+
+      # The type of message to send
+      # Default: m.text
+      message_type: m.notice
+
+      # The message to send (optional)
+      message: Hello world
+
+      # An HTML formatted version of the message to send (optional)
+      formatted_message: Hello <b>World</b>!
+
+      # If to install the matrix-msg binary
+      # Default: false
+      tool: false
+
+        #notify:
+        #  name: Send Notifications
+        #  runs-on: ubuntu-latest
+        #  needs:
+        #    - docker-readme
+        #    - create-github-release
+        #    - publish-documentation
+        #    - deploy-examples
+        #  if: always()
+        #  steps:
+        #    - name: Checkout code
+        #      uses: actions/checkout@v4
+
+        #    - name: Download notification script
+        #      run: |
+        #        wget https://raw.githubusercontent.com/${{ github.repository }}/${{ github.sha }}/tests/config/drone/notification.sh
+
+        #    - name: Send Matrix notification
+        #      run: bash notification.sh
+        #      env:
+        #        MATRIX_TOKEN: ${{ secrets.MATRIX_TOKEN }}
+        #        DRONE_BUILD_STATUS: ${{ job.status }}
+        #        DRONE_BUILD_EVENT: tag
+        #        DRONE_REPO: ${{ github.repository }}
+        #        DRONE_BUILD_NUMBER: ${{ github.run_number }}
+        #        DRONE_BUILD_LINK: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
