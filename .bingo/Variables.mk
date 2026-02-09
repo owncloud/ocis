@@ -53,11 +53,11 @@ $(GOLANGCI_LINT): $(BINGO_DIR)/golangci-lint.mod
 	@echo "(re)installing $(GOBIN)/golangci-lint-v1.64.6"
 	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=golangci-lint.mod -o=$(GOBIN)/golangci-lint-v1.64.6 "github.com/golangci/golangci-lint/cmd/golangci-lint"
 
-GOVULNCHECK := $(GOBIN)/govulncheck-v1.0.1
+GOVULNCHECK := $(GOBIN)/govulncheck-v1.1.4
 $(GOVULNCHECK): $(BINGO_DIR)/govulncheck.mod
 	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
-	@echo "(re)installing $(GOBIN)/govulncheck-v1.0.1"
-	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=govulncheck.mod -o=$(GOBIN)/govulncheck-v1.0.1 "golang.org/x/vuln/cmd/govulncheck"
+	@echo "(re)installing $(GOBIN)/govulncheck-v1.1.4"
+	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=govulncheck.mod -o=$(GOBIN)/govulncheck-v1.1.4 "golang.org/x/vuln/cmd/govulncheck"
 
 MOCKERY := $(GOBIN)/mockery-v2.53.5
 $(MOCKERY): $(BINGO_DIR)/mockery.mod
