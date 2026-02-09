@@ -4077,8 +4077,13 @@ def deployOcisK8s(name = OCIS_SERVER_NAME):
     step_name = "deploy-" + name
 
     return [{
+<<<<<<< HEAD
         "name": step_name,
         "image": OC_CI_GOLANG,
+=======
+        "name": "deploy-ocis",
+        "image": "owncloudci/golang:1.25",
+>>>>>>> de492f72ded (feat: bump go to 1.25)
         "commands": [
             "export KUBECONFIG=%s/kubeconfig-$${DRONE_BUILD_NUMBER}-%s.yaml" % (dirs["base"], name),
             "cd %s/ocis-charts" % dirs["base"],
