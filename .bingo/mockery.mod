@@ -4,4 +4,4 @@ go 1.24
 
 toolchain go1.24.0
 
-require github.com/vektra/mockery/v2 v2.52.3
+require github.com/vektra/mockery/v2 v2.53.5
