@@ -203,6 +203,122 @@ var _ = Describe("Searchprovider", func() {
 		})
 	})
 
+	Describe("UpsertItem", func() {
+		var ref *sprovider.ResourceId
+
+		BeforeEach(func() {
+			ref = ri.Id
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(&sprovider.StatResponse{
+				Status: status.NewOK(context.Background()),
+				Info: &sprovider.ResourceInfo{
+					Id:       ri.Id,
+					ParentId: ri.ParentId,
+					Path:     ri.Path,
+					Name:     "foo.pdf",
+					Size:     ri.Size,
+					Mtime:    ri.Mtime,
+					Type:     sprovider.ResourceType_RESOURCE_TYPE_FILE,
+					Checksum: &sprovider.ResourceChecksum{
+						Type: sprovider.ResourceChecksumType_RESOURCE_CHECKSUM_TYPE_SHA1,
+						Sum:  "sha1:abc123",
+					},
+				},
+			}, nil)
+		})
+
+		It("skips content extraction when checksum is unchanged", func() {
+			// Override the default Retrieve mock to return an existing resource
+			indexClient.ExpectedCalls = removeCall(indexClient.ExpectedCalls, "Retrieve")
+			indexClient.On("Retrieve", "storageid$spaceid!opaqueid").Return(&engine.Resource{
+				ID:       "storageid$spaceid!opaqueid",
+				RootID:   "storageid$spaceid!spaceid",
+				Path:     "./foo.pdf",
+				Document: content.Document{Name: "foo.pdf", Checksum: "sha1:abc123"},
+			}, nil)
+			indexClient.On("Upsert", mock.Anything, mock.Anything).Return(nil)
+
+			s.UpsertItem(&sprovider.Reference{ResourceId: ref})
+
+			extractor.AssertNotCalled(GinkgoT(), "Extract", mock.Anything, mock.Anything, mock.Anything)
+			indexClient.AssertCalled(GinkgoT(), "Upsert", "storageid$spaceid!opaqueid", mock.Anything)
+		})
+
+		It("performs full extraction when checksum differs", func() {
+			// Override the default Retrieve mock to return an existing resource with OLD checksum
+			indexClient.ExpectedCalls = removeCall(indexClient.ExpectedCalls, "Retrieve")
+			indexClient.On("Retrieve", "storageid$spaceid!opaqueid").Return(&engine.Resource{
+				ID:       "storageid$spaceid!opaqueid",
+				RootID:   "storageid$spaceid!spaceid",
+				Path:     "./foo.pdf",
+				Document: content.Document{Name: "foo.pdf", Checksum: "sha1:oldhash"},
+			}, nil)
+			extractor.On("Extract", mock.Anything, mock.Anything, mock.Anything).Return(content.Document{Name: "foo.pdf"}, nil)
+			indexClient.On("Upsert", mock.Anything, mock.Anything).Return(nil)
+
+			s.UpsertItem(&sprovider.Reference{ResourceId: ref})
+
+			extractor.AssertCalled(GinkgoT(), "Extract", mock.Anything, mock.Anything, mock.Anything)
+		})
+
+		It("performs full extraction when resource is not yet indexed", func() {
+			// Default Retrieve mock returns "not found" — so full extraction should run
+			extractor.On("Extract", mock.Anything, mock.Anything, mock.Anything).Return(content.Document{Name: "foo.pdf"}, nil)
+			indexClient.On("Upsert", mock.Anything, mock.Anything).Return(nil)
+
+			s.UpsertItem(&sprovider.Reference{ResourceId: ref})
+
+			extractor.AssertCalled(GinkgoT(), "Extract", mock.Anything, mock.Anything, mock.Anything)
+		})
+	})
+
+	Describe("UpdateTags", func() {
+		BeforeEach(func() {
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(&sprovider.StatResponse{
+				Status: status.NewOK(context.Background()),
+				Info: &sprovider.ResourceInfo{
+					Id:       ri.Id,
+					ParentId: ri.ParentId,
+					Path:     ri.Path,
+					Name:     "foo.pdf",
+					Size:     ri.Size,
+					Mtime:    ri.Mtime,
+					Type:     sprovider.ResourceType_RESOURCE_TYPE_FILE,
+					ArbitraryMetadata: &sprovider.ArbitraryMetadata{
+						Metadata: map[string]string{"tags": "important,work"},
+					},
+				},
+			}, nil)
+		})
+
+		It("updates tags without content extraction when resource is indexed", func() {
+			indexClient.ExpectedCalls = removeCall(indexClient.ExpectedCalls, "Retrieve")
+			indexClient.On("Retrieve", "storageid$spaceid!opaqueid").Return(&engine.Resource{
+				ID:       "storageid$spaceid!opaqueid",
+				RootID:   "storageid$spaceid!spaceid",
+				Path:     "./foo.pdf",
+				Document: content.Document{Name: "foo.pdf", Content: "existing tika content"},
+			}, nil)
+			indexClient.On("Upsert", mock.Anything, mock.MatchedBy(func(r engine.Resource) bool {
+				return len(r.Tags) == 2 && r.Content == "existing tika content"
+			})).Return(nil)
+
+			s.UpdateTags(&sprovider.Reference{ResourceId: ri.Id})
+
+			extractor.AssertNotCalled(GinkgoT(), "Extract", mock.Anything, mock.Anything, mock.Anything)
+			indexClient.AssertCalled(GinkgoT(), "Upsert", "storageid$spaceid!opaqueid", mock.Anything)
+		})
+
+		It("falls back to full UpsertItem when resource is not yet indexed", func() {
+			// Default Retrieve mock returns "not found"
+			extractor.On("Extract", mock.Anything, mock.Anything, mock.Anything).Return(content.Document{Name: "foo.pdf"}, nil)
+			indexClient.On("Upsert", mock.Anything, mock.Anything).Return(nil)
+
+			s.UpdateTags(&sprovider.Reference{ResourceId: ri.Id})
+
+			extractor.AssertCalled(GinkgoT(), "Extract", mock.Anything, mock.Anything, mock.Anything)
+		})
+	})
+
 	Describe("Search", func() {
 		It("fails when an empty query is given", func() {
 			res, err := s.Search(ctx, &searchsvc.SearchRequest{
@@ -554,6 +670,18 @@ var _ = Describe("Searchprovider", func() {
 		})
 	})
 })
+
+// removeCall removes all expected calls with the given method name, allowing
+// tests to override the default mock set up in BeforeEach.
+func removeCall(calls []*mock.Call, method string) []*mock.Call {
+	var filtered []*mock.Call
+	for _, c := range calls {
+		if c.Method != method {
+			filtered = append(filtered, c)
+		}
+	}
+	return filtered
+}
 
 var _ = DescribeTable("Parse Scope",
 	func(pattern, wantSearch, wantScope string) {
