@@ -86,13 +86,18 @@ Feature: enforce password on public link
 
   Scenario Outline: create a public link with a password in accordance with the password policy
     Given the following configs have been set:
-      | service | config                                            | value |
-      | sharing | SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD | true  |
-      | sharing | SHARING_PASSWORD_POLICY_MIN_CHARACTERS            | 13    |
-      | sharing | SHARING_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS  | 3     |
-      | sharing | SHARING_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS  | 2     |
-      | sharing | SHARING_PASSWORD_POLICY_MIN_DIGITS                | 2     |
-      | sharing | SHARING_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS    | 2     |
+      | service  | config                                            | value |
+      | sharing  | SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD | true  |
+      | sharing  | SHARING_PASSWORD_POLICY_MIN_CHARACTERS            | 13    |
+      | sharing  | SHARING_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS  | 3     |
+      | sharing  | SHARING_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS  | 2     |
+      | sharing  | SHARING_PASSWORD_POLICY_MIN_DIGITS                | 2     |
+      | sharing  | SHARING_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS    | 2     |
+      | frontend | FRONTEND_PASSWORD_POLICY_MIN_CHARACTERS           | 13    |
+      | frontend | FRONTEND_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS | 3     |
+      | frontend | FRONTEND_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS | 2     |
+      | frontend | FRONTEND_PASSWORD_POLICY_MIN_DIGITS               | 2     |
+      | frontend | FRONTEND_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS   | 2     |
     And user "Alice" has been created with default attributes
     And user "Alice" has uploaded file with content "test file" to "/testfile.txt"
     And using OCS API version "<ocs-api-version>"
@@ -150,14 +155,19 @@ Feature: enforce password on public link
 
   Scenario Outline: update a public link with a password in accordance with the password policy
     Given the following configs have been set:
-      | service | config                                            | value |
-      | sharing | SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD           | false |
-      | sharing | SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD | true  |
-      | sharing | SHARING_PASSWORD_POLICY_MIN_CHARACTERS            | 13    |
-      | sharing | SHARING_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS  | 3     |
-      | sharing | SHARING_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS  | 2     |
-      | sharing | SHARING_PASSWORD_POLICY_MIN_DIGITS                | 1     |
-      | sharing | SHARING_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS    | 2     |
+      | service  | config                                            | value |
+      | sharing  | SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD           | false |
+      | sharing  | SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD | true  |
+      | sharing  | SHARING_PASSWORD_POLICY_MIN_CHARACTERS            | 13    |
+      | sharing  | SHARING_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS  | 3     |
+      | sharing  | SHARING_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS  | 2     |
+      | sharing  | SHARING_PASSWORD_POLICY_MIN_DIGITS                | 1     |
+      | sharing  | SHARING_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS    | 2     |
+      | frontend | FRONTEND_PASSWORD_POLICY_MIN_CHARACTERS           | 13    |
+      | frontend | FRONTEND_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS | 3     |
+      | frontend | FRONTEND_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS | 2     |
+      | frontend | FRONTEND_PASSWORD_POLICY_MIN_DIGITS               | 1     |
+      | frontend | FRONTEND_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS   | 2     |
     And user "Alice" has been created with default attributes
     And user "Alice" has uploaded file with content "test file" to "/testfile.txt"
     And using OCS API version "<ocs-api-version>"

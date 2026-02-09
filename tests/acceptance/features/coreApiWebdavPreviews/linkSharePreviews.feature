@@ -23,7 +23,7 @@ Feature: accessing a public link share
 
   @env-config
   Scenario: access to the preview of public shared file without password
-    Given the config "OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false" for "sharing" service
+    Given the config "SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false" for "sharing" service
     And user "Alice" has uploaded file "filesForUpload/testavatar.jpg" to "testavatar.jpg"
     And using SharingNG
     And user "Alice" has created the following resource link share:
@@ -52,7 +52,7 @@ Feature: accessing a public link share
 
   @env-config
   Scenario: access to the preview of public shared file inside a folder without password
-    Given the config "OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false" for "sharing" service
+    Given the config "SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false" for "sharing" service
     And user "Alice" has created folder "FOLDER"
     And user "Alice" has uploaded file "filesForUpload/testavatar.jpg" to "FOLDER/testavatar.jpg"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "FOLDER/textfile0.txt"
