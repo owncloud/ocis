@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	"github.com/owncloud/ocis/v2/ocis-pkg/generators"
@@ -54,7 +55,7 @@ func RestartPostprocessing(cfg *config.Config) *cli.Command {
 
 			var ev events.Unmarshaller
 			switch {
-			case c.Bool("retrigger"):
+			case c.Bool("restart"):
 				ev = events.RestartPostprocessing{
 					UploadID:  uid,
 					Timestamp: utils.TSNow(),
@@ -67,7 +68,12 @@ func RestartPostprocessing(cfg *config.Config) *cli.Command {
 				}
 			}
 
-			return events.Publish(context.Background(), stream, ev)
+			if err := events.Publish(context.Background(), stream, ev); err != nil {
+				return err
+			}
+
+			fmt.Println("Postprocessing event published successfully")
+			return nil
 		},
 	}
 }
