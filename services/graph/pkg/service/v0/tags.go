@@ -238,7 +238,16 @@ func (g Graph) UnassignTags(w http.ResponseWriter, r *http.Request) {
 
 	// Always publish the event so the search index gets updated,
 	// even if the tag was already absent from file metadata.
-	if g.publishTagsRemoved(ctx, client, unassignment.Tags, &rid, sres, tagsChanged, currentTags) != nil {
+	ev := events.TagsRemoved{
+		Tags: strings.Join(unassignment.Tags, ","),
+		Ref: &provider.Reference{
+			ResourceId: &rid,
+			Path:       ".",
+		},
+		SpaceOwner: sres.Info.Owner,
+		Executant:  revaCtx.ContextMustGetUser(ctx).Id,
+	}
+	if g.publishTagsRemoved(ctx, client, ev, tagsChanged, currentTags) != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -246,19 +255,9 @@ func (g Graph) UnassignTags(w http.ResponseWriter, r *http.Request) {
 
 // publishTagsRemoved publishes a TagsRemoved event and rolls back the metadata
 // change if publishing fails. Returns nil on success or if no publisher is configured.
-func (g Graph) publishTagsRemoved(ctx context.Context, client gateway.GatewayAPIClient, removedTags []string, rid *provider.ResourceId, sres *provider.StatResponse, tagsChanged bool, previousTags string) error {
+func (g Graph) publishTagsRemoved(ctx context.Context, client gateway.GatewayAPIClient, ev events.TagsRemoved, tagsChanged bool, previousTags string) error {
 	if g.eventsPublisher == nil {
 		return nil
-	}
-
-	ev := events.TagsRemoved{
-		Tags: strings.Join(removedTags, ","),
-		Ref: &provider.Reference{
-			ResourceId: rid,
-			Path:       ".",
-		},
-		SpaceOwner: sres.Info.Owner,
-		Executant:  revaCtx.ContextMustGetUser(ctx).Id,
 	}
 
 	if err := events.Publish(ctx, g.eventsPublisher, ev); err != nil {
@@ -272,7 +271,7 @@ func (g Graph) publishTagsRemoved(ctx context.Context, client gateway.GatewayAPI
 		// restore. A proper fix would require locking the resource.
 		if tagsChanged {
 			if _, rollbackErr := client.SetArbitraryMetadata(ctx, &provider.SetArbitraryMetadataRequest{
-				Ref: &provider.Reference{ResourceId: rid},
+				Ref:               ev.Ref,
 				ArbitraryMetadata: &provider.ArbitraryMetadata{
 					Metadata: map[string]string{
 						"tags": previousTags,
