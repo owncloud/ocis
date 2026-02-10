@@ -1,7 +1,15 @@
 variables:
 - rawname: CS3_GATEWAY
-  path: services/idp/pkg/backends/cs3/bootstrap/cs3.go:77
+  path: tests/qa-activity-report/generate-qa-activity-report.go./services/idp/pkg/backends/cs3/bootstrap/cs3.go:77
   foundincode: true
+  name: CS3_GATEWAY
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: CS3_GATEWAY
+  path: services/idp/pkg/backends/cs3/bootstrap/cs3.go:77
+  foundincode: false
   name: CS3_GATEWAY
   type: ""
   default_value: ""
@@ -17,7 +25,7 @@ variables:
   do_ignore: true
 - rawname: DAYS
   path: tests/qa-activity-report/generate-qa-activity-report.go:94
-  foundincode: true
+  foundincode: false
   name: DAYS
   type: ""
   default_value: ""
