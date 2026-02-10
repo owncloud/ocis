@@ -30,7 +30,7 @@ RUN make ci-go-generate build ENABLE_VIPS=true
 
 FROM alpine:3.23.3
 
-RUN apk add --no-cache attr ca-certificates curl mailcap tree vips && \
+RUN apk add --no-cache attr ca-certificates curl mailcap tree vips=8.17 && \
 	echo 'hosts: files dns' >| /etc/nsswitch.conf
 
 LABEL maintainer="ownCloud GmbH <devops@owncloud.com>" \
