@@ -238,7 +238,7 @@ func (g Graph) UnassignTags(w http.ResponseWriter, r *http.Request) {
 
 	// Always publish the event so the search index gets updated,
 	// even if the tag was already absent from file metadata.
-	if err := g.publishTagsRemoved(ctx, client, unassignment.Tags, &rid, sres, tagsChanged, currentTags); err != nil {
+	if g.publishTagsRemoved(ctx, client, unassignment.Tags, &rid, sres, tagsChanged, currentTags) != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -267,7 +267,7 @@ func (g Graph) publishTagsRemoved(ctx context.Context, client gateway.GatewayAPI
 		// Try to rollback the metadata change so we don't leave the
 		// system in an inconsistent state (metadata updated but search
 		// index not notified).
-		// FIXME: this rollback is not atomic — another request could
+		// NOTE: this rollback is not atomic — another request could
 		// modify the tags between our SetArbitraryMetadata and this
 		// restore. A proper fix would require locking the resource.
 		if tagsChanged {
