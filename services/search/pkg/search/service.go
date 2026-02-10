@@ -517,21 +517,8 @@ func (s *Service) UpsertItem(ref *provider.Reference) {
 
 	resourceID := storagespace.FormatResourceID(stat.Info.Id)
 
-	// If the file is already indexed with the same content checksum, the blob
-	// has not been written to — only metadata (mtime, tags, etc.) was updated.
-	// Skip the expensive Tika content extraction and the SetArbitraryMetadata
-	// writeback (which itself bumps the mtime and would otherwise cause a
-	// second cycle).
-	currentChecksum := stat.Info.GetChecksum().GetSum()
-	if existing, err := s.engine.Retrieve(resourceID); err == nil &&
-		currentChecksum != "" && existing.Checksum == currentChecksum {
-		s.logger.Debug().Str("id", resourceID).Msg("checksum unchanged, skipping content extraction")
-		s.refreshMetadata(existing, stat, path)
-		if err = s.engine.Upsert(existing.ID, *existing); err != nil {
-			s.logger.Error().Err(err).Msg("error updating the resource in the index")
-		} else {
-			logDocCount(s.engine, s.logger)
-		}
+	// If the content checksum is unchanged, skip expensive Tika extraction.
+	if s.skipUnchangedContent(resourceID, stat, path) {
 		return
 	}
 
@@ -592,6 +579,32 @@ func (s *Service) UpsertItem(ref *provider.Reference) {
 		s.logger.Error().Err(err).Int32("status", int32(resp.GetStatus().GetCode())).Msg("error storing metadata")
 		return
 	}
+}
+
+// skipUnchangedContent checks whether the file is already indexed with the same
+// content checksum. If so, it refreshes basic metadata (tags, mtime, etc.)
+// without running Tika extraction and returns true. This avoids an expensive
+// extraction cycle when only metadata has changed, and prevents the
+// SetArbitraryMetadata writeback from bumping the mtime into a second cycle.
+func (s *Service) skipUnchangedContent(resourceID string, stat *provider.StatResponse, path string) bool {
+	currentChecksum := stat.Info.GetChecksum().GetSum()
+	if currentChecksum == "" {
+		return false
+	}
+
+	existing, err := s.engine.Retrieve(resourceID)
+	if err != nil || existing.Checksum != currentChecksum {
+		return false
+	}
+
+	s.logger.Debug().Str("id", resourceID).Msg("checksum unchanged, skipping content extraction")
+	s.refreshMetadata(existing, stat, path)
+	if err = s.engine.Upsert(existing.ID, *existing); err != nil {
+		s.logger.Error().Err(err).Msg("error updating the resource in the index")
+	} else {
+		logDocCount(s.engine, s.logger)
+	}
+	return true
 }
 
 // UpdateTags updates only the tags (and basic metadata) of an already-indexed
