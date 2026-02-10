@@ -551,7 +551,13 @@ func (s *Service) UpsertItem(ref *provider.Reference) {
 		logDocCount(s.engine, s.logger)
 	}
 
-	// determine if metadata needs to be stored in storage as well
+	s.storeExtractedMetadata(ctx, ref, doc)
+}
+
+// storeExtractedMetadata persists Tika-extracted audio, image, location, and
+// photo metadata back to the storage provider so it is available outside the
+// search index.
+func (s *Service) storeExtractedMetadata(ctx context.Context, ref *provider.Reference, doc content.Document) {
 	metadata := map[string]string{}
 	addAudioMetadata(metadata, doc.Audio)
 	addImageMetadata(metadata, doc.Image)
@@ -577,7 +583,6 @@ func (s *Service) UpsertItem(ref *provider.Reference) {
 	})
 	if err != nil || resp.GetStatus().GetCode() != rpc.Code_CODE_OK {
 		s.logger.Error().Err(err).Int32("status", int32(resp.GetStatus().GetCode())).Msg("error storing metadata")
-		return
 	}
 }
 
