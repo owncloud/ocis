@@ -271,7 +271,7 @@ func (g Graph) publishTagsRemoved(ctx context.Context, client gateway.GatewayAPI
 		// restore. A proper fix would require locking the resource.
 		if tagsChanged {
 			if _, rollbackErr := client.SetArbitraryMetadata(ctx, &provider.SetArbitraryMetadataRequest{
-				Ref:               ev.Ref,
+				Ref: ev.Ref,
 				ArbitraryMetadata: &provider.ArbitraryMetadata{
 					Metadata: map[string]string{
 						"tags": previousTags,
