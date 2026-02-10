@@ -216,7 +216,8 @@ func (g Graph) UnassignTags(w http.ResponseWriter, r *http.Request) {
 	}
 
 	allTags := tags.New(currentTags)
-	if allTags.Remove(unassignment.Tags...) {
+	tagsChanged := allTags.Remove(unassignment.Tags...)
+	if tagsChanged {
 		// Tags were present in metadata — update the file.
 		resp, err := client.SetArbitraryMetadata(ctx, &provider.SetArbitraryMetadataRequest{
 			Ref: &provider.Reference{ResourceId: &rid},
@@ -246,7 +247,29 @@ func (g Graph) UnassignTags(w http.ResponseWriter, r *http.Request) {
 			Executant:  revaCtx.ContextMustGetUser(r.Context()).Id,
 		}
 		if err := events.Publish(ctx, g.eventsPublisher, ev); err != nil {
-			g.logger.Error().Err(err).Msg("Failed to publish TagsAdded event")
+			g.logger.Error().Err(err).Msg("Failed to publish TagsRemoved event")
+
+			// Try to rollback the metadata change so we don't leave the
+			// system in an inconsistent state (metadata updated but search
+			// index not notified).
+			// FIXME: this rollback is not atomic — another request could
+			// modify the tags between our SetArbitraryMetadata and this
+			// restore. A proper fix would require locking the resource.
+			if tagsChanged {
+				if _, rollbackErr := client.SetArbitraryMetadata(ctx, &provider.SetArbitraryMetadataRequest{
+					Ref: &provider.Reference{ResourceId: &rid},
+					ArbitraryMetadata: &provider.ArbitraryMetadata{
+						Metadata: map[string]string{
+							"tags": currentTags,
+						},
+					},
+				}); rollbackErr != nil {
+					g.logger.Error().Err(rollbackErr).Msg("failed to rollback tags after publish failure")
+				}
+			}
+
+			w.WriteHeader(http.StatusInternalServerError)
+			return
 		}
 	}
 }
