@@ -1313,8 +1313,8 @@ github.com/orcaman/concurrent-map
 # github.com/owncloud/libre-graph-api-go v1.0.5-0.20260116104114-10074a92be64
 ## explicit; go 1.18
 github.com/owncloud/libre-graph-api-go
-# github.com/owncloud/reva/v2 v2.0.0-20260209172723-6b94461c2a1a
-## explicit; go 1.25
+# github.com/owncloud/reva/v2 v2.0.0-20260205150948-e8cf2a492c9d
+## explicit; go 1.24.0
 github.com/owncloud/reva/v2/cmd/revad/internal/grace
 github.com/owncloud/reva/v2/cmd/revad/runtime
 github.com/owncloud/reva/v2/internal/grpc/interceptors/appctx

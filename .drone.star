@@ -19,7 +19,7 @@ OC_CI_BAZEL_BUILDIFIER = "owncloudci/bazel-buildifier:latest"
 OC_CI_CLAMAVD = "owncloudci/clamavd"
 OC_CI_DRONE_ANSIBLE = "owncloudci/drone-ansible:latest"
 OC_CI_DRONE_SKIP_PIPELINE = "owncloudci/drone-skip-pipeline"
-OC_CI_GOLANG = "owncloudci/golang:1.25"
+OC_CI_GOLANG = "owncloudci/golang:1.24"
 OC_CI_NODEJS = "owncloudci/nodejs:%s"
 OC_CI_PHP = "owncloudci/php:%s"
 OC_CI_WAIT_FOR = "owncloudci/wait-for:latest"
@@ -3854,7 +3854,7 @@ def prepareOcisDeployment():
 
     return [{
         "name": "prepare-ocis-deployment",
-        "image": "owncloudci/golang:1.25",
+        "image": "owncloudci/golang:1.24",
         "commands": commands,
         "volumes": [
             {
@@ -3886,7 +3886,7 @@ def setupOcisConfigMaps():
 def deployOcis():
     return [{
         "name": "deploy-ocis",
-        "image": "owncloudci/golang:1.25",
+        "image": "owncloudci/golang:1.24",
         "commands": [
             "export KUBECONFIG=%s/kubeconfig-$${DRONE_BUILD_NUMBER}.yaml" % dirs["base"],
             "cd %s/ocis-charts" % dirs["base"],

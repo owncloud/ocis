@@ -1,6 +1,6 @@
 module ociswrapper
 
-go 1.25
+go 1.24.13
 
 require (
 	github.com/creack/pty v1.1.24
