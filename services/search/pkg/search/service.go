@@ -517,11 +517,6 @@ func (s *Service) UpsertItem(ref *provider.Reference) {
 
 	resourceID := storagespace.FormatResourceID(stat.Info.Id)
 
-	// If the content checksum is unchanged, skip expensive Tika extraction.
-	if s.skipUnchangedContent(resourceID, stat, path) {
-		return
-	}
-
 	doc, err := s.extractor.Extract(ctx, stat.Info)
 	if err != nil {
 		s.logger.Error().Err(err).Msg("failed to extract resource content")
@@ -586,32 +581,6 @@ func (s *Service) storeExtractedMetadata(ctx context.Context, ref *provider.Refe
 	}
 }
 
-// skipUnchangedContent checks whether the file is already indexed with the same
-// content checksum. If so, it refreshes basic metadata (tags, mtime, etc.)
-// without running Tika extraction and returns true. This avoids an expensive
-// extraction cycle when only metadata has changed, and prevents the
-// SetArbitraryMetadata writeback from bumping the mtime into a second cycle.
-func (s *Service) skipUnchangedContent(resourceID string, stat *provider.StatResponse, path string) bool {
-	currentChecksum := stat.Info.GetChecksum().GetSum()
-	if currentChecksum == "" {
-		return false
-	}
-
-	existing, err := s.engine.Retrieve(resourceID)
-	if err != nil || existing.Checksum != currentChecksum {
-		return false
-	}
-
-	s.logger.Debug().Str("id", resourceID).Msg("checksum unchanged, skipping content extraction")
-	s.refreshMetadata(existing, stat, path)
-	if err = s.engine.Upsert(existing.ID, *existing); err != nil {
-		s.logger.Error().Err(err).Msg("error updating the resource in the index")
-	} else {
-		logDocCount(s.engine, s.logger)
-	}
-	return true
-}
-
 // UpdateTags updates only the tags (and basic metadata) of an already-indexed
 // resource without triggering a full content re-extraction via Tika.  If the
 // resource is not yet in the index it falls back to a full UpsertItem.
@@ -623,22 +592,15 @@ func (s *Service) UpdateTags(ref *provider.Reference) {
 
 	resourceID := storagespace.FormatResourceID(stat.Info.Id)
 
-	// Try to load the existing indexed resource so we can preserve
+	// Update the existing indexed resource in-place, preserving
 	// Tika-extracted fields (Content, Title, Audio, Image, Location, Photo).
-	existing, err := s.engine.Retrieve(resourceID)
+	err := s.engine.Update(resourceID, func(r *engine.Resource) {
+		s.refreshMetadata(r, stat, path)
+	})
 	if err != nil {
 		// Resource is not yet indexed — fall back to the full extraction path.
 		s.logger.Debug().Err(err).Str("id", resourceID).Msg("resource not in index, falling back to full upsert for tag update")
 		s.UpsertItem(ref)
-		return
-	}
-
-	s.refreshMetadata(existing, stat, path)
-
-	if err = s.engine.Upsert(existing.ID, *existing); err != nil {
-		s.logger.Error().Err(err).Msg("error updating tags in the index")
-	} else {
-		logDocCount(s.engine, s.logger)
 	}
 }
 
@@ -649,9 +611,6 @@ func (s *Service) refreshMetadata(r *engine.Resource, stat *provider.StatRespons
 	r.Name = stat.Info.Name
 	r.Size = stat.Info.Size
 	r.MimeType = stat.Info.MimeType
-	if checksum := stat.Info.GetChecksum().GetSum(); checksum != "" {
-		r.Checksum = checksum
-	}
 	r.Path = utils.MakeRelativePath(path)
 	r.Hidden = strings.HasPrefix(r.Path, ".")
 
