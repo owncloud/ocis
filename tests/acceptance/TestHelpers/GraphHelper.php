@@ -143,7 +143,11 @@ class GraphHelper {
 	 * @return string
 	 */
 	public static function getFederatedUserRegex(): string {
-		return self::getUUIDv4Regex() . '@[a-zA-Z-\\\.]+(:\\\d+)?';
+		return str_replace(
+			'\\',
+			'\\\\',
+			self::getUUIDv4Regex() . '@[a-zA-Z0-9\-\.]+(:\d+)?',
+		);
 	}
 
 	/**
