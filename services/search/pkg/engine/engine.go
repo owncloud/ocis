@@ -18,7 +18,7 @@ var queryEscape = regexp.MustCompile(`([` + regexp.QuoteMeta(`+=&|><!(){}[]^\"~*
 type Engine interface {
 	Search(ctx context.Context, req *searchService.SearchIndexRequest) (*searchService.SearchIndexResponse, error)
 	Upsert(id string, r Resource) error
-	Retrieve(id string) (*Resource, error)
+	Update(id string, mutateFn func(*Resource)) error
 	Move(id string, parentid string, target string) error
 	Delete(id string) error
 	Restore(id string) error
