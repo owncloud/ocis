@@ -103,6 +103,43 @@ features:
   quotas:
     default: "1000000000"
     max: "0"
+  appsIntegration:
+    enabled: false
+    wopiIntegration:
+      officeSuites:
+        - name: "Collabora"
+          uri: "https://collabora:9980"
+          wopiSrc: "http://ocis-server:9300"
+          product: "Collabora"
+          enabled: true
+          insecure: true
+          disableProof: true
+          secureViewEnabled: false
+          disableChat: true
+          ingress:
+            enabled: false
+        - name: "FakeOffice"
+          uri: "http://fakeoffice:8080"
+          wopiSrc: "http://ocis-server:9301"
+          product: "FakeOffice"
+          enabled: true
+          insecure: true
+          disableProof: true
+          secureViewEnabled: false
+          disableChat: true
+          ingress:
+            enabled: false
+        - name: "OnlyOffice"
+          uri: "https://onlyoffice"
+          wopiSrc: "http://ocis-server:9302"
+          product: "OnlyOffice"
+          enabled: true
+          insecure: true
+          disableProof: true
+          secureViewEnabled: false
+          disableChat: true
+          ingress:
+            enabled: false
 
 http:
   cors:
