@@ -47,10 +47,21 @@ features:
     default: "1000000000"
     max: "0"
   appsIntegration:
+    enabled: true
     wopiIntegration:
       officeSuites:
-        name: "Collabora"
-        uri: "https://collabora:9980"
+        - name: "Collabora"
+          uri: "https://collabora:9980"
+          product: "Collabora"
+          enabled: true
+          insecure: true
+          disableProof: true
+          secureViewEnabled: false
+          disableChat: true
+          ingress:
+            enabled: false
+
+
 
 http:
   cors:
