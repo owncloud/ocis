@@ -42,6 +42,8 @@ POSTGRES_ALPINE_IMAGE = "postgres:alpine3.18"
 TRIVY_IMAGE = "aquasec/trivy:latest"
 K3D_IMAGE = "ghcr.io/k3d-io/k3d:5-dind"
 
+KUBECTL_VERSION = "v1.27.3"
+
 # the hugo version needs to be the same as in owncloud.github.io
 OC_CI_HUGO_STATIC_IMAGE = "hugomods/hugo:base-0.129.0"
 
@@ -1236,7 +1238,7 @@ def localApiTests(
         "export KUBECONFIG=%s/kubeconfig-$${DRONE_BUILD_NUMBER}.yaml" % dirs["base"],
         "until test -f $${KUBECONFIG}; do sleep 1; done",
         # Install kubectl if missing
-        "bash -lc 'command -v kubectl >/dev/null || (curl -fsSL -o /usr/local/bin/kubectl https://dl.k8s.io/release/v1.27.3/bin/linux/amd64/kubectl && chmod +x /usr/local/bin/kubectl)'",
+        "bash -lc 'command -v kubectl >/dev/null || (curl -fsSL -o /usr/local/bin/kubectl https://dl.k8s.io/release/%s/bin/linux/amd64/kubectl && chmod +x /usr/local/bin/kubectl)'" % KUBECTL_VERSION,
 
         # Port-forwards
     ] + getWopiPortForwardCommands() + [
@@ -3922,7 +3924,7 @@ def getWopiCommands():
 def getWopiPortForwardCommands():
     """Get port forwarding commands for WOPI collaboration services"""
     return [
-        "bash -lc 'command -v kubectl >/dev/null || (curl -fsSL -o /usr/local/bin/kubectl https://dl.k8s.io/release/v1.27.3/bin/linux/amd64/kubectl && chmod +x /usr/local/bin/kubectl) || true'",
+        "bash -lc 'command -v kubectl >/dev/null || (curl -fsSL -o /usr/local/bin/kubectl https://dl.k8s.io/release/%s/bin/linux/amd64/kubectl && chmod +x /usr/local/bin/kubectl) || true'" % KUBECTL_VERSION,
         "kubectl -n ocis port-forward svc/collaboration-fakeoffice 9300:9300 --address=127.0.0.1 >/dev/null 2>&1 &",
         "kubectl -n ocis port-forward svc/collaboration-collabora 9302:9300 --address=127.0.0.1 >/dev/null 2>&1 &",
         "kubectl -n ocis port-forward svc/collaboration-onlyoffice 9305:9300 --address=127.0.0.1 >/dev/null 2>&1 &",
