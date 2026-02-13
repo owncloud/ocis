@@ -46,6 +46,11 @@ features:
   quotas:
     default: "1000000000"
     max: "0"
+  appsIntegration:
+    wopiIntegration:
+      officeSuites:
+        name: "Collabora"
+        uri: "https://collabora:9980"
 
 http:
   cors:
