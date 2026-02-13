@@ -13,10 +13,14 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
 <<<<<<< HEAD
+<<<<<<< HEAD
 "POT-Creation-Date: 2026-03-05 14:42+0000\n"
 =======
 "POT-Creation-Date: 2026-01-23 00:05+0000\n"
 >>>>>>> f2c73cdc454 (chore: release 8.0.0-rc.1)
+=======
+"POT-Creation-Date: 2026-02-13 00:17+0000\n"
+>>>>>>> 8b783a2debc (chore: release 8.0.0)
 "PO-Revision-Date: 2026-01-02 10:10+0000\n"
 "Last-Translator: Victor Vinuela <vinuela.victor@dissectio.com>, 2026\n"
 "Language-Team: Spanish (https://app.transifex.com/owncloud-org/teams/6149/es/)\n"

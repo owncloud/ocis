@@ -11,7 +11,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
+<<<<<<< HEAD
 "POT-Creation-Date: 2026-03-05 00:04+0000\n"
+=======
+"POT-Creation-Date: 2026-02-12 00:19+0000\n"
+>>>>>>> 8b783a2debc (chore: release 8.0.0)
 "PO-Revision-Date: 2026-01-02 10:10+0000\n"
 "Last-Translator: Martin <github@diemattels.at>, 2026\n"
 "Language-Team: English (United Kingdom) (https://app.transifex.com/owncloud-org/teams/6149/en_GB/)\n"
