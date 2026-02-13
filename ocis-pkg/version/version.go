@@ -16,7 +16,7 @@ var (
 	// LatestTag is the latest released version plus the dev meta version.
 	// Will be overwritten by the release pipeline
 	// Needs a manual change for every tagged release
-	LatestTag = "8.0.0-rc.1"
+	LatestTag = "8.0.0"
 
 	// Date indicates the build date.
 	// This has been removed, it looks like you can only replace static strings with recent go versions
