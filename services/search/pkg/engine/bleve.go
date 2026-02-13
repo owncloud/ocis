@@ -286,6 +286,21 @@ func (b *Bleve) Upsert(id string, r Resource) error {
 	return bleveIndex.Index(id, r)
 }
 
+// Update retrieves an existing resource from the index, applies the given
+// mutation function, and writes it back. This is the public counterpart of
+// the internal updateEntity helper, providing a get + mutate + set cycle
+// without exposing raw resource retrieval.
+func (b *Bleve) Update(id string, mutateFn func(*Resource)) error {
+	bleveIndex, closeFn, err := b.indexGetter.GetIndex()
+	if err != nil {
+		return err
+	}
+	defer closeFn()
+
+	_, err = b.updateEntity(bleveIndex, id, mutateFn)
+	return err
+}
+
 // Move updates the resource location and all of its necessary fields.
 func (b *Bleve) Move(id string, parentid string, target string) error {
 	bleveIndex, closeFn, err := b.indexGetter.GetIndex()
