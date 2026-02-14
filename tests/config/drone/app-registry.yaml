@@ -7,3 +7,24 @@ app_registry:
       icon: ""
       default_app: FakeOffice
       allow_creation: true
+    - mime_type: text/plain
+      extension: txt
+      name: Plain Text
+      description: Plain text document
+      icon: ""
+      default_app: FakeOffice
+      allow_creation: true
+    - mime_type: application/vnd.oasis.opendocument.text-template
+      extension: ott
+      name: OpenDocument Text Template
+      description: OpenDocument text template
+      icon: ""
+      default_app: Collabora
+      allow_creation: true
+    - mime_type: application/vnd.openxmlformats-officedocument.wordprocessingml.template
+      extension: dotx
+      name: Word Template
+      description: Microsoft Word template
+      icon: ""
+      default_app: OnlyOffice
+      allow_creation: true
