@@ -3,6 +3,8 @@ package ocis
 import (
 	"bytes"
 	"fmt"
+	"net/http"
+	"ociswrapper/ocis/config"
 	"os/exec"
 	"strings"
 	"time"
@@ -38,7 +40,7 @@ func IsServiceRunning(service string) {
 	for {
 		select {
 		case <-timeout:
-			fmt.Printf("Timeout: %s service did not become ready in time.\n",service)
+			fmt.Printf("Timeout: %s service did not become ready in time.\n", service)
 			return
 		case <-tick.C:
 			cmd := exec.Command("sh", "-c", fmt.Sprintf("kubectl get pods -n ocis -A | grep %s | wc -l", service))
@@ -63,6 +65,25 @@ func IsServiceRunning(service string) {
 						if strings.TrimSpace(string(stdout)) == "1" {
 							return
 						}
+
+						if strings.TrimSpace(string(stdout)) == "1" {
+							port := config.GetServiceDebugPort(service)
+							health := fmt.Sprintf("http://127.0.0.1:%d/healthz", port)
+							ready := fmt.Sprintf("http://127.0.0.1:%d/readyz", port)
+
+							client := &http.Client{}
+							healthResp, err := client.Get(health)
+							readyResp, err1 := client.Get(ready)
+							if err == nil {
+								fmt.Printf("%s service health check returned status code: %d. Service is running\n", service, healthResp.StatusCode)
+								healthResp.Body.Close()
+							}
+							if err1 == nil {
+								fmt.Printf("%s service readyness check returned status code: %d. Service is running\n", service, readyResp.StatusCode)
+								readyResp.Body.Close()
+								return
+							}
+						}
 					}
 				}
 			}
@@ -73,7 +94,7 @@ func IsServiceRunning(service string) {
 func Rollback() (bool, string) {
 	for service, envs := range K3dServiceEnvConfigs {
 		cmdArgs := []string{"set", "env", "-n", "ocis"}
-		cmdArgs = append(cmdArgs, fmt.Sprintf("deployment/%s",service))
+		cmdArgs = append(cmdArgs, fmt.Sprintf("deployment/%s", service))
 		for _, env := range envs {
 			cmdArgs = append(cmdArgs, strings.SplitN(env, "=", 2)[0]+"-")
 			cmd = exec.Command("kubectl", cmdArgs...)
