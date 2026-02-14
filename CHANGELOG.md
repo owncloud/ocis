@@ -103,6 +103,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Update the traefik image for some deployment examples: [#11915](https://github.com/owncloud/ocis/pull/11915)
 * Enhancement - Add users instances: [#11925](https://github.com/owncloud/ocis/pull/11925)
 * Enhancement - Introduce external shares permission: [#11931](https://github.com/owncloud/ocis/pull/11931)
+* Enhancement - Add web extensions deployment configuration: [#11940](https://github.com/owncloud/ocis/pull/11940)
 * Enhancement - Add AI-assisted development guide: [#11941](https://github.com/owncloud/ocis/pull/11941)
 * Enhancement - Update to go 1.25: [#12011](https://github.com/owncloud/ocis/pull/12011)
 * Enhancement - Bump Web to 12.3.1: [#12015](https://github.com/owncloud/ocis/pull/12015)
@@ -438,6 +439,15 @@ The following sections list the changes for unreleased.
    ocis. This permission is by default added to the admin and space-admin role.
 
    https://github.com/owncloud/ocis/pull/11931
+
+* Enhancement - Add web extensions deployment configuration: [#11940](https://github.com/owncloud/ocis/pull/11940)
+
+   We added deployment configuration for the photo-addon and advanced-search web
+   extensions to the ocis_full example. This includes Docker compose files for both
+   extensions and CSP configuration for OpenStreetMap tiles required by the
+   photo-addon map feature.
+
+   https://github.com/owncloud/ocis/pull/11940
 
 * Enhancement - Add AI-assisted development guide: [#11941](https://github.com/owncloud/ocis/pull/11941)
 
