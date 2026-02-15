@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2026-02-14-00-21-13]
+[#deprecation-note-2026-02-15-00-20-56]
 [caption=]
 .Deprecation notes for the gateway service
 [width="100%",cols="~,~,~,~",options="header"]
