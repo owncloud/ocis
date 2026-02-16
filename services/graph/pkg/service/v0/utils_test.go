@@ -5,13 +5,22 @@ import (
 	"net/http"
 	"net/http/httptest"
 
+	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
+	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
+	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"github.com/go-chi/chi/v5"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	rConversions "github.com/owncloud/reva/v2/pkg/conversions"
+	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/owncloud/reva/v2/pkg/utils"
+	cs3mocks "github.com/owncloud/reva/v2/tests/cs3mocks/mocks"
+	"github.com/stretchr/testify/mock"
+	"google.golang.org/grpc"
 
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/owncloud/reva/v2/pkg/storagespace"
@@ -150,4 +159,105 @@ var _ = Describe("Utils", func() {
 			},
 		),
 	)
+
+	Describe("cs3ReceivedSharesToDriveItems", func() {
+		It("sets spaceId in remoteItem", func() {
+			pool.RemoveSelector("GatewaySelector" + "com.owncloud.api.gateway")
+			gatewayClient := &cs3mocks.GatewayAPIClient{}
+			gatewaySelector := pool.GetSelector[gateway.GatewayAPIClient](
+				"GatewaySelector",
+				"com.owncloud.api.gateway",
+				func(cc grpc.ClientConnInterface) gateway.GatewayAPIClient {
+					return gatewayClient
+				},
+			)
+
+			statResponse := &storageprovider.StatResponse{
+				Status: &rpc.Status{Code: rpc.Code_CODE_OK},
+				Info: &storageprovider.ResourceInfo{
+					Id: &storageprovider.ResourceId{
+						StorageId: "storage-id-123",
+						SpaceId:   "space-id-456",
+						OpaqueId:  "opaque-id-789",
+					},
+					Name:  "shared-file.txt",
+					Type:  storageprovider.ResourceType_RESOURCE_TYPE_FILE,
+					Etag:  "etag-abc",
+					Size:  1024,
+					Mtime: &typesv1beta1.Timestamp{Seconds: 1234567890},
+					Space: &storageprovider.StorageSpace{
+						SpaceType: "project",
+						Root: &storageprovider.ResourceId{
+							StorageId: "storage-id-123",
+							SpaceId:   "space-id-456",
+							OpaqueId:  "space-id-456",
+						},
+					},
+				},
+			}
+
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(statResponse, nil)
+
+			getUserResponse := &userpb.GetUserResponse{
+				Status: &rpc.Status{Code: rpc.Code_CODE_OK},
+				User: &userpb.User{
+					Id: &userpb.UserId{
+						OpaqueId: "user-123",
+					},
+					DisplayName: "Test User",
+					Mail:        "test@example.com",
+				},
+			}
+			gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(getUserResponse, nil)
+
+			identityCache := identity.NewIdentityCache(
+				identity.IdentityCacheWithGatewaySelector(gatewaySelector),
+			)
+
+			receivedShares := []*collaboration.ReceivedShare{
+				{
+					Share: &collaboration.Share{
+						Id: &collaboration.ShareId{
+							OpaqueId: "share-123",
+						},
+						ResourceId: &storageprovider.ResourceId{
+							StorageId: "storage-id-123",
+							SpaceId:   "space-id-456",
+							OpaqueId:  "opaque-id-789",
+						},
+						Permissions: &collaboration.SharePermissions{
+							Permissions: rConversions.NewViewerRole().CS3ResourcePermissions(),
+						},
+						Creator: &userpb.UserId{
+							OpaqueId: "user-123",
+						},
+						Ctime: &typesv1beta1.Timestamp{Seconds: 1234567890},
+					},
+					State: collaboration.ShareState_SHARE_STATE_ACCEPTED,
+					MountPoint: &storageprovider.Reference{
+						Path: "shared-file.txt",
+					},
+				},
+			}
+
+			driveItems, err := service.Cs3ReceivedSharesToDriveItems(
+				context.Background(),
+				conversions.ToPointer(log.NopLogger()),
+				gatewayClient,
+				identityCache,
+				receivedShares,
+				unifiedrole.GetRoles(unifiedrole.RoleFilterAll()),
+			)
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(driveItems).To(HaveLen(1))
+
+			driveItem := driveItems[0]
+			Expect(driveItem.RemoteItem).ToNot(BeNil())
+
+			Expect(driveItem.RemoteItem.HasSpaceId()).To(BeTrue())
+			expectedSpaceId := storagespace.FormatStorageID("storage-id-123", "space-id-456")
+			Expect(driveItem.RemoteItem.GetSpaceId()).To(Equal(expectedSpaceId))
+		})
+	})
 })

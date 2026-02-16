@@ -54,6 +54,8 @@ type RemoteItem struct {
 	WebDavUrl *string `json:"webDavUrl,omitempty"`
 	// URL that displays the resource in the browser. Read-only.
 	WebUrl *string `json:"webUrl,omitempty"`
+	// The UUID of the space that contains the item.
+	SpaceId *string `json:"spaceId,omitempty"`
 }
 
 // NewRemoteItem instantiates a new RemoteItem object
@@ -745,6 +747,38 @@ func (o *RemoteItem) SetWebUrl(v string) {
 	o.WebUrl = &v
 }
 
+// GetSpaceId returns the SpaceId field value if set, zero value otherwise.
+func (o *RemoteItem) GetSpaceId() string {
+	if o == nil || IsNil(o.SpaceId) {
+		var ret string
+		return ret
+	}
+	return *o.SpaceId
+}
+
+// GetSpaceIdOk returns a tuple with the SpaceId field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *RemoteItem) GetSpaceIdOk() (*string, bool) {
+	if o == nil || IsNil(o.SpaceId) {
+		return nil, false
+	}
+	return o.SpaceId, true
+}
+
+// HasSpaceId returns a boolean if a field has been set.
+func (o *RemoteItem) HasSpaceId() bool {
+	if o != nil && !IsNil(o.SpaceId) {
+		return true
+	}
+
+	return false
+}
+
+// SetSpaceId gets a reference to the given string and assigns it to the SpaceId field.
+func (o *RemoteItem) SetSpaceId(v string) {
+	o.SpaceId = &v
+}
+
 func (o RemoteItem) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -817,6 +851,9 @@ func (o RemoteItem) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.WebUrl) {
 		toSerialize["webUrl"] = o.WebUrl
+	}
+	if !IsNil(o.SpaceId) {
+		toSerialize["spaceId"] = o.SpaceId
 	}
 	return toSerialize, nil
 }
