@@ -5,7 +5,7 @@
 # NOTE: need to be updated if new production releases are determined
 # - follow semver
 # - omit 'v' prefix
-PRODUCTION_RELEASE_TAGS = ["5.0", "7"]
+PRODUCTION_RELEASE_TAGS = ["5.0", "7", "8"]
 
 # images
 ALPINE_GIT = "alpine/git:latest"
