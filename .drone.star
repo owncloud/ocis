@@ -2468,7 +2468,7 @@ def documentation():
                     },
                     "pages_directory": "docs/hugo/content/",
                     "copy_contents": "true",
-                    "target_branch": "docs",
+                    "target_branch": "docs-stable-8.0",
                     "delete": "true",
                 },
                 "when": {
