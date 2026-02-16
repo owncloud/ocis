@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2026-02-12 00:19+0000\n"
+"POT-Creation-Date: 2026-02-16 00:18+0000\n"
 "PO-Revision-Date: 2026-01-02 10:10+0000\n"
 "Last-Translator: Ivan Fustero, 2026\n"
 "Language-Team: Catalan (https://app.transifex.com/owncloud-org/teams/6149/ca/)\n"
@@ -140,45 +140,46 @@ msgstr "Visualitza, descarrega i mostra totes les persones convidades."
 #. UnifiedRole FileEditor, Role Description (resolves directly)
 #: pkg/unifiedrole/roles.go:174
 msgid "View, download, upload and edit."
-msgstr "Visualitza, descarrega, puja i edita."
+msgstr "Visualitza, descarrega, carrega i edita."
 
 #. UnifiedRole EditorLite, Role Description (resolves directly)
 #. UnifiedRole SpaceEditorWithoutVersions, Role Description (resolves
 #. directly)
 #: pkg/unifiedrole/roles.go:140 pkg/unifiedrole/roles.go:208
 msgid "View, download, upload, edit and add."
-msgstr "Visualitza, descarrega, puja, edita i afegeix."
+msgstr "Visualitza, descarrega, carrega, edita i afegeix."
 
 #. UnifiedRole FileEditorListGrants, Role Description (resolves directly)
 #: pkg/unifiedrole/roles.go:182
 msgid "View, download, upload, edit and show all invited people."
 msgstr ""
-"Visualitza, descarrega, puja, edita i mostra totes les persones convidades."
+"Visualitza, descarrega, carrega, edita i mostra totes les persones "
+"convidades."
 
 #. UnifiedRole Editor, Role Description (resolves directly)
 #: pkg/unifiedrole/roles.go:148
 msgid "View, download, upload, edit, add and delete."
-msgstr "Visualitza, descarrega, puja, edita, afegeix i suprimeix."
+msgstr "Visualitza, descarrega, carrega, edita, afegeix i suprimeix."
 
 #. UnifiedRole SpaceEditorWithoutTrashbin, Role Description (resolves
 #. directly)
 #: pkg/unifiedrole/roles.go:216
 msgid "View, download, upload, edit, add and show all versions."
-msgstr "Visualitza, descarrega, puja, edita i mostra totes les versions."
+msgstr "Visualitza, descarrega, carrega, edita i mostra totes les versions."
 
 #. UnifiedRole EditorListGrants Editor, Role Description (resolves directly)
 #: pkg/unifiedrole/roles.go:156
 msgid "View, download, upload, edit, add, delete and show all invited people."
 msgstr ""
-"Visualitza, descarregar, pujar, editar, afegir, esborrar i mostrar totes les"
-" persones convidades."
+"Visualitza, descarregar, carrega, editar, afegir, esborrar i mostrar totes "
+"les persones convidades."
 
 #. UnifiedRole SpaceEditor, Role Description (resolves directly)
 #: pkg/unifiedrole/roles.go:224
 msgid "View, download, upload, edit, add, show all versions and delete."
 msgstr ""
-"Visualitza, descarrega, puja, edita, afegeix, mostra totes les versions i "
-"suprimeix."
+"Visualitza, descarrega, carrega, edita, afegeix, mostra totes les versions i"
+" suprimeix."
 
 #. UnifiedRole Manager, Role Description (resolves directly)
 #: pkg/unifiedrole/roles.go:232
@@ -186,7 +187,7 @@ msgid ""
 "View, download, upload, edit, add, show all versions, delete and manage "
 "members."
 msgstr ""
-"Visualitza, descarrega, puja, edita, afegeix, mostra totes les versions, "
+"Visualitza, descarrega, carrega, edita, afegeix, mostra totes les versions, "
 "elimina i gestiona membres."
 
 #. UnifiedRole EditorListGrantsWithVersions, Role Description (resolves
@@ -196,8 +197,8 @@ msgid ""
 "View, download, upload, edit, delete, show all versions and all invited "
 "people."
 msgstr ""
-"Visualitza, descarrega, puja, edita, suprimeix, mostra totes les versions i "
-"totes les persones convidades."
+"Visualitza, descarrega, carrega, edita, suprimeix, mostra totes les versions"
+" i totes les persones convidades."
 
 #. UnifiedRole FileEditorListGrantsWithVersions, Role Description (resolves
 #. directly)
@@ -205,5 +206,5 @@ msgstr ""
 msgid ""
 "View, download, upload, edit, show all versions and all invited people."
 msgstr ""
-"Visualitza, descarrega, puja, edita, mostra totes les versions i totes les "
-"persones convidades."
+"Visualitza, descarrega, carrega, edita, mostra totes les versions i totes "
+"les persones convidades."
