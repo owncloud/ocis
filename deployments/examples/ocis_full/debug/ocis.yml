@@ -1,0 +1,7 @@
+---
+services:
+
+  ocis:
+    command: [ "-c", "ocis init || true; dlv --listen=:40000 --headless=true --continue --check-go-version=false --api-version=2 --accept-multiclient exec /usr/bin/ocis server" ]
+    ports:
+      - 40000:40000

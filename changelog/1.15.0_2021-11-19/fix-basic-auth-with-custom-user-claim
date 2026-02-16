@@ -1,0 +1,7 @@
+Bugfix: Fix basic auth with custom user claim
+
+We've fixed authentication with basic if oCIS is configured to use a non-standard claim
+as user claim (`PROXY_USER_OIDC_CLAIM`). Prior to this bugfix the authentication always
+failed and is now working.
+
+https://github.com/owncloud/ocis/pull/2755

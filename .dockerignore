@@ -1,0 +1,6 @@
+.bingo
+!.bingo/*.mod
+!.bingo/Variables.mk
+**/bin
+docs
+**/node_modules

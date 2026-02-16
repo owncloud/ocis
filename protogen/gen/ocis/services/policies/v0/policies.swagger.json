@@ -1,0 +1,216 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "ownCloud Infinite Scale policies",
+    "version": "1.0.0",
+    "contact": {
+      "name": "ownCloud GmbH",
+      "url": "https://github.com/owncloud/ocis",
+      "email": "support@owncloud.com"
+    },
+    "license": {
+      "name": "Apache-2.0",
+      "url": "https://github.com/owncloud/ocis/blob/master/LICENSE"
+    }
+  },
+  "tags": [
+    {
+      "name": "policiesProvider"
+    }
+  ],
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/api/v0/policies/evaluate": {
+      "post": {
+        "operationId": "policiesProvider_Evaluate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v0EvaluateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v0EvaluateRequest"
+            }
+          }
+        ],
+        "tags": [
+          "policiesProvider"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v0Environment": {
+      "type": "object",
+      "properties": {
+        "stage": {
+          "$ref": "#/definitions/v0Stage"
+        },
+        "user": {
+          "$ref": "#/definitions/v0User"
+        },
+        "request": {
+          "$ref": "#/definitions/v0Request"
+        },
+        "resource": {
+          "$ref": "#/definitions/v0Resource"
+        }
+      }
+    },
+    "v0EvaluateRequest": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "string"
+        },
+        "environment": {
+          "$ref": "#/definitions/v0Environment"
+        }
+      }
+    },
+    "v0EvaluateResponse": {
+      "type": "object",
+      "properties": {
+        "result": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v0Request": {
+      "type": "object",
+      "properties": {
+        "method": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        }
+      }
+    },
+    "v0Resource": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/v0ResourceID"
+        },
+        "name": {
+          "type": "string"
+        },
+        "size": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "v0ResourceID": {
+      "type": "object",
+      "properties": {
+        "storageId": {
+          "type": "string"
+        },
+        "opaqueId": {
+          "type": "string"
+        },
+        "spaceId": {
+          "type": "string"
+        }
+      }
+    },
+    "v0Stage": {
+      "type": "string",
+      "enum": [
+        "STAGE_PP",
+        "STAGE_HTTP"
+      ],
+      "default": "STAGE_PP"
+    },
+    "v0User": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/v0UserID"
+        },
+        "username": {
+          "type": "string"
+        },
+        "mail": {
+          "type": "string"
+        },
+        "displayName": {
+          "type": "string"
+        },
+        "groups": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "v0UserID": {
+      "type": "object",
+      "properties": {
+        "opaqueId": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "externalDocs": {
+    "description": "Developer Manual",
+    "url": "https://owncloud.dev/services/policies/"
+  }
+}

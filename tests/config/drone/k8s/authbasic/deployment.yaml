@@ -1,0 +1,102 @@
+{{- include "ocis.basicServiceTemplates" (dict "scope" . "appName" "appNameAuthBasic" "appNameSuffix" "") -}}
+apiVersion: apps/v1
+kind: Deployment
+{{ include "ocis.metadata" . }}
+spec:
+  {{- include "ocis.selector" . | nindent 2 }}
+  {{- if and (not .Values.autoscaling.enabled) (.Values.replicas) }}
+  replicas: {{ .Values.replicas }}
+  {{- end }}
+  {{- include "ocis.deploymentStrategy" . | nindent 2 }}
+  template:
+    {{- include "ocis.templateMetadata" (dict "scope" $ "configCheck" false) | nindent 4 }}
+    spec:
+      {{- include "ocis.affinity" $ | nindent 6 }}
+      {{- include "ocis.securityContextAndtopologySpreadConstraints" . | nindent 6 }}
+      {{- include "ocis.priorityClassName" $.priorityClassName | nindent 6 }}
+      {{- include "ocis.hostAliases" $ | nindent 6 }}
+      nodeSelector: {{ toYaml $.nodeSelector | nindent 8 }}
+      containers:
+        - name: {{ .appName }}
+          {{- include "ocis.image" $ | nindent 10 }}
+          command: ["ocis"]
+          args: ["auth-basic", "server"]
+          {{- include "ocis.containerSecurityContext" . | nindent 10 }}
+          env:
+            {{- include "ocis.serviceRegistry" . | nindent 12 }}
+
+            - name: AUTH_BASIC_LOG_COLOR
+              value: {{ .Values.logging.color | quote }}
+            - name: AUTH_BASIC_LOG_LEVEL
+              value: {{ .Values.logging.level | quote }}
+            - name: AUTH_BASIC_LOG_PRETTY
+              value: {{ .Values.logging.pretty | quote }}
+
+            - name: AUTH_BASIC_TRACING_ENABLED
+              value: "{{ .Values.tracing.enabled }}"
+            - name: AUTH_BASIC_TRACING_TYPE
+              value: {{ .Values.tracing.type | quote }}
+            - name: AUTH_BASIC_TRACING_ENDPOINT
+              value: {{ .Values.tracing.endpoint | quote }}
+            - name: AUTH_BASIC_TRACING_COLLECTOR
+              value: {{ .Values.tracing.collector | quote }}
+
+            - name: AUTH_BASIC_DEBUG_PPROF
+              value: {{ .Values.debug.profiling | quote }}
+
+            # ----------------------------------------------------
+            - name: OCIS_URL
+              value: "https://{{ .Values.externalDomain }}"
+
+            - name: AUTH_BASIC_LDAP_URI
+              value: ldaps://{{ .appNameIdm }}:9235
+
+            - name: AUTH_BASIC_LDAP_CACERT
+              value: /etc/ocis/ldap-ca/ldap-ca.crt
+
+            - name: AUTH_BASIC_LDAP_BIND_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "secrets.ldapBindSecret" . }}
+                  key: reva-ldap-bind-password
+            # ----------------------------------------------------
+
+            - name: AUTH_BASIC_GRPC_ADDR
+              value: 0.0.0.0:9146
+            - name: AUTH_BASIC_DEBUG_ADDR
+              value: 0.0.0.0:9147
+
+            - name: AUTH_BASIC_JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "secrets.jwtSecret" . }}
+                  key: jwt-secret
+
+            {{- include "ocis.caEnv" $ | nindent 12}}
+
+          {{- include "ocis.livenessProbe" . | nindent 10 }}
+
+          resources: {{ toYaml .resources | nindent 12 }}
+
+          ports:
+            - name: grpc
+              containerPort: 9146
+            - name: metrics-debug
+              containerPort: 9147
+
+          volumeMounts:
+            - name: tmp-volume
+              mountPath: /tmp
+            - name: ldap-ca
+              mountPath: /etc/ocis/ldap-ca
+              readOnly: true
+            {{- include "ocis.caPath" $ | nindent 12}}
+
+      {{- include "ocis.imagePullSecrets" $ | nindent 6 }}
+      volumes:
+        - name: tmp-volume
+          emptyDir: {}
+        - name: ldap-ca
+          secret:
+            secretName: {{ include "secrets.ldapCASecret" . }}
+        {{- include "ocis.caVolume" $ | nindent 8}}

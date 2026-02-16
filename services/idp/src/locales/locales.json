@@ -1,0 +1,66 @@
+[
+  {
+    "locale": "de",
+    "name": "German",
+    "nativeName": "Deutsch",
+    "orientation": {
+      "characterOrder": "left-to-right",
+      "lineOrder": "top-to-bottom"
+    }
+  },
+  {
+    "locale": "en-GB",
+    "name": "English",
+    "nativeName": "English",
+    "orientation": {
+      "characterOrder": "left-to-right",
+      "lineOrder": "top-to-bottom"
+    }
+  },
+  {
+    "locale": "es",
+    "name": "Spanish",
+    "nativeName": "Español",
+    "orientation": {
+      "characterOrder": "left-to-right",
+      "lineOrder": "top-to-bottom"
+    }
+  },
+  {
+    "locale": "fr",
+    "name": "French",
+    "nativeName": "Français",
+    "orientation": {
+      "characterOrder": "left-to-right",
+      "lineOrder": "top-to-bottom"
+    }
+  },
+  {
+    "locale": "it",
+    "name": "Italian",
+    "nativeName": "Italiano",
+    "orientation": {
+      "characterOrder": "left-to-right",
+      "lineOrder": "top-to-bottom"
+    }
+  },
+  {
+    "locale": "nl",
+    "name": "Dutch",
+    "nativeName": "Nederlands",
+    "orientation": {
+      "characterOrder": "left-to-right",
+      "lineOrder": "top-to-bottom"
+    }
+  },
+  {
+    "locale": "zh-CN",
+    "name": "Simplified Chinese",
+    "nativeName": "简体中文",
+    "orientation": {
+      "characterOrder": "left-to-right",
+      "lineOrder": "top-to-bottom"
+    },
+    "ietf": "zh_hans"
+  }
+]

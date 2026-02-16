@@ -1,0 +1,31 @@
+{
+  "server": "https://localhost:10200",
+  "theme": "https://localhost:10200/themes/owncloud/theme.json",
+  "version": "0.1.0",
+  "openIdConnect": {
+    "metadata_url": "https://localhost:10200/.well-known/openid-configuration",
+    "authority": "https://localhost:10200",
+    "client_id": "web",
+    "response_type": "code",
+    "scope": "openid profile email"
+  },
+  "options": {
+    "topCenterNotifications": true,
+    "displayResourcesLazy": false,
+    "sidebar": {
+      "shares": {
+        "showAllOnLoad": true
+      }
+    }
+  },
+  "apps": [
+    "files",
+    "ocm",
+    "text-editor",
+    "preview",
+    "pdf-viewer",
+    "search",
+    "admin-settings",
+    "app-store"
+  ]
+}

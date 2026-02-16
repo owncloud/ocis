@@ -1,0 +1,25 @@
+# Antivirus
+msgid "Virus found"
+msgstr "Virus gefunden"
+
+msgid "Virus found in {resource}. Upload not possible. Virus: {virus}"
+msgstr "In {resource} wurde potenziell schädlicher Code gefunden. Das Hochladen wurde abgebrochen. Grund: {virus}"
+
+# User Log
+msgid "Space shared"
+msgstr "Space freigegeben"
+
+msgid "{user} added you to Space {space}"
+msgstr "{user} hat Sie zu Space {space} hinzugefügt"
+
+msgid "Instance will be shut down and deprovisioned"
+msgstr "Instanz wird heruntergefahren und außer Betrieb genommen werden."
+
+msgid "Attention! The instance will be shut down and deprovisioned on {date}. Download all your data before that date as no access past that date is possible."
+msgstr "Achtung! Diese Instanz wird am {date} heruntergefahren und außer Betrieb genommen werden. Laden Sie Ihre Daten vor diesem Tag herunter, da Sie danach nicht mehr darauf zugreifen können."
+
+msgid "Resource shared"
+msgstr "Neue Freigabe"
+
+msgid "{user} shared {resource} with you"
+msgstr "{user} hat {resource} mit Ihnen geteilt"

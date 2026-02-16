@@ -1,0 +1,12 @@
+---
+
+mapping:
+#  old-scope: custom-scope
+
+scopes:
+#  custom-scope:
+#    description: "This is the a custom scope"
+#    priority: 100
+
+#  another-scope:
+#    description: "This is the another scope"

@@ -1,0 +1,187 @@
+variables:
+- rawname: CS3_GATEWAY
+  path: services/idp/pkg/backends/cs3/bootstrap/cs3.go:77
+  foundincode: true
+  name: CS3_GATEWAY
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: true
+- rawname: CS3_MACHINE_AUTH_API_KEY
+  path: services/idp/pkg/backends/cs3/bootstrap/cs3.go:78
+  foundincode: true
+  name: CS3_MACHINE_AUTH_API_KEY
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: true
+- rawname: DAYS
+  path: tests/qa-activity-report/generate-qa-activity-report.go:94
+  foundincode: true
+  name: DAYS
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: true
+- rawname: _registryRegisterIntervalEnv
+  path: ocis-pkg/registry/expiry.go:19
+  foundincode: true
+  name: EXPERIMENTAL_REGISTER_INTERVAL
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: true
+- rawname: _registryRegisterTTLEnv
+  path: ocis-pkg/registry/expiry.go:28
+  foundincode: true
+  name: EXPERIMENTAL_REGISTER_TTL
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: true
+- rawname: _serverMaxConnectionAgeEnv
+  path: ocis-pkg/service/grpc/keepalive.go:19
+  foundincode: true
+  name: GRPC_MAX_CONNECTION_AGE
+  type: Duration
+  default_value: "9223372036854775807"
+  description: Timeout for GRPC connections. After timeout, a new connection will
+    be established automatically. The default value is in ns and is about 2.5 mio
+    h.
+  do_ignore: false
+- rawname: MICRO_LOG_LEVEL
+  path: ocis-pkg/log/log.go:34
+  foundincode: true
+  name: MICRO_LOG_LEVEL
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: true
+- rawname: MICRO_LOG_LEVEL
+  path: ocis-pkg/log/log.go:31
+  foundincode: false
+  name: MICRO_LOG_LEVEL
+  type: string
+  default_value: Error
+  description: Set the log level for the internal go micro framework. Only change
+    on supervision of ownCloud Support.
+  do_ignore: false
+- rawname: MICRO_LOG_LEVEL
+  path: ocis-pkg/log/log.go:30
+  foundincode: true
+  name: MICRO_LOG_LEVEL
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: true
+- rawname: _registryEnv
+  path: ocis-pkg/registry/registry.go:88
+  foundincode: true
+  name: MICRO_REGISTRY
+  type: string
+  default_value: nats-js-kv
+  description: 'The Go micro registry type to use. Supported types are: ''memory''
+    and ''nats-js-kv'' (default). Only change on supervision of ownCloud Support.'
+  do_ignore: false
+- rawname: _registryAddressEnv
+  path: ocis-pkg/registry/registry.go:92
+  foundincode: true
+  name: MICRO_REGISTRY_ADDRESS
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: true
+- rawname: _registryAddressEnv
+  path: ocis-pkg/natsjsregistry/registry.go:206
+  foundincode: true
+  name: MICRO_REGISTRY_ADDRESS
+  type: string
+  default_value: 127.0.0.1:9233
+  description: The bind address of the internal go micro framework. Only change on
+    supervision of ownCloud Support.
+  do_ignore: false
+- rawname: _registryPasswordEnv
+  path: ocis-pkg/natsjsregistry/registry.go:234
+  foundincode: true
+  name: MICRO_REGISTRY_AUTH_PASSWORD
+  type: string
+  default_value: ""
+  description: Optional when using nats to authenticate with the nats cluster.
+  do_ignore: false
+- rawname: _registryUsernameEnv
+  path: ocis-pkg/natsjsregistry/registry.go:234
+  foundincode: true
+  name: MICRO_REGISTRY_AUTH_USERNAME
+  type: string
+  default_value: ""
+  description: Optional when using nats to authenticate with the nats cluster.
+  do_ignore: false
+- rawname: MONTH
+  path: tests/qa-activity-report/generate-qa-activity-report.go:92
+  foundincode: true
+  name: MONTH
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: true
+- rawname: OCIS_BASE_DATA_PATH
+  path: ocis-pkg/config/defaults/paths.go:23
+  foundincode: true
+  name: OCIS_BASE_DATA_PATH
+  type: string
+  default_value: ""
+  description: The base directory location used by several services and for user data.
+    See the General Info section in the documentation for more details on defaults.
+    Services can have, if available, an individual setting with an own environment
+    variable.
+  do_ignore: false
+- rawname: OCIS_BASE_DATA_PATH
+  path: ocis/pkg/command/shares.go:50
+  foundincode: true
+  name: OCIS_BASE_DATA_PATH
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: true
+- rawname: OCIS_CONFIG_DIR
+  path: ocis-pkg/config/defaults/paths.go:56
+  foundincode: true
+  name: OCIS_CONFIG_DIR
+  type: string
+  default_value: ""
+  description: The default directory location for config files. See the General Info
+    section in the documentation for more details on defaults.
+  do_ignore: false
+- rawname: OCIS_INSECURE
+  path: ocis-pkg/service/grpc/client.go:77
+  foundincode: true
+  name: OCIS_INSECURE
+  type: bool
+  default_value: "false"
+  description: Insecure TLS mode is only allowed in development environments with
+    OCIS_INSECURE=true
+  do_ignore: false
+- rawname: RUN_CMD_TEST
+  path: internal/testenv/test.go:32
+  foundincode: true
+  name: RUN_CMD_TEST
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: true
+- rawname: YEAR
+  path: tests/qa-activity-report/generate-qa-activity-report.go:93
+  foundincode: true
+  name: YEAR
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: true
+- rawname: parts[0]
+  path: ocis-pkg/config/envdecode/envdecode.go:396
+  foundincode: true
+  name: parts[0]
+  type: ""
+  default_value: ""
+  description: false positive - code that extract envvars for config structs
+  do_ignore: true

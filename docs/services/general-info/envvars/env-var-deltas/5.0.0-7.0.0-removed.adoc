@@ -1,0 +1,257 @@
+// # Removed Variables between oCIS 5.0.0 and oCIS 7.0.0
+// commenting the headline to make it better includable
+
+// table created per 2024.12.02
+// the table should be recreated/updated on source () changes
+
+[width="100%",cols="~,~,~,~",options="header"]
+|===
+| Service | Variable | Description | Default
+
+| xref:deployment/services/env-vars-special-scope.adoc[Special Scope Envvars]
+| OCIS_CACHE_SIZE
+| The maximum quantity of items in the user info cache. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not exclicitly set as default.
+| 0
+
+| 
+| OCIS_DECOMPOSEDFS_METADATA_BACKEND
+| The backend to use for storing metadata. Supported values are 'messagepack' and 'xattrs'. The setting 'messagepack' uses a dedicated file to store file metadata while 'xattrs' uses extended attributes to store file metadata. Defaults to 'messagepack'.
+| messagepack
+
+| 
+| OCIS_ENABLE_RESHARING
+| Changing this value is NOT supported. Enables the support for re-sharing in the clients.
+| false
+
+| 
+| OCIS_PERSISTENT_STORE_SIZE
+| The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not exclicitly set as default.
+| 0
+
+| xref:{s-path}/antivirus.adoc[Antivirus]
+| ANTIVIRUS_ICAP_TIMEOUT
+| Timeout for the ICAP client.
+| 0
+
+| xref:{s-path}/eventhistory.adoc[Eventhistory]
+| EVENTHISTORY_STORE_SIZE
+| The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived and used from the ocmem package though no explicit default was set.
+| 0
+
+| xref:{s-path}/frontend.adoc[Frontend]
+| FRONTEND_ENABLE_RESHARING
+| Changing this value is NOT supported. Enables the support for re-sharing in the clients.
+| false
+
+| 
+| FRONTEND_OCS_STAT_CACHE_SIZE
+| Max number of entries to hold in the cache.
+| 0
+
+| xref:{s-path}/gateway.adoc[Gateway]
+| GATEWAY_CREATE_HOME_CACHE_SIZE
+| The maximum quantity of items in the cache. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not explicitly set as default.
+| 0
+
+| 
+| GATEWAY_PROVIDER_CACHE_SIZE
+| The maximum quantity of items in the cache. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not explicitly set as default.
+| 0
+
+| xref:{s-path}/graph.adoc[Graph]
+| GRAPH_CACHE_SIZE
+| The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not explicitly set as default.
+| 0
+
+| 
+| GRAPH_ENABLE_RESHARING
+| Changing this value is NOT supported. Enables the support for re-sharing.
+| false
+
+| xref:{s-path}/ocm.adoc[OCM]
+| OCM_OCM_PROVIDER_AUTHORIZER_VERIFY_REQUEST_HOSTNAME
+| Verify the hostname of the incoming request against the hostname of the OCM provider.
+| false
+
+| xref:{s-path}/postprocessing.adoc[Postprocessing]
+| POSTPROCESSING_STORE_SIZE
+| The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not exclicitly set as default.
+| 0
+
+| xref:{s-path}/proxy.adoc[Proxy]
+| PROXY_OIDC_USERINFO_CACHE_SIZE
+| The maximum quantity of items in the user info cache. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not explicitly set as default.
+| 0
+
+| xref:{s-path}/settings.adoc[Settings]
+| SETTINGS_CACHE_SIZE
+| The maximum quantity of items in the cache. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not exclicitly set as default.
+| 0
+
+| 
+| SETTINGS_DATA_PATH
+| The directory where the filesystem storage will store ocis settings. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/settings.
+| /var/lib/ocis/settings
+
+| 
+| SETTINGS_STORE_TYPE
+| Store type configures the persistency driver. Supported values are 'metadata' and 'filesystem'. Note that the value 'filesystem' is considered deprecated.
+| metadata
+
+| xref:{s-path}/sharing.adoc[Sharing]
+| SHARING_ENABLE_RESHARING
+| Changing this value is NOT supported. Enables the support for resharing.
+| false
+
+| xref:{s-path}/storage-system.adoc[Storage-System]
+| STORAGE_SYSTEM_CACHE_SIZE
+| The maximum quantity of items in the user info cache. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not exclicitly set as default.
+| 0
+
+| 
+| STORAGE_SYSTEM_OCIS_METADATA_BACKEND
+| The backend to use for storing metadata. Supported values are 'messagepack' and 'xattrs'. The setting 'messagepack' uses a dedicated file to store file metadata while 'xattrs' uses extended attributes to store file metadata. Defaults to 'messagepack'.
+| messagepack
+
+| xref:{s-path}/storage-users.adoc[Storage-Users]
+| STORAGE_USERS_FILEMETADATA_CACHE_SIZE
+| The maximum quantity of items in the user info cache. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not exclicitly set as default.
+| 0
+
+| 
+| STORAGE_USERS_ID_CACHE_SIZE
+| The maximum quantity of items in the user info cache. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not exclicitly set as default.
+| 0
+
+| 
+| STORAGE_USERS_OCIS_METADATA_BACKEND
+| The backend to use for storing metadata. Supported values are 'messagepack' and 'xattrs'. The setting 'messagepack' uses a dedicated file to store file metadata while 'xattrs' uses extended attributes to store file metadata. Defaults to 'messagepack'.
+| messagepack
+
+| 
+| STORAGE_USERS_S3NG_METADATA_BACKEND
+| The backend to use for storing metadata. Supported values are 'xattrs' and 'messagepack'. The setting 'xattrs' uses extended attributes to store file metadata while 'messagepack' uses a dedicated file to store file metadata. Defaults to 'xattrs'.
+| messagepack
+
+| The `Store` service has been removed completely
+| STORE_DATA_PATH
+| The directory where the filesystem storage will store ocis settings. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/store.
+| /var/lib/ocis/store
+
+| 
+| STORE_DEBUG_ADDR
+| Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.
+| 127.0.0.1:9464
+
+| 
+| STORE_DEBUG_PPROF
+| Enables pprof, which can be used for profiling.
+| false
+
+| 
+| STORE_DEBUG_TOKEN
+| Token to secure the metrics endpoint.
+| 
+
+| 
+| STORE_DEBUG_ZPAGES
+| Enables zpages, which can be used for collecting and viewing in-memory traces.
+| false
+
+| 
+| STORE_GRPC_ADDR
+| The bind address of the GRPC service.
+| 127.0.0.1:9460
+
+| 
+| STORE_LOG_COLOR
+| Activates colorized log output.
+| false
+
+| 
+| STORE_LOG_FILE
+| The path to the log file. Activates logging to this file if set.
+| 
+
+| 
+| STORE_LOG_LEVEL
+| The log level. Valid values are: 'panic', 'fatal', 'error', 'warn', 'info', 'debug', 'trace'.
+| 
+
+| 
+| STORE_LOG_PRETTY
+| Activates pretty log output.
+| false
+
+| 
+| STORE_TRACING_COLLECTOR
+| The HTTP endpoint for sending spans directly to a collector, i.e. http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.
+| 
+
+| 
+| STORE_TRACING_ENABLED
+| Activates tracing.
+| false
+
+| 
+| STORE_TRACING_ENDPOINT
+| The endpoint of the tracing agent.
+| 
+
+| 
+| STORE_TRACING_TYPE
+| The type of tracing. Defaults to '', which is the same as 'jaeger'. Allowed tracing types are 'jaeger' and '' as of now.
+| 
+
+| xref:{s-path}/userlog.adoc[Userlog]
+| USERLOG_STORE_SIZE
+| The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured. Defaults to 512 which is derived from the ocmem package though not exclicitly set as default.
+| 0
+
+| xref:{s-path}/web.adoc[Web]
+| WEB_ASSET_PATH
+| Serve ownCloud Web assets from a path on the filesystem instead of the builtin assets.
+| 
+
+| 
+| WEB_OPTION_DISABLE_PREVIEWS
+| Set this option to 'true' to disable previews in all the different web file listing views. This can speed up file listings in folders with many files. The only list view that is not affected by this setting is the trash bin, as it does not allow previewing at all.
+| false
+
+| 
+| WEB_OPTION_HOME_FOLDER
+| Specifies a folder that is used when the user navigates 'home'. Navigating home gets triggered by clicking on the 'All files' menu item. The user will not be jailed in that directory, it simply serves as a default location. A static location can be provided, or variables of the user object to come up with a user specific home path can be used. This uses the twig template variable style and allows picking a value or a substring of a value of the authenticated user. Examples are '/Shares', '/{{.Id}}' and '/{{substr 0 3 .Id}}/{{.Id}'.
+| 
+
+| 
+| WEB_OPTION_HOVERABLE_QUICK_ACTIONS
+| Set this option to 'true' to hide quick actions (buttons appearing on file rows) and only show them when the user hovers over the row with his mouse. Defaults to 'false'.
+| false
+
+| 
+| WEB_OPTION_OPEN_LINKS_WITH_DEFAULT_APP
+| Specifies whether single file link shares should be opened with the default app or not. If not opened by the default app, the Web UI just displays the file details.
+| true
+
+| 
+| WEB_OPTION_PREVIEW_FILE_MIMETYPES
+| A list of mimeTypes to specify which ones will be previewed in the UI. For example, to only preview jpg and text files, set this option to 'image/jpeg,text/plain'. See the Environment Variable Types description for more details.
+| [image/gif image/png image/jpeg text/plain image/tiff image/bmp image/x-ms-bmp application/vnd.geogebra.slides]
+
+|
+| WEB_OPTION_ROUTING_ID_BASED
+| Enable or disable fileIds being added to the URL. Defaults to 'true', because otherwise spaces with name clashes cannot be resolved correctly. Note: Only disable this if you can guarantee on the server side, that spaces of the same namespace cannot have name clashes.
+| true
+
+| 
+| WEB_OPTION_SHARING_RECIPIENTS_PER_PAGE
+| Sets the number of users shown as recipients in the dropdown menu when sharing resources.
+| 200
+
+| 
+| WEB_OPTION_SIDEBAR_SHARES_SHOW_ALL_ON_LOAD
+| Sets the list of the (link) shares list in the sidebar to be initially expanded. Default is a collapsed state, only showing the first three shares.
+| false
+
+|===
+

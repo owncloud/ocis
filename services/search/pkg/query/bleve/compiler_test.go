@@ -1,0 +1,665 @@
+package bleve
+
+import (
+	"testing"
+	"time"
+
+	"github.com/blevesearch/bleve/v2/search/query"
+	"github.com/owncloud/ocis/v2/ocis-pkg/ast"
+	tAssert "github.com/stretchr/testify/assert"
+)
+
+var timeMustParse = func(t *testing.T, ts string) time.Time {
+	tp, err := time.Parse(time.RFC3339Nano, ts)
+	if err != nil {
+		t.Fatalf("time.Parse(...) error = %v", err)
+	}
+
+	return tp
+}
+
+func Test_compile(t *testing.T) {
+	tests := []struct {
+		name    string
+		args    *ast.Ast
+		want    query.Query
+		wantErr bool
+	}{
+		{
+			name: `federated`,
+			args: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.StringNode{Value: "federated"},
+				},
+			},
+			want: query.NewConjunctionQuery([]query.Query{
+				query.NewQueryStringQuery(`Name:federated`),
+			}),
+			wantErr: false,
+		},
+		{
+			name: `"John Smith"`,
+			args: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.StringNode{Value: "John Smith"},
+				},
+			},
+			want: query.NewConjunctionQuery([]query.Query{
+				query.NewQueryStringQuery(`Name:john\ smith`),
+			}),
+			wantErr: false,
+		},
+		{
+			name: `"John Smith" Jane`,
+			args: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.StringNode{Key: "name", Value: "John Smith"},
+					&ast.OperatorNode{Value: "AND"},
+					&ast.StringNode{Key: "name", Value: "Jane"},
+				},
+			},
+			want: query.NewConjunctionQuery([]query.Query{
+				query.NewQueryStringQuery(`Name:john\ smith`),
+				query.NewQueryStringQuery(`Name:jane`),
+			}),
+			wantErr: false,
+		},
+		{
+			name: `tag:bestseller tag:book`,
+			args: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.StringNode{Key: "tag", Value: "bestseller"},
+					&ast.OperatorNode{Value: "AND"},
+					&ast.StringNode{Key: "tag", Value: "book"},
+				},
+			},
+			want: query.NewConjunctionQuery([]query.Query{
+				query.NewQueryStringQuery(`Tags:bestseller`),
+				query.NewQueryStringQuery(`Tags:book`),
+			}),
+			wantErr: false,
+		},
+		{
+			name: `name:"moby di*" OR tag:bestseller AND tag:book`,
+			args: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.StringNode{Key: "name", Value: "moby di*"},
+					&ast.OperatorNode{Value: "OR"},
+					&ast.StringNode{Key: "tag", Value: "bestseller"},
+					&ast.OperatorNode{Value: "AND"},
+					&ast.StringNode{Key: "tag", Value: "book"},
+				},
+			},
+			want: query.NewDisjunctionQuery([]query.Query{
+				query.NewQueryStringQuery(`Name:moby\ di*`),
+				query.NewConjunctionQuery([]query.Query{
+					query.NewQueryStringQuery(`Tags:bestseller`),
+					query.NewQueryStringQuery(`Tags:book`),
+				}),
+			}),
+			wantErr: false,
+		},
+		{
+			name: `a AND b OR c`,
+			args: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.StringNode{Value: "a"},
+					&ast.OperatorNode{Value: "AND"},
+					&ast.StringNode{Value: "b"},
+					&ast.OperatorNode{Value: "OR"},
+					&ast.StringNode{Value: "c"},
+				},
+			},
+			want: query.NewDisjunctionQuery([]query.Query{
+				query.NewConjunctionQuery([]query.Query{
+					query.NewQueryStringQuery(`Name:a`),
+					query.NewQueryStringQuery(`Name:b`),
+				}),
+				query.NewQueryStringQuery(`Name:c`),
+			}),
+			wantErr: false,
+		},
+		{
+			name: `a OR b AND c`,
+			args: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.StringNode{Value: "a"},
+					&ast.OperatorNode{Value: "OR"},
+					&ast.StringNode{Value: "b"},
+					&ast.OperatorNode{Value: "AND"},
+					&ast.StringNode{Value: "c"},
+				},
+			},
+			want: query.NewDisjunctionQuery([]query.Query{
+				query.NewQueryStringQuery(`Name:a`),
+				query.NewConjunctionQuery([]query.Query{
+					query.NewQueryStringQuery(`Name:b`),
+					query.NewQueryStringQuery(`Name:c`),
+				}),
+			}),
+			wantErr: false,
+		},
+		{
+			name: `(a OR b OR c) AND d`,
+			args: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.GroupNode{Nodes: []ast.Node{
+						&ast.StringNode{Value: "a"},
+						&ast.OperatorNode{Value: "OR"},
+						&ast.StringNode{Value: "b"},
+						&ast.OperatorNode{Value: "OR"},
+						&ast.StringNode{Value: "c"},
+					}},
+					&ast.OperatorNode{Value: "AND"},
+					&ast.StringNode{Value: "d"},
+				},
+			},
+			want: query.NewConjunctionQuery([]query.Query{
+				query.NewDisjunctionQuery([]query.Query{
+					query.NewQueryStringQuery(`Name:a`),
+					query.NewQueryStringQuery(`Name:b`),
+					query.NewQueryStringQuery(`Name:c`),
+				}),
+				query.NewQueryStringQuery(`Name:d`),
+			}),
+			wantErr: false,
+		},
+		{
+			name: `(name:"moby di*" OR tag:bestseller) AND tag:book`,
+			args: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.GroupNode{Nodes: []ast.Node{
+						&ast.StringNode{Key: "name", Value: "moby di*"},
+						&ast.OperatorNode{Value: "OR"},
+						&ast.StringNode{Key: "tag", Value: "bestseller"},
+					}},
+					&ast.OperatorNode{Value: "AND"},
+					&ast.StringNode{Key: "tag", Value: "book"},
+				},
+			},
+			want: query.NewConjunctionQuery([]query.Query{
+				query.NewDisjunctionQuery([]query.Query{
+					query.NewQueryStringQuery(`Name:moby\ di*`),
+					query.NewQueryStringQuery(`Tags:bestseller`),
+				}),
+				query.NewQueryStringQuery(`Tags:book`),
+			}),
+			wantErr: false,
+		},
+		{
+			name: `(name:"moby di*" OR tag:bestseller) AND tag:book AND NOT tag:read`,
+			args: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.GroupNode{Nodes: []ast.Node{
+						&ast.StringNode{Key: "name", Value: "moby di*"},
+						&ast.OperatorNode{Value: "OR"},
+						&ast.StringNode{Key: "tag", Value: "bestseller"},
+					}},
+					&ast.OperatorNode{Value: "AND"},
+					&ast.StringNode{Key: "tag", Value: "book"},
+					&ast.OperatorNode{Value: "AND"},
+					&ast.OperatorNode{Value: "NOT"},
+					&ast.StringNode{Key: "tag", Value: "read"},
+				},
+			},
+			want: query.NewConjunctionQuery([]query.Query{
+				query.NewDisjunctionQuery([]query.Query{
+					query.NewQueryStringQuery(`Name:moby\ di*`),
+					query.NewQueryStringQuery(`Tags:bestseller`),
+				}),
+				query.NewQueryStringQuery(`Tags:book`),
+				query.NewBooleanQuery(nil, nil, []query.Query{query.NewQueryStringQuery(`Tags:read`)}),
+			}),
+			wantErr: false,
+		},
+		{
+			name: `author:("John Smith" Jane)`,
+			args: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.GroupNode{
+						Key: "author",
+						Nodes: []ast.Node{
+							&ast.StringNode{Value: "John Smith"},
+							&ast.OperatorNode{Value: "AND"},
+							&ast.StringNode{Value: "Jane"},
+						},
+					},
+				},
+			},
+			want: query.NewConjunctionQuery([]query.Query{
+				query.NewQueryStringQuery(`author:john\ smith`),
+				query.NewQueryStringQuery(`author:jane`),
+			}),
+			wantErr: false,
+		},
+		{
+			name: `author:("John Smith" Jane) AND tag:bestseller`,
+			args: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.GroupNode{
+						Key: "author",
+						Nodes: []ast.Node{
+							&ast.StringNode{Value: "John Smith"},
+							&ast.OperatorNode{Value: "AND"},
+							&ast.StringNode{Value: "Jane"},
+						},
+					},
+					&ast.OperatorNode{Value: "AND"},
+					&ast.StringNode{Key: "tag", Value: "bestseller"},
+				},
+			},
+			want: query.NewConjunctionQuery([]query.Query{
+				query.NewQueryStringQuery(`author:john\ smith`),
+				query.NewQueryStringQuery(`author:jane`),
+				query.NewQueryStringQuery(`Tags:bestseller`),
+			}),
+			wantErr: false,
+		},
+		{
+			name: `id:b27d3bf1-b254-459f-92e8-bdba668d6d3f$d0648459-25fb-4ed8-8684-bc62c7dca29c!d0648459-25fb-4ed8-8684-bc62c7dca29c mtime>=2023-09-05T12:40:59.14741+02:00`,
+			args: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.StringNode{
+						Key:   "id",
+						Value: "b27d3bf1-b254-459f-92e8-bdba668d6d3f$d0648459-25fb-4ed8-8684-bc62c7dca29c!d0648459-25fb-4ed8-8684-bc62c7dca29c",
+					},
+					&ast.OperatorNode{Value: "AND"},
+					&ast.DateTimeNode{
+						Key:      "Mtime",
+						Operator: &ast.OperatorNode{Value: ">="},
+						Value:    timeMustParse(t, "2023-09-05T08:42:11.23554+02:00"),
+					},
+				},
+			},
+			want: query.NewConjunctionQuery([]query.Query{
+				query.NewQueryStringQuery(`ID:b27d3bf1-b254-459f-92e8-bdba668d6d3f$d0648459-25fb-4ed8-8684-bc62c7dca29c!d0648459-25fb-4ed8-8684-bc62c7dca29c`),
+				func() query.Query {
+					q := query.NewDateRangeInclusiveQuery(timeMustParse(t, "2023-09-05T08:42:11.23554+02:00"), time.Time{}, &[]bool{true}[0], nil)
+					q.FieldVal = "Mtime"
+					return q
+				}(),
+			}),
+			wantErr: false,
+		},
+		{
+			name: `StringNode value lowercase`,
+			args: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.StringNode{Value: "John Smith"},
+					&ast.OperatorNode{Value: "AND"},
+					&ast.StringNode{Key: "Hidden", Value: "T"},
+					&ast.OperatorNode{Value: "AND"},
+					&ast.StringNode{Key: "hidden", Value: "T"},
+				},
+			},
+			want: query.NewConjunctionQuery([]query.Query{
+				query.NewQueryStringQuery(`Name:john\ smith`),
+				query.NewQueryStringQuery(`Hidden:T`),
+				query.NewQueryStringQuery(`Hidden:T`),
+			}),
+			wantErr: false,
+		},
+		{
+			name: `NOT tag:physik`,
+			args: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.OperatorNode{Value: "NOT"},
+					&ast.StringNode{Key: "tag", Value: "physik"},
+				},
+			},
+			want: query.NewConjunctionQuery([]query.Query{
+				query.NewBooleanQuery(nil, nil, []query.Query{query.NewQueryStringQuery(`Tags:physik`)}),
+			}),
+			wantErr: false,
+		},
+		{
+			name: `ast.DateTimeNode`,
+			args: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.DateTimeNode{
+						Key: "mtime",
+						// "=" is not supported by bleve, ignore
+						Operator: &ast.OperatorNode{Value: "="},
+						Value:    timeMustParse(t, "2023-09-05T08:42:11.23554+02:00"),
+					},
+					&ast.OperatorNode{Value: "AND"},
+					&ast.DateTimeNode{
+						Key: "mtime",
+						// ":" is not supported by bleve, ignore
+						Operator: &ast.OperatorNode{Value: ":"},
+						Value:    timeMustParse(t, "2023-09-05T08:42:11.23554+02:00"),
+					},
+					&ast.OperatorNode{Value: "AND"},
+					&ast.DateTimeNode{
+						Key: "mtime",
+						// no operator, skip
+						Value: timeMustParse(t, "2023-09-05T08:42:11.23554+02:00"),
+					},
+					&ast.OperatorNode{Value: "AND"},
+					&ast.DateTimeNode{
+						Key:      "mtime",
+						Operator: &ast.OperatorNode{Value: ">"},
+						Value:    timeMustParse(t, "2023-09-05T08:42:11.23554+02:00"),
+					},
+					&ast.OperatorNode{Value: "AND"},
+					&ast.DateTimeNode{
+						Key:      "mtime",
+						Operator: &ast.OperatorNode{Value: ">="},
+						Value:    timeMustParse(t, "2023-09-05T08:42:11.23554+02:00"),
+					},
+					&ast.OperatorNode{Value: "AND"},
+					&ast.DateTimeNode{
+						Key:      "mtime",
+						Operator: &ast.OperatorNode{Value: "<"},
+						Value:    timeMustParse(t, "2023-09-05T08:42:11.23554+02:00"),
+					},
+					&ast.OperatorNode{Value: "AND"},
+					&ast.DateTimeNode{
+						Key:      "mtime",
+						Operator: &ast.OperatorNode{Value: "<="},
+						Value:    timeMustParse(t, "2023-09-05T08:42:11.23554+02:00"),
+					},
+				},
+			},
+			want: query.NewConjunctionQuery([]query.Query{
+				func() query.Query {
+					q := query.NewDateRangeInclusiveQuery(timeMustParse(t, "2023-09-05T08:42:11.23554+02:00"), time.Time{}, &[]bool{false}[0], nil)
+					q.FieldVal = "Mtime"
+					return q
+				}(),
+				func() query.Query {
+					q := query.NewDateRangeInclusiveQuery(timeMustParse(t, "2023-09-05T08:42:11.23554+02:00"), time.Time{}, &[]bool{true}[0], nil)
+					q.FieldVal = "Mtime"
+					return q
+				}(),
+				func() query.Query {
+					q := query.NewDateRangeInclusiveQuery(time.Time{}, timeMustParse(t, "2023-09-05T08:42:11.23554+02:00"), nil, &[]bool{false}[0])
+					q.FieldVal = "Mtime"
+					return q
+				}(),
+				func() query.Query {
+					q := query.NewDateRangeInclusiveQuery(time.Time{}, timeMustParse(t, "2023-09-05T08:42:11.23554+02:00"), nil, &[]bool{true}[0])
+					q.FieldVal = "Mtime"
+					return q
+				}(),
+			}),
+			wantErr: false,
+		},
+		{
+			name: `MimeType:document`,
+			args: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.StringNode{Key: "mediatype", Value: "document"},
+				},
+			},
+			want: query.NewDisjunctionQuery([]query.Query{
+				query.NewQueryStringQuery(`MimeType:application/msword`),
+				query.NewQueryStringQuery(`MimeType:application/vnd.openxmlformats-officedocument.wordprocessingml.document`),
+				query.NewQueryStringQuery(`MimeType:application/vnd.openxmlformats-officedocument.wordprocessingml.form`),
+				query.NewQueryStringQuery(`MimeType:application/vnd.oasis.opendocument.text`),
+				query.NewQueryStringQuery(`MimeType:text/plain`),
+				query.NewQueryStringQuery(`MimeType:text/markdown`),
+				query.NewQueryStringQuery(`MimeType:application/rtf`),
+				query.NewQueryStringQuery(`MimeType:application/vnd.apple.pages`),
+			}),
+			wantErr: false,
+		},
+		{
+			name: `MimeType:document AND *tdd*`,
+			args: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.StringNode{Key: "mediatype", Value: "document"},
+					&ast.OperatorNode{Value: "AND"},
+					&ast.StringNode{Key: "name", Value: "*tdd*"},
+				},
+			},
+			want: query.NewConjunctionQuery([]query.Query{
+				query.NewDisjunctionQuery([]query.Query{
+					query.NewQueryStringQuery(`MimeType:application/msword`),
+					query.NewQueryStringQuery(`MimeType:application/vnd.openxmlformats-officedocument.wordprocessingml.document`),
+					query.NewQueryStringQuery(`MimeType:application/vnd.openxmlformats-officedocument.wordprocessingml.form`),
+					query.NewQueryStringQuery(`MimeType:application/vnd.oasis.opendocument.text`),
+					query.NewQueryStringQuery(`MimeType:text/plain`),
+					query.NewQueryStringQuery(`MimeType:text/markdown`),
+					query.NewQueryStringQuery(`MimeType:application/rtf`),
+					query.NewQueryStringQuery(`MimeType:application/vnd.apple.pages`),
+				}),
+				query.NewQueryStringQuery(`Name:*tdd*`),
+			}),
+			wantErr: false,
+		},
+		{
+			name: `MimeType:document OR MimeType:pdf AND *tdd*`,
+			args: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.StringNode{Key: "mediatype", Value: "document"},
+					&ast.OperatorNode{Value: "OR"},
+					&ast.StringNode{Key: "mediatype", Value: "pdf"},
+					&ast.OperatorNode{Value: "AND"},
+					&ast.StringNode{Key: "name", Value: "*tdd*"},
+				},
+			},
+			want: query.NewDisjunctionQuery([]query.Query{
+				query.NewQueryStringQuery(`MimeType:application/msword`),
+				query.NewQueryStringQuery(`MimeType:application/vnd.openxmlformats-officedocument.wordprocessingml.document`),
+				query.NewQueryStringQuery(`MimeType:application/vnd.openxmlformats-officedocument.wordprocessingml.form`),
+				query.NewQueryStringQuery(`MimeType:application/vnd.oasis.opendocument.text`),
+				query.NewQueryStringQuery(`MimeType:text/plain`),
+				query.NewQueryStringQuery(`MimeType:text/markdown`),
+				query.NewQueryStringQuery(`MimeType:application/rtf`),
+				query.NewQueryStringQuery(`MimeType:application/vnd.apple.pages`),
+				query.NewConjunctionQuery([]query.Query{
+					query.NewQueryStringQuery(`MimeType:application/pdf`),
+					query.NewQueryStringQuery(`Name:*tdd*`),
+				}),
+			}),
+			wantErr: false,
+		},
+		{
+			name: `(MimeType:document OR MimeType:pdf) AND *tdd*`,
+			args: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.GroupNode{Nodes: []ast.Node{
+						&ast.StringNode{Key: "mediatype", Value: "document"},
+						&ast.OperatorNode{Value: "OR"},
+						&ast.StringNode{Key: "mediatype", Value: "pdf"},
+					}},
+					&ast.OperatorNode{Value: "AND"},
+					&ast.StringNode{Key: "name", Value: "*tdd*"},
+				},
+			},
+			want: query.NewConjunctionQuery([]query.Query{
+				query.NewDisjunctionQuery([]query.Query{
+					query.NewQueryStringQuery(`MimeType:application/msword`),
+					query.NewQueryStringQuery(`MimeType:application/vnd.openxmlformats-officedocument.wordprocessingml.document`),
+					query.NewQueryStringQuery(`MimeType:application/vnd.openxmlformats-officedocument.wordprocessingml.form`),
+					query.NewQueryStringQuery(`MimeType:application/vnd.oasis.opendocument.text`),
+					query.NewQueryStringQuery(`MimeType:text/plain`),
+					query.NewQueryStringQuery(`MimeType:text/markdown`),
+					query.NewQueryStringQuery(`MimeType:application/rtf`),
+					query.NewQueryStringQuery(`MimeType:application/vnd.apple.pages`),
+					query.NewQueryStringQuery(`MimeType:application/pdf`),
+				}),
+				query.NewQueryStringQuery(`Name:*tdd*`),
+			}),
+			wantErr: false,
+		},
+		{
+			name: `(MimeType:pdf OR MimeType:document) AND *tdd*`,
+			args: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.GroupNode{Nodes: []ast.Node{
+						&ast.StringNode{Key: "mediatype", Value: "pdf"},
+						&ast.OperatorNode{Value: "OR"},
+						&ast.StringNode{Key: "mediatype", Value: "document"},
+					}},
+					&ast.OperatorNode{Value: "AND"},
+					&ast.StringNode{Key: "name", Value: "*tdd*"},
+				},
+			},
+			want: query.NewConjunctionQuery([]query.Query{
+				query.NewDisjunctionQuery([]query.Query{
+					query.NewQueryStringQuery(`MimeType:application/pdf`),
+					query.NewQueryStringQuery(`MimeType:application/msword`),
+					query.NewQueryStringQuery(`MimeType:application/vnd.openxmlformats-officedocument.wordprocessingml.document`),
+					query.NewQueryStringQuery(`MimeType:application/vnd.openxmlformats-officedocument.wordprocessingml.form`),
+					query.NewQueryStringQuery(`MimeType:application/vnd.oasis.opendocument.text`),
+					query.NewQueryStringQuery(`MimeType:text/plain`),
+					query.NewQueryStringQuery(`MimeType:text/markdown`),
+					query.NewQueryStringQuery(`MimeType:application/rtf`),
+					query.NewQueryStringQuery(`MimeType:application/vnd.apple.pages`),
+				}),
+				query.NewQueryStringQuery(`Name:*tdd*`),
+			}),
+			wantErr: false,
+		},
+		{
+			name: `John Smith`,
+			args: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.StringNode{Value: "John Smith +-=&|><!(){}[]^\"~: "},
+				},
+			},
+			want: query.NewConjunctionQuery([]query.Query{
+				query.NewQueryStringQuery(`Name:john\ smith\ \+\-\=\&\|\>\<\!\(\)\{\}\[\]\^\"\~\:\ `),
+			}),
+			wantErr: false,
+		},
+		{
+			name: `photo.takenDateTime>=2024-01-01`,
+			args: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.DateTimeNode{
+						Key:      "photo.takenDateTime",
+						Operator: &ast.OperatorNode{Value: ">="},
+						Value:    timeMustParse(t, "2024-01-01T00:00:00Z"),
+					},
+				},
+			},
+			want: query.NewConjunctionQuery([]query.Query{
+				func() query.Query {
+					q := query.NewDateRangeInclusiveQuery(timeMustParse(t, "2024-01-01T00:00:00Z"), time.Time{}, &[]bool{true}[0], nil)
+					q.FieldVal = "photo.takenDateTime"
+					return q
+				}(),
+			}),
+			wantErr: false,
+		},
+		{
+			name: `photo.takenDateTime<2024-12-31`,
+			args: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.DateTimeNode{
+						Key:      "photo.takenDateTime",
+						Operator: &ast.OperatorNode{Value: "<"},
+						Value:    timeMustParse(t, "2024-12-31T00:00:00Z"),
+					},
+				},
+			},
+			want: query.NewConjunctionQuery([]query.Query{
+				func() query.Query {
+					q := query.NewDateRangeInclusiveQuery(time.Time{}, timeMustParse(t, "2024-12-31T00:00:00Z"), nil, &[]bool{false}[0])
+					q.FieldVal = "photo.takenDateTime"
+					return q
+				}(),
+			}),
+			wantErr: false,
+		},
+		{
+			name: `photo.cameraMake:canon`,
+			args: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.StringNode{Key: "photo.cameraMake", Value: "canon"},
+				},
+			},
+			want: query.NewConjunctionQuery([]query.Query{
+				query.NewQueryStringQuery(`photo.cameraMake:canon`),
+			}),
+			wantErr: false,
+		},
+		{
+			name: `photo.iso query`,
+			args: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.StringNode{Key: "photo.iso", Value: "100"},
+				},
+			},
+			want: query.NewConjunctionQuery([]query.Query{
+				query.NewQueryStringQuery(`photo.iso:100`),
+			}),
+			wantErr: false,
+		},
+	}
+
+	assert := tAssert.New(t)
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := compile(tt.args)
+
+			if (err != nil) != tt.wantErr {
+				t.Errorf("compile() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			assert.Equal(tt.want, got)
+		})
+	}
+}
+
+func Test_escape(t *testing.T) {
+	type args struct {
+		str string
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{
+			name: "all escaped",
+			args: args{
+				`+-=&|><!(){}[]^"~:\/ `,
+			},
+			want: `\+\-\=\&\|\>\<\!\(\)\{\}\[\]\^\"\~\:\\\/\ `,
+		},
+		{
+			name: "no one escaped",
+			args: args{
+				`@#$%`,
+			},
+			want: `@#$%`,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tAssert.Equalf(t, tt.want, bleveEscaper.Replace(tt.args.str), "bleveEscaper(%v)", tt.args.str)
+		})
+	}
+}
+
+func Test_getField(t *testing.T) {
+	tests := []struct {
+		name  string
+		input string
+		want  string
+	}{
+		{"empty defaults to Name", "", "Name"},
+		{"regular field mtime", "mtime", "Mtime"},
+		{"regular field name", "name", "Name"},
+		{"photo.takenDateTime", "photo.takendatetime", "photo.takenDateTime"},
+		{"photo.cameraMake", "photo.cameramake", "photo.cameraMake"},
+		{"photo.cameraModel", "photo.cameramodel", "photo.cameraModel"},
+		{"photo.iso", "photo.iso", "photo.iso"},
+		{"case insensitive Photo.TakenDateTime", "Photo.TakenDateTime", "photo.takenDateTime"},
+		{"case insensitive PHOTO.CAMERAMAKE", "PHOTO.CAMERAMAKE", "photo.cameraMake"},
+		{"unknown photo field passthrough", "photo.unknown", "photo.unknown"},
+		{"unknown prefix passthrough", "unknown.field", "unknown.field"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := getField(tt.input); got != tt.want {
+				t.Errorf("getField(%q) = %q, want %q", tt.input, got, tt.want)
+			}
+		})
+	}
+}

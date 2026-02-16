@@ -1,0 +1,26 @@
+// collected through docs/helpers/extendedEnv.go
+
+[caption=]
+.Environment variables with extended scope not included in a service
+[width="100%",cols="35%,10%,18%,~"",options="header"]
+|===
+| Name
+| Type
+| Default Value
+| Description
+{{- range .Variables}}
+
+{{- if .Ignore }}
+    {{ continue }}
+{{- end }}
+
+a| `{{- .Name }}` +
+a| [subs=-attributes]
+++{{ .Type }} ++
+a| [subs=-attributes]
+++{{.DefaultValue}} ++
+a| [subs=-attributes]
+++{{.Description}} ++
+
+{{- end }}
+|===

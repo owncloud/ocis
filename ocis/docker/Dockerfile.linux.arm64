@@ -1,0 +1,41 @@
+FROM arm64v8/alpine:3.23.3
+
+ARG VERSION=""
+ARG REVISION=""
+
+RUN apk add --no-cache attr bash ca-certificates curl inotify-tools libc6-compat mailcap tree vips patch && \
+	echo 'hosts: files dns' >| /etc/nsswitch.conf
+
+LABEL maintainer="ownCloud GmbH <devops@owncloud.com>" \
+  org.opencontainers.image.title="ownCloud Infinite Scale" \
+  org.opencontainers.image.vendor="ownCloud GmbH" \
+  org.opencontainers.image.authors="ownCloud GmbH" \
+  org.opencontainers.image.description="oCIS - ownCloud Infinite Scale is a modern file-sync and share platform" \
+  org.opencontainers.image.licenses="Apache-2.0" \
+  org.opencontainers.image.documentation="https://github.com/owncloud/ocis" \
+  org.opencontainers.image.url="https://hub.docker.com/r/owncloud/ocis" \
+  org.opencontainers.image.source="https://github.com/owncloud/ocis" \
+  org.opencontainers.image.version="${VERSION}" \
+  org.opencontainers.image.revision="${REVISION}"
+
+RUN addgroup -g 1000 -S ocis-group && \
+  adduser -S --ingroup ocis-group --uid 1000 ocis-user --home /var/lib/ocis
+
+RUN mkdir -p /var/lib/ocis && \
+ chown -R ocis-user:ocis-group /var/lib/ocis && \
+ chmod -R 751 /var/lib/ocis && \
+ mkdir -p /etc/ocis && \
+ chown -R ocis-user:ocis-group /etc/ocis && \
+ chmod -R 751 /etc/ocis
+
+VOLUME [ "/var/lib/ocis", "/etc/ocis" ]
+WORKDIR /var/lib/ocis
+
+USER 1000
+
+EXPOSE 9200/tcp
+
+ENTRYPOINT ["/usr/bin/ocis"]
+CMD ["server"]
+
+COPY dist/binaries/ocis-linux-arm64 /usr/bin/ocis

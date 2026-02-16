@@ -1,0 +1,38 @@
+Feature: Copy test
+  As a user
+  I want to check the PROPFIND response
+  So that I can make sure that the response contains all the relevant values
+
+
+  Background:
+    Given these users have been created with default attributes:
+      | username |
+      | Alice    |
+    And using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "new-space" with the default quota using the Graph API
+
+
+  Scenario: check the COPY response headers
+    Given user "Alice" has uploaded a file inside space "new-space" with content "some content" to "testfile.txt"
+    And user "Alice" has created a folder "new" in space "new-space"
+    When user "Alice" copies file "testfile.txt" from space "new-space" to "/new/testfile.txt" inside space "new-space" with following headers using the WebDAV API
+      | header | value      |
+      | Origin | %base_url% |
+    Then the HTTP status code should be "201"
+    And the following headers should match these regular expressions
+      | Oc-Fileid                   | /^[a-f0-9!\$\-]{110}$/ |
+      | Access-Control-Allow-Origin | /^%base_url%$/         |
+      | X-Request-Id                | %request_id_pattern%   |
+
+  @issue-10809
+  Scenario: copy a folder with Transfer-Encoding: chunked header
+    Given user "Alice" has created a folder "folder1" in space "new-space"
+    And user "Alice" has created a folder "folder2" in space "new-space"
+    When user "Alice" copies folder "folder2" from space "new-space" to "folder1/folder2" inside space "new-space" with following headers using the WebDAV API
+      | header            | value   |
+      # NOTE: requires system curl version >= 8.12.0
+      | Transfer-Encoding | chunked |
+    Then the HTTP status code should be "201"
+    And for user "Alice" folder "folder1" of the space "new-space" should contain these entries:
+      | folder2 |

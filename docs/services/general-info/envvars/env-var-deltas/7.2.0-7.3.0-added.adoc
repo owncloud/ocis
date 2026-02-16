@@ -1,0 +1,22 @@
+// # Added Variables between oCIS 7.2.0 and oCIS 7.3.0
+// commenting the headline to make it better includable
+
+// table created per 2025.09.22
+// the table should be recreated/updated on source () changes
+
+[width="100%",cols="~,~,~,~",options="header"]
+|===
+| Service | Variable | Description | Default
+
+| xref:{s-path}/collaboration.adoc[Collaboration]
+| COLLABORATION_APP_PRODUCT_EDITION
+| The WebOffice app edition defines the capabilities specific to the product such as CE - Community Edition, EE - Enterprise Edition DE - Developer Edition, etc. Currently supported values are limited to OnlyOffice and are: 'ce', 'ee' or 'de' and  default to empty which is equal to ce). See the documentation for more details.
+| 
+
+| 
+| COLLABORATION_WOPI_ENABLE_MOBILE
+| Enable the mobile web view for office app. This feature applies to OnlyOffice.  See the documentation for more details.
+| false
+
+|===
+

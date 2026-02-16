@@ -1,0 +1,12 @@
+// # Removed Variables between oCIS 7.0.0 and oCIS 7.1.0
+// commenting the headline to make it better includable
+
+// table created per 2025.01.10
+// the table should be recreated/updated on source () changes
+
+[width="100%",cols="~,~,~,~",options="header"]
+|===
+| Service | Variable | Description | Default
+
+|===
+

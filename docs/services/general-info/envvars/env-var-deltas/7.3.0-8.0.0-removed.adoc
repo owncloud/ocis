@@ -1,0 +1,17 @@
+// # Removed Variables between oCIS 7.3.0 and oCIS 8.0.0
+// commenting the headline to make it better includable
+
+// table created per 2026.01.22
+// the table should be recreated/updated on source () changes
+
+[width="100%",cols="~,~,~,~",options="header"]
+|===
+| Service | Variable | Description | Default
+
+| xref:{s-path}/frontend.adoc[Frontend]
+| OCIS_SHOW_USER_EMAIL_IN_RESULTS
+| Include user email addresses in responses. If absent or set to false emails will be omitted from results. Please note that admin users can always see all email addresses.
+| false
+
+|===
+

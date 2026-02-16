@@ -1,0 +1,10 @@
+.idea/
+.vscode/
+.DS_Store
+old.go
+old_test.go
+file.txt
+user_agents.txt
+ua2.go
+settings.json
+benchmarks.txt

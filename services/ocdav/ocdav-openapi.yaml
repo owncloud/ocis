@@ -1,0 +1,483 @@
+openapi: 3.1.0
+info:
+  title: oCIS WebDAV API
+  description: |
+    The oCIS WebDAV API provides Web Distributed Authoring and Versioning (WebDAV) functionality for file and folder 
+    management, metadata operations, and resource locking. WebDAV extends HTTP/1.1 with additional methods, headers, 
+    and content-types for comprehensive resource management.
+    
+    This API is one of the central interfaces that ownCloud clients use for handling file resources, metadata, and locks.
+    It supports the full WebDAV specification (RFC 4918) with ownCloud-specific extensions.
+    
+    **Key Features:**
+    - File and folder operations (create, read, update, delete)
+    - Property management and metadata operations
+    - Resource locking and collision avoidance
+    - Directory listings and resource discovery
+    - Resumable uploads via TUS protocol integration
+    - ownCloud-specific properties and extensions
+    
+    **WebDAV Methods:**
+    This API uses standard HTTP methods where possible, and documents WebDAV-specific methods 
+    using POST with method override headers for compatibility with OpenAPI tooling.
+  version: 1.0.0
+  contact:
+    name: ownCloud
+    url: https://github.com/owncloud/ocis
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+
+servers:
+  - url: https://your-ocis-instance.com
+    description: oCIS instance
+
+security:
+  - BearerAuth: []
+  - BasicAuth: []
+
+paths:
+  /dav/spaces/{resourceId}:
+    parameters:
+      - $ref: '#/components/parameters/ResourceId'
+    
+    get:
+      summary: Download Resource
+      description: |
+        Downloads a file or retrieves information about a folder. This is the standard HTTP GET method 
+        applied to WebDAV resources. For files, it returns the file content with appropriate headers. 
+        For folders, it may return an HTML representation or redirect to a PROPFIND operation.
+      operationId: downloadResource
+      tags:
+        - Resource Operations
+      parameters:
+        - $ref: '#/components/parameters/PathParam'
+        - name: Range
+          in: header
+          description: Request specific byte ranges of the file
+          schema:
+            type: string
+            example: "bytes=0-1023"
+      responses:
+        '200':
+          description: Resource content retrieved successfully
+          headers:
+            Content-Type:
+              schema:
+                type: string
+              description: MIME type of the resource
+            Content-Length:
+              schema:
+                type: integer
+              description: Size of the resource in bytes
+            ETag:
+              schema:
+                type: string
+              description: Entity tag for the resource
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: binary
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      summary: Upload/Update Resource
+      description: |
+        Creates a new file or completely replaces the content of an existing file. This is the primary method 
+        for uploading files to the WebDAV server. The entire file content must be provided in the request body.
+      operationId: uploadResource
+      tags:
+        - Resource Operations
+      parameters:
+        - $ref: '#/components/parameters/PathParam'
+        - name: X-OC-Mtime
+          in: header
+          description: Custom modification time (Unix timestamp)
+          schema:
+            type: integer
+            example: 1692369418
+      requestBody:
+        required: true
+        content:
+          '*/*':
+            schema:
+              type: string
+              format: binary
+      responses:
+        '201':
+          description: File created successfully
+        '204':
+          description: File updated successfully
+
+    delete:
+      summary: Delete Resource
+      description: |
+        Permanently deletes a file or folder from the WebDAV server. For folders, this operation 
+        recursively deletes all contained files and subfolders.
+      operationId: deleteResource
+      tags:
+        - Resource Operations
+      parameters:
+        - $ref: '#/components/parameters/PathParam'
+      responses:
+        '204':
+          description: Resource deleted successfully
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /dav/spaces/{resourceId}/{path}:
+    parameters:
+      - $ref: '#/components/parameters/ResourceId'
+      - $ref: '#/components/parameters/PathParam'
+
+    post:
+      summary: WebDAV Operations (PROPFIND, PROPPATCH, MKCOL, etc.)
+      description: |
+        This endpoint handles various WebDAV methods using POST with method override headers.
+        The specific WebDAV method is indicated by the X-HTTP-Method-Override header.
+        
+        **Supported WebDAV Methods:**
+        - **PROPFIND**: Retrieve properties and metadata from resources
+        - **PROPPATCH**: Update properties on resources  
+        - **MKCOL**: Create collections (directories)
+        - **COPY**: Copy resources to new locations
+        - **MOVE**: Move resources to new locations
+        - **LOCK**: Create locks on resources
+        - **UNLOCK**: Remove locks from resources
+      operationId: webdavOperation
+      tags:
+        - WebDAV Operations
+      parameters:
+        - name: X-HTTP-Method-Override
+          in: header
+          required: true
+          description: The WebDAV method to execute
+          schema:
+            type: string
+            enum: ['PROPFIND', 'PROPPATCH', 'MKCOL', 'COPY', 'MOVE', 'LOCK', 'UNLOCK']
+        - name: Depth
+          in: header
+          description: Depth for operations that support it (PROPFIND, COPY, LOCK)
+          schema:
+            type: string
+            enum: ['0', '1', 'infinity']
+        - name: Destination
+          in: header
+          description: Destination URI for COPY and MOVE operations
+          schema:
+            type: string
+            format: uri
+        - name: Overwrite
+          in: header
+          description: Whether to overwrite existing destination (COPY, MOVE)
+          schema:
+            type: string
+            enum: ['T', 'F']
+        - name: Lock-Token
+          in: header
+          description: Lock token for UNLOCK operations
+          schema:
+            type: string
+        - name: Timeout
+          in: header
+          description: Lock timeout for LOCK operations
+          schema:
+            type: string
+            example: "Second-3600"
+      requestBody:
+        description: Request body varies by WebDAV method
+        content:
+          application/xml:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/PropfindRequest'
+                - $ref: '#/components/schemas/ProppatchRequest'
+                - $ref: '#/components/schemas/LockRequest'
+            examples:
+              propfind:
+                summary: PROPFIND request
+                value: |
+                  <?xml version="1.0"?>
+                  <d:propfind xmlns:d="DAV:">
+                    <d:allprop/>
+                  </d:propfind>
+              proppatch:
+                summary: PROPPATCH request
+                value: |
+                  <?xml version="1.0"?>
+                  <d:propertyupdate xmlns:d="DAV:" xmlns:oc="http://owncloud.org/ns">
+                    <d:set>
+                      <d:prop>
+                        <oc:favorite>1</oc:favorite>
+                      </d:prop>
+                    </d:set>
+                  </d:propertyupdate>
+              lock:
+                summary: LOCK request
+                value: |
+                  <?xml version="1.0"?>
+                  <d:lockinfo xmlns:d="DAV:">
+                    <d:lockscope><d:exclusive/></d:lockscope>
+                    <d:locktype><d:write/></d:locktype>
+                    <d:owner>John Doe</d:owner>
+                  </d:lockinfo>
+      responses:
+        '200':
+          description: Operation successful (LOCK)
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/LockResponse'
+        '201':
+          description: Resource created (MKCOL, COPY, MOVE)
+        '204':
+          description: Operation successful (PROPPATCH, UNLOCK, MOVE, COPY)
+        '207':
+          description: Multi-status response (PROPFIND, partial operations)
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/MultistatusResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '423':
+          description: Resource is locked
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/DAVError'
+
+    patch:
+      summary: Upload File Chunk (TUS Protocol)
+      description: |
+        Uploads a chunk of data to an existing upload session. This is the core operation of the TUS
+        resumable upload protocol, allowing files to be uploaded in multiple chunks that can be
+        resumed if interrupted.
+      operationId: uploadFileChunk
+      tags:
+        - Upload Operations
+      parameters:
+        - name: Tus-Resumable
+          in: header
+          required: true
+          description: TUS protocol version
+          schema:
+            type: string
+            example: "1.0.0"
+        - name: Upload-Offset
+          in: header
+          required: true
+          description: Byte offset where this chunk should be written
+          schema:
+            type: integer
+            example: 0
+        - name: Content-Type
+          in: header
+          required: true
+          description: Must be application/offset+octet-stream
+          schema:
+            type: string
+            const: "application/offset+octet-stream"
+      requestBody:
+        required: true
+        content:
+          application/offset+octet-stream:
+            schema:
+              type: string
+              format: binary
+      responses:
+        '204':
+          description: Chunk uploaded successfully
+          headers:
+            Upload-Offset:
+              schema:
+                type: integer
+              description: Current upload offset after this chunk
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /dav/spaces/{resourceId}/{path}/upload:
+    parameters:
+      - $ref: '#/components/parameters/ResourceId'
+      - $ref: '#/components/parameters/PathParam'
+
+    post:
+      summary: Create Upload Session (TUS Protocol)
+      description: |
+        Creates a new resumable upload session using the TUS protocol. This endpoint is used to initiate 
+        large file uploads that can be resumed if interrupted.
+      operationId: createUploadSession
+      tags:
+        - Upload Operations
+      parameters:
+        - name: Tus-Resumable
+          in: header
+          required: true
+          description: TUS protocol version
+          schema:
+            type: string
+            example: "1.0.0"
+        - name: Upload-Length
+          in: header
+          required: true
+          description: Total size of the file to be uploaded
+          schema:
+            type: integer
+            example: 1048576
+        - name: Upload-Metadata
+          in: header
+          description: Base64-encoded metadata key-value pairs
+          schema:
+            type: string
+            example: "filename dGVzdC50eHQ="
+      responses:
+        '201':
+          description: Upload session created successfully
+          headers:
+            Location:
+              schema:
+                type: string
+                format: uri
+              description: URL for upload operations
+            Tus-Resumable:
+              schema:
+                type: string
+              description: TUS protocol version
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Bearer token authentication using JWT tokens
+    BasicAuth:
+      type: http
+      scheme: basic
+      description: Basic authentication (for development only)
+
+  parameters:
+    ResourceId:
+      name: resourceId
+      in: path
+      required: true
+      description: Unique identifier of the WebDAV resource/space
+      schema:
+        type: string
+        example: "storage-users-1$some-admin-user-id-0000-000000000000"
+    
+    PathParam:
+      name: path
+      in: path
+      required: false
+      description: Relative path within the resource
+      schema:
+        type: string
+        example: "Documents/example.txt"
+      style: simple
+      explode: false
+
+  responses:
+    BadRequest:
+      description: Bad request - malformed request or invalid parameters
+      content:
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/DAVError'
+
+    Forbidden:
+      description: Forbidden - insufficient permissions
+      content:
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/DAVError'
+
+    NotFound:
+      description: Not found - resource does not exist
+      content:
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/DAVError'
+
+    Conflict:
+      description: Conflict - request conflicts with current resource state
+      content:
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/DAVError'
+
+  schemas:
+    PropfindRequest:
+      type: object
+      description: PROPFIND request body for property discovery
+      xml:
+        name: propfind
+        namespace: "DAV:"
+
+    ProppatchRequest:
+      type: object
+      description: PROPPATCH request body for property updates
+      xml:
+        name: propertyupdate
+        namespace: "DAV:"
+
+    LockRequest:
+      type: object
+      description: LOCK request body for resource locking
+      xml:
+        name: lockinfo
+        namespace: "DAV:"
+
+    LockResponse:
+      type: object
+      description: LOCK response body with lock information
+      xml:
+        name: prop
+        namespace: "DAV:"
+
+    MultistatusResponse:
+      type: object
+      description: Multi-status response for operations affecting multiple resources
+      xml:
+        name: multistatus
+        namespace: "DAV:"
+
+    DAVError:
+      type: object
+      description: WebDAV error response
+      xml:
+        name: error
+        namespace: "DAV:"
+      properties:
+        exception:
+          type: string
+          description: Exception class name
+        message:
+          type: string
+          description: Human-readable error message
+
+tags:
+  - name: Resource Operations
+    description: Basic file and folder operations (GET, PUT, DELETE)
+  - name: WebDAV Operations
+    description: WebDAV-specific operations (PROPFIND, PROPPATCH, MKCOL, COPY, MOVE, LOCK, UNLOCK)
+  - name: Upload Operations
+    description: Resumable file upload operations (TUS protocol)
+
+externalDocs:
+  description: WebDAV RFC 4918
+  url: https://datatracker.ietf.org/doc/html/rfc4918

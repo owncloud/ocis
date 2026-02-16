@@ -1,0 +1,40 @@
+{
+    "konnect": {
+        "consent": {
+            "allowButton": {},
+            "cancelButton": {},
+            "tooltip": {}
+        },
+        "chooseaccount": {
+            "useOther": {
+                "persona": {}
+            }
+        },
+        "scopeDescription": {},
+        "login": {
+            "usernameField": {
+                "placeholder": {}
+            },
+            "nextButton": {},
+            "passwordField": {},
+            "retryButton": {}
+        },
+        "error": {
+            "login": {
+                "validate": {}
+            },
+            "http": {}
+        },
+        "loading": {
+            "error": {}
+        },
+        "goodbye": {
+            "confirm": {},
+            "message": {},
+            "signoutButton": {}
+        },
+        "welcome": {
+            "signoutButton": {}
+        }
+    }
+}

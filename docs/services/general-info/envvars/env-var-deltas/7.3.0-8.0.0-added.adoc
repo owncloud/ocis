@@ -1,0 +1,147 @@
+// # Added Variables between oCIS 7.3.0 and oCIS 8.0.0
+// commenting the headline to make it better includable
+
+// table created per 2026.01.21
+// the table should be recreated/updated on source () changes
+
+[width="100%",cols="~,~,~,~",options="header"]
+|===
+| Service | Variable | Description | Default
+
+| xref:{s-path}/collaboration.adoc[Collaboration]
+| COLLABORATION_WOPI_DISABLED_EXTENSIONS
+| List of extensions to disable: Disabling an extension will make it unavailable to the Office web front end. The list is comma-separated with no spaces between the items, such as 'docx,xlsx,pptx'.
+| []
+
+| xref:{s-path}/graph.adoc[Graph]
+| GRAPH_LDAP_EXTERNAL_ID_ATTRIBUTE
+| LDAP attribute that references the external ID of users during the provisioning process. The final ID is provided by an external identity provider. If it is not set, a default attribute will be used instead.
+| owncloudExternalID
+
+|
+| GRAPH_LDAP_REQUIRE_EXTERNAL_ID
+| If enabled, the 'OCIS_LDAP_USER_SCHEMA_EXTERNAL_ID' is used as primary identifier for the provisioning API.
+| false
+
+|
+| OCIS_LDAP_USER_SCHEMA_EXTERNAL_ID
+| LDAP attribute that references the external ID of users during the provisioning process. The final ID is provided by an external identity provider. If it is not set, a default attribute will be used instead.
+| owncloudExternalID
+
+|
+| OCIS_LDAP_INSTANCE_MAPPER_BASE_DN
+| BaseDN of the 'instancename to instanceid' mapper in LDAP. Requires OCIS_MULTI_INSTANCE_ENABLED.
+| 
+
+|
+| OCIS_LDAP_INSTANCE_MAPPER_ENABLED
+| The InstanceMapper allows mapping instance names (user readable) to instance IDs (machine readable) based on an LDAP query. See other _INSTANCE_MAPPER_ env vars. Requires OCIS_MULTI_INSTANCE_ENABLED.
+| false
+
+|
+| OCIS_LDAP_INSTANCE_MAPPER_ID_ATTRIBUTE
+| LDAP Attribute of the instance ID. Requires OCIS_MULTI_INSTANCE_ENABLED.
+| 
+
+|
+| OCIS_LDAP_INSTANCE_MAPPER_NAME_ATTRIBUTE
+| LDAP Attribute of the instance name. Requires OCIS_MULTI_INSTANCE_ENABLED.
+| 
+
+|
+| OCIS_LDAP_CROSS_INSTANCE_REFERENCE_TEMPLATE
+| Template for the users unique reference across oCIS instances. Requires OCIS_MULTI_INSTANCE_ENABLED.
+| 
+
+|
+| OCIS_LDAP_INSTANCE_URL_TEMPLATE
+| Template for the instance URL. Requires OCIS_MULTI_INSTANCE_ENABLED.
+| 
+
+|
+| OCIS_LDAP_GROUP_AFFILIATION_ATTRIBUTE
+| LDAP Attribute to signal which instance the group is belonging to. Requires OCIS_MULTI_INSTANCE_ENABLED.
+| 
+
+|
+| OCIS_LDAP_PRECISE_SEARCH_ATTRIBUTE
+| LDAP Attribute to be used for searching users on other instances. Requires OCIS_MULTI_INSTANCE_ENABLED.
+| 
+
+|
+| OCIS_LDAP_USER_GUEST_ATTRIBUTE
+| LDAP Attribute to signal the user is guest of an instance. Requires OCIS_MULTI_INSTANCE_ENABLED.
+| 
+
+|
+| OCIS_LDAP_USER_MEMBER_ATTRIBUTE
+| LDAP Attribute to signal the user is member of an instance. Requires OCIS_MULTI_INSTANCE_ENABLED.
+| 
+
+|
+| OCIS_MULTI_INSTANCE_QUERY_TEMPLATE
+| The regular expression extracting username and instancename from a user provided search.
+| 
+
+| xref:{s-path}/proxy.adoc[Proxy]
+| PROXY_FORCE_STRICT_TRANSPORT_SECURITY
+| Force emission of the Strict-Transport-Security header on all responses, including plain HTTP requests. See also: PROXY_TLS
+| false
+
+|
+| OCIS_MULTI_INSTANCE_ENABLED
+| Enable multiple instances of Infinite Scale.
+| false
+
+|
+| OCIS_MULTI_INSTANCE_GUEST_CLAIM
+| The claim name for the 'guestOf' property
+| guestOf
+
+|
+| OCIS_MULTI_INSTANCE_GUEST_ROLE
+| The role that should be assigned to a guest user
+| user-light
+
+|
+| OCIS_MULTI_INSTANCE_INSTANCEID
+| The unique id of this instance
+| c1f28cf2-d363-4671-a8fe-8d7a80b36b87
+
+|
+| OCIS_MULTI_INSTANCE_MEMBER_CLAIM
+| The claim name for the 'memberOf' property
+| memberOf
+
+| xref:{s-path}/storage-publiclink.adoc[Storage-Publiclink]
+| STORAGE_PUBLICLINK_STORE_STORE
+| The type of the store. Supported values are: 'memory', 'nats-js-kv', 'redis-sentinel', 'noop'. See the text description for details.
+| nats-js-kv
+
+|
+| STORAGE_PUBLICLINK_STORE_NODES
+| A list of nodes to access the configured store. This has no effect when 'memory' store is configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details.
+| [127.0.0.1:9233]
+
+|
+| STORAGE_PUBLICLINK_STORE_DATABASE
+| The database name the configured store should use.
+|
+
+|
+| STORAGE_PUBLICLINK_STORE_TABLE
+| The database table the store should use.
+|
+
+|
+| STORAGE_PUBLICLINK_STORE_AUTH_USERNAME
+| The username to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.
+|
+
+|
+| STORAGE_PUBLICLINK_STORE_AUTH_PASSWORD
+| The password to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.
+|
+
+|===
+

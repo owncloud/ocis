@@ -1,0 +1,7 @@
+Enhancement: Update ODS in accounts & settings extension
+
+The accounts and settings extensions were updated to reflect the 
+latest changes in the ownCloud design system. In addition, a couple of 
+quick wins in terms of accessibility are included.
+
+https://github.com/owncloud/ocis/pull/1934

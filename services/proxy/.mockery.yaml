@@ -1,0 +1,15 @@
+with-expecter: true
+filename: "{{.InterfaceName | snakecase }}.go"
+mockname: "{{.InterfaceName}}"
+outpkg: "mocks"
+packages:
+    github.com/owncloud/ocis/v2/services/proxy/pkg/user/backend:
+        config:
+          dir: "pkg/user/backend/mocks"
+        interfaces:
+            UserBackend:
+    github.com/owncloud/ocis/v2/services/proxy/pkg/userroles:
+        config:
+          dir: "pkg/userroles/mocks"
+        interfaces:
+            UserRoleAssigner:

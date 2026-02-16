@@ -1,0 +1,17 @@
+language: go
+
+go:
+  - 1.7
+  - 1.8
+  - tip
+
+before_install:
+  - go get golang.org/x/text/language
+  - go get golang.org/x/text/unicode/norm
+  - pip install --user codecov
+
+script:
+  - go test -coverprofile=coverage.txt -covermode=atomic
+
+after_success:
+  - codecov

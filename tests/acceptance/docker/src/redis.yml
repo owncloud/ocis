@@ -1,0 +1,4 @@
+services:
+  redis:
+    image: redis:6
+    command: ["--databases", "1"]
