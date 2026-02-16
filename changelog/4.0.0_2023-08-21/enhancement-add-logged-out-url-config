@@ -1,5 +1,0 @@
-Enhancement: Add logged out url config
-
-Introduce a config to set the more button url on the access denied page in web via `WEB_OPTION_ACCESS_DENIED_HELP_URL`.
-
-https://github.com/owncloud/ocis/pull/6549

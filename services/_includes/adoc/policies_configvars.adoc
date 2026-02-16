@@ -1,0 +1,302 @@
+// set the attribute to true or leave empty, true without any quotes.
+// if the generated adoc file is used outside tabs, it renders correctly depending on the attribute set.
+// if inside, you need to also use the xxx_deprecation.adoc file. attributes can't be defined inside tabs.
+
+:show-deprecation: false
+
+ifeval::[{show-deprecation} == true]
+
+[#deprecation-note-2026-02-16-13-23-04]
+[caption=]
+.Deprecation notes for the policies service
+[width="100%",cols="~,~,~,~",options="header"]
+|===
+| Deprecation Info
+| Deprecation Version
+| Removal Version
+| Deprecation Replacement
+|===
+
+{empty} +
+
+endif::[]
+
+[caption=]
+.Environment variables for the policies service
+[width="100%",cols="~,~,~,~,~",options="header"]
+|===
+| Name
+| IV
+| Type
+| Default Value
+| Description
+
+a|`POLICIES_GRPC_ADDR` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++127.0.0.1:9125 ++
+a| [subs=-attributes]
+The bind address of the GRPC service.
+
+a|`POLICIES_DEBUG_ADDR` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++127.0.0.1:9129 ++
+a| [subs=-attributes]
+Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.
+
+a|`POLICIES_DEBUG_TOKEN` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Token to secure the metrics endpoint.
+
+a|`POLICIES_DEBUG_PPROF` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Enables pprof, which can be used for profiling.
+
+a|`POLICIES_DEBUG_ZPAGES` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Enables zpages, which can be used for collecting and viewing in-memory traces.
+
+a|`OCIS_EVENTS_ENDPOINT` +
+`POLICIES_EVENTS_ENDPOINT` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++127.0.0.1:9233 ++
+a| [subs=-attributes]
+The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.
+
+a|`OCIS_EVENTS_CLUSTER` +
+`POLICIES_EVENTS_CLUSTER` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ocis-cluster ++
+a| [subs=-attributes]
+The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system.
+
+a|`OCIS_INSECURE` +
+`POLICIES_EVENTS_TLS_INSECURE` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Whether the server should skip the client certificate verification during the TLS handshake.
+
+a|`OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
+`POLICIES_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The root CA certificate used to validate the server's TLS certificate. If provided POLICIES_EVENTS_TLS_INSECURE will be seen as false.
+
+a|`OCIS_EVENTS_ENABLE_TLS` +
+`POLICIES_EVENTS_ENABLE_TLS` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services.
+
+a|`OCIS_EVENTS_AUTH_USERNAME` +
+`POLICIES_EVENTS_AUTH_USERNAME` +
+
+a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The username to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.
+
+a|`OCIS_EVENTS_AUTH_PASSWORD` +
+`POLICIES_EVENTS_AUTH_PASSWORD` +
+
+a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The password to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.
+
+a|`OCIS_LOG_LEVEL` +
+`POLICIES_LOG_LEVEL` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The log level. Valid values are: 'panic', 'fatal', 'error', 'warn', 'info', 'debug', 'trace'.
+
+a|`OCIS_LOG_PRETTY` +
+`POLICIES_LOG_PRETTY` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Activates pretty log output.
+
+a|`OCIS_LOG_COLOR` +
+`POLICIES_LOG_COLOR` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Activates colorized log output.
+
+a|`OCIS_LOG_FILE` +
+`POLICIES_LOG_FILE` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The path to the log file. Activates logging to this file if set.
+
+a|`POLICIES_ENGINE_TIMEOUT` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++Duration ++
+a| [subs=-attributes]
+++10s ++
+a| [subs=-attributes]
+Sets the timeout the rego expression evaluation can take. Rules default to deny if the timeout was reached. See the Environment Variable Types description for more details.
+
+a|`POLICIES_ENGINE_MIMES` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Sets the mimes file path which maps mimetypes to associated file extensions. See the text description for details.
+
+a|`POLICIES_POSTPROCESSING_QUERY` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Defines the 'Complete Rules' variable defined in the rego rule set this step uses for its evaluation. Defaults to deny if the variable was not found.
+
+a|`OCIS_TRACING_ENABLED` +
+`POLICIES_TRACING_ENABLED` +
+
+a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Activates tracing.
+
+a|`OCIS_TRACING_TYPE` +
+`POLICIES_TRACING_TYPE` +
+
+a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The type of tracing. Defaults to '', which is the same as 'jaeger'. Allowed tracing types are 'jaeger', 'otlp' and '' as of now.
+
+a|`OCIS_TRACING_ENDPOINT` +
+`POLICIES_TRACING_ENDPOINT` +
+
+a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The endpoint of the tracing agent.
+
+a|`OCIS_TRACING_COLLECTOR` +
+`POLICIES_TRACING_COLLECTOR` +
+
+a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.
+|===
+

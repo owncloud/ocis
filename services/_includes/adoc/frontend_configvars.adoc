@@ -1,0 +1,1054 @@
+// set the attribute to true or leave empty, true without any quotes.
+// if the generated adoc file is used outside tabs, it renders correctly depending on the attribute set.
+// if inside, you need to also use the xxx_deprecation.adoc file. attributes can't be defined inside tabs.
+
+:show-deprecation: true
+
+ifeval::[{show-deprecation} == true]
+
+[#deprecation-note-2026-02-16-13-23-04]
+[caption=]
+.Deprecation notes for the frontend service
+[width="100%",cols="~,~,~,~",options="header"]
+|===
+| Deprecation Info
+| Deprecation Version
+| Removal Version
+| Deprecation Replacement
+
+| The use of OCIS_CACHE_STORE in the frontend service is deprecated because the OCS API is deprecated
+| 7.0.0
+| next-prod
+| 
+
+| The use of OCIS_CACHE_STORE_NODES in the frontend service is deprecated because the OCS API is deprecated
+| 7.0.0
+| next-prod
+| 
+
+| The use of OCIS_CACHE_DATABASE in the frontend service is deprecated because the OCS API is deprecated
+| 7.0.0
+| next-prod
+| 
+
+| The use of OCIS_CACHE_TTL in the frontend service is deprecated because the OCS API is deprecated
+| 7.0.0
+| next-prod
+| 
+
+| The use of OCIS_CACHE_DISABLE_PERSISTENCE in the frontend service is deprecated because the OCS API is deprecated
+| 7.0.0
+| next-prod
+| 
+
+| The use of OCIS_CACHE_AUTH_USERNAME in the frontend service is deprecated because the OCS API is deprecated OCS API is deprecated
+| 7.0.0
+| next-prod
+| 
+
+| The use of OCIS_CACHE_AUTH_PASSWORD in the frontend service is deprecated because the OCS API is deprecated OCS API is deprecated
+| 7.0.0
+| next-prod
+| 
+
+| The OCS API is deprecated
+| 7.0.0
+| next-prod
+| 
+
+| The OCS API is deprecated
+| 7.0.0
+| next-prod
+| 
+
+| The OCS API is deprecated
+| 7.0.0
+| next-prod
+| 
+
+| The OCS API is deprecated
+| 7.0.0
+| next-prod
+| 
+|===
+
+{empty} +
+
+endif::[]
+
+[caption=]
+.Environment variables for the frontend service
+[width="100%",cols="~,~,~,~,~",options="header"]
+|===
+| Name
+| IV
+| Type
+| Default Value
+| Description
+
+a|`OCIS_TRACING_ENABLED` +
+`FRONTEND_TRACING_ENABLED` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Activates tracing.
+
+a|`OCIS_TRACING_TYPE` +
+`FRONTEND_TRACING_TYPE` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The type of tracing. Defaults to '', which is the same as 'jaeger'. Allowed tracing types are 'jaeger', 'otlp' and '' as of now.
+
+a|`OCIS_TRACING_ENDPOINT` +
+`FRONTEND_TRACING_ENDPOINT` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The endpoint of the tracing agent.
+
+a|`OCIS_TRACING_COLLECTOR` +
+`FRONTEND_TRACING_COLLECTOR` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.
+
+a|`OCIS_LOG_LEVEL` +
+`FRONTEND_LOG_LEVEL` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The log level. Valid values are: 'panic', 'fatal', 'error', 'warn', 'info', 'debug', 'trace'.
+
+a|`OCIS_LOG_PRETTY` +
+`FRONTEND_LOG_PRETTY` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Activates pretty log output.
+
+a|`OCIS_LOG_COLOR` +
+`FRONTEND_LOG_COLOR` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Activates colorized log output.
+
+a|`OCIS_LOG_FILE` +
+`FRONTEND_LOG_FILE` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The path to the log file. Activates logging to this file if set.
+
+a|`FRONTEND_DEBUG_ADDR` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++127.0.0.1:9141 ++
+a| [subs=-attributes]
+Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.
+
+a|`FRONTEND_DEBUG_TOKEN` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Token to secure the metrics endpoint.
+
+a|`FRONTEND_DEBUG_PPROF` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Enables pprof, which can be used for profiling.
+
+a|`FRONTEND_DEBUG_ZPAGES` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Enables zpages, which can be used for collecting and viewing in-memory traces.
+
+a|`FRONTEND_HTTP_ADDR` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++127.0.0.1:9140 ++
+a| [subs=-attributes]
+The bind address of the HTTP service.
+
+a|`FRONTEND_HTTP_PROTOCOL` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++tcp ++
+a| [subs=-attributes]
+The transport protocol of the HTTP service.
+
+a|`FRONTEND_HTTP_PREFIX` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The Path prefix where the frontend can be accessed (defaults to /).
+
+a|`OCIS_CORS_ALLOW_ORIGINS` +
+`FRONTEND_CORS_ALLOW_ORIGINS` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++[]string ++
+a| [subs=-attributes]
+++[https://localhost:9200] ++
+a| [subs=-attributes]
+A list of allowed CORS origins. See following chapter for more details: *Access-Control-Allow-Origin* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin. See the Environment Variable Types description for more details.
+
+a|`OCIS_CORS_ALLOW_METHODS` +
+`FRONTEND_CORS_ALLOW_METHODS` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++[]string ++
+a| [subs=-attributes]
+++[OPTIONS HEAD GET PUT POST PATCH DELETE MKCOL PROPFIND PROPPATCH MOVE COPY REPORT SEARCH] ++
+a| [subs=-attributes]
+A list of allowed CORS methods. See following chapter for more details: *Access-Control-Request-Method* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method. See the Environment Variable Types description for more details.
+
+a|`OCIS_CORS_ALLOW_HEADERS` +
+`FRONTEND_CORS_ALLOW_HEADERS` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++[]string ++
+a| [subs=-attributes]
+++[Origin Accept Content-Type Depth Authorization Ocs-Apirequest If-None-Match If-Match Destination Overwrite X-Request-Id X-Requested-With Tus-Resumable Tus-Checksum-Algorithm Upload-Concat Upload-Length Upload-Metadata Upload-Defer-Length Upload-Expires Upload-Checksum Upload-Offset X-HTTP-Method-Override Cache-Control] ++
+a| [subs=-attributes]
+A list of allowed CORS headers. See following chapter for more details: *Access-Control-Request-Headers* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers. See the Environment Variable Types description for more details.
+
+a|`OCIS_CORS_ALLOW_CREDENTIALS` +
+`FRONTEND_CORS_ALLOW_CREDENTIALS` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Allow credentials for CORS.See following chapter for more details: *Access-Control-Allow-Credentials* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials.
+
+a|`OCIS_TRANSFER_SECRET` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Transfer secret for signing file up- and download requests.
+
+a|`OCIS_JWT_SECRET` +
+`FRONTEND_JWT_SECRET` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The secret to mint and validate jwt tokens.
+
+a|`OCIS_REVA_GATEWAY` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++com.owncloud.api.gateway ++
+a| [subs=-attributes]
+The CS3 gateway endpoint.
+
+a|`OCIS_GRPC_CLIENT_TLS_MODE` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+TLS mode for grpc connection to the go-micro based grpc services. Possible values are 'off', 'insecure' and 'on'. 'off': disables transport security for the clients. 'insecure' allows using transport security, but disables certificate verification (to be used with the autogenerated self-signed certificates). 'on' enables transport security, including server certificate verification.
+
+a|`OCIS_GRPC_CLIENT_TLS_CACERT` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the go-micro based grpc services.
+
+a|`OCIS_MACHINE_AUTH_API_KEY` +
+`FRONTEND_MACHINE_AUTH_API_KEY` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The machine auth API key used to validate internal requests necessary to access resources from other services.
+
+a|`FRONTEND_SKIP_USER_GROUPS_IN_TOKEN` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Disables the loading of user's group memberships from the reva access token.
+
+a|`FRONTEND_ENABLE_FAVORITES` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Enables the support for favorites in the clients.
+
+a|`OCIS_SPACES_MAX_QUOTA` +
+`FRONTEND_MAX_QUOTA` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++uint64 ++
+a| [subs=-attributes]
+++0 ++
+a| [subs=-attributes]
+Set the global max quota value in bytes. A value of 0 equals unlimited. The value is provided via capabilities.
+
+a|`FRONTEND_UPLOAD_MAX_CHUNK_SIZE` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++int ++
+a| [subs=-attributes]
+++10000000 ++
+a| [subs=-attributes]
+Sets the max chunk sizes in bytes for uploads via the clients.
+
+a|`FRONTEND_UPLOAD_HTTP_METHOD_OVERRIDE` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Advise TUS to replace PATCH requests by POST requests.
+
+a|`FRONTEND_DEFAULT_UPLOAD_PROTOCOL` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++tus ++
+a| [subs=-attributes]
+The default upload protocol to use in clients. Currently only 'tus' is available. See the developer API documentation for more details about TUS.
+
+a|`OCIS_ENABLE_OCM` +
+`FRONTEND_ENABLE_FEDERATED_SHARING_INCOMING` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Changing this value is NOT supported. Enables support for incoming federated sharing for clients. The backend behaviour is not changed.
+
+a|`OCIS_ENABLE_OCM` +
+`FRONTEND_ENABLE_FEDERATED_SHARING_OUTGOING` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Changing this value is NOT supported. Enables support for outgoing federated sharing for clients. The backend behaviour is not changed.
+
+a|`FRONTEND_SEARCH_MIN_LENGTH` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++int ++
+a| [subs=-attributes]
+++3 ++
+a| [subs=-attributes]
+Minimum number of characters to enter before a client should start a search for Share receivers. This setting can be used to customize the user experience if e.g too many results are displayed.
+
+a|`OCIS_USER_SEARCH_DISPLAYED_ATTRIBUTES` +
+`FRONTEND_USER_SEARCH_DISPLAYED_ATTRIBUTES` +
+
+a| [subs=-attributes]
+++7.3.0 ++
+a| [subs=-attributes]
+++[]string ++
+a| [subs=-attributes]
+++[] ++
+a| [subs=-attributes]
+A list of user attributes to display in the user search results.
+
+a|`OCIS_EDITION` +
+`FRONTEND_EDITION` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++Community ++
+a| [subs=-attributes]
+Edition of oCIS. Used for branding purposes.
+
+a|`OCIS_DISABLE_SSE` +
+`FRONTEND_DISABLE_SSE` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+When set to true, clients are informed that the Server-Sent Events endpoint is not accessible.
+
+a|`FRONTEND_DEFAULT_LINK_PERMISSIONS` +
+
+a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
+++int ++
+a| [subs=-attributes]
+++1 ++
+a| [subs=-attributes]
+Defines the default permissions a link is being created with. Possible values are 0 (= internal link, for instance members only) and 1 (= public link with viewer permissions). Defaults to 1.
+
+a|`OCIS_URL` +
+`FRONTEND_PUBLIC_URL` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++https://localhost:9200 ++
+a| [subs=-attributes]
+The public facing URL of the oCIS frontend.
+
+a|`OCIS_MAX_CONCURRENCY` +
+`FRONTEND_MAX_CONCURRENCY` +
+
+a| [subs=-attributes]
+++7.0.0 ++
+a| [subs=-attributes]
+++int ++
+a| [subs=-attributes]
+++1 ++
+a| [subs=-attributes]
+Maximum number of concurrent go-routines. Higher values can potentially get work done faster but will also cause more load on the system. Values of 0 or below will be ignored and the default value will be used.
+
+a|`OCIS_INSECURE` +
+`FRONTEND_APP_HANDLER_INSECURE` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Allow insecure connections to the frontend.
+
+a|`FRONTEND_APP_HANDLER_SECURE_VIEW_APP_ADDR` +
+
+a| [subs=-attributes]
+++6.0.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++com.owncloud.api.collaboration ++
+a| [subs=-attributes]
+Service name or address of the app provider to use for secure view. Should match the service name or address of the registered CS3 app provider.
+
+a|`FRONTEND_ARCHIVER_MAX_NUM_FILES` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++int64 ++
+a| [subs=-attributes]
+++10000 ++
+a| [subs=-attributes]
+Max number of files that can be packed into an archive.
+
+a|`FRONTEND_ARCHIVER_MAX_SIZE` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++int64 ++
+a| [subs=-attributes]
+++1073741824 ++
+a| [subs=-attributes]
+Max size in bytes of the zip archive the archiver can create.
+
+a|`OCIS_INSECURE` +
+`FRONTEND_ARCHIVER_INSECURE` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Allow insecure connections to the archiver.
+
+a|`FRONTEND_DATA_GATEWAY_PREFIX` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++data ++
+a| [subs=-attributes]
+Path prefix for the data gateway.
+
+a|`OCIS_CACHE_STORE` +
+xref:deprecation-note-2026-02-16-13-23-04[Deprecation Note]
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++memory ++
+a| [subs=-attributes]
+The type of the cache store. Supported values are: 'memory', 'redis-sentinel', 'nats-js-kv', 'noop'. See the text description for details.
+
+a|`OCIS_CACHE_STORE_NODES` +
+xref:deprecation-note-2026-02-16-13-23-04[Deprecation Note]
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++[]string ++
+a| [subs=-attributes]
+++[127.0.0.1:9233] ++
+a| [subs=-attributes]
+A list of nodes to access the configured store. This has no effect when 'memory' store is configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details.
+
+a|`OCIS_CACHE_DATABASE` +
+xref:deprecation-note-2026-02-16-13-23-04[Deprecation Note]
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++cache-stat ++
+a| [subs=-attributes]
+The database name the configured store should use.
+
+a|`OCIS_CACHE_TTL` +
+xref:deprecation-note-2026-02-16-13-23-04[Deprecation Note]
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++Duration ++
+a| [subs=-attributes]
+++5m0s ++
+a| [subs=-attributes]
+Default time to live for user info in the cache. Only applied when access tokens has no expiration. See the Environment Variable Types description for more details.
+
+a|`OCIS_CACHE_DISABLE_PERSISTENCE` +
+xref:deprecation-note-2026-02-16-13-23-04[Deprecation Note]
+a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Disable persistence of the cache. Only applies when using the 'nats-js-kv' store type. Defaults to false.
+
+a|`OCIS_CACHE_AUTH_USERNAME` +
+xref:deprecation-note-2026-02-16-13-23-04[Deprecation Note]
+a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The username to use for authentication. Only applies when using the 'nats-js-kv' store type.
+
+a|`OCIS_CACHE_AUTH_PASSWORD` +
+xref:deprecation-note-2026-02-16-13-23-04[Deprecation Note]
+a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The password to use for authentication. Only applies when using the 'nats-js-kv' store type.
+
+a|`OCIS_ENABLE_OCM` +
+xref:deprecation-note-2026-02-16-13-23-04[Deprecation Note]
+a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++true ++
+a| [subs=-attributes]
+Include OCM shares when listing shares. See the OCM service documentation for more details.
+
+a|`OCIS_ENABLE_OCM` +
+xref:deprecation-note-2026-02-16-13-23-04[Deprecation Note]
+a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Include OCM sharees when listing sharees.
+
+a|`OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD` +
+xref:deprecation-note-2026-02-16-13-23-04[Deprecation Note]
+a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++true ++
+a| [subs=-attributes]
+Set this to true if you want to enforce passwords on all public shares.
+
+a|`OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD` +
+xref:deprecation-note-2026-02-16-13-23-04[Deprecation Note]
+a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Set this to true if you want to enforce passwords for writable shares. Only effective if the setting for 'passwords on all public shares' is set to false.
+
+a|`FRONTEND_CHECKSUMS_SUPPORTED_TYPES` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++[]string ++
+a| [subs=-attributes]
+++[sha1 md5 adler32] ++
+a| [subs=-attributes]
+A list of checksum types that indicate to clients which hashes the server can use to verify upload integrity. Supported types are 'sha1', 'md5' and 'adler32'. See the Environment Variable Types description for more details.
+
+a|`FRONTEND_CHECKSUMS_PREFERRED_UPLOAD_TYPE` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++sha1 ++
+a| [subs=-attributes]
+The supported checksum type for uploads that indicates to clients supporting multiple hash algorithms which one is preferred by the server. Must be one out of the defined list of SUPPORTED_TYPES.
+
+a|`FRONTEND_READONLY_USER_ATTRIBUTES` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++[]string ++
+a| [subs=-attributes]
+++[] ++
+a| [subs=-attributes]
+A list of user attributes to indicate as read-only. Supported values: 'user.onPremisesSamAccountName' (username), 'user.displayName', 'user.mail', 'user.passwordProfile' (password), 'user.appRoleAssignments' (role), 'user.memberOf' (groups), 'user.accountEnabled' (login allowed), 'drive.quota' (quota). See the Environment Variable Types description for more details.
+
+a|`OCIS_LDAP_SERVER_WRITE_ENABLED` +
+`FRONTEND_LDAP_SERVER_WRITE_ENABLED` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++true ++
+a| [subs=-attributes]
+Allow creating, modifying and deleting LDAP users via the GRAPH API. This can only be set to 'true' when keeping default settings for the LDAP user and group attribute types (the 'OCIS_LDAP_USER_SCHEMA_* and 'OCIS_LDAP_GROUP_SCHEMA_* variables).
+
+a|`FRONTEND_FULL_TEXT_SEARCH_ENABLED` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Set to true to signal the web client that full-text search is enabled.
+
+a|`OCIS_EVENTS_ENDPOINT` +
+`FRONTEND_EVENTS_ENDPOINT` +
+
+a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++127.0.0.1:9233 ++
+a| [subs=-attributes]
+The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.
+
+a|`OCIS_EVENTS_CLUSTER` +
+`FRONTEND_EVENTS_CLUSTER` +
+
+a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ocis-cluster ++
+a| [subs=-attributes]
+The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system.
+
+a|`OCIS_INSECURE` +
+`FRONTEND_EVENTS_TLS_INSECURE` +
+
+a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Whether to verify the server TLS certificates.
+
+a|`FRONTEND_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
+`OCS_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
+
+a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The root CA certificate used to validate the server's TLS certificate. If provided NOTIFICATIONS_EVENTS_TLS_INSECURE will be seen as false.
+
+a|`OCIS_EVENTS_ENABLE_TLS` +
+`FRONTEND_EVENTS_ENABLE_TLS` +
+
+a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services.
+
+a|`OCIS_EVENTS_AUTH_USERNAME` +
+`FRONTEND_EVENTS_AUTH_USERNAME` +
+
+a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The username to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.
+
+a|`OCIS_EVENTS_AUTH_PASSWORD` +
+`FRONTEND_EVENTS_AUTH_PASSWORD` +
+
+a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The password to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.
+
+a|`FRONTEND_AUTO_ACCEPT_SHARES` +
+
+a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++true ++
+a| [subs=-attributes]
+Defines if shares should be auto accepted by default. Users can change this setting individually in their profile.
+
+a|`OCIS_SERVICE_ACCOUNT_ID` +
+`FRONTEND_SERVICE_ACCOUNT_ID` +
+
+a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The ID of the service account the service should use. See the 'auth-service' service description for more details.
+
+a|`OCIS_SERVICE_ACCOUNT_SECRET` +
+`FRONTEND_SERVICE_ACCOUNT_SECRET` +
+
+a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The service account secret.
+
+a|`OCIS_PASSWORD_POLICY_DISABLED` +
+`FRONTEND_PASSWORD_POLICY_DISABLED` +
+
+a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Disable the password policy. Defaults to false if not set.
+
+a|`OCIS_PASSWORD_POLICY_MIN_CHARACTERS` +
+`FRONTEND_PASSWORD_POLICY_MIN_CHARACTERS` +
+
+a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
+++int ++
+a| [subs=-attributes]
+++8 ++
+a| [subs=-attributes]
+Define the minimum password length. Defaults to 8 if not set.
+
+a|`OCIS_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS` +
+`FRONTEND_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS` +
+
+a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
+++int ++
+a| [subs=-attributes]
+++1 ++
+a| [subs=-attributes]
+Define the minimum number of uppercase letters. Defaults to 1 if not set.
+
+a|`OCIS_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS` +
+`FRONTEND_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS` +
+
+a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
+++int ++
+a| [subs=-attributes]
+++1 ++
+a| [subs=-attributes]
+Define the minimum number of lowercase letters. Defaults to 1 if not set.
+
+a|`OCIS_PASSWORD_POLICY_MIN_DIGITS` +
+`FRONTEND_PASSWORD_POLICY_MIN_DIGITS` +
+
+a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
+++int ++
+a| [subs=-attributes]
+++1 ++
+a| [subs=-attributes]
+Define the minimum number of digits. Defaults to 1 if not set.
+
+a|`OCIS_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS` +
+`FRONTEND_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS` +
+
+a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
+++int ++
+a| [subs=-attributes]
+++1 ++
+a| [subs=-attributes]
+Define the minimum number of characters from the special characters list to be present. Defaults to 1 if not set.
+
+a|`OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST` +
+`FRONTEND_PASSWORD_POLICY_BANNED_PASSWORDS_LIST` +
+
+a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Path to the 'banned passwords list' file. This only impacts public link password validation. See the documentation for more details.
+
+a|`OCIS_MAX_TAG_LENGTH` +
+
+a| [subs=-attributes]
+++7.2.0 ++
+a| [subs=-attributes]
+++int ++
+a| [subs=-attributes]
+++100 ++
+a| [subs=-attributes]
+Define the maximum tag length. Defaults to 100 if not set. Set to 0 to not limit the tag length. Changes only impact the validation of new tags.
+
+a|`FRONTEND_CONFIGURABLE_NOTIFICATIONS` +
+
+a| [subs=-attributes]
+++7.1.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Allow configuring notifications via web client.
+
+a|`OCIS_CLAIM_MANAGED_SPACES_ENABLED` +
+
+a| [subs=-attributes]
+++7.2.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Enables Space management through OIDC claims. See the text description for more details.
+
+a|`OCIS_MFA_ENABLED` +
+
+a| [subs=-attributes]
+++7.3.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Set to true to enable multi factor authentication. See the documentation for more details.
+
+a|`OCIS_MFA_AUTH_LEVEL_NAMES` +
+
+a| [subs=-attributes]
+++7.3.0 ++
+a| [subs=-attributes]
+++[]string ++
+a| [subs=-attributes]
+++[advanced] ++
+a| [subs=-attributes]
+This authentication level name indicates that multi-factor authentication was performed. The name must match the ACR claim in the access token received. Note: If multiple names are required, use a comma-separated list. The front-end service will use the first name in the list when requesting multi-factor authentication (MFA).
+|===
+

@@ -1,0 +1,969 @@
+// set the attribute to true or leave empty, true without any quotes.
+// if the generated adoc file is used outside tabs, it renders correctly depending on the attribute set.
+// if inside, you need to also use the xxx_deprecation.adoc file. attributes can't be defined inside tabs.
+
+:show-deprecation: false
+
+ifeval::[{show-deprecation} == true]
+
+[#deprecation-note-2026-02-16-13-23-04]
+[caption=]
+.Deprecation notes for the proxy service
+[width="100%",cols="~,~,~,~",options="header"]
+|===
+| Deprecation Info
+| Deprecation Version
+| Removal Version
+| Deprecation Replacement
+|===
+
+{empty} +
+
+endif::[]
+
+[caption=]
+.Environment variables for the proxy service
+[width="100%",cols="~,~,~,~,~",options="header"]
+|===
+| Name
+| IV
+| Type
+| Default Value
+| Description
+
+a|`OCIS_TRACING_ENABLED` +
+`PROXY_TRACING_ENABLED` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Activates tracing.
+
+a|`OCIS_TRACING_TYPE` +
+`PROXY_TRACING_TYPE` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The type of tracing. Defaults to '', which is the same as 'jaeger'. Allowed tracing types are 'jaeger', 'otlp' and '' as of now.
+
+a|`OCIS_TRACING_ENDPOINT` +
+`PROXY_TRACING_ENDPOINT` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The endpoint of the tracing agent.
+
+a|`OCIS_TRACING_COLLECTOR` +
+`PROXY_TRACING_COLLECTOR` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.
+
+a|`OCIS_LOG_LEVEL` +
+`PROXY_LOG_LEVEL` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The log level. Valid values are: 'panic', 'fatal', 'error', 'warn', 'info', 'debug', 'trace'.
+
+a|`OCIS_LOG_PRETTY` +
+`PROXY_LOG_PRETTY` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Activates pretty log output.
+
+a|`OCIS_LOG_COLOR` +
+`PROXY_LOG_COLOR` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Activates colorized log output.
+
+a|`OCIS_LOG_FILE` +
+`PROXY_LOG_FILE` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The path to the log file. Activates logging to this file if set.
+
+a|`PROXY_DEBUG_ADDR` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++127.0.0.1:9205 ++
+a| [subs=-attributes]
+Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.
+
+a|`PROXY_DEBUG_TOKEN` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Token to secure the metrics endpoint.
+
+a|`PROXY_DEBUG_PPROF` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Enables pprof, which can be used for profiling.
+
+a|`PROXY_DEBUG_ZPAGES` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Enables zpages, which can be used for collecting and viewing in-memory traces.
+
+a|`PROXY_HTTP_ADDR` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++0.0.0.0:9200 ++
+a| [subs=-attributes]
+The bind address of the HTTP service.
+
+a|`PROXY_HTTP_ROOT` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++/ ++
+a| [subs=-attributes]
+Subdirectory that serves as the root for this HTTP service.
+
+a|`PROXY_TRANSPORT_TLS_CERT` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++/var/lib/ocis/proxy/server.crt ++
+a| [subs=-attributes]
+Path/File name of the TLS server certificate (in PEM format) for the external http services. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH/proxy.
+
+a|`PROXY_TRANSPORT_TLS_KEY` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++/var/lib/ocis/proxy/server.key ++
+a| [subs=-attributes]
+Path/File name for the TLS certificate key (in PEM format) for the server certificate to use for the external http services. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH/proxy.
+
+a|`PROXY_TLS` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++true ++
+a| [subs=-attributes]
+Enable/Disable HTTPS for external HTTP services. Must be set to 'true' if the built-in IDP service an no reverse proxy is used. See the text description for details.
+
+a|`PROXY_FORCE_STRICT_TRANSPORT_SECURITY` +
+
+a| [subs=-attributes]
+++8.0.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Force emission of the Strict-Transport-Security header on all responses, including plain HTTP requests. See also: PROXY_TLS
+
+a|`OCIS_REVA_GATEWAY` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++com.owncloud.api.gateway ++
+a| [subs=-attributes]
+The CS3 gateway endpoint.
+
+a|`OCIS_GRPC_CLIENT_TLS_MODE` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+TLS mode for grpc connection to the go-micro based grpc services. Possible values are 'off', 'insecure' and 'on'. 'off': disables transport security for the clients. 'insecure' allows using transport security, but disables certificate verification (to be used with the autogenerated self-signed certificates). 'on' enables transport security, including server certificate verification.
+
+a|`OCIS_GRPC_CLIENT_TLS_CACERT` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the go-micro based grpc services.
+
+a|`OCIS_URL` +
+`OCIS_OIDC_ISSUER` +
+`PROXY_OIDC_ISSUER` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++https://localhost:9200 ++
+a| [subs=-attributes]
+URL of the OIDC issuer. It defaults to URL of the builtin IDP.
+
+a|`OCIS_INSECURE` +
+`PROXY_OIDC_INSECURE` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Disable TLS certificate validation for connections to the IDP. Note that this is not recommended for production environments.
+
+a|`PROXY_OIDC_ACCESS_TOKEN_VERIFY_METHOD` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++jwt ++
+a| [subs=-attributes]
+Sets how OIDC access tokens should be verified. Possible values are 'none' and 'jwt'. When using 'none', no special validation apart from using it for accessing the IPD's userinfo endpoint will be done. When using 'jwt', it tries to parse the access token as a jwt token and verifies the signature using the keys published on the IDP's 'jwks_uri'.
+
+a|`PROXY_OIDC_SKIP_USER_INFO` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Do not look up user claims at the userinfo endpoint and directly read them from the access token. Incompatible with 'PROXY_OIDC_ACCESS_TOKEN_VERIFY_METHOD=none'.
+
+a|`OCIS_CACHE_STORE` +
+`PROXY_OIDC_USERINFO_CACHE_STORE` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++memory ++
+a| [subs=-attributes]
+The type of the cache store. Supported values are: 'memory', 'redis-sentinel', 'nats-js-kv', 'noop'. See the text description for details.
+
+a|`OCIS_CACHE_STORE_NODES` +
+`PROXY_OIDC_USERINFO_CACHE_STORE_NODES` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++[]string ++
+a| [subs=-attributes]
+++[127.0.0.1:9233] ++
+a| [subs=-attributes]
+A list of nodes to access the configured store. This has no effect when 'memory' store is configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details.
+
+a|`OCIS_CACHE_DATABASE` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++cache-userinfo ++
+a| [subs=-attributes]
+The database name the configured store should use.
+
+a|`PROXY_OIDC_USERINFO_CACHE_TABLE` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The database table the store should use.
+
+a|`OCIS_CACHE_TTL` +
+`PROXY_OIDC_USERINFO_CACHE_TTL` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++Duration ++
+a| [subs=-attributes]
+++10s ++
+a| [subs=-attributes]
+Default time to live for user info in the user info cache. Only applied when access tokens has no expiration. See the Environment Variable Types description for more details.
+
+a|`OCIS_CACHE_DISABLE_PERSISTENCE` +
+`PROXY_OIDC_USERINFO_CACHE_DISABLE_PERSISTENCE` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Disables persistence of the cache. Only applies when store type 'nats-js-kv' is configured. Defaults to false.
+
+a|`OCIS_CACHE_AUTH_USERNAME` +
+`PROXY_OIDC_USERINFO_CACHE_AUTH_USERNAME` +
+
+a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The username to authenticate with the cache. Only applies when store type 'nats-js-kv' is configured.
+
+a|`OCIS_CACHE_AUTH_PASSWORD` +
+`PROXY_OIDC_USERINFO_CACHE_AUTH_PASSWORD` +
+
+a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The password to authenticate with the cache. Only applies when store type 'nats-js-kv' is configured.
+
+a|`PROXY_OIDC_JWKS_REFRESH_INTERVAL` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++uint64 ++
+a| [subs=-attributes]
+++60 ++
+a| [subs=-attributes]
+The interval for refreshing the JWKS (JSON Web Key Set) in minutes in the background via a new HTTP request to the IDP.
+
+a|`PROXY_OIDC_JWKS_REFRESH_TIMEOUT` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++uint64 ++
+a| [subs=-attributes]
+++10 ++
+a| [subs=-attributes]
+The timeout in seconds for an outgoing JWKS request.
+
+a|`PROXY_OIDC_JWKS_REFRESH_RATE_LIMIT` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++uint64 ++
+a| [subs=-attributes]
+++60 ++
+a| [subs=-attributes]
+Limits the rate in seconds at which refresh requests are performed for unknown keys. This is used to prevent malicious clients from imposing high network load on the IDP via ocis.
+
+a|`PROXY_OIDC_JWKS_REFRESH_UNKNOWN_KID` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++true ++
+a| [subs=-attributes]
+If set to 'true', the JWKS refresh request will occur every time an unknown KEY ID (KID) is seen. Always set a 'refresh_limit' when enabling this.
+
+a|`PROXY_OIDC_REWRITE_WELLKNOWN` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Enables rewriting the /.well-known/openid-configuration to the configured OIDC issuer. Needed by the Desktop Client, Android Client and iOS Client to discover the OIDC provider.
+
+a|`OCIS_SERVICE_ACCOUNT_ID` +
+`PROXY_SERVICE_ACCOUNT_ID` +
+
+a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The ID of the service account the service should use. See the 'auth-service' service description for more details.
+
+a|`OCIS_SERVICE_ACCOUNT_SECRET` +
+`PROXY_SERVICE_ACCOUNT_SECRET` +
+
+a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The service account secret.
+
+a|`PROXY_ROLE_ASSIGNMENT_DRIVER` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++default ++
+a| [subs=-attributes]
+The mechanism that should be used to assign roles to user upon login. Supported values: 'default' or 'oidc'. 'default' will assign the role 'user' to users which don't have a role assigned at the time they login. 'oidc' will assign the role based on the value of a claim (configured via PROXY_ROLE_ASSIGNMENT_OIDC_CLAIM) from the users OIDC claims.
+
+a|`PROXY_ROLE_ASSIGNMENT_OIDC_CLAIM` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++roles ++
+a| [subs=-attributes]
+The OIDC claim used to create the users role assignment.
+
+a|`PROXY_ENABLE_PRESIGNEDURLS` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++true ++
+a| [subs=-attributes]
+Allow OCS to get a signing key to sign requests.
+
+a|`OCIS_CACHE_STORE` +
+`PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE` +
+
+a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++nats-js-kv ++
+a| [subs=-attributes]
+The type of the signing key store. Supported values are: 'redis-sentinel', 'nats-js-kv' and 'ocisstoreservice' (deprecated). See the text description for details.
+
+a|`OCIS_CACHE_STORE_NODES` +
+`PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE_NODES` +
+
+a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
+++[]string ++
+a| [subs=-attributes]
+++[127.0.0.1:9233] ++
+a| [subs=-attributes]
+A list of nodes to access the configured store. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details.
+
+a|`OCIS_CACHE_TTL` +
+`PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE_TTL` +
+
+a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
+++Duration ++
+a| [subs=-attributes]
+++12h0m0s ++
+a| [subs=-attributes]
+Default time to live for signing keys. See the Environment Variable Types description for more details.
+
+a|`OCIS_CACHE_DISABLE_PERSISTENCE` +
+`PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE_DISABLE_PERSISTENCE` +
+
+a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++true ++
+a| [subs=-attributes]
+Disables persistence of the store. Only applies when store type 'nats-js-kv' is configured. Defaults to true.
+
+a|`OCIS_CACHE_AUTH_USERNAME` +
+`PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE_AUTH_USERNAME` +
+
+a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The username to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.
+
+a|`OCIS_CACHE_AUTH_PASSWORD` +
+`PROXY_PRESIGNEDURL_SIGNING_KEYS_STORE_AUTH_PASSWORD` +
+
+a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The password to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.
+
+a|`PROXY_ACCOUNT_BACKEND_TYPE` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++cs3 ++
+a| [subs=-attributes]
+Account backend the PROXY service should use. Currently only 'cs3' is possible here.
+
+a|`PROXY_USER_OIDC_CLAIM` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++preferred_username ++
+a| [subs=-attributes]
+The name of an OpenID Connect claim that is used for resolving users with the account backend. The value of the claim must hold a per user unique, stable and non re-assignable identifier. The availability of claims depends on your Identity Provider. There are common claims available for most Identity providers like 'email' or 'preferred_username' but you can also add your own claim.
+
+a|`PROXY_USER_CS3_CLAIM` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++username ++
+a| [subs=-attributes]
+The name of a CS3 user attribute (claim) that should be mapped to the 'user_oidc_claim'. Supported values are 'username', 'mail' and 'userid'.
+
+a|`OCIS_MACHINE_AUTH_API_KEY` +
+`PROXY_MACHINE_AUTH_API_KEY` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Machine auth API key used to validate internal requests necessary to access resources from other services.
+
+a|`PROXY_AUTOPROVISION_ACCOUNTS` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Set this to 'true' to automatically provision users that do not yet exist in the users service on-demand upon first sign-in. To use this a write-enabled libregraph user backend needs to be setup an running.
+
+a|`PROXY_AUTOPROVISION_CLAIM_USERNAME` +
+
+a| [subs=-attributes]
+++6.0.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++preferred_username ++
+a| [subs=-attributes]
+The name of the OIDC claim that holds the username.
+
+a|`PROXY_AUTOPROVISION_CLAIM_EMAIL` +
+
+a| [subs=-attributes]
+++6.0.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++email ++
+a| [subs=-attributes]
+The name of the OIDC claim that holds the email.
+
+a|`PROXY_AUTOPROVISION_CLAIM_DISPLAYNAME` +
+
+a| [subs=-attributes]
+++6.0.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++name ++
+a| [subs=-attributes]
+The name of the OIDC claim that holds the display name.
+
+a|`PROXY_AUTOPROVISION_CLAIM_GROUPS` +
+
+a| [subs=-attributes]
+++6.1.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++groups ++
+a| [subs=-attributes]
+The name of the OIDC claim that holds the groups.
+
+a|`PROXY_ENABLE_BASIC_AUTH` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Set this to true to enable 'basic authentication' (username/password).
+
+a|`PROXY_INSECURE_BACKENDS` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Disable TLS certificate validation for all HTTP backend connections.
+
+a|`PROXY_HTTPS_CACERT` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Path/File for the root CA certificate used to validate the server’s TLS certificate for https enabled backend services.
+
+a|`PROXY_ENABLE_APP_AUTH` +
+
+a| [subs=-attributes]
+++7.0.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Allow app authentication. This can be used to authenticate 3rd party applications. Note that auth-app service must be running for this feature to work.
+
+a|`PROXY_POLICIES_QUERY` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Defines the 'Complete Rules' variable defined in the rego rule set this step uses for its evaluation. Rules default to deny if the variable was not found.
+
+a|`PROXY_CSP_CONFIG_FILE_LOCATION` +
+
+a| [subs=-attributes]
+++6.0.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The location of the CSP configuration file.
+
+a|`OCIS_EVENTS_ENDPOINT` +
+`PROXY_EVENTS_ENDPOINT` +
+
+a| [subs=-attributes]
+++7.0.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++127.0.0.1:9233 ++
+a| [subs=-attributes]
+The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Set to a empty string to disable emitting events.
+
+a|`OCIS_EVENTS_CLUSTER` +
+`PROXY_EVENTS_CLUSTER` +
+
+a| [subs=-attributes]
+++7.0.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ocis-cluster ++
+a| [subs=-attributes]
+The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.
+
+a|`OCIS_INSECURE` +
+`PROXY_EVENTS_TLS_INSECURE` +
+
+a| [subs=-attributes]
+++7.0.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Whether to verify the server TLS certificates.
+
+a|`OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
+`PROXY_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
+
+a| [subs=-attributes]
+++7.0.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The root CA certificate used to validate the server's TLS certificate. If provided PROXY_EVENTS_TLS_INSECURE will be seen as false.
+
+a|`OCIS_EVENTS_ENABLE_TLS` +
+`PROXY_EVENTS_ENABLE_TLS` +
+
+a| [subs=-attributes]
+++7.0.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services.
+
+a|`OCIS_EVENTS_AUTH_USERNAME` +
+`PROXY_EVENTS_AUTH_USERNAME` +
+
+a| [subs=-attributes]
+++7.0.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The username to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.
+
+a|`OCIS_EVENTS_AUTH_PASSWORD` +
+`PROXY_EVENTS_AUTH_PASSWORD` +
+
+a| [subs=-attributes]
+++7.0.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The password to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.
+
+a|`OCIS_CLAIM_MANAGED_SPACES_ENABLED` +
+
+a| [subs=-attributes]
+++7.2.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Enables Space management through OIDC claims. See the text description for more details.
+
+a|`OCIS_CLAIM_MANAGED_SPACES_CLAIMNAME` +
+
+a| [subs=-attributes]
+++7.2.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The name of the claim used to manage Spaces.
+
+a|`OCIS_CLAIM_MANAGED_SPACES_REGEXP` +
+
+a| [subs=-attributes]
+++7.2.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The regular expression that extracts Space IDs and roles from a claim.
+
+a|`OCIS_CLAIM_MANAGED_SPACES_MAPPING` +
+
+a| [subs=-attributes]
+++7.2.0 ++
+a| [subs=-attributes]
+++[]string ++
+a| [subs=-attributes]
+++[] ++
+a| [subs=-attributes]
+(Optional) Mapping of OIDC roles to ocis Space roles. Example: 'oidcroleA:viewer,oidcroleB:manager'
+
+a|`OCIS_MFA_ENABLED` +
+
+a| [subs=-attributes]
+++Balch ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Enable MFA enforcement. If enabled users need to complete MFA before they can access specific paths
+
+a|`OCIS_MFA_AUTH_LEVEL_NAMES` +
+
+a| [subs=-attributes]
+++7.3.0 ++
+a| [subs=-attributes]
+++[]string ++
+a| [subs=-attributes]
+++[advanced] ++
+a| [subs=-attributes]
+This authentication level name indicates that multi-factor authentication was performed. The name must match the ACR claim in the access token received. Note: If multiple names are required, use a comma-separated list. The front-end service will use the first name in the list when requesting multi-factor authentication (MFA).
+
+a|`OCIS_MULTI_INSTANCE_ENABLED` +
+
+a| [subs=-attributes]
+++8.0.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Enable multiple instances of Infinite Scale.
+
+a|`OCIS_MULTI_INSTANCE_INSTANCEID` +
+
+a| [subs=-attributes]
+++8.0.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The unique id of this instance
+
+a|`OCIS_MULTI_INSTANCE_MEMBER_CLAIM` +
+
+a| [subs=-attributes]
+++8.0.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The claim name for the 'memberOf' property
+
+a|`OCIS_MULTI_INSTANCE_GUEST_CLAIM` +
+
+a| [subs=-attributes]
+++8.0.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The claim name for the 'guestOf' property
+
+a|`OCIS_MULTI_INSTANCE_GUEST_ROLE` +
+
+a| [subs=-attributes]
+++8.0.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The role that should be assigned to a guest user
+|===
+

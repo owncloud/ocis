@@ -1,8 +1,0 @@
-services:
-  tika-service:
-    image: dadarek/wait-for-dependencies
-    depends_on:
-      - tika
-    command: tika:9998
-  tika:
-    image: apache/tika:3.2.2.0-full

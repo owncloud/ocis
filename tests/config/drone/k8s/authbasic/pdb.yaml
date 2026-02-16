@@ -1,2 +1,0 @@
-{{- include "ocis.basicServiceTemplates" (dict "scope" . "appName" "appNameAuthBasic" "appNameSuffix" "") -}}
-{{ include "ocis.pdb" . }}

@@ -1,0 +1,395 @@
+// set the attribute to true or leave empty, true without any quotes.
+// if the generated adoc file is used outside tabs, it renders correctly depending on the attribute set.
+// if inside, you need to also use the xxx_deprecation.adoc file. attributes can't be defined inside tabs.
+
+:show-deprecation: false
+
+ifeval::[{show-deprecation} == true]
+
+[#deprecation-note-2026-02-16-13-23-04]
+[caption=]
+.Deprecation notes for the postprocessing service
+[width="100%",cols="~,~,~,~",options="header"]
+|===
+| Deprecation Info
+| Deprecation Version
+| Removal Version
+| Deprecation Replacement
+|===
+
+{empty} +
+
+endif::[]
+
+[caption=]
+.Environment variables for the postprocessing service
+[width="100%",cols="~,~,~,~,~",options="header"]
+|===
+| Name
+| IV
+| Type
+| Default Value
+| Description
+
+a|`OCIS_TRACING_ENABLED` +
+`POSTPROCESSING_TRACING_ENABLED` +
+
+a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Activates tracing.
+
+a|`OCIS_TRACING_TYPE` +
+`POSTPROCESSING_TRACING_TYPE` +
+
+a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The type of tracing. Defaults to '', which is the same as 'jaeger'. Allowed tracing types are 'jaeger', 'otlp' and '' as of now.
+
+a|`OCIS_TRACING_ENDPOINT` +
+`POSTPROCESSING_TRACING_ENDPOINT` +
+
+a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The endpoint of the tracing agent.
+
+a|`OCIS_TRACING_COLLECTOR` +
+`POSTPROCESSING_TRACING_COLLECTOR` +
+
+a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.
+
+a|`OCIS_LOG_LEVEL` +
+`POSTPROCESSING_LOG_LEVEL` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The log level. Valid values are: 'panic', 'fatal', 'error', 'warn', 'info', 'debug', 'trace'.
+
+a|`OCIS_LOG_PRETTY` +
+`POSTPROCESSING_LOG_PRETTY` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Activates pretty log output.
+
+a|`OCIS_LOG_COLOR` +
+`POSTPROCESSING_LOG_COLOR` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Activates colorized log output.
+
+a|`OCIS_LOG_FILE` +
+`POSTPROCESSING_LOG_FILE` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The path to the log file. Activates logging to this file if set.
+
+a|`POSTPROCESSING_DEBUG_ADDR` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++127.0.0.1:9255 ++
+a| [subs=-attributes]
+Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.
+
+a|`POSTPROCESSING_DEBUG_TOKEN` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Token to secure the metrics endpoint.
+
+a|`POSTPROCESSING_DEBUG_PPROF` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Enables pprof, which can be used for profiling.
+
+a|`POSTPROCESSING_DEBUG_ZPAGES` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Enables zpages, which can be used for collecting and viewing in-memory traces.
+
+a|`OCIS_PERSISTENT_STORE` +
+`POSTPROCESSING_STORE` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++nats-js-kv ++
+a| [subs=-attributes]
+The type of the store. Supported values are: 'memory', 'redis-sentinel', 'nats-js-kv', 'noop'. See the text description for details.
+
+a|`OCIS_PERSISTENT_STORE_NODES` +
+`POSTPROCESSING_STORE_NODES` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++[]string ++
+a| [subs=-attributes]
+++[127.0.0.1:9233] ++
+a| [subs=-attributes]
+A list of nodes to access the configured store. This has no effect when 'memory' store is configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details.
+
+a|`POSTPROCESSING_STORE_DATABASE` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++postprocessing ++
+a| [subs=-attributes]
+The database name the configured store should use.
+
+a|`POSTPROCESSING_STORE_TABLE` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The database table the store should use.
+
+a|`OCIS_PERSISTENT_STORE_TTL` +
+`POSTPROCESSING_STORE_TTL` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++Duration ++
+a| [subs=-attributes]
+++0s ++
+a| [subs=-attributes]
+Time to live for events in the store. See the Environment Variable Types description for more details.
+
+a|`OCIS_PERSISTENT_STORE_AUTH_USERNAME` +
+`POSTPROCESSING_STORE_AUTH_USERNAME` +
+
+a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The username to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.
+
+a|`OCIS_PERSISTENT_STORE_AUTH_PASSWORD` +
+`POSTPROCESSING_STORE_AUTH_PASSWORD` +
+
+a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The password to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.
+
+a|`OCIS_EVENTS_ENDPOINT` +
+`POSTPROCESSING_EVENTS_ENDPOINT` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++127.0.0.1:9233 ++
+a| [subs=-attributes]
+The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.
+
+a|`OCIS_EVENTS_CLUSTER` +
+`POSTPROCESSING_EVENTS_CLUSTER` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ocis-cluster ++
+a| [subs=-attributes]
+The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system.
+
+a|`OCIS_INSECURE` +
+`POSTPROCESSING_EVENTS_TLS_INSECURE` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Whether the ocis server should skip the client certificate verification during the TLS handshake.
+
+a|`OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
+`POSTPROCESSING_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The root CA certificate used to validate the server's TLS certificate. If provided POSTPROCESSING_EVENTS_TLS_INSECURE will be seen as false.
+
+a|`OCIS_EVENTS_ENABLE_TLS` +
+`POSTPROCESSING_EVENTS_ENABLE_TLS` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services.
+
+a|`OCIS_EVENTS_AUTH_USERNAME` +
+`POSTPROCESSING_EVENTS_AUTH_USERNAME` +
+
+a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The username to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.
+
+a|`OCIS_EVENTS_AUTH_PASSWORD` +
+`POSTPROCESSING_EVENTS_AUTH_PASSWORD` +
+
+a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The password to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.
+
+a|`POSTPROCESSING_WORKERS` +
+
+a| [subs=-attributes]
+++6.7 ++
+a| [subs=-attributes]
+++int ++
+a| [subs=-attributes]
+++3 ++
+a| [subs=-attributes]
+The number of concurrent go routines that fetch events from the event queue.
+
+a|`POSTPROCESSING_STEPS` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++[]string ++
+a| [subs=-attributes]
+++[] ++
+a| [subs=-attributes]
+A list of postprocessing steps processed in order of their appearance. Currently supported values by the system are: 'virusscan', 'policies' and 'delay'. Custom steps are allowed. See the documentation for instructions. See the Environment Variable Types description for more details.
+
+a|`POSTPROCESSING_DELAY` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++Duration ++
+a| [subs=-attributes]
+++0s ++
+a| [subs=-attributes]
+After uploading a file but before making it available for download, a delay step can be added. Intended for developing purposes only. If a duration is set but the keyword 'delay' is not explicitely added to 'POSTPROCESSING_STEPS', the delay step will be processed as last step. In such a case, a log entry will be written on service startup to remind the admin about that situation. See the Environment Variable Types description for more details.
+
+a|`POSTPROCESSING_RETRY_BACKOFF_DURATION` +
+
+a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
+++Duration ++
+a| [subs=-attributes]
+++5s ++
+a| [subs=-attributes]
+The base for the exponential backoff duration before retrying a failed postprocessing step. See the Environment Variable Types description for more details.
+
+a|`POSTPROCESSING_MAX_RETRIES` +
+
+a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
+++int ++
+a| [subs=-attributes]
+++14 ++
+a| [subs=-attributes]
+The maximum number of retries for a failed postprocessing step.
+|===
+

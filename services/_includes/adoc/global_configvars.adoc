@@ -1,0 +1,2808 @@
+// collected through docs/helpers/adoc-generator.go.tmpl
+
+[.landscape]
+[caption=]
+.Environment variables with global scope available in multiple services
+[width="100%",cols="30%,~,25%,~,~,~",options="header"]
+|===
+| Name
+| IV
+| Services
+| Type
+| Default Value
+| Description
+
+a| `IDM_CREATE_DEMO_USERS`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/idm.adoc[idm] +
+* xref:{s-path}/settings.adoc[settings] +
+
+a| [subs=-attributes]
+++bool ++
+
+a| [subs=-attributes]
+++false ++
+
+a| [subs=-attributes]
+The default role assignments the demo users should be setup.
+a| `OCIS_ADMIN_USER_ID`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/idm.adoc[idm] +
+* xref:{s-path}/settings.adoc[settings] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++ ++
+
+a| [subs=-attributes]
+ID of the user that should receive admin privileges. Consider that the UUID can be encoded in some LDAP deployment configurations like in .ldif files. These need to be decoded beforehand.
+a| `OCIS_ASYNC_UPLOADS`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/search.adoc[search] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+
+a| [subs=-attributes]
+++bool ++
+
+a| [subs=-attributes]
+++true ++
+
+a| [subs=-attributes]
+Enable asynchronous file uploads.
+a| `OCIS_CACHE_AUTH_PASSWORD`
+
+a| [subs=-attributes]
+++5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/gateway.adoc[gateway] +
+* xref:{s-path}/gateway.adoc[gateway] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/ocs.adoc[ocs] +
+* xref:{s-path}/proxy.adoc[proxy] +
+* xref:{s-path}/proxy.adoc[proxy] +
+* xref:{s-path}/settings.adoc[settings] +
+* xref:{s-path}/storage-system.adoc[storage-system] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++ ++
+
+a| [subs=-attributes]
+Password for the configured store. Only applies when store type 'nats-js-kv' is configured.
+a| `OCIS_CACHE_AUTH_USERNAME`
+
+a| [subs=-attributes]
+++5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/gateway.adoc[gateway] +
+* xref:{s-path}/gateway.adoc[gateway] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/ocs.adoc[ocs] +
+* xref:{s-path}/proxy.adoc[proxy] +
+* xref:{s-path}/proxy.adoc[proxy] +
+* xref:{s-path}/settings.adoc[settings] +
+* xref:{s-path}/storage-system.adoc[storage-system] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++ ++
+
+a| [subs=-attributes]
+Username for the configured store. Only applies when store type 'nats-js-kv' is configured.
+a| `OCIS_CACHE_DATABASE`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/gateway.adoc[gateway] +
+* xref:{s-path}/gateway.adoc[gateway] +
+* xref:{s-path}/proxy.adoc[proxy] +
+* xref:{s-path}/settings.adoc[settings] +
+* xref:{s-path}/storage-system.adoc[storage-system] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++storage-system ++
+
+a| [subs=-attributes]
+The database name the configured store should use.
+a| `OCIS_CACHE_DISABLE_PERSISTENCE`
+
+a| [subs=-attributes]
+++5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/gateway.adoc[gateway] +
+* xref:{s-path}/gateway.adoc[gateway] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/proxy.adoc[proxy] +
+* xref:{s-path}/proxy.adoc[proxy] +
+* xref:{s-path}/settings.adoc[settings] +
+* xref:{s-path}/storage-system.adoc[storage-system] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+
+a| [subs=-attributes]
+++bool ++
+
+a| [subs=-attributes]
+++false ++
+
+a| [subs=-attributes]
+Disables persistence of the cache. Only applies when store type 'nats-js-kv' is configured. Defaults to false.
+a| `OCIS_CACHE_STORE`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/gateway.adoc[gateway] +
+* xref:{s-path}/gateway.adoc[gateway] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/ocs.adoc[ocs] +
+* xref:{s-path}/proxy.adoc[proxy] +
+* xref:{s-path}/proxy.adoc[proxy] +
+* xref:{s-path}/settings.adoc[settings] +
+* xref:{s-path}/storage-system.adoc[storage-system] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++memory ++
+
+a| [subs=-attributes]
+The type of the cache store. Supported values are: 'memory', 'redis-sentinel', 'nats-js-kv', 'noop'. See the text description for details.
+a| `OCIS_CACHE_STORE_NODES`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/gateway.adoc[gateway] +
+* xref:{s-path}/gateway.adoc[gateway] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/ocs.adoc[ocs] +
+* xref:{s-path}/proxy.adoc[proxy] +
+* xref:{s-path}/proxy.adoc[proxy] +
+* xref:{s-path}/settings.adoc[settings] +
+* xref:{s-path}/storage-system.adoc[storage-system] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+
+a| [subs=-attributes]
+++[]string ++
+
+a| [subs=-attributes]
+++[127.0.0.1:9233] ++
+
+a| [subs=-attributes]
+A list of nodes to access the configured store. This has no effect when 'memory' store is configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details.
+a| `OCIS_CACHE_TTL`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/gateway.adoc[gateway] +
+* xref:{s-path}/gateway.adoc[gateway] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/ocs.adoc[ocs] +
+* xref:{s-path}/proxy.adoc[proxy] +
+* xref:{s-path}/proxy.adoc[proxy] +
+* xref:{s-path}/settings.adoc[settings] +
+* xref:{s-path}/storage-system.adoc[storage-system] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+
+a| [subs=-attributes]
+++Duration ++
+
+a| [subs=-attributes]
+++24m0s ++
+
+a| [subs=-attributes]
+Default time to live for user info in the user info cache. Only applied when access tokens has no expiration. See the Environment Variable Types description for more details.
+a| `OCIS_CLAIM_MANAGED_SPACES_ENABLED`
+
+a| [subs=-attributes]
+++7.2.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/proxy.adoc[proxy] +
+
+a| [subs=-attributes]
+++bool ++
+
+a| [subs=-attributes]
+++false ++
+
+a| [subs=-attributes]
+Enables Space management through OIDC claims. See the text description for more details.
+a| `OCIS_CORS_ALLOW_CREDENTIALS`
+
+a| [subs=-attributes]
+++5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/activitylog.adoc[activitylog] +
+* xref:{s-path}/auth-app.adoc[auth-app] +
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/invitations.adoc[invitations] +
+* xref:{s-path}/ocdav.adoc[ocdav] +
+* xref:{s-path}/ocm.adoc[ocm] +
+* xref:{s-path}/ocs.adoc[ocs] +
+* xref:{s-path}/settings.adoc[settings] +
+* xref:{s-path}/sse.adoc[sse] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+* xref:{s-path}/thumbnails.adoc[thumbnails] +
+* xref:{s-path}/userlog.adoc[userlog] +
+* xref:{s-path}/web.adoc[web] +
+* xref:{s-path}/webdav.adoc[webdav] +
+* xref:{s-path}/webfinger.adoc[webfinger] +
+
+a| [subs=-attributes]
+++bool ++
+
+a| [subs=-attributes]
+++false ++
+
+a| [subs=-attributes]
+Allow credentials for CORS.See following chapter for more details: *Access-Control-Allow-Credentials* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials.
+a| `OCIS_CORS_ALLOW_HEADERS`
+
+a| [subs=-attributes]
+++5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/activitylog.adoc[activitylog] +
+* xref:{s-path}/auth-app.adoc[auth-app] +
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/invitations.adoc[invitations] +
+* xref:{s-path}/ocdav.adoc[ocdav] +
+* xref:{s-path}/ocm.adoc[ocm] +
+* xref:{s-path}/ocs.adoc[ocs] +
+* xref:{s-path}/settings.adoc[settings] +
+* xref:{s-path}/sse.adoc[sse] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+* xref:{s-path}/thumbnails.adoc[thumbnails] +
+* xref:{s-path}/userlog.adoc[userlog] +
+* xref:{s-path}/web.adoc[web] +
+* xref:{s-path}/webdav.adoc[webdav] +
+* xref:{s-path}/webfinger.adoc[webfinger] +
+
+a| [subs=-attributes]
+++[]string ++
+
+a| [subs=-attributes]
+++[Origin Accept Content-Type Depth Authorization Ocs-Apirequest If-None-Match If-Match Destination Overwrite X-Request-Id X-Requested-With Tus-Resumable Tus-Checksum-Algorithm Upload-Concat Upload-Length Upload-Metadata Upload-Defer-Length Upload-Expires Upload-Checksum Upload-Offset X-HTTP-Method-Override Cache-Control] ++
+
+a| [subs=-attributes]
+A list of allowed CORS headers. See following chapter for more details: *Access-Control-Request-Headers* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers. See the Environment Variable Types description for more details.
+a| `OCIS_CORS_ALLOW_METHODS`
+
+a| [subs=-attributes]
+++5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/activitylog.adoc[activitylog] +
+* xref:{s-path}/auth-app.adoc[auth-app] +
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/invitations.adoc[invitations] +
+* xref:{s-path}/ocdav.adoc[ocdav] +
+* xref:{s-path}/ocm.adoc[ocm] +
+* xref:{s-path}/ocs.adoc[ocs] +
+* xref:{s-path}/settings.adoc[settings] +
+* xref:{s-path}/sse.adoc[sse] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+* xref:{s-path}/thumbnails.adoc[thumbnails] +
+* xref:{s-path}/userlog.adoc[userlog] +
+* xref:{s-path}/web.adoc[web] +
+* xref:{s-path}/webdav.adoc[webdav] +
+* xref:{s-path}/webfinger.adoc[webfinger] +
+
+a| [subs=-attributes]
+++[]string ++
+
+a| [subs=-attributes]
+++[OPTIONS HEAD GET PUT POST DELETE MKCOL PROPFIND PROPPATCH MOVE COPY REPORT SEARCH] ++
+
+a| [subs=-attributes]
+A list of allowed CORS methods. See following chapter for more details: *Access-Control-Request-Method* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method. See the Environment Variable Types description for more details.
+a| `OCIS_CORS_ALLOW_ORIGINS`
+
+a| [subs=-attributes]
+++5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/activitylog.adoc[activitylog] +
+* xref:{s-path}/auth-app.adoc[auth-app] +
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/invitations.adoc[invitations] +
+* xref:{s-path}/ocdav.adoc[ocdav] +
+* xref:{s-path}/ocm.adoc[ocm] +
+* xref:{s-path}/ocs.adoc[ocs] +
+* xref:{s-path}/settings.adoc[settings] +
+* xref:{s-path}/sse.adoc[sse] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+* xref:{s-path}/thumbnails.adoc[thumbnails] +
+* xref:{s-path}/userlog.adoc[userlog] +
+* xref:{s-path}/web.adoc[web] +
+* xref:{s-path}/webdav.adoc[webdav] +
+* xref:{s-path}/webfinger.adoc[webfinger] +
+
+a| [subs=-attributes]
+++[]string ++
+
+a| [subs=-attributes]
+++[https://localhost:9200] ++
+
+a| [subs=-attributes]
+A list of allowed CORS origins. See following chapter for more details: *Access-Control-Allow-Origin* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin. See the Environment Variable Types description for more details.
+a| `OCIS_DECOMPOSEDFS_PROPAGATOR`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/storage-users.adoc[storage-users] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++sync ++
+
+a| [subs=-attributes]
+The propagator used for decomposedfs. At the moment, only 'sync' is fully supported, 'async' is available as an experimental option.
+a| `OCIS_DEFAULT_LANGUAGE`
+
+a| [subs=-attributes]
+++7.0.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/activitylog.adoc[activitylog] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/notifications.adoc[notifications] +
+* xref:{s-path}/settings.adoc[settings] +
+* xref:{s-path}/userlog.adoc[userlog] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++en ++
+
+a| [subs=-attributes]
+The default language used by services and the WebUI. If not defined, English will be used as default. See the documentation for more details.
+a| `OCIS_DISABLE_VERSIONING`
+
+a| [subs=-attributes]
+++7.0.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/storage-users.adoc[storage-users] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+
+a| [subs=-attributes]
+++bool ++
+
+a| [subs=-attributes]
+++false ++
+
+a| [subs=-attributes]
+Disables versioning of files. When set to true, new uploads with the same filename will overwrite existing files instead of creating a new version.
+a| `OCIS_EDITION`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/ocdav.adoc[ocdav] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++Community ++
+
+a| [subs=-attributes]
+Edition of oCIS. Used for branding purposes.
+a| `OCIS_ENABLE_OCM`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/graph.adoc[graph] +
+
+a| [subs=-attributes]
+++bool ++
+
+a| [subs=-attributes]
+++false ++
+
+a| [subs=-attributes]
+Changing this value is NOT supported. Enables support for incoming federated sharing for clients. The backend behaviour is not changed.
+a| `OCIS_EVENTS_AUTH_PASSWORD`
+
+a| [subs=-attributes]
+++5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/activitylog.adoc[activitylog] +
+* xref:{s-path}/antivirus.adoc[antivirus] +
+* xref:{s-path}/audit.adoc[audit] +
+* xref:{s-path}/clientlog.adoc[clientlog] +
+* xref:{s-path}/eventhistory.adoc[eventhistory] +
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/notifications.adoc[notifications] +
+* xref:{s-path}/ocm.adoc[ocm] +
+* xref:{s-path}/policies.adoc[policies] +
+* xref:{s-path}/postprocessing.adoc[postprocessing] +
+* xref:{s-path}/proxy.adoc[proxy] +
+* xref:{s-path}/search.adoc[search] +
+* xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/sse.adoc[sse] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+* xref:{s-path}/userlog.adoc[userlog] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++ ++
+
+a| [subs=-attributes]
+The password to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.
+a| `OCIS_EVENTS_AUTH_USERNAME`
+
+a| [subs=-attributes]
+++5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/activitylog.adoc[activitylog] +
+* xref:{s-path}/antivirus.adoc[antivirus] +
+* xref:{s-path}/audit.adoc[audit] +
+* xref:{s-path}/clientlog.adoc[clientlog] +
+* xref:{s-path}/eventhistory.adoc[eventhistory] +
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/notifications.adoc[notifications] +
+* xref:{s-path}/ocm.adoc[ocm] +
+* xref:{s-path}/policies.adoc[policies] +
+* xref:{s-path}/postprocessing.adoc[postprocessing] +
+* xref:{s-path}/proxy.adoc[proxy] +
+* xref:{s-path}/search.adoc[search] +
+* xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/sse.adoc[sse] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+* xref:{s-path}/userlog.adoc[userlog] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++ ++
+
+a| [subs=-attributes]
+The username to authenticate with the events broker. The events broker is the ocis service which receives and delivers events between the services.
+a| `OCIS_EVENTS_CLUSTER`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/activitylog.adoc[activitylog] +
+* xref:{s-path}/antivirus.adoc[antivirus] +
+* xref:{s-path}/audit.adoc[audit] +
+* xref:{s-path}/clientlog.adoc[clientlog] +
+* xref:{s-path}/eventhistory.adoc[eventhistory] +
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/notifications.adoc[notifications] +
+* xref:{s-path}/ocm.adoc[ocm] +
+* xref:{s-path}/policies.adoc[policies] +
+* xref:{s-path}/postprocessing.adoc[postprocessing] +
+* xref:{s-path}/proxy.adoc[proxy] +
+* xref:{s-path}/search.adoc[search] +
+* xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/sse.adoc[sse] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+* xref:{s-path}/userlog.adoc[userlog] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++ocis-cluster ++
+
+a| [subs=-attributes]
+The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system.
+a| `OCIS_EVENTS_ENABLE_TLS`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/activitylog.adoc[activitylog] +
+* xref:{s-path}/antivirus.adoc[antivirus] +
+* xref:{s-path}/audit.adoc[audit] +
+* xref:{s-path}/clientlog.adoc[clientlog] +
+* xref:{s-path}/eventhistory.adoc[eventhistory] +
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/nats.adoc[nats] +
+* xref:{s-path}/notifications.adoc[notifications] +
+* xref:{s-path}/ocm.adoc[ocm] +
+* xref:{s-path}/policies.adoc[policies] +
+* xref:{s-path}/postprocessing.adoc[postprocessing] +
+* xref:{s-path}/proxy.adoc[proxy] +
+* xref:{s-path}/search.adoc[search] +
+* xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/sse.adoc[sse] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+* xref:{s-path}/userlog.adoc[userlog] +
+
+a| [subs=-attributes]
+++bool ++
+
+a| [subs=-attributes]
+++false ++
+
+a| [subs=-attributes]
+Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services.
+a| `OCIS_EVENTS_ENDPOINT`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/activitylog.adoc[activitylog] +
+* xref:{s-path}/antivirus.adoc[antivirus] +
+* xref:{s-path}/audit.adoc[audit] +
+* xref:{s-path}/clientlog.adoc[clientlog] +
+* xref:{s-path}/eventhistory.adoc[eventhistory] +
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/notifications.adoc[notifications] +
+* xref:{s-path}/ocm.adoc[ocm] +
+* xref:{s-path}/policies.adoc[policies] +
+* xref:{s-path}/postprocessing.adoc[postprocessing] +
+* xref:{s-path}/proxy.adoc[proxy] +
+* xref:{s-path}/search.adoc[search] +
+* xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/sse.adoc[sse] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+* xref:{s-path}/userlog.adoc[userlog] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++127.0.0.1:9233 ++
+
+a| [subs=-attributes]
+The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.
+a| `OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/activitylog.adoc[activitylog] +
+* xref:{s-path}/antivirus.adoc[antivirus] +
+* xref:{s-path}/audit.adoc[audit] +
+* xref:{s-path}/clientlog.adoc[clientlog] +
+* xref:{s-path}/eventhistory.adoc[eventhistory] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/notifications.adoc[notifications] +
+* xref:{s-path}/ocm.adoc[ocm] +
+* xref:{s-path}/policies.adoc[policies] +
+* xref:{s-path}/postprocessing.adoc[postprocessing] +
+* xref:{s-path}/proxy.adoc[proxy] +
+* xref:{s-path}/search.adoc[search] +
+* xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/sse.adoc[sse] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+* xref:{s-path}/userlog.adoc[userlog] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++ ++
+
+a| [subs=-attributes]
+The root CA certificate used to validate the server's TLS certificate. If provided AUDIT_EVENTS_TLS_INSECURE will be seen as false.
+a| `OCIS_GATEWAY_GRPC_ADDR`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/gateway.adoc[gateway] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++127.0.0.1:9142 ++
+
+a| [subs=-attributes]
+The bind address of the GRPC service.
+a| `OCIS_GRPC_CLIENT_TLS_CACERT`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/app-provider.adoc[app-provider] +
+* xref:{s-path}/app-registry.adoc[app-registry] +
+* xref:{s-path}/auth-app.adoc[auth-app] +
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/auth-bearer.adoc[auth-bearer] +
+* xref:{s-path}/auth-machine.adoc[auth-machine] +
+* xref:{s-path}/auth-service.adoc[auth-service] +
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/gateway.adoc[gateway] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/idp.adoc[idp] +
+* xref:{s-path}/notifications.adoc[notifications] +
+* xref:{s-path}/ocdav.adoc[ocdav] +
+* xref:{s-path}/ocm.adoc[ocm] +
+* xref:{s-path}/proxy.adoc[proxy] +
+* xref:{s-path}/search.adoc[search] +
+* xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/storage-publiclink.adoc[storage-publiclink] +
+* xref:{s-path}/storage-shares.adoc[storage-shares] +
+* xref:{s-path}/storage-system.adoc[storage-system] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+* xref:{s-path}/users.adoc[users] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++ ++
+
+a| [subs=-attributes]
+Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the go-micro based grpc services.
+a| `OCIS_GRPC_CLIENT_TLS_MODE`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/app-provider.adoc[app-provider] +
+* xref:{s-path}/app-registry.adoc[app-registry] +
+* xref:{s-path}/auth-app.adoc[auth-app] +
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/auth-bearer.adoc[auth-bearer] +
+* xref:{s-path}/auth-machine.adoc[auth-machine] +
+* xref:{s-path}/auth-service.adoc[auth-service] +
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/gateway.adoc[gateway] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/idp.adoc[idp] +
+* xref:{s-path}/notifications.adoc[notifications] +
+* xref:{s-path}/ocdav.adoc[ocdav] +
+* xref:{s-path}/ocm.adoc[ocm] +
+* xref:{s-path}/proxy.adoc[proxy] +
+* xref:{s-path}/search.adoc[search] +
+* xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/storage-publiclink.adoc[storage-publiclink] +
+* xref:{s-path}/storage-shares.adoc[storage-shares] +
+* xref:{s-path}/storage-system.adoc[storage-system] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+* xref:{s-path}/users.adoc[users] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++ ++
+
+a| [subs=-attributes]
+TLS mode for grpc connection to the go-micro based grpc services. Possible values are 'off', 'insecure' and 'on'. 'off': disables transport security for the clients. 'insecure' allows using transport security, but disables certificate verification (to be used with the autogenerated self-signed certificates). 'on' enables transport security, including server certificate verification.
+a| `OCIS_GRPC_PROTOCOL`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/app-provider.adoc[app-provider] +
+* xref:{s-path}/app-registry.adoc[app-registry] +
+* xref:{s-path}/auth-app.adoc[auth-app] +
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/auth-bearer.adoc[auth-bearer] +
+* xref:{s-path}/auth-machine.adoc[auth-machine] +
+* xref:{s-path}/auth-service.adoc[auth-service] +
+* xref:{s-path}/collaboration.adoc[collaboration] +
+* xref:{s-path}/gateway.adoc[gateway] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/ocm.adoc[ocm] +
+* xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/storage-publiclink.adoc[storage-publiclink] +
+* xref:{s-path}/storage-shares.adoc[storage-shares] +
+* xref:{s-path}/storage-system.adoc[storage-system] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+* xref:{s-path}/users.adoc[users] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++tcp ++
+
+a| [subs=-attributes]
+The transport protocol of the GRPC service.
+a| `OCIS_HTTP_TLS_CERTIFICATE`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/activitylog.adoc[activitylog] +
+* xref:{s-path}/auth-app.adoc[auth-app] +
+* xref:{s-path}/collaboration.adoc[collaboration] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/invitations.adoc[invitations] +
+* xref:{s-path}/ocs.adoc[ocs] +
+* xref:{s-path}/settings.adoc[settings] +
+* xref:{s-path}/sse.adoc[sse] +
+* xref:{s-path}/thumbnails.adoc[thumbnails] +
+* xref:{s-path}/userlog.adoc[userlog] +
+* xref:{s-path}/web.adoc[web] +
+* xref:{s-path}/webdav.adoc[webdav] +
+* xref:{s-path}/webfinger.adoc[webfinger] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++ ++
+
+a| [subs=-attributes]
+Path/File name of the TLS server certificate (in PEM format) for the http services.
+a| `OCIS_HTTP_TLS_ENABLED`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/activitylog.adoc[activitylog] +
+* xref:{s-path}/auth-app.adoc[auth-app] +
+* xref:{s-path}/collaboration.adoc[collaboration] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/invitations.adoc[invitations] +
+* xref:{s-path}/ocs.adoc[ocs] +
+* xref:{s-path}/settings.adoc[settings] +
+* xref:{s-path}/sse.adoc[sse] +
+* xref:{s-path}/thumbnails.adoc[thumbnails] +
+* xref:{s-path}/userlog.adoc[userlog] +
+* xref:{s-path}/web.adoc[web] +
+* xref:{s-path}/webdav.adoc[webdav] +
+* xref:{s-path}/webfinger.adoc[webfinger] +
+
+a| [subs=-attributes]
+++bool ++
+
+a| [subs=-attributes]
+++false ++
+
+a| [subs=-attributes]
+Activates TLS for the http based services using the server certifcate and key configured via OCIS_HTTP_TLS_CERTIFICATE and OCIS_HTTP_TLS_KEY. If OCIS_HTTP_TLS_CERTIFICATE is not set a temporary server certificate is generated - to be used with PROXY_INSECURE_BACKEND=true.
+a| `OCIS_HTTP_TLS_KEY`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/activitylog.adoc[activitylog] +
+* xref:{s-path}/auth-app.adoc[auth-app] +
+* xref:{s-path}/collaboration.adoc[collaboration] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/invitations.adoc[invitations] +
+* xref:{s-path}/ocs.adoc[ocs] +
+* xref:{s-path}/settings.adoc[settings] +
+* xref:{s-path}/sse.adoc[sse] +
+* xref:{s-path}/thumbnails.adoc[thumbnails] +
+* xref:{s-path}/userlog.adoc[userlog] +
+* xref:{s-path}/web.adoc[web] +
+* xref:{s-path}/webdav.adoc[webdav] +
+* xref:{s-path}/webfinger.adoc[webfinger] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++ ++
+
+a| [subs=-attributes]
+Path/File name for the TLS certificate key (in PEM format) for the server certificate to use for the http services.
+a| `OCIS_INSECURE`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/activitylog.adoc[activitylog] +
+* xref:{s-path}/antivirus.adoc[antivirus] +
+* xref:{s-path}/audit.adoc[audit] +
+* xref:{s-path}/auth-bearer.adoc[auth-bearer] +
+* xref:{s-path}/clientlog.adoc[clientlog] +
+* xref:{s-path}/eventhistory.adoc[eventhistory] +
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/nats.adoc[nats] +
+* xref:{s-path}/notifications.adoc[notifications] +
+* xref:{s-path}/ocdav.adoc[ocdav] +
+* xref:{s-path}/ocm.adoc[ocm] +
+* xref:{s-path}/policies.adoc[policies] +
+* xref:{s-path}/postprocessing.adoc[postprocessing] +
+* xref:{s-path}/proxy.adoc[proxy] +
+* xref:{s-path}/proxy.adoc[proxy] +
+* xref:{s-path}/search.adoc[search] +
+* xref:{s-path}/search.adoc[search] +
+* xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/sse.adoc[sse] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+* xref:{s-path}/thumbnails.adoc[thumbnails] +
+* xref:{s-path}/thumbnails.adoc[thumbnails] +
+* xref:{s-path}/userlog.adoc[userlog] +
+* xref:{s-path}/webfinger.adoc[webfinger] +
+
+a| [subs=-attributes]
+++bool ++
+
+a| [subs=-attributes]
+++false ++
+
+a| [subs=-attributes]
+Whether to verify the server TLS certificates.
+a| `OCIS_JWT_SECRET`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/activitylog.adoc[activitylog] +
+* xref:{s-path}/app-provider.adoc[app-provider] +
+* xref:{s-path}/app-registry.adoc[app-registry] +
+* xref:{s-path}/auth-app.adoc[auth-app] +
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/auth-bearer.adoc[auth-bearer] +
+* xref:{s-path}/auth-machine.adoc[auth-machine] +
+* xref:{s-path}/auth-service.adoc[auth-service] +
+* xref:{s-path}/clientlog.adoc[clientlog] +
+* xref:{s-path}/collaboration.adoc[collaboration] +
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/gateway.adoc[gateway] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/invitations.adoc[invitations] +
+* xref:{s-path}/ocdav.adoc[ocdav] +
+* xref:{s-path}/ocm.adoc[ocm] +
+* xref:{s-path}/ocs.adoc[ocs] +
+* xref:{s-path}/search.adoc[search] +
+* xref:{s-path}/settings.adoc[settings] +
+* xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/sse.adoc[sse] +
+* xref:{s-path}/storage-publiclink.adoc[storage-publiclink] +
+* xref:{s-path}/storage-shares.adoc[storage-shares] +
+* xref:{s-path}/storage-system.adoc[storage-system] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+* xref:{s-path}/userlog.adoc[userlog] +
+* xref:{s-path}/users.adoc[users] +
+* xref:{s-path}/web.adoc[web] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++ ++
+
+a| [subs=-attributes]
+The secret to mint and validate jwt tokens.
+a| `OCIS_KEYCLOAK_BASE_PATH`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/invitations.adoc[invitations] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++ ++
+
+a| [subs=-attributes]
+The URL to access keycloak.
+a| `OCIS_KEYCLOAK_CLIENT_ID`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/invitations.adoc[invitations] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++ ++
+
+a| [subs=-attributes]
+The client id to authenticate with keycloak.
+a| `OCIS_KEYCLOAK_CLIENT_REALM`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/invitations.adoc[invitations] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++ ++
+
+a| [subs=-attributes]
+The realm the client is defined in.
+a| `OCIS_KEYCLOAK_CLIENT_SECRET`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/invitations.adoc[invitations] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++ ++
+
+a| [subs=-attributes]
+The client secret to use in authentication.
+a| `OCIS_KEYCLOAK_INSECURE_SKIP_VERIFY`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/invitations.adoc[invitations] +
+
+a| [subs=-attributes]
+++bool ++
+
+a| [subs=-attributes]
+++false ++
+
+a| [subs=-attributes]
+Disable TLS certificate validation for Keycloak connections. Do not set this in production environments.
+a| `OCIS_KEYCLOAK_USER_REALM`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/invitations.adoc[invitations] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++ ++
+
+a| [subs=-attributes]
+The realm users are defined.
+a| `OCIS_LDAP_BIND_DN`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/idp.adoc[idp] +
+* xref:{s-path}/users.adoc[users] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++uid=reva,ou=sysusers,o=libregraph-idm ++
+
+a| [subs=-attributes]
+LDAP DN to use for simple bind authentication with the target LDAP server.
+a| `OCIS_LDAP_BIND_PASSWORD`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/idp.adoc[idp] +
+* xref:{s-path}/users.adoc[users] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++ ++
+
+a| [subs=-attributes]
+Password to use for authenticating the 'bind_dn'.
+a| `OCIS_LDAP_CACERT`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/idp.adoc[idp] +
+* xref:{s-path}/users.adoc[users] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++/var/lib/ocis/idm/ldap.crt ++
+
+a| [subs=-attributes]
+Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the LDAP service. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH/idm.
+a| `OCIS_LDAP_DISABLED_USERS_GROUP_DN`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/users.adoc[users] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++cn=DisabledUsersGroup,ou=groups,o=libregraph-idm ++
+
+a| [subs=-attributes]
+The distinguished name of the group to which added users will be classified as disabled when 'disable_user_mechanism' is set to 'group'.
+a| `OCIS_LDAP_DISABLE_USER_MECHANISM`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/users.adoc[users] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++attribute ++
+
+a| [subs=-attributes]
+An option to control the behavior for disabling users. Valid options are 'none', 'attribute' and 'group'. If set to 'group', disabling a user via API will add the user to the configured group for disabled users, if set to 'attribute' this will be done in the ldap user entry, if set to 'none' the disable request is not processed.
+a| `OCIS_LDAP_GROUP_BASE_DN`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/users.adoc[users] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++ou=groups,o=libregraph-idm ++
+
+a| [subs=-attributes]
+Search base DN for looking up LDAP groups.
+a| `OCIS_LDAP_GROUP_FILTER`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/users.adoc[users] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++ ++
+
+a| [subs=-attributes]
+LDAP filter to add to the default filters for group searches.
+a| `OCIS_LDAP_GROUP_OBJECTCLASS`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/users.adoc[users] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++groupOfNames ++
+
+a| [subs=-attributes]
+The object class to use for groups in the default group search filter ('groupOfNames').
+a| `OCIS_LDAP_GROUP_SCHEMA_DISPLAYNAME`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/users.adoc[users] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++cn ++
+
+a| [subs=-attributes]
+LDAP Attribute to use for the displayname of groups (often the same as groupname attribute).
+a| `OCIS_LDAP_GROUP_SCHEMA_GROUPNAME`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/users.adoc[users] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++cn ++
+
+a| [subs=-attributes]
+LDAP Attribute to use for the name of groups.
+a| `OCIS_LDAP_GROUP_SCHEMA_ID`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/users.adoc[users] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++ownclouduuid ++
+
+a| [subs=-attributes]
+LDAP Attribute to use as the unique id for groups. This should be a stable globally unique ID like a UUID.
+a| `OCIS_LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/users.adoc[users] +
+
+a| [subs=-attributes]
+++bool ++
+
+a| [subs=-attributes]
+++false ++
+
+a| [subs=-attributes]
+Set this to true if the defined 'id' attribute for groups is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the group ID's.
+a| `OCIS_LDAP_GROUP_SCHEMA_MAIL`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/users.adoc[users] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++mail ++
+
+a| [subs=-attributes]
+LDAP Attribute to use for the email address of groups (can be empty).
+a| `OCIS_LDAP_GROUP_SCHEMA_MEMBER`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/users.adoc[users] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++member ++
+
+a| [subs=-attributes]
+LDAP Attribute that is used for group members.
+a| `OCIS_LDAP_GROUP_SCOPE`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/users.adoc[users] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++sub ++
+
+a| [subs=-attributes]
+LDAP search scope to use when looking up groups. Supported scopes are 'base', 'one' and 'sub'.
+a| `OCIS_LDAP_INSECURE`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/idp.adoc[idp] +
+* xref:{s-path}/users.adoc[users] +
+
+a| [subs=-attributes]
+++bool ++
+
+a| [subs=-attributes]
+++false ++
+
+a| [subs=-attributes]
+Disable TLS certificate validation for the LDAP connections. Do not set this in production environments.
+a| `OCIS_LDAP_SERVER_WRITE_ENABLED`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/graph.adoc[graph] +
+
+a| [subs=-attributes]
+++bool ++
+
+a| [subs=-attributes]
+++true ++
+
+a| [subs=-attributes]
+Allow creating, modifying and deleting LDAP users via the GRAPH API. This can only be set to 'true' when keeping default settings for the LDAP user and group attribute types (the 'OCIS_LDAP_USER_SCHEMA_* and 'OCIS_LDAP_GROUP_SCHEMA_* variables).
+a| `OCIS_LDAP_URI`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/idp.adoc[idp] +
+* xref:{s-path}/users.adoc[users] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++ldaps://localhost:9235 ++
+
+a| [subs=-attributes]
+URI of the LDAP Server to connect to. Supported URI schemes are 'ldaps://' and 'ldap://'
+a| `OCIS_LDAP_USER_BASE_DN`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/idp.adoc[idp] +
+* xref:{s-path}/users.adoc[users] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++ou=users,o=libregraph-idm ++
+
+a| [subs=-attributes]
+Search base DN for looking up LDAP users.
+a| `OCIS_LDAP_USER_ENABLED_ATTRIBUTE`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/idp.adoc[idp] +
+* xref:{s-path}/users.adoc[users] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++ownCloudUserEnabled ++
+
+a| [subs=-attributes]
+LDAP attribute to use as a flag telling if the user is enabled or disabled.
+a| `OCIS_LDAP_USER_FILTER`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/idp.adoc[idp] +
+* xref:{s-path}/users.adoc[users] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++ ++
+
+a| [subs=-attributes]
+LDAP filter to add to the default filters for user search like '(objectclass=ownCloud)'.
+a| `OCIS_LDAP_USER_OBJECTCLASS`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/idp.adoc[idp] +
+* xref:{s-path}/users.adoc[users] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++inetOrgPerson ++
+
+a| [subs=-attributes]
+The object class to use for users in the default user search filter ('inetOrgPerson').
+a| `OCIS_LDAP_USER_SCHEMA_DISPLAYNAME`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/users.adoc[users] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++displayname ++
+
+a| [subs=-attributes]
+LDAP Attribute to use for the displayname of users.
+a| `OCIS_LDAP_USER_SCHEMA_ID`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/idp.adoc[idp] +
+* xref:{s-path}/users.adoc[users] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++ownclouduuid ++
+
+a| [subs=-attributes]
+LDAP Attribute to use as the unique id for users. This should be a stable globally unique id like a UUID.
+a| `OCIS_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/users.adoc[users] +
+
+a| [subs=-attributes]
+++bool ++
+
+a| [subs=-attributes]
+++false ++
+
+a| [subs=-attributes]
+Set this to true if the defined 'ID' attribute for users is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the user ID's.
+a| `OCIS_LDAP_USER_SCHEMA_MAIL`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/idp.adoc[idp] +
+* xref:{s-path}/users.adoc[users] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++mail ++
+
+a| [subs=-attributes]
+LDAP Attribute to use for the email address of users.
+a| `OCIS_LDAP_USER_SCHEMA_USERNAME`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/idp.adoc[idp] +
+* xref:{s-path}/users.adoc[users] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++uid ++
+
+a| [subs=-attributes]
+LDAP Attribute to use for username of users.
+a| `OCIS_LDAP_USER_SCHEMA_USER_TYPE`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/users.adoc[users] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++ownCloudUserType ++
+
+a| [subs=-attributes]
+LDAP Attribute to distinguish between 'Member' and 'Guest' users. Default is 'ownCloudUserType'.
+a| `OCIS_LDAP_USER_SCOPE`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/idp.adoc[idp] +
+* xref:{s-path}/users.adoc[users] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++sub ++
+
+a| [subs=-attributes]
+LDAP search scope to use when looking up users. Supported scopes are 'base', 'one' and 'sub'.
+a| `OCIS_LOG_COLOR`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/activitylog.adoc[activitylog] +
+* xref:{s-path}/antivirus.adoc[antivirus] +
+* xref:{s-path}/app-provider.adoc[app-provider] +
+* xref:{s-path}/app-registry.adoc[app-registry] +
+* xref:{s-path}/audit.adoc[audit] +
+* xref:{s-path}/auth-app.adoc[auth-app] +
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/auth-bearer.adoc[auth-bearer] +
+* xref:{s-path}/auth-machine.adoc[auth-machine] +
+* xref:{s-path}/auth-service.adoc[auth-service] +
+* xref:{s-path}/clientlog.adoc[clientlog] +
+* xref:{s-path}/collaboration.adoc[collaboration] +
+* xref:{s-path}/eventhistory.adoc[eventhistory] +
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/gateway.adoc[gateway] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/idm.adoc[idm] +
+* xref:{s-path}/idp.adoc[idp] +
+* xref:{s-path}/invitations.adoc[invitations] +
+* xref:{s-path}/nats.adoc[nats] +
+* xref:{s-path}/notifications.adoc[notifications] +
+* xref:{s-path}/ocdav.adoc[ocdav] +
+* xref:{s-path}/ocm.adoc[ocm] +
+* xref:{s-path}/ocs.adoc[ocs] +
+* xref:{s-path}/policies.adoc[policies] +
+* xref:{s-path}/postprocessing.adoc[postprocessing] +
+* xref:{s-path}/proxy.adoc[proxy] +
+* xref:{s-path}/search.adoc[search] +
+* xref:{s-path}/settings.adoc[settings] +
+* xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/sse.adoc[sse] +
+* xref:{s-path}/storage-publiclink.adoc[storage-publiclink] +
+* xref:{s-path}/storage-shares.adoc[storage-shares] +
+* xref:{s-path}/storage-system.adoc[storage-system] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+* xref:{s-path}/thumbnails.adoc[thumbnails] +
+* xref:{s-path}/userlog.adoc[userlog] +
+* xref:{s-path}/users.adoc[users] +
+* xref:{s-path}/web.adoc[web] +
+* xref:{s-path}/webdav.adoc[webdav] +
+* xref:{s-path}/webfinger.adoc[webfinger] +
+
+a| [subs=-attributes]
+++bool ++
+
+a| [subs=-attributes]
+++false ++
+
+a| [subs=-attributes]
+Activates colorized log output.
+a| `OCIS_LOG_FILE`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/activitylog.adoc[activitylog] +
+* xref:{s-path}/antivirus.adoc[antivirus] +
+* xref:{s-path}/app-provider.adoc[app-provider] +
+* xref:{s-path}/app-registry.adoc[app-registry] +
+* xref:{s-path}/audit.adoc[audit] +
+* xref:{s-path}/auth-app.adoc[auth-app] +
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/auth-bearer.adoc[auth-bearer] +
+* xref:{s-path}/auth-machine.adoc[auth-machine] +
+* xref:{s-path}/auth-service.adoc[auth-service] +
+* xref:{s-path}/clientlog.adoc[clientlog] +
+* xref:{s-path}/collaboration.adoc[collaboration] +
+* xref:{s-path}/eventhistory.adoc[eventhistory] +
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/gateway.adoc[gateway] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/idm.adoc[idm] +
+* xref:{s-path}/idp.adoc[idp] +
+* xref:{s-path}/invitations.adoc[invitations] +
+* xref:{s-path}/nats.adoc[nats] +
+* xref:{s-path}/notifications.adoc[notifications] +
+* xref:{s-path}/ocdav.adoc[ocdav] +
+* xref:{s-path}/ocm.adoc[ocm] +
+* xref:{s-path}/ocs.adoc[ocs] +
+* xref:{s-path}/policies.adoc[policies] +
+* xref:{s-path}/postprocessing.adoc[postprocessing] +
+* xref:{s-path}/proxy.adoc[proxy] +
+* xref:{s-path}/search.adoc[search] +
+* xref:{s-path}/settings.adoc[settings] +
+* xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/sse.adoc[sse] +
+* xref:{s-path}/storage-publiclink.adoc[storage-publiclink] +
+* xref:{s-path}/storage-shares.adoc[storage-shares] +
+* xref:{s-path}/storage-system.adoc[storage-system] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+* xref:{s-path}/thumbnails.adoc[thumbnails] +
+* xref:{s-path}/userlog.adoc[userlog] +
+* xref:{s-path}/users.adoc[users] +
+* xref:{s-path}/web.adoc[web] +
+* xref:{s-path}/webdav.adoc[webdav] +
+* xref:{s-path}/webfinger.adoc[webfinger] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++ ++
+
+a| [subs=-attributes]
+The path to the log file. Activates logging to this file if set.
+a| `OCIS_LOG_LEVEL`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/activitylog.adoc[activitylog] +
+* xref:{s-path}/antivirus.adoc[antivirus] +
+* xref:{s-path}/app-provider.adoc[app-provider] +
+* xref:{s-path}/app-registry.adoc[app-registry] +
+* xref:{s-path}/audit.adoc[audit] +
+* xref:{s-path}/auth-app.adoc[auth-app] +
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/auth-bearer.adoc[auth-bearer] +
+* xref:{s-path}/auth-machine.adoc[auth-machine] +
+* xref:{s-path}/auth-service.adoc[auth-service] +
+* xref:{s-path}/clientlog.adoc[clientlog] +
+* xref:{s-path}/collaboration.adoc[collaboration] +
+* xref:{s-path}/eventhistory.adoc[eventhistory] +
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/gateway.adoc[gateway] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/idm.adoc[idm] +
+* xref:{s-path}/idp.adoc[idp] +
+* xref:{s-path}/invitations.adoc[invitations] +
+* xref:{s-path}/nats.adoc[nats] +
+* xref:{s-path}/notifications.adoc[notifications] +
+* xref:{s-path}/ocdav.adoc[ocdav] +
+* xref:{s-path}/ocm.adoc[ocm] +
+* xref:{s-path}/ocs.adoc[ocs] +
+* xref:{s-path}/policies.adoc[policies] +
+* xref:{s-path}/postprocessing.adoc[postprocessing] +
+* xref:{s-path}/proxy.adoc[proxy] +
+* xref:{s-path}/search.adoc[search] +
+* xref:{s-path}/settings.adoc[settings] +
+* xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/sse.adoc[sse] +
+* xref:{s-path}/storage-publiclink.adoc[storage-publiclink] +
+* xref:{s-path}/storage-shares.adoc[storage-shares] +
+* xref:{s-path}/storage-system.adoc[storage-system] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+* xref:{s-path}/thumbnails.adoc[thumbnails] +
+* xref:{s-path}/userlog.adoc[userlog] +
+* xref:{s-path}/users.adoc[users] +
+* xref:{s-path}/web.adoc[web] +
+* xref:{s-path}/webdav.adoc[webdav] +
+* xref:{s-path}/webfinger.adoc[webfinger] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++ ++
+
+a| [subs=-attributes]
+The log level. Valid values are: 'panic', 'fatal', 'error', 'warn', 'info', 'debug', 'trace'.
+a| `OCIS_LOG_PRETTY`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/activitylog.adoc[activitylog] +
+* xref:{s-path}/antivirus.adoc[antivirus] +
+* xref:{s-path}/app-provider.adoc[app-provider] +
+* xref:{s-path}/app-registry.adoc[app-registry] +
+* xref:{s-path}/audit.adoc[audit] +
+* xref:{s-path}/auth-app.adoc[auth-app] +
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/auth-bearer.adoc[auth-bearer] +
+* xref:{s-path}/auth-machine.adoc[auth-machine] +
+* xref:{s-path}/auth-service.adoc[auth-service] +
+* xref:{s-path}/clientlog.adoc[clientlog] +
+* xref:{s-path}/collaboration.adoc[collaboration] +
+* xref:{s-path}/eventhistory.adoc[eventhistory] +
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/gateway.adoc[gateway] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/idm.adoc[idm] +
+* xref:{s-path}/idp.adoc[idp] +
+* xref:{s-path}/invitations.adoc[invitations] +
+* xref:{s-path}/nats.adoc[nats] +
+* xref:{s-path}/notifications.adoc[notifications] +
+* xref:{s-path}/ocdav.adoc[ocdav] +
+* xref:{s-path}/ocm.adoc[ocm] +
+* xref:{s-path}/ocs.adoc[ocs] +
+* xref:{s-path}/policies.adoc[policies] +
+* xref:{s-path}/postprocessing.adoc[postprocessing] +
+* xref:{s-path}/proxy.adoc[proxy] +
+* xref:{s-path}/search.adoc[search] +
+* xref:{s-path}/settings.adoc[settings] +
+* xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/sse.adoc[sse] +
+* xref:{s-path}/storage-publiclink.adoc[storage-publiclink] +
+* xref:{s-path}/storage-shares.adoc[storage-shares] +
+* xref:{s-path}/storage-system.adoc[storage-system] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+* xref:{s-path}/thumbnails.adoc[thumbnails] +
+* xref:{s-path}/userlog.adoc[userlog] +
+* xref:{s-path}/users.adoc[users] +
+* xref:{s-path}/web.adoc[web] +
+* xref:{s-path}/webdav.adoc[webdav] +
+* xref:{s-path}/webfinger.adoc[webfinger] +
+
+a| [subs=-attributes]
+++bool ++
+
+a| [subs=-attributes]
+++false ++
+
+a| [subs=-attributes]
+Activates pretty log output.
+a| `OCIS_MACHINE_AUTH_API_KEY`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/auth-app.adoc[auth-app] +
+* xref:{s-path}/auth-machine.adoc[auth-machine] +
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/idp.adoc[idp] +
+* xref:{s-path}/ocdav.adoc[ocdav] +
+* xref:{s-path}/proxy.adoc[proxy] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++ ++
+
+a| [subs=-attributes]
+Machine auth API key used to validate internal requests necessary for the access to resources from other services.
+a| `OCIS_MAX_CONCURRENCY`
+
+a| [subs=-attributes]
+++7.0.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+* xref:{s-path}/userlog.adoc[userlog] +
+
+a| [subs=-attributes]
+++int ++
+
+a| [subs=-attributes]
+++1 ++
+
+a| [subs=-attributes]
+Maximum number of concurrent go-routines. Higher values can potentially get work done faster but will also cause more load on the system. Values of 0 or below will be ignored and the default value will be used.
+a| `OCIS_MAX_TAG_LENGTH`
+
+a| [subs=-attributes]
+++7.2.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/graph.adoc[graph] +
+
+a| [subs=-attributes]
+++int ++
+
+a| [subs=-attributes]
+++100 ++
+
+a| [subs=-attributes]
+Define the maximum tag length. Defaults to 100 if not set. Set to 0 to not limit the tag length. Changes only impact the validation of new tags.
+a| `OCIS_MFA_AUTH_LEVEL_NAMES`
+
+a| [subs=-attributes]
+++7.3.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/proxy.adoc[proxy] +
+
+a| [subs=-attributes]
+++[]string ++
+
+a| [subs=-attributes]
+++[advanced] ++
+
+a| [subs=-attributes]
+This authentication level name indicates that multi-factor authentication was performed. The name must match the ACR claim in the access token received. Note: If multiple names are required, use a comma-separated list. The front-end service will use the first name in the list when requesting multi-factor authentication (MFA).
+a| `OCIS_MFA_ENABLED`
+
+a| [subs=-attributes]
+++7.3.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/proxy.adoc[proxy] +
+
+a| [subs=-attributes]
+++bool ++
+
+a| [subs=-attributes]
+++false ++
+
+a| [subs=-attributes]
+Set to true to enable multi factor authentication. See the documentation for more details.
+a| `OCIS_MULTI_INSTANCE_ENABLED`
+
+a| [subs=-attributes]
+++8.0.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/proxy.adoc[proxy] +
+
+a| [subs=-attributes]
+++bool ++
+
+a| [subs=-attributes]
+++false ++
+
+a| [subs=-attributes]
+Enable multiple instances of Infinite Scale.
+a| `OCIS_MULTI_INSTANCE_INSTANCEID`
+
+a| [subs=-attributes]
+++8.0.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/proxy.adoc[proxy] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++ ++
+
+a| [subs=-attributes]
+The unique ID of this instance.
+a| `OCIS_OIDC_ISSUER`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/auth-bearer.adoc[auth-bearer] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/idm.adoc[idm] +
+* xref:{s-path}/idp.adoc[idp] +
+* xref:{s-path}/proxy.adoc[proxy] +
+* xref:{s-path}/users.adoc[users] +
+* xref:{s-path}/web.adoc[web] +
+* xref:{s-path}/webfinger.adoc[webfinger] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++https://localhost:9200 ++
+
+a| [subs=-attributes]
+The identity provider value to set in the group IDs of the CS3 group objects for groups returned by this group provider.
+a| `OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST`
+
+a| [subs=-attributes]
+++5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/sharing.adoc[sharing] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++ ++
+
+a| [subs=-attributes]
+Path to the 'banned passwords list' file. This only impacts public link password validation. See the documentation for more details.
+a| `OCIS_PASSWORD_POLICY_DISABLED`
+
+a| [subs=-attributes]
+++5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/sharing.adoc[sharing] +
+
+a| [subs=-attributes]
+++bool ++
+
+a| [subs=-attributes]
+++false ++
+
+a| [subs=-attributes]
+Disable the password policy. Defaults to false if not set.
+a| `OCIS_PASSWORD_POLICY_MIN_CHARACTERS`
+
+a| [subs=-attributes]
+++5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/sharing.adoc[sharing] +
+
+a| [subs=-attributes]
+++int ++
+
+a| [subs=-attributes]
+++8 ++
+
+a| [subs=-attributes]
+Define the minimum password length. Defaults to 8 if not set.
+a| `OCIS_PASSWORD_POLICY_MIN_DIGITS`
+
+a| [subs=-attributes]
+++5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/sharing.adoc[sharing] +
+
+a| [subs=-attributes]
+++int ++
+
+a| [subs=-attributes]
+++1 ++
+
+a| [subs=-attributes]
+Define the minimum number of digits. Defaults to 1 if not set.
+a| `OCIS_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS`
+
+a| [subs=-attributes]
+++5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/sharing.adoc[sharing] +
+
+a| [subs=-attributes]
+++int ++
+
+a| [subs=-attributes]
+++1 ++
+
+a| [subs=-attributes]
+Define the minimum number of uppercase letters. Defaults to 1 if not set.
+a| `OCIS_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS`
+
+a| [subs=-attributes]
+++5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/sharing.adoc[sharing] +
+
+a| [subs=-attributes]
+++int ++
+
+a| [subs=-attributes]
+++1 ++
+
+a| [subs=-attributes]
+Define the minimum number of characters from the special characters list to be present. Defaults to 1 if not set.
+a| `OCIS_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS`
+
+a| [subs=-attributes]
+++5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/sharing.adoc[sharing] +
+
+a| [subs=-attributes]
+++int ++
+
+a| [subs=-attributes]
+++1 ++
+
+a| [subs=-attributes]
+Define the minimum number of lowercase letters. Defaults to 1 if not set.
+a| `OCIS_PERSISTENT_STORE`
+
+a| [subs=-attributes]
+++8.0.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/activitylog.adoc[activitylog] +
+* xref:{s-path}/collaboration.adoc[collaboration] +
+* xref:{s-path}/eventhistory.adoc[eventhistory] +
+* xref:{s-path}/notifications.adoc[notifications] +
+* xref:{s-path}/postprocessing.adoc[postprocessing] +
+* xref:{s-path}/storage-publiclink.adoc[storage-publiclink] +
+* xref:{s-path}/userlog.adoc[userlog] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++nats-js-kv ++
+
+a| [subs=-attributes]
+The type of the store. Supported values are: 'memory', 'nats-js-kv', 'redis-sentinel', 'noop'. See the text description for details.
+a| `OCIS_PERSISTENT_STORE_AUTH_PASSWORD`
+
+a| [subs=-attributes]
+++8.0.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/activitylog.adoc[activitylog] +
+* xref:{s-path}/collaboration.adoc[collaboration] +
+* xref:{s-path}/eventhistory.adoc[eventhistory] +
+* xref:{s-path}/notifications.adoc[notifications] +
+* xref:{s-path}/postprocessing.adoc[postprocessing] +
+* xref:{s-path}/storage-publiclink.adoc[storage-publiclink] +
+* xref:{s-path}/userlog.adoc[userlog] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++ ++
+
+a| [subs=-attributes]
+The password to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.
+a| `OCIS_PERSISTENT_STORE_AUTH_USERNAME`
+
+a| [subs=-attributes]
+++8.0.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/activitylog.adoc[activitylog] +
+* xref:{s-path}/collaboration.adoc[collaboration] +
+* xref:{s-path}/eventhistory.adoc[eventhistory] +
+* xref:{s-path}/notifications.adoc[notifications] +
+* xref:{s-path}/postprocessing.adoc[postprocessing] +
+* xref:{s-path}/storage-publiclink.adoc[storage-publiclink] +
+* xref:{s-path}/userlog.adoc[userlog] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++ ++
+
+a| [subs=-attributes]
+The username to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.
+a| `OCIS_PERSISTENT_STORE_NODES`
+
+a| [subs=-attributes]
+++8.0.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/activitylog.adoc[activitylog] +
+* xref:{s-path}/collaboration.adoc[collaboration] +
+* xref:{s-path}/eventhistory.adoc[eventhistory] +
+* xref:{s-path}/notifications.adoc[notifications] +
+* xref:{s-path}/postprocessing.adoc[postprocessing] +
+* xref:{s-path}/storage-publiclink.adoc[storage-publiclink] +
+* xref:{s-path}/userlog.adoc[userlog] +
+
+a| [subs=-attributes]
+++[]string ++
+
+a| [subs=-attributes]
+++[127.0.0.1:9233] ++
+
+a| [subs=-attributes]
+A list of nodes to access the configured store. This has no effect when 'memory' store is configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details.
+a| `OCIS_PERSISTENT_STORE_TTL`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/activitylog.adoc[activitylog] +
+* xref:{s-path}/collaboration.adoc[collaboration] +
+* xref:{s-path}/eventhistory.adoc[eventhistory] +
+* xref:{s-path}/notifications.adoc[notifications] +
+* xref:{s-path}/postprocessing.adoc[postprocessing] +
+* xref:{s-path}/userlog.adoc[userlog] +
+
+a| [subs=-attributes]
+++Duration ++
+
+a| [subs=-attributes]
+++0s ++
+
+a| [subs=-attributes]
+Time to live for events in the store. See the Environment Variable Types description for more details.
+a| `OCIS_REVA_GATEWAY`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/activitylog.adoc[activitylog] +
+* xref:{s-path}/app-provider.adoc[app-provider] +
+* xref:{s-path}/app-registry.adoc[app-registry] +
+* xref:{s-path}/auth-app.adoc[auth-app] +
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/auth-bearer.adoc[auth-bearer] +
+* xref:{s-path}/auth-machine.adoc[auth-machine] +
+* xref:{s-path}/auth-service.adoc[auth-service] +
+* xref:{s-path}/clientlog.adoc[clientlog] +
+* xref:{s-path}/collaboration.adoc[collaboration] +
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/gateway.adoc[gateway] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/idp.adoc[idp] +
+* xref:{s-path}/notifications.adoc[notifications] +
+* xref:{s-path}/ocdav.adoc[ocdav] +
+* xref:{s-path}/ocm.adoc[ocm] +
+* xref:{s-path}/proxy.adoc[proxy] +
+* xref:{s-path}/search.adoc[search] +
+* xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/storage-publiclink.adoc[storage-publiclink] +
+* xref:{s-path}/storage-shares.adoc[storage-shares] +
+* xref:{s-path}/storage-system.adoc[storage-system] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+* xref:{s-path}/thumbnails.adoc[thumbnails] +
+* xref:{s-path}/userlog.adoc[userlog] +
+* xref:{s-path}/users.adoc[users] +
+* xref:{s-path}/webdav.adoc[webdav] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++com.owncloud.api.gateway ++
+
+a| [subs=-attributes]
+The CS3 gateway endpoint.
+a| `OCIS_SERVICE_ACCOUNT_ID`
+
+a| [subs=-attributes]
+++5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/activitylog.adoc[activitylog] +
+* xref:{s-path}/auth-service.adoc[auth-service] +
+* xref:{s-path}/clientlog.adoc[clientlog] +
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/notifications.adoc[notifications] +
+* xref:{s-path}/ocm.adoc[ocm] +
+* xref:{s-path}/proxy.adoc[proxy] +
+* xref:{s-path}/search.adoc[search] +
+* xref:{s-path}/settings.adoc[settings] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+* xref:{s-path}/userlog.adoc[userlog] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++ ++
+
+a| [subs=-attributes]
+The ID of the service account the service should use. See the 'auth-service' service description for more details.
+a| `OCIS_SERVICE_ACCOUNT_SECRET`
+
+a| [subs=-attributes]
+++5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/activitylog.adoc[activitylog] +
+* xref:{s-path}/auth-service.adoc[auth-service] +
+* xref:{s-path}/clientlog.adoc[clientlog] +
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/notifications.adoc[notifications] +
+* xref:{s-path}/ocm.adoc[ocm] +
+* xref:{s-path}/proxy.adoc[proxy] +
+* xref:{s-path}/search.adoc[search] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+* xref:{s-path}/userlog.adoc[userlog] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++ ++
+
+a| [subs=-attributes]
+The service account secret.
+a| `OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD`
+
+a| [subs=-attributes]
+++5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/sharing.adoc[sharing] +
+
+a| [subs=-attributes]
+++bool ++
+
+a| [subs=-attributes]
+++true ++
+
+a| [subs=-attributes]
+Set this to true if you want to enforce passwords on all public shares.
+a| `OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD`
+
+a| [subs=-attributes]
+++5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/sharing.adoc[sharing] +
+
+a| [subs=-attributes]
+++bool ++
+
+a| [subs=-attributes]
+++false ++
+
+a| [subs=-attributes]
+Set this to true if you want to enforce passwords on Uploader, Editor or Contributor shares.
+a| `OCIS_SPACES_MAX_QUOTA`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+
+a| [subs=-attributes]
+++uint64 ++
+
+a| [subs=-attributes]
+++0 ++
+
+a| [subs=-attributes]
+Set the global max quota value in bytes. A value of 0 equals unlimited. The value is provided via capabilities.
+a| `OCIS_SYSTEM_USER_API_KEY`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/settings.adoc[settings] +
+* xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/storage-system.adoc[storage-system] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++ ++
+
+a| [subs=-attributes]
+API key for the STORAGE-SYSTEM system user.
+a| `OCIS_SYSTEM_USER_ID`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/settings.adoc[settings] +
+* xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/storage-system.adoc[storage-system] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++ ++
+
+a| [subs=-attributes]
+ID of the oCIS storage-system system user. Admins need to set the ID for the STORAGE-SYSTEM system user in this config option which is then used to reference the user. Any reasonable long string is possible, preferably this would be an UUIDv4 format.
+a| `OCIS_SYSTEM_USER_IDP`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/settings.adoc[settings] +
+* xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/sharing.adoc[sharing] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++internal ++
+
+a| [subs=-attributes]
+IDP of the oCIS STORAGE-SYSTEM system user.
+a| `OCIS_TRACING_COLLECTOR`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/activitylog.adoc[activitylog] +
+* xref:{s-path}/antivirus.adoc[antivirus] +
+* xref:{s-path}/app-provider.adoc[app-provider] +
+* xref:{s-path}/app-registry.adoc[app-registry] +
+* xref:{s-path}/audit.adoc[audit] +
+* xref:{s-path}/auth-app.adoc[auth-app] +
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/auth-bearer.adoc[auth-bearer] +
+* xref:{s-path}/auth-machine.adoc[auth-machine] +
+* xref:{s-path}/auth-service.adoc[auth-service] +
+* xref:{s-path}/clientlog.adoc[clientlog] +
+* xref:{s-path}/collaboration.adoc[collaboration] +
+* xref:{s-path}/eventhistory.adoc[eventhistory] +
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/gateway.adoc[gateway] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/idm.adoc[idm] +
+* xref:{s-path}/idp.adoc[idp] +
+* xref:{s-path}/invitations.adoc[invitations] +
+* xref:{s-path}/nats.adoc[nats] +
+* xref:{s-path}/notifications.adoc[notifications] +
+* xref:{s-path}/ocdav.adoc[ocdav] +
+* xref:{s-path}/ocm.adoc[ocm] +
+* xref:{s-path}/ocs.adoc[ocs] +
+* xref:{s-path}/policies.adoc[policies] +
+* xref:{s-path}/postprocessing.adoc[postprocessing] +
+* xref:{s-path}/proxy.adoc[proxy] +
+* xref:{s-path}/search.adoc[search] +
+* xref:{s-path}/settings.adoc[settings] +
+* xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/sse.adoc[sse] +
+* xref:{s-path}/storage-publiclink.adoc[storage-publiclink] +
+* xref:{s-path}/storage-shares.adoc[storage-shares] +
+* xref:{s-path}/storage-system.adoc[storage-system] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+* xref:{s-path}/thumbnails.adoc[thumbnails] +
+* xref:{s-path}/userlog.adoc[userlog] +
+* xref:{s-path}/users.adoc[users] +
+* xref:{s-path}/web.adoc[web] +
+* xref:{s-path}/webdav.adoc[webdav] +
+* xref:{s-path}/webfinger.adoc[webfinger] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++ ++
+
+a| [subs=-attributes]
+The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.
+a| `OCIS_TRACING_ENABLED`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/activitylog.adoc[activitylog] +
+* xref:{s-path}/antivirus.adoc[antivirus] +
+* xref:{s-path}/app-provider.adoc[app-provider] +
+* xref:{s-path}/app-registry.adoc[app-registry] +
+* xref:{s-path}/audit.adoc[audit] +
+* xref:{s-path}/auth-app.adoc[auth-app] +
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/auth-bearer.adoc[auth-bearer] +
+* xref:{s-path}/auth-machine.adoc[auth-machine] +
+* xref:{s-path}/auth-service.adoc[auth-service] +
+* xref:{s-path}/clientlog.adoc[clientlog] +
+* xref:{s-path}/collaboration.adoc[collaboration] +
+* xref:{s-path}/eventhistory.adoc[eventhistory] +
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/gateway.adoc[gateway] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/idm.adoc[idm] +
+* xref:{s-path}/idp.adoc[idp] +
+* xref:{s-path}/invitations.adoc[invitations] +
+* xref:{s-path}/nats.adoc[nats] +
+* xref:{s-path}/notifications.adoc[notifications] +
+* xref:{s-path}/ocdav.adoc[ocdav] +
+* xref:{s-path}/ocm.adoc[ocm] +
+* xref:{s-path}/ocs.adoc[ocs] +
+* xref:{s-path}/policies.adoc[policies] +
+* xref:{s-path}/postprocessing.adoc[postprocessing] +
+* xref:{s-path}/proxy.adoc[proxy] +
+* xref:{s-path}/search.adoc[search] +
+* xref:{s-path}/settings.adoc[settings] +
+* xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/sse.adoc[sse] +
+* xref:{s-path}/storage-publiclink.adoc[storage-publiclink] +
+* xref:{s-path}/storage-shares.adoc[storage-shares] +
+* xref:{s-path}/storage-system.adoc[storage-system] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+* xref:{s-path}/thumbnails.adoc[thumbnails] +
+* xref:{s-path}/userlog.adoc[userlog] +
+* xref:{s-path}/users.adoc[users] +
+* xref:{s-path}/web.adoc[web] +
+* xref:{s-path}/webdav.adoc[webdav] +
+* xref:{s-path}/webfinger.adoc[webfinger] +
+
+a| [subs=-attributes]
+++bool ++
+
+a| [subs=-attributes]
+++false ++
+
+a| [subs=-attributes]
+Activates tracing.
+a| `OCIS_TRACING_ENDPOINT`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/activitylog.adoc[activitylog] +
+* xref:{s-path}/antivirus.adoc[antivirus] +
+* xref:{s-path}/app-provider.adoc[app-provider] +
+* xref:{s-path}/app-registry.adoc[app-registry] +
+* xref:{s-path}/audit.adoc[audit] +
+* xref:{s-path}/auth-app.adoc[auth-app] +
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/auth-bearer.adoc[auth-bearer] +
+* xref:{s-path}/auth-machine.adoc[auth-machine] +
+* xref:{s-path}/auth-service.adoc[auth-service] +
+* xref:{s-path}/clientlog.adoc[clientlog] +
+* xref:{s-path}/collaboration.adoc[collaboration] +
+* xref:{s-path}/eventhistory.adoc[eventhistory] +
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/gateway.adoc[gateway] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/idm.adoc[idm] +
+* xref:{s-path}/idp.adoc[idp] +
+* xref:{s-path}/invitations.adoc[invitations] +
+* xref:{s-path}/nats.adoc[nats] +
+* xref:{s-path}/notifications.adoc[notifications] +
+* xref:{s-path}/ocdav.adoc[ocdav] +
+* xref:{s-path}/ocm.adoc[ocm] +
+* xref:{s-path}/ocs.adoc[ocs] +
+* xref:{s-path}/policies.adoc[policies] +
+* xref:{s-path}/postprocessing.adoc[postprocessing] +
+* xref:{s-path}/proxy.adoc[proxy] +
+* xref:{s-path}/search.adoc[search] +
+* xref:{s-path}/settings.adoc[settings] +
+* xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/sse.adoc[sse] +
+* xref:{s-path}/storage-publiclink.adoc[storage-publiclink] +
+* xref:{s-path}/storage-shares.adoc[storage-shares] +
+* xref:{s-path}/storage-system.adoc[storage-system] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+* xref:{s-path}/thumbnails.adoc[thumbnails] +
+* xref:{s-path}/userlog.adoc[userlog] +
+* xref:{s-path}/users.adoc[users] +
+* xref:{s-path}/web.adoc[web] +
+* xref:{s-path}/webdav.adoc[webdav] +
+* xref:{s-path}/webfinger.adoc[webfinger] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++ ++
+
+a| [subs=-attributes]
+The endpoint of the tracing agent.
+a| `OCIS_TRACING_TYPE`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/activitylog.adoc[activitylog] +
+* xref:{s-path}/antivirus.adoc[antivirus] +
+* xref:{s-path}/app-provider.adoc[app-provider] +
+* xref:{s-path}/app-registry.adoc[app-registry] +
+* xref:{s-path}/audit.adoc[audit] +
+* xref:{s-path}/auth-app.adoc[auth-app] +
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/auth-bearer.adoc[auth-bearer] +
+* xref:{s-path}/auth-machine.adoc[auth-machine] +
+* xref:{s-path}/auth-service.adoc[auth-service] +
+* xref:{s-path}/clientlog.adoc[clientlog] +
+* xref:{s-path}/collaboration.adoc[collaboration] +
+* xref:{s-path}/eventhistory.adoc[eventhistory] +
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/gateway.adoc[gateway] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/idm.adoc[idm] +
+* xref:{s-path}/idp.adoc[idp] +
+* xref:{s-path}/invitations.adoc[invitations] +
+* xref:{s-path}/nats.adoc[nats] +
+* xref:{s-path}/notifications.adoc[notifications] +
+* xref:{s-path}/ocdav.adoc[ocdav] +
+* xref:{s-path}/ocm.adoc[ocm] +
+* xref:{s-path}/ocs.adoc[ocs] +
+* xref:{s-path}/policies.adoc[policies] +
+* xref:{s-path}/postprocessing.adoc[postprocessing] +
+* xref:{s-path}/proxy.adoc[proxy] +
+* xref:{s-path}/search.adoc[search] +
+* xref:{s-path}/settings.adoc[settings] +
+* xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/sse.adoc[sse] +
+* xref:{s-path}/storage-publiclink.adoc[storage-publiclink] +
+* xref:{s-path}/storage-shares.adoc[storage-shares] +
+* xref:{s-path}/storage-system.adoc[storage-system] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+* xref:{s-path}/thumbnails.adoc[thumbnails] +
+* xref:{s-path}/userlog.adoc[userlog] +
+* xref:{s-path}/users.adoc[users] +
+* xref:{s-path}/web.adoc[web] +
+* xref:{s-path}/webdav.adoc[webdav] +
+* xref:{s-path}/webfinger.adoc[webfinger] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++ ++
+
+a| [subs=-attributes]
+The type of tracing. Defaults to '', which is the same as 'jaeger'. Allowed tracing types are 'jaeger', 'otlp' and '' as of now.
+a| `OCIS_TRANSFER_SECRET`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/gateway.adoc[gateway] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++ ++
+
+a| [subs=-attributes]
+Transfer secret for signing file up- and download requests.
+a| `OCIS_TRANSLATION_PATH`
+
+a| [subs=-attributes]
+++7.0.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/activitylog.adoc[activitylog] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/notifications.adoc[notifications] +
+* xref:{s-path}/settings.adoc[settings] +
+* xref:{s-path}/userlog.adoc[userlog] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++ ++
+
+a| [subs=-attributes]
+(optional) Set this to a path with custom translations to overwrite the builtin translations. Note that file and folder naming rules apply, see the documentation for more details.
+a| `OCIS_URL`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/app-provider.adoc[app-provider] +
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/auth-bearer.adoc[auth-bearer] +
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/gateway.adoc[gateway] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/idm.adoc[idm] +
+* xref:{s-path}/idp.adoc[idp] +
+* xref:{s-path}/notifications.adoc[notifications] +
+* xref:{s-path}/ocdav.adoc[ocdav] +
+* xref:{s-path}/proxy.adoc[proxy] +
+* xref:{s-path}/users.adoc[users] +
+* xref:{s-path}/web.adoc[web] +
+* xref:{s-path}/web.adoc[web] +
+* xref:{s-path}/web.adoc[web] +
+* xref:{s-path}/webdav.adoc[webdav] +
+* xref:{s-path}/webfinger.adoc[webfinger] +
+* xref:{s-path}/webfinger.adoc[webfinger] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++https://localhost:9200 ++
+
+a| [subs=-attributes]
+The identity provider value to set in the group IDs of the CS3 group objects for groups returned by this group provider.
+a| `OCIS_USER_SEARCH_DISPLAYED_ATTRIBUTES`
+
+a| [subs=-attributes]
+++7.3.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/graph.adoc[graph] +
+
+a| [subs=-attributes]
+++[]string ++
+
+a| [subs=-attributes]
+++[] ++
+
+a| [subs=-attributes]
+A list of user attributes to display in the user search results.
+a| `OCIS_WOPI_DISABLE_CHAT`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/app-provider.adoc[app-provider] +
+* xref:{s-path}/collaboration.adoc[collaboration] +
+
+a| [subs=-attributes]
+++bool ++
+
+a| [subs=-attributes]
+++false ++
+
+a| [subs=-attributes]
+Disable the chat functionality of the office app.
+a| `STORAGE_USERS_ASYNC_PROPAGATOR_PROPAGATION_DELAY`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/storage-users.adoc[storage-users] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+
+a| [subs=-attributes]
+++Duration ++
+
+a| [subs=-attributes]
+++0s ++
+
+a| [subs=-attributes]
+The delay between a change made to a tree and the propagation start on treesize and treetime. Multiple propagations are computed to a single one. See the Environment Variable Types description for more details.
+a| `STORAGE_USERS_PERMISSION_ENDPOINT`
+
+a| [subs=-attributes]
+++pre5.0 ++
+
+a| [subs=attributes+]
+* xref:{s-path}/storage-users.adoc[storage-users] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++com.owncloud.api.settings ++
+
+a| [subs=-attributes]
+Endpoint of the permissions service. The endpoints can differ for 'ocis' and 's3ng'.
+|===

@@ -1,0 +1,556 @@
+// set the attribute to true or leave empty, true without any quotes.
+// if the generated adoc file is used outside tabs, it renders correctly depending on the attribute set.
+// if inside, you need to also use the xxx_deprecation.adoc file. attributes can't be defined inside tabs.
+
+:show-deprecation: false
+
+ifeval::[{show-deprecation} == true]
+
+[#deprecation-note-2026-02-16-13-23-04]
+[caption=]
+.Deprecation notes for the collaboration service
+[width="100%",cols="~,~,~,~",options="header"]
+|===
+| Deprecation Info
+| Deprecation Version
+| Removal Version
+| Deprecation Replacement
+|===
+
+{empty} +
+
+endif::[]
+
+[caption=]
+.Environment variables for the collaboration service
+[width="100%",cols="~,~,~,~,~",options="header"]
+|===
+| Name
+| IV
+| Type
+| Default Value
+| Description
+
+a|`COLLABORATION_APP_NAME` +
+
+a| [subs=-attributes]
+++6.0.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++Collabora ++
+a| [subs=-attributes]
+The name of the app which is shown to the user. You can chose freely but you are limited to a single word without special characters or whitespaces. We recommend to use pascalCase like 'CollaboraOnline'.
+
+a|`COLLABORATION_APP_PRODUCT` +
+
+a| [subs=-attributes]
+++7.0.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++Collabora ++
+a| [subs=-attributes]
+The WebOffice app, either Collabora, OnlyOffice, Microsoft365 or MicrosoftOfficeOnline.
+
+a|`COLLABORATION_APP_PRODUCT_EDITION` +
+
+a| [subs=-attributes]
+++7.3.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The WebOffice app edition defines the capabilities specific to the product such as CE - Community Edition, EE - Enterprise Edition DE - Developer Edition, etc. Currently supported values are limited to OnlyOffice and are: 'ce', 'ee' or 'de' and  default to empty which is equal to ce). See the documentation for more details.
+
+a|`COLLABORATION_APP_DESCRIPTION` +
+
+a| [subs=-attributes]
+++6.0.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++Open office documents with Collabora ++
+a| [subs=-attributes]
+App description
+
+a|`COLLABORATION_APP_ICON` +
+
+a| [subs=-attributes]
+++6.0.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++image-edit ++
+a| [subs=-attributes]
+Icon for the app
+
+a|`COLLABORATION_APP_ADDR` +
+
+a| [subs=-attributes]
+++6.0.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++https://127.0.0.1:9980 ++
+a| [subs=-attributes]
+The URL where the WOPI app is located, such as \https://127.0.0.1:8080.
+
+a|`COLLABORATION_APP_INSECURE` +
+
+a| [subs=-attributes]
+++6.0.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Skip TLS certificate verification when connecting to the WOPI app
+
+a|`COLLABORATION_APP_PROOF_DISABLE` +
+
+a| [subs=-attributes]
+++6.0.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Disable the proof keys verification
+
+a|`COLLABORATION_APP_PROOF_DURATION` +
+
+a| [subs=-attributes]
+++6.0.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++12h ++
+a| [subs=-attributes]
+Duration for the proof keys to be cached in memory, using time.ParseDuration format. If the duration can't be parsed, we'll use the default 12h as duration
+
+a|`COLLABORATION_APP_LICENSE_CHECK_ENABLE` +
+
+a| [subs=-attributes]
+++7.0.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Enable license checking to edit files. Needs to be enabled when using Microsoft365 with the business flow.
+
+a|`OCIS_PERSISTENT_STORE` +
+`COLLABORATION_STORE` +
+
+a| [subs=-attributes]
+++7.0.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++nats-js-kv ++
+a| [subs=-attributes]
+The type of the store. Supported values are: 'memory', 'nats-js-kv', 'redis-sentinel', 'noop'. See the text description for details.
+
+a|`OCIS_PERSISTENT_STORE_NODES` +
+`COLLABORATION_STORE_NODES` +
+
+a| [subs=-attributes]
+++7.0.0 ++
+a| [subs=-attributes]
+++[]string ++
+a| [subs=-attributes]
+++[127.0.0.1:9233] ++
+a| [subs=-attributes]
+A list of nodes to access the configured store. This has no effect when 'memory' store is configured. Note that the behaviour how nodes are used is dependent on the library of the configured store. See the Environment Variable Types description for more details.
+
+a|`COLLABORATION_STORE_DATABASE` +
+
+a| [subs=-attributes]
+++7.0.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++collaboration ++
+a| [subs=-attributes]
+The database name the configured store should use.
+
+a|`COLLABORATION_STORE_TABLE` +
+
+a| [subs=-attributes]
+++7.0.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The database table the store should use.
+
+a|`OCIS_PERSISTENT_STORE_TTL` +
+`COLLABORATION_STORE_TTL` +
+
+a| [subs=-attributes]
+++7.0.0 ++
+a| [subs=-attributes]
+++Duration ++
+a| [subs=-attributes]
+++30m0s ++
+a| [subs=-attributes]
+Time to live for events in the store. Defaults to '30m' (30 minutes). See the Environment Variable Types description for more details.
+
+a|`OCIS_PERSISTENT_STORE_AUTH_USERNAME` +
+`COLLABORATION_STORE_AUTH_USERNAME` +
+
+a| [subs=-attributes]
+++7.0.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The username to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.
+
+a|`OCIS_PERSISTENT_STORE_AUTH_PASSWORD` +
+`COLLABORATION_STORE_AUTH_PASSWORD` +
+
+a| [subs=-attributes]
+++7.0.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The password to authenticate with the store. Only applies when store type 'nats-js-kv' is configured.
+
+a|`OCIS_JWT_SECRET` +
+`COLLABORATION_JWT_SECRET` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The secret to mint and validate jwt tokens.
+
+a|`COLLABORATION_GRPC_ADDR` +
+
+a| [subs=-attributes]
+++6.0.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++127.0.0.1:9301 ++
+a| [subs=-attributes]
+The bind address of the GRPC service.
+
+a|`OCIS_GRPC_PROTOCOL` +
+`COLLABORATION_GRPC_PROTOCOL` +
+
+a| [subs=-attributes]
+++7.0.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++tcp ++
+a| [subs=-attributes]
+The transport protocol of the GRPC service.
+
+a|`COLLABORATION_HTTP_ADDR` +
+
+a| [subs=-attributes]
+++6.0.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++127.0.0.1:9300 ++
+a| [subs=-attributes]
+The bind address of the HTTP service.
+
+a|`OCIS_HTTP_TLS_ENABLED` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Activates TLS for the http based services using the server certifcate and key configured via OCIS_HTTP_TLS_CERTIFICATE and OCIS_HTTP_TLS_KEY. If OCIS_HTTP_TLS_CERTIFICATE is not set a temporary server certificate is generated - to be used with PROXY_INSECURE_BACKEND=true.
+
+a|`OCIS_HTTP_TLS_CERTIFICATE` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Path/File name of the TLS server certificate (in PEM format) for the http services.
+
+a|`OCIS_HTTP_TLS_KEY` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Path/File name for the TLS certificate key (in PEM format) for the server certificate to use for the http services.
+
+a|`COLLABORATION_WOPI_SRC` +
+
+a| [subs=-attributes]
+++6.0.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++https://localhost:9300 ++
+a| [subs=-attributes]
+The WOPI source base URL containing schema, host and port. Set this to the schema and domain where the collaboration service is reachable for the wopi app, such as \https://office.owncloud.test.
+
+a|`COLLABORATION_WOPI_SECRET` +
+
+a| [subs=-attributes]
+++6.0.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Used to mint and verify WOPI JWT tokens and encrypt and decrypt the REVA JWT token embedded in the WOPI JWT token.
+
+a|`COLLABORATION_WOPI_DISABLE_CHAT` +
+`OCIS_WOPI_DISABLE_CHAT` +
+
+a| [subs=-attributes]
+++7.0.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Disable chat in the office web frontend. This feature applies to OnlyOffice and Microsoft.
+
+a|`COLLABORATION_WOPI_ENABLE_MOBILE` +
+
+a| [subs=-attributes]
+++7.3.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Enable the mobile web view for office app. This feature applies to OnlyOffice.  See the documentation for more details.
+
+a|`COLLABORATION_WOPI_PROXY_URL` +
+
+a| [subs=-attributes]
+++7.0.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The URL to the ownCloud Office365 WOPI proxy. Optional. To use this feature, you need an office365 proxy subscription. If you become part of the Microsoft CSP program (\https://learn.microsoft.com/en-us/partner-center/enroll/csp-overview), you can use WebOffice without a proxy.
+
+a|`COLLABORATION_WOPI_PROXY_SECRET` +
+
+a| [subs=-attributes]
+++7.0.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Optional, the secret to authenticate against the ownCloud Office365 WOPI proxy. This secret can be obtained from ownCloud via the office365 proxy subscription.
+
+a|`COLLABORATION_WOPI_SHORTTOKENS` +
+
+a| [subs=-attributes]
+++7.0.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Use short access tokens for WOPI access. This is useful for office packages, like Microsoft Office Online, which have URL length restrictions. If enabled, a persistent store must be configured.
+
+a|`COLLABORATION_WOPI_DISABLED_EXTENSIONS` +
+
+a| [subs=-attributes]
+++8.0.0 ++
+a| [subs=-attributes]
+++[]string ++
+a| [subs=-attributes]
+++[] ++
+a| [subs=-attributes]
+List of extensions to disable: Disabling an extension will make it unavailable to the Office web front end. The list is comma-separated with no spaces between the items, such as 'docx,xlsx,pptx'.
+
+a|`OCIS_REVA_GATEWAY` +
+
+a| [subs=-attributes]
+++6.0.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++com.owncloud.api.gateway ++
+a| [subs=-attributes]
+CS3 gateway used to look up user metadata.
+
+a|`COLLABORATION_CS3API_DATAGATEWAY_INSECURE` +
+
+a| [subs=-attributes]
+++6.0.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Connect to the CS3API data gateway insecurely.
+
+a|`OCIS_TRACING_ENABLED` +
+`COLLABORATION_TRACING_ENABLED` +
+
+a| [subs=-attributes]
+++6.0.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Activates tracing.
+
+a|`OCIS_TRACING_TYPE` +
+`COLLABORATION_TRACING_TYPE` +
+
+a| [subs=-attributes]
+++6.0.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The type of tracing. Defaults to '', which is the same as 'jaeger'. Allowed tracing types are 'jaeger', 'otlp' and '' as of now.
+
+a|`OCIS_TRACING_ENDPOINT` +
+`COLLABORATION_TRACING_ENDPOINT` +
+
+a| [subs=-attributes]
+++6.0.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The endpoint of the tracing agent.
+
+a|`OCIS_TRACING_COLLECTOR` +
+`COLLABORATION_TRACING_COLLECTOR` +
+
+a| [subs=-attributes]
+++6.0.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.
+
+a|`OCIS_LOG_LEVEL` +
+`COLLABORATION_LOG_LEVEL` +
+
+a| [subs=-attributes]
+++6.0.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The log level. Valid values are: 'panic', 'fatal', 'error', 'warn', 'info', 'debug', 'trace'.
+
+a|`OCIS_LOG_PRETTY` +
+`COLLABORATION_LOG_PRETTY` +
+
+a| [subs=-attributes]
+++6.0.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Activates pretty log output.
+
+a|`OCIS_LOG_COLOR` +
+`COLLABORATION_LOG_COLOR` +
+
+a| [subs=-attributes]
+++6.0.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Activates colorized log output.
+
+a|`OCIS_LOG_FILE` +
+`COLLABORATION_LOG_FILE` +
+
+a| [subs=-attributes]
+++6.0.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The path to the log file. Activates logging to this file if set.
+
+a|`COLLABORATION_DEBUG_ADDR` +
+
+a| [subs=-attributes]
+++6.0.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++127.0.0.1:9304 ++
+a| [subs=-attributes]
+Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.
+
+a|`COLLABORATION_DEBUG_TOKEN` +
+
+a| [subs=-attributes]
+++6.0.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Token to secure the metrics endpoint.
+
+a|`COLLABORATION_DEBUG_PPROF` +
+
+a| [subs=-attributes]
+++6.0.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Enables pprof, which can be used for profiling.
+
+a|`COLLABORATION_DEBUG_ZPAGES` +
+
+a| [subs=-attributes]
+++6.0.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Enables zpages, which can be used for collecting and viewing in-memory traces.
+|===
+

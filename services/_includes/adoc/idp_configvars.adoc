@@ -1,0 +1,674 @@
+// set the attribute to true or leave empty, true without any quotes.
+// if the generated adoc file is used outside tabs, it renders correctly depending on the attribute set.
+// if inside, you need to also use the xxx_deprecation.adoc file. attributes can't be defined inside tabs.
+
+:show-deprecation: false
+
+ifeval::[{show-deprecation} == true]
+
+[#deprecation-note-2026-02-16-13-23-04]
+[caption=]
+.Deprecation notes for the idp service
+[width="100%",cols="~,~,~,~",options="header"]
+|===
+| Deprecation Info
+| Deprecation Version
+| Removal Version
+| Deprecation Replacement
+|===
+
+{empty} +
+
+endif::[]
+
+[caption=]
+.Environment variables for the idp service
+[width="100%",cols="~,~,~,~,~",options="header"]
+|===
+| Name
+| IV
+| Type
+| Default Value
+| Description
+
+a|`IDP_PASSWORD_RESET_URI` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The URI where a user can reset their password.
+
+a|`OCIS_TRACING_ENABLED` +
+`IDP_TRACING_ENABLED` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Activates tracing.
+
+a|`OCIS_TRACING_TYPE` +
+`IDP_TRACING_TYPE` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The type of tracing. Defaults to '', which is the same as 'jaeger'. Allowed tracing types are 'jaeger', 'otlp' and '' as of now.
+
+a|`OCIS_TRACING_ENDPOINT` +
+`IDP_TRACING_ENDPOINT` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The endpoint of the tracing agent.
+
+a|`OCIS_TRACING_COLLECTOR` +
+`IDP_TRACING_COLLECTOR` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.
+
+a|`OCIS_LOG_LEVEL` +
+`IDP_LOG_LEVEL` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The log level. Valid values are: 'panic', 'fatal', 'error', 'warn', 'info', 'debug', 'trace'.
+
+a|`OCIS_LOG_PRETTY` +
+`IDP_LOG_PRETTY` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Activates pretty log output.
+
+a|`OCIS_LOG_COLOR` +
+`IDP_LOG_COLOR` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Activates colorized log output.
+
+a|`OCIS_LOG_FILE` +
+`IDP_LOG_FILE` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The path to the log file. Activates logging to this file if set.
+
+a|`IDP_DEBUG_ADDR` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++127.0.0.1:9134 ++
+a| [subs=-attributes]
+Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.
+
+a|`IDP_DEBUG_TOKEN` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Token to secure the metrics endpoint.
+
+a|`IDP_DEBUG_PPROF` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Enables pprof, which can be used for profiling.
+
+a|`IDP_DEBUG_ZPAGES` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Enables zpages, which can be used for collecting and viewing in-memory traces.
+
+a|`IDP_HTTP_ADDR` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++127.0.0.1:9130 ++
+a| [subs=-attributes]
+The bind address of the HTTP service.
+
+a|`IDP_HTTP_ROOT` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++/ ++
+a| [subs=-attributes]
+Subdirectory that serves as the root for this HTTP service.
+
+a|`IDP_TRANSPORT_TLS_CERT` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++/var/lib/ocis/idp/server.crt ++
+a| [subs=-attributes]
+Path/File name of the TLS server certificate (in PEM format) for the IDP service. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH/idp.
+
+a|`IDP_TRANSPORT_TLS_KEY` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++/var/lib/ocis/idp/server.key ++
+a| [subs=-attributes]
+Path/File name for the TLS certificate key (in PEM format) for the server certificate to use for the IDP service. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH/idp.
+
+a|`IDP_TLS` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Disable or Enable HTTPS for the communication between the Proxy service and the IDP service. If set to 'true', the key and cert files need to be configured and present.
+
+a|`OCIS_REVA_GATEWAY` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++com.owncloud.api.gateway ++
+a| [subs=-attributes]
+The CS3 gateway endpoint.
+
+a|`OCIS_GRPC_CLIENT_TLS_MODE` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+TLS mode for grpc connection to the go-micro based grpc services. Possible values are 'off', 'insecure' and 'on'. 'off': disables transport security for the clients. 'insecure' allows using transport security, but disables certificate verification (to be used with the autogenerated self-signed certificates). 'on' enables transport security, including server certificate verification.
+
+a|`OCIS_GRPC_CLIENT_TLS_CACERT` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the go-micro based grpc services.
+
+a|`OCIS_MACHINE_AUTH_API_KEY` +
+`IDP_MACHINE_AUTH_API_KEY` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Machine auth API key used to validate internal requests necessary for the access to resources from other services.
+
+a|`IDP_ASSET_PATH` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Serve IDP assets from a path on the filesystem instead of the builtin assets.
+
+a|`IDP_LOGIN_BACKGROUND_URL` +
+
+a| [subs=-attributes]
+++5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Configure an alternative URL to the background image for the login page.
+
+a|`OCIS_URL` +
+`OCIS_OIDC_ISSUER` +
+`IDP_ISS` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++https://localhost:9200 ++
+a| [subs=-attributes]
+The OIDC issuer URL to use.
+
+a|`IDP_IDENTITY_MANAGER` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ldap ++
+a| [subs=-attributes]
+The identity manager implementation to use. Supported identity managers are 'ldap', 'cs3', 'libregraph' and 'guest'.
+
+a|`IDP_URI_BASE_PATH` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+IDP uri base path (defaults to '').
+
+a|`IDP_SIGN_IN_URI` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+IDP sign-in url.
+
+a|`IDP_SIGN_OUT_URI` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+IDP sign-out url.
+
+a|`IDP_ENDPOINT_URI` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+URL of the IDP endpoint.
+
+a|`OCIS_LDAP_INSECURE` +
+`IDP_INSECURE` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Disable TLS certificate validation for the LDAP connections. Do not set this in production environments.
+
+a|`IDP_ALLOW_CLIENT_GUESTS` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Allow guest clients to access oCIS.
+
+a|`IDP_ALLOW_DYNAMIC_CLIENT_REGISTRATION` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Allow dynamic client registration.
+
+a|`IDP_ENCRYPTION_SECRET_FILE` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++/var/lib/ocis/idp/encryption.key ++
+a| [subs=-attributes]
+Path to the encryption secret file, if unset, a new certificate will be autogenerated upon each restart, thus invalidating all existing sessions. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH/idp.
+
+a|`IDP_SIGNING_KID` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++private-key ++
+a| [subs=-attributes]
+Value of the KID (Key ID) field which is used in created tokens to uniquely identify the signing-private-key.
+
+a|`IDP_SIGNING_METHOD` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++PS256 ++
+a| [subs=-attributes]
+Signing method of IDP requests like 'PS256'
+
+a|`IDP_SIGNING_PRIVATE_KEY_FILES` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++[]string ++
+a| [subs=-attributes]
+++[/var/lib/ocis/idp/private-key.pem] ++
+a| [subs=-attributes]
+A list of private key files for signing IDP requests. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH/idp. See the Environment Variable Types description for more details.
+
+a|`IDP_VALIDATION_KEYS_PATH` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Path to validation keys for IDP requests.
+
+a|`IDP_ACCESS_TOKEN_EXPIRATION` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++uint64 ++
+a| [subs=-attributes]
+++300 ++
+a| [subs=-attributes]
+'Access token lifespan in seconds (time before an access token is expired).'
+
+a|`IDP_ID_TOKEN_EXPIRATION` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++uint64 ++
+a| [subs=-attributes]
+++300 ++
+a| [subs=-attributes]
+ID token lifespan in seconds (time before an ID token is expired).
+
+a|`IDP_REFRESH_TOKEN_EXPIRATION` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++uint64 ++
+a| [subs=-attributes]
+++2592000 ++
+a| [subs=-attributes]
+Refresh token lifespan in seconds (time before an refresh token is expired). This also limits the duration of an idle offline session.
+
+a|`IDP_DYNAMIC_CLIENT_SECRET_DURATION` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++uint64 ++
+a| [subs=-attributes]
+++0 ++
+a| [subs=-attributes]
+Lifespan in seconds of a dynamically registered OIDC client.
+
+a|`OCIS_LDAP_URI` +
+`IDP_LDAP_URI` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ldaps://localhost:9235 ++
+a| [subs=-attributes]
+Url of the LDAP service to use as IDP.
+
+a|`OCIS_LDAP_CACERT` +
+`IDP_LDAP_TLS_CACERT` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++/var/lib/ocis/idm/ldap.crt ++
+a| [subs=-attributes]
+Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the LDAP service. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH/idp.
+
+a|`OCIS_LDAP_BIND_DN` +
+`IDP_LDAP_BIND_DN` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++uid=idp,ou=sysusers,o=libregraph-idm ++
+a| [subs=-attributes]
+LDAP DN to use for simple bind authentication with the target LDAP server.
+
+a|`OCIS_LDAP_BIND_PASSWORD` +
+`IDP_LDAP_BIND_PASSWORD` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Password to use for authenticating the 'bind_dn'.
+
+a|`OCIS_LDAP_USER_BASE_DN` +
+`IDP_LDAP_BASE_DN` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ou=users,o=libregraph-idm ++
+a| [subs=-attributes]
+Search base DN for looking up LDAP users.
+
+a|`OCIS_LDAP_USER_SCOPE` +
+`IDP_LDAP_SCOPE` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++sub ++
+a| [subs=-attributes]
+LDAP search scope to use when looking up users. Supported scopes are 'base', 'one' and 'sub'.
+
+a|`IDP_LDAP_LOGIN_ATTRIBUTE` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++uid ++
+a| [subs=-attributes]
+LDAP User attribute to use for login like 'uid'.
+
+a|`OCIS_LDAP_USER_SCHEMA_MAIL` +
+`IDP_LDAP_EMAIL_ATTRIBUTE` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++mail ++
+a| [subs=-attributes]
+LDAP User email attribute like 'mail'.
+
+a|`OCIS_LDAP_USER_SCHEMA_USERNAME` +
+`IDP_LDAP_NAME_ATTRIBUTE` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++displayName ++
+a| [subs=-attributes]
+LDAP User name attribute like 'displayName'.
+
+a|`OCIS_LDAP_USER_SCHEMA_ID` +
+`IDP_LDAP_UUID_ATTRIBUTE` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ownCloudUUID ++
+a| [subs=-attributes]
+LDAP User UUID attribute like 'uid'.
+
+a|`IDP_LDAP_UUID_ATTRIBUTE_TYPE` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++text ++
+a| [subs=-attributes]
+LDAP User uuid attribute type like 'text'.
+
+a|`OCIS_LDAP_USER_ENABLED_ATTRIBUTE` +
+`IDP_USER_ENABLED_ATTRIBUTE` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ownCloudUserEnabled ++
+a| [subs=-attributes]
+LDAP Attribute to use as a flag telling if the user is enabled or disabled.
+
+a|`OCIS_LDAP_USER_FILTER` +
+`IDP_LDAP_FILTER` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+LDAP filter to add to the default filters for user search like '(objectclass=ownCloud)'.
+
+a|`OCIS_LDAP_USER_OBJECTCLASS` +
+`IDP_LDAP_OBJECTCLASS` +
+
+a| [subs=-attributes]
+++pre5.0 ++
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++inetOrgPerson ++
+a| [subs=-attributes]
+LDAP User ObjectClass like 'inetOrgPerson'.
+|===
+

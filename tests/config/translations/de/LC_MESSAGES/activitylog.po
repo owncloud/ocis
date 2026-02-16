@@ -1,3 +1,0 @@
-# Activity Log
-msgid "{user} added {resource} to {folder}"
-msgstr "{user} hat {resource} zu {folder} hinzugefügt"

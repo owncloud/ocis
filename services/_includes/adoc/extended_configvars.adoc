@@ -1,0 +1,96 @@
+// collected through docs/helpers/extendedEnv.go
+
+[caption=]
+.Environment variables with extended scope not included in a service
+[width="100%",cols="35%,10%,18%,~"",options="header"]
+|===
+| Name
+| Type
+| Default Value
+| Description
+    
+    
+    
+    
+    
+
+a| `GRPC_MAX_CONNECTION_AGE` +
+a| [subs=-attributes]
+++Duration ++
+a| [subs=-attributes]
+++9223372036854775807 ++
+a| [subs=-attributes]
+++Timeout for GRPC connections. After timeout, a new connection will be established automatically. The default value is in ns and is about 2.5 mio h. ++
+    
+
+a| `MICRO_LOG_LEVEL` +
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++Error ++
+a| [subs=-attributes]
+++Set the log level for the internal go micro framework. Only change on supervision of ownCloud Support. ++
+    
+
+a| `MICRO_REGISTRY` +
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++nats-js-kv ++
+a| [subs=-attributes]
+++The Go micro registry type to use. Supported types are: 'memory' and 'nats-js-kv' (default). Only change on supervision of ownCloud Support. ++
+    
+
+a| `MICRO_REGISTRY_ADDRESS` +
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++127.0.0.1:9233 ++
+a| [subs=-attributes]
+++The bind address of the internal go micro framework. Only change on supervision of ownCloud Support. ++
+
+a| `MICRO_REGISTRY_AUTH_PASSWORD` +
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+++Optional when using nats to authenticate with the nats cluster. ++
+
+a| `MICRO_REGISTRY_AUTH_USERNAME` +
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+++Optional when using nats to authenticate with the nats cluster. ++
+    
+
+a| `OCIS_BASE_DATA_PATH` +
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+++The base directory location used by several services and for user data. See the General Info section in the documentation for more details on defaults. Services can have, if available, an individual setting with an own environment variable. ++
+    
+
+a| `OCIS_CONFIG_DIR` +
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+++The default directory location for config files. See the General Info section in the documentation for more details on defaults. ++
+
+a| `OCIS_INSECURE` +
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+++Insecure TLS mode is only allowed in development environments with OCIS_INSECURE=true ++
+    
+    
+    
+|===
