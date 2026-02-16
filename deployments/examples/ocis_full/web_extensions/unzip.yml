@@ -6,7 +6,7 @@ services:
         condition: service_completed_successfully
 
   unzip-init:
-    image: owncloud/web-extensions:unzip-0.4.2
+    image: owncloud/web-extensions:unzip-0.4.3
     user: root
     volumes:
       - ocis-apps:/apps
