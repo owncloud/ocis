@@ -1099,8 +1099,33 @@ def localApiTestPipeline(ctx):
                     for run_with_remote_php in params["withRemotePhp"]:
                         run_on_k8s = params["k8s"]
                         ocis_url = OCIS_URL
+                        ocis_server_steps = ocisServer(
+                                            storage, 
+                                            extra_server_environment = params["extraServerEnvironment"], 
+                                            with_wrapper = True, 
+                                            tika_enabled = params["tikaNeeded"], 
+                                            volumes = [stepVolumeOcisStorage]
+                                          )
                         if run_on_k8s:
                             ocis_url = "https://%s" % OCIS_SERVER_NAME
+                            ocis_server_steps = waitK3sCluster() + prepareOcisDeployment() + setupOcisConfigMaps()
+                            # pre deploy steps
+                            if params["antivirusNeeded"]:
+                                ocis_server_steps += enableAntivirusServiceK8s()
+                            if params["collaborationServiceNeeded"]:
+                                ocis_server_steps += enableAppsIntegrationK8s()
+                                ocis_server_steps += exposeExternalServersK8s([["collabora", 9980], ["fakeoffice", 8080], ["onlyoffice", 443]])
+                            if params["emailNeeded"]:
+                                ocis_server_steps += emailServiceK8s()
+
+                            ocis_server_steps += deployOcis() + \
+                                                 waitForOcis(ocis_url = ocis_url) + \
+                                                 ociswrapper() + \
+                                                 waitForOciswrapper()
+
+                            # post deploy steps
+                            if params["collaborationServiceNeeded"]:
+                                ocis_server_steps += exposeNodePortsK8s([["collaboration-collabora", 9300], ["collaboration-microsoftofficeonline", 9300], ["collaboration-onlyoffice", 9300]]) + debugK8sState()
 
                         pipeline = {
                             "kind": "pipeline",
@@ -1113,8 +1138,8 @@ def localApiTestPipeline(ctx):
                             "steps": skipIfUnchanged(ctx, "acceptance-tests") +
                                      ([] if run_on_k8s else restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin")) +
                                      (tikaService() if params["tikaNeeded"] and not run_on_k8s else tikaServiceK8s() if params["tikaNeeded"] and run_on_k8s else []) +
-                                     (waitForServices("online-offices", ["collabora:9980"]) if params["collaborationServiceNeeded"] else []) +
-                                     (waitK3sCluster() + (enableAntivirusServiceK8s() if params["antivirusNeeded"] and run_on_k8s else []) + (emailServiceK8s() if params["emailNeeded"] and run_on_k8s else []) + prepareOcisDeployment() + setupOcisConfigMaps() + exposeCollaboraK8s() + deployOcis() + waitForOcis(ocis_url = ocis_url) + debugK8sState() + ociswrapper() + waitForOciswrapper() + exposeNodePortsK8s() if run_on_k8s else ocisServer(storage, extra_server_environment = params["extraServerEnvironment"], with_wrapper = True, tika_enabled = params["tikaNeeded"], volumes = ([stepVolumeOcisStorage]))) +
+                                     (waitForServices("online-offices", ["collabora:9980", "onlyoffice:443", "fakeoffice:8080"]) if params["collaborationServiceNeeded"] else []) +
+                                     ocis_server_steps +
                                      (waitForClamavService() if params["antivirusNeeded"] and not run_on_k8s else exposeAntivirusServiceK8s() if params["antivirusNeeded"] and run_on_k8s else []) +
                                      (waitForEmailService() if params["emailNeeded"] and not run_on_k8s else exposeEmailServiceK8s() if params["emailNeeded"] and run_on_k8s else []) +
                                      (ocisServer(storage, deploy_type = "federation", extra_server_environment = params["extraServerEnvironment"]) if params["federationServer"] else []) +
@@ -1124,7 +1149,7 @@ def localApiTestPipeline(ctx):
                             "services": (k3sCluster() if run_on_k8s else []) +
                                         (emailService() if params["emailNeeded"] and not run_on_k8s else []) +
                                         (clamavService() if params["antivirusNeeded"] and not run_on_k8s else []) +
-                                        (collaboraService() if params["collaborationServiceNeeded"] else []),
+                                        ((fakeOffice() + collaboraService() + onlyofficeService()) if params["collaborationServiceNeeded"] else []),
                             "depends_on": [],
                             "trigger": {
                                 "ref": [
@@ -3899,9 +3924,18 @@ def enableAntivirusServiceK8s():
         "image": OC_CI_ALPINE,
         "commands": [
             "cp -r %s/tests/config/drone/k8s/clamav %s/ocis-charts/charts/ocis/templates/" % (dirs["base"], dirs["base"]),
-            "sed -i '/^  virusscan:/,/^ *[^ ]/ s/enabled: .*/enabled: true/' %s/tests/config/drone/k8s/values.yaml" % dirs["base"],
+            "sed -i '/^  virusscan:/,/^ *[^ ]/ s/enabled: .*/enabled: true/' %s/ocis-charts/charts/ocis/ci/deployment-values.yaml" % dirs["base"],
             "sed -i '/name: ANTIVIRUS_SCANNER_TYPE/{n;s/value: *\"icap\"/value: \"clamav\"/}' %s/ocis-charts/charts/ocis/templates/antivirus/deployment.yaml" % dirs["base"],
             "sed -i '/- name: ANTIVIRUS_SCANNER_TYPE/i\\\\            - name: ANTIVIRUS_CLAMAV_SOCKET\\\n              value: \"tcp://clamav:3310\"' %s/ocis-charts/charts/ocis/templates/antivirus/deployment.yaml" % dirs["base"],
+        ],
+    }]
+
+def enableAppsIntegrationK8s():
+    return [{
+        "name": "enable-apps-integration",
+        "image": OC_CI_ALPINE,
+        "commands": [
+            "sed -i '/^  appsIntegration:/,/^ *[^ ]/ s/enabled: .*/enabled: true/' %s/ocis-charts/charts/ocis/ci/deployment-values.yaml" % dirs["base"],
         ],
     }]
 
@@ -3979,52 +4013,69 @@ def tikaServiceK8s():
         ],
     }]
 
-def exposeNodePortsK8s():
+def exposeNodePortsK8s(services = []):
+    commands = []
+    for idx, service in enumerate(services):
+        service_name = service[0]
+        service_port = str(service[1])
+        node_port = service_port.replace("9", "30", 1)
+        # there can be multiple collaboration services
+        if service_port == "9300" and "collaboration" in service_name:
+            node_port = "3030%d" % idx
+        commands.append("kubectl -n ocis expose deployment %s --type=NodePort --port=%s --name=%s-np" % (service_name, service_port, service_name))
+        commands.append("kubectl -n ocis patch svc %s-np -p '{\"spec\":{\"ports\":[{\"port\":%s,\"nodePort\":%s}]}}'" % (service_name, service_port, node_port))
+
     return [{
-        "name": "expose-node-ports",
+        "name": "expose-nodeports",
         "image": K3D_IMAGE,
         "commands": [
             "export KUBECONFIG=kubeconfig-$${DRONE_BUILD_NUMBER}.yaml",
             "until test -f $${KUBECONFIG}; do sleep 1s; done",
-            # expose service via NodePort
-            "kubectl -n ocis expose deployment collaboration-collabora --type=NodePort --port=9300 --name=collaboration-np",
-            "kubectl -n ocis patch svc collaboration-np -p '{\"spec\":{\"ports\":[{\"port\":9300,\"nodePort\":30300}]}}'",
-        ],
+        ] + commands,
     }]
 
-def exposeCollaboraK8s():
+def exposeExternalServersK8s(severs = []):
+    commands = []
+    for server in severs:
+        server_name = server[0]
+        server_port = str(server[1])
+        commands.append("SERVER_IP=$(getent hosts %s | awk '{print $1}')" % server_name)
+        commands.append('echo -e "apiVersion: v1\nkind: Endpoints\nmetadata:\n  name: %s\n  namespace: ocis\n' % server_name +
+                        'subsets:\n- addresses:\n  - ip: $SERVER_IP\n  ports:\n  - port: %s" | kubectl apply -f -' % server_port)
+        commands.append('echo -e "apiVersion: v1\nkind: Service\nmetadata:\n  name: %s\n  namespace: ocis\n' % server_name +
+                        'spec:\n  ports:\n  - port: %s\n    targetPort: %s" | kubectl apply -f -' % (server_port, server_port))
+
     return [{
-        "name": "expose-collabora",
+        "name": "expose-external-servers",
         "image": K3D_IMAGE,
         "commands": [
             "export KUBECONFIG=kubeconfig-$${DRONE_BUILD_NUMBER}.yaml",
             "until test -f $${KUBECONFIG}; do sleep 1s; done",
-            # add external clamav endpoint and service
-            "COLLABORA_IP=$(getent hosts collabora | awk '{print $1}')",
-            "echo -e \"apiVersion: v1\nkind: Endpoints\nmetadata:\n  name: collabora\n  namespace: ocis\n" +
-            "subsets:\n- addresses:\n  - ip: $COLLABORA_IP\n  ports:\n  - port: 9980\" | kubectl apply -f -",
-            "echo -e \"apiVersion: v1\nkind: Service\nmetadata:\n  name: collabora\n  namespace: ocis\n" +
-            "spec:\n  ports:\n  - port: 9980\n    targetPort: 9980\" | kubectl apply -f -",
-        ],
+        ] + commands,
     }]
 
 def debugK8sState():
     return [{
         "name": "debug-k8s-state",
         "image": K3D_IMAGE,
+        "detach": True,
         "commands": [
             "export KUBECONFIG=kubeconfig-$${DRONE_BUILD_NUMBER}.yaml",
+            "until test -f $${KUBECONFIG}; do sleep 1s; done",
+            "sleep 60",
             "echo '=== PODS ==='",
             "kubectl get pods -n ocis",
             "echo '=== DEPLOYMENTS ==='",
             "kubectl get deployments -n ocis",
             "echo '=== SERVICES ==='",
-            "kubectl get svc -n ocis",
-            "echo '=== ENDPOINTS ==='",
-            "kubectl get endpoints -n ocis",
-            "echo '=== COLLABORATION POD ENV ==='",
-            "kubectl get pods -n ocis -o name | grep collaboration | head -1 | xargs -I{} kubectl exec {} -n ocis -- env | grep COLLABORATION || echo 'No COLLABORATION env vars'",
-            "echo '=== COLLABORATION POD DETAILS ==='",
-            "kubectl describe pod -n ocis $(kubectl get pods -n ocis -o name | grep collaboration | head -1 | cut -d/ -f2)",
+            "kubectl get svc -n ocis | grep collaboration",
+
+            "kubectl describe pods -n ocis -l app=collaboration-onlyoffice",
+            "kubectl describe pods -n ocis -l app=collaboration-collabora",
+            "kubectl describe pods -n ocis -l app=collaboration-microsoftofficeonline",
+            "echo '=== LOGS ==='",
+            "kubectl logs -n ocis -l app=collaboration-onlyoffice",
+            "kubectl logs -n ocis -l app=collaboration-collabora",
+            "kubectl logs -n ocis -l app=collaboration-microsoftofficeonline",            
         ],
     }]

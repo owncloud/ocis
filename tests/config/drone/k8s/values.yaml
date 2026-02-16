@@ -60,8 +60,26 @@ features:
           disableChat: true
           ingress:
             enabled: false
-
-
+        - name: "MicrosoftOfficeOnline"
+          uri: "http://fakeoffice:8080"
+          product: "MicrosoftOfficeOnline"
+          enabled: true
+          insecure: true
+          disableProof: true
+          secureViewEnabled: false
+          disableChat: true
+          ingress:
+            enabled: false
+        - name: "OnlyOffice"
+          uri: "https://onlyoffice"
+          product: "OnlyOffice"
+          enabled: true
+          insecure: true
+          disableProof: true
+          secureViewEnabled: false
+          disableChat: true
+          ingress:
+            enabled: false
 
 http:
   cors:
