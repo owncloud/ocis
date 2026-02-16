@@ -76,6 +76,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add web extensions deployment configuration: [#11940](https://github.com/owncloud/ocis/pull/11940)
 * Enhancement - Add AI-assisted development guide: [#11941](https://github.com/owncloud/ocis/pull/11941)
 * Enhancement - Bump Web to 12.3.1: [#12015](https://github.com/owncloud/ocis/pull/12015)
+* Enhancement - Add space ID to incoming shares: [#12024](https://github.com/owncloud/ocis/pull/12024)
 
 ## Details
 
@@ -145,6 +146,14 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/12015
    https://github.com/owncloud/web/releases/tag/v12.3.1
+
+* Enhancement - Add space ID to incoming shares: [#12024](https://github.com/owncloud/ocis/pull/12024)
+
+   Added the `spaceId` to the incoming shares. This is aligning the graph API with
+   the WebDAV API where the clients can use `spaceid` property. This change allows
+   clients to get the space ID directly instead of having to parse the resource ID.
+
+   https://github.com/owncloud/ocis/pull/12024
 
 # Changelog for [8.0.0] (2026-02-13)
 

@@ -63,7 +63,7 @@ require (
 	github.com/onsi/gomega v1.39.0
 	github.com/open-policy-agent/opa v1.12.3
 	github.com/orcaman/concurrent-map v1.0.0
-	github.com/owncloud/libre-graph-api-go v1.0.5-0.20260116104114-10074a92be64
+	github.com/owncloud/libre-graph-api-go v1.0.5-0.20260216101009-eeac018af245
 	github.com/owncloud/reva/v2 v2.0.0-20260213104810-a8d45f58b2d5
 	github.com/pkg/errors v0.9.1
 	github.com/pkg/xattr v0.4.12
