@@ -1,6 +1,7 @@
 # Table of Contents
 
 * [Changelog for unreleased](#changelog-for-unreleased-unreleased)
+* [Changelog for 8.0.0](#changelog-for-800-2026-02-13)
 * [Changelog for 7.3.1](#changelog-for-731-2025-11-24)
 * [Changelog for 7.3.0](#changelog-for-730-2025-10-13)
 * [Changelog for 7.2.0](#changelog-for-720-2025-07-14)
@@ -64,11 +65,95 @@
 
 The following sections list the changes for unreleased.
 
-[unreleased]: https://github.com/owncloud/ocis/compare/v7.3.1...master
+[unreleased]: https://github.com/owncloud/ocis/compare/v8.0.0...master
 
 ## Summary
 
 * Bugfix - Fix postprocessing resume command --restart flag: [#11692](https://github.com/owncloud/ocis/issues/11692)
+* Bugfix - Translation for some email notifications: [#11979](https://github.com/owncloud/ocis/pull/11979)
+* Bugfix - Rework monitoring in the ocis_full deployment example: [#11995](https://github.com/owncloud/ocis/pull/11995)
+* Bugfix - Expose the signature-auth attribute: [#12016](https://github.com/owncloud/ocis/pull/12016)
+* Enhancement - Add web extensions deployment configuration: [#11940](https://github.com/owncloud/ocis/pull/11940)
+* Enhancement - Add AI-assisted development guide: [#11941](https://github.com/owncloud/ocis/pull/11941)
+* Enhancement - Bump Web to 12.3.1: [#12015](https://github.com/owncloud/ocis/pull/12015)
+
+## Details
+
+* Bugfix - Fix postprocessing resume command --restart flag: [#11692](https://github.com/owncloud/ocis/issues/11692)
+
+   The `--restart` / `-r` flag for `ocis postprocessing resume` was broken due to a
+   flag name mismatch (`retrigger` vs `restart`) and silently did nothing. This has
+   been fixed and the command now prints a confirmation message on success.
+
+   https://github.com/owncloud/ocis/issues/11692
+   https://github.com/owncloud/ocis/pull/12002
+
+* Bugfix - Translation for some email notifications: [#11979](https://github.com/owncloud/ocis/pull/11979)
+
+   Some email notifications showed a wrong translated message that shouldn't
+   appear. It's fixed so that message won't appear anymore.
+
+   https://github.com/owncloud/ocis/pull/11979
+
+* Bugfix - Rework monitoring in the ocis_full deployment example: [#11995](https://github.com/owncloud/ocis/pull/11995)
+
+   The ocis_full deployment example has been basically reworked for how to provide
+   monitoring.
+
+   We now have: - a singe place for the definition of the tracing envvars for all
+   ocis related container services - an easy and modular setup defining which
+   sources should be inlcuded in monitoring via .env - comments describing the
+   setup for the ease extending it - the monitoring definition in .env has been
+   moved to the bottom and the compose_file assembly has monitoring as last entry
+   now to guarantee nothing gets overwritten by accident
+
+   https://github.com/owncloud/ocis/pull/11995
+
+* Bugfix - Expose the signature-auth attribute: [#12016](https://github.com/owncloud/ocis/pull/12016)
+
+   Expose the "oc:signature-auth" attribute for the subfolders in the public link
+   propfinds. This is a necessary change to be able to support archive downloads in
+   password protected public links.
+
+   https://github.com/owncloud/ocis/pull/12016
+
+* Enhancement - Add web extensions deployment configuration: [#11940](https://github.com/owncloud/ocis/pull/11940)
+
+   We added deployment configuration for the photo-addon and advanced-search web
+   extensions to the ocis_full example. This includes Docker compose files for both
+   extensions and CSP configuration for OpenStreetMap tiles required by the
+   photo-addon map feature.
+
+   https://github.com/owncloud/ocis/pull/11940
+
+* Enhancement - Add AI-assisted development guide: [#11941](https://github.com/owncloud/ocis/pull/11941)
+
+   A new guide has been added to the oCIS documentation demonstrating how to build
+   web extensions using AI-assisted development with Claude AI. The guide covers
+   MCP connector setup, a five-phase development workflow, debugging techniques,
+   and contribution workflows.
+
+   This approach has been validated through real contributions including PR #11912
+   (photo metadata search backend) and web extensions PRs #305 and #306.
+
+   https://github.com/owncloud/ocis/pull/11941
+
+* Enhancement - Bump Web to 12.3.1: [#12015](https://github.com/owncloud/ocis/pull/12015)
+
+   Bugfix [owncloud/web#13553](https://github.com/owncloud/web/pull/13553): Search
+   Text Overalps With Search Icon In The Search Bar
+
+   https://github.com/owncloud/ocis/pull/12015
+   https://github.com/owncloud/web/releases/tag/v12.3.1
+
+# Changelog for [8.0.0] (2026-02-13)
+
+The following sections list the changes for 8.0.0.
+
+[8.0.0]: https://github.com/owncloud/ocis/compare/v7.3.1...v8.0.0
+
+## Summary
+
 * Bugfix - Fix user light creation: [#11765](https://github.com/owncloud/ocis/pull/11765)
 * Bugfix - OCM Specification Compliance: [#11773](https://github.com/owncloud/ocis/pull/11773)
 * Bugfix - Remove leading dot before checking disabled extension: [#11814](https://github.com/owncloud/ocis/pull/11814)
@@ -77,9 +162,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix error code when a user can't disable a space: [#11845](https://github.com/owncloud/ocis/pull/11845)
 * Bugfix - Fix Sharingroles: [#11898](https://github.com/owncloud/ocis/pull/11898)
 * Bugfix - Fix the error handling for empty name on space update: [#11933](https://github.com/owncloud/ocis/pull/11933)
-* Bugfix - Translation for some email notifications: [#11979](https://github.com/owncloud/ocis/pull/11979)
-* Bugfix - Rework monitoring in the ocis_full deployment example: [#11995](https://github.com/owncloud/ocis/pull/11995)
-* Bugfix - Expose the signature-auth attribute: [#12016](https://github.com/owncloud/ocis/pull/12016)
+* Bugfix - Fix group creation in ocis-multi example: [#12019](https://github.com/owncloud/ocis/pull/12019)
 * Change - Remove deprecated OCIS_SHOW_USER_EMAIL_IN_RESULTS: [#11942](https://github.com/owncloud/ocis/pull/11942)
 * Enhancement - Bump Reva: [#460](https://github.com/owncloud/reva/pull/460)
 * Enhancement - Set Referrer-Policy to no-referrer: [#11722](https://github.com/owncloud/ocis/pull/11722)
@@ -103,22 +186,11 @@ The following sections list the changes for unreleased.
 * Enhancement - Update the traefik image for some deployment examples: [#11915](https://github.com/owncloud/ocis/pull/11915)
 * Enhancement - Add users instances: [#11925](https://github.com/owncloud/ocis/pull/11925)
 * Enhancement - Introduce external shares permission: [#11931](https://github.com/owncloud/ocis/pull/11931)
-* Enhancement - Add web extensions deployment configuration: [#11940](https://github.com/owncloud/ocis/pull/11940)
-* Enhancement - Add AI-assisted development guide: [#11941](https://github.com/owncloud/ocis/pull/11941)
 * Enhancement - Update to go 1.25: [#12011](https://github.com/owncloud/ocis/pull/12011)
-* Enhancement - Bump Web to 12.3.1: [#12015](https://github.com/owncloud/ocis/pull/12015)
+* Enhancement - Bump Web to 12.3.1: [#12016](https://github.com/owncloud/ocis/pull/12016)
 * Enhancement - Bump Web to 12.3.0: [#13519](https://github.com/owncloud/web/pull/13519)
 
 ## Details
-
-* Bugfix - Fix postprocessing resume command --restart flag: [#11692](https://github.com/owncloud/ocis/issues/11692)
-
-   The `--restart` / `-r` flag for `ocis postprocessing resume` was broken due to a
-   flag name mismatch (`retrigger` vs `restart`) and silently did nothing. This has
-   been fixed and the command now prints a confirmation message on success.
-
-   https://github.com/owncloud/ocis/issues/11692
-   https://github.com/owncloud/ocis/pull/12002
 
 * Bugfix - Fix user light creation: [#11765](https://github.com/owncloud/ocis/pull/11765)
 
@@ -183,34 +255,11 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/issues/11887
    https://github.com/owncloud/ocis/pull/11933
 
-* Bugfix - Translation for some email notifications: [#11979](https://github.com/owncloud/ocis/pull/11979)
+* Bugfix - Fix group creation in ocis-multi example: [#12019](https://github.com/owncloud/ocis/pull/12019)
 
-   Some email notifications showed a wrong translated message that shouldn't
-   appear. It's fixed so that message won't appear anymore.
+   Group creation was not working in ocis.ocm instance
 
-   https://github.com/owncloud/ocis/pull/11979
-
-* Bugfix - Rework monitoring in the ocis_full deployment example: [#11995](https://github.com/owncloud/ocis/pull/11995)
-
-   The ocis_full deployment example has been basically reworked for how to provide
-   monitoring.
-
-   We now have: - a singe place for the definition of the tracing envvars for all
-   ocis related container services - an easy and modular setup defining which
-   sources should be inlcuded in monitoring via .env - comments describing the
-   setup for the ease extending it - the monitoring definition in .env has been
-   moved to the bottom and the compose_file assembly has monitoring as last entry
-   now to guarantee nothing gets overwritten by accident
-
-   https://github.com/owncloud/ocis/pull/11995
-
-* Bugfix - Expose the signature-auth attribute: [#12016](https://github.com/owncloud/ocis/pull/12016)
-
-   Expose the "oc:signature-auth" attribute for the subfolders in the public link
-   propfinds. This is a necessary change to be able to support archive downloads in
-   password protected public links.
-
-   https://github.com/owncloud/ocis/pull/12016
+   https://github.com/owncloud/ocis/pull/12019
 
 * Change - Remove deprecated OCIS_SHOW_USER_EMAIL_IN_RESULTS: [#11942](https://github.com/owncloud/ocis/pull/11942)
 
@@ -440,39 +489,19 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/11931
 
-* Enhancement - Add web extensions deployment configuration: [#11940](https://github.com/owncloud/ocis/pull/11940)
-
-   We added deployment configuration for the photo-addon and advanced-search web
-   extensions to the ocis_full example. This includes Docker compose files for both
-   extensions and CSP configuration for OpenStreetMap tiles required by the
-   photo-addon map feature.
-
-   https://github.com/owncloud/ocis/pull/11940
-
-* Enhancement - Add AI-assisted development guide: [#11941](https://github.com/owncloud/ocis/pull/11941)
-
-   A new guide has been added to the oCIS documentation demonstrating how to build
-   web extensions using AI-assisted development with Claude AI. The guide covers
-   MCP connector setup, a five-phase development workflow, debugging techniques,
-   and contribution workflows.
-
-   This approach has been validated through real contributions including PR #11912
-   (photo metadata search backend) and web extensions PRs #305 and #306.
-
-   https://github.com/owncloud/ocis/pull/11941
-
 * Enhancement - Update to go 1.25: [#12011](https://github.com/owncloud/ocis/pull/12011)
 
    We have updated go to version 1.25 and alpine to version 3.23.3
 
    https://github.com/owncloud/ocis/pull/12011
+   https://github.com/owncloud/ocis/pull/12004
 
-* Enhancement - Bump Web to 12.3.1: [#12015](https://github.com/owncloud/ocis/pull/12015)
+* Enhancement - Bump Web to 12.3.1: [#12016](https://github.com/owncloud/ocis/pull/12016)
 
    Bugfix [owncloud/web#13553](https://github.com/owncloud/web/pull/13553): Search
    Text Overalps With Search Icon In The Search Bar
 
-   https://github.com/owncloud/ocis/pull/12015
+   https://github.com/owncloud/ocis/pull/12016
    https://github.com/owncloud/web/releases/tag/v12.3.1
 
 * Enhancement - Bump Web to 12.3.0: [#13519](https://github.com/owncloud/web/pull/13519)
