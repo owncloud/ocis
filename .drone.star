@@ -3762,7 +3762,7 @@ def trivyScan(ctx):
                 # - Scans entire repository including compiled artifacts and dependencies
                 # - --exit-code 0: never fails the job regardless of findings
                 # - --no-progress: reduces log noise in CI
-                "trivy fs --exit-code 0 --severity HIGH,CRITICAL --no-progress /drone/src",
+                "trivy fs --exit-code 0 --severity HIGH,CRITICAL --no-progress --ignorefile /drone/src/.trivyignore.yaml /drone/src",
             ],
             "failure": "ignore",
         },
