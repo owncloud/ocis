@@ -173,6 +173,53 @@ func (_c *Engine_Move_Call) RunAndReturn(run func(string, string, string) error)
 	return _c
 }
 
+// Update provides a mock function with given fields: id, mutateFn
+func (_m *Engine) Update(id string, mutateFn func(*engine.Resource)) error {
+	ret := _m.Called(id, mutateFn)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Update")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string, func(*engine.Resource)) error); ok {
+		r0 = rf(id, mutateFn)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// Engine_Update_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Update'
+type Engine_Update_Call struct {
+	*mock.Call
+}
+
+// Update is a helper method to define mock.On call
+//   - id string
+//   - mutateFn func(*engine.Resource)
+func (_e *Engine_Expecter) Update(id interface{}, mutateFn interface{}) *Engine_Update_Call {
+	return &Engine_Update_Call{Call: _e.mock.On("Update", id, mutateFn)}
+}
+
+func (_c *Engine_Update_Call) Run(run func(id string, mutateFn func(*engine.Resource))) *Engine_Update_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string), args[1].(func(*engine.Resource)))
+	})
+	return _c
+}
+
+func (_c *Engine_Update_Call) Return(_a0 error) *Engine_Update_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Engine_Update_Call) RunAndReturn(run func(string, func(*engine.Resource)) error) *Engine_Update_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // Purge provides a mock function with given fields: id
 func (_m *Engine) Purge(id string) error {
 	ret := _m.Called(id)

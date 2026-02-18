@@ -2,6 +2,7 @@ package search_test
 
 import (
 	"context"
+	"errors"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
@@ -198,6 +199,45 @@ var _ = Describe("Searchprovider", func() {
 			indexClient.AssertNotCalled(GinkgoT(), "Search", mock.Anything, mock.Anything)
 			err := s.IndexSpace(&sprovider.StorageSpaceId{OpaqueId: "storageid$spaceid!spaceid"})
 			Expect(err).ShouldNot(HaveOccurred())
+		})
+	})
+
+	Describe("UpdateTags", func() {
+		BeforeEach(func() {
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(&sprovider.StatResponse{
+				Status: status.NewOK(context.Background()),
+				Info: &sprovider.ResourceInfo{
+					Id:       ri.Id,
+					ParentId: ri.ParentId,
+					Path:     ri.Path,
+					Name:     "foo.pdf",
+					Size:     ri.Size,
+					Mtime:    ri.Mtime,
+					Type:     sprovider.ResourceType_RESOURCE_TYPE_FILE,
+					ArbitraryMetadata: &sprovider.ArbitraryMetadata{
+						Metadata: map[string]string{"tags": "important,work"},
+					},
+				},
+			}, nil)
+		})
+
+		It("updates tags without content extraction when resource is indexed", func() {
+			indexClient.On("Update", "storageid$spaceid!opaqueid", mock.Anything).Return(nil)
+
+			s.UpdateTags(&sprovider.Reference{ResourceId: ri.Id})
+
+			extractor.AssertNotCalled(GinkgoT(), "Extract", mock.Anything, mock.Anything, mock.Anything)
+			indexClient.AssertCalled(GinkgoT(), "Update", "storageid$spaceid!opaqueid", mock.Anything)
+		})
+
+		It("falls back to full UpsertItem when resource is not yet indexed", func() {
+			indexClient.On("Update", mock.Anything, mock.Anything).Return(errors.New("entity not found"))
+			extractor.On("Extract", mock.Anything, mock.Anything, mock.Anything).Return(content.Document{Name: "foo.pdf"}, nil)
+			indexClient.On("Upsert", mock.Anything, mock.Anything).Return(nil)
+
+			s.UpdateTags(&sprovider.Reference{ResourceId: ri.Id})
+
+			extractor.AssertCalled(GinkgoT(), "Extract", mock.Anything, mock.Anything, mock.Anything)
 		})
 	})
 
