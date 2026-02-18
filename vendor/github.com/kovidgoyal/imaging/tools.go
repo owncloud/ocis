@@ -10,6 +10,7 @@ import (
 	"slices"
 
 	"github.com/kovidgoyal/imaging/nrgb"
+	"github.com/kovidgoyal/imaging/nrgba"
 )
 
 var _ = fmt.Println
@@ -34,30 +35,32 @@ func New(width, height int, fillColor color.Color) *image.NRGBA {
 
 // Clone returns a copy of the given image.
 func Clone(img image.Image) *image.NRGBA {
-	src := newScanner(img)
-	dst := image.NewNRGBA(image.Rect(0, 0, src.w, src.h))
-	size := src.w * 4
+	w, h := img.Bounds().Dx(), img.Bounds().Dy()
+	src := nrgba.NewNRGBAScanner(img)
+	dst := image.NewNRGBA(image.Rect(0, 0, w, h))
+	size := w * 4
 	if err := run_in_parallel_over_range(0, func(start, limit int) {
 		for y := start; y < limit; y++ {
 			i := y * dst.Stride
-			src.Scan(0, y, src.w, y+1, dst.Pix[i:i+size])
+			src.Scan(0, y, w, y+1, dst.Pix[i:i+size])
 		}
-	}, 0, src.h); err != nil {
+	}, 0, h); err != nil {
 		panic(err)
 	}
 	return dst
 }
 
 func ClonePreservingOrigin(img image.Image) *image.NRGBA {
-	src := newScanner(img)
+	w, h := img.Bounds().Dx(), img.Bounds().Dy()
+	src := nrgba.NewNRGBAScanner(img)
 	dst := image.NewNRGBA(img.Bounds())
-	size := src.w * 4
+	size := w * 4
 	if err := run_in_parallel_over_range(0, func(start, limit int) {
 		for y := start; y < limit; y++ {
 			i := y * dst.Stride
-			src.Scan(0, y, src.w, y+1, dst.Pix[i:i+size])
+			src.Scan(0, y, w, y+1, dst.Pix[i:i+size])
 		}
-	}, 0, src.h); err != nil {
+	}, 0, h); err != nil {
 		panic(err)
 	}
 	return dst
@@ -306,7 +309,7 @@ func Crop(img image.Image, rect image.Rectangle) *image.NRGBA {
 		return Clone(img)
 	}
 
-	src := newScanner(img)
+	src := nrgba.NewNRGBAScanner(img)
 	dst := image.NewNRGBA(image.Rect(0, 0, r.Dx(), r.Dy()))
 	rowSize := r.Dx() * 4
 	if err := run_in_parallel_over_range(0, func(start, limit int) {
@@ -349,7 +352,7 @@ func Paste(background, img image.Image, pos image.Point) *image.NRGBA {
 		return Clone(img)
 	}
 
-	src := newScanner(img)
+	src := nrgba.NewNRGBAScanner(img)
 	if err := run_in_parallel_over_range(0, func(start, limit int) {
 		for y := start; y < limit; y++ {
 			x1 := interRect.Min.X - pasteRect.Min.X
@@ -403,7 +406,7 @@ func Overlay(background, img image.Image, pos image.Point, opacity float64) *ima
 	if interRect.Empty() {
 		return dst
 	}
-	src := newScanner(img)
+	src := nrgba.NewNRGBAScanner(img)
 	if err := run_in_parallel_over_range(0, func(start, limit int) {
 		scanLine := make([]uint8, interRect.Dx()*4)
 		for y := start; y < limit; y++ {
@@ -488,4 +491,32 @@ func PasteOntoBackground(img image.Image, bg color.Color) image.Image {
 		return AsNRGB(base)
 	}
 	return base
+}
+
+// Return contiguous non-premultiplied RGB pixel data for this image with 8 bits per channel
+func AsRGBData8(img image.Image) (pix []uint8) {
+	b := img.Bounds()
+	n := AsNRGB(img)
+	if n.Stride == b.Dx()*3 {
+		return n.Pix
+	}
+	pix = make([]uint8, 0, b.Dx()*b.Dy()*3)
+	for y := range b.Dy() {
+		pix = append(pix, n.Pix[y*n.Stride:y*(n.Stride+1)]...)
+	}
+	return pix
+}
+
+// Return contiguous non-premultiplied RGBA pixel data for this image with 8 bits per channel
+func AsRGBAData8(img image.Image) (pix []uint8) {
+	b := img.Bounds()
+	n := AsNRGBA(img)
+	if n.Stride == b.Dx()*4 {
+		return n.Pix
+	}
+	pix = make([]uint8, 0, b.Dx()*b.Dy()*4)
+	for y := range b.Dy() {
+		pix = append(pix, n.Pix[y*n.Stride:y*(n.Stride+1)]...)
+	}
+	return pix
 }

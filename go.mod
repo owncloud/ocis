@@ -48,7 +48,7 @@ require (
 	github.com/jellydator/ttlcache/v3 v3.4.0
 	github.com/jinzhu/now v1.1.5
 	github.com/justinas/alice v1.2.0
-	github.com/kovidgoyal/imaging v1.8.7
+	github.com/kovidgoyal/imaging v1.8.19
 	github.com/leonelquinteros/gotext v1.7.2
 	github.com/libregraph/idm v0.5.0
 	github.com/libregraph/lico v0.66.0
@@ -96,8 +96,8 @@ require (
 	go.opentelemetry.io/otel/trace v1.39.0
 	golang.org/x/crypto v0.47.0
 	golang.org/x/exp v0.0.0-20250620022241-b7579e27df2b
-	golang.org/x/image v0.32.0
-	golang.org/x/net v0.48.0
+	golang.org/x/image v0.35.0
+	golang.org/x/net v0.49.0
 	golang.org/x/oauth2 v0.34.0
 	golang.org/x/sync v0.19.0
 	golang.org/x/term v0.39.0
@@ -236,12 +236,12 @@ require (
 	github.com/jonboulle/clockwork v0.5.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/juliangruber/go-intersect v1.1.0 // indirect
-	github.com/kettek/apng v0.0.0-20250827064933-2bb5f5fcf253 // indirect
 	github.com/kevinburke/ssh_config v1.2.0 // indirect
 	github.com/klauspost/compress v1.18.2 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.11 // indirect
 	github.com/klauspost/crc32 v1.3.0 // indirect
 	github.com/kovidgoyal/go-parallel v1.1.1 // indirect
+	github.com/kovidgoyal/go-shm v1.0.0 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/lestrrat-go/blackmagic v1.0.4 // indirect
 	github.com/lestrrat-go/dsig v1.0.0 // indirect
