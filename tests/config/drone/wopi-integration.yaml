@@ -1,0 +1,47 @@
+  appsIntegration:
+    enabled: true
+    wopiIntegration:
+      officeSuites:
+        - name: FakeOffice
+          product: MicrosoftOfficeOnline
+          enabled: true
+          uri: http://fakeoffice:8080
+          insecure: true
+          disableProof: true
+          disableChat: true
+          postMessageOrigin: https://ocis-server
+          wopiSrc: http://localhost:9300
+          ingress:
+            enabled: false
+        - name: Collabora
+          product: Collabora
+          enabled: true
+          uri: http://fakeoffice:8080
+          insecure: true
+          disableProof: true
+          postMessageOrigin: https://ocis-server
+          wopiSrc: http://localhost:9302
+          ingress:
+            enabled: false
+        - name: OnlyOffice
+          product: OnlyOffice
+          enabled: true
+          uri: http://fakeoffice:8080
+          insecure: true
+          disableProof: true
+          disableChat: true
+          postMessageOrigin: https://ocis-server
+          wopiSrc: http://localhost:9305
+          ingress:
+            enabled: false
+    mimetypes:
+      - mime_type: application/vnd.oasis.opendocument.text
+        extension: odt
+        name: OpenDocument Text
+        default_app: FakeOffice
+        allow_creation: true
+      - mime_type: text/plain
+        extension: txt
+        name: Plain Text
+        default_app: FakeOffice
+        allow_creation: true

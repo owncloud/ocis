@@ -168,7 +168,8 @@ Feature: check file info with different wopi apps
             "const": "textfile0.txt"
           },
           "PostMessageOrigin": {
-            "const": "https://localhost:9200"
+            "type": "string",
+             "pattern": "%base_url%"
           },
           "DisablePrint": {
             "const": false
@@ -566,7 +567,8 @@ Feature: check file info with different wopi apps
             "const": "textfile0.txt"
           },
           "PostMessageOrigin": {
-            "const": "https://localhost:9200"
+            "type": "string",
+             "pattern": "%base_url%"
           },
           "DisablePrint": {
             "const": <disable-print>
@@ -676,7 +678,8 @@ Feature: check file info with different wopi apps
             "const": "textfile0.txt"
           },
           "PostMessageOrigin": {
-            "const": "https://localhost:9200"
+            "type": "string",
+             "pattern": "%base_url%"
           },
           "DisablePrint": {
             "const": false
@@ -1062,7 +1065,8 @@ Feature: check file info with different wopi apps
             "const": "renamedfile.txt"
           },
           "PostMessageOrigin": {
-            "const": "https://localhost:9200"
+            "type": "string",
+            "pattern": "%base_url%"
           },
           "DisablePrint": {
             "const": false
@@ -1409,7 +1413,8 @@ Feature: check file info with different wopi apps
             "const": "text.txt"
           },
           "PostMessageOrigin": {
-            "const": "https://localhost:9200"
+            "type": "string",
+             "pattern": "%base_url%"
           },
           "DisablePrint": {
             "const": false
@@ -1795,7 +1800,8 @@ Feature: check file info with different wopi apps
             "const": "text.txt"
           },
           "PostMessageOrigin": {
-            "const": "https://localhost:9200"
+            "type": "string",
+             "pattern": "%base_url%"
           },
           "DisablePrint": {
             "const": <disable-print>
