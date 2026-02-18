@@ -95,7 +95,7 @@ Feature: antivirus
 
   Scenario Outline: public uploads a file with the virus to a public share
     Given using <dav-path-version> DAV path
-    And the config "OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false" for "sharing" service
+    And the config "SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false" for "sharing" service
     And using SharingNG
     And user "Alice" has created folder "/uploadFolder"
     And user "Alice" has created the following resource link share:
@@ -337,7 +337,7 @@ Feature: antivirus
 
   @env-config
   Scenario Outline: try to overwrite a file with the virus content in a public link share
-    Given the config "OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false" for "sharing" service
+    Given the config "SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false" for "sharing" service
     And using <dav-path-version> DAV path
     And using SharingNG
     And user "Alice" has uploaded file with content "hello" to "test.txt"
