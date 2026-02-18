@@ -707,7 +707,10 @@ class FeatureContext extends BehatVariablesContext {
 	 */
 	public function removeSchemeFromUrl(string $url): string {
 		$parsedUrl = parse_url($url);
-		return $parsedUrl["host"] . ":" . $parsedUrl["port"];
+		if (isset($parsedUrl['port'])) {
+			return $parsedUrl["host"] . ":" . $parsedUrl["port"];
+		}
+		return $parsedUrl["host"];
 	}
 
 	/**
