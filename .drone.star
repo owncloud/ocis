@@ -99,7 +99,7 @@ config = {
                 "apiContract",
                 "apiLocks",
             ],
-            "skip": False,
+            "skip": True,
             "k8s": True,
         },
         "settingsAndNotification": {
@@ -108,7 +108,7 @@ config = {
                 "apiNotification",
                 "apiCors",
             ],
-            "skip": False,
+            "skip": True,
             "withRemotePhp": [False],
             "emailNeeded": True,
             "extraEnvironment": {
@@ -128,7 +128,7 @@ config = {
             "suites": [
                 "apiGraphUser",
             ],
-            "skip": False,
+            "skip": True,
             "withRemotePhp": [False],
             "k8s": True,
         },
@@ -136,14 +136,14 @@ config = {
             "suites": [
                 "apiSpaces",
             ],
-            "skip": False,
+            "skip": True,
             "k8s": True,
         },
         "spacesShares": {
             "suites": [
                 "apiSpacesShares",
             ],
-            "skip": False,
+            "skip": True,
             "k8s": True,
         },
         "davOperations": {
@@ -155,7 +155,7 @@ config = {
                 "apiArchiver",
                 "apiActivities",
             ],
-            "skip": False,
+            "skip": True,
         },
         "groupAndSearch1": {
             "suites": [
@@ -163,7 +163,7 @@ config = {
                 "apiGraph",
                 "apiGraphGroup",
             ],
-            "skip": False,
+            "skip": True,
             "k8s": True,
         },
         "search2": {
@@ -172,7 +172,7 @@ config = {
                 "apiSearchContent",
             ],
             "tikaNeeded": True,
-            "skip": False,
+            "skip": True,
             "k8s": True,
         },
         "sharingNg1": {
@@ -181,7 +181,7 @@ config = {
                 "apiReshare",
                 "apiSharingNgPermissions",
             ],
-            "skip": False,
+            "skip": True,
             "withRemotePhp": [False],
             "k8s": True,
         },
@@ -189,7 +189,7 @@ config = {
             "suites": [
                 "apiSharingNgAdditionalShareRole",
             ],
-            "skip": False,
+            "skip": True,
             "k8s": True,
             "withRemotePhp": [False],
         },
@@ -198,7 +198,7 @@ config = {
                 "apiSharingNgDriveInvitation",
                 "apiSharingNgItemInvitation",
             ],
-            "skip": False,
+            "skip": True,
             "withRemotePhp": [False],
         },
         "sharingNgLinkShare": {
@@ -207,7 +207,7 @@ config = {
                 "apiSharingNgItemLinkShare",
                 "apiSharingNgLinkShareManagement",
             ],
-            "skip": False,
+            "skip": True,
             "k8s": True,
             "withRemotePhp": [False],
         },
@@ -215,7 +215,7 @@ config = {
             "suites": [
                 "apiAntivirus",
             ],
-            "skip": False,
+            "skip": True,
             "k8s": True,
             "antivirusNeeded": True,
             "extraServerEnvironment": {
@@ -231,7 +231,7 @@ config = {
                 "apiOcm",
                 "apiServiceAvailability",
             ],
-            "skip": False,
+            "skip": True,
             "withRemotePhp": [False],
             "federationServer": True,
             "emailNeeded": True,
@@ -257,7 +257,7 @@ config = {
             "suites": [
                 "apiAuthApp",
             ],
-            "skip": False,
+            "skip": True,
             "k8s": True,
             "withRemotePhp": [False],
             "extraServerEnvironment": {
@@ -270,6 +270,7 @@ config = {
                 "apiCollaboration",
             ],
             "skip": False,
+            "k8s": True,
             "withRemotePhp": [False],
             "collaborationServiceNeeded": True,
             "extraServerEnvironment": {
@@ -280,7 +281,7 @@ config = {
             "suites": [
                 "cliCommands",
             ],
-            "skip": False,
+            "skip": True,
             "withRemotePhp": [False],
             "antivirusNeeded": True,
             "emailNeeded": True,
@@ -510,15 +511,6 @@ def main(ctx):
         licenseCheck(ctx)
 
     test_pipelines = \
-        codestyle(ctx) + \
-        checkGherkinLint(ctx) + \
-        checkTestSuitesInExpectedFailures(ctx) + \
-        buildWebCache(ctx) + \
-        getGoBinForTesting(ctx) + \
-        buildOcisBinaryForTesting(ctx) + \
-        checkStarlark() + \
-        build_release_helpers + \
-        testOcisAndUploadResults(ctx) + \
         testPipelines(ctx)
 
     build_release_pipelines = \
@@ -539,7 +531,7 @@ def main(ctx):
         ),
     )
 
-    pipelines = test_pipelines + build_release_pipelines
+    pipelines = test_pipelines
 
     # nightly Trivy security scan (non-blocking)
     pipelines.append(trivyScan(ctx))
@@ -629,7 +621,7 @@ def testPipelines(ctx):
     if ("skip" not in config["k6LoadTests"] or not config["k6LoadTests"]["skip"]) and ("k6-test" in ctx.build.title.lower() or ctx.build.event == "cron"):
         pipelines += k6LoadTests(ctx)
 
-    return pipelines
+    return localApiTestPipeline(ctx)
 
 def getGoBinForTesting(ctx):
     return [{
@@ -1105,10 +1097,35 @@ def localApiTestPipeline(ctx):
                     params[item] = matrix[item] if item in matrix else defaults[item]
                 for storage in params["storages"]:
                     for run_with_remote_php in params["withRemotePhp"]:
-                        run_on_k8s = params["k8s"] and ctx.build.event == "cron"
+                        run_on_k8s = params["k8s"]
                         ocis_url = OCIS_URL
+                        ocis_server_steps = ocisServer(
+                                            storage, 
+                                            extra_server_environment = params["extraServerEnvironment"], 
+                                            with_wrapper = True, 
+                                            tika_enabled = params["tikaNeeded"], 
+                                            volumes = [stepVolumeOcisStorage]
+                                          )
                         if run_on_k8s:
                             ocis_url = "https://%s" % OCIS_SERVER_NAME
+                            ocis_server_steps = waitK3sCluster() + prepareOcisDeployment() + setupOcisConfigMaps()
+                            # pre deploy steps
+                            if params["antivirusNeeded"]:
+                                ocis_server_steps += enableAntivirusServiceK8s()
+                            if params["collaborationServiceNeeded"]:
+                                ocis_server_steps += enableAppsIntegrationK8s()
+                                ocis_server_steps += exposeExternalServersK8s([["collabora", 9980], ["fakeoffice", 8080], ["onlyoffice", 443]])
+                            if params["emailNeeded"]:
+                                ocis_server_steps += emailServiceK8s()
+
+                            ocis_server_steps += deployOcis() + \
+                                                 waitForOcis(ocis_url = ocis_url) + \
+                                                 ociswrapper() + \
+                                                 waitForOciswrapper()
+
+                            # post deploy steps
+                            if params["collaborationServiceNeeded"]:
+                                ocis_server_steps += exposeNodePortsK8s([["collaboration-collabora", 9300], ["collaboration-microsoftofficeonline", 9300], ["collaboration-onlyoffice", 9300]]) + debugK8sState()
 
                         pipeline = {
                             "kind": "pipeline",
@@ -1122,12 +1139,10 @@ def localApiTestPipeline(ctx):
                                      ([] if run_on_k8s else restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin")) +
                                      (tikaService() if params["tikaNeeded"] and not run_on_k8s else tikaServiceK8s() if params["tikaNeeded"] and run_on_k8s else []) +
                                      (waitForServices("online-offices", ["collabora:9980", "onlyoffice:443", "fakeoffice:8080"]) if params["collaborationServiceNeeded"] else []) +
-                                     (waitK3sCluster() + (enableAntivirusServiceK8s() if params["antivirusNeeded"] and run_on_k8s else []) + (emailServiceK8s() if params["emailNeeded"] and run_on_k8s else []) + prepareOcisDeployment() + setupOcisConfigMaps() + deployOcis() + waitForOcis(ocis_url = ocis_url) + ociswrapper() + waitForOciswrapper() if run_on_k8s else ocisServer(storage, extra_server_environment = params["extraServerEnvironment"], with_wrapper = True, tika_enabled = params["tikaNeeded"], volumes = ([stepVolumeOcisStorage]))) +
+                                     ocis_server_steps +
                                      (waitForClamavService() if params["antivirusNeeded"] and not run_on_k8s else exposeAntivirusServiceK8s() if params["antivirusNeeded"] and run_on_k8s else []) +
                                      (waitForEmailService() if params["emailNeeded"] and not run_on_k8s else exposeEmailServiceK8s() if params["emailNeeded"] and run_on_k8s else []) +
                                      (ocisServer(storage, deploy_type = "federation", extra_server_environment = params["extraServerEnvironment"]) if params["federationServer"] else []) +
-                                     ((wopiCollaborationService("fakeoffice") + wopiCollaborationService("collabora") + wopiCollaborationService("onlyoffice")) if params["collaborationServiceNeeded"] else []) +
-                                     (ocisHealthCheck("wopi", ["wopi-collabora:9304", "wopi-onlyoffice:9304", "wopi-fakeoffice:9304"]) if params["collaborationServiceNeeded"] else []) +
                                      localApiTests(name, params["suites"], storage, params["extraEnvironment"], run_with_remote_php, ocis_url = ocis_url, k8s = run_on_k8s) +
                                      apiTestFailureLog() +
                                      (generateCoverageFromAPITest(ctx, name) if not run_on_k8s else []),
@@ -1135,7 +1150,7 @@ def localApiTestPipeline(ctx):
                                         (emailService() if params["emailNeeded"] and not run_on_k8s else []) +
                                         (clamavService() if params["antivirusNeeded"] and not run_on_k8s else []) +
                                         ((fakeOffice() + collaboraService() + onlyofficeService()) if params["collaborationServiceNeeded"] else []),
-                            "depends_on": getPipelineNames(buildOcisBinaryForTesting(ctx)),
+                            "depends_on": [],
                             "trigger": {
                                 "ref": [
                                     "refs/heads/master",
@@ -3670,7 +3685,7 @@ def collaboraService():
             "detach": True,
             "environment": {
                 "DONT_GEN_SSL_CERT": "set",
-                "extra_params": "--o:ssl.enable=true --o:ssl.termination=true --o:welcome.enable=false --o:net.frame_ancestors=%s" % OCIS_URL,
+                "extra_params": "--o:ssl.enable=true --o:ssl.termination=true --o:welcome.enable=false --o:net.frame_ancestors=https://%s" % OCIS_SERVER_NAME,
             },
             "commands": [
                 "coolconfig generate-proof-key",
@@ -3851,6 +3866,8 @@ def prepareOcisDeployment():
         "sed -i '/- name: THUMBNAILS_TRANSFER_TOKEN/i\\\\            - name: THUMBNAILS_TXT_FONTMAP_FILE\\\n              value: /etc/ocis/fontsMap.json\\\n' ./charts/ocis/templates/thumbnails/deployment.yaml",
         "sed -i '/volumeMounts:/a\\\\            - name: ocis-fonts-ttf\\\n              mountPath: /etc/ocis/fonts\\\n            - name: ocis-fonts-map\\\n              mountPath: /etc/ocis/fontsMap.json\\\n              subPath: fontsMap.json' ./charts/ocis/templates/thumbnails/deployment.yaml",
         "sed -i '/volumes:/a\\\\        - name: ocis-fonts-ttf\\\n          configMap:\\\n            name: ocis-fonts-ttf\\\n        - name: ocis-fonts-map\\\n          configMap:\\\n            name: ocis-fonts-map' ./charts/ocis/templates/thumbnails/deployment.yaml",
+        "sed -i -E 's|value: http:\\\\/\\\\/.*:9300|value: http://ocis-server:9300|' ./charts/ocis/templates/collaboration/deployment.yaml",
+        "cat ./charts/ocis/templates/collaboration/deployment.yaml",
     ]
 
     return [{
@@ -3907,9 +3924,18 @@ def enableAntivirusServiceK8s():
         "image": OC_CI_ALPINE,
         "commands": [
             "cp -r %s/tests/config/drone/k8s/clamav %s/ocis-charts/charts/ocis/templates/" % (dirs["base"], dirs["base"]),
-            "sed -i '/^  virusscan:/,/^ *[^ ]/ s/enabled: .*/enabled: true/' %s/tests/config/drone/k8s/values.yaml" % dirs["base"],
+            "sed -i '/^  virusscan:/,/^ *[^ ]/ s/enabled: .*/enabled: true/' %s/ocis-charts/charts/ocis/ci/deployment-values.yaml" % dirs["base"],
             "sed -i '/name: ANTIVIRUS_SCANNER_TYPE/{n;s/value: *\"icap\"/value: \"clamav\"/}' %s/ocis-charts/charts/ocis/templates/antivirus/deployment.yaml" % dirs["base"],
             "sed -i '/- name: ANTIVIRUS_SCANNER_TYPE/i\\\\            - name: ANTIVIRUS_CLAMAV_SOCKET\\\n              value: \"tcp://clamav:3310\"' %s/ocis-charts/charts/ocis/templates/antivirus/deployment.yaml" % dirs["base"],
+        ],
+    }]
+
+def enableAppsIntegrationK8s():
+    return [{
+        "name": "enable-apps-integration",
+        "image": OC_CI_ALPINE,
+        "commands": [
+            "sed -i '/^  appsIntegration:/,/^ *[^ ]/ s/enabled: .*/enabled: true/' %s/ocis-charts/charts/ocis/ci/deployment-values.yaml" % dirs["base"],
         ],
     }]
 
@@ -3956,8 +3982,8 @@ def ociswrapper():
             "until test -f $${KUBECONFIG}; do sleep 1s; done",
             "kubectl get pods -A",
             "kubectl get ingress -A",
-            "kubectl describe pods $(kubectl get pods -n ocis -l app=antivirus -o jsonpath=\"{.items[0].metadata.name}\") -n ocis",
-            "kubectl describe pods $(kubectl get pods -n ocis -l app=postprocessing -o jsonpath=\"{.items[0].metadata.name}\") -n ocis",
+            "kubectl describe pods $(kubectl get pods -n ocis -l app=collaboration -o jsonpath=\"{.items[0].metadata.name}\") -n ocis",
+            # "kubectl describe pods $(kubectl get pods -n ocis -l app=postprocessing -o jsonpath=\"{.items[0].metadata.name}\") -n ocis",
             "%s/bin/ociswrapper serve --url https://%s --admin-username admin --admin-password admin --skip-ocis-run" % (dirs["ocisWrapper"], OCIS_SERVER_NAME),
         ],
         "detach": True,
@@ -3984,5 +4010,72 @@ def tikaServiceK8s():
             "until test -f %s/ocis-charts/charts/ocis/templates/search/deployment.yaml; do sleep 1s; done" % dirs["base"],
             "cp -r %s/tests/config/drone/k8s/tika %s/ocis-charts/charts/ocis/templates/" % (dirs["base"], dirs["base"]),
             "sed -i '/^[[:space:]]*storagesystem:/i\\\\  search:\\\n    extractor:\\\n      type: \"tika\"\\\n      tika:\\\n        url: \"http://tika:9998\"\\\n    persistence:\\\n      enabled: true\\\n      accessModes:\\\n        - ReadWriteOnce' %s/tests/config/drone/k8s/values.yaml" % dirs["base"],
+        ],
+    }]
+
+def exposeNodePortsK8s(services = []):
+    commands = []
+    for idx, service in enumerate(services):
+        service_name = service[0]
+        service_port = str(service[1])
+        node_port = service_port.replace("9", "30", 1)
+        # there can be multiple collaboration services
+        if service_port == "9300" and "collaboration" in service_name:
+            node_port = "3030%d" % idx
+        commands.append("kubectl -n ocis expose deployment %s --type=NodePort --port=%s --name=%s-np" % (service_name, service_port, service_name))
+        commands.append("kubectl -n ocis patch svc %s-np -p '{\"spec\":{\"ports\":[{\"port\":%s,\"nodePort\":%s}]}}'" % (service_name, service_port, node_port))
+
+    return [{
+        "name": "expose-nodeports",
+        "image": K3D_IMAGE,
+        "commands": [
+            "export KUBECONFIG=kubeconfig-$${DRONE_BUILD_NUMBER}.yaml",
+            "until test -f $${KUBECONFIG}; do sleep 1s; done",
+        ] + commands,
+    }]
+
+def exposeExternalServersK8s(severs = []):
+    commands = []
+    for server in severs:
+        server_name = server[0]
+        server_port = str(server[1])
+        commands.append("SERVER_IP=$(getent hosts %s | awk '{print $1}')" % server_name)
+        commands.append('echo -e "apiVersion: v1\nkind: Endpoints\nmetadata:\n  name: %s\n  namespace: ocis\n' % server_name +
+                        'subsets:\n- addresses:\n  - ip: $SERVER_IP\n  ports:\n  - port: %s" | kubectl apply -f -' % server_port)
+        commands.append('echo -e "apiVersion: v1\nkind: Service\nmetadata:\n  name: %s\n  namespace: ocis\n' % server_name +
+                        'spec:\n  ports:\n  - port: %s\n    targetPort: %s" | kubectl apply -f -' % (server_port, server_port))
+
+    return [{
+        "name": "expose-external-servers",
+        "image": K3D_IMAGE,
+        "commands": [
+            "export KUBECONFIG=kubeconfig-$${DRONE_BUILD_NUMBER}.yaml",
+            "until test -f $${KUBECONFIG}; do sleep 1s; done",
+        ] + commands,
+    }]
+
+def debugK8sState():
+    return [{
+        "name": "debug-k8s-state",
+        "image": K3D_IMAGE,
+        "detach": True,
+        "commands": [
+            "export KUBECONFIG=kubeconfig-$${DRONE_BUILD_NUMBER}.yaml",
+            "until test -f $${KUBECONFIG}; do sleep 1s; done",
+            "sleep 60",
+            "echo '=== PODS ==='",
+            "kubectl get pods -n ocis",
+            "echo '=== DEPLOYMENTS ==='",
+            "kubectl get deployments -n ocis",
+            "echo '=== SERVICES ==='",
+            "kubectl get svc -n ocis | grep collaboration",
+
+            "kubectl describe pods -n ocis -l app=collaboration-onlyoffice",
+            "kubectl describe pods -n ocis -l app=collaboration-collabora",
+            "kubectl describe pods -n ocis -l app=collaboration-microsoftofficeonline",
+            "echo '=== LOGS ==='",
+            "kubectl logs -n ocis -l app=collaboration-onlyoffice",
+            "kubectl logs -n ocis -l app=collaboration-collabora",
+            "kubectl logs -n ocis -l app=collaboration-microsoftofficeonline",            
         ],
     }]

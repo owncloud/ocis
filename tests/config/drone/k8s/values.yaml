@@ -46,6 +46,40 @@ features:
   quotas:
     default: "1000000000"
     max: "0"
+  appsIntegration:
+    enabled: true
+    wopiIntegration:
+      officeSuites:
+        - name: "Collabora"
+          uri: "https://collabora:9980"
+          product: "Collabora"
+          enabled: true
+          insecure: true
+          disableProof: true
+          secureViewEnabled: false
+          disableChat: true
+          ingress:
+            enabled: false
+        - name: "MicrosoftOfficeOnline"
+          uri: "http://fakeoffice:8080"
+          product: "MicrosoftOfficeOnline"
+          enabled: true
+          insecure: true
+          disableProof: true
+          secureViewEnabled: false
+          disableChat: true
+          ingress:
+            enabled: false
+        - name: "OnlyOffice"
+          uri: "https://onlyoffice"
+          product: "OnlyOffice"
+          enabled: true
+          insecure: true
+          disableProof: true
+          secureViewEnabled: false
+          disableChat: true
+          ingress:
+            enabled: false
 
 http:
   cors:
