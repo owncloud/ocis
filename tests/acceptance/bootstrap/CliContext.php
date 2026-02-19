@@ -563,6 +563,51 @@ class CliContext implements Context {
 	}
 
 	/**
+	 * @Given the administrator waits until file :filename is no longer in processing upload sessions
+	 *
+	 * @param string $filename
+	 *
+	 * @return void
+	 * @throws JsonException
+	 */
+	public function theAdministratorWaitsUntilFileIsNoLongerInProcessingUploadSessions(string $filename): void {
+		$timeout = 30; // seconds
+		$interval = 1; // seconds
+		$startTime = \time();
+
+		// Poll until file is no longer in --processing list (allows time for state transitions).
+		// Replaces fixed wait that assumed deterministic timing.
+		while (true) {
+			$this->theAdministratorListsAllTheUploadSessions("processing");
+			$this->featureContext->theHTTPStatusCodeShouldBe(200);
+			$responseArray = $this->getJSONDecodedCliMessage($this->featureContext->getResponse());
+
+			$found = false;
+			foreach ($responseArray as $item) {
+				if (isset($item->filename) && $item->filename === $filename) {
+					$found = true;
+					break;
+				}
+			}
+
+			if (!$found) {
+				// File is no longer in processing list - abort completed and state updated
+				return;
+			}
+
+			$elapsed = \time() - $startTime;
+			if ($elapsed >= $timeout) {
+				Assert::fail(
+					"Timeout after {$timeout}s: file '{$filename}' is still in processing upload sessions list. " .
+					"Virus scan + abort may not have completed within timeout period.",
+				);
+			}
+
+			\sleep($interval);
+		}
+	}
+
+	/**
 	 * @param ResponseInterface $response
 	 *
 	 * @return array
