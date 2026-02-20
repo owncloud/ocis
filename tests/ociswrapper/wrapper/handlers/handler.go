@@ -282,7 +282,7 @@ func OcisServiceHandler(res http.ResponseWriter, req *http.Request) {
 		common.Wg.Add(1)
 		go ocis.StartService(serviceName, ocis.ServiceEnvConfigs[serviceName])
 
-		success := ocis.WaitForServiceStatus(serviceName, true)
+		success := ocis.WaitForServiceStatus(serviceName, true, false)
 		if success {
 			sendResponse(res, http.StatusOK, fmt.Sprintf("'%s' service started successfully", serviceName))
 		} else {
@@ -315,7 +315,7 @@ func OcisServiceHandler(res http.ResponseWriter, req *http.Request) {
 			log.Println(fmt.Sprintf("Restarting '%s' service...", serviceName))
 			go ocis.StartService(serviceName, serviceEnvMap)
 
-			success := ocis.WaitForServiceStatus(serviceName, true)
+			success := ocis.WaitForServiceStatus(serviceName, true, false)
 			if success {
 				sendResponse(res, http.StatusOK, fmt.Sprintf("'%s' service updated successfully", serviceName))
 				return
@@ -338,7 +338,7 @@ func RollbackServicesHandler(res http.ResponseWriter, req *http.Request) {
 
 	for serviceName := range ocis.ServiceEnvConfigs {
 		if serviceName != "ocis" {
-			if success := ocis.WaitForServiceStatus(serviceName, true); success {
+			if success := ocis.WaitForServiceStatus(serviceName, true, false); success {
 				success, message := ocis.StopService(serviceName)
 				log.Println(message)
 				if !success {

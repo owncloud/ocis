@@ -38,7 +38,6 @@ func IsServiceRunning(service string) {
 	for {
 		select {
 		case <-timeout:
-			fmt.Printf("Timeout: %s service did not become ready in time.\n",service)
 			return
 		case <-tick.C:
 			cmd := exec.Command("sh", "-c", fmt.Sprintf("kubectl get pods -n ocis -A | grep %s | wc -l", service))
