@@ -329,7 +329,7 @@ func StopService(service string) (bool, string) {
 		return false, fmt.Sprintf("Failed to stop service with process id %d", pid)
 	}
 
-	success := WaitForServiceStatus(service, false, false)
+	success := WaitForServiceStatus(service, false)
 	if !success {
 		StopService(service)
 	}
@@ -338,7 +338,7 @@ func StopService(service string) (bool, string) {
 	return true, fmt.Sprintf(fmt.Sprintf("%s service stopped successfully", service))
 }
 
-func WaitForServiceStatus(service string, waitForUp bool, isRunningInK8s bool) bool {
+func WaitForServiceStatus(service string, waitForUp bool) bool {
 	overallTimeout := time.After(30 * time.Second)
 	ticker := time.NewTicker(2 * time.Second)
 	defer ticker.Stop()
@@ -355,11 +355,9 @@ func WaitForServiceStatus(service string, waitForUp bool, isRunningInK8s bool) b
 			log.Println(fmt.Errorf("Timeout: %s service did not %s within 30 seconds", service, status).Error())
 			return false
 		case <-ticker.C:
-			if !isRunningInK8s {
-				if _, exists := runningServices[service]; !exists {
-					log.Println(fmt.Sprintf("Service %s not found in running services. Retrying...", service))
-					continue
-				}
+			if _, exists := runningServices[service]; !exists {
+				log.Println(fmt.Sprintf("Service %s not found in running services. Retrying...", service))
+				continue
 			}
 
 			address := fmt.Sprintf(":%d", port)

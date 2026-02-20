@@ -38,7 +38,6 @@ func IsServiceRunning(service string) {
 	for {
 		select {
 		case <-timeout:
-			fmt.Printf("Timeout: %s service did not become ready in time.\n", service)
 			return
 		case <-tick.C:
 			cmd := exec.Command("sh", "-c", fmt.Sprintf("kubectl get pods -n ocis -A | grep %s | wc -l", service))
@@ -73,7 +72,7 @@ func IsServiceRunning(service string) {
 func Rollback() (bool, string) {
 	for service, envs := range K3dServiceEnvConfigs {
 		cmdArgs := []string{"set", "env", "-n", "ocis"}
-		cmdArgs = append(cmdArgs, fmt.Sprintf("deployment/%s", service))
+		cmdArgs = append(cmdArgs, fmt.Sprintf("deployment/%s",service))
 		for _, env := range envs {
 			cmdArgs = append(cmdArgs, strings.SplitN(env, "=", 2)[0]+"-")
 			cmd = exec.Command("kubectl", cmdArgs...)
@@ -82,7 +81,6 @@ func Rollback() (bool, string) {
 				return false, "service didnt restart"
 			}
 			IsServiceRunning(service)
-			WaitForServiceStatus(service, true, true)
 			delete(K3dServiceEnvConfigs, service)
 		}
 	}
