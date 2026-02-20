@@ -206,7 +206,7 @@ USAGE:
    ocis storage-users uploads consistency [command options]
 
 OPTIONS:
-   --id value    filter sessions by upload session id (default: unset)
+   --id value    filter sessions by upload session ID (default: unset)
    --verbose     Enable verbose logging (default: false)
    --help, -h    show help
 ```
