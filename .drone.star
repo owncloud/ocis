@@ -3028,7 +3028,6 @@ def uploadAPITestCoverageReport(ctx):
             ],
             "status": [
                 "success",
-                "failure",
             ],
         },
     }
