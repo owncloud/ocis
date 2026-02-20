@@ -211,7 +211,7 @@ OPTIONS:
    --help, -h    show help
 ```
 
-The command prints a summary of how many upload sessions are being checked and then, for each session, reports issues it finds in the node hierarchy. In verbose mode it also prints the traversal of parent nodes.
+The command prints a summary of the number of upload sessions being checked, and then reports any issues found in the node hierarchy for each session. In verbose mode, it also prints the traversal of parent nodes.
 
 **Command Examples**
 
