@@ -78,8 +78,8 @@ importers:
         specifier: ^1.2.1
         version: 1.2.1
       kpop:
-        specifier: https://download.kopano.io/community/kapp:/kpop-2.7.2.tgz
-        version: https://download.kopano.io/community/kapp:/kpop-2.7.2.tgz(@gluejs/glue@0.3.0)(@material-ui/core@4.12.4(@types/react@17.0.87)(react-dom@17.0.2(react@17.0.2))(react@17.0.2))(@material-ui/icons@4.11.3(@material-ui/core@4.12.4(@types/react@17.0.87)(react-dom@17.0.2(react@17.0.2))(react@17.0.2))(@types/react@17.0.87)(react-dom@17.0.2(react@17.0.2))(react@17.0.2))(notistack@1.0.10(@material-ui/core@4.12.4(@types/react@17.0.87)(react-dom@17.0.2(react@17.0.2))(react@17.0.2))(react-dom@17.0.2(react@17.0.2))(react@17.0.2))(oidc-client@1.11.5)(react-dom@17.0.2(react@17.0.2))(react-intl@5.25.1(react@17.0.2)(typescript@5.9.3))(react@17.0.2)
+        specifier: https://github.com/Kopano-dev/kpop/archive/refs/tags/v2.7.2.tar.gz
+        version: https://github.com/Kopano-dev/kpop/archive/refs/tags/v2.7.2.tar.gz(@gluejs/glue@0.3.0)(@material-ui/core@4.12.4(@types/react@17.0.87)(react-dom@17.0.2(react@17.0.2))(react@17.0.2))(@material-ui/icons@4.11.3(@material-ui/core@4.12.4(@types/react@17.0.87)(react-dom@17.0.2(react@17.0.2))(react@17.0.2))(@types/react@17.0.87)(react-dom@17.0.2(react@17.0.2))(react@17.0.2))(notistack@1.0.10(@material-ui/core@4.12.4(@types/react@17.0.87)(react-dom@17.0.2(react@17.0.2))(react@17.0.2))(react-dom@17.0.2(react@17.0.2))(react@17.0.2))(oidc-client@1.11.5)(react-dom@17.0.2(react@17.0.2))(react-intl@5.25.1(react@17.0.2)(typescript@5.9.3))(react@17.0.2)
       notistack:
         specifier: ^1.0.10
         version: 1.0.10(@material-ui/core@4.12.4(@types/react@17.0.87)(react-dom@17.0.2(react@17.0.2))(react@17.0.2))(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
@@ -4644,8 +4644,8 @@ packages:
     resolution: {integrity: sha512-eTIzlVOSUR+JxdDFepEYcBMtZ9Qqdef+rnzWdRZuMbOywu5tO2w2N7rqjoANZ5k9vywhL6Br1VRjUIgTQx4E8w==}
     engines: {node: '>=6'}
 
-  kpop@https://download.kopano.io/community/kapp:/kpop-2.7.2.tgz:
-    resolution: {tarball: https://download.kopano.io/community/kapp:/kpop-2.7.2.tgz}
+  kpop@https://github.com/Kopano-dev/kpop/archive/refs/tags/v2.7.2.tar.gz:
+    resolution: {integrity: sha512-lVIoe38n37QTO9bg7HYaMZ7NAlI5Snnw/RiW78AI3rvdBI1YEfcjTsq/J3345jPz2hqkjS0Zqg+BJ1KcyuIO4w==, tarball: https://github.com/Kopano-dev/kpop/archive/refs/tags/v2.7.2.tar.gz}
     version: 2.7.1
     engines: {node: '>=6.11.0'}
     peerDependencies:
@@ -12195,7 +12195,7 @@ snapshots:
 
   kleur@3.0.3: {}
 
-  kpop@https://download.kopano.io/community/kapp:/kpop-2.7.2.tgz(@gluejs/glue@0.3.0)(@material-ui/core@4.12.4(@types/react@17.0.87)(react-dom@17.0.2(react@17.0.2))(react@17.0.2))(@material-ui/icons@4.11.3(@material-ui/core@4.12.4(@types/react@17.0.87)(react-dom@17.0.2(react@17.0.2))(react@17.0.2))(@types/react@17.0.87)(react-dom@17.0.2(react@17.0.2))(react@17.0.2))(notistack@1.0.10(@material-ui/core@4.12.4(@types/react@17.0.87)(react-dom@17.0.2(react@17.0.2))(react@17.0.2))(react-dom@17.0.2(react@17.0.2))(react@17.0.2))(oidc-client@1.11.5)(react-dom@17.0.2(react@17.0.2))(react-intl@5.25.1(react@17.0.2)(typescript@5.9.3))(react@17.0.2):
+  kpop@https://github.com/Kopano-dev/kpop/archive/refs/tags/v2.7.2.tar.gz(@gluejs/glue@0.3.0)(@material-ui/core@4.12.4(@types/react@17.0.87)(react-dom@17.0.2(react@17.0.2))(react@17.0.2))(@material-ui/icons@4.11.3(@material-ui/core@4.12.4(@types/react@17.0.87)(react-dom@17.0.2(react@17.0.2))(react@17.0.2))(@types/react@17.0.87)(react-dom@17.0.2(react@17.0.2))(react@17.0.2))(notistack@1.0.10(@material-ui/core@4.12.4(@types/react@17.0.87)(react-dom@17.0.2(react@17.0.2))(react@17.0.2))(react-dom@17.0.2(react@17.0.2))(react@17.0.2))(oidc-client@1.11.5)(react-dom@17.0.2(react@17.0.2))(react-intl@5.25.1(react@17.0.2)(typescript@5.9.3))(react@17.0.2):
     dependencies:
       '@gluejs/glue': 0.3.0
       '@material-ui/core': 4.12.4(@types/react@17.0.87)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
