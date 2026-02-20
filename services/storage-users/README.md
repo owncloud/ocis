@@ -55,7 +55,9 @@ ocis storage-users uploads <command>
 
 ```plaintext
 COMMANDS:
-   sessions   Print a list of upload sessions
+   sessions          Print a list of upload sessions
+   delete-stale-nodes   Delete (or revert) all nodes in processing state that are not referenced by any upload session
+   consistency       Check consistency of uploads
 ```
 
 #### Sessions command
@@ -140,7 +142,6 @@ ocis storage-users uploads sessions --expired=true --clean
 ocis storage-users uploads sessions --processing=true --has-virus=false --resume
 ```
 
-
 #### Delete Stale Nodes command
 
 This command allows to remove (or revert) nodes that are stale, meaning they are in postprocessing but their upload session is gone.
@@ -181,6 +182,55 @@ Use `--verbose` to get more information about what is happening
 
 ```bash
 ocis storage-users uploads delete-stale-nodes --dry-run=false --verbose
+```
+
+
+#### Consistency command
+
+This command checks the consistency of upload sessions and their corresponding target nodes in the decomposedfs. It will:
+
+- **List upload sessions** (optionally filtered by ID).
+- **Verify the target node hierarchy** for each session.
+- **Detect missing parent nodes** and **missing parent node metadata files**.
+- **Detect parents that were moved to the trash**.
+
+```bash
+ocis storage-users uploads consistency [command options]
+```
+
+```
+NAME:
+   ocis storage-users uploads consistency - Check consistency of uploads.
+
+USAGE:
+   ocis storage-users uploads consistency [command options]
+
+OPTIONS:
+   --id value    filter sessions by upload session ID (default: unset)
+   --verbose     Enable verbose logging (default: false)
+   --help, -h    show help
+```
+
+The command prints a summary of the number of upload sessions being checked, and then reports any issues found in the node hierarchy for each session. In verbose mode, it also prints the traversal of parent nodes.
+
+**Command Examples**
+
+Check all upload sessions for consistency issues:
+
+```bash
+ocis storage-users uploads consistency
+```
+
+Check a specific upload session by ID:
+
+```bash
+ocis storage-users uploads consistency --id <upload-id>
+```
+
+Enable verbose logging to see node traversal details:
+
+```bash
+ocis storage-users uploads consistency --verbose
 ```
 
 

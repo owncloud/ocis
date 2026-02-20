@@ -175,7 +175,7 @@ See also [example server setup]({{< ref "preparing_server" >}})
   # Minio domain. Defaults to "minio.owncloud.test".
   MINIO_DOMAIN=
 
-  # Define SMPT settings if you would like to send Infinite Scale email notifications.
+  # Define SMTP settings if you would like to send Infinite Scale email notifications.
   # For more details see:
   # https://doc.owncloud.com/ocis/latest/deployment/services/s-list/notifications.html
   # NOTE: when configuring mail server, these settings have no effect, see mailserver.yml for details.

@@ -63,6 +63,7 @@ func Uploads(cfg *config.Config) *cli.Command {
 		Subcommands: []*cli.Command{
 			ListUploadSessions(cfg),
 			DeleteStaleProcessingNodes(cfg),
+			Consistency(cfg),
 		},
 	}
 }
