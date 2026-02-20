@@ -1,6 +1,6 @@
 ---
 title: Auth-Bearer
-date: 2026-02-20T00:20:26.438276978Z
+date: 2026-02-20T03:32:27.402830678Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/auth-bearer
