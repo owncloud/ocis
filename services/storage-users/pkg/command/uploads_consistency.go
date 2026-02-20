@@ -29,7 +29,7 @@ func Consistency(cfg *config.Config) *cli.Command {
 			&cli.StringFlag{
 				Name:        "id",
 				DefaultText: "unset",
-				Usage:       "filter sessions by upload session id",
+				Usage:       "Filter sessions by upload session ID",
 			},
 			&cli.BoolFlag{
 				Name:  "verbose",
