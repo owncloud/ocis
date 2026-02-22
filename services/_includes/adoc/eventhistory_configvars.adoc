@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2026-02-21-00-21-00]
+[#deprecation-note-2026-02-22-00-19-37]
 [caption=]
 .Deprecation notes for the eventhistory service
 [width="100%",cols="~,~,~,~",options="header"]
