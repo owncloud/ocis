@@ -14,7 +14,8 @@ services:
         condition: service_completed_successfully
 
   importer-init:
-    image: owncloud/web-extensions:importer-0.3.1
+    image: owncloud/web-extensions:importer-0.3.1@sha256:07682cd30784b0c990156a7da053d9f2bb79d2a6a00e4761a08243c72a95dce9
+    platform: linux/${IMAGE_ARCH:-amd64}
     user: root
     volumes:
       - ocis-apps:/apps
@@ -23,7 +24,8 @@ services:
     command: [ "-c", "cp -R /var/lib/nginx/html/importer/ /apps" ]
 
   companion:
-    image: ${COMPANION_IMAGE:-transloadit/companion:5.8.0}
+    image: transloadit/companion:5.8.0@sha256:65052a640897deb14fdf449fa88a121b8648f0fb06c52a1503fa4b3bb1d2564f
+    platform: linux/${IMAGE_ARCH:-amd64}
     networks:
       - ocis-net
     environment:

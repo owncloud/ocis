@@ -7,7 +7,8 @@ services:
           - ${ONLYOFFICE_DOMAIN:-onlyoffice.owncloud.test}
 
   collaboration-oo:
-    image: ${OCIS_DOCKER_IMAGE:-owncloud/ocis}:${OCIS_DOCKER_TAG:-latest}
+    image: owncloud/ocis:8.0.0@sha256:41e6d78f43507015e0c34b87bff49ae0744f261a92916f044e47d32067ff18ce
+    platform: linux/${IMAGE_ARCH:-amd64}
     networks:
       ocis-net:
     depends_on:
@@ -45,7 +46,8 @@ services:
 
   onlyoffice:
     # note, you also need to add a volume when using the enterprise version, see below
-    image: ${ONLYOFFICE_IMAGE:-onlyoffice/documentserver}:${ONLYOFFICE_DOCKER_TAG:-latest}
+    image: onlyoffice/documentserver:9.2.1.1@sha256:fd00acbbbde3d8b1ead9b933aafa7c2df77e62c48b1b171886e6bef343c13882
+    platform: linux/${IMAGE_ARCH:-amd64}
     networks:
       ocis-net:
     entrypoint:
