@@ -1,0 +1,23 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:base", "docker:pinDigests"],
+  "labels": ["dependencies", "docker", "ocis_full"],
+  "reviewers": ["owncloud/qa"],
+  "assignees": ["owncloud/qa"],
+  "timezone": "Europe/Berlin",
+  "schedule": ["every day"],
+  "prConcurrentLimit": 10,
+  "docker-compose": {
+    "fileMatch": ["^deployments/examples/ocis_full/.*\\.ya?ml$"]
+  },
+  "packageRules": [
+    {
+      "matchManagers": ["docker-compose"],
+      "matchFileNames": [
+        "deployments/examples/ocis_full/**/*.yml",
+        "deployments/examples/ocis_full/**/*.yaml"
+      ],
+      "groupName": "ocis_full image updates (tags+digests)"
+    }
+  ]
+}
