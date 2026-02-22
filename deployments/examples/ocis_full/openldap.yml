@@ -1,0 +1,79 @@
+---
+services:
+  ocis:
+    depends_on:
+      openldap:
+        condition: service_healthy
+    environment:
+      # OCIS_RUN_SERVICES: exclude the internal IDM service, replaced by external LDAP.
+      # If KEYCLOAK is enabled, exclude internal IDP as well.
+      OCIS_EXCLUDE_RUN_SERVICES: "idm${KEYCLOAK:+,idp}"
+      # LDAP settings shared across oCIS services
+      OCIS_LDAP_URI: ldaps://openldap:636
+      OCIS_LDAP_INSECURE: "true"
+      OCIS_LDAP_BIND_DN: "cn=admin,dc=owncloud,dc=com"
+      OCIS_LDAP_BIND_PASSWORD: ${LDAP_ADMIN_PASSWORD}
+      OCIS_LDAP_GROUP_BASE_DN: "ou=groups,dc=owncloud,dc=com"
+      OCIS_LDAP_GROUP_FILTER: "(objectclass=owncloud)"
+      OCIS_LDAP_GROUP_OBJECTCLASS: "groupOfNames"
+      OCIS_LDAP_USER_BASE_DN: "ou=users,dc=owncloud,dc=com"
+      OCIS_LDAP_USER_FILTER: "(objectclass=owncloud)"
+      OCIS_LDAP_USER_OBJECTCLASS: "inetOrgPerson"
+      LDAP_LOGIN_ATTRIBUTES: "uid"
+      OCIS_ADMIN_USER_ID: "ddc2004c-0977-11eb-9d3f-a793888cd0f8"
+      IDP_LDAP_LOGIN_ATTRIBUTE: "uid"
+      IDP_LDAP_UUID_ATTRIBUTE: "ownclouduuid"
+      IDP_LDAP_UUID_ATTRIBUTE_TYPE: binary
+      # Graph-specific LDAP settings
+      GRAPH_LDAP_URI: ldaps://openldap:636
+      GRAPH_LDAP_BIND_DN: "cn=admin,dc=owncloud,dc=com"
+      GRAPH_LDAP_BIND_PASSWORD: ${LDAP_ADMIN_PASSWORD}
+      GRAPH_LDAP_GROUP_BASE_DN: "ou=groups,dc=owncloud,dc=com"
+      GRAPH_LDAP_GROUP_FILTER: "(objectclass=owncloud)"
+      GRAPH_LDAP_GROUP_OBJECTCLASS: "groupOfNames"
+      GRAPH_LDAP_USER_BASE_DN: "ou=users,dc=owncloud,dc=com"
+      GRAPH_LDAP_USER_FILTER: "(objectclass=owncloud)"
+      GRAPH_LDAP_USER_OBJECTCLASS: "inetOrgPerson"
+      GRAPH_LDAP_SERVER_WRITE_ENABLED: "${GRAPH_LDAP_SERVER_WRITE_ENABLED:-false}"
+      GRAPH_LDAP_REFINT_ENABLED: "true"
+
+  openldap:
+    image: osixia/openldap:1.5.0
+    networks:
+      ocis-net:
+    environment:
+      LDAP_TLS_VERIFY_CLIENT: never
+      LDAP_TLS: true
+      LDAP_ORGANISATION: owncloud
+      LDAP_DOMAIN: owncloud.com
+      LDAP_ROOT: "dc=owncloud,dc=com"
+      LDAP_ADMIN_PASSWORD: ${LDAP_ADMIN_PASSWORD}
+      LDAP_SEED_INTERNAL_LDIF_PATH: /ldifs
+      LDAP_SEED_INTERNAL_SCHEMA_PATH: /schemas
+    ports:
+      - "127.0.0.1:389:389"
+      - "127.0.0.1:636:636"
+    volumes:
+      - ./config/ldap/ldif:/ldifs:ro
+      - ./config/ldap/schemas:/schemas:ro
+      - openldap-certs:/container/service/slapd/assets/certs
+      - openldap-data:/var/lib/ldap
+      - openldap-config:/etc/ldap/slapd.d
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "ldapsearch -x -H ldap://127.0.0.1:389 -D \"cn=admin,dc=owncloud,dc=com\" -w \"$${LDAP_ADMIN_PASSWORD}\" -b \"dc=owncloud,dc=com\" -s base >/dev/null 2>&1",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+      start_period: 20s
+    logging:
+      driver: ${LOG_DRIVER:-local}
+    restart: always
+
+volumes:
+  openldap-certs:
+  openldap-data:
+  openldap-config:

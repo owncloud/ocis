@@ -1,0 +1,98 @@
+---
+services:
+  traefik:
+    networks:
+      ocis-net:
+        aliases:
+          - ${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}
+
+  ocis:
+    depends_on:
+      keycloak:
+        condition: service_healthy
+    environment:
+      # Keycloak IDP specific configuration
+      PROXY_AUTOPROVISION_ACCOUNTS: "true"
+      PROXY_ROLE_ASSIGNMENT_DRIVER: "oidc"
+      OCIS_OIDC_ISSUER: https://${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}/realms/${KEYCLOAK_REALM:-oCIS}
+      PROXY_OIDC_REWRITE_WELLKNOWN: "true"
+      WEB_OIDC_CLIENT_ID: ${OCIS_OIDC_CLIENT_ID:-web}
+      PROXY_USER_OIDC_CLAIM: "preferred_username"
+      PROXY_USER_CS3_CLAIM: "username"
+      WEB_OIDC_SCOPE: "openid profile email acr"
+      KEYCLOAK_DOMAIN: ${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}
+      OCIS_EXCLUDE_RUN_SERVICES: "idp"
+      GRAPH_ASSIGN_DEFAULT_USER_ROLE: "false"
+      GRAPH_USERNAME_MATCH: "none"
+
+  keycloak-postgres:
+    image: postgres:16-alpine
+    networks:
+      ocis-net:
+    volumes:
+      - keycloak-postgres-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: ${KEYCLOAK_DB_NAME:-keycloak}
+      POSTGRES_USER: ${KEYCLOAK_DB_USER:-keycloak}
+      POSTGRES_PASSWORD: ${KEYCLOAK_DB_PASSWORD}
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${KEYCLOAK_DB_USER:-keycloak} -d ${KEYCLOAK_DB_NAME:-keycloak}",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    logging:
+      driver: ${LOG_DRIVER:-local}
+    restart: always
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:${KEYCLOAK_DOCKER_TAG:-26.2.5}
+    networks:
+      ocis-net:
+    command:
+      [
+        "start",
+        "--spi-connections-http-client-default-disable-trust-manager=${INSECURE:-false}",
+        "--import-realm",
+      ]
+    entrypoint: ["/bin/sh", "/opt/keycloak/bin/docker-entrypoint-override.sh"]
+    volumes:
+      - ./config/keycloak/docker-entrypoint-override.sh:/opt/keycloak/bin/docker-entrypoint-override.sh:ro
+      - ./config/keycloak/ocis-realm.dist.json:/opt/keycloak/data/import-dist/ocis-realm.json:ro
+    environment:
+      OCIS_DOMAIN: ${OCIS_DOMAIN:-ocis.owncloud.test}
+      KC_HOSTNAME: ${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://keycloak-postgres:5432/${KEYCLOAK_DB_NAME:-keycloak}
+      KC_DB_USERNAME: ${KEYCLOAK_DB_USER:-keycloak}
+      KC_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD}
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_ADMIN_USER:-admin}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+      KC_PROXY_HEADERS: xforwarded
+      KC_HTTP_ENABLED: "true"
+      KC_HEALTH_ENABLED: "true"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.keycloak.entrypoints=https"
+      - "traefik.http.routers.keycloak.rule=Host(`${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}`)"
+      - "traefik.http.routers.keycloak.tls.certresolver=http"
+      - "traefik.http.routers.keycloak.service=keycloak"
+      - "traefik.http.services.keycloak.loadbalancer.server.port=8080"
+    depends_on:
+      keycloak-postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c 'exec 3<>/dev/tcp/127.0.0.1/8080'"]
+      interval: 15s
+      timeout: 5s
+      retries: 20
+      start_period: 40s
+    logging:
+      driver: ${LOG_DRIVER:-local}
+    restart: always
+
+volumes:
+  keycloak-postgres-data:

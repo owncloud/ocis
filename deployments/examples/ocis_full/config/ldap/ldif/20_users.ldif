@@ -1,0 +1,100 @@
+# Start dn with uid (user identifier / login), not cn (Firstname + Surname)
+dn: uid=einstein,ou=users,dc=owncloud,dc=com
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: ownCloudUser
+objectClass: person
+objectClass: posixAccount
+objectClass: top
+uid: einstein
+givenName: Albert
+sn: Einstein
+cn: einstein
+displayName: Albert Einstein
+description: A German-born theoretical physicist who developed the theory of relativity, one of the two pillars of modern physics (alongside quantum mechanics).
+mail: einstein@example.org
+uidNumber: 20000
+gidNumber: 30000
+homeDirectory: /home/einstein
+ownCloudUUID: 4c510ada-c86b-4815-8820-42cdf82c3d51
+userPassword:: e1NTSEF9TXJEcXpFNGdKbXZxbVRVTGhvWEZ1VzJBbkV3NWFLK3J3WTIvbHc9PQ==
+
+dn: uid=marie,ou=users,dc=owncloud,dc=com
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: ownCloudUser
+objectClass: person
+objectClass: posixAccount
+objectClass: top
+uid: marie
+givenName: Marie
+sn: Curie
+cn: marie
+displayName: Marie Skłodowska Curie
+description: A Polish and naturalized-French physicist and chemist who conducted pioneering research on radioactivity.
+mail: marie@example.org
+uidNumber: 20001
+gidNumber: 30000
+homeDirectory: /home/marie
+ownCloudUUID: f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c
+userPassword:: e1NTSEF9UmFvQWs3TU9jRHBIUWY3bXN3MGhHNnVraFZQWnRIRlhOSUNNZEE9PQ==
+
+dn: uid=richard,ou=users,dc=owncloud,dc=com
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: ownCloudUser
+objectClass: person
+objectClass: posixAccount
+objectClass: top
+uid: richard
+givenName: Richard
+sn: Feynman
+cn: richard
+displayName: Richard Phillips Feynman
+description: An American theoretical physicist, known for his work in the path integral formulation of quantum mechanics, the theory of quantum electrodynamics, the physics of the superfluidity of supercooled liquid helium, as well as his work in particle physics for which he proposed the parton model.
+mail: richard@example.org
+uidNumber: 20002
+gidNumber: 30000
+homeDirectory: /home/richard
+ownCloudUUID: 932b4540-8d16-481e-8ef4-588e4b6b151c
+userPassword:: e1NTSEF9Z05LZTRreHdmOGRUREY5eHlhSmpySTZ3MGxSVUM1d1RGcWROTVE9PQ==
+
+dn: uid=moss,ou=users,dc=owncloud,dc=com
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: ownCloudUser
+objectClass: person
+objectClass: posixAccount
+objectClass: top
+uid: moss
+givenName: Maurice
+sn: Moss
+cn: moss
+displayName: Maurice Moss
+description: A worker in the IT Department of Reynholm Industries. Of all the working staff in the IT Department, he is the most hard-working, the most experienced, and the most capable of doing his job well. He puts a lot of effort into his work, however he does not get the credit he deserves.
+mail: moss@example.org
+uidNumber: 20003
+gidNumber: 30000
+homeDirectory: /home/moss
+ownCloudUUID: 058bff95-6708-4fe5-91e4-9ea3d377588b
+userPassword:: e1NTSEF9N0hEdTRoMkFDVExFWWt4U0RtSDZVQjhmUlpKRExDZDc=
+
+dn: uid=admin,ou=users,dc=owncloud,dc=com
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: ownCloudUser
+objectClass: person
+objectClass: posixAccount
+objectClass: top
+uid: admin
+givenName: Admin
+sn: Admin
+cn: admin
+displayName: Admin
+description: An admin for this oCIS instance.
+mail: admin@example.org
+uidNumber: 20004
+gidNumber: 30000
+homeDirectory: /home/admin
+ownCloudUUID: ddc2004c-0977-11eb-9d3f-a793888cd0f8
+userPassword:: e1NTSEF9UWhmaFB3dERydTUydURoWFFObDRMbzVIckI3TkI5Nmo=
