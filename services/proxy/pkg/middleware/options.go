@@ -80,6 +80,7 @@ type Options struct {
 	// Multi-Instance Options
 	MultiInstanceEnabled bool
 	InstanceID           string
+	MasterID             string
 	MemberClaim          string
 	GuestClaim           string
 	GuestRoleName        string
@@ -273,10 +274,11 @@ func ServiceAccount(id string, secret string) Option {
 }
 
 // MultiInstance sets muli-instance options
-func MultiInstance(enabled bool, iid string, memberClaim, guestClaim string, guestRole string) Option {
+func MultiInstance(enabled bool, iid string, masterID string, memberClaim, guestClaim string, guestRole string) Option {
 	return func(o *Options) {
 		o.MultiInstanceEnabled = enabled
 		o.InstanceID = iid
+		o.MasterID = masterID
 		o.MemberClaim = memberClaim
 		o.GuestClaim = guestClaim
 		o.GuestRoleName = guestRole
