@@ -43,6 +43,7 @@ func AccountResolver(optionSetters ...Option) func(next http.Handler) http.Handl
 			eventsPublisher:       options.EventsPublisher,
 			multiInstance:         options.MultiInstanceEnabled,
 			instanceID:            options.InstanceID,
+			masterID:              options.MasterID,
 			memberClaim:           options.MemberClaim,
 			guestClaim:            options.GuestClaim,
 			guestRoleName:         options.GuestRoleName,
@@ -70,6 +71,7 @@ type accountResolver struct {
 	guestClaim    string
 	guestRoleName string
 	instanceID    string
+	masterID      string
 }
 
 // TODO do not use the context to store values: https://medium.com/@cep21/how-to-correctly-use-context-context-in-go-1-7-8f2c0fafdf39
@@ -221,12 +223,28 @@ func (m accountResolver) resolveUserType(claims map[string]interface{}) (isMembe
 		// single instance behaviour - any user is considered a member
 		return true, false
 	}
+
+	// Check for master-id first (if configured)
+	if m.masterID != "" {
+		memberClaims := readClaim(m.memberClaim, claims)
+		m.logger.Debug().Interface("memberClaims", memberClaims).Str("masterID", m.masterID).Msg("checking master-id")
+		for _, miid := range memberClaims {
+			if miid != "" && miid == m.masterID {
+				m.logger.Debug().Msg("master-id matched!")
+				return true, false
+			}
+		}
+	}
+
+	// Check for instance-specific ID
 	for _, miid := range readClaim(m.memberClaim, claims) {
 		if miid != "" && miid == m.instanceID {
 			return true, false
 		}
 	}
-	for _, giid := range readClaim(m.guestClaim, claims) {
+	guestClaims := readClaim(m.guestClaim, claims)
+	m.logger.Debug().Interface("guestClaims", guestClaims).Msg("checking guest claims")
+	for _, giid := range guestClaims {
 		if giid != "" && giid == m.instanceID {
 			return false, true
 		}

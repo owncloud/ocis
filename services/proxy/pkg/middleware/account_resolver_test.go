@@ -295,3 +295,180 @@ func mockRequest(claims map[string]interface{}) (*http.Request, *httptest.Respon
 type mockHandler struct{}
 
 func (m mockHandler) ServeHTTP(writer http.ResponseWriter, request *http.Request) {}
+
+func TestResolveUserType(t *testing.T) {
+	const (
+		instanceID1 = "ec730a6c-1b63-4b45-b83b-9e2311afdf85"
+		instanceID2 = "8d24cb5f-6ee6-4b98-86df-c4c268dddb46"
+		masterID    = "11111111-1111-1111-1111-111111111111"
+	)
+
+	testCases := []struct {
+		name           string
+		multiInstance  bool
+		instanceID     string
+		masterID       string
+		memberClaim    string
+		guestClaim     string
+		claims         map[string]interface{}
+		expectMember   bool
+		expectGuest    bool
+		description    string
+	}{
+		{
+			name:          "single instance mode - always member",
+			multiInstance: false,
+			instanceID:    instanceID1,
+			masterID:      "",
+			memberClaim:   "owncloudMemberOf",
+			guestClaim:    "owncloudGuestOf",
+			claims:        map[string]interface{}{},
+			expectMember:  true,
+			expectGuest:   false,
+			description:   "In single instance mode, any user should be considered a member",
+		},
+		{
+			name:          "multi-instance: user has matching instance ID in memberClaim",
+			multiInstance: true,
+			instanceID:    instanceID1,
+			masterID:      "",
+			memberClaim:   "owncloudMemberOf",
+			guestClaim:    "owncloudGuestOf",
+			claims: map[string]interface{}{
+				"owncloudMemberOf": instanceID1,
+			},
+			expectMember: true,
+			expectGuest:  false,
+			description:  "User with matching instance ID should be granted member access",
+		},
+		{
+			name:          "multi-instance: user has matching instance ID in guestClaim",
+			multiInstance: true,
+			instanceID:    instanceID1,
+			masterID:      "",
+			memberClaim:   "owncloudMemberOf",
+			guestClaim:    "owncloudGuestOf",
+			claims: map[string]interface{}{
+				"owncloudGuestOf": instanceID1,
+			},
+			expectMember: false,
+			expectGuest:  true,
+			description:  "User with matching instance ID in guestClaim should be granted guest access",
+		},
+		{
+			name:          "multi-instance: user has no matching instance ID",
+			multiInstance: true,
+			instanceID:    instanceID1,
+			masterID:      "",
+			memberClaim:   "owncloudMemberOf",
+			guestClaim:    "owncloudGuestOf",
+			claims: map[string]interface{}{
+				"owncloudMemberOf": instanceID2,
+			},
+			expectMember: false,
+			expectGuest:  false,
+			description:  "User without matching instance ID should be denied access",
+		},
+		{
+			name:          "multi-instance with master-id: user has master-id in memberClaim",
+			multiInstance: true,
+			instanceID:    instanceID1,
+			masterID:      masterID,
+			memberClaim:   "owncloudMemberOf",
+			guestClaim:    "owncloudGuestOf",
+			claims: map[string]interface{}{
+				"owncloudMemberOf": masterID,
+			},
+			expectMember: true,
+			expectGuest:  false,
+			description:  "User with master-id in memberClaim should be granted member access to any instance",
+		},
+		{
+			name:          "multi-instance with master-id disabled: user has master-id value but feature disabled",
+			multiInstance: true,
+			instanceID:    instanceID1,
+			masterID:      "", // Empty = disabled
+			memberClaim:   "owncloudMemberOf",
+			guestClaim:    "owncloudGuestOf",
+			claims: map[string]interface{}{
+				"owncloudMemberOf": masterID,
+			},
+			expectMember: false,
+			expectGuest:  false,
+			description:  "When master-id is empty/disabled, having the master-id value should not grant access",
+		},
+		{
+			name:          "multi-instance with master-id: user has both master-id and instance-id",
+			multiInstance: true,
+			instanceID:    instanceID1,
+			masterID:      masterID,
+			memberClaim:   "owncloudMemberOf",
+			guestClaim:    "owncloudGuestOf",
+			claims: map[string]interface{}{
+				"owncloudMemberOf": []string{masterID, instanceID1},
+			},
+			expectMember: true,
+			expectGuest:  false,
+			description:  "User with both master-id and instance-id should be granted access (master-id matches first)",
+		},
+		{
+			name:          "multi-instance with master-id: array with master-id in middle",
+			multiInstance: true,
+			instanceID:    instanceID1,
+			masterID:      masterID,
+			memberClaim:   "owncloudMemberOf",
+			guestClaim:    "owncloudGuestOf",
+			claims: map[string]interface{}{
+				"owncloudMemberOf": []string{instanceID2, masterID, "other-id"},
+			},
+			expectMember: true,
+			expectGuest:  false,
+			description:  "Master-id should be found when it's in an array with other values",
+		},
+		{
+			name:          "multi-instance with master-id: user on wrong instance but has master-id",
+			multiInstance: true,
+			instanceID:    instanceID2, // Different instance
+			masterID:      masterID,
+			memberClaim:   "owncloudMemberOf",
+			guestClaim:    "owncloudGuestOf",
+			claims: map[string]interface{}{
+				"owncloudMemberOf": masterID,
+			},
+			expectMember: true,
+			expectGuest:  false,
+			description:  "Master-id should grant access to ANY instance, regardless of which instance is checking",
+		},
+		{
+			name:          "multi-instance: empty claim values",
+			multiInstance: true,
+			instanceID:    instanceID1,
+			masterID:      masterID,
+			memberClaim:   "owncloudMemberOf",
+			guestClaim:    "owncloudGuestOf",
+			claims: map[string]interface{}{
+				"owncloudMemberOf": "",
+			},
+			expectMember: false,
+			expectGuest:  false,
+			description:  "Empty string values should not grant access",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			resolver := accountResolver{
+				multiInstance: tc.multiInstance,
+				instanceID:    tc.instanceID,
+				masterID:      tc.masterID,
+				memberClaim:   tc.memberClaim,
+				guestClaim:    tc.guestClaim,
+			}
+
+			isMember, isGuest := resolver.resolveUserType(tc.claims)
+
+			assert.Equal(t, tc.expectMember, isMember, "isMember mismatch: %s", tc.description)
+			assert.Equal(t, tc.expectGuest, isGuest, "isGuest mismatch: %s", tc.description)
+		})
+	}
+}
