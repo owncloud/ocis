@@ -251,6 +251,7 @@ type ClaimSpaceManagement struct {
 type MultiInstanceConfig struct {
 	Enabled     bool   `yaml:"enabled" env:"OCIS_MULTI_INSTANCE_ENABLED" desc:"Enable multiple instances of Infinite Scale." introductionVersion:"8.0.0"`
 	InstanceID  string `yaml:"instanceid" env:"OCIS_MULTI_INSTANCE_INSTANCEID" desc:"The unique id of this instance" introductionVersion:"8.0.0"`
+	MasterID    string `yaml:"master_id" env:"OCIS_MULTI_INSTANCE_MASTER_ID" desc:"The master ID that grants access to all instances. Users with this ID in their memberOf or guestOf claims can access any instance. Leave empty to disable." introductionVersion:"NEXT"`
 	MemberClaim string `yaml:"member_claim" env:"OCIS_MULTI_INSTANCE_MEMBER_CLAIM" desc:"The claim name for the 'memberOf' property" introductionVersion:"8.0.0"`
 	GuestClaim  string `yaml:"guest_claim" env:"OCIS_MULTI_INSTANCE_GUEST_CLAIM" desc:"The claim name for the 'guestOf' property" introductionVersion:"8.0.0"`
 	GuestRole   string `yaml:"guest_role" env:"OCIS_MULTI_INSTANCE_GUEST_ROLE" desc:"The role that should be assigned to a guest user" introductionVersion:"8.0.0"`

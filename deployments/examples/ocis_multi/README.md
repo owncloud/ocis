@@ -18,4 +18,16 @@ Demo User have different roles on different instances
 
 Users can be invited to instances they are not member of by using their exact email address in space membership or share dialog.
 
+## Master-ID Configuration
+
+**Configuration:**
+- **Master-ID Value**: `11111111-1111-1111-1111-111111111111`
+- **Environment Variable**: `OCIS_MULTI_INSTANCE_MASTER_ID`
+- **User**: admin (configured in config/ldap/ldif/20_users.ldif)
+- **Purpose**: Users with this ID in their `owncloudMemberOf` or `owncloudGuestOf` claims can login to any instance
+
+Users with the master-id are granted member access to all instances without maintaining instance-specific IDs. The feature is optional and disabled when `OCIS_MULTI_INSTANCE_MASTER_ID` is empty.
+
+**Security Note:** Master-id grants member status only (not admin privileges). Regular users require specific instance IDs for access control.
+
 
