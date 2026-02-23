@@ -2,6 +2,7 @@ package engine
 
 import (
 	"context"
+	"errors"
 	"regexp"
 
 	"github.com/blevesearch/bleve/v2/search"
@@ -11,6 +12,9 @@ import (
 	searchService "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
 	"github.com/owncloud/ocis/v2/services/search/pkg/content"
 )
+
+// ErrResourceNotFound is returned when a resource is not present in the index.
+var ErrResourceNotFound = errors.New("entity not found")
 
 var queryEscape = regexp.MustCompile(`([` + regexp.QuoteMeta(`+=&|><!(){}[]^\"~*?:\/`) + `\-\s])`)
 

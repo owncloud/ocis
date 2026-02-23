@@ -2,6 +2,7 @@ package search
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"path/filepath"
 	"slices"
@@ -581,53 +582,41 @@ func (s *Service) storeExtractedMetadata(ctx context.Context, ref *provider.Refe
 	}
 }
 
-// UpdateTags updates only the tags (and basic metadata) of an already-indexed
-// resource without triggering a full content re-extraction via Tika.  If the
-// resource is not yet in the index it falls back to a full UpsertItem.
+// UpdateTags updates only the tags of an already-indexed resource without
+// triggering a full content re-extraction via Tika. If the resource is not
+// yet in the index it falls back to a full UpsertItem.
 func (s *Service) UpdateTags(ref *provider.Reference) {
-	_, stat, path := s.resInfo(ref)
-	if stat == nil || path == "" {
+	_, stat, _ := s.resInfo(ref)
+	if stat == nil {
 		return
 	}
 
 	resourceID := storagespace.FormatResourceID(stat.Info.Id)
 
-	// Update the existing indexed resource in-place, preserving
-	// Tika-extracted fields (Content, Title, Audio, Image, Location, Photo).
-	err := s.engine.Update(resourceID, func(r *engine.Resource) {
-		s.refreshMetadata(r, stat, path)
-	})
-	if err != nil {
-		// Resource is not yet indexed — fall back to the full extraction path.
-		s.logger.Debug().Err(err).Str("id", resourceID).Msg("resource not in index, falling back to full upsert for tag update")
-		s.UpsertItem(ref)
-	}
-}
-
-// refreshMetadata updates the basic metadata fields on an already-indexed
-// resource from the current stat response, preserving any previously
-// extracted content (Title, Content, Audio, Image, Location, Photo).
-func (s *Service) refreshMetadata(r *engine.Resource, stat *provider.StatResponse, path string) {
-	r.Name = stat.Info.Name
-	r.Size = stat.Info.Size
-	r.MimeType = stat.Info.MimeType
-	r.Path = utils.MakeRelativePath(path)
-	r.Hidden = strings.HasPrefix(r.Path, ".")
-
-	if stat.Info.Mtime != nil {
-		r.Mtime = utils.TSToTime(stat.Info.Mtime).UTC().Format(time.RFC3339Nano)
-	}
-	if parentID := stat.GetInfo().GetParentId(); parentID != nil {
-		r.ParentID = storagespace.FormatResourceID(parentID)
-	}
-
-	// Refresh tags from current ArbitraryMetadata.
-	r.Tags = nil
+	// Read the current tags from ArbitraryMetadata.
+	var newTags []string
 	if m := stat.Info.ArbitraryMetadata.GetMetadata(); m != nil {
 		if t, ok := m["tags"]; ok {
-			r.Tags = tags.New(t).AsSlice()
+			newTags = tags.New(t).AsSlice()
 		}
 	}
+
+	// Update only the tags field on the existing indexed resource.
+	err := s.engine.Update(resourceID, func(r *engine.Resource) {
+		r.Tags = newTags
+	})
+	if err == nil {
+		return
+	}
+
+	if errors.Is(err, engine.ErrResourceNotFound) {
+		// Resource is not yet indexed — fall back to the full extraction path.
+		s.logger.Debug().Str("id", resourceID).Msg("resource not in index, falling back to full upsert for tag update")
+		s.UpsertItem(ref)
+		return
+	}
+
+	s.logger.Error().Err(err).Str("id", resourceID).Msg("failed to update tags in index")
 }
 
 func addAudioMetadata(metadata map[string]string, audio *libregraph.Audio) {

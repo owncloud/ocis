@@ -231,13 +231,22 @@ var _ = Describe("Searchprovider", func() {
 		})
 
 		It("falls back to full UpsertItem when resource is not yet indexed", func() {
-			indexClient.On("Update", mock.Anything, mock.Anything).Return(errors.New("entity not found"))
+			indexClient.On("Update", mock.Anything, mock.Anything).Return(engine.ErrResourceNotFound)
 			extractor.On("Extract", mock.Anything, mock.Anything, mock.Anything).Return(content.Document{Name: "foo.pdf"}, nil)
 			indexClient.On("Upsert", mock.Anything, mock.Anything).Return(nil)
 
 			s.UpdateTags(&sprovider.Reference{ResourceId: ri.Id})
 
 			extractor.AssertCalled(GinkgoT(), "Extract", mock.Anything, mock.Anything, mock.Anything)
+		})
+
+		It("logs an error and does not fall back on non-retriable errors", func() {
+			indexClient.On("Update", mock.Anything, mock.Anything).Return(errors.New("connection refused"))
+
+			s.UpdateTags(&sprovider.Reference{ResourceId: ri.Id})
+
+			extractor.AssertNotCalled(GinkgoT(), "Extract", mock.Anything, mock.Anything, mock.Anything)
+			indexClient.AssertNotCalled(GinkgoT(), "Upsert", mock.Anything, mock.Anything)
 		})
 	})
 
