@@ -41,6 +41,11 @@ olcAttributeTypes: ( ownCloudOid:1.1.9 NAME 'ownCloudRole'
   EQUALITY caseIgnoreMatch
   SUBSTR caseIgnoreSubstringsMatch
   SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+olcAttributeTypes: ( ownCloudOid:1.1.10 NAME 'owncloudExternalID'
+  DESC 'External ID for the user'
+  EQUALITY caseIgnoreMatch
+  SUBSTR caseIgnoreSubstringsMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
 olcObjectClasses: ( ownCloudOid:1.2.1 NAME 'ownCloud'
   DESC 'ownCloud LDAP Schema'
   AUXILIARY
@@ -49,7 +54,7 @@ olcObjectClasses: ( ownCloudOid:1.2.2 NAME 'ownCloudUser'
   DESC 'ownCloud User LDAP Schema'
   SUP ownCloud
   AUXILIARY
-  MAY ( ocExternalIdentity $ ownCloudUserEnabled $ ownCloudUserType $ ocLastSignInTimestamp $ ownCloudMemberOf $ ownCloudGuestOf $ ownCloudRole) )
+  MAY ( ocExternalIdentity $ ownCloudUserEnabled $ ownCloudUserType $ ocLastSignInTimestamp $ ownCloudMemberOf $ ownCloudGuestOf $ ownCloudRole $ owncloudExternalID) )
 olcObjectClasses: ( ownCloudOid:1.2.3 NAME 'ownCloudGroup'
   DESC 'ownCloud Group LDAP Schema'
   SUP groupOfNames
