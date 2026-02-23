@@ -37,6 +37,7 @@ import (
 	link "github.com/cs3org/go-cs3apis/cs3/sharing/link/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	"github.com/iancoleman/strcase"
 	"github.com/owncloud/reva/v2/internal/grpc/services/storageprovider"
 	"github.com/owncloud/reva/v2/internal/http/services/owncloud/ocdav/config"
 	"github.com/owncloud/reva/v2/internal/http/services/owncloud/ocdav/errors"
@@ -52,7 +53,6 @@ import (
 	"github.com/owncloud/reva/v2/pkg/rhttp/router"
 	"github.com/owncloud/reva/v2/pkg/storagespace"
 	"github.com/owncloud/reva/v2/pkg/utils"
-	"github.com/iancoleman/strcase"
 	"github.com/rs/zerolog"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
@@ -1538,8 +1538,8 @@ func mdToPropResponse(ctx context.Context, pf *XML, md *provider.ResourceInfo, p
 					}
 				case "signature-auth":
 					if isPublic {
-						// We only want to add the attribute to the root of the propfind.
-						if strings.HasSuffix(p, ls.Token) && ls.Signature != nil {
+						// Required to support archive downloads in password-protected public links.
+						if strings.Contains(p, ls.Token) && ls.Signature != nil {
 							expiration := time.Unix(int64(ls.Signature.SignatureExpiration.Seconds), int64(ls.Signature.SignatureExpiration.Nanos))
 							var sb strings.Builder
 							sb.WriteString("<oc:signature>")
