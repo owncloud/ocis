@@ -1,0 +1,32 @@
+name: Weekly Pipeline Report
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - feat/ci-report-tool
+  schedule:
+    - cron: "0 8 * * 1" # Every Monday at 8:00 AM UTC
+
+permissions:
+  contents: read
+
+jobs:
+  generate-report:
+    name: Generate Pipeline Report
+    runs-on: ubuntu-latest
+    container: golang:1.25-alpine
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run CI Reporter
+        working-directory: tools/ci-reporter
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        # Review the pipelines in last 14 days before the dorne logs expire
+        run: |
+          GOWORK=off go run ./cmd/list-failed-commits \
+            --github-token "$GITHUB_TOKEN" \
+            --since 14d \
+            --max-commits 9999999
