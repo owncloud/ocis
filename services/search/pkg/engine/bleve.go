@@ -291,6 +291,9 @@ func (b *Bleve) Upsert(id string, r Resource) error {
 // mutation function, and writes it back. This provides a get + mutate + set
 // cycle without exposing raw resource retrieval.
 //
+// NOTE: this operation is not atomic. A concurrent Upsert between the get and
+// set may be overwritten. Callers should be aware of potential race conditions.
+//
 // The mutateFn should only modify fields on the provided resource.
 // For example:
 //
