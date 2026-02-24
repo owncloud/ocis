@@ -21,6 +21,7 @@ import (
 	"github.com/owncloud/reva/v2/pkg/storagespace"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/keycloak"
+	"github.com/owncloud/ocis/v2/ocis-pkg/mfa"
 	ehsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/eventhistory/v0"
 	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
@@ -154,38 +155,85 @@ func parseIDParam(r *http.Request, param string) (storageprovider.ResourceId, er
 	return id, nil
 }
 
-// regular users can only search for terms with a minimum length
-func hasAcceptableSearch(query *godata.GoDataQuery, minSearchLength int) bool {
+// QueryValidator defines a strategy for validating godata queries.
+type QueryValidator interface {
+	Validate(query *godata.GoDataQuery) error
+}
+
+// SearchValidator validates the search query.
+type SearchValidator struct {
+	MinLength int
+}
+
+// Validate checks if the search term is acceptable.
+func (v SearchValidator) Validate(query *godata.GoDataQuery) error {
 	if query == nil || query.Search == nil {
-		return false
+		return errors.New("search term too short")
 	}
 
+	minSearchLength := v.MinLength
 	if strings.HasPrefix(query.Search.RawValue, "\"") {
 		// if search starts with double quotes then it must finish with double quotes
 		// add +2 to the minimum search length in this case
 		minSearchLength += 2
 	}
 
-	return len(query.Search.RawValue) >= minSearchLength
+	if len(query.Search.RawValue) < minSearchLength {
+		return errors.New("search term too short")
+	}
+	return nil
 }
 
-// regular users can only filter by userType
-func hasAcceptableFilter(query *godata.GoDataQuery) bool {
+// FilterValidator validates the filter query.
+type FilterValidator struct{}
+
+// Validate checks if the filter applies forbidden elements.
+func (v FilterValidator) Validate(query *godata.GoDataQuery) error {
 	switch {
 	case query == nil || query.Filter == nil:
-		return true
+		return nil
 	case query.Filter.Tree.Token.Type != godata.ExpressionTokenLogical:
-		return false
+		return errors.New("filter has forbidden elements for regular users")
 	case query.Filter.Tree.Token.Value != "eq":
-		return false
+		return errors.New("filter has forbidden elements for regular users")
 	case query.Filter.Tree.Children[0].Token.Value != "userType":
-		return false
+		return errors.New("filter has forbidden elements for regular users")
 	}
 
-	return true
+	return nil
 }
 
-// regular users can only use basic queries without any expansions, computes or applies
-func hasAcceptableQuery(query *godata.GoDataQuery) bool {
-	return query != nil && query.Apply == nil && query.Expand == nil && query.Compute == nil
+// BasicQueryValidator validates basic queries.
+type BasicQueryValidator struct{}
+
+// Validate checks if the query contains unsupported operations like apply, expand, or compute.
+func (v BasicQueryValidator) Validate(query *godata.GoDataQuery) error {
+	if query != nil && (query.Apply != nil || query.Expand != nil || query.Compute != nil) {
+		return errors.New("query has forbidden elements for regular users")
+	}
+	return nil
+}
+
+// validateQuery validates the godata query based on provided validators.
+// It handles user permissions and MFA requirements centrally.
+func (g Graph) validateQuery(r *http.Request, w http.ResponseWriter, query *godata.GoDataQuery, validators ...QueryValidator) bool {
+	ctxHasFullPerms := g.contextUserHasFullAccountPerms(r.Context())
+	hasMFA := mfa.Has(r.Context())
+	logger := g.logger.SubloggerWithRequestID(r.Context())
+
+	for _, v := range validators {
+		if err := v.Validate(query); err != nil {
+			if !ctxHasFullPerms {
+				logger.Debug().Interface("query", r.URL.Query()).Msg(err.Error())
+				errorcode.AccessDenied.Render(w, r, http.StatusForbidden, err.Error())
+				return false
+			}
+			if !hasMFA {
+				logger.Error().Str("path", r.URL.Path).Msg("MFA required but not satisfied")
+				mfa.SetRequiredStatus(w)
+				return false
+			}
+		}
+	}
+	return true
 }
