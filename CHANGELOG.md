@@ -78,6 +78,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Bump Web to 12.3.1: [#12015](https://github.com/owncloud/ocis/pull/12015)
 * Enhancement - Add space ID to incoming shares: [#12024](https://github.com/owncloud/ocis/pull/12024)
 * Enhancement - Add spaceid to REPORT: [#12028](https://github.com/owncloud/ocis/pull/12028)
+* Enhancement - Bump Reva version: [#12051](https://github.com/owncloud/ocis/pull/12051)
 
 ## Details
 
@@ -162,6 +163,12 @@ The following sections list the changes for unreleased.
    method with the `PROPFIND` method.
 
    https://github.com/owncloud/ocis/pull/12028
+
+* Enhancement - Bump Reva version: [#12051](https://github.com/owncloud/ocis/pull/12051)
+
+   Bumped reva version
+
+   https://github.com/owncloud/ocis/pull/12051
 
 # Changelog for [8.0.0] (2026-02-13)
 
