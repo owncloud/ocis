@@ -101,7 +101,7 @@ func (fs *Decomposedfs) Upload(ctx context.Context, req storage.UploadRequest, u
 			ResourceId: &provider.ResourceId{
 				StorageId: session.ProviderID(),
 				SpaceId:   session.SpaceID(),
-				OpaqueId:  session.SpaceID(),
+				OpaqueId:  session.NodeID(),
 			},
 			Path: utils.MakeRelativePath(filepath.Join(session.Dir(), session.Filename())),
 		}
