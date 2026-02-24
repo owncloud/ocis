@@ -563,6 +563,51 @@ class CliContext implements Context {
 	}
 
 	/**
+	 * @Given the administrator has waited until the file :filename has finished processing
+	 *
+	 * @param string $filename
+	 *
+	 * @return void
+	 * @throws JsonException
+	 */
+	public function theAdministratorHasWaitedUntilFileHasFinishedProcessing(string $filename): void {
+		$timeout = 30; // seconds
+		$interval = 1; // seconds
+		$startTime = \time();
+
+		// Poll until file is no longer in --processing list (allows time for state transitions).
+		// Replaces fixed wait that assumed deterministic timing.
+		while (true) {
+			$this->theAdministratorListsAllTheUploadSessions("processing");
+			$this->featureContext->theHTTPStatusCodeShouldBe(200);
+			$responseArray = $this->getJSONDecodedCliMessage($this->featureContext->getResponse());
+
+			$found = false;
+			foreach ($responseArray as $item) {
+				if (isset($item->filename) && $item->filename === $filename) {
+					$found = true;
+					break;
+				}
+			}
+
+			if (!$found) {
+				// File is no longer in processing list - abort completed and state updated
+				return;
+			}
+
+			$elapsed = \time() - $startTime;
+			if ($elapsed >= $timeout) {
+				Assert::fail(
+					"Timeout after {$timeout}s: file '{$filename}' is still in processing upload sessions list. " .
+					"Virus scan + abort may not have completed within timeout period.",
+				);
+			}
+
+			\sleep($interval);
+		}
+	}
+
+	/**
 	 * @param ResponseInterface $response
 	 *
 	 * @return array
@@ -575,7 +620,7 @@ class CliContext implements Context {
 		// Example Output: "INFO memory is not limited, skipping package=github.com/KimMachineGun/automemlimit/memlimit [{<output-json>}]"
 		// So, only extracting the array of output json from the message
 		\preg_match('/(\[.*\])/', $responseBody["message"], $matches);
-		return \json_decode($matches[1], null, 512, JSON_THROW_ON_ERROR);
+		return isset($matches[1]) ? \json_decode($matches[1], null, 512, JSON_THROW_ON_ERROR) : [];
 	}
 
 	/**
