@@ -75,7 +75,7 @@ func (t Tika) Extract(ctx context.Context, ri *provider.ResourceInfo) (Document,
 
 	var reader io.Reader = data
 	if ri.Size > t.ContentExtractionSizeLimit {
-		reader = io.LimitReader(data, int64(t.ContentExtractionSizeLimit))
+		reader = io.LimitReader(data, int64(t.ContentExtractionSizeLimit)) //nolint:gosec // ContentExtractionSizeLimit is a config value, never exceeds int64 max
 	}
 
 	metas, err := t.tika.MetaRecursive(ctx, reader)
@@ -201,13 +201,12 @@ func (t Tika) getPhoto(meta map[string][]string) *libregraph.Photo {
 		}
 	}
 
-	if v, err := getFirstValue(meta, "exif:IsoSpeedRatings"); err == nil {
-		if i, err := strconv.ParseInt(v, 0, 32); err == nil {
-			initPhoto()
-			photo.SetIso(int32(i))
-		}
-	} else if v, err := getFirstValue(meta, "Base ISO"); err == nil {
-		if i, err := strconv.ParseInt(v, 0, 32); err == nil {
+	isoStr, err := getFirstValue(meta, "exif:IsoSpeedRatings")
+	if err != nil {
+		isoStr, err = getFirstValue(meta, "Base ISO")
+	}
+	if err == nil {
+		if i, err := strconv.ParseInt(isoStr, 0, 32); err == nil {
 			initPhoto()
 			photo.SetIso(int32(i))
 		}
