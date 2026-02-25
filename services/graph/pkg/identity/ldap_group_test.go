@@ -8,6 +8,7 @@ import (
 
 	"github.com/CiscoM31/godata"
 	"github.com/go-ldap/ldap/v3"
+	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/identity/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -448,6 +449,66 @@ func TestUpdateGroupName(t *testing.T) {
 
 			err := i.UpdateGroupName(context.Background(), tt.args.groupId, tt.args.newName)
 			tt.assertion(t, err)
+		})
+	}
+}
+
+func TestGroupToLDAPAttrValuesUsesConfiguredObjectClass(t *testing.T) {
+	tests := []struct {
+		name             string
+		groupObjectClass string
+	}{
+		{
+			name:             "default groupOfNames",
+			groupObjectClass: "groupOfNames",
+		},
+		{
+			name:             "custom groupOfUniqueNames",
+			groupObjectClass: "groupOfUniqueNames",
+		},
+		{
+			name:             "custom posixGroup",
+			groupObjectClass: "posixGroup",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Setup config with custom groupObjectClass
+			testConfig := lconfig
+			testConfig.GroupObjectClass = tt.groupObjectClass
+
+			lm := &mocks.Client{}
+			b, err := getMockedBackend(lm, testConfig, &logger)
+			if err != nil {
+				t.Fatalf("Failed to create backend: %s", err.Error())
+			}
+
+			// Create test group
+			group := libregraph.Group{}
+			displayName := "Test Group"
+			group.SetDisplayName(displayName)
+
+			// Get LDAP attributes
+			attrs, err := b.groupToLDAPAttrValues(group)
+			if err != nil {
+				t.Fatalf("Expected groupToLDAPAttrValues to succeed, got error: %s", err.Error())
+			}
+
+			objectClasses, ok := attrs["objectClass"]
+			if !ok {
+				t.Fatal("Expected objectClass attribute to be present")
+			}
+
+			// Check objectClass has exactly 3 elements
+			if len(objectClasses) != 3 {
+				t.Errorf("Expected objectClass to have exactly 3 elements, got %d: %v", len(objectClasses), objectClasses)
+			}
+
+			// Check first element is the configured groupObjectClass (exact match)
+			if objectClasses[0] != tt.groupObjectClass {
+				t.Errorf("Expected first objectClass to be '%s', got '%s'", tt.groupObjectClass, objectClasses[0])
+			}
 		})
 	}
 }
