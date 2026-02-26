@@ -24,7 +24,6 @@ services:
 
   companion:
     image: transloadit/companion:5.8.0@sha256:65052a640897deb14fdf449fa88a121b8648f0fb06c52a1503fa4b3bb1d2564f
-    platform: linux/${IMAGE_ARCH:-amd64}
     networks:
       - ocis-net
     environment:
