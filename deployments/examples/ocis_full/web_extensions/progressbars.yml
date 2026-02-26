@@ -6,8 +6,7 @@ services:
         condition: service_completed_successfully
 
   progressbars-init:
-    image: owncloud/web-extensions:progress-bars-0.3.2@sha256:9878254320ae30d52910c6d9153899a4a1ce46e428fcd90b36dfc1bb80dc223a
-    platform: linux/${IMAGE_ARCH:-amd64}
+    image: owncloud/web-extensions:progress-bars-0.3.3@sha256:8faf230c3c601fb4d212720a0edd86073e292893b032021f951512e78e215390
     user: root
     volumes:
       - ocis-apps:/apps

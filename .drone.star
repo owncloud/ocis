@@ -5,7 +5,7 @@
 # NOTE: need to be updated if new production releases are determined
 # - follow semver
 # - omit 'v' prefix
-PRODUCTION_RELEASE_TAGS = ["5.0", "7"]
+PRODUCTION_RELEASE_TAGS = ["5.0", "7", "8"]
 
 # images
 ALPINE_GIT = "alpine/git:latest"
@@ -895,12 +895,15 @@ def uploadScanResults(ctx):
             },
             {
                 "name": "codacy",
-                "image": PLUGINS_CODACY,
-                "settings": {
-                    "token": {
+                "image": "codacy/codacy-coverage-reporter:latest",
+                "environment": {
+                    "CODACY_PROJECT_TOKEN": {
                         "from_secret": "codacy_token",
                     },
                 },
+                "commands": [
+                    "/app/codacy-coverage-reporter report --force-coverage-parser go -r cache/coverage/coverage.out",
+                ],
             },
             {
                 "name": "sonarcloud",
@@ -3028,7 +3031,6 @@ def uploadAPITestCoverageReport(ctx):
             ],
             "status": [
                 "success",
-                "failure",
             ],
         },
     }

@@ -6,8 +6,7 @@ services:
         condition: service_completed_successfully
 
   unzip-init:
-    image: owncloud/web-extensions:unzip-0.4.2@sha256:08d5d82f842450b1ae24cf52e1f975b80bb7c7814e5be422a9fba710ad432e51
-    platform: linux/${IMAGE_ARCH:-amd64}
+    image: owncloud/web-extensions:unzip-0.4.3@sha256:9fc726645749514c98c6b9b5a7e6315295897ff5c62a538a3ff383a49272160b
     user: root
     volumes:
       - ocis-apps:/apps

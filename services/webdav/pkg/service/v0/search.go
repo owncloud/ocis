@@ -256,6 +256,9 @@ func matchToPropResponse(match *searchmsg.Match, hrefPrefix string) (*propfind.R
 	propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:permissions", match.Entity.Permissions))
 	propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:highlights", match.Entity.Highlights))
 
+	spaceId := storagespace.FormatStorageID(match.Entity.Id.StorageId, match.Entity.Id.SpaceId)
+	propstatOK.Prop = appendStringProp(propstatOK.Prop, "oc:spaceid", &spaceId)
+
 	t := tags.New(match.Entity.Tags...)
 	propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:tags", t.AsList()))
 

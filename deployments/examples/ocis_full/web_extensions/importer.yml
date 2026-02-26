@@ -14,7 +14,7 @@ services:
         condition: service_completed_successfully
 
   importer-init:
-    image: owncloud/web-extensions:importer-0.3.1@sha256:07682cd30784b0c990156a7da053d9f2bb79d2a6a00e4761a08243c72a95dce9
+    image: owncloud/web-extensions:importer-0.3.2@sha256:a813d0678b69473d3bfe127fa1649c5cdaed89cf57619c1b55aa3245e695e003
     user: root
     volumes:
       - ocis-apps:/apps

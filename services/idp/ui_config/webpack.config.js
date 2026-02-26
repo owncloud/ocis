@@ -26,6 +26,13 @@ const ESLintPlugin = require('eslint-webpack-plugin')
 const postcssNormalize = require('postcss-normalize')
 
 const appPackageJson = require(paths.appPackageJson)
+const babelPresetReactAppPath = require.resolve('babel-preset-react-app')
+const babelRuntimeHelpersPath = require.resolve('@babel/runtime/helpers/esm/assertThisInitialized', {
+  paths: [babelPresetReactAppPath]
+})
+const babelRuntimeRegeneratorPath = require.resolve('@babel/runtime/regenerator', {
+  paths: [babelPresetReactAppPath]
+})
 
 // Source maps are resource heavy and can cause out of memory issue for large source files.
 const shouldUseSourceMap = process.env.GENERATE_SOURCEMAP !== 'false'
@@ -273,7 +280,12 @@ module.exports = function (webpackEnv) {
         // To fix this, we prevent you from importing files out of src/ -- if you'd like to,
         // please link the files into your node_modules/ and let module-resolution kick in.
         // Make sure your source files are compiled, as they will not be processed in any way.
-        new ModuleScopePlugin(paths.appSrc, [paths.appPackageJson])
+        new ModuleScopePlugin(paths.appSrc, [
+          paths.appPackageJson,
+          babelPresetReactAppPath,
+          babelRuntimeHelpersPath,
+          babelRuntimeRegeneratorPath
+        ])
       ]
     },
     resolveLoader: {

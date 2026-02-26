@@ -235,6 +235,7 @@ func cs3ReceivedSharesToDriveItems(ctx context.Context,
 			{
 				if id := shareStat.GetInfo().GetId(); id != nil {
 					remoteItem.SetId(storagespace.FormatResourceID(id))
+					remoteItem.SpaceId = libregraph.PtrString(storagespace.FormatStorageID(id.StorageId, id.SpaceId))
 				}
 
 				if name := shareStat.GetInfo().GetName(); name != "" {
@@ -264,7 +265,6 @@ func cs3ReceivedSharesToDriveItems(ctx context.Context,
 				if !reflect.ValueOf(*parentReference).IsZero() {
 					remoteItem.ParentReference = parentReference
 				}
-
 			}
 
 			// the parentReference of the outer driveItem should be the drive

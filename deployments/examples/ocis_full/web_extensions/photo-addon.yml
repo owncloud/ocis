@@ -1,0 +1,15 @@
+---
+services:
+  ocis:
+    depends_on:
+      photo-addon-init:
+        condition: service_completed_successfully
+
+  photo-addon-init:
+    image: owncloud/web-extensions:photo-addon-0.1.0
+    user: root
+    volumes:
+      - ocis-apps:/apps
+    entrypoint:
+      - /bin/sh
+    command: ["-c", "cp -R /var/lib/nginx/html/photo-addon/ /apps"]
