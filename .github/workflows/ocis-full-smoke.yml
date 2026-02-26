@@ -6,7 +6,7 @@ on:
       - "deployments/examples/ocis_full/**"
   push:
     branches:
-      - main
+      - master
     paths:
       - "deployments/examples/ocis_full/**"
   schedule:
