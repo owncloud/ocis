@@ -168,7 +168,7 @@ Feature: check file info with different wopi apps
             "const": "textfile0.txt"
           },
           "PostMessageOrigin": {
-            "pattern": "%base_url%"
+            "const": "%base_url%"
           },
           "DisablePrint": {
             "const": false
@@ -566,7 +566,7 @@ Feature: check file info with different wopi apps
             "const": "textfile0.txt"
           },
           "PostMessageOrigin": {
-            "pattern": "%base_url%"
+            "const": "%base_url%"
           },
           "DisablePrint": {
             "const": <disable-print>
@@ -676,7 +676,7 @@ Feature: check file info with different wopi apps
             "const": "textfile0.txt"
           },
           "PostMessageOrigin": {
-            "pattern": "%base_url%"
+            "const": "%base_url%"
           },
           "DisablePrint": {
             "const": false
@@ -1063,7 +1063,7 @@ Feature: check file info with different wopi apps
           },
           "PostMessageOrigin": {
             "type": "string",
-            "pattern": "%base_url%"
+            "const": "%base_url%"
           },
           "DisablePrint": {
             "const": false
@@ -1410,7 +1410,7 @@ Feature: check file info with different wopi apps
             "const": "text.txt"
           },
           "PostMessageOrigin": {
-            "pattern": "%base_url%"
+            "const": "%base_url%"
           },
           "DisablePrint": {
             "const": false
@@ -1796,7 +1796,7 @@ Feature: check file info with different wopi apps
             "const": "text.txt"
           },
           "PostMessageOrigin": {
-            "pattern": "%base_url%"
+            "const": "%base_url%"
           },
           "DisablePrint": {
             "const": <disable-print>

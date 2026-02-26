@@ -1152,12 +1152,11 @@ def localApiTestPipeline(ctx):
                                      ([] if run_on_k8s else restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin")) +
                                      (tikaService() if params["tikaNeeded"] and not run_on_k8s else tikaServiceK8s() if params["tikaNeeded"] and run_on_k8s else []) +
                                      (waitForServices("online-offices", ["collabora:9980", "onlyoffice:443", "fakeoffice:8080"]) if params["collaborationServiceNeeded"] else []) +
-                                     deployment_steps +
-                                     (waitK3sCluster() + (enableAntivirusServiceK8s() if params["antivirusNeeded"] and run_on_k8s else []) + (emailServiceK8s() if params["emailNeeded"] and run_on_k8s else []) + prepareOcisDeployment(enable_wopi = params["collaborationServiceNeeded"] if run_on_k8s else False) + setupOcisConfigMaps() + (deployFakeofficeK8s() if params["collaborationServiceNeeded"] and run_on_k8s else []) + deployOcis() + (exposeCollaborationServicesK8s() if params["collaborationServiceNeeded"] and run_on_k8s else []) + waitForOcis(ocis_url = ocis_url) + ociswrapper() + waitForOciswrapper() if run_on_k8s else ocisServer(storage, extra_server_environment = params["extraServerEnvironment"], with_wrapper = True, tika_enabled = params["tikaNeeded"], volumes = ([stepVolumeOcisStorage]))) +
+                                     (waitK3sCluster() + (enableAntivirusServiceK8s() if params["antivirusNeeded"] and run_on_k8s else []) + (emailServiceK8s() if params["emailNeeded"] and run_on_k8s else []) + prepareOcisDeployment(enable_wopi = params["collaborationServiceNeeded"] if run_on_k8s else False) + setupOcisConfigMaps() + (deployFakeofficeK8s() if params["collaborationServiceNeeded"] and run_on_k8s else []) + deployOcis() + (exposeCollaborationServicesK8s() if params["collaborationServiceNeeded"] and run_on_k8s else []) + waitForOcis(ocis_url = ocis_url) + ociswrapper() + waitForOciswrapper() if run_on_k8s else ocisServer(storage, ocis_url = ocis_url, extra_server_environment = params["extraServerEnvironment"], with_wrapper = True, tika_enabled = params["tikaNeeded"], volumes = ([stepVolumeOcisStorage]))) +
                                      (waitForClamavService() if params["antivirusNeeded"] and not run_on_k8s else exposeAntivirusServiceK8s() if params["antivirusNeeded"] and run_on_k8s else []) +
                                      (waitForEmailService() if params["emailNeeded"] and not run_on_k8s else exposeEmailServiceK8s() if params["emailNeeded"] and run_on_k8s else []) +
                                      (ocisServer(storage, deploy_type = "federation", extra_server_environment = params["extraServerEnvironment"]) if params["federationServer"] else []) +
-                                     ((wopiCollaborationService("fakeoffice") + wopiCollaborationService("collabora") + wopiCollaborationService("onlyoffice")) if params["collaborationServiceNeeded"] and not run_on_k8s else []) +
+                                     ((wopiCollaborationService("fakeoffice", ocis_url) + wopiCollaborationService("collabora", ocis_url) + wopiCollaborationService("onlyoffice", ocis_url)) if params["collaborationServiceNeeded"] and not run_on_k8s else []) +
                                      (ocisHealthCheck("wopi", ["wopi-collabora:9304", "wopi-onlyoffice:9304", "wopi-fakeoffice:9304"]) if params["collaborationServiceNeeded"] and not run_on_k8s else []) +
                                      localApiTests(name, params["suites"], storage, params["extraEnvironment"], run_with_remote_php, ocis_url = ocis_url, k8s = run_on_k8s) +
                                      apiTestFailureLog() +
@@ -1334,7 +1333,7 @@ def wopiValidatorTests(ctx, storage, wopiServerType):
             "OCIS_EXCLUDE_RUN_SERVICES": "app-provider",
         }
 
-        wopiServer = wopiCollaborationService("fakeoffice")
+        wopiServer = wopiCollaborationService("fakeoffice", OCIS_URL)
 
     for testgroup in testgroups:
         validatorTests.append({
@@ -1449,8 +1448,6 @@ def coreApiTestPipeline(ctx):
                     expected_failures_file = "%s/expected-failures-API-on-%s-storage.md" % (test_dir, storage.upper())
                     run_on_k8s = params["k8s"] and ctx.build.event == "cron"
                     ocis_url = OCIS_URL
-                    if run_on_k8s:
-                        ocis_url = "https://%s" % OCIS_SERVER_NAME
                     pipeline = {
                         "kind": "pipeline",
                         "type": "docker",
@@ -2614,11 +2611,11 @@ def notify(ctx):
         },
     }
 
-def ocisServer(storage = "ocis", volumes = [], depends_on = [], deploy_type = "", extra_server_environment = {}, with_wrapper = False, tika_enabled = False, debug = True, external_idp = False):
+def ocisServer(storage = "ocis", volumes = [], depends_on = [], deploy_type = "", extra_server_environment = {}, with_wrapper = False, tika_enabled = False, debug = True, external_idp = False, ocis_url = OCIS_URL):
     user = "0:0"
     container_name = OCIS_SERVER_NAME
     environment = {
-        "OCIS_URL": OCIS_URL,
+        "OCIS_URL": ocis_url,
         "OCIS_CONFIG_DIR": "/root/.ocis/config",  # needed for checking config later
         "STORAGE_USERS_DRIVER": "%s" % (storage),
         "PROXY_ENABLE_BASIC_AUTH": True,
@@ -3503,10 +3500,11 @@ def fakeOffice():
         },
     ]
 
-def wopiCollaborationService(name):
+def wopiCollaborationService(name, ocis_url):
     service_name = "wopi-%s" % name
 
     environment = {
+        "OCIS_URL": ocis_url,
         "MICRO_REGISTRY": "nats-js-kv",
         "MICRO_REGISTRY_ADDRESS": "%s:9233" % OCIS_SERVER_NAME,
         "COLLABORATION_LOG_LEVEL": "debug",

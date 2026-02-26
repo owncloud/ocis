@@ -58,8 +58,14 @@ class OcisHelper {
 	 * @return string
 	 */
 	public static function getServerUrl(): string {
-		if (\getenv('TEST_SERVER_URL')) {
-			return \getenv('TEST_SERVER_URL');
+		$env = \getenv('TEST_SERVER_URL');
+		if ($env) {
+			return $env;
+		}
+		// If running in k8s use the service DNS name so features that
+		// expect the cluster host (ocis-server) match the substituted value.
+		if (\getenv('K8S') === 'true') {
+			return 'https://ocis-server';
 		}
 		return 'https://localhost:9200';
 	}
