@@ -7,7 +7,6 @@ services:
 
   drawio-init:
     image: owncloud/web-extensions:draw-io-0.3.2@sha256:7ee660dd39f13549cb8ea2dc7d6350f52d54ceaca7e804c0c345231b52027634
-    platform: linux/${IMAGE_ARCH:-amd64}
     user: root
     volumes:
       - ocis-apps:/apps
