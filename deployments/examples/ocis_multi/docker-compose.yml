@@ -100,6 +100,8 @@ services:
       IDP_LDAP_UUID_ATTRIBUTE_TYPE: binary
       GRAPH_LDAP_SERVER_WRITE_ENABLED: "true" # assuming the external ldap is writable
       GRAPH_LDAP_REFINT_ENABLED: "true" # osixia has refint enabled.
+      OCIS_LDAP_DISABLE_USER_MECHANISM: "group"
+      OCIS_LDAP_DISABLED_USERS_GROUP_DN: "cn=disabled-users-ec730a6c-1b63-4b45-b83b-9e2311afdf85,ou=groups,dc=owncloud,dc=com"
       # Multi-Instance Configuration
       OCIS_MULTI_INSTANCE_ENABLED: true
       OCIS_MULTI_INSTANCE_INSTANCEID: "ec730a6c-1b63-4b45-b83b-9e2311afdf85"
@@ -199,6 +201,8 @@ services:
       IDP_LDAP_UUID_ATTRIBUTE_TYPE: binary
       GRAPH_LDAP_SERVER_WRITE_ENABLED: "true" # assuming the external ldap is writable
       GRAPH_LDAP_REFINT_ENABLED: "true" # osixia has refint enabled.
+      OCIS_LDAP_DISABLE_USER_MECHANISM: "group"
+      OCIS_LDAP_DISABLED_USERS_GROUP_DN: "cn=disabled-users-8d24cb5f-6ee6-4b98-86df-c4c268dddb46,ou=groups,dc=owncloud,dc=com"
       # Multi-Instance
       OCIS_MULTI_INSTANCE_ENABLED: true
       OCIS_MULTI_INSTANCE_INSTANCEID: "8d24cb5f-6ee6-4b98-86df-c4c268dddb46"
