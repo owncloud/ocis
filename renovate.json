@@ -7,9 +7,6 @@
   "timezone": "Europe/Berlin",
   "schedule": ["every weekend"],
   "prConcurrentLimit": 10,
-  "docker-compose": {
-    "fileMatch": ["^deployments/examples/ocis_full/.*\\.ya?ml$"]
-  },
   "packageRules": [
     {
       "matchManagers": ["docker-compose"],
