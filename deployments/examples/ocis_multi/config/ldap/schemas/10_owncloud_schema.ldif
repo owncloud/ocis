@@ -52,6 +52,6 @@ olcObjectClasses: ( ownCloudOid:1.2.2 NAME 'ownCloudUser'
   MAY ( ocExternalIdentity $ ownCloudUserEnabled $ ownCloudUserType $ ocLastSignInTimestamp $ ownCloudMemberOf $ ownCloudGuestOf $ ownCloudRole) )
 olcObjectClasses: ( ownCloudOid:1.2.3 NAME 'ownCloudGroup'
   DESC 'ownCloud Group LDAP Schema'
-  SUP ownCloud
-  AUXILIARY
+  SUP groupOfNames
+  STRUCTURAL
   MAY ( ownCloudMemberOf ) )
