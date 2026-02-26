@@ -2,7 +2,6 @@
 services:
   tika:
     image: apache/tika:3.2.3.0-full@sha256:21d8052de04e491ccf66e8680ade4da6f3d453a56d59f740b4167e54167219b7
-    platform: linux/${IMAGE_ARCH:-amd64}
     # release notes: https://tika.apache.org
     networks:
       ocis-net:
