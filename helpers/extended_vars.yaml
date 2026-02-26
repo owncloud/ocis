@@ -25,7 +25,7 @@ variables:
   do_ignore: true
 - rawname: _registryRegisterIntervalEnv
   path: ocis-pkg/registry/expiry.go:19
-  foundincode: false
+  foundincode: true
   name: EXPERIMENTAL_REGISTER_INTERVAL
   type: ""
   default_value: ""
@@ -171,28 +171,12 @@ variables:
   do_ignore: true
 - rawname: YEAR
   path: tests/qa-activity-report/generate-qa-activity-report.go:93
-  foundincode: false
+  foundincode: true
   name: YEAR
   type: ""
   default_value: ""
   description: ""
   do_ignore: true
-- rawname: YEAR
-  path: ocis-pkg/registry/expiry.go:./tests/qa-activity-report/generate-qa-activity-report.go
-  foundincode: true
-  name: YEAR
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: _registryRegisterIntervalEnv
-  path: "19:\td, err "
-  foundincode: true
-  name: _registryRegisterIntervalEnv
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
 - rawname: parts[0]
   path: ocis-pkg/config/envdecode/envdecode.go:396
   foundincode: true
