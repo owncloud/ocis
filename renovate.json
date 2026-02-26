@@ -14,8 +14,7 @@
     {
       "matchManagers": ["docker-compose"],
       "matchFileNames": [
-        "deployments/examples/ocis_full/**/*.yml",
-        "deployments/examples/ocis_full/**/*.yaml"
+        "^deployments/examples/ocis_full/.*\\.ya?ml$"
       ],
       "groupName": "ocis_full image updates (tags+digests)"
     }
