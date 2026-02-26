@@ -4,6 +4,13 @@ on:
   pull_request:
     paths:
       - "deployments/examples/ocis_full/**"
+  push:
+    branches:
+      - main
+    paths:
+      - "deployments/examples/ocis_full/**"
+  schedule:
+    - cron: "0 3 * * *"
 
 jobs:
   smoke:
