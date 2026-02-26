@@ -41,6 +41,9 @@ KEYCLOAK_IMAGE = "quay.io/keycloak/keycloak:26.2.5"
 POSTGRES_ALPINE_IMAGE = "postgres:alpine3.18"
 TRIVY_IMAGE = "aquasec/trivy:latest"
 K3D_IMAGE = "ghcr.io/k3d-io/k3d:5-dind"
+CODACY_COVERAGE_REPORTER = "codacy/codacy-coverage-reporter:latest"
+CS3ORG_WOPISERVER = "cs3org/wopiserver:v10.4.0"
+OC_CI_WOPI_VALIDATOR = "owncloudci/wopi-validator"
 
 # the hugo version needs to be the same as in owncloud.github.io
 OC_CI_HUGO_STATIC_IMAGE = "hugomods/hugo:base-0.129.0"
@@ -896,7 +899,7 @@ def uploadScanResults(ctx):
             },
             {
                 "name": "codacy",
-                "image": "codacy/codacy-coverage-reporter:latest",
+                "image": CODACY_COVERAGE_REPORTER,
                 "environment": {
                     "CODACY_PROJECT_TOKEN": {
                         "from_secret": "codacy_token",
@@ -1126,7 +1129,7 @@ def localApiTestPipeline(ctx):
                             if params["emailNeeded"]:
                                 deployment_steps += emailServiceK8s()
 
-                            deployment_steps += prepareOcisDeployment() + setupOcisConfigMaps() + deployOcis() + waitForOcis(ocis_url = ocis_url)
+                            deployment_steps += prepareOcisDeployment() + setupOcisConfigMaps() + deployOcis() + streamK8sOcisLogs() + waitForOcis(ocis_url = ocis_url)
                             if params["federationServer"]:
                                 deployment_steps += setupOcisConfigMaps(name = FED_OCIS_SERVER_NAME) + deployOcis(name = FED_OCIS_SERVER_NAME) + waitForOcis(name = "federation-ocis", ocis_url = ocis_fed_url)
 
@@ -1160,7 +1163,7 @@ def localApiTestPipeline(ctx):
                                         (emailService() if params["emailNeeded"] and not run_on_k8s else []) +
                                         (clamavService() if params["antivirusNeeded"] and not run_on_k8s else []) +
                                         ((fakeOffice() + collaboraService() + onlyofficeService()) if params["collaborationServiceNeeded"] else []),
-                            "depends_on": getPipelineNames(buildOcisBinaryForTesting(ctx)),
+                            "depends_on": [] if run_on_k8s else getPipelineNames(buildOcisBinaryForTesting(ctx)),
                             "trigger": {
                                 "ref": [
                                     "refs/heads/master",
@@ -1305,7 +1308,7 @@ def wopiValidatorTests(ctx, storage, wopiServerType):
         wopiServer = [
             {
                 "name": "wopi-fakeoffice",
-                "image": "cs3org/wopiserver:v10.4.0",
+                "image": CS3ORG_WOPISERVER,
                 "detach": True,
                 "commands": [
                     "cp %s/tests/config/drone/wopiserver.conf /etc/wopi/wopiserver.conf" % (dirs["base"]),
@@ -1324,7 +1327,7 @@ def wopiValidatorTests(ctx, storage, wopiServerType):
     for testgroup in testgroups:
         validatorTests.append({
             "name": "wopiValidatorTests-%s" % testgroup,
-            "image": "owncloudci/wopi-validator",
+            "image": OC_CI_WOPI_VALIDATOR,
             "commands": [
                 "export WOPI_TOKEN=$(cat accesstoken)",
                 "echo $WOPI_TOKEN",
@@ -1340,7 +1343,7 @@ def wopiValidatorTests(ctx, storage, wopiServerType):
         for builtinOnlyGroup in builtinOnlyTestGroups:
             validatorTests.append({
                 "name": "wopiValidatorTests-%s" % builtinOnlyGroup,
-                "image": "owncloudci/wopi-validator",
+                "image": OC_CI_WOPI_VALIDATOR,
                 "commands": [
                     "export WOPI_TOKEN=$(cat accesstoken)",
                     "echo $WOPI_TOKEN",
@@ -3813,15 +3816,19 @@ def trivyScan(ctx):
 def k3sCluster(name = OCIS_SERVER_NAME, ocm = False):
     peer_name = OCIS_SERVER_NAME if name == FED_OCIS_SERVER_NAME else FED_OCIS_SERVER_NAME
     commands = []
+    log_dir = "%s/logs-%s" % (dirs["base"], name)
 
     commands.extend([
         "if [ ! -d %s/ocis-charts ]; then git clone --single-branch --branch main --depth 1 https://github.com/owncloud/ocis-charts.git; fi" % dirs["base"],
         "nohup dockerd-entrypoint.sh &",
         "until docker ps 2>&1 > /dev/null; do sleep 1s; done",
+        # create ocis logs dir
+        "mkdir -p %s && chmod 777 %s" % (log_dir, log_dir),
         # create cluster
         "k3d cluster create %s --api-port %s:33199 " % (name, name) +
         "-p '80:80@loadbalancer' -p '443:443@loadbalancer' -p '8025:32025@loadbalancer' -p '9100-9399:30100-30399@loadbalancer' " +
-        "--k3s-arg '--tls-san=k3d@server:*' --k3s-arg '--disable=metrics-server@server:*'",
+        "--k3s-arg '--tls-san=k3d@server:*' --k3s-arg '--disable=metrics-server@server:*' " +
+        "-v %s:/logs" % log_dir,
         # wait for services to be ready
         "until kubectl get deployment coredns -n kube-system -o go-template='{{.status.availableReplicas}}' | grep -v -e '<no value>'; do sleep 1s; done",
         "until kubectl get deployment traefik -n kube-system -o go-template='{{.status.availableReplicas}}' | grep -v -e '<no value>'; do sleep 1s; done",
@@ -3884,7 +3891,14 @@ def prepareOcisDeployment():
         "make -C %s build" % dirs["ocisWrapper"],
         "mv %s/tests/config/drone/k8s/values.yaml %s/ocis-charts/charts/ocis/ci/deployment-values.yaml" % (dirs["base"], dirs["base"]),
         "cp -r %s/tests/config/drone/k8s/authbasic %s/ocis-charts/charts/ocis/templates/" % (dirs["base"], dirs["base"]),
-        "cd %s/ocis-charts" % dirs["base"],
+        "cp tests/config/drone/k8s/_zoverride.tpl ocis-charts/charts/ocis/templates/_common/",
+        "cd ocis-charts",
+        # patch activitylog service
+        "sed -i '/env:/a\\\\{{- include \"ocis.caEnv\" $ | nindent 12}}' ./charts/ocis/templates/activitylog/deployment.yaml",
+        "sed -i '/volumeMounts:/a\\\\{{- include \"ocis.caPath\" $ | nindent 12}}' ./charts/ocis/templates/activitylog/deployment.yaml",
+        "sed -i '/volumes:/a\\\\{{- include \"ocis.caVolume\" $ | nindent 8}}' ./charts/ocis/templates/activitylog/deployment.yaml",
+        # disable audit logs in console
+        "sed -i '/AUDIT_LOG_TO_CONSOLE/{n;s/true/false/;}' ./charts/ocis/templates/audit/deployment.yaml",
         "sed -i '/{{- define \"ocis.basicServiceTemplates\" -}}/a\\\\  {{- $_ := set .scope \"appNameAuthBasic\" \"authbasic\" -}}' ./charts/ocis/templates/_common/_tplvalues.tpl",
         "sed -i '/- name: IDM_ADMIN_PASSWORD/{n;N;N;N;d;}' ./charts/ocis/templates/idm/deployment.yaml",
         "sed -i '/- name: IDM_ADMIN_PASSWORD/a\\\\\\n              value: \"admin\"' ./charts/ocis/templates/idm/deployment.yaml",
@@ -3906,7 +3920,7 @@ def prepareOcisDeployment():
 
     return [{
         "name": "prepare-ocis-deployment",
-        "image": "owncloudci/golang:1.25",
+        "image": OC_CI_GOLANG,
         "commands": commands,
         "volumes": [
             {
@@ -3955,13 +3969,24 @@ def deployOcis(name = OCIS_SERVER_NAME):
     ])
     return [{
         "name": step_name,
-        "image": "owncloudci/golang:1.25",
+        "image": OC_CI_GOLANG,
         "commands": commands,
         "volumes": [
             {
                 "name": "gopath",
                 "path": "/go",
             },
+        ],
+    }]
+
+def streamK8sOcisLogs():
+    return [{
+        "name": "ocis-logs",
+        "image": OC_CI_ALPINE,
+        "detach": True,
+        "commands": [
+            "until test -f logs-%s/ocis.log; do sleep 10s; done" % OCIS_SERVER_NAME,
+            "tail -f logs-%s/ocis.log" % OCIS_SERVER_NAME,
         ],
     }]
 
@@ -4021,9 +4046,6 @@ def ociswrapper(name = OCIS_SERVER_NAME):
             "export KUBECONFIG=kubeconfig-$${DRONE_BUILD_NUMBER}-%s.yaml" % name,
             "until test -f $${KUBECONFIG}; do sleep 1s; done",
             "kubectl get pods -A",
-            "kubectl get ingress -A",
-            "kubectl describe pods $(kubectl get pods -n ocis -l app=antivirus -o jsonpath=\"{.items[0].metadata.name}\") -n ocis",
-            "kubectl describe pods $(kubectl get pods -n ocis -l app=postprocessing -o jsonpath=\"{.items[0].metadata.name}\") -n ocis",
             "%s/bin/ociswrapper serve --url https://%s --admin-username admin --admin-password admin --skip-ocis-run" % (dirs["ocisWrapper"], OCIS_SERVER_NAME),
         ],
         "detach": True,
