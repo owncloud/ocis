@@ -46,7 +46,6 @@ services:
   onlyoffice:
     # note, you also need to add a volume when using the enterprise version, see below
     image: onlyoffice/documentserver:9.2.1.1@sha256:fd00acbbbde3d8b1ead9b933aafa7c2df77e62c48b1b171886e6bef343c13882
-    platform: linux/${IMAGE_ARCH:-amd64}
     networks:
       ocis-net:
     entrypoint:
