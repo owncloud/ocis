@@ -35,12 +35,14 @@ import (
 )
 
 const (
-	_spaceStateTrashed   = "trashed"
-	_spaceTypeMountpoint = "mountpoint"
-	_spaceTypePersonal   = "personal"
-	_spaceTypeProject    = "project"
-	_spaceTypeGrant      = "grant"
-	_slowQueryDuration   = 500 * time.Millisecond
+	_spaceStateTrashed          = "trashed"
+	_spaceTypeMountpoint        = "mountpoint"
+	_spaceTypePersonal          = "personal"
+	_spaceTypeProject           = "project"
+	_spaceTypeProtectedPersonal = "protected_personal"
+	_spaceTypeProtectedProject  = "protected_project"
+	_spaceTypeGrant             = "grant"
+	_slowQueryDuration          = 500 * time.Millisecond
 )
 
 var (
@@ -166,6 +168,10 @@ func (s *Service) Search(ctx context.Context, req *searchsvc.SearchRequest) (*se
 		if space.SpaceType != "mountpoint" && req.Ref != nil && (req.Ref.GetResourceId().GetSpaceId() != space.Root.GetSpaceId()) {
 			// Do not search (non-mountpoint) spaces that do not match the given scope (if a scope is set)
 			// We still need the mountpoint in order to map the result paths to the according share
+			continue
+		}
+		if space.SpaceType == _spaceTypeProtectedPersonal || space.SpaceType == _spaceTypeProtectedProject {
+			// Exclude protected spaces from search results
 			continue
 		}
 		spaces = append(spaces, space)

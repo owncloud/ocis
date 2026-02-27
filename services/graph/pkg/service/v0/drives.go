@@ -29,6 +29,7 @@ import (
 	"google.golang.org/protobuf/proto"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/l10n"
+	"github.com/owncloud/ocis/v2/ocis-pkg/mfa"
 	v0 "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
@@ -782,6 +783,18 @@ func (g Graph) ListStorageSpacesWithFilters(ctx context.Context, filters []*stor
 		return nil, err
 	}
 	res, err := gatewayClient.ListStorageSpaces(ctx, lReq)
+
+	// Filter out protected spaces if MFA is not enabled
+	if !mfa.Has(ctx) {
+		var filtered []*storageprovider.StorageSpace
+		for _, s := range res.StorageSpaces {
+			if s.SpaceType != _spaceTypeProtectedPersonal && s.SpaceType != _spaceTypeProtectedProject {
+				filtered = append(filtered, s)
+			}
+		}
+		res.StorageSpaces = filtered
+	}
+
 	return res, err
 }
 

@@ -50,6 +50,17 @@ const (
 
 	// WwwAuthenticate captures the Www-Authenticate header string.
 	WwwAuthenticate = "Www-Authenticate"
+
+	// mfaHeader is the header used to forward the MFA authentication status.
+	mfaHeader = "X-Multi-Factor-Authentication"
+
+	// mfaRequiredHeader is the response header indicating that MFA step-up authentication is required.
+	mfaRequiredHeader = "X-Ocis-Mfa-Required"
+
+	_spaceTypePersonal          = "personal"
+	_spaceTypeProject           = "project"
+	_spaceTypeProtectedPersonal = "protected-personal"
+	_spaceTypeProtectedProject  = "protected-project"
 )
 
 const (
@@ -454,4 +465,18 @@ func handleOCMAuth(ctx context.Context, c gatewayv1beta1.GatewayAPIClient, ocmsh
 		ClientId:     ocmshare,
 		ClientSecret: sharedSecret,
 	})
+}
+
+func isMfaSet(r *http.Request) bool {
+	return r.Header.Get(mfaHeader) == "true"
+}
+
+// isUnprotectedSpaceType returns true if the space type is unprotected.
+func isUnprotectedSpaceType(spaceType string) bool {
+	return spaceType == _spaceTypePersonal || spaceType == _spaceTypeProject
+}
+
+// isProtectedSpaceType returns true if the space type requires MFA authentication.
+func isProtectedSpaceType(spaceType string) bool {
+	return spaceType == _spaceTypeProtectedPersonal || spaceType == _spaceTypeProtectedProject
 }

@@ -8,6 +8,7 @@ import (
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	"github.com/google/uuid"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
 	revactx "github.com/owncloud/reva/v2/pkg/ctx"
@@ -76,6 +77,36 @@ func (m createHome) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 			err := status.NewErrorFromCode(createHomeRes.Status.Code, "gateway")
 			if createHomeRes.Status.Code != rpc.Code_CODE_ALREADY_EXISTS {
 				m.logger.Err(err).Msg("error when calling Createhome")
+			}
+		} else if createHomeRes.Status.Code == rpc.Code_CODE_OK {
+			if u != nil {
+				// Create the "protected-personal" space.
+				// Use the user ID as the space ID if it is a valid uuid or generate a new one.
+				// Replace last 4 chars of the space id with "0000" to make it visible.
+				spaceID := u.Id.OpaqueId
+				if err := uuid.Validate(spaceID); err != nil {
+					spaceID = uuid.New().String()
+				}
+				spaceID = spaceID[:len(spaceID)-4] + "0000"
+
+				createProtectedSpaceReq := &provider.CreateStorageSpaceRequest{
+					Type: "protected-personal",
+					Name: "Protected Personal",
+					Owner: &userv1beta1.User{
+						Id: u.Id,
+					},
+					Opaque: utils.AppendPlainToOpaque(nil, "spaceid", spaceID),
+				}
+
+				createProtectedSpaceRes, err := client.CreateStorageSpace(ctx, createProtectedSpaceReq)
+				if err != nil {
+					m.logger.Err(err).Msg("error calling CreateStorageSpace for protected-personal")
+				} else if createProtectedSpaceRes.Status.Code != rpc.Code_CODE_OK && createProtectedSpaceRes.Status.Code != rpc.Code_CODE_ALREADY_EXISTS {
+					m.logger.Error().
+						Interface("status", createProtectedSpaceRes.Status).
+						Str("userid", u.Id.OpaqueId).
+						Msg("error when creating protected-personal space")
+				}
 			}
 		}
 	}

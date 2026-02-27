@@ -162,7 +162,7 @@ func spacesProviders(cfg *config.Config, logger log.Logger) map[string]map[strin
 				},
 				"protected-personal": map[string]interface{}{
 					"mount_point":   "/protected-users",
-					"path_template": "/protected-users/{{.Space.Owner.Id.OpaqueId}}",
+					"path_template": "/protected-users/{{.Space.Name}}",
 				},
 				"protected-project": map[string]interface{}{
 					"mount_point":   "/protected-projects",

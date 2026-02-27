@@ -192,6 +192,63 @@ var _ = Describe("Graph", func() {
 			}
 			`))
 			})
+			It("filters out protected spaces when not having mfa", func() {
+				gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Times(1).Return(&provider.ListStorageSpacesResponse{
+					Status: status.NewOK(ctx),
+					StorageSpaces: []*provider.StorageSpace{
+						{
+							Id:        &provider.StorageSpaceId{OpaqueId: "p-personal"},
+							SpaceType: "protected-personal",
+							Root: &provider.ResourceId{
+								StorageId: "pro-1",
+								SpaceId:   "p-personal",
+								OpaqueId:  "p-personal",
+							},
+							Name: "Protected Personal",
+						},
+						{
+							Id:        &provider.StorageSpaceId{OpaqueId: "p-project"},
+							SpaceType: "protected-project",
+							Root: &provider.ResourceId{
+								StorageId: "pro-1",
+								SpaceId:   "p-project",
+								OpaqueId:  "p-project",
+							},
+							Name: "Protected Project",
+						},
+						{
+							Id:        &provider.StorageSpaceId{OpaqueId: "normal"},
+							SpaceType: "personal",
+							Root: &provider.ResourceId{
+								StorageId: "pro-1",
+								SpaceId:   "normal",
+								OpaqueId:  "normal",
+							},
+							Name: "Normal Personal",
+						},
+					},
+				}, nil)
+				gatewayClient.On("InitiateFileDownload", mock.Anything, mock.Anything).Return(&gateway.InitiateFileDownloadResponse{
+					Status: status.NewNotFound(ctx, "not found"),
+				}, nil)
+				gatewayClient.On("GetQuota", mock.Anything, mock.Anything).Return(&provider.GetQuotaResponse{
+					Status: status.NewUnimplemented(ctx, fmt.Errorf("not supported"), "not supported"),
+				}, nil)
+
+				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drives", nil)
+				r = r.WithContext(ctx)
+				rr := httptest.NewRecorder()
+				svc.GetDrivesV1(rr, r)
+
+				Expect(rr.Code).To(Equal(http.StatusOK))
+
+				body, _ := io.ReadAll(rr.Body)
+				var response map[string][]libregraph.Drive
+				err := json.Unmarshal(body, &response)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(len(response["value"])).To(Equal(1))
+				Expect(*response["value"][0].DriveType).To(Equal("personal"))
+			})
 			It("can list a spaces with sort", func() {
 				gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&provider.ListStorageSpacesResponse{
 					Status: status.NewOK(ctx),

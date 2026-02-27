@@ -225,7 +225,7 @@ func (v DriveTypeValidator) Validate(query *godata.GoDataQuery) error {
 
 	if query.Filter.Tree.Token.Value == "eq" && query.Filter.Tree.Children[0].Token.Value == "driveType" {
 		driveType := strings.Trim(query.Filter.Tree.Children[1].Token.Value, "'")
-		if strings.HasPrefix(driveType, "protected-") {
+		if driveType == _spaceTypeProtectedProject || driveType == _spaceTypeProtectedPersonal {
 			return errors.New("mfa required for protected spaces")
 		}
 	}

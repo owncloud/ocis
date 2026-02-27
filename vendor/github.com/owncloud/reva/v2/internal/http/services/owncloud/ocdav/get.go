@@ -79,6 +79,14 @@ func (s *svc) handleGet(ctx context.Context, w http.ResponseWriter, r *http.Requ
 		return
 	}
 
+	// MFA enforcement.
+	if isProtectedSpaceType(sRes.GetInfo().GetSpace().GetSpaceType()) && !isMfaSet(r) {
+		log.Debug().Interface("ref", ref).Str("spacetype", sRes.GetInfo().GetSpace().GetSpaceType()).Msg("MFA required for protected space")
+		w.Header().Set(mfaRequiredHeader, "true")
+		w.WriteHeader(http.StatusForbidden)
+		return
+	}
+
 	if sRes.Info.Type != provider.ResourceType_RESOURCE_TYPE_FILE {
 		w.Header().Set("Content-Length", "0")
 		w.WriteHeader(http.StatusOK)
