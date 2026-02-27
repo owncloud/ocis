@@ -323,8 +323,6 @@ func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ctxHasFullPerms := g.contextUserHasFullAccountPerms(r.Context())
-
 	if !g.validateQuery(r, w, odataReq.Query, SearchValidator{MinLength: g.config.API.IdentitySearchMinLength}, FilterValidator{}, BasicQueryValidator{}) {
 		return
 	}
@@ -392,6 +390,8 @@ func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 
 	usersWithAttributes := make([]*UserWithAttributes, 0, len(users))
 	displayedAttributes := g.config.API.UserSearchDisplayedAttributes
+
+	ctxHasFullPerms := g.contextUserHasFullAccountPerms(r.Context())
 
 	for _, user := range users {
 		attributes, err := getUsersAttributes(displayedAttributes, user)

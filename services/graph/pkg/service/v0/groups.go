@@ -31,7 +31,6 @@ func (g Graph) GetGroups(w http.ResponseWriter, r *http.Request) {
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
 		return
 	}
-	ctxHasFullPerms := g.contextUserHasFullAccountPerms(r.Context())
 
 	if !g.validateQuery(r, w, odataReq.Query, SearchValidator{MinLength: g.config.API.IdentitySearchMinLength}, BasicQueryValidator{}) {
 		return
@@ -44,7 +43,7 @@ func (g Graph) GetGroups(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// If the user isn't admin, we'll show just the minimum group attibutes
-	if !ctxHasFullPerms {
+	if !g.contextUserHasFullAccountPerms(r.Context()) {
 		finalGroups := make([]*libregraph.Group, len(groups))
 		for i, grp := range groups {
 			finalGroups[i] = &libregraph.Group{

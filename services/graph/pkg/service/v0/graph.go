@@ -214,6 +214,25 @@ func (v BasicQueryValidator) Validate(query *godata.GoDataQuery) error {
 	return nil
 }
 
+// DriveTypeValidator validates if the driveType filter contains protected types.
+type DriveTypeValidator struct{}
+
+// Validate checks if the driveType filter contains protected types.
+func (v DriveTypeValidator) Validate(query *godata.GoDataQuery) error {
+	if query == nil || query.Filter == nil {
+		return nil
+	}
+
+	if query.Filter.Tree.Token.Value == "eq" && query.Filter.Tree.Children[0].Token.Value == "driveType" {
+		driveType := strings.Trim(query.Filter.Tree.Children[1].Token.Value, "'")
+		if strings.HasPrefix(driveType, "protected-") {
+			return errors.New("mfa required for protected spaces")
+		}
+	}
+
+	return nil
+}
+
 // validateQuery validates the godata query based on provided validators.
 // It handles user permissions and MFA requirements centrally.
 func (g Graph) validateQuery(r *http.Request, w http.ResponseWriter, query *godata.GoDataQuery, validators ...QueryValidator) bool {
@@ -234,6 +253,37 @@ func (g Graph) validateQuery(r *http.Request, w http.ResponseWriter, query *goda
 				return false
 			}
 		}
+	}
+	return true
+}
+
+// validateQueryMFA validates the godata query based on provided validators.
+// It only handles MFA requirements and does not check for user permissions.
+func (g Graph) validateQueryMFA(r *http.Request, w http.ResponseWriter, query *godata.GoDataQuery, validators ...QueryValidator) bool {
+	hasMFA := mfa.Has(r.Context())
+	logger := g.logger.SubloggerWithRequestID(r.Context())
+
+	for _, v := range validators {
+		if err := v.Validate(query); err != nil {
+			if !hasMFA {
+				logger.Error().Str("path", r.URL.Path).Msg("MFA required but not satisfied")
+				mfa.SetRequiredStatus(w)
+				return false
+			}
+		}
+	}
+	return true
+}
+
+// validateMFA validates the MFA requirement.
+func (g Graph) validateMFA(r *http.Request, w http.ResponseWriter) bool {
+	hasMFA := mfa.Has(r.Context())
+	logger := g.logger.SubloggerWithRequestID(r.Context())
+
+	if !hasMFA {
+		logger.Error().Str("path", r.URL.Path).Msg("MFA required but not satisfied")
+		mfa.SetRequiredStatus(w)
+		return false
 	}
 	return true
 }

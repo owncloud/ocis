@@ -29,7 +29,6 @@ import (
 	"google.golang.org/protobuf/proto"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/l10n"
-	"github.com/owncloud/ocis/v2/ocis-pkg/mfa"
 	v0 "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
@@ -37,11 +36,13 @@ import (
 )
 
 const (
-	_spaceTypePersonal   = "personal"
-	_spaceTypeProject    = "project"
-	_spaceTypeVirtual    = "virtual"
-	_spaceTypeMountpoint = "mountpoint"
-	_spaceStateTrashed   = "trashed"
+	_spaceTypePersonal          = "personal"
+	_spaceTypeProject           = "project"
+	_spaceTypeProtectedPersonal = "protected-personal"
+	_spaceTypeProtectedProject  = "protected-project"
+	_spaceTypeVirtual           = "virtual"
+	_spaceTypeMountpoint        = "mountpoint"
+	_spaceStateTrashed          = "trashed"
 
 	_sortDescending = "desc"
 )
@@ -78,7 +79,7 @@ func (g Graph) GetDrives(version APIVersion) http.HandlerFunc {
 // GetDrivesV1 attempts to retrieve the current users drives;
 // it lists all drives the current user has access to.
 func (g Graph) GetDrivesV1(w http.ResponseWriter, r *http.Request) {
-	spaces, errCode := g.getDrives(r, false, APIVersion_1)
+	spaces, errCode := g.getDrives(w, r, false, APIVersion_1)
 	if errCode != nil {
 		errorcode.RenderError(w, r, errCode)
 		return
@@ -99,7 +100,7 @@ func (g Graph) GetDrivesV1(w http.ResponseWriter, r *http.Request) {
 // it includes the grantedtoV2 property
 // it uses unified roles instead of the cs3 representations
 func (g Graph) GetDrivesV1Beta1(w http.ResponseWriter, r *http.Request) {
-	spaces, errCode := g.getDrives(r, false, APIVersion_1_Beta_1)
+	spaces, errCode := g.getDrives(w, r, false, APIVersion_1_Beta_1)
 	if errCode != nil {
 		errorcode.RenderError(w, r, errCode)
 		return
@@ -133,14 +134,11 @@ func (g Graph) GetAllDrives(version APIVersion) http.HandlerFunc {
 // GetAllDrivesV1 attempts to retrieve the current users drives;
 // it includes another user's drives, if the current user has the permission.
 func (g Graph) GetAllDrivesV1(w http.ResponseWriter, r *http.Request) {
-	if !mfa.Has(r.Context()) {
-		logger := g.logger.SubloggerWithRequestID(r.Context())
-		logger.Error().Str("path", r.URL.Path).Msg("MFA required but not satisfied")
-		mfa.SetRequiredStatus(w)
+	if !g.validateMFA(r, w) {
 		return
 	}
 
-	spaces, errCode := g.getDrives(r, true, APIVersion_1)
+	spaces, errCode := g.getDrives(w, r, true, APIVersion_1)
 	if errCode != nil {
 		errorcode.RenderError(w, r, errCode)
 		return
@@ -160,14 +158,11 @@ func (g Graph) GetAllDrivesV1(w http.ResponseWriter, r *http.Request) {
 // it includes the grantedtoV2 property
 // it uses unified roles instead of the cs3 representations
 func (g Graph) GetAllDrivesV1Beta1(w http.ResponseWriter, r *http.Request) {
-	if !mfa.Has(r.Context()) {
-		logger := g.logger.SubloggerWithRequestID(r.Context())
-		logger.Error().Str("path", r.URL.Path).Msg("MFA required but not satisfied")
-		mfa.SetRequiredStatus(w)
+	if !g.validateMFA(r, w) {
 		return
 	}
 
-	drives, errCode := g.getDrives(r, true, APIVersion_1_Beta_1)
+	drives, errCode := g.getDrives(w, r, true, APIVersion_1_Beta_1)
 	if errCode != nil {
 		errorcode.RenderError(w, r, errCode)
 		return
@@ -184,7 +179,7 @@ func (g Graph) GetAllDrivesV1Beta1(w http.ResponseWriter, r *http.Request) {
 }
 
 // getDrives implements the Service interface.
-func (g Graph) getDrives(r *http.Request, unrestricted bool, apiVersion APIVersion) ([]*libregraph.Drive, error) {
+func (g Graph) getDrives(w http.ResponseWriter, r *http.Request, unrestricted bool, apiVersion APIVersion) ([]*libregraph.Drive, error) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 	logger.Info().
 		Interface("query", r.URL.Query()).
@@ -196,6 +191,10 @@ func (g Graph) getDrives(r *http.Request, unrestricted bool, apiVersion APIVersi
 	if err != nil {
 		logger.Debug().Err(err).Interface("query", r.URL.Query()).Msg("could not get drives: query error")
 		return nil, errorcode.New(errorcode.InvalidRequest, err.Error())
+	}
+
+	if !g.validateQueryMFA(r, w, odataReq.Query, DriveTypeValidator{}) {
+		return nil, errorcode.New(errorcode.AccessDenied, "")
 	}
 	ctx := r.Context()
 
@@ -409,6 +408,8 @@ func (g Graph) createDrive(w http.ResponseWriter, r *http.Request, apiVersion AP
 	switch driveType {
 	case "", _spaceTypeProject:
 		driveType = _spaceTypeProject
+	case _spaceTypeProtectedProject:
+		driveType = _spaceTypeProtectedProject
 	default:
 		logger.Debug().Str("type", driveType).Msg("could not create drive: drives of this type cannot be created via this api")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "drives of this type cannot be created via this api")
@@ -468,7 +469,7 @@ func (g Graph) createDrive(w http.ResponseWriter, r *http.Request, apiVersion AP
 	}
 
 	space := resp.GetStorageSpace()
-	if t := r.URL.Query().Get(TemplateParameter); t != "" && driveType == _spaceTypeProject {
+	if t := r.URL.Query().Get(TemplateParameter); t != "" && (driveType == _spaceTypeProject || driveType == _spaceTypeProtectedProject) {
 		loc := l10n.MustGetUserLocale(ctx, us.GetId().GetOpaqueId(), r.Header.Get(HeaderAcceptLanguage), g.valueService)
 		if err := g.applySpaceTemplate(ctx, gatewayClient, space.GetRoot(), t, loc); err != nil {
 			logger.Error().Err(err).Msg("could not apply template to space")
@@ -596,7 +597,7 @@ func (g Graph) updateDrive(w http.ResponseWriter, r *http.Request, apiVersion AP
 			for _, sp := range res.StorageSpaces {
 				id, _ := storagespace.ParseID(sp.GetId().GetOpaqueId())
 				if id.GetSpaceId() == rid.GetSpaceId() {
-					dt = _spaceTypeProject
+					dt = sp.SpaceType
 				}
 			}
 		}
@@ -1016,8 +1017,11 @@ func getQuota(quota *libregraph.Quota, defaultQuota string) *storageprovider.Quo
 
 func (g Graph) canSetSpaceQuota(ctx context.Context, _ *userv1beta1.User, typ string) (bool, error) {
 	permID := settingsServiceExt.SetPersonalSpaceQuotaPermission(0).Id
-	if typ == _spaceTypeProject {
+	if typ == _spaceTypeProject || typ == _spaceTypeProtectedProject {
 		permID = settingsServiceExt.SetProjectSpaceQuotaPermission(0).Id
+	}
+	if typ == _spaceTypeProtectedPersonal {
+		permID = settingsServiceExt.SetPersonalSpaceQuotaPermission(0).Id
 	}
 	_, err := g.permissionsService.GetPermissionByID(ctx, &settingssvc.GetPermissionByIDRequest{PermissionId: permID})
 	if err != nil {
