@@ -330,7 +330,9 @@ func parseObjectValue(v string) (string, float64) {
 
 // getObjectLabels extracts object detection labels from Tika metadata.
 // It reads the "OBJECT" key, parses each value for label and confidence,
-// and returns labels with confidence >= 0.10.
+// and returns labels with confidence >= 0.0001. The threshold is set low
+// because Tika's models (e.g. Inception V3) produce log-probability
+// confidence scores in the 0.0001–0.01 range.
 func getObjectLabels(meta map[string][]string) []string {
 	values, ok := meta["OBJECT"]
 	if !ok || len(values) == 0 {
@@ -339,7 +341,7 @@ func getObjectLabels(meta map[string][]string) []string {
 	var labels []string
 	for _, v := range values {
 		label, conf := parseObjectValue(v)
-		if conf >= 0.10 {
+		if conf >= 0.0001 {
 			labels = append(labels, label)
 		}
 	}
@@ -348,7 +350,9 @@ func getObjectLabels(meta map[string][]string) []string {
 
 // getObjectCaptions extracts image captions from Tika metadata.
 // It reads the "CAPTION" key, parses each value for text and confidence,
-// and returns captions with confidence >= 0.10.
+// and returns captions with confidence >= 0.0001. The threshold is set low
+// because Tika's Show and Tell captioning model produces log-probability
+// confidence scores in the 0.0001–0.002 range.
 func getObjectCaptions(meta map[string][]string) []string {
 	values, ok := meta["CAPTION"]
 	if !ok || len(values) == 0 {
@@ -357,7 +361,7 @@ func getObjectCaptions(meta map[string][]string) []string {
 	var captions []string
 	for _, v := range values {
 		caption, conf := parseObjectValue(v)
-		if conf >= 0.10 {
+		if conf >= 0.0001 {
 			captions = append(captions, caption)
 		}
 	}

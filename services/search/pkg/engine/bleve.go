@@ -130,7 +130,7 @@ func BuildBleveMapping() (mapping.IndexMapping, error) {
 	objectCaptionMapping := bleve.NewTextFieldMapping()
 	objectCaptionMapping.Store = true
 	objectCaptionMapping.Index = true
-	objectCaptionMapping.Analyzer = "lowercaseKeyword"
+	objectCaptionMapping.Analyzer = "fulltext"
 	docMapping.AddFieldMappingsAt("ObjectCaptions", objectCaptionMapping)
 
 	indexMapping := bleve.NewIndexMapping()

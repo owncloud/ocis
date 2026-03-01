@@ -216,6 +216,71 @@ var _ = Describe("Tika", func() {
 			Expect(photo.TakenDateTime).To(Equal(libregraph.PtrTime(time.Date(2018, 1, 1, 12, 34, 56, 0, time.UTC))))
 		})
 
+		It("extracts object captions with low confidence from Show and Tell model", func() {
+			fullResponse = `[
+				{
+					"Content-Type": "image/jpeg",
+					"CAPTION": [
+						"a dog that is standing in the grass . (0.00122)",
+						"a dog that is standing in the grass with a frisbee . (0.00101)",
+						"a dog is standing in the grass with a frisbee . (0.00018)"
+					]
+				}
+			]`
+
+			doc, err := tika.Extract(context.TODO(), &provider.ResourceInfo{
+				Type: provider.ResourceType_RESOURCE_TYPE_FILE,
+				Size: 1,
+			})
+			Expect(err).ToNot(HaveOccurred())
+			Expect(doc.ObjectCaptions).To(HaveLen(3))
+			Expect(doc.ObjectCaptions[0]).To(Equal("a dog that is standing in the grass ."))
+			Expect(doc.ObjectCaptions[1]).To(Equal("a dog that is standing in the grass with a frisbee ."))
+			Expect(doc.ObjectCaptions[2]).To(Equal("a dog is standing in the grass with a frisbee ."))
+		})
+
+		It("filters captions below minimum confidence threshold", func() {
+			fullResponse = `[
+				{
+					"Content-Type": "image/jpeg",
+					"CAPTION": [
+						"a blurry photo (0.00001)",
+						"a dog on a beach (0.001)"
+					]
+				}
+			]`
+
+			doc, err := tika.Extract(context.TODO(), &provider.ResourceInfo{
+				Type: provider.ResourceType_RESOURCE_TYPE_FILE,
+				Size: 1,
+			})
+			Expect(err).ToNot(HaveOccurred())
+			Expect(doc.ObjectCaptions).To(HaveLen(1))
+			Expect(doc.ObjectCaptions[0]).To(Equal("a dog on a beach"))
+		})
+
+		It("extracts object labels with low confidence", func() {
+			fullResponse = `[
+				{
+					"Content-Type": "image/jpeg",
+					"OBJECT": [
+						"Labrador retriever (0.0015)",
+						"golden retriever (0.0008)",
+						"tennis ball (0.00005)"
+					]
+				}
+			]`
+
+			doc, err := tika.Extract(context.TODO(), &provider.ResourceInfo{
+				Type: provider.ResourceType_RESOURCE_TYPE_FILE,
+				Size: 1,
+			})
+			Expect(err).ToNot(HaveOccurred())
+			Expect(doc.ObjectLabels).To(HaveLen(2))
+			Expect(doc.ObjectLabels[0]).To(Equal("Labrador retriever"))
+			Expect(doc.ObjectLabels[1]).To(Equal("golden retriever"))
+		})
+
 		It("removes stop words", func() {
 			body = "body to test stop words!!! against almost everyone"
 			language = "en"
