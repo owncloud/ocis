@@ -1,7 +1,7 @@
 ---
 title: "ocis.messages.eventhistory.v0"
 url: /apis/grpc_apis/ocis_messages_eventhistory_v0
-date: 2026-02-28T00:05:48Z
+date: 2026-03-01T00:06:10Z
 weight: 50
 geekdocRepo: https://github.com/owncloud/ocis
 ---
