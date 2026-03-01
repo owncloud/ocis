@@ -1,8 +1,7 @@
-Enhancement: Add photo EXIF metadata to search index and WebDAV results
+Enhancement: Add photo EXIF metadata and Tika object detection to search
 
-We've added support for photo metadata fields in the Bleve search index and
-WebDAV REPORT responses. This enables photo gallery applications to efficiently
-query photos by their EXIF metadata and display camera information.
+We've added support for photo metadata fields and AI-generated object detection
+labels and captions in the Bleve search index and WebDAV REPORT responses.
 
 The following photo metadata fields are now indexed and searchable:
 - `photo.takenDateTime` - When the photo was taken (supports date range queries)
@@ -20,8 +19,15 @@ GPS location data is also included when available:
 - `photo.location.longitude` - GPS longitude
 - `photo.location.altitude` - GPS altitude
 
-These fields are returned in WebDAV search results using the `oc:photo-*`
-property namespace, allowing web extensions to build photo timeline views,
-filter by camera, or show photos on a map.
+Object detection labels and captions from Tika's ObjectRecognitionParser
+(Inception V3 / Show and Tell models) are now extracted and searchable:
+- `objectLabel:` - Search by detected object labels (e.g., `objectLabel:dog`)
+- `objectCaption:` - Search by generated image captions (e.g., `objectCaption:beach`)
+- Results are exposed as `oc:object-labels` and `oc:object-captions` WebDAV properties
+
+These fields are returned in WebDAV search results, allowing web extensions
+to build photo timeline views, filter by camera, show photos on a map, or
+search photos by their visual content.
 
 https://github.com/owncloud/ocis/pull/11912
+https://github.com/owncloud/ocis/pull/12072
