@@ -120,6 +120,19 @@ func BuildBleveMapping() (mapping.IndexMapping, error) {
 	locationMapping.AddFieldMappingsAt("altitude", locationNumericMapping)
 	docMapping.AddSubDocumentMapping("location", locationMapping)
 
+	// Object detection labels and captions (top-level string slices like Tags)
+	objectLabelMapping := bleve.NewTextFieldMapping()
+	objectLabelMapping.Store = true
+	objectLabelMapping.Index = true
+	objectLabelMapping.Analyzer = "lowercaseKeyword"
+	docMapping.AddFieldMappingsAt("ObjectLabels", objectLabelMapping)
+
+	objectCaptionMapping := bleve.NewTextFieldMapping()
+	objectCaptionMapping.Store = true
+	objectCaptionMapping.Index = true
+	objectCaptionMapping.Analyzer = "lowercaseKeyword"
+	docMapping.AddFieldMappingsAt("ObjectCaptions", objectCaptionMapping)
+
 	indexMapping := bleve.NewIndexMapping()
 	indexMapping.DefaultAnalyzer = keyword.Name
 	indexMapping.DefaultMapping = docMapping
@@ -253,12 +266,14 @@ func (b *Bleve) Search(ctx context.Context, sir *searchService.SearchIndexReques
 				Type:       uint64(getFieldValue[float64](hit.Fields, "Type")),
 				MimeType:   getFieldValue[string](hit.Fields, "MimeType"),
 				Deleted:    getFieldValue[bool](hit.Fields, "Deleted"),
-				Tags:       getFieldSliceValue[string](hit.Fields, "Tags"),
-				Highlights: getFragmentValue(hit.Fragments, "Content", 0),
-				Audio:      getAudioValue[searchMessage.Audio](hit.Fields),
-				Image:      getImageValue[searchMessage.Image](hit.Fields),
-				Location:   getLocationValue[searchMessage.GeoCoordinates](hit.Fields),
-				Photo:      getPhotoValue[searchMessage.Photo](hit.Fields),
+				Tags:           getFieldSliceValue[string](hit.Fields, "Tags"),
+				Highlights:     getFragmentValue(hit.Fragments, "Content", 0),
+				Audio:          getAudioValue[searchMessage.Audio](hit.Fields),
+				Image:          getImageValue[searchMessage.Image](hit.Fields),
+				Location:       getLocationValue[searchMessage.GeoCoordinates](hit.Fields),
+				Photo:          getPhotoValue[searchMessage.Photo](hit.Fields),
+				ObjectLabels:   getFieldSliceValue[string](hit.Fields, "ObjectLabels"),
+				ObjectCaptions: getFieldSliceValue[string](hit.Fields, "ObjectCaptions"),
 			},
 		}
 
@@ -411,11 +426,13 @@ func (b *Bleve) getResource(bleveIndex bleve.Index, id string) (*Resource, error
 			Mtime:    getFieldValue[string](fields, "Mtime"),
 			MimeType: getFieldValue[string](fields, "MimeType"),
 			Content:  getFieldValue[string](fields, "Content"),
-			Tags:     getFieldSliceValue[string](fields, "Tags"),
-			Audio:    getAudioValue[libregraph.Audio](fields),
-			Image:    getImageValue[libregraph.Image](fields),
-			Location: getLocationValue[libregraph.GeoCoordinates](fields),
-			Photo:    getPhotoValue[libregraph.Photo](fields),
+			Tags:           getFieldSliceValue[string](fields, "Tags"),
+			Audio:          getAudioValue[libregraph.Audio](fields),
+			Image:          getImageValue[libregraph.Image](fields),
+			Location:       getLocationValue[libregraph.GeoCoordinates](fields),
+			Photo:          getPhotoValue[libregraph.Photo](fields),
+			ObjectLabels:   getFieldSliceValue[string](fields, "ObjectLabels"),
+			ObjectCaptions: getFieldSliceValue[string](fields, "ObjectCaptions"),
 		},
 	}, nil
 }

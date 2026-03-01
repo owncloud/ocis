@@ -21,8 +21,12 @@ var _fields = map[string]string{
 	"type":      "Type",
 	"tag":       "Tags",
 	"tags":      "Tags",
-	"content":   "Content",
-	"hidden":    "Hidden",
+	"content":        "Content",
+	"hidden":         "Hidden",
+	"objectlabel":    "ObjectLabels",
+	"objectlabels":   "ObjectLabels",
+	"objectcaption":  "ObjectCaptions",
+	"objectcaptions": "ObjectCaptions",
 }
 
 var _photoFields = map[string]string{

@@ -559,6 +559,8 @@ type Entity struct {
 	RemoteItemId     *ResourceID            `protobuf:"bytes,17,opt,name=remote_item_id,json=remoteItemId,proto3" json:"remote_item_id,omitempty"`
 	Image            *Image                 `protobuf:"bytes,18,opt,name=image,proto3" json:"image,omitempty"`
 	Photo            *Photo                 `protobuf:"bytes,19,opt,name=photo,proto3" json:"photo,omitempty"`
+	ObjectLabels     []string               `protobuf:"bytes,20,rep,name=object_labels,json=objectLabels,proto3" json:"object_labels,omitempty"`
+	ObjectCaptions   []string               `protobuf:"bytes,21,rep,name=object_captions,json=objectCaptions,proto3" json:"object_captions,omitempty"`
 }
 
 func (x *Entity) Reset() {
@@ -722,6 +724,20 @@ func (x *Entity) GetImage() *Image {
 func (x *Entity) GetPhoto() *Photo {
 	if x != nil {
 		return x.Photo
+	}
+	return nil
+}
+
+func (x *Entity) GetObjectLabels() []string {
+	if x != nil {
+		return x.ObjectLabels
+	}
+	return nil
+}
+
+func (x *Entity) GetObjectCaptions() []string {
+	if x != nil {
+		return x.ObjectCaptions
 	}
 	return nil
 }

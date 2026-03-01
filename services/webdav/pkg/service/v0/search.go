@@ -184,6 +184,17 @@ func appendLocationProps(props []prop.PropertyXML, location *searchmsg.GeoCoordi
 	return props
 }
 
+// appendObjectDetectionProps appends object detection labels and captions to the property list
+func appendObjectDetectionProps(props []prop.PropertyXML, entity *searchmsg.Entity) []prop.PropertyXML {
+	if len(entity.ObjectLabels) > 0 {
+		props = append(props, prop.Escaped("oc:object-labels", strings.Join(entity.ObjectLabels, ",")))
+	}
+	if len(entity.ObjectCaptions) > 0 {
+		props = append(props, prop.Escaped("oc:object-captions", strings.Join(entity.ObjectCaptions, ",")))
+	}
+	return props
+}
+
 func matchToPropResponse(match *searchmsg.Match, hrefPrefix string) (*propfind.ResponseXML, error) {
 	// unfortunately search uses own versions of ResourceId and Ref. So we need to assert them here
 	var (
@@ -276,9 +287,10 @@ func matchToPropResponse(match *searchmsg.Match, hrefPrefix string) (*propfind.R
 	score := strconv.FormatFloat(float64(match.Score), 'f', -1, 64)
 	propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:score", score))
 
-	// Add photo and location metadata using helper functions
+	// Add photo, location, and object detection metadata using helper functions
 	propstatOK.Prop = appendPhotoProps(propstatOK.Prop, match.Entity.Photo)
 	propstatOK.Prop = appendLocationProps(propstatOK.Prop, match.Entity.Location)
+	propstatOK.Prop = appendObjectDetectionProps(propstatOK.Prop, match.Entity)
 
 	if len(propstatOK.Prop) > 0 {
 		response.Propstat = append(response.Propstat, propstatOK)

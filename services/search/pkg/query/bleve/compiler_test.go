@@ -526,6 +526,30 @@ func Test_compile(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			name: `objectLabel:dog`,
+			args: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.StringNode{Key: "objectLabel", Value: "dog"},
+				},
+			},
+			want: query.NewConjunctionQuery([]query.Query{
+				query.NewQueryStringQuery(`ObjectLabels:dog`),
+			}),
+			wantErr: false,
+		},
+		{
+			name: `objectCaption:"a dog on a beach"`,
+			args: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.StringNode{Key: "objectCaption", Value: "a dog on a beach"},
+				},
+			},
+			want: query.NewConjunctionQuery([]query.Query{
+				query.NewQueryStringQuery(`ObjectCaptions:a\ dog\ on\ a\ beach`),
+			}),
+			wantErr: false,
+		},
+		{
 			name: `photo.takenDateTime>=2024-01-01`,
 			args: &ast.Ast{
 				Nodes: []ast.Node{
@@ -654,6 +678,12 @@ func Test_getField(t *testing.T) {
 		{"case insensitive PHOTO.CAMERAMAKE", "PHOTO.CAMERAMAKE", "photo.cameraMake"},
 		{"unknown photo field passthrough", "photo.unknown", "photo.unknown"},
 		{"unknown prefix passthrough", "unknown.field", "unknown.field"},
+		{"objectlabel maps to ObjectLabels", "objectlabel", "ObjectLabels"},
+		{"objectlabels maps to ObjectLabels", "objectlabels", "ObjectLabels"},
+		{"objectcaption maps to ObjectCaptions", "objectcaption", "ObjectCaptions"},
+		{"objectcaptions maps to ObjectCaptions", "objectcaptions", "ObjectCaptions"},
+		{"case insensitive ObjectLabel", "ObjectLabel", "ObjectLabels"},
+		{"case insensitive OBJECTLABELS", "OBJECTLABELS", "ObjectLabels"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

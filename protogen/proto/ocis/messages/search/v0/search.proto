@@ -79,6 +79,8 @@ message Entity {
 	ResourceID remote_item_id = 17;
 	Image image = 18;
 	Photo photo = 19;
+	repeated string object_labels = 20;
+	repeated string object_captions = 21;
 }
 
 message Match {

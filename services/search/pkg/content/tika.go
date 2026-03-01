@@ -94,6 +94,8 @@ func (t Tika) Extract(ctx context.Context, ri *provider.ResourceInfo) (Document,
 		doc.Location = t.getLocation(meta)
 		doc.Image = t.getImage(meta)
 		doc.Photo = t.getPhoto(meta)
+		doc.ObjectLabels = getObjectLabels(meta)
+		doc.ObjectCaptions = getObjectCaptions(meta)
 
 		if contentType, err := getFirstValue(meta, "Content-Type"); err == nil && strings.HasPrefix(contentType, "audio/") {
 			doc.Audio = t.getAudio(meta)
@@ -307,4 +309,57 @@ func (t Tika) getAudio(meta map[string][]string) *libregraph.Audio {
 	}
 
 	return audio
+}
+
+// parseObjectValue splits a Tika object recognition value like "dog (0.78)"
+// into its label and confidence score. It finds the last " (" to handle labels
+// that may contain parentheses.
+func parseObjectValue(v string) (string, float64) {
+	idx := strings.LastIndex(v, " (")
+	if idx < 0 {
+		return v, 0
+	}
+	label := v[:idx]
+	confStr := strings.TrimSuffix(v[idx+2:], ")")
+	conf, err := strconv.ParseFloat(confStr, 64)
+	if err != nil {
+		return v, 0
+	}
+	return label, conf
+}
+
+// getObjectLabels extracts object detection labels from Tika metadata.
+// It reads the "OBJECT" key, parses each value for label and confidence,
+// and returns labels with confidence >= 0.10.
+func getObjectLabels(meta map[string][]string) []string {
+	values, ok := meta["OBJECT"]
+	if !ok || len(values) == 0 {
+		return nil
+	}
+	var labels []string
+	for _, v := range values {
+		label, conf := parseObjectValue(v)
+		if conf >= 0.10 {
+			labels = append(labels, label)
+		}
+	}
+	return labels
+}
+
+// getObjectCaptions extracts image captions from Tika metadata.
+// It reads the "CAPTION" key, parses each value for text and confidence,
+// and returns captions with confidence >= 0.10.
+func getObjectCaptions(meta map[string][]string) []string {
+	values, ok := meta["CAPTION"]
+	if !ok || len(values) == 0 {
+		return nil
+	}
+	var captions []string
+	for _, v := range values {
+		caption, conf := parseObjectValue(v)
+		if conf >= 0.10 {
+			captions = append(captions, caption)
+		}
+	}
+	return captions
 }
