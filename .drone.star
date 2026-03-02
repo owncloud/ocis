@@ -1131,14 +1131,21 @@ def localApiTestPipeline(ctx):
                                 deployment_steps += enableAntivirusServiceK8s()
                             if params["emailNeeded"]:
                                 deployment_steps += emailServiceK8s()
+                            if params["collaborationServiceNeeded"]:
+                                deployment_steps += prepareOcisDeployment(enable_wopi = True)
+                            else:
+                                deployment_steps += prepareOcisDeployment()
 
-                            deployment_steps += prepareOcisDeployment() + setupOcisConfigMaps() + deployOcis() + streamK8sOcisLogs() + waitForOcis(ocis_url = ocis_url)
+                            deployment_steps += setupOcisConfigMaps() + deployOcis() + streamK8sOcisLogs() + waitForOcis(ocis_url = ocis_url)
+
+                            if params["collaborationServiceNeeded"]:
+                                deployment_steps += deployFakeofficeK8s() + exposeCollaborationServicesK8s()
                             if params["federationServer"]:
                                 deployment_steps += setupOcisConfigMaps(name = FED_OCIS_SERVER_NAME) + deployOcis(name = FED_OCIS_SERVER_NAME) + waitForOcis(name = "federation-ocis", ocis_url = ocis_fed_url)
 
                             deployment_steps += ociswrapper() + waitForOciswrapper()
                         else:
-                            deployment_steps = ocisServer(storage, extra_server_environment = params["extraServerEnvironment"], with_wrapper = True, tika_enabled = params["tikaNeeded"], volumes = [stepVolumeOcisStorage])
+                            deployment_steps = ocisServer(storage, extra_server_environment = params["extraServerEnvironment"], with_wrapper = True, tika_enabled = params["tikaNeeded"], volumes = [stepVolumeOcisStorage], ocis_url = ocis_url)
 
                         pipeline = {
                             "kind": "pipeline",
@@ -4138,7 +4145,7 @@ def exposeCollaborationServicesK8s():
         ],
     }]
 
-def ociswrapper():
+def ociswrapper(name = OCIS_SERVER_NAME):
     return [{
         "name": "ociswrapper",
         "image": K3D_IMAGE,
