@@ -1,6 +1,6 @@
 ---
 title: Search
-date: 2026-03-02T00:06:53.35263388Z
+date: 2026-03-02T10:30:47.479558761Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/search
