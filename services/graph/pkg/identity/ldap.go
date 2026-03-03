@@ -1307,7 +1307,7 @@ func (i *LDAP) CreateLDAPGroupByDN(dn string) error {
 	ar := ldap.NewAddRequest(dn, nil)
 
 	attrs := map[string][]string{
-		"objectClass": {"groupOfNames", "top"},
+		"objectClass": {i.groupObjectClass, "top"},
 		"member":      {""},
 	}
 

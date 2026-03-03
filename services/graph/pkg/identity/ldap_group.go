@@ -184,9 +184,9 @@ func (i *LDAP) GetGroupMembers(ctx context.Context, groupID string, req *godata.
 }
 
 // CreateGroup implements the Backend Interface for the LDAP Backend
-// It is currently restricted to managing groups based on the "groupOfNames" ObjectClass.
-// As "groupOfNames" requires a "member" Attribute to be present. Empty Groups (groups
-// without a member) a represented by adding an empty DN as the single member.
+// The implementation uses the configured groupObjectClass. Many common classes like
+// "groupOfNames" and "groupOfUniqueNames" require a "member" attribute to be present.
+// Empty Groups (groups without a member) are represented by adding an empty DN as the single member.
 func (i *LDAP) CreateGroup(ctx context.Context, group libregraph.Group) (*libregraph.Group, error) {
 	logger := i.logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "ldap").Msg("create group")
@@ -448,7 +448,7 @@ func (i *LDAP) getGroupCreateLDAPDN(group libregraph.Group) string {
 func (i *LDAP) groupToLDAPAttrValues(group libregraph.Group) (map[string][]string, error) {
 	attrs := map[string][]string{
 		i.groupAttributeMap.name: {group.GetDisplayName()},
-		"objectClass":            {"groupOfNames", "top", i.groupObjectClass},
+		"objectClass":            {i.groupObjectClass, "top"},
 		// This is a crutch to allow groups without members for LDAP servers
 		// that apply strict Schema checking. The RFCs define "member/uniqueMember"
 		// as required attribute for groupOfNames/groupOfUniqueNames. So we
