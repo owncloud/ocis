@@ -19,11 +19,16 @@ GPS location data is also included when available:
 - `photo.location.longitude` - GPS longitude
 - `photo.location.altitude` - GPS altitude
 
-Object detection labels and captions from Tika's ObjectRecognitionParser
-(Inception V3 / Show and Tell models) are now extracted and searchable:
+Object detection labels and captions are now indexed and searchable:
 - `objectLabel:` - Search by detected object labels (e.g., `objectLabel:dog`)
 - `objectCaption:` - Search by generated image captions (e.g., `objectCaption:beach`)
 - Results are exposed as `oc:object-labels` and `oc:object-captions` WebDAV properties
+
+These fields are extractor-agnostic and work with any content extractor that
+populates the standard `OBJECT` and `CAPTION` metadata keys. Tika 3.x
+`ObjectRecognitionParser` is one such source; alternative extractors (custom
+vision APIs, local models, etc.) are also supported via the pluggable
+`SEARCH_EXTRACTOR_TYPE` configuration.
 
 These fields are returned in WebDAV search results, allowing web extensions
 to build photo timeline views, filter by camera, show photos on a map, or

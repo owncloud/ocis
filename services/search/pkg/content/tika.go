@@ -311,7 +311,7 @@ func (t Tika) getAudio(meta map[string][]string) *libregraph.Audio {
 	return audio
 }
 
-// parseObjectValue splits a Tika object recognition value like "dog (0.78)"
+// parseObjectValue splits an object recognition value like "dog (0.78)"
 // into its label and confidence score. It finds the last " (" to handle labels
 // that may contain parentheses.
 func parseObjectValue(v string) (string, float64) {
@@ -328,11 +328,16 @@ func parseObjectValue(v string) (string, float64) {
 	return label, conf
 }
 
-// getObjectLabels extracts object detection labels from Tika metadata.
+// getObjectLabels extracts object detection labels from extractor metadata.
 // It reads the "OBJECT" key, parses each value for label and confidence,
 // and returns labels with confidence >= 0.0001. The threshold is set low
-// because Tika's models (e.g. Inception V3) produce log-probability
+// because common vision models (e.g. Inception V3) produce log-probability
 // confidence scores in the 0.0001–0.01 range.
+//
+// The OBJECT metadata key is populated by Tika 3.x ObjectRecognitionParser
+// or any custom extractor that provides object detection metadata.
+// Note: Tika 4.x removed ObjectRecognitionParser (TIKA-4500);
+// the field remains available for alternative detection sources.
 func getObjectLabels(meta map[string][]string) []string {
 	values, ok := meta["OBJECT"]
 	if !ok || len(values) == 0 {
@@ -348,11 +353,16 @@ func getObjectLabels(meta map[string][]string) []string {
 	return labels
 }
 
-// getObjectCaptions extracts image captions from Tika metadata.
+// getObjectCaptions extracts image captions from extractor metadata.
 // It reads the "CAPTION" key, parses each value for text and confidence,
 // and returns captions with confidence >= 0.0001. The threshold is set low
-// because Tika's Show and Tell captioning model produces log-probability
+// because common captioning models (e.g. Show and Tell) produce log-probability
 // confidence scores in the 0.0001–0.002 range.
+//
+// The CAPTION metadata key is populated by Tika 3.x ObjectRecognitionParser
+// or any custom extractor that provides image caption metadata.
+// Note: Tika 4.x removed ObjectRecognitionParser (TIKA-4500);
+// the field remains available for alternative caption sources.
 func getObjectCaptions(meta map[string][]string) []string {
 	values, ok := meta["CAPTION"]
 	if !ok || len(values) == 0 {
