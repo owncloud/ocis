@@ -70,6 +70,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Fix postprocessing resume command --restart flag: [#11692](https://github.com/owncloud/ocis/issues/11692)
+* Bugfix - Don't use hardcoded groupOfNames in group creation: [#11776](https://github.com/owncloud/ocis/pull/11776)
 * Bugfix - Translation for some email notifications: [#11979](https://github.com/owncloud/ocis/pull/11979)
 * Bugfix - Rework monitoring in the ocis_full deployment example: [#11995](https://github.com/owncloud/ocis/pull/11995)
 * Bugfix - Expose the signature-auth attribute: [#12016](https://github.com/owncloud/ocis/pull/12016)
@@ -90,6 +91,14 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/11692
    https://github.com/owncloud/ocis/pull/12002
+
+* Bugfix - Don't use hardcoded groupOfNames in group creation: [#11776](https://github.com/owncloud/ocis/pull/11776)
+
+   Formerly, when creating a group with a different objectClass, it will always use
+   groupOfNames instead of the one provided in the config. Now, the server creates
+   groups using the objectClass defined in the config.
+
+   https://github.com/owncloud/ocis/pull/11776
 
 * Bugfix - Translation for some email notifications: [#11979](https://github.com/owncloud/ocis/pull/11979)
 
