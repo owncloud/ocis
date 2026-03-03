@@ -39,6 +39,14 @@ variables:
   default_value: ""
   description: ""
   do_ignore: true
+- rawname: GITHUB_TOKEN
+  path: tools/ci-reporter/cmd/list-failed-commits/main.go:116
+  foundincode: true
+  name: GITHUB_TOKEN
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
 - rawname: _serverMaxConnectionAgeEnv
   path: ocis-pkg/service/grpc/keepalive.go:19
   foundincode: true
