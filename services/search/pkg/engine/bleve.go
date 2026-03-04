@@ -91,7 +91,7 @@ func BuildBleveMapping() (mapping.IndexMapping, error) {
 	photoStringMapping := bleve.NewTextFieldMapping()
 	photoStringMapping.Store = true
 	photoStringMapping.Index = true
-	photoStringMapping.Analyzer = keyword.Name
+	photoStringMapping.Analyzer = "lowercaseKeyword"
 	photoNumericMapping := bleve.NewNumericFieldMapping()
 	photoNumericMapping.Store = true
 	photoNumericMapping.Index = true
