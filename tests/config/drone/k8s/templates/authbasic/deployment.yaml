@@ -73,6 +73,7 @@ spec:
                   key: jwt-secret
 
             {{- include "ocis.caEnv" $ | nindent 12}}
+            {{- include "ocis.extraEnvs" . | nindent 12}}
 
           {{- include "ocis.livenessProbe" . | nindent 10 }}
 
@@ -91,6 +92,7 @@ spec:
               mountPath: /etc/ocis/ldap-ca
               readOnly: true
             {{- include "ocis.caPath" $ | nindent 12}}
+            {{- include "ocis.extraVolMounts" . | nindent 12}}
 
       {{- include "ocis.imagePullSecrets" $ | nindent 6 }}
       volumes:
@@ -100,3 +102,4 @@ spec:
           secret:
             secretName: {{ include "secrets.ldapCASecret" . }}
         {{- include "ocis.caVolume" $ | nindent 8}}
+        {{- include "ocis.extraVolumes" . | nindent 8}}

@@ -2,9 +2,8 @@
 
 set -e
 
-if [[ -z "$1" ]]; then
-    ROOT="../../../../"
-else
+ROOT="."
+if [[ -n "$1" ]]; then
     ROOT="$1"
 fi
 
@@ -12,17 +11,31 @@ CFG_DIR="$ROOT/tests/config/drone/k8s"
 CHT_DIR="$ROOT/ocis-charts/charts/ocis"
 TPL_DIR="$CHT_DIR/templates"
 
+if [[ ! -d "$ROOT/ocis-charts" ]]; then
+    echo "Error: ocis-charts not found in $ROOT/ocis-charts. Please clone it first."
+    exit 1
+fi
+
+# patch ocis service templates
+for service in "$TPL_DIR"/*/; do
+    if [[ -f "$service/deployment.yaml" ]]; then
+        if grep -qE 'ocis.caEnv' "$service/deployment.yaml"; then
+            sed -i '/.*ocis.caEnv.*/a\{{- include "ocis.extraEnvs" . | nindent 12 }}' "$service/deployment.yaml"
+            sed -i '/.*ocis.caPath.*/a\{{- include "ocis.extraVolMounts" . | nindent 12 }}' "$service/deployment.yaml"
+            sed -i '/.*ocis.caVolume.*/a\{{- include "ocis.extraVolumes" . | nindent 8 }}' "$service/deployment.yaml"
+        else
+            sed -i '/env:/a\{{- include "ocis.extraEnvs" . | nindent 12 }}' "$service/deployment.yaml"
+            sed -i '/volumeMounts:/a\{{- include "ocis.extraVolMounts" . | nindent 12 }}' "$service/deployment.yaml"
+            sed -i '/volumes:/a\{{- include "ocis.extraVolumes" . | nindent 8 }}' "$service/deployment.yaml"
+        fi
+    fi
+done
+
 # copy custom template resources
 cp -r $CFG_DIR/templates/* $TPL_DIR/
 
 # add authbasic service
 sed -i '/{{- define "ocis.basicServiceTemplates" -}}/a\  {{- $_ := set .scope "appNameAuthBasic" "authbasic" -}}' $TPL_DIR/_common/_tplvalues.tpl
-
-# patch activitylog service
-#  - include extra volume mounts and envs
-sed -i '/env:/a\{{- include "ocis.caEnv" $ | nindent 12}}' $TPL_DIR/activitylog/deployment.yaml
-sed -i '/volumeMounts:/a\{{- include "ocis.caPath" $ | nindent 12}}' $TPL_DIR/activitylog/deployment.yaml
-sed -i '/volumes:/a\{{- include "ocis.caVolume" $ | nindent 8}}' $TPL_DIR/activitylog/deployment.yaml
 
 if [[ "$ENABLE_ANTIVIRUS" == "true" ]]; then
     # TODO: use external service
