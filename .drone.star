@@ -2872,15 +2872,17 @@ def ocisServerK8s(federation = False, antivirus = False, email = False, tika = F
     expose_ext_server_step = []
     external_servers = []
 
-    steps = prepareOcisDeployment()
-    if antivirus:
-        steps += enableAntivirusServiceK8s()
-    if email:
-        steps += enableEmailServiceK8s()
-    if tika:
-        steps += enableTikaServiceK8s()
+    environment = {
+        "ENABLE_ANTIVIRUS": antivirus,
+        "ENABLE_EMAIL": email,
+        "ENABLE_TIKA": tika,
+        "ENABLE_WOPI": wopi,
+        "ENABLE_OCM": federation,
+    }
+
+    steps = prepareChartsK8s(environment)
+
     if wopi:
-        steps += enableAppsIntegrationK8s()
         external_servers += [["collabora", 9980], ["fakeoffice", 8080], ["onlyoffice", 443]]
 
     if external_servers:
@@ -2888,16 +2890,16 @@ def ocisServerK8s(federation = False, antivirus = False, email = False, tika = F
 
     steps += waitK3sCluster(name) + \
              (waitK3sCluster(fed_name) if federation else []) + \
-             setupOcisConfigMaps(name) + \
-             (setupOcisConfigMaps(fed_name) if federation else []) + \
+             setupConfigMapsK8s(name) + \
+             (setupConfigMapsK8s(fed_name) if federation else []) + \
              expose_ext_server_step + \
-             deployOcis(name) + \
-             (deployOcis(fed_name) if federation else []) + \
-             streamK8sOcisLogs(name) + \
+             deployOcisK8s(name) + \
+             (deployOcisK8s(fed_name) if federation else []) + \
+             streamOcisLogsK8s(name) + \
              waitForOcis(name, url) + \
-             (waitForOcis(fed_name, fed_url) if federation else [])
-
-    return steps + ociswrapperK8s(name)
+             (waitForOcis(fed_name, fed_url) if federation else []) + \
+             ociswrapperK8s(name)
+    return steps
 
 def redis():
     return [
@@ -4025,49 +4027,21 @@ def waitK3sCluster(name = OCIS_SERVER_NAME):
         ],
     }]
 
-def prepareOcisDeployment():
+def prepareChartsK8s(environment = []):
     commands = [
         # build ocis wrapper
         "make -C %s build" % dirs["ocisWrapper"],
         # get ocis charts
-        "if [ ! -d %s/ocis-charts ]; then git clone --single-branch -b main --depth 1 https://github.com/owncloud/ocis-charts.git; fi" % dirs["base"],
-        # move CI values file
-        "mv %s/tests/config/drone/k8s/values.yaml %s/ocis-charts/charts/ocis/ci/deployment-values.yaml" % (dirs["base"], dirs["base"]),
-        # enable authbasic service
-        "cp -r %s/tests/config/drone/k8s/authbasic %s/ocis-charts/charts/ocis/templates/" % (dirs["base"], dirs["base"]),
-        # copy override template
-        "cp tests/config/drone/k8s/_zoverride.tpl ocis-charts/charts/ocis/templates/_common/",
-        "cd ocis-charts",
-        # patch activitylog service
-        "sed -i '/env:/a\\\\{{- include \"ocis.caEnv\" $ | nindent 12}}' ./charts/ocis/templates/activitylog/deployment.yaml",
-        "sed -i '/volumeMounts:/a\\\\{{- include \"ocis.caPath\" $ | nindent 12}}' ./charts/ocis/templates/activitylog/deployment.yaml",
-        "sed -i '/volumes:/a\\\\{{- include \"ocis.caVolume\" $ | nindent 8}}' ./charts/ocis/templates/activitylog/deployment.yaml",
-        # disable audit logs in console
-        "sed -i '/AUDIT_LOG_TO_CONSOLE/{n;s/true/false/;}' ./charts/ocis/templates/audit/deployment.yaml",
-        "sed -i '/{{- define \"ocis.basicServiceTemplates\" -}}/a\\\\  {{- $_ := set .scope \"appNameAuthBasic\" \"authbasic\" -}}' ./charts/ocis/templates/_common/_tplvalues.tpl",
-        "sed -i '/- name: IDM_ADMIN_PASSWORD/{n;N;N;N;d;}' ./charts/ocis/templates/idm/deployment.yaml",
-        "sed -i '/- name: IDM_ADMIN_PASSWORD/a\\\\\\n              value: \"admin\"' ./charts/ocis/templates/idm/deployment.yaml",
-        "sed -i '/- name: STORAGE_PUBLICLINK_DEBUG_ADDR/i\\\\            {{- include \"ocis.persistentStore\" . | nindent 12 }}\\\n' ./charts/ocis/templates/storagepubliclink/deployment.yaml",
-        "sed -i '/- name: PROXY_HTTP_ADDR/i\\\\            - name: PROXY_ENABLE_BASIC_AUTH\\\n              value: \"true\"' ./charts/ocis/templates/proxy/deployment.yaml",
-        "sed -i 's|/etc/ocis/sharing-banned-passwords.txt|config/drone/banned-password-list.txt|' ./charts/ocis/templates/sharing/deployment.yaml",
-        "sed -i 's|- name: configs|- name: banned-passwords|' ./charts/ocis/templates/sharing/deployment.yaml",
-        "sed -i 's|mountPath: /etc/ocis$|mountPath: /etc/ocis/config/drone|' ./charts/ocis/templates/sharing/deployment.yaml",
-        "sed -i 's|name: sharing-banned-passwords-{{ .appName }}|name: sharing-banned-passwords|' ./charts/ocis/templates/sharing/deployment.yaml",
-        "sed -i 's|/etc/ocis/sharing-banned-passwords.txt|config/drone/banned-password-list.txt|' ./charts/ocis/templates/frontend/deployment.yaml",
-        "sed -i 's|- name: configs|- name: banned-passwords|' ./charts/ocis/templates/frontend/deployment.yaml",
-        "sed -i 's|mountPath: /etc/ocis$|mountPath: /etc/ocis/config/drone|' ./charts/ocis/templates/frontend/deployment.yaml",
-        "sed -i 's|name: sharing-banned-passwords-{{ .appName }}|name: sharing-banned-passwords|' ./charts/ocis/templates/frontend/deployment.yaml",
-        # Patch thumbnails deployment to mount Unicode fonts (ConfigMaps created in k3sCluster)
-        "sed -i '/- name: THUMBNAILS_TRANSFER_TOKEN/i\\\\            - name: THUMBNAILS_TXT_FONTMAP_FILE\\\n              value: /etc/ocis/fontsMap.json\\\n' ./charts/ocis/templates/thumbnails/deployment.yaml",
-        "sed -i '/volumeMounts:/a\\\\            - name: ocis-fonts-ttf\\\n              mountPath: /etc/ocis/fonts\\\n            - name: ocis-fonts-map\\\n              mountPath: /etc/ocis/fontsMap.json\\\n              subPath: fontsMap.json' ./charts/ocis/templates/thumbnails/deployment.yaml",
-        "sed -i '/volumes:/a\\\\        - name: ocis-fonts-ttf\\\n          configMap:\\\n            name: ocis-fonts-ttf\\\n        - name: ocis-fonts-map\\\n          configMap:\\\n            name: ocis-fonts-map' ./charts/ocis/templates/thumbnails/deployment.yaml",
-        "sed -i -E 's|value: http:\\\\/\\\\/.*:9300|value: {{ $officeSuite.wopiSrc }}|' ./charts/ocis/templates/collaboration/deployment.yaml",
-        "cat ./charts/ocis/templates/collaboration/deployment.yaml",
+        "if [ ! -d %s/ocis-charts ]; then " +
+        "git clone --single-branch -b main --depth 1 https://github.com/owncloud/ocis-charts.git; fi" % dirs["base"],
+        # prepare charts for the tests
+        "bash %s/tests/config/drone/k8s/setup.sh" % dirs["base"],
     ]
 
     return [{
         "name": "prepare-ocis-deployment",
         "image": OC_CI_GOLANG,
+        "environment": environment,
         "commands": commands,
         "volumes": [
             {
@@ -4077,18 +4051,15 @@ def prepareOcisDeployment():
         ],
     }]
 
-def setupOcisConfigMaps(name = OCIS_SERVER_NAME):
+def setupConfigMapsK8s(name = OCIS_SERVER_NAME):
     step_name = "setup-configmaps-" + name
 
     commands = [
         "export KUBECONFIG=%s/kubeconfig-$${DRONE_BUILD_NUMBER}-%s.yaml" % (dirs["base"], name),
         # Create namespace for oCIS deployment
         "kubectl create namespace ocis || true",
-        "kubectl create configmap -n ocis sharing-banned-passwords --from-file=banned-password-list.txt=%s/tests/config/drone/banned-password-list.txt" % dirs["base"],
         # Setup Unicode font support for thumbnails - create ConfigMaps
-        "echo '{\"defaultFont\": \"/etc/ocis/fonts/NotoSans.ttf\"}' > %s/fontsMap.json" % dirs["base"],
         "kubectl create configmap -n ocis ocis-fonts-ttf --from-file=%s/tests/config/drone/NotoSans.ttf" % dirs["base"],
-        "kubectl create configmap -n ocis ocis-fonts-map --from-file=%s/fontsMap.json" % dirs["base"],
     ]
 
     return [{
@@ -4098,39 +4069,27 @@ def setupOcisConfigMaps(name = OCIS_SERVER_NAME):
         "commands": commands,
     }]
 
-def deployOcis(name = OCIS_SERVER_NAME):
+def deployOcisK8s(name = OCIS_SERVER_NAME):
     step_name = "deploy-" + name
 
-    commands = [
-        "export KUBECONFIG=%s/kubeconfig-$${DRONE_BUILD_NUMBER}-%s.yaml" % (dirs["base"], name),
-        "cd %s/ocis-charts" % dirs["base"],
-    ]
-
-    if name == FED_OCIS_SERVER_NAME:
-        commands.extend([
-            "sed -i 's|externalDomain: ocis-server|externalDomain: %s|' ./charts/ocis/ci/deployment-values.yaml" % FED_OCIS_SERVER_NAME,
-        ])
-
-    commands.extend([
-        # [NOTE]
-        # Remove schema validation to add extra configs in values.yaml.
-        # Also this allows us to use fakeoffice as web-office server
-        "rm ./charts/ocis/values.schema.json",
-        "make helm-install-atomic",
-    ])
     return [{
         "name": step_name,
         "image": OC_CI_GOLANG,
-        "commands": commands,
-        "volumes": [
-            {
-                "name": "gopath",
-                "path": "/go",
-            },
+        "commands": [
+            "export KUBECONFIG=%s/kubeconfig-$${DRONE_BUILD_NUMBER}-%s.yaml" % (dirs["base"], name),
+            "cd %s/ocis-charts" % dirs["base"],
+            # update external domain
+            "sed -i 's|externalDomain:.*|externalDomain: %s|' ./charts/ocis/ci/deployment-values.yaml" % name,
+            # [NOTE]
+            # Remove schema validation to add extra configs in values.yaml.
+            # Also this allows us to use fakeoffice as web-office server
+            "rm ./charts/ocis/values.schema.json",
+            # deploy ocis
+            "make helm-install-atomic",
         ],
     }]
 
-def streamK8sOcisLogs(name = OCIS_SERVER_NAME):
+def streamOcisLogsK8s(name = OCIS_SERVER_NAME):
     return [{
         "name": "%s-logs" % name,
         "image": OC_CI_ALPINE,
@@ -4138,36 +4097,6 @@ def streamK8sOcisLogs(name = OCIS_SERVER_NAME):
         "commands": [
             "until test -f logs-%s/ocis.log; do sleep 10s; done" % name,
             "tail -f logs-%s/ocis.log" % name,
-        ],
-    }]
-
-def enableAntivirusServiceK8s():
-    return [{
-        "name": "enable-antivirus-service",
-        "image": OC_CI_ALPINE,
-        "commands": [
-            "cp -r %s/tests/config/drone/k8s/clamav %s/ocis-charts/charts/ocis/templates/" % (dirs["base"], dirs["base"]),
-            "sed -i '/^  virusscan:/,/^ *[^ ]/ s/enabled: .*/enabled: true/' %s/ocis-charts/charts/ocis/ci/deployment-values.yaml" % dirs["base"],
-            "sed -i '/name: ANTIVIRUS_SCANNER_TYPE/{n;s/value: *\"icap\"/value: \"clamav\"/}' %s/ocis-charts/charts/ocis/templates/antivirus/deployment.yaml" % dirs["base"],
-            "sed -i '/- name: ANTIVIRUS_SCANNER_TYPE/i\\\\            - name: ANTIVIRUS_CLAMAV_SOCKET\\\n              value: \"tcp://clamav:3310\"' %s/ocis-charts/charts/ocis/templates/antivirus/deployment.yaml" % dirs["base"],
-        ],
-    }]
-
-def enableAppsIntegrationK8s():
-    return [{
-        "name": "enable-apps-integration",
-        "image": OC_CI_ALPINE,
-        "commands": [
-            "sed -i '/^  appsIntegration:/,/^ *[^ ]/ s/enabled: .*/enabled: true/' %s/ocis-charts/charts/ocis/ci/deployment-values.yaml" % dirs["base"],
-        ],
-    }]
-
-def enableEmailServiceK8s():
-    return [{
-        "name": "copy-%s-service" % EMAIL_SMTP_HOST,
-        "image": OC_CI_ALPINE,
-        "commands": [
-            "cp -r %s/tests/config/drone/k8s/mailpit %s/ocis-charts/charts/ocis/templates/" % (dirs["base"], dirs["base"]),
         ],
     }]
 
@@ -4214,18 +4143,6 @@ def ociswrapperK8s(name = OCIS_SERVER_NAME, ocis_url = OCIS_URL_K8S):
             "timeout 60 bash -c 'while [ $(curl -sk " +
             "http://ociswrapper:5200 " +
             "-w %{http_code} -o /dev/null) != 404 ]; do sleep 1; done'",
-        ],
-    }]
-
-def enableTikaServiceK8s():
-    return [{
-        "name": "tika",
-        "type": "docker",
-        "image": OC_CI_ALPINE,
-        "commands": [
-            "until test -f %s/ocis-charts/charts/ocis/templates/search/deployment.yaml; do sleep 1s; done" % dirs["base"],
-            "cp -r %s/tests/config/drone/k8s/tika %s/ocis-charts/charts/ocis/templates/" % (dirs["base"], dirs["base"]),
-            "sed -i '/^[[:space:]]*storagesystem:/i\\\\  search:\\\n    extractor:\\\n      type: \"tika\"\\\n      tika:\\\n        url: \"http://tika:9998\"\\\n    persistence:\\\n      enabled: true\\\n      accessModes:\\\n        - ReadWriteOnce' %s/ocis-charts/charts/ocis/ci/deployment-values.yaml" % dirs["base"],
         ],
     }]
 
