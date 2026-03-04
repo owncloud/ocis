@@ -1132,8 +1132,6 @@ def localApiTestPipeline(ctx):
                                 params["collaborationServiceNeeded"],
                             )
 
-                            if params["antivirusNeeded"]:
-                                setup_steps += exposeAntivirusServiceK8s()
                             if params["emailNeeded"]:
                                 setup_steps += exposeEmailServiceK8s()
                             if params["collaborationServiceNeeded"]:
@@ -1514,8 +1512,6 @@ def coreApiTestPipeline(ctx):
                         wrapper_url = "http://ociswrapper:5200"
 
                         setup_steps += ocisServerK8s(antivirus = params["antivirusNeeded"], email = params["emailNeeded"])
-                        if params["antivirusNeeded"]:
-                            setup_steps += exposeAntivirusServiceK8s()
                         if params["emailNeeded"]:
                             setup_steps += exposeEmailServiceK8s()
                     else:
@@ -2895,9 +2891,13 @@ def ocisServerK8s(federation = False, antivirus = False, email = False, tika = F
              (deployOcis(fed_name) if federation else []) + \
              streamK8sOcisLogs(name) + \
              waitForOcis(name, url) + \
-             (waitForOcis(fed_name, fed_url) if federation else [])
+             (waitForOcis(fed_name, fed_url) if federation else []) + \
+             ociswrapperK8s(name)
 
-    return steps + ociswrapperK8s(name)
+    if antivirus:
+        steps += exposeAntivirusServiceK8s(name)
+
+    return steps
 
 def redis():
     return [
