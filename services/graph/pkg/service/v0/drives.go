@@ -783,6 +783,12 @@ func (g Graph) ListStorageSpacesWithFilters(ctx context.Context, filters []*stor
 		return nil, err
 	}
 	res, err := gatewayClient.ListStorageSpaces(ctx, lReq)
+	if err != nil {
+		return nil, err
+	}
+	if res.GetStatus().GetCode() != cs3rpc.Code_CODE_OK {
+		return res, nil
+	}
 
 	// Filter out protected spaces if MFA is not enabled
 	if !mfa.Has(ctx) {
@@ -795,7 +801,7 @@ func (g Graph) ListStorageSpacesWithFilters(ctx context.Context, filters []*stor
 		res.StorageSpaces = filtered
 	}
 
-	return res, err
+	return res, nil
 }
 
 func (g Graph) cs3StorageSpaceToDrive(ctx context.Context, baseURL *url.URL, space *storageprovider.StorageSpace, apiVersion APIVersion) (*libregraph.Drive, error) {
