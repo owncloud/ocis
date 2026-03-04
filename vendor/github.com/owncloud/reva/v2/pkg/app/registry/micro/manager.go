@@ -20,10 +20,12 @@ package micro
 
 import (
 	"context"
-	"sort"
-	"strconv"
 	"sync"
 	"time"
+
+	"sort"
+	"strconv"
+	"strings"
 
 	registrypb "github.com/cs3org/go-cs3apis/cs3/app/registry/v1beta1"
 	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
@@ -222,7 +224,7 @@ func (m *manager) updateProvidersFromMicroRegistry() error {
 	if err != nil {
 		return err
 	}
-	sortByPriority(lst)
+	SortByPriorityThenName(lst)
 	for _, outer := range lst {
 		for _, inner := range outer.MimeTypes {
 			ma[inner] = append(ma[inner], outer)
@@ -245,7 +247,8 @@ func equalsProviderInfo(p1, p2 *registrypb.ProviderInfo) bool {
 	return false
 }
 
-func getPriority(p *registrypb.ProviderInfo) string {
+// GetPriority extracts priority from ProviderInfo.Opaque, returns defaultPriority ("0") if not set.
+func GetPriority(p *registrypb.ProviderInfo) string {
 	if p.Opaque != nil && len(p.Opaque.Map) != 0 {
 		if priority, ok := p.Opaque.Map["priority"]; ok {
 			return string(priority.GetValue())
@@ -254,12 +257,14 @@ func getPriority(p *registrypb.ProviderInfo) string {
 	return defaultPriority
 }
 
-func sortByPriority(providers []*registrypb.ProviderInfo) {
-	less := func(i, j int) bool {
-		prioI, _ := strconv.ParseInt(getPriority(providers[i]), 10, 64)
-		prioJ, _ := strconv.ParseInt(getPriority(providers[j]), 10, 64)
-		return prioI < prioJ
-	}
-
-	sort.Slice(providers, less)
+// SortByPriorityThenName sorts providers by priority (lower first), then by Name. Used by micro registry and HTTP appprovider.
+func SortByPriorityThenName(providers []*registrypb.ProviderInfo) {
+	sort.Slice(providers, func(i, j int) bool {
+		pi, _ := strconv.ParseInt(GetPriority(providers[i]), 10, 64)
+		pj, _ := strconv.ParseInt(GetPriority(providers[j]), 10, 64)
+		if pi != pj {
+			return pi < pj
+		}
+		return strings.ToLower(providers[i].Name) < strings.ToLower(providers[j].Name)
+	})
 }

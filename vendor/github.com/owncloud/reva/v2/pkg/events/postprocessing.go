@@ -184,10 +184,10 @@ type UploadReady struct {
 	ExecutingUser     *user.User
 	ImpersonatingUser *user.User
 	FileRef           *provider.Reference
+	ResourceID        *provider.ResourceId
 	Timestamp         *types.Timestamp
 	Failed            bool
 	IsVersion         bool
-	// add reference here? We could use it to inform client pp is finished
 }
 
 // Unmarshal to fulfill umarshaller interface
