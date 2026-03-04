@@ -191,7 +191,7 @@ var _ = Describe("Tika", func() {
 					"exif:ExposureTime": "0.001",
 					"exif:FNumber": "1.8",
 					"exif:FocalLength": "50",
-					"Base ISO": "100",
+					"exif:IsoSpeedRatings": "100",
 					"tiff:Orientation": "1",
 					"exif:DateTimeOriginal": "2018-01-01T12:34:56"
 				}
@@ -214,6 +214,56 @@ var _ = Describe("Tika", func() {
 			Expect(photo.Iso).To(Equal(libregraph.PtrInt32(100)))
 			Expect(photo.Orientation).To(Equal(libregraph.PtrInt32(1)))
 			Expect(photo.TakenDateTime).To(Equal(libregraph.PtrTime(time.Date(2018, 1, 1, 12, 34, 56, 0, time.UTC))))
+		})
+
+		It("falls back to Base ISO when exif:IsoSpeedRatings is absent", func() {
+			fullResponse = `[
+				{
+					"tiff:Make": "Canon",
+					"Base ISO": "200"
+				}
+			]`
+			doc, err := tika.Extract(context.TODO(), &provider.ResourceInfo{
+				Type: provider.ResourceType_RESOURCE_TYPE_FILE,
+				Size: 1,
+			})
+			Expect(err).ToNot(HaveOccurred())
+
+			Expect(doc.Photo).ToNot(BeNil())
+			Expect(doc.Photo.Iso).To(Equal(libregraph.PtrInt32(200)))
+		})
+
+		It("extracts metadata from oversized files using truncated stream", func() {
+			fullResponse = `[
+				{
+					"tiff:Make": "Google",
+					"tiff:Model": "Pixel 7",
+					"exif:FNumber": "1.85",
+					"exif:FocalLength": "6.81",
+					"Base ISO": "58",
+					"tiff:Orientation": "1",
+					"exif:DateTimeOriginal": "2024-06-15T14:30:00",
+					"tiff:ImageWidth": "4080",
+					"tiff:ImageLength": "3072"
+				}
+			]`
+
+			tika.ContentExtractionSizeLimit = 10
+
+			doc, err := tika.Extract(context.TODO(), &provider.ResourceInfo{
+				Type: provider.ResourceType_RESOURCE_TYPE_FILE,
+				Size: 8_000_000,
+			})
+			Expect(err).ToNot(HaveOccurred())
+
+			Expect(doc.Photo).ToNot(BeNil())
+			Expect(doc.Photo.CameraMake).To(Equal(libregraph.PtrString("Google")))
+			Expect(doc.Photo.CameraModel).To(Equal(libregraph.PtrString("Pixel 7")))
+			Expect(doc.Photo.TakenDateTime).ToNot(BeNil())
+
+			Expect(doc.Image).ToNot(BeNil())
+			Expect(doc.Image.Width).To(Equal(libregraph.PtrInt32(4080)))
+			Expect(doc.Image.Height).To(Equal(libregraph.PtrInt32(3072)))
 		})
 
 		It("removes stop words", func() {
