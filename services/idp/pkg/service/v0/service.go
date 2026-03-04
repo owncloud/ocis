@@ -280,10 +280,12 @@ func (idp *IDP) initMux(ctx context.Context, r []server.WithRoutes, h http.Handl
 		idp.tp,
 	))
 
-	// handle / | index.html with a template that needs to have the BASE_PREFIX replaced
+	// Login and static pages (must be before Mount so chi matches first)
 	idp.mux.Get("/signin/v1/identifier", idp.Index())
 	idp.mux.Get("/signin/v1/identifier/", idp.Index())
 	idp.mux.Get("/signin/v1/identifier/index.html", idp.Index())
+	idp.mux.Get("/signin/v1/welcome", idp.Welcome())
+	idp.mux.Get("/signin/v1/goodbye", idp.Goodbye())
 
 	idp.mux.Mount("/", gm)
 
@@ -298,37 +300,74 @@ func (idp *IDP) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	idp.mux.ServeHTTP(w, r)
 }
 
-// Index renders the static html with templated variables.
+// Index renders the login page with templated variables.
 func (idp *IDP) Index() http.HandlerFunc {
-	f, err := idp.assets.Open("/identifier/index.html")
+	tpl, err := idp.readTemplate("/identifier/index.html")
 	if err != nil {
-		idp.logger.Fatal().Err(err).Msg("Could not open index template")
+		idp.logger.Fatal().Err(err).Msg("Could not load index template")
 	}
-
-	template, err := io.ReadAll(f)
-	if err != nil {
-		idp.logger.Fatal().Err(err).Msg("Could not read index template")
-	}
-	if err = f.Close(); err != nil {
-		idp.logger.Fatal().Err(err).Msg("Could not close body")
-	}
-
-	// TODO add environment variable to make the path prefix configurable
-	pp := "/signin/v1"
-	indexHTML := bytes.Replace(template, []byte("__PATH_PREFIX__"), []byte(pp), 1)
-
-	background := idp.config.Asset.LoginBackgroundUrl
-	indexHTML = bytes.Replace(template, []byte("__BG_IMG_URL__"), []byte(background), 1)
-
-	nonce := rndm.GenerateRandomString(32)
-	indexHTML = bytes.Replace(indexHTML, []byte("__CSP_NONCE__"), []byte(nonce), 1)
-
-	indexHTML = bytes.Replace(indexHTML, []byte("__PASSWORD_RESET_LINK__"), []byte(idp.config.Service.PasswordResetURI), 1)
-
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		html := idp.renderTemplate(tpl, idp.config.Service.PasswordResetURI)
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 		w.WriteHeader(http.StatusOK)
-		if _, err := w.Write(indexHTML); err != nil {
+		if _, err := w.Write(html); err != nil {
 			idp.logger.Error().Err(err).Msg("could not write to response writer")
 		}
-	})
+	}
+}
+
+// Welcome renders the signed-in confirmation page.
+func (idp *IDP) Welcome() http.HandlerFunc {
+	tpl, err := idp.readTemplate("/identifier/welcome.html")
+	if err != nil {
+		idp.logger.Fatal().Err(err).Msg("Could not load welcome template")
+	}
+	return func(w http.ResponseWriter, r *http.Request) {
+		html := idp.renderTemplate(tpl, "")
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		w.WriteHeader(http.StatusOK)
+		if _, err := w.Write(html); err != nil {
+			idp.logger.Error().Err(err).Msg("could not write to response writer")
+		}
+	}
+}
+
+// Goodbye renders the signed-out confirmation page.
+func (idp *IDP) Goodbye() http.HandlerFunc {
+	tpl, err := idp.readTemplate("/identifier/goodbye.html")
+	if err != nil {
+		idp.logger.Fatal().Err(err).Msg("Could not load goodbye template")
+	}
+	return func(w http.ResponseWriter, r *http.Request) {
+		html := idp.renderTemplate(tpl, "")
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		w.WriteHeader(http.StatusOK)
+		if _, err := w.Write(html); err != nil {
+			idp.logger.Error().Err(err).Msg("could not write to response writer")
+		}
+	}
+}
+
+func (idp *IDP) readTemplate(name string) ([]byte, error) {
+	f, err := idp.assets.Open(name)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+	return io.ReadAll(f)
+}
+
+func (idp *IDP) renderTemplate(tpl []byte, passwordResetURI string) []byte {
+	pp := []byte("/signin/v1")
+	nonce := []byte(rndm.GenerateRandomString(32))
+	bg := []byte(idp.config.Asset.LoginBackgroundUrl)
+	var resetHTML []byte
+	if passwordResetURI != "" {
+		resetHTML = []byte("<p><a href=\"" + passwordResetURI + "\">Reset password</a></p>")
+	}
+	out := bytes.ReplaceAll(tpl, []byte("__PATH_PREFIX__"), pp)
+	out = bytes.ReplaceAll(out, []byte("__CSP_NONCE__"), nonce)
+	out = bytes.ReplaceAll(out, []byte("__BG_IMG_URL__"), bg)
+	out = bytes.ReplaceAll(out, []byte("__PASSWORD_RESET_LINK_HTML__"), resetHTML)
+	return out
 }
