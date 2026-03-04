@@ -1059,7 +1059,6 @@ func (i *LDAP) userToLDAPAttrValues(user libregraph.User) (map[string][]string, 
 		"objectClass":                  {"inetOrgPerson", "organizationalPerson", "person", "top", "ownCloudUser"},
 		"cn":                           {user.GetOnPremisesSamAccountName()},
 		i.userAttributeMap.userType:    {user.GetUserType()},
-		i.userAttributeMap.externalID:  {user.GetExternalID()},
 	}
 
 	if identities, ok := user.GetIdentitiesOk(); ok {
@@ -1098,6 +1097,11 @@ func (i *LDAP) userToLDAPAttrValues(user libregraph.User) (map[string][]string, 
 	// When we get a givenName, we set the attribute.
 	if givenName := user.GetGivenName(); givenName != "" {
 		attrs[i.userAttributeMap.givenName] = []string{givenName}
+	}
+
+	// Only set externalID when it's not empty.
+	if externalID := user.GetExternalID(); externalID != "" {
+		attrs[i.userAttributeMap.externalID] = []string{externalID}
 	}
 
 	if !i.usePwModifyExOp && user.PasswordProfile != nil && user.PasswordProfile.Password != nil {
