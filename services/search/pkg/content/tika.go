@@ -202,15 +202,13 @@ func (t Tika) getPhoto(meta map[string][]string) *libregraph.Photo {
 		}
 	}
 
-	if v, err := getFirstValue(meta, "exif:IsoSpeedRatings"); err == nil {
-		if i, err := strconv.ParseInt(v, 0, 32); err == nil {
-			initPhoto()
-			photo.SetIso(int32(i))
-		}
-	} else if v, err := getFirstValue(meta, "Base ISO"); err == nil {
-		if i, err := strconv.ParseInt(v, 0, 32); err == nil {
-			initPhoto()
-			photo.SetIso(int32(i))
+	for _, isoKey := range []string{"exif:IsoSpeedRatings", "Base ISO"} {
+		if v, err := getFirstValue(meta, isoKey); err == nil {
+			if i, err := strconv.ParseInt(v, 0, 32); err == nil {
+				initPhoto()
+				photo.SetIso(int32(i))
+			}
+			break
 		}
 	}
 
