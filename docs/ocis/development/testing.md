@@ -707,6 +707,33 @@ Also, clone the [ocis-charts](https://github.com/owncloud/ocis-charts/) reposito
    cp -r <path-to-ocis-repo>/tests/config/drone/k8s/tika charts/ocis/templates/
    ```
 
+6. Run OCM Test\
+   For running OCM test suite on k8s, we need to deploy a federation OCIS server in a separate namespace on the same cluster, alongside the OCIS server:
+
+    - **Update values for federation server**:
+      ```bash
+      cd ocis-charts
+      cp <path-to-ocis-repo>/tests/config/drone/k8s/values.yaml ./charts/ocis/ci/federation-deployment-values.yaml
+      sed -i 's|namespaceOverride: ocis|namespaceOverride: federation-ocis|' ./charts/ocis/ci/federation-deployment-values.yaml
+      sed -i 's|externalDomain: ocis-server|externalDomain: federation-ocis-server|' ./charts/ocis/ci/federation-deployment-values.yaml
+      ```
+
+    - **Deploy federation server**:
+      ```bash
+      helm upgrade --install ocis charts/ocis/ \
+        -n federation-ocis \
+        --create-namespace \
+        --values charts/ocis/ci/federation-deployment-values.yaml \
+        --atomic --timeout 5m0s
+      ```
+
+    - **Run OCM tests**:
+      ```bash
+      cd <path-to-ocis-repo>
+
+      K8S=true TEST_SERVER_URL="https://ocis-server" TEST_SERVER_FED_URL="https://federation-ocis-server" \
+        make test-acceptance-api BEHAT_FEATURE=tests/acceptance/features/apiOcm/createInvitation.feature
+      ```
 ### Running Core API Test Suites from Pipeline "8"
 
 For running specific core API suites (`coreApiWebdavMove1`, `coreApiWebdavPreviews`, `coreApiWebdavUpload`, `coreApiWebdavUploadTUS`) on k8s:
