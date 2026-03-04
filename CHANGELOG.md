@@ -73,6 +73,8 @@ The following sections list the changes for unreleased.
 * Bugfix - Don't use hardcoded groupOfNames in group creation: [#11776](https://github.com/owncloud/ocis/pull/11776)
 * Bugfix - Translation for some email notifications: [#11979](https://github.com/owncloud/ocis/pull/11979)
 * Bugfix - Rework monitoring in the ocis_full deployment example: [#11995](https://github.com/owncloud/ocis/pull/11995)
+* Bugfix - Extract metadata from oversized files and fix ISO field: [#12000](https://github.com/owncloud/ocis/pull/12000)
+* Bugfix - Make tag unassignment idempotent and handle publish failures: [#12001](https://github.com/owncloud/ocis/pull/12001)
 * Bugfix - Expose the signature-auth attribute: [#12016](https://github.com/owncloud/ocis/pull/12016)
 * Enhancement - Add web extensions deployment configuration: [#11940](https://github.com/owncloud/ocis/pull/11940)
 * Enhancement - Add AI-assisted development guide: [#11941](https://github.com/owncloud/ocis/pull/11941)
@@ -120,6 +122,37 @@ The following sections list the changes for unreleased.
    now to guarantee nothing gets overwritten by accident
 
    https://github.com/owncloud/ocis/pull/11995
+
+* Bugfix - Extract metadata from oversized files and fix ISO field: [#12000](https://github.com/owncloud/ocis/pull/12000)
+
+   Two issues were found in the Tika content extractor:
+
+   1. Files exceeding `SEARCH_CONTENT_EXTRACTION_SIZE_LIMIT` (default 20MB) were
+   skipped entirely — no EXIF, no photo metadata, no image dimensions were
+   extracted. This particularly affected Pixel Motion Photos (`.MP.jpg`) which
+   embed an MP4 video making them 3-9MB. Since EXIF metadata lives in the JPEG
+   header (first few KB), a truncated stream is sufficient. The extractor now wraps
+   the download in `io.LimitReader` instead of skipping Tika, sending only the
+   first N bytes for metadata extraction.
+
+   2. The ISO speed field was read from `"Base ISO"`, a Canon-specific Tika field
+   (sensor base sensitivity). Most cameras — Pixel, iPhone, Samsung — provide
+   ISO via the standard `"exif:IsoSpeedRatings"` field. The extractor now checks
+   `exif:IsoSpeedRatings` first and falls back to `Base ISO` for Canon
+   compatibility.
+
+   https://github.com/owncloud/ocis/pull/12000
+
+* Bugfix - Make tag unassignment idempotent and handle publish failures: [#12001](https://github.com/owncloud/ocis/pull/12001)
+
+   The DELETE tags endpoint now returns success when the requested tag is already
+   absent from the file's metadata, instead of returning HTTP 400 with a misleading
+   error message. The TagsRemoved event is always published so the search index
+   stays in sync even when file metadata and the search index are out of sync. If
+   event publishing fails, the metadata change is rolled back and HTTP 500 is
+   returned to avoid leaving the system in an inconsistent state.
+
+   https://github.com/owncloud/ocis/pull/12001
 
 * Bugfix - Expose the signature-auth attribute: [#12016](https://github.com/owncloud/ocis/pull/12016)
 
