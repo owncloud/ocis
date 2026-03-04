@@ -34,6 +34,8 @@ import (
 	searchQuery "github.com/owncloud/ocis/v2/services/search/pkg/query"
 )
 
+const lowercaseKeywordAnalyzer = "lowercaseKeyword"
+
 // Bleve represents a search engine which utilizes bleve to search and store resources.
 type Bleve struct {
 	indexGetter  bleveEngine.IndexGetter
@@ -71,11 +73,11 @@ func (b *Bleve) Close() error {
 // BuildBleveMapping builds a bleve index mapping which can be used for indexing
 func BuildBleveMapping() (mapping.IndexMapping, error) {
 	nameMapping := bleve.NewTextFieldMapping()
-	nameMapping.Analyzer = "lowercaseKeyword"
+	nameMapping.Analyzer = lowercaseKeywordAnalyzer
 
 	lowercaseMapping := bleve.NewTextFieldMapping()
 	lowercaseMapping.IncludeInAll = false
-	lowercaseMapping.Analyzer = "lowercaseKeyword"
+	lowercaseMapping.Analyzer = lowercaseKeywordAnalyzer
 
 	fulltextFieldMapping := bleve.NewTextFieldMapping()
 	fulltextFieldMapping.Analyzer = "fulltext"
@@ -91,7 +93,7 @@ func BuildBleveMapping() (mapping.IndexMapping, error) {
 	photoStringMapping := bleve.NewTextFieldMapping()
 	photoStringMapping.Store = true
 	photoStringMapping.Index = true
-	photoStringMapping.Analyzer = "lowercaseKeyword"
+	photoStringMapping.Analyzer = lowercaseKeywordAnalyzer
 	photoNumericMapping := bleve.NewNumericFieldMapping()
 	photoNumericMapping.Store = true
 	photoNumericMapping.Index = true
@@ -123,7 +125,7 @@ func BuildBleveMapping() (mapping.IndexMapping, error) {
 	indexMapping := bleve.NewIndexMapping()
 	indexMapping.DefaultAnalyzer = keyword.Name
 	indexMapping.DefaultMapping = docMapping
-	err := indexMapping.AddCustomAnalyzer("lowercaseKeyword",
+	err := indexMapping.AddCustomAnalyzer(lowercaseKeywordAnalyzer,
 		map[string]interface{}{
 			"type":      custom.Name,
 			"tokenizer": single.Name,
