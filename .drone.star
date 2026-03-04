@@ -2871,6 +2871,7 @@ def ocisServerK8s(federation = False, antivirus = False, email = False, tika = F
     fed_name = FED_OCIS_SERVER_NAME
     fed_url = OCIS_FED_URL_K8S
 
+    steps = []
     expose_ext_server_step = []
     external_servers = []
 
@@ -2882,13 +2883,14 @@ def ocisServerK8s(federation = False, antivirus = False, email = False, tika = F
         "ENABLE_OCM": federation,
     }
 
-    steps = prepareChartsK8s(environment)
-
     if wopi:
         external_servers += [["collabora", 9980], ["fakeoffice", 8080], ["onlyoffice", 443]]
+        steps += waitForServices("online-offices", ["collabora:9980", "onlyoffice:443", "fakeoffice:8080"])
 
     if external_servers:
         expose_ext_server_step = exposeExternalServersK8s(external_servers)
+
+    steps += prepareChartsK8s(environment)
 
     steps += waitK3sCluster(name) + \
              (waitK3sCluster(fed_name) if federation else []) + \
