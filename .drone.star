@@ -4037,7 +4037,7 @@ def prepareChartsK8s(environment = []):
         "if [ ! -d %s/ocis-charts ]; then " % dirs["base"] +
         "git clone --single-branch -b main --depth 1 https://github.com/owncloud/ocis-charts.git; fi",
         # prepare charts for the tests
-        "bash %s/tests/config/drone/k8s/setup.sh" % dirs["base"],
+        "bash %s/tests/config/drone/k8s/setup.sh %s" % (dirs["base"], dirs["base"]),
     ]
 
     return [{

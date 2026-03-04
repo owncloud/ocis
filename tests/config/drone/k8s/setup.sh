@@ -2,7 +2,12 @@
 
 set -e
 
-ROOT=""
+if [[ -z "$1" ]]; then
+    ROOT="../../../../"
+else
+    ROOT="$1"
+fi
+
 CFG_DIR="$ROOT/tests/config/drone/k8s"
 CHT_DIR="$ROOT/ocis-charts/charts/ocis"
 TPL_DIR="$CHT_DIR/templates"
