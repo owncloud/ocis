@@ -111,11 +111,11 @@ config = {
         },
         "settingsAndNotification": {
             "suites": [
-                # "apiSettings",
+                "apiSettings",
                 "apiNotification",
-                # "apiCors",
+                "apiCors",
             ],
-            "skip": False,
+            "skip": True,
             "withRemotePhp": [False],
             "emailNeeded": True,
             "extraEnvironment": {
