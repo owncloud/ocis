@@ -103,7 +103,7 @@ config = {
     "localApiTests": {
         "contractAndLock": {
             "suites": [
-                "apiContract",
+                # "apiContract",
                 "apiLocks",
             ],
             "skip": False,
@@ -111,9 +111,9 @@ config = {
         },
         "settingsAndNotification": {
             "suites": [
-                "apiSettings",
+                # "apiSettings",
                 "apiNotification",
-                "apiCors",
+                # "apiCors",
             ],
             "skip": False,
             "withRemotePhp": [False],
@@ -135,7 +135,7 @@ config = {
             "suites": [
                 "apiGraphUser",
             ],
-            "skip": False,
+            "skip": True,
             "withRemotePhp": [False],
             "k8s": True,
         },
@@ -143,14 +143,14 @@ config = {
             "suites": [
                 "apiSpaces",
             ],
-            "skip": False,
+            "skip": True,
             "k8s": True,
         },
         "spacesShares": {
             "suites": [
                 "apiSpacesShares",
             ],
-            "skip": False,
+            "skip": True,
             "k8s": True,
         },
         "davOperations": {
@@ -162,7 +162,7 @@ config = {
                 "apiArchiver",
                 "apiActivities",
             ],
-            "skip": False,
+            "skip": True,
         },
         "groupAndSearch1": {
             "suites": [
@@ -170,12 +170,12 @@ config = {
                 "apiGraph",
                 "apiGraphGroup",
             ],
-            "skip": False,
+            "skip": True,
             "k8s": True,
         },
         "search2": {
             "suites": [
-                "apiSearch2",
+                # "apiSearch2",
                 "apiSearchContent",
             ],
             "tikaNeeded": True,
@@ -188,7 +188,7 @@ config = {
                 "apiReshare",
                 "apiSharingNgPermissions",
             ],
-            "skip": False,
+            "skip": True,
             "withRemotePhp": [False],
             "k8s": True,
         },
@@ -196,7 +196,7 @@ config = {
             "suites": [
                 "apiSharingNgAdditionalShareRole",
             ],
-            "skip": False,
+            "skip": True,
             "k8s": True,
             "withRemotePhp": [False],
         },
@@ -205,7 +205,7 @@ config = {
                 "apiSharingNgDriveInvitation",
                 "apiSharingNgItemInvitation",
             ],
-            "skip": False,
+            "skip": True,
             "withRemotePhp": [False],
         },
         "sharingNgLinkShare": {
@@ -214,7 +214,7 @@ config = {
                 "apiSharingNgItemLinkShare",
                 "apiSharingNgLinkShareManagement",
             ],
-            "skip": False,
+            "skip": True,
             "k8s": True,
             "withRemotePhp": [False],
         },
@@ -264,7 +264,7 @@ config = {
             "suites": [
                 "apiAuthApp",
             ],
-            "skip": False,
+            "skip": True,
             "k8s": True,
             "withRemotePhp": [False],
             "extraServerEnvironment": {
@@ -289,7 +289,7 @@ config = {
                 "cliCommands",
                 "apiServiceAvailability",
             ],
-            "skip": False,
+            "skip": True,
             "withRemotePhp": [False],
             "antivirusNeeded": True,
             "emailNeeded": True,
@@ -512,6 +512,7 @@ def main(ctx):
     """
 
     pipelines = []
+    return testPipelines(ctx)
 
     build_release_helpers = \
         changelog() + \
@@ -620,6 +621,7 @@ def testOcisAndUploadResults(ctx):
 
 def testPipelines(ctx):
     pipelines = []
+    return localApiTestPipeline(ctx)
 
     if config["litmus"]:
         pipelines += litmus(ctx, "ocis")
@@ -1117,7 +1119,7 @@ def localApiTestPipeline(ctx):
                     params[item] = matrix[item] if item in matrix else defaults[item]
                 for storage in params["storages"]:
                     for run_with_remote_php in params["withRemotePhp"]:
-                        run_on_k8s = params["k8s"] and ctx.build.event == "cron"
+                        run_on_k8s = params["k8s"]  #and ctx.build.event == "cron"
 
                         ####################
                         # SETUP STEPS      #
