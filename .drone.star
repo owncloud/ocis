@@ -1180,6 +1180,8 @@ def localApiTestPipeline(ctx):
                         # SERVICES         #
                         ####################
                         services = []
+                        if params["collaborationServiceNeeded"]:
+                            services += fakeOffice() + collaboraService() + onlyofficeService()
                         if run_on_k8s:
                             services += k3sCluster(ocm = params["federationServer"])
                             if params["federationServer"]:
@@ -1189,8 +1191,6 @@ def localApiTestPipeline(ctx):
                                 services += emailService()
                             if params["antivirusNeeded"]:
                                 services += clamavService()
-                            if params["collaborationServiceNeeded"]:
-                                services += fakeOffice() + collaboraService() + onlyofficeService()
 
                         ####################
                         # PIPELINE         #
