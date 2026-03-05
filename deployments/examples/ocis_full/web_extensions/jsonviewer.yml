@@ -6,7 +6,7 @@ services:
         condition: service_completed_successfully
 
   jsonviewer-init:
-    image: owncloud/web-extensions:json-viewer-0.3.3
+    image: owncloud/web-extensions:json-viewer-0.3.3@sha256:1a609676de54153b4d7618413904b12078119a55ca3379ec75cedd1f84544cea
     user: root
     volumes:
       - ocis-apps:/apps

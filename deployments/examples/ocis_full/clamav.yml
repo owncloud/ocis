@@ -13,7 +13,8 @@ services:
       - "clamav-socket:/var/run/clamav"
 
   clamav:
-    image: clamav/clamav:${CLAMAV_DOCKER_TAG:-latest}
+    image: clamav/clamav:1.5.1@sha256:e4f5060e4ef3f066a4c1234fbe45d8d876635f03b13e41aa679f89792968bc6c
+    platform: linux/${IMAGE_ARCH:-amd64}
     # release notes: https://blog.clamav.net
     networks:
       ocis-net:

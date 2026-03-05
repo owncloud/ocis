@@ -64,3 +64,5 @@ go.work.sum
 .envrc
 CLAUDE.md
 .claude/
+
+.DS_Store

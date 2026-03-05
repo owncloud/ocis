@@ -6,12 +6,10 @@ services:
         condition: service_completed_successfully
 
   unzip-init:
-    image: owncloud/web-extensions:unzip-0.4.3
+    image: owncloud/web-extensions:unzip-0.4.3@sha256:9fc726645749514c98c6b9b5a7e6315295897ff5c62a538a3ff383a49272160b
     user: root
     volumes:
       - ocis-apps:/apps
     entrypoint:
       - /bin/sh
     command: ["-c", "cp -R /var/lib/nginx/html/unzip/ /apps"]
-
-
