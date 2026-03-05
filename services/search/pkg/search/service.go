@@ -39,8 +39,8 @@ const (
 	_spaceTypeMountpoint        = "mountpoint"
 	_spaceTypePersonal          = "personal"
 	_spaceTypeProject           = "project"
-	_spaceTypeProtectedPersonal = "protected_personal"
-	_spaceTypeProtectedProject  = "protected_project"
+	_spaceTypeProtectedPersonal = "protected-personal"
+	_spaceTypeProtectedProject  = "protected-project"
 	_spaceTypeGrant             = "grant"
 	_slowQueryDuration          = 500 * time.Millisecond
 )
