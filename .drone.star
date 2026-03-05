@@ -41,6 +41,9 @@ KEYCLOAK_IMAGE = "quay.io/keycloak/keycloak:26.2.5"
 POSTGRES_ALPINE_IMAGE = "postgres:alpine3.18"
 TRIVY_IMAGE = "aquasec/trivy:latest"
 K3D_IMAGE = "ghcr.io/k3d-io/k3d:5-dind"
+CODACY_COVERAGE_REPORTER = "codacy/codacy-coverage-reporter:latest"
+CS3ORG_WOPISERVER = "cs3org/wopiserver:v10.4.0"
+OC_CI_WOPI_VALIDATOR = "owncloudci/wopi-validator"
 
 # the hugo version needs to be the same as in owncloud.github.io
 OC_CI_HUGO_STATIC_IMAGE = "hugomods/hugo:base-0.129.0"
@@ -71,6 +74,10 @@ OCIS_DOMAIN = "%s:9200" % OCIS_SERVER_NAME
 FED_OCIS_SERVER_NAME = "federation-%s" % OCIS_SERVER_NAME
 OCIS_FED_URL = "https://%s:10200" % FED_OCIS_SERVER_NAME
 OCIS_FED_DOMAIN = "%s:10200" % FED_OCIS_SERVER_NAME
+
+# urls for k8s deployment
+OCIS_URL_K8S = "https://%s" % OCIS_SERVER_NAME
+OCIS_FED_URL_K8S = "https://%s" % FED_OCIS_SERVER_NAME
 
 # emails
 EMAIL_PORT = "8025"
@@ -229,9 +236,9 @@ config = {
         "ocm": {
             "suites": [
                 "apiOcm",
-                "apiServiceAvailability",
             ],
             "skip": False,
+            "k8s": True,
             "withRemotePhp": [False],
             "federationServer": True,
             "emailNeeded": True,
@@ -270,6 +277,7 @@ config = {
                 "apiCollaboration",
             ],
             "skip": False,
+            "k8s": True,
             "withRemotePhp": [False],
             "collaborationServiceNeeded": True,
             "extraServerEnvironment": {
@@ -279,6 +287,7 @@ config = {
         "cliCommands": {
             "suites": [
                 "cliCommands",
+                "apiServiceAvailability",
             ],
             "skip": False,
             "withRemotePhp": [False],
@@ -895,12 +904,15 @@ def uploadScanResults(ctx):
             },
             {
                 "name": "codacy",
-                "image": PLUGINS_CODACY,
-                "settings": {
-                    "token": {
+                "image": CODACY_COVERAGE_REPORTER,
+                "environment": {
+                    "CODACY_PROJECT_TOKEN": {
                         "from_secret": "codacy_token",
                     },
                 },
+                "commands": [
+                    "/app/codacy-coverage-reporter report --force-coverage-parser go -r cache/coverage/coverage.out",
+                ],
             },
             {
                 "name": "sonarcloud",
@@ -1106,36 +1118,107 @@ def localApiTestPipeline(ctx):
                 for storage in params["storages"]:
                     for run_with_remote_php in params["withRemotePhp"]:
                         run_on_k8s = params["k8s"] and ctx.build.event == "cron"
-                        ocis_url = OCIS_URL
-                        if run_on_k8s:
-                            ocis_url = "https://%s" % OCIS_SERVER_NAME
 
+                        ####################
+                        # SETUP STEPS      #
+                        ####################
+                        setup_steps = skipIfUnchanged(ctx, "acceptance-tests")
+                        if run_on_k8s:
+                            setup_steps += ocisServerK8s(
+                                params["federationServer"],
+                                params["antivirusNeeded"],
+                                params["emailNeeded"],
+                                params["tikaNeeded"],
+                                params["collaborationServiceNeeded"],
+                            )
+
+                            if params["antivirusNeeded"]:
+                                setup_steps += exposeAntivirusServiceK8s()
+                            if params["emailNeeded"]:
+                                setup_steps += exposeEmailServiceK8s()
+                            if params["collaborationServiceNeeded"]:
+                                setup_steps += exposeNodePortsK8s([
+                                    ["collaboration-collabora", 9300],
+                                    ["collaboration-fakeoffice", 9300],
+                                    ["collaboration-onlyoffice", 9300],
+                                    ["collaboration-fakeoffice", 9304],
+                                ])
+                        else:
+                            setup_steps += restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin")
+                            if params["tikaNeeded"]:
+                                setup_steps += tikaService()
+                            if params["collaborationServiceNeeded"]:
+                                setup_steps += waitForServices("online-offices", ["collabora:9980", "onlyoffice:443", "fakeoffice:8080"])
+                            if params["antivirusNeeded"]:
+                                setup_steps += waitForClamavService()
+                            if params["emailNeeded"]:
+                                setup_steps += waitForEmailService()
+
+                            setup_steps += ocisServer(
+                                storage,
+                                extra_server_environment = params["extraServerEnvironment"],
+                                with_wrapper = True,
+                                tika_enabled = params["tikaNeeded"],
+                                volumes = [stepVolumeOcisStorage],
+                            )
+
+                            if params["federationServer"]:
+                                setup_steps += ocisServer(
+                                    storage,
+                                    deploy_type = "federation",
+                                    extra_server_environment = params["extraServerEnvironment"],
+                                )
+                            if params["collaborationServiceNeeded"]:
+                                setup_steps += wopiCollaborationService("fakeoffice") + \
+                                               wopiCollaborationService("collabora") + \
+                                               wopiCollaborationService("onlyoffice") + \
+                                               ocisHealthCheck("wopi", ["wopi-collabora:9304", "wopi-onlyoffice:9304", "wopi-fakeoffice:9304"])
+
+                        ####################
+                        # SERVICES         #
+                        ####################
+                        services = []
+                        if run_on_k8s:
+                            services += k3sCluster(ocm = params["federationServer"])
+                            if params["federationServer"]:
+                                services += k3sCluster(name = FED_OCIS_SERVER_NAME, ocm = True)
+                        else:
+                            if params["emailNeeded"]:
+                                services += emailService()
+                            if params["antivirusNeeded"]:
+                                services += clamavService()
+                            if params["collaborationServiceNeeded"]:
+                                services += fakeOffice() + collaboraService() + onlyofficeService()
+
+                        ####################
+                        # PIPELINE         #
+                        ####################
+                        pipeline_name = "%s-%s" % ("CLI" if name.startswith("cli") else "API", name)
+                        if run_with_remote_php:
+                            pipeline_name += "-withRemotePhp"
+                        if run_on_k8s:
+                            pipeline_name += "-k8s"
                         pipeline = {
                             "kind": "pipeline",
                             "type": "docker",
-                            "name": "%s-%s%s%s" % ("CLI" if name.startswith("cli") else "API", name, "-withRemotePhp" if run_with_remote_php else "", "-k8s" if run_on_k8s else ""),
+                            "name": pipeline_name,
                             "platform": {
                                 "os": "linux",
                                 "arch": "amd64",
                             },
-                            "steps": skipIfUnchanged(ctx, "acceptance-tests") +
-                                     ([] if run_on_k8s else restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin")) +
-                                     (tikaService() if params["tikaNeeded"] and not run_on_k8s else tikaServiceK8s() if params["tikaNeeded"] and run_on_k8s else []) +
-                                     (waitForServices("online-offices", ["collabora:9980", "onlyoffice:443", "fakeoffice:8080"]) if params["collaborationServiceNeeded"] else []) +
-                                     (waitK3sCluster() + (enableAntivirusServiceK8s() if params["antivirusNeeded"] and run_on_k8s else []) + (emailServiceK8s() if params["emailNeeded"] and run_on_k8s else []) + prepareOcisDeployment() + setupOcisConfigMaps() + deployOcis() + waitForOcis(ocis_url = ocis_url) + ociswrapper() + waitForOciswrapper() if run_on_k8s else ocisServer(storage, extra_server_environment = params["extraServerEnvironment"], with_wrapper = True, tika_enabled = params["tikaNeeded"], volumes = ([stepVolumeOcisStorage]))) +
-                                     (waitForClamavService() if params["antivirusNeeded"] and not run_on_k8s else exposeAntivirusServiceK8s() if params["antivirusNeeded"] and run_on_k8s else []) +
-                                     (waitForEmailService() if params["emailNeeded"] and not run_on_k8s else exposeEmailServiceK8s() if params["emailNeeded"] and run_on_k8s else []) +
-                                     (ocisServer(storage, deploy_type = "federation", extra_server_environment = params["extraServerEnvironment"]) if params["federationServer"] else []) +
-                                     ((wopiCollaborationService("fakeoffice") + wopiCollaborationService("collabora") + wopiCollaborationService("onlyoffice")) if params["collaborationServiceNeeded"] else []) +
-                                     (ocisHealthCheck("wopi", ["wopi-collabora:9304", "wopi-onlyoffice:9304", "wopi-fakeoffice:9304"]) if params["collaborationServiceNeeded"] else []) +
-                                     localApiTests(name, params["suites"], storage, params["extraEnvironment"], run_with_remote_php, ocis_url = ocis_url, k8s = run_on_k8s) +
+                            "steps": setup_steps +
+                                     localApiTests(
+                                         name,
+                                         params["suites"],
+                                         storage,
+                                         params["extraEnvironment"],
+                                         run_with_remote_php,
+                                         k8s = run_on_k8s,
+                                     ) +
                                      apiTestFailureLog() +
                                      (generateCoverageFromAPITest(ctx, name) if not run_on_k8s else []),
-                            "services": (k3sCluster() if run_on_k8s else []) +
-                                        (emailService() if params["emailNeeded"] and not run_on_k8s else []) +
-                                        (clamavService() if params["antivirusNeeded"] and not run_on_k8s else []) +
-                                        ((fakeOffice() + collaboraService() + onlyofficeService()) if params["collaborationServiceNeeded"] else []),
-                            "depends_on": getPipelineNames(buildOcisBinaryForTesting(ctx)),
+                            "services": services,
+                            "depends_on": [] if run_on_k8s else getPipelineNames(buildOcisBinaryForTesting(ctx)),
                             "trigger": {
                                 "ref": [
                                     "refs/heads/master",
@@ -1188,26 +1271,37 @@ def generateCoverageFromAPITest(ctx, name):
         },
     ]
 
-def localApiTests(name, suites, storage = "ocis", extra_environment = {}, with_remote_php = False, ocis_url = OCIS_URL, k8s = False):
+def localApiTests(name, suites, storage = "ocis", extra_environment = {}, with_remote_php = False, k8s = False):
     test_dir = "%s/tests/acceptance" % dirs["base"]
     expected_failures_file = "%s/expected-failures-localAPI-on-%s-storage.md" % (test_dir, storage.upper())
+    wrapper_url = "http://%s:5200" % OCIS_SERVER_NAME
+    ocis_url = OCIS_URL
+    ocis_fed_url = OCIS_FED_URL
+
+    if k8s:
+        ocis_url = OCIS_URL_K8S
+        ocis_fed_url = OCIS_FED_URL_K8S
+        wrapper_url = "http://ociswrapper:5200"
 
     environment = {
         "TEST_SERVER_URL": ocis_url,
-        "TEST_SERVER_FED_URL": OCIS_FED_URL,
+        "TEST_SERVER_FED_URL": ocis_fed_url,
         "OCIS_REVA_DATA_ROOT": "%s" % (dirs["ocisRevaDataRoot"] if storage == "owncloud" else ""),
         "STORAGE_DRIVER": storage,
         "BEHAT_SUITES": ",".join(suites),
         "BEHAT_FILTER_TAGS": "~@skip&&~@skipOnGraph&&~@skipOnOcis-%s-Storage" % ("OC" if storage == "owncloud" else "OCIS"),
         "EXPECTED_FAILURES_FILE": expected_failures_file,
         "UPLOAD_DELETE_WAIT_TIME": "1" if storage == "owncloud" else 0,
-        "OCIS_WRAPPER_URL": "http://ociswrapper:5200" if k8s else "http://%s:5200" % OCIS_SERVER_NAME,
+        "OCIS_WRAPPER_URL": wrapper_url,
         "WITH_REMOTE_PHP": with_remote_php,
-        "COLLABORATION_SERVICE_URL": "http://wopi-fakeoffice:9300",
+        "COLLABORATION_SERVICE_URL": "http://ocis-server:9304" if k8s else "http://wopi-fakeoffice:9300",
         "K8S": k8s,
     }
 
     for item in extra_environment:
+        if item == "EMAIL_HOST" and k8s:
+            environment[item] = OCIS_SERVER_NAME
+            continue
         environment[item] = extra_environment[item]
 
     return [{
@@ -1280,7 +1374,7 @@ def wopiValidatorTests(ctx, storage, wopiServerType):
         wopiServer = [
             {
                 "name": "wopi-fakeoffice",
-                "image": "cs3org/wopiserver:v10.4.0",
+                "image": CS3ORG_WOPISERVER,
                 "detach": True,
                 "commands": [
                     "cp %s/tests/config/drone/wopiserver.conf /etc/wopi/wopiserver.conf" % (dirs["base"]),
@@ -1299,7 +1393,7 @@ def wopiValidatorTests(ctx, storage, wopiServerType):
     for testgroup in testgroups:
         validatorTests.append({
             "name": "wopiValidatorTests-%s" % testgroup,
-            "image": "owncloudci/wopi-validator",
+            "image": OC_CI_WOPI_VALIDATOR,
             "commands": [
                 "export WOPI_TOKEN=$(cat accesstoken)",
                 "echo $WOPI_TOKEN",
@@ -1315,7 +1409,7 @@ def wopiValidatorTests(ctx, storage, wopiServerType):
         for builtinOnlyGroup in builtinOnlyTestGroups:
             validatorTests.append({
                 "name": "wopiValidatorTests-%s" % builtinOnlyGroup,
-                "image": "owncloudci/wopi-validator",
+                "image": OC_CI_WOPI_VALIDATOR,
                 "commands": [
                     "export WOPI_TOKEN=$(cat accesstoken)",
                     "echo $WOPI_TOKEN",
@@ -1409,8 +1503,52 @@ def coreApiTestPipeline(ctx):
                     expected_failures_file = "%s/expected-failures-API-on-%s-storage.md" % (test_dir, storage.upper())
                     run_on_k8s = params["k8s"] and ctx.build.event == "cron"
                     ocis_url = OCIS_URL
+                    wrapper_url = "http://%s:5200" % OCIS_SERVER_NAME
+
+                    ####################
+                    # SETUP STEPS      #
+                    ####################
+                    setup_steps = skipIfUnchanged(ctx, "acceptance-tests")
                     if run_on_k8s:
-                        ocis_url = "https://%s" % OCIS_SERVER_NAME
+                        ocis_url = OCIS_URL_K8S
+                        wrapper_url = "http://ociswrapper:5200"
+
+                        setup_steps += ocisServerK8s(antivirus = params["antivirusNeeded"], email = params["emailNeeded"])
+                        if params["antivirusNeeded"]:
+                            setup_steps += exposeAntivirusServiceK8s()
+                        if params["emailNeeded"]:
+                            setup_steps += exposeEmailServiceK8s()
+                    else:
+                        setup_steps += restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin")
+                        if params["tikaNeeded"]:
+                            setup_steps += tikaService()
+                        if params["antivirusNeeded"]:
+                            setup_steps += waitForClamavService()
+                        if params["emailNeeded"]:
+                            setup_steps += waitForEmailService()
+                        setup_steps += ocisServer(
+                            storage,
+                            extra_server_environment = params["extraServerEnvironment"],
+                            with_wrapper = True,
+                            tika_enabled = params["tikaNeeded"],
+                            volumes = ([stepVolumeOcisStorage]),
+                        )
+
+                    ####################
+                    # SERVICES         #
+                    ####################
+                    services = []
+                    if run_on_k8s:
+                        services += k3sCluster()
+                    else:
+                        if params["emailNeeded"]:
+                            services += emailService()
+                        if params["antivirusNeeded"]:
+                            services += clamavService()
+
+                    ####################
+                    # PIPELINE         #
+                    ####################
                     pipeline = {
                         "kind": "pipeline",
                         "type": "docker",
@@ -1419,12 +1557,7 @@ def coreApiTestPipeline(ctx):
                             "os": "linux",
                             "arch": "amd64",
                         },
-                        "steps": skipIfUnchanged(ctx, "acceptance-tests") +
-                                 ([] if run_on_k8s else restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin")) +
-                                 (tikaService() if params["tikaNeeded"] else []) +
-                                 (waitForClamavService() if params["antivirusNeeded"] else []) +
-                                 (waitForEmailService() if params["emailNeeded"] else []) +
-                                 (waitK3sCluster() + prepareOcisDeployment() + setupOcisConfigMaps() + deployOcis() + waitForOcis(ocis_url = ocis_url) + ociswrapper() + waitForOciswrapper() if run_on_k8s else ocisServer(storage, extra_server_environment = params["extraServerEnvironment"], with_wrapper = True, tika_enabled = params["tikaNeeded"], volumes = ([stepVolumeOcisStorage]))) +
+                        "steps": setup_steps +
                                  [
                                      {
                                          "name": "run-api-tests",
@@ -1438,7 +1571,7 @@ def coreApiTestPipeline(ctx):
                                              "ACCEPTANCE_TEST_TYPE": "core-api",
                                              "EXPECTED_FAILURES_FILE": expected_failures_file,
                                              "UPLOAD_DELETE_WAIT_TIME": "1" if storage == "owncloud" else 0,
-                                             "OCIS_WRAPPER_URL": "http://ociswrapper:5200" if run_on_k8s else "http://%s:5200" % OCIS_SERVER_NAME,
+                                             "OCIS_WRAPPER_URL": wrapper_url,
                                              "WITH_REMOTE_PHP": run_with_remote_php,
                                              "K8S": run_on_k8s,
                                          },
@@ -1451,10 +1584,8 @@ def coreApiTestPipeline(ctx):
                                  ] +
                                  apiTestFailureLog() +
                                  ([] if run_on_k8s else generateCoverageFromAPITest(ctx, name)),
-                        "services": (emailService() if params["emailNeeded"] else []) +
-                                    (clamavService() if params["antivirusNeeded"] else []) +
-                                    (k3sCluster() if run_on_k8s else []),
-                        "depends_on": getPipelineNames(buildOcisBinaryForTesting(ctx)),
+                        "services": services,
+                        "depends_on": [] if run_on_k8s else getPipelineNames(buildOcisBinaryForTesting(ctx)),
                         "trigger": {
                             "ref": [
                                 "refs/heads/master",
@@ -2732,6 +2863,42 @@ def startOcisService(service = None, name = None, environment = {}, volumes = []
         },
     ]
 
+def ocisServerK8s(federation = False, antivirus = False, email = False, tika = False, wopi = False):
+    name = OCIS_SERVER_NAME
+    url = OCIS_URL_K8S
+    fed_name = FED_OCIS_SERVER_NAME
+    fed_url = OCIS_FED_URL_K8S
+
+    expose_ext_server_step = []
+    external_servers = []
+
+    steps = prepareOcisDeployment()
+    if antivirus:
+        steps += enableAntivirusServiceK8s()
+    if email:
+        steps += enableEmailServiceK8s()
+    if tika:
+        steps += enableTikaServiceK8s()
+    if wopi:
+        steps += enableAppsIntegrationK8s()
+        external_servers += [["collabora", 9980], ["fakeoffice", 8080], ["onlyoffice", 443]]
+
+    if external_servers:
+        expose_ext_server_step = exposeExternalServersK8s(external_servers)
+
+    steps += waitK3sCluster(name) + \
+             (waitK3sCluster(fed_name) if federation else []) + \
+             setupOcisConfigMaps(name) + \
+             (setupOcisConfigMaps(fed_name) if federation else []) + \
+             expose_ext_server_step + \
+             deployOcis(name) + \
+             (deployOcis(fed_name) if federation else []) + \
+             streamK8sOcisLogs(name) + \
+             waitForOcis(name, url) + \
+             (waitForOcis(fed_name, fed_url) if federation else [])
+
+    return steps + ociswrapperK8s(name)
+
 def redis():
     return [
         {
@@ -3028,7 +3195,6 @@ def uploadAPITestCoverageReport(ctx):
             ],
             "status": [
                 "success",
-                "failure",
             ],
         },
     }
@@ -3462,10 +3628,11 @@ def fakeOffice():
         },
     ]
 
-def wopiCollaborationService(name):
+def wopiCollaborationService(name, ocis_url = OCIS_URL):
     service_name = "wopi-%s" % name
 
     environment = {
+        "OCIS_URL": ocis_url,
         "MICRO_REGISTRY": "nats-js-kv",
         "MICRO_REGISTRY_ADDRESS": "%s:9233" % OCIS_SERVER_NAME,
         "COLLABORATION_LOG_LEVEL": "debug",
@@ -3670,7 +3837,7 @@ def collaboraService():
             "detach": True,
             "environment": {
                 "DONT_GEN_SSL_CERT": "set",
-                "extra_params": "--o:ssl.enable=true --o:ssl.termination=true --o:welcome.enable=false --o:net.frame_ancestors=%s" % OCIS_URL,
+                "extra_params": "--o:ssl.enable=true --o:ssl.termination=true --o:welcome.enable=false --o:net.frame_ancestors=https://%s" % OCIS_SERVER_NAME,
             },
             "commands": [
                 "coolconfig generate-proof-key",
@@ -3786,42 +3953,72 @@ def trivyScan(ctx):
         },
     }
 
-def k3sCluster():
+def k3sCluster(name = OCIS_SERVER_NAME, ocm = False):
+    peer_name = OCIS_SERVER_NAME if name == FED_OCIS_SERVER_NAME else FED_OCIS_SERVER_NAME
+    commands = []
+    log_dir = "%s/logs-%s" % (dirs["base"], name)
+
+    commands.extend([
+        "nohup dockerd-entrypoint.sh &",
+        "until docker ps 2>&1 > /dev/null; do sleep 1s; done",
+        # create ocis logs dir
+        "mkdir -p %s && chmod 777 %s" % (log_dir, log_dir),
+        # create cluster
+        "k3d cluster create %s --api-port %s:33199 " % (name, name) +
+        "-p '80:80@loadbalancer' -p '443:443@loadbalancer' -p '8025:32025@loadbalancer' -p '9100-9399:30100-30399@loadbalancer' " +
+        "--k3s-arg '--tls-san=k3d@server:*' --k3s-arg '--disable=metrics-server@server:*' " +
+        "-v %s:/logs" % log_dir,
+        # wait for services to be ready
+        "until kubectl get deployment coredns -n kube-system -o go-template='{{.status.availableReplicas}}' | grep -v -e '<no value>'; do sleep 1s; done",
+        "until kubectl get deployment traefik -n kube-system -o go-template='{{.status.availableReplicas}}' | grep -v -e '<no value>'; do sleep 1s; done",
+        "k3d kubeconfig get %s > kubeconfig-$${DRONE_BUILD_NUMBER}-%s.yaml" % (name, name),
+        "chmod 0600 kubeconfig-$${DRONE_BUILD_NUMBER}-%s.yaml" % name,
+        "printf '@@@@@@@@@@@@@@@@@@@@@@@\\n@@@@ k3d is ready @@@@\\n@@@@@@@@@@@@@@@@@@@@@@@\\n'",
+        # add dns rewrite rule
+        "kubectl create configmap coredns-custom -n kube-system " +
+        "--from-literal='rewritehost.override=rewrite name exact %s host.k3d.internal'" % name,
+        "kubectl -n kube-system rollout restart deployment coredns",
+    ])
+
+    if ocm:
+        commands.extend([
+            # wait for peer
+            "echo 'Waiting for %s to be available...'" % peer_name,
+            "for i in {1..60}; do if getent hosts %s > /dev/null 2>&1; then break; fi; echo 'Waiting for %s... attempt '$i; sleep 2; done" % (peer_name, peer_name),
+            # get the IP of peer
+            "PEER_IP=$(getent hosts %s | awk '{ print $1 }')" % peer_name,
+            "echo \"%s IP: $PEER_IP\"" % peer_name,
+            # create namespace for ocis
+            "kubectl create namespace ocis --dry-run=client -o yaml | kubectl apply -f -",
+            # create service in the 'ocis' namespace
+            "cat <<EOF | kubectl apply -f -\napiVersion: v1\nkind: Service\nmetadata:\n  name: %s\n  namespace: ocis\nspec:\n  type: ClusterIP\n  clusterIP: None\n  ports:\n  - port: 443\n    protocol: TCP\n---\napiVersion: v1\nkind: Endpoints\nmetadata:\n  name: %s\n  namespace: ocis\nsubsets:\n- addresses:\n  - ip: $PEER_IP\n  ports:\n  - port: 443\n    protocol: TCP\nEOF" % (peer_name, peer_name),
+            # verify
+            "kubectl get svc %s -n ocis" % peer_name,
+            "kubectl get endpoints %s -n ocis" % peer_name,
+        ])
+
+    commands.extend([
+        "printf '@@@@@@@@@@@@@@@@@@@@@@@\\n@@@@ k3d is ready @@@@\\n@@@@@@@@@@@@@@@@@@@@@@@\\n'",
+        # watch events
+        "kubectl get events -Aw",
+    ])
+
     return [{
-        "name": OCIS_SERVER_NAME,
+        "name": name,
         "image": K3D_IMAGE,
         "user": "root",
         "privileged": True,
-        "commands": [
-            "git clone --single-branch --branch main --depth 1 https://github.com/owncloud/ocis-charts.git",
-            "nohup dockerd-entrypoint.sh &",
-            "until docker ps 2>&1 > /dev/null; do sleep 1s; done",
-            # create cluster
-            "k3d cluster create drone --api-port %s:33199 " % OCIS_SERVER_NAME +
-            "-p '80:80@loadbalancer' -p '443:443@loadbalancer' -p '9100-9399:30100-30399@loadbalancer' " +
-            "--k3s-arg '--tls-san=k3d@server:*' --k3s-arg '--disable=metrics-server@server:*'",
-            # wait for services to be ready
-            "until kubectl get deployment coredns -n kube-system -o go-template='{{.status.availableReplicas}}' | grep -v -e '<no value>'; do sleep 1s; done",
-            "until kubectl get deployment traefik -n kube-system -o go-template='{{.status.availableReplicas}}' | grep -v -e '<no value>'; do sleep 1s; done",
-            "k3d kubeconfig get drone > kubeconfig-$${DRONE_BUILD_NUMBER}.yaml",
-            "chmod 0600 kubeconfig-$${DRONE_BUILD_NUMBER}.yaml",
-            "printf '@@@@@@@@@@@@@@@@@@@@@@@\n@@@@ k3d is ready @@@@\n@@@@@@@@@@@@@@@@@@@@@@@\n'",
-            # add dns rewrite rule
-            "kubectl create configmap coredns-custom -n kube-system " +
-            "--from-literal='rewritehost.override=rewrite name exact %s host.k3d.internal'" % OCIS_SERVER_NAME,
-            "kubectl -n kube-system rollout restart deployment coredns",
-            # watch events
-            "kubectl get events -Aw",
-        ],
+        "commands": commands,
     }]
 
-def waitK3sCluster():
+def waitK3sCluster(name = OCIS_SERVER_NAME):
+    step_name = "wait-cluster-" + name
     return [{
-        "name": "wait-cluster",
+        "name": step_name,
         "image": K3D_IMAGE,
         "user": "root",
         "commands": [
-            "export KUBECONFIG=kubeconfig-$${DRONE_BUILD_NUMBER}.yaml",
+            "export KUBECONFIG=kubeconfig-$${DRONE_BUILD_NUMBER}-" + OCIS_SERVER_NAME + ".yaml",
             "timeout 300 bash -c 'until test -f $${KUBECONFIG}; do sleep 1; done'",
             "kubectl config view",
             "kubectl get pods -A",
@@ -3830,10 +4027,23 @@ def waitK3sCluster():
 
 def prepareOcisDeployment():
     commands = [
+        # build ocis wrapper
         "make -C %s build" % dirs["ocisWrapper"],
+        # get ocis charts
+        "if [ ! -d %s/ocis-charts ]; then git clone --single-branch -b main --depth 1 https://github.com/owncloud/ocis-charts.git; fi" % dirs["base"],
+        # move CI values file
         "mv %s/tests/config/drone/k8s/values.yaml %s/ocis-charts/charts/ocis/ci/deployment-values.yaml" % (dirs["base"], dirs["base"]),
+        # enable authbasic service
         "cp -r %s/tests/config/drone/k8s/authbasic %s/ocis-charts/charts/ocis/templates/" % (dirs["base"], dirs["base"]),
-        "cd %s/ocis-charts" % dirs["base"],
+        # copy override template
+        "cp tests/config/drone/k8s/_zoverride.tpl ocis-charts/charts/ocis/templates/_common/",
+        "cd ocis-charts",
+        # patch activitylog service
+        "sed -i '/env:/a\\\\{{- include \"ocis.caEnv\" $ | nindent 12}}' ./charts/ocis/templates/activitylog/deployment.yaml",
+        "sed -i '/volumeMounts:/a\\\\{{- include \"ocis.caPath\" $ | nindent 12}}' ./charts/ocis/templates/activitylog/deployment.yaml",
+        "sed -i '/volumes:/a\\\\{{- include \"ocis.caVolume\" $ | nindent 8}}' ./charts/ocis/templates/activitylog/deployment.yaml",
+        # disable audit logs in console
+        "sed -i '/AUDIT_LOG_TO_CONSOLE/{n;s/true/false/;}' ./charts/ocis/templates/audit/deployment.yaml",
         "sed -i '/{{- define \"ocis.basicServiceTemplates\" -}}/a\\\\  {{- $_ := set .scope \"appNameAuthBasic\" \"authbasic\" -}}' ./charts/ocis/templates/_common/_tplvalues.tpl",
         "sed -i '/- name: IDM_ADMIN_PASSWORD/{n;N;N;N;d;}' ./charts/ocis/templates/idm/deployment.yaml",
         "sed -i '/- name: IDM_ADMIN_PASSWORD/a\\\\\\n              value: \"admin\"' ./charts/ocis/templates/idm/deployment.yaml",
@@ -3851,11 +4061,13 @@ def prepareOcisDeployment():
         "sed -i '/- name: THUMBNAILS_TRANSFER_TOKEN/i\\\\            - name: THUMBNAILS_TXT_FONTMAP_FILE\\\n              value: /etc/ocis/fontsMap.json\\\n' ./charts/ocis/templates/thumbnails/deployment.yaml",
         "sed -i '/volumeMounts:/a\\\\            - name: ocis-fonts-ttf\\\n              mountPath: /etc/ocis/fonts\\\n            - name: ocis-fonts-map\\\n              mountPath: /etc/ocis/fontsMap.json\\\n              subPath: fontsMap.json' ./charts/ocis/templates/thumbnails/deployment.yaml",
         "sed -i '/volumes:/a\\\\        - name: ocis-fonts-ttf\\\n          configMap:\\\n            name: ocis-fonts-ttf\\\n        - name: ocis-fonts-map\\\n          configMap:\\\n            name: ocis-fonts-map' ./charts/ocis/templates/thumbnails/deployment.yaml",
+        "sed -i -E 's|value: http:\\\\/\\\\/.*:9300|value: {{ $officeSuite.wopiSrc }}|' ./charts/ocis/templates/collaboration/deployment.yaml",
+        "cat ./charts/ocis/templates/collaboration/deployment.yaml",
     ]
 
     return [{
         "name": "prepare-ocis-deployment",
-        "image": "owncloudci/golang:1.25",
+        "image": OC_CI_GOLANG,
         "commands": commands,
         "volumes": [
             {
@@ -3865,9 +4077,11 @@ def prepareOcisDeployment():
         ],
     }]
 
-def setupOcisConfigMaps():
+def setupOcisConfigMaps(name = OCIS_SERVER_NAME):
+    step_name = "setup-configmaps-" + name
+
     commands = [
-        "export KUBECONFIG=%s/kubeconfig-$${DRONE_BUILD_NUMBER}.yaml" % dirs["base"],
+        "export KUBECONFIG=%s/kubeconfig-$${DRONE_BUILD_NUMBER}-%s.yaml" % (dirs["base"], name),
         # Create namespace for oCIS deployment
         "kubectl create namespace ocis || true",
         "kubectl create configmap -n ocis sharing-banned-passwords --from-file=banned-password-list.txt=%s/tests/config/drone/banned-password-list.txt" % dirs["base"],
@@ -3878,26 +4092,52 @@ def setupOcisConfigMaps():
     ]
 
     return [{
-        "name": "setup-configmaps",
+        "name": step_name,
         "image": K3D_IMAGE,
         "user": "root",
         "commands": commands,
     }]
 
-def deployOcis():
+def deployOcis(name = OCIS_SERVER_NAME):
+    step_name = "deploy-" + name
+
+    commands = [
+        "export KUBECONFIG=%s/kubeconfig-$${DRONE_BUILD_NUMBER}-%s.yaml" % (dirs["base"], name),
+        "cd %s/ocis-charts" % dirs["base"],
+    ]
+
+    if name == FED_OCIS_SERVER_NAME:
+        commands.extend([
+            "sed -i 's|externalDomain: ocis-server|externalDomain: %s|' ./charts/ocis/ci/deployment-values.yaml" % FED_OCIS_SERVER_NAME,
+        ])
+
+    commands.extend([
+        # [NOTE]
+        # Remove schema validation to add extra configs in values.yaml.
+        # Also this allows us to use fakeoffice as web-office server
+        "rm ./charts/ocis/values.schema.json",
+        "make helm-install-atomic",
+    ])
     return [{
-        "name": "deploy-ocis",
-        "image": "owncloudci/golang:1.25",
-        "commands": [
-            "export KUBECONFIG=%s/kubeconfig-$${DRONE_BUILD_NUMBER}.yaml" % dirs["base"],
-            "cd %s/ocis-charts" % dirs["base"],
-            "make helm-install-atomic",
-        ],
+        "name": step_name,
+        "image": OC_CI_GOLANG,
+        "commands": commands,
         "volumes": [
             {
                 "name": "gopath",
                 "path": "/go",
             },
+        ],
+    }]
+
+def streamK8sOcisLogs(name = OCIS_SERVER_NAME):
+    return [{
+        "name": "%s-logs" % name,
+        "image": OC_CI_ALPINE,
+        "detach": True,
+        "commands": [
+            "until test -f logs-%s/ocis.log; do sleep 10s; done" % name,
+            "tail -f logs-%s/ocis.log" % name,
         ],
     }]
 
@@ -3907,13 +4147,22 @@ def enableAntivirusServiceK8s():
         "image": OC_CI_ALPINE,
         "commands": [
             "cp -r %s/tests/config/drone/k8s/clamav %s/ocis-charts/charts/ocis/templates/" % (dirs["base"], dirs["base"]),
-            "sed -i '/^  virusscan:/,/^ *[^ ]/ s/enabled: .*/enabled: true/' %s/tests/config/drone/k8s/values.yaml" % dirs["base"],
+            "sed -i '/^  virusscan:/,/^ *[^ ]/ s/enabled: .*/enabled: true/' %s/ocis-charts/charts/ocis/ci/deployment-values.yaml" % dirs["base"],
             "sed -i '/name: ANTIVIRUS_SCANNER_TYPE/{n;s/value: *\"icap\"/value: \"clamav\"/}' %s/ocis-charts/charts/ocis/templates/antivirus/deployment.yaml" % dirs["base"],
             "sed -i '/- name: ANTIVIRUS_SCANNER_TYPE/i\\\\            - name: ANTIVIRUS_CLAMAV_SOCKET\\\n              value: \"tcp://clamav:3310\"' %s/ocis-charts/charts/ocis/templates/antivirus/deployment.yaml" % dirs["base"],
         ],
     }]
 
-def emailServiceK8s():
+def enableAppsIntegrationK8s():
+    return [{
+        "name": "enable-apps-integration",
+        "image": OC_CI_ALPINE,
+        "commands": [
+            "sed -i '/^  appsIntegration:/,/^ *[^ ]/ s/enabled: .*/enabled: true/' %s/ocis-charts/charts/ocis/ci/deployment-values.yaml" % dirs["base"],
+        ],
+    }]
+
+def enableEmailServiceK8s():
     return [{
         "name": "copy-%s-service" % EMAIL_SMTP_HOST,
         "image": OC_CI_ALPINE,
@@ -3922,23 +4171,25 @@ def emailServiceK8s():
         ],
     }]
 
-def exposeEmailServiceK8s():
+def exposeEmailServiceK8s(name = OCIS_SERVER_NAME):
     return [{
         "name": EMAIL_SMTP_HOST,
         "image": K3D_IMAGE,
         "commands": [
-            "kubectl port-forward svc/mailpit %s:%s -n ocis" % (EMAIL_PORT, EMAIL_PORT),
-            "kubectl port-forward svc/mailpit 9174:9174 -n ocis",
+            "export KUBECONFIG=%s/kubeconfig-$${DRONE_BUILD_NUMBER}-%s.yaml" % (dirs["base"], name),
+            "until test -f $${KUBECONFIG}; do sleep 1s; done",
+            "kubectl -n ocis expose deployment mailpit --type=NodePort --port=8025 --name=mailpit-np",
+            "kubectl -n ocis patch svc mailpit-np -p '{\"spec\":{\"ports\":[{\"port\":8025,\"nodePort\":32025,\"targetPort\":8025}]}}'",
         ],
         "detach": True,
     }]
 
-def exposeAntivirusServiceK8s():
+def exposeAntivirusServiceK8s(name = OCIS_SERVER_NAME):
     return [{
         "name": "expose-antivirus-service",
         "image": K3D_IMAGE,
         "commands": [
-            "export KUBECONFIG=kubeconfig-$${DRONE_BUILD_NUMBER}.yaml",
+            "export KUBECONFIG=kubeconfig-$${DRONE_BUILD_NUMBER}-%s.yaml" % name,
             "until test -f $${KUBECONFIG}; do sleep 1s; done",
             # expose antivirus service via NodePort
             "kubectl -n ocis expose deployment antivirus --type=NodePort --port=9277 --name=antivirus-np",
@@ -3946,36 +4197,27 @@ def exposeAntivirusServiceK8s():
         ],
     }]
 
-def ociswrapper():
+def ociswrapperK8s(name = OCIS_SERVER_NAME, ocis_url = OCIS_URL_K8S):
     return [{
         "name": "ociswrapper",
         "image": K3D_IMAGE,
-        "user": "root",
-        "commands": [
-            "export KUBECONFIG=kubeconfig-$${DRONE_BUILD_NUMBER}.yaml",
-            "until test -f $${KUBECONFIG}; do sleep 1s; done",
-            "kubectl get pods -A",
-            "kubectl get ingress -A",
-            "kubectl describe pods $(kubectl get pods -n ocis -l app=antivirus -o jsonpath=\"{.items[0].metadata.name}\") -n ocis",
-            "kubectl describe pods $(kubectl get pods -n ocis -l app=postprocessing -o jsonpath=\"{.items[0].metadata.name}\") -n ocis",
-            "%s/bin/ociswrapper serve --url https://%s --admin-username admin --admin-password admin --skip-ocis-run" % (dirs["ocisWrapper"], OCIS_SERVER_NAME),
-        ],
         "detach": True,
-    }]
-
-def waitForOciswrapper(url = "http://ociswrapper:5200", depends_on = []):
-    return [{
+        "commands": [
+            "export KUBECONFIG=kubeconfig-$${DRONE_BUILD_NUMBER}-%s.yaml" % name,
+            "until test -f $${KUBECONFIG}; do sleep 1s; done",
+            "%s/bin/ociswrapper serve --url %s --admin-username admin --admin-password admin --skip-ocis-run" % (dirs["ocisWrapper"], ocis_url),
+        ],
+    }, {
         "name": "wait-for-wrapper",
         "image": OC_CI_ALPINE,
         "commands": [
             "timeout 60 bash -c 'while [ $(curl -sk " +
-            "%s " % url +
+            "http://ociswrapper:5200 " +
             "-w %{http_code} -o /dev/null) != 404 ]; do sleep 1; done'",
         ],
-        "depends_on": depends_on,
     }]
 
-def tikaServiceK8s():
+def enableTikaServiceK8s():
     return [{
         "name": "tika",
         "type": "docker",
@@ -3983,6 +4225,49 @@ def tikaServiceK8s():
         "commands": [
             "until test -f %s/ocis-charts/charts/ocis/templates/search/deployment.yaml; do sleep 1s; done" % dirs["base"],
             "cp -r %s/tests/config/drone/k8s/tika %s/ocis-charts/charts/ocis/templates/" % (dirs["base"], dirs["base"]),
-            "sed -i '/^[[:space:]]*storagesystem:/i\\\\  search:\\\n    extractor:\\\n      type: \"tika\"\\\n      tika:\\\n        url: \"http://tika:9998\"\\\n    persistence:\\\n      enabled: true\\\n      accessModes:\\\n        - ReadWriteOnce' %s/tests/config/drone/k8s/values.yaml" % dirs["base"],
+            "sed -i '/^[[:space:]]*storagesystem:/i\\\\  search:\\\n    extractor:\\\n      type: \"tika\"\\\n      tika:\\\n        url: \"http://tika:9998\"\\\n    persistence:\\\n      enabled: true\\\n      accessModes:\\\n        - ReadWriteOnce' %s/ocis-charts/charts/ocis/ci/deployment-values.yaml" % dirs["base"],
         ],
+    }]
+
+def exposeNodePortsK8s(services = [], name = OCIS_SERVER_NAME):
+    commands = []
+    for idx, service in enumerate(services):
+        deploy_name = service[0]
+        service_port = str(service[1])
+        node_port = service_port.replace("9", "30", 1)
+
+        # there can be multiple collaboration services
+        if service_port == "9300" and "collaboration" in deploy_name:
+            node_port = "3030%d" % idx
+        service_name = "%s-%s-np" % (deploy_name, node_port)
+        commands.append("kubectl -n ocis expose deployment %s --type=NodePort --port=%s --name=%s" % (deploy_name, service_port, service_name))
+        commands.append("kubectl -n ocis patch svc %s -p '{\"spec\":{\"ports\":[{\"port\":%s,\"nodePort\":%s}]}}'" % (service_name, service_port, node_port))
+
+    return [{
+        "name": "expose-nodeports",
+        "image": K3D_IMAGE,
+        "commands": [
+            "export KUBECONFIG=kubeconfig-$${DRONE_BUILD_NUMBER}-%s.yaml" % name,
+            "until test -f $${KUBECONFIG}; do sleep 1s; done",
+        ] + commands,
+    }]
+
+def exposeExternalServersK8s(servers = [], name = OCIS_SERVER_NAME):
+    commands = []
+    for server in servers:
+        server_name = server[0]
+        server_port = str(server[1])
+        commands.append("SERVER_IP=$(getent hosts %s | awk '{print $1}')" % server_name)
+        commands.append('echo -e "apiVersion: v1\nkind: Endpoints\nmetadata:\n  name: %s\n  namespace: ocis\n' % server_name +
+                        'subsets:\n- addresses:\n  - ip: $SERVER_IP\n  ports:\n  - port: %s" | kubectl apply -f -' % server_port)
+        commands.append('echo -e "apiVersion: v1\nkind: Service\nmetadata:\n  name: %s\n  namespace: ocis\n' % server_name +
+                        'spec:\n  ports:\n  - port: %s\n    targetPort: %s" | kubectl apply -f -' % (server_port, server_port))
+
+    return [{
+        "name": "expose-external-servers",
+        "image": K3D_IMAGE,
+        "commands": [
+            "export KUBECONFIG=kubeconfig-$${DRONE_BUILD_NUMBER}-%s.yaml" % name,
+            "until test -f $${KUBECONFIG}; do sleep 1s; done",
+        ] + commands,
     }]

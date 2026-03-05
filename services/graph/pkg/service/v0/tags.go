@@ -1,9 +1,11 @@
 package svc
 
 import (
+	"context"
 	"net/http"
 	"strings"
 
+	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/go-chi/render"
@@ -216,37 +218,72 @@ func (g Graph) UnassignTags(w http.ResponseWriter, r *http.Request) {
 	}
 
 	allTags := tags.New(currentTags)
-	if !allTags.Remove(unassignment.Tags...) {
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "no new tags in createtagsrequest or maximum reached")
-		return
+	tagsChanged := allTags.Remove(unassignment.Tags...)
+	if tagsChanged {
+		// Tags were present in metadata — update the file.
+		resp, err := client.SetArbitraryMetadata(ctx, &provider.SetArbitraryMetadataRequest{
+			Ref: &provider.Reference{ResourceId: &rid},
+			ArbitraryMetadata: &provider.ArbitraryMetadata{
+				Metadata: map[string]string{
+					"tags": allTags.AsList(),
+				},
+			},
+		})
+		if err != nil || resp.GetStatus().GetCode() != rpc.Code_CODE_OK {
+			g.logger.Error().Err(err).Msg("error setting tags")
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
 	}
 
-	resp, err := client.SetArbitraryMetadata(ctx, &provider.SetArbitraryMetadataRequest{
-		Ref: &provider.Reference{ResourceId: &rid},
-		ArbitraryMetadata: &provider.ArbitraryMetadata{
-			Metadata: map[string]string{
-				"tags": allTags.AsList(),
-			},
+	// Always publish the event so the search index gets updated,
+	// even if the tag was already absent from file metadata.
+	ev := events.TagsRemoved{
+		Tags: strings.Join(unassignment.Tags, ","),
+		Ref: &provider.Reference{
+			ResourceId: &rid,
+			Path:       ".",
 		},
-	})
-	if err != nil || resp.GetStatus().GetCode() != rpc.Code_CODE_OK {
-		g.logger.Error().Err(err).Msg("error setting tags")
+		SpaceOwner: sres.Info.Owner,
+		Executant:  revaCtx.ContextMustGetUser(ctx).Id,
+	}
+	if g.publishTagsRemoved(ctx, client, ev, tagsChanged, currentTags) != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+}
 
-	if g.eventsPublisher != nil {
-		ev := events.TagsRemoved{
-			Tags: strings.Join(unassignment.Tags, ","),
-			Ref: &provider.Reference{
-				ResourceId: &rid,
-				Path:       ".",
-			},
-			SpaceOwner: sres.Info.Owner,
-			Executant:  revaCtx.ContextMustGetUser(r.Context()).Id,
-		}
-		if err := events.Publish(ctx, g.eventsPublisher, ev); err != nil {
-			g.logger.Error().Err(err).Msg("Failed to publish TagsAdded event")
-		}
+// publishTagsRemoved publishes a TagsRemoved event and rolls back the metadata
+// change if publishing fails. Returns nil on success or if no publisher is configured.
+func (g Graph) publishTagsRemoved(ctx context.Context, client gateway.GatewayAPIClient, ev events.TagsRemoved, tagsChanged bool, previousTags string) error {
+	if g.eventsPublisher == nil {
+		return nil
 	}
+
+	if err := events.Publish(ctx, g.eventsPublisher, ev); err != nil {
+		g.logger.Error().Err(err).Msg("Failed to publish TagsRemoved event")
+
+		// Try to rollback the metadata change so we don't leave the
+		// system in an inconsistent state (metadata updated but search
+		// index not notified).
+		// NOTE: this rollback is not atomic — another request could
+		// modify the tags between our SetArbitraryMetadata and this
+		// restore. A proper fix would require locking the resource.
+		if tagsChanged {
+			if _, rollbackErr := client.SetArbitraryMetadata(ctx, &provider.SetArbitraryMetadataRequest{
+				Ref: ev.Ref,
+				ArbitraryMetadata: &provider.ArbitraryMetadata{
+					Metadata: map[string]string{
+						"tags": previousTags,
+					},
+				},
+			}); rollbackErr != nil {
+				g.logger.Error().Err(rollbackErr).Msg("failed to rollback tags after publish failure")
+			}
+		}
+
+		return err
+	}
+
+	return nil
 }

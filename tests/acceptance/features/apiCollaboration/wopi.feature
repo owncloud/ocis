@@ -27,7 +27,7 @@ Feature: collaboration (wopi)
         "properties": {
           "app_url": {
             "type": "string",
-            "pattern": "^.*\\?WOPISrc=.*wopi%2Ffiles%2F[a-fA-F0-9]{64}$"
+            "pattern": "^.*\\?WOPISrc=.*wopi%2Ffiles%2F[a-fA-F0-9]{64}"
           },
           "method": {
             "const": "POST"
@@ -73,7 +73,7 @@ Feature: collaboration (wopi)
         "properties": {
           "app_url": {
             "type": "string",
-            "pattern": "^.*\\?WOPISrc=.*wopi%2Ffiles%2F[a-fA-F0-9]{64}$"
+            "pattern": "^.*\\?WOPISrc=.*wopi%2Ffiles%2F[a-fA-F0-9]{64}"
           },
           "method": {
             "const": "POST"
@@ -115,7 +115,7 @@ Feature: collaboration (wopi)
         "properties": {
           "app_url": {
             "type": "string",
-            "pattern": "^.*\\?WOPISrc=.*wopi%2Ffiles%2F[a-fA-F0-9]{64}$"
+            "pattern": "^.*\\?WOPISrc=.*wopi%2Ffiles%2F[a-fA-F0-9]{64}"
           },
           "method": {
             "const": "POST"
@@ -163,7 +163,7 @@ Feature: collaboration (wopi)
         "properties": {
           "app_url": {
             "type": "string",
-            "pattern": "^.*\\?WOPISrc=.*wopi%2Ffiles%2F[a-fA-F0-9]{64}$"
+            "pattern": "^.*\\?WOPISrc=.*wopi%2Ffiles%2F[a-fA-F0-9]{64}"
           },
           "method": {
             "const": "POST"
@@ -214,7 +214,7 @@ Feature: collaboration (wopi)
         "properties": {
           "app_url": {
             "type": "string",
-            "pattern": "^.*\\?WOPISrc=.*wopi%2Ffiles%2F[a-fA-F0-9]{64}$"
+            "pattern": "^.*\\?WOPISrc=.*wopi%2Ffiles%2F[a-fA-F0-9]{64}"
           },
           "method": {
             "const": "POST"
@@ -315,7 +315,7 @@ Feature: collaboration (wopi)
         "properties": {
           "app_url": {
             "type": "string",
-            "pattern": "^.*\\?WOPISrc=.*wopi%2Ffiles%2F[a-fA-F0-9]{64}$"
+            "pattern": "^.*\\?WOPISrc=.*wopi%2Ffiles%2F[a-fA-F0-9]{64}"
           },
           "method": {
             "const": "POST"
@@ -366,9 +366,9 @@ Feature: collaboration (wopi)
       }
       """
     Examples:
-      | app-endpoint                                              | url-query       |
-      | /app/open-with-web?file_id=<<FILEID>>&app_name=FakeOffice | app=FakeOffice& |
-      | /app/open-with-web?file_id=<<FILEID>>                     | app=FakeOffice& |
+      | app-endpoint                                              | url-query                                |
+      | /app/open-with-web?file_id=<<FILEID>>&app_name=FakeOffice | app=FakeOffice&                          |
+      | /app/open-with-web?file_id=<<FILEID>>                     | app=(FakeOffice\|Collabora\|OnlyOffice)& |
 
 
   Scenario: open text file using open-with-web with app name in url query (MIME type not registered in app-registry)
@@ -408,7 +408,7 @@ Feature: collaboration (wopi)
         "properties": {
           "uri": {
             "type": "string",
-             "pattern": "%base_url%/external\\?app=FakeOffice&contextRouteName=files-spaces-personal&fileId=%uuidv4_pattern%%24%uuidv4_pattern%%21%uuidv4_pattern%$"
+             "pattern": "%base_url%/external\\?app=(FakeOffice|Collabora|OnlyOffice)&contextRouteName=files-spaces-personal&fileId=%uuidv4_pattern%%24%uuidv4_pattern%%21%uuidv4_pattern%$"
           }
         }
       }
@@ -441,9 +441,9 @@ Feature: collaboration (wopi)
       }
       """
     Examples:
-      | app-endpoint                                              | url-query       |
-      | /app/open-with-web?file_id=<<FILEID>>&app_name=FakeOffice | app=FakeOffice& |
-      | /app/open-with-web?file_id=<<FILEID>>                     | app=FakeOffice& |
+      | app-endpoint                                              | url-query                                |
+      | /app/open-with-web?file_id=<<FILEID>>&app_name=FakeOffice | app=FakeOffice&                          |
+      | /app/open-with-web?file_id=<<FILEID>>                     | app=(FakeOffice\|Collabora\|OnlyOffice)& |
 
 
   Scenario Outline: sharee open file with .odt extension (open-with-web)
@@ -473,9 +473,9 @@ Feature: collaboration (wopi)
       }
       """
     Examples:
-      | app-endpoint                                              | url-query       |
-      | /app/open-with-web?file_id=<<FILEID>>&app_name=FakeOffice | app=FakeOffice& |
-      | /app/open-with-web?file_id=<<FILEID>>                     | app=FakeOffice& |
+      | app-endpoint                                              | url-query                                |
+      | /app/open-with-web?file_id=<<FILEID>>&app_name=FakeOffice | app=FakeOffice&                          |
+      | /app/open-with-web?file_id=<<FILEID>>                     | app=(FakeOffice\|Collabora\|OnlyOffice)& |
 
 
   Scenario Outline: open file with .odt extension with different view mode (open-with-web)
@@ -1108,7 +1108,7 @@ Feature: collaboration (wopi)
         "properties": {
           "app_url": {
             "type": "string",
-            "pattern": "^.*\\?WOPISrc=.*wopi%2Ffiles%2F[a-fA-F0-9]{64}$"
+            "pattern": "^.*\\?WOPISrc=.*wopi%2Ffiles%2F[a-fA-F0-9]{64}"
           },
           "method": {
             "const": "POST"

@@ -3,6 +3,7 @@ package content
 import (
 	"context"
 	"fmt"
+	"io"
 	"math"
 	"strconv"
 	"strings"
@@ -62,11 +63,6 @@ func (t Tika) Extract(ctx context.Context, ri *provider.ResourceInfo) (Document,
 		return doc, nil
 	}
 
-	if ri.Size > t.ContentExtractionSizeLimit {
-		t.logger.Info().Interface("ResourceID", ri.Id).Str("Name", ri.Name).Msg("file exceeds content extraction size limit. skipping.")
-		return doc, nil
-	}
-
 	if ri.Type != provider.ResourceType_RESOURCE_TYPE_FILE {
 		return doc, nil
 	}
@@ -77,7 +73,12 @@ func (t Tika) Extract(ctx context.Context, ri *provider.ResourceInfo) (Document,
 	}
 	defer data.Close()
 
-	metas, err := t.tika.MetaRecursive(ctx, data)
+	var reader io.Reader = data
+	if ri.Size > t.ContentExtractionSizeLimit {
+		reader = io.LimitReader(data, int64(t.ContentExtractionSizeLimit)) //nolint:gosec // ContentExtractionSizeLimit is a config value, never exceeds int64 max
+	}
+
+	metas, err := t.tika.MetaRecursive(ctx, reader)
 	if err != nil {
 		return doc, err
 	}
@@ -200,8 +201,12 @@ func (t Tika) getPhoto(meta map[string][]string) *libregraph.Photo {
 		}
 	}
 
-	if v, err := getFirstValue(meta, "Base ISO"); err == nil {
-		if i, err := strconv.ParseInt(v, 0, 32); err == nil {
+	isoStr, err := getFirstValue(meta, "exif:IsoSpeedRatings")
+	if err != nil {
+		isoStr, err = getFirstValue(meta, "Base ISO")
+	}
+	if err == nil {
+		if i, err := strconv.ParseInt(isoStr, 0, 32); err == nil {
 			initPhoto()
 			photo.SetIso(int32(i))
 		}

@@ -39,8 +39,8 @@
 * [Changelog for 3.0.0](#changelog-for-300-2023-06-06)
 * [Changelog for 2.0.0](#changelog-for-200-2022-11-30)
 * [Changelog for 1.20.0](#changelog-for-1200-2022-04-13)
-* [Changelog for 1.19.1](#changelog-for-1191-2022-03-29)
 * [Changelog for 1.19.0](#changelog-for-1190-2022-03-29)
+* [Changelog for 1.19.1](#changelog-for-1191-2022-03-29)
 * [Changelog for 1.18.0](#changelog-for-1180-2022-03-03)
 * [Changelog for 1.17.0](#changelog-for-1170-2022-02-16)
 * [Changelog for 1.16.0](#changelog-for-1160-2021-12-10)
@@ -70,14 +70,18 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Fix postprocessing resume command --restart flag: [#11692](https://github.com/owncloud/ocis/issues/11692)
+* Bugfix - Don't use hardcoded groupOfNames in group creation: [#11776](https://github.com/owncloud/ocis/pull/11776)
 * Bugfix - Translation for some email notifications: [#11979](https://github.com/owncloud/ocis/pull/11979)
 * Bugfix - Rework monitoring in the ocis_full deployment example: [#11995](https://github.com/owncloud/ocis/pull/11995)
+* Bugfix - Extract metadata from oversized files and fix ISO field: [#12000](https://github.com/owncloud/ocis/pull/12000)
+* Bugfix - Make tag unassignment idempotent and handle publish failures: [#12001](https://github.com/owncloud/ocis/pull/12001)
 * Bugfix - Expose the signature-auth attribute: [#12016](https://github.com/owncloud/ocis/pull/12016)
 * Enhancement - Add web extensions deployment configuration: [#11940](https://github.com/owncloud/ocis/pull/11940)
 * Enhancement - Add AI-assisted development guide: [#11941](https://github.com/owncloud/ocis/pull/11941)
 * Enhancement - Bump Web to 12.3.1: [#12015](https://github.com/owncloud/ocis/pull/12015)
 * Enhancement - Add space ID to incoming shares: [#12024](https://github.com/owncloud/ocis/pull/12024)
 * Enhancement - Add spaceid to REPORT: [#12028](https://github.com/owncloud/ocis/pull/12028)
+* Enhancement - Bump Reva version: [#12051](https://github.com/owncloud/ocis/pull/12051)
 
 ## Details
 
@@ -89,6 +93,14 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/11692
    https://github.com/owncloud/ocis/pull/12002
+
+* Bugfix - Don't use hardcoded groupOfNames in group creation: [#11776](https://github.com/owncloud/ocis/pull/11776)
+
+   Formerly, when creating a group with a different objectClass, it will always use
+   groupOfNames instead of the one provided in the config. Now, the server creates
+   groups using the objectClass defined in the config.
+
+   https://github.com/owncloud/ocis/pull/11776
 
 * Bugfix - Translation for some email notifications: [#11979](https://github.com/owncloud/ocis/pull/11979)
 
@@ -110,6 +122,37 @@ The following sections list the changes for unreleased.
    now to guarantee nothing gets overwritten by accident
 
    https://github.com/owncloud/ocis/pull/11995
+
+* Bugfix - Extract metadata from oversized files and fix ISO field: [#12000](https://github.com/owncloud/ocis/pull/12000)
+
+   Two issues were found in the Tika content extractor:
+
+   1. Files exceeding `SEARCH_CONTENT_EXTRACTION_SIZE_LIMIT` (default 20MB) were
+   skipped entirely — no EXIF, no photo metadata, no image dimensions were
+   extracted. This particularly affected Pixel Motion Photos (`.MP.jpg`) which
+   embed an MP4 video making them 3-9MB. Since EXIF metadata lives in the JPEG
+   header (first few KB), a truncated stream is sufficient. The extractor now wraps
+   the download in `io.LimitReader` instead of skipping Tika, sending only the
+   first N bytes for metadata extraction.
+
+   2. The ISO speed field was read from `"Base ISO"`, a Canon-specific Tika field
+   (sensor base sensitivity). Most cameras — Pixel, iPhone, Samsung — provide
+   ISO via the standard `"exif:IsoSpeedRatings"` field. The extractor now checks
+   `exif:IsoSpeedRatings` first and falls back to `Base ISO` for Canon
+   compatibility.
+
+   https://github.com/owncloud/ocis/pull/12000
+
+* Bugfix - Make tag unassignment idempotent and handle publish failures: [#12001](https://github.com/owncloud/ocis/pull/12001)
+
+   The DELETE tags endpoint now returns success when the requested tag is already
+   absent from the file's metadata, instead of returning HTTP 400 with a misleading
+   error message. The TagsRemoved event is always published so the search index
+   stays in sync even when file metadata and the search index are out of sync. If
+   event publishing fails, the metadata change is rolled back and HTTP 500 is
+   returned to avoid leaving the system in an inconsistent state.
+
+   https://github.com/owncloud/ocis/pull/12001
 
 * Bugfix - Expose the signature-auth attribute: [#12016](https://github.com/owncloud/ocis/pull/12016)
 
@@ -162,6 +205,12 @@ The following sections list the changes for unreleased.
    method with the `PROPFIND` method.
 
    https://github.com/owncloud/ocis/pull/12028
+
+* Enhancement - Bump Reva version: [#12051](https://github.com/owncloud/ocis/pull/12051)
+
+   Bumped reva version
+
+   https://github.com/owncloud/ocis/pull/12051
 
 # Changelog for [8.0.0] (2026-02-13)
 
@@ -12536,7 +12585,7 @@ The following sections list the changes for 2.0.0.
 
 The following sections list the changes for 1.20.0.
 
-[1.20.0]: https://github.com/owncloud/ocis/compare/v1.19.1...v1.20.0
+[1.20.0]: https://github.com/owncloud/ocis/compare/v1.19.0...v1.20.0
 
 ## Summary
 
@@ -12710,29 +12759,11 @@ The following sections list the changes for 1.20.0.
    https://github.com/owncloud/ocis/pull/3509
    https://github.com/owncloud/web/releases/tag/v5.4.0
 
-# Changelog for [1.19.1] (2022-03-29)
-
-The following sections list the changes for 1.19.1.
-
-[1.19.1]: https://github.com/owncloud/ocis/compare/v1.19.0...v1.19.1
-
-## Summary
-
-* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
-
-## Details
-
-* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
-
-   URLs for Special items (space image, readme) were broken.
-
-   https://github.com/owncloud/ocis/pull/3419
-
 # Changelog for [1.19.0] (2022-03-29)
 
 The following sections list the changes for 1.19.0.
 
-[1.19.0]: https://github.com/owncloud/ocis/compare/v1.18.0...v1.19.0
+[1.19.0]: https://github.com/owncloud/ocis/compare/v1.19.1...v1.19.0
 
 ## Summary
 
@@ -12905,6 +12936,24 @@ The following sections list the changes for 1.19.0.
    https://github.com/owncloud/ocis/pull/3291
    https://github.com/owncloud/ocis/pull/3375
    https://github.com/owncloud/web/releases/tag/v5.3.0
+
+# Changelog for [1.19.1] (2022-03-29)
+
+The following sections list the changes for 1.19.1.
+
+[1.19.1]: https://github.com/owncloud/ocis/compare/v1.18.0...v1.19.1
+
+## Summary
+
+* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
+
+## Details
+
+* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
+
+   URLs for Special items (space image, readme) were broken.
+
+   https://github.com/owncloud/ocis/pull/3419
 
 # Changelog for [1.18.0] (2022-03-03)
 
