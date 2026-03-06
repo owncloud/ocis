@@ -2,6 +2,7 @@ package search
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"path/filepath"
 	"slices"
@@ -21,6 +22,7 @@ import (
 	sdk "github.com/owncloud/reva/v2/pkg/sdk/common"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/walker"
 	"github.com/owncloud/reva/v2/pkg/storagespace"
+	"github.com/owncloud/reva/v2/pkg/tags"
 	"github.com/owncloud/reva/v2/pkg/utils"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
@@ -58,6 +60,7 @@ type Searcher interface {
 	IndexSpace(rID *provider.StorageSpaceId) error
 	TrashItem(rID *provider.ResourceId)
 	UpsertItem(ref *provider.Reference)
+	UpdateTags(ref *provider.Reference)
 	RestoreItem(ref *provider.Reference)
 	MoveItem(ref *provider.Reference)
 }
@@ -513,6 +516,8 @@ func (s *Service) UpsertItem(ref *provider.Reference) {
 		}
 	}
 
+	resourceID := storagespace.FormatResourceID(stat.Info.Id)
+
 	doc, err := s.extractor.Extract(ctx, stat.Info)
 	if err != nil {
 		s.logger.Error().Err(err).Msg("failed to extract resource content")
@@ -520,7 +525,7 @@ func (s *Service) UpsertItem(ref *provider.Reference) {
 	}
 
 	r := engine.Resource{
-		ID: storagespace.FormatResourceID(stat.Info.Id),
+		ID: resourceID,
 		RootID: storagespace.FormatResourceID(&provider.ResourceId{
 			StorageId: stat.Info.Id.StorageId,
 			OpaqueId:  stat.Info.Id.SpaceId,
@@ -542,7 +547,13 @@ func (s *Service) UpsertItem(ref *provider.Reference) {
 		logDocCount(s.engine, s.logger)
 	}
 
-	// determine if metadata needs to be stored in storage as well
+	s.storeExtractedMetadata(ctx, ref, doc)
+}
+
+// storeExtractedMetadata persists Tika-extracted audio, image, location, and
+// photo metadata back to the storage provider so it is available outside the
+// search index.
+func (s *Service) storeExtractedMetadata(ctx context.Context, ref *provider.Reference, doc content.Document) {
 	metadata := map[string]string{}
 	addAudioMetadata(metadata, doc.Audio)
 	addImageMetadata(metadata, doc.Image)
@@ -568,8 +579,44 @@ func (s *Service) UpsertItem(ref *provider.Reference) {
 	})
 	if err != nil || resp.GetStatus().GetCode() != rpc.Code_CODE_OK {
 		s.logger.Error().Err(err).Int32("status", int32(resp.GetStatus().GetCode())).Msg("error storing metadata")
+	}
+}
+
+// UpdateTags updates only the tags of an already-indexed resource without
+// triggering a full content re-extraction via Tika. If the resource is not
+// yet in the index it falls back to a full UpsertItem.
+func (s *Service) UpdateTags(ref *provider.Reference) {
+	_, stat, _ := s.resInfo(ref)
+	if stat == nil {
 		return
 	}
+
+	resourceID := storagespace.FormatResourceID(stat.Info.Id)
+
+	// Read the current tags from ArbitraryMetadata.
+	var newTags []string
+	if m := stat.Info.ArbitraryMetadata.GetMetadata(); m != nil {
+		if t, ok := m["tags"]; ok {
+			newTags = tags.New(t).AsSlice()
+		}
+	}
+
+	// Update only the tags field on the existing indexed resource.
+	err := s.engine.Update(resourceID, func(r *engine.Resource) {
+		r.Tags = newTags
+	})
+	if err == nil {
+		return
+	}
+
+	if errors.Is(err, engine.ErrResourceNotFound) {
+		// Resource is not yet indexed — fall back to the full extraction path.
+		s.logger.Debug().Str("id", resourceID).Msg("resource not in index, falling back to full upsert for tag update")
+		s.UpsertItem(ref)
+		return
+	}
+
+	s.logger.Error().Err(err).Str("id", resourceID).Msg("failed to update tags in index")
 }
 
 func addAudioMetadata(metadata map[string]string, audio *libregraph.Audio) {

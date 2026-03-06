@@ -2,6 +2,7 @@ package engine
 
 import (
 	"context"
+	"errors"
 	"regexp"
 
 	"github.com/blevesearch/bleve/v2/search"
@@ -12,12 +13,16 @@ import (
 	"github.com/owncloud/ocis/v2/services/search/pkg/content"
 )
 
+// ErrResourceNotFound is returned when a resource is not present in the index.
+var ErrResourceNotFound = errors.New("entity not found")
+
 var queryEscape = regexp.MustCompile(`([` + regexp.QuoteMeta(`+=&|><!(){}[]^\"~*?:\/`) + `\-\s])`)
 
 // Engine is the interface to the search engine
 type Engine interface {
 	Search(ctx context.Context, req *searchService.SearchIndexRequest) (*searchService.SearchIndexResponse, error)
 	Upsert(id string, r Resource) error
+	Update(id string, mutateFn func(*Resource)) error
 	Move(id string, parentid string, target string) error
 	Delete(id string) error
 	Restore(id string) error

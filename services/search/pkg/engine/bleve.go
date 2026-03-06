@@ -2,7 +2,6 @@ package engine
 
 import (
 	"context"
-	"errors"
 	"math"
 	"path"
 	"reflect"
@@ -288,6 +287,34 @@ func (b *Bleve) Upsert(id string, r Resource) error {
 	return bleveIndex.Index(id, r)
 }
 
+// Update retrieves an existing resource from the index, applies the given
+// mutation function, and writes it back. This provides a get + mutate + set
+// cycle without exposing raw resource retrieval.
+//
+// NOTE: this operation is not atomic. A concurrent Upsert between the get and
+// set may be overwritten. Callers should be aware of potential race conditions.
+//
+// The mutateFn should only modify fields on the provided resource.
+// For example:
+//
+//	newTags := []string{"tag1", "tag2", "tag3"}
+//	mutateFn := func(r *Resource) {
+//	    r.Tags = newTags
+//	}
+//	bleveEngine.Update("docId1", mutateFn)
+//
+// Returns ErrResourceNotFound if the resource is not in the index.
+func (b *Bleve) Update(id string, mutateFn func(*Resource)) error {
+	bleveIndex, closeFn, err := b.indexGetter.GetIndex()
+	if err != nil {
+		return err
+	}
+	defer closeFn()
+
+	_, err = b.updateEntity(bleveIndex, id, mutateFn)
+	return err
+}
+
 // Move updates the resource location and all of its necessary fields.
 func (b *Bleve) Move(id string, parentid string, target string) error {
 	bleveIndex, closeFn, err := b.indexGetter.GetIndex()
@@ -394,7 +421,7 @@ func (b *Bleve) getResource(bleveIndex bleve.Index, id string) (*Resource, error
 		return nil, err
 	}
 	if res.Hits.Len() == 0 {
-		return nil, errors.New("entity not found")
+		return nil, ErrResourceNotFound
 	}
 
 	fields := res.Hits[0].Fields

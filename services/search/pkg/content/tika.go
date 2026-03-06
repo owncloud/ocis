@@ -75,7 +75,11 @@ func (t Tika) Extract(ctx context.Context, ri *provider.ResourceInfo) (Document,
 
 	var reader io.Reader = data
 	if ri.Size > t.ContentExtractionSizeLimit {
-		reader = io.LimitReader(data, int64(t.ContentExtractionSizeLimit)) //nolint:gosec // ContentExtractionSizeLimit is a config value, never exceeds int64 max
+		limit := t.ContentExtractionSizeLimit
+		if limit > math.MaxInt64 {
+			limit = math.MaxInt64
+		}
+		reader = io.LimitReader(data, int64(limit)) //nolint:gosec // overflow guarded above
 	}
 
 	metas, err := t.tika.MetaRecursive(ctx, reader)
