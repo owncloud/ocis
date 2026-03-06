@@ -33,7 +33,9 @@ PLUGINS_GH_PAGES = "plugins/gh-pages:1"
 PLUGINS_GITHUB_RELEASE = "plugins/github-release:1"
 PLUGINS_GIT_ACTION = "plugins/git-action:1"
 PLUGINS_MANIFEST = "plugins/manifest:1"
-PLUGINS_S3 = "plugins/s3:1"
+
+# 1.4.0 is required due to minio compatibility
+PLUGINS_S3 = "plugins/s3:1.4.0"
 PLUGINS_S3_CACHE = "plugins/s3-cache:1"
 REDIS = "redis:6-alpine"
 SONARSOURCE_SONAR_SCANNER_CLI = "sonarsource/sonar-scanner-cli:11.0"
