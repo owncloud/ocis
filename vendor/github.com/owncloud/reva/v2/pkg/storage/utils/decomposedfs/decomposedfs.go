@@ -394,6 +394,11 @@ func (fs *Decomposedfs) Postprocessing(ch <-chan events.Event) {
 						},
 						Path: utils.MakeRelativePath(filepath.Join(session.Dir(), session.Filename())),
 					},
+					ResourceID: &provider.ResourceId{
+						StorageId: session.ProviderID(),
+						SpaceId:   session.SpaceID(),
+						OpaqueId:  session.NodeID(),
+					},
 					Timestamp:         utils.TimeToTS(now),
 					SpaceOwner:        n.SpaceOwnerOrManager(ctx),
 					IsVersion:         isVersion,

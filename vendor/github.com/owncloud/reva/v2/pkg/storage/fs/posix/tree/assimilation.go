@@ -504,6 +504,7 @@ func (t *Tree) assimilate(item scanItem) error {
 				t.PublishEvent(events.UploadReady{
 					SpaceOwner: user,
 					FileRef:    ref,
+					ResourceID: ref.ResourceId,
 					Timestamp:  utils.TSNow(),
 				})
 			}

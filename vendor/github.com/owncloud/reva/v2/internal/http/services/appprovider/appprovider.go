@@ -27,6 +27,7 @@ import (
 	"strings"
 
 	appregistry "github.com/cs3org/go-cs3apis/cs3/app/registry/v1beta1"
+	"github.com/owncloud/reva/v2/pkg/app/registry/micro"
 	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/auth/provider/v1beta1"
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
@@ -403,23 +404,30 @@ func (s *svc) handleOpen(openMode int) http.HandlerFunc {
 
 		appName := r.Form.Get("app_name")
 		if appName == "" {
-			apps, err := client.GetAppProviders(ctx, &appregistry.GetAppProvidersRequest{
-				ResourceInfo: statRes.Info,
+			defRes, err := client.GetDefaultAppProviderForMimeType(ctx, &appregistry.GetDefaultAppProviderForMimeTypeRequest{
+				MimeType: statRes.Info.MimeType,
 			})
-			if err != nil {
-				writeError(w, r, appErrorServerError, "error getting app providers", err)
-				return
+			if err == nil && defRes.Status.Code == rpc.Code_CODE_OK && defRes.Provider != nil {
+				appName = defRes.Provider.Name
+			} else {
+				apps, err := client.GetAppProviders(ctx, &appregistry.GetAppProvidersRequest{
+					ResourceInfo: statRes.Info,
+				})
+				if err != nil {
+					writeError(w, r, appErrorServerError, "error getting app providers", err)
+					return
+				}
+				if apps.Status.Code != rpc.Code_CODE_OK {
+					writeError(w, r, appErrorServerError, "error getting app providers", nil)
+					return
+				}
+				if len(apps.Providers) == 0 {
+					writeError(w, r, appErrorProviderNotFound, "no app providers found", nil)
+					return
+				}
+				micro.SortByPriorityThenName(apps.Providers)
+				appName = apps.Providers[0].Name
 			}
-			if apps.Status.Code != rpc.Code_CODE_OK {
-				writeError(w, r, appErrorServerError, "error getting app providers", nil)
-				return
-			}
-			if len(apps.Providers) == 0 {
-				writeError(w, r, appErrorProviderNotFound, "no app providers found", nil)
-				return
-			}
-
-			appName = apps.Providers[0].Name
 		}
 
 		openReq := gateway.OpenInAppRequest{
