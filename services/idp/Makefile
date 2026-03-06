@@ -23,42 +23,23 @@ docs-generate: config-docs-generate
 ############ generate ############
 include ../../.make/generate.mk
 
-.PHONY: ci-go-generate
-ci-go-generate: # CI runs ci-node-generate automatically before this target
-
-.PHONY: ci-node-generate
-ci-node-generate: assets
-
-.PHONY: assets
-assets: pnpm-build \
-		assets/identifier/static \
-		assets/identifier/static/favicon.ico
+FAVICON_URL = https://raw.githubusercontent.com/owncloud/assets/main/favicon.ico
 
 assets/identifier/static:
 	mkdir -p assets/identifier/static
-
-FAVICON_URL = https://raw.githubusercontent.com/owncloud/assets/main/favicon.ico
 
 .PHONY: assets/identifier/static/favicon.ico # force overwrite
 assets/identifier/static/favicon.ico:
 	curl --fail -o assets/identifier/static/favicon.ico ${FAVICON_URL}
 
-.PHONY: pnpm-build
-pnpm-build: node_modules
-	#pnpm lint #TODO: activate
-	#pnpm test #TODO: activate
-	pnpm build
+.PHONY: ci-go-generate
+ci-go-generate: # CI runs ci-node-generate automatically before this target
 
-.PHONY: node_modules
-node_modules:
-	pnpm install
+.PHONY: assets
+assets:
+	@mkdir -p assets/identifier/static
 
-############ licenses ############
-.PHONY: ci-node-check-licenses
-ci-node-check-licenses: node_modules
-	pnpm licenses:check
-
-.PHONY: ci-node-save-licenses
-ci-node-save-licenses: node_modules
-	pnpm licenses:csv
-	pnpm licenses:save
+############ testing ############
+.PHONY: test-go
+test-go: ## Run all tests (unit + integration)
+	@go test -v -tags=integration ./pkg/service/v0/... -timeout 60s
