@@ -1117,7 +1117,7 @@ def localApiTestPipeline(ctx):
                     params[item] = matrix[item] if item in matrix else defaults[item]
                 for storage in params["storages"]:
                     for run_with_remote_php in params["withRemotePhp"]:
-                        run_on_k8s = params["k8s"] and ctx.build.event == "cron"
+                        run_on_k8s = params["k8s"]
 
                         ####################
                         # SETUP STEPS      #
@@ -1132,8 +1132,6 @@ def localApiTestPipeline(ctx):
                                 params["collaborationServiceNeeded"],
                             )
 
-                            if params["antivirusNeeded"]:
-                                setup_steps += exposeAntivirusServiceK8s()
                             if params["emailNeeded"]:
                                 setup_steps += exposeEmailServiceK8s()
                             if params["collaborationServiceNeeded"]:
@@ -1501,7 +1499,7 @@ def coreApiTestPipeline(ctx):
                 for run_with_remote_php in params["withRemotePhp"]:
                     filter_tags = "~@skipOnGraph&&~@skipOnOcis-%s-Storage" % ("OC" if storage == "owncloud" else "OCIS")
                     expected_failures_file = "%s/expected-failures-API-on-%s-storage.md" % (test_dir, storage.upper())
-                    run_on_k8s = params["k8s"] and ctx.build.event == "cron"
+                    run_on_k8s = params["k8s"]
                     ocis_url = OCIS_URL
                     wrapper_url = "http://%s:5200" % OCIS_SERVER_NAME
 
@@ -1514,8 +1512,6 @@ def coreApiTestPipeline(ctx):
                         wrapper_url = "http://ociswrapper:5200"
 
                         setup_steps += ocisServerK8s(antivirus = params["antivirusNeeded"], email = params["emailNeeded"])
-                        if params["antivirusNeeded"]:
-                            setup_steps += exposeAntivirusServiceK8s()
                         if params["emailNeeded"]:
                             setup_steps += exposeEmailServiceK8s()
                     else:
@@ -2895,9 +2891,13 @@ def ocisServerK8s(federation = False, antivirus = False, email = False, tika = F
              (deployOcis(fed_name) if federation else []) + \
              streamK8sOcisLogs(name) + \
              waitForOcis(name, url) + \
-             (waitForOcis(fed_name, fed_url) if federation else [])
+             (waitForOcis(fed_name, fed_url) if federation else []) + \
+             ociswrapperK8s(name)
 
-    return steps + ociswrapperK8s(name)
+    if antivirus:
+        steps += exposeAntivirusServiceK8s(name)
+
+    return steps
 
 def redis():
     return [
