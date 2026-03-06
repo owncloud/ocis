@@ -192,6 +192,63 @@ var _ = Describe("Graph", func() {
 			}
 			`))
 			})
+			It("filters out protected spaces when not having mfa", func() {
+				gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Times(1).Return(&provider.ListStorageSpacesResponse{
+					Status: status.NewOK(ctx),
+					StorageSpaces: []*provider.StorageSpace{
+						{
+							Id:        &provider.StorageSpaceId{OpaqueId: "p-personal"},
+							SpaceType: "protected-personal",
+							Root: &provider.ResourceId{
+								StorageId: "pro-1",
+								SpaceId:   "p-personal",
+								OpaqueId:  "p-personal",
+							},
+							Name: "Protected Personal",
+						},
+						{
+							Id:        &provider.StorageSpaceId{OpaqueId: "p-project"},
+							SpaceType: "protected-project",
+							Root: &provider.ResourceId{
+								StorageId: "pro-1",
+								SpaceId:   "p-project",
+								OpaqueId:  "p-project",
+							},
+							Name: "Protected Project",
+						},
+						{
+							Id:        &provider.StorageSpaceId{OpaqueId: "normal"},
+							SpaceType: "personal",
+							Root: &provider.ResourceId{
+								StorageId: "pro-1",
+								SpaceId:   "normal",
+								OpaqueId:  "normal",
+							},
+							Name: "Normal Personal",
+						},
+					},
+				}, nil)
+				gatewayClient.On("InitiateFileDownload", mock.Anything, mock.Anything).Return(&gateway.InitiateFileDownloadResponse{
+					Status: status.NewNotFound(ctx, "not found"),
+				}, nil)
+				gatewayClient.On("GetQuota", mock.Anything, mock.Anything).Return(&provider.GetQuotaResponse{
+					Status: status.NewUnimplemented(ctx, fmt.Errorf("not supported"), "not supported"),
+				}, nil)
+
+				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drives", nil)
+				r = r.WithContext(ctx)
+				rr := httptest.NewRecorder()
+				svc.GetDrivesV1(rr, r)
+
+				Expect(rr.Code).To(Equal(http.StatusOK))
+
+				body, _ := io.ReadAll(rr.Body)
+				var response map[string][]libregraph.Drive
+				err := json.Unmarshal(body, &response)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(len(response["value"])).To(Equal(1))
+				Expect(*response["value"][0].DriveType).To(Equal("personal"))
+			})
 			It("can list a spaces with sort", func() {
 				gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&provider.ListStorageSpacesResponse{
 					Status: status.NewOK(ctx),
@@ -810,6 +867,53 @@ var _ = Describe("Graph", func() {
 				Expect(*response.DriveType).To(Equal("project"))
 				Expect(*response.DriveAlias).To(Equal("project/testspace"))
 				Expect(*response.Description).To(Equal("This space is for testing"))
+			})
+			It("can create a protected-project space", func() {
+				gatewayClient.On("CreateStorageSpace", mock.Anything, mock.Anything).Return(&provider.CreateStorageSpaceResponse{
+					Status: status.NewOK(ctx),
+					StorageSpace: &provider.StorageSpace{
+						Id:        &provider.StorageSpaceId{OpaqueId: "newID"},
+						Name:      "Top Secret Project",
+						SpaceType: "protected-project",
+						Root: &provider.ResourceId{
+							StorageId: "pro-1",
+							SpaceId:   "newID",
+							OpaqueId:  "newID",
+						},
+						Opaque: &typesv1beta1.Opaque{
+							Map: map[string]*typesv1beta1.OpaqueEntry{
+								"description": {Decoder: "plain", Value: []byte("This space is protected")},
+								"spaceAlias":  {Decoder: "plain", Value: []byte("protected-project/topsecretproject")},
+							},
+						},
+					},
+				}, nil)
+
+				permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settingssvc.GetPermissionByIDResponse{
+					Permission: &v0.Permission{
+						Operation:  v0.Permission_OPERATION_READWRITE,
+						Constraint: v0.Permission_CONSTRAINT_ALL,
+					},
+				}, nil)
+
+				gatewayClient.On("GetQuota", mock.Anything, mock.Anything).Return(&provider.GetQuotaResponse{
+					Status:     status.NewOK(ctx),
+					TotalBytes: 500,
+				}, nil)
+
+				jsonBody := []byte(`{"name": "Top Secret Project", "driveType": "protected-project", "description": "This space is protected"}`)
+				r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/drives", bytes.NewBuffer(jsonBody)).WithContext(ctx)
+				rr := httptest.NewRecorder()
+				svc.CreateDrive(rr, r)
+				Expect(rr.Code).To(Equal(http.StatusCreated))
+
+				body, _ := io.ReadAll(rr.Body)
+				var response libregraph.Drive
+				err := json.Unmarshal(body, &response)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(response.Name).To(Equal("Top Secret Project"))
+				Expect(*response.DriveType).To(Equal("protected-project"))
+				Expect(*response.Description).To(Equal("This space is protected"))
 			})
 			It("Incomplete space", func() {
 				gatewayClient.On("CreateStorageSpace", mock.Anything, mock.Anything).Return(&provider.CreateStorageSpaceResponse{

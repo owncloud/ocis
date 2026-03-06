@@ -671,6 +671,13 @@ func (s *svc) prepareCopy(ctx context.Context, w http.ResponseWriter, r *http.Re
 		return nil
 	}
 
+	// Disallow copying from poctected space to unprotected space
+	if isUnprotectedSpaceType(dstStatRes.GetInfo().GetSpace().GetSpaceType()) && isProtectedSpaceType(srcStatRes.GetInfo().GetSpace().GetSpaceType()) {
+		log.Error().Msg("the unprotected destination is disallowed")
+		w.WriteHeader(http.StatusBadRequest)
+		return nil
+	}
+
 	successCode := http.StatusCreated // 201 if new resource was created, see https://tools.ietf.org/html/rfc4918#section-9.8.5
 	if dstStatRes.Status.Code == rpc.Code_CODE_OK {
 		successCode = http.StatusNoContent // 204 if target already existed, see https://tools.ietf.org/html/rfc4918#section-9.8.5

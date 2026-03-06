@@ -160,6 +160,14 @@ func spacesProviders(cfg *config.Config, logger log.Logger) map[string]map[strin
 					"mount_point":   "/projects",
 					"path_template": "/projects/{{.Space.Name}}",
 				},
+				"protected-personal": map[string]interface{}{
+					"mount_point":   "/protected-users",
+					"path_template": "/protected-users/{{.Space.Name}}",
+				},
+				"protected-project": map[string]interface{}{
+					"mount_point":   "/protected-projects",
+					"path_template": "/protected-projects/{{.Space.Name}}",
+				},
 			},
 		},
 		cfg.StorageSharesEndpoint: {

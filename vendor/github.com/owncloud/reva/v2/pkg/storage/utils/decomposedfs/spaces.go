@@ -56,11 +56,13 @@ import (
 )
 
 const (
-	_spaceTypePersonal = "personal"
-	_spaceTypeProject  = "project"
-	spaceTypeShare     = "share"
-	spaceTypeAny       = "*"
-	spaceIDAny         = "*"
+	_spaceTypePersonal          = "personal"
+	_spaceTypeProject           = "project"
+	_spaceTypeProtectedPersonal = "protected-personal"
+	_spaceTypeProtectedProject  = "protected-project"
+	spaceTypeShare              = "share"
+	spaceTypeAny                = "*"
+	spaceIDAny                  = "*"
 
 	quotaUnrestricted = 0
 )
@@ -82,7 +84,7 @@ func (fs *Decomposedfs) CreateStorageSpace(ctx context.Context, req *provider.Cr
 	// Check if space already exists
 	rootPath := ""
 	switch req.Type {
-	case _spaceTypePersonal:
+	case _spaceTypePersonal, _spaceTypeProtectedPersonal:
 		if fs.o.PersonalSpacePathTemplate != "" {
 			rootPath = filepath.Join(fs.o.Root, templates.WithUser(u, fs.o.PersonalSpacePathTemplate))
 		}
@@ -102,7 +104,7 @@ func (fs *Decomposedfs) CreateStorageSpace(ctx context.Context, req *provider.Cr
 	if alias == "" {
 		alias = templates.WithSpacePropertiesAndUser(u, req.Type, req.Name, spaceID, fs.o.GeneralSpaceAliasTemplate)
 	}
-	if req.Type == _spaceTypePersonal {
+	if req.Type == _spaceTypePersonal || req.Type == _spaceTypeProtectedPersonal {
 		alias = templates.WithSpacePropertiesAndUser(u, req.Type, req.Name, spaceID, fs.o.PersonalSpaceAliasTemplate)
 	}
 
@@ -199,7 +201,7 @@ func (fs *Decomposedfs) CreateStorageSpace(ctx context.Context, req *provider.Cr
 
 	ctx = storageprovider.WithSpaceType(ctx, req.Type)
 
-	if req.Type != _spaceTypePersonal {
+	if req.Type != _spaceTypePersonal && req.Type != _spaceTypeProtectedPersonal {
 		if err := fs.AddGrant(ctx, &provider.Reference{
 			ResourceId: &provider.ResourceId{
 				SpaceId:  spaceID,
@@ -375,9 +377,11 @@ func (fs *Decomposedfs) ListStorageSpaces(ctx context.Context, filter []*provide
 		if _, ok := spaceTypes[spaceTypeAny]; ok {
 			// TODO do not hardcode dirs
 			spaceTypes = map[string]struct{}{
-				"personal": {},
-				"project":  {},
-				"share":    {},
+				"personal":           {},
+				"project":            {},
+				"share":              {},
+				"protected-personal": {},
+				"protected-project":  {},
 			}
 		}
 
@@ -1164,7 +1168,7 @@ func (fs *Decomposedfs) getSpaceRoot(spaceID string) string {
 // - a project space can always be enabled/disabled/deleted by its manager (i.e. users have the "remove" grant)
 func canDeleteSpace(ctx context.Context, spaceID string, typ string, purge bool, n *node.Node, p permissions.Permissions) error {
 	// delete-all-home spaces allows to disable and delete a personal space
-	if typ == "personal" {
+	if typ == _spaceTypePersonal || typ == _spaceTypeProtectedPersonal {
 		if p.DeleteAllHomeSpaces(ctx) {
 			return nil
 		}

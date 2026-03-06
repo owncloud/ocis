@@ -10,7 +10,6 @@ import (
 
 	"github.com/CiscoM31/godata"
 	libregraph "github.com/owncloud/libre-graph-api-go"
-	"github.com/owncloud/ocis/v2/ocis-pkg/mfa"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
 
 	"github.com/go-chi/chi/v5"
@@ -32,35 +31,9 @@ func (g Graph) GetGroups(w http.ResponseWriter, r *http.Request) {
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
 		return
 	}
-	ctxHasFullPerms := g.contextUserHasFullAccountPerms(r.Context())
-	hasMFA := mfa.Has(r.Context())
-	if !hasAcceptableSearch(odataReq.Query, g.config.API.IdentitySearchMinLength) {
-		if !ctxHasFullPerms {
-			// for regular user the search term must have a minimum length
-			logger.Debug().Interface("query", r.URL.Query()).Msgf("search with less than %d chars for a regular user", g.config.API.IdentitySearchMinLength)
-			errorcode.AccessDenied.Render(w, r, http.StatusForbidden, "search term too short")
-			return
-		}
-		if !hasMFA {
-			logger.Error().Str("path", r.URL.Path).Msg("MFA required but not satisfied")
-			mfa.SetRequiredStatus(w)
-			return
-		}
-	}
 
-	if !hasAcceptableQuery(odataReq.Query) {
-		if !ctxHasFullPerms {
-			// regular users can't use filter, apply, expand and compute
-			logger.Debug().Interface("query", r.URL.Query()).Msg("forbidden query elements for a regular user")
-			errorcode.AccessDenied.Render(w, r, http.StatusForbidden, "query has forbidden elements for regular users")
-			return
-		}
-
-		if !hasMFA {
-			logger.Error().Str("path", r.URL.Path).Msg("MFA required but not satisfied")
-			mfa.SetRequiredStatus(w)
-			return
-		}
+	if !g.validateQuery(r, w, odataReq.Query, SearchValidator{MinLength: g.config.API.IdentitySearchMinLength}, BasicQueryValidator{}) {
+		return
 	}
 
 	groups, err := g.identityBackend.GetGroups(r.Context(), odataReq)
@@ -70,7 +43,7 @@ func (g Graph) GetGroups(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// If the user isn't admin, we'll show just the minimum group attibutes
-	if !ctxHasFullPerms {
+	if !g.contextUserHasFullAccountPerms(r.Context()) {
 		finalGroups := make([]*libregraph.Group, len(groups))
 		for i, grp := range groups {
 			finalGroups[i] = &libregraph.Group{

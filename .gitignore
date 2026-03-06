@@ -64,3 +64,4 @@ go.work.sum
 .envrc
 CLAUDE.md
 .claude/
+.agents/

@@ -31,6 +31,8 @@ import (
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 
+	"github.com/gdexlab/go-render/render"
+	"github.com/mitchellh/mapstructure"
 	"github.com/owncloud/reva/v2/internal/http/services/archiver/manager"
 	"github.com/owncloud/reva/v2/pkg/errtypes"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
@@ -40,9 +42,15 @@ import (
 	"github.com/owncloud/reva/v2/pkg/storage/utils/downloader"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/walker"
 	"github.com/owncloud/reva/v2/pkg/storagespace"
-	"github.com/gdexlab/go-render/render"
-	"github.com/mitchellh/mapstructure"
 	"github.com/rs/zerolog"
+)
+
+const (
+	mfaHeader         = "X-Multi-Factor-Authentication"
+	mfaRequiredHeader = "X-Ocis-Mfa-Required"
+
+	_spaceTypeProtectedPersonal = "protected-personal"
+	_spaceTypeProtectedProject  = "protected-project"
 )
 
 type svc struct {
@@ -251,6 +259,38 @@ func (s *svc) Handler() http.Handler {
 			return
 		}
 
+		// MFA check
+		gatewayClient, err := s.gatewaySelector.Next()
+		if err != nil {
+			s.log.Error().Err(err).Msg("failed to get gateway client")
+			s.writeHTTPError(rw, err)
+			return
+		}
+		for _, resource := range resources {
+			res, err := gatewayClient.Stat(ctx, &provider.StatRequest{
+				Ref: &provider.Reference{
+					ResourceId: resource,
+					Path:       ".",
+				},
+			})
+			if err != nil {
+				s.log.Error().Err(err).Interface("resource", resource).Msg("failed to stat resource")
+				s.writeHTTPError(rw, err)
+				return
+			}
+			if res.Status.Code != rpc.Code_CODE_OK {
+				s.log.Error().Interface("resource", resource).Str("status", res.Status.Message).Msg("failed to stat resource")
+				s.writeHTTPError(rw, errors.New(res.Status.Message))
+				return
+			}
+			if isProtectedSpaceType(res.Info.GetSpace().GetSpaceType()) && !isMfaSet(r) {
+				s.log.Debug().Interface("resource", resource).Str("spacetype", res.Info.GetSpace().GetSpaceType()).Msg("MFA required for protected space")
+				rw.Header().Set(mfaRequiredHeader, "true")
+				rw.WriteHeader(http.StatusForbidden)
+				return
+			}
+		}
+
 		archName := s.config.Name
 		if format == "tar" {
 			archName += ".tar"
@@ -290,4 +330,12 @@ func (s *svc) Close() error {
 
 func (s *svc) Unprotected() []string {
 	return nil
+}
+
+func isMfaSet(r *http.Request) bool {
+	return r.Header.Get(mfaHeader) == "true"
+}
+
+func isProtectedSpaceType(spaceType string) bool {
+	return spaceType == _spaceTypeProtectedPersonal || spaceType == _spaceTypeProtectedProject
 }

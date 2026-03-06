@@ -105,6 +105,10 @@ func (c *cachedSpacesAPIClient) CreateStorageSpace(ctx context.Context, in *prov
 		if key != "" {
 			s := &provider.CreateStorageSpaceResponse{}
 			if err := c.createPersonalSpaceCache.PullFromCache(key, s); err == nil {
+				if s.Status == nil {
+					s.Status = &rpc.Status{}
+				}
+				s.Status.Code = rpc.Code_CODE_ALREADY_EXISTS
 				return s, nil
 			}
 		}
@@ -163,6 +167,10 @@ func (c *cachedAPIClient) CreateHome(ctx context.Context, in *provider.CreateHom
 	if key != "" {
 		s := &provider.CreateHomeResponse{}
 		if err := c.createPersonalSpaceCache.PullFromCache(key, s); err == nil {
+			if s.Status == nil {
+				s.Status = &rpc.Status{}
+			}
+			s.Status.Code = rpc.Code_CODE_ALREADY_EXISTS
 			return s, nil
 		}
 	}

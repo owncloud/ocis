@@ -33,6 +33,7 @@ import (
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	"github.com/mitchellh/mapstructure"
 	"github.com/owncloud/reva/v2/pkg/appctx"
 	"github.com/owncloud/reva/v2/pkg/conversions"
 	ctxpkg "github.com/owncloud/reva/v2/pkg/ctx"
@@ -47,7 +48,6 @@ import (
 	"github.com/owncloud/reva/v2/pkg/storage/fs/registry"
 	"github.com/owncloud/reva/v2/pkg/storagespace"
 	"github.com/owncloud/reva/v2/pkg/utils"
-	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 	"go.opentelemetry.io/otel/attribute"
@@ -519,7 +519,7 @@ func (s *Service) CreateStorageSpace(ctx context.Context, req *provider.CreateSt
 			// if trying to create a user home fall back to CreateHome
 			if u, ok := ctxpkg.ContextGetUser(ctx); ok && req.Type == "personal" && utils.UserEqual(req.GetOwner().Id, u.Id) {
 				if err := s.Storage.CreateHome(ctx); err != nil {
-					st = status.NewInternal(ctx, "error creating home")
+					st = status.NewStatusFromErrType(ctx, "error creating home", err)
 				} else {
 					st = status.NewOK(ctx)
 					// TODO we cannot return a space, but the gateway currently does not expect one...

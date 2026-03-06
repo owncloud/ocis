@@ -34,6 +34,7 @@ import (
 	providerpb "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	registrypb "github.com/cs3org/go-cs3apis/cs3/storage/registry/v1beta1"
 	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	"github.com/mitchellh/mapstructure"
 	"github.com/owncloud/reva/v2/pkg/appctx"
 	ctxpkg "github.com/owncloud/reva/v2/pkg/ctx"
 	"github.com/owncloud/reva/v2/pkg/errtypes"
@@ -44,7 +45,6 @@ import (
 	pkgregistry "github.com/owncloud/reva/v2/pkg/storage/registry/registry"
 	"github.com/owncloud/reva/v2/pkg/storagespace"
 	"github.com/owncloud/reva/v2/pkg/utils"
-	"github.com/mitchellh/mapstructure"
 	"google.golang.org/grpc"
 )
 
@@ -101,12 +101,14 @@ func (c *config) init() {
 		c.Providers = map[string]*Provider{
 			sharedconf.GetGatewaySVC(""): {
 				Spaces: map[string]*spaceConfig{
-					"personal":   {MountPoint: "/users", PathTemplate: "/users/{{.Space.Owner.Id.OpaqueId}}"},
-					"project":    {MountPoint: "/projects", PathTemplate: "/projects/{{.Space.Name}}"},
-					"virtual":    {MountPoint: "/users/{{.CurrentUser.Id.OpaqueId}}/Shares"},
-					"grant":      {MountPoint: "."},
-					"mountpoint": {MountPoint: "/users/{{.CurrentUser.Id.OpaqueId}}/Shares", PathTemplate: "/users/{{.CurrentUser.Id.OpaqueId}}/Shares/{{.Space.Name}}"},
-					"public":     {MountPoint: "/public"},
+					"personal":           {MountPoint: "/users", PathTemplate: "/users/{{.Space.Owner.Id.OpaqueId}}"},
+					"project":            {MountPoint: "/projects", PathTemplate: "/projects/{{.Space.Name}}"},
+					"protected-personal": {MountPoint: "/protected-users", PathTemplate: "/protected-users/{{.Space.Owner.Id.OpaqueId}}"},
+					"protected-project":  {MountPoint: "/protected-projects", PathTemplate: "/protected-projects/{{.Space.Name}}"},
+					"virtual":            {MountPoint: "/users/{{.CurrentUser.Id.OpaqueId}}/Shares"},
+					"grant":              {MountPoint: "."},
+					"mountpoint":         {MountPoint: "/users/{{.CurrentUser.Id.OpaqueId}}/Shares", PathTemplate: "/users/{{.CurrentUser.Id.OpaqueId}}/Shares/{{.Space.Name}}"},
+					"public":             {MountPoint: "/public"},
 				},
 			},
 		}

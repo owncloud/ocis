@@ -8,10 +8,10 @@ import (
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	"github.com/google/uuid"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
 	revactx "github.com/owncloud/reva/v2/pkg/ctx"
-	"github.com/owncloud/reva/v2/pkg/rgrpc/status"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/owncloud/reva/v2/pkg/utils"
 	"google.golang.org/grpc/metadata"
@@ -72,10 +72,41 @@ func (m createHome) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		createHomeRes, err := client.CreateHome(ctx, createHomeReq)
 		if err != nil {
 			m.logger.Err(err).Msg("error calling CreateHome")
-		} else if createHomeRes.Status.Code != rpc.Code_CODE_OK {
-			err := status.NewErrorFromCode(createHomeRes.Status.Code, "gateway")
-			if createHomeRes.Status.Code != rpc.Code_CODE_ALREADY_EXISTS {
-				m.logger.Err(err).Msg("error when calling Createhome")
+		}
+		switch {
+		case createHomeRes.GetStatus().GetCode() == rpc.Code_CODE_OK:
+			m.logger.Info().Interface("userID", u.GetId().GetOpaqueId()).Msg("personal space created")
+		case createHomeRes.GetStatus().GetCode() != rpc.Code_CODE_ALREADY_EXISTS:
+			m.logger.Error().Interface("userID", u.GetId().GetOpaqueId()).Interface("status", createHomeRes.GetStatus()).Msg("personal space creation failed")
+		}
+
+		if spaceID := u.GetId().GetOpaqueId(); spaceID != "" {
+			// Create the "protected-personal" space.
+			// Use the user ID as the space ID if it is a valid uuid or generate a new one.
+			// Replace last 4 chars of the space id with "0000" to make it visible.
+			if err := uuid.Validate(spaceID); err != nil {
+				spaceID = uuid.New().String()
+			}
+			spaceID = spaceID[:len(spaceID)-4] + "0000"
+
+			createProtectedSpaceReq := &provider.CreateStorageSpaceRequest{
+				Type: "protected-personal",
+				Name: "Protected Personal",
+				Owner: &userv1beta1.User{
+					Id: u.Id,
+				},
+				Opaque: utils.AppendPlainToOpaque(nil, "spaceid", spaceID),
+			}
+
+			cpsRes, err := client.CreateStorageSpace(ctx, createProtectedSpaceReq)
+			if err != nil {
+				m.logger.Err(err).Msg("error calling CreateStorageSpace for protected-personal")
+			}
+			switch {
+			case cpsRes.GetStatus().GetCode() == rpc.Code_CODE_OK:
+				m.logger.Info().Interface("userID", u.GetId().GetOpaqueId()).Msg("protected-personal space created")
+			case cpsRes.GetStatus().GetCode() != rpc.Code_CODE_ALREADY_EXISTS:
+				m.logger.Error().Interface("userID", u.GetId().GetOpaqueId()).Interface("status", cpsRes.GetStatus()).Msg("protected-personal space creation failed")
 			}
 		}
 	}

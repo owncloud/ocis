@@ -22,7 +22,6 @@ import (
 	"github.com/go-chi/render"
 	"github.com/google/uuid"
 	libregraph "github.com/owncloud/libre-graph-api-go"
-	"github.com/owncloud/ocis/v2/ocis-pkg/mfa"
 	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
@@ -324,51 +323,8 @@ func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ctxHasFullPerms := g.contextUserHasFullAccountPerms(r.Context())
-	hasMFA := mfa.Has(r.Context())
-
-	if !hasAcceptableSearch(odataReq.Query, g.config.API.IdentitySearchMinLength) {
-		if !ctxHasFullPerms {
-			// for regular user the search term must have a minimum length
-			logger.Debug().Interface("query", r.URL.Query()).Msgf("search with less than %d chars for a regular user", g.config.API.IdentitySearchMinLength)
-			errorcode.AccessDenied.Render(w, r, http.StatusForbidden, "search term too short")
-			return
-		}
-		if !hasMFA {
-			logger.Error().Str("path", r.URL.Path).Msg("MFA required but not satisfied")
-			mfa.SetRequiredStatus(w)
-			return
-		}
-	}
-
-	if !hasAcceptableFilter(odataReq.Query) {
-		if !ctxHasFullPerms {
-			// regular users are allowed to filter only by userType
-			logger.Debug().Interface("query", r.URL.Query()).Msg("forbidden filter for a regular user")
-			errorcode.AccessDenied.Render(w, r, http.StatusForbidden, "filter has forbidden elements for regular users")
-			return
-		}
-
-		if !hasMFA {
-			logger.Error().Str("path", r.URL.Path).Msg("MFA required but not satisfied")
-			mfa.SetRequiredStatus(w)
-			return
-		}
-	}
-
-	if !hasAcceptableQuery(odataReq.Query) {
-		if !ctxHasFullPerms {
-			// regular users can't use filter, apply, expand and compute
-			logger.Debug().Interface("query", r.URL.Query()).Msg("forbidden query elements for a regular user")
-			errorcode.AccessDenied.Render(w, r, http.StatusForbidden, "query has forbidden elements for regular users")
-			return
-		}
-
-		if !hasMFA {
-			logger.Error().Str("path", r.URL.Path).Msg("MFA required but not satisfied")
-			mfa.SetRequiredStatus(w)
-			return
-		}
+	if !g.validateQuery(r, w, odataReq.Query, SearchValidator{MinLength: g.config.API.IdentitySearchMinLength}, FilterValidator{}, BasicQueryValidator{}) {
+		return
 	}
 
 	logger.Debug().Interface("query", r.URL.Query()).Msg("calling get users on backend")
@@ -434,6 +390,8 @@ func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 
 	usersWithAttributes := make([]*UserWithAttributes, 0, len(users))
 	displayedAttributes := g.config.API.UserSearchDisplayedAttributes
+
+	ctxHasFullPerms := g.contextUserHasFullAccountPerms(r.Context())
 
 	for _, user := range users {
 		attributes, err := getUsersAttributes(displayedAttributes, user)

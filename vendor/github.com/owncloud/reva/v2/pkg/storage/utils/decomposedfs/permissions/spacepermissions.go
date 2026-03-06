@@ -25,8 +25,10 @@ func init() {
 }
 
 const (
-	_spaceTypePersonal = "personal"
-	_spaceTypeProject  = "project"
+	_spaceTypePersonal          = "personal"
+	_spaceTypeProject           = "project"
+	_spaceTypeProtectedPersonal = "protected-personal"
+	_spaceTypeProtectedProject  = "protected-project"
 )
 
 // PermissionsChecker defines an interface for checking permissions on a Node
@@ -75,9 +77,9 @@ func (p Permissions) SetSpaceQuota(ctx context.Context, spaceid string, spaceTyp
 	switch spaceType {
 	default:
 		return false // only quotas of personal and project space may be changed
-	case _spaceTypePersonal:
+	case _spaceTypePersonal, _spaceTypeProtectedPersonal:
 		return p.checkPermission(ctx, "Drives.ReadWritePersonalQuota", spaceRef(spaceid))
-	case _spaceTypeProject:
+	case _spaceTypeProject, _spaceTypeProtectedProject:
 		return p.checkPermission(ctx, "Drives.ReadWriteProjectQuota", spaceRef(spaceid))
 	}
 }
