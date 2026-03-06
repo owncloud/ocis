@@ -58,6 +58,7 @@ func Security(cfg *config.Config, cspConfig *config.CSP) func(h http.Handler) ht
 		ContentSecurityPolicy:        cspBuilder.MustBuild(),
 		ContentTypeNosniff:           true,
 		CustomFrameOptionsValue:      "SAMEORIGIN",
+		CustomBrowserXssValue:        "0",
 		FrameDeny:                    true,
 		ReferrerPolicy:               "no-referrer",
 		STSSeconds:                   315360000,
