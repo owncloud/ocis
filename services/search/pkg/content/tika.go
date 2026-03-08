@@ -87,6 +87,10 @@ func (t Tika) Extract(ctx context.Context, ri *provider.ResourceInfo) (Document,
 		return doc, err
 	}
 
+	if len(metas) == 0 {
+		return doc, fmt.Errorf("tika returned empty metadata for %q", ri.Name)
+	}
+
 	for _, meta := range metas {
 		if title, err := getFirstValue(meta, "title"); err == nil {
 			doc.Title = strings.TrimSpace(fmt.Sprintf("%s %s", doc.Title, title))

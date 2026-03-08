@@ -463,7 +463,7 @@ func (s *Service) IndexSpace(spaceID *provider.StorageSpaceId) error {
 		s.logger.Debug().Str("path", ref.Path).Msg("Walking tree")
 
 		searchRes, err := s.engine.Search(ownerCtx, &searchsvc.SearchIndexRequest{
-			Query: "id:" + storagespace.FormatResourceID(info.Id) + ` mtime>=` + utils.TSToTime(info.Mtime).Format(time.RFC3339Nano),
+			Query: "id:" + storagespace.FormatResourceID(info.Id) + ` mtime>=` + utils.TSToTime(info.Mtime).Format(time.RFC3339Nano) + ` Extracted:true`,
 		})
 
 		if err == nil && len(searchRes.Matches) >= 1 {
@@ -531,9 +531,10 @@ func (s *Service) UpsertItem(ref *provider.Reference) {
 			OpaqueId:  stat.Info.Id.SpaceId,
 			SpaceId:   stat.Info.Id.SpaceId,
 		}),
-		Path:     utils.MakeRelativePath(path),
-		Type:     uint64(stat.Info.Type),
-		Document: doc,
+		Path:      utils.MakeRelativePath(path),
+		Type:      uint64(stat.Info.Type),
+		Document:  doc,
+		Extracted: true,
 	}
 	r.Hidden = strings.HasPrefix(r.Path, ".")
 

@@ -34,13 +34,14 @@ type Engine interface {
 type Resource struct {
 	content.Document
 
-	ID       string
-	RootID   string
-	Path     string
-	ParentID string
-	Type     uint64
-	Deleted  bool
-	Hidden   bool
+	ID        string
+	RootID    string
+	Path      string
+	ParentID  string
+	Type      uint64
+	Deleted   bool
+	Hidden    bool
+	Extracted bool
 }
 
 func resourceIDtoSearchID(id storageProvider.ResourceId) *searchMessage.ResourceID {
