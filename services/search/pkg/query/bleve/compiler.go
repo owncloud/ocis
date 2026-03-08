@@ -159,34 +159,10 @@ func walk(offset int, nodes []ast.Node) (bleveQuery.Query, int, error) {
 				next = q
 			}
 		case *ast.NumericNode:
-			if n.Operator == nil {
+			q := numericQuery(n)
+			if q == nil {
 				continue
 			}
-
-			var minVal, maxVal *float64
-			var minInclusive, maxInclusive *bool
-			val := n.Value
-
-			switch n.Operator.Value {
-			case ">":
-				minVal = &val
-				minInclusive = &[]bool{false}[0]
-			case ">=":
-				minVal = &val
-				minInclusive = &[]bool{true}[0]
-			case "<":
-				maxVal = &val
-				maxInclusive = &[]bool{false}[0]
-			case "<=":
-				maxVal = &val
-				maxInclusive = &[]bool{true}[0]
-			default:
-				continue
-			}
-
-			q := bleve.NewNumericRangeInclusiveQuery(minVal, maxVal, minInclusive, maxInclusive)
-			q.SetField(getField(n.Key))
-
 			if prev == nil {
 				prev = q
 			} else {
@@ -402,6 +378,37 @@ func mimeType(k, v string) (bleveQuery.Query, bool) {
 	default:
 		return bleveQuery.NewQueryStringQuery(k + ":" + v), false
 	}
+}
+
+func numericQuery(n *ast.NumericNode) bleveQuery.Query {
+	if n.Operator == nil {
+		return nil
+	}
+
+	var minVal, maxVal *float64
+	var minInclusive, maxInclusive *bool
+	val := n.Value
+
+	switch n.Operator.Value {
+	case ">":
+		minVal = &val
+		minInclusive = &[]bool{false}[0]
+	case ">=":
+		minVal = &val
+		minInclusive = &[]bool{true}[0]
+	case "<":
+		maxVal = &val
+		maxInclusive = &[]bool{false}[0]
+	case "<=":
+		maxVal = &val
+		maxInclusive = &[]bool{true}[0]
+	default:
+		return nil
+	}
+
+	q := bleve.NewNumericRangeInclusiveQuery(minVal, maxVal, minInclusive, maxInclusive)
+	q.SetField(getField(n.Key))
+	return q
 }
 
 func newQueryStringQueryList(k string, v ...string) []bleveQuery.Query {
