@@ -566,6 +566,107 @@ func Test_compile(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			name: `size>=1048576`,
+			args: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.NumericNode{
+						Key:      "size",
+						Operator: &ast.OperatorNode{Value: ">="},
+						Value:    1048576,
+					},
+				},
+			},
+			want: query.NewConjunctionQuery([]query.Query{
+				func() query.Query {
+					min := 1048576.0
+					inclusive := true
+					q := query.NewNumericRangeInclusiveQuery(&min, nil, &inclusive, nil)
+					q.SetField("Size")
+					return q
+				}(),
+			}),
+			wantErr: false,
+		},
+		{
+			name: `size<=10485760`,
+			args: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.NumericNode{
+						Key:      "size",
+						Operator: &ast.OperatorNode{Value: "<="},
+						Value:    10485760,
+					},
+				},
+			},
+			want: query.NewConjunctionQuery([]query.Query{
+				func() query.Query {
+					max := 10485760.0
+					inclusive := true
+					q := query.NewNumericRangeInclusiveQuery(nil, &max, nil, &inclusive)
+					q.SetField("Size")
+					return q
+				}(),
+			}),
+			wantErr: false,
+		},
+		{
+			name: `photo.iso>100 AND photo.iso<3200`,
+			args: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.NumericNode{
+						Key:      "photo.iso",
+						Operator: &ast.OperatorNode{Value: ">"},
+						Value:    100,
+					},
+					&ast.OperatorNode{Value: "AND"},
+					&ast.NumericNode{
+						Key:      "photo.iso",
+						Operator: &ast.OperatorNode{Value: "<"},
+						Value:    3200,
+					},
+				},
+			},
+			want: query.NewConjunctionQuery([]query.Query{
+				func() query.Query {
+					min := 100.0
+					inclusive := false
+					q := query.NewNumericRangeInclusiveQuery(&min, nil, &inclusive, nil)
+					q.SetField("photo.iso")
+					return q
+				}(),
+				func() query.Query {
+					max := 3200.0
+					inclusive := false
+					q := query.NewNumericRangeInclusiveQuery(nil, &max, nil, &inclusive)
+					q.SetField("photo.iso")
+					return q
+				}(),
+			}),
+			wantErr: false,
+		},
+		{
+			name: `photo.fNumber>=2.8`,
+			args: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.NumericNode{
+						Key:      "photo.fNumber",
+						Operator: &ast.OperatorNode{Value: ">="},
+						Value:    2.8,
+					},
+				},
+			},
+			want: query.NewConjunctionQuery([]query.Query{
+				func() query.Query {
+					min := 2.8
+					inclusive := true
+					q := query.NewNumericRangeInclusiveQuery(&min, nil, &inclusive, nil)
+					q.SetField("photo.fNumber")
+					return q
+				}(),
+			}),
+			wantErr: false,
+		},
+		{
 			name: `photo.cameraMake:canon`,
 			args: &ast.Ast{
 				Nodes: []ast.Node{

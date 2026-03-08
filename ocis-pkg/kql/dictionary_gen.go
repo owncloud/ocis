@@ -12,6 +12,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"sync"
 	"unicode"
 	"unicode/utf8"
 )
@@ -42,19 +43,9 @@ var g = &grammar{
 				expr: &seqExpr{
 					pos: position{line: 19, col: 6, offset: 351},
 					exprs: []any{
-						&actionExpr{
-							pos: position{line: 233, col: 5, offset: 4805},
-							run: (*parser).callonNodes3,
-							expr: &zeroOrMoreExpr{
-								pos: position{line: 233, col: 5, offset: 4805},
-								expr: &charClassMatcher{
-									pos:        position{line: 233, col: 5, offset: 4805},
-									val:        "[ \\t]",
-									chars:      []rune{' ', '\t'},
-									ignoreCase: false,
-									inverted:   false,
-								},
-							},
+						&ruleRefExpr{
+							pos:  position{line: 19, col: 6, offset: 351},
+							name: "_",
 						},
 						&ruleRefExpr{
 							pos:  position{line: 19, col: 8, offset: 353},
@@ -74,1438 +65,17 @@ var g = &grammar{
 						pos:  position{line: 22, col: 5, offset: 373},
 						name: "GroupNode",
 					},
-					&actionExpr{
-						pos: position{line: 46, col: 5, offset: 1042},
-						run: (*parser).callonNode3,
-						expr: &seqExpr{
-							pos: position{line: 46, col: 5, offset: 1042},
-							exprs: []any{
-								&labeledExpr{
-									pos:   position{line: 46, col: 5, offset: 1042},
-									label: "k",
-									expr: &oneOrMoreExpr{
-										pos: position{line: 46, col: 7, offset: 1044},
-										expr: &actionExpr{
-											pos: position{line: 218, col: 5, offset: 4634},
-											run: (*parser).callonNode7,
-											expr: &charClassMatcher{
-												pos:        position{line: 218, col: 5, offset: 4634},
-												val:        "[.A-Za-z]",
-												chars:      []rune{'.'},
-												ranges:     []rune{'A', 'Z', 'a', 'z'},
-												ignoreCase: false,
-												inverted:   false,
-											},
-										},
-									},
-								},
-								&choiceExpr{
-									pos: position{line: 46, col: 14, offset: 1051},
-									alternatives: []any{
-										&actionExpr{
-											pos: position{line: 120, col: 5, offset: 2911},
-											run: (*parser).callonNode10,
-											expr: &litMatcher{
-												pos:        position{line: 120, col: 5, offset: 2911},
-												val:        ":",
-												ignoreCase: false,
-												want:       "\":\"",
-											},
-										},
-										&actionExpr{
-											pos: position{line: 125, col: 5, offset: 2997},
-											run: (*parser).callonNode12,
-											expr: &litMatcher{
-												pos:        position{line: 125, col: 5, offset: 2997},
-												val:        "=",
-												ignoreCase: false,
-												want:       "\"=\"",
-											},
-										},
-									},
-								},
-								&labeledExpr{
-									pos:   position{line: 46, col: 53, offset: 1090},
-									label: "v",
-									expr: &choiceExpr{
-										pos: position{line: 46, col: 56, offset: 1093},
-										alternatives: []any{
-											&litMatcher{
-												pos:        position{line: 46, col: 56, offset: 1093},
-												val:        "true",
-												ignoreCase: false,
-												want:       "\"true\"",
-											},
-											&litMatcher{
-												pos:        position{line: 46, col: 65, offset: 1102},
-												val:        "false",
-												ignoreCase: false,
-												want:       "\"false\"",
-											},
-										},
-									},
-								},
-							},
-						},
+					&ruleRefExpr{
+						pos:  position{line: 23, col: 5, offset: 389},
+						name: "PropertyRestrictionNodes",
 					},
-					&actionExpr{
-						pos: position{line: 51, col: 5, offset: 1203},
-						run: (*parser).callonNode18,
-						expr: &seqExpr{
-							pos: position{line: 51, col: 5, offset: 1203},
-							exprs: []any{
-								&labeledExpr{
-									pos:   position{line: 51, col: 5, offset: 1203},
-									label: "k",
-									expr: &oneOrMoreExpr{
-										pos: position{line: 51, col: 7, offset: 1205},
-										expr: &actionExpr{
-											pos: position{line: 218, col: 5, offset: 4634},
-											run: (*parser).callonNode22,
-											expr: &charClassMatcher{
-												pos:        position{line: 218, col: 5, offset: 4634},
-												val:        "[.A-Za-z]",
-												chars:      []rune{'.'},
-												ranges:     []rune{'A', 'Z', 'a', 'z'},
-												ignoreCase: false,
-												inverted:   false,
-											},
-										},
-									},
-								},
-								&labeledExpr{
-									pos:   position{line: 51, col: 13, offset: 1211},
-									label: "o",
-									expr: &choiceExpr{
-										pos: position{line: 52, col: 9, offset: 1223},
-										alternatives: []any{
-											&actionExpr{
-												pos: position{line: 145, col: 5, offset: 3358},
-												run: (*parser).callonNode26,
-												expr: &litMatcher{
-													pos:        position{line: 145, col: 5, offset: 3358},
-													val:        ">=",
-													ignoreCase: false,
-													want:       "\">=\"",
-												},
-											},
-											&actionExpr{
-												pos: position{line: 135, col: 5, offset: 3174},
-												run: (*parser).callonNode28,
-												expr: &litMatcher{
-													pos:        position{line: 135, col: 5, offset: 3174},
-													val:        "<=",
-													ignoreCase: false,
-													want:       "\"<=\"",
-												},
-											},
-											&actionExpr{
-												pos: position{line: 140, col: 5, offset: 3263},
-												run: (*parser).callonNode30,
-												expr: &litMatcher{
-													pos:        position{line: 140, col: 5, offset: 3263},
-													val:        ">",
-													ignoreCase: false,
-													want:       "\">\"",
-												},
-											},
-											&actionExpr{
-												pos: position{line: 130, col: 5, offset: 3082},
-												run: (*parser).callonNode32,
-												expr: &litMatcher{
-													pos:        position{line: 130, col: 5, offset: 3082},
-													val:        "<",
-													ignoreCase: false,
-													want:       "\"<\"",
-												},
-											},
-											&actionExpr{
-												pos: position{line: 125, col: 5, offset: 2997},
-												run: (*parser).callonNode34,
-												expr: &litMatcher{
-													pos:        position{line: 125, col: 5, offset: 2997},
-													val:        "=",
-													ignoreCase: false,
-													want:       "\"=\"",
-												},
-											},
-											&actionExpr{
-												pos: position{line: 120, col: 5, offset: 2911},
-												run: (*parser).callonNode36,
-												expr: &litMatcher{
-													pos:        position{line: 120, col: 5, offset: 2911},
-													val:        ":",
-													ignoreCase: false,
-													want:       "\":\"",
-												},
-											},
-										},
-									},
-								},
-								&zeroOrOneExpr{
-									pos: position{line: 58, col: 7, offset: 1403},
-									expr: &litMatcher{
-										pos:        position{line: 58, col: 7, offset: 1403},
-										val:        "\"",
-										ignoreCase: false,
-										want:       "\"\\\"\"",
-									},
-								},
-								&labeledExpr{
-									pos:   position{line: 58, col: 12, offset: 1408},
-									label: "v",
-									expr: &choiceExpr{
-										pos: position{line: 59, col: 9, offset: 1420},
-										alternatives: []any{
-											&actionExpr{
-												pos: position{line: 195, col: 5, offset: 4197},
-												run: (*parser).callonNode42,
-												expr: &seqExpr{
-													pos: position{line: 195, col: 5, offset: 4197},
-													exprs: []any{
-														&actionExpr{
-															pos: position{line: 185, col: 5, offset: 3960},
-															run: (*parser).callonNode44,
-															expr: &seqExpr{
-																pos: position{line: 185, col: 5, offset: 3960},
-																exprs: []any{
-																	&actionExpr{
-																		pos: position{line: 155, col: 5, offset: 3560},
-																		run: (*parser).callonNode46,
-																		expr: &seqExpr{
-																			pos: position{line: 155, col: 5, offset: 3560},
-																			exprs: []any{
-																				&actionExpr{
-																					pos: position{line: 228, col: 5, offset: 4754},
-																					run: (*parser).callonNode48,
-																					expr: &charClassMatcher{
-																						pos:        position{line: 228, col: 5, offset: 4754},
-																						val:        "[0-9]",
-																						ranges:     []rune{'0', '9'},
-																						ignoreCase: false,
-																						inverted:   false,
-																					},
-																				},
-																				&actionExpr{
-																					pos: position{line: 228, col: 5, offset: 4754},
-																					run: (*parser).callonNode50,
-																					expr: &charClassMatcher{
-																						pos:        position{line: 228, col: 5, offset: 4754},
-																						val:        "[0-9]",
-																						ranges:     []rune{'0', '9'},
-																						ignoreCase: false,
-																						inverted:   false,
-																					},
-																				},
-																				&actionExpr{
-																					pos: position{line: 228, col: 5, offset: 4754},
-																					run: (*parser).callonNode52,
-																					expr: &charClassMatcher{
-																						pos:        position{line: 228, col: 5, offset: 4754},
-																						val:        "[0-9]",
-																						ranges:     []rune{'0', '9'},
-																						ignoreCase: false,
-																						inverted:   false,
-																					},
-																				},
-																				&actionExpr{
-																					pos: position{line: 228, col: 5, offset: 4754},
-																					run: (*parser).callonNode54,
-																					expr: &charClassMatcher{
-																						pos:        position{line: 228, col: 5, offset: 4754},
-																						val:        "[0-9]",
-																						ranges:     []rune{'0', '9'},
-																						ignoreCase: false,
-																						inverted:   false,
-																					},
-																				},
-																			},
-																		},
-																	},
-																	&litMatcher{
-																		pos:        position{line: 185, col: 14, offset: 3969},
-																		val:        "-",
-																		ignoreCase: false,
-																		want:       "\"-\"",
-																	},
-																	&actionExpr{
-																		pos: position{line: 160, col: 5, offset: 3637},
-																		run: (*parser).callonNode57,
-																		expr: &seqExpr{
-																			pos: position{line: 160, col: 5, offset: 3637},
-																			exprs: []any{
-																				&actionExpr{
-																					pos: position{line: 228, col: 5, offset: 4754},
-																					run: (*parser).callonNode59,
-																					expr: &charClassMatcher{
-																						pos:        position{line: 228, col: 5, offset: 4754},
-																						val:        "[0-9]",
-																						ranges:     []rune{'0', '9'},
-																						ignoreCase: false,
-																						inverted:   false,
-																					},
-																				},
-																				&actionExpr{
-																					pos: position{line: 228, col: 5, offset: 4754},
-																					run: (*parser).callonNode61,
-																					expr: &charClassMatcher{
-																						pos:        position{line: 228, col: 5, offset: 4754},
-																						val:        "[0-9]",
-																						ranges:     []rune{'0', '9'},
-																						ignoreCase: false,
-																						inverted:   false,
-																					},
-																				},
-																			},
-																		},
-																	},
-																	&litMatcher{
-																		pos:        position{line: 185, col: 28, offset: 3983},
-																		val:        "-",
-																		ignoreCase: false,
-																		want:       "\"-\"",
-																	},
-																	&actionExpr{
-																		pos: position{line: 165, col: 5, offset: 3700},
-																		run: (*parser).callonNode64,
-																		expr: &seqExpr{
-																			pos: position{line: 165, col: 5, offset: 3700},
-																			exprs: []any{
-																				&actionExpr{
-																					pos: position{line: 228, col: 5, offset: 4754},
-																					run: (*parser).callonNode66,
-																					expr: &charClassMatcher{
-																						pos:        position{line: 228, col: 5, offset: 4754},
-																						val:        "[0-9]",
-																						ranges:     []rune{'0', '9'},
-																						ignoreCase: false,
-																						inverted:   false,
-																					},
-																				},
-																				&actionExpr{
-																					pos: position{line: 228, col: 5, offset: 4754},
-																					run: (*parser).callonNode68,
-																					expr: &charClassMatcher{
-																						pos:        position{line: 228, col: 5, offset: 4754},
-																						val:        "[0-9]",
-																						ranges:     []rune{'0', '9'},
-																						ignoreCase: false,
-																						inverted:   false,
-																					},
-																				},
-																			},
-																		},
-																	},
-																},
-															},
-														},
-														&litMatcher{
-															pos:        position{line: 195, col: 14, offset: 4206},
-															val:        "T",
-															ignoreCase: false,
-															want:       "\"T\"",
-														},
-														&actionExpr{
-															pos: position{line: 190, col: 5, offset: 4047},
-															run: (*parser).callonNode71,
-															expr: &seqExpr{
-																pos: position{line: 190, col: 5, offset: 4047},
-																exprs: []any{
-																	&actionExpr{
-																		pos: position{line: 170, col: 5, offset: 3764},
-																		run: (*parser).callonNode73,
-																		expr: &seqExpr{
-																			pos: position{line: 170, col: 5, offset: 3764},
-																			exprs: []any{
-																				&actionExpr{
-																					pos: position{line: 228, col: 5, offset: 4754},
-																					run: (*parser).callonNode75,
-																					expr: &charClassMatcher{
-																						pos:        position{line: 228, col: 5, offset: 4754},
-																						val:        "[0-9]",
-																						ranges:     []rune{'0', '9'},
-																						ignoreCase: false,
-																						inverted:   false,
-																					},
-																				},
-																				&actionExpr{
-																					pos: position{line: 228, col: 5, offset: 4754},
-																					run: (*parser).callonNode77,
-																					expr: &charClassMatcher{
-																						pos:        position{line: 228, col: 5, offset: 4754},
-																						val:        "[0-9]",
-																						ranges:     []rune{'0', '9'},
-																						ignoreCase: false,
-																						inverted:   false,
-																					},
-																				},
-																			},
-																		},
-																	},
-																	&litMatcher{
-																		pos:        position{line: 190, col: 14, offset: 4056},
-																		val:        ":",
-																		ignoreCase: false,
-																		want:       "\":\"",
-																	},
-																	&actionExpr{
-																		pos: position{line: 175, col: 5, offset: 3830},
-																		run: (*parser).callonNode80,
-																		expr: &seqExpr{
-																			pos: position{line: 175, col: 5, offset: 3830},
-																			exprs: []any{
-																				&actionExpr{
-																					pos: position{line: 228, col: 5, offset: 4754},
-																					run: (*parser).callonNode82,
-																					expr: &charClassMatcher{
-																						pos:        position{line: 228, col: 5, offset: 4754},
-																						val:        "[0-9]",
-																						ranges:     []rune{'0', '9'},
-																						ignoreCase: false,
-																						inverted:   false,
-																					},
-																				},
-																				&actionExpr{
-																					pos: position{line: 228, col: 5, offset: 4754},
-																					run: (*parser).callonNode84,
-																					expr: &charClassMatcher{
-																						pos:        position{line: 228, col: 5, offset: 4754},
-																						val:        "[0-9]",
-																						ranges:     []rune{'0', '9'},
-																						ignoreCase: false,
-																						inverted:   false,
-																					},
-																				},
-																			},
-																		},
-																	},
-																	&litMatcher{
-																		pos:        position{line: 190, col: 29, offset: 4071},
-																		val:        ":",
-																		ignoreCase: false,
-																		want:       "\":\"",
-																	},
-																	&actionExpr{
-																		pos: position{line: 180, col: 5, offset: 3896},
-																		run: (*parser).callonNode87,
-																		expr: &seqExpr{
-																			pos: position{line: 180, col: 5, offset: 3896},
-																			exprs: []any{
-																				&actionExpr{
-																					pos: position{line: 228, col: 5, offset: 4754},
-																					run: (*parser).callonNode89,
-																					expr: &charClassMatcher{
-																						pos:        position{line: 228, col: 5, offset: 4754},
-																						val:        "[0-9]",
-																						ranges:     []rune{'0', '9'},
-																						ignoreCase: false,
-																						inverted:   false,
-																					},
-																				},
-																				&actionExpr{
-																					pos: position{line: 228, col: 5, offset: 4754},
-																					run: (*parser).callonNode91,
-																					expr: &charClassMatcher{
-																						pos:        position{line: 228, col: 5, offset: 4754},
-																						val:        "[0-9]",
-																						ranges:     []rune{'0', '9'},
-																						ignoreCase: false,
-																						inverted:   false,
-																					},
-																				},
-																			},
-																		},
-																	},
-																	&zeroOrOneExpr{
-																		pos: position{line: 190, col: 44, offset: 4086},
-																		expr: &seqExpr{
-																			pos: position{line: 190, col: 45, offset: 4087},
-																			exprs: []any{
-																				&litMatcher{
-																					pos:        position{line: 190, col: 45, offset: 4087},
-																					val:        ".",
-																					ignoreCase: false,
-																					want:       "\".\"",
-																				},
-																				&oneOrMoreExpr{
-																					pos: position{line: 190, col: 49, offset: 4091},
-																					expr: &actionExpr{
-																						pos: position{line: 228, col: 5, offset: 4754},
-																						run: (*parser).callonNode97,
-																						expr: &charClassMatcher{
-																							pos:        position{line: 228, col: 5, offset: 4754},
-																							val:        "[0-9]",
-																							ranges:     []rune{'0', '9'},
-																							ignoreCase: false,
-																							inverted:   false,
-																						},
-																					},
-																				},
-																			},
-																		},
-																	},
-																	&choiceExpr{
-																		pos: position{line: 190, col: 59, offset: 4101},
-																		alternatives: []any{
-																			&litMatcher{
-																				pos:        position{line: 190, col: 59, offset: 4101},
-																				val:        "Z",
-																				ignoreCase: false,
-																				want:       "\"Z\"",
-																			},
-																			&seqExpr{
-																				pos: position{line: 190, col: 65, offset: 4107},
-																				exprs: []any{
-																					&charClassMatcher{
-																						pos:        position{line: 190, col: 66, offset: 4108},
-																						val:        "[+-]",
-																						chars:      []rune{'+', '-'},
-																						ignoreCase: false,
-																						inverted:   false,
-																					},
-																					&actionExpr{
-																						pos: position{line: 170, col: 5, offset: 3764},
-																						run: (*parser).callonNode103,
-																						expr: &seqExpr{
-																							pos: position{line: 170, col: 5, offset: 3764},
-																							exprs: []any{
-																								&actionExpr{
-																									pos: position{line: 228, col: 5, offset: 4754},
-																									run: (*parser).callonNode105,
-																									expr: &charClassMatcher{
-																										pos:        position{line: 228, col: 5, offset: 4754},
-																										val:        "[0-9]",
-																										ranges:     []rune{'0', '9'},
-																										ignoreCase: false,
-																										inverted:   false,
-																									},
-																								},
-																								&actionExpr{
-																									pos: position{line: 228, col: 5, offset: 4754},
-																									run: (*parser).callonNode107,
-																									expr: &charClassMatcher{
-																										pos:        position{line: 228, col: 5, offset: 4754},
-																										val:        "[0-9]",
-																										ranges:     []rune{'0', '9'},
-																										ignoreCase: false,
-																										inverted:   false,
-																									},
-																								},
-																							},
-																						},
-																					},
-																					&litMatcher{
-																						pos:        position{line: 190, col: 86, offset: 4128},
-																						val:        ":",
-																						ignoreCase: false,
-																						want:       "\":\"",
-																					},
-																					&actionExpr{
-																						pos: position{line: 175, col: 5, offset: 3830},
-																						run: (*parser).callonNode110,
-																						expr: &seqExpr{
-																							pos: position{line: 175, col: 5, offset: 3830},
-																							exprs: []any{
-																								&actionExpr{
-																									pos: position{line: 228, col: 5, offset: 4754},
-																									run: (*parser).callonNode112,
-																									expr: &charClassMatcher{
-																										pos:        position{line: 228, col: 5, offset: 4754},
-																										val:        "[0-9]",
-																										ranges:     []rune{'0', '9'},
-																										ignoreCase: false,
-																										inverted:   false,
-																									},
-																								},
-																								&actionExpr{
-																									pos: position{line: 228, col: 5, offset: 4754},
-																									run: (*parser).callonNode114,
-																									expr: &charClassMatcher{
-																										pos:        position{line: 228, col: 5, offset: 4754},
-																										val:        "[0-9]",
-																										ranges:     []rune{'0', '9'},
-																										ignoreCase: false,
-																										inverted:   false,
-																									},
-																								},
-																							},
-																						},
-																					},
-																				},
-																			},
-																		},
-																	},
-																},
-															},
-														},
-													},
-												},
-											},
-											&actionExpr{
-												pos: position{line: 185, col: 5, offset: 3960},
-												run: (*parser).callonNode116,
-												expr: &seqExpr{
-													pos: position{line: 185, col: 5, offset: 3960},
-													exprs: []any{
-														&actionExpr{
-															pos: position{line: 155, col: 5, offset: 3560},
-															run: (*parser).callonNode118,
-															expr: &seqExpr{
-																pos: position{line: 155, col: 5, offset: 3560},
-																exprs: []any{
-																	&actionExpr{
-																		pos: position{line: 228, col: 5, offset: 4754},
-																		run: (*parser).callonNode120,
-																		expr: &charClassMatcher{
-																			pos:        position{line: 228, col: 5, offset: 4754},
-																			val:        "[0-9]",
-																			ranges:     []rune{'0', '9'},
-																			ignoreCase: false,
-																			inverted:   false,
-																		},
-																	},
-																	&actionExpr{
-																		pos: position{line: 228, col: 5, offset: 4754},
-																		run: (*parser).callonNode122,
-																		expr: &charClassMatcher{
-																			pos:        position{line: 228, col: 5, offset: 4754},
-																			val:        "[0-9]",
-																			ranges:     []rune{'0', '9'},
-																			ignoreCase: false,
-																			inverted:   false,
-																		},
-																	},
-																	&actionExpr{
-																		pos: position{line: 228, col: 5, offset: 4754},
-																		run: (*parser).callonNode124,
-																		expr: &charClassMatcher{
-																			pos:        position{line: 228, col: 5, offset: 4754},
-																			val:        "[0-9]",
-																			ranges:     []rune{'0', '9'},
-																			ignoreCase: false,
-																			inverted:   false,
-																		},
-																	},
-																	&actionExpr{
-																		pos: position{line: 228, col: 5, offset: 4754},
-																		run: (*parser).callonNode126,
-																		expr: &charClassMatcher{
-																			pos:        position{line: 228, col: 5, offset: 4754},
-																			val:        "[0-9]",
-																			ranges:     []rune{'0', '9'},
-																			ignoreCase: false,
-																			inverted:   false,
-																		},
-																	},
-																},
-															},
-														},
-														&litMatcher{
-															pos:        position{line: 185, col: 14, offset: 3969},
-															val:        "-",
-															ignoreCase: false,
-															want:       "\"-\"",
-														},
-														&actionExpr{
-															pos: position{line: 160, col: 5, offset: 3637},
-															run: (*parser).callonNode129,
-															expr: &seqExpr{
-																pos: position{line: 160, col: 5, offset: 3637},
-																exprs: []any{
-																	&actionExpr{
-																		pos: position{line: 228, col: 5, offset: 4754},
-																		run: (*parser).callonNode131,
-																		expr: &charClassMatcher{
-																			pos:        position{line: 228, col: 5, offset: 4754},
-																			val:        "[0-9]",
-																			ranges:     []rune{'0', '9'},
-																			ignoreCase: false,
-																			inverted:   false,
-																		},
-																	},
-																	&actionExpr{
-																		pos: position{line: 228, col: 5, offset: 4754},
-																		run: (*parser).callonNode133,
-																		expr: &charClassMatcher{
-																			pos:        position{line: 228, col: 5, offset: 4754},
-																			val:        "[0-9]",
-																			ranges:     []rune{'0', '9'},
-																			ignoreCase: false,
-																			inverted:   false,
-																		},
-																	},
-																},
-															},
-														},
-														&litMatcher{
-															pos:        position{line: 185, col: 28, offset: 3983},
-															val:        "-",
-															ignoreCase: false,
-															want:       "\"-\"",
-														},
-														&actionExpr{
-															pos: position{line: 165, col: 5, offset: 3700},
-															run: (*parser).callonNode136,
-															expr: &seqExpr{
-																pos: position{line: 165, col: 5, offset: 3700},
-																exprs: []any{
-																	&actionExpr{
-																		pos: position{line: 228, col: 5, offset: 4754},
-																		run: (*parser).callonNode138,
-																		expr: &charClassMatcher{
-																			pos:        position{line: 228, col: 5, offset: 4754},
-																			val:        "[0-9]",
-																			ranges:     []rune{'0', '9'},
-																			ignoreCase: false,
-																			inverted:   false,
-																		},
-																	},
-																	&actionExpr{
-																		pos: position{line: 228, col: 5, offset: 4754},
-																		run: (*parser).callonNode140,
-																		expr: &charClassMatcher{
-																			pos:        position{line: 228, col: 5, offset: 4754},
-																			val:        "[0-9]",
-																			ranges:     []rune{'0', '9'},
-																			ignoreCase: false,
-																			inverted:   false,
-																		},
-																	},
-																},
-															},
-														},
-													},
-												},
-											},
-											&actionExpr{
-												pos: position{line: 190, col: 5, offset: 4047},
-												run: (*parser).callonNode142,
-												expr: &seqExpr{
-													pos: position{line: 190, col: 5, offset: 4047},
-													exprs: []any{
-														&actionExpr{
-															pos: position{line: 170, col: 5, offset: 3764},
-															run: (*parser).callonNode144,
-															expr: &seqExpr{
-																pos: position{line: 170, col: 5, offset: 3764},
-																exprs: []any{
-																	&actionExpr{
-																		pos: position{line: 228, col: 5, offset: 4754},
-																		run: (*parser).callonNode146,
-																		expr: &charClassMatcher{
-																			pos:        position{line: 228, col: 5, offset: 4754},
-																			val:        "[0-9]",
-																			ranges:     []rune{'0', '9'},
-																			ignoreCase: false,
-																			inverted:   false,
-																		},
-																	},
-																	&actionExpr{
-																		pos: position{line: 228, col: 5, offset: 4754},
-																		run: (*parser).callonNode148,
-																		expr: &charClassMatcher{
-																			pos:        position{line: 228, col: 5, offset: 4754},
-																			val:        "[0-9]",
-																			ranges:     []rune{'0', '9'},
-																			ignoreCase: false,
-																			inverted:   false,
-																		},
-																	},
-																},
-															},
-														},
-														&litMatcher{
-															pos:        position{line: 190, col: 14, offset: 4056},
-															val:        ":",
-															ignoreCase: false,
-															want:       "\":\"",
-														},
-														&actionExpr{
-															pos: position{line: 175, col: 5, offset: 3830},
-															run: (*parser).callonNode151,
-															expr: &seqExpr{
-																pos: position{line: 175, col: 5, offset: 3830},
-																exprs: []any{
-																	&actionExpr{
-																		pos: position{line: 228, col: 5, offset: 4754},
-																		run: (*parser).callonNode153,
-																		expr: &charClassMatcher{
-																			pos:        position{line: 228, col: 5, offset: 4754},
-																			val:        "[0-9]",
-																			ranges:     []rune{'0', '9'},
-																			ignoreCase: false,
-																			inverted:   false,
-																		},
-																	},
-																	&actionExpr{
-																		pos: position{line: 228, col: 5, offset: 4754},
-																		run: (*parser).callonNode155,
-																		expr: &charClassMatcher{
-																			pos:        position{line: 228, col: 5, offset: 4754},
-																			val:        "[0-9]",
-																			ranges:     []rune{'0', '9'},
-																			ignoreCase: false,
-																			inverted:   false,
-																		},
-																	},
-																},
-															},
-														},
-														&litMatcher{
-															pos:        position{line: 190, col: 29, offset: 4071},
-															val:        ":",
-															ignoreCase: false,
-															want:       "\":\"",
-														},
-														&actionExpr{
-															pos: position{line: 180, col: 5, offset: 3896},
-															run: (*parser).callonNode158,
-															expr: &seqExpr{
-																pos: position{line: 180, col: 5, offset: 3896},
-																exprs: []any{
-																	&actionExpr{
-																		pos: position{line: 228, col: 5, offset: 4754},
-																		run: (*parser).callonNode160,
-																		expr: &charClassMatcher{
-																			pos:        position{line: 228, col: 5, offset: 4754},
-																			val:        "[0-9]",
-																			ranges:     []rune{'0', '9'},
-																			ignoreCase: false,
-																			inverted:   false,
-																		},
-																	},
-																	&actionExpr{
-																		pos: position{line: 228, col: 5, offset: 4754},
-																		run: (*parser).callonNode162,
-																		expr: &charClassMatcher{
-																			pos:        position{line: 228, col: 5, offset: 4754},
-																			val:        "[0-9]",
-																			ranges:     []rune{'0', '9'},
-																			ignoreCase: false,
-																			inverted:   false,
-																		},
-																	},
-																},
-															},
-														},
-														&zeroOrOneExpr{
-															pos: position{line: 190, col: 44, offset: 4086},
-															expr: &seqExpr{
-																pos: position{line: 190, col: 45, offset: 4087},
-																exprs: []any{
-																	&litMatcher{
-																		pos:        position{line: 190, col: 45, offset: 4087},
-																		val:        ".",
-																		ignoreCase: false,
-																		want:       "\".\"",
-																	},
-																	&oneOrMoreExpr{
-																		pos: position{line: 190, col: 49, offset: 4091},
-																		expr: &actionExpr{
-																			pos: position{line: 228, col: 5, offset: 4754},
-																			run: (*parser).callonNode168,
-																			expr: &charClassMatcher{
-																				pos:        position{line: 228, col: 5, offset: 4754},
-																				val:        "[0-9]",
-																				ranges:     []rune{'0', '9'},
-																				ignoreCase: false,
-																				inverted:   false,
-																			},
-																		},
-																	},
-																},
-															},
-														},
-														&choiceExpr{
-															pos: position{line: 190, col: 59, offset: 4101},
-															alternatives: []any{
-																&litMatcher{
-																	pos:        position{line: 190, col: 59, offset: 4101},
-																	val:        "Z",
-																	ignoreCase: false,
-																	want:       "\"Z\"",
-																},
-																&seqExpr{
-																	pos: position{line: 190, col: 65, offset: 4107},
-																	exprs: []any{
-																		&charClassMatcher{
-																			pos:        position{line: 190, col: 66, offset: 4108},
-																			val:        "[+-]",
-																			chars:      []rune{'+', '-'},
-																			ignoreCase: false,
-																			inverted:   false,
-																		},
-																		&actionExpr{
-																			pos: position{line: 170, col: 5, offset: 3764},
-																			run: (*parser).callonNode174,
-																			expr: &seqExpr{
-																				pos: position{line: 170, col: 5, offset: 3764},
-																				exprs: []any{
-																					&actionExpr{
-																						pos: position{line: 228, col: 5, offset: 4754},
-																						run: (*parser).callonNode176,
-																						expr: &charClassMatcher{
-																							pos:        position{line: 228, col: 5, offset: 4754},
-																							val:        "[0-9]",
-																							ranges:     []rune{'0', '9'},
-																							ignoreCase: false,
-																							inverted:   false,
-																						},
-																					},
-																					&actionExpr{
-																						pos: position{line: 228, col: 5, offset: 4754},
-																						run: (*parser).callonNode178,
-																						expr: &charClassMatcher{
-																							pos:        position{line: 228, col: 5, offset: 4754},
-																							val:        "[0-9]",
-																							ranges:     []rune{'0', '9'},
-																							ignoreCase: false,
-																							inverted:   false,
-																						},
-																					},
-																				},
-																			},
-																		},
-																		&litMatcher{
-																			pos:        position{line: 190, col: 86, offset: 4128},
-																			val:        ":",
-																			ignoreCase: false,
-																			want:       "\":\"",
-																		},
-																		&actionExpr{
-																			pos: position{line: 175, col: 5, offset: 3830},
-																			run: (*parser).callonNode181,
-																			expr: &seqExpr{
-																				pos: position{line: 175, col: 5, offset: 3830},
-																				exprs: []any{
-																					&actionExpr{
-																						pos: position{line: 228, col: 5, offset: 4754},
-																						run: (*parser).callonNode183,
-																						expr: &charClassMatcher{
-																							pos:        position{line: 228, col: 5, offset: 4754},
-																							val:        "[0-9]",
-																							ranges:     []rune{'0', '9'},
-																							ignoreCase: false,
-																							inverted:   false,
-																						},
-																					},
-																					&actionExpr{
-																						pos: position{line: 228, col: 5, offset: 4754},
-																						run: (*parser).callonNode185,
-																						expr: &charClassMatcher{
-																							pos:        position{line: 228, col: 5, offset: 4754},
-																							val:        "[0-9]",
-																							ranges:     []rune{'0', '9'},
-																							ignoreCase: false,
-																							inverted:   false,
-																						},
-																					},
-																				},
-																			},
-																		},
-																	},
-																},
-															},
-														},
-													},
-												},
-											},
-										},
-									},
-								},
-								&zeroOrOneExpr{
-									pos: position{line: 62, col: 7, offset: 1473},
-									expr: &litMatcher{
-										pos:        position{line: 62, col: 7, offset: 1473},
-										val:        "\"",
-										ignoreCase: false,
-										want:       "\"\\\"\"",
-									},
-								},
-							},
-						},
+					&ruleRefExpr{
+						pos:  position{line: 24, col: 5, offset: 420},
+						name: "OperatorBooleanNodes",
 					},
-					&actionExpr{
-						pos: position{line: 65, col: 5, offset: 1549},
-						run: (*parser).callonNode189,
-						expr: &seqExpr{
-							pos: position{line: 65, col: 5, offset: 1549},
-							exprs: []any{
-								&labeledExpr{
-									pos:   position{line: 65, col: 5, offset: 1549},
-									label: "k",
-									expr: &oneOrMoreExpr{
-										pos: position{line: 65, col: 7, offset: 1551},
-										expr: &actionExpr{
-											pos: position{line: 218, col: 5, offset: 4634},
-											run: (*parser).callonNode193,
-											expr: &charClassMatcher{
-												pos:        position{line: 218, col: 5, offset: 4634},
-												val:        "[.A-Za-z]",
-												chars:      []rune{'.'},
-												ranges:     []rune{'A', 'Z', 'a', 'z'},
-												ignoreCase: false,
-												inverted:   false,
-											},
-										},
-									},
-								},
-								&choiceExpr{
-									pos: position{line: 66, col: 9, offset: 1567},
-									alternatives: []any{
-										&actionExpr{
-											pos: position{line: 125, col: 5, offset: 2997},
-											run: (*parser).callonNode196,
-											expr: &litMatcher{
-												pos:        position{line: 125, col: 5, offset: 2997},
-												val:        "=",
-												ignoreCase: false,
-												want:       "\"=\"",
-											},
-										},
-										&actionExpr{
-											pos: position{line: 120, col: 5, offset: 2911},
-											run: (*parser).callonNode198,
-											expr: &litMatcher{
-												pos:        position{line: 120, col: 5, offset: 2911},
-												val:        ":",
-												ignoreCase: false,
-												want:       "\":\"",
-											},
-										},
-									},
-								},
-								&zeroOrOneExpr{
-									pos: position{line: 68, col: 7, offset: 1619},
-									expr: &litMatcher{
-										pos:        position{line: 68, col: 7, offset: 1619},
-										val:        "\"",
-										ignoreCase: false,
-										want:       "\"\\\"\"",
-									},
-								},
-								&labeledExpr{
-									pos:   position{line: 68, col: 12, offset: 1624},
-									label: "v",
-									expr: &choiceExpr{
-										pos: position{line: 200, col: 5, offset: 4285},
-										alternatives: []any{
-											&litMatcher{
-												pos:        position{line: 200, col: 5, offset: 4285},
-												val:        "today",
-												ignoreCase: false,
-												want:       "\"today\"",
-											},
-											&litMatcher{
-												pos:        position{line: 201, col: 5, offset: 4299},
-												val:        "yesterday",
-												ignoreCase: false,
-												want:       "\"yesterday\"",
-											},
-											&litMatcher{
-												pos:        position{line: 202, col: 5, offset: 4317},
-												val:        "this week",
-												ignoreCase: false,
-												want:       "\"this week\"",
-											},
-											&litMatcher{
-												pos:        position{line: 203, col: 5, offset: 4335},
-												val:        "last week",
-												ignoreCase: false,
-												want:       "\"last week\"",
-											},
-											&litMatcher{
-												pos:        position{line: 204, col: 5, offset: 4353},
-												val:        "last 7 days",
-												ignoreCase: false,
-												want:       "\"last 7 days\"",
-											},
-											&litMatcher{
-												pos:        position{line: 205, col: 5, offset: 4373},
-												val:        "this month",
-												ignoreCase: false,
-												want:       "\"this month\"",
-											},
-											&litMatcher{
-												pos:        position{line: 206, col: 5, offset: 4392},
-												val:        "last month",
-												ignoreCase: false,
-												want:       "\"last month\"",
-											},
-											&litMatcher{
-												pos:        position{line: 207, col: 5, offset: 4411},
-												val:        "last 30 days",
-												ignoreCase: false,
-												want:       "\"last 30 days\"",
-											},
-											&litMatcher{
-												pos:        position{line: 208, col: 5, offset: 4432},
-												val:        "this year",
-												ignoreCase: false,
-												want:       "\"this year\"",
-											},
-											&actionExpr{
-												pos: position{line: 209, col: 5, offset: 4450},
-												run: (*parser).callonNode213,
-												expr: &litMatcher{
-													pos:        position{line: 209, col: 5, offset: 4450},
-													val:        "last year",
-													ignoreCase: false,
-													want:       "\"last year\"",
-												},
-											},
-										},
-									},
-								},
-								&zeroOrOneExpr{
-									pos: position{line: 68, col: 38, offset: 1650},
-									expr: &litMatcher{
-										pos:        position{line: 68, col: 38, offset: 1650},
-										val:        "\"",
-										ignoreCase: false,
-										want:       "\"\\\"\"",
-									},
-								},
-							},
-						},
-					},
-					&actionExpr{
-						pos: position{line: 73, col: 5, offset: 1769},
-						run: (*parser).callonNode217,
-						expr: &seqExpr{
-							pos: position{line: 73, col: 5, offset: 1769},
-							exprs: []any{
-								&labeledExpr{
-									pos:   position{line: 73, col: 5, offset: 1769},
-									label: "k",
-									expr: &oneOrMoreExpr{
-										pos: position{line: 73, col: 7, offset: 1771},
-										expr: &actionExpr{
-											pos: position{line: 218, col: 5, offset: 4634},
-											run: (*parser).callonNode221,
-											expr: &charClassMatcher{
-												pos:        position{line: 218, col: 5, offset: 4634},
-												val:        "[.A-Za-z]",
-												chars:      []rune{'.'},
-												ranges:     []rune{'A', 'Z', 'a', 'z'},
-												ignoreCase: false,
-												inverted:   false,
-											},
-										},
-									},
-								},
-								&choiceExpr{
-									pos: position{line: 73, col: 14, offset: 1778},
-									alternatives: []any{
-										&actionExpr{
-											pos: position{line: 120, col: 5, offset: 2911},
-											run: (*parser).callonNode224,
-											expr: &litMatcher{
-												pos:        position{line: 120, col: 5, offset: 2911},
-												val:        ":",
-												ignoreCase: false,
-												want:       "\":\"",
-											},
-										},
-										&actionExpr{
-											pos: position{line: 125, col: 5, offset: 2997},
-											run: (*parser).callonNode226,
-											expr: &litMatcher{
-												pos:        position{line: 125, col: 5, offset: 2997},
-												val:        "=",
-												ignoreCase: false,
-												want:       "\"=\"",
-											},
-										},
-									},
-								},
-								&labeledExpr{
-									pos:   position{line: 73, col: 53, offset: 1817},
-									label: "v",
-									expr: &choiceExpr{
-										pos: position{line: 73, col: 56, offset: 1820},
-										alternatives: []any{
-											&actionExpr{
-												pos: position{line: 223, col: 5, offset: 4694},
-												run: (*parser).callonNode230,
-												expr: &seqExpr{
-													pos: position{line: 223, col: 5, offset: 4694},
-													exprs: []any{
-														&litMatcher{
-															pos:        position{line: 223, col: 5, offset: 4694},
-															val:        "\"",
-															ignoreCase: false,
-															want:       "\"\\\"\"",
-														},
-														&labeledExpr{
-															pos:   position{line: 223, col: 9, offset: 4698},
-															label: "v",
-															expr: &zeroOrMoreExpr{
-																pos: position{line: 223, col: 11, offset: 4700},
-																expr: &charClassMatcher{
-																	pos:        position{line: 223, col: 11, offset: 4700},
-																	val:        "[^\"]",
-																	chars:      []rune{'"'},
-																	ignoreCase: false,
-																	inverted:   true,
-																},
-															},
-														},
-														&litMatcher{
-															pos:        position{line: 223, col: 17, offset: 4706},
-															val:        "\"",
-															ignoreCase: false,
-															want:       "\"\\\"\"",
-														},
-													},
-												},
-											},
-											&oneOrMoreExpr{
-												pos: position{line: 73, col: 65, offset: 1829},
-												expr: &charClassMatcher{
-													pos:        position{line: 73, col: 65, offset: 1829},
-													val:        "[^ ()]",
-													chars:      []rune{' ', '(', ')'},
-													ignoreCase: false,
-													inverted:   true,
-												},
-											},
-										},
-									},
-								},
-							},
-						},
-					},
-					&actionExpr{
-						pos: position{line: 105, col: 5, offset: 2621},
-						run: (*parser).callonNode239,
-						expr: &choiceExpr{
-							pos: position{line: 105, col: 6, offset: 2622},
-							alternatives: []any{
-								&litMatcher{
-									pos:        position{line: 105, col: 6, offset: 2622},
-									val:        "AND",
-									ignoreCase: false,
-									want:       "\"AND\"",
-								},
-								&litMatcher{
-									pos:        position{line: 105, col: 14, offset: 2630},
-									val:        "+",
-									ignoreCase: false,
-									want:       "\"+\"",
-								},
-							},
-						},
-					},
-					&actionExpr{
-						pos: position{line: 110, col: 5, offset: 2722},
-						run: (*parser).callonNode243,
-						expr: &choiceExpr{
-							pos: position{line: 110, col: 6, offset: 2723},
-							alternatives: []any{
-								&litMatcher{
-									pos:        position{line: 110, col: 6, offset: 2723},
-									val:        "NOT",
-									ignoreCase: false,
-									want:       "\"NOT\"",
-								},
-								&litMatcher{
-									pos:        position{line: 110, col: 14, offset: 2731},
-									val:        "-",
-									ignoreCase: false,
-									want:       "\"-\"",
-								},
-							},
-						},
-					},
-					&actionExpr{
-						pos: position{line: 115, col: 5, offset: 2822},
-						run: (*parser).callonNode247,
-						expr: &litMatcher{
-							pos:        position{line: 115, col: 6, offset: 2823},
-							val:        "OR",
-							ignoreCase: false,
-							want:       "\"OR\"",
-						},
-					},
-					&actionExpr{
-						pos: position{line: 86, col: 6, offset: 2109},
-						run: (*parser).callonNode249,
-						expr: &seqExpr{
-							pos: position{line: 86, col: 6, offset: 2109},
-							exprs: []any{
-								&zeroOrOneExpr{
-									pos: position{line: 86, col: 6, offset: 2109},
-									expr: &actionExpr{
-										pos: position{line: 120, col: 5, offset: 2911},
-										run: (*parser).callonNode252,
-										expr: &litMatcher{
-											pos:        position{line: 120, col: 5, offset: 2911},
-											val:        ":",
-											ignoreCase: false,
-											want:       "\":\"",
-										},
-									},
-								},
-								&actionExpr{
-									pos: position{line: 233, col: 5, offset: 4805},
-									run: (*parser).callonNode254,
-									expr: &zeroOrMoreExpr{
-										pos: position{line: 233, col: 5, offset: 4805},
-										expr: &charClassMatcher{
-											pos:        position{line: 233, col: 5, offset: 4805},
-											val:        "[ \\t]",
-											chars:      []rune{' ', '\t'},
-											ignoreCase: false,
-											inverted:   false,
-										},
-									},
-								},
-								&labeledExpr{
-									pos:   position{line: 86, col: 27, offset: 2130},
-									label: "v",
-									expr: &actionExpr{
-										pos: position{line: 223, col: 5, offset: 4694},
-										run: (*parser).callonNode258,
-										expr: &seqExpr{
-											pos: position{line: 223, col: 5, offset: 4694},
-											exprs: []any{
-												&litMatcher{
-													pos:        position{line: 223, col: 5, offset: 4694},
-													val:        "\"",
-													ignoreCase: false,
-													want:       "\"\\\"\"",
-												},
-												&labeledExpr{
-													pos:   position{line: 223, col: 9, offset: 4698},
-													label: "v",
-													expr: &zeroOrMoreExpr{
-														pos: position{line: 223, col: 11, offset: 4700},
-														expr: &charClassMatcher{
-															pos:        position{line: 223, col: 11, offset: 4700},
-															val:        "[^\"]",
-															chars:      []rune{'"'},
-															ignoreCase: false,
-															inverted:   true,
-														},
-													},
-												},
-												&litMatcher{
-													pos:        position{line: 223, col: 17, offset: 4706},
-													val:        "\"",
-													ignoreCase: false,
-													want:       "\"\\\"\"",
-												},
-											},
-										},
-									},
-								},
-								&actionExpr{
-									pos: position{line: 233, col: 5, offset: 4805},
-									run: (*parser).callonNode265,
-									expr: &zeroOrMoreExpr{
-										pos: position{line: 233, col: 5, offset: 4805},
-										expr: &charClassMatcher{
-											pos:        position{line: 233, col: 5, offset: 4805},
-											val:        "[ \\t]",
-											chars:      []rune{' ', '\t'},
-											ignoreCase: false,
-											inverted:   false,
-										},
-									},
-								},
-								&zeroOrOneExpr{
-									pos: position{line: 86, col: 38, offset: 2141},
-									expr: &actionExpr{
-										pos: position{line: 120, col: 5, offset: 2911},
-										run: (*parser).callonNode269,
-										expr: &litMatcher{
-											pos:        position{line: 120, col: 5, offset: 2911},
-											val:        ":",
-											ignoreCase: false,
-											want:       "\":\"",
-										},
-									},
-								},
-							},
-						},
-					},
-					&actionExpr{
-						pos: position{line: 91, col: 6, offset: 2239},
-						run: (*parser).callonNode271,
-						expr: &seqExpr{
-							pos: position{line: 91, col: 6, offset: 2239},
-							exprs: []any{
-								&zeroOrOneExpr{
-									pos: position{line: 91, col: 6, offset: 2239},
-									expr: &actionExpr{
-										pos: position{line: 120, col: 5, offset: 2911},
-										run: (*parser).callonNode274,
-										expr: &litMatcher{
-											pos:        position{line: 120, col: 5, offset: 2911},
-											val:        ":",
-											ignoreCase: false,
-											want:       "\":\"",
-										},
-									},
-								},
-								&actionExpr{
-									pos: position{line: 233, col: 5, offset: 4805},
-									run: (*parser).callonNode276,
-									expr: &zeroOrMoreExpr{
-										pos: position{line: 233, col: 5, offset: 4805},
-										expr: &charClassMatcher{
-											pos:        position{line: 233, col: 5, offset: 4805},
-											val:        "[ \\t]",
-											chars:      []rune{' ', '\t'},
-											ignoreCase: false,
-											inverted:   false,
-										},
-									},
-								},
-								&labeledExpr{
-									pos:   position{line: 91, col: 27, offset: 2260},
-									label: "v",
-									expr: &oneOrMoreExpr{
-										pos: position{line: 91, col: 29, offset: 2262},
-										expr: &charClassMatcher{
-											pos:        position{line: 91, col: 29, offset: 2262},
-											val:        "[^ :()]",
-											chars:      []rune{' ', ':', '(', ')'},
-											ignoreCase: false,
-											inverted:   true,
-										},
-									},
-								},
-								&actionExpr{
-									pos: position{line: 233, col: 5, offset: 4805},
-									run: (*parser).callonNode282,
-									expr: &zeroOrMoreExpr{
-										pos: position{line: 233, col: 5, offset: 4805},
-										expr: &charClassMatcher{
-											pos:        position{line: 233, col: 5, offset: 4805},
-											val:        "[ \\t]",
-											chars:      []rune{' ', '\t'},
-											ignoreCase: false,
-											inverted:   false,
-										},
-									},
-								},
-								&zeroOrOneExpr{
-									pos: position{line: 91, col: 40, offset: 2273},
-									expr: &actionExpr{
-										pos: position{line: 120, col: 5, offset: 2911},
-										run: (*parser).callonNode286,
-										expr: &litMatcher{
-											pos:        position{line: 120, col: 5, offset: 2911},
-											val:        ":",
-											ignoreCase: false,
-											want:       "\":\"",
-										},
-									},
-								},
-							},
-						},
+					&ruleRefExpr{
+						pos:  position{line: 25, col: 5, offset: 447},
+						name: "FreeTextKeywordNodes",
 					},
 				},
 			},
@@ -1526,17 +96,9 @@ var g = &grammar{
 								pos: position{line: 32, col: 7, offset: 614},
 								expr: &oneOrMoreExpr{
 									pos: position{line: 32, col: 8, offset: 615},
-									expr: &actionExpr{
-										pos: position{line: 218, col: 5, offset: 4634},
-										run: (*parser).callonGroupNode6,
-										expr: &charClassMatcher{
-											pos:        position{line: 218, col: 5, offset: 4634},
-											val:        "[.A-Za-z]",
-											chars:      []rune{'.'},
-											ranges:     []rune{'A', 'Z', 'a', 'z'},
-											ignoreCase: false,
-											inverted:   false,
-										},
+									expr: &ruleRefExpr{
+										pos:  position{line: 32, col: 8, offset: 615},
+										name: "Char",
 									},
 								},
 							},
@@ -1546,25 +108,13 @@ var g = &grammar{
 							expr: &choiceExpr{
 								pos: position{line: 32, col: 17, offset: 624},
 								alternatives: []any{
-									&actionExpr{
-										pos: position{line: 120, col: 5, offset: 2911},
-										run: (*parser).callonGroupNode10,
-										expr: &litMatcher{
-											pos:        position{line: 120, col: 5, offset: 2911},
-											val:        ":",
-											ignoreCase: false,
-											want:       "\":\"",
-										},
+									&ruleRefExpr{
+										pos:  position{line: 32, col: 17, offset: 624},
+										name: "OperatorColonNode",
 									},
-									&actionExpr{
-										pos: position{line: 125, col: 5, offset: 2997},
-										run: (*parser).callonGroupNode12,
-										expr: &litMatcher{
-											pos:        position{line: 125, col: 5, offset: 2997},
-											val:        "=",
-											ignoreCase: false,
-											want:       "\"=\"",
-										},
+									&ruleRefExpr{
+										pos:  position{line: 32, col: 37, offset: 644},
+										name: "OperatorEqualNode",
 									},
 								},
 							},
@@ -1593,6 +143,1155 @@ var g = &grammar{
 				},
 			},
 		},
+		{
+			name: "PropertyRestrictionNodes",
+			pos:  position{line: 40, col: 1, offset: 880},
+			expr: &choiceExpr{
+				pos: position{line: 41, col: 5, offset: 912},
+				alternatives: []any{
+					&ruleRefExpr{
+						pos:  position{line: 41, col: 5, offset: 912},
+						name: "YesNoPropertyRestrictionNode",
+					},
+					&ruleRefExpr{
+						pos:  position{line: 42, col: 5, offset: 947},
+						name: "DateTimeRestrictionNode",
+					},
+					&ruleRefExpr{
+						pos:  position{line: 43, col: 5, offset: 977},
+						name: "NumericRestrictionNode",
+					},
+					&ruleRefExpr{
+						pos:  position{line: 44, col: 5, offset: 1006},
+						name: "TextPropertyRestrictionNode",
+					},
+				},
+			},
+		},
+		{
+			name: "YesNoPropertyRestrictionNode",
+			pos:  position{line: 46, col: 1, offset: 1035},
+			expr: &actionExpr{
+				pos: position{line: 47, col: 5, offset: 1071},
+				run: (*parser).callonYesNoPropertyRestrictionNode1,
+				expr: &seqExpr{
+					pos: position{line: 47, col: 5, offset: 1071},
+					exprs: []any{
+						&labeledExpr{
+							pos:   position{line: 47, col: 5, offset: 1071},
+							label: "k",
+							expr: &oneOrMoreExpr{
+								pos: position{line: 47, col: 7, offset: 1073},
+								expr: &ruleRefExpr{
+									pos:  position{line: 47, col: 7, offset: 1073},
+									name: "Char",
+								},
+							},
+						},
+						&choiceExpr{
+							pos: position{line: 47, col: 14, offset: 1080},
+							alternatives: []any{
+								&ruleRefExpr{
+									pos:  position{line: 47, col: 14, offset: 1080},
+									name: "OperatorColonNode",
+								},
+								&ruleRefExpr{
+									pos:  position{line: 47, col: 34, offset: 1100},
+									name: "OperatorEqualNode",
+								},
+							},
+						},
+						&labeledExpr{
+							pos:   position{line: 47, col: 53, offset: 1119},
+							label: "v",
+							expr: &choiceExpr{
+								pos: position{line: 47, col: 56, offset: 1122},
+								alternatives: []any{
+									&litMatcher{
+										pos:        position{line: 47, col: 56, offset: 1122},
+										val:        "true",
+										ignoreCase: false,
+										want:       "\"true\"",
+									},
+									&litMatcher{
+										pos:        position{line: 47, col: 65, offset: 1131},
+										val:        "false",
+										ignoreCase: false,
+										want:       "\"false\"",
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "DateTimeRestrictionNode",
+			pos:  position{line: 51, col: 1, offset: 1201},
+			expr: &choiceExpr{
+				pos: position{line: 52, col: 5, offset: 1232},
+				alternatives: []any{
+					&actionExpr{
+						pos: position{line: 52, col: 5, offset: 1232},
+						run: (*parser).callonDateTimeRestrictionNode2,
+						expr: &seqExpr{
+							pos: position{line: 52, col: 5, offset: 1232},
+							exprs: []any{
+								&labeledExpr{
+									pos:   position{line: 52, col: 5, offset: 1232},
+									label: "k",
+									expr: &oneOrMoreExpr{
+										pos: position{line: 52, col: 7, offset: 1234},
+										expr: &ruleRefExpr{
+											pos:  position{line: 52, col: 7, offset: 1234},
+											name: "Char",
+										},
+									},
+								},
+								&labeledExpr{
+									pos:   position{line: 52, col: 13, offset: 1240},
+									label: "o",
+									expr: &choiceExpr{
+										pos: position{line: 53, col: 9, offset: 1252},
+										alternatives: []any{
+											&ruleRefExpr{
+												pos:  position{line: 53, col: 9, offset: 1252},
+												name: "OperatorGreaterOrEqualNode",
+											},
+											&ruleRefExpr{
+												pos:  position{line: 54, col: 9, offset: 1289},
+												name: "OperatorLessOrEqualNode",
+											},
+											&ruleRefExpr{
+												pos:  position{line: 55, col: 9, offset: 1323},
+												name: "OperatorGreaterNode",
+											},
+											&ruleRefExpr{
+												pos:  position{line: 56, col: 9, offset: 1353},
+												name: "OperatorLessNode",
+											},
+											&ruleRefExpr{
+												pos:  position{line: 57, col: 9, offset: 1380},
+												name: "OperatorEqualNode",
+											},
+											&ruleRefExpr{
+												pos:  position{line: 58, col: 9, offset: 1408},
+												name: "OperatorColonNode",
+											},
+										},
+									},
+								},
+								&zeroOrOneExpr{
+									pos: position{line: 59, col: 7, offset: 1432},
+									expr: &litMatcher{
+										pos:        position{line: 59, col: 7, offset: 1432},
+										val:        "\"",
+										ignoreCase: false,
+										want:       "\"\\\"\"",
+									},
+								},
+								&labeledExpr{
+									pos:   position{line: 59, col: 12, offset: 1437},
+									label: "v",
+									expr: &choiceExpr{
+										pos: position{line: 60, col: 9, offset: 1449},
+										alternatives: []any{
+											&ruleRefExpr{
+												pos:  position{line: 60, col: 9, offset: 1449},
+												name: "DateTime",
+											},
+											&ruleRefExpr{
+												pos:  position{line: 61, col: 9, offset: 1468},
+												name: "FullDate",
+											},
+											&ruleRefExpr{
+												pos:  position{line: 62, col: 9, offset: 1487},
+												name: "FullTime",
+											},
+										},
+									},
+								},
+								&zeroOrOneExpr{
+									pos: position{line: 63, col: 7, offset: 1502},
+									expr: &litMatcher{
+										pos:        position{line: 63, col: 7, offset: 1502},
+										val:        "\"",
+										ignoreCase: false,
+										want:       "\"\\\"\"",
+									},
+								},
+							},
+						},
+					},
+					&actionExpr{
+						pos: position{line: 66, col: 5, offset: 1578},
+						run: (*parser).callonDateTimeRestrictionNode24,
+						expr: &seqExpr{
+							pos: position{line: 66, col: 5, offset: 1578},
+							exprs: []any{
+								&labeledExpr{
+									pos:   position{line: 66, col: 5, offset: 1578},
+									label: "k",
+									expr: &oneOrMoreExpr{
+										pos: position{line: 66, col: 7, offset: 1580},
+										expr: &ruleRefExpr{
+											pos:  position{line: 66, col: 7, offset: 1580},
+											name: "Char",
+										},
+									},
+								},
+								&choiceExpr{
+									pos: position{line: 67, col: 9, offset: 1596},
+									alternatives: []any{
+										&ruleRefExpr{
+											pos:  position{line: 67, col: 9, offset: 1596},
+											name: "OperatorEqualNode",
+										},
+										&ruleRefExpr{
+											pos:  position{line: 68, col: 9, offset: 1624},
+											name: "OperatorColonNode",
+										},
+									},
+								},
+								&zeroOrOneExpr{
+									pos: position{line: 69, col: 7, offset: 1648},
+									expr: &litMatcher{
+										pos:        position{line: 69, col: 7, offset: 1648},
+										val:        "\"",
+										ignoreCase: false,
+										want:       "\"\\\"\"",
+									},
+								},
+								&labeledExpr{
+									pos:   position{line: 69, col: 12, offset: 1653},
+									label: "v",
+									expr: &ruleRefExpr{
+										pos:  position{line: 69, col: 14, offset: 1655},
+										name: "NaturalLanguageDateTime",
+									},
+								},
+								&zeroOrOneExpr{
+									pos: position{line: 69, col: 38, offset: 1679},
+									expr: &litMatcher{
+										pos:        position{line: 69, col: 38, offset: 1679},
+										val:        "\"",
+										ignoreCase: false,
+										want:       "\"\\\"\"",
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "NumericRestrictionNode",
+			pos:  position{line: 73, col: 1, offset: 1763},
+			expr: &actionExpr{
+				pos: position{line: 74, col: 5, offset: 1793},
+				run: (*parser).callonNumericRestrictionNode1,
+				expr: &seqExpr{
+					pos: position{line: 74, col: 5, offset: 1793},
+					exprs: []any{
+						&labeledExpr{
+							pos:   position{line: 74, col: 5, offset: 1793},
+							label: "k",
+							expr: &oneOrMoreExpr{
+								pos: position{line: 74, col: 7, offset: 1795},
+								expr: &ruleRefExpr{
+									pos:  position{line: 74, col: 7, offset: 1795},
+									name: "Char",
+								},
+							},
+						},
+						&labeledExpr{
+							pos:   position{line: 74, col: 13, offset: 1801},
+							label: "o",
+							expr: &choiceExpr{
+								pos: position{line: 75, col: 9, offset: 1813},
+								alternatives: []any{
+									&ruleRefExpr{
+										pos:  position{line: 75, col: 9, offset: 1813},
+										name: "OperatorGreaterOrEqualNode",
+									},
+									&ruleRefExpr{
+										pos:  position{line: 76, col: 9, offset: 1850},
+										name: "OperatorLessOrEqualNode",
+									},
+									&ruleRefExpr{
+										pos:  position{line: 77, col: 9, offset: 1884},
+										name: "OperatorGreaterNode",
+									},
+									&ruleRefExpr{
+										pos:  position{line: 78, col: 9, offset: 1914},
+										name: "OperatorLessNode",
+									},
+								},
+							},
+						},
+						&labeledExpr{
+							pos:   position{line: 79, col: 7, offset: 1937},
+							label: "v",
+							expr: &ruleRefExpr{
+								pos:  position{line: 79, col: 9, offset: 1939},
+								name: "Number",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "TextPropertyRestrictionNode",
+			pos:  position{line: 83, col: 1, offset: 2011},
+			expr: &actionExpr{
+				pos: position{line: 84, col: 5, offset: 2046},
+				run: (*parser).callonTextPropertyRestrictionNode1,
+				expr: &seqExpr{
+					pos: position{line: 84, col: 5, offset: 2046},
+					exprs: []any{
+						&labeledExpr{
+							pos:   position{line: 84, col: 5, offset: 2046},
+							label: "k",
+							expr: &oneOrMoreExpr{
+								pos: position{line: 84, col: 7, offset: 2048},
+								expr: &ruleRefExpr{
+									pos:  position{line: 84, col: 7, offset: 2048},
+									name: "Char",
+								},
+							},
+						},
+						&choiceExpr{
+							pos: position{line: 84, col: 14, offset: 2055},
+							alternatives: []any{
+								&ruleRefExpr{
+									pos:  position{line: 84, col: 14, offset: 2055},
+									name: "OperatorColonNode",
+								},
+								&ruleRefExpr{
+									pos:  position{line: 84, col: 34, offset: 2075},
+									name: "OperatorEqualNode",
+								},
+							},
+						},
+						&labeledExpr{
+							pos:   position{line: 84, col: 53, offset: 2094},
+							label: "v",
+							expr: &choiceExpr{
+								pos: position{line: 84, col: 56, offset: 2097},
+								alternatives: []any{
+									&ruleRefExpr{
+										pos:  position{line: 84, col: 56, offset: 2097},
+										name: "String",
+									},
+									&oneOrMoreExpr{
+										pos: position{line: 84, col: 65, offset: 2106},
+										expr: &charClassMatcher{
+											pos:        position{line: 84, col: 65, offset: 2106},
+											val:        "[^ ()]",
+											chars:      []rune{' ', '(', ')'},
+											ignoreCase: false,
+											inverted:   true,
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "FreeTextKeywordNodes",
+			pos:  position{line: 92, col: 1, offset: 2312},
+			expr: &choiceExpr{
+				pos: position{line: 93, col: 5, offset: 2340},
+				alternatives: []any{
+					&ruleRefExpr{
+						pos:  position{line: 93, col: 5, offset: 2340},
+						name: "PhraseNode",
+					},
+					&ruleRefExpr{
+						pos:  position{line: 94, col: 5, offset: 2357},
+						name: "WordNode",
+					},
+				},
+			},
+		},
+		{
+			name: "PhraseNode",
+			pos:  position{line: 96, col: 1, offset: 2367},
+			expr: &actionExpr{
+				pos: position{line: 97, col: 6, offset: 2386},
+				run: (*parser).callonPhraseNode1,
+				expr: &seqExpr{
+					pos: position{line: 97, col: 6, offset: 2386},
+					exprs: []any{
+						&zeroOrOneExpr{
+							pos: position{line: 97, col: 6, offset: 2386},
+							expr: &ruleRefExpr{
+								pos:  position{line: 97, col: 6, offset: 2386},
+								name: "OperatorColonNode",
+							},
+						},
+						&ruleRefExpr{
+							pos:  position{line: 97, col: 25, offset: 2405},
+							name: "_",
+						},
+						&labeledExpr{
+							pos:   position{line: 97, col: 27, offset: 2407},
+							label: "v",
+							expr: &ruleRefExpr{
+								pos:  position{line: 97, col: 29, offset: 2409},
+								name: "String",
+							},
+						},
+						&ruleRefExpr{
+							pos:  position{line: 97, col: 36, offset: 2416},
+							name: "_",
+						},
+						&zeroOrOneExpr{
+							pos: position{line: 97, col: 38, offset: 2418},
+							expr: &ruleRefExpr{
+								pos:  position{line: 97, col: 38, offset: 2418},
+								name: "OperatorColonNode",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "WordNode",
+			pos:  position{line: 101, col: 1, offset: 2499},
+			expr: &actionExpr{
+				pos: position{line: 102, col: 6, offset: 2516},
+				run: (*parser).callonWordNode1,
+				expr: &seqExpr{
+					pos: position{line: 102, col: 6, offset: 2516},
+					exprs: []any{
+						&zeroOrOneExpr{
+							pos: position{line: 102, col: 6, offset: 2516},
+							expr: &ruleRefExpr{
+								pos:  position{line: 102, col: 6, offset: 2516},
+								name: "OperatorColonNode",
+							},
+						},
+						&ruleRefExpr{
+							pos:  position{line: 102, col: 25, offset: 2535},
+							name: "_",
+						},
+						&labeledExpr{
+							pos:   position{line: 102, col: 27, offset: 2537},
+							label: "v",
+							expr: &oneOrMoreExpr{
+								pos: position{line: 102, col: 29, offset: 2539},
+								expr: &charClassMatcher{
+									pos:        position{line: 102, col: 29, offset: 2539},
+									val:        "[^ :()]",
+									chars:      []rune{' ', ':', '(', ')'},
+									ignoreCase: false,
+									inverted:   true,
+								},
+							},
+						},
+						&ruleRefExpr{
+							pos:  position{line: 102, col: 38, offset: 2548},
+							name: "_",
+						},
+						&zeroOrOneExpr{
+							pos: position{line: 102, col: 40, offset: 2550},
+							expr: &ruleRefExpr{
+								pos:  position{line: 102, col: 40, offset: 2550},
+								name: "OperatorColonNode",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "OperatorBooleanNodes",
+			pos:  position{line: 110, col: 1, offset: 2759},
+			expr: &choiceExpr{
+				pos: position{line: 111, col: 5, offset: 2787},
+				alternatives: []any{
+					&ruleRefExpr{
+						pos:  position{line: 111, col: 5, offset: 2787},
+						name: "OperatorBooleanAndNode",
+					},
+					&ruleRefExpr{
+						pos:  position{line: 112, col: 5, offset: 2816},
+						name: "OperatorBooleanNotNode",
+					},
+					&ruleRefExpr{
+						pos:  position{line: 113, col: 5, offset: 2845},
+						name: "OperatorBooleanOrNode",
+					},
+				},
+			},
+		},
+		{
+			name: "OperatorBooleanAndNode",
+			pos:  position{line: 115, col: 1, offset: 2868},
+			expr: &actionExpr{
+				pos: position{line: 116, col: 5, offset: 2898},
+				run: (*parser).callonOperatorBooleanAndNode1,
+				expr: &choiceExpr{
+					pos: position{line: 116, col: 6, offset: 2899},
+					alternatives: []any{
+						&litMatcher{
+							pos:        position{line: 116, col: 6, offset: 2899},
+							val:        "AND",
+							ignoreCase: false,
+							want:       "\"AND\"",
+						},
+						&litMatcher{
+							pos:        position{line: 116, col: 14, offset: 2907},
+							val:        "+",
+							ignoreCase: false,
+							want:       "\"+\"",
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "OperatorBooleanNotNode",
+			pos:  position{line: 120, col: 1, offset: 2969},
+			expr: &actionExpr{
+				pos: position{line: 121, col: 5, offset: 2999},
+				run: (*parser).callonOperatorBooleanNotNode1,
+				expr: &choiceExpr{
+					pos: position{line: 121, col: 6, offset: 3000},
+					alternatives: []any{
+						&litMatcher{
+							pos:        position{line: 121, col: 6, offset: 3000},
+							val:        "NOT",
+							ignoreCase: false,
+							want:       "\"NOT\"",
+						},
+						&litMatcher{
+							pos:        position{line: 121, col: 14, offset: 3008},
+							val:        "-",
+							ignoreCase: false,
+							want:       "\"-\"",
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "OperatorBooleanOrNode",
+			pos:  position{line: 125, col: 1, offset: 3070},
+			expr: &actionExpr{
+				pos: position{line: 126, col: 5, offset: 3099},
+				run: (*parser).callonOperatorBooleanOrNode1,
+				expr: &litMatcher{
+					pos:        position{line: 126, col: 6, offset: 3100},
+					val:        "OR",
+					ignoreCase: false,
+					want:       "\"OR\"",
+				},
+			},
+		},
+		{
+			name: "OperatorColonNode",
+			pos:  position{line: 130, col: 1, offset: 3163},
+			expr: &actionExpr{
+				pos: position{line: 131, col: 5, offset: 3188},
+				run: (*parser).callonOperatorColonNode1,
+				expr: &litMatcher{
+					pos:        position{line: 131, col: 5, offset: 3188},
+					val:        ":",
+					ignoreCase: false,
+					want:       "\":\"",
+				},
+			},
+		},
+		{
+			name: "OperatorEqualNode",
+			pos:  position{line: 135, col: 1, offset: 3249},
+			expr: &actionExpr{
+				pos: position{line: 136, col: 5, offset: 3274},
+				run: (*parser).callonOperatorEqualNode1,
+				expr: &litMatcher{
+					pos:        position{line: 136, col: 5, offset: 3274},
+					val:        "=",
+					ignoreCase: false,
+					want:       "\"=\"",
+				},
+			},
+		},
+		{
+			name: "OperatorLessNode",
+			pos:  position{line: 140, col: 1, offset: 3335},
+			expr: &actionExpr{
+				pos: position{line: 141, col: 5, offset: 3359},
+				run: (*parser).callonOperatorLessNode1,
+				expr: &litMatcher{
+					pos:        position{line: 141, col: 5, offset: 3359},
+					val:        "<",
+					ignoreCase: false,
+					want:       "\"<\"",
+				},
+			},
+		},
+		{
+			name: "OperatorLessOrEqualNode",
+			pos:  position{line: 145, col: 1, offset: 3420},
+			expr: &actionExpr{
+				pos: position{line: 146, col: 5, offset: 3451},
+				run: (*parser).callonOperatorLessOrEqualNode1,
+				expr: &litMatcher{
+					pos:        position{line: 146, col: 5, offset: 3451},
+					val:        "<=",
+					ignoreCase: false,
+					want:       "\"<=\"",
+				},
+			},
+		},
+		{
+			name: "OperatorGreaterNode",
+			pos:  position{line: 150, col: 1, offset: 3513},
+			expr: &actionExpr{
+				pos: position{line: 151, col: 5, offset: 3540},
+				run: (*parser).callonOperatorGreaterNode1,
+				expr: &litMatcher{
+					pos:        position{line: 151, col: 5, offset: 3540},
+					val:        ">",
+					ignoreCase: false,
+					want:       "\">\"",
+				},
+			},
+		},
+		{
+			name: "OperatorGreaterOrEqualNode",
+			pos:  position{line: 155, col: 1, offset: 3601},
+			expr: &actionExpr{
+				pos: position{line: 156, col: 5, offset: 3635},
+				run: (*parser).callonOperatorGreaterOrEqualNode1,
+				expr: &litMatcher{
+					pos:        position{line: 156, col: 5, offset: 3635},
+					val:        ">=",
+					ignoreCase: false,
+					want:       "\">=\"",
+				},
+			},
+		},
+		{
+			name: "TimeYear",
+			pos:  position{line: 165, col: 1, offset: 3821},
+			expr: &actionExpr{
+				pos: position{line: 166, col: 5, offset: 3837},
+				run: (*parser).callonTimeYear1,
+				expr: &seqExpr{
+					pos: position{line: 166, col: 5, offset: 3837},
+					exprs: []any{
+						&ruleRefExpr{
+							pos:  position{line: 166, col: 5, offset: 3837},
+							name: "Digit",
+						},
+						&ruleRefExpr{
+							pos:  position{line: 166, col: 11, offset: 3843},
+							name: "Digit",
+						},
+						&ruleRefExpr{
+							pos:  position{line: 166, col: 17, offset: 3849},
+							name: "Digit",
+						},
+						&ruleRefExpr{
+							pos:  position{line: 166, col: 23, offset: 3855},
+							name: "Digit",
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "TimeMonth",
+			pos:  position{line: 170, col: 1, offset: 3897},
+			expr: &actionExpr{
+				pos: position{line: 171, col: 5, offset: 3914},
+				run: (*parser).callonTimeMonth1,
+				expr: &seqExpr{
+					pos: position{line: 171, col: 5, offset: 3914},
+					exprs: []any{
+						&ruleRefExpr{
+							pos:  position{line: 171, col: 5, offset: 3914},
+							name: "Digit",
+						},
+						&ruleRefExpr{
+							pos:  position{line: 171, col: 11, offset: 3920},
+							name: "Digit",
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "TimeDay",
+			pos:  position{line: 175, col: 1, offset: 3962},
+			expr: &actionExpr{
+				pos: position{line: 176, col: 5, offset: 3977},
+				run: (*parser).callonTimeDay1,
+				expr: &seqExpr{
+					pos: position{line: 176, col: 5, offset: 3977},
+					exprs: []any{
+						&ruleRefExpr{
+							pos:  position{line: 176, col: 5, offset: 3977},
+							name: "Digit",
+						},
+						&ruleRefExpr{
+							pos:  position{line: 176, col: 11, offset: 3983},
+							name: "Digit",
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "TimeHour",
+			pos:  position{line: 180, col: 1, offset: 4025},
+			expr: &actionExpr{
+				pos: position{line: 181, col: 5, offset: 4041},
+				run: (*parser).callonTimeHour1,
+				expr: &seqExpr{
+					pos: position{line: 181, col: 5, offset: 4041},
+					exprs: []any{
+						&ruleRefExpr{
+							pos:  position{line: 181, col: 5, offset: 4041},
+							name: "Digit",
+						},
+						&ruleRefExpr{
+							pos:  position{line: 181, col: 11, offset: 4047},
+							name: "Digit",
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "TimeMinute",
+			pos:  position{line: 185, col: 1, offset: 4089},
+			expr: &actionExpr{
+				pos: position{line: 186, col: 5, offset: 4107},
+				run: (*parser).callonTimeMinute1,
+				expr: &seqExpr{
+					pos: position{line: 186, col: 5, offset: 4107},
+					exprs: []any{
+						&ruleRefExpr{
+							pos:  position{line: 186, col: 5, offset: 4107},
+							name: "Digit",
+						},
+						&ruleRefExpr{
+							pos:  position{line: 186, col: 11, offset: 4113},
+							name: "Digit",
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "TimeSecond",
+			pos:  position{line: 190, col: 1, offset: 4155},
+			expr: &actionExpr{
+				pos: position{line: 191, col: 5, offset: 4173},
+				run: (*parser).callonTimeSecond1,
+				expr: &seqExpr{
+					pos: position{line: 191, col: 5, offset: 4173},
+					exprs: []any{
+						&ruleRefExpr{
+							pos:  position{line: 191, col: 5, offset: 4173},
+							name: "Digit",
+						},
+						&ruleRefExpr{
+							pos:  position{line: 191, col: 11, offset: 4179},
+							name: "Digit",
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "FullDate",
+			pos:  position{line: 195, col: 1, offset: 4221},
+			expr: &actionExpr{
+				pos: position{line: 196, col: 5, offset: 4237},
+				run: (*parser).callonFullDate1,
+				expr: &seqExpr{
+					pos: position{line: 196, col: 5, offset: 4237},
+					exprs: []any{
+						&ruleRefExpr{
+							pos:  position{line: 196, col: 5, offset: 4237},
+							name: "TimeYear",
+						},
+						&litMatcher{
+							pos:        position{line: 196, col: 14, offset: 4246},
+							val:        "-",
+							ignoreCase: false,
+							want:       "\"-\"",
+						},
+						&ruleRefExpr{
+							pos:  position{line: 196, col: 18, offset: 4250},
+							name: "TimeMonth",
+						},
+						&litMatcher{
+							pos:        position{line: 196, col: 28, offset: 4260},
+							val:        "-",
+							ignoreCase: false,
+							want:       "\"-\"",
+						},
+						&ruleRefExpr{
+							pos:  position{line: 196, col: 32, offset: 4264},
+							name: "TimeDay",
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "FullTime",
+			pos:  position{line: 200, col: 1, offset: 4308},
+			expr: &actionExpr{
+				pos: position{line: 201, col: 5, offset: 4324},
+				run: (*parser).callonFullTime1,
+				expr: &seqExpr{
+					pos: position{line: 201, col: 5, offset: 4324},
+					exprs: []any{
+						&ruleRefExpr{
+							pos:  position{line: 201, col: 5, offset: 4324},
+							name: "TimeHour",
+						},
+						&litMatcher{
+							pos:        position{line: 201, col: 14, offset: 4333},
+							val:        ":",
+							ignoreCase: false,
+							want:       "\":\"",
+						},
+						&ruleRefExpr{
+							pos:  position{line: 201, col: 18, offset: 4337},
+							name: "TimeMinute",
+						},
+						&litMatcher{
+							pos:        position{line: 201, col: 29, offset: 4348},
+							val:        ":",
+							ignoreCase: false,
+							want:       "\":\"",
+						},
+						&ruleRefExpr{
+							pos:  position{line: 201, col: 33, offset: 4352},
+							name: "TimeSecond",
+						},
+						&zeroOrOneExpr{
+							pos: position{line: 201, col: 44, offset: 4363},
+							expr: &seqExpr{
+								pos: position{line: 201, col: 45, offset: 4364},
+								exprs: []any{
+									&litMatcher{
+										pos:        position{line: 201, col: 45, offset: 4364},
+										val:        ".",
+										ignoreCase: false,
+										want:       "\".\"",
+									},
+									&oneOrMoreExpr{
+										pos: position{line: 201, col: 49, offset: 4368},
+										expr: &ruleRefExpr{
+											pos:  position{line: 201, col: 49, offset: 4368},
+											name: "Digit",
+										},
+									},
+								},
+							},
+						},
+						&choiceExpr{
+							pos: position{line: 201, col: 59, offset: 4378},
+							alternatives: []any{
+								&litMatcher{
+									pos:        position{line: 201, col: 59, offset: 4378},
+									val:        "Z",
+									ignoreCase: false,
+									want:       "\"Z\"",
+								},
+								&seqExpr{
+									pos: position{line: 201, col: 65, offset: 4384},
+									exprs: []any{
+										&choiceExpr{
+											pos: position{line: 201, col: 66, offset: 4385},
+											alternatives: []any{
+												&litMatcher{
+													pos:        position{line: 201, col: 66, offset: 4385},
+													val:        "+",
+													ignoreCase: false,
+													want:       "\"+\"",
+												},
+												&litMatcher{
+													pos:        position{line: 201, col: 72, offset: 4391},
+													val:        "-",
+													ignoreCase: false,
+													want:       "\"-\"",
+												},
+											},
+										},
+										&ruleRefExpr{
+											pos:  position{line: 201, col: 77, offset: 4396},
+											name: "TimeHour",
+										},
+										&litMatcher{
+											pos:        position{line: 201, col: 86, offset: 4405},
+											val:        ":",
+											ignoreCase: false,
+											want:       "\":\"",
+										},
+										&ruleRefExpr{
+											pos:  position{line: 201, col: 90, offset: 4409},
+											name: "TimeMinute",
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "DateTime",
+			pos:  position{line: 205, col: 1, offset: 4457},
+			expr: &actionExpr{
+				pos: position{line: 206, col: 5, offset: 4474},
+				run: (*parser).callonDateTime1,
+				expr: &seqExpr{
+					pos: position{line: 206, col: 5, offset: 4474},
+					exprs: []any{
+						&ruleRefExpr{
+							pos:  position{line: 206, col: 5, offset: 4474},
+							name: "FullDate",
+						},
+						&litMatcher{
+							pos:        position{line: 206, col: 14, offset: 4483},
+							val:        "T",
+							ignoreCase: false,
+							want:       "\"T\"",
+						},
+						&ruleRefExpr{
+							pos:  position{line: 206, col: 18, offset: 4487},
+							name: "FullTime",
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "NaturalLanguageDateTime",
+			pos:  position{line: 210, col: 1, offset: 4530},
+			expr: &choiceExpr{
+				pos: position{line: 211, col: 5, offset: 4562},
+				alternatives: []any{
+					&litMatcher{
+						pos:        position{line: 211, col: 5, offset: 4562},
+						val:        "today",
+						ignoreCase: false,
+						want:       "\"today\"",
+					},
+					&litMatcher{
+						pos:        position{line: 212, col: 5, offset: 4576},
+						val:        "yesterday",
+						ignoreCase: false,
+						want:       "\"yesterday\"",
+					},
+					&litMatcher{
+						pos:        position{line: 213, col: 5, offset: 4594},
+						val:        "this week",
+						ignoreCase: false,
+						want:       "\"this week\"",
+					},
+					&litMatcher{
+						pos:        position{line: 214, col: 5, offset: 4612},
+						val:        "last week",
+						ignoreCase: false,
+						want:       "\"last week\"",
+					},
+					&litMatcher{
+						pos:        position{line: 215, col: 5, offset: 4630},
+						val:        "last 7 days",
+						ignoreCase: false,
+						want:       "\"last 7 days\"",
+					},
+					&litMatcher{
+						pos:        position{line: 216, col: 5, offset: 4650},
+						val:        "this month",
+						ignoreCase: false,
+						want:       "\"this month\"",
+					},
+					&litMatcher{
+						pos:        position{line: 217, col: 5, offset: 4669},
+						val:        "last month",
+						ignoreCase: false,
+						want:       "\"last month\"",
+					},
+					&litMatcher{
+						pos:        position{line: 218, col: 5, offset: 4688},
+						val:        "last 30 days",
+						ignoreCase: false,
+						want:       "\"last 30 days\"",
+					},
+					&litMatcher{
+						pos:        position{line: 219, col: 5, offset: 4709},
+						val:        "this year",
+						ignoreCase: false,
+						want:       "\"this year\"",
+					},
+					&actionExpr{
+						pos: position{line: 220, col: 5, offset: 4727},
+						run: (*parser).callonNaturalLanguageDateTime11,
+						expr: &litMatcher{
+							pos:        position{line: 220, col: 5, offset: 4727},
+							val:        "last year",
+							ignoreCase: false,
+							want:       "\"last year\"",
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "Char",
+			pos:  position{line: 228, col: 1, offset: 4899},
+			expr: &actionExpr{
+				pos: position{line: 229, col: 5, offset: 4911},
+				run: (*parser).callonChar1,
+				expr: &charClassMatcher{
+					pos:        position{line: 229, col: 5, offset: 4911},
+					val:        "[A-Za-z.]",
+					chars:      []rune{'.'},
+					ranges:     []rune{'A', 'Z', 'a', 'z'},
+					ignoreCase: false,
+					inverted:   false,
+				},
+			},
+		},
+		{
+			name: "String",
+			pos:  position{line: 233, col: 1, offset: 4957},
+			expr: &actionExpr{
+				pos: position{line: 234, col: 5, offset: 4971},
+				run: (*parser).callonString1,
+				expr: &seqExpr{
+					pos: position{line: 234, col: 5, offset: 4971},
+					exprs: []any{
+						&litMatcher{
+							pos:        position{line: 234, col: 5, offset: 4971},
+							val:        "\"",
+							ignoreCase: false,
+							want:       "\"\\\"\"",
+						},
+						&labeledExpr{
+							pos:   position{line: 234, col: 9, offset: 4975},
+							label: "v",
+							expr: &zeroOrMoreExpr{
+								pos: position{line: 234, col: 11, offset: 4977},
+								expr: &charClassMatcher{
+									pos:        position{line: 234, col: 11, offset: 4977},
+									val:        "[^\"]",
+									chars:      []rune{'"'},
+									ignoreCase: false,
+									inverted:   true,
+								},
+							},
+						},
+						&litMatcher{
+							pos:        position{line: 234, col: 17, offset: 4983},
+							val:        "\"",
+							ignoreCase: false,
+							want:       "\"\\\"\"",
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "Number",
+			pos:  position{line: 238, col: 1, offset: 5018},
+			expr: &actionExpr{
+				pos: position{line: 239, col: 5, offset: 5032},
+				run: (*parser).callonNumber1,
+				expr: &seqExpr{
+					pos: position{line: 239, col: 5, offset: 5032},
+					exprs: []any{
+						&oneOrMoreExpr{
+							pos: position{line: 239, col: 5, offset: 5032},
+							expr: &charClassMatcher{
+								pos:        position{line: 239, col: 5, offset: 5032},
+								val:        "[0-9]",
+								ranges:     []rune{'0', '9'},
+								ignoreCase: false,
+								inverted:   false,
+							},
+						},
+						&zeroOrOneExpr{
+							pos: position{line: 239, col: 12, offset: 5039},
+							expr: &seqExpr{
+								pos: position{line: 239, col: 13, offset: 5040},
+								exprs: []any{
+									&litMatcher{
+										pos:        position{line: 239, col: 13, offset: 5040},
+										val:        ".",
+										ignoreCase: false,
+										want:       "\".\"",
+									},
+									&oneOrMoreExpr{
+										pos: position{line: 239, col: 17, offset: 5044},
+										expr: &charClassMatcher{
+											pos:        position{line: 239, col: 17, offset: 5044},
+											val:        "[0-9]",
+											ranges:     []rune{'0', '9'},
+											ignoreCase: false,
+											inverted:   false,
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "Digit",
+			pos:  position{line: 243, col: 1, offset: 5089},
+			expr: &actionExpr{
+				pos: position{line: 244, col: 5, offset: 5102},
+				run: (*parser).callonDigit1,
+				expr: &charClassMatcher{
+					pos:        position{line: 244, col: 5, offset: 5102},
+					val:        "[0-9]",
+					ranges:     []rune{'0', '9'},
+					ignoreCase: false,
+					inverted:   false,
+				},
+			},
+		},
+		{
+			name: "_",
+			pos:  position{line: 248, col: 1, offset: 5144},
+			expr: &actionExpr{
+				pos: position{line: 249, col: 5, offset: 5153},
+				run: (*parser).callon_1,
+				expr: &zeroOrMoreExpr{
+					pos: position{line: 249, col: 5, offset: 5153},
+					expr: &charClassMatcher{
+						pos:        position{line: 249, col: 5, offset: 5153},
+						val:        "[ \\t]",
+						chars:      []rune{' ', '\t'},
+						ignoreCase: false,
+						inverted:   false,
+					},
+				},
+			},
+		},
 	},
 }
 
@@ -1607,1095 +1306,6 @@ func (p *parser) callonAST1() (any, error) {
 	return p.cur.onAST1(stack["n"])
 }
 
-func (c *current) onNodes3() (any, error) {
-	return nil, nil
-
-}
-
-func (p *parser) callonNodes3() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNodes3()
-}
-
-func (c *current) onNode7() (any, error) {
-	return c.text, nil
-
-}
-
-func (p *parser) callonNode7() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode7()
-}
-
-func (c *current) onNode10() (any, error) {
-	return buildOperatorNode(c.text, c.pos)
-
-}
-
-func (p *parser) callonNode10() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode10()
-}
-
-func (c *current) onNode12() (any, error) {
-	return buildOperatorNode(c.text, c.pos)
-
-}
-
-func (p *parser) callonNode12() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode12()
-}
-
-func (c *current) onNode3(k, v any) (any, error) {
-	return buildBooleanNode(k, v, c.text, c.pos)
-
-}
-
-func (p *parser) callonNode3() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode3(stack["k"], stack["v"])
-}
-
-func (c *current) onNode22() (any, error) {
-	return c.text, nil
-
-}
-
-func (p *parser) callonNode22() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode22()
-}
-
-func (c *current) onNode26() (any, error) {
-	return buildOperatorNode(c.text, c.pos)
-
-}
-
-func (p *parser) callonNode26() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode26()
-}
-
-func (c *current) onNode28() (any, error) {
-	return buildOperatorNode(c.text, c.pos)
-
-}
-
-func (p *parser) callonNode28() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode28()
-}
-
-func (c *current) onNode30() (any, error) {
-	return buildOperatorNode(c.text, c.pos)
-
-}
-
-func (p *parser) callonNode30() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode30()
-}
-
-func (c *current) onNode32() (any, error) {
-	return buildOperatorNode(c.text, c.pos)
-
-}
-
-func (p *parser) callonNode32() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode32()
-}
-
-func (c *current) onNode34() (any, error) {
-	return buildOperatorNode(c.text, c.pos)
-
-}
-
-func (p *parser) callonNode34() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode34()
-}
-
-func (c *current) onNode36() (any, error) {
-	return buildOperatorNode(c.text, c.pos)
-
-}
-
-func (p *parser) callonNode36() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode36()
-}
-
-func (c *current) onNode48() (any, error) {
-	return c.text, nil
-
-}
-
-func (p *parser) callonNode48() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode48()
-}
-
-func (c *current) onNode50() (any, error) {
-	return c.text, nil
-
-}
-
-func (p *parser) callonNode50() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode50()
-}
-
-func (c *current) onNode52() (any, error) {
-	return c.text, nil
-
-}
-
-func (p *parser) callonNode52() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode52()
-}
-
-func (c *current) onNode54() (any, error) {
-	return c.text, nil
-
-}
-
-func (p *parser) callonNode54() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode54()
-}
-
-func (c *current) onNode46() (any, error) {
-	return c.text, nil
-
-}
-
-func (p *parser) callonNode46() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode46()
-}
-
-func (c *current) onNode59() (any, error) {
-	return c.text, nil
-
-}
-
-func (p *parser) callonNode59() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode59()
-}
-
-func (c *current) onNode61() (any, error) {
-	return c.text, nil
-
-}
-
-func (p *parser) callonNode61() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode61()
-}
-
-func (c *current) onNode57() (any, error) {
-	return c.text, nil
-
-}
-
-func (p *parser) callonNode57() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode57()
-}
-
-func (c *current) onNode66() (any, error) {
-	return c.text, nil
-
-}
-
-func (p *parser) callonNode66() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode66()
-}
-
-func (c *current) onNode68() (any, error) {
-	return c.text, nil
-
-}
-
-func (p *parser) callonNode68() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode68()
-}
-
-func (c *current) onNode64() (any, error) {
-	return c.text, nil
-
-}
-
-func (p *parser) callonNode64() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode64()
-}
-
-func (c *current) onNode44() (any, error) {
-	return c.text, nil
-
-}
-
-func (p *parser) callonNode44() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode44()
-}
-
-func (c *current) onNode75() (any, error) {
-	return c.text, nil
-
-}
-
-func (p *parser) callonNode75() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode75()
-}
-
-func (c *current) onNode77() (any, error) {
-	return c.text, nil
-
-}
-
-func (p *parser) callonNode77() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode77()
-}
-
-func (c *current) onNode73() (any, error) {
-	return c.text, nil
-
-}
-
-func (p *parser) callonNode73() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode73()
-}
-
-func (c *current) onNode82() (any, error) {
-	return c.text, nil
-
-}
-
-func (p *parser) callonNode82() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode82()
-}
-
-func (c *current) onNode84() (any, error) {
-	return c.text, nil
-
-}
-
-func (p *parser) callonNode84() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode84()
-}
-
-func (c *current) onNode80() (any, error) {
-	return c.text, nil
-
-}
-
-func (p *parser) callonNode80() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode80()
-}
-
-func (c *current) onNode89() (any, error) {
-	return c.text, nil
-
-}
-
-func (p *parser) callonNode89() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode89()
-}
-
-func (c *current) onNode91() (any, error) {
-	return c.text, nil
-
-}
-
-func (p *parser) callonNode91() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode91()
-}
-
-func (c *current) onNode87() (any, error) {
-	return c.text, nil
-
-}
-
-func (p *parser) callonNode87() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode87()
-}
-
-func (c *current) onNode97() (any, error) {
-	return c.text, nil
-
-}
-
-func (p *parser) callonNode97() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode97()
-}
-
-func (c *current) onNode105() (any, error) {
-	return c.text, nil
-
-}
-
-func (p *parser) callonNode105() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode105()
-}
-
-func (c *current) onNode107() (any, error) {
-	return c.text, nil
-
-}
-
-func (p *parser) callonNode107() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode107()
-}
-
-func (c *current) onNode103() (any, error) {
-	return c.text, nil
-
-}
-
-func (p *parser) callonNode103() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode103()
-}
-
-func (c *current) onNode112() (any, error) {
-	return c.text, nil
-
-}
-
-func (p *parser) callonNode112() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode112()
-}
-
-func (c *current) onNode114() (any, error) {
-	return c.text, nil
-
-}
-
-func (p *parser) callonNode114() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode114()
-}
-
-func (c *current) onNode110() (any, error) {
-	return c.text, nil
-
-}
-
-func (p *parser) callonNode110() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode110()
-}
-
-func (c *current) onNode71() (any, error) {
-	return c.text, nil
-
-}
-
-func (p *parser) callonNode71() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode71()
-}
-
-func (c *current) onNode42() (any, error) {
-	return c.text, nil
-
-}
-
-func (p *parser) callonNode42() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode42()
-}
-
-func (c *current) onNode120() (any, error) {
-	return c.text, nil
-
-}
-
-func (p *parser) callonNode120() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode120()
-}
-
-func (c *current) onNode122() (any, error) {
-	return c.text, nil
-
-}
-
-func (p *parser) callonNode122() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode122()
-}
-
-func (c *current) onNode124() (any, error) {
-	return c.text, nil
-
-}
-
-func (p *parser) callonNode124() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode124()
-}
-
-func (c *current) onNode126() (any, error) {
-	return c.text, nil
-
-}
-
-func (p *parser) callonNode126() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode126()
-}
-
-func (c *current) onNode118() (any, error) {
-	return c.text, nil
-
-}
-
-func (p *parser) callonNode118() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode118()
-}
-
-func (c *current) onNode131() (any, error) {
-	return c.text, nil
-
-}
-
-func (p *parser) callonNode131() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode131()
-}
-
-func (c *current) onNode133() (any, error) {
-	return c.text, nil
-
-}
-
-func (p *parser) callonNode133() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode133()
-}
-
-func (c *current) onNode129() (any, error) {
-	return c.text, nil
-
-}
-
-func (p *parser) callonNode129() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode129()
-}
-
-func (c *current) onNode138() (any, error) {
-	return c.text, nil
-
-}
-
-func (p *parser) callonNode138() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode138()
-}
-
-func (c *current) onNode140() (any, error) {
-	return c.text, nil
-
-}
-
-func (p *parser) callonNode140() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode140()
-}
-
-func (c *current) onNode136() (any, error) {
-	return c.text, nil
-
-}
-
-func (p *parser) callonNode136() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode136()
-}
-
-func (c *current) onNode116() (any, error) {
-	return c.text, nil
-
-}
-
-func (p *parser) callonNode116() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode116()
-}
-
-func (c *current) onNode146() (any, error) {
-	return c.text, nil
-
-}
-
-func (p *parser) callonNode146() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode146()
-}
-
-func (c *current) onNode148() (any, error) {
-	return c.text, nil
-
-}
-
-func (p *parser) callonNode148() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode148()
-}
-
-func (c *current) onNode144() (any, error) {
-	return c.text, nil
-
-}
-
-func (p *parser) callonNode144() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode144()
-}
-
-func (c *current) onNode153() (any, error) {
-	return c.text, nil
-
-}
-
-func (p *parser) callonNode153() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode153()
-}
-
-func (c *current) onNode155() (any, error) {
-	return c.text, nil
-
-}
-
-func (p *parser) callonNode155() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode155()
-}
-
-func (c *current) onNode151() (any, error) {
-	return c.text, nil
-
-}
-
-func (p *parser) callonNode151() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode151()
-}
-
-func (c *current) onNode160() (any, error) {
-	return c.text, nil
-
-}
-
-func (p *parser) callonNode160() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode160()
-}
-
-func (c *current) onNode162() (any, error) {
-	return c.text, nil
-
-}
-
-func (p *parser) callonNode162() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode162()
-}
-
-func (c *current) onNode158() (any, error) {
-	return c.text, nil
-
-}
-
-func (p *parser) callonNode158() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode158()
-}
-
-func (c *current) onNode168() (any, error) {
-	return c.text, nil
-
-}
-
-func (p *parser) callonNode168() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode168()
-}
-
-func (c *current) onNode176() (any, error) {
-	return c.text, nil
-
-}
-
-func (p *parser) callonNode176() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode176()
-}
-
-func (c *current) onNode178() (any, error) {
-	return c.text, nil
-
-}
-
-func (p *parser) callonNode178() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode178()
-}
-
-func (c *current) onNode174() (any, error) {
-	return c.text, nil
-
-}
-
-func (p *parser) callonNode174() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode174()
-}
-
-func (c *current) onNode183() (any, error) {
-	return c.text, nil
-
-}
-
-func (p *parser) callonNode183() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode183()
-}
-
-func (c *current) onNode185() (any, error) {
-	return c.text, nil
-
-}
-
-func (p *parser) callonNode185() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode185()
-}
-
-func (c *current) onNode181() (any, error) {
-	return c.text, nil
-
-}
-
-func (p *parser) callonNode181() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode181()
-}
-
-func (c *current) onNode142() (any, error) {
-	return c.text, nil
-
-}
-
-func (p *parser) callonNode142() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode142()
-}
-
-func (c *current) onNode18(k, o, v any) (any, error) {
-	return buildDateTimeNode(k, o, v, c.text, c.pos)
-
-}
-
-func (p *parser) callonNode18() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode18(stack["k"], stack["o"], stack["v"])
-}
-
-func (c *current) onNode193() (any, error) {
-	return c.text, nil
-
-}
-
-func (p *parser) callonNode193() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode193()
-}
-
-func (c *current) onNode196() (any, error) {
-	return buildOperatorNode(c.text, c.pos)
-
-}
-
-func (p *parser) callonNode196() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode196()
-}
-
-func (c *current) onNode198() (any, error) {
-	return buildOperatorNode(c.text, c.pos)
-
-}
-
-func (p *parser) callonNode198() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode198()
-}
-
-func (c *current) onNode213() (any, error) {
-	return c.text, nil
-
-}
-
-func (p *parser) callonNode213() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode213()
-}
-
-func (c *current) onNode189(k, v any) (any, error) {
-	return buildNaturalLanguageDateTimeNodes(k, v, c.text, c.pos)
-
-}
-
-func (p *parser) callonNode189() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode189(stack["k"], stack["v"])
-}
-
-func (c *current) onNode221() (any, error) {
-	return c.text, nil
-
-}
-
-func (p *parser) callonNode221() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode221()
-}
-
-func (c *current) onNode224() (any, error) {
-	return buildOperatorNode(c.text, c.pos)
-
-}
-
-func (p *parser) callonNode224() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode224()
-}
-
-func (c *current) onNode226() (any, error) {
-	return buildOperatorNode(c.text, c.pos)
-
-}
-
-func (p *parser) callonNode226() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode226()
-}
-
-func (c *current) onNode230(v any) (any, error) {
-	return v, nil
-
-}
-
-func (p *parser) callonNode230() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode230(stack["v"])
-}
-
-func (c *current) onNode217(k, v any) (any, error) {
-	return buildStringNode(k, v, c.text, c.pos)
-
-}
-
-func (p *parser) callonNode217() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode217(stack["k"], stack["v"])
-}
-
-func (c *current) onNode239() (any, error) {
-	return buildOperatorNode(c.text, c.pos)
-
-}
-
-func (p *parser) callonNode239() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode239()
-}
-
-func (c *current) onNode243() (any, error) {
-	return buildOperatorNode(c.text, c.pos)
-
-}
-
-func (p *parser) callonNode243() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode243()
-}
-
-func (c *current) onNode247() (any, error) {
-	return buildOperatorNode(c.text, c.pos)
-
-}
-
-func (p *parser) callonNode247() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode247()
-}
-
-func (c *current) onNode252() (any, error) {
-	return buildOperatorNode(c.text, c.pos)
-
-}
-
-func (p *parser) callonNode252() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode252()
-}
-
-func (c *current) onNode254() (any, error) {
-	return nil, nil
-
-}
-
-func (p *parser) callonNode254() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode254()
-}
-
-func (c *current) onNode258(v any) (any, error) {
-	return v, nil
-
-}
-
-func (p *parser) callonNode258() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode258(stack["v"])
-}
-
-func (c *current) onNode265(v any) (any, error) {
-	return nil, nil
-
-}
-
-func (p *parser) callonNode265() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode265(stack["v"])
-}
-
-func (c *current) onNode269() (any, error) {
-	return buildOperatorNode(c.text, c.pos)
-
-}
-
-func (p *parser) callonNode269() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode269()
-}
-
-func (c *current) onNode249(v any) (any, error) {
-	return buildStringNode("", v, c.text, c.pos)
-
-}
-
-func (p *parser) callonNode249() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode249(stack["v"])
-}
-
-func (c *current) onNode274() (any, error) {
-	return buildOperatorNode(c.text, c.pos)
-
-}
-
-func (p *parser) callonNode274() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode274()
-}
-
-func (c *current) onNode276() (any, error) {
-	return nil, nil
-
-}
-
-func (p *parser) callonNode276() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode276()
-}
-
-func (c *current) onNode282(v any) (any, error) {
-	return nil, nil
-
-}
-
-func (p *parser) callonNode282() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode282(stack["v"])
-}
-
-func (c *current) onNode286() (any, error) {
-	return buildOperatorNode(c.text, c.pos)
-
-}
-
-func (p *parser) callonNode286() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode286()
-}
-
-func (c *current) onNode271(v any) (any, error) {
-	return buildStringNode("", v, c.text, c.pos)
-
-}
-
-func (p *parser) callonNode271() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onNode271(stack["v"])
-}
-
-func (c *current) onGroupNode6() (any, error) {
-	return c.text, nil
-
-}
-
-func (p *parser) callonGroupNode6() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onGroupNode6()
-}
-
-func (c *current) onGroupNode10() (any, error) {
-	return buildOperatorNode(c.text, c.pos)
-
-}
-
-func (p *parser) callonGroupNode10() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onGroupNode10()
-}
-
-func (c *current) onGroupNode12() (any, error) {
-	return buildOperatorNode(c.text, c.pos)
-
-}
-
-func (p *parser) callonGroupNode12() (any, error) {
-	stack := p.vstack[len(p.vstack)-1]
-	_ = stack
-	return p.cur.onGroupNode12()
-}
-
 func (c *current) onGroupNode1(k, v any) (any, error) {
 	return buildGroupNode(k, v, c.text, c.pos)
 
@@ -2705,6 +1315,347 @@ func (p *parser) callonGroupNode1() (any, error) {
 	stack := p.vstack[len(p.vstack)-1]
 	_ = stack
 	return p.cur.onGroupNode1(stack["k"], stack["v"])
+}
+
+func (c *current) onYesNoPropertyRestrictionNode1(k, v any) (any, error) {
+	return buildBooleanNode(k, v, c.text, c.pos)
+
+}
+
+func (p *parser) callonYesNoPropertyRestrictionNode1() (any, error) {
+	stack := p.vstack[len(p.vstack)-1]
+	_ = stack
+	return p.cur.onYesNoPropertyRestrictionNode1(stack["k"], stack["v"])
+}
+
+func (c *current) onDateTimeRestrictionNode2(k, o, v any) (any, error) {
+	return buildDateTimeNode(k, o, v, c.text, c.pos)
+
+}
+
+func (p *parser) callonDateTimeRestrictionNode2() (any, error) {
+	stack := p.vstack[len(p.vstack)-1]
+	_ = stack
+	return p.cur.onDateTimeRestrictionNode2(stack["k"], stack["o"], stack["v"])
+}
+
+func (c *current) onDateTimeRestrictionNode24(k, v any) (any, error) {
+	return buildNaturalLanguageDateTimeNodes(k, v, c.text, c.pos)
+
+}
+
+func (p *parser) callonDateTimeRestrictionNode24() (any, error) {
+	stack := p.vstack[len(p.vstack)-1]
+	_ = stack
+	return p.cur.onDateTimeRestrictionNode24(stack["k"], stack["v"])
+}
+
+func (c *current) onNumericRestrictionNode1(k, o, v any) (any, error) {
+	return buildNumericNode(k, o, v, c.text, c.pos)
+
+}
+
+func (p *parser) callonNumericRestrictionNode1() (any, error) {
+	stack := p.vstack[len(p.vstack)-1]
+	_ = stack
+	return p.cur.onNumericRestrictionNode1(stack["k"], stack["o"], stack["v"])
+}
+
+func (c *current) onTextPropertyRestrictionNode1(k, v any) (any, error) {
+	return buildStringNode(k, v, c.text, c.pos)
+
+}
+
+func (p *parser) callonTextPropertyRestrictionNode1() (any, error) {
+	stack := p.vstack[len(p.vstack)-1]
+	_ = stack
+	return p.cur.onTextPropertyRestrictionNode1(stack["k"], stack["v"])
+}
+
+func (c *current) onPhraseNode1(v any) (any, error) {
+	return buildStringNode("", v, c.text, c.pos)
+
+}
+
+func (p *parser) callonPhraseNode1() (any, error) {
+	stack := p.vstack[len(p.vstack)-1]
+	_ = stack
+	return p.cur.onPhraseNode1(stack["v"])
+}
+
+func (c *current) onWordNode1(v any) (any, error) {
+	return buildStringNode("", v, c.text, c.pos)
+
+}
+
+func (p *parser) callonWordNode1() (any, error) {
+	stack := p.vstack[len(p.vstack)-1]
+	_ = stack
+	return p.cur.onWordNode1(stack["v"])
+}
+
+func (c *current) onOperatorBooleanAndNode1() (any, error) {
+	return buildOperatorNode(c.text, c.pos)
+
+}
+
+func (p *parser) callonOperatorBooleanAndNode1() (any, error) {
+	stack := p.vstack[len(p.vstack)-1]
+	_ = stack
+	return p.cur.onOperatorBooleanAndNode1()
+}
+
+func (c *current) onOperatorBooleanNotNode1() (any, error) {
+	return buildOperatorNode(c.text, c.pos)
+
+}
+
+func (p *parser) callonOperatorBooleanNotNode1() (any, error) {
+	stack := p.vstack[len(p.vstack)-1]
+	_ = stack
+	return p.cur.onOperatorBooleanNotNode1()
+}
+
+func (c *current) onOperatorBooleanOrNode1() (any, error) {
+	return buildOperatorNode(c.text, c.pos)
+
+}
+
+func (p *parser) callonOperatorBooleanOrNode1() (any, error) {
+	stack := p.vstack[len(p.vstack)-1]
+	_ = stack
+	return p.cur.onOperatorBooleanOrNode1()
+}
+
+func (c *current) onOperatorColonNode1() (any, error) {
+	return buildOperatorNode(c.text, c.pos)
+
+}
+
+func (p *parser) callonOperatorColonNode1() (any, error) {
+	stack := p.vstack[len(p.vstack)-1]
+	_ = stack
+	return p.cur.onOperatorColonNode1()
+}
+
+func (c *current) onOperatorEqualNode1() (any, error) {
+	return buildOperatorNode(c.text, c.pos)
+
+}
+
+func (p *parser) callonOperatorEqualNode1() (any, error) {
+	stack := p.vstack[len(p.vstack)-1]
+	_ = stack
+	return p.cur.onOperatorEqualNode1()
+}
+
+func (c *current) onOperatorLessNode1() (any, error) {
+	return buildOperatorNode(c.text, c.pos)
+
+}
+
+func (p *parser) callonOperatorLessNode1() (any, error) {
+	stack := p.vstack[len(p.vstack)-1]
+	_ = stack
+	return p.cur.onOperatorLessNode1()
+}
+
+func (c *current) onOperatorLessOrEqualNode1() (any, error) {
+	return buildOperatorNode(c.text, c.pos)
+
+}
+
+func (p *parser) callonOperatorLessOrEqualNode1() (any, error) {
+	stack := p.vstack[len(p.vstack)-1]
+	_ = stack
+	return p.cur.onOperatorLessOrEqualNode1()
+}
+
+func (c *current) onOperatorGreaterNode1() (any, error) {
+	return buildOperatorNode(c.text, c.pos)
+
+}
+
+func (p *parser) callonOperatorGreaterNode1() (any, error) {
+	stack := p.vstack[len(p.vstack)-1]
+	_ = stack
+	return p.cur.onOperatorGreaterNode1()
+}
+
+func (c *current) onOperatorGreaterOrEqualNode1() (any, error) {
+	return buildOperatorNode(c.text, c.pos)
+
+}
+
+func (p *parser) callonOperatorGreaterOrEqualNode1() (any, error) {
+	stack := p.vstack[len(p.vstack)-1]
+	_ = stack
+	return p.cur.onOperatorGreaterOrEqualNode1()
+}
+
+func (c *current) onTimeYear1() (any, error) {
+	return c.text, nil
+
+}
+
+func (p *parser) callonTimeYear1() (any, error) {
+	stack := p.vstack[len(p.vstack)-1]
+	_ = stack
+	return p.cur.onTimeYear1()
+}
+
+func (c *current) onTimeMonth1() (any, error) {
+	return c.text, nil
+
+}
+
+func (p *parser) callonTimeMonth1() (any, error) {
+	stack := p.vstack[len(p.vstack)-1]
+	_ = stack
+	return p.cur.onTimeMonth1()
+}
+
+func (c *current) onTimeDay1() (any, error) {
+	return c.text, nil
+
+}
+
+func (p *parser) callonTimeDay1() (any, error) {
+	stack := p.vstack[len(p.vstack)-1]
+	_ = stack
+	return p.cur.onTimeDay1()
+}
+
+func (c *current) onTimeHour1() (any, error) {
+	return c.text, nil
+
+}
+
+func (p *parser) callonTimeHour1() (any, error) {
+	stack := p.vstack[len(p.vstack)-1]
+	_ = stack
+	return p.cur.onTimeHour1()
+}
+
+func (c *current) onTimeMinute1() (any, error) {
+	return c.text, nil
+
+}
+
+func (p *parser) callonTimeMinute1() (any, error) {
+	stack := p.vstack[len(p.vstack)-1]
+	_ = stack
+	return p.cur.onTimeMinute1()
+}
+
+func (c *current) onTimeSecond1() (any, error) {
+	return c.text, nil
+
+}
+
+func (p *parser) callonTimeSecond1() (any, error) {
+	stack := p.vstack[len(p.vstack)-1]
+	_ = stack
+	return p.cur.onTimeSecond1()
+}
+
+func (c *current) onFullDate1() (any, error) {
+	return c.text, nil
+
+}
+
+func (p *parser) callonFullDate1() (any, error) {
+	stack := p.vstack[len(p.vstack)-1]
+	_ = stack
+	return p.cur.onFullDate1()
+}
+
+func (c *current) onFullTime1() (any, error) {
+	return c.text, nil
+
+}
+
+func (p *parser) callonFullTime1() (any, error) {
+	stack := p.vstack[len(p.vstack)-1]
+	_ = stack
+	return p.cur.onFullTime1()
+}
+
+func (c *current) onDateTime1() (any, error) {
+	return c.text, nil
+
+}
+
+func (p *parser) callonDateTime1() (any, error) {
+	stack := p.vstack[len(p.vstack)-1]
+	_ = stack
+	return p.cur.onDateTime1()
+}
+
+func (c *current) onNaturalLanguageDateTime11() (any, error) {
+	return c.text, nil
+
+}
+
+func (p *parser) callonNaturalLanguageDateTime11() (any, error) {
+	stack := p.vstack[len(p.vstack)-1]
+	_ = stack
+	return p.cur.onNaturalLanguageDateTime11()
+}
+
+func (c *current) onChar1() (any, error) {
+	return c.text, nil
+
+}
+
+func (p *parser) callonChar1() (any, error) {
+	stack := p.vstack[len(p.vstack)-1]
+	_ = stack
+	return p.cur.onChar1()
+}
+
+func (c *current) onString1(v any) (any, error) {
+	return v, nil
+
+}
+
+func (p *parser) callonString1() (any, error) {
+	stack := p.vstack[len(p.vstack)-1]
+	_ = stack
+	return p.cur.onString1(stack["v"])
+}
+
+func (c *current) onNumber1() (any, error) {
+	return c.text, nil
+
+}
+
+func (p *parser) callonNumber1() (any, error) {
+	stack := p.vstack[len(p.vstack)-1]
+	_ = stack
+	return p.cur.onNumber1()
+}
+
+func (c *current) onDigit1() (any, error) {
+	return c.text, nil
+
+}
+
+func (p *parser) callonDigit1() (any, error) {
+	stack := p.vstack[len(p.vstack)-1]
+	_ = stack
+	return p.cur.onDigit1()
+}
+
+func (c *current) on_1() (any, error) {
+	return nil, nil
+
+}
+
+func (p *parser) callon_1() (any, error) {
+	stack := p.vstack[len(p.vstack)-1]
+	_ = stack
+	return p.cur.on_1()
 }
 
 var (
@@ -2759,6 +1710,62 @@ func Entrypoint(ruleName string) Option {
 	}
 }
 
+// Statistics adds a user provided Stats struct to the parser to allow
+// the user to process the results after the parsing has finished.
+// Also the key for the "no match" counter is set.
+//
+// Example usage:
+//
+//	input := "input"
+//	stats := Stats{}
+//	_, err := Parse("input-file", []byte(input), Statistics(&stats, "no match"))
+//	if err != nil {
+//	    log.Panicln(err)
+//	}
+//	b, err := json.MarshalIndent(stats.ChoiceAltCnt, "", "  ")
+//	if err != nil {
+//	    log.Panicln(err)
+//	}
+//	fmt.Println(string(b))
+func Statistics(stats *Stats, choiceNoMatch string) Option {
+	return func(p *parser) Option {
+		oldStats := p.Stats
+		p.Stats = stats
+		oldChoiceNoMatch := p.choiceNoMatch
+		p.choiceNoMatch = choiceNoMatch
+		if p.Stats.ChoiceAltCnt == nil {
+			p.Stats.ChoiceAltCnt = make(map[string]map[string]int)
+		}
+		return Statistics(oldStats, oldChoiceNoMatch)
+	}
+}
+
+// Debug creates an Option to set the debug flag to b. When set to true,
+// debugging information is printed to stdout while parsing.
+//
+// The default is false.
+func Debug(b bool) Option {
+	return func(p *parser) Option {
+		old := p.debug
+		p.debug = b
+		return Debug(old)
+	}
+}
+
+// Memoize creates an Option to set the memoize flag to b. When set to true,
+// the parser will cache all results so each expression is evaluated only
+// once. This guarantees linear parsing time even for pathological cases,
+// at the expense of more memory and slower times for typical cases.
+//
+// The default is false.
+func Memoize(b bool) Option {
+	return func(p *parser) Option {
+		old := p.memoize
+		p.memoize = b
+		return Memoize(old)
+	}
+}
+
 // AllowInvalidUTF8 creates an Option to allow invalid UTF-8 bytes.
 // Every invalid UTF-8 byte is treated as a utf8.RuneError (U+FFFD)
 // by character class matchers and is matched by the any matcher.
@@ -2794,6 +1801,16 @@ func GlobalStore(key string, value any) Option {
 		old := p.cur.globalStore[key]
 		p.cur.globalStore[key] = value
 		return GlobalStore(key, old)
+	}
+}
+
+// InitState creates an Option to set a key to a certain value in
+// the global "state" store.
+func InitState(key string, value any) Option {
+	return func(p *parser) Option {
+		old := p.cur.state[key]
+		p.cur.state[key] = value
+		return InitState(key, old)
 	}
 }
 
@@ -2848,6 +1865,11 @@ type savepoint struct {
 type current struct {
 	pos  position // start position of the match
 	text []byte   // raw text of the match
+
+	// state is a store for arbitrary key,value pairs that the user wants to be
+	// tied to the backtracking of the parser.
+	// This is always rolled back if a parsing rule fails.
+	state storeDict
 
 	// globalStore is a general store for the user to store arbitrary key-value
 	// pairs that they need to manage and that they do not want tied to the
@@ -2923,6 +1945,11 @@ type (
 type ruleRefExpr struct {
 	pos  position
 	name string
+}
+
+type stateCodeExpr struct {
+	pos position
+	run func(*parser) error
 }
 
 type andCodeExpr struct {
@@ -3028,6 +2055,7 @@ func newParser(filename string, b []byte, opts ...Option) *parser {
 		pt:       savepoint{position: position{line: 1}},
 		recover:  true,
 		cur: current{
+			state:       make(storeDict),
 			globalStore: make(storeDict),
 		},
 		maxFailPos:      position{col: 1, line: 1},
@@ -3092,6 +2120,12 @@ type parser struct {
 
 	depth   int
 	recover bool
+	debug   bool
+
+	memoize bool
+	// memoization table for the packrat algorithm:
+	// map[offset in source] map[expression or rule] {value, match}
+	memo map[int]map[any]resultTuple
 
 	// rules table, maps the rule identifier to the rule node
 	rules map[string]*rule
@@ -3176,6 +2210,31 @@ func (p *parser) popRecovery() {
 	p.recoveryStack = p.recoveryStack[:len(p.recoveryStack)-1]
 }
 
+func (p *parser) print(prefix, s string) string {
+	if !p.debug {
+		return s
+	}
+
+	fmt.Printf("%s %d:%d:%d: %s [%#U]\n",
+		prefix, p.pt.line, p.pt.col, p.pt.offset, s, p.pt.rn)
+	return s
+}
+
+func (p *parser) printIndent(mark string, s string) string {
+	return p.print(strings.Repeat(" ", p.depth)+mark, s)
+}
+
+func (p *parser) in(s string) string {
+	res := p.printIndent(">", s)
+	p.depth++
+	return res
+}
+
+func (p *parser) out(s string) string {
+	p.depth--
+	return p.printIndent("<", s)
+}
+
 func (p *parser) addErr(err error) {
 	p.addErrAt(err, p.pt.position, []string{})
 }
@@ -3244,15 +2303,91 @@ func (p *parser) read() {
 
 // restore parser position to the savepoint pt.
 func (p *parser) restore(pt savepoint) {
+	if p.debug {
+		defer p.out(p.in("restore"))
+	}
 	if pt.offset == p.pt.offset {
 		return
 	}
 	p.pt = pt
 }
 
+// Cloner is implemented by any value that has a Clone method, which returns a
+// copy of the value. This is mainly used for types which are not passed by
+// value (e.g map, slice, chan) or structs that contain such types.
+//
+// This is used in conjunction with the global state feature to create proper
+// copies of the state to allow the parser to properly restore the state in
+// the case of backtracking.
+type Cloner interface {
+	Clone() any
+}
+
+var statePool = &sync.Pool{
+	New: func() any { return make(storeDict) },
+}
+
+func (sd storeDict) Discard() {
+	for k := range sd {
+		delete(sd, k)
+	}
+	statePool.Put(sd)
+}
+
+// clone and return parser current state.
+func (p *parser) cloneState() storeDict {
+	if p.debug {
+		defer p.out(p.in("cloneState"))
+	}
+
+	state := statePool.Get().(storeDict)
+	for k, v := range p.cur.state {
+		if c, ok := v.(Cloner); ok {
+			state[k] = c.Clone()
+		} else {
+			state[k] = v
+		}
+	}
+	return state
+}
+
+// restore parser current state to the state storeDict.
+// every restoreState should applied only one time for every cloned state
+func (p *parser) restoreState(state storeDict) {
+	if p.debug {
+		defer p.out(p.in("restoreState"))
+	}
+	p.cur.state.Discard()
+	p.cur.state = state
+}
+
 // get the slice of bytes from the savepoint start to the current position.
 func (p *parser) sliceFrom(start savepoint) []byte {
 	return p.data[start.position.offset:p.pt.position.offset]
+}
+
+func (p *parser) getMemoized(node any) (resultTuple, bool) {
+	if len(p.memo) == 0 {
+		return resultTuple{}, false
+	}
+	m := p.memo[p.pt.offset]
+	if len(m) == 0 {
+		return resultTuple{}, false
+	}
+	res, ok := m[node]
+	return res, ok
+}
+
+func (p *parser) setMemoized(pt savepoint, node any, tuple resultTuple) {
+	if p.memo == nil {
+		p.memo = make(map[int]map[any]resultTuple)
+	}
+	m := p.memo[pt.offset]
+	if m == nil {
+		m = make(map[any]resultTuple)
+		p.memo[pt.offset] = m
+	}
+	m[node] = tuple
 }
 
 func (p *parser) buildRulesTable(g *grammar) {
@@ -3276,6 +2411,9 @@ func (p *parser) parse(g *grammar) (val any, err error) {
 		// and return the panic as an error.
 		defer func() {
 			if e := recover(); e != nil {
+				if p.debug {
+					defer p.out(p.in("panic handler"))
+				}
 				val = nil
 				switch e := e.(type) {
 				case error:
@@ -3336,14 +2474,39 @@ func listJoin(list []string, sep string, lastSep string) string {
 	}
 }
 
+func (p *parser) parseRuleMemoize(rule *rule) (any, bool) {
+	res, ok := p.getMemoized(rule)
+	if ok {
+		p.restore(res.end)
+		return res.v, res.b
+	}
+
+	startMark := p.pt
+	val, ok := p.parseRule(rule)
+	p.setMemoized(startMark, rule, resultTuple{val, ok, p.pt})
+
+	return val, ok
+}
+
 func (p *parser) parseRuleWrap(rule *rule) (any, bool) {
+	if p.debug {
+		defer p.out(p.in("parseRule " + rule.name))
+	}
 	var (
-		val any
-		ok  bool
+		val       any
+		ok        bool
+		startMark = p.pt
 	)
 
-	val, ok = p.parseRule(rule)
+	if p.memoize {
+		val, ok = p.parseRuleMemoize(rule)
+	} else {
+		val, ok = p.parseRule(rule)
+	}
 
+	if ok && p.debug {
+		p.printIndent("MATCH", string(p.sliceFrom(startMark)))
+	}
 	return val, ok
 }
 
@@ -3357,8 +2520,22 @@ func (p *parser) parseRule(rule *rule) (any, bool) {
 }
 
 func (p *parser) parseExprWrap(expr any) (any, bool) {
+	var pt savepoint
+
+	if p.memoize {
+		res, ok := p.getMemoized(expr)
+		if ok {
+			p.restore(res.end)
+			return res.v, res.b
+		}
+		pt = p.pt
+	}
+
 	val, ok := p.parseExpr(expr)
 
+	if p.memoize {
+		p.setMemoized(pt, expr, resultTuple{val, ok, p.pt})
+	}
 	return val, ok
 }
 
@@ -3399,6 +2576,8 @@ func (p *parser) parseExpr(expr any) (any, bool) {
 		val, ok = p.parseRuleRefExpr(expr)
 	case *seqExpr:
 		val, ok = p.parseSeqExpr(expr)
+	case *stateCodeExpr:
+		val, ok = p.parseStateCodeExpr(expr)
 	case *throwExpr:
 		val, ok = p.parseThrowExpr(expr)
 	case *zeroOrMoreExpr:
@@ -3412,42 +2591,67 @@ func (p *parser) parseExpr(expr any) (any, bool) {
 }
 
 func (p *parser) parseActionExpr(act *actionExpr) (any, bool) {
+	if p.debug {
+		defer p.out(p.in("parseActionExpr"))
+	}
+
 	start := p.pt
 	val, ok := p.parseExprWrap(act.expr)
 	if ok {
 		p.cur.pos = start.position
 		p.cur.text = p.sliceFrom(start)
+		state := p.cloneState()
 		actVal, err := act.run(p)
 		if err != nil {
 			p.addErrAt(err, start.position, []string{})
 		}
+		p.restoreState(state)
 
 		val = actVal
+	}
+	if ok && p.debug {
+		p.printIndent("MATCH", string(p.sliceFrom(start)))
 	}
 	return val, ok
 }
 
 func (p *parser) parseAndCodeExpr(and *andCodeExpr) (any, bool) {
+	if p.debug {
+		defer p.out(p.in("parseAndCodeExpr"))
+	}
+
+	state := p.cloneState()
 
 	ok, err := and.run(p)
 	if err != nil {
 		p.addErr(err)
 	}
+	p.restoreState(state)
 
 	return nil, ok
 }
 
 func (p *parser) parseAndExpr(and *andExpr) (any, bool) {
+	if p.debug {
+		defer p.out(p.in("parseAndExpr"))
+	}
+
 	pt := p.pt
+	state := p.cloneState()
 	p.pushV()
 	_, ok := p.parseExprWrap(and.expr)
 	p.popV()
+	p.restoreState(state)
 	p.restore(pt)
 
 	return nil, ok
 }
 
 func (p *parser) parseAnyMatcher(any *anyMatcher) (any, bool) {
+	if p.debug {
+		defer p.out(p.in("parseAnyMatcher"))
+	}
+
 	if p.pt.rn == utf8.RuneError && p.pt.w == 0 {
 		// EOF - see utf8.DecodeRune
 		p.failAt(false, p.pt.position, ".")
@@ -3460,6 +2664,10 @@ func (p *parser) parseAnyMatcher(any *anyMatcher) (any, bool) {
 }
 
 func (p *parser) parseCharClassMatcher(chr *charClassMatcher) (any, bool) {
+	if p.debug {
+		defer p.out(p.in("parseCharClassMatcher"))
+	}
+
 	cur := p.pt.rn
 	start := p.pt
 
@@ -3521,23 +2729,50 @@ func (p *parser) parseCharClassMatcher(chr *charClassMatcher) (any, bool) {
 	return nil, false
 }
 
+func (p *parser) incChoiceAltCnt(ch *choiceExpr, altI int) {
+	choiceIdent := fmt.Sprintf("%s %d:%d", p.rstack[len(p.rstack)-1].name, ch.pos.line, ch.pos.col)
+	m := p.ChoiceAltCnt[choiceIdent]
+	if m == nil {
+		m = make(map[string]int)
+		p.ChoiceAltCnt[choiceIdent] = m
+	}
+	// We increment altI by 1, so the keys do not start at 0
+	alt := strconv.Itoa(altI + 1)
+	if altI == choiceNoMatch {
+		alt = p.choiceNoMatch
+	}
+	m[alt]++
+}
+
 func (p *parser) parseChoiceExpr(ch *choiceExpr) (any, bool) {
+	if p.debug {
+		defer p.out(p.in("parseChoiceExpr"))
+	}
 
 	for altI, alt := range ch.alternatives {
 		// dummy assignment to prevent compile error if optimized
 		_ = altI
 
+		state := p.cloneState()
+
 		p.pushV()
 		val, ok := p.parseExprWrap(alt)
 		p.popV()
 		if ok {
+			p.incChoiceAltCnt(ch, altI)
 			return val, ok
 		}
+		p.restoreState(state)
 	}
+	p.incChoiceAltCnt(ch, choiceNoMatch)
 	return nil, false
 }
 
 func (p *parser) parseLabeledExpr(lab *labeledExpr) (any, bool) {
+	if p.debug {
+		defer p.out(p.in("parseLabeledExpr"))
+	}
+
 	p.pushV()
 	val, ok := p.parseExprWrap(lab.expr)
 	p.popV()
@@ -3549,6 +2784,10 @@ func (p *parser) parseLabeledExpr(lab *labeledExpr) (any, bool) {
 }
 
 func (p *parser) parseLitMatcher(lit *litMatcher) (any, bool) {
+	if p.debug {
+		defer p.out(p.in("parseLitMatcher"))
+	}
+
 	start := p.pt
 	for _, want := range lit.val {
 		cur := p.pt.rn
@@ -3567,27 +2806,44 @@ func (p *parser) parseLitMatcher(lit *litMatcher) (any, bool) {
 }
 
 func (p *parser) parseNotCodeExpr(not *notCodeExpr) (any, bool) {
+	if p.debug {
+		defer p.out(p.in("parseNotCodeExpr"))
+	}
+
+	state := p.cloneState()
+
 	ok, err := not.run(p)
 	if err != nil {
 		p.addErr(err)
 	}
+	p.restoreState(state)
 
 	return nil, !ok
 }
 
 func (p *parser) parseNotExpr(not *notExpr) (any, bool) {
+	if p.debug {
+		defer p.out(p.in("parseNotExpr"))
+	}
+
 	pt := p.pt
+	state := p.cloneState()
 	p.pushV()
 	p.maxFailInvertExpected = !p.maxFailInvertExpected
 	_, ok := p.parseExprWrap(not.expr)
 	p.maxFailInvertExpected = !p.maxFailInvertExpected
 	p.popV()
+	p.restoreState(state)
 	p.restore(pt)
 
 	return nil, !ok
 }
 
 func (p *parser) parseOneOrMoreExpr(expr *oneOrMoreExpr) (any, bool) {
+	if p.debug {
+		defer p.out(p.in("parseOneOrMoreExpr"))
+	}
+
 	var vals []any
 
 	for {
@@ -3606,6 +2862,9 @@ func (p *parser) parseOneOrMoreExpr(expr *oneOrMoreExpr) (any, bool) {
 }
 
 func (p *parser) parseRecoveryExpr(recover *recoveryExpr) (any, bool) {
+	if p.debug {
+		defer p.out(p.in("parseRecoveryExpr (" + strings.Join(recover.failureLabel, ",") + ")"))
+	}
 
 	p.pushRecovery(recover.failureLabel, recover.recoverExpr)
 	val, ok := p.parseExprWrap(recover.expr)
@@ -3615,6 +2874,10 @@ func (p *parser) parseRecoveryExpr(recover *recoveryExpr) (any, bool) {
 }
 
 func (p *parser) parseRuleRefExpr(ref *ruleRefExpr) (any, bool) {
+	if p.debug {
+		defer p.out(p.in("parseRuleRefExpr " + ref.name))
+	}
+
 	if ref.name == "" {
 		panic(fmt.Sprintf("%s: invalid rule: missing name", ref.pos))
 	}
@@ -3628,12 +2891,18 @@ func (p *parser) parseRuleRefExpr(ref *ruleRefExpr) (any, bool) {
 }
 
 func (p *parser) parseSeqExpr(seq *seqExpr) (any, bool) {
+	if p.debug {
+		defer p.out(p.in("parseSeqExpr"))
+	}
+
 	vals := make([]any, 0, len(seq.exprs))
 
 	pt := p.pt
+	state := p.cloneState()
 	for _, expr := range seq.exprs {
 		val, ok := p.parseExprWrap(expr)
 		if !ok {
+			p.restoreState(state)
 			p.restore(pt)
 			return nil, false
 		}
@@ -3642,7 +2911,22 @@ func (p *parser) parseSeqExpr(seq *seqExpr) (any, bool) {
 	return vals, true
 }
 
+func (p *parser) parseStateCodeExpr(state *stateCodeExpr) (any, bool) {
+	if p.debug {
+		defer p.out(p.in("parseStateCodeExpr"))
+	}
+
+	err := state.run(p)
+	if err != nil {
+		p.addErr(err)
+	}
+	return nil, true
+}
+
 func (p *parser) parseThrowExpr(expr *throwExpr) (any, bool) {
+	if p.debug {
+		defer p.out(p.in("parseThrowExpr"))
+	}
 
 	for i := len(p.recoveryStack) - 1; i >= 0; i-- {
 		if recoverExpr, ok := p.recoveryStack[i][expr.label]; ok {
@@ -3656,6 +2940,10 @@ func (p *parser) parseThrowExpr(expr *throwExpr) (any, bool) {
 }
 
 func (p *parser) parseZeroOrMoreExpr(expr *zeroOrMoreExpr) (any, bool) {
+	if p.debug {
+		defer p.out(p.in("parseZeroOrMoreExpr"))
+	}
+
 	var vals []any
 
 	for {
@@ -3670,6 +2958,10 @@ func (p *parser) parseZeroOrMoreExpr(expr *zeroOrMoreExpr) (any, bool) {
 }
 
 func (p *parser) parseZeroOrOneExpr(expr *zeroOrOneExpr) (any, bool) {
+	if p.debug {
+		defer p.out(p.in("parseZeroOrOneExpr"))
+	}
+
 	p.pushV()
 	val, _ := p.parseExprWrap(expr.expr)
 	p.popV()

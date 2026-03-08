@@ -158,6 +158,40 @@ func walk(offset int, nodes []ast.Node) (bleveQuery.Query, int, error) {
 			} else {
 				next = q
 			}
+		case *ast.NumericNode:
+			if n.Operator == nil {
+				continue
+			}
+
+			var minVal, maxVal *float64
+			var minInclusive, maxInclusive *bool
+			val := n.Value
+
+			switch n.Operator.Value {
+			case ">":
+				minVal = &val
+				minInclusive = &[]bool{false}[0]
+			case ">=":
+				minVal = &val
+				minInclusive = &[]bool{true}[0]
+			case "<":
+				maxVal = &val
+				maxInclusive = &[]bool{false}[0]
+			case "<=":
+				maxVal = &val
+				maxInclusive = &[]bool{true}[0]
+			default:
+				continue
+			}
+
+			q := bleve.NewNumericRangeInclusiveQuery(minVal, maxVal, minInclusive, maxInclusive)
+			q.SetField(getField(n.Key))
+
+			if prev == nil {
+				prev = q
+			} else {
+				next = q
+			}
 		case *ast.BooleanNode:
 			q := bleveQuery.NewQueryStringQuery(getField(n.Key) + fmt.Sprintf(":%v", n.Value))
 			if prev == nil {
