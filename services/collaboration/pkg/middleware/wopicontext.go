@@ -36,6 +36,7 @@ type WopiContext struct {
 	FileReference     *providerv1beta1.Reference
 	TemplateReference *providerv1beta1.Reference
 	ViewMode          appproviderv1beta1.ViewMode
+	HasMFA            bool
 }
 
 // WopiContextAuthMiddleware will prepare an HTTP handler to be used as
@@ -132,6 +133,9 @@ func WopiContextAuthMiddleware(cfg *config.Config, st microstore.Store, next htt
 		ctx = metadata.AppendToOutgoingContext(ctx, ctxpkg.TokenHeader, claims.WopiContext.AccessToken)
 		ctx = ctxpkg.ContextSetUser(ctx, user)
 		ctx = ctxpkg.ContextSetScopes(ctx, scopes)
+
+		// Propagate MFA status embedded in the WOPI token to outgoing gRPC metadata.
+		ctx = ctxpkg.AppendMFAToOutgoingContext(ctx, claims.WopiContext.HasMFA)
 
 		// include additional info in the context's logger
 		wopiLogger = wopiLogger.With().

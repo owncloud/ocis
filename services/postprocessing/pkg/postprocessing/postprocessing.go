@@ -119,6 +119,7 @@ func (pp *Postprocessing) finished(outcome events.PostprocessingOutcome) events.
 		UploadID:          pp.ID,
 		ExecutingUser:     pp.User,
 		Filename:          pp.Filename,
+		ResourceID:        pp.ResourceID,
 		Outcome:           outcome,
 		ImpersonatingUser: pp.ImpersonatingUser,
 	}

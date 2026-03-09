@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net/url"
 	"path"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -13,10 +14,12 @@ import (
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	ctxpkg "github.com/owncloud/reva/v2/pkg/ctx"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/owncloud/reva/v2/pkg/storagespace"
 	"github.com/owncloud/reva/v2/pkg/utils"
 	microstore "go-micro.dev/v4/store"
+	"google.golang.org/grpc/metadata"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config"
@@ -121,11 +124,14 @@ func (s *Service) OpenInApp(
 	}
 
 	// create the wopiContext and generate the token
+	mfav := metadata.ValueFromIncomingContext(ctx, ctxpkg.MFAOutgoingHeader)
+	hasMFA := slices.Contains(mfav, "true")
 	wopiContext := middleware.WopiContext{
 		AccessToken:   req.GetAccessToken(), // it will be encrypted
 		ViewOnlyToken: utils.ReadPlainFromOpaque(req.GetOpaque(), "viewOnlyToken"),
 		FileReference: &providerFileRef,
 		ViewMode:      req.GetViewMode(),
+		HasMFA:        hasMFA,
 	}
 
 	if templateID := utils.ReadPlainFromOpaque(req.GetOpaque(), "template"); templateID != "" {

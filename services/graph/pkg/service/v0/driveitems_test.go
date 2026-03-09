@@ -30,6 +30,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config/defaults"
 	identitymocks "github.com/owncloud/ocis/v2/services/graph/pkg/identity/mocks"
+	graphmw "github.com/owncloud/ocis/v2/services/graph/pkg/middleware"
 	service "github.com/owncloud/ocis/v2/services/graph/pkg/service/v0"
 )
 
@@ -194,6 +195,43 @@ var _ = Describe("Driveitems", func() {
 			Expect(res.Value[0].GetLastModifiedDateTime().Equal(mtime)).To(BeTrue())
 			Expect(res.Value[0].GetETag()).To(Equal("etag"))
 			Expect(res.Value[0].GetId()).To(Equal("storageid$spaceid!opaqueid"))
+		})
+	})
+
+	Describe("GetRootDriveChildren vault mode filter", func() {
+		It("does not set storage_id opaque in normal mode", func() {
+			var captured *provider.ListStorageSpacesRequest
+			gatewayClient.On("ListStorageSpaces", mock.Anything, mock.MatchedBy(func(req *provider.ListStorageSpacesRequest) bool {
+				captured = req
+				return true
+			})).Return(&provider.ListStorageSpacesResponse{
+				Status: status.NewNotFound(ctx, "not found"),
+			}, nil).Once()
+
+			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drive/root/children", nil)
+			r = r.WithContext(revactx.ContextSetUser(ctx, currentUser))
+			svc.GetRootDriveChildren(rr, r)
+
+			Expect(captured).ToNot(BeNil())
+			Expect(captured.GetOpaque().GetMap()).ToNot(HaveKey("storage_id"))
+		})
+
+		It("sets storage_id opaque to VaultStorageProviderID in vault mode", func() {
+			var captured *provider.ListStorageSpacesRequest
+			gatewayClient.On("ListStorageSpaces", mock.Anything, mock.MatchedBy(func(req *provider.ListStorageSpacesRequest) bool {
+				captured = req
+				return true
+			})).Return(&provider.ListStorageSpacesResponse{
+				Status: status.NewNotFound(ctx, "not found"),
+			}, nil).Once()
+
+			r := httptest.NewRequest(http.MethodGet, "/vault/graph/v1.0/me/drive/root/children", nil)
+			r = r.WithContext(graphmw.SetVaultMode(revactx.ContextSetUser(ctx, currentUser), true))
+			svc.GetRootDriveChildren(rr, r)
+
+			Expect(captured).ToNot(BeNil())
+			Expect(captured.GetOpaque().GetMap()).To(HaveKey("storage_id"))
+			Expect(string(captured.GetOpaque().GetMap()["storage_id"].Value)).To(Equal(utils.VaultStorageProviderID))
 		})
 	})
 
