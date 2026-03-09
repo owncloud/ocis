@@ -14,6 +14,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: EMAIL\n"
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 "POT-Creation-Date: 2026-03-05 14:42+0000\n"
 =======
 "POT-Creation-Date: 2026-01-23 00:05+0000\n"
@@ -21,6 +22,9 @@ msgstr ""
 =======
 "POT-Creation-Date: 2026-02-13 00:17+0000\n"
 >>>>>>> 8b783a2debc (chore: release 8.0.0)
+=======
+"POT-Creation-Date: 2026-03-05 14:42+0000\n"
+>>>>>>> bb5c6c2c929 (chore: release 8.0.1)
 "PO-Revision-Date: 2026-01-02 10:10+0000\n"
 "Last-Translator: Cesare Capoferri, 2026\n"
 "Language-Team: Italian (https://app.transifex.com/owncloud-org/teams/6149/it/)\n"
