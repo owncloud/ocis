@@ -1,0 +1,45 @@
+name: oCIS Full Smoke
+
+on:
+  pull_request:
+    paths:
+      - "deployments/examples/ocis_full/**"
+  push:
+    branches:
+      - master
+    paths:
+      - "deployments/examples/ocis_full/**"
+  schedule:
+    - cron: "0 3 * * *"
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: deployments/examples/ocis_full
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate compose config
+        run: docker compose --env-file .env config >/dev/null
+
+      - name: Start default stack
+        run: docker compose --env-file .env up -d
+
+      - name: Wait for startup
+        run: sleep 45
+
+      - name: Show compose status
+        if: always()
+        run: docker compose --env-file .env ps
+
+      - name: Show recent compose logs
+        if: always()
+        run: docker compose --env-file .env logs --tail 200
+
+      - name: Tear down stack
+        if: always()
+        run: docker compose --env-file .env down -v --remove-orphans

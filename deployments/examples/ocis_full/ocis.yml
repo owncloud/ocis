@@ -6,7 +6,7 @@ services:
         aliases:
           - ${OCIS_DOMAIN:-ocis.owncloud.test}
   ocis:
-    image: ${OCIS_DOCKER_IMAGE:-owncloud/ocis}:${OCIS_DOCKER_TAG:-latest}
+    image: owncloud/ocis:8.0.0@sha256:41e6d78f43507015e0c34b87bff49ae0744f261a92916f044e47d32067ff18ce
     # changelog: https://github.com/owncloud/ocis/tree/master/changelog
     # release notes: https://doc.owncloud.com/ocis_release_notes.html
     networks:

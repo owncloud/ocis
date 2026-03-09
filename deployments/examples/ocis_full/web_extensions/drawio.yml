@@ -6,7 +6,7 @@ services:
         condition: service_completed_successfully
 
   drawio-init:
-    image: owncloud/web-extensions:draw-io-0.3.3
+    image: owncloud/web-extensions:draw-io-0.3.3@sha256:57ef8c26e4e811f92e6e2ac784c42969f50ef0ac9e4384dbbf13b12f2a4c1ae4
     user: root
     volumes:
       - ocis-apps:/apps
