@@ -218,6 +218,7 @@ mfa:
 multi_instance:
   enabled: false
   instanceid: ""
+  master_id: ""
   member_claim: ""
   guest_claim: ""
   guest_role: ""
