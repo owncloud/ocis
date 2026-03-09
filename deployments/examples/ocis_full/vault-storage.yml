@@ -1,0 +1,37 @@
+services:
+  ocis:
+    environment:
+      OCIS_MFA_ENABLED: true
+      NATS_NATS_HOST: 0.0.0.0
+      SETTINGS_GRPC_ADDR: ocis:9191
+      PROXY_CREATE_VAULT_HOME: true
+      GRAPH_ENABLE_VAULT_MODE: true
+
+  storage-users-vault:
+    image: ${OCIS_DOCKER_IMAGE:-owncloud/ocis}:${OCIS_DOCKER_TAG:-latest}
+    networks:
+      ocis-net:
+    depends_on:
+      ocis:
+        condition: service_started
+    command: ["storage-users", "server"]
+    environment:
+      OCIS_LOG_LEVEL: debug
+      OCIS_GATEWAY_GRPC_ADDR: ocis:9142
+      STORAGE_USERS_ENABLE_VAULT_MODE: true
+      STORAGE_USERS_SERVICE_NAME: storage-users-vault
+      STORAGE_USERS_GRPC_ADDR: storage-users-vault:9170
+      STORAGE_USERS_HTTP_ADDR: storage-users-vault:9168
+      STORAGE_USERS_DATA_SERVER_URL: http://storage-users-vault:9168/data
+      STORAGE_USERS_DEBUG_ADDR: storage-users-vault:9169
+      STORAGE_USERS_OCIS_ROOT: /var/lib/ocis/storage/users-vault
+      STORAGE_USERS_EVENTS_CONSUMER_GROUP: vault-dcfs
+      MICRO_REGISTRY_ADDRESS: ocis:9233
+      OCIS_EVENTS_ENDPOINT: ocis:9233
+      OCIS_CACHE_STORE_NODES: ocis:9233
+    volumes:
+      - ocis-data:/var/lib/ocis
+      - ocis-config:/etc/ocis
+    logging:
+      driver: ${LOG_DRIVER:-local}
+    restart: always

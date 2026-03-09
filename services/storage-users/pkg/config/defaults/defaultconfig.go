@@ -8,6 +8,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	"github.com/owncloud/ocis/v2/ocis-pkg/structs"
 	"github.com/owncloud/ocis/v2/services/storage-users/pkg/config"
+	"github.com/owncloud/reva/v2/pkg/utils"
 )
 
 // FullDefaultConfig returns a fully initialized default configuration
@@ -225,6 +226,11 @@ func EnsureDefaults(cfg *config.Config) {
 			len(cfg.HTTP.CORS.AllowedOrigins) == 1 &&
 				cfg.HTTP.CORS.AllowedOrigins[0] == "https://localhost:9200") {
 		cfg.HTTP.CORS.AllowedOrigins = []string{cfg.Commons.OcisURL}
+	}
+
+	// set mount id to vault storage provider id
+	if cfg.EnableVaultMode {
+		cfg.MountID = utils.VaultStorageProviderID
 	}
 }
 

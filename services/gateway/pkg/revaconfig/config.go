@@ -75,16 +75,6 @@ func GatewayConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]i
 						"cache_auth_username": cfg.Cache.ProviderCacheAuthUsername,
 						"cache_auth_password": cfg.Cache.ProviderCacheAuthPassword,
 					},
-					"create_personal_space_cache_config": map[string]interface{}{
-						"cache_store":               cfg.Cache.CreateHomeCacheStore,
-						"cache_nodes":               cfg.Cache.CreateHomeCacheNodes,
-						"cache_database":            cfg.Cache.CreateHomeCacheDatabase,
-						"cache_table":               "create_personal_space",
-						"cache_ttl":                 cfg.Cache.CreateHomeCacheTTL,
-						"cache_disable_persistence": cfg.Cache.CreateHomeCacheDisablePersistence,
-						"cache_auth_username":       cfg.Cache.CreateHomeCacheAuthUsername,
-						"cache_auth_password":       cfg.Cache.CreateHomeCacheAuthPassword,
-					},
 				},
 				"authregistry": map[string]interface{}{
 					"driver": "static",
@@ -159,6 +149,22 @@ func spacesProviders(cfg *config.Config, logger log.Logger) map[string]map[strin
 				"project": map[string]interface{}{
 					"mount_point":   "/projects",
 					"path_template": "/projects/{{.Space.Name}}",
+				},
+			},
+		},
+		"com.owncloud.api.storage-users-vault": {
+			// Use the dedicated storage provider for vault
+			"providerid": utils.VaultStorageProviderID,
+			"spaces": map[string]interface{}{
+				"personal": map[string]interface{}{
+					// The mount point must have the "vault/" prefix to be picked up by the vault storage provider
+					"mount_point":   "/vault/users",
+					"path_template": "/vault/users/{{.Space.Owner.Id.OpaqueId}}",
+				},
+				"project": map[string]interface{}{
+					// The mount point must have the "vault/" prefix to be picked up by the vault storage provider
+					"mount_point":   "/vault/projects",
+					"path_template": "/vault/projects/{{.Space.Name}}",
 				},
 			},
 		},

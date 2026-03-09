@@ -33,6 +33,7 @@ import (
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	"github.com/mitchellh/mapstructure"
 	"github.com/owncloud/reva/v2/pkg/appctx"
 	"github.com/owncloud/reva/v2/pkg/conversions"
 	ctxpkg "github.com/owncloud/reva/v2/pkg/ctx"
@@ -47,7 +48,6 @@ import (
 	"github.com/owncloud/reva/v2/pkg/storage/fs/registry"
 	"github.com/owncloud/reva/v2/pkg/storagespace"
 	"github.com/owncloud/reva/v2/pkg/utils"
-	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 	"go.opentelemetry.io/otel/attribute"
@@ -787,6 +787,7 @@ func (s *Service) Stat(ctx context.Context, req *provider.StatRequest) (*provide
 	s.addMissingStorageProviderID(md.GetId(), nil)
 	s.addMissingStorageProviderID(md.GetParentId(), nil)
 	s.addMissingStorageProviderID(md.GetSpace().GetRoot(), nil)
+	s.addMissingStorageProviderID(md.GetSpace().GetRootInfo().GetId(), nil)
 
 	return &provider.StatResponse{
 		Status: status.NewOK(ctx),

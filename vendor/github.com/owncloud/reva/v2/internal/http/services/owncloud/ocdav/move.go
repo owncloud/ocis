@@ -141,6 +141,13 @@ func (s *svc) handleSpacesMove(w http.ResponseWriter, r *http.Request, srcSpaceI
 }
 
 func (s *svc) handleMove(ctx context.Context, w http.ResponseWriter, r *http.Request, src, dst *provider.Reference, log zerolog.Logger) {
+	// restrict move from the vault
+	if destinationIsNotAllowed(src, dst) {
+		w.WriteHeader(http.StatusConflict)
+		b, err := errors.Marshal(http.StatusBadRequest, "destination is not allowed", "", "")
+		errors.HandleWebdavError(&log, w, b, err)
+		return
+	}
 	isChild, err := s.referenceIsChildOf(ctx, s.gatewaySelector, dst, src)
 	if err != nil {
 		switch err.(type) {

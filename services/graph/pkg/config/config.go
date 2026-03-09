@@ -39,6 +39,8 @@ type Config struct {
 
 	Validation Validation `yaml:"validation"`
 
+	EnableVaultMode bool `yaml:"enable_vault_mode" env:"GRAPH_ENABLE_VAULT_MODE" desc:"Enable vault mode for the graph service runned in addition to the regular graph service. Required the running the storage-users-vault additional service." introductionVersion:"daledda"`
+
 	Context context.Context `yaml:"-"`
 }
 

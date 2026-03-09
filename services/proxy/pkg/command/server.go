@@ -373,6 +373,7 @@ func loadMiddlewares(logger log.Logger, cfg *config.Config,
 			middleware.Logger(logger),
 			middleware.WithRevaGatewaySelector(gatewaySelector),
 			middleware.RoleQuotas(cfg.RoleQuotas),
+			middleware.CreateVaultHome(cfg.CreateVaultHome),
 		),
 		// trigger space assignment when a user logs in
 		middleware.SpaceManager(
