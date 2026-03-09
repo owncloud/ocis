@@ -125,6 +125,7 @@ func (s Service) processEvent(e events.Event) error {
 		if err := events.Publish(ctx, s.stream, events.PostprocessingStepFinished{
 			Outcome:       outcome,
 			UploadID:      ev.UploadID,
+			ResourceID:    ev.ResourceID,
 			ExecutingUser: ev.ExecutingUser,
 			Filename:      ev.Filename,
 			FinishedStep:  ev.StepToStart,

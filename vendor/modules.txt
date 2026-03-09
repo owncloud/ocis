@@ -733,8 +733,8 @@ github.com/google/go-tpm/tpmutil/tbs
 # github.com/google/pprof v0.0.0-20260115054156-294ebfa9ad83
 ## explicit; go 1.24.0
 github.com/google/pprof/profile
-# github.com/google/renameio/v2 v2.0.1
-## explicit; go 1.13
+# github.com/google/renameio/v2 v2.0.2
+## explicit; go 1.25
 github.com/google/renameio/v2
 # github.com/google/uuid v1.6.0
 ## explicit
@@ -785,7 +785,7 @@ github.com/gorilla/schema
 ## explicit; go 1.14
 github.com/grpc-ecosystem/go-grpc-middleware
 github.com/grpc-ecosystem/go-grpc-middleware/recovery
-# github.com/grpc-ecosystem/grpc-gateway/v2 v2.27.7
+# github.com/grpc-ecosystem/grpc-gateway/v2 v2.28.0
 ## explicit; go 1.24.0
 github.com/grpc-ecosystem/grpc-gateway/v2/internal/httprule
 github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2/options
@@ -1317,8 +1317,8 @@ github.com/orcaman/concurrent-map
 # github.com/owncloud/libre-graph-api-go v1.0.5-0.20260216101009-eeac018af245
 ## explicit; go 1.18
 github.com/owncloud/libre-graph-api-go
-# github.com/owncloud/reva/v2 v2.0.0-20260424082219-c88989902d1a
-## explicit; go 1.25.0
+# github.com/owncloud/reva/v2 v2.0.0-20260511115023-2bc11c903e32
+## explicit; go 1.25.7
 github.com/owncloud/reva/v2/cmd/revad/internal/grace
 github.com/owncloud/reva/v2/cmd/revad/runtime
 github.com/owncloud/reva/v2/internal/grpc/interceptors/appctx
@@ -1969,8 +1969,8 @@ github.com/trustelem/zxcvbn/internal/mathutils
 github.com/trustelem/zxcvbn/match
 github.com/trustelem/zxcvbn/matching
 github.com/trustelem/zxcvbn/scoring
-# github.com/tus/tusd/v2 v2.8.0
-## explicit; go 1.23.0
+# github.com/tus/tusd/v2 v2.9.1
+## explicit; go 1.25
 github.com/tus/tusd/v2/pkg/handler
 # github.com/unrolled/secure v1.17.0 => github.com/DeepDiver1975/secure v0.0.0-20240611112133-abc838fb797c
 ## explicit; go 1.13
@@ -2172,7 +2172,6 @@ go.opentelemetry.io/otel/semconv/v1.20.0
 go.opentelemetry.io/otel/semconv/v1.21.0
 go.opentelemetry.io/otel/semconv/v1.37.0
 go.opentelemetry.io/otel/semconv/v1.39.0
-go.opentelemetry.io/otel/semconv/v1.39.0/otelconv
 go.opentelemetry.io/otel/semconv/v1.39.0/rpcconv
 go.opentelemetry.io/otel/semconv/v1.4.0
 go.opentelemetry.io/otel/semconv/v1.40.0
@@ -2185,12 +2184,12 @@ go.opentelemetry.io/otel/exporters/jaeger/internal/gen-go/agent
 go.opentelemetry.io/otel/exporters/jaeger/internal/gen-go/jaeger
 go.opentelemetry.io/otel/exporters/jaeger/internal/gen-go/zipkincore
 go.opentelemetry.io/otel/exporters/jaeger/internal/third_party/thrift/lib/go/thrift
-# go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.40.0
-## explicit; go 1.24.0
+# go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.42.0
+## explicit; go 1.25.0
 go.opentelemetry.io/otel/exporters/otlp/otlptrace
 go.opentelemetry.io/otel/exporters/otlp/otlptrace/internal/tracetransform
-# go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.40.0
-## explicit; go 1.24.0
+# go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.42.0
+## explicit; go 1.25.0
 go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc
 go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc/internal
 go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc/internal/counter
@@ -2405,8 +2404,8 @@ golang.org/x/tools/internal/stdlib
 golang.org/x/tools/internal/typeparams
 golang.org/x/tools/internal/typesinternal
 golang.org/x/tools/internal/versions
-# google.golang.org/genproto v0.0.0-20250303144028-a0af3efb3deb
-## explicit; go 1.23.0
+# google.golang.org/genproto v0.0.0-20251202230838-ff82c1b0f217
+## explicit; go 1.24.0
 google.golang.org/genproto/protobuf/field_mask
 # google.golang.org/genproto/googleapis/api v0.0.0-20260319201613-d00831a3d3e7
 ## explicit; go 1.25.0

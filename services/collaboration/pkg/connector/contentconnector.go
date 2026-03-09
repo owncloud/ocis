@@ -15,6 +15,7 @@ import (
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	"github.com/owncloud/ocis/v2/ocis-pkg/mfa"
 	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/config"
 	"github.com/owncloud/ocis/v2/services/collaboration/pkg/middleware"
@@ -71,6 +72,7 @@ func newHttpRequest(ctx context.Context, wopiContext middleware.WopiContext, met
 	} else {
 		httpReq.Header.Add("X-Access-Token", wopiContext.AccessToken)
 	}
+	mfa.SetHeader(httpReq, wopiContext.HasMFA)
 	return httpReq, nil
 }
 

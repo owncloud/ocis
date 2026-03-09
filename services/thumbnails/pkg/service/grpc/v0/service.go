@@ -18,6 +18,7 @@ import (
 	"github.com/owncloud/reva/v2/pkg/utils"
 	"github.com/pkg/errors"
 	merrors "go-micro.dev/v4/errors"
+	gmmetadata "go-micro.dev/v4/metadata"
 	"google.golang.org/grpc/metadata"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
@@ -28,6 +29,7 @@ import (
 	tjwt "github.com/owncloud/ocis/v2/services/thumbnails/pkg/service/jwt"
 	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/thumbnail"
 	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/thumbnail/imgsource"
+	ctxpkg "github.com/owncloud/reva/v2/pkg/ctx"
 )
 
 // NewService returns a service implementation for Service.
@@ -140,7 +142,7 @@ func (g Thumbnail) checkThumbnail(req *thumbnailssvc.GetThumbnailRequest, sRes *
 
 func (g Thumbnail) handleCS3Source(ctx context.Context, req *thumbnailssvc.GetThumbnailRequest) (string, error) {
 	src := req.GetCs3Source()
-	sRes, err := g.stat(src.GetPath(), src.GetAuthorization())
+	sRes, err := g.stat(ctx, src.GetPath(), src.GetAuthorization())
 	if err != nil {
 		return "", err
 	}
@@ -223,7 +225,7 @@ func (g Thumbnail) handleWebdavSource(ctx context.Context, req *thumbnailssvc.Ge
 		auth = src.GetRevaAuthorization()
 		statPath = req.GetFilepath()
 	}
-	sRes, err := g.stat(statPath, auth)
+	sRes, err := g.stat(ctx, statPath, auth)
 	if err != nil {
 		return "", err
 	}
@@ -272,8 +274,17 @@ func (g Thumbnail) handleWebdavSource(ctx context.Context, req *thumbnailssvc.Ge
 	return key, err
 }
 
-func (g Thumbnail) stat(path, auth string) (*provider.StatResponse, error) {
-	ctx := metadata.AppendToOutgoingContext(context.Background(), revactx.TokenHeader, auth)
+func (g Thumbnail) stat(ctx context.Context, path, auth string) (*provider.StatResponse, error) {
+	outCtx := metadata.AppendToOutgoingContext(ctx, revactx.TokenHeader, auth)
+
+	// Bridge MFA status from go-micro metadata (set by the webdav service) into
+	// outgoing gRPC metadata. The autoprop-prefixed key is then forwarded
+	// automatically at every subsequent gRPC hop by the metadata interceptor.
+	if md, ok := gmmetadata.FromContext(ctx); ok {
+		if v, ok := md.Get(ctxpkg.MFAOutgoingHeader); ok && v != "" {
+			outCtx = metadata.AppendToOutgoingContext(outCtx, ctxpkg.MFAOutgoingHeader, v)
+		}
+	}
 
 	ref, err := storagespace.ParseReference(path)
 	if err != nil {
@@ -289,7 +300,7 @@ func (g Thumbnail) stat(path, auth string) (*provider.StatResponse, error) {
 		return nil, merrors.InternalServerError(g.serviceID, "could not select next gateway client: %s", err.Error())
 	}
 	req := &provider.StatRequest{Ref: &ref}
-	rsp, err := client.Stat(ctx, req)
+	rsp, err := client.Stat(outCtx, req)
 	if err != nil {
 		g.logger.Error().Err(err).Str("path", path).Msg("could not stat file")
 		return nil, merrors.InternalServerError(g.serviceID, "could not stat file: %s", err.Error())

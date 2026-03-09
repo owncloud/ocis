@@ -223,9 +223,8 @@ func NewService(opts ...Option) (Graph, error) { //nolint:maintidx
 		return svc, err
 	}
 
-	m.Route(options.Config.HTTP.Root, func(r chi.Router) {
+	graphRoutes := func(r chi.Router, drivesRequireMFA func(http.Handler) http.Handler) {
 		r.Use(middleware.StripSlashes)
-
 		r.Route("/v1beta1", func(r chi.Router) {
 			r.Route("/me", func(r chi.Router) {
 				r.Get("/drives", svc.GetDrives(APIVersion_1_Beta_1))
@@ -235,7 +234,7 @@ func NewService(opts ...Option) (Graph, error) { //nolint:maintidx
 				})
 			})
 			r.Route("/drives", func(r chi.Router) {
-				r.Get("/", svc.GetAllDrives(APIVersion_1_Beta_1))
+				r.With(drivesRequireMFA).Get("/", svc.GetAllDrives(APIVersion_1_Beta_1))
 				r.Post("/", svc.CreateDriveV1Beta1)
 				r.Route("/{driveID}", func(r chi.Router) {
 					r.Get("/", svc.GetSingleDriveV1Beta1)
@@ -331,7 +330,7 @@ func NewService(opts ...Option) (Graph, error) { //nolint:maintidx
 				})
 			})
 			r.Route("/drives", func(r chi.Router) {
-				r.Get("/", svc.GetAllDrives(APIVersion_1))
+				r.With(drivesRequireMFA).Get("/", svc.GetAllDrives(APIVersion_1))
 				r.Post("/", svc.CreateDrive)
 				r.Route("/{driveID}", func(r chi.Router) {
 					r.Patch("/", svc.UpdateDrive)
@@ -394,7 +393,23 @@ func NewService(opts ...Option) (Graph, error) { //nolint:maintidx
 				})
 			})
 		})
+	}
+
+	requireMFA := graphm.RequireMFA(options.Logger)
+	blankMW := func(next http.Handler) http.Handler { return next }
+
+	m.Route(options.Config.HTTP.Root, func(r chi.Router) {
+		graphRoutes(r, requireMFA)
 	})
+
+	// Initialize the Vault routes
+	if options.Config.EnableVaultMode {
+		m.Route("/vault/graph", func(r chi.Router) {
+			r.Use(requireMFA)
+			r.Use(graphm.VaultModeMiddleware())
+			graphRoutes(r, blankMW)
+		})
+	}
 
 	_ = chi.Walk(m, func(method string, route string, handler http.Handler, middlewares ...func(http.Handler) http.Handler) error {
 		options.Logger.Debug().Str("method", method).Str("route", route).Int("middlewares", len(middlewares)).Msg("serving endpoint")
