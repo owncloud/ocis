@@ -20,7 +20,7 @@ features:
   emailNotifications:
     enabled: false
     smtp:
-      host: mailpit
+      host: email
       port: 1025
       sender: 'oCIS <noreply@local.test>'
       authentication: none
@@ -34,26 +34,26 @@ features:
     enabled: false
   ocm:
     enabled: false
-    providersConfigRef: "ocmproviders"
+    providersConfigRef: 'ocmproviders'
   sharing:
     passwordPolicies:
       bannedPasswords:
-        - "password"
-        - "123"
-        - "12345678"
-        - "ownCloud"
-        - "owncloud-1"
+        - 'password'
+        - '123'
+        - '12345678'
+        - 'ownCloud'
+        - 'owncloud-1'
   quotas:
-    default: "1000000000"
-    max: "0"
+    default: '1000000000'
+    max: '0'
   appsIntegration:
     enabled: false
     wopiIntegration:
       officeSuites:
-        - name: "Collabora"
-          uri: "https://collabora:9980"
-          wopiSrc: "http://ocis-server:9300"
-          product: "Collabora"
+        - name: 'Collabora'
+          uri: 'https://collabora:9980'
+          wopiSrc: 'http://ocis-server:9300'
+          product: 'Collabora'
           enabled: true
           insecure: true
           disableProof: true
@@ -61,10 +61,10 @@ features:
           disableChat: true
           ingress:
             enabled: false
-        - name: "FakeOffice"
-          uri: "http://fakeoffice:8080"
-          wopiSrc: "http://ocis-server:9301"
-          product: "FakeOffice"
+        - name: 'FakeOffice'
+          uri: 'http://fakeoffice:8080'
+          wopiSrc: 'http://ocis-server:9301'
+          product: 'FakeOffice'
           enabled: true
           insecure: true
           disableProof: true
@@ -72,10 +72,10 @@ features:
           disableChat: true
           ingress:
             enabled: false
-        - name: "OnlyOffice"
-          uri: "https://onlyoffice"
-          wopiSrc: "http://ocis-server:9302"
-          product: "OnlyOffice"
+        - name: 'OnlyOffice'
+          uri: 'https://onlyoffice'
+          wopiSrc: 'http://ocis-server:9302'
+          product: 'OnlyOffice'
           enabled: true
           insecure: true
           disableProof: true
@@ -93,26 +93,30 @@ http:
         - "'self'"
       connectSrc:
         - "'self'"
-        - "blob: https://raw.githubusercontent.com/owncloud/awesome-ocis/"
+        - 'blob:'
+        - 'https://raw.githubusercontent.com/owncloud/awesome-ocis/'
       defaultSrc:
         - "'none'"
       fontSrc:
         - "'self'"
       frameAncestors:
-        - "'self'"
+        - "'none'"
       frameSrc:
         - "'self'"
-        - "data: blob: https://embed.diagrams.net/"
+        - 'blob:'
+        - 'https://embed.diagrams.net/'
       imgSrc:
         - "'self'"
-        - "blob: https://raw.githubusercontent.com/owncloud/awesome-ocis/"
+        - 'data:'
+        - 'blob:'
+        - 'https://raw.githubusercontent.com/owncloud/awesome-ocis/'
       manifestSrc:
         - "'self'"
       mediaSrc:
         - "'self'"
       objectSrc:
         - "'self'"
-        - "blob:"
+        - 'blob:'
       scriptSrc:
         - "'self'"
         - "'unsafe-inline'"
