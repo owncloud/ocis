@@ -40,6 +40,7 @@ GroupNode <-
 PropertyRestrictionNodes <-
     YesNoPropertyRestrictionNode /
     DateTimeRestrictionNode /
+    NumericRestrictionNode /
     TextPropertyRestrictionNode
 
 YesNoPropertyRestrictionNode <-
@@ -67,6 +68,16 @@ DateTimeRestrictionNode <-
         OperatorColonNode
     ) '"'? v:NaturalLanguageDateTime '"'? {
         return buildNaturalLanguageDateTimeNodes(k, v, c.text, c.pos)
+    }
+
+NumericRestrictionNode <-
+    k:Char+ o:(
+        OperatorGreaterOrEqualNode /
+        OperatorLessOrEqualNode /
+        OperatorGreaterNode /
+        OperatorLessNode
+    ) v:Number {
+        return buildNumericNode(k, o, v, c.text, c.pos)
     }
 
 TextPropertyRestrictionNode <-
@@ -222,6 +233,11 @@ Char <-
 String <-
     '"' v:[^"]* '"' {
         return v, nil
+    }
+
+Number <-
+    [0-9]+ ("." [0-9]+)? {
+        return c.text, nil
     }
 
 Digit <-

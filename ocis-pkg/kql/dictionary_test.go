@@ -858,6 +858,97 @@ func TestParse_DateTimeRestrictionNode(t *testing.T) {
 	}
 }
 
+func TestParse_NumericRestrictionNode(t *testing.T) {
+	tests := []testCase{
+		{
+			name: `size>=1048576`,
+			ast: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.NumericNode{
+						Key:      "size",
+						Operator: &ast.OperatorNode{Value: ">="},
+						Value:    1048576,
+					},
+				},
+			},
+		},
+		{
+			name: `size<=10485760`,
+			ast: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.NumericNode{
+						Key:      "size",
+						Operator: &ast.OperatorNode{Value: "<="},
+						Value:    10485760,
+					},
+				},
+			},
+		},
+		{
+			name:  `size>=1024 AND size<=2048`,
+			query: `size>=1024 AND size<=2048`,
+			ast: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.NumericNode{
+						Key:      "size",
+						Operator: &ast.OperatorNode{Value: ">="},
+						Value:    1024,
+					},
+					&ast.OperatorNode{Value: kql.BoolAND},
+					&ast.NumericNode{
+						Key:      "size",
+						Operator: &ast.OperatorNode{Value: "<="},
+						Value:    2048,
+					},
+				},
+			},
+		},
+		{
+			name: `photo.fNumber>=2.8`,
+			ast: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.NumericNode{
+						Key:      "photo.fNumber",
+						Operator: &ast.OperatorNode{Value: ">="},
+						Value:    2.8,
+					},
+				},
+			},
+		},
+		{
+			name: `photo.iso>100`,
+			ast: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.NumericNode{
+						Key:      "photo.iso",
+						Operator: &ast.OperatorNode{Value: ">"},
+						Value:    100,
+					},
+				},
+			},
+		},
+		{
+			name: `photo.focalLength<50`,
+			ast: &ast.Ast{
+				Nodes: []ast.Node{
+					&ast.NumericNode{
+						Key:      "photo.focalLength",
+						Operator: &ast.OperatorNode{Value: "<"},
+						Value:    50,
+					},
+				},
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			testKQL(t, tc)
+		})
+	}
+}
+
 func TestParse_Errors(t *testing.T) {
 	tests := []testCase{
 		{

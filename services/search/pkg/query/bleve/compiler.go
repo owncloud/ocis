@@ -124,35 +124,20 @@ func walk(offset int, nodes []ast.Node) (bleveQuery.Query, int, error) {
 				next = q
 			}
 		case *ast.DateTimeNode:
-			q := &bleveQuery.DateRangeQuery{
-				Start:          bleveQuery.BleveQueryTime{},
-				End:            bleveQuery.BleveQueryTime{},
-				InclusiveStart: nil,
-				InclusiveEnd:   nil,
-				FieldVal:       getField(n.Key),
-			}
-
-			if n.Operator == nil {
+			q := dateTimeQuery(n)
+			if q == nil {
 				continue
 			}
-
-			switch n.Operator.Value {
-			case ">":
-				q.Start.Time = n.Value
-				q.InclusiveStart = &[]bool{false}[0]
-			case ">=":
-				q.Start.Time = n.Value
-				q.InclusiveStart = &[]bool{true}[0]
-			case "<":
-				q.End.Time = n.Value
-				q.InclusiveEnd = &[]bool{false}[0]
-			case "<=":
-				q.End.Time = n.Value
-				q.InclusiveEnd = &[]bool{true}[0]
-			default:
+			if prev == nil {
+				prev = q
+			} else {
+				next = q
+			}
+		case *ast.NumericNode:
+			q := numericQuery(n)
+			if q == nil {
 				continue
 			}
-
 			if prev == nil {
 				prev = q
 			} else {
@@ -368,6 +353,68 @@ func mimeType(k, v string) (bleveQuery.Query, bool) {
 	default:
 		return bleveQuery.NewQueryStringQuery(k + ":" + v), false
 	}
+}
+
+func dateTimeQuery(n *ast.DateTimeNode) bleveQuery.Query {
+	if n.Operator == nil {
+		return nil
+	}
+
+	q := &bleveQuery.DateRangeQuery{
+		Start:    bleveQuery.BleveQueryTime{},
+		End:      bleveQuery.BleveQueryTime{},
+		FieldVal: getField(n.Key),
+	}
+
+	switch n.Operator.Value {
+	case ">":
+		q.Start.Time = n.Value
+		q.InclusiveStart = &[]bool{false}[0]
+	case ">=":
+		q.Start.Time = n.Value
+		q.InclusiveStart = &[]bool{true}[0]
+	case "<":
+		q.End.Time = n.Value
+		q.InclusiveEnd = &[]bool{false}[0]
+	case "<=":
+		q.End.Time = n.Value
+		q.InclusiveEnd = &[]bool{true}[0]
+	default:
+		return nil
+	}
+
+	return q
+}
+
+func numericQuery(n *ast.NumericNode) bleveQuery.Query {
+	if n.Operator == nil {
+		return nil
+	}
+
+	var minVal, maxVal *float64
+	var minInclusive, maxInclusive *bool
+	val := n.Value
+
+	switch n.Operator.Value {
+	case ">":
+		minVal = &val
+		minInclusive = &[]bool{false}[0]
+	case ">=":
+		minVal = &val
+		minInclusive = &[]bool{true}[0]
+	case "<":
+		maxVal = &val
+		maxInclusive = &[]bool{false}[0]
+	case "<=":
+		maxVal = &val
+		maxInclusive = &[]bool{true}[0]
+	default:
+		return nil
+	}
+
+	q := bleve.NewNumericRangeInclusiveQuery(minVal, maxVal, minInclusive, maxInclusive)
+	q.SetField(getField(n.Key))
+	return q
 }
 
 func newQueryStringQueryList(k string, v ...string) []bleveQuery.Query {

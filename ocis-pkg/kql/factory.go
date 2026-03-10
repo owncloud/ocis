@@ -73,6 +73,35 @@ func buildStringNode(k, v interface{}, text []byte, pos position) (*ast.StringNo
 	}, nil
 }
 
+func buildNumericNode(k, o, v interface{}, text []byte, pos position) (*ast.NumericNode, error) {
+	b, err := base(text, pos)
+	if err != nil {
+		return nil, err
+	}
+
+	operator, err := toNode[*ast.OperatorNode](o)
+	if err != nil {
+		return nil, err
+	}
+
+	key, err := toString(k)
+	if err != nil {
+		return nil, err
+	}
+
+	value, err := toFloat64(v)
+	if err != nil {
+		return nil, err
+	}
+
+	return &ast.NumericNode{
+		Base:     b,
+		Key:      key,
+		Operator: operator,
+		Value:    value,
+	}, nil
+}
+
 func buildDateTimeNode(k, o, v interface{}, text []byte, pos position) (*ast.DateTimeNode, error) {
 	b, err := base(text, pos)
 	if err != nil {

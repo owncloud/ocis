@@ -2,6 +2,7 @@ package kql
 
 import (
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/jinzhu/now"
@@ -25,7 +26,7 @@ func toNodes[T ast.Node](in interface{}) ([]T, error) {
 		return []T{v}, nil
 	case []T:
 		return v, nil
-	case []*ast.OperatorNode, []*ast.DateTimeNode:
+	case []*ast.OperatorNode, []*ast.DateTimeNode, []*ast.NumericNode:
 		return toNodes[T](v)
 	case []interface{}:
 		var nodes []T
@@ -68,6 +69,15 @@ func toString(in interface{}) (string, error) {
 	default:
 		return "", fmt.Errorf("can't convert '%T' to string", v)
 	}
+}
+
+func toFloat64(in interface{}) (float64, error) {
+	s, err := toString(in)
+	if err != nil {
+		return 0, err
+	}
+
+	return strconv.ParseFloat(s, 64)
 }
 
 func toTime(in interface{}) (time.Time, error) {
