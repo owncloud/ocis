@@ -1302,9 +1302,6 @@ def localApiTests(name, suites, storage = "ocis", extra_environment = {}, with_r
     }
 
     for item in extra_environment:
-        if item == "EMAIL_HOST" and k8s:
-            environment[item] = OCIS_SERVER_NAME
-            continue
         environment[item] = extra_environment[item]
 
     return [{
