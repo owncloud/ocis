@@ -119,6 +119,7 @@ config = {
             ],
             "skip": False,
             "withRemotePhp": [False],
+            "k8s": True,
             "emailNeeded": True,
             "extraEnvironment": {
                 "EMAIL_HOST": EMAIL_SMTP_HOST,
@@ -165,6 +166,7 @@ config = {
                 "apiActivities",
             ],
             "skip": False,
+            "k8s": True,
         },
         "groupAndSearch1": {
             "suites": [
@@ -209,6 +211,7 @@ config = {
             ],
             "skip": False,
             "withRemotePhp": [False],
+            "k8s": True,
         },
         "sharingNgLinkShare": {
             "suites": [
@@ -372,6 +375,7 @@ config = {
                 "coreApiWebdavMove2",
             ],
             "skip": False,
+            "k8s": True,
         },
         "7": {
             "suites": [
