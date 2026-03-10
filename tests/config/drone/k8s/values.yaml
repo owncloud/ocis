@@ -7,63 +7,6 @@ ingress:
   enabled: true
   ingressClassName: traefik
 externalDomain: ocis-server
-extraResources:
-  - |
-    apiVersion: v1
-    kind: ConfigMap
-    metadata:
-      name: ocmproviders
-      namespace: {{ template "ocis.namespace" . }}
-      labels:
-        {{- include "ocis.labels" . | nindent 8 }}
-    data:
-      ocmproviders.json: |
-        [
-          {
-            "name": "ocis",
-            "full_name": "ocis server",
-            "organization": "ownCloud",
-            "domain": "ocis-server",
-            "homepage": "https://ocis-server",
-            "services": [
-              {
-                "endpoint": {
-                  "type": {
-                    "name": "OCM",
-                    "description": "ownCloud Open Cloud Mesh API"
-                  },
-                  "name": "ocis-server - OCM API",
-                  "path": "https://ocis-server/ocm/",
-                  "is_monitored": true
-                },
-                "api_version": "0.0.1",
-                "host": "https://ocis-server"
-              }
-            ]
-          },
-          {
-            "name": "federation ocis",
-            "full_name": "federation ocis server",
-            "organization": "ownCloud",
-            "domain": "federation-ocis-server",
-            "homepage": "https://federation-ocis-server",
-            "services": [
-              {
-                "endpoint": {
-                  "type": {
-                    "name": "OCM",
-                    "description": "federation ownCloud Open Cloud Mesh API"
-                  },
-                  "name": "federation-ocis-server - OCM API",
-                  "path": "https://federation-ocis-server/ocm/",
-                  "is_monitored": true
-                },
-                "api_version": "0.0.1",
-                "host": "https://federation-ocis-server"
-              }
-            ]
-          }
-        ]
 
 logging:
   level: error
@@ -75,7 +18,7 @@ features:
   authapp:
     enabled: true
   emailNotifications:
-    enabled: true
+    enabled: false
     smtp:
       host: mailpit
       port: 1025
@@ -90,7 +33,7 @@ features:
   policies:
     enabled: false
   ocm:
-    enabled: true
+    enabled: false
     providersConfigRef: "ocmproviders"
   sharing:
     passwordPolicies:
@@ -217,5 +160,14 @@ services:
     events:
       consumer:
         concurrency: 10
+  search:
+    extractor:
+      type: basic
+      tika:
+        url: http://tika:9998
+    persistence:
+      enabled: true
+      accessModes:
+        - ReadWriteOnce
 secretRefs:
   notificationsSmtpSecretRef: notifications-smtp-secret
