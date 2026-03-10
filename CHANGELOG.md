@@ -69,6 +69,7 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Security - Add X-XSS-Protection header: [#12092](https://github.com/owncloud/ocis/pull/12092)
 * Bugfix - Fix postprocessing resume command --restart flag: [#11692](https://github.com/owncloud/ocis/issues/11692)
 * Bugfix - Don't use hardcoded groupOfNames in group creation: [#11776](https://github.com/owncloud/ocis/pull/11776)
 * Bugfix - Translation for some email notifications: [#11979](https://github.com/owncloud/ocis/pull/11979)
@@ -77,14 +78,27 @@ The following sections list the changes for unreleased.
 * Bugfix - Make tag unassignment idempotent and handle publish failures: [#12001](https://github.com/owncloud/ocis/pull/12001)
 * Bugfix - Expose the signature-auth attribute: [#12016](https://github.com/owncloud/ocis/pull/12016)
 * Bugfix - Fix case-sensitive photo metadata search: [#12078](https://github.com/owncloud/ocis/pull/12078)
+* Bugfix - Prevent incomplete Tika extractions from permanently blocking re-index: [#12095](https://github.com/owncloud/ocis/pull/12095)
 * Enhancement - Add web extensions deployment configuration: [#11940](https://github.com/owncloud/ocis/pull/11940)
 * Enhancement - Add AI-assisted development guide: [#11941](https://github.com/owncloud/ocis/pull/11941)
 * Enhancement - Bump Web to 12.3.1: [#12015](https://github.com/owncloud/ocis/pull/12015)
 * Enhancement - Add space ID to incoming shares: [#12024](https://github.com/owncloud/ocis/pull/12024)
 * Enhancement - Add spaceid to REPORT: [#12028](https://github.com/owncloud/ocis/pull/12028)
 * Enhancement - Bump Reva version: [#12051](https://github.com/owncloud/ocis/pull/12051)
+* Enhancement - Support numeric range queries in KQL: [#12094](https://github.com/owncloud/ocis/pull/12094)
 
 ## Details
+
+* Security - Add X-XSS-Protection header: [#12092](https://github.com/owncloud/ocis/pull/12092)
+
+   Added the X-XSS-Protection header set to "0" to explicitly disable the
+   deprecated browser XSS filter, which can introduce side-channel vulnerabilities.
+   Modern XSS protection is provided through the Content-Security-Policy header.
+
+   This change addresses security audit findings requiring explicit configuration
+   of HTTP security headers per OWASP recommendations.
+
+   https://github.com/owncloud/ocis/pull/12092
 
 * Bugfix - Fix postprocessing resume command --restart flag: [#11692](https://github.com/owncloud/ocis/issues/11692)
 
@@ -173,6 +187,31 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/12078
 
+* Bugfix - Prevent incomplete Tika extractions from permanently blocking re-index: [#12095](https://github.com/owncloud/ocis/pull/12095)
+
+   When Tika returned HTTP 200 but its child processes (OCR, ImageMagick) failed
+   due to resource limits, the search index received metadata but no content. The
+   document was written to Bleve with the correct mtime, and subsequent reindexes
+   skipped it because the id+mtime check passed. This left files permanently stuck
+   as "indexed" with no searchable content.
+
+   Two fixes are applied:
+
+   1. Validate Tika responses: if `MetaRecursive()` returns an empty metadata list,
+   it is now treated as an extraction error so the document is not written to the
+   index.
+
+   2. Add an `Extracted` field to indexed resources. It is set to `true` only after
+   successful extraction. The reindex skip check now requires `Extracted:true`, so
+   incompletely indexed documents are automatically re-processed on the next
+   reindex run.
+
+   Note: existing search indexes will trigger a full re-extraction on the next
+   reindex because documents written before this change lack the `Extracted` field.
+
+   https://github.com/owncloud/ocis/issues/12093
+   https://github.com/owncloud/ocis/pull/12095
+
 * Enhancement - Add web extensions deployment configuration: [#11940](https://github.com/owncloud/ocis/pull/11940)
 
    We added deployment configuration for the photo-addon and advanced-search web
@@ -223,6 +262,19 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/12051
    https://github.com/owncloud/ocis/pull/12087
+
+* Enhancement - Support numeric range queries in KQL: [#12094](https://github.com/owncloud/ocis/pull/12094)
+
+   The KQL parser now supports numeric range queries using comparison operators
+   (>=, <=, >, <) on numeric fields. Previously, range operators only worked with
+   DateTime values, causing queries like `size>=1048576` or `photo.iso>=100` to
+   silently fail by falling through to free-text search.
+
+   Affected numeric fields: Size, photo.iso, photo.fNumber, photo.focalLength,
+   photo.orientation.
+
+   https://github.com/owncloud/ocis/issues/12093
+   https://github.com/owncloud/ocis/pull/12094
 
 # Changelog for [8.0.0] (2026-02-13)
 
