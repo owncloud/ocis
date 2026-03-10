@@ -194,8 +194,8 @@ ocis storage-users blobstore <command>
 
 ```plaintext
 COMMANDS:
-   check  Check blobstore connectivity via an upload/download/delete round-trip
-   get    Get a blob from the blobstore by ID
+   check  check blobstore connectivity via an upload/download/delete round-trip
+   get    get a blob from the blobstore by ID
 ```
 
 #### Check

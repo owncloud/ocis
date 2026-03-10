@@ -10,10 +10,10 @@ import (
 	"strings"
 
 	"github.com/google/uuid"
-	"github.com/owncloud/reva/v2/pkg/bytesize"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	"github.com/owncloud/ocis/v2/services/storage-users/pkg/config"
 	"github.com/owncloud/ocis/v2/services/storage-users/pkg/config/parser"
+	"github.com/owncloud/reva/v2/pkg/bytesize"
 	ocisbs "github.com/owncloud/reva/v2/pkg/storage/fs/ocis/blobstore"
 	s3bs "github.com/owncloud/reva/v2/pkg/storage/fs/s3ng/blobstore"
 	"github.com/owncloud/reva/v2/pkg/storage/utils/decomposedfs/node"
@@ -144,7 +144,8 @@ func parseBlobPath(path string) (spaceID, blobID string, err error) {
 // it strips the directory separators that were inserted every two characters
 // up to the given depth.
 // e.g. depathify("61/03/ab/c3/-b08a-4556-9937-2bf3065c1202", 4)
-//      → "6103abc3-b08a-4556-9937-2bf3065c1202"
+//
+//	→ "6103abc3-b08a-4556-9937-2bf3065c1202"
 func depathify(path string, depth int) string {
 	parts := strings.SplitN(path, "/", depth+1)
 	return strings.Join(parts, "")
@@ -181,7 +182,8 @@ func initBlobstore(cfg *config.Config) (tree.Blobstore, error) {
 // retrieved object size does not match node.Blobsize, and captures the actual size.
 var blobSizeMismatchRe = regexp.MustCompile(`blob has unexpected size\. \d+ bytes expected, got (\d+) bytes`)
 
-// downloadBlob downloads a single blob identified by blobID and closes the reader.
+// downloadBlob downloads a single blob identified by blobID, drains the reader
+// to surface any streaming errors, then closes it.
 // If the s3ng blobstore rejects the download due to a size mismatch, the actual
 // size is extracted from the error and the download is retried with the correct value.
 func downloadBlob(bs tree.Blobstore, blobID, spaceID string, blobSize int64) error {
@@ -203,7 +205,14 @@ func downloadBlob(bs tree.Blobstore, blobID, spaceID string, blobSize int64) err
 			return fmt.Errorf("download failed: %w", err)
 		}
 	}
-	rc.Close()
+	defer func() {
+		if cerr := rc.Close(); cerr != nil {
+			fmt.Fprintf(os.Stderr, "warning: failed to close blob reader for blob %s in space %s: %v\n", blobID, spaceID, cerr)
+		}
+	}()
+	if _, err := io.Copy(io.Discard, rc); err != nil {
+		return fmt.Errorf("download failed while reading: %w", err)
+	}
 	fmt.Println("Download: OK")
 	return nil
 }
