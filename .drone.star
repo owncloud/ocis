@@ -2883,6 +2883,8 @@ def ocisServerK8s(federation = False, antivirus = False, email = False, tika = F
 
     if antivirus:
         external_servers.append(["clamav", 3310])
+    if tika:
+        external_servers.append(["tika", 9998])
     if email:
         external_servers.append([EMAIL_SMTP_HOST, EMAIL_PORT])
     if wopi:
