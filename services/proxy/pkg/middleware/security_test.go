@@ -84,3 +84,27 @@ func TestStrictTransportSecurity_ForceOnHTTP(t *testing.T) {
 	expected := "max-age=315360000; includeSubDomains; preload"
 	assert.Equal(t, stsHeader, expected)
 }
+
+func TestXXSSProtection(t *testing.T) {
+	// Reference: Penetration test audit Section 2.2, Table 2 Row 3
+	// X-XSS-Protection header must be explicitly set to "0" to disable
+	// the deprecated browser XSS filter which can introduce vulnerabilities
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	})
+	cspConfig := &config.CSP{
+		Directives: map[string][]string{
+			"default-src": {"'none'"},
+		},
+	}
+	cfg := &config.Config{HTTP: config.HTTP{ForceStrictTransportSecurity: false}}
+	securityMiddleware := Security(cfg, cspConfig)
+
+	req := httptest.NewRequest("GET", "https://example.com/", nil)
+	rr := httptest.NewRecorder()
+	securityMiddleware(handler).ServeHTTP(rr, req)
+
+	xssHeader := rr.Header().Get("X-XSS-Protection")
+	expected := "0"
+	assert.Equal(t, xssHeader, expected, "X-XSS-Protection must be '0' to disable deprecated XSS filter (audit requirement)")
+}
