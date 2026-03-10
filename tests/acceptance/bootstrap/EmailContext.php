@@ -134,7 +134,7 @@ class EmailContext implements Context {
 			echo "[INFO] Mailbox is empty. Retrying...\n";
 			// Wait for 1 second and try again
 			// the mailbox might not be created yet
-			sleep(5);
+			sleep(1);
 			$response = EmailHelper::searchEmails($query);
 			$emails = $this->featureContext->getJsonDecodedResponse($response);
 		}
