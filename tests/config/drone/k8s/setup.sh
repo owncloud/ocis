@@ -38,20 +38,14 @@ cp -r $CFG_DIR/templates/* $TPL_DIR/
 sed -i "/{{- define \"ocis.basicServiceTemplates\" -}}/a\  {{- \$_ := set .scope \"appNameAuthBasic\" \"authbasic\" -}}" $TPL_DIR/_common/_tplvalues.tpl
 
 if [[ "$ENABLE_ANTIVIRUS" == "true" ]]; then
-    # TODO: use external service
-    cp -r $CFG_DIR/clamav $TPL_DIR/
     sed -i '/virusscan:/{n;s|false|true|}' $CFG_DIR/values.yaml
 fi
 
 if [[ "$ENABLE_EMAIL" == "true" ]]; then
-    # TODO: use external service
-    cp -r $CFG_DIR/mailpit $TPL_DIR/
     sed -i '/emailNotifications:/{n;s|false|true|}' $CFG_DIR/values.yaml
 fi
 
 if [[ "$ENABLE_TIKA" == "true" ]]; then
-    # TODO: use external service
-    cp -r $CFG_DIR/tika $TPL_DIR/
     sed -i 's|type: basic|type: tika|' $CFG_DIR/values.yaml
 fi
 

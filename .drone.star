@@ -1129,6 +1129,15 @@ def localApiTestPipeline(ctx):
                         # SETUP STEPS      #
                         ####################
                         setup_steps = skipIfUnchanged(ctx, "acceptance-tests")
+                        if params["tikaNeeded"]:
+                            setup_steps += waitForServices("tika", ["tika:9998"])
+                        if params["antivirusNeeded"]:
+                            setup_steps += waitForServices("clamav", ["clamav:3310"])
+                        if params["emailNeeded"]:
+                            setup_steps += waitForServices("email", ["%s:%s" % (EMAIL_SMTP_HOST, EMAIL_PORT)])
+                        if params["collaborationServiceNeeded"]:
+                            setup_steps += waitForServices("online-offices", ["collabora:9980", "onlyoffice:443", "fakeoffice:8080"])
+
                         if run_on_k8s:
                             setup_steps += ocisServerK8s(
                                 params["federationServer"],
@@ -1138,10 +1147,6 @@ def localApiTestPipeline(ctx):
                                 params["collaborationServiceNeeded"],
                             )
 
-                            if params["antivirusNeeded"]:
-                                setup_steps += exposeAntivirusServiceK8s()
-                            if params["emailNeeded"]:
-                                setup_steps += exposeEmailServiceK8s()
                             if params["collaborationServiceNeeded"]:
                                 setup_steps += exposeNodePortsK8s([
                                     ["collaboration-collabora", 9300],
@@ -1151,15 +1156,6 @@ def localApiTestPipeline(ctx):
                                 ])
                         else:
                             setup_steps += restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin")
-                            if params["tikaNeeded"]:
-                                setup_steps += tikaService()
-                            if params["collaborationServiceNeeded"]:
-                                setup_steps += waitForServices("online-offices", ["collabora:9980", "onlyoffice:443", "fakeoffice:8080"])
-                            if params["antivirusNeeded"]:
-                                setup_steps += waitForClamavService()
-                            if params["emailNeeded"]:
-                                setup_steps += waitForEmailService()
-
                             setup_steps += ocisServer(
                                 storage,
                                 extra_server_environment = params["extraServerEnvironment"],
@@ -1184,17 +1180,18 @@ def localApiTestPipeline(ctx):
                         # SERVICES         #
                         ####################
                         services = []
+                        if params["tikaNeeded"]:
+                            services += tikaService()
+                        if params["emailNeeded"]:
+                            services += emailService()
+                        if params["antivirusNeeded"]:
+                            services += clamavService()
                         if params["collaborationServiceNeeded"]:
                             services += fakeOffice() + collaboraService() + onlyofficeService()
                         if run_on_k8s:
                             services += k3sCluster(ocm = params["federationServer"])
                             if params["federationServer"]:
                                 services += k3sCluster(name = FED_OCIS_SERVER_NAME, ocm = True)
-                        else:
-                            if params["emailNeeded"]:
-                                services += emailService()
-                            if params["antivirusNeeded"]:
-                                services += clamavService()
 
                         ####################
                         # PIPELINE         #
@@ -1515,23 +1512,20 @@ def coreApiTestPipeline(ctx):
                     # SETUP STEPS      #
                     ####################
                     setup_steps = skipIfUnchanged(ctx, "acceptance-tests")
+                    if params["tikaNeeded"]:
+                        setup_steps += waitForServices("tika", ["tika:9998"])
+                    if params["antivirusNeeded"]:
+                        setup_steps += waitForServices("clamav", ["clamav:3310"])
+                    if params["emailNeeded"]:
+                        setup_steps += waitForServices("email", ["%s:%s" % (EMAIL_SMTP_HOST, EMAIL_PORT)])
+
                     if run_on_k8s:
                         ocis_url = OCIS_URL_K8S
                         wrapper_url = "http://ociswrapper:5200"
 
                         setup_steps += ocisServerK8s(antivirus = params["antivirusNeeded"], email = params["emailNeeded"])
-                        if params["antivirusNeeded"]:
-                            setup_steps += exposeAntivirusServiceK8s()
-                        if params["emailNeeded"]:
-                            setup_steps += exposeEmailServiceK8s()
                     else:
                         setup_steps += restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin")
-                        if params["tikaNeeded"]:
-                            setup_steps += tikaService()
-                        if params["antivirusNeeded"]:
-                            setup_steps += waitForClamavService()
-                        if params["emailNeeded"]:
-                            setup_steps += waitForEmailService()
                         setup_steps += ocisServer(
                             storage,
                             extra_server_environment = params["extraServerEnvironment"],
@@ -1544,13 +1538,14 @@ def coreApiTestPipeline(ctx):
                     # SERVICES         #
                     ####################
                     services = []
+                    if params["tikaNeeded"]:
+                        services += tikaService()
+                    if params["emailNeeded"]:
+                        services += emailService()
+                    if params["antivirusNeeded"]:
+                        services += clamavService()
                     if run_on_k8s:
                         services += k3sCluster()
-                    else:
-                        if params["emailNeeded"]:
-                            services += emailService()
-                        if params["antivirusNeeded"]:
-                            services += clamavService()
 
                     ####################
                     # PIPELINE         #
@@ -1701,13 +1696,14 @@ def e2eTestPipeline(ctx):
             })
 
         services = postgresService() if params["keycloakNeeded"] else []
+        services += tikaService() if params["tikaNeeded"] else []
 
         steps_before = \
             skipIfUnchanged(ctx, "e2e-tests") + \
             restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") + \
             restoreWebCache() + \
             restoreWebPnpmCache() + \
-            (tikaService() if params["tikaNeeded"] else []) + \
+            (waitForServices("tika", ["tika:9998"]) if params["tikaNeeded"] else []) + \
             (keycloakService() if params["keycloakNeeded"] else []) + \
             ocisServer(extra_server_environment = extra_server_environment, with_wrapper = not params["keycloakNeeded"], tika_enabled = params["tikaNeeded"], debug = False, external_idp = params["keycloakNeeded"])
 
@@ -1851,7 +1847,7 @@ def multiServiceE2ePipeline(ctx):
             restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") + \
             restoreWebCache() + \
             restoreWebPnpmCache() + \
-            tikaService() + \
+            waitForServices("tika", ["tika:9998"]) + \
             ocisServer(extra_server_environment = extra_server_environment, tika_enabled = params["tikaNeeded"], debug = False) + \
             storage_users_services + \
             [{
@@ -1885,6 +1881,7 @@ def multiServiceE2ePipeline(ctx):
                 },
                 pipelineVolumeGo,
             ],
+            "services": tikaService(),
         })
     return pipelines
 
@@ -2887,9 +2884,12 @@ def ocisServerK8s(federation = False, antivirus = False, email = False, tika = F
         "ENABLE_OCM": federation,
     }
 
+    if antivirus:
+        external_servers.append(["clamav", 3310])
+    if email:
+        external_servers.append([EMAIL_SMTP_HOST, EMAIL_PORT])
     if wopi:
-        external_servers += [["collabora", 9980], ["fakeoffice", 8080], ["onlyoffice", 443]]
-        steps += waitForServices("online-offices", ["collabora:9980", "onlyoffice:443", "fakeoffice:8080"])
+        external_servers.append(["collabora", 9980], ["fakeoffice", 8080], ["onlyoffice", 443])
 
     if external_servers:
         expose_ext_server_step = exposeExternalServersK8s(external_servers)
@@ -3601,28 +3601,10 @@ def emailService():
         "image": AXLLENT_MAILPIT,
     }]
 
-def waitForEmailService():
-    return [{
-        "name": "wait-for-email",
-        "image": OC_CI_WAIT_FOR,
-        "commands": [
-            "wait-for -it email:%s -t 600" % EMAIL_PORT,
-        ],
-    }]
-
 def clamavService():
     return [{
         "name": "clamav",
         "image": OC_CI_CLAMAVD,
-    }]
-
-def waitForClamavService():
-    return [{
-        "name": "wait-for-clamav",
-        "image": OC_CI_WAIT_FOR,
-        "commands": [
-            "wait-for -it clamav:3310 -t 600",
-        ],
     }]
 
 def fakeOffice():
@@ -3680,13 +3662,6 @@ def tikaService():
         "name": "tika",
         "type": "docker",
         "image": APACHE_TIKA,
-        "detach": True,
-    }, {
-        "name": "wait-for-tika-service",
-        "image": OC_CI_WAIT_FOR,
-        "commands": [
-            "wait-for -it tika:9998 -t 300",
-        ],
     }]
 
 def apiTestFailureLog():
@@ -3975,7 +3950,7 @@ def k3sCluster(name = OCIS_SERVER_NAME, ocm = False):
         "mkdir -p %s && chmod 777 %s" % (log_dir, log_dir),
         # create cluster
         "k3d cluster create %s --api-port %s:33199 " % (name, name) +
-        "-p '80:80@loadbalancer' -p '443:443@loadbalancer' -p '8025:32025@loadbalancer' -p '9100-9399:30100-30399@loadbalancer' " +
+        "-p '80:80@loadbalancer' -p '443:443@loadbalancer' -p '9100-9399:30100-30399@loadbalancer' " +
         "--k3s-arg '--tls-san=k3d@server:*' --k3s-arg '--disable=metrics-server@server:*' " +
         "-v %s:/logs" % log_dir,
         # wait for services to be ready
@@ -4105,33 +4080,6 @@ def streamOcisLogsK8s(name = OCIS_SERVER_NAME):
         "commands": [
             "until test -f logs-%s/ocis.log; do sleep 10s; done" % name,
             "tail -f logs-%s/ocis.log" % name,
-        ],
-    }]
-
-def exposeEmailServiceK8s(name = OCIS_SERVER_NAME):
-    return [{
-        "name": EMAIL_SMTP_HOST,
-        "image": K3D_IMAGE,
-        "commands": [
-            "export KUBECONFIG=%s/kubeconfig-$${DRONE_BUILD_NUMBER}-%s.yaml" % (dirs["base"], name),
-            "until test -f $${KUBECONFIG}; do sleep 1s; done",
-            "kubectl -n ocis expose deployment mailpit --type=NodePort --port=8025 --name=mailpit-np",
-            "kubectl -n ocis patch svc mailpit-np -p '{\"spec\":{\"ports\":[{\"port\":8025,\"nodePort\":32025,\"targetPort\":8025}]}}'",
-        ],
-        "detach": True,
-    }]
-
-def exposeAntivirusServiceK8s(name = OCIS_SERVER_NAME):
-    return [{
-        "name": "expose-antivirus-service",
-        "image": K3D_IMAGE,
-        "commands": [
-            "export KUBECONFIG=kubeconfig-$${DRONE_BUILD_NUMBER}-%s.yaml" % name,
-            "until test -f $${KUBECONFIG}; do sleep 1s; done",
-            "kubectl get pods -A",
-            # expose antivirus service via NodePort
-            "kubectl -n ocis expose deployment antivirus --type=NodePort --port=9277 --name=antivirus-np",
-            "kubectl -n ocis patch svc antivirus-np -p '{\"spec\":{\"ports\":[{\"port\":9277,\"nodePort\":30277}]}}'",
         ],
     }]
 
