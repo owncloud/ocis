@@ -427,12 +427,13 @@ func (b *Bleve) getResource(bleveIndex bleve.Index, id string) (*Resource, error
 	fields := res.Hits[0].Fields
 
 	return &Resource{
-		ID:       getFieldValue[string](fields, "ID"),
-		RootID:   getFieldValue[string](fields, "RootID"),
-		Path:     getFieldValue[string](fields, "Path"),
-		ParentID: getFieldValue[string](fields, "ParentID"),
-		Type:     uint64(getFieldValue[float64](fields, "Type")),
-		Deleted:  getFieldValue[bool](fields, "Deleted"),
+		ID:        getFieldValue[string](fields, "ID"),
+		RootID:    getFieldValue[string](fields, "RootID"),
+		Path:      getFieldValue[string](fields, "Path"),
+		ParentID:  getFieldValue[string](fields, "ParentID"),
+		Type:      uint64(getFieldValue[float64](fields, "Type")),
+		Deleted:   getFieldValue[bool](fields, "Deleted"),
+		Extracted: getFieldValue[bool](fields, "Extracted"),
 		Document: content.Document{
 			Name:     getFieldValue[string](fields, "Name"),
 			Title:    getFieldValue[string](fields, "Title"),
