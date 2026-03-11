@@ -2,19 +2,23 @@
 
 set -e
 
-ROOT="."
-if [[ -n "$1" ]]; then
-    ROOT="$1"
-fi
-
-CFG_DIR="$ROOT/tests/config/drone/k8s"
-CHT_DIR="$ROOT/ocis-charts/charts/ocis"
-TPL_DIR="$CHT_DIR/templates"
-
-if [[ ! -d "$ROOT/ocis-charts" ]]; then
-    echo "Error: ocis-charts not found in $ROOT/ocis-charts. Please clone it first."
+CHART_REPO="$1"
+if [[ -z "$CHART_REPO" ]]; then
+    echo "[ERR] Chart directory argument missing. Usage: $0 <chart-repo-directory>"
     exit 1
 fi
+
+if [[ ! -d "$CHART_REPO" ]]; then
+    echo "[ERR] Path not found: $CHART_REPO"
+    exit 1
+fi
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+ROOT="$(cd $SCRIPT_DIR/../../../.. && pwd)"
+
+CFG_DIR="$ROOT/tests/config/drone/k8s"
+CHT_DIR="$CHART_REPO/charts/ocis"
+TPL_DIR="$CHT_DIR/templates"
 
 # patch ocis service templates
 for service in "$TPL_DIR"/*/; do
