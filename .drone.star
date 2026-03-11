@@ -2886,7 +2886,7 @@ def ocisServerK8s(federation = False, antivirus = False, email = False, tika = F
     if tika:
         external_servers.append(["tika", 9998])
     if email:
-        external_servers.append([EMAIL_SMTP_HOST, EMAIL_PORT])
+        external_servers.append([EMAIL_SMTP_HOST, EMAIL_SMTP_PORT])
     if wopi:
         external_servers += [["collabora", 9980], ["fakeoffice", 8080], ["onlyoffice", 443]]
 

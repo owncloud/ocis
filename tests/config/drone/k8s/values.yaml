@@ -99,8 +99,9 @@ http:
         - "'none'"
       fontSrc:
         - "'self'"
+        - 'data:'
       frameAncestors:
-        - "'none'"
+        - "'self'"
       frameSrc:
         - "'self'"
         - 'blob:'
