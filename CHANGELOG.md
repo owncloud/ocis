@@ -77,6 +77,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Extract metadata from oversized files and fix ISO field: [#12000](https://github.com/owncloud/ocis/pull/12000)
 * Bugfix - Make tag unassignment idempotent and handle publish failures: [#12001](https://github.com/owncloud/ocis/pull/12001)
 * Bugfix - Expose the signature-auth attribute: [#12016](https://github.com/owncloud/ocis/pull/12016)
+* Bugfix - Fix CSP blocking bundled KaTeX font: [#12070](https://github.com/owncloud/ocis/pull/12070)
 * Bugfix - Fix case-sensitive photo metadata search: [#12078](https://github.com/owncloud/ocis/pull/12078)
 * Bugfix - Prevent incomplete Tika extractions from permanently blocking re-index: [#12095](https://github.com/owncloud/ocis/pull/12095)
 * Enhancement - Add web extensions deployment configuration: [#11940](https://github.com/owncloud/ocis/pull/11940)
@@ -176,6 +177,16 @@ The following sections list the changes for unreleased.
    password protected public links.
 
    https://github.com/owncloud/ocis/pull/12016
+
+* Bugfix - Fix CSP blocking bundled KaTeX font: [#12070](https://github.com/owncloud/ocis/pull/12070)
+
+   The default Content Security Policy blocked the bundled KaTeX math font (used by
+   the md-editor) because it is inlined as a `data:` URI in the Web UI CSS. Added
+   `data:` to the `font-src` directive to resolve the console error on every page
+   load. Users with custom CSP files (`PROXY_CSP_CONFIG_FILE_LOCATION`) will need
+   to add `data:` to their `font-src` directive manually.
+
+   https://github.com/owncloud/ocis/pull/12070
 
 * Bugfix - Fix case-sensitive photo metadata search: [#12078](https://github.com/owncloud/ocis/pull/12078)
 
