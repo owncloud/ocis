@@ -5,15 +5,16 @@
 # 
 # Translators:
 # Martin <github@diemattels.at>, 2026
+# Ivan Fustero, 2026
 # 
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2026-02-12 00:19+0000\n"
+"POT-Creation-Date: 2026-03-08 00:34+0000\n"
 "PO-Revision-Date: 2026-01-02 10:10+0000\n"
-"Last-Translator: Martin <github@diemattels.at>, 2026\n"
+"Last-Translator: Ivan Fustero, 2026\n"
 "Language-Team: Catalan (https://app.transifex.com/owncloud-org/teams/6149/ca/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -120,7 +121,7 @@ msgid ""
 msgstr ""
 "{ShareSharer} ({ShareSharerMail}) vol començar a compartir recursos de col·laboració amb vós.\n"
 "Visiteu la configuració de la federació i utilitzeu els detalls següents:\n"
-"Testimoni (token): {Token}\n"
+"Token: {Token}\n"
 "Domini del proveïdor: {ProviderDomain}"
 
 #. ScienceMeshInviteTokenGenerated email template, resolves via {{
@@ -140,7 +141,7 @@ msgstr ""
 "{ShareLink}\n"
 "\n"
 "Alternativament, podeu visitar la configuració de la vostra federació i utilitzar els següents detalls:\n"
-"Testimoni (token): {Token}\n"
+"Token: {Token}\n"
 "Domini del proveïdor: {ProviderDomain}"
 
 #. ShareCreated email template, resolves via {{ .MessageBody }}
