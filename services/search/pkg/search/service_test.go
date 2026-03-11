@@ -163,7 +163,7 @@ var _ = Describe("Searchprovider", func() {
 			indexClient.On("Upsert", mock.Anything, mock.MatchedBy(func(r engine.Resource) bool {
 				return r.ID == "storageid$spaceid!opaqueid" && r.Path == "./foo.pdf"
 			})).Return(nil)
-			indexClient.On("Search", mock.Anything, mock.Anything).Return(&searchsvc.SearchIndexResponse{}, nil)
+			indexClient.On("Lookup", mock.Anything).Return(nil, engine.ErrResourceNotFound)
 			gatewayClient.On("Stat", mock.Anything, mock.MatchedBy(func(sreq *sprovider.StatRequest) bool {
 				return sreq.Ref.ResourceId.StorageId == "storageid" &&
 					sreq.Ref.ResourceId.OpaqueId == "spaceid" &&

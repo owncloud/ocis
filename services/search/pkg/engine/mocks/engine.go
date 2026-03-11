@@ -125,6 +125,64 @@ func (_c *Engine_DocCount_Call) RunAndReturn(run func() (uint64, error)) *Engine
 	return _c
 }
 
+// Lookup provides a mock function with given fields: id
+func (_m *Engine) Lookup(id string) (*engine.Resource, error) {
+	ret := _m.Called(id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Lookup")
+	}
+
+	var r0 *engine.Resource
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string) (*engine.Resource, error)); ok {
+		return rf(id)
+	}
+	if rf, ok := ret.Get(0).(func(string) *engine.Resource); ok {
+		r0 = rf(id)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*engine.Resource)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(id)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Engine_Lookup_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Lookup'
+type Engine_Lookup_Call struct {
+	*mock.Call
+}
+
+// Lookup is a helper method to define mock.On call
+//   - id string
+func (_e *Engine_Expecter) Lookup(id interface{}) *Engine_Lookup_Call {
+	return &Engine_Lookup_Call{Call: _e.mock.On("Lookup", id)}
+}
+
+func (_c *Engine_Lookup_Call) Run(run func(id string)) *Engine_Lookup_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *Engine_Lookup_Call) Return(_a0 *engine.Resource, _a1 error) *Engine_Lookup_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Engine_Lookup_Call) RunAndReturn(run func(string) (*engine.Resource, error)) *Engine_Lookup_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // Move provides a mock function with given fields: id, parentid, target
 func (_m *Engine) Move(id string, parentid string, target string) error {
 	ret := _m.Called(id, parentid, target)

@@ -23,6 +23,7 @@ type Engine interface {
 	Search(ctx context.Context, req *searchService.SearchIndexRequest) (*searchService.SearchIndexResponse, error)
 	Upsert(id string, r Resource) error
 	Update(id string, mutateFn func(*Resource)) error
+	Lookup(id string) (*Resource, error)
 	Move(id string, parentid string, target string) error
 	Delete(id string) error
 	Restore(id string) error
