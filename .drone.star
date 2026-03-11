@@ -4070,10 +4070,6 @@ def deployOcisK8s(name = OCIS_SERVER_NAME):
             "cd %s/ocis-charts" % dirs["base"],
             # update external domain
             "sed -i 's|externalDomain:.*|externalDomain: %s|' ./charts/ocis/ci/deployment-values.yaml" % name,
-            # [NOTE]
-            # Remove schema validation to add extra configs in values.yaml.
-            # Also this allows us to use fakeoffice as web-office server
-            "rm ./charts/ocis/values.schema.json || true",
             # deploy ocis
             "make helm-install-atomic",
         ],
