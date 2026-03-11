@@ -4003,7 +4003,7 @@ def waitK3sCluster(name = OCIS_SERVER_NAME):
         "image": K3D_IMAGE,
         "user": "root",
         "commands": [
-            "export KUBECONFIG=kubeconfig-$${DRONE_BUILD_NUMBER}-" + OCIS_SERVER_NAME + ".yaml",
+            "export KUBECONFIG=kubeconfig-$${DRONE_BUILD_NUMBER}-%s.yaml" % name,
             "timeout 300 bash -c 'until test -f $${KUBECONFIG}; do sleep 1; done'",
             "kubectl config view",
             "kubectl get pods -A",

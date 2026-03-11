@@ -21,7 +21,7 @@ data:
         "name": "ocis",
         "full_name": "ocis server",
         "organization": "ownCloud",
-        "domain": "(ocis-server|federation-ocis-server)",
+        "domain": ".*-server",
         "homepage": "https://owncloud.com",
         "services": [
           {
@@ -31,11 +31,11 @@ data:
                 "description": "ownCloud Open Cloud Mesh API"
               },
               "name": "ownCloud - OCM API",
-              "path": "https://(ocis-server|federation-ocis-server)/ocm/",
+              "path": "https://.*-server/ocm/",
               "is_monitored": true
             },
             "api_version": "0.0.1",
-            "host": "(ocis-server|federation-ocis-server)"
+            "host": ".*-server"
           }
         ]
       }
