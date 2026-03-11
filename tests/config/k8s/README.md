@@ -6,6 +6,7 @@ Install the following tools:
 
 - [k3d](https://k3d.io/stable/)
 - [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/)
+- [helm](https://helm.sh/docs/intro/install/)
 
 ## Setup
 
