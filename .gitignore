@@ -64,6 +64,3 @@ go.work.sum
 .envrc
 CLAUDE.md
 .claude/
-
-# charts
-ocis-charts/
