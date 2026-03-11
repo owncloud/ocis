@@ -2903,6 +2903,7 @@ def ocisServerK8s(federation = False, antivirus = False, email = False, tika = F
              deployOcisK8s(name) + \
              (deployOcisK8s(fed_name) if federation else []) + \
              streamOcisLogsK8s(name) + \
+             (streamOcisLogsK8s(fed_name) if federation else []) + \
              waitForOcis(name, url) + \
              (waitForOcis(fed_name, fed_url) if federation else []) + \
              ociswrapperK8s(name)
