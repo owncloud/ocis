@@ -2,6 +2,7 @@ package engine
 
 import (
 	"context"
+	"fmt"
 	"math"
 	"path"
 	"reflect"
@@ -15,6 +16,7 @@ import (
 	"github.com/blevesearch/bleve/v2/analysis/token/porter"
 	"github.com/blevesearch/bleve/v2/analysis/tokenizer/single"
 	"github.com/blevesearch/bleve/v2/analysis/tokenizer/unicode"
+	"github.com/blevesearch/bleve/v2/index/scorch/mergeplan"
 	"github.com/blevesearch/bleve/v2/mapping"
 	"github.com/blevesearch/bleve/v2/search/query"
 	storageProvider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
@@ -400,6 +402,33 @@ func (b *Bleve) Purge(id string) error {
 	defer closeFn()
 
 	return bleveIndex.Delete(id)
+}
+
+// Optimize triggers a force merge of the bleve index segments into a single
+// segment, improving query performance. This is an expensive I/O operation
+// and should be called during low-usage periods (e.g., after bulk indexing).
+func (b *Bleve) Optimize(ctx context.Context) error {
+	bleveIndex, closeFn, err := b.indexGetter.GetIndex()
+	if err != nil {
+		return err
+	}
+	defer closeFn()
+
+	internal, err := bleveIndex.Advanced()
+	if err != nil {
+		return fmt.Errorf("failed to access internal index: %w", err)
+	}
+
+	type forceMerger interface {
+		ForceMerge(context.Context, *mergeplan.MergePlanOptions) error
+	}
+
+	fm, ok := internal.(forceMerger)
+	if !ok {
+		return fmt.Errorf("index implementation does not support force merge")
+	}
+
+	return fm.ForceMerge(ctx, nil)
 }
 
 // DocCount returns the number of resources in the index.
