@@ -39,6 +39,7 @@ Feature: service health check
       | http://%base_url_hostname%:9119/healthz | webdav             |
       | http://%base_url_hostname%:9279/healthz | webfinger          |
       | http://%base_url_hostname%:9277/healthz | antivirus          |
+      | http://%base_url_hostname%:9174/healthz | notification       |
     Then the HTTP status code of responses on all endpoints should be "200"
 
   @env-config
@@ -92,6 +93,7 @@ Feature: service health check
       | http://%base_url_hostname%:9119/readyz | webdav             |
       | http://%base_url_hostname%:9279/readyz | webfinger          |
       | http://%base_url_hostname%:9277/readyz | antivirus          |
+      | http://%base_url_hostname%:9174/readyz | notification       |
     Then the HTTP status code of responses on all endpoints should be "200"
 
   @env-config

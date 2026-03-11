@@ -123,9 +123,9 @@ Feature: Deprovisioning notification
       }
       """
     Examples:
-      | language | subject                                                          | message                                                                                                                                                                                                 |
-      | de       | Instanz wird heruntergefahren und außer Betrieb genommen werden. | Achtung! Diese Instanz wird am 2043-07-04T11:23:12Z heruntergefahren und außer Betrieb genommen werden. Laden Sie Ihre Daten vor diesem Tag herunter, da Sie danach nicht mehr darauf zugreifen können. |
-      | es       | La instancia se cerrará y se desaprovisionará                    | ¡Atención! La instancia se cerrará y se desaprovisionará el 2043-07-04T11:23:12Z. Descarga todos tus datos antes de esa fecha, puesto que el acceso pasada la fecha no será posible.                    |
+      | language | subject                                                         | message                                                                                                                                                                                                 |
+      | de       | Instanz wird heruntergefahren und außer Betrieb genommen werden | Achtung! Diese Instanz wird am 2043-07-04T11:23:12Z heruntergefahren und außer Betrieb genommen werden. Laden Sie Ihre Daten vor diesem Tag herunter, da Sie danach nicht mehr darauf zugreifen können. |
+      | es       | La instancia se cerrará y se desaprovisionará                   | ¡Atención! La instancia se cerrará y se desaprovisionará el 2043-07-04T11:23:12Z. Descarga todos tus datos antes de esa fecha, puesto que el acceso pasada la fecha no será posible.                    |
 
 
   Scenario: deprovisioning notification reappears again even after being marked as read
