@@ -1139,12 +1139,16 @@ def localApiTestPipeline(ctx):
                             setup_steps += waitForServices("online-offices", ["collabora:9980", "onlyoffice:443", "fakeoffice:8080"])
 
                         if run_on_k8s:
+                            enable_auth_app = False
+                            if "OCIS_ADD_RUN_SERVICES" in params["extraServerEnvironment"]:
+                                enable_auth_app = "auth-app" in params["extraServerEnvironment"]["OCIS_ADD_RUN_SERVICES"]
                             setup_steps += ocisServerK8s(
                                 params["federationServer"],
                                 params["antivirusNeeded"],
                                 params["emailNeeded"],
                                 params["tikaNeeded"],
                                 params["collaborationServiceNeeded"],
+                                enable_auth_app,
                             )
 
                             if params["collaborationServiceNeeded"]:
@@ -2863,7 +2867,7 @@ def startOcisService(service = None, name = None, environment = {}, volumes = []
         },
     ]
 
-def ocisServerK8s(federation = False, antivirus = False, email = False, tika = False, wopi = False):
+def ocisServerK8s(federation = False, antivirus = False, email = False, tika = False, wopi = False, auth_app = False):
     name = OCIS_SERVER_NAME
     url = OCIS_URL_K8S
     fed_name = FED_OCIS_SERVER_NAME
@@ -2879,6 +2883,7 @@ def ocisServerK8s(federation = False, antivirus = False, email = False, tika = F
         "ENABLE_TIKA": tika,
         "ENABLE_WOPI": wopi,
         "ENABLE_OCM": federation,
+        "ENABLE_AUTH_APP": auth_app,
     }
 
     if antivirus:

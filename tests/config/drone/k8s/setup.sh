@@ -64,5 +64,9 @@ if [[ "$ENABLE_OCM" == "true" ]]; then
     sed -i '/ocm:/{n;s|false|true|}' $CFG_DIR/values.yaml
 fi
 
+if [[ "$ENABLE_AUTH_APP" == "true" ]]; then
+    sed -i '/authapp:/{n;s|false|true|}' $CFG_DIR/values.yaml
+fi
+
 # move custom values file
 cp $CFG_DIR/values.yaml "$CHT_DIR/ci/deployment-values.yaml"

@@ -16,7 +16,7 @@ insecure:
   ocmInsecure: true
 features:
   authapp:
-    enabled: true
+    enabled: false
   emailNotifications:
     enabled: false
     smtp:
