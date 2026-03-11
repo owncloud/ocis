@@ -310,6 +310,7 @@ config = {
                 "NOTIFICATIONS_DEBUG_ADDR": "0.0.0.0:9174",
                 "ANTIVIRUS_SCANNER_TYPE": "clamav",
                 "ANTIVIRUS_CLAMAV_SOCKET": "tcp://clamav:3310",
+                "ANTIVIRUS_DEBUG_ADDR": "0.0.0.0:9277",
                 "OCIS_ADD_RUN_SERVICES": "antivirus,notifications",
             },
         },
