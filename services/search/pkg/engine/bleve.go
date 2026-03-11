@@ -420,7 +420,7 @@ func (b *Bleve) Optimize(ctx context.Context) error {
 	}
 
 	type forceMerger interface {
-		ForceMerge(context.Context, *mergeplan.MergePlanOptions) error
+		ForceMerge(ctx context.Context, mo *mergeplan.MergePlanOptions) error
 	}
 
 	fm, ok := internal.(forceMerger)
