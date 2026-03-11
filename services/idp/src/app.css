@@ -1,3 +1,147 @@
+/* Kopano styles */
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+#bg {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: white;
+}
+
+#loader {
+  position: absolute;
+  bottom: 6%;
+  left: 50%;
+  font-weight: 400;
+  font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
+  color: #666;
+  transform: translate(-50%, -50%);
+}
+
+#loader > a {
+  color: #1e98d7; /* KopanoBlue700 */
+}
+
+#font-preloader {
+  position: absolute;
+  top: -500px;
+  font-weight: 400;
+  color: white;
+  font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
+}
+
+#font-preloader > span {
+  font-weight: 500;
+}
+
+#root {
+  height: 100%;
+  display: flex;
+}
+
+/* CSS Scrollbars, currently only Firefox: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Scrollbars */
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #ddd #f5f5f5;
+}
+
+body:hover * {
+  scrollbar-color: #bdbdbd #f5f5f5;
+}
+
+/* Webkit specific scrollbars, works in Chrome and Safari */
+
+::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+  background: transparent;
+  overflow: visible;
+}
+
+::-webkit-scrollbar-corner {
+  display: none;
+  background: #f5f5f5;
+}
+
+::-webkit-scrollbar-button {
+  display: none;
+  height: 0;
+  width: 0;
+}
+
+::-webkit-scrollbar-button:start:decrement,
+::-webkit-scrollbar-button:end:increment {
+  display: block;
+}
+
+::-webkit-scrollbar-button:vertical:start:increment,
+::-webkit-scrollbar-button:vertical:end:decrement {
+  display: none;
+}
+
+::-webkit-scrollbar-track {
+  -moz-background-clip: border;
+  -webkit-background-clip: border;
+  background-clip: padding-box;
+  background-color: #f5f5f5;
+}
+
+::-webkit-scrollbar-thumb {
+  background-clip: padding-box;
+  background-color: #ddd;
+  min-height: 40px;
+  padding-top: 100px;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-track:vertical,
+::-webkit-scrollbar-track:horizontal {
+  border-left-width: 0;
+  border-right-width: 0;
+}
+
+::-webkit-scrollbar-track:vertical,
+::-webkit-scrollbar-track:horizontal,
+::-webkit-scrollbar-thumb:vertical,
+::-webkit-scrollbar-thumb:horizontal,
+::-webkit-scrollbar-track:vertical,
+::-webkit-scrollbar-track:horizontal,
+::-webkit-scrollbar-thumb:vertical,
+::-webkit-scrollbar-thumb:horizontal {
+  border-style: solid;
+  border-color: transparent;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #bdbdbd;
+}
+
+::-webkit-scrollbar-thumb:active {
+  background-color: #989898;
+}
+
+::-webkit-scrollbar-thumb:vertical,
+::-webkit-scrollbar-thumb:horizontal {
+  border-width: 0;
+  border-left-width: 0;
+  border-right-width: 0;
+}
+
+body:hover ::-webkit-scrollbar-thumb {
+  background-color: #bdbdbd;
+}
+
 /* additional css on top of kpop */
 @font-face {
   font-family: Inter;
@@ -7,7 +151,7 @@
 }
 
 html {
-  font-feature-settings: "cv11";
+  font-feature-settings: 'cv11';
 }
 
 body {
@@ -140,7 +284,6 @@ strong {
 .oc-login-form div:not(:last-of-type) {
   margin-bottom: 15px;
 }
-
 
 /*
  * Special SR classes

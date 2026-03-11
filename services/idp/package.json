@@ -90,7 +90,6 @@
     "i18next-browser-languagedetector": "^7.2.2",
     "i18next-http-backend": "^2.7.3",
     "i18next-resources-to-backend": "^1.2.1",
-    "kpop": "https://download.kopano.io/community/kapp:/kpop-2.7.2.tgz",
     "notistack": "^1.0.10",
     "query-string": "^9.3.1",
     "react": "^17.0.2",
@@ -169,9 +168,6 @@
   },
   "pnpm": {
     "overrides": {
-      "kpop>cldr": "",
-      "kpop>notistack": "^1.0.5",
-      "kpop>react-intl": "^5.25.0",
       "undici": ">=6.21.1",
       "vue-template-compiler": "^3.0.0"
     },
