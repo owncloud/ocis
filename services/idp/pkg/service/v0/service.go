@@ -432,8 +432,8 @@ func writeSecureHTML(w http.ResponseWriter, body []byte, nonce string) {
 	h := w.Header()
 	h.Set("Content-Type", "text/html; charset=utf-8")
 	h.Set("Content-Security-Policy", fmt.Sprintf(
-		"default-src 'self'; script-src 'nonce-%s'; style-src 'self'; img-src 'self' data:; font-src 'self'; base-uri 'none'; frame-ancestors 'none';",
-		nonce))
+		"default-src 'self'; script-src 'nonce-%s'; style-src 'self' 'nonce-%s'; img-src 'self' data:; font-src 'self'; base-uri 'none'; frame-ancestors 'none';",
+		nonce, nonce))
 	h.Set("X-Frame-Options", "DENY")
 	h.Set("X-Content-Type-Options", "nosniff")
 	h.Set("Referrer-Policy", "origin")
