@@ -162,6 +162,22 @@ func spacesProviders(cfg *config.Config, logger log.Logger) map[string]map[strin
 				},
 			},
 		},
+		"com.owncloud.api.storage-users-vault": {
+			// Use the dedicated storage provider for vault
+			"providerid": utils.VaultStorageProviderID,
+			"spaces": map[string]interface{}{
+				"personal": map[string]interface{}{
+					// The mount point must have the "vault/" prefix to be picked up by the vault storage provider
+					"mount_point":   "/vault/users",
+					"path_template": "/vault/users/{{.Space.Owner.Id.OpaqueId}}",
+				},
+				"project": map[string]interface{}{
+					// The mount point must have the "vault/" prefix to be picked up by the vault storage provider
+					"mount_point":   "/vault/projects",
+					"path_template": "/vault/projects/{{.Space.Name}}",
+				},
+			},
+		},
 		cfg.StorageSharesEndpoint: {
 			"providerid": utils.ShareStorageProviderID,
 			"spaces": map[string]interface{}{
