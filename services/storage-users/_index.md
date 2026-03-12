@@ -1,6 +1,6 @@
 ---
 title: Storage-Users
-date: 2026-03-12T05:03:26.188962684Z
+date: 2026-03-12T07:29:26.574293784Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/storage-users
@@ -25,6 +25,9 @@ Purpose and description to be added
     * [Command Examples](#command-examples)
     * [Delete Stale Nodes command](#delete-stale-nodes-command)
     * [Command Examples](#command-examples)
+  * [Check and Inspect the Blobstore](#check-and-inspect-the-blobstore)
+    * [Check](#check)
+    * [Get](#get)
   * [Manage Spaces](#manage-spaces)
     * [Purge (delete permanently) Disabled Spaces](#purge-(delete-permanently)-disabled-spaces)
   * [Manage Trash-Bin Items](#manage-trash-bin-items)
@@ -214,6 +217,92 @@ Use `--verbose` to get more information about what is happening
 ocis storage-users uploads delete-stale-nodes --dry-run=false --verbose
 ```
 
+
+### Check and Inspect the Blobstore
+
+The `blobstore` command group provides tools to verify connectivity to the configured blobstore and to inspect individual blobs. Both the `ocis` and `s3ng` storage drivers are supported.
+
+```bash
+ocis storage-users blobstore <command>
+```
+
+```plaintext
+COMMANDS:
+   check  check blobstore connectivity via an upload/download/delete round-trip
+   get    get a blob from the blobstore by ID
+```
+
+#### Check
+
+Verifies that the blobstore is reachable and fully operational by uploading a random blob, downloading and verifying it, then deleting it again. All three steps must succeed.
+
+```bash
+ocis storage-users blobstore check [command options]
+```
+
+```
+OPTIONS:
+   --blob-size value  size of the random blob to upload, e.g. 64, 1KB, 1MB, 4MiB (default: "64")
+   --help, -h         show help
+```
+
+**Examples:**
+
+```bash
+# Basic connectivity check using the default 64-byte payload
+ocis storage-users blobstore check
+
+# Use a larger payload to also stress-test throughput
+ocis storage-users blobstore check --blob-size=4MiB
+```
+
+```plaintext
+Uploading test blob: spaceID=a5c9bd5c-7348-4e9e-a462-d4d9e5287d01 blobID=3f1e5a82-b7e3-4c91-a110-1d5e2f3a4b6c
+Upload: OK
+Download and verify: OK
+Delete: OK
+Blobstore check successful.
+```
+
+#### Get
+
+Downloads a single blob by its ID to verify it exists and is readable. Useful when investigating errors in log lines that contain a blob path such as:
+
+```
+decomposedfs: error download blob '04ba5496-...': blob path: b19ec764-.../61/03/ab/c3/-b08a-...: The specified key does not exist.
+```
+
+The blob can be identified either by passing the raw path from the log line with `--path`, or by supplying `--blob-id` and `--space-id` individually.
+
+```bash
+ocis storage-users blobstore get [command options]
+```
+
+```
+OPTIONS:
+   --path value      blobstore path as it appears in log lines; spaceID and blobID are extracted automatically.
+                     Supports both s3ng format ("<spaceID>/<pathified_blobID>") and ocis format
+                     ("…/spaces/<pathified_spaceID>/blobs/<pathified_blobID>").
+   --blob-id value   blob ID to download (required when --path is not set)
+   --space-id value  space ID the blob belongs to (required when --path is not set)
+   --blob-size value expected blob size in bytes; only needed for the s3ng driver when the size is known
+                     upfront. If omitted or wrong, a size mismatch triggers one automatic retry with the
+                     actual size returned by s3ng. (default: 0)
+   --help, -h        show help
+```
+
+**Examples:**
+
+```bash
+# Identify a blob using the path from a log line (s3ng)
+ocis storage-users blobstore get --path="b19ec764-5398-458a-8ff1-1925bd906999/61/03/ab/c3/-b08a-4556-9937-2bf3065c1202"
+
+# Identify a blob using the full filesystem path from a log line (ocis driver)
+ocis storage-users blobstore get --path="/var/lib/ocis/storage/users/spaces/b1/9ec764-5398-458a-8ff1-1925bd906999/blobs/61/03/ab/c3/-b08a-4556-9937-2bf3065c1202"
+
+# Identify a blob using explicit IDs
+ocis storage-users blobstore get --space-id=b19ec764-5398-458a-8ff1-1925bd906999 --blob-id=6103abc3-b08a-4556-9937-2bf3065c1202
+```
 
 ### Manage Spaces
 
