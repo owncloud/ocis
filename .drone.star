@@ -3975,18 +3975,8 @@ def k3sCluster(name = OCIS_SERVER_NAME, ocm = False):
     if ocm:
         commands.extend([
             # wait for peer
-            "echo 'Waiting for %s to be available...'" % peer_name,
-            "for i in {1..60}; do if getent hosts %s > /dev/null 2>&1; then break; fi; echo 'Waiting for %s... attempt '$i; sleep 2; done" % (peer_name, peer_name),
-            # get the IP of peer
-            "PEER_IP=$(getent hosts %s | awk '{ print $1 }')" % peer_name,
-            "echo \"%s IP: $PEER_IP\"" % peer_name,
-            # create namespace for ocis
-            "kubectl create namespace ocis --dry-run=client -o yaml | kubectl apply -f -",
-            # create service in the 'ocis' namespace
-            "cat <<EOF | kubectl apply -f -\napiVersion: v1\nkind: Service\nmetadata:\n  name: %s\n  namespace: ocis\nspec:\n  type: ClusterIP\n  clusterIP: None\n  ports:\n  - port: 443\n    protocol: TCP\n---\napiVersion: v1\nkind: Endpoints\nmetadata:\n  name: %s\n  namespace: ocis\nsubsets:\n- addresses:\n  - ip: $PEER_IP\n  ports:\n  - port: 443\n    protocol: TCP\nEOF" % (peer_name, peer_name),
-            # verify
-            "kubectl get svc %s -n ocis" % peer_name,
-            "kubectl get endpoints %s -n ocis" % peer_name,
+            "until getent hosts %s >/dev/null 2>&1; do echo 'Waiting for %s...'; sleep 2; done" % (peer_name, peer_name),
+            "bash %s/tests/config/k8s/expose-external-svc.sh %s:443" % (dirs["base"], peer_name),
         ])
 
     commands.extend([
