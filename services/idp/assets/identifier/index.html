@@ -14,7 +14,13 @@
       <img class="oc-logo" src="/themes/owncloud/assets/logo.svg" alt="ownCloud">
       <h1 class="oc-invisible-sr">__SR_HEADLINE__</h1>
       <p id="login-error" class="oc-error-message" hidden></p>
-      <form id="login-form" method="post" action="#">
+      <form id="login-form" method="post" action="#"
+        data-msg-required="__ERR_REQUIRED__"
+        data-msg-invalid="__ERR_INVALID__"
+        data-msg-failed="__ERR_FAILED__"
+        data-msg-default="__ERR_DEFAULT__"
+        data-msg-signing-in="__BUTTON_SIGNING_IN__"
+        data-msg-sign-in="__BUTTON_SIGNIN__">
         <div>
           <label class="oc-label" for="username">__LABEL_USERNAME__</label>
           <input class="oc-input" type="text" id="username" name="username" autocomplete="username" required>
@@ -36,21 +42,23 @@
   var bg = document.body.getAttribute("data-bg");
   if (bg) document.body.style.backgroundImage = "url('" + bg + "')";
 
-  var MSG_REQUIRED = "__ERR_REQUIRED__";
-  var MSG_INVALID = "__ERR_INVALID__";
-  var MSG_FAILED = "__ERR_FAILED__";
-  var MSG_DEFAULT = "__ERR_DEFAULT__";
-  var MSG_SIGNING_IN = "__BUTTON_SIGNING_IN__";
-  var MSG_SIGN_IN = "__BUTTON_SIGNIN__";
+  var form = document.getElementById("login-form");
+  var errorEl = document.getElementById("login-error");
+  var btnEl = document.getElementById("submit-btn");
+
+  var MSG_REQUIRED = form.dataset.msgRequired;
+  var MSG_INVALID = form.dataset.msgInvalid;
+  var MSG_FAILED = form.dataset.msgFailed;
+  var MSG_DEFAULT = form.dataset.msgDefault;
+  var MSG_SIGNING_IN = form.dataset.msgSigningIn;
+  var MSG_SIGN_IN = form.dataset.msgSignIn;
 
   var pathPrefix = "__PATH_PREFIX__";
   var apiBase = pathPrefix + "/identifier";
   var xsrf = "1";
 
-  function qs(name) {
-    var m = new URLSearchParams(window.location.search);
-    return m.get(name) || "";
-  }
+  var params = new URLSearchParams(window.location.search);
+  function qs(name) { return params.get(name) || ""; }
 
   function helloRequest() {
     return {
@@ -90,27 +98,25 @@
   }
 
   function showError(msg) {
-    var el = document.getElementById("login-error");
-    if (el) {
-      el.textContent = msg || MSG_DEFAULT;
-      el.hidden = false;
-    }
+    errorEl.textContent = msg || MSG_DEFAULT;
+    errorEl.hidden = false;
   }
 
   function hideError() {
-    var el = document.getElementById("login-error");
-    if (el) el.hidden = true;
+    errorEl.hidden = true;
   }
 
   function setLoading(loading) {
-    var btn = document.getElementById("submit-btn");
-    if (btn) {
-      btn.disabled = loading;
-      btn.textContent = loading ? MSG_SIGNING_IN : MSG_SIGN_IN;
-    }
+    btnEl.disabled = loading;
+    btnEl.textContent = loading ? MSG_SIGNING_IN : MSG_SIGN_IN;
   }
 
-  document.getElementById("login-form").addEventListener("submit", function(e) {
+  function isSameOrigin(url) {
+    try { return new URL(url, window.location.origin).origin === window.location.origin; }
+    catch (_) { return false; }
+  }
+
+  form.addEventListener("submit", function(e) {
     e.preventDefault();
     hideError();
     setLoading(true);
@@ -138,18 +144,13 @@
         if (result.ok && result.data.success) {
           var next = result.data.hello && (result.data.hello.continue_uri || result.data.hello.next);
           if (next) {
-            // Preserve OIDC query parameters
-            var targetUrl = next;
-            if (next.indexOf("http") === 0) {
-              // Full URL: append query string if present
-              if (window.location.search) {
-                targetUrl = next + (next.indexOf("?") === -1 ? "?" : "&") + window.location.search.slice(1);
-              }
-            } else {
-              // Relative URL: prepend pathPrefix and append query string
-              targetUrl = pathPrefix + (next.charAt(0) === "/" ? next : "/" + next) + (window.location.search ? "?" + window.location.search.slice(1) : "");
+            var base = window.location.origin + pathPrefix + "/";
+            var target = new URL(next, next.indexOf("http") === 0 ? undefined : base);
+            var current = new URLSearchParams(window.location.search);
+            current.forEach(function(v, k) { if (!target.searchParams.has(k)) target.searchParams.set(k, v); });
+            if (isSameOrigin(target.href)) {
+              window.location.href = target.href;
             }
-            window.location.href = targetUrl;
             return;
           }
         }
@@ -161,12 +162,12 @@
       })
       .catch(function(err) {
         setLoading(false);
-        var errText = ((err && err.name) ? err.name : "") + " " + ((err && err.message) ? err.message : "");
-        errText = errText.toLowerCase();
-        // Some browsers surface a completed 204 No Content / canceled fetch as aborted.
-        // Treat this like invalid credentials to avoid misleading transport errors.
-        if (errText.indexOf("abort") !== -1 || errText.indexOf("failed to fetch") !== -1) {
+        if (err instanceof DOMException && err.name === "AbortError") {
           showError(MSG_INVALID);
+          return;
+        }
+        if (err instanceof TypeError) {
+          showError(MSG_FAILED);
           return;
         }
         showError(MSG_FAILED);
@@ -178,7 +179,7 @@
     fetchApi("/_/hello", hello)
       .then(function(res) { return parseJsonMaybe(res); })
       .then(function(data) {
-        if (data && data.success && data.continue_uri) {
+        if (data && data.success && data.continue_uri && isSameOrigin(data.continue_uri)) {
           window.location.href = data.continue_uri;
         }
       })
