@@ -3,8 +3,10 @@ package svc
 import (
 	"bytes"
 	"context"
+	"embed"
 	"fmt"
 	"io"
+	"io/fs"
 	"net/http"
 	"os"
 	"path"
@@ -18,6 +20,7 @@ import (
 	libreGraphBackendSupport "github.com/libregraph/lico/bootstrap/backends/libregraph"
 	licoconfig "github.com/libregraph/lico/config"
 	"github.com/libregraph/lico/server"
+	"github.com/owncloud/ocis/v2/ocis-pkg/l10n"
 	"github.com/owncloud/ocis/v2/ocis-pkg/ldap"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/idp/pkg/assets"
@@ -25,9 +28,13 @@ import (
 	"github.com/owncloud/ocis/v2/services/idp/pkg/config"
 	"github.com/owncloud/ocis/v2/services/idp/pkg/middleware"
 	"go.opentelemetry.io/otel/trace"
+	"golang.org/x/text/language"
 	"gopkg.in/yaml.v2"
 	"stash.kopano.io/kgol/rndm"
 )
+
+//go:embed l10n/locale
+var _translationFS embed.FS
 
 // Service defines the service handlers.
 type Service interface {
@@ -123,11 +130,16 @@ func NewService(opts ...Option) Service {
 	routes := []server.WithRoutes{managers.Must("identity").(server.WithRoutes)}
 	handlers := managers.Must("handler").(http.Handler)
 
+	var translationFS fs.FS
+	translationFS, _ = fs.Sub(_translationFS, "l10n/locale")
+	translator := l10n.NewTranslator("en", "idp", translationFS)
+
 	svc := &IDP{
-		logger: options.Logger,
-		config: options.Config,
-		assets: assetVFS,
-		tp:     options.TraceProvider,
+		logger:     options.Logger,
+		config:     options.Config,
+		assets:     assetVFS,
+		tp:         options.TraceProvider,
+		translator: translator,
 	}
 
 	svc.initMux(ctx, routes, handlers, options)
@@ -249,11 +261,12 @@ func initLicoInternalLDAPEnvVars(ldap *config.Ldap) error {
 
 // IDP defines implements the business logic for Service.
 type IDP struct {
-	logger log.Logger
-	config *config.Config
-	mux    *chi.Mux
-	assets http.FileSystem
-	tp     trace.TracerProvider
+	logger     log.Logger
+	config     *config.Config
+	mux        *chi.Mux
+	assets     http.FileSystem
+	tp         trace.TracerProvider
+	translator l10n.Translator
 }
 
 // initMux initializes the internal idp gorilla mux and mounts it in to an ocis chi-router
@@ -307,7 +320,7 @@ func (idp *IDP) Index() http.HandlerFunc {
 		idp.logger.Fatal().Err(err).Msg("Could not load index template")
 	}
 	return func(w http.ResponseWriter, r *http.Request) {
-		html := idp.renderTemplate(tpl, idp.config.Service.PasswordResetURI)
+		html := idp.renderTemplate(tpl, idp.config.Service.PasswordResetURI, r)
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 		w.WriteHeader(http.StatusOK)
 		if _, err := w.Write(html); err != nil {
@@ -323,7 +336,7 @@ func (idp *IDP) Welcome() http.HandlerFunc {
 		idp.logger.Fatal().Err(err).Msg("Could not load welcome template")
 	}
 	return func(w http.ResponseWriter, r *http.Request) {
-		html := idp.renderTemplate(tpl, "")
+		html := idp.renderTemplate(tpl, "", r)
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 		w.WriteHeader(http.StatusOK)
 		if _, err := w.Write(html); err != nil {
@@ -339,7 +352,7 @@ func (idp *IDP) Goodbye() http.HandlerFunc {
 		idp.logger.Fatal().Err(err).Msg("Could not load goodbye template")
 	}
 	return func(w http.ResponseWriter, r *http.Request) {
-		html := idp.renderTemplate(tpl, "")
+		html := idp.renderTemplate(tpl, "", r)
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 		w.WriteHeader(http.StatusOK)
 		if _, err := w.Write(html); err != nil {
