@@ -4131,6 +4131,6 @@ def exposeExternalServersK8s(servers = [], name = OCIS_SERVER_NAME):
         "commands": [
             "export KUBECONFIG=kubeconfig-$${DRONE_BUILD_NUMBER}-%s.yaml" % name,
             "until test -f $${KUBECONFIG}; do sleep 1s; done",
-            "bash %s/tests/config/k8s/expose-external-svc.sh %s" % (dirs["base"], servers_arg),
+            "bash %s/tests/config/k8s/expose-external-svc.sh -n ocis %s" % (dirs["base"], servers_arg),
         ],
     }]
