@@ -33,8 +33,8 @@ OCIS_MULTI_INSTANCE_MASTER_ID: "11111111-1111-1111-1111-111111111111"
 OCIS_LDAP_USER_FILTER: "(&(objectclass=owncloud)(ownCloudMemberOf=instance-id))"
 ```
 
-In this example, the admin user (configured in `config/ldap/ldif/20_users.ldif` with `owncloudMemberOf: 11111111-1111-1111-1111-111111111111`) can access both instances. The master-id is automatically included in LDAP queries alongside the per-instance filter.
+In this example, the admin user (configured in `config/ldap/ldif/20_users.ldif` with `owncloudMemberOf: 11111111-1111-1111-1111-111111111111`) can access both instances. The master-ID is automatically included in LDAP queries alongside the per-instance filter.
 
-**Security Note:** Master-id grants member status only (not admin privileges). Regular users require specific instance IDs for access control.
+**Security Note:** Master-ID grants member status only (not admin privileges). Regular users require specific instance IDs for access control.
 
 
