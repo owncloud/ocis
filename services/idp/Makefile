@@ -35,6 +35,15 @@ assets/identifier/static/favicon.ico:
 .PHONY: ci-go-generate
 ci-go-generate: # CI runs ci-node-generate automatically before this target
 
+.PHONY: ci-node-generate
+ci-node-generate:
+
+.PHONY: ci-node-check-licenses
+ci-node-check-licenses:
+
+.PHONY: ci-node-save-licenses
+ci-node-save-licenses:
+
 .PHONY: assets
 assets:
 	@mkdir -p assets/identifier/static
