@@ -5,6 +5,7 @@ import (
 	"context"
 	"embed"
 	"fmt"
+	"html"
 	"io"
 	"io/fs"
 	"net/http"
@@ -320,7 +321,21 @@ func (idp *IDP) Index() http.HandlerFunc {
 		idp.logger.Fatal().Err(err).Msg("Could not load index template")
 	}
 	return func(w http.ResponseWriter, r *http.Request) {
-		html := idp.renderTemplate(tpl, idp.config.Service.PasswordResetURI, r)
+		lang := detectLocale(r)
+		t := idp.translator.Locale(lang)
+		replacements := map[string]string{
+			"__TITLE__":             html.EscapeString(t.Get("Sign in - ownCloud")),
+			"__SR_HEADLINE__":       html.EscapeString(t.Get("Login")),
+			"__LABEL_USERNAME__":    html.EscapeString(t.Get("Username")),
+			"__LABEL_PASSWORD__":    html.EscapeString(t.Get("Password")),
+			"__BUTTON_SIGNIN__":     html.EscapeString(t.Get("Sign in")),
+			"__BUTTON_SIGNING_IN__": html.EscapeString(t.Get("Signing in…")),
+			"__ERR_REQUIRED__":      html.EscapeString(t.Get("Username and password are required.")),
+			"__ERR_INVALID__":       html.EscapeString(t.Get("Invalid username or password.")),
+			"__ERR_FAILED__":        html.EscapeString(t.Get("Login failed. Please try again.")),
+			"__ERR_DEFAULT__":       html.EscapeString(t.Get("Login failed.")),
+		}
+		html := idp.renderTemplate(tpl, idp.config.Service.PasswordResetURI, r, replacements)
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 		w.WriteHeader(http.StatusOK)
 		if _, err := w.Write(html); err != nil {
@@ -336,7 +351,14 @@ func (idp *IDP) Welcome() http.HandlerFunc {
 		idp.logger.Fatal().Err(err).Msg("Could not load welcome template")
 	}
 	return func(w http.ResponseWriter, r *http.Request) {
-		html := idp.renderTemplate(tpl, "", r)
+		lang := detectLocale(r)
+		t := idp.translator.Locale(lang)
+		replacements := map[string]string{
+			"__TITLE__":           html.EscapeString(t.Get("Signed in - ownCloud")),
+			"__SR_HEADLINE__":     html.EscapeString(t.Get("Signed in")),
+			"__WELCOME_MESSAGE__": html.EscapeString(t.Get("You are signed in. You can close this window and return to the application.")),
+		}
+		html := idp.renderTemplate(tpl, "", r, replacements)
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 		w.WriteHeader(http.StatusOK)
 		if _, err := w.Write(html); err != nil {
@@ -352,7 +374,14 @@ func (idp *IDP) Goodbye() http.HandlerFunc {
 		idp.logger.Fatal().Err(err).Msg("Could not load goodbye template")
 	}
 	return func(w http.ResponseWriter, r *http.Request) {
-		html := idp.renderTemplate(tpl, "", r)
+		lang := detectLocale(r)
+		t := idp.translator.Locale(lang)
+		replacements := map[string]string{
+			"__TITLE__":           html.EscapeString(t.Get("Signed out - ownCloud")),
+			"__SR_HEADLINE__":     html.EscapeString(t.Get("Signed out")),
+			"__GOODBYE_MESSAGE__": html.EscapeString(t.Get("You are signed out. You can close this window.")),
+		}
+		html := idp.renderTemplate(tpl, "", r, replacements)
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 		w.WriteHeader(http.StatusOK)
 		if _, err := w.Write(html); err != nil {
@@ -370,17 +399,43 @@ func (idp *IDP) readTemplate(name string) ([]byte, error) {
 	return io.ReadAll(f)
 }
 
-func (idp *IDP) renderTemplate(tpl []byte, passwordResetURI string) []byte {
+var supportedLangs = []language.Tag{
+	language.English,
+	language.German,
+	language.French,
+	language.Dutch,
+}
+var langMatcher = language.NewMatcher(supportedLangs)
+
+func detectLocale(r *http.Request) string {
+	accept := r.Header.Get("Accept-Language")
+	tag, _ := language.MatchStrings(langMatcher, accept)
+	base, _ := tag.Base()
+	return base.String()
+}
+
+func (idp *IDP) renderTemplate(tpl []byte, passwordResetURI string, r *http.Request, replacements map[string]string) []byte {
+	lang := detectLocale(r)
+	t := idp.translator.Locale(lang)
+
 	pp := []byte("/signin/v1")
 	nonce := []byte(rndm.GenerateRandomString(32))
 	bg := []byte(idp.config.Asset.LoginBackgroundUrl)
+
 	var resetHTML []byte
 	if passwordResetURI != "" {
-		resetHTML = []byte("<p><a href=\"" + passwordResetURI + "\">Reset password</a></p>")
+		resetLabel := html.EscapeString(t.Get("Reset password"))
+		resetHTML = []byte(`<p><a href="` + html.EscapeString(passwordResetURI) + `">` + resetLabel + `</a></p>`)
 	}
+
 	out := bytes.ReplaceAll(tpl, []byte("__PATH_PREFIX__"), pp)
 	out = bytes.ReplaceAll(out, []byte("__CSP_NONCE__"), nonce)
 	out = bytes.ReplaceAll(out, []byte("__BG_IMG_URL__"), bg)
+	out = bytes.ReplaceAll(out, []byte("__LANG__"), []byte(lang))
 	out = bytes.ReplaceAll(out, []byte("__PASSWORD_RESET_LINK_HTML__"), resetHTML)
+
+	for placeholder, value := range replacements {
+		out = bytes.ReplaceAll(out, []byte(placeholder), []byte(value))
+	}
 	return out
 }
