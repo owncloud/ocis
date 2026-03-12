@@ -322,7 +322,7 @@ class NotificationContext implements Context {
 		if (isset($this->featureContext->getJsonDecodedResponseBodyContent($response)->ocs->data)) {
 			$responseBody = $this->featureContext->getJsonDecodedResponseBodyContent($response)->ocs->data;
 			foreach ($responseBody as $value) {
-				if (isset($value->subject) && $value->subject === $subject) {
+				if (isset($value->subject) && trim($value->subject, ".") === trim($subject, ".")) {
 					// set notificationId
 					$this->notificationIds[] = $value->notification_id;
 					return $value;
@@ -356,7 +356,7 @@ class NotificationContext implements Context {
 
 		$notifications = $responseObject->ocs->data;
 		foreach ($notifications as $notification) {
-			if (isset($notification->subject) && $notification->subject === $subject
+			if (isset($notification->subject) && trim($notification->subject, ".") === trim($subject, ".")
 				&& isset($notification->messageRichParameters->resource->name)
 				&& $notification->messageRichParameters->resource->name === $resource
 			) {

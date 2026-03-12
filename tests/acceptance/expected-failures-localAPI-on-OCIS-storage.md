@@ -292,9 +292,9 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 
 #### [Readiness check for some services returns 500 status code](https://github.com/owncloud/ocis/issues/10661)
 
-- [apiServiceAvailability/serviceAvailabilityCheck.feature:111](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiServiceAvailability/serviceAvailabilityCheck.feature#L111)
-- [apiServiceAvailability/serviceAvailabilityCheck.feature:120](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiServiceAvailability/serviceAvailabilityCheck.feature#L120)
-- [apiServiceAvailability/serviceAvailabilityCheck.feature:131](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiServiceAvailability/serviceAvailabilityCheck.feature#L131)
+- [apiServiceAvailability/serviceAvailabilityCheck.feature:115](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiServiceAvailability/serviceAvailabilityCheck.feature#L115)
+- [apiServiceAvailability/serviceAvailabilityCheck.feature:124](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiServiceAvailability/serviceAvailabilityCheck.feature#L124)
+- [apiServiceAvailability/serviceAvailabilityCheck.feature:135](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiServiceAvailability/serviceAvailabilityCheck.feature#L135)
 
 #### [[OCM] Hide & Enable Sync fail with received federated shares](https://github.com/owncloud/ocis/issues/10719)
 
@@ -400,7 +400,6 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiGraphUser/editUser.feature:235](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUser/editUser.feature#L235)
 - [apiGraphUser/getUser.feature:696](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUser/getUser.feature#L696)
 - [apiGraphUser/getUser.feature:700](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraphUser/getUser.feature#L700)
-
 
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.

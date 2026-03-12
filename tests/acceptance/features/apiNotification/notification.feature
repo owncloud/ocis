@@ -375,7 +375,7 @@ Feature: Notification
 
   @env-config @email
   Scenario Outline: group members gets an in-app and mail notifications in default language when someone shares a file with the group
-    Given the config "OCIS_DEFAULT_LANGUAGE" has been set to "de" for "notifications" service
+    Given the config "OCIS_DEFAULT_LANGUAGE" has been set to "de" for "settings" service
     And group "group1" has been created
     And user "Brian" has been added to group "group1"
     And user "Carol" has been added to group "group1"
