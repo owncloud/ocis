@@ -4130,15 +4130,10 @@ def exposeNodePortsK8s(services = [], name = OCIS_SERVER_NAME):
     }]
 
 def exposeExternalServersK8s(servers = [], name = OCIS_SERVER_NAME):
-    commands = []
+    servers_arg = []
     for server in servers:
-        server_name = server[0]
-        server_port = str(server[1])
-        commands.append("SERVER_IP=$(getent hosts %s | awk '{print $1}')" % server_name)
-        commands.append('echo -e "apiVersion: v1\nkind: Endpoints\nmetadata:\n  name: %s\n  namespace: ocis\n' % server_name +
-                        'subsets:\n- addresses:\n  - ip: $SERVER_IP\n  ports:\n  - port: %s" | kubectl apply -f -' % server_port)
-        commands.append('echo -e "apiVersion: v1\nkind: Service\nmetadata:\n  name: %s\n  namespace: ocis\n' % server_name +
-                        'spec:\n  ports:\n  - port: %s\n    targetPort: %s" | kubectl apply -f -' % (server_port, server_port))
+        servers_arg.append("%s:%s" % (server[0], str(server[1])))
+    servers_arg = ",".join(servers_arg)
 
     return [{
         "name": "expose-external-servers",
@@ -4146,5 +4141,6 @@ def exposeExternalServersK8s(servers = [], name = OCIS_SERVER_NAME):
         "commands": [
             "export KUBECONFIG=kubeconfig-$${DRONE_BUILD_NUMBER}-%s.yaml" % name,
             "until test -f $${KUBECONFIG}; do sleep 1s; done",
-        ] + commands,
+            "bash %s/tests/config/k8s/expose-external-svc.sh %s" % (dirs["base"], servers_arg),
+        ],
     }]

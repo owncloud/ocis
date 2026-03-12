@@ -9,28 +9,104 @@
 
 2. Add these hosts to your `/etc/hosts` file:
 
-```bash
-echo "127.0.0.1       ocis-server federation-ocis-server clamav collabora onlyoffice fakeoffice tika email" | sudo tee -a /etc/hosts
-```
+   ```bash
+   echo "127.0.0.1       ocis-server federation-ocis-server clamav collabora onlyoffice fakeoffice tika email" | sudo tee -a /etc/hosts
+   ```
 
 ## Setup
 
-### 1. Create K8s Cluster
+1. Change directory to `<ocis-rooot>/tests/config/k8s`:
 
-To set up the local Kubernetes cluster for running API tests, use the following commands:
+   ```bash
+   cd <ocis-root>/tests/config/k8s
+   ```
+
+2. Create K8s Cluster
+
+   ```bash
+   make create-cluster
+   ```
+
+3. Prepare Charts
+
+   ```bash
+   make prepare-charts
+   ```
+
+   ⚠️ NOTE: To run the test suites that require extra services, use the following appropriate environment variables:
+   - `ENABLE_ANTIVIRUS=true`: Antivirus test suites
+   - `ENABLE_EMAIL=true`: Notification test suites
+   - `ENABLE_TIKA=true`: Content search test suites
+   - `ENABLE_WOPI=true`: WOPI test suites
+   - `ENABLE_OCM=true`: OCM test suites
+   - `ENABLE_AUTH_APP=true`: auth-app test suites
+
+   Example:
+
+   ```bash
+   ENABLE_EMAIL=true make prepare-charts
+   ```
+
+4. Deploy oCIS
+
+   ```bash
+   make deploy-ocis
+   ```
+
+## Running API Tests
+
+### Pre-requisites
+
+1. Change directory to the ocis root:
+
+   ```bash
+   cd <ocis-root>
+   ```
+
+2. Build the ociswrapper:
+
+   ```bash
+   make -C tests/ociswrapper build
+   ```
+
+3. Run the ociswrapper:
+
+   ```bash
+   tests/ociswrapper/bin/ociswrapper serve --url https://ocis-server --admin-username admin --admin-password admin --skip-ocis-run
+   ```
+
+### Run General API tests
 
 ```bash
-make create-cluster
+TEST_SERVER_URL=https://ocis-server \
+K8S=true \
+BEHAT_FEATURE=tests/acceptance/features/apiDownloads/download.feature \
+make test-acceptance-api
 ```
 
-### 2. Prepare Charts
+### Run Notification API tests
 
-```bash
-make prepare-charts
-```
+1. Start the email server
 
-### 3. Deploy oCIS
+   ```bash
+   docker run -d -p 1025:1025 -p 8025:8025 axllent/mailpit:v1.22.3
+   ```
 
-```bash
-make deploy-ocis
-```
+2. Expose the email server to the cluster
+
+   ```bash
+   bash tests/config/k8s/expose-external-svc.sh email:1025
+   ```
+
+3. Check if setup [step 3](#3-prepare-charts) is done correctly. (`ENABLE_EMAIL=true`)
+
+4. Run the tests
+
+   ```bash
+   TEST_SERVER_URL=https://ocis-server \
+   EMAIL_HOST=email \
+   EMAIL_PORT=8025 \
+   K8S=true \
+   BEHAT_FEATURE=tests/acceptance/features/apiNotification/notification.feature \
+   make test-acceptance-api
+   ```
