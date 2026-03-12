@@ -9,7 +9,7 @@ variables:
   do_ignore: true
 - rawname: CS3_MACHINE_AUTH_API_KEY
   path: services/idp/pkg/backends/cs3/bootstrap/cs3.go:78
-  foundincode: true
+  foundincode: false
   name: CS3_MACHINE_AUTH_API_KEY
   type: ""
   default_value: ""
@@ -76,7 +76,7 @@ variables:
   do_ignore: true
 - rawname: _registryEnv
   path: ocis-pkg/registry/registry.go:88
-  foundincode: true
+  foundincode: false
   name: MICRO_REGISTRY
   type: string
   default_value: nats-js-kv
@@ -177,6 +177,14 @@ variables:
   default_value: ""
   description: ""
   do_ignore: true
+- rawname: _registryEnv
+  path: services/idp/pkg/backends/cs3/bootstrap/cs3.go./ocis-pkg/registry/registry.go:88
+  foundincode: true
+  name: _registryEnv
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
 - rawname: parts[0]
   path: ocis-pkg/config/envdecode/envdecode.go:396
   foundincode: true
