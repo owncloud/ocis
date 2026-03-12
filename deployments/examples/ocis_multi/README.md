@@ -24,8 +24,8 @@ The master-id grants users access to all instances without maintaining instance-
 
 **Configuration:**
 - Set `OCIS_MULTI_INSTANCE_MASTER_ID` environment variable on each instance
-- Configure users in LDAP with the master-id value in their `owncloudMemberOf` attribute
-- The master-id is automatically injected into LDAP user queries
+- Configure users in LDAP with the master-ID value in their `owncloudMemberOf` attribute
+- The master-ID is automatically injected into LDAP user queries
 
 **Example:**
 ```yaml
