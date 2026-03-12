@@ -7,6 +7,7 @@ metadata:
 data:
   fontsMap.json: |
     {"defaultFont": "/etc/ocis/fonts/NotoSans.ttf"}
+
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -20,8 +21,8 @@ data:
         "name": "ocis",
         "full_name": "ocis server",
         "organization": "ownCloud",
-        "domain": "ocis-server",
-        "homepage": "https://ocis-server",
+        "domain": ".*-server",
+        "homepage": "https://owncloud.com",
         "services": [
           {
             "endpoint": {
@@ -29,34 +30,12 @@ data:
                 "name": "OCM",
                 "description": "ownCloud Open Cloud Mesh API"
               },
-              "name": "ocis-server - OCM API",
-              "path": "https://ocis-server/ocm/",
+              "name": "ownCloud - OCM API",
+              "path": "https://.*-server/ocm/",
               "is_monitored": true
             },
             "api_version": "0.0.1",
-            "host": "https://ocis-server"
-          }
-        ]
-      },
-      {
-        "name": "federation ocis",
-        "full_name": "federation ocis server",
-        "organization": "ownCloud",
-        "domain": "federation-ocis-server",
-        "homepage": "https://federation-ocis-server",
-        "services": [
-          {
-            "endpoint": {
-              "type": {
-                "name": "OCM",
-                "description": "federation ownCloud Open Cloud Mesh API"
-              },
-              "name": "federation-ocis-server - OCM API",
-              "path": "https://federation-ocis-server/ocm/",
-              "is_monitored": true
-            },
-            "api_version": "0.0.1",
-            "host": "https://federation-ocis-server"
+            "host": ".*-server"
           }
         ]
       }

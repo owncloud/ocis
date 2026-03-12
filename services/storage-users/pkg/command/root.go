@@ -18,6 +18,7 @@ func GetCommands(cfg *config.Config) cli.Commands {
 		Uploads(cfg),
 		TrashBin(cfg),
 		Spaces(cfg),
+		Blobstore(cfg),
 
 		// infos about this service
 		Health(cfg),

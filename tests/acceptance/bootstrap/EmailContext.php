@@ -131,7 +131,7 @@ class EmailContext implements Context {
 		$response = EmailHelper::searchEmails($query);
 		$emails = $this->featureContext->getJsonDecodedResponse($response);
 		if ($emails["messages_count"] <= $count) {
-			echo "[INFO] Mailbox is empty...\n";
+			echo "[INFO] Mailbox is empty. Retrying...\n";
 			// Wait for 1 second and try again
 			// the mailbox might not be created yet
 			sleep(1);

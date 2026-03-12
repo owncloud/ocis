@@ -39,8 +39,8 @@
 * [Changelog for 3.0.0](#changelog-for-300-2023-06-06)
 * [Changelog for 2.0.0](#changelog-for-200-2022-11-30)
 * [Changelog for 1.20.0](#changelog-for-1200-2022-04-13)
-* [Changelog for 1.19.0](#changelog-for-1190-2022-03-29)
 * [Changelog for 1.19.1](#changelog-for-1191-2022-03-29)
+* [Changelog for 1.19.0](#changelog-for-1190-2022-03-29)
 * [Changelog for 1.18.0](#changelog-for-1180-2022-03-03)
 * [Changelog for 1.17.0](#changelog-for-1170-2022-02-16)
 * [Changelog for 1.16.0](#changelog-for-1160-2021-12-10)
@@ -77,6 +77,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Extract metadata from oversized files and fix ISO field: [#12000](https://github.com/owncloud/ocis/pull/12000)
 * Bugfix - Make tag unassignment idempotent and handle publish failures: [#12001](https://github.com/owncloud/ocis/pull/12001)
 * Bugfix - Expose the signature-auth attribute: [#12016](https://github.com/owncloud/ocis/pull/12016)
+* Bugfix - Fix CSP blocking bundled KaTeX font: [#12070](https://github.com/owncloud/ocis/pull/12070)
 * Bugfix - Fix case-sensitive photo metadata search: [#12078](https://github.com/owncloud/ocis/pull/12078)
 * Bugfix - Prevent incomplete Tika extractions from permanently blocking re-index: [#12095](https://github.com/owncloud/ocis/pull/12095)
 * Enhancement - Add web extensions deployment configuration: [#11940](https://github.com/owncloud/ocis/pull/11940)
@@ -86,6 +87,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add spaceid to REPORT: [#12028](https://github.com/owncloud/ocis/pull/12028)
 * Enhancement - Bump Reva version: [#12051](https://github.com/owncloud/ocis/pull/12051)
 * Enhancement - Support numeric range queries in KQL: [#12094](https://github.com/owncloud/ocis/pull/12094)
+* Enhancement - Add blobstore CLI commands to storage-users service: [#12102](https://github.com/owncloud/ocis/pull/12102)
 
 ## Details
 
@@ -176,6 +178,16 @@ The following sections list the changes for unreleased.
    password protected public links.
 
    https://github.com/owncloud/ocis/pull/12016
+
+* Bugfix - Fix CSP blocking bundled KaTeX font: [#12070](https://github.com/owncloud/ocis/pull/12070)
+
+   The default Content Security Policy blocked the bundled KaTeX math font (used by
+   the md-editor) because it is inlined as a `data:` URI in the Web UI CSS. Added
+   `data:` to the `font-src` directive to resolve the console error on every page
+   load. Users with custom CSP files (`PROXY_CSP_CONFIG_FILE_LOCATION`) will need
+   to add `data:` to their `font-src` directive manually.
+
+   https://github.com/owncloud/ocis/pull/12070
 
 * Bugfix - Fix case-sensitive photo metadata search: [#12078](https://github.com/owncloud/ocis/pull/12078)
 
@@ -275,6 +287,30 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/12093
    https://github.com/owncloud/ocis/pull/12094
+
+* Enhancement - Add blobstore CLI commands to storage-users service: [#12102](https://github.com/owncloud/ocis/pull/12102)
+
+   Added two new CLI commands under `ocis storage-users blobstore` to help
+   operators verify and inspect the configured blobstore without needing direct
+   access to the underlying storage system.
+
+   `blobstore check` performs a full upload/download/delete round-trip using a
+   random payload. The payload size is configurable via `--blob-size` and accepts
+   human-readable values such as `64`, `1KB` or `4MiB` (default: 64 bytes).
+
+   `blobstore get` downloads a specific blob by its ID to verify it is readable.
+   The blob can be identified either with `--blob-id` and `--space-id`, or by
+   passing the raw blob path from a log line directly via `--path`. Both the s3ng
+   key format (`<spaceID>/<pathified_blobID>`) and the ocis filesystem path format
+   (`…/spaces/<pathified_spaceID>/blobs/<pathified_blobID>`) are accepted. When
+   using the s3ng driver without a known blob size, an automatic retry with the
+   actual size is performed on a size mismatch.
+
+   Both commands read the existing service configuration, so they always target the
+   same blobstore as the running service. Only the `ocis` and `s3ng` storage
+   drivers are supported.
+
+   https://github.com/owncloud/ocis/pull/12102
 
 # Changelog for [8.0.0] (2026-02-13)
 
@@ -12649,7 +12685,7 @@ The following sections list the changes for 2.0.0.
 
 The following sections list the changes for 1.20.0.
 
-[1.20.0]: https://github.com/owncloud/ocis/compare/v1.19.0...v1.20.0
+[1.20.0]: https://github.com/owncloud/ocis/compare/v1.19.1...v1.20.0
 
 ## Summary
 
@@ -12823,11 +12859,29 @@ The following sections list the changes for 1.20.0.
    https://github.com/owncloud/ocis/pull/3509
    https://github.com/owncloud/web/releases/tag/v5.4.0
 
+# Changelog for [1.19.1] (2022-03-29)
+
+The following sections list the changes for 1.19.1.
+
+[1.19.1]: https://github.com/owncloud/ocis/compare/v1.19.0...v1.19.1
+
+## Summary
+
+* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
+
+## Details
+
+* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
+
+   URLs for Special items (space image, readme) were broken.
+
+   https://github.com/owncloud/ocis/pull/3419
+
 # Changelog for [1.19.0] (2022-03-29)
 
 The following sections list the changes for 1.19.0.
 
-[1.19.0]: https://github.com/owncloud/ocis/compare/v1.19.1...v1.19.0
+[1.19.0]: https://github.com/owncloud/ocis/compare/v1.18.0...v1.19.0
 
 ## Summary
 
@@ -13000,24 +13054,6 @@ The following sections list the changes for 1.19.0.
    https://github.com/owncloud/ocis/pull/3291
    https://github.com/owncloud/ocis/pull/3375
    https://github.com/owncloud/web/releases/tag/v5.3.0
-
-# Changelog for [1.19.1] (2022-03-29)
-
-The following sections list the changes for 1.19.1.
-
-[1.19.1]: https://github.com/owncloud/ocis/compare/v1.18.0...v1.19.1
-
-## Summary
-
-* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
-
-## Details
-
-* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
-
-   URLs for Special items (space image, readme) were broken.
-
-   https://github.com/owncloud/ocis/pull/3419
 
 # Changelog for [1.18.0] (2022-03-03)
 

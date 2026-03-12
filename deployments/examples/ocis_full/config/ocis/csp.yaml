@@ -13,6 +13,7 @@ directives:
     - '''none'''
   font-src:
     - '''self'''
+    - 'data:'
   frame-ancestors:
     - '''self'''
   frame-src:
