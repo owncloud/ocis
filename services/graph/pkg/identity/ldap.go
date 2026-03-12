@@ -614,7 +614,7 @@ func (i *LDAP) getPreciseLDAPUser(uniqueID string, instanceID string) (*ldap.Ent
 }
 
 func (i *LDAP) getLDAPUserByFilter(filter string, userFilter string) (*ldap.Entry, error) {
-	enhancedUserFilter := ocisldap.EnhanceUserFilterFromEnv(userFilter)
+	enhancedUserFilter := ocisldap.EnhanceFilterWithMasterID(userFilter, i.masterID, i.userAttributeMap.userMemberAttribute, i.userAttributeMap.userGuestAttribute)
 	filter = fmt.Sprintf("(&%s(objectClass=%s)%s)", enhancedUserFilter, i.userObjectClass, filter)
 	return i.searchLDAPEntryByFilter(i.userBaseDN, i.getUserAttrTypesForSearch(), filter)
 }

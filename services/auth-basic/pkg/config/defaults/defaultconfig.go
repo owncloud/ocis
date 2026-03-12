@@ -129,5 +129,5 @@ func EnsureDefaults(cfg *config.Config) {
 
 // Sanitize sanitized the configuration
 func Sanitize(cfg *config.Config) {
-	cfg.AuthProviders.LDAP.UserFilter = ocisldap.EnhanceUserFilterFromEnv(cfg.AuthProviders.LDAP.UserFilter)
+	cfg.AuthProviders.LDAP.UserFilter = ocisldap.EnhanceFilterWithMasterID(cfg.AuthProviders.LDAP.UserFilter, cfg.AuthProviders.LDAP.MasterID, cfg.AuthProviders.LDAP.UserMemberAttribute, cfg.AuthProviders.LDAP.UserGuestAttribute)
 }

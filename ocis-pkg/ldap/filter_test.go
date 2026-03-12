@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-func Test_enhanceFilterWithMasterID(t *testing.T) {
+func TestEnhanceFilterWithMasterID(t *testing.T) {
 	tests := []struct {
 		name           string
 		filter         string
@@ -73,9 +73,9 @@ func Test_enhanceFilterWithMasterID(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := enhanceFilterWithMasterID(tt.filter, tt.masterID, tt.memberAttr, tt.guestAttr)
+			result := EnhanceFilterWithMasterID(tt.filter, tt.masterID, tt.memberAttr, tt.guestAttr)
 			if result != tt.expectedFilter {
-				t.Errorf("enhanceFilterWithMasterID() = %q, want %q", result, tt.expectedFilter)
+				t.Errorf("EnhanceFilterWithMasterID() = %q, want %q", result, tt.expectedFilter)
 			}
 		})
 	}
