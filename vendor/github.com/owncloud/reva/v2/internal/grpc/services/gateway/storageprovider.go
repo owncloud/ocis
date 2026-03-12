@@ -146,9 +146,6 @@ func (s *svc) CreateHome(ctx context.Context, req *provider.CreateHomeRequest) (
 
 	// pass storage_id to the storage provider to handle vault storage id
 	if storageId := utils.ReadPlainFromOpaque(req.GetOpaque(), "storage_id"); storageId != "" {
-		// if spaceId := utils.ReadPlainFromOpaque(createReq.GetOpaque(), "space_id"); spaceId != "" {
-		// 	storageId = storageId + "$" + spaceId
-		// }
 		createReq.Opaque = utils.AppendPlainToOpaque(createReq.Opaque, "storage_id", storageId)
 	}
 
@@ -184,7 +181,7 @@ func (s *svc) CreateStorageSpace(ctx context.Context, req *provider.CreateStorag
 		req.Opaque = utils.AppendPlainToOpaque(req.Opaque, "storage_id", storageId)
 	}
 
-	srClient, err := s.getStorageRegistryClient(ctx, s.c.StorageRegistryEndpoint)
+	srClient, err := pool.GetStorageRegistryClient(s.c.StorageRegistryEndpoint)
 	if err != nil {
 		return &provider.CreateStorageSpaceResponse{
 			Status: status.NewStatusFromErrType(ctx, "gateway could get storage registry client", err),
@@ -227,7 +224,7 @@ func (s *svc) CreateStorageSpace(ctx context.Context, req *provider.CreateStorag
 	}
 
 	// just pick the first provider, we expect only one
-	c, err := s.getSpacesProviderClient(ctx, res.Providers[0])
+	c, err := pool.GetSpacesProviderServiceClient(res.Providers[0].Address)
 	if err != nil {
 		return &provider.CreateStorageSpaceResponse{
 			Status: status.NewStatusFromErrType(ctx, "gateway could not get storage provider client", err),
@@ -290,7 +287,7 @@ func (s *svc) ListStorageSpaces(ctx context.Context, req *provider.ListStorageSp
 		filters["storage_id"] = utils.ReadPlainFromOpaque(req.Opaque, "storage_id")
 	}
 
-	c, err := s.getStorageRegistryClient(ctx, s.c.StorageRegistryEndpoint)
+	c, err := pool.GetStorageRegistryClient(s.c.StorageRegistryEndpoint)
 	if err != nil {
 		return &provider.ListStorageSpacesResponse{
 			Status: status.NewStatusFromErrType(ctx, "gateway could not get storage registry client", err),
@@ -344,10 +341,6 @@ func (s *svc) UpdateStorageSpace(ctx context.Context, req *provider.UpdateStorag
 		}, nil
 	}
 
-	if res.Status.Code == rpc.Code_CODE_OK {
-		id := res.StorageSpace.Root
-		s.providerCache.RemoveListStorageProviders(id)
-	}
 	return res, nil
 }
 
@@ -382,7 +375,6 @@ func (s *svc) DeleteStorageSpace(ctx context.Context, req *provider.DeleteStorag
 	}
 
 	id := &provider.ResourceId{OpaqueId: req.GetId().GetOpaqueId()}
-	s.providerCache.RemoveListStorageProviders(id)
 
 	if dsRes.Status.Code != rpc.Code_CODE_OK {
 		return dsRes, nil
@@ -453,7 +445,7 @@ func (s *svc) GetHome(ctx context.Context, _ *provider.GetHomeRequest) (*provide
 		return nil, errors.New("user not found in context")
 	}
 
-	srClient, err := s.getStorageRegistryClient(ctx, s.c.StorageRegistryEndpoint)
+	srClient, err := pool.GetStorageRegistryClient(s.c.StorageRegistryEndpoint)
 	if err != nil {
 		return &provider.GetHomeResponse{
 			Status: status.NewStatusFromErrType(ctx, "gateway could not get storage registry client", err),
@@ -1047,7 +1039,7 @@ func (s *svc) find(ctx context.Context, ref *provider.Reference) (provider.Provi
 		return nil, nil, err
 	}
 
-	client, err := s.getStorageProviderClient(ctx, p[0])
+	client, err := pool.GetStorageProviderServiceClient(p[0].Address)
 	return client, p[0], err
 }
 
@@ -1061,7 +1053,7 @@ func (s *svc) findSpacesProvider(ctx context.Context, ref *provider.Reference) (
 		return nil, nil, err
 	}
 
-	client, err := s.getSpacesProviderClient(ctx, p[0])
+	client, err := pool.GetSpacesProviderServiceClient(p[0].Address)
 	return client, p[0], err
 }
 
@@ -1084,41 +1076,6 @@ func (s *svc) findAndUnwrap(ctx context.Context, ref *provider.Reference) (provi
 	relativeReference := unwrap(ref, mountPath, root)
 
 	return c, p, relativeReference, nil
-}
-
-func (s *svc) getSpacesProviderClient(_ context.Context, p *registry.ProviderInfo) (provider.SpacesAPIClient, error) {
-	c, err := pool.GetSpacesProviderServiceClient(p.Address)
-	if err != nil {
-		return nil, err
-	}
-
-	return &cachedSpacesAPIClient{
-		c:                        c,
-		createPersonalSpaceCache: s.createPersonalSpaceCache,
-	}, nil
-}
-
-func (s *svc) getStorageProviderClient(_ context.Context, p *registry.ProviderInfo) (provider.ProviderAPIClient, error) {
-	c, err := pool.GetStorageProviderServiceClient(p.Address)
-	if err != nil {
-		return nil, err
-	}
-
-	return &cachedAPIClient{
-		c:                        c,
-		createPersonalSpaceCache: s.createPersonalSpaceCache,
-	}, nil
-}
-
-func (s *svc) getStorageRegistryClient(_ context.Context, address string) (registry.RegistryAPIClient, error) {
-	c, err := pool.GetStorageRegistryClient(address)
-	if err != nil {
-		return nil, err
-	}
-	return &cachedRegistryClient{
-		c:     c,
-		cache: s.providerCache,
-	}, nil
 }
 
 func (s *svc) findSingleSpace(ctx context.Context, ref *provider.Reference) ([]*registry.ProviderInfo, error) {
