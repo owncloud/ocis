@@ -39,7 +39,3 @@ ci-go-generate: # CI runs ci-node-generate automatically before this target
 assets:
 	@mkdir -p assets/identifier/static
 
-############ testing ############
-.PHONY: test-go
-test-go: ## Run all tests (unit + integration)
-	@go test -v -tags=integration ./pkg/service/v0/... -timeout 60s
