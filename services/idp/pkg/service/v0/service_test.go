@@ -372,41 +372,39 @@ func TestSecurityHeaders(t *testing.T) {
 		"/signin/v1/goodbye",
 	}
 
+	nonceRe := regexp.MustCompile(`nonce="([^"]+)"`)
+
 	for _, p := range pages {
 		t.Run(p, func(t *testing.T) {
 			_, body, headers := getPage(t, srv, p, "")
-
-			// Extract nonce from HTML to verify it matches CSP header
-			nonceRe := regexp.MustCompile(`nonce="([^"]+)"`)
 			nonceMatch := nonceRe.FindStringSubmatch(body)
 			if len(nonceMatch) < 2 {
 				t.Fatal("could not find nonce in HTML")
 			}
 			nonce := nonceMatch[1]
 
+			for name, want := range map[string]string{
+				"X-Frame-Options":        "DENY",
+				"X-Content-Type-Options": "nosniff",
+				"Referrer-Policy":        "origin",
+			} {
+				if got := headers.Get(name); got != want {
+					t.Errorf("%s = %q, want %q", name, got, want)
+				}
+			}
+
 			csp := headers.Get("Content-Security-Policy")
 			if csp == "" {
 				t.Fatal("missing Content-Security-Policy header")
 			}
-			expectedCSPNonce := "script-src 'nonce-" + nonce + "'"
-			if !strings.Contains(csp, expectedCSPNonce) {
-				t.Errorf("CSP missing nonce: got %q, want substring %q", csp, expectedCSPNonce)
-			}
-			if !strings.Contains(csp, "frame-ancestors 'none'") {
-				t.Error("CSP missing frame-ancestors 'none'")
-			}
-			if !strings.Contains(csp, "base-uri 'none'") {
-				t.Error("CSP missing base-uri 'none'")
-			}
-
-			if v := headers.Get("X-Frame-Options"); v != "DENY" {
-				t.Errorf("X-Frame-Options = %q, want DENY", v)
-			}
-			if v := headers.Get("X-Content-Type-Options"); v != "nosniff" {
-				t.Errorf("X-Content-Type-Options = %q, want nosniff", v)
-			}
-			if v := headers.Get("Referrer-Policy"); v != "origin" {
-				t.Errorf("Referrer-Policy = %q, want origin", v)
+			for _, substr := range []string{
+				"script-src 'nonce-" + nonce + "'",
+				"frame-ancestors 'none'",
+				"base-uri 'none'",
+			} {
+				if !strings.Contains(csp, substr) {
+					t.Errorf("CSP missing %q in %q", substr, csp)
+				}
 			}
 		})
 	}
