@@ -80,6 +80,9 @@ type LDAPDriver struct {
 	DisableUserMechanism     string          `yaml:"disable_user_mechanism" env:"OCIS_LDAP_DISABLE_USER_MECHANISM;USERS_LDAP_DISABLE_USER_MECHANISM" desc:"An option to control the behavior for disabling users. Valid options are 'none', 'attribute' and 'group'. If set to 'group', disabling a user via API will add the user to the configured group for disabled users, if set to 'attribute' this will be done in the ldap user entry, if set to 'none' the disable request is not processed." introductionVersion:"pre5.0"`
 	UserTypeAttribute        string          `yaml:"user_type_attribute" env:"OCIS_LDAP_USER_SCHEMA_USER_TYPE;USERS_LDAP_USER_TYPE_ATTRIBUTE" desc:"LDAP Attribute to distinguish between 'Member' and 'Guest' users. Default is 'ownCloudUserType'." introductionVersion:"pre5.0"`
 	LdapDisabledUsersGroupDN string          `yaml:"ldap_disabled_users_group_dn" env:"OCIS_LDAP_DISABLED_USERS_GROUP_DN;USERS_LDAP_DISABLED_USERS_GROUP_DN" desc:"The distinguished name of the group to which added users will be classified as disabled when 'disable_user_mechanism' is set to 'group'." introductionVersion:"pre5.0"`
+	MasterID                 string          `yaml:"master_id" env:"OCIS_MULTI_INSTANCE_MASTER_ID" desc:"The master instance ID for multi-instance setups. When set, LDAP user filters are enhanced to also match users belonging to the master instance." introductionVersion:"7.0"`
+	UserMemberAttribute      string          `yaml:"user_member_attribute" env:"OCIS_LDAP_USER_MEMBER_ATTRIBUTE" desc:"LDAP attribute that marks a user as a member of an instance." introductionVersion:"7.0"`
+	UserGuestAttribute       string          `yaml:"user_guest_attribute" env:"OCIS_LDAP_USER_GUEST_ATTRIBUTE" desc:"LDAP attribute that marks a user as a guest of an instance." introductionVersion:"7.0"`
 	UserSchema               LDAPUserSchema  `yaml:"user_schema"`
 	GroupSchema              LDAPGroupSchema `yaml:"group_schema"`
 }

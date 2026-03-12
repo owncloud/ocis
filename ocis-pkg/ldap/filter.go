@@ -2,25 +2,14 @@ package ldap
 
 import (
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/go-ldap/ldap/v3"
 )
 
-// EnhanceUserFilterFromEnv OR's the given LDAP filter with master-id match clauses
-// read from OCIS_MULTI_INSTANCE_MASTER_ID, OCIS_LDAP_USER_MEMBER_ATTRIBUTE, and
-// OCIS_LDAP_USER_GUEST_ATTRIBUTE. Returns filter unchanged when env vars are unset.
-func EnhanceUserFilterFromEnv(filter string) string {
-	return enhanceFilterWithMasterID(
-		filter,
-		os.Getenv("OCIS_MULTI_INSTANCE_MASTER_ID"),
-		os.Getenv("OCIS_LDAP_USER_MEMBER_ATTRIBUTE"),
-		os.Getenv("OCIS_LDAP_USER_GUEST_ATTRIBUTE"),
-	)
-}
-
-func enhanceFilterWithMasterID(filter, masterID, memberAttr, guestAttr string) string {
+// EnhanceFilterWithMasterID OR's the given LDAP filter with master-id match clauses.
+// Returns filter unchanged when masterID is empty or both attributes are empty.
+func EnhanceFilterWithMasterID(filter, masterID, memberAttr, guestAttr string) string {
 	if masterID == "" {
 		return filter
 	}
