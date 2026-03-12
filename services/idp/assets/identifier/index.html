@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#1b223d">
+  <title>Sign in - ownCloud</title>
+  <link rel="stylesheet" href="__PATH_PREFIX__/static/theme.css">
+  <meta property="csp-nonce" content="__CSP_NONCE__">
+</head>
+<body class="oc-login-bg" data-bg="__BG_IMG_URL__">
+  <main>
+    <div class="oc-login-form" id="login-root">
+      <img class="oc-logo" src="/themes/owncloud/assets/logo.svg" alt="ownCloud">
+      <h1 class="oc-invisible-sr">Login</h1>
+      <p id="login-error" class="oc-error-message" hidden></p>
+      <form id="login-form" method="post" action="#">
+        <div>
+          <label class="oc-label" for="username">Username</label>
+          <input class="oc-input" type="text" id="username" name="username" autocomplete="username" required>
+        </div>
+        <div>
+          <label class="oc-label" for="password">Password</label>
+          <input class="oc-input" type="password" id="password" name="password" autocomplete="current-password" required>
+        </div>
+        <div>
+          <button class="oc-button-primary" type="submit" id="submit-btn">Sign in</button>
+        </div>
+      </form>
+      __PASSWORD_RESET_LINK_HTML__
+      <footer class="oc-footer-message">ownCloud – a safe home for all your data</footer>
+    </div>
+  </main>
+  <script nonce="__CSP_NONCE__">
+(function() {
+  var bg = document.body.getAttribute("data-bg");
+  if (bg) document.body.style.backgroundImage = "url('" + bg + "')";
+
+  var pathPrefix = "__PATH_PREFIX__";
+  var apiBase = pathPrefix + "/identifier";
+  var xsrf = "1";
+
+  function qs(name) {
+    var m = new URLSearchParams(window.location.search);
+    return m.get(name) || "";
+  }
+
+  function helloRequest() {
+    return {
+      state: qs("state"),
+      flow: qs("flow") || "oidc",
+      scope: qs("scope"),
+      prompt: qs("prompt"),
+      client_id: qs("client_id"),
+      redirect_uri: qs("redirect_uri"),
+      id_token_hint: qs("id_token_hint"),
+      max_age: qs("max_age")
+    };
+  }
+
+  function fetchApi(path, body) {
+    return fetch(apiBase + path, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Kopano-Konnect-XSRF": xsrf
+      },
+      body: body ? JSON.stringify(body) : undefined,
+      credentials: "same-origin"
+    });
+  }
+
+  function parseJsonMaybe(res) {
+    if (res.status === 204) return Promise.resolve(null);
+    return res.text().then(function(text) {
+      if (!text) return null;
+      try {
+        return JSON.parse(text);
+      } catch (_) {
+        return null;
+      }
+    });
+  }
+
+  function showError(msg) {
+    var el = document.getElementById("login-error");
+    if (el) {
+      el.textContent = msg || "Login failed.";
+      el.hidden = false;
+    }
+  }
+
+  function hideError() {
+    var el = document.getElementById("login-error");
+    if (el) el.hidden = true;
+  }
+
+  function setLoading(loading) {
+    var btn = document.getElementById("submit-btn");
+    if (btn) {
+      btn.disabled = loading;
+      btn.textContent = loading ? "Signing in…" : "Sign in";
+    }
+  }
+
+  document.getElementById("login-form").addEventListener("submit", function(e) {
+    e.preventDefault();
+    hideError();
+    setLoading(true);
+    var username = document.getElementById("username").value.trim();
+    var password = document.getElementById("password").value;
+    if (!username || !password) {
+      showError("Username and password are required.");
+      setLoading(false);
+      return;
+    }
+    var hello = helloRequest();
+    var logonBody = {
+      state: hello.state,
+      params: [username, password, "1"],
+      hello: hello
+    };
+    fetchApi("/_/logon", logonBody)
+      .then(function(res) {
+        return parseJsonMaybe(res).then(function(data) {
+          return { ok: res.ok, status: res.status, data: data };
+        });
+      })
+      .then(function(result) {
+        setLoading(false);
+        if (result.ok && result.data.success) {
+          var next = result.data.hello && (result.data.hello.continue_uri || result.data.hello.next);
+          if (next) {
+            // Preserve OIDC query parameters
+            var targetUrl = next;
+            if (next.indexOf("http") === 0) {
+              // Full URL: append query string if present
+              if (window.location.search) {
+                targetUrl = next + (next.indexOf("?") === -1 ? "?" : "&") + window.location.search.slice(1);
+              }
+            } else {
+              // Relative URL: prepend pathPrefix and append query string
+              targetUrl = pathPrefix + (next.charAt(0) === "/" ? next : "/" + next) + (window.location.search ? "?" + window.location.search.slice(1) : "");
+            }
+            window.location.href = targetUrl;
+            return;
+          }
+        }
+        if (result.status === 204 || (result.data && !result.data.success)) {
+          showError("Invalid username or password.");
+          return;
+        }
+        showError("Login failed. Please try again.");
+      })
+      .catch(function(err) {
+        setLoading(false);
+        var errText = ((err && err.name) ? err.name : "") + " " + ((err && err.message) ? err.message : "");
+        errText = errText.toLowerCase();
+        // Some browsers surface a completed 204 No Content / canceled fetch as aborted.
+        // Treat this like invalid credentials to avoid misleading transport errors.
+        if (errText.indexOf("abort") !== -1 || errText.indexOf("failed to fetch") !== -1) {
+          showError("Invalid username or password.");
+          return;
+        }
+        showError("Login failed. Please try again.");
+      });
+  });
+
+  var hello = helloRequest();
+  if (hello.state || hello.client_id) {
+    fetchApi("/_/hello", hello)
+      .then(function(res) { return parseJsonMaybe(res); })
+      .then(function(data) {
+        if (data && data.success && data.continue_uri) {
+          window.location.href = data.continue_uri;
+        }
+      })
+      .catch(function() {});
+  }
+})();
+  </script>
+</body>
+</html>
