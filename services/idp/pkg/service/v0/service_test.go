@@ -336,7 +336,8 @@ func TestQuotesInTranslationsEscaped(t *testing.T) {
 	replacements := map[string]string{
 		"__MSG__": html.EscapeString(`Nom d'utilisateur "obligatoire"`),
 	}
-	out := string(idp.renderTemplate(tpl, "", req, replacements))
+	rendered, _ := idp.renderTemplate(tpl, "", req, replacements)
+	out := string(rendered)
 
 	if strings.Contains(out, `"obligatoire"`) {
 		t.Error("unescaped double quote in data attribute")
@@ -359,6 +360,55 @@ func TestStaticAssets(t *testing.T) {
 	}
 	if len(body) == 0 {
 		t.Error("theme.css is empty")
+	}
+}
+
+func TestSecurityHeaders(t *testing.T) {
+	_, srv := newTestService(t, nil)
+
+	pages := []string{
+		"/signin/v1/identifier",
+		"/signin/v1/welcome",
+		"/signin/v1/goodbye",
+	}
+
+	for _, p := range pages {
+		t.Run(p, func(t *testing.T) {
+			_, body, headers := getPage(t, srv, p, "")
+
+			// Extract nonce from HTML to verify it matches CSP header
+			nonceRe := regexp.MustCompile(`nonce="([^"]+)"`)
+			nonceMatch := nonceRe.FindStringSubmatch(body)
+			if len(nonceMatch) < 2 {
+				t.Fatal("could not find nonce in HTML")
+			}
+			nonce := nonceMatch[1]
+
+			csp := headers.Get("Content-Security-Policy")
+			if csp == "" {
+				t.Fatal("missing Content-Security-Policy header")
+			}
+			expectedCSPNonce := "script-src 'nonce-" + nonce + "'"
+			if !strings.Contains(csp, expectedCSPNonce) {
+				t.Errorf("CSP missing nonce: got %q, want substring %q", csp, expectedCSPNonce)
+			}
+			if !strings.Contains(csp, "frame-ancestors 'none'") {
+				t.Error("CSP missing frame-ancestors 'none'")
+			}
+			if !strings.Contains(csp, "base-uri 'none'") {
+				t.Error("CSP missing base-uri 'none'")
+			}
+
+			if v := headers.Get("X-Frame-Options"); v != "DENY" {
+				t.Errorf("X-Frame-Options = %q, want DENY", v)
+			}
+			if v := headers.Get("X-Content-Type-Options"); v != "nosniff" {
+				t.Errorf("X-Content-Type-Options = %q, want nosniff", v)
+			}
+			if v := headers.Get("Referrer-Policy"); v != "origin" {
+				t.Errorf("Referrer-Policy = %q, want origin", v)
+			}
+		})
 	}
 }
 

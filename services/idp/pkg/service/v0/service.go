@@ -335,12 +335,8 @@ func (idp *IDP) Index() http.HandlerFunc {
 			"__ERR_FAILED__":        html.EscapeString(t.Get("Login failed. Please try again.")),
 			"__ERR_DEFAULT__":       html.EscapeString(t.Get("Login failed.")),
 		}
-		html := idp.renderTemplate(tpl, idp.config.Service.PasswordResetURI, r, replacements)
-		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		w.WriteHeader(http.StatusOK)
-		if _, err := w.Write(html); err != nil {
-			idp.logger.Error().Err(err).Msg("could not write to response writer")
-		}
+		body, nonce := idp.renderTemplate(tpl, idp.config.Service.PasswordResetURI, r, replacements)
+		writeSecureHTML(w, body, nonce)
 	}
 }
 
@@ -358,12 +354,8 @@ func (idp *IDP) Welcome() http.HandlerFunc {
 			"__SR_HEADLINE__":     html.EscapeString(t.Get("Signed in")),
 			"__WELCOME_MESSAGE__": html.EscapeString(t.Get("You are signed in. You can close this window and return to the application.")),
 		}
-		html := idp.renderTemplate(tpl, "", r, replacements)
-		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		w.WriteHeader(http.StatusOK)
-		if _, err := w.Write(html); err != nil {
-			idp.logger.Error().Err(err).Msg("could not write to response writer")
-		}
+		body, nonce := idp.renderTemplate(tpl, "", r, replacements)
+		writeSecureHTML(w, body, nonce)
 	}
 }
 
@@ -381,12 +373,8 @@ func (idp *IDP) Goodbye() http.HandlerFunc {
 			"__SR_HEADLINE__":     html.EscapeString(t.Get("Signed out")),
 			"__GOODBYE_MESSAGE__": html.EscapeString(t.Get("You are signed out. You can close this window.")),
 		}
-		html := idp.renderTemplate(tpl, "", r, replacements)
-		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		w.WriteHeader(http.StatusOK)
-		if _, err := w.Write(html); err != nil {
-			idp.logger.Error().Err(err).Msg("could not write to response writer")
-		}
+		body, nonce := idp.renderTemplate(tpl, "", r, replacements)
+		writeSecureHTML(w, body, nonce)
 	}
 }
 
@@ -414,12 +402,12 @@ func detectLocale(r *http.Request) string {
 	return base.String()
 }
 
-func (idp *IDP) renderTemplate(tpl []byte, passwordResetURI string, r *http.Request, replacements map[string]string) []byte {
+func (idp *IDP) renderTemplate(tpl []byte, passwordResetURI string, r *http.Request, replacements map[string]string) ([]byte, string) {
 	lang := detectLocale(r)
 	t := idp.translator.Locale(lang)
 
 	pp := []byte("/signin/v1")
-	nonce := []byte(rndm.GenerateRandomString(32))
+	nonce := rndm.GenerateRandomString(32)
 	bg := []byte(idp.config.Asset.LoginBackgroundUrl)
 
 	var resetHTML []byte
@@ -429,7 +417,7 @@ func (idp *IDP) renderTemplate(tpl []byte, passwordResetURI string, r *http.Requ
 	}
 
 	out := bytes.ReplaceAll(tpl, []byte("__PATH_PREFIX__"), pp)
-	out = bytes.ReplaceAll(out, []byte("__CSP_NONCE__"), nonce)
+	out = bytes.ReplaceAll(out, []byte("__CSP_NONCE__"), []byte(nonce))
 	out = bytes.ReplaceAll(out, []byte("__BG_IMG_URL__"), bg)
 	out = bytes.ReplaceAll(out, []byte("__LANG__"), []byte(lang))
 	out = bytes.ReplaceAll(out, []byte("__PASSWORD_RESET_LINK_HTML__"), resetHTML)
@@ -437,5 +425,18 @@ func (idp *IDP) renderTemplate(tpl []byte, passwordResetURI string, r *http.Requ
 	for placeholder, value := range replacements {
 		out = bytes.ReplaceAll(out, []byte(placeholder), []byte(value))
 	}
-	return out
+	return out, nonce
+}
+
+func writeSecureHTML(w http.ResponseWriter, body []byte, nonce string) {
+	h := w.Header()
+	h.Set("Content-Type", "text/html; charset=utf-8")
+	h.Set("Content-Security-Policy", fmt.Sprintf(
+		"default-src 'self'; script-src 'nonce-%s'; style-src 'self'; img-src 'self' data:; font-src 'self'; base-uri 'none'; frame-ancestors 'none';",
+		nonce))
+	h.Set("X-Frame-Options", "DENY")
+	h.Set("X-Content-Type-Options", "nosniff")
+	h.Set("Referrer-Policy", "origin")
+	w.WriteHeader(http.StatusOK)
+	w.Write(body) //nolint:errcheck
 }
