@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="__LANG__">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#1b223d">
-  <title>Sign in - ownCloud</title>
+  <title>__TITLE__</title>
   <link rel="stylesheet" href="__PATH_PREFIX__/static/theme.css">
   <meta property="csp-nonce" content="__CSP_NONCE__">
 </head>
@@ -12,19 +12,19 @@
   <main>
     <div class="oc-login-form" id="login-root">
       <img class="oc-logo" src="/themes/owncloud/assets/logo.svg" alt="ownCloud">
-      <h1 class="oc-invisible-sr">Login</h1>
+      <h1 class="oc-invisible-sr">__SR_HEADLINE__</h1>
       <p id="login-error" class="oc-error-message" hidden></p>
       <form id="login-form" method="post" action="#">
         <div>
-          <label class="oc-label" for="username">Username</label>
+          <label class="oc-label" for="username">__LABEL_USERNAME__</label>
           <input class="oc-input" type="text" id="username" name="username" autocomplete="username" required>
         </div>
         <div>
-          <label class="oc-label" for="password">Password</label>
+          <label class="oc-label" for="password">__LABEL_PASSWORD__</label>
           <input class="oc-input" type="password" id="password" name="password" autocomplete="current-password" required>
         </div>
         <div>
-          <button class="oc-button-primary" type="submit" id="submit-btn">Sign in</button>
+          <button class="oc-button-primary" type="submit" id="submit-btn">__BUTTON_SIGNIN__</button>
         </div>
       </form>
       __PASSWORD_RESET_LINK_HTML__
@@ -35,6 +35,13 @@
 (function() {
   var bg = document.body.getAttribute("data-bg");
   if (bg) document.body.style.backgroundImage = "url('" + bg + "')";
+
+  var MSG_REQUIRED = "__ERR_REQUIRED__";
+  var MSG_INVALID = "__ERR_INVALID__";
+  var MSG_FAILED = "__ERR_FAILED__";
+  var MSG_DEFAULT = "__ERR_DEFAULT__";
+  var MSG_SIGNING_IN = "__BUTTON_SIGNING_IN__";
+  var MSG_SIGN_IN = "__BUTTON_SIGNIN__";
 
   var pathPrefix = "__PATH_PREFIX__";
   var apiBase = pathPrefix + "/identifier";
@@ -85,7 +92,7 @@
   function showError(msg) {
     var el = document.getElementById("login-error");
     if (el) {
-      el.textContent = msg || "Login failed.";
+      el.textContent = msg || MSG_DEFAULT;
       el.hidden = false;
     }
   }
@@ -99,7 +106,7 @@
     var btn = document.getElementById("submit-btn");
     if (btn) {
       btn.disabled = loading;
-      btn.textContent = loading ? "Signing in…" : "Sign in";
+      btn.textContent = loading ? MSG_SIGNING_IN : MSG_SIGN_IN;
     }
   }
 
@@ -110,7 +117,7 @@
     var username = document.getElementById("username").value.trim();
     var password = document.getElementById("password").value;
     if (!username || !password) {
-      showError("Username and password are required.");
+      showError(MSG_REQUIRED);
       setLoading(false);
       return;
     }
@@ -147,10 +154,10 @@
           }
         }
         if (result.status === 204 || (result.data && !result.data.success)) {
-          showError("Invalid username or password.");
+          showError(MSG_INVALID);
           return;
         }
-        showError("Login failed. Please try again.");
+        showError(MSG_FAILED);
       })
       .catch(function(err) {
         setLoading(false);
@@ -159,10 +166,10 @@
         // Some browsers surface a completed 204 No Content / canceled fetch as aborted.
         // Treat this like invalid credentials to avoid misleading transport errors.
         if (errText.indexOf("abort") !== -1 || errText.indexOf("failed to fetch") !== -1) {
-          showError("Invalid username or password.");
+          showError(MSG_INVALID);
           return;
         }
-        showError("Login failed. Please try again.");
+        showError(MSG_FAILED);
       });
   });
 
