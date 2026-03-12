@@ -110,3 +110,53 @@ make test-acceptance-api
    BEHAT_FEATURE=tests/acceptance/features/apiNotification/notification.feature \
    make test-acceptance-api
    ```
+
+### Run Antivirus API tests
+
+1. Start the antivirus server
+
+   ```bash
+   docker run -d -p 3310:3310 owncloudci/clamavd
+   ```
+
+2. Expose the antivirus server to the cluster
+
+   ```bash
+   bash tests/config/k8s/expose-external-svc.sh clamav:3310
+   ```
+
+3. Check if setup [step 3](#3-prepare-charts) is done correctly. (`ENABLE_ANTIVIRUS=true`)
+
+4. Run the tests
+
+   ```bash
+   TEST_SERVER_URL=https://ocis-server \
+   K8S=true \
+   BEHAT_FEATURE=tests/acceptance/features/apiAntivirus/antivirus.feature \
+   make test-acceptance-api
+   ```
+
+### Run Full Text Search API tests
+
+1. Start the tika server
+
+   ```bash
+   docker run -d -p 9998:9998 apache/tika:3.2.2.0-full
+   ```
+
+2. Expose the tika server to the cluster
+
+   ```bash
+   bash tests/config/k8s/expose-external-svc.sh tika:9998
+   ```
+
+3. Check if setup [step 3](#3-prepare-charts) is done correctly. (`ENABLE_TIKA=true`)
+
+4. Run the tests
+
+   ```bash
+   TEST_SERVER_URL=https://ocis-server \
+   K8S=true \
+   BEHAT_FEATURE=tests/acceptance/features/apiSearchContent/contentSearch.feature \
+   make test-acceptance-api
+   ```
