@@ -75,16 +75,6 @@ func GatewayConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]i
 						"cache_auth_username": cfg.Cache.ProviderCacheAuthUsername,
 						"cache_auth_password": cfg.Cache.ProviderCacheAuthPassword,
 					},
-					"create_personal_space_cache_config": map[string]interface{}{
-						"cache_store":               cfg.Cache.CreateHomeCacheStore,
-						"cache_nodes":               cfg.Cache.CreateHomeCacheNodes,
-						"cache_database":            cfg.Cache.CreateHomeCacheDatabase,
-						"cache_table":               "create_personal_space",
-						"cache_ttl":                 cfg.Cache.CreateHomeCacheTTL,
-						"cache_disable_persistence": cfg.Cache.CreateHomeCacheDisablePersistence,
-						"cache_auth_username":       cfg.Cache.CreateHomeCacheAuthUsername,
-						"cache_auth_password":       cfg.Cache.CreateHomeCacheAuthPassword,
-					},
 				},
 				"authregistry": map[string]interface{}{
 					"driver": "static",
