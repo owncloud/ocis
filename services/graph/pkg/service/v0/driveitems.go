@@ -158,6 +158,11 @@ func (g Graph) GetRootDriveChildren(w http.ResponseWriter, r *http.Request) {
 	filters = append(filters, listStorageSpacesUserFilter(currentUser.GetId().GetOpaqueId()))
 	filters = append(filters, listStorageSpacesTypeFilter("personal"))
 
+	// force vault storage space if vault mode is enabled
+	if g.config.EnableVaultMode {
+		filters = append(filters, listStorageSpacesIDFilter(utils.VaultStorageProviderID))
+	}
+
 	res, err := gatewayClient.ListStorageSpaces(ctx, &storageprovider.ListStorageSpacesRequest{
 		Filters: filters,
 	})

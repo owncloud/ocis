@@ -34,6 +34,7 @@ import (
 	providerpb "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	registrypb "github.com/cs3org/go-cs3apis/cs3/storage/registry/v1beta1"
 	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	"github.com/mitchellh/mapstructure"
 	"github.com/owncloud/reva/v2/pkg/appctx"
 	ctxpkg "github.com/owncloud/reva/v2/pkg/ctx"
 	"github.com/owncloud/reva/v2/pkg/errtypes"
@@ -44,7 +45,6 @@ import (
 	pkgregistry "github.com/owncloud/reva/v2/pkg/storage/registry/registry"
 	"github.com/owncloud/reva/v2/pkg/storagespace"
 	"github.com/owncloud/reva/v2/pkg/utils"
-	"github.com/mitchellh/mapstructure"
 	"google.golang.org/grpc"
 )
 
@@ -195,6 +195,18 @@ func (r *registry) GetProvider(ctx context.Context, space *providerpb.StorageSpa
 			if space.SpaceType != "" && spaceType != space.SpaceType {
 				continue
 			}
+
+			// Filter out vault spaces if no storageId is provided
+			if space.GetRoot().GetStorageId() != "" {
+				if space.GetRoot().GetStorageId() != provider.ProviderID {
+					continue
+				}
+			} else {
+				if strings.HasPrefix(sc.MountPoint, "/vault/") {
+					continue
+				}
+			}
+
 			if space.Owner != nil {
 				user := ctxpkg.ContextMustGetUser(ctx)
 				spacePath, err = sc.SpacePath(user, space)
@@ -289,7 +301,7 @@ func (r *registry) ListProviders(ctx context.Context, filters map[string]string)
 		// return all providers
 		return r.findAllProviders(ctx, mask), nil
 	default:
-		return r.findProvidersForFilter(ctx, r.buildFilters(filters), unrestricted, mask), nil
+		return r.findProvidersForFilter(ctx, r.buildFilters(filters), filters["storage_id"], unrestricted, mask), nil
 	}
 }
 
@@ -340,7 +352,7 @@ func (r *registry) buildFilters(filterMap map[string]string) []*providerpb.ListS
 	return filters
 }
 
-func (r *registry) findProvidersForFilter(ctx context.Context, filters []*providerpb.ListStorageSpacesRequest_Filter, unrestricted bool, _ string) []*registrypb.ProviderInfo {
+func (r *registry) findProvidersForFilter(ctx context.Context, filters []*providerpb.ListStorageSpacesRequest_Filter, storageId string, unrestricted bool, _ string) []*registrypb.ProviderInfo {
 
 	var requestedSpaceType string
 	for _, f := range filters {
@@ -357,6 +369,10 @@ func (r *registry) findProvidersForFilter(ctx context.Context, filters []*provid
 		// we have to ignore a space type filter with +grant or +mountpoint type because they can live on any provider
 		if requestedSpaceType != "" && !strings.HasPrefix(requestedSpaceType, "+") {
 			found := false
+			if storageId != "" && storageId != provider.ProviderID {
+				// skip mismatching storageproviders
+				continue
+			}
 			for spaceType := range provider.Spaces {
 				if spaceType == requestedSpaceType {
 					found = true
@@ -383,6 +399,10 @@ func (r *registry) findProvidersForFilter(ctx context.Context, filters []*provid
 				var spacePath string
 				// filter unconfigured space types
 				if sc, ok = provider.Spaces[space.SpaceType]; !ok {
+					continue
+				}
+				// Filter out vault spaces if no storageId is provided
+				if storageId == "" && strings.HasPrefix(sc.MountPoint, "/vault/") {
 					continue
 				}
 				spacePath, err = sc.SpacePath(currentUser, space)

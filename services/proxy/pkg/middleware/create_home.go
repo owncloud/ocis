@@ -11,7 +11,6 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
 	revactx "github.com/owncloud/reva/v2/pkg/ctx"
-	"github.com/owncloud/reva/v2/pkg/rgrpc/status"
 	"github.com/owncloud/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/owncloud/reva/v2/pkg/utils"
 	"google.golang.org/grpc/metadata"
@@ -70,14 +69,35 @@ func (m createHome) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		m.logger.Err(err).Msg("error selecting next gateway client")
 	} else {
 		createHomeRes, err := client.CreateHome(ctx, createHomeReq)
-		if err != nil {
+		switch {
+		case err != nil:
 			m.logger.Err(err).Msg("error calling CreateHome")
-		} else if createHomeRes.Status.Code != rpc.Code_CODE_OK {
-			err := status.NewErrorFromCode(createHomeRes.Status.Code, "gateway")
-			if createHomeRes.Status.Code != rpc.Code_CODE_ALREADY_EXISTS {
-				m.logger.Err(err).Msg("error when calling Createhome")
-			}
+		case createHomeRes.GetStatus().GetCode() == rpc.Code_CODE_OK:
+			m.logger.Debug().Interface("userID", u.GetId().GetOpaqueId()).Msg("personal space created")
+		case createHomeRes.GetStatus().GetCode() == rpc.Code_CODE_ALREADY_EXISTS:
+			m.logger.Info().Interface("userID", u.GetId().GetOpaqueId()).Interface("status", createHomeRes.GetStatus()).Msg("===== personal space already exists")
+		default:
+			m.logger.Error().Interface("userID", u.GetId().GetOpaqueId()).Interface("status", createHomeRes.GetStatus()).Msg("===== personal space creation failed")
 		}
+
+		// TODO: issue: The vault personal space can not be created after regular personal space creation.
+		// If the regular personal cometed out the valut creation pass
+		//
+		// Create vault personal space
+		// Inject storage_id into opaque for vault personal space
+		createHomeReq.Opaque = utils.AppendPlainToOpaque(createHomeReq.Opaque, "storage_id", utils.VaultStorageProviderID)
+		cpsRes, err := client.CreateHome(ctx, createHomeReq)
+		switch {
+		case err != nil:
+			m.logger.Err(err).Msg("error calling CreateHome for vault personal")
+		case cpsRes.GetStatus().GetCode() == rpc.Code_CODE_OK:
+			m.logger.Debug().Interface("userID", u.GetId().GetOpaqueId()).Msg("vault personal space created")
+		case cpsRes.GetStatus().GetCode() == rpc.Code_CODE_ALREADY_EXISTS:
+			m.logger.Info().Interface("userID", u.GetId().GetOpaqueId()).Interface("status", cpsRes.GetStatus()).Msg("=====+ vault personal space already exists")
+		default:
+			m.logger.Error().Interface("userID", u.GetId().GetOpaqueId()).Interface("status", cpsRes.GetStatus()).Msg("=====! vault personal space creation failed")
+		}
+
 	}
 
 	m.next.ServeHTTP(w, req)

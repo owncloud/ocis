@@ -113,7 +113,7 @@ var _ = Describe("Graph", func() {
 				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drives", nil)
 				r = r.WithContext(ctx)
 				rr := httptest.NewRecorder()
-				svc.GetDrivesV1(rr, r)
+				svc.ServeHTTP(rr, r)
 				Expect(rr.Code).To(Equal(http.StatusOK))
 			})
 
@@ -126,7 +126,7 @@ var _ = Describe("Graph", func() {
 				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/drives", nil)
 				r = r.WithContext(mfa.Set(ctx, true))
 				rr := httptest.NewRecorder()
-				svc.GetAllDrivesV1(rr, r)
+				svc.ServeHTTP(rr, r)
 				Expect(rr.Code).To(Equal(http.StatusOK))
 			})
 
@@ -138,7 +138,7 @@ var _ = Describe("Graph", func() {
 
 				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/drives", nil)
 				rr := httptest.NewRecorder()
-				svc.GetAllDrivesV1(rr, r)
+				svc.ServeHTTP(rr, r)
 				Expect(rr.Code).To(Equal(http.StatusForbidden))
 				Expect(rr.Header().Get("X-Ocis-Mfa-Required")).To(Equal("true"))
 			})
