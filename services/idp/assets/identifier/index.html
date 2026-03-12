@@ -7,9 +7,10 @@
   <title>__TITLE__</title>
   <link rel="icon" href="__PATH_PREFIX__/static/favicon.ico">
   <link rel="stylesheet" href="__PATH_PREFIX__/static/theme.css">
+  <style nonce="__CSP_NONCE__">body.oc-login-bg{background-image:url('__BG_IMG_URL__')}</style>
   <meta property="csp-nonce" content="__CSP_NONCE__">
 </head>
-<body class="oc-login-bg" data-bg="__BG_IMG_URL__">
+<body class="oc-login-bg">
   <main>
     <div class="oc-login-form" id="login-root">
       <img class="oc-logo" src="/themes/owncloud/assets/logo.svg" alt="ownCloud">
@@ -40,9 +41,6 @@
   </main>
   <script nonce="__CSP_NONCE__">
 (function() {
-  var bg = document.body.getAttribute("data-bg");
-  if (bg) document.body.style.backgroundImage = "url('" + bg + "')";
-
   var form = document.getElementById("login-form");
   var errorEl = document.getElementById("login-error");
   var btnEl = document.getElementById("submit-btn");

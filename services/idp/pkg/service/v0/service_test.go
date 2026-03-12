@@ -399,6 +399,7 @@ func TestSecurityHeaders(t *testing.T) {
 			}
 			for _, substr := range []string{
 				"script-src 'nonce-" + nonce + "'",
+				"style-src 'self' 'nonce-" + nonce + "'",
 				"frame-ancestors 'none'",
 				"base-uri 'none'",
 			} {
