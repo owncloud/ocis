@@ -199,7 +199,7 @@ func TestHTMLStructure(t *testing.T) {
 	t.Run("index_form_elements", func(t *testing.T) {
 		_, body, _ := getPage(t, srv, "/signin/v1/identifier", "")
 		required := []string{
-			"<form", `id="login-form"`, `id="username"`, `id="password"`, `id="submit-btn"`,
+			"<form", `id="login-form"`, `id="oc-login-username"`, `id="oc-login-password"`, `id="submit-btn"`,
 			`fetchApi("/_/logon"`,
 		}
 		for _, s := range required {

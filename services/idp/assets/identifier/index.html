@@ -22,12 +22,12 @@
         data-msg-signing-in="__BUTTON_SIGNING_IN__"
         data-msg-sign-in="__BUTTON_SIGNIN__">
         <div>
-          <label class="oc-label" for="username">__LABEL_USERNAME__</label>
-          <input class="oc-input" type="text" id="username" name="username" autocomplete="username" required>
+          <label class="oc-label" for="oc-login-username">__LABEL_USERNAME__</label>
+          <input class="oc-input" type="text" id="oc-login-username" name="username" autocomplete="username" required>
         </div>
         <div>
-          <label class="oc-label" for="password">__LABEL_PASSWORD__</label>
-          <input class="oc-input" type="password" id="password" name="password" autocomplete="current-password" required>
+          <label class="oc-label" for="oc-login-password">__LABEL_PASSWORD__</label>
+          <input class="oc-input" type="password" id="oc-login-password" name="password" autocomplete="current-password" required>
         </div>
         <div>
           <button class="oc-button-primary" type="submit" id="submit-btn">__BUTTON_SIGNIN__</button>
@@ -120,8 +120,8 @@
     e.preventDefault();
     hideError();
     setLoading(true);
-    var username = document.getElementById("username").value.trim();
-    var password = document.getElementById("password").value;
+    var username = document.getElementById("oc-login-username").value.trim();
+    var password = document.getElementById("oc-login-password").value;
     if (!username || !password) {
       showError(MSG_REQUIRED);
       setLoading(false);
