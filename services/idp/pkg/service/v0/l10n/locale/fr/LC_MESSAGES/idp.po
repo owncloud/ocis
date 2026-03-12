@@ -1,0 +1,66 @@
+# French translations for IDP login pages.
+# Copyright (C) 2026 ownCloud GmbH
+# This file is distributed under the same license as the oCIS package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: ocis-idp\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-03-12 00:00+0000\n"
+"PO-Revision-Date: 2026-03-12 00:00+0000\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+msgid "Sign in - ownCloud"
+msgstr "Identification - ownCloud"
+
+msgid "Login"
+msgstr "Identification"
+
+msgid "Username"
+msgstr "Utilisateur"
+
+msgid "Password"
+msgstr "Mot de passe"
+
+msgid "Sign in"
+msgstr "Suivant"
+
+msgid "Signing in…"
+msgstr "Connexion…"
+
+msgid "Reset password"
+msgstr "Réinitialiser le mot de passe"
+
+msgid "Username and password are required."
+msgstr "Identifiant et mot de passe requis."
+
+msgid "Invalid username or password."
+msgstr "Echec de connexion. Vérifier vos identifiants et essayer à nouveau."
+
+msgid "Login failed. Please try again."
+msgstr "Echec de connexion. Vérifier vos identifiants et essayer à nouveau."
+
+msgid "Login failed."
+msgstr "Echec de connexion."
+
+msgid "Signed in - ownCloud"
+msgstr "Connecté - ownCloud"
+
+msgid "Signed in"
+msgstr "Connecté"
+
+msgid "You are signed in. You can close this window and return to the application."
+msgstr "Magnifique - Vous êtes connecté!"
+
+msgid "Signed out - ownCloud"
+msgstr "Déconnecté - ownCloud"
+
+msgid "Signed out"
+msgstr "Déconnecté"
+
+msgid "You are signed out. You can close this window."
+msgstr "Vous pouvez fermer cette fenêtre à présent."

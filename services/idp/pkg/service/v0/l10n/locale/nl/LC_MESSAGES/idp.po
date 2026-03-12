@@ -1,0 +1,66 @@
+# Dutch translations for IDP login pages.
+# Copyright (C) 2026 ownCloud GmbH
+# This file is distributed under the same license as the oCIS package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: ocis-idp\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-03-12 00:00+0000\n"
+"PO-Revision-Date: 2026-03-12 00:00+0000\n"
+"Language: nl\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Sign in - ownCloud"
+msgstr "Aanmelden - ownCloud"
+
+msgid "Login"
+msgstr "Aanmelden"
+
+msgid "Username"
+msgstr "Gebruikersnaam"
+
+msgid "Password"
+msgstr "Wachtwoord"
+
+msgid "Sign in"
+msgstr "Volgende"
+
+msgid "Signing in…"
+msgstr "Aanmelden…"
+
+msgid "Reset password"
+msgstr "Wachtwoord resetten"
+
+msgid "Username and password are required."
+msgstr "Gebruikersnaam en wachtwoord zijn vereist."
+
+msgid "Invalid username or password."
+msgstr "Inloggen mislukt. Controleer logingegevens en probeer opnieuw."
+
+msgid "Login failed. Please try again."
+msgstr "Inloggen mislukt. Controleer logingegevens en probeer opnieuw."
+
+msgid "Login failed."
+msgstr "Inloggen mislukt."
+
+msgid "Signed in - ownCloud"
+msgstr "Aangemeld - ownCloud"
+
+msgid "Signed in"
+msgstr "Aangemeld"
+
+msgid "You are signed in. You can close this window and return to the application."
+msgstr "Je bent aangemeld - fantastisch!"
+
+msgid "Signed out - ownCloud"
+msgstr "Afgemeld - ownCloud"
+
+msgid "Signed out"
+msgstr "Afgemeld"
+
+msgid "You are signed out. You can close this window."
+msgstr "Dit venster kan nu worden gesloten."
