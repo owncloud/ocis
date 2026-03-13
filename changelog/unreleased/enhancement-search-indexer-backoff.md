@@ -8,4 +8,4 @@ After 5 backoff cycles with no recovery, it aborts the walk with a
 clear error message. A summary of extracted, skipped, and failed
 files is logged at the end of every index walk.
 
-https://github.com/owncloud/ocis/pull/XXXXX
+https://github.com/owncloud/ocis/pull/12111
