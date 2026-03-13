@@ -599,7 +599,7 @@ class FeatureContext extends BehatVariablesContext {
 	 * @return void
 	 */
 	public function startOcisServer(): void {
-		if (\getenv('K8S') === "true") {
+		if (OcisConfigHelper::isK8s()) {
 			return;
 		}
 		$response = OcisConfigHelper::startOcis();
