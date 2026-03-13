@@ -83,6 +83,16 @@ class OcisConfigHelper {
 	}
 
 	/**
+	 * @return bool
+	 */
+	public static function isK8s(): bool {
+		if (\getenv('K8S') === "true") {
+			return true;
+		}
+		return false;
+	}
+
+	/**
 	 * @param array $envs
 	 *
 	 * @return ResponseInterface
