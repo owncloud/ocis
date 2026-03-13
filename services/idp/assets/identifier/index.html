@@ -1,45 +1,45 @@
 <!DOCTYPE html>
-<html lang="__LANG__">
+<html lang="{{.Lang}}">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#1b223d">
-  <title>__TITLE__</title>
-  <link rel="icon" href="__PATH_PREFIX__/static/favicon.ico">
-  <link rel="stylesheet" href="__PATH_PREFIX__/static/theme.css">
-  <style nonce="__CSP_NONCE__">body.oc-login-bg{background-image:url('__BG_IMG_URL__')}</style>
-  <meta property="csp-nonce" content="__CSP_NONCE__">
+  <title>{{.Title}}</title>
+  <link rel="icon" href="{{.PathPrefix}}/static/favicon.ico">
+  <link rel="stylesheet" href="{{.PathPrefix}}/static/theme.css">
+  <style nonce="{{.Nonce}}">body.oc-login-bg{background-image:url('{{.BgImgURL}}')}</style>
+  <meta property="csp-nonce" content="{{.Nonce}}">
 </head>
 <body class="oc-login-bg">
   <main>
     <div class="oc-login-form" id="login-root">
       <img class="oc-logo" src="/themes/owncloud/assets/logo.svg" alt="ownCloud">
-      <h1 class="oc-invisible-sr">__SR_HEADLINE__</h1>
+      <h1 class="oc-invisible-sr">{{.Headline}}</h1>
       <p id="oc-login-error-message" class="oc-error-message" hidden></p>
       <form id="login-form" method="post" action="#"
-        data-msg-required="__ERR_REQUIRED__"
-        data-msg-invalid="__ERR_INVALID__"
-        data-msg-failed="__ERR_FAILED__"
-        data-msg-default="__ERR_DEFAULT__"
-        data-msg-signing-in="__BUTTON_SIGNING_IN__"
-        data-msg-sign-in="__BUTTON_SIGNIN__">
+        data-msg-required="{{.ErrRequired}}"
+        data-msg-invalid="{{.ErrInvalid}}"
+        data-msg-failed="{{.ErrFailed}}"
+        data-msg-default="{{.ErrDefault}}"
+        data-msg-signing-in="{{.ButtonSigningIn}}"
+        data-msg-sign-in="{{.ButtonSignIn}}">
         <div>
-          <label class="oc-label" for="oc-login-username">__LABEL_USERNAME__</label>
+          <label class="oc-label" for="oc-login-username">{{.LabelUsername}}</label>
           <input class="oc-input" type="text" id="oc-login-username" name="username" autocomplete="username" required>
         </div>
         <div>
-          <label class="oc-label" for="oc-login-password">__LABEL_PASSWORD__</label>
+          <label class="oc-label" for="oc-login-password">{{.LabelPassword}}</label>
           <input class="oc-input" type="password" id="oc-login-password" name="password" autocomplete="current-password" required>
         </div>
         <div>
-          <button class="oc-button-primary" type="submit" id="submit-btn">__BUTTON_SIGNIN__</button>
+          <button class="oc-button-primary" type="submit" id="submit-btn">{{.ButtonSignIn}}</button>
         </div>
       </form>
-      __PASSWORD_RESET_LINK_HTML__
+      {{if .PasswordResetURI}}<p><a href="{{.PasswordResetURI}}">{{.ResetLabel}}</a></p>{{end}}
       <footer class="oc-footer-message">ownCloud – a safe home for all your data</footer>
     </div>
   </main>
-  <script nonce="__CSP_NONCE__">
+  <script nonce="{{.Nonce}}">
 (function() {
   var form = document.getElementById("login-form");
   var errorEl = document.getElementById("oc-login-error-message");
@@ -52,7 +52,7 @@
   var MSG_SIGNING_IN = form.dataset.msgSigningIn;
   var MSG_SIGN_IN = form.dataset.msgSignIn;
 
-  var pathPrefix = "__PATH_PREFIX__";
+  var pathPrefix = {{.PathPrefix}};
   var apiBase = pathPrefix + "/identifier";
   var xsrf = "1";
 
