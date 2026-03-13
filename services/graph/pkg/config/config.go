@@ -179,5 +179,6 @@ type Validation struct {
 type MultiInstanceConfig struct {
 	Enabled     bool   `yaml:"enabled" env:"OCIS_MULTI_INSTANCE_ENABLED" desc:"Enable multiple instances of Infinite Scale." introductionVersion:"8.0.0"`
 	InstanceID  string `yaml:"instanceid" env:"OCIS_MULTI_INSTANCE_INSTANCEID" desc:"The unique ID of this instance." introductionVersion:"8.0.0"`
+	MasterID    string `yaml:"master_id" env:"OCIS_MULTI_INSTANCE_MASTER_ID" desc:"The master ID that grants access to all instances. Users with this ID in their memberOf or guestOf claims can access any instance. Leave empty to disable." introductionVersion:"NEXT"`
 	QueryRegexp string `yaml:"query_regexp" env:"OCIS_MULTI_INSTANCE_QUERY_TEMPLATE" desc:"The regular expression extracting username and instancename from a user provided search." introductionVersion:"8.0.0"`
 }

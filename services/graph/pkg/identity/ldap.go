@@ -17,6 +17,7 @@ import (
 	"github.com/libregraph/idm/pkg/ldapdn"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 
+	ocisldap "github.com/owncloud/ocis/v2/ocis-pkg/ldap"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/errorcode"
@@ -80,6 +81,7 @@ type LDAP struct {
 
 	// multi instance only
 	instanceID                     string
+	masterID                       string
 	preciseSearchAttribute         string
 	instanceMapperEnabled          bool
 	instanceMapperBaseDN           string
@@ -122,7 +124,7 @@ func ParseDisableMechanismType(disableMechanism string) (DisableUserMechanismTyp
 	return t, nil
 }
 
-func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger, instanceID string) (*LDAP, error) {
+func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger, instanceID string, masterID string) (*LDAP, error) {
 	if config.UserDisplayNameAttribute == "" || config.UserIDAttribute == "" ||
 		config.UserEmailAttribute == "" || config.UserNameAttribute == "" {
 		return nil, errors.New("invalid user attribute mappings")
@@ -214,6 +216,7 @@ func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger, inst
 		refintEnabled:                  config.RefintEnabled,
 		useExternalID:                  config.RequireExternalID,
 		instanceID:                     instanceID,
+		masterID:                       masterID,
 		preciseSearchAttribute:         config.PreciseSearchAttribute,
 		instanceMapperEnabled:          config.InstanceMapperEnabled,
 		instanceMapperBaseDN:           config.InstanceMapperBaseDN,
@@ -611,7 +614,8 @@ func (i *LDAP) getPreciseLDAPUser(uniqueID string, instanceID string) (*ldap.Ent
 }
 
 func (i *LDAP) getLDAPUserByFilter(filter string, userFilter string) (*ldap.Entry, error) {
-	filter = fmt.Sprintf("(&%s(objectClass=%s)%s)", userFilter, i.userObjectClass, filter)
+	enhancedUserFilter := ocisldap.EnhanceFilterWithMasterID(userFilter, i.masterID, i.userAttributeMap.userMemberAttribute, i.userAttributeMap.userGuestAttribute)
+	filter = fmt.Sprintf("(&%s(objectClass=%s)%s)", enhancedUserFilter, i.userObjectClass, filter)
 	return i.searchLDAPEntryByFilter(i.userBaseDN, i.getUserAttrTypesForSearch(), filter)
 }
 
