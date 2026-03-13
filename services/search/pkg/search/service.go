@@ -421,6 +421,14 @@ func (s *Service) searchIndex(ctx context.Context, req *searchsvc.SearchRequest,
 	return res, nil
 }
 
+// Backoff constants for IndexSpace extraction failure handling.
+const (
+	_backoffThreshold   = 5                // consecutive failures before pausing
+	_backoffDuration    = 30 * time.Second // pause duration between retry cycles
+	_maxBackoffCycles   = 5                // max pause+retry cycles before aborting
+	_healthCheckTimeout = 5 * time.Second  // timeout for extractor health check
+)
+
 // IndexSpace (re)indexes all resources of a given space.
 func (s *Service) IndexSpace(spaceID *provider.StorageSpaceId) error {
 	ownerCtx, err := getAuthContext(s.serviceAccountID, s.gatewaySelector, s.serviceAccountSecret, s.logger)
@@ -438,6 +446,14 @@ func (s *Service) IndexSpace(spaceID *provider.StorageSpaceId) error {
 		return fmt.Errorf("invalid space id")
 	}
 	rootID.OpaqueId = rootID.SpaceId
+
+	var (
+		consecutiveFailures int
+		totalFailures       int
+		totalExtracted      int
+		totalSkipped        int
+		backoffCycles       int
+	)
 
 	w := walker.NewWalker(s.gatewaySelector)
 	err = w.Walk(ownerCtx, &rootID, func(wd string, info *provider.ResourceInfo, err error) error {
@@ -470,17 +486,75 @@ func (s *Service) IndexSpace(spaceID *provider.StorageSpaceId) error {
 			if parseErr == nil && !docMtime.Before(fileMtime) {
 				if info.Type == provider.ResourceType_RESOURCE_TYPE_CONTAINER {
 					s.logger.Debug().Str("path", ref.Path).Msg("subtree hasn't changed. Skipping.")
+					totalSkipped++
 					return filepath.SkipDir
 				}
 				s.logger.Debug().Str("path", ref.Path).Msg("element hasn't changed. Skipping.")
+				totalSkipped++
 				return nil
 			}
 		}
 
-		s.UpsertItem(ref)
+		// Check if we need to backoff due to repeated extraction failures.
+		if consecutiveFailures >= _backoffThreshold {
+			backoffCycles++
+			if backoffCycles > _maxBackoffCycles {
+				s.logger.Error().
+					Int("consecutiveFailures", consecutiveFailures).
+					Int("totalFailures", totalFailures).
+					Int("totalExtracted", totalExtracted).
+					Int("totalSkipped", totalSkipped).
+					Int("backoffCycles", backoffCycles).
+					Msg("aborting index walk: extraction service unavailable after repeated backoff attempts")
+				return fmt.Errorf("extraction service unavailable after %d consecutive failures and %d backoff cycles", consecutiveFailures, backoffCycles)
+			}
 
+			s.logger.Warn().
+				Int("consecutiveFailures", consecutiveFailures).
+				Int("backoffCycle", backoffCycles).
+				Int("maxCycles", _maxBackoffCycles).
+				Dur("backoffDuration", _backoffDuration).
+				Msg("pausing index walk due to repeated extraction failures")
+
+			time.Sleep(_backoffDuration)
+
+			if hc, ok := s.extractor.(content.HealthChecker); ok {
+				ctx, cancel := context.WithTimeout(context.Background(), _healthCheckTimeout)
+				healthy := hc.Healthy(ctx)
+				cancel()
+				if !healthy {
+					s.logger.Warn().Msg("extraction service still unreachable after backoff pause")
+					return nil // continue walking, will trigger next backoff cycle
+				}
+				s.logger.Info().Msg("extraction service reachable again after backoff — resuming")
+			}
+
+			consecutiveFailures = 0
+		}
+
+		if err := s.upsertItem(ref); err != nil {
+			consecutiveFailures++
+			totalFailures++
+			s.logger.Debug().
+				Err(err).
+				Int("consecutiveFailures", consecutiveFailures).
+				Str("path", ref.Path).
+				Msg("extraction failed for file")
+			return nil
+		}
+
+		consecutiveFailures = 0
+		backoffCycles = 0
+		totalExtracted++
 		return nil
 	})
+
+	s.logger.Info().
+		Int("totalExtracted", totalExtracted).
+		Int("totalSkipped", totalSkipped).
+		Int("totalFailures", totalFailures).
+		Int("backoffCycles", backoffCycles).
+		Msg("index walk completed")
 
 	if err != nil {
 		return err
@@ -541,7 +615,7 @@ func (s *Service) UpsertItem(ref *provider.Reference) {
 			SpaceId:   stat.Info.Id.SpaceId,
 		}),
 		Path:      utils.MakeRelativePath(path),
-		Type:      uint64(stat.Info.Type),
+		Type:      safeResourceType(stat.Info.Type),
 		Document:  doc,
 		Extracted: true,
 	}
@@ -558,6 +632,59 @@ func (s *Service) UpsertItem(ref *provider.Reference) {
 	}
 
 	s.storeExtractedMetadata(ctx, ref, doc)
+}
+
+// upsertItem is like UpsertItem but returns an error so that IndexSpace can
+// track extraction failures for backoff logic. The public UpsertItem remains
+// unchanged for the NATS event path.
+func (s *Service) upsertItem(ref *provider.Reference) error {
+	ctx, stat, path := s.resInfo(ref)
+	if ctx == nil || stat == nil || path == "" {
+		return fmt.Errorf("could not resolve resource info for %s", ref.GetPath())
+	}
+
+	if slices.Contains(_skipPathNames, path) || slices.Contains(_skipPathDirs, path) {
+		return nil
+	}
+
+	for _, skipPath := range _skipPathDirs {
+		if strings.HasPrefix(path, skipPath+"/") {
+			return nil
+		}
+	}
+
+	resourceID := storagespace.FormatResourceID(stat.Info.Id)
+
+	doc, err := s.extractor.Extract(ctx, stat.Info)
+	if err != nil {
+		return err
+	}
+
+	r := engine.Resource{
+		ID: resourceID,
+		RootID: storagespace.FormatResourceID(&provider.ResourceId{
+			StorageId: stat.Info.Id.StorageId,
+			OpaqueId:  stat.Info.Id.SpaceId,
+			SpaceId:   stat.Info.Id.SpaceId,
+		}),
+		Path:      utils.MakeRelativePath(path),
+		Type:      safeResourceType(stat.Info.Type),
+		Document:  doc,
+		Extracted: true,
+	}
+	r.Hidden = strings.HasPrefix(r.Path, ".")
+
+	if parentID := stat.GetInfo().GetParentId(); parentID != nil {
+		r.ParentID = storagespace.FormatResourceID(parentID)
+	}
+
+	if err = s.engine.Upsert(r.ID, r); err != nil {
+		return fmt.Errorf("index upsert: %w", err)
+	}
+
+	logDocCount(s.engine, s.logger)
+	s.storeExtractedMetadata(ctx, ref, doc)
+	return nil
 }
 
 // storeExtractedMetadata persists Tika-extracted audio, image, location, and
@@ -735,4 +862,13 @@ func (s *Service) resInfo(ref *provider.Reference) (context.Context, *provider.S
 	}
 
 	return ownerCtx, statRes, r.GetPath()
+}
+
+// safeResourceType converts a protobuf ResourceType (int32) to uint64,
+// clamping negative values to 0 to prevent overflow (gosec G115).
+func safeResourceType(t provider.ResourceType) uint64 {
+	if t < 0 {
+		return 0
+	}
+	return uint64(t) // #nosec G115 -- negative values are guarded above
 }

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"math"
+	"net/http"
 	"strconv"
 	"strings"
 	"time"
@@ -25,6 +26,7 @@ type Tika struct {
 	*Basic
 	Retriever
 	tika                       *tika.Client
+	tikaURL                    string
 	ContentExtractionSizeLimit uint64
 	CleanStopWords             bool
 }
@@ -47,9 +49,25 @@ func NewTikaExtractor(gatewaySelector pool.Selectable[gateway.GatewayAPIClient],
 		Basic:                      basic,
 		Retriever:                  newCS3Retriever(gatewaySelector, logger, cfg.Extractor.CS3AllowInsecure),
 		tika:                       tika.NewClient(nil, cfg.Extractor.Tika.TikaURL),
+		tikaURL:                    cfg.Extractor.Tika.TikaURL,
 		ContentExtractionSizeLimit: cfg.ContentExtractionSizeLimit,
 		CleanStopWords:             cfg.Extractor.Tika.CleanStopWords,
 	}, nil
+}
+
+// Healthy reports whether the Tika server is reachable by hitting the /tika
+// endpoint. The context controls the request timeout.
+func (t Tika) Healthy(ctx context.Context) bool {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, t.tikaURL+"/tika", nil)
+	if err != nil {
+		return false
+	}
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return false
+	}
+	resp.Body.Close()
+	return resp.StatusCode == http.StatusOK
 }
 
 // Extract loads a resource from its underlying storage, passes it to tika and processes the result into a Document.

@@ -13,6 +13,13 @@ type Extractor interface {
 	Extract(ctx context.Context, ri *provider.ResourceInfo) (Document, error)
 }
 
+// HealthChecker is an optional interface that Extractor implementations may
+// support to report whether the extraction backend is reachable. Callers
+// should type-assert before use.
+type HealthChecker interface {
+	Healthy(ctx context.Context) bool
+}
+
 func getFirstValue(m map[string][]string, key string) (string, error) {
 	if m == nil {
 		return "", errors.New("undefined map")
