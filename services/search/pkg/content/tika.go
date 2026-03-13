@@ -81,13 +81,25 @@ func checkTikaServerTimeout(tikaURL string, logger log.Logger) {
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		logger.Debug().Err(err).Msg("could not query Tika server status for timeout check")
+		logger.Warn().Err(err).
+			Int64("defaultTimeoutMs", _defaultTikaTaskTimeoutMs).
+			Int64("recommendedMinMs", _minSafeTaskTimeoutMs).
+			Msg("Could not query Tika server status to verify taskTimeoutMillis. " +
+				"The default is 120s which is lower than the typical tesseract OCR timeout (300s). " +
+				"If OCR extraction causes Tika child processes to be killed by the watchdog, " +
+				"add <taskTimeoutMillis>360000</taskTimeoutMillis> to the <server><params> section of tika-config.xml.")
 		return
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		logger.Debug().Int("status", resp.StatusCode).Msg("Tika /status endpoint returned non-200")
+		logger.Warn().
+			Int64("defaultTimeoutMs", _defaultTikaTaskTimeoutMs).
+			Int64("recommendedMinMs", _minSafeTaskTimeoutMs).
+			Msg("Could not determine Tika server taskTimeoutMillis (status endpoint unavailable). " +
+				"The default is 120s which is lower than the typical tesseract OCR timeout (300s). " +
+				"If OCR extraction causes Tika child processes to be killed by the watchdog, " +
+				"add <taskTimeoutMillis>360000</taskTimeoutMillis> to the <server><params> section of tika-config.xml.")
 		return
 	}
 
