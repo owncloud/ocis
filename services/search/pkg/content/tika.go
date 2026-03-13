@@ -2,9 +2,11 @@ package content
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"math"
+	"net/http"
 	"strconv"
 	"strings"
 	"time"
@@ -43,6 +45,8 @@ func NewTikaExtractor(gatewaySelector pool.Selectable[gateway.GatewayAPIClient],
 	}
 	logger.Info().Msgf("Tika version: %s", tkv)
 
+	checkTikaServerTimeout(cfg.Extractor.Tika.TikaURL, logger)
+
 	return &Tika{
 		Basic:                      basic,
 		Retriever:                  newCS3Retriever(gatewaySelector, logger, cfg.Extractor.CS3AllowInsecure),
@@ -50,6 +54,66 @@ func NewTikaExtractor(gatewaySelector pool.Selectable[gateway.GatewayAPIClient],
 		ContentExtractionSizeLimit: cfg.ContentExtractionSizeLimit,
 		CleanStopWords:             cfg.Extractor.Tika.CleanStopWords,
 	}, nil
+}
+
+// _defaultTikaTaskTimeoutMs is Tika Server's default taskTimeoutMillis when
+// no <server><params><taskTimeoutMillis> is set in tika-config.xml.
+const _defaultTikaTaskTimeoutMs = 120_000
+
+// _minSafeTaskTimeoutMs is the minimum recommended taskTimeoutMillis. OCR via
+// tesseract can legitimately take several minutes on large or complex images.
+// If the Tika watchdog timeout is lower than the parser timeout, the watchdog
+// kills the child process mid-work, causing cascading restarts.
+const _minSafeTaskTimeoutMs = 300_000
+
+// checkTikaServerTimeout queries the Tika server status endpoint and warns if
+// taskTimeoutMillis is too low. A mismatch between the server watchdog timeout
+// and parser-level timeouts (e.g. tesseract OCR) causes the watchdog to kill
+// child processes during legitimate long-running extractions.
+func checkTikaServerTimeout(tikaURL string, logger log.Logger) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, tikaURL+"/status", nil)
+	if err != nil {
+		return
+	}
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		logger.Debug().Err(err).Msg("could not query Tika server status for timeout check")
+		return
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		logger.Debug().Int("status", resp.StatusCode).Msg("Tika /status endpoint returned non-200")
+		return
+	}
+
+	var status struct {
+		ServerTimeout int64 `json:"server_timeout_millis"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&status); err != nil || status.ServerTimeout == 0 {
+		// Tika /status doesn't expose the timeout — assume default.
+		logger.Warn().
+			Int64("defaultTimeoutMs", _defaultTikaTaskTimeoutMs).
+			Int64("recommendedMinMs", _minSafeTaskTimeoutMs).
+			Msg("Could not determine Tika server taskTimeoutMillis. " +
+				"The default is 120s which is lower than the typical tesseract OCR timeout (300s). " +
+				"If OCR extraction causes Tika child processes to be killed by the watchdog, " +
+				"add <taskTimeoutMillis>360000</taskTimeoutMillis> to the <server><params> section of tika-config.xml.")
+		return
+	}
+
+	if status.ServerTimeout < _minSafeTaskTimeoutMs {
+		logger.Warn().
+			Int64("taskTimeoutMs", status.ServerTimeout).
+			Int64("recommendedMinMs", _minSafeTaskTimeoutMs).
+			Msg("Tika server taskTimeoutMillis is lower than the recommended minimum for OCR workloads. " +
+				"The watchdog may kill child processes during legitimate tesseract OCR. " +
+				"Increase taskTimeoutMillis in the <server><params> section of tika-config.xml.")
+	}
 }
 
 // Extract loads a resource from its underlying storage, passes it to tika and processes the result into a Document.
