@@ -3980,7 +3980,9 @@ def k3sCluster(name = OCIS_SERVER_NAME, ocm = False):
         commands.extend([
             # wait for peer
             "until getent hosts %s >/dev/null 2>&1; do echo 'Waiting for %s...'; sleep 2; done" % (peer_name, peer_name),
-            "bash %s/tests/config/k8s/expose-external-svc.sh %s:443" % (dirs["base"], peer_name),
+            # create namespace
+            "kubectl create namespace ocis || true",
+            "bash %s/tests/config/k8s/expose-external-svc.sh -n ocis %s:443" % (dirs["base"], peer_name),
         ])
 
     commands.extend([
