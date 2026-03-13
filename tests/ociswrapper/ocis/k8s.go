@@ -7,19 +7,29 @@ import (
 	"ociswrapper/log"
 	"ociswrapper/ocis/config"
 	"os/exec"
-	"slices"
 	"strings"
 	"time"
 )
 
 var K3dServiceEnvConfigs = make(map[string][]string)
 
+type EnvVar struct {
+	Name      string `json:"name"`
+	Value     string `json:"value,omitempty"`
+	ValueFrom *struct {
+		SecretKeyRef struct {
+			Name string `json:"name"`
+			Key  string `json:"key"`
+		} `json:"secretKeyRef"`
+	} `json:"valueFrom,omitempty"`
+}
+
 func K8sUpdateEnv(service string, envMap []string) (bool, string) {
 	log.Println(fmt.Sprintf("Updating environment variables for service '%s'...", service))
 	if envMap == nil {
 		envMap = []string{}
 	}
-	initialEnvs, err := getInitialEnvs(service, getEnvKeys(envMap))
+	initialEnvs, err := getInitialEnvs(service)
 	if err != nil {
 		return false, "error getting existing envs"
 	}
@@ -40,18 +50,7 @@ func K8sUpdateEnv(service string, envMap []string) (bool, string) {
 	return true, "ok"
 }
 
-type EnvVar struct {
-	Name      string `json:"name"`
-	Value     string `json:"value,omitempty"`
-	ValueFrom *struct {
-		SecretKeyRef struct {
-			Name string `json:"name"`
-			Key  string `json:"key"`
-		} `json:"secretKeyRef"`
-	} `json:"valueFrom,omitempty"`
-}
-
-func getInitialEnvs(service string, filterEnvs []string) ([]string, error) {
+func getInitialEnvs(service string) ([]string, error) {
 	filter := "jsonpath=\"{.spec.template.spec.containers[*].env}\""
 	cmdArgs := []string{"get", "-n", config.Get("namespace"), "deployment", service, "-o", filter}
 	cmd := exec.Command("kubectl", cmdArgs...)
@@ -63,39 +62,21 @@ func getInitialEnvs(service string, filterEnvs []string) ([]string, error) {
 	output = bytes.TrimSpace(output)
 	output = bytes.Trim(output, "\"")
 
-	var envVars []string
-	var envMap []EnvVar
-	err = json.Unmarshal(output, &envMap)
+	var flatEnvVars []string
+	var allEnvs []EnvVar
+	err = json.Unmarshal(output, &allEnvs)
 	if err != nil {
-		log.Println("here...")
 		log.Println(err.Error())
 		return nil, err
 	}
 
-	for _, env := range envMap {
-		envName := env.Name
-		envValue := ""
-		if !slices.Contains(filterEnvs, envName) {
-			// use empty string as initial value
-			envVars = append(envVars, fmt.Sprintf("%s=%s", envName, envValue))
-			continue
-		}
-		// if env has 'valueFrom' field (used for secrets), use the empty string value
+	for _, env := range allEnvs {
+		// do not include env vars with valueFrom (includes secrets).
 		if env.ValueFrom == nil {
-			envValue = env.Value
+			flatEnvVars = append(flatEnvVars, fmt.Sprintf("%s=%s", env.Name, env.Value))
 		}
-		envVars = append(envVars, fmt.Sprintf("%s=%s", envName, envValue))
 	}
-	return envVars, nil
-}
-
-func getEnvKeys(envs []string) []string {
-	var keys []string
-	for _, env := range envs {
-		parts := strings.SplitN(env, "=", 2)
-		keys = append(keys, strings.TrimSpace(parts[0]))
-	}
-	return keys
+	return flatEnvVars, nil
 }
 
 func waitForService(service string) (bool, error) {
@@ -134,6 +115,7 @@ func waitForService(service string) (bool, error) {
 
 func K8sRollback() (bool, string) {
 	for service, envs := range K3dServiceEnvConfigs {
+		log.Println(fmt.Sprintf("Rolling back '%s' service...", service))
 		cmdArgs := []string{"set", "env", "-n", config.Get("namespace"), "deployment", service}
 		cmdArgs = append(cmdArgs, envs...)
 		cmd := exec.Command("kubectl", cmdArgs...)
