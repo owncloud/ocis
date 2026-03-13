@@ -15,7 +15,7 @@
     <div class="oc-login-form" id="login-root">
       <img class="oc-logo" src="/themes/owncloud/assets/logo.svg" alt="ownCloud">
       <h1 class="oc-invisible-sr">__SR_HEADLINE__</h1>
-      <p id="login-error" class="oc-error-message" hidden></p>
+      <p id="oc-login-error-message" class="oc-error-message" hidden></p>
       <form id="login-form" method="post" action="#"
         data-msg-required="__ERR_REQUIRED__"
         data-msg-invalid="__ERR_INVALID__"
@@ -42,7 +42,7 @@
   <script nonce="__CSP_NONCE__">
 (function() {
   var form = document.getElementById("login-form");
-  var errorEl = document.getElementById("login-error");
+  var errorEl = document.getElementById("oc-login-error-message");
   var btnEl = document.getElementById("submit-btn");
 
   var MSG_REQUIRED = form.dataset.msgRequired;
