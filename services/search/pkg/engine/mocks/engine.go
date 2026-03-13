@@ -166,6 +166,7 @@ func (_e *Engine_Expecter) Lookup(id interface{}) *Engine_Lookup_Call {
 	return &Engine_Lookup_Call{Call: _e.mock.On("Lookup", id)}
 }
 
+// Run sets a handler to be called when the Lookup mock is matched.
 func (_c *Engine_Lookup_Call) Run(run func(id string)) *Engine_Lookup_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(string))
@@ -173,11 +174,13 @@ func (_c *Engine_Lookup_Call) Run(run func(id string)) *Engine_Lookup_Call {
 	return _c
 }
 
+// Return specifies the return values for the Lookup mock.
 func (_c *Engine_Lookup_Call) Return(_a0 *engine.Resource, _a1 error) *Engine_Lookup_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
+// RunAndReturn sets a handler that is called and whose return values are used as the mock's return values.
 func (_c *Engine_Lookup_Call) RunAndReturn(run func(string) (*engine.Resource, error)) *Engine_Lookup_Call {
 	_c.Call.Return(run)
 	return _c
