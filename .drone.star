@@ -899,6 +899,7 @@ def uploadScanResults(ctx):
                                 "git checkout $DRONE_COMMIT",
                             ],
             },
+        ] + skipIfUnchanged(ctx, "unit-tests") + [
             {
                 "name": "sync-from-cache",
                 "image": MINIO_MC,

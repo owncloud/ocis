@@ -23,11 +23,18 @@ type Engine interface {
 	Search(ctx context.Context, req *searchService.SearchIndexRequest) (*searchService.SearchIndexResponse, error)
 	Upsert(id string, r Resource) error
 	Update(id string, mutateFn func(*Resource)) error
+	Lookup(id string) (*Resource, error)
 	Move(id string, parentid string, target string) error
 	Delete(id string) error
 	Restore(id string) error
 	Purge(id string) error
 	DocCount() (uint64, error)
+}
+
+// Optimizer is an optional interface that Engine implementations may support
+// to trigger index compaction. Callers should type-assert before use.
+type Optimizer interface {
+	Optimize(ctx context.Context) error
 }
 
 // Resource is the entity that is stored in the index.

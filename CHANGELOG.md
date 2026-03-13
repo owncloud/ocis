@@ -39,8 +39,8 @@
 * [Changelog for 3.0.0](#changelog-for-300-2023-06-06)
 * [Changelog for 2.0.0](#changelog-for-200-2022-11-30)
 * [Changelog for 1.20.0](#changelog-for-1200-2022-04-13)
-* [Changelog for 1.19.1](#changelog-for-1191-2022-03-29)
 * [Changelog for 1.19.0](#changelog-for-1190-2022-03-29)
+* [Changelog for 1.19.1](#changelog-for-1191-2022-03-29)
 * [Changelog for 1.18.0](#changelog-for-1180-2022-03-03)
 * [Changelog for 1.17.0](#changelog-for-1170-2022-02-16)
 * [Changelog for 1.16.0](#changelog-for-1160-2021-12-10)
@@ -80,6 +80,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix CSP blocking bundled KaTeX font: [#12070](https://github.com/owncloud/ocis/pull/12070)
 * Bugfix - Fix case-sensitive photo metadata search: [#12078](https://github.com/owncloud/ocis/pull/12078)
 * Bugfix - Prevent incomplete Tika extractions from permanently blocking re-index: [#12095](https://github.com/owncloud/ocis/pull/12095)
+* Bugfix - Use O(1) document lookup instead of full search during reindexing: [#12096](https://github.com/owncloud/ocis/pull/12096)
 * Enhancement - Add web extensions deployment configuration: [#11940](https://github.com/owncloud/ocis/pull/11940)
 * Enhancement - Add AI-assisted development guide: [#11941](https://github.com/owncloud/ocis/pull/11941)
 * Enhancement - Bump Web to 12.3.1: [#12015](https://github.com/owncloud/ocis/pull/12015)
@@ -88,6 +89,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Bump Reva version: [#12051](https://github.com/owncloud/ocis/pull/12051)
 * Enhancement - Support numeric range queries in KQL: [#12094](https://github.com/owncloud/ocis/pull/12094)
 * Enhancement - Add blobstore CLI commands to storage-users service: [#12102](https://github.com/owncloud/ocis/pull/12102)
+* Enhancement - Optimize search index after bulk reindexing: [#12104](https://github.com/owncloud/ocis/pull/12104)
 
 ## Details
 
@@ -224,6 +226,18 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/issues/12093
    https://github.com/owncloud/ocis/pull/12095
 
+* Bugfix - Use O(1) document lookup instead of full search during reindexing: [#12096](https://github.com/owncloud/ocis/pull/12096)
+
+   The `IndexSpace` bulk reindexer was using a full KQL search query per file to
+   check whether re-extraction was needed. On large indexes this query took
+   600–950ms each, making a 61,000-file space take ~13.5 hours just to walk.
+   Replaced the per-file `Search()` call with an O(1) `Lookup()` using Bleve's
+   `DocIDQuery`, then comparing mtime and extraction status in memory. This reduces
+   per-file check time from ~800ms to <1ms.
+
+   https://github.com/owncloud/ocis/issues/12093
+   https://github.com/owncloud/ocis/pull/12096
+
 * Enhancement - Add web extensions deployment configuration: [#11940](https://github.com/owncloud/ocis/pull/11940)
 
    We added deployment configuration for the photo-addon and advanced-search web
@@ -311,6 +325,18 @@ The following sections list the changes for unreleased.
    drivers are supported.
 
    https://github.com/owncloud/ocis/pull/12102
+
+* Enhancement - Optimize search index after bulk reindexing: [#12104](https://github.com/owncloud/ocis/pull/12104)
+
+   After an `IndexSpace` walk completes, the search engine now triggers a segment
+   merge (compaction) on the bleve index. Over time, writes create multiple index
+   segments that degrade query performance. The new `Optimize()` method calls
+   bleve's `ForceMerge` to consolidate all segments into one, improving subsequent
+   search and lookup speed. This is especially beneficial after bulk reindexing
+   large spaces.
+
+   https://github.com/owncloud/ocis/issues/12093
+   https://github.com/owncloud/ocis/pull/12104
 
 # Changelog for [8.0.0] (2026-02-13)
 
@@ -12685,7 +12711,7 @@ The following sections list the changes for 2.0.0.
 
 The following sections list the changes for 1.20.0.
 
-[1.20.0]: https://github.com/owncloud/ocis/compare/v1.19.1...v1.20.0
+[1.20.0]: https://github.com/owncloud/ocis/compare/v1.19.0...v1.20.0
 
 ## Summary
 
@@ -12859,29 +12885,11 @@ The following sections list the changes for 1.20.0.
    https://github.com/owncloud/ocis/pull/3509
    https://github.com/owncloud/web/releases/tag/v5.4.0
 
-# Changelog for [1.19.1] (2022-03-29)
-
-The following sections list the changes for 1.19.1.
-
-[1.19.1]: https://github.com/owncloud/ocis/compare/v1.19.0...v1.19.1
-
-## Summary
-
-* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
-
-## Details
-
-* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
-
-   URLs for Special items (space image, readme) were broken.
-
-   https://github.com/owncloud/ocis/pull/3419
-
 # Changelog for [1.19.0] (2022-03-29)
 
 The following sections list the changes for 1.19.0.
 
-[1.19.0]: https://github.com/owncloud/ocis/compare/v1.18.0...v1.19.0
+[1.19.0]: https://github.com/owncloud/ocis/compare/v1.19.1...v1.19.0
 
 ## Summary
 
@@ -13054,6 +13062,24 @@ The following sections list the changes for 1.19.0.
    https://github.com/owncloud/ocis/pull/3291
    https://github.com/owncloud/ocis/pull/3375
    https://github.com/owncloud/web/releases/tag/v5.3.0
+
+# Changelog for [1.19.1] (2022-03-29)
+
+The following sections list the changes for 1.19.1.
+
+[1.19.1]: https://github.com/owncloud/ocis/compare/v1.18.0...v1.19.1
+
+## Summary
+
+* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
+
+## Details
+
+* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
+
+   URLs for Special items (space image, readme) were broken.
+
+   https://github.com/owncloud/ocis/pull/3419
 
 # Changelog for [1.18.0] (2022-03-03)
 
