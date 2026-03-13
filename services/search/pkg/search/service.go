@@ -462,17 +462,19 @@ func (s *Service) IndexSpace(spaceID *provider.StorageSpaceId) error {
 		}
 		s.logger.Debug().Str("path", ref.Path).Msg("Walking tree")
 
-		searchRes, err := s.engine.Search(ownerCtx, &searchsvc.SearchIndexRequest{
-			Query: "id:" + storagespace.FormatResourceID(info.Id) + ` mtime>=` + utils.TSToTime(info.Mtime).Format(time.RFC3339Nano) + ` Extracted:true`,
-		})
-
-		if err == nil && len(searchRes.Matches) >= 1 {
-			if info.Type == provider.ResourceType_RESOURCE_TYPE_CONTAINER {
-				s.logger.Debug().Str("path", ref.Path).Msg("subtree hasn't changed. Skipping.")
-				return filepath.SkipDir
+		resourceID := storagespace.FormatResourceID(info.Id)
+		r, err := s.engine.Lookup(resourceID)
+		if err == nil && r.Extracted {
+			fileMtime := utils.TSToTime(info.Mtime)
+			docMtime, parseErr := time.Parse(time.RFC3339Nano, r.Mtime)
+			if parseErr == nil && !docMtime.Before(fileMtime) {
+				if info.Type == provider.ResourceType_RESOURCE_TYPE_CONTAINER {
+					s.logger.Debug().Str("path", ref.Path).Msg("subtree hasn't changed. Skipping.")
+					return filepath.SkipDir
+				}
+				s.logger.Debug().Str("path", ref.Path).Msg("element hasn't changed. Skipping.")
+				return nil
 			}
-			s.logger.Debug().Str("path", ref.Path).Msg("element hasn't changed. Skipping.")
-			return nil
 		}
 
 		s.UpsertItem(ref)

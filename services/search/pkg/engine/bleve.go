@@ -317,6 +317,18 @@ func (b *Bleve) Update(id string, mutateFn func(*Resource)) error {
 	return err
 }
 
+// Lookup retrieves a resource by its document ID using an O(1) DocIDQuery.
+// Returns ErrResourceNotFound if the resource is not in the index.
+func (b *Bleve) Lookup(id string) (*Resource, error) {
+	bleveIndex, closeFn, err := b.indexGetter.GetIndex(bleveEngine.ReadOnly(true))
+	if err != nil {
+		return nil, err
+	}
+	defer closeFn()
+
+	return b.getResource(bleveIndex, id)
+}
+
 // Move updates the resource location and all of its necessary fields.
 func (b *Bleve) Move(id string, parentid string, target string) error {
 	bleveIndex, closeFn, err := b.indexGetter.GetIndex()
