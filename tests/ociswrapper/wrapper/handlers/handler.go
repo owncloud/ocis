@@ -170,7 +170,6 @@ func K8sRollbackHandler(res http.ResponseWriter, req *http.Request) {
 		sendResponse(res, http.StatusOK, message)
 		return
 	}
-	fmt.Println(success)
 	message = "Failed to rollback oCIS"
 	sendResponse(res, http.StatusInternalServerError, message)
 }
