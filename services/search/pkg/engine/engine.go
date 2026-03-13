@@ -30,6 +30,12 @@ type Engine interface {
 	DocCount() (uint64, error)
 }
 
+// Optimizer is an optional interface that Engine implementations may support
+// to trigger index compaction. Callers should type-assert before use.
+type Optimizer interface {
+	Optimize(ctx context.Context) error
+}
+
 // Resource is the entity that is stored in the index.
 type Resource struct {
 	content.Document
