@@ -7,4 +7,4 @@ This mismatch causes the Tika watchdog to kill child processes during
 legitimate long-running OCR, leading to cascading restarts and
 extraction failures.
 
-https://github.com/owncloud/ocis/pull/XXXXX
+https://github.com/owncloud/ocis/pull/12110
