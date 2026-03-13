@@ -1,8 +1,9 @@
 package ocis
 
 import (
-	"bytes"
 	"fmt"
+	"ociswrapper/log"
+	"ociswrapper/ocis/config"
 	"os/exec"
 	"strings"
 	"time"
@@ -10,80 +11,70 @@ import (
 
 var K3dServiceEnvConfigs = make(map[string][]string)
 
-func UpdateEnv(service string, envMap []string) (bool, string) {
+func K8sUpdateEnv(service string, envMap []string) (bool, string) {
 	if envMap == nil {
 		envMap = []string{}
 	}
+	K3dServiceEnvConfigs[service] = append(K3dServiceEnvConfigs[service], envMap...)
 
-	cmdArgs := new(bytes.Buffer)
-	for _, value := range envMap {
-		fmt.Fprintf(cmdArgs, "%s ", value)
-	}
-	envMap = append([]string{"set", "env", "-n", "ocis", "deployment", service}, envMap...)
-	cmd = exec.Command("kubectl", envMap...)
+	cmdArgs := append([]string{"set", "env", "-n", "ocis-server", "deployment", service}, envMap...)
+	cmd := exec.Command("kubectl", cmdArgs...)
 	_, err := cmd.Output()
 	if err != nil {
-		fmt.Println(err.Error())
+		log.Println(err.Error())
 		return false, "error"
 	}
-	IsServiceRunning(service)
+	waitForService(service)
 	return true, "ok"
 }
 
-func IsServiceRunning(service string) {
-	timeout := time.After(10 * time.Second)
-	tick := time.NewTicker(500 * time.Millisecond)
+func waitForService(service string) {
+	timeout := time.After(30 * time.Second)
+	tick := time.NewTicker(2 * time.Second)
 	defer tick.Stop()
 
+	port := config.GetServiceDebugPort(service)
+	healthUrl := fmt.Sprintf("http://%s:%d/healthz", service, port)
+	readyUrl := fmt.Sprintf("http://%s:%d/readyz", service, port)
 	for {
 		select {
 		case <-timeout:
-			fmt.Printf("Timeout: %s service did not become ready in time.\n",service)
+			log.Println(fmt.Sprintf("%s seconds timeout waiting for '%s' service.", "30", service))
 			return
 		case <-tick.C:
-			cmd := exec.Command("sh", "-c", fmt.Sprintf("kubectl get pods -n ocis -A | grep %s | wc -l", service))
+			curlCmd := fmt.Sprintf("curl %s -s -o /dev/null -w '%%{http_code}';", healthUrl)
+			curlCmd += fmt.Sprintf("curl %s -s -o /dev/null -w '%%{http_code}';echo", readyUrl)
+			cmdString := fmt.Sprintf("kubectl run healthcheck -n %s --rm -it --image=curlimages/curl --restart=Never -- sh -c", "ocis-server")
+			cmdString += fmt.Sprintf(" \"%s\"", curlCmd)
+			cmd := exec.Command("sh", "-c", cmdString)
 			stdout, err := cmd.Output()
 			if err != nil {
-				fmt.Println(err.Error())
+				log.Println(err.Error())
 				continue
 			}
-			if strings.TrimSpace(string(stdout)) == "1" {
-				for {
-					select {
-					case <-timeout:
-						fmt.Println("Timeout: service did not reach 'Running' state in time.")
-						return
-					case <-tick.C:
-						cmd := exec.Command("sh", "-c", fmt.Sprintf("kubectl get pods -n ocis -A | grep %s | grep Running | wc -l", service))
-						stdout, err := cmd.Output()
-						if err != nil {
-							fmt.Println(err.Error())
-							continue
-						}
-						if strings.TrimSpace(string(stdout)) == "1" {
-							return
-						}
-					}
-				}
+			output := strings.ReplaceAll(strings.TrimSpace(string(stdout)), "\n", ":")
+			if strings.Contains(output, "200200") {
+				log.Println(fmt.Sprintf("'%s' service is healthy and ready.", service))
+				return
+			} else {
+				log.Println(fmt.Sprintf("Waiting for '%s' service. Output: %s", service, output))
 			}
 		}
 	}
 }
 
-func Rollback() (bool, string) {
+func K8sRollback() (bool, string) {
 	for service, envs := range K3dServiceEnvConfigs {
-		cmdArgs := []string{"set", "env", "-n", "ocis"}
-		cmdArgs = append(cmdArgs, fmt.Sprintf("deployment/%s",service))
-		for _, env := range envs {
-			cmdArgs = append(cmdArgs, strings.SplitN(env, "=", 2)[0]+"-")
-			cmd = exec.Command("kubectl", cmdArgs...)
-			_, err := cmd.Output()
-			if err != nil {
-				return false, "service didnt restart"
-			}
-			IsServiceRunning(service)
-			delete(K3dServiceEnvConfigs, service)
+		cmdArgs := []string{"set", "env", "-n", "ocis-server", "deployment", service}
+		cmdArgs = append(cmdArgs, envs...)
+		cmd := exec.Command("kubectl", cmdArgs...)
+		_, err := cmd.Output()
+		if err != nil {
+			log.Println(fmt.Sprintf("Failed to rollback service '%s'. %s", service, err.Error()))
+			return false, "failed to rollback"
 		}
+		waitForService(service)
+		delete(K3dServiceEnvConfigs, service)
 	}
 	return true, "ok"
 }
