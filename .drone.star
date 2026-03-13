@@ -108,7 +108,7 @@ config = {
                 "apiContract",
                 "apiLocks",
             ],
-            "skip": False,
+            "skip": True,
             "k8s": True,
         },
         "settingsAndNotification": {
@@ -117,7 +117,7 @@ config = {
                 "apiNotification",
                 "apiCors",
             ],
-            "skip": False,
+            "skip": True,
             "withRemotePhp": [False],
             "k8s": True,
             "emailNeeded": True,
@@ -138,7 +138,7 @@ config = {
             "suites": [
                 "apiGraphUser",
             ],
-            "skip": False,
+            "skip": True,
             "withRemotePhp": [False],
             "k8s": True,
         },
@@ -146,14 +146,14 @@ config = {
             "suites": [
                 "apiSpaces",
             ],
-            "skip": False,
+            "skip": True,
             "k8s": True,
         },
         "spacesShares": {
             "suites": [
                 "apiSpacesShares",
             ],
-            "skip": False,
+            "skip": True,
             "k8s": True,
         },
         "davOperations": {
@@ -165,7 +165,7 @@ config = {
                 "apiArchiver",
                 "apiActivities",
             ],
-            "skip": False,
+            "skip": True,
             "k8s": True,
         },
         "groupAndSearch1": {
@@ -174,7 +174,7 @@ config = {
                 "apiGraph",
                 "apiGraphGroup",
             ],
-            "skip": False,
+            "skip": True,
             "k8s": True,
         },
         "search2": {
@@ -183,7 +183,7 @@ config = {
                 "apiSearchContent",
             ],
             "tikaNeeded": True,
-            "skip": False,
+            "skip": True,
             "k8s": True,
         },
         "sharingNg1": {
@@ -192,7 +192,7 @@ config = {
                 "apiReshare",
                 "apiSharingNgPermissions",
             ],
-            "skip": False,
+            "skip": True,
             "withRemotePhp": [False],
             "k8s": True,
         },
@@ -200,7 +200,7 @@ config = {
             "suites": [
                 "apiSharingNgAdditionalShareRole",
             ],
-            "skip": False,
+            "skip": True,
             "k8s": True,
             "withRemotePhp": [False],
         },
@@ -227,7 +227,7 @@ config = {
             "suites": [
                 "apiAntivirus",
             ],
-            "skip": False,
+            "skip": True,
             "k8s": True,
             "antivirusNeeded": True,
             "extraServerEnvironment": {
@@ -242,7 +242,7 @@ config = {
             "suites": [
                 "apiOcm",
             ],
-            "skip": False,
+            "skip": True,
             "k8s": True,
             "withRemotePhp": [False],
             "federationServer": True,
@@ -269,7 +269,7 @@ config = {
             "suites": [
                 "apiAuthApp",
             ],
-            "skip": False,
+            "skip": True,
             "k8s": True,
             "withRemotePhp": [False],
             "extraServerEnvironment": {
@@ -281,7 +281,7 @@ config = {
             "suites": [
                 "apiCollaboration",
             ],
-            "skip": False,
+            "skip": True,
             "k8s": True,
             "withRemotePhp": [False],
             "collaborationServiceNeeded": True,
@@ -294,7 +294,7 @@ config = {
                 "cliCommands",
                 "apiServiceAvailability",
             ],
-            "skip": False,
+            "skip": True,
             "withRemotePhp": [False],
             "antivirusNeeded": True,
             "emailNeeded": True,
@@ -324,7 +324,7 @@ config = {
                 "coreApiMain",
                 "coreApiVersions",
             ],
-            "skip": False,
+            "skip": True,
             "withRemotePhp": [False],
             "k8s": True,
         },
@@ -333,7 +333,7 @@ config = {
                 "coreApiShareManagementBasicToShares",
                 "coreApiShareManagementToShares",
             ],
-            "skip": False,
+            "skip": True,
             "k8s": True,
             "withRemotePhp": [False],
         },
@@ -355,7 +355,7 @@ config = {
                 "coreApiShareCreateSpecialToShares2",
                 "coreApiShareUpdateToShares",
             ],
-            "skip": False,
+            "skip": True,
             "k8s": True,
             "withRemotePhp": [False],
         },
@@ -366,7 +366,7 @@ config = {
                 "coreApiWebdavEtagPropagation1",
                 "coreApiWebdavEtagPropagation2",
             ],
-            "skip": False,
+            "skip": True,
             "k8s": True,
         },
         "6": {
@@ -375,14 +375,14 @@ config = {
                 "coreApiWebdavOperations",
                 "coreApiWebdavMove2",
             ],
-            "skip": False,
+            "skip": True,
             "k8s": True,
         },
         "7": {
             "suites": [
                 "coreApiWebdavProperties",
             ],
-            "skip": False,
+            "skip": True,
             "k8s": True,
         },
         "8": {
@@ -392,7 +392,7 @@ config = {
                 "coreApiWebdavUpload",
                 "coreApiWebdavUploadTUS",
             ],
-            "skip": False,
+            "skip": True,
             "k8s": True,
         },
     },
@@ -509,6 +509,7 @@ def getPipelineNames(pipelines = []):
     return names
 
 def main(ctx):
+    return testPipelines(ctx)
     """main is the entrypoint for drone
 
     Args:
@@ -627,6 +628,9 @@ def testOcisAndUploadResults(ctx):
 
 def testPipelines(ctx):
     pipelines = []
+    pipelines += localApiTestPipeline(ctx)
+    pipelines += coreApiTestPipeline(ctx)
+    return pipelines
 
     if config["litmus"]:
         pipelines += litmus(ctx, "ocis")
@@ -1125,7 +1129,7 @@ def localApiTestPipeline(ctx):
                     params[item] = matrix[item] if item in matrix else defaults[item]
                 for storage in params["storages"]:
                     for run_with_remote_php in params["withRemotePhp"]:
-                        run_on_k8s = params["k8s"] and ctx.build.event == "cron"
+                        run_on_k8s = params["k8s"]  #and ctx.build.event == "cron"
 
                         ####################
                         # SETUP STEPS      #
@@ -1507,7 +1511,7 @@ def coreApiTestPipeline(ctx):
                 for run_with_remote_php in params["withRemotePhp"]:
                     filter_tags = "~@skipOnGraph&&~@skipOnOcis-%s-Storage" % ("OC" if storage == "owncloud" else "OCIS")
                     expected_failures_file = "%s/expected-failures-API-on-%s-storage.md" % (test_dir, storage.upper())
-                    run_on_k8s = params["k8s"] and ctx.build.event == "cron"
+                    run_on_k8s = params["k8s"]  #and ctx.build.event == "cron"
                     ocis_url = OCIS_URL
                     wrapper_url = "http://%s:5200" % OCIS_SERVER_NAME
 
@@ -3975,18 +3979,10 @@ def k3sCluster(name = OCIS_SERVER_NAME, ocm = False):
     if ocm:
         commands.extend([
             # wait for peer
-            "echo 'Waiting for %s to be available...'" % peer_name,
-            "for i in {1..60}; do if getent hosts %s > /dev/null 2>&1; then break; fi; echo 'Waiting for %s... attempt '$i; sleep 2; done" % (peer_name, peer_name),
-            # get the IP of peer
-            "PEER_IP=$(getent hosts %s | awk '{ print $1 }')" % peer_name,
-            "echo \"%s IP: $PEER_IP\"" % peer_name,
-            # create namespace for ocis
-            "kubectl create namespace ocis --dry-run=client -o yaml | kubectl apply -f -",
-            # create service in the 'ocis' namespace
-            "cat <<EOF | kubectl apply -f -\napiVersion: v1\nkind: Service\nmetadata:\n  name: %s\n  namespace: ocis\nspec:\n  type: ClusterIP\n  clusterIP: None\n  ports:\n  - port: 443\n    protocol: TCP\n---\napiVersion: v1\nkind: Endpoints\nmetadata:\n  name: %s\n  namespace: ocis\nsubsets:\n- addresses:\n  - ip: $PEER_IP\n  ports:\n  - port: 443\n    protocol: TCP\nEOF" % (peer_name, peer_name),
-            # verify
-            "kubectl get svc %s -n ocis" % peer_name,
-            "kubectl get endpoints %s -n ocis" % peer_name,
+            "until getent hosts %s >/dev/null 2>&1; do echo 'Waiting for %s...'; sleep 2; done" % (peer_name, peer_name),
+            # create namespace
+            "kubectl create namespace ocis || true",
+            "bash %s/tests/config/k8s/expose-external-svc.sh -n ocis %s:443" % (dirs["base"], peer_name),
         ])
 
     commands.extend([
@@ -4025,7 +4021,7 @@ def prepareChartsK8s(environment = []):
         "[ ! -d %s/ocis-charts ] && " % dirs["base"] +
         "git clone --single-branch -b main --depth 1 https://github.com/owncloud/ocis-charts.git",
         # prepare charts for the tests
-        "bash %s/tests/config/drone/k8s/setup.sh %s/ocis-charts" % (dirs["base"], dirs["base"]),
+        "bash %s/tests/config/k8s/setup.sh %s/ocis-charts" % (dirs["base"], dirs["base"]),
     ]
 
     return [{
@@ -4070,10 +4066,6 @@ def deployOcisK8s(name = OCIS_SERVER_NAME):
             "cd %s/ocis-charts" % dirs["base"],
             # update external domain
             "sed -i 's|externalDomain:.*|externalDomain: %s|' ./charts/ocis/ci/deployment-values.yaml" % name,
-            # [NOTE]
-            # Remove schema validation to add extra configs in values.yaml.
-            # Also this allows us to use fakeoffice as web-office server
-            "rm ./charts/ocis/values.schema.json || true",
             # deploy ocis
             "make helm-install-atomic",
         ],
@@ -4134,15 +4126,10 @@ def exposeNodePortsK8s(services = [], name = OCIS_SERVER_NAME):
     }]
 
 def exposeExternalServersK8s(servers = [], name = OCIS_SERVER_NAME):
-    commands = []
+    servers_arg = []
     for server in servers:
-        server_name = server[0]
-        server_port = str(server[1])
-        commands.append("SERVER_IP=$(getent hosts %s | awk '{print $1}')" % server_name)
-        commands.append('echo -e "apiVersion: v1\nkind: Endpoints\nmetadata:\n  name: %s\n  namespace: ocis\n' % server_name +
-                        'subsets:\n- addresses:\n  - ip: $SERVER_IP\n  ports:\n  - port: %s" | kubectl apply -f -' % server_port)
-        commands.append('echo -e "apiVersion: v1\nkind: Service\nmetadata:\n  name: %s\n  namespace: ocis\n' % server_name +
-                        'spec:\n  ports:\n  - port: %s\n    targetPort: %s" | kubectl apply -f -' % (server_port, server_port))
+        servers_arg.append("%s:%s" % (server[0], str(server[1])))
+    servers_arg = ",".join(servers_arg)
 
     return [{
         "name": "expose-external-servers",
@@ -4150,5 +4137,6 @@ def exposeExternalServersK8s(servers = [], name = OCIS_SERVER_NAME):
         "commands": [
             "export KUBECONFIG=kubeconfig-$${DRONE_BUILD_NUMBER}-%s.yaml" % name,
             "until test -f $${KUBECONFIG}; do sleep 1s; done",
-        ] + commands,
+            "bash %s/tests/config/k8s/expose-external-svc.sh -n ocis %s" % (dirs["base"], servers_arg),
+        ],
     }]

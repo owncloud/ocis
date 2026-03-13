@@ -14,9 +14,9 @@ if [[ ! -d "$CHART_REPO" ]]; then
 fi
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-ROOT="$(cd $SCRIPT_DIR/../../../.. && pwd)"
+ROOT="$(cd $SCRIPT_DIR/../../.. && pwd)"
 
-CFG_DIR="$ROOT/tests/config/drone/k8s"
+CFG_DIR="$ROOT/tests/config/k8s"
 CHT_DIR="$CHART_REPO/charts/ocis"
 TPL_DIR="$CHT_DIR/templates"
 
@@ -68,5 +68,10 @@ if [[ "$ENABLE_AUTH_APP" == "true" ]]; then
     sed -i '/authapp:/{n;s|false|true|}' $CFG_DIR/values.yaml
 fi
 
-# move custom values file
+# [NOTE]
+# Remove schema validation to add extra configs in values.yaml.
+# Also this allows us to use fakeoffice as web-office server
+rm "$CHT_DIR/values.schema.json"
+
+# copy custom values file
 cp $CFG_DIR/values.yaml "$CHT_DIR/ci/deployment-values.yaml"

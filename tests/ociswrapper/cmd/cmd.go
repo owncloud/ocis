@@ -35,6 +35,7 @@ func serveCmd() *cobra.Command {
 			ocisConfig.Set("retry", cmd.Flag("retry").Value.String())
 			ocisConfig.Set("adminUsername", cmd.Flag("admin-username").Value.String())
 			ocisConfig.Set("adminPassword", cmd.Flag("admin-password").Value.String())
+			ocisConfig.Set("namespace", cmd.Flag("namespace").Value.String())
 
 			if cmd.Flag("skip-ocis-run").Value.String() == "false" {
 				go ocis.Start(nil)
@@ -52,6 +53,7 @@ func serveCmd() *cobra.Command {
 	serveCmd.Flags().StringP("admin-username", "", "", "admin username for oCIS server")
 	serveCmd.Flags().StringP("admin-password", "", "", "admin password for oCIS server")
 	serveCmd.Flags().Bool("skip-ocis-run", false, "Skip running oCIS server")
+	serveCmd.Flags().StringP("namespace", "n", ocisConfig.Get("namespace"), "K8s namespace of oCIS server")
 
 	return serveCmd
 }
