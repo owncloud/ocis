@@ -6,5 +6,5 @@ location. This helps catch misconfigured Docker volume mounts where
 data silently falls back to an ephemeral container path instead of
 the intended persistent mount.
 
-https://github.com/owncloud/ocis/pull/XXXX
+https://github.com/owncloud/ocis/pull/12117
 https://github.com/owncloud/ocis/issues/12044
