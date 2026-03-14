@@ -6,5 +6,5 @@ fail to resolve on non-Linux platforms like FreeBSD. Setting
 `absoluteRuntime: false` makes Babel resolve the runtime relative to
 the source file, which works across all platforms.
 
-https://github.com/owncloud/ocis/pull/XXXX
+https://github.com/owncloud/ocis/pull/12114
 https://github.com/owncloud/ocis/issues/12065
