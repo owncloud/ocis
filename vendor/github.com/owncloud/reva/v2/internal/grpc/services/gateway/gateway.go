@@ -24,13 +24,13 @@ import (
 	"strings"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
+	"github.com/mitchellh/mapstructure"
 	"github.com/owncloud/reva/v2/pkg/errtypes"
 	"github.com/owncloud/reva/v2/pkg/rgrpc"
 	"github.com/owncloud/reva/v2/pkg/sharedconf"
 	"github.com/owncloud/reva/v2/pkg/storage/cache"
 	"github.com/owncloud/reva/v2/pkg/token"
 	"github.com/owncloud/reva/v2/pkg/token/manager/registry"
-	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 	"google.golang.org/grpc"
@@ -70,13 +70,12 @@ type config struct {
 	TokenManager                  string `mapstructure:"token_manager"`
 	// ShareFolder is the location where to create shares in the recipient's storage provider.
 	// FIXME get rid of ShareFolder, there are findByPath calls in the ocmshareporvider.go and usershareprovider.go
-	ShareFolder                    string                            `mapstructure:"share_folder"`
-	DataTransfersFolder            string                            `mapstructure:"data_transfers_folder"`
-	TokenManagers                  map[string]map[string]interface{} `mapstructure:"token_managers"`
-	AllowedUserAgents              map[string][]string               `mapstructure:"allowed_user_agents"` // map[path][]user-agent
-	CreatePersonalSpaceCacheConfig cache.Config                      `mapstructure:"create_personal_space_cache_config"`
-	ProviderCacheConfig            cache.Config                      `mapstructure:"provider_cache_config"`
-	UseCommonSpaceRootShareLogic   bool                              `mapstructure:"use_common_space_root_share_logic"`
+	ShareFolder                  string                            `mapstructure:"share_folder"`
+	DataTransfersFolder          string                            `mapstructure:"data_transfers_folder"`
+	TokenManagers                map[string]map[string]interface{} `mapstructure:"token_managers"`
+	AllowedUserAgents            map[string][]string               `mapstructure:"allowed_user_agents"` // map[path][]user-agent
+	ProviderCacheConfig          cache.Config                      `mapstructure:"provider_cache_config"`
+	UseCommonSpaceRootShareLogic bool                              `mapstructure:"use_common_space_root_share_logic"`
 }
 
 // sets defaults
@@ -130,22 +129,13 @@ func (c *config) init() {
 	if c.ProviderCacheConfig.Database == "" {
 		c.ProviderCacheConfig.Database = "reva"
 	}
-
-	if c.CreatePersonalSpaceCacheConfig.Store == "" {
-		c.CreatePersonalSpaceCacheConfig.Store = "memory"
-	}
-
-	if c.CreatePersonalSpaceCacheConfig.Database == "" {
-		c.CreatePersonalSpaceCacheConfig.Database = "reva"
-	}
 }
 
 type svc struct {
-	c                        *config
-	dataGatewayURL           url.URL
-	tokenmgr                 token.Manager
-	providerCache            cache.ProviderCache
-	createPersonalSpaceCache cache.CreatePersonalSpaceCache
+	c              *config
+	dataGatewayURL url.URL
+	tokenmgr       token.Manager
+	providerCache  cache.ProviderCache
 }
 
 // New creates a new gateway svc that acts as a proxy for any grpc operation.
@@ -171,11 +161,10 @@ func New(m map[string]interface{}, _ *grpc.Server, _ *zerolog.Logger) (rgrpc.Ser
 	}
 
 	s := &svc{
-		c:                        c,
-		dataGatewayURL:           *u,
-		tokenmgr:                 tokenManager,
-		providerCache:            cache.GetProviderCache(c.ProviderCacheConfig),
-		createPersonalSpaceCache: cache.GetCreatePersonalSpaceCache(c.CreatePersonalSpaceCacheConfig),
+		c:              c,
+		dataGatewayURL: *u,
+		tokenmgr:       tokenManager,
+		providerCache:  cache.GetProviderCache(c.ProviderCacheConfig),
 	}
 
 	return s, nil
@@ -187,7 +176,6 @@ func (s *svc) Register(ss *grpc.Server) {
 
 func (s *svc) Close() error {
 	s.providerCache.Close()
-	s.createPersonalSpaceCache.Close()
 	return nil
 }
 
