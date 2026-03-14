@@ -10,3 +10,4 @@ file's unique identifier for Graph API or WebDAV operations can now use
 https://github.com/owncloud/ocis/pull/12060
 https://github.com/owncloud/ocis/issues/12056
 https://github.com/owncloud/reva/pull/547
+https://github.com/owncloud/reva/pull/560
