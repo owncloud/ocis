@@ -7,5 +7,5 @@ triggering a redundant CreateHome call. This change uses singleflight
 to collapse concurrent calls for the same user and caches successful
 results in-process so subsequent requests skip the gRPC call entirely.
 
-https://github.com/owncloud/ocis/pull/XXXX
+https://github.com/owncloud/ocis/pull/12115
 https://github.com/owncloud/ocis/issues/12068
