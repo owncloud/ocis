@@ -34,6 +34,10 @@ func ResetPassword(cfg *config.Config) *cli.Command {
 				Usage:   "User name",
 				Value:   "admin",
 			},
+			&cli.BoolFlag{
+				Name:  "service-user",
+				Usage: "Target a service user (ou=sysusers) instead of a regular user (ou=users)",
+			},
 		},
 		Before: func(_ *cli.Context) error {
 			return configlog.ReturnFatal(parser.ParseConfig(cfg))
@@ -43,12 +47,12 @@ func ResetPassword(cfg *config.Config) *cli.Command {
 			ctx, cancel := context.WithCancel(c.Context)
 
 			defer cancel()
-			return resetPassword(ctx, logger, cfg, c.String("user-name"))
+			return resetPassword(ctx, logger, cfg, c.String("user-name"), c.Bool("service-user"))
 		},
 	}
 }
 
-func resetPassword(_ context.Context, logger log.Logger, cfg *config.Config, userName string) error {
+func resetPassword(_ context.Context, logger log.Logger, cfg *config.Config, userName string, serviceUser bool) error {
 	servercfg := server.Config{
 		Logger:      log.LogrusWrap(logger.Logger),
 		LDAPHandler: "boltdb",
@@ -57,7 +61,11 @@ func resetPassword(_ context.Context, logger log.Logger, cfg *config.Config, use
 		BoltDBFile: cfg.IDM.DatabasePath,
 	}
 
-	userDN := fmt.Sprintf("uid=%s,ou=users,%s", userName, servercfg.LDAPBaseDN)
+	ou := "users"
+	if serviceUser {
+		ou = "sysusers"
+	}
+	userDN := fmt.Sprintf("uid=%s,ou=%s,%s", userName, ou, servercfg.LDAPBaseDN)
 	fmt.Printf("Resetting password for user '%s'.\n", userDN)
 	if _, err := os.Stat(servercfg.BoltDBFile); errors.Is(err, os.ErrNotExist) {
 		fmt.Fprintf(os.Stderr, "IDM database does not exist.\n")
