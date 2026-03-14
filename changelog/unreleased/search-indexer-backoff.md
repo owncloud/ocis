@@ -1,4 +1,4 @@
-Enhancement: Add backoff and abort logic to search indexer when Tika is unavailable
+Enhancement: Add backoff and abort when extraction fails during indexing
 
 The bulk indexer (IndexSpace) now detects repeated extraction failures
 and pauses with exponential backoff instead of continuing to send
