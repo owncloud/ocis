@@ -87,6 +87,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add space ID to incoming shares: [#12024](https://github.com/owncloud/ocis/pull/12024)
 * Enhancement - Add spaceid to REPORT: [#12028](https://github.com/owncloud/ocis/pull/12028)
 * Enhancement - Bump Reva version: [#12051](https://github.com/owncloud/ocis/pull/12051)
+* Enhancement - Add ResourceID field to UploadReady event: [#12060](https://github.com/owncloud/ocis/pull/12060)
 * Enhancement - Support numeric range queries in KQL: [#12094](https://github.com/owncloud/ocis/pull/12094)
 * Enhancement - Add blobstore CLI commands to storage-users service: [#12102](https://github.com/owncloud/ocis/pull/12102)
 * Enhancement - Optimize search index after bulk reindexing: [#12104](https://github.com/owncloud/ocis/pull/12104)
@@ -288,6 +289,20 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/12051
    https://github.com/owncloud/ocis/pull/12087
+
+* Enhancement - Add ResourceID field to UploadReady event: [#12060](https://github.com/owncloud/ocis/pull/12060)
+
+   The UploadReady NATS event now includes a `ResourceID` field containing the
+   file's actual resource identifier (with the correct node OpaqueId). Previously,
+   only `FileRef` was available, whose `ResourceId.OpaqueId` is set to the space
+   root ID (required for CS3 gateway path resolution). Consumers that need the
+   file's unique identifier for Graph API or WebDAV operations can now use
+   `ResourceID.OpaqueId` directly.
+
+   https://github.com/owncloud/ocis/issues/12056
+   https://github.com/owncloud/ocis/pull/12060
+   https://github.com/owncloud/reva/pull/547
+   https://github.com/owncloud/reva/pull/560
 
 * Enhancement - Support numeric range queries in KQL: [#12094](https://github.com/owncloud/ocis/pull/12094)
 
