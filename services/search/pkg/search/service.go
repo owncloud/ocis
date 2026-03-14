@@ -423,10 +423,11 @@ func (s *Service) searchIndex(ctx context.Context, req *searchsvc.SearchRequest,
 
 // Backoff constants for IndexSpace extraction failure handling.
 const (
-	_backoffThreshold   = 5                // consecutive failures before pausing
-	_backoffDuration    = 30 * time.Second // pause duration between retry cycles
-	_maxBackoffCycles   = 5                // max pause+retry cycles before aborting
-	_healthCheckTimeout = 5 * time.Second  // timeout for extractor health check
+	_backoffThreshold    = 5                 // consecutive failures before first pause
+	_initialBackoff      = 30 * time.Second  // first pause duration
+	_maxBackoff          = 120 * time.Second // cap on pause duration
+	_maxTotalFailureTime = 30 * time.Minute  // abort after this much continuous failure
+	_healthCheckTimeout  = 5 * time.Second   // timeout for extractor health check
 )
 
 // IndexSpace (re)indexes all resources of a given space.
@@ -453,6 +454,8 @@ func (s *Service) IndexSpace(spaceID *provider.StorageSpaceId) error {
 		totalExtracted      int
 		totalSkipped        int
 		backoffCycles       int
+		currentBackoff      = _initialBackoff
+		failureSince        time.Time // zero value = not in failure state
 	)
 
 	w := walker.NewWalker(s.gatewaySelector)
@@ -497,26 +500,30 @@ func (s *Service) IndexSpace(spaceID *provider.StorageSpaceId) error {
 
 		// Check if we need to backoff due to repeated extraction failures.
 		if consecutiveFailures >= _backoffThreshold {
-			backoffCycles++
-			if backoffCycles > _maxBackoffCycles {
+			if failureSince.IsZero() {
+				failureSince = time.Now()
+			}
+
+			if time.Since(failureSince) > _maxTotalFailureTime {
 				s.logger.Error().
 					Int("consecutiveFailures", consecutiveFailures).
 					Int("totalFailures", totalFailures).
 					Int("totalExtracted", totalExtracted).
 					Int("totalSkipped", totalSkipped).
-					Int("backoffCycles", backoffCycles).
-					Msg("aborting index walk: extraction service unavailable after repeated backoff attempts")
-				return fmt.Errorf("extraction service unavailable after %d consecutive failures and %d backoff cycles", consecutiveFailures, backoffCycles)
+					Dur("failingFor", time.Since(failureSince)).
+					Msg("aborting index walk: extraction service unavailable for over 30 minutes")
+				return fmt.Errorf("extraction service unavailable for %v", time.Since(failureSince).Truncate(time.Second))
 			}
 
+			backoffCycles++
 			s.logger.Warn().
 				Int("consecutiveFailures", consecutiveFailures).
 				Int("backoffCycle", backoffCycles).
-				Int("maxCycles", _maxBackoffCycles).
-				Dur("backoffDuration", _backoffDuration).
+				Dur("backoffDuration", currentBackoff).
+				Time("failingSince", failureSince).
 				Msg("pausing index walk due to repeated extraction failures")
 
-			time.Sleep(_backoffDuration)
+			time.Sleep(currentBackoff)
 
 			if hc, ok := s.extractor.(content.HealthChecker); ok {
 				ctx, cancel := context.WithTimeout(context.Background(), _healthCheckTimeout)
@@ -524,12 +531,17 @@ func (s *Service) IndexSpace(spaceID *provider.StorageSpaceId) error {
 				cancel()
 				if !healthy {
 					s.logger.Warn().Msg("extraction service still unreachable after backoff pause")
+					currentBackoff = min(currentBackoff*2, _maxBackoff)
 					return nil // continue walking, will trigger next backoff cycle
 				}
-				s.logger.Info().Msg("extraction service reachable again after backoff — resuming")
+				s.logger.Info().
+					Dur("downtime", time.Since(failureSince)).
+					Msg("extraction service reachable again after backoff — resuming")
 			}
 
 			consecutiveFailures = 0
+			currentBackoff = _initialBackoff
+			failureSince = time.Time{}
 		}
 
 		if err := s.upsertItem(ref); err != nil {
@@ -544,6 +556,8 @@ func (s *Service) IndexSpace(spaceID *provider.StorageSpaceId) error {
 		}
 
 		consecutiveFailures = 0
+		currentBackoff = _initialBackoff
+		failureSince = time.Time{}
 		backoffCycles = 0
 		totalExtracted++
 		return nil
