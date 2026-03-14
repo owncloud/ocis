@@ -6,5 +6,5 @@ flag to target service accounts (libregraph, idp, reva) which live in
 to `ou=users`, making it impossible to reset service user passwords
 via the CLI.
 
-https://github.com/owncloud/ocis/pull/XXXX
+https://github.com/owncloud/ocis/pull/12118
 https://github.com/owncloud/ocis/issues/12106
