@@ -13,6 +13,7 @@ endif
 create-cluster:
 	@echo $(LOGS_DIR)
 	@mkdir -p $(LOGS_DIR)
+	@chmod 777 $(LOGS_DIR)
 	k3d cluster create local-ocis \
 		-p '80:80@loadbalancer' -p '443:443@loadbalancer' -p '9100-9399:30100-30399@loadbalancer' \
 		--k3s-arg '--tls-san=k3d@server:*' --k3s-arg '--disable=metrics-server@server:*' \

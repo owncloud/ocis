@@ -17,7 +17,7 @@
 1. Install the following tools:
    - [k3d](https://k3d.io/stable/)
    - [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/)
-   - [helm](https://helm.sh/docs/intro/install/)
+   - [helm@v3](https://github.com/helm/helm/releases/tag/v3.20.1) (⚠️ MUST use v3)
 
 2. Add these hosts to your `/etc/hosts` file:
 
@@ -29,7 +29,7 @@
 
 ### Deploy oCIS in K8s
 
-1. Change directory to `<ocis-rooot>/tests/config/k8s`:
+1. Change directory to `<ocis-root>/tests/config/k8s`:
 
    ```bash
    cd <ocis-root>/tests/config/k8s
@@ -179,7 +179,7 @@ make test-acceptance-api
 To delete the cluster and all the setup resources, run the following command:
 
 ```bash
-make -C <ocis-rooot>tests/config/k8s cleanup
+make -C <ocis-root>/tests/config/k8s cleanup
 ```
 
 This will delete the K8s cluster, ocis-charts, and ocis logs directory.
