@@ -1,5 +1,15 @@
 # Running API Tests in Kubernetes Cluster
 
+## Table of Contents
+
+- [K8s Setup](#k8s-setup)
+- [Running API Tests](#running-api-tests)
+  - [Run General API tests](#run-general-api-tests)
+  - [Run Notification API tests](#run-notification-api-tests)
+  - [Run Antivirus API tests](#run-antivirus-api-tests)
+  - [Run Full Text Search API tests](#run-full-text-search-api-tests)
+- [Cleanup the Setup](#cleanup-the-setup)
+
 ## K8s Setup
 
 ### Pre-requisites
@@ -163,3 +173,13 @@ make test-acceptance-api
    BEHAT_FEATURE=<test-suites-path>/apiSearchContent/contentSearch.feature \
    make test-acceptance-api
    ```
+
+## Cleanup the Setup
+
+To delete the cluster and all the setup resources, run the following command:
+
+```bash
+make -C <ocis-rooot>tests/config/k8s cleanup
+```
+
+This will delete the K8s cluster, ocis-charts, and ocis logs directory.
