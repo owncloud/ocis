@@ -52,7 +52,12 @@ func K8sUpdateEnv(service string, envMap []string) (bool, string) {
 	cmd := exec.Command("kubectl", cmdArgs...)
 	_, err = cmd.Output()
 	if err != nil {
-		log.Println(fmt.Sprintf("[%s] Failed to set env. %s", service, err.Error()))
+		errMsg := ""
+		if exitErr, ok := err.(*exec.ExitError); ok {
+			// stderr from the command
+			errMsg = string(exitErr.Stderr)
+		}
+		log.Println(fmt.Sprintf("[%s] Failed to set env. %s", service, errMsg))
 		return false, "error"
 	}
 	_, err = waitForService(service)
@@ -68,7 +73,12 @@ func getInitialEnvs(service string) ([]string, error) {
 	cmd := exec.Command("kubectl", cmdArgs...)
 	output, err := cmd.Output()
 	if err != nil {
-		log.Println(fmt.Sprintf("[%s] Failed to get initial envs. %s", service, err.Error()))
+		errMsg := ""
+		if exitErr, ok := err.(*exec.ExitError); ok {
+			// stderr from the command
+			errMsg = string(exitErr.Stderr)
+		}
+		log.Println(fmt.Sprintf("[%s] Failed to get initial envs. %s", service, errMsg))
 		return nil, err
 	}
 	output = bytes.TrimSpace(output)
@@ -131,7 +141,12 @@ func waitForService(service string) (bool, error) {
 			cmd := exec.Command("sh", "-c", cmdString)
 			stdout, err := cmd.Output()
 			if err != nil {
-				log.Println(fmt.Sprintf("[%s] Failed to run health check. %s", service, err.Error()))
+				errMsg := ""
+				if exitErr, ok := err.(*exec.ExitError); ok {
+					// stderr from the command
+					errMsg = string(exitErr.Stderr)
+				}
+				log.Println(fmt.Sprintf("[%s] Failed to run health check. %s", service, errMsg))
 				continue
 			}
 			output := strings.ReplaceAll(strings.TrimSpace(string(stdout)), "\n", ": ")
@@ -149,7 +164,13 @@ func getPodName(service string) (string, error) {
 	cmd := exec.Command("sh", "-c", cmdString)
 	stdout, err := cmd.Output()
 	if err != nil {
-		log.Println(fmt.Sprintf("[%s] Failed to get pod name. %s", service, err.Error()))
+		errMsg := ""
+		if exitErr, ok := err.(*exec.ExitError); ok {
+			// stderr from the command
+			errMsg = string(exitErr.Stderr)
+		}
+		log.Println(fmt.Sprintf("[%s] Failed to get pod name. %s", service, errMsg))
+
 		return "", err
 	}
 	return strings.TrimSpace(string(stdout)), nil
@@ -160,7 +181,12 @@ func waitPodReady(service string, timeout int) (string, error) {
 	cmd := exec.Command("sh", "-c", cmdString)
 	stdout, err := cmd.Output()
 	if err != nil {
-		log.Println(fmt.Sprintf("[%s] Pod not in ready state. %s", service, err.Error()))
+		errMsg := ""
+		if exitErr, ok := err.(*exec.ExitError); ok {
+			// stderr from the command
+			errMsg = string(exitErr.Stderr)
+		}
+		log.Println(fmt.Sprintf("[%s] Pod not in ready state. %s", service, errMsg))
 		return "", err
 	}
 	return strings.ReplaceAll(strings.TrimSpace(string(stdout)), "\n", ". "), nil
@@ -171,7 +197,12 @@ func waitPodDelete(podName string, timeout int) (string, error) {
 	cmd := exec.Command("sh", "-c", cmdString)
 	stdout, err := cmd.Output()
 	if err != nil {
-		log.Println(fmt.Sprintf("Pod '%s' not deleted. %s", podName, err.Error()))
+		errMsg := ""
+		if exitErr, ok := err.(*exec.ExitError); ok {
+			// stderr from the command
+			errMsg = string(exitErr.Stderr)
+		}
+		log.Println(fmt.Sprintf("Pod '%s' not deleted. %s", podName, errMsg))
 		return "", err
 	}
 	return strings.ReplaceAll(strings.TrimSpace(string(stdout)), "\n", ". "), nil
@@ -191,7 +222,12 @@ func K8sRollback() (bool, string) {
 		cmd := exec.Command("kubectl", cmdArgs...)
 		_, err = cmd.Output()
 		if err != nil {
-			log.Println(fmt.Sprintf("[%s] Failed to rollback service. Pod: %s. %s", service, podName, err.Error()))
+			errMsg := ""
+			if exitErr, ok := err.(*exec.ExitError); ok {
+				// stderr from the command
+				errMsg = string(exitErr.Stderr)
+			}
+			log.Println(fmt.Sprintf("[%s] Failed to rollback service. Pod: %s. %s", service, podName, errMsg))
 			return false, "failed to rollback"
 		}
 		_, err = waitForService(service)
