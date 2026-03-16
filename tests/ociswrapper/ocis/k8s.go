@@ -50,7 +50,7 @@ func K8sUpdateEnv(service string, envMap []string) (bool, string) {
 
 	cmdArgs := append([]string{"set", "env", "-n", config.Get("namespace"), "deployment", service}, envMap...)
 	cmd := exec.Command("kubectl", cmdArgs...)
-	_, err = cmd.Output()
+	out, err := cmd.Output()
 	if err != nil {
 		errMsg := ""
 		if exitErr, ok := err.(*exec.ExitError); ok {
@@ -60,6 +60,7 @@ func K8sUpdateEnv(service string, envMap []string) (bool, string) {
 		log.Println(fmt.Sprintf("[%s] Failed to set env. %s", service, errMsg))
 		return false, "error"
 	}
+	log.Println(fmt.Sprintf("Pass: %s", string(out)))
 	_, err = waitForService(service)
 	if err != nil {
 		return false, err.Error()
@@ -107,16 +108,11 @@ func waitForService(service string) (bool, error) {
 	tick := time.NewTicker(2 * time.Second)
 	defer tick.Stop()
 
-	_, err := waitPodDelete(K8sOcisServices.CurrentPod)
+	_, err := waitPodDelete(K8sOcisServices.CurrentPod, timeoutInSecond)
 	if err != nil {
 		return false, fmt.Errorf("[%s] Pod not deleted", service)
 	}
 	log.Println(fmt.Sprintf("[%s] Old pod '%s' deleted.", service, K8sOcisServices.CurrentPod))
-
-	port := config.GetServiceDebugPort(service)
-	healthUrl := fmt.Sprintf("http://%s:%d/healthz", service, port)
-	readyUrl := fmt.Sprintf("http://%s:%d/readyz", service, port)
-
 	log.Println(fmt.Sprintf("[%s] Waiting for service to be ready...", service))
 
 	for {
@@ -134,22 +130,11 @@ func waitForService(service string) (bool, error) {
 				continue
 			}
 
-			curlCmd := fmt.Sprintf("curl %s -s -o /dev/null -w '%%{http_code}';", healthUrl)
-			curlCmd += fmt.Sprintf("curl %s -s -o /dev/null -w '%%{http_code}';echo", readyUrl)
-			cmdString := fmt.Sprintf("kubectl run healthcheck -n %s --rm -it --image=curlimages/curl --restart=Never -- sh -c", config.Get("namespace"))
-			cmdString += fmt.Sprintf(" \"%s\"", curlCmd)
-			cmd := exec.Command("sh", "-c", cmdString)
-			stdout, err := cmd.Output()
+			output, err := serviceHealthCheck(service)
 			if err != nil {
-				errMsg := ""
-				if exitErr, ok := err.(*exec.ExitError); ok {
-					// stderr from the command
-					errMsg = strings.TrimSpace(string(exitErr.Stderr))
-				}
-				log.Println(fmt.Sprintf("[%s] Failed to run health check. %s", service, errMsg))
 				continue
 			}
-			output := strings.ReplaceAll(strings.TrimSpace(string(stdout)), "\n", ": ")
+
 			if strings.Contains(output, "200200") {
 				log.Println(fmt.Sprintf("[%s] Service is healthy and ready. Pod: %s", service, podName))
 				return true, nil
@@ -157,6 +142,31 @@ func waitForService(service string) (bool, error) {
 			log.Println(fmt.Sprintf("[%s] Waiting for service. Pod: %s. Output: %s", service, podName, output))
 		}
 	}
+}
+
+func serviceHealthCheck(service string) (string, error) {
+	port := config.GetServiceDebugPort(service)
+	healthUrl := fmt.Sprintf("http://%s:%d/healthz", service, port)
+	readyUrl := fmt.Sprintf("http://%s:%d/readyz", service, port)
+
+	curlCmd := fmt.Sprintf("curl %s -s -o /dev/null -w '%%{http_code}';", healthUrl)
+	curlCmd += fmt.Sprintf("curl %s -s -o /dev/null -w '%%{http_code}';echo", readyUrl)
+	cmdString := fmt.Sprintf("kubectl run healthcheck -n %s --rm -it --image=curlimages/curl --restart=Never -- sh -c", config.Get("namespace"))
+	cmdString += fmt.Sprintf(" \"%s\"", curlCmd)
+
+	cmd := exec.Command("sh", "-c", cmdString)
+	stdout, err := cmd.Output()
+	if err != nil {
+		errMsg := ""
+		if exitErr, ok := err.(*exec.ExitError); ok {
+			// stderr from the command
+			errMsg = strings.TrimSpace(string(exitErr.Stderr))
+		}
+		log.Println(fmt.Sprintf("[%s] Failed to run health check. %s", service, errMsg))
+		return "", err
+	}
+	output := strings.ReplaceAll(strings.TrimSpace(string(stdout)), "\n", ": ")
+	return output, nil
 }
 
 func getPodName(service string) (string, error) {
@@ -192,8 +202,7 @@ func waitPodReady(service string, timeout int) (string, error) {
 	return strings.ReplaceAll(strings.TrimSpace(string(stdout)), "\n", ". "), nil
 }
 
-func waitPodDelete(podName string) (string, error) {
-	timeout := 120 // 2 minutes
+func waitPodDelete(podName string, timeout int) (string, error) {
 	cmdString := fmt.Sprintf("kubectl -n %s wait pod %s --for=delete --timeout=%ds", config.Get("namespace"), podName, timeout)
 	cmd := exec.Command("sh", "-c", cmdString)
 	stdout, err := cmd.Output()
