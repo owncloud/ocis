@@ -46,7 +46,7 @@ variables:
   type: ""
   default_value: ""
   description: ""
-  do_ignore: false
+  do_ignore: true
 - rawname: _serverMaxConnectionAgeEnv
   path: ocis-pkg/service/grpc/keepalive.go:19
   foundincode: true
