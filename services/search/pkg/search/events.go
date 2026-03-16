@@ -87,6 +87,9 @@ func HandleEvents(s Searcher, bus events.Consumer, logger log.Logger, cfg *confi
 					case events.FileUploaded:
 						indexSpaceDebouncer.Debounce(getSpaceID(ev.Ref))
 					case events.UploadReady:
+						if ev.Failed {
+							return
+						}
 						indexSpaceDebouncer.Debounce(getSpaceID(ev.FileRef))
 					case events.SpaceRenamed:
 						indexSpaceDebouncer.Debounce(ev.ID)
