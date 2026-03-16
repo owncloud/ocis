@@ -48,7 +48,7 @@ type Config struct {
 	ClaimSpaceManagement      ClaimSpaceManagement `yaml:"claim_space_management"`
 	MultiFactorAuthentication MFAConfig            `yaml:"mfa"`
 	MultiInstance             MultiInstanceConfig  `yaml:"multi_instance"`
-	CreateHomeCacheDisabled   bool                 `yaml:"create_home_cache_disabled" env:"PROXY_CREATEHOME_CACHE_DISABLED" desc:"Disable the in-memory cache that skips redundant CreateHome calls for users whose home has already been created. Set this to true as a fallback if the cache causes unexpected behavior." introductionVersion:"8.0.0"`
+	CreateHomeCacheDisabled   bool                 `yaml:"create_home_cache_disabled" env:"PROXY_CREATEHOME_CACHE_DISABLED" desc:"Disable the process-lifetime cache that tracks which users already have a personal space. When enabled, the proxy skips redundant CreateHome gRPC calls for returning users. Set this to true as a fallback if the cache causes unexpected behavior." introductionVersion:"Daledda"`
 
 	Context context.Context `json:"-" yaml:"-"`
 }
