@@ -48,22 +48,16 @@ func K8sUpdateEnv(service string, envMap []string) (bool, string) {
 	}
 	K8sOcisServices.Envs[service] = initialEnvs
 
-	cmdArgs := append([]string{"set", "env", "-n", config.Get("namespace"), "deployment", service}, envMap...)
-	cmd := exec.Command("kubectl", cmdArgs...)
-	out, err := cmd.Output()
-	if err != nil {
-		errMsg := ""
-		if exitErr, ok := err.(*exec.ExitError); ok {
-			// stderr from the command
-			errMsg = strings.TrimSpace(string(exitErr.Stderr))
-		}
-		log.Println(fmt.Sprintf("[%s] Failed to set env. %s", service, errMsg))
-		return false, "error"
-	}
-	log.Println(fmt.Sprintf("Pass: %s", string(out)))
-	_, err = waitForService(service)
+	envSet, err := setServiceEnv(service, envMap, "Failed to set env")
 	if err != nil {
 		return false, err.Error()
+	}
+
+	if envSet {
+		_, err = waitForService(service)
+		if err != nil {
+			return false, err.Error()
+		}
 	}
 	return true, "ok"
 }
@@ -142,6 +136,27 @@ func waitForService(service string) (bool, error) {
 			log.Println(fmt.Sprintf("[%s] Waiting for service. Pod: %s. Output: %s", service, podName, output))
 		}
 	}
+}
+
+func setServiceEnv(service string, envMap []string, errMsgPrefix string) (bool, error) {
+	cmdArgs := append([]string{"set", "env", "-n", config.Get("namespace"), "deployment", service}, envMap...)
+	cmd := exec.Command("kubectl", cmdArgs...)
+	output, err := cmd.Output()
+	if err != nil {
+		errMsg := ""
+		if exitErr, ok := err.(*exec.ExitError); ok {
+			// stderr from the command
+			errMsg = strings.TrimSpace(string(exitErr.Stderr))
+		}
+		log.Println(fmt.Sprintf("[%s] %s. %s", service, errMsgPrefix, errMsg))
+		return false, fmt.Errorf("error setting env")
+	}
+	outString := strings.TrimSpace(string(output))
+	if strings.Contains(outString, "env updated") {
+		return true, nil
+	}
+	log.Println(fmt.Sprintf("[%s] No change in env. Current pod will be used.", service))
+	return false, nil
 }
 
 func serviceHealthCheck(service string) (string, error) {
@@ -227,22 +242,16 @@ func K8sRollback() (bool, string) {
 		K8sOcisServices.CurrentPod = podName
 		log.Println(fmt.Sprintf("[%s] Rolling back service. Current Pod: %s", service, podName))
 
-		cmdArgs := []string{"set", "env", "-n", config.Get("namespace"), "deployment", service}
-		cmdArgs = append(cmdArgs, envs...)
-		cmd := exec.Command("kubectl", cmdArgs...)
-		_, err = cmd.Output()
+		envSet, err := setServiceEnv(service, envs, fmt.Sprintf("Failed to rollback service. Pod: %s", podName))
 		if err != nil {
-			errMsg := ""
-			if exitErr, ok := err.(*exec.ExitError); ok {
-				// stderr from the command
-				errMsg = strings.TrimSpace(string(exitErr.Stderr))
-			}
-			log.Println(fmt.Sprintf("[%s] Failed to rollback service. Pod: %s. %s", service, podName, errMsg))
 			return false, "failed to rollback"
 		}
-		_, err = waitForService(service)
-		if err != nil {
-			return false, "error waiting for service"
+
+		if envSet {
+			_, err = waitForService(service)
+			if err != nil {
+				return false, "error waiting for service"
+			}
 		}
 		delete(K8sOcisServices.Envs, service)
 	}
