@@ -8,4 +8,4 @@ because the parent directory's mtime had not changed. The indexer now
 always descends into directories, relying on the O(1) per-file DocID
 lookup to skip already-indexed files efficiently.
 
-https://github.com/owncloud/ocis/pull/XXXX
+https://github.com/owncloud/ocis/pull/12119
