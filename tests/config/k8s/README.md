@@ -88,7 +88,7 @@ Build and run the ociswrapper to be able to run the API tests tagged with `@env-
 
    ```bash
    tests/ociswrapper/bin/ociswrapper serve --url https://ocis-server \
-   --admin-username admin --admin-password admin --skip-ocis-run
+   --admin-username admin --admin-password admin --skip-ocis-run -n ocis-server
    ```
 
 ### Run General API tests
