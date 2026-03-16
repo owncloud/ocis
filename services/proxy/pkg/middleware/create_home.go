@@ -24,7 +24,7 @@ func CreateHome(optionSetters ...Option) func(next http.Handler) http.Handler {
 	logger := options.Logger
 
 	cache := ttlcache.New(
-		ttlcache.WithTTL[string, string](30*time.Second),
+		ttlcache.WithTTL[string, string](60*time.Second),
 		ttlcache.WithDisableTouchOnHit[string, string](),
 	)
 	go cache.Start()
@@ -35,6 +35,7 @@ func CreateHome(optionSetters ...Option) func(next http.Handler) http.Handler {
 			logger:              logger,
 			revaGatewaySelector: options.RevaGatewaySelector,
 			roleQuotas:          options.RoleQuotas,
+			createVaultHome:     options.CreateVaultHome,
 			cache:               cache,
 		}
 	}
@@ -45,6 +46,7 @@ type createHome struct {
 	logger              log.Logger
 	revaGatewaySelector pool.Selectable[gateway.GatewayAPIClient]
 	roleQuotas          map[string]uint64
+	createVaultHome     bool
 	cache               *ttlcache.Cache[string, string]
 }
 
@@ -57,7 +59,6 @@ func (m createHome) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	token := req.Header.Get("x-access-token")
 
 	// we need to pass the token to authenticate the CreateHome request.
-	//ctx := tokenpkg.ContextSetToken(r.Context(), token)
 	ctx := metadata.AppendToOutgoingContext(req.Context(), revactx.TokenHeader, token)
 
 	createHomeReq := &provider.CreateHomeRequest{}
@@ -95,24 +96,25 @@ func (m createHome) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 			}
 		}
 
-		vaultKey := "vault" + u.GetId().GetOpaqueId()
-		if !m.cache.Has(vaultKey) {
-			// TODO: Should be optional
-			// Create vault personal space
-			// Inject storage_id into opaque for vault personal space
-			createHomeReq.Opaque = utils.AppendPlainToOpaque(createHomeReq.Opaque, "storage_id", utils.VaultStorageProviderID)
-			cpsRes, err := client.CreateHome(ctx, createHomeReq)
-			switch {
-			case err != nil:
-				m.logger.Err(err).Msg("error calling CreateHome for vault personal")
-			case cpsRes.GetStatus().GetCode() == rpc.Code_CODE_OK:
-				m.logger.Debug().Interface("userID", u.GetId().GetOpaqueId()).Msg("vault personal space created")
-				m.cache.Set(vaultKey, "ok", 0)
-			case cpsRes.GetStatus().GetCode() == rpc.Code_CODE_ALREADY_EXISTS:
-				m.logger.Info().Interface("userID", u.GetId().GetOpaqueId()).Interface("status", cpsRes.GetStatus()).Msg("vault personal space already exists")
-				m.cache.Set(vaultKey, "ok", 0)
-			default:
-				m.logger.Error().Interface("userID", u.GetId().GetOpaqueId()).Interface("status", cpsRes.GetStatus()).Msg("vault personal space creation failed")
+		if m.createVaultHome {
+			vaultKey := "vault" + u.GetId().GetOpaqueId()
+			if !m.cache.Has(vaultKey) {
+				// Create vault personal space
+				// Inject storage_id into opaque for vault personal space
+				createHomeReq.Opaque = utils.AppendPlainToOpaque(createHomeReq.Opaque, "storage_id", utils.VaultStorageProviderID)
+				cpsRes, err := client.CreateHome(ctx, createHomeReq)
+				switch {
+				case err != nil:
+					m.logger.Err(err).Msg("error calling CreateHome for vault personal")
+				case cpsRes.GetStatus().GetCode() == rpc.Code_CODE_OK:
+					m.logger.Debug().Interface("userID", u.GetId().GetOpaqueId()).Msg("vault personal space created")
+					m.cache.Set(vaultKey, "ok", 0)
+				case cpsRes.GetStatus().GetCode() == rpc.Code_CODE_ALREADY_EXISTS:
+					m.logger.Info().Interface("userID", u.GetId().GetOpaqueId()).Interface("status", cpsRes.GetStatus()).Msg("vault personal space already exists")
+					m.cache.Set(vaultKey, "ok", 0)
+				default:
+					m.logger.Error().Interface("userID", u.GetId().GetOpaqueId()).Interface("status", cpsRes.GetStatus()).Msg("vault personal space creation failed")
+				}
 			}
 		}
 	}
