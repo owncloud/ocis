@@ -16,8 +16,8 @@ Feature: enforce password on public link
   Scenario Outline: create a public link with edit permission without a password when enforce-password is enabled
     Given the following configs have been set:
       | service  | config                                                 | value |
-      | frontend  | SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD                | false |
-      | frontend  | SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD      | true  |
+      | sharing  | SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD                | false |
+      | sharing  | SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD      | true  |
     And user "Alice" has been created with default attributes
     And user "Alice" has uploaded file with content "test file" to "/testfile.txt"
     And using OCS API version "<ocs-api-version>"
@@ -36,8 +36,10 @@ Feature: enforce password on public link
   Scenario Outline: create a public link with viewer permission without a password when enforce-password is enabled
     Given the following configs have been set:
       | service  | config                                                 | value |
-      | frontend  | SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD                | false |
-      | frontend  | SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD      | true  |
+      | sharing  | SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD                | false |
+      | sharing  | SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD      | true  |
+      | frontend | OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD           | false |
+      | frontend | OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD | true  |
     And user "Alice" has been created with default attributes
     And user "Alice" has uploaded file with content "test file" to "/testfile.txt"
     And using OCS API version "<ocs-api-version>"
@@ -55,8 +57,10 @@ Feature: enforce password on public link
   Scenario Outline: updates a public link to edit permission with a password
     Given the following configs have been set:
       | service  | config                                                 | value |
-      | frontend  | SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD                | false |
-      | frontend  | SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD      | true  |
+      | sharing  | SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD                | false |
+      | sharing  | SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD      | true  |
+      | frontend | OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD           | false |
+      | frontend | OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD | true  |
     And user "Alice" has been created with default attributes
     And user "Alice" has uploaded file with content "test file" to "/testfile.txt"
     And using OCS API version "<ocs-api-version>"
@@ -83,12 +87,17 @@ Feature: enforce password on public link
   Scenario Outline: create a public link with a password in accordance with the password policy
     Given the following configs have been set:
       | service  | config                                            | value |
-      | frontend  | SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD | true  |
-      | frontend  | SHARING_PASSWORD_POLICY_MIN_CHARACTERS            | 13    |
-      | frontend  | SHARING_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS  | 3     |
-      | frontend  | SHARING_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS  | 2     |
-      | frontend  | SHARING_PASSWORD_POLICY_MIN_DIGITS                | 2     |
-      | frontend  | SHARING_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS    | 2     |
+      | sharing  | SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD | true  |
+      | sharing  | SHARING_PASSWORD_POLICY_MIN_CHARACTERS            | 13    |
+      | sharing  | SHARING_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS  | 3     |
+      | sharing  | SHARING_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS  | 2     |
+      | sharing  | SHARING_PASSWORD_POLICY_MIN_DIGITS                | 2     |
+      | sharing  | SHARING_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS    | 2     |
+      | frontend | FRONTEND_PASSWORD_POLICY_MIN_CHARACTERS           | 13    |
+      | frontend | FRONTEND_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS | 3     |
+      | frontend | FRONTEND_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS | 2     |
+      | frontend | FRONTEND_PASSWORD_POLICY_MIN_DIGITS               | 2     |
+      | frontend | FRONTEND_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS   | 2     |
     And user "Alice" has been created with default attributes
     And user "Alice" has uploaded file with content "test file" to "/testfile.txt"
     And using OCS API version "<ocs-api-version>"
@@ -111,11 +120,16 @@ Feature: enforce password on public link
   Scenario Outline: try to create a public link with a password that does not comply with the password policy
     Given the following configs have been set:
       | service  | config                                            | value |
-      | frontend  | SHARING_PASSWORD_POLICY_MIN_CHARACTERS            | 13    |
-      | frontend  | SHARING_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS  | 3     |
-      | frontend  | SHARING_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS  | 2     |
-      | frontend  | SHARING_PASSWORD_POLICY_MIN_DIGITS                | 2     |
-      | frontend  | SHARING_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS    | 2     |
+      | sharing  | SHARING_PASSWORD_POLICY_MIN_CHARACTERS            | 13    |
+      | sharing  | SHARING_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS  | 3     |
+      | sharing  | SHARING_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS  | 2     |
+      | sharing  | SHARING_PASSWORD_POLICY_MIN_DIGITS                | 2     |
+      | sharing  | SHARING_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS    | 2     |
+      | frontend | FRONTEND_PASSWORD_POLICY_MIN_CHARACTERS           | 13    |
+      | frontend | FRONTEND_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS | 3     |
+      | frontend | FRONTEND_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS | 2     |
+      | frontend | FRONTEND_PASSWORD_POLICY_MIN_DIGITS               | 2     |
+      | frontend | FRONTEND_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS   | 2     |
     And user "Alice" has been created with default attributes
     And user "Alice" has uploaded file with content "test file" to "/testfile.txt"
     And using OCS API version "<ocs-api-version>"
@@ -142,13 +156,18 @@ Feature: enforce password on public link
   Scenario Outline: update a public link with a password in accordance with the password policy
     Given the following configs have been set:
       | service  | config                                            | value |
-      | frontend  | SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD           | false |
-      | frontend  | SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD | true  |
-      | frontend  | SHARING_PASSWORD_POLICY_MIN_CHARACTERS            | 13    |
-      | frontend  | SHARING_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS  | 3     |
-      | frontend  | SHARING_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS  | 2     |
-      | frontend  | SHARING_PASSWORD_POLICY_MIN_DIGITS                | 1     |
-      | frontend  | SHARING_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS    | 2     |
+      | sharing  | SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD           | false |
+      | sharing  | SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD | true  |
+      | sharing  | SHARING_PASSWORD_POLICY_MIN_CHARACTERS            | 13    |
+      | sharing  | SHARING_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS  | 3     |
+      | sharing  | SHARING_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS  | 2     |
+      | sharing  | SHARING_PASSWORD_POLICY_MIN_DIGITS                | 1     |
+      | sharing  | SHARING_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS    | 2     |
+      | frontend | FRONTEND_PASSWORD_POLICY_MIN_CHARACTERS           | 13    |
+      | frontend | FRONTEND_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS | 3     |
+      | frontend | FRONTEND_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS | 2     |
+      | frontend | FRONTEND_PASSWORD_POLICY_MIN_DIGITS               | 1     |
+      | frontend | FRONTEND_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS   | 2     |
     And user "Alice" has been created with default attributes
     And user "Alice" has uploaded file with content "test file" to "/testfile.txt"
     And using OCS API version "<ocs-api-version>"
@@ -175,13 +194,18 @@ Feature: enforce password on public link
   Scenario Outline: try to update a public link with a password that does not comply with the password policy
     Given the following configs have been set:
       | service  | config                                            | value |
-      | frontend  | SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD           | false |
-      | frontend  | SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD | true  |
-      | frontend  | SHARING_PASSWORD_POLICY_MIN_CHARACTERS            | 13    |
-      | frontend  | SHARING_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS  | 3     |
-      | frontend  | SHARING_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS  | 2     |
-      | frontend  | SHARING_PASSWORD_POLICY_MIN_DIGITS                | 1     |
-      | frontend  | SHARING_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS    | 2     |
+      | sharing  | SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD           | false |
+      | sharing  | SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD | true  |
+      | sharing  | SHARING_PASSWORD_POLICY_MIN_CHARACTERS            | 13    |
+      | sharing  | SHARING_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS  | 3     |
+      | sharing  | SHARING_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS  | 2     |
+      | sharing  | SHARING_PASSWORD_POLICY_MIN_DIGITS                | 1     |
+      | sharing  | SHARING_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS    | 2     |
+      | frontend | FRONTEND_PASSWORD_POLICY_MIN_CHARACTERS           | 13    |
+      | frontend | FRONTEND_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS | 3     |
+      | frontend | FRONTEND_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS | 2     |
+      | frontend | FRONTEND_PASSWORD_POLICY_MIN_DIGITS               | 1     |
+      | frontend | FRONTEND_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS   | 2     |
     And user "Alice" has been created with default attributes
     And user "Alice" has uploaded file with content "test file" to "/testfile.txt"
     And using OCS API version "<ocs-api-version>"
@@ -212,7 +236,8 @@ Feature: enforce password on public link
   Scenario Outline: create a public link with a password in accordance with the password policy (valid cases)
     Given the following configs have been set:
       | service  | config            | value          |
-      | frontend  | <sharing-config>  | <config-value> |
+      | sharing  | <sharing-config>  | <config-value> |
+      | frontend | <frontend-config> | <config-value> |
     And using OCS API version "2"
     And user "Alice" has been created with default attributes
     And user "Alice" has uploaded file with content "test file" to "/testfile.txt"
@@ -227,15 +252,15 @@ Feature: enforce password on public link
     And the public should not be able to download file "/testfile.txt" from inside the last public link shared folder using the public WebDAV API with password "wrong pass"
     But the public should be able to download file "/testfile.txt" from inside the last public link shared folder using the public WebDAV API with password "<password>"
     Examples:
-      | frontend-config                                   | config-value | password                             |
-      | SHARING_PASSWORD_POLICY_MIN_CHARACTERS           | 4            | Ps-1                                 |
-      | SHARING_PASSWORD_POLICY_MIN_CHARACTERS           | 14           | Ps1:with space                       |
-      | SHARING_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS | 4            | PS1:test                             |
-      | SHARING_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS | 3            | PS1:TeƒsT                            |
-      | SHARING_PASSWORD_POLICY_MIN_DIGITS               | 2            | PS1:test2                            |
-      | SHARING_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS   | 2            | PS1:test pass                        |
-      | SHARING_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS   | 33           | pS1! #$%&'()*+,-./:;<=>?@[\]^_`{  }~ |
-      | SHARING_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS   | 5            | 1sameCharacterShouldWork!!!!!        |
+      | sharing-config                                   | frontend-config                                   | config-value | password                             |
+      | SHARING_PASSWORD_POLICY_MIN_CHARACTERS           | FRONTEND_PASSWORD_POLICY_MIN_CHARACTERS           | 4            | Ps-1                                 |
+      | SHARING_PASSWORD_POLICY_MIN_CHARACTERS           | FRONTEND_PASSWORD_POLICY_MIN_CHARACTERS           | 14           | Ps1:with space                       |
+      | SHARING_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS | FRONTEND_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS | 4            | PS1:test                             |
+      | SHARING_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS | FRONTEND_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS | 3            | PS1:TeƒsT                            |
+      | SHARING_PASSWORD_POLICY_MIN_DIGITS               | FRONTEND_PASSWORD_POLICY_MIN_DIGITS               | 2            | PS1:test2                            |
+      | SHARING_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS   | FRONTEND_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS   | 2            | PS1:test pass                        |
+      | SHARING_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS   | FRONTEND_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS   | 33           | pS1! #$%&'()*+,-./:;<=>?@[\]^_`{  }~ |
+      | SHARING_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS   | FRONTEND_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS   | 5            | 1sameCharacterShouldWork!!!!!        |
 
 
   Scenario Outline: try to create a public link with a password that does not comply with the password policy (invalid cases)
@@ -258,7 +283,8 @@ Feature: enforce password on public link
 
 
   Scenario Outline: update a public link with a password that is listed in the Banned-Password-List
-    Given the config "SHARING_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/drone/banned-password-list.txt" for "frontend" service
+    Given the config "SHARING_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/drone/banned-password-list.txt" for "sharing" service
+    And the config "FRONTEND_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/drone/banned-password-list.txt" for "frontend" service
     And using OCS API version "2"
     And user "Alice" has been created with default attributes
     And user "Alice" has uploaded file with content "test file" to "/testfile.txt"
@@ -281,7 +307,8 @@ Feature: enforce password on public link
 
 
   Scenario Outline: create  a public link with a password that is listed in the Banned-Password-List
-    Given the config "SHARING_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/drone/banned-password-list.txt" for "frontend" service
+    Given the config "SHARING_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/drone/banned-password-list.txt" for "sharing" service
+    And the config "FRONTEND_PASSWORD_POLICY_BANNED_PASSWORDS_LIST" has been set to path "config/drone/banned-password-list.txt" for "frontend" service
     And using OCS API version "2"
     And user "Alice" has been created with default attributes
     And user "Alice" has uploaded file with content "test file" to "/testfile.txt"
