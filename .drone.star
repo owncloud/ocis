@@ -340,6 +340,7 @@ config = {
         "3": {
             "suites": [
                 "coreApiSharees",
+                "coreApiSharePublicLink1",
                 "coreApiSharePublicLink2",
             ],
             "skip": False,
@@ -350,7 +351,6 @@ config = {
             "suites": [
                 "coreApiShareOperationsToShares1",
                 "coreApiShareOperationsToShares2",
-                "coreApiSharePublicLink1",
                 "coreApiShareCreateSpecialToShares1",
                 "coreApiShareCreateSpecialToShares2",
                 "coreApiShareUpdateToShares",
@@ -1228,6 +1228,7 @@ def localApiTestPipeline(ctx):
                                          run_with_remote_php,
                                          k8s = run_on_k8s,
                                      ) +
+                                     debug() +
                                      apiTestFailureLog() +
                                      (generateCoverageFromAPITest(ctx, name) if not run_on_k8s else []),
                             "services": services,
@@ -1303,12 +1304,13 @@ def localApiTests(name, suites, storage = "ocis", extra_environment = {}, with_r
         "STORAGE_DRIVER": storage,
         "BEHAT_SUITES": ",".join(suites),
         "BEHAT_FILTER_TAGS": "~@skip&&~@skipOnGraph&&~@skipOnOcis-%s-Storage" % ("OC" if storage == "owncloud" else "OCIS"),
-        "EXPECTED_FAILURES_FILE": expected_failures_file,
+        #"EXPECTED_FAILURES_FILE": expected_failures_file,
         "UPLOAD_DELETE_WAIT_TIME": "1" if storage == "owncloud" else 0,
         "OCIS_WRAPPER_URL": wrapper_url,
         "WITH_REMOTE_PHP": with_remote_php,
         "COLLABORATION_SERVICE_URL": "http://ocis-server:9304" if k8s else "http://wopi-fakeoffice:9300",
         "K8S": k8s,
+        "STOP_ON_FAILURE": True,
     }
 
     for item in extra_environment:
@@ -1577,11 +1579,12 @@ def coreApiTestPipeline(ctx):
                                              "BEHAT_FILTER_TAGS": filter_tags,
                                              "BEHAT_SUITES": ",".join(params["suites"]),
                                              "ACCEPTANCE_TEST_TYPE": "core-api",
-                                             "EXPECTED_FAILURES_FILE": expected_failures_file,
+                                             #  "EXPECTED_FAILURES_FILE": expected_failures_file,
                                              "UPLOAD_DELETE_WAIT_TIME": "1" if storage == "owncloud" else 0,
                                              "OCIS_WRAPPER_URL": wrapper_url,
                                              "WITH_REMOTE_PHP": run_with_remote_php,
                                              "K8S": run_on_k8s,
+                                             "STOP_ON_FAILURE": True,
                                          },
                                          "commands": [
                                              # merge the expected failures
@@ -1590,6 +1593,7 @@ def coreApiTestPipeline(ctx):
                                          ],
                                      },
                                  ] +
+                                 debug() +
                                  apiTestFailureLog() +
                                  ([] if run_on_k8s else generateCoverageFromAPITest(ctx, name)),
                         "services": services,
@@ -4155,4 +4159,23 @@ def exposeExternalServersK8s(servers = [], name = OCIS_SERVER_NAME):
             "export KUBECONFIG=kubeconfig-$${DRONE_BUILD_NUMBER}-%s.yaml" % name,
             "until test -f $${KUBECONFIG}; do sleep 1s; done",
         ] + commands,
+    }]
+
+def debug(name = OCIS_SERVER_NAME):
+    return [{
+        "name": "debug-logs",
+        "image": K3D_IMAGE,
+        "commands": [
+            "export KUBECONFIG=kubeconfig-$${DRONE_BUILD_NUMBER}-%s.yaml" % name,
+            "until test -f $${KUBECONFIG}; do sleep 1s; done",
+            "kubectl get pods -n ocis",
+            "kubectl get svc -n ocis",
+            "kubectl get deployment -n ocis",
+        ],
+        "when": {
+            "status": [
+                "failure",
+                "success",
+            ],
+        },
     }]
