@@ -149,7 +149,6 @@ Feature: create a public link share
   Scenario Outline: getting the share information of password less public-links hides credential placeholders
     Given the following configs have been set:
       | service  | config                                       | value |
-      | frontend | OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD | false |
       | sharing  | SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD      | false |
     And using OCS API version "<ocs-api-version>"
     And user "Alice" has uploaded file with content "Random data" to "/randomfile.txt"
@@ -320,7 +319,6 @@ Feature: create a public link share
   Scenario Outline: get the mtime of a file shared by public link
     Given the following configs have been set:
       | service  | config                                       | value |
-      | frontend | OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD | false |
       | sharing  | SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD      | false |
     And using <dav-path-version> DAV path
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "file.txt" with mtime "Thu, 08 Aug 2019 04:18:13 GMT"
@@ -338,7 +336,6 @@ Feature: create a public link share
   Scenario Outline: get the mtime of a file inside a folder shared by public link
     Given the following configs have been set:
       | service  | config                                       | value |
-      | frontend | OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD | false |
       | sharing  | SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD      | false |
     And using <dav-path-version> DAV path
     And user "Alice" has created folder "testFolder"
@@ -357,9 +354,7 @@ Feature: create a public link share
   Scenario: get the mtime of a file inside a folder shared by public link using new webDAV version
     Given the following configs have been set:
       | service  | config                                       | value |
-      | frontend | OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD | false |
       | sharing  | SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD      | false |
-    # Given the config "OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false" for "frontend" service
     And user "Alice" has created folder "testFolder"
     And using SharingNG
     And user "Alice" has created the following resource link share:
@@ -376,7 +371,6 @@ Feature: create a public link share
   Scenario: overwriting a file changes its mtime (public webDAV API)
     Given the following configs have been set:
       | service  | config                                       | value |
-      | frontend | OCIS_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD | false |
       | sharing  | SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD      | false |
     And user "Alice" has created folder "testFolder"
     When user "Alice" uploads file with content "uploaded content for file name ending with a dot" to "testFolder/file.txt" using the WebDAV API
