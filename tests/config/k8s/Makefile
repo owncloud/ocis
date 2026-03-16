@@ -31,7 +31,7 @@ deploy-ocis:
 	@sed -i 's|externalDomain:.*|externalDomain: $(DOMAIN)|' $(CHART_REPO)/charts/ocis/ci/deployment-values.yaml
 	helm install -n $(DOMAIN) --create-namespace \
 		--values $(CHART_REPO)/charts/ocis/ci/deployment-values.yaml \
-		--atomic --timeout 5m0s ocis $(CHART_REPO)/charts/ocis/
+		--wait --timeout 5m0s ocis $(CHART_REPO)/charts/ocis/
 
 cleanup:
 	k3d cluster delete local-ocis
