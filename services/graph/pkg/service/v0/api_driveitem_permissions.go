@@ -556,49 +556,13 @@ func (s DriveItemPermissionsService) DeletePermission(ctx context.Context, itemI
 	ctx, span := s.tp.Tracer("graph").Start(ctx, "DeletePermission")
 	defer span.End()
 
-	var permissionType permissionType
-	var sharedResourceID *storageprovider.ResourceId
-	var err error
-
-	if IsSpaceRoot(itemID) {
-		// Space roots carry two kinds of permissions: space permissions
-		// (member/group grants with "u:" or "g:" prefixed IDs) and public
-		// links.  Recognise space permissions by their ID format to avoid
-		// a superfluous gateway call to GetPublicShare.
-		if _, parseErr := spacePermissionIdToCS3Grantee(permissionID); parseErr == nil {
-			permissionType = Space
-			sharedResourceID = itemID
-		} else {
-			sharedResourceID, err = s.getLinkPermissionResourceID(ctx, permissionID)
-			if err == nil {
-				permissionType = Public
-			}
-		}
-	} else {
-		// Non-space-root: try public link, then user share, then OCM share.
-		sharedResourceID, err = s.getLinkPermissionResourceID(ctx, permissionID)
-		if err == nil {
-			permissionType = Public
-		} else {
-			sharedResourceID, err = s.getUserPermissionResourceID(ctx, permissionID)
-			if err == nil {
-				permissionType = User
-			}
-		}
-
-		if sharedResourceID == nil && s.config.IncludeOCMSharees {
-			sharedResourceID, err = s.getOCMPermissionResourceID(ctx, permissionID)
-			if err == nil {
-				permissionType = OCM
-			}
-		}
-	}
+	permType, sharedResourceID, err := s.resolveDeletePermission(ctx, itemID, permissionID)
 
 	switch {
 	case err != nil:
 		s.logger.Error().Err(err).Msg("permission error")
 		return err
-	case permissionType == Unknown:
+	case permType == Unknown:
 		s.logger.Error().Err(err).Msg("permission not found")
 		return errorcode.New(errorcode.ItemNotFound, "permission not found")
 	case sharedResourceID == nil:
@@ -614,7 +578,7 @@ func (s DriveItemPermissionsService) DeletePermission(ctx context.Context, itemI
 		return err
 	}
 
-	switch permissionType {
+	switch permType {
 	case User:
 		return s.removeUserShare(ctx, permissionID)
 	case Public:
@@ -629,6 +593,54 @@ func (s DriveItemPermissionsService) DeletePermission(ctx context.Context, itemI
 		s.logger.Error().Err(err).Str("resourceId", itemID.GetStorageId()).Str("permissionID", permissionID).Msg(err.Error())
 		return err
 	}
+}
+
+// resolveDeletePermission determines the type and shared resource ID for a permission
+// that is about to be deleted.
+func (s DriveItemPermissionsService) resolveDeletePermission(ctx context.Context, itemID *storageprovider.ResourceId, permissionID string) (permissionType, *storageprovider.ResourceId, error) {
+	if IsSpaceRoot(itemID) {
+		return s.resolveSpaceRootPermission(ctx, itemID, permissionID)
+	}
+	return s.resolveItemPermission(ctx, permissionID)
+}
+
+// resolveSpaceRootPermission resolves permissions on a space root. Space roots
+// carry space permissions (member/group grants with "u:"/"g:" prefixed IDs) and
+// public links. Space permissions are recognised by their ID format to avoid a
+// superfluous gateway call to GetPublicShare.
+func (s DriveItemPermissionsService) resolveSpaceRootPermission(ctx context.Context, itemID *storageprovider.ResourceId, permissionID string) (permissionType, *storageprovider.ResourceId, error) {
+	if _, parseErr := spacePermissionIdToCS3Grantee(permissionID); parseErr == nil {
+		return Space, itemID, nil
+	}
+
+	sharedResourceID, err := s.getLinkPermissionResourceID(ctx, permissionID)
+	if err == nil {
+		return Public, sharedResourceID, nil
+	}
+	return Unknown, nil, err
+}
+
+// resolveItemPermission resolves permissions on a non-space-root item by trying
+// public link, user share, then OCM share lookups in order.
+func (s DriveItemPermissionsService) resolveItemPermission(ctx context.Context, permissionID string) (permissionType, *storageprovider.ResourceId, error) {
+	sharedResourceID, err := s.getLinkPermissionResourceID(ctx, permissionID)
+	if err == nil {
+		return Public, sharedResourceID, nil
+	}
+
+	sharedResourceID, err = s.getUserPermissionResourceID(ctx, permissionID)
+	if err == nil {
+		return User, sharedResourceID, nil
+	}
+
+	if s.config.IncludeOCMSharees {
+		sharedResourceID, err = s.getOCMPermissionResourceID(ctx, permissionID)
+		if err == nil {
+			return OCM, sharedResourceID, nil
+		}
+	}
+
+	return Unknown, nil, err
 }
 
 // DeleteSpaceRootPermission deletes a permission on the root item of a project space
