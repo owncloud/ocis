@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"context"
 	"net/http"
 	"strconv"
 	"sync"
@@ -70,11 +71,9 @@ func (m *createHome) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	userID := u.Id.OpaqueId
 
 	// Fast path: home already known to exist for this user.
-	if !m.cacheDisabled {
-		if _, ok := m.knownHomes.Load(userID); ok {
-			m.next.ServeHTTP(w, req)
-			return
-		}
+	if m.homeKnown(userID) {
+		m.next.ServeHTTP(w, req)
+		return
 	}
 
 	createHomeReq := &provider.CreateHomeRequest{}
@@ -90,25 +89,7 @@ func (m *createHome) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 	// Deduplicate concurrent CreateHome calls for the same user.
 	_, err, _ = m.flight.Do(userID, func() (interface{}, error) {
-		client, err := m.revaGatewaySelector.Next()
-		if err != nil {
-			m.logger.Err(err).Msg("error selecting next gateway client")
-			return nil, err
-		}
-
-		createHomeRes, err := client.CreateHome(ctx, createHomeReq)
-		if err != nil {
-			m.logger.Err(err).Msg("error calling CreateHome")
-			return nil, err
-		}
-
-		if createHomeRes.Status.Code != rpc.Code_CODE_OK && createHomeRes.Status.Code != rpc.Code_CODE_ALREADY_EXISTS {
-			err := status.NewErrorFromCode(createHomeRes.Status.Code, "gateway")
-			m.logger.Err(err).Msg("error when calling CreateHome")
-			return nil, err
-		}
-
-		return true, nil
+		return m.createHome(ctx, createHomeReq)
 	})
 
 	// Only cache on success — if CreateHome failed, retry on next request.
@@ -117,6 +98,36 @@ func (m *createHome) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	}
 
 	m.next.ServeHTTP(w, req)
+}
+
+func (m *createHome) homeKnown(userID string) bool {
+	if m.cacheDisabled {
+		return false
+	}
+	_, ok := m.knownHomes.Load(userID)
+	return ok
+}
+
+func (m *createHome) createHome(ctx context.Context, req *provider.CreateHomeRequest) (interface{}, error) {
+	client, err := m.revaGatewaySelector.Next()
+	if err != nil {
+		m.logger.Err(err).Msg("error selecting next gateway client")
+		return nil, err
+	}
+
+	createHomeRes, err := client.CreateHome(ctx, req)
+	if err != nil {
+		m.logger.Err(err).Msg("error calling CreateHome")
+		return nil, err
+	}
+
+	if createHomeRes.Status.Code != rpc.Code_CODE_OK && createHomeRes.Status.Code != rpc.Code_CODE_ALREADY_EXISTS {
+		err := status.NewErrorFromCode(createHomeRes.Status.Code, "gateway")
+		m.logger.Err(err).Msg("error when calling CreateHome")
+		return nil, err
+	}
+
+	return true, nil
 }
 
 func (m *createHome) shouldServe(req *http.Request) bool {
