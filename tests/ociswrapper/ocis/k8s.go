@@ -50,14 +50,12 @@ func K8sUpdateEnv(service string, envMap []string) (bool, string) {
 
 	envSet, err := setServiceEnv(service, envMap, "Failed to set env")
 	if err != nil {
-		return false, err.Error()
+		return false, "error setting env"
 	}
 
-	if envSet {
-		_, err = waitForService(service)
-		if err != nil {
-			return false, err.Error()
-		}
+	_, err = waitForService(service, envSet)
+	if err != nil {
+		return false, "error waiting for service"
 	}
 	return true, "ok"
 }
@@ -96,17 +94,19 @@ func getInitialEnvs(service string) ([]string, error) {
 	return flatEnvVars, nil
 }
 
-func waitForService(service string) (bool, error) {
+func waitForService(service string, waitDeletion bool) (bool, error) {
 	timeoutInSecond := 30
 	timeout := time.After(time.Duration(timeoutInSecond) * time.Second)
 	tick := time.NewTicker(2 * time.Second)
 	defer tick.Stop()
 
-	_, err := waitPodDelete(K8sOcisServices.CurrentPod, timeoutInSecond)
-	if err != nil {
-		return false, fmt.Errorf("[%s] Pod not deleted", service)
+	if waitDeletion {
+		_, err := waitPodDelete(K8sOcisServices.CurrentPod, timeoutInSecond)
+		if err != nil {
+			return false, fmt.Errorf("[%s] Pod not deleted", service)
+		}
+		log.Println(fmt.Sprintf("[%s] Old pod '%s' deleted.", service, K8sOcisServices.CurrentPod))
 	}
-	log.Println(fmt.Sprintf("[%s] Old pod '%s' deleted.", service, K8sOcisServices.CurrentPod))
 	log.Println(fmt.Sprintf("[%s] Waiting for service to be ready...", service))
 
 	for {
@@ -247,11 +247,9 @@ func K8sRollback() (bool, string) {
 			return false, "failed to rollback"
 		}
 
-		if envSet {
-			_, err = waitForService(service)
-			if err != nil {
-				return false, "error waiting for service"
-			}
+		_, err = waitForService(service, envSet)
+		if err != nil {
+			return false, "error waiting for service"
 		}
 		delete(K8sOcisServices.Envs, service)
 	}
