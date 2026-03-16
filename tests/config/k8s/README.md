@@ -1,6 +1,8 @@
-# Running API Tests
+# Running API Tests in Kubernetes Cluster
 
-## Pre-requisites
+## K8s Setup
+
+### Pre-requisites
 
 1. Install the following tools:
    - [k3d](https://k3d.io/stable/)
@@ -10,10 +12,12 @@
 2. Add these hosts to your `/etc/hosts` file:
 
    ```bash
-   echo "127.0.0.1       ocis-server federation-ocis-server clamav collabora onlyoffice fakeoffice tika email" | sudo tee -a /etc/hosts
+   echo "127.0.0.1       ocis-server federation-ocis-server \
+   clamav collabora onlyoffice fakeoffice tika \
+   email" | sudo tee -a /etc/hosts
    ```
 
-## Setup
+### Deploy oCIS in K8s
 
 1. Change directory to `<ocis-rooot>/tests/config/k8s`:
 
@@ -33,7 +37,8 @@
    make prepare-charts
    ```
 
-   ⚠️ NOTE: To run the test suites that require extra services, use the following appropriate environment variables:
+   ⚠️ NOTE: To run the test suites that require extra services,
+   use the following appropriate environment variables:
    - `ENABLE_ANTIVIRUS=true`: Antivirus test suites
    - `ENABLE_EMAIL=true`: Notification test suites
    - `ENABLE_TIKA=true`: Content search test suites
@@ -55,7 +60,7 @@
 
 ## Running API Tests
 
-### Pre-requisites
+Build and run the ociswrapper to be able to run the API tests tagged with `@env-config`.
 
 1. Change directory to the ocis root:
 
@@ -72,7 +77,8 @@
 3. Run the ociswrapper:
 
    ```bash
-   tests/ociswrapper/bin/ociswrapper serve --url https://ocis-server --admin-username admin --admin-password admin --skip-ocis-run
+   tests/ociswrapper/bin/ociswrapper serve --url https://ocis-server \
+   --admin-username admin --admin-password admin --skip-ocis-run
    ```
 
 ### Run General API tests
@@ -80,25 +86,24 @@
 ```bash
 TEST_SERVER_URL=https://ocis-server \
 K8S=true \
-BEHAT_FEATURE=tests/acceptance/features/apiDownloads/download.feature \
+BEHAT_FEATURE=<test-suites-path>/apiDownloads/download.feature \
 make test-acceptance-api
 ```
 
 ### Run Notification API tests
 
-1. Start the email server
+1. Check if setup [step 3](#deploy-ocis-in-k8s) is done correctly. (`ENABLE_EMAIL=true`)
+2. Start the email server
 
    ```bash
    docker run -d -p 1025:1025 -p 8025:8025 axllent/mailpit:v1.22.3
    ```
 
-2. Expose the email server to the cluster
+3. Expose the email server to the cluster
 
    ```bash
    bash tests/config/k8s/expose-external-svc.sh email:1025
    ```
-
-3. Check if setup [step 3](#3-prepare-charts) is done correctly. (`ENABLE_EMAIL=true`)
 
 4. Run the tests
 
@@ -107,56 +112,54 @@ make test-acceptance-api
    EMAIL_HOST=email \
    EMAIL_PORT=8025 \
    K8S=true \
-   BEHAT_FEATURE=tests/acceptance/features/apiNotification/notification.feature \
+   BEHAT_FEATURE=<test-suites-path>/apiNotification/notification.feature \
    make test-acceptance-api
    ```
 
 ### Run Antivirus API tests
 
-1. Start the antivirus server
+1. Check if setup [step 3](#deploy-ocis-in-k8s) is done correctly. (`ENABLE_ANTIVIRUS=true`)
+2. Start the antivirus server
 
    ```bash
    docker run -d -p 3310:3310 owncloudci/clamavd
    ```
 
-2. Expose the antivirus server to the cluster
+3. Expose the antivirus server to the cluster
 
    ```bash
    bash tests/config/k8s/expose-external-svc.sh clamav:3310
    ```
 
-3. Check if setup [step 3](#3-prepare-charts) is done correctly. (`ENABLE_ANTIVIRUS=true`)
-
 4. Run the tests
 
    ```bash
    TEST_SERVER_URL=https://ocis-server \
    K8S=true \
-   BEHAT_FEATURE=tests/acceptance/features/apiAntivirus/antivirus.feature \
+   BEHAT_FEATURE=<test-suites-path>/apiAntivirus/antivirus.feature \
    make test-acceptance-api
    ```
 
 ### Run Full Text Search API tests
 
-1. Start the tika server
+1. Check if setup [step 3](#deploy-ocis-in-k8s) is done correctly. (`ENABLE_TIKA=true`)
+2. Start the tika server
 
    ```bash
    docker run -d -p 9998:9998 apache/tika:3.2.2.0-full
    ```
 
-2. Expose the tika server to the cluster
+3. Expose the tika server to the cluster
 
    ```bash
    bash tests/config/k8s/expose-external-svc.sh tika:9998
    ```
-
-3. Check if setup [step 3](#3-prepare-charts) is done correctly. (`ENABLE_TIKA=true`)
 
 4. Run the tests
 
    ```bash
    TEST_SERVER_URL=https://ocis-server \
    K8S=true \
-   BEHAT_FEATURE=tests/acceptance/features/apiSearchContent/contentSearch.feature \
+   BEHAT_FEATURE=<test-suites-path>/apiSearchContent/contentSearch.feature \
    make test-acceptance-api
    ```
