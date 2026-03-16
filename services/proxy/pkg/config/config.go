@@ -48,6 +48,7 @@ type Config struct {
 	ClaimSpaceManagement      ClaimSpaceManagement `yaml:"claim_space_management"`
 	MultiFactorAuthentication MFAConfig            `yaml:"mfa"`
 	MultiInstance             MultiInstanceConfig  `yaml:"multi_instance"`
+	CreateHomeCacheDisabled   bool                 `yaml:"create_home_cache_disabled" env:"PROXY_CREATEHOME_CACHE_DISABLED" desc:"Disable the in-memory cache that skips redundant CreateHome calls for users whose home has already been created. Set this to true as a fallback if the cache causes unexpected behavior." introductionVersion:"8.0.0"`
 
 	Context context.Context `json:"-" yaml:"-"`
 }

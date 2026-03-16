@@ -26,12 +26,15 @@ func CreateHome(optionSetters ...Option) func(next http.Handler) http.Handler {
 	options := newOptions(optionSetters...)
 	logger := options.Logger
 
+	cacheDisabled := options.CreateHomeCacheDisabled
+
 	return func(next http.Handler) http.Handler {
 		return &createHome{
 			next:                next,
 			logger:              logger,
 			revaGatewaySelector: options.RevaGatewaySelector,
 			roleQuotas:          options.RoleQuotas,
+			cacheDisabled:       cacheDisabled,
 		}
 	}
 }
@@ -41,6 +44,7 @@ type createHome struct {
 	logger              log.Logger
 	revaGatewaySelector pool.Selectable[gateway.GatewayAPIClient]
 	roleQuotas          map[string]uint64
+	cacheDisabled       bool
 
 	knownHomes sync.Map           // map[userID]struct{} — users whose home is confirmed
 	flight     singleflight.Group // collapses concurrent CreateHome calls per user
@@ -66,9 +70,11 @@ func (m *createHome) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	userID := u.Id.OpaqueId
 
 	// Fast path: home already known to exist for this user.
-	if _, ok := m.knownHomes.Load(userID); ok {
-		m.next.ServeHTTP(w, req)
-		return
+	if !m.cacheDisabled {
+		if _, ok := m.knownHomes.Load(userID); ok {
+			m.next.ServeHTTP(w, req)
+			return
+		}
 	}
 
 	createHomeReq := &provider.CreateHomeRequest{}
@@ -106,7 +112,7 @@ func (m *createHome) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	})
 
 	// Only cache on success — if CreateHome failed, retry on next request.
-	if err == nil {
+	if err == nil && !m.cacheDisabled {
 		m.knownHomes.Store(userID, struct{}{})
 	}
 
