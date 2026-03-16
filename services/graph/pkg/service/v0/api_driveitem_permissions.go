@@ -557,31 +557,40 @@ func (s DriveItemPermissionsService) DeletePermission(ctx context.Context, itemI
 	defer span.End()
 
 	var permissionType permissionType
+	var sharedResourceID *storageprovider.ResourceId
+	var err error
 
-	sharedResourceID, err := s.getLinkPermissionResourceID(ctx, permissionID)
-	switch {
-	// Check if the ID is referring to a public share
-	case err == nil:
-		permissionType = Public
-	// If the item id is referring to a space root and this is not a public share
-	// we have to deal with space permissions
-	case IsSpaceRoot(itemID):
-		permissionType = Space
-		sharedResourceID = itemID
-		err = nil
-	// If this is neither a public share nor a space permission, check if this is a
-	// user share
-	default:
-		sharedResourceID, err = s.getUserPermissionResourceID(ctx, permissionID)
-		if err == nil {
-			permissionType = User
+	if IsSpaceRoot(itemID) {
+		// Space roots carry two kinds of permissions: space permissions
+		// (member/group grants with "u:" or "g:" prefixed IDs) and public
+		// links.  Recognise space permissions by their ID format to avoid
+		// a superfluous gateway call to GetPublicShare.
+		if _, parseErr := spacePermissionIdToCS3Grantee(permissionID); parseErr == nil {
+			permissionType = Space
+			sharedResourceID = itemID
+		} else {
+			sharedResourceID, err = s.getLinkPermissionResourceID(ctx, permissionID)
+			if err == nil {
+				permissionType = Public
+			}
 		}
-	}
-
-	if sharedResourceID == nil && s.config.IncludeOCMSharees {
-		sharedResourceID, err = s.getOCMPermissionResourceID(ctx, permissionID)
+	} else {
+		// Non-space-root: try public link, then user share, then OCM share.
+		sharedResourceID, err = s.getLinkPermissionResourceID(ctx, permissionID)
 		if err == nil {
-			permissionType = OCM
+			permissionType = Public
+		} else {
+			sharedResourceID, err = s.getUserPermissionResourceID(ctx, permissionID)
+			if err == nil {
+				permissionType = User
+			}
+		}
+
+		if sharedResourceID == nil && s.config.IncludeOCMSharees {
+			sharedResourceID, err = s.getOCMPermissionResourceID(ctx, permissionID)
+			if err == nil {
+				permissionType = OCM
+			}
 		}
 	}
 
