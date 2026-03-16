@@ -81,6 +81,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix case-sensitive photo metadata search: [#12078](https://github.com/owncloud/ocis/pull/12078)
 * Bugfix - Prevent incomplete Tika extractions from permanently blocking re-index: [#12095](https://github.com/owncloud/ocis/pull/12095)
 * Bugfix - Use O(1) document lookup instead of full search during reindexing: [#12096](https://github.com/owncloud/ocis/pull/12096)
+* Bugfix - Fix IDP build on FreeBSD by disabling absolute Babel runtime: [#12114](https://github.com/owncloud/ocis/pull/12114)
 * Enhancement - Add web extensions deployment configuration: [#11940](https://github.com/owncloud/ocis/pull/11940)
 * Enhancement - Add AI-assisted development guide: [#11941](https://github.com/owncloud/ocis/pull/11941)
 * Enhancement - Bump Web to 12.3.1: [#12015](https://github.com/owncloud/ocis/pull/12015)
@@ -238,6 +239,17 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/12093
    https://github.com/owncloud/ocis/pull/12096
+
+* Bugfix - Fix IDP build on FreeBSD by disabling absolute Babel runtime: [#12114](https://github.com/owncloud/ocis/pull/12114)
+
+   The `babel-preset-react-app` preset defaults to `absoluteRuntime: true`, which
+   hardcodes absolute paths to `@babel/runtime` helpers. These paths fail to
+   resolve on non-Linux platforms like FreeBSD. Setting `absoluteRuntime: false`
+   makes Babel resolve the runtime relative to the source file, which works across
+   all platforms.
+
+   https://github.com/owncloud/ocis/issues/12065
+   https://github.com/owncloud/ocis/pull/12114
 
 * Enhancement - Add web extensions deployment configuration: [#11940](https://github.com/owncloud/ocis/pull/11940)
 
