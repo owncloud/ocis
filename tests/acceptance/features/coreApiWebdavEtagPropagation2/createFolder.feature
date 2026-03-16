@@ -109,7 +109,7 @@ Feature: propagation of etags when creating folders
 
   @env-config @issue-4251
   Scenario: creating a folder in a publicly shared folder changes its etag for the sharer
-    Given the config "SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false" for "sharing" service
+    Given the config "SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD" has been set to "false" for "frontend" service
     And user "Alice" has created folder "/folder"
     And using SharingNG
     And user "Alice" has created the following resource link share:
