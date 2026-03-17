@@ -90,7 +90,7 @@ func getInitialEnvs(service string) ([]string, error) {
 
 	for _, env := range allEnvs {
 		// do not include env vars with valueFrom (includes secrets).
-		if env.ValueFrom == nil {
+		if env.ValueFrom == nil && env.Value != "" {
 			flatEnvVars = append(flatEnvVars, fmt.Sprintf("%s=%s", env.Name, env.Value))
 		}
 	}
