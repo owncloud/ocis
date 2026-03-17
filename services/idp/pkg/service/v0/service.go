@@ -300,6 +300,7 @@ func (idp *IDP) initMux(ctx context.Context, r []server.WithRoutes, h http.Handl
 	idp.mux.Get("/signin/v1/identifier/index.html", idp.Index())
 	idp.mux.Get("/signin/v1/welcome", idp.Welcome())
 	idp.mux.Get("/signin/v1/goodbye", idp.Goodbye())
+	idp.mux.Get("/signin/v1/consent", idp.Consent())
 
 	idp.mux.Mount("/", gm)
 
@@ -330,6 +331,12 @@ type pageData struct {
 	Message                                  string
 }
 
+type consentData struct {
+	Lang, Title, Headline, Nonce, PathPrefix string
+	BgImgURL                                 template.CSS
+	AllowLabel, DenyLabel                    string
+}
+
 // Index renders the login page with templated variables.
 func (idp *IDP) Index() http.HandlerFunc {
 	tpl, err := idp.parseTemplate("/identifier/index.html")
@@ -337,6 +344,10 @@ func (idp *IDP) Index() http.HandlerFunc {
 		idp.logger.Fatal().Err(err).Msg("Could not load index template")
 	}
 	return func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Query().Get("flow") == "consent" {
+			http.Redirect(w, r, "/signin/v1/consent?"+r.URL.RawQuery, http.StatusFound)
+			return
+		}
 		lang := detectLocale(r)
 		t := idp.translator.Locale(lang)
 		nonce := rndm.GenerateRandomString(32)
@@ -413,6 +424,35 @@ func (idp *IDP) Goodbye() http.HandlerFunc {
 			PathPrefix: "/signin/v1",
 			BgImgURL:   template.CSS(idp.config.Asset.LoginBackgroundUrl),
 			Message:    t.Get("You are signed out. You can close this window."),
+		}
+		var buf bytes.Buffer
+		if err := tpl.Execute(&buf, data); err != nil {
+			http.Error(w, "template error", http.StatusInternalServerError)
+			return
+		}
+		writeSecureHTML(w, buf.Bytes(), nonce)
+	}
+}
+
+// Consent renders the OAuth2 consent page.
+func (idp *IDP) Consent() http.HandlerFunc {
+	tpl, err := idp.parseTemplate("/identifier/consent.html")
+	if err != nil {
+		idp.logger.Fatal().Err(err).Msg("Could not load consent template")
+	}
+	return func(w http.ResponseWriter, r *http.Request) {
+		lang := detectLocale(r)
+		t := idp.translator.Locale(lang)
+		nonce := rndm.GenerateRandomString(32)
+		data := consentData{
+			Lang:       lang,
+			Title:      t.Get("Authorize - ownCloud"),
+			Headline:   t.Get("Authorize"),
+			Nonce:      nonce,
+			PathPrefix: "/signin/v1",
+			BgImgURL:   template.CSS(idp.config.Asset.LoginBackgroundUrl),
+			AllowLabel: t.Get("Allow"),
+			DenyLabel:  t.Get("Deny"),
 		}
 		var buf bytes.Buffer
 		if err := tpl.Execute(&buf, data); err != nil {

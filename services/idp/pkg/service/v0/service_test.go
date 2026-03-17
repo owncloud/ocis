@@ -363,6 +363,7 @@ func TestSecurityHeaders(t *testing.T) {
 		"/signin/v1/identifier",
 		"/signin/v1/welcome",
 		"/signin/v1/goodbye",
+		"/signin/v1/consent",
 	}
 
 	nonceRe := regexp.MustCompile(`nonce="([^"]+)"`)
@@ -412,6 +413,7 @@ func TestNoRawPlaceholders(t *testing.T) {
 		"/signin/v1/identifier",
 		"/signin/v1/welcome",
 		"/signin/v1/goodbye",
+		"/signin/v1/consent",
 	}
 
 	for _, p := range paths {
@@ -421,5 +423,27 @@ func TestNoRawPlaceholders(t *testing.T) {
 				t.Errorf("unexecuted template markers in %s: %v", p, matches)
 			}
 		})
+	}
+}
+
+func TestConsentRedirect(t *testing.T) {
+	_, srv := newTestService(t, nil)
+	client := &http.Client{CheckRedirect: func(*http.Request, []*http.Request) error {
+		return http.ErrUseLastResponse
+	}}
+	req, _ := http.NewRequest("GET", srv.URL+"/signin/v1/identifier?flow=consent&state=abc&client_id=test", nil)
+	resp, err := client.Do(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if resp.StatusCode != http.StatusFound {
+		t.Fatalf("want 302, got %d", resp.StatusCode)
+	}
+	loc := resp.Header.Get("Location")
+	if !strings.HasPrefix(loc, "/signin/v1/consent?") {
+		t.Errorf("unexpected redirect location: %q", loc)
+	}
+	if !strings.Contains(loc, "flow=consent") || !strings.Contains(loc, "state=abc") {
+		t.Errorf("redirect dropped query params: %q", loc)
 	}
 }
