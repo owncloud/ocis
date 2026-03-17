@@ -209,7 +209,10 @@ var _ = Describe("Searchprovider", func() {
 			// (mtime matches) but each contains one unindexed file — e.g. after
 			// a Tika crash interrupted a previous reindex run.  The fix ensures
 			// we never SkipDir for directories, so children are always visited.
-			const numDirs = 100
+			//
+			// 10,000 directories: pessimistic-case benchmark confirming the walker
+			// scales linearly even when every directory is already indexed.
+			const numDirs = 10000
 
 			gatewayClient.On("GetUserByClaim", mock.Anything, mock.Anything).Return(&userv1beta1.GetUserByClaimResponse{
 				Status: status.NewOK(context.Background()),
@@ -237,28 +240,11 @@ var _ = Describe("Searchprovider", func() {
 				}
 			}
 
-			// Stat on root returns the root container.
-			gatewayClient.On("Stat", mock.Anything, mock.MatchedBy(func(sreq *sprovider.StatRequest) bool {
-				return sreq.Ref.ResourceId.StorageId == "storageid" &&
-					sreq.Ref.ResourceId.SpaceId == "spaceid" &&
-					sreq.Ref.ResourceId.OpaqueId == "spaceid"
-			})).Return(&sprovider.StatResponse{
-				Status: status.NewOK(context.Background()),
-				Info:   rootInfo,
-			}, nil)
-
-			// ListContainer on root returns the directories.
-			gatewayClient.On("ListContainer", mock.Anything, mock.MatchedBy(func(req *sprovider.ListContainerRequest) bool {
-				return req.Ref.ResourceId.OpaqueId == "spaceid"
-			})).Return(&sprovider.ListContainerResponse{
-				Status: status.NewOK(context.Background()),
-				Infos:  dirInfos,
-			}, nil)
-
-			// Each directory's ListContainer returns one file.
+			// Pre-build file infos for each directory (map for O(1) dispatch).
+			fileInfoByDir := make(map[string]*sprovider.ResourceInfo, numDirs)
 			for i := 0; i < numDirs; i++ {
 				dirID := fmt.Sprintf("dir-%d", i)
-				fileInfo := &sprovider.ResourceInfo{
+				fileInfoByDir[dirID] = &sprovider.ResourceInfo{
 					Id:       &sprovider.ResourceId{StorageId: "storageid", SpaceId: "spaceid", OpaqueId: fmt.Sprintf("file-%d", i)},
 					ParentId: &sprovider.ResourceId{StorageId: "storageid", SpaceId: "spaceid", OpaqueId: dirID},
 					Type:     sprovider.ResourceType_RESOURCE_TYPE_FILE,
@@ -266,34 +252,75 @@ var _ = Describe("Searchprovider", func() {
 					Size:     1024,
 					Mtime:    &typesv1beta1.Timestamp{Seconds: 5000},
 				}
-				gatewayClient.On("ListContainer", mock.Anything, mock.MatchedBy(func(req *sprovider.ListContainerRequest) bool {
-					return req.Ref.ResourceId.OpaqueId == dirID
-				})).Return(&sprovider.ListContainerResponse{
-					Status: status.NewOK(context.Background()),
-					Infos:  []*sprovider.ResourceInfo{fileInfo},
-				}, nil)
-
-				// Stat calls from UpsertItem for each file.
-				gatewayClient.On("Stat", mock.Anything, mock.MatchedBy(func(sreq *sprovider.StatRequest) bool {
-					return sreq.Ref.Path == fmt.Sprintf("./dir-%d/file-%d.pdf", i, i)
-				})).Return(&sprovider.StatResponse{
-					Status: status.NewOK(context.Background()),
-					Info:   fileInfo,
-				}, nil)
 			}
 
-			// Lookup: root and directories are already indexed with matching mtime.
-			indexClient.On("Lookup", mock.MatchedBy(func(id string) bool {
-				return id == "storageid$spaceid!spaceid" || len(id) > 18 // dir-N IDs
-			})).Return(func(id string) (*engine.Resource, error) {
-				// Check if this is a directory lookup.
-				for i := 0; i < numDirs; i++ {
-					if id == fmt.Sprintf("storageid$spaceid!dir-%d", i) {
-						return &engine.Resource{Document: content.Document{Mtime: indexedMtime}, Extracted: true}, nil
+			// Build path-to-fileInfo map for O(1) Stat dispatch.
+			fileInfoByPath := make(map[string]*sprovider.ResourceInfo, numDirs)
+			for dirID, fi := range fileInfoByDir {
+				fileInfoByPath["./"+dirID+"/"+fi.Path] = fi
+			}
+
+			// Single Stat mock dispatching via map — avoids 10k separate matchers.
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(
+				func(_ context.Context, sreq *sprovider.StatRequest, _ ...grpc.CallOption) *sprovider.StatResponse {
+					if sreq.Ref.ResourceId != nil && sreq.Ref.ResourceId.OpaqueId == "spaceid" {
+						return &sprovider.StatResponse{
+							Status: status.NewOK(context.Background()),
+							Info:   rootInfo,
+						}
 					}
-				}
-				if id == "storageid$spaceid!spaceid" {
-					return &engine.Resource{Document: content.Document{Mtime: indexedMtime}, Extracted: true}, nil
+					if fi, ok := fileInfoByPath[sreq.Ref.Path]; ok {
+						return &sprovider.StatResponse{
+							Status: status.NewOK(context.Background()),
+							Info:   fi,
+						}
+					}
+					return &sprovider.StatResponse{Status: status.NewOK(context.Background()), Info: rootInfo}
+				},
+				func(_ context.Context, _ *sprovider.StatRequest, _ ...grpc.CallOption) error {
+					return nil
+				},
+			)
+
+			// Single ListContainer mock dispatching via map.
+			gatewayClient.On("ListContainer", mock.Anything, mock.Anything).Return(
+				func(_ context.Context, req *sprovider.ListContainerRequest, _ ...grpc.CallOption) *sprovider.ListContainerResponse {
+					opaqueID := req.Ref.ResourceId.OpaqueId
+					if opaqueID == "spaceid" {
+						return &sprovider.ListContainerResponse{
+							Status: status.NewOK(context.Background()),
+							Infos:  dirInfos,
+						}
+					}
+					if fi, ok := fileInfoByDir[opaqueID]; ok {
+						return &sprovider.ListContainerResponse{
+							Status: status.NewOK(context.Background()),
+							Infos:  []*sprovider.ResourceInfo{fi},
+						}
+					}
+					return &sprovider.ListContainerResponse{
+						Status: status.NewOK(context.Background()),
+						Infos:  nil,
+					}
+				},
+				func(_ context.Context, _ *sprovider.ListContainerRequest, _ ...grpc.CallOption) error {
+					return nil
+				},
+			)
+
+			// Lookup: root and directories are already indexed with matching mtime.
+			// Use a map for O(1) lookup instead of linear scan (matters at 10k dirs).
+			indexedIDs := make(map[string]bool, numDirs+1)
+			indexedIDs["storageid$spaceid!spaceid"] = true
+			for i := 0; i < numDirs; i++ {
+				indexedIDs[fmt.Sprintf("storageid$spaceid!dir-%d", i)] = true
+			}
+			indexedResource := &engine.Resource{Document: content.Document{Mtime: indexedMtime}, Extracted: true}
+			indexClient.On("Lookup", mock.MatchedBy(func(id string) bool {
+				return indexedIDs[id] || len(id) > 18 // dir-N or file-N IDs
+			})).Return(func(id string) (*engine.Resource, error) {
+				if indexedIDs[id] {
+					return indexedResource, nil
 				}
 				// Files are not indexed.
 				return nil, engine.ErrResourceNotFound
