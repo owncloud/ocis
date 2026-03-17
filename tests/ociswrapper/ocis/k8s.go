@@ -4,11 +4,14 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"ociswrapper/log"
 	"ociswrapper/ocis/config"
 	"os/exec"
 	"strings"
 	"time"
+
+	"github.com/creack/pty"
 )
 
 type ServiceConfig struct {
@@ -97,8 +100,7 @@ func getInitialEnvs(service string) ([]string, error) {
 func waitForService(service string, waitDeletion bool) (bool, error) {
 	timeoutInSecond := 30
 	timeout := time.After(time.Duration(timeoutInSecond) * time.Second)
-	tick := time.NewTicker(2 * time.Second)
-	defer tick.Stop()
+	pollInterval := 5 * time.Second
 
 	if waitDeletion {
 		_, err := waitPodDelete(K8sOcisServices.CurrentPod, timeoutInSecond)
@@ -112,20 +114,30 @@ func waitForService(service string, waitDeletion bool) (bool, error) {
 	for {
 		select {
 		case <-timeout:
-			return false, fmt.Errorf("[%s] %d seconds timeout waiting service.", service, timeoutInSecond)
-		case <-tick.C:
+			log.Println(fmt.Sprintf("[%s] %d seconds timeout waiting service.", service, timeoutInSecond))
+			return false, fmt.Errorf("timeout waiting for service")
+		default:
 			_, err := waitPodReady(service, timeoutInSecond)
 			if err != nil {
+				time.Sleep(pollInterval)
 				continue
 			}
 
 			podName, err := getPodName(service)
 			if err != nil {
+				time.Sleep(pollInterval)
 				continue
 			}
 
-			output, err := serviceHealthCheck(service)
+			err = checkServiceGrpc(service, podName)
 			if err != nil {
+				time.Sleep(pollInterval)
+				continue
+			}
+
+			output, err := checkServiceHealth(service)
+			if err != nil {
+				time.Sleep(pollInterval)
 				continue
 			}
 
@@ -133,7 +145,9 @@ func waitForService(service string, waitDeletion bool) (bool, error) {
 				log.Println(fmt.Sprintf("[%s] Service is healthy and ready. Pod: %s", service, podName))
 				return true, nil
 			}
+
 			log.Println(fmt.Sprintf("[%s] Waiting for service. Pod: %s. Output: %s", service, podName, output))
+			time.Sleep(pollInterval)
 		}
 	}
 }
@@ -159,7 +173,46 @@ func setServiceEnv(service string, envMap []string, errMsgPrefix string) (bool, 
 	return false, nil
 }
 
-func serviceHealthCheck(service string) (string, error) {
+func checkServiceGrpc(service string, podName string) error {
+	grpcPort := config.GetServiceGRPCPort(service)
+	checkCmd := fmt.Sprintf("-plaintext -max-time 1 %s:%d list", service, grpcPort)
+	cmdString := fmt.Sprintf(
+		"run grpccheck -n %s --rm --attach --image=fullstorydev/grpcurl --restart=Never -- %s",
+		config.Get("namespace"),
+		checkCmd,
+	)
+	cmdArgs := strings.Split(cmdString, " ")
+	c := exec.Command("kubectl", cmdArgs...)
+
+	// Start the command with a pty (pseudo terminal)
+	// This is required by grpc connection
+	ptyF, err := pty.Start(c)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer ptyF.Close()
+
+	var output bytes.Buffer
+	done := make(chan error, 1)
+	// read concurrently from the pty
+	go func() {
+		_, err := io.Copy(&output, ptyF)
+		done <- err
+	}()
+
+	// wait for copy to finish
+	<-done
+	cmdOutput := output.String()
+	cmdOutput = strings.ReplaceAll(strings.TrimSpace(string(cmdOutput)), "\n", ". ")
+	if strings.Contains(cmdOutput, "reflection API") {
+		log.Println(fmt.Sprintf("[%s] gRPC service is ready. Pod: %s", service, podName))
+		return nil
+	}
+	log.Println(fmt.Sprintf("[%s] gRPC service is not reachable. Pod: %s. Output: %s", service, podName, cmdOutput))
+	return fmt.Errorf("gRPC service not reachable")
+}
+
+func checkServiceHealth(service string) (string, error) {
 	port := config.GetServiceDebugPort(service)
 	healthUrl := fmt.Sprintf("http://%s:%d/healthz", service, port)
 	readyUrl := fmt.Sprintf("http://%s:%d/readyz", service, port)
@@ -180,7 +233,7 @@ func serviceHealthCheck(service string) (string, error) {
 		log.Println(fmt.Sprintf("[%s] Failed to run health check. %s", service, errMsg))
 		return "", err
 	}
-	output := strings.ReplaceAll(strings.TrimSpace(string(stdout)), "\n", ": ")
+	output := strings.ReplaceAll(strings.TrimSpace(string(stdout)), "\n", ". ")
 	return output, nil
 }
 
@@ -235,6 +288,7 @@ func waitPodDelete(podName string, timeout int) (string, error) {
 
 func K8sRollback() (bool, string) {
 	for service, envs := range K8sOcisServices.Envs {
+		log.Println(fmt.Sprintf("[%s] Rolling envs: %s", service, strings.Join(envs, ", ")))
 		podName, err := getPodName(service)
 		if err != nil {
 			return false, "error getting pod name"
