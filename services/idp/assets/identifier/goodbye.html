@@ -6,7 +6,7 @@
   <title>{{.Title}}</title>
   <link rel="icon" href="{{.PathPrefix}}/static/favicon.ico">
   <link rel="stylesheet" href="{{.PathPrefix}}/static/theme.css">
-  <style nonce="{{.Nonce}}">body.oc-login-bg{background-image:url('{{.BgImgURL}}')}</style>
+  <style nonce="{{.Nonce}}">{{if .BgImgURL}}body.oc-login-bg{background-image:url('{{.BgImgURL}}')}{{end}}</style>
 </head>
 <body class="oc-login-bg">
   <main>
