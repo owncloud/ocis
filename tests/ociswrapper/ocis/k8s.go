@@ -175,6 +175,10 @@ func setServiceEnv(service string, envMap []string, errMsgPrefix string) (bool, 
 
 func checkServiceGrpc(service string, podName string) error {
 	grpcPort := config.GetServiceGRPCPort(service)
+	if grpcPort == 0 {
+		return nil
+	}
+
 	checkCmd := fmt.Sprintf("-plaintext -max-time 1 %s:%d list", service, grpcPort)
 	cmdString := fmt.Sprintf(
 		"run grpccheck -n %s --rm --attach --image=fullstorydev/grpcurl --restart=Never -- %s",
@@ -214,6 +218,10 @@ func checkServiceGrpc(service string, podName string) error {
 
 func checkServiceHealth(service string) (string, error) {
 	port := config.GetServiceDebugPort(service)
+	if port == 0 {
+		log.Println(fmt.Sprintf("[%s] Debug port not found", service))
+		return "", fmt.Errorf("invalid debug port")
+	}
 	healthUrl := fmt.Sprintf("http://%s:%d/healthz", service, port)
 	readyUrl := fmt.Sprintf("http://%s:%d/readyz", service, port)
 
