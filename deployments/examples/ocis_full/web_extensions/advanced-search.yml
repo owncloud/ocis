@@ -6,7 +6,7 @@ services:
         condition: service_completed_successfully
 
   advanced-search-init:
-    image: owncloud/web-extensions:advanced-search-0.1.0
+    image: owncloud/web-extensions:advanced-search-0.2.0
     user: root
     volumes:
       - ocis-apps:/apps
