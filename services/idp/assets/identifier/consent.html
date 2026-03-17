@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="{{.Lang}}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#1b223d">
+  <title>{{.Title}}</title>
+  <link rel="icon" href="{{.PathPrefix}}/static/favicon.ico">
+  <link rel="stylesheet" href="{{.PathPrefix}}/static/theme.css">
+  <style nonce="{{.Nonce}}">{{if .BgImgURL}}body.oc-login-bg{background-image:url('{{.BgImgURL}}')}{{end}}</style>
+  <meta property="csp-nonce" content="{{.Nonce}}">
+</head>
+<body class="oc-login-bg">
+  <main>
+    <div class="oc-login-form" id="consent-root">
+      <img class="oc-logo" src="/themes/owncloud/assets/logo.svg" alt="ownCloud">
+      <h1 class="oc-invisible-sr">{{.Headline}}</h1>
+      <p id="oc-consent-error-message" class="oc-error-message" hidden></p>
+      <div id="consent-body" hidden>
+        <p id="consent-client-name" class="oc-message"></p>
+        <div id="consent-actions">
+          <button class="oc-button-primary" id="consent-allow-btn"
+            data-msg-allow="{{.AllowLabel}}"
+            data-msg-deny="{{.DenyLabel}}">{{.AllowLabel}}</button>
+          <button class="oc-button-secondary" id="consent-deny-btn">{{.DenyLabel}}</button>
+        </div>
+      </div>
+      <footer class="oc-footer-message">ownCloud – a safe home for all your data</footer>
+    </div>
+  </main>
+  <script nonce="{{.Nonce}}">
+(function() {
+  var errorEl = document.getElementById("oc-consent-error-message");
+  var bodyEl = document.getElementById("consent-body");
+  var clientNameEl = document.getElementById("consent-client-name");
+  var allowBtn = document.getElementById("consent-allow-btn");
+  var denyBtn = document.getElementById("consent-deny-btn");
+
+  var pathPrefix = {{.PathPrefix}};
+  var apiBase = pathPrefix + "/identifier";
+  var xsrf = "1";
+
+  var params = new URLSearchParams(window.location.search);
+  function qs(name) { return params.get(name) || ""; }
+
+  function fetchApi(path, body) {
+    return fetch(apiBase + path, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Kopano-Konnect-XSRF": xsrf
+      },
+      body: body ? JSON.stringify(body) : undefined,
+      credentials: "same-origin"
+    });
+  }
+
+  function parseJsonMaybe(res) {
+    if (res.status === 204) return Promise.resolve(null);
+    return res.text().then(function(text) {
+      if (!text) return null;
+      try { return JSON.parse(text); } catch (_) { return null; }
+    });
+  }
+
+  function showError(msg) {
+    errorEl.textContent = msg || "An error occurred.";
+    errorEl.hidden = false;
+    bodyEl.hidden = true;
+  }
+
+  function randomHex(len) {
+    var arr = new Uint8Array(len);
+    window.crypto.getRandomValues(arr);
+    return Array.from(arr).map(function(b) { return ('0' + b.toString(16)).slice(-2); }).join('');
+  }
+
+  function isSameOrigin(url) {
+    try { return new URL(url, window.location.origin).origin === window.location.origin; }
+    catch (_) { return false; }
+  }
+
+  var helloReq = {
+    state: qs("state"),
+    flow: qs("flow") || "oidc",
+    scope: qs("scope"),
+    prompt: qs("prompt"),
+    client_id: qs("client_id"),
+    redirect_uri: qs("redirect_uri"),
+    id_token_hint: qs("id_token_hint"),
+    max_age: qs("max_age")
+  };
+
+  var helloData = null;
+
+  fetchApi("/_/hello", helloReq)
+    .then(function(res) { return parseJsonMaybe(res); })
+    .then(function(data) {
+      if (!data || !data.success) {
+        showError("Could not load consent information.");
+        return;
+      }
+      helloData = data;
+      var clientName = (data.client && data.client.display_name) || qs("client_id");
+      clientNameEl.textContent = "\"" + clientName + "\" is requesting access to your account.";
+      bodyEl.hidden = false;
+    })
+    .catch(function() { showError("Could not load consent information."); });
+
+  function doConsent(allow) {
+    allowBtn.disabled = true;
+    denyBtn.disabled = true;
+
+    var scope = qs("scope") || "openid";
+    var body = {
+      state: randomHex(16),
+      allow: allow,
+      scope: scope,
+      client_id: qs("client_id"),
+      redirect_uri: qs("redirect_uri"),
+      ref: qs("state"),
+      flow_nonce: qs("nonce")
+    };
+
+    fetchApi("/_/consent", body)
+      .then(function(res) {
+        return parseJsonMaybe(res).then(function(data) {
+          return { ok: res.ok, status: res.status, data: data };
+        });
+      })
+      .then(function(result) {
+        if (!allow) {
+          showError("Access denied.");
+          return;
+        }
+        if (result.ok && result.data && result.data.success) {
+          var continueURI = (helloData && helloData.continue_uri) || qs("redirect_uri");
+          if (continueURI && isSameOrigin(continueURI)) {
+            var sep = continueURI.indexOf('?') >= 0 ? '&' : '?';
+            window.location.href = continueURI + sep + "prompt=none&" + params.toString();
+          }
+          return;
+        }
+        showError("Consent failed. Please try again.");
+        allowBtn.disabled = false;
+        denyBtn.disabled = false;
+      })
+      .catch(function() {
+        showError("Consent failed. Please try again.");
+        allowBtn.disabled = false;
+        denyBtn.disabled = false;
+      });
+  }
+
+  allowBtn.addEventListener("click", function() { doConsent(true); });
+  denyBtn.addEventListener("click", function() { doConsent(false); });
+})();
+  </script>
+</body>
+</html>
