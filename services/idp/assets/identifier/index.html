@@ -141,7 +141,12 @@
       .then(function(result) {
         setLoading(false);
         if (result.ok && result.data.success) {
-          var next = result.data.hello && (result.data.hello.continue_uri || result.data.hello.next);
+          var hello = result.data.hello;
+          if (hello && hello.next === 'consent') {
+            window.location.href = '/signin/v1/consent' + window.location.search;
+            return;
+          }
+          var next = hello && (hello.continue_uri || hello.next);
           if (next) {
             var base = window.location.origin + pathPrefix + "/";
             var target = new URL(next, next.indexOf("http") === 0 ? undefined : base);
@@ -179,7 +184,11 @@
       .then(function(res) { return parseJsonMaybe(res); })
       .then(function(data) {
         if (data && data.success && data.continue_uri && isSameOrigin(data.continue_uri)) {
-          window.location.href = data.continue_uri;
+          if (data.next === 'consent') {
+            window.location.href = '/signin/v1/consent' + window.location.search;
+          } else {
+            window.location.href = data.continue_uri;
+          }
         }
       })
       .catch(function() {});
