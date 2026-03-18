@@ -109,6 +109,11 @@ services:
       POSTGRES_DB: keycloak
       POSTGRES_USER: keycloak
       POSTGRES_PASSWORD: keycloak
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U keycloak"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
     logging:
       driver: ${LOG_DRIVER:-local}
     restart: always
@@ -138,6 +143,13 @@ services:
       # tracing
       KC_TRACING_ENABLED: ${KEYCLOAK_TRACING:-false}
       KC_TRACING_ENDPOINT: http://jaeger:4317
+      KC_HEALTH_ENABLED: "true"
+    healthcheck:
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/localhost/9000 && echo -e 'GET /health/ready HTTP/1.0\\r\\n\\r\\n' >&3 && grep -q '\"status\": \"UP\"' <&3"]
+      interval: 10s
+      timeout: 5s
+      retries: 18
+      start_period: 30s
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.keycloak.entrypoints=https"
@@ -146,7 +158,8 @@ services:
       - "traefik.http.routers.keycloak.service=keycloak"
       - "traefik.http.services.keycloak.loadbalancer.server.port=8080"
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     logging:
       driver: ${LOG_DRIVER:-local}
     restart: always
