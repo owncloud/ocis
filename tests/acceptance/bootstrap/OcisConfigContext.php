@@ -241,7 +241,7 @@ class OcisConfigContext implements Context {
 	 */
 	public function theConfigHasBeenSetToPath(string $configVariable, string $path, ?string $serviceName = null): void {
 		if (getenv("K8S") === "true") {
-			if ($configVariable === "SHARING_PASSWORD_POLICY_BANNED_PASSWORDS_LIST") {
+			if (\str_ends_with($configVariable, "PASSWORD_POLICY_BANNED_PASSWORDS_LIST")) {
 				// The banned password list is already configured in K8s setup.
 				return;
 			}
