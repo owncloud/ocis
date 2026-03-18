@@ -1,7 +1,7 @@
 
 LOGS_DIR := $(abspath ./logs)
 CHART_REPO := $(abspath ./ocis-charts)
-HOST_IP := $(shell hostname -i | awk '{print $1}')
+HOST_IP := $(shell ip route get 1 | awk '{print $$7}')
 
 OCM ?= false
 DOMAIN := ocis-server

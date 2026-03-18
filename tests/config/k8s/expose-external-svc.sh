@@ -2,7 +2,7 @@
 
 set -e
 
-HOST_IP=$(hostname -i | awk '{print $1}')
+HOST_IP=$(ip route get 1 | awk '{print $7}')
 
 NAMESPACE="ocis-server"
 
