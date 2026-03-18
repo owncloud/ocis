@@ -2277,7 +2277,7 @@
           "requirement": "REQUIRED",
           "priority": 1,
           "autheticatorFlow": false,
-          "userSetupAllowed": false
+          "userSetupAllowed": true
         }
       ]
     },

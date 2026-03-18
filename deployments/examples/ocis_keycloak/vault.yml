@@ -9,6 +9,8 @@ services:
       OCIS_GATEWAY_GRPC_ADDR: 0.0.0.0:9142
       # Vault: auto-create vault home space on first user login
       PROXY_CREATE_VAULT_HOME: "true"
+      # MFA: guard Admin Settings with step-up auth (LOA2)
+      # OCIS_MFA_ENABLED: "true"
 
   graph-vault:
     image: ${OCIS_DOCKER_IMAGE:-owncloud/ocis}:${OCIS_DOCKER_TAG:-latest}
