@@ -39,8 +39,8 @@
 * [Changelog for 3.0.0](#changelog-for-300-2023-06-06)
 * [Changelog for 2.0.0](#changelog-for-200-2022-11-30)
 * [Changelog for 1.20.0](#changelog-for-1200-2022-04-13)
-* [Changelog for 1.19.0](#changelog-for-1190-2022-03-29)
 * [Changelog for 1.19.1](#changelog-for-1191-2022-03-29)
+* [Changelog for 1.19.0](#changelog-for-1190-2022-03-29)
 * [Changelog for 1.18.0](#changelog-for-1180-2022-03-03)
 * [Changelog for 1.17.0](#changelog-for-1170-2022-02-16)
 * [Changelog for 1.16.0](#changelog-for-1160-2021-12-10)
@@ -82,6 +82,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Prevent incomplete Tika extractions from permanently blocking re-index: [#12095](https://github.com/owncloud/ocis/pull/12095)
 * Bugfix - Use O(1) document lookup instead of full search during reindexing: [#12096](https://github.com/owncloud/ocis/pull/12096)
 * Bugfix - Fix IDP build on FreeBSD by disabling absolute Babel runtime: [#12114](https://github.com/owncloud/ocis/pull/12114)
+* Bugfix - Deduplicate CreateHome calls in proxy middleware: [#12115](https://github.com/owncloud/ocis/pull/12115)
 * Enhancement - Add web extensions deployment configuration: [#11940](https://github.com/owncloud/ocis/pull/11940)
 * Enhancement - Add AI-assisted development guide: [#11941](https://github.com/owncloud/ocis/pull/11941)
 * Enhancement - Bump Web to 12.3.1: [#12015](https://github.com/owncloud/ocis/pull/12015)
@@ -250,6 +251,18 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/12065
    https://github.com/owncloud/ocis/pull/12114
+
+* Bugfix - Deduplicate CreateHome calls in proxy middleware: [#12115](https://github.com/owncloud/ocis/pull/12115)
+
+   The CreateHome proxy middleware previously fired a CreateHome gRPC request on
+   every authenticated HTTP request with no deduplication. On first login, the
+   browser sends many parallel requests, each triggering a redundant CreateHome
+   call. This change uses singleflight to collapse concurrent calls for the same
+   user and caches successful results in-process so subsequent requests skip the
+   gRPC call entirely.
+
+   https://github.com/owncloud/ocis/issues/12068
+   https://github.com/owncloud/ocis/pull/12115
 
 * Enhancement - Add web extensions deployment configuration: [#11940](https://github.com/owncloud/ocis/pull/11940)
 
@@ -12738,7 +12751,7 @@ The following sections list the changes for 2.0.0.
 
 The following sections list the changes for 1.20.0.
 
-[1.20.0]: https://github.com/owncloud/ocis/compare/v1.19.0...v1.20.0
+[1.20.0]: https://github.com/owncloud/ocis/compare/v1.19.1...v1.20.0
 
 ## Summary
 
@@ -12912,11 +12925,29 @@ The following sections list the changes for 1.20.0.
    https://github.com/owncloud/ocis/pull/3509
    https://github.com/owncloud/web/releases/tag/v5.4.0
 
+# Changelog for [1.19.1] (2022-03-29)
+
+The following sections list the changes for 1.19.1.
+
+[1.19.1]: https://github.com/owncloud/ocis/compare/v1.19.0...v1.19.1
+
+## Summary
+
+* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
+
+## Details
+
+* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
+
+   URLs for Special items (space image, readme) were broken.
+
+   https://github.com/owncloud/ocis/pull/3419
+
 # Changelog for [1.19.0] (2022-03-29)
 
 The following sections list the changes for 1.19.0.
 
-[1.19.0]: https://github.com/owncloud/ocis/compare/v1.19.1...v1.19.0
+[1.19.0]: https://github.com/owncloud/ocis/compare/v1.18.0...v1.19.0
 
 ## Summary
 
@@ -13089,24 +13120,6 @@ The following sections list the changes for 1.19.0.
    https://github.com/owncloud/ocis/pull/3291
    https://github.com/owncloud/ocis/pull/3375
    https://github.com/owncloud/web/releases/tag/v5.3.0
-
-# Changelog for [1.19.1] (2022-03-29)
-
-The following sections list the changes for 1.19.1.
-
-[1.19.1]: https://github.com/owncloud/ocis/compare/v1.18.0...v1.19.1
-
-## Summary
-
-* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
-
-## Details
-
-* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
-
-   URLs for Special items (space image, readme) were broken.
-
-   https://github.com/owncloud/ocis/pull/3419
 
 # Changelog for [1.18.0] (2022-03-03)
 
