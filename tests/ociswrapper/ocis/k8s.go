@@ -16,12 +16,10 @@ import (
 
 type ServiceConfig struct {
 	CurrentPod string
-	Envs       map[string][]string
+	Envs       []string
 }
 
-var K8sOcisServices = ServiceConfig{
-	Envs: make(map[string][]string),
-}
+var K8sOcisInitEnv = make(map[string]*ServiceConfig)
 
 type EnvVar struct {
 	Name      string `json:"name"`
@@ -39,17 +37,24 @@ func K8sUpdateEnv(service string, envMap []string) (bool, string) {
 	if err != nil {
 		return false, "error getting pod name"
 	}
-	K8sOcisServices.CurrentPod = podName
 	log.Println(fmt.Sprintf("[%s] Updating env variables. Current Pod: %s", service, podName))
 
 	if envMap == nil {
 		envMap = []string{}
 	}
-	initialEnvs, err := getInitialEnvs(service)
-	if err != nil {
-		return false, "error getting existing envs"
+
+	_, ok := K8sOcisInitEnv[service]
+	if !ok {
+		initialEnvs, err := getInitialEnvs(service)
+		if err != nil {
+			return false, "error getting existing envs"
+		}
+		K8sOcisInitEnv[service] = &ServiceConfig{
+			CurrentPod: podName,
+			Envs:       initialEnvs,
+		}
 	}
-	K8sOcisServices.Envs[service] = initialEnvs
+	K8sOcisInitEnv[service].CurrentPod = podName
 
 	envSet, err := setServiceEnv(service, envMap, "Failed to set env")
 	if err != nil {
@@ -103,11 +108,11 @@ func waitForService(service string, waitDeletion bool) (bool, error) {
 	pollInterval := 5 * time.Second
 
 	if waitDeletion {
-		_, err := waitPodDelete(K8sOcisServices.CurrentPod, timeoutInSecond)
+		_, err := waitPodDelete(K8sOcisInitEnv[service].CurrentPod, timeoutInSecond)
 		if err != nil {
 			return false, fmt.Errorf("[%s] Pod not deleted", service)
 		}
-		log.Println(fmt.Sprintf("[%s] Old pod '%s' deleted.", service, K8sOcisServices.CurrentPod))
+		log.Println(fmt.Sprintf("[%s] Old pod '%s' deleted.", service, K8sOcisInitEnv[service].CurrentPod))
 	}
 	log.Println(fmt.Sprintf("[%s] Waiting for service to be ready...", service))
 
@@ -295,13 +300,14 @@ func waitPodDelete(podName string, timeout int) (string, error) {
 }
 
 func K8sRollback() (bool, string) {
-	for service, envs := range K8sOcisServices.Envs {
+	for service, config := range K8sOcisInitEnv {
+		envs := config.Envs
 		log.Println(fmt.Sprintf("[%s] Rolling envs: %s", service, strings.Join(envs, ", ")))
 		podName, err := getPodName(service)
 		if err != nil {
 			return false, "error getting pod name"
 		}
-		K8sOcisServices.CurrentPod = podName
+		K8sOcisInitEnv[service].CurrentPod = podName
 		log.Println(fmt.Sprintf("[%s] Rolling back service. Current Pod: %s", service, podName))
 
 		envSet, err := setServiceEnv(service, envs, fmt.Sprintf("Failed to rollback service. Pod: %s", podName))
@@ -313,7 +319,6 @@ func K8sRollback() (bool, string) {
 		if err != nil {
 			return false, "error waiting for service"
 		}
-		delete(K8sOcisServices.Envs, service)
 	}
 	return true, "ok"
 }
