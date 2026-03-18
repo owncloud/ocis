@@ -1955,15 +1955,11 @@ trait Provisioning {
 			$this->usingServer($userData["serverType"]);
 
 			$user = $userData['actualUsername'];
-			$this->withRetry(
-				function () use ($user) {
-					$response = $this->deleteUser($user);
-					if ($response->getStatusCode() === 204 && !$this->userExists($user)) {
-						return true;
-					}
-					return false;
-				},
-				"Failed to delete '$user'",
+			$response = $this->deleteUser($user);
+			$this->theHTTPStatusCodeShouldBe(204, "Failed to delete user '$user'", $response);
+			Assert::assertFalse(
+				$this->userExists($user),
+				"User '$user' should not exist but does exist",
 			);
 		}
 		$this->usingServer($previousServer);
