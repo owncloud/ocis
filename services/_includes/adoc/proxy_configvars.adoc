@@ -6,7 +6,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2026-03-18-00-10-03]
+[#deprecation-note-2026-03-18-08-27-39]
 [caption=]
 .Deprecation notes for the proxy service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -965,5 +965,16 @@ a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 The role that should be assigned to a guest user
+
+a|`PROXY_CREATEHOME_CACHE_DISABLED` +
+
+a| [subs=-attributes]
+++Daledda ++
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Disable the process-lifetime cache that tracks which users already have a personal space. When enabled, the proxy skips redundant CreateHome gRPC calls for returning users. Set this to true as a fallback if the cache causes unexpected behavior.
 |===
 

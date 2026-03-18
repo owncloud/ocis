@@ -221,3 +221,4 @@ multi_instance:
   member_claim: ""
   guest_claim: ""
   guest_role: ""
+create_home_cache_disabled: false

@@ -84,3 +84,4 @@
 | OCIS_MULTI_INSTANCE_MEMBER_CLAIM | string |  | The claim name for the 'memberOf' property|
 | OCIS_MULTI_INSTANCE_GUEST_CLAIM | string |  | The claim name for the 'guestOf' property|
 | OCIS_MULTI_INSTANCE_GUEST_ROLE | string |  | The role that should be assigned to a guest user|
+| PROXY_CREATEHOME_CACHE_DISABLED | bool | false | Disable the process-lifetime cache that tracks which users already have a personal space. When enabled, the proxy skips redundant CreateHome gRPC calls for returning users. Set this to true as a fallback if the cache causes unexpected behavior.|
