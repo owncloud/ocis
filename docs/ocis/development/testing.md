@@ -1,6 +1,6 @@
 ---
 title: 'Acceptance Testing'
-date: 2018-05-02T00:00:00+00:00
+date: 2026-03-18T00:00:00+00:00
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/ocis/development
@@ -591,7 +591,7 @@ The sample `fontsMap.json` file is located in `tests/config/drone/fontsMap.json`
 
 ## Running Test on Helm Setup
 
-Refer to [this docs](../../../tests/config/k8s/) for running tests against K8s setup
+Refer to the [Running API Tests in Kubernetes Cluster](../../../tests/config/k8s/README.md) documentation for running tests against a K8s setup.
 
 ## Generating Code Coverage Report by Running Acceptance Tests
 
