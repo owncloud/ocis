@@ -8,6 +8,7 @@ import (
 	"ociswrapper/log"
 	"ociswrapper/ocis/config"
 	"os/exec"
+	"slices"
 	"strings"
 	"time"
 
@@ -43,18 +44,22 @@ func K8sUpdateEnv(service string, envMap []string) (bool, string) {
 		envMap = []string{}
 	}
 
+	initialEnvs, err := getInitialEnvs(service)
+	if err != nil {
+		return false, "error getting existing envs"
+	}
+
 	_, ok := K8sOcisInitEnv[service]
 	if !ok {
-		initialEnvs, err := getInitialEnvs(service)
-		if err != nil {
-			return false, "error getting existing envs"
-		}
 		K8sOcisInitEnv[service] = &ServiceConfig{
 			CurrentPod: podName,
 			Envs:       initialEnvs,
 		}
+	} else {
+		extraEnvs := diffEnvs(K8sOcisInitEnv[service].Envs, initialEnvs)
+		K8sOcisInitEnv[service].Envs = append(K8sOcisInitEnv[service].Envs, extraEnvs...)
+		K8sOcisInitEnv[service].CurrentPod = podName
 	}
-	K8sOcisInitEnv[service].CurrentPod = podName
 
 	envSet, err := setServiceEnv(service, envMap, "Failed to set env")
 	if err != nil {
@@ -66,6 +71,25 @@ func K8sUpdateEnv(service string, envMap []string) (bool, string) {
 		return false, "error waiting for service"
 	}
 	return true, "ok"
+}
+
+func diffEnvs(initialEnvsMap []string, currentEnvMap []string) []string {
+	extraEnvs := []string{}
+	for _, env := range getEnvKeys(currentEnvMap) {
+		if !slices.Contains(getEnvKeys(initialEnvsMap), env) {
+			extraEnvs = append(extraEnvs, env+"-")
+		}
+	}
+	return extraEnvs
+}
+
+func getEnvKeys(envMap []string) []string {
+	envKeys := []string{}
+	for _, env := range envMap {
+		envKey := strings.Split(env, "=")[0]
+		envKeys = append(envKeys, envKey)
+	}
+	return envKeys
 }
 
 func getInitialEnvs(service string) ([]string, error) {
