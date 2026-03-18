@@ -1955,11 +1955,15 @@ trait Provisioning {
 			$this->usingServer($userData["serverType"]);
 
 			$user = $userData['actualUsername'];
-			$response = $this->deleteUser($user);
-			$this->theHTTPStatusCodeShouldBe(204, "Failed to delete user '$user'", $response);
-			Assert::assertFalse(
-				$this->userExists($user),
-				"User '$user' should not exist but does exist",
+			$this->withRetry(
+				function () use ($user) {
+					$response = $this->deleteUser($user);
+					if ($response->getStatusCode() === 204 && !$this->userExists($user)) {
+						return true;
+					}
+					return false;
+				},
+				"Failed to delete '$user'",
 			);
 		}
 		$this->usingServer($previousServer);
@@ -2028,5 +2032,32 @@ trait Provisioning {
 			$actualUser,
 			$actualPassword,
 		);
+	}
+
+	/**
+	 * Perform function call with retries
+	 * [IMPORTANT]: the function should return true if the call was successful and false if it should be retried
+	 *
+	 * @param callable $fn
+	 * @param string $errMessage
+	 *
+	 * @return void
+	 */
+	public function withRetry(callable $fn, string $errMessage = ""): void {
+		$tryAgain = false;
+		$retried = 0;
+		$errMessage = \rtrim($errMessage, ".");
+		do {
+			if ($fn() === true) {
+				return;
+			}
+			echo $errMessage . ". Retrying...\n";
+
+			$tryAgain = $retried < MAX_REQUEST_RETRY_COUNT;
+			$retried++;
+			\sleep(STANDARD_REQUEST_POLLING_INTERVAL_SEC);
+		} while ($tryAgain);
+
+		Assert::fail("Failed after " . MAX_REQUEST_RETRY_COUNT . " retries. " . $errMessage);
 	}
 }
