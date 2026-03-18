@@ -148,6 +148,11 @@ func waitForService(service string, waitDeletion bool) (bool, error) {
 				}
 
 				log.Println(fmt.Sprintf("[%s] Service is healthy and ready. Pod: %s", service, podName))
+
+				if waitDeletion {
+					// wait 5 seconds
+					time.Sleep(5 * time.Second)
+				}
 				return true, nil
 			}
 
