@@ -77,6 +77,8 @@ type Options struct {
 	// Service Accounts
 	ServiceAccountID     string
 	ServiceAccountSecret string
+	// CreateHomeCacheDisabled disables the knownHomes cache in the CreateHome middleware
+	CreateHomeCacheDisabled bool
 	// Multi-Instance Options
 	MultiInstanceEnabled bool
 	InstanceID           string
@@ -233,6 +235,13 @@ func UserRoleAssigner(ra userroles.UserRoleAssigner) Option {
 func AccessTokenVerifyMethod(method string) Option {
 	return func(o *Options) {
 		o.AccessTokenVerifyMethod = method
+	}
+}
+
+// CreateHomeCacheDisabled provides a function to disable the CreateHome cache.
+func CreateHomeCacheDisabled(val bool) Option {
+	return func(o *Options) {
+		o.CreateHomeCacheDisabled = val
 	}
 }
 
