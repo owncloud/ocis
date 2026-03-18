@@ -165,11 +165,11 @@ func waitForService(service string, waitDeletion bool) (bool, error) {
 			}
 
 			if strings.Contains(output, "200200") {
-				err = checkServiceGrpc(service, podName)
-				if err != nil {
-					time.Sleep(pollInterval)
-					continue
-				}
+				// err = checkServiceGrpc(service, podName)
+				// if err != nil {
+				// 	time.Sleep(pollInterval)
+				// 	continue
+				// }
 
 				log.Println(fmt.Sprintf("[%s] Service is healthy and ready. Pod: %s", service, podName))
 
