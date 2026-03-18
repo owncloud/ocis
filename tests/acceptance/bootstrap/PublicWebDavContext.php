@@ -1213,6 +1213,54 @@ class PublicWebDavContext implements Context {
 	}
 
 	/**
+	 * Extracts file IDs, signature, and expiration from a public link XML response.
+	 *
+	 * @param string $xml
+	 *
+	 * @return array {
+	 *     fileIds: string[],
+	 *     signature: string|null,
+	 *     expiration: string|null
+	 * }
+	 */
+	private function extractPublicLinkData(string $xml): array {
+		$doc = new \SimpleXMLElement($xml);
+
+		$doc->registerXPathNamespace('d', 'DAV:');
+		$doc->registerXPathNamespace('oc', 'http://owncloud.org/ns');
+
+		$fileIds = [];
+		$signature = null;
+		$expiration = null;
+
+		foreach ($doc->xpath('//d:response') as $response) {
+			$type = $response->xpath('.//oc:public-link-item-type');
+			$fileId = $response->xpath('.//oc:fileid');
+			$sig = $response->xpath('.//oc:signature');
+			$exp = $response->xpath('.//oc:expiration');
+
+			// only files
+			if (!empty($type) && (string)$type[0] === 'file' && !empty($fileId)) {
+				$fileIds[] = (string)$fileId[0];
+			}
+
+			if ($signature === null && !empty($sig)) {
+				$signature = (string)$sig[0];
+			}
+
+			if ($expiration === null && !empty($exp)) {
+				$expiration = (string)$exp[0];
+			}
+		}
+
+		return [
+			'fileIds' => $fileIds,
+			'signature' => $signature,
+			'expiration' => $expiration,
+		];
+	}
+
+	/**
 	 * @When /^the public sends "([^"]*)" request to the last public link share using the public WebDAV API(?: with password "([^"]*)")?$/
 	 *
 	 * @param string $method
@@ -1260,5 +1308,65 @@ class PublicWebDavContext implements Context {
 			$body,
 		);
 		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @When /^the public sends "([^"]*)" request to fetch archive metadata using the public WebDAV API(?: with password "([^"]*)")?$/
+	 *
+	 * @param string $method
+	 * @param string|null $password
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function publicSendsPropfindRequestForArchiveData(string $method, ?string $password = ''): void {
+		if ($method === "PROPFIND") {
+			$body = '<?xml version="1.0"?>
+		<d:propfind xmlns:d="DAV:" xmlns:oc="http://owncloud.org/ns">
+			<d:prop>
+				<d:resourcetype/>
+				<oc:public-link-item-type/>
+				<oc:public-link-permission/>
+				<oc:public-link-expiration/>
+				<oc:fileid/>
+				<oc:downloadURL/>
+				<oc:signature-auth/>
+				<oc:public-link-share-datetime/>
+				<oc:public-link-share-owner/>
+			</d:prop>
+		</d:propfind>';
+		} else {
+			$body = null;
+		}
+		
+		$token = $this->featureContext->isUsingSharingNG()
+		? $this->featureContext->shareNgGetLastCreatedLinkShareToken()
+		: $this->featureContext->getLastCreatedPublicShareToken();
+		$password = $this->featureContext->getActualPassword($password);
+
+		$fullUrl = $this->featureContext->getBaseUrl() . "/dav/public-files/$token";
+
+		$headers = [
+			"Depth" => "1",
+			"OCS-APIRequest" => "true",
+			"public-token" => $token,
+			"Content-Type" => "application/xml; charset=utf-8",
+			"Authorization" => "Basic " . base64_encode("public:$password"),
+		];
+		$response = HttpRequestHelper::sendRequest(
+			$fullUrl,
+			$method,
+			null,
+			null,
+			$headers,
+			$body,
+		);
+
+		$responseBody = $response->getBody()->getContents();
+
+		$this->featureContext->setResponse($response);
+		$this->featureContext->setPublicLinkPropfindXml($responseBody);
+		$data = $this->extractPublicLinkData($responseBody);
+		$this->featureContext->setPublicLinkArchiveData($data);
 	}
 }

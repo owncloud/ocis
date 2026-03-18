@@ -257,6 +257,56 @@ class ArchiverContext implements Context {
 	}
 
 	/**
+	 * @When public downloads the archive of these items from a public link
+	 * @When public tries to download the archive of these items from a public link
+	 *
+	 * @param TableNode $items
+	 *
+	 * @return void
+	 *
+	 * @throws GuzzleException|Exception
+	 */
+
+    public function publicDownloadsTheArchiveOfItems(
+		TableNode $items
+	): void {
+    $queryString = [];
+    foreach ($items->getRows() as $item) {
+        $queryString[] = $this->getArchiverQueryString('public ', $item[0], 'ids');
+    }
+    $queryString = \join('&', $queryString);
+
+    $data = $this->featureContext->getPublicLinkArchiveData();
+
+    $fileIds = $data['fileIds'];
+    $signature = $data['signature'];
+    $expiration = $data['expiration'];
+
+    $token = $this->featureContext->isUsingSharingNG()
+			? $this->featureContext->shareNgGetLastCreatedLinkShareToken()
+			: $this->featureContext->getLastCreatedPublicShareToken();
+
+    $queryParts = [];
+
+    $queryParts[] = "public-token=" . urlencode($token);
+
+    foreach ($fileIds as $fileId) {
+        $queryParts[] = "id=" . urlencode($fileId);
+    }
+
+    $queryParts[] = "signature=" . urlencode($signature);
+    $queryParts[] = "expiration=" . urlencode($expiration);
+
+    $queryString = implode('&', $queryParts);
+
+    $url = $this->featureContext->getBaseUrl() . "/archiver?" . $queryString;
+
+    $this->featureContext->setResponse(
+        HttpRequestHelper::get($url)
+    );
+	}
+
+	/**
 	 * @Then the downloaded :type archive should contain these files:
 	 *
 	 * @param string $type
