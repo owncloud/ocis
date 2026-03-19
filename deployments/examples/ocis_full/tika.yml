@@ -1,7 +1,7 @@
 ---
 services:
   tika:
-    image: ${TIKA_IMAGE:-apache/tika:latest-full}
+    image: apache/tika:${TIKA_DOCKER_TAG}
     # release notes: https://tika.apache.org
     networks:
       ocis-net:

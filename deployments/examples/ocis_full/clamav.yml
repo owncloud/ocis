@@ -13,7 +13,7 @@ services:
       - "clamav-socket:/var/run/clamav"
 
   clamav:
-    image: clamav/clamav:${CLAMAV_DOCKER_TAG:-latest}
+    image: clamav/clamav:${CLAMAV_DOCKER_TAG}
     # release notes: https://blog.clamav.net
     networks:
       ocis-net:

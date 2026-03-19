@@ -1,7 +1,7 @@
 ---
 services:
   minio:
-    image: minio/minio:latest
+    image: minio/minio:${MINIO_DOCKER_TAG}
     # release notes: https://github.com/minio/minio/releases
     networks:
       ocis-net:
