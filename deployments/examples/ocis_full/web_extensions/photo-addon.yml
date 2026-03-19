@@ -6,7 +6,7 @@ services:
         condition: service_completed_successfully
 
   photo-addon-init:
-    image: owncloud/web-extensions:photo-addon-0.1.0
+    image: owncloud/web-extensions:photo-addon-0.2.0
     user: root
     volumes:
       - ocis-apps:/apps

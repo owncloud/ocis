@@ -1,7 +1,7 @@
 ---
 services:
   traefik:
-    image: traefik:${TRAEFIK_DOCKER_TAG:-latest}
+    image: traefik:${TRAEFIK_DOCKER_TAG}
     networks:
       ocis-net:
     command:
