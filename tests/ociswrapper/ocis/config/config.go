@@ -6,6 +6,7 @@ var config = map[string]string{
 	"retry":         "5",
 	"adminUsername": "",
 	"adminPassword": "",
+	"namespace":     "ocis",
 }
 
 var services = map[string]int{

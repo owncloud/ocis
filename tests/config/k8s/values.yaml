@@ -1,5 +1,4 @@
 ---
-namespaceOverride: ocis
 image:
   repository: owncloud/ocis-rolling
   tag: master
