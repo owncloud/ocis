@@ -34,6 +34,11 @@ deploy-ocis:
 		--values $(CHART_REPO)/charts/ocis/ci/deployment-values.yaml \
 		--wait --timeout 5m0s ocis $(CHART_REPO)/charts/ocis/
 
+.PHONY: show-logs
+show-logs:
+	@tail -f $(LOGS_DIR)/*.log
+
+.PHONY: cleanup
 cleanup:
 	k3d cluster delete local-ocis
 	rm -rf $(LOGS_DIR)

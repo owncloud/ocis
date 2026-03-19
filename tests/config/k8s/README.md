@@ -47,14 +47,20 @@
    make prepare-charts
    ```
 
-   ⚠️ NOTE: To run the test suites that require extra services,
-   use the following appropriate environment variables:
-   - `ENABLE_ANTIVIRUS=true`: Antivirus test suites
-   - `ENABLE_EMAIL=true`: Notification test suites
-   - `ENABLE_TIKA=true`: Content search test suites
-   - `ENABLE_WOPI=true`: WOPI test suites
-   - `ENABLE_OCM=true`: OCM test suites
-   - `ENABLE_AUTH_APP=true`: auth-app test suites
+   > [!TIP]
+   > To run the test suites that require extra services,
+   > use the following appropriate environment variables:
+   >
+   > - `ENABLE_ANTIVIRUS=true`: Antivirus test suites
+   > - `ENABLE_EMAIL=true`: Notification test suites
+   > - `ENABLE_TIKA=true`: Content search test suites
+   > - `ENABLE_WOPI=true`: WOPI test suites
+   > - `ENABLE_OCM=true`: OCM test suites
+   > - `ENABLE_AUTH_APP=true`: auth-app test suites
+   >
+   > ⚠️ When using the above environment variables,
+   > make sure you run the necessary external services and expose them to the cluster.
+   > Check the respective test running sections for more details.
 
    Example:
 
@@ -66,6 +72,12 @@
 
    ```bash
    make deploy-ocis
+   ```
+
+5. Check the ocis logs
+
+   ```bash
+   make show-logs
    ```
 
 ## Running API Tests
