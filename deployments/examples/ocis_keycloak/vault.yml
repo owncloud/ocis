@@ -9,37 +9,9 @@ services:
       OCIS_GATEWAY_GRPC_ADDR: 0.0.0.0:9142
       # Vault: auto-create vault home space on first user login
       PROXY_CREATE_VAULT_HOME: "true"
+      GRAPH_ENABLE_VAULT_MODE: "true"
       # MFA: guard Admin Settings with step-up auth (LOA2)
       # OCIS_MFA_ENABLED: "true"
-
-  graph-vault:
-    image: ${OCIS_DOCKER_IMAGE:-owncloud/ocis}:${OCIS_DOCKER_TAG:-latest}
-    networks:
-      ocis-net:
-    depends_on:
-      ocis:
-        condition: service_started
-    command: ["graph", "server"]
-    environment:
-      OCIS_LOG_LEVEL: ${OCIS_LOG_LEVEL:-info}
-      OCIS_LOG_COLOR: "${OCIS_LOG_COLOR:-false}"
-      GRAPH_ENABLE_VAULT_MODE: "true"
-      OCIS_GATEWAY_GRPC_ADDR: ocis:9142
-      GRAPH_HTTP_ADDR: 0.0.0.0:9125
-      GRAPH_DEBUG_ADDR: 0.0.0.0:9126
-      GRAPH_HTTP_ROOT: /vault/graph
-      GRAPH_SERVICE_NAME: graph-vault
-      MICRO_REGISTRY_ADDRESS: ocis:9233
-      OCIS_EVENTS_ENDPOINT: ocis:9233
-      OCIS_CACHE_STORE_NODES: ocis:9233
-      GRAPH_SPACES_STORAGE_USERS_ADDRESS: com.owncloud.api.storage-users-vault
-      OCIS_INSECURE: "${INSECURE:-false}"
-    volumes:
-      - ocis-data:/var/lib/ocis
-      - ocis-config:/etc/ocis
-    logging:
-      driver: ${LOG_DRIVER:-local}
-    restart: always
 
   storage-users-vault:
     image: ${OCIS_DOCKER_IMAGE:-owncloud/ocis}:${OCIS_DOCKER_TAG:-latest}

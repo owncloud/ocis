@@ -83,11 +83,13 @@ services:
       KEYCLOAK_DOMAIN: ${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}
       OCIS_MFA_ENABLED: ${OCIS_MFA_ENABLED:-false}
       WEB_OIDC_SCOPE: "openid profile email acr"
+      # WEB_ASSET_CORE_PATH: /web/dist # local web dist
     volumes:
       - ./config/ocis/banned-password-list.txt:/etc/ocis/banned-password-list.txt
       - ./config/ocis/csp.yaml:/etc/ocis/csp.yaml
       - ocis-config:/etc/ocis
       - ocis-data:/var/lib/ocis
+      # - /Users/mk/dev/kiteworks/web/dist:/web/dist # local web dist
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.ocis.entrypoints=https"
