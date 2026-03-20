@@ -34,12 +34,10 @@ import (
 
 var (
 	// DefaultStatCache is the memory store.
-	statCaches                = make(map[string]StatCache)
-	providerCaches            = make(map[string]ProviderCache)
-	createHomeCaches          = make(map[string]CreateHomeCache)
-	createPersonalSpaceCaches = make(map[string]CreatePersonalSpaceCache)
-	fileMetadataCaches        = make(map[string]FileMetadataCache)
-	mutex                     sync.Mutex
+	statCaches         = make(map[string]StatCache)
+	providerCaches     = make(map[string]ProviderCache)
+	fileMetadataCaches = make(map[string]FileMetadataCache)
+	mutex              sync.Mutex
 )
 
 // Config contains the configuring for a cache
@@ -82,19 +80,6 @@ type ProviderCache interface {
 	GetKey(userID *userpb.UserId, spaceID string) string
 }
 
-// CreateHomeCache handles removing keys from a create home cache
-type CreateHomeCache interface {
-	Cache
-	RemoveCreateHome(res *provider.ResourceId)
-	GetKey(userID *userpb.UserId) string
-}
-
-// CreatePersonalSpaceCache handles removing keys from a create home cache
-type CreatePersonalSpaceCache interface {
-	Cache
-	GetKey(userID *userpb.UserId) string
-}
-
 // FileMetadataCache handles file metadata
 type FileMetadataCache interface {
 	Cache
@@ -125,32 +110,6 @@ func GetProviderCache(cfg Config) ProviderCache {
 		providerCaches[key] = NewProviderCache(cfg)
 	}
 	return providerCaches[key]
-}
-
-// GetCreateHomeCache will return an existing CreateHomeCache for the given store, nodes, database and table
-// If it does not exist yet it will be created, different TTLs are ignored
-func GetCreateHomeCache(cfg Config) CreateHomeCache {
-	mutex.Lock()
-	defer mutex.Unlock()
-
-	key := strings.Join(append(append([]string{cfg.Store}, cfg.Nodes...), cfg.Database, cfg.Table), ":")
-	if createHomeCaches[key] == nil {
-		createHomeCaches[key] = NewCreateHomeCache(cfg)
-	}
-	return createHomeCaches[key]
-}
-
-// GetCreatePersonalSpaceCache will return an existing CreatePersonalSpaceCache for the given store, nodes, database and table
-// If it does not exist yet it will be created, different TTLs are ignored
-func GetCreatePersonalSpaceCache(cfg Config) CreatePersonalSpaceCache {
-	mutex.Lock()
-	defer mutex.Unlock()
-
-	key := strings.Join(append(append([]string{cfg.Store}, cfg.Nodes...), cfg.Database, cfg.Table), ":")
-	if createPersonalSpaceCaches[key] == nil {
-		createPersonalSpaceCaches[key] = NewCreatePersonalSpaceCache(cfg)
-	}
-	return createPersonalSpaceCaches[key]
 }
 
 // GetFileMetadataCache will return an existing GetFileMetadataCache for the given store, nodes, database and table

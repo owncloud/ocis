@@ -38,6 +38,7 @@ import (
 	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"google.golang.org/grpc/codes"
 
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/owncloud/reva/v2/pkg/appctx"
 	ctxpkg "github.com/owncloud/reva/v2/pkg/ctx"
 	"github.com/owncloud/reva/v2/pkg/errtypes"
@@ -48,7 +49,6 @@ import (
 	"github.com/owncloud/reva/v2/pkg/share"
 	"github.com/owncloud/reva/v2/pkg/storagespace"
 	"github.com/owncloud/reva/v2/pkg/utils"
-	"github.com/golang-jwt/jwt/v5"
 	"github.com/pkg/errors"
 	gstatus "google.golang.org/grpc/status"
 )
@@ -213,7 +213,7 @@ func (s *svc) CreateStorageSpace(ctx context.Context, req *provider.CreateStorag
 	}
 
 	// just pick the first provider, we expect only one
-	c, err := s.getSpacesProviderClient(ctx, res.Providers[0])
+	c, err := pool.GetSpacesProviderServiceClient(res.Providers[0].Address)
 	if err != nil {
 		return &provider.CreateStorageSpaceResponse{
 			Status: status.NewStatusFromErrType(ctx, "gateway could not get storage provider client", err),
@@ -1027,7 +1027,7 @@ func (s *svc) find(ctx context.Context, ref *provider.Reference) (provider.Provi
 		return nil, nil, err
 	}
 
-	client, err := s.getStorageProviderClient(ctx, p[0])
+	client, err := pool.GetStorageProviderServiceClient(p[0].Address)
 	return client, p[0], err
 }
 
@@ -1041,7 +1041,7 @@ func (s *svc) findSpacesProvider(ctx context.Context, ref *provider.Reference) (
 		return nil, nil, err
 	}
 
-	client, err := s.getSpacesProviderClient(ctx, p[0])
+	client, err := pool.GetSpacesProviderServiceClient(p[0].Address)
 	return client, p[0], err
 }
 
@@ -1064,30 +1064,6 @@ func (s *svc) findAndUnwrap(ctx context.Context, ref *provider.Reference) (provi
 	relativeReference := unwrap(ref, mountPath, root)
 
 	return c, p, relativeReference, nil
-}
-
-func (s *svc) getSpacesProviderClient(_ context.Context, p *registry.ProviderInfo) (provider.SpacesAPIClient, error) {
-	c, err := pool.GetSpacesProviderServiceClient(p.Address)
-	if err != nil {
-		return nil, err
-	}
-
-	return &cachedSpacesAPIClient{
-		c:                        c,
-		createPersonalSpaceCache: s.createPersonalSpaceCache,
-	}, nil
-}
-
-func (s *svc) getStorageProviderClient(_ context.Context, p *registry.ProviderInfo) (provider.ProviderAPIClient, error) {
-	c, err := pool.GetStorageProviderServiceClient(p.Address)
-	if err != nil {
-		return nil, err
-	}
-
-	return &cachedAPIClient{
-		c:                        c,
-		createPersonalSpaceCache: s.createPersonalSpaceCache,
-	}, nil
 }
 
 func (s *svc) getStorageRegistryClient(_ context.Context, address string) (registry.RegistryAPIClient, error) {
