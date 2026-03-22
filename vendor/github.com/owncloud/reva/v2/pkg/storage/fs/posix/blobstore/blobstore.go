@@ -59,17 +59,14 @@ func (bs *Blobstore) Upload(node *node.Node, source string) error {
 	defer f.Close()
 
 	w := bufio.NewWriter(f)
-	if _, err = w.ReadFrom(file); err != nil {
+	_, err = w.ReadFrom(file)
+	if err != nil {
 		return errors.Wrapf(err, "could not write blob '%s'", node.InternalPath())
 	}
 
-	if err = w.Flush(); err != nil {
-		return errors.Wrapf(err, "could not flush blob '%s'", node.InternalPath())
-	}
-
-	// Ensure data is synced to disk before returning
-	if err = f.Sync(); err != nil {
-		return errors.Wrapf(err, "could not sync blob '%s' to disk", node.InternalPath())
+	err = w.Flush()
+	if err != nil {
+		return err
 	}
 
 	if fi != nil {

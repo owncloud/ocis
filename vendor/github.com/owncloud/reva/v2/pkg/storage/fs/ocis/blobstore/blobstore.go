@@ -80,27 +80,14 @@ func (bs *Blobstore) Upload(node *node.Node, source string) error {
 	if err != nil {
 		return errors.Wrapf(err, "could not open blob '%s' for writing", dest)
 	}
-	defer func() {
-		if cerr := f.Close(); cerr != nil && err == nil {
-			err = errors.Wrapf(cerr, "could not close blob '%s'", dest)
-		}
-	}()
 
 	w := bufio.NewWriter(f)
-	if _, err = w.ReadFrom(file); err != nil {
+	_, err = w.ReadFrom(file)
+	if err != nil {
 		return errors.Wrapf(err, "could not write blob '%s'", dest)
 	}
 
-	if err = w.Flush(); err != nil {
-		return errors.Wrapf(err, "could not flush blob '%s'", dest)
-	}
-
-	// Ensure data is synced to disk before returning
-	if err = f.Sync(); err != nil {
-		return errors.Wrapf(err, "could not sync blob '%s' to disk", dest)
-	}
-
-	return nil
+	return w.Flush()
 }
 
 // Download retrieves a blob from the blobstore for reading

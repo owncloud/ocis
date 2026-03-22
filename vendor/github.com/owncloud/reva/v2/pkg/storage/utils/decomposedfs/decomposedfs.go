@@ -390,8 +390,9 @@ func (fs *Decomposedfs) Postprocessing(ch <-chan events.Event) {
 						ResourceId: &provider.ResourceId{
 							StorageId: session.ProviderID(),
 							SpaceId:   session.SpaceID(),
-							OpaqueId:  session.NodeID(),
+							OpaqueId:  session.SpaceID(),
 						},
+						Path: utils.MakeRelativePath(filepath.Join(session.Dir(), session.Filename())),
 					},
 					ResourceID: &provider.ResourceId{
 						StorageId: session.ProviderID(),
