@@ -64,7 +64,7 @@ require (
 	github.com/open-policy-agent/opa v1.12.3
 	github.com/orcaman/concurrent-map v1.0.0
 	github.com/owncloud/libre-graph-api-go v1.0.5-0.20260216101009-eeac018af245
-	github.com/owncloud/reva/v2 v2.0.0-20260304131727-ce3149532498
+	github.com/owncloud/reva/v2 v2.0.0-20260324082555-823c2f1c2593
 	github.com/pkg/errors v0.9.1
 	github.com/pkg/xattr v0.4.12
 	github.com/prometheus/client_golang v1.23.2
