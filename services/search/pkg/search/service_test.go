@@ -336,6 +336,31 @@ var _ = Describe("Searchprovider", func() {
 			Expect(err).ShouldNot(HaveOccurred())
 			Expect(int(upsertCount.Load())).To(Equal(numDirs), "every unindexed file inside an already-indexed directory must be visited")
 		})
+
+		It("scales linearly when a single directory contains many unindexed files", func() {
+			// Pessimistic case for a heavy user: one directory holding N files,
+			// the directory itself already indexed.  Runs at three scales and
+			// prints wall-clock durations so the reviewer can eyeball linearity.
+			scales := []int{100, 1000, 10000}
+
+			type result struct {
+				numFiles int
+				duration time.Duration
+			}
+			results := make([]result, 0, len(scales))
+
+			for _, numFiles := range scales {
+				upserts, dur, err := runSingleDirScaleTest(numFiles)
+				Expect(err).ShouldNot(HaveOccurred())
+				Expect(upserts).To(Equal(numFiles), fmt.Sprintf("all %d unindexed files must be visited", numFiles))
+				results = append(results, result{numFiles: numFiles, duration: dur})
+			}
+
+			fmt.Fprintf(GinkgoWriter, "\nScale benchmark — single dir with N unindexed files:\n")
+			for _, r := range results {
+				fmt.Fprintf(GinkgoWriter, "  %6d files → %s\n", r.numFiles, r.duration)
+			}
+		})
 	})
 
 	Describe("UpdateTags", func() {
@@ -737,6 +762,129 @@ var _ = Describe("Searchprovider", func() {
 		})
 	})
 })
+
+// runSingleDirScaleTest creates a fresh service with mocks and runs IndexSpace
+// against a tree: root → big-dir → N files.  Root and big-dir are already
+// indexed (mtime matches); files are not.  Returns the number of Upsert calls,
+// the wall-clock duration of IndexSpace, and any error.
+func runSingleDirScaleTest(numFiles int) (int, time.Duration, error) {
+	logger := log.NewLogger()
+	user := &userv1beta1.User{Id: &userv1beta1.UserId{OpaqueId: "user"}}
+
+	selectorKey := fmt.Sprintf("ScaleBench-%d", numFiles)
+	pool.RemoveSelector(selectorKey + "com.owncloud.api.gateway")
+	gw := &cs3mocks.GatewayAPIClient{}
+	gwSelector := pool.GetSelector[gateway.GatewayAPIClient](
+		selectorKey,
+		"com.owncloud.api.gateway",
+		func(cc grpc.ClientConnInterface) gateway.GatewayAPIClient {
+			return gw
+		},
+	)
+
+	idx := &engineMocks.Engine{}
+	ext := &contentMocks.Extractor{}
+	svc := search.NewService(gwSelector, idx, ext, logger, &config.Config{})
+
+	gw.On("Authenticate", mock.Anything, mock.Anything).Return(&gateway.AuthenticateResponse{
+		Status: status.NewOK(context.Background()),
+		Token:  "authtoken",
+	}, nil)
+	gw.On("GetUserByClaim", mock.Anything, mock.Anything).Return(&userv1beta1.GetUserByClaimResponse{
+		Status: status.NewOK(context.Background()),
+		User:   user,
+	}, nil)
+	ext.On("Extract", mock.Anything, mock.Anything, mock.Anything).Return(content.Document{}, nil)
+	idx.On("DocCount").Return(uint64(1), nil)
+
+	indexedMtime := time.Unix(5000, 0).UTC().Format(time.RFC3339Nano)
+
+	rootInfo := &sprovider.ResourceInfo{
+		Id:    &sprovider.ResourceId{StorageId: "storageid", SpaceId: "spaceid", OpaqueId: "spaceid"},
+		Type:  sprovider.ResourceType_RESOURCE_TYPE_CONTAINER,
+		Path:  ".",
+		Mtime: &typesv1beta1.Timestamp{Seconds: 5000},
+	}
+	bigDirInfo := &sprovider.ResourceInfo{
+		Id:    &sprovider.ResourceId{StorageId: "storageid", SpaceId: "spaceid", OpaqueId: "big-dir"},
+		Type:  sprovider.ResourceType_RESOURCE_TYPE_CONTAINER,
+		Path:  "big-dir",
+		Mtime: &typesv1beta1.Timestamp{Seconds: 5000},
+	}
+
+	fileInfos := make([]*sprovider.ResourceInfo, numFiles)
+	fileInfoByPath := make(map[string]*sprovider.ResourceInfo, numFiles)
+	for i := range numFiles {
+		fi := &sprovider.ResourceInfo{
+			Id:       &sprovider.ResourceId{StorageId: "storageid", SpaceId: "spaceid", OpaqueId: fmt.Sprintf("file-%d", i)},
+			ParentId: &sprovider.ResourceId{StorageId: "storageid", SpaceId: "spaceid", OpaqueId: "big-dir"},
+			Type:     sprovider.ResourceType_RESOURCE_TYPE_FILE,
+			Path:     fmt.Sprintf("file-%d.pdf", i),
+			Size:     1024,
+			Mtime:    &typesv1beta1.Timestamp{Seconds: 5000},
+		}
+		fileInfos[i] = fi
+		fileInfoByPath["./big-dir/"+fi.Path] = fi
+	}
+
+	gw.On("Stat", mock.Anything, mock.Anything).Return(
+		func(_ context.Context, sreq *sprovider.StatRequest, _ ...grpc.CallOption) *sprovider.StatResponse {
+			if sreq.Ref.ResourceId != nil && sreq.Ref.ResourceId.OpaqueId == "spaceid" {
+				return &sprovider.StatResponse{Status: status.NewOK(context.Background()), Info: rootInfo}
+			}
+			if fi, ok := fileInfoByPath[sreq.Ref.Path]; ok {
+				return &sprovider.StatResponse{Status: status.NewOK(context.Background()), Info: fi}
+			}
+			return &sprovider.StatResponse{Status: status.NewOK(context.Background()), Info: rootInfo}
+		},
+		func(_ context.Context, _ *sprovider.StatRequest, _ ...grpc.CallOption) error { return nil },
+	)
+
+	gw.On("ListContainer", mock.Anything, mock.Anything).Return(
+		func(_ context.Context, req *sprovider.ListContainerRequest, _ ...grpc.CallOption) *sprovider.ListContainerResponse {
+			switch req.Ref.ResourceId.OpaqueId {
+			case "spaceid":
+				return &sprovider.ListContainerResponse{
+					Status: status.NewOK(context.Background()),
+					Infos:  []*sprovider.ResourceInfo{bigDirInfo},
+				}
+			case "big-dir":
+				return &sprovider.ListContainerResponse{
+					Status: status.NewOK(context.Background()),
+					Infos:  fileInfos,
+				}
+			default:
+				return &sprovider.ListContainerResponse{
+					Status: status.NewOK(context.Background()),
+				}
+			}
+		},
+		func(_ context.Context, _ *sprovider.ListContainerRequest, _ ...grpc.CallOption) error { return nil },
+	)
+
+	indexedIDs := map[string]bool{
+		"storageid$spaceid!spaceid": true,
+		"storageid$spaceid!big-dir": true,
+	}
+	indexedResource := &engine.Resource{Document: content.Document{Mtime: indexedMtime}, Extracted: true}
+	idx.On("Lookup", mock.Anything).Return(func(id string) (*engine.Resource, error) {
+		if indexedIDs[id] {
+			return indexedResource, nil
+		}
+		return nil, engine.ErrResourceNotFound
+	})
+
+	var upsertCount atomic.Int32
+	idx.On("Upsert", mock.Anything, mock.Anything).Run(func(_ mock.Arguments) {
+		upsertCount.Add(1)
+	}).Return(nil)
+
+	start := time.Now()
+	err := svc.IndexSpace(&sprovider.StorageSpaceId{OpaqueId: "storageid$spaceid!spaceid"})
+	dur := time.Since(start)
+
+	return int(upsertCount.Load()), dur, err
+}
 
 var _ = DescribeTable("Parse Scope",
 	func(pattern, wantSearch, wantScope string) {
