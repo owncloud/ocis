@@ -15,4 +15,11 @@ This deployment example is documented in two locations for different audiences:
   Providing details which are more developer focused. This description can also be used when deviating from the default.\
   Note that this examples uses self signed certificates and is intended for testing purposes.
 
+## Optional Services
 
+### Keycloak
+
+Keycloak can be optionally enabled by uncommenting the corresponding variables in the `.env` file:
+- `KEYCLOAK=:keycloak.yml`
+
+Note that Keycloak requires the default `ocis` Identity Provider to be disabled, which is automatically handled when the `keycloak.yml` configuration is used.
