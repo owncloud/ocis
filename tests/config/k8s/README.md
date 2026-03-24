@@ -190,6 +190,34 @@ make test-acceptance-api
    make test-acceptance-api
    ```
 
+### Run OCM tests
+
+For running OCM test suite on k8s, we need to deploy a federation ocis server
+in a separate namespace on the same cluster, alongside the ocis server:
+
+1. Check if setup [step 3](#deploy-ocis-in-k8s) is done correctly. (`ENABLE_OCM=true`)
+2. Prepare Charts for federation oCIS
+
+   ```bash
+   OCM=true make prepare-charts
+   ```
+
+3. Deploy federation oCIS
+
+   ```bash
+   OCM=true make deploy-ocis
+   ```
+
+4. Run the tests
+
+   ```bash
+   TEST_SERVER_URL=https://ocis-server \
+   TEST_SERVER_FED_URL=https://federation-ocis-server \
+   K8S=true \
+   BEHAT_FEATURE=<test-suites-path>/apiOcm/share.feature \
+   make test-acceptance-api
+   ```
+
 ## Cleanup the Setup
 
 To delete the cluster and all the setup resources, run the following command:
