@@ -1,0 +1,78 @@
+---
+services:
+  traefik:
+    networks:
+      ocis-net:
+        aliases:
+          - ${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}
+
+  ocis:
+    environment:
+      # Keycloak IDP specific configuration
+      PROXY_AUTOPROVISION_ACCOUNTS: "true"
+      PROXY_ROLE_ASSIGNMENT_DRIVER: "oidc"
+      OCIS_OIDC_ISSUER: https://${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}/realms/${KEYCLOAK_REALM:-oCIS}
+      PROXY_OIDC_REWRITE_WELLKNOWN: "true"
+      WEB_OIDC_CLIENT_ID: ${OCIS_OIDC_CLIENT_ID:-web}
+      PROXY_USER_OIDC_CLAIM: "preferred_username"
+      PROXY_USER_CS3_CLAIM: "username"
+      OCIS_EXCLUDE_RUN_SERVICES: "idp"
+      GRAPH_ASSIGN_DEFAULT_USER_ROLE: "false"
+      GRAPH_USERNAME_MATCH: "none"
+      KEYCLOAK_DOMAIN: ${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}
+      WEB_OIDC_SCOPE: "openid profile email acr"
+
+  postgres:
+    image: postgres:alpine
+    networks:
+      ocis-net:
+    volumes:
+      - keycloak_postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: keycloak
+    logging:
+      driver: ${LOG_DRIVER:-local}
+    restart: always
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:${KEYCLOAK_DOCKER_TAG}
+    networks:
+      ocis-net:
+    command: ["start", "--spi-connections-http-client-default-disable-trust-manager=${INSECURE:-false}", "--import-realm"]
+    entrypoint: ["/bin/sh", "/opt/keycloak/bin/docker-entrypoint-override.sh"]
+    volumes:
+      - "./config/keycloak/docker-entrypoint-override.sh:/opt/keycloak/bin/docker-entrypoint-override.sh"
+      - "./config/keycloak/ocis-realm.dist.json:/opt/keycloak/data/import-dist/ocis-realm.json"
+    environment:
+      OCIS_DOMAIN: ${OCIS_DOMAIN:-ocis.owncloud.test}
+      KC_HOSTNAME: ${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}
+      KC_DB: postgres
+      KC_DB_URL: "jdbc:postgresql://postgres:5432/keycloak"
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: keycloak
+      KC_FEATURES: impersonation,opentelemetry
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_ADMIN_USER:-admin}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-admin}
+      # as replacement of --proxy=edge
+      KC_PROXY_HEADERS: xforwarded
+      KC_HTTP_ENABLED: true
+      # tracing
+      KC_TRACING_ENABLED: ${KEYCLOAK_TRACING:-false}
+      KC_TRACING_ENDPOINT: http://jaeger:4317
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.keycloak.entrypoints=https"
+      - "traefik.http.routers.keycloak.rule=Host(`${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}`)"
+      - "traefik.http.routers.keycloak.tls.certresolver=http"
+      - "traefik.http.routers.keycloak.service=keycloak"
+      - "traefik.http.services.keycloak.loadbalancer.server.port=8080"
+    depends_on:
+      - postgres
+    logging:
+      driver: ${LOG_DRIVER:-local}
+    restart: always
+
+volumes:
+  keycloak_postgres_data:
