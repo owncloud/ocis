@@ -27,6 +27,7 @@ import (
 	"github.com/thejerf/suture/v4"
 
 	ociscfg "github.com/owncloud/ocis/v2/ocis-pkg/config"
+	"github.com/owncloud/ocis/v2/ocis-pkg/config/defaults"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	ogrpc "github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
@@ -369,6 +370,13 @@ func Start(ctx context.Context, o ...Option) error {
 	if err != nil {
 		return err
 	}
+
+	// Log the effective data and config paths at startup so operators can
+	// verify that data is written to the expected location.
+	s.Log.Info().
+		Str("data_path", defaults.BaseDataPath()).
+		Str("config_path", defaults.BaseConfigPath()).
+		Msg("effective data and config paths")
 
 	// cancel the context when a signal is received.
 	var cancel context.CancelFunc = func() {}
