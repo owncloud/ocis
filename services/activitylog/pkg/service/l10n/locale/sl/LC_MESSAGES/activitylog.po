@@ -1,0 +1,109 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# 
+# Translators:
+# Martin <github@diemattels.at>, 2026
+# Miha Podobnik, 2026
+# 
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: EMAIL\n"
+"POT-Creation-Date: 2026-03-24 00:06+0000\n"
+"PO-Revision-Date: 2026-01-02 10:10+0000\n"
+"Last-Translator: Miha Podobnik, 2026\n"
+"Language-Team: Slovenian (https://app.transifex.com/owncloud-org/teams/6149/sl/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: sl\n"
+"Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3);\n"
+
+#: pkg/service/response.go:44
+msgid "description"
+msgstr "opis"
+
+#: pkg/service/response.go:43
+msgid "display name"
+msgstr "prikazno ime"
+
+#: pkg/service/response.go:42
+msgid "expiration date"
+msgstr "datum poteka"
+
+#: pkg/service/response.go:41
+msgid "password"
+msgstr "geslo"
+
+#: pkg/service/response.go:40
+msgid "permission"
+msgstr "dovoljenje"
+
+#: pkg/service/response.go:45
+msgid "shared-with-me"
+msgstr "deljeno-z-mano"
+
+#: pkg/service/response.go:39
+msgid "some field"
+msgstr "neko polje"
+
+#: pkg/service/response.go:26
+msgid "{resource} was downloaded via public link {token}"
+msgstr "{resource} je bil prenesen prek javne povezave {token}"
+
+#: pkg/service/response.go:24
+msgid "{user} added {resource} to {folder}"
+msgstr "{user} je dodal {resource} v {folder}"
+
+#: pkg/service/response.go:36
+msgid "{user} added {sharee} as member of {space}"
+msgstr "{user} je dodal {sharee} kot član {space}"
+
+#: pkg/service/response.go:27
+msgid "{user} deleted {resource} from {folder}"
+msgstr "{user} je izbrisal {resource} iz {folder}"
+
+#: pkg/service/response.go:28
+msgid "{user} moved {resource} to {folder}"
+msgstr "{user} je premaknil {resource} v {folder}"
+
+#: pkg/service/response.go:35
+msgid "{user} removed link to {resource}"
+msgstr "{user} je odstranil povezavo do {resource}"
+
+#: pkg/service/response.go:32
+msgid "{user} removed {sharee} from {resource}"
+msgstr "{user} je odstranil uporabnika {sharee} iz {resource}"
+
+#: pkg/service/response.go:37
+msgid "{user} removed {sharee} from {space}"
+msgstr "{user} je odstranil uporabnika {sharee} iz {space}"
+
+#: pkg/service/response.go:29
+msgid "{user} renamed {oldResource} to {resource}"
+msgstr "{user} je preimenoval/a {oldResource} v {resource}"
+
+#: pkg/service/response.go:33
+msgid "{user} shared {resource} via link"
+msgstr "{user} je omogočil souporabo {resource} prek povezave"
+
+#: pkg/service/response.go:30
+msgid "{user} shared {resource} with {sharee}"
+msgstr "Uporabnik {user} je omogočil souporabo {resource} z {sharee}"
+
+#: pkg/service/response.go:34
+msgid "{user} updated {field} for a link {token} on {resource}"
+msgstr ""
+"Uporabnik {user} je posodobil polje {field} za povezavo {token} na viru "
+"{resource}"
+
+#: pkg/service/response.go:31
+msgid "{user} updated {field} for the {resource}"
+msgstr "{user} je preimenoval/a {oldResource} v {resource}"
+
+#: pkg/service/response.go:25
+msgid "{user} updated {resource} in {folder}"
+msgstr "Uporabnik {user} je posodobil {resource} v {folder}"
