@@ -469,8 +469,11 @@ func (s *Service) IndexSpace(spaceID *provider.StorageSpaceId) error {
 			docMtime, parseErr := time.Parse(time.RFC3339Nano, r.Mtime)
 			if parseErr == nil && !docMtime.Before(fileMtime) {
 				if info.Type == provider.ResourceType_RESOURCE_TYPE_CONTAINER {
-					s.logger.Debug().Str("path", ref.Path).Msg("subtree hasn't changed. Skipping.")
-					return filepath.SkipDir
+					// Always descend into directories — a directory's
+					// mtime only reflects direct child add/remove, not
+					// whether all children were successfully indexed.
+					// With O(1) DocID lookups the cost is negligible.
+					return nil
 				}
 				s.logger.Debug().Str("path", ref.Path).Msg("element hasn't changed. Skipping.")
 				return nil
