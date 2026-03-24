@@ -3,6 +3,9 @@ package search_test
 import (
 	"context"
 	"errors"
+	"fmt"
+	"sync/atomic"
+	"time"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
@@ -199,6 +202,139 @@ var _ = Describe("Searchprovider", func() {
 			indexClient.AssertNotCalled(GinkgoT(), "Search", mock.Anything, mock.Anything)
 			err := s.IndexSpace(&sprovider.StorageSpaceId{OpaqueId: "storageid$spaceid!spaceid"})
 			Expect(err).ShouldNot(HaveOccurred())
+		})
+
+		It("descends into already-indexed directories to index unvisited children", func() {
+			// Simulate a large tree where all directories are already indexed
+			// (mtime matches) but each contains one unindexed file — e.g. after
+			// a Tika crash interrupted a previous reindex run.  The fix ensures
+			// we never SkipDir for directories, so children are always visited.
+			//
+			// 10,000 directories: pessimistic-case benchmark confirming the walker
+			// scales linearly even when every directory is already indexed.
+			const numDirs = 10000
+
+			gatewayClient.On("GetUserByClaim", mock.Anything, mock.Anything).Return(&userv1beta1.GetUserByClaimResponse{
+				Status: status.NewOK(context.Background()),
+				User:   user,
+			}, nil)
+			extractor.On("Extract", mock.Anything, mock.Anything, mock.Anything).Return(content.Document{}, nil)
+
+			// The indexed mtime that the engine returns for directories.
+			indexedMtime := time.Unix(5000, 0).UTC().Format(time.RFC3339Nano)
+
+			// Build root: a container that lists numDirs child directories.
+			rootInfo := &sprovider.ResourceInfo{
+				Id:    &sprovider.ResourceId{StorageId: "storageid", SpaceId: "spaceid", OpaqueId: "spaceid"},
+				Type:  sprovider.ResourceType_RESOURCE_TYPE_CONTAINER,
+				Path:  ".",
+				Mtime: &typesv1beta1.Timestamp{Seconds: 5000},
+			}
+			dirInfos := make([]*sprovider.ResourceInfo, numDirs)
+			for i := 0; i < numDirs; i++ {
+				dirInfos[i] = &sprovider.ResourceInfo{
+					Id:    &sprovider.ResourceId{StorageId: "storageid", SpaceId: "spaceid", OpaqueId: fmt.Sprintf("dir-%d", i)},
+					Type:  sprovider.ResourceType_RESOURCE_TYPE_CONTAINER,
+					Path:  fmt.Sprintf("dir-%d", i),
+					Mtime: &typesv1beta1.Timestamp{Seconds: 5000},
+				}
+			}
+
+			// Pre-build file infos for each directory (map for O(1) dispatch).
+			fileInfoByDir := make(map[string]*sprovider.ResourceInfo, numDirs)
+			for i := 0; i < numDirs; i++ {
+				dirID := fmt.Sprintf("dir-%d", i)
+				fileInfoByDir[dirID] = &sprovider.ResourceInfo{
+					Id:       &sprovider.ResourceId{StorageId: "storageid", SpaceId: "spaceid", OpaqueId: fmt.Sprintf("file-%d", i)},
+					ParentId: &sprovider.ResourceId{StorageId: "storageid", SpaceId: "spaceid", OpaqueId: dirID},
+					Type:     sprovider.ResourceType_RESOURCE_TYPE_FILE,
+					Path:     fmt.Sprintf("file-%d.pdf", i),
+					Size:     1024,
+					Mtime:    &typesv1beta1.Timestamp{Seconds: 5000},
+				}
+			}
+
+			// Build path-to-fileInfo map for O(1) Stat dispatch.
+			fileInfoByPath := make(map[string]*sprovider.ResourceInfo, numDirs)
+			for dirID, fi := range fileInfoByDir {
+				fileInfoByPath["./"+dirID+"/"+fi.Path] = fi
+			}
+
+			// Single Stat mock dispatching via map — avoids 10k separate matchers.
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(
+				func(_ context.Context, sreq *sprovider.StatRequest, _ ...grpc.CallOption) *sprovider.StatResponse {
+					if sreq.Ref.ResourceId != nil && sreq.Ref.ResourceId.OpaqueId == "spaceid" {
+						return &sprovider.StatResponse{
+							Status: status.NewOK(context.Background()),
+							Info:   rootInfo,
+						}
+					}
+					if fi, ok := fileInfoByPath[sreq.Ref.Path]; ok {
+						return &sprovider.StatResponse{
+							Status: status.NewOK(context.Background()),
+							Info:   fi,
+						}
+					}
+					return &sprovider.StatResponse{Status: status.NewOK(context.Background()), Info: rootInfo}
+				},
+				func(_ context.Context, _ *sprovider.StatRequest, _ ...grpc.CallOption) error {
+					return nil
+				},
+			)
+
+			// Single ListContainer mock dispatching via map.
+			gatewayClient.On("ListContainer", mock.Anything, mock.Anything).Return(
+				func(_ context.Context, req *sprovider.ListContainerRequest, _ ...grpc.CallOption) *sprovider.ListContainerResponse {
+					opaqueID := req.Ref.ResourceId.OpaqueId
+					if opaqueID == "spaceid" {
+						return &sprovider.ListContainerResponse{
+							Status: status.NewOK(context.Background()),
+							Infos:  dirInfos,
+						}
+					}
+					if fi, ok := fileInfoByDir[opaqueID]; ok {
+						return &sprovider.ListContainerResponse{
+							Status: status.NewOK(context.Background()),
+							Infos:  []*sprovider.ResourceInfo{fi},
+						}
+					}
+					return &sprovider.ListContainerResponse{
+						Status: status.NewOK(context.Background()),
+						Infos:  nil,
+					}
+				},
+				func(_ context.Context, _ *sprovider.ListContainerRequest, _ ...grpc.CallOption) error {
+					return nil
+				},
+			)
+
+			// Lookup: root and directories are already indexed with matching mtime.
+			// Use a map for O(1) lookup instead of linear scan (matters at 10k dirs).
+			indexedIDs := make(map[string]bool, numDirs+1)
+			indexedIDs["storageid$spaceid!spaceid"] = true
+			for i := 0; i < numDirs; i++ {
+				indexedIDs[fmt.Sprintf("storageid$spaceid!dir-%d", i)] = true
+			}
+			indexedResource := &engine.Resource{Document: content.Document{Mtime: indexedMtime}, Extracted: true}
+			indexClient.On("Lookup", mock.MatchedBy(func(id string) bool {
+				return indexedIDs[id] || len(id) > 18 // dir-N or file-N IDs
+			})).Return(func(id string) (*engine.Resource, error) {
+				if indexedIDs[id] {
+					return indexedResource, nil
+				}
+				// Files are not indexed.
+				return nil, engine.ErrResourceNotFound
+			})
+
+			// Track Upsert calls — each unindexed file should trigger one.
+			var upsertCount atomic.Int32
+			indexClient.On("Upsert", mock.Anything, mock.Anything).Run(func(_ mock.Arguments) {
+				upsertCount.Add(1)
+			}).Return(nil)
+
+			err := s.IndexSpace(&sprovider.StorageSpaceId{OpaqueId: "storageid$spaceid!spaceid"})
+			Expect(err).ShouldNot(HaveOccurred())
+			Expect(int(upsertCount.Load())).To(Equal(numDirs), "every unindexed file inside an already-indexed directory must be visited")
 		})
 	})
 
