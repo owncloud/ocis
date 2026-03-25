@@ -6,8 +6,15 @@ on:
 
 jobs:
   acceptance-tests-graph:
-    name: apiGraph
+    name: ${{ matrix.suite }}
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        suite:
+          - apiGraph
+          - apiGraphGroup
+          - apiGraphUser
     steps:
       - uses: actions/checkout@v4
 
@@ -22,6 +29,12 @@ jobs:
           extensions: curl, xml, mbstring, zip
           tools: composer
 
-      - name: Run graph acceptance tests
-        run: bash tests/acceptance/run-graph.sh
+      - name: Run ${{ matrix.suite }}
+        run: BEHAT_SUITES=${{ matrix.suite }} bash tests/acceptance/run-graph.sh
 
+      - name: Upload test logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-logs-${{ matrix.suite }}
+          path: tests/acceptance/output/

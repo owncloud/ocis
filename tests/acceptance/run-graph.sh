@@ -7,6 +7,9 @@ WRAPPER_BIN="$REPO_ROOT/tests/ociswrapper/bin/ociswrapper"
 OCIS_URL="https://localhost:9200"
 OCIS_CONFIG_DIR="$HOME/.ocis/config"
 
+# suite(s) to run — set via env or passed from CI matrix
+: "${BEHAT_SUITES:?BEHAT_SUITES is required, e.g. BEHAT_SUITES=apiGraph bash run-graph.sh}"
+
 # build
 make -C "$REPO_ROOT/ocis" build
 GOWORK=off make -C "$REPO_ROOT/tests/ociswrapper" build
@@ -50,10 +53,11 @@ timeout 300 bash -c \
     -w %{http_code} -o /dev/null) != 200 ]; do sleep 1; done"
 echo "ocis ready."
 
-# run apiGraph acceptance tests
+# run acceptance tests for declared suites
+echo "Running suites: $BEHAT_SUITES"
 TEST_SERVER_URL=$OCIS_URL \
 OCIS_WRAPPER_URL=http://localhost:5200 \
-BEHAT_SUITES=apiGraph \
+BEHAT_SUITES=$BEHAT_SUITES \
 BEHAT_FILTER_TAGS="~@skip&&~@skipOnGraph&&~@skipOnOcis-OCIS-Storage" \
 EXPECTED_FAILURES_FILE="$REPO_ROOT/tests/acceptance/expected-failures-localAPI-on-OCIS-storage.md" \
 STORAGE_DRIVER=ocis \
