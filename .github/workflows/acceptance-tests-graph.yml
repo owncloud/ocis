@@ -23,7 +23,7 @@ jobs:
           tools: composer
 
       - name: Build ocis
-        run: make build
+        run: make -C ocis build
 
       - name: Build ociswrapper
         run: make -C tests/ociswrapper build
