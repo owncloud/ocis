@@ -1,0 +1,40 @@
+name: Acceptance Tests
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  acceptance-tests-graph:
+    name: ${{ matrix.suite }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        suite:
+          - apiGraph
+          - apiGraphGroup
+          - apiGraphUser
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.4"
+          extensions: curl, xml, mbstring, zip
+          tools: composer
+
+      - name: Run ${{ matrix.suite }}
+        run: BEHAT_SUITES=${{ matrix.suite }} bash tests/acceptance/run-github.sh
+
+      - name: Upload test logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-logs-${{ matrix.suite }}
+          path: tests/acceptance/output/
