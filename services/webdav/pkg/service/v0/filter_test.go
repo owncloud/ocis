@@ -206,9 +206,10 @@ func TestFilterFilesReturns207WithFavorites(t *testing.T) {
 		t.Fatalf("expected 1 favorite response, got %d", len(ms.Responses))
 	}
 
-	// Check href
-	if !strings.Contains(ms.Responses[0].Href, "/dav/files/alice/favorite-doc.txt") {
-		t.Errorf("unexpected href: %s", ms.Responses[0].Href)
+	// Check href — personal space favorites use /dav/files/<user>/ format
+	expectedHref := "/dav/files/alice/favorite-doc.txt"
+	if ms.Responses[0].Href != expectedHref {
+		t.Errorf("expected href %q, got %q", expectedHref, ms.Responses[0].Href)
 	}
 }
 
@@ -390,14 +391,53 @@ func TestFilterFilesHrefsUseFilesPrefix(t *testing.T) {
 		t.Fatalf("expected 1 response, got %d", len(ms.Responses))
 	}
 
+	// Personal space favorites use /dav/files/<user>/ format
 	expectedHref := "/dav/files/bob/Documents/notes.md"
 	if ms.Responses[0].Href != expectedHref {
 		t.Errorf("expected href %q, got %q", expectedHref, ms.Responses[0].Href)
 	}
+}
 
-	// Verify it does NOT use /dav/spaces/ format
-	if strings.Contains(ms.Responses[0].Href, "/dav/spaces/") {
-		t.Errorf("href should not contain /dav/spaces/: %s", ms.Responses[0].Href)
+func TestFilterFilesSkipsProjectSpaces(t *testing.T) {
+	gwClient := cs3mocks.NewGatewayAPIClient(t)
+	svc := setupTestWebdav(t, gwClient)
+
+	mockCheckPermission(gwClient, true)
+	mockWhoAmI(gwClient, "alice")
+
+	projectSpace := &provider.StorageSpace{
+		Id:        &provider.StorageSpaceId{OpaqueId: "proj-space"},
+		SpaceType: "project",
+		Name:      "Engineering",
+		Root: &provider.ResourceId{
+			StorageId: "storage1",
+			SpaceId:   "proj-space",
+			OpaqueId:  "proj-space",
+		},
+	}
+	mockListStorageSpaces(gwClient, []*provider.StorageSpace{projectSpace})
+
+	// No ListContainer mock needed — project spaces should be skipped entirely
+
+	r := newFilterFilesRequest("alice")
+	rep, _ := readReport(r.Body)
+	r = newFilterFilesRequest("alice")
+	rr := httptest.NewRecorder()
+	svc.handleFilterFiles(rr, r, rep.FilterFiles)
+
+	if rr.Code != http.StatusMultiStatus {
+		t.Fatalf("expected 207, got %d: %s", rr.Code, rr.Body.String())
+	}
+
+	var ms propfind.MultiStatusResponseUnmarshalXML
+	if err := xml.Unmarshal(rr.Body.Bytes(), &ms); err != nil {
+		t.Fatalf("unmarshal: %v", err)
+	}
+
+	// Project spaces are not addressable under /dav/files/<user>/,
+	// so they should be skipped — no favorites returned.
+	if len(ms.Responses) != 0 {
+		t.Fatalf("expected 0 responses (project spaces skipped), got %d", len(ms.Responses))
 	}
 }
 
@@ -405,6 +445,7 @@ func TestFilterFilesPermissionDenied(t *testing.T) {
 	gwClient := cs3mocks.NewGatewayAPIClient(t)
 	svc := setupTestWebdav(t, gwClient)
 
+	mockWhoAmI(gwClient, "alice")
 	mockCheckPermission(gwClient, false)
 
 	r := newFilterFilesRequest("alice")

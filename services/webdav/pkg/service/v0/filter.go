@@ -12,7 +12,7 @@ import (
 	gatewayv1beta1 "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	"go-micro.dev/v4/metadata"
+	grpcmetadata "google.golang.org/grpc/metadata"
 
 	"github.com/owncloud/ocis/v2/services/webdav/pkg/constants"
 	"github.com/owncloud/ocis/v2/services/webdav/pkg/net"
@@ -30,9 +30,12 @@ const propOcFavorite = "http://owncloud.org/ns/favorite"
 // favoriteInfo holds a ResourceInfo and the resolved path for href construction.
 type favoriteInfo struct {
 	info *provider.ResourceInfo
-	// href-ready path relative to the files root, e.g. "Documents/notes.md"
-	// or "Shares/Project X/report.pdf"
+	// href-ready path relative to the space root, e.g. "Documents/notes.md"
 	relativePath string
+	// hrefPrefix is the DAV prefix for constructing hrefs, e.g.
+	// "/dav/files/admin" for personal/share spaces or
+	// "/dav/spaces/<storageId>$<spaceId>" for project spaces.
+	hrefPrefix string
 }
 
 // handleFilterFiles handles REPORT requests with oc:filter-files / oc:filter-rules.
@@ -47,7 +50,7 @@ func (g Webdav) handleFilterFiles(w http.ResponseWriter, r *http.Request, ff *re
 
 	t := r.Header.Get(revactx.TokenHeader)
 	ctx := revactx.ContextSetToken(r.Context(), t)
-	ctx = metadata.Set(ctx, revactx.TokenHeader, t)
+	ctx = grpcmetadata.AppendToOutgoingContext(ctx, revactx.TokenHeader, t)
 
 	gwClient, err := g.gatewaySelector.Next()
 	if err != nil {
@@ -55,6 +58,22 @@ func (g Webdav) handleFilterFiles(w http.ResponseWriter, r *http.Request, ff *re
 		renderError(w, r, errInternalError("could not get gateway client"))
 		return
 	}
+
+	// Get current user — needed both for CheckPermission (which reads the
+	// user from the context) and for href construction later.
+	whoAmI, err := gwClient.WhoAmI(ctx, &gatewayv1beta1.WhoAmIRequest{Token: t})
+	if err != nil {
+		logger.Error().Err(err).Msg("error getting current user")
+		renderError(w, r, errInternalError("could not get current user"))
+		return
+	}
+	if whoAmI.Status.Code != rpcv1beta1.Code_CODE_OK {
+		logger.Error().Str("status", whoAmI.Status.Message).Msg("could not get current user")
+		renderError(w, r, errInternalError("could not get current user"))
+		return
+	}
+	ctx = revactx.ContextSetUser(ctx, whoAmI.User)
+	username := whoAmI.User.Username
 
 	// Check permission
 	ok, err := utils.CheckPermission(ctx, permission.ListFavorites, gwClient)
@@ -68,20 +87,6 @@ func (g Webdav) handleFilterFiles(w http.ResponseWriter, r *http.Request, ff *re
 		renderError(w, r, errPermissionDenied("permission denied"))
 		return
 	}
-
-	// Get current user for href construction
-	whoAmI, err := gwClient.WhoAmI(ctx, &gatewayv1beta1.WhoAmIRequest{Token: t})
-	if err != nil {
-		logger.Error().Err(err).Msg("error getting current user")
-		renderError(w, r, errInternalError("could not get current user"))
-		return
-	}
-	if whoAmI.Status.Code != rpcv1beta1.Code_CODE_OK {
-		logger.Error().Str("status", whoAmI.Status.Message).Msg("could not get current user")
-		renderError(w, r, errInternalError("could not get current user"))
-		return
-	}
-	username := whoAmI.User.Username
 
 	// List user's storage spaces
 	spacesResp, err := gwClient.ListStorageSpaces(ctx, &provider.ListStorageSpacesRequest{
@@ -105,7 +110,16 @@ func (g Webdav) handleFilterFiles(w http.ResponseWriter, r *http.Request, ff *re
 		return
 	}
 
-	// Collect favorites across all traversable spaces
+	// Build the /dav/files/<user> href prefix.
+	// The frontend expects all hrefs under this prefix when it sends
+	// REPORT to /dav/files/<user>. Project spaces are not addressable
+	// under this path and are skipped for now.
+	filesPrefix := path.Join("/dav/files", username)
+	if strings.HasPrefix(r.URL.Path, "/remote.php/") {
+		filesPrefix = path.Join("/remote.php/dav/files", username)
+	}
+
+	// Collect favorites across personal and share spaces
 	var favorites []favoriteInfo
 	for _, space := range spacesResp.StorageSpaces {
 		if space.Root == nil {
@@ -124,17 +138,15 @@ func (g Webdav) handleFilterFiles(w http.ResponseWriter, r *http.Request, ff *re
 			}
 			pathPrefix = path.Join("Shares", name)
 		default:
-			// Skip project spaces and other types that don't appear
-			// under /dav/files/<user>/
+			// Project spaces and other types don't appear under
+			// /dav/files/<user>/ — skip for now.
 			continue
 		}
 
-		g.collectFavorites(ctx, gwClient, &provider.Reference{ResourceId: space.Root}, pathPrefix, &favorites)
+		g.collectFavorites(ctx, gwClient, &provider.Reference{ResourceId: space.Root}, pathPrefix, filesPrefix, &favorites)
 	}
 
 	g.sendFavoritesResponse(favorites, w, r)
-
-	_ = username // used implicitly via request URL
 }
 
 // collectFavorites recursively walks a storage space, collecting resources
@@ -144,6 +156,7 @@ func (g Webdav) collectFavorites(
 	client gatewayv1beta1.GatewayAPIClient,
 	ref *provider.Reference,
 	pathPrefix string,
+	hrefPrefix string,
 	results *[]favoriteInfo,
 ) {
 	resp, err := client.ListContainer(ctx, &provider.ListContainerRequest{
@@ -168,13 +181,14 @@ func (g Webdav) collectFavorites(
 				*results = append(*results, favoriteInfo{
 					info:         info,
 					relativePath: childPath,
+					hrefPrefix:   hrefPrefix,
 				})
 			}
 		}
 
 		// Recurse into directories
 		if info.Type == provider.ResourceType_RESOURCE_TYPE_CONTAINER {
-			g.collectFavorites(ctx, client, &provider.Reference{ResourceId: info.Id}, childPath, results)
+			g.collectFavorites(ctx, client, &provider.Reference{ResourceId: info.Id}, childPath, hrefPrefix, results)
 		}
 	}
 }
@@ -183,16 +197,9 @@ func (g Webdav) collectFavorites(
 func (g Webdav) sendFavoritesResponse(favorites []favoriteInfo, w http.ResponseWriter, r *http.Request) {
 	logger := g.log.SubloggerWithRequestID(r.Context())
 
-	// Determine the href prefix based on the request path
-	username, _ := r.Context().Value(constants.ContextKeyID).(string)
-	hrefPrefix := path.Join("/dav/files", username)
-	if strings.HasPrefix(r.URL.Path, "/remote.php/") {
-		hrefPrefix = path.Join("/remote.php/dav/files", username)
-	}
-
 	responses := make([]*propfind.ResponseXML, 0, len(favorites))
 	for i := range favorites {
-		resp := favoriteInfoToPropResponse(&favorites[i], hrefPrefix)
+		resp := favoriteInfoToPropResponse(&favorites[i])
 		responses = append(responses, resp)
 	}
 
@@ -215,11 +222,11 @@ func (g Webdav) sendFavoritesResponse(favorites []favoriteInfo, w http.ResponseW
 }
 
 // favoriteInfoToPropResponse converts a favoriteInfo into a ResponseXML.
-func favoriteInfoToPropResponse(fav *favoriteInfo, hrefPrefix string) *propfind.ResponseXML {
+func favoriteInfoToPropResponse(fav *favoriteInfo) *propfind.ResponseXML {
 	info := fav.info
 
 	response := &propfind.ResponseXML{
-		Href:     net.EncodePath(path.Join(hrefPrefix, fav.relativePath)),
+		Href:     net.EncodePath(path.Join(fav.hrefPrefix, fav.relativePath)),
 		Propstat: []propfind.PropstatXML{},
 	}
 
