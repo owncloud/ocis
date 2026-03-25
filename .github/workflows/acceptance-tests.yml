@@ -62,3 +62,14 @@ jobs:
         with:
           name: test-logs-${{ matrix.suite }}
           path: tests/acceptance/output/
+
+  all-acceptance-tests:
+    needs: [acceptance-tests]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Check all jobs passed
+        run: |
+          if [[ "${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}" == "true" ]]; then
+            exit 1
+          fi
