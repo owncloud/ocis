@@ -1,4 +1,4 @@
-name: Acceptance Tests - Graph
+name: Acceptance Tests
 
 on:
   pull_request:
@@ -30,7 +30,7 @@ jobs:
           tools: composer
 
       - name: Run ${{ matrix.suite }}
-        run: BEHAT_SUITES=${{ matrix.suite }} bash tests/acceptance/run-graph.sh
+        run: BEHAT_SUITES=${{ matrix.suite }} bash tests/acceptance/run-github.sh
 
       - name: Upload test logs
         if: failure()
