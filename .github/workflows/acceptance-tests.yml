@@ -56,26 +56,25 @@ jobs:
           - apiSharingNgItemLinkShare
           - apiSharingNgDriveLinkShare
           - apiSharingNgLinkShareManagement
-          
-          # P1
+                    
           # search
-          # - apiSearch1
-          # - apiSearchContent    # needs Tika
+          - apiSearch1
+          - apiSearchContent    # needs Tika
           # contract & locks
-          # - apiContract
-          # # auth
-          # - apiAuthApp
-          # # settings & notifications (needs email)
-          # - apiSettings
-          # - apiNotification
-          # # antivirus (needs ClamAV)
-          # - apiAntivirus
-          # # federation (needs email + federation ocis)
-          # - apiOcm
-          # # collaboration (needs WOPI)
-          # - apiCollaboration
-          # # cli (needs ClamAV + email)
-          # - cliCommands
+          - apiContract
+          # auth
+          - apiAuthApp
+          # settings & notifications (needs email)
+          - apiSettings
+          - apiNotification
+          # antivirus (needs ClamAV)
+          - apiAntivirus
+          # federation (needs email + federation ocis)
+          - apiOcm
+          # collaboration (needs WOPI)
+          - apiCollaboration
+          # cli (needs ClamAV + email)
+          - cliCommands
           
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -93,13 +92,6 @@ jobs:
 
       - name: Run ${{ matrix.suite }}
         run: BEHAT_SUITES=${{ matrix.suite }} bash tests/acceptance/run-github.sh
-
-      - name: Upload test logs
-        if: failure()
-        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
-        with:
-          name: test-logs-${{ matrix.suite }}
-          path: tests/acceptance/output/
 
   core-api-tests:
     name: ${{ matrix.suite }}
@@ -136,13 +128,6 @@ jobs:
           ACCEPTANCE_TEST_TYPE=core-api
           EXPECTED_FAILURES_FILE=tests/acceptance/expected-failures-API-on-OCIS-storage.md
           bash tests/acceptance/run-github.sh
-
-      - name: Upload test logs
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-logs-${{ matrix.suite }}
-          path: tests/acceptance/output/
 
   all-acceptance-tests:
     needs: [acceptance-tests, core-api-tests]
