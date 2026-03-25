@@ -22,54 +22,6 @@ jobs:
           extensions: curl, xml, mbstring, zip
           tools: composer
 
-      - name: Build ocis
-        run: make -C ocis build
-
-      - name: Build ociswrapper
-        run: make -C tests/ociswrapper build
-
-      - name: Install PHP test dependencies
-        run: |
-          composer install --no-progress
-          composer bin behat install --no-progress
-
-      - name: Start ocis
-        run: |
-          ocis/bin/ocis init --insecure true
-          cp tests/config/drone/app-registry.yaml $HOME/.ocis/config/app-registry.yaml
-          env \
-            OCIS_URL=https://localhost:9200 \
-            OCIS_CONFIG_DIR=$HOME/.ocis/config \
-            STORAGE_USERS_DRIVER=ocis \
-            PROXY_ENABLE_BASIC_AUTH=true \
-            OCIS_LOG_LEVEL=error \
-            IDM_CREATE_DEMO_USERS=true \
-            IDM_ADMIN_PASSWORD=admin \
-            OCIS_ASYNC_UPLOADS=true \
-            OCIS_EVENTS_ENABLE_TLS=false \
-            NATS_NATS_HOST=0.0.0.0 \
-            NATS_NATS_PORT=9233 \
-            OCIS_JWT_SECRET=some-ocis-jwt-secret \
-            WEB_UI_CONFIG_FILE=tests/config/drone/ocis-config.json \
-          tests/ociswrapper/bin/ociswrapper serve \
-            --bin ocis/bin/ocis \
-            --url https://localhost:9200 \
-            --admin-username admin \
-            --admin-password admin &
-
-      - name: Wait for ocis
-        run: |
-          timeout 300 bash -c \
-            'while [ $(curl -sk -uadmin:admin https://localhost:9200/graph/v1.0/users/admin \
-              -w %{http_code} -o /dev/null) != 200 ]; do sleep 1; done'
-
       - name: Run graph acceptance tests
-        env:
-          TEST_SERVER_URL: https://localhost:9200
-          OCIS_WRAPPER_URL: http://localhost:5200
-          BEHAT_SUITES: apiGraph
-          BEHAT_FILTER_TAGS: "~@skip&&~@skipOnGraph&&~@skipOnOcis-OCIS-Storage"
-          EXPECTED_FAILURES_FILE: tests/acceptance/expected-failures-localAPI-on-OCIS-storage.md
-          STORAGE_DRIVER: ocis
-        run: make test-acceptance-api
+        run: bash tests/acceptance/run-graph.sh
 
