@@ -20,6 +20,7 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"math/bits"
 	"net"
 	"net/url"
 	"reflect"
@@ -165,7 +166,7 @@ func urlsAreEqual(u1, u2 *url.URL) bool {
 // e.g. comma(834142) -> 834,142
 //
 // This function was copied from the github.com/dustin/go-humanize
-// package and is Copyright Dustin Sallings <dustin@spy.net>
+// package (MIT License) and is Copyright Dustin Sallings <dustin@spy.net>
 func comma(v int64) string {
 	sign := ""
 
@@ -362,4 +363,24 @@ func parallelTaskQueue(mp int) chan<- func() {
 		}()
 	}
 	return tq
+}
+
+// addSaturate returns a + b, saturating at math.MaxInt64.
+// Both a and b must be non-negative.
+func addSaturate(a, b int64) int64 {
+	sum, carry := bits.Add64(uint64(a), uint64(b), 0)
+	if carry != 0 || sum > uint64(math.MaxInt64) {
+		return math.MaxInt64
+	}
+	return int64(sum)
+}
+
+// mulSaturate returns a * b, saturating at math.MaxInt64.
+// Both a and b must be non-negative.
+func mulSaturate(a, b int64) int64 {
+	hi, lo := bits.Mul64(uint64(a), uint64(b))
+	if hi != 0 || lo > uint64(math.MaxInt64) {
+		return math.MaxInt64
+	}
+	return int64(lo)
 }

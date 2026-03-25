@@ -1563,7 +1563,7 @@ func (a *Account) EnableJetStream(limits map[string]JetStreamAccountLimits, tq c
 		}
 
 		// Add in the stream.
-		mset, err := a.addStream(&cfg.StreamConfig)
+		mset, err := a.recoverStream(&cfg.StreamConfig)
 		if err != nil {
 			s.Warnf("  Error recreating stream %q: %v", cfg.Name, err)
 			// If we removed a keyfile from above make sure to put it back.
@@ -2365,8 +2365,10 @@ func tierName(replicas int) string {
 }
 
 func isSameTier(cfgA, cfgB *StreamConfig) bool {
+	a := max(1, cfgA.Replicas)
+	b := max(1, cfgB.Replicas)
 	// TODO (mh) this is where we could select based off a placement tag as well "qos:tier"
-	return cfgA.Replicas == cfgB.Replicas
+	return a == b
 }
 
 func (jsa *jsAccount) jetStreamAndClustered() (*jetStream, bool) {
@@ -2441,17 +2443,11 @@ func (jsa *jsAccount) wouldExceedLimits(storeType StorageType, tierName string, 
 	// Since tiers are flat we need to scale limit up by replicas when checking.
 	if storeType == MemoryStorage {
 		totalMem := inUse.total.mem + (int64(memStoreMsgSize(subj, hdr, msg)) * r)
-		if selectedLimits.MemoryMaxStreamBytes > 0 && totalMem > selectedLimits.MemoryMaxStreamBytes*lr {
-			return true, nil
-		}
 		if selectedLimits.MaxMemory >= 0 && totalMem > selectedLimits.MaxMemory*lr {
 			return true, nil
 		}
 	} else {
 		totalStore := inUse.total.store + (int64(fileStoreMsgSize(subj, hdr, msg)) * r)
-		if selectedLimits.StoreMaxStreamBytes > 0 && totalStore > selectedLimits.StoreMaxStreamBytes*lr {
-			return true, nil
-		}
 		if selectedLimits.MaxStore >= 0 && totalStore > selectedLimits.MaxStore*lr {
 			return true, nil
 		}
@@ -2490,25 +2486,25 @@ func (js *jetStream) checkBytesLimits(selectedLimits *JetStreamAccountLimits, ad
 	if addBytes < 0 {
 		addBytes = 1
 	}
-	totalBytes := addBytes + maxBytesOffset
+	totalBytes := addSaturate(addBytes, maxBytesOffset)
 
 	switch storage {
 	case MemoryStorage:
 		// Account limits defined.
-		if selectedLimits.MaxMemory >= 0 && currentRes+totalBytes > selectedLimits.MaxMemory {
+		if selectedLimits.MaxMemory >= 0 && (currentRes > selectedLimits.MaxMemory || totalBytes > selectedLimits.MaxMemory-currentRes) {
 			return NewJSMemoryResourcesExceededError()
 		}
 		// Check if this server can handle request.
-		if checkServer && js.memReserved+totalBytes > js.config.MaxMemory {
+		if checkServer && (js.memReserved > js.config.MaxMemory || totalBytes > js.config.MaxMemory-js.memReserved) {
 			return NewJSMemoryResourcesExceededError()
 		}
 	case FileStorage:
 		// Account limits defined.
-		if selectedLimits.MaxStore >= 0 && currentRes+totalBytes > selectedLimits.MaxStore {
+		if selectedLimits.MaxStore >= 0 && (currentRes > selectedLimits.MaxStore || totalBytes > selectedLimits.MaxStore-currentRes) {
 			return NewJSStorageResourcesExceededError()
 		}
 		// Check if this server can handle request.
-		if checkServer && js.storeReserved+totalBytes > js.config.MaxStore {
+		if checkServer && (js.storeReserved > js.config.MaxStore || totalBytes > js.config.MaxStore-js.storeReserved) {
 			return NewJSStorageResourcesExceededError()
 		}
 	}

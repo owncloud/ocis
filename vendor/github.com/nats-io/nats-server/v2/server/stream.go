@@ -428,7 +428,8 @@ type stream struct {
 	cisrun atomic.Bool // Indicates one checkInterestState is already running.
 
 	// Mirror
-	mirror *sourceInfo
+	mirror              *sourceInfo
+	mirrorConsumerSetup *time.Timer
 
 	// Sources
 	sources              map[string]*sourceInfo
@@ -619,19 +620,24 @@ const StreamMaxReplicas = 5
 
 // AddStream adds a stream for the given account.
 func (a *Account) addStream(config *StreamConfig) (*stream, error) {
-	return a.addStreamWithAssignment(config, nil, nil, false)
+	return a.addStreamWithAssignment(config, nil, nil, false, false)
+}
+
+// recoverStream recovers a stream from disk for the given account.
+func (a *Account) recoverStream(config *StreamConfig) (*stream, error) {
+	return a.addStreamWithAssignment(config, nil, nil, false, true)
 }
 
 // AddStreamWithStore adds a stream for the given account with custome store config options.
 func (a *Account) addStreamWithStore(config *StreamConfig, fsConfig *FileStoreConfig) (*stream, error) {
-	return a.addStreamWithAssignment(config, fsConfig, nil, false)
+	return a.addStreamWithAssignment(config, fsConfig, nil, false, false)
 }
 
 func (a *Account) addStreamPedantic(config *StreamConfig, pedantic bool) (*stream, error) {
-	return a.addStreamWithAssignment(config, nil, nil, pedantic)
+	return a.addStreamWithAssignment(config, nil, nil, pedantic, false)
 }
 
-func (a *Account) addStreamWithAssignment(config *StreamConfig, fsConfig *FileStoreConfig, sa *streamAssignment, pedantic bool) (*stream, error) {
+func (a *Account) addStreamWithAssignment(config *StreamConfig, fsConfig *FileStoreConfig, sa *streamAssignment, pedantic, recovering bool) (*stream, error) {
 	s, jsa, err := a.checkForJetStream()
 	if err != nil {
 		return nil, err
@@ -678,6 +684,7 @@ func (a *Account) addStreamWithAssignment(config *StreamConfig, fsConfig *FileSt
 		}()
 	}
 
+	// Note that isClustered will be false during recovery, even if we're part of a cluster. It shouldn't be used then.
 	js, isClustered := jsa.jetStreamAndClustered()
 	jsa.mu.Lock()
 	if mset, ok := jsa.streams[cfg.Name]; ok {
@@ -707,25 +714,30 @@ func (a *Account) addStreamWithAssignment(config *StreamConfig, fsConfig *FileSt
 	jsa.usageMu.RLock()
 	selected, tier, hasTier := jsa.selectLimits(cfg.Replicas)
 	jsa.usageMu.RUnlock()
-	reserved := int64(0)
-	if !isClustered {
-		reserved = jsa.tieredReservation(tier, cfg)
-	}
-	jsa.mu.Unlock()
 
 	if !hasTier {
+		jsa.mu.Unlock()
 		return nil, NewJSNoLimitsError()
 	}
-	js.mu.RLock()
-	if isClustered {
-		_, reserved = tieredStreamAndReservationCount(js.cluster.streams[a.Name], tier, cfg)
-	}
-	if err := js.checkAllLimits(&selected, cfg, reserved, 0); err != nil {
+
+	// Skip if we're recovering.
+	if !recovering {
+		reserved := int64(0)
+		if !isClustered {
+			reserved = jsa.tieredReservation(tier, cfg)
+		}
+		jsa.mu.Unlock()
+		js.mu.RLock()
+		if isClustered {
+			_, reserved = js.tieredStreamAndReservationCount(a.Name, tier, cfg)
+		}
+		if err := js.checkAllLimits(&selected, cfg, reserved, 0); err != nil {
+			js.mu.RUnlock()
+			return nil, err
+		}
 		js.mu.RUnlock()
-		return nil, err
+		jsa.mu.Lock()
 	}
-	js.mu.RUnlock()
-	jsa.mu.Lock()
 	// Check for template ownership if present.
 	if cfg.Template != _EMPTY_ && jsa.account != nil {
 		if !jsa.checkTemplateOwnership(cfg.Template, cfg.Name) {
@@ -788,11 +800,6 @@ func (a *Account) addStreamWithAssignment(config *StreamConfig, fsConfig *FileSt
 	if jsa.subjectsOverlap(cfg.Subjects, nil) {
 		jsa.mu.Unlock()
 		return nil, NewJSStreamSubjectOverlapError()
-	}
-
-	if !hasTier {
-		jsa.mu.Unlock()
-		return nil, fmt.Errorf("no applicable tier found")
 	}
 
 	// Setup the internal clients.
@@ -1088,8 +1095,12 @@ func (mset *stream) monitorQuitC() <-chan struct{} {
 	if mset == nil {
 		return nil
 	}
-	mset.mu.RLock()
-	defer mset.mu.RUnlock()
+	mset.mu.Lock()
+	defer mset.mu.Unlock()
+	// Recreate if a prior monitor routine was stopped.
+	if mset.mqch == nil {
+		mset.mqch = make(chan struct{})
+	}
 	return mset.mqch
 }
 
@@ -1819,7 +1830,7 @@ func (s *Server) checkStreamCfg(config *StreamConfig, acc *Account, pedantic boo
 		}
 	}
 
-	// check for duplicates
+	// check sources for duplicates
 	var iNames = make(map[string]struct{})
 	for _, src := range cfg.Sources {
 		if src == nil || !isValidName(src.Name) {
@@ -1830,6 +1841,30 @@ func (s *Server) checkStreamCfg(config *StreamConfig, acc *Account, pedantic boo
 		} else {
 			return StreamConfig{}, NewJSSourceDuplicateDetectedError()
 		}
+
+		if src.FilterSubject != _EMPTY_ && len(src.SubjectTransforms) != 0 {
+			return StreamConfig{}, NewJSSourceMultipleFiltersNotAllowedError()
+		}
+
+		for _, tr := range src.SubjectTransforms {
+			if tr.Source != _EMPTY_ && !IsValidSubject(tr.Source) {
+				return StreamConfig{}, NewJSSourceInvalidSubjectFilterError(fmt.Errorf("%w %s", ErrBadSubject, tr.Source))
+			}
+			err := ValidateMapping(tr.Source, tr.Destination)
+			if err != nil {
+				return StreamConfig{}, NewJSSourceInvalidTransformDestinationError(err)
+			}
+		}
+
+		// Check subject filters overlap.
+		for outer, tr := range src.SubjectTransforms {
+			for inner, innertr := range src.SubjectTransforms {
+				if inner != outer && subjectIsSubsetMatch(tr.Source, innertr.Source) {
+					return StreamConfig{}, NewJSSourceOverlappingSubjectFiltersError()
+				}
+			}
+		}
+
 		// Do not perform checks if External is provided, as it could lead to
 		// checking against itself (if sourced stream name is the same on different JetStream)
 		if src.External == nil {
@@ -1840,30 +1875,6 @@ func (s *Server) checkStreamCfg(config *StreamConfig, acc *Account, pedantic boo
 			if exists {
 				if cfg.MaxMsgSize > 0 && maxMsgSize > 0 && cfg.MaxMsgSize < maxMsgSize {
 					return StreamConfig{}, NewJSSourceMaxMessageSizeTooBigError()
-				}
-			}
-
-			if src.FilterSubject != _EMPTY_ && len(src.SubjectTransforms) != 0 {
-				return StreamConfig{}, NewJSSourceMultipleFiltersNotAllowedError()
-			}
-
-			for _, tr := range src.SubjectTransforms {
-				if tr.Source != _EMPTY_ && !IsValidSubject(tr.Source) {
-					return StreamConfig{}, NewJSSourceInvalidSubjectFilterError(fmt.Errorf("%w %s", ErrBadSubject, tr.Source))
-				}
-
-				err := ValidateMapping(tr.Source, tr.Destination)
-				if err != nil {
-					return StreamConfig{}, NewJSSourceInvalidTransformDestinationError(err)
-				}
-			}
-
-			// Check subject filters overlap.
-			for outer, tr := range src.SubjectTransforms {
-				for inner, innertr := range src.SubjectTransforms {
-					if inner != outer && subjectIsSubsetMatch(tr.Source, innertr.Source) {
-						return StreamConfig{}, NewJSSourceOverlappingSubjectFiltersError()
-					}
 				}
 			}
 			continue
@@ -1957,7 +1968,7 @@ func (s *Server) checkStreamCfg(config *StreamConfig, acc *Account, pedantic boo
 		// Check for literal duplication of subject interest in config
 		// and no overlap with any JS or SYS API subject space.
 		dset := make(map[string]struct{}, len(cfg.Subjects))
-		for _, subj := range cfg.Subjects {
+		for i, subj := range cfg.Subjects {
 			// Make sure the subject is valid. Check this first.
 			if !IsValidSubject(subj) {
 				return StreamConfig{}, NewJSStreamInvalidConfigError(fmt.Errorf("invalid subject"))
@@ -1991,6 +2002,13 @@ func (s *Server) checkStreamCfg(config *StreamConfig, acc *Account, pedantic boo
 					}
 				}
 			}
+			// Now check if we have multiple subjects that we do not overlap ourselves
+			// which would cause duplicate entries (assuming no MsgID).
+			for _, tsubj := range cfg.Subjects[i+1:] {
+				if SubjectsCollide(tsubj, subj) {
+					return StreamConfig{}, NewJSStreamInvalidConfigError(fmt.Errorf("subject %q overlaps with %q", subj, tsubj))
+				}
+			}
 			// Mark for duplicate check.
 			dset[subj] = struct{}{}
 		}
@@ -2006,18 +2024,6 @@ func (s *Server) checkStreamCfg(config *StreamConfig, acc *Account, pedantic boo
 		return StreamConfig{}, NewJSStreamMaxBytesRequiredError()
 	} else if limit > 0 && cfg.MaxBytes > limit {
 		return StreamConfig{}, NewJSStreamMaxStreamBytesExceededError()
-	}
-
-	// Now check if we have multiple subjects they we do not overlap ourselves
-	// which would cause duplicate entries (assuming no MsgID).
-	if len(cfg.Subjects) > 1 {
-		for _, subj := range cfg.Subjects {
-			for _, tsubj := range cfg.Subjects {
-				if tsubj != subj && SubjectsCollide(tsubj, subj) {
-					return StreamConfig{}, NewJSStreamInvalidConfigError(fmt.Errorf("subject %q overlaps with %q", subj, tsubj))
-				}
-			}
-		}
 	}
 
 	// Check the subject transform if any
@@ -2109,10 +2115,6 @@ func (jsa *jsAccount) configUpdateCheck(old, new *StreamConfig, s *Server, pedan
 	// Name must match.
 	if cfg.Name != old.Name {
 		return nil, NewJSStreamInvalidConfigError(fmt.Errorf("stream configuration name must match original"))
-	}
-	// Can't change MaxConsumers for now.
-	if cfg.MaxConsumers != old.MaxConsumers {
-		return nil, NewJSStreamInvalidConfigError(fmt.Errorf("stream configuration update can not change MaxConsumers"))
 	}
 	// Can't change storage types.
 	if cfg.Storage != old.Storage {
@@ -2230,13 +2232,15 @@ func (jsa *jsAccount) configUpdateCheck(old, new *StreamConfig, s *Server, pedan
 	js.mu.RLock()
 	defer js.mu.RUnlock()
 	if isClustered {
-		_, reserved = tieredStreamAndReservationCount(js.cluster.streams[acc.Name], tier, &cfg)
+		_, reserved = js.tieredStreamAndReservationCount(acc.Name, tier, &cfg)
 	}
 	// reservation does not account for this stream, hence add the old value
-	if tier == _EMPTY_ && old.Replicas > 1 {
-		reserved += old.MaxBytes * int64(old.Replicas)
-	} else {
-		reserved += old.MaxBytes
+	if old.MaxBytes > 0 {
+		if tier == _EMPTY_ && old.Replicas > 1 {
+			reserved = addSaturate(reserved, mulSaturate(int64(old.Replicas), old.MaxBytes))
+		} else {
+			reserved = addSaturate(reserved, old.MaxBytes)
+		}
 	}
 	if err := js.checkAllLimits(&selected, &cfg, reserved, maxBytesOffset); err != nil {
 		return nil, err
@@ -2805,6 +2809,12 @@ func (mset *stream) processMirrorMsgs(mirror *sourceInfo, ready *sync.WaitGroup)
 	// Grab stream quit channel.
 	mset.mu.Lock()
 	msgs, qch, siqch := mirror.msgs, mset.qch, mirror.qch
+	// If the mirror was already canceled before we got here, exit early.
+	if siqch == nil {
+		mset.mu.Unlock()
+		ready.Done()
+		return
+	}
 	// Set the last seen as now so that we don't fail at the first check.
 	mirror.last.Store(time.Now().UnixNano())
 	mset.mu.Unlock()
@@ -3119,7 +3129,8 @@ func (mset *stream) scheduleSetupMirrorConsumerRetry() {
 	// Add some jitter.
 	next += time.Duration(rand.Intn(int(100*time.Millisecond))) + 100*time.Millisecond
 
-	time.AfterFunc(next, func() {
+	stopAndClearTimer(&mset.mirrorConsumerSetup)
+	mset.mirrorConsumerSetup = time.AfterFunc(next, func() {
 		mset.mu.Lock()
 		mset.setupMirrorConsumer()
 		mset.mu.Unlock()
@@ -3409,6 +3420,7 @@ func (mset *stream) setupMirrorConsumer() error {
 						"consumer": mirror.cname,
 					},
 				) {
+					mirror.wg.Done()
 					ready.Done()
 				}
 			}
@@ -3971,7 +3983,6 @@ func (mset *stream) processInboundSourceMsg(si *sourceInfo, m *inMsg) bool {
 	} else {
 		err = mset.processJetStreamMsg(m.subj, _EMPTY_, hdr, msg, 0, 0, nil, true, true)
 	}
-
 	if err != nil {
 		s := mset.srv
 		if strings.Contains(err.Error(), "no space left") {
@@ -3981,31 +3992,35 @@ func (mset *stream) processInboundSourceMsg(si *sourceInfo, m *inMsg) bool {
 			mset.mu.RLock()
 			accName, sname, iName := mset.acc.Name, mset.cfg.Name, si.iname
 			mset.mu.RUnlock()
-
-			// Can happen temporarily all the time during normal operations when the sourcing stream
-			// is working queue/interest with a limit and discard new.
-			// TODO - Improve sourcing to WQ with limit and new to use flow control rather than re-creating the consumer.
-			if errors.Is(err, ErrMaxMsgs) || errors.Is(err, ErrMaxBytes) {
+			// Can happen temporarily all the time during normal operations when the sourcing stream is discard new
+			// (example use case is for sourcing into a work queue)
+			// TODO - Maybe improve sourcing to WQ with limit and new to use flow control rather than re-creating the consumer.
+			if errors.Is(err, ErrMaxMsgs) || errors.Is(err, ErrMaxBytes) || errors.Is(err, ErrMaxMsgsPerSubject) {
 				// Do not need to do a full retry that includes finding the last sequence in the stream
 				// for that source. Just re-create starting with the seq we couldn't store instead.
 				mset.mu.Lock()
 				mset.retrySourceConsumerAtSeq(iName, si.sseq)
 				mset.mu.Unlock()
 			} else {
-				// Log some warning for errors other than errLastSeqMismatch or errMaxMsgs.
-				if !errors.Is(err, errLastSeqMismatch) {
+				// Log some warning for errors other than errLastSeqMismatch.
+				if !errors.Is(err, errLastSeqMismatch) && !errors.Is(err, errMsgIdDuplicate) {
 					s.RateLimitWarnf("Error processing inbound source %q for '%s' > '%s': %v",
 						iName, accName, sname, err)
 				}
-				// Retry in all type of errors if we are still leader.
+				// Retry in all type of errors we do not want to skip if we are still leader.
 				if mset.isLeader() {
-					// This will make sure the source is still in mset.sources map,
-					// find the last sequence and then call setupSourceConsumer.
-					iNameMap := map[string]struct{}{iName: {}}
-					mset.setStartingSequenceForSources(iNameMap)
-					mset.mu.Lock()
-					mset.retrySourceConsumerAtSeq(iName, si.sseq+1)
-					mset.mu.Unlock()
+					if !errors.Is(err, errMsgIdDuplicate) {
+						// This will make sure the source is still in mset.sources map,
+						// find the last sequence and then call setupSourceConsumer.
+						iNameMap := map[string]struct{}{iName: {}}
+						mset.setStartingSequenceForSources(iNameMap)
+						mset.mu.Lock()
+						mset.retrySourceConsumerAtSeq(iName, si.sseq+1)
+						mset.mu.Unlock()
+					} else {
+						// skipping the message but keep processing the rest of the batch
+						return true
+					}
 				}
 			}
 		}
@@ -5400,6 +5415,7 @@ func (mset *stream) getDirectRequest(req *JSApiMsgGetRequest, reply string) {
 // processInboundJetStreamMsg handles processing messages bound for a stream.
 func (mset *stream) processInboundJetStreamMsg(_ *subscription, c *client, _ *Account, subject, reply string, rmsg []byte) {
 	hdr, msg := c.msgParts(copyBytes(rmsg)) // Need to copy.
+	hdr = removeHeaderStatusIfPresent(hdr)
 	if mt, traceOnly := c.isMsgTraceEnabled(); mt != nil {
 		// If message is delivered, we need to disable the message trace headers
 		// to prevent a trace event to be generated when a stored message
@@ -5795,7 +5811,7 @@ func (mset *stream) processJetStreamMsg(subject, reply string, hdr, msg []byte, 
 				mset.ddMu.Unlock()
 				if seq > 0 {
 					if canRespond {
-						response := append(pubAck, strconv.FormatUint(dde.seq, 10)...)
+						response := append(pubAck, strconv.FormatUint(seq, 10)...)
 						response = append(response, ",\"duplicate\": true}"...)
 						outq.sendMsg(reply, response)
 					}
@@ -6753,36 +6769,31 @@ type jsPubMsg struct {
 	o *consumer
 }
 
-var jsPubMsgPool sync.Pool
+var jsPubMsgPool = sync.Pool{
+	New: func() any {
+		return &jsPubMsg{}
+	},
+}
 
 func newJSPubMsg(dsubj, subj, reply string, hdr, msg []byte, o *consumer, seq uint64) *jsPubMsg {
-	var m *jsPubMsg
-	var buf []byte
-	pm := jsPubMsgPool.Get()
-	if pm != nil {
-		m = pm.(*jsPubMsg)
-		buf = m.buf[:0]
-		if hdr != nil {
-			hdr = append(m.hdr[:0], hdr...)
-		}
-	} else {
-		m = new(jsPubMsg)
+	m := getJSPubMsgFromPool()
+	if m.buf == nil {
+		m.buf = make([]byte, 0, len(hdr)+len(msg))
 	}
+	buf := append(m.buf[:0], hdr...)
+	buf = append(buf, msg...)
+	hdr = buf[:len(hdr):len(hdr)]
+	msg = buf[len(hdr):]
 	// When getting something from a pool it is critical that all fields are
 	// initialized. Doing this way guarantees that if someone adds a field to
 	// the structure, the compiler will fail the build if this line is not updated.
 	(*m) = jsPubMsg{dsubj, reply, StoreMsg{subj, hdr, msg, buf, seq, 0}, o}
-
 	return m
 }
 
 // Gets a jsPubMsg from the pool.
 func getJSPubMsgFromPool() *jsPubMsg {
-	pm := jsPubMsgPool.Get()
-	if pm != nil {
-		return pm.(*jsPubMsg)
-	}
-	return new(jsPubMsg)
+	return jsPubMsgPool.Get().(*jsPubMsg)
 }
 
 func (pm *jsPubMsg) returnToPool() {
@@ -6792,9 +6803,6 @@ func (pm *jsPubMsg) returnToPool() {
 	pm.subj, pm.dsubj, pm.reply, pm.hdr, pm.msg, pm.o = _EMPTY_, _EMPTY_, _EMPTY_, nil, nil, nil
 	if len(pm.buf) > 0 {
 		pm.buf = pm.buf[:0]
-	}
-	if len(pm.hdr) > 0 {
-		pm.hdr = pm.hdr[:0]
 	}
 	jsPubMsgPool.Put(pm)
 }
@@ -7691,15 +7699,8 @@ func (mset *stream) ackMsg(o *consumer, seq uint64) bool {
 		return false
 	}
 
-	var shouldRemove bool
-	switch mset.cfg.Retention {
-	case WorkQueuePolicy:
-		// Normally we just remove a message when its ack'd here but if we have direct consumers
-		// from sources and/or mirrors we need to make sure they have delivered the msg.
-		shouldRemove = mset.directs <= 0 || mset.noInterest(seq, o)
-	case InterestPolicy:
-		shouldRemove = mset.noInterest(seq, o)
-	}
+	// If there's no interest left on this message for all consumers, we can remove it.
+	shouldRemove := mset.noInterest(seq, nil)
 
 	// If nothing else to do.
 	if !shouldRemove {
@@ -7810,7 +7811,7 @@ func (a *Account) RestoreStream(ncfg *StreamConfig, r io.Reader) (*stream, error
 	if hasTier {
 		if isClustered {
 			js.mu.RLock()
-			_, reserved = tieredStreamAndReservationCount(js.cluster.streams[a.Name], tier, &cfg)
+			_, reserved = js.tieredStreamAndReservationCount(a.Name, tier, &cfg)
 			js.mu.RUnlock()
 		} else {
 			reserved = jsa.tieredReservation(tier, &cfg)
